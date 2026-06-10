@@ -1,0 +1,27 @@
+﻿# Auto-detect text files and perform LF normalization
+* text=auto
+
+# Source code files - force CRLF line endings on checkout for Windows compatibility in VS 2026
+*.cs text eol=crlf
+*.csproj text eol=crlf
+*.sln text eol=crlf
+*.slnx text eol=crlf
+*.config text eol=crlf
+*.xml text eol=crlf
+*.json text eol=crlf
+
+# Documentation files
+*.md text eol=crlf
+*.txt text eol=crlf
+LICENSE text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.dll binary
+*.exe binary

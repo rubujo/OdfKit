@@ -1,0 +1,95 @@
+﻿## Ignore Visual Studio temp files, build results, and caches
+## Suitable for Visual Studio 2026 and modern .NET development
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/ActiveState Co-op)
+*.userprefs
+
+# Mono auto-generated files
+mono_crash.*
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+x64/
+x86/
+SDK/
+bld/
+bin/
+Bin/
+obj/
+Obj/
+Log/
+Logs/
+
+# Visual Studio 2015/2017/2019/2022/2026 cache directory
+.vs/
+# Generated Folders
+# (Exclude folders containing source code or necessary project assets)
+[Aa]gents/
+[Aa]gents_backup/
+[Tt]emp/
+TestResults/
+
+# Roslyn cache directories
+.ilc/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-agent*
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Visual Studio Code
+.vscode/
+
+# Compiled Utility resources
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# MSBuild
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Packages folder
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.assets.json
+
+# Tooling
+.tools/
+.cli/
+.paket/
+
+# Project specifications

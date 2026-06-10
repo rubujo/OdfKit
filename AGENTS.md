@@ -1,0 +1,63 @@
+# OdfKit 專案 Agent 開發規範 (AGENTS.md)
+
+本檔案為所有參與此專案之 AI 開發 Agent（如 Codex、Claude Code、GitHub Copilot、Antigravity、Grok Build 等）的**單一事實來源 (Single Source of Truth)**。
+
+---
+
+## 1. 專案背景與技術棧
+- **專案名稱**：OdfKit
+- **程式語言**：C# / .NET
+- **目標架構**：`net10.0` 與 `netstandard2.0`（雙平台編譯）
+- **核心第三方相依套件**（詳細版本參見專案檔，如 `OdfKit.csproj`）：
+  - `PDFsharp` (採用 MIT 授權)
+  - `CommunityToolkit.HighPerformance` (採用 MIT 授權)
+  - `System.Security.Cryptography.Xml` (採用 MIT 授權)
+- **授權協議**：**CC0-1.0 Universal** (專案原創程式碼屬公有領域；第三方套件維持其原 MIT 授權)。
+
+---
+
+## 2. 核心架構與編碼規則
+在修改或擴充此程式庫時，所有 Agent 必須嚴格遵守以下設計約束：
+
+### A. 程式碼風格與完整性
+- **語言版本**：採用目標 SDK 支援之最新 C# 語法。
+- **註解與文件**：必須完整保留所有既有的 XML 註解與程式碼說明，除非有明確要求，否則不得刪除或簡化。
+- **可空性 (Nullability)**：專案已啟用可空類型標記 (`<Nullable>enable</Nullable>`)，請撰寫 Null 安全的程式碼。
+- **異常處理**：針對 ZIP 串流解析、XML 讀寫等底層操作，務必進行防禦性異常攔截與資源釋放。
+
+### B. ODF 與 XML 協定規格
+- **命名空間處理**：一律使用與前綴無關的 `NamespaceURI` + `LocalName` 作為 XML 節點與屬性的比對基準。
+- **ZIP 檔案路徑**：ZIP 封裝容器內的所有 Entry 路徑分隔符號必須統一使用正斜線 (`/`)，以符合 ODF 標準規範。
+- **日期時間格式**：
+  - UTC 日期格式：`"yyyy-MM-ddTHH:mm:ssZ"`
+  - 本地日期格式：`"yyyy-MM-ddTHH:mm:ss"`
+  - 必須安全處理 `DateTime.MinValue` 與 `DateTime.MaxValue` 的邊界值，防止時區轉換位移導致程式崩潰。
+
+### C. 效能與記憶體安全
+- **高效流式寫入**：`OdsStreamWriter` 必須採用超低記憶體設計，確保在導出大數據時，記憶體佔用小於 1MB。善用 `CommunityToolkit.HighPerformance` 或 `Span<T>` / `ReadOnlySpan<T>` 等無分配 API。
+- **XXE 與 DoS 防禦**：顯式設定 `XmlReaderSettings`，禁用外部 DTD 解析與 XML 實體展開，以杜絕 XXE 安全漏洞。
+- **Zip Slip 漏洞防禦**：對 ZIP 解壓的目標路徑進行嚴格的合法性檢查，防止目錄穿越攻擊。
+
+### D. Git 提交規範 (Conventional Commits)
+- **規範標準**：嚴格遵循「慣例式提交 (Conventional Commits) v1.0.0」規範。
+- **結構要求**：禁止單行式提交。必須包含「主旨 (Subject)」與「內文 (Body)」，必要時加「腳註 (Footer)」。
+  - 主旨：限制在 50 字元內，描述變更類型（如 `feat`, `fix`, `docs`, `refactor`）與簡要描述，結尾不加句點。
+  - 內文：每行限 72 字元內，說明變更原因與細節，排版須緊湊，避免過多空白換行。
+- **語言限制**：一律使用正體中文臺灣地區用語撰寫提交訊息，僅在必要時使用英文或原文。
+
+---
+
+## 3. 開發常用指令
+- **建置專案**：
+  ```powershell
+  dotnet build
+  ```
+- **執行單元與整合測試**：
+  ```powershell
+  dotnet test
+  ```
+
+---
+
+## 4. 規範擴充與維護
+若要針對特定工具（如 Claude Code 的 `CLAUDE.md` 或 GitHub Copilot 的 `.github/copilot-instructions.md`）配置專屬規則，必須採用**墊片指向 (Shim)** 的方式，直接連結至本 [`AGENTS.md`](file:///d:/Dev/Project/Application/OdfKit/AGENTS.md) 檔案，嚴禁複製與同步重複的文本內容。
