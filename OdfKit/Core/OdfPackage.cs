@@ -1502,12 +1502,17 @@ namespace OdfKit.Core
         private void WriteFlatXmlToStream(Stream targetStream)
         {
             var officeNs = XNamespace.Get(OdfNamespaces.Office);
+            var xmlSettings = new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Prohibit,
+                XmlResolver = null
+            };
 
             // Read content.xml
             XElement contentRoot;
             if (_entries.TryGetValue("content.xml", out var contentEntry))
             {
-                using var reader = XmlReader.Create(contentEntry.OpenReader());
+                using var reader = XmlReader.Create(contentEntry.OpenReader(), xmlSettings);
                 contentRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid content.xml root");
             }
             else
@@ -1519,7 +1524,7 @@ namespace OdfKit.Core
             XElement stylesRoot;
             if (_entries.TryGetValue("styles.xml", out var stylesEntry))
             {
-                using var reader = XmlReader.Create(stylesEntry.OpenReader());
+                using var reader = XmlReader.Create(stylesEntry.OpenReader(), xmlSettings);
                 stylesRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid styles.xml root");
             }
             else
@@ -1531,7 +1536,7 @@ namespace OdfKit.Core
             XElement metaRoot;
             if (_entries.TryGetValue("meta.xml", out var metaEntry))
             {
-                using var reader = XmlReader.Create(metaEntry.OpenReader());
+                using var reader = XmlReader.Create(metaEntry.OpenReader(), xmlSettings);
                 metaRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid meta.xml root");
             }
             else
@@ -1543,7 +1548,7 @@ namespace OdfKit.Core
             XElement settingsRoot;
             if (_entries.TryGetValue("settings.xml", out var settingsEntry))
             {
-                using var reader = XmlReader.Create(settingsEntry.OpenReader());
+                using var reader = XmlReader.Create(settingsEntry.OpenReader(), xmlSettings);
                 settingsRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid settings.xml root");
             }
             else

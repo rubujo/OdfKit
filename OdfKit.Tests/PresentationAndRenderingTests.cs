@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -15,6 +15,7 @@ using OdfKit.Extensions.Rendering;
 
 namespace OdfKit.Tests
 {
+    [Collection("SequentialRenderingTests")]
     public class PresentationAndRenderingTests
     {
         #region 1. OdfComment Tests

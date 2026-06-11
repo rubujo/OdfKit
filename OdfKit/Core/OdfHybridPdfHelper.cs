@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 using Xml = System.Xml;
 using PdfSharp.Pdf;
@@ -228,7 +228,11 @@ namespace OdfKit.Core
 
                 // Load to XmlDocument
                 var xmlDoc = new Xml.XmlDocument();
-                xmlDoc.LoadXml(xmpText);
+                var xmlSettings = new Xml.XmlReaderSettings { DtdProcessing = Xml.DtdProcessing.Prohibit, XmlResolver = null };
+                using (var reader = Xml.XmlReader.Create(new System.IO.StringReader(xmpText), xmlSettings))
+                {
+                    xmlDoc.Load(reader);
+                }
 
                 var nsManager = new Xml.XmlNamespaceManager(xmlDoc.NameTable);
                 nsManager.AddNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
@@ -263,7 +267,10 @@ namespace OdfKit.Core
                         </pdfaExtension:schemas>";
 
                     var tempDoc = new Xml.XmlDocument();
-                    tempDoc.LoadXml(schemaSnippet);
+                    using (var reader = Xml.XmlReader.Create(new System.IO.StringReader(schemaSnippet), xmlSettings))
+                    {
+                        tempDoc.Load(reader);
+                    }
                     var imported = xmlDoc.ImportNode(tempDoc.DocumentElement!, true);
                     descNode.AppendChild(imported);
 
