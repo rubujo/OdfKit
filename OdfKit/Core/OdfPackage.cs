@@ -38,6 +38,21 @@ namespace OdfKit.Core
         public OdfPackageMode Mode => _mode;
         public string? MimeType => _mimetype;
         public IReadOnlyDictionary<string, string> Manifest => _manifest;
+        internal IReadOnlyDictionary<string, OdfPackageEntry> Entries => _entries;
+        internal OdfLoadOptions LoadOptions => _loadOptions;
+        internal OdfSaveOptions SaveOptions => _saveOptions;
+
+        public bool IsEntryEncrypted(string name)
+        {
+            name = SanitizeEntryName(name);
+            return _entries.TryGetValue(name, out var entry) && entry.EncryptionInfo != null;
+        }
+
+        public OdfEncryptionInfo? GetEntryEncryptionInfo(string name)
+        {
+            name = SanitizeEntryName(name);
+            return _entries.TryGetValue(name, out var entry) ? entry.EncryptionInfo : null;
+        }
 
         private OdfPackage(OdfPackageMode mode, Stream? underlyingStream, bool leaveOpen, OdfLoadOptions? loadOptions, OdfSaveOptions? saveOptions)
         {
@@ -158,6 +173,11 @@ namespace OdfKit.Core
 
             // Load manifest
             LoadManifest();
+
+            if (_loadOptions.Password != null || _loadOptions.CryptographyProvider != null)
+            {
+                OdfEncryption.Decrypt(this, _loadOptions.Password ?? string.Empty);
+            }
         }
 
         private void LoadManifest()
@@ -179,21 +199,130 @@ namespace OdfKit.Core
                 IgnoreWhitespace = true
             };
 
+            OdfPackageEntry? currentEntry = null;
+            OdfEncryptionInfo? currentEncryptionInfo = null;
+
             using var reader = XmlReader.Create(stream, settings);
             while (reader.Read())
             {
-                if (reader.NodeType == XmlNodeType.Element && 
-                    reader.LocalName == "file-entry" && 
-                    reader.NamespaceURI == OdfNamespaces.Manifest)
+                if (reader.NodeType == XmlNodeType.Element)
                 {
-                    string? path = reader.GetAttribute("full-path", OdfNamespaces.Manifest);
-                    string? mediaType = reader.GetAttribute("media-type", OdfNamespaces.Manifest);
-
-                    if (path != null && mediaType != null)
+                    if (reader.LocalName == "file-entry" && reader.NamespaceURI == OdfNamespaces.Manifest)
                     {
-                        // Standardize manifest path
-                        string normPath = path == "/" ? "/" : SanitizeEntryName(path);
-                        _manifest[normPath] = mediaType;
+                        string? path = reader.GetAttribute("full-path", OdfNamespaces.Manifest) ?? reader.GetAttribute("full-path");
+                        string? mediaType = reader.GetAttribute("media-type", OdfNamespaces.Manifest) ?? reader.GetAttribute("media-type");
+
+                        if (path != null && mediaType != null)
+                        {
+                            string normPath = path == "/" ? "/" : SanitizeEntryName(path);
+                            _manifest[normPath] = mediaType;
+                            
+                            if (normPath != "/" && _entries.TryGetValue(normPath, out var entry))
+                            {
+                                currentEntry = entry;
+                            }
+                            else
+                            {
+                                currentEntry = null;
+                            }
+                        }
+                        else
+                        {
+                            currentEntry = null;
+                        }
+                        currentEncryptionInfo = null;
+                    }
+                    else if (reader.LocalName == "encryption-data" && reader.NamespaceURI == OdfNamespaces.Manifest && currentEntry != null)
+                    {
+                        currentEncryptionInfo = new OdfEncryptionInfo();
+                        string? checksumType = reader.GetAttribute("checksum-type", OdfNamespaces.Manifest) ?? reader.GetAttribute("checksum-type");
+                        string? checksumStr = reader.GetAttribute("checksum", OdfNamespaces.Manifest) ?? reader.GetAttribute("checksum");
+                        
+                        if (!string.IsNullOrEmpty(checksumType))
+                        {
+                            currentEncryptionInfo.ChecksumType = checksumType;
+                        }
+                        if (!string.IsNullOrEmpty(checksumStr))
+                        {
+                            currentEncryptionInfo.Checksum = Convert.FromBase64String(checksumStr);
+                        }
+                        
+                        currentEntry.EncryptionInfo = currentEncryptionInfo;
+
+                        // Load other attributes into ExtensionProperties
+                        for (int i = 0; i < reader.AttributeCount; i++)
+                        {
+                            reader.MoveToAttribute(i);
+                            if (reader.LocalName != "checksum-type" && reader.LocalName != "checksum")
+                            {
+                                currentEncryptionInfo.ExtensionProperties[reader.LocalName] = reader.Value;
+                            }
+                        }
+                        reader.MoveToElement();
+                    }
+                    else if (reader.LocalName == "algorithm" && reader.NamespaceURI == OdfNamespaces.Manifest && currentEncryptionInfo != null)
+                    {
+                        string? algorithmName = reader.GetAttribute("algorithm-name", OdfNamespaces.Manifest) ?? reader.GetAttribute("algorithm-name");
+                        string? ivStr = reader.GetAttribute("initialisation-vector", OdfNamespaces.Manifest) ?? reader.GetAttribute("initialisation-vector");
+                        
+                        if (!string.IsNullOrEmpty(algorithmName))
+                        {
+                            currentEncryptionInfo.AlgorithmName = algorithmName;
+                        }
+                        if (!string.IsNullOrEmpty(ivStr))
+                        {
+                            currentEncryptionInfo.InitialisationVector = Convert.FromBase64String(ivStr);
+                        }
+                    }
+                    else if (reader.LocalName == "key-derivation" && reader.NamespaceURI == OdfNamespaces.Manifest && currentEncryptionInfo != null)
+                    {
+                        string? derivationName = reader.GetAttribute("key-derivation-name", OdfNamespaces.Manifest) ?? reader.GetAttribute("key-derivation-name");
+                        string? keySizeStr = reader.GetAttribute("key-size", OdfNamespaces.Manifest) ?? reader.GetAttribute("key-size");
+                        string? iterationCountStr = reader.GetAttribute("iteration-count", OdfNamespaces.Manifest) ?? reader.GetAttribute("iteration-count");
+                        string? saltStr = reader.GetAttribute("salt", OdfNamespaces.Manifest) ?? reader.GetAttribute("salt");
+
+                        if (!string.IsNullOrEmpty(derivationName))
+                        {
+                            currentEncryptionInfo.KeyDerivationName = derivationName;
+                        }
+                        if (int.TryParse(keySizeStr, out int keySize))
+                        {
+                            currentEncryptionInfo.KeySize = keySize;
+                        }
+                        if (int.TryParse(iterationCountStr, out int iterationCount))
+                        {
+                            currentEncryptionInfo.IterationCount = iterationCount;
+                        }
+                        if (!string.IsNullOrEmpty(saltStr))
+                        {
+                            currentEncryptionInfo.Salt = Convert.FromBase64String(saltStr);
+                        }
+                    }
+                    else if (reader.LocalName == "start-key-generation" && reader.NamespaceURI == OdfNamespaces.Manifest && currentEncryptionInfo != null)
+                    {
+                        string? startKeyGenName = reader.GetAttribute("start-key-generation-name", OdfNamespaces.Manifest) ?? reader.GetAttribute("start-key-generation-name");
+                        string? startKeySizeStr = reader.GetAttribute("key-size", OdfNamespaces.Manifest) ?? reader.GetAttribute("key-size");
+
+                        if (!string.IsNullOrEmpty(startKeyGenName))
+                        {
+                            currentEncryptionInfo.StartKeyGenerationName = startKeyGenName;
+                        }
+                        if (int.TryParse(startKeySizeStr, out int startKeySize))
+                        {
+                            currentEncryptionInfo.StartKeySize = startKeySize;
+                        }
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.EndElement)
+                {
+                    if (reader.LocalName == "file-entry" && reader.NamespaceURI == OdfNamespaces.Manifest)
+                    {
+                        currentEntry = null;
+                        currentEncryptionInfo = null;
+                    }
+                    else if (reader.LocalName == "encryption-data" && reader.NamespaceURI == OdfNamespaces.Manifest)
+                    {
+                        currentEncryptionInfo = null;
                     }
                 }
             }
@@ -533,47 +662,62 @@ namespace OdfKit.Core
                 // Process formulas and font embedding on save if configured
                 ProcessSaveHooks();
 
-                // Write/update manifest before serialize
-                SaveManifestToEntries();
-
-                if (_underlyingStream != null && _underlyingStream.CanWrite)
+                bool hasEncryption = _saveOptions.Password != null || _saveOptions.CryptographyProvider != null;
+                if (hasEncryption)
                 {
-                    long estimatedSize = 0;
-                    foreach (var entry in _entries.Values)
-                    {
-                        estimatedSize += entry.GetEstimatedSize();
-                    }
+                    OdfEncryption.Encrypt(this, _saveOptions.Password ?? string.Empty, _saveOptions.EncryptionAlgorithm);
+                }
+                try
+                {
+                    // Write/update manifest before serialize
+                    SaveManifestToEntries();
 
-                    bool useTempFile = estimatedSize >= 50 * 1024 * 1024;
-                    Stream tempStream;
-
-                    if (useTempFile)
+                    if (_underlyingStream != null && _underlyingStream.CanWrite)
                     {
-                        string tempDir = _saveOptions.TemporaryDirectory ?? Path.GetTempPath();
-                        if (!Directory.Exists(tempDir))
+                        long estimatedSize = 0;
+                        foreach (var entry in _entries.Values)
                         {
-                            Directory.CreateDirectory(tempDir);
+                            estimatedSize += entry.GetEstimatedSize();
                         }
-                        string tempFilePath = Path.Combine(tempDir, "odfkit_" + Path.GetRandomFileName());
-                        tempStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
-                    }
-                    else
-                    {
-                        tempStream = new MemoryStream();
-                    }
 
-                    try
-                    {
-                        WriteToArchive(tempStream);
+                        bool useTempFile = estimatedSize >= 50 * 1024 * 1024;
+                        Stream tempStream;
 
-                        _underlyingStream.SetLength(0);
-                        tempStream.Position = 0;
-                        tempStream.CopyTo(_underlyingStream);
-                        _underlyingStream.Flush();
+                        if (useTempFile)
+                        {
+                            string tempDir = _saveOptions.TemporaryDirectory ?? Path.GetTempPath();
+                            if (!Directory.Exists(tempDir))
+                            {
+                                Directory.CreateDirectory(tempDir);
+                            }
+                            string tempFilePath = Path.Combine(tempDir, "odfkit_" + Path.GetRandomFileName());
+                            tempStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
+                        }
+                        else
+                        {
+                            tempStream = new MemoryStream();
+                        }
+
+                        try
+                        {
+                            WriteToArchive(tempStream);
+
+                            _underlyingStream.SetLength(0);
+                            tempStream.Position = 0;
+                            tempStream.CopyTo(_underlyingStream);
+                            _underlyingStream.Flush();
+                        }
+                        finally
+                        {
+                            tempStream.Dispose();
+                        }
                     }
-                    finally
+                }
+                finally
+                {
+                    if (hasEncryption)
                     {
-                        tempStream.Dispose();
+                        OdfEncryption.Decrypt(this, _saveOptions.Password ?? string.Empty);
                     }
                 }
             }
@@ -596,53 +740,68 @@ namespace OdfKit.Core
                 // Process formulas and font embedding on save if configured
                 ProcessSaveHooks();
 
-                SaveManifestToEntries();
-
-                if (_underlyingStream != null && _underlyingStream.CanWrite)
+                bool hasEncryption = _saveOptions.Password != null || _saveOptions.CryptographyProvider != null;
+                if (hasEncryption)
                 {
-                    long estimatedSize = 0;
-                    foreach (var entry in _entries.Values)
-                    {
-                        estimatedSize += entry.GetEstimatedSize();
-                    }
+                    OdfEncryption.Encrypt(this, _saveOptions.Password ?? string.Empty, _saveOptions.EncryptionAlgorithm);
+                }
+                try
+                {
+                    SaveManifestToEntries();
 
-                    bool useTempFile = estimatedSize >= 50 * 1024 * 1024;
-                    Stream tempStream;
-
-                    if (useTempFile)
+                    if (_underlyingStream != null && _underlyingStream.CanWrite)
                     {
-                        string tempDir = _saveOptions.TemporaryDirectory ?? Path.GetTempPath();
-                        if (!Directory.Exists(tempDir))
+                        long estimatedSize = 0;
+                        foreach (var entry in _entries.Values)
                         {
-                            Directory.CreateDirectory(tempDir);
+                            estimatedSize += entry.GetEstimatedSize();
                         }
-                        string tempFilePath = Path.Combine(tempDir, "odfkit_" + Path.GetRandomFileName());
-                        tempStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose | FileOptions.Asynchronous);
-                    }
-                    else
-                    {
-                        tempStream = new MemoryStream();
-                    }
 
-                    try
-                    {
-                        await Task.Run(() => WriteToArchive(tempStream), cancellationToken).ConfigureAwait(false);
+                        bool useTempFile = estimatedSize >= 50 * 1024 * 1024;
+                        Stream tempStream;
 
-                        _underlyingStream.SetLength(0);
-                        tempStream.Position = 0;
-                        await tempStream.CopyToAsync(_underlyingStream, 81920, cancellationToken).ConfigureAwait(false);
-                        await _underlyingStream.FlushAsync(cancellationToken).ConfigureAwait(false);
-                    }
-                    finally
-                    {
-                        if (tempStream is IAsyncDisposable asyncTempStream)
+                        if (useTempFile)
                         {
-                            await asyncTempStream.DisposeAsync().ConfigureAwait(false);
+                            string tempDir = _saveOptions.TemporaryDirectory ?? Path.GetTempPath();
+                            if (!Directory.Exists(tempDir))
+                            {
+                                Directory.CreateDirectory(tempDir);
+                            }
+                            string tempFilePath = Path.Combine(tempDir, "odfkit_" + Path.GetRandomFileName());
+                            tempStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose | FileOptions.Asynchronous);
                         }
                         else
                         {
-                            tempStream.Dispose();
+                            tempStream = new MemoryStream();
                         }
+
+                        try
+                        {
+                            await Task.Run(() => WriteToArchive(tempStream), cancellationToken).ConfigureAwait(false);
+
+                            _underlyingStream.SetLength(0);
+                            tempStream.Position = 0;
+                            await tempStream.CopyToAsync(_underlyingStream, 81920, cancellationToken).ConfigureAwait(false);
+                            await _underlyingStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+                        }
+                        finally
+                        {
+                            if (tempStream is IAsyncDisposable asyncTempStream)
+                            {
+                                await asyncTempStream.DisposeAsync().ConfigureAwait(false);
+                            }
+                            else
+                            {
+                                tempStream.Dispose();
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    if (hasEncryption)
+                    {
+                        OdfEncryption.Decrypt(this, _saveOptions.Password ?? string.Empty);
                     }
                 }
             }
@@ -660,8 +819,24 @@ namespace OdfKit.Core
             try
             {
                 ProcessSaveHooks();
-                SaveManifestToEntries();
-                WriteToArchive(destinationStream);
+
+                bool hasEncryption = _saveOptions.Password != null || _saveOptions.CryptographyProvider != null;
+                if (hasEncryption)
+                {
+                    OdfEncryption.Encrypt(this, _saveOptions.Password ?? string.Empty, _saveOptions.EncryptionAlgorithm);
+                }
+                try
+                {
+                    SaveManifestToEntries();
+                    WriteToArchive(destinationStream);
+                }
+                finally
+                {
+                    if (hasEncryption)
+                    {
+                        OdfEncryption.Decrypt(this, _saveOptions.Password ?? string.Empty);
+                    }
+                }
             }
             finally
             {
@@ -677,8 +852,24 @@ namespace OdfKit.Core
             try
             {
                 ProcessSaveHooks();
-                SaveManifestToEntries();
-                await Task.Run(() => WriteToArchive(destinationStream), cancellationToken).ConfigureAwait(false);
+
+                bool hasEncryption = _saveOptions.Password != null || _saveOptions.CryptographyProvider != null;
+                if (hasEncryption)
+                {
+                    OdfEncryption.Encrypt(this, _saveOptions.Password ?? string.Empty, _saveOptions.EncryptionAlgorithm);
+                }
+                try
+                {
+                    SaveManifestToEntries();
+                    await Task.Run(() => WriteToArchive(destinationStream), cancellationToken).ConfigureAwait(false);
+                }
+                finally
+                {
+                    if (hasEncryption)
+                    {
+                        OdfEncryption.Decrypt(this, _saveOptions.Password ?? string.Empty);
+                    }
+                }
             }
             finally
             {
@@ -718,7 +909,46 @@ namespace OdfKit.Core
                     writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
                     writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, key);
                     writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, _manifest[key]);
-                    writer.WriteEndElement();
+
+                    if (_entries.TryGetValue(key, out var entry) && entry.EncryptionInfo != null)
+                    {
+                        var info = entry.EncryptionInfo;
+                        writer.WriteStartElement("encryption-data", OdfNamespaces.Manifest);
+                        writer.WriteAttributeString("manifest", "checksum-type", OdfNamespaces.Manifest, info.ChecksumType);
+                        writer.WriteAttributeString("manifest", "checksum", OdfNamespaces.Manifest, Convert.ToBase64String(info.Checksum));
+
+                        if (info.ExtensionProperties != null)
+                        {
+                            foreach (var prop in info.ExtensionProperties)
+                            {
+                                writer.WriteAttributeString("manifest", prop.Key, OdfNamespaces.Manifest, prop.Value);
+                            }
+                        }
+
+                        writer.WriteStartElement("algorithm", OdfNamespaces.Manifest);
+                        writer.WriteAttributeString("manifest", "algorithm-name", OdfNamespaces.Manifest, info.AlgorithmName);
+                        writer.WriteAttributeString("manifest", "initialisation-vector", OdfNamespaces.Manifest, Convert.ToBase64String(info.InitialisationVector));
+                        writer.WriteEndElement(); // algorithm
+
+                        writer.WriteStartElement("key-derivation", OdfNamespaces.Manifest);
+                        writer.WriteAttributeString("manifest", "key-derivation-name", OdfNamespaces.Manifest, info.KeyDerivationName);
+                        writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.KeySize.ToString());
+                        writer.WriteAttributeString("manifest", "iteration-count", OdfNamespaces.Manifest, info.IterationCount.ToString());
+                        writer.WriteAttributeString("manifest", "salt", OdfNamespaces.Manifest, Convert.ToBase64String(info.Salt));
+                        writer.WriteEndElement(); // key-derivation
+
+                        if (!string.IsNullOrEmpty(info.StartKeyGenerationName) && info.StartKeySize.HasValue)
+                        {
+                            writer.WriteStartElement("start-key-generation", OdfNamespaces.Manifest);
+                            writer.WriteAttributeString("manifest", "start-key-generation-name", OdfNamespaces.Manifest, info.StartKeyGenerationName);
+                            writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.StartKeySize.Value.ToString());
+                            writer.WriteEndElement(); // start-key-generation
+                        }
+
+                        writer.WriteEndElement(); // encryption-data
+                    }
+
+                    writer.WriteEndElement(); // file-entry
                 }
 
                 writer.WriteEndElement(); // manifest
@@ -961,6 +1191,13 @@ namespace OdfKit.Core
         private byte[]? _bytes;
         private Stream? _stream;
         public bool IsCompressed { get; set; } = true;
+        public OdfEncryptionInfo? EncryptionInfo { get; set; }
+
+        public void SetContent(byte[] bytes)
+        {
+            _bytes = bytes;
+            _stream = null;
+        }
 
         public long GetEstimatedSize()
         {

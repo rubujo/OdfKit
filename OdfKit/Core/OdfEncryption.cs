@@ -1,4 +1,7 @@
-﻿using System.Security.Cryptography;
+using System;
+using System.IO;
+using System.IO.Compression;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace OdfKit.Core
@@ -9,53 +12,65 @@ namespace OdfKit.Core
         public const string BlowfishAlgorithmUri = "http://www.w3.org/2001/04/xmldsig-more#blowfish-cbc";
 
         /// <summary>
-        /// 自訂實作 PBKDF2-SHA256。
-        /// 由於 .NET Standard 2.0 下的 Rfc2898DeriveBytes 不支援直接指定 SHA-256 (僅支援 SHA-1)，
-        /// 此自訂實作確保在 .NET 10.0 與 Standard 2.0 上具有完全一致的行為且無需額外套件。
+        /// 自訂實作 PBKDF2，支援 SHA-1 與 SHA-256，以確保在所有平台上的行為完全一致。
         /// </summary>
-        public static byte[] Pbkdf2Sha256(byte[] password, byte[] salt, int iterations, int keyLength)
+        public static byte[] Pbkdf2(byte[] password, byte[] salt, int iterations, int keyLength, string hashName)
         {
-            using (var hmac = new HMACSHA256(password))
+            if (hashName.IndexOf("sha256", StringComparison.OrdinalIgnoreCase) >= 0 || hashName.IndexOf("sha-256", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                byte[] key = new byte[keyLength];
-                int hashLength = hmac.HashSize / 8; // 32 bytes for SHA-256
-                int numBlocks = (keyLength + hashLength - 1) / hashLength;
-                byte[] blockBuf = new byte[salt.Length + 4];
-                Buffer.BlockCopy(salt, 0, blockBuf, 0, salt.Length);
-
-                for (int i = 1; i <= numBlocks; i++)
+                using (var hmac = new HMACSHA256(password))
                 {
-                    // Write block index in big-endian
-                    blockBuf[salt.Length] = (byte)(i >> 24);
-                    blockBuf[salt.Length + 1] = (byte)(i >> 16);
-                    blockBuf[salt.Length + 2] = (byte)(i >> 8);
-                    blockBuf[salt.Length + 3] = (byte)i;
-
-                    byte[] u = hmac.ComputeHash(blockBuf);
-                    byte[] f = new byte[hashLength];
-                    Buffer.BlockCopy(u, 0, f, 0, hashLength);
-
-                    for (int j = 1; j < iterations; j++)
-                    {
-                        u = hmac.ComputeHash(u);
-                        for (int k = 0; k < hashLength; k++)
-                        {
-                            f[k] ^= u[k];
-                        }
-                    }
-
-                    int offset = (i - 1) * hashLength;
-                    int count = Math.Min(hashLength, keyLength - offset);
-                    Buffer.BlockCopy(f, 0, key, offset, count);
+                    return Pbkdf2Hmac(hmac, salt, iterations, keyLength);
                 }
-                return key;
             }
+            else
+            {
+                using (var hmac = new HMACSHA1(password))
+                {
+                    return Pbkdf2Hmac(hmac, salt, iterations, keyLength);
+                }
+            }
+        }
+
+        private static byte[] Pbkdf2Hmac(HMAC hmac, byte[] salt, int iterations, int keyLength)
+        {
+            byte[] key = new byte[keyLength];
+            int hashLength = hmac.HashSize / 8;
+            int numBlocks = (keyLength + hashLength - 1) / hashLength;
+            byte[] blockBuf = new byte[salt.Length + 4];
+            Buffer.BlockCopy(salt, 0, blockBuf, 0, salt.Length);
+
+            for (int i = 1; i <= numBlocks; i++)
+            {
+                blockBuf[salt.Length] = (byte)(i >> 24);
+                blockBuf[salt.Length + 1] = (byte)(i >> 16);
+                blockBuf[salt.Length + 2] = (byte)(i >> 8);
+                blockBuf[salt.Length + 3] = (byte)i;
+
+                byte[] u = hmac.ComputeHash(blockBuf);
+                byte[] f = new byte[hashLength];
+                Buffer.BlockCopy(u, 0, f, 0, hashLength);
+
+                for (int j = 1; j < iterations; j++)
+                {
+                    u = hmac.ComputeHash(u);
+                    for (int k = 0; k < hashLength; k++)
+                    {
+                        f[k] ^= u[k];
+                    }
+                }
+
+                int offset = (i - 1) * hashLength;
+                int count = Math.Min(hashLength, keyLength - offset);
+                Buffer.BlockCopy(f, 0, key, offset, count);
+            }
+            return key;
         }
 
         /// <summary>
         /// 解密單個 ODF 加密 Entry 的內容。
         /// </summary>
-        public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv)
+        public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName = null)
         {
             if (algorithmUri != Aes256AlgorithmUri && algorithmUri != BlowfishAlgorithmUri)
             {
@@ -67,13 +82,46 @@ namespace OdfKit.Core
                 throw new NotSupportedException($"Unsupported key derivation function: {derivationName}.");
             }
 
-            // Derive key
-            byte[] pwdBytes = Encoding.UTF8.GetBytes(password);
-            byte[] derivedKey = Pbkdf2Sha256(pwdBytes, salt, iterationCount, keySize);
+            // Derive password bytes if startKeyGenName is present
+            byte[] pwdBytes;
+            if (startKeyGenName != null)
+            {
+                byte[] rawPassBytes = Encoding.UTF8.GetBytes(password);
+                if (startKeyGenName.IndexOf("sha256", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    using (var sha = SHA256.Create())
+                        pwdBytes = sha.ComputeHash(rawPassBytes);
+                }
+                else if (startKeyGenName.IndexOf("sha1", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    using (var sha = SHA1.Create())
+                        pwdBytes = sha.ComputeHash(rawPassBytes);
+                }
+                else
+                {
+                    pwdBytes = rawPassBytes;
+                }
+            }
+            else
+            {
+                pwdBytes = Encoding.UTF8.GetBytes(password);
+            }
+
+            // Determine hash name for PBKDF2
+            string hashName = "sha256";
+            if (startKeyGenName != null && startKeyGenName.IndexOf("sha1", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                hashName = "sha1";
+            }
+            else if (algorithmUri == BlowfishAlgorithmUri)
+            {
+                hashName = "sha1";
+            }
+
+            byte[] derivedKey = Pbkdf2(pwdBytes, salt, iterationCount, keySize, hashName);
 
             if (algorithmUri == Aes256AlgorithmUri)
             {
-                // Decrypt with AES-CBC
                 using (var aes = Aes.Create())
                 {
                     aes.Key = derivedKey;
@@ -95,7 +143,6 @@ namespace OdfKit.Core
             }
             else
             {
-                // Decrypt with Blowfish-CBC
                 var blowfish = new Blowfish();
                 blowfish.Initialize(derivedKey);
                 return blowfish.DecryptCbc(ciphertext, iv);
@@ -107,7 +154,6 @@ namespace OdfKit.Core
         /// </summary>
         public static byte[] EncryptEntry(byte[] plaintext, string password, OdfEncryptionAlgorithm algorithm, out byte[] iv, out byte[] salt, out byte[] checksum)
         {
-            // Generate random salt and IV
             salt = new byte[16];
             iv = new byte[algorithm == OdfEncryptionAlgorithm.Aes256 ? 16 : 8];
             using (var rng = RandomNumberGenerator.Create())
@@ -116,16 +162,28 @@ namespace OdfKit.Core
                 rng.GetBytes(iv);
             }
 
-            // Derive key
             byte[] pwdBytes = Encoding.UTF8.GetBytes(password);
-            int keySize = algorithm == OdfEncryptionAlgorithm.Aes256 ? 32 : 16; // AES-256 uses 32 bytes, Blowfish uses 16 bytes
-            byte[] derivedKey = Pbkdf2Sha256(pwdBytes, salt, 1024, keySize);
+            int keySize = algorithm == OdfEncryptionAlgorithm.Aes256 ? 32 : 16;
+            
+            byte[] preHashedPwd;
+            byte[] derivedKey;
+            if (algorithm == OdfEncryptionAlgorithm.Aes256)
+            {
+                using (var sha = SHA256.Create())
+                    preHashedPwd = sha.ComputeHash(pwdBytes);
+                derivedKey = Pbkdf2(preHashedPwd, salt, 1024, keySize, "sha256");
+            }
+            else
+            {
+                using (var sha = SHA1.Create())
+                    preHashedPwd = sha.ComputeHash(pwdBytes);
+                derivedKey = Pbkdf2(preHashedPwd, salt, 1024, keySize, "sha1");
+            }
 
             byte[] ciphertext;
 
             if (algorithm == OdfEncryptionAlgorithm.Aes256)
             {
-                // Encrypt with AES-CBC
                 using (var aes = Aes.Create())
                 {
                     aes.Key = derivedKey;
@@ -147,19 +205,214 @@ namespace OdfKit.Core
             }
             else
             {
-                // Encrypt with Blowfish-CBC
                 var blowfish = new Blowfish();
                 blowfish.Initialize(derivedKey);
                 ciphertext = blowfish.EncryptCbc(plaintext, iv);
             }
 
-            // Compute checksum of plaintext (standard ODF 1.3 SHA-256)
             using (var sha = SHA256.Create())
             {
                 checksum = sha.ComputeHash(plaintext);
             }
 
             return ciphertext;
+        }
+
+        public static void Decrypt(OdfPackage package, string password)
+        {
+            foreach (var entry in package.Entries.Values)
+            {
+                if (entry.EncryptionInfo == null) continue;
+
+                byte[] ciphertext;
+                using (var stream = entry.OpenReader())
+                using (var ms = new MemoryStream())
+                {
+                    stream.CopyTo(ms);
+                    ciphertext = ms.ToArray();
+                }
+
+                byte[] decryptedPlaintext;
+
+                IOdfCryptographyProvider? cryptoProvider = null;
+                if (package.LoadOptions.CryptographyProvider != null &&
+                    package.LoadOptions.CryptographyProvider.CanHandle(entry.EncryptionInfo))
+                {
+                    cryptoProvider = package.LoadOptions.CryptographyProvider;
+                }
+                else if (package.SaveOptions.CryptographyProvider != null &&
+                         package.SaveOptions.CryptographyProvider.CanHandle(entry.EncryptionInfo))
+                {
+                    cryptoProvider = package.SaveOptions.CryptographyProvider;
+                }
+
+                if (cryptoProvider != null)
+                {
+                    decryptedPlaintext = cryptoProvider.Decrypt(ciphertext, entry.EncryptionInfo, package.LoadOptions);
+                }
+                else
+                {
+                    byte[] decryptedBytes = DecryptEntry(
+                        ciphertext,
+                        password,
+                        entry.EncryptionInfo.AlgorithmName,
+                        entry.EncryptionInfo.KeyDerivationName,
+                        entry.EncryptionInfo.KeySize,
+                        entry.EncryptionInfo.IterationCount,
+                        entry.EncryptionInfo.Salt,
+                        entry.EncryptionInfo.InitialisationVector,
+                        entry.EncryptionInfo.StartKeyGenerationName
+                    );
+
+                    bool decompressedSuccessfully = false;
+                    byte[]? decompressedBytes = null;
+                    try
+                    {
+                        using (var ms = new MemoryStream(decryptedBytes))
+                        using (var deflate = new DeflateStream(ms, CompressionMode.Decompress))
+                        using (var outMs = new MemoryStream())
+                        {
+                            deflate.CopyTo(outMs);
+                            decompressedBytes = outMs.ToArray();
+                            decompressedSuccessfully = true;
+                        }
+                    }
+                    catch
+                    {
+                        // Fallback verification
+                    }
+
+                    if (decompressedSuccessfully && decompressedBytes != null)
+                    {
+                        byte[] calculatedChecksum = ComputeHash(decompressedBytes, entry.EncryptionInfo.ChecksumType);
+                        if (ByteArrayEquals(calculatedChecksum, entry.EncryptionInfo.Checksum))
+                        {
+                            decryptedPlaintext = decompressedBytes;
+                            goto AssignPlaintext;
+                        }
+                    }
+
+                    byte[] rawCalculatedChecksum = ComputeHash(decryptedBytes, entry.EncryptionInfo.ChecksumType);
+                    if (ByteArrayEquals(rawCalculatedChecksum, entry.EncryptionInfo.Checksum))
+                    {
+                        decryptedPlaintext = decryptedBytes;
+                    }
+                    else
+                    {
+                        throw new CryptographicException("Decryption failed: Checksum mismatch or invalid password.");
+                    }
+                }
+
+            AssignPlaintext:
+                entry.SetContent(decryptedPlaintext);
+                entry.EncryptionInfo = null;
+            }
+        }
+
+        public static void Encrypt(OdfPackage package, string password, OdfEncryptionAlgorithm algorithm = OdfEncryptionAlgorithm.Aes256)
+        {
+            foreach (var entry in package.Entries.Values)
+            {
+                string name = entry.Name;
+                if (name == "mimetype" || name.StartsWith("META-INF/"))
+                {
+                    continue;
+                }
+
+                byte[] plaintext;
+                using (var stream = entry.OpenReader())
+                using (var ms = new MemoryStream())
+                {
+                    stream.CopyTo(ms);
+                    plaintext = ms.ToArray();
+                }
+
+                byte[] ciphertext;
+                OdfEncryptionInfo info;
+
+                if (package.SaveOptions.CryptographyProvider != null)
+                {
+                    ciphertext = package.SaveOptions.CryptographyProvider.Encrypt(plaintext, name, package.SaveOptions, out info);
+                }
+                else
+                {
+                    byte[] compressedPlaintext;
+                    using (var ms = new MemoryStream())
+                    {
+                        using (var deflate = new DeflateStream(ms, CompressionMode.Compress, true))
+                        {
+                            deflate.Write(plaintext, 0, plaintext.Length);
+                        }
+                        compressedPlaintext = ms.ToArray();
+                    }
+
+                    byte[] iv;
+                    byte[] salt;
+                    byte[] dummyChecksum;
+                    ciphertext = EncryptEntry(compressedPlaintext, password, algorithm, out iv, out salt, out dummyChecksum);
+
+                    byte[] checksum = ComputeHash(plaintext, "SHA256");
+
+                    info = new OdfEncryptionInfo
+                    {
+                        ChecksumType = "SHA256",
+                        Checksum = checksum,
+                        AlgorithmName = algorithm == OdfEncryptionAlgorithm.Aes256 ? Aes256AlgorithmUri : BlowfishAlgorithmUri,
+                        InitialisationVector = iv,
+                        KeyDerivationName = "PBKDF2",
+                        KeySize = algorithm == OdfEncryptionAlgorithm.Aes256 ? 32 : 16,
+                        IterationCount = 1024,
+                        Salt = salt
+                    };
+
+                    if (algorithm == OdfEncryptionAlgorithm.Aes256)
+                    {
+                        info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha256";
+                        info.StartKeySize = 32;
+                    }
+                    else
+                    {
+                        info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha1";
+                        info.StartKeySize = 20;
+                    }
+                }
+
+                entry.SetContent(ciphertext);
+                entry.EncryptionInfo = info;
+            }
+        }
+
+        public static byte[] ComputeHash(byte[] data, string checksumType)
+        {
+            if (checksumType.IndexOf("sha256", StringComparison.OrdinalIgnoreCase) >= 0 || checksumType.IndexOf("sha-256", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                using (var sha = SHA256.Create())
+                {
+                    return sha.ComputeHash(data);
+                }
+            }
+            else if (checksumType.IndexOf("sha1", StringComparison.OrdinalIgnoreCase) >= 0 || checksumType.IndexOf("sha-1", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                using (var sha = SHA1.Create())
+                {
+                    return sha.ComputeHash(data);
+                }
+            }
+            else
+            {
+                throw new NotSupportedException($"Unsupported checksum type: {checksumType}");
+            }
+        }
+
+        public static bool ByteArrayEquals(byte[] a, byte[] b)
+        {
+            if (a == null || b == null) return a == b;
+            if (a.Length != b.Length) return false;
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i]) return false;
+            }
+            return true;
         }
     }
 
@@ -186,10 +439,8 @@ namespace OdfKit.Core
             {
                 xl ^= _p[i];
                 xr ^= F(xl);
-                // Swap
                 uint temp = xl; xl = xr; xr = temp;
             }
-            // Swap back
             uint t = xl; xl = xr; xr = t;
             xr ^= _p[16];
             xl ^= _p[17];
@@ -201,10 +452,8 @@ namespace OdfKit.Core
             {
                 xl ^= _p[i];
                 xr ^= F(xl);
-                // Swap
                 uint temp = xl; xl = xr; xr = temp;
             }
-            // Swap back
             uint t = xl; xl = xr; xr = t;
             xr ^= _p[1];
             xl ^= _p[0];

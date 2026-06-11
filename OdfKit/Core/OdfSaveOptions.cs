@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.IO.Compression;
 
 namespace OdfKit.Core
@@ -59,6 +59,10 @@ namespace OdfKit.Core
         /// Gets or sets a value indicating whether to evaluate formulas in the document on save.
         /// </summary>
         public bool EvaluateFormulasOnSave { get; set; } = false;
+
+        public string? Password { get; set; }
+
+        public IOdfCryptographyProvider? CryptographyProvider { get; set; }
 
         public static OdfSaveOptions Default => new();
     }

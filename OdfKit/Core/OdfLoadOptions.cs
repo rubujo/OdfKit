@@ -1,4 +1,4 @@
-﻿namespace OdfKit.Core
+namespace OdfKit.Core
 {
     public class OdfLoadOptions
     {
@@ -27,6 +27,10 @@
         /// 整個 ZIP 封裝解壓後的總位元組數限制（預設 1GB，防禦 Zip Bomb）。
         /// </summary>
         public long MaxTotalUncompressedSize { get; set; } = 1024 * 1024 * 1024;
+
+        public string? Password { get; set; }
+
+        public IOdfCryptographyProvider? CryptographyProvider { get; set; }
 
         public static OdfLoadOptions Default => new();
     }
