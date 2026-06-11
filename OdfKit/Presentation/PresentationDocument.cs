@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -309,6 +309,25 @@ namespace OdfKit.Presentation
                 }
             }
             return null;
+        }
+
+        public void AddMasterPage(string name, string pageLayoutName)
+        {
+            if (string.IsNullOrEmpty(name)) throw new ArgumentException("Master page name cannot be null or empty.", nameof(name));
+            if (string.IsNullOrEmpty(pageLayoutName)) throw new ArgumentException("Page layout name cannot be null or empty.", nameof(pageLayoutName));
+
+            var masterStyles = FindChildElement(StylesRoot, "master-styles", OdfNamespaces.Office);
+            if (masterStyles == null)
+            {
+                masterStyles = new OdfNode(OdfNodeType.Element, "master-styles", OdfNamespaces.Office, "office");
+                StylesRoot.AppendChild(masterStyles);
+            }
+
+            var masterPage = new OdfNode(OdfNodeType.Element, "master-page", OdfNamespaces.Style, "style");
+            masterPage.SetAttribute("name", OdfNamespaces.Style, name, "style");
+            masterPage.SetAttribute("page-layout-name", OdfNamespaces.Style, pageLayoutName, "style");
+
+            masterStyles.AppendChild(masterPage);
         }
     }
 

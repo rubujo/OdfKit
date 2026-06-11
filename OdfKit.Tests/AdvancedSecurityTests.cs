@@ -1638,6 +1638,173 @@ namespace OdfKit.Tests
                 Assert.Contains(sigValElem.InnerText.Trim(), canonString);
             }
         }
+
+        [Fact]
+        public async Task TestSignatureVerificationFailsWithFakeSignedCrl()
+        {
+            var cdpBytes = new byte[] {
+                0x30, 0x29, 0x30, 0x27, 0xa0, 0x25, 0xa0, 0x23, 0x86, 0x21,
+                (byte)'h', (byte)'t', (byte)'t', (byte)'p', (byte)':', (byte)'/', (byte)'/', 
+                (byte)'m', (byte)'o', (byte)'c', (byte)'k', (byte)'c', (byte)'r', (byte)'l', (byte)'.', (byte)'c', (byte)'o', (byte)'m', 
+                (byte)'/', (byte)'r', (byte)'e', (byte)'v', (byte)'o', (byte)'c', (byte)'a', (byte)'t', (byte)'i', (byte)'o', (byte)'n', 
+                (byte)'.', (byte)'c', (byte)'r', (byte)'l'
+            };
+
+            var (rootCert, leafCert) = GenerateCertificateChain("XadesARootCA", "XadesATestSigner", cdpBytes);
+            using var signerCA = rootCert;
+            using var signerCert = leafCert;
+            using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
+
+            // Generate mock CRL but with completely invalid signature (fake)
+            byte[] fakeCrlBytes = CreateMockCrlBytes(signerCA, new List<string>(), useInvalidSignature: true);
+
+            var mockHandler = new MockHttpMessageHandler(request =>
+            {
+                string url = request.RequestUri?.AbsoluteUri ?? "";
+                if (url == "http://mockcrl.com/revocation.crl")
+                {
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new ByteArrayContent(fakeCrlBytes) };
+                }
+                else if (url == "http://mocktsa.com/tsa")
+                {
+                    byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    var root = ParseDer(reqBytes);
+                    byte[] hash = root.Children[1].Children[1].Value;
+                    byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
+                    
+                    var contentInfo = new ContentInfo(new Oid("1.2.840.113549.1.9.16.1.4"), tstInfoBytes);
+                    var signedCms = new SignedCms(contentInfo, false);
+                    signedCms.ComputeSignature(new CmsSigner(tsaCert));
+                    
+                    byte[] tsaResponse = CreateTsaResponse(signedCms.Encode());
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new ByteArrayContent(tsaResponse) };
+                }
+                return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+            });
+
+            using var httpClient = new HttpClient(mockHandler);
+            using var ms = new MemoryStream();
+            
+            // Sign the package first (bypass revocation checking during signing)
+            using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                package.SetMimeType("application/vnd.oasis.opendocument.text");
+                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+                
+                var options = new OdfSigningOptions
+                {
+                    Level = XadesLevel.A,
+                    TsaUrl = "http://mocktsa.com/tsa",
+                    HttpClient = httpClient,
+                    CheckRevocation = false,
+                    AllowUntrustedRoot = true
+                };
+                options.ExtraCertificates.Add(signerCA);
+
+                await OdfSigner.SignAsync(package, signerCert, options);
+                package.Save();
+            }
+
+            // Verify package validation fails when CheckRevocation is true and the CRL has a fake signature
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms))
+            {
+                var options = new OdfSigningOptions
+                {
+                    HttpClient = httpClient,
+                    CheckRevocation = true,
+                    AllowUntrustedRoot = true
+                };
+                options.ExtraCertificates.Add(signerCA);
+
+                var result = await OdfSigner.VerifySignaturesAsync(package, options);
+                Assert.False(result.IsValid);
+                Assert.False(result.Signatures[0].IsRevocationValid);
+                Assert.Equal("CRL_SIGNATURE_INVALID", result.Signatures[0].ErrorCode);
+            }
+        }
+
+        [Fact]
+        public async Task TestCoSigningWithTimestamps()
+        {
+            using var certA = GenerateSelfSignedCertificate("SignerA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
+            using var certB = GenerateSelfSignedCertificate("SignerB", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
+            using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
+
+            var mockHandler = new MockHttpMessageHandler(request =>
+            {
+                if (request.RequestUri?.AbsoluteUri == "http://mocktsa.com/tsa")
+                {
+                    byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    var root = ParseDer(reqBytes);
+                    byte[] hash = root.Children[1].Children[1].Value;
+                    byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
+                    
+                    var contentInfo = new ContentInfo(new Oid("1.2.840.113549.1.9.16.1.4"), tstInfoBytes);
+                    var signedCms = new SignedCms(contentInfo, false);
+                    signedCms.ComputeSignature(new CmsSigner(tsaCert));
+                    
+                    byte[] tsaResponse = CreateTsaResponse(signedCms.Encode());
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new ByteArrayContent(tsaResponse) };
+                }
+                return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+            });
+
+            using var httpClient = new HttpClient(mockHandler);
+            using var ms = new MemoryStream();
+
+            // 1. Create a package and sign with Cert A + timestamp
+            using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                package.SetMimeType("application/vnd.oasis.opendocument.text");
+                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+                
+                var options = new OdfSigningOptions
+                {
+                    Level = XadesLevel.T,
+                    TsaUrl = "http://mocktsa.com/tsa",
+                    HttpClient = httpClient
+                };
+                await OdfSigner.SignAsync(package, certA, options);
+                package.Save();
+            }
+
+            // 2. Open package and co-sign with Cert B + timestamp
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms, leaveOpen: true))
+            {
+                var options = new OdfSigningOptions
+                {
+                    Level = XadesLevel.T,
+                    TsaUrl = "http://mocktsa.com/tsa",
+                    HttpClient = httpClient
+                };
+                await OdfSigner.SignAsync(package, certB, options);
+                package.Save();
+            }
+
+            // 3. Open package and verify both signatures and timestamps are valid
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms))
+            {
+                var options = new OdfSigningOptions
+                {
+                    HttpClient = httpClient,
+                    AllowUntrustedRoot = true,
+                    AllowUntrustedTimestamp = true
+                };
+                var result = await OdfSigner.VerifySignaturesAsync(package, options);
+                
+                Assert.True(result.IsValid, result.Signatures.FirstOrDefault(s => !s.IsSignatureValid)?.ErrorMessage);
+                Assert.Equal(2, result.Signatures.Count);
+                
+                Assert.True(result.Signatures[0].IsSignatureValid);
+                Assert.True(result.Signatures[0].IsTimestampValid);
+                
+                Assert.True(result.Signatures[1].IsSignatureValid);
+                Assert.True(result.Signatures[1].IsTimestampValid);
+            }
+        }
     }
 
     public class MockHttpMessageHandler : HttpMessageHandler

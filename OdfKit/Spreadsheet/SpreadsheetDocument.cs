@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -112,7 +112,7 @@ namespace OdfKit.Spreadsheet
             }
             if (mapNode == null)
             {
-                mapNode = new OdfNode(OdfNodeType.Element, "config-item-map-named", OdfNamespaces.Config, "config");
+                mapNode = OdfNodeFactory.CreateElement("config-item-map-named", OdfNamespaces.Config, "config");
                 mapNode.SetAttribute("name", OdfNamespaces.Config, "WorkbookSettings", "config");
                 docSettings.AppendChild(mapNode);
             }
@@ -124,7 +124,7 @@ namespace OdfKit.Spreadsheet
             }
             else
             {
-                entry = new OdfNode(OdfNodeType.Element, "config-item-map-entry", OdfNamespaces.Config, "config");
+                entry = OdfNodeFactory.CreateElement("config-item-map-entry", OdfNamespaces.Config, "config");
                 mapNode.AppendChild(entry);
             }
 
@@ -139,6 +139,77 @@ namespace OdfKit.Spreadsheet
 
             var itemSalt = FindOrCreateConfigItemNode(entry, "WorkbookProtectionKeyDigestSalt", "string");
             itemSalt.TextContent = Convert.ToBase64String(salt);
+        }
+
+        public bool VerifyWorkbookPassword(string password)
+        {
+            if (!WorkbookStructureProtected) return true;
+
+            var docSettings = FindSettingsNode(SettingsDom, "document-settings");
+            if (docSettings == null) return false;
+
+            OdfNode? mapNode = null;
+            foreach (var child in docSettings.Children)
+            {
+                if (child.LocalName == "config-item-map-named" && child.GetAttribute("name", OdfNamespaces.Config) == "WorkbookSettings")
+                {
+                    mapNode = child;
+                    break;
+                }
+            }
+            if (mapNode == null || mapNode.Children.Count == 0) return false;
+            var entry = mapNode.Children[0];
+
+            string? keyStr = FindConfigItemValue(entry, "WorkbookProtectionKey");
+            string? algo = FindConfigItemValue(entry, "WorkbookProtectionKeyDigestAlgorithm");
+            string? saltStr = FindConfigItemValue(entry, "WorkbookProtectionKeyDigestSalt");
+
+            if (keyStr == null || algo == null || saltStr == null) return false;
+
+            byte[] salt = Convert.FromBase64String(saltStr);
+            byte[] expectedHash = Convert.FromBase64String(keyStr);
+            byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password);
+
+            byte[] input = new byte[salt.Length + passwordBytes.Length];
+            Buffer.BlockCopy(salt, 0, input, 0, salt.Length);
+            Buffer.BlockCopy(passwordBytes, 0, input, salt.Length, passwordBytes.Length);
+
+            byte[] actualHash;
+            if (algo == "http://www.w3.org/2001/04/xmlenc#sha256")
+            {
+                using (var sha = System.Security.Cryptography.SHA256.Create())
+                {
+                    actualHash = sha.ComputeHash(input);
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            return CompareBytes(expectedHash, actualHash);
+        }
+
+        private string? FindConfigItemValue(OdfNode entry, string name)
+        {
+            foreach (var child in entry.Children)
+            {
+                if (child.LocalName == "config-item" && child.GetAttribute("name", OdfNamespaces.Config) == name)
+                {
+                    return child.TextContent;
+                }
+            }
+            return null;
+        }
+
+        private static bool CompareBytes(byte[] a, byte[] b)
+        {
+            if (a.Length != b.Length) return false;
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i]) return false;
+            }
+            return true;
         }
 
         protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
@@ -208,6 +279,50 @@ namespace OdfKit.Spreadsheet
             TableNode.SetAttribute("protection-key", OdfNamespaces.Table, Convert.ToBase64String(hash), "table");
             TableNode.SetAttribute("protection-key-digest-algorithm", OdfNamespaces.Table, "http://www.w3.org/2000/09/xmldsig#sha256", "table");
             TableNode.SetAttribute("protection-key-digest-salt", OdfNamespaces.Table, Convert.ToBase64String(salt), "table");
+        }
+
+        public bool VerifyPassword(string password)
+        {
+            if (!IsProtected) return true;
+
+            string? keyStr = TableNode.GetAttribute("protection-key", OdfNamespaces.Table);
+            string? algo = TableNode.GetAttribute("protection-key-digest-algorithm", OdfNamespaces.Table);
+            string? saltStr = TableNode.GetAttribute("protection-key-digest-salt", OdfNamespaces.Table);
+
+            if (keyStr == null || algo == null || saltStr == null) return false;
+
+            byte[] salt = Convert.FromBase64String(saltStr);
+            byte[] expectedHash = Convert.FromBase64String(keyStr);
+            byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password);
+
+            byte[] input = new byte[salt.Length + passwordBytes.Length];
+            Buffer.BlockCopy(salt, 0, input, 0, salt.Length);
+            Buffer.BlockCopy(passwordBytes, 0, input, salt.Length, passwordBytes.Length);
+
+            byte[] actualHash;
+            if (algo == "http://www.w3.org/2000/09/xmldsig#sha256")
+            {
+                using (var sha = System.Security.Cryptography.SHA256.Create())
+                {
+                    actualHash = sha.ComputeHash(input);
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            return CompareBytes(expectedHash, actualHash);
+        }
+
+        private static bool CompareBytes(byte[] a, byte[] b)
+        {
+            if (a.Length != b.Length) return false;
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i]) return false;
+            }
+            return true;
         }
 
         public OdfCell GetCell(int row, int col)
@@ -433,6 +548,30 @@ namespace OdfKit.Spreadsheet
             }
 
             return cols[col];
+        }
+
+        private OdfNode GetOrCreateRowNode(int row)
+        {
+            var rows = GetRowsList();
+            while (rows.Count <= row)
+            {
+                var newRow = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
+                TableNode.AppendChild(newRow);
+                rows.Add(newRow);
+            }
+            return rows[row];
+        }
+
+        public void SetRowVisible(int row, bool visible)
+        {
+            var rowNode = GetOrCreateRowNode(row);
+            rowNode.SetAttribute("visibility", OdfNamespaces.Table, visible ? "visible" : "collapse", "table");
+        }
+
+        public void SetColumnVisible(int col, bool visible)
+        {
+            var colNode = GetOrCreateColumnNode(col);
+            colNode.SetAttribute("visibility", OdfNamespaces.Table, visible ? "visible" : "collapse", "table");
         }
     }
 

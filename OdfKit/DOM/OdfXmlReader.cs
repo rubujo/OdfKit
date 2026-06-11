@@ -54,7 +54,7 @@ namespace OdfKit.DOM
                                 string nsUri = pool.GetOrAdd(reader.NamespaceURI);
                                 string prefix = pool.GetOrAdd(reader.Prefix);
 
-                                var node = new OdfNode(OdfNodeType.Element, localName, nsUri, prefix);
+                                var node = OdfNodeFactory.CreateElement(localName, nsUri, prefix);
 
                                 // Parse attributes
                                 if (reader.HasAttributes)

@@ -1,10 +1,16 @@
-﻿using System.Security;
+using System.IO;
+using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Xunit;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Text;
+using OdfKit.Spreadsheet;
+using OdfKit.Drawing;
+using OdfKit.Styles;
+using OdfKit.Presentation;
 
 namespace OdfKit.Tests
 {
@@ -185,6 +191,315 @@ namespace OdfKit.Tests
             finally
             {
                 OdfKitDiagnostics.Log -= logHandler;
+            }
+        }
+
+        [Fact]
+        public void TestTypedDomWrappers()
+        {
+            string xml = @"<office:document-content xmlns:office=""urn:oasis:names:tc:opendocument:xmlns:office:1.0"" xmlns:text=""urn:oasis:names:tc:opendocument:xmlns:text:1.0"" xmlns:table=""urn:oasis:names:tc:opendocument:xmlns:table:1.0"" office:version=""1.3"">
+  <office:body>
+    <office:text>
+      <text:h text:style-name=""Heading1"" text:outline-level=""2"">My Heading</text:h>
+      <text:p text:style-name=""Standard"">Hello World</text:p>
+      <table:table table:name=""Sheet1"">
+        <table:table-row>
+          <table:table-cell office:value-type=""string"">Cell Value</table:table-cell>
+        </table:table-row>
+      </table:table>
+    </office:text>
+  </office:body>
+</office:document-content>";
+
+            using var readStream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+            OdfNode root = OdfXmlReader.Parse(readStream);
+
+            Assert.IsType<OfficeDocumentContentElement>(root);
+
+            OdfNode? FindElement(OdfNode parent, string name)
+            {
+                foreach (var child in parent.Children)
+                {
+                    if (child.NodeType == OdfNodeType.Element && child.LocalName == name)
+                    {
+                        return child;
+                    }
+                }
+                return null;
+            }
+
+            var body = FindElement(root, "body");
+            Assert.IsType<OfficeBodyElement>(body);
+
+            var text = FindElement(body!, "text");
+            Assert.IsType<OfficeTextElement>(text);
+
+            var heading = FindElement(text!, "h");
+            var headingElement = Assert.IsType<TextHElement>(heading);
+            Assert.Equal("Heading1", headingElement.StyleName);
+            Assert.Equal(2, headingElement.OutlineLevel);
+
+            var paragraph = FindElement(text!, "p");
+            var pElement = Assert.IsType<TextPElement>(paragraph);
+            Assert.Equal("Standard", pElement.StyleName);
+
+            var table = FindElement(text!, "table");
+            var tableElement = Assert.IsType<TableTableElement>(table);
+            Assert.Equal("Sheet1", tableElement.Name);
+
+            // Test setting properties
+            headingElement.OutlineLevel = 3;
+            Assert.Equal("3", headingElement.GetAttribute("outline-level", OdfNamespaces.Text));
+            Assert.Equal(3, headingElement.OutlineLevel);
+
+            pElement.StyleName = "NewStyle";
+            Assert.Equal("NewStyle", pElement.GetAttribute("style-name", OdfNamespaces.Text));
+
+            // Test Cloning preserves types
+            var headingClone = headingElement.CloneNode(deep: true);
+            Assert.IsType<TextHElement>(headingClone);
+            Assert.Equal("Heading1", ((TextHElement)headingClone).StyleName);
+            Assert.Equal(3, ((TextHElement)headingClone).OutlineLevel);
+        }
+
+        [Fact]
+        public void TestDocumentEnhancements()
+        {
+            OdfNode? FindDescendant(OdfNode parent, string localName, string namespaceUri)
+            {
+                foreach (var child in parent.Children)
+                {
+                    if (child.NodeType == OdfNodeType.Element && child.LocalName == localName && child.NamespaceUri == namespaceUri)
+                    {
+                        return child;
+                    }
+                    var found = FindDescendant(child, localName, namespaceUri);
+                    if (found != null) return found;
+                }
+                return null;
+            }
+
+            // 1. TextDocument Enhancements
+            using (var package = OdfPackage.Create(new MemoryStream()))
+            {
+                var doc = new TextDocument(package);
+                
+                // AddHeading
+                var heading = doc.AddHeading("Introduction", 1);
+                Assert.NotNull(heading);
+                Assert.Equal("Introduction", heading.Node.TextContent);
+                Assert.Equal("1", heading.Node.GetAttribute("outline-level", OdfNamespaces.Text));
+
+                // AddList
+                var list = doc.AddList("ListStyle");
+                Assert.NotNull(list);
+                Assert.Equal("ListStyle", list.Node.GetAttribute("style-name", OdfNamespaces.Text));
+
+                // Add Paragraph and Fields
+                var p = doc.AddParagraph("Some paragraph");
+                doc.AddDateField(p);
+                doc.AddTimeField(p);
+                doc.AddAuthorField(p);
+                doc.AddChapterField(p);
+                doc.AddSequenceField(p, "Illustration", "1");
+                doc.AddReferenceField(p, "ref1");
+                doc.AddVariableSetField(p, "myVar", "100");
+                doc.AddVariableGetField(p, "myVar");
+
+                Assert.NotNull(FindDescendant(p.Node, "date", OdfNamespaces.Text));
+                Assert.NotNull(FindDescendant(p.Node, "time", OdfNamespaces.Text));
+                Assert.NotNull(FindDescendant(p.Node, "author-name", OdfNamespaces.Text));
+                Assert.NotNull(FindDescendant(p.Node, "chapter", OdfNamespaces.Text));
+                
+                var seq = FindDescendant(p.Node, "sequence", OdfNamespaces.Text);
+                Assert.NotNull(seq);
+                Assert.Equal("Illustration", seq.GetAttribute("name", OdfNamespaces.Text));
+
+                var refRef = FindDescendant(p.Node, "reference-ref", OdfNamespaces.Text);
+                Assert.NotNull(refRef);
+                Assert.Equal("ref1", refRef.GetAttribute("ref-name", OdfNamespaces.Text));
+
+                var varSet = FindDescendant(p.Node, "variable-set", OdfNamespaces.Text);
+                Assert.NotNull(varSet);
+                Assert.Equal("myVar", varSet.GetAttribute("name", OdfNamespaces.Text));
+
+                var varGet = FindDescendant(p.Node, "variable-get", OdfNamespaces.Text);
+                Assert.NotNull(varGet);
+                Assert.Equal("myVar", varGet.GetAttribute("name", OdfNamespaces.Text));
+
+                // Indexes
+                doc.AddAlphabeticalIndex();
+                doc.AddBibliography();
+                doc.AddTableIndex();
+                Assert.NotNull(FindDescendant(doc.ContentRoot, "alphabetical-index", OdfNamespaces.Text));
+                Assert.NotNull(FindDescendant(doc.ContentRoot, "bibliography", OdfNamespaces.Text));
+                Assert.NotNull(FindDescendant(doc.ContentRoot, "table-index", OdfNamespaces.Text));
+
+                // Comments & bookmarks & hyperlink & Ruby & Image
+                doc.AddCommentStart(p, "comment1");
+                doc.AddCommentEnd(p, "comment1");
+                doc.AddBookmark(p, "bookmark1");
+                doc.AddReferenceMark(p, "refmark1");
+                doc.AddHyperlink(p, "http://example.com", "link");
+                
+                var img = doc.AddImage(p, "Pictures/test.png", "5cm", "4cm", "img1");
+                Assert.NotNull(img);
+                
+                doc.AddRuby(p, "base", "ruby");
+
+                var annStart = FindDescendant(p.Node, "annotation-start", OdfNamespaces.Office);
+                Assert.NotNull(annStart);
+                Assert.Equal("comment1", annStart.GetAttribute("name", OdfNamespaces.Office));
+
+                var annEnd = FindDescendant(p.Node, "annotation-end", OdfNamespaces.Office);
+                Assert.NotNull(annEnd);
+                Assert.Equal("comment1", annEnd.GetAttribute("name", OdfNamespaces.Office));
+
+                var bmark = FindDescendant(p.Node, "bookmark", OdfNamespaces.Text);
+                Assert.NotNull(bmark);
+                Assert.Equal("bookmark1", bmark.GetAttribute("name", OdfNamespaces.Text));
+
+                var rmark = FindDescendant(p.Node, "reference-mark", OdfNamespaces.Text);
+                Assert.NotNull(rmark);
+                Assert.Equal("refmark1", rmark.GetAttribute("name", OdfNamespaces.Text));
+
+                var hyperlink = FindDescendant(p.Node, "a", OdfNamespaces.Text);
+                Assert.NotNull(hyperlink);
+                Assert.Equal("http://example.com", hyperlink.GetAttribute("href", OdfNamespaces.XLink));
+
+                var frame = FindDescendant(p.Node, "frame", OdfNamespaces.Draw);
+                Assert.NotNull(frame);
+                Assert.Equal("img1", frame.GetAttribute("name", OdfNamespaces.Draw));
+
+                Assert.NotNull(FindDescendant(p.Node, "ruby", OdfNamespaces.Text));
+
+                // Tracked Changes
+                var tcNode = OdfNodeFactory.CreateElement("tracked-changes", OdfNamespaces.Text, "text");
+                var changedRegion = OdfNodeFactory.CreateElement("changed-region", OdfNamespaces.Text, "text");
+                changedRegion.SetAttribute("id", OdfNamespaces.Text, "change1", "text");
+                var insertion = OdfNodeFactory.CreateElement("insertion", OdfNamespaces.Text, "text");
+                changedRegion.AppendChild(insertion);
+                tcNode.AppendChild(changedRegion);
+                doc.BodyTextRoot.AppendChild(tcNode);
+
+                var changeStart = OdfNodeFactory.CreateElement("change-start", OdfNamespaces.Text, "text");
+                changeStart.SetAttribute("change-id", OdfNamespaces.Text, "change1", "text");
+                p.Node.AppendChild(changeStart);
+                var changeTextNode = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = "Inserted Content" };
+                p.Node.AppendChild(changeTextNode);
+                var changeEnd = OdfNodeFactory.CreateElement("change-end", OdfNamespaces.Text, "text");
+                changeEnd.SetAttribute("change-id", OdfNamespaces.Text, "change1", "text");
+                p.Node.AppendChild(changeEnd);
+
+                doc.RejectChange("change1");
+                Assert.Null(FindDescendant(p.Node, "change-start", OdfNamespaces.Text));
+                Assert.DoesNotContain("Inserted Content", p.Node.TextContent);
+            }
+
+            // 2. SpreadsheetDocument Password Verification
+            using (var package = OdfPackage.Create(new MemoryStream()))
+            {
+                var doc = new SpreadsheetDocument(package);
+                var sheet = doc.AddSheet("Sheet1");
+
+                sheet.Protect("secret");
+                Assert.True(sheet.IsProtected);
+                Assert.True(sheet.VerifyPassword("secret"));
+                Assert.False(sheet.VerifyPassword("wrong"));
+
+                doc.ProtectWorkbook("wbsecret");
+                Assert.True(doc.WorkbookStructureProtected);
+                Assert.True(doc.VerifyWorkbookPassword("wbsecret"));
+                Assert.False(doc.VerifyWorkbookPassword("wrong"));
+            }
+
+            // 3. DrawingDocument Enhancements
+            using (var package = OdfPackage.Create(new MemoryStream()))
+            {
+                var doc = new OdfKit.Drawing.DrawingDocument(package);
+                var page = doc.AddPage("Page1");
+                Assert.NotNull(page);
+                Assert.Equal("Page1", page.Name);
+
+                var shape = page.AddShape(OdfShapeType.Rectangle, new OdfLength(10, OdfUnit.Millimeters), new OdfLength(20, OdfUnit.Millimeters), new OdfLength(30, OdfUnit.Millimeters), new OdfLength(40, OdfUnit.Millimeters));
+                Assert.NotNull(shape);
+                Assert.Equal("rect", shape.Node.LocalName);
+                Assert.Equal("10mm", shape.Node.GetAttribute("x", OdfNamespaces.Svg));
+
+                var textBox = page.AddTextBox(new OdfLength(10, OdfUnit.Millimeters), new OdfLength(20, OdfUnit.Millimeters), new OdfLength(30, OdfUnit.Millimeters), new OdfLength(40, OdfUnit.Millimeters), "Hello Shape");
+                Assert.NotNull(textBox);
+                Assert.Equal("Hello Shape", textBox.Node.TextContent);
+            }
+        }
+
+        [Fact]
+        public void TestTextDocumentMathMLAndTOCRoundTrip()
+        {
+            using var ms = new MemoryStream();
+            using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                var doc = new TextDocument(package);
+                var p = doc.AddParagraph("Formula paragraph:");
+                doc.AddFormula(p, "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>x</mi></math>");
+                doc.AddTableOfContents();
+                doc.Save();
+            }
+
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms, leaveOpen: true))
+            {
+                var doc = new TextDocument(package);
+                
+                // Verify MathML frame and object exists
+                var bodyText = doc.BodyTextRoot;
+                Assert.NotNull(bodyText);
+                
+                OdfNode? frame = null;
+                foreach (var child in bodyText.Children)
+                {
+                    if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
+                    {
+                        foreach (var inner in child.Children)
+                        {
+                            if (inner.LocalName == "frame" && inner.NamespaceUri == OdfNamespaces.Draw)
+                            {
+                                frame = inner;
+                                break;
+                            }
+                        }
+                    }
+                }
+                Assert.NotNull(frame);
+                OdfNode? obj = null;
+                foreach (var child in frame.Children)
+                {
+                    if (child.LocalName == "object" && child.NamespaceUri == OdfNamespaces.Draw)
+                    {
+                        obj = child;
+                        break;
+                    }
+                }
+                Assert.NotNull(obj);
+                string? href = obj.GetAttribute("href", OdfNamespaces.XLink);
+                Assert.NotNull(href);
+
+                // Verify embedded formula content.xml exists and is preserved
+                Assert.True(package.HasEntry($"{href}/content.xml"));
+                Assert.True(package.HasEntry($"{href}/mimetype"));
+                Assert.Equal("application/vnd.oasis.opendocument.formula", package.Manifest[$"{href}/mimetype"]);
+
+                // Verify TOC exists
+                OdfNode? toc = null;
+                foreach (var child in bodyText.Children)
+                {
+                    if (child.LocalName == "table-of-content" && child.NamespaceUri == OdfNamespaces.Text)
+                    {
+                        toc = child;
+                        break;
+                    }
+                }
+                Assert.NotNull(toc);
+                Assert.Equal("Table of Contents", toc.GetAttribute("name", OdfNamespaces.Text));
             }
         }
     }

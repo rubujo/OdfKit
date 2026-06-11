@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -424,6 +424,138 @@ namespace OdfKit.Tests
             Assert.Equal(99.0, result);
         }
 
+        [Fact]
+        public void TestNewOpenFormulaFunctions()
+        {
+            var context = new MockEvaluationContext();
+            var evaluator = new DefaultFormulaEvaluator();
+            context.Evaluator = evaluator;
+
+            // Math Functions
+            Assert.Equal(5.0, evaluator.Evaluate("ABS(-5)", context));
+            Assert.Equal(4.0, evaluator.Evaluate("SQRT(16)", context));
+            Assert.Equal(12.35, evaluator.Evaluate("ROUND(12.3456, 2)", context));
+            Assert.Equal(120.0, evaluator.Evaluate("ROUND(123.45, -1)", context));
+            Assert.Equal(1.0, evaluator.Evaluate("MOD(10, 3)", context));
+            Assert.Equal(8.0, evaluator.Evaluate("POWER(2, 3)", context));
+            Assert.Equal(0.0, evaluator.Evaluate("LN(1)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("LOG(100, 10)", context));
+            Assert.Equal(Math.Exp(1), evaluator.Evaluate("EXP(1)", context));
+            Assert.Equal(3.0, evaluator.Evaluate("CEILING(2.3)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("FLOOR(2.7)", context));
+            Assert.Equal(Math.PI, evaluator.Evaluate("PI()", context));
+            Assert.Equal(180.0, evaluator.Evaluate("DEGREES(PI())", context));
+            Assert.Equal(Math.PI, evaluator.Evaluate("RADIANS(180)", context));
+            Assert.Equal(0.0, evaluator.Evaluate("SIN(0)", context));
+            Assert.Equal(1.0, evaluator.Evaluate("COS(0)", context));
+            Assert.Equal(0.0, evaluator.Evaluate("TAN(0)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("TRUNC(2.7)", context));
+            Assert.Equal(20.0, evaluator.Evaluate("TRUNC(27.8, -1)", context));
+
+            // String Functions
+            Assert.Equal(5.0, evaluator.Evaluate("LEN(\"Hello\")", context));
+            Assert.Equal("hello", evaluator.Evaluate("LOWER(\"Hello\")", context));
+            Assert.Equal("HELLO", evaluator.Evaluate("UPPER(\"Hello\")", context));
+            Assert.Equal("A B C", evaluator.Evaluate("TRIM(\"  A  B  C  \")", context));
+            Assert.Equal("A-D-C", evaluator.Evaluate("REPLACE(\"A-B-C\", 3, 1, \"D\")", context));
+
+            // Statistical Functions
+            var maxRange = OdfCellAddress.ParseExcel("A1");
+            var maxRange2 = OdfCellAddress.ParseExcel("A2");
+            var maxRange3 = OdfCellAddress.ParseExcel("A3");
+            context.CellValues[maxRange] = 5.0;
+            context.CellValues[maxRange2] = 10.0;
+            context.CellValues[maxRange3] = 2.0;
+
+            Assert.Equal(10.0, evaluator.Evaluate("MAX(A1:A3)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("MIN(A1:A3)", context));
+
+            // Date/Time Functions
+            double dateVal = (new DateTime(2026, 6, 12) - new DateTime(1899, 12, 30)).TotalDays;
+            Assert.Equal(dateVal, evaluator.Evaluate("DATE(2026, 6, 12)", context));
+            
+            var dateCell = OdfCellAddress.ParseExcel("B1");
+            context.CellValues[dateCell] = dateVal;
+            Assert.Equal(12.0, evaluator.Evaluate("DAY(B1)", context));
+            Assert.Equal(6.0, evaluator.Evaluate("MONTH(B1)", context));
+            Assert.Equal(2026.0, evaluator.Evaluate("YEAR(B1)", context));
+
+            var timeCell = OdfCellAddress.ParseExcel("B2");
+            double timeVal = (12.0 * 3600.0 + 30.0 * 60.0 + 45.0) / 86400.0;
+            context.CellValues[timeCell] = timeVal;
+            Assert.Equal(12.0, evaluator.Evaluate("HOUR(B2)", context));
+            Assert.Equal(30.0, evaluator.Evaluate("MINUTE(B2)", context));
+            Assert.Equal(45.0, evaluator.Evaluate("SECOND(B2)", context));
+
+            Assert.Equal(timeVal, evaluator.Evaluate("TIME(12, 30, 45)", context));
+
+            var todayVal = evaluator.Evaluate("TODAY()", context);
+            var nowVal = evaluator.Evaluate("NOW()", context);
+            Assert.True(todayVal is double);
+            Assert.True(nowVal is double);
+            Assert.True((double)nowVal >= (double)todayVal);
+
+            // Matrix Functions
+            var transResult = evaluator.Evaluate("TRANSPOSE(A1:A3)", context);
+            Assert.True(transResult is object[,]);
+            var arr = (object[,])transResult;
+            Assert.Equal(1, arr.GetLength(0));
+            Assert.Equal(3, arr.GetLength(1));
+            Assert.Equal(5.0, arr[0, 0]);
+            Assert.Equal(10.0, arr[0, 1]);
+            Assert.Equal(2.0, arr[0, 2]);
+
+            // Database Functions
+            // Setup a database range A10:C13
+            context.CellValues[OdfCellAddress.ParseExcel("A10")] = "Name";
+            context.CellValues[OdfCellAddress.ParseExcel("B10")] = "Age";
+            context.CellValues[OdfCellAddress.ParseExcel("C10")] = "Salary";
+            
+            context.CellValues[OdfCellAddress.ParseExcel("A11")] = "Alice";
+            context.CellValues[OdfCellAddress.ParseExcel("B11")] = 30.0;
+            context.CellValues[OdfCellAddress.ParseExcel("C11")] = 1000.0;
+            
+            context.CellValues[OdfCellAddress.ParseExcel("A12")] = "Bob";
+            context.CellValues[OdfCellAddress.ParseExcel("B12")] = 40.0;
+            context.CellValues[OdfCellAddress.ParseExcel("C12")] = 2000.0;
+            
+            context.CellValues[OdfCellAddress.ParseExcel("A13")] = "Charlie";
+            context.CellValues[OdfCellAddress.ParseExcel("B13")] = 30.0;
+            context.CellValues[OdfCellAddress.ParseExcel("C13")] = 3000.0;
+
+            // Setup criteria range E10:E11
+            context.CellValues[OdfCellAddress.ParseExcel("E10")] = "Age";
+            context.CellValues[OdfCellAddress.ParseExcel("E11")] = 30.0;
+
+            Assert.Equal(4000.0, evaluator.Evaluate("DSUM(A10:C13, \"Salary\", E10:E11)", context));
+            Assert.Equal(2000.0, evaluator.Evaluate("DAVERAGE(A10:C13, \"Salary\", E10:E11)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("DCOUNT(A10:C13, \"Salary\", E10:E11)", context));
+            Assert.Equal(3000.0, evaluator.Evaluate("DMAX(A10:C13, \"Salary\", E10:E11)", context));
+            Assert.Equal(1000.0, evaluator.Evaluate("DMIN(A10:C13, \"Salary\", E10:E11)", context));
+
+            // Financial Functions
+            double pmt = (double)evaluator.Evaluate("PMT(0.06/12, 360, 100000)", context);
+            Assert.Equal(-599.55, Math.Round(pmt, 2));
+
+            double fv = (double)evaluator.Evaluate("FV(0.05/12, 10, -100, -1000)", context);
+            Assert.Equal(2061.42, Math.Round(fv, 2));
+
+            double pv = (double)evaluator.Evaluate("PV(0.05/12, 10, -100, -1000)", context);
+            Assert.Equal(1936.73, Math.Round(pv, 2));
+
+            double nper = (double)evaluator.Evaluate("NPER(0.05/12, -100, 1000)", context);
+            Assert.Equal(10.24, Math.Round(nper, 2));
+
+            double rate = (double)evaluator.Evaluate("RATE(12, -100, 1000)", context);
+            Assert.Equal(0.03, Math.Round(rate, 2));
+
+            double ipmt = (double)evaluator.Evaluate("IPMT(0.06/12, 1, 360, 100000)", context);
+            Assert.Equal(-500.0, Math.Round(ipmt, 2));
+
+            double ppmt = (double)evaluator.Evaluate("PPMT(0.06/12, 1, 360, 100000)", context);
+            Assert.Equal(-99.55, Math.Round(ppmt, 2));
+        }
+
         #endregion
 
         #region OdfNumberFormatter Tests
@@ -652,6 +784,90 @@ namespace OdfKit.Tests
             return null;
         }
 
-        #endregion
+        #region Row/Column Visibility Tests
+
+        [Fact]
+        public void TestRowColumnVisibility()
+        {
+            using (var ms = new MemoryStream())
+            {
+                using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                var doc = new SpreadsheetDocument(package);
+                var sheet = doc.AddSheet("VisibilitySheet");
+                
+                sheet.SetRowVisible(0, false);
+                sheet.SetRowVisible(1, true);
+
+                sheet.SetColumnVisible(0, false);
+                sheet.SetColumnVisible(1, true);
+
+                doc.Save();
+            }
+
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms, leaveOpen: true))
+            {
+                var doc = new SpreadsheetDocument(package);
+                var sheet = doc.GetSheet("VisibilitySheet");
+                Assert.NotNull(sheet);
+
+                // Let's check row visibility
+                var rows = new List<OdfNode>();
+                foreach (var child in sheet.TableNode.Children)
+                {
+                    if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
+                        rows.Add(child);
+                }
+
+                Assert.True(rows.Count > 1);
+                Assert.Equal("collapse", rows[0].GetAttribute("visibility", OdfNamespaces.Table));
+                Assert.Equal("visible", rows[1].GetAttribute("visibility", OdfNamespaces.Table));
+
+                // Check column visibility
+                var cols = new List<OdfNode>();
+                foreach (var child in sheet.TableNode.Children)
+                {
+                    if (child.LocalName == "table-column" && child.NamespaceUri == OdfNamespaces.Table)
+                        cols.Add(child);
+                }
+                Assert.True(cols.Count > 1);
+                Assert.Equal("collapse", cols[0].GetAttribute("visibility", OdfNamespaces.Table));
+                Assert.Equal("visible", cols[1].GetAttribute("visibility", OdfNamespaces.Table));
+            }
+        }
     }
+
+        [Fact]
+        public void TestReferenceModelUnionAndIntersection()
+        {
+            var context = new MockEvaluationContext();
+            var evaluator = new DefaultFormulaEvaluator();
+            context.Evaluator = evaluator;
+
+            // Setup cell values
+            context.CellValues[OdfCellAddress.ParseExcel("A1")] = 10.0;
+            context.CellValues[OdfCellAddress.ParseExcel("B1")] = 20.0;
+            context.CellValues[OdfCellAddress.ParseExcel("A2")] = 30.0;
+            context.CellValues[OdfCellAddress.ParseExcel("B2")] = 40.0;
+
+            context.CellValues[OdfCellAddress.ParseExcel("C3")] = 50.0;
+            context.CellValues[OdfCellAddress.ParseExcel("D3")] = 60.0;
+
+            // 1. Reference Union: SUM(A1:B2 ~ C3:D3) -> 10 + 20 + 30 + 40 + 50 + 60 = 210
+            Assert.Equal(210.0, evaluator.Evaluate("SUM(A1:B2 ~ C3:D3)", context));
+
+            // 2. Reference Intersection: SUM(A1:B2 ! A2:B2) -> 30 + 40 = 70
+            Assert.Equal(70.0, evaluator.Evaluate("SUM(A1:B2 ! A2:B2)", context));
+
+            // 3. No intersection returns #NULL!
+            var nullResult = evaluator.Evaluate("SUM(A1:B2 ! C3:D3)", context);
+            Assert.IsType<OdfFormulaError>(nullResult);
+            Assert.Equal(OdfFormulaErrorType.Null, ((OdfFormulaError)nullResult).ErrorType);
+        }
+    }
+
+        #endregion
+
+        #endregion
 }

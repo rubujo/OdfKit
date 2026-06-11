@@ -7,7 +7,7 @@ namespace OdfKit.Tools.OdfSchemaGenerator;
 /// </summary>
 public static class OdfSchemaGeneratorCli
 {
-    private const string Usage = "Usage: OdfSchemaGenerator [--format json|csharp|csharp-provider] [--output <file>] [--class-name <name>] [--source-url <uri>] [--source-date <date>] <schema.rng>";
+    private const string Usage = "Usage: OdfSchemaGenerator [--format json|csharp|csharp-provider|dom-wrappers] [--output <file>] [--class-name <name>] [--source-url <uri>] [--source-date <date>] <schema.rng>";
 
     /// <summary>
     /// Runs the schema generator command.
@@ -205,7 +205,8 @@ public static class OdfSchemaGeneratorCli
     {
         return string.Equals(format, "json", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(format, "csharp", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(format, "csharp-provider", StringComparison.OrdinalIgnoreCase);
+            string.Equals(format, "csharp-provider", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(format, "dom-wrappers", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsValidClassName(string className)
@@ -268,6 +269,12 @@ public static class OdfSchemaGeneratorCli
         if (string.Equals(options.Format, "csharp", StringComparison.OrdinalIgnoreCase))
         {
             new SchemaMetadataCSharpWriter().Write(metadata, writer, options.ClassName);
+            return;
+        }
+
+        if (string.Equals(options.Format, "dom-wrappers", StringComparison.OrdinalIgnoreCase))
+        {
+            new DomWrappersCSharpWriter().Write(metadata, writer);
             return;
         }
 

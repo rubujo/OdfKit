@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -38,14 +38,192 @@ namespace OdfKit.Text
             return "<office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:meta=\"urn:oasis:names:tc:opendocument:xmlns:meta:1.0\" xmlns:number=\"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\" xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\" xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\" xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"1.3\"><office:styles></office:styles><office:automatic-styles></office:automatic-styles><office:master-styles></office:master-styles></office:document-styles>";
         }
 
-        #region Paragraph Addition API
+        #region Document Elements Addition API
 
         public OdfParagraph AddParagraph(string text = "")
         {
-            var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+            var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
             pNode.TextContent = text;
             BodyTextRoot.AppendChild(pNode);
             return new OdfParagraph(pNode, this);
+        }
+
+        public OdfHeading AddHeading(string text, int outlineLevel)
+        {
+            var hNode = OdfNodeFactory.CreateElement("h", OdfNamespaces.Text, "text");
+            hNode.TextContent = text;
+            hNode.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(), "text");
+            BodyTextRoot.AppendChild(hNode);
+            return new OdfHeading(hNode, this);
+        }
+
+        public OdfList AddList(string? styleName = null)
+        {
+            var listNode = OdfNodeFactory.CreateElement("list", OdfNamespaces.Text, "text");
+            if (styleName != null)
+            {
+                listNode.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
+            }
+            BodyTextRoot.AppendChild(listNode);
+            return new OdfList(listNode, this);
+        }
+
+        public void AddDateField(OdfParagraph paragraph)
+        {
+            var fNode = OdfNodeFactory.CreateElement("date", OdfNamespaces.Text, "text");
+            paragraph.Node.AppendChild(fNode);
+        }
+
+        public void AddTimeField(OdfParagraph paragraph)
+        {
+            var fNode = OdfNodeFactory.CreateElement("time", OdfNamespaces.Text, "text");
+            paragraph.Node.AppendChild(fNode);
+        }
+
+        public void AddAuthorField(OdfParagraph paragraph)
+        {
+            var fNode = OdfNodeFactory.CreateElement("author-name", OdfNamespaces.Text, "text");
+            paragraph.Node.AppendChild(fNode);
+        }
+
+        public void AddChapterField(OdfParagraph paragraph)
+        {
+            var fNode = OdfNodeFactory.CreateElement("chapter", OdfNamespaces.Text, "text");
+            paragraph.Node.AppendChild(fNode);
+        }
+
+        public void AddSequenceField(OdfParagraph paragraph, string name, string numFormat = "1")
+        {
+            var fNode = OdfNodeFactory.CreateElement("sequence", OdfNamespaces.Text, "text");
+            fNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
+            fNode.SetAttribute("num-format", OdfNamespaces.Style, numFormat, "style");
+            paragraph.Node.AppendChild(fNode);
+        }
+
+        public void AddReferenceField(OdfParagraph paragraph, string refName)
+        {
+            var fNode = OdfNodeFactory.CreateElement("reference-ref", OdfNamespaces.Text, "text");
+            fNode.SetAttribute("ref-name", OdfNamespaces.Text, refName, "text");
+            paragraph.Node.AppendChild(fNode);
+        }
+
+        public void AddVariableSetField(OdfParagraph paragraph, string name, string value)
+        {
+            var fNode = OdfNodeFactory.CreateElement("variable-set", OdfNamespaces.Text, "text");
+            fNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
+            fNode.TextContent = value;
+            paragraph.Node.AppendChild(fNode);
+        }
+
+        public void AddVariableGetField(OdfParagraph paragraph, string name)
+        {
+            var fNode = OdfNodeFactory.CreateElement("variable-get", OdfNamespaces.Text, "text");
+            fNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
+            paragraph.Node.AppendChild(fNode);
+        }
+
+        public void AddAlphabeticalIndex()
+        {
+            var idxNode = OdfNodeFactory.CreateElement("alphabetical-index", OdfNamespaces.Text, "text");
+            idxNode.SetAttribute("name", OdfNamespaces.Text, "Alphabetical Index", "text");
+            var bodyNode = OdfNodeFactory.CreateElement("index-body", OdfNamespaces.Text, "text");
+            idxNode.AppendChild(bodyNode);
+            BodyTextRoot.AppendChild(idxNode);
+            SetUpdateFieldsWhenOpening(true);
+        }
+
+        public void AddBibliography()
+        {
+            var bibNode = OdfNodeFactory.CreateElement("bibliography", OdfNamespaces.Text, "text");
+            bibNode.SetAttribute("name", OdfNamespaces.Text, "Bibliography", "text");
+            var bodyNode = OdfNodeFactory.CreateElement("index-body", OdfNamespaces.Text, "text");
+            bibNode.AppendChild(bodyNode);
+            BodyTextRoot.AppendChild(bibNode);
+            SetUpdateFieldsWhenOpening(true);
+        }
+
+        public void AddTableIndex()
+        {
+            var idxNode = OdfNodeFactory.CreateElement("table-index", OdfNamespaces.Text, "text");
+            idxNode.SetAttribute("name", OdfNamespaces.Text, "Index of Tables", "text");
+            var bodyNode = OdfNodeFactory.CreateElement("index-body", OdfNamespaces.Text, "text");
+            idxNode.AppendChild(bodyNode);
+            BodyTextRoot.AppendChild(idxNode);
+            SetUpdateFieldsWhenOpening(true);
+        }
+
+        public void AddCommentStart(OdfParagraph paragraph, string name)
+        {
+            var startNode = OdfNodeFactory.CreateElement("annotation-start", OdfNamespaces.Office, "office");
+            startNode.SetAttribute("name", OdfNamespaces.Office, name, "office");
+            paragraph.Node.AppendChild(startNode);
+        }
+
+        public void AddCommentEnd(OdfParagraph paragraph, string name)
+        {
+            var endNode = OdfNodeFactory.CreateElement("annotation-end", OdfNamespaces.Office, "office");
+            endNode.SetAttribute("name", OdfNamespaces.Office, name, "office");
+            paragraph.Node.AppendChild(endNode);
+        }
+
+        public void AddBookmark(OdfParagraph paragraph, string name)
+        {
+            var bNode = OdfNodeFactory.CreateElement("bookmark", OdfNamespaces.Text, "text");
+            bNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
+            paragraph.Node.AppendChild(bNode);
+        }
+
+        public void AddReferenceMark(OdfParagraph paragraph, string name)
+        {
+            var rNode = OdfNodeFactory.CreateElement("reference-mark", OdfNamespaces.Text, "text");
+            rNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
+            paragraph.Node.AppendChild(rNode);
+        }
+
+        public void AddHyperlink(OdfParagraph paragraph, string url, string text)
+        {
+            var aNode = OdfNodeFactory.CreateElement("a", OdfNamespaces.Text, "text");
+            aNode.SetAttribute("href", OdfNamespaces.XLink, url, "xlink");
+            aNode.TextContent = text;
+            paragraph.Node.AppendChild(aNode);
+        }
+
+        public OdfImage AddImage(OdfParagraph paragraph, string packagePath, string widthCm, string heightCm, string? name = null)
+        {
+            var frameNode = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
+            if (name != null)
+            {
+                frameNode.SetAttribute("name", OdfNamespaces.Draw, name, "draw");
+            }
+            frameNode.SetAttribute("anchor-type", OdfNamespaces.Text, "paragraph", "text");
+            frameNode.SetAttribute("width", OdfNamespaces.Svg, widthCm, "svg");
+            frameNode.SetAttribute("height", OdfNamespaces.Svg, heightCm, "svg");
+
+            var imageNode = OdfNodeFactory.CreateElement("image", OdfNamespaces.Draw, "draw");
+            imageNode.SetAttribute("href", OdfNamespaces.XLink, packagePath, "xlink");
+            imageNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+            imageNode.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
+            imageNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
+
+            frameNode.AppendChild(imageNode);
+            paragraph.Node.AppendChild(frameNode);
+
+            return new OdfImage(frameNode, imageNode);
+        }
+
+        public void AddRuby(OdfParagraph paragraph, string baseText, string rubyText)
+        {
+            var rubyNode = OdfNodeFactory.CreateElement("ruby", OdfNamespaces.Text, "text");
+            
+            var baseNode = OdfNodeFactory.CreateElement("ruby-base", OdfNamespaces.Text, "text");
+            baseNode.TextContent = baseText;
+            rubyNode.AppendChild(baseNode);
+
+            var textNode = OdfNodeFactory.CreateElement("ruby-text", OdfNamespaces.Text, "text");
+            textNode.TextContent = rubyText;
+            rubyNode.AppendChild(textNode);
+
+            paragraph.Node.AppendChild(rubyNode);
         }
 
         #endregion
@@ -351,7 +529,7 @@ namespace OdfKit.Text
 
         #endregion
 
-        #region Tracked Changes (AcceptAll)
+        #region Tracked Changes (Accept/Reject)
 
         public bool TrackedChanges { get; set; }
 
@@ -375,6 +553,164 @@ namespace OdfKit.Text
             CleanupRemainingChangeMarkers(BodyTextRoot);
 
             BodyTextRoot.RemoveChild(tcNode);
+        }
+
+        public void RejectAllTrackedChanges()
+        {
+            var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
+            if (tcNode == null) return;
+
+            var changes = new Dictionary<string, string>(StringComparer.Ordinal);
+            ExtractTrackedChangesMeta(tcNode, changes);
+
+            foreach (var kvp in changes)
+            {
+                if (kvp.Value == "insertion")
+                {
+                    var purger = new ChangePurger(kvp.Key);
+                    purger.Purge(BodyTextRoot);
+                }
+                else if (kvp.Value == "deletion")
+                {
+                    RestoreDeletedContent(tcNode, kvp.Key);
+                }
+            }
+
+            CleanupRemainingChangeMarkers(BodyTextRoot);
+            BodyTextRoot.RemoveChild(tcNode);
+        }
+
+        public void AcceptChange(string changeId)
+        {
+            var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
+            if (tcNode == null) return;
+
+            var changes = new Dictionary<string, string>(StringComparer.Ordinal);
+            ExtractTrackedChangesMeta(tcNode, changes);
+
+            if (!changes.TryGetValue(changeId, out var type)) return;
+
+            if (type == "deletion")
+            {
+                var purger = new ChangePurger(changeId);
+                purger.Purge(BodyTextRoot);
+            }
+
+            RemoveChangeMarkersForId(BodyTextRoot, changeId);
+
+            OdfNode? regionToRemove = null;
+            foreach (var region in tcNode.Children)
+            {
+                if (region.GetAttribute("id", OdfNamespaces.Text) == changeId)
+                {
+                    regionToRemove = region;
+                    break;
+                }
+            }
+            if (regionToRemove != null) tcNode.RemoveChild(regionToRemove);
+            if (tcNode.Children.Count == 0) BodyTextRoot.RemoveChild(tcNode);
+        }
+
+        public void RejectChange(string changeId)
+        {
+            var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
+            if (tcNode == null) return;
+
+            var changes = new Dictionary<string, string>(StringComparer.Ordinal);
+            ExtractTrackedChangesMeta(tcNode, changes);
+
+            if (!changes.TryGetValue(changeId, out var type)) return;
+
+            if (type == "insertion")
+            {
+                var purger = new ChangePurger(changeId);
+                purger.Purge(BodyTextRoot);
+            }
+            else if (type == "deletion")
+            {
+                RestoreDeletedContent(tcNode, changeId);
+            }
+
+            RemoveChangeMarkersForId(BodyTextRoot, changeId);
+
+            OdfNode? regionToRemove = null;
+            foreach (var region in tcNode.Children)
+            {
+                if (region.GetAttribute("id", OdfNamespaces.Text) == changeId)
+                {
+                    regionToRemove = region;
+                    break;
+                }
+            }
+            if (regionToRemove != null) tcNode.RemoveChild(regionToRemove);
+            if (tcNode.Children.Count == 0) BodyTextRoot.RemoveChild(tcNode);
+        }
+
+        private void RestoreDeletedContent(OdfNode tcNode, string changeId)
+        {
+            OdfNode? deletionContent = null;
+            foreach (var changedRegion in tcNode.Children)
+            {
+                if (changedRegion.GetAttribute("id", OdfNamespaces.Text) == changeId)
+                {
+                    foreach (var spec in changedRegion.Children)
+                    {
+                        if (spec.LocalName == "deletion" && spec.NamespaceUri == OdfNamespaces.Text)
+                        {
+                            deletionContent = spec;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (deletionContent == null) return;
+
+            OdfNode? startNode = FindChangeNode(BodyTextRoot, "change-start", changeId);
+            if (startNode != null && startNode.Parent != null)
+            {
+                var parent = startNode.Parent;
+                foreach (var child in deletionContent.Children)
+                {
+                    if (child.LocalName != "change-info")
+                    {
+                        var imported = OdfNode.ImportNode(child, Package, Package);
+                        parent.InsertBefore(imported, startNode);
+                    }
+                }
+            }
+        }
+
+        private OdfNode? FindChangeNode(OdfNode root, string localName, string changeId)
+        {
+            if (root.LocalName == localName && root.NamespaceUri == OdfNamespaces.Text && root.GetAttribute("change-id", OdfNamespaces.Text) == changeId)
+            {
+                return root;
+            }
+            foreach (var child in root.Children)
+            {
+                var found = FindChangeNode(child, localName, changeId);
+                if (found != null) return found;
+            }
+            return null;
+        }
+
+        private void RemoveChangeMarkersForId(OdfNode node, string changeId)
+        {
+            for (int i = node.Children.Count - 1; i >= 0; i--)
+            {
+                var child = node.Children[i];
+                if ((child.LocalName == "change-start" || child.LocalName == "change-end") && 
+                    child.NamespaceUri == OdfNamespaces.Text && 
+                    child.GetAttribute("change-id", OdfNamespaces.Text) == changeId)
+                {
+                    node.RemoveChild(child);
+                }
+                else
+                {
+                    RemoveChangeMarkersForId(child, changeId);
+                }
+            }
         }
 
         private void ExtractTrackedChangesMeta(OdfNode tcNode, Dictionary<string, string> changes)
@@ -968,18 +1304,67 @@ namespace OdfKit.Text
     public class OdfParagraph
     {
         public OdfNode Node { get; }
-        private readonly TextDocument _doc;
+        protected readonly TextDocument Doc;
 
         public OdfParagraph(OdfNode node, TextDocument doc)
         {
             Node = node;
-            _doc = doc;
+            Doc = doc;
         }
 
         public string TextContent
         {
             get => Node.TextContent;
             set => Node.TextContent = value;
+        }
+
+        public OdfTextRun AddTextRun(string text)
+        {
+            var spanNode = OdfNodeFactory.CreateElement("span", OdfNamespaces.Text, "text");
+            spanNode.TextContent = text;
+            Node.AppendChild(spanNode);
+            return new OdfTextRun(spanNode, Doc);
+        }
+
+        public void AddSoftPageBreak()
+        {
+            var node = OdfNodeFactory.CreateElement("soft-page-break", OdfNamespaces.Text, "text");
+            Node.AppendChild(node);
+        }
+
+        public void AddTab()
+        {
+            var node = OdfNodeFactory.CreateElement("tab", OdfNamespaces.Text, "text");
+            Node.AppendChild(node);
+        }
+
+        public void AddLineBreak()
+        {
+            var node = OdfNodeFactory.CreateElement("line-break", OdfNamespaces.Text, "text");
+            Node.AppendChild(node);
+        }
+
+        public void AddSpace(int count = 1)
+        {
+            var node = OdfNodeFactory.CreateElement("s", OdfNamespaces.Text, "text");
+            if (count > 1)
+            {
+                node.SetAttribute("c", OdfNamespaces.Text, count.ToString(), "text");
+            }
+            Node.AppendChild(node);
+        }
+    }
+
+    public class OdfHeading : OdfParagraph
+    {
+        public OdfHeading(OdfNode node, TextDocument doc) : base(node, doc)
+        {
+        }
+
+        public int OutlineLevel
+        {
+            get => int.TryParse(Node.GetAttribute("outline-level", OdfNamespaces.Text), out var lvl) ? lvl : 1;
+            set => Node.SetAttribute("outline-level", OdfNamespaces.Text, value.ToString(), "text");
         }
     }
 
@@ -1018,6 +1403,30 @@ namespace OdfKit.Text
             set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "text-underline-style", OdfNamespaces.Style, value ? "solid" : "none", "style");
         }
 
+        public string? FontNameAsian
+        {
+            get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "font-name-asian", OdfNamespaces.Style, "text");
+            set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "font-name-asian", OdfNamespaces.Style, value ?? string.Empty, "style");
+        }
+
+        public string? FontNameComplex
+        {
+            get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "font-name-complex", OdfNamespaces.Style, "text");
+            set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "font-name-complex", OdfNamespaces.Style, value ?? string.Empty, "style");
+        }
+
+        public string? FontSizeAsian
+        {
+            get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "font-size-asian", OdfNamespaces.Fo, "text");
+            set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "font-size-asian", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        }
+
+        public string? FontSizeComplex
+        {
+            get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "font-size-complex", OdfNamespaces.Fo, "text");
+            set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "font-size-complex", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        }
+
         private string GetStyleName() => Node.GetAttribute("style-name", OdfNamespaces.Text) ?? string.Empty;
     }
 
@@ -1031,6 +1440,14 @@ namespace OdfKit.Text
             Node = node;
             _doc = doc;
         }
+
+        public string? WritingMode
+        {
+            get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "writing-mode", OdfNamespaces.Style, "section");
+            set => _doc.StyleEngine.SetLocalStyleProperty(Node, "section", "section-properties", "writing-mode", OdfNamespaces.Style, value ?? string.Empty, "style");
+        }
+
+        private string GetStyleName() => Node.GetAttribute("style-name", OdfNamespaces.Text) ?? string.Empty;
     }
 
     public class OdfTable
@@ -1109,6 +1526,183 @@ namespace OdfKit.Text
                     rowNode.RemoveChild(cellToRemove);
                 }
             }
+        }
+
+        public OdfTable AddNestedTable(int row, int col, int nestedRows, int nestedCols)
+        {
+            var cellNode = GetCellNode(row, col);
+            var nestedTableNode = OdfNodeFactory.CreateElement("table", OdfNamespaces.Table, "table");
+            cellNode.AppendChild(nestedTableNode);
+            return new OdfTable(nestedTableNode, nestedRows, nestedCols, _doc);
+        }
+
+        public void SetCellStyle(int row, int col, string styleName)
+        {
+            var cellNode = GetCellNode(row, col);
+            cellNode.SetAttribute("style-name", OdfNamespaces.Table, styleName, "table");
+        }
+
+        public void SetRowRepeat(int row, int repeatCount)
+        {
+            var rows = new List<OdfNode>();
+            foreach (var child in Node.Children)
+            {
+                if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
+                    rows.Add(child);
+            }
+            var rowNode = rows[row];
+            rowNode.SetAttribute("number-rows-repeated", OdfNamespaces.Table, repeatCount.ToString(), "table");
+        }
+
+        private OdfNode GetCellNode(int row, int col)
+        {
+            var rows = new List<OdfNode>();
+            foreach (var child in Node.Children)
+            {
+                if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
+                    rows.Add(child);
+            }
+            var rowNode = rows[row];
+            var cells = new List<OdfNode>();
+            foreach (var child in rowNode.Children)
+            {
+                if ((child.LocalName == "table-cell" || child.LocalName == "covered-table-cell") && child.NamespaceUri == OdfNamespaces.Table)
+                    cells.Add(child);
+            }
+            return cells[col];
+        }
+    }
+
+    public class OdfList
+    {
+        public OdfNode Node { get; }
+        private readonly TextDocument _doc;
+
+        public OdfList(OdfNode node, TextDocument doc)
+        {
+            Node = node;
+            _doc = doc;
+        }
+
+        public string? StyleName
+        {
+            get => Node.GetAttribute("style-name", OdfNamespaces.Text);
+            set => Node.SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, "text");
+        }
+
+        public bool? ContinueNumbering
+        {
+            get => Node.GetAttribute("continue-numbering", OdfNamespaces.Text) == "true" ? true : (Node.GetAttribute("continue-numbering", OdfNamespaces.Text) == "false" ? false : null);
+            set
+            {
+                if (value.HasValue)
+                    Node.SetAttribute("continue-numbering", OdfNamespaces.Text, value.Value ? "true" : "false", "text");
+                else
+                    Node.RemoveAttribute("continue-numbering", OdfNamespaces.Text);
+            }
+        }
+
+        public OdfListItem AddListItem(string text = "")
+        {
+            var itemNode = OdfNodeFactory.CreateElement("list-item", OdfNamespaces.Text, "text");
+            Node.AppendChild(itemNode);
+            var item = new OdfListItem(itemNode, _doc);
+            if (!string.IsNullOrEmpty(text))
+            {
+                item.AddParagraph(text);
+            }
+            return item;
+        }
+    }
+
+    public class OdfListItem
+    {
+        public OdfNode Node { get; }
+        private readonly TextDocument _doc;
+
+        public OdfListItem(OdfNode node, TextDocument doc)
+        {
+            Node = node;
+            _doc = doc;
+        }
+
+        public int? StartValue
+        {
+            get => int.TryParse(Node.GetAttribute("start-value", OdfNamespaces.Text), out var val) ? val : null;
+            set
+            {
+                if (value.HasValue)
+                    Node.SetAttribute("start-value", OdfNamespaces.Text, value.Value.ToString(), "text");
+                else
+                    Node.RemoveAttribute("start-value", OdfNamespaces.Text);
+            }
+        }
+
+        public OdfParagraph AddParagraph(string text = "")
+        {
+            var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
+            pNode.TextContent = text;
+            Node.AppendChild(pNode);
+            return new OdfParagraph(pNode, _doc);
+        }
+
+        public OdfList AddNestedList(string? styleName = null)
+        {
+            var listNode = OdfNodeFactory.CreateElement("list", OdfNamespaces.Text, "text");
+            if (styleName != null)
+            {
+                listNode.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
+            }
+            Node.AppendChild(listNode);
+            return new OdfList(listNode, _doc);
+        }
+    }
+
+    public class OdfImage
+    {
+        public OdfNode FrameNode { get; }
+        public OdfNode ImageNode { get; }
+
+        public OdfImage(OdfNode frameNode, OdfNode imageNode)
+        {
+            FrameNode = frameNode;
+            ImageNode = imageNode;
+        }
+
+        public string? Name
+        {
+            get => FrameNode.GetAttribute("name", OdfNamespaces.Draw);
+            set => FrameNode.SetAttribute("name", OdfNamespaces.Draw, value ?? string.Empty, "draw");
+        }
+
+        public string? AnchorType
+        {
+            get => FrameNode.GetAttribute("anchor-type", OdfNamespaces.Text);
+            set => FrameNode.SetAttribute("anchor-type", OdfNamespaces.Text, value ?? "paragraph", "text");
+        }
+
+        public string? Width
+        {
+            get => FrameNode.GetAttribute("width", OdfNamespaces.Svg);
+            set => FrameNode.SetAttribute("width", OdfNamespaces.Svg, value ?? string.Empty, "svg");
+        }
+
+        public string? Height
+        {
+            get => FrameNode.GetAttribute("height", OdfNamespaces.Svg);
+            set => FrameNode.SetAttribute("height", OdfNamespaces.Svg, value ?? string.Empty, "svg");
+        }
+
+        public string? WrapStyle
+        {
+            get => FrameNode.GetAttribute("wrap-style", OdfNamespaces.Style);
+            set => FrameNode.SetAttribute("wrap-style", OdfNamespaces.Style, value ?? "none", "style");
+        }
+
+        public string? CropTop
+        {
+            get => ImageNode.GetAttribute("clip", OdfNamespaces.Fo);
+            set => ImageNode.SetAttribute("clip", OdfNamespaces.Fo, value ?? string.Empty, "fo");
         }
     }
 }

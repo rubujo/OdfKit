@@ -1,12 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula.AST
 {
+    public class OdfReferenceList
+    {
+        public List<object> References { get; } = new();
+    }
+
     public abstract class AstNode
     {
         public abstract object Evaluate(IEvaluationContext context);
+        public virtual List<OdfCellRange> GetRanges(IEvaluationContext context) => new();
     }
 
     public class LiteralNode : AstNode
@@ -21,6 +27,7 @@ namespace OdfKit.Formula.AST
         public OdfCellAddress Address { get; }
         public CellAddressNode(OdfCellAddress address) => Address = address;
         public override object Evaluate(IEvaluationContext context) => context.GetCellValue(Address);
+        public override List<OdfCellRange> GetRanges(IEvaluationContext context) => new() { new OdfCellRange(Address, Address) };
     }
 
     public class RangeReferenceNode : AstNode
@@ -28,6 +35,88 @@ namespace OdfKit.Formula.AST
         public OdfCellRange Range { get; }
         public RangeReferenceNode(OdfCellRange range) => Range = range;
         public override object Evaluate(IEvaluationContext context) => context.GetRangeValues(Range);
+        public override List<OdfCellRange> GetRanges(IEvaluationContext context) => new() { Range };
+    }
+
+    public class ReferenceUnionNode : AstNode
+    {
+        private readonly AstNode _left;
+        private readonly AstNode _right;
+
+        public ReferenceUnionNode(AstNode left, AstNode right)
+        {
+            _left = left;
+            _right = right;
+        }
+
+        public override List<OdfCellRange> GetRanges(IEvaluationContext context)
+        {
+            var list = new List<OdfCellRange>();
+            list.AddRange(_left.GetRanges(context));
+            list.AddRange(_right.GetRanges(context));
+            return list;
+        }
+
+        public override object Evaluate(IEvaluationContext context)
+        {
+            var ranges = GetRanges(context);
+            var list = new OdfReferenceList();
+            foreach (var r in ranges)
+            {
+                list.References.Add(context.GetRangeValues(r));
+            }
+            return list;
+        }
+    }
+
+    public class ReferenceIntersectionNode : AstNode
+    {
+        private readonly AstNode _left;
+        private readonly AstNode _right;
+
+        public ReferenceIntersectionNode(AstNode left, AstNode right)
+        {
+            _left = left;
+            _right = right;
+        }
+
+        public override List<OdfCellRange> GetRanges(IEvaluationContext context)
+        {
+            var leftRanges = _left.GetRanges(context);
+            var rightRanges = _right.GetRanges(context);
+            var list = new List<OdfCellRange>();
+            foreach (var r1 in leftRanges)
+            {
+                foreach (var r2 in rightRanges)
+                {
+                    var intersect = r1.Intersect(r2);
+                    if (intersect.HasValue)
+                    {
+                        list.Add(intersect.Value);
+                    }
+                }
+            }
+            return list;
+        }
+
+        public override object Evaluate(IEvaluationContext context)
+        {
+            var ranges = GetRanges(context);
+            if (ranges.Count == 0)
+            {
+                return OdfFormulaError.Null; // No intersection returns #NULL!
+            }
+            if (ranges.Count == 1)
+            {
+                return context.GetRangeValues(ranges[0]);
+            }
+            var list = new OdfReferenceList();
+            foreach (var r in ranges)
+            {
+                list.References.Add(context.GetRangeValues(r));
+            }
+            return list;
+        }
     }
 
     public class UnaryNode : AstNode

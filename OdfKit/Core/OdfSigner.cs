@@ -75,10 +75,11 @@ namespace OdfKit.Core
             package.WriteEntry(SignaturePath, Array.Empty<byte>(), "text/xml");
             package.SaveManifestToEntries();
 
-            // 2. Setup XadesSignedXml
+            // 2. Setup XadesSignedXml with custom package resolver
             var signedXml = new XadesSignedXml(doc)
             {
-                SigningKey = privateKey
+                SigningKey = privateKey,
+                Resolver = new OdfPackageXmlResolver(package)
             };
             signedXml.SignedInfo!.CanonicalizationMethod = SignedXml.XmlDsigC14NTransformUrl;
 
@@ -105,7 +106,7 @@ namespace OdfKit.Core
 
             // 3. Setup XAdES if requested
             XmlElement? qualifyingProperties = null;
-            if (options.Level != XadesLevel.None)
+            if (options.SignatureLevel != OdfSignatureLevel.None)
             {
                 var dataObject = new DataObject();
 
@@ -181,12 +182,9 @@ namespace OdfKit.Core
                         var reference = new Reference(file);
                         // Standard ODF 1.3 uses SHA-256
                         reference.DigestMethod = SignedXml.XmlDsigSHA256Url;
-
-                        // Retrieve original unparsed stream from package and inject directly
                         var stream = package.GetEntryStream(file);
                         openStreams.Add(stream);
                         InjectReferenceStream(reference, stream);
-
                         signedXml.AddReference(reference);
                     }
                 }
@@ -196,7 +194,6 @@ namespace OdfKit.Core
             }
             finally
             {
-                // Clean up and release streams after signature computation is completed to avoid locks
                 foreach (var stream in openStreams)
                 {
                     stream.Dispose();
@@ -207,35 +204,26 @@ namespace OdfKit.Core
             var xmlSignature = signedXml.GetXml();
 
             // 6. If XAdES-T or XAdES-A, fetch timestamp and build unsigned properties
-            if (options.Level == XadesLevel.T || options.Level == XadesLevel.A)
+            if (options.SignatureLevel == OdfSignatureLevel.XadesT || options.SignatureLevel == OdfSignatureLevel.XadesA)
             {
                 if (string.IsNullOrEmpty(options.TsaUrl))
                 {
                     throw new CryptographicException("TSA URL must be configured for XAdES-T or XAdES-A.");
                 }
 
-                // Find the ds:SignatureValue element in the generated xmlSignature
+                // Find the ds:SignatureValue element in the generated xmlSignature using relative XPath to support co-signing
                 var nsManager = new XmlNamespaceManager(doc.NameTable);
                 nsManager.AddNamespace("ds", OdfNamespaces.Ds);
                 nsManager.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
 
-                var sigValElem = xmlSignature.SelectSingleNode("//ds:SignatureValue", nsManager) as XmlElement;
+                var sigValElem = xmlSignature.SelectSingleNode(".//ds:SignatureValue", nsManager) as XmlElement;
                 if (sigValElem == null)
                 {
                     throw new CryptographicException("ds:SignatureValue element was not found in computed signature.");
                 }
 
-                // Canonicalize ds:SignatureValue in a clean namespace context
-                var cleanDoc = new XmlDocument();
-                var imported = (XmlElement)cleanDoc.ImportNode(sigValElem, true);
-                cleanDoc.AppendChild(imported);
-
-                var transform = new XmlDsigExcC14NTransform();
-                transform.LoadInput(imported.SelectNodes("descendant-or-self::node()")!);
-                using var tsStream = (Stream)transform.GetOutput(typeof(Stream));
-                using var tsMs = new MemoryStream();
-                tsStream.CopyTo(tsMs);
-                byte[] sigValueBytes = tsMs.ToArray();
+                // Canonicalize ds:SignatureValue consistently
+                byte[] sigValueBytes = CanonicalizeSignatureValue(sigValElem);
 
                 using var sha256 = SHA256.Create();
                 byte[] sigHash = sha256.ComputeHash(sigValueBytes);
@@ -244,8 +232,8 @@ namespace OdfKit.Core
                 byte[] tsaResponse = await QueryTsaAsync(options.TsaUrl!, sigHash, options.HttpClient);
                 byte[] tsToken = ExtractTimestampToken(tsaResponse);
 
-                // Find qualifyingProperties in the imported xmlSignature XML node tree
-                var importedQualProps = xmlSignature.SelectSingleNode("//xades:QualifyingProperties", nsManager) as XmlElement;
+                // Find qualifyingProperties in the imported xmlSignature XML node tree using relative XPath
+                var importedQualProps = xmlSignature.SelectSingleNode(".//xades:QualifyingProperties", nsManager) as XmlElement;
                 if (importedQualProps == null)
                 {
                     throw new CryptographicException("xades:QualifyingProperties element was not found in computed signature.");
@@ -270,7 +258,7 @@ namespace OdfKit.Core
                 importedQualProps.AppendChild(unsignedProps);
 
                 // 7. If XAdES-A, add certificate values and revocation values
-                if (options.Level == XadesLevel.A)
+                if (options.SignatureLevel == OdfSignatureLevel.XadesA)
                 {
                     // Build certificate chain
                     var chain = new X509Chain();
@@ -431,8 +419,12 @@ namespace OdfKit.Core
                         IsRevocationValid = true
                     };
                     result.Signatures.Add(singleResult);
+                    singleResult.ValidationSteps.Add($"Starting verification for signature ID: {singleResult.SignatureId}");
 
-                    var signedXml = new XadesSignedXml(doc);
+                    var signedXml = new XadesSignedXml(doc)
+                    {
+                        Resolver = new OdfPackageXmlResolver(package)
+                    };
                     signedXml.LoadXml((XmlElement)signatureNode);
 
                     bool singleValid = true;
@@ -449,7 +441,9 @@ namespace OdfKit.Core
                             catch (FormatException ex)
                             {
                                 singleResult.IsRevocationValid = false;
+                                singleResult.ErrorCode = "CRL_INVALID_FORMAT";
                                 singleResult.ErrorMessage = $"Embedded CRL is not valid Base64: {ex.Message}";
+                                singleResult.Warnings.Add(singleResult.ErrorMessage);
                                 singleValid = false;
                                 overallValid = false;
                                 break;
@@ -462,27 +456,8 @@ namespace OdfKit.Core
                         continue;
                     }
 
-                    var openStreams = new List<Stream>();
                     try
                     {
-                        if (signedXml.SignedInfo != null)
-                        {
-                            foreach (Reference reference in signedXml.SignedInfo.References)
-                            {
-                                string? uri = reference.Uri;
-                                if (uri != null && !uri.StartsWith("#"))
-                                {
-                                    string entryName = uri.Replace('\\', '/').TrimStart('/');
-                                    if (package.HasEntry(entryName))
-                                    {
-                                        var stream = package.GetEntryStream(entryName);
-                                        openStreams.Add(stream);
-                                        InjectReferenceStream(reference, stream);
-                                    }
-                                }
-                            }
-                        }
-
                         // Extract certificate
                         X509Certificate2? cert = null;
                         if (signedXml.KeyInfo != null)
@@ -506,6 +481,7 @@ namespace OdfKit.Core
 
                         if (cert == null)
                         {
+                            singleResult.ErrorCode = "CERTIFICATE_MISSING";
                             singleResult.ErrorMessage = "Signature key info does not contain a valid X509 certificate.";
                             overallValid = false;
                             continue;
@@ -514,36 +490,75 @@ namespace OdfKit.Core
                         singleResult.Certificate = cert;
 
                         // 1. Verify XML DSig signature
-                        bool isSignatureValid = signedXml.CheckSignature(cert, true);
+                        singleResult.ValidationSteps.Add("1. Verifying cryptographic XMLDSig signature...");
+                        
+                        var openStreams = new List<Stream>();
+                        bool isSignatureValid = false;
+                        try
+                        {
+                            if (signedXml.SignedInfo != null)
+                            {
+                                foreach (Reference reference in signedXml.SignedInfo.References)
+                                {
+                                    string? uri = reference.Uri;
+                                    if (!string.IsNullOrEmpty(uri) && !uri!.StartsWith("#"))
+                                    {
+                                        string entryName = uri.Replace('\\', '/').TrimStart('/');
+                                        if (package.HasEntry(entryName))
+                                        {
+                                            var stream = package.GetEntryStream(entryName);
+                                            openStreams.Add(stream);
+                                            InjectReferenceStream(reference, stream);
+                                        }
+                                    }
+                                }
+                            }
+
+                            isSignatureValid = signedXml.CheckSignature(cert, true);
+                        }
+                        finally
+                        {
+                            foreach (var stream in openStreams)
+                            {
+                                stream.Dispose();
+                            }
+                        }
+
                         singleResult.IsSignatureValid = isSignatureValid;
                         if (!isSignatureValid)
                         {
+                            singleResult.ErrorCode = "CRYPTOGRAPHIC_SIGNATURE_INVALID";
                             singleResult.ErrorMessage = "XML signature verification failed (cryptographically invalid).";
                             overallValid = false;
                             continue;
                         }
 
                         // 2. Validate certificate validity period
+                        singleResult.ValidationSteps.Add("2. Verifying certificate validity period...");
                         var now = DateTime.UtcNow;
                         var notBeforeUtc = cert.NotBefore.ToUniversalTime();
                         var notAfterUtc = cert.NotAfter.ToUniversalTime();
                         singleResult.IsCertificateValid = (now >= notBeforeUtc && now <= notAfterUtc);
                         if (!singleResult.IsCertificateValid)
                         {
+                            singleResult.ErrorCode = "CERTIFICATE_EXPIRED";
                             singleResult.ErrorMessage = "Signing certificate is expired or not yet valid.";
                             overallValid = false;
                             continue;
                         }
 
                         // 3. XAdES-BES CertDigest validation
+                        singleResult.ValidationSteps.Add("3. Verifying signing certificate digest...");
                         if (!VerifySigningCertificateDigest((XmlElement)signatureNode, cert, out string? digestError))
                         {
+                            singleResult.ErrorCode = "CERTIFICATE_DIGEST_MISMATCH";
                             singleResult.ErrorMessage = digestError;
                             overallValid = false;
                             continue;
                         }
 
                         // 4. Validate Certificate Chain
+                        singleResult.ValidationSteps.Add("4. Verifying certificate trust chain...");
                         var chain = new X509Chain();
                         chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
                         foreach (var embeddedCertificate in GetEmbeddedCertificates(signatureNode, nsManager))
@@ -582,6 +597,7 @@ namespace OdfKit.Core
                         singleResult.IsChainValid = isChainValid;
                         if (!isChainValid)
                         {
+                            singleResult.ErrorCode = "CERTIFICATE_CHAIN_INVALID";
                             singleResult.ErrorMessage = "Certificate chain validation failed.";
                             overallValid = false;
                             continue;
@@ -595,6 +611,7 @@ namespace OdfKit.Core
                         }
 
                         // 5. Revocation Check (offline CRLs & online CDP)
+                        singleResult.ValidationSteps.Add("5. Verifying revocation status...");
                         foreach (var chainCert in chainCerts)
                         {
                             if (chainCert.Subject == chainCert.Issuer) continue;
@@ -614,6 +631,7 @@ namespace OdfKit.Core
                                 if (options.CheckRevocation)
                                 {
                                     singleResult.IsRevocationValid = false;
+                                    singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
                                     singleResult.ErrorMessage = $"Issuer certificate for {chainCert.Subject} not found in chain.";
                                     singleValid = false;
                                     overallValid = false;
@@ -639,6 +657,7 @@ namespace OdfKit.Core
                                             // Validate CRL cryptographic signature using issuer's public key
                                             if (!VerifyCrlSignature(crlBytes, issuerCert))
                                             {
+                                                singleResult.ErrorCode = "CRL_SIGNATURE_INVALID";
                                                 throw new CryptographicException("Embedded CRL signature is invalid.");
                                             }
 
@@ -647,6 +666,7 @@ namespace OdfKit.Core
                                             if (revoked.Contains(NormalizeHexSerial(chainCert.SerialNumber)))
                                             {
                                                 isRevoked = true;
+                                                singleResult.ErrorCode = "CERTIFICATE_REVOKED";
                                                 break;
                                             }
                                         }
@@ -657,6 +677,10 @@ namespace OdfKit.Core
                                     if (options.CheckRevocation)
                                     {
                                         singleResult.IsRevocationValid = false;
+                                        if (string.IsNullOrEmpty(singleResult.ErrorCode))
+                                        {
+                                            singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
+                                        }
                                         singleResult.ErrorMessage = $"Embedded CRL validation failed: {ex.Message}";
                                         singleValid = false;
                                         overallValid = false;
@@ -686,6 +710,7 @@ namespace OdfKit.Core
                                 if (urls.Count == 0 && !checkedAnyCrl)
                                 {
                                     singleResult.IsRevocationValid = false;
+                                    singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
                                     singleResult.ErrorMessage = $"No CRL distribution points found for certificate {chainCert.Subject}.";
                                     singleValid = false;
                                     overallValid = false;
@@ -706,6 +731,7 @@ namespace OdfKit.Core
                                             // Validate CRL cryptographic signature using issuer's public key
                                             if (!VerifyCrlSignature(crlBytes, issuerCert))
                                             {
+                                                singleResult.ErrorCode = "CRL_SIGNATURE_INVALID";
                                                 throw new CryptographicException("Downloaded CRL signature is invalid.");
                                             }
 
@@ -714,6 +740,7 @@ namespace OdfKit.Core
                                             if (revoked.Contains(NormalizeHexSerial(chainCert.SerialNumber)))
                                             {
                                                 isRevoked = true;
+                                                singleResult.ErrorCode = "CERTIFICATE_REVOKED";
                                                 break;
                                             }
                                         }
@@ -731,6 +758,10 @@ namespace OdfKit.Core
                                 if (isRevoked)
                                 {
                                     singleResult.IsRevocationValid = false;
+                                    if (string.IsNullOrEmpty(singleResult.ErrorCode))
+                                    {
+                                        singleResult.ErrorCode = "CERTIFICATE_REVOKED";
+                                    }
                                     singleResult.ErrorMessage = $"Certificate {chainCert.Subject} has been revoked online.";
                                     singleValid = false;
                                     overallValid = false;
@@ -741,6 +772,7 @@ namespace OdfKit.Core
                                 if (!onlineCrlCheckedSuccessfully && !checkedAnyCrl)
                                 {
                                     singleResult.IsRevocationValid = false;
+                                    singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
                                     singleResult.ErrorMessage = $"CRL retrieval or validation failed for certificate {chainCert.Subject}. Last error: {lastCrlException?.Message}";
                                     singleValid = false;
                                     overallValid = false;
@@ -755,6 +787,7 @@ namespace OdfKit.Core
                         }
 
                         // 6. XAdES-T/A Timestamp validation
+                        singleResult.ValidationSteps.Add("6. Verifying signature timestamp...");
                         var timestampNode = signatureNode.SelectSingleNode(".//xades:SignatureTimeStamp/xades:EncapsulatedTimeStamp", nsManager);
                         if (timestampNode != null)
                         {
@@ -787,6 +820,7 @@ namespace OdfKit.Core
                             catch (Exception ex)
                             {
                                 singleResult.IsTimestampValid = false;
+                                singleResult.ErrorCode = "TIMESTAMP_SIGNATURE_INVALID";
                                 singleResult.ErrorMessage = $"Timestamp signature verification failed: {ex.Message}";
                                 overallValid = false;
                                 continue;
@@ -797,21 +831,13 @@ namespace OdfKit.Core
                             if (signatureValueElem == null)
                             {
                                 singleResult.IsTimestampValid = false;
+                                singleResult.ErrorCode = "TIMESTAMP_IMPRINT_MISMATCH";
                                 singleResult.ErrorMessage = "Missing SignatureValue for timestamp verification.";
                                 overallValid = false;
                                 continue;
                             }
 
-                            var cleanDoc = new XmlDocument();
-                            var imported = (XmlElement)cleanDoc.ImportNode(signatureValueElem, true);
-                            cleanDoc.AppendChild(imported);
-
-                            var transform = new XmlDsigExcC14NTransform();
-                            transform.LoadInput(imported.SelectNodes("descendant-or-self::node()")!);
-                            using var tsStream = (Stream)transform.GetOutput(typeof(Stream));
-                            using var tsMs = new MemoryStream();
-                            tsStream.CopyTo(tsMs);
-                            byte[] sigBytes = tsMs.ToArray();
+                            byte[] sigBytes = CanonicalizeSignatureValue(signatureValueElem);
 
                             using var sha256 = SHA256.Create();
                             byte[] calculatedHash = sha256.ComputeHash(sigBytes);
@@ -831,20 +857,35 @@ namespace OdfKit.Core
                             if (embeddedHash == null || !StructuralEqual(calculatedHash, embeddedHash))
                             {
                                 singleResult.IsTimestampValid = false;
+                                singleResult.ErrorCode = "TIMESTAMP_IMPRINT_MISMATCH";
                                 singleResult.ErrorMessage = "Timestamp message imprint does not match the signature value.";
                                 overallValid = false;
                                 continue;
+                            }
+                        }
+
+                        // Collect references
+                        if (signedXml.SignedInfo != null)
+                        {
+                            foreach (Reference reference in signedXml.SignedInfo.References)
+                            {
+                                string? uri = reference.Uri;
+                                if (uri != null && !uri.StartsWith("#"))
+                                {
+                                    string entryName = uri.Replace('\\', '/').TrimStart('/');
+                                    singleResult.CheckedReferences.Add(entryName);
+                                }
                             }
                         }
                     }
                     catch (Exception ex)
                     {
                         singleResult.ErrorMessage = $"Verification error: {ex.Message}";
+                        if (string.IsNullOrEmpty(singleResult.ErrorCode))
+                        {
+                            singleResult.ErrorCode = "VERIFICATION_ERROR";
+                        }
                         overallValid = false;
-                    }
-                    finally
-                    {
-                        foreach (var s in openStreams) s.Dispose();
                     }
                 }
 
@@ -859,31 +900,18 @@ namespace OdfKit.Core
             }
         }
 
-        /// <summary>
-        /// Inject raw Stream directly into SignedXml's Reference using reflection to bypass modern .NET Core URI resolution limits.
-        /// </summary>
-        private static void InjectReferenceStream(Reference reference, Stream stream)
+        private static byte[] CanonicalizeSignatureValue(XmlElement signatureValueElem)
         {
-            if (reference == null) throw new ArgumentNullException(nameof(reference));
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            var cleanDoc = new XmlDocument();
+            var imported = (XmlElement)cleanDoc.ImportNode(signatureValueElem, true);
+            cleanDoc.AppendChild(imported);
 
-            var type = typeof(Reference);
-            var refTargetField = type.GetField("_refTarget", BindingFlags.Instance | BindingFlags.NonPublic)
-                ?? type.GetField("m_refTarget", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            var refTargetTypeField = type.GetField("_refTargetType", BindingFlags.Instance | BindingFlags.NonPublic)
-                ?? type.GetField("m_refTargetType", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            if (refTargetField == null || refTargetTypeField == null)
-            {
-                throw new CryptographicException("Failed to locate required internal fields (_refTarget / _refTargetType) in Reference.");
-            }
-
-            refTargetField.SetValue(reference, stream);
-
-            var enumType = refTargetTypeField.FieldType;
-            var streamVal = Enum.ToObject(enumType, 0); // 0 corresponds to Stream
-            refTargetTypeField.SetValue(reference, streamVal);
+            var transform = new XmlDsigExcC14NTransform();
+            transform.LoadInput(imported.SelectNodes("descendant-or-self::node()")!);
+            using var tsStream = (Stream)transform.GetOutput(typeof(Stream));
+            using var tsMs = new MemoryStream();
+            tsStream.CopyTo(tsMs);
+            return tsMs.ToArray();
         }
 
         #region Helper classes and ASN.1/DER/CRL/TSA utilities
@@ -1405,8 +1433,130 @@ namespace OdfKit.Core
                 return false;
             }
         }
+        /// <summary>
+        /// Inject raw Stream directly into SignedXml's Reference using reflection to bypass modern .NET Core URI resolution limits.
+        /// </summary>
+        private static void InjectReferenceStream(Reference reference, Stream stream)
+        {
+            if (reference == null) throw new ArgumentNullException(nameof(reference));
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            var type = typeof(Reference);
+            var refTargetField = type.GetField("_refTarget", BindingFlags.Instance | BindingFlags.NonPublic)
+                ?? type.GetField("m_refTarget", BindingFlags.Instance | BindingFlags.NonPublic);
+                
+            var refTargetTypeField = type.GetField("_refTargetType", BindingFlags.Instance | BindingFlags.NonPublic)
+                ?? type.GetField("m_refTargetType", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            if (refTargetField == null || refTargetTypeField == null)
+            {
+                throw new CryptographicException("Failed to locate required internal fields (_refTarget / _refTargetType) in Reference.");
+            }
+
+            refTargetField.SetValue(reference, stream);
+            
+            // ReferenceTargetType.Stream is 0
+            var enumType = refTargetTypeField.FieldType;
+            var streamVal = Enum.ToObject(enumType, 0); // 0 corresponds to Stream
+            refTargetTypeField.SetValue(reference, streamVal);
+        }
 
         #endregion
+    }
+
+    internal sealed class OdfPackageXmlResolver : XmlResolver
+    {
+        private readonly OdfPackage _package;
+
+        public OdfPackageXmlResolver(OdfPackage package)
+        {
+            _package = package;
+        }
+
+        public override System.Net.ICredentials Credentials
+        {
+            set { }
+        }
+
+        public override object? GetEntity(Uri absoluteUri, string? role, Type? ofObjectToReturn)
+        {
+            if (absoluteUri == null) throw new ArgumentNullException(nameof(absoluteUri));
+
+            if (string.Equals(absoluteUri.Scheme, "odf", StringComparison.OrdinalIgnoreCase))
+            {
+                string path = absoluteUri.AbsolutePath.TrimStart('/');
+                if (_package.HasEntry(path))
+                {
+                    return _package.GetEntryStream(path);
+                }
+            }
+            else if (string.Equals(absoluteUri.Scheme, "file", StringComparison.OrdinalIgnoreCase))
+            {
+                string localPath = absoluteUri.LocalPath;
+
+                // Try resolving relative to current working directory
+                string currentDir = Directory.GetCurrentDirectory();
+                string? relativePath = GetRelativePath(currentDir, localPath);
+                if (relativePath != null && _package.HasEntry(relativePath))
+                {
+                    return _package.GetEntryStream(relativePath);
+                }
+
+                // Try resolving relative to AppDomain base directory
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                if (!string.IsNullOrEmpty(baseDir))
+                {
+                    relativePath = GetRelativePath(baseDir, localPath);
+                    if (relativePath != null && _package.HasEntry(relativePath))
+                    {
+                        return _package.GetEntryStream(relativePath);
+                    }
+                }
+
+                // Fallback: check if the file name alone exists in the package
+                string fileName = Path.GetFileName(localPath);
+                if (_package.HasEntry(fileName))
+                {
+                    return _package.GetEntryStream(fileName);
+                }
+            }
+
+            return null;
+        }
+
+        public override Uri ResolveUri(Uri? baseUri, string? relativeUri)
+        {
+            if (baseUri == null)
+            {
+                return new Uri($"odf://package/{relativeUri?.TrimStart('/')}");
+            }
+            return new Uri(baseUri, relativeUri);
+        }
+
+        private static string? GetRelativePath(string baseDir, string fullPath)
+        {
+            try
+            {
+                if (!baseDir.EndsWith(Path.DirectorySeparatorChar.ToString()) && 
+                    !baseDir.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
+                {
+                    baseDir += Path.DirectorySeparatorChar;
+                }
+
+                Uri baseUri = new Uri(baseDir);
+                Uri fullUri = new Uri(fullPath);
+                if (baseUri.Scheme != fullUri.Scheme) return null;
+
+                Uri relativeUri = baseUri.MakeRelativeUri(fullUri);
+                if (relativeUri.IsAbsoluteUri) return null;
+
+                return Uri.UnescapeDataString(relativeUri.ToString()).Replace('\\', '/');
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 
     /// <summary>

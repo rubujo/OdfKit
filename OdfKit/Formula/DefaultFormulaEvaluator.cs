@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.Spreadsheet;
@@ -223,6 +223,11 @@ namespace OdfKit.Formula
                     "LEFT" => EvaluateLeft(arguments, context),
                     "RIGHT" => EvaluateRight(arguments, context),
                     "MID" => EvaluateMid(arguments, context),
+                    "LEN" => EvaluateLen(arguments, context),
+                    "LOWER" => EvaluateLower(arguments, context),
+                    "UPPER" => EvaluateUpper(arguments, context),
+                    "TRIM" => EvaluateTrim(arguments, context),
+                    "REPLACE" => EvaluateReplace(arguments, context),
 
                     // 3. Statistical Functions
                     "SUM" => EvaluateSum(arguments, context),
@@ -230,9 +235,61 @@ namespace OdfKit.Formula
                     "COUNT" => EvaluateCount(arguments, context),
                     "SUMIF" => EvaluateSumIf(arguments, context),
                     "COUNTIF" => EvaluateCountIf(arguments, context),
+                    "MAX" => EvaluateMax(arguments, context),
+                    "MIN" => EvaluateMin(arguments, context),
 
                     // 4. Lookup Functions
                     "VLOOKUP" => EvaluateVLookup(arguments, context),
+
+                    // 5. Math Functions
+                    "ABS" => EvaluateAbs(arguments, context),
+                    "SQRT" => EvaluateSqrt(arguments, context),
+                    "ROUND" => EvaluateRound(arguments, context),
+                    "MOD" => EvaluateMod(arguments, context),
+                    "POWER" => EvaluatePower(arguments, context),
+                    "LN" => EvaluateLn(arguments, context),
+                    "LOG" => EvaluateLog(arguments, context),
+                    "EXP" => EvaluateExp(arguments, context),
+                    "CEILING" => EvaluateCeiling(arguments, context),
+                    "FLOOR" => EvaluateFloor(arguments, context),
+                    "PI" => EvaluatePi(arguments, context),
+                    "DEGREES" => EvaluateDegrees(arguments, context),
+                    "RADIANS" => EvaluateRadians(arguments, context),
+                    "SIN" => EvaluateSin(arguments, context),
+                    "COS" => EvaluateCos(arguments, context),
+                    "TAN" => EvaluateTan(arguments, context),
+                    "TRUNC" => EvaluateTrunc(arguments, context),
+
+                    // 6. Date/Time Functions
+                    "DATE" => EvaluateDate(arguments, context),
+                    "DAY" => EvaluateDay(arguments, context),
+                    "HOUR" => EvaluateHour(arguments, context),
+                    "MINUTE" => EvaluateMinute(arguments, context),
+                    "MONTH" => EvaluateMonth(arguments, context),
+                    "NOW" => EvaluateNow(arguments, context),
+                    "SECOND" => EvaluateSecond(arguments, context),
+                    "TIME" => EvaluateTime(arguments, context),
+                    "TODAY" => EvaluateToday(arguments, context),
+                    "YEAR" => EvaluateYear(arguments, context),
+
+                    // 7. Matrix Functions
+                    "TRANSPOSE" => EvaluateTranspose(arguments, context),
+
+                    // 8. Database Functions
+                    "DSUM" => EvaluateDSum(arguments, context),
+                    "DAVERAGE" => EvaluateDAverage(arguments, context),
+                    "DCOUNT" => EvaluateDCount(arguments, context),
+                    "DMAX" => EvaluateDMax(arguments, context),
+                    "DMIN" => EvaluateDMin(arguments, context),
+
+                    // 9. Financial Functions
+                    "PMT" => EvaluatePmt(arguments, context),
+                    "FV" => EvaluateFv(arguments, context),
+                    "PV" => EvaluatePv(arguments, context),
+                    "NPER" => EvaluateNper(arguments, context),
+                    "RATE" => EvaluateRate(arguments, context),
+                    "IPMT" => EvaluateIpmt(arguments, context),
+                    "PPMT" => EvaluatePpmt(arguments, context),
 
                     _ => OdfFormulaError.Name
                 };
@@ -613,11 +670,1204 @@ namespace OdfKit.Formula
 
         #endregion
 
+        #region Math Functions
+
+        private static object EvaluateAbs(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double d)) return OdfFormulaError.Value;
+            return Math.Abs(d);
+        }
+
+        private static object EvaluateSqrt(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double d)) return OdfFormulaError.Value;
+            if (d < 0) return OdfFormulaError.Num;
+            return Math.Sqrt(d);
+        }
+
+        private static object EvaluateRound(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 1 || arguments.Count > 2) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double num)) return OdfFormulaError.Value;
+
+            double digits = 0;
+            if (arguments.Count == 2)
+            {
+                var digitsVal = arguments[1].Evaluate(context);
+                if (digitsVal is OdfFormulaError err2) return err2;
+                if (!TryCoerceDouble(digitsVal, out digits)) return OdfFormulaError.Value;
+            }
+
+            int count = (int)digits;
+            if (count >= 0)
+            {
+                return Math.Round(num, count, MidpointRounding.AwayFromZero);
+            }
+            else
+            {
+                double factor = Math.Pow(10, -count);
+                return Math.Round(num / factor, 0, MidpointRounding.AwayFromZero) * factor;
+            }
+        }
+
+        private static object EvaluateMod(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 2) return OdfFormulaError.Value;
+            var val1 = arguments[0].Evaluate(context);
+            var val2 = arguments[1].Evaluate(context);
+            if (val1 is OdfFormulaError err1) return err1;
+            if (val2 is OdfFormulaError err2) return err2;
+
+            if (!TryCoerceDouble(val1, out double n) || !TryCoerceDouble(val2, out double d))
+                return OdfFormulaError.Value;
+
+            if (d == 0) return OdfFormulaError.Div0;
+            return n - d * Math.Floor(n / d);
+        }
+
+        private static object EvaluatePower(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 2) return OdfFormulaError.Value;
+            var val1 = arguments[0].Evaluate(context);
+            var val2 = arguments[1].Evaluate(context);
+            if (val1 is OdfFormulaError err1) return err1;
+            if (val2 is OdfFormulaError err2) return err2;
+
+            if (!TryCoerceDouble(val1, out double b) || !TryCoerceDouble(val2, out double e))
+                return OdfFormulaError.Value;
+
+            if (b < 0 && Math.Abs(e - (int)e) > 1e-9) return OdfFormulaError.Num;
+            if (b == 0 && e < 0) return OdfFormulaError.Div0;
+            return Math.Pow(b, e);
+        }
+
+        private static object EvaluateLn(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double d)) return OdfFormulaError.Value;
+            if (d <= 0) return OdfFormulaError.Num;
+            return Math.Log(d);
+        }
+
+        private static object EvaluateLog(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 1 || arguments.Count > 2) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double num)) return OdfFormulaError.Value;
+            if (num <= 0) return OdfFormulaError.Num;
+
+            double baseVal = 10;
+            if (arguments.Count == 2)
+            {
+                var baseObject = arguments[1].Evaluate(context);
+                if (baseObject is OdfFormulaError err2) return err2;
+                if (!TryCoerceDouble(baseObject, out baseVal)) return OdfFormulaError.Value;
+                if (baseVal <= 0 || baseVal == 1) return OdfFormulaError.Num;
+            }
+
+            return Math.Log(num, baseVal);
+        }
+
+        private static object EvaluateExp(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double d)) return OdfFormulaError.Value;
+            return Math.Exp(d);
+        }
+
+        private static object EvaluateCeiling(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 1 || arguments.Count > 3) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double num)) return OdfFormulaError.Value;
+
+            if (arguments.Count == 1)
+            {
+                return Math.Ceiling(num);
+            }
+
+            var sigVal = arguments[1].Evaluate(context);
+            if (sigVal is OdfFormulaError err2) return err2;
+            if (!TryCoerceDouble(sigVal, out double significance)) return OdfFormulaError.Value;
+            if (significance == 0.0) return 0.0;
+
+            int mode = 1;
+            if (arguments.Count == 3)
+            {
+                var modeVal = arguments[2].Evaluate(context);
+                if (modeVal is OdfFormulaError err3) return err3;
+                if (!TryCoerceDouble(modeVal, out double m)) return OdfFormulaError.Value;
+                mode = (int)m;
+            }
+
+            if (num > 0 && significance < 0) return OdfFormulaError.Num;
+            if (num == 0.0) return 0.0;
+
+            if (mode == 0)
+            {
+                return Math.Ceiling(num / significance) * significance;
+            }
+            else
+            {
+                if (num < 0)
+                    return Math.Floor(num / significance) * significance;
+                else
+                    return Math.Ceiling(num / significance) * significance;
+            }
+        }
+
+        private static object EvaluateFloor(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 1 || arguments.Count > 3) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double num)) return OdfFormulaError.Value;
+
+            if (arguments.Count == 1)
+            {
+                return Math.Floor(num);
+            }
+
+            var sigVal = arguments[1].Evaluate(context);
+            if (sigVal is OdfFormulaError err2) return err2;
+            if (!TryCoerceDouble(sigVal, out double significance)) return OdfFormulaError.Value;
+            if (significance == 0.0) return 0.0;
+
+            int mode = 1;
+            if (arguments.Count == 3)
+            {
+                var modeVal = arguments[2].Evaluate(context);
+                if (modeVal is OdfFormulaError err3) return err3;
+                if (!TryCoerceDouble(modeVal, out double m)) return OdfFormulaError.Value;
+                mode = (int)m;
+            }
+
+            if (num > 0 && significance < 0) return OdfFormulaError.Num;
+            if (num == 0.0) return 0.0;
+
+            if (mode == 0)
+            {
+                return Math.Floor(num / significance) * significance;
+            }
+            else
+            {
+                if (num < 0)
+                    return Math.Ceiling(num / significance) * significance;
+                else
+                    return Math.Floor(num / significance) * significance;
+            }
+        }
+
+        private static object EvaluatePi(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 0) return OdfFormulaError.Value;
+            return Math.PI;
+        }
+
+        private static object EvaluateDegrees(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double d)) return OdfFormulaError.Value;
+            return d * 180.0 / Math.PI;
+        }
+
+        private static object EvaluateRadians(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double d)) return OdfFormulaError.Value;
+            return d * Math.PI / 180.0;
+        }
+
+        private static object EvaluateSin(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double d)) return OdfFormulaError.Value;
+            return Math.Sin(d);
+        }
+
+        private static object EvaluateCos(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double d)) return OdfFormulaError.Value;
+            return Math.Cos(d);
+        }
+
+        private static object EvaluateTan(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double d)) return OdfFormulaError.Value;
+            return Math.Tan(d);
+        }
+
+        private static object EvaluateTrunc(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 1 || arguments.Count > 2) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDouble(val, out double num)) return OdfFormulaError.Value;
+
+            double digits = 0;
+            if (arguments.Count == 2)
+            {
+                var digitsVal = arguments[1].Evaluate(context);
+                if (digitsVal is OdfFormulaError err2) return err2;
+                if (!TryCoerceDouble(digitsVal, out digits)) return OdfFormulaError.Value;
+            }
+
+            int count = (int)digits;
+            double factor = Math.Pow(10, count);
+            if (num < 0)
+                return Math.Ceiling(num * factor) / factor;
+            else
+                return Math.Floor(num * factor) / factor;
+        }
+
+        #endregion
+
+        #region Additional String Functions
+
+        private static object EvaluateLen(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            string str = val.ToString() ?? "";
+            return (double)str.Length;
+        }
+
+        private static object EvaluateLower(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            string str = val.ToString() ?? "";
+            return str.ToLowerInvariant();
+        }
+
+        private static object EvaluateUpper(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            string str = val.ToString() ?? "";
+            return str.ToUpperInvariant();
+        }
+
+        private static object EvaluateTrim(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            string str = val.ToString() ?? "";
+            str = str.Trim();
+            var sb = new System.Text.StringBuilder();
+            bool lastWasSpace = false;
+            foreach (char c in str)
+            {
+                if (c == ' ')
+                {
+                    if (!lastWasSpace)
+                    {
+                        sb.Append(c);
+                        lastWasSpace = true;
+                    }
+                }
+                else
+                {
+                    sb.Append(c);
+                    lastWasSpace = false;
+                }
+            }
+            return sb.ToString();
+        }
+
+        private static object EvaluateReplace(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 4) return OdfFormulaError.Value;
+            var valText = arguments[0].Evaluate(context);
+            var valStart = arguments[1].Evaluate(context);
+            var valLen = arguments[2].Evaluate(context);
+            var valNewText = arguments[3].Evaluate(context);
+
+            if (valText is OdfFormulaError err1) return err1;
+            if (valStart is OdfFormulaError err2) return err2;
+            if (valLen is OdfFormulaError err3) return err3;
+            if (valNewText is OdfFormulaError err4) return err4;
+
+            string oldText = valText.ToString() ?? "";
+            if (!TryCoerceDouble(valStart, out double startD) || !TryCoerceDouble(valLen, out double lenD))
+                return OdfFormulaError.Value;
+
+            int startIndex = (int)startD - 1;
+            int len = (int)lenD;
+            string newText = valNewText.ToString() ?? "";
+
+            if (startIndex < 0 || len < 0) return OdfFormulaError.Value;
+            if (startIndex > oldText.Length) startIndex = oldText.Length;
+            int end = startIndex + len;
+            if (end > oldText.Length) end = oldText.Length;
+
+            string part1 = oldText.Substring(0, startIndex);
+            string part2 = oldText.Substring(end);
+            return part1 + newText + part2;
+        }
+
+        #endregion
+
+        #region Additional Statistical Functions
+
+        private static object EvaluateMax(List<AstNode> arguments, IEvaluationContext context)
+        {
+            double max = double.MinValue;
+            bool hasNumber = false;
+            foreach (var arg in arguments)
+            {
+                var val = arg.Evaluate(context);
+                if (val is OdfFormulaError err) return err;
+                foreach (var innerVal in FlattenValues(val))
+                {
+                    if (TryCoerceDouble(innerVal, out double d))
+                    {
+                        if (d > max) max = d;
+                        hasNumber = true;
+                    }
+                }
+            }
+            return hasNumber ? max : 0.0;
+        }
+
+        private static object EvaluateMin(List<AstNode> arguments, IEvaluationContext context)
+        {
+            double min = double.MaxValue;
+            bool hasNumber = false;
+            foreach (var arg in arguments)
+            {
+                var val = arg.Evaluate(context);
+                if (val is OdfFormulaError err) return err;
+                foreach (var innerVal in FlattenValues(val))
+                {
+                    if (TryCoerceDouble(innerVal, out double d))
+                    {
+                        if (d < min) min = d;
+                        hasNumber = true;
+                    }
+                }
+            }
+            return hasNumber ? min : 0.0;
+        }
+
+        #endregion
+
+        #region Database and Financial Functions
+
+        private static object EvaluateDatabaseFunction(string name, List<AstNode> arguments, IEvaluationContext context, Func<List<double>, object> aggregator)
+        {
+            if (arguments.Count != 3) return OdfFormulaError.Value;
+
+            var dbVal = arguments[0].Evaluate(context);
+            var fieldVal = arguments[1].Evaluate(context);
+            var criteriaVal = arguments[2].Evaluate(context);
+
+            if (dbVal is OdfFormulaError err1) return err1;
+            if (fieldVal is OdfFormulaError err2) return err2;
+            if (criteriaVal is OdfFormulaError err3) return err3;
+
+            if (dbVal is not object[,] db || criteriaVal is not object[,] crit) return OdfFormulaError.Value;
+
+            int dbRows = db.GetLength(0);
+            int dbCols = db.GetLength(1);
+            int critRows = crit.GetLength(0);
+            int critCols = crit.GetLength(1);
+
+            if (dbRows < 2 || dbCols < 1 || critRows < 2 || critCols < 1) return OdfFormulaError.Value;
+
+            // Resolve field column index
+            int fieldCol = -1;
+            if (TryCoerceDouble(fieldVal, out double colD))
+            {
+                fieldCol = (int)colD - 1;
+            }
+            else
+            {
+                string fieldStr = fieldVal.ToString() ?? "";
+                for (int c = 0; c < dbCols; c++)
+                {
+                    if (string.Equals(db[0, c]?.ToString(), fieldStr, StringComparison.OrdinalIgnoreCase))
+                    {
+                        fieldCol = c;
+                        break;
+                    }
+                }
+            }
+
+            if (fieldCol < 0 || fieldCol >= dbCols) return OdfFormulaError.Value;
+
+            // Map criteria columns
+            var critColMap = new Dictionary<int, int>(); // critCol -> dbCol
+            for (int c = 0; c < critCols; c++)
+            {
+                string header = crit[0, c]?.ToString() ?? "";
+                if (string.IsNullOrEmpty(header)) continue;
+
+                int mappedCol = -1;
+                for (int dc = 0; dc < dbCols; dc++)
+                {
+                    if (string.Equals(db[0, dc]?.ToString(), header, StringComparison.OrdinalIgnoreCase))
+                    {
+                        mappedCol = dc;
+                        break;
+                    }
+                }
+                critColMap[c] = mappedCol;
+            }
+
+            var selectedValues = new List<double>();
+
+            // For each row in database (excluding header)
+            for (int r = 1; r < dbRows; r++)
+            {
+                bool rowMatches = false;
+
+                // Match against criteria rows (excluding header)
+                // If any criteria row matches, then rowMatches = true (OR logic across rows)
+                for (int cr = 1; cr < critRows; cr++)
+                {
+                    bool critRowMatches = true;
+                    bool hasConditions = false;
+
+                    // All conditions in the criteria row must match (AND logic within columns of a row)
+                    for (int cc = 0; cc < critCols; cc++)
+                    {
+                        object critCell = crit[cr, cc];
+                        if (critCell == null || string.IsNullOrEmpty(critCell.ToString())) continue;
+
+                        hasConditions = true;
+                        int dbCol = critColMap.TryGetValue(cc, out int mapped) ? mapped : -1;
+                        if (dbCol < 0)
+                        {
+                            critRowMatches = false;
+                            break;
+                        }
+
+                        object dbCell = db[r, dbCol];
+                        var matcher = new CriteriaMatcher(critCell);
+                        if (!matcher.Matches(dbCell))
+                        {
+                            critRowMatches = false;
+                            break;
+                        }
+                    }
+
+                    if (hasConditions && critRowMatches)
+                    {
+                        rowMatches = true;
+                        break;
+                    }
+                }
+
+                if (rowMatches)
+                {
+                    object cellVal = db[r, fieldCol];
+                    if (TryCoerceDouble(cellVal, out double val))
+                    {
+                        selectedValues.Add(val);
+                    }
+                }
+            }
+
+            return aggregator(selectedValues);
+        }
+
+        private static object EvaluateDSum(List<AstNode> arguments, IEvaluationContext context)
+        {
+            return EvaluateDatabaseFunction("DSUM", arguments, context, list =>
+            {
+                double sum = 0;
+                foreach (var d in list) sum += d;
+                return sum;
+            });
+        }
+
+        private static object EvaluateDAverage(List<AstNode> arguments, IEvaluationContext context)
+        {
+            return EvaluateDatabaseFunction("DAVERAGE", arguments, context, list =>
+            {
+                if (list.Count == 0) return OdfFormulaError.Div0;
+                double sum = 0;
+                foreach (var d in list) sum += d;
+                return sum / list.Count;
+            });
+        }
+
+        private static object EvaluateDCount(List<AstNode> arguments, IEvaluationContext context)
+        {
+            return EvaluateDatabaseFunction("DCOUNT", arguments, context, list => (double)list.Count);
+        }
+
+        private static object EvaluateDMax(List<AstNode> arguments, IEvaluationContext context)
+        {
+            return EvaluateDatabaseFunction("DMAX", arguments, context, list =>
+            {
+                if (list.Count == 0) return 0.0;
+                double max = double.MinValue;
+                foreach (var d in list) if (d > max) max = d;
+                return max;
+            });
+        }
+
+        private static object EvaluateDMin(List<AstNode> arguments, IEvaluationContext context)
+        {
+            return EvaluateDatabaseFunction("DMIN", arguments, context, list =>
+            {
+                if (list.Count == 0) return 0.0;
+                double min = double.MaxValue;
+                foreach (var d in list) if (d < min) min = d;
+                return min;
+            });
+        }
+
+        private static object EvaluatePmt(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 3 || arguments.Count > 5) return OdfFormulaError.Value;
+            var valRate = arguments[0].Evaluate(context);
+            var valNper = arguments[1].Evaluate(context);
+            var valPv = arguments[2].Evaluate(context);
+
+            if (valRate is OdfFormulaError err1) return err1;
+            if (valNper is OdfFormulaError err2) return err2;
+            if (valPv is OdfFormulaError err3) return err3;
+
+            if (!TryCoerceDouble(valRate, out double rate) ||
+                !TryCoerceDouble(valNper, out double nper) ||
+                !TryCoerceDouble(valPv, out double pv))
+                return OdfFormulaError.Value;
+
+            double fv = 0;
+            if (arguments.Count >= 4)
+            {
+                var valFv = arguments[3].Evaluate(context);
+                if (valFv is OdfFormulaError err4) return err4;
+                if (!TryCoerceDouble(valFv, out fv)) return OdfFormulaError.Value;
+            }
+
+            double type = 0;
+            if (arguments.Count == 5)
+            {
+                var valType = arguments[4].Evaluate(context);
+                if (valType is OdfFormulaError err5) return err5;
+                if (!TryCoerceDouble(valType, out type)) return OdfFormulaError.Value;
+            }
+
+            if (nper <= 0) return OdfFormulaError.Value;
+
+            if (rate == 0)
+            {
+                return -(pv + fv) / nper;
+            }
+            else
+            {
+                double p = Math.Pow(1 + rate, nper);
+                if (type != 0)
+                {
+                    return -(pv * p + fv) * rate / ((p - 1) * (1 + rate));
+                }
+                else
+                {
+                    return -(pv * p + fv) * rate / (p - 1);
+                }
+            }
+        }
+
+        private static object EvaluateFv(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 3 || arguments.Count > 5) return OdfFormulaError.Value;
+            var valRate = arguments[0].Evaluate(context);
+            var valNper = arguments[1].Evaluate(context);
+            var valPmt = arguments[2].Evaluate(context);
+
+            if (valRate is OdfFormulaError err1) return err1;
+            if (valNper is OdfFormulaError err2) return err2;
+            if (valPmt is OdfFormulaError err3) return err3;
+
+            if (!TryCoerceDouble(valRate, out double rate) ||
+                !TryCoerceDouble(valNper, out double nper) ||
+                !TryCoerceDouble(valPmt, out double pmt))
+                return OdfFormulaError.Value;
+
+            double pv = 0;
+            if (arguments.Count >= 4)
+            {
+                var valPv = arguments[3].Evaluate(context);
+                if (valPv is OdfFormulaError err4) return err4;
+                if (!TryCoerceDouble(valPv, out pv)) return OdfFormulaError.Value;
+            }
+
+            double type = 0;
+            if (arguments.Count == 5)
+            {
+                var valType = arguments[4].Evaluate(context);
+                if (valType is OdfFormulaError err5) return err5;
+                if (!TryCoerceDouble(valType, out type)) return OdfFormulaError.Value;
+            }
+
+            if (rate == 0)
+            {
+                return -(pv + pmt * nper);
+            }
+            else
+            {
+                double p = Math.Pow(1 + rate, nper);
+                if (type != 0)
+                {
+                    return -pv * p - pmt * (1 + rate) * (p - 1) / rate;
+                }
+                else
+                {
+                    return -pv * p - pmt * (p - 1) / rate;
+                }
+            }
+        }
+
+        private static object EvaluatePv(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 3 || arguments.Count > 5) return OdfFormulaError.Value;
+            var valRate = arguments[0].Evaluate(context);
+            var valNper = arguments[1].Evaluate(context);
+            var valPmt = arguments[2].Evaluate(context);
+
+            if (valRate is OdfFormulaError err1) return err1;
+            if (valNper is OdfFormulaError err2) return err2;
+            if (valPmt is OdfFormulaError err3) return err3;
+
+            if (!TryCoerceDouble(valRate, out double rate) ||
+                !TryCoerceDouble(valNper, out double nper) ||
+                !TryCoerceDouble(valPmt, out double pmt))
+                return OdfFormulaError.Value;
+
+            double fv = 0;
+            if (arguments.Count >= 4)
+            {
+                var valFv = arguments[3].Evaluate(context);
+                if (valFv is OdfFormulaError err4) return err4;
+                if (!TryCoerceDouble(valFv, out fv)) return OdfFormulaError.Value;
+            }
+
+            double type = 0;
+            if (arguments.Count == 5)
+            {
+                var valType = arguments[4].Evaluate(context);
+                if (valType is OdfFormulaError err5) return err5;
+                if (!TryCoerceDouble(valType, out type)) return OdfFormulaError.Value;
+            }
+
+            if (rate == 0)
+            {
+                return -(fv + pmt * nper);
+            }
+            else
+            {
+                double p = Math.Pow(1 + rate, nper);
+                if (type != 0)
+                {
+                    return (-fv - pmt * (1 + rate) * (p - 1) / rate) / p;
+                }
+                else
+                {
+                    return (-fv - pmt * (p - 1) / rate) / p;
+                }
+            }
+        }
+
+        private static object EvaluateNper(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 3 || arguments.Count > 5) return OdfFormulaError.Value;
+            var valRate = arguments[0].Evaluate(context);
+            var valPmt = arguments[1].Evaluate(context);
+            var valPv = arguments[2].Evaluate(context);
+
+            if (valRate is OdfFormulaError err1) return err1;
+            if (valPmt is OdfFormulaError err2) return err2;
+            if (valPv is OdfFormulaError err3) return err3;
+
+            if (!TryCoerceDouble(valRate, out double rate) ||
+                !TryCoerceDouble(valPmt, out double pmt) ||
+                !TryCoerceDouble(valPv, out double pv))
+                return OdfFormulaError.Value;
+
+            double fv = 0;
+            if (arguments.Count >= 4)
+            {
+                var valFv = arguments[3].Evaluate(context);
+                if (valFv is OdfFormulaError err4) return err4;
+                if (!TryCoerceDouble(valFv, out fv)) return OdfFormulaError.Value;
+            }
+
+            double type = 0;
+            if (arguments.Count == 5)
+            {
+                var valType = arguments[4].Evaluate(context);
+                if (valType is OdfFormulaError err5) return err5;
+                if (!TryCoerceDouble(valType, out type)) return OdfFormulaError.Value;
+            }
+
+            if (pmt == 0) return OdfFormulaError.Value;
+
+            if (rate == 0)
+            {
+                return -(pv + fv) / pmt;
+            }
+            else
+            {
+                double num = pmt * (1 + rate * (type != 0 ? 1 : 0)) - fv * rate;
+                double den = pmt * (1 + rate * (type != 0 ? 1 : 0)) + pv * rate;
+                if (num * den <= 0) return OdfFormulaError.Num;
+                return Math.Log(num / den) / Math.Log(1 + rate);
+            }
+        }
+
+        private static object EvaluateRate(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 3 || arguments.Count > 6) return OdfFormulaError.Value;
+            var valNper = arguments[0].Evaluate(context);
+            var valPmt = arguments[1].Evaluate(context);
+            var valPv = arguments[2].Evaluate(context);
+
+            if (valNper is OdfFormulaError err1) return err1;
+            if (valPmt is OdfFormulaError err2) return err2;
+            if (valPv is OdfFormulaError err3) return err3;
+
+            if (!TryCoerceDouble(valNper, out double nper) ||
+                !TryCoerceDouble(valPmt, out double pmt) ||
+                !TryCoerceDouble(valPv, out double pv))
+                return OdfFormulaError.Value;
+
+            double fv = 0;
+            if (arguments.Count >= 4)
+            {
+                var valFv = arguments[3].Evaluate(context);
+                if (valFv is OdfFormulaError err4) return err4;
+                if (!TryCoerceDouble(valFv, out fv)) return OdfFormulaError.Value;
+            }
+
+            double type = 0;
+            if (arguments.Count >= 5)
+            {
+                var valType = arguments[4].Evaluate(context);
+                if (valType is OdfFormulaError err5) return err5;
+                if (!TryCoerceDouble(valType, out type)) return OdfFormulaError.Value;
+            }
+
+            double guess = 0.1;
+            if (arguments.Count == 6)
+            {
+                var valGuess = arguments[5].Evaluate(context);
+                if (valGuess is OdfFormulaError err6) return err6;
+                if (!TryCoerceDouble(valGuess, out guess)) return OdfFormulaError.Value;
+            }
+
+            double F(double r)
+            {
+                if (r == 0)
+                {
+                    return pv + pmt * nper + fv;
+                }
+                else
+                {
+                    double p = Math.Pow(1 + r, nper);
+                    return pv * p + pmt * (1 + r * (type != 0 ? 1 : 0)) * (p - 1) / r + fv;
+                }
+            }
+
+            // Secant method solver
+            double r0 = guess;
+            double r1 = guess * 1.1 + 0.01;
+            
+            for (int i = 0; i < 100; i++)
+            {
+                double f0 = F(r0);
+                double f1 = F(r1);
+
+                if (Math.Abs(f1 - f0) < 1e-15) break;
+
+                double r_next = r1 - f1 * (r1 - r0) / (f1 - f0);
+                if (Math.Abs(r_next - r1) < 1e-9)
+                {
+                    return r_next;
+                }
+
+                r0 = r1;
+                r1 = r_next;
+            }
+
+            return OdfFormulaError.Num;
+        }
+
+        private static object EvaluateIpmt(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 4 || arguments.Count > 6) return OdfFormulaError.Value;
+            var valRate = arguments[0].Evaluate(context);
+            var valPer = arguments[1].Evaluate(context);
+            var valNper = arguments[2].Evaluate(context);
+            var valPv = arguments[3].Evaluate(context);
+
+            if (valRate is OdfFormulaError err1) return err1;
+            if (valPer is OdfFormulaError err2) return err2;
+            if (valNper is OdfFormulaError err3) return err3;
+            if (valPv is OdfFormulaError err4) return err4;
+
+            if (!TryCoerceDouble(valRate, out double rate) ||
+                !TryCoerceDouble(valPer, out double per) ||
+                !TryCoerceDouble(valNper, out double nper) ||
+                !TryCoerceDouble(valPv, out double pv))
+                return OdfFormulaError.Value;
+
+            double fv = 0;
+            if (arguments.Count >= 5)
+            {
+                var valFv = arguments[4].Evaluate(context);
+                if (valFv is OdfFormulaError err5) return err5;
+                if (!TryCoerceDouble(valFv, out fv)) return OdfFormulaError.Value;
+            }
+
+            double type = 0;
+            if (arguments.Count == 6)
+            {
+                var valType = arguments[5].Evaluate(context);
+                if (valType is OdfFormulaError err6) return err6;
+                if (!TryCoerceDouble(valType, out type)) return OdfFormulaError.Value;
+            }
+
+            if (per < 1 || per > nper) return OdfFormulaError.Value;
+
+            // Calculate standard PMT
+            var pmtArgs = new List<AstNode> {
+                new LiteralNode(rate),
+                new LiteralNode(nper),
+                new LiteralNode(pv),
+                new LiteralNode(fv),
+                new LiteralNode(type)
+            };
+            var pmtResult = EvaluatePmt(pmtArgs, context);
+            if (pmtResult is OdfFormulaError) return pmtResult;
+            double pmt = (double)pmtResult;
+
+            // Simple balance progression
+            double balance = pv;
+            double interest = 0;
+
+            for (int t = 1; t <= per; t++)
+            {
+                if (type != 0)
+                {
+                    if (t == 1)
+                    {
+                        interest = 0;
+                        balance = balance + pmt;
+                    }
+                    else
+                    {
+                        interest = (balance) * rate;
+                        balance = balance + interest + pmt;
+                    }
+                }
+                else
+                {
+                    interest = balance * rate;
+                    balance = balance + interest + pmt;
+                }
+            }
+
+            return -interest;
+        }
+
+        private static object EvaluatePpmt(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count < 4 || arguments.Count > 6) return OdfFormulaError.Value;
+
+            // PPMT = PMT - IPMT
+            var rate = arguments[0].Evaluate(context);
+            var per = arguments[1].Evaluate(context);
+            var nper = arguments[2].Evaluate(context);
+            var pv = arguments[3].Evaluate(context);
+
+            if (rate is OdfFormulaError err1) return err1;
+            if (per is OdfFormulaError err2) return err2;
+            if (nper is OdfFormulaError err3) return err3;
+            if (pv is OdfFormulaError err4) return err4;
+
+            double fv = 0;
+            if (arguments.Count >= 5)
+            {
+                var valFv = arguments[4].Evaluate(context);
+                if (valFv is OdfFormulaError err5) return err5;
+                if (!TryCoerceDouble(valFv, out fv)) return OdfFormulaError.Value;
+            }
+
+            double type = 0;
+            if (arguments.Count == 6)
+            {
+                var valType = arguments[5].Evaluate(context);
+                if (valType is OdfFormulaError err6) return err6;
+                if (!TryCoerceDouble(valType, out type)) return OdfFormulaError.Value;
+            }
+
+            var pmtArgs = new List<AstNode> {
+                new LiteralNode(rate),
+                new LiteralNode(nper),
+                new LiteralNode(pv),
+                new LiteralNode(fv),
+                new LiteralNode(type)
+            };
+            var pmtResult = EvaluatePmt(pmtArgs, context);
+            if (pmtResult is OdfFormulaError) return pmtResult;
+
+            var ipmtResult = EvaluateIpmt(arguments, context);
+            if (ipmtResult is OdfFormulaError) return ipmtResult;
+
+            return (double)pmtResult - (double)ipmtResult;
+        }
+
+        #endregion
+
+        #region Date and Time Functions
+
+        private static readonly DateTime Epoch = new DateTime(1899, 12, 30, 0, 0, 0, DateTimeKind.Unspecified);
+
+        private static bool TryCoerceDateTime(object val, out DateTime dt)
+        {
+            dt = DateTime.MinValue;
+            if (val == null || val is OdfFormulaError) return false;
+
+            if (val is double d)
+            {
+                try
+                {
+                    dt = Epoch.AddDays(d);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            string s = val.ToString() ?? "";
+            if (double.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double num))
+            {
+                try
+                {
+                    dt = Epoch.AddDays(num);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            if (s.StartsWith("PT", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    var ts = System.Xml.XmlConvert.ToTimeSpan(s);
+                    dt = Epoch.Add(ts);
+                    return true;
+                }
+                catch {}
+            }
+
+            if (DateTime.TryParse(s, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static object EvaluateDate(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 3) return OdfFormulaError.Value;
+            var valY = arguments[0].Evaluate(context);
+            var valM = arguments[1].Evaluate(context);
+            var valD = arguments[2].Evaluate(context);
+
+            if (valY is OdfFormulaError err1) return err1;
+            if (valM is OdfFormulaError err2) return err2;
+            if (valD is OdfFormulaError err3) return err3;
+
+            if (!TryCoerceDouble(valY, out double yD) || !TryCoerceDouble(valM, out double mD) || !TryCoerceDouble(valD, out double dD))
+                return OdfFormulaError.Value;
+
+            int y = (int)yD;
+            int m = (int)mD;
+            int d = (int)dD;
+
+            if (y >= 0 && y < 1900) y += 1900;
+            try
+            {
+                DateTime baseDate = new DateTime(y, 1, 1);
+                DateTime dt = baseDate.AddMonths(m - 1).AddDays(d - 1);
+                return (dt - Epoch).TotalDays;
+            }
+            catch
+            {
+                return OdfFormulaError.Value;
+            }
+        }
+
+        private static object EvaluateDay(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDateTime(val, out DateTime dt)) return OdfFormulaError.Value;
+            return (double)dt.Day;
+        }
+
+        private static object EvaluateHour(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDateTime(val, out DateTime dt)) return OdfFormulaError.Value;
+            return (double)dt.Hour;
+        }
+
+        private static object EvaluateMinute(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDateTime(val, out DateTime dt)) return OdfFormulaError.Value;
+            return (double)dt.Minute;
+        }
+
+        private static object EvaluateMonth(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDateTime(val, out DateTime dt)) return OdfFormulaError.Value;
+            return (double)dt.Month;
+        }
+
+        private static object EvaluateNow(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 0) return OdfFormulaError.Value;
+            return (DateTime.Now - Epoch).TotalDays;
+        }
+
+        private static object EvaluateSecond(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDateTime(val, out DateTime dt)) return OdfFormulaError.Value;
+            return (double)dt.Second;
+        }
+
+        private static object EvaluateTime(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 3) return OdfFormulaError.Value;
+            var valH = arguments[0].Evaluate(context);
+            var valM = arguments[1].Evaluate(context);
+            var valS = arguments[2].Evaluate(context);
+
+            if (valH is OdfFormulaError err1) return err1;
+            if (valM is OdfFormulaError err2) return err2;
+            if (valS is OdfFormulaError err3) return err3;
+
+            if (!TryCoerceDouble(valH, out double h) || !TryCoerceDouble(valM, out double m) || !TryCoerceDouble(valS, out double s))
+                return OdfFormulaError.Value;
+
+            return (h * 3600.0 + m * 60.0 + s) / 86400.0;
+        }
+
+        private static object EvaluateToday(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 0) return OdfFormulaError.Value;
+            return (DateTime.Today - Epoch).TotalDays;
+        }
+
+        private static object EvaluateYear(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+            if (!TryCoerceDateTime(val, out DateTime dt)) return OdfFormulaError.Value;
+            return (double)dt.Year;
+        }
+
+        #endregion
+
+        #region Matrix Functions
+
+        private static object EvaluateTranspose(List<AstNode> arguments, IEvaluationContext context)
+        {
+            if (arguments.Count != 1) return OdfFormulaError.Value;
+            var val = arguments[0].Evaluate(context);
+            if (val is OdfFormulaError err) return err;
+
+            if (val is object[,] arr)
+            {
+                int rows = arr.GetLength(0);
+                int cols = arr.GetLength(1);
+                var result = new object[cols, rows];
+                for (int r = 0; r < rows; r++)
+                {
+                    for (int c = 0; c < cols; c++)
+                    {
+                        result[c, r] = arr[r, c];
+                    }
+                }
+                return result;
+            }
+            else
+            {
+                var result = new object[1, 1];
+                result[0, 0] = val;
+                return result;
+            }
+        }
+
+        #endregion
+
         #region Helpers & Coercion
 
         private static IEnumerable<object> FlattenValues(object val)
         {
-            if (val is object[,] arr)
+            if (val is OdfReferenceList refList)
+            {
+                foreach (var r in refList.References)
+                {
+                    foreach (var item in FlattenValues(r)) yield return item;
+                }
+            }
+            else if (val is object[,] arr)
             {
                 foreach (var item in arr) yield return item;
             }

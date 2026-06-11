@@ -30,14 +30,69 @@ namespace OdfKit.Core
     }
 
     /// <summary>
+    /// Supported signature levels for ODF documents.
+    /// </summary>
+    public enum OdfSignatureLevel
+    {
+        /// <summary>
+        /// Plain XMLDSig signature without XAdES extensions.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// XAdES Basic Electronic Signature (XAdES-BES).
+        /// </summary>
+        XadesBes = 1,
+
+        /// <summary>
+        /// XAdES with Timestamp (XAdES-T).
+        /// </summary>
+        XadesT = 2,
+
+        /// <summary>
+        /// XAdES Archive / Long Term Validation (XAdES-A).
+        /// </summary>
+        XadesA = 3
+    }
+
+    /// <summary>
     /// Configuration options for signing and verifying ODF packages with Digital Signatures / XAdES.
     /// </summary>
     public class OdfSigningOptions
     {
         /// <summary>
+        /// Gets or sets the signature level.
+        /// </summary>
+        public OdfSignatureLevel SignatureLevel { get; set; } = OdfSignatureLevel.None;
+
+        /// <summary>
         /// Gets or sets the XAdES standard level (None/XMLDSig, BES, T, A).
         /// </summary>
-        public XadesLevel Level { get; set; } = XadesLevel.None;
+        public XadesLevel Level
+        {
+            get
+            {
+                return SignatureLevel switch
+                {
+                    OdfSignatureLevel.None => XadesLevel.None,
+                    OdfSignatureLevel.XadesBes => XadesLevel.BES,
+                    OdfSignatureLevel.XadesT => XadesLevel.T,
+                    OdfSignatureLevel.XadesA => XadesLevel.A,
+                    _ => XadesLevel.None
+                };
+            }
+            set
+            {
+                SignatureLevel = value switch
+                {
+                    XadesLevel.None => OdfSignatureLevel.None,
+                    XadesLevel.BES => OdfSignatureLevel.XadesBes,
+                    XadesLevel.T => OdfSignatureLevel.XadesT,
+                    XadesLevel.A => OdfSignatureLevel.XadesA,
+                    _ => OdfSignatureLevel.None
+                };
+            }
+        }
 
         /// <summary>
         /// Gets or sets the RFC 3161 Time Stamping Authority (TSA) URL.

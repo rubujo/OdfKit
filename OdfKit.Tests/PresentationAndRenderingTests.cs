@@ -655,6 +655,39 @@ namespace OdfKit.Tests
             Assert.Contains("exited with code 1", ex.Message);
         }
 
+        [Fact]
+        public void TestAddMasterPage()
+        {
+            using var ms = new MemoryStream();
+            using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                var doc = new PresentationDocument(package);
+                doc.AddMasterPage("CustomMaster", "PM1");
+                doc.Save();
+            }
+
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms, leaveOpen: true))
+            {
+                var doc = new PresentationDocument(package);
+                var masterStyles = doc.FindChildElement(doc.StylesRoot, "master-styles", OdfNamespaces.Office);
+                Assert.NotNull(masterStyles);
+
+                OdfNode? customMaster = null;
+                foreach (var child in masterStyles.Children)
+                {
+                    if (child.LocalName == "master-page" && child.NamespaceUri == OdfNamespaces.Style &&
+                        child.GetAttribute("name", OdfNamespaces.Style) == "CustomMaster")
+                    {
+                        customMaster = child;
+                        break;
+                    }
+                }
+                Assert.NotNull(customMaster);
+                Assert.Equal("PM1", customMaster.GetAttribute("page-layout-name", OdfNamespaces.Style));
+            }
+        }
+
         #endregion
 
         #region Helpers

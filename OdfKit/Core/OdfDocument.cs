@@ -495,6 +495,22 @@ namespace OdfKit.Core
             return setNode;
         }
 
+        protected OdfNode? FindSettingsNode(OdfNode root, string name)
+        {
+            foreach (var child in root.Children)
+            {
+                if (child.LocalName == "settings" && child.NamespaceUri == OdfNamespaces.Office)
+                {
+                    foreach (var sc in child.Children)
+                    {
+                        if (sc.LocalName == "config-item-set" && sc.GetAttribute("name", OdfNamespaces.Config) == name)
+                            return sc;
+                    }
+                }
+            }
+            return null;
+        }
+
         protected OdfNode FindOrCreateMapNode(OdfNode setNode, string name)
         {
             foreach (var child in setNode.Children)

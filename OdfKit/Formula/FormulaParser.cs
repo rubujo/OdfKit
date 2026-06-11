@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using OdfKit.Spreadsheet;
 using OdfKit.Formula.AST;
@@ -105,7 +105,7 @@ namespace OdfKit.Formula
                 return new FormulaParserToken(FormulaTokenType.Operator, _formula.Slice(start, _index - start));
             }
 
-            if (current == '+' || current == '-' || current == '*' || current == '/' || current == '^' || current == '&' || current == '%')
+            if (current == '+' || current == '-' || current == '*' || current == '/' || current == '^' || current == '&' || current == '%' || current == '~' || current == '!')
             {
                 _index++;
                 return new FormulaParserToken(FormulaTokenType.Operator, _formula.Slice(_index - 1, 1));
@@ -320,7 +320,7 @@ namespace OdfKit.Formula
                 return new UnaryNode(op, child);
             }
 
-            var node = ParsePrimary();
+            var node = ParseReferenceExpression();
 
             while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("%", StringComparison.Ordinal))
             {
@@ -328,6 +328,30 @@ namespace OdfKit.Formula
                 node = new UnaryNode('%', node);
             }
 
+            return node;
+        }
+
+        private AstNode ParseReferenceExpression()
+        {
+            var node = ParseIntersectionExpression();
+            while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("~", StringComparison.Ordinal))
+            {
+                Consume();
+                var right = ParseIntersectionExpression();
+                node = new ReferenceUnionNode(node, right);
+            }
+            return node;
+        }
+
+        private AstNode ParseIntersectionExpression()
+        {
+            var node = ParsePrimary();
+            while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("!", StringComparison.Ordinal))
+            {
+                Consume();
+                var right = ParsePrimary();
+                node = new ReferenceIntersectionNode(node, right);
+            }
             return node;
         }
 

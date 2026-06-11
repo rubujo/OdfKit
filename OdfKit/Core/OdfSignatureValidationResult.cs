@@ -63,5 +63,25 @@ namespace OdfKit.Core
         /// Gets or sets any error or warning message encountered during validation.
         /// </summary>
         public string? ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the diagnostic error code if validation failed.
+        /// </summary>
+        public string? ErrorCode { get; set; }
+
+        /// <summary>
+        /// Gets the warnings encountered during validation.
+        /// </summary>
+        public List<string> Warnings { get; } = new List<string>();
+
+        /// <summary>
+        /// Gets the ODF package references verified for this signature.
+        /// </summary>
+        public List<string> CheckedReferences { get; } = new List<string>();
+
+        /// <summary>
+        /// Gets the trace logs of validation steps executed.
+        /// </summary>
+        public List<string> ValidationSteps { get; } = new List<string>();
     }
 }

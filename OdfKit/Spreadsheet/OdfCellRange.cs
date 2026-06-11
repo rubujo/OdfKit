@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 
 namespace OdfKit.Spreadsheet
@@ -139,6 +139,30 @@ namespace OdfKit.Spreadsheet
 
             return minRow1 <= maxRow2 && maxRow1 >= minRow2 &&
                    minCol1 <= maxCol2 && maxCol1 >= minCol2;
+        }
+
+        public OdfCellRange? Intersect(OdfCellRange other)
+        {
+            if (!Intersects(other)) return null;
+
+            int minRow1 = Math.Min(StartAddress.Row, EndAddress.Row);
+            int maxRow1 = Math.Max(StartAddress.Row, EndAddress.Row);
+            int minCol1 = Math.Min(StartAddress.Column, EndAddress.Column);
+            int maxCol1 = Math.Max(StartAddress.Column, EndAddress.Column);
+
+            int minRow2 = Math.Min(other.StartAddress.Row, other.EndAddress.Row);
+            int maxRow2 = Math.Max(other.StartAddress.Row, other.EndAddress.Row);
+            int minCol2 = Math.Min(other.StartAddress.Column, other.EndAddress.Column);
+            int maxCol2 = Math.Max(other.StartAddress.Column, other.EndAddress.Column);
+
+            int startRow = Math.Max(minRow1, minRow2);
+            int endRow = Math.Min(maxRow1, maxRow2);
+            int startCol = Math.Max(minCol1, minCol2);
+            int endCol = Math.Min(maxCol1, maxCol2);
+
+            var start = new OdfCellAddress(startRow, startCol, StartAddress.SheetName);
+            var end = new OdfCellAddress(endRow, endCol, StartAddress.SheetName);
+            return new OdfCellRange(start, end);
         }
 
         public OdfCellRange ShiftStructural(int insertRowIndex, int rowCount, int insertColIndex, int colCount)
