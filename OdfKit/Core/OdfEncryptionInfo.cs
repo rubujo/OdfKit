@@ -16,5 +16,12 @@ namespace OdfKit.Core
         public string? StartKeyGenerationName { get; set; }
         public int? StartKeySize { get; set; }
         public Dictionary<string, string> ExtensionProperties { get; set; } = new(StringComparer.Ordinal);
+        internal bool HasChecksumType { get; set; }
+        internal bool HasChecksum { get; set; }
+        internal bool HasAlgorithmName { get; set; }
+        internal bool HasInitialisationVector { get; set; }
+        internal bool HasKeyDerivationName { get; set; }
+        internal bool HasIterationCount { get; set; }
+        internal bool HasSalt { get; set; }
     }
 }

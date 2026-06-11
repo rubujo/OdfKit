@@ -14,4 +14,5 @@
   <Project Path="OdfKit/OdfKit.csproj" />
   <Project Path="OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj" />
   <Project Path="OdfKit.Tests/OdfKit.Tests.csproj" />
+  <Project Path="tools/OdfSchemaGenerator/OdfSchemaGenerator.csproj" />
 </Solution>

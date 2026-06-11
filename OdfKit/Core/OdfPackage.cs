@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 using OdfKit.DOM;
 using OdfKit.Formula;
 using OdfKit.Styles;
@@ -25,7 +27,7 @@ namespace OdfKit.Core
     public class OdfPackage : IDisposable, IAsyncDisposable
     {
         private readonly OdfPackageMode _mode;
-        private readonly Stream? _underlyingStream;
+        private Stream? _underlyingStream;
         private readonly bool _leaveOpen;
         private readonly OdfLoadOptions _loadOptions;
         private readonly OdfSaveOptions _saveOptions;
@@ -33,14 +35,26 @@ namespace OdfKit.Core
         private ZipArchive? _archive;
         private readonly Dictionary<string, OdfPackageEntry> _entries = new(StringComparer.Ordinal);
         private readonly Dictionary<string, string> _manifest = new(StringComparer.Ordinal);
+        private readonly List<string> _entryOrder = new();
+        private readonly List<string> _duplicateEntryNames = new();
+        private readonly List<string> _duplicateManifestPaths = new();
+        private readonly List<OdfManifestFileEntryIssue> _manifestFileEntryIssues = new();
+        private OdfManifestRootInfo? _manifestRootInfo;
         private readonly SemaphoreSlim _lock = new(1, 1);
         private bool _isDisposed;
         private string? _mimetype;
+        private bool _isFlatXml;
 
         public OdfPackageMode Mode => _mode;
         public string? MimeType => _mimetype;
+        public bool IsFlatXml => _isFlatXml;
         public IReadOnlyDictionary<string, string> Manifest => _manifest;
         internal IReadOnlyDictionary<string, OdfPackageEntry> Entries => _entries;
+        internal IReadOnlyList<string> EntryOrder => _entryOrder;
+        internal IReadOnlyList<string> DuplicateEntryNames => _duplicateEntryNames;
+        internal IReadOnlyList<string> DuplicateManifestPaths => _duplicateManifestPaths;
+        internal IReadOnlyList<OdfManifestFileEntryIssue> ManifestFileEntryIssues => _manifestFileEntryIssues;
+        internal OdfManifestRootInfo? ManifestRootInfo => _manifestRootInfo;
         internal OdfLoadOptions LoadOptions => _loadOptions;
         internal OdfSaveOptions SaveOptions => _saveOptions;
 
@@ -117,6 +131,48 @@ namespace OdfKit.Core
         {
             if (_underlyingStream == null) throw new InvalidOperationException("No input stream available.");
 
+            // Sniff signature: check if it is ZIP (PK\x03\x04)
+            byte[] signature = new byte[4];
+            int bytesRead = 0;
+            if (_underlyingStream.CanSeek)
+            {
+                long initialPosition = _underlyingStream.Position;
+                bytesRead = ReadAll(_underlyingStream, signature, 0, signature.Length);
+                _underlyingStream.Position = initialPosition;
+            }
+            else
+            {
+                bytesRead = ReadAll(_underlyingStream, signature, 0, signature.Length);
+            }
+
+            bool isZip = bytesRead == 4 &&
+                         signature[0] == 0x50 &&
+                         signature[1] == 0x4B &&
+                         signature[2] == 0x03 &&
+                         signature[3] == 0x04;
+
+            if (!isZip)
+            {
+                _isFlatXml = true;
+                InitializeFlatXml(signature, bytesRead);
+                return;
+            }
+
+            if (!_underlyingStream.CanSeek)
+            {
+                // If it is ZIP and non-seekable, we copy it to a seekable MemoryStream
+                // because ZipArchive requires a seekable stream to read the central directory.
+                var ms = new MemoryStream();
+                ms.Write(signature, 0, bytesRead);
+                _underlyingStream.CopyTo(ms);
+                ms.Position = 0;
+                if (!_leaveOpen)
+                {
+                    _underlyingStream.Dispose();
+                }
+                _underlyingStream = ms;
+            }
+
             // Register CodePages for ZIP filenames in .NET Standard 2.0 if needed
 #if NETSTANDARD2_0
             try
@@ -159,7 +215,15 @@ namespace OdfKit.Core
 
                 // Add entry to our index
                 var pkgEntry = new OdfPackageEntry(name, entry);
+                if (_entries.ContainsKey(name))
+                {
+                    _duplicateEntryNames.Add(name);
+                }
                 _entries[name] = pkgEntry;
+                if (!_entryOrder.Contains(name))
+                {
+                    _entryOrder.Add(name);
+                }
             }
 
             // Load mimetype
@@ -179,6 +243,212 @@ namespace OdfKit.Core
             if (_loadOptions.Password != null || _loadOptions.CryptographyProvider != null)
             {
                 OdfEncryption.Decrypt(this, _loadOptions.Password ?? string.Empty);
+            }
+        }
+
+        private void InitializeFlatXml(byte[] signature, int signatureLength)
+        {
+            var settings = new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Prohibit,
+                XmlResolver = null,
+                CloseInput = !_leaveOpen
+            };
+
+            XDocument doc;
+            Stream xmlStream = _underlyingStream!;
+            if (!_underlyingStream!.CanSeek && signatureLength > 0)
+            {
+                xmlStream = new PeekableStream(_underlyingStream, signature, signatureLength, _leaveOpen);
+            }
+
+            using (var reader = XmlReader.Create(xmlStream, settings))
+            {
+                doc = XDocument.Load(reader);
+            }
+
+            var root = doc.Root;
+            if (root == null || root.Name.LocalName != "document" || root.Name.NamespaceName != OdfNamespaces.Office)
+            {
+                throw new InvalidDataException("Invalid Flat XML: root element must be office:document.");
+            }
+
+            var officeNs = XNamespace.Get(OdfNamespaces.Office);
+
+            // Get mimetype
+            var mimeAttr = root.Attribute(officeNs + "mimetype") ?? root.Attribute("mimetype");
+            _mimetype = mimeAttr?.Value;
+            if (string.IsNullOrEmpty(_mimetype) && _loadOptions.ValidateMimeType)
+            {
+                throw new InvalidDataException("Invalid Flat XML: missing office:mimetype.");
+            }
+
+            // Get office:version
+            var versionAttr = root.Attribute(officeNs + "version") ?? root.Attribute("version");
+            string version = versionAttr?.Value ?? "1.3";
+
+            // Extract office elements
+            var metaElement = root.Element(officeNs + "meta");
+            var settingsElement = root.Element(officeNs + "settings");
+            var stylesElement = root.Element(officeNs + "styles");
+            var autoStylesElement = root.Element(officeNs + "automatic-styles");
+            var masterStylesElement = root.Element(officeNs + "master-styles");
+            var fontDeclsElement = root.Element(officeNs + "font-face-decls");
+            var bodyElement = root.Element(officeNs + "body");
+
+            // Extract binary data (images)
+            var binaryDataElements = doc.Descendants(officeNs + "binary-data").ToList();
+            int imageCounter = 1;
+            foreach (var binData in binaryDataElements)
+            {
+                string base64 = binData.Value;
+                // Clean up whitespace/newlines from base64 string
+                base64 = base64.Replace("\r", "").Replace("\n", "").Replace(" ", "").Replace("\t", "");
+                byte[] bytes = Convert.FromBase64String(base64);
+
+                // Detect image format/extension
+                OdfMediaManager.DetectImageFormat(bytes, out var mediaType, out var ext);
+
+                // Construct a virtual entry path, e.g. Pictures/image_1.png
+                string imagePath = $"Pictures/image_{imageCounter++}{ext}";
+
+                // Add to virtual entries
+                _entries[imagePath] = new OdfPackageEntry(imagePath, bytes);
+                _manifest[imagePath] = mediaType;
+                _entryOrder.Add(imagePath);
+
+                // Replace <office:binary-data> with drawing reference in parent
+                var parent = binData.Parent;
+                if (parent != null)
+                {
+                    binData.Remove();
+
+                    var xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
+
+                    parent.SetAttributeValue(xlinkNs + "href", imagePath);
+                    parent.SetAttributeValue(xlinkNs + "type", "simple");
+                    parent.SetAttributeValue(xlinkNs + "show", "embed");
+                    parent.SetAttributeValue(xlinkNs + "actuate", "onLoad");
+                }
+            }
+
+            // Construct content.xml
+            var contentRoot = new XElement(officeNs + "document-content",
+                new XAttribute(officeNs + "version", version));
+            CopyNamespaces(root, contentRoot);
+
+            if (fontDeclsElement != null)
+            {
+                contentRoot.Add(new XElement(fontDeclsElement));
+            }
+            if (autoStylesElement != null)
+            {
+                contentRoot.Add(new XElement(autoStylesElement));
+            }
+            if (bodyElement != null)
+            {
+                contentRoot.Add(new XElement(bodyElement));
+            }
+
+            // Construct styles.xml
+            var stylesRoot = new XElement(officeNs + "document-styles",
+                new XAttribute(officeNs + "version", version));
+            CopyNamespaces(root, stylesRoot);
+
+            if (fontDeclsElement != null)
+            {
+                stylesRoot.Add(new XElement(fontDeclsElement));
+            }
+            if (stylesElement != null)
+            {
+                stylesRoot.Add(new XElement(stylesElement));
+            }
+            if (autoStylesElement != null)
+            {
+                stylesRoot.Add(new XElement(autoStylesElement));
+            }
+            if (masterStylesElement != null)
+            {
+                stylesRoot.Add(new XElement(masterStylesElement));
+            }
+
+            // Construct meta.xml
+            var metaRoot = new XElement(officeNs + "document-meta",
+                new XAttribute(officeNs + "version", version));
+            CopyNamespaces(root, metaRoot);
+
+            if (metaElement != null)
+            {
+                metaRoot.Add(new XElement(metaElement));
+            }
+            else
+            {
+                metaRoot.Add(new XElement(officeNs + "meta"));
+            }
+
+            // Construct settings.xml
+            var settingsRoot = new XElement(officeNs + "document-settings",
+                new XAttribute(officeNs + "version", version));
+            CopyNamespaces(root, settingsRoot);
+
+            if (settingsElement != null)
+            {
+                settingsRoot.Add(new XElement(settingsElement));
+            }
+            else
+            {
+                settingsRoot.Add(new XElement(officeNs + "settings"));
+            }
+
+            byte[] ToUtf8Bytes(XElement element)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    var writerSettings = new XmlWriterSettings
+                    {
+                        Encoding = new UTF8Encoding(false),
+                        Indent = _saveOptions.IndentXml
+                    };
+                    using (var writer = XmlWriter.Create(ms, writerSettings))
+                    {
+                        element.Save(writer);
+                    }
+                    return ms.ToArray();
+                }
+            }
+
+            WriteVirtualEntry("content.xml", ToUtf8Bytes(contentRoot), "text/xml");
+            WriteVirtualEntry("styles.xml", ToUtf8Bytes(stylesRoot), "text/xml");
+            WriteVirtualEntry("meta.xml", ToUtf8Bytes(metaRoot), "text/xml");
+            WriteVirtualEntry("settings.xml", ToUtf8Bytes(settingsRoot), "text/xml");
+            if (!string.IsNullOrEmpty(_mimetype))
+            {
+                WriteVirtualEntry("mimetype", Encoding.UTF8.GetBytes(_mimetype), string.Empty);
+            }
+        }
+
+        private void WriteVirtualEntry(string name, byte[] content, string mediaType)
+        {
+            name = SanitizeEntryName(name);
+            _entries[name] = new OdfPackageEntry(name, content);
+            _manifest[name] = mediaType;
+            if (!_entryOrder.Contains(name))
+            {
+                _entryOrder.Add(name);
+            }
+        }
+
+        private void CopyNamespaces(XElement source, XElement target)
+        {
+            foreach (var attr in source.Attributes())
+            {
+                if (attr.IsNamespaceDeclaration)
+                {
+                    if (target.Attribute(attr.Name) == null)
+                    {
+                        target.SetAttributeValue(attr.Name, attr.Value);
+                    }
+                }
             }
         }
 
@@ -209,15 +479,76 @@ namespace OdfKit.Core
             {
                 if (reader.NodeType == XmlNodeType.Element)
                 {
-                    if (reader.LocalName == "file-entry" && reader.NamespaceURI == OdfNamespaces.Manifest)
+                    if (reader.LocalName == "manifest" && reader.NamespaceURI == OdfNamespaces.Manifest)
+                    {
+                        string? version = reader.GetAttribute("version", OdfNamespaces.Manifest) ?? reader.GetAttribute("version");
+                        _manifestRootInfo = new OdfManifestRootInfo(reader.NamespaceURI, reader.LocalName, version);
+                    }
+                    else if (reader.LocalName == "file-entry" && reader.NamespaceURI == OdfNamespaces.Manifest)
                     {
                         string? path = reader.GetAttribute("full-path", OdfNamespaces.Manifest) ?? reader.GetAttribute("full-path");
                         string? mediaType = reader.GetAttribute("media-type", OdfNamespaces.Manifest) ?? reader.GetAttribute("media-type");
 
-                        if (path != null && mediaType != null)
+                        var issue = new OdfManifestFileEntryIssue();
+                        bool hasIssue = false;
+
+                        if (path == null)
                         {
-                            string normPath = path == "/" ? "/" : SanitizeEntryName(path);
-                            _manifest[normPath] = mediaType;
+                            issue.MissingFullPath = true;
+                            hasIssue = true;
+                        }
+                        else
+                        {
+                            issue.FullPath = path;
+                            if (path != "/" && !IsSafeManifestPath(path))
+                            {
+                                issue.InvalidFullPath = true;
+                                hasIssue = true;
+                            }
+                        }
+
+                        if (mediaType == null)
+                        {
+                            issue.MissingMediaType = true;
+                            hasIssue = true;
+                        }
+
+                        if (hasIssue)
+                        {
+                            _manifestFileEntryIssues.Add(issue);
+                        }
+
+                        if (path != null)
+                        {
+                            string normPath;
+                            if (path == "/")
+                            {
+                                normPath = "/";
+                            }
+                            else if (!IsSafeManifestPath(path))
+                            {
+                                normPath = path;
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    normPath = SanitizeEntryName(path);
+                                }
+                                catch (SecurityException)
+                                {
+                                    normPath = path;
+                                }
+                            }
+
+                            if (_manifest.ContainsKey(normPath))
+                            {
+                                _duplicateManifestPaths.Add(normPath);
+                            }
+                            if (mediaType != null)
+                            {
+                                _manifest[normPath] = mediaType;
+                            }
                             
                             if (normPath != "/" && _entries.TryGetValue(normPath, out var entry))
                             {
@@ -332,6 +663,33 @@ namespace OdfKit.Core
                     }
                 }
             }
+        }
+
+        private bool IsSafeManifestPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return false;
+            }
+
+            if (path.StartsWith("/", StringComparison.Ordinal) ||
+                path.Contains("\\") ||
+                path.Contains(":") ||
+                path.Contains("//"))
+            {
+                return false;
+            }
+
+            var parts = path.Split('/');
+            foreach (var part in parts)
+            {
+                if (part.Length == 0 || part == "." || part == "..")
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         #endregion
@@ -676,7 +1034,10 @@ namespace OdfKit.Core
                 try
                 {
                     // Write/update manifest before serialize
-                    SaveManifestToEntries();
+                    if (!_isFlatXml)
+                    {
+                        SaveManifestToEntries();
+                    }
 
                     if (_underlyingStream != null && _underlyingStream.CanWrite)
                     {
@@ -753,7 +1114,10 @@ namespace OdfKit.Core
                 }
                 try
                 {
-                    SaveManifestToEntries();
+                    if (!_isFlatXml)
+                    {
+                        SaveManifestToEntries();
+                    }
 
                     if (_underlyingStream != null && _underlyingStream.CanWrite)
                     {
@@ -833,7 +1197,10 @@ namespace OdfKit.Core
                 }
                 try
                 {
-                    SaveManifestToEntries();
+                    if (!_isFlatXml)
+                    {
+                        SaveManifestToEntries();
+                    }
                     WriteToArchive(destinationStream);
                 }
                 finally
@@ -866,7 +1233,10 @@ namespace OdfKit.Core
                 }
                 try
                 {
-                    SaveManifestToEntries();
+                    if (!_isFlatXml)
+                    {
+                        SaveManifestToEntries();
+                    }
                     await Task.Run(() => WriteToArchive(destinationStream), cancellationToken).ConfigureAwait(false);
                 }
                 finally
@@ -1082,6 +1452,12 @@ namespace OdfKit.Core
 
         private void WriteToArchive(Stream targetStream)
         {
+            if (_isFlatXml)
+            {
+                WriteFlatXmlToStream(targetStream);
+                return;
+            }
+
             using var zip = new ZipArchive(targetStream, ZipArchiveMode.Create, true, Encoding.UTF8);
 
             // 1. mimetype MUST be first and Stored (uncompressed)
@@ -1089,7 +1465,7 @@ namespace OdfKit.Core
             {
                 var zipEntry = zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
                 
-                // Write fixed timestamp if Deterministic is enabled
+                // Write fixed timestamp if Determinional is enabled
                 if (_saveOptions.Deterministic)
                 {
                     zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -1120,6 +1496,197 @@ namespace OdfKit.Core
                 {
                     src.CopyTo(entryStream);
                 }
+            }
+        }
+
+        private void WriteFlatXmlToStream(Stream targetStream)
+        {
+            var officeNs = XNamespace.Get(OdfNamespaces.Office);
+
+            // Read content.xml
+            XElement contentRoot;
+            if (_entries.TryGetValue("content.xml", out var contentEntry))
+            {
+                using var reader = XmlReader.Create(contentEntry.OpenReader());
+                contentRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid content.xml root");
+            }
+            else
+            {
+                throw new InvalidDataException("Missing virtual content.xml");
+            }
+
+            // Read styles.xml
+            XElement stylesRoot;
+            if (_entries.TryGetValue("styles.xml", out var stylesEntry))
+            {
+                using var reader = XmlReader.Create(stylesEntry.OpenReader());
+                stylesRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid styles.xml root");
+            }
+            else
+            {
+                stylesRoot = new XElement(officeNs + "document-styles");
+            }
+
+            // Read meta.xml
+            XElement metaRoot;
+            if (_entries.TryGetValue("meta.xml", out var metaEntry))
+            {
+                using var reader = XmlReader.Create(metaEntry.OpenReader());
+                metaRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid meta.xml root");
+            }
+            else
+            {
+                metaRoot = new XElement(officeNs + "document-meta");
+            }
+
+            // Read settings.xml
+            XElement settingsRoot;
+            if (_entries.TryGetValue("settings.xml", out var settingsEntry))
+            {
+                using var reader = XmlReader.Create(settingsEntry.OpenReader());
+                settingsRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid settings.xml root");
+            }
+            else
+            {
+                settingsRoot = new XElement(officeNs + "document-settings");
+            }
+
+            // Construct new office:document
+            var root = new XElement(officeNs + "document");
+
+            // Copy version and mimetype
+            string version = contentRoot.Attribute(officeNs + "version")?.Value ?? "1.3";
+            root.SetAttributeValue(officeNs + "version", version);
+            if (!string.IsNullOrEmpty(_mimetype))
+            {
+                root.SetAttributeValue(officeNs + "mimetype", _mimetype);
+            }
+
+            // Copy namespace declarations
+            CopyNamespaces(contentRoot, root);
+            CopyNamespaces(stylesRoot, root);
+            CopyNamespaces(metaRoot, root);
+            CopyNamespaces(settingsRoot, root);
+
+            // 1. meta
+            var metaElement = metaRoot.Element(officeNs + "meta");
+            if (metaElement != null)
+            {
+                root.Add(new XElement(metaElement));
+            }
+
+            // 2. settings
+            var settingsElement = settingsRoot.Element(officeNs + "settings");
+            if (settingsElement != null)
+            {
+                root.Add(new XElement(settingsElement));
+            }
+
+            // 3. font-face-decls
+            var contentFontDecls = contentRoot.Element(officeNs + "font-face-decls");
+            var stylesFontDecls = stylesRoot.Element(officeNs + "font-face-decls");
+            XElement? fontDecls = null;
+            if (stylesFontDecls != null)
+            {
+                fontDecls = new XElement(stylesFontDecls);
+            }
+            else if (contentFontDecls != null)
+            {
+                fontDecls = new XElement(contentFontDecls);
+            }
+            if (fontDecls != null)
+            {
+                root.Add(fontDecls);
+            }
+
+            // 4. styles
+            var stylesElement = stylesRoot.Element(officeNs + "styles");
+            if (stylesElement != null)
+            {
+                root.Add(new XElement(stylesElement));
+            }
+
+            // 5. automatic-styles
+            var combinedAutoStyles = new XElement(officeNs + "automatic-styles");
+            var contentAuto = contentRoot.Element(officeNs + "automatic-styles");
+            if (contentAuto != null)
+            {
+                combinedAutoStyles.Add(contentAuto.Elements());
+            }
+            var stylesAuto = stylesRoot.Element(officeNs + "automatic-styles");
+            if (stylesAuto != null)
+            {
+                foreach (var element in stylesAuto.Elements())
+                {
+                    var nameAttr = element.Attribute(XName.Get("name", OdfNamespaces.Style));
+                    if (nameAttr != null)
+                    {
+                        var existing = combinedAutoStyles.Elements().FirstOrDefault(e => e.Attribute(XName.Get("name", OdfNamespaces.Style))?.Value == nameAttr.Value);
+                        if (existing != null) continue;
+                    }
+                    combinedAutoStyles.Add(new XElement(element));
+                }
+            }
+            if (combinedAutoStyles.HasElements)
+            {
+                root.Add(combinedAutoStyles);
+            }
+
+            // 6. master-styles
+            var masterStyles = stylesRoot.Element(officeNs + "master-styles");
+            if (masterStyles != null)
+            {
+                root.Add(new XElement(masterStyles));
+            }
+
+            // 7. body
+            var bodyElement = contentRoot.Element(officeNs + "body");
+            if (bodyElement != null)
+            {
+                root.Add(new XElement(bodyElement));
+            }
+
+            // Re-embed base64 images from virtual entries
+            var xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
+            var elementsWithHref = root.Descendants().Where(e => e.Attribute(xlinkNs + "href") != null).ToList();
+
+            foreach (var elem in elementsWithHref)
+            {
+                var hrefAttr = elem.Attribute(xlinkNs + "href")!;
+                string href = hrefAttr.Value;
+                if (href.StartsWith("Pictures/"))
+                {
+                    if (_entries.TryGetValue(href, out var entry))
+                    {
+                        byte[] imageBytes;
+                        using (var entryReader = entry.OpenReader())
+                        using (var ms = new MemoryStream())
+                        {
+                            entryReader.CopyTo(ms);
+                            imageBytes = ms.ToArray();
+                        }
+
+                        string base64 = Convert.ToBase64String(imageBytes);
+                        var binDataElement = new XElement(officeNs + "binary-data", base64);
+                        elem.Add(binDataElement);
+
+                        hrefAttr.Remove();
+                        elem.Attribute(xlinkNs + "type")?.Remove();
+                        elem.Attribute(xlinkNs + "show")?.Remove();
+                        elem.Attribute(xlinkNs + "actuate")?.Remove();
+                    }
+                }
+            }
+
+            // Write consolidated XML tree to targetStream
+            var writerSettings = new XmlWriterSettings
+            {
+                Encoding = new UTF8Encoding(false),
+                Indent = _saveOptions.IndentXml
+            };
+            using (var writer = XmlWriter.Create(targetStream, writerSettings))
+            {
+                root.Save(writer);
             }
         }
 
@@ -1185,6 +1752,18 @@ namespace OdfKit.Core
             GC.SuppressFinalize(this);
         }
 
+        private static int ReadAll(Stream stream, byte[] buffer, int offset, int count)
+        {
+            int totalRead = 0;
+            while (totalRead < count)
+            {
+                int read = stream.Read(buffer, offset + totalRead, count - totalRead);
+                if (read <= 0) break;
+                totalRead += read;
+            }
+            return totalRead;
+        }
+
         #endregion
     }
 
@@ -1198,6 +1777,32 @@ namespace OdfKit.Core
         private Stream? _stream;
         public bool IsCompressed { get; set; } = true;
         public OdfEncryptionInfo? EncryptionInfo { get; set; }
+
+        public bool WasStoredInZip
+        {
+            get
+            {
+                if (_zipEntry == null) return false;
+                try
+                {
+                    var fieldInfo = typeof(ZipArchiveEntry).GetField("_compressionMethod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (fieldInfo != null)
+                    {
+                        var val = fieldInfo.GetValue(_zipEntry);
+                        if (val != null)
+                        {
+                            int intVal = Convert.ToInt32(val);
+                            return intVal == 0; // 0 is Stored
+                        }
+                    }
+                }
+                catch
+                {
+                    // Fallback
+                }
+                return _zipEntry.CompressedLength == _zipEntry.Length;
+            }
+        }
 
         public void SetContent(byte[] bytes)
         {
@@ -1264,6 +1869,70 @@ namespace OdfKit.Core
         public void Dispose()
         {
             _stream?.Dispose();
+        }
+    }
+
+    internal class PeekableStream : Stream
+    {
+        private readonly Stream _underlying;
+        private readonly byte[] _peekBuffer;
+        private readonly int _peekedCount;
+        private readonly bool _leaveOpen;
+        private int _peekPosition;
+
+        public PeekableStream(Stream underlying, byte[] peekBuffer, int peekedCount, bool leaveOpen)
+        {
+            _underlying = underlying ?? throw new ArgumentNullException(nameof(underlying));
+            _peekBuffer = peekBuffer ?? throw new ArgumentNullException(nameof(peekBuffer));
+            _peekedCount = peekedCount;
+            _leaveOpen = leaveOpen;
+        }
+
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+
+        public override void Flush() => _underlying.Flush();
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            int bytesRead = 0;
+            if (_peekPosition < _peekedCount)
+            {
+                int available = _peekedCount - _peekPosition;
+                int toCopy = Math.Min(available, count);
+                Array.Copy(_peekBuffer, _peekPosition, buffer, offset, toCopy);
+                _peekPosition += toCopy;
+                offset += toCopy;
+                count -= toCopy;
+                bytesRead += toCopy;
+            }
+
+            if (count > 0)
+            {
+                bytesRead += _underlying.Read(buffer, offset, count);
+            }
+
+            return bytesRead;
+        }
+
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && !_leaveOpen)
+            {
+                _underlying.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 

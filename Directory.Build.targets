@@ -1,0 +1,14 @@
+<Project>
+  <ItemGroup>
+    <Compile Remove="bin\**\*.cs" />
+    <Compile Remove="obj\**\*.cs" />
+    <Compile Remove="bin_antigravity\**\*.cs" />
+    <Compile Remove="obj_antigravity\**\*.cs" />
+    <Compile Remove=".codex-tmp\**\*.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\bin\**\*.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\obj\**\*.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\bin_antigravity\**\*.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\obj_antigravity\**\*.cs" />
+    <Compile Remove="$(MSBuildProjectDirectory)\.codex-tmp\**\*.cs" />
+  </ItemGroup>
+</Project>

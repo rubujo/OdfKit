@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
     <ProjectReference Include="..\OdfKit.Extensions.Rendering\OdfKit.Extensions.Rendering.csproj" />
+    <ProjectReference Include="..\tools\OdfSchemaGenerator\OdfSchemaGenerator.csproj" />
   </ItemGroup>
 
 </Project>
