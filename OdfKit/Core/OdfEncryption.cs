@@ -16,6 +16,10 @@ namespace OdfKit.Core
         /// </summary>
         public static byte[] Pbkdf2(byte[] password, byte[] salt, int iterations, int keyLength, string hashName)
         {
+            if (iterations > 50000)
+            {
+                throw new CryptographicException($"PBKDF2 iteration count {iterations} exceeds the maximum limit of 50000.");
+            }
             if (hashName.IndexOf("sha256", StringComparison.OrdinalIgnoreCase) >= 0 || hashName.IndexOf("sha-256", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 using (var hmac = new HMACSHA256(password))
@@ -72,6 +76,11 @@ namespace OdfKit.Core
         /// </summary>
         public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName = null)
         {
+            if (iterationCount > 50000)
+            {
+                throw new CryptographicException($"PBKDF2 iteration count {iterationCount} exceeds the maximum limit of 50000.");
+            }
+
             if (algorithmUri != Aes256AlgorithmUri && algorithmUri != BlowfishAlgorithmUri)
             {
                 throw new NotSupportedException($"Unsupported encryption algorithm: {algorithmUri}. OdfKit supports standard AES-256-CBC and Blowfish-CBC.");
@@ -272,10 +281,26 @@ namespace OdfKit.Core
                         using (var deflate = new DeflateStream(ms, CompressionMode.Decompress))
                         using (var outMs = new MemoryStream())
                         {
-                            deflate.CopyTo(outMs);
+                            long maxEntrySize = package.LoadOptions.MaxEntrySize;
+                            byte[] buffer = new byte[8192];
+                            long cumulativeBytes = 0;
+                            int bytesRead;
+                            while ((bytesRead = deflate.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                cumulativeBytes += bytesRead;
+                                if (cumulativeBytes > maxEntrySize)
+                                {
+                                    throw new System.Security.SecurityException($"Decompressed size of entry exceeds the maximum entry size limit of {maxEntrySize} bytes.");
+                                }
+                                outMs.Write(buffer, 0, bytesRead);
+                            }
                             decompressedBytes = outMs.ToArray();
                             decompressedSuccessfully = true;
                         }
+                    }
+                    catch (System.Security.SecurityException)
+                    {
+                        throw;
                     }
                     catch
                     {
@@ -461,6 +486,10 @@ namespace OdfKit.Core
 
         public void Initialize(byte[] key)
         {
+            if (key == null || key.Length == 0)
+            {
+                throw new ArgumentException("Blowfish key cannot be null or empty.", nameof(key));
+            }
             Array.Copy(BlowfishConstants.P, _p, 18);
             for (int i = 0; i < 4; i++)
             {

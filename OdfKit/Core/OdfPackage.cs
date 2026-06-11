@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Security;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -285,12 +287,16 @@ namespace OdfKit.Core
                         {
                             currentEncryptionInfo.KeyDerivationName = derivationName;
                         }
-                        if (int.TryParse(keySizeStr, out int keySize))
+                        if (int.TryParse(keySizeStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int keySize))
                         {
                             currentEncryptionInfo.KeySize = keySize;
                         }
-                        if (int.TryParse(iterationCountStr, out int iterationCount))
+                        if (int.TryParse(iterationCountStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int iterationCount))
                         {
+                            if (iterationCount > 50000)
+                            {
+                                throw new CryptographicException($"PBKDF2 iteration count {iterationCount} exceeds the maximum limit of 50000.");
+                            }
                             currentEncryptionInfo.IterationCount = iterationCount;
                         }
                         if (!string.IsNullOrEmpty(saltStr))
@@ -307,7 +313,7 @@ namespace OdfKit.Core
                         {
                             currentEncryptionInfo.StartKeyGenerationName = startKeyGenName;
                         }
-                        if (int.TryParse(startKeySizeStr, out int startKeySize))
+                        if (int.TryParse(startKeySizeStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int startKeySize))
                         {
                             currentEncryptionInfo.StartKeySize = startKeySize;
                         }
@@ -932,8 +938,8 @@ namespace OdfKit.Core
 
                         writer.WriteStartElement("key-derivation", OdfNamespaces.Manifest);
                         writer.WriteAttributeString("manifest", "key-derivation-name", OdfNamespaces.Manifest, info.KeyDerivationName);
-                        writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.KeySize.ToString());
-                        writer.WriteAttributeString("manifest", "iteration-count", OdfNamespaces.Manifest, info.IterationCount.ToString());
+                        writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.KeySize.ToString(CultureInfo.InvariantCulture));
+                        writer.WriteAttributeString("manifest", "iteration-count", OdfNamespaces.Manifest, info.IterationCount.ToString(CultureInfo.InvariantCulture));
                         writer.WriteAttributeString("manifest", "salt", OdfNamespaces.Manifest, Convert.ToBase64String(info.Salt));
                         writer.WriteEndElement(); // key-derivation
 
@@ -941,7 +947,7 @@ namespace OdfKit.Core
                         {
                             writer.WriteStartElement("start-key-generation", OdfNamespaces.Manifest);
                             writer.WriteAttributeString("manifest", "start-key-generation-name", OdfNamespaces.Manifest, info.StartKeyGenerationName);
-                            writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.StartKeySize.Value.ToString());
+                            writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.StartKeySize.Value.ToString(CultureInfo.InvariantCulture));
                             writer.WriteEndElement(); // start-key-generation
                         }
 

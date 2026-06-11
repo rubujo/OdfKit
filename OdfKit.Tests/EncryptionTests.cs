@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using Xunit;
@@ -9,6 +10,65 @@ namespace OdfKit.Tests
 {
     public class EncryptionTests
     {
+        [Fact]
+        public void TestPbkdf2IterationLimit()
+        {
+            // Verify direct Pbkdf2 throws CryptographicException
+            Assert.Throws<CryptographicException>(() =>
+            {
+                OdfEncryption.Pbkdf2(new byte[16], new byte[8], 50001, 16, "sha256");
+            });
+
+            // Verify direct DecryptEntry throws CryptographicException
+            Assert.Throws<CryptographicException>(() =>
+            {
+                OdfEncryption.DecryptEntry(new byte[16], "password", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50001, new byte[16], new byte[16]);
+            });
+        }
+
+        [Fact]
+        public void TestBlowfishKeyLengthValidation()
+        {
+            var blowfish = new Blowfish();
+            Assert.Throws<ArgumentException>(() => blowfish.Initialize(null!));
+            Assert.Throws<ArgumentException>(() => blowfish.Initialize(new byte[0]));
+        }
+
+        [Fact]
+        public void TestDecompressionBombDefense()
+        {
+            var ms = new MemoryStream();
+            string originalContent = new string('A', 150); // 150 bytes
+            string password = "DecompressPassword";
+
+            // 1. Create and encrypt a package
+            using (var package = OdfPackage.Create(ms, true))
+            {
+                package.SetMimeType("application/vnd.oasis.opendocument.text");
+                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(originalContent), "text/xml");
+                
+                package.SaveOptions.Password = password;
+                package.SaveOptions.EncryptionAlgorithm = OdfEncryptionAlgorithm.Aes256;
+                package.Save();
+            }
+
+            // 2. Try to open the package with a MaxEntrySize limit smaller than 150 bytes
+            ms.Position = 0;
+            var loadOptions = new OdfLoadOptions
+            {
+                Password = password,
+                MaxEntrySize = 100 // smaller than 150 bytes
+            };
+
+            Assert.Throws<SecurityException>(() =>
+            {
+                using (var package = OdfPackage.Open(ms, true, loadOptions))
+                {
+                    // Open triggers Decrypt, which decompresses content.xml
+                }
+            });
+        }
+
         [Fact]
         public void TestAes256EncryptionDecryption_Roundtrip()
         {
