@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Xml;
 using OdfKit.Core;
 
@@ -65,6 +65,12 @@ namespace OdfKit.DOM
 
         private static void WriteNode(OdfNode node, XmlWriter writer, Dictionary<string, string> nsDict, ref int openElementsCount, bool isRoot)
         {
+            if (node.NodeType == OdfNodeType.Comment)
+            {
+                writer.WriteComment(node.TextContent);
+                return;
+            }
+
             if (node.NodeType == OdfNodeType.Text)
             {
                 writer.WriteString(node.TextContent);

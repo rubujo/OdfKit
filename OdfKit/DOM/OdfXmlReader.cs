@@ -1,4 +1,4 @@
-﻿using System.Security;
+using System.Security;
 using System.Xml;
 using OdfKit.Core;
 using CommunityToolkit.HighPerformance.Buffers;
@@ -22,7 +22,7 @@ namespace OdfKit.DOM
                 DtdProcessing = DtdProcessing.Prohibit, // XXE 防禦
                 XmlResolver = null,                     // XXE 防禦
                 IgnoreWhitespace = false,               // 保留有意義的空白
-                IgnoreComments = true,
+                IgnoreComments = false,
                 IgnoreProcessingInstructions = true
             };
 
@@ -103,6 +103,18 @@ namespace OdfKit.DOM
                                     stack.Pop();
                                 }
                                 currentDepth--;
+                                break;
+
+                            case XmlNodeType.Comment:
+                                if (stack.Count > 0)
+                                {
+                                    string commentVal = reader.Value;
+                                    var commentNode = new OdfNode(OdfNodeType.Comment, string.Empty, string.Empty)
+                                    {
+                                        TextContent = commentVal
+                                    };
+                                    stack.Peek().AppendChild(commentNode);
+                                }
                                 break;
 
                             case XmlNodeType.Text:

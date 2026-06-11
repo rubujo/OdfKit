@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
@@ -32,6 +32,18 @@ namespace OdfKit.Core
             
             LoadXmlTrees();
             StyleEngine = new OdfStyleEngine(ContentDom, StylesDom);
+        }
+
+        /// <summary>
+        /// Sanitizes the document by removing all VBA/StarBasic scripts, signatures, and script references.
+        /// </summary>
+        public void SanitizeMacros()
+        {
+            OdfPackage.SanitizeXmlNode(ContentDom);
+            OdfPackage.SanitizeXmlNode(StylesDom);
+            OdfPackage.SanitizeXmlNode(MetaDom);
+            OdfPackage.SanitizeXmlNode(SettingsDom);
+            Package.SanitizeMacros();
         }
 
         private void LoadXmlTrees()
@@ -348,7 +360,7 @@ namespace OdfKit.Core
 
         private DateTime? ParseMetaDate(string? text)
         {
-            if (DateTime.TryParse(text, null, System.Globalization.DateTimeStyles.RoundtripKind, out var val))
+            if (DateTime.TryParse(text, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out var val))
             {
                 if (val == DateTime.MinValue || val == DateTime.MaxValue)
                     return val;
@@ -370,15 +382,15 @@ namespace OdfKit.Core
             var val = dt.Value;
             if (val == DateTime.MinValue || val == DateTime.MaxValue)
             {
-                return val.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                return val.ToString("yyyy-MM-ddTHH:mm:ssZ", System.Globalization.CultureInfo.InvariantCulture);
             }
             try
             {
-                return val.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
+                return val.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ", System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (ArgumentOutOfRangeException)
             {
-                return val.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                return val.ToString("yyyy-MM-ddTHH:mm:ssZ", System.Globalization.CultureInfo.InvariantCulture);
             }
         }
 
@@ -397,15 +409,15 @@ namespace OdfKit.Core
         {
             if (val == DateTime.MinValue || val == DateTime.MaxValue)
             {
-                return val.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                return val.ToString("yyyy-MM-ddTHH:mm:ssZ", System.Globalization.CultureInfo.InvariantCulture);
             }
             try
             {
-                return val.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
+                return val.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ", System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (ArgumentOutOfRangeException)
             {
-                return val.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                return val.ToString("yyyy-MM-ddTHH:mm:ssZ", System.Globalization.CultureInfo.InvariantCulture);
             }
         }
 
@@ -415,7 +427,7 @@ namespace OdfKit.Core
             {
                 "boolean" => bool.TryParse(val, out var b) && b,
                 "float" => double.TryParse(val, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var f) ? f : 0.0,
-                "date" => DateTime.TryParse(val, null, System.Globalization.DateTimeStyles.RoundtripKind, out var d) ? d : DateTime.MinValue,
+                "date" => DateTime.TryParse(val, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out var d) ? d : DateTime.MinValue,
                 _ => val
             };
         }

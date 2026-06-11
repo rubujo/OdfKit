@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using OdfKit.Core;
 
 namespace OdfKit.DOM
@@ -6,7 +6,8 @@ namespace OdfKit.DOM
     public enum OdfNodeType
     {
         Element,
-        Text
+        Text,
+        Comment
     }
 
     public struct OdfAttributeName : IEquatable<OdfAttributeName>
@@ -84,7 +85,7 @@ namespace OdfKit.DOM
         {
             get
             {
-                if (NodeType == OdfNodeType.Text)
+                if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment)
                 {
                     return _value ?? string.Empty;
                 }
@@ -123,7 +124,7 @@ namespace OdfKit.DOM
             set
             {
                 IsModified = true;
-                if (NodeType == OdfNodeType.Text)
+                if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment)
                 {
                     _value = value;
                 }
@@ -148,9 +149,9 @@ namespace OdfKit.DOM
         public void AppendChild(OdfNode child)
         {
             if (child == null) throw new ArgumentNullException(nameof(child));
-            if (NodeType == OdfNodeType.Text)
+            if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment)
             {
-                throw new InvalidOperationException("Cannot add child nodes to a text node.");
+                throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
             }
 
             IsModified = true;
@@ -163,9 +164,9 @@ namespace OdfKit.DOM
         {
             if (newChild == null) throw new ArgumentNullException(nameof(newChild));
             if (refChild == null) throw new ArgumentNullException(nameof(refChild));
-            if (NodeType == OdfNodeType.Text)
+            if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment)
             {
-                throw new InvalidOperationException("Cannot add child nodes to a text node.");
+                throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
             }
 
             int index = Children.IndexOf(refChild);
@@ -184,9 +185,9 @@ namespace OdfKit.DOM
         {
             if (newChild == null) throw new ArgumentNullException(nameof(newChild));
             if (refChild == null) throw new ArgumentNullException(nameof(refChild));
-            if (NodeType == OdfNodeType.Text)
+            if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment)
             {
-                throw new InvalidOperationException("Cannot add child nodes to a text node.");
+                throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
             }
 
             int index = Children.IndexOf(refChild);
