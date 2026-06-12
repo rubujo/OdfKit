@@ -1,5 +1,6 @@
 using System.Text;
 using OdfKit.Core;
+using OdfKit.Compliance;
 
 namespace OdfKit.DOM
 {
@@ -242,6 +243,51 @@ namespace OdfKit.DOM
         }
 
         #endregion
+
+        /// <summary>
+        /// Gets the ODF version of the document this node belongs to by walking up to the root element.
+        /// </summary>
+        public OdfVersion GetDocumentVersion()
+        {
+            OdfNode current = this;
+            while (current.Parent != null)
+            {
+                current = current.Parent;
+            }
+            if (current.NodeType == OdfNodeType.Element)
+            {
+                string? versionStr = current.GetAttribute("version", OdfNamespaces.Office);
+                if (versionStr == null && current.LocalName == "manifest")
+                {
+                    versionStr = current.GetAttribute("version", OdfNamespaces.Manifest);
+                }
+                if (versionStr == null)
+                {
+                    foreach (var attr in current.Attributes)
+                    {
+                        if (attr.Key.LocalName == "version")
+                        {
+                            versionStr = attr.Value;
+                            break;
+                        }
+                    }
+                }
+                
+                if (versionStr != null)
+                {
+                    return versionStr switch
+                    {
+                        "1.0" => OdfVersion.Odf10,
+                        "1.1" => OdfVersion.Odf11,
+                        "1.2" => OdfVersion.Odf12,
+                        "1.3" => OdfVersion.Odf13,
+                        "1.4" => OdfVersion.Odf14,
+                        _ => OdfVersion.Odf14
+                    };
+                }
+            }
+            return OdfVersion.Odf14; // Default fallback for detached/standalone nodes
+        }
 
         #region Clone & Import Node
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -177,7 +177,7 @@ namespace OdfKit.Tests
                 var child = p.Node.Children[idx];
                 Console.WriteLine($"DEBUG: Child {idx}: NodeType={child.NodeType}, LocalName='{child.LocalName}', TextContent='{child.TextContent}'");
             }
-            Assert.Equal(1, p.Node.Children.Count);
+            Assert.Single(p.Node.Children);
             Assert.Equal("Plain Bold Extra", p.Node.TextContent);
         }
 

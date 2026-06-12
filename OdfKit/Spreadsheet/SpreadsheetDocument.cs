@@ -470,62 +470,212 @@ namespace OdfKit.Spreadsheet
             return list;
         }
 
+        private OdfNode SplitRepeatedRow(OdfNode rowNode, int targetRowIndex, int currentRowIndex, int repeatedCount)
+        {
+            int beforeCount = targetRowIndex - currentRowIndex;
+            int afterCount = (currentRowIndex + repeatedCount) - (targetRowIndex + 1);
+
+            OdfNode targetRowNode = rowNode;
+
+            if (beforeCount > 0)
+            {
+                var beforeRow = rowNode.CloneNode(true);
+                if (beforeCount > 1)
+                    beforeRow.SetAttribute("number-rows-repeated", OdfNamespaces.Table, beforeCount.ToString(), "table");
+                else
+                    beforeRow.RemoveAttribute("number-rows-repeated", OdfNamespaces.Table);
+                TableNode.InsertBefore(beforeRow, rowNode);
+            }
+
+            if (afterCount > 0)
+            {
+                var afterRow = rowNode.CloneNode(true);
+                if (afterCount > 1)
+                    afterRow.SetAttribute("number-rows-repeated", OdfNamespaces.Table, afterCount.ToString(), "table");
+                else
+                    afterRow.RemoveAttribute("number-rows-repeated", OdfNamespaces.Table);
+                TableNode.InsertAfter(afterRow, rowNode);
+            }
+
+            targetRowNode.RemoveAttribute("number-rows-repeated", OdfNamespaces.Table);
+            return targetRowNode;
+        }
+
+        private OdfNode SplitRepeatedCell(OdfNode cellNode, int targetColIndex, int currentColIndex, int repeatedCount, OdfNode rowNode)
+        {
+            int beforeCount = targetColIndex - currentColIndex;
+            int afterCount = (currentColIndex + repeatedCount) - (targetColIndex + 1);
+
+            OdfNode targetCellNode = cellNode;
+
+            if (beforeCount > 0)
+            {
+                var beforeCell = cellNode.CloneNode(true);
+                if (beforeCount > 1)
+                    beforeCell.SetAttribute("number-columns-repeated", OdfNamespaces.Table, beforeCount.ToString(), "table");
+                else
+                    beforeCell.RemoveAttribute("number-columns-repeated", OdfNamespaces.Table);
+                rowNode.InsertBefore(beforeCell, cellNode);
+            }
+
+            if (afterCount > 0)
+            {
+                var afterCell = cellNode.CloneNode(true);
+                if (afterCount > 1)
+                    afterCell.SetAttribute("number-columns-repeated", OdfNamespaces.Table, afterCount.ToString(), "table");
+                else
+                    afterCell.RemoveAttribute("number-columns-repeated", OdfNamespaces.Table);
+                rowNode.InsertAfter(afterCell, cellNode);
+            }
+
+            targetCellNode.RemoveAttribute("number-columns-repeated", OdfNamespaces.Table);
+            return targetCellNode;
+        }
+
+        private OdfNode SplitRepeatedColumn(OdfNode colNode, int targetColIndex, int currentColIndex, int repeatedCount)
+        {
+            int beforeCount = targetColIndex - currentColIndex;
+            int afterCount = (currentColIndex + repeatedCount) - (targetColIndex + 1);
+
+            OdfNode targetColNode = colNode;
+
+            if (beforeCount > 0)
+            {
+                var beforeCol = colNode.CloneNode(true);
+                if (beforeCount > 1)
+                    beforeCol.SetAttribute("number-columns-repeated", OdfNamespaces.Table, beforeCount.ToString(), "table");
+                else
+                    beforeCol.RemoveAttribute("number-columns-repeated", OdfNamespaces.Table);
+                TableNode.InsertBefore(beforeCol, colNode);
+            }
+
+            if (afterCount > 0)
+            {
+                var afterCol = colNode.CloneNode(true);
+                if (afterCount > 1)
+                    afterCol.SetAttribute("number-columns-repeated", OdfNamespaces.Table, afterCount.ToString(), "table");
+                else
+                    afterCol.RemoveAttribute("number-columns-repeated", OdfNamespaces.Table);
+                TableNode.InsertAfter(afterCol, colNode);
+            }
+
+            targetColNode.RemoveAttribute("number-columns-repeated", OdfNamespaces.Table);
+            return targetColNode;
+        }
+
+        private OdfNode GetOrCreateRowNodeInternal(int row, bool forWrite)
+        {
+            int currentRowIndex = 0;
+            foreach (var child in TableNode.Children)
+            {
+                if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
+                {
+                    int repeatedCount = 1;
+                    string? repStr = child.GetAttribute("number-rows-repeated", OdfNamespaces.Table);
+                    if (!string.IsNullOrEmpty(repStr) && int.TryParse(repStr, out int rc))
+                    {
+                        repeatedCount = rc;
+                    }
+
+                    if (row >= currentRowIndex && row < currentRowIndex + repeatedCount)
+                    {
+                        if (forWrite && repeatedCount > 1)
+                        {
+                            return SplitRepeatedRow(child, row, currentRowIndex, repeatedCount);
+                        }
+                        return child;
+                    }
+                    currentRowIndex += repeatedCount;
+                }
+            }
+
+            OdfNode? lastRow = null;
+            while (currentRowIndex <= row)
+            {
+                lastRow = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
+                TableNode.AppendChild(lastRow);
+                currentRowIndex++;
+            }
+            return lastRow!;
+        }
+
+        private OdfNode GetOrCreateCellNodeInternal(OdfNode rowNode, int col, bool forWrite)
+        {
+            int currentColIndex = 0;
+            foreach (var child in rowNode.Children)
+            {
+                if ((child.LocalName == "table-cell" || child.LocalName == "covered-table-cell") && child.NamespaceUri == OdfNamespaces.Table)
+                {
+                    int repeatedCount = 1;
+                    string? repStr = child.GetAttribute("number-columns-repeated", OdfNamespaces.Table);
+                    if (!string.IsNullOrEmpty(repStr) && int.TryParse(repStr, out int rc))
+                    {
+                        repeatedCount = rc;
+                    }
+
+                    if (col >= currentColIndex && col < currentColIndex + repeatedCount)
+                    {
+                        if (forWrite && repeatedCount > 1)
+                        {
+                            return SplitRepeatedCell(child, col, currentColIndex, repeatedCount, rowNode);
+                        }
+                        return child;
+                    }
+                    currentColIndex += repeatedCount;
+                }
+            }
+
+            OdfNode? lastCell = null;
+            while (currentColIndex <= col)
+            {
+                lastCell = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table");
+                rowNode.AppendChild(lastCell);
+                currentColIndex++;
+            }
+            return lastCell!;
+        }
+
         private OdfNode GetOrCreateCellNode(int row, int col)
         {
-            var rows = GetRowsList();
-            while (rows.Count <= row)
-            {
-                var newRow = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
-                TableNode.AppendChild(newRow);
-                rows.Add(newRow);
-            }
-
-            var rowNode = rows[row];
-            var cells = GetCellsInRow(rowNode);
-            while (cells.Count <= col)
-            {
-                var newCell = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table");
-                rowNode.AppendChild(newCell);
-                cells.Add(newCell);
-            }
-
-            return cells[col];
+            var rowNode = GetOrCreateRowNodeInternal(row, forWrite: true);
+            return GetOrCreateCellNodeInternal(rowNode, col, forWrite: true);
         }
 
         private void ReplaceCellNode(int row, int col, OdfNode newCellNode)
         {
-            var rows = GetRowsList();
-            while (rows.Count <= row)
-            {
-                var newRow = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
-                TableNode.AppendChild(newRow);
-                rows.Add(newRow);
-            }
-
-            var rowNode = rows[row];
-            var cells = GetCellsInRow(rowNode);
-            while (cells.Count <= col)
-            {
-                var newCell = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table");
-                rowNode.AppendChild(newCell);
-                cells.Add(newCell);
-            }
-
-            var oldCell = cells[col];
+            var rowNode = GetOrCreateRowNodeInternal(row, forWrite: true);
+            var oldCell = GetOrCreateCellNodeInternal(rowNode, col, forWrite: true);
             rowNode.InsertBefore(newCellNode, oldCell);
             rowNode.RemoveChild(oldCell);
         }
 
         private OdfNode GetOrCreateColumnNode(int col)
         {
-            var cols = new List<OdfNode>();
+            int currentColIndex = 0;
             OdfNode? insertBeforeNode = null;
-            
+            var cols = new List<OdfNode>();
+
             foreach (var child in TableNode.Children)
             {
                 if (child.LocalName == "table-column" && child.NamespaceUri == OdfNamespaces.Table)
                 {
                     cols.Add(child);
+                    int repeatedCount = 1;
+                    string? repStr = child.GetAttribute("number-columns-repeated", OdfNamespaces.Table);
+                    if (!string.IsNullOrEmpty(repStr) && int.TryParse(repStr, out int rc))
+                    {
+                        repeatedCount = rc;
+                    }
+
+                    if (col >= currentColIndex && col < currentColIndex + repeatedCount)
+                    {
+                        if (repeatedCount > 1)
+                        {
+                            return SplitRepeatedColumn(child, col, currentColIndex, repeatedCount);
+                        }
+                        return child;
+                    }
+                    currentColIndex += repeatedCount;
                 }
                 else if (cols.Count > 0 && insertBeforeNode == null)
                 {
@@ -533,33 +683,26 @@ namespace OdfKit.Spreadsheet
                 }
             }
 
-            while (cols.Count <= col)
+            OdfNode? lastCol = null;
+            while (currentColIndex <= col)
             {
-                var newCol = new OdfNode(OdfNodeType.Element, "table-column", OdfNamespaces.Table, "table");
+                lastCol = new OdfNode(OdfNodeType.Element, "table-column", OdfNamespaces.Table, "table");
                 if (insertBeforeNode != null)
                 {
-                    TableNode.InsertBefore(newCol, insertBeforeNode);
+                    TableNode.InsertBefore(lastCol, insertBeforeNode);
                 }
                 else
                 {
-                    TableNode.AppendChild(newCol);
+                    TableNode.AppendChild(lastCol);
                 }
-                cols.Add(newCol);
+                currentColIndex++;
             }
-
-            return cols[col];
+            return lastCol!;
         }
 
         private OdfNode GetOrCreateRowNode(int row)
         {
-            var rows = GetRowsList();
-            while (rows.Count <= row)
-            {
-                var newRow = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
-                TableNode.AppendChild(newRow);
-                rows.Add(newRow);
-            }
-            return rows[row];
+            return GetOrCreateRowNodeInternal(row, forWrite: true);
         }
 
         public void SetRowVisible(int row, bool visible)
@@ -572,6 +715,54 @@ namespace OdfKit.Spreadsheet
         {
             var colNode = GetOrCreateColumnNode(col);
             colNode.SetAttribute("visibility", OdfNamespaces.Table, visible ? "visible" : "collapse", "table");
+        }
+
+        public bool IsRowVisible(int row)
+        {
+            int currentRowIndex = 0;
+            foreach (var child in TableNode.Children)
+            {
+                if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
+                {
+                    int repeatedCount = 1;
+                    string? repStr = child.GetAttribute("number-rows-repeated", OdfNamespaces.Table);
+                    if (!string.IsNullOrEmpty(repStr) && int.TryParse(repStr, out int rc))
+                    {
+                        repeatedCount = rc;
+                    }
+
+                    if (row >= currentRowIndex && row < currentRowIndex + repeatedCount)
+                    {
+                        return child.GetAttribute("visibility", OdfNamespaces.Table) != "collapse";
+                    }
+                    currentRowIndex += repeatedCount;
+                }
+            }
+            return true;
+        }
+
+        public bool IsColumnVisible(int col)
+        {
+            int currentColIndex = 0;
+            foreach (var child in TableNode.Children)
+            {
+                if (child.LocalName == "table-column" && child.NamespaceUri == OdfNamespaces.Table)
+                {
+                    int repeatedCount = 1;
+                    string? repStr = child.GetAttribute("number-columns-repeated", OdfNamespaces.Table);
+                    if (!string.IsNullOrEmpty(repStr) && int.TryParse(repStr, out int rc))
+                    {
+                        repeatedCount = rc;
+                    }
+
+                    if (col >= currentColIndex && col < currentColIndex + repeatedCount)
+                    {
+                        return child.GetAttribute("visibility", OdfNamespaces.Table) != "collapse";
+                    }
+                    currentColIndex += repeatedCount;
+                }
+            }
+            return true;
         }
     }
 

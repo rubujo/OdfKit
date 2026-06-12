@@ -70,8 +70,14 @@ namespace OdfKit.DOM
 
         public string? StyleName
         {
-            get => GetAttribute("style-name", OdfNamespaces.Text);
-            set => SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Text));
+            get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("style-name", OdfNamespaces.Text);
+                else
+                    SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+            }
         }
     }
 
@@ -81,14 +87,20 @@ namespace OdfKit.DOM
 
         public string? StyleName
         {
-            get => GetAttribute("style-name", OdfNamespaces.Text);
-            set => SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Text));
+            get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("style-name", OdfNamespaces.Text);
+                else
+                    SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+            }
         }
 
         public int OutlineLevel
         {
-            get => int.TryParse(GetAttribute("outline-level", OdfNamespaces.Text), out var level) ? level : 1;
-            set => SetAttribute("outline-level", OdfNamespaces.Text, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Text));
+            get => int.TryParse(GetAttributeValue("outline-level", OdfNamespaces.Text, GetDocumentVersion()), out var level) ? level : 1;
+            set => SetAttributeValue("outline-level", OdfNamespaces.Text, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
         }
     }
 
@@ -98,8 +110,14 @@ namespace OdfKit.DOM
 
         public string? StyleName
         {
-            get => GetAttribute("style-name", OdfNamespaces.Text);
-            set => SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Text));
+            get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("style-name", OdfNamespaces.Text);
+                else
+                    SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+            }
         }
     }
 
@@ -109,8 +127,14 @@ namespace OdfKit.DOM
 
         public string? StyleName
         {
-            get => GetAttribute("style-name", OdfNamespaces.Text);
-            set => SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Text));
+            get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("style-name", OdfNamespaces.Text);
+                else
+                    SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+            }
         }
     }
 
@@ -125,14 +149,26 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Text);
-            set => SetAttribute("name", OdfNamespaces.Text, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Text));
+            get => GetAttributeValue("name", OdfNamespaces.Text, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Text);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+            }
         }
 
         public string? StyleName
         {
-            get => GetAttribute("style-name", OdfNamespaces.Text);
-            set => SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Text));
+            get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("style-name", OdfNamespaces.Text);
+                else
+                    SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+            }
         }
     }
 
@@ -142,8 +178,14 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Text);
-            set => SetAttribute("name", OdfNamespaces.Text, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Text));
+            get => GetAttributeValue("name", OdfNamespaces.Text, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Text);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+            }
         }
     }
 
@@ -153,8 +195,14 @@ namespace OdfKit.DOM
 
         public string? NoteClass
         {
-            get => GetAttribute("note-class", OdfNamespaces.Text);
-            set => SetAttribute("note-class", OdfNamespaces.Text, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Text));
+            get => GetAttributeValue("note-class", OdfNamespaces.Text, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("note-class", OdfNamespaces.Text);
+                else
+                    SetAttributeValue("note-class", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+            }
         }
     }
 
@@ -164,8 +212,14 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Office);
-            set => SetAttribute("name", OdfNamespaces.Office, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
+            get => GetAttributeValue("name", OdfNamespaces.Office, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Office);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Office, value, OdfNamespaces.GetPrefix(OdfNamespaces.Office), GetDocumentVersion());
+            }
         }
     }
 
@@ -179,14 +233,26 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Table);
-            set => SetAttribute("name", OdfNamespaces.Table, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Table));
+            get => GetAttributeValue("name", OdfNamespaces.Table, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Table);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+            }
         }
 
         public string? StyleName
         {
-            get => GetAttribute("style-name", OdfNamespaces.Table);
-            set => SetAttribute("style-name", OdfNamespaces.Table, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Table));
+            get => GetAttributeValue("style-name", OdfNamespaces.Table, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("style-name", OdfNamespaces.Table);
+                else
+                    SetAttributeValue("style-name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+            }
         }
     }
 
@@ -196,8 +262,8 @@ namespace OdfKit.DOM
 
         public int NumberRowsRepeated
         {
-            get => int.TryParse(GetAttribute("number-rows-repeated", OdfNamespaces.Table), out var val) ? val : 1;
-            set => SetAttribute("number-rows-repeated", OdfNamespaces.Table, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Table));
+            get => int.TryParse(GetAttributeValue("number-rows-repeated", OdfNamespaces.Table, GetDocumentVersion()), out var val) ? val : 1;
+            set => SetAttributeValue("number-rows-repeated", OdfNamespaces.Table, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
         }
     }
 
@@ -207,14 +273,20 @@ namespace OdfKit.DOM
 
         public int NumberColumnsRepeated
         {
-            get => int.TryParse(GetAttribute("number-columns-repeated", OdfNamespaces.Table), out var val) ? val : 1;
-            set => SetAttribute("number-columns-repeated", OdfNamespaces.Table, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Table));
+            get => int.TryParse(GetAttributeValue("number-columns-repeated", OdfNamespaces.Table, GetDocumentVersion()), out var val) ? val : 1;
+            set => SetAttributeValue("number-columns-repeated", OdfNamespaces.Table, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
         }
 
         public string? ValueType
         {
-            get => GetAttribute("value-type", OdfNamespaces.Office);
-            set => SetAttribute("value-type", OdfNamespaces.Office, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
+            get => GetAttributeValue("value-type", OdfNamespaces.Office, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("value-type", OdfNamespaces.Office);
+                else
+                    SetAttributeValue("value-type", OdfNamespaces.Office, value, OdfNamespaces.GetPrefix(OdfNamespaces.Office), GetDocumentVersion());
+            }
         }
     }
 
@@ -229,8 +301,14 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Table);
-            set => SetAttribute("name", OdfNamespaces.Table, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Table));
+            get => GetAttributeValue("name", OdfNamespaces.Table, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Table);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+            }
         }
     }
 
@@ -240,8 +318,14 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Table);
-            set => SetAttribute("name", OdfNamespaces.Table, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Table));
+            get => GetAttributeValue("name", OdfNamespaces.Table, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Table);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+            }
         }
     }
 
@@ -255,8 +339,14 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Draw);
-            set => SetAttribute("name", OdfNamespaces.Draw, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Draw));
+            get => GetAttributeValue("name", OdfNamespaces.Draw, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Draw);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Draw, value, OdfNamespaces.GetPrefix(OdfNamespaces.Draw), GetDocumentVersion());
+            }
         }
     }
 
@@ -266,8 +356,14 @@ namespace OdfKit.DOM
 
         public string? Href
         {
-            get => GetAttribute("href", OdfNamespaces.XLink);
-            set => SetAttribute("href", OdfNamespaces.XLink, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.XLink));
+            get => GetAttributeValue("href", OdfNamespaces.XLink, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("href", OdfNamespaces.XLink);
+                else
+                    SetAttributeValue("href", OdfNamespaces.XLink, value, OdfNamespaces.GetPrefix(OdfNamespaces.XLink), GetDocumentVersion());
+            }
         }
     }
 
@@ -277,8 +373,14 @@ namespace OdfKit.DOM
 
         public string? Href
         {
-            get => GetAttribute("href", OdfNamespaces.XLink);
-            set => SetAttribute("href", OdfNamespaces.XLink, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.XLink));
+            get => GetAttributeValue("href", OdfNamespaces.XLink, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("href", OdfNamespaces.XLink);
+                else
+                    SetAttributeValue("href", OdfNamespaces.XLink, value, OdfNamespaces.GetPrefix(OdfNamespaces.XLink), GetDocumentVersion());
+            }
         }
     }
 
@@ -288,8 +390,14 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Draw);
-            set => SetAttribute("name", OdfNamespaces.Draw, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Draw));
+            get => GetAttributeValue("name", OdfNamespaces.Draw, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Draw);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Draw, value, OdfNamespaces.GetPrefix(OdfNamespaces.Draw), GetDocumentVersion());
+            }
         }
     }
 
@@ -313,14 +421,26 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Style);
-            set => SetAttribute("name", OdfNamespaces.Style, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
+            get => GetAttributeValue("name", OdfNamespaces.Style, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Style);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
+            }
         }
 
         public string? Family
         {
-            get => GetAttribute("family", OdfNamespaces.Style);
-            set => SetAttribute("family", OdfNamespaces.Style, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
+            get => GetAttributeValue("family", OdfNamespaces.Style, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("family", OdfNamespaces.Style);
+                else
+                    SetAttributeValue("family", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
+            }
         }
     }
 
@@ -330,8 +450,14 @@ namespace OdfKit.DOM
 
         public string? Family
         {
-            get => GetAttribute("family", OdfNamespaces.Style);
-            set => SetAttribute("family", OdfNamespaces.Style, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
+            get => GetAttributeValue("family", OdfNamespaces.Style, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("family", OdfNamespaces.Style);
+                else
+                    SetAttributeValue("family", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
+            }
         }
     }
 
@@ -341,8 +467,14 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Style);
-            set => SetAttribute("name", OdfNamespaces.Style, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
+            get => GetAttributeValue("name", OdfNamespaces.Style, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Style);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
+            }
         }
     }
 
@@ -352,8 +484,14 @@ namespace OdfKit.DOM
 
         public string? Name
         {
-            get => GetAttribute("name", OdfNamespaces.Style);
-            set => SetAttribute("name", OdfNamespaces.Style, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
+            get => GetAttributeValue("name", OdfNamespaces.Style, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", OdfNamespaces.Style);
+                else
+                    SetAttributeValue("name", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
+            }
         }
     }
 
@@ -421,14 +559,26 @@ namespace OdfKit.DOM
 
         public string? FullPath
         {
-            get => GetAttribute("full-path", OdfNamespaces.Manifest);
-            set => SetAttribute("full-path", OdfNamespaces.Manifest, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Manifest));
+            get => GetAttributeValue("full-path", OdfNamespaces.Manifest, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("full-path", OdfNamespaces.Manifest);
+                else
+                    SetAttributeValue("full-path", OdfNamespaces.Manifest, value, OdfNamespaces.GetPrefix(OdfNamespaces.Manifest), GetDocumentVersion());
+            }
         }
 
         public string? MediaType
         {
-            get => GetAttribute("media-type", OdfNamespaces.Manifest);
-            set => SetAttribute("media-type", OdfNamespaces.Manifest, value ?? string.Empty, OdfNamespaces.GetPrefix(OdfNamespaces.Manifest));
+            get => GetAttributeValue("media-type", OdfNamespaces.Manifest, GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("media-type", OdfNamespaces.Manifest);
+                else
+                    SetAttributeValue("media-type", OdfNamespaces.Manifest, value, OdfNamespaces.GetPrefix(OdfNamespaces.Manifest), GetDocumentVersion());
+            }
         }
     }
 

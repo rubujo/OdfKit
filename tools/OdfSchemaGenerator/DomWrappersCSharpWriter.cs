@@ -32,6 +32,8 @@ public sealed class DomWrappersCSharpWriter
         writer.WriteLine("namespace OdfKit.DOM");
         writer.WriteLine("{");
 
+        var elementAttributes = ResolveAllElementAttributes(metadata);
+
         var sortedElements = metadata.Elements
             .OrderBy(e => e.NamespaceUri, StringComparer.Ordinal)
             .ThenBy(e => e.LocalName, StringComparer.Ordinal)
@@ -55,6 +57,30 @@ public sealed class DomWrappersCSharpWriter
             writer.WriteLine($"    public partial class {className} : OdfElement");
             writer.WriteLine("    {");
             writer.WriteLine($"        public {className}(string? prefix = null) : base(\"{element.LocalName}\", \"{element.NamespaceUri}\", prefix) {{ }}");
+
+            // Write version-aware property accessors
+            if (elementAttributes.TryGetValue((element.NamespaceUri, element.LocalName), out var attrs))
+            {
+                var resolvedNames = ResolvePropertyNames(attrs);
+                foreach (var attr in attrs.OrderBy(a => resolvedNames[a], StringComparer.Ordinal))
+                {
+                    string propName = resolvedNames[attr];
+                    string prefix = GetPrefix(attr.NamespaceUri);
+                    writer.WriteLine();
+                    writer.WriteLine($"        public string? {propName}");
+                    writer.WriteLine("        {");
+                    writer.WriteLine($"            get => GetAttributeValue(\"{attr.LocalName}\", \"{attr.NamespaceUri}\", GetDocumentVersion());");
+                    writer.WriteLine("            set");
+                    writer.WriteLine("            {");
+                    writer.WriteLine("                if (value == null)");
+                    writer.WriteLine($"                    RemoveAttribute(\"{attr.LocalName}\", \"{attr.NamespaceUri}\");");
+                    writer.WriteLine("                else");
+                    writer.WriteLine($"                    SetAttributeValue(\"{attr.LocalName}\", \"{attr.NamespaceUri}\", value, \"{prefix}\", GetDocumentVersion());");
+                    writer.WriteLine("            }");
+                    writer.WriteLine("        }");
+                }
+            }
+
             writer.WriteLine("    }");
             writer.WriteLine();
         }
@@ -97,6 +123,149 @@ public sealed class DomWrappersCSharpWriter
         writer.WriteLine("        }");
         writer.WriteLine("    }");
         writer.WriteLine("}");
+    }
+
+    private static Dictionary<(string, string), List<SchemaNameMetadata>> ResolveAllElementAttributes(SchemaMetadata metadata)
+    {
+        var elementAttributes = new Dictionary<(string, string), List<SchemaNameMetadata>>();
+        var elementNodes = new List<SchemaPatternNodeMetadata>();
+
+        foreach (var pattern in metadata.Patterns)
+        {
+            foreach (var node in pattern.PatternTree)
+            {
+                FindElementNodes(node, elementNodes);
+            }
+        }
+
+        foreach (var node in elementNodes)
+        {
+            var key = (node.NamespaceUri, node.LocalName);
+            if (!elementAttributes.TryGetValue(key, out var attrs))
+            {
+                attrs = new List<SchemaNameMetadata>();
+                elementAttributes[key] = attrs;
+            }
+
+            var collected = new List<SchemaNameMetadata>();
+            CollectAttributes(node, collected, metadata, new HashSet<string>());
+
+            foreach (var attr in collected)
+            {
+                if (!attrs.Any(a => a.NamespaceUri == attr.NamespaceUri && a.LocalName == attr.LocalName))
+                {
+                    attrs.Add(attr);
+                }
+            }
+        }
+
+        return elementAttributes;
+    }
+
+    private static void FindElementNodes(SchemaPatternNodeMetadata node, List<SchemaPatternNodeMetadata> elementNodes)
+    {
+        if (node.Kind == "element")
+        {
+            elementNodes.Add(node);
+        }
+        foreach (var child in node.Children)
+        {
+            FindElementNodes(child, elementNodes);
+        }
+    }
+
+    private static void CollectAttributes(SchemaPatternNodeMetadata node, List<SchemaNameMetadata> attrs, SchemaMetadata metadata, HashSet<string> visitedRefs)
+    {
+        if (node.Kind == "attribute" && !string.IsNullOrEmpty(node.LocalName))
+        {
+            attrs.Add(new SchemaNameMetadata { NamespaceUri = node.NamespaceUri, LocalName = node.LocalName });
+        }
+        else if (node.Kind == "ref" && !string.IsNullOrEmpty(node.ReferenceName) && visitedRefs.Add(node.ReferenceName))
+        {
+            var refPattern = metadata.Patterns.FirstOrDefault(p => p.Name == node.ReferenceName);
+            if (refPattern != null)
+            {
+                foreach (var refNode in refPattern.PatternTree)
+                {
+                    CollectAttributes(refNode, attrs, metadata, visitedRefs);
+                }
+            }
+        }
+        foreach (var child in node.Children)
+        {
+            CollectAttributes(child, attrs, metadata, visitedRefs);
+        }
+    }
+
+    private static Dictionary<SchemaNameMetadata, string> ResolvePropertyNames(List<SchemaNameMetadata> attrs)
+    {
+        var reservedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "NodeType", "LocalName", "NamespaceUri", "Prefix", "Parent", "Children",
+            "Attributes", "TextContent", "CloneNode", "ImportNode", "GetAttribute",
+            "SetAttribute", "RemoveAttribute", "AppendChild", "InsertBefore", "InsertAfter",
+            "RemoveChild", "GetDocumentVersion", "GetAttributeValue", "SetAttributeValue"
+        };
+
+        var usedNames = new HashSet<string>(reservedNames, StringComparer.OrdinalIgnoreCase);
+        var propNames = new Dictionary<SchemaNameMetadata, string>();
+
+        var localNameGroups = attrs.GroupBy(a => ToPascalCase(a.LocalName)).ToList();
+        foreach (var group in localNameGroups)
+        {
+            if (group.Count() == 1)
+            {
+                var attr = group.First();
+                string name = ToPascalCase(attr.LocalName);
+                if (usedNames.Add(name))
+                {
+                    propNames[attr] = name;
+                }
+                else
+                {
+                    string altName = GetNamespacePascalName(attr.NamespaceUri) + name;
+                    if (usedNames.Add(altName))
+                    {
+                        propNames[attr] = altName;
+                    }
+                    else
+                    {
+                        altName += "Attribute";
+                        int counter = 1;
+                        while (!usedNames.Add(altName))
+                        {
+                            altName = GetNamespacePascalName(attr.NamespaceUri) + name + "Attribute" + counter;
+                            counter++;
+                        }
+                        propNames[attr] = altName;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var attr in group)
+                {
+                    string name = GetNamespacePascalName(attr.NamespaceUri) + ToPascalCase(attr.LocalName);
+                    if (usedNames.Add(name))
+                    {
+                        propNames[attr] = name;
+                    }
+                    else
+                    {
+                        name += "Attribute";
+                        int counter = 1;
+                        while (!usedNames.Add(name))
+                        {
+                            name = GetNamespacePascalName(attr.NamespaceUri) + ToPascalCase(attr.LocalName) + "Attribute" + counter;
+                            counter++;
+                        }
+                        propNames[attr] = name;
+                    }
+                }
+            }
+        }
+
+        return propNames;
     }
 
     private static string ToPascalCase(string s)
@@ -146,7 +315,6 @@ public sealed class DomWrappersCSharpWriter
         string? prefix = GetNamespacePrefix(namespaceUri);
         if (prefix != null) return prefix;
 
-        // Fallback: extract last segment or parse it
         string segment = namespaceUri;
         if (namespaceUri.StartsWith("urn:", StringComparison.Ordinal))
         {

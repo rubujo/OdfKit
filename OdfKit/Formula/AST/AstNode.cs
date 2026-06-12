@@ -13,6 +13,7 @@ namespace OdfKit.Formula.AST
     {
         public abstract object Evaluate(IEvaluationContext context);
         public virtual List<OdfCellRange> GetRanges(IEvaluationContext context) => new();
+        public abstract string Serialize();
     }
 
     public class LiteralNode : AstNode
@@ -20,6 +21,16 @@ namespace OdfKit.Formula.AST
         private readonly object _value;
         public LiteralNode(object value) => _value = value;
         public override object Evaluate(IEvaluationContext context) => _value;
+        public override string Serialize()
+        {
+            if (_value is string s)
+                return $"\"{s.Replace("\"", "\"\"")}\"";
+            if (_value is bool b)
+                return b ? "TRUE" : "FALSE";
+            if (_value is double d)
+                return d.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return _value?.ToString() ?? string.Empty;
+        }
     }
 
     public class CellAddressNode : AstNode
@@ -28,6 +39,7 @@ namespace OdfKit.Formula.AST
         public CellAddressNode(OdfCellAddress address) => Address = address;
         public override object Evaluate(IEvaluationContext context) => context.GetCellValue(Address);
         public override List<OdfCellRange> GetRanges(IEvaluationContext context) => new() { new OdfCellRange(Address, Address) };
+        public override string Serialize() => Address.ToString();
     }
 
     public class RangeReferenceNode : AstNode
@@ -36,6 +48,7 @@ namespace OdfKit.Formula.AST
         public RangeReferenceNode(OdfCellRange range) => Range = range;
         public override object Evaluate(IEvaluationContext context) => context.GetRangeValues(Range);
         public override List<OdfCellRange> GetRanges(IEvaluationContext context) => new() { Range };
+        public override string Serialize() => Range.ToString();
     }
 
     public class ReferenceUnionNode : AstNode
@@ -67,6 +80,8 @@ namespace OdfKit.Formula.AST
             }
             return list;
         }
+
+        public override string Serialize() => $"{_left.Serialize()}~{_right.Serialize()}";
     }
 
     public class ReferenceIntersectionNode : AstNode
@@ -117,6 +132,8 @@ namespace OdfKit.Formula.AST
             }
             return list;
         }
+
+        public override string Serialize() => $"{_left.Serialize()}!{_right.Serialize()}";
     }
 
     public class UnaryNode : AstNode
@@ -153,6 +170,13 @@ namespace OdfKit.Formula.AST
                 return _op == '-' ? -parsedNum : parsedNum;
 
             return OdfFormulaError.Value;
+        }
+
+        public override string Serialize()
+        {
+            if (_op == '%')
+                return $"{_child.Serialize()}%";
+            return $"{_op}{_child.Serialize()}";
         }
     }
 
@@ -256,6 +280,8 @@ namespace OdfKit.Formula.AST
                 _ => OdfFormulaError.Value
             };
         }
+
+        public override string Serialize() => $"{_left.Serialize()}{_op}{_right.Serialize()}";
     }
 
     public class FunctionNode : AstNode
@@ -273,5 +299,33 @@ namespace OdfKit.Formula.AST
         {
             return DefaultFormulaEvaluator.EvaluateFunction(Name, Arguments, context);
         }
+
+        public override string Serialize()
+        {
+            var args = new List<string>();
+            foreach (var arg in Arguments)
+            {
+                args.Add(arg.Serialize());
+            }
+            return $"{Name}({string.Join(",", args)})";
+        }
+    }
+
+    public class ParenthesizedNode : AstNode
+    {
+        private readonly AstNode _inner;
+
+        public ParenthesizedNode(AstNode inner)
+        {
+            _inner = inner;
+        }
+
+        public AstNode Inner => _inner;
+
+        public override object Evaluate(IEvaluationContext context) => _inner.Evaluate(context);
+
+        public override List<OdfCellRange> GetRanges(IEvaluationContext context) => _inner.GetRanges(context);
+
+        public override string Serialize() => $"({_inner.Serialize()})";
     }
 }

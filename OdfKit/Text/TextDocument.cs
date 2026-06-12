@@ -1318,6 +1318,18 @@ namespace OdfKit.Text
             set => Node.TextContent = value;
         }
 
+        public string? StyleName
+        {
+            get => Node.GetAttribute("style-name", OdfNamespaces.Text);
+            set => Node.SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, "text");
+        }
+
+        public string? HorizontalAlignment
+        {
+            get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "text-align", OdfNamespaces.Fo, "paragraph");
+            set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "text-align", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        }
+
         public OdfTextRun AddTextRun(string text)
         {
             var spanNode = OdfNodeFactory.CreateElement("span", OdfNamespaces.Text, "text");
@@ -1571,6 +1583,54 @@ namespace OdfKit.Text
             }
             return cells[col];
         }
+
+        public OdfTableCell GetCell(int row, int col)
+        {
+            var cellNode = GetCellNode(row, col);
+            return new OdfTableCell(cellNode, _doc);
+        }
+
+        public void SetColumnWidth(int col, OdfLength width)
+        {
+            var colNode = GetOrCreateColumnNode(col);
+            _doc.StyleEngine.SetLocalStyleProperty(colNode, "table-column", "table-column-properties", "column-width", OdfNamespaces.Style, width.ToString(), "style");
+        }
+
+        private OdfNode GetOrCreateColumnNode(int col)
+        {
+            var cols = new List<OdfNode>();
+            OdfNode? firstNonCol = null;
+            foreach (var child in Node.Children)
+            {
+                if (child.NodeType == OdfNodeType.Element)
+                {
+                    if (child.LocalName == "table-column" && child.NamespaceUri == OdfNamespaces.Table)
+                    {
+                        cols.Add(child);
+                    }
+                    else if (firstNonCol == null)
+                    {
+                        firstNonCol = child;
+                    }
+                }
+            }
+
+            while (cols.Count <= col)
+            {
+                var newCol = OdfNodeFactory.CreateElement("table-column", OdfNamespaces.Table, "table");
+                if (firstNonCol != null)
+                {
+                    Node.InsertBefore(newCol, firstNonCol);
+                }
+                else
+                {
+                    Node.AppendChild(newCol);
+                }
+                cols.Add(newCol);
+            }
+
+            return cols[col];
+        }
     }
 
     public class OdfList
@@ -1612,6 +1672,17 @@ namespace OdfKit.Text
                 item.AddParagraph(text);
             }
             return item;
+        }
+
+        public void RestartNumbering(int startValue = 1)
+        {
+            ContinueNumbering = false;
+            var firstItemNode = Node.Children.FirstOrDefault(c => c.LocalName == "list-item" && c.NamespaceUri == OdfNamespaces.Text);
+            if (firstItemNode != null)
+            {
+                var item = new OdfListItem(firstItemNode, _doc);
+                item.StartValue = startValue;
+            }
         }
     }
 
@@ -1703,6 +1774,32 @@ namespace OdfKit.Text
         {
             get => ImageNode.GetAttribute("clip", OdfNamespaces.Fo);
             set => ImageNode.SetAttribute("clip", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        }
+    }
+
+    public class OdfTableCell
+    {
+        public OdfNode Node { get; }
+        private readonly TextDocument _doc;
+
+        public OdfTableCell(OdfNode node, TextDocument doc)
+        {
+            Node = node;
+            _doc = doc;
+        }
+
+        public string TextContent
+        {
+            get => Node.TextContent;
+            set => Node.TextContent = value;
+        }
+
+        public OdfParagraph AddParagraph(string text)
+        {
+            var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
+            pNode.TextContent = text;
+            Node.AppendChild(pNode);
+            return new OdfParagraph(pNode, _doc);
         }
     }
 }

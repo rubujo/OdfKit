@@ -132,7 +132,7 @@ namespace OdfKit.Tests
 
             ms.Position = 0;
             var report = OdfFlatDocumentValidator.Validate(ms, "document.fodt");
-            Assert.Empty(report.Issues.Where(i => i.Severity == OdfIssueSeverity.Error || i.Severity == OdfIssueSeverity.Fatal));
+            Assert.DoesNotContain(report.Issues, i => i.Severity == OdfIssueSeverity.Error || i.Severity == OdfIssueSeverity.Fatal);
             Assert.Equal(OdfDocumentKind.FlatText, report.DocumentKind);
             Assert.Equal(OdfVersion.Odf14, report.DetectedVersion);
 
@@ -151,7 +151,7 @@ namespace OdfKit.Tests
 
             ms.Position = 0;
             var report = OdfFlatDocumentValidator.Validate(ms, "workbook.fods");
-            Assert.Empty(report.Issues.Where(i => i.Severity == OdfIssueSeverity.Error || i.Severity == OdfIssueSeverity.Fatal));
+            Assert.DoesNotContain(report.Issues, i => i.Severity == OdfIssueSeverity.Error || i.Severity == OdfIssueSeverity.Fatal);
             Assert.Equal(OdfDocumentKind.FlatSpreadsheet, report.DocumentKind);
 
             ms.Position = 0;
@@ -781,7 +781,7 @@ namespace OdfKit.Tests
 
             flatMs.Position = 0;
             var report = OdfFlatDocumentValidator.Validate(flatMs, "document.fodt", OdfComplianceProfiles.OasisOdf14Strict);
-            Assert.Empty(report.Issues.Where(i => i.Severity == OdfIssueSeverity.Error));
+            Assert.DoesNotContain(report.Issues, i => i.Severity == OdfIssueSeverity.Error);
         }
 
         [Fact]
@@ -1023,7 +1023,7 @@ namespace OdfKit.Tests
             validatedMs.Position = 0;
 
             var report = OdfFlatDocumentValidator.Validate(validatedMs, "report.fodt");
-            Assert.Empty(report.Issues.Where(i => i.Severity == OdfIssueSeverity.Error));
+            Assert.DoesNotContain(report.Issues, i => i.Severity == OdfIssueSeverity.Error);
         }
 
         [Fact]

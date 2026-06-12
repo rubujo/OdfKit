@@ -16,6 +16,17 @@ namespace OdfKit.Tests
 {
     public class AdvancedSecurityTests
     {
+#if NET9_0_OR_GREATER
+        private static X509Certificate2 LoadCertificateFromPfx(byte[] pfxData)
+        {
+            return X509CertificateLoader.LoadPkcs12Collection(pfxData, (string?)null, X509KeyStorageFlags.Exportable)[0];
+        }
+#else
+        private static X509Certificate2 LoadCertificateFromPfx(byte[] pfxData)
+        {
+            return new X509Certificate2(pfxData, (string?)null, X509KeyStorageFlags.Exportable);
+        }
+#endif
         [Fact]
         public async Task TestXmlDsigSigningAndVerification()
         {
@@ -368,25 +379,34 @@ namespace OdfKit.Tests
 
             var signerType = typeof(OdfSigner);
             
-            var tbsNode = signerType.GetMethod("GetTbsNode", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(null, new object[] { revokedCrlBytes });
+            var getTbsNodeMethod = signerType.GetMethod("GetTbsNode", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Assert.NotNull(getTbsNodeMethod);
+            var tbsNode = getTbsNodeMethod.Invoke(null, new object?[] { revokedCrlBytes });
             Assert.NotNull(tbsNode);
 
-            var crlIssuer = (byte[])signerType.GetMethod("GetCrlIssuerDer", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(null, new object[] { tbsNode });
+            var getCrlIssuerDerMethod = signerType.GetMethod("GetCrlIssuerDer", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Assert.NotNull(getCrlIssuerDerMethod);
+            var crlIssuer = (byte[]?)getCrlIssuerDerMethod.Invoke(null, new object?[] { tbsNode });
             Assert.NotNull(crlIssuer);
             
-            bool isIssuerEqual = (bool)signerType.GetMethod("StructuralEqual", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(null, new object[] { crlIssuer, leafCert.IssuerName.RawData });
+            var structuralEqualMethod = signerType.GetMethod("StructuralEqual", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Assert.NotNull(structuralEqualMethod);
+            var isIssuerEqualVal = structuralEqualMethod.Invoke(null, new object?[] { crlIssuer, leafCert.IssuerName.RawData });
+            Assert.NotNull(isIssuerEqualVal);
+            bool isIssuerEqual = (bool)isIssuerEqualVal;
             Assert.True(isIssuerEqual);
 
-            var revoked = (HashSet<string>)signerType.GetMethod("GetRevokedSerialNumbers", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(null, new object[] { revokedCrlBytes });
+            var getRevokedSerialNumbersMethod = signerType.GetMethod("GetRevokedSerialNumbers", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Assert.NotNull(getRevokedSerialNumbersMethod);
+            var revoked = (HashSet<string>?)getRevokedSerialNumbersMethod.Invoke(null, new object?[] { revokedCrlBytes });
+            Assert.NotNull(revoked);
             
-            var normalizedSerial = (string)signerType.GetMethod("NormalizeHexSerial", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(null, new object[] { leafCert.SerialNumber });
+            var normalizeHexSerialMethod = signerType.GetMethod("NormalizeHexSerial", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Assert.NotNull(normalizeHexSerialMethod);
+            var normalizedSerial = (string?)normalizeHexSerialMethod.Invoke(null, new object?[] { leafCert.SerialNumber });
+            Assert.NotNull(normalizedSerial);
                 
-            Assert.Contains(normalizedSerial, revoked);
+            Assert.Contains(normalizedSerial!, revoked);
         }
 
         [Fact]
@@ -623,7 +643,7 @@ namespace OdfKit.Tests
                         var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true });
                         Assert.True(result.IsValid, $"Signature verification failed for index {localIndex}: {result.Signatures.FirstOrDefault()?.ErrorMessage}");
                     }
-                });
+                }, TestContext.Current.CancellationToken);
             }
             
             await Task.WhenAll(tasks);
@@ -652,10 +672,10 @@ namespace OdfKit.Tests
             var leafWithKey = leafCert.CopyWithPrivateKey(leafRsa);
             
             var rootPfx = rootCert.Export(X509ContentType.Pfx);
-            var rootImported = new X509Certificate2(rootPfx, (string?)null, X509KeyStorageFlags.Exportable);
+            var rootImported = LoadCertificateFromPfx(rootPfx);
             
             var leafPfx = leafWithKey.Export(X509ContentType.Pfx);
-            var leafImported = new X509Certificate2(leafPfx, (string?)null, X509KeyStorageFlags.Exportable);
+            var leafImported = LoadCertificateFromPfx(leafPfx);
 
             return (rootImported, leafImported);
         }
@@ -696,7 +716,7 @@ namespace OdfKit.Tests
             var cert = request.CreateSelfSigned(notBefore, notAfter);
             
             var pfx = cert.Export(X509ContentType.Pfx);
-            return new X509Certificate2(pfx, (string?)null, X509KeyStorageFlags.Exportable);
+            return LoadCertificateFromPfx(pfx);
         }
 
         private static (X509Certificate2 Root, X509Certificate2 Leaf) GenerateCertificateChain(string rootName, string leafName, byte[]? cdpBytes = null)
@@ -726,10 +746,10 @@ namespace OdfKit.Tests
             var leafWithKey = leafCert.CopyWithPrivateKey(leafRsa);
             
             var rootPfx = rootCert.Export(X509ContentType.Pfx);
-            var rootImported = new X509Certificate2(rootPfx, (string?)null, X509KeyStorageFlags.Exportable);
+            var rootImported = LoadCertificateFromPfx(rootPfx);
             
             var leafPfx = leafWithKey.Export(X509ContentType.Pfx);
-            var leafImported = new X509Certificate2(leafPfx, (string?)null, X509KeyStorageFlags.Exportable);
+            var leafImported = LoadCertificateFromPfx(leafPfx);
 
             return (rootImported, leafImported);
         }
@@ -1545,26 +1565,35 @@ namespace OdfKit.Tests
             byte[] revokedCrlBytes = CreateMockCrlBytes(rootCert, new List<string> { leafCert.SerialNumber }, useInvalidSignature: true);
 
             var signerType = typeof(OdfSigner);
-            var tbsNode = signerType.GetMethod("GetTbsNode", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(null, new object[] { revokedCrlBytes });
+            var getTbsNodeMethod = signerType.GetMethod("GetTbsNode", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Assert.NotNull(getTbsNodeMethod);
+            var tbsNode = getTbsNodeMethod.Invoke(null, new object?[] { revokedCrlBytes });
             Assert.NotNull(tbsNode);
 
-            var crlIssuer = (byte[])signerType.GetMethod("GetCrlIssuerDer", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(null, new object[] { tbsNode });
+            var getCrlIssuerDerMethod = signerType.GetMethod("GetCrlIssuerDer", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Assert.NotNull(getCrlIssuerDerMethod);
+            var crlIssuer = (byte[]?)getCrlIssuerDerMethod.Invoke(null, new object?[] { tbsNode });
             Assert.NotNull(crlIssuer);
             
-            bool isIssuerEqual = (bool)signerType.GetMethod("StructuralEqual", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(null, new object[] { crlIssuer, leafCert.IssuerName.RawData });
+            var structuralEqualMethod = signerType.GetMethod("StructuralEqual", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Assert.NotNull(structuralEqualMethod);
+            var isIssuerEqualVal = structuralEqualMethod.Invoke(null, new object?[] { crlIssuer, leafCert.IssuerName.RawData });
+            Assert.NotNull(isIssuerEqualVal);
+            bool isIssuerEqual = (bool)isIssuerEqualVal;
             Assert.True(isIssuerEqual);
 
             // Verify the revoked serial is successfully extracted, despite the CRL having a fake signature
-            var revoked = (HashSet<string>)signerType.GetMethod("GetRevokedSerialNumbers", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(null, new object[] { revokedCrlBytes });
+            var getRevokedSerialNumbersMethod = signerType.GetMethod("GetRevokedSerialNumbers", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Assert.NotNull(getRevokedSerialNumbersMethod);
+            var revoked = (HashSet<string>?)getRevokedSerialNumbersMethod.Invoke(null, new object?[] { revokedCrlBytes });
+            Assert.NotNull(revoked);
             
-            var normalizedSerial = (string)signerType.GetMethod("NormalizeHexSerial", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(null, new object[] { leafCert.SerialNumber });
+            var normalizeHexSerialMethod = signerType.GetMethod("NormalizeHexSerial", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Assert.NotNull(normalizeHexSerialMethod);
+            var normalizedSerial = (string?)normalizeHexSerialMethod.Invoke(null, new object?[] { leafCert.SerialNumber });
+            Assert.NotNull(normalizedSerial);
                 
-            Assert.Contains(normalizedSerial, revoked);
+            Assert.Contains(normalizedSerial!, revoked);
         }
 
         [Fact]

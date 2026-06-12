@@ -6,6 +6,7 @@ using System.Text;
 using Xunit;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Compliance;
 using OdfKit.Text;
 using OdfKit.Spreadsheet;
 using OdfKit.Drawing;
@@ -500,6 +501,69 @@ namespace OdfKit.Tests
                 }
                 Assert.NotNull(toc);
                 Assert.Equal("Table of Contents", toc.GetAttribute("name", OdfNamespaces.Text));
+            }
+        }
+
+        [Fact]
+        public void TestVersionAwareTypedDomWrappersAndRoundTrip()
+        {
+            // 1. Parent walk-up version resolution
+            var p = new TextPElement("text");
+            Assert.Equal(OdfVersion.Odf14, p.GetDocumentVersion());
+
+            var docContent = new OfficeDocumentContentElement("office");
+            docContent.AppendChild(p);
+            Assert.Equal(OdfVersion.Odf14, p.GetDocumentVersion());
+
+            docContent.SetAttribute("version", OdfNamespaces.Office, "1.2");
+            Assert.Equal(OdfVersion.Odf12, p.GetDocumentVersion());
+
+            docContent.SetAttribute("version", OdfNamespaces.Office, "1.3");
+            Assert.Equal(OdfVersion.Odf13, p.GetDocumentVersion());
+
+            docContent.RemoveAttribute("version", OdfNamespaces.Office);
+            Assert.Equal(OdfVersion.Odf14, p.GetDocumentVersion());
+
+            // 2. Nullable property cleanup deletes attribute
+            p.StyleName = "MyStyle";
+            Assert.Equal("MyStyle", p.StyleName);
+            Assert.Equal("MyStyle", p.GetAttribute("style-name", OdfNamespaces.Text));
+
+            p.StyleName = null;
+            Assert.Null(p.StyleName);
+            Assert.Null(p.GetAttribute("style-name", OdfNamespaces.Text));
+            Assert.False(p.Attributes.ContainsKey(new OdfAttributeName("style-name", OdfNamespaces.Text)));
+
+            // 3. Round-trip preservation of unknown/foreign attributes
+            var foreignAttr = new OdfAttributeName("custom-attr", "http://example.com/custom");
+            p.SetAttribute("custom-attr", "http://example.com/custom", "custom-value", "custom");
+            p.StyleName = "SomeStyle";
+            Assert.Equal("custom-value", p.GetAttribute("custom-attr", "http://example.com/custom"));
+            Assert.Equal("SomeStyle", p.StyleName);
+
+            // 4. Version-aware warnings checking
+            bool warningTriggered = false;
+            string? warningMessage = null;
+            EventHandler<OdfDiagnosticsEventArgs> logHandler = (sender, args) =>
+            {
+                if (args.Level == OdfDiagnosticsLevel.Warning)
+                {
+                    warningTriggered = true;
+                    warningMessage = args.Message;
+                }
+            };
+
+            OdfKitDiagnostics.Log += logHandler;
+            try
+            {
+                docContent.SetAttribute("version", OdfNamespaces.Office, "1.1");
+                p.SetAttributeValue("non-existent-attr", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", "val", "text", p.GetDocumentVersion());
+                Assert.True(warningTriggered);
+                Assert.Contains("non-existent-attr", warningMessage);
+            }
+            finally
+            {
+                OdfKitDiagnostics.Log -= logHandler;
             }
         }
     }

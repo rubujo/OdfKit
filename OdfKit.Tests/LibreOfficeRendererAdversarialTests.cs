@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -50,7 +50,7 @@ namespace OdfKit.Tests
                     {
                         if (File.Exists(outPath)) File.Delete(outPath);
                     }
-                }));
+                }, TestContext.Current.CancellationToken));
             }
 
             await Task.WhenAll(tasks);
@@ -157,7 +157,7 @@ namespace OdfKit.Tests
                     {
                         if (File.Exists(outPath)) File.Delete(outPath);
                     }
-                }));
+                }, TestContext.Current.CancellationToken));
             }
 
             await Task.WhenAll(tasks);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -17,7 +17,7 @@ namespace OdfKit.Tests
     public class LibreOfficeRendererChallengerTests
     {
         [Fact]
-        public void TestParallelRenderingSafety()
+        public async Task TestParallelRenderingSafety()
         {
             string mockSoffice = GetMockSofficePath();
             Assert.False(string.IsNullOrEmpty(mockSoffice), "MockSoffice not found.");
@@ -52,10 +52,10 @@ namespace OdfKit.Tests
                     {
                         if (File.Exists(outPath)) File.Delete(outPath);
                     }
-                }));
+                }, TestContext.Current.CancellationToken));
             }
 
-            Task.WaitAll(tasks.ToArray());
+            await Task.WhenAll(tasks);
         }
 
         [Fact]
@@ -227,7 +227,7 @@ namespace OdfKit.Tests
                     }
                     await Task.Delay(10);
                 }
-            });
+            }, TestContext.Current.CancellationToken);
 
             try
             {
@@ -723,7 +723,7 @@ namespace OdfKit.Tests
                     {
                         if (File.Exists(outPath)) File.Delete(outPath);
                     }
-                }));
+                }, TestContext.Current.CancellationToken));
             }
 
             await Task.WhenAll(tasks);

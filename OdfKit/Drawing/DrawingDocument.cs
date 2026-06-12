@@ -153,6 +153,12 @@ namespace OdfKit.Drawing
             set => Node.SetAttribute("name", OdfNamespaces.Draw, value, "draw");
         }
 
+        public string? MasterPageName
+        {
+            get => Node.GetAttribute("master-page-name", OdfNamespaces.Draw);
+            set => Node.SetAttribute("master-page-name", OdfNamespaces.Draw, value ?? string.Empty, "draw");
+        }
+
         public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, string text)
         {
             var frame = CreateDrawingFrame(x, y, w, h);
@@ -164,7 +170,7 @@ namespace OdfKit.Drawing
             textBoxNode.AppendChild(pNode);
 
             Node.AppendChild(frame);
-            return new OdfTextBox(frame, null!); // slide is null
+            return new OdfTextBox(frame, Document);
         }
 
         public OdfShape AddShape(OdfShapeType shapeType, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
@@ -184,7 +190,23 @@ namespace OdfKit.Drawing
             shapeNode.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
 
             Node.AppendChild(shapeNode);
-            return new OdfShape(shapeNode, null!); // slide is null
+            return new OdfShape(shapeNode, Document);
+        }
+
+        public OdfShape AddPolyline(IEnumerable<System.Drawing.PointF> points, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
+        {
+            var shapeNode = OdfNodeFactory.CreateElement("polyline", OdfNamespaces.Draw, "draw");
+            shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+            shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
+            shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
+            shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
+            shapeNode.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
+
+            var pointsStr = string.Join(" ", points.Select(p => $"{p.X.ToString(System.Globalization.CultureInfo.InvariantCulture)},{p.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}"));
+            shapeNode.SetAttribute("points", OdfNamespaces.Draw, pointsStr, "draw");
+
+            Node.AppendChild(shapeNode);
+            return new OdfShape(shapeNode, Document);
         }
 
         private OdfNode CreateDrawingFrame(OdfLength x, OdfLength y, OdfLength w, OdfLength h)

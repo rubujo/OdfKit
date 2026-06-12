@@ -157,6 +157,17 @@ namespace OdfKit.Formula
                 while (_index < _formula.Length)
                 {
                     char c = _formula[_index];
+                    if (c == '!')
+                    {
+                        // Check if what we have scanned so far is a valid cell address.
+                        // If it is, then '!' is the intersection operator, not a sheet separator.
+                        string prefix = _formula.Slice(start, _index - start).ToString();
+                        if (OdfCellAddress.TryParse(prefix, out _))
+                        {
+                            break;
+                        }
+                    }
+
                     if (char.IsLetterOrDigit(c) || c == '$' || c == '_' || c == '.' || c == '!')
                     {
                         _index++;
@@ -389,7 +400,7 @@ namespace OdfKit.Formula
                     throw new InvalidOperationException("Mismatched parentheses: expected CloseParen.");
                 }
                 Consume();
-                return node;
+                return new ParenthesizedNode(node);
             }
 
             if (_currentToken.Type == FormulaTokenType.Identifier)

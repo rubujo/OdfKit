@@ -430,6 +430,22 @@ namespace OdfKit.Presentation
             return new OdfShape(shapeNode, this);
         }
 
+        public OdfShape AddPolyline(IEnumerable<System.Drawing.PointF> points, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
+        {
+            var shapeNode = new OdfNode(OdfNodeType.Element, "polyline", OdfNamespaces.Draw, "draw");
+            shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+            shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
+            shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
+            shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
+            shapeNode.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
+
+            var pointsStr = string.Join(" ", points.Select(p => $"{p.X.ToString(System.Globalization.CultureInfo.InvariantCulture)},{p.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}"));
+            shapeNode.SetAttribute("points", OdfNamespaces.Draw, pointsStr, "draw");
+
+            Node.AppendChild(shapeNode);
+            return new OdfShape(shapeNode, this);
+        }
+
         public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
         {
             var frame = CreateDrawingFrame(x, y, w, h);
@@ -512,7 +528,8 @@ namespace OdfKit.Presentation
     public class OdfShape
     {
         public OdfNode Node { get; }
-        public OdfSlide Slide { get; }
+        public OdfSlide? Slide { get; }
+        public OdfDocument Document { get; }
 
         public string Id
         {
@@ -520,14 +537,46 @@ namespace OdfKit.Presentation
             set => Node.SetAttribute("id", OdfNamespaces.Draw, value, "draw");
         }
 
+        public string? FillColor
+        {
+            get => Document.StyleEngine.GetStyleProperty(Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "fill-color", OdfNamespaces.Draw, "graphic");
+            set
+            {
+                Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "fill", OdfNamespaces.Draw, "solid", "draw");
+                Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "fill-color", OdfNamespaces.Draw, value ?? string.Empty, "draw");
+            }
+        }
+
+        public string? StrokeColor
+        {
+            get => Document.StyleEngine.GetStyleProperty(Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "stroke-color", OdfNamespaces.Svg, "graphic");
+            set
+            {
+                Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "stroke", OdfNamespaces.Draw, "solid", "draw");
+                Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "stroke-color", OdfNamespaces.Svg, value ?? string.Empty, "svg");
+            }
+        }
+
         public OdfShape(OdfNode node, OdfSlide slide)
         {
             Node = node;
             Slide = slide;
+            Document = slide?.Document!;
+        }
+
+        public OdfShape(OdfNode node, OdfDocument doc)
+        {
+            Node = node;
+            Slide = null;
+            Document = doc;
         }
 
         public void Animate(OdfAnimationType type, OdfLength duration, OdfLength delay)
         {
+            if (Slide == null)
+            {
+                throw new InvalidOperationException("Animation is only supported for presentation slides.");
+            }
             var slideNode = Slide.Node;
             var mainSeq = FindOrCreateAnimationSequence(slideNode);
 
@@ -616,10 +665,12 @@ namespace OdfKit.Presentation
     public class OdfTextBox : OdfShape
     {
         public OdfTextBox(OdfNode node, OdfSlide slide) : base(node, slide) { }
+        public OdfTextBox(OdfNode node, OdfDocument doc) : base(node, doc) { }
     }
 
     public class OdfPicture : OdfShape
     {
         public OdfPicture(OdfNode node, OdfSlide slide) : base(node, slide) { }
+        public OdfPicture(OdfNode node, OdfDocument doc) : base(node, doc) { }
     }
 }
