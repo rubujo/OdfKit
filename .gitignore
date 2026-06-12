@@ -1,4 +1,4 @@
-﻿## Ignore Visual Studio temp files, build results, and caches
+## Ignore Visual Studio temp files, build results, and caches
 ## Suitable for Visual Studio 2026 and modern .NET development
 
 # User-specific files
@@ -93,3 +93,4 @@ project.assets.json
 .paket/
 
 # Project specifications
+implementation_plan.md

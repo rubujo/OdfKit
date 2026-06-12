@@ -1,7 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj_antigravity\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
-    <BaseOutputPath>$(MSBuildThisFileDirectory)bin_antigravity\$(MSBuildProjectName)\</BaseOutputPath>
-    <DefaultItemExcludes>$(DefaultItemExcludes);**/.codex-tmp/**;**/obj_antigravity/**;**/bin_antigravity/**</DefaultItemExcludes>
-  </PropertyGroup>
-</Project>
