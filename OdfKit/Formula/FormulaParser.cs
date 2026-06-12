@@ -1,484 +1,552 @@
-#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.Collections.Generic;
 using OdfKit.Spreadsheet;
 using OdfKit.Formula.AST;
 
-namespace OdfKit.Formula
+namespace OdfKit.Formula;
+
+/// <summary>
+/// 代表公式剖析器的語彙基元型別。
+/// </summary>
+public enum FormulaTokenType
 {
-    public enum FormulaTokenType
+    /// <summary>
+    /// 數字。
+    /// </summary>
+    Number,
+
+    /// <summary>
+    /// 字串。
+    /// </summary>
+    String,
+
+    /// <summary>
+    /// 布林值。
+    /// </summary>
+    Bool,
+
+    /// <summary>
+    /// 識別碼 (例如函式名稱、儲存格或範圍名稱)。
+    /// </summary>
+    Identifier,
+
+    /// <summary>
+    /// 運算子，例如 +, -, *, /, ^, &amp;, =, &lt;, &gt;, &lt;=, &gt;=, &lt;&gt; 等。
+    /// </summary>
+    Operator,
+
+    /// <summary>
+    /// 左括號 (。
+    /// </summary>
+    OpenParen,
+
+    /// <summary>
+    /// 右括號 )。
+    /// </summary>
+    CloseParen,
+
+    /// <summary>
+    /// 分隔符號，即 「,」 或 「;」。
+    /// </summary>
+    Separator,
+
+    /// <summary>
+    /// 冒號 :。
+    /// </summary>
+    Colon,
+
+    /// <summary>
+    /// 公式結尾。
+    /// </summary>
+    EndOfFormula
+}
+
+/// <summary>
+/// 代表公式剖析器的語彙基元。
+/// </summary>
+/// <param name="type">語彙基元型別</param>
+/// <param name="span">語彙基元的字元範圍</param>
+/// <param name="numValue">數值</param>
+/// <param name="boolValue">布林值</param>
+public readonly ref struct FormulaParserToken(FormulaTokenType type, ReadOnlySpan<char> span, double numValue = 0, bool boolValue = false)
+{
+    /// <summary>
+    /// 取得語彙基元的型別。
+    /// </summary>
+    public FormulaTokenType Type { get; } = type;
+
+    /// <summary>
+    /// 取得語彙基元的字元範圍。
+    /// </summary>
+    public ReadOnlySpan<char> Span { get; } = span;
+
+    /// <summary>
+    /// 取得語彙基元的雙倍精確度浮點數數值。
+    /// </summary>
+    public double NumberValue { get; } = numValue;
+
+    /// <summary>
+    /// 取得語彙基元的布林值。
+    /// </summary>
+    public bool BoolValue { get; } = boolValue;
+}
+
+/// <summary>
+/// 公式字串的分詞器。
+/// </summary>
+/// <param name="formula">要分詞的公式字元範圍</param>
+public ref struct Tokenizer(ReadOnlySpan<char> formula)
+{
+    private readonly ReadOnlySpan<char> _formula = formula;
+    private int _index = 0;
+
+    /// <summary>
+    /// 取得下一個語彙基元。
+    /// </summary>
+    /// <returns>下一個語彙基元</returns>
+    public FormulaParserToken NextToken()
     {
-        Number,
-        String,
-        Bool,
-        Identifier, // Functions, coordinate names
-        Operator,   // +, -, *, /, ^, &, =, <, >, <=, >=, <>
-        OpenParen,  // (
-        CloseParen, // )
-        Separator,  // , or ;
-        Colon,      // :
-        EndOfFormula
-    }
+        SkipWhitespace();
 
-    public readonly ref struct FormulaParserToken
-    {
-        public FormulaTokenType Type { get; }
-        public ReadOnlySpan<char> Span { get; }
-        public double NumberValue { get; }
-        public bool BoolValue { get; }
+        if (_index >= _formula.Length)
+            return new(FormulaTokenType.EndOfFormula, ReadOnlySpan<char>.Empty);
 
-        public FormulaParserToken(FormulaTokenType type, ReadOnlySpan<char> span, double numValue = 0, bool boolValue = false)
+        char current = _formula[_index];
+
+        // 1. 括號與分隔符號
+        if (current == '(') { _index++; return new(FormulaTokenType.OpenParen, _formula.Slice(_index - 1, 1)); }
+        if (current == ')') { _index++; return new(FormulaTokenType.CloseParen, _formula.Slice(_index - 1, 1)); }
+        if (current == ',' || current == ';') { _index++; return new(FormulaTokenType.Separator, _formula.Slice(_index - 1, 1)); }
+        if (current == ':') { _index++; return new(FormulaTokenType.Colon, _formula.Slice(_index - 1, 1)); }
+
+        // 2. 字串常值
+        if (current == '"')
         {
-            Type = type;
-            Span = span;
-            NumberValue = numValue;
-            BoolValue = boolValue;
-        }
-    }
-
-    public ref struct Tokenizer
-    {
-        private readonly ReadOnlySpan<char> _formula;
-        private int _index;
-
-        public Tokenizer(ReadOnlySpan<char> formula)
-        {
-            _formula = formula;
-            _index = 0;
-        }
-
-        public FormulaParserToken NextToken()
-        {
-            SkipWhitespace();
-
-            if (_index >= _formula.Length)
-                return new FormulaParserToken(FormulaTokenType.EndOfFormula, ReadOnlySpan<char>.Empty);
-
-            char current = _formula[_index];
-
-            // 1. Parentheses and separators
-            if (current == '(') { _index++; return new FormulaParserToken(FormulaTokenType.OpenParen, _formula.Slice(_index - 1, 1)); }
-            if (current == ')') { _index++; return new FormulaParserToken(FormulaTokenType.CloseParen, _formula.Slice(_index - 1, 1)); }
-            if (current == ',' || current == ';') { _index++; return new FormulaParserToken(FormulaTokenType.Separator, _formula.Slice(_index - 1, 1)); }
-            if (current == ':') { _index++; return new FormulaParserToken(FormulaTokenType.Colon, _formula.Slice(_index - 1, 1)); }
-
-            // 2. String literal
-            if (current == '"')
+            int start = _index;
+            _index++; // 跳過起始引號
+            while (_index < _formula.Length)
             {
-                int start = _index;
-                _index++; // skip opening quote
-                while (_index < _formula.Length)
+                if (_formula[_index] == '"')
                 {
-                    if (_formula[_index] == '"')
+                    if (_index + 1 < _formula.Length && _formula[_index + 1] == '"')
                     {
-                        if (_index + 1 < _formula.Length && _formula[_index + 1] == '"')
-                        {
-                            _index += 2; // skip escaped quote ""
-                        }
-                        else
-                        {
-                            _index++; // skip closing quote
-                            break;
-                        }
+                        _index += 2; // 跳過逸出引號 ""
                     }
                     else
                     {
-                        _index++;
-                    }
-                }
-                return new FormulaParserToken(FormulaTokenType.String, _formula.Slice(start, _index - start));
-            }
-
-            // 3. Operators
-            if (current == '<' || current == '>' || current == '=')
-            {
-                int start = _index;
-                _index++;
-                if (_index < _formula.Length)
-                {
-                    char next = _formula[_index];
-                    if ((current == '<' && (next == '>' || next == '=')) ||
-                        (current == '>' && next == '='))
-                    {
-                        _index++;
-                    }
-                }
-                return new FormulaParserToken(FormulaTokenType.Operator, _formula.Slice(start, _index - start));
-            }
-
-            if (current == '+' || current == '-' || current == '*' || current == '/' || current == '^' || current == '&' || current == '%' || current == '~' || current == '!')
-            {
-                _index++;
-                return new FormulaParserToken(FormulaTokenType.Operator, _formula.Slice(_index - 1, 1));
-            }
-
-            // 4. Number literals
-            if (char.IsDigit(current) || current == '.')
-            {
-                int start = _index;
-                bool hasDot = current == '.';
-                _index++;
-                while (_index < _formula.Length)
-                {
-                    char c = _formula[_index];
-                    if (char.IsDigit(c))
-                    {
-                        _index++;
-                    }
-                    else if (c == '.' && !hasDot)
-                    {
-                        hasDot = true;
-                        _index++;
-                    }
-                    else
-                    {
+                        _index++; // 跳過結束引號
                         break;
                     }
                 }
-                var numSpan = _formula.Slice(start, _index - start);
-                double val = ParseDouble(numSpan);
-                return new FormulaParserToken(FormulaTokenType.Number, numSpan, val);
-            }
-
-            // 5. Identifiers, functions, coordinates
-            if (char.IsLetter(current) || current == '$' || current == '_' || current == '\'')
-            {
-                int start = _index;
-                if (current == '\'')
+                else
                 {
-                    // Quoted sheet name handling: 'Sheet Name'.A1 or 'Sheet Name'!A1
                     _index++;
-                    while (_index < _formula.Length && _formula[_index] != '\'')
-                    {
-                        _index++;
-                    }
-                    if (_index < _formula.Length) _index++; // skip closing quote
                 }
+            }
+            return new(FormulaTokenType.String, _formula.Slice(start, _index - start));
+        }
 
-                while (_index < _formula.Length)
+        // 3. 運算子
+        if (current == '<' || current == '>' || current == '=')
+        {
+            int start = _index;
+            _index++;
+            if (_index < _formula.Length)
+            {
+                char next = _formula[_index];
+                if ((current == '<' && (next == '>' || next == '=')) ||
+                    (current == '>' && next == '='))
                 {
-                    char c = _formula[_index];
-                    if (c == '!')
-                    {
-                        // Check if what we have scanned so far is a valid cell address.
-                        // If it is, then '!' is the intersection operator, not a sheet separator.
-                        string prefix = _formula.Slice(start, _index - start).ToString();
-                        if (OdfCellAddress.TryParse(prefix, out _))
-                        {
-                            break;
-                        }
-                    }
+                    _index++;
+                }
+            }
+            return new(FormulaTokenType.Operator, _formula.Slice(start, _index - start));
+        }
 
-                    if (char.IsLetterOrDigit(c) || c == '$' || c == '_' || c == '.' || c == '!')
-                    {
-                        _index++;
-                    }
-                    else
+        if (current == '+' || current == '-' || current == '*' || current == '/' || current == '^' || current == '&' || current == '%' || current == '~' || current == '!')
+        {
+            _index++;
+            return new(FormulaTokenType.Operator, _formula.Slice(_index - 1, 1));
+        }
+
+        // 4. 數字常值
+        if (char.IsDigit(current) || current == '.')
+        {
+            int start = _index;
+            bool hasDot = current == '.';
+            _index++;
+            while (_index < _formula.Length)
+            {
+                char c = _formula[_index];
+                if (char.IsDigit(c))
+                {
+                    _index++;
+                }
+                else if (c == '.' && !hasDot)
+                {
+                    hasDot = true;
+                    _index++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            var numSpan = _formula.Slice(start, _index - start);
+            double val = ParseDouble(numSpan);
+            return new(FormulaTokenType.Number, numSpan, val);
+        }
+
+        // 5. 識別碼、函式、座標
+        if (char.IsLetter(current) || current == '$' || current == '_' || current == '\'')
+        {
+            int start = _index;
+            if (current == '\'')
+            {
+                // 處理引號工作表名稱：'Sheet Name'.A1 或 'Sheet Name'!A1
+                _index++;
+                while (_index < _formula.Length && _formula[_index] != '\'')
+                {
+                    _index++;
+                }
+                if (_index < _formula.Length) _index++; // 跳過結束引號
+            }
+
+            while (_index < _formula.Length)
+            {
+                char c = _formula[_index];
+                if (c == '!')
+                {
+                    // 檢查目前掃描的內容是否為有效的儲存格位址。
+                    // 如果是，則 '!' 為交集運算子，而非工作表分隔符號。
+                    string prefix = _formula.Slice(start, _index - start).ToString();
+                    if (OdfCellAddress.TryParse(prefix, out _))
                     {
                         break;
                     }
                 }
 
-                var identSpan = _formula.Slice(start, _index - start);
-                
-                // Fast-check for logical literals
-                bool isFunctionCall = false;
-                int peekIdx = _index;
-                while (peekIdx < _formula.Length && char.IsWhiteSpace(_formula[peekIdx]))
+                if (char.IsLetterOrDigit(c) || c == '$' || c == '_' || c == '.' || c == '!')
                 {
-                    peekIdx++;
+                    _index++;
                 }
-                if (peekIdx < _formula.Length && _formula[peekIdx] == '(')
+                else
                 {
-                    isFunctionCall = true;
+                    break;
                 }
-
-                if (!isFunctionCall)
-                {
-                    if (identSpan.Equals("TRUE", StringComparison.OrdinalIgnoreCase))
-                        return new FormulaParserToken(FormulaTokenType.Bool, identSpan, boolValue: true);
-                    if (identSpan.Equals("FALSE", StringComparison.OrdinalIgnoreCase))
-                        return new FormulaParserToken(FormulaTokenType.Bool, identSpan, boolValue: false);
-                }
-
-                return new FormulaParserToken(FormulaTokenType.Identifier, identSpan);
             }
 
-            // Fallback for unknown character
-            int errStart = _index;
-            _index++;
-            return new FormulaParserToken(FormulaTokenType.Operator, _formula.Slice(errStart, 1));
-        }
-
-        private void SkipWhitespace()
-        {
-            while (_index < _formula.Length && char.IsWhiteSpace(_formula[_index]))
+            var identSpan = _formula.Slice(start, _index - start);
+            
+            // 快速檢查是否為邏輯常值
+            bool isFunctionCall = false;
+            int peekIdx = _index;
+            while (peekIdx < _formula.Length && char.IsWhiteSpace(_formula[peekIdx]))
             {
-                _index++;
+                peekIdx++;
             }
+            if (peekIdx < _formula.Length && _formula[peekIdx] == '(')
+            {
+                isFunctionCall = true;
+            }
+
+            if (!isFunctionCall)
+            {
+                if (identSpan.Equals("TRUE", StringComparison.OrdinalIgnoreCase))
+                    return new(FormulaTokenType.Bool, identSpan, boolValue: true);
+                if (identSpan.Equals("FALSE", StringComparison.OrdinalIgnoreCase))
+                    return new(FormulaTokenType.Bool, identSpan, boolValue: false);
+            }
+
+            return new(FormulaTokenType.Identifier, identSpan);
         }
 
-        private static double ParseDouble(ReadOnlySpan<char> span)
+        // 未知字元的備用方案
+        int errStart = _index;
+        _index++;
+        return new(FormulaTokenType.Operator, _formula.Slice(errStart, 1));
+    }
+
+    private void SkipWhitespace()
+    {
+        while (_index < _formula.Length && char.IsWhiteSpace(_formula[_index]))
         {
-#if NET10_0_OR_GREATER
-            return double.Parse(span, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
-#else
-            return double.Parse(span.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
-#endif
+            _index++;
         }
     }
 
-    public ref struct FormulaParser
+    private static double ParseDouble(ReadOnlySpan<char> span)
     {
-        private Tokenizer _tokenizer;
-        private FormulaParserToken _currentToken;
+#if NET10_0_OR_GREATER
+        return double.Parse(span, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
+#else
+        return double.Parse(span.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
+#endif
+    }
+}
 
-        public FormulaParser(string formula)
+/// <summary>
+/// 公式剖析器，用於將公式字串剖析為抽象語法樹 (AST)。
+/// </summary>
+public ref struct FormulaParser
+{
+    private Tokenizer _tokenizer;
+    private FormulaParserToken _currentToken;
+
+    /// <summary>
+    /// 使用指定的公式字串初始化 <see cref="FormulaParser"/> 結構的新執行個體。
+    /// </summary>
+    /// <param name="formula">公式字串</param>
+    public FormulaParser(string formula)
+    {
+        _tokenizer = new Tokenizer(formula.AsSpan());
+        _currentToken = _tokenizer.NextToken();
+    }
+
+    private void Consume()
+    {
+        _currentToken = _tokenizer.NextToken();
+    }
+
+    /// <summary>
+    /// 開始剖析公式。
+    /// </summary>
+    /// <returns>剖析後的 AST 根節點</returns>
+    /// <exception cref="InvalidOperationException">當公式結尾有未預期的語彙基元時擲出</exception>
+    public AstNode Parse()
+    {
+        var node = ParseExpression();
+        if (_currentToken.Type != FormulaTokenType.EndOfFormula)
         {
-            _tokenizer = new Tokenizer(formula.AsSpan());
-            _currentToken = _tokenizer.NextToken();
+            throw new InvalidOperationException($"Unexpected token at the end of formula: {_currentToken.Span.ToString()}");
+        }
+        return node;
+    }
+
+    // 優先權 1：邏輯運算 (比較)
+    private AstNode ParseExpression()
+    {
+        var node = ParseConcat();
+        while (_currentToken.Type == FormulaTokenType.Operator && IsComparisonOperator(_currentToken.Span))
+        {
+            string op = _currentToken.Span.ToString();
+            Consume();
+            var right = ParseConcat();
+            node = new BinaryNode(op, node, right);
+        }
+        return node;
+    }
+
+    private static bool IsComparisonOperator(ReadOnlySpan<char> op)
+    {
+        return op.Equals("=", StringComparison.Ordinal) ||
+               op.Equals("<", StringComparison.Ordinal) ||
+               op.Equals(">", StringComparison.Ordinal) ||
+               op.Equals("<=", StringComparison.Ordinal) ||
+               op.Equals(">=", StringComparison.Ordinal) ||
+               op.Equals("<>", StringComparison.Ordinal);
+    }
+
+    // 優先權 2：字串連接 (&amp;)
+    private AstNode ParseConcat()
+    {
+        var node = ParseTerm();
+        while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("&", StringComparison.Ordinal))
+        {
+            Consume();
+            var right = ParseTerm();
+            node = new BinaryNode("&", node, right);
+        }
+        return node;
+    }
+
+    // 優先權 3：項運算 (+, -)
+    private AstNode ParseTerm()
+    {
+        var node = ParseFactor();
+        while (_currentToken.Type == FormulaTokenType.Operator && 
+              (_currentToken.Span.Equals("+", StringComparison.Ordinal) || _currentToken.Span.Equals("-", StringComparison.Ordinal)))
+        {
+            string op = _currentToken.Span.ToString();
+            Consume();
+            var right = ParseFactor();
+            node = new BinaryNode(op, node, right);
+        }
+        return node;
+    }
+
+    // 優先權 4：因數運算 (*, /)
+    private AstNode ParseFactor()
+    {
+        var node = ParsePower();
+        while (_currentToken.Type == FormulaTokenType.Operator && 
+              (_currentToken.Span.Equals("*", StringComparison.Ordinal) || _currentToken.Span.Equals("/", StringComparison.Ordinal)))
+        {
+            string op = _currentToken.Span.ToString();
+            Consume();
+            var right = ParsePower();
+            node = new BinaryNode(op, node, right);
+        }
+        return node;
+    }
+
+    // 優先權 5：乘方運算 (^)
+    private AstNode ParsePower()
+    {
+        var node = ParseUnary();
+        while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("^", StringComparison.Ordinal))
+        {
+            Consume();
+            var right = ParseUnary();
+            node = new BinaryNode("^", node, right);
+        }
+        return node;
+    }
+
+    // 優先權 6：單元運算 (+, -, %)
+    private AstNode ParseUnary()
+    {
+        if (_currentToken.Type == FormulaTokenType.Operator && 
+           (_currentToken.Span.Equals("+", StringComparison.Ordinal) || _currentToken.Span.Equals("-", StringComparison.Ordinal)))
+        {
+            char op = _currentToken.Span[0];
+            Consume();
+            var child = ParseUnary();
+            return new UnaryNode(op, child);
         }
 
-        private void Consume()
+        var node = ParseReferenceExpression();
+
+        while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("%", StringComparison.Ordinal))
         {
-            _currentToken = _tokenizer.NextToken();
+            Consume();
+            node = new UnaryNode('%', node);
         }
 
-        public AstNode Parse()
+        return node;
+    }
+
+    private AstNode ParseReferenceExpression()
+    {
+        var node = ParseIntersectionExpression();
+        while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("~", StringComparison.Ordinal))
         {
+            Consume();
+            var right = ParseIntersectionExpression();
+            node = new ReferenceUnionNode(node, right);
+        }
+        return node;
+    }
+
+    private AstNode ParseIntersectionExpression()
+    {
+        var node = ParsePrimary();
+        while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("!", StringComparison.Ordinal))
+        {
+            Consume();
+            var right = ParsePrimary();
+            node = new ReferenceIntersectionNode(node, right);
+        }
+        return node;
+    }
+
+    // 優先權 7：主要運算式 (常值、括號、函式、儲存格/範圍)
+    private AstNode ParsePrimary()
+    {
+        if (_currentToken.Type == FormulaTokenType.Number)
+        {
+            double val = _currentToken.NumberValue;
+            Consume();
+            return new LiteralNode(val);
+        }
+
+        if (_currentToken.Type == FormulaTokenType.String)
+        {
+            string raw = _currentToken.Span.ToString();
+            string strVal = raw.Substring(1, raw.Length - 2).Replace("\"\"", "\"");
+            Consume();
+            return new LiteralNode(strVal);
+        }
+
+        if (_currentToken.Type == FormulaTokenType.Bool)
+        {
+            bool val = _currentToken.BoolValue;
+            Consume();
+            return new LiteralNode(val);
+        }
+
+        if (_currentToken.Type == FormulaTokenType.OpenParen)
+        {
+            Consume();
             var node = ParseExpression();
-            if (_currentToken.Type != FormulaTokenType.EndOfFormula)
+            if (_currentToken.Type != FormulaTokenType.CloseParen)
             {
-                throw new InvalidOperationException($"Unexpected token at the end of formula: {_currentToken.Span.ToString()}");
+                throw new InvalidOperationException("Mismatched parentheses: expected CloseParen.");
             }
-            return node;
+            Consume();
+            return new ParenthesizedNode(node);
         }
 
-        // Precedence 1: Logical operations (Comparisons)
-        private AstNode ParseExpression()
+        if (_currentToken.Type == FormulaTokenType.Identifier)
         {
-            var node = ParseConcat();
-            while (_currentToken.Type == FormulaTokenType.Operator && IsComparisonOperator(_currentToken.Span))
-            {
-                string op = _currentToken.Span.ToString();
-                Consume();
-                var right = ParseConcat();
-                node = new BinaryNode(op, node, right);
-            }
-            return node;
-        }
+            string ident = _currentToken.Span.ToString();
+            Consume();
 
-        private static bool IsComparisonOperator(ReadOnlySpan<char> op)
-        {
-            return op.Equals("=", StringComparison.Ordinal) ||
-                   op.Equals("<", StringComparison.Ordinal) ||
-                   op.Equals(">", StringComparison.Ordinal) ||
-                   op.Equals("<=", StringComparison.Ordinal) ||
-                   op.Equals(">=", StringComparison.Ordinal) ||
-                   op.Equals("<>", StringComparison.Ordinal);
-        }
-
-        // Precedence 2: Concat (&)
-        private AstNode ParseConcat()
-        {
-            var node = ParseTerm();
-            while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("&", StringComparison.Ordinal))
-            {
-                Consume();
-                var right = ParseTerm();
-                node = new BinaryNode("&", node, right);
-            }
-            return node;
-        }
-
-        // Precedence 3: Term (+, -)
-        private AstNode ParseTerm()
-        {
-            var node = ParseFactor();
-            while (_currentToken.Type == FormulaTokenType.Operator && 
-                  (_currentToken.Span.Equals("+", StringComparison.Ordinal) || _currentToken.Span.Equals("-", StringComparison.Ordinal)))
-            {
-                string op = _currentToken.Span.ToString();
-                Consume();
-                var right = ParseFactor();
-                node = new BinaryNode(op, node, right);
-            }
-            return node;
-        }
-
-        // Precedence 4: Factor (*, /)
-        private AstNode ParseFactor()
-        {
-            var node = ParsePower();
-            while (_currentToken.Type == FormulaTokenType.Operator && 
-                  (_currentToken.Span.Equals("*", StringComparison.Ordinal) || _currentToken.Span.Equals("/", StringComparison.Ordinal)))
-            {
-                string op = _currentToken.Span.ToString();
-                Consume();
-                var right = ParsePower();
-                node = new BinaryNode(op, node, right);
-            }
-            return node;
-        }
-
-        // Precedence 5: Power (^)
-        private AstNode ParsePower()
-        {
-            var node = ParseUnary();
-            while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("^", StringComparison.Ordinal))
-            {
-                Consume();
-                var right = ParseUnary();
-                node = new BinaryNode("^", node, right);
-            }
-            return node;
-        }
-
-        // Precedence 6: Unary (+, -, %)
-        private AstNode ParseUnary()
-        {
-            if (_currentToken.Type == FormulaTokenType.Operator && 
-               (_currentToken.Span.Equals("+", StringComparison.Ordinal) || _currentToken.Span.Equals("-", StringComparison.Ordinal)))
-            {
-                char op = _currentToken.Span[0];
-                Consume();
-                var child = ParseUnary();
-                return new UnaryNode(op, child);
-            }
-
-            var node = ParseReferenceExpression();
-
-            while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("%", StringComparison.Ordinal))
-            {
-                Consume();
-                node = new UnaryNode('%', node);
-            }
-
-            return node;
-        }
-
-        private AstNode ParseReferenceExpression()
-        {
-            var node = ParseIntersectionExpression();
-            while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("~", StringComparison.Ordinal))
-            {
-                Consume();
-                var right = ParseIntersectionExpression();
-                node = new ReferenceUnionNode(node, right);
-            }
-            return node;
-        }
-
-        private AstNode ParseIntersectionExpression()
-        {
-            var node = ParsePrimary();
-            while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("!", StringComparison.Ordinal))
-            {
-                Consume();
-                var right = ParsePrimary();
-                node = new ReferenceIntersectionNode(node, right);
-            }
-            return node;
-        }
-
-        // Precedence 7: Primary (Literals, Parens, Functions, Cells/Ranges)
-        private AstNode ParsePrimary()
-        {
-            if (_currentToken.Type == FormulaTokenType.Number)
-            {
-                double val = _currentToken.NumberValue;
-                Consume();
-                return new LiteralNode(val);
-            }
-
-            if (_currentToken.Type == FormulaTokenType.String)
-            {
-                string raw = _currentToken.Span.ToString();
-                string strVal = raw.Substring(1, raw.Length - 2).Replace("\"\"", "\"");
-                Consume();
-                return new LiteralNode(strVal);
-            }
-
-            if (_currentToken.Type == FormulaTokenType.Bool)
-            {
-                bool val = _currentToken.BoolValue;
-                Consume();
-                return new LiteralNode(val);
-            }
-
+            // 1. 檢查是否為函式呼叫
             if (_currentToken.Type == FormulaTokenType.OpenParen)
             {
-                Consume();
-                var node = ParseExpression();
+                Consume(); // 消耗 '('
+                List<AstNode> args = [];
                 if (_currentToken.Type != FormulaTokenType.CloseParen)
                 {
-                    throw new InvalidOperationException("Mismatched parentheses: expected CloseParen.");
-                }
-                Consume();
-                return new ParenthesizedNode(node);
-            }
-
-            if (_currentToken.Type == FormulaTokenType.Identifier)
-            {
-                string ident = _currentToken.Span.ToString();
-                Consume();
-
-                // 1. Check if it is a function call
-                if (_currentToken.Type == FormulaTokenType.OpenParen)
-                {
-                    Consume(); // consume '('
-                    var args = new List<AstNode>();
-                    if (_currentToken.Type != FormulaTokenType.CloseParen)
+                    args.Add(ParseExpression());
+                    while (_currentToken.Type == FormulaTokenType.Separator)
                     {
+                        Consume();
                         args.Add(ParseExpression());
-                        while (_currentToken.Type == FormulaTokenType.Separator)
-                        {
-                            Consume();
-                            args.Add(ParseExpression());
-                        }
                     }
-                    if (_currentToken.Type != FormulaTokenType.CloseParen)
-                    {
-                        throw new InvalidOperationException("Mismatched parentheses in function call.");
-                    }
-                    Consume(); // consume ')'
-                    return new FunctionNode(ident, args);
                 }
-
-                // 2. Check if it is a range or cell reference
-                if (_currentToken.Type == FormulaTokenType.Colon)
+                if (_currentToken.Type != FormulaTokenType.CloseParen)
                 {
-                    // Range case: A1:B10
-                    Consume(); // consume ':'
-                    if (_currentToken.Type != FormulaTokenType.Identifier)
-                    {
-                        throw new InvalidOperationException("Invalid range reference layout: missing end coordinate.");
-                    }
-                    string endIdent = _currentToken.Span.ToString();
-                    Consume();
-
-                    string fullRangeStr = $"{ident}:{endIdent}";
-                    if (OdfCellRange.TryParse(fullRangeStr, out var range))
-                    {
-                        return new RangeReferenceNode(range);
-                    }
-                    throw new InvalidOperationException($"Failed to parse range string '{fullRangeStr}'.");
+                    throw new InvalidOperationException("Mismatched parentheses in function call.");
                 }
-
-                // Single cell or single sheet-qualified cell A1 or Sheet1.A1
-                if (OdfCellRange.TryParse(ident, out var cellRange))
-                {
-                    if (cellRange.StartAddress == cellRange.EndAddress)
-                    {
-                        return new CellAddressNode(cellRange.StartAddress);
-                    }
-                    return new RangeReferenceNode(cellRange);
-                }
-
-                return new NamedRangeNode(ident);
+                Consume(); // 消耗 ')'
+                return new FunctionNode(ident, args);
             }
 
-            throw new InvalidOperationException($"Unexpected token type {_currentToken.Type} during parsing.");
+            // 2. 檢查是否為範圍或儲存格參照
+            if (_currentToken.Type == FormulaTokenType.Colon)
+            {
+                // 範圍情況：A1:B10
+                Consume(); // 消耗 ':'
+                if (_currentToken.Type != FormulaTokenType.Identifier)
+                {
+                    throw new InvalidOperationException("Invalid range reference layout: missing end coordinate.");
+                }
+                string endIdent = _currentToken.Span.ToString();
+                Consume();
+
+                string fullRangeStr = $"{ident}:{endIdent}";
+                if (OdfCellRange.TryParse(fullRangeStr, out var range))
+                {
+                    return new RangeReferenceNode(range);
+                }
+                throw new InvalidOperationException($"Failed to parse range string '{fullRangeStr}'.");
+            }
+
+            // 單一儲存格或單一工作表限定之儲存格 A1 或 Sheet1.A1
+            if (OdfCellRange.TryParse(ident, out var cellRange))
+            {
+                if (cellRange.StartAddress == cellRange.EndAddress)
+                {
+                    return new CellAddressNode(cellRange.StartAddress);
+                }
+                return new RangeReferenceNode(cellRange);
+            }
+
+            return new NamedRangeNode(ident);
         }
+
+        throw new InvalidOperationException($"Unexpected token type {_currentToken.Type} during parsing.");
     }
 }

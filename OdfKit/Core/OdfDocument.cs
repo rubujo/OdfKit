@@ -1,4 +1,3 @@
-#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,53 +8,106 @@ using System.Threading.Tasks;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
-namespace OdfKit.Core
+namespace OdfKit.Core;
+
+/// <summary>
+/// 代表一個 ODF 文件封裝容器的抽象基底類別。
+/// </summary>
+public abstract class OdfDocument : IDisposable, IAsyncDisposable
 {
-    public abstract class OdfDocument : IDisposable, IAsyncDisposable
+    /// <summary>
+    /// 取得與此文件相關聯的 ODF 封裝容器。
+    /// </summary>
+    public OdfPackage Package { get; }
+
+    /// <summary>
+    /// 取得或設定文件的內容 DOM 樹。
+    /// </summary>
+    public OdfNode ContentDom { get; protected set; } = null!;
+
+    /// <summary>
+    /// 取得或設定文件的樣式 DOM 樹。
+    /// </summary>
+    public OdfNode StylesDom { get; protected set; } = null!;
+
+    /// <summary>
+    /// 取得或設定文件的樣式引擎。
+    /// </summary>
+    public OdfStyleEngine StyleEngine { get; protected set; } = null!;
+
+    /// <summary>
+    /// 取得或設定文件的中繼資料 DOM 樹。
+    /// </summary>
+    public OdfNode MetaDom { get; protected set; } = null!;
+
+    /// <summary>
+    /// 取得或設定文件的設定值 DOM 樹。
+    /// </summary>
+    public OdfNode SettingsDom { get; protected set; } = null!;
+
+    /// <summary>
+    /// 取得或設定文件內容的根節點。
+    /// </summary>
+    public OdfNode ContentRoot { get => ContentDom; protected set => ContentDom = value; }
+
+    /// <summary>
+    /// 取得或設定文件樣式的根節點。
+    /// </summary>
+    public OdfNode StylesRoot { get => StylesDom; protected set => StylesDom = value; }
+
+    /// <summary>
+    /// 取得或設定文件中繼資料的根節點。
+    /// </summary>
+    public OdfNode MetaRoot { get => MetaDom; protected set => MetaDom = value; }
+
+    /// <summary>
+    /// 取得或設定文件設定值的根節點。
+    /// </summary>
+    public OdfNode SettingsRoot { get => SettingsDom; protected set => SettingsDom = value; }
+
+    private bool _isDisposed;
+
+    /// <summary>
+    /// 取得或設定嵌入式文件在封裝容器內的路徑。若為根文件則為空字串。
+    /// </summary>
+    public string SubPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfDocument"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="package">OdfPackage 封裝容器</param>
+    protected OdfDocument(OdfPackage package) : this(package, string.Empty)
     {
-        public OdfPackage Package { get; }
-        public OdfNode ContentDom { get; protected set; } = null!;
-        public OdfNode StylesDom { get; protected set; } = null!;
-        public OdfStyleEngine StyleEngine { get; protected set; } = null!;
-        public OdfNode MetaDom { get; protected set; } = null!;
-        public OdfNode SettingsDom { get; protected set; } = null!;
+    }
 
-        public OdfNode ContentRoot { get => ContentDom; protected set => ContentDom = value; }
-        public OdfNode StylesRoot { get => StylesDom; protected set => StylesDom = value; }
-        public OdfNode MetaRoot { get => MetaDom; protected set => MetaDom = value; }
-        public OdfNode SettingsRoot { get => SettingsDom; protected set => SettingsDom = value; }
-
-        private bool _isDisposed;
-
-        public string SubPath { get; set; } = string.Empty;
-
-        protected OdfDocument(OdfPackage package) : this(package, string.Empty)
+    /// <summary>
+    /// 初始化指定子路徑的 <see cref="OdfDocument"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="package">OdfPackage 封裝容器</param>
+    /// <param name="subPath">嵌入式文件在封裝中的子路徑</param>
+    protected OdfDocument(OdfPackage package, string subPath)
+    {
+        Package = package ?? throw new ArgumentNullException(nameof(package));
+        SubPath = subPath ?? string.Empty;
+        if (!string.IsNullOrEmpty(SubPath) && !SubPath.EndsWith("/"))
         {
+            SubPath += "/";
         }
+        LoadXmlTrees();
+        StyleEngine = new OdfStyleEngine(ContentDom, StylesDom);
+    }
 
-        protected OdfDocument(OdfPackage package, string subPath)
-        {
-            Package = package ?? throw new ArgumentNullException(nameof(package));
-            SubPath = subPath ?? string.Empty;
-            if (!string.IsNullOrEmpty(SubPath) && !SubPath.EndsWith("/"))
-            {
-                SubPath += "/";
-            }
-            LoadXmlTrees();
-            StyleEngine = new OdfStyleEngine(ContentDom, StylesDom);
-        }
-
-        /// <summary>
-        /// Sanitizes the document by removing all VBA/StarBasic scripts, signatures, and script references.
-        /// </summary>
-        public void SanitizeMacros()
-        {
-            OdfPackage.SanitizeXmlNode(ContentDom);
-            OdfPackage.SanitizeXmlNode(StylesDom);
-            OdfPackage.SanitizeXmlNode(MetaDom);
-            OdfPackage.SanitizeXmlNode(SettingsDom);
-            Package.SanitizeMacros();
-        }
+    /// <summary>
+    /// 清理文件，移除所有 VBA 與 StarBasic 巨集指令碼、數位簽章及指令碼參照。
+    /// </summary>
+    public void SanitizeMacros()
+    {
+        OdfPackage.SanitizeXmlNode(ContentDom);
+        OdfPackage.SanitizeXmlNode(StylesDom);
+        OdfPackage.SanitizeXmlNode(MetaDom);
+        OdfPackage.SanitizeXmlNode(SettingsDom);
+        Package.SanitizeMacros();
+    }
 
         private void LoadXmlTrees()
         {
@@ -95,63 +147,82 @@ namespace OdfKit.Core
 
         #region Package Lifecycle & Persistence
 
-        public virtual void Save(OdfSaveOptions? options = null)
-        {
-            options ??= OdfSaveOptions.Default;
+    /// <summary>
+    /// 儲存文件至 ODF 封裝容器中。
+    /// </summary>
+    /// <param name="options">儲存設定選項</param>
+    public virtual void Save(OdfSaveOptions? options = null)
+    {
+        options ??= OdfSaveOptions.Default;
 
-            StyleEngine.DeduplicateAndSaveStyles();
-            UpdateDocumentStatistics();
+        StyleEngine.DeduplicateAndSaveStyles();
+        UpdateDocumentStatistics();
 
-            WriteDomToEntry("content.xml", ContentDom, options);
-            WriteDomToEntry("styles.xml", StylesDom, options);
-            WriteDomToEntry("meta.xml", MetaDom, options);
-            WriteDomToEntry("settings.xml", SettingsDom, options);
+        WriteDomToEntry("content.xml", ContentDom, options);
+        WriteDomToEntry("styles.xml", StylesDom, options);
+        WriteDomToEntry("meta.xml", MetaDom, options);
+        WriteDomToEntry("settings.xml", SettingsDom, options);
 
-            Package.Save();
-        }
+        Package.Save();
+    }
 
-        public virtual async Task SaveAsync(OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            options ??= OdfSaveOptions.Default;
+    /// <summary>
+    /// 非同步儲存文件至 ODF 封裝容器中。
+    /// </summary>
+    /// <param name="options">儲存設定選項</param>
+    /// <param name="cancellationToken">取消語彙</param>
+    /// <returns>代表非同步作業的 Task 執行個體</returns>
+    public virtual async Task SaveAsync(OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        options ??= OdfSaveOptions.Default;
 
-            StyleEngine.DeduplicateAndSaveStyles();
-            UpdateDocumentStatistics();
+        StyleEngine.DeduplicateAndSaveStyles();
+        UpdateDocumentStatistics();
 
-            WriteDomToEntry("content.xml", ContentDom, options);
-            WriteDomToEntry("styles.xml", StylesDom, options);
-            WriteDomToEntry("meta.xml", MetaDom, options);
-            WriteDomToEntry("settings.xml", SettingsDom, options);
+        WriteDomToEntry("content.xml", ContentDom, options);
+        WriteDomToEntry("styles.xml", StylesDom, options);
+        WriteDomToEntry("meta.xml", MetaDom, options);
+        WriteDomToEntry("settings.xml", SettingsDom, options);
 
-            await Package.SaveAsync(cancellationToken).ConfigureAwait(false);
-        }
+        await Package.SaveAsync(cancellationToken).ConfigureAwait(false);
+    }
 
-        private void WriteDomToEntry(string name, OdfNode node, OdfSaveOptions options)
-        {
-            using var ms = new MemoryStream();
-            OdfXmlWriter.Write(node, ms, options);
-            string path = string.IsNullOrEmpty(SubPath) ? name : SubPath + name;
-            Package.WriteEntry(path, ms.ToArray(), "text/xml");
-        }
+    private void WriteDomToEntry(string name, OdfNode node, OdfSaveOptions options)
+    {
+        using var ms = new MemoryStream();
+        OdfXmlWriter.Write(node, ms, options);
+        string path = string.IsNullOrEmpty(SubPath) ? name : SubPath + name;
+        Package.WriteEntry(path, ms.ToArray(), "text/xml");
+    }
 
-        #endregion
+    #endregion
 
-        #region High-Level Digital Signatures
+    #region High-Level Digital Signatures
 
-        public void Sign(X509Certificate2 certificate)
-        {
-            StyleEngine.DeduplicateAndSaveStyles();
-            WriteDomToEntry("content.xml", ContentDom, OdfSaveOptions.Default);
-            WriteDomToEntry("styles.xml", StylesDom, OdfSaveOptions.Default);
-            WriteDomToEntry("meta.xml", MetaDom, OdfSaveOptions.Default);
-            WriteDomToEntry("settings.xml", SettingsDom, OdfSaveOptions.Default);
+    /// <summary>
+    /// 使用指定的 X.509 憑證對文件進行數位簽章。
+    /// </summary>
+    /// <param name="certificate">用於簽章的憑證</param>
+    public void Sign(X509Certificate2 certificate)
+    {
+        StyleEngine.DeduplicateAndSaveStyles();
+        WriteDomToEntry("content.xml", ContentDom, OdfSaveOptions.Default);
+        WriteDomToEntry("styles.xml", StylesDom, OdfSaveOptions.Default);
+        WriteDomToEntry("meta.xml", MetaDom, OdfSaveOptions.Default);
+        WriteDomToEntry("settings.xml", SettingsDom, OdfSaveOptions.Default);
 
-            OdfSigner.Sign(Package, certificate);
-        }
+        OdfSigner.Sign(Package, certificate);
+    }
 
-        public bool VerifySignatures(out X509Certificate2Collection certificates)
-        {
-            return OdfSigner.VerifySignatures(Package, out certificates);
-        }
+    /// <summary>
+    /// 驗證文件中的所有數位簽章。
+    /// </summary>
+    /// <param name="certificates">輸出參數，傳回驗證通過的憑證集合</param>
+    /// <returns>若所有簽章皆驗證成功則傳回 true；否則傳回 false</returns>
+    public bool VerifySignatures(out X509Certificate2Collection certificates)
+    {
+        return OdfSigner.VerifySignatures(Package, out certificates);
+    }
 
         #endregion
 
@@ -823,4 +894,3 @@ namespace OdfKit.Core
             return doc;
         }
     }
-}

@@ -1,4 +1,3 @@
-#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,15 +13,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace OdfKit.Core
-{
-    public static class OdfSigner
+namespace OdfKit.Core;
+
+/// <summary>
+/// 提供 ODF 封裝的數位簽署與驗證功能。
+/// </summary>
+public static class OdfSigner
     {
         private const string SignaturePath = "META-INF/documentsignatures.xml";
 
         /// <summary>
         /// 對 ODF 封裝中的關鍵檔案進行數位簽署，支援同僚聯署。
         /// </summary>
+        /// <param name="package">要簽署的 ODF 封裝</param>
+        /// <param name="certificate">用於簽署的 X.509 憑證</param>
         public static void Sign(OdfPackage package, X509Certificate2 certificate)
         {
             Sign(package, certificate, new OdfSigningOptions { Level = XadesLevel.None });
@@ -31,6 +35,9 @@ namespace OdfKit.Core
         /// <summary>
         /// 對 ODF 封裝中的關鍵檔案進行數位簽署，支援自訂選項。
         /// </summary>
+        /// <param name="package">要簽署的 ODF 封裝</param>
+        /// <param name="certificate">用於簽署的 X.509 憑證</param>
+        /// <param name="options">簽署選項</param>
         public static void Sign(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options)
         {
             SignAsync(package, certificate, options).GetAwaiter().GetResult();
@@ -39,6 +46,10 @@ namespace OdfKit.Core
         /// <summary>
         /// 對 ODF 封裝中的關鍵檔案進行數位簽署（非同步）。
         /// </summary>
+        /// <param name="package">要簽署的 ODF 封裝</param>
+        /// <param name="certificate">用於簽署的 X.509 憑證</param>
+        /// <param name="options">簽署選項</param>
+        /// <returns>代表非同步作業的工作</returns>
         public static async Task SignAsync(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options)
         {
             if (package == null) throw new ArgumentNullException(nameof(package));
@@ -347,6 +358,9 @@ namespace OdfKit.Core
         /// <summary>
         /// 驗證 ODF 封裝中的所有數位簽章。
         /// </summary>
+        /// <param name="package">要驗證的 ODF 封裝</param>
+        /// <param name="certificates">輸出參數，包含所有已驗證的憑證集合</param>
+        /// <returns>若所有簽章皆有效，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
         public static bool VerifySignatures(OdfPackage package, out X509Certificate2Collection certificates)
         {
             certificates = new X509Certificate2Collection();
@@ -362,16 +376,22 @@ namespace OdfKit.Core
         }
 
         /// <summary>
-        /// 驗證 ODF 封裝中的所有數位簽章，並返回詳細的驗證結果。
+        /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果。
         /// </summary>
+        /// <param name="package">要驗證的 ODF 封裝</param>
+        /// <param name="options">簽署選項</param>
+        /// <returns>詳細的數位簽章驗證結果</returns>
         public static OdfSignatureValidationResult VerifySignatures(OdfPackage package, OdfSigningOptions? options = null)
         {
             return VerifySignaturesAsync(package, options).GetAwaiter().GetResult();
         }
 
         /// <summary>
-        /// 驗證 ODF 封裝中的所有數位簽章，並返回詳細的驗證結果（非同步）。
+        /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果（非同步）。
         /// </summary>
+        /// <param name="package">要驗證的 ODF 封裝</param>
+        /// <param name="options">簽署選項</param>
+        /// <returns>代表非同步作業的工作，其結果包含詳細的數位簽章驗證結果</returns>
         public static async Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfPackage package, OdfSigningOptions? options = null)
         {
             options ??= new OdfSigningOptions();
@@ -1465,14 +1485,9 @@ namespace OdfKit.Core
         #endregion
     }
 
-    internal sealed class OdfPackageXmlResolver : XmlResolver
+    internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
     {
-        private readonly OdfPackage _package;
-
-        public OdfPackageXmlResolver(OdfPackage package)
-        {
-            _package = package;
-        }
+        private readonly OdfPackage _package = package;
 
         public override System.Net.ICredentials Credentials
         {
@@ -1561,19 +1576,32 @@ namespace OdfKit.Core
     }
 
     /// <summary>
-    /// Custom SignedXml subclass that manually searches for elements matching Reference URI ID
-    /// to bypass .NET Core GetElementById schema resolution limitations.
+    /// 自訂的 <see cref="SignedXml"/> 子類別，手動尋找符合參考 URI ID 的項目，以繞過 .NET Core 中 GetElementById 的結構描述解析限制。
     /// </summary>
     public class XadesSignedXml : SignedXml
     {
+        /// <summary>
+        /// 使用指定的 XML 文件初始化 <see cref="XadesSignedXml"/> 類別的新執行個體。
+        /// </summary>
+        /// <param name="document">用於初始化 <see cref="XadesSignedXml"/> 的 XML 文件</param>
         public XadesSignedXml(XmlDocument document) : base(document)
         {
         }
 
+        /// <summary>
+        /// 使用指定的 XML 元素初始化 <see cref="XadesSignedXml"/> 類別的新執行個體。
+        /// </summary>
+        /// <param name="element">用於初始化 <see cref="XadesSignedXml"/> 的 XML 元素</param>
         public XadesSignedXml(XmlElement element) : base(element)
         {
         }
 
+        /// <summary>
+        /// 傳回指定 XML 文件中具有指定 ID 的 XML 元素。
+        /// </summary>
+        /// <param name="document">要搜尋的 XML 文件</param>
+        /// <param name="idValue">要尋找的 ID 值</param>
+        /// <returns>若找到具有指定 ID 的元素，則為該元素；否則為 <see langword="null"/></returns>
         public override XmlElement? GetIdElement(XmlDocument? document, string idValue)
         {
             if (document == null) return null;
@@ -1643,19 +1671,12 @@ namespace OdfKit.Core
         }
     }
 
-    internal class DerNode
+    internal class DerNode(byte tag, byte[] value)
     {
-        public byte Tag { get; set; }
-        public byte[] Value { get; set; } = Array.Empty<byte>();
-        public List<DerNode> Children { get; } = new List<DerNode>();
+        public byte Tag { get; set; } = tag;
+        public byte[] Value { get; set; } = value;
+        public List<DerNode> Children { get; } = [];
         public int StartOffset { get; set; }
         public int Length { get; set; }
-        public byte[] RawBytes { get; set; } = Array.Empty<byte>();
-
-        public DerNode(byte tag, byte[] value)
-        {
-            Tag = tag;
-            Value = value;
-        }
+        public byte[] RawBytes { get; set; } = [];
     }
-}

@@ -1,4 +1,3 @@
-﻿#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,18 +15,35 @@ using OdfKit.DOM;
 using OdfKit.Formula;
 using OdfKit.Styles;
 
-namespace OdfKit.Core
-{
-    public enum OdfPackageMode
-    {
-        Read,
-        ReadWrite,
-        Create
-    }
+namespace OdfKit.Core;
 
-    public class OdfPackage : IDisposable, IAsyncDisposable
-    {
-        private readonly OdfPackageMode _mode;
+/// <summary>
+/// 表示 ODF 封裝的開啟模式。
+/// </summary>
+public enum OdfPackageMode
+{
+    /// <summary>
+    /// 唯讀模式。
+    /// </summary>
+    Read,
+
+    /// <summary>
+    /// 讀寫模式。
+    /// </summary>
+    ReadWrite,
+
+    /// <summary>
+    /// 建立模式。
+    /// </summary>
+    Create
+}
+
+/// <summary>
+/// 表示 ODF 文件的實體封裝。
+/// </summary>
+public class OdfPackage : IDisposable, IAsyncDisposable
+{
+    private readonly OdfPackageMode _mode;
         private Stream? _underlyingStream;
         private readonly bool _leaveOpen;
         private readonly OdfLoadOptions _loadOptions;
@@ -46,9 +62,24 @@ namespace OdfKit.Core
         private string? _mimetype;
         private bool _isFlatXml;
 
+        /// <summary>
+        /// 取得目前 ODF 封裝的開啟模式。
+        /// </summary>
         public OdfPackageMode Mode => _mode;
+
+        /// <summary>
+        /// 取得或設定 ODF 封裝的 MIME 媒體類型。
+        /// </summary>
         public string? MimeType => _mimetype;
+
+        /// <summary>
+        /// 取得一個值，指出目前封裝是否為單一 Flat XML 檔案。
+        /// </summary>
         public bool IsFlatXml => _isFlatXml;
+
+        /// <summary>
+        /// 取得封裝內部所有項目的媒體類型資訊清單。
+        /// </summary>
         public IReadOnlyDictionary<string, string> Manifest => _manifest;
         internal IReadOnlyDictionary<string, OdfPackageEntry> Entries => _entries;
         internal IReadOnlyList<string> EntryOrder => _entryOrder;
@@ -59,12 +90,22 @@ namespace OdfKit.Core
         internal OdfLoadOptions LoadOptions => _loadOptions;
         internal OdfSaveOptions SaveOptions => _saveOptions;
 
+        /// <summary>
+        /// 判斷指定路徑的項目是否已加密。
+        /// </summary>
+        /// <param name="name">項目的相對路徑名稱</param>
+        /// <returns>若該項目已加密，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
         public bool IsEntryEncrypted(string name)
         {
             name = SanitizeEntryName(name);
             return _entries.TryGetValue(name, out var entry) && entry.EncryptionInfo != null;
         }
 
+        /// <summary>
+        /// 取得指定項目的加密詳細資訊。
+        /// </summary>
+        /// <param name="name">項目的相對路徑名稱</param>
+        /// <returns>項目的加密資訊；若未加密則為 <see langword="null"/></returns>
         public OdfEncryptionInfo? GetEntryEncryptionInfo(string name)
         {
             name = SanitizeEntryName(name);
@@ -82,10 +123,16 @@ namespace OdfKit.Core
 
         #region Factory Methods
 
+        /// <summary>
+        /// 從指定的檔案路徑開啟既有的 ODF 封裝。
+        /// </summary>
+        /// <param name="path">ODF 檔案的路徑</param>
+        /// <param name="options">載入選項</param>
+        /// <returns>開啟的 <see cref="OdfPackage"/> 執行個體</returns>
         public static OdfPackage Open(string path, OdfLoadOptions? options = null)
         {
-            var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            var package = new OdfPackage(OdfPackageMode.ReadWrite, stream, false, options, null);
+            FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            OdfPackage package = new(OdfPackageMode.ReadWrite, stream, false, options, null);
             try
             {
                 package.InitializeLoad();
@@ -98,9 +145,16 @@ namespace OdfKit.Core
             }
         }
 
+        /// <summary>
+        /// 從指定的資料流開啟既有的 ODF 封裝。
+        /// </summary>
+        /// <param name="stream">包含 ODF 封裝資料的資料流</param>
+        /// <param name="leaveOpen">若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/></param>
+        /// <param name="options">載入選項</param>
+        /// <returns>開啟的 <see cref="OdfPackage"/> 執行個體</returns>
         public static OdfPackage Open(Stream stream, bool leaveOpen = false, OdfLoadOptions? options = null)
         {
-            var package = new OdfPackage(OdfPackageMode.ReadWrite, stream, leaveOpen, options, null);
+            OdfPackage package = new(OdfPackageMode.ReadWrite, stream, leaveOpen, options, null);
             try
             {
                 package.InitializeLoad();
@@ -113,12 +167,25 @@ namespace OdfKit.Core
             }
         }
 
+        /// <summary>
+        /// 在指定的檔案路徑建立一個新的 ODF 封裝。
+        /// </summary>
+        /// <param name="path">要建立的檔案路徑</param>
+        /// <param name="options">儲存與加密選項</param>
+        /// <returns>建立的 <see cref="OdfPackage"/> 執行個體</returns>
         public static OdfPackage Create(string path, OdfSaveOptions? options = null)
         {
-            var stream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+            FileStream stream = new(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
             return new OdfPackage(OdfPackageMode.Create, stream, false, null, options);
         }
 
+        /// <summary>
+        /// 在指定的資料流建立一個新的 ODF 封裝。
+        /// </summary>
+        /// <param name="stream">要寫入 ODF 封裝的資料流</param>
+        /// <param name="leaveOpen">若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/></param>
+        /// <param name="options">儲存與加密選項</param>
+        /// <returns>建立的 <see cref="OdfPackage"/> 執行個體</returns>
         public static OdfPackage Create(Stream stream, bool leaveOpen = false, OdfSaveOptions? options = null)
         {
             return new OdfPackage(OdfPackageMode.Create, stream, leaveOpen, null, options);
@@ -812,6 +879,11 @@ namespace OdfKit.Core
 
         #region ZIP Path & Entry Sanitize (Zip Slip Protection)
 
+        /// <summary>
+        /// 淨化與驗證 ZIP 項目名稱，防止目錄穿越攻擊（Zip Slip 漏洞防禦）。
+        /// </summary>
+        /// <param name="name">原始項目名稱</param>
+        /// <returns>淨化後的標準項目名稱</returns>
         public static string SanitizeEntryName(string name)
         {
             if (string.IsNullOrEmpty(name)) return name;
@@ -856,7 +928,7 @@ namespace OdfKit.Core
         #region Macro Sanitization
 
         /// <summary>
-        /// Sanitizes the package by removing all VBA/StarBasic scripts, signatures, and script references.
+        /// 淨化封裝以移除所有 VBA、StarBasic 巨集指令碼、簽章以及指令碼參考。
         /// </summary>
         public void SanitizeMacros()
         {
@@ -930,8 +1002,10 @@ namespace OdfKit.Core
         }
 
         /// <summary>
-        /// Recursively sanitizes an XML node by removing event listeners and macro/script attributes.
+        /// 遞迴淨化指定的 XML 節點，移除事件監聽器與巨集或指令碼屬性。
         /// </summary>
+        /// <param name="node">要淨化的 ODF 節點</param>
+        /// <returns>若節點被修改則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
         public static bool SanitizeXmlNode(OdfNode node)
         {
             if (node == null) return false;
@@ -1002,22 +1076,47 @@ namespace OdfKit.Core
 
         #region Public API
 
+        /// <summary>
+        /// 檢查封裝中是否包含指定名稱的項目。
+        /// </summary>
+        /// <param name="name">項目的相對路徑名稱</param>
+        /// <returns>若項目存在則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
         public bool HasEntry(string name)
         {
             return _entries.ContainsKey(SanitizeEntryName(name));
         }
 
+        /// <summary>
+        /// 提供 ODF 封裝中實體項目的基本資訊。
+        /// </summary>
         public class OdfPackageEntryInfo
         {
+            /// <summary>
+            /// 取得項目的相對路徑。
+            /// </summary>
             public string Path { get; }
+
+            /// <summary>
+            /// 初始化 <see cref="OdfPackageEntryInfo"/> 類別的新執行個體。
+            /// </summary>
+            /// <param name="path">項目的相對路徑</param>
             public OdfPackageEntryInfo(string path) => Path = path;
         }
 
+        /// <summary>
+        /// 取得封裝中所有實體項目的資訊集合。
+        /// </summary>
+        /// <returns>所有項目的資訊集合</returns>
         public IEnumerable<OdfPackageEntryInfo> GetEntries()
         {
             return _entries.Keys.Select(k => new OdfPackageEntryInfo(k));
         }
 
+        /// <summary>
+        /// 讀取指定路徑項目的完整內容位元組。
+        /// </summary>
+        /// <param name="path">項目的相對路徑名稱</param>
+        /// <returns>項目的位元組陣列內容</returns>
         public byte[] ReadEntry(string path)
         {
             using var stream = GetEntryStream(path);
@@ -1026,11 +1125,20 @@ namespace OdfKit.Core
             return ms.ToArray();
         }
 
+        /// <summary>
+        /// 將目前 ODF 封裝儲存到指定的目標資料流中。
+        /// </summary>
+        /// <param name="stream">要寫入的目標資料流</param>
         public void Save(Stream stream)
         {
             SaveToStream(stream);
         }
 
+        /// <summary>
+        /// 取得指定項目的唯讀資料流。
+        /// </summary>
+        /// <param name="name">項目的相對路徑名稱</param>
+        /// <returns>代表項目內容的資料流</returns>
         public Stream GetEntryStream(string name)
         {
             name = SanitizeEntryName(name);
@@ -1043,10 +1151,16 @@ namespace OdfKit.Core
             throw new FileNotFoundException($"Entry '{name}' not found in ODF package.");
         }
 
+        /// <summary>
+        /// 將指定的位元組內容寫入或覆寫封裝中的項目。
+        /// </summary>
+        /// <param name="name">項目的相對路徑名稱</param>
+        /// <param name="content">要寫入的位元組內容</param>
+        /// <param name="mediaType">項目的 MIME 媒體類型</param>
         public void WriteEntry(string name, byte[] content, string mediaType)
         {
             name = SanitizeEntryName(name);
-            var entry = new OdfPackageEntry(name, content);
+            OdfPackageEntry entry = new(name, content);
             _entries[name] = entry;
             _manifest[name] = mediaType;
 
@@ -1064,10 +1178,16 @@ namespace OdfKit.Core
             }
         }
 
+        /// <summary>
+        /// 將指定的資料流內容寫入或覆寫封裝中的項目。
+        /// </summary>
+        /// <param name="name">項目的相對路徑名稱</param>
+        /// <param name="contentStream">要寫入的內容來源資料流</param>
+        /// <param name="mediaType">項目的 MIME 媒體類型</param>
         public void WriteEntry(string name, Stream contentStream, string mediaType)
         {
             name = SanitizeEntryName(name);
-            var entry = new OdfPackageEntry(name, contentStream);
+            OdfPackageEntry entry = new(name, contentStream);
             _entries[name] = entry;
             _manifest[name] = mediaType;
 
@@ -1075,7 +1195,7 @@ namespace OdfKit.Core
             {
                 string folder = name.Substring(0, name.Length - 8); // keeps the trailing slash
                 byte[] bytes;
-                using (var ms = new MemoryStream())
+                using (MemoryStream ms = new())
                 {
                     contentStream.CopyTo(ms);
                     bytes = ms.ToArray();
@@ -1091,6 +1211,10 @@ namespace OdfKit.Core
             }
         }
 
+        /// <summary>
+        /// 從封裝中移除指定的項目。
+        /// </summary>
+        /// <param name="name">要移除的項目相對路徑名稱</param>
         public void RemoveEntry(string name)
         {
             name = SanitizeEntryName(name);
@@ -1103,15 +1227,19 @@ namespace OdfKit.Core
             }
         }
 
+        /// <summary>
+        /// 清理封裝中未被參照的圖片等媒體檔案。
+        /// </summary>
+        /// <param name="referencedMediaPaths">所有目前正被參照的媒體檔案路徑集合</param>
         public void PruneUnusedMedia(IEnumerable<string> referencedMediaPaths)
         {
-            var referencedSet = new HashSet<string>(StringComparer.Ordinal);
+            HashSet<string> referencedSet = new(StringComparer.Ordinal);
             foreach (var path in referencedMediaPaths)
             {
                 referencedSet.Add(SanitizeEntryName(path));
             }
 
-            var keysToRemove = new List<string>();
+            List<string> keysToRemove = [];
             foreach (var key in _entries.Keys)
             {
                 if (key.StartsWith("Pictures/", StringComparison.OrdinalIgnoreCase))
@@ -1130,6 +1258,10 @@ namespace OdfKit.Core
             }
         }
 
+        /// <summary>
+        /// 設定 ODF 封裝的主要 MIME 媒體類型。
+        /// </summary>
+        /// <param name="mimetype">媒體類型字串</param>
         public void SetMimeType(string mimetype)
         {
             _mimetype = mimetype;
@@ -1145,14 +1277,18 @@ namespace OdfKit.Core
 
         #region Embedded Objects Extraction
 
+        /// <summary>
+        /// 取得此封裝中所內嵌的 ODF 物件資料夾路徑清單。
+        /// </summary>
+        /// <returns>內嵌物件路徑的集合</returns>
         public IEnumerable<string> GetEmbeddedObjects()
         {
-            var list = new List<string>();
+            List<string> list = [];
             foreach (var kvp in _manifest)
             {
                 // Embedded objects have media types starting with application/vnd.oasis.opendocument.*
                 // and full paths that represent folders (registered in manifest with '/' at end or as parents)
-                if (kvp.Key != "/" && kvp.Value.StartsWith("application/vnd.oasis.opendocument."))
+                if (kvp.Key != "/" && kvp.Value.StartsWith("application/vnd.oasis.opendocument.", StringComparison.Ordinal))
                 {
                     list.Add(kvp.Key);
                 }
@@ -1160,12 +1296,17 @@ namespace OdfKit.Core
             return list;
         }
 
+        /// <summary>
+        /// 擷取內嵌物件的主要內容 XML 資料流。
+        /// </summary>
+        /// <param name="objectName">內嵌物件的路徑名稱</param>
+        /// <returns>內嵌物件內容的資料流</returns>
         public Stream ExtractObjectStream(string objectName)
         {
-            // Object streams are embedded folders. We look for entries inside objectName/
-            // Usually, objects have content.xml, styles.xml, etc. inside their sub-paths.
-            // If the user requests the object itself, we throw or return a sub-package.
-            // For general embedding extraction, users can use GetEntryStream with objectName + "/content.xml".
+            // 內嵌物件資料流為資料夾結構。我們會在其路徑（如 objectName/）下尋找相關項目。
+            // 一般而言，內嵌物件在其子路徑下會包含 content.xml、styles.xml 等項目。
+            // 若使用者要求物件主體本身，則擲出例外狀況或傳回子封裝。
+            // 對於一般的內嵌擷取，使用者可透過 GetEntryStream 並搭配 objectName + "/content.xml" 來取得。
             string path = SanitizeEntryName(objectName);
             return GetEntryStream(path + "/content.xml");
         }
@@ -1174,6 +1315,9 @@ namespace OdfKit.Core
 
         #region Saving and Atomic Save
 
+        /// <summary>
+        /// 將所有變更儲存回原來的檔案或資料流中。
+        /// </summary>
         public void Save()
         {
             if (_mode == OdfPackageMode.Read)
@@ -1255,6 +1399,11 @@ namespace OdfKit.Core
             }
         }
 
+        /// <summary>
+        /// 將所有變更儲存回原來的檔案或資料流中（非同步）。
+        /// </summary>
+        /// <param name="cancellationToken">取消語彙</param>
+        /// <returns>代表非同步作業的工作</returns>
         public async Task SaveAsync(CancellationToken cancellationToken = default)
         {
             if (_mode == OdfPackageMode.Read)
@@ -1342,6 +1491,10 @@ namespace OdfKit.Core
             }
         }
 
+        /// <summary>
+        /// 將封裝序列化儲存至指定的目的地資料流。
+        /// </summary>
+        /// <param name="destinationStream">目標目的地資料流</param>
         public void SaveToStream(Stream destinationStream)
         {
             if (destinationStream == null) throw new ArgumentNullException(nameof(destinationStream));
@@ -1378,6 +1531,12 @@ namespace OdfKit.Core
             }
         }
 
+        /// <summary>
+        /// 將封裝序列化儲存至指定的目的地資料流（非同步）。
+        /// </summary>
+        /// <param name="destinationStream">目標目的地資料流</param>
+        /// <param name="cancellationToken">取消語彙</param>
+        /// <returns>代表非同步作業的工作</returns>
         public async Task SaveToStreamAsync(Stream destinationStream, CancellationToken cancellationToken = default)
         {
             if (destinationStream == null) throw new ArgumentNullException(nameof(destinationStream));
@@ -1968,12 +2127,19 @@ namespace OdfKit.Core
             }
         }
 
+        /// <summary>
+        /// 釋放 <see cref="OdfPackage"/> 類別所使用的資源。
+        /// </summary>
         public void Dispose()
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// 非同步釋放 <see cref="OdfPackage"/> 類別所使用的資源。
+        /// </summary>
+        /// <returns>代表非同步處置作業的 ValueTask</returns>
         public async ValueTask DisposeAsync()
         {
             if (!_isDisposed)
@@ -2194,4 +2360,3 @@ namespace OdfKit.Core
     }
 
     #endregion
-}

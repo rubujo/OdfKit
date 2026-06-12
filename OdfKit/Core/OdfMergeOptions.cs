@@ -1,49 +1,46 @@
-﻿#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 
-namespace OdfKit.Core
+namespace OdfKit.Core;
+
+/// <summary>
+/// 指定在附加或合併文件時，如何解決樣式名稱的衝突。
+/// </summary>
+public enum ConflictResolution
 {
     /// <summary>
-    /// Specifies how style name conflicts are resolved when appending or merging documents.
+    /// 衝突的來源文件樣式會被重新命名（例如 MyStyle_s1 ），並複製以保持來源文件格式的獨立性。
     /// </summary>
-    public enum ConflictResolution
-    {
-        /// <summary>
-        /// Conflicting styles from the source document are renamed (e.g. MyStyle_s1) 
-        /// and copied to keep the source document's formatting isolated.
-        /// </summary>
-        KeepSourceFormatting,
-
-        /// <summary>
-        /// Conflicting styles are discarded. Cloned source nodes will reference 
-        /// the destination's style directly, aligning with the destination's theme.
-        /// </summary>
-        UseDestinationStyles
-    }
+    KeepSourceFormatting,
 
     /// <summary>
-    /// Configuration options for merging or appending documents.
+    /// 捨棄衝突的樣式。複製的來源節點將直接參考目的地的樣式，以符合目的地的佈景主題。
     /// </summary>
-    public class OdfMergeOptions
-    {
-        /// <summary>
-        /// Gets or sets the style conflict resolution strategy.
-        /// </summary>
-        public ConflictResolution StyleConflictResolution { get; set; } = ConflictResolution.KeepSourceFormatting;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether referenced media/images should be copied and migrated.
-        /// </summary>
-        public bool CopyMedia { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether custom styles should be imported.
-        /// </summary>
-        public bool ImportStyles { get; set; } = true;
-
-        /// <summary>
-        /// Gets the default merge options configuration.
-        /// </summary>
-        public static OdfMergeOptions Default => new OdfMergeOptions();
-    }
+    UseDestinationStyles
 }
+
+/// <summary>
+/// 合併或附加文件時的組態選項。
+/// </summary>
+public class OdfMergeOptions
+{
+    /// <summary>
+    /// 取得或設定樣式衝突的解決策略。
+    /// </summary>
+    public ConflictResolution StyleConflictResolution { get; set; } = ConflictResolution.KeepSourceFormatting;
+
+    /// <summary>
+    /// 取得或設定一個值，指出是否應複製並遷移參考的媒體或圖片。
+    /// </summary>
+    public bool CopyMedia { get; set; } = true;
+
+    /// <summary>
+    /// 取得或設定一個值，指出是否應匯入自訂樣式。
+    /// </summary>
+    public bool ImportStyles { get; set; } = true;
+
+    /// <summary>
+    /// 取得預設的合併選項組態。
+    /// </summary>
+    public static OdfMergeOptions Default => new();
+}
+

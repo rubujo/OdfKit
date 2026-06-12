@@ -1,129 +1,126 @@
-#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 
-namespace OdfKit.Core
+namespace OdfKit.Core;
+
+/// <summary>
+/// XAdES 標準層級。
+/// </summary>
+public enum XadesLevel
 {
     /// <summary>
-    /// XAdES standard levels.
+    /// 不使用 XAdES 擴充的純 W3C XMLDSig 簽章。
     /// </summary>
-    public enum XadesLevel
-    {
-        /// <summary>
-        /// Plain W3C XMLDSig signature without XAdES extensions.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// XAdES Basic Electronic Signature (XAdES-BES).
-        /// </summary>
-        BES,
-
-        /// <summary>
-        /// XAdES with Timestamp (XAdES-T).
-        /// </summary>
-        T,
-
-        /// <summary>
-        /// XAdES Archive / Long Term Validation (XAdES-A).
-        /// </summary>
-        A
-    }
+    None,
 
     /// <summary>
-    /// Supported signature levels for ODF documents.
+    /// XAdES 基本電子簽章 (XAdES-BES)。
     /// </summary>
-    public enum OdfSignatureLevel
-    {
-        /// <summary>
-        /// Plain XMLDSig signature without XAdES extensions.
-        /// </summary>
-        None = 0,
-
-        /// <summary>
-        /// XAdES Basic Electronic Signature (XAdES-BES).
-        /// </summary>
-        XadesBes = 1,
-
-        /// <summary>
-        /// XAdES with Timestamp (XAdES-T).
-        /// </summary>
-        XadesT = 2,
-
-        /// <summary>
-        /// XAdES Archive / Long Term Validation (XAdES-A).
-        /// </summary>
-        XadesA = 3
-    }
+    BES,
 
     /// <summary>
-    /// Configuration options for signing and verifying ODF packages with Digital Signatures / XAdES.
+    /// 含時間戳記的 XAdES 簽章 (XAdES-T)。
     /// </summary>
-    public class OdfSigningOptions
-    {
-        /// <summary>
-        /// Gets or sets the signature level.
-        /// </summary>
-        public OdfSignatureLevel SignatureLevel { get; set; } = OdfSignatureLevel.None;
+    T,
 
-        /// <summary>
-        /// Gets or sets the XAdES standard level (None/XMLDSig, BES, T, A).
-        /// </summary>
-        public XadesLevel Level
+    /// <summary>
+    /// 封存/長期驗證 XAdES 簽章 (XAdES-A)。
+    /// </summary>
+    A
+}
+
+/// <summary>
+/// ODF 文件支援的簽章層級。
+/// </summary>
+public enum OdfSignatureLevel
+{
+    /// <summary>
+    /// 不使用 XAdES 擴充的純 XMLDSig 簽章。
+    /// </summary>
+    None = 0,
+
+    /// <summary>
+    /// XAdES 基本電子簽章 (XAdES-BES)。
+    /// </summary>
+    XadesBes = 1,
+
+    /// <summary>
+    /// 含時間戳記的 XAdES 簽章 (XAdES-T)。
+    /// </summary>
+    XadesT = 2,
+
+    /// <summary>
+    /// 封存/長期驗證 XAdES 簽章 (XAdES-A)。
+    /// </summary>
+    XadesA = 3
+}
+
+/// <summary>
+/// 用於以數位簽章/ XAdES 簽署與驗證 ODF 封裝的組態選項。
+/// </summary>
+public class OdfSigningOptions
+{
+    /// <summary>
+    /// 取得或設定簽章層級。
+    /// </summary>
+    public OdfSignatureLevel SignatureLevel { get; set; } = OdfSignatureLevel.None;
+
+    /// <summary>
+    /// 取得或設定 XAdES 標準層級（ None/XMLDSig, BES, T, A ）。
+    /// </summary>
+    public XadesLevel Level
+    {
+        get
         {
-            get
+            return SignatureLevel switch
             {
-                return SignatureLevel switch
-                {
-                    OdfSignatureLevel.None => XadesLevel.None,
-                    OdfSignatureLevel.XadesBes => XadesLevel.BES,
-                    OdfSignatureLevel.XadesT => XadesLevel.T,
-                    OdfSignatureLevel.XadesA => XadesLevel.A,
-                    _ => XadesLevel.None
-                };
-            }
-            set
-            {
-                SignatureLevel = value switch
-                {
-                    XadesLevel.None => OdfSignatureLevel.None,
-                    XadesLevel.BES => OdfSignatureLevel.XadesBes,
-                    XadesLevel.T => OdfSignatureLevel.XadesT,
-                    XadesLevel.A => OdfSignatureLevel.XadesA,
-                    _ => OdfSignatureLevel.None
-                };
-            }
+                OdfSignatureLevel.None => XadesLevel.None,
+                OdfSignatureLevel.XadesBes => XadesLevel.BES,
+                OdfSignatureLevel.XadesT => XadesLevel.T,
+                OdfSignatureLevel.XadesA => XadesLevel.A,
+                _ => XadesLevel.None
+            };
         }
-
-        /// <summary>
-        /// Gets or sets the RFC 3161 Time Stamping Authority (TSA) URL.
-        /// </summary>
-        public string? TsaUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether to check certificate revocation (via CRLs).
-        /// </summary>
-        public bool CheckRevocation { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets a custom HttpClient to be used for fetching CRLs and querying the TSA.
-        /// Useful for offline mock testing.
-        /// </summary>
-        public HttpClient? HttpClient { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether to allow an untrusted root certificate when validating signatures.
-        /// </summary>
-        public bool AllowUntrustedRoot { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets whether to allow an untrusted timestamp certificate when validating signatures.
-        /// </summary>
-        public bool AllowUntrustedTimestamp { get; set; } = false;
-
-        /// <summary>
-        /// Gets additional certificates to use when building signing or validation chains.
-        /// </summary>
-        public X509Certificate2Collection ExtraCertificates { get; } = new X509Certificate2Collection();
+        set
+        {
+            SignatureLevel = value switch
+            {
+                XadesLevel.None => OdfSignatureLevel.None,
+                XadesLevel.BES => OdfSignatureLevel.XadesBes,
+                XadesLevel.T => OdfSignatureLevel.XadesT,
+                XadesLevel.A => OdfSignatureLevel.XadesA,
+                _ => OdfSignatureLevel.None
+            };
+        }
     }
+
+    /// <summary>
+    /// 取得或設定 RFC 3161 時間戳記授權機構（TSA）的 URL 。
+    /// </summary>
+    public string? TsaUrl { get; set; }
+
+    /// <summary>
+    /// 取得或設定是否檢查憑證撤銷狀態（透過 CRL ）。
+    /// </summary>
+    public bool CheckRevocation { get; set; } = false;
+
+    /// <summary>
+    /// 取得或設定自訂的 HttpClient ，用於擷取 CRL 與查詢 TSA ；可用於離線模擬測試。
+    /// </summary>
+    public HttpClient? HttpClient { get; set; }
+
+    /// <summary>
+    /// 取得或設定在驗證簽章時，是否允許不受信任的根憑證。
+    /// </summary>
+    public bool AllowUntrustedRoot { get; set; } = false;
+
+    /// <summary>
+    /// 取得或設定在驗證簽章時，是否允許不受信任的時間戳記憑證。
+    /// </summary>
+    public bool AllowUntrustedTimestamp { get; set; } = false;
+
+    /// <summary>
+    /// 取得額外的憑證，用於建立簽署或驗證憑證鏈。
+    /// </summary>
+    public X509Certificate2Collection ExtraCertificates { get; } = new();
 }

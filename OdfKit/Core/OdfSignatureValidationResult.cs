@@ -1,88 +1,87 @@
-#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 
-namespace OdfKit.Core
+namespace OdfKit.Core;
+
+/// <summary>
+/// 表示 ODF 封裝中所有簽章的驗證結果。
+/// </summary>
+public class OdfSignatureValidationResult
 {
     /// <summary>
-    /// Represents the validation results for all signatures within an ODF package.
+    /// 取得或設定一個值，指出封裝中的所有簽章是否皆為有效。
     /// </summary>
-    public class OdfSignatureValidationResult
-    {
-        /// <summary>
-        /// Gets or sets whether all signatures in the package are valid.
-        /// </summary>
-        public bool IsValid { get; set; }
-
-        /// <summary>
-        /// Gets the collection of individual signature validation results.
-        /// </summary>
-        public List<OdfSingleSignatureValidationResult> Signatures { get; } = new List<OdfSingleSignatureValidationResult>();
-    }
+    public bool IsValid { get; set; }
 
     /// <summary>
-    /// Represents the detailed validation result of a single digital signature.
+    /// 取得個別簽章驗證結果的集合。
     /// </summary>
-    public class OdfSingleSignatureValidationResult
-    {
-        /// <summary>
-        /// Gets or sets the signature identifier if available.
-        /// </summary>
-        public string? SignatureId { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the XML cryptographic signature is valid.
-        /// </summary>
-        public bool IsSignatureValid { get; set; }
-
-        /// <summary>
-        /// Gets or sets the signing certificate.
-        /// </summary>
-        public X509Certificate2? Certificate { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the signing certificate is valid (e.g. not expired or not yet valid).
-        /// </summary>
-        public bool IsCertificateValid { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the certificate chain is valid.
-        /// </summary>
-        public bool IsChainValid { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the XAdES-T timestamp (if present) is cryptographically valid.
-        /// </summary>
-        public bool IsTimestampValid { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the revocation check (CRL/OCSP) succeeded and the certificate is not revoked.
-        /// </summary>
-        public bool IsRevocationValid { get; set; }
-
-        /// <summary>
-        /// Gets or sets any error or warning message encountered during validation.
-        /// </summary>
-        public string? ErrorMessage { get; set; }
-
-        /// <summary>
-        /// Gets or sets the diagnostic error code if validation failed.
-        /// </summary>
-        public string? ErrorCode { get; set; }
-
-        /// <summary>
-        /// Gets the warnings encountered during validation.
-        /// </summary>
-        public List<string> Warnings { get; } = new List<string>();
-
-        /// <summary>
-        /// Gets the ODF package references verified for this signature.
-        /// </summary>
-        public List<string> CheckedReferences { get; } = new List<string>();
-
-        /// <summary>
-        /// Gets the trace logs of validation steps executed.
-        /// </summary>
-        public List<string> ValidationSteps { get; } = new List<string>();
-    }
+    public List<OdfSingleSignatureValidationResult> Signatures { get; } = [];
 }
+
+/// <summary>
+/// 表示單一數位簽章的詳細驗證結果。
+/// </summary>
+public class OdfSingleSignatureValidationResult
+{
+    /// <summary>
+    /// 取得或設定簽章識別碼（若可用）。
+    /// </summary>
+    public string? SignatureId { get; set; }
+
+    /// <summary>
+    /// 取得或設定 XML 密碼學簽章是否有效。
+    /// </summary>
+    public bool IsSignatureValid { get; set; }
+
+    /// <summary>
+    /// 取得或設定簽署憑證。
+    /// </summary>
+    public X509Certificate2? Certificate { get; set; }
+
+    /// <summary>
+    /// 取得或設定簽署憑證是否有效（例如未過期且已生效）。
+    /// </summary>
+    public bool IsCertificateValid { get; set; }
+
+    /// <summary>
+    /// 取得或設定憑證鏈是否有效。
+    /// </summary>
+    public bool IsChainValid { get; set; }
+
+    /// <summary>
+    /// 取得或設定 XAdES-T 時間戳記（若存在）在密碼學上是否有效。
+    /// </summary>
+    public bool IsTimestampValid { get; set; }
+
+    /// <summary>
+    /// 取得或設定撤銷檢查（ CRL/OCSP ）是否成功且憑證未被撤銷。
+    /// </summary>
+    public bool IsRevocationValid { get; set; }
+
+    /// <summary>
+    /// 取得或設定驗證過程中遇到的任何錯誤或警告訊息。
+    /// </summary>
+    public string? ErrorMessage { get; set; }
+
+    /// <summary>
+    /// 取得或設定驗證失敗時的診斷錯誤碼。
+    /// </summary>
+    public string? ErrorCode { get; set; }
+
+    /// <summary>
+    /// 取得驗證過程中遇到的警告清單。
+    /// </summary>
+    public List<string> Warnings { get; } = [];
+
+    /// <summary>
+    /// 取得此簽章所驗證的 ODF 封裝參考項目清單。
+    /// </summary>
+    public List<string> CheckedReferences { get; } = [];
+
+    /// <summary>
+    /// 取得已執行驗證步驟的追蹤記錄。
+    /// </summary>
+    public List<string> ValidationSteps { get; } = [];
+}
+

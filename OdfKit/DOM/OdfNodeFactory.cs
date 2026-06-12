@@ -1,25 +1,30 @@
-#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using OdfKit.Core;
 
-namespace OdfKit.DOM
+namespace OdfKit.DOM;
+
+/// <summary>
+/// 根據限定名稱來具現化特定 <see cref="OdfElement"/> 子類別的工廠類別。
+/// </summary>
+public static partial class OdfNodeFactory
 {
     /// <summary>
-    /// Factory for instantiating specialized OdfElement subclasses based on qualified name.
+    /// 建立特定類型的 ODF 元素；如果無對應的特定類型，則建立通用的 <see cref="OdfElement"/>。
     /// </summary>
-    public static partial class OdfNodeFactory
+    /// <param name="localName">元素局部名稱</param>
+    /// <param name="namespaceUri">元素命名空間 URI</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <returns>所建立的 ODF 元素節點</returns>
+    public static OdfNode CreateElement(string localName, string namespaceUri, string? prefix = null)
     {
-        public static OdfNode CreateElement(string localName, string namespaceUri, string? prefix = null)
+        // 嘗試先使用結構定義驅動所產生的對應關係來產生元素
+        var generatedElement = CreateGeneratedElement(localName, namespaceUri, prefix);
+        if (generatedElement is not null)
         {
-            // Try generating the element using the schema-driven generated mapping first
-            var generatedElement = CreateGeneratedElement(localName, namespaceUri, prefix);
-            if (generatedElement != null)
-            {
-                return generatedElement;
-            }
-
-            // Fallback to generic OdfElement
-            return new OdfElement(localName, namespaceUri, prefix);
+            return generatedElement;
         }
+
+        // 後備使用通用的 OdfElement
+        return new OdfElement(localName, namespaceUri, prefix);
     }
 }

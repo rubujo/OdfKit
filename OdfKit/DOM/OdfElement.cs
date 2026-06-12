@@ -1,592 +1,744 @@
-#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.IO;
 using OdfKit.Core;
 using OdfKit.Compliance;
 
-namespace OdfKit.DOM
+namespace OdfKit.DOM;
+
+/// <summary>
+/// 所有專門類型 ODF 元素包裝器的基底類別。
+/// </summary>
+/// <param name="localName">元素局部名稱</param>
+/// <param name="namespaceUri">元素命名空間 URI</param>
+/// <param name="prefix">選用的命名空間前綴</param>
+public class OdfElement(string localName, string namespaceUri, string? prefix = null) 
+    : OdfNode(OdfNodeType.Element, localName, namespaceUri, prefix)
 {
     /// <summary>
-    /// Base class for all specialized typed ODF element wrappers.
+    /// 取得具有版本內容且結構定義說明的屬性值。
     /// </summary>
-    public class OdfElement : OdfNode
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="version">ODF 版本內容</param>
+    /// <returns>屬性值；如果找不到，則為 <see langword="null"/></returns>
+    public string? GetAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
-        public OdfElement(string localName, string namespaceUri, string? prefix = null)
-            : base(OdfNodeType.Element, localName, namespaceUri, prefix)
+        var attrDef = OdfSchemaRegistry.GetSchema(version).FindAttribute(namespaceUri, localName);
+        if (attrDef is null)
         {
+            OdfKitDiagnostics.Warn($"Attribute '{localName}' in namespace '{namespaceUri}' is not defined in ODF {version} schema.");
         }
-
-        /// <summary>
-        /// Gets a schema-defined attribute value with version context.
-        /// </summary>
-        public string? GetAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
-        {
-            var attrDef = OdfSchemaRegistry.GetSchema(version).FindAttribute(namespaceUri, localName);
-            if (attrDef == null)
-            {
-                OdfKitDiagnostics.Warn($"Attribute '{localName}' in namespace '{namespaceUri}' is not defined in ODF {version} schema.");
-            }
-            return GetAttribute(localName, namespaceUri);
-        }
-
-        /// <summary>
-        /// Sets a schema-defined attribute value with version context.
-        /// </summary>
-        public void SetAttributeValue(string localName, string namespaceUri, string value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
-        {
-            var attrDef = OdfSchemaRegistry.GetSchema(version).FindAttribute(namespaceUri, localName);
-            if (attrDef == null)
-            {
-                OdfKitDiagnostics.Warn($"Attribute '{localName}' in namespace '{namespaceUri}' is not defined in ODF {version} schema.");
-            }
-            SetAttribute(localName, namespaceUri, value, prefix);
-        }
-
-        /// <summary>
-        /// Clones the current element, returning a new typed element instance.
-        /// </summary>
-        public override OdfNode CloneNode(bool deep)
-        {
-            var clone = OdfNodeFactory.CreateElement(LocalName, NamespaceUri, Prefix);
-            foreach (var attr in Attributes)
-            {
-                clone.Attributes[attr.Key] = attr.Value;
-            }
-            if (deep)
-            {
-                foreach (var child in Children)
-                {
-                    clone.AppendChild(child.CloneNode(true));
-                }
-            }
-            return clone;
-        }
+        return GetAttribute(localName, namespaceUri);
     }
 
-    #region Text Wrappers
-
-    public partial class TextPElement : OdfElement
+    /// <summary>
+    /// 設定具有版本內容且結構定義說明的屬性值。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="value">屬性值</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <param name="version">ODF 版本內容</param>
+    public void SetAttributeValue(string localName, string namespaceUri, string value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        public TextPElement(string? prefix = null) : base("p", OdfNamespaces.Text, prefix) { }
-
-        public string? StyleName
+        var attrDef = OdfSchemaRegistry.GetSchema(version).FindAttribute(namespaceUri, localName);
+        if (attrDef is null)
         {
-            get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
-            set
+            OdfKitDiagnostics.Warn($"Attribute '{localName}' in namespace '{namespaceUri}' is not defined in ODF {version} schema.");
+        }
+        SetAttribute(localName, namespaceUri, value, prefix);
+    }
+
+    /// <summary>
+    /// 複製目前元素，傳回新的類型元素執行個體。
+    /// </summary>
+    /// <param name="deep">是否進行深層複製 (遞迴複製子節點)</param>
+    /// <returns>複製的新元素</returns>
+    public override OdfNode CloneNode(bool deep)
+    {
+        var clone = OdfNodeFactory.CreateElement(LocalName, NamespaceUri, Prefix);
+        foreach (var attr in Attributes)
+        {
+            clone.Attributes[attr.Key] = attr.Value;
+        }
+        if (deep)
+        {
+            foreach (var child in Children)
             {
-                if (value == null)
-                    RemoveAttribute("style-name", OdfNamespaces.Text);
-                else
-                    SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+                clone.AppendChild(child.CloneNode(true));
             }
         }
+        return clone;
     }
-
-    public partial class TextHElement : OdfElement
-    {
-        public TextHElement(string? prefix = null) : base("h", OdfNamespaces.Text, prefix) { }
-
-        public string? StyleName
-        {
-            get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("style-name", OdfNamespaces.Text);
-                else
-                    SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
-            }
-        }
-
-        public int OutlineLevel
-        {
-            get => int.TryParse(GetAttributeValue("outline-level", OdfNamespaces.Text, GetDocumentVersion()), out var level) ? level : 1;
-            set => SetAttributeValue("outline-level", OdfNamespaces.Text, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
-        }
-    }
-
-    public partial class TextSpanElement : OdfElement
-    {
-        public TextSpanElement(string? prefix = null) : base("span", OdfNamespaces.Text, prefix) { }
-
-        public string? StyleName
-        {
-            get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("style-name", OdfNamespaces.Text);
-                else
-                    SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class TextListElement : OdfElement
-    {
-        public TextListElement(string? prefix = null) : base("list", OdfNamespaces.Text, prefix) { }
-
-        public string? StyleName
-        {
-            get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("style-name", OdfNamespaces.Text);
-                else
-                    SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class TextListItemElement : OdfElement
-    {
-        public TextListItemElement(string? prefix = null) : base("list-item", OdfNamespaces.Text, prefix) { }
-    }
-
-    public partial class TextSectionElement : OdfElement
-    {
-        public TextSectionElement(string? prefix = null) : base("section", OdfNamespaces.Text, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Text, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Text);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
-            }
-        }
-
-        public string? StyleName
-        {
-            get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("style-name", OdfNamespaces.Text);
-                else
-                    SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class TextBookmarkElement : OdfElement
-    {
-        public TextBookmarkElement(string? prefix = null) : base("bookmark", OdfNamespaces.Text, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Text, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Text);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class TextNoteElement : OdfElement
-    {
-        public TextNoteElement(string? prefix = null) : base("note", OdfNamespaces.Text, prefix) { }
-
-        public string? NoteClass
-        {
-            get => GetAttributeValue("note-class", OdfNamespaces.Text, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("note-class", OdfNamespaces.Text);
-                else
-                    SetAttributeValue("note-class", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class OfficeAnnotationElement : OdfElement
-    {
-        public OfficeAnnotationElement(string? prefix = null) : base("annotation", OdfNamespaces.Office, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Office, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Office);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Office, value, OdfNamespaces.GetPrefix(OdfNamespaces.Office), GetDocumentVersion());
-            }
-        }
-    }
-
-    #endregion
-
-    #region Table Wrappers
-
-    public partial class TableTableElement : OdfElement
-    {
-        public TableTableElement(string? prefix = null) : base("table", OdfNamespaces.Table, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Table, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Table);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
-            }
-        }
-
-        public string? StyleName
-        {
-            get => GetAttributeValue("style-name", OdfNamespaces.Table, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("style-name", OdfNamespaces.Table);
-                else
-                    SetAttributeValue("style-name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class TableTableRowElement : OdfElement
-    {
-        public TableTableRowElement(string? prefix = null) : base("table-row", OdfNamespaces.Table, prefix) { }
-
-        public int NumberRowsRepeated
-        {
-            get => int.TryParse(GetAttributeValue("number-rows-repeated", OdfNamespaces.Table, GetDocumentVersion()), out var val) ? val : 1;
-            set => SetAttributeValue("number-rows-repeated", OdfNamespaces.Table, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
-        }
-    }
-
-    public partial class TableTableCellElement : OdfElement
-    {
-        public TableTableCellElement(string? prefix = null) : base("table-cell", OdfNamespaces.Table, prefix) { }
-
-        public int NumberColumnsRepeated
-        {
-            get => int.TryParse(GetAttributeValue("number-columns-repeated", OdfNamespaces.Table, GetDocumentVersion()), out var val) ? val : 1;
-            set => SetAttributeValue("number-columns-repeated", OdfNamespaces.Table, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
-        }
-
-        public string? ValueType
-        {
-            get => GetAttributeValue("value-type", OdfNamespaces.Office, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("value-type", OdfNamespaces.Office);
-                else
-                    SetAttributeValue("value-type", OdfNamespaces.Office, value, OdfNamespaces.GetPrefix(OdfNamespaces.Office), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class TableCoveredTableCellElement : OdfElement
-    {
-        public TableCoveredTableCellElement(string? prefix = null) : base("covered-table-cell", OdfNamespaces.Table, prefix) { }
-    }
-
-    public partial class TableNamedRangeElement : OdfElement
-    {
-        public TableNamedRangeElement(string? prefix = null) : base("named-range", OdfNamespaces.Table, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Table, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Table);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class TableDatabaseRangeElement : OdfElement
-    {
-        public TableDatabaseRangeElement(string? prefix = null) : base("database-range", OdfNamespaces.Table, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Table, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Table);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
-            }
-        }
-    }
-
-    #endregion
-
-    #region Draw Wrappers
-
-    public partial class DrawFrameElement : OdfElement
-    {
-        public DrawFrameElement(string? prefix = null) : base("frame", OdfNamespaces.Draw, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Draw, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Draw);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Draw, value, OdfNamespaces.GetPrefix(OdfNamespaces.Draw), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class DrawImageElement : OdfElement
-    {
-        public DrawImageElement(string? prefix = null) : base("image", OdfNamespaces.Draw, prefix) { }
-
-        public string? Href
-        {
-            get => GetAttributeValue("href", OdfNamespaces.XLink, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("href", OdfNamespaces.XLink);
-                else
-                    SetAttributeValue("href", OdfNamespaces.XLink, value, OdfNamespaces.GetPrefix(OdfNamespaces.XLink), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class DrawObjectElement : OdfElement
-    {
-        public DrawObjectElement(string? prefix = null) : base("object", OdfNamespaces.Draw, prefix) { }
-
-        public string? Href
-        {
-            get => GetAttributeValue("href", OdfNamespaces.XLink, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("href", OdfNamespaces.XLink);
-                else
-                    SetAttributeValue("href", OdfNamespaces.XLink, value, OdfNamespaces.GetPrefix(OdfNamespaces.XLink), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class DrawShapeElement : OdfElement
-    {
-        public DrawShapeElement(string shapeKind, string? prefix = null) : base(shapeKind, OdfNamespaces.Draw, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Draw, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Draw);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Draw, value, OdfNamespaces.GetPrefix(OdfNamespaces.Draw), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class DrawGroupElement : OdfElement
-    {
-        public DrawGroupElement(string? prefix = null) : base("g", OdfNamespaces.Draw, prefix) { }
-    }
-
-    public partial class DrawConnectorElement : OdfElement
-    {
-        public DrawConnectorElement(string? prefix = null) : base("connector", OdfNamespaces.Draw, prefix) { }
-    }
-
-    #endregion
-
-    #region Style Wrappers
-
-    public partial class StyleStyleElement : OdfElement
-    {
-        public StyleStyleElement(string? prefix = null) : base("style", OdfNamespaces.Style, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Style, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Style);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
-            }
-        }
-
-        public string? Family
-        {
-            get => GetAttributeValue("family", OdfNamespaces.Style, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("family", OdfNamespaces.Style);
-                else
-                    SetAttributeValue("family", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class StyleDefaultStyleElement : OdfElement
-    {
-        public StyleDefaultStyleElement(string? prefix = null) : base("default-style", OdfNamespaces.Style, prefix) { }
-
-        public string? Family
-        {
-            get => GetAttributeValue("family", OdfNamespaces.Style, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("family", OdfNamespaces.Style);
-                else
-                    SetAttributeValue("family", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class StyleMasterPageElement : OdfElement
-    {
-        public StyleMasterPageElement(string? prefix = null) : base("master-page", OdfNamespaces.Style, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Style, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Style);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class StylePageLayoutElement : OdfElement
-    {
-        public StylePageLayoutElement(string? prefix = null) : base("page-layout", OdfNamespaces.Style, prefix) { }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", OdfNamespaces.Style, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", OdfNamespaces.Style);
-                else
-                    SetAttributeValue("name", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class StyleTextPropertiesElement : OdfElement
-    {
-        public StyleTextPropertiesElement(string? prefix = null) : base("text-properties", OdfNamespaces.Style, prefix) { }
-    }
-
-    public partial class StyleParagraphPropertiesElement : OdfElement
-    {
-        public StyleParagraphPropertiesElement(string? prefix = null) : base("paragraph-properties", OdfNamespaces.Style, prefix) { }
-    }
-
-    #endregion
-
-    #region Office Wrappers
-
-    public partial class OfficeDocumentElement : OdfElement
-    {
-        public OfficeDocumentElement(string? prefix = null) : base("document", OdfNamespaces.Office, prefix) { }
-    }
-
-    public partial class OfficeDocumentContentElement : OdfElement
-    {
-        public OfficeDocumentContentElement(string? prefix = null) : base("document-content", OdfNamespaces.Office, prefix) { }
-    }
-
-    public partial class OfficeBodyElement : OdfElement
-    {
-        public OfficeBodyElement(string? prefix = null) : base("body", OdfNamespaces.Office, prefix) { }
-    }
-
-    public partial class OfficeTextElement : OdfElement
-    {
-        public OfficeTextElement(string? prefix = null) : base("text", OdfNamespaces.Office, prefix) { }
-    }
-
-    public partial class OfficeSpreadsheetElement : OdfElement
-    {
-        public OfficeSpreadsheetElement(string? prefix = null) : base("spreadsheet", OdfNamespaces.Office, prefix) { }
-    }
-
-    public partial class OfficePresentationElement : OdfElement
-    {
-        public OfficePresentationElement(string? prefix = null) : base("presentation", OdfNamespaces.Office, prefix) { }
-    }
-
-    public partial class OfficeDrawingElement : OdfElement
-    {
-        public OfficeDrawingElement(string? prefix = null) : base("drawing", OdfNamespaces.Office, prefix) { }
-    }
-
-    #endregion
-
-    #region Manifest Wrappers
-
-    public partial class ManifestManifestElement : OdfElement
-    {
-        public ManifestManifestElement(string? prefix = null) : base("manifest", OdfNamespaces.Manifest, prefix) { }
-    }
-
-    public partial class ManifestFileEntryElement : OdfElement
-    {
-        public ManifestFileEntryElement(string? prefix = null) : base("file-entry", OdfNamespaces.Manifest, prefix) { }
-
-        public string? FullPath
-        {
-            get => GetAttributeValue("full-path", OdfNamespaces.Manifest, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("full-path", OdfNamespaces.Manifest);
-                else
-                    SetAttributeValue("full-path", OdfNamespaces.Manifest, value, OdfNamespaces.GetPrefix(OdfNamespaces.Manifest), GetDocumentVersion());
-            }
-        }
-
-        public string? MediaType
-        {
-            get => GetAttributeValue("media-type", OdfNamespaces.Manifest, GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("media-type", OdfNamespaces.Manifest);
-                else
-                    SetAttributeValue("media-type", OdfNamespaces.Manifest, value, OdfNamespaces.GetPrefix(OdfNamespaces.Manifest), GetDocumentVersion());
-            }
-        }
-    }
-
-    public partial class ManifestEncryptionDataElement : OdfElement
-    {
-        public ManifestEncryptionDataElement(string? prefix = null) : base("encryption-data", OdfNamespaces.Manifest, prefix) { }
-    }
-
-    #endregion
 }
+
+#region Text Wrappers
+
+/// <summary>
+/// 表示 ODF 中的 text:p 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TextPElement(string? prefix = null) : OdfElement("p", OdfNamespaces.Text, prefix)
+{
+    /// <summary>
+    /// 取得或設定此段落的樣式名稱。
+    /// </summary>
+    public string? StyleName
+    {
+        get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("style-name", OdfNamespaces.Text);
+            else
+                SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 text:h 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TextHElement(string? prefix = null) : OdfElement("h", OdfNamespaces.Text, prefix)
+{
+    /// <summary>
+    /// 取得或設定此標題的樣式名稱。
+    /// </summary>
+    public string? StyleName
+    {
+        get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("style-name", OdfNamespaces.Text);
+            else
+                SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定此標題的大綱層級。
+    /// </summary>
+    public int OutlineLevel
+    {
+        get => int.TryParse(GetAttributeValue("outline-level", OdfNamespaces.Text, GetDocumentVersion()), out var level) ? level : 1;
+        set => SetAttributeValue("outline-level", OdfNamespaces.Text, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 text:span 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TextSpanElement(string? prefix = null) : OdfElement("span", OdfNamespaces.Text, prefix)
+{
+    /// <summary>
+    /// 取得或設定此文字區段的樣式名稱。
+    /// </summary>
+    public string? StyleName
+    {
+        get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("style-name", OdfNamespaces.Text);
+            else
+                SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 text:list 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TextListElement(string? prefix = null) : OdfElement("list", OdfNamespaces.Text, prefix)
+{
+    /// <summary>
+    /// 取得或設定此清單的樣式名稱。
+    /// </summary>
+    public string? StyleName
+    {
+        get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("style-name", OdfNamespaces.Text);
+            else
+                SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 text:list-item 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TextListItemElement(string? prefix = null) : OdfElement("list-item", OdfNamespaces.Text, prefix);
+
+/// <summary>
+/// 表示 ODF 中的 text:section 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TextSectionElement(string? prefix = null) : OdfElement("section", OdfNamespaces.Text, prefix)
+{
+    /// <summary>
+    /// 取得或設定此區段的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Text, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Text);
+            else
+                SetAttributeValue("name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定此區段的樣式名稱。
+    /// </summary>
+    public string? StyleName
+    {
+        get => GetAttributeValue("style-name", OdfNamespaces.Text, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("style-name", OdfNamespaces.Text);
+            else
+                SetAttributeValue("style-name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 text:bookmark 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TextBookmarkElement(string? prefix = null) : OdfElement("bookmark", OdfNamespaces.Text, prefix)
+{
+    /// <summary>
+    /// 取得或設定此書籤的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Text, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Text);
+            else
+                SetAttributeValue("name", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 text:note 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TextNoteElement(string? prefix = null) : OdfElement("note", OdfNamespaces.Text, prefix)
+{
+    /// <summary>
+    /// 取得或設定此註腳或章節附註的類別。
+    /// </summary>
+    public string? NoteClass
+    {
+        get => GetAttributeValue("note-class", OdfNamespaces.Text, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("note-class", OdfNamespaces.Text);
+            else
+                SetAttributeValue("note-class", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 office:annotation 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class OfficeAnnotationElement(string? prefix = null) : OdfElement("annotation", OdfNamespaces.Office, prefix)
+{
+    /// <summary>
+    /// 取得或設定此註解的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Office, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Office);
+            else
+                SetAttributeValue("name", OdfNamespaces.Office, value, OdfNamespaces.GetPrefix(OdfNamespaces.Office), GetDocumentVersion());
+        }
+    }
+}
+
+#endregion
+
+#region Table Wrappers
+
+/// <summary>
+/// 表示 ODF 中的 table:table 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TableTableElement(string? prefix = null) : OdfElement("table", OdfNamespaces.Table, prefix)
+{
+    /// <summary>
+    /// 取得或設定此表格的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Table, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Table);
+            else
+                SetAttributeValue("name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定此表格的樣式名稱。
+    /// </summary>
+    public string? StyleName
+    {
+        get => GetAttributeValue("style-name", OdfNamespaces.Table, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("style-name", OdfNamespaces.Table);
+            else
+                SetAttributeValue("style-name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 table:table-row 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TableTableRowElement(string? prefix = null) : OdfElement("table-row", OdfNamespaces.Table, prefix)
+{
+    /// <summary>
+    /// 取得或設定此表格列的重複次數。
+    /// </summary>
+    public int NumberRowsRepeated
+    {
+        get => int.TryParse(GetAttributeValue("number-rows-repeated", OdfNamespaces.Table, GetDocumentVersion()), out var val) ? val : 1;
+        set => SetAttributeValue("number-rows-repeated", OdfNamespaces.Table, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 table:table-cell 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TableTableCellElement(string? prefix = null) : OdfElement("table-cell", OdfNamespaces.Table, prefix)
+{
+    /// <summary>
+    /// 取得或設定此表格儲存格的重複次數。
+    /// </summary>
+    public int NumberColumnsRepeated
+    {
+        get => int.TryParse(GetAttributeValue("number-columns-repeated", OdfNamespaces.Table, GetDocumentVersion()), out var val) ? val : 1;
+        set => SetAttributeValue("number-columns-repeated", OdfNamespaces.Table, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+    }
+
+    /// <summary>
+    /// 取得或設定此表格儲存格的值類型。
+    /// </summary>
+    public string? ValueType
+    {
+        get => GetAttributeValue("value-type", OdfNamespaces.Office, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("value-type", OdfNamespaces.Office);
+            else
+                SetAttributeValue("value-type", OdfNamespaces.Office, value, OdfNamespaces.GetPrefix(OdfNamespaces.Office), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 table:covered-table-cell 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TableCoveredTableCellElement(string? prefix = null) : OdfElement("covered-table-cell", OdfNamespaces.Table, prefix);
+
+/// <summary>
+/// 表示 ODF 中的 table:named-range 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TableNamedRangeElement(string? prefix = null) : OdfElement("named-range", OdfNamespaces.Table, prefix)
+{
+    /// <summary>
+    /// 取得或設定此具名範圍的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Table, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Table);
+            else
+                SetAttributeValue("name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 table:database-range 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class TableDatabaseRangeElement(string? prefix = null) : OdfElement("database-range", OdfNamespaces.Table, prefix)
+{
+    /// <summary>
+    /// 取得或設定此資料庫範圍的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Table, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Table);
+            else
+                SetAttributeValue("name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+        }
+    }
+}
+
+#endregion
+
+#region Draw Wrappers
+
+/// <summary>
+/// 表示 ODF 中的 draw:frame 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class DrawFrameElement(string? prefix = null) : OdfElement("frame", OdfNamespaces.Draw, prefix)
+{
+    /// <summary>
+    /// 取得或設定此框架的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Draw, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Draw);
+            else
+                SetAttributeValue("name", OdfNamespaces.Draw, value, OdfNamespaces.GetPrefix(OdfNamespaces.Draw), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 draw:image 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class DrawImageElement(string? prefix = null) : OdfElement("image", OdfNamespaces.Draw, prefix)
+{
+    /// <summary>
+    /// 取得或設定影像的超連結 URL。
+    /// </summary>
+    public string? Href
+    {
+        get => GetAttributeValue("href", OdfNamespaces.XLink, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("href", OdfNamespaces.XLink);
+            else
+                SetAttributeValue("href", OdfNamespaces.XLink, value, OdfNamespaces.GetPrefix(OdfNamespaces.XLink), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 draw:object 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class DrawObjectElement(string? prefix = null) : OdfElement("object", OdfNamespaces.Draw, prefix)
+{
+    /// <summary>
+    /// 取得或設定內嵌物件的超連結 URL。
+    /// </summary>
+    public string? Href
+    {
+        get => GetAttributeValue("href", OdfNamespaces.XLink, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("href", OdfNamespaces.XLink);
+            else
+                SetAttributeValue("href", OdfNamespaces.XLink, value, OdfNamespaces.GetPrefix(OdfNamespaces.XLink), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的繪圖形狀元素。
+/// </summary>
+/// <param name="shapeKind">形狀種類</param>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class DrawShapeElement(string shapeKind, string? prefix = null) : OdfElement(shapeKind, OdfNamespaces.Draw, prefix)
+{
+    /// <summary>
+    /// 取得或設定此形狀的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Draw, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Draw);
+            else
+                SetAttributeValue("name", OdfNamespaces.Draw, value, OdfNamespaces.GetPrefix(OdfNamespaces.Draw), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 draw:g 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class DrawGroupElement(string? prefix = null) : OdfElement("g", OdfNamespaces.Draw, prefix);
+
+/// <summary>
+/// 表示 ODF 中的 draw:connector 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class DrawConnectorElement(string? prefix = null) : OdfElement("connector", OdfNamespaces.Draw, prefix);
+
+#endregion
+
+#region Style Wrappers
+
+/// <summary>
+/// 表示 ODF 中的 style:style 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class StyleStyleElement(string? prefix = null) : OdfElement("style", OdfNamespaces.Style, prefix)
+{
+    /// <summary>
+    /// 取得或設定此樣式的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Style, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Style);
+            else
+                SetAttributeValue("name", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定此樣式的家族類型。
+    /// </summary>
+    public string? Family
+    {
+        get => GetAttributeValue("family", OdfNamespaces.Style, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("family", OdfNamespaces.Style);
+            else
+                SetAttributeValue("family", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 style:default-style 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class StyleDefaultStyleElement(string? prefix = null) : OdfElement("default-style", OdfNamespaces.Style, prefix)
+{
+    /// <summary>
+    /// 取得或設定此預設樣式的家族類型。
+    /// </summary>
+    public string? Family
+    {
+        get => GetAttributeValue("family", OdfNamespaces.Style, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("family", OdfNamespaces.Style);
+            else
+                SetAttributeValue("family", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 style:master-page 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class StyleMasterPageElement(string? prefix = null) : OdfElement("master-page", OdfNamespaces.Style, prefix)
+{
+    /// <summary>
+    /// 取得或設定此母片頁面的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Style, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Style);
+            else
+                SetAttributeValue("name", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 style:page-layout 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class StylePageLayoutElement(string? prefix = null) : OdfElement("page-layout", OdfNamespaces.Style, prefix)
+{
+    /// <summary>
+    /// 取得或設定此頁面版面配置的名稱。
+    /// </summary>
+    public string? Name
+    {
+        get => GetAttributeValue("name", OdfNamespaces.Style, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("name", OdfNamespaces.Style);
+            else
+                SetAttributeValue("name", OdfNamespaces.Style, value, OdfNamespaces.GetPrefix(OdfNamespaces.Style), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 中的 style:text-properties 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class StyleTextPropertiesElement(string? prefix = null) : OdfElement("text-properties", OdfNamespaces.Style, prefix);
+
+/// <summary>
+/// 表示 ODF 中的 style:paragraph-properties 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class StyleParagraphPropertiesElement(string? prefix = null) : OdfElement("paragraph-properties", OdfNamespaces.Style, prefix);
+
+#endregion
+
+#region Office Wrappers
+
+/// <summary>
+/// 表示 ODF 中的 office:document 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class OfficeDocumentElement(string? prefix = null) : OdfElement("document", OdfNamespaces.Office, prefix);
+
+/// <summary>
+/// 表示 ODF 中的 office:document-content 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class OfficeDocumentContentElement(string? prefix = null) : OdfElement("document-content", OdfNamespaces.Office, prefix);
+
+/// <summary>
+/// 表示 ODF 中的 office:body 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class OfficeBodyElement(string? prefix = null) : OdfElement("body", OdfNamespaces.Office, prefix);
+
+/// <summary>
+/// 表示 ODF 中的 office:text 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class OfficeTextElement(string? prefix = null) : OdfElement("text", OdfNamespaces.Office, prefix);
+
+/// <summary>
+/// 表示 ODF 中的 office:spreadsheet 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class OfficeSpreadsheetElement(string? prefix = null) : OdfElement("spreadsheet", OdfNamespaces.Office, prefix);
+
+/// <summary>
+/// 表示 ODF 中的 office:presentation 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class OfficePresentationElement(string? prefix = null) : OdfElement("presentation", OdfNamespaces.Office, prefix);
+
+/// <summary>
+/// 表示 ODF 中的 office:drawing 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class OfficeDrawingElement(string? prefix = null) : OdfElement("drawing", OdfNamespaces.Office, prefix);
+
+#endregion
+
+#region Manifest Wrappers
+
+/// <summary>
+/// 表示 ODF 資訊清單中的 manifest:manifest 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class ManifestManifestElement(string? prefix = null) : OdfElement("manifest", OdfNamespaces.Manifest, prefix);
+
+/// <summary>
+/// 表示 ODF 資訊清單中的 manifest:file-entry 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class ManifestFileEntryElement(string? prefix = null) : OdfElement("file-entry", OdfNamespaces.Manifest, prefix)
+{
+    /// <summary>
+    /// 取得或設定檔案項目在套件中的完整路徑。
+    /// </summary>
+    public string? FullPath
+    {
+        get => GetAttributeValue("full-path", OdfNamespaces.Manifest, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("full-path", OdfNamespaces.Manifest);
+            else
+                SetAttributeValue("full-path", OdfNamespaces.Manifest, value, OdfNamespaces.GetPrefix(OdfNamespaces.Manifest), GetDocumentVersion());
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定檔案項目的媒體類型。
+    /// </summary>
+    public string? MediaType
+    {
+        get => GetAttributeValue("media-type", OdfNamespaces.Manifest, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("media-type", OdfNamespaces.Manifest);
+            else
+                SetAttributeValue("media-type", OdfNamespaces.Manifest, value, OdfNamespaces.GetPrefix(OdfNamespaces.Manifest), GetDocumentVersion());
+        }
+    }
+}
+
+/// <summary>
+/// 表示 ODF 資訊清單中的 manifest:encryption-data 元素。
+/// </summary>
+/// <param name="prefix">選用的命名空間前綴</param>
+public partial class ManifestEncryptionDataElement(string? prefix = null) : OdfElement("encryption-data", OdfNamespaces.Manifest, prefix);
+
+#endregion

@@ -1,165 +1,273 @@
-﻿#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.Collections.Generic;
 using System.Text;
 using OdfKit.Spreadsheet;
 
-namespace OdfKit.Formula
+namespace OdfKit.Formula;
+
+/// <summary>
+/// 代表公式語彙基元的型別。
+/// </summary>
+public enum TokenType
 {
-    public enum TokenType
-    {
-        Identifier,
-        CellReference,
-        StringLiteral,
-        Number,
-        Operator,
-        Separator, // ',' or ';'
-        OpenParenthesis,
-        CloseParenthesis,
-        OpenBrace,
-        CloseBrace,
-        Whitespace,
-        Unknown
-    }
+    /// <summary>
+    /// 識別碼，例如函式名稱、具名範圍。
+    /// </summary>
+    Identifier,
 
-    public class FormulaToken
-    {
-        public TokenType Type { get; }
-        public string Value { get; }
-        public int StartIndex { get; }
+    /// <summary>
+    /// 儲存格參照。
+    /// </summary>
+    CellReference,
 
-        public FormulaToken(TokenType type, string value, int startIndex)
+    /// <summary>
+    /// 字串常值。
+    /// </summary>
+    StringLiteral,
+
+    /// <summary>
+    /// 數字。
+    /// </summary>
+    Number,
+
+    /// <summary>
+    /// 運算子。
+    /// </summary>
+    Operator,
+
+    /// <summary>
+    /// 分隔符號，即 「,」 或 「;」。
+    /// </summary>
+    Separator,
+
+    /// <summary>
+    /// 左括號。
+    /// </summary>
+    OpenParenthesis,
+
+    /// <summary>
+    /// 右括號。
+    /// </summary>
+    CloseParenthesis,
+
+    /// <summary>
+    /// 左大括號。
+    /// </summary>
+    OpenBrace,
+
+    /// <summary>
+    /// 右大括號。
+    /// </summary>
+    CloseBrace,
+
+    /// <summary>
+    /// 空白字元。
+    /// </summary>
+    Whitespace,
+
+    /// <summary>
+    /// 未知型別。
+    /// </summary>
+    Unknown
+}
+
+/// <summary>
+/// 代表公式中的一個語彙基元。
+/// </summary>
+/// <param name="type">語彙基元型別</param>
+/// <param name="value">語彙基元內容</param>
+/// <param name="startIndex">起始索引位置</param>
+public class FormulaToken(TokenType type, string value, int startIndex)
+{
+    /// <summary>
+    /// 取得語彙基元的型別。
+    /// </summary>
+    public TokenType Type { get; } = type;
+
+    /// <summary>
+    /// 取得語彙基元的字串值。
+    /// </summary>
+    public string Value { get; } = value;
+
+    /// <summary>
+    /// 取得語彙基元在原始公式字串中的起始索引。
+    /// </summary>
+    public int StartIndex { get; } = startIndex;
+}
+
+/// <summary>
+/// 提供 ODF 與 Excel 公式格式之間的轉換與偏移工具。
+/// </summary>
+public static class OdfFormulaTranslator
+{
+    /// <summary>
+    /// 將公式字串分割為語彙基元清單。
+    /// </summary>
+    /// <param name="formula">公式字串</param>
+    /// <returns>語彙基元清單</returns>
+    public static List<FormulaToken> Tokenize(string formula)
+    {
+        List<FormulaToken> tokens = [];
+        int i = 0;
+        int length = formula.Length;
+
+        while (i < length)
         {
-            Type = type;
-            Value = value;
-            StartIndex = startIndex;
-        }
-    }
+            char c = formula[i];
 
-    public static class OdfFormulaTranslator
-    {
-        public static List<FormulaToken> Tokenize(string formula)
-        {
-            var tokens = new List<FormulaToken>();
-            int i = 0;
-            int length = formula.Length;
-
-            while (i < length)
+            if (char.IsWhiteSpace(c))
             {
-                char c = formula[i];
-
-                if (char.IsWhiteSpace(c))
-                {
-                    int start = i;
-                    while (i < length && char.IsWhiteSpace(formula[i])) i++;
-                    tokens.Add(new FormulaToken(TokenType.Whitespace, formula.Substring(start, i - start), start));
-                    continue;
-                }
-
-                if (c == '"')
-                {
-                    int start = i++;
-                    while (i < length)
-                    {
-                        if (formula[i] == '"')
-                        {
-                            if (i + 1 < length && formula[i + 1] == '"') i += 2; // Escaped ""
-                            else { i++; break; }
-                        }
-                        else i++;
-                    }
-                    tokens.Add(new FormulaToken(TokenType.StringLiteral, formula.Substring(start, i - start), start));
-                    continue;
-                }
-
-                // ODF Bracketed Cell Reference
-                if (c == '[')
-                {
-                    int start = i++;
-                    int bracketCount = 1;
-                    while (i < length && bracketCount > 0)
-                    {
-                        if (formula[i] == '[') bracketCount++;
-                        else if (formula[i] == ']') bracketCount--;
-                        i++;
-                    }
-                    tokens.Add(new FormulaToken(TokenType.CellReference, formula.Substring(start, i - start), start));
-                    continue;
-                }
-
-                if (c == ',' || c == ';')
-                {
-                    tokens.Add(new FormulaToken(TokenType.Separator, c.ToString(), i++));
-                    continue;
-                }
-
-                if (c == '(') { tokens.Add(new FormulaToken(TokenType.OpenParenthesis, "(", i++)); continue; }
-                if (c == ')') { tokens.Add(new FormulaToken(TokenType.CloseParenthesis, ")", i++)); continue; }
-                if (c == '{') { tokens.Add(new FormulaToken(TokenType.OpenBrace, "{", i++)); continue; }
-                if (c == '}') { tokens.Add(new FormulaToken(TokenType.CloseBrace, "}", i++)); continue; }
-
-                if (c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '&' || c == '=')
-                {
-                    tokens.Add(new FormulaToken(TokenType.Operator, c.ToString(), i++));
-                    continue;
-                }
-
-                if (c == '<' || c == '>')
-                {
-                    int start = i++;
-                    if (i < length)
-                    {
-                        char next = formula[i];
-                        if ((c == '<' && (next == '>' || next == '=')) || (c == '>' && next == '=')) i++;
-                    }
-                    tokens.Add(new FormulaToken(TokenType.Operator, formula.Substring(start, i - start), start));
-                    continue;
-                }
-
-                if (char.IsDigit(c) || (c == '.' && i + 1 < length && char.IsDigit(formula[i + 1])))
-                {
-                    int start = i++;
-                    bool hasDecimal = (c == '.');
-                    while (i < length)
-                    {
-                        char next = formula[i];
-                        if (char.IsDigit(next)) i++;
-                        else if (next == '.' && !hasDecimal) { hasDecimal = true; i++; }
-                        else break;
-                    }
-                    tokens.Add(new FormulaToken(TokenType.Number, formula.Substring(start, i - start), start));
-                    continue;
-                }
-
-                if (char.IsLetter(c) || c == '_' || c == '\'' || c == '$')
-                {
-                    int start = i;
-                    if (TryScanExcelReference(formula, start, out int consumed))
-                    {
-                        tokens.Add(new FormulaToken(TokenType.CellReference, formula.Substring(start, consumed), start));
-                        i += consumed;
-                    }
-                    else
-                    {
-                        while (i < length && (char.IsLetterOrDigit(formula[i]) || formula[i] == '_')) i++;
-                        tokens.Add(new FormulaToken(TokenType.Identifier, formula.Substring(start, i - start), start));
-                    }
-                    continue;
-                }
-
-                tokens.Add(new FormulaToken(TokenType.Unknown, c.ToString(), i++));
+                int start = i;
+                while (i < length && char.IsWhiteSpace(formula[i])) i++;
+                tokens.Add(new(TokenType.Whitespace, formula.Substring(start, i - start), start));
+                continue;
             }
-            return tokens;
+
+            if (c == '"')
+            {
+                int start = i++;
+                while (i < length)
+                {
+                    if (formula[i] == '"')
+                    {
+                        if (i + 1 < length && formula[i + 1] == '"') i += 2; // 逸出引號 ""
+                        else { i++; break; }
+                    }
+                    else i++;
+                }
+                tokens.Add(new(TokenType.StringLiteral, formula.Substring(start, i - start), start));
+                continue;
+            }
+
+            // ODF 括號儲存格參照
+            if (c == '[')
+            {
+                int start = i++;
+                int bracketCount = 1;
+                while (i < length && bracketCount > 0)
+                {
+                    if (formula[i] == '[') bracketCount++;
+                    else if (formula[i] == ']') bracketCount--;
+                    i++;
+                }
+                tokens.Add(new(TokenType.CellReference, formula.Substring(start, i - start), start));
+                continue;
+            }
+
+            if (c == ',' || c == ';')
+            {
+                tokens.Add(new(TokenType.Separator, c.ToString(), i++));
+                continue;
+            }
+
+            if (c == '(') { tokens.Add(new(TokenType.OpenParenthesis, "(", i++)); continue; }
+            if (c == ')') { tokens.Add(new(TokenType.CloseParenthesis, ")", i++)); continue; }
+            if (c == '{') { tokens.Add(new(TokenType.OpenBrace, "{", i++)); continue; }
+            if (c == '}') { tokens.Add(new(TokenType.CloseBrace, "}", i++)); continue; }
+
+            if (c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '&' || c == '=')
+            {
+                tokens.Add(new(TokenType.Operator, c.ToString(), i++));
+                continue;
+            }
+
+            if (c == '<' || c == '>')
+            {
+                int start = i++;
+                if (i < length)
+                {
+                    char next = formula[i];
+                    if ((c == '<' && (next == '>' || next == '=')) || (c == '>' && next == '=')) i++;
+                }
+                tokens.Add(new(TokenType.Operator, formula.Substring(start, i - start), start));
+                continue;
+            }
+
+            if (char.IsDigit(c) || (c == '.' && i + 1 < length && char.IsDigit(formula[i + 1])))
+            {
+                int start = i++;
+                bool hasDecimal = (c == '.');
+                while (i < length)
+                {
+                    char next = formula[i];
+                    if (char.IsDigit(next)) i++;
+                    else if (next == '.' && !hasDecimal) { hasDecimal = true; i++; }
+                    else break;
+                }
+                tokens.Add(new(TokenType.Number, formula.Substring(start, i - start), start));
+                continue;
+            }
+
+            if (char.IsLetter(c) || c == '_' || c == '\'' || c == '$')
+            {
+                int start = i;
+                if (TryScanExcelReference(formula, start, out int consumed))
+                {
+                    tokens.Add(new(TokenType.CellReference, formula.Substring(start, consumed), start));
+                    i += consumed;
+                }
+                else
+                {
+                    while (i < length && (char.IsLetterOrDigit(formula[i]) || formula[i] == '_')) i++;
+                    tokens.Add(new(TokenType.Identifier, formula.Substring(start, i - start), start));
+                }
+                continue;
+            }
+
+            tokens.Add(new(TokenType.Unknown, c.ToString(), i++));
+        }
+        return tokens;
+    }
+
+    private static bool TryScanExcelReference(string formula, int start, out int consumed)
+    {
+        consumed = 0;
+        int i = start;
+        int length = formula.Length;
+
+        // 選擇性工作表名稱
+        int sheetEnd = -1;
+        if (i < length && formula[i] == '\'')
+        {
+            int temp = i + 1;
+            while (temp < length)
+            {
+                if (formula[temp] == '\'')
+                {
+                    if (temp + 1 < length && formula[temp + 1] == '\'') temp += 2;
+                    else { temp++; break; }
+                }
+                else temp++;
+            }
+            if (temp < length && formula[temp] == '!') sheetEnd = temp + 1;
+        }
+        else
+        {
+            int temp = i;
+            while (temp < length && (char.IsLetterOrDigit(formula[temp]) || formula[temp] == '_' || formula[temp] == '$')) temp++;
+            if (temp < length && formula[temp] == '!') sheetEnd = temp + 1;
         }
 
-        private static bool TryScanExcelReference(string formula, int start, out int consumed)
-        {
-            consumed = 0;
-            int i = start;
-            int length = formula.Length;
+        if (sheetEnd != -1) i = sheetEnd;
 
-            // Optional Sheet name
-            int sheetEnd = -1;
+        // 處理欄範圍 (A:B) 或列範圍 (1:10)
+        int rangeStart = i;
+        if (ScanColumnRange(formula, ref i) || ScanRowRange(formula, ref i))
+        {
+            consumed = i - start;
+            return true;
+        }
+        i = rangeStart; // 回滾
+
+        // 處理標準儲存格 (A1) 或儲存格範圍 (A1:B10)
+        if (!ScanCellCoordinate(formula, ref i)) return false;
+
+        if (i < length && formula[i] == ':')
+        {
+            int sepIndex = i++;
+            
+            // 選擇性第二個工作表前綴
+            int sheetEnd2 = -1;
             if (i < length && formula[i] == '\'')
             {
                 int temp = i + 1;
@@ -172,338 +280,313 @@ namespace OdfKit.Formula
                     }
                     else temp++;
                 }
-                if (temp < length && formula[temp] == '!') sheetEnd = temp + 1;
+                if (temp < length && formula[temp] == '!') sheetEnd2 = temp + 1;
             }
             else
             {
                 int temp = i;
                 while (temp < length && (char.IsLetterOrDigit(formula[temp]) || formula[temp] == '_' || formula[temp] == '$')) temp++;
-                if (temp < length && formula[temp] == '!') sheetEnd = temp + 1;
+                if (temp < length && formula[temp] == '!') sheetEnd2 = temp + 1;
             }
 
-            if (sheetEnd != -1) i = sheetEnd;
+            if (sheetEnd2 != -1) i = sheetEnd2;
 
-            // Handle Column ranges (A:B) or Row ranges (1:10)
-            int rangeStart = i;
-            if (ScanColumnRange(formula, ref i) || ScanRowRange(formula, ref i))
+            if (!ScanCellCoordinate(formula, ref i))
             {
-                consumed = i - start;
-                return true;
+                i = sepIndex; // 回滾至第一個座標
             }
-            i = rangeStart; // rollback
+        }
 
-            // Handle standard Cell (A1) or Cell Range (A1:B10)
-            if (!ScanCellCoordinate(formula, ref i)) return false;
+        consumed = i - start;
+        return true;
+    }
 
-            if (i < length && formula[i] == ':')
+    private static bool ScanColumnRange(string formula, ref int i)
+    {
+        int start = i;
+        int length = formula.Length;
+        if (i < length && formula[i] == '$') i++;
+        int colStart = i;
+        while (i < length && char.IsLetter(formula[i])) i++;
+        if (i == colStart || i >= length || formula[i] != ':') { i = start; return false; }
+        i++; // 跳過 ':'
+        if (i < length && formula[i] == '$') i++;
+        colStart = i;
+        while (i < length && char.IsLetter(formula[i])) i++;
+        if (i == colStart) { i = start; return false; }
+        return true;
+    }
+
+    private static bool ScanRowRange(string formula, ref int i)
+    {
+        int start = i;
+        int length = formula.Length;
+        if (i < length && formula[i] == '$') i++;
+        int rowStart = i;
+        while (i < length && char.IsDigit(formula[i])) i++;
+        if (i == rowStart || i >= length || formula[i] != ':') { i = start; return false; }
+        i++; // 跳過 ':'
+        if (i < length && formula[i] == '$') i++;
+        rowStart = i;
+        while (i < length && char.IsDigit(formula[i])) i++;
+        if (i == rowStart) { i = start; return false; }
+        return true;
+    }
+
+    private static bool ScanCellCoordinate(string formula, ref int i)
+    {
+        int start = i;
+        int length = formula.Length;
+        if (i < length && formula[i] == '$') i++;
+        int colStart = i;
+        while (i < length && char.IsLetter(formula[i])) i++;
+        if (i == colStart) { i = start; return false; }
+        int colLen = i - colStart;
+        if (colLen > 3) { i = start; return false; }
+
+        if (i < length && formula[i] == '$') i++;
+        int rowStart = i;
+        while (i < length && char.IsDigit(formula[i])) i++;
+        if (i == rowStart) { i = start; return false; }
+
+        // 確保座標後的下一個字元不是識別碼字元
+        if (i < length && (char.IsLetterOrDigit(formula[i]) || formula[i] == '_'))
+        {
+            i = start;
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 將 Excel 樣式的公式轉換為 ODF 樣式的公式。
+    /// </summary>
+    /// <param name="excelFormula">Excel 樣式的公式字串</param>
+    /// <returns>ODF 樣式的公式字串</returns>
+    public static string ExcelToOdfFormula(string excelFormula)
+    {
+        if (string.IsNullOrEmpty(excelFormula)) return excelFormula;
+
+        string inner = excelFormula;
+        if (excelFormula.StartsWith("=")) inner = excelFormula.Substring(1);
+
+        var tokens = Tokenize(inner);
+        StringBuilder sb = new("oooc:=");
+
+        for (int idx = 0; idx < tokens.Count; idx++)
+        {
+            var token = tokens[idx];
+            switch (token.Type)
             {
-                int sepIndex = i++;
-                
-                // Optional second sheet prefix
-                int sheetEnd2 = -1;
-                if (i < length && formula[i] == '\'')
-                {
-                    int temp = i + 1;
-                    while (temp < length)
-                    {
-                        if (formula[temp] == '\'')
-                        {
-                            if (temp + 1 < length && formula[temp + 1] == '\'') temp += 2;
-                            else { temp++; break; }
-                        }
-                        else temp++;
-                    }
-                    if (temp < length && formula[temp] == '!') sheetEnd2 = temp + 1;
-                }
-                else
-                {
-                    int temp = i;
-                    while (temp < length && (char.IsLetterOrDigit(formula[temp]) || formula[temp] == '_' || formula[temp] == '$')) temp++;
-                    if (temp < length && formula[temp] == '!') sheetEnd2 = temp + 1;
-                }
-
-                if (sheetEnd2 != -1) i = sheetEnd2;
-
-                if (!ScanCellCoordinate(formula, ref i))
-                {
-                    i = sepIndex; // rollback to first coordinate
-                }
-            }
-
-            consumed = i - start;
-            return true;
-        }
-
-        private static bool ScanColumnRange(string formula, ref int i)
-        {
-            int start = i;
-            int length = formula.Length;
-            if (i < length && formula[i] == '$') i++;
-            int colStart = i;
-            while (i < length && char.IsLetter(formula[i])) i++;
-            if (i == colStart || i >= length || formula[i] != ':') { i = start; return false; }
-            i++; // skip ':'
-            if (i < length && formula[i] == '$') i++;
-            colStart = i;
-            while (i < length && char.IsLetter(formula[i])) i++;
-            if (i == colStart) { i = start; return false; }
-            return true;
-        }
-
-        private static bool ScanRowRange(string formula, ref int i)
-        {
-            int start = i;
-            int length = formula.Length;
-            if (i < length && formula[i] == '$') i++;
-            int rowStart = i;
-            while (i < length && char.IsDigit(formula[i])) i++;
-            if (i == rowStart || i >= length || formula[i] != ':') { i = start; return false; }
-            i++; // skip ':'
-            if (i < length && formula[i] == '$') i++;
-            rowStart = i;
-            while (i < length && char.IsDigit(formula[i])) i++;
-            if (i == rowStart) { i = start; return false; }
-            return true;
-        }
-
-        private static bool ScanCellCoordinate(string formula, ref int i)
-        {
-            int start = i;
-            int length = formula.Length;
-            if (i < length && formula[i] == '$') i++;
-            int colStart = i;
-            while (i < length && char.IsLetter(formula[i])) i++;
-            if (i == colStart) { i = start; return false; }
-            int colLen = i - colStart;
-            if (colLen > 3) { i = start; return false; }
-
-            if (i < length && formula[i] == '$') i++;
-            int rowStart = i;
-            while (i < length && char.IsDigit(formula[i])) i++;
-            if (i == rowStart) { i = start; return false; }
-
-            // Ensure the character immediately following the coordinate is not an identifier character
-            if (i < length && (char.IsLetterOrDigit(formula[i]) || formula[i] == '_'))
-            {
-                i = start;
-                return false;
-            }
-
-            return true;
-        }
-
-        public static string ExcelToOdfFormula(string excelFormula)
-        {
-            if (string.IsNullOrEmpty(excelFormula)) return excelFormula;
-
-            string inner = excelFormula;
-            if (excelFormula.StartsWith("=")) inner = excelFormula.Substring(1);
-
-            var tokens = Tokenize(inner);
-            var sb = new StringBuilder("oooc:=");
-
-            for (int idx = 0; idx < tokens.Count; idx++)
-            {
-                var token = tokens[idx];
-                switch (token.Type)
-                {
-                    case TokenType.Identifier:
-                        // Normalize function names to uppercase when followed by '('
-                        if (idx + 1 < tokens.Count && tokens[idx + 1].Type == TokenType.OpenParenthesis)
-                            sb.Append(token.Value.ToUpperInvariant());
-                        else
-                            sb.Append(token.Value);
-                        break;
-
-                    case TokenType.CellReference:
-                        try
-                        {
-                            if (token.Value.Contains(":"))
-                            {
-                                var range = OdfCellRange.ParseExcel(token.Value);
-                                sb.Append("[").Append(range.ToOdfString(false)).Append("]");
-                            }
-                            else
-                            {
-                                var addr = OdfCellAddress.ParseExcel(token.Value);
-                                sb.Append("[").Append(addr.ToOdfString(false)).Append("]");
-                            }
-                        }
-                        catch
-                        {
-                            sb.Append(token.Value); // Fallback
-                        }
-                        break;
-
-                    case TokenType.Separator:
-                        // Convert parameter commas to semicolons, preserving braces array rules
-                        sb.Append(token.Value == "," ? ";" : token.Value);
-                        break;
-
-                    default:
+                case TokenType.Identifier:
+                    // 當識別碼後方緊接 '(' 時，將其標準化為大寫的函式名稱
+                    if (idx + 1 < tokens.Count && tokens[idx + 1].Type == TokenType.OpenParenthesis)
+                        sb.Append(token.Value.ToUpperInvariant());
+                    else
                         sb.Append(token.Value);
-                        break;
-                }
-            }
-            return sb.ToString();
-        }
+                    break;
 
-        public static string OdfToExcelFormula(string odfFormula)
-        {
-            if (string.IsNullOrEmpty(odfFormula)) return odfFormula;
-
-            string inner = odfFormula;
-            if (odfFormula.StartsWith("oooc:=")) inner = odfFormula.Substring(6);
-            else if (odfFormula.StartsWith("of:=")) inner = odfFormula.Substring(4);
-            else if (odfFormula.StartsWith("=")) inner = odfFormula.Substring(1);
-
-            var tokens = Tokenize(inner);
-            var sb = new StringBuilder("=");
-
-            for (int idx = 0; idx < tokens.Count; idx++)
-            {
-                var token = tokens[idx];
-                switch (token.Type)
-                {
-                    case TokenType.Identifier:
-                        if (idx + 1 < tokens.Count && tokens[idx + 1].Type == TokenType.OpenParenthesis)
-                            sb.Append(token.Value.ToUpperInvariant());
-                        else
-                            sb.Append(token.Value);
-                        break;
-
-                    case TokenType.CellReference:
-                        try
-                        {
-                            string raw = token.Value;
-                            if (raw.StartsWith("[") && raw.EndsWith("]"))
-                            {
-                                string content = raw.Substring(1, raw.Length - 2);
-                                if (content.Contains(":"))
-                                {
-                                    var range = OdfCellRange.ParseOdf(content);
-                                    sb.Append(range.ToExcelString());
-                                }
-                                else
-                                {
-                                    var addr = OdfCellAddress.ParseOdf(content);
-                                    sb.Append(addr.ToExcelString());
-                                }
-                            }
-                            else sb.Append(raw);
-                        }
-                        catch
-                        {
-                            sb.Append(token.Value);
-                        }
-                        break;
-
-                    case TokenType.Separator:
-                        sb.Append(token.Value == ";" ? "," : token.Value);
-                        break;
-
-                    default:
-                        sb.Append(token.Value);
-                        break;
-                }
-            }
-            return sb.ToString();
-        }
-
-        public static string TranslateFormulaOffset(string formula, int rowOffset, int colOffset)
-        {
-            if (string.IsNullOrEmpty(formula) || (rowOffset == 0 && colOffset == 0))
-                return formula;
-
-            bool isOdf = false;
-            string prefix = "";
-            string inner = formula;
-
-            if (formula.StartsWith("oooc:=")) { isOdf = true; prefix = "oooc:="; inner = formula.Substring(6); }
-            else if (formula.StartsWith("of:=")) { isOdf = true; prefix = "of:="; inner = formula.Substring(4); }
-            else if (formula.StartsWith("=")) { prefix = "="; inner = formula.Substring(1); }
-
-            var tokens = Tokenize(inner);
-            var sb = new StringBuilder(prefix);
-
-            foreach (var token in tokens)
-            {
-                if (token.Type == TokenType.CellReference)
-                {
+                case TokenType.CellReference:
                     try
                     {
-                        if (isOdf)
+                        if (token.Value.Contains(':'))
                         {
-                            string raw = token.Value;
-                            if (raw.StartsWith("[") && raw.EndsWith("]"))
-                            {
-                                string content = raw.Substring(1, raw.Length - 2);
-                                if (content.Contains(":"))
-                                {
-                                    var range = OdfCellRange.ParseOdf(content);
-                                    var shifted = ShiftRelativeRange(range, rowOffset, colOffset);
-                                    sb.Append("[").Append(shifted.ToOdfString(false)).Append("]");
-                                }
-                                else
-                                {
-                                    var addr = OdfCellAddress.ParseOdf(content);
-                                    var shifted = ShiftRelativeAddress(addr, rowOffset, colOffset);
-                                    sb.Append("[").Append(shifted.ToOdfString(false)).Append("]");
-                                }
-                            }
-                            else sb.Append(token.Value);
+                            var range = OdfCellRange.ParseExcel(token.Value);
+                            sb.Append('[').Append(range.ToOdfString(false)).Append(']');
                         }
                         else
                         {
-                            string raw = token.Value;
-                            if (raw.Contains(":"))
+                            var addr = OdfCellAddress.ParseExcel(token.Value);
+                            sb.Append('[').Append(addr.ToOdfString(false)).Append(']');
+                        }
+                    }
+                    catch
+                    {
+                        sb.Append(token.Value); // 備用方案
+                    }
+                    break;
+
+                case TokenType.Separator:
+                    // 將參數逗號轉換為分號，保留大括號陣列的規則
+                    sb.Append(token.Value == "," ? ";" : token.Value);
+                    break;
+
+                default:
+                    sb.Append(token.Value);
+                    break;
+            }
+        }
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// 將 ODF 樣式的公式轉換為 Excel 樣式的公式。
+    /// </summary>
+    /// <param name="odfFormula">ODF 樣式的公式字串</param>
+    /// <returns>Excel 樣式的公式字串</returns>
+    public static string OdfToExcelFormula(string odfFormula)
+    {
+        if (string.IsNullOrEmpty(odfFormula)) return odfFormula;
+
+        string inner = odfFormula;
+        if (odfFormula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase)) inner = odfFormula.Substring(6);
+        else if (odfFormula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase)) inner = odfFormula.Substring(4);
+        else if (odfFormula.StartsWith("=")) inner = odfFormula.Substring(1);
+
+        var tokens = Tokenize(inner);
+        StringBuilder sb = new("=");
+
+        for (int idx = 0; idx < tokens.Count; idx++)
+        {
+            var token = tokens[idx];
+            switch (token.Type)
+            {
+                case TokenType.Identifier:
+                    if (idx + 1 < tokens.Count && tokens[idx + 1].Type == TokenType.OpenParenthesis)
+                        sb.Append(token.Value.ToUpperInvariant());
+                    else
+                        sb.Append(token.Value);
+                    break;
+
+                case TokenType.CellReference:
+                    try
+                    {
+                        string raw = token.Value;
+                        if (raw.StartsWith("[") && raw.EndsWith("]"))
+                        {
+                            string content = raw.Substring(1, raw.Length - 2);
+                            if (content.Contains(':'))
                             {
-                                var range = OdfCellRange.ParseExcel(raw);
-                                var shifted = ShiftRelativeRange(range, rowOffset, colOffset);
-                                sb.Append(shifted.ToExcelString());
+                                var range = OdfCellRange.ParseOdf(content);
+                                sb.Append(range.ToExcelString());
                             }
                             else
                             {
-                                var addr = OdfCellAddress.ParseExcel(raw);
-                                var shifted = ShiftRelativeAddress(addr, rowOffset, colOffset);
-                                sb.Append(shifted.ToExcelString());
+                                var addr = OdfCellAddress.ParseOdf(content);
+                                sb.Append(addr.ToExcelString());
                             }
                         }
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        sb.Append(isOdf ? "[.#REF!]" : "#REF!");
+                        else sb.Append(raw);
                     }
                     catch
                     {
                         sb.Append(token.Value);
                     }
+                    break;
+
+                case TokenType.Separator:
+                    sb.Append(token.Value == ";" ? "," : token.Value);
+                    break;
+
+                default:
+                    sb.Append(token.Value);
+                    break;
+            }
+        }
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// 偏移公式中的相對儲存格參照。
+    /// </summary>
+    /// <param name="formula">要偏移的公式字串</param>
+    /// <param name="rowOffset">列偏移量</param>
+    /// <param name="colOffset">欄偏移量</param>
+    /// <returns>偏移後的公式字串</returns>
+    public static string TranslateFormulaOffset(string formula, int rowOffset, int colOffset)
+    {
+        if (string.IsNullOrEmpty(formula) || (rowOffset == 0 && colOffset == 0))
+            return formula;
+
+        bool isOdf = false;
+        string prefix = "";
+        string inner = formula;
+
+        if (formula.StartsWith("oooc:=")) { isOdf = true; prefix = "oooc:="; inner = formula.Substring(6); }
+        else if (formula.StartsWith("of:=")) { isOdf = true; prefix = "of:="; inner = formula.Substring(4); }
+        else if (formula.StartsWith("=")) { prefix = "="; inner = formula.Substring(1); }
+
+        var tokens = Tokenize(inner);
+        StringBuilder sb = new(prefix);
+
+        foreach (var token in tokens)
+        {
+            if (token.Type == TokenType.CellReference)
+            {
+                try
+                {
+                    if (isOdf)
+                    {
+                        string raw = token.Value;
+                        if (raw.StartsWith("[") && raw.EndsWith("]"))
+                        {
+                            string content = raw.Substring(1, raw.Length - 2);
+                            if (content.Contains(':'))
+                            {
+                                var range = OdfCellRange.ParseOdf(content);
+                                var shifted = ShiftRelativeRange(range, rowOffset, colOffset);
+                                sb.Append('[').Append(shifted.ToOdfString(false)).Append(']');
+                            }
+                            else
+                            {
+                                var addr = OdfCellAddress.ParseOdf(content);
+                                var shifted = ShiftRelativeAddress(addr, rowOffset, colOffset);
+                                sb.Append('[').Append(shifted.ToOdfString(false)).Append(']');
+                            }
+                        }
+                        else sb.Append(token.Value);
+                    }
+                    else
+                    {
+                        string raw = token.Value;
+                        if (raw.Contains(':'))
+                        {
+                            var range = OdfCellRange.ParseExcel(raw);
+                            var shifted = ShiftRelativeRange(range, rowOffset, colOffset);
+                            sb.Append(shifted.ToExcelString());
+                        }
+                        else
+                        {
+                            var addr = OdfCellAddress.ParseExcel(raw);
+                            var shifted = ShiftRelativeAddress(addr, rowOffset, colOffset);
+                            sb.Append(shifted.ToExcelString());
+                        }
+                    }
                 }
-                else
+                catch (ArgumentOutOfRangeException)
+                {
+                    sb.Append(isOdf ? "[.#REF!]" : "#REF!");
+                }
+                catch
                 {
                     sb.Append(token.Value);
                 }
             }
-            return sb.ToString();
+            else
+            {
+                sb.Append(token.Value);
+            }
         }
+        return sb.ToString();
+    }
 
-        private static OdfCellAddress ShiftRelativeAddress(OdfCellAddress addr, int rowOffset, int colOffset)
-        {
-            int newRow = addr.IsRowAbsolute ? addr.Row : addr.Row + rowOffset;
-            int newCol = addr.IsColumnAbsolute ? addr.Column : addr.Column + colOffset;
+    private static OdfCellAddress ShiftRelativeAddress(OdfCellAddress addr, int rowOffset, int colOffset)
+    {
+        int newRow = addr.IsRowAbsolute ? addr.Row : addr.Row + rowOffset;
+        int newCol = addr.IsColumnAbsolute ? addr.Column : addr.Column + colOffset;
 
-            if (newRow < 0 || newCol < 0)
-                throw new ArgumentOutOfRangeException(nameof(addr), "Index offset results in out of bounds coordinate.");
+        if (newRow < 0 || newCol < 0)
+            throw new ArgumentOutOfRangeException(nameof(addr), "Index offset results in out of bounds coordinate.");
 
-            return new OdfCellAddress(newRow, newCol, addr.SheetName, 
-                addr.IsRowAbsolute, addr.IsColumnAbsolute, addr.IsSheetAbsolute);
-        }
+        return new OdfCellAddress(newRow, newCol, addr.SheetName, 
+            addr.IsRowAbsolute, addr.IsColumnAbsolute, addr.IsSheetAbsolute);
+    }
 
-        private static OdfCellRange ShiftRelativeRange(OdfCellRange range, int rowOffset, int colOffset)
-        {
-            var start = ShiftRelativeAddress(range.StartAddress, rowOffset, colOffset);
-            var end = ShiftRelativeAddress(range.EndAddress, rowOffset, colOffset);
-            return new OdfCellRange(start, end);
-        }
+    private static OdfCellRange ShiftRelativeRange(OdfCellRange range, int rowOffset, int colOffset)
+    {
+        var start = ShiftRelativeAddress(range.StartAddress, rowOffset, colOffset);
+        var end = ShiftRelativeAddress(range.EndAddress, rowOffset, colOffset);
+        return new OdfCellRange(start, end);
     }
 }

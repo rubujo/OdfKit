@@ -1,4 +1,3 @@
-#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,46 +7,50 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace OdfKit.Compliance
+namespace OdfKit.Compliance;
+
+/// <summary>
+/// 針對 XML 元素評估保留的 RELAX NG 模式樹中繼資料。
+/// </summary>
+public static class OdfSchemaPatternValidator
 {
     /// <summary>
-    /// Evaluates preserved RELAX NG pattern tree metadata against XML elements.
+    /// 根據具名的結構描述模式驗證 XML 元素。
     /// </summary>
-    public static class OdfSchemaPatternValidator
+    /// <param name="element">XML 元素</param>
+    /// <param name="schema">結構描述集</param>
+    /// <param name="patternName">模式名稱</param>
+    /// <returns>模式驗證結果</returns>
+    public static OdfSchemaPatternValidationResult ValidateElement(
+        XElement element,
+        OdfSchemaSet schema,
+        string patternName)
     {
-        /// <summary>
-        /// Validates an XML element against a named schema pattern.
-        /// </summary>
-        public static OdfSchemaPatternValidationResult ValidateElement(
-            XElement element,
-            OdfSchemaSet schema,
-            string patternName)
+        if (element is null) throw new ArgumentNullException(nameof(element));
+        if (schema is null) throw new ArgumentNullException(nameof(schema));
+        if (string.IsNullOrWhiteSpace(patternName)) throw new ArgumentException("Pattern name cannot be empty.", nameof(patternName));
+
+        OdfSchemaPatternDefinition? pattern = schema.FindPattern(patternName);
+        if (pattern is null)
         {
-            if (element == null) throw new ArgumentNullException(nameof(element));
-            if (schema == null) throw new ArgumentNullException(nameof(schema));
-            if (string.IsNullOrWhiteSpace(patternName)) throw new ArgumentException("Pattern name cannot be empty.", nameof(patternName));
-
-            OdfSchemaPatternDefinition? pattern = schema.FindPattern(patternName);
-            if (pattern == null)
-            {
-                return OdfSchemaPatternValidationResult.Fail(
-                    "ODF3100",
-                    $"Schema pattern '{patternName}' is not available.");
-            }
-
-            var context = new MatchContext(schema);
-            foreach (OdfSchemaPatternNode root in pattern.Roots)
-            {
-                if (MatchesRootNode(root, element, context))
-                {
-                    return OdfSchemaPatternValidationResult.Success();
-                }
-            }
-
             return OdfSchemaPatternValidationResult.Fail(
-                "ODF3101",
-                $"Element '{{{element.Name.NamespaceName}}}{element.Name.LocalName}' does not match schema pattern '{patternName}'.");
+                "ODF3100",
+                $"Schema pattern '{patternName}' is not available.");
         }
+
+        var context = new MatchContext(schema);
+        foreach (OdfSchemaPatternNode root in pattern.Roots)
+        {
+            if (MatchesRootNode(root, element, context))
+            {
+                return OdfSchemaPatternValidationResult.Success();
+            }
+        }
+
+        return OdfSchemaPatternValidationResult.Fail(
+            "ODF3101",
+            $"Element '{{{element.Name.NamespaceName}}}{element.Name.LocalName}' does not match schema pattern '{patternName}'.");
+    }
 
         private static bool MatchesRootNode(
             OdfSchemaPatternNode node,
@@ -2398,42 +2401,40 @@ namespace OdfKit.Compliance
 
             public void LeaveReference(string referenceName) => _activeReferences.Remove(referenceName);
         }
+}
+
+/// <summary>
+/// 代表結構描述模式驗證的結果。
+/// </summary>
+public sealed class OdfSchemaPatternValidationResult
+{
+    private OdfSchemaPatternValidationResult(bool isMatch, IReadOnlyList<OdfValidationIssue> issues)
+    {
+        IsMatch = isMatch;
+        Issues = issues;
     }
 
     /// <summary>
-    /// Represents the result of a schema pattern validation.
+    /// 取得一個值，表示 XML 元素是否符合結構描述模式。
     /// </summary>
-    public sealed class OdfSchemaPatternValidationResult
+    public bool IsMatch { get; }
+
+    /// <summary>
+    /// 取得模式驗證的問題。
+    /// </summary>
+    public IReadOnlyList<OdfValidationIssue> Issues { get; }
+
+    internal static OdfSchemaPatternValidationResult Success()
     {
-        private OdfSchemaPatternValidationResult(bool isMatch, IReadOnlyList<OdfValidationIssue> issues)
-        {
-            IsMatch = isMatch;
-            Issues = issues;
-        }
+        return new OdfSchemaPatternValidationResult(true, []);
+    }
 
-        /// <summary>
-        /// Gets whether the XML element matched the schema pattern.
-        /// </summary>
-        public bool IsMatch { get; }
-
-        /// <summary>
-        /// Gets pattern validation issues.
-        /// </summary>
-        public IReadOnlyList<OdfValidationIssue> Issues { get; }
-
-        internal static OdfSchemaPatternValidationResult Success()
-        {
-            return new OdfSchemaPatternValidationResult(true, Array.Empty<OdfValidationIssue>());
-        }
-
-        internal static OdfSchemaPatternValidationResult Fail(string ruleId, string message)
-        {
-            return new OdfSchemaPatternValidationResult(
-                false,
-                new[]
-                {
-                    new OdfValidationIssue(OdfIssueSeverity.Error, ruleId, message)
-                });
-        }
+    internal static OdfSchemaPatternValidationResult Fail(string ruleId, string message)
+    {
+        return new OdfSchemaPatternValidationResult(
+            false,
+            [
+                new OdfValidationIssue(OdfIssueSeverity.Error, ruleId, message)
+            ]);
     }
 }

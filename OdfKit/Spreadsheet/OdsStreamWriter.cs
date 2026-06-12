@@ -1,4 +1,3 @@
-﻿#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -7,335 +6,400 @@ using System.Xml;
 using OdfKit.Core;
 using OdfKit.Styles;
 
-namespace OdfKit.Spreadsheet
+namespace OdfKit.Spreadsheet;
+
+/// <summary>
+/// 提供以資料流方式寫入 ODS 試算表文件的功能，以支援高效能、低記憶體耗用的寫入作業。
+/// </summary>
+public class OdsStreamWriter : IDisposable
 {
-    public class OdsStreamWriter : IDisposable
+    private readonly Stream _outputStream;
+    private readonly ZipArchive _zip;
+    private readonly Stream _contentEntryStream;
+    private readonly XmlWriter _writer;
+    private bool _isRowStarted;
+    private bool _isSheetStarted;
+    private bool _disposed;
+    private readonly System.Collections.Generic.List<(string styleName, OdfLength width)> _columnStyles = [];
+    private int _autoColumnStyleIndex = 0;
+
+    /// <summary>
+    /// 初始化 <see cref="OdsStreamWriter"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="outputStream">用來輸出 ODS 文件的目標資料流</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="outputStream"/> 為 null 時擲出</exception>
+    public OdsStreamWriter(Stream outputStream)
     {
-        private readonly Stream _outputStream;
-        private readonly ZipArchive _zip;
-        private readonly Stream _contentEntryStream;
-        private readonly XmlWriter _writer;
-        private bool _isRowStarted;
-        private bool _isSheetStarted;
-        private bool _disposed;
-        private readonly System.Collections.Generic.List<(string styleName, OdfLength width)> _columnStyles = new();
-        private int _autoColumnStyleIndex = 0;
-
-        public OdsStreamWriter(Stream outputStream)
+        _outputStream = outputStream ?? throw new ArgumentNullException(nameof(outputStream));
+        
+        // 包裝於 NonSeekableStreamWrapper 以強制 ZipArchive 使用資料流、非緩衝模式
+        _zip = new ZipArchive(new NonSeekableStreamWrapper(_outputStream), ZipArchiveMode.Create, leaveOpen: true);
+        
+        // 1. 先寫入未壓縮的 mimetype
+        var mimeEntry = _zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
+        using (var s = mimeEntry.Open())
         {
-            _outputStream = outputStream ?? throw new ArgumentNullException(nameof(outputStream));
-            
-            // Wrap in NonSeekableStreamWrapper to force streaming, non-buffering mode in ZipArchive
-            _zip = new ZipArchive(new NonSeekableStreamWrapper(_outputStream), ZipArchiveMode.Create, leaveOpen: true);
-            
-            // 1. Write uncompressed mimetype first
-            var mimeEntry = _zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
-            using (var s = mimeEntry.Open())
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.spreadsheet");
-                s.Write(bytes, 0, bytes.Length);
-            }
-
-            // 2. Write metadata, styles, and manifest entries
-            WriteDefaultMetaFiles();
-
-            // 3. Open content.xml for streaming
-            var contentEntry = _zip.CreateEntry("content.xml", CompressionLevel.Fastest);
-            _contentEntryStream = contentEntry.Open();
-            
-            var settings = new XmlWriterSettings
-            {
-                Encoding = new UTF8Encoding(false),
-                Indent = false // Minimize size
-            };
-            _writer = XmlWriter.Create(_contentEntryStream, settings);
-
-            // Write ODF XML header and root document-content tags
-            _writer.WriteStartDocument();
-            _writer.WriteStartElement("office", "document-content", OdfNamespaces.Office);
-            _writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
-            _writer.WriteAttributeString("xmlns", "table", null, OdfNamespaces.Table);
-            _writer.WriteAttributeString("xmlns", "text", null, OdfNamespaces.Text);
-            _writer.WriteAttributeString("xmlns", "style", null, OdfNamespaces.Style);
-            
-            // Write body and spreadsheet wrapper
-            _writer.WriteStartElement("office", "body", OdfNamespaces.Office);
-            _writer.WriteStartElement("office", "spreadsheet", OdfNamespaces.Office);
+            byte[] bytes = Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.spreadsheet");
+            s.Write(bytes, 0, bytes.Length);
         }
 
-        public void WriteStartSheet(string sheetName)
+        // 2. 寫入預設的中繼資料、樣式與資訊清單項目
+        WriteDefaultMetaFiles();
+
+        // 3. 開啟 content.xml 以進行資料流寫入
+        var contentEntry = _zip.CreateEntry("content.xml", CompressionLevel.Fastest);
+        _contentEntryStream = contentEntry.Open();
+        
+        var settings = new XmlWriterSettings
         {
-            if (_disposed) return;
-            try
-            {
-                if (_isSheetStarted) WriteEndSheet();
-                _writer.WriteStartElement("table", "table", OdfNamespaces.Table);
-                _writer.WriteAttributeString("table", "name", OdfNamespaces.Table, sheetName);
-                _isSheetStarted = true;
-            }
-            catch (Exception) { }
+            Encoding = new UTF8Encoding(false),
+            Indent = false // 最小化大小
+        };
+        _writer = XmlWriter.Create(_contentEntryStream, settings);
+
+        // 寫入 ODF XML 標頭與根 document-content 標籤
+        _writer.WriteStartDocument();
+        _writer.WriteStartElement("office", "document-content", OdfNamespaces.Office);
+        _writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
+        _writer.WriteAttributeString("xmlns", "table", null, OdfNamespaces.Table);
+        _writer.WriteAttributeString("xmlns", "text", null, OdfNamespaces.Text);
+        _writer.WriteAttributeString("xmlns", "style", null, OdfNamespaces.Style);
+        
+        // 寫入 body 與 spreadsheet 包裝器
+        _writer.WriteStartElement("office", "body", OdfNamespaces.Office);
+        _writer.WriteStartElement("office", "spreadsheet", OdfNamespaces.Office);
+    }
+
+    /// <summary>
+    /// 開始寫入一個新的工作表。
+    /// </summary>
+    /// <param name="sheetName">工作表名稱</param>
+    public void WriteStartSheet(string sheetName)
+    {
+        if (_disposed) return;
+        try
+        {
+            if (_isSheetStarted) WriteEndSheet();
+            _writer.WriteStartElement("table", "table", OdfNamespaces.Table);
+            _writer.WriteAttributeString("table", "name", OdfNamespaces.Table, sheetName);
+            _isSheetStarted = true;
         }
+        catch (Exception) { }
+    }
 
-        public void WriteColumn(OdfLength width, string? styleName = null)
+    /// <summary>
+    /// 寫入資料欄定義。
+    /// </summary>
+    /// <param name="width">資料欄寬度</param>
+    /// <param name="styleName">樣式名稱，如果為 null 則自動產生</param>
+    public void WriteColumn(OdfLength width, string? styleName = null)
+    {
+        if (_disposed) return;
+        try
         {
-            if (_disposed) return;
-            try
-            {
-                string name = string.IsNullOrEmpty(styleName)
-                    ? $"co_auto_{++_autoColumnStyleIndex}"
-                    : styleName!;
+            string name = string.IsNullOrEmpty(styleName)
+                ? $"co_auto_{++_autoColumnStyleIndex}"
+                : styleName!;
 
-                _writer.WriteStartElement("table", "table-column", OdfNamespaces.Table);
-                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, name);
-                _writer.WriteEndElement();
+            _writer.WriteStartElement("table", "table-column", OdfNamespaces.Table);
+            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, name);
+            _writer.WriteEndElement();
 
-                _columnStyles.Add((name, width));
-            }
-            catch (Exception) { }
+            _columnStyles.Add((name, width));
         }
+        catch (Exception) { }
+    }
 
-        public void WriteStartRow(double? height = null, string? styleName = null, bool useOptimalHeight = false)
+    /// <summary>
+    /// 開始寫入一個新的資料列。
+    /// </summary>
+    /// <param name="height">資料列高度</param>
+    /// <param name="styleName">樣式名稱</param>
+    /// <param name="useOptimalHeight">是否使用最佳高度</param>
+    public void WriteStartRow(double? height = null, string? styleName = null, bool useOptimalHeight = false)
+    {
+        if (_disposed) return;
+        try
         {
-            if (_disposed) return;
-            try
-            {
-                if (_isRowStarted) WriteEndRow();
-                _isRowStarted = true;
-                _writer.WriteStartElement("table", "table-row", OdfNamespaces.Table);
-                if (!string.IsNullOrEmpty(styleName))
-                {
-                    _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
-                }
-            }
-            catch (Exception) { }
-        }
-
-        public void WriteCell(string value, string? styleName = null)
-        {
-            if (_disposed) return;
-            try
-            {
-                _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-                _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "string");
-                if (!string.IsNullOrEmpty(styleName))
-                {
-                    _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
-                }
-                _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-                _writer.WriteString(value);
-                _writer.WriteEndElement(); // text:p
-                _writer.WriteEndElement(); // table:cell
-            }
-            catch (Exception) { }
-        }
-
-        public void WriteCell(double value, string? styleName = null)
-        {
-            if (_disposed) return;
-            try
-            {
-                _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-                _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "float");
-                _writer.WriteAttributeString("office", "value", OdfNamespaces.Office, value.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                if (!string.IsNullOrEmpty(styleName))
-                {
-                    _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
-                }
-                _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-                _writer.WriteString(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                _writer.WriteEndElement(); // text:p
-                _writer.WriteEndElement(); // table:cell
-            }
-            catch (Exception) { }
-        }
-
-        public void WriteCell(DateTime value, string? styleName = null, bool timezoneNaive = false)
-        {
-            if (_disposed) return;
-            try
-            {
-                _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-                _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "date");
-                
-                string isoDate;
-                if (value == DateTime.MinValue || value == DateTime.MaxValue)
-                {
-                    isoDate = timezoneNaive
-                        ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
-                        : value.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
-                }
-                else
-                {
-                    isoDate = timezoneNaive 
-                        ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
-                        : value.ToUniversalTime().ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
-                }
-                    
-                _writer.WriteAttributeString("office", "date-value", OdfNamespaces.Office, isoDate);
-                if (!string.IsNullOrEmpty(styleName))
-                {
-                    _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
-                }
-                _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-                _writer.WriteString(isoDate);
-                _writer.WriteEndElement(); // text:p
-                _writer.WriteEndElement(); // table:cell
-            }
-            catch (Exception) { }
-        }
-
-        public void WriteCell(bool value, string? styleName = null)
-        {
-            if (_disposed) return;
-            try
-            {
-                _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-                _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "boolean");
-                _writer.WriteAttributeString("office", "boolean-value", OdfNamespaces.Office, value ? "true" : "false");
-                if (!string.IsNullOrEmpty(styleName))
-                {
-                    _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
-                }
-                _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-                _writer.WriteString(value ? "TRUE" : "FALSE");
-                _writer.WriteEndElement(); // text:p
-                _writer.WriteEndElement(); // table:cell
-            }
-            catch (Exception) { }
-        }
-
-        public void WriteEndRow()
-        {
-            if (_disposed) return;
-            if (_isRowStarted)
-            {
-                try
-                {
-                    _writer.WriteEndElement(); // table-row
-                }
-                catch (Exception) { }
-                _isRowStarted = false;
-            }
-        }
-
-        public void WriteEndSheet()
-        {
-            if (_disposed) return;
             if (_isRowStarted) WriteEndRow();
-            if (_isSheetStarted)
+            _isRowStarted = true;
+            _writer.WriteStartElement("table", "table-row", OdfNamespaces.Table);
+            if (!string.IsNullOrEmpty(styleName))
             {
-                try
-                {
-                    _writer.WriteEndElement(); // table:table
-                }
-                catch (Exception) { }
-                _isSheetStarted = false;
+                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
             }
         }
+        catch (Exception) { }
+    }
 
-        private void WriteDefaultMetaFiles()
+    /// <summary>
+    /// 寫入字串型態的儲存格。
+    /// </summary>
+    /// <param name="value">儲存格的值</param>
+    /// <param name="styleName">樣式名稱</param>
+    public void WriteCell(string value, string? styleName = null)
+    {
+        if (_disposed) return;
+        try
         {
-            WriteManifest();
-            // Do not write styles.xml here
-            WriteMeta();
-        }
-
-        private void WriteManifest()
-        {
-            var entry = _zip.CreateEntry("META-INF/manifest.xml", CompressionLevel.Optimal);
-            using (var stream = entry.Open())
-            using (var writer = XmlWriter.Create(stream))
+            _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+            _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "string");
+            if (!string.IsNullOrEmpty(styleName))
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
-                writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, "1.3");
+                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            }
+            _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+            _writer.WriteString(value);
+            _writer.WriteEndElement(); // text:p
+            _writer.WriteEndElement(); // table:cell
+        }
+        catch (Exception) { }
+    }
+
+    /// <summary>
+    /// 寫入數值型態的儲存格。
+    /// </summary>
+    /// <param name="value">儲存格的數值</param>
+    /// <param name="styleName">樣式名稱</param>
+    public void WriteCell(double value, string? styleName = null)
+    {
+        if (_disposed) return;
+        try
+        {
+            _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+            _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "float");
+            _writer.WriteAttributeString("office", "value", OdfNamespaces.Office, value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            if (!string.IsNullOrEmpty(styleName))
+            {
+                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            }
+            _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+            _writer.WriteString(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            _writer.WriteEndElement(); // text:p
+            _writer.WriteEndElement(); // table:cell
+        }
+        catch (Exception) { }
+    }
+
+    /// <summary>
+    /// 寫入日期時間型態的儲存格。
+    /// </summary>
+    /// <param name="value">儲存格的日期時間值</param>
+    /// <param name="styleName">樣式名稱</param>
+    /// <param name="timezoneNaive">是否忽略時區轉換</param>
+    public void WriteCell(DateTime value, string? styleName = null, bool timezoneNaive = false)
+    {
+        if (_disposed) return;
+        try
+        {
+            _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+            _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "date");
+            
+            string isoDate;
+            if (value == DateTime.MinValue || value == DateTime.MaxValue)
+            {
+                isoDate = timezoneNaive
+                    ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                    : value.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
+            }
+            else
+            {
+                isoDate = timezoneNaive 
+                    ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                    : value.ToUniversalTime().ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
+            }
                 
-                writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
-                writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "/");
-                writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "application/vnd.oasis.opendocument.spreadsheet");
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
-                writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "content.xml");
-                writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "text/xml");
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
-                writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "styles.xml");
-                writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "text/xml");
-                writer.WriteEndElement();
-
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
-            }
-        }
-
-        private void WriteStyles()
-        {
-            var entry = _zip.CreateEntry("styles.xml", CompressionLevel.Optimal);
-            using (var stream = entry.Open())
-            using (var writer = XmlWriter.Create(stream))
+            _writer.WriteAttributeString("office", "date-value", OdfNamespaces.Office, isoDate);
+            if (!string.IsNullOrEmpty(styleName))
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("office", "document-styles", OdfNamespaces.Office);
-                writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
-                writer.WriteAttributeString("xmlns", "style", null, OdfNamespaces.Style);
-                writer.WriteAttributeString("xmlns", "text", null, OdfNamespaces.Text);
-                writer.WriteAttributeString("xmlns", "table", null, OdfNamespaces.Table);
-                writer.WriteAttributeString("xmlns", "fo", null, OdfNamespaces.Fo);
-                
-                writer.WriteStartElement("office", "styles", OdfNamespaces.Office);
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("office", "automatic-styles", OdfNamespaces.Office);
-                foreach (var style in _columnStyles)
-                {
-                    writer.WriteStartElement("style", "style", OdfNamespaces.Style);
-                    writer.WriteAttributeString("style", "name", OdfNamespaces.Style, style.styleName);
-                    writer.WriteAttributeString("style", "family", OdfNamespaces.Style, "table-column");
-                    writer.WriteStartElement("style", "table-column-properties", OdfNamespaces.Style);
-                    writer.WriteAttributeString("style", "column-width", OdfNamespaces.Style, style.width.ToString());
-                    writer.WriteEndElement(); // table-column-properties
-                    writer.WriteEndElement(); // style
-                }
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("office", "master-styles", OdfNamespaces.Office);
-                writer.WriteEndElement();
-
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
+                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
             }
+            _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+            _writer.WriteString(isoDate);
+            _writer.WriteEndElement(); // text:p
+            _writer.WriteEndElement(); // table:cell
         }
+        catch (Exception) { }
+    }
 
-        private void WriteMeta()
+    /// <summary>
+    /// 寫入布林值型態的儲存格。
+    /// </summary>
+    /// <param name="value">儲存格的布林值</param>
+    /// <param name="styleName">樣式名稱</param>
+    public void WriteCell(bool value, string? styleName = null)
+    {
+        if (_disposed) return;
+        try
         {
-            var entry = _zip.CreateEntry("meta.xml", CompressionLevel.Optimal);
-            using (var stream = entry.Open())
-            using (var writer = XmlWriter.Create(stream))
+            _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+            _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "boolean");
+            _writer.WriteAttributeString("office", "boolean-value", OdfNamespaces.Office, value ? "true" : "false");
+            if (!string.IsNullOrEmpty(styleName))
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("office", "document-meta", OdfNamespaces.Office);
-                writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
-                writer.WriteAttributeString("xmlns", "dc", null, OdfNamespaces.Dc);
-                writer.WriteAttributeString("xmlns", "meta", null, OdfNamespaces.Meta);
-                
-                writer.WriteStartElement("office", "meta", OdfNamespaces.Office);
-                writer.WriteEndElement();
-
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
+                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
             }
+            _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+            _writer.WriteString(value ? "TRUE" : "FALSE");
+            _writer.WriteEndElement(); // text:p
+            _writer.WriteEndElement(); // table:cell
         }
+        catch (Exception) { }
+    }
 
-        public void Dispose()
+    /// <summary>
+    /// 結束目前資料列的寫入。
+    /// </summary>
+    public void WriteEndRow()
+    {
+        if (_disposed) return;
+        if (_isRowStarted)
         {
-            if (_disposed) return;
-            _disposed = true;
+            try
+            {
+                _writer.WriteEndElement(); // table-row
+            }
+            catch (Exception) { }
+            _isRowStarted = false;
+        }
+    }
 
+    /// <summary>
+    /// 結束目前工作表的寫入。
+    /// </summary>
+    public void WriteEndSheet()
+    {
+        if (_disposed) return;
+        if (_isRowStarted) WriteEndRow();
+        if (_isSheetStarted)
+        {
+            try
+            {
+                _writer.WriteEndElement(); // table:table
+            }
+            catch (Exception) { }
+            _isSheetStarted = false;
+        }
+    }
+
+    private void WriteDefaultMetaFiles()
+    {
+        WriteManifest();
+        // 此處不寫入 styles.xml
+        WriteMeta();
+    }
+
+    private void WriteManifest()
+    {
+        var entry = _zip.CreateEntry("META-INF/manifest.xml", CompressionLevel.Optimal);
+        using (var stream = entry.Open())
+        using (var writer = XmlWriter.Create(stream))
+        {
+            writer.WriteStartDocument();
+            writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
+            writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, "1.3");
+            
+            writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
+            writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "/");
+            writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "application/vnd.oasis.opendocument.spreadsheet");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
+            writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "content.xml");
+            writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "text/xml");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
+            writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "styles.xml");
+            writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "text/xml");
+            writer.WriteEndElement();
+
+            writer.WriteEndElement();
+            writer.WriteEndDocument();
+        }
+    }
+
+    private void WriteStyles()
+    {
+        var entry = _zip.CreateEntry("styles.xml", CompressionLevel.Optimal);
+        using (var stream = entry.Open())
+        using (var writer = XmlWriter.Create(stream))
+        {
+            writer.WriteStartDocument();
+            writer.WriteStartElement("office", "document-styles", OdfNamespaces.Office);
+            writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
+            writer.WriteAttributeString("xmlns", "style", null, OdfNamespaces.Style);
+            writer.WriteAttributeString("xmlns", "text", null, OdfNamespaces.Text);
+            writer.WriteAttributeString("xmlns", "table", null, OdfNamespaces.Table);
+            writer.WriteAttributeString("xmlns", "fo", null, OdfNamespaces.Fo);
+            
+            writer.WriteStartElement("office", "styles", OdfNamespaces.Office);
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("office", "automatic-styles", OdfNamespaces.Office);
+            foreach (var style in _columnStyles)
+            {
+                writer.WriteStartElement("style", "style", OdfNamespaces.Style);
+                writer.WriteAttributeString("style", "name", OdfNamespaces.Style, style.styleName);
+                writer.WriteAttributeString("style", "family", OdfNamespaces.Style, "table-column");
+                writer.WriteStartElement("style", "table-column-properties", OdfNamespaces.Style);
+                writer.WriteAttributeString("style", "column-width", OdfNamespaces.Style, style.width.ToString());
+                writer.WriteEndElement(); // table-column-properties
+                writer.WriteEndElement(); // style
+            }
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("office", "master-styles", OdfNamespaces.Office);
+            writer.WriteEndElement();
+
+            writer.WriteEndElement();
+            writer.WriteEndDocument();
+        }
+    }
+
+    private void WriteMeta()
+    {
+        var entry = _zip.CreateEntry("meta.xml", CompressionLevel.Optimal);
+        using (var stream = entry.Open())
+        using (var writer = XmlWriter.Create(stream))
+        {
+            writer.WriteStartDocument();
+            writer.WriteStartElement("office", "document-meta", OdfNamespaces.Office);
+            writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
+            writer.WriteAttributeString("xmlns", "dc", null, OdfNamespaces.Dc);
+            writer.WriteAttributeString("xmlns", "meta", null, OdfNamespaces.Meta);
+            
+            writer.WriteStartElement("office", "meta", OdfNamespaces.Office);
+            writer.WriteEndElement();
+
+            writer.WriteEndElement();
+            writer.WriteEndDocument();
+        }
+    }
+
+    /// <summary>
+    /// 關閉所有底層資料流並釋放 <see cref="OdsStreamWriter"/> 使用的資源。
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// 釋放 <see cref="OdsStreamWriter"/> 類別所使用的非受控資源，並選擇性釋放受控資源。
+    /// </summary>
+    /// <param name="disposing">為 true 則釋放受控與非受控資源；為 false 則僅釋放非受控資源</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        if (disposing)
+        {
             if (_isSheetStarted) WriteEndSheet();
             
-            // Close spreadsheet, body, document-content tags
+            // 關閉 spreadsheet、body、document-content 標籤
             _writer.WriteEndElement(); // office:spreadsheet
             _writer.WriteEndElement(); // office:body
             _writer.WriteEndElement(); // office:document-content
@@ -349,49 +413,44 @@ namespace OdfKit.Spreadsheet
             _zip.Dispose();
         }
     }
+}
 
-    internal class NonSeekableStreamWrapper : Stream
+internal class NonSeekableStreamWrapper(Stream baseStream) : Stream
+{
+    private readonly Stream _baseStream = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
+
+    public override bool CanRead => _baseStream.CanRead;
+    public override bool CanSeek => false;
+    public override bool CanWrite => _baseStream.CanWrite;
+    public override long Length => throw new NotSupportedException();
+    public override long Position
     {
-        private readonly Stream _baseStream;
+        get => throw new NotSupportedException();
+        set => throw new NotSupportedException();
+    }
 
-        public NonSeekableStreamWrapper(Stream baseStream)
-        {
-            _baseStream = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
-        }
+    public override void Flush() => _baseStream.Flush();
 
-        public override bool CanRead => _baseStream.CanRead;
-        public override bool CanSeek => false;
-        public override bool CanWrite => _baseStream.CanWrite;
-        public override long Length => throw new NotSupportedException();
-        public override long Position
-        {
-            get => throw new NotSupportedException();
-            set => throw new NotSupportedException();
-        }
+    public override int Read(byte[] buffer, int offset, int count) => _baseStream.Read(buffer, offset, count);
 
-        public override void Flush() => _baseStream.Flush();
+    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
-        public override int Read(byte[] buffer, int offset, int count) => _baseStream.Read(buffer, offset, count);
+    public override void SetLength(long value) => throw new NotSupportedException();
 
-        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+    public override void Write(byte[] buffer, int offset, int count) => _baseStream.Write(buffer, offset, count);
 
-        public override void SetLength(long value) => throw new NotSupportedException();
+    public override System.Threading.Tasks.Task WriteAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
+    {
+        return _baseStream.WriteAsync(buffer, offset, count, cancellationToken);
+    }
 
-        public override void Write(byte[] buffer, int offset, int count) => _baseStream.Write(buffer, offset, count);
+    public override System.Threading.Tasks.Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
+    {
+        return _baseStream.ReadAsync(buffer, offset, count, cancellationToken);
+    }
 
-        public override System.Threading.Tasks.Task WriteAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
-        {
-            return _baseStream.WriteAsync(buffer, offset, count, cancellationToken);
-        }
-
-        public override System.Threading.Tasks.Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
-        {
-            return _baseStream.ReadAsync(buffer, offset, count, cancellationToken);
-        }
-
-        public override System.Threading.Tasks.Task FlushAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            return _baseStream.FlushAsync(cancellationToken);
-        }
+    public override System.Threading.Tasks.Task FlushAsync(System.Threading.CancellationToken cancellationToken)
+    {
+        return _baseStream.FlushAsync(cancellationToken);
     }
 }
