@@ -1,3 +1,4 @@
+#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System.Security;
 using System.Xml;
 using OdfKit.Core;

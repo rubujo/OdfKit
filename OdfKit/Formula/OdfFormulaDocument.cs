@@ -1,3 +1,4 @@
+﻿#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.IO;
 using System.Text;
@@ -45,7 +46,23 @@ namespace OdfKit.Formula
 
         protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, System.Collections.Generic.Dictionary<string, string> renameMap)
         {
-            throw new NotImplementedException();
+            var srcFormula = sourceDoc as OdfFormulaDocument ?? throw new ArgumentException("Source document must be a OdfFormulaDocument.");
+            
+            var body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
+            var destFormulaRoot = FindOrCreateChild(body, "formula", OdfNamespaces.Office, "office");
+            
+            var srcBody = srcFormula.FindOrCreateChild(srcFormula.ContentDom, "body", OdfNamespaces.Office, "office");
+            var srcFormulaRoot = srcFormula.FindOrCreateChild(srcBody, "formula", OdfNamespaces.Office, "office");
+            
+            foreach (var child in srcFormulaRoot.Children)
+            {
+                if (child.NodeType == OdfNodeType.Element)
+                {
+                    var imported = OdfNode.ImportNode(child, srcFormula.Package, Package);
+                    RemapStylesInNodes(imported, renameMap);
+                    destFormulaRoot.AppendChild(imported);
+                }
+            }
         }
     }
 }

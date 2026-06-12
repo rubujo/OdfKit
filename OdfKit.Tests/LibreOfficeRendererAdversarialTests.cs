@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -232,7 +232,9 @@ namespace OdfKit.Tests
         private async Task<string?> CaptureSandboxDirAsync(Action runAction)
         {
             var tempPath = Path.GetTempPath();
-            var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, "OdfKit_Render_*"), StringComparer.OrdinalIgnoreCase);
+            var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var searchPattern = $"OdfKit_Render_{currentPid}_*";
+            var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var token = cts.Token;
             string? detectedDir = null;
@@ -243,7 +245,7 @@ namespace OdfKit.Tests
                 {
                     try
                     {
-                        var dirs = Directory.GetDirectories(tempPath, "OdfKit_Render_*");
+                        var dirs = Directory.GetDirectories(tempPath, searchPattern);
                         foreach (var dir in dirs)
                         {
                             if (existingDirs.Contains(dir)) continue;

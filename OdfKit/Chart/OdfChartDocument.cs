@@ -1,3 +1,4 @@
+﻿#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.IO;
 using System.Text;
@@ -52,7 +53,23 @@ namespace OdfKit.Chart
 
         protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, System.Collections.Generic.Dictionary<string, string> renameMap)
         {
-            throw new NotImplementedException();
+            var srcChart = sourceDoc as OdfChartDocument ?? throw new ArgumentException("Source document must be a OdfChartDocument.");
+            
+            var body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
+            var destChartRoot = FindOrCreateChild(body, "chart", OdfNamespaces.Office, "office");
+            
+            var srcBody = srcChart.FindOrCreateChild(srcChart.ContentDom, "body", OdfNamespaces.Office, "office");
+            var srcChartRoot = srcChart.FindOrCreateChild(srcBody, "chart", OdfNamespaces.Office, "office");
+            
+            foreach (var child in srcChartRoot.Children)
+            {
+                if (child.NodeType == OdfNodeType.Element)
+                {
+                    var imported = OdfNode.ImportNode(child, srcChart.Package, Package);
+                    RemapStylesInNodes(imported, renameMap);
+                    destChartRoot.AppendChild(imported);
+                }
+            }
         }
     }
 }

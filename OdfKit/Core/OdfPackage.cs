@@ -1,3 +1,4 @@
+﻿#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -199,8 +200,18 @@ namespace OdfKit.Core
 
             foreach (var entry in _archive.Entries)
             {
-                // Sanitize and check Zip Slip
-                string name = SanitizeEntryName(entry.FullName);
+                // Sanitize and check Zip Slip. If it is unsafe, we still store it in memory using the raw name
+                // so that the compliance validator can report it (as a Fatal ODF0200/ODF0201 issue),
+                // but any subsequent access to this entry via SanitizeEntryName will throw SecurityException.
+                string name;
+                try
+                {
+                    name = SanitizeEntryName(entry.FullName);
+                }
+                catch (SecurityException)
+                {
+                    name = entry.FullName;
+                }
 
                 // Zip DoS Defense: entry size
                 if (entry.Length > _loadOptions.MaxEntrySize)

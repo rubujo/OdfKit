@@ -288,5 +288,121 @@ namespace OdfKit.Tests
                 Assert.Equal("12pt", p.FontSizeComplex);
             }
         }
+
+        [Fact]
+        public void TestChartDocumentMerge()
+        {
+            using var ms1 = new MemoryStream();
+            using var ms2 = new MemoryStream();
+
+            using (var pkg1 = OdfPackage.Create(ms1, leaveOpen: true))
+            {
+                var doc1 = new OdfKit.Chart.OdfChartDocument(pkg1);
+                doc1.Save();
+            }
+            using (var pkg2 = OdfPackage.Create(ms2, leaveOpen: true))
+            {
+                var doc2 = new OdfKit.Chart.OdfChartDocument(pkg2);
+                doc2.Save();
+            }
+
+            ms1.Position = 0;
+            ms2.Position = 0;
+
+            using var src = new OdfKit.Chart.OdfChartDocument(OdfPackage.Open(ms1));
+            using var dest = new OdfKit.Chart.OdfChartDocument(OdfPackage.Open(ms2));
+
+            dest.AppendDocument(src, OdfMergeOptions.Default);
+
+            OdfNode? bodyNode = null;
+            foreach (var child in dest.ContentDom.Children)
+            {
+                if (child.LocalName == "body" && child.NamespaceUri == OdfNamespaces.Office)
+                {
+                    bodyNode = child;
+                    break;
+                }
+            }
+            Assert.NotNull(bodyNode);
+            
+            OdfNode? chartRoot = null;
+            foreach (var child in bodyNode.Children)
+            {
+                if (child.LocalName == "chart" && child.NamespaceUri == OdfNamespaces.Office)
+                {
+                    chartRoot = child;
+                    break;
+                }
+            }
+            Assert.NotNull(chartRoot);
+            
+            int chartCount = 0;
+            foreach (var child in chartRoot.Children)
+            {
+                if (child.LocalName == "chart" && child.NamespaceUri == OdfNamespaces.Chart)
+                {
+                    chartCount++;
+                }
+            }
+            Assert.Equal(2, chartCount);
+        }
+
+        [Fact]
+        public void TestFormulaDocumentMerge()
+        {
+            using var ms1 = new MemoryStream();
+            using var ms2 = new MemoryStream();
+
+            using (var pkg1 = OdfPackage.Create(ms1, leaveOpen: true))
+            {
+                var doc1 = new OdfKit.Formula.OdfFormulaDocument(pkg1);
+                doc1.Save();
+            }
+            using (var pkg2 = OdfPackage.Create(ms2, leaveOpen: true))
+            {
+                var doc2 = new OdfKit.Formula.OdfFormulaDocument(pkg2);
+                doc2.Save();
+            }
+
+            ms1.Position = 0;
+            ms2.Position = 0;
+
+            using var src = new OdfKit.Formula.OdfFormulaDocument(OdfPackage.Open(ms1));
+            using var dest = new OdfKit.Formula.OdfFormulaDocument(OdfPackage.Open(ms2));
+
+            dest.AppendDocument(src, OdfMergeOptions.Default);
+
+            OdfNode? bodyNode = null;
+            foreach (var child in dest.ContentDom.Children)
+            {
+                if (child.LocalName == "body" && child.NamespaceUri == OdfNamespaces.Office)
+                {
+                    bodyNode = child;
+                    break;
+                }
+            }
+            Assert.NotNull(bodyNode);
+            
+            OdfNode? formulaRoot = null;
+            foreach (var child in bodyNode.Children)
+            {
+                if (child.LocalName == "formula" && child.NamespaceUri == OdfNamespaces.Office)
+                {
+                    formulaRoot = child;
+                    break;
+                }
+            }
+            Assert.NotNull(formulaRoot);
+            
+            int mathCount = 0;
+            foreach (var child in formulaRoot.Children)
+            {
+                if (child.LocalName == "math" && child.NamespaceUri == "http://www.w3.org/1998/Math/MathML")
+                {
+                    mathCount++;
+                }
+            }
+            Assert.Equal(2, mathCount);
+        }
     }
 }

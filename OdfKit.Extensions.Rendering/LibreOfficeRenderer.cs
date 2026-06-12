@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -37,8 +38,8 @@ namespace OdfKit.Extensions.Rendering
             string? sandboxDir = null;
             try
             {
-                // Create a unique sandbox directory inside the OS temporary path
-                string tempSandbox = Path.Combine(Path.GetTempPath(), "OdfKit_Render_" + Guid.NewGuid().ToString("N"));
+                // Create a unique sandbox directory inside the OS temporary path, isolated by process ID
+                string tempSandbox = Path.Combine(Path.GetTempPath(), "OdfKit_Render_" + System.Diagnostics.Process.GetCurrentProcess().Id + "_" + Guid.NewGuid().ToString("N"));
                 if (!Directory.Exists(tempSandbox))
                 {
                     Directory.CreateDirectory(tempSandbox);

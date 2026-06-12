@@ -196,7 +196,9 @@ namespace OdfKit.Tests
             string outPath = Path.Combine(Path.GetTempPath(), "OdfKit_Challenger_Out_" + Guid.NewGuid().ToString("N") + ".pdf");
 
             var tempPath = Path.GetTempPath();
-            var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, "OdfKit_Render_*"), StringComparer.OrdinalIgnoreCase);
+            var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var searchPattern = $"OdfKit_Render_{currentPid}_*";
+            var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var token = cts.Token;
             string? detectedDir = null;
@@ -206,32 +208,47 @@ namespace OdfKit.Tests
             {
                 while (!token.IsCancellationRequested && detectedDir == null)
                 {
-                    var dirs = Directory.GetDirectories(tempPath, "OdfKit_Render_*");
-                    foreach (var dir in dirs)
+                    try
                     {
-                        if (existingDirs.Contains(dir)) continue;
-
-                        string profileDir = Path.Combine(dir, "profile");
-                        if (Directory.Exists(profileDir))
+                        var dirs = Directory.GetDirectories(tempPath, searchPattern);
+                        foreach (var dir in dirs)
                         {
-                            detectedDir = dir;
-                            // Acquire an exclusive file lock inside the profile directory to simulate an active handle
-                            try
+                            if (existingDirs.Contains(dir)) continue;
+
+                            string argsFile = Path.Combine(dir, "arguments.txt");
+                            if (File.Exists(argsFile))
                             {
-                                string lockFile = Path.Combine(profileDir, "lockfile.tmp");
-                                fsLock = new FileStream(lockFile, FileMode.Create, FileAccess.Write, FileShare.None);
+                                try
+                                {
+                                    var lines = File.ReadAllLines(argsFile);
+                                    if (System.Linq.Enumerable.Contains(lines, "pdf-leak-delay"))
+                                    {
+                                        // Acquire an exclusive file lock on arguments.txt to block cleanup/deletion
+                                        fsLock = new FileStream(argsFile, FileMode.Open, FileAccess.Read, FileShare.None);
+                                        detectedDir = dir;
+                                        break;
+                                    }
+                                }
+                                catch
+                                {
+                                    if (fsLock != null)
+                                    {
+                                        fsLock.Dispose();
+                                        fsLock = null;
+                                    }
+                                }
                             }
-                            catch { }
-                            break;
                         }
                     }
+                    catch { }
+                    if (detectedDir != null) break;
                     await Task.Delay(10);
                 }
             }, TestContext.Current.CancellationToken);
 
             try
             {
-                renderer.Convert(doc, outPath, "pdf-delay");
+                renderer.Convert(doc, outPath, "pdf-leak-delay");
             }
             catch (Exception)
             {
@@ -355,7 +372,9 @@ namespace OdfKit.Tests
         {
             LogDebug("CaptureSandboxDirAsync started");
             var tempPath = Path.GetTempPath();
-            var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, "OdfKit_Render_*"), StringComparer.OrdinalIgnoreCase);
+            var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var searchPattern = $"OdfKit_Render_{currentPid}_*";
+            var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var token = cts.Token;
             string? detectedDir = null;
@@ -367,7 +386,7 @@ namespace OdfKit.Tests
                 {
                     try
                     {
-                        var dirs = Directory.GetDirectories(tempPath, "OdfKit_Render_*");
+                        var dirs = Directory.GetDirectories(tempPath, searchPattern);
                         foreach (var dir in dirs)
                         {
                             if (existingDirs.Contains(dir)) continue;
@@ -415,7 +434,9 @@ namespace OdfKit.Tests
         {
             LogDebug("CaptureArgumentsAsync started");
             var tempPath = Path.GetTempPath();
-            var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, "OdfKit_Render_*"), StringComparer.OrdinalIgnoreCase);
+            var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var searchPattern = $"OdfKit_Render_{currentPid}_*";
+            var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var token = cts.Token;
 
@@ -430,7 +451,7 @@ namespace OdfKit.Tests
                 {
                     try
                     {
-                        var dirs = Directory.GetDirectories(tempPath, "OdfKit_Render_*");
+                        var dirs = Directory.GetDirectories(tempPath, searchPattern);
                         foreach (var dir in dirs)
                         {
                             if (existingDirs.Contains(dir)) continue;
@@ -681,7 +702,9 @@ namespace OdfKit.Tests
             var tasks = new List<Task>();
             
             var tempPath = Path.GetTempPath();
-            var baselineDirs = new HashSet<string>(Directory.GetDirectories(tempPath, "OdfKit_Render_*"), StringComparer.OrdinalIgnoreCase);
+            var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var searchPattern = $"OdfKit_Render_{currentPid}_*";
+            var baselineDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
 
             for (int i = 0; i < parallelCount; i++)
             {
@@ -736,7 +759,7 @@ namespace OdfKit.Tests
             Thread.Sleep(2000);
 
             // Verify that all temporary sandbox directories created by this stress test were cleaned up
-            var postDirs = Directory.GetDirectories(tempPath, "OdfKit_Render_*");
+            var postDirs = Directory.GetDirectories(tempPath, searchPattern);
             var leakedDirs = new List<string>();
             foreach (var dir in postDirs)
             {

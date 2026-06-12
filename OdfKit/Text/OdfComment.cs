@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using OdfKit.DOM;
 using OdfKit.Core;
@@ -55,7 +55,7 @@ namespace OdfKit.Text
         }
 
         /// <summary>
-        /// Renders this comment and its replies recursively into standard ODF 1.3 XML flat sibling <office:annotation> nodes.
+        /// Renders this comment and its replies recursively into standard ODF 1.3 XML flat sibling office annotation nodes.
         /// </summary>
         public OdfNode ToXmlNode()
         {

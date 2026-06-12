@@ -1,3 +1,4 @@
+﻿#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,7 +60,7 @@ namespace OdfKit.Compliance
             OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(detectedVersion);
             ValidateXmlRoots(package, schema, issues, profileId);
             ValidateProfileExtension(fileName, profile, profileId, issues);
-            ValidateProfileVersion(detectedVersion, profile, profileId, issues);
+            ValidateProfileVersion(detectedVersion, profile, profileId, issues, fileName, "/office:document-content[1]");
             OdfProfileRuleValidator.ValidatePackage(package, profile, schema, issues);
 
             return new OdfValidationReport(detectedVersion, documentKind, issues);
@@ -790,8 +791,11 @@ namespace OdfKit.Compliance
             OdfVersion detectedVersion,
             OdfComplianceProfile? profile,
             string? profileId,
-            List<OdfValidationIssue> issues)
+            List<OdfValidationIssue> issues,
+            string? fileName = null,
+            string? xPath = null)
         {
+            Console.WriteLine($"DEBUG: ValidateProfileVersion detectedVersion={detectedVersion}, profile={profile?.Id}, fileName={fileName}, xPath={xPath}");
             if (profile == null || detectedVersion == OdfVersion.Unknown)
             {
                 return;
@@ -803,6 +807,8 @@ namespace OdfKit.Compliance
                     OdfIssueSeverity.Error,
                     "ODF1001",
                     $"ODF version '{detectedVersion}' is not allowed by profile '{profile.Id}'.",
+                    packagePath: fileName,
+                    xPath: xPath,
                     requiredVersion: profile.SupportedVersions.Minimum,
                     profileId: profileId));
             }

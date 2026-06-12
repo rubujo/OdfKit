@@ -1,3 +1,4 @@
+﻿#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for legacy hand-written APIs to maintain zero-warning compilation under TreatWarningsAsErrors while package XML documentation is generated.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -376,6 +377,42 @@ namespace OdfKit.Compliance
             }
         }
 
+        private class ValidationStackFrame
+        {
+            public string NamespaceUri { get; }
+            public string LocalName { get; }
+            public string QualifiedName { get; }
+            public string XPath { get; }
+
+            // Track count of child element QNames seen in this frame
+            public Dictionary<string, int> ChildCounts { get; } = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            // Accessibility check accumulators
+            public bool HasAltText { get; set; }        // Set to true if svg:title or svg:desc is found inside this element
+            public bool HasTableHeaderRows { get; set; } // Set to true if table:table-header-rows is found inside table:table
+            public List<ImageInfo> ChildImages { get; } = new List<ImageInfo>();
+
+            public ValidationStackFrame(string namespaceUri, string localName, string qName, string xpath)
+            {
+                NamespaceUri = namespaceUri;
+                LocalName = localName;
+                QualifiedName = qName;
+                XPath = xpath;
+            }
+        }
+
+        private class ImageInfo
+        {
+            public string XPath { get; }
+            public bool HasAltText { get; }
+
+            public ImageInfo(string xpath, bool hasAltText)
+            {
+                XPath = xpath;
+                HasAltText = hasAltText;
+            }
+        }
+
         private static void ScanXml(
             Stream stream,
             string? packagePath,
@@ -393,21 +430,193 @@ namespace OdfKit.Compliance
                 CloseInput = closeInput
             };
 
+            OdfPolicyRule? accessRule = FindRule(profile, "RequireAccessibilityMetadata");
+            var stack = new Stack<ValidationStackFrame>();
+
             using XmlReader reader = XmlReader.Create(stream, settings);
             while (reader.Read())
             {
-                if (reader.NodeType != XmlNodeType.Element)
+                if (reader.NodeType == XmlNodeType.Element)
                 {
-                    continue;
-                }
+                    string prefix = OdfNamespaces.GetPrefix(reader.NamespaceURI);
+                    if (string.IsNullOrEmpty(prefix))
+                    {
+                        prefix = reader.Prefix;
+                    }
+                    string qName = string.IsNullOrEmpty(prefix) ? reader.LocalName : $"{prefix}:{reader.LocalName}";
 
-                string xPath = "/" + reader.LocalName;
-                ValidateOdfNamespaceElement(reader, packagePath, xPath, profile, schema, issues);
-                ValidateOdfNamespaceAttributes(reader, packagePath, xPath, profile, schema, issues);
-                ValidateForeignExtensionElement(reader, packagePath, xPath, profile, issues);
-                ValidateMacroOrScriptElement(reader, packagePath, xPath, profile, issues);
-                ValidateExternalResourceAttributes(reader, packagePath, xPath, profile, issues);
+                    // 1. Calculate XPath
+                    string currentXPath;
+                    if (stack.Count > 0)
+                    {
+                        var parent = stack.Peek();
+                        if (!parent.ChildCounts.TryGetValue(qName, out int count))
+                        {
+                            count = 0;
+                        }
+                        count++;
+                        parent.ChildCounts[qName] = count;
+                        currentXPath = $"{parent.XPath}/{qName}[{count}]";
+                    }
+                    else
+                    {
+                        currentXPath = $"/{qName}[1]";
+                    }
+
+                    // 2. Perform validation checks
+                    ValidateOdfNamespaceElement(reader, packagePath, currentXPath, profile, schema, issues);
+                    ValidateOdfNamespaceAttributes(reader, packagePath, currentXPath, profile, schema, issues);
+                    ValidateForeignExtensionElement(reader, packagePath, currentXPath, profile, issues);
+                    ValidateMacroOrScriptElement(reader, packagePath, currentXPath, profile, issues);
+                    ValidateMacroOrScriptAttributes(reader, packagePath, currentXPath, profile, issues);
+                    ValidateExternalResourceAttributes(reader, packagePath, currentXPath, profile, issues);
+
+                    // 3. Process accessibility metadata accumulation
+                    if (accessRule != null && stack.Count > 0)
+                    {
+                        var parent = stack.Peek();
+                        if (reader.NamespaceURI == OdfNamespaces.Svg &&
+                            (reader.LocalName == "title" || reader.LocalName == "desc"))
+                        {
+                            parent.HasAltText = true;
+                        }
+                        else if (reader.NamespaceURI == OdfNamespaces.Table &&
+                                 reader.LocalName == "table-header-rows" &&
+                                 parent.LocalName == "table" && parent.NamespaceUri == OdfNamespaces.Table)
+                        {
+                            parent.HasTableHeaderRows = true;
+                        }
+                    }
+
+                    // 4. Handle stack push / empty elements
+                    if (reader.IsEmptyElement)
+                    {
+                        if (accessRule != null && reader.NamespaceURI == OdfNamespaces.Draw && reader.LocalName == "image")
+                        {
+                            if (stack.Count > 0 && stack.Peek().LocalName == "frame" && stack.Peek().NamespaceUri == OdfNamespaces.Draw)
+                            {
+                                stack.Peek().ChildImages.Add(new ImageInfo(currentXPath, hasAltText: false));
+                            }
+                            else
+                            {
+                                // Standalone image with no alternative text
+                                issues.Add(new OdfValidationIssue(
+                                    accessRule.DefaultSeverity,
+                                    accessRule.Id,
+                                    "Image is missing alternative text (svg:title or svg:desc).",
+                                    packagePath,
+                                    currentXPath,
+                                    profileId: profile.Id));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        stack.Push(new ValidationStackFrame(reader.NamespaceURI, reader.LocalName, qName, currentXPath));
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.EndElement)
+                {
+                    if (stack.Count == 0) continue;
+                    var frame = stack.Pop();
+
+                    if (accessRule != null)
+                    {
+                        if (frame.NamespaceUri == OdfNamespaces.Draw && frame.LocalName == "image")
+                        {
+                            if (stack.Count > 0 && stack.Peek().LocalName == "frame" && stack.Peek().NamespaceUri == OdfNamespaces.Draw)
+                            {
+                                stack.Peek().ChildImages.Add(new ImageInfo(frame.XPath, frame.HasAltText));
+                            }
+                            else if (!frame.HasAltText)
+                            {
+                                // Standalone image with no alternative text
+                                issues.Add(new OdfValidationIssue(
+                                    accessRule.DefaultSeverity,
+                                    accessRule.Id,
+                                    "Image is missing alternative text (svg:title or svg:desc).",
+                                    packagePath,
+                                    frame.XPath,
+                                    profileId: profile.Id));
+                            }
+                        }
+                        else if (frame.NamespaceUri == OdfNamespaces.Draw && frame.LocalName == "frame")
+                        {
+                            if (!frame.HasAltText)
+                            {
+                                foreach (var img in frame.ChildImages)
+                                {
+                                    if (!img.HasAltText)
+                                    {
+                                        issues.Add(new OdfValidationIssue(
+                                            accessRule.DefaultSeverity,
+                                            accessRule.Id,
+                                            "Image is missing alternative text (svg:title or svg:desc) on both the draw:image and its parent draw:frame.",
+                                            packagePath,
+                                            img.XPath,
+                                            profileId: profile.Id));
+                                    }
+                                }
+                            }
+                        }
+                        else if (frame.NamespaceUri == OdfNamespaces.Table && frame.LocalName == "table")
+                        {
+                            if (!frame.HasTableHeaderRows)
+                            {
+                                issues.Add(new OdfValidationIssue(
+                                    accessRule.DefaultSeverity,
+                                    accessRule.Id,
+                                    "Table is missing a table:table-header-rows child element.",
+                                    packagePath,
+                                    frame.XPath,
+                                    profileId: profile.Id));
+                            }
+                        }
+                    }
+                }
             }
+        }
+
+        private static OdfVersion? FindMinimumElementVersion(string namespaceUri, string localName)
+        {
+            var versions = new[]
+            {
+                OdfVersion.Odf10,
+                OdfVersion.Odf11,
+                OdfVersion.Odf12,
+                OdfVersion.Odf13,
+                OdfVersion.Odf14
+            };
+            foreach (var version in versions)
+            {
+                var schema = OdfSchemaRegistry.GetSchema(version);
+                if (schema != null && schema.ContainsElement(namespaceUri, localName))
+                {
+                    return version;
+                }
+            }
+            return null;
+        }
+
+        private static OdfVersion? FindMinimumAttributeVersion(string namespaceUri, string localName)
+        {
+            var versions = new[]
+            {
+                OdfVersion.Odf10,
+                OdfVersion.Odf11,
+                OdfVersion.Odf12,
+                OdfVersion.Odf13,
+                OdfVersion.Odf14
+            };
+            foreach (var version in versions)
+            {
+                var schema = OdfSchemaRegistry.GetSchema(version);
+                if (schema != null && schema.FindAttribute(namespaceUri, localName) != null)
+                {
+                    return version;
+                }
+            }
+            return null;
         }
 
         private static void ValidateOdfNamespaceElement(
@@ -430,12 +639,15 @@ namespace OdfKit.Compliance
                 return;
             }
 
+            OdfVersion? requiredVersion = FindMinimumElementVersion(reader.NamespaceURI, reader.LocalName);
+
             issues.Add(new OdfValidationIssue(
                 rule.DefaultSeverity,
                 rule.Id,
                 $"ODF namespace element '{{{reader.NamespaceURI}}}{reader.LocalName}' is not present in the selected schema metadata.",
                 packagePath,
                 xPath,
+                requiredVersion: requiredVersion,
                 profileId: profile.Id));
         }
 
@@ -460,12 +672,15 @@ namespace OdfKit.Compliance
                 if (IsOdfNamespace(reader.NamespaceURI) &&
                     schema.FindAttribute(reader.NamespaceURI, reader.LocalName) == null)
                 {
+                    OdfVersion? requiredVersion = FindMinimumAttributeVersion(reader.NamespaceURI, reader.LocalName);
+
                     issues.Add(new OdfValidationIssue(
                         rule.DefaultSeverity,
                         rule.Id,
                         $"ODF namespace attribute '{{{reader.NamespaceURI}}}{reader.LocalName}' is not present in the selected schema metadata.",
                         packagePath,
                         xPath + "/@" + reader.LocalName,
+                        requiredVersion: requiredVersion,
                         profileId: profile.Id));
                 }
             }
@@ -530,6 +745,45 @@ namespace OdfKit.Compliance
                 profileId: profile.Id));
         }
 
+        private static void ValidateMacroOrScriptAttributes(
+            XmlReader reader,
+            string? packagePath,
+            string xPath,
+            OdfComplianceProfile profile,
+            List<OdfValidationIssue> issues)
+        {
+            OdfPolicyRule? macroRule = FindRule(profile, "DisallowMacroByDefault");
+            if (macroRule == null || !reader.HasAttributes)
+            {
+                return;
+            }
+
+            for (int i = 0; i < reader.AttributeCount; i++)
+            {
+                reader.MoveToAttribute(i);
+                
+                string attrQName = string.IsNullOrEmpty(reader.Prefix) ? reader.LocalName : $"{reader.Prefix}:{reader.LocalName}";
+                bool isScriptAttr = reader.NamespaceURI == "urn:oasis:names:tc:opendocument:xmlns:script:1.0" ||
+                                    string.Equals(reader.Prefix, "script", StringComparison.Ordinal) ||
+                                    string.Equals(attrQName, "script:event-name", StringComparison.Ordinal) ||
+                                    (string.Equals(reader.LocalName, "event-name", StringComparison.Ordinal) && reader.NamespaceURI == "urn:oasis:names:tc:opendocument:xmlns:script:1.0") ||
+                                    reader.Value.Contains("vnd.sun.star.script:", StringComparison.Ordinal);
+
+                if (isScriptAttr)
+                {
+                    issues.Add(new OdfValidationIssue(
+                        macroRule.DefaultSeverity,
+                        macroRule.Id,
+                        $"Profile reports script or macro attribute '{attrQName}' with value '{reader.Value}'.",
+                        packagePath,
+                        xPath,
+                        profileId: profile.Id));
+                }
+            }
+
+            reader.MoveToElement();
+        }
+
         private static void ValidateExternalResourceAttributes(
             XmlReader reader,
             string? packagePath,
@@ -584,10 +838,32 @@ namespace OdfKit.Compliance
 
         private static bool IsExternalReference(string value)
         {
-            return value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                value.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
-                value.StartsWith("file:", StringComparison.OrdinalIgnoreCase) ||
-                value.StartsWith("//", StringComparison.Ordinal);
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            if (value.StartsWith("//", StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            int colonIndex = value.IndexOf(':');
+            if (colonIndex > 0)
+            {
+                // Check if all characters before the colon are letters
+                for (int i = 0; i < colonIndex; i++)
+                {
+                    char c = value[i];
+                    if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            return false;
         }
     }
 }
