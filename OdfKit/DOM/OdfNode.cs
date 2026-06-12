@@ -1,4 +1,5 @@
 using System.Text;
+using System.Xml.Linq;
 using OdfKit.Core;
 using OdfKit.Compliance;
 
@@ -64,6 +65,11 @@ namespace OdfKit.DOM
             LocalName = localName;
             NamespaceUri = namespaceUri;
             Prefix = prefix;
+        }
+
+        public OdfNode(OdfNodeType nodeType, string localName, XNamespace namespaceUri, string? prefix = null)
+            : this(nodeType, localName, namespaceUri.NamespaceName, prefix)
+        {
         }
 
         /// <summary>
@@ -213,6 +219,18 @@ namespace OdfKit.DOM
             }
         }
 
+        public IEnumerable<OdfNode> Descendants()
+        {
+            foreach (var child in Children)
+            {
+                yield return child;
+                foreach (var descendant in child.Descendants())
+                {
+                    yield return descendant;
+                }
+            }
+        }
+
         #endregion
 
         #region Attributes Helper
@@ -222,6 +240,8 @@ namespace OdfKit.DOM
             var key = new OdfAttributeName(localName, namespaceUri);
             return Attributes.TryGetValue(key, out string? value) ? value : null;
         }
+
+        public string? GetAttribute(string localName, XNamespace namespaceUri) => GetAttribute(localName, namespaceUri.NamespaceName);
 
         public void SetAttribute(string localName, string namespaceUri, string value, string? prefix = null)
         {
@@ -233,6 +253,8 @@ namespace OdfKit.DOM
             }
         }
 
+        public void SetAttribute(string localName, XNamespace namespaceUri, string value, string? prefix = null) => SetAttribute(localName, namespaceUri.NamespaceName, value, prefix);
+
         public void RemoveAttribute(string localName, string namespaceUri)
         {
             var key = new OdfAttributeName(localName, namespaceUri);
@@ -241,6 +263,8 @@ namespace OdfKit.DOM
                 IsModified = true;
             }
         }
+
+        public void RemoveAttribute(string localName, XNamespace namespaceUri) => RemoveAttribute(localName, namespaceUri.NamespaceName);
 
         #endregion
 
@@ -342,10 +366,10 @@ namespace OdfKit.DOM
         {
             // Check xlink:href attribute in the node
             var hrefKey = new OdfAttributeName("href", OdfNamespaces.XLink);
-            if (node.Attributes.TryGetValue(hrefKey, out string? href))
+            if (node.Attributes.TryGetValue(hrefKey, out string? href) && href != null)
             {
                 // Media references normally reside in "Pictures/" within the zip package
-                if (href != null && href.StartsWith("Pictures/", StringComparison.OrdinalIgnoreCase))
+                if (href.StartsWith("Pictures/", StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {
@@ -367,9 +391,48 @@ namespace OdfKit.DOM
                         OdfKitDiagnostics.Warn($"Failed to migrate media reference '{href}' during node import: {ex.Message}");
                     }
                 }
+                else
+                {
+                    string normHref = href.TrimStart('.', '/').TrimEnd('/');
+                    string folderPrefix = normHref + "/";
+                    var entriesToCopy = sourcePackage.GetEntries()
+                                                      .Where(e => e.Path.StartsWith(folderPrefix, StringComparison.OrdinalIgnoreCase))
+                                                      .ToList();
+                    
+                    if (entriesToCopy.Any())
+                    {
+                        string originalPrefix = normHref.StartsWith("Object", StringComparison.OrdinalIgnoreCase) ? "Object" : "Formula";
+                        string newHref = $"{originalPrefix}_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
+                        
+                        foreach (var entryInfo in entriesToCopy)
+                        {
+                            string srcPath = entryInfo.Path;
+                            string relativePath = srcPath.Substring(folderPrefix.Length);
+                            string destPath = $"{newHref}/{relativePath}";
+                            
+                            try
+                            {
+                                byte[] bytes = sourcePackage.ReadEntry(srcPath);
+                                string mediaType = sourcePackage.Manifest.TryGetValue(srcPath, out var m) ? m : "text/xml";
+                                if (relativePath == "mimetype")
+                                {
+                                    mediaType = Encoding.UTF8.GetString(bytes).Trim();
+                                }
+                                destPackage.WriteEntry(destPath, bytes, mediaType);
+                            }
+                            catch (Exception ex)
+                            {
+                                OdfKitDiagnostics.Warn($"Failed to migrate embedded entry '{srcPath}' during node import: {ex.Message}");
+                            }
+                        }
+                        
+                        node.Attributes[hrefKey] = newHref;
+                        destPackage.SaveManifestToEntries();
+                }
             }
+        }
 
-            // Recurse children
+        // Recurse children
             foreach (var child in node.Children)
             {
                 MigrateMediaReferences(child, sourcePackage, destPackage);
@@ -378,4 +441,36 @@ namespace OdfKit.DOM
 
         #endregion
     }
+
+    public static class OdfNodeExtensions
+    {
+        public static IEnumerable<OdfNode> Descendants(this OdfNode node)
+        {
+            if (node == null) yield break;
+            foreach (var child in node.Children)
+            {
+                yield return child;
+                foreach (var desc in child.Descendants())
+                {
+                    yield return desc;
+                }
+            }
+        }
+
+        public static OdfNode? FindChildElement(this OdfNode node, string localName, string nsUri)
+        {
+            if (node == null) return null;
+            foreach (var child in node.Children)
+            {
+                if (child.NodeType == OdfNodeType.Element &&
+                    string.Equals(child.LocalName, localName, StringComparison.Ordinal) &&
+                    string.Equals(child.NamespaceUri, nsUri, StringComparison.Ordinal))
+                {
+                    return child;
+                }
+            }
+            return null;
+        }
+    }
 }
+

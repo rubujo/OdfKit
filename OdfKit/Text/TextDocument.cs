@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -20,6 +21,7 @@ namespace OdfKit.Text
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
             }
             InitializeTextRoot();
+            StyleEngine.OnStyleChanging = TrackFormatChange;
         }
 
         private void InitializeTextRoot()
@@ -35,7 +37,7 @@ namespace OdfKit.Text
 
         protected override string GetDefaultStylesXml()
         {
-            return "<office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:meta=\"urn:oasis:names:tc:opendocument:xmlns:meta:1.0\" xmlns:number=\"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\" xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\" xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\" xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"1.3\"><office:styles></office:styles><office:automatic-styles></office:automatic-styles><office:master-styles></office:master-styles></office:document-styles>";
+            return "<office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:meta=\"urn:oasis:names:tc:opendocument:xmlns:meta:1.0\" xmlns:number=\"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\" xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\" xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\" xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"1.3\"><office:styles></office:styles><office:automatic-styles></office:automatic-styles><office:master-styles><style:master-page style:name=\"Standard\" style:page-layout-name=\"Mpm1\"/></office:master-styles></office:document-styles>";
         }
 
         #region Document Elements Addition API
@@ -44,7 +46,22 @@ namespace OdfKit.Text
         {
             var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
             pNode.TextContent = text;
-            BodyTextRoot.AppendChild(pNode);
+            if (TrackedChanges)
+            {
+                string changeId = RecordTrackedChange("insertion");
+                var startNode = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
+                startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+                var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
+                endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+                
+                BodyTextRoot.AppendChild(startNode);
+                BodyTextRoot.AppendChild(pNode);
+                BodyTextRoot.AppendChild(endNode);
+            }
+            else
+            {
+                BodyTextRoot.AppendChild(pNode);
+            }
             return new OdfParagraph(pNode, this);
         }
 
@@ -53,7 +70,22 @@ namespace OdfKit.Text
             var hNode = OdfNodeFactory.CreateElement("h", OdfNamespaces.Text, "text");
             hNode.TextContent = text;
             hNode.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(), "text");
-            BodyTextRoot.AppendChild(hNode);
+            if (TrackedChanges)
+            {
+                string changeId = RecordTrackedChange("insertion");
+                var startNode = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
+                startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+                var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
+                endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+                
+                BodyTextRoot.AppendChild(startNode);
+                BodyTextRoot.AppendChild(hNode);
+                BodyTextRoot.AppendChild(endNode);
+            }
+            else
+            {
+                BodyTextRoot.AppendChild(hNode);
+            }
             return new OdfHeading(hNode, this);
         }
 
@@ -122,24 +154,90 @@ namespace OdfKit.Text
             paragraph.Node.AppendChild(fNode);
         }
 
-        public void AddAlphabeticalIndex()
+        public OdfAlphabeticalIndex AddAlphabeticalIndex(string title = "Alphabetical Index")
         {
             var idxNode = OdfNodeFactory.CreateElement("alphabetical-index", OdfNamespaces.Text, "text");
-            idxNode.SetAttribute("name", OdfNamespaces.Text, "Alphabetical Index", "text");
+            idxNode.SetAttribute("name", OdfNamespaces.Text, title, "text");
+            
+            var sourceNode = OdfNodeFactory.CreateElement("alphabetical-index-source", OdfNamespaces.Text, "text");
+            idxNode.AppendChild(sourceNode);
+
             var bodyNode = OdfNodeFactory.CreateElement("index-body", OdfNamespaces.Text, "text");
+            var titlePara = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
+            titlePara.TextContent = title;
+            bodyNode.AppendChild(titlePara);
             idxNode.AppendChild(bodyNode);
+
             BodyTextRoot.AppendChild(idxNode);
             SetUpdateFieldsWhenOpening(true);
+            return new OdfAlphabeticalIndex(idxNode, this);
         }
 
-        public void AddBibliography()
+        public OdfBibliography AddBibliography(string title = "Bibliography")
         {
             var bibNode = OdfNodeFactory.CreateElement("bibliography", OdfNamespaces.Text, "text");
-            bibNode.SetAttribute("name", OdfNamespaces.Text, "Bibliography", "text");
+            bibNode.SetAttribute("name", OdfNamespaces.Text, title, "text");
+            
+            var sourceNode = OdfNodeFactory.CreateElement("bibliography-source", OdfNamespaces.Text, "text");
+            bibNode.AppendChild(sourceNode);
+
             var bodyNode = OdfNodeFactory.CreateElement("index-body", OdfNamespaces.Text, "text");
+            var titlePara = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
+            titlePara.TextContent = title;
+            bodyNode.AppendChild(titlePara);
             bibNode.AppendChild(bodyNode);
+
             BodyTextRoot.AppendChild(bibNode);
             SetUpdateFieldsWhenOpening(true);
+            return new OdfBibliography(bibNode, this);
+        }
+
+        public List<OdfIndex> GetIndexes()
+        {
+            var list = new List<OdfIndex>();
+            FindIndexesRecursive(BodyTextRoot, list);
+            return list;
+        }
+
+        private void FindIndexesRecursive(OdfNode node, List<OdfIndex> list)
+        {
+            if (node.NamespaceUri == OdfNamespaces.Text)
+            {
+                if (node.LocalName == "table-of-content")
+                    list.Add(new OdfTableOfContents(node, this));
+                else if (node.LocalName == "alphabetical-index")
+                    list.Add(new OdfAlphabeticalIndex(node, this));
+                else if (node.LocalName == "bibliography")
+                    list.Add(new OdfBibliography(node, this));
+            }
+            foreach (var child in node.Children)
+            {
+                FindIndexesRecursive(child, list);
+            }
+        }
+
+        public OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(OdfParagraph paragraph, string stringValue, string? key1 = null, string? key2 = null)
+        {
+            var markNode = OdfNodeFactory.CreateElement("alphabetical-index-mark", OdfNamespaces.Text, "text");
+            markNode.SetAttribute("string-value", OdfNamespaces.Text, stringValue, "text");
+            if (key1 != null) markNode.SetAttribute("key1", OdfNamespaces.Text, key1, "text");
+            if (key2 != null) markNode.SetAttribute("key2", OdfNamespaces.Text, key2, "text");
+            
+            paragraph.Node.AppendChild(markNode);
+            return new OdfAlphabeticalIndexMark(markNode);
+        }
+
+        public OdfBibliographyMark AddBibliographyMark(OdfParagraph paragraph, string identifier, string bibliographyType, string author, string title, string year)
+        {
+            var markNode = OdfNodeFactory.CreateElement("bibliography-mark", OdfNamespaces.Text, "text");
+            markNode.SetAttribute("identifier", OdfNamespaces.Text, identifier, "text");
+            markNode.SetAttribute("bibliography-type", OdfNamespaces.Text, bibliographyType, "text");
+            markNode.SetAttribute("author", OdfNamespaces.Text, author, "text");
+            markNode.SetAttribute("title", OdfNamespaces.Text, title, "text");
+            markNode.SetAttribute("year", OdfNamespaces.Text, year, "text");
+
+            paragraph.Node.AppendChild(markNode);
+            return new OdfBibliographyMark(markNode);
         }
 
         public void AddTableIndex()
@@ -211,7 +309,7 @@ namespace OdfKit.Text
             return new OdfImage(frameNode, imageNode);
         }
 
-        public void AddRuby(OdfParagraph paragraph, string baseText, string rubyText)
+        public OdfRuby AddRuby(OdfParagraph paragraph, string baseText, string rubyText)
         {
             var rubyNode = OdfNodeFactory.CreateElement("ruby", OdfNamespaces.Text, "text");
             
@@ -224,6 +322,7 @@ namespace OdfKit.Text
             rubyNode.AppendChild(textNode);
 
             paragraph.Node.AppendChild(rubyNode);
+            return new OdfRuby(rubyNode, this);
         }
 
         #endregion
@@ -239,26 +338,27 @@ namespace OdfKit.Text
 
         #region TOC (Table of Contents)
 
-        public void AddTableOfContents()
+        public OdfTableOfContents AddTableOfContents(string title = "Table of Contents", int outlineLevel = 10)
         {
-            var tocNode = new OdfNode(OdfNodeType.Element, "table-of-content", OdfNamespaces.Text, "text");
-            tocNode.SetAttribute("name", OdfNamespaces.Text, "Table of Contents", "text");
+            var tocNode = OdfNodeFactory.CreateElement("table-of-content", OdfNamespaces.Text, "text");
+            tocNode.SetAttribute("name", OdfNamespaces.Text, title, "text");
 
-            var sourceNode = new OdfNode(OdfNodeType.Element, "table-of-content-source", OdfNamespaces.Text, "text");
-            sourceNode.SetAttribute("outline-level", OdfNamespaces.Text, "10", "text");
+            var sourceNode = OdfNodeFactory.CreateElement("table-of-content-source", OdfNamespaces.Text, "text");
+            sourceNode.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(), "text");
             tocNode.AppendChild(sourceNode);
 
-            var bodyNode = new OdfNode(OdfNodeType.Element, "index-body", OdfNamespaces.Text, "text");
+            var bodyNode = OdfNodeFactory.CreateElement("index-body", OdfNamespaces.Text, "text");
             
-            var titlePara = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+            var titlePara = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
             titlePara.SetAttribute("style-name", OdfNamespaces.Text, "Contents_20_Heading", "text");
-            titlePara.TextContent = "Table of Contents";
+            titlePara.TextContent = title;
             bodyNode.AppendChild(titlePara);
             
             tocNode.AppendChild(bodyNode);
             BodyTextRoot.AppendChild(tocNode);
 
             SetUpdateFieldsWhenOpening(true);
+            return new OdfTableOfContents(tocNode, this);
         }
 
         private void SetUpdateFieldsWhenOpening(bool update)
@@ -411,6 +511,16 @@ namespace OdfKit.Text
             if (paragraph == null) throw new ArgumentNullException(nameof(paragraph));
             if (string.IsNullOrWhiteSpace(mathMlXmlString)) throw new ArgumentException("MathML XML content cannot be empty.", nameof(mathMlXmlString));
 
+            // Validate that mathMlXmlString is well-formed XML
+            try
+            {
+                XElement.Parse(mathMlXmlString);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException("Invalid MathML XML: " + ex.Message, nameof(mathMlXmlString), ex);
+            }
+
             string folder = $"Formula_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
             string mathDocXml = $"<office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:math=\"http://www.w3.org/1998/Math/MathML\"><office:body><office:formula>{mathMlXmlString}</office:formula></office:body></office:document-meta>";
 
@@ -435,6 +545,22 @@ namespace OdfKit.Text
             frame.AppendChild(obj);
 
             paragraph.Node.AppendChild(frame);
+        }
+
+        #endregion
+
+        #region CJK Font Fallback
+
+        public void ApplyCjkFontFallback()
+        {
+            // Declare default CJK fonts in font-face-decls if they are not present
+            AddFontFace("PMingLiU", "PMingLiU", "system-serif", "variable");
+            AddFontFace("Microsoft JhengHei", "Microsoft JhengHei", "system-sans-serif", "variable");
+            AddFontFace("MS Mincho", "MS Mincho", "system-serif", "variable");
+            AddFontFace("MS Gothic", "MS Gothic", "system-sans-serif", "variable");
+            AddFontFace("SimSun", "SimSun", "system-serif", "variable");
+            AddFontFace("Microsoft YaHei", "Microsoft YaHei", "system-sans-serif", "variable");
+            AddFontFace("Malgun Gothic", "Malgun Gothic", "system-sans-serif", "variable");
         }
 
         #endregion
@@ -533,6 +659,220 @@ namespace OdfKit.Text
 
         public bool TrackedChanges { get; set; }
 
+        public string RecordTrackedChange(string changeType, OdfNode? extraContent = null, string? originalStyleName = null, string? targetFamily = null)
+        {
+            OdfNode? tcNode = null;
+            foreach (var child in BodyTextRoot.Children)
+            {
+                if (child.LocalName == "tracked-changes" && child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    tcNode = child;
+                    break;
+                }
+            }
+            if (tcNode == null)
+            {
+                tcNode = new OdfNode(OdfNodeType.Element, "tracked-changes", OdfNamespaces.Text, "text");
+                if (BodyTextRoot.Children.Count > 0)
+                    BodyTextRoot.InsertBefore(tcNode, BodyTextRoot.Children[0]);
+                else
+                    BodyTextRoot.AppendChild(tcNode);
+            }
+
+            string changeId = "ct_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+
+            var changedRegion = new OdfNode(OdfNodeType.Element, "changed-region", OdfNamespaces.Text, "text");
+            changedRegion.SetAttribute("id", OdfNamespaces.Text, changeId, "text");
+
+            var typeNode = new OdfNode(OdfNodeType.Element, changeType, OdfNamespaces.Text, "text");
+            if (changeType == "deletion" && extraContent != null)
+            {
+                typeNode.AppendChild(extraContent.CloneNode(true));
+            }
+            else if (changeType == "format-change")
+            {
+                if (originalStyleName != null)
+                {
+                    typeNode.SetAttribute("style-name", OdfNamespaces.Text, originalStyleName, "text");
+                }
+                if (targetFamily != null)
+                {
+                    typeNode.SetAttribute("target-family", OdfNamespaces.Text, targetFamily, "text");
+                }
+            }
+            changedRegion.AppendChild(typeNode);
+
+            var changeInfo = new OdfNode(OdfNodeType.Element, "change-info", OdfNamespaces.Office, "office");
+            typeNode.AppendChild(changeInfo);
+
+            var creator = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc");
+            creator.TextContent = "Author";
+            changeInfo.AppendChild(creator);
+
+            var date = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc");
+            date.TextContent = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            changeInfo.AppendChild(date);
+
+            tcNode.AppendChild(changedRegion);
+            return changeId;
+        }
+
+        public void TrackFormatChange(OdfNode node, string family)
+        {
+            if (!TrackedChanges) return;
+
+            string styleAttr = "style-name";
+            string styleNs = family switch
+            {
+                "table-cell" or "table-row" or "table-column" => OdfNamespaces.Table,
+                "graphic" => OdfNamespaces.Draw,
+                _ => OdfNamespaces.Text
+            };
+            string? originalStyleName = node.GetAttribute(styleAttr, styleNs);
+
+            string changeId = RecordTrackedChange("format-change", null, originalStyleName, family);
+
+            var startNode = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
+            startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+            var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
+            endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+
+            if (node.LocalName == "p" || node.LocalName == "h")
+            {
+                if (node.Children.Count > 0)
+                {
+                    node.InsertBefore(startNode, node.Children[0]);
+                }
+                else
+                {
+                    node.AppendChild(startNode);
+                }
+                node.AppendChild(endNode);
+            }
+            else
+            {
+                var parent = node.Parent;
+                if (parent != null)
+                {
+                    parent.InsertBefore(startNode, node);
+                    parent.InsertAfter(endNode, node);
+                }
+            }
+        }
+
+        public void DeleteNode(OdfNode node)
+        {
+            if (node.Parent == null) return;
+            var parent = node.Parent;
+
+            if (TrackedChanges)
+            {
+                string changeId = RecordTrackedChange("deletion", node);
+
+                var startNode = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
+                startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+                var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
+                endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+
+                parent.InsertBefore(startNode, node);
+                parent.InsertAfter(endNode, node);
+                parent.RemoveChild(node);
+            }
+            else
+            {
+                parent.RemoveChild(node);
+            }
+        }
+
+        private List<OdfNode> FindAffectedNodesForFormatChange(string changeId)
+        {
+            var affected = new List<OdfNode>();
+            
+            // Look up targetFamily from tracked changes metadata
+            string? targetFamily = null;
+            var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
+            if (tcNode != null)
+            {
+                foreach (var region in tcNode.Children)
+                {
+                    if (region.GetAttribute("id", OdfNamespaces.Text) == changeId)
+                    {
+                        foreach (var spec in region.Children)
+                        {
+                            if (spec.LocalName == "format-change" && spec.NamespaceUri == OdfNamespaces.Text)
+                            {
+                                targetFamily = spec.GetAttribute("target-family", OdfNamespaces.Text);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            var startNode = FindChangeNode(BodyTextRoot, "change-start", changeId);
+            if (startNode == null || startNode.Parent == null) return affected;
+
+            var parent = startNode.Parent;
+            
+            if (targetFamily == "paragraph")
+            {
+                affected.Add(parent);
+                return affected;
+            }
+
+            if (parent.LocalName == "p" || parent.LocalName == "h")
+            {
+                var endNode = FindChangeNode(parent, "change-end", changeId);
+                if (endNode != null && endNode.Parent == parent)
+                {
+                    var siblingsBetween = new List<OdfNode>();
+                    bool collect = false;
+                    foreach (var child in parent.Children)
+                    {
+                        if (child == startNode) { collect = true; continue; }
+                        if (child == endNode) { collect = false; break; }
+                        if (collect) siblingsBetween.Add(child);
+                    }
+
+                    if (siblingsBetween.Count > 0)
+                    {
+                        foreach (var sibling in siblingsBetween)
+                        {
+                            if (sibling.LocalName == "span")
+                            {
+                                affected.Add(sibling);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        affected.Add(parent);
+                    }
+                }
+            }
+            else
+            {
+                var endNode = FindChangeNode(BodyTextRoot, "change-end", changeId);
+                if (endNode != null && endNode.Parent == parent)
+                {
+                    bool collect = false;
+                    foreach (var child in parent.Children)
+                    {
+                        if (child == startNode) { collect = true; continue; }
+                        if (child == endNode) { collect = false; break; }
+                        if (collect) affected.Add(child);
+                    }
+                }
+            }
+
+            if (affected.Count == 0)
+            {
+                affected.Add(parent);
+            }
+
+            return affected;
+        }
+
         public void AcceptAllTrackedChanges()
         {
             var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
@@ -573,6 +913,48 @@ namespace OdfKit.Text
                 else if (kvp.Value == "deletion")
                 {
                     RestoreDeletedContent(tcNode, kvp.Key);
+                }
+                else if (kvp.Value == "format-change")
+                {
+                    string? originalStyleName = null;
+                    foreach (var changedRegion in tcNode.Children)
+                    {
+                        if (changedRegion.GetAttribute("id", OdfNamespaces.Text) == kvp.Key)
+                        {
+                            foreach (var spec in changedRegion.Children)
+                            {
+                                if (spec.LocalName == "format-change" && spec.NamespaceUri == OdfNamespaces.Text)
+                                {
+                                    originalStyleName = spec.GetAttribute("style-name", OdfNamespaces.Text);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    var affected = FindAffectedNodesForFormatChange(kvp.Key);
+                    foreach (var node in affected)
+                    {
+                        string styleAttr = "style-name";
+                        string styleNs = OdfNamespaces.Text;
+                        if (node.LocalName == "table-cell" || node.LocalName == "table-row" || node.LocalName == "table-column")
+                        {
+                            styleNs = OdfNamespaces.Table;
+                        }
+                        else if (node.LocalName == "object" || node.LocalName == "frame")
+                        {
+                            styleNs = OdfNamespaces.Draw;
+                        }
+
+                        if (originalStyleName != null)
+                        {
+                            node.SetAttribute(styleAttr, styleNs, originalStyleName);
+                        }
+                        else
+                        {
+                            node.RemoveAttribute(styleAttr, styleNs);
+                        }
+                    }
                 }
             }
 
@@ -629,6 +1011,48 @@ namespace OdfKit.Text
             else if (type == "deletion")
             {
                 RestoreDeletedContent(tcNode, changeId);
+            }
+            else if (type == "format-change")
+            {
+                string? originalStyleName = null;
+                foreach (var changedRegion in tcNode.Children)
+                {
+                    if (changedRegion.GetAttribute("id", OdfNamespaces.Text) == changeId)
+                    {
+                        foreach (var spec in changedRegion.Children)
+                        {
+                            if (spec.LocalName == "format-change" && spec.NamespaceUri == OdfNamespaces.Text)
+                            {
+                                originalStyleName = spec.GetAttribute("style-name", OdfNamespaces.Text);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                var affected = FindAffectedNodesForFormatChange(changeId);
+                foreach (var node in affected)
+                {
+                    string styleAttr = "style-name";
+                    string styleNs = OdfNamespaces.Text;
+                    if (node.LocalName == "table-cell" || node.LocalName == "table-row" || node.LocalName == "table-column")
+                    {
+                        styleNs = OdfNamespaces.Table;
+                    }
+                    else if (node.LocalName == "object" || node.LocalName == "frame")
+                    {
+                        styleNs = OdfNamespaces.Draw;
+                    }
+
+                    if (originalStyleName != null)
+                    {
+                        node.SetAttribute(styleAttr, styleNs, originalStyleName);
+                    }
+                    else
+                    {
+                        node.RemoveAttribute(styleAttr, styleNs);
+                    }
+                }
             }
 
             RemoveChangeMarkersForId(BodyTextRoot, changeId);
@@ -729,6 +1153,10 @@ namespace OdfKit.Text
                     else if (spec.LocalName == "deletion" && spec.NamespaceUri == OdfNamespaces.Text)
                     {
                         changes[id!] = "deletion";
+                    }
+                    else if (spec.LocalName == "format-change" && spec.NamespaceUri == OdfNamespaces.Text)
+                    {
+                        changes[id!] = "format-change";
                     }
                 }
             }
@@ -1092,12 +1520,42 @@ namespace OdfKit.Text
             return decoded;
         }
 
+        public void AddFontFace(string name, string fontFamily, string? genericFamily = null, string? pitch = null)
+        {
+            void AddToDom(OdfNode domRoot)
+            {
+                var fontDecls = FindOrCreateChild(domRoot, "font-face-decls", OdfNamespaces.Office, "office");
+                foreach (var child in fontDecls.Children)
+                {
+                    if (child.LocalName == "font-face" && child.NamespaceUri == OdfNamespaces.Style && child.GetAttribute("name", OdfNamespaces.Style) == name)
+                    {
+                        child.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
+                        if (genericFamily != null) child.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
+                        if (pitch != null) child.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
+                        return;
+                    }
+                }
+
+                var fontFace = new OdfNode(OdfNodeType.Element, "font-face", OdfNamespaces.Style, "style");
+                fontFace.SetAttribute("name", OdfNamespaces.Style, name, "style");
+                fontFace.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
+                if (genericFamily != null) fontFace.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
+                if (pitch != null) fontFace.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
+                fontDecls.AppendChild(fontFace);
+            }
+
+            AddToDom(ContentDom);
+            if (StylesDom != null) AddToDom(StylesDom);
+        }
+
         #endregion
     }
 
     public class OdfPageSetup
     {
         private readonly TextDocument _doc;
+        private OdfNode ContentDom => _doc.ContentDom;
+        private OdfNode StylesDom => _doc.StylesDom;
 
         public OdfPageSetup(TextDocument doc)
         {
@@ -1140,6 +1598,87 @@ namespace OdfKit.Text
                 var props = FindOrCreatePageLayoutProperties();
                 props.SetAttribute("page-usage", OdfNamespaces.Style, value ?? "all", "style");
             }
+        }
+
+        public string? WritingMode
+        {
+            get
+            {
+                var props = FindOrCreatePageLayoutProperties();
+                return props.GetAttribute("writing-mode", OdfNamespaces.Style);
+            }
+            set
+            {
+                var props = FindOrCreatePageLayoutProperties();
+                props.SetAttribute("writing-mode", OdfNamespaces.Style, value ?? "lr-tb", "style");
+            }
+        }
+
+        private string? GetPageStyleProp(string name)
+        {
+            var props = FindOrCreatePageLayoutProperties();
+            return props.GetAttribute(name, OdfNamespaces.Style);
+        }
+
+        private void SetPageStyleProp(string name, string? val)
+        {
+            var props = FindOrCreatePageLayoutProperties();
+            if (val != null)
+            {
+                props.SetAttribute(name, OdfNamespaces.Style, val, "style");
+            }
+            else
+            {
+                props.RemoveAttribute(name, OdfNamespaces.Style);
+            }
+        }
+
+        public string? LayoutGridMode
+        {
+            get => GetPageStyleProp("layout-grid-mode");
+            set => SetPageStyleProp("layout-grid-mode", value);
+        }
+
+        public string? LayoutGridBaseHeight
+        {
+            get => GetPageStyleProp("layout-grid-base-height");
+            set => SetPageStyleProp("layout-grid-base-height", value);
+        }
+
+        public string? LayoutGridBaseWidth
+        {
+            get => GetPageStyleProp("layout-grid-base-width");
+            set => SetPageStyleProp("layout-grid-base-width", value);
+        }
+
+        public string? LayoutGridRubyHeight
+        {
+            get => GetPageStyleProp("layout-grid-ruby-height");
+            set => SetPageStyleProp("layout-grid-ruby-height", value);
+        }
+
+        public int? LayoutGridLines
+        {
+            get => int.TryParse(GetPageStyleProp("layout-grid-lines"), out var val) ? val : (int?)null;
+            set => SetPageStyleProp("layout-grid-lines", value?.ToString());
+        }
+
+        public int? LayoutGridCharacters
+        {
+            get => int.TryParse(GetPageStyleProp("layout-grid-characters"), out var val) ? val : (int?)null;
+            set => SetPageStyleProp("layout-grid-characters", value?.ToString());
+        }
+
+        public bool? LayoutGridDisplay
+        {
+            get => GetPageStyleProp("layout-grid-display") == "true" ? true : (GetPageStyleProp("layout-grid-display") == "false" ? false : (bool?)null);
+            set => SetPageStyleProp("layout-grid-display", value == null ? null : (value.Value ? "true" : "false"));
+        }
+
+        public bool? LayoutGridPrint
+        {
+            get => GetPageStyleProp("layout-grid-print") == "true" ? true : (GetPageStyleProp("layout-grid-print") == "false" ? false : (bool?)null);
+            set => SetPageStyleProp("layout-grid-print", value == null ? null : (value.Value ? "true" : "false"));
         }
 
         public string? HeaderText
@@ -1296,8 +1835,43 @@ namespace OdfKit.Text
                     return child;
             }
             var node = new OdfNode(OdfNodeType.Element, localName, ns, prefix);
-            parent.AppendChild(node);
+            if (localName == "font-face-decls" && parent.Children.Count > 0)
+            {
+                parent.InsertBefore(node, parent.Children[0]);
+            }
+            else
+            {
+                parent.AppendChild(node);
+            }
             return node;
+        }
+
+        public void AddFontFace(string name, string fontFamily, string? genericFamily = null, string? pitch = null)
+        {
+            void AddToDom(OdfNode domRoot)
+            {
+                var fontDecls = FindOrCreateChild(domRoot, "font-face-decls", OdfNamespaces.Office, "office");
+                foreach (var child in fontDecls.Children)
+                {
+                    if (child.LocalName == "font-face" && child.NamespaceUri == OdfNamespaces.Style && child.GetAttribute("name", OdfNamespaces.Style) == name)
+                    {
+                        child.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
+                        if (genericFamily != null) child.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
+                        if (pitch != null) child.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
+                        return;
+                    }
+                }
+
+                var fontFace = new OdfNode(OdfNodeType.Element, "font-face", OdfNamespaces.Style, "style");
+                fontFace.SetAttribute("name", OdfNamespaces.Style, name, "style");
+                fontFace.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
+                if (genericFamily != null) fontFace.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
+                if (pitch != null) fontFace.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
+                fontDecls.AppendChild(fontFace);
+            }
+
+            AddToDom(_doc.ContentDom);
+            if (_doc.StylesDom != null) AddToDom(_doc.StylesDom);
         }
     }
 
@@ -1321,7 +1895,14 @@ namespace OdfKit.Text
         public string? StyleName
         {
             get => Node.GetAttribute("style-name", OdfNamespaces.Text);
-            set => Node.SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, "text");
+            set
+            {
+                if (Doc.TrackedChanges)
+                {
+                    Doc.TrackFormatChange(Node, "paragraph");
+                }
+                Node.SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, "text");
+            }
         }
 
         public string? HorizontalAlignment
@@ -1330,11 +1911,82 @@ namespace OdfKit.Text
             set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "text-align", OdfNamespaces.Fo, value ?? string.Empty, "fo");
         }
 
+        public string? WritingMode
+        {
+            get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "writing-mode", OdfNamespaces.Style, "paragraph");
+            set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "writing-mode", OdfNamespaces.Style, value ?? string.Empty, "style");
+        }
+
+        public string? FontName
+        {
+            get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-name", OdfNamespaces.Style, "paragraph");
+            set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-name", OdfNamespaces.Style, value ?? string.Empty, "style");
+        }
+
+        public string? FontNameAsian
+        {
+            get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-name-asian", OdfNamespaces.Style, "paragraph");
+            set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-name-asian", OdfNamespaces.Style, value ?? string.Empty, "style");
+        }
+
+        public string? FontNameComplex
+        {
+            get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-name-complex", OdfNamespaces.Style, "paragraph");
+            set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-name-complex", OdfNamespaces.Style, value ?? string.Empty, "style");
+        }
+
+        public string? FontSize
+        {
+            get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-size", OdfNamespaces.Fo, "paragraph");
+            set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-size", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        }
+
+        public string? FontSizeAsian
+        {
+            get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-size-asian", OdfNamespaces.Fo, "paragraph");
+            set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-size-asian", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        }
+
+        public string? FontSizeComplex
+        {
+            get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-size-complex", OdfNamespaces.Fo, "paragraph");
+            set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-size-complex", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        }
+
+        public void SetFont(string westernFont, string? asianFont = null, string? complexFont = null)
+        {
+            FontName = westernFont;
+            FontNameAsian = asianFont ?? westernFont;
+            FontNameComplex = complexFont ?? westernFont;
+        }
+
+        public void SetFontSize(string westernSize, string? asianSize = null, string? complexSize = null)
+        {
+            FontSize = westernSize;
+            FontSizeAsian = asianSize ?? westernSize;
+            FontSizeComplex = complexSize ?? westernSize;
+        }
+
         public OdfTextRun AddTextRun(string text)
         {
             var spanNode = OdfNodeFactory.CreateElement("span", OdfNamespaces.Text, "text");
             spanNode.TextContent = text;
-            Node.AppendChild(spanNode);
+            if (Doc.TrackedChanges)
+            {
+                string changeId = Doc.RecordTrackedChange("insertion");
+                var startNode = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
+                startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+                var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
+                endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+                
+                Node.AppendChild(startNode);
+                Node.AppendChild(spanNode);
+                Node.AppendChild(endNode);
+            }
+            else
+            {
+                Node.AppendChild(spanNode);
+            }
             return new OdfTextRun(spanNode, Doc);
         }
 
@@ -1364,6 +2016,11 @@ namespace OdfKit.Text
                 node.SetAttribute("c", OdfNamespaces.Text, count.ToString(), "text");
             }
             Node.AppendChild(node);
+        }
+
+        public void Delete()
+        {
+            Doc.DeleteNode(Node);
         }
     }
 
@@ -1395,6 +2052,45 @@ namespace OdfKit.Text
         {
             get => Node.TextContent;
             set => Node.TextContent = value;
+        }
+
+        public string? StyleName
+        {
+            get => Node.GetAttribute("style-name", OdfNamespaces.Text);
+            set
+            {
+                if (_doc.TrackedChanges)
+                {
+                    _doc.TrackFormatChange(Node, "text");
+                }
+                Node.SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, "text");
+            }
+        }
+
+        public string? FontName
+        {
+            get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "font-name", OdfNamespaces.Style, "text");
+            set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "font-name", OdfNamespaces.Style, value ?? string.Empty, "style");
+        }
+
+        public string? FontSize
+        {
+            get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "font-size", OdfNamespaces.Fo, "text");
+            set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "font-size", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        }
+
+        public void SetFont(string westernFont, string? asianFont = null, string? complexFont = null)
+        {
+            FontName = westernFont;
+            FontNameAsian = asianFont ?? westernFont;
+            FontNameComplex = complexFont ?? westernFont;
+        }
+
+        public void SetFontSize(string westernSize, string? asianSize = null, string? complexSize = null)
+        {
+            FontSize = westernSize;
+            FontSizeAsian = asianSize ?? westernSize;
+            FontSizeComplex = complexSize ?? westernSize;
         }
 
         public bool IsBold
@@ -1440,6 +2136,11 @@ namespace OdfKit.Text
         }
 
         private string GetStyleName() => Node.GetAttribute("style-name", OdfNamespaces.Text) ?? string.Empty;
+
+        public void Delete()
+        {
+            _doc.DeleteNode(Node);
+        }
     }
 
     public class OdfSection

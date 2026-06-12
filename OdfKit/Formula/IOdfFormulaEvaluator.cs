@@ -1,4 +1,4 @@
-﻿using OdfKit.Spreadsheet;
+using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula
 {
@@ -42,5 +42,10 @@ namespace OdfKit.Formula
         /// Gets the formula string of a cell (returns null or empty if it's a static value cell).
         /// </summary>
         string? GetCellFormula(OdfCellAddress address);
+
+        /// <summary>
+        /// Resolves and returns the value of a named range or named expression.
+        /// </summary>
+        object GetNamedRangeOrExpressionValue(string name);
     }
 }

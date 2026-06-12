@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -74,6 +74,11 @@ namespace OdfKit.Tests
             public string? GetCellFormula(OdfCellAddress address)
             {
                 return CellFormulas.TryGetValue(address, out var formula) ? formula : null;
+            }
+
+            public object GetNamedRangeOrExpressionValue(string name)
+            {
+                return 0.0;
             }
         }
 

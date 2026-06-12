@@ -688,6 +688,192 @@ namespace OdfKit.Tests
             }
         }
 
+        [Fact]
+        public void TestSlideLayoutAndPlaceholderAPIs()
+        {
+            using var ms = new MemoryStream();
+            using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                var doc = new PresentationDocument(package);
+                var layout = doc.CreatePresentationPageLayout("CustomLayout");
+                Assert.NotNull(layout);
+                Assert.Equal("CustomLayout", layout.Name);
+
+                var phTemplate = layout.AddPlaceholder(OdfPlaceholderType.Title, OdfLength.Parse("1cm"), OdfLength.Parse("2cm"), OdfLength.Parse("10cm"), OdfLength.Parse("3cm"));
+                Assert.Equal(OdfPlaceholderType.Title, phTemplate.PlaceholderType);
+                Assert.Equal("1cm", phTemplate.X?.ToString());
+                Assert.Equal("2cm", phTemplate.Y?.ToString());
+
+                var slide = doc.AddSlide("Slide 1");
+                slide.PresentationPageLayoutName = "CustomLayout";
+                Assert.Equal("CustomLayout", slide.PresentationPageLayoutName);
+
+                var instancedPh = slide.AddPlaceholder(OdfPlaceholderType.Title, OdfLength.Parse("1.5cm"), OdfLength.Parse("2.5cm"), OdfLength.Parse("9cm"), OdfLength.Parse("2.5cm"));
+                Assert.Equal(OdfPlaceholderType.Title, instancedPh.PlaceholderType);
+
+                var placeholders = slide.Placeholders;
+                Assert.Single(placeholders);
+                Assert.Equal(OdfPlaceholderType.Title, placeholders[0].PlaceholderType);
+
+                doc.Save();
+            }
+
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms))
+            {
+                var doc = new PresentationDocument(package);
+                var layout = doc.GetPresentationPageLayout("CustomLayout");
+                Assert.NotNull(layout);
+                Assert.Single(layout.Placeholders);
+                Assert.Equal(OdfPlaceholderType.Title, layout.Placeholders[0].PlaceholderType);
+
+                var slide = doc.Slides[0];
+                Assert.Equal("CustomLayout", slide.PresentationPageLayoutName);
+                Assert.Single(slide.Placeholders);
+                Assert.Equal(OdfPlaceholderType.Title, slide.Placeholders[0].PlaceholderType);
+            }
+        }
+
+        [Fact]
+        public void TestSpeakerNotesAndHandoutsCanvas()
+        {
+            using var ms = new MemoryStream();
+            using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                var doc = new PresentationDocument(package);
+                var slide = doc.AddSlide("Slide 1");
+
+                // Note page
+                var notes = slide.SpeakerNotesPage;
+                Assert.NotNull(notes);
+                notes.SpeakerNotesText = "Hello speaker notes";
+                notes.AddSlideThumbnail(OdfLength.Parse("1cm"), OdfLength.Parse("1cm"), OdfLength.Parse("5cm"), OdfLength.Parse("4cm"));
+                notes.AddShape(OdfShapeType.Rectangle, OdfLength.Parse("2cm"), OdfLength.Parse("6cm"), OdfLength.Parse("3cm"), OdfLength.Parse("2cm"));
+
+                // Handout page
+                var handout = doc.HandoutPage;
+                Assert.NotNull(handout);
+                handout.AddTextBox(OdfLength.Parse("1cm"), OdfLength.Parse("1cm"), OdfLength.Parse("10cm"), OdfLength.Parse("2cm"), "Handout Header");
+                handout.AddSlideThumbnailPlaceholder(OdfLength.Parse("2cm"), OdfLength.Parse("4cm"), OdfLength.Parse("8cm"), OdfLength.Parse("6cm"));
+
+                doc.Save();
+            }
+
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms))
+            {
+                var doc = new PresentationDocument(package);
+                var slide = doc.Slides[0];
+                var notes = slide.SpeakerNotesPage;
+                Assert.Equal("Hello speaker notes", notes.SpeakerNotesText);
+                
+                // Expect thumbnail and shape
+                Assert.Equal(2, notes.Shapes.Count); // Note frame + shape
+                
+                var handout = doc.HandoutPage;
+                Assert.Single(handout.Shapes); // Text box frame
+                Assert.Equal("Handout Header", handout.Shapes[0].Node.TextContent.Trim());
+            }
+        }
+
+        [Fact]
+        public void TestSmilTimingAnimations()
+        {
+            using var ms = new MemoryStream();
+            using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                var doc = new PresentationDocument(package);
+                var slide = doc.AddSlide("Slide 1");
+                var shape = slide.AddShape(OdfShapeType.Rectangle, OdfLength.Parse("1cm"), OdfLength.Parse("1cm"), OdfLength.Parse("2cm"), OdfLength.Parse("2cm"));
+                shape.Id = "shape1";
+
+                var rootSeq = slide.AnimationRoot;
+                Assert.NotNull(rootSeq);
+
+                var seqNode = rootSeq.AddSequence("click");
+                var parNode = seqNode.AddParallel("0s");
+                parNode.AddEffect(OdfAnimationType.FadeIn, "shape1", OdfLength.Parse("1in"), OdfLength.Parse("0in"));
+
+                doc.Save();
+            }
+
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms))
+            {
+                var doc = new PresentationDocument(package);
+                var slide = doc.Slides[0];
+                var rootSeq = slide.AnimationRoot;
+                
+                Assert.Single(rootSeq.Children);
+                var seq = rootSeq.Children[0];
+                Assert.Equal(OdfAnimationNodeType.Sequence, seq.Type);
+                Assert.Equal("click", seq.Begin);
+
+                Assert.Single(seq.Children);
+                var par = seq.Children[0];
+                Assert.Equal(OdfAnimationNodeType.Parallel, par.Type);
+                Assert.Equal("0s", par.Begin);
+
+                Assert.Single(par.Children);
+                var effect = par.Children[0];
+                Assert.Equal(OdfAnimationNodeType.Effect, effect.Type);
+                Assert.Equal("shape1", effect.TargetElement);
+            }
+        }
+
+        [Fact]
+        public void TestEmbeddedChartAndFormulaDocuments()
+        {
+            using var ms = new MemoryStream();
+            using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                var doc = new PresentationDocument(package);
+                
+                var chartDoc = doc.CreateEmbeddedDocument<OdfKit.Chart.OdfChartDocument>("Object 1");
+                Assert.NotNull(chartDoc);
+                
+                var formulaDoc = doc.CreateEmbeddedDocument<OdfKit.Formula.OdfFormulaDocument>("Object 2");
+                Assert.NotNull(formulaDoc);
+
+                var slide = doc.AddSlide("Slide 1");
+                slide.AddEmbeddedObject("Object 1", OdfLength.Parse("1cm"), OdfLength.Parse("1cm"), OdfLength.Parse("8cm"), OdfLength.Parse("6cm"));
+                slide.AddEmbeddedObject("Object 2", OdfLength.Parse("10cm"), OdfLength.Parse("1cm"), OdfLength.Parse("8cm"), OdfLength.Parse("6cm"));
+
+                doc.Save();
+            }
+
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms))
+            {
+                var doc = new PresentationDocument(package);
+                
+                var chartDoc = doc.GetEmbeddedDocument<OdfKit.Chart.OdfChartDocument>("Object 1");
+                Assert.NotNull(chartDoc);
+                Assert.Equal("application/vnd.oasis.opendocument.chart", chartDoc.Package.Manifest["Object 1/"]);
+
+                var formulaDoc = doc.GetEmbeddedDocument<OdfKit.Formula.OdfFormulaDocument>("Object 2");
+                Assert.NotNull(formulaDoc);
+                Assert.Equal("application/vnd.oasis.opendocument.formula", formulaDoc.Package.Manifest["Object 2/"]);
+
+                // Verify the directory full-paths exist in manifest
+                Assert.True(package.Manifest.ContainsKey("Object 1/"));
+                Assert.True(package.Manifest.ContainsKey("Object 2/"));
+
+                var slide = doc.Slides[0];
+                var frames = new List<OdfNode>();
+                FindNodesByLocalName(slide.Node, "frame", frames);
+                Assert.Equal(2, frames.Count);
+
+                var obj1 = FindNodeByLocalName(frames[0], "object");
+                Assert.NotNull(obj1);
+                Assert.Equal("./Object 1", obj1.GetAttribute("href", OdfNamespaces.XLink));
+
+                var obj2 = FindNodeByLocalName(frames[1], "object");
+                Assert.NotNull(obj2);
+                Assert.Equal("./Object 2", obj2.GetAttribute("href", OdfNamespaces.XLink));
+            }
+        }
+
         #endregion
 
         #region Helpers

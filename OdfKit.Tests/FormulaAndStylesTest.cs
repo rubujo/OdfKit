@@ -16,7 +16,7 @@ namespace OdfKit.Tests
     {
         #region Mock IEvaluationContext
 
-        private class MockEvaluationContext : IEvaluationContext
+        public class MockEvaluationContext : IEvaluationContext
         {
             public OdfCellAddress CurrentCell { get; set; }
             public Dictionary<OdfCellAddress, object> CellValues { get; } = new();
@@ -63,6 +63,14 @@ namespace OdfKit.Tests
             public string? GetCellFormula(OdfCellAddress address)
             {
                 return CellFormulas.TryGetValue(address, out var formula) ? formula : null;
+            }
+
+            public Dictionary<string, object> NamedValues { get; } = new();
+
+            public object GetNamedRangeOrExpressionValue(string name)
+            {
+                if (NamedValues.TryGetValue(name, out var val)) return val;
+                return 0.0;
             }
         }
 
@@ -864,6 +872,139 @@ namespace OdfKit.Tests
             var nullResult = evaluator.Evaluate("SUM(A1:B2 ! C3:D3)", context);
             Assert.IsType<OdfFormulaError>(nullResult);
             Assert.Equal(OdfFormulaErrorType.Null, ((OdfFormulaError)nullResult).ErrorType);
+        }
+
+        [Fact]
+        public void TestMilestoneM8SpreadsheetAndFormulaAPIs()
+        {
+            using (var pkg = OdfPackage.Create(new MemoryStream()))
+            {
+                var doc = new SpreadsheetDocument(pkg);
+                var sheet = doc.AddSheet("Sheet1");
+
+                sheet.GetCell(0, 0).SetValue(10.0);
+                sheet.GetCell(1, 0).SetValue(20.0);
+                sheet.GetCell(2, 0).SetValue(30.0);
+
+                doc.AddNamedRange("MyGlobalRange", new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(2, 0, "Sheet1")));
+                sheet.AddNamedRange("MyLocalRange", new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(1, 0, "Sheet1")));
+                doc.AddNamedExpression("MyGlobalExpr", "SUM(Sheet1.A1:Sheet1.A3)");
+
+                var evaluator = new DefaultFormulaEvaluator();
+                var domContext = new OdfDomEvaluationContext(doc.ContentDom, evaluator);
+
+                var valGlobal = domContext.GetNamedRangeOrExpressionValue("MyGlobalRange");
+                Assert.NotNull(valGlobal);
+                Assert.IsType<object[,]>(valGlobal);
+                var arrGlobal = (object[,])valGlobal;
+                Assert.Equal(3, arrGlobal.GetLength(0));
+                Assert.Equal(10.0, arrGlobal[0, 0]);
+
+                var valExpr = domContext.GetNamedRangeOrExpressionValue("MyGlobalExpr");
+                Assert.Equal(60.0, valExpr);
+
+                domContext.CurrentCell = new OdfCellAddress(5, 0, "Sheet1");
+                var sumGlobalResult = evaluator.Evaluate("SUM(MyGlobalRange)", domContext);
+                Assert.Equal(60.0, sumGlobalResult);
+
+                var sumLocalResult = evaluator.Evaluate("SUM(MyLocalRange)", domContext);
+                Assert.Equal(30.0, sumLocalResult);
+
+                var dbRange = doc.AddDatabaseRange("SalesData", new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(9, 2, "Sheet1")));
+                dbRange.SetSort((0, true), (1, false));
+                dbRange.SetFilter((0, "=", "Active"), (2, ">", "100"));
+
+                var dbRangeNode = dbRange.Node;
+                Assert.Equal("SalesData", dbRangeNode.GetAttribute("name", OdfNamespaces.Table));
+                
+                OdfNode? sortNode = null;
+                OdfNode? filterNode = null;
+                foreach (var child in dbRangeNode.Children)
+                {
+                    if (child.LocalName == "sort" && child.NamespaceUri == OdfNamespaces.Table) sortNode = child;
+                    if (child.LocalName == "filter" && child.NamespaceUri == OdfNamespaces.Table) filterNode = child;
+                }
+                Assert.NotNull(sortNode);
+                Assert.NotNull(filterNode);
+
+                Assert.Equal(2, sortNode.Children.Count);
+                Assert.Equal("0", sortNode.Children[0].GetAttribute("field-number", OdfNamespaces.Table));
+                Assert.Equal("ascending", sortNode.Children[0].GetAttribute("order", OdfNamespaces.Table));
+
+                Assert.Equal(2, filterNode.Children.Count);
+                Assert.Equal("0", filterNode.Children[0].GetAttribute("field-number", OdfNamespaces.Table));
+                Assert.Equal("=", filterNode.Children[0].GetAttribute("operator", OdfNamespaces.Table));
+                Assert.Equal("Active", filterNode.Children[0].GetAttribute("value", OdfNamespaces.Table));
+
+                var cell = sheet.GetCell(0, 0);
+                cell.AddConditionalFormatMap("cell-content() > 50", "MyAlertStyle", new OdfCellAddress(0, 0, "Sheet1"));
+
+                var styleNode = doc.StyleEngine.GetOrCreateLocalStyle(cell.Node, "table-cell");
+                OdfNode? mapNode = null;
+                foreach (var child in styleNode.Children)
+                {
+                    if (child.LocalName == "map" && child.NamespaceUri == OdfNamespaces.Style)
+                    {
+                        mapNode = child;
+                        break;
+                    }
+                }
+                Assert.NotNull(mapNode);
+                Assert.Equal("cell-content() > 50", mapNode.GetAttribute("condition", OdfNamespaces.Style));
+                Assert.Equal("MyAlertStyle", mapNode.GetAttribute("apply-style-name", OdfNamespaces.Style));
+                Assert.Equal("Sheet1.A1", mapNode.GetAttribute("base-cell-address", OdfNamespaces.Style));
+
+                var pivotBuilder = new OdfPivotTableBuilder(
+                    "MyPivot", 
+                    new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(9, 3, "Sheet1")), 
+                    new OdfCellAddress(12, 0, "Sheet1"), 
+                    sheet
+                );
+                pivotBuilder
+                    .AddRowField("Category")
+                    .AddColumnField("Region")
+                    .AddDataField("Sales", "sum")
+                    .AddPageField("Year")
+                    .Build();
+
+                OdfNode? dataPilotTablesNode = null;
+                foreach (var child in sheet.TableNode.Children)
+                {
+                    if (child.LocalName == "data-pilot-tables" && child.NamespaceUri == OdfNamespaces.Table)
+                    {
+                        dataPilotTablesNode = child;
+                        break;
+                    }
+                }
+                Assert.NotNull(dataPilotTablesNode);
+                Assert.Single(dataPilotTablesNode.Children);
+                var pivotNode = dataPilotTablesNode.Children[0];
+                Assert.Equal("MyPivot", pivotNode.GetAttribute("name", OdfNamespaces.Table));
+                
+                OdfNode? srcRangeNode = null;
+                var fieldNodes = new List<OdfNode>();
+                foreach (var child in pivotNode.Children)
+                {
+                    if (child.LocalName == "source-cell-range" && child.NamespaceUri == OdfNamespaces.Table) srcRangeNode = child;
+                    if (child.LocalName == "data-pilot-field" && child.NamespaceUri == OdfNamespaces.Table) fieldNodes.Add(child);
+                }
+                Assert.NotNull(srcRangeNode);
+                Assert.Equal("Sheet1.A1:.D10", srcRangeNode.GetAttribute("cell-range-address", OdfNamespaces.Table));
+                
+                Assert.Equal(4, fieldNodes.Count);
+                Assert.Equal("Category", fieldNodes[0].GetAttribute("source-field-name", OdfNamespaces.Table));
+                Assert.Equal("row", fieldNodes[0].GetAttribute("orientation", OdfNamespaces.Table));
+
+                Assert.Equal("Region", fieldNodes[1].GetAttribute("source-field-name", OdfNamespaces.Table));
+                Assert.Equal("column", fieldNodes[1].GetAttribute("orientation", OdfNamespaces.Table));
+
+                Assert.Equal("Sales", fieldNodes[2].GetAttribute("source-field-name", OdfNamespaces.Table));
+                Assert.Equal("data", fieldNodes[2].GetAttribute("orientation", OdfNamespaces.Table));
+                Assert.Equal("sum", fieldNodes[2].GetAttribute("function", OdfNamespaces.Table));
+
+                Assert.Equal("Year", fieldNodes[3].GetAttribute("source-field-name", OdfNamespaces.Table));
+                Assert.Equal("page", fieldNodes[3].GetAttribute("orientation", OdfNamespaces.Table));
+            }
         }
     }
 

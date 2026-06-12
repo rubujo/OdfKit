@@ -226,6 +226,42 @@ namespace OdfKit.Spreadsheet
                 }
             }
         }
+
+        public void AddNamedRange(string name, OdfCellRange range, OdfCellAddress? baseCell = null)
+        {
+            var namedExpressions = FindOrCreateChild(SheetsRoot, "named-expressions", OdfNamespaces.Table, "table");
+            var namedRange = new OdfNode(OdfNodeType.Element, "named-range", OdfNamespaces.Table, "table");
+            namedRange.SetAttribute("name", OdfNamespaces.Table, name, "table");
+            namedRange.SetAttribute("cell-range-address", OdfNamespaces.Table, range.ToOdfString(false), "table");
+            if (baseCell.HasValue)
+            {
+                namedRange.SetAttribute("base-cell-address", OdfNamespaces.Table, baseCell.Value.ToOdfString(false), "table");
+            }
+            namedExpressions.AppendChild(namedRange);
+        }
+
+        public void AddNamedExpression(string name, string expression, OdfCellAddress? baseCell = null)
+        {
+            var namedExpressions = FindOrCreateChild(SheetsRoot, "named-expressions", OdfNamespaces.Table, "table");
+            var namedExpr = new OdfNode(OdfNodeType.Element, "named-expression", OdfNamespaces.Table, "table");
+            namedExpr.SetAttribute("name", OdfNamespaces.Table, name, "table");
+            namedExpr.SetAttribute("expression", OdfNamespaces.Table, expression, "table");
+            if (baseCell.HasValue)
+            {
+                namedExpr.SetAttribute("base-cell-address", OdfNamespaces.Table, baseCell.Value.ToOdfString(false), "table");
+            }
+            namedExpressions.AppendChild(namedExpr);
+        }
+
+        public OdfDatabaseRange AddDatabaseRange(string name, OdfCellRange range)
+        {
+            var databaseRanges = FindOrCreateChild(SheetsRoot, "database-ranges", OdfNamespaces.Table, "table");
+            var dbRangeNode = new OdfNode(OdfNodeType.Element, "database-range", OdfNamespaces.Table, "table");
+            dbRangeNode.SetAttribute("name", OdfNamespaces.Table, name, "table");
+            dbRangeNode.SetAttribute("target-range-address", OdfNamespaces.Table, range.ToOdfString(false), "table");
+            databaseRanges.AppendChild(dbRangeNode);
+            return new OdfDatabaseRange(dbRangeNode, this);
+        }
     }
 
     public class OdfTableSheet
@@ -436,8 +472,12 @@ namespace OdfKit.Spreadsheet
             }
 
             var format = new OdfNode(OdfNodeType.Element, "conditional-format", calcextNs, "calcext");
-            string sheetPrefix = $"{Name}.";
-            string rangeAddr = $"{sheetPrefix}{range.StartAddress.ToString()}:{sheetPrefix}{range.EndAddress.ToString()}";
+            var startAddr = range.StartAddress;
+            if (startAddr.SheetName == null) startAddr = new OdfCellAddress(startAddr.Row, startAddr.Column, Name, startAddr.IsRowAbsolute, startAddr.IsColumnAbsolute, startAddr.IsSheetAbsolute);
+            var endAddr = range.EndAddress;
+            if (endAddr.SheetName == null) endAddr = new OdfCellAddress(endAddr.Row, endAddr.Column, Name, endAddr.IsRowAbsolute, endAddr.IsColumnAbsolute, endAddr.IsSheetAbsolute);
+
+            string rangeAddr = $"{startAddr.ToOdfString(false)}:{endAddr.ToOdfString(false)}";
             format.SetAttribute("target-range-address", calcextNs, rangeAddr, "calcext");
 
             var condition = new OdfNode(OdfNodeType.Element, "condition", calcextNs, "calcext");
@@ -764,6 +804,44 @@ namespace OdfKit.Spreadsheet
             }
             return true;
         }
+
+        public void AddNamedRange(string name, OdfCellRange range, OdfCellAddress? baseCell = null)
+        {
+            var namedExpressions = FindOrCreateChild(TableNode, "named-expressions", OdfNamespaces.Table, "table");
+            var namedRange = new OdfNode(OdfNodeType.Element, "named-range", OdfNamespaces.Table, "table");
+            namedRange.SetAttribute("name", OdfNamespaces.Table, name, "table");
+            namedRange.SetAttribute("cell-range-address", OdfNamespaces.Table, range.ToOdfString(false), "table");
+            if (baseCell.HasValue)
+            {
+                namedRange.SetAttribute("base-cell-address", OdfNamespaces.Table, baseCell.Value.ToOdfString(false), "table");
+            }
+            namedExpressions.AppendChild(namedRange);
+        }
+
+        public void AddNamedExpression(string name, string expression, OdfCellAddress? baseCell = null)
+        {
+            var namedExpressions = FindOrCreateChild(TableNode, "named-expressions", OdfNamespaces.Table, "table");
+            var namedExpr = new OdfNode(OdfNodeType.Element, "named-expression", OdfNamespaces.Table, "table");
+            namedExpr.SetAttribute("name", OdfNamespaces.Table, name, "table");
+            namedExpr.SetAttribute("expression", OdfNamespaces.Table, expression, "table");
+            if (baseCell.HasValue)
+            {
+                namedExpr.SetAttribute("base-cell-address", OdfNamespaces.Table, baseCell.Value.ToOdfString(false), "table");
+            }
+            namedExpressions.AppendChild(namedExpr);
+        }
+
+        private OdfNode FindOrCreateChild(OdfNode parent, string localName, string ns, string prefix)
+        {
+            foreach (var child in parent.Children)
+            {
+                if (child.LocalName == localName && child.NamespaceUri == ns)
+                    return child;
+            }
+            var node = new OdfNode(OdfNodeType.Element, localName, ns, prefix);
+            parent.AppendChild(node);
+            return node;
+        }
     }
 
     public class OdfCell
@@ -935,6 +1013,19 @@ namespace OdfKit.Spreadsheet
             if (bottom.HasValue) SetStyleProperty("table-cell-properties", "border-bottom", OdfNamespaces.Fo, bottom.Value.ToString(), "fo");
             if (left.HasValue) SetStyleProperty("table-cell-properties", "border-left", OdfNamespaces.Fo, left.Value.ToString(), "fo");
             if (right.HasValue) SetStyleProperty("table-cell-properties", "border-right", OdfNamespaces.Fo, right.Value.ToString(), "fo");
+        }
+
+        public void AddConditionalFormatMap(string condition, string applyStyleName, OdfCellAddress? baseCell = null)
+        {
+            var styleNode = _doc.StyleEngine.GetOrCreateLocalStyle(Node, "table-cell");
+            var mapNode = new OdfNode(OdfNodeType.Element, "map", OdfNamespaces.Style, "style");
+            mapNode.SetAttribute("condition", OdfNamespaces.Style, condition, "style");
+            mapNode.SetAttribute("apply-style-name", OdfNamespaces.Style, applyStyleName, "style");
+            if (baseCell.HasValue)
+            {
+                mapNode.SetAttribute("base-cell-address", OdfNamespaces.Style, baseCell.Value.ToOdfString(false), "style");
+            }
+            styleNode.AppendChild(mapNode);
         }
 
         private void SetStyleProperty(string propertiesElement, string propertyAttr, string propertyNs, string value, string propertyPrefix)

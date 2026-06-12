@@ -14,6 +14,12 @@ namespace OdfKit.Spreadsheet
             EndAddress = end;
         }
 
+        public OdfCellRange(int startRow, int startCol, int endRow, int endCol, string? sheetName = null)
+        {
+            StartAddress = new OdfCellAddress(startRow, startCol, sheetName);
+            EndAddress = new OdfCellAddress(endRow, endCol, sheetName);
+        }
+
         public bool Equals(OdfCellRange other) => 
             StartAddress == other.StartAddress && EndAddress == other.EndAddress;
 

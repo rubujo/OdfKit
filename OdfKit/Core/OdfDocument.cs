@@ -26,10 +26,20 @@ namespace OdfKit.Core
 
         private bool _isDisposed;
 
-        protected OdfDocument(OdfPackage package)
+        public string SubPath { get; set; } = string.Empty;
+
+        protected OdfDocument(OdfPackage package) : this(package, string.Empty)
+        {
+        }
+
+        protected OdfDocument(OdfPackage package, string subPath)
         {
             Package = package ?? throw new ArgumentNullException(nameof(package));
-            
+            SubPath = subPath ?? string.Empty;
+            if (!string.IsNullOrEmpty(SubPath) && !SubPath.EndsWith("/"))
+            {
+                SubPath += "/";
+            }
             LoadXmlTrees();
             StyleEngine = new OdfStyleEngine(ContentDom, StylesDom);
         }
@@ -56,9 +66,10 @@ namespace OdfKit.Core
 
         private OdfNode LoadOrInitDom(string entryName, string defaultXml)
         {
-            if (Package.HasEntry(entryName))
+            string path = string.IsNullOrEmpty(SubPath) ? entryName : SubPath + entryName;
+            if (Package.HasEntry(path))
             {
-                using var stream = Package.GetEntryStream(entryName);
+                using var stream = Package.GetEntryStream(path);
                 return OdfXmlReader.Parse(stream);
             }
             else
@@ -117,7 +128,8 @@ namespace OdfKit.Core
         {
             using var ms = new MemoryStream();
             OdfXmlWriter.Write(node, ms, options);
-            Package.WriteEntry(name, ms.ToArray(), "text/xml");
+            string path = string.IsNullOrEmpty(SubPath) ? name : SubPath + name;
+            Package.WriteEntry(path, ms.ToArray(), "text/xml");
         }
 
         #endregion
@@ -744,6 +756,70 @@ namespace OdfKit.Core
                 _isDisposed = true;
             }
             GC.SuppressFinalize(this);
+        }
+
+        public T GetEmbeddedDocument<T>(string subPath) where T : OdfDocument
+        {
+            if (string.IsNullOrEmpty(subPath)) throw new ArgumentException("Subpath cannot be null or empty.", nameof(subPath));
+            if (!subPath.EndsWith("/")) subPath += "/";
+
+            var ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage), typeof(string) });
+            if (ctor != null)
+            {
+                return (T)ctor.Invoke(new object[] { Package, subPath });
+            }
+            else
+            {
+                ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage) });
+                if (ctor != null)
+                {
+                    var doc = (T)ctor.Invoke(new object[] { Package });
+                    doc.SubPath = subPath;
+                    return doc;
+                }
+            }
+            throw new InvalidOperationException($"Type {typeof(T).Name} does not have a compatible constructor.");
+        }
+
+        public T CreateEmbeddedDocument<T>(string subPath) where T : OdfDocument
+        {
+            if (string.IsNullOrEmpty(subPath)) throw new ArgumentException("Subpath cannot be null or empty.", nameof(subPath));
+            if (!subPath.EndsWith("/")) subPath += "/";
+
+            string mimeType = typeof(T) switch
+            {
+                Type t when t == typeof(Presentation.PresentationDocument) => "application/vnd.oasis.opendocument.presentation",
+                Type t when t == typeof(Spreadsheet.SpreadsheetDocument) => "application/vnd.oasis.opendocument.spreadsheet",
+                Type t when t == typeof(OdfKit.Chart.OdfChartDocument) => "application/vnd.oasis.opendocument.chart",
+                Type t when t == typeof(OdfKit.Formula.OdfFormulaDocument) => "application/vnd.oasis.opendocument.formula",
+                _ => "application/vnd.oasis.opendocument.text"
+            };
+
+            string mimePath = subPath + "mimetype";
+            Package.WriteEntry(mimePath, Encoding.UTF8.GetBytes(mimeType), "");
+
+            T doc;
+            var ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage), typeof(string) });
+            if (ctor != null)
+            {
+                doc = (T)ctor.Invoke(new object[] { Package, subPath });
+            }
+            else
+            {
+                ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage) });
+                if (ctor != null)
+                {
+                    doc = (T)ctor.Invoke(new object[] { Package });
+                    doc.SubPath = subPath;
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Type {typeof(T).Name} does not have a compatible constructor.");
+                }
+            }
+
+            doc.Save();
+            return doc;
         }
     }
 }

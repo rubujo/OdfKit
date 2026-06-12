@@ -181,10 +181,24 @@ namespace OdfKit.Formula
                 var identSpan = _formula.Slice(start, _index - start);
                 
                 // Fast-check for logical literals
-                if (identSpan.Equals("TRUE", StringComparison.OrdinalIgnoreCase))
-                    return new FormulaParserToken(FormulaTokenType.Bool, identSpan, boolValue: true);
-                if (identSpan.Equals("FALSE", StringComparison.OrdinalIgnoreCase))
-                    return new FormulaParserToken(FormulaTokenType.Bool, identSpan, boolValue: false);
+                bool isFunctionCall = false;
+                int peekIdx = _index;
+                while (peekIdx < _formula.Length && char.IsWhiteSpace(_formula[peekIdx]))
+                {
+                    peekIdx++;
+                }
+                if (peekIdx < _formula.Length && _formula[peekIdx] == '(')
+                {
+                    isFunctionCall = true;
+                }
+
+                if (!isFunctionCall)
+                {
+                    if (identSpan.Equals("TRUE", StringComparison.OrdinalIgnoreCase))
+                        return new FormulaParserToken(FormulaTokenType.Bool, identSpan, boolValue: true);
+                    if (identSpan.Equals("FALSE", StringComparison.OrdinalIgnoreCase))
+                        return new FormulaParserToken(FormulaTokenType.Bool, identSpan, boolValue: false);
+                }
 
                 return new FormulaParserToken(FormulaTokenType.Identifier, identSpan);
             }
@@ -460,7 +474,7 @@ namespace OdfKit.Formula
                     return new RangeReferenceNode(cellRange);
                 }
 
-                throw new InvalidOperationException($"Unknown reference name or variable: '{ident}'");
+                return new NamedRangeNode(ident);
             }
 
             throw new InvalidOperationException($"Unexpected token type {_currentToken.Type} during parsing.");

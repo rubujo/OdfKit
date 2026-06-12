@@ -217,6 +217,8 @@ namespace OdfKit.Formula
                     "IF" => EvaluateIf(arguments, context),
                     "AND" => EvaluateAnd(arguments, context),
                     "OR" => EvaluateOr(arguments, context),
+                    "TRUE" => true,
+                    "FALSE" => false,
 
                     // 2. String Functions
                     "CONCAT" => EvaluateConcat(arguments, context),
@@ -2009,9 +2011,11 @@ namespace OdfKit.Formula
         private readonly Dictionary<OdfCellAddress, string> _cellFormulas = new();
         private readonly Dictionary<OdfCellAddress, object> _cellValues = new();
         private readonly DefaultFormulaEvaluator _evaluator;
+        private readonly OdfNode _contentRoot;
 
         public OdfDomEvaluationContext(OdfNode contentRoot, DefaultFormulaEvaluator evaluator)
         {
+            _contentRoot = contentRoot;
             _evaluator = evaluator;
             TraverseTable(contentRoot);
         }
@@ -2205,6 +2209,138 @@ namespace OdfKit.Formula
                     address.IsRowAbsolute, address.IsColumnAbsolute, address.IsSheetAbsolute);
             }
             return _cellFormulas.TryGetValue(address, out var formula) ? formula : null;
+        }
+
+        public object GetNamedRangeOrExpressionValue(string name)
+        {
+            string? currentSheet = CurrentCell.SheetName;
+            OdfNode? targetNode = null;
+
+            if (!string.IsNullOrEmpty(currentSheet))
+            {
+                var sheetNode = FindSheetNode(_contentRoot, currentSheet);
+                if (sheetNode != null)
+                {
+                    targetNode = FindNamedNodeUnderParent(sheetNode, name);
+                }
+            }
+
+            if (targetNode == null)
+            {
+                targetNode = FindGlobalNamedNode(_contentRoot, name);
+            }
+
+            if (targetNode == null)
+            {
+                return OdfFormulaError.Name;
+            }
+
+            if (targetNode.LocalName == "named-range")
+            {
+                string? cellRangeAddress = targetNode.GetAttribute("cell-range-address", OdfNamespaces.Table);
+                if (string.IsNullOrEmpty(cellRangeAddress))
+                {
+                    return OdfFormulaError.Value;
+                }
+
+                if (OdfCellRange.TryParse(cellRangeAddress!, out var range))
+                {
+                    return GetRangeValues(range);
+                }
+                return OdfFormulaError.Value;
+            }
+            else if (targetNode.LocalName == "named-expression")
+            {
+                string? expression = targetNode.GetAttribute("expression", OdfNamespaces.Table);
+                if (string.IsNullOrEmpty(expression))
+                {
+                    return OdfFormulaError.Value;
+                }
+
+                if (expression!.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase) ||
+                    expression.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
+                {
+                    expression = OdfFormulaTranslator.OdfToExcelFormula(expression);
+                }
+
+                if (expression!.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase))
+                    expression = expression.Substring(6);
+                else if (expression.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
+                    expression = expression.Substring(4);
+                else if (expression.StartsWith("="))
+                    expression = expression.Substring(1);
+
+                return _evaluator.Evaluate(expression!, this);
+            }
+
+            return OdfFormulaError.Name;
+        }
+
+        private OdfNode? FindSheetNode(OdfNode node, string? sheetName)
+        {
+            if (string.IsNullOrEmpty(sheetName)) return null;
+            if (node.NodeType == OdfNodeType.Element && node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table)
+            {
+                if (node.GetAttribute("name", OdfNamespaces.Table) == sheetName)
+                    return node;
+            }
+            foreach (var child in node.Children)
+            {
+                var match = FindSheetNode(child, sheetName);
+                if (match != null) return match;
+            }
+            return null;
+        }
+
+        private OdfNode? FindNamedNodeUnderParent(OdfNode parent, string name)
+        {
+            foreach (var child in parent.Children)
+            {
+                if (child.NodeType == OdfNodeType.Element && child.LocalName == "named-expressions" && child.NamespaceUri == OdfNamespaces.Table)
+                {
+                    foreach (var exprChild in child.Children)
+                    {
+                        if (exprChild.NodeType == OdfNodeType.Element &&
+                            (exprChild.LocalName == "named-range" || exprChild.LocalName == "named-expression") &&
+                            exprChild.NamespaceUri == OdfNamespaces.Table &&
+                            exprChild.GetAttribute("name", OdfNamespaces.Table) == name)
+                        {
+                            return exprChild;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        private OdfNode? FindGlobalNamedNode(OdfNode root, string name)
+        {
+            if (root.NodeType == OdfNodeType.Element && root.LocalName == "table" && root.NamespaceUri == OdfNamespaces.Table)
+            {
+                return null;
+            }
+
+            if (root.NodeType == OdfNodeType.Element && root.LocalName == "named-expressions" && root.NamespaceUri == OdfNamespaces.Table)
+            {
+                foreach (var exprChild in root.Children)
+                {
+                    if (exprChild.NodeType == OdfNodeType.Element &&
+                        (exprChild.LocalName == "named-range" || exprChild.LocalName == "named-expression") &&
+                        exprChild.NamespaceUri == OdfNamespaces.Table &&
+                        exprChild.GetAttribute("name", OdfNamespaces.Table) == name)
+                    {
+                        return exprChild;
+                    }
+                }
+            }
+
+            foreach (var child in root.Children)
+            {
+                var match = FindGlobalNamedNode(child, name);
+                if (match != null) return match;
+            }
+
+            return null;
         }
     }
 }

@@ -329,6 +329,76 @@ namespace OdfKit.Presentation
 
             masterStyles.AppendChild(masterPage);
         }
+
+        public OdfPresentationPageLayout CreatePresentationPageLayout(string name)
+        {
+            var autoStyles = FindChildElement(StylesRoot, "automatic-styles", OdfNamespaces.Office);
+            if (autoStyles == null)
+            {
+                autoStyles = new OdfNode(OdfNodeType.Element, "automatic-styles", OdfNamespaces.Office, "office");
+                StylesRoot.AppendChild(autoStyles);
+            }
+            var layoutNode = new OdfNode(OdfNodeType.Element, "presentation-page-layout", OdfNamespaces.Style, "style");
+            layoutNode.SetAttribute("name", OdfNamespaces.Style, name, "style");
+            autoStyles.AppendChild(layoutNode);
+            return new OdfPresentationPageLayout(layoutNode);
+        }
+
+        public OdfPresentationPageLayout? GetPresentationPageLayout(string name)
+        {
+            // Search in ContentDom first
+            var autoStyles = FindChildElement(ContentRoot, "automatic-styles", OdfNamespaces.Office);
+            if (autoStyles != null)
+            {
+                foreach (var child in autoStyles.Children)
+                {
+                    if (child.LocalName == "presentation-page-layout" && 
+                        child.NamespaceUri == OdfNamespaces.Style && 
+                        child.GetAttribute("name", OdfNamespaces.Style) == name)
+                    {
+                        return new OdfPresentationPageLayout(child);
+                    }
+                }
+            }
+            // Search in StylesDom
+            autoStyles = FindChildElement(StylesRoot, "automatic-styles", OdfNamespaces.Office);
+            if (autoStyles != null)
+            {
+                foreach (var child in autoStyles.Children)
+                {
+                    if (child.LocalName == "presentation-page-layout" && 
+                        child.NamespaceUri == OdfNamespaces.Style && 
+                        child.GetAttribute("name", OdfNamespaces.Style) == name)
+                    {
+                        return new OdfPresentationPageLayout(child);
+                    }
+                }
+            }
+            return null;
+        }
+
+        public OdfHandoutPage HandoutPage
+        {
+            get
+            {
+                var masterStyles = FindChildElement(StylesRoot, "master-styles", OdfNamespaces.Office);
+                if (masterStyles == null)
+                {
+                    masterStyles = new OdfNode(OdfNodeType.Element, "master-styles", OdfNamespaces.Office, "office");
+                    StylesRoot.AppendChild(masterStyles);
+                }
+
+                var handoutNode = FindChildElement(masterStyles, "handout", OdfNamespaces.Presentation);
+                if (handoutNode == null)
+                {
+                    handoutNode = new OdfNode(OdfNodeType.Element, "handout", OdfNamespaces.Presentation, "presentation");
+                    handoutNode.SetAttribute("name", OdfNamespaces.Style, "DefaultHandout", "style");
+                    handoutNode.SetAttribute("page-layout-name", OdfNamespaces.Style, "PM1", "style");
+                    masterStyles.AppendChild(handoutNode);
+                }
+                return new OdfHandoutPage(handoutNode, this);
+            }
+        }
     }
 
     public class OdfSlide
@@ -348,46 +418,161 @@ namespace OdfKit.Presentation
             set => Node.SetAttribute("master-page-name", OdfNamespaces.Draw, value, "draw");
         }
 
-        public string SpeakerNotes
+        public string? PresentationPageLayoutName
+        {
+            get => Node.GetAttribute("presentation-page-layout-name", OdfNamespaces.Presentation);
+            set
+            {
+                if (value == null)
+                    Node.RemoveAttribute("presentation-page-layout-name", OdfNamespaces.Presentation);
+                else
+                    Node.SetAttribute("presentation-page-layout-name", OdfNamespaces.Presentation, value, "presentation");
+            }
+        }
+
+        public string? UseHeaderName
+        {
+            get => Node.GetAttribute("use-header-name", OdfNamespaces.Presentation);
+            set
+            {
+                if (value == null)
+                    Node.RemoveAttribute("use-header-name", OdfNamespaces.Presentation);
+                else
+                    Node.SetAttribute("use-header-name", OdfNamespaces.Presentation, value, "presentation");
+            }
+        }
+
+        public string? UseFooterName
+        {
+            get => Node.GetAttribute("use-footer-name", OdfNamespaces.Presentation);
+            set
+            {
+                if (value == null)
+                    Node.RemoveAttribute("use-footer-name", OdfNamespaces.Presentation);
+                else
+                    Node.SetAttribute("use-footer-name", OdfNamespaces.Presentation, value, "presentation");
+            }
+        }
+
+        public string? UseDateTimeName
+        {
+            get => Node.GetAttribute("use-date-time-name", OdfNamespaces.Presentation);
+            set
+            {
+                if (value == null)
+                    Node.RemoveAttribute("use-date-time-name", OdfNamespaces.Presentation);
+                else
+                    Node.SetAttribute("use-date-time-name", OdfNamespaces.Presentation, value, "presentation");
+            }
+        }
+
+        public OdfNotesPage SpeakerNotesPage
         {
             get
             {
-                var notesNode = Document.FindChildElement(Node, "notes", OdfNamespaces.Presentation);
-                if (notesNode == null) return string.Empty;
-
-                var textBox = FindTextBoxInNotes(notesNode);
-                return textBox?.TextContent ?? string.Empty;
-            }
-            set
-            {
-                var notesNode = Document.FindChildElement(Node, "notes", OdfNamespaces.Presentation);
+                var notesNode = Node.FindChildElement("notes", OdfNamespaces.Presentation);
                 if (notesNode == null)
                 {
                     notesNode = new OdfNode(OdfNodeType.Element, "notes", OdfNamespaces.Presentation, "presentation");
                     Node.AppendChild(notesNode);
                 }
-
-                var textBox = FindTextBoxInNotes(notesNode);
-                if (textBox == null)
-                {
-                    var frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-                    frame.SetAttribute("class", OdfNamespaces.Presentation, "notes", "presentation");
-                    frame.SetAttribute("x", OdfNamespaces.Svg, "2cm", "svg");
-                    frame.SetAttribute("y", OdfNamespaces.Svg, "15cm", "svg");
-                    frame.SetAttribute("width", OdfNamespaces.Svg, "20cm", "svg");
-                    frame.SetAttribute("height", OdfNamespaces.Svg, "10cm", "svg");
-
-                    var box = new OdfNode(OdfNodeType.Element, "text-box", OdfNamespaces.Draw, "draw");
-                    frame.AppendChild(box);
-                    notesNode.AppendChild(frame);
-                    textBox = box;
-                }
-
-                textBox.Children.Clear();
-                var p = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
-                p.TextContent = value;
-                textBox.AppendChild(p);
+                return new OdfNotesPage(notesNode, this);
             }
+        }
+
+        public string SpeakerNotes
+        {
+            get => SpeakerNotesPage.SpeakerNotesText;
+            set => SpeakerNotesPage.SpeakerNotesText = value;
+        }
+
+        public OdfAnimationNode AnimationRoot
+        {
+            get
+            {
+                OdfNode? mainSeq = null;
+                foreach (var child in Node.Children)
+                {
+                    if (child.NodeType == OdfNodeType.Element && child.LocalName == "seq" && child.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:animation:1.0")
+                    {
+                        string? nodeType = child.GetAttribute("node-type", OdfNamespaces.Presentation);
+                        if (nodeType == "main-sequence")
+                        {
+                            mainSeq = child;
+                            break;
+                        }
+                    }
+                }
+                if (mainSeq == null)
+                {
+                    mainSeq = new OdfNode(OdfNodeType.Element, "seq", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
+                    mainSeq.SetAttribute("node-type", OdfNamespaces.Presentation, "main-sequence", "presentation");
+                    Node.AppendChild(mainSeq);
+                }
+                return new OdfAnimationNode(mainSeq);
+            }
+        }
+
+        public IReadOnlyList<OdfPlaceholder> Placeholders
+        {
+            get
+            {
+                var list = new List<OdfPlaceholder>();
+                foreach (var child in Node.Children)
+                {
+                    if (child.NodeType == OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Draw)
+                    {
+                        string? ph = child.GetAttribute("placeholder", OdfNamespaces.Presentation);
+                        if (ph == "true")
+                        {
+                            list.Add(new OdfPlaceholder(child, this));
+                        }
+                    }
+                }
+                return list.AsReadOnly();
+            }
+        }
+
+        public OdfPlaceholder AddPlaceholder(OdfPlaceholderType type, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
+        {
+            var shapeNode = new OdfNode(OdfNodeType.Element, "rect", OdfNamespaces.Draw, "draw");
+            shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+            shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
+            shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
+            shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
+            shapeNode.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
+            
+            Node.AppendChild(shapeNode);
+            var placeholder = new OdfPlaceholder(shapeNode, this)
+            {
+                PlaceholderType = type
+            };
+            return placeholder;
+        }
+
+        public OdfShape AddEmbeddedObject(string subPath, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
+        {
+            var frame = CreateDrawingFrame(x, y, w, h);
+            var objNode = new OdfNode(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
+            
+            string href = subPath;
+            if (!href.StartsWith("./"))
+            {
+                href = "./" + href;
+            }
+            if (href.EndsWith("/"))
+            {
+                href = href.Substring(0, href.Length - 1);
+            }
+            
+            objNode.SetAttribute("href", OdfNamespaces.XLink, href, "xlink");
+            objNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+            objNode.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
+            objNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
+            
+            frame.AppendChild(objNode);
+            Node.AppendChild(frame);
+            return new OdfShape(frame, this);
         }
 
         public OdfSlide(OdfNode node, PresentationDocument doc)

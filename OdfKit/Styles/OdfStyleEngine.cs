@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,6 +11,7 @@ namespace OdfKit.Styles
     {
         private readonly OdfNode _contentRoot;
         private readonly OdfNode _stylesRoot;
+        public Action<OdfNode, string>? OnStyleChanging;
 
         // Registry of loaded styles
         private readonly Dictionary<string, OdfNode> _automaticStyles = new(StringComparer.Ordinal);
@@ -200,6 +201,7 @@ namespace OdfKit.Styles
 
         public void SetLocalStyleProperty(OdfNode elementNode, string family, string propElementLocalName, string propAttrLocalName, string propAttrNsUri, string value, string? propAttrPrefix = null)
         {
+            OnStyleChanging?.Invoke(elementNode, family);
             var styleNode = GetOrCreateLocalStyle(elementNode, family);
             
             // Find or create the properties element (e.g. style:text-properties)

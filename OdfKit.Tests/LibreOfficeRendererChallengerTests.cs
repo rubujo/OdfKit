@@ -497,6 +497,10 @@ namespace OdfKit.Tests
                 LogDebug($"Action failed with exception: {ex}");
                 Console.WriteLine($"DBGP: CaptureArgumentsAsync runAction exception: {ex}");
             }
+            finally
+            {
+                cts.Cancel();
+            }
 
             await watcherTask;
 
@@ -801,7 +805,7 @@ namespace OdfKit.Tests
                     renderer.Convert(doc, outPath, formatWithMetachars);
                 }
                 catch {}
-            }, args => args.Any(arg => arg.Contains("whoami") || arg.Contains("dir") || arg.Contains("--foo")));
+            }, args => args.Any(arg => arg.Contains("whoami") || arg.Contains("&dir") || arg.Contains("--foo")));
 
             Assert.NotEmpty(arguments);
 

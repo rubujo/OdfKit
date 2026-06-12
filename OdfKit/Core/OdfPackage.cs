@@ -137,6 +137,7 @@ namespace OdfKit.Core
             if (_underlyingStream.CanSeek)
             {
                 long initialPosition = _underlyingStream.Position;
+                _underlyingStream.Position = 0;
                 bytesRead = ReadAll(_underlyingStream, signature, 0, signature.Length);
                 _underlyingStream.Position = initialPosition;
             }
@@ -213,8 +214,43 @@ namespace OdfKit.Core
                     throw new SecurityException($"Zip archive total uncompressed size exceeds limit ({totalUncompressedSize} > {_loadOptions.MaxTotalUncompressedSize} bytes).");
                 }
 
-                // Add entry to our index
-                var pkgEntry = new OdfPackageEntry(name, entry);
+                byte[] entryBytes;
+                using (var entryStream = entry.Open())
+                using (var ms = new MemoryStream())
+                {
+                    entryStream.CopyTo(ms);
+                    entryBytes = ms.ToArray();
+                }
+                var pkgEntry = new OdfPackageEntry(name, entryBytes);
+                if (entry.CompressedLength == entry.Length && entry.Length > 0)
+                {
+                    pkgEntry.IsCompressed = false;
+                }
+                
+                // Determine if it was stored without compression
+                bool wasStored = false;
+                try
+                {
+                    var fieldInfo = typeof(ZipArchiveEntry).GetField("_compressionMethod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (fieldInfo != null)
+                    {
+                        var val = fieldInfo.GetValue(entry);
+                        if (val != null)
+                        {
+                            int intVal = Convert.ToInt32(val);
+                            wasStored = (intVal == 0);
+                        }
+                    }
+                    else
+                    {
+                        wasStored = (entry.CompressedLength == entry.Length);
+                    }
+                }
+                catch
+                {
+                    wasStored = (entry.CompressedLength == entry.Length);
+                }
+                pkgEntry.WasStoredInZip = wasStored;
                 if (_entries.ContainsKey(name))
                 {
                     _duplicateEntryNames.Add(name);
@@ -274,6 +310,7 @@ namespace OdfKit.Core
             }
 
             var officeNs = XNamespace.Get(OdfNamespaces.Office);
+            var xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
 
             // Get mimetype
             var mimeAttr = root.Attribute(officeNs + "mimetype") ?? root.Attribute("mimetype");
@@ -286,6 +323,74 @@ namespace OdfKit.Core
             // Get office:version
             var versionAttr = root.Attribute(officeNs + "version") ?? root.Attribute("version");
             string version = versionAttr?.Value ?? "1.3";
+
+            // Extract nested office:document elements (embedded objects, e.g. formulas)
+            var nestedDocs = doc.Descendants(officeNs + "document")
+                                .Where(d => d != doc.Root)
+                                .ToList();
+            
+            int objectCounter = 1;
+            foreach (var nestedDoc in nestedDocs)
+            {
+                var parent = nestedDoc.Parent;
+                if (parent != null && parent.Name.LocalName == "object" && parent.Name.NamespaceName == OdfNamespaces.Draw)
+                {
+                    string mimeType = nestedDoc.Attribute(officeNs + "mimetype")?.Value 
+                                      ?? nestedDoc.Attribute("mimetype")?.Value 
+                                      ?? "application/vnd.oasis.opendocument.formula";
+                    
+                    string? objectId = parent.Attribute(XNamespace.Get(OdfNamespaces.XLink) + "href")?.Value;
+                    if (string.IsNullOrEmpty(objectId))
+                    {
+                        objectId = $"Object_{objectCounter++}";
+                    }
+                    else
+                    {
+                        objectId = objectId!.TrimStart('.', '/').TrimEnd('/');
+                    }
+                    string subDocVersion = nestedDoc.Attribute(officeNs + "version")?.Value ?? "1.3";
+                    
+                    var subDocRoot = new XElement(officeNs + "document-content",
+                        new XAttribute(officeNs + "version", subDocVersion));
+                    
+                    CopyNamespaces(nestedDoc, subDocRoot);
+                    foreach (var child in nestedDoc.Elements())
+                    {
+                        subDocRoot.Add(new XElement(child));
+                    }
+                    
+                    byte[] contentBytes;
+                    using (var ms = new MemoryStream())
+                    {
+                        var xdoc = new XDocument(subDocRoot);
+                        xdoc.Save(ms);
+                        contentBytes = ms.ToArray();
+                    }
+                    
+                    string folderPath = objectId;
+                    string contentPath = $"{folderPath}/content.xml";
+                    string mimePath = $"{folderPath}/mimetype";
+                    
+                    _entries[contentPath] = new OdfPackageEntry(contentPath, contentBytes);
+                    _manifest[contentPath] = "text/xml";
+                    _entryOrder.Add(contentPath);
+                    
+                    byte[] mimeBytes = Encoding.UTF8.GetBytes(mimeType);
+                    _entries[mimePath] = new OdfPackageEntry(mimePath, mimeBytes);
+                    _manifest[mimePath] = mimeType;
+                    _entryOrder.Add(mimePath);
+                    
+                    _manifest[folderPath + "/"] = mimeType;
+                    
+                    nestedDoc.Remove();
+                    
+                    var xlinkNsFormula = XNamespace.Get(OdfNamespaces.XLink);
+                    parent.SetAttributeValue(xlinkNsFormula + "href", folderPath);
+                    parent.SetAttributeValue(xlinkNsFormula + "type", "simple");
+                    parent.SetAttributeValue(xlinkNsFormula + "show", "embed");
+                    parent.SetAttributeValue(xlinkNsFormula + "actuate", "onLoad");
+                }
+            }
 
             // Extract office elements
             var metaElement = root.Element(officeNs + "meta");
@@ -323,7 +428,7 @@ namespace OdfKit.Core
                 {
                     binData.Remove();
 
-                    var xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
+                    xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
 
                     parent.SetAttributeValue(xlinkNs + "href", imagePath);
                     parent.SetAttributeValue(xlinkNs + "type", "simple");
@@ -891,6 +996,30 @@ namespace OdfKit.Core
             return _entries.ContainsKey(SanitizeEntryName(name));
         }
 
+        public class OdfPackageEntryInfo
+        {
+            public string Path { get; }
+            public OdfPackageEntryInfo(string path) => Path = path;
+        }
+
+        public IEnumerable<OdfPackageEntryInfo> GetEntries()
+        {
+            return _entries.Keys.Select(k => new OdfPackageEntryInfo(k));
+        }
+
+        public byte[] ReadEntry(string path)
+        {
+            using var stream = GetEntryStream(path);
+            using var ms = new MemoryStream();
+            stream.CopyTo(ms);
+            return ms.ToArray();
+        }
+
+        public void Save(Stream stream)
+        {
+            SaveToStream(stream);
+        }
+
         public Stream GetEntryStream(string name)
         {
             name = SanitizeEntryName(name);
@@ -910,6 +1039,13 @@ namespace OdfKit.Core
             _entries[name] = entry;
             _manifest[name] = mediaType;
 
+            if (name.EndsWith("/mimetype") && name.Length > 9)
+            {
+                string folder = name.Substring(0, name.Length - 8); // keeps the trailing slash
+                string mimeText = Encoding.UTF8.GetString(content).Trim();
+                _manifest[folder] = mimeText;
+            }
+
             // Clear signature on edit, except when writing signature itself or manifest
             if (name != "META-INF/documentsignatures.xml" && name != "META-INF/manifest.xml")
             {
@@ -923,6 +1059,20 @@ namespace OdfKit.Core
             var entry = new OdfPackageEntry(name, contentStream);
             _entries[name] = entry;
             _manifest[name] = mediaType;
+
+            if (name.EndsWith("/mimetype") && name.Length > 9)
+            {
+                string folder = name.Substring(0, name.Length - 8); // keeps the trailing slash
+                byte[] bytes;
+                using (var ms = new MemoryStream())
+                {
+                    contentStream.CopyTo(ms);
+                    bytes = ms.ToArray();
+                }
+                entry.SetContent(bytes);
+                string mimeText = Encoding.UTF8.GetString(bytes).Trim();
+                _manifest[folder] = mimeText;
+            }
 
             if (name != "META-INF/documentsignatures.xml" && name != "META-INF/manifest.xml")
             {
@@ -1275,8 +1425,42 @@ namespace OdfKit.Core
                 writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, _mimetype ?? "application/vnd.oasis.opendocument.text");
                 writer.WriteEndElement();
 
+                // Collect directory entries
+                var directories = new Dictionary<string, string>(StringComparer.Ordinal);
+                foreach (var key in _manifest.Keys)
+                {
+                    int slashIdx = key.IndexOf('/');
+                    if (slashIdx != -1)
+                    {
+                        string dir = key.Substring(0, slashIdx + 1);
+                        if (!directories.ContainsKey(dir))
+                        {
+                            // Try to read mimetype for this directory
+                            string mimeKey = dir + "mimetype";
+                            string mimeType = "";
+                            if (_entries.TryGetValue(mimeKey, out var mimeEntry))
+                            {
+                                try
+                                {
+                                    using var r = new StreamReader(mimeEntry.OpenReader(), Encoding.UTF8);
+                                    mimeType = r.ReadToEnd().Trim();
+                                }
+                                catch {}
+                            }
+                            directories[dir] = mimeType;
+                        }
+                    }
+                }
+
                 // Rest of manifest sorted by key for deterministic output (required for digital signatures)
                 var sortedKeys = new List<string>(_manifest.Keys);
+                foreach (var dir in directories.Keys)
+                {
+                    if (!sortedKeys.Contains(dir))
+                    {
+                        sortedKeys.Add(dir);
+                    }
+                }
                 sortedKeys.Sort(StringComparer.Ordinal);
                 foreach (var key in sortedKeys)
                 {
@@ -1284,7 +1468,9 @@ namespace OdfKit.Core
 
                     writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
                     writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, key);
-                    writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, _manifest[key]);
+                    
+                    string mediaType = _manifest.TryGetValue(key, out var mt) ? mt : (directories.TryGetValue(key, out var dm) ? dm : "");
+                    writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, mediaType);
 
                     if (_entries.TryGetValue(key, out var entry) && entry.EncryptionInfo != null)
                     {
@@ -1651,7 +1837,7 @@ namespace OdfKit.Core
                 root.Add(new XElement(bodyElement));
             }
 
-            // Re-embed base64 images from virtual entries
+            // Re-embed base64 images and sub-documents from virtual entries
             var xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
             var elementsWithHref = root.Descendants().Where(e => e.Attribute(xlinkNs + "href") != null).ToList();
 
@@ -1674,6 +1860,55 @@ namespace OdfKit.Core
                         string base64 = Convert.ToBase64String(imageBytes);
                         var binDataElement = new XElement(officeNs + "binary-data", base64);
                         elem.Add(binDataElement);
+
+                        hrefAttr.Remove();
+                        elem.Attribute(xlinkNs + "type")?.Remove();
+                        elem.Attribute(xlinkNs + "show")?.Remove();
+                        elem.Attribute(xlinkNs + "actuate")?.Remove();
+                    }
+                }
+                else
+                {
+                    string normHref = href.TrimStart('.', '/').TrimEnd('/');
+                    string subDocContentPath = $"{normHref}/content.xml";
+                    if (_entries.TryGetValue(subDocContentPath, out var subDocEntry))
+                    {
+                        string mimeType = "application/vnd.oasis.opendocument.formula";
+                        string subDocMimePath = $"{normHref}/mimetype";
+                        if (_entries.TryGetValue(subDocMimePath, out var mimeEntry))
+                        {
+                            using var mimeReader = new StreamReader(mimeEntry.OpenReader(), Encoding.UTF8);
+                            mimeType = mimeReader.ReadToEnd().Trim();
+                        }
+                        else if (_manifest.TryGetValue(normHref, out var m))
+                        {
+                            mimeType = m;
+                        }
+                        else if (_manifest.TryGetValue(normHref + "/", out var mSlash))
+                        {
+                            mimeType = mSlash;
+                        }
+
+                        XElement subDocRoot;
+                        using (var subReader = XmlReader.Create(subDocEntry.OpenReader(), xmlSettings))
+                        {
+                            subDocRoot = XDocument.Load(subReader).Root ?? throw new InvalidDataException($"Invalid {subDocContentPath} root");
+                        }
+
+                        var nestedDoc = new XElement(officeNs + "document");
+                        nestedDoc.SetAttributeValue(officeNs + "mimetype", mimeType);
+                        
+                        string subDocVersion = subDocRoot.Attribute(officeNs + "version")?.Value ?? "1.3";
+                        nestedDoc.SetAttributeValue(officeNs + "version", subDocVersion);
+
+                        CopyNamespaces(subDocRoot, nestedDoc);
+
+                        foreach (var child in subDocRoot.Elements())
+                        {
+                            nestedDoc.Add(new XElement(child));
+                        }
+
+                        elem.Add(nestedDoc);
 
                         hrefAttr.Remove();
                         elem.Attribute(xlinkNs + "type")?.Remove();
@@ -1783,11 +2018,16 @@ namespace OdfKit.Core
         public bool IsCompressed { get; set; } = true;
         public OdfEncryptionInfo? EncryptionInfo { get; set; }
 
+        private bool? _wasStoredInZip;
         public bool WasStoredInZip
         {
             get
             {
-                if (_zipEntry == null) return false;
+                if (_wasStoredInZip.HasValue) return _wasStoredInZip.Value;
+                if (_zipEntry == null)
+                {
+                    return !IsCompressed;
+                }
                 try
                 {
                     var fieldInfo = typeof(ZipArchiveEntry).GetField("_compressionMethod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -1807,6 +2047,7 @@ namespace OdfKit.Core
                 }
                 return _zipEntry.CompressedLength == _zipEntry.Length;
             }
+            internal set => _wasStoredInZip = value;
         }
 
         public void SetContent(byte[] bytes)

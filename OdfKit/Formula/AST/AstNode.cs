@@ -328,4 +328,19 @@ namespace OdfKit.Formula.AST
 
         public override string Serialize() => $"({_inner.Serialize()})";
     }
+
+    public class NamedRangeNode : AstNode
+    {
+        public string Name { get; }
+        public NamedRangeNode(string name) => Name = name;
+        public override object Evaluate(IEvaluationContext context) => context.GetNamedRangeOrExpressionValue(Name);
+        public override List<OdfCellRange> GetRanges(IEvaluationContext context)
+        {
+            var val = context.GetNamedRangeOrExpressionValue(Name);
+            if (val is OdfCellRange r) return new List<OdfCellRange> { r };
+            if (val is string s && OdfCellRange.TryParse(s, out var range)) return new List<OdfCellRange> { range };
+            return new List<OdfCellRange>();
+        }
+        public override string Serialize() => Name;
+    }
 }
