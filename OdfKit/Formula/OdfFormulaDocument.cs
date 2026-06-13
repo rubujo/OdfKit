@@ -82,6 +82,23 @@ public class OdfFormulaDocument : OdfDocument
     public string MathText => MathNode.TextContent;
 
     /// <summary>
+    /// 取得或設定完整 MathML XML 字串。
+    /// </summary>
+    /// <remarks>
+    /// 讀取時會序列化目前的 MathML 根節點；寫入時會沿用 <see cref="SetMathMl(string)"/> 的安全解析與根節點檢查。
+    /// </remarks>
+    public string MathMlXml
+    {
+        get
+        {
+            using var stream = new MemoryStream();
+            OdfXmlWriter.Write(MathNode, stream);
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+        set => SetMathMl(value);
+    }
+
+    /// <summary>
     /// 以指定 MathML XML 取代公式內容。
     /// </summary>
     /// <param name="mathMlXml">格式正確的 MathML XML。</param>

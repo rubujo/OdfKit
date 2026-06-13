@@ -167,13 +167,15 @@ public class DocumentKindApiUsabilityTests
     public void CreateLoadFormulaWithMathMlRoot()
     {
         using var formula = OdfFormulaDocument.Create();
-        formula.SetMathMl("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow></math>");
+        formula.MathMlXml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow></math>";
 
         using OdfFormulaDocument loaded = RoundTrip(formula, "formula.odf", OdfFormulaDocument.Load);
 
         Assert.Equal("application/vnd.oasis.opendocument.formula", loaded.Package.MimeType);
         Assert.Equal("math", loaded.MathNode.LocalName);
         Assert.Equal("x=1", loaded.MathText);
+        Assert.Contains("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"", loaded.MathMlXml, StringComparison.Ordinal);
+        Assert.Contains("<mi>x</mi>", loaded.MathMlXml, StringComparison.Ordinal);
         Assert.Equal("x", FindDescendant(loaded.MathNode, "mi", "http://www.w3.org/1998/Math/MathML")?.TextContent);
     }
 
