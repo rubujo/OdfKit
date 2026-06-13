@@ -225,24 +225,39 @@ public static class OdfKitCli
 
     private static int Sanitize(string[] args, TextWriter output, TextWriter error)
     {
-        if (!RequireArity(args, 3, "sanitize input.odt output.odt", error))
+        if (!TryParseSanitizeOptions(args, error, out SanitizeOptions? options))
         {
             return 2;
         }
 
-        if (!File.Exists(args[1]))
+        SanitizeOptions parsedOptions = options ?? throw new InvalidOperationException("sanitize options were not parsed.");
+        if (!File.Exists(parsedOptions.InputPath))
         {
-            error.WriteLine("path not found: " + args[1]);
+            error.WriteLine("path not found: " + parsedOptions.InputPath);
             return 2;
         }
 
-        using OdfDocument document = OdfDocument.Load(args[1]);
+        using OdfDocument document = OdfDocument.Load(
+            parsedOptions.InputPath,
+            new OdfLoadOptions { Password = parsedOptions.InputPassword });
         int artifactCountBefore = CountSanitizableArtifacts(document.Package);
         document.SanitizeMacros();
         int artifactCountAfter = CountSanitizableArtifacts(document.Package);
-        document.Save(args[2]);
-        output.WriteLine("wrote: " + args[2]);
+        document.Save(
+            parsedOptions.OutputPath,
+            new OdfSaveOptions
+            {
+                Password = parsedOptions.OutputPassword,
+                EncryptionAlgorithm = parsedOptions.EncryptionAlgorithm
+            });
+        output.WriteLine("wrote: " + parsedOptions.OutputPath);
         output.WriteLine("removed-artifacts: " + Math.Max(0, artifactCountBefore - artifactCountAfter).ToString(CultureInfo.InvariantCulture));
+        if (parsedOptions.OutputPassword is not null)
+        {
+            output.WriteLine("encrypted-output: true");
+            output.WriteLine("encryption-algorithm: " + FormatEncryptionAlgorithm(parsedOptions.EncryptionAlgorithm));
+        }
+
         return 0;
     }
 
@@ -324,7 +339,7 @@ public static class OdfKitCli
         output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
         output.WriteLine("  validate-corpus manifest.json [--root path] [--format text|json] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
         output.WriteLine("  info file.ods");
-        output.WriteLine("  sanitize input.odt output.odt");
+        output.WriteLine("  sanitize input.odt output.odt [--password value] [--output-password value] [--encryption aes256|blowfish]");
         output.WriteLine("  typed-dom-coverage [--format text|json]");
         output.WriteLine("  convert-flat input.odt output.fodt");
         output.WriteLine("  pack input.fodt output.odt");
@@ -610,6 +625,82 @@ public static class OdfKitCli
         return true;
     }
 
+    private static bool TryParseSanitizeOptions(string[] args, TextWriter error, out SanitizeOptions? options)
+    {
+        options = null;
+        string? inputPath = null;
+        string? outputPath = null;
+        string? inputPassword = null;
+        string? outputPassword = null;
+        bool outputPasswordSpecified = false;
+        OdfEncryptionAlgorithm encryptionAlgorithm = OdfEncryptionAlgorithm.Aes256;
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            string arg = args[i];
+            switch (arg)
+            {
+                case "--password":
+                    if (!TryReadValue(args, ref i, error, "--password", out inputPassword))
+                    {
+                        return false;
+                    }
+                    break;
+                case "--output-password":
+                    if (!TryReadValue(args, ref i, error, "--output-password", out outputPassword))
+                    {
+                        return false;
+                    }
+
+                    outputPasswordSpecified = true;
+                    break;
+                case "--encryption":
+                    if (!TryReadValue(args, ref i, error, "--encryption", out string? algorithmValue) ||
+                        !TryParseEncryptionAlgorithm(algorithmValue, out encryptionAlgorithm))
+                    {
+                        error.WriteLine("supported encryption algorithms: aes256, blowfish");
+                        return false;
+                    }
+                    break;
+                default:
+                    if (arg.StartsWith("-", StringComparison.Ordinal))
+                    {
+                        error.WriteLine("unknown option: " + arg);
+                        return false;
+                    }
+
+                    if (inputPath is null)
+                    {
+                        inputPath = arg;
+                    }
+                    else if (outputPath is null)
+                    {
+                        outputPath = arg;
+                    }
+                    else
+                    {
+                        error.WriteLine("usage: odfkit sanitize input.odt output.odt [options]");
+                        return false;
+                    }
+                    break;
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(inputPath) || string.IsNullOrWhiteSpace(outputPath))
+        {
+            error.WriteLine("usage: odfkit sanitize input.odt output.odt [options]");
+            return false;
+        }
+
+        options = new SanitizeOptions(
+            inputPath,
+            outputPath,
+            inputPassword,
+            outputPasswordSpecified ? outputPassword : inputPassword,
+            encryptionAlgorithm);
+        return true;
+    }
+
     private static bool TryReadValue(string[] args, ref int index, TextWriter error, string optionName, out string? value)
     {
         value = null;
@@ -639,6 +730,30 @@ public static class OdfKitCli
 
         format = ValidateOutputFormat.Text;
         return false;
+    }
+
+    private static bool TryParseEncryptionAlgorithm(string? value, out OdfEncryptionAlgorithm algorithm)
+    {
+        if (string.Equals(value, "aes256", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(value, "aes-256", StringComparison.OrdinalIgnoreCase))
+        {
+            algorithm = OdfEncryptionAlgorithm.Aes256;
+            return true;
+        }
+
+        if (string.Equals(value, "blowfish", StringComparison.OrdinalIgnoreCase))
+        {
+            algorithm = OdfEncryptionAlgorithm.Blowfish;
+            return true;
+        }
+
+        algorithm = OdfEncryptionAlgorithm.Aes256;
+        return false;
+    }
+
+    private static string FormatEncryptionAlgorithm(OdfEncryptionAlgorithm algorithm)
+    {
+        return algorithm == OdfEncryptionAlgorithm.Blowfish ? "blowfish" : "aes256";
     }
 
     private static bool TryParseFailOn(string? value, out ValidateFailOn failOn)
@@ -1027,6 +1142,13 @@ public static class OdfKitCli
     {
         public ValidateBaselineOptions BaselineOptions => new(Baseline, BaselineJarPath, BaselineCommandPath);
     }
+
+    private sealed record SanitizeOptions(
+        string InputPath,
+        string OutputPath,
+        string? InputPassword,
+        string? OutputPassword,
+        OdfEncryptionAlgorithm EncryptionAlgorithm);
 
     private sealed record ValidateFileResult(
         string Path,

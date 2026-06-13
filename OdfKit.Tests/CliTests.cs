@@ -100,6 +100,61 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證 sanitize 可讀取加密輸入並將清理後的輸出重新加密。
+    /// </summary>
+    [Fact]
+    public void SanitizeEncryptedPackageCanReencryptOutput()
+    {
+        const string inputPassword = "CliInputSecret";
+        const string outputPassword = "CliOutputSecret";
+        string sourcePath = CreateTempPath(".odt");
+        string outputPath = CreateTempPath(".odt");
+        try
+        {
+            CreateMacroPackage(sourcePath, inputPassword);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                [
+                    "sanitize",
+                    sourcePath,
+                    outputPath,
+                    "--password",
+                    inputPassword,
+                    "--output-password",
+                    outputPassword,
+                    "--encryption",
+                    "aes256"
+                ],
+                output,
+                error);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            Assert.Contains("encrypted-output: true", output.ToString());
+            Assert.Contains("encryption-algorithm: aes256", output.ToString());
+
+            using (OdfPackage metadataPackage = OdfPackage.Open(outputPath))
+            {
+                Assert.NotNull(metadataPackage.GetEntryEncryptionInfo("content.xml"));
+            }
+
+            using OdfPackage sanitized = OdfPackage.Open(
+                outputPath,
+                new OdfLoadOptions { Password = outputPassword });
+            Assert.False(sanitized.HasEntry("Basic/script.xlb"));
+            Assert.True(sanitized.HasEntry("content.xml"));
+        }
+        finally
+        {
+            TryDelete(sourcePath);
+            TryDelete(outputPath);
+        }
+    }
+
+    /// <summary>
     /// 驗證 typed-dom-coverage 可輸出 machine-readable JSON 摘要。
     /// </summary>
     [Fact]
@@ -953,10 +1008,17 @@ public class CliTests
         document.Save(path);
     }
 
-    private static void CreateMacroPackage(string path)
+    private static void CreateMacroPackage(string path, string? password = null)
     {
         using FileStream stream = File.Create(path);
-        using OdfPackage package = OdfPackage.Create(stream, leaveOpen: true);
+        OdfSaveOptions? options = password is null
+            ? null
+            : new OdfSaveOptions
+            {
+                Password = password,
+                EncryptionAlgorithm = OdfEncryptionAlgorithm.Aes256
+            };
+        using OdfPackage package = OdfPackage.Create(stream, leaveOpen: true, options);
         package.SetMimeType("application/vnd.oasis.opendocument.text");
         package.WriteEntry(
             "content.xml",

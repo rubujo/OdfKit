@@ -137,12 +137,14 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus cor
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- info file.ods
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- metadata file.odt
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- sanitize input.odt sanitized.odt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- sanitize encrypted.odt sanitized.odt --password old-secret --output-password new-secret --encryption aes256
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- typed-dom-coverage --format json
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- convert-flat input.odt output.fodt
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack input.fodt output.odt
 ```
 
 `validate` 的 exit code 固定為：通過為 `0`，驗證錯誤或 `--fail-on warning` 命中為 `1`，參數錯誤或路徑不存在為 `2`。
+`sanitize` 可用 `--password` 開啟加密輸入，並用 `--output-password` 重新加密輸出。
 
 ## 限制
 
