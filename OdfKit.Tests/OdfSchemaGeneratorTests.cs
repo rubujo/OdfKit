@@ -276,6 +276,9 @@ namespace OdfKit.Tests
                 "<attribute name=\"table:style-names\"><ref name=\"styleNameRefs\" /></attribute>" +
                 "<attribute name=\"draw:fill-color\"><ref name=\"color\" /></attribute>" +
                 "<attribute name=\"xlink:href\"><ref name=\"anyIRI\" /></attribute>" +
+                "<attribute name=\"xlink:type\"><value>simple</value></attribute>" +
+                "<attribute name=\"xlink:show\"><choice><value>embed</value><value>new</value><value>none</value><value>replace</value></choice></attribute>" +
+                "<attribute name=\"xlink:actuate\"><choice><value>onLoad</value><value>onRequest</value></choice></attribute>" +
                 "<attribute name=\"draw:opacity\"><ref name=\"zeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"draw:shadow-offset\"><ref name=\"signedZeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"table:base-cell-address\"><ref name=\"cellAddress\" /></attribute>" +
@@ -358,6 +361,12 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfIriReference? Href", code);
             Assert.Contains("get => GetIriReferenceAttributeValue(\"href\", \"http://www.w3.org/1999/xlink\", GetDocumentVersion());", code);
             Assert.Contains("SetIriReferenceAttributeValue(\"href\", \"http://www.w3.org/1999/xlink\", value.Value, \"xlink\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfXLinkType? Type", code);
+            Assert.Contains("get => GetXLinkTypeAttributeValue(\"type\", \"http://www.w3.org/1999/xlink\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfXLinkShow? Show", code);
+            Assert.Contains("get => GetXLinkShowAttributeValue(\"show\", \"http://www.w3.org/1999/xlink\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfXLinkActuate? Actuate", code);
+            Assert.Contains("get => GetXLinkActuateAttributeValue(\"actuate\", \"http://www.w3.org/1999/xlink\", GetDocumentVersion());", code);
             Assert.Contains("public OdfPercent? Opacity", code);
             Assert.Contains("get => GetPercentAttributeValue(\"opacity\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetPercentAttributeValue(\"opacity\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);

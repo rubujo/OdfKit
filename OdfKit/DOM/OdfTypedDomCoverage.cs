@@ -227,6 +227,21 @@ public static class OdfTypedDomCoverage
             return "targetFrameName";
         }
 
+        if (resolvedType == typeof(OdfXLinkType))
+        {
+            return "xLinkType";
+        }
+
+        if (resolvedType == typeof(OdfXLinkShow))
+        {
+            return "xLinkShow";
+        }
+
+        if (resolvedType == typeof(OdfXLinkActuate))
+        {
+            return "xLinkActuate";
+        }
+
         if (resolvedType == typeof(OdfLineStyle))
         {
             return "lineStyle";

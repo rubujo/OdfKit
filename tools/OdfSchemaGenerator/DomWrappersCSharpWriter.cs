@@ -291,6 +291,24 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.MediaType;
         }
 
+        if (node.NamespaceUri == "http://www.w3.org/1999/xlink" &&
+            node.LocalName == "type")
+        {
+            return AttributeValueKind.XLinkType;
+        }
+
+        if (node.NamespaceUri == "http://www.w3.org/1999/xlink" &&
+            node.LocalName == "show")
+        {
+            return AttributeValueKind.XLinkShow;
+        }
+
+        if (node.NamespaceUri == "http://www.w3.org/1999/xlink" &&
+            node.LocalName == "actuate")
+        {
+            return AttributeValueKind.XLinkActuate;
+        }
+
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
             node.LocalName == "font-relief")
         {
@@ -732,6 +750,33 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetIriReferenceAttributeValue",
                     "SetIriReferenceAttributeValue");
+                break;
+            case AttributeValueKind.XLinkType:
+                writer.WriteLine($"        public OdfXLinkType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetXLinkTypeAttributeValue",
+                    "SetXLinkTypeAttributeValue");
+                break;
+            case AttributeValueKind.XLinkShow:
+                writer.WriteLine($"        public OdfXLinkShow? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetXLinkShowAttributeValue",
+                    "SetXLinkShowAttributeValue");
+                break;
+            case AttributeValueKind.XLinkActuate:
+                writer.WriteLine($"        public OdfXLinkActuate? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetXLinkActuateAttributeValue",
+                    "SetXLinkActuateAttributeValue");
                 break;
             case AttributeValueKind.Percent:
                 writer.WriteLine($"        public OdfPercent? {propName}");
@@ -1209,6 +1254,9 @@ public sealed class DomWrappersCSharpWriter
         StyleNameList,
         Color,
         IriReference,
+        XLinkType,
+        XLinkShow,
+        XLinkActuate,
         Percent,
         SignedPercent,
         CellAddress,

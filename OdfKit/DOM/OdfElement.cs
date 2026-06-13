@@ -435,6 +435,84 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的 XLink 類型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的 XLink 類型；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfXLinkType? GetXLinkTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseXLinkType(value, out OdfXLinkType type) ? type : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 XLink 類型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的 XLink 類型。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetXLinkTypeAttributeValue(string localName, string namespaceUri, OdfXLinkType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatXLinkType(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的 XLink 顯示行為屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的 XLink 顯示行為；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfXLinkShow? GetXLinkShowAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseXLinkShow(value, out OdfXLinkShow show) ? show : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 XLink 顯示行為屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的 XLink 顯示行為。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetXLinkShowAttributeValue(string localName, string namespaceUri, OdfXLinkShow value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatXLinkShow(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的 XLink 觸發行為屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的 XLink 觸發行為；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfXLinkActuate? GetXLinkActuateAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseXLinkActuate(value, out OdfXLinkActuate actuate) ? actuate : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 XLink 觸發行為屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的 XLink 觸發行為。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetXLinkActuateAttributeValue(string localName, string namespaceUri, OdfXLinkActuate value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatXLinkActuate(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的 0 到 100 百分比屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -1831,6 +1909,88 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfStyleRepeat.Repeat => "repeat",
             OdfStyleRepeat.Stretch => "stretch",
             _ => throw new ArgumentOutOfRangeException(nameof(repeat), repeat, "未知的 ODF 背景重複。")
+        };
+    }
+
+    private static bool TryParseXLinkType(string? value, out OdfXLinkType type)
+    {
+        switch (value)
+        {
+            case "simple":
+                type = OdfXLinkType.Simple;
+                return true;
+            default:
+                type = default;
+                return false;
+        }
+    }
+
+    private static string FormatXLinkType(OdfXLinkType type)
+    {
+        return type switch
+        {
+            OdfXLinkType.Simple => "simple",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "未知的 ODF XLink 類型。")
+        };
+    }
+
+    private static bool TryParseXLinkShow(string? value, out OdfXLinkShow show)
+    {
+        switch (value)
+        {
+            case "embed":
+                show = OdfXLinkShow.Embed;
+                return true;
+            case "new":
+                show = OdfXLinkShow.New;
+                return true;
+            case "none":
+                show = OdfXLinkShow.None;
+                return true;
+            case "replace":
+                show = OdfXLinkShow.Replace;
+                return true;
+            default:
+                show = default;
+                return false;
+        }
+    }
+
+    private static string FormatXLinkShow(OdfXLinkShow show)
+    {
+        return show switch
+        {
+            OdfXLinkShow.Embed => "embed",
+            OdfXLinkShow.New => "new",
+            OdfXLinkShow.None => "none",
+            OdfXLinkShow.Replace => "replace",
+            _ => throw new ArgumentOutOfRangeException(nameof(show), show, "未知的 ODF XLink 顯示行為。")
+        };
+    }
+
+    private static bool TryParseXLinkActuate(string? value, out OdfXLinkActuate actuate)
+    {
+        switch (value)
+        {
+            case "onLoad":
+                actuate = OdfXLinkActuate.OnLoad;
+                return true;
+            case "onRequest":
+                actuate = OdfXLinkActuate.OnRequest;
+                return true;
+            default:
+                actuate = default;
+                return false;
+        }
+    }
+
+    private static string FormatXLinkActuate(OdfXLinkActuate actuate)
+    {
+        return actuate switch
+        {
+            OdfXLinkActuate.OnLoad => "onLoad",
+            OdfXLinkActuate.OnRequest => "onRequest",
+            _ => throw new ArgumentOutOfRangeException(nameof(actuate), actuate, "未知的 ODF XLink 觸發行為。")
         };
     }
 
