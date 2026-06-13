@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -13,6 +16,8 @@ namespace OdfKit.Spreadsheet;
 /// </summary>
 public class SpreadsheetDocument : OdfDocument
 {
+    private OdfWorksheetCollection? _worksheets;
+
     /// <summary>
     /// 取得活頁簿中所有工作表的根節點。
     /// </summary>
@@ -31,10 +36,63 @@ public class SpreadsheetDocument : OdfDocument
         InitializeSheetsRoot();
     }
 
+    /// <summary>
+    /// 建立新的 ODS 試算表文件。
+    /// </summary>
+    /// <returns>新的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
+    public static SpreadsheetDocument Create()
+    {
+        return (SpreadsheetDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Spreadsheet);
+    }
+
+    /// <summary>
+    /// 從指定路徑載入 ODS 試算表文件。
+    /// </summary>
+    /// <param name="path">ODS 文件路徑。</param>
+    /// <returns>載入完成的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODS 試算表時擲出。</exception>
+    public new static SpreadsheetDocument Load(string path)
+    {
+        return EnsureSpreadsheet(OdfDocumentFactory.LoadDocument(path));
+    }
+
+    /// <summary>
+    /// 從指定資料流載入 ODS 試算表文件。
+    /// </summary>
+    /// <param name="stream">包含 ODS 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>載入完成的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODS 試算表時擲出。</exception>
+    public new static SpreadsheetDocument Load(Stream stream, string? fileName = null)
+    {
+        return EnsureSpreadsheet(OdfDocumentFactory.LoadDocument(stream, fileName));
+    }
+
+    /// <summary>
+    /// 取得工作表集合。
+    /// </summary>
+    public OdfWorksheetCollection Worksheets => _worksheets ??= new OdfWorksheetCollection(this);
+
+    private static SpreadsheetDocument EnsureSpreadsheet(OdfDocument document)
+    {
+        if (document is SpreadsheetDocument spreadsheet)
+        {
+            return spreadsheet;
+        }
+
+        document.Dispose();
+        throw new InvalidOperationException("指定的 ODF 文件不是 ODS 試算表。");
+    }
+
     private void InitializeSheetsRoot()
     {
         var body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
         SheetsRoot = FindOrCreateChild(body, "spreadsheet", OdfNamespaces.Office, "office");
+    }
+
+    internal OdfNode GetOrCreateSettingsItemSet(string name)
+    {
+        return FindOrCreateSettingsNode(SettingsDom, name);
     }
 
     /// <summary>
@@ -334,6 +392,92 @@ public class SpreadsheetDocument : OdfDocument
 }
 
 /// <summary>
+/// 提供活頁簿工作表的索引與列舉入口。
+/// </summary>
+public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
+{
+    private readonly SpreadsheetDocument _document;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfWorksheetCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="document">所屬試算表文件。</param>
+    public OdfWorksheetCollection(SpreadsheetDocument document)
+    {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 取得目前工作表數量。
+    /// </summary>
+    public int Count => _document.GetSheets().Count;
+
+    /// <summary>
+    /// 依索引取得工作表。
+    /// </summary>
+    /// <param name="index">以 0 為基準的工作表索引。</param>
+    /// <returns>指定索引的工作表。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">當索引超出範圍時擲出。</exception>
+    public OdfTableSheet this[int index]
+    {
+        get
+        {
+            IReadOnlyList<OdfTableSheet> sheets = _document.GetSheets();
+            if (index < 0 || index >= sheets.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return sheets[index];
+        }
+    }
+
+    /// <summary>
+    /// 依名稱取得工作表。
+    /// </summary>
+    /// <param name="name">工作表名稱。</param>
+    /// <returns>指定名稱的工作表。</returns>
+    /// <exception cref="KeyNotFoundException">當找不到指定工作表時擲出。</exception>
+    public OdfTableSheet this[string name]
+    {
+        get
+        {
+            OdfTableSheet? sheet = _document.GetSheet(name);
+            if (sheet is null)
+            {
+                throw new KeyNotFoundException($"找不到名稱為 '{name}' 的工作表。");
+            }
+
+            return sheet;
+        }
+    }
+
+    /// <summary>
+    /// 新增工作表。
+    /// </summary>
+    /// <param name="name">工作表名稱。</param>
+    /// <returns>新增完成的工作表。</returns>
+    public OdfTableSheet Add(string name)
+    {
+        return _document.AddSheet(name);
+    }
+
+    /// <summary>
+    /// 取得工作表列舉器。
+    /// </summary>
+    /// <returns>工作表列舉器。</returns>
+    public IEnumerator<OdfTableSheet> GetEnumerator()
+    {
+        return _document.GetSheets().GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+}
+
+/// <summary>
 /// 表示 ODF 試算表中的工作表。
 /// </summary>
 /// <remarks>
@@ -343,6 +487,11 @@ public class SpreadsheetDocument : OdfDocument
 /// <param name="doc">試算表文件</param>
 public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
 {
+    private OdfCellCollection? _cells;
+    private OdfRowCollection? _rows;
+    private OdfColumnCollection? _columns;
+    private OdfRangeCollection? _ranges;
+
     /// <summary>
     /// 取得代表此工作表的 XML 節點。
     /// </summary>
@@ -358,6 +507,26 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
         get => TableNode.GetAttribute("name", OdfNamespaces.Table) ?? string.Empty;
         set => TableNode.SetAttribute("name", OdfNamespaces.Table, value, "table");
     }
+
+    /// <summary>
+    /// 取得此工作表的儲存格集合。
+    /// </summary>
+    public OdfCellCollection Cells => _cells ??= new OdfCellCollection(this);
+
+    /// <summary>
+    /// 取得此工作表的列集合。
+    /// </summary>
+    public OdfRowCollection Rows => _rows ??= new OdfRowCollection(this);
+
+    /// <summary>
+    /// 取得此工作表的欄集合。
+    /// </summary>
+    public OdfColumnCollection Columns => _columns ??= new OdfColumnCollection(this);
+
+    /// <summary>
+    /// 取得此工作表的儲存格範圍集合。
+    /// </summary>
+    public OdfRangeCollection Ranges => _ranges ??= new OdfRangeCollection(this);
 
     /// <summary>
     /// 取得或設定工作表是否顯示。
@@ -611,6 +780,170 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
         format.AppendChild(condition);
 
         formatsNode.AppendChild(format);
+    }
+
+    /// <summary>
+    /// 新增資料庫範圍至此工作表。
+    /// </summary>
+    /// <param name="name">資料庫範圍名稱。</param>
+    /// <param name="range">目標儲存格範圍。</param>
+    /// <returns>新增的資料庫範圍。</returns>
+    public OdfDatabaseRange AddDatabaseRange(string name, OdfCellRange range)
+    {
+        return _doc.AddDatabaseRange(name, range);
+    }
+
+    /// <summary>
+    /// 凍結指定數量的上方列與左側欄。
+    /// </summary>
+    /// <param name="frozenRows">要凍結的列數。</param>
+    /// <param name="frozenColumns">要凍結的欄數。</param>
+    /// <exception cref="ArgumentOutOfRangeException">當列數或欄數小於 0 時擲出。</exception>
+    public void FreezePanes(int frozenRows, int frozenColumns)
+    {
+        if (frozenRows < 0) throw new ArgumentOutOfRangeException(nameof(frozenRows));
+        if (frozenColumns < 0) throw new ArgumentOutOfRangeException(nameof(frozenColumns));
+
+        TableNode.SetAttribute("frozen-rows", OdfNamespaces.Table, frozenRows.ToString(CultureInfo.InvariantCulture), "table");
+        TableNode.SetAttribute("frozen-columns", OdfNamespaces.Table, frozenColumns.ToString(CultureInfo.InvariantCulture), "table");
+
+        var viewSettings = _doc.GetOrCreateSettingsItemSet("view-settings");
+        var views = FindOrCreateChild(viewSettings, "config-item-map-indexed", OdfNamespaces.Config, "config");
+        views.SetAttribute("name", OdfNamespaces.Config, "Views", "config");
+        var viewEntry = FindOrCreateFirstChild(views, "config-item-map-entry", OdfNamespaces.Config, "config");
+        var tables = FindOrCreateChild(viewEntry, "config-item-map-named", OdfNamespaces.Config, "config");
+        tables.SetAttribute("name", OdfNamespaces.Config, "Tables", "config");
+        var sheetEntry = FindOrCreateNamedMapEntry(tables, Name);
+
+        SetConfigItem(sheetEntry, "HorizontalSplitMode", "short", frozenRows > 0 ? "2" : "0");
+        SetConfigItem(sheetEntry, "VerticalSplitMode", "short", frozenColumns > 0 ? "2" : "0");
+        SetConfigItem(sheetEntry, "HorizontalSplitPosition", "int", frozenRows.ToString(CultureInfo.InvariantCulture));
+        SetConfigItem(sheetEntry, "VerticalSplitPosition", "int", frozenColumns.ToString(CultureInfo.InvariantCulture));
+    }
+
+    /// <summary>
+    /// 新增清單型資料驗證，並套用到指定範圍。
+    /// </summary>
+    /// <param name="range">要套用的儲存格範圍。</param>
+    /// <param name="name">驗證規則名稱。</param>
+    /// <param name="allowedValues">允許的值。</param>
+    public void AddValidationList(OdfCellRange range, string name, params string[] allowedValues)
+    {
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("驗證名稱不可空白。", nameof(name));
+        if (allowedValues is null || allowedValues.Length == 0) throw new ArgumentException("驗證清單至少需要一個允許值。", nameof(allowedValues));
+
+        var validations = FindOrCreateChild(TableNode, "content-validations", OdfNamespaces.Table, "table");
+        var validation = FindOrCreateNamedChild(validations, "content-validation", name);
+        validation.SetAttribute("name", OdfNamespaces.Table, name, "table");
+        validation.SetAttribute("condition", OdfNamespaces.Table, BuildValidationListCondition(allowedValues), "table");
+        validation.SetAttribute("allow-empty-cell", OdfNamespaces.Table, "true", "table");
+
+        foreach (OdfCell cell in EnumerateCells(range))
+        {
+            cell.Node.SetAttribute("content-validation-name", OdfNamespaces.Table, name, "table");
+        }
+    }
+
+    private IEnumerable<OdfCell> EnumerateCells(OdfCellRange range)
+    {
+        int startRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
+        int endRow = Math.Max(range.StartAddress.Row, range.EndAddress.Row);
+        int startCol = Math.Min(range.StartAddress.Column, range.EndAddress.Column);
+        int endCol = Math.Max(range.StartAddress.Column, range.EndAddress.Column);
+
+        for (int row = startRow; row <= endRow; row++)
+        {
+            for (int col = startCol; col <= endCol; col++)
+            {
+                yield return GetCell(row, col);
+            }
+        }
+    }
+
+    private static string BuildValidationListCondition(IEnumerable<string> values)
+    {
+        var quoted = new List<string>();
+        foreach (string value in values)
+        {
+            quoted.Add("\"" + value.Replace("\"", "\"\"") + "\"");
+        }
+
+        return "cell-content-is-in-list(" + string.Join(";", quoted) + ")";
+    }
+
+    private OdfNode FindOrCreateNamedChild(OdfNode parent, string localName, string name)
+    {
+        foreach (var child in parent.Children)
+        {
+            if (child.LocalName == localName &&
+                child.NamespaceUri == OdfNamespaces.Table &&
+                child.GetAttribute("name", OdfNamespaces.Table) == name)
+            {
+                return child;
+            }
+        }
+
+        var node = new OdfNode(OdfNodeType.Element, localName, OdfNamespaces.Table, "table");
+        parent.AppendChild(node);
+        return node;
+    }
+
+    private static OdfNode FindOrCreateFirstChild(OdfNode parent, string localName, string ns, string prefix)
+    {
+        foreach (var child in parent.Children)
+        {
+            if (child.LocalName == localName && child.NamespaceUri == ns)
+            {
+                return child;
+            }
+        }
+
+        var node = new OdfNode(OdfNodeType.Element, localName, ns, prefix);
+        parent.AppendChild(node);
+        return node;
+    }
+
+    private static OdfNode FindOrCreateNamedMapEntry(OdfNode parent, string name)
+    {
+        foreach (var child in parent.Children)
+        {
+            if (child.LocalName == "config-item-map-entry" &&
+                child.NamespaceUri == OdfNamespaces.Config &&
+                child.GetAttribute("name", OdfNamespaces.Config) == name)
+            {
+                return child;
+            }
+        }
+
+        var entry = new OdfNode(OdfNodeType.Element, "config-item-map-entry", OdfNamespaces.Config, "config");
+        entry.SetAttribute("name", OdfNamespaces.Config, name, "config");
+        parent.AppendChild(entry);
+        return entry;
+    }
+
+    private static void SetConfigItem(OdfNode entry, string name, string type, string value)
+    {
+        OdfNode? item = null;
+        foreach (var child in entry.Children)
+        {
+            if (child.LocalName == "config-item" &&
+                child.NamespaceUri == OdfNamespaces.Config &&
+                child.GetAttribute("name", OdfNamespaces.Config) == name)
+            {
+                item = child;
+                break;
+            }
+        }
+
+        if (item is null)
+        {
+            item = new OdfNode(OdfNodeType.Element, "config-item", OdfNamespaces.Config, "config");
+            item.SetAttribute("name", OdfNamespaces.Config, name, "config");
+            entry.AppendChild(item);
+        }
+
+        item.SetAttribute("type", OdfNamespaces.Config, type, "config");
+        item.TextContent = value;
     }
 
     private List<OdfNode> GetRowsList()
@@ -1002,6 +1335,325 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
 }
 
 /// <summary>
+/// 提供工作表列的索引入口。
+/// </summary>
+public sealed class OdfRowCollection
+{
+    private readonly OdfTableSheet _sheet;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfRowCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="sheet">所屬工作表。</param>
+    public OdfRowCollection(OdfTableSheet sheet)
+    {
+        _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+    }
+
+    /// <summary>
+    /// 依索引取得列。
+    /// </summary>
+    /// <param name="index">以 0 為基準的列索引。</param>
+    /// <returns>指定列。</returns>
+    public OdfSheetRow this[int index] => new(_sheet, index);
+}
+
+/// <summary>
+/// 表示工作表中的一列。
+/// </summary>
+public sealed class OdfSheetRow
+{
+    private readonly OdfTableSheet _sheet;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfSheetRow"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="sheet">所屬工作表。</param>
+    /// <param name="index">以 0 為基準的列索引。</param>
+    public OdfSheetRow(OdfTableSheet sheet, int index)
+    {
+        _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+        Index = index;
+    }
+
+    /// <summary>
+    /// 取得以 0 為基準的列索引。
+    /// </summary>
+    public int Index { get; }
+
+    /// <summary>
+    /// 取得或設定此列是否顯示。
+    /// </summary>
+    public bool Visible
+    {
+        get => _sheet.IsRowVisible(Index);
+        set => _sheet.SetRowVisible(Index, value);
+    }
+
+    /// <summary>
+    /// 取得此列的儲存格集合。
+    /// </summary>
+    public OdfRowCellCollection Cells => new(_sheet, Index);
+}
+
+/// <summary>
+/// 提供列內儲存格的索引入口。
+/// </summary>
+public sealed class OdfRowCellCollection
+{
+    private readonly OdfTableSheet _sheet;
+    private readonly int _row;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfRowCellCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="sheet">所屬工作表。</param>
+    /// <param name="row">以 0 為基準的列索引。</param>
+    public OdfRowCellCollection(OdfTableSheet sheet, int row)
+    {
+        _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+        _row = row;
+    }
+
+    /// <summary>
+    /// 依欄索引取得列內儲存格。
+    /// </summary>
+    /// <param name="column">以 0 為基準的欄索引。</param>
+    /// <returns>指定儲存格。</returns>
+    public OdfCell this[int column] => _sheet.GetCell(_row, column);
+}
+
+/// <summary>
+/// 提供工作表欄的索引入口。
+/// </summary>
+public sealed class OdfColumnCollection
+{
+    private readonly OdfTableSheet _sheet;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfColumnCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="sheet">所屬工作表。</param>
+    public OdfColumnCollection(OdfTableSheet sheet)
+    {
+        _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+    }
+
+    /// <summary>
+    /// 依索引取得欄。
+    /// </summary>
+    /// <param name="index">以 0 為基準的欄索引。</param>
+    /// <returns>指定欄。</returns>
+    public OdfSheetColumn this[int index] => new(_sheet, index);
+}
+
+/// <summary>
+/// 表示工作表中的一欄。
+/// </summary>
+public sealed class OdfSheetColumn
+{
+    private readonly OdfTableSheet _sheet;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfSheetColumn"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="sheet">所屬工作表。</param>
+    /// <param name="index">以 0 為基準的欄索引。</param>
+    public OdfSheetColumn(OdfTableSheet sheet, int index)
+    {
+        _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+        Index = index;
+    }
+
+    /// <summary>
+    /// 取得以 0 為基準的欄索引。
+    /// </summary>
+    public int Index { get; }
+
+    /// <summary>
+    /// 取得或設定此欄是否顯示。
+    /// </summary>
+    public bool Visible
+    {
+        get => _sheet.IsColumnVisible(Index);
+        set => _sheet.SetColumnVisible(Index, value);
+    }
+
+    /// <summary>
+    /// 設定欄寬。
+    /// </summary>
+    /// <param name="width">欄寬。</param>
+    public void SetWidth(OdfLength width)
+    {
+        _sheet.SetColumnWidth(Index, width);
+    }
+
+    /// <summary>
+    /// 依目前內容自動調整欄寬。
+    /// </summary>
+    public void AutoFit()
+    {
+        _sheet.AutoFitColumnWidth(Index);
+    }
+}
+
+/// <summary>
+/// 提供工作表儲存格範圍的索引入口。
+/// </summary>
+public sealed class OdfRangeCollection
+{
+    private readonly OdfTableSheet _sheet;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfRangeCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="sheet">所屬工作表。</param>
+    public OdfRangeCollection(OdfTableSheet sheet)
+    {
+        _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+    }
+
+    /// <summary>
+    /// 依 Excel 樣式範圍字串取得範圍。
+    /// </summary>
+    /// <param name="address">範圍位址，例如 <c>A1:C3</c>。</param>
+    /// <returns>範圍選取物件。</returns>
+    public OdfCellRangeSelection this[string address] => new(_sheet, OdfCellRange.ParseExcel(address));
+
+    /// <summary>
+    /// 依列與欄索引取得範圍。
+    /// </summary>
+    /// <param name="startRow">起始列索引。</param>
+    /// <param name="startColumn">起始欄索引。</param>
+    /// <param name="endRow">結束列索引。</param>
+    /// <param name="endColumn">結束欄索引。</param>
+    /// <returns>範圍選取物件。</returns>
+    public OdfCellRangeSelection this[int startRow, int startColumn, int endRow, int endColumn] =>
+        new(_sheet, new OdfCellRange(startRow, startColumn, endRow, endColumn, _sheet.Name));
+}
+
+/// <summary>
+/// 表示工作表中的一個範圍選取。
+/// </summary>
+public sealed class OdfCellRangeSelection
+{
+    private readonly OdfTableSheet _sheet;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfCellRangeSelection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="sheet">所屬工作表。</param>
+    /// <param name="range">儲存格範圍。</param>
+    public OdfCellRangeSelection(OdfTableSheet sheet, OdfCellRange range)
+    {
+        _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+        Range = EnsureSheetName(range, sheet.Name);
+    }
+
+    /// <summary>
+    /// 取得此選取代表的儲存格範圍。
+    /// </summary>
+    public OdfCellRange Range { get; }
+
+    /// <summary>
+    /// 合併此範圍的儲存格。
+    /// </summary>
+    public void Merge()
+    {
+        _sheet.MergeCells(Range);
+    }
+
+    /// <summary>
+    /// 將此範圍加入命名範圍。
+    /// </summary>
+    /// <param name="name">命名範圍名稱。</param>
+    public void NameAs(string name)
+    {
+        _sheet.AddNamedRange(name, Range);
+    }
+
+    /// <summary>
+    /// 為此範圍新增篩選。
+    /// </summary>
+    /// <param name="name">資料庫範圍名稱。</param>
+    /// <param name="conditions">篩選條件。</param>
+    public void AddFilter(string name, params (int fieldNumber, string op, string value)[] conditions)
+    {
+        _sheet.AddDatabaseRange(name, Range).SetFilter(conditions);
+    }
+
+    /// <summary>
+    /// 為此範圍新增條件格式。
+    /// </summary>
+    /// <param name="condition">條件運算式。</param>
+    /// <param name="styleName">套用的樣式名稱。</param>
+    public void AddConditionalFormat(string condition, string styleName)
+    {
+        _sheet.AddConditionalFormat(Range, condition, styleName);
+    }
+
+    /// <summary>
+    /// 為此範圍新增清單型資料驗證。
+    /// </summary>
+    /// <param name="name">驗證規則名稱。</param>
+    /// <param name="allowedValues">允許的值。</param>
+    public void AddValidationList(string name, params string[] allowedValues)
+    {
+        _sheet.AddValidationList(Range, name, allowedValues);
+    }
+
+    private static OdfCellRange EnsureSheetName(OdfCellRange range, string sheetName)
+    {
+        var start = range.StartAddress;
+        var end = range.EndAddress;
+
+        if (start.SheetName is null)
+        {
+            start = new OdfCellAddress(start.Row, start.Column, sheetName, start.IsRowAbsolute, start.IsColumnAbsolute, start.IsSheetAbsolute);
+        }
+
+        if (end.SheetName is null)
+        {
+            end = new OdfCellAddress(end.Row, end.Column, sheetName, end.IsRowAbsolute, end.IsColumnAbsolute, end.IsSheetAbsolute);
+        }
+
+        return new OdfCellRange(start, end);
+    }
+}
+
+/// <summary>
+/// 提供工作表儲存格的索引入口。
+/// </summary>
+public sealed class OdfCellCollection
+{
+    private readonly OdfTableSheet _sheet;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfCellCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="sheet">所屬工作表。</param>
+    public OdfCellCollection(OdfTableSheet sheet)
+    {
+        _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+    }
+
+    /// <summary>
+    /// 依 A1 樣式位址取得儲存格。
+    /// </summary>
+    /// <param name="address">儲存格位址，例如 <c>A1</c>。</param>
+    /// <returns>指定位置的儲存格。</returns>
+    public OdfCell this[string address] => _sheet.GetCell(address);
+
+    /// <summary>
+    /// 依列與欄索引取得儲存格。
+    /// </summary>
+    /// <param name="row">以 0 為基準的列索引。</param>
+    /// <param name="column">以 0 為基準的欄索引。</param>
+    /// <returns>指定位置的儲存格。</returns>
+    public OdfCell this[int row, int column] => _sheet.GetCell(row, column);
+}
+
+/// <summary>
 /// 表示 ODF 工作表中的一個儲存格。
 /// </summary>
 /// <remarks>
@@ -1046,6 +1698,71 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     {
         get => Node.GetAttribute("value", OdfNamespaces.Office) ?? string.Empty;
         set => Node.SetAttribute("value", OdfNamespaces.Office, value, "office");
+    }
+
+    /// <summary>
+    /// 取得或設定儲存格的常用型別值。
+    /// </summary>
+    public object? CellValue
+    {
+        get
+        {
+            return ValueType switch
+            {
+                "float" => double.TryParse(Value, NumberStyles.Float, CultureInfo.InvariantCulture, out double number)
+                    ? number
+                    : null,
+                "boolean" => bool.TryParse(Node.GetAttribute("boolean-value", OdfNamespaces.Office), out bool flag)
+                    ? flag
+                    : null,
+                "date" => Node.GetAttribute("date-value", OdfNamespaces.Office),
+                "string" => TextContent,
+                _ => string.IsNullOrEmpty(TextContent) ? null : TextContent
+            };
+        }
+        set
+        {
+            switch (value)
+            {
+                case null:
+                    ClearValue();
+                    break;
+                case string text:
+                    SetValue(text);
+                    break;
+                case bool flag:
+                    SetValue(flag);
+                    break;
+                case DateTime date:
+                    SetValue(date);
+                    break;
+                case byte or sbyte or short or ushort or int or uint or long or ulong or float or double or decimal:
+                    SetValue(Convert.ToDouble(value, CultureInfo.InvariantCulture));
+                    break;
+                default:
+                    SetValue(value.ToString() ?? string.Empty);
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定儲存格套用的表格樣式名稱。
+    /// </summary>
+    public string? StyleName
+    {
+        get => Node.GetAttribute("style-name", OdfNamespaces.Table);
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                Node.RemoveAttribute("style-name", OdfNamespaces.Table);
+            }
+            else
+            {
+                Node.SetAttribute("style-name", OdfNamespaces.Table, value!, "table");
+            }
+        }
     }
 
     /// <summary>
@@ -1134,6 +1851,15 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     {
         ValueType = "string";
         TextContent = text;
+    }
+
+    private void ClearValue()
+    {
+        Node.RemoveAttribute("value-type", OdfNamespaces.Office);
+        Node.RemoveAttribute("value", OdfNamespaces.Office);
+        Node.RemoveAttribute("boolean-value", OdfNamespaces.Office);
+        Node.RemoveAttribute("date-value", OdfNamespaces.Office);
+        TextContent = string.Empty;
     }
 
     private void SetCellTextContent(string text)

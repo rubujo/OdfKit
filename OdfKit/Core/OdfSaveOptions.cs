@@ -2,6 +2,7 @@
 
 using System.Globalization;
 using System.IO.Compression;
+using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 
@@ -54,6 +55,11 @@ public class OdfSaveOptions
     /// 確保內容不變時，產出的二進位 ZIP 雜湊值（MD5/SHA256）完全相同。
     /// </remarks>
     public bool Deterministic { get; set; } = false;
+
+    /// <summary>
+    /// 取得或設定儲存時要強制寫入的 ODF 版本。若為 <see langword="null"/>，則保留文件目前宣告的版本。
+    /// </summary>
+    public OdfVersion? ForceVersion { get; set; }
 
     /// <summary>
     /// 取得或設定自訂原子化儲存的磁碟暫存路徑。

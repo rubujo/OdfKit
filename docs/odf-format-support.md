@@ -1,0 +1,44 @@
+# ODF 格式支援矩陣
+
+本文件記錄 OdfKit 對主要 ODF 格式的實作狀態。狀態以目前程式碼與
+測試證據為準，不把路線圖中的目標預先標為完成。
+
+## 狀態標記
+
+- `complete`：已有直接 API 與測試覆蓋，可作為目前支援能力使用。
+- `validated`：已有驗證或偵測測試證據，但高階 API 仍可能有限。
+- `package-level`：可建立、載入、保存與驗證最小封裝，但高階語意 API 尚未完整。
+- `partial`：已有部分高階模型或 round-trip 能力，但仍有明確缺口。
+- `planned`：尚未有足夠程式與測試證據支撐。
+
+## 矩陣
+
+| Extension | MIME type | `OdfDocumentKind` | Detect | Create | Load | Save | Validate | Round-trip | High-level API | Test evidence |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | partial | `TextApiUsabilityTests`, `TextAdvancedFidelityTests`, `ComplianceTests` |
+| `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests` |
+| `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests` |
+| `.fodt` | `application/vnd.oasis.opendocument.text` | `FlatText` | complete | complete | complete | complete | validated | complete | package-level | `ComplianceTests`, `E2ETests`, `PackageRoundTripTests` |
+| `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | complete | complete | complete | complete | validated | complete | partial | `SpreadsheetApiUsabilityTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests` |
+| `.ots` | `application/vnd.oasis.opendocument.spreadsheet-template` | `SpreadsheetTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests` |
+| `.fods` | `application/vnd.oasis.opendocument.spreadsheet` | `FlatSpreadsheet` | complete | complete | complete | complete | validated | complete | package-level | `ComplianceTests`, `E2ETests`, `PackageRoundTripTests` |
+| `.odp` | `application/vnd.oasis.opendocument.presentation` | `Presentation` | complete | complete | complete | complete | validated | complete | partial | `PresentationApiUsabilityTests`, `PresentationAndRenderingTests`, `PresentationBoundaryTests` |
+| `.otp` | `application/vnd.oasis.opendocument.presentation-template` | `PresentationTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests` |
+| `.fodp` | `application/vnd.oasis.opendocument.presentation` | `FlatPresentation` | complete | complete | complete | complete | validated | complete | package-level | `ComplianceTests`, `PackageRoundTripTests` |
+| `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | complete | complete | complete | complete | validated | complete | partial | `DrawingApiUsabilityTests`, `ComplianceTests` |
+| `.otg` | `application/vnd.oasis.opendocument.graphics-template` | `GraphicsTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests` |
+| `.fodg` | `application/vnd.oasis.opendocument.graphics` | `FlatGraphics` | complete | complete | complete | complete | validated | complete | package-level | `ComplianceTests`, `PackageRoundTripTests` |
+| `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `ComplianceTests` |
+| `.odf` | `application/vnd.oasis.opendocument.formula` | `Formula` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `PackageRoundTripTests` |
+| `.odi` | `application/vnd.oasis.opendocument.image` | `Image` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `ComplianceTests` |
+| `.odb` | `application/vnd.oasis.opendocument.database` | `Database` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `ComplianceTests` |
+
+## 目前缺口
+
+- 統一的 `OdfDocument.Load` / `OdfDocument.Create` 與
+  `OdfDocumentFactory.LoadDocument` / `CreateDocument` 高階入口已建立。
+- ODT、ODS、ODP、ODG 已有常用高階建立與編輯 API，但尚非完整辦公套件物件模型。
+- `.odc`、`.odf`、`.odi`、`.odb` 已有 typed wrapper 與最小高階 story；完整圖表、
+  MathML、影像與資料庫語意模型仍屬後續擴充。
+- 全格式最小 round-trip corpus 已由 `OdfFormatRoundTripTests` 覆蓋；後續仍需加入
+  更接近真實文件的 corpus。

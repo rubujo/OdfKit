@@ -1,0 +1,45 @@
+# Interop Corpus
+
+本文件記錄目前 OdfKit 用來支撐相容性與 round-trip 宣稱的 corpus 類型。這不是外部檔案清單的完整快照，而是可維護的測試來源說明。
+
+## Generated corpus
+
+- `OdfFormatRoundTripTests`：建立 17 種主要 ODF extension 的最小文件，驗證 MIME、ODF 版本、document kind、載入與保存。
+- `OdfValidatorApiTests`：覆蓋 package 與 flat XML 驗證入口。
+- `PackageRoundTripTests`：覆蓋 flat XML / ZIP package 互轉、圖片與嵌入公式 round-trip。
+
+## ODF 1.4 positive corpus
+
+- `CorpusComplianceTests` 以 OASIS ODF 1.4 schema provider 與最小文件樣本驗證主要 body kind。
+- Positive corpus 目前重點是格式偵測、body kind、manifest 與 schema pattern 可執行性。
+
+## Negative corpus
+
+- `CorpusComplianceTests` 與 `ComplianceTests` 覆蓋錯誤 root、錯誤 MIME / extension、Zip Slip、manifest 不一致與 profile rule 違規。
+- 驗證器應回報結構化 issue，而不是在一般錯誤文件上崩潰。
+
+## Unknown content corpus
+
+- `OdfPackageUnknownEntryTests` 覆蓋未知 package entries、`Configurations2`、`ObjectReplacements` 與未知 media entry 保存。
+- `OdfUnknownXmlRoundTripTests` 覆蓋 foreign namespace、未知屬性、comments、processing instructions 與 prefix 保留。
+
+## Security boundary corpus
+
+- `OdfSecurityBoundaryTests` 覆蓋簽章保存 / 失效、macro sanitize、加密文件 sanitize 後重新保存。
+- XML reader 與 package loader 另有 XXE、DoS 與 Zip Slip 防禦測試。
+
+## Rendering / LibreOffice corpus
+
+- `OdfKit.Extensions.Rendering` 與相關測試使用可替換的 LibreOffice finder。
+- 這部分屬可選 rendering 擴充，不是核心 OdfKit 建立、載入、保存與驗證能力的必要條件。
+
+## Real-world sanitized corpus
+
+目前 repo 內未宣稱內建大量真實世界文件 corpus。新增真實文件時，應先去識別化，並記錄來源、授權、預期驗證結果與是否允許 round-trip 後 byte-level 差異。
+
+## Expected behavior
+
+- 對支援的結構：建立、載入、保存、驗證應可重複執行。
+- 對未知但合法的 package / XML：預設保留。
+- 對不安全內容：validator 應回報 issue；sanitize API 可移除巨集與過期簽章等風險內容。
+- 對無法完整語意化的高階內容：不得因保存而破壞未知資料。

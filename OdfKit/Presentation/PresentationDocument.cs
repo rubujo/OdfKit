@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -109,11 +111,12 @@ public enum OdfAnimationType
 public class PresentationDocument : OdfDocument
 {
     private readonly List<OdfSlide> _slides = [];
+    private OdfSlideCollection? _slideCollection;
 
     /// <summary>
-    /// 取得投影片的唯讀清單。
+    /// 取得投影片集合。
     /// </summary>
-    public IReadOnlyList<OdfSlide> Slides => _slides.AsReadOnly();
+    public OdfSlideCollection Slides => _slideCollection ??= new OdfSlideCollection(this);
 
     /// <summary>
     /// 初始化 <see cref="PresentationDocument"/> 類別的新執行個體。
@@ -135,6 +138,54 @@ public class PresentationDocument : OdfDocument
             package.SetMimeType("application/vnd.oasis.opendocument.presentation");
         }
         ParseSlides();
+    }
+
+    /// <summary>
+    /// 建立新的 ODP 簡報文件。
+    /// </summary>
+    /// <returns>新的 <see cref="PresentationDocument"/> 執行個體。</returns>
+    public static PresentationDocument Create()
+    {
+        return (PresentationDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Presentation);
+    }
+
+    /// <summary>
+    /// 從指定路徑載入 ODP 簡報文件。
+    /// </summary>
+    /// <param name="path">ODP 文件路徑。</param>
+    /// <returns>載入完成的 <see cref="PresentationDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODP 簡報時擲出。</exception>
+    public new static PresentationDocument Load(string path)
+    {
+        return EnsurePresentation(OdfDocumentFactory.LoadDocument(path));
+    }
+
+    /// <summary>
+    /// 從指定資料流載入 ODP 簡報文件。
+    /// </summary>
+    /// <param name="stream">包含 ODP 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>載入完成的 <see cref="PresentationDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODP 簡報時擲出。</exception>
+    public new static PresentationDocument Load(Stream stream, string? fileName = null)
+    {
+        return EnsurePresentation(OdfDocumentFactory.LoadDocument(stream, fileName));
+    }
+
+    internal IReadOnlyList<OdfSlide> GetSlidesSnapshot()
+    {
+        return _slides.AsReadOnly();
+    }
+
+    private static PresentationDocument EnsurePresentation(OdfDocument document)
+    {
+        if (document is PresentationDocument presentation)
+        {
+            return presentation;
+        }
+
+        document.Dispose();
+        throw new InvalidOperationException("指定的 ODF 文件不是 ODP 簡報。");
     }
 
     private void ParseSlides()
@@ -567,6 +618,59 @@ public class PresentationDocument : OdfDocument
             }
             return new OdfHandoutPage(handoutNode, this);
         }
+    }
+}
+
+/// <summary>
+/// 提供簡報投影片的索引、列舉與新增入口。
+/// </summary>
+public sealed class OdfSlideCollection : IReadOnlyList<OdfSlide>
+{
+    private readonly PresentationDocument _document;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfSlideCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="document">所屬簡報文件。</param>
+    public OdfSlideCollection(PresentationDocument document)
+    {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 取得投影片數量。
+    /// </summary>
+    public int Count => _document.GetSlidesSnapshot().Count;
+
+    /// <summary>
+    /// 依索引取得投影片。
+    /// </summary>
+    /// <param name="index">以 0 為基準的投影片索引。</param>
+    /// <returns>指定投影片。</returns>
+    public OdfSlide this[int index] => _document.GetSlidesSnapshot()[index];
+
+    /// <summary>
+    /// 新增投影片。
+    /// </summary>
+    /// <param name="name">選用的投影片名稱。</param>
+    /// <returns>新增完成的投影片。</returns>
+    public OdfSlide Add(string? name = null)
+    {
+        return _document.AddSlide(name);
+    }
+
+    /// <summary>
+    /// 取得投影片列舉器。
+    /// </summary>
+    /// <returns>投影片列舉器。</returns>
+    public IEnumerator<OdfSlide> GetEnumerator()
+    {
+        return _document.GetSlidesSnapshot().GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }
 

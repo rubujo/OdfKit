@@ -1,52 +1,97 @@
 #pragma warning restore CS1591
 using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace OdfKit.Compliance;
+
+/// <summary>
+/// 描述單一 ODF 檔案格式的副檔名、MIME 類型與文件種類。
+/// </summary>
+/// <param name="extension">包含前導句點的檔案副檔名。</param>
+/// <param name="mimeType">ODF 封裝或扁平 XML 宣告的 MIME 類型。</param>
+/// <param name="kind">對應的 ODF 文件種類。</param>
+/// <param name="bodyKind">對應於 <c>office:body</c> 子元素的內容種類。</param>
+/// <param name="isFlatXml">是否為單一 XML (Flat XML) 格式。</param>
+public sealed class OdfFormatInfo(
+    string extension,
+    string mimeType,
+    OdfDocumentKind kind,
+    OdfDocumentKind bodyKind,
+    bool isFlatXml)
+{
+    /// <summary>
+    /// 取得包含前導句點的檔案副檔名。
+    /// </summary>
+    public string Extension { get; } = extension ?? throw new ArgumentNullException(nameof(extension));
+
+    /// <summary>
+    /// 取得 ODF 封裝或扁平 XML 宣告的 MIME 類型。
+    /// </summary>
+    public string MimeType { get; } = mimeType ?? throw new ArgumentNullException(nameof(mimeType));
+
+    /// <summary>
+    /// 取得對應的 ODF 文件種類。
+    /// </summary>
+    public OdfDocumentKind Kind { get; } = kind;
+
+    /// <summary>
+    /// 取得對應於 <c>office:body</c> 子元素的內容種類。
+    /// </summary>
+    public OdfDocumentKind BodyKind { get; } = bodyKind;
+
+    /// <summary>
+    /// 取得是否為單一 XML (Flat XML) 格式。
+    /// </summary>
+    public bool IsFlatXml { get; } = isFlatXml;
+}
 
 /// <summary>
 /// 從 MIME 類型與副檔名偵測 ODF 文件種類。
 /// </summary>
 public static class OdfDocumentKindDetector
 {
-    private static readonly Dictionary<string, OdfDocumentKind> MimeTypeKinds = new(StringComparer.Ordinal)
-    {
-        ["application/vnd.oasis.opendocument.text"] = OdfDocumentKind.Text,
-        ["application/vnd.oasis.opendocument.text-template"] = OdfDocumentKind.TextTemplate,
-        ["application/vnd.oasis.opendocument.text-master"] = OdfDocumentKind.TextMaster,
-        ["application/vnd.oasis.opendocument.spreadsheet"] = OdfDocumentKind.Spreadsheet,
-        ["application/vnd.oasis.opendocument.spreadsheet-template"] = OdfDocumentKind.SpreadsheetTemplate,
-        ["application/vnd.oasis.opendocument.presentation"] = OdfDocumentKind.Presentation,
-        ["application/vnd.oasis.opendocument.presentation-template"] = OdfDocumentKind.PresentationTemplate,
-        ["application/vnd.oasis.opendocument.graphics"] = OdfDocumentKind.Graphics,
-        ["application/vnd.oasis.opendocument.graphics-template"] = OdfDocumentKind.GraphicsTemplate,
-        ["application/vnd.oasis.opendocument.chart"] = OdfDocumentKind.Chart,
-        ["application/vnd.oasis.opendocument.formula"] = OdfDocumentKind.Formula,
-        ["application/vnd.oasis.opendocument.image"] = OdfDocumentKind.Image,
-        ["application/vnd.oasis.opendocument.database"] = OdfDocumentKind.Database
-    };
+    private const string TextMimeType = "application/vnd.oasis.opendocument.text";
+    private const string SpreadsheetMimeType = "application/vnd.oasis.opendocument.spreadsheet";
+    private const string PresentationMimeType = "application/vnd.oasis.opendocument.presentation";
+    private const string GraphicsMimeType = "application/vnd.oasis.opendocument.graphics";
 
-    private static readonly Dictionary<string, OdfDocumentKind> ExtensionKinds = new(StringComparer.OrdinalIgnoreCase)
-    {
-        [".odt"] = OdfDocumentKind.Text,
-        [".ott"] = OdfDocumentKind.TextTemplate,
-        [".odm"] = OdfDocumentKind.TextMaster,
-        [".ods"] = OdfDocumentKind.Spreadsheet,
-        [".ots"] = OdfDocumentKind.SpreadsheetTemplate,
-        [".odp"] = OdfDocumentKind.Presentation,
-        [".otp"] = OdfDocumentKind.PresentationTemplate,
-        [".odg"] = OdfDocumentKind.Graphics,
-        [".otg"] = OdfDocumentKind.GraphicsTemplate,
-        [".odc"] = OdfDocumentKind.Chart,
-        [".odf"] = OdfDocumentKind.Formula,
-        [".odi"] = OdfDocumentKind.Image,
-        [".odb"] = OdfDocumentKind.Database,
-        [".fodt"] = OdfDocumentKind.FlatText,
-        [".fods"] = OdfDocumentKind.FlatSpreadsheet,
-        [".fodp"] = OdfDocumentKind.FlatPresentation,
-        [".fodg"] = OdfDocumentKind.FlatGraphics
-    };
+    private static readonly OdfFormatInfo[] FormatTable =
+    [
+        new(".odt", TextMimeType, OdfDocumentKind.Text, OdfDocumentKind.Text, false),
+        new(".ott", "application/vnd.oasis.opendocument.text-template", OdfDocumentKind.TextTemplate, OdfDocumentKind.Text, false),
+        new(".odm", "application/vnd.oasis.opendocument.text-master", OdfDocumentKind.TextMaster, OdfDocumentKind.Text, false),
+        new(".ods", SpreadsheetMimeType, OdfDocumentKind.Spreadsheet, OdfDocumentKind.Spreadsheet, false),
+        new(".ots", "application/vnd.oasis.opendocument.spreadsheet-template", OdfDocumentKind.SpreadsheetTemplate, OdfDocumentKind.Spreadsheet, false),
+        new(".odp", PresentationMimeType, OdfDocumentKind.Presentation, OdfDocumentKind.Presentation, false),
+        new(".otp", "application/vnd.oasis.opendocument.presentation-template", OdfDocumentKind.PresentationTemplate, OdfDocumentKind.Presentation, false),
+        new(".odg", GraphicsMimeType, OdfDocumentKind.Graphics, OdfDocumentKind.Graphics, false),
+        new(".otg", "application/vnd.oasis.opendocument.graphics-template", OdfDocumentKind.GraphicsTemplate, OdfDocumentKind.Graphics, false),
+        new(".odc", "application/vnd.oasis.opendocument.chart", OdfDocumentKind.Chart, OdfDocumentKind.Chart, false),
+        new(".odf", "application/vnd.oasis.opendocument.formula", OdfDocumentKind.Formula, OdfDocumentKind.Formula, false),
+        new(".odi", "application/vnd.oasis.opendocument.image", OdfDocumentKind.Image, OdfDocumentKind.Image, false),
+        new(".odb", "application/vnd.oasis.opendocument.database", OdfDocumentKind.Database, OdfDocumentKind.Database, false),
+        new(".fodt", TextMimeType, OdfDocumentKind.FlatText, OdfDocumentKind.Text, true),
+        new(".fods", SpreadsheetMimeType, OdfDocumentKind.FlatSpreadsheet, OdfDocumentKind.Spreadsheet, true),
+        new(".fodp", PresentationMimeType, OdfDocumentKind.FlatPresentation, OdfDocumentKind.Presentation, true),
+        new(".fodg", GraphicsMimeType, OdfDocumentKind.FlatGraphics, OdfDocumentKind.Graphics, true)
+    ];
+
+    private static readonly ReadOnlyCollection<OdfFormatInfo> SupportedFormatsValue = Array.AsReadOnly(FormatTable);
+
+    private static readonly Dictionary<string, OdfFormatInfo> MimeTypeFormats = FormatTable
+        .Where(format => !format.IsFlatXml)
+        .ToDictionary(format => format.MimeType, format => format, StringComparer.Ordinal);
+
+    private static readonly Dictionary<string, OdfFormatInfo> ExtensionFormats = FormatTable
+        .ToDictionary(format => format.Extension, format => format, StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// 取得目前支援偵測的 ODF 格式描述清單。
+    /// </summary>
+    public static IReadOnlyList<OdfFormatInfo> SupportedFormats => SupportedFormatsValue;
 
     /// <summary>
     /// 從 ODF MIME 類型偵測封裝的 ODF 文件種類。
@@ -55,8 +100,8 @@ public static class OdfDocumentKindDetector
     /// <returns>偵測到的 ODF 文件種類；若無法識別則傳回 <see cref="OdfDocumentKind.Unknown"/></returns>
     public static OdfDocumentKind FromMimeType(string? mimeType)
     {
-        return mimeType is not null && MimeTypeKinds.TryGetValue(mimeType, out OdfDocumentKind kind)
-            ? kind
+        return TryGetFormatByMimeType(mimeType, out OdfFormatInfo? format)
+            ? format!.Kind
             : OdfDocumentKind.Unknown;
     }
 
@@ -72,10 +117,60 @@ public static class OdfDocumentKindDetector
             return OdfDocumentKind.Unknown;
         }
 
-        string extension = Path.GetExtension(fileName);
-        return ExtensionKinds.TryGetValue(extension, out OdfDocumentKind kind)
-            ? kind
+        return TryGetFormatByFileName(fileName, out OdfFormatInfo? format)
+            ? format!.Kind
             : OdfDocumentKind.Unknown;
+    }
+
+    /// <summary>
+    /// 從 ODF MIME 類型取得格式描述。
+    /// </summary>
+    /// <param name="mimeType">MIME 類型。</param>
+    /// <param name="format">成功時傳回格式描述。</param>
+    /// <returns>若 MIME 類型已知則傳回 <see langword="true"/>；否則傳回 <see langword="false"/>。</returns>
+    public static bool TryGetFormatByMimeType(string? mimeType, out OdfFormatInfo? format)
+    {
+        format = null;
+        return mimeType is not null && MimeTypeFormats.TryGetValue(mimeType, out format);
+    }
+
+    /// <summary>
+    /// 從檔案名稱或副檔名取得格式描述。
+    /// </summary>
+    /// <param name="fileName">檔案名稱或副檔名。</param>
+    /// <param name="format">成功時傳回格式描述。</param>
+    /// <returns>若副檔名已知則傳回 <see langword="true"/>；否則傳回 <see langword="false"/>。</returns>
+    public static bool TryGetFormatByFileName(string? fileName, out OdfFormatInfo? format)
+    {
+        format = null;
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            return false;
+        }
+
+        string extension = GetExtension(fileName!);
+        return ExtensionFormats.TryGetValue(extension, out format);
+    }
+
+    /// <summary>
+    /// 從 ODF 文件種類取得格式描述。
+    /// </summary>
+    /// <param name="kind">ODF 文件種類。</param>
+    /// <param name="format">成功時傳回格式描述。</param>
+    /// <returns>若文件種類已知則傳回 <see langword="true"/>；否則傳回 <see langword="false"/>。</returns>
+    public static bool TryGetFormatByKind(OdfDocumentKind kind, out OdfFormatInfo? format)
+    {
+        format = FormatTable.FirstOrDefault(item => item.Kind == kind);
+        return format is not null;
+    }
+
+    private static string GetExtension(string fileName)
+    {
+        string trimmed = fileName.Trim();
+        return trimmed.StartsWith(".", StringComparison.Ordinal) &&
+            trimmed.IndexOfAny(new[] { '/', '\\' }) < 0
+            ? trimmed
+            : Path.GetExtension(trimmed);
     }
 
     /// <summary>

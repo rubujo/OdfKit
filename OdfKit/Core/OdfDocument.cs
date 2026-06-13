@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using OdfKit.Compliance;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
@@ -17,6 +18,28 @@ namespace OdfKit.Core;
 /// </summary>
 public abstract class OdfDocument : IDisposable, IAsyncDisposable
 {
+    /// <summary>
+    /// 建立指定種類的 ODF 文件。
+    /// </summary>
+    /// <param name="kind">要建立的 ODF 文件種類。</param>
+    /// <returns>建立完成的 ODF 文件。</returns>
+    public static OdfDocument Create(OdfDocumentKind kind) => OdfDocumentFactory.CreateDocument(kind);
+
+    /// <summary>
+    /// 從指定路徑載入 ODF 文件。
+    /// </summary>
+    /// <param name="path">ODF 文件路徑。</param>
+    /// <returns>載入完成的 ODF 文件。</returns>
+    public static OdfDocument Load(string path) => OdfDocumentFactory.LoadDocument(path);
+
+    /// <summary>
+    /// 從指定資料流載入 ODF 文件。
+    /// </summary>
+    /// <param name="stream">包含 ODF 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>載入完成的 ODF 文件。</returns>
+    public static OdfDocument Load(Stream stream, string? fileName = null) => OdfDocumentFactory.LoadDocument(stream, fileName);
+
     /// <summary>
     /// 取得與此文件相關聯的 ODF 封裝容器。
     /// </summary>
@@ -134,14 +157,31 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             }
         }
 
+        /// <summary>
+        /// 取得此文件類型的預設 content.xml。
+        /// </summary>
+        /// <returns>預設 content.xml 字串。</returns>
         protected abstract string GetDefaultContentXml();
+
+        /// <summary>
+        /// 取得此文件類型的預設 styles.xml。
+        /// </summary>
+        /// <returns>預設 styles.xml 字串。</returns>
         protected abstract string GetDefaultStylesXml();
 
+        /// <summary>
+        /// 取得此文件類型的預設 meta.xml。
+        /// </summary>
+        /// <returns>預設 meta.xml 字串。</returns>
         protected virtual string GetDefaultMetaXml()
         {
             return "<office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:meta=\"urn:oasis:names:tc:opendocument:xmlns:meta:1.0\" office:version=\"" + OdfVersionInfo.DefaultVersionString + "\"><office:meta></office:meta></office:document-meta>";
         }
 
+        /// <summary>
+        /// 取得此文件類型的預設 settings.xml。
+        /// </summary>
+        /// <returns>預設 settings.xml 字串。</returns>
         protected virtual string GetDefaultSettingsXml()
         {
             return "<office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"" + OdfVersionInfo.DefaultVersionString + "\"><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"VisibleAreaTop\" config:type=\"int\">0</config:config-item></config:config-item-set></office:settings></office:document-settings>";
@@ -159,13 +199,37 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         StyleEngine.DeduplicateAndSaveStyles();
         UpdateDocumentStatistics();
+        ApplySaveVersionOptions(options);
 
         WriteDomToEntry("content.xml", ContentDom, options);
         WriteDomToEntry("styles.xml", StylesDom, options);
         WriteDomToEntry("meta.xml", MetaDom, options);
         WriteDomToEntry("settings.xml", SettingsDom, options);
 
-        Package.Save();
+        Package.Save(options);
+    }
+
+    /// <summary>
+    /// 將文件保存到指定檔案路徑。
+    /// </summary>
+    /// <param name="path">要寫入的檔案路徑。</param>
+    /// <param name="options">儲存設定選項。</param>
+    public void Save(string path, OdfSaveOptions? options = null)
+    {
+        if (path is null) throw new ArgumentNullException(nameof(path));
+
+        options ??= OdfSaveOptions.Default;
+        StyleEngine.DeduplicateAndSaveStyles();
+        UpdateDocumentStatistics();
+        ApplySaveVersionOptions(options);
+
+        WriteDomToEntry("content.xml", ContentDom, options);
+        WriteDomToEntry("styles.xml", StylesDom, options);
+        WriteDomToEntry("meta.xml", MetaDom, options);
+        WriteDomToEntry("settings.xml", SettingsDom, options);
+
+        using FileStream stream = new(path, FileMode.Create, FileAccess.Write, FileShare.None);
+        Package.SaveToStream(stream, options);
     }
 
     /// <summary>
@@ -180,13 +244,14 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         StyleEngine.DeduplicateAndSaveStyles();
         UpdateDocumentStatistics();
+        ApplySaveVersionOptions(options);
 
         WriteDomToEntry("content.xml", ContentDom, options);
         WriteDomToEntry("styles.xml", StylesDom, options);
         WriteDomToEntry("meta.xml", MetaDom, options);
         WriteDomToEntry("settings.xml", SettingsDom, options);
 
-        await Package.SaveAsync(cancellationToken).ConfigureAwait(false);
+        await Package.SaveAsync(options, cancellationToken).ConfigureAwait(false);
     }
 
     private void WriteDomToEntry(string name, OdfNode node, OdfSaveOptions options)
@@ -230,48 +295,75 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         #region Metadata API (meta.xml)
 
+        /// <summary>
+        /// 取得或設定文件標題。
+        /// </summary>
         public string? Title
         {
             get => GetMetaElementText("dc:title");
             set => SetMetaElementText("dc:title", value);
         }
 
+        /// <summary>
+        /// 取得或設定文件建立者。
+        /// </summary>
         public string? Creator
         {
             get => GetMetaElementText("dc:creator");
             set => SetMetaElementText("dc:creator", value);
         }
 
+        /// <summary>
+        /// 取得或設定文件描述。
+        /// </summary>
         public string? Description
         {
             get => GetMetaElementText("dc:description");
             set => SetMetaElementText("dc:description", value);
         }
 
+        /// <summary>
+        /// 取得或設定文件主旨。
+        /// </summary>
         public string? Subject
         {
             get => GetMetaElementText("dc:subject");
             set => SetMetaElementText("dc:subject", value);
         }
 
+        /// <summary>
+        /// 取得或設定文件語言。
+        /// </summary>
         public string? Language
         {
             get => GetMetaElementText("dc:language");
             set => SetMetaElementText("dc:language", value);
         }
 
+        /// <summary>
+        /// 取得或設定文件建立日期。
+        /// </summary>
         public DateTime? CreationDate
         {
             get => ParseMetaDate(GetMetaElementText("meta:creation-date"));
             set => SetMetaElementText("meta:creation-date", FormatMetaDate(value));
         }
 
+        /// <summary>
+        /// 取得或設定文件修改日期。
+        /// </summary>
         public DateTime? ModificationDate
         {
             get => ParseMetaDate(GetMetaElementText("dc:date"));
             set => SetMetaElementText("dc:date", FormatMetaDate(value));
         }
 
+        /// <summary>
+        /// 設定自訂中繼資料屬性。
+        /// </summary>
+        /// <param name="name">屬性名稱。</param>
+        /// <param name="value">屬性值。</param>
+        /// <param name="type">ODF 中繼資料值類型，例如 string、float、boolean 或 date。</param>
         public void SetCustomProperty(string name, object value, string type)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Property name cannot be empty.", nameof(name));
@@ -296,6 +388,11 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             metaRoot.AppendChild(propNode);
         }
 
+        /// <summary>
+        /// 取得自訂中繼資料屬性。
+        /// </summary>
+        /// <param name="name">屬性名稱。</param>
+        /// <returns>屬性值；若不存在則為 <see langword="null"/>。</returns>
         public object? GetCustomProperty(string name)
         {
             var metaRoot = FindOrCreateMetaRoot();
@@ -311,6 +408,9 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         #region Zoom & View Settings (settings.xml)
 
+        /// <summary>
+        /// 取得或設定文件檢視縮放百分比。
+        /// </summary>
         public double ZoomLevel
         {
             get => GetZoomLevelInternal();
@@ -321,6 +421,10 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         #region Web Streaming APIs
 
+        /// <summary>
+        /// 將文件儲存為 ODF 封裝位元組陣列。
+        /// </summary>
+        /// <returns>包含文件封裝內容的位元組陣列</returns>
         public byte[] SaveToBytes()
         {
             using var ms = new MemoryStream();
@@ -328,19 +432,26 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             return ms.ToArray();
         }
 
-        public void SaveToStream(Stream destinationStream)
+        /// <summary>
+        /// 將文件儲存至指定的資料流。
+        /// </summary>
+        /// <param name="destinationStream">要寫入文件封裝內容的目標資料流</param>
+        /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
+        public void SaveToStream(Stream destinationStream, OdfSaveOptions? options = null)
         {
             if (destinationStream == null) throw new ArgumentNullException(nameof(destinationStream));
 
+            options ??= OdfSaveOptions.Default;
             StyleEngine.DeduplicateAndSaveStyles();
             UpdateDocumentStatistics();
+            ApplySaveVersionOptions(options);
 
-            WriteDomToEntry("content.xml", ContentDom, OdfSaveOptions.Default);
-            WriteDomToEntry("styles.xml", StylesDom, OdfSaveOptions.Default);
-            WriteDomToEntry("meta.xml", MetaDom, OdfSaveOptions.Default);
-            WriteDomToEntry("settings.xml", SettingsDom, OdfSaveOptions.Default);
+            WriteDomToEntry("content.xml", ContentDom, options);
+            WriteDomToEntry("styles.xml", StylesDom, options);
+            WriteDomToEntry("meta.xml", MetaDom, options);
+            WriteDomToEntry("settings.xml", SettingsDom, options);
 
-            Package.SaveToStream(destinationStream);
+            Package.SaveToStream(destinationStream, options);
             
             if (destinationStream.CanSeek)
             {
@@ -352,6 +463,11 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         #region Document Merging API
 
+        /// <summary>
+        /// 將另一份 ODF 文件附加到目前文件。
+        /// </summary>
+        /// <param name="otherDoc">要附加的來源文件。</param>
+        /// <param name="options">合併選項。</param>
         public virtual void AppendDocument(OdfDocument otherDoc, OdfMergeOptions? options = null)
         {
             options ??= OdfMergeOptions.Default;
@@ -371,6 +487,10 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         #region Helper Methods
 
+        /// <summary>
+        /// 尋找或建立 office:meta 根節點。
+        /// </summary>
+        /// <returns>office:meta 節點。</returns>
         protected OdfNode FindOrCreateMetaRoot()
         {
             foreach (var child in MetaDom.Children)
@@ -539,6 +659,11 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             zoomTypeNode.TextContent = "0"; // 0: Direct Zoom percentage
         }
 
+        /// <summary>
+        /// 尋找指定名稱的設定項目。
+        /// </summary>
+        /// <param name="name">設定項目名稱。</param>
+        /// <returns>設定項目節點；若不存在則為 <see langword="null"/>。</returns>
         protected OdfNode? FindSettingsConfigItem(string name)
         {
             return FindNodeByNameRecursive(SettingsDom, "config-item", name);
@@ -556,6 +681,12 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             return null;
         }
 
+        /// <summary>
+        /// 尋找或建立指定名稱的設定集合節點。
+        /// </summary>
+        /// <param name="root">設定 DOM 根節點。</param>
+        /// <param name="name">設定集合名稱。</param>
+        /// <returns>設定集合節點。</returns>
         protected OdfNode FindOrCreateSettingsNode(OdfNode root, string name)
         {
             foreach (var child in root.Children)
@@ -581,6 +712,12 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             return setNode;
         }
 
+        /// <summary>
+        /// 尋找指定名稱的設定集合節點。
+        /// </summary>
+        /// <param name="root">設定 DOM 根節點。</param>
+        /// <param name="name">設定集合名稱。</param>
+        /// <returns>設定集合節點；若不存在則為 <see langword="null"/>。</returns>
         protected OdfNode? FindSettingsNode(OdfNode root, string name)
         {
             foreach (var child in root.Children)
@@ -597,6 +734,12 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             return null;
         }
 
+        /// <summary>
+        /// 尋找或建立設定 map 節點。
+        /// </summary>
+        /// <param name="setNode">設定集合節點。</param>
+        /// <param name="name">map 名稱。</param>
+        /// <returns>設定 map 節點。</returns>
         protected OdfNode FindOrCreateMapNode(OdfNode setNode, string name)
         {
             foreach (var child in setNode.Children)
@@ -610,6 +753,11 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             return node;
         }
 
+        /// <summary>
+        /// 尋找或建立設定 map entry 節點。
+        /// </summary>
+        /// <param name="mapNode">設定 map 節點。</param>
+        /// <returns>設定 map entry 節點。</returns>
         protected OdfNode FindOrCreateMapEntryNode(OdfNode mapNode)
         {
             if (mapNode.Children.Count > 0)
@@ -619,6 +767,13 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             return node;
         }
 
+        /// <summary>
+        /// 尋找或建立設定項目節點。
+        /// </summary>
+        /// <param name="entryNode">設定 map entry 節點。</param>
+        /// <param name="name">設定項目名稱。</param>
+        /// <param name="type">設定項目類型。</param>
+        /// <returns>設定項目節點。</returns>
         protected OdfNode FindOrCreateConfigItemNode(OdfNode entryNode, string name, string type)
         {
             foreach (var child in entryNode.Children)
@@ -637,6 +792,9 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         #region Statistics & Document Structure Diagnostics
 
+        /// <summary>
+        /// 更新文件統計中繼資料。
+        /// </summary>
         protected virtual void UpdateDocumentStatistics()
         {
             int wordCount = 0;
@@ -753,6 +911,14 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             return testName;
         }
 
+        /// <summary>
+        /// 尋找或建立指定子元素。
+        /// </summary>
+        /// <param name="parent">父節點。</param>
+        /// <param name="localName">子元素區域名稱。</param>
+        /// <param name="ns">子元素命名空間 URI。</param>
+        /// <param name="prefix">子元素前綴。</param>
+        /// <returns>符合條件的既有或新建子元素。</returns>
         protected OdfNode FindOrCreateChild(OdfNode parent, string localName, string ns, string prefix)
         {
             foreach (var child in parent.Children)
@@ -765,8 +931,19 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             return node;
         }
 
+        /// <summary>
+        /// 將來源文件的內容節點合併到目前文件。
+        /// </summary>
+        /// <param name="sourceDoc">來源文件。</param>
+        /// <param name="options">合併選項。</param>
+        /// <param name="renameMap">樣式重新命名對照表。</param>
         protected abstract void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap);
 
+        /// <summary>
+        /// 依樣式重新命名對照表重寫節點樹中的樣式參照。
+        /// </summary>
+        /// <param name="node">要處理的根節點。</param>
+        /// <param name="renameMap">樣式重新命名對照表。</param>
         protected void RemapStylesInNodes(OdfNode node, Dictionary<string, string> renameMap)
         {
             var styleNameAttr = new OdfAttributeName("style-name", OdfNamespaces.Text);
@@ -804,12 +981,42 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         #endregion
 
+        private void ApplySaveVersionOptions(OdfSaveOptions options)
+        {
+            if (options.ForceVersion is not OdfVersion forcedVersion)
+            {
+                return;
+            }
+
+            string version = OdfVersionInfo.ToVersionString(forcedVersion);
+            Package.Version = forcedVersion;
+            SetDocumentRootVersion(ContentDom, version);
+            SetDocumentRootVersion(StylesDom, version);
+            SetDocumentRootVersion(MetaDom, version);
+            SetDocumentRootVersion(SettingsDom, version);
+        }
+
+        private static void SetDocumentRootVersion(OdfNode node, string version)
+        {
+            if (node.NodeType == OdfNodeType.Element)
+            {
+                node.SetAttribute("version", OdfNamespaces.Office, version, "office");
+            }
+        }
+
+        /// <summary>
+        /// 釋放文件與底層封裝資源。
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// 釋放文件持有的資源。
+        /// </summary>
+        /// <param name="disposing">若為 <see langword="true"/>，則釋放受控資源。</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
@@ -822,6 +1029,10 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             }
         }
 
+        /// <summary>
+        /// 非同步釋放文件與底層封裝資源。
+        /// </summary>
+        /// <returns>代表非同步釋放作業的值工作。</returns>
         public async ValueTask DisposeAsync()
         {
             if (!_isDisposed)
@@ -832,6 +1043,12 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// 取得指定子路徑的嵌入式 ODF 文件。
+        /// </summary>
+        /// <typeparam name="T">嵌入式文件 wrapper 類型。</typeparam>
+        /// <param name="subPath">封裝中的子路徑。</param>
+        /// <returns>嵌入式文件 wrapper。</returns>
         public T GetEmbeddedDocument<T>(string subPath) where T : OdfDocument
         {
             if (string.IsNullOrEmpty(subPath)) throw new ArgumentException("Subpath cannot be null or empty.", nameof(subPath));
@@ -855,6 +1072,12 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             throw new InvalidOperationException($"Type {typeof(T).Name} does not have a compatible constructor.");
         }
 
+        /// <summary>
+        /// 建立指定子路徑的嵌入式 ODF 文件。
+        /// </summary>
+        /// <typeparam name="T">嵌入式文件 wrapper 類型。</typeparam>
+        /// <param name="subPath">封裝中的子路徑。</param>
+        /// <returns>建立完成的嵌入式文件 wrapper。</returns>
         public T CreateEmbeddedDocument<T>(string subPath) where T : OdfDocument
         {
             if (string.IsNullOrEmpty(subPath)) throw new ArgumentException("Subpath cannot be null or empty.", nameof(subPath));

@@ -1,160 +1,142 @@
-# OdfKit 專案說明文件
+# OdfKit
 
-[![Tests](https://img.shields.io/badge/tests-558%20passed-brightgreen.svg)](#)
-[![License](https://img.shields.io/badge/license-CC0--1.0-blue.svg)](#)
+OdfKit 是純 managed C# / .NET 的 ODF (Open Document Format) 文件處理程式庫。核心目標是讓應用程式可以在不啟動 LibreOffice、OpenOffice、UNO、Microsoft Office 或 Java 的情況下，建立、載入、保存、驗證並保留 ODF 文件內容。
 
-本專案是一個專為 .NET 平台開發之高效能、低相依性 ODF (Open Document Format) 文件處理受控類別庫，支援對 `.odt`（文字）、`.ods`（試算表）及 `.odp`（簡報）等 ODF 標準文件進行讀取、寫入與修改。
+目前預設新建文件為 ODF 1.4，主要程式庫目標框架為 `net10.0` 與 `netstandard2.0`。測試專案目前覆蓋 `net10.0` 與 `net8.0`。
 
-專案具備優秀的相容性，同時支援現代化的 `.NET 10.0` 與相容性極佳的 `.NET Standard 2.0` 雙目標架構編譯。
+## 目前狀態
 
----
+- 支援 17 種主要 ODF extension 的格式偵測、最小建立、載入、保存、驗證與 round-trip。
+- ODT、ODS、ODP、ODG 已有常用高階建立與編輯 API。
+- ODC、ODF formula、ODI、ODB 已有 typed wrapper 與最小高階 story。
+- Package 與 DOM round-trip 會保留未知 package entries、foreign XML、processing instructions、comments 與 prefix。
+- 驗證器包含 package / flat XML 檢查、ODF 1.4 schema metadata、profile rules、positive / negative corpus 測試。
+- CLI 骨架提供 `validate`、`info`、`metadata`、`convert-flat` 與 `pack`。
 
-## 1. AI 輔助開發聲明
+完整格式矩陣請見 [docs/odf-format-support.md](docs/odf-format-support.md)，ODF 1.4 覆蓋狀態請見 [docs/odf14-coverage.md](docs/odf14-coverage.md)。
 
-本專案之核心架構、演算法設計、安全防禦機制（防範 XXE 與 Zip Slip 漏洞）以及完整的單元與整合測試套件，均是由 Google DeepMind 團隊所設計之 Antigravity 高階 AI 程式開發助理協作與自主編碼開發完成。
+## 安裝與建置
 
-整個開發歷程導入了自動化的多 Agent 協作開發系統（包含協調器、實作人員、程式碼審查員、極限測試挑戰者以及獨立的鑑識稽核員），在保障代碼品質與誠信開發的規範下，通過了嚴格的獨立測試驗證與合規稽核，最終交付了具備高可靠性與企業級標準的軟體程式庫。
+目前此 repo 以原始碼專案形式使用：
 
----
-
-## 2. 核心功能與支援層級
-
-本專案功能與 ODF 1.4 標準的支援程度劃分為以下三個支援層級。詳細的規格覆蓋矩陣請參閱 [ODF 1.4 Coverage Matrix](file:///d:/Dev/Project/Application/OdfKit/docs/odf14-coverage.md)。
-
-### A. 目前完整支援與驗證 (Validated & Complete)
-- **執行緒安全 `OdfPackage`**：實作 ZIP 容器解壓與原子化安全存檔機制，具備 CoW (Copy-on-Write) 寫時複製機制，並內建防止 Zip Slip 目錄穿越攻擊之防禦。
-- **符合 ODF 1.4/1.3 的數位簽章 `OdfSigner`**：使用原始未解析之位元串流為基礎，支援 SHA-256、SHA-384、SHA-512 數位簽署與驗證。
-- **高強度加密 `OdfEncryption`**：支援 AES-256-CBC 與 Blowfish 加密演算法，並於 `.NET Standard 2.0` 環境中手動實作 PBKDF2-SHA256 金鑰衍生函數。
-- **XXE 與 DoS 安全防範**：底層 XML 讀寫器顯式設定禁用外部 DTD 解析，確保不受 XXE 與 DoS 實體展開攻擊威脅。
-- **OASIS ODF 1.4 驗證器**：在 Strict/Extended 驗證中完整支援 RELAX NG 結構驗證與 CNS15251 政策驗證。
-- **強型別 `OdfNode` DOM 樹**：支援完整保留未識別之 XML 節點與屬性以進行 Round-trip 輸出。
-
-### B. 實驗性與部分支援 (Experimental & Partial)
-- **高階文件 API**：提供 `TextDocument` (ODT)、`SpreadsheetDocument` (ODS) 與 `PresentationDocument` (ODP) 等物件導向 API，支援目錄生成 (TOC)、MailMerge 郵件合併範本、凍結窗格與自動篩選等功能。
-- **高效能 `OdsStreamWriter`**：專為導出大量試算表數據設計，限制記憶體佔用在 1MB 以內，防止記憶體溢出 (OOM)。
-- **輕量 AST 求解器 `DefaultFormulaEvaluator`**：支援 `VLOOKUP`、`IF`、`SUM`、`SUMIF`、`COUNTIF` 等常用函數，並防禦公式循環參照。
-- **繪圖與公式套件**：提供對繪圖 (`DrawingDocument`)、圖表 (`ChartDocument`) 與 MathML 公式 (`OdfFormulaDocument`) 的初步包裝。
-- **LibreOffice 轉檔擴充**：透過 `LibreOfficeRenderer` 提供在背景調用 Headless LibreOffice 進行 PDF 或圖片轉檔的功能。
-
-### C. 後續規劃與 Roadmap (Planned)
-- **變更追蹤 (Change tracking)**：預定於後續階段加固 Preserving/Editing 的高階 API 支援。
-- **Chart / MathML 規格保真度**：深化圖表關係與 MathML 元素嵌入驗證。
-- **非反射式 Package 讀取**：研究並移除對 `ZipArchiveEntry` 私有欄位的反射讀取，提升跨平台穩定性。
-- **ODF 1.4 Roadmap 詳情**：請參閱 [odf14-coverage.md](file:///d:/Dev/Project/Application/OdfKit/docs/odf14-coverage.md) 的「下一步目標」部分。
-
----
-
-## 3. C# 程式範例
-
-### A. 建立並寫入文字與試算表文件
-#### 建立文字文件 (ODT)
-```csharp
-using System.IO;
-using OdfKit.Text;
-using OdfKit.Core;
-
-using (var package = OdfPackage.Create(new MemoryStream(), leaveOpen: true))
-{
-    var doc = new TextDocument(package);
-    doc.AddParagraph("哈囉，OdfKit！這是一份自動生成的 ODF 文字文件。");
-    doc.Save();
-}
+```powershell
+dotnet build
+dotnet test
 ```
 
-#### 建立試算表文件 (ODS)
+CLI 可透過專案執行：
+
+```powershell
+dotnet run --project tools/OdfKit.Cli -- validate file.odt
+dotnet run --project tools/OdfKit.Cli -- info file.ods
+```
+
+## 快速開始
+
+### 建立 ODT
+
 ```csharp
-using System.IO;
+using OdfKit.Text;
+
+using TextDocument document = TextDocument.Create();
+document.Body.Headings.Add("報告", 1);
+document.Body.Paragraphs.Add("這是一份 ODF 文字文件。");
+document.Save("report.odt");
+```
+
+### 建立 ODS
+
+```csharp
 using OdfKit.Spreadsheet;
-using OdfKit.Core;
 
-using (var package = OdfPackage.Create(new MemoryStream(), leaveOpen: true))
-{
-    var doc = new SpreadsheetDocument(package);
-    var sheet = doc.AddSheet("工作表1");
-    var cell = sheet.GetCell(0, 0);
-    cell.TextContent = "哈囉，OdfKit！試算表單元格 A1";
-    cell.ValueType = "string";
-    doc.Save();
-}
+using SpreadsheetDocument workbook = SpreadsheetDocument.Create();
+OdfTableSheet sheet = workbook.Worksheets.Add("Sheet1");
+sheet.Cells["A1"].CellValue = "項目";
+sheet.Cells["B1"].CellValue = "金額";
+sheet.Cells["B2"].CellValue = 1200;
+sheet.Cells["B3"].Formula = "of:=SUM([.B2:.B2])";
+workbook.Save("report.ods");
 ```
 
-### B. 數位簽署與驗證文件
+### 建立 ODP
+
 ```csharp
-using System;
-using System.Security.Cryptography.X509Certificates;
-using OdfKit.Text;
-using OdfKit.Core;
+using OdfKit.Presentation;
+using OdfKit.Styles;
 
-using (var package = OdfPackage.Open("document.odt"))
-{
-    var doc = new TextDocument(package);
-    X509Certificate2 cert = LoadYourCertificate(); // 自行載入憑證
-    
-    // 進行簽署
-    doc.Sign(cert);
-    doc.Save();
-
-    // 驗證簽章
-    X509Certificate2Collection verifiedCerts;
-    bool isValid = doc.VerifySignatures(out verifiedCerts);
-    Console.WriteLine($"簽章是否有效: {isValid}");
-}
+using PresentationDocument deck = PresentationDocument.Create();
+OdfSlide slide = deck.Slides.Add("Intro");
+slide.AddTextBox(
+    OdfLength.FromCentimeters(1),
+    OdfLength.FromCentimeters(1),
+    OdfLength.FromCentimeters(10),
+    OdfLength.FromCentimeters(2),
+    "標題");
+deck.Save("slides.odp");
 ```
 
-### C. 執行 Policy Profiles 合規性驗證 (CNS15251 或 EU Profile)
+### 建立 ODG
+
 ```csharp
-using System;
-using OdfKit.Core;
+using OdfKit.Drawing;
+using OdfKit.Presentation;
+using OdfKit.Styles;
+
+using DrawingDocument drawing = DrawingDocument.Create();
+OdfDrawPage page = drawing.Pages.Add("Canvas");
+OdfShape rect = page.AddShape(
+    OdfShapeType.Rectangle,
+    OdfLength.FromCentimeters(1),
+    OdfLength.FromCentimeters(1),
+    OdfLength.FromCentimeters(4),
+    OdfLength.FromCentimeters(2));
+rect.FillColor = "#ffcc00";
+drawing.Save("drawing.odg");
+```
+
+### 驗證文件
+
+```csharp
 using OdfKit.Compliance;
 
-using (var package = OdfPackage.Open("document.odt"))
+OdfValidationReport report = OdfValidator.Validate("report.odt");
+if (!report.IsValid)
 {
-    // 選擇 ROC Taiwan ODF-CNS15251 標準 Profile 或歐盟 (EU) 標準 Profile
-    var profile = OdfComplianceProfiles.Find("ROC_Taiwan_ODF_CNS15251"); // 亦可使用 "EU_Interoperable_Europe"
-    
-    // 執行驗證
-    OdfValidationReport report = OdfPackageValidator.Validate(package, profile, "document.odt");
-    
-    Console.WriteLine($"是否合規: {report.IsValid}");
-    foreach (var issue in report.Issues)
+    foreach (OdfValidationIssue issue in report.Issues)
     {
-        Console.WriteLine($"[{issue.Severity}] Rule ID: {issue.RuleId} - {issue.Message} (位置: {issue.XPath})");
+        Console.WriteLine($"{issue.Severity}: {issue.RuleId} {issue.Message}");
     }
 }
 ```
 
----
+### 保留未知內容
 
-## 4. 建置與測試說明
+對於 OdfKit 尚未提供高階語意 API 的內容，建議使用 package / DOM 入口載入並保存。測試目前覆蓋未知 package entry、foreign namespace、未知屬性、comments 與 processing instructions 的 round-trip。
 
-專案採用標準的 .NET CLI 工具鏈進行管理：
+```csharp
+using OdfKit.Core;
 
-* **編譯專案**：
-  ```powershell
-  dotnet build
-  ```
-* **執行 558 項自動化測試套件**：
-  ```powershell
-  dotnet test
-  ```
+using OdfDocument document = OdfDocument.Load("input.odt");
+document.Save("output.odt");
+```
 
----
+## CLI
 
-## 5. 授權與第三方套件聲明
+```powershell
+dotnet run --project tools/OdfKit.Cli -- validate file.odt
+dotnet run --project tools/OdfKit.Cli -- info file.ods
+dotnet run --project tools/OdfKit.Cli -- metadata file.odt
+dotnet run --project tools/OdfKit.Cli -- convert-flat input.odt output.fodt
+dotnet run --project tools/OdfKit.Cli -- pack input.fodt output.odt
+```
 
-### 專案原創程式碼授權
-本專案的原創程式碼（含 `OdfKit` 與 `OdfKit.Extensions.Rendering` 專案）完全採用 **CC0-1.0 Universal**（CC0 1.0 通用公有領域貢獻宣告）授權發布。
+## 限制
 
-您無需保留任何著作權聲明，即可將本專案代碼自由地用於私有、商業、修改、分發等任何用途。
+- 高階 API 覆蓋度依格式不同而不同；請以 support matrix 與測試證據為準。
+- 圖表、公式、影像與資料庫文件目前是最小高階 story，不是完整的辦公套件物件模型。
+- 舊版 ODF 文件的版本差異處理屬 best-effort；保存時可使用 `OdfSaveOptions.ForceVersion` 明確指定輸出版本。
+- LibreOffice rendering 擴充仍需外部 LibreOffice 或相容執行檔，不屬於核心 OdfKit 的純 managed 路徑。
 
-### 第三方相依套件授權
-本專案在編譯與運行時，引用了以下第三方開源套件，其各自維持原有的 **MIT 授權** 協議：
+## 授權
 
-1. **`PDFsharp`**（用於 PDF 檔案處理與轉檔擴充）—— 採用 [MIT 授權](https://github.com/empira/PDFsharp/blob/master/LICENSE).
-2. **`CommunityToolkit.HighPerformance`**（用於記憶體效能優化）—— 採用 [MIT 授權](https://github.com/CommunityToolkit/dotnet/blob/main/License.md).
-3. **`System.Security.Cryptography.Xml`**（用於處理數位簽章）—— 採用 [MIT 授權](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT).
-4. **`System.Security.Cryptography.Pkcs`**（用於 PKCS7/CMS 簽章與時間戳）—— 採用 [MIT 授權](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT).
-5. 微軟 **`.NET Foundation`** 提供之相依底層 System.* 系統套件 —— 採用 [MIT 授權](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT).
-
-> [!IMPORTANT]
-> 雖然本專案原創代碼為 CC0 授權，但當您分發包含上述第三方套件編譯產物 (DLL) 的軟體時，仍須依據各自的授權條款，在軟體中保留這些相依套件的原 MIT 著作權聲明。
+OdfKit 原創程式碼採用 CC0-1.0 Universal。第三方相依套件維持各自授權；主要相依套件包含 PDFsharp、CommunityToolkit.HighPerformance、System.Security.Cryptography.Xml 與 System.Security.Cryptography.Pkcs。

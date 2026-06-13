@@ -1,0 +1,470 @@
+using System;
+using System.Collections.Generic;
+using OdfKit.Formula.AST;
+
+namespace OdfKit.Formula;
+
+/// <summary>
+/// 表示公式函式支援層級。
+/// </summary>
+public enum OdfFormulaSupportLevel
+{
+    /// <summary>
+    /// 可由預設評估器計算。
+    /// </summary>
+    Evaluated,
+
+    /// <summary>
+    /// 可在文件中保真保存，但預設評估器不計算。
+    /// </summary>
+    PreservedOnly
+}
+
+/// <summary>
+/// 表示公式診斷的嚴重性。
+/// </summary>
+public enum OdfFormulaDiagnosticSeverity
+{
+    /// <summary>
+    /// 資訊。
+    /// </summary>
+    Info,
+
+    /// <summary>
+    /// 警告。
+    /// </summary>
+    Warning,
+
+    /// <summary>
+    /// 錯誤。
+    /// </summary>
+    Error
+}
+
+/// <summary>
+/// 描述一個預設公式評估器支援的函式。
+/// </summary>
+public sealed class OdfFormulaFunctionInfo
+{
+    /// <summary>
+    /// 初始化 <see cref="OdfFormulaFunctionInfo"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="name">函式名稱。</param>
+    /// <param name="category">函式分類。</param>
+    /// <param name="supportLevel">支援層級。</param>
+    public OdfFormulaFunctionInfo(string name, string category, OdfFormulaSupportLevel supportLevel)
+    {
+        Name = name;
+        Category = category;
+        SupportLevel = supportLevel;
+    }
+
+    /// <summary>
+    /// 取得函式名稱。
+    /// </summary>
+    public string Name { get; }
+
+    /// <summary>
+    /// 取得函式分類。
+    /// </summary>
+    public string Category { get; }
+
+    /// <summary>
+    /// 取得支援層級。
+    /// </summary>
+    public OdfFormulaSupportLevel SupportLevel { get; }
+}
+
+/// <summary>
+/// 表示公式分析診斷。
+/// </summary>
+public sealed class OdfFormulaDiagnostic
+{
+    /// <summary>
+    /// 初始化 <see cref="OdfFormulaDiagnostic"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="code">診斷代碼。</param>
+    /// <param name="message">診斷訊息。</param>
+    /// <param name="severity">嚴重性。</param>
+    /// <param name="position">公式中的字元位置，若無位置資訊則為 null。</param>
+    public OdfFormulaDiagnostic(string code, string message, OdfFormulaDiagnosticSeverity severity, int? position = null)
+    {
+        Code = code;
+        Message = message;
+        Severity = severity;
+        Position = position;
+    }
+
+    /// <summary>
+    /// 取得診斷代碼。
+    /// </summary>
+    public string Code { get; }
+
+    /// <summary>
+    /// 取得診斷訊息。
+    /// </summary>
+    public string Message { get; }
+
+    /// <summary>
+    /// 取得嚴重性。
+    /// </summary>
+    public OdfFormulaDiagnosticSeverity Severity { get; }
+
+    /// <summary>
+    /// 取得公式中的字元位置，若無位置資訊則為 null。
+    /// </summary>
+    public int? Position { get; }
+}
+
+/// <summary>
+/// 表示公式分析結果。
+/// </summary>
+public sealed class OdfFormulaAnalysis
+{
+    /// <summary>
+    /// 初始化 <see cref="OdfFormulaAnalysis"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="originalFormula">原始公式。</param>
+    /// <param name="normalizedFormula">供剖析使用的標準化公式。</param>
+    /// <param name="serializedFormula">重新序列化的公式，若無法安全序列化則為 null。</param>
+    /// <param name="functions">公式中出現的函式名稱。</param>
+    /// <param name="diagnostics">診斷清單。</param>
+    public OdfFormulaAnalysis(
+        string originalFormula,
+        string normalizedFormula,
+        string? serializedFormula,
+        IReadOnlyList<string> functions,
+        IReadOnlyList<OdfFormulaDiagnostic> diagnostics)
+    {
+        OriginalFormula = originalFormula;
+        NormalizedFormula = normalizedFormula;
+        SerializedFormula = serializedFormula;
+        Functions = functions;
+        Diagnostics = diagnostics;
+    }
+
+    /// <summary>
+    /// 取得原始公式。
+    /// </summary>
+    public string OriginalFormula { get; }
+
+    /// <summary>
+    /// 取得供剖析使用的標準化公式。
+    /// </summary>
+    public string NormalizedFormula { get; }
+
+    /// <summary>
+    /// 取得重新序列化的公式，若無法安全序列化則為 null。
+    /// </summary>
+    public string? SerializedFormula { get; }
+
+    /// <summary>
+    /// 取得公式中出現的函式名稱。
+    /// </summary>
+    public IReadOnlyList<string> Functions { get; }
+
+    /// <summary>
+    /// 取得診斷清單。
+    /// </summary>
+    public IReadOnlyList<OdfFormulaDiagnostic> Diagnostics { get; }
+
+    /// <summary>
+    /// 取得一個值，指出公式可被剖析且沒有錯誤診斷。
+    /// </summary>
+    public bool CanParse
+    {
+        get
+        {
+            foreach (var diagnostic in Diagnostics)
+            {
+                if (diagnostic.Severity == OdfFormulaDiagnosticSeverity.Error)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// 取得一個值，指出公式包含預設評估器不支援的函式。
+    /// </summary>
+    public bool HasUnsupportedFunctions
+    {
+        get
+        {
+            foreach (var diagnostic in Diagnostics)
+            {
+                if (diagnostic.Code == OdfFormulaSupport.UnsupportedFunctionCode)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+}
+
+/// <summary>
+/// 提供 OpenFormula 支援範圍、保真序列化與診斷工具。
+/// </summary>
+public static class OdfFormulaSupport
+{
+    internal const string UnsupportedFunctionCode = "OF0002";
+
+    private static readonly OdfFormulaFunctionInfo[] FunctionTable =
+    [
+        new("IF", "Logical", OdfFormulaSupportLevel.Evaluated),
+        new("AND", "Logical", OdfFormulaSupportLevel.Evaluated),
+        new("OR", "Logical", OdfFormulaSupportLevel.Evaluated),
+        new("TRUE", "Logical", OdfFormulaSupportLevel.Evaluated),
+        new("FALSE", "Logical", OdfFormulaSupportLevel.Evaluated),
+        new("CONCAT", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("LEFT", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("RIGHT", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("MID", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("LEN", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("LOWER", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("UPPER", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("TRIM", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("REPLACE", "Text", OdfFormulaSupportLevel.Evaluated),
+        new("SUM", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("AVERAGE", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("COUNT", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("SUMIF", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("COUNTIF", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("MAX", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("MIN", "Statistical", OdfFormulaSupportLevel.Evaluated),
+        new("VLOOKUP", "Lookup", OdfFormulaSupportLevel.Evaluated),
+        new("ABS", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("SQRT", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("ROUND", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("MOD", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("POWER", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("LN", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("LOG", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("EXP", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("CEILING", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("FLOOR", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("PI", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("DEGREES", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("RADIANS", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("SIN", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("COS", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("TAN", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("TRUNC", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("DATE", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("DAY", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("HOUR", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("MINUTE", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("MONTH", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("NOW", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("SECOND", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("TIME", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("TODAY", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("YEAR", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("TRANSPOSE", "Matrix", OdfFormulaSupportLevel.Evaluated),
+        new("DSUM", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DAVERAGE", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DCOUNT", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DMAX", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("DMIN", "Database", OdfFormulaSupportLevel.Evaluated),
+        new("PMT", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("FV", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("PV", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("NPER", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("RATE", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("IPMT", "Financial", OdfFormulaSupportLevel.Evaluated),
+        new("PPMT", "Financial", OdfFormulaSupportLevel.Evaluated)
+    ];
+
+    private static readonly HashSet<string> SupportedFunctionNames = CreateSupportedFunctionSet();
+
+    /// <summary>
+    /// 取得預設公式評估器支援的函式表。
+    /// </summary>
+    public static IReadOnlyList<OdfFormulaFunctionInfo> SupportedFunctions => FunctionTable;
+
+    /// <summary>
+    /// 判斷預設評估器是否支援指定函式。
+    /// </summary>
+    /// <param name="name">函式名稱。</param>
+    /// <returns>若支援則為 true，否則為 false。</returns>
+    public static bool IsFunctionSupported(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return false;
+        }
+
+        return SupportedFunctionNames.Contains(name.Trim());
+    }
+
+    /// <summary>
+    /// 分析公式是否可剖析，以及是否包含預設評估器不支援的函式。
+    /// </summary>
+    /// <param name="formula">要分析的公式。</param>
+    /// <returns>公式分析結果。</returns>
+    public static OdfFormulaAnalysis Analyze(string formula)
+    {
+        if (formula is null) throw new ArgumentNullException(nameof(formula));
+
+        string normalized = NormalizeForParsing(formula);
+        var diagnostics = new List<OdfFormulaDiagnostic>();
+        List<string> functions = ExtractFunctionNames(normalized, diagnostics);
+        string? serialized = null;
+
+        try
+        {
+            var parser = new FormulaParser(CleanFormulaPrefix(normalized));
+            AstNode ast = parser.Parse();
+            serialized = ast.Serialize();
+        }
+        catch (Exception ex)
+        {
+            diagnostics.Add(new OdfFormulaDiagnostic(
+                "OF0001",
+                $"公式無法剖析：{ex.Message}",
+                OdfFormulaDiagnosticSeverity.Error));
+        }
+
+        foreach (string functionName in functions)
+        {
+            if (!IsFunctionSupported(functionName))
+            {
+                diagnostics.Add(new OdfFormulaDiagnostic(
+                    UnsupportedFunctionCode,
+                    $"預設評估器尚未支援函式 {functionName}，保存時應保留原公式。",
+                    OdfFormulaDiagnosticSeverity.Warning));
+            }
+        }
+
+        return new OdfFormulaAnalysis(formula, normalized, serialized, functions, diagnostics);
+    }
+
+    /// <summary>
+    /// 支援的公式會回傳重新序列化結果；不支援或無法剖析時保留原公式。
+    /// </summary>
+    /// <param name="formula">要序列化的公式。</param>
+    /// <returns>安全的公式字串。</returns>
+    public static string SerializePreservingUnsupported(string formula)
+    {
+        OdfFormulaAnalysis analysis = Analyze(formula);
+        if (!analysis.CanParse || analysis.HasUnsupportedFunctions || analysis.SerializedFormula is null)
+        {
+            return formula;
+        }
+
+        if (formula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
+        {
+            return "of:=" + analysis.SerializedFormula;
+        }
+
+        if (formula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase))
+        {
+            return "oooc:=" + analysis.SerializedFormula;
+        }
+
+        if (formula.StartsWith("=", StringComparison.Ordinal))
+        {
+            return "=" + analysis.SerializedFormula;
+        }
+
+        return analysis.SerializedFormula;
+    }
+
+    private static HashSet<string> CreateSupportedFunctionSet()
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var function in FunctionTable)
+        {
+            set.Add(function.Name);
+        }
+
+        return set;
+    }
+
+    private static string NormalizeForParsing(string formula)
+    {
+        if (formula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase) ||
+            formula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase))
+        {
+            return OdfFormulaTranslator.OdfToExcelFormula(formula);
+        }
+
+        return formula;
+    }
+
+    private static string CleanFormulaPrefix(string formula)
+    {
+        if (formula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase))
+        {
+            return formula.Substring(6);
+        }
+
+        if (formula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
+        {
+            return formula.Substring(4);
+        }
+
+        if (formula.StartsWith("=", StringComparison.Ordinal))
+        {
+            return formula.Substring(1);
+        }
+
+        return formula;
+    }
+
+    private static List<string> ExtractFunctionNames(string normalizedFormula, List<OdfFormulaDiagnostic> diagnostics)
+    {
+        string text = CleanFormulaPrefix(normalizedFormula);
+        List<FormulaToken> tokens = OdfFormulaTranslator.Tokenize(text);
+        var functions = new List<string>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        for (int i = 0; i < tokens.Count; i++)
+        {
+            FormulaToken token = tokens[i];
+            if (token.Type == TokenType.Unknown)
+            {
+                diagnostics.Add(new OdfFormulaDiagnostic(
+                    "OF0003",
+                    $"公式包含無法識別的字元 '{token.Value}'。",
+                    OdfFormulaDiagnosticSeverity.Error,
+                    token.StartIndex));
+            }
+
+            if (token.Type != TokenType.Identifier)
+            {
+                continue;
+            }
+
+            int nextIndex = FindNextNonWhitespace(tokens, i + 1);
+            if (nextIndex >= 0 && tokens[nextIndex].Type == TokenType.OpenParenthesis)
+            {
+                string name = token.Value.ToUpperInvariant();
+                if (seen.Add(name))
+                {
+                    functions.Add(name);
+                }
+            }
+        }
+
+        return functions;
+    }
+
+    private static int FindNextNonWhitespace(IReadOnlyList<FormulaToken> tokens, int startIndex)
+    {
+        for (int i = startIndex; i < tokens.Count; i++)
+        {
+            if (tokens[i].Type != TokenType.Whitespace)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+}

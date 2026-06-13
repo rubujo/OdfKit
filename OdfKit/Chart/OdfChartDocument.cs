@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -23,6 +24,118 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
     }
 
     private readonly bool _initialized = InitMimeType(package);
+
+    /// <summary>
+    /// 建立新的 ODC 圖表文件。
+    /// </summary>
+    /// <returns>新的 <see cref="OdfChartDocument"/> 執行個體。</returns>
+    public static OdfChartDocument Create()
+    {
+        return (OdfChartDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Chart);
+    }
+
+    /// <summary>
+    /// 從指定路徑載入 ODC 圖表文件。
+    /// </summary>
+    /// <param name="path">ODC 文件路徑。</param>
+    /// <returns>載入完成的 <see cref="OdfChartDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODC 圖表時擲出。</exception>
+    public new static OdfChartDocument Load(string path)
+    {
+        return EnsureChart(OdfDocumentFactory.LoadDocument(path));
+    }
+
+    /// <summary>
+    /// 從指定資料流載入 ODC 圖表文件。
+    /// </summary>
+    /// <param name="stream">包含 ODC 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>載入完成的 <see cref="OdfChartDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODC 圖表時擲出。</exception>
+    public new static OdfChartDocument Load(Stream stream, string? fileName = null)
+    {
+        return EnsureChart(OdfDocumentFactory.LoadDocument(stream, fileName));
+    }
+
+    /// <summary>
+    /// 取得主要圖表節點。
+    /// </summary>
+    public OdfNode ChartNode => GetChartNode();
+
+    /// <summary>
+    /// 取得或設定圖表類型。
+    /// </summary>
+    public string ChartClass
+    {
+        get => GetChartNode().GetAttribute("class", OdfNamespaces.Chart) ?? "line";
+        set => GetChartNode().SetAttribute("class", OdfNamespaces.Chart, value, "chart");
+    }
+
+    /// <summary>
+    /// 取得或設定圖表標題。
+    /// </summary>
+    public string? ChartTitle
+    {
+        get
+        {
+            OdfNode? title = FindChildElement(GetChartNode(), "title", OdfNamespaces.Chart);
+            OdfNode? paragraph = title is null ? null : FindChildElement(title, "p", OdfNamespaces.Text);
+            return paragraph?.TextContent;
+        }
+        set
+        {
+            OdfNode chart = GetChartNode();
+            OdfNode title = FindOrCreateChild(chart, "title", OdfNamespaces.Chart, "chart");
+            OdfNode paragraph = FindOrCreateChild(title, "p", OdfNamespaces.Text, "text");
+            paragraph.TextContent = value ?? string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// 設定圖例位置。
+    /// </summary>
+    /// <param name="position">圖例位置，例如 top、bottom、start 或 end。</param>
+    public void SetLegend(string position)
+    {
+        OdfNode legend = FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
+        legend.SetAttribute("legend-position", OdfNamespaces.Chart, position, "chart");
+    }
+
+    /// <summary>
+    /// 新增資料序列佔位節點。
+    /// </summary>
+    /// <param name="valuesCellRangeAddress">資料值儲存格範圍位址。</param>
+    /// <param name="labelCellAddress">選用的標籤儲存格位址。</param>
+    /// <returns>新增的序列節點。</returns>
+    public OdfNode AddSeries(string valuesCellRangeAddress, string? labelCellAddress = null)
+    {
+        if (string.IsNullOrWhiteSpace(valuesCellRangeAddress))
+        {
+            throw new ArgumentException("資料範圍位址不能為空。", nameof(valuesCellRangeAddress));
+        }
+
+        OdfNode plotArea = FindOrCreateChild(GetChartNode(), "plot-area", OdfNamespaces.Chart, "chart");
+        OdfNode series = OdfNodeFactory.CreateElement("series", OdfNamespaces.Chart, "chart");
+        series.SetAttribute("values-cell-range-address", OdfNamespaces.Chart, valuesCellRangeAddress, "chart");
+        if (!string.IsNullOrWhiteSpace(labelCellAddress))
+        {
+            series.SetAttribute("label-cell-address", OdfNamespaces.Chart, labelCellAddress!, "chart");
+        }
+
+        plotArea.AppendChild(series);
+        return series;
+    }
+
+    private static OdfChartDocument EnsureChart(OdfDocument document)
+    {
+        if (document is OdfChartDocument chart)
+        {
+            return chart;
+        }
+
+        document.Dispose();
+        throw new InvalidOperationException("指定的 ODF 文件不是 ODC 圖表。");
+    }
 
     private static bool InitMimeType(OdfPackage pkg)
     {
@@ -96,5 +209,27 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
                 destChartRoot.AppendChild(imported);
             }
         }
+    }
+
+    private OdfNode GetChartNode()
+    {
+        OdfNode body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
+        OdfNode chartRoot = FindOrCreateChild(body, "chart", OdfNamespaces.Office, "office");
+        return FindOrCreateChild(chartRoot, "chart", OdfNamespaces.Chart, "chart");
+    }
+
+    private static OdfNode? FindChildElement(OdfNode parent, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+        }
+
+        return null;
     }
 }

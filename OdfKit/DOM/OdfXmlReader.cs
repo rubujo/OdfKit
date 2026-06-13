@@ -35,7 +35,7 @@ public static class OdfXmlReader
             XmlResolver = null,                     // XXE 防禦
             IgnoreWhitespace = false,               // 保留有意義的空白
             IgnoreComments = false,
-            IgnoreProcessingInstructions = true
+            IgnoreProcessingInstructions = false
         };
 
         // StringPool 用於重複使用常見的字串執行個體 (例如元素與屬性名稱、命名空間)，
@@ -126,6 +126,17 @@ public static class OdfXmlReader
                                     TextContent = commentVal
                                 };
                                 stack.Peek().AppendChild(commentNode);
+                            }
+                            break;
+
+                        case XmlNodeType.ProcessingInstruction:
+                            if (stack.Count > 0)
+                            {
+                                OdfNode instructionNode = new(OdfNodeType.ProcessingInstruction, reader.Name, string.Empty)
+                                {
+                                    TextContent = reader.Value
+                                };
+                                stack.Peek().AppendChild(instructionNode);
                             }
                             break;
 

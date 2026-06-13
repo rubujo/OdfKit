@@ -50,7 +50,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
         private Stream? _underlyingStream;
         private readonly bool _leaveOpen;
         private readonly OdfLoadOptions _loadOptions;
-        private readonly OdfSaveOptions _saveOptions;
+        private OdfSaveOptions _saveOptions;
         
         private ZipArchive? _archive;
         private readonly Dictionary<string, OdfPackageEntry> _entries = new(StringComparer.Ordinal);
@@ -1168,9 +1168,10 @@ public class OdfPackage : IDisposable, IAsyncDisposable
         /// 將目前 ODF 封裝儲存到指定的目標資料流中。
         /// </summary>
         /// <param name="stream">要寫入的目標資料流</param>
-        public void Save(Stream stream)
+        /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
+        public void Save(Stream stream, OdfSaveOptions? options = null)
         {
-            SaveToStream(stream);
+            SaveToStream(stream, options);
         }
 
         /// <summary>
@@ -1357,7 +1358,8 @@ public class OdfPackage : IDisposable, IAsyncDisposable
         /// <summary>
         /// 將所有變更儲存回原來的檔案或資料流中。
         /// </summary>
-        public void Save()
+        /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
+        public void Save(OdfSaveOptions? options = null)
         {
             if (_mode == OdfPackageMode.Read)
             {
@@ -1365,6 +1367,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             }
 
             _lock.Wait();
+            OdfSaveOptions previousOptions = UseSaveOptions(options);
             try
             {
                 // Process formulas and font embedding on save if configured
@@ -1434,6 +1437,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             }
             finally
             {
+                _saveOptions = previousOptions;
                 _lock.Release();
             }
         }
@@ -1445,12 +1449,24 @@ public class OdfPackage : IDisposable, IAsyncDisposable
         /// <returns>代表非同步作業的工作</returns>
         public async Task SaveAsync(CancellationToken cancellationToken = default)
         {
+            await SaveAsync(null, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 使用指定儲存選項，將所有變更儲存回原來的檔案或資料流中（非同步）。
+        /// </summary>
+        /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
+        /// <param name="cancellationToken">取消語彙</param>
+        /// <returns>代表非同步作業的工作</returns>
+        public async Task SaveAsync(OdfSaveOptions? options, CancellationToken cancellationToken = default)
+        {
             if (_mode == OdfPackageMode.Read)
             {
                 throw new InvalidOperationException("Cannot save a read-only ODF package.");
             }
 
             await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            OdfSaveOptions previousOptions = UseSaveOptions(options);
             try
             {
                 // Process formulas and font embedding on save if configured
@@ -1526,6 +1542,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             }
             finally
             {
+                _saveOptions = previousOptions;
                 _lock.Release();
             }
         }
@@ -1534,11 +1551,13 @@ public class OdfPackage : IDisposable, IAsyncDisposable
         /// 將封裝序列化儲存至指定的目的地資料流。
         /// </summary>
         /// <param name="destinationStream">目標目的地資料流</param>
-        public void SaveToStream(Stream destinationStream)
+        /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
+        public void SaveToStream(Stream destinationStream, OdfSaveOptions? options = null)
         {
             if (destinationStream == null) throw new ArgumentNullException(nameof(destinationStream));
             
             _lock.Wait();
+            OdfSaveOptions previousOptions = UseSaveOptions(options);
             try
             {
                 ProcessSaveHooks();
@@ -1566,6 +1585,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             }
             finally
             {
+                _saveOptions = previousOptions;
                 _lock.Release();
             }
         }
@@ -1578,9 +1598,22 @@ public class OdfPackage : IDisposable, IAsyncDisposable
         /// <returns>代表非同步作業的工作</returns>
         public async Task SaveToStreamAsync(Stream destinationStream, CancellationToken cancellationToken = default)
         {
+            await SaveToStreamAsync(destinationStream, null, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 使用指定儲存選項，將封裝序列化儲存至指定的目的地資料流（非同步）。
+        /// </summary>
+        /// <param name="destinationStream">目標目的地資料流</param>
+        /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
+        /// <param name="cancellationToken">取消語彙</param>
+        /// <returns>代表非同步作業的工作</returns>
+        public async Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options, CancellationToken cancellationToken = default)
+        {
             if (destinationStream == null) throw new ArgumentNullException(nameof(destinationStream));
             
             await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            OdfSaveOptions previousOptions = UseSaveOptions(options);
             try
             {
                 ProcessSaveHooks();
@@ -1608,8 +1641,20 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             }
             finally
             {
+                _saveOptions = previousOptions;
                 _lock.Release();
             }
+        }
+
+        private OdfSaveOptions UseSaveOptions(OdfSaveOptions? options)
+        {
+            OdfSaveOptions previousOptions = _saveOptions;
+            if (options is not null)
+            {
+                _saveOptions = options;
+            }
+
+            return previousOptions;
         }
 
         internal void SaveManifestToEntries()
@@ -1869,7 +1914,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             {
                 var zipEntry = zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
                 
-                // Write fixed timestamp if Determinional is enabled
+                // 啟用確定性輸出時，使用固定 ZIP 時間戳記。
                 if (_saveOptions.Deterministic)
                 {
                     zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -2152,6 +2197,10 @@ public class OdfPackage : IDisposable, IAsyncDisposable
 
         #region Dispose
 
+        /// <summary>
+        /// 釋放封裝持有的資源。
+        /// </summary>
+        /// <param name="disposing">若為 <see langword="true"/>，則釋放受控資源。</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)

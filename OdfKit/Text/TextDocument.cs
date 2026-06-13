@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -15,6 +16,9 @@ namespace OdfKit.Text;
 /// </summary>
 public class TextDocument : OdfDocument
 {
+    private OdfTextBody? _body;
+    private OdfDocumentMetadata? _metadata;
+
     /// <summary>
     /// 取得或設定文字文件的本文根節點。
     /// </summary>
@@ -32,6 +36,59 @@ public class TextDocument : OdfDocument
         }
         InitializeTextRoot();
         StyleEngine.OnStyleChanging = TrackFormatChange;
+    }
+
+    /// <summary>
+    /// 建立新的 ODT 文字文件。
+    /// </summary>
+    /// <returns>新的 <see cref="TextDocument"/> 執行個體。</returns>
+    public static TextDocument Create()
+    {
+        return (TextDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Text);
+    }
+
+    /// <summary>
+    /// 從指定路徑載入 ODT 文字文件。
+    /// </summary>
+    /// <param name="path">ODT 文件路徑。</param>
+    /// <returns>載入完成的 <see cref="TextDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODT 文字文件時擲出。</exception>
+    public new static TextDocument Load(string path)
+    {
+        return EnsureTextDocument(OdfDocumentFactory.LoadDocument(path));
+    }
+
+    /// <summary>
+    /// 從指定資料流載入 ODT 文字文件。
+    /// </summary>
+    /// <param name="stream">包含 ODT 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>載入完成的 <see cref="TextDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODT 文字文件時擲出。</exception>
+    public new static TextDocument Load(Stream stream, string? fileName = null)
+    {
+        return EnsureTextDocument(OdfDocumentFactory.LoadDocument(stream, fileName));
+    }
+
+    /// <summary>
+    /// 取得文字文件本文的高階操作入口。
+    /// </summary>
+    public OdfTextBody Body => _body ??= new OdfTextBody(this);
+
+    /// <summary>
+    /// 取得文件中繼資料的高階操作入口。
+    /// </summary>
+    public OdfDocumentMetadata Metadata => _metadata ??= new OdfDocumentMetadata(this);
+
+    private static TextDocument EnsureTextDocument(OdfDocument document)
+    {
+        if (document is TextDocument textDocument)
+        {
+            return textDocument;
+        }
+
+        document.Dispose();
+        throw new InvalidOperationException("指定的 ODF 文件不是 ODT 文字文件。");
     }
 
     private void InitializeTextRoot()
@@ -2182,6 +2239,249 @@ public class OdfPageSetup(TextDocument doc)
 
         AddToDom(_doc.ContentDom);
         if (_doc.StylesDom is not null) AddToDom(_doc.StylesDom);
+    }
+}
+
+/// <summary>
+/// 提供文字文件本文的高階操作入口。
+/// </summary>
+public sealed class OdfTextBody
+{
+    private readonly TextDocument _document;
+    private OdfParagraphCollection? _paragraphs;
+    private OdfHeadingCollection? _headings;
+    private OdfListCollection? _lists;
+    private OdfTextTableCollection? _tables;
+    private OdfTextImageCollection? _images;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfTextBody"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="document">所屬文字文件。</param>
+    public OdfTextBody(TextDocument document)
+    {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 取得段落集合。
+    /// </summary>
+    public OdfParagraphCollection Paragraphs => _paragraphs ??= new OdfParagraphCollection(_document);
+
+    /// <summary>
+    /// 取得標題集合。
+    /// </summary>
+    public OdfHeadingCollection Headings => _headings ??= new OdfHeadingCollection(_document);
+
+    /// <summary>
+    /// 取得清單集合。
+    /// </summary>
+    public OdfListCollection Lists => _lists ??= new OdfListCollection(_document);
+
+    /// <summary>
+    /// 取得表格集合。
+    /// </summary>
+    public OdfTextTableCollection Tables => _tables ??= new OdfTextTableCollection(_document);
+
+    /// <summary>
+    /// 取得圖片集合。
+    /// </summary>
+    public OdfTextImageCollection Images => _images ??= new OdfTextImageCollection(_document);
+}
+
+/// <summary>
+/// 提供段落新增入口。
+/// </summary>
+public sealed class OdfParagraphCollection
+{
+    private readonly TextDocument _document;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfParagraphCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="document">所屬文字文件。</param>
+    public OdfParagraphCollection(TextDocument document)
+    {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 新增段落。
+    /// </summary>
+    /// <param name="text">段落文字。</param>
+    /// <returns>新增完成的段落。</returns>
+    public OdfParagraph Add(string text = "")
+    {
+        return _document.AddParagraph(text);
+    }
+}
+
+/// <summary>
+/// 提供標題新增入口。
+/// </summary>
+public sealed class OdfHeadingCollection
+{
+    private readonly TextDocument _document;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfHeadingCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="document">所屬文字文件。</param>
+    public OdfHeadingCollection(TextDocument document)
+    {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 新增標題。
+    /// </summary>
+    /// <param name="text">標題文字。</param>
+    /// <param name="outlineLevel">大綱階層。</param>
+    /// <returns>新增完成的標題。</returns>
+    public OdfHeading Add(string text, int outlineLevel = 1)
+    {
+        return _document.AddHeading(text, outlineLevel);
+    }
+}
+
+/// <summary>
+/// 提供清單新增入口。
+/// </summary>
+public sealed class OdfListCollection
+{
+    private readonly TextDocument _document;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfListCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="document">所屬文字文件。</param>
+    public OdfListCollection(TextDocument document)
+    {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 新增清單。
+    /// </summary>
+    /// <param name="styleName">選用的清單樣式名稱。</param>
+    /// <returns>新增完成的清單。</returns>
+    public OdfList Add(string? styleName = null)
+    {
+        return _document.AddList(styleName);
+    }
+}
+
+/// <summary>
+/// 提供表格新增入口。
+/// </summary>
+public sealed class OdfTextTableCollection
+{
+    private readonly TextDocument _document;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfTextTableCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="document">所屬文字文件。</param>
+    public OdfTextTableCollection(TextDocument document)
+    {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 新增表格。
+    /// </summary>
+    /// <param name="rows">列數。</param>
+    /// <param name="columns">欄數。</param>
+    /// <returns>新增完成的表格。</returns>
+    public OdfTable Add(int rows, int columns)
+    {
+        return _document.AddTable(rows, columns);
+    }
+}
+
+/// <summary>
+/// 提供圖片新增入口。
+/// </summary>
+public sealed class OdfTextImageCollection
+{
+    private readonly TextDocument _document;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfTextImageCollection"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="document">所屬文字文件。</param>
+    public OdfTextImageCollection(TextDocument document)
+    {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 新增圖片至新的段落。
+    /// </summary>
+    /// <param name="imageBytes">圖片二進位內容。</param>
+    /// <param name="widthCm">圖片寬度，例如 <c>2cm</c>。</param>
+    /// <param name="heightCm">圖片高度，例如 <c>2cm</c>。</param>
+    /// <param name="name">選用的圖片名稱。</param>
+    /// <returns>新增完成的圖片。</returns>
+    public OdfImage Add(byte[] imageBytes, string widthCm, string heightCm, string? name = null)
+    {
+        var media = new OdfMediaManager(_document.Package);
+        string path = media.AddImage(imageBytes, name);
+        OdfParagraph paragraph = _document.AddParagraph();
+        return _document.AddImage(paragraph, path, widthCm, heightCm, name);
+    }
+}
+
+/// <summary>
+/// 提供文件中繼資料的高階操作入口。
+/// </summary>
+public sealed class OdfDocumentMetadata
+{
+    private readonly OdfDocument _document;
+
+    /// <summary>
+    /// 初始化 <see cref="OdfDocumentMetadata"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="document">所屬文件。</param>
+    public OdfDocumentMetadata(OdfDocument document)
+    {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 取得或設定標題。
+    /// </summary>
+    public string? Title
+    {
+        get => _document.Title;
+        set => _document.Title = value;
+    }
+
+    /// <summary>
+    /// 取得或設定作者。
+    /// </summary>
+    public string? Creator
+    {
+        get => _document.Creator;
+        set => _document.Creator = value;
+    }
+
+    /// <summary>
+    /// 取得或設定主旨。
+    /// </summary>
+    public string? Subject
+    {
+        get => _document.Subject;
+        set => _document.Subject = value;
+    }
+
+    /// <summary>
+    /// 取得或設定描述。
+    /// </summary>
+    public string? Description
+    {
+        get => _document.Description;
+        set => _document.Description = value;
     }
 }
 

@@ -4,7 +4,16 @@ using System;
 using System.IO;
 using System.Text;
 using System.Xml;
+using OdfKit.Chart;
 using OdfKit.Compliance;
+using OdfKit.Database;
+using OdfKit.DOM;
+using OdfKit.Drawing;
+using OdfKit.Formula;
+using OdfKit.Image;
+using OdfKit.Presentation;
+using OdfKit.Spreadsheet;
+using OdfKit.Text;
 
 namespace OdfKit.Core;
 
@@ -13,6 +22,51 @@ namespace OdfKit.Core;
 /// </summary>
 public static class OdfDocumentFactory
 {
+    /// <summary>
+    /// 建立指定種類的高階 ODF 文件 wrapper。
+    /// </summary>
+    /// <param name="kind">要建立的 ODF 文件種類。</param>
+    /// <returns>建立完成的 ODF 文件。</returns>
+    public static OdfDocument CreateDocument(OdfDocumentKind kind)
+    {
+        OdfDocumentKind packageKind = OdfDocumentKindDetector.IsFlatKind(kind)
+            ? OdfDocumentKindDetector.ToContentKind(kind)
+            : kind;
+
+        var stream = new MemoryStream();
+        OdfPackage package = OdfPackage.Create(stream);
+        InitializeMinimalPackage(package, packageKind);
+        package.IsFlatXml = OdfDocumentKindDetector.IsFlatKind(kind);
+        return CreateDocumentWrapper(package, kind);
+    }
+
+    /// <summary>
+    /// 從指定路徑載入高階 ODF 文件 wrapper。
+    /// </summary>
+    /// <param name="path">ODF 文件路徑。</param>
+    /// <returns>載入完成的 ODF 文件。</returns>
+    public static OdfDocument LoadDocument(string path)
+    {
+        if (path is null) throw new ArgumentNullException(nameof(path));
+
+        OdfPackage package = OdfPackage.Open(path);
+        return CreateDocumentWrapper(package, DetectDocumentKind(package, path));
+    }
+
+    /// <summary>
+    /// 從指定資料流載入高階 ODF 文件 wrapper。
+    /// </summary>
+    /// <param name="stream">包含 ODF 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>載入完成的 ODF 文件。</returns>
+    public static OdfDocument LoadDocument(Stream stream, string? fileName = null)
+    {
+        if (stream is null) throw new ArgumentNullException(nameof(stream));
+
+        OdfPackage package = OdfPackage.Open(stream);
+        return CreateDocumentWrapper(package, DetectDocumentKind(package, fileName));
+    }
+
     /// <summary>
     /// 在提供的資料流中建立一個最小封裝的 ODF 文件。
     /// </summary>
@@ -121,6 +175,7 @@ public static class OdfDocumentFactory
         string mimeType = GetMimeType(kind);
         string versionText = FormatVersion(version);
 
+        package.Version = version;
         package.SetMimeType(mimeType);
         package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(CreateContentXml(kind, versionText)), "text/xml");
         package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes(CreateStylesXml(versionText)), "text/xml");
@@ -253,5 +308,51 @@ public static class OdfDocumentFactory
         " xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\"" +
         " xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\"" +
         " xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\"";
+
+    private static OdfDocumentKind DetectDocumentKind(OdfPackage package, string? fileName)
+    {
+        OdfDocumentKind extensionKind = OdfDocumentKindDetector.FromFileName(fileName);
+        OdfDocumentKind mimeKind = OdfDocumentKindDetector.FromMimeType(package.MimeType);
+
+        if (package.IsFlatXml)
+        {
+            if (OdfDocumentKindDetector.IsFlatKind(extensionKind))
+            {
+                return extensionKind;
+            }
+
+            if (mimeKind != OdfDocumentKind.Unknown)
+            {
+                return OdfDocumentKindDetector.ToFlatKind(mimeKind);
+            }
+        }
+
+        if (mimeKind != OdfDocumentKind.Unknown)
+        {
+            return mimeKind;
+        }
+
+        OdfValidationReport report = OdfPackageValidator.Validate(package, fileName: fileName);
+
+        return report.DocumentKind != OdfDocumentKind.Unknown
+            ? report.DocumentKind
+            : extensionKind;
+    }
+
+    private static OdfDocument CreateDocumentWrapper(OdfPackage package, OdfDocumentKind kind)
+    {
+        return OdfDocumentKindDetector.ToContentKind(kind) switch
+        {
+            OdfDocumentKind.Text => new TextDocument(package),
+            OdfDocumentKind.Spreadsheet => new SpreadsheetDocument(package),
+            OdfDocumentKind.Presentation => new PresentationDocument(package),
+            OdfDocumentKind.Graphics => new DrawingDocument(package),
+            OdfDocumentKind.Chart => new OdfChartDocument(package),
+            OdfDocumentKind.Formula => new OdfFormulaDocument(package),
+            OdfDocumentKind.Image => new OdfImageDocument(package),
+            OdfDocumentKind.Database => new OdfDatabaseDocument(package),
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")
+        };
+    }
 }
 

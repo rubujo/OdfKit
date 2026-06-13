@@ -78,6 +78,12 @@ public static class OdfXmlWriter
             return;
         }
 
+        if (node.NodeType == OdfNodeType.ProcessingInstruction)
+        {
+            writer.WriteProcessingInstruction(node.LocalName, node.TextContent);
+            return;
+        }
+
         if (node.NodeType == OdfNodeType.Text)
         {
             writer.WriteString(node.TextContent);
@@ -117,7 +123,7 @@ public static class OdfXmlWriter
         // 寫入屬性
         foreach (var attr in node.Attributes)
         {
-            string attrPrefix = GetNamespacePrefix(attr.Key.NamespaceUri, null, nsDict);
+            string attrPrefix = GetNamespacePrefix(attr.Key.NamespaceUri, node.GetAttributePrefix(attr.Key), nsDict);
             if (!string.IsNullOrEmpty(attr.Key.NamespaceUri))
             {
                 writer.WriteAttributeString(attrPrefix, attr.Key.LocalName, attr.Key.NamespaceUri, attr.Value);
@@ -178,7 +184,7 @@ public static class OdfXmlWriter
                     string prefix = OdfNamespaces.GetPrefix(attr.NamespaceUri);
                     if (string.IsNullOrEmpty(prefix))
                     {
-                        prefix = $"ns{nsDict.Count + 1}";
+                        prefix = node.GetAttributePrefix(attr) ?? $"ns{nsDict.Count + 1}";
                     }
                     nsDict[attr.NamespaceUri] = prefix;
                 }

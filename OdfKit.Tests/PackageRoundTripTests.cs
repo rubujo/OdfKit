@@ -20,8 +20,87 @@ public class PackageRoundTripTests
     private static readonly XNamespace DrawNs = OdfNamespaces.Draw;
     private static readonly XNamespace XLinkNs = OdfNamespaces.XLink;
     private static readonly XNamespace SvgNs = "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0";
+    private static readonly XNamespace StyleNs = OdfNamespaces.Style;
+    private static readonly XNamespace TableNs = OdfNamespaces.Table;
+    private static readonly XNamespace ConfigNs = OdfNamespaces.Config;
 
     private const string Base64Image = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
+    [Theory]
+    [InlineData("application/vnd.oasis.opendocument.spreadsheet", "spreadsheet")]
+    [InlineData("application/vnd.oasis.opendocument.presentation", "presentation")]
+    [InlineData("application/vnd.oasis.opendocument.graphics", "drawing")]
+    public void TestFlatXmlAndZipPackageCoreDocumentRoundTrip(string mimeType, string bodyLocalName)
+    {
+        var flatXml = new XDocument(
+            new XElement(OfficeNs + "document",
+                new XAttribute(OfficeNs + "mimetype", mimeType),
+                new XAttribute(OfficeNs + "version", "1.4"),
+                new XAttribute(XNamespace.Xmlns + "office", OfficeNs.NamespaceName),
+                new XAttribute(XNamespace.Xmlns + "style", StyleNs.NamespaceName),
+                new XAttribute(XNamespace.Xmlns + "table", TableNs.NamespaceName),
+                new XAttribute(XNamespace.Xmlns + "draw", DrawNs.NamespaceName),
+                new XAttribute(XNamespace.Xmlns + "config", ConfigNs.NamespaceName),
+                new XElement(OfficeNs + "meta",
+                    new XElement(XName.Get("generator", OdfNamespaces.Meta), "OdfKit R3")),
+                new XElement(OfficeNs + "settings",
+                    new XElement(ConfigNs + "config-item-set",
+                        new XAttribute(ConfigNs + "name", "ooo:view-settings"),
+                        new XElement(ConfigNs + "config-item",
+                            new XAttribute(ConfigNs + "name", "ShowGrid"),
+                            new XAttribute(ConfigNs + "type", "boolean"),
+                            "true"))),
+                new XElement(OfficeNs + "font-face-decls",
+                    new XElement(StyleNs + "font-face",
+                        new XAttribute(StyleNs + "name", "Liberation Sans"))),
+                new XElement(OfficeNs + "styles",
+                    new XElement(StyleNs + "style",
+                        new XAttribute(StyleNs + "name", "Default"))),
+                new XElement(OfficeNs + "automatic-styles",
+                    new XElement(StyleNs + "style",
+                        new XAttribute(StyleNs + "name", "Auto1"))),
+                new XElement(OfficeNs + "master-styles"),
+                new XElement(OfficeNs + "body",
+                    new XElement(OfficeNs + bodyLocalName))
+            )
+        );
+
+        using var msFlat = new MemoryStream();
+        flatXml.Save(msFlat);
+        msFlat.Position = 0;
+
+        using var package = OdfPackage.Open(msFlat, leaveOpen: true);
+        Assert.True(package.IsFlatXml);
+        Assert.True(package.HasEntry("content.xml"));
+        Assert.True(package.HasEntry("styles.xml"));
+        Assert.True(package.HasEntry("meta.xml"));
+        Assert.True(package.HasEntry("settings.xml"));
+
+        package.IsFlatXml = false;
+        using var msZip = new MemoryStream();
+        package.Save(msZip);
+        msZip.Position = 0;
+
+        using (var zipPackage = OdfPackage.Open(msZip, leaveOpen: true))
+        {
+            OdfValidationReport report = OdfPackageValidator.Validate(zipPackage);
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
+        }
+
+        msZip.Position = 0;
+        using var reloaded = OdfPackage.Open(msZip, leaveOpen: true);
+        reloaded.IsFlatXml = true;
+        using var msFlatOutput = new MemoryStream();
+        reloaded.Save(msFlatOutput);
+        msFlatOutput.Position = 0;
+
+        XDocument output = XDocument.Load(msFlatOutput);
+        Assert.NotNull(output.Descendants(OfficeNs + bodyLocalName).SingleOrDefault());
+        Assert.Equal("OdfKit R3", output.Descendants(XName.Get("generator", OdfNamespaces.Meta)).Single().Value);
+        Assert.Equal("true", output.Descendants(ConfigNs + "config-item").Single(item => item.Attribute(ConfigNs + "name")?.Value == "ShowGrid").Value);
+        Assert.NotNull(output.Descendants(OfficeNs + "font-face-decls").SingleOrDefault());
+        Assert.NotNull(output.Descendants(OfficeNs + "styles").SingleOrDefault());
+    }
 
     [Fact]
     public void TestFlatXmlAndZipPackageImageRoundTrip()
@@ -174,6 +253,14 @@ public class PackageRoundTripTests
             var entries = zip.Entries;
             Assert.Contains(entries, e => e.FullName == "Object1/content.xml");
             Assert.Contains(entries, e => e.FullName == "Object1/mimetype");
+        }
+
+        msZip.Position = 0;
+        using (var zipPackage = OdfPackage.Open(msZip, leaveOpen: true))
+        {
+            Assert.Equal("application/vnd.oasis.opendocument.formula", zipPackage.Manifest["Object1/"]);
+            Assert.Equal("text/xml", zipPackage.Manifest["Object1/content.xml"]);
+            Assert.Equal("application/vnd.oasis.opendocument.formula", zipPackage.Manifest["Object1/mimetype"]);
         }
 
         // 5. 重新載入 ZIP Package 並轉回 Flat XML

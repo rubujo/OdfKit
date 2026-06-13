@@ -23,7 +23,12 @@ public enum OdfNodeType
     /// <summary>
     /// 註解節點。
     /// </summary>
-    Comment
+    Comment,
+
+    /// <summary>
+    /// XML 處理指令節點。
+    /// </summary>
+    ProcessingInstruction
 }
 
 /// <summary>
@@ -129,6 +134,8 @@ public class OdfNode
     /// 取得此節點的屬性字典。
     /// </summary>
     public Dictionary<OdfAttributeName, string> Attributes { get; } = new(OdfAttributeNameComparer.Instance);
+
+    private readonly Dictionary<OdfAttributeName, string> _attributePrefixes = new(OdfAttributeNameComparer.Instance);
     
     /// <summary>
     /// 取得或設定標記此節點是否被新增或修改 (Dirty Flag)，用於自動樣式去重。
@@ -184,7 +191,7 @@ public class OdfNode
     {
         get
         {
-            if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment)
+            if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
             {
                 return _value ?? string.Empty;
             }
@@ -223,7 +230,7 @@ public class OdfNode
         set
         {
             IsModified = true;
-            if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment)
+            if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
             {
                 _value = value;
             }
@@ -254,7 +261,7 @@ public class OdfNode
     public void AppendChild(OdfNode child)
     {
         if (child is null) throw new ArgumentNullException(nameof(child));
-        if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment)
+        if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
             throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
         }
@@ -276,7 +283,7 @@ public class OdfNode
     {
         if (newChild is null) throw new ArgumentNullException(nameof(newChild));
         if (refChild is null) throw new ArgumentNullException(nameof(refChild));
-        if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment)
+        if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
             throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
         }
@@ -304,7 +311,7 @@ public class OdfNode
     {
         if (newChild is null) throw new ArgumentNullException(nameof(newChild));
         if (refChild is null) throw new ArgumentNullException(nameof(refChild));
-        if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment)
+        if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
             throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
         }
@@ -386,10 +393,30 @@ public class OdfNode
     public void SetAttribute(string localName, string namespaceUri, string value, string? prefix = null)
     {
         var key = new OdfAttributeName(localName, namespaceUri);
+        string? existingPrefix = GetAttributePrefix(key);
         if (!Attributes.TryGetValue(key, out string? existing) || existing != value)
         {
             IsModified = true;
             Attributes[key] = value;
+        }
+
+        if (!string.IsNullOrEmpty(prefix) && prefix is string attributePrefix)
+        {
+            if (!string.Equals(existingPrefix, attributePrefix, StringComparison.Ordinal))
+            {
+                IsModified = true;
+            }
+
+            _attributePrefixes[key] = attributePrefix;
+        }
+        else
+        {
+            if (existingPrefix is not null)
+            {
+                IsModified = true;
+            }
+
+            _attributePrefixes.Remove(key);
         }
     }
 
@@ -412,8 +439,19 @@ public class OdfNode
         var key = new OdfAttributeName(localName, namespaceUri);
         if (Attributes.Remove(key))
         {
+            _attributePrefixes.Remove(key);
             IsModified = true;
         }
+    }
+
+    /// <summary>
+    /// 取得指定屬性的原始命名空間前綴。
+    /// </summary>
+    /// <param name="attributeName">屬性名稱。</param>
+    /// <returns>原始前綴；若未記錄則為 <see langword="null"/>。</returns>
+    public string? GetAttributePrefix(OdfAttributeName attributeName)
+    {
+        return _attributePrefixes.TryGetValue(attributeName, out string? prefix) ? prefix : null;
     }
 
     /// <summary>
@@ -488,6 +526,11 @@ public class OdfNode
         foreach (var attr in Attributes)
         {
             clone.Attributes[attr.Key] = attr.Value;
+        }
+
+        foreach (var attrPrefix in _attributePrefixes)
+        {
+            clone._attributePrefixes[attrPrefix.Key] = attrPrefix.Value;
         }
 
         if (deep)

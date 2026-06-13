@@ -7,6 +7,12 @@ using System.Text;
 using System.Xml.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.Database;
+using OdfKit.Drawing;
+using OdfKit.Image;
+using OdfKit.Presentation;
+using OdfKit.Spreadsheet;
+using OdfKit.Text;
 using Xunit;
 
 namespace OdfKit.Tests
@@ -48,6 +54,80 @@ namespace OdfKit.Tests
             Assert.Equal(OdfPolicyAuthorityLevel.Draft, OdfComplianceProfiles.RocTaiwanOdfCns15251.AuthorityLevel);
             Assert.Equal(OdfProfileVerificationStatus.NeedsActiveSource, OdfComplianceProfiles.RocTaiwanOdfCns15251.VerificationStatus);
             Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.AuthorityLevel);
+        }
+
+        [Fact]
+        public void ProfileSemanticsKeepOasisSchemaValidationNormative()
+        {
+            Assert.Equal(OdfPolicyAuthorityLevel.Normative, OdfComplianceProfiles.OasisOdf14Strict.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.OasisOdf14Strict.VerificationStatus);
+            Assert.True(OdfComplianceProfiles.OasisOdf14Strict.SupportedVersions.Contains(OdfVersion.Odf14));
+            Assert.False(OdfComplianceProfiles.OasisOdf14Strict.SupportedVersions.Contains(OdfVersion.Odf13));
+
+            Assert.Equal(OdfPolicyAuthorityLevel.Normative, OdfComplianceProfiles.OasisOdf14Extended.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.OasisOdf14Extended.VerificationStatus);
+            Assert.True(OdfComplianceProfiles.OasisOdf14Extended.SupportedVersions.Contains(OdfVersion.Odf14));
+            Assert.False(OdfComplianceProfiles.OasisOdf14Extended.SupportedVersions.Contains(OdfVersion.Odf13));
+
+            Assert.Contains(
+                OdfComplianceProfiles.OasisOdf14Strict.Rules,
+                rule => rule.Id == "RequireSchemaPatternValidation" && rule.DefaultSeverity == OdfIssueSeverity.Error);
+            Assert.Contains(
+                OdfComplianceProfiles.OasisOdf14Extended.Rules,
+                rule => rule.Id == "RequireSchemaPatternValidation" && rule.DefaultSeverity == OdfIssueSeverity.Error);
+            Assert.Contains(
+                OdfComplianceProfiles.OasisOdf14Strict.Rules,
+                rule => rule.Id == "DisallowInvalidOdfNamespaceExtensions");
+            Assert.DoesNotContain(
+                OdfComplianceProfiles.OasisOdf14Extended.Rules,
+                rule => rule.Id == "DisallowInvalidOdfNamespaceExtensions");
+        }
+
+        [Fact]
+        public void ProfileSemanticsKeepDraftAndCompatibilityProfilesPolicyScoped()
+        {
+            OdfComplianceProfile[] policyProfiles =
+            [
+                OdfComplianceProfiles.EuOfficeDocumentExchange,
+                OdfComplianceProfiles.RocTaiwanOdfCns15251,
+                OdfComplianceProfiles.RocTaiwanGovernmentOdfTools
+            ];
+
+            foreach (OdfComplianceProfile profile in policyProfiles)
+            {
+                Assert.NotEqual(OdfPolicyAuthorityLevel.Normative, profile.AuthorityLevel);
+                Assert.NotEqual(OdfProfileVerificationStatus.VerifiedOfficial, profile.VerificationStatus);
+                Assert.DoesNotContain(
+                    profile.Rules,
+                    rule => rule.Id == "DisallowInvalidOdfNamespaceExtensions");
+            }
+
+            Assert.Equal(OdfPolicyAuthorityLevel.Draft, OdfComplianceProfiles.RocTaiwanOdfCns15251.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.NeedsActiveSource, OdfComplianceProfiles.RocTaiwanOdfCns15251.VerificationStatus);
+            Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.CompatibilityOnly, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.VerificationStatus);
+            Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.EuOfficeDocumentExchange.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.OfficialButIndirect, OdfComplianceProfiles.EuOfficeDocumentExchange.VerificationStatus);
+        }
+
+        [Fact]
+        public void ProfileValidationReportsPolicyIssuesWithoutNormativeRuleIds()
+        {
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.4\"><office:body><office:text><draw:frame><draw:image xlink:href=\"https://example.invalid/image.png\" /></draw:frame></office:text></office:body></office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(
+                package,
+                OdfComplianceProfiles.RocTaiwanGovernmentOdfTools);
+
+            Assert.Contains(report.Issues, issue =>
+                issue.RuleId == "RequireSafeExternalResourcePolicy" &&
+                issue.ProfileId == OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.Id &&
+                issue.Severity == OdfIssueSeverity.Warning);
+            Assert.DoesNotContain(report.Issues, issue =>
+                issue.RuleId == "DisallowInvalidOdfNamespaceExtensions" &&
+                issue.ProfileId == OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.Id);
         }
 
         [Fact]
@@ -1354,6 +1434,62 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void DocumentKindDetectorExposesSupportedFormatMetadata()
+        {
+            Assert.Equal(17, OdfDocumentKindDetector.SupportedFormats.Count);
+
+            Assert.True(OdfDocumentKindDetector.TryGetFormatByFileName(".fods", out OdfFormatInfo? flatSpreadsheet));
+            Assert.Equal(OdfDocumentKind.FlatSpreadsheet, flatSpreadsheet!.Kind);
+            Assert.Equal(OdfDocumentKind.Spreadsheet, flatSpreadsheet.BodyKind);
+            Assert.True(flatSpreadsheet.IsFlatXml);
+            Assert.Equal("application/vnd.oasis.opendocument.spreadsheet", flatSpreadsheet.MimeType);
+
+            Assert.True(OdfDocumentKindDetector.TryGetFormatByKind(OdfDocumentKind.Database, out OdfFormatInfo? database));
+            Assert.Equal(".odb", database!.Extension);
+            Assert.Equal("application/vnd.oasis.opendocument.database", database.MimeType);
+            Assert.False(database.IsFlatXml);
+        }
+
+        [Theory]
+        [InlineData("application/vnd.oasis.opendocument.text", OdfDocumentKind.Text)]
+        [InlineData("application/vnd.oasis.opendocument.text-template", OdfDocumentKind.TextTemplate)]
+        [InlineData("application/vnd.oasis.opendocument.text-master", OdfDocumentKind.TextMaster)]
+        [InlineData("application/vnd.oasis.opendocument.spreadsheet", OdfDocumentKind.Spreadsheet)]
+        [InlineData("application/vnd.oasis.opendocument.spreadsheet-template", OdfDocumentKind.SpreadsheetTemplate)]
+        [InlineData("application/vnd.oasis.opendocument.presentation", OdfDocumentKind.Presentation)]
+        [InlineData("application/vnd.oasis.opendocument.presentation-template", OdfDocumentKind.PresentationTemplate)]
+        [InlineData("application/vnd.oasis.opendocument.graphics", OdfDocumentKind.Graphics)]
+        [InlineData("application/vnd.oasis.opendocument.graphics-template", OdfDocumentKind.GraphicsTemplate)]
+        [InlineData("application/vnd.oasis.opendocument.chart", OdfDocumentKind.Chart)]
+        [InlineData("application/vnd.oasis.opendocument.formula", OdfDocumentKind.Formula)]
+        [InlineData("application/vnd.oasis.opendocument.image", OdfDocumentKind.Image)]
+        [InlineData("application/vnd.oasis.opendocument.database", OdfDocumentKind.Database)]
+        public void DocumentKindDetectorRecognizesOdfMimeTypes(string mimeType, OdfDocumentKind expected)
+        {
+            Assert.Equal(expected, OdfDocumentKindDetector.FromMimeType(mimeType));
+            Assert.True(OdfDocumentKindDetector.TryGetFormatByMimeType(mimeType, out OdfFormatInfo? format));
+            Assert.Equal(expected, format!.Kind);
+        }
+
+        [Theory]
+        [InlineData("text", false, OdfDocumentKind.Text)]
+        [InlineData("spreadsheet", false, OdfDocumentKind.Spreadsheet)]
+        [InlineData("presentation", false, OdfDocumentKind.Presentation)]
+        [InlineData("drawing", false, OdfDocumentKind.Graphics)]
+        [InlineData("chart", false, OdfDocumentKind.Chart)]
+        [InlineData("formula", false, OdfDocumentKind.Formula)]
+        [InlineData("image", false, OdfDocumentKind.Image)]
+        [InlineData("database", false, OdfDocumentKind.Database)]
+        [InlineData("text", true, OdfDocumentKind.FlatText)]
+        [InlineData("spreadsheet", true, OdfDocumentKind.FlatSpreadsheet)]
+        [InlineData("presentation", true, OdfDocumentKind.FlatPresentation)]
+        [InlineData("drawing", true, OdfDocumentKind.FlatGraphics)]
+        public void DocumentKindDetectorRecognizesOfficeBodyKinds(string localName, bool flat, OdfDocumentKind expected)
+        {
+            Assert.Equal(expected, OdfDocumentKindDetector.FromOfficeBodyElement(localName, flat));
+        }
+
+        [Fact]
         public void ValidatorDetectsTemplatePackageKind()
         {
             using MemoryStream ms = CreatePackage(
@@ -1678,6 +1814,84 @@ namespace OdfKit.Tests
             Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
             Assert.Equal(kind, report.DocumentKind);
             Assert.Equal(OdfVersion.Odf14, report.DetectedVersion);
+        }
+
+        [Theory]
+        [InlineData(OdfDocumentKind.Text, typeof(TextDocument))]
+        [InlineData(OdfDocumentKind.TextTemplate, typeof(TextDocument))]
+        [InlineData(OdfDocumentKind.TextMaster, typeof(TextDocument))]
+        [InlineData(OdfDocumentKind.Spreadsheet, typeof(SpreadsheetDocument))]
+        [InlineData(OdfDocumentKind.SpreadsheetTemplate, typeof(SpreadsheetDocument))]
+        [InlineData(OdfDocumentKind.Presentation, typeof(PresentationDocument))]
+        [InlineData(OdfDocumentKind.PresentationTemplate, typeof(PresentationDocument))]
+        [InlineData(OdfDocumentKind.Graphics, typeof(DrawingDocument))]
+        [InlineData(OdfDocumentKind.GraphicsTemplate, typeof(DrawingDocument))]
+        public void HighLevelFactoryCreatesTypedDocuments(OdfDocumentKind kind, Type expectedType)
+        {
+            using OdfDocument document = OdfDocumentFactory.CreateDocument(kind);
+
+            Assert.IsType(expectedType, document);
+
+            using var ms = new MemoryStream();
+            document.SaveToStream(ms);
+            ms.Position = 0;
+
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Extended);
+
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
+            Assert.Equal(kind, report.DocumentKind);
+        }
+
+        [Theory]
+        [InlineData(OdfDocumentKind.Chart, "OdfChartDocument")]
+        [InlineData(OdfDocumentKind.Formula, "OdfFormulaDocument")]
+        [InlineData(OdfDocumentKind.Image, nameof(OdfImageDocument))]
+        [InlineData(OdfDocumentKind.Database, nameof(OdfDatabaseDocument))]
+        public void HighLevelFactoryCreatesPackageLevelDocuments(OdfDocumentKind kind, string expectedTypeName)
+        {
+            using OdfDocument document = OdfDocument.Create(kind);
+            Assert.Equal(expectedTypeName, document.GetType().Name);
+
+            using var ms = new MemoryStream();
+            document.SaveToStream(ms);
+            ms.Position = 0;
+
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Extended);
+
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
+            Assert.Equal(kind, report.DocumentKind);
+        }
+
+        [Fact]
+        public void HighLevelFactoryLoadsDocumentFromStreamAndSavesToPath()
+        {
+            using var source = new MemoryStream();
+            using (OdfPackage package = OdfDocumentFactory.CreatePackage(source, OdfDocumentKind.Spreadsheet, leaveOpen: true))
+            {
+                package.Save();
+            }
+
+            source.Position = 0;
+            using OdfDocument document = OdfDocument.Load(source, "sheet.ods");
+            Assert.IsType<SpreadsheetDocument>(document);
+
+            string path = Path.Combine(Path.GetTempPath(), "OdfKit.FactoryLoadSave." + Guid.NewGuid().ToString("N") + ".ods");
+            try
+            {
+                document.Save(path);
+                using OdfDocument loaded = OdfDocumentFactory.LoadDocument(path);
+                Assert.IsType<SpreadsheetDocument>(loaded);
+                Assert.Equal("application/vnd.oasis.opendocument.spreadsheet", loaded.Package.MimeType);
+            }
+            finally
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
         }
 
         [Fact]

@@ -47,8 +47,10 @@ public abstract class AstNode
 /// <param name="value">常值內容</param>
 public class LiteralNode(object value) : AstNode
 {
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context) => value;
 
+    /// <inheritdoc />
     public override string Serialize()
     {
         if (value is string s)
@@ -72,10 +74,13 @@ public class CellAddressNode(OdfCellAddress address) : AstNode
     /// </summary>
     public OdfCellAddress Address { get; } = address;
 
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context) => context.GetCellValue(Address);
 
+    /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context) => [new OdfCellRange(Address, Address)];
 
+    /// <inheritdoc />
     public override string Serialize() => Address.ToString();
 }
 
@@ -90,10 +95,13 @@ public class RangeReferenceNode(OdfCellRange range) : AstNode
     /// </summary>
     public OdfCellRange Range { get; } = range;
 
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context) => context.GetRangeValues(Range);
 
+    /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context) => [Range];
 
+    /// <inheritdoc />
     public override string Serialize() => Range.ToString();
 }
 
@@ -104,6 +112,7 @@ public class RangeReferenceNode(OdfCellRange range) : AstNode
 /// <param name="right">右側 AST 節點</param>
 public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
 {
+    /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
         var list = new List<OdfCellRange>();
@@ -112,6 +121,7 @@ public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
         return list;
     }
 
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
         var ranges = GetRanges(context);
@@ -123,6 +133,7 @@ public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
         return list;
     }
 
+    /// <inheritdoc />
     public override string Serialize() => $"{left.Serialize()}~{right.Serialize()}";
 }
 
@@ -133,6 +144,7 @@ public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
 /// <param name="right">右側 AST 節點</param>
 public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
 {
+    /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
         var leftRanges = left.GetRanges(context);
@@ -152,6 +164,7 @@ public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
         return list;
     }
 
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
         var ranges = GetRanges(context);
@@ -171,6 +184,7 @@ public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
         return list;
     }
 
+    /// <inheritdoc />
     public override string Serialize() => $"{left.Serialize()}!{right.Serialize()}";
 }
 
@@ -181,6 +195,7 @@ public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
 /// <param name="child">子 AST 節點</param>
 public class UnaryNode(char op, AstNode child) : AstNode
 {
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
         var val = child.Evaluate(context);
@@ -206,6 +221,7 @@ public class UnaryNode(char op, AstNode child) : AstNode
         return OdfFormulaError.Value;
     }
 
+    /// <inheritdoc />
     public override string Serialize()
     {
         if (op == '%')
@@ -222,6 +238,7 @@ public class UnaryNode(char op, AstNode child) : AstNode
 /// <param name="right">右側 AST 節點</param>
 public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
 {
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
         var leftVal = left.Evaluate(context);
@@ -310,6 +327,7 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
         };
     }
 
+    /// <inheritdoc />
     public override string Serialize() => $"{left.Serialize()}{op}{right.Serialize()}";
 }
 
@@ -330,11 +348,13 @@ public class FunctionNode(string name, List<AstNode> arguments) : AstNode
     /// </summary>
     public List<AstNode> Arguments { get; } = arguments;
 
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
         return DefaultFormulaEvaluator.EvaluateFunction(Name, Arguments, context);
     }
 
+    /// <inheritdoc />
     public override string Serialize()
     {
         var args = new List<string>();
@@ -357,10 +377,13 @@ public class ParenthesizedNode(AstNode inner) : AstNode
     /// </summary>
     public AstNode Inner => inner;
 
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context) => inner.Evaluate(context);
 
+    /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context) => inner.GetRanges(context);
 
+    /// <inheritdoc />
     public override string Serialize() => $"({inner.Serialize()})";
 }
 
@@ -375,8 +398,10 @@ public class NamedRangeNode(string name) : AstNode
     /// </summary>
     public string Name { get; } = name;
 
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context) => context.GetNamedRangeOrExpressionValue(Name);
 
+    /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
         var val = context.GetNamedRangeOrExpressionValue(Name);
@@ -385,5 +410,6 @@ public class NamedRangeNode(string name) : AstNode
         return [];
     }
 
+    /// <inheritdoc />
     public override string Serialize() => Name;
 }

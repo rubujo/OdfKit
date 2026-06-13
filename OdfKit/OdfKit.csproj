@@ -9,9 +9,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     
-    <!-- Localized warning suppression for auto-generated DOM wrappers and schemas that lack XML comments -->
-    <NoWarn>$(NoWarn);1591</NoWarn>
-    
     <!-- CC0 1.0 Universal license settings -->
     <PackageId>OdfKit</PackageId>
     <Version>1.0.0</Version>
@@ -22,12 +19,22 @@
     <RepositoryUrl>https://github.com/OdfKit/OdfKit</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>ODF;OpenDocument;ODT;ODS;ODP;ODG</PackageTags>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <RootNamespace>OdfKit</RootNamespace>
     <AssemblyName>OdfKit</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <!-- Common Package References -->

@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -29,6 +32,89 @@ public class OdfFormulaDocument : OdfDocument
         {
             package.SetMimeType("application/vnd.oasis.opendocument.formula");
         }
+    }
+
+    /// <summary>
+    /// 建立新的 ODF 公式文件。
+    /// </summary>
+    /// <returns>新的 <see cref="OdfFormulaDocument"/> 執行個體。</returns>
+    public static OdfFormulaDocument Create()
+    {
+        return (OdfFormulaDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Formula);
+    }
+
+    /// <summary>
+    /// 從指定路徑載入 ODF 公式文件。
+    /// </summary>
+    /// <param name="path">ODF 公式文件路徑。</param>
+    /// <returns>載入完成的 <see cref="OdfFormulaDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODF 公式時擲出。</exception>
+    public new static OdfFormulaDocument Load(string path)
+    {
+        return EnsureFormula(OdfDocumentFactory.LoadDocument(path));
+    }
+
+    /// <summary>
+    /// 從指定資料流載入 ODF 公式文件。
+    /// </summary>
+    /// <param name="stream">包含 ODF 公式文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>載入完成的 <see cref="OdfFormulaDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODF 公式時擲出。</exception>
+    public new static OdfFormulaDocument Load(Stream stream, string? fileName = null)
+    {
+        return EnsureFormula(OdfDocumentFactory.LoadDocument(stream, fileName));
+    }
+
+    /// <summary>
+    /// 取得主要公式節點。
+    /// </summary>
+    public OdfNode FormulaNode => GetFormulaNode();
+
+    /// <summary>
+    /// 取得目前的 MathML 根節點。
+    /// </summary>
+    public OdfNode MathNode => FindOrCreateChild(GetFormulaNode(), "math", "http://www.w3.org/1998/Math/MathML", "math");
+
+    /// <summary>
+    /// 以指定 MathML XML 取代公式內容。
+    /// </summary>
+    /// <param name="mathMlXml">格式正確的 MathML XML。</param>
+    /// <returns>匯入後的 MathML 根節點。</returns>
+    /// <exception cref="ArgumentException">當 MathML XML 為空或根節點不是 MathML math 時擲出。</exception>
+    public OdfNode SetMathMl(string mathMlXml)
+    {
+        if (string.IsNullOrWhiteSpace(mathMlXml))
+        {
+            throw new ArgumentException("MathML XML 不能為空。", nameof(mathMlXml));
+        }
+
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(mathMlXml));
+        OdfNode math = OdfXmlReader.Parse(stream);
+        if (math.LocalName != "math" || math.NamespaceUri != "http://www.w3.org/1998/Math/MathML")
+        {
+            throw new ArgumentException("MathML 根節點必須是 math:math。", nameof(mathMlXml));
+        }
+
+        OdfNode formula = GetFormulaNode();
+        foreach (OdfNode child in new List<OdfNode>(formula.Children))
+        {
+            formula.RemoveChild(child);
+        }
+
+        formula.AppendChild(math);
+        return math;
+    }
+
+    private static OdfFormulaDocument EnsureFormula(OdfDocument document)
+    {
+        if (document is OdfFormulaDocument formula)
+        {
+            return formula;
+        }
+
+        document.Dispose();
+        throw new InvalidOperationException("指定的 ODF 文件不是 ODF 公式。");
     }
 
     /// <summary>
@@ -88,5 +174,11 @@ public class OdfFormulaDocument : OdfDocument
                 destFormulaRoot.AppendChild(imported);
             }
         }
+    }
+
+    private OdfNode GetFormulaNode()
+    {
+        OdfNode body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
+        return FindOrCreateChild(body, "formula", OdfNamespaces.Office, "office");
     }
 }
