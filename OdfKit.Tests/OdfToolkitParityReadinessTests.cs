@@ -166,6 +166,7 @@ public class OdfToolkitParityReadinessTests
         Assert.Contains("validate-corpus", script, StringComparison.Ordinal);
         Assert.Contains("ODFKIT_PARITY_CORPUS_ROOT", script, StringComparison.Ordinal);
         Assert.Contains("ODFKIT_ODFVALIDATOR_JAR", script, StringComparison.Ordinal);
+        Assert.Contains("--metadata-only", script, StringComparison.Ordinal);
         Assert.Contains("manifest.json", initializeScript, StringComparison.Ordinal);
         Assert.Contains("baseline-exceptions.json", initializeScript, StringComparison.Ordinal);
         Assert.Contains("Test-OdfCorpus.ps1", workflow, StringComparison.Ordinal);

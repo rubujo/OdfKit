@@ -43,6 +43,13 @@ try {
             throw "External corpus manifest not found: $manifestPath"
         }
 
+        $metadataArgs = @($manifestPath, "--metadata-only", "--format", "json")
+        if (-not [string]::IsNullOrWhiteSpace($BaselineExceptions)) {
+            $metadataArgs += @("--baseline-exceptions", $BaselineExceptions)
+        }
+
+        dotnet @commonArgs @metadataArgs
+
         $externalArgs = @($manifestPath, "--root", $ExternalRoot, "--format", "json")
         if (-not [string]::IsNullOrWhiteSpace($BaselineJar)) {
             $externalArgs += @("--baseline", "odf-validator", "--baseline-jar", $BaselineJar)

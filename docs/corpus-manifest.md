@@ -95,6 +95,8 @@ repo 也提供 CI 與本機共用腳本：
 
 `Initialize-OdfExternalCorpus.ps1` 會將外部 manifest 與 baseline exception 範本複製到指定資料夾。
 `Test-OdfCorpus.ps1` 必定執行內建 corpus；若設定 `ODFKIT_PARITY_CORPUS_ROOT`，則會同時執行外部 corpus。
+外部 corpus 會先以 `validate-corpus --metadata-only` 檢查 manifest 與 baseline exception metadata，
+再執行實體 fixture 驗證。
 若再設定 `ODFKIT_ODFVALIDATOR_JAR`，外部 corpus 會加上 ODF Validator baseline。
 若外部 corpus 有已驗證的暫時分類差異，可用 `-BaselineExceptions` 指向
 `baseline-exceptions.json`。
