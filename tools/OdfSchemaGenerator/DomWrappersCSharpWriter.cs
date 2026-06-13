@@ -327,6 +327,12 @@ public sealed class DomWrappersCSharpWriter
         }
 
         if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "styleNameRefs", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.StyleNameList;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
             string.Equals(node.ReferenceName, "color", StringComparison.Ordinal))
         {
             return AttributeValueKind.Color;
@@ -522,6 +528,15 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetStyleNameAttributeValue",
                     "SetStyleNameAttributeValue");
+                break;
+            case AttributeValueKind.StyleNameList:
+                writer.WriteLine($"        public OdfStyleNameList? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleNameListAttributeValue",
+                    "SetStyleNameListAttributeValue");
                 break;
             case AttributeValueKind.Color:
                 writer.WriteLine($"        public OdfColor? {propName}");
@@ -770,6 +785,7 @@ public sealed class DomWrappersCSharpWriter
         Duration,
         Angle,
         StyleName,
+        StyleNameList,
         Color,
         IriReference,
         Percent,

@@ -237,6 +237,7 @@ namespace OdfKit.Tests
                 "<define name=\"NCName\"><data type=\"NCName\" /></define>" +
                 "<define name=\"boolean\"><choice><value>true</value><value>false</value></choice></define>" +
                 "<define name=\"styleNameRef\"><data type=\"NCName\" /></define>" +
+                "<define name=\"styleNameRefs\"><list><zeroOrMore><data type=\"NCName\" /></zeroOrMore></list></define>" +
                 "<define name=\"color\"><data type=\"string\"><param name=\"pattern\">#[0-9a-fA-F]{6}</param></data></define>" +
                 "<define name=\"anyIRI\"><data type=\"anyURI\" /></define>" +
                 "<define name=\"zeroToHundredPercent\"><data type=\"string\"><param name=\"pattern\">([0-9]?[0-9](\\.[0-9]*)?|100(\\.0*)?|\\.[0-9]+)%</param></data></define>" +
@@ -252,6 +253,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"table:number-columns-spanned\"><ref name=\"positive-integer\" /></attribute>" +
                 "<attribute name=\"table:enabled\"><ref name=\"boolean\" /></attribute>" +
                 "<attribute name=\"table:style-name\"><ref name=\"styleNameRef\" /></attribute>" +
+                "<attribute name=\"table:style-names\"><ref name=\"styleNameRefs\" /></attribute>" +
                 "<attribute name=\"draw:fill-color\"><ref name=\"color\" /></attribute>" +
                 "<attribute name=\"xlink:href\"><ref name=\"anyIRI\" /></attribute>" +
                 "<attribute name=\"draw:opacity\"><ref name=\"zeroToHundredPercent\" /></attribute>" +
@@ -299,6 +301,9 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfStyleName? StyleName", code);
             Assert.Contains("get => GetStyleNameAttributeValue(\"style-name\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetStyleNameAttributeValue(\"style-name\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", value.Value, \"table\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfStyleNameList? StyleNames", code);
+            Assert.Contains("get => GetStyleNameListAttributeValue(\"style-names\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetStyleNameListAttributeValue(\"style-names\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", value.Value, \"table\", GetDocumentVersion());", code);
             Assert.Contains("public OdfColor? FillColor", code);
             Assert.Contains("get => GetColorAttributeValue(\"fill-color\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetColorAttributeValue(\"fill-color\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);

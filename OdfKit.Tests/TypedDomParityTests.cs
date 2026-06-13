@@ -59,6 +59,7 @@ public class TypedDomParityTests
         int durationPropertyCount = Regex.Matches(generated, @"public OdfDuration\? \w+").Count;
         int anglePropertyCount = Regex.Matches(generated, @"public OdfAngle\? \w+").Count;
         int styleNamePropertyCount = Regex.Matches(generated, @"public OdfStyleName\? \w+").Count;
+        int styleNameListPropertyCount = Regex.Matches(generated, @"public OdfStyleNameList\? \w+").Count;
         int colorPropertyCount = Regex.Matches(generated, @"public OdfColor\? \w+").Count;
         int iriReferencePropertyCount = Regex.Matches(generated, @"public OdfIriReference\? \w+").Count;
         int percentPropertyCount = Regex.Matches(generated, @"public OdfPercent\? \w+").Count;
@@ -70,7 +71,7 @@ public class TypedDomParityTests
         int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
         int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
         int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + colorPropertyCount + iriReferencePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
+        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + styleNameListPropertyCount + colorPropertyCount + iriReferencePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -84,6 +85,7 @@ public class TypedDomParityTests
         Assert.True(durationPropertyCount >= 1000, "generated duration attribute property count regressed: " + durationPropertyCount);
         Assert.True(anglePropertyCount >= 1000, "generated angle attribute property count regressed: " + anglePropertyCount);
         Assert.True(styleNamePropertyCount >= 1000, "generated style name attribute property count regressed: " + styleNamePropertyCount);
+        Assert.True(styleNameListPropertyCount >= 300, "generated style name list attribute property count regressed: " + styleNameListPropertyCount);
         Assert.True(colorPropertyCount >= 1000, "generated color attribute property count regressed: " + colorPropertyCount);
         Assert.True(iriReferencePropertyCount >= 400, "generated IRI reference attribute property count regressed: " + iriReferencePropertyCount);
         Assert.True(percentPropertyCount >= 1000, "generated percent attribute property count regressed: " + percentPropertyCount);
@@ -124,6 +126,7 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["duration"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["angle"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["styleName"] >= 1000);
+        Assert.True(report.WrapperPropertyTypeCounts["styleNameList"] >= 300);
         Assert.True(report.WrapperPropertyTypeCounts["color"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["iriReference"] >= 400);
         Assert.True(report.WrapperPropertyTypeCounts["percent"] >= 1000);
@@ -146,6 +149,7 @@ public class TypedDomParityTests
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("duration").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("angle").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleName").GetInt32() >= 1000);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleNameList").GetInt32() >= 300);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("color").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("iriReference").GetInt32() >= 400);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("percent").GetInt32() >= 1000);
@@ -179,6 +183,7 @@ public class TypedDomParityTests
         cell.SetDurationAttributeValue("duration", OdfNamespaces.Presentation, new OdfDuration("PT1H30M"), OdfNamespaces.GetPrefix(OdfNamespaces.Presentation));
         cell.SetAngleAttributeValue("rotation-angle", OdfNamespaces.Style, OdfAngle.FromDegrees(45.5m), OdfNamespaces.GetPrefix(OdfNamespaces.Style));
         cell.SetStyleNameAttributeValue("style-name", OdfNamespaces.Table, new OdfStyleName("CellStyle1"), OdfNamespaces.GetPrefix(OdfNamespaces.Table));
+        cell.SetStyleNameListAttributeValue("style-names", OdfNamespaces.Table, new OdfStyleNameList([new OdfStyleName("CellStyle1"), new OdfStyleName("Accent2")]), OdfNamespaces.GetPrefix(OdfNamespaces.Table));
         cell.SetColorAttributeValue("fill-color", OdfNamespaces.Draw, OdfColor.FromRgb(255, 204, 0), OdfNamespaces.GetPrefix(OdfNamespaces.Draw));
         cell.SetIriReferenceAttributeValue("href", OdfNamespaces.XLink, new OdfIriReference("../Pictures/logo.svg#main"), OdfNamespaces.GetPrefix(OdfNamespaces.XLink));
         cell.SetPercentAttributeValue("opacity", OdfNamespaces.Draw, new OdfPercent("87.5%"), OdfNamespaces.GetPrefix(OdfNamespaces.Draw));
@@ -210,6 +215,9 @@ public class TypedDomParityTests
         Assert.Equal(45.5m, degrees);
         Assert.Equal(new OdfStyleName("CellStyle1"), cell.GetStyleNameAttributeValue("style-name", OdfNamespaces.Table));
         Assert.Equal("CellStyle1", cell.GetAttribute("style-name", OdfNamespaces.Table));
+        OdfStyleNameList? styleNameList = cell.GetStyleNameListAttributeValue("style-names", OdfNamespaces.Table);
+        Assert.Equal(2, styleNameList!.Value.StyleNames.Count);
+        Assert.Equal("Accent2", styleNameList.Value.StyleNames[1].Value);
         Assert.Equal(new OdfColor("#ffcc00"), cell.GetColorAttributeValue("fill-color", OdfNamespaces.Draw));
         Assert.Equal("#ffcc00", cell.GetAttribute("fill-color", OdfNamespaces.Draw));
         Assert.Equal(new OdfIriReference("../Pictures/logo.svg#main"), cell.GetIriReferenceAttributeValue("href", OdfNamespaces.XLink));
@@ -243,6 +251,10 @@ public class TypedDomParityTests
         Assert.Null(cell.GetAngleAttributeValue("rotation-angle", OdfNamespaces.Style));
         cell.SetAttribute("style-name", OdfNamespaces.Table, "invalid style");
         Assert.Null(cell.GetStyleNameAttributeValue("style-name", OdfNamespaces.Table));
+        cell.SetAttribute("style-names", OdfNamespaces.Table, "Valid invalid:name");
+        Assert.Null(cell.GetStyleNameListAttributeValue("style-names", OdfNamespaces.Table));
+        cell.SetAttribute("style-names", OdfNamespaces.Table, string.Empty);
+        Assert.Empty(cell.GetStyleNameListAttributeValue("style-names", OdfNamespaces.Table)!.Value.StyleNames);
         cell.SetAttribute("fill-color", OdfNamespaces.Draw, "#ff0");
         Assert.Null(cell.GetColorAttributeValue("fill-color", OdfNamespaces.Draw));
         cell.SetAttribute("href", OdfNamespaces.XLink, "bad\u0001iri");
