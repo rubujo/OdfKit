@@ -301,6 +301,8 @@ namespace OdfKit.Tests
                 "<attribute name=\"fo:font-weight\"><ref name=\"fontWeight\" /></attribute>" +
                 "<attribute name=\"style:font-family-generic\"><ref name=\"fontFamilyGeneric\" /></attribute>" +
                 "<attribute name=\"style:font-pitch\"><ref name=\"fontPitch\" /></attribute>" +
+                "<attribute name=\"style:font-relief\"><choice><value>none</value><value>embossed</value><value>engraved</value></choice></attribute>" +
+                "<attribute name=\"svg:font-stretch\"><choice><value>normal</value><value>condensed</value><value>expanded</value></choice></attribute>" +
                 "<attribute name=\"style:border-line-width\"><ref name=\"borderWidths\" /></attribute>" +
                 "<attribute name=\"draw:shape-id\"><ref name=\"IDREF\" /></attribute>" +
                 "<attribute name=\"draw:name-token\"><ref name=\"NCName\" /></attribute>" +
@@ -409,6 +411,10 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetFontFamilyGenericAttributeValue(\"font-family-generic\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfFontPitch? FontPitch", code);
             Assert.Contains("get => GetFontPitchAttributeValue(\"font-pitch\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFontRelief? FontRelief", code);
+            Assert.Contains("get => GetFontReliefAttributeValue(\"font-relief\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFontStretch? FontStretch", code);
+            Assert.Contains("get => GetFontStretchAttributeValue(\"font-stretch\", \"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfBorderWidths? BorderLineWidth", code);
             Assert.Contains("get => GetBorderWidthsAttributeValue(\"border-line-width\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfXmlName? ShapeId", code);

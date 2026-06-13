@@ -53,6 +53,78 @@ public enum OdfFontPitch
 }
 
 /// <summary>
+/// 表示 ODF schema 中 <c>style:font-relief</c> 的字型浮雕 token。
+/// </summary>
+public enum OdfFontRelief
+{
+    /// <summary>
+    /// 無字型浮雕效果。
+    /// </summary>
+    None,
+
+    /// <summary>
+    /// 凸起字型浮雕效果。
+    /// </summary>
+    Embossed,
+
+    /// <summary>
+    /// 雕刻字型浮雕效果。
+    /// </summary>
+    Engraved
+}
+
+/// <summary>
+/// 表示 ODF schema 中 <c>svg:font-stretch</c> 的字型伸縮 token。
+/// </summary>
+public enum OdfFontStretch
+{
+    /// <summary>
+    /// 一般字型伸縮。
+    /// </summary>
+    Normal,
+
+    /// <summary>
+    /// 超窄字型伸縮。
+    /// </summary>
+    UltraCondensed,
+
+    /// <summary>
+    /// 特窄字型伸縮。
+    /// </summary>
+    ExtraCondensed,
+
+    /// <summary>
+    /// 窄字型伸縮。
+    /// </summary>
+    Condensed,
+
+    /// <summary>
+    /// 半窄字型伸縮。
+    /// </summary>
+    SemiCondensed,
+
+    /// <summary>
+    /// 半寬字型伸縮。
+    /// </summary>
+    SemiExpanded,
+
+    /// <summary>
+    /// 寬字型伸縮。
+    /// </summary>
+    Expanded,
+
+    /// <summary>
+    /// 特寬字型伸縮。
+    /// </summary>
+    ExtraExpanded,
+
+    /// <summary>
+    /// 超寬字型伸縮。
+    /// </summary>
+    UltraExpanded
+}
+
+/// <summary>
 /// 表示 ODF schema 中名為 <c>fontStyle</c> 的字型樣式 token。
 /// </summary>
 public enum OdfFontStyle

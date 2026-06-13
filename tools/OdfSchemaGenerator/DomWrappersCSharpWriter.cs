@@ -291,6 +291,18 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.MediaType;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "font-relief")
+        {
+            return AttributeValueKind.FontRelief;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" &&
+            node.LocalName == "font-stretch")
+        {
+            return AttributeValueKind.FontStretch;
+        }
+
         AttributeValueKind valueKind = AttributeValueKind.Unknown;
         foreach (var child in node.Children)
         {
@@ -910,6 +922,24 @@ public sealed class DomWrappersCSharpWriter
                     "GetFontPitchAttributeValue",
                     "SetFontPitchAttributeValue");
                 break;
+            case AttributeValueKind.FontRelief:
+                writer.WriteLine($"        public OdfFontRelief? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFontReliefAttributeValue",
+                    "SetFontReliefAttributeValue");
+                break;
+            case AttributeValueKind.FontStretch:
+                writer.WriteLine($"        public OdfFontStretch? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFontStretchAttributeValue",
+                    "SetFontStretchAttributeValue");
+                break;
             case AttributeValueKind.XmlName:
                 writer.WriteLine($"        public OdfXmlName? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1114,6 +1144,8 @@ public sealed class DomWrappersCSharpWriter
         FontWeight,
         FontFamilyGeneric,
         FontPitch,
+        FontRelief,
+        FontStretch,
         XmlName,
         StyleFamily,
         OdfVersion,

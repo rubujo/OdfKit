@@ -1117,6 +1117,58 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的字型浮雕屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的字型浮雕；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfFontRelief? GetFontReliefAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseFontRelief(value, out OdfFontRelief relief) ? relief : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的字型浮雕屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的字型浮雕。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetFontReliefAttributeValue(string localName, string namespaceUri, OdfFontRelief value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatFontRelief(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的字型伸縮屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的字型伸縮；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfFontStretch? GetFontStretchAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseFontStretch(value, out OdfFontStretch stretch) ? stretch : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的字型伸縮屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的字型伸縮。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetFontStretchAttributeValue(string localName, string namespaceUri, OdfFontStretch value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatFontStretch(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -1483,6 +1535,90 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfFontPitch.Fixed => "fixed",
             OdfFontPitch.Variable => "variable",
             _ => throw new ArgumentOutOfRangeException(nameof(pitch), pitch, "未知的 ODF 字型間距。")
+        };
+    }
+
+    private static bool TryParseFontRelief(string? value, out OdfFontRelief relief)
+    {
+        switch (value)
+        {
+            case "none":
+                relief = OdfFontRelief.None;
+                return true;
+            case "embossed":
+                relief = OdfFontRelief.Embossed;
+                return true;
+            case "engraved":
+                relief = OdfFontRelief.Engraved;
+                return true;
+            default:
+                relief = default;
+                return false;
+        }
+    }
+
+    private static string FormatFontRelief(OdfFontRelief relief)
+    {
+        return relief switch
+        {
+            OdfFontRelief.None => "none",
+            OdfFontRelief.Embossed => "embossed",
+            OdfFontRelief.Engraved => "engraved",
+            _ => throw new ArgumentOutOfRangeException(nameof(relief), relief, "未知的 ODF 字型浮雕。")
+        };
+    }
+
+    private static bool TryParseFontStretch(string? value, out OdfFontStretch stretch)
+    {
+        switch (value)
+        {
+            case "normal":
+                stretch = OdfFontStretch.Normal;
+                return true;
+            case "ultra-condensed":
+                stretch = OdfFontStretch.UltraCondensed;
+                return true;
+            case "extra-condensed":
+                stretch = OdfFontStretch.ExtraCondensed;
+                return true;
+            case "condensed":
+                stretch = OdfFontStretch.Condensed;
+                return true;
+            case "semi-condensed":
+                stretch = OdfFontStretch.SemiCondensed;
+                return true;
+            case "semi-expanded":
+                stretch = OdfFontStretch.SemiExpanded;
+                return true;
+            case "expanded":
+                stretch = OdfFontStretch.Expanded;
+                return true;
+            case "extra-expanded":
+                stretch = OdfFontStretch.ExtraExpanded;
+                return true;
+            case "ultra-expanded":
+                stretch = OdfFontStretch.UltraExpanded;
+                return true;
+            default:
+                stretch = default;
+                return false;
+        }
+    }
+
+    private static string FormatFontStretch(OdfFontStretch stretch)
+    {
+        return stretch switch
+        {
+            OdfFontStretch.Normal => "normal",
+            OdfFontStretch.UltraCondensed => "ultra-condensed",
+            OdfFontStretch.ExtraCondensed => "extra-condensed",
+            OdfFontStretch.Condensed => "condensed",
+            OdfFontStretch.SemiCondensed => "semi-condensed",
+            OdfFontStretch.SemiExpanded => "semi-expanded",
+            OdfFontStretch.Expanded => "expanded",
+            OdfFontStretch.ExtraExpanded => "extra-expanded",
+            OdfFontStretch.UltraExpanded => "ultra-expanded",
+            _ => throw new ArgumentOutOfRangeException(nameof(stretch), stretch, "未知的 ODF 字型伸縮。")
         };
     }
 
