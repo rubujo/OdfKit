@@ -154,6 +154,13 @@ public class CliTests
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("dr3dShadeMode").GetInt32() >= 100);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("svgFillRule").GetInt32() >= 109);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableBorderModel").GetInt32() >= 99);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textLabelFollowedBy").GetInt32() >= 107);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textListLevelPositionMode").GetInt32() >= 106);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textIndexScope").GetInt32() >= 104);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textTableType").GetInt32() >= 103);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textAnchorType").GetInt32() >= 102);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textNoteClass").GetInt32() >= 101);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textSelectPage").GetInt32() >= 100);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineStyle").GetInt32() >= 534);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineType").GetInt32() >= 433);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineWidth").GetInt32() >= 433);

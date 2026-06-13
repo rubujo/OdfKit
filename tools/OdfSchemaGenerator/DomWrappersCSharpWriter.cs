@@ -363,6 +363,48 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.TableBorderModel;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "label-followed-by")
+        {
+            return AttributeValueKind.TextLabelFollowedBy;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "list-level-position-and-space-mode")
+        {
+            return AttributeValueKind.TextListLevelPositionMode;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "index-scope")
+        {
+            return AttributeValueKind.TextIndexScope;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "table-type")
+        {
+            return AttributeValueKind.TextTableType;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "anchor-type")
+        {
+            return AttributeValueKind.TextAnchorType;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "note-class")
+        {
+            return AttributeValueKind.TextNoteClass;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "select-page")
+        {
+            return AttributeValueKind.TextSelectPage;
+        }
+
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
             node.LocalName == "font-relief")
         {
@@ -913,6 +955,69 @@ public sealed class DomWrappersCSharpWriter
                     "GetTableBorderModelAttributeValue",
                     "SetTableBorderModelAttributeValue");
                 break;
+            case AttributeValueKind.TextLabelFollowedBy:
+                writer.WriteLine($"        public OdfTextLabelFollowedBy? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextLabelFollowedByAttributeValue",
+                    "SetTextLabelFollowedByAttributeValue");
+                break;
+            case AttributeValueKind.TextListLevelPositionMode:
+                writer.WriteLine($"        public OdfTextListLevelPositionMode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextListLevelPositionModeAttributeValue",
+                    "SetTextListLevelPositionModeAttributeValue");
+                break;
+            case AttributeValueKind.TextIndexScope:
+                writer.WriteLine($"        public OdfTextIndexScope? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextIndexScopeAttributeValue",
+                    "SetTextIndexScopeAttributeValue");
+                break;
+            case AttributeValueKind.TextTableType:
+                writer.WriteLine($"        public OdfTextTableType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextTableTypeAttributeValue",
+                    "SetTextTableTypeAttributeValue");
+                break;
+            case AttributeValueKind.TextAnchorType:
+                writer.WriteLine($"        public OdfTextAnchorType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextAnchorTypeAttributeValue",
+                    "SetTextAnchorTypeAttributeValue");
+                break;
+            case AttributeValueKind.TextNoteClass:
+                writer.WriteLine($"        public OdfTextNoteClass? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextNoteClassAttributeValue",
+                    "SetTextNoteClassAttributeValue");
+                break;
+            case AttributeValueKind.TextSelectPage:
+                writer.WriteLine($"        public OdfTextSelectPage? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextSelectPageAttributeValue",
+                    "SetTextSelectPageAttributeValue");
+                break;
             case AttributeValueKind.Percent:
                 writer.WriteLine($"        public OdfPercent? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1401,6 +1506,13 @@ public sealed class DomWrappersCSharpWriter
         Dr3dShadeMode,
         SvgFillRule,
         TableBorderModel,
+        TextLabelFollowedBy,
+        TextListLevelPositionMode,
+        TextIndexScope,
+        TextTableType,
+        TextAnchorType,
+        TextNoteClass,
+        TextSelectPage,
         Percent,
         SignedPercent,
         CellAddress,

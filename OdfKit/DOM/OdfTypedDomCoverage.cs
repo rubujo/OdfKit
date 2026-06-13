@@ -287,6 +287,41 @@ public static class OdfTypedDomCoverage
             return "tableBorderModel";
         }
 
+        if (resolvedType == typeof(OdfTextLabelFollowedBy))
+        {
+            return "textLabelFollowedBy";
+        }
+
+        if (resolvedType == typeof(OdfTextListLevelPositionMode))
+        {
+            return "textListLevelPositionMode";
+        }
+
+        if (resolvedType == typeof(OdfTextIndexScope))
+        {
+            return "textIndexScope";
+        }
+
+        if (resolvedType == typeof(OdfTextTableType))
+        {
+            return "textTableType";
+        }
+
+        if (resolvedType == typeof(OdfTextAnchorType))
+        {
+            return "textAnchorType";
+        }
+
+        if (resolvedType == typeof(OdfTextNoteClass))
+        {
+            return "textNoteClass";
+        }
+
+        if (resolvedType == typeof(OdfTextSelectPage))
+        {
+            return "textSelectPage";
+        }
+
         if (resolvedType == typeof(OdfLineStyle))
         {
             return "lineStyle";

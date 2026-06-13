@@ -288,6 +288,13 @@ namespace OdfKit.Tests
                 "<attribute name=\"dr3d:shade-mode\"><choice><value>draft</value><value>flat</value><value>gouraud</value><value>phong</value></choice></attribute>" +
                 "<attribute name=\"svg:fill-rule\"><choice><value>evenodd</value><value>nonzero</value></choice></attribute>" +
                 "<attribute name=\"table:border-model\"><choice><value>collapsing</value><value>separating</value></choice></attribute>" +
+                "<attribute name=\"text:label-followed-by\"><choice><value>listtab</value><value>nothing</value><value>space</value></choice></attribute>" +
+                "<attribute name=\"text:list-level-position-and-space-mode\"><choice><value>label-alignment</value><value>label-width-and-position</value></choice></attribute>" +
+                "<attribute name=\"text:index-scope\"><choice><value>chapter</value><value>document</value></choice></attribute>" +
+                "<attribute name=\"text:table-type\"><choice><value>command</value><value>query</value><value>table</value></choice></attribute>" +
+                "<attribute name=\"text:anchor-type\"><choice><value>as-char</value><value>char</value><value>frame</value><value>page</value><value>paragraph</value></choice></attribute>" +
+                "<attribute name=\"text:note-class\"><choice><value>endnote</value><value>footnote</value></choice></attribute>" +
+                "<attribute name=\"text:select-page\"><choice><value>current</value><value>next</value><value>previous</value></choice></attribute>" +
                 "<attribute name=\"draw:opacity\"><ref name=\"zeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"draw:shadow-offset\"><ref name=\"signedZeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"table:base-cell-address\"><ref name=\"cellAddress\" /></attribute>" +
@@ -394,6 +401,20 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetSvgFillRuleAttributeValue(\"fill-rule\", \"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfTableBorderModel? BorderModel", code);
             Assert.Contains("get => GetTableBorderModelAttributeValue(\"border-model\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextLabelFollowedBy? LabelFollowedBy", code);
+            Assert.Contains("get => GetTextLabelFollowedByAttributeValue(\"label-followed-by\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextListLevelPositionMode? ListLevelPositionAndSpaceMode", code);
+            Assert.Contains("get => GetTextListLevelPositionModeAttributeValue(\"list-level-position-and-space-mode\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextIndexScope? IndexScope", code);
+            Assert.Contains("get => GetTextIndexScopeAttributeValue(\"index-scope\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextTableType? TextTableType", code);
+            Assert.Contains("get => GetTextTableTypeAttributeValue(\"table-type\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextAnchorType? AnchorType", code);
+            Assert.Contains("get => GetTextAnchorTypeAttributeValue(\"anchor-type\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextNoteClass? NoteClass", code);
+            Assert.Contains("get => GetTextNoteClassAttributeValue(\"note-class\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextSelectPage? SelectPage", code);
+            Assert.Contains("get => GetTextSelectPageAttributeValue(\"select-page\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfPercent? Opacity", code);
             Assert.Contains("get => GetPercentAttributeValue(\"opacity\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetPercentAttributeValue(\"opacity\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
