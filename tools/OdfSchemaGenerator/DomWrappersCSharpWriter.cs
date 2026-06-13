@@ -410,7 +410,8 @@ public sealed class DomWrappersCSharpWriter
             "date" or "datetime" => AttributeValueKind.DateTime,
             "time" => AttributeValueKind.Time,
             "duration" => AttributeValueKind.Duration,
-            "string" or "normalizedstring" or "token" or "language" or "name" or "ncname" or "id" or "idref" or "anyuri" => AttributeValueKind.String,
+            "ncname" or "id" or "idref" => AttributeValueKind.XmlName,
+            "string" or "normalizedstring" or "token" or "language" or "name" or "anyuri" => AttributeValueKind.String,
             _ => AttributeValueKind.String
         };
     }
@@ -578,6 +579,15 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetVector3DAttributeValue",
                     "SetVector3DAttributeValue");
+                break;
+            case AttributeValueKind.XmlName:
+                writer.WriteLine($"        public OdfXmlName? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetXmlNameAttributeValue",
+                    "SetXmlNameAttributeValue");
                 break;
             case AttributeValueKind.StyleFamily:
                 writer.WriteLine($"        public OdfStyleFamily? {propName}");
@@ -752,6 +762,7 @@ public sealed class DomWrappersCSharpWriter
         CellAddress,
         CellRangeAddress,
         Vector3D,
+        XmlName,
         StyleFamily,
         OdfVersion,
         MediaType

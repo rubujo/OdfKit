@@ -233,6 +233,8 @@ namespace OdfKit.Tests
         {
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateGrammar(
                 "<define name=\"positive-integer\"><data type=\"positiveInteger\" /></define>" +
+                "<define name=\"IDREF\"><data type=\"IDREF\" /></define>" +
+                "<define name=\"NCName\"><data type=\"NCName\" /></define>" +
                 "<define name=\"boolean\"><choice><value>true</value><value>false</value></choice></define>" +
                 "<define name=\"styleNameRef\"><data type=\"NCName\" /></define>" +
                 "<define name=\"color\"><data type=\"string\"><param name=\"pattern\">#[0-9a-fA-F]{6}</param></data></define>" +
@@ -256,6 +258,8 @@ namespace OdfKit.Tests
                 "<attribute name=\"table:base-cell-address\"><ref name=\"cellAddress\" /></attribute>" +
                 "<attribute name=\"table:cell-range-address\"><ref name=\"cellRangeAddress\" /></attribute>" +
                 "<attribute name=\"draw:extrusion-direction\"><ref name=\"vector3D\" /></attribute>" +
+                "<attribute name=\"draw:shape-id\"><ref name=\"IDREF\" /></attribute>" +
+                "<attribute name=\"draw:name-token\"><ref name=\"NCName\" /></attribute>" +
                 "<attribute name=\"table:width\"><ref name=\"length\" /></attribute>" +
                 "<attribute name=\"table:scale\"><ref name=\"percent\" /></attribute>" +
                 "<attribute name=\"office:boolean-value\"><data type=\"boolean\" /></attribute>" +
@@ -314,6 +318,11 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfVector3D? ExtrusionDirection", code);
             Assert.Contains("get => GetVector3DAttributeValue(\"extrusion-direction\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetVector3DAttributeValue(\"extrusion-direction\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfXmlName? ShapeId", code);
+            Assert.Contains("get => GetXmlNameAttributeValue(\"shape-id\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetXmlNameAttributeValue(\"shape-id\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfXmlName? NameToken", code);
+            Assert.Contains("get => GetXmlNameAttributeValue(\"name-token\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public decimal? Value", code);
             Assert.Contains("get => GetDecimalAttributeValue(\"value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public DateTime? DateValue", code);

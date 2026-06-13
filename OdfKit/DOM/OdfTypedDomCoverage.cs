@@ -162,6 +162,11 @@ public static class OdfTypedDomCoverage
             return "vector3D";
         }
 
+        if (resolvedType == typeof(OdfXmlName))
+        {
+            return "xmlName";
+        }
+
         if (resolvedType == typeof(OdfStyleFamily))
         {
             return "styleFamily";
