@@ -54,6 +54,33 @@ public class DocumentKindApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證文件層格式摘要會回報主控文字文件種類。
+    /// </summary>
+    [Fact]
+    public void DocumentFormatSummaryReportsTextMasterKind()
+    {
+        using OdfDocument document = OdfDocument.Create(OdfDocumentKind.TextMaster);
+
+        Assert.Equal(OdfDocumentKind.TextMaster, document.DocumentKind);
+        Assert.Equal(OdfDocumentKind.Text, document.ContentKind);
+        Assert.False(document.IsTemplate);
+        Assert.True(document.IsMasterDocument);
+        Assert.False(document.IsFlatXml);
+        Assert.Equal(".odm", document.Format?.Extension);
+        Assert.True(OdfDocumentKindDetector.IsMasterKind(OdfDocumentKind.TextMaster));
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfDocument loaded = OdfDocument.Load(stream, "master.odm");
+        Assert.Equal(OdfDocumentKind.TextMaster, loaded.DocumentKind);
+        Assert.Equal(OdfDocumentKind.Text, loaded.ContentKind);
+        Assert.True(loaded.IsMasterDocument);
+        Assert.Equal(".odm", loaded.Format?.Extension);
+    }
+
+    /// <summary>
     /// 驗證 ODC 圖表可建立標題、圖例與序列佔位並 round-trip。
     /// </summary>
     [Fact]

@@ -71,6 +71,11 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
     public bool IsTemplate => OdfDocumentKindDetector.IsTemplateKind(DocumentKind);
 
     /// <summary>
+    /// 取得一個值，指出目前文件是否為 ODF 主控文件格式。
+    /// </summary>
+    public bool IsMasterDocument => OdfDocumentKindDetector.IsMasterKind(DocumentKind);
+
+    /// <summary>
     /// 取得一個值，指出目前文件是否為單一 XML (Flat XML) ODF 格式。
     /// </summary>
     public bool IsFlatXml => Package.IsFlatXml;

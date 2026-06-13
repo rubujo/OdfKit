@@ -272,4 +272,14 @@ public static class OdfDocumentKindDetector
             kind == OdfDocumentKind.PresentationTemplate ||
             kind == OdfDocumentKind.GraphicsTemplate;
     }
+
+    /// <summary>
+    /// 傳回指定的種類是否代表 ODF 主控文件。
+    /// </summary>
+    /// <param name="kind">ODF 文件種類。</param>
+    /// <returns>若是 ODF 主控文件種類則傳回 <see langword="true"/>；否則傳回 <see langword="false"/>。</returns>
+    public static bool IsMasterKind(OdfDocumentKind kind)
+    {
+        return kind == OdfDocumentKind.TextMaster;
+    }
 }

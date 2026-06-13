@@ -19,7 +19,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 |---|---|---|---|---|---|---|---|---|---|---|
 | `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | partial | `TextApiUsabilityTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | complete | complete | complete | complete | validated | complete | partial | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
-| `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `InteropCorpusTests` |
+| `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | complete | complete | complete | complete | validated | complete | partial | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.fodt` | `application/vnd.oasis.opendocument.text` | `FlatText` | complete | complete | complete | complete | validated | complete | package-level | `ComplianceTests`, `E2ETests`, `PackageRoundTripTests` |
 | `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | complete | complete | complete | complete | validated | complete | partial | `SpreadsheetApiUsabilityTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests`, `InteropCorpusTests` |
 | `.ots` | `application/vnd.oasis.opendocument.spreadsheet-template` | `SpreadsheetTemplate` | complete | complete | complete | complete | validated | complete | partial | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
@@ -42,6 +42,8 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - ODT、ODS、ODP、ODG 已有常用高階建立與編輯 API，但尚非完整辦公套件物件模型。
 - `.ott`、`.ots`、`.otp` 與 `.otg` 已可透過通用高階 factory 建立、
   載入、保存與 round-trip，並提供文件層格式摘要；完整範本專屬語意模型仍屬後續擴充。
+- `.odm` 已可透過通用高階 factory 建立、載入、保存與 round-trip，並提供
+  主控文件格式摘要；完整主控文件專屬語意模型仍屬後續擴充。
 - `.odc` 已有圖表類型、標題、圖例位置與序列摘要 API；`.odf` 已有 MathML 根節點與純文字摘要 API；`.odi` 已有主要影像路徑、媒體類型與大小摘要 API；`.odb` 已有連線參照與資料表摘要 API。完整圖表、MathML、影像與資料庫語意模型仍屬後續擴充。
 - 全格式最小 round-trip corpus 已由 `OdfFormatRoundTripTests` 覆蓋；後續仍需加入
   更接近真實文件的 corpus。
