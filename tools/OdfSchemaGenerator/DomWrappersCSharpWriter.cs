@@ -392,6 +392,30 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.PointList;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "languageCode", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.LanguageCode;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "countryCode", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.CountryCode;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "scriptCode", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.ScriptCode;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "language", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.LanguageTag;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -640,6 +664,42 @@ public sealed class DomWrappersCSharpWriter
                     "GetPointListAttributeValue",
                     "SetPointListAttributeValue");
                 break;
+            case AttributeValueKind.LanguageCode:
+                writer.WriteLine($"        public OdfLanguageCode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetLanguageCodeAttributeValue",
+                    "SetLanguageCodeAttributeValue");
+                break;
+            case AttributeValueKind.CountryCode:
+                writer.WriteLine($"        public OdfCountryCode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetCountryCodeAttributeValue",
+                    "SetCountryCodeAttributeValue");
+                break;
+            case AttributeValueKind.ScriptCode:
+                writer.WriteLine($"        public OdfScriptCode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetScriptCodeAttributeValue",
+                    "SetScriptCodeAttributeValue");
+                break;
+            case AttributeValueKind.LanguageTag:
+                writer.WriteLine($"        public OdfLanguageTag? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetLanguageTagAttributeValue",
+                    "SetLanguageTagAttributeValue");
+                break;
             case AttributeValueKind.XmlName:
                 writer.WriteLine($"        public OdfXmlName? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -826,6 +886,10 @@ public sealed class DomWrappersCSharpWriter
         Vector3D,
         Point3D,
         PointList,
+        LanguageCode,
+        CountryCode,
+        ScriptCode,
+        LanguageTag,
         XmlName,
         StyleFamily,
         OdfVersion,

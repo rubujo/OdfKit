@@ -182,6 +182,26 @@ public static class OdfTypedDomCoverage
             return "pointList";
         }
 
+        if (resolvedType == typeof(OdfLanguageCode))
+        {
+            return "languageCode";
+        }
+
+        if (resolvedType == typeof(OdfCountryCode))
+        {
+            return "countryCode";
+        }
+
+        if (resolvedType == typeof(OdfScriptCode))
+        {
+            return "scriptCode";
+        }
+
+        if (resolvedType == typeof(OdfLanguageTag))
+        {
+            return "languageTag";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";

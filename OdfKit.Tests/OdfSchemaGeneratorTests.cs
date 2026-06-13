@@ -248,6 +248,10 @@ namespace OdfKit.Tests
                 "<define name=\"vector3D\"><data type=\"string\"><param name=\"pattern\">\\([ ]*-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([ ]+-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)){2}[ ]*\\)</param></data></define>" +
                 "<define name=\"point3D\"><data type=\"string\"><param name=\"pattern\">\\([ ]*-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)((cm)|(mm)|(in)|(pt)|(pc))([ ]+-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)((cm)|(mm)|(in)|(pt)|(pc))){2}[ ]*\\)</param></data></define>" +
                 "<define name=\"points\"><data type=\"string\"><param name=\"pattern\">-?[0-9]+,-?[0-9]+([ ]+-?[0-9]+,-?[0-9]+)*</param></data></define>" +
+                "<define name=\"languageCode\"><data type=\"token\"><param name=\"pattern\">[A-Za-z]{1,8}</param></data></define>" +
+                "<define name=\"countryCode\"><data type=\"token\"><param name=\"pattern\">[A-Za-z0-9]{1,8}</param></data></define>" +
+                "<define name=\"scriptCode\"><data type=\"token\"><param name=\"pattern\">[A-Za-z0-9]{1,8}</param></data></define>" +
+                "<define name=\"language\"><data type=\"language\" /></define>" +
                 "<define name=\"length\"><data type=\"string\"><param name=\"pattern\">[0-9]+cm</param></data></define>" +
                 "<define name=\"percent\"><data type=\"string\"><param name=\"pattern\">[0-9]+%</param></data></define>" +
                 "<define name=\"angle\"><data type=\"string\" /></define>" +
@@ -266,6 +270,10 @@ namespace OdfKit.Tests
                 "<attribute name=\"draw:extrusion-direction\"><ref name=\"vector3D\" /></attribute>" +
                 "<attribute name=\"draw:extrusion-viewpoint\"><ref name=\"point3D\" /></attribute>" +
                 "<attribute name=\"draw:points\"><ref name=\"points\" /></attribute>" +
+                "<attribute name=\"fo:language\"><ref name=\"languageCode\" /></attribute>" +
+                "<attribute name=\"fo:country\"><ref name=\"countryCode\" /></attribute>" +
+                "<attribute name=\"fo:script\"><ref name=\"scriptCode\" /></attribute>" +
+                "<attribute name=\"table:rfc-language-tag\"><ref name=\"language\" /></attribute>" +
                 "<attribute name=\"draw:shape-id\"><ref name=\"IDREF\" /></attribute>" +
                 "<attribute name=\"draw:name-token\"><ref name=\"NCName\" /></attribute>" +
                 "<attribute name=\"table:width\"><ref name=\"length\" /></attribute>" +
@@ -338,6 +346,14 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfPointList? Points", code);
             Assert.Contains("get => GetPointListAttributeValue(\"points\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetPointListAttributeValue(\"points\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfLanguageCode? Language", code);
+            Assert.Contains("get => GetLanguageCodeAttributeValue(\"language\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfCountryCode? Country", code);
+            Assert.Contains("get => GetCountryCodeAttributeValue(\"country\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfScriptCode? Script", code);
+            Assert.Contains("get => GetScriptCodeAttributeValue(\"script\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfLanguageTag? RfcLanguageTag", code);
+            Assert.Contains("get => GetLanguageTagAttributeValue(\"rfc-language-tag\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfXmlName? ShapeId", code);
             Assert.Contains("get => GetXmlNameAttributeValue(\"shape-id\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetXmlNameAttributeValue(\"shape-id\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
