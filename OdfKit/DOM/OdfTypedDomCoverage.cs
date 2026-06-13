@@ -207,6 +207,11 @@ public static class OdfTypedDomCoverage
             return "namespacedToken";
         }
 
+        if (resolvedType == typeof(OdfCharacter))
+        {
+            return "character";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";
