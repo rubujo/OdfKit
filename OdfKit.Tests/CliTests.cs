@@ -156,6 +156,7 @@ public class CliTests
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkShow").GetInt32() >= 160);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkActuate").GetInt32() >= 167);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberStyle").GetInt32() >= 109);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberCalendar").GetInt32() >= 106);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableOrder").GetInt32() >= 108);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableType").GetInt32() >= 102);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationEffect").GetInt32() >= 131);
@@ -181,7 +182,17 @@ public class CliTests
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleWritingMode").GetInt32() >= 104);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableDisplayMemberMode").GetInt32() >= 103);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableLayoutMode").GetInt32() >= 103);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableMemberType").GetInt32() >= 102);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableGroupedBy").GetInt32() >= 102);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableSortMode").GetInt32() >= 103);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableConditionSource").GetInt32() >= 103);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableFunction").GetInt32() >= 109);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("databaseRule").GetInt32() >= 206);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("databaseIsNullable").GetInt32() >= 103);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("databaseDataSourceSettingType").GetInt32() >= 102);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("animationColorInterpolation").GetInt32() >= 102);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("animationColorInterpolationDirection").GetInt32() >= 102);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawNoHref").GetInt32() >= 102);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationPresetClass").GetInt32() >= 103);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberTransliterationStyle").GetInt32() >= 105);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleScriptType").GetInt32() >= 111);

@@ -554,6 +554,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.NumberStyle;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" &&
+            node.LocalName == "calendar")
+        {
+            return AttributeValueKind.NumberCalendar;
+        }
+
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
             node.LocalName == "order")
         {
@@ -710,10 +716,70 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.TableLayoutMode;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "member-type")
+        {
+            return AttributeValueKind.TableMemberType;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "grouped-by")
+        {
+            return AttributeValueKind.TableGroupedBy;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "sort-mode")
+        {
+            return AttributeValueKind.TableSortMode;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "condition-source")
+        {
+            return AttributeValueKind.TableConditionSource;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "function")
+        {
+            return AttributeValueKind.TableFunction;
+        }
+
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:database:1.0" &&
             (node.LocalName == "delete-rule" || node.LocalName == "update-rule"))
         {
             return AttributeValueKind.DatabaseRule;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:database:1.0" &&
+            node.LocalName == "is-nullable")
+        {
+            return AttributeValueKind.DatabaseIsNullable;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:database:1.0" &&
+            node.LocalName == "data-source-setting-type")
+        {
+            return AttributeValueKind.DatabaseDataSourceSettingType;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:animation:1.0" &&
+            node.LocalName == "color-interpolation")
+        {
+            return AttributeValueKind.AnimationColorInterpolation;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:animation:1.0" &&
+            node.LocalName == "color-interpolation-direction")
+        {
+            return AttributeValueKind.AnimationColorInterpolationDirection;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" &&
+            node.LocalName == "nohref")
+        {
+            return AttributeValueKind.DrawNoHref;
         }
 
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" &&
@@ -1362,6 +1428,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetNumberStyleAttributeValue",
                     "SetNumberStyleAttributeValue");
                 break;
+            case AttributeValueKind.NumberCalendar:
+                writer.WriteLine($"        public OdfNumberCalendar? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetNumberCalendarAttributeValue",
+                    "SetNumberCalendarAttributeValue");
+                break;
             case AttributeValueKind.TableOrder:
                 writer.WriteLine($"        public OdfTableOrder? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1596,6 +1671,51 @@ public sealed class DomWrappersCSharpWriter
                     "GetTableLayoutModeAttributeValue",
                     "SetTableLayoutModeAttributeValue");
                 break;
+            case AttributeValueKind.TableMemberType:
+                writer.WriteLine($"        public OdfTableMemberType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableMemberTypeAttributeValue",
+                    "SetTableMemberTypeAttributeValue");
+                break;
+            case AttributeValueKind.TableGroupedBy:
+                writer.WriteLine($"        public OdfTableGroupedBy? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableGroupedByAttributeValue",
+                    "SetTableGroupedByAttributeValue");
+                break;
+            case AttributeValueKind.TableSortMode:
+                writer.WriteLine($"        public OdfTableSortMode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableSortModeAttributeValue",
+                    "SetTableSortModeAttributeValue");
+                break;
+            case AttributeValueKind.TableConditionSource:
+                writer.WriteLine($"        public OdfTableConditionSource? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableConditionSourceAttributeValue",
+                    "SetTableConditionSourceAttributeValue");
+                break;
+            case AttributeValueKind.TableFunction:
+                writer.WriteLine($"        public OdfTableFunction? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableFunctionAttributeValue",
+                    "SetTableFunctionAttributeValue");
+                break;
             case AttributeValueKind.DatabaseRule:
                 writer.WriteLine($"        public OdfDatabaseRule? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1604,6 +1724,51 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetDatabaseRuleAttributeValue",
                     "SetDatabaseRuleAttributeValue");
+                break;
+            case AttributeValueKind.DatabaseIsNullable:
+                writer.WriteLine($"        public OdfDatabaseIsNullable? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDatabaseIsNullableAttributeValue",
+                    "SetDatabaseIsNullableAttributeValue");
+                break;
+            case AttributeValueKind.DatabaseDataSourceSettingType:
+                writer.WriteLine($"        public OdfDatabaseDataSourceSettingType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDatabaseDataSourceSettingTypeAttributeValue",
+                    "SetDatabaseDataSourceSettingTypeAttributeValue");
+                break;
+            case AttributeValueKind.AnimationColorInterpolation:
+                writer.WriteLine($"        public OdfAnimationColorInterpolation? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetAnimationColorInterpolationAttributeValue",
+                    "SetAnimationColorInterpolationAttributeValue");
+                break;
+            case AttributeValueKind.AnimationColorInterpolationDirection:
+                writer.WriteLine($"        public OdfAnimationColorInterpolationDirection? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetAnimationColorInterpolationDirectionAttributeValue",
+                    "SetAnimationColorInterpolationDirectionAttributeValue");
+                break;
+            case AttributeValueKind.DrawNoHref:
+                writer.WriteLine($"        public OdfDrawNoHref? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDrawNoHrefAttributeValue",
+                    "SetDrawNoHrefAttributeValue");
                 break;
             case AttributeValueKind.PresentationPresetClass:
                 writer.WriteLine($"        public OdfPresentationPresetClass? {propName}");
@@ -2343,6 +2508,7 @@ public sealed class DomWrappersCSharpWriter
         XLinkShow,
         XLinkActuate,
         NumberStyle,
+        NumberCalendar,
         TableOrder,
         TableType,
         PresentationEffect,
@@ -2369,7 +2535,17 @@ public sealed class DomWrappersCSharpWriter
         StyleWritingMode,
         TableDisplayMemberMode,
         TableLayoutMode,
+        TableMemberType,
+        TableGroupedBy,
+        TableSortMode,
+        TableConditionSource,
+        TableFunction,
         DatabaseRule,
+        DatabaseIsNullable,
+        DatabaseDataSourceSettingType,
+        AnimationColorInterpolation,
+        AnimationColorInterpolationDirection,
+        DrawNoHref,
         PresentationPresetClass,
         NumberTransliterationStyle,
         StyleScriptType,

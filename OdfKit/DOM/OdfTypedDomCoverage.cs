@@ -390,6 +390,11 @@ public static class OdfTypedDomCoverage
             return "numberStyle";
         }
 
+        if (resolvedType == typeof(OdfNumberCalendar))
+        {
+            return "numberCalendar";
+        }
+
         if (resolvedType == typeof(OdfTableOrder))
         {
             return "tableOrder";
@@ -520,9 +525,59 @@ public static class OdfTypedDomCoverage
             return "tableLayoutMode";
         }
 
+        if (resolvedType == typeof(OdfTableMemberType))
+        {
+            return "tableMemberType";
+        }
+
+        if (resolvedType == typeof(OdfTableGroupedBy))
+        {
+            return "tableGroupedBy";
+        }
+
+        if (resolvedType == typeof(OdfTableSortMode))
+        {
+            return "tableSortMode";
+        }
+
+        if (resolvedType == typeof(OdfTableConditionSource))
+        {
+            return "tableConditionSource";
+        }
+
+        if (resolvedType == typeof(OdfTableFunction))
+        {
+            return "tableFunction";
+        }
+
         if (resolvedType == typeof(OdfDatabaseRule))
         {
             return "databaseRule";
+        }
+
+        if (resolvedType == typeof(OdfDatabaseIsNullable))
+        {
+            return "databaseIsNullable";
+        }
+
+        if (resolvedType == typeof(OdfDatabaseDataSourceSettingType))
+        {
+            return "databaseDataSourceSettingType";
+        }
+
+        if (resolvedType == typeof(OdfAnimationColorInterpolation))
+        {
+            return "animationColorInterpolation";
+        }
+
+        if (resolvedType == typeof(OdfAnimationColorInterpolationDirection))
+        {
+            return "animationColorInterpolationDirection";
+        }
+
+        if (resolvedType == typeof(OdfDrawNoHref))
+        {
+            return "drawNoHref";
         }
 
         if (resolvedType == typeof(OdfPresentationPresetClass))

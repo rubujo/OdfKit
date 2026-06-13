@@ -280,6 +280,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"xlink:show\"><choice><value>embed</value><value>new</value><value>none</value><value>replace</value></choice></attribute>" +
                 "<attribute name=\"xlink:actuate\"><choice><value>onLoad</value><value>onRequest</value></choice></attribute>" +
                 "<attribute name=\"number:style\"><choice><value>short</value><value>long</value></choice></attribute>" +
+                "<attribute name=\"number:calendar\"><choice><value>gregorian</value><value>ROC</value></choice></attribute>" +
                 "<attribute name=\"table:order\"><choice><value>ascending</value><value>descending</value></choice></attribute>" +
                 "<attribute name=\"table:type\"><choice><value>column</value><value>row</value><value>table</value><value>running-total</value></choice></attribute>" +
                 "<attribute name=\"presentation:effect\"><choice><value>none</value><value>move-short</value></choice></attribute>" +
@@ -305,7 +306,17 @@ namespace OdfKit.Tests
                 "<attribute name=\"style:writing-mode\"><choice><value>lr-tb</value><value>sideways-rl</value></choice></attribute>" +
                 "<attribute name=\"table:display-member-mode\"><choice><value>from-bottom</value><value>from-top</value></choice></attribute>" +
                 "<attribute name=\"table:layout-mode\"><choice><value>outline-subtotals-bottom</value><value>tabular-layout</value></choice></attribute>" +
+                "<attribute name=\"table:member-type\"><choice><value>named</value><value>previous</value></choice></attribute>" +
+                "<attribute name=\"table:grouped-by\"><choice><value>months</value><value>quarters</value></choice></attribute>" +
+                "<attribute name=\"table:sort-mode\"><choice><value>data</value><value>manual</value></choice></attribute>" +
+                "<attribute name=\"table:condition-source\"><choice><value>cell-range</value><value>self</value></choice></attribute>" +
+                "<attribute name=\"table:function\"><choice><value>sum</value><value>stdevp</value></choice></attribute>" +
                 "<attribute name=\"db:delete-rule\"><choice><value>cascade</value><value>set-null</value></choice></attribute>" +
+                "<attribute name=\"db:is-nullable\"><choice><value>no-nulls</value><value>nullable</value></choice></attribute>" +
+                "<attribute name=\"db:data-source-setting-type\"><choice><value>boolean</value><value>string</value></choice></attribute>" +
+                "<attribute name=\"anim:color-interpolation\"><choice><value>hsl</value><value>rgb</value></choice></attribute>" +
+                "<attribute name=\"anim:color-interpolation-direction\"><choice><value>clockwise</value><value>counter-clockwise</value></choice></attribute>" +
+                "<attribute name=\"draw:nohref\"><value>nohref</value></attribute>" +
                 "<attribute name=\"presentation:preset-class\"><choice><value>custom</value><value>motion-path</value></choice></attribute>" +
                 "<attribute name=\"number:transliteration-style\"><choice><value>long</value><value>medium</value><value>short</value></choice></attribute>" +
                 "<attribute name=\"style:script-type\"><choice><value>asian</value><value>complex</value></choice></attribute>" +
@@ -427,6 +438,8 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetXLinkActuateAttributeValue(\"actuate\", \"http://www.w3.org/1999/xlink\", GetDocumentVersion());", code);
             Assert.Contains("public OdfNumberStyle? Style", code);
             Assert.Contains("get => GetNumberStyleAttributeValue(\"style\", \"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfNumberCalendar? Calendar", code);
+            Assert.Contains("get => GetNumberCalendarAttributeValue(\"calendar\", \"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfTableOrder? Order", code);
             Assert.Contains("get => GetTableOrderAttributeValue(\"order\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfTableType? TableType", code);
@@ -477,9 +490,30 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetTableDisplayMemberModeAttributeValue(\"display-member-mode\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfTableLayoutMode? LayoutMode", code);
             Assert.Contains("get => GetTableLayoutModeAttributeValue(\"layout-mode\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableMemberType? MemberType", code);
+            Assert.Contains("get => GetTableMemberTypeAttributeValue(\"member-type\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableGroupedBy? GroupedBy", code);
+            Assert.Contains("get => GetTableGroupedByAttributeValue(\"grouped-by\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableSortMode? SortMode", code);
+            Assert.Contains("get => GetTableSortModeAttributeValue(\"sort-mode\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableConditionSource? ConditionSource", code);
+            Assert.Contains("get => GetTableConditionSourceAttributeValue(\"condition-source\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableFunction? Function", code);
+            Assert.Contains("get => GetTableFunctionAttributeValue(\"function\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfDatabaseRule? DeleteRule", code);
             Assert.Contains("get => GetDatabaseRuleAttributeValue(\"delete-rule\", \"urn:oasis:names:tc:opendocument:xmlns:database:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetDatabaseRuleAttributeValue(\"delete-rule\", \"urn:oasis:names:tc:opendocument:xmlns:database:1.0\", value.Value, \"ns\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfDatabaseIsNullable? IsNullable", code);
+            Assert.Contains("get => GetDatabaseIsNullableAttributeValue(\"is-nullable\", \"urn:oasis:names:tc:opendocument:xmlns:database:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfDatabaseDataSourceSettingType? DataSourceSettingType", code);
+            Assert.Contains("get => GetDatabaseDataSourceSettingTypeAttributeValue(\"data-source-setting-type\", \"urn:oasis:names:tc:opendocument:xmlns:database:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfAnimationColorInterpolation? ColorInterpolation", code);
+            Assert.Contains("get => GetAnimationColorInterpolationAttributeValue(\"color-interpolation\", \"urn:oasis:names:tc:opendocument:xmlns:animation:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetAnimationColorInterpolationAttributeValue(\"color-interpolation\", \"urn:oasis:names:tc:opendocument:xmlns:animation:1.0\", value.Value, \"ns\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfAnimationColorInterpolationDirection? ColorInterpolationDirection", code);
+            Assert.Contains("get => GetAnimationColorInterpolationDirectionAttributeValue(\"color-interpolation-direction\", \"urn:oasis:names:tc:opendocument:xmlns:animation:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfDrawNoHref? Nohref", code);
+            Assert.Contains("get => GetDrawNoHrefAttributeValue(\"nohref\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfPresentationPresetClass? PresetClass", code);
             Assert.Contains("get => GetPresentationPresetClassAttributeValue(\"preset-class\", \"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfNumberTransliterationStyle? TransliterationStyle", code);
@@ -1013,6 +1047,7 @@ namespace OdfKit.Tests
                 " xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\"" +
                 " xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\"" +
                 " xmlns:db=\"urn:oasis:names:tc:opendocument:xmlns:database:1.0\"" +
+                " xmlns:anim=\"urn:oasis:names:tc:opendocument:xmlns:animation:1.0\"" +
                 " xmlns:xlink=\"http://www.w3.org/1999/xlink\"" +
                 " xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\"" +
                 " xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\"" +
