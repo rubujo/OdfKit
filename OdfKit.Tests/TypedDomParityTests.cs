@@ -84,6 +84,12 @@ public class TypedDomParityTests
         int numberStylePropertyCount = Regex.Matches(generated, @"public OdfNumberStyle\? \w+").Count;
         int tableOrderPropertyCount = Regex.Matches(generated, @"public OdfTableOrder\? \w+").Count;
         int tableTypePropertyCount = Regex.Matches(generated, @"public OdfTableType\? \w+").Count;
+        int foKeepTogetherPropertyCount = Regex.Matches(generated, @"public OdfFoKeepTogether\? \w+").Count;
+        int foWrapOptionPropertyCount = Regex.Matches(generated, @"public OdfFoWrapOption\? \w+").Count;
+        int dr3dProjectionPropertyCount = Regex.Matches(generated, @"public OdfDr3dProjection\? \w+").Count;
+        int dr3dShadeModePropertyCount = Regex.Matches(generated, @"public OdfDr3dShadeMode\? \w+").Count;
+        int svgFillRulePropertyCount = Regex.Matches(generated, @"public OdfSvgFillRule\? \w+").Count;
+        int tableBorderModelPropertyCount = Regex.Matches(generated, @"public OdfTableBorderModel\? \w+").Count;
         int lineStylePropertyCount = Regex.Matches(generated, @"public OdfLineStyle\? \w+").Count;
         int lineTypePropertyCount = Regex.Matches(generated, @"public OdfLineType\? \w+").Count;
         int lineWidthPropertyCount = Regex.Matches(generated, @"public OdfLineWidth\? \w+").Count;
@@ -105,7 +111,7 @@ public class TypedDomParityTests
         int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
         int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
         int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + borderWidthsPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + styleNameListPropertyCount + colorPropertyCount + iriReferencePropertyCount + xLinkTypePropertyCount + xLinkShowPropertyCount + xLinkActuatePropertyCount + numberStylePropertyCount + tableOrderPropertyCount + tableTypePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + point3DPropertyCount + pointListPropertyCount + languageCodePropertyCount + countryCodePropertyCount + scriptCodePropertyCount + languageTagPropertyCount + namespacedTokenPropertyCount + characterPropertyCount + textEncodingPropertyCount + targetFrameNamePropertyCount + lineStylePropertyCount + lineTypePropertyCount + lineWidthPropertyCount + lineModePropertyCount + fontStylePropertyCount + fontVariantPropertyCount + fontWeightPropertyCount + fontFamilyGenericPropertyCount + fontPitchPropertyCount + fontReliefPropertyCount + fontStretchPropertyCount + styleLineBreakPropertyCount + styleRepeatPropertyCount + styleDirectionPropertyCount + formOrientationPropertyCount + tableDirectionPropertyCount + tableOrientationPropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
+        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + borderWidthsPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + styleNameListPropertyCount + colorPropertyCount + iriReferencePropertyCount + xLinkTypePropertyCount + xLinkShowPropertyCount + xLinkActuatePropertyCount + numberStylePropertyCount + tableOrderPropertyCount + tableTypePropertyCount + foKeepTogetherPropertyCount + foWrapOptionPropertyCount + dr3dProjectionPropertyCount + dr3dShadeModePropertyCount + svgFillRulePropertyCount + tableBorderModelPropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + point3DPropertyCount + pointListPropertyCount + languageCodePropertyCount + countryCodePropertyCount + scriptCodePropertyCount + languageTagPropertyCount + namespacedTokenPropertyCount + characterPropertyCount + textEncodingPropertyCount + targetFrameNamePropertyCount + lineStylePropertyCount + lineTypePropertyCount + lineWidthPropertyCount + lineModePropertyCount + fontStylePropertyCount + fontVariantPropertyCount + fontWeightPropertyCount + fontFamilyGenericPropertyCount + fontPitchPropertyCount + fontReliefPropertyCount + fontStretchPropertyCount + styleLineBreakPropertyCount + styleRepeatPropertyCount + styleDirectionPropertyCount + formOrientationPropertyCount + tableDirectionPropertyCount + tableOrientationPropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -144,6 +150,12 @@ public class TypedDomParityTests
         Assert.True(numberStylePropertyCount >= 109, "generated number style attribute property count regressed: " + numberStylePropertyCount);
         Assert.True(tableOrderPropertyCount >= 108, "generated table order attribute property count regressed: " + tableOrderPropertyCount);
         Assert.True(tableTypePropertyCount >= 102, "generated table type attribute property count regressed: " + tableTypePropertyCount);
+        Assert.True(foKeepTogetherPropertyCount >= 99, "generated FO keep-together attribute property count regressed: " + foKeepTogetherPropertyCount);
+        Assert.True(foWrapOptionPropertyCount >= 100, "generated FO wrap option attribute property count regressed: " + foWrapOptionPropertyCount);
+        Assert.True(dr3dProjectionPropertyCount >= 100, "generated 3D projection attribute property count regressed: " + dr3dProjectionPropertyCount);
+        Assert.True(dr3dShadeModePropertyCount >= 100, "generated 3D shade mode attribute property count regressed: " + dr3dShadeModePropertyCount);
+        Assert.True(svgFillRulePropertyCount >= 109, "generated SVG fill rule attribute property count regressed: " + svgFillRulePropertyCount);
+        Assert.True(tableBorderModelPropertyCount >= 99, "generated table border model attribute property count regressed: " + tableBorderModelPropertyCount);
         Assert.True(lineStylePropertyCount >= 534, "generated line style attribute property count regressed: " + lineStylePropertyCount);
         Assert.True(lineTypePropertyCount >= 433, "generated line type attribute property count regressed: " + lineTypePropertyCount);
         Assert.True(lineWidthPropertyCount >= 433, "generated line width attribute property count regressed: " + lineWidthPropertyCount);
@@ -219,6 +231,12 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["numberStyle"] >= 109);
         Assert.True(report.WrapperPropertyTypeCounts["tableOrder"] >= 108);
         Assert.True(report.WrapperPropertyTypeCounts["tableType"] >= 102);
+        Assert.True(report.WrapperPropertyTypeCounts["foKeepTogether"] >= 99);
+        Assert.True(report.WrapperPropertyTypeCounts["foWrapOption"] >= 100);
+        Assert.True(report.WrapperPropertyTypeCounts["dr3dProjection"] >= 100);
+        Assert.True(report.WrapperPropertyTypeCounts["dr3dShadeMode"] >= 100);
+        Assert.True(report.WrapperPropertyTypeCounts["svgFillRule"] >= 109);
+        Assert.True(report.WrapperPropertyTypeCounts["tableBorderModel"] >= 99);
         Assert.True(report.WrapperPropertyTypeCounts["lineStyle"] >= 534);
         Assert.True(report.WrapperPropertyTypeCounts["lineType"] >= 433);
         Assert.True(report.WrapperPropertyTypeCounts["lineWidth"] >= 433);
@@ -276,6 +294,12 @@ public class TypedDomParityTests
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberStyle").GetInt32() >= 109);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableOrder").GetInt32() >= 108);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableType").GetInt32() >= 102);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foKeepTogether").GetInt32() >= 99);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foWrapOption").GetInt32() >= 100);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("dr3dProjection").GetInt32() >= 100);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("dr3dShadeMode").GetInt32() >= 100);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("svgFillRule").GetInt32() >= 109);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableBorderModel").GetInt32() >= 99);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineStyle").GetInt32() >= 534);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineType").GetInt32() >= 433);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineWidth").GetInt32() >= 433);
@@ -308,6 +332,7 @@ public class TypedDomParityTests
     {
         TableTableCellElement cell = new("table");
         const string formNamespace = "urn:oasis:names:tc:opendocument:xmlns:form:1.0";
+        const string dr3dNamespace = "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0";
         DateTime utc = new(2026, 6, 13, 9, 30, 0, DateTimeKind.Utc);
         DateTime local = new(2026, 6, 13, 17, 30, 0, DateTimeKind.Unspecified);
 
@@ -355,6 +380,12 @@ public class TypedDomParityTests
         cell.SetNumberStyleAttributeValue("style", OdfNamespaces.Number, OdfNumberStyle.Long, OdfNamespaces.GetPrefix(OdfNamespaces.Number));
         cell.SetTableOrderAttributeValue("order", OdfNamespaces.Table, OdfTableOrder.Descending, OdfNamespaces.GetPrefix(OdfNamespaces.Table));
         cell.SetTableTypeAttributeValue("type", OdfNamespaces.Table, OdfTableType.RunningTotal, OdfNamespaces.GetPrefix(OdfNamespaces.Table));
+        cell.SetFoKeepTogetherAttributeValue("keep-together", OdfNamespaces.Fo, OdfFoKeepTogether.Always, OdfNamespaces.GetPrefix(OdfNamespaces.Fo));
+        cell.SetFoWrapOptionAttributeValue("wrap-option", OdfNamespaces.Fo, OdfFoWrapOption.NoWrap, OdfNamespaces.GetPrefix(OdfNamespaces.Fo));
+        cell.SetDr3dProjectionAttributeValue("projection", dr3dNamespace, OdfDr3dProjection.Perspective, "dr3d");
+        cell.SetDr3dShadeModeAttributeValue("shade-mode", dr3dNamespace, OdfDr3dShadeMode.Phong, "dr3d");
+        cell.SetSvgFillRuleAttributeValue("fill-rule", OdfNamespaces.Svg, OdfSvgFillRule.EvenOdd, OdfNamespaces.GetPrefix(OdfNamespaces.Svg));
+        cell.SetTableBorderModelAttributeValue("border-model", OdfNamespaces.Table, OdfTableBorderModel.Collapsing, OdfNamespaces.GetPrefix(OdfNamespaces.Table));
         cell.SetLineStyleAttributeValue("text-underline-style", OdfNamespaces.Style, OdfLineStyle.LongDash, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
         cell.SetLineTypeAttributeValue("text-underline-type", OdfNamespaces.Style, OdfLineType.Double, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
         cell.SetLineWidthAttributeValue("text-underline-width", OdfNamespaces.Style, new OdfLineWidth("150%"), OdfNamespaces.GetPrefix(OdfNamespaces.Style));
@@ -442,6 +473,18 @@ public class TypedDomParityTests
         Assert.Equal("descending", cell.GetAttribute("order", OdfNamespaces.Table));
         Assert.Equal(OdfTableType.RunningTotal, cell.GetTableTypeAttributeValue("type", OdfNamespaces.Table));
         Assert.Equal("running-total", cell.GetAttribute("type", OdfNamespaces.Table));
+        Assert.Equal(OdfFoKeepTogether.Always, cell.GetFoKeepTogetherAttributeValue("keep-together", OdfNamespaces.Fo));
+        Assert.Equal("always", cell.GetAttribute("keep-together", OdfNamespaces.Fo));
+        Assert.Equal(OdfFoWrapOption.NoWrap, cell.GetFoWrapOptionAttributeValue("wrap-option", OdfNamespaces.Fo));
+        Assert.Equal("no-wrap", cell.GetAttribute("wrap-option", OdfNamespaces.Fo));
+        Assert.Equal(OdfDr3dProjection.Perspective, cell.GetDr3dProjectionAttributeValue("projection", dr3dNamespace));
+        Assert.Equal("perspective", cell.GetAttribute("projection", dr3dNamespace));
+        Assert.Equal(OdfDr3dShadeMode.Phong, cell.GetDr3dShadeModeAttributeValue("shade-mode", dr3dNamespace));
+        Assert.Equal("phong", cell.GetAttribute("shade-mode", dr3dNamespace));
+        Assert.Equal(OdfSvgFillRule.EvenOdd, cell.GetSvgFillRuleAttributeValue("fill-rule", OdfNamespaces.Svg));
+        Assert.Equal("evenodd", cell.GetAttribute("fill-rule", OdfNamespaces.Svg));
+        Assert.Equal(OdfTableBorderModel.Collapsing, cell.GetTableBorderModelAttributeValue("border-model", OdfNamespaces.Table));
+        Assert.Equal("collapsing", cell.GetAttribute("border-model", OdfNamespaces.Table));
         Assert.Equal(OdfLineStyle.LongDash, cell.GetLineStyleAttributeValue("text-underline-style", OdfNamespaces.Style));
         Assert.Equal("long-dash", cell.GetAttribute("text-underline-style", OdfNamespaces.Style));
         Assert.Equal(OdfLineType.Double, cell.GetLineTypeAttributeValue("text-underline-type", OdfNamespaces.Style));
@@ -556,6 +599,18 @@ public class TypedDomParityTests
         Assert.Null(cell.GetTableOrderAttributeValue("order", OdfNamespaces.Table));
         cell.SetAttribute("type", OdfNamespaces.Table, "custom");
         Assert.Null(cell.GetTableTypeAttributeValue("type", OdfNamespaces.Table));
+        cell.SetAttribute("keep-together", OdfNamespaces.Fo, "never");
+        Assert.Null(cell.GetFoKeepTogetherAttributeValue("keep-together", OdfNamespaces.Fo));
+        cell.SetAttribute("wrap-option", OdfNamespaces.Fo, "balance");
+        Assert.Null(cell.GetFoWrapOptionAttributeValue("wrap-option", OdfNamespaces.Fo));
+        cell.SetAttribute("projection", dr3dNamespace, "orthographic");
+        Assert.Null(cell.GetDr3dProjectionAttributeValue("projection", dr3dNamespace));
+        cell.SetAttribute("shade-mode", dr3dNamespace, "toon");
+        Assert.Null(cell.GetDr3dShadeModeAttributeValue("shade-mode", dr3dNamespace));
+        cell.SetAttribute("fill-rule", OdfNamespaces.Svg, "winding");
+        Assert.Null(cell.GetSvgFillRuleAttributeValue("fill-rule", OdfNamespaces.Svg));
+        cell.SetAttribute("border-model", OdfNamespaces.Table, "merged");
+        Assert.Null(cell.GetTableBorderModelAttributeValue("border-model", OdfNamespaces.Table));
         cell.SetAttribute("text-underline-style", OdfNamespaces.Style, "unknown");
         Assert.Null(cell.GetLineStyleAttributeValue("text-underline-style", OdfNamespaces.Style));
         cell.SetAttribute("text-underline-type", OdfNamespaces.Style, "triple");

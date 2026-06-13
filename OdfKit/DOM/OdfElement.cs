@@ -591,6 +591,162 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的 FO 分頁保持屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的 FO 分頁保持設定；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfFoKeepTogether? GetFoKeepTogetherAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseFoKeepTogether(value, out OdfFoKeepTogether keepTogether) ? keepTogether : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 FO 分頁保持屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的 FO 分頁保持設定。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetFoKeepTogetherAttributeValue(string localName, string namespaceUri, OdfFoKeepTogether value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatFoKeepTogether(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的 FO 換行選項屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的 FO 換行選項；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfFoWrapOption? GetFoWrapOptionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseFoWrapOption(value, out OdfFoWrapOption wrapOption) ? wrapOption : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 FO 換行選項屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的 FO 換行選項。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetFoWrapOptionAttributeValue(string localName, string namespaceUri, OdfFoWrapOption value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatFoWrapOption(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的 3D 投影屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的 3D 投影；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfDr3dProjection? GetDr3dProjectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseDr3dProjection(value, out OdfDr3dProjection projection) ? projection : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 3D 投影屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的 3D 投影。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetDr3dProjectionAttributeValue(string localName, string namespaceUri, OdfDr3dProjection value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatDr3dProjection(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的 3D 著色模式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的 3D 著色模式；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfDr3dShadeMode? GetDr3dShadeModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseDr3dShadeMode(value, out OdfDr3dShadeMode shadeMode) ? shadeMode : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 3D 著色模式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的 3D 著色模式。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetDr3dShadeModeAttributeValue(string localName, string namespaceUri, OdfDr3dShadeMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatDr3dShadeMode(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的 SVG 填滿規則屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的 SVG 填滿規則；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfSvgFillRule? GetSvgFillRuleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseSvgFillRule(value, out OdfSvgFillRule fillRule) ? fillRule : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 SVG 填滿規則屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的 SVG 填滿規則。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetSvgFillRuleAttributeValue(string localName, string namespaceUri, OdfSvgFillRule value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatSvgFillRule(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的表格邊框模型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的表格邊框模型；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTableBorderModel? GetTableBorderModelAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTableBorderModel(value, out OdfTableBorderModel borderModel) ? borderModel : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的表格邊框模型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的表格邊框模型。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTableBorderModelAttributeValue(string localName, string namespaceUri, OdfTableBorderModel value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTableBorderModel(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的 0 到 100 百分比屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -2187,6 +2343,170 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfTableType.RunningTotal => "running-total",
             OdfTableType.TotalPercentage => "total-percentage",
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, "未知的 ODF 表格類型。")
+        };
+    }
+
+    private static bool TryParseFoKeepTogether(string? value, out OdfFoKeepTogether keepTogether)
+    {
+        switch (value)
+        {
+            case "auto":
+                keepTogether = OdfFoKeepTogether.Auto;
+                return true;
+            case "always":
+                keepTogether = OdfFoKeepTogether.Always;
+                return true;
+            default:
+                keepTogether = default;
+                return false;
+        }
+    }
+
+    private static string FormatFoKeepTogether(OdfFoKeepTogether keepTogether)
+    {
+        return keepTogether switch
+        {
+            OdfFoKeepTogether.Auto => "auto",
+            OdfFoKeepTogether.Always => "always",
+            _ => throw new ArgumentOutOfRangeException(nameof(keepTogether), keepTogether, "未知的 ODF FO 分頁保持設定。")
+        };
+    }
+
+    private static bool TryParseFoWrapOption(string? value, out OdfFoWrapOption wrapOption)
+    {
+        switch (value)
+        {
+            case "wrap":
+                wrapOption = OdfFoWrapOption.Wrap;
+                return true;
+            case "no-wrap":
+                wrapOption = OdfFoWrapOption.NoWrap;
+                return true;
+            default:
+                wrapOption = default;
+                return false;
+        }
+    }
+
+    private static string FormatFoWrapOption(OdfFoWrapOption wrapOption)
+    {
+        return wrapOption switch
+        {
+            OdfFoWrapOption.Wrap => "wrap",
+            OdfFoWrapOption.NoWrap => "no-wrap",
+            _ => throw new ArgumentOutOfRangeException(nameof(wrapOption), wrapOption, "未知的 ODF FO 換行選項。")
+        };
+    }
+
+    private static bool TryParseDr3dProjection(string? value, out OdfDr3dProjection projection)
+    {
+        switch (value)
+        {
+            case "parallel":
+                projection = OdfDr3dProjection.Parallel;
+                return true;
+            case "perspective":
+                projection = OdfDr3dProjection.Perspective;
+                return true;
+            default:
+                projection = default;
+                return false;
+        }
+    }
+
+    private static string FormatDr3dProjection(OdfDr3dProjection projection)
+    {
+        return projection switch
+        {
+            OdfDr3dProjection.Parallel => "parallel",
+            OdfDr3dProjection.Perspective => "perspective",
+            _ => throw new ArgumentOutOfRangeException(nameof(projection), projection, "未知的 ODF 3D 投影。")
+        };
+    }
+
+    private static bool TryParseDr3dShadeMode(string? value, out OdfDr3dShadeMode shadeMode)
+    {
+        switch (value)
+        {
+            case "draft":
+                shadeMode = OdfDr3dShadeMode.Draft;
+                return true;
+            case "flat":
+                shadeMode = OdfDr3dShadeMode.Flat;
+                return true;
+            case "gouraud":
+                shadeMode = OdfDr3dShadeMode.Gouraud;
+                return true;
+            case "phong":
+                shadeMode = OdfDr3dShadeMode.Phong;
+                return true;
+            default:
+                shadeMode = default;
+                return false;
+        }
+    }
+
+    private static string FormatDr3dShadeMode(OdfDr3dShadeMode shadeMode)
+    {
+        return shadeMode switch
+        {
+            OdfDr3dShadeMode.Draft => "draft",
+            OdfDr3dShadeMode.Flat => "flat",
+            OdfDr3dShadeMode.Gouraud => "gouraud",
+            OdfDr3dShadeMode.Phong => "phong",
+            _ => throw new ArgumentOutOfRangeException(nameof(shadeMode), shadeMode, "未知的 ODF 3D 著色模式。")
+        };
+    }
+
+    private static bool TryParseSvgFillRule(string? value, out OdfSvgFillRule fillRule)
+    {
+        switch (value)
+        {
+            case "evenodd":
+                fillRule = OdfSvgFillRule.EvenOdd;
+                return true;
+            case "nonzero":
+                fillRule = OdfSvgFillRule.Nonzero;
+                return true;
+            default:
+                fillRule = default;
+                return false;
+        }
+    }
+
+    private static string FormatSvgFillRule(OdfSvgFillRule fillRule)
+    {
+        return fillRule switch
+        {
+            OdfSvgFillRule.EvenOdd => "evenodd",
+            OdfSvgFillRule.Nonzero => "nonzero",
+            _ => throw new ArgumentOutOfRangeException(nameof(fillRule), fillRule, "未知的 ODF SVG 填滿規則。")
+        };
+    }
+
+    private static bool TryParseTableBorderModel(string? value, out OdfTableBorderModel borderModel)
+    {
+        switch (value)
+        {
+            case "collapsing":
+                borderModel = OdfTableBorderModel.Collapsing;
+                return true;
+            case "separating":
+                borderModel = OdfTableBorderModel.Separating;
+                return true;
+            default:
+                borderModel = default;
+                return false;
+        }
+    }
+
+    private static string FormatTableBorderModel(OdfTableBorderModel borderModel)
+    {
+        return borderModel switch
+        {
+            OdfTableBorderModel.Collapsing => "collapsing",
+            OdfTableBorderModel.Separating => "separating",
+            _ => throw new ArgumentOutOfRangeException(nameof(borderModel), borderModel, "未知的 ODF 表格邊框模型。")
         };
     }
 

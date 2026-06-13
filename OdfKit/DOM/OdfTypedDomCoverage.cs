@@ -257,6 +257,36 @@ public static class OdfTypedDomCoverage
             return "tableType";
         }
 
+        if (resolvedType == typeof(OdfFoKeepTogether))
+        {
+            return "foKeepTogether";
+        }
+
+        if (resolvedType == typeof(OdfFoWrapOption))
+        {
+            return "foWrapOption";
+        }
+
+        if (resolvedType == typeof(OdfDr3dProjection))
+        {
+            return "dr3dProjection";
+        }
+
+        if (resolvedType == typeof(OdfDr3dShadeMode))
+        {
+            return "dr3dShadeMode";
+        }
+
+        if (resolvedType == typeof(OdfSvgFillRule))
+        {
+            return "svgFillRule";
+        }
+
+        if (resolvedType == typeof(OdfTableBorderModel))
+        {
+            return "tableBorderModel";
+        }
+
         if (resolvedType == typeof(OdfLineStyle))
         {
             return "lineStyle";

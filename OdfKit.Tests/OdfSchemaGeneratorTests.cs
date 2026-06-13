@@ -282,6 +282,12 @@ namespace OdfKit.Tests
                 "<attribute name=\"number:style\"><choice><value>short</value><value>long</value></choice></attribute>" +
                 "<attribute name=\"table:order\"><choice><value>ascending</value><value>descending</value></choice></attribute>" +
                 "<attribute name=\"table:type\"><choice><value>column</value><value>row</value><value>table</value><value>running-total</value></choice></attribute>" +
+                "<attribute name=\"fo:keep-together\"><choice><value>auto</value><value>always</value></choice></attribute>" +
+                "<attribute name=\"fo:wrap-option\"><choice><value>wrap</value><value>no-wrap</value></choice></attribute>" +
+                "<attribute name=\"dr3d:projection\"><choice><value>parallel</value><value>perspective</value></choice></attribute>" +
+                "<attribute name=\"dr3d:shade-mode\"><choice><value>draft</value><value>flat</value><value>gouraud</value><value>phong</value></choice></attribute>" +
+                "<attribute name=\"svg:fill-rule\"><choice><value>evenodd</value><value>nonzero</value></choice></attribute>" +
+                "<attribute name=\"table:border-model\"><choice><value>collapsing</value><value>separating</value></choice></attribute>" +
                 "<attribute name=\"draw:opacity\"><ref name=\"zeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"draw:shadow-offset\"><ref name=\"signedZeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"table:base-cell-address\"><ref name=\"cellAddress\" /></attribute>" +
@@ -376,6 +382,18 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetTableOrderAttributeValue(\"order\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfTableType? TableType", code);
             Assert.Contains("get => GetTableTypeAttributeValue(\"type\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFoKeepTogether? KeepTogether", code);
+            Assert.Contains("get => GetFoKeepTogetherAttributeValue(\"keep-together\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFoWrapOption? WrapOption", code);
+            Assert.Contains("get => GetFoWrapOptionAttributeValue(\"wrap-option\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfDr3dProjection? Projection", code);
+            Assert.Contains("get => GetDr3dProjectionAttributeValue(\"projection\", \"urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfDr3dShadeMode? ShadeMode", code);
+            Assert.Contains("get => GetDr3dShadeModeAttributeValue(\"shade-mode\", \"urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfSvgFillRule? FillRule", code);
+            Assert.Contains("get => GetSvgFillRuleAttributeValue(\"fill-rule\", \"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableBorderModel? BorderModel", code);
+            Assert.Contains("get => GetTableBorderModelAttributeValue(\"border-model\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfPercent? Opacity", code);
             Assert.Contains("get => GetPercentAttributeValue(\"opacity\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetPercentAttributeValue(\"opacity\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);

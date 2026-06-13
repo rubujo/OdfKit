@@ -327,6 +327,42 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.TableType;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" &&
+            node.LocalName == "keep-together")
+        {
+            return AttributeValueKind.FoKeepTogether;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" &&
+            node.LocalName == "wrap-option")
+        {
+            return AttributeValueKind.FoWrapOption;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" &&
+            node.LocalName == "projection")
+        {
+            return AttributeValueKind.Dr3dProjection;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" &&
+            node.LocalName == "shade-mode")
+        {
+            return AttributeValueKind.Dr3dShadeMode;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" &&
+            node.LocalName == "fill-rule")
+        {
+            return AttributeValueKind.SvgFillRule;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "border-model")
+        {
+            return AttributeValueKind.TableBorderModel;
+        }
+
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
             node.LocalName == "font-relief")
         {
@@ -823,6 +859,60 @@ public sealed class DomWrappersCSharpWriter
                     "GetTableTypeAttributeValue",
                     "SetTableTypeAttributeValue");
                 break;
+            case AttributeValueKind.FoKeepTogether:
+                writer.WriteLine($"        public OdfFoKeepTogether? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFoKeepTogetherAttributeValue",
+                    "SetFoKeepTogetherAttributeValue");
+                break;
+            case AttributeValueKind.FoWrapOption:
+                writer.WriteLine($"        public OdfFoWrapOption? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFoWrapOptionAttributeValue",
+                    "SetFoWrapOptionAttributeValue");
+                break;
+            case AttributeValueKind.Dr3dProjection:
+                writer.WriteLine($"        public OdfDr3dProjection? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDr3dProjectionAttributeValue",
+                    "SetDr3dProjectionAttributeValue");
+                break;
+            case AttributeValueKind.Dr3dShadeMode:
+                writer.WriteLine($"        public OdfDr3dShadeMode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDr3dShadeModeAttributeValue",
+                    "SetDr3dShadeModeAttributeValue");
+                break;
+            case AttributeValueKind.SvgFillRule:
+                writer.WriteLine($"        public OdfSvgFillRule? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetSvgFillRuleAttributeValue",
+                    "SetSvgFillRuleAttributeValue");
+                break;
+            case AttributeValueKind.TableBorderModel:
+                writer.WriteLine($"        public OdfTableBorderModel? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableBorderModelAttributeValue",
+                    "SetTableBorderModelAttributeValue");
+                break;
             case AttributeValueKind.Percent:
                 writer.WriteLine($"        public OdfPercent? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1305,6 +1395,12 @@ public sealed class DomWrappersCSharpWriter
         NumberStyle,
         TableOrder,
         TableType,
+        FoKeepTogether,
+        FoWrapOption,
+        Dr3dProjection,
+        Dr3dShadeMode,
+        SvgFillRule,
+        TableBorderModel,
         Percent,
         SignedPercent,
         CellAddress,

@@ -148,6 +148,12 @@ public class CliTests
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberStyle").GetInt32() >= 109);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableOrder").GetInt32() >= 108);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableType").GetInt32() >= 102);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foKeepTogether").GetInt32() >= 99);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foWrapOption").GetInt32() >= 100);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("dr3dProjection").GetInt32() >= 100);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("dr3dShadeMode").GetInt32() >= 100);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("svgFillRule").GetInt32() >= 109);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableBorderModel").GetInt32() >= 99);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineStyle").GetInt32() >= 534);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineType").GetInt32() >= 433);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineWidth").GetInt32() >= 433);
