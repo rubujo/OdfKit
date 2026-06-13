@@ -70,6 +70,7 @@ public static class OdfKitCli
             return 2;
         }
 
+        ValidateBaselineExceptionSet baselineExceptions = ValidateBaselineExceptionSet.Load(parsedOptions.BaselineExceptionsPath);
         List<ValidateFileResult> results = [];
         foreach (string file in files)
         {
@@ -82,7 +83,13 @@ public static class OdfKitCli
                 });
 
             ValidateBaselineResult? baseline = ValidateWithBaseline(file, parsedOptions);
-            results.Add(new ValidateFileResult(file, report, baseline));
+            bool documentedException = baselineExceptions.Contains(
+                file,
+                parsedOptions.Baseline,
+                report.IsValid,
+                baseline?.IsValid,
+                parsedOptions.Profile?.Id);
+            results.Add(new ValidateFileResult(file, report, baseline, documentedException));
         }
 
         ValidateSummary summary = ValidateSummary.Create(results);
@@ -180,7 +187,7 @@ public static class OdfKitCli
     {
         output.WriteLine("usage: odfkit <command> [arguments]");
         output.WriteLine("commands:");
-        output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path]");
+        output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
         output.WriteLine("  info file.ods");
         output.WriteLine("  convert-flat input.odt output.fodt");
         output.WriteLine("  pack input.fodt output.odt");
@@ -199,6 +206,7 @@ public static class OdfKitCli
         ValidateBaselineKind baseline = ValidateBaselineKind.None;
         string? baselineJarPath = null;
         string? baselineCommandPath = null;
+        string? baselineExceptionsPath = null;
 
         for (int i = 1; i < args.Length; i++)
         {
@@ -262,6 +270,12 @@ public static class OdfKitCli
                     }
                     baseline = ValidateBaselineKind.Command;
                     break;
+                case "--baseline-exceptions":
+                    if (!TryReadValue(args, ref i, error, "--baseline-exceptions", out baselineExceptionsPath))
+                    {
+                        return false;
+                    }
+                    break;
                 default:
                     if (arg.StartsWith("-", StringComparison.Ordinal))
                     {
@@ -292,7 +306,23 @@ public static class OdfKitCli
             return false;
         }
 
-        options = new ValidateOptions(path, format, failOn, profile, recursive, quiet, baseline, baselineJarPath, baselineCommandPath);
+        if (!string.IsNullOrWhiteSpace(baselineExceptionsPath) && !File.Exists(baselineExceptionsPath))
+        {
+            error.WriteLine("baseline exceptions file not found: " + baselineExceptionsPath);
+            return false;
+        }
+
+        options = new ValidateOptions(
+            path,
+            format,
+            failOn,
+            profile,
+            recursive,
+            quiet,
+            baseline,
+            baselineJarPath,
+            baselineCommandPath,
+            baselineExceptionsPath);
         return true;
     }
 
@@ -426,7 +456,8 @@ public static class OdfKitCli
                 output.WriteLine("baseline: " + result.Baseline.Kind);
                 output.WriteLine("baseline-valid: " + result.Baseline.IsValid.ToString(CultureInfo.InvariantCulture));
                 output.WriteLine("baseline-exit-code: " + result.Baseline.ExitCode.ToString(CultureInfo.InvariantCulture));
-                output.WriteLine("baseline-matches: " + result.BaselineMatches.ToString(CultureInfo.InvariantCulture));
+                output.WriteLine("baseline-matches: " + result.RawBaselineMatches.ToString(CultureInfo.InvariantCulture));
+                output.WriteLine("baseline-documented-exception: " + result.BaselineExceptionDocumented.ToString(CultureInfo.InvariantCulture));
             }
 
             foreach (OdfValidationIssue issue in report.Issues)
@@ -446,7 +477,8 @@ public static class OdfKitCli
             if (summary.BaselineFileCount > 0)
             {
                 output.WriteLine("baseline-summary: files=" + summary.BaselineFileCount.ToString(CultureInfo.InvariantCulture) +
-                    " mismatches=" + summary.BaselineMismatchCount.ToString(CultureInfo.InvariantCulture));
+                    " mismatches=" + summary.BaselineMismatchCount.ToString(CultureInfo.InvariantCulture) +
+                    " documented-exceptions=" + summary.BaselineDocumentedExceptionCount.ToString(CultureInfo.InvariantCulture));
             }
         }
     }
@@ -469,7 +501,8 @@ public static class OdfKitCli
                 fatalCount = summary.FatalCount,
                 blockingIssueCount = summary.BlockingIssueCount,
                 baselineFileCount = summary.BaselineFileCount,
-                baselineMismatchCount = summary.BaselineMismatchCount
+                baselineMismatchCount = summary.BaselineMismatchCount,
+                baselineDocumentedExceptionCount = summary.BaselineDocumentedExceptionCount
             },
             files = results.Select(result => new
             {
@@ -487,7 +520,8 @@ public static class OdfKitCli
                     kind = result.Baseline.Kind,
                     isValid = result.Baseline.IsValid,
                     exitCode = result.Baseline.ExitCode,
-                    matchesOdfKit = result.BaselineMatches,
+                    matchesOdfKit = result.RawBaselineMatches,
+                    documentedException = result.BaselineExceptionDocumented,
                     standardOutput = result.Baseline.StandardOutput,
                     standardError = result.Baseline.StandardError
                 },
@@ -561,14 +595,18 @@ public static class OdfKitCli
         bool Quiet,
         ValidateBaselineKind Baseline,
         string? BaselineJarPath,
-        string? BaselineCommandPath);
+        string? BaselineCommandPath,
+        string? BaselineExceptionsPath);
 
     private sealed record ValidateFileResult(
         string Path,
         OdfValidationReport Report,
-        ValidateBaselineResult? Baseline)
+        ValidateBaselineResult? Baseline,
+        bool BaselineExceptionDocumented)
     {
-        public bool BaselineMatches => Baseline is null || Baseline.IsValid == Report.IsValid;
+        public bool RawBaselineMatches => Baseline is null || Baseline.IsValid == Report.IsValid;
+
+        public bool BaselineMatches => RawBaselineMatches || BaselineExceptionDocumented;
     }
 
     private sealed record ValidateBaselineResult(
@@ -600,6 +638,8 @@ public static class OdfKitCli
 
         public int BaselineMismatchCount { get; private init; }
 
+        public int BaselineDocumentedExceptionCount { get; private init; }
+
         public static ValidateSummary Create(IReadOnlyList<ValidateFileResult> results)
         {
             return new ValidateSummary
@@ -613,8 +653,161 @@ public static class OdfKitCli
                 FatalCount = results.Sum(result => result.Report.FatalCount),
                 BlockingIssueCount = results.Sum(result => result.Report.BlockingIssueCount),
                 BaselineFileCount = results.Count(result => result.Baseline is not null),
-                BaselineMismatchCount = results.Count(result => !result.BaselineMatches)
+                BaselineMismatchCount = results.Count(result => !result.BaselineMatches),
+                BaselineDocumentedExceptionCount = results.Count(result => result.BaselineExceptionDocumented)
             };
+        }
+    }
+
+    private sealed class ValidateBaselineExceptionSet
+    {
+        private static readonly ValidateBaselineExceptionSet Empty = new([]);
+
+        private readonly IReadOnlyList<ValidateBaselineExceptionEntry> entries;
+
+        private ValidateBaselineExceptionSet(IReadOnlyList<ValidateBaselineExceptionEntry> entries)
+        {
+            this.entries = entries;
+        }
+
+        public static ValidateBaselineExceptionSet Load(string? path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return Empty;
+            }
+
+            using FileStream stream = File.OpenRead(path);
+            using JsonDocument document = JsonDocument.Parse(stream);
+            JsonElement root = document.RootElement;
+            if (root.ValueKind != JsonValueKind.Object ||
+                !root.TryGetProperty("exceptions", out JsonElement exceptions) ||
+                exceptions.ValueKind != JsonValueKind.Array)
+            {
+                throw new InvalidDataException("baseline exceptions must contain an exceptions array.");
+            }
+
+            List<ValidateBaselineExceptionEntry> parsed = [];
+            foreach (JsonElement item in exceptions.EnumerateArray())
+            {
+                parsed.Add(ValidateBaselineExceptionEntry.Parse(item));
+            }
+
+            return new ValidateBaselineExceptionSet(parsed);
+        }
+
+        public bool Contains(
+            string path,
+            ValidateBaselineKind baseline,
+            bool odfKitIsValid,
+            bool? baselineIsValid,
+            string? profileId)
+        {
+            if (baselineIsValid is null)
+            {
+                return false;
+            }
+
+            foreach (ValidateBaselineExceptionEntry entry in entries)
+            {
+                if (entry.Matches(path, baseline, odfKitIsValid, baselineIsValid.Value, profileId))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    private sealed record ValidateBaselineExceptionEntry(
+        string Path,
+        ValidateBaselineKind Baseline,
+        bool OdfKitIsValid,
+        bool BaselineIsValid,
+        string? ProfileId,
+        string Reason)
+    {
+        public static ValidateBaselineExceptionEntry Parse(JsonElement item)
+        {
+            if (item.ValueKind != JsonValueKind.Object)
+            {
+                throw new InvalidDataException("baseline exception entries must be objects.");
+            }
+
+            string path = ReadRequiredString(item, "path");
+            string baselineValue = ReadRequiredString(item, "baseline");
+            if (!TryParseBaseline(baselineValue, out ValidateBaselineKind baseline) || baseline == ValidateBaselineKind.None)
+            {
+                throw new InvalidDataException("baseline exception baseline must be odf-validator or command.");
+            }
+
+            bool odfKitIsValid = ReadRequiredBoolean(item, "odfKitIsValid");
+            bool baselineIsValid = ReadRequiredBoolean(item, "baselineIsValid");
+            string? profileId = ReadOptionalString(item, "profileId");
+            string reason = ReadRequiredString(item, "reason");
+            return new ValidateBaselineExceptionEntry(path, baseline, odfKitIsValid, baselineIsValid, profileId, reason);
+        }
+
+        public bool Matches(
+            string candidatePath,
+            ValidateBaselineKind baseline,
+            bool odfKitIsValid,
+            bool baselineIsValid,
+            string? profileId)
+        {
+            return Baseline == baseline &&
+                OdfKitIsValid == odfKitIsValid &&
+                BaselineIsValid == baselineIsValid &&
+                PathMatches(candidatePath) &&
+                (string.IsNullOrWhiteSpace(ProfileId) || string.Equals(ProfileId, profileId, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private bool PathMatches(string candidatePath)
+        {
+            string expected = NormalizePath(Path);
+            string actual = NormalizePath(candidatePath);
+            if (expected.IndexOf('/') < 0)
+            {
+                return string.Equals(expected, System.IO.Path.GetFileName(actual), StringComparison.OrdinalIgnoreCase);
+            }
+
+            return string.Equals(actual, expected, StringComparison.OrdinalIgnoreCase) ||
+                actual.EndsWith("/" + expected, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string NormalizePath(string path)
+        {
+            return path.Replace('\\', '/').Trim();
+        }
+
+        private static string ReadRequiredString(JsonElement item, string propertyName)
+        {
+            string? value = ReadOptionalString(item, propertyName);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new InvalidDataException("baseline exception requires " + propertyName + ".");
+            }
+
+            return value;
+        }
+
+        private static string? ReadOptionalString(JsonElement item, string propertyName)
+        {
+            return item.TryGetProperty(propertyName, out JsonElement value) && value.ValueKind == JsonValueKind.String
+                ? value.GetString()
+                : null;
+        }
+
+        private static bool ReadRequiredBoolean(JsonElement item, string propertyName)
+        {
+            if (!item.TryGetProperty(propertyName, out JsonElement value) ||
+                value.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
+            {
+                throw new InvalidDataException("baseline exception requires boolean " + propertyName + ".");
+            }
+
+            return value.GetBoolean();
         }
     }
 }

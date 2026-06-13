@@ -39,7 +39,7 @@
 
 - OdfKit 允許用外部 ODF Validator 作為 optional baseline。
 - 一般 CI 不要求 Java 或 ODF Validator JAR；設定 `ODFKIT_ODFVALIDATOR_JAR` 或 CLI `--baseline-jar` 後才執行外部比對。
-- Classification mismatch 必須記錄為 documented exception，否則視為 parity failure。
+- Classification mismatch 必須透過 `--baseline-exceptions` 指定的 JSON manifest 記錄為 documented exception，否則視為 parity failure。
 
 ## Real-world sanitized corpus
 

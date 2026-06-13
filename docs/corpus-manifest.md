@@ -44,3 +44,27 @@ $env:ODFKIT_PARITY_CORPUS_ROOT = "D:\Corpus\OdfKit"
 ```
 
 外部 corpus 的 manifest 可放在該資料夾根目錄，格式需包含本文件列出的欄位。
+
+## Baseline exception manifest
+
+外部 ODF Validator 與 OdfKit 的 valid / invalid classification 若不同，必須另外記錄
+baseline exception manifest，並在 CLI 加上 `--baseline-exceptions`。此 manifest 可與外部
+corpus manifest 放在同一資料夾，建議命名為 `baseline-exceptions.json`。
+
+```json
+{
+  "exceptions": [
+    {
+      "path": "relative/path/to/fixture.odt",
+      "baseline": "odf-validator",
+      "odfKitIsValid": true,
+      "baselineIsValid": false,
+      "profileId": "OASIS_ODF_1_4_Extended",
+      "reason": "說明為何暫時接受這個分類差異。"
+    }
+  ]
+}
+```
+
+`path` 若只填檔名，會對檔名比對；若包含 `/`，會以正斜線正規化後對完整路徑尾端比對。
+沒有列入此 manifest 的 baseline mismatch 仍必須讓 parity job 失敗。

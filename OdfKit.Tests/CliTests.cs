@@ -240,6 +240,110 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證已文件化的外部 baseline 差異不會讓 validate 失敗。
+    /// </summary>
+    [Fact]
+    public void ValidateBaselineDocumentedExceptionDoesNotFail()
+    {
+        string path = CreateTempPath(".odt");
+        string command = CreateBaselineCommand(exitCode: 1);
+        string exceptions = CreateTempPath(".json");
+        try
+        {
+            CreateTextDocument(path, "baseline documented exception");
+            File.WriteAllText(
+                exceptions,
+                "{\n" +
+                "  \"exceptions\": [\n" +
+                "    {\n" +
+                "      \"path\": \"" + Path.GetFileName(path) + "\",\n" +
+                "      \"baseline\": \"command\",\n" +
+                "      \"odfKitIsValid\": true,\n" +
+                "      \"baselineIsValid\": false,\n" +
+                "      \"reason\": \"測試外部 validator 分類差異。\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n",
+                Encoding.UTF8);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                [
+                    "validate",
+                    path,
+                    "--format",
+                    "json",
+                    "--baseline",
+                    "command",
+                    "--baseline-command",
+                    command,
+                    "--baseline-exceptions",
+                    exceptions
+                ],
+                output,
+                error);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            using JsonDocument json = JsonDocument.Parse(output.ToString());
+            JsonElement summary = json.RootElement.GetProperty("summary");
+            JsonElement baseline = json.RootElement.GetProperty("files")[0].GetProperty("baseline");
+            Assert.Equal(0, summary.GetProperty("baselineMismatchCount").GetInt32());
+            Assert.Equal(1, summary.GetProperty("baselineDocumentedExceptionCount").GetInt32());
+            Assert.False(baseline.GetProperty("matchesOdfKit").GetBoolean());
+            Assert.True(baseline.GetProperty("documentedException").GetBoolean());
+        }
+        finally
+        {
+            TryDelete(path);
+            TryDelete(command);
+            TryDelete(exceptions);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 baseline exception 檔案不存在時會回傳使用錯誤。
+    /// </summary>
+    [Fact]
+    public void ValidateBaselineExceptionsRequiresExistingFile()
+    {
+        string path = CreateTempPath(".odt");
+        string command = CreateBaselineCommand(exitCode: 1);
+        string exceptions = CreateTempPath(".json");
+        try
+        {
+            CreateTextDocument(path, "missing baseline exceptions");
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                [
+                    "validate",
+                    path,
+                    "--baseline",
+                    "command",
+                    "--baseline-command",
+                    command,
+                    "--baseline-exceptions",
+                    exceptions
+                ],
+                output,
+                error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains("baseline exceptions file not found", error.ToString());
+        }
+        finally
+        {
+            TryDelete(path);
+            TryDelete(command);
+        }
+    }
+
+    /// <summary>
     /// 驗證 ODF Validator baseline 缺少 JAR 時會回傳使用錯誤。
     /// </summary>
     [Fact]

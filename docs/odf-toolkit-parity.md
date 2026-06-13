@@ -25,7 +25,7 @@
 | Package API | `OdfPackage` | ODF Toolkit package handling | complete | 可開啟、建立、保存 ZIP / flat XML，並保留 unknown entries。 |
 | Document factory | `OdfDocumentFactory`、typed wrappers | Simple API document load/create | complete | 17 種主要 extension 可最小 create / load / save / validate / round-trip。 |
 | Validator API | `OdfValidator`、`OdfPackageValidator`、`OdfFlatDocumentValidator` | ODF Validator | partial | 與外部 ODF Validator 對相同 corpus 的 valid / invalid classification 一致，差異需列入 documented exceptions。 |
-| External baseline | `OdfExternalValidator`、CLI `--baseline` | ODF Validator CLI | partial | 可選執行 ODF Validator JAR；未設定時一般測試與 CI 不受影響。 |
+| External baseline | `OdfExternalValidator`、CLI `--baseline` | ODF Validator CLI | validated | 可選執行 ODF Validator JAR，並支援 documented exception manifest；未設定時一般測試與 CI 不受影響。 |
 | Typed DOM | generated DOM wrappers、`OdfNodeFactory` | ODFDOM | partial | 以 [typed-dom-coverage.md](typed-dom-coverage.md) 追蹤 wrapper / factory / attribute coverage，並逐步補 typed datatype。 |
 | Simple high-level API | Text / Spreadsheet / Presentation / Drawing facade | ODF Toolkit Simple API | partial | ODT / ODS / ODP / ODG 常見建立、讀取與有限修改有直接 facade。 |
 | Corpus | generated、positive、negative、unknown、security corpus | ODF Validator sample corpus | partial | 小型可提交 corpus 有 manifest；大型或第三方 corpus 用外部路徑。 |
@@ -48,7 +48,39 @@ dotnet run --project tools/OdfKit.Cli -- validate sample.odt --baseline odf-vali
 ```
 
 `validate` 會比較 OdfKit 與外部 validator 的 valid / invalid classification。
-若分類不同，exit code 為 `1`，JSON summary 的 `baselineMismatchCount` 會大於 `0`。
+若分類不同且沒有列入 documented exception，exit code 為 `1`，JSON summary 的
+`baselineMismatchCount` 會大於 `0`。
+
+若使用自訂 wrapper、已知 ODF Validator 誤判或 profile 差異，需要明確提供例外清單：
+
+```powershell
+dotnet run --project tools/OdfKit.Cli -- validate sample.odt `
+  --baseline odf-validator `
+  --baseline-jar C:\tools\odfvalidator.jar `
+  --baseline-exceptions docs\baseline-exceptions.json `
+  --format json
+```
+
+例外清單格式如下：
+
+```json
+{
+  "exceptions": [
+    {
+      "path": "samples/known-profile-difference.odt",
+      "baseline": "odf-validator",
+      "odfKitIsValid": true,
+      "baselineIsValid": false,
+      "profileId": "OASIS_ODF_1_4_Extended",
+      "reason": "外部 validator 尚未接受此 ODF 1.4 profile 組合。"
+    }
+  ]
+}
+```
+
+`path` 可以是完整相對路徑，也可以只填檔名；含 `/` 的路徑會以正斜線正規化後比對。
+已記錄的差異會讓 `baselineDocumentedExceptionCount` 增加，且該檔案的
+`baseline.documentedException` 為 `true`；`baseline.matchesOdfKit` 仍保留原始分類是否一致。
 
 ## Corpus 原則
 
@@ -61,13 +93,12 @@ dotnet run --project tools/OdfKit.Cli -- validate sample.odt --baseline odf-vali
 
 ## Documented exceptions
 
-若 OdfKit 與外部 ODF Validator 分類不同，必須記錄：
+若 OdfKit 與外部 ODF Validator 分類不同，必須記錄在 `--baseline-exceptions` 使用的 JSON manifest：
 
 - fixture path
 - OdfKit classification
 - external classification
-- OdfKit issue codes
-- external output 摘要
+- OdfKit issue codes 或外部 output 摘要
 - profile
 - 暫時接受差異的原因
 
