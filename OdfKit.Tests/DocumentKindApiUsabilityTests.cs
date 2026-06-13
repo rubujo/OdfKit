@@ -5,8 +5,12 @@ using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Database;
 using OdfKit.DOM;
+using OdfKit.Drawing;
 using OdfKit.Formula;
 using OdfKit.Image;
+using OdfKit.Presentation;
+using OdfKit.Spreadsheet;
+using OdfKit.Text;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -16,6 +20,46 @@ namespace OdfKit.Tests;
 /// </summary>
 public class DocumentKindApiUsabilityTests
 {
+    /// <summary>
+    /// 驗證文件層格式摘要會回報 Flat XML 種類與高階 wrapper。
+    /// </summary>
+    /// <param name="kind">要建立的 Flat XML ODF 種類。</param>
+    /// <param name="contentKind">對應的內容種類。</param>
+    /// <param name="expectedType">預期的高階 wrapper 類型。</param>
+    /// <param name="extension">預期副檔名。</param>
+    [Theory]
+    [InlineData(OdfDocumentKind.FlatText, OdfDocumentKind.Text, typeof(TextDocument), ".fodt")]
+    [InlineData(OdfDocumentKind.FlatSpreadsheet, OdfDocumentKind.Spreadsheet, typeof(SpreadsheetDocument), ".fods")]
+    [InlineData(OdfDocumentKind.FlatPresentation, OdfDocumentKind.Presentation, typeof(PresentationDocument), ".fodp")]
+    [InlineData(OdfDocumentKind.FlatGraphics, OdfDocumentKind.Graphics, typeof(DrawingDocument), ".fodg")]
+    public void DocumentFormatSummaryReportsFlatXmlKinds(
+        OdfDocumentKind kind,
+        OdfDocumentKind contentKind,
+        Type expectedType,
+        string extension)
+    {
+        using OdfDocument document = OdfDocument.Create(kind);
+
+        Assert.IsType(expectedType, document);
+        Assert.Equal(kind, document.DocumentKind);
+        Assert.Equal(contentKind, document.ContentKind);
+        Assert.False(document.IsTemplate);
+        Assert.True(document.IsFlatXml);
+        OdfFormatInfo format = Assert.IsType<OdfFormatInfo>(document.Format);
+        Assert.Equal(extension, format.Extension);
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfDocument loaded = OdfDocument.Load(stream, "flat" + extension);
+        Assert.IsType(expectedType, loaded);
+        Assert.Equal(kind, loaded.DocumentKind);
+        Assert.Equal(contentKind, loaded.ContentKind);
+        Assert.True(loaded.IsFlatXml);
+        Assert.Equal(extension, loaded.Format?.Extension);
+    }
+
     /// <summary>
     /// 驗證文件層格式摘要會回報範本種類與內容種類。
     /// </summary>

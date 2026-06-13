@@ -69,7 +69,16 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
     /// <summary>
     /// 取得目前封裝 MIME 類型所宣告的 ODF 文件種類。
     /// </summary>
-    public OdfDocumentKind DocumentKind => OdfDocumentKindDetector.FromMimeType(Package.MimeType);
+    public OdfDocumentKind DocumentKind
+    {
+        get
+        {
+            OdfDocumentKind mimeKind = OdfDocumentKindDetector.FromMimeType(Package.MimeType);
+            return Package.IsFlatXml && mimeKind != OdfDocumentKind.Unknown
+                ? OdfDocumentKindDetector.ToFlatKind(mimeKind)
+                : mimeKind;
+        }
+    }
 
     /// <summary>
     /// 取得目前文件種類對應的格式描述；若 MIME 類型無法辨識則為 <see langword="null"/>。
