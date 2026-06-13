@@ -82,6 +82,60 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 schema-specific child collection 可支援 ODFDOM 風格的 typed traversal。
+    /// </summary>
+    [Fact]
+    public void SchemaSpecificChildCollectionsSupportOdfDomSampleTraversal()
+    {
+        OfficeDocumentContentElement document = new("office");
+        OfficeBodyElement body = document.AppendElement(new OfficeBodyElement("office"));
+        OfficeTextElement text = body.AppendElement(new OfficeTextElement("office"));
+        TextPElement firstParagraph = text.AppendElement(new TextPElement("text"));
+        TextPElement secondParagraph = text.AppendElement(new TextPElement("text"));
+        OfficeSpreadsheetElement spreadsheet = body.AppendElement(new OfficeSpreadsheetElement("office"));
+        TableTableElement table = spreadsheet.AppendElement(new TableTableElement("table"));
+        TableTableRowElement row = table.AppendElement(new TableTableRowElement("table"));
+        TableTableCellElement cell = row.AppendElement(new TableTableCellElement("table"));
+        TextPElement cellParagraph = cell.AppendElement(new TextPElement("text"));
+
+        firstParagraph.TextContent = "ODFDOM typed traversal";
+        secondParagraph.TextContent = "Schema child collection";
+        table.Name = "Sheet1";
+        cell.ValueType = "string";
+        cellParagraph.TextContent = "A1";
+
+        Assert.Equal([text], body.OfficeTextChildElements.ToArray());
+        Assert.Equal([spreadsheet], body.OfficeSpreadsheetChildElements.ToArray());
+        Assert.Equal([firstParagraph, secondParagraph], text.TextPChildElements.ToArray());
+        Assert.Equal([table], spreadsheet.TableTableChildElements.ToArray());
+        Assert.Equal([row], table.TableTableRowChildElements.ToArray());
+        Assert.Equal([cell], row.TableTableCellChildElements.ToArray());
+        Assert.Equal([cellParagraph], cell.TextPChildElements.ToArray());
+
+        using MemoryStream stream = new();
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeDocumentContentElement parsedDocument = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream));
+        OfficeBodyElement parsedBody = parsedDocument.OfficeBodyChildElements.Single();
+        OfficeTextElement parsedText = parsedBody.OfficeTextChildElements.Single();
+        TableTableElement parsedTable = parsedBody.OfficeSpreadsheetChildElements
+            .Single()
+            .TableTableChildElements
+            .Single();
+        TableTableCellElement parsedCell = parsedTable.TableTableRowChildElements
+            .Single()
+            .TableTableCellChildElements
+            .Single();
+
+        Assert.Equal("ODFDOM typed traversal", parsedText.TextPChildElements.First().TextContent);
+        Assert.Equal("Schema child collection", parsedText.TextPChildElements.ElementAt(1).TextContent);
+        Assert.Equal("Sheet1", parsedTable.Name);
+        Assert.Equal("string", parsedCell.ValueType);
+        Assert.Equal("A1", parsedCell.TextPChildElements.Single().TextContent);
+    }
+
+    /// <summary>
     /// 驗證 generated DOM wrapper 的 class、factory case 與屬性數量沒有意外退化。
     /// </summary>
     [Fact]
