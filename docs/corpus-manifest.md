@@ -33,6 +33,9 @@ repo 內可直接執行的範本 manifest 位於 `tests/fixtures/corpus/manifest
 | id | path | source | license | kind | version | profile | expected | roundTrip |
 |---|---|---|---|---|---|---|---|---|
 | repo-generated-minimal-flat-text | `tests/fixtures/corpus/generated/minimal-text.fodt` | generated | generated-no-copyright | FlatText | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| repo-generated-minimal-flat-spreadsheet | `tests/fixtures/corpus/generated/minimal-spreadsheet.fods` | generated | generated-no-copyright | FlatSpreadsheet | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| repo-generated-minimal-flat-presentation | `tests/fixtures/corpus/generated/minimal-presentation.fodp` | generated | generated-no-copyright | FlatPresentation | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| repo-generated-minimal-flat-graphics | `tests/fixtures/corpus/generated/minimal-graphics.fodg` | generated | generated-no-copyright | FlatGraphics | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
 | generated-format-minimal | generated in `OdfFormatRoundTripTests` | generated | generated-no-copyright | 17 extensions | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
 | generated-interop-package | generated in `InteropCorpusTests` | generated | generated-no-copyright | package formats | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | generated-schema-negative | generated in `CorpusComplianceTests` | generated | generated-no-copyright | ODT / flat XML | 1.4 | OASIS ODF 1.4 Strict | invalid | semantic-equivalent |

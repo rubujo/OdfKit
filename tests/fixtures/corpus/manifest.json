@@ -11,6 +11,42 @@
       "expected": "valid",
       "roundTrip": "semantic-equivalent",
       "notes": "Small repo-local fixture for validating the corpus manifest contract."
+    },
+    {
+      "id": "repo-generated-minimal-flat-spreadsheet",
+      "path": "generated/minimal-spreadsheet.fods",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatSpreadsheet",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local fixture for validating the spreadsheet corpus contract."
+    },
+    {
+      "id": "repo-generated-minimal-flat-presentation",
+      "path": "generated/minimal-presentation.fodp",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatPresentation",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local fixture for validating the presentation corpus contract."
+    },
+    {
+      "id": "repo-generated-minimal-flat-graphics",
+      "path": "generated/minimal-graphics.fodg",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatGraphics",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local fixture for validating the drawing corpus contract."
     }
   ]
 }

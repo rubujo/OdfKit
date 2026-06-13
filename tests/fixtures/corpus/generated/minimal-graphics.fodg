@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  office:mimetype="application/vnd.oasis.opendocument.graphics"
+  office:version="1.4">
+  <office:body>
+    <office:drawing />
+  </office:body>
+</office:document>
