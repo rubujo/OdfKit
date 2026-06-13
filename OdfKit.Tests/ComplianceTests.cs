@@ -1202,9 +1202,12 @@ namespace OdfKit.Tests
             OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
 
             Assert.False(report.IsValid);
-            Assert.Contains(report.Issues, issue =>
+            OdfValidationIssue issue = Assert.Single(report.Issues, issue =>
                 issue.RuleId == "ODF0103" &&
                 issue.PackagePath == "META-INF/manifest.xml");
+            Assert.Equal("/", issue.Details["entryPath"]);
+            Assert.Equal("application/vnd.oasis.opendocument.text", issue.Details["expectedMediaType"]);
+            Assert.Equal("application/vnd.oasis.opendocument.spreadsheet", issue.Details["actualMediaType"]);
         }
 
         [Fact]
@@ -1367,9 +1370,12 @@ namespace OdfKit.Tests
             OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
 
             Assert.False(report.IsValid);
-            Assert.Contains(report.Issues, issue =>
+            OdfValidationIssue issue = Assert.Single(report.Issues, issue =>
                 issue.RuleId == "ODF0105" &&
                 issue.PackagePath == "content.xml");
+            Assert.Equal("content.xml", issue.Details["entryPath"]);
+            Assert.Equal("text/xml", issue.Details["expectedMediaType"]);
+            Assert.Equal("image/png", issue.Details["actualMediaType"]);
         }
 
         [Fact]

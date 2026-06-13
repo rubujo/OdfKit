@@ -153,6 +153,8 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
         AppendJsonProperty(builder, "profileId", issue.ProfileId);
         builder.Append(',');
         AppendJsonProperty(builder, "suggestedFix", issue.SuggestedFix);
+        builder.Append(',');
+        AppendJsonObject(builder, "details", issue.Details);
         builder.Append('}');
     }
 
@@ -176,6 +178,40 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
     private static void AppendJsonProperty(StringBuilder builder, string name, bool value)
     {
         builder.Append('"').Append(EscapeJson(name)).Append("\":").Append(value ? "true" : "false");
+    }
+
+    private static void AppendJsonObject(StringBuilder builder, string name, IReadOnlyDictionary<string, string?> values)
+    {
+        builder.Append('"').Append(EscapeJson(name)).Append("\":{");
+        int index = 0;
+        foreach (KeyValuePair<string, string?> pair in values)
+        {
+            if (index > 0)
+            {
+                builder.Append(',');
+            }
+
+            AppendJsonProperty(builder, pair.Key, pair.Value);
+            index++;
+        }
+
+        builder.Append('}');
+    }
+
+    internal static IReadOnlyDictionary<string, string?> CopyDetails(IReadOnlyDictionary<string, string?>? details)
+    {
+        Dictionary<string, string?> copy = new(StringComparer.Ordinal);
+        if (details is null)
+        {
+            return copy;
+        }
+
+        foreach (KeyValuePair<string, string?> pair in details)
+        {
+            copy[pair.Key] = pair.Value;
+        }
+
+        return copy;
     }
 
     private static string EscapeJson(string value)
@@ -233,6 +269,7 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
 /// <param name="xPath">與此問題相關的 XML 路徑（可用時）</param>
 /// <param name="requiredVersion">問題與版本相關時所需的 ODF 版本</param>
 /// <param name="profileId">發出此問題的相容性設定檔識別碼</param>
+/// <param name="details">可供工具處理的結構化診斷細節。</param>
 public sealed class OdfValidationIssue(
     OdfIssueSeverity severity,
     string ruleId,
@@ -240,7 +277,8 @@ public sealed class OdfValidationIssue(
     string? packagePath = null,
     string? xPath = null,
     OdfVersion? requiredVersion = null,
-    string? profileId = null)
+    string? profileId = null,
+    IReadOnlyDictionary<string, string?>? details = null)
 {
     /// <summary>
     /// 取得問題嚴重性。
@@ -278,6 +316,11 @@ public sealed class OdfValidationIssue(
     public string? ProfileId { get; } = profileId;
 
     /// <summary>
+    /// 取得可供工具處理的結構化診斷細節。
+    /// </summary>
+    public IReadOnlyDictionary<string, string?> Details { get; } = OdfValidationReport.CopyDetails(details);
+
+    /// <summary>
     /// 取得使用者可採取的建議修復文字。
     /// </summary>
     public string SuggestedFix => BuildSuggestedFix();
@@ -296,7 +339,8 @@ public sealed class OdfValidationIssue(
             XPath,
             RequiredVersion?.ToString(),
             ProfileId,
-            SuggestedFix);
+            SuggestedFix,
+            Details);
     }
 
     private string BuildSuggestedFix()
@@ -423,6 +467,7 @@ public sealed class OdfValidationIssueJsonModel
     /// <param name="requiredVersion">所需 ODF 版本。</param>
     /// <param name="profileId">相容性設定檔識別碼。</param>
     /// <param name="suggestedFix">建議修復文字。</param>
+    /// <param name="details">結構化診斷細節。</param>
     public OdfValidationIssueJsonModel(
         string severity,
         string ruleId,
@@ -431,7 +476,8 @@ public sealed class OdfValidationIssueJsonModel
         string? xPath,
         string? requiredVersion,
         string? profileId,
-        string suggestedFix)
+        string suggestedFix,
+        IReadOnlyDictionary<string, string?>? details)
     {
         Severity = severity ?? string.Empty;
         RuleId = ruleId ?? string.Empty;
@@ -441,6 +487,7 @@ public sealed class OdfValidationIssueJsonModel
         RequiredVersion = requiredVersion;
         ProfileId = profileId;
         SuggestedFix = suggestedFix ?? string.Empty;
+        Details = OdfValidationReport.CopyDetails(details);
     }
 
     /// <summary>
@@ -482,4 +529,9 @@ public sealed class OdfValidationIssueJsonModel
     /// 取得建議修復文字。
     /// </summary>
     public string SuggestedFix { get; }
+
+    /// <summary>
+    /// 取得結構化診斷細節。
+    /// </summary>
+    public IReadOnlyDictionary<string, string?> Details { get; }
 }

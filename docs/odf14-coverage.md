@@ -16,7 +16,7 @@
 |---|---|---|---|---|---|
 | 文件格式偵測 | MIME、extension、`office:body` 對應 | `OdfDocumentKindDetector`、`OdfFormatInfo` | `OdfFormatRoundTripTests`、`ComplianceTests` | complete | README 已說明 template / master / flat 變體辨識與高階模型限制。 |
 | ODF 1.4 預設版本 | `office:version="1.4"`、manifest version | `OdfVersionInfo`、`OdfDocumentFactory`、`OdfSaveOptions.ForceVersion` | `OdfSaveOptionsVersionTests`、`OdfFormatRoundTripTests` | complete | 舊版文件的完整 schema 差異仍屬 best-effort。 |
-| 封裝 manifest 完整性 | `RequireManifestIntegrity`、mimetype entry、root media type | `OdfPackage`、`OdfPackageValidator`、`OdfValidator`、`OdfKit.Cli` | `ComplianceTests`、`CorpusComplianceTests`、`OdfValidatorApiTests`、`CliTests` | validated | CLI 已提供摘要；manifest 差異報告仍可擴充。 |
+| 封裝 manifest 完整性 | `RequireManifestIntegrity`、mimetype entry、root media type | `OdfPackage`、`OdfPackageValidator`、`OdfValidator`、`OdfKit.Cli` | `ComplianceTests`、`CorpusComplianceTests`、`OdfValidatorApiTests`、`CliTests` | validated | CLI / JSON 已提供 manifest expected / actual 差異 details；仍可擴充更多真實 corpus。 |
 | ZIP entry 安全 | `RequireSafePackagePaths`、Zip Slip 防禦 | `OdfPackage.Open`、`OdfPackageValidator` | `CorpusComplianceTests` | complete | 無。 |
 | XML 安全讀取 | 禁用 DTD 與外部解析 | `OdfXmlReader`、validator XML readers | `SecurityComplianceTests`、`ComplianceTests` | validated | 仍可補更多大型 XML DoS corpus。 |
 | 官方 ODF 1.4 schema metadata | generated ODF 1.4 schema provider | `Odf14OfficialSchemaProvider.g.cs`、`OdfSchemaRegistry` | `ComplianceTests`、`OdfSchemaGeneratorTests` | validated | 需在 V2/V3 擴大 positive / negative corpus。 |

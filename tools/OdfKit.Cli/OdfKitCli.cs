@@ -946,7 +946,8 @@ public static class OdfKitCli
                     xPath = issue.XPath,
                     requiredVersion = issue.RequiredVersion?.ToString(),
                     profileId = issue.ProfileId,
-                    suggestedFix = issue.SuggestedFix
+                    suggestedFix = issue.SuggestedFix,
+                    details = issue.Details
                 }).ToArray()
             }).ToArray()
         };
@@ -1047,7 +1048,8 @@ public static class OdfKitCli
                     xPath = issue.XPath,
                     requiredVersion = issue.RequiredVersion?.ToString(),
                     profileId = issue.ProfileId,
-                    suggestedFix = issue.SuggestedFix
+                    suggestedFix = issue.SuggestedFix,
+                    details = issue.Details
                 }).ToArray()
             }).ToArray()
         };

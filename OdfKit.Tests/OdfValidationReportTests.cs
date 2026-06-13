@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Collections.Generic;
 using System.Text.Json;
 using OdfKit.Compliance;
 using Xunit;
@@ -59,6 +60,8 @@ public class OdfValidationReportTests
         Assert.Equal("/office:document-content[1]", model.Issues[1].XPath);
         Assert.Equal("OASIS_ODF_1_4_Strict", model.Issues[1].ProfileId);
         Assert.Contains("office:version", model.Issues[1].SuggestedFix);
+        Assert.Equal("1.4", model.Issues[1].Details["expectedVersion"]);
+        Assert.Equal("missing", model.Issues[1].Details["actualVersion"]);
     }
 
     /// <summary>
@@ -78,6 +81,8 @@ public class OdfValidationReportTests
         Assert.Equal(1, root.GetProperty("fatalCount").GetInt32());
         Assert.Equal("ODF1002", root.GetProperty("issues")[1].GetProperty("ruleId").GetString());
         Assert.Equal("加入或修正 content.xml 的 office:version。", root.GetProperty("issues")[1].GetProperty("suggestedFix").GetString());
+        Assert.Equal("1.4", root.GetProperty("issues")[1].GetProperty("details").GetProperty("expectedVersion").GetString());
+        Assert.Equal("missing", root.GetProperty("issues")[1].GetProperty("details").GetProperty("actualVersion").GetString());
     }
 
     private static OdfValidationReport CreateReport()
@@ -99,7 +104,12 @@ public class OdfValidationReportTests
                     "content.xml",
                     "/office:document-content[1]",
                     OdfVersion.Odf14,
-                    "OASIS_ODF_1_4_Strict"),
+                    "OASIS_ODF_1_4_Strict",
+                    new Dictionary<string, string?>
+                    {
+                        ["expectedVersion"] = "1.4",
+                        ["actualVersion"] = "missing"
+                    }),
                 new OdfValidationIssue(
                     OdfIssueSeverity.Fatal,
                     "ODF0200",

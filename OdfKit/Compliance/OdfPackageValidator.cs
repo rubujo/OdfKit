@@ -336,7 +336,11 @@ public static class OdfPackageValidator
                 "ODF0103",
                 "Manifest root media type does not match the package mimetype entry.",
                 "META-INF/manifest.xml",
-                profileId: profileId));
+                profileId: profileId,
+                details: ManifestDetails(
+                    entryPath: "/",
+                    expectedMediaType: mimeType,
+                    actualMediaType: package.Manifest["/"])));
         }
 
         foreach (string entryName in package.Entries.Keys)
@@ -353,7 +357,11 @@ public static class OdfPackageValidator
                     "ODF0102",
                     "Package entry is not listed in META-INF/manifest.xml.",
                     entryName,
-                    profileId: profileId));
+                    profileId: profileId,
+                    details: ManifestDetails(
+                        entryPath: entryName,
+                        expectedManifestEntry: "present",
+                        actualManifestEntry: "missing")));
             }
         }
 
@@ -390,7 +398,11 @@ public static class OdfPackageValidator
                     "ODF0104",
                     "Manifest file-entry points to a package entry that does not exist.",
                     manifestPath,
-                    profileId: profileId));
+                    profileId: profileId,
+                    details: ManifestDetails(
+                        entryPath: manifestPath,
+                        expectedPackageEntry: "present",
+                        actualPackageEntry: "missing")));
             }
         }
 
@@ -407,7 +419,11 @@ public static class OdfPackageValidator
                 "ODF0105",
                 $"Manifest media type for '{expected.Key}' must be '{expected.Value}'.",
                 expected.Key,
-                profileId: profileId));
+                profileId: profileId,
+                details: ManifestDetails(
+                    entryPath: expected.Key,
+                    expectedMediaType: expected.Value,
+                    actualMediaType: declaredMediaType)));
         }
 
         ValidateEncryptionMetadata(package, profileId, issues);
@@ -420,8 +436,36 @@ public static class OdfPackageValidator
                 "ODF0110",
                 "Digital signature entry must be listed in META-INF/manifest.xml.",
                 "META-INF/documentsignatures.xml",
-                profileId: profileId));
+                profileId: profileId,
+                details: ManifestDetails(
+                    entryPath: "META-INF/documentsignatures.xml",
+                    expectedManifestEntry: "present",
+                    actualManifestEntry: "missing")));
         }
+    }
+
+    private static IReadOnlyDictionary<string, string?> ManifestDetails(
+        string entryPath,
+        string? expectedMediaType = null,
+        string? actualMediaType = null,
+        string? expectedManifestEntry = null,
+        string? actualManifestEntry = null,
+        string? expectedPackageEntry = null,
+        string? actualPackageEntry = null)
+    {
+        Dictionary<string, string?> details = new(StringComparer.Ordinal)
+        {
+            ["entryPath"] = entryPath
+        };
+
+        if (expectedMediaType is not null) details["expectedMediaType"] = expectedMediaType;
+        if (actualMediaType is not null) details["actualMediaType"] = actualMediaType;
+        if (expectedManifestEntry is not null) details["expectedManifestEntry"] = expectedManifestEntry;
+        if (actualManifestEntry is not null) details["actualManifestEntry"] = actualManifestEntry;
+        if (expectedPackageEntry is not null) details["expectedPackageEntry"] = expectedPackageEntry;
+        if (actualPackageEntry is not null) details["actualPackageEntry"] = actualPackageEntry;
+
+        return details;
     }
 
     private static void ValidateEncryptionMetadata(
