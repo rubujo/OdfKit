@@ -136,6 +136,59 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 typed DOM 可用 ODFDOM 風格走訪圖文混排 frame、image 與 SVG 替代文字。
+    /// </summary>
+    [Fact]
+    public void TypedDomSupportsOdfDomStyleImageFrameTraversal()
+    {
+        OfficeDocumentContentElement document = new("office");
+        document.SetOdfVersionAttributeValue("version", OdfNamespaces.Office, OdfVersion.Odf14, "office");
+        OfficeBodyElement body = document.AppendElement(new OfficeBodyElement("office"));
+        OfficeTextElement text = body.AppendElement(new OfficeTextElement("office"));
+        TextPElement paragraph = text.AppendElement(new TextPElement("text"));
+        DrawFrameElement frame = paragraph.AppendElement(new DrawFrameElement("draw"));
+        SvgTitleElement title = frame.AppendElement(new SvgTitleElement("svg"));
+        SvgDescElement description = frame.AppendElement(new SvgDescElement("svg"));
+        DrawImageElement image = frame.AppendElement(new DrawImageElement("draw"));
+        TextPElement caption = image.AppendElement(new TextPElement("text"));
+
+        frame.SetLengthAttributeValue("width", OdfNamespaces.Svg, OdfLength.FromCentimeters(4), "svg");
+        frame.SetLengthAttributeValue("height", OdfNamespaces.Svg, OdfLength.FromCentimeters(3), "svg");
+        title.TextContent = "產品截圖";
+        description.TextContent = "含有替代文字的圖片 frame。";
+        image.SetIriReferenceAttributeValue("href", OdfNamespaces.XLink, new OdfIriReference("Pictures/image.png"), "xlink");
+        image.SetXLinkTypeAttributeValue("type", OdfNamespaces.XLink, OdfXLinkType.Simple, "xlink");
+        image.SetXLinkShowAttributeValue("show", OdfNamespaces.XLink, OdfXLinkShow.Embed, "xlink");
+        image.SetXLinkActuateAttributeValue("actuate", OdfNamespaces.XLink, OdfXLinkActuate.OnLoad, "xlink");
+        caption.TextContent = "Figure 1";
+
+        Assert.Same(frame, paragraph.ChildElements<DrawFrameElement>().Single());
+        Assert.Equal([title], frame.SvgTitleChildElements.ToArray());
+        Assert.Equal([description], frame.SvgDescChildElements.ToArray());
+        Assert.Equal([image], frame.DrawImageChildElements.ToArray());
+        Assert.Equal([caption], image.TextPChildElements.ToArray());
+        Assert.Equal(OdfLength.FromCentimeters(4), frame.GetLengthAttributeValue("width", OdfNamespaces.Svg));
+        Assert.Equal(OdfXLinkType.Simple, image.GetXLinkTypeAttributeValue("type", OdfNamespaces.XLink));
+        Assert.Equal(OdfXLinkShow.Embed, image.GetXLinkShowAttributeValue("show", OdfNamespaces.XLink));
+        Assert.Equal(OdfXLinkActuate.OnLoad, image.GetXLinkActuateAttributeValue("actuate", OdfNamespaces.XLink));
+
+        using MemoryStream stream = new();
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeDocumentContentElement parsedDocument = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream));
+        DrawFrameElement parsedFrame = parsedDocument.DescendantElements<DrawFrameElement>().Single();
+        DrawImageElement parsedImage = parsedFrame.DrawImageChildElements.Single();
+
+        Assert.Equal("產品截圖", parsedFrame.SvgTitleChildElements.Single().TextContent);
+        Assert.Equal("含有替代文字的圖片 frame。", parsedFrame.SvgDescChildElements.Single().TextContent);
+        Assert.Equal(OdfLength.FromCentimeters(3), parsedFrame.GetLengthAttributeValue("height", OdfNamespaces.Svg));
+        Assert.Equal(new OdfIriReference("Pictures/image.png"), parsedImage.GetIriReferenceAttributeValue("href", OdfNamespaces.XLink));
+        Assert.Equal(OdfXLinkShow.Embed, parsedImage.GetXLinkShowAttributeValue("show", OdfNamespaces.XLink));
+        Assert.Equal("Figure 1", parsedImage.TextPChildElements.Single().TextContent);
+    }
+
+    /// <summary>
     /// 驗證 generated DOM wrapper 的 class、factory case 與屬性數量沒有意外退化。
     /// </summary>
     [Fact]
