@@ -29,6 +29,7 @@ public class CliTests
         Assert.Contains("validate", output.ToString());
         Assert.Contains("validate-corpus", output.ToString());
         Assert.Contains("sanitize", output.ToString());
+        Assert.Contains("typed-dom-coverage", output.ToString());
         Assert.Contains("convert-flat", output.ToString());
         Assert.Contains("--baseline odf-validator", output.ToString());
         Assert.Equal(string.Empty, error.ToString());
@@ -95,6 +96,27 @@ public class CliTests
             TryDelete(sourcePath);
             TryDelete(outputPath);
         }
+    }
+
+    /// <summary>
+    /// 驗證 typed-dom-coverage 可輸出 machine-readable JSON 摘要。
+    /// </summary>
+    [Fact]
+    public void TypedDomCoverageCanWriteJsonReport()
+    {
+        using StringWriter output = new();
+        using StringWriter error = new();
+
+        int exitCode = OdfKitCli.Run(["typed-dom-coverage", "--format", "json"], output, error);
+
+        Assert.Equal(0, exitCode);
+        Assert.Equal(string.Empty, error.ToString());
+        using JsonDocument json = JsonDocument.Parse(output.ToString());
+        JsonElement summary = json.RootElement.GetProperty("summary");
+        Assert.True(summary.GetProperty("schemaElementCount").GetInt32() >= 550);
+        Assert.True(summary.GetProperty("typedElementCount").GetInt32() >= 550);
+        Assert.True(summary.GetProperty("schemaAttributeCount").GetInt32() >= 100);
+        Assert.True(json.RootElement.GetProperty("elements").GetArrayLength() >= 550);
     }
 
     /// <summary>

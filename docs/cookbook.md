@@ -181,6 +181,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt -
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate samples --recursive --fail-on warning
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt --profile OASIS_ODF_1_4_Extended
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- sanitize input.odt sanitized.odt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- typed-dom-coverage --format json
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- convert-flat file.odt file.fodt
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack file.fodt file.odt
 ```

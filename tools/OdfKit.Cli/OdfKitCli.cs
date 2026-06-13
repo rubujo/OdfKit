@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.DOM;
 
 namespace OdfKit.Cli;
 
@@ -45,6 +46,7 @@ public static class OdfKitCli
                 "info" => Info(args, output, error),
                 "metadata" => Metadata(args, output, error),
                 "sanitize" => Sanitize(args, output, error),
+                "typed-dom-coverage" => TypedDomCoverage(args, output, error),
                 "convert-flat" => ConvertFlat(args, output, error),
                 "pack" => Pack(args, output, error),
                 _ => UnknownCommand(args[0], error)
@@ -190,6 +192,30 @@ public static class OdfKitCli
         return 0;
     }
 
+    private static int TypedDomCoverage(string[] args, TextWriter output, TextWriter error)
+    {
+        if (!TryParseTypedDomCoverageOptions(args, error, out ValidateOutputFormat format))
+        {
+            return 2;
+        }
+
+        OdfTypedDomCoverageReport report = OdfTypedDomCoverage.Build();
+        if (format == ValidateOutputFormat.Json)
+        {
+            output.WriteLine(JsonSerializer.Serialize(report.ToJsonModel(), JsonOptions));
+            return 0;
+        }
+
+        output.WriteLine("schema-version: " + report.SchemaVersion);
+        output.WriteLine("schema-source: " + report.SchemaSourceUrl);
+        output.WriteLine("schema-elements: " + report.SchemaElementCount.ToString(CultureInfo.InvariantCulture));
+        output.WriteLine("typed-elements: " + report.TypedElementCount.ToString(CultureInfo.InvariantCulture));
+        output.WriteLine("fallback-elements: " + report.FallbackElementCount.ToString(CultureInfo.InvariantCulture));
+        output.WriteLine("schema-attributes: " + report.SchemaAttributeCount.ToString(CultureInfo.InvariantCulture));
+        output.WriteLine("wrapper-properties: " + report.WrapperPropertyCount.ToString(CultureInfo.InvariantCulture));
+        return 0;
+    }
+
     private static int Sanitize(string[] args, TextWriter output, TextWriter error)
     {
         if (!RequireArity(args, 3, "sanitize input.odt output.odt", error))
@@ -292,6 +318,7 @@ public static class OdfKitCli
         output.WriteLine("  validate-corpus manifest.json [--root path] [--format text|json] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
         output.WriteLine("  info file.ods");
         output.WriteLine("  sanitize input.odt output.odt");
+        output.WriteLine("  typed-dom-coverage [--format text|json]");
         output.WriteLine("  convert-flat input.odt output.fodt");
         output.WriteLine("  pack input.fodt output.odt");
         output.WriteLine("  metadata file.odt");
@@ -546,6 +573,33 @@ public static class OdfKitCli
             baselineJarPath,
             baselineCommandPath,
             baselineExceptionsPath);
+        return true;
+    }
+
+    private static bool TryParseTypedDomCoverageOptions(string[] args, TextWriter error, out ValidateOutputFormat format)
+    {
+        format = ValidateOutputFormat.Text;
+        for (int i = 1; i < args.Length; i++)
+        {
+            string arg = args[i];
+            switch (arg)
+            {
+                case "--format":
+                    if (!TryReadValue(args, ref i, error, "--format", out string? formatValue) ||
+                        !TryParseFormat(formatValue, out format))
+                    {
+                        error.WriteLine("supported formats: text, json");
+                        return false;
+                    }
+                    break;
+                default:
+                    error.WriteLine(arg.StartsWith("-", StringComparison.Ordinal)
+                        ? "unknown option: " + arg
+                        : "usage: odfkit typed-dom-coverage [--format text|json]");
+                    return false;
+            }
+        }
+
         return true;
     }
 

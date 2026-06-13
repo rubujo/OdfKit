@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Text.Json;
 using OdfKit.Core;
 using OdfKit.DOM;
 using Xunit;
@@ -50,6 +52,31 @@ public class TypedDomParityTests
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
         Assert.True(propertyCount >= 100000, "generated attribute property count regressed: " + propertyCount);
+    }
+
+    /// <summary>
+    /// 驗證 typed DOM coverage report 可輸出 schema-to-wrapper 對照。
+    /// </summary>
+    [Fact]
+    public void TypedDomCoverageReportDeclaresSchemaWrapperMappings()
+    {
+        OdfTypedDomCoverageReport report = OdfTypedDomCoverage.Build();
+
+        Assert.True(report.SchemaElementCount >= 550, "schema element count too low: " + report.SchemaElementCount);
+        Assert.True(report.TypedElementCount >= 550, "typed element count too low: " + report.TypedElementCount);
+        Assert.True(report.SchemaAttributeCount >= 100, "schema attribute count too low: " + report.SchemaAttributeCount);
+        Assert.Contains(
+            report.Elements,
+            element => element.NamespaceUri == OdfNamespaces.Text &&
+                element.LocalName == "p" &&
+                element.HasTypedWrapper &&
+                element.WrapperType.Contains("TextPElement", StringComparison.Ordinal));
+        Assert.Contains(report.AttributeValueTypeCounts, pair => pair.Key.Length > 0 && pair.Value > 0);
+
+        string json = JsonSerializer.Serialize(report.ToJsonModel());
+        using JsonDocument document = JsonDocument.Parse(json);
+        Assert.Equal(report.SchemaElementCount, document.RootElement.GetProperty("summary").GetProperty("schemaElementCount").GetInt32());
+        Assert.True(document.RootElement.GetProperty("elements").GetArrayLength() >= report.SchemaElementCount);
     }
 
     /// <summary>

@@ -137,6 +137,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus cor
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- info file.ods
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- metadata file.odt
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- sanitize input.odt sanitized.odt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- typed-dom-coverage --format json
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- convert-flat input.odt output.fodt
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack input.fodt output.odt
 ```
