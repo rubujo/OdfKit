@@ -149,6 +149,10 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack input.fodt out
 ## 限制
 
 - 高階 API 覆蓋度依格式不同而不同；請以 support matrix 與測試證據為準。
+- Template、master 與 Flat XML 變體可透過 `OdfFormatInfo.IsTemplate`、
+  `OdfFormatInfo.IsMasterDocument`、`OdfFormatInfo.IsFlatXml` 與
+  `OdfDocument` 的格式摘要屬性辨識；目前它們共用對應內容種類的高階
+  wrapper，尚未提供完整變體專屬物件模型。
 - 圖表、公式、影像與資料庫文件目前是最小高階 story，不是完整的辦公套件物件模型。
 - 舊版 ODF 文件的版本差異處理屬 best-effort；保存時可使用 `OdfSaveOptions.ForceVersion` 明確指定輸出版本。
 - LibreOffice rendering 擴充仍需外部 LibreOffice 或相容執行檔，不屬於核心 OdfKit 的純 managed 路徑。

@@ -1442,12 +1442,28 @@ namespace OdfKit.Tests
             Assert.Equal(OdfDocumentKind.FlatSpreadsheet, flatSpreadsheet!.Kind);
             Assert.Equal(OdfDocumentKind.Spreadsheet, flatSpreadsheet.BodyKind);
             Assert.True(flatSpreadsheet.IsFlatXml);
+            Assert.False(flatSpreadsheet.IsTemplate);
+            Assert.False(flatSpreadsheet.IsMasterDocument);
             Assert.Equal("application/vnd.oasis.opendocument.spreadsheet", flatSpreadsheet.MimeType);
+
+            Assert.True(OdfDocumentKindDetector.TryGetFormatByKind(OdfDocumentKind.PresentationTemplate, out OdfFormatInfo? presentationTemplate));
+            Assert.Equal(".otp", presentationTemplate!.Extension);
+            Assert.True(presentationTemplate.IsTemplate);
+            Assert.False(presentationTemplate.IsMasterDocument);
+            Assert.False(presentationTemplate.IsFlatXml);
+
+            Assert.True(OdfDocumentKindDetector.TryGetFormatByKind(OdfDocumentKind.TextMaster, out OdfFormatInfo? textMaster));
+            Assert.Equal(".odm", textMaster!.Extension);
+            Assert.False(textMaster.IsTemplate);
+            Assert.True(textMaster.IsMasterDocument);
+            Assert.False(textMaster.IsFlatXml);
 
             Assert.True(OdfDocumentKindDetector.TryGetFormatByKind(OdfDocumentKind.Database, out OdfFormatInfo? database));
             Assert.Equal(".odb", database!.Extension);
             Assert.Equal("application/vnd.oasis.opendocument.database", database.MimeType);
             Assert.False(database.IsFlatXml);
+            Assert.False(database.IsTemplate);
+            Assert.False(database.IsMasterDocument);
         }
 
         [Theory]

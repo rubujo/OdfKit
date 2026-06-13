@@ -46,6 +46,16 @@ public sealed class OdfFormatInfo(
     /// 取得是否為單一 XML (Flat XML) 格式。
     /// </summary>
     public bool IsFlatXml { get; } = isFlatXml;
+
+    /// <summary>
+    /// 取得是否為 ODF 範本格式。
+    /// </summary>
+    public bool IsTemplate => OdfDocumentKindDetector.IsTemplateKind(Kind);
+
+    /// <summary>
+    /// 取得是否為 ODF 主控文件格式。
+    /// </summary>
+    public bool IsMasterDocument => OdfDocumentKindDetector.IsMasterKind(Kind);
 }
 
 /// <summary>
