@@ -3,6 +3,8 @@
 本文件記錄 OdfKit 對主要 ODF 格式的實作狀態。狀態以目前程式碼與
 測試證據為準，不把路線圖中的目標預先標為完成。
 
+ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-parity.md)。
+
 ## 狀態標記
 
 - `complete`：已有直接 API 與測試覆蓋，可作為目前支援能力使用。
@@ -42,3 +44,5 @@
   MathML、影像與資料庫語意模型仍屬後續擴充。
 - 全格式最小 round-trip corpus 已由 `OdfFormatRoundTripTests` 覆蓋；後續仍需加入
   更接近真實文件的 corpus。
+- 外部 ODF Validator baseline 已可透過 CLI `validate --baseline odf-validator` 選用，
+  但完整 parity corpus 與 documented exceptions 仍需擴充。

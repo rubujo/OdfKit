@@ -28,6 +28,7 @@ public class CliTests
         Assert.Equal(0, exitCode);
         Assert.Contains("validate", output.ToString());
         Assert.Contains("convert-flat", output.ToString());
+        Assert.Contains("--baseline odf-validator", output.ToString());
         Assert.Equal(string.Empty, error.ToString());
     }
 
@@ -169,6 +170,106 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證 validate 可執行外部 baseline 命令並輸出 JSON 對照結果。
+    /// </summary>
+    [Fact]
+    public void ValidateBaselineCommandWritesJsonParityResult()
+    {
+        string path = CreateTempPath(".odt");
+        string command = CreateBaselineCommand(exitCode: 0);
+        try
+        {
+            CreateTextDocument(path, "baseline");
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                ["validate", path, "--format", "json", "--baseline", "command", "--baseline-command", command],
+                output,
+                error);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            using JsonDocument json = JsonDocument.Parse(output.ToString());
+            JsonElement summary = json.RootElement.GetProperty("summary");
+            JsonElement file = json.RootElement.GetProperty("files")[0];
+            JsonElement baseline = file.GetProperty("baseline");
+            Assert.Equal(1, summary.GetProperty("baselineFileCount").GetInt32());
+            Assert.Equal(0, summary.GetProperty("baselineMismatchCount").GetInt32());
+            Assert.True(baseline.GetProperty("isValid").GetBoolean());
+            Assert.True(baseline.GetProperty("matchesOdfKit").GetBoolean());
+            Assert.Contains("baseline-ok", baseline.GetProperty("standardOutput").GetString());
+        }
+        finally
+        {
+            TryDelete(path);
+            TryDelete(command);
+        }
+    }
+
+    /// <summary>
+    /// 驗證外部 baseline 與 OdfKit 分類不同時會讓 validate 失敗。
+    /// </summary>
+    [Fact]
+    public void ValidateBaselineMismatchReturnsFailure()
+    {
+        string path = CreateTempPath(".odt");
+        string command = CreateBaselineCommand(exitCode: 1);
+        try
+        {
+            CreateTextDocument(path, "baseline mismatch");
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                ["validate", path, "--baseline", "command", "--baseline-command", command],
+                output,
+                error);
+
+            Assert.Equal(1, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            Assert.Contains("baseline-matches: False", output.ToString());
+        }
+        finally
+        {
+            TryDelete(path);
+            TryDelete(command);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 ODF Validator baseline 缺少 JAR 時會回傳使用錯誤。
+    /// </summary>
+    [Fact]
+    public void ValidateOdfValidatorBaselineRequiresJar()
+    {
+        string path = CreateTempPath(".odt");
+        string jarPath = Path.Combine(Path.GetTempPath(), "odfkit-missing-" + Path.GetRandomFileName() + ".jar");
+        try
+        {
+            CreateTextDocument(path, "missing jar");
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                ["validate", path, "--baseline", "odf-validator", "--baseline-jar", jarPath],
+                output,
+                error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains("ODF Validator JAR", error.ToString());
+        }
+        finally
+        {
+            TryDelete(path);
+        }
+    }
+
+    /// <summary>
     /// 驗證 convert-flat 與 pack 可在封裝 ODF 與 Flat XML 之間轉換。
     /// </summary>
     [Fact]
@@ -288,6 +389,18 @@ public class CliTests
             "text/xml");
         package.WriteEntry("Basic/script.xlb", Encoding.UTF8.GetBytes("macro"), "application/octet-stream");
         package.Save();
+    }
+
+    private static string CreateBaselineCommand(int exitCode)
+    {
+        string path = CreateTempPath(".cmd");
+        File.WriteAllText(
+            path,
+            "@echo off\r\n" +
+            "echo baseline-ok %1\r\n" +
+            "exit /b " + exitCode.ToString(System.Globalization.CultureInfo.InvariantCulture) + "\r\n",
+            Encoding.ASCII);
+        return path;
     }
 
     private static void TryDelete(string path)

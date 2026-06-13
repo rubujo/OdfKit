@@ -48,7 +48,7 @@ public static class OdfKitCli
                 _ => UnknownCommand(args[0], error)
             };
         }
-        catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or ArgumentException)
+        catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or ArgumentException or TimeoutException)
         {
             error.WriteLine(ex.Message);
             return 2;
@@ -80,7 +80,9 @@ public static class OdfKitCli
                     FileName = file,
                     Profile = parsedOptions.Profile
                 });
-            results.Add(new ValidateFileResult(file, report));
+
+            ValidateBaselineResult? baseline = ValidateWithBaseline(file, parsedOptions);
+            results.Add(new ValidateFileResult(file, report, baseline));
         }
 
         ValidateSummary summary = ValidateSummary.Create(results);
@@ -178,7 +180,7 @@ public static class OdfKitCli
     {
         output.WriteLine("usage: odfkit <command> [arguments]");
         output.WriteLine("commands:");
-        output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet]");
+        output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path]");
         output.WriteLine("  info file.ods");
         output.WriteLine("  convert-flat input.odt output.fodt");
         output.WriteLine("  pack input.fodt output.odt");
@@ -194,6 +196,9 @@ public static class OdfKitCli
         OdfComplianceProfile? profile = null;
         bool recursive = false;
         bool quiet = false;
+        ValidateBaselineKind baseline = ValidateBaselineKind.None;
+        string? baselineJarPath = null;
+        string? baselineCommandPath = null;
 
         for (int i = 1; i < args.Length; i++)
         {
@@ -235,6 +240,28 @@ public static class OdfKitCli
                 case "--quiet":
                     quiet = true;
                     break;
+                case "--baseline":
+                    if (!TryReadValue(args, ref i, error, "--baseline", out string? baselineValue) ||
+                        !TryParseBaseline(baselineValue, out baseline))
+                    {
+                        error.WriteLine("supported baselines: none, odf-validator, command");
+                        return false;
+                    }
+                    break;
+                case "--baseline-jar":
+                    if (!TryReadValue(args, ref i, error, "--baseline-jar", out baselineJarPath))
+                    {
+                        return false;
+                    }
+                    baseline = ValidateBaselineKind.OdfValidator;
+                    break;
+                case "--baseline-command":
+                    if (!TryReadValue(args, ref i, error, "--baseline-command", out baselineCommandPath))
+                    {
+                        return false;
+                    }
+                    baseline = ValidateBaselineKind.Command;
+                    break;
                 default:
                     if (arg.StartsWith("-", StringComparison.Ordinal))
                     {
@@ -265,7 +292,7 @@ public static class OdfKitCli
             return false;
         }
 
-        options = new ValidateOptions(path, format, failOn, profile, recursive, quiet);
+        options = new ValidateOptions(path, format, failOn, profile, recursive, quiet, baseline, baselineJarPath, baselineCommandPath);
         return true;
     }
 
@@ -318,6 +345,54 @@ public static class OdfKitCli
         return false;
     }
 
+    private static bool TryParseBaseline(string? value, out ValidateBaselineKind baseline)
+    {
+        if (string.Equals(value, "none", StringComparison.OrdinalIgnoreCase))
+        {
+            baseline = ValidateBaselineKind.None;
+            return true;
+        }
+
+        if (string.Equals(value, "odf-validator", StringComparison.OrdinalIgnoreCase))
+        {
+            baseline = ValidateBaselineKind.OdfValidator;
+            return true;
+        }
+
+        if (string.Equals(value, "command", StringComparison.OrdinalIgnoreCase))
+        {
+            baseline = ValidateBaselineKind.Command;
+            return true;
+        }
+
+        baseline = ValidateBaselineKind.None;
+        return false;
+    }
+
+    private static ValidateBaselineResult? ValidateWithBaseline(string file, ValidateOptions options)
+    {
+        if (options.Baseline == ValidateBaselineKind.None)
+        {
+            return null;
+        }
+
+        OdfExternalValidatorResult result = options.Baseline switch
+        {
+            ValidateBaselineKind.OdfValidator => OdfExternalValidator.ValidateWithOdfValidator(file, options.BaselineJarPath),
+            ValidateBaselineKind.Command => OdfExternalValidator.ValidateWithCommand(
+                options.BaselineCommandPath ?? throw new ArgumentException("未提供 baseline command 路徑。"),
+                file),
+            _ => throw new ArgumentOutOfRangeException(nameof(options), "不支援的 baseline。")
+        };
+
+        return new ValidateBaselineResult(
+            options.Baseline.ToString(),
+            result.ExitCode,
+            result.IsValid,
+            result.StandardOutput,
+            result.StandardError);
+    }
+
     private static IReadOnlyList<string> ResolveValidateFiles(string path, bool recursive)
     {
         if (File.Exists(path))
@@ -346,6 +421,14 @@ public static class OdfKitCli
             output.WriteLine("kind: " + report.DocumentKind);
             output.WriteLine("version: " + FormatVersion(report.DetectedVersion));
             output.WriteLine("issues: " + report.Issues.Count.ToString(CultureInfo.InvariantCulture));
+            if (result.Baseline is not null)
+            {
+                output.WriteLine("baseline: " + result.Baseline.Kind);
+                output.WriteLine("baseline-valid: " + result.Baseline.IsValid.ToString(CultureInfo.InvariantCulture));
+                output.WriteLine("baseline-exit-code: " + result.Baseline.ExitCode.ToString(CultureInfo.InvariantCulture));
+                output.WriteLine("baseline-matches: " + result.BaselineMatches.ToString(CultureInfo.InvariantCulture));
+            }
+
             foreach (OdfValidationIssue issue in report.Issues)
             {
                 output.WriteLine($"{issue.Severity}: {issue.RuleId} {issue.Message}");
@@ -360,6 +443,11 @@ public static class OdfKitCli
                 " warnings=" + summary.WarningCount.ToString(CultureInfo.InvariantCulture) +
                 " errors=" + summary.ErrorCount.ToString(CultureInfo.InvariantCulture) +
                 " fatal=" + summary.FatalCount.ToString(CultureInfo.InvariantCulture));
+            if (summary.BaselineFileCount > 0)
+            {
+                output.WriteLine("baseline-summary: files=" + summary.BaselineFileCount.ToString(CultureInfo.InvariantCulture) +
+                    " mismatches=" + summary.BaselineMismatchCount.ToString(CultureInfo.InvariantCulture));
+            }
         }
     }
 
@@ -379,7 +467,9 @@ public static class OdfKitCli
                 warningCount = summary.WarningCount,
                 errorCount = summary.ErrorCount,
                 fatalCount = summary.FatalCount,
-                blockingIssueCount = summary.BlockingIssueCount
+                blockingIssueCount = summary.BlockingIssueCount,
+                baselineFileCount = summary.BaselineFileCount,
+                baselineMismatchCount = summary.BaselineMismatchCount
             },
             files = results.Select(result => new
             {
@@ -392,6 +482,15 @@ public static class OdfKitCli
                 errorCount = result.Report.ErrorCount,
                 fatalCount = result.Report.FatalCount,
                 blockingIssueCount = result.Report.BlockingIssueCount,
+                baseline = result.Baseline is null ? null : new
+                {
+                    kind = result.Baseline.Kind,
+                    isValid = result.Baseline.IsValid,
+                    exitCode = result.Baseline.ExitCode,
+                    matchesOdfKit = result.BaselineMatches,
+                    standardOutput = result.Baseline.StandardOutput,
+                    standardError = result.Baseline.StandardError
+                },
                 issues = result.Report.Issues.Select(issue => new
                 {
                     severity = issue.Severity.ToString(),
@@ -411,6 +510,11 @@ public static class OdfKitCli
 
     private static bool ShouldFail(ValidateSummary summary, ValidateFailOn failOn)
     {
+        if (summary.BaselineMismatchCount > 0)
+        {
+            return true;
+        }
+
         return failOn == ValidateFailOn.Warning
             ? summary.WarningCount > 0 || summary.ErrorCount > 0 || summary.FatalCount > 0
             : summary.ErrorCount > 0 || summary.FatalCount > 0;
@@ -441,15 +545,38 @@ public static class OdfKitCli
         Warning
     }
 
+    private enum ValidateBaselineKind
+    {
+        None,
+        OdfValidator,
+        Command
+    }
+
     private sealed record ValidateOptions(
         string Path,
         ValidateOutputFormat Format,
         ValidateFailOn FailOn,
         OdfComplianceProfile? Profile,
         bool Recursive,
-        bool Quiet);
+        bool Quiet,
+        ValidateBaselineKind Baseline,
+        string? BaselineJarPath,
+        string? BaselineCommandPath);
 
-    private sealed record ValidateFileResult(string Path, OdfValidationReport Report);
+    private sealed record ValidateFileResult(
+        string Path,
+        OdfValidationReport Report,
+        ValidateBaselineResult? Baseline)
+    {
+        public bool BaselineMatches => Baseline is null || Baseline.IsValid == Report.IsValid;
+    }
+
+    private sealed record ValidateBaselineResult(
+        string Kind,
+        int ExitCode,
+        bool IsValid,
+        string StandardOutput,
+        string StandardError);
 
     private sealed class ValidateSummary
     {
@@ -469,6 +596,10 @@ public static class OdfKitCli
 
         public int BlockingIssueCount { get; private init; }
 
+        public int BaselineFileCount { get; private init; }
+
+        public int BaselineMismatchCount { get; private init; }
+
         public static ValidateSummary Create(IReadOnlyList<ValidateFileResult> results)
         {
             return new ValidateSummary
@@ -480,7 +611,9 @@ public static class OdfKitCli
                 WarningCount = results.Sum(result => result.Report.WarningCount),
                 ErrorCount = results.Sum(result => result.Report.ErrorCount),
                 FatalCount = results.Sum(result => result.Report.FatalCount),
-                BlockingIssueCount = results.Sum(result => result.Report.BlockingIssueCount)
+                BlockingIssueCount = results.Sum(result => result.Report.BlockingIssueCount),
+                BaselineFileCount = results.Count(result => result.Baseline is not null),
+                BaselineMismatchCount = results.Count(result => !result.BaselineMatches)
             };
         }
     }

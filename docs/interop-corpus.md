@@ -1,6 +1,6 @@
 # Interop Corpus
 
-本文件記錄目前 OdfKit 用來支撐相容性與 round-trip 宣稱的 corpus 類型。這不是外部檔案清單的完整快照，而是可維護的測試來源說明。
+本文件記錄目前 OdfKit 用來支撐相容性與 round-trip 宣稱的 corpus 類型。這不是外部檔案清單的完整快照，而是可維護的測試來源說明。fixture metadata 規則請見 [corpus-manifest.md](corpus-manifest.md)，ODF Toolkit / ODF Validator 對標線請見 [odf-toolkit-parity.md](odf-toolkit-parity.md)。
 
 ## Generated corpus
 
@@ -34,6 +34,12 @@
 
 - `OdfKit.Extensions.Rendering` 與相關測試使用可替換的 LibreOffice finder。
 - 這部分屬可選 rendering 擴充，不是核心 OdfKit 建立、載入、保存與驗證能力的必要條件。
+
+## ODF Toolkit parity corpus
+
+- OdfKit 允許用外部 ODF Validator 作為 optional baseline。
+- 一般 CI 不要求 Java 或 ODF Validator JAR；設定 `ODFKIT_ODFVALIDATOR_JAR` 或 CLI `--baseline-jar` 後才執行外部比對。
+- Classification mismatch 必須記錄為 documented exception，否則視為 parity failure。
 
 ## Real-world sanitized corpus
 
