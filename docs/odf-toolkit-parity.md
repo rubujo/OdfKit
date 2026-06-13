@@ -89,6 +89,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate sample.odt
   指向本機資料夾。
 - 每個 fixture 都要記錄來源、授權、預期 valid / invalid、ODF 版本、
   profile 與 round-trip 預期。
+- Corpus manifest 會拒絕重複 `id` / `path`、未知 `roundTrip` 策略與逃出 corpus root 的路徑。
 - 不以 byte-level identity 作為一般 round-trip 要求；除非該 fixture 明確標記。
 
 Corpus manifest 可用 CLI 執行：

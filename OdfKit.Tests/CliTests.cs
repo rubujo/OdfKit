@@ -472,6 +472,96 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證 validate-corpus 會拒絕逃出 corpus root 的 fixture 路徑。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusRejectsPathEscapingRoot()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string manifest = Path.Combine(root, "manifest.json");
+            WriteCorpusManifest(manifest, "../outside.odt", "valid");
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest], output, error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains("escapes the corpus root", error.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 validate-corpus 會拒絕重複 fixture id。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusRejectsDuplicateFixtureIds()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string manifest = Path.Combine(root, "manifest.json");
+            WriteCorpusManifest(
+                manifest,
+                [
+                    ("generated-valid", "first.odt", "valid", "Text", "1.4", "semantic-equivalent"),
+                    ("generated-valid", "second.odt", "valid", "Text", "1.4", "semantic-equivalent")
+                ]);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest], output, error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains("duplicate corpus fixture id", error.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 validate-corpus 會拒絕未知 roundTrip 策略。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusRejectsUnknownRoundTripPolicy()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string manifest = Path.Combine(root, "manifest.json");
+            WriteCorpusManifest(
+                manifest,
+                [
+                    ("generated-valid", "fixture.odt", "valid", "Text", "1.4", "unknown-policy")
+                ]);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest], output, error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains("roundTrip", error.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
     /// 驗證 validate-corpus 可沿用 baseline documented exceptions。
     /// </summary>
     [Fact]
@@ -709,24 +799,37 @@ public class CliTests
         string kind = "Text",
         string version = "1.4")
     {
-        File.WriteAllText(
+        WriteCorpusManifest(
             manifestPath,
-            "{\n" +
-            "  \"fixtures\": [\n" +
-            "    {\n" +
-            "      \"id\": \"generated-valid\",\n" +
-            "      \"path\": \"" + fixturePath + "\",\n" +
-            "      \"source\": \"generated\",\n" +
-            "      \"license\": \"generated-no-copyright\",\n" +
-            "      \"kind\": \"" + kind + "\",\n" +
-            "      \"version\": \"" + version + "\",\n" +
-            "      \"profile\": \"" + OdfComplianceProfiles.OasisOdf14Extended.Id + "\",\n" +
-            "      \"expected\": \"" + expected + "\",\n" +
-            "      \"roundTrip\": \"semantic-equivalent\"\n" +
-            "    }\n" +
-            "  ]\n" +
-            "}\n",
-            Encoding.UTF8);
+            [("generated-valid", fixturePath, expected, kind, version, "semantic-equivalent")]);
+    }
+
+    private static void WriteCorpusManifest(
+        string manifestPath,
+        IReadOnlyList<(string Id, string Path, string Expected, string Kind, string Version, string RoundTrip)> fixtures)
+    {
+        StringBuilder builder = new();
+        builder.AppendLine("{");
+        builder.AppendLine("  \"fixtures\": [");
+        for (int i = 0; i < fixtures.Count; i++)
+        {
+            var fixture = fixtures[i];
+            builder.AppendLine("    {");
+            builder.AppendLine("      \"id\": \"" + fixture.Id + "\",");
+            builder.AppendLine("      \"path\": \"" + fixture.Path.Replace("\\", "\\\\") + "\",");
+            builder.AppendLine("      \"source\": \"generated\",");
+            builder.AppendLine("      \"license\": \"generated-no-copyright\",");
+            builder.AppendLine("      \"kind\": \"" + fixture.Kind + "\",");
+            builder.AppendLine("      \"version\": \"" + fixture.Version + "\",");
+            builder.AppendLine("      \"profile\": \"" + OdfComplianceProfiles.OasisOdf14Extended.Id + "\",");
+            builder.AppendLine("      \"expected\": \"" + fixture.Expected + "\",");
+            builder.AppendLine("      \"roundTrip\": \"" + fixture.RoundTrip + "\"");
+            builder.Append(i + 1 == fixtures.Count ? "    }\n" : "    },\n");
+        }
+
+        builder.AppendLine("  ]");
+        builder.AppendLine("}");
+        File.WriteAllText(manifestPath, builder.ToString(), Encoding.UTF8);
     }
 
     private static void TryDelete(string path)

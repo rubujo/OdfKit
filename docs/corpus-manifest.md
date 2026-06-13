@@ -28,6 +28,15 @@ repo 內可直接執行的範本 manifest 位於 `tests/fixtures/corpus/manifest
 | `roundTrip` | yes | `preserve-unknown`、`semantic-equivalent` 或 `byte-identical`。 |
 | `notes` | no | 差異、例外或外部 validator 注意事項。 |
 
+## Manifest 驗證規則
+
+- `id` 必須在同一 manifest 內唯一。
+- `path` 必須在同一 manifest 內唯一，且必須是相對路徑。
+- `path` 解析後不得逃出 manifest root 或 `--root` 指定的 corpus root。
+- `roundTrip` 只能是 `preserve-unknown`、`semantic-equivalent` 或 `byte-identical`。
+- `profile` 必須能對應到 OdfKit 內建的 compliance profile。
+- `expected` 只能是 `valid` 或 `invalid`。
+
 ## 初始內建 corpus
 
 | id | path | source | license | kind | version | profile | expected | roundTrip |

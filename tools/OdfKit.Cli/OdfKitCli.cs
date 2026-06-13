@@ -119,7 +119,7 @@ public static class OdfKitCli
         List<ValidateCorpusFixtureResult> results = [];
         foreach (ValidateCorpusFixture fixture in manifest.Fixtures)
         {
-            string path = Path.GetFullPath(Path.Combine(parsedOptions.RootPath, fixture.Path));
+            string path = ResolveCorpusFixturePath(parsedOptions.RootPath, fixture.Path);
             if (!File.Exists(path))
             {
                 throw new InvalidDataException("corpus fixture not found: " + fixture.Path);
@@ -226,6 +226,32 @@ public static class OdfKitCli
 
         error.WriteLine("usage: odfkit " + usage);
         return false;
+    }
+
+    private static string ResolveCorpusFixturePath(string rootPath, string fixturePath)
+    {
+        if (Path.IsPathRooted(fixturePath))
+        {
+            throw new InvalidDataException("corpus fixture path must be relative: " + fixturePath);
+        }
+
+        string root = Path.GetFullPath(rootPath);
+        string candidate = Path.GetFullPath(Path.Combine(root, fixturePath));
+        string rootWithSeparator = EnsureTrailingDirectorySeparator(root);
+        if (!candidate.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidDataException("corpus fixture path escapes the corpus root: " + fixturePath);
+        }
+
+        return candidate;
+    }
+
+    private static string EnsureTrailingDirectorySeparator(string path)
+    {
+        return path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) ||
+            path.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+            ? path
+            : path + Path.DirectorySeparatorChar;
     }
 
     private static int UnknownCommand(string command, TextWriter error)
@@ -1070,9 +1096,23 @@ public static class OdfKitCli
             }
 
             List<ValidateCorpusFixture> parsed = [];
+            HashSet<string> ids = new(StringComparer.OrdinalIgnoreCase);
+            HashSet<string> paths = new(StringComparer.OrdinalIgnoreCase);
             foreach (JsonElement item in fixtures.EnumerateArray())
             {
-                parsed.Add(ValidateCorpusFixture.Parse(item));
+                ValidateCorpusFixture fixture = ValidateCorpusFixture.Parse(item);
+                if (!ids.Add(fixture.Id))
+                {
+                    throw new InvalidDataException("duplicate corpus fixture id: " + fixture.Id);
+                }
+
+                string normalizedPath = fixture.Path.Replace('\\', '/').Trim();
+                if (!paths.Add(normalizedPath))
+                {
+                    throw new InvalidDataException("duplicate corpus fixture path: " + fixture.Path);
+                }
+
+                parsed.Add(fixture);
             }
 
             if (parsed.Count == 0)
@@ -1114,6 +1154,7 @@ public static class OdfKitCli
             OdfComplianceProfile profile = OdfComplianceProfiles.Find(profileId) ??
                 throw new InvalidDataException("unknown corpus fixture profile: " + profileId);
             ValidateCorpusExpected expected = ParseExpected(expectedValue);
+            ValidateRoundTrip(roundTrip);
             return new ValidateCorpusFixture(id, path, source, license, kind, version, profile, expected, roundTrip);
         }
 
@@ -1130,6 +1171,18 @@ public static class OdfKitCli
             }
 
             throw new InvalidDataException("corpus fixture expected must be valid or invalid.");
+        }
+
+        private static void ValidateRoundTrip(string value)
+        {
+            if (string.Equals(value, "preserve-unknown", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "semantic-equivalent", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "byte-identical", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            throw new InvalidDataException("corpus fixture roundTrip must be preserve-unknown, semantic-equivalent, or byte-identical.");
         }
 
         private static string ReadRequiredString(JsonElement item, string propertyName)
