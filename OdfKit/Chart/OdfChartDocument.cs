@@ -169,6 +169,24 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
     }
 
     /// <summary>
+    /// 取得或設定 X 軸標題。
+    /// </summary>
+    public string? XAxisTitle
+    {
+        get => GetAxisTitle("x");
+        set => SetAxisTitle("x", value);
+    }
+
+    /// <summary>
+    /// 取得或設定 Y 軸標題。
+    /// </summary>
+    public string? YAxisTitle
+    {
+        get => GetAxisTitle("y");
+        set => SetAxisTitle("y", value);
+    }
+
+    /// <summary>
     /// 取得圖表中的資料序列摘要。
     /// </summary>
     public IReadOnlyList<OdfChartSeriesInfo> Series => GetSeries();
@@ -196,6 +214,51 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
         OdfNode axis = FindOrCreateAxis("x");
         OdfNode categories = FindOrCreateChild(axis, "categories", OdfNamespaces.Chart, "chart");
         categories.SetAttribute("cell-range-address", OdfNamespaces.Table, cellRangeAddress, "table");
+    }
+
+    /// <summary>
+    /// 取得指定維度座標軸的標題。
+    /// </summary>
+    /// <param name="dimension">座標軸維度，例如 x、y 或 z。</param>
+    /// <returns>座標軸標題；若未設定則為 <see langword="null"/>。</returns>
+    public string? GetAxisTitle(string dimension)
+    {
+        ValidateAxisDimension(dimension);
+
+        OdfNode? axis = FindAxis(dimension);
+        OdfNode? title = axis is null ? null : FindChildElement(axis, "title", OdfNamespaces.Chart);
+        OdfNode? paragraph = title is null ? null : FindChildElement(title, "p", OdfNamespaces.Text);
+        string? text = paragraph?.TextContent;
+        return string.IsNullOrEmpty(text) ? null : text;
+    }
+
+    /// <summary>
+    /// 設定指定維度座標軸的標題。
+    /// </summary>
+    /// <param name="dimension">座標軸維度，例如 x、y 或 z。</param>
+    /// <param name="title">座標軸標題；空白值會移除既有標題。</param>
+    public void SetAxisTitle(string dimension, string? title)
+    {
+        ValidateAxisDimension(dimension);
+
+        OdfNode? existingAxis = FindAxis(dimension);
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            OdfNode? existingTitle = existingAxis is null
+                ? null
+                : FindChildElement(existingAxis, "title", OdfNamespaces.Chart);
+            if (existingTitle is not null)
+            {
+                existingAxis!.RemoveChild(existingTitle);
+            }
+
+            return;
+        }
+
+        OdfNode axis = existingAxis ?? FindOrCreateAxis(dimension);
+        OdfNode titleNode = FindOrCreateAxisTitle(axis);
+        OdfNode paragraph = FindOrCreateChild(titleNode, "p", OdfNamespaces.Text, "text");
+        paragraph.TextContent = title!;
     }
 
     /// <summary>
@@ -231,15 +294,10 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
     private OdfNode FindOrCreateAxis(string dimension)
     {
         OdfNode plotArea = FindOrCreatePlotArea();
-        foreach (OdfNode child in plotArea.Children)
+        OdfNode? existingAxis = FindAxis(plotArea, dimension);
+        if (existingAxis is not null)
         {
-            if (child.NodeType is OdfNodeType.Element &&
-                child.LocalName == "axis" &&
-                child.NamespaceUri == OdfNamespaces.Chart &&
-                string.Equals(child.GetAttribute("dimension", OdfNamespaces.Chart), dimension, StringComparison.Ordinal))
-            {
-                return child;
-            }
+            return existingAxis;
         }
 
         OdfNode axis = OdfNodeFactory.CreateElement("axis", OdfNamespaces.Chart, "chart");
@@ -255,6 +313,50 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
         }
 
         return axis;
+    }
+
+    private OdfNode? FindAxis(string dimension)
+    {
+        OdfNode? plotArea = FindChildElement(GetChartNode(), "plot-area", OdfNamespaces.Chart);
+        return plotArea is null ? null : FindAxis(plotArea, dimension);
+    }
+
+    private static OdfNode? FindAxis(OdfNode plotArea, string dimension)
+    {
+        foreach (OdfNode child in plotArea.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "axis" &&
+                child.NamespaceUri == OdfNamespaces.Chart &&
+                string.Equals(child.GetAttribute("dimension", OdfNamespaces.Chart), dimension, StringComparison.Ordinal))
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private static OdfNode FindOrCreateAxisTitle(OdfNode axis)
+    {
+        OdfNode? existingTitle = FindChildElement(axis, "title", OdfNamespaces.Chart);
+        if (existingTitle is not null)
+        {
+            return existingTitle;
+        }
+
+        OdfNode title = OdfNodeFactory.CreateElement("title", OdfNamespaces.Chart, "chart");
+        OdfNode? categories = FindChildElement(axis, "categories", OdfNamespaces.Chart);
+        if (categories is not null)
+        {
+            axis.InsertBefore(title, categories);
+        }
+        else
+        {
+            axis.AppendChild(title);
+        }
+
+        return title;
     }
 
     private OdfNode? FindCategoriesNode()
@@ -322,6 +424,14 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
         }
 
         return series;
+    }
+
+    private static void ValidateAxisDimension(string dimension)
+    {
+        if (string.IsNullOrWhiteSpace(dimension))
+        {
+            throw new ArgumentException("座標軸維度不能為空。", nameof(dimension));
+        }
     }
 
     private static OdfChartDocument EnsureChart(OdfDocument document)

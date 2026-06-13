@@ -126,7 +126,7 @@ public class DocumentKindApiUsabilityTests
     }
 
     /// <summary>
-    /// 驗證 ODC 圖表可建立標題、圖例、資料來源標籤、分類與序列佔位並 round-trip。
+    /// 驗證 ODC 圖表可建立標題、圖例、座標軸、資料來源標籤、分類與序列佔位並 round-trip。
     /// </summary>
     [Fact]
     public void CreateLoadChartWithTitleLegendAndSeries()
@@ -137,16 +137,24 @@ public class DocumentKindApiUsabilityTests
         chart.DataSourceHasLabels = "both";
         chart.SetLegend("top");
         chart.SetCategories("Sheet1.A1:C1");
+        chart.XAxisTitle = "月份";
+        chart.YAxisTitle = "金額";
         chart.AddSeries("Sheet1.A1:A3", "Sheet1.A1");
 
         using OdfChartDocument loaded = RoundTrip(chart, "chart.odc", OdfChartDocument.Load);
+        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "chart.odc");
 
         Assert.Equal("application/vnd.oasis.opendocument.chart", loaded.Package.MimeType);
+        Assert.True(report.IsValid, report.ToJson());
         Assert.Equal("bar", loaded.ChartClass);
         Assert.Equal("營收", loaded.ChartTitle);
         Assert.Equal("both", loaded.DataSourceHasLabels);
         Assert.Equal("top", loaded.LegendPosition);
         Assert.Equal("Sheet1.A1:C1", loaded.CategoriesCellRangeAddress);
+        Assert.Equal("月份", loaded.XAxisTitle);
+        Assert.Equal("金額", loaded.YAxisTitle);
+        Assert.Equal("月份", loaded.GetAxisTitle("x"));
+        Assert.Equal("金額", loaded.GetAxisTitle("y"));
         Assert.Single(loaded.Series);
         Assert.Equal("Sheet1.A1:A3", loaded.Series[0].ValuesCellRangeAddress);
         Assert.Equal("Sheet1.A1", loaded.Series[0].LabelCellAddress);
@@ -156,6 +164,11 @@ public class DocumentKindApiUsabilityTests
         Assert.Equal(
             "Sheet1.A1:C1",
             FindDescendant(loaded.ChartNode, "categories", OdfNamespaces.Chart)?.GetAttribute("cell-range-address", OdfNamespaces.Table));
+        Assert.Equal(
+            "月份",
+            FindDescendant(loaded.ChartNode, "axis", OdfNamespaces.Chart)?
+                .Children.Find(child => child.LocalName == "title" && child.NamespaceUri == OdfNamespaces.Chart)?
+                .TextContent);
         Assert.Equal(
             "Sheet1.A1:A3",
             FindDescendant(loaded.ChartNode, "series", OdfNamespaces.Chart)?.GetAttribute("values-cell-range-address", OdfNamespaces.Chart));

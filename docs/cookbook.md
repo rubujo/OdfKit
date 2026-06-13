@@ -144,6 +144,26 @@ Console.WriteLine(loadedImage.FrameTitle);
 Console.WriteLine(loadedImage.FrameWidth);
 ```
 
+## 建立 ODC 圖表
+
+```csharp
+using OdfKit.Chart;
+
+using OdfChartDocument chart = OdfChartDocument.Create();
+chart.ChartClass = "bar";
+chart.ChartTitle = "營收";
+chart.SetLegend("top");
+chart.SetCategories("Sheet1.A1:C1");
+chart.XAxisTitle = "月份";
+chart.YAxisTitle = "金額";
+chart.AddSeries("Sheet1.A1:A3", "Sheet1.A1");
+chart.Save("revenue.odc");
+
+using OdfChartDocument loadedChart = OdfChartDocument.Load("revenue.odc");
+Console.WriteLine(loadedChart.XAxisTitle);
+Console.WriteLine(loadedChart.Series[0].ValuesCellRangeAddress);
+```
+
 ## 建立 ODB 資料來源描述
 
 ```csharp
