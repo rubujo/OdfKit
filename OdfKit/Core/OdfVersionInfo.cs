@@ -37,4 +37,24 @@ public static class OdfVersionInfo
             _ => "unknown"
         };
     }
+
+    /// <summary>
+    /// 嘗試將規格版本字串轉換為 <see cref="OdfVersion"/>。
+    /// </summary>
+    /// <param name="value">版本字串，例如 <c>1.4</c>。</param>
+    /// <param name="version">轉換後的 ODF 版本。</param>
+    /// <returns>若版本字串可辨識則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public static bool TryParseVersionString(string? value, out OdfVersion version)
+    {
+        version = value switch
+        {
+            "1.0" => OdfVersion.Odf10,
+            "1.1" => OdfVersion.Odf11,
+            "1.2" => OdfVersion.Odf12,
+            "1.3" => OdfVersion.Odf13,
+            "1.4" => OdfVersion.Odf14,
+            _ => OdfVersion.Unknown
+        };
+        return version != OdfVersion.Unknown;
+    }
 }

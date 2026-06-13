@@ -277,6 +277,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.StyleFamily;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:office:1.0" &&
+            node.LocalName == "version")
+        {
+            return AttributeValueKind.OdfVersion;
+        }
+
         AttributeValueKind valueKind = AttributeValueKind.Unknown;
         foreach (var child in node.Children)
         {
@@ -398,6 +404,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetStyleFamilyAttributeValue",
                     "SetStyleFamilyAttributeValue");
                 break;
+            case AttributeValueKind.OdfVersion:
+                writer.WriteLine($"        public OdfVersion? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetOdfVersionAttributeValue",
+                    "SetOdfVersionAttributeValue");
+                break;
             default:
                 writer.WriteLine($"        public string? {propName}");
                 writer.WriteLine("        {");
@@ -516,7 +531,8 @@ public sealed class DomWrappersCSharpWriter
         Boolean,
         Decimal,
         DateTime,
-        StyleFamily
+        StyleFamily,
+        OdfVersion
     }
 
     private sealed class AttributePropertyMetadata

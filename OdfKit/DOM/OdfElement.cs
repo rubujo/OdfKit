@@ -225,6 +225,32 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
         SetAttributeValue(localName, namespaceUri, FormatStyleFamily(value), prefix, version);
     }
 
+    /// <summary>
+    /// 取得具有 schema awareness 的 ODF 版本屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的 ODF 版本；若屬性不存在或不是已知版本則為 <see langword="null"/>。</returns>
+    public OdfVersion? GetOdfVersionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return OdfVersionInfo.TryParseVersionString(value, out OdfVersion parsed) ? parsed : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 ODF 版本屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的 ODF 版本。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetOdfVersionAttributeValue(string localName, string namespaceUri, OdfVersion value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, OdfVersionInfo.ToVersionString(value), prefix, version);
+    }
+
     private static bool TryParseStyleFamily(string? value, out OdfStyleFamily family)
     {
         switch (value)
