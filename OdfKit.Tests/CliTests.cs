@@ -161,6 +161,15 @@ public class CliTests
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textAnchorType").GetInt32() >= 102);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textNoteClass").GetInt32() >= 101);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textSelectPage").GetInt32() >= 100);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textReferenceFormat").GetInt32() >= 100);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textStartNumberingAt").GetInt32() >= 100);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textFootnotesPosition").GetInt32() >= 100);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textCaptionSequenceFormat").GetInt32() >= 100);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textNumberPosition").GetInt32() >= 99);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textPlaceholderType").GetInt32() >= 99);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textAnimation").GetInt32() >= 99);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textAnimationDirection").GetInt32() >= 99);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textKind").GetInt32() >= 99);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineStyle").GetInt32() >= 534);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineType").GetInt32() >= 433);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineWidth").GetInt32() >= 433);

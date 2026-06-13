@@ -929,6 +929,240 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的文字參照格式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的文字參照格式；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTextReferenceFormat? GetTextReferenceFormatAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTextReferenceFormat(value, out OdfTextReferenceFormat format) ? format : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的文字參照格式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的文字參照格式。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTextReferenceFormatAttributeValue(string localName, string namespaceUri, OdfTextReferenceFormat value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTextReferenceFormat(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的文字起始編號範圍屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的文字起始編號範圍；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTextStartNumberingAt? GetTextStartNumberingAtAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTextStartNumberingAt(value, out OdfTextStartNumberingAt startNumberingAt) ? startNumberingAt : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的文字起始編號範圍屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的文字起始編號範圍。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTextStartNumberingAtAttributeValue(string localName, string namespaceUri, OdfTextStartNumberingAt value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTextStartNumberingAt(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的文字註腳位置屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的文字註腳位置；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTextFootnotesPosition? GetTextFootnotesPositionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTextFootnotesPosition(value, out OdfTextFootnotesPosition position) ? position : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的文字註腳位置屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的文字註腳位置。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTextFootnotesPositionAttributeValue(string localName, string namespaceUri, OdfTextFootnotesPosition value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTextFootnotesPosition(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的文字標號序列格式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的文字標號序列格式；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTextCaptionSequenceFormat? GetTextCaptionSequenceFormatAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTextCaptionSequenceFormat(value, out OdfTextCaptionSequenceFormat format) ? format : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的文字標號序列格式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的文字標號序列格式。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTextCaptionSequenceFormatAttributeValue(string localName, string namespaceUri, OdfTextCaptionSequenceFormat value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTextCaptionSequenceFormat(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的文字編號位置屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的文字編號位置；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTextNumberPosition? GetTextNumberPositionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTextNumberPosition(value, out OdfTextNumberPosition position) ? position : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的文字編號位置屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的文字編號位置。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTextNumberPositionAttributeValue(string localName, string namespaceUri, OdfTextNumberPosition value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTextNumberPosition(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的文字預留位置類型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的文字預留位置類型；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTextPlaceholderType? GetTextPlaceholderTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTextPlaceholderType(value, out OdfTextPlaceholderType placeholderType) ? placeholderType : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的文字預留位置類型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的文字預留位置類型。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTextPlaceholderTypeAttributeValue(string localName, string namespaceUri, OdfTextPlaceholderType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTextPlaceholderType(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的文字動畫屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的文字動畫；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTextAnimation? GetTextAnimationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTextAnimation(value, out OdfTextAnimation animation) ? animation : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的文字動畫屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的文字動畫。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTextAnimationAttributeValue(string localName, string namespaceUri, OdfTextAnimation value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTextAnimation(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的文字動畫方向屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的文字動畫方向；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTextAnimationDirection? GetTextAnimationDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTextAnimationDirection(value, out OdfTextAnimationDirection direction) ? direction : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的文字動畫方向屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的文字動畫方向。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTextAnimationDirectionAttributeValue(string localName, string namespaceUri, OdfTextAnimationDirection value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTextAnimationDirection(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的文字索引項目種類屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的文字索引項目種類；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTextKind? GetTextKindAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTextKind(value, out OdfTextKind kind) ? kind : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的文字索引項目種類屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的文字索引項目種類。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTextKindAttributeValue(string localName, string namespaceUri, OdfTextKind value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTextKind(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的 0 到 100 百分比屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -2895,6 +3129,328 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfTextSelectPage.Next => "next",
             OdfTextSelectPage.Previous => "previous",
             _ => throw new ArgumentOutOfRangeException(nameof(selectPage), selectPage, "未知的 ODF 文字頁面選取。")
+        };
+    }
+
+    private static bool TryParseTextReferenceFormat(string? value, out OdfTextReferenceFormat format)
+    {
+        switch (value)
+        {
+            case "caption":
+                format = OdfTextReferenceFormat.Caption;
+                return true;
+            case "category-and-value":
+                format = OdfTextReferenceFormat.CategoryAndValue;
+                return true;
+            case "chapter":
+                format = OdfTextReferenceFormat.Chapter;
+                return true;
+            case "direction":
+                format = OdfTextReferenceFormat.Direction;
+                return true;
+            case "number":
+                format = OdfTextReferenceFormat.Number;
+                return true;
+            case "number-all-superior":
+                format = OdfTextReferenceFormat.NumberAllSuperior;
+                return true;
+            case "number-no-superior":
+                format = OdfTextReferenceFormat.NumberNoSuperior;
+                return true;
+            case "page":
+                format = OdfTextReferenceFormat.Page;
+                return true;
+            case "text":
+                format = OdfTextReferenceFormat.Text;
+                return true;
+            case "value":
+                format = OdfTextReferenceFormat.Value;
+                return true;
+            default:
+                format = default;
+                return false;
+        }
+    }
+
+    private static string FormatTextReferenceFormat(OdfTextReferenceFormat format)
+    {
+        return format switch
+        {
+            OdfTextReferenceFormat.Caption => "caption",
+            OdfTextReferenceFormat.CategoryAndValue => "category-and-value",
+            OdfTextReferenceFormat.Chapter => "chapter",
+            OdfTextReferenceFormat.Direction => "direction",
+            OdfTextReferenceFormat.Number => "number",
+            OdfTextReferenceFormat.NumberAllSuperior => "number-all-superior",
+            OdfTextReferenceFormat.NumberNoSuperior => "number-no-superior",
+            OdfTextReferenceFormat.Page => "page",
+            OdfTextReferenceFormat.Text => "text",
+            OdfTextReferenceFormat.Value => "value",
+            _ => throw new ArgumentOutOfRangeException(nameof(format), format, "未知的 ODF 文字參照格式。")
+        };
+    }
+
+    private static bool TryParseTextStartNumberingAt(string? value, out OdfTextStartNumberingAt startNumberingAt)
+    {
+        switch (value)
+        {
+            case "chapter":
+                startNumberingAt = OdfTextStartNumberingAt.Chapter;
+                return true;
+            case "document":
+                startNumberingAt = OdfTextStartNumberingAt.Document;
+                return true;
+            case "page":
+                startNumberingAt = OdfTextStartNumberingAt.Page;
+                return true;
+            default:
+                startNumberingAt = default;
+                return false;
+        }
+    }
+
+    private static string FormatTextStartNumberingAt(OdfTextStartNumberingAt startNumberingAt)
+    {
+        return startNumberingAt switch
+        {
+            OdfTextStartNumberingAt.Chapter => "chapter",
+            OdfTextStartNumberingAt.Document => "document",
+            OdfTextStartNumberingAt.Page => "page",
+            _ => throw new ArgumentOutOfRangeException(nameof(startNumberingAt), startNumberingAt, "未知的 ODF 文字起始編號範圍。")
+        };
+    }
+
+    private static bool TryParseTextFootnotesPosition(string? value, out OdfTextFootnotesPosition position)
+    {
+        switch (value)
+        {
+            case "document":
+                position = OdfTextFootnotesPosition.Document;
+                return true;
+            case "page":
+                position = OdfTextFootnotesPosition.Page;
+                return true;
+            case "section":
+                position = OdfTextFootnotesPosition.Section;
+                return true;
+            case "text":
+                position = OdfTextFootnotesPosition.Text;
+                return true;
+            default:
+                position = default;
+                return false;
+        }
+    }
+
+    private static string FormatTextFootnotesPosition(OdfTextFootnotesPosition position)
+    {
+        return position switch
+        {
+            OdfTextFootnotesPosition.Document => "document",
+            OdfTextFootnotesPosition.Page => "page",
+            OdfTextFootnotesPosition.Section => "section",
+            OdfTextFootnotesPosition.Text => "text",
+            _ => throw new ArgumentOutOfRangeException(nameof(position), position, "未知的 ODF 文字註腳位置。")
+        };
+    }
+
+    private static bool TryParseTextCaptionSequenceFormat(string? value, out OdfTextCaptionSequenceFormat format)
+    {
+        switch (value)
+        {
+            case "caption":
+                format = OdfTextCaptionSequenceFormat.Caption;
+                return true;
+            case "category-and-value":
+                format = OdfTextCaptionSequenceFormat.CategoryAndValue;
+                return true;
+            case "text":
+                format = OdfTextCaptionSequenceFormat.Text;
+                return true;
+            default:
+                format = default;
+                return false;
+        }
+    }
+
+    private static string FormatTextCaptionSequenceFormat(OdfTextCaptionSequenceFormat format)
+    {
+        return format switch
+        {
+            OdfTextCaptionSequenceFormat.Caption => "caption",
+            OdfTextCaptionSequenceFormat.CategoryAndValue => "category-and-value",
+            OdfTextCaptionSequenceFormat.Text => "text",
+            _ => throw new ArgumentOutOfRangeException(nameof(format), format, "未知的 ODF 文字標號序列格式。")
+        };
+    }
+
+    private static bool TryParseTextNumberPosition(string? value, out OdfTextNumberPosition position)
+    {
+        switch (value)
+        {
+            case "inner":
+                position = OdfTextNumberPosition.Inner;
+                return true;
+            case "left":
+                position = OdfTextNumberPosition.Left;
+                return true;
+            case "outer":
+                position = OdfTextNumberPosition.Outer;
+                return true;
+            case "right":
+                position = OdfTextNumberPosition.Right;
+                return true;
+            default:
+                position = default;
+                return false;
+        }
+    }
+
+    private static string FormatTextNumberPosition(OdfTextNumberPosition position)
+    {
+        return position switch
+        {
+            OdfTextNumberPosition.Inner => "inner",
+            OdfTextNumberPosition.Left => "left",
+            OdfTextNumberPosition.Outer => "outer",
+            OdfTextNumberPosition.Right => "right",
+            _ => throw new ArgumentOutOfRangeException(nameof(position), position, "未知的 ODF 文字編號位置。")
+        };
+    }
+
+    private static bool TryParseTextPlaceholderType(string? value, out OdfTextPlaceholderType placeholderType)
+    {
+        switch (value)
+        {
+            case "image":
+                placeholderType = OdfTextPlaceholderType.Image;
+                return true;
+            case "object":
+                placeholderType = OdfTextPlaceholderType.Object;
+                return true;
+            case "table":
+                placeholderType = OdfTextPlaceholderType.Table;
+                return true;
+            case "text":
+                placeholderType = OdfTextPlaceholderType.Text;
+                return true;
+            case "text-box":
+                placeholderType = OdfTextPlaceholderType.TextBox;
+                return true;
+            default:
+                placeholderType = default;
+                return false;
+        }
+    }
+
+    private static string FormatTextPlaceholderType(OdfTextPlaceholderType placeholderType)
+    {
+        return placeholderType switch
+        {
+            OdfTextPlaceholderType.Image => "image",
+            OdfTextPlaceholderType.Object => "object",
+            OdfTextPlaceholderType.Table => "table",
+            OdfTextPlaceholderType.Text => "text",
+            OdfTextPlaceholderType.TextBox => "text-box",
+            _ => throw new ArgumentOutOfRangeException(nameof(placeholderType), placeholderType, "未知的 ODF 文字預留位置類型。")
+        };
+    }
+
+    private static bool TryParseTextAnimation(string? value, out OdfTextAnimation animation)
+    {
+        switch (value)
+        {
+            case "alternate":
+                animation = OdfTextAnimation.Alternate;
+                return true;
+            case "none":
+                animation = OdfTextAnimation.None;
+                return true;
+            case "scroll":
+                animation = OdfTextAnimation.Scroll;
+                return true;
+            case "slide":
+                animation = OdfTextAnimation.Slide;
+                return true;
+            default:
+                animation = default;
+                return false;
+        }
+    }
+
+    private static string FormatTextAnimation(OdfTextAnimation animation)
+    {
+        return animation switch
+        {
+            OdfTextAnimation.Alternate => "alternate",
+            OdfTextAnimation.None => "none",
+            OdfTextAnimation.Scroll => "scroll",
+            OdfTextAnimation.Slide => "slide",
+            _ => throw new ArgumentOutOfRangeException(nameof(animation), animation, "未知的 ODF 文字動畫。")
+        };
+    }
+
+    private static bool TryParseTextAnimationDirection(string? value, out OdfTextAnimationDirection direction)
+    {
+        switch (value)
+        {
+            case "down":
+                direction = OdfTextAnimationDirection.Down;
+                return true;
+            case "left":
+                direction = OdfTextAnimationDirection.Left;
+                return true;
+            case "right":
+                direction = OdfTextAnimationDirection.Right;
+                return true;
+            case "up":
+                direction = OdfTextAnimationDirection.Up;
+                return true;
+            default:
+                direction = default;
+                return false;
+        }
+    }
+
+    private static string FormatTextAnimationDirection(OdfTextAnimationDirection direction)
+    {
+        return direction switch
+        {
+            OdfTextAnimationDirection.Down => "down",
+            OdfTextAnimationDirection.Left => "left",
+            OdfTextAnimationDirection.Right => "right",
+            OdfTextAnimationDirection.Up => "up",
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "未知的 ODF 文字動畫方向。")
+        };
+    }
+
+    private static bool TryParseTextKind(string? value, out OdfTextKind kind)
+    {
+        switch (value)
+        {
+            case "gap":
+                kind = OdfTextKind.Gap;
+                return true;
+            case "unit":
+                kind = OdfTextKind.Unit;
+                return true;
+            case "value":
+                kind = OdfTextKind.Value;
+                return true;
+            default:
+                kind = default;
+                return false;
+        }
+    }
+
+    private static string FormatTextKind(OdfTextKind kind)
+    {
+        return kind switch
+        {
+            OdfTextKind.Gap => "gap",
+            OdfTextKind.Unit => "unit",
+            OdfTextKind.Value => "value",
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "未知的 ODF 文字索引項目種類。")
         };
     }
 

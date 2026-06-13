@@ -405,6 +405,60 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.TextSelectPage;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "reference-format")
+        {
+            return AttributeValueKind.TextReferenceFormat;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "start-numbering-at")
+        {
+            return AttributeValueKind.TextStartNumberingAt;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "footnotes-position")
+        {
+            return AttributeValueKind.TextFootnotesPosition;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "caption-sequence-format")
+        {
+            return AttributeValueKind.TextCaptionSequenceFormat;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "number-position")
+        {
+            return AttributeValueKind.TextNumberPosition;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "placeholder-type")
+        {
+            return AttributeValueKind.TextPlaceholderType;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "animation")
+        {
+            return AttributeValueKind.TextAnimation;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "animation-direction")
+        {
+            return AttributeValueKind.TextAnimationDirection;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:text:1.0" &&
+            node.LocalName == "kind")
+        {
+            return AttributeValueKind.TextKind;
+        }
+
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
             node.LocalName == "font-relief")
         {
@@ -1018,6 +1072,87 @@ public sealed class DomWrappersCSharpWriter
                     "GetTextSelectPageAttributeValue",
                     "SetTextSelectPageAttributeValue");
                 break;
+            case AttributeValueKind.TextReferenceFormat:
+                writer.WriteLine($"        public OdfTextReferenceFormat? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextReferenceFormatAttributeValue",
+                    "SetTextReferenceFormatAttributeValue");
+                break;
+            case AttributeValueKind.TextStartNumberingAt:
+                writer.WriteLine($"        public OdfTextStartNumberingAt? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextStartNumberingAtAttributeValue",
+                    "SetTextStartNumberingAtAttributeValue");
+                break;
+            case AttributeValueKind.TextFootnotesPosition:
+                writer.WriteLine($"        public OdfTextFootnotesPosition? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextFootnotesPositionAttributeValue",
+                    "SetTextFootnotesPositionAttributeValue");
+                break;
+            case AttributeValueKind.TextCaptionSequenceFormat:
+                writer.WriteLine($"        public OdfTextCaptionSequenceFormat? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextCaptionSequenceFormatAttributeValue",
+                    "SetTextCaptionSequenceFormatAttributeValue");
+                break;
+            case AttributeValueKind.TextNumberPosition:
+                writer.WriteLine($"        public OdfTextNumberPosition? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextNumberPositionAttributeValue",
+                    "SetTextNumberPositionAttributeValue");
+                break;
+            case AttributeValueKind.TextPlaceholderType:
+                writer.WriteLine($"        public OdfTextPlaceholderType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextPlaceholderTypeAttributeValue",
+                    "SetTextPlaceholderTypeAttributeValue");
+                break;
+            case AttributeValueKind.TextAnimation:
+                writer.WriteLine($"        public OdfTextAnimation? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextAnimationAttributeValue",
+                    "SetTextAnimationAttributeValue");
+                break;
+            case AttributeValueKind.TextAnimationDirection:
+                writer.WriteLine($"        public OdfTextAnimationDirection? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextAnimationDirectionAttributeValue",
+                    "SetTextAnimationDirectionAttributeValue");
+                break;
+            case AttributeValueKind.TextKind:
+                writer.WriteLine($"        public OdfTextKind? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTextKindAttributeValue",
+                    "SetTextKindAttributeValue");
+                break;
             case AttributeValueKind.Percent:
                 writer.WriteLine($"        public OdfPercent? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1513,6 +1648,15 @@ public sealed class DomWrappersCSharpWriter
         TextAnchorType,
         TextNoteClass,
         TextSelectPage,
+        TextReferenceFormat,
+        TextStartNumberingAt,
+        TextFootnotesPosition,
+        TextCaptionSequenceFormat,
+        TextNumberPosition,
+        TextPlaceholderType,
+        TextAnimation,
+        TextAnimationDirection,
+        TextKind,
         Percent,
         SignedPercent,
         CellAddress,

@@ -322,6 +322,51 @@ public static class OdfTypedDomCoverage
             return "textSelectPage";
         }
 
+        if (resolvedType == typeof(OdfTextReferenceFormat))
+        {
+            return "textReferenceFormat";
+        }
+
+        if (resolvedType == typeof(OdfTextStartNumberingAt))
+        {
+            return "textStartNumberingAt";
+        }
+
+        if (resolvedType == typeof(OdfTextFootnotesPosition))
+        {
+            return "textFootnotesPosition";
+        }
+
+        if (resolvedType == typeof(OdfTextCaptionSequenceFormat))
+        {
+            return "textCaptionSequenceFormat";
+        }
+
+        if (resolvedType == typeof(OdfTextNumberPosition))
+        {
+            return "textNumberPosition";
+        }
+
+        if (resolvedType == typeof(OdfTextPlaceholderType))
+        {
+            return "textPlaceholderType";
+        }
+
+        if (resolvedType == typeof(OdfTextAnimation))
+        {
+            return "textAnimation";
+        }
+
+        if (resolvedType == typeof(OdfTextAnimationDirection))
+        {
+            return "textAnimationDirection";
+        }
+
+        if (resolvedType == typeof(OdfTextKind))
+        {
+            return "textKind";
+        }
+
         if (resolvedType == typeof(OdfLineStyle))
         {
             return "lineStyle";

@@ -295,6 +295,15 @@ namespace OdfKit.Tests
                 "<attribute name=\"text:anchor-type\"><choice><value>as-char</value><value>char</value><value>frame</value><value>page</value><value>paragraph</value></choice></attribute>" +
                 "<attribute name=\"text:note-class\"><choice><value>endnote</value><value>footnote</value></choice></attribute>" +
                 "<attribute name=\"text:select-page\"><choice><value>current</value><value>next</value><value>previous</value></choice></attribute>" +
+                "<attribute name=\"text:reference-format\"><choice><value>caption</value><value>category-and-value</value><value>chapter</value><value>direction</value><value>number</value><value>number-all-superior</value><value>number-no-superior</value><value>page</value><value>text</value><value>value</value></choice></attribute>" +
+                "<attribute name=\"text:start-numbering-at\"><choice><value>chapter</value><value>document</value><value>page</value></choice></attribute>" +
+                "<attribute name=\"text:footnotes-position\"><choice><value>document</value><value>page</value><value>section</value><value>text</value></choice></attribute>" +
+                "<attribute name=\"text:caption-sequence-format\"><choice><value>caption</value><value>category-and-value</value><value>text</value></choice></attribute>" +
+                "<attribute name=\"text:number-position\"><choice><value>inner</value><value>left</value><value>outer</value><value>right</value></choice></attribute>" +
+                "<attribute name=\"text:placeholder-type\"><choice><value>image</value><value>object</value><value>table</value><value>text</value><value>text-box</value></choice></attribute>" +
+                "<attribute name=\"text:animation\"><choice><value>alternate</value><value>none</value><value>scroll</value><value>slide</value></choice></attribute>" +
+                "<attribute name=\"text:animation-direction\"><choice><value>down</value><value>left</value><value>right</value><value>up</value></choice></attribute>" +
+                "<attribute name=\"text:kind\"><choice><value>gap</value><value>unit</value><value>value</value></choice></attribute>" +
                 "<attribute name=\"draw:opacity\"><ref name=\"zeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"draw:shadow-offset\"><ref name=\"signedZeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"table:base-cell-address\"><ref name=\"cellAddress\" /></attribute>" +
@@ -415,6 +424,24 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetTextNoteClassAttributeValue(\"note-class\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfTextSelectPage? SelectPage", code);
             Assert.Contains("get => GetTextSelectPageAttributeValue(\"select-page\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextReferenceFormat? ReferenceFormat", code);
+            Assert.Contains("get => GetTextReferenceFormatAttributeValue(\"reference-format\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextStartNumberingAt? StartNumberingAt", code);
+            Assert.Contains("get => GetTextStartNumberingAtAttributeValue(\"start-numbering-at\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextFootnotesPosition? FootnotesPosition", code);
+            Assert.Contains("get => GetTextFootnotesPositionAttributeValue(\"footnotes-position\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextCaptionSequenceFormat? CaptionSequenceFormat", code);
+            Assert.Contains("get => GetTextCaptionSequenceFormatAttributeValue(\"caption-sequence-format\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextNumberPosition? NumberPosition", code);
+            Assert.Contains("get => GetTextNumberPositionAttributeValue(\"number-position\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextPlaceholderType? PlaceholderType", code);
+            Assert.Contains("get => GetTextPlaceholderTypeAttributeValue(\"placeholder-type\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextAnimation? Animation", code);
+            Assert.Contains("get => GetTextAnimationAttributeValue(\"animation\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextAnimationDirection? AnimationDirection", code);
+            Assert.Contains("get => GetTextAnimationDirectionAttributeValue(\"animation-direction\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTextKind? Kind", code);
+            Assert.Contains("get => GetTextKindAttributeValue(\"kind\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfPercent? Opacity", code);
             Assert.Contains("get => GetPercentAttributeValue(\"opacity\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetPercentAttributeValue(\"opacity\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
