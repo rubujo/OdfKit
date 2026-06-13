@@ -616,6 +616,55 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void OasisOdf14Corpus_Positive_PageLayoutPropertiesInterleaveOutOfOrder()
+        {
+            string content =
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+                "xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" " +
+                "xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" office:version=\"1.4\">" +
+                "<office:automatic-styles><style:page-layout style:name=\"pm1\">" +
+                "<style:page-layout-properties>" +
+                "<style:footnote-sep/>" +
+                "<style:columns fo:column-count=\"2\"/>" +
+                "</style:page-layout-properties>" +
+                "</style:page-layout></office:automatic-styles>" +
+                "<office:body><office:text/></office:body></office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+
+            LogReport("OasisOdf14Corpus_Positive_PageLayoutPropertiesInterleaveOutOfOrder", report);
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Negative_PageLayoutPropertiesRejectsDuplicateInterleaveBranch()
+        {
+            string content =
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+                "xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" " +
+                "xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" office:version=\"1.4\">" +
+                "<office:automatic-styles><style:page-layout style:name=\"pm1\">" +
+                "<style:page-layout-properties>" +
+                "<style:columns fo:column-count=\"2\"/>" +
+                "<style:columns fo:column-count=\"3\"/>" +
+                "</style:page-layout-properties>" +
+                "</style:page-layout></office:automatic-styles>" +
+                "<office:body><office:text/></office:body></office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+
+            LogReport("OasisOdf14Corpus_Negative_PageLayoutPropertiesRejectsDuplicateInterleaveBranch", report);
+            Assert.False(report.IsValid);
+            Assert.Contains(report.Issues, issue =>
+                issue.RuleId == "ODF3101" &&
+                issue.PackagePath == "content.xml");
+        }
+
+        [Fact]
         public void OasisOdf14Corpus_Negative_InvalidContentOrder()
         {
             string flatXml = "<office:document xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.4\" office:mimetype=\"application/vnd.oasis.opendocument.text\"><office:body><office:text/></office:body><office:meta/></office:document>";

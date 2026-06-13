@@ -724,8 +724,31 @@ public static class OdfSchemaPatternValidator
             }
 
             return node.Kind == OdfSchemaPatternNodeKind.Attribute ||
-                IsAttributeReference(node, context) ||
+                ReferenceContainsAttributePattern(node, context) ||
                 node.Children.Any(child => ContainsAttributePattern(child, context));
+        }
+
+        private static bool ReferenceContainsAttributePattern(
+            OdfSchemaPatternNode node,
+            MatchContext context)
+        {
+            if (node.Kind != OdfSchemaPatternNodeKind.Ref ||
+                string.IsNullOrWhiteSpace(node.ReferenceName) ||
+                !context.EnterReference(node.ReferenceName))
+            {
+                return false;
+            }
+
+            try
+            {
+                OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(node.ReferenceName);
+                return pattern is not null &&
+                    pattern.Roots.Any(root => ContainsAttributePattern(root, context));
+            }
+            finally
+            {
+                context.LeaveReference(node.ReferenceName);
+            }
         }
 
         private static bool IsAttributeReference(
@@ -742,12 +765,37 @@ public static class OdfSchemaPatternValidator
             try
             {
                 OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(node.ReferenceName);
-                return pattern != null &&
-                    pattern.Roots.Any(root => ContainsAttributePattern(root, context));
+                return pattern is not null &&
+                    pattern.Roots.Count > 0 &&
+                    pattern.Roots.All(root => IsPureAttributePattern(root, context));
             }
             finally
             {
                 context.LeaveReference(node.ReferenceName);
+            }
+        }
+
+        private static bool IsPureAttributePattern(
+            OdfSchemaPatternNode node,
+            MatchContext context)
+        {
+            switch (node.Kind)
+            {
+                case OdfSchemaPatternNodeKind.Attribute:
+                    return true;
+                case OdfSchemaPatternNodeKind.Ref:
+                    return IsAttributeReference(node, context);
+                case OdfSchemaPatternNodeKind.Group:
+                case OdfSchemaPatternNodeKind.Interleave:
+                case OdfSchemaPatternNodeKind.Choice:
+                case OdfSchemaPatternNodeKind.Optional:
+                case OdfSchemaPatternNodeKind.ZeroOrMore:
+                case OdfSchemaPatternNodeKind.OneOrMore:
+                case OdfSchemaPatternNodeKind.Other:
+                    return node.Children.Count > 0 &&
+                        node.Children.All(child => IsPureAttributePattern(child, context));
+                default:
+                    return false;
             }
         }
 
@@ -1132,7 +1180,7 @@ public static class OdfSchemaPatternValidator
                 return;
             }
 
-            if (InterleaveRequirementsSatisfied(nodes, used, oneOrMoreSatisfied))
+            if (InterleaveRequirementsSatisfied(nodes, used, oneOrMoreSatisfied, context))
             {
                 matches.Add(index);
             }
@@ -1268,12 +1316,15 @@ public static class OdfSchemaPatternValidator
         private static bool InterleaveRequirementsSatisfied(
             IReadOnlyList<OdfSchemaPatternNode> nodes,
             IReadOnlyList<bool> used,
-            IReadOnlyList<bool> oneOrMoreSatisfied)
+            IReadOnlyList<bool> oneOrMoreSatisfied,
+            MatchContext context)
         {
             for (int i = 0; i < nodes.Count; i++)
             {
                 OdfSchemaPatternNode node = nodes[i];
-                if (node.Occurrence == "optional" || node.Occurrence == "zeroOrMore")
+                if (node.Occurrence == "optional" ||
+                    node.Occurrence == "zeroOrMore" ||
+                    ContentNodeCanMatchEmpty(node, context))
                 {
                     continue;
                 }
@@ -1309,6 +1360,66 @@ public static class OdfSchemaPatternValidator
             }
 
             return true;
+        }
+
+        private static bool ContentNodeCanMatchEmpty(
+            OdfSchemaPatternNode node,
+            MatchContext context)
+        {
+            return ContentNodeCanMatchEmpty(node, context, new HashSet<string>(StringComparer.Ordinal));
+        }
+
+        private static bool ContentNodeCanMatchEmpty(
+            OdfSchemaPatternNode node,
+            MatchContext context,
+            HashSet<string> visitingReferences)
+        {
+            switch (node.Kind)
+            {
+                case OdfSchemaPatternNodeKind.Empty:
+                case OdfSchemaPatternNodeKind.Optional:
+                case OdfSchemaPatternNodeKind.ZeroOrMore:
+                    return true;
+                case OdfSchemaPatternNodeKind.Text:
+                    return true;
+                case OdfSchemaPatternNodeKind.Choice:
+                    return node.Children.Any(child => ContentNodeCanMatchEmpty(child, context, visitingReferences));
+                case OdfSchemaPatternNodeKind.Group:
+                case OdfSchemaPatternNodeKind.Interleave:
+                case OdfSchemaPatternNodeKind.Mixed:
+                case OdfSchemaPatternNodeKind.Other:
+                    return node.Children.All(child => ContentNodeCanMatchEmpty(child, context, visitingReferences));
+                case OdfSchemaPatternNodeKind.OneOrMore:
+                    return node.Children.Count > 0 &&
+                        node.Children.All(child => ContentNodeCanMatchEmpty(child, context, visitingReferences));
+                case OdfSchemaPatternNodeKind.Ref:
+                    return ReferenceCanMatchEmpty(node.ReferenceName, context, visitingReferences);
+                default:
+                    return false;
+            }
+        }
+
+        private static bool ReferenceCanMatchEmpty(
+            string referenceName,
+            MatchContext context,
+            HashSet<string> visitingReferences)
+        {
+            if (string.IsNullOrWhiteSpace(referenceName) ||
+                !visitingReferences.Add(referenceName))
+            {
+                return false;
+            }
+
+            try
+            {
+                OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
+                return pattern is not null &&
+                    pattern.Roots.Any(root => ContentNodeCanMatchEmpty(root, context, visitingReferences));
+            }
+            finally
+            {
+                visitingReferences.Remove(referenceName);
+            }
         }
 
         private static string CreateInterleaveStateKey(
