@@ -370,7 +370,10 @@ public class CliTests
             Assert.Equal(1, summary.GetProperty("fixtureCount").GetInt32());
             Assert.Equal(1, summary.GetProperty("passedCount").GetInt32());
             Assert.Equal(0, summary.GetProperty("failedCount").GetInt32());
-            Assert.Equal("generated-valid", json.RootElement.GetProperty("fixtures")[0].GetProperty("id").GetString());
+            JsonElement result = json.RootElement.GetProperty("fixtures")[0];
+            Assert.Equal("generated-valid", result.GetProperty("id").GetString());
+            Assert.True(result.GetProperty("kindMatches").GetBoolean());
+            Assert.True(result.GetProperty("versionMatches").GetBoolean());
         }
         finally
         {
@@ -401,6 +404,66 @@ public class CliTests
             Assert.Equal(string.Empty, error.ToString());
             Assert.Contains("fail", output.ToString());
             Assert.Contains("failed=1", output.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 validate-corpus 對 kind 宣告不一致時會失敗。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusKindMismatchReturnsFailure()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string fixture = Path.Combine(root, "fixture.odt");
+            string manifest = Path.Combine(root, "manifest.json");
+            CreateTextDocument(fixture, "corpus kind mismatch");
+            WriteCorpusManifest(manifest, "fixture.odt", "valid", kind: "Spreadsheet");
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest], output, error);
+
+            Assert.Equal(1, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            Assert.Contains("kind-matches: False", output.ToString());
+            Assert.Contains("kind-mismatches=1", output.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 validate-corpus 對 version 宣告不一致時會失敗。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusVersionMismatchReturnsFailure()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string fixture = Path.Combine(root, "fixture.odt");
+            string manifest = Path.Combine(root, "manifest.json");
+            CreateTextDocument(fixture, "corpus version mismatch");
+            WriteCorpusManifest(manifest, "fixture.odt", "valid", version: "1.3");
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest], output, error);
+
+            Assert.Equal(1, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            Assert.Contains("version-matches: False", output.ToString());
+            Assert.Contains("version-mismatches=1", output.ToString());
         }
         finally
         {
@@ -639,7 +702,12 @@ public class CliTests
         return path;
     }
 
-    private static void WriteCorpusManifest(string manifestPath, string fixturePath, string expected)
+    private static void WriteCorpusManifest(
+        string manifestPath,
+        string fixturePath,
+        string expected,
+        string kind = "Text",
+        string version = "1.4")
     {
         File.WriteAllText(
             manifestPath,
@@ -650,8 +718,8 @@ public class CliTests
             "      \"path\": \"" + fixturePath + "\",\n" +
             "      \"source\": \"generated\",\n" +
             "      \"license\": \"generated-no-copyright\",\n" +
-            "      \"kind\": \"Text\",\n" +
-            "      \"version\": \"1.4\",\n" +
+            "      \"kind\": \"" + kind + "\",\n" +
+            "      \"version\": \"" + version + "\",\n" +
             "      \"profile\": \"" + OdfComplianceProfiles.OasisOdf14Extended.Id + "\",\n" +
             "      \"expected\": \"" + expected + "\",\n" +
             "      \"roundTrip\": \"semantic-equivalent\"\n" +

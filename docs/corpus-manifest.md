@@ -54,8 +54,8 @@ dotnet run --project tools/OdfKit.Cli -- validate-corpus manifest.json `
 ```
 
 `validate-corpus` 會讀取 `fixtures` 陣列，逐一比對 `expected` 的 `valid` / `invalid`
-classification。任一 fixture 與 expected 不一致，或未文件化的外部 baseline mismatch，
-都會讓 exit code 為 `1`。
+classification、`kind` 文件種類與 `version` ODF 版本。任一 fixture 與 manifest 宣告不一致，
+或未文件化的外部 baseline mismatch，都會讓 exit code 為 `1`。
 
 ## Baseline exception manifest
 

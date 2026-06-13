@@ -726,6 +726,12 @@ public static class OdfKitCli
             output.WriteLine("path: " + result.Path);
             output.WriteLine("expected: " + FormatExpected(result.Fixture.Expected));
             output.WriteLine("actual-valid: " + result.Report.IsValid.ToString(CultureInfo.InvariantCulture));
+            output.WriteLine("expected-kind: " + result.Fixture.Kind);
+            output.WriteLine("actual-kind: " + result.Report.DocumentKind);
+            output.WriteLine("kind-matches: " + result.KindMatches.ToString(CultureInfo.InvariantCulture));
+            output.WriteLine("expected-version: " + result.Fixture.Version);
+            output.WriteLine("actual-version: " + FormatVersion(result.Report.DetectedVersion));
+            output.WriteLine("version-matches: " + result.VersionMatches.ToString(CultureInfo.InvariantCulture));
             output.WriteLine("profile: " + result.Fixture.Profile.Id);
             output.WriteLine("issues: " + result.Report.Issues.Count.ToString(CultureInfo.InvariantCulture));
             if (result.Baseline is not null)
@@ -740,6 +746,8 @@ public static class OdfKitCli
         output.WriteLine("summary: fixtures=" + summary.FixtureCount.ToString(CultureInfo.InvariantCulture) +
             " passed=" + summary.PassedCount.ToString(CultureInfo.InvariantCulture) +
             " failed=" + summary.FailedCount.ToString(CultureInfo.InvariantCulture) +
+            " kind-mismatches=" + summary.KindMismatchCount.ToString(CultureInfo.InvariantCulture) +
+            " version-mismatches=" + summary.VersionMismatchCount.ToString(CultureInfo.InvariantCulture) +
             " baseline-mismatches=" + summary.BaselineMismatchCount.ToString(CultureInfo.InvariantCulture) +
             " baseline-documented-exceptions=" + summary.BaselineDocumentedExceptionCount.ToString(CultureInfo.InvariantCulture));
     }
@@ -758,6 +766,8 @@ public static class OdfKitCli
                 failedCount = summary.FailedCount,
                 validCount = summary.ValidCount,
                 invalidCount = summary.InvalidCount,
+                kindMismatchCount = summary.KindMismatchCount,
+                versionMismatchCount = summary.VersionMismatchCount,
                 baselineFileCount = summary.BaselineFileCount,
                 baselineMismatchCount = summary.BaselineMismatchCount,
                 baselineDocumentedExceptionCount = summary.BaselineDocumentedExceptionCount
@@ -768,8 +778,13 @@ public static class OdfKitCli
                 path = result.Path,
                 expected = FormatExpected(result.Fixture.Expected),
                 passed = result.Passed,
+                expectedKind = result.Fixture.Kind,
                 documentKind = result.Report.DocumentKind.ToString(),
+                kindMatches = result.KindMatches,
+                expectedVersion = result.Fixture.Version,
                 detectedVersion = result.Report.DetectedVersion.ToString(),
+                version = FormatVersion(result.Report.DetectedVersion),
+                versionMatches = result.VersionMatches,
                 isValid = result.Report.IsValid,
                 profileId = result.Fixture.Profile.Id,
                 blockingIssueCount = result.Report.BlockingIssueCount,
@@ -956,13 +971,41 @@ public static class OdfKitCli
         ValidateBaselineResult? Baseline,
         bool BaselineExceptionDocumented)
     {
-        public bool Passed => Fixture.Expected == ValidateCorpusExpected.Valid
+        public bool ClassificationMatches => Fixture.Expected == ValidateCorpusExpected.Valid
             ? Report.IsValid
             : !Report.IsValid;
+
+        public bool KindMatches => MatchesFixtureKind(Fixture.Kind, Report.DocumentKind);
+
+        public bool VersionMatches => string.Equals(
+            Fixture.Version,
+            FormatVersion(Report.DetectedVersion),
+            StringComparison.OrdinalIgnoreCase);
+
+        public bool Passed => ClassificationMatches && KindMatches && VersionMatches;
 
         public bool RawBaselineMatches => Baseline is null || Baseline.IsValid == Report.IsValid;
 
         public bool BaselineMatches => RawBaselineMatches || BaselineExceptionDocumented;
+
+        private static bool MatchesFixtureKind(string expectedKind, OdfDocumentKind actualKind)
+        {
+            if (string.Equals(expectedKind, actualKind.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (!OdfDocumentKindDetector.TryGetFormatByKind(actualKind, out OdfFormatInfo? format) ||
+                format is null)
+            {
+                return false;
+            }
+
+            string normalized = expectedKind.StartsWith(".", StringComparison.Ordinal)
+                ? expectedKind
+                : "." + expectedKind;
+            return string.Equals(normalized, format.Extension, StringComparison.OrdinalIgnoreCase);
+        }
     }
 
     private sealed class ValidateCorpusSummary
@@ -976,6 +1019,10 @@ public static class OdfKitCli
         public int ValidCount { get; private init; }
 
         public int InvalidCount { get; private init; }
+
+        public int KindMismatchCount { get; private init; }
+
+        public int VersionMismatchCount { get; private init; }
 
         public int BaselineFileCount { get; private init; }
 
@@ -992,6 +1039,8 @@ public static class OdfKitCli
                 FailedCount = results.Count(result => !result.Passed),
                 ValidCount = results.Count(result => result.Report.IsValid),
                 InvalidCount = results.Count(result => !result.Report.IsValid),
+                KindMismatchCount = results.Count(result => !result.KindMatches),
+                VersionMismatchCount = results.Count(result => !result.VersionMatches),
                 BaselineFileCount = results.Count(result => result.Baseline is not null),
                 BaselineMismatchCount = results.Count(result => !result.BaselineMatches),
                 BaselineDocumentedExceptionCount = results.Count(result => result.BaselineExceptionDocumented)

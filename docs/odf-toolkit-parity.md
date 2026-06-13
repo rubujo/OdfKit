@@ -24,7 +24,7 @@
 |---|---|---|---|---|
 | Package API | `OdfPackage` | ODF Toolkit package handling | complete | 可開啟、建立、保存 ZIP / flat XML，並保留 unknown entries。 |
 | Document factory | `OdfDocumentFactory`、typed wrappers | Simple API document load/create | complete | 17 種主要 extension 可最小 create / load / save / validate / round-trip。 |
-| Validator API | `OdfValidator`、`OdfPackageValidator`、`OdfFlatDocumentValidator` | ODF Validator | partial | `validate-corpus` 可執行 manifest 並比對 expected classification；仍需擴大官方 corpus。 |
+| Validator API | `OdfValidator`、`OdfPackageValidator`、`OdfFlatDocumentValidator` | ODF Validator | partial | `validate-corpus` 可執行 manifest 並比對 expected classification、kind 與 version；仍需擴大官方 corpus。 |
 | External baseline | `OdfExternalValidator`、CLI `--baseline` | ODF Validator CLI | validated | 可選執行 ODF Validator JAR，並支援 documented exception manifest；未設定時一般測試與 CI 不受影響。 |
 | Typed DOM | generated DOM wrappers、`OdfNodeFactory` | ODFDOM | partial | 以 [typed-dom-coverage.md](typed-dom-coverage.md) 追蹤 wrapper / factory / attribute coverage，並逐步補 typed datatype。 |
 | Simple high-level API | Text / Spreadsheet / Presentation / Drawing facade | ODF Toolkit Simple API | partial | ODT / ODS / ODP / ODG 常見建立、讀取與有限修改有直接 facade。 |
@@ -101,8 +101,8 @@ dotnet run --project tools/OdfKit.Cli -- validate-corpus manifest.json `
   --baseline-exceptions baseline-exceptions.json
 ```
 
-`validate-corpus` 會把 fixture 的 `expected` 欄位視為 OdfKit classification 的完成線；
-外部 baseline mismatch 若未列入 documented exception，也會讓 job 失敗。
+`validate-corpus` 會把 fixture 的 `expected`、`kind` 與 `version` 欄位視為 OdfKit
+corpus 完成線；外部 baseline mismatch 若未列入 documented exception，也會讓 job 失敗。
 
 ## Documented exceptions
 
