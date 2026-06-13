@@ -64,10 +64,11 @@ public class TypedDomParityTests
         int percentPropertyCount = Regex.Matches(generated, @"public OdfPercent\? \w+").Count;
         int cellAddressPropertyCount = Regex.Matches(generated, @"public OdfCellAddressReference\? \w+").Count;
         int cellRangeAddressPropertyCount = Regex.Matches(generated, @"public OdfCellRangeAddress\? \w+").Count;
+        int vector3DPropertyCount = Regex.Matches(generated, @"public OdfVector3D\? \w+").Count;
         int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
         int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
         int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + colorPropertyCount + iriReferencePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
+        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + colorPropertyCount + iriReferencePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + vector3DPropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -86,6 +87,7 @@ public class TypedDomParityTests
         Assert.True(percentPropertyCount >= 1000, "generated percent attribute property count regressed: " + percentPropertyCount);
         Assert.True(cellAddressPropertyCount >= 400, "generated cell address attribute property count regressed: " + cellAddressPropertyCount);
         Assert.True(cellRangeAddressPropertyCount >= 400, "generated cell range address attribute property count regressed: " + cellRangeAddressPropertyCount);
+        Assert.True(vector3DPropertyCount >= 1000, "generated vector3D attribute property count regressed: " + vector3DPropertyCount);
         Assert.True(styleFamilyPropertyCount >= 50, "generated style family attribute property count regressed: " + styleFamilyPropertyCount);
         Assert.True(odfVersionPropertyCount >= 50, "generated ODF version attribute property count regressed: " + odfVersionPropertyCount);
         Assert.True(mediaTypePropertyCount >= 100, "generated media type attribute property count regressed: " + mediaTypePropertyCount);
@@ -123,6 +125,7 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["percent"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["cellAddress"] >= 400);
         Assert.True(report.WrapperPropertyTypeCounts["cellRangeAddress"] >= 400);
+        Assert.True(report.WrapperPropertyTypeCounts["vector3D"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["styleFamily"] >= 50);
         Assert.True(report.WrapperPropertyTypeCounts["odfVersion"] >= 50);
         Assert.True(report.WrapperPropertyTypeCounts["mediaType"] >= 100);
@@ -142,6 +145,7 @@ public class TypedDomParityTests
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("percent").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("cellAddress").GetInt32() >= 400);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("cellRangeAddress").GetInt32() >= 400);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("vector3D").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleFamily").GetInt32() >= 50);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("odfVersion").GetInt32() >= 50);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("mediaType").GetInt32() >= 100);
@@ -173,6 +177,7 @@ public class TypedDomParityTests
         cell.SetSignedPercentAttributeValue("shadow-offset", OdfNamespaces.Draw, new OdfPercent("-12.5%"), OdfNamespaces.GetPrefix(OdfNamespaces.Draw));
         cell.SetCellAddressAttributeValue("base-cell-address", OdfNamespaces.Table, new OdfCellAddressReference("'My Sheet'.$A$1"), OdfNamespaces.GetPrefix(OdfNamespaces.Table));
         cell.SetCellRangeAddressAttributeValue("cell-range-address", OdfNamespaces.Table, new OdfCellRangeAddress("'My Sheet'.$A$1:'My Sheet'.$C$3"), OdfNamespaces.GetPrefix(OdfNamespaces.Table));
+        cell.SetVector3DAttributeValue("extrusion-direction", OdfNamespaces.Draw, new OdfVector3D(1m, 0m, -0.5m), OdfNamespaces.GetPrefix(OdfNamespaces.Draw));
 
         Assert.Equal(3, cell.NumberColumnsRepeated);
         Assert.Equal(12.50m, cell.GetDecimalAttributeValue("value", OdfNamespaces.Office));
@@ -201,6 +206,8 @@ public class TypedDomParityTests
         Assert.Equal("-12.5%", cell.GetAttribute("shadow-offset", OdfNamespaces.Draw));
         Assert.Equal(new OdfCellAddressReference("'My Sheet'.$A$1"), cell.GetCellAddressAttributeValue("base-cell-address", OdfNamespaces.Table));
         Assert.Equal(new OdfCellRangeAddress("'My Sheet'.$A$1:'My Sheet'.$C$3"), cell.GetCellRangeAddressAttributeValue("cell-range-address", OdfNamespaces.Table));
+        Assert.Equal(new OdfVector3D("(1 0 -0.5)"), cell.GetVector3DAttributeValue("extrusion-direction", OdfNamespaces.Draw));
+        Assert.Equal(-0.5m, cell.GetVector3DAttributeValue("extrusion-direction", OdfNamespaces.Draw)!.Value.Z);
 
         cell.SetDateTimeAttributeValue("date-value", OdfNamespaces.Office, local, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
         cell.SetAttribute("time-value", OdfNamespaces.Office, "23:59:59.125+02:30");
@@ -232,6 +239,8 @@ public class TypedDomParityTests
         Assert.Null(cell.GetCellAddressAttributeValue("base-cell-address", OdfNamespaces.Table));
         cell.SetAttribute("cell-range-address", OdfNamespaces.Table, ".A1:B2");
         Assert.Null(cell.GetCellRangeAddressAttributeValue("cell-range-address", OdfNamespaces.Table));
+        cell.SetAttribute("extrusion-direction", OdfNamespaces.Draw, "(1 2)");
+        Assert.Null(cell.GetVector3DAttributeValue("extrusion-direction", OdfNamespaces.Draw));
         Assert.Equal(7, cell.GetInt32AttributeValue("missing", OdfNamespaces.Table, 7));
         Assert.Null(cell.GetBooleanAttributeValue("missing", OdfNamespaces.Table));
 

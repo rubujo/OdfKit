@@ -157,6 +157,11 @@ public static class OdfTypedDomCoverage
             return "cellRangeAddress";
         }
 
+        if (resolvedType == typeof(OdfVector3D))
+        {
+            return "vector3D";
+        }
+
         if (resolvedType == typeof(OdfStyleFamily))
         {
             return "styleFamily";

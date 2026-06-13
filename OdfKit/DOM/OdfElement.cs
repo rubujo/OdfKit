@@ -493,6 +493,32 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的三維向量屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的三維向量；若屬性不存在或格式無效則為 <see langword="null"/>。</returns>
+    public OdfVector3D? GetVector3DAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return OdfVector3D.TryParse(value, out OdfVector3D vector) ? vector : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的三維向量屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的三維向量。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetVector3DAttributeValue(string localName, string namespaceUri, OdfVector3D value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
