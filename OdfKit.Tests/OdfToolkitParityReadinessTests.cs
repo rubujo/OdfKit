@@ -108,6 +108,9 @@ public class OdfToolkitParityReadinessTests
         JsonElement fixture = manifest.RootElement.GetProperty("fixtures")[0];
         Assert.Equal("external-review-required", fixture.GetProperty("license").GetString());
         Assert.Equal("ODF Validator sample", fixture.GetProperty("source").GetString());
+        Assert.Equal(
+            "https://odftoolkit.org/conformance/ODFValidator.html",
+            fixture.GetProperty("sourceUri").GetString());
         Assert.Equal("semantic-equivalent", fixture.GetProperty("roundTrip").GetString());
         Assert.Equal("odf-validator", exceptions.RootElement.GetProperty("exceptions")[0].GetProperty("baseline").GetString());
     }

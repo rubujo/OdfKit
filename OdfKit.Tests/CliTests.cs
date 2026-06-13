@@ -803,6 +803,89 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證外部 corpus fixture 必須宣告可追溯來源 URI。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusRejectsExternalFixtureWithoutSourceUri()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string manifest = Path.Combine(root, "manifest.json");
+            WriteCorpusManifest(
+                manifest,
+                [
+                    new CorpusFixtureTemplate(
+                        "odf-validator-sample-valid",
+                        "fixture.odt",
+                        "ODF Validator sample",
+                        null,
+                        "external-review-required",
+                        "valid",
+                        "Text",
+                        "1.4",
+                        "semantic-equivalent")
+                ]);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest], output, error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains("sourceUri", error.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
+    /// 驗證外部 corpus fixture 有來源 URI 時仍可由 CLI 執行。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusAcceptsExternalFixtureWithSourceUri()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string fixture = Path.Combine(root, "fixture.odt");
+            string manifest = Path.Combine(root, "manifest.json");
+            CreateTextDocument(fixture, "external source uri");
+            WriteCorpusManifest(
+                manifest,
+                [
+                    new CorpusFixtureTemplate(
+                        "odf-validator-sample-valid",
+                        "fixture.odt",
+                        "ODF Validator sample",
+                        "https://odftoolkit.org/conformance/ODFValidator.html",
+                        "external-review-required",
+                        "valid",
+                        "Text",
+                        "1.4",
+                        "semantic-equivalent")
+                ]);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest, "--format", "json"], output, error);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            using JsonDocument json = JsonDocument.Parse(output.ToString());
+            Assert.Equal(1, json.RootElement.GetProperty("summary").GetProperty("passedCount").GetInt32());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
     /// 驗證 validate-corpus 對未文件化的 baseline 分類差異會失敗。
     /// </summary>
     [Fact]
@@ -1109,6 +1192,26 @@ public class CliTests
         string manifestPath,
         IReadOnlyList<(string Id, string Path, string Expected, string Kind, string Version, string RoundTrip)> fixtures)
     {
+        WriteCorpusManifest(
+            manifestPath,
+            fixtures
+                .Select(fixture => new CorpusFixtureTemplate(
+                    fixture.Id,
+                    fixture.Path,
+                    "generated",
+                    null,
+                    "generated-no-copyright",
+                    fixture.Expected,
+                    fixture.Kind,
+                    fixture.Version,
+                    fixture.RoundTrip))
+                .ToArray());
+    }
+
+    private static void WriteCorpusManifest(
+        string manifestPath,
+        IReadOnlyList<CorpusFixtureTemplate> fixtures)
+    {
         StringBuilder builder = new();
         builder.AppendLine("{");
         builder.AppendLine("  \"fixtures\": [");
@@ -1118,8 +1221,13 @@ public class CliTests
             builder.AppendLine("    {");
             builder.AppendLine("      \"id\": \"" + fixture.Id + "\",");
             builder.AppendLine("      \"path\": \"" + fixture.Path.Replace("\\", "\\\\") + "\",");
-            builder.AppendLine("      \"source\": \"generated\",");
-            builder.AppendLine("      \"license\": \"generated-no-copyright\",");
+            builder.AppendLine("      \"source\": \"" + fixture.Source + "\",");
+            if (fixture.SourceUri is not null)
+            {
+                builder.AppendLine("      \"sourceUri\": \"" + fixture.SourceUri + "\",");
+            }
+
+            builder.AppendLine("      \"license\": \"" + fixture.License + "\",");
             builder.AppendLine("      \"kind\": \"" + fixture.Kind + "\",");
             builder.AppendLine("      \"version\": \"" + fixture.Version + "\",");
             builder.AppendLine("      \"profile\": \"" + OdfComplianceProfiles.OasisOdf14Extended.Id + "\",");
@@ -1132,6 +1240,17 @@ public class CliTests
         builder.AppendLine("}");
         File.WriteAllText(manifestPath, builder.ToString(), Encoding.UTF8);
     }
+
+    private sealed record CorpusFixtureTemplate(
+        string Id,
+        string Path,
+        string Source,
+        string? SourceUri,
+        string License,
+        string Expected,
+        string Kind,
+        string Version,
+        string RoundTrip);
 
     private static void TryDelete(string path)
     {

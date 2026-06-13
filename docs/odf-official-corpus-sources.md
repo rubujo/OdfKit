@@ -18,7 +18,7 @@
 1. 先用 `eng/Initialize-OdfExternalCorpus.ps1 -OutputRoot <path>` 建立外部 corpus root。
 2. 將官方或授權允許的樣本放在外部 root 內，不直接提交到 repo。
 3. 依 `docs/examples/external-corpus/manifest.json` 填入每個 fixture 的 `id`、`path`、
-   `source`、`license`、`kind`、`version`、`profile`、`expected` 與 `roundTrip`。
+   `source`、`sourceUri`、`license`、`kind`、`version`、`profile`、`expected` 與 `roundTrip`。
 4. 若 ODF Toolkit Validator 與 OdfKit classification 不一致，先確認是否為 OdfKit bug。
    只有確認為暫時接受的 baseline 差異時，才記錄到 `baseline-exceptions.json`。
 5. 使用 `eng/Test-OdfCorpus.ps1` 執行內建與外部 corpus。
@@ -34,6 +34,7 @@ OPF 的 `odf-validator` 是另一套工具，不應混入同一份 baseline mani
 外部 corpus 進入 parity matrix 前，必須同時具備：
 
 - 可追溯來源 URL。
+- manifest `sourceUri` 必須指向官方來源或可審核的上游樣本頁面。
 - 授權與可再散布判斷。
 - `validate-corpus` 可執行 manifest。
 - 若啟用 ODF Toolkit Validator，必須有 baseline 結果或 documented exception。

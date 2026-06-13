@@ -23,6 +23,7 @@ repo 內可直接執行的範本 manifest 位於 `tests/fixtures/corpus/manifest
 | `id` | yes | 穩定 fixture id。 |
 | `path` | yes | repo 內路徑或外部 corpus 相對路徑。 |
 | `source` | yes | generated、OdfKit、ODF Toolkit sample、LibreOffice export、real-world sanitized 等。 |
+| `sourceUri` | external | 外部或官方 corpus 的可追溯來源 URL；generated 或 OdfKit 自有樣本可省略。 |
 | `license` | yes | CC0、Apache-2.0、MPL-2.0、generated-no-copyright 等。 |
 | `kind` | yes | `OdfDocumentKind` 或 extension。 |
 | `version` | yes | 預期 ODF 版本。 |
@@ -39,23 +40,25 @@ repo 內可直接執行的範本 manifest 位於 `tests/fixtures/corpus/manifest
 - `roundTrip` 只能是 `preserve-unknown`、`semantic-equivalent` 或 `byte-identical`。
 - `profile` 必須能對應到 OdfKit 內建的 compliance profile。
 - `expected` 只能是 `valid` 或 `invalid`。
+- `source` 若不是 generated / OdfKit 自有來源，必須提供絕對 `http(s)`
+  `sourceUri`，避免 ODF Toolkit / ODF Validator parity 樣本失去來源追溯。
 
 ## 初始內建 corpus
 
-| id | path | source | license | kind | version | profile | expected | roundTrip |
-|---|---|---|---|---|---|---|---|---|
-| repo-generated-minimal-flat-text | `tests/fixtures/corpus/generated/minimal-text.fodt` | generated | generated-no-copyright | FlatText | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
-| repo-generated-minimal-flat-spreadsheet | `tests/fixtures/corpus/generated/minimal-spreadsheet.fods` | generated | generated-no-copyright | FlatSpreadsheet | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
-| repo-generated-minimal-flat-presentation | `tests/fixtures/corpus/generated/minimal-presentation.fodp` | generated | generated-no-copyright | FlatPresentation | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
-| repo-generated-minimal-flat-graphics | `tests/fixtures/corpus/generated/minimal-graphics.fodg` | generated | generated-no-copyright | FlatGraphics | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
-| repo-generated-minimal-text | `tests/fixtures/corpus/generated/minimal-text.odt` | generated | generated-no-copyright | Text | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
-| repo-generated-minimal-spreadsheet | `tests/fixtures/corpus/generated/minimal-spreadsheet.ods` | generated | generated-no-copyright | Spreadsheet | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
-| repo-generated-minimal-presentation | `tests/fixtures/corpus/generated/minimal-presentation.odp` | generated | generated-no-copyright | Presentation | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
-| repo-generated-minimal-graphics | `tests/fixtures/corpus/generated/minimal-graphics.odg` | generated | generated-no-copyright | Graphics | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
-| generated-format-minimal | generated in `OdfFormatRoundTripTests` | generated | generated-no-copyright | 17 extensions | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
-| generated-interop-package | generated in `InteropCorpusTests` | generated | generated-no-copyright | package formats | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
-| generated-schema-negative | generated in `CorpusComplianceTests` | generated | generated-no-copyright | ODT / flat XML | 1.4 | OASIS ODF 1.4 Strict | invalid | semantic-equivalent |
-| generated-security-boundary | generated in `OdfSecurityBoundaryTests` | generated | generated-no-copyright | package formats | mixed | policy profiles | mixed | preserve-unknown |
+| id | path | source | sourceUri | license | kind | version | profile | expected | roundTrip |
+|---|---|---|---|---|---|---|---|---|---|
+| repo-generated-minimal-flat-text | `tests/fixtures/corpus/generated/minimal-text.fodt` | generated | n/a | generated-no-copyright | FlatText | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| repo-generated-minimal-flat-spreadsheet | `tests/fixtures/corpus/generated/minimal-spreadsheet.fods` | generated | n/a | generated-no-copyright | FlatSpreadsheet | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| repo-generated-minimal-flat-presentation | `tests/fixtures/corpus/generated/minimal-presentation.fodp` | generated | n/a | generated-no-copyright | FlatPresentation | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| repo-generated-minimal-flat-graphics | `tests/fixtures/corpus/generated/minimal-graphics.fodg` | generated | n/a | generated-no-copyright | FlatGraphics | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| repo-generated-minimal-text | `tests/fixtures/corpus/generated/minimal-text.odt` | generated | n/a | generated-no-copyright | Text | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
+| repo-generated-minimal-spreadsheet | `tests/fixtures/corpus/generated/minimal-spreadsheet.ods` | generated | n/a | generated-no-copyright | Spreadsheet | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
+| repo-generated-minimal-presentation | `tests/fixtures/corpus/generated/minimal-presentation.odp` | generated | n/a | generated-no-copyright | Presentation | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
+| repo-generated-minimal-graphics | `tests/fixtures/corpus/generated/minimal-graphics.odg` | generated | n/a | generated-no-copyright | Graphics | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
+| generated-format-minimal | generated in `OdfFormatRoundTripTests` | generated | n/a | generated-no-copyright | 17 extensions | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| generated-interop-package | generated in `InteropCorpusTests` | generated | n/a | generated-no-copyright | package formats | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
+| generated-schema-negative | generated in `CorpusComplianceTests` | generated | n/a | generated-no-copyright | ODT / flat XML | 1.4 | OASIS ODF 1.4 Strict | invalid | semantic-equivalent |
+| generated-security-boundary | generated in `OdfSecurityBoundaryTests` | generated | n/a | generated-no-copyright | package formats | mixed | policy profiles | mixed | preserve-unknown |
 
 ## 外部 corpus 路徑
 

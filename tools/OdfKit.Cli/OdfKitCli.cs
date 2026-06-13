@@ -1351,6 +1351,7 @@ public static class OdfKitCli
         string Id,
         string Path,
         string Source,
+        string? SourceUri,
         string License,
         string Kind,
         string Version,
@@ -1368,6 +1369,7 @@ public static class OdfKitCli
             string id = ReadRequiredString(item, "id");
             string path = ReadRequiredString(item, "path");
             string source = ReadRequiredString(item, "source");
+            string? sourceUri = ReadOptionalString(item, "sourceUri");
             string license = ReadRequiredString(item, "license");
             string kind = ReadRequiredString(item, "kind");
             string version = ReadRequiredString(item, "version");
@@ -1378,7 +1380,31 @@ public static class OdfKitCli
                 throw new InvalidDataException("unknown corpus fixture profile: " + profileId);
             ValidateCorpusExpected expected = ParseExpected(expectedValue);
             ValidateRoundTrip(roundTrip);
-            return new ValidateCorpusFixture(id, path, source, license, kind, version, profile, expected, roundTrip);
+            ValidateSourceTraceability(source, sourceUri, license);
+            return new ValidateCorpusFixture(id, path, source, sourceUri, license, kind, version, profile, expected, roundTrip);
+        }
+
+        private static void ValidateSourceTraceability(string source, string? sourceUri, string license)
+        {
+            if (IsRepoOwnedSource(source, license))
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(sourceUri) ||
+                !Uri.TryCreate(sourceUri, UriKind.Absolute, out Uri? uri) ||
+                uri.Scheme is not ("https" or "http"))
+            {
+                throw new InvalidDataException("external corpus fixture requires absolute http(s) sourceUri.");
+            }
+        }
+
+        private static bool IsRepoOwnedSource(string source, string license)
+        {
+            return string.Equals(source, "generated", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(source, "OdfKit", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(license, "generated-no-copyright", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(license, "CC0-1.0", StringComparison.OrdinalIgnoreCase);
         }
 
         private static ValidateCorpusExpected ParseExpected(string value)
@@ -1410,14 +1436,25 @@ public static class OdfKitCli
 
         private static string ReadRequiredString(JsonElement item, string propertyName)
         {
-            if (!item.TryGetProperty(propertyName, out JsonElement value) ||
-                value.ValueKind != JsonValueKind.String ||
-                string.IsNullOrWhiteSpace(value.GetString()))
+            string? value = ReadOptionalString(item, propertyName);
+            if (string.IsNullOrWhiteSpace(value))
             {
                 throw new InvalidDataException("corpus fixture requires " + propertyName + ".");
             }
 
-            return value.GetString()!;
+            return value;
+        }
+
+        private static string? ReadOptionalString(JsonElement item, string propertyName)
+        {
+            if (!item.TryGetProperty(propertyName, out JsonElement value) ||
+                value.ValueKind != JsonValueKind.String)
+            {
+                return null;
+            }
+
+            string? text = value.GetString();
+            return string.IsNullOrWhiteSpace(text) ? null : text;
         }
     }
 
