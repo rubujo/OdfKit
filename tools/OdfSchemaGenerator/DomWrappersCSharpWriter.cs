@@ -470,6 +470,24 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.LineMode;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "fontStyle", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.FontStyle;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "fontVariant", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.FontVariant;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "fontWeight", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.FontWeight;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -835,6 +853,33 @@ public sealed class DomWrappersCSharpWriter
                     "GetLineModeAttributeValue",
                     "SetLineModeAttributeValue");
                 break;
+            case AttributeValueKind.FontStyle:
+                writer.WriteLine($"        public OdfFontStyle? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFontStyleAttributeValue",
+                    "SetFontStyleAttributeValue");
+                break;
+            case AttributeValueKind.FontVariant:
+                writer.WriteLine($"        public OdfFontVariant? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFontVariantAttributeValue",
+                    "SetFontVariantAttributeValue");
+                break;
+            case AttributeValueKind.FontWeight:
+                writer.WriteLine($"        public OdfFontWeight? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFontWeightAttributeValue",
+                    "SetFontWeightAttributeValue");
+                break;
             case AttributeValueKind.XmlName:
                 writer.WriteLine($"        public OdfXmlName? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1034,6 +1079,9 @@ public sealed class DomWrappersCSharpWriter
         LineType,
         LineWidth,
         LineMode,
+        FontStyle,
+        FontVariant,
+        FontWeight,
         XmlName,
         StyleFamily,
         OdfVersion,

@@ -247,6 +247,21 @@ public static class OdfTypedDomCoverage
             return "lineMode";
         }
 
+        if (resolvedType == typeof(OdfFontStyle))
+        {
+            return "fontStyle";
+        }
+
+        if (resolvedType == typeof(OdfFontVariant))
+        {
+            return "fontVariant";
+        }
+
+        if (resolvedType == typeof(OdfFontWeight))
+        {
+            return "fontWeight";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";

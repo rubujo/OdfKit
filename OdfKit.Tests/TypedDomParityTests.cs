@@ -82,11 +82,14 @@ public class TypedDomParityTests
         int lineTypePropertyCount = Regex.Matches(generated, @"public OdfLineType\? \w+").Count;
         int lineWidthPropertyCount = Regex.Matches(generated, @"public OdfLineWidth\? \w+").Count;
         int lineModePropertyCount = Regex.Matches(generated, @"public OdfLineMode\? \w+").Count;
+        int fontStylePropertyCount = Regex.Matches(generated, @"public OdfFontStyle\? \w+").Count;
+        int fontVariantPropertyCount = Regex.Matches(generated, @"public OdfFontVariant\? \w+").Count;
+        int fontWeightPropertyCount = Regex.Matches(generated, @"public OdfFontWeight\? \w+").Count;
         int xmlNamePropertyCount = Regex.Matches(generated, @"public OdfXmlName\? \w+").Count;
         int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
         int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
         int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + borderWidthsPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + styleNameListPropertyCount + colorPropertyCount + iriReferencePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + point3DPropertyCount + pointListPropertyCount + languageCodePropertyCount + countryCodePropertyCount + scriptCodePropertyCount + languageTagPropertyCount + namespacedTokenPropertyCount + characterPropertyCount + textEncodingPropertyCount + targetFrameNamePropertyCount + lineStylePropertyCount + lineTypePropertyCount + lineWidthPropertyCount + lineModePropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
+        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + borderWidthsPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + styleNameListPropertyCount + colorPropertyCount + iriReferencePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + point3DPropertyCount + pointListPropertyCount + languageCodePropertyCount + countryCodePropertyCount + scriptCodePropertyCount + languageTagPropertyCount + namespacedTokenPropertyCount + characterPropertyCount + textEncodingPropertyCount + targetFrameNamePropertyCount + lineStylePropertyCount + lineTypePropertyCount + lineWidthPropertyCount + lineModePropertyCount + fontStylePropertyCount + fontVariantPropertyCount + fontWeightPropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -123,6 +126,9 @@ public class TypedDomParityTests
         Assert.True(lineTypePropertyCount >= 433, "generated line type attribute property count regressed: " + lineTypePropertyCount);
         Assert.True(lineWidthPropertyCount >= 433, "generated line width attribute property count regressed: " + lineWidthPropertyCount);
         Assert.True(lineModePropertyCount >= 333, "generated line mode attribute property count regressed: " + lineModePropertyCount);
+        Assert.True(fontStylePropertyCount >= 433, "generated font style attribute property count regressed: " + fontStylePropertyCount);
+        Assert.True(fontVariantPropertyCount >= 211, "generated font variant attribute property count regressed: " + fontVariantPropertyCount);
+        Assert.True(fontWeightPropertyCount >= 433, "generated font weight attribute property count regressed: " + fontWeightPropertyCount);
         Assert.True(xmlNamePropertyCount >= 1000, "generated XML name attribute property count regressed: " + xmlNamePropertyCount);
         Assert.True(styleFamilyPropertyCount >= 50, "generated style family attribute property count regressed: " + styleFamilyPropertyCount);
         Assert.True(odfVersionPropertyCount >= 50, "generated ODF version attribute property count regressed: " + odfVersionPropertyCount);
@@ -179,6 +185,9 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["lineType"] >= 433);
         Assert.True(report.WrapperPropertyTypeCounts["lineWidth"] >= 433);
         Assert.True(report.WrapperPropertyTypeCounts["lineMode"] >= 333);
+        Assert.True(report.WrapperPropertyTypeCounts["fontStyle"] >= 433);
+        Assert.True(report.WrapperPropertyTypeCounts["fontVariant"] >= 211);
+        Assert.True(report.WrapperPropertyTypeCounts["fontWeight"] >= 433);
         Assert.True(report.WrapperPropertyTypeCounts["xmlName"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["styleFamily"] >= 50);
         Assert.True(report.WrapperPropertyTypeCounts["odfVersion"] >= 50);
@@ -217,6 +226,9 @@ public class TypedDomParityTests
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineType").GetInt32() >= 433);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineWidth").GetInt32() >= 433);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineMode").GetInt32() >= 333);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontStyle").GetInt32() >= 433);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontVariant").GetInt32() >= 211);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontWeight").GetInt32() >= 433);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xmlName").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleFamily").GetInt32() >= 50);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("odfVersion").GetInt32() >= 50);
@@ -276,6 +288,9 @@ public class TypedDomParityTests
         cell.SetLineTypeAttributeValue("text-underline-type", OdfNamespaces.Style, OdfLineType.Double, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
         cell.SetLineWidthAttributeValue("text-underline-width", OdfNamespaces.Style, new OdfLineWidth("150%"), OdfNamespaces.GetPrefix(OdfNamespaces.Style));
         cell.SetLineModeAttributeValue("text-underline-mode", OdfNamespaces.Style, OdfLineMode.SkipWhiteSpace, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
+        cell.SetFontStyleAttributeValue("font-style", OdfNamespaces.Fo, OdfFontStyle.Italic, OdfNamespaces.GetPrefix(OdfNamespaces.Fo));
+        cell.SetFontVariantAttributeValue("font-variant", OdfNamespaces.Fo, OdfFontVariant.SmallCaps, OdfNamespaces.GetPrefix(OdfNamespaces.Fo));
+        cell.SetFontWeightAttributeValue("font-weight", OdfNamespaces.Fo, OdfFontWeight.Weight700, OdfNamespaces.GetPrefix(OdfNamespaces.Fo));
 
         Assert.Equal(3, cell.NumberColumnsRepeated);
         Assert.Equal(12.50m, cell.GetDecimalAttributeValue("value", OdfNamespaces.Office));
@@ -343,6 +358,12 @@ public class TypedDomParityTests
         Assert.Equal(150m, lineWidth.Value.Percent);
         Assert.Equal(OdfLineMode.SkipWhiteSpace, cell.GetLineModeAttributeValue("text-underline-mode", OdfNamespaces.Style));
         Assert.Equal("skip-white-space", cell.GetAttribute("text-underline-mode", OdfNamespaces.Style));
+        Assert.Equal(OdfFontStyle.Italic, cell.GetFontStyleAttributeValue("font-style", OdfNamespaces.Fo));
+        Assert.Equal("italic", cell.GetAttribute("font-style", OdfNamespaces.Fo));
+        Assert.Equal(OdfFontVariant.SmallCaps, cell.GetFontVariantAttributeValue("font-variant", OdfNamespaces.Fo));
+        Assert.Equal("small-caps", cell.GetAttribute("font-variant", OdfNamespaces.Fo));
+        Assert.Equal(OdfFontWeight.Weight700, cell.GetFontWeightAttributeValue("font-weight", OdfNamespaces.Fo));
+        Assert.Equal("700", cell.GetAttribute("font-weight", OdfNamespaces.Fo));
 
         cell.SetDateTimeAttributeValue("date-value", OdfNamespaces.Office, local, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
         cell.SetAttribute("time-value", OdfNamespaces.Office, "23:59:59.125+02:30");
@@ -420,6 +441,12 @@ public class TypedDomParityTests
         Assert.Equal(OdfLineWidthKind.Bold, cell.GetLineWidthAttributeValue("text-underline-width", OdfNamespaces.Style)!.Value.Kind);
         cell.SetAttribute("text-underline-mode", OdfNamespaces.Style, "sometimes");
         Assert.Null(cell.GetLineModeAttributeValue("text-underline-mode", OdfNamespaces.Style));
+        cell.SetAttribute("font-style", OdfNamespaces.Fo, "slanted");
+        Assert.Null(cell.GetFontStyleAttributeValue("font-style", OdfNamespaces.Fo));
+        cell.SetAttribute("font-variant", OdfNamespaces.Fo, "caps");
+        Assert.Null(cell.GetFontVariantAttributeValue("font-variant", OdfNamespaces.Fo));
+        cell.SetAttribute("font-weight", OdfNamespaces.Fo, "950");
+        Assert.Null(cell.GetFontWeightAttributeValue("font-weight", OdfNamespaces.Fo));
         Assert.Equal(7, cell.GetInt32AttributeValue("missing", OdfNamespaces.Table, 7));
         Assert.Null(cell.GetBooleanAttributeValue("missing", OdfNamespaces.Table));
 

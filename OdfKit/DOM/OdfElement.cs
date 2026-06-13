@@ -987,6 +987,84 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的字型樣式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的字型樣式；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfFontStyle? GetFontStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseFontStyle(value, out OdfFontStyle fontStyle) ? fontStyle : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的字型樣式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的字型樣式。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetFontStyleAttributeValue(string localName, string namespaceUri, OdfFontStyle value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatFontStyle(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的字型變體屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的字型變體；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfFontVariant? GetFontVariantAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseFontVariant(value, out OdfFontVariant fontVariant) ? fontVariant : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的字型變體屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的字型變體。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetFontVariantAttributeValue(string localName, string namespaceUri, OdfFontVariant value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatFontVariant(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的字型粗細屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的字型粗細；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfFontWeight? GetFontWeightAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseFontWeight(value, out OdfFontWeight fontWeight) ? fontWeight : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的字型粗細屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的字型粗細。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetFontWeightAttributeValue(string localName, string namespaceUri, OdfFontWeight value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatFontWeight(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -1167,6 +1245,124 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfLineMode.Continuous => "continuous",
             OdfLineMode.SkipWhiteSpace => "skip-white-space",
             _ => throw new ArgumentOutOfRangeException(nameof(lineMode), lineMode, "未知的 ODF 線條模式。")
+        };
+    }
+
+    private static bool TryParseFontStyle(string? value, out OdfFontStyle fontStyle)
+    {
+        switch (value)
+        {
+            case "normal":
+                fontStyle = OdfFontStyle.Normal;
+                return true;
+            case "italic":
+                fontStyle = OdfFontStyle.Italic;
+                return true;
+            case "oblique":
+                fontStyle = OdfFontStyle.Oblique;
+                return true;
+            default:
+                fontStyle = default;
+                return false;
+        }
+    }
+
+    private static string FormatFontStyle(OdfFontStyle fontStyle)
+    {
+        return fontStyle switch
+        {
+            OdfFontStyle.Normal => "normal",
+            OdfFontStyle.Italic => "italic",
+            OdfFontStyle.Oblique => "oblique",
+            _ => throw new ArgumentOutOfRangeException(nameof(fontStyle), fontStyle, "未知的 ODF 字型樣式。")
+        };
+    }
+
+    private static bool TryParseFontVariant(string? value, out OdfFontVariant fontVariant)
+    {
+        switch (value)
+        {
+            case "normal":
+                fontVariant = OdfFontVariant.Normal;
+                return true;
+            case "small-caps":
+                fontVariant = OdfFontVariant.SmallCaps;
+                return true;
+            default:
+                fontVariant = default;
+                return false;
+        }
+    }
+
+    private static string FormatFontVariant(OdfFontVariant fontVariant)
+    {
+        return fontVariant switch
+        {
+            OdfFontVariant.Normal => "normal",
+            OdfFontVariant.SmallCaps => "small-caps",
+            _ => throw new ArgumentOutOfRangeException(nameof(fontVariant), fontVariant, "未知的 ODF 字型變體。")
+        };
+    }
+
+    private static bool TryParseFontWeight(string? value, out OdfFontWeight fontWeight)
+    {
+        switch (value)
+        {
+            case "normal":
+                fontWeight = OdfFontWeight.Normal;
+                return true;
+            case "bold":
+                fontWeight = OdfFontWeight.Bold;
+                return true;
+            case "100":
+                fontWeight = OdfFontWeight.Weight100;
+                return true;
+            case "200":
+                fontWeight = OdfFontWeight.Weight200;
+                return true;
+            case "300":
+                fontWeight = OdfFontWeight.Weight300;
+                return true;
+            case "400":
+                fontWeight = OdfFontWeight.Weight400;
+                return true;
+            case "500":
+                fontWeight = OdfFontWeight.Weight500;
+                return true;
+            case "600":
+                fontWeight = OdfFontWeight.Weight600;
+                return true;
+            case "700":
+                fontWeight = OdfFontWeight.Weight700;
+                return true;
+            case "800":
+                fontWeight = OdfFontWeight.Weight800;
+                return true;
+            case "900":
+                fontWeight = OdfFontWeight.Weight900;
+                return true;
+            default:
+                fontWeight = default;
+                return false;
+        }
+    }
+
+    private static string FormatFontWeight(OdfFontWeight fontWeight)
+    {
+        return fontWeight switch
+        {
+            OdfFontWeight.Normal => "normal",
+            OdfFontWeight.Bold => "bold",
+            OdfFontWeight.Weight100 => "100",
+            OdfFontWeight.Weight200 => "200",
+            OdfFontWeight.Weight300 => "300",
+            OdfFontWeight.Weight400 => "400",
+            OdfFontWeight.Weight500 => "500",
+            OdfFontWeight.Weight600 => "600",
+            OdfFontWeight.Weight700 => "700",
+            OdfFontWeight.Weight800 => "800",
+            OdfFontWeight.Weight900 => "900",
+            _ => throw new ArgumentOutOfRangeException(nameof(fontWeight), fontWeight, "未知的 ODF 字型粗細。")
         };
     }
 

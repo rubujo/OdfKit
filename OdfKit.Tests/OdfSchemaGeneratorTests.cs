@@ -260,6 +260,9 @@ namespace OdfKit.Tests
                 "<define name=\"lineType\"><choice><value>none</value><value>single</value><value>double</value></choice></define>" +
                 "<define name=\"lineWidth\"><choice><value>auto</value><value>bold</value><ref name=\"positive-integer\" /><ref name=\"percent\" /><ref name=\"length\" /></choice></define>" +
                 "<define name=\"lineMode\"><choice><value>continuous</value><value>skip-white-space</value></choice></define>" +
+                "<define name=\"fontStyle\"><choice><value>normal</value><value>italic</value><value>oblique</value></choice></define>" +
+                "<define name=\"fontVariant\"><choice><value>normal</value><value>small-caps</value></choice></define>" +
+                "<define name=\"fontWeight\"><choice><value>normal</value><value>bold</value><value>100</value><value>200</value></choice></define>" +
                 "<define name=\"borderWidths\"><list><ref name=\"positiveLength\" /><ref name=\"positiveLength\" /><ref name=\"positiveLength\" /></list></define>" +
                 "<define name=\"length\"><data type=\"string\"><param name=\"pattern\">[0-9]+cm</param></data></define>" +
                 "<define name=\"percent\"><data type=\"string\"><param name=\"pattern\">[0-9]+%</param></data></define>" +
@@ -291,6 +294,9 @@ namespace OdfKit.Tests
                 "<attribute name=\"style:text-underline-type\"><ref name=\"lineType\" /></attribute>" +
                 "<attribute name=\"style:text-underline-width\"><ref name=\"lineWidth\" /></attribute>" +
                 "<attribute name=\"style:text-underline-mode\"><ref name=\"lineMode\" /></attribute>" +
+                "<attribute name=\"fo:font-style\"><ref name=\"fontStyle\" /></attribute>" +
+                "<attribute name=\"fo:font-variant\"><ref name=\"fontVariant\" /></attribute>" +
+                "<attribute name=\"fo:font-weight\"><ref name=\"fontWeight\" /></attribute>" +
                 "<attribute name=\"style:border-line-width\"><ref name=\"borderWidths\" /></attribute>" +
                 "<attribute name=\"draw:shape-id\"><ref name=\"IDREF\" /></attribute>" +
                 "<attribute name=\"draw:name-token\"><ref name=\"NCName\" /></attribute>" +
@@ -389,6 +395,12 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetLineWidthAttributeValue(\"text-underline-width\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfLineMode? TextUnderlineMode", code);
             Assert.Contains("get => GetLineModeAttributeValue(\"text-underline-mode\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFontStyle? FontStyle", code);
+            Assert.Contains("get => GetFontStyleAttributeValue(\"font-style\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFontVariant? FontVariant", code);
+            Assert.Contains("get => GetFontVariantAttributeValue(\"font-variant\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFontWeight? FontWeight", code);
+            Assert.Contains("get => GetFontWeightAttributeValue(\"font-weight\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfBorderWidths? BorderLineWidth", code);
             Assert.Contains("get => GetBorderWidthsAttributeValue(\"border-line-width\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfXmlName? ShapeId", code);
