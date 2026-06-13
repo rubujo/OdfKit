@@ -55,6 +55,7 @@ public class DocumentKindApiUsabilityTests
 
         Assert.Equal("application/vnd.oasis.opendocument.formula", loaded.Package.MimeType);
         Assert.Equal("math", loaded.MathNode.LocalName);
+        Assert.Equal("x=1", loaded.MathText);
         Assert.Equal("x", FindDescendant(loaded.MathNode, "mi", "http://www.w3.org/1998/Math/MathML")?.TextContent);
     }
 

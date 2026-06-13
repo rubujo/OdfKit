@@ -77,6 +77,11 @@ public class OdfFormulaDocument : OdfDocument
     public OdfNode MathNode => FindOrCreateChild(GetFormulaNode(), "math", "http://www.w3.org/1998/Math/MathML", "math");
 
     /// <summary>
+    /// 取得 MathML 內容的純文字摘要。
+    /// </summary>
+    public string MathText => MathNode.TextContent;
+
+    /// <summary>
     /// 以指定 MathML XML 取代公式內容。
     /// </summary>
     /// <param name="mathMlXml">格式正確的 MathML XML。</param>
