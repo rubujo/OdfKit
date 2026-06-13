@@ -338,6 +338,18 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.IriReference;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "zeroToHundredPercent", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.Percent;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "signedZeroToHundredPercent", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.SignedPercent;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -503,6 +515,24 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetIriReferenceAttributeValue",
                     "SetIriReferenceAttributeValue");
+                break;
+            case AttributeValueKind.Percent:
+                writer.WriteLine($"        public OdfPercent? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetPercentAttributeValue",
+                    "SetPercentAttributeValue");
+                break;
+            case AttributeValueKind.SignedPercent:
+                writer.WriteLine($"        public OdfPercent? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetSignedPercentAttributeValue",
+                    "SetSignedPercentAttributeValue");
                 break;
             case AttributeValueKind.StyleFamily:
                 writer.WriteLine($"        public OdfStyleFamily? {propName}");
@@ -672,6 +702,8 @@ public sealed class DomWrappersCSharpWriter
         StyleName,
         Color,
         IriReference,
+        Percent,
+        SignedPercent,
         StyleFamily,
         OdfVersion,
         MediaType

@@ -142,6 +142,11 @@ public static class OdfTypedDomCoverage
             return "iriReference";
         }
 
+        if (resolvedType == typeof(OdfPercent))
+        {
+            return "percent";
+        }
+
         if (resolvedType == typeof(OdfStyleFamily))
         {
             return "styleFamily";
