@@ -803,6 +803,59 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證 validate-corpus 對未文件化的 baseline 分類差異會失敗。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusBaselineMismatchReturnsFailure()
+    {
+        string root = CreateTempDirectory();
+        string command = CreateBaselineCommand(exitCode: 1);
+        try
+        {
+            string fixture = Path.Combine(root, "fixture.odt");
+            string manifest = Path.Combine(root, "manifest.json");
+            CreateTextDocument(fixture, "corpus baseline mismatch");
+            WriteCorpusManifest(manifest, "fixture.odt", "valid");
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                [
+                    "validate-corpus",
+                    manifest,
+                    "--format",
+                    "json",
+                    "--baseline",
+                    "command",
+                    "--baseline-command",
+                    command
+                ],
+                output,
+                error);
+
+            Assert.Equal(1, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            using JsonDocument json = JsonDocument.Parse(output.ToString());
+            JsonElement summary = json.RootElement.GetProperty("summary");
+            JsonElement fixtureResult = json.RootElement.GetProperty("fixtures")[0];
+            JsonElement baseline = fixtureResult.GetProperty("baseline");
+            Assert.Equal(1, summary.GetProperty("baselineFileCount").GetInt32());
+            Assert.Equal(1, summary.GetProperty("baselineMismatchCount").GetInt32());
+            Assert.Equal(0, summary.GetProperty("baselineDocumentedExceptionCount").GetInt32());
+            Assert.False(fixtureResult.GetProperty("passed").GetBoolean());
+            Assert.False(baseline.GetProperty("isValid").GetBoolean());
+            Assert.False(baseline.GetProperty("matchesOdfKit").GetBoolean());
+            Assert.False(baseline.GetProperty("documentedException").GetBoolean());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+            TryDelete(command);
+        }
+    }
+
+    /// <summary>
     /// 驗證 validate-corpus 可沿用 baseline documented exceptions。
     /// </summary>
     [Fact]

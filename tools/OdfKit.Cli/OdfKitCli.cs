@@ -1231,7 +1231,7 @@ public static class OdfKitCli
             FormatVersion(Report.DetectedVersion),
             StringComparison.OrdinalIgnoreCase);
 
-        public bool Passed => ClassificationMatches && KindMatches && VersionMatches;
+        public bool Passed => ClassificationMatches && KindMatches && VersionMatches && BaselineMatches;
 
         public bool RawBaselineMatches => Baseline is null || Baseline.IsValid == Report.IsValid;
 
