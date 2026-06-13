@@ -575,6 +575,47 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void OasisOdf14Corpus_Positive_TableRowChoiceCoveredCell()
+        {
+            string content =
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+                "xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" office:version=\"1.4\">" +
+                "<office:body><office:spreadsheet><table:table table:name=\"Sheet1\">" +
+                "<table:table-column/>" +
+                "<table:table-row><table:covered-table-cell/></table:table-row>" +
+                "</table:table></office:spreadsheet></office:body></office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.spreadsheet", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+
+            LogReport("OasisOdf14Corpus_Positive_TableRowChoiceCoveredCell", report);
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Negative_TableRowRequiresAtLeastOneCell()
+        {
+            string content =
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+                "xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" office:version=\"1.4\">" +
+                "<office:body><office:spreadsheet><table:table table:name=\"Sheet1\">" +
+                "<table:table-column/>" +
+                "<table:table-row/>" +
+                "</table:table></office:spreadsheet></office:body></office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.spreadsheet", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+
+            LogReport("OasisOdf14Corpus_Negative_TableRowRequiresAtLeastOneCell", report);
+            Assert.False(report.IsValid);
+            Assert.Contains(report.Issues, issue =>
+                issue.RuleId == "ODF3101" &&
+                issue.PackagePath == "content.xml");
+        }
+
+        [Fact]
         public void OasisOdf14Corpus_Negative_InvalidContentOrder()
         {
             string flatXml = "<office:document xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.4\" office:mimetype=\"application/vnd.oasis.opendocument.text\"><office:body><office:text/></office:body><office:meta/></office:document>";
