@@ -315,6 +315,30 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.StyleRepeat;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "direction")
+        {
+            return AttributeValueKind.StyleDirection;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:form:1.0" &&
+            node.LocalName == "orientation")
+        {
+            return AttributeValueKind.FormOrientation;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "direction")
+        {
+            return AttributeValueKind.TableDirection;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "orientation")
+        {
+            return AttributeValueKind.TableOrientation;
+        }
+
         AttributeValueKind valueKind = AttributeValueKind.Unknown;
         foreach (var child in node.Children)
         {
@@ -970,6 +994,42 @@ public sealed class DomWrappersCSharpWriter
                     "GetStyleRepeatAttributeValue",
                     "SetStyleRepeatAttributeValue");
                 break;
+            case AttributeValueKind.StyleDirection:
+                writer.WriteLine($"        public OdfStyleDirection? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleDirectionAttributeValue",
+                    "SetStyleDirectionAttributeValue");
+                break;
+            case AttributeValueKind.FormOrientation:
+                writer.WriteLine($"        public OdfFormOrientation? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFormOrientationAttributeValue",
+                    "SetFormOrientationAttributeValue");
+                break;
+            case AttributeValueKind.TableDirection:
+                writer.WriteLine($"        public OdfTableDirection? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableDirectionAttributeValue",
+                    "SetTableDirectionAttributeValue");
+                break;
+            case AttributeValueKind.TableOrientation:
+                writer.WriteLine($"        public OdfTableOrientation? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableOrientationAttributeValue",
+                    "SetTableOrientationAttributeValue");
+                break;
             case AttributeValueKind.XmlName:
                 writer.WriteLine($"        public OdfXmlName? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1178,6 +1238,10 @@ public sealed class DomWrappersCSharpWriter
         FontStretch,
         StyleLineBreak,
         StyleRepeat,
+        StyleDirection,
+        FormOrientation,
+        TableDirection,
+        TableOrientation,
         XmlName,
         StyleFamily,
         OdfVersion,

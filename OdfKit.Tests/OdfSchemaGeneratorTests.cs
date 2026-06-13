@@ -305,6 +305,10 @@ namespace OdfKit.Tests
                 "<attribute name=\"svg:font-stretch\"><choice><value>normal</value><value>condensed</value><value>expanded</value></choice></attribute>" +
                 "<attribute name=\"style:line-break\"><choice><value>normal</value><value>strict</value></choice></attribute>" +
                 "<attribute name=\"style:repeat\"><choice><value>no-repeat</value><value>repeat</value><value>stretch</value></choice></attribute>" +
+                "<attribute name=\"style:direction\"><choice><value>ltr</value><value>ttb</value></choice></attribute>" +
+                "<attribute name=\"form:orientation\"><choice><value>horizontal</value><value>vertical</value></choice></attribute>" +
+                "<attribute name=\"table:direction\"><choice><value>from-another-table</value><value>to-another-table</value><value>from-same-table</value></choice></attribute>" +
+                "<attribute name=\"table:orientation\"><choice><value>row</value><value>column</value><value>data</value><value>hidden</value><value>page</value></choice></attribute>" +
                 "<attribute name=\"style:border-line-width\"><ref name=\"borderWidths\" /></attribute>" +
                 "<attribute name=\"draw:shape-id\"><ref name=\"IDREF\" /></attribute>" +
                 "<attribute name=\"draw:name-token\"><ref name=\"NCName\" /></attribute>" +
@@ -421,6 +425,14 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetStyleLineBreakAttributeValue(\"line-break\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfStyleRepeat? Repeat", code);
             Assert.Contains("get => GetStyleRepeatAttributeValue(\"repeat\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfStyleDirection? StyleDirection", code);
+            Assert.Contains("get => GetStyleDirectionAttributeValue(\"direction\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFormOrientation? FormOrientation", code);
+            Assert.Contains("get => GetFormOrientationAttributeValue(\"orientation\", \"urn:oasis:names:tc:opendocument:xmlns:form:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableDirection? TableDirection", code);
+            Assert.Contains("get => GetTableDirectionAttributeValue(\"direction\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableOrientation? TableOrientation", code);
+            Assert.Contains("get => GetTableOrientationAttributeValue(\"orientation\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfBorderWidths? BorderLineWidth", code);
             Assert.Contains("get => GetBorderWidthsAttributeValue(\"border-line-width\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfXmlName? ShapeId", code);

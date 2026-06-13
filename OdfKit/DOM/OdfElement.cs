@@ -1221,6 +1221,110 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的樣式方向屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的樣式方向；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfStyleDirection? GetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseStyleDirection(value, out OdfStyleDirection direction) ? direction : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的樣式方向屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的樣式方向。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfStyleDirection value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatStyleDirection(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的表單方向屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的表單方向；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfFormOrientation? GetFormOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseFormOrientation(value, out OdfFormOrientation orientation) ? orientation : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的表單方向屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的表單方向。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetFormOrientationAttributeValue(string localName, string namespaceUri, OdfFormOrientation value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatFormOrientation(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的表格方向屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的表格方向；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTableDirection? GetTableDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTableDirection(value, out OdfTableDirection direction) ? direction : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的表格方向屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的表格方向。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTableDirectionAttributeValue(string localName, string namespaceUri, OdfTableDirection value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTableDirection(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的表格方位屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的表格方位；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTableOrientation? GetTableOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTableOrientation(value, out OdfTableOrientation orientation) ? orientation : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的表格方位屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的表格方位。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTableOrientationAttributeValue(string localName, string namespaceUri, OdfTableOrientation value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTableOrientation(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -1727,6 +1831,126 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfStyleRepeat.Repeat => "repeat",
             OdfStyleRepeat.Stretch => "stretch",
             _ => throw new ArgumentOutOfRangeException(nameof(repeat), repeat, "未知的 ODF 背景重複。")
+        };
+    }
+
+    private static bool TryParseStyleDirection(string? value, out OdfStyleDirection direction)
+    {
+        switch (value)
+        {
+            case "ltr":
+                direction = OdfStyleDirection.LeftToRight;
+                return true;
+            case "ttb":
+                direction = OdfStyleDirection.TopToBottom;
+                return true;
+            default:
+                direction = default;
+                return false;
+        }
+    }
+
+    private static string FormatStyleDirection(OdfStyleDirection direction)
+    {
+        return direction switch
+        {
+            OdfStyleDirection.LeftToRight => "ltr",
+            OdfStyleDirection.TopToBottom => "ttb",
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "未知的 ODF 樣式方向。")
+        };
+    }
+
+    private static bool TryParseFormOrientation(string? value, out OdfFormOrientation orientation)
+    {
+        switch (value)
+        {
+            case "horizontal":
+                orientation = OdfFormOrientation.Horizontal;
+                return true;
+            case "vertical":
+                orientation = OdfFormOrientation.Vertical;
+                return true;
+            default:
+                orientation = default;
+                return false;
+        }
+    }
+
+    private static string FormatFormOrientation(OdfFormOrientation orientation)
+    {
+        return orientation switch
+        {
+            OdfFormOrientation.Horizontal => "horizontal",
+            OdfFormOrientation.Vertical => "vertical",
+            _ => throw new ArgumentOutOfRangeException(nameof(orientation), orientation, "未知的 ODF 表單方向。")
+        };
+    }
+
+    private static bool TryParseTableDirection(string? value, out OdfTableDirection direction)
+    {
+        switch (value)
+        {
+            case "from-another-table":
+                direction = OdfTableDirection.FromAnotherTable;
+                return true;
+            case "to-another-table":
+                direction = OdfTableDirection.ToAnotherTable;
+                return true;
+            case "from-same-table":
+                direction = OdfTableDirection.FromSameTable;
+                return true;
+            default:
+                direction = default;
+                return false;
+        }
+    }
+
+    private static string FormatTableDirection(OdfTableDirection direction)
+    {
+        return direction switch
+        {
+            OdfTableDirection.FromAnotherTable => "from-another-table",
+            OdfTableDirection.ToAnotherTable => "to-another-table",
+            OdfTableDirection.FromSameTable => "from-same-table",
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "未知的 ODF 表格方向。")
+        };
+    }
+
+    private static bool TryParseTableOrientation(string? value, out OdfTableOrientation orientation)
+    {
+        switch (value)
+        {
+            case "row":
+                orientation = OdfTableOrientation.Row;
+                return true;
+            case "column":
+                orientation = OdfTableOrientation.Column;
+                return true;
+            case "data":
+                orientation = OdfTableOrientation.Data;
+                return true;
+            case "hidden":
+                orientation = OdfTableOrientation.Hidden;
+                return true;
+            case "page":
+                orientation = OdfTableOrientation.Page;
+                return true;
+            default:
+                orientation = default;
+                return false;
+        }
+    }
+
+    private static string FormatTableOrientation(OdfTableOrientation orientation)
+    {
+        return orientation switch
+        {
+            OdfTableOrientation.Row => "row",
+            OdfTableOrientation.Column => "column",
+            OdfTableOrientation.Data => "data",
+            OdfTableOrientation.Hidden => "hidden",
+            OdfTableOrientation.Page => "page",
+            _ => throw new ArgumentOutOfRangeException(nameof(orientation), orientation, "未知的 ODF 表格方位。")
         };
     }
 

@@ -292,6 +292,26 @@ public static class OdfTypedDomCoverage
             return "styleRepeat";
         }
 
+        if (resolvedType == typeof(OdfStyleDirection))
+        {
+            return "styleDirection";
+        }
+
+        if (resolvedType == typeof(OdfFormOrientation))
+        {
+            return "formOrientation";
+        }
+
+        if (resolvedType == typeof(OdfTableDirection))
+        {
+            return "tableDirection";
+        }
+
+        if (resolvedType == typeof(OdfTableOrientation))
+        {
+            return "tableOrientation";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";
