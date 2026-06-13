@@ -363,6 +363,12 @@ public sealed class DomWrappersCSharpWriter
         }
 
         if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "cellRangeAddressList", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.CellRangeAddressList;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
             string.Equals(node.ReferenceName, "vector3D", StringComparison.Ordinal))
         {
             return AttributeValueKind.Vector3D;
@@ -571,6 +577,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetCellRangeAddressAttributeValue",
                     "SetCellRangeAddressAttributeValue");
                 break;
+            case AttributeValueKind.CellRangeAddressList:
+                writer.WriteLine($"        public OdfCellRangeAddressList? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetCellRangeAddressListAttributeValue",
+                    "SetCellRangeAddressListAttributeValue");
+                break;
             case AttributeValueKind.Vector3D:
                 writer.WriteLine($"        public OdfVector3D? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -761,6 +776,7 @@ public sealed class DomWrappersCSharpWriter
         SignedPercent,
         CellAddress,
         CellRangeAddress,
+        CellRangeAddressList,
         Vector3D,
         XmlName,
         StyleFamily,

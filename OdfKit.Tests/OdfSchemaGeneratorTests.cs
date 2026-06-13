@@ -243,6 +243,7 @@ namespace OdfKit.Tests
                 "<define name=\"signedZeroToHundredPercent\"><data type=\"string\"><param name=\"pattern\">-?([0-9]?[0-9](\\.[0-9]*)?|100(\\.0*)?|\\.[0-9]+)%</param></data></define>" +
                 "<define name=\"cellAddress\"><data type=\"string\"><param name=\"pattern\">($?([^\\. ']+|'([^']|'')+'))?\\.$?[A-Z]+$?[0-9]+</param></data></define>" +
                 "<define name=\"cellRangeAddress\"><data type=\"string\"><param name=\"pattern\">($?([^\\. ']+|'([^']|'')+'))?\\.$?[A-Z]+$?[0-9]+(:($?([^\\. ']+|'([^']|'')+'))?\\.$?[A-Z]+$?[0-9]+)?</param></data></define>" +
+                "<define name=\"cellRangeAddressList\"><data type=\"string\" /></define>" +
                 "<define name=\"vector3D\"><data type=\"string\"><param name=\"pattern\">\\([ ]*-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([ ]+-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)){2}[ ]*\\)</param></data></define>" +
                 "<define name=\"length\"><data type=\"string\"><param name=\"pattern\">[0-9]+cm</param></data></define>" +
                 "<define name=\"percent\"><data type=\"string\"><param name=\"pattern\">[0-9]+%</param></data></define>" +
@@ -257,6 +258,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"draw:shadow-offset\"><ref name=\"signedZeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"table:base-cell-address\"><ref name=\"cellAddress\" /></attribute>" +
                 "<attribute name=\"table:cell-range-address\"><ref name=\"cellRangeAddress\" /></attribute>" +
+                "<attribute name=\"table:cell-range-address-list\"><ref name=\"cellRangeAddressList\" /></attribute>" +
                 "<attribute name=\"draw:extrusion-direction\"><ref name=\"vector3D\" /></attribute>" +
                 "<attribute name=\"draw:shape-id\"><ref name=\"IDREF\" /></attribute>" +
                 "<attribute name=\"draw:name-token\"><ref name=\"NCName\" /></attribute>" +
@@ -315,6 +317,9 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfCellRangeAddress? CellRangeAddress", code);
             Assert.Contains("get => GetCellRangeAddressAttributeValue(\"cell-range-address\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetCellRangeAddressAttributeValue(\"cell-range-address\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", value.Value, \"table\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfCellRangeAddressList? CellRangeAddressList", code);
+            Assert.Contains("get => GetCellRangeAddressListAttributeValue(\"cell-range-address-list\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetCellRangeAddressListAttributeValue(\"cell-range-address-list\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", value.Value, \"table\", GetDocumentVersion());", code);
             Assert.Contains("public OdfVector3D? ExtrusionDirection", code);
             Assert.Contains("get => GetVector3DAttributeValue(\"extrusion-direction\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetVector3DAttributeValue(\"extrusion-direction\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
