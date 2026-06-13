@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using OdfKit.Core;
 using OdfKit.Compliance;
@@ -47,6 +48,140 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfKitDiagnostics.Warn($"Attribute '{localName}' in namespace '{namespaceUri}' is not defined in ODF {version} schema.");
         }
         SetAttribute(localName, namespaceUri, value, prefix);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的 32 位元整數屬性值。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="defaultValue">屬性不存在或格式無效時的預設值。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的整數值。</returns>
+    public int GetInt32AttributeValue(string localName, string namespaceUri, int defaultValue = 0, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed)
+            ? parsed
+            : defaultValue;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 32 位元整數屬性值。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的整數值。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetInt32AttributeValue(string localName, string namespaceUri, int value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, value.ToString(CultureInfo.InvariantCulture), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的布林屬性值。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的布林值；若屬性不存在或格式無效則為 <see langword="null"/>。</returns>
+    public bool? GetBooleanAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        if (string.Equals(value, "true", StringComparison.OrdinalIgnoreCase) || string.Equals(value, "1", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (string.Equals(value, "false", StringComparison.OrdinalIgnoreCase) || string.Equals(value, "0", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的布林屬性值。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的布林值。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetBooleanAttributeValue(string localName, string namespaceUri, bool value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, value ? "true" : "false", prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的十進位數值屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的十進位數值；若屬性不存在或格式無效則為 <see langword="null"/>。</returns>
+    public decimal? GetDecimalAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal parsed)
+            ? parsed
+            : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的十進位數值屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的十進位數值。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetDecimalAttributeValue(string localName, string namespaceUri, decimal value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, value.ToString(CultureInfo.InvariantCulture), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的日期時間屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的日期時間；若屬性不存在或格式無效則為 <see langword="null"/>。</returns>
+    public DateTime? GetDateTimeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        string text = value!;
+        string format = text.EndsWith("Z", StringComparison.Ordinal) ? "yyyy-MM-ddTHH:mm:ssZ" : "yyyy-MM-ddTHH:mm:ss";
+        DateTimeStyles styles = text.EndsWith("Z", StringComparison.Ordinal)
+            ? DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal
+            : DateTimeStyles.None;
+        return DateTime.TryParseExact(text, format, CultureInfo.InvariantCulture, styles, out DateTime parsed)
+            ? parsed
+            : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的日期時間屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的日期時間。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetDateTimeAttributeValue(string localName, string namespaceUri, DateTime value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        string formatted = value.Kind == DateTimeKind.Utc
+            ? value.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
+            : value.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+        SetAttributeValue(localName, namespaceUri, formatted, prefix, version);
     }
 
     /// <summary>
@@ -122,8 +257,8 @@ public partial class TextHElement(string? prefix = null) : OdfElement("h", OdfNa
     /// </summary>
     public int OutlineLevel
     {
-        get => int.TryParse(GetAttributeValue("outline-level", OdfNamespaces.Text, GetDocumentVersion()), out var level) ? level : 1;
-        set => SetAttributeValue("outline-level", OdfNamespaces.Text, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
+        get => GetInt32AttributeValue("outline-level", OdfNamespaces.Text, 1, GetDocumentVersion());
+        set => SetInt32AttributeValue("outline-level", OdfNamespaces.Text, value, OdfNamespaces.GetPrefix(OdfNamespaces.Text), GetDocumentVersion());
     }
 }
 
@@ -332,8 +467,8 @@ public partial class TableTableRowElement(string? prefix = null) : OdfElement("t
     /// </summary>
     public int NumberRowsRepeated
     {
-        get => int.TryParse(GetAttributeValue("number-rows-repeated", OdfNamespaces.Table, GetDocumentVersion()), out var val) ? val : 1;
-        set => SetAttributeValue("number-rows-repeated", OdfNamespaces.Table, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+        get => GetInt32AttributeValue("number-rows-repeated", OdfNamespaces.Table, 1, GetDocumentVersion());
+        set => SetInt32AttributeValue("number-rows-repeated", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
     }
 }
 
@@ -348,8 +483,8 @@ public partial class TableTableCellElement(string? prefix = null) : OdfElement("
     /// </summary>
     public int NumberColumnsRepeated
     {
-        get => int.TryParse(GetAttributeValue("number-columns-repeated", OdfNamespaces.Table, GetDocumentVersion()), out var val) ? val : 1;
-        set => SetAttributeValue("number-columns-repeated", OdfNamespaces.Table, value.ToString(), OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+        get => GetInt32AttributeValue("number-columns-repeated", OdfNamespaces.Table, 1, GetDocumentVersion());
+        set => SetInt32AttributeValue("number-columns-repeated", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
     }
 
     /// <summary>

@@ -80,6 +80,35 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 typed DOM 屬性 helper 可用強型別讀寫常用 ODF datatype。
+    /// </summary>
+    [Fact]
+    public void TypedDomAttributeHelpersReadAndWriteCommonDatatypes()
+    {
+        TableTableCellElement cell = new("table");
+        DateTime utc = new(2026, 6, 13, 9, 30, 0, DateTimeKind.Utc);
+        DateTime local = new(2026, 6, 13, 17, 30, 0, DateTimeKind.Unspecified);
+
+        cell.NumberColumnsRepeated = 3;
+        cell.SetDecimalAttributeValue("value", OdfNamespaces.Office, 12.50m, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
+        cell.SetBooleanAttributeValue("boolean-value", OdfNamespaces.Office, true, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
+        cell.SetDateTimeAttributeValue("date-value", OdfNamespaces.Office, utc, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
+
+        Assert.Equal(3, cell.NumberColumnsRepeated);
+        Assert.Equal(12.50m, cell.GetDecimalAttributeValue("value", OdfNamespaces.Office));
+        Assert.True(cell.GetBooleanAttributeValue("boolean-value", OdfNamespaces.Office));
+        Assert.Equal(utc, cell.GetDateTimeAttributeValue("date-value", OdfNamespaces.Office));
+        Assert.Equal("2026-06-13T09:30:00Z", cell.GetAttribute("date-value", OdfNamespaces.Office));
+
+        cell.SetDateTimeAttributeValue("date-value", OdfNamespaces.Office, local, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
+
+        Assert.Equal(local, cell.GetDateTimeAttributeValue("date-value", OdfNamespaces.Office));
+        Assert.Equal("2026-06-13T17:30:00", cell.GetAttribute("date-value", OdfNamespaces.Office));
+        Assert.Equal(7, cell.GetInt32AttributeValue("missing", OdfNamespaces.Table, 7));
+        Assert.Null(cell.GetBooleanAttributeValue("missing", OdfNamespaces.Table));
+    }
+
+    /// <summary>
     /// 驗證 typed DOM coverage 文件列出 ODFDOM 對標缺口與 coverage guard。
     /// </summary>
     [Fact]
