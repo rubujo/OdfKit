@@ -28,6 +28,7 @@ public class CliTests
         Assert.Equal(0, exitCode);
         Assert.Contains("validate", output.ToString());
         Assert.Contains("validate-corpus", output.ToString());
+        Assert.Contains("sanitize", output.ToString());
         Assert.Contains("convert-flat", output.ToString());
         Assert.Contains("--baseline odf-validator", output.ToString());
         Assert.Equal(string.Empty, error.ToString());
@@ -56,6 +57,43 @@ public class CliTests
         finally
         {
             TryDelete(path);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 sanitize 會將巨集 artifact 移除並另存輸出檔。
+    /// </summary>
+    [Fact]
+    public void SanitizeRemovesMacroArtifactsToOutputFile()
+    {
+        string sourcePath = CreateTempPath(".odt");
+        string outputPath = CreateTempPath(".odt");
+        try
+        {
+            CreateMacroPackage(sourcePath);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["sanitize", sourcePath, outputPath], output, error);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            Assert.Contains("wrote: " + outputPath, output.ToString());
+            Assert.Contains("removed-artifacts: 1", output.ToString());
+            using (OdfPackage source = OdfPackage.Open(sourcePath))
+            {
+                Assert.True(source.HasEntry("Basic/script.xlb"));
+            }
+
+            using OdfPackage sanitized = OdfPackage.Open(outputPath);
+            Assert.False(sanitized.HasEntry("Basic/script.xlb"));
+            Assert.True(sanitized.HasEntry("content.xml"));
+        }
+        finally
+        {
+            TryDelete(sourcePath);
+            TryDelete(outputPath);
         }
     }
 

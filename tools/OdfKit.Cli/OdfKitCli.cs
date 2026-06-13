@@ -44,6 +44,7 @@ public static class OdfKitCli
                 "validate-corpus" => ValidateCorpus(args, output, error),
                 "info" => Info(args, output, error),
                 "metadata" => Metadata(args, output, error),
+                "sanitize" => Sanitize(args, output, error),
                 "convert-flat" => ConvertFlat(args, output, error),
                 "pack" => Pack(args, output, error),
                 _ => UnknownCommand(args[0], error)
@@ -189,6 +190,29 @@ public static class OdfKitCli
         return 0;
     }
 
+    private static int Sanitize(string[] args, TextWriter output, TextWriter error)
+    {
+        if (!RequireArity(args, 3, "sanitize input.odt output.odt", error))
+        {
+            return 2;
+        }
+
+        if (!File.Exists(args[1]))
+        {
+            error.WriteLine("path not found: " + args[1]);
+            return 2;
+        }
+
+        using OdfDocument document = OdfDocument.Load(args[1]);
+        int artifactCountBefore = CountSanitizableArtifacts(document.Package);
+        document.SanitizeMacros();
+        int artifactCountAfter = CountSanitizableArtifacts(document.Package);
+        document.Save(args[2]);
+        output.WriteLine("wrote: " + args[2]);
+        output.WriteLine("removed-artifacts: " + Math.Max(0, artifactCountBefore - artifactCountAfter).ToString(CultureInfo.InvariantCulture));
+        return 0;
+    }
+
     private static int ConvertFlat(string[] args, TextWriter output, TextWriter error)
     {
         if (!RequireArity(args, 3, "convert-flat input.odt output.fodt", error))
@@ -267,6 +291,7 @@ public static class OdfKitCli
         output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
         output.WriteLine("  validate-corpus manifest.json [--root path] [--format text|json] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
         output.WriteLine("  info file.ods");
+        output.WriteLine("  sanitize input.odt output.odt");
         output.WriteLine("  convert-flat input.odt output.fodt");
         output.WriteLine("  pack input.fodt output.odt");
         output.WriteLine("  metadata file.odt");
@@ -634,6 +659,19 @@ public static class OdfKitCli
             .OrderBy(file => file, StringComparer.OrdinalIgnoreCase)
             .Select(Path.GetFullPath)
             .ToArray();
+    }
+
+    private static int CountSanitizableArtifacts(OdfPackage package)
+    {
+        return package.GetEntries().Count(entry => IsSanitizableArtifact(entry.Path));
+    }
+
+    private static bool IsSanitizableArtifact(string path)
+    {
+        string normalized = path.Replace('\\', '/');
+        return normalized.StartsWith("Basic/", StringComparison.OrdinalIgnoreCase) ||
+            normalized.StartsWith("Scripts/", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(normalized, "META-INF/documentsignatures.xml", StringComparison.OrdinalIgnoreCase);
     }
 
     private static void WriteValidateText(

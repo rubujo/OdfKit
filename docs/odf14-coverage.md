@@ -28,7 +28,7 @@
 | strict profile | `OASIS_ODF_1_4_Strict`、ODF namespace extension 禁止 | `OdfComplianceProfiles.OasisOdf14Strict` | `CorpusComplianceTests`、`ComplianceTests` | validated | 需補更多官方 strict negative case。 |
 | extended profile | `OASIS_ODF_1_4_Extended`、foreign extension isolation | `OdfComplianceProfiles.OasisOdf14Extended` | `CorpusComplianceTests`、`OdfUnknownXmlRoundTripTests` | validated | foreign content 的可移除性目前以規則與 round-trip 測試支撐，尚未有完整文件化策略。 |
 | 版本範圍 profile | ISO / EU / ROC profile version rules | `OdfComplianceProfiles` | `CorpusComplianceTests`、`ComplianceTests` | validated | profile 來源文件與驗證狀態仍需在發行文件中更明確標示。 |
-| macro / script policy | `DisallowMacroByDefault`、script namespace、macro URI | `OdfProfileRuleValidator`、`OdfDocument.SanitizeMacros` | `CorpusComplianceTests`、`OdfSecurityBoundaryTests` | complete | sanitize policy 尚未包成獨立 CLI。 |
+| macro / script policy | `DisallowMacroByDefault`、script namespace、macro URI | `OdfProfileRuleValidator`、`OdfDocument.SanitizeMacros`、CLI `sanitize` | `CorpusComplianceTests`、`OdfSecurityBoundaryTests`、`CliTests` | complete | 加密 sanitize 的 CLI 與 UX 文件仍待補。 |
 | 外部資源政策 | `RequireSafeExternalResourcePolicy` | `OdfProfileRuleValidator` | `CorpusComplianceTests`、`ComplianceTests` | validated | 還可補更多 remote image/object corpus。 |
 | unknown package entry 保真 | manifest 與未辨識 entry round-trip | `OdfPackage` | `OdfPackageUnknownEntryTests` | complete | 無。 |
 | unknown XML / foreign namespace 保真 | Namespace URI + LocalName、prefix / PI / comment 保存 | `OdfNode`、`OdfXmlReader`、`OdfXmlWriter` | `OdfUnknownXmlRoundTripTests` | complete | 無。 |
@@ -45,5 +45,5 @@ profile rule validation、package / flat XML 驗證、全格式最小 round-trip
 
 - 擴大更接近真實世界文件的 positive / negative corpus。
 - 依 [odf-official-corpus-sources.md](odf-official-corpus-sources.md) 擴大 ODF Toolkit / ODF Validator parity matrix 的官方與真實 corpus 覆蓋。
-- 補齊 CLI sanitize 與更多 policy automation。
+- 補齊加密 sanitize CLI UX 與更多 policy automation。
 - 繼續擴充 ODC、ODF formula、ODI 與 ODB 的高階語意 API。
