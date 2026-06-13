@@ -22,6 +22,7 @@ public static class OdfTypedDomCoverage
     {
         OdfSchemaSet resolvedSchema = schema ?? OdfSchemaRegistry.Latest;
         List<OdfTypedDomElementCoverage> elements = [];
+        Dictionary<string, int> wrapperPropertyTypeCounts = new(StringComparer.Ordinal);
         foreach (OdfElementDefinition definition in resolvedSchema.Elements.Values
             .OrderBy(element => element.Name.NamespaceUri, StringComparer.Ordinal)
             .ThenBy(element => element.Name.LocalName, StringComparer.Ordinal))
@@ -40,6 +41,13 @@ public static class OdfTypedDomCoverage
                 wrapperType.FullName ?? wrapperType.Name,
                 hasTypedWrapper,
                 CountDeclaredPublicProperties(wrapperType)));
+            foreach (PropertyInfo property in GetDeclaredPublicProperties(wrapperType))
+            {
+                string propertyType = GetPropertyTypeName(property.PropertyType);
+                wrapperPropertyTypeCounts[propertyType] = wrapperPropertyTypeCounts.TryGetValue(propertyType, out int count)
+                    ? count + 1
+                    : 1;
+            }
         }
 
         Dictionary<string, int> attributeValueTypeCounts = resolvedSchema.Attributes.Values
@@ -53,12 +61,52 @@ public static class OdfTypedDomCoverage
             resolvedSchema.SourceDate,
             elements,
             resolvedSchema.Attributes.Count,
-            attributeValueTypeCounts);
+            attributeValueTypeCounts,
+            wrapperPropertyTypeCounts
+                .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal));
     }
 
     private static int CountDeclaredPublicProperties(Type type)
     {
-        return type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly).Length;
+        return GetDeclaredPublicProperties(type).Length;
+    }
+
+    private static PropertyInfo[] GetDeclaredPublicProperties(Type type)
+    {
+        return type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+    }
+
+    private static string GetPropertyTypeName(Type type)
+    {
+        Type? nullableType = Nullable.GetUnderlyingType(type);
+        Type resolvedType = nullableType ?? type;
+        if (resolvedType == typeof(string))
+        {
+            return "string";
+        }
+
+        if (resolvedType == typeof(int))
+        {
+            return "int";
+        }
+
+        if (resolvedType == typeof(bool))
+        {
+            return "bool";
+        }
+
+        if (resolvedType == typeof(decimal))
+        {
+            return "decimal";
+        }
+
+        if (resolvedType == typeof(DateTime))
+        {
+            return "dateTime";
+        }
+
+        return resolvedType.FullName ?? resolvedType.Name;
     }
 
     private static string FormatVersion(OdfVersion version)
@@ -82,6 +130,7 @@ public sealed class OdfTypedDomCoverageReport
 {
     private readonly IReadOnlyList<OdfTypedDomElementCoverage> elements;
     private readonly IReadOnlyDictionary<string, int> attributeValueTypeCounts;
+    private readonly IReadOnlyDictionary<string, int> wrapperPropertyTypeCounts;
 
     /// <summary>
     /// 初始化 typed DOM 覆蓋報告。
@@ -92,13 +141,15 @@ public sealed class OdfTypedDomCoverageReport
     /// <param name="elements">元素覆蓋清單。</param>
     /// <param name="schemaAttributeCount">schema 屬性總數。</param>
     /// <param name="attributeValueTypeCounts">schema 屬性值類型分布。</param>
+    /// <param name="wrapperPropertyTypeCounts">wrapper 屬性 CLR 類型分布。</param>
     public OdfTypedDomCoverageReport(
         string schemaVersion,
         string schemaSourceUrl,
         string schemaSourceDate,
         IReadOnlyList<OdfTypedDomElementCoverage> elements,
         int schemaAttributeCount,
-        IReadOnlyDictionary<string, int> attributeValueTypeCounts)
+        IReadOnlyDictionary<string, int> attributeValueTypeCounts,
+        IReadOnlyDictionary<string, int> wrapperPropertyTypeCounts)
     {
         SchemaVersion = schemaVersion ?? throw new ArgumentNullException(nameof(schemaVersion));
         SchemaSourceUrl = schemaSourceUrl ?? throw new ArgumentNullException(nameof(schemaSourceUrl));
@@ -106,6 +157,7 @@ public sealed class OdfTypedDomCoverageReport
         this.elements = elements ?? throw new ArgumentNullException(nameof(elements));
         SchemaAttributeCount = schemaAttributeCount;
         this.attributeValueTypeCounts = attributeValueTypeCounts ?? throw new ArgumentNullException(nameof(attributeValueTypeCounts));
+        this.wrapperPropertyTypeCounts = wrapperPropertyTypeCounts ?? throw new ArgumentNullException(nameof(wrapperPropertyTypeCounts));
     }
 
     /// <summary>
@@ -166,6 +218,11 @@ public sealed class OdfTypedDomCoverageReport
     public IReadOnlyDictionary<string, int> AttributeValueTypeCounts => attributeValueTypeCounts;
 
     /// <summary>
+    /// 取得 wrapper 屬性 CLR 類型分布。
+    /// </summary>
+    public IReadOnlyDictionary<string, int> WrapperPropertyTypeCounts => wrapperPropertyTypeCounts;
+
+    /// <summary>
     /// 建立適合 JSON 序列化的匿名模型。
     /// </summary>
     /// <returns>可被 JSON 序列化的報告模型。</returns>
@@ -186,6 +243,7 @@ public sealed class OdfTypedDomCoverageReport
                 wrapperPropertyCount = WrapperPropertyCount
             },
             attributeValueTypeCounts = AttributeValueTypeCounts,
+            wrapperPropertyTypeCounts = WrapperPropertyTypeCounts,
             elements = Elements.Select(element => new
             {
                 namespaceUri = element.NamespaceUri,

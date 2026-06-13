@@ -213,6 +213,12 @@ public static class OdfKitCli
         output.WriteLine("fallback-elements: " + report.FallbackElementCount.ToString(CultureInfo.InvariantCulture));
         output.WriteLine("schema-attributes: " + report.SchemaAttributeCount.ToString(CultureInfo.InvariantCulture));
         output.WriteLine("wrapper-properties: " + report.WrapperPropertyCount.ToString(CultureInfo.InvariantCulture));
+        output.WriteLine("wrapper-property-types:");
+        foreach (KeyValuePair<string, int> pair in report.WrapperPropertyTypeCounts)
+        {
+            output.WriteLine("  " + pair.Key + ": " + pair.Value.ToString(CultureInfo.InvariantCulture));
+        }
+
         return 0;
     }
 
