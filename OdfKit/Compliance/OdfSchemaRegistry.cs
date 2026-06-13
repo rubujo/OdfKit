@@ -78,15 +78,28 @@ public static class OdfSchemaRegistry
             return registered;
         }
 
-        return version switch
+        if (version == OdfVersion.Odf14)
         {
-            OdfVersion.Odf14 => Odf14Default,
-            OdfVersion.Odf13 => Odf14Default,
-            OdfVersion.Odf12 => Odf14Default,
-            OdfVersion.Odf11 => Odf14Default,
-            OdfVersion.Odf10 => Odf14Default,
-            _ => Odf14Default
-        };
+            return Odf14Default;
+        }
+
+        // 動態建立適用於該舊版本的 schema (過濾掉不支援該舊版本的元素與屬性)
+        var filteredElements = Odf14Default.Elements.Values
+            .Where(e => e.SupportedVersions.Contains(version));
+        var filteredAttributes = Odf14Default.Attributes.Values
+            .Where(a => a.SupportedVersions.Contains(version));
+
+        var schema = new OdfSchemaSet(
+            version,
+            Odf14Default.SourceUrl,
+            Odf14Default.SourceDate,
+            filteredElements,
+            filteredAttributes,
+            Odf14Default.NameClasses,
+            Odf14Default.Patterns.Values);
+
+        RegisteredSchemas[version] = schema;
+        return schema;
     }
 
     private sealed class RegistrationScope(OdfVersion version, OdfSchemaSet? previous) : IDisposable
@@ -137,6 +150,8 @@ public static class OdfSchemaRegistry
             Body("image", OdfDocumentKind.Image),
             Body("database", OdfDocumentKind.Database),
             Element("scripts"),
+            Element("event-listeners"),
+            Element(OdfNamespaces.Script, "event-listener"),
             Element("font-face-decls"),
             Element("styles"),
             Element("automatic-styles"),
@@ -209,7 +224,12 @@ public static class OdfSchemaRegistry
             Attribute(OdfNamespaces.Style, "family", "style-family"),
             Attribute(OdfNamespaces.Style, "parent-style-name", "style-name"),
             Attribute(OdfNamespaces.Config, "name", "string"),
-            Attribute(OdfNamespaces.Config, "type", "string")
+            Attribute(OdfNamespaces.Config, "type", "string"),
+            Attribute(OdfNamespaces.Script, "event-name", "string"),
+            Attribute(OdfNamespaces.Script, "language", "string"),
+            Attribute(OdfNamespaces.Script, "macro-name", "string"),
+            Attribute(OdfNamespaces.XLink, "href", "string"),
+            Attribute(OdfNamespaces.XLink, "type", "string")
         ];
 
         return new OdfSchemaSet(OdfVersion.Odf14, Odf14SchemaSource, "2025-10-06", elements, attributes);

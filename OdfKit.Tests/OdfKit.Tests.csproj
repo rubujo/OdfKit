@@ -29,6 +29,14 @@
     <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
     <ProjectReference Include="..\OdfKit.Extensions.Rendering\OdfKit.Extensions.Rendering.csproj" />
     <ProjectReference Include="..\tools\OdfSchemaGenerator\OdfSchemaGenerator.csproj" />
+    <ProjectReference Include="MockSoffice\MockSoffice.csproj" ReferenceOutputAssembly="false" OutputItemType="None" />
   </ItemGroup>
+
+  <Target Name="CopyMockSoffice" AfterTargets="Build">
+    <ItemGroup>
+      <MockSofficeFiles Include="$(MSBuildProjectDirectory)\MockSoffice\bin\$(Configuration)\net8.0\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(MockSofficeFiles)" DestinationFolder="$(OutputPath)MockSoffice\%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

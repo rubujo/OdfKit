@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -202,7 +202,7 @@ namespace OdfKit.Tests
             Assert.False(isLeaked, $"Vulnerability: Sandbox directory '{sandboxDir}' was leaked on invalid output path failure.");
         }
 
-        [Fact(Skip = "Demonstrates missing ArgumentNullException for null format on netstandard2.0/net8.0 target.")]
+        [Fact]
         public void TestNullFormatHandling()
         {
             string mockSoffice = GetMockSofficePath();
@@ -279,28 +279,7 @@ namespace OdfKit.Tests
 
         private string GetMockSofficePath()
         {
-            var baseDir = AppContext.BaseDirectory;
-            var paths = new List<string>
-            {
-                Path.Combine(baseDir, "MockSoffice", "MockSoffice.exe"),
-                Path.Combine(baseDir, "MockSoffice", "MockSoffice"),
-                Path.Combine(baseDir, "..", "..", "..", "MockSoffice", "bin", "MockSoffice.exe"),
-                Path.Combine(baseDir, "..", "..", "..", "MockSoffice", "bin", "MockSoffice"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "OdfKit.Tests", "MockSoffice", "bin", "MockSoffice.exe"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "OdfKit.Tests", "MockSoffice", "bin", "MockSoffice"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "OdfKit.Tests", "MockSoffice", "bin", "Debug", "net8.0", "MockSoffice.exe"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "OdfKit.Tests", "MockSoffice", "bin", "Debug", "net8.0", "MockSoffice")
-            };
-
-            foreach (var path in paths)
-            {
-                if (File.Exists(path))
-                {
-                    return Path.GetFullPath(path);
-                }
-            }
-
-            return string.Empty;
+            return MockSofficeFinder.GetMockSofficePath();
         }
     }
 }

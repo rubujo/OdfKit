@@ -566,5 +566,79 @@ namespace OdfKit.Tests
                 OdfKitDiagnostics.Log -= logHandler;
             }
         }
+
+        [Fact]
+        public void TestDomFidelityAndPrefixIndependence()
+        {
+            string xml = @"<office:document-content xmlns:office=""urn:oasis:names:tc:opendocument:xmlns:office:1.0"" xmlns:text=""urn:oasis:names:tc:opendocument:xmlns:text:1.0"" xmlns:custom=""urn:example:custom"" office:version=""1.4"">
+  <office:body>
+    <office:text>
+      <text:p text:style-name=""Standard"" custom:my-attr=""hello"">
+        Hello World
+        <custom:my-element>nested value</custom:my-element>
+      </text:p>
+    </office:text>
+  </office:body>
+</office:document-content>";
+
+            // 1. 測試解析
+            using var readStream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+            OdfNode root = OdfXmlReader.Parse(readStream);
+
+            // 2. 尋找段落節點
+            OdfNode? FindElement(OdfNode parent, string localName)
+            {
+                foreach (var child in parent.Children)
+                {
+                    if (child.NodeType == OdfNodeType.Element && child.LocalName == localName)
+                    {
+                        return child;
+                    }
+                    var found = FindElement(child, localName);
+                    if (found != null) return found;
+                }
+                return null;
+            }
+
+            var pNode = FindElement(root, "p");
+            Assert.NotNull(pNode);
+
+            // 驗證自訂/外來屬性是否存在
+            Assert.Equal("hello", pNode.GetAttribute("my-attr", "urn:example:custom"));
+
+            // 驗證自訂/外來子元素是否存在
+            var customElem = pNode.Children.FirstOrDefault(c => c.LocalName == "my-element" && c.NamespaceUri == "urn:example:custom");
+            Assert.NotNull(customElem);
+            Assert.Equal("nested value", customElem.TextContent);
+
+            // 3. 修改 prefix，測試 prefix 改變後的獨立性
+            root.Prefix = "o";
+            pNode.Prefix = "t";
+            pNode.SetAttribute("style-name", OdfNamespaces.Text, "NewStyle", "t"); // 雖然給定 t，但 lookup 依然基於 URI
+            
+            // 4. 寫回並重新解析驗證，以確保 prefix 獨立性與 unknown elements/attributes 的保留
+            using var writeStream = new MemoryStream();
+            OdfXmlWriter.Write(root, writeStream, new OdfSaveOptions { IndentXml = true });
+            string outputXml = Encoding.UTF8.GetString(writeStream.ToArray());
+
+            using var reParsedStream = new MemoryStream(Encoding.UTF8.GetBytes(outputXml));
+            OdfNode reParsedRoot = OdfXmlReader.Parse(reParsedStream);
+
+            var reParsedP = FindElement(reParsedRoot, "p");
+            Assert.NotNull(reParsedP);
+
+            // 即使 prefix 改變，屬性 lookup 依然正確 (證明 prefix 獨立性與屬性保留)
+            Assert.Equal("hello", reParsedP.GetAttribute("my-attr", "urn:example:custom"));
+
+            // 即使 prefix 改變，子元素 lookup 依然正確 (證明子元素保留)
+            var reParsedCustomElem = reParsedP.Children.FirstOrDefault(c => c.LocalName == "my-element" && c.NamespaceUri == "urn:example:custom");
+            Assert.NotNull(reParsedCustomElem);
+            Assert.Equal("nested value", reParsedCustomElem.TextContent);
+
+            // 5. Smoke test for auto-generated DOM wrappers (e.g. OfficeEventListenersElement)
+            var eventListeners = new OfficeEventListenersElement();
+            Assert.Equal("event-listeners", eventListeners.LocalName);
+            Assert.Equal(OdfNamespaces.Office, eventListeners.NamespaceUri);
+        }
     }
 }

@@ -105,7 +105,7 @@ public class DrawingDocument : OdfDocument
             "xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" " +
             "xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
             "xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\" " +
-            "office:version=\"1.3\">" +
+            "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
             "<office:body>" +
             "<office:drawing />" +
             "</office:body>" +
@@ -124,7 +124,7 @@ public class DrawingDocument : OdfDocument
             "xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" " +
             "xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
             "xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" " +
-            "office:version=\"1.3\">" +
+            "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
             "<office:styles></office:styles>" +
             "<office:automatic-styles></office:automatic-styles>" +
             "<office:master-styles></office:master-styles>" +

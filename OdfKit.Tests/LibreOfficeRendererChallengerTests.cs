@@ -363,7 +363,8 @@ namespace OdfKit.Tests
         {
             try
             {
-                File.AppendAllText(@"D:\Dev\Project\Application\ODF\debug_log.txt", $"[{DateTime.UtcNow:O}] {message}\n");
+                string logPath = Path.Combine(Path.GetTempPath(), "OdfKit_test_debug_log.txt");
+                File.AppendAllText(logPath, $"[{DateTime.UtcNow:O}] {message}\n");
             }
             catch {}
         }
@@ -516,7 +517,6 @@ namespace OdfKit.Tests
             catch (Exception ex)
             {
                 LogDebug($"Action failed with exception: {ex}");
-                Console.WriteLine($"DBGP: CaptureArgumentsAsync runAction exception: {ex}");
             }
             finally
             {
@@ -541,28 +541,7 @@ namespace OdfKit.Tests
 
         private string GetMockSofficePath()
         {
-            var baseDir = AppContext.BaseDirectory;
-            var paths = new List<string>
-            {
-                Path.Combine(baseDir, "MockSoffice", "MockSoffice.exe"),
-                Path.Combine(baseDir, "MockSoffice", "MockSoffice"),
-                Path.Combine(baseDir, "..", "..", "..", "MockSoffice", "bin", "MockSoffice.exe"),
-                Path.Combine(baseDir, "..", "..", "..", "MockSoffice", "bin", "MockSoffice"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "OdfKit.Tests", "MockSoffice", "bin", "MockSoffice.exe"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "OdfKit.Tests", "MockSoffice", "bin", "MockSoffice"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "OdfKit.Tests", "MockSoffice", "bin", "Debug", "net8.0", "MockSoffice.exe"),
-                Path.Combine(baseDir, "..", "..", "..", "..", "OdfKit.Tests", "MockSoffice", "bin", "Debug", "net8.0", "MockSoffice")
-            };
-
-            foreach (var path in paths)
-            {
-                if (File.Exists(path))
-                {
-                    return Path.GetFullPath(path);
-                }
-            }
-
-            return string.Empty;
+            return MockSofficeFinder.GetMockSofficePath();
         }
 
         [Fact]
@@ -629,18 +608,8 @@ namespace OdfKit.Tests
             string outPath = Path.Combine(Path.GetTempPath(), "OdfKit_NullFormat_" + Guid.NewGuid().ToString("N") + ".pdf");
             try
             {
-#if NET10_0
-                // Under NET10_0 target, process.StartInfo.ArgumentList.Add(null) is executed and throws ArgumentNullException
+                // Both targets should now uniformly throw ArgumentNullException on null format parameter.
                 Assert.Throws<ArgumentNullException>(() => renderer.Convert(doc, outPath, null!));
-#else
-                // Under net8.0 (representing netstandard2.0 build), process.StartInfo.Arguments is built using string builder.
-                // EscapeArgument(null) returns "" which is passed as a format argument.
-                // This does NOT throw an exception because MockSoffice creates a file named "document."
-                // which the renderer finds and copies to the output path successfully!
-                renderer.Convert(doc, outPath, null!);
-                Assert.True(File.Exists(outPath));
-                Assert.Equal("mock image content", File.ReadAllText(outPath));
-#endif
             }
             finally
             {

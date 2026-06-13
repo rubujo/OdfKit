@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using OdfKit.Core;
 using OdfKit.Styles;
+using OdfKit.Compliance;
 
 namespace OdfKit.Spreadsheet;
 
@@ -22,15 +23,40 @@ public class OdsStreamWriter : IDisposable
     private bool _disposed;
     private readonly System.Collections.Generic.List<(string styleName, OdfLength width)> _columnStyles = [];
     private int _autoColumnStyleIndex = 0;
+    private OdfVersion _version = OdfVersionInfo.DefaultVersion;
+
+    /// <summary>
+    /// 取得或設定寫入之 ODS 文件的 ODF 版本。
+    /// </summary>
+    public OdfVersion Version
+    {
+        get => _version;
+        set => _version = value;
+    }
+
+    private static string FormatVersion(OdfVersion version)
+    {
+        return version switch
+        {
+            OdfVersion.Odf10 => "1.0",
+            OdfVersion.Odf11 => "1.1",
+            OdfVersion.Odf12 => "1.2",
+            OdfVersion.Odf13 => "1.3",
+            OdfVersion.Odf14 => "1.4",
+            _ => "1.4"
+        };
+    }
 
     /// <summary>
     /// 初始化 <see cref="OdsStreamWriter"/> 類別的新執行個體。
     /// </summary>
     /// <param name="outputStream">用來輸出 ODS 文件的目標資料流</param>
+    /// <param name="version">要寫入的 ODF 規格版本</param>
     /// <exception cref="ArgumentNullException">當 <paramref name="outputStream"/> 為 null 時擲出</exception>
-    public OdsStreamWriter(Stream outputStream)
+    public OdsStreamWriter(Stream outputStream, OdfVersion version = OdfVersion.Odf14)
     {
         _outputStream = outputStream ?? throw new ArgumentNullException(nameof(outputStream));
+        _version = version;
         
         // 包裝於 NonSeekableStreamWrapper 以強制 ZipArchive 使用資料流、非緩衝模式
         _zip = new ZipArchive(new NonSeekableStreamWrapper(_outputStream), ZipArchiveMode.Create, leaveOpen: true);
@@ -43,7 +69,7 @@ public class OdsStreamWriter : IDisposable
             s.Write(bytes, 0, bytes.Length);
         }
 
-        // 2. 寫入預設的中繼資料、樣式與資訊清單項目
+        // 2. 寫入預設的中階資料、樣式與資訊清單項目
         WriteDefaultMetaFiles();
 
         // 3. 開啟 content.xml 以進行資料流寫入
@@ -60,6 +86,7 @@ public class OdsStreamWriter : IDisposable
         // 寫入 ODF XML 標頭與根 document-content 標籤
         _writer.WriteStartDocument();
         _writer.WriteStartElement("office", "document-content", OdfNamespaces.Office);
+        _writer.WriteAttributeString("office", "version", OdfNamespaces.Office, FormatVersion(_version));
         _writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
         _writer.WriteAttributeString("xmlns", "table", null, OdfNamespaces.Table);
         _writer.WriteAttributeString("xmlns", "text", null, OdfNamespaces.Text);
@@ -77,14 +104,10 @@ public class OdsStreamWriter : IDisposable
     public void WriteStartSheet(string sheetName)
     {
         if (_disposed) return;
-        try
-        {
-            if (_isSheetStarted) WriteEndSheet();
-            _writer.WriteStartElement("table", "table", OdfNamespaces.Table);
-            _writer.WriteAttributeString("table", "name", OdfNamespaces.Table, sheetName);
-            _isSheetStarted = true;
-        }
-        catch (Exception) { }
+        if (_isSheetStarted) WriteEndSheet();
+        _writer.WriteStartElement("table", "table", OdfNamespaces.Table);
+        _writer.WriteAttributeString("table", "name", OdfNamespaces.Table, sheetName);
+        _isSheetStarted = true;
     }
 
     /// <summary>
@@ -95,19 +118,15 @@ public class OdsStreamWriter : IDisposable
     public void WriteColumn(OdfLength width, string? styleName = null)
     {
         if (_disposed) return;
-        try
-        {
-            string name = string.IsNullOrEmpty(styleName)
-                ? $"co_auto_{++_autoColumnStyleIndex}"
-                : styleName!;
+        string name = string.IsNullOrEmpty(styleName)
+            ? $"co_auto_{++_autoColumnStyleIndex}"
+            : styleName!;
 
-            _writer.WriteStartElement("table", "table-column", OdfNamespaces.Table);
-            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, name);
-            _writer.WriteEndElement();
+        _writer.WriteStartElement("table", "table-column", OdfNamespaces.Table);
+        _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, name);
+        _writer.WriteEndElement();
 
-            _columnStyles.Add((name, width));
-        }
-        catch (Exception) { }
+        _columnStyles.Add((name, width));
     }
 
     /// <summary>
@@ -119,17 +138,13 @@ public class OdsStreamWriter : IDisposable
     public void WriteStartRow(double? height = null, string? styleName = null, bool useOptimalHeight = false)
     {
         if (_disposed) return;
-        try
+        if (_isRowStarted) WriteEndRow();
+        _isRowStarted = true;
+        _writer.WriteStartElement("table", "table-row", OdfNamespaces.Table);
+        if (!string.IsNullOrEmpty(styleName))
         {
-            if (_isRowStarted) WriteEndRow();
-            _isRowStarted = true;
-            _writer.WriteStartElement("table", "table-row", OdfNamespaces.Table);
-            if (!string.IsNullOrEmpty(styleName))
-            {
-                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
-            }
+            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
         }
-        catch (Exception) { }
     }
 
     /// <summary>
@@ -140,20 +155,16 @@ public class OdsStreamWriter : IDisposable
     public void WriteCell(string value, string? styleName = null)
     {
         if (_disposed) return;
-        try
+        _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+        _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "string");
+        if (!string.IsNullOrEmpty(styleName))
         {
-            _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-            _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "string");
-            if (!string.IsNullOrEmpty(styleName))
-            {
-                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
-            }
-            _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-            _writer.WriteString(value);
-            _writer.WriteEndElement(); // text:p
-            _writer.WriteEndElement(); // table:cell
+            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
         }
-        catch (Exception) { }
+        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+        _writer.WriteString(value);
+        _writer.WriteEndElement(); // text:p
+        _writer.WriteEndElement(); // table:cell
     }
 
     /// <summary>
@@ -164,21 +175,17 @@ public class OdsStreamWriter : IDisposable
     public void WriteCell(double value, string? styleName = null)
     {
         if (_disposed) return;
-        try
+        _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+        _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "float");
+        _writer.WriteAttributeString("office", "value", OdfNamespaces.Office, value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        if (!string.IsNullOrEmpty(styleName))
         {
-            _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-            _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "float");
-            _writer.WriteAttributeString("office", "value", OdfNamespaces.Office, value.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            if (!string.IsNullOrEmpty(styleName))
-            {
-                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
-            }
-            _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-            _writer.WriteString(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            _writer.WriteEndElement(); // text:p
-            _writer.WriteEndElement(); // table:cell
+            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
         }
-        catch (Exception) { }
+        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+        _writer.WriteString(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        _writer.WriteEndElement(); // text:p
+        _writer.WriteEndElement(); // table:cell
     }
 
     /// <summary>
@@ -190,36 +197,32 @@ public class OdsStreamWriter : IDisposable
     public void WriteCell(DateTime value, string? styleName = null, bool timezoneNaive = false)
     {
         if (_disposed) return;
-        try
+        _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+        _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "date");
+        
+        string isoDate;
+        if (value == DateTime.MinValue || value == DateTime.MaxValue)
         {
-            _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-            _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "date");
-            
-            string isoDate;
-            if (value == DateTime.MinValue || value == DateTime.MaxValue)
-            {
-                isoDate = timezoneNaive
-                    ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
-                    : value.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
-            }
-            else
-            {
-                isoDate = timezoneNaive 
-                    ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
-                    : value.ToUniversalTime().ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
-            }
-                
-            _writer.WriteAttributeString("office", "date-value", OdfNamespaces.Office, isoDate);
-            if (!string.IsNullOrEmpty(styleName))
-            {
-                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
-            }
-            _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-            _writer.WriteString(isoDate);
-            _writer.WriteEndElement(); // text:p
-            _writer.WriteEndElement(); // table:cell
+            isoDate = timezoneNaive
+                ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                : value.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
         }
-        catch (Exception) { }
+        else
+        {
+            isoDate = timezoneNaive 
+                ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                : value.ToUniversalTime().ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
+        }
+            
+        _writer.WriteAttributeString("office", "date-value", OdfNamespaces.Office, isoDate);
+        if (!string.IsNullOrEmpty(styleName))
+        {
+            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+        }
+        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+        _writer.WriteString(isoDate);
+        _writer.WriteEndElement(); // text:p
+        _writer.WriteEndElement(); // table:cell
     }
 
     /// <summary>
@@ -230,21 +233,17 @@ public class OdsStreamWriter : IDisposable
     public void WriteCell(bool value, string? styleName = null)
     {
         if (_disposed) return;
-        try
+        _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+        _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "boolean");
+        _writer.WriteAttributeString("office", "boolean-value", OdfNamespaces.Office, value ? "true" : "false");
+        if (!string.IsNullOrEmpty(styleName))
         {
-            _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-            _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "boolean");
-            _writer.WriteAttributeString("office", "boolean-value", OdfNamespaces.Office, value ? "true" : "false");
-            if (!string.IsNullOrEmpty(styleName))
-            {
-                _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
-            }
-            _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-            _writer.WriteString(value ? "TRUE" : "FALSE");
-            _writer.WriteEndElement(); // text:p
-            _writer.WriteEndElement(); // table:cell
+            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
         }
-        catch (Exception) { }
+        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+        _writer.WriteString(value ? "TRUE" : "FALSE");
+        _writer.WriteEndElement(); // text:p
+        _writer.WriteEndElement(); // table:cell
     }
 
     /// <summary>
@@ -255,11 +254,7 @@ public class OdsStreamWriter : IDisposable
         if (_disposed) return;
         if (_isRowStarted)
         {
-            try
-            {
-                _writer.WriteEndElement(); // table-row
-            }
-            catch (Exception) { }
+            _writer.WriteEndElement(); // table-row
             _isRowStarted = false;
         }
     }
@@ -273,11 +268,7 @@ public class OdsStreamWriter : IDisposable
         if (_isRowStarted) WriteEndRow();
         if (_isSheetStarted)
         {
-            try
-            {
-                _writer.WriteEndElement(); // table:table
-            }
-            catch (Exception) { }
+            _writer.WriteEndElement(); // table:table
             _isSheetStarted = false;
         }
     }
@@ -297,7 +288,7 @@ public class OdsStreamWriter : IDisposable
         {
             writer.WriteStartDocument();
             writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
-            writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, "1.3");
+            writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, FormatVersion(_version));
             
             writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
             writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "/");
@@ -327,6 +318,7 @@ public class OdsStreamWriter : IDisposable
         {
             writer.WriteStartDocument();
             writer.WriteStartElement("office", "document-styles", OdfNamespaces.Office);
+            writer.WriteAttributeString("office", "version", OdfNamespaces.Office, FormatVersion(_version));
             writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
             writer.WriteAttributeString("xmlns", "style", null, OdfNamespaces.Style);
             writer.WriteAttributeString("xmlns", "text", null, OdfNamespaces.Text);
@@ -365,6 +357,7 @@ public class OdsStreamWriter : IDisposable
         {
             writer.WriteStartDocument();
             writer.WriteStartElement("office", "document-meta", OdfNamespaces.Office);
+            writer.WriteAttributeString("office", "version", OdfNamespaces.Office, FormatVersion(_version));
             writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
             writer.WriteAttributeString("xmlns", "dc", null, OdfNamespaces.Dc);
             writer.WriteAttributeString("xmlns", "meta", null, OdfNamespaces.Meta);

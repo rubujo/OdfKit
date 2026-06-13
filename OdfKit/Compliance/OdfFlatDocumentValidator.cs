@@ -1,3 +1,4 @@
+#pragma warning restore CS1591
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,6 +34,15 @@ public static class OdfFlatDocumentValidator
             ? ParseVersion(rootInfo.Version)
             : OdfVersion.Unknown;
         OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(detectedVersion);
+        if (detectedVersion != OdfVersion.Odf14 && detectedVersion != OdfVersion.Unknown)
+        {
+            issues.Add(new OdfValidationIssue(
+                OdfIssueSeverity.Warning,
+                "ODF1005",
+                $"The validator is using ODF 1.4 schema to perform best-effort validation on ODF {OdfVersionInfo.ToVersionString(detectedVersion)} document.",
+                fileName,
+                profileId: profileId));
+        }
 
         ValidateRoot(rootInfo, schema, fileName, profileId, issues);
         ValidateMimeType(rootInfo?.MimeType, documentKind, profile, fileName, profileId, issues);

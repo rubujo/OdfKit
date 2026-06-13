@@ -1,3 +1,5 @@
+#pragma warning restore CS1591
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,6 +16,7 @@ using System.Xml.Linq;
 using OdfKit.DOM;
 using OdfKit.Formula;
 using OdfKit.Styles;
+using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 
@@ -72,10 +75,25 @@ public class OdfPackage : IDisposable, IAsyncDisposable
         /// </summary>
         public string? MimeType => _mimetype;
 
+        private OdfVersion _version = OdfVersionInfo.DefaultVersion;
+
+        /// <summary>
+        /// 取得或設定封裝文件的 ODF 規格版本。
+        /// </summary>
+        public OdfVersion Version
+        {
+            get => _version;
+            set => _version = value;
+        }
+
         /// <summary>
         /// 取得一個值，指出目前封裝是否為單一 Flat XML 檔案。
         /// </summary>
-        public bool IsFlatXml => _isFlatXml;
+        public bool IsFlatXml
+        {
+            get => _isFlatXml;
+            set => _isFlatXml = value;
+        }
 
         /// <summary>
         /// 取得封裝內部所有項目的媒體類型資訊清單。
@@ -401,6 +419,15 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             // Get office:version
             var versionAttr = root.Attribute(officeNs + "version") ?? root.Attribute("version");
             string version = versionAttr?.Value ?? "1.3";
+            _version = version switch
+            {
+                "1.0" => OdfVersion.Odf10,
+                "1.1" => OdfVersion.Odf11,
+                "1.2" => OdfVersion.Odf12,
+                "1.3" => OdfVersion.Odf13,
+                "1.4" => OdfVersion.Odf14,
+                _ => OdfVersion.Odf14
+            };
 
             // Extract nested office:document elements (embedded objects, e.g. formulas)
             var nestedDocs = doc.Descendants(officeNs + "document")
@@ -666,6 +693,18 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                     {
                         string? version = reader.GetAttribute("version", OdfNamespaces.Manifest) ?? reader.GetAttribute("version");
                         _manifestRootInfo = new OdfManifestRootInfo(reader.NamespaceURI, reader.LocalName, version);
+                        if (version != null)
+                        {
+                            _version = version switch
+                            {
+                                "1.0" => OdfVersion.Odf10,
+                                "1.1" => OdfVersion.Odf11,
+                                "1.2" => OdfVersion.Odf12,
+                                "1.3" => OdfVersion.Odf13,
+                                "1.4" => OdfVersion.Odf14,
+                                _ => OdfVersion.Odf14
+                            };
+                        }
                     }
                     else if (reader.LocalName == "file-entry" && reader.NamespaceURI == OdfNamespaces.Manifest)
                     {
@@ -1586,8 +1625,17 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             using (var writer = XmlWriter.Create(ms, settings))
             {
                 writer.WriteStartDocument();
+                string versionText = Version switch
+                {
+                    OdfVersion.Odf10 => "1.0",
+                    OdfVersion.Odf11 => "1.1",
+                    OdfVersion.Odf12 => "1.2",
+                    OdfVersion.Odf13 => "1.3",
+                    OdfVersion.Odf14 => "1.4",
+                    _ => "1.4"
+                };
                 writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
-                writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, "1.3");
+                writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, versionText);
 
                 // Root entry
                 writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);

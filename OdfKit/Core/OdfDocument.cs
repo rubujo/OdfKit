@@ -1,3 +1,5 @@
+#pragma warning restore CS1591
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -137,12 +139,12 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         protected virtual string GetDefaultMetaXml()
         {
-            return "<office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:meta=\"urn:oasis:names:tc:opendocument:xmlns:meta:1.0\" office:version=\"1.3\"><office:meta></office:meta></office:document-meta>";
+            return "<office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:meta=\"urn:oasis:names:tc:opendocument:xmlns:meta:1.0\" office:version=\"" + OdfVersionInfo.DefaultVersionString + "\"><office:meta></office:meta></office:document-meta>";
         }
 
         protected virtual string GetDefaultSettingsXml()
         {
-            return "<office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"1.3\"><office:settings></office:settings></office:document-settings>";
+            return "<office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"" + OdfVersionInfo.DefaultVersionString + "\"><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"VisibleAreaTop\" config:type=\"int\">0</config:config-item></config:config-item-set></office:settings></office:document-settings>";
         }
 
         #region Package Lifecycle & Persistence

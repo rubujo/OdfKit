@@ -40,7 +40,7 @@ public class OdfFormulaDocument : OdfDocument
         return "<office:document-content " +
                "xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
                "xmlns:math=\"http://www.w3.org/1998/Math/MathML\" " +
-               "office:version=\"1.3\">" +
+               "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
                "<office:body>" +
                "<office:formula>" +
                "<math:math />" +
@@ -57,7 +57,7 @@ public class OdfFormulaDocument : OdfDocument
     {
         return "<office:document-styles " +
                "xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
-               "office:version=\"1.3\">" +
+               "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
                "<office:styles></office:styles>" +
                "</office:document-styles>";
     }

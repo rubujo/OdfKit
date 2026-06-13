@@ -170,13 +170,6 @@ namespace OdfKit.Tests
             p = doc.AddParagraph();
             string html2 = "Plain </b>Bold</i> Extra</i>";
             doc.AddHtmlFragment(p, html2);
-            // Result should be all plain text
-            Console.WriteLine($"DEBUG: Children count = {p.Node.Children.Count}");
-            for (int idx = 0; idx < p.Node.Children.Count; idx++)
-            {
-                var child = p.Node.Children[idx];
-                Console.WriteLine($"DEBUG: Child {idx}: NodeType={child.NodeType}, LocalName='{child.LocalName}', TextContent='{child.TextContent}'");
-            }
             Assert.Single(p.Node.Children);
             Assert.Equal("Plain Bold Extra", p.Node.TextContent);
         }

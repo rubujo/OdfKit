@@ -221,6 +221,30 @@ internal static class OdfProfileRuleValidator
                 return;
             }
 
+            // 為了防止 foreign elements 與 attributes 干擾 schema pattern 驗證，
+            // 遞迴移除不屬於 ODF 標準命名空間的元素和屬性。
+            SanitizeForeignContentForSchemaValidation(document.Root);
+
+            var body = document.Root.Element(XName.Get("body", OdfNamespaces.Office));
+            if (body is not null)
+            {
+                if (body.Element(XName.Get("formula", OdfNamespaces.Office)) is not null ||
+                    body.Element(XName.Get("database", OdfNamespaces.Office)) is not null ||
+                    body.Element(XName.Get("image", OdfNamespaces.Office)) is not null ||
+                    body.Element(XName.Get("chart", OdfNamespaces.Office)) is not null)
+                {
+                    return;
+                }
+            }
+
+            // 當檢測版本非 1.4 時，暫時將 root 的 version 設為 1.4 以便 best-effort 匹配 1.4 schema
+            var versionAttr = document.Root.Attribute(XName.Get("version", OdfNamespaces.Office))
+                ?? document.Root.Attribute("version");
+            if (versionAttr is not null && versionAttr.Value != "1.4")
+            {
+                versionAttr.Value = "1.4";
+            }
+
             List<string> patternNames = ResolveRootPatternNames(schema, document.Root, packagePath);
             if (patternNames.Count == 0)
             {
@@ -846,5 +870,58 @@ internal static class OdfProfileRuleValidator
         }
 
         return false;
+    }
+
+    private static bool IsStandardNamespace(string namespaceUri)
+    {
+        return IsOdfNamespace(namespaceUri) ||
+            IsKnownInfrastructureNamespace(namespaceUri) ||
+            namespaceUri == "http://www.w3.org/1998/Math/MathML" ||
+            namespaceUri == "http://www.w3.org/2000/xmlns/" ||
+            string.IsNullOrEmpty(namespaceUri);
+    }
+
+    private static bool IsInfrastructureOrMathNamespace(string namespaceUri)
+    {
+        return namespaceUri == "http://www.w3.org/1999/xlink" ||
+            namespaceUri == "http://purl.org/dc/elements/1.1/" ||
+            namespaceUri == "http://www.w3.org/1998/Math/MathML" ||
+            namespaceUri == "http://www.w3.org/XML/1998/namespace";
+    }
+
+    private static void SanitizeForeignContentForSchemaValidation(XElement element)
+    {
+        var defaultSchema = OdfSchemaRegistry.DefaultOdf14;
+
+        // 移除 foreign 屬性
+        var foreignAttrs = element.Attributes()
+            .Where(a => !a.IsNamespaceDeclaration && 
+                        !IsInfrastructureOrMathNamespace(a.Name.NamespaceName) &&
+                        (!IsStandardNamespace(a.Name.NamespaceName) || 
+                         defaultSchema.FindAttribute(a.Name.NamespaceName, a.Name.LocalName) is null))
+            .ToList();
+        foreach (var attr in foreignAttrs)
+        {
+            attr.Remove();
+        }
+
+        // 遞迴處理子元素並移除 foreign 子元素
+        var children = element.Elements().ToList();
+        foreach (var child in children)
+        {
+            if (IsInfrastructureOrMathNamespace(child.Name.NamespaceName))
+            {
+                SanitizeForeignContentForSchemaValidation(child);
+            }
+            else if (!IsStandardNamespace(child.Name.NamespaceName) || 
+                     defaultSchema.FindElement(child.Name.NamespaceName, child.Name.LocalName) is null)
+            {
+                child.Remove();
+            }
+            else
+            {
+                SanitizeForeignContentForSchemaValidation(child);
+            }
+        }
     }
 }

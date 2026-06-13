@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -340,7 +340,7 @@ namespace OdfKit.Tests
 
         private static void LogStressResult(string message)
         {
-            string logPath = @"d:\Dev\Project\Application\ODF\.agents\challenger_milestone3_1_gen3\stress_test_runs.log";
+            string logPath = Path.Combine(Path.GetTempPath(), "stress_test_runs.log");
             try
             {
                 File.AppendAllText(logPath, $"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ssZ} - {message}\n");

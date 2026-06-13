@@ -48,14 +48,14 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
                "xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" " +
                "xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" " +
                "xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
-               "office:version=\"1.3\">" +
+               "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
                "<office:body>" +
                "<office:chart>" +
                "<chart:chart chart:class=\"line\" />" +
                "</office:chart>" +
                "</office:body>" +
                "</office:document-content>";
-    }
+     }
 
     /// <summary>
     /// 取得預設的樣式 XML 字串。
@@ -66,7 +66,7 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
         return "<office:document-styles " +
                "xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
                "xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" " +
-               "office:version=\"1.3\">" +
+               "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
                "<office:styles></office:styles>" +
                "</office:document-styles>";
     }

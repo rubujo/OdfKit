@@ -26,12 +26,6 @@ namespace OdfKit.Tests
                 
                 string mathMl = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>y</mi><mo>=</mo><mi>x</mi></math>";
                 doc.AddFormula(p, mathMl);
-                
-                Console.WriteLine("DEBUG: BodyTextRoot children count: " + doc.BodyTextRoot.Children.Count);
-                foreach (var child in doc.BodyTextRoot.Children)
-                {
-                    Console.WriteLine("DEBUG: Child: " + child.LocalName + ", Content: " + child.TextContent);
-                }
                 using var saveMs = new MemoryStream();
                 doc.SaveToStream(saveMs);
                 

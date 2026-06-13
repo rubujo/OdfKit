@@ -1,3 +1,5 @@
+#pragma warning restore CS1591
+
 namespace OdfKit.Core;
 
 /// <summary>

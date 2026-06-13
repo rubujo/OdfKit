@@ -116,7 +116,6 @@ public class OdfMailMergeEngine(TextDocument doc)
                     if (!resolved)
                     {
                         resolved = TryResolveValuePath(parentDataSource, placeholder, out val);
-                        Console.WriteLine($"DBGP: placeholder={placeholder} resolved={resolved} val={val}");
                     }
 
                     string valStr = val?.ToString() ?? string.Empty;

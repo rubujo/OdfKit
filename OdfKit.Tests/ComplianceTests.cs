@@ -1414,7 +1414,7 @@ namespace OdfKit.Tests
         {
             using MemoryStream ms = CreatePackage(
                 "application/vnd.oasis.opendocument.spreadsheet",
-                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" office:version=\"1.4\"><office:body><office:spreadsheet><table:table table:name=\"Sheet1\"><table:table-row><table:table-cell office:value-type=\"string\" office:string-value=\"A1\" /></table:table-row></table:table></office:spreadsheet></office:body></office:document-content>");
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" office:version=\"1.4\"><office:body><office:spreadsheet><table:table table:name=\"Sheet1\"><table:table-column /><table:table-row><table:table-cell office:value-type=\"string\" office:string-value=\"A1\" /></table:table-row></table:table></office:spreadsheet></office:body></office:document-content>");
 
             using OdfPackage package = OdfPackage.Open(ms);
             OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
@@ -1475,12 +1475,12 @@ namespace OdfKit.Tests
         {
             using MemoryStream ms = CreatePackage(
                 "application/vnd.oasis.opendocument.text",
-                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.4\"><office:body><office:text><draw:image xlink:href=\"https://example.invalid/image.png\" /></office:text></office:body></office:document-content>");
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.4\"><office:body><office:text><text:p><text:a xlink:type=\"simple\" xlink:href=\"https://example.invalid/image.png\">Link</text:a></text:p></office:text></office:body></office:document-content>");
 
             using OdfPackage package = OdfPackage.Open(ms);
             OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools);
 
-            Assert.True(report.IsValid);
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.RuleId + ": " + i.Message)));
             Assert.Contains(report.Issues, issue => issue.RuleId == "RequireSafeExternalResourcePolicy");
         }
 
@@ -1489,7 +1489,8 @@ namespace OdfKit.Tests
         {
             using MemoryStream ms = CreateFlatDocument(
                 "application/vnd.oasis.opendocument.spreadsheet",
-                "1.4");
+                "1.4",
+                "spreadsheet");
 
             OdfValidationReport report = OdfFlatDocumentValidator.Validate(
                 ms,
@@ -1506,7 +1507,8 @@ namespace OdfKit.Tests
         {
             using MemoryStream ms = CreateFlatDocument(
                 "application/vnd.oasis.opendocument.text",
-                "1.4");
+                "1.4",
+                "text");
 
             OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, "workbook.fods");
 
@@ -1520,7 +1522,8 @@ namespace OdfKit.Tests
         {
             using MemoryStream ms = CreateFlatDocument(
                 "application/vnd.oasis.opendocument.text",
-                "1.4");
+                "1.4",
+                "text");
 
             OdfValidationReport report = OdfFlatDocumentValidator.Validate(
                 ms,
@@ -1568,7 +1571,8 @@ namespace OdfKit.Tests
         {
             using MemoryStream ms = CreateFlatDocument(
                 "application/vnd.oasis.opendocument.text",
-                "1.4");
+                "1.4",
+                "text");
 
             OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, "document.fodt", OdfComplianceProfiles.IsoIec26300);
 

@@ -105,7 +105,9 @@ public static class OdfSchemaPatternValidator
                 return childElements.Count == 0;
             }
 
-            return MatchSequence(contentNodes, element, childElements, 0, context).Contains(childElements.Count);
+            var matchesResult = MatchSequence(contentNodes, element, childElements, 0, context);
+            bool isSeqMatch = matchesResult.Contains(childElements.Count);
+            return isSeqMatch;
         }
 
         private static bool HasSignificantDirectText(XElement element)
@@ -1270,7 +1272,13 @@ public static class OdfSchemaPatternValidator
         {
             for (int i = 0; i < nodes.Count; i++)
             {
-                switch (nodes[i].Kind)
+                OdfSchemaPatternNode node = nodes[i];
+                if (node.Occurrence == "optional" || node.Occurrence == "zeroOrMore")
+                {
+                    continue;
+                }
+
+                switch (node.Kind)
                 {
                     case OdfSchemaPatternNodeKind.ZeroOrMore:
                     case OdfSchemaPatternNodeKind.Optional:
@@ -1284,7 +1292,14 @@ public static class OdfSchemaPatternValidator
 
                         continue;
                     default:
-                        if (!used[i])
+                        if (node.Occurrence == "oneOrMore")
+                        {
+                            if (!oneOrMoreSatisfied[i])
+                            {
+                                return false;
+                            }
+                        }
+                        else if (!used[i])
                         {
                             return false;
                         }

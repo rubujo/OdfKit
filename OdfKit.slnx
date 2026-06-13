@@ -1,4 +1,4 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/方案項目/">
     <File Path=".editorconfig" />
     <File Path=".gitattributes" />
@@ -14,5 +14,6 @@
   <Project Path="OdfKit/OdfKit.csproj" />
   <Project Path="OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj" />
   <Project Path="OdfKit.Tests/OdfKit.Tests.csproj" />
+  <Project Path="OdfKit.Tests/MockSoffice/MockSoffice.csproj" />
   <Project Path="tools/OdfSchemaGenerator/OdfSchemaGenerator.csproj" />
 </Solution>

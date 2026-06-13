@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -20,7 +20,8 @@ namespace OdfKit.Tests
             {
                 sb.AppendLine($"  RuleId: {issue.RuleId}, PackagePath: '{issue.PackagePath}', XPath: '{issue.XPath}', RequiredVersion: '{issue.RequiredVersion}', Message: '{issue.Message}'");
             }
-            File.AppendAllText("d:/Dev/Project/Application/OdfKit/diagnostic_output.txt", sb.ToString());
+            string diagPath = Path.Combine(Path.GetTempPath(), $"diagnostic_output_{Guid.NewGuid():N}.txt");
+            File.AppendAllText(diagPath, sb.ToString());
         }
 
         private static MemoryStream CreatePackage(
@@ -297,15 +298,15 @@ namespace OdfKit.Tests
         [Fact]
         public void RocTaiwanOdfCns15251_Negative_ScriptAttribute()
         {
-            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:script=\"urn:oasis:names:tc:opendocument:xmlns:script:1.0\" office:version=\"1.2\"><office:body><office:text>" +
-                             "<office:event-listeners script:event-name=\"dom-click\" />" +
-                             "</office:text></office:body></office:document-content>";
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:script=\"urn:oasis:names:tc:opendocument:xmlns:script:1.0\" office:version=\"1.2\">" +
+                             "<office:scripts><office:event-listeners><script:event-listener script:event-name=\"dom-click\" script:language=\"ooo:script\" script:macro-name=\"MyMacro\" /></office:event-listeners></office:scripts>" +
+                             "<office:body><office:text/></office:body></office:document-content>";
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
             OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.RocTaiwanOdfCns15251);
             LogReport("RocTaiwanOdfCns15251_Negative_ScriptAttribute", report);
-            Assert.True(report.IsValid); // Warning only
-            Assert.Contains(report.Issues, issue => issue.RuleId == "DisallowMacroByDefault" && issue.XPath == "/office:document-content[1]/office:body[1]/office:text[1]/office:event-listeners[1]");
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.RuleId + ": " + i.Message))); // Warning only
+            Assert.Contains(report.Issues, issue => issue.RuleId == "DisallowMacroByDefault" && issue.XPath == "/office:document-content[1]/office:scripts[1]/office:event-listeners[1]/script:event-listener[1]");
         }
 
         // 7. ROC Taiwan Government ODF Tools Tests
@@ -323,14 +324,14 @@ namespace OdfKit.Tests
         [Fact]
         public void RocTaiwanGovernmentOdfTools_Negative_ScriptValue()
         {
-            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.2\"><office:body><office:text>" +
-                             "<office:event-listeners event-name=\"click\" event-url=\"vnd.sun.star.script:MyMacro\" />" +
-                             "</office:text></office:body></office:document-content>";
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:script=\"urn:oasis:names:tc:opendocument:xmlns:script:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.2\">" +
+                             "<office:scripts><office:event-listeners><script:event-listener script:event-name=\"dom-click\" script:language=\"ooo:script\" xlink:type=\"simple\" xlink:href=\"vnd.sun.star.script:MyMacro\" /></office:event-listeners></office:scripts>" +
+                             "<office:body><office:text/></office:body></office:document-content>";
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
             OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools);
             LogReport("RocTaiwanGovernmentOdfTools_Negative_ScriptValue", report);
-            Assert.True(report.IsValid); // Warning only
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.RuleId + ": " + i.Message))); // Warning only
             Assert.Contains(report.Issues, issue => issue.RuleId == "DisallowMacroByDefault");
         }
 
@@ -363,6 +364,116 @@ namespace OdfKit.Tests
                                                         issue.RequiredVersion == OdfVersion.Odf13 &&
                                                         issue.XPath == "/office:document-content[1]/office:body[1]/office:text[1]/text:custom-new-element[1]");
             }
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Positive_DocumentStyles()
+        {
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text/></office:body></office:document-content>";
+            var additional = new Dictionary<string, string>
+            {
+                { "styles.xml", "<office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" office:version=\"1.4\"><office:styles/></office:document-styles>" }
+            };
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content, additional);
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+            LogReport("OasisOdf14Corpus_Positive_DocumentStyles", report);
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Positive_DocumentMeta()
+        {
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text/></office:body></office:document-content>";
+            var additional = new Dictionary<string, string>
+            {
+                { "meta.xml", "<office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:meta=\"urn:oasis:names:tc:opendocument:xmlns:meta:1.0\" office:version=\"1.4\"><office:meta><meta:generator>OdfKit</meta:generator></office:meta></office:document-meta>" }
+            };
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content, additional);
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+            LogReport("OasisOdf14Corpus_Positive_DocumentMeta", report);
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Positive_DocumentSettings()
+        {
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text/></office:body></office:document-content>";
+            var additional = new Dictionary<string, string>
+            {
+                { "settings.xml", "<office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"1.4\"><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"ShowGrid\" config:type=\"boolean\">true</config:config-item></config:config-item-set></office:settings></office:document-settings>" }
+            };
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content, additional);
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+            LogReport("OasisOdf14Corpus_Positive_DocumentSettings", report);
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Positive_FlatDocument()
+        {
+            string flatXml = "<office:document xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"1.4\" office:mimetype=\"application/vnd.oasis.opendocument.text\"><office:meta/><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"ShowGrid\" config:type=\"boolean\">true</config:config-item></config:config-item-set></office:settings><office:styles/><office:body><office:text/></office:body></office:document>";
+            using var ms = new MemoryStream(Encoding.UTF8.GetBytes(flatXml));
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, "document.fodt", OdfComplianceProfiles.OasisOdf14Strict);
+            LogReport("OasisOdf14Corpus_Positive_FlatDocument", report);
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Negative_MissingVersion()
+        {
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"><office:body><office:text/></office:body></office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+            LogReport("OasisOdf14Corpus_Negative_MissingVersion", report);
+            Assert.False(report.IsValid);
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Negative_InvalidRoot()
+        {
+            string content = "<office:unknown-root xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text/></office:body></office:unknown-root>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+            LogReport("OasisOdf14Corpus_Negative_InvalidRoot", report);
+            Assert.False(report.IsValid);
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Negative_InvalidBodyKind()
+        {
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:unknown-body/></office:body></office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+            LogReport("OasisOdf14Corpus_Negative_InvalidBodyKind", report);
+            Assert.False(report.IsValid);
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Negative_InvalidAttributeDatatype()
+        {
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" office:version=\"1.4\"><office:body><office:text><table:table table:name=\"Sheet1\"><table:table-column table:number-columns-repeated=\"not-a-number\"/><table:table-row><table:table-cell office:value-type=\"string\" office:string-value=\"A1\"/></table:table-row></table:table></office:text></office:body></office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+            LogReport("OasisOdf14Corpus_Negative_InvalidAttributeDatatype", report);
+            Assert.False(report.IsValid);
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Negative_InvalidContentOrder()
+        {
+            string flatXml = "<office:document xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.4\" office:mimetype=\"application/vnd.oasis.opendocument.text\"><office:body><office:text/></office:body><office:meta/></office:document>";
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes(flatXml));
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+            LogReport("OasisOdf14Corpus_Negative_InvalidContentOrder", report);
+            Assert.False(report.IsValid);
         }
     }
 }

@@ -1,3 +1,5 @@
+#pragma warning restore CS1591
+
 using System;
 using System.IO;
 using System.Text;
@@ -154,7 +156,7 @@ public static class OdfDocumentFactory
     {
         return "<office:document-settings" +
             CommonNamespaceAttributes +
-            " office:version=\"" + version + "\"><office:settings /></office:document-settings>";
+            " office:version=\"" + version + "\"><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"VisibleAreaTop\" config:type=\"int\">0</config:config-item></config:config-item-set></office:settings></office:document-settings>";
     }
 
     private static string GetMimeType(OdfDocumentKind kind)

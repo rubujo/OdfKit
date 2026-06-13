@@ -61,6 +61,15 @@ public static class OdfPackageValidator
 
         OdfVersion detectedVersion = DetectVersion(package, issues, profileId);
         OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(detectedVersion);
+        if (detectedVersion != OdfVersion.Odf14 && detectedVersion != OdfVersion.Unknown)
+        {
+            issues.Add(new OdfValidationIssue(
+                OdfIssueSeverity.Warning,
+                "ODF1005",
+                $"The validator is using ODF 1.4 schema to perform best-effort validation on ODF {OdfVersionInfo.ToVersionString(detectedVersion)} document.",
+                fileName,
+                profileId: profileId));
+        }
         ValidateXmlRoots(package, schema, issues, profileId);
         ValidateProfileExtension(fileName, profile, profileId, issues);
         ValidateProfileVersion(detectedVersion, profile, profileId, issues, fileName, "/office:document-content[1]");
@@ -798,7 +807,6 @@ public static class OdfPackageValidator
         string? fileName = null,
         string? xPath = null)
     {
-        Console.WriteLine($"DEBUG: ValidateProfileVersion detectedVersion={detectedVersion}, profile={profile?.Id}, fileName={fileName}, xPath={xPath}");
         if (profile is null || detectedVersion == OdfVersion.Unknown)
         {
             return;

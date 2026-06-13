@@ -67,6 +67,7 @@ public class LibreOfficeRenderer
     {
         if (document is null) throw new ArgumentNullException(nameof(document));
         if (string.IsNullOrEmpty(outputPath)) throw new ArgumentNullException(nameof(outputPath));
+        if (format is null) throw new ArgumentNullException(nameof(format));
 
         string? sandboxDir = null;
         try

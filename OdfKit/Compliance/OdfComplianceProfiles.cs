@@ -1,3 +1,5 @@
+#pragma warning restore CS1591
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +60,7 @@ public static class OdfComplianceProfiles
         OdfVersionRange.Exact(OdfVersion.Odf14),
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
-        [.. StandardRules, Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error)]);
+        [.. StandardRules, Rule("DisallowInvalidOdfNamespaceExtensions", "Strict conformance does not allow non-schema ODF namespace extensions.", OdfIssueSeverity.Error), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)]);
 
     /// <summary>
     /// 取得 OASIS OpenDocument v1.4 擴充 (Extended) 一致性規範。
@@ -74,7 +76,7 @@ public static class OdfComplianceProfiles
         OdfVersionRange.Exact(OdfVersion.Odf14),
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
-        [.. StandardRules, Rule("RequireForeignExtensionIsolation", "Foreign extensions must use non-ODF namespaces and remain removable.", OdfIssueSeverity.Warning)]);
+        [.. StandardRules, Rule("RequireForeignExtensionIsolation", "Foreign extensions must use non-ODF namespaces and remain removable.", OdfIssueSeverity.Warning), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)]);
 
     /// <summary>
     /// 取得 ISO/IEC 26300 一致性規範（初版對應於 ODF 1.2 基準）。
@@ -156,7 +158,8 @@ public static class OdfComplianceProfiles
             Rule("AllowPdfForFinalPublication", "Final non-editable publications may use PDF or PDF/A alongside editable ODF sources.", OdfIssueSeverity.Info),
             Rule("DisallowMacroByDefault", "Government exchange profiles should reject macro and script content by default.", OdfIssueSeverity.Warning),
             Rule("PreserveCjkLayoutFeatures", "Vertical layout, ruby, East Asian grids, CJK spacing, and fallback font information must be preserved.", OdfIssueSeverity.Warning),
-            Rule("RequireSafeExternalResourcePolicy", "External images, objects, remote links, and event handlers should be reported by default.", OdfIssueSeverity.Warning)
+            Rule("RequireSafeExternalResourcePolicy", "External images, objects, remote links, and event handlers should be reported by default.", OdfIssueSeverity.Warning),
+            Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)
         ]);
 
     /// <summary>
@@ -177,7 +180,8 @@ public static class OdfComplianceProfiles
             Rule("RequireGovernmentToolCompatibility", "Documents should remain compatible with government ODF application tools.", OdfIssueSeverity.Warning),
             Rule("RequireTraditionalChineseMetadataSupport", "Traditional Chinese metadata, language tags, CJK text, and font names must round-trip without damage.", OdfIssueSeverity.Warning),
             Rule("DisallowMacroByDefault", "Government exchange profiles should reject macro and script content by default.", OdfIssueSeverity.Warning),
-            Rule("RequireSafeExternalResourcePolicy", "External images, objects, remote links, and event handlers should be reported by default.", OdfIssueSeverity.Warning)
+            Rule("RequireSafeExternalResourcePolicy", "External images, objects, remote links, and event handlers should be reported by default.", OdfIssueSeverity.Warning),
+            Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)
         ]);
 
     /// <summary>

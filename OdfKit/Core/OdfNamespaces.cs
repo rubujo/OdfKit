@@ -47,6 +47,9 @@ public static class OdfNamespaces
     /// <summary>Config 命名空間 URI</summary>
     public const string Config = "urn:oasis:names:tc:opendocument:xmlns:config:1.0";
 
+    /// <summary>Script 命名空間 URI</summary>
+    public const string Script = "urn:oasis:names:tc:opendocument:xmlns:script:1.0";
+
     /// <summary>Manifest 命名空間 URI</summary>
     public const string Manifest = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0";
 
@@ -79,6 +82,7 @@ public static class OdfNamespaces
             Svg => "svg",
             Chart => "chart",
             Config => "config",
+            Script => "script",
             Manifest => "manifest",
             Dsig => "dsig",
             Ds => "ds",

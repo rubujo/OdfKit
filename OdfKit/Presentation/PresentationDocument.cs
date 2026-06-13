@@ -375,7 +375,7 @@ public class PresentationDocument : OdfDocument
             "xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\" " +
             "xmlns:anim=\"urn:oasis:names:tc:opendocument:xmlns:animation:1.0\" " +
             "xmlns:smil=\"urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0\" " +
-            "office:version=\"1.3\">" +
+            "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
             "<office:body>" +
             "<office:presentation />" +
             "</office:body>" +
@@ -396,7 +396,7 @@ public class PresentationDocument : OdfDocument
             "xmlns:number=\"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\" " +
             "xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\" " +
             "xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" " +
-            "office:version=\"1.3\">" +
+            "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
             "<office:styles></office:styles>" +
             "<office:automatic-styles>" +
             "<style:page-layout style:name=\"PM1\">" +
