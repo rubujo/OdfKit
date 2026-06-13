@@ -38,20 +38,25 @@ public static class OdfEncryption
         {
             throw new CryptographicException($"PBKDF2 反覆運算次數 {iterations} 超過最大限制 50000。");
         }
-        if (hashName.Contains("sha256") || hashName.Contains("sha-256"))
+
+        string normalizedHashName = hashName.Trim().ToLowerInvariant();
+        if (normalizedHashName is "sha256" or "sha-256" or "http://www.w3.org/2000/09/xmldsig#sha256")
         {
             using (var hmac = new HMACSHA256(password))
             {
                 return Pbkdf2Hmac(hmac, salt, iterations, keyLength);
             }
         }
-        else
+
+        if (normalizedHashName is "sha1" or "sha-1" or "http://www.w3.org/2000/09/xmldsig#sha1")
         {
             using (var hmac = new HMACSHA1(password))
             {
                 return Pbkdf2Hmac(hmac, salt, iterations, keyLength);
             }
         }
+
+        throw new NotSupportedException($"不支援的雜湊演算法：{hashName}");
     }
 
     private static byte[] Pbkdf2Hmac(HMAC hmac, byte[] salt, int iterations, int keyLength)

@@ -26,6 +26,34 @@ namespace OdfKit.Tests
             });
         }
 
+        [Theory]
+        [InlineData("sha256", "sha-256")]
+        [InlineData("sha256", "http://www.w3.org/2000/09/xmldsig#sha256")]
+        [InlineData("sha1", "sha-1")]
+        [InlineData("sha1", "http://www.w3.org/2000/09/xmldsig#sha1")]
+        public void Pbkdf2_HashAlgorithm_AcceptsKnownAliases(string canonicalName, string aliasName)
+        {
+            byte[] password = Encoding.UTF8.GetBytes("密碼");
+            byte[] salt = Encoding.UTF8.GetBytes("salt");
+
+            byte[] canonical = OdfEncryption.Pbkdf2(password, salt, 1024, 16, canonicalName);
+            byte[] alias = OdfEncryption.Pbkdf2(password, salt, 1024, 16, aliasName);
+
+            Assert.Equal(canonical, alias);
+        }
+
+        [Theory]
+        [InlineData("sha2561")]
+        [InlineData("http://www.w3.org/2000/09/xmldsig#sha2561")]
+        [InlineData("sha512")]
+        public void Pbkdf2_HashAlgorithm_RejectsUnsupportedNames(string hashName)
+        {
+            var exception = Assert.Throws<NotSupportedException>(() =>
+                OdfEncryption.Pbkdf2(new byte[16], new byte[8], 1024, 16, hashName));
+
+            Assert.Equal($"不支援的雜湊演算法：{hashName}", exception.Message);
+        }
+
         [Fact]
         public void TestBlowfishKeyLengthValidation()
         {
