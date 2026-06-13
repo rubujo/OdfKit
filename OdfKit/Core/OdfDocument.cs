@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using OdfKit.Compliance;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -18,6 +19,8 @@ namespace OdfKit.Core;
 /// </summary>
 public abstract class OdfDocument : IDisposable, IAsyncDisposable
 {
+    private const string DocumentSignaturesPath = "META-INF/documentsignatures.xml";
+
     /// <summary>
     /// 建立指定種類的 ODF 文件。
     /// </summary>
@@ -282,6 +285,29 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// 取得文件封裝內數位簽章項目的摘要狀態。
+    /// </summary>
+    /// <returns>描述簽章項目存在狀態、可讀性與簽章數量的摘要。</returns>
+    public OdfDocumentSignatureSummary GetSignatureSummary()
+    {
+        if (!Package.HasEntry(DocumentSignaturesPath))
+        {
+            return OdfDocumentSignatureSummary.Unsigned(DocumentSignaturesPath);
+        }
+
+        try
+        {
+            using Stream stream = Package.GetEntryStream(DocumentSignaturesPath);
+            int signatureCount = CountSignatureElements(stream);
+            return OdfDocumentSignatureSummary.Readable(DocumentSignaturesPath, signatureCount);
+        }
+        catch (Exception ex) when (ex is IOException || ex is InvalidDataException || ex is XmlException)
+        {
+            return OdfDocumentSignatureSummary.Unreadable(DocumentSignaturesPath, ex.Message);
+        }
+    }
+
+    /// <summary>
     /// 驗證文件中的所有數位簽章。
     /// </summary>
     /// <param name="certificates">輸出參數，傳回驗證通過的憑證集合</param>
@@ -289,6 +315,49 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
     public bool VerifySignatures(out X509Certificate2Collection certificates)
     {
         return OdfSigner.VerifySignatures(Package, out certificates);
+    }
+
+    /// <summary>
+    /// 驗證文件中的所有數位簽章，並傳回詳細驗證結果。
+    /// </summary>
+    /// <param name="options">簽章驗證選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <returns>詳細的數位簽章驗證結果。</returns>
+    public OdfSignatureValidationResult VerifySignatures(OdfSigningOptions? options = null)
+    {
+        return OdfSigner.VerifySignatures(Package, options);
+    }
+
+    /// <summary>
+    /// 非同步驗證文件中的所有數位簽章，並傳回詳細驗證結果。
+    /// </summary>
+    /// <param name="options">簽章驗證選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果。</returns>
+    public Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfSigningOptions? options = null)
+    {
+        return OdfSigner.VerifySignaturesAsync(Package, options);
+    }
+
+    private static int CountSignatureElements(Stream stream)
+    {
+        XmlReaderSettings settings = new()
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null
+        };
+
+        int count = 0;
+        using XmlReader reader = XmlReader.Create(stream, settings);
+        while (reader.Read())
+        {
+            if (reader.NodeType == XmlNodeType.Element &&
+                reader.LocalName == "Signature" &&
+                reader.NamespaceURI == OdfNamespaces.Ds)
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 
         #endregion

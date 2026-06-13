@@ -33,7 +33,7 @@
 | unknown package entry 保真 | manifest 與未辨識 entry round-trip | `OdfPackage` | `OdfPackageUnknownEntryTests` | complete | 無。 |
 | unknown XML / foreign namespace 保真 | Namespace URI + LocalName、prefix / PI / comment 保存 | `OdfNode`、`OdfXmlReader`、`OdfXmlWriter` | `OdfUnknownXmlRoundTripTests` | complete | 無。 |
 | flat / ZIP 雙向互轉 | package entries、meta/settings/styles/font-face-decls | `OdfPackage` | `PackageRoundTripTests` | complete | 更大型文件 corpus 尚未加入。 |
-| 簽章邊界 | 未編輯保存保留，內容修改移除過期簽章 | `OdfPackage`、`OdfSigner` | `DomTest`、`AdvancedSecurityTests`、`OdfSecurityBoundaryTests` | complete | 高階文件層尚未提供簽章狀態查詢摘要 API。 |
+| 簽章邊界 | 未編輯保存保留，內容修改移除過期簽章 | `OdfPackage`、`OdfSigner`、`OdfDocument.GetSignatureSummary`、`OdfDocument.VerifySignaturesAsync` | `DomTest`、`AdvancedSecurityTests`、`OdfSecurityBoundaryTests` | complete | 無。 |
 | 加密邊界 | manifest encryption metadata、解密、重新加密保存 | `OdfEncryption`、`OdfSaveOptions`、`OdfLoadOptions` | `EncryptionTests`、`OdfSecurityBoundaryTests` | validated | 加密 sanitize 的 CLI 與 UX 文件仍待補。 |
 | 全格式最小 round-trip | 17 種 extension 最小 create / load / save / validate | `OdfDocumentFactory`、`OdfDocument`、format wrappers | `OdfFormatRoundTripTests`、`tests/fixtures/corpus/manifest.json`、`docs/odf-format-support.md` | complete | 高階語意 API 依格式成熟度不同，ODC / ODF / ODI / ODB 仍是最小 story。 |
 

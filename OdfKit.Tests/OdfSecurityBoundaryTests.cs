@@ -55,6 +55,89 @@ public class OdfSecurityBoundaryTests
     }
 
     /// <summary>
+    /// 驗證文件層簽章摘要會回報未簽署文件。
+    /// </summary>
+    [Fact]
+    public void DocumentSignatureSummaryReportsUnsignedDocument()
+    {
+        using OdfDocument document = OdfDocument.Create(OdfDocumentKind.Text);
+
+        OdfDocumentSignatureSummary summary = document.GetSignatureSummary();
+
+        Assert.Equal("META-INF/documentsignatures.xml", summary.SignatureEntryPath);
+        Assert.False(summary.HasSignatureEntry);
+        Assert.False(summary.IsSignatureEntryReadable);
+        Assert.False(summary.IsSigned);
+        Assert.Equal(0, summary.SignatureCount);
+        Assert.Null(summary.ErrorMessage);
+    }
+
+    /// <summary>
+    /// 驗證文件層簽章摘要會以命名空間 URI 統計 XML 簽章數。
+    /// </summary>
+    [Fact]
+    public void DocumentSignatureSummaryCountsXmlSignaturesByNamespaceUri()
+    {
+        using MemoryStream source = CreateTextPackage();
+        using var document = new TextDocument(OdfPackage.Open(source, leaveOpen: true));
+        document.Package.WriteEntry(
+            "META-INF/documentsignatures.xml",
+            Encoding.UTF8.GetBytes($"""
+                <odfds:document-signatures xmlns:odfds="urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0"
+                                           xmlns:any="{OdfNamespaces.Ds}">
+                  <any:Signature Id="a" />
+                  <any:Signature Id="b" />
+                  <Signature xmlns="urn:odfkit:test:ignored" />
+                </odfds:document-signatures>
+                """),
+            "text/xml");
+
+        OdfDocumentSignatureSummary summary = document.GetSignatureSummary();
+
+        Assert.True(summary.HasSignatureEntry);
+        Assert.True(summary.IsSignatureEntryReadable);
+        Assert.True(summary.IsSigned);
+        Assert.Equal(2, summary.SignatureCount);
+        Assert.Null(summary.ErrorMessage);
+    }
+
+    /// <summary>
+    /// 驗證文件層簽章摘要會安全回報無法解析的簽章項目。
+    /// </summary>
+    [Fact]
+    public void DocumentSignatureSummaryReportsUnreadableSignatureEntry()
+    {
+        using MemoryStream source = CreateTextPackage();
+        using var document = new TextDocument(OdfPackage.Open(source, leaveOpen: true));
+        document.Package.WriteEntry(
+            "META-INF/documentsignatures.xml",
+            Encoding.UTF8.GetBytes("<broken-signatures>"),
+            "text/xml");
+
+        OdfDocumentSignatureSummary summary = document.GetSignatureSummary();
+
+        Assert.True(summary.HasSignatureEntry);
+        Assert.False(summary.IsSignatureEntryReadable);
+        Assert.False(summary.IsSigned);
+        Assert.Equal(0, summary.SignatureCount);
+        Assert.NotNull(summary.ErrorMessage);
+    }
+
+    /// <summary>
+    /// 驗證文件層詳細驗章入口會委派到底層封裝驗章器。
+    /// </summary>
+    [Fact]
+    public async Task DocumentVerifySignaturesAsyncReportsUnsignedDocument()
+    {
+        using OdfDocument document = OdfDocument.Create(OdfDocumentKind.Text);
+
+        OdfSignatureValidationResult result = await document.VerifySignaturesAsync();
+
+        Assert.False(result.IsValid);
+        Assert.Empty(result.Signatures);
+    }
+
+    /// <summary>
     /// 驗證巨集淨化會移除巨集與簽章，但不會誤刪安全的 foreign content。
     /// </summary>
     [Fact]
