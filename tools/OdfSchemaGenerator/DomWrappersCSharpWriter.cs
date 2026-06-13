@@ -67,18 +67,7 @@ public sealed class DomWrappersCSharpWriter
                 {
                     string propName = resolvedNames[attr];
                     string prefix = GetPrefix(attr.NamespaceUri);
-                    writer.WriteLine();
-                    writer.WriteLine($"        public string? {propName}");
-                    writer.WriteLine("        {");
-                    writer.WriteLine($"            get => GetAttributeValue(\"{attr.LocalName}\", \"{attr.NamespaceUri}\", GetDocumentVersion());");
-                    writer.WriteLine("            set");
-                    writer.WriteLine("            {");
-                    writer.WriteLine("                if (value == null)");
-                    writer.WriteLine($"                    RemoveAttribute(\"{attr.LocalName}\", \"{attr.NamespaceUri}\");");
-                    writer.WriteLine("                else");
-                    writer.WriteLine($"                    SetAttributeValue(\"{attr.LocalName}\", \"{attr.NamespaceUri}\", value, \"{prefix}\", GetDocumentVersion());");
-                    writer.WriteLine("            }");
-                    writer.WriteLine("        }");
+                    WriteAttributeProperty(writer, attr, propName, prefix);
                 }
             }
 
@@ -126,9 +115,9 @@ public sealed class DomWrappersCSharpWriter
         writer.WriteLine("}");
     }
 
-    private static Dictionary<(string, string), List<SchemaNameMetadata>> ResolveAllElementAttributes(SchemaMetadata metadata)
+    private static Dictionary<(string, string), List<AttributePropertyMetadata>> ResolveAllElementAttributes(SchemaMetadata metadata)
     {
-        var elementAttributes = new Dictionary<(string, string), List<SchemaNameMetadata>>();
+        var elementAttributes = new Dictionary<(string, string), List<AttributePropertyMetadata>>();
         var elementNodes = new List<SchemaPatternNodeMetadata>();
 
         foreach (var pattern in metadata.Patterns)
@@ -144,19 +133,25 @@ public sealed class DomWrappersCSharpWriter
             var key = (node.NamespaceUri, node.LocalName);
             if (!elementAttributes.TryGetValue(key, out var attrs))
             {
-                attrs = new List<SchemaNameMetadata>();
+                attrs = new List<AttributePropertyMetadata>();
                 elementAttributes[key] = attrs;
             }
 
-            var collected = new List<SchemaNameMetadata>();
+            var collected = new List<AttributePropertyMetadata>();
             CollectAttributes(node, collected, metadata, new HashSet<string>());
 
             foreach (var attr in collected)
             {
-                if (!attrs.Any(a => a.NamespaceUri == attr.NamespaceUri && a.LocalName == attr.LocalName))
+                AttributePropertyMetadata? existing = attrs.FirstOrDefault(a =>
+                    a.NamespaceUri == attr.NamespaceUri &&
+                    a.LocalName == attr.LocalName);
+                if (existing is null)
                 {
                     attrs.Add(attr);
+                    continue;
                 }
+
+                existing.ValueKind = MergeValueKinds(existing.ValueKind, attr.ValueKind);
             }
         }
 
@@ -175,11 +170,16 @@ public sealed class DomWrappersCSharpWriter
         }
     }
 
-    private static void CollectAttributes(SchemaPatternNodeMetadata node, List<SchemaNameMetadata> attrs, SchemaMetadata metadata, HashSet<string> visitedRefs)
+    private static void CollectAttributes(SchemaPatternNodeMetadata node, List<AttributePropertyMetadata> attrs, SchemaMetadata metadata, HashSet<string> visitedRefs)
     {
         if (node.Kind == "attribute" && !string.IsNullOrEmpty(node.LocalName))
         {
-            attrs.Add(new SchemaNameMetadata { NamespaceUri = node.NamespaceUri, LocalName = node.LocalName });
+            attrs.Add(new AttributePropertyMetadata
+            {
+                NamespaceUri = node.NamespaceUri,
+                LocalName = node.LocalName,
+                ValueKind = InferAttributeValueKind(node, metadata, new HashSet<string>())
+            });
         }
         else if (node.Kind == "ref" && !string.IsNullOrEmpty(node.ReferenceName) && visitedRefs.Add(node.ReferenceName))
         {
@@ -198,7 +198,7 @@ public sealed class DomWrappersCSharpWriter
         }
     }
 
-    private static Dictionary<SchemaNameMetadata, string> ResolvePropertyNames(List<SchemaNameMetadata> attrs)
+    private static Dictionary<AttributePropertyMetadata, string> ResolvePropertyNames(List<AttributePropertyMetadata> attrs)
     {
         var reservedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -209,7 +209,7 @@ public sealed class DomWrappersCSharpWriter
         };
 
         var usedNames = new HashSet<string>(reservedNames, StringComparer.OrdinalIgnoreCase);
-        var propNames = new Dictionary<SchemaNameMetadata, string>();
+        var propNames = new Dictionary<AttributePropertyMetadata, string>();
 
         var localNameGroups = attrs.GroupBy(a => ToPascalCase(a.LocalName)).ToList();
         foreach (var group in localNameGroups)
@@ -267,6 +267,155 @@ public sealed class DomWrappersCSharpWriter
         }
 
         return propNames;
+    }
+
+    private static AttributeValueKind InferAttributeValueKind(SchemaPatternNodeMetadata node, SchemaMetadata metadata, HashSet<string> visitedRefs)
+    {
+        AttributeValueKind valueKind = AttributeValueKind.Unknown;
+        foreach (var child in node.Children)
+        {
+            valueKind = MergeValueKinds(valueKind, InferValueKind(child, metadata, visitedRefs));
+        }
+
+        return valueKind == AttributeValueKind.Unknown ? AttributeValueKind.String : valueKind;
+    }
+
+    private static AttributeValueKind InferValueKind(SchemaPatternNodeMetadata node, SchemaMetadata metadata, HashSet<string> visitedRefs)
+    {
+        if (node.Kind == "data" || node.Kind == "value")
+        {
+            return GetValueKind(node.DataType);
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            !string.IsNullOrEmpty(node.ReferenceName) &&
+            visitedRefs.Add(node.ReferenceName))
+        {
+            var refPattern = metadata.Patterns.FirstOrDefault(p => p.Name == node.ReferenceName);
+            if (refPattern is not null)
+            {
+                AttributeValueKind valueKind = AttributeValueKind.Unknown;
+                foreach (var refNode in refPattern.PatternTree)
+                {
+                    valueKind = MergeValueKinds(valueKind, InferValueKind(refNode, metadata, visitedRefs));
+                }
+
+                return valueKind;
+            }
+        }
+
+        AttributeValueKind childValueKind = AttributeValueKind.Unknown;
+        foreach (var child in node.Children)
+        {
+            childValueKind = MergeValueKinds(childValueKind, InferValueKind(child, metadata, visitedRefs));
+        }
+
+        return childValueKind;
+    }
+
+    private static AttributeValueKind GetValueKind(string dataType)
+    {
+        string normalized = dataType.Replace("-", string.Empty).ToLowerInvariant();
+        return normalized switch
+        {
+            "boolean" => AttributeValueKind.Boolean,
+            "byte" or "short" or "int" or "integer" or "long" or "nonnegativeinteger" or "positiveinteger" or "nonpositiveinteger" or "negativeinteger" => AttributeValueKind.Int32,
+            "decimal" or "double" or "float" => AttributeValueKind.Decimal,
+            "date" or "datetime" => AttributeValueKind.DateTime,
+            "string" or "normalizedstring" or "token" or "language" or "name" or "ncname" or "id" or "idref" or "anyuri" => AttributeValueKind.String,
+            _ => AttributeValueKind.String
+        };
+    }
+
+    private static AttributeValueKind MergeValueKinds(AttributeValueKind first, AttributeValueKind second)
+    {
+        if (first == AttributeValueKind.Unknown)
+        {
+            return second;
+        }
+
+        if (second == AttributeValueKind.Unknown || first == second)
+        {
+            return first;
+        }
+
+        return AttributeValueKind.String;
+    }
+
+    private static void WriteAttributeProperty(TextWriter writer, AttributePropertyMetadata attr, string propName, string prefix)
+    {
+        writer.WriteLine();
+        switch (attr.ValueKind)
+        {
+            case AttributeValueKind.Int32:
+                writer.WriteLine($"        public int? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetNullableInt32AttributeValue",
+                    "SetInt32AttributeValue");
+                break;
+            case AttributeValueKind.Boolean:
+                writer.WriteLine($"        public bool? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetBooleanAttributeValue",
+                    "SetBooleanAttributeValue");
+                break;
+            case AttributeValueKind.Decimal:
+                writer.WriteLine($"        public decimal? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDecimalAttributeValue",
+                    "SetDecimalAttributeValue");
+                break;
+            case AttributeValueKind.DateTime:
+                writer.WriteLine($"        public DateTime? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDateTimeAttributeValue",
+                    "SetDateTimeAttributeValue");
+                break;
+            default:
+                writer.WriteLine($"        public string? {propName}");
+                writer.WriteLine("        {");
+                writer.WriteLine($"            get => GetAttributeValue(\"{attr.LocalName}\", \"{attr.NamespaceUri}\", GetDocumentVersion());");
+                writer.WriteLine("            set");
+                writer.WriteLine("            {");
+                writer.WriteLine("                if (value == null)");
+                writer.WriteLine($"                    RemoveAttribute(\"{attr.LocalName}\", \"{attr.NamespaceUri}\");");
+                writer.WriteLine("                else");
+                writer.WriteLine($"                    SetAttributeValue(\"{attr.LocalName}\", \"{attr.NamespaceUri}\", value, \"{prefix}\", GetDocumentVersion());");
+                writer.WriteLine("            }");
+                writer.WriteLine("        }");
+                break;
+        }
+    }
+
+    private static void WriteNullableTypedAttributePropertyBody(
+        TextWriter writer,
+        AttributePropertyMetadata attr,
+        string prefix,
+        string getterName,
+        string setterName)
+    {
+        writer.WriteLine("        {");
+        writer.WriteLine($"            get => {getterName}(\"{attr.LocalName}\", \"{attr.NamespaceUri}\", GetDocumentVersion());");
+        writer.WriteLine("            set");
+        writer.WriteLine("            {");
+        writer.WriteLine("                if (value == null)");
+        writer.WriteLine($"                    RemoveAttribute(\"{attr.LocalName}\", \"{attr.NamespaceUri}\");");
+        writer.WriteLine("                else");
+        writer.WriteLine($"                    {setterName}(\"{attr.LocalName}\", \"{attr.NamespaceUri}\", value.Value, \"{prefix}\", GetDocumentVersion());");
+        writer.WriteLine("            }");
+        writer.WriteLine("        }");
     }
 
     private static string ToPascalCase(string s)
@@ -342,5 +491,24 @@ public sealed class DomWrappersCSharpWriter
             }
         }
         return ToPascalCase(segment);
+    }
+
+    private enum AttributeValueKind
+    {
+        Unknown,
+        String,
+        Int32,
+        Boolean,
+        Decimal,
+        DateTime
+    }
+
+    private sealed class AttributePropertyMetadata
+    {
+        public string NamespaceUri { get; set; } = string.Empty;
+
+        public string LocalName { get; set; } = string.Empty;
+
+        public AttributeValueKind ValueKind { get; set; }
     }
 }

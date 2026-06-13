@@ -11,6 +11,7 @@
 - CLI `typed-dom-coverage --format json` 可輸出同一份 report，供 CI 或 release artifact 保存。
 - `eng/Test-OdfTypedDomCoverage.ps1` 會產生 `artifacts/typed-dom-coverage/odf-typed-dom-coverage.json`，GitHub Actions `Typed DOM coverage` workflow 會上傳同一份 artifact。
 - `OdfElement` 已提供 schema-aware typed attribute helpers，涵蓋 `int`、`bool`、`decimal` 與 ODF 日期時間字串，手寫常用 wrapper 可逐步改用強型別 accessor。
+- `DomWrappersCSharpWriter` 會從 RELAX NG `data` / `value` 節點推斷常用 datatype，讓後續產生的 wrapper 可把 boolean、integer、decimal 與 date/dateTime attribute 輸出為可空強型別屬性；未知或衝突型別會保守維持 `string?`。
 - 所有元素與屬性比對仍以 namespace URI + local name 為準，不依賴 XML prefix。
 - generated wrapper 保留局部 CS1591 pragma；手寫 public / protected API 仍必須具備正體中文 XML docs。
 
@@ -29,7 +30,7 @@
 ## ODFDOM parity gaps
 
 - 尚未產生完整 child collection facade；目前主要是 element wrapper 與 attribute property。
-- Attribute property 目前已有基底 typed helper，但 generated property 仍多為 string-based；尚未全面轉為 enum、length、date、boolean、integer 等強型別。
+- Attribute property 目前已有基底 typed helper，且 generator 已可輸出 boolean、integer、decimal 與 date/dateTime 強型別；既有 generated artifact 尚未全面重產生，enum、length 與其他 ODF datatype 仍需補齊。
 - schema-to-wrapper coverage report 已可由 API / CLI 產生，並在 release pipeline 中固定保存 artifact。
 - 尚未對 ODF Toolkit / ODFDOM 的 sample corpus 做逐項 API parity。
 - High-level facade 仍由 Text / Spreadsheet / Presentation / Drawing 等文件模型承接，不直接從 generated DOM 推導。

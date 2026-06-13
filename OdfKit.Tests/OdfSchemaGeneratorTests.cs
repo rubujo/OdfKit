@@ -229,6 +229,39 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void DomWrapperWriterEmitsTypedAttributePropertiesFromDatatypeNodes()
+        {
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateGrammar(
+                "<define name=\"positive-integer\"><data type=\"positiveInteger\" /></define>" +
+                "<define name=\"typed-attributes\"><element name=\"table:calculation-settings\">" +
+                "<attribute name=\"table:number-columns-spanned\"><ref name=\"positive-integer\" /></attribute>" +
+                "<attribute name=\"office:boolean-value\"><data type=\"boolean\" /></attribute>" +
+                "<attribute name=\"office:value\"><data type=\"decimal\" /></attribute>" +
+                "<attribute name=\"office:date-value\"><data type=\"dateTime\" /></attribute>" +
+                "<attribute name=\"table:name\"><data type=\"string\" /></attribute>" +
+                "</element></define>")));
+            SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
+            using var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+
+            new DomWrappersCSharpWriter().Write(metadata, writer);
+
+            string code = writer.ToString();
+            Assert.Contains("public partial class TableCalculationSettingsElement : OdfElement", code);
+            Assert.Contains("public int? NumberColumnsSpanned", code);
+            Assert.Contains("get => GetNullableInt32AttributeValue(\"number-columns-spanned\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetInt32AttributeValue(\"number-columns-spanned\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", value.Value, \"table\", GetDocumentVersion());", code);
+            Assert.Contains("public bool? BooleanValue", code);
+            Assert.Contains("get => GetBooleanAttributeValue(\"boolean-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetBooleanAttributeValue(\"boolean-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", value.Value, \"office\", GetDocumentVersion());", code);
+            Assert.Contains("public decimal? Value", code);
+            Assert.Contains("get => GetDecimalAttributeValue(\"value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public DateTime? DateValue", code);
+            Assert.Contains("get => GetDateTimeAttributeValue(\"date-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public string? Name", code);
+            Assert.Contains("get => GetAttributeValue(\"name\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+        }
+
+        [Fact]
         public void ReaderAndCSharpWriterTreatParentRefAsRuntimeReference()
         {
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateGrammar(
