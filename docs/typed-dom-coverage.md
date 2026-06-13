@@ -9,6 +9,7 @@
 - `GeneratedDomWrappers.g.cs` 由 ODF 1.4 schema metadata 產生，涵蓋大量 schema element wrapper、factory case 與 attribute property。
 - `OdfTypedDomCoverage.Build()` 會產生 machine-readable schema-to-wrapper report，列出 schema element、wrapper type、fallback 狀態、wrapper property 數與 schema attribute value type 分布。
 - CLI `typed-dom-coverage --format json` 可輸出同一份 report，供 CI 或 release artifact 保存。
+- `eng/Test-OdfTypedDomCoverage.ps1` 會產生 `artifacts/typed-dom-coverage/odf-typed-dom-coverage.json`，GitHub Actions `Typed DOM coverage` workflow 會上傳同一份 artifact。
 - 所有元素與屬性比對仍以 namespace URI + local name 為準，不依賴 XML prefix。
 - generated wrapper 保留局部 CS1591 pragma；手寫 public / protected API 仍必須具備正體中文 XML docs。
 
@@ -28,7 +29,7 @@
 
 - 尚未產生完整 child collection facade；目前主要是 element wrapper 與 attribute property。
 - Attribute property 目前多為 string-based；尚未全面轉為 enum、length、date、boolean、integer 等強型別。
-- schema-to-wrapper coverage report 已可由 API / CLI 產生；尚未在 release pipeline 固定保存 artifact。
+- schema-to-wrapper coverage report 已可由 API / CLI 產生，並在 release pipeline 中固定保存 artifact。
 - 尚未對 ODF Toolkit / ODFDOM 的 sample corpus 做逐項 API parity。
 - High-level facade 仍由 Text / Spreadsheet / Presentation / Drawing 等文件模型承接，不直接從 generated DOM 推導。
 

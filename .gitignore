@@ -18,6 +18,7 @@ mono_crash.*
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
+artifacts/
 x64/
 x86/
 SDK/

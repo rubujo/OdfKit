@@ -109,6 +109,26 @@ public class OdfToolkitParityReadinessTests
     }
 
     /// <summary>
+    /// 驗證 typed DOM coverage artifact 腳本與 GitHub Actions 入口存在。
+    /// </summary>
+    [Fact]
+    public void TypedDomCoverageArtifactEntryPointsExist()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string scriptPath = Path.Combine(repoRoot, "eng", "Test-OdfTypedDomCoverage.ps1");
+        string workflowPath = Path.Combine(repoRoot, ".github", "workflows", "typed-dom-coverage.yml");
+        string script = File.ReadAllText(scriptPath);
+        string workflow = File.ReadAllText(workflowPath);
+
+        Assert.Contains("typed-dom-coverage", script, StringComparison.Ordinal);
+        Assert.Contains("odf-typed-dom-coverage.json", script, StringComparison.Ordinal);
+        Assert.Contains("schemaElementCount", script, StringComparison.Ordinal);
+        Assert.Contains("Test-OdfTypedDomCoverage.ps1", workflow, StringComparison.Ordinal);
+        Assert.Contains("upload-artifact", workflow, StringComparison.Ordinal);
+        Assert.Contains("odf-typed-dom-coverage", workflow, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// 驗證 repo 內可提交 corpus manifest 可由 CLI 直接執行。
     /// </summary>
     [Fact]
