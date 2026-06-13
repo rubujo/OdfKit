@@ -883,6 +883,32 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的線條樣式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的線條樣式；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfLineStyle? GetLineStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseLineStyle(value, out OdfLineStyle lineStyle) ? lineStyle : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的線條樣式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的線條樣式。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetLineStyleAttributeValue(string localName, string namespaceUri, OdfLineStyle value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatLineStyle(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -958,6 +984,56 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     public void SetMediaTypeAttributeValue(string localName, string namespaceUri, OdfMediaType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
+    }
+
+    private static bool TryParseLineStyle(string? value, out OdfLineStyle lineStyle)
+    {
+        switch (value)
+        {
+            case "none":
+                lineStyle = OdfLineStyle.None;
+                return true;
+            case "solid":
+                lineStyle = OdfLineStyle.Solid;
+                return true;
+            case "dotted":
+                lineStyle = OdfLineStyle.Dotted;
+                return true;
+            case "dash":
+                lineStyle = OdfLineStyle.Dash;
+                return true;
+            case "long-dash":
+                lineStyle = OdfLineStyle.LongDash;
+                return true;
+            case "dot-dash":
+                lineStyle = OdfLineStyle.DotDash;
+                return true;
+            case "dot-dot-dash":
+                lineStyle = OdfLineStyle.DotDotDash;
+                return true;
+            case "wave":
+                lineStyle = OdfLineStyle.Wave;
+                return true;
+            default:
+                lineStyle = default;
+                return false;
+        }
+    }
+
+    private static string FormatLineStyle(OdfLineStyle lineStyle)
+    {
+        return lineStyle switch
+        {
+            OdfLineStyle.None => "none",
+            OdfLineStyle.Solid => "solid",
+            OdfLineStyle.Dotted => "dotted",
+            OdfLineStyle.Dash => "dash",
+            OdfLineStyle.LongDash => "long-dash",
+            OdfLineStyle.DotDash => "dot-dash",
+            OdfLineStyle.DotDotDash => "dot-dot-dash",
+            OdfLineStyle.Wave => "wave",
+            _ => throw new ArgumentOutOfRangeException(nameof(lineStyle), lineStyle, "未知的 ODF 線條樣式。")
+        };
     }
 
     private static bool TryParseStyleFamily(string? value, out OdfStyleFamily family)

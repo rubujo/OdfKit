@@ -256,6 +256,7 @@ namespace OdfKit.Tests
                 "<define name=\"character\"><data type=\"string\"><param name=\"length\">1</param></data></define>" +
                 "<define name=\"textEncoding\"><data type=\"string\"><param name=\"pattern\">[A-Za-z][A-Za-z0-9._\\-]*</param></data></define>" +
                 "<define name=\"targetFrameName\"><choice><value>_self</value><value>_blank</value><ref name=\"string\" /></choice></define>" +
+                "<define name=\"lineStyle\"><choice><value>none</value><value>solid</value><value>dotted</value></choice></define>" +
                 "<define name=\"borderWidths\"><list><ref name=\"positiveLength\" /><ref name=\"positiveLength\" /><ref name=\"positiveLength\" /></list></define>" +
                 "<define name=\"length\"><data type=\"string\"><param name=\"pattern\">[0-9]+cm</param></data></define>" +
                 "<define name=\"percent\"><data type=\"string\"><param name=\"pattern\">[0-9]+%</param></data></define>" +
@@ -283,6 +284,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"number:decimal-replacement\"><ref name=\"character\" /></attribute>" +
                 "<attribute name=\"text:encoding\"><ref name=\"textEncoding\" /></attribute>" +
                 "<attribute name=\"office:target-frame-name\"><ref name=\"targetFrameName\" /></attribute>" +
+                "<attribute name=\"style:text-underline-style\"><ref name=\"lineStyle\" /></attribute>" +
                 "<attribute name=\"style:border-line-width\"><ref name=\"borderWidths\" /></attribute>" +
                 "<attribute name=\"draw:shape-id\"><ref name=\"IDREF\" /></attribute>" +
                 "<attribute name=\"draw:name-token\"><ref name=\"NCName\" /></attribute>" +
@@ -373,6 +375,8 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetTextEncodingAttributeValue(\"encoding\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfTargetFrameName? TargetFrameName", code);
             Assert.Contains("get => GetTargetFrameNameAttributeValue(\"target-frame-name\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfLineStyle? TextUnderlineStyle", code);
+            Assert.Contains("get => GetLineStyleAttributeValue(\"text-underline-style\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfBorderWidths? BorderLineWidth", code);
             Assert.Contains("get => GetBorderWidthsAttributeValue(\"border-line-width\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfXmlName? ShapeId", code);
