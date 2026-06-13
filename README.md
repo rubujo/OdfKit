@@ -27,9 +27,9 @@ dotnet test
 CLI 可透過專案執行：
 
 ```powershell
-dotnet run --project tools/OdfKit.Cli -- validate file.odt
-dotnet run --project tools/OdfKit.Cli -- validate docs --recursive --format json
-dotnet run --project tools/OdfKit.Cli -- info file.ods
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate docs --recursive --format json
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- info file.ods
 ```
 
 ## 快速開始
@@ -124,17 +124,18 @@ document.Save("output.odt");
 ## CLI
 
 ```powershell
-dotnet run --project tools/OdfKit.Cli -- validate file.odt
-dotnet run --project tools/OdfKit.Cli -- validate file.odt --format json
-dotnet run --project tools/OdfKit.Cli -- validate samples --recursive --fail-on warning
-dotnet run --project tools/OdfKit.Cli -- validate file.odt --profile OASIS_ODF_1_4_Extended
-dotnet run --project tools/OdfKit.Cli -- validate file.odt --baseline odf-validator --baseline-jar C:\tools\odfvalidator.jar
-dotnet run --project tools/OdfKit.Cli -- validate file.odt --baseline odf-validator --baseline-exceptions docs\baseline-exceptions.json
-dotnet run --project tools/OdfKit.Cli -- validate-corpus corpus\manifest.json --root corpus --format json
-dotnet run --project tools/OdfKit.Cli -- info file.ods
-dotnet run --project tools/OdfKit.Cli -- metadata file.odt
-dotnet run --project tools/OdfKit.Cli -- convert-flat input.odt output.fodt
-dotnet run --project tools/OdfKit.Cli -- pack input.fodt output.odt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt --format json
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate samples --recursive --fail-on warning
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt --profile OASIS_ODF_1_4_Extended
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt --baseline odf-validator --baseline-jar C:\tools\odfvalidator.jar
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt --baseline odf-validator --baseline-exceptions docs\baseline-exceptions.json
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus tests\fixtures\corpus\manifest.json --format json
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus corpus\manifest.json --root corpus --format json
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- info file.ods
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- metadata file.odt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- convert-flat input.odt output.fodt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack input.fodt output.odt
 ```
 
 `validate` 的 exit code 固定為：通過為 `0`，驗證錯誤或 `--fail-on warning` 命中為 `1`，參數錯誤或路徑不存在為 `2`。

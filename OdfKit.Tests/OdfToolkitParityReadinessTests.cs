@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Text.Json;
+using OdfKit.Cli;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -41,7 +43,34 @@ public class OdfToolkitParityReadinessTests
         Assert.Contains("expected", manifest, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("roundTrip", manifest, StringComparison.Ordinal);
         Assert.Contains("validate-corpus", manifest, StringComparison.Ordinal);
+        Assert.Contains("tests/fixtures/corpus/manifest.json", manifest, StringComparison.Ordinal);
+        Assert.Contains("repo-generated-minimal-flat-text", manifest, StringComparison.Ordinal);
         Assert.Contains("generated-format-minimal", manifest, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 repo 內可提交 corpus manifest 可由 CLI 直接執行。
+    /// </summary>
+    [Fact]
+    public void RepoCorpusManifestCanBeValidatedByCli()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string manifestPath = Path.Combine(repoRoot, "tests", "fixtures", "corpus", "manifest.json");
+        using StringWriter output = new();
+        using StringWriter error = new();
+
+        int exitCode = OdfKitCli.Run(["validate-corpus", manifestPath, "--format", "json"], output, error);
+
+        Assert.Equal(0, exitCode);
+        Assert.Equal(string.Empty, error.ToString());
+        using JsonDocument json = JsonDocument.Parse(output.ToString());
+        JsonElement summary = json.RootElement.GetProperty("summary");
+        JsonElement fixture = json.RootElement.GetProperty("fixtures")[0];
+        Assert.Equal(1, summary.GetProperty("fixtureCount").GetInt32());
+        Assert.Equal(1, summary.GetProperty("passedCount").GetInt32());
+        Assert.Equal("repo-generated-minimal-flat-text", fixture.GetProperty("id").GetString());
+        Assert.True(fixture.GetProperty("kindMatches").GetBoolean());
+        Assert.True(fixture.GetProperty("versionMatches").GetBoolean());
     }
 
     private static string FindRepositoryRoot()

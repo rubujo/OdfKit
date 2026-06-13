@@ -176,12 +176,12 @@ writer.WriteEndSheet();
 ## CLI 驗證與轉換
 
 ```powershell
-dotnet run --project tools/OdfKit.Cli -- validate file.odt
-dotnet run --project tools/OdfKit.Cli -- validate file.odt --format json
-dotnet run --project tools/OdfKit.Cli -- validate samples --recursive --fail-on warning
-dotnet run --project tools/OdfKit.Cli -- validate file.odt --profile OASIS_ODF_1_4_Extended
-dotnet run --project tools/OdfKit.Cli -- convert-flat file.odt file.fodt
-dotnet run --project tools/OdfKit.Cli -- pack file.fodt file.odt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt --format json
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate samples --recursive --fail-on warning
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt --profile OASIS_ODF_1_4_Extended
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- convert-flat file.odt file.fodt
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack file.fodt file.odt
 ```
 
 `validate` 在 CI 中可用 exit code 判斷結果：`0` 表示通過，`1` 表示驗證錯誤或 `--fail-on warning` 命中，`2` 表示參數或路徑錯誤。

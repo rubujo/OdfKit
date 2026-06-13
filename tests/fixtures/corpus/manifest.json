@@ -1,0 +1,16 @@
+{
+  "fixtures": [
+    {
+      "id": "repo-generated-minimal-flat-text",
+      "path": "generated/minimal-text.fodt",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatText",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local fixture for validating the corpus manifest contract."
+    }
+  ]
+}

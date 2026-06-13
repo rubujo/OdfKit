@@ -41,6 +41,7 @@
 - 一般 CI 不要求 Java 或 ODF Validator JAR；設定 `ODFKIT_ODFVALIDATOR_JAR` 或 CLI `--baseline-jar` 後才執行外部比對。
 - Classification mismatch 必須透過 `--baseline-exceptions` 指定的 JSON manifest 記錄為 documented exception，否則視為 parity failure。
 - 外部 corpus manifest 可用 `validate-corpus` 執行，並以 fixture 的 `expected`、`kind` 與 `version` 欄位作為完成線。
+- repo 內建 `tests/fixtures/corpus/manifest.json` 作為可提交 manifest 的最小範本。
 
 ## Real-world sanitized corpus
 
