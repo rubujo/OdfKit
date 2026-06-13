@@ -288,11 +288,13 @@ namespace OdfKit.Tests
                 "<attribute name=\"presentation:transition-type\"><choice><value>manual</value><value>automatic</value><value>semi-automatic</value></choice></attribute>" +
                 "<attribute name=\"presentation:transition-style\"><choice><value>none</value><value>interlocking-horizontal-right</value><value>melt</value></choice></attribute>" +
                 "<attribute name=\"fo:text-transform\"><choice><value>capitalize</value><value>uppercase</value></choice></attribute>" +
+                "<attribute name=\"fo:text-align\"><choice><value>start</value><value>justify</value></choice></attribute>" +
                 "<attribute name=\"style:text-rotation-scale\"><choice><value>fixed</value><value>line-height</value></choice></attribute>" +
                 "<attribute name=\"style:text-combine\"><choice><value>letters</value><value>lines</value><value>none</value></choice></attribute>" +
                 "<attribute name=\"draw:fill\"><choice><value>none</value><value>solid</value><value>gradient</value></choice></attribute>" +
                 "<attribute name=\"draw:fill-image-ref-point\"><choice><value>top-left</value><value>center</value><value>bottom-right</value></choice></attribute>" +
                 "<attribute name=\"draw:color-mode\"><choice><value>greyscale</value><value>standard</value></choice></attribute>" +
+                "<attribute name=\"style:vertical-align\"><choice><value>automatic</value><value>middle</value></choice></attribute>" +
                 "<attribute name=\"style:vertical-pos\"><choice><value>top</value><value>from-top</value></choice></attribute>" +
                 "<attribute name=\"style:vertical-rel\"><choice><value>baseline</value><value>page-content-bottom</value></choice></attribute>" +
                 "<attribute name=\"style:horizontal-pos\"><choice><value>left</value><value>from-inside</value></choice></attribute>" +
@@ -300,6 +302,14 @@ namespace OdfKit.Tests
                 "<attribute name=\"style:wrap\"><choice><value>none</value><value>run-through</value></choice></attribute>" +
                 "<attribute name=\"style:run-through\"><choice><value>background</value><value>foreground</value></choice></attribute>" +
                 "<attribute name=\"style:wrap-contour-mode\"><choice><value>full</value><value>outside</value></choice></attribute>" +
+                "<attribute name=\"style:writing-mode\"><choice><value>lr-tb</value><value>sideways-rl</value></choice></attribute>" +
+                "<attribute name=\"table:display-member-mode\"><choice><value>from-bottom</value><value>from-top</value></choice></attribute>" +
+                "<attribute name=\"table:layout-mode\"><choice><value>outline-subtotals-bottom</value><value>tabular-layout</value></choice></attribute>" +
+                "<attribute name=\"db:delete-rule\"><choice><value>cascade</value><value>set-null</value></choice></attribute>" +
+                "<attribute name=\"presentation:preset-class\"><choice><value>custom</value><value>motion-path</value></choice></attribute>" +
+                "<attribute name=\"number:transliteration-style\"><choice><value>long</value><value>medium</value><value>short</value></choice></attribute>" +
+                "<attribute name=\"style:script-type\"><choice><value>asian</value><value>complex</value></choice></attribute>" +
+                "<attribute name=\"style:text-emphasize\"><choice><value>none</value><value>circle</value></choice></attribute>" +
                 "<attribute name=\"draw:stroke-linejoin\"><choice><value>miter</value><value>round</value></choice></attribute>" +
                 "<attribute name=\"svg:stroke-linecap\"><choice><value>butt</value><value>square</value></choice></attribute>" +
                 "<attribute name=\"fo:keep-together\"><choice><value>auto</value><value>always</value></choice></attribute>" +
@@ -433,6 +443,8 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetPresentationTransitionStyleAttributeValue(\"transition-style\", \"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfFoTextTransform? TextTransform", code);
             Assert.Contains("get => GetFoTextTransformAttributeValue(\"text-transform\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFoTextAlign? TextAlign", code);
+            Assert.Contains("get => GetFoTextAlignAttributeValue(\"text-align\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfStyleTextRotationScale? TextRotationScale", code);
             Assert.Contains("get => GetStyleTextRotationScaleAttributeValue(\"text-rotation-scale\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfStyleTextCombine? TextCombine", code);
@@ -443,6 +455,8 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetDrawFillImageRefPointAttributeValue(\"fill-image-ref-point\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfDrawColorMode? ColorMode", code);
             Assert.Contains("get => GetDrawColorModeAttributeValue(\"color-mode\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfStyleVerticalAlign? VerticalAlign", code);
+            Assert.Contains("get => GetStyleVerticalAlignAttributeValue(\"vertical-align\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfStyleVerticalPos? VerticalPos", code);
             Assert.Contains("get => GetStyleVerticalPosAttributeValue(\"vertical-pos\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfStyleVerticalRel? VerticalRel", code);
@@ -457,6 +471,23 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetStyleRunThroughAttributeValue(\"run-through\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfStyleWrapContourMode? WrapContourMode", code);
             Assert.Contains("get => GetStyleWrapContourModeAttributeValue(\"wrap-contour-mode\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfStyleWritingMode? WritingMode", code);
+            Assert.Contains("get => GetStyleWritingModeAttributeValue(\"writing-mode\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableDisplayMemberMode? DisplayMemberMode", code);
+            Assert.Contains("get => GetTableDisplayMemberModeAttributeValue(\"display-member-mode\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableLayoutMode? LayoutMode", code);
+            Assert.Contains("get => GetTableLayoutModeAttributeValue(\"layout-mode\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfDatabaseRule? DeleteRule", code);
+            Assert.Contains("get => GetDatabaseRuleAttributeValue(\"delete-rule\", \"urn:oasis:names:tc:opendocument:xmlns:database:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetDatabaseRuleAttributeValue(\"delete-rule\", \"urn:oasis:names:tc:opendocument:xmlns:database:1.0\", value.Value, \"ns\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfPresentationPresetClass? PresetClass", code);
+            Assert.Contains("get => GetPresentationPresetClassAttributeValue(\"preset-class\", \"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfNumberTransliterationStyle? TransliterationStyle", code);
+            Assert.Contains("get => GetNumberTransliterationStyleAttributeValue(\"transliteration-style\", \"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfStyleScriptType? ScriptType", code);
+            Assert.Contains("get => GetStyleScriptTypeAttributeValue(\"script-type\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfStyleTextEmphasize? TextEmphasize", code);
+            Assert.Contains("get => GetStyleTextEmphasizeAttributeValue(\"text-emphasize\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfDrawStrokeLineJoin? StrokeLinejoin", code);
             Assert.Contains("get => GetDrawStrokeLineJoinAttributeValue(\"stroke-linejoin\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfSvgStrokeLineCap? StrokeLinecap", code);
@@ -981,6 +1012,7 @@ namespace OdfKit.Tests
                 " xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\"" +
                 " xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\"" +
                 " xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\"" +
+                " xmlns:db=\"urn:oasis:names:tc:opendocument:xmlns:database:1.0\"" +
                 " xmlns:xlink=\"http://www.w3.org/1999/xlink\"" +
                 " xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\"" +
                 " xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\"" +

@@ -430,6 +430,11 @@ public static class OdfTypedDomCoverage
             return "foTextTransform";
         }
 
+        if (resolvedType == typeof(OdfFoTextAlign))
+        {
+            return "foTextAlign";
+        }
+
         if (resolvedType == typeof(OdfStyleTextRotationScale))
         {
             return "styleTextRotationScale";
@@ -458,6 +463,11 @@ public static class OdfTypedDomCoverage
         if (resolvedType == typeof(OdfDrawColorMode))
         {
             return "drawColorMode";
+        }
+
+        if (resolvedType == typeof(OdfStyleVerticalAlign))
+        {
+            return "styleVerticalAlign";
         }
 
         if (resolvedType == typeof(OdfStyleVerticalPos))
@@ -493,6 +503,46 @@ public static class OdfTypedDomCoverage
         if (resolvedType == typeof(OdfStyleWrapContourMode))
         {
             return "styleWrapContourMode";
+        }
+
+        if (resolvedType == typeof(OdfStyleWritingMode))
+        {
+            return "styleWritingMode";
+        }
+
+        if (resolvedType == typeof(OdfTableDisplayMemberMode))
+        {
+            return "tableDisplayMemberMode";
+        }
+
+        if (resolvedType == typeof(OdfTableLayoutMode))
+        {
+            return "tableLayoutMode";
+        }
+
+        if (resolvedType == typeof(OdfDatabaseRule))
+        {
+            return "databaseRule";
+        }
+
+        if (resolvedType == typeof(OdfPresentationPresetClass))
+        {
+            return "presentationPresetClass";
+        }
+
+        if (resolvedType == typeof(OdfNumberTransliterationStyle))
+        {
+            return "numberTransliterationStyle";
+        }
+
+        if (resolvedType == typeof(OdfStyleScriptType))
+        {
+            return "styleScriptType";
+        }
+
+        if (resolvedType == typeof(OdfStyleTextEmphasize))
+        {
+            return "styleTextEmphasize";
         }
 
         if (resolvedType == typeof(OdfDrawStrokeLineJoin))

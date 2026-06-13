@@ -19,6 +19,30 @@ public enum OdfFoTextTransform
 }
 
 /// <summary>
+/// 表示 ODF schema 中 <c>fo:text-align</c> 的文字對齊 token。
+/// </summary>
+public enum OdfFoTextAlign
+{
+    /// <summary>置中對齊。</summary>
+    Center,
+
+    /// <summary>結束端對齊。</summary>
+    End,
+
+    /// <summary>左右對齊。</summary>
+    Justify,
+
+    /// <summary>靠左對齊。</summary>
+    Left,
+
+    /// <summary>靠右對齊。</summary>
+    Right,
+
+    /// <summary>起始端對齊。</summary>
+    Start
+}
+
+/// <summary>
 /// 表示 ODF schema 中 <c>style:text-rotation-scale</c> 的文字旋轉縮放 token。
 /// </summary>
 public enum OdfStyleTextRotationScale
@@ -139,6 +163,30 @@ public enum OdfDrawColorMode
 
     /// <summary>浮水印模式。</summary>
     Watermark
+}
+
+/// <summary>
+/// 表示 ODF schema 中 <c>style:vertical-align</c> 的垂直對齊 token。
+/// </summary>
+public enum OdfStyleVerticalAlign
+{
+    /// <summary>自動對齊。</summary>
+    Auto,
+
+    /// <summary>自動對齊。</summary>
+    Automatic,
+
+    /// <summary>基線對齊。</summary>
+    Baseline,
+
+    /// <summary>底部對齊。</summary>
+    Bottom,
+
+    /// <summary>置中對齊。</summary>
+    Middle,
+
+    /// <summary>頂部對齊。</summary>
+    Top
 }
 
 /// <summary>
@@ -277,6 +325,42 @@ public enum OdfStyleHorizontalRel
 }
 
 /// <summary>
+/// 表示 ODF schema 中 <c>style:writing-mode</c> 的書寫方向 token。
+/// </summary>
+public enum OdfStyleWritingMode
+{
+    /// <summary>由左至右。</summary>
+    Lr,
+
+    /// <summary>由左至右、由上至下。</summary>
+    LrTb,
+
+    /// <summary>依頁面設定。</summary>
+    Page,
+
+    /// <summary>由右至左。</summary>
+    Rl,
+
+    /// <summary>由右至左、由上至下。</summary>
+    RlTb,
+
+    /// <summary>側向由左至右。</summary>
+    SidewaysLr,
+
+    /// <summary>側向由右至左。</summary>
+    SidewaysRl,
+
+    /// <summary>由上至下。</summary>
+    Tb,
+
+    /// <summary>由上至下、由左至右。</summary>
+    TbLr,
+
+    /// <summary>由上至下、由右至左。</summary>
+    TbRl
+}
+
+/// <summary>
 /// 表示 ODF schema 中 <c>style:wrap</c> 的文繞圖 token。
 /// </summary>
 public enum OdfStyleWrap
@@ -325,6 +409,141 @@ public enum OdfStyleWrapContourMode
 
     /// <summary>外側輪廓。</summary>
     Outside
+}
+
+/// <summary>
+/// 表示 ODF schema 中 <c>table:display-member-mode</c> 的成員顯示方向 token。
+/// </summary>
+public enum OdfTableDisplayMemberMode
+{
+    /// <summary>由下方開始顯示。</summary>
+    FromBottom,
+
+    /// <summary>由上方開始顯示。</summary>
+    FromTop
+}
+
+/// <summary>
+/// 表示 ODF schema 中 <c>table:layout-mode</c> 的版面配置模式 token。
+/// </summary>
+public enum OdfTableLayoutMode
+{
+    /// <summary>大綱小計在下方。</summary>
+    OutlineSubtotalsBottom,
+
+    /// <summary>大綱小計在上方。</summary>
+    OutlineSubtotalsTop,
+
+    /// <summary>表格版面配置。</summary>
+    TabularLayout
+}
+
+/// <summary>
+/// 表示 ODF schema 中資料庫參照動作規則的 token。
+/// </summary>
+public enum OdfDatabaseRule
+{
+    /// <summary>連鎖處理。</summary>
+    Cascade,
+
+    /// <summary>不執行動作。</summary>
+    NoAction,
+
+    /// <summary>限制動作。</summary>
+    Restrict,
+
+    /// <summary>設為預設值。</summary>
+    SetDefault,
+
+    /// <summary>設為 null。</summary>
+    SetNull
+}
+
+/// <summary>
+/// 表示 ODF schema 中 <c>presentation:preset-class</c> 的預設動畫類別 token。
+/// </summary>
+public enum OdfPresentationPresetClass
+{
+    /// <summary>自訂類別。</summary>
+    Custom,
+
+    /// <summary>強調類別。</summary>
+    Emphasis,
+
+    /// <summary>進入類別。</summary>
+    Entrance,
+
+    /// <summary>離開類別。</summary>
+    Exit,
+
+    /// <summary>媒體呼叫類別。</summary>
+    MediaCall,
+
+    /// <summary>動作路徑類別。</summary>
+    MotionPath,
+
+    /// <summary>OLE 動作類別。</summary>
+    OleAction
+}
+
+/// <summary>
+/// 表示 ODF schema 中 <c>number:transliteration-style</c> 的音譯樣式 token。
+/// </summary>
+public enum OdfNumberTransliterationStyle
+{
+    /// <summary>長格式。</summary>
+    Long,
+
+    /// <summary>中格式。</summary>
+    Medium,
+
+    /// <summary>短格式。</summary>
+    Short
+}
+
+/// <summary>
+/// 表示 ODF schema 中 <c>style:script-type</c> 的文字系統類型 token。
+/// </summary>
+public enum OdfStyleScriptType
+{
+    /// <summary>亞洲文字系統。</summary>
+    Asian,
+
+    /// <summary>複雜文字系統。</summary>
+    Complex,
+
+    /// <summary>忽略文字系統。</summary>
+    Ignore,
+
+    /// <summary>拉丁文字系統。</summary>
+    Latin
+}
+
+/// <summary>
+/// 表示 ODF schema 中 <c>style:text-emphasize</c> 的文字強調標記 token。
+/// </summary>
+public enum OdfStyleTextEmphasize
+{
+    /// <summary>置於上方。</summary>
+    Above,
+
+    /// <summary>重音標記。</summary>
+    Accent,
+
+    /// <summary>置於下方。</summary>
+    Below,
+
+    /// <summary>圓圈標記。</summary>
+    Circle,
+
+    /// <summary>實心圓標記。</summary>
+    Disc,
+
+    /// <summary>點標記。</summary>
+    Dot,
+
+    /// <summary>無強調標記。</summary>
+    None
 }
 
 /// <summary>

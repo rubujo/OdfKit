@@ -602,6 +602,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.FoTextTransform;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" &&
+            node.LocalName == "text-align")
+        {
+            return AttributeValueKind.FoTextAlign;
+        }
+
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
             node.LocalName == "text-rotation-scale")
         {
@@ -636,6 +642,12 @@ public sealed class DomWrappersCSharpWriter
             node.LocalName == "color-mode")
         {
             return AttributeValueKind.DrawColorMode;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "vertical-align")
+        {
+            return AttributeValueKind.StyleVerticalAlign;
         }
 
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
@@ -678,6 +690,54 @@ public sealed class DomWrappersCSharpWriter
             node.LocalName == "wrap-contour-mode")
         {
             return AttributeValueKind.StyleWrapContourMode;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "writing-mode")
+        {
+            return AttributeValueKind.StyleWritingMode;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "display-member-mode")
+        {
+            return AttributeValueKind.TableDisplayMemberMode;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "layout-mode")
+        {
+            return AttributeValueKind.TableLayoutMode;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:database:1.0" &&
+            (node.LocalName == "delete-rule" || node.LocalName == "update-rule"))
+        {
+            return AttributeValueKind.DatabaseRule;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" &&
+            node.LocalName == "preset-class")
+        {
+            return AttributeValueKind.PresentationPresetClass;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" &&
+            node.LocalName == "transliteration-style")
+        {
+            return AttributeValueKind.NumberTransliterationStyle;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "script-type")
+        {
+            return AttributeValueKind.StyleScriptType;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "text-emphasize")
+        {
+            return AttributeValueKind.StyleTextEmphasize;
         }
 
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" &&
@@ -1374,6 +1434,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetFoTextTransformAttributeValue",
                     "SetFoTextTransformAttributeValue");
                 break;
+            case AttributeValueKind.FoTextAlign:
+                writer.WriteLine($"        public OdfFoTextAlign? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFoTextAlignAttributeValue",
+                    "SetFoTextAlignAttributeValue");
+                break;
             case AttributeValueKind.StyleTextRotationScale:
                 writer.WriteLine($"        public OdfStyleTextRotationScale? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1427,6 +1496,15 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetDrawColorModeAttributeValue",
                     "SetDrawColorModeAttributeValue");
+                break;
+            case AttributeValueKind.StyleVerticalAlign:
+                writer.WriteLine($"        public OdfStyleVerticalAlign? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleVerticalAlignAttributeValue",
+                    "SetStyleVerticalAlignAttributeValue");
                 break;
             case AttributeValueKind.StyleVerticalPos:
                 writer.WriteLine($"        public OdfStyleVerticalPos? {propName}");
@@ -1490,6 +1568,78 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetStyleWrapContourModeAttributeValue",
                     "SetStyleWrapContourModeAttributeValue");
+                break;
+            case AttributeValueKind.StyleWritingMode:
+                writer.WriteLine($"        public OdfStyleWritingMode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleWritingModeAttributeValue",
+                    "SetStyleWritingModeAttributeValue");
+                break;
+            case AttributeValueKind.TableDisplayMemberMode:
+                writer.WriteLine($"        public OdfTableDisplayMemberMode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableDisplayMemberModeAttributeValue",
+                    "SetTableDisplayMemberModeAttributeValue");
+                break;
+            case AttributeValueKind.TableLayoutMode:
+                writer.WriteLine($"        public OdfTableLayoutMode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableLayoutModeAttributeValue",
+                    "SetTableLayoutModeAttributeValue");
+                break;
+            case AttributeValueKind.DatabaseRule:
+                writer.WriteLine($"        public OdfDatabaseRule? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDatabaseRuleAttributeValue",
+                    "SetDatabaseRuleAttributeValue");
+                break;
+            case AttributeValueKind.PresentationPresetClass:
+                writer.WriteLine($"        public OdfPresentationPresetClass? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetPresentationPresetClassAttributeValue",
+                    "SetPresentationPresetClassAttributeValue");
+                break;
+            case AttributeValueKind.NumberTransliterationStyle:
+                writer.WriteLine($"        public OdfNumberTransliterationStyle? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetNumberTransliterationStyleAttributeValue",
+                    "SetNumberTransliterationStyleAttributeValue");
+                break;
+            case AttributeValueKind.StyleScriptType:
+                writer.WriteLine($"        public OdfStyleScriptType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleScriptTypeAttributeValue",
+                    "SetStyleScriptTypeAttributeValue");
+                break;
+            case AttributeValueKind.StyleTextEmphasize:
+                writer.WriteLine($"        public OdfStyleTextEmphasize? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleTextEmphasizeAttributeValue",
+                    "SetStyleTextEmphasizeAttributeValue");
                 break;
             case AttributeValueKind.DrawStrokeLineJoin:
                 writer.WriteLine($"        public OdfDrawStrokeLineJoin? {propName}");
@@ -2201,12 +2351,14 @@ public sealed class DomWrappersCSharpWriter
         PresentationTransitionType,
         PresentationTransitionStyle,
         FoTextTransform,
+        FoTextAlign,
         StyleTextRotationScale,
         StyleTextCombine,
         DrawFill,
         SmilFill,
         DrawFillImageRefPoint,
         DrawColorMode,
+        StyleVerticalAlign,
         StyleVerticalPos,
         StyleVerticalRel,
         StyleHorizontalPos,
@@ -2214,6 +2366,14 @@ public sealed class DomWrappersCSharpWriter
         StyleWrap,
         StyleRunThrough,
         StyleWrapContourMode,
+        StyleWritingMode,
+        TableDisplayMemberMode,
+        TableLayoutMode,
+        DatabaseRule,
+        PresentationPresetClass,
+        NumberTransliterationStyle,
+        StyleScriptType,
+        StyleTextEmphasize,
         DrawStrokeLineJoin,
         SvgStrokeLineCap,
         FoKeepTogether,
