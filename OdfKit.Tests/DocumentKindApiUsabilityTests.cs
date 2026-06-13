@@ -211,16 +211,33 @@ public class DocumentKindApiUsabilityTests
         database.SetConnection("sdbc:embedded:hsqldb");
         database.AddTable("Customers", "SELECT * FROM Customers");
         database.AddTable("Scratch", "SELECT 1");
+        database.AddQuery(
+            "ActiveCustomers",
+            "SELECT * FROM Customers WHERE IsActive = TRUE",
+            "Active customers",
+            "只列出啟用中的客戶。",
+            escapeProcessing: true);
+        database.AddQuery("ScratchQuery", "SELECT 1");
         Assert.True(database.RemoveTable("Scratch"));
+        Assert.True(database.RemoveQuery("ScratchQuery"));
 
         using OdfDatabaseDocument loaded = RoundTrip(database, "database.odb", OdfDatabaseDocument.Load);
+        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "database.odb");
 
         Assert.Equal("application/vnd.oasis.opendocument.database", loaded.Package.MimeType);
+        Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
         Assert.Equal("sdbc:embedded:hsqldb", loaded.ConnectionHref);
         Assert.Single(loaded.Tables);
         Assert.Equal("Customers", loaded.Tables[0].Name);
         Assert.Equal("SELECT * FROM Customers", loaded.FindTable("Customers")?.Command);
         Assert.Null(loaded.FindTable("Scratch"));
+        Assert.Single(loaded.Queries);
+        Assert.Equal("ActiveCustomers", loaded.Queries[0].Name);
+        Assert.Equal("SELECT * FROM Customers WHERE IsActive = TRUE", loaded.FindQuery("ActiveCustomers")?.Command);
+        Assert.Equal("Active customers", loaded.FindQuery("ActiveCustomers")?.Title);
+        Assert.Equal("只列出啟用中的客戶。", loaded.FindQuery("ActiveCustomers")?.Description);
+        Assert.True(loaded.FindQuery("ActiveCustomers")?.EscapeProcessing);
+        Assert.Null(loaded.FindQuery("ScratchQuery"));
     }
 
     /// <summary>

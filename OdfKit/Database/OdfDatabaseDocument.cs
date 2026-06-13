@@ -81,6 +81,11 @@ public class OdfDatabaseDocument : OdfDocument
     public IReadOnlyList<OdfDatabaseTableInfo> Tables => GetTables();
 
     /// <summary>
+    /// 取得目前宣告的查詢描述清單。
+    /// </summary>
+    public IReadOnlyList<OdfDatabaseQueryInfo> Queries => GetQueries();
+
+    /// <summary>
     /// 設定資料來源連線參照。
     /// </summary>
     /// <param name="href">連線資源路徑或 URL。</param>
@@ -125,6 +130,37 @@ public class OdfDatabaseDocument : OdfDocument
     }
 
     /// <summary>
+    /// 取得目前宣告的查詢描述清單。
+    /// </summary>
+    /// <returns>查詢描述清單。</returns>
+    public IReadOnlyList<OdfDatabaseQueryInfo> GetQueries()
+    {
+        OdfNode? queries = FindChildElement(GetDatabaseNode(), "queries", DatabaseNamespace);
+        if (queries is null)
+        {
+            return [];
+        }
+
+        List<OdfDatabaseQueryInfo> queryInfos = [];
+        foreach (OdfNode child in queries.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "query" &&
+                child.NamespaceUri == DatabaseNamespace)
+            {
+                queryInfos.Add(new OdfDatabaseQueryInfo(
+                    child.GetAttribute("name", DatabaseNamespace) ?? string.Empty,
+                    child.GetAttribute("command", DatabaseNamespace) ?? string.Empty,
+                    child.GetAttribute("title", DatabaseNamespace),
+                    child.GetAttribute("description", DatabaseNamespace),
+                    ParseNullableBoolean(child.GetAttribute("escape-processing", DatabaseNamespace))));
+            }
+        }
+
+        return queryInfos.AsReadOnly();
+    }
+
+    /// <summary>
     /// 依名稱尋找資料表描述。
     /// </summary>
     /// <param name="name">資料表名稱。</param>
@@ -141,6 +177,29 @@ public class OdfDatabaseDocument : OdfDocument
             if (string.Equals(table.Name, name, StringComparison.Ordinal))
             {
                 return table;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 依名稱尋找查詢描述。
+    /// </summary>
+    /// <param name="name">查詢名稱。</param>
+    /// <returns>符合名稱的查詢描述；找不到時為 <see langword="null"/>。</returns>
+    public OdfDatabaseQueryInfo? FindQuery(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("查詢名稱不能為空。", nameof(name));
+        }
+
+        foreach (OdfDatabaseQueryInfo query in GetQueries())
+        {
+            if (string.Equals(query.Name, name, StringComparison.Ordinal))
+            {
+                return query;
             }
         }
 
@@ -173,6 +232,59 @@ public class OdfDatabaseDocument : OdfDocument
     }
 
     /// <summary>
+    /// 新增查詢描述。
+    /// </summary>
+    /// <param name="name">查詢名稱。</param>
+    /// <param name="command">查詢命令或 SQL 內容。</param>
+    /// <param name="title">選用的顯示標題。</param>
+    /// <param name="description">選用的描述文字。</param>
+    /// <param name="escapeProcessing">選用的 SQL escape processing 設定。</param>
+    /// <returns>新增的查詢節點。</returns>
+    public OdfNode AddQuery(
+        string name,
+        string command,
+        string? title = null,
+        string? description = null,
+        bool? escapeProcessing = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("查詢名稱不能為空。", nameof(name));
+        }
+
+        if (string.IsNullOrWhiteSpace(command))
+        {
+            throw new ArgumentException("查詢命令不能為空。", nameof(command));
+        }
+
+        OdfNode queries = FindOrCreateChild(GetDatabaseNode(), "queries", DatabaseNamespace, "db");
+        OdfNode query = OdfNodeFactory.CreateElement("query", DatabaseNamespace, "db");
+        query.SetAttribute("name", DatabaseNamespace, name, "db");
+        query.SetAttribute("command", DatabaseNamespace, command, "db");
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            query.SetAttribute("title", DatabaseNamespace, title!, "db");
+        }
+
+        if (!string.IsNullOrWhiteSpace(description))
+        {
+            query.SetAttribute("description", DatabaseNamespace, description!, "db");
+        }
+
+        if (escapeProcessing is not null)
+        {
+            query.SetAttribute(
+                "escape-processing",
+                DatabaseNamespace,
+                escapeProcessing.Value ? "true" : "false",
+                "db");
+        }
+
+        queries.AppendChild(query);
+        return query;
+    }
+
+    /// <summary>
     /// 移除指定名稱的資料表描述。
     /// </summary>
     /// <param name="name">資料表名稱。</param>
@@ -198,6 +310,39 @@ public class OdfDatabaseDocument : OdfDocument
                 string.Equals(child.GetAttribute("name", DatabaseNamespace), name, StringComparison.Ordinal))
             {
                 tableRepresentations.RemoveChild(child);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 移除指定名稱的查詢描述。
+    /// </summary>
+    /// <param name="name">查詢名稱。</param>
+    /// <returns>如果成功移除查詢描述，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveQuery(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("查詢名稱不能為空。", nameof(name));
+        }
+
+        OdfNode? queries = FindChildElement(GetDatabaseNode(), "queries", DatabaseNamespace);
+        if (queries is null)
+        {
+            return false;
+        }
+
+        foreach (OdfNode child in new List<OdfNode>(queries.Children))
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "query" &&
+                child.NamespaceUri == DatabaseNamespace &&
+                string.Equals(child.GetAttribute("name", DatabaseNamespace), name, StringComparison.Ordinal))
+            {
+                queries.RemoveChild(child);
                 return true;
             }
         }
@@ -288,6 +433,17 @@ public class OdfDatabaseDocument : OdfDocument
 
         return null;
     }
+
+    private static bool? ParseNullableBoolean(string? value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        return string.Equals(value, "true", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(value, "1", StringComparison.Ordinal);
+    }
 }
 
 /// <summary>
@@ -306,4 +462,45 @@ public sealed class OdfDatabaseTableInfo(string name, string? command)
     /// 取得資料表命令或來源名稱。
     /// </summary>
     public string? Command { get; } = command;
+}
+
+/// <summary>
+/// 表示 ODB 查詢描述。
+/// </summary>
+/// <param name="name">查詢名稱。</param>
+/// <param name="command">查詢命令或 SQL 內容。</param>
+/// <param name="title">顯示標題。</param>
+/// <param name="description">描述文字。</param>
+/// <param name="escapeProcessing">SQL escape processing 設定。</param>
+public sealed class OdfDatabaseQueryInfo(
+    string name,
+    string command,
+    string? title,
+    string? description,
+    bool? escapeProcessing)
+{
+    /// <summary>
+    /// 取得查詢名稱。
+    /// </summary>
+    public string Name { get; } = name ?? string.Empty;
+
+    /// <summary>
+    /// 取得查詢命令或 SQL 內容。
+    /// </summary>
+    public string Command { get; } = command ?? string.Empty;
+
+    /// <summary>
+    /// 取得顯示標題。
+    /// </summary>
+    public string? Title { get; } = title;
+
+    /// <summary>
+    /// 取得描述文字。
+    /// </summary>
+    public string? Description { get; } = description;
+
+    /// <summary>
+    /// 取得 SQL escape processing 設定。
+    /// </summary>
+    public bool? EscapeProcessing { get; } = escapeProcessing;
 }

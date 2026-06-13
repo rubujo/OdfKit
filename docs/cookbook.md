@@ -128,11 +128,18 @@ using OdfKit.Database;
 using OdfDatabaseDocument database = OdfDatabaseDocument.Create();
 database.SetConnection("sdbc:embedded:hsqldb");
 database.AddTable("Customers", "SELECT * FROM Customers");
+database.AddQuery(
+    "ActiveCustomers",
+    "SELECT * FROM Customers WHERE IsActive = TRUE",
+    "Active customers",
+    "只列出啟用中的客戶。",
+    escapeProcessing: true);
 database.Save("data.odb");
 
 using OdfDatabaseDocument loaded = OdfDatabaseDocument.Load("data.odb");
 Console.WriteLine(loaded.ConnectionHref);
-Console.WriteLine(loaded.GetTables()[0].Name);
+Console.WriteLine(loaded.Tables[0].Name);
+Console.WriteLine(loaded.FindQuery("ActiveCustomers")?.Command);
 ```
 
 ## 驗證文件
