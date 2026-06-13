@@ -247,6 +247,7 @@ namespace OdfKit.Tests
                 "<define name=\"cellRangeAddressList\"><data type=\"string\" /></define>" +
                 "<define name=\"vector3D\"><data type=\"string\"><param name=\"pattern\">\\([ ]*-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([ ]+-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)){2}[ ]*\\)</param></data></define>" +
                 "<define name=\"point3D\"><data type=\"string\"><param name=\"pattern\">\\([ ]*-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)((cm)|(mm)|(in)|(pt)|(pc))([ ]+-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)((cm)|(mm)|(in)|(pt)|(pc))){2}[ ]*\\)</param></data></define>" +
+                "<define name=\"points\"><data type=\"string\"><param name=\"pattern\">-?[0-9]+,-?[0-9]+([ ]+-?[0-9]+,-?[0-9]+)*</param></data></define>" +
                 "<define name=\"length\"><data type=\"string\"><param name=\"pattern\">[0-9]+cm</param></data></define>" +
                 "<define name=\"percent\"><data type=\"string\"><param name=\"pattern\">[0-9]+%</param></data></define>" +
                 "<define name=\"angle\"><data type=\"string\" /></define>" +
@@ -264,6 +265,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"table:cell-range-address-list\"><ref name=\"cellRangeAddressList\" /></attribute>" +
                 "<attribute name=\"draw:extrusion-direction\"><ref name=\"vector3D\" /></attribute>" +
                 "<attribute name=\"draw:extrusion-viewpoint\"><ref name=\"point3D\" /></attribute>" +
+                "<attribute name=\"draw:points\"><ref name=\"points\" /></attribute>" +
                 "<attribute name=\"draw:shape-id\"><ref name=\"IDREF\" /></attribute>" +
                 "<attribute name=\"draw:name-token\"><ref name=\"NCName\" /></attribute>" +
                 "<attribute name=\"table:width\"><ref name=\"length\" /></attribute>" +
@@ -333,6 +335,9 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfPoint3D? ExtrusionViewpoint", code);
             Assert.Contains("get => GetPoint3DAttributeValue(\"extrusion-viewpoint\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetPoint3DAttributeValue(\"extrusion-viewpoint\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfPointList? Points", code);
+            Assert.Contains("get => GetPointListAttributeValue(\"points\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetPointListAttributeValue(\"points\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
             Assert.Contains("public OdfXmlName? ShapeId", code);
             Assert.Contains("get => GetXmlNameAttributeValue(\"shape-id\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetXmlNameAttributeValue(\"shape-id\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);

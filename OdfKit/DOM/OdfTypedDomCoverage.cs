@@ -177,6 +177,11 @@ public static class OdfTypedDomCoverage
             return "point3D";
         }
 
+        if (resolvedType == typeof(OdfPointList))
+        {
+            return "pointList";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";
