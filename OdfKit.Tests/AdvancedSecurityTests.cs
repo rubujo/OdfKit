@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using Xunit;
 
@@ -27,6 +28,31 @@ namespace OdfKit.Tests
             return new X509Certificate2(pfxData, (string?)null, X509KeyStorageFlags.Exportable);
         }
 #endif
+        [Theory]
+        [InlineData(OdfVersion.Odf10, "1.0")]
+        [InlineData(OdfVersion.Odf11, "1.0")]
+        [InlineData(OdfVersion.Odf12, "1.2")]
+        [InlineData(OdfVersion.Odf13, "1.3")]
+        [InlineData(OdfVersion.Odf14, "1.3")]
+        public async Task OdfSigner_Version_WritesSignatureDocumentVersionForPackageVersion(OdfVersion packageVersion, string expectedVersion)
+        {
+            using var cert = GenerateSelfSignedCertificate("VersionSigner", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
+            using var stream = new MemoryStream();
+
+            using var package = OdfPackage.Create(stream, leaveOpen: true);
+            package.Version = packageVersion;
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+
+            await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None });
+
+            using var signatureStream = package.GetEntryStream("META-INF/documentsignatures.xml");
+            var document = new XmlDocument();
+            document.Load(signatureStream);
+
+            Assert.Equal(expectedVersion, document.DocumentElement?.GetAttribute("version"));
+        }
+
         [Fact]
         public async Task TestXmlDsigSigningAndVerification()
         {

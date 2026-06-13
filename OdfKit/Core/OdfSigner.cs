@@ -12,6 +12,7 @@ using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 
@@ -79,7 +80,7 @@ public static class OdfSigner
             else
             {
                 root = doc.CreateElement("document-signatures", OdfNamespaces.Dsig);
-                root.SetAttribute("version", "1.3");
+                root.SetAttribute("version", GetSignatureDocumentVersion(package.Version));
                 doc.AppendChild(root);
             }
 
@@ -353,6 +354,16 @@ public static class OdfSigner
 
             package.WriteEntry(SignaturePath, ms.ToArray(), "text/xml");
             OdfKitDiagnostics.Info($"Added digital signature to package using certificate: {certificate.Subject}");
+        }
+
+        private static string GetSignatureDocumentVersion(OdfVersion packageVersion)
+        {
+            return packageVersion switch
+            {
+                OdfVersion.Odf12 => OdfVersionInfo.ToVersionString(OdfVersion.Odf12),
+                OdfVersion.Odf13 or OdfVersion.Odf14 => OdfVersionInfo.ToVersionString(OdfVersion.Odf13),
+                _ => OdfVersionInfo.ToVersionString(OdfVersion.Odf10)
+            };
         }
 
         /// <summary>
