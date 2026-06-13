@@ -452,6 +452,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.LineStyle;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "lineType", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.LineType;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -790,6 +796,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetLineStyleAttributeValue",
                     "SetLineStyleAttributeValue");
                 break;
+            case AttributeValueKind.LineType:
+                writer.WriteLine($"        public OdfLineType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetLineTypeAttributeValue",
+                    "SetLineTypeAttributeValue");
+                break;
             case AttributeValueKind.XmlName:
                 writer.WriteLine($"        public OdfXmlName? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -986,6 +1001,7 @@ public sealed class DomWrappersCSharpWriter
         TextEncoding,
         TargetFrameName,
         LineStyle,
+        LineType,
         XmlName,
         StyleFamily,
         OdfVersion,

@@ -909,6 +909,32 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的線條類型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的線條類型；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfLineType? GetLineTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseLineType(value, out OdfLineType lineType) ? lineType : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的線條類型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的線條類型。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetLineTypeAttributeValue(string localName, string namespaceUri, OdfLineType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatLineType(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -1033,6 +1059,36 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfLineStyle.DotDotDash => "dot-dot-dash",
             OdfLineStyle.Wave => "wave",
             _ => throw new ArgumentOutOfRangeException(nameof(lineStyle), lineStyle, "未知的 ODF 線條樣式。")
+        };
+    }
+
+    private static bool TryParseLineType(string? value, out OdfLineType lineType)
+    {
+        switch (value)
+        {
+            case "none":
+                lineType = OdfLineType.None;
+                return true;
+            case "single":
+                lineType = OdfLineType.Single;
+                return true;
+            case "double":
+                lineType = OdfLineType.Double;
+                return true;
+            default:
+                lineType = default;
+                return false;
+        }
+    }
+
+    private static string FormatLineType(OdfLineType lineType)
+    {
+        return lineType switch
+        {
+            OdfLineType.None => "none",
+            OdfLineType.Single => "single",
+            OdfLineType.Double => "double",
+            _ => throw new ArgumentOutOfRangeException(nameof(lineType), lineType, "未知的 ODF 線條類型。")
         };
     }
 

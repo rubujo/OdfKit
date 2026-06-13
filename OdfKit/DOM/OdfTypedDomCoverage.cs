@@ -232,6 +232,11 @@ public static class OdfTypedDomCoverage
             return "lineStyle";
         }
 
+        if (resolvedType == typeof(OdfLineType))
+        {
+            return "lineType";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";
