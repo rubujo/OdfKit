@@ -271,6 +271,12 @@ public sealed class DomWrappersCSharpWriter
 
     private static AttributeValueKind InferAttributeValueKind(SchemaPatternNodeMetadata node, SchemaMetadata metadata, HashSet<string> visitedRefs)
     {
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "family")
+        {
+            return AttributeValueKind.StyleFamily;
+        }
+
         AttributeValueKind valueKind = AttributeValueKind.Unknown;
         foreach (var child in node.Children)
         {
@@ -382,6 +388,15 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetDateTimeAttributeValue",
                     "SetDateTimeAttributeValue");
+                break;
+            case AttributeValueKind.StyleFamily:
+                writer.WriteLine($"        public OdfStyleFamily? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleFamilyAttributeValue",
+                    "SetStyleFamilyAttributeValue");
                 break;
             default:
                 writer.WriteLine($"        public string? {propName}");
@@ -500,7 +515,8 @@ public sealed class DomWrappersCSharpWriter
         Int32,
         Boolean,
         Decimal,
-        DateTime
+        DateTime,
+        StyleFamily
     }
 
     private sealed class AttributePropertyMetadata

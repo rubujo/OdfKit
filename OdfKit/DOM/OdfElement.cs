@@ -200,6 +200,98 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的樣式家族屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的樣式家族；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfStyleFamily? GetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseStyleFamily(value, out OdfStyleFamily family) ? family : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的樣式家族屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的樣式家族。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfStyleFamily value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatStyleFamily(value), prefix, version);
+    }
+
+    private static bool TryParseStyleFamily(string? value, out OdfStyleFamily family)
+    {
+        switch (value)
+        {
+            case "text":
+                family = OdfStyleFamily.Text;
+                return true;
+            case "paragraph":
+                family = OdfStyleFamily.Paragraph;
+                return true;
+            case "section":
+                family = OdfStyleFamily.Section;
+                return true;
+            case "ruby":
+                family = OdfStyleFamily.Ruby;
+                return true;
+            case "table":
+                family = OdfStyleFamily.Table;
+                return true;
+            case "table-column":
+                family = OdfStyleFamily.TableColumn;
+                return true;
+            case "table-row":
+                family = OdfStyleFamily.TableRow;
+                return true;
+            case "table-cell":
+                family = OdfStyleFamily.TableCell;
+                return true;
+            case "graphic":
+                family = OdfStyleFamily.Graphic;
+                return true;
+            case "presentation":
+                family = OdfStyleFamily.Presentation;
+                return true;
+            case "drawing-page":
+                family = OdfStyleFamily.DrawingPage;
+                return true;
+            case "chart":
+                family = OdfStyleFamily.Chart;
+                return true;
+            default:
+                family = default;
+                return false;
+        }
+    }
+
+    private static string FormatStyleFamily(OdfStyleFamily family)
+    {
+        return family switch
+        {
+            OdfStyleFamily.Text => "text",
+            OdfStyleFamily.Paragraph => "paragraph",
+            OdfStyleFamily.Section => "section",
+            OdfStyleFamily.Ruby => "ruby",
+            OdfStyleFamily.Table => "table",
+            OdfStyleFamily.TableColumn => "table-column",
+            OdfStyleFamily.TableRow => "table-row",
+            OdfStyleFamily.TableCell => "table-cell",
+            OdfStyleFamily.Graphic => "graphic",
+            OdfStyleFamily.Presentation => "presentation",
+            OdfStyleFamily.DrawingPage => "drawing-page",
+            OdfStyleFamily.Chart => "chart",
+            _ => throw new ArgumentOutOfRangeException(nameof(family), family, "未知的 ODF 樣式家族。")
+        };
+    }
+
+    /// <summary>
     /// 複製目前元素，傳回新的類型元素執行個體。
     /// </summary>
     /// <param name="deep">是否進行深層複製 (遞迴複製子節點)</param>

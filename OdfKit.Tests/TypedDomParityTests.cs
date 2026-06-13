@@ -51,7 +51,8 @@ public class TypedDomParityTests
         int intPropertyCount = Regex.Matches(generated, @"public int\? \w+").Count;
         int decimalPropertyCount = Regex.Matches(generated, @"public decimal\? \w+").Count;
         int dateTimePropertyCount = Regex.Matches(generated, @"public DateTime\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + decimalPropertyCount + dateTimePropertyCount;
+        int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
+        int propertyCount = stringPropertyCount + intPropertyCount + decimalPropertyCount + dateTimePropertyCount + styleFamilyPropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -59,6 +60,7 @@ public class TypedDomParityTests
         Assert.True(intPropertyCount >= 1000, "generated integer attribute property count regressed: " + intPropertyCount);
         Assert.True(decimalPropertyCount >= 100, "generated decimal attribute property count regressed: " + decimalPropertyCount);
         Assert.True(dateTimePropertyCount >= 100, "generated date/time attribute property count regressed: " + dateTimePropertyCount);
+        Assert.True(styleFamilyPropertyCount >= 50, "generated style family attribute property count regressed: " + styleFamilyPropertyCount);
     }
 
     /// <summary>
@@ -82,11 +84,13 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["int"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["decimal"] >= 100);
         Assert.True(report.WrapperPropertyTypeCounts["dateTime"] >= 100);
+        Assert.True(report.WrapperPropertyTypeCounts["styleFamily"] >= 50);
 
         string json = JsonSerializer.Serialize(report.ToJsonModel());
         using JsonDocument document = JsonDocument.Parse(json);
         Assert.Equal(report.SchemaElementCount, document.RootElement.GetProperty("summary").GetProperty("schemaElementCount").GetInt32());
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("int").GetInt32() >= 1000);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleFamily").GetInt32() >= 50);
         Assert.True(document.RootElement.GetProperty("elements").GetArrayLength() >= report.SchemaElementCount);
     }
 
@@ -117,6 +121,14 @@ public class TypedDomParityTests
         Assert.Equal("2026-06-13T17:30:00", cell.GetAttribute("date-value", OdfNamespaces.Office));
         Assert.Equal(7, cell.GetInt32AttributeValue("missing", OdfNamespaces.Table, 7));
         Assert.Null(cell.GetBooleanAttributeValue("missing", OdfNamespaces.Table));
+
+        OdfElement style = new("style", OdfNamespaces.Style, "style");
+        style.SetStyleFamilyAttributeValue("family", OdfNamespaces.Style, OdfStyleFamily.TableColumn, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
+
+        Assert.Equal(OdfStyleFamily.TableColumn, style.GetStyleFamilyAttributeValue("family", OdfNamespaces.Style));
+        Assert.Equal("table-column", style.GetAttribute("family", OdfNamespaces.Style));
+        style.SetAttribute("family", OdfNamespaces.Style, "unknown-family");
+        Assert.Null(style.GetStyleFamilyAttributeValue("family", OdfNamespaces.Style));
     }
 
     /// <summary>

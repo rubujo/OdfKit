@@ -106,6 +106,11 @@ public static class OdfTypedDomCoverage
             return "dateTime";
         }
 
+        if (resolvedType == typeof(OdfStyleFamily))
+        {
+            return "styleFamily";
+        }
+
         return resolvedType.FullName ?? resolvedType.Name;
     }
 

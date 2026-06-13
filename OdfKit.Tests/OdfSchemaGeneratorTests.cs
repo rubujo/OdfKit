@@ -238,6 +238,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"office:boolean-value\"><data type=\"boolean\" /></attribute>" +
                 "<attribute name=\"office:value\"><data type=\"decimal\" /></attribute>" +
                 "<attribute name=\"office:date-value\"><data type=\"dateTime\" /></attribute>" +
+                "<attribute name=\"style:family\"><value>paragraph</value></attribute>" +
                 "<attribute name=\"table:name\"><data type=\"string\" /></attribute>" +
                 "</element></define>")));
             SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
@@ -257,6 +258,9 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetDecimalAttributeValue(\"value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public DateTime? DateValue", code);
             Assert.Contains("get => GetDateTimeAttributeValue(\"date-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfStyleFamily? Family", code);
+            Assert.Contains("get => GetStyleFamilyAttributeValue(\"family\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetStyleFamilyAttributeValue(\"family\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", value.Value, \"style\", GetDocumentVersion());", code);
             Assert.Contains("public string? Name", code);
             Assert.Contains("get => GetAttributeValue(\"name\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
         }
@@ -627,7 +631,8 @@ namespace OdfKit.Tests
             return "<grammar xmlns=\"http://relaxng.org/ns/structure/1.0\"" +
                 " xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"" +
                 " xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\"" +
-                " xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\">" +
+                " xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\"" +
+                " xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\">" +
                 body +
                 "</grammar>";
         }
