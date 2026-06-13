@@ -76,13 +76,17 @@ public class OdfToolkitParityReadinessTests
     {
         string repoRoot = FindRepositoryRoot();
         string scriptPath = Path.Combine(repoRoot, "eng", "Test-OdfCorpus.ps1");
+        string initializeScriptPath = Path.Combine(repoRoot, "eng", "Initialize-OdfExternalCorpus.ps1");
         string workflowPath = Path.Combine(repoRoot, ".github", "workflows", "odf-corpus.yml");
         string script = File.ReadAllText(scriptPath);
+        string initializeScript = File.ReadAllText(initializeScriptPath);
         string workflow = File.ReadAllText(workflowPath);
 
         Assert.Contains("validate-corpus", script, StringComparison.Ordinal);
         Assert.Contains("ODFKIT_PARITY_CORPUS_ROOT", script, StringComparison.Ordinal);
         Assert.Contains("ODFKIT_ODFVALIDATOR_JAR", script, StringComparison.Ordinal);
+        Assert.Contains("manifest.json", initializeScript, StringComparison.Ordinal);
+        Assert.Contains("baseline-exceptions.json", initializeScript, StringComparison.Ordinal);
         Assert.Contains("Test-OdfCorpus.ps1", workflow, StringComparison.Ordinal);
     }
 

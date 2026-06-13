@@ -101,6 +101,8 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus tes
 
 .\eng\Test-OdfCorpus.ps1
 
+.\eng\Initialize-OdfExternalCorpus.ps1 -OutputRoot D:\Corpus\OdfKit
+
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus manifest.json `
   --root $env:ODFKIT_PARITY_CORPUS_ROOT `
   --baseline odf-validator `

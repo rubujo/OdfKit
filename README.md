@@ -133,6 +133,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate file.odt -
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus tests\fixtures\corpus\manifest.json --format json
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus corpus\manifest.json --root corpus --format json
 .\eng\Test-OdfCorpus.ps1
+.\eng\Initialize-OdfExternalCorpus.ps1 -OutputRoot D:\Corpus\OdfKit
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- info file.ods
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- metadata file.odt
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- convert-flat input.odt output.fodt
