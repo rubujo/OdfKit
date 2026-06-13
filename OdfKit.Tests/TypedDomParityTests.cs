@@ -56,10 +56,11 @@ public class TypedDomParityTests
         int timePropertyCount = Regex.Matches(generated, @"public OdfTime\? \w+").Count;
         int lengthPropertyCount = Regex.Matches(generated, @"public OdfLength\? \w+").Count;
         int durationPropertyCount = Regex.Matches(generated, @"public OdfDuration\? \w+").Count;
+        int anglePropertyCount = Regex.Matches(generated, @"public OdfAngle\? \w+").Count;
         int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
         int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
         int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + durationPropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
+        int propertyCount = stringPropertyCount + intPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + durationPropertyCount + anglePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -70,6 +71,7 @@ public class TypedDomParityTests
         Assert.True(timePropertyCount >= 6, "generated time attribute property count regressed: " + timePropertyCount);
         Assert.True(lengthPropertyCount >= 10000, "generated length attribute property count regressed: " + lengthPropertyCount);
         Assert.True(durationPropertyCount >= 1000, "generated duration attribute property count regressed: " + durationPropertyCount);
+        Assert.True(anglePropertyCount >= 1000, "generated angle attribute property count regressed: " + anglePropertyCount);
         Assert.True(styleFamilyPropertyCount >= 50, "generated style family attribute property count regressed: " + styleFamilyPropertyCount);
         Assert.True(odfVersionPropertyCount >= 50, "generated ODF version attribute property count regressed: " + odfVersionPropertyCount);
         Assert.True(mediaTypePropertyCount >= 100, "generated media type attribute property count regressed: " + mediaTypePropertyCount);
@@ -99,6 +101,7 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["time"] >= 6);
         Assert.True(report.WrapperPropertyTypeCounts["length"] >= 10000);
         Assert.True(report.WrapperPropertyTypeCounts["duration"] >= 1000);
+        Assert.True(report.WrapperPropertyTypeCounts["angle"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["styleFamily"] >= 50);
         Assert.True(report.WrapperPropertyTypeCounts["odfVersion"] >= 50);
         Assert.True(report.WrapperPropertyTypeCounts["mediaType"] >= 100);
@@ -110,6 +113,7 @@ public class TypedDomParityTests
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("time").GetInt32() >= 6);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("length").GetInt32() >= 10000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("duration").GetInt32() >= 1000);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("angle").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleFamily").GetInt32() >= 50);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("odfVersion").GetInt32() >= 50);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("mediaType").GetInt32() >= 100);
@@ -133,6 +137,7 @@ public class TypedDomParityTests
         cell.SetTimeAttributeValue("time-value", OdfNamespaces.Office, new OdfTime(new TimeSpan(12, 30, 45), TimeSpan.Zero), OdfNamespaces.GetPrefix(OdfNamespaces.Office));
         cell.SetLengthAttributeValue("width", OdfNamespaces.Style, OdfLength.FromCentimeters(2.5), OdfNamespaces.GetPrefix(OdfNamespaces.Style));
         cell.SetDurationAttributeValue("duration", OdfNamespaces.Presentation, new OdfDuration("PT1H30M"), OdfNamespaces.GetPrefix(OdfNamespaces.Presentation));
+        cell.SetAngleAttributeValue("rotation-angle", OdfNamespaces.Style, OdfAngle.FromDegrees(45.5m), OdfNamespaces.GetPrefix(OdfNamespaces.Style));
 
         Assert.Equal(3, cell.NumberColumnsRepeated);
         Assert.Equal(12.50m, cell.GetDecimalAttributeValue("value", OdfNamespaces.Office));
@@ -145,6 +150,10 @@ public class TypedDomParityTests
         Assert.Equal("2.5cm", cell.GetAttribute("width", OdfNamespaces.Style));
         Assert.Equal(new OdfDuration("PT1H30M"), cell.GetDurationAttributeValue("duration", OdfNamespaces.Presentation));
         Assert.Equal("PT1H30M", cell.GetAttribute("duration", OdfNamespaces.Presentation));
+        OdfAngle? angle = cell.GetAngleAttributeValue("rotation-angle", OdfNamespaces.Style);
+        Assert.Equal(new OdfAngle("45.5"), angle);
+        Assert.True(angle!.Value.TryGetDegrees(out decimal degrees));
+        Assert.Equal(45.5m, degrees);
 
         cell.SetDateTimeAttributeValue("date-value", OdfNamespaces.Office, local, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
         cell.SetAttribute("time-value", OdfNamespaces.Office, "23:59:59.125+02:30");
@@ -158,6 +167,8 @@ public class TypedDomParityTests
         Assert.Null(cell.GetLengthAttributeValue("width", OdfNamespaces.Style));
         cell.SetAttribute("duration", OdfNamespaces.Presentation, "not-duration");
         Assert.Null(cell.GetDurationAttributeValue("duration", OdfNamespaces.Presentation));
+        cell.SetAttribute("rotation-angle", OdfNamespaces.Style, "\u0001");
+        Assert.Null(cell.GetAngleAttributeValue("rotation-angle", OdfNamespaces.Style));
         Assert.Equal(7, cell.GetInt32AttributeValue("missing", OdfNamespaces.Table, 7));
         Assert.Null(cell.GetBooleanAttributeValue("missing", OdfNamespaces.Table));
 

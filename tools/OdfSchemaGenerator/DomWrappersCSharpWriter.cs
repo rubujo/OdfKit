@@ -308,6 +308,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.Length;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "angle", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.Angle;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -437,6 +443,15 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetDurationAttributeValue",
                     "SetDurationAttributeValue");
+                break;
+            case AttributeValueKind.Angle:
+                writer.WriteLine($"        public OdfAngle? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetAngleAttributeValue",
+                    "SetAngleAttributeValue");
                 break;
             case AttributeValueKind.StyleFamily:
                 writer.WriteLine($"        public OdfStyleFamily? {propName}");
@@ -597,6 +612,7 @@ public sealed class DomWrappersCSharpWriter
         Time,
         Length,
         Duration,
+        Angle,
         StyleFamily,
         OdfVersion,
         MediaType
