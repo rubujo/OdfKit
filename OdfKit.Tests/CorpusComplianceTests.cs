@@ -329,6 +329,32 @@ namespace OdfKit.Tests
             Assert.Contains(report.Issues, issue => issue.RuleId == "DisallowMacroByDefault");
         }
 
+        [Theory]
+        [InlineData("draw:image", "https://example.invalid/remote-image.png")]
+        [InlineData("draw:object", "https://example.invalid/remote-object.odg")]
+        [InlineData("draw:plugin", "//cdn.example.invalid/plugin.bin")]
+        public void RocTaiwanGovernmentOdfTools_Negative_RemoteResourceReferences(
+            string elementName,
+            string href)
+        {
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.2\">" +
+                             "<office:body><office:text><draw:frame>" +
+                             $"<{elementName} xlink:type=\"simple\" xlink:href=\"{href}\" />" +
+                             "</draw:frame></office:text></office:body></office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+            OdfValidationReport report = OdfPackageValidator.Validate(
+                package,
+                OdfComplianceProfiles.RocTaiwanGovernmentOdfTools,
+                "remote-resource.odt");
+
+            LogReport("RocTaiwanGovernmentOdfTools_Negative_RemoteResourceReferences", report);
+            Assert.Contains(report.Issues, issue =>
+                issue.RuleId == "RequireSafeExternalResourcePolicy" &&
+                issue.PackagePath == "content.xml" &&
+                issue.Message.Contains(href, StringComparison.Ordinal));
+        }
+
         // Cross-Version Schema Lookup test
         [Fact]
         public void CrossVersionSchemaLookup_DetectsCorrectRequiredVersion()
