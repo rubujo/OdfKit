@@ -434,6 +434,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.TextEncoding;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "targetFrameName", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.TargetFrameName;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -745,6 +751,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetTextEncodingAttributeValue",
                     "SetTextEncodingAttributeValue");
                 break;
+            case AttributeValueKind.TargetFrameName:
+                writer.WriteLine($"        public OdfTargetFrameName? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTargetFrameNameAttributeValue",
+                    "SetTargetFrameNameAttributeValue");
+                break;
             case AttributeValueKind.XmlName:
                 writer.WriteLine($"        public OdfXmlName? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -938,6 +953,7 @@ public sealed class DomWrappersCSharpWriter
         NamespacedToken,
         Character,
         TextEncoding,
+        TargetFrameName,
         XmlName,
         StyleFamily,
         OdfVersion,

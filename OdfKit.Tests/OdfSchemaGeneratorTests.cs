@@ -255,6 +255,7 @@ namespace OdfKit.Tests
                 "<define name=\"namespacedToken\"><data type=\"QName\"><param name=\"pattern\">[^:]+:[^:]+</param></data></define>" +
                 "<define name=\"character\"><data type=\"string\"><param name=\"length\">1</param></data></define>" +
                 "<define name=\"textEncoding\"><data type=\"string\"><param name=\"pattern\">[A-Za-z][A-Za-z0-9._\\-]*</param></data></define>" +
+                "<define name=\"targetFrameName\"><choice><value>_self</value><value>_blank</value><ref name=\"string\" /></choice></define>" +
                 "<define name=\"length\"><data type=\"string\"><param name=\"pattern\">[0-9]+cm</param></data></define>" +
                 "<define name=\"percent\"><data type=\"string\"><param name=\"pattern\">[0-9]+%</param></data></define>" +
                 "<define name=\"angle\"><data type=\"string\" /></define>" +
@@ -280,6 +281,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"draw:type-name\"><ref name=\"namespacedToken\" /></attribute>" +
                 "<attribute name=\"number:decimal-replacement\"><ref name=\"character\" /></attribute>" +
                 "<attribute name=\"text:encoding\"><ref name=\"textEncoding\" /></attribute>" +
+                "<attribute name=\"office:target-frame-name\"><ref name=\"targetFrameName\" /></attribute>" +
                 "<attribute name=\"draw:shape-id\"><ref name=\"IDREF\" /></attribute>" +
                 "<attribute name=\"draw:name-token\"><ref name=\"NCName\" /></attribute>" +
                 "<attribute name=\"table:width\"><ref name=\"length\" /></attribute>" +
@@ -367,6 +369,8 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetCharacterAttributeValue(\"decimal-replacement\", \"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfTextEncoding? Encoding", code);
             Assert.Contains("get => GetTextEncodingAttributeValue(\"encoding\", \"urn:oasis:names:tc:opendocument:xmlns:text:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTargetFrameName? TargetFrameName", code);
+            Assert.Contains("get => GetTargetFrameNameAttributeValue(\"target-frame-name\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfXmlName? ShapeId", code);
             Assert.Contains("get => GetXmlNameAttributeValue(\"shape-id\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetXmlNameAttributeValue(\"shape-id\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);

@@ -217,6 +217,11 @@ public static class OdfTypedDomCoverage
             return "textEncoding";
         }
 
+        if (resolvedType == typeof(OdfTargetFrameName))
+        {
+            return "targetFrameName";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";
