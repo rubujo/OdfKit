@@ -341,6 +341,7 @@ public sealed class DomWrappersCSharpWriter
             "byte" or "short" or "int" or "integer" or "long" or "nonnegativeinteger" or "positiveinteger" or "nonpositiveinteger" or "negativeinteger" => AttributeValueKind.Int32,
             "decimal" or "double" or "float" => AttributeValueKind.Decimal,
             "date" or "datetime" => AttributeValueKind.DateTime,
+            "time" => AttributeValueKind.Time,
             "string" or "normalizedstring" or "token" or "language" or "name" or "ncname" or "id" or "idref" or "anyuri" => AttributeValueKind.String,
             _ => AttributeValueKind.String
         };
@@ -401,6 +402,15 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetDateTimeAttributeValue",
                     "SetDateTimeAttributeValue");
+                break;
+            case AttributeValueKind.Time:
+                writer.WriteLine($"        public OdfTime? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTimeAttributeValue",
+                    "SetTimeAttributeValue");
                 break;
             case AttributeValueKind.StyleFamily:
                 writer.WriteLine($"        public OdfStyleFamily? {propName}");
@@ -547,6 +557,7 @@ public sealed class DomWrappersCSharpWriter
         Boolean,
         Decimal,
         DateTime,
+        Time,
         StyleFamily,
         OdfVersion,
         MediaType

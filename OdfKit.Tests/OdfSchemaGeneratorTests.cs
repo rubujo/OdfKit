@@ -238,6 +238,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"office:boolean-value\"><data type=\"boolean\" /></attribute>" +
                 "<attribute name=\"office:value\"><data type=\"decimal\" /></attribute>" +
                 "<attribute name=\"office:date-value\"><data type=\"dateTime\" /></attribute>" +
+                "<attribute name=\"office:time-value\"><data type=\"time\" /></attribute>" +
                 "<attribute name=\"office:version\"><value>1.4</value></attribute>" +
                 "<attribute name=\"office:mimetype\"><data type=\"string\" /></attribute>" +
                 "<attribute name=\"style:family\"><value>paragraph</value></attribute>" +
@@ -260,6 +261,9 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetDecimalAttributeValue(\"value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public DateTime? DateValue", code);
             Assert.Contains("get => GetDateTimeAttributeValue(\"date-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTime? TimeValue", code);
+            Assert.Contains("get => GetTimeAttributeValue(\"time-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetTimeAttributeValue(\"time-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", value.Value, \"office\", GetDocumentVersion());", code);
             Assert.Contains("public OdfStyleFamily? Family", code);
             Assert.Contains("get => GetStyleFamilyAttributeValue(\"family\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetStyleFamilyAttributeValue(\"family\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", value.Value, \"style\", GetDocumentVersion());", code);

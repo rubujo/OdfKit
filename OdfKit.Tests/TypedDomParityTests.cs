@@ -52,10 +52,11 @@ public class TypedDomParityTests
         int intPropertyCount = Regex.Matches(generated, @"public int\? \w+").Count;
         int decimalPropertyCount = Regex.Matches(generated, @"public decimal\? \w+").Count;
         int dateTimePropertyCount = Regex.Matches(generated, @"public DateTime\? \w+").Count;
+        int timePropertyCount = Regex.Matches(generated, @"public OdfTime\? \w+").Count;
         int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
         int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
         int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + decimalPropertyCount + dateTimePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
+        int propertyCount = stringPropertyCount + intPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -63,6 +64,7 @@ public class TypedDomParityTests
         Assert.True(intPropertyCount >= 1000, "generated integer attribute property count regressed: " + intPropertyCount);
         Assert.True(decimalPropertyCount >= 100, "generated decimal attribute property count regressed: " + decimalPropertyCount);
         Assert.True(dateTimePropertyCount >= 100, "generated date/time attribute property count regressed: " + dateTimePropertyCount);
+        Assert.True(timePropertyCount >= 6, "generated time attribute property count regressed: " + timePropertyCount);
         Assert.True(styleFamilyPropertyCount >= 50, "generated style family attribute property count regressed: " + styleFamilyPropertyCount);
         Assert.True(odfVersionPropertyCount >= 50, "generated ODF version attribute property count regressed: " + odfVersionPropertyCount);
         Assert.True(mediaTypePropertyCount >= 100, "generated media type attribute property count regressed: " + mediaTypePropertyCount);
@@ -89,6 +91,7 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["int"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["decimal"] >= 100);
         Assert.True(report.WrapperPropertyTypeCounts["dateTime"] >= 100);
+        Assert.True(report.WrapperPropertyTypeCounts["time"] >= 6);
         Assert.True(report.WrapperPropertyTypeCounts["styleFamily"] >= 50);
         Assert.True(report.WrapperPropertyTypeCounts["odfVersion"] >= 50);
         Assert.True(report.WrapperPropertyTypeCounts["mediaType"] >= 100);
@@ -97,6 +100,7 @@ public class TypedDomParityTests
         using JsonDocument document = JsonDocument.Parse(json);
         Assert.Equal(report.SchemaElementCount, document.RootElement.GetProperty("summary").GetProperty("schemaElementCount").GetInt32());
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("int").GetInt32() >= 1000);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("time").GetInt32() >= 6);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleFamily").GetInt32() >= 50);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("odfVersion").GetInt32() >= 50);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("mediaType").GetInt32() >= 100);
@@ -117,17 +121,24 @@ public class TypedDomParityTests
         cell.SetDecimalAttributeValue("value", OdfNamespaces.Office, 12.50m, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
         cell.SetBooleanAttributeValue("boolean-value", OdfNamespaces.Office, true, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
         cell.SetDateTimeAttributeValue("date-value", OdfNamespaces.Office, utc, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
+        cell.SetTimeAttributeValue("time-value", OdfNamespaces.Office, new OdfTime(new TimeSpan(12, 30, 45), TimeSpan.Zero), OdfNamespaces.GetPrefix(OdfNamespaces.Office));
 
         Assert.Equal(3, cell.NumberColumnsRepeated);
         Assert.Equal(12.50m, cell.GetDecimalAttributeValue("value", OdfNamespaces.Office));
         Assert.True(cell.GetBooleanAttributeValue("boolean-value", OdfNamespaces.Office));
         Assert.Equal(utc, cell.GetDateTimeAttributeValue("date-value", OdfNamespaces.Office));
         Assert.Equal("2026-06-13T09:30:00Z", cell.GetAttribute("date-value", OdfNamespaces.Office));
+        Assert.Equal(new OdfTime(new TimeSpan(12, 30, 45), TimeSpan.Zero), cell.GetTimeAttributeValue("time-value", OdfNamespaces.Office));
+        Assert.Equal("12:30:45Z", cell.GetAttribute("time-value", OdfNamespaces.Office));
 
         cell.SetDateTimeAttributeValue("date-value", OdfNamespaces.Office, local, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
+        cell.SetAttribute("time-value", OdfNamespaces.Office, "23:59:59.125+02:30");
 
         Assert.Equal(local, cell.GetDateTimeAttributeValue("date-value", OdfNamespaces.Office));
         Assert.Equal("2026-06-13T17:30:00", cell.GetAttribute("date-value", OdfNamespaces.Office));
+        Assert.Equal(new OdfTime(new TimeSpan(0, 23, 59, 59, 125), new TimeSpan(2, 30, 0)), cell.GetTimeAttributeValue("time-value", OdfNamespaces.Office));
+        cell.SetAttribute("time-value", OdfNamespaces.Office, "25:00:00");
+        Assert.Null(cell.GetTimeAttributeValue("time-value", OdfNamespaces.Office));
         Assert.Equal(7, cell.GetInt32AttributeValue("missing", OdfNamespaces.Table, 7));
         Assert.Null(cell.GetBooleanAttributeValue("missing", OdfNamespaces.Table));
 
