@@ -45,6 +45,18 @@ $env:ODFKIT_PARITY_CORPUS_ROOT = "D:\Corpus\OdfKit"
 
 外部 corpus 的 manifest 可放在該資料夾根目錄，格式需包含本文件列出的欄位。
 
+可用 CLI 直接執行 manifest：
+
+```powershell
+dotnet run --project tools/OdfKit.Cli -- validate-corpus manifest.json `
+  --root $env:ODFKIT_PARITY_CORPUS_ROOT `
+  --format json
+```
+
+`validate-corpus` 會讀取 `fixtures` 陣列，逐一比對 `expected` 的 `valid` / `invalid`
+classification。任一 fixture 與 expected 不一致，或未文件化的外部 baseline mismatch，
+都會讓 exit code 為 `1`。
+
 ## Baseline exception manifest
 
 外部 ODF Validator 與 OdfKit 的 valid / invalid classification 若不同，必須另外記錄

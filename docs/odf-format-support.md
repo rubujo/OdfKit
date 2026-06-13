@@ -44,5 +44,5 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
   MathML、影像與資料庫語意模型仍屬後續擴充。
 - 全格式最小 round-trip corpus 已由 `OdfFormatRoundTripTests` 覆蓋；後續仍需加入
   更接近真實文件的 corpus。
-- 外部 ODF Validator baseline 已可透過 CLI `validate --baseline odf-validator` 選用，
-  但完整 parity corpus 與 documented exceptions 仍需擴充。
+- 外部 ODF Validator baseline 已可透過 CLI `validate --baseline odf-validator` 與
+  `validate-corpus` 選用，但完整官方 parity corpus 仍需擴充。

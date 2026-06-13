@@ -27,6 +27,7 @@ public class CliTests
 
         Assert.Equal(0, exitCode);
         Assert.Contains("validate", output.ToString());
+        Assert.Contains("validate-corpus", output.ToString());
         Assert.Contains("convert-flat", output.ToString());
         Assert.Contains("--baseline odf-validator", output.ToString());
         Assert.Equal(string.Empty, error.ToString());
@@ -344,6 +345,137 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證 validate-corpus 可執行 manifest 並輸出 JSON 摘要。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusCanWriteJsonSummary()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string fixture = Path.Combine(root, "fixture.odt");
+            string manifest = Path.Combine(root, "manifest.json");
+            CreateTextDocument(fixture, "corpus");
+            WriteCorpusManifest(manifest, "fixture.odt", "valid");
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest, "--format", "json"], output, error);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            using JsonDocument json = JsonDocument.Parse(output.ToString());
+            JsonElement summary = json.RootElement.GetProperty("summary");
+            Assert.Equal(1, summary.GetProperty("fixtureCount").GetInt32());
+            Assert.Equal(1, summary.GetProperty("passedCount").GetInt32());
+            Assert.Equal(0, summary.GetProperty("failedCount").GetInt32());
+            Assert.Equal("generated-valid", json.RootElement.GetProperty("fixtures")[0].GetProperty("id").GetString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 validate-corpus 對 expected classification 不一致時會失敗。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusExpectedMismatchReturnsFailure()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string fixture = Path.Combine(root, "fixture.odt");
+            string manifest = Path.Combine(root, "manifest.json");
+            CreateTextDocument(fixture, "corpus mismatch");
+            WriteCorpusManifest(manifest, "fixture.odt", "invalid");
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest], output, error);
+
+            Assert.Equal(1, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            Assert.Contains("fail", output.ToString());
+            Assert.Contains("failed=1", output.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 validate-corpus 可沿用 baseline documented exceptions。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusBaselineDocumentedExceptionDoesNotFail()
+    {
+        string root = CreateTempDirectory();
+        string command = CreateBaselineCommand(exitCode: 1);
+        try
+        {
+            string fixture = Path.Combine(root, "fixture.odt");
+            string manifest = Path.Combine(root, "manifest.json");
+            string exceptions = Path.Combine(root, "baseline-exceptions.json");
+            CreateTextDocument(fixture, "corpus baseline exception");
+            WriteCorpusManifest(manifest, "fixture.odt", "valid");
+            File.WriteAllText(
+                exceptions,
+                "{\n" +
+                "  \"exceptions\": [\n" +
+                "    {\n" +
+                "      \"path\": \"fixture.odt\",\n" +
+                "      \"baseline\": \"command\",\n" +
+                "      \"odfKitIsValid\": true,\n" +
+                "      \"baselineIsValid\": false,\n" +
+                "      \"profileId\": \"" + OdfComplianceProfiles.OasisOdf14Extended.Id + "\",\n" +
+                "      \"reason\": \"測試 corpus baseline 分類差異。\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n",
+                Encoding.UTF8);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                [
+                    "validate-corpus",
+                    manifest,
+                    "--format",
+                    "json",
+                    "--baseline",
+                    "command",
+                    "--baseline-command",
+                    command,
+                    "--baseline-exceptions",
+                    exceptions
+                ],
+                output,
+                error);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            using JsonDocument json = JsonDocument.Parse(output.ToString());
+            JsonElement summary = json.RootElement.GetProperty("summary");
+            JsonElement baseline = json.RootElement.GetProperty("fixtures")[0].GetProperty("baseline");
+            Assert.Equal(0, summary.GetProperty("baselineMismatchCount").GetInt32());
+            Assert.Equal(1, summary.GetProperty("baselineDocumentedExceptionCount").GetInt32());
+            Assert.False(baseline.GetProperty("matchesOdfKit").GetBoolean());
+            Assert.True(baseline.GetProperty("documentedException").GetBoolean());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+            TryDelete(command);
+        }
+    }
+
+    /// <summary>
     /// 驗證 ODF Validator baseline 缺少 JAR 時會回傳使用錯誤。
     /// </summary>
     [Fact]
@@ -505,6 +637,28 @@ public class CliTests
             "exit /b " + exitCode.ToString(System.Globalization.CultureInfo.InvariantCulture) + "\r\n",
             Encoding.ASCII);
         return path;
+    }
+
+    private static void WriteCorpusManifest(string manifestPath, string fixturePath, string expected)
+    {
+        File.WriteAllText(
+            manifestPath,
+            "{\n" +
+            "  \"fixtures\": [\n" +
+            "    {\n" +
+            "      \"id\": \"generated-valid\",\n" +
+            "      \"path\": \"" + fixturePath + "\",\n" +
+            "      \"source\": \"generated\",\n" +
+            "      \"license\": \"generated-no-copyright\",\n" +
+            "      \"kind\": \"Text\",\n" +
+            "      \"version\": \"1.4\",\n" +
+            "      \"profile\": \"" + OdfComplianceProfiles.OasisOdf14Extended.Id + "\",\n" +
+            "      \"expected\": \"" + expected + "\",\n" +
+            "      \"roundTrip\": \"semantic-equivalent\"\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}\n",
+            Encoding.UTF8);
     }
 
     private static void TryDelete(string path)

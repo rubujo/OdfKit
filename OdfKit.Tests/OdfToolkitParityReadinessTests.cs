@@ -22,6 +22,7 @@ public class OdfToolkitParityReadinessTests
         Assert.Contains("ODF Validator", parity, StringComparison.Ordinal);
         Assert.Contains("ODFKIT_ODFVALIDATOR_JAR", parity, StringComparison.Ordinal);
         Assert.Contains("--baseline odf-validator", parity, StringComparison.Ordinal);
+        Assert.Contains("validate-corpus", parity, StringComparison.Ordinal);
         Assert.Contains("baselineMismatchCount", parity, StringComparison.Ordinal);
         Assert.Contains("documented exception", parity, StringComparison.OrdinalIgnoreCase);
     }
@@ -39,6 +40,7 @@ public class OdfToolkitParityReadinessTests
         Assert.Contains("license", manifest, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("expected", manifest, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("roundTrip", manifest, StringComparison.Ordinal);
+        Assert.Contains("validate-corpus", manifest, StringComparison.Ordinal);
         Assert.Contains("generated-format-minimal", manifest, StringComparison.Ordinal);
     }
 

@@ -41,6 +41,7 @@ public static class OdfKitCli
             return args[0] switch
             {
                 "validate" => Validate(args, output, error),
+                "validate-corpus" => ValidateCorpus(args, output, error),
                 "info" => Info(args, output, error),
                 "metadata" => Metadata(args, output, error),
                 "convert-flat" => ConvertFlat(args, output, error),
@@ -82,7 +83,7 @@ public static class OdfKitCli
                     Profile = parsedOptions.Profile
                 });
 
-            ValidateBaselineResult? baseline = ValidateWithBaseline(file, parsedOptions);
+            ValidateBaselineResult? baseline = ValidateWithBaseline(file, parsedOptions.BaselineOptions);
             bool documentedException = baselineExceptions.Contains(
                 file,
                 parsedOptions.Baseline,
@@ -103,6 +104,56 @@ public static class OdfKitCli
         }
 
         return ShouldFail(summary, parsedOptions.FailOn) ? 1 : 0;
+    }
+
+    private static int ValidateCorpus(string[] args, TextWriter output, TextWriter error)
+    {
+        if (!TryParseValidateCorpusOptions(args, error, out ValidateCorpusOptions? options))
+        {
+            return 2;
+        }
+
+        ValidateCorpusOptions parsedOptions = options ?? throw new InvalidOperationException("validate-corpus options were not parsed.");
+        ValidateCorpusManifest manifest = ValidateCorpusManifest.Load(parsedOptions.ManifestPath);
+        ValidateBaselineExceptionSet baselineExceptions = ValidateBaselineExceptionSet.Load(parsedOptions.BaselineExceptionsPath);
+        List<ValidateCorpusFixtureResult> results = [];
+        foreach (ValidateCorpusFixture fixture in manifest.Fixtures)
+        {
+            string path = Path.GetFullPath(Path.Combine(parsedOptions.RootPath, fixture.Path));
+            if (!File.Exists(path))
+            {
+                throw new InvalidDataException("corpus fixture not found: " + fixture.Path);
+            }
+
+            OdfValidationReport report = OdfValidator.Validate(
+                path,
+                new OdfValidationOptions
+                {
+                    FileName = path,
+                    Profile = fixture.Profile
+                });
+
+            ValidateBaselineResult? baseline = ValidateWithBaseline(path, parsedOptions.BaselineOptions);
+            bool documentedException = baselineExceptions.Contains(
+                path,
+                parsedOptions.Baseline,
+                report.IsValid,
+                baseline?.IsValid,
+                fixture.Profile.Id);
+            results.Add(new ValidateCorpusFixtureResult(fixture, path, report, baseline, documentedException));
+        }
+
+        ValidateCorpusSummary summary = ValidateCorpusSummary.Create(results);
+        if (parsedOptions.Format == ValidateOutputFormat.Json)
+        {
+            WriteValidateCorpusJson(output, summary, results);
+        }
+        else if (!parsedOptions.Quiet)
+        {
+            WriteValidateCorpusText(output, summary, results);
+        }
+
+        return summary.FailedCount > 0 || summary.BaselineMismatchCount > 0 ? 1 : 0;
     }
 
     private static int Info(string[] args, TextWriter output, TextWriter error)
@@ -188,6 +239,7 @@ public static class OdfKitCli
         output.WriteLine("usage: odfkit <command> [arguments]");
         output.WriteLine("commands:");
         output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
+        output.WriteLine("  validate-corpus manifest.json [--root path] [--format text|json] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
         output.WriteLine("  info file.ods");
         output.WriteLine("  convert-flat input.odt output.fodt");
         output.WriteLine("  pack input.fodt output.odt");
@@ -326,6 +378,126 @@ public static class OdfKitCli
         return true;
     }
 
+    private static bool TryParseValidateCorpusOptions(string[] args, TextWriter error, out ValidateCorpusOptions? options)
+    {
+        options = null;
+        string? manifestPath = null;
+        string? rootPath = null;
+        ValidateOutputFormat format = ValidateOutputFormat.Text;
+        bool quiet = false;
+        ValidateBaselineKind baseline = ValidateBaselineKind.None;
+        string? baselineJarPath = null;
+        string? baselineCommandPath = null;
+        string? baselineExceptionsPath = null;
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            string arg = args[i];
+            switch (arg)
+            {
+                case "--root":
+                    if (!TryReadValue(args, ref i, error, "--root", out rootPath))
+                    {
+                        return false;
+                    }
+                    break;
+                case "--format":
+                    if (!TryReadValue(args, ref i, error, "--format", out string? formatValue) ||
+                        !TryParseFormat(formatValue, out format))
+                    {
+                        error.WriteLine("supported formats: text, json");
+                        return false;
+                    }
+                    break;
+                case "--quiet":
+                    quiet = true;
+                    break;
+                case "--baseline":
+                    if (!TryReadValue(args, ref i, error, "--baseline", out string? baselineValue) ||
+                        !TryParseBaseline(baselineValue, out baseline))
+                    {
+                        error.WriteLine("supported baselines: none, odf-validator, command");
+                        return false;
+                    }
+                    break;
+                case "--baseline-jar":
+                    if (!TryReadValue(args, ref i, error, "--baseline-jar", out baselineJarPath))
+                    {
+                        return false;
+                    }
+                    baseline = ValidateBaselineKind.OdfValidator;
+                    break;
+                case "--baseline-command":
+                    if (!TryReadValue(args, ref i, error, "--baseline-command", out baselineCommandPath))
+                    {
+                        return false;
+                    }
+                    baseline = ValidateBaselineKind.Command;
+                    break;
+                case "--baseline-exceptions":
+                    if (!TryReadValue(args, ref i, error, "--baseline-exceptions", out baselineExceptionsPath))
+                    {
+                        return false;
+                    }
+                    break;
+                default:
+                    if (arg.StartsWith("-", StringComparison.Ordinal))
+                    {
+                        error.WriteLine("unknown option: " + arg);
+                        return false;
+                    }
+
+                    if (manifestPath is not null)
+                    {
+                        error.WriteLine("usage: odfkit validate-corpus manifest.json [options]");
+                        return false;
+                    }
+
+                    manifestPath = arg;
+                    break;
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(manifestPath))
+        {
+            error.WriteLine("usage: odfkit validate-corpus manifest.json [options]");
+            return false;
+        }
+
+        if (!File.Exists(manifestPath))
+        {
+            error.WriteLine("manifest not found: " + manifestPath);
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(rootPath) && !Directory.Exists(rootPath))
+        {
+            error.WriteLine("root not found: " + rootPath);
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(baselineExceptionsPath) && !File.Exists(baselineExceptionsPath))
+        {
+            error.WriteLine("baseline exceptions file not found: " + baselineExceptionsPath);
+            return false;
+        }
+
+        string resolvedManifestPath = Path.GetFullPath(manifestPath);
+        string resolvedRootPath = string.IsNullOrWhiteSpace(rootPath)
+            ? Path.GetDirectoryName(resolvedManifestPath) ?? Directory.GetCurrentDirectory()
+            : Path.GetFullPath(rootPath);
+        options = new ValidateCorpusOptions(
+            resolvedManifestPath,
+            resolvedRootPath,
+            format,
+            quiet,
+            baseline,
+            baselineJarPath,
+            baselineCommandPath,
+            baselineExceptionsPath);
+        return true;
+    }
+
     private static bool TryReadValue(string[] args, ref int index, TextWriter error, string optionName, out string? value)
     {
         value = null;
@@ -399,7 +571,7 @@ public static class OdfKitCli
         return false;
     }
 
-    private static ValidateBaselineResult? ValidateWithBaseline(string file, ValidateOptions options)
+    private static ValidateBaselineResult? ValidateWithBaseline(string file, ValidateBaselineOptions options)
     {
         if (options.Baseline == ValidateBaselineKind.None)
         {
@@ -542,6 +714,92 @@ public static class OdfKitCli
         output.WriteLine(JsonSerializer.Serialize(model, JsonOptions));
     }
 
+    private static void WriteValidateCorpusText(
+        TextWriter output,
+        ValidateCorpusSummary summary,
+        IReadOnlyList<ValidateCorpusFixtureResult> results)
+    {
+        foreach (ValidateCorpusFixtureResult result in results)
+        {
+            output.WriteLine(result.Passed ? "pass" : "fail");
+            output.WriteLine("id: " + result.Fixture.Id);
+            output.WriteLine("path: " + result.Path);
+            output.WriteLine("expected: " + FormatExpected(result.Fixture.Expected));
+            output.WriteLine("actual-valid: " + result.Report.IsValid.ToString(CultureInfo.InvariantCulture));
+            output.WriteLine("profile: " + result.Fixture.Profile.Id);
+            output.WriteLine("issues: " + result.Report.Issues.Count.ToString(CultureInfo.InvariantCulture));
+            if (result.Baseline is not null)
+            {
+                output.WriteLine("baseline: " + result.Baseline.Kind);
+                output.WriteLine("baseline-valid: " + result.Baseline.IsValid.ToString(CultureInfo.InvariantCulture));
+                output.WriteLine("baseline-matches: " + result.RawBaselineMatches.ToString(CultureInfo.InvariantCulture));
+                output.WriteLine("baseline-documented-exception: " + result.BaselineExceptionDocumented.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        output.WriteLine("summary: fixtures=" + summary.FixtureCount.ToString(CultureInfo.InvariantCulture) +
+            " passed=" + summary.PassedCount.ToString(CultureInfo.InvariantCulture) +
+            " failed=" + summary.FailedCount.ToString(CultureInfo.InvariantCulture) +
+            " baseline-mismatches=" + summary.BaselineMismatchCount.ToString(CultureInfo.InvariantCulture) +
+            " baseline-documented-exceptions=" + summary.BaselineDocumentedExceptionCount.ToString(CultureInfo.InvariantCulture));
+    }
+
+    private static void WriteValidateCorpusJson(
+        TextWriter output,
+        ValidateCorpusSummary summary,
+        IReadOnlyList<ValidateCorpusFixtureResult> results)
+    {
+        var model = new
+        {
+            summary = new
+            {
+                fixtureCount = summary.FixtureCount,
+                passedCount = summary.PassedCount,
+                failedCount = summary.FailedCount,
+                validCount = summary.ValidCount,
+                invalidCount = summary.InvalidCount,
+                baselineFileCount = summary.BaselineFileCount,
+                baselineMismatchCount = summary.BaselineMismatchCount,
+                baselineDocumentedExceptionCount = summary.BaselineDocumentedExceptionCount
+            },
+            fixtures = results.Select(result => new
+            {
+                id = result.Fixture.Id,
+                path = result.Path,
+                expected = FormatExpected(result.Fixture.Expected),
+                passed = result.Passed,
+                documentKind = result.Report.DocumentKind.ToString(),
+                detectedVersion = result.Report.DetectedVersion.ToString(),
+                isValid = result.Report.IsValid,
+                profileId = result.Fixture.Profile.Id,
+                blockingIssueCount = result.Report.BlockingIssueCount,
+                baseline = result.Baseline is null ? null : new
+                {
+                    kind = result.Baseline.Kind,
+                    isValid = result.Baseline.IsValid,
+                    exitCode = result.Baseline.ExitCode,
+                    matchesOdfKit = result.RawBaselineMatches,
+                    documentedException = result.BaselineExceptionDocumented,
+                    standardOutput = result.Baseline.StandardOutput,
+                    standardError = result.Baseline.StandardError
+                },
+                issues = result.Report.Issues.Select(issue => new
+                {
+                    severity = issue.Severity.ToString(),
+                    ruleId = issue.RuleId,
+                    message = issue.Message,
+                    packagePath = issue.PackagePath,
+                    xPath = issue.XPath,
+                    requiredVersion = issue.RequiredVersion?.ToString(),
+                    profileId = issue.ProfileId,
+                    suggestedFix = issue.SuggestedFix
+                }).ToArray()
+            }).ToArray()
+        };
+
+        output.WriteLine(JsonSerializer.Serialize(model, JsonOptions));
+    }
+
     private static bool ShouldFail(ValidateSummary summary, ValidateFailOn failOn)
     {
         if (summary.BaselineMismatchCount > 0)
@@ -567,6 +825,11 @@ public static class OdfKitCli
         };
     }
 
+    private static string FormatExpected(ValidateCorpusExpected expected)
+    {
+        return expected == ValidateCorpusExpected.Valid ? "valid" : "invalid";
+    }
+
     private enum ValidateOutputFormat
     {
         Text,
@@ -586,6 +849,17 @@ public static class OdfKitCli
         Command
     }
 
+    private enum ValidateCorpusExpected
+    {
+        Valid,
+        Invalid
+    }
+
+    private sealed record ValidateBaselineOptions(
+        ValidateBaselineKind Baseline,
+        string? BaselineJarPath,
+        string? BaselineCommandPath);
+
     private sealed record ValidateOptions(
         string Path,
         ValidateOutputFormat Format,
@@ -596,7 +870,23 @@ public static class OdfKitCli
         ValidateBaselineKind Baseline,
         string? BaselineJarPath,
         string? BaselineCommandPath,
-        string? BaselineExceptionsPath);
+        string? BaselineExceptionsPath)
+    {
+        public ValidateBaselineOptions BaselineOptions => new(Baseline, BaselineJarPath, BaselineCommandPath);
+    }
+
+    private sealed record ValidateCorpusOptions(
+        string ManifestPath,
+        string RootPath,
+        ValidateOutputFormat Format,
+        bool Quiet,
+        ValidateBaselineKind Baseline,
+        string? BaselineJarPath,
+        string? BaselineCommandPath,
+        string? BaselineExceptionsPath)
+    {
+        public ValidateBaselineOptions BaselineOptions => new(Baseline, BaselineJarPath, BaselineCommandPath);
+    }
 
     private sealed record ValidateFileResult(
         string Path,
@@ -656,6 +946,153 @@ public static class OdfKitCli
                 BaselineMismatchCount = results.Count(result => !result.BaselineMatches),
                 BaselineDocumentedExceptionCount = results.Count(result => result.BaselineExceptionDocumented)
             };
+        }
+    }
+
+    private sealed record ValidateCorpusFixtureResult(
+        ValidateCorpusFixture Fixture,
+        string Path,
+        OdfValidationReport Report,
+        ValidateBaselineResult? Baseline,
+        bool BaselineExceptionDocumented)
+    {
+        public bool Passed => Fixture.Expected == ValidateCorpusExpected.Valid
+            ? Report.IsValid
+            : !Report.IsValid;
+
+        public bool RawBaselineMatches => Baseline is null || Baseline.IsValid == Report.IsValid;
+
+        public bool BaselineMatches => RawBaselineMatches || BaselineExceptionDocumented;
+    }
+
+    private sealed class ValidateCorpusSummary
+    {
+        public int FixtureCount { get; private init; }
+
+        public int PassedCount { get; private init; }
+
+        public int FailedCount { get; private init; }
+
+        public int ValidCount { get; private init; }
+
+        public int InvalidCount { get; private init; }
+
+        public int BaselineFileCount { get; private init; }
+
+        public int BaselineMismatchCount { get; private init; }
+
+        public int BaselineDocumentedExceptionCount { get; private init; }
+
+        public static ValidateCorpusSummary Create(IReadOnlyList<ValidateCorpusFixtureResult> results)
+        {
+            return new ValidateCorpusSummary
+            {
+                FixtureCount = results.Count,
+                PassedCount = results.Count(result => result.Passed),
+                FailedCount = results.Count(result => !result.Passed),
+                ValidCount = results.Count(result => result.Report.IsValid),
+                InvalidCount = results.Count(result => !result.Report.IsValid),
+                BaselineFileCount = results.Count(result => result.Baseline is not null),
+                BaselineMismatchCount = results.Count(result => !result.BaselineMatches),
+                BaselineDocumentedExceptionCount = results.Count(result => result.BaselineExceptionDocumented)
+            };
+        }
+    }
+
+    private sealed class ValidateCorpusManifest
+    {
+        private ValidateCorpusManifest(IReadOnlyList<ValidateCorpusFixture> fixtures)
+        {
+            Fixtures = fixtures;
+        }
+
+        public IReadOnlyList<ValidateCorpusFixture> Fixtures { get; }
+
+        public static ValidateCorpusManifest Load(string path)
+        {
+            using FileStream stream = File.OpenRead(path);
+            using JsonDocument document = JsonDocument.Parse(stream);
+            JsonElement root = document.RootElement;
+            if (root.ValueKind != JsonValueKind.Object ||
+                !root.TryGetProperty("fixtures", out JsonElement fixtures) ||
+                fixtures.ValueKind != JsonValueKind.Array)
+            {
+                throw new InvalidDataException("corpus manifest must contain a fixtures array.");
+            }
+
+            List<ValidateCorpusFixture> parsed = [];
+            foreach (JsonElement item in fixtures.EnumerateArray())
+            {
+                parsed.Add(ValidateCorpusFixture.Parse(item));
+            }
+
+            if (parsed.Count == 0)
+            {
+                throw new InvalidDataException("corpus manifest must contain at least one fixture.");
+            }
+
+            return new ValidateCorpusManifest(parsed);
+        }
+    }
+
+    private sealed record ValidateCorpusFixture(
+        string Id,
+        string Path,
+        string Source,
+        string License,
+        string Kind,
+        string Version,
+        OdfComplianceProfile Profile,
+        ValidateCorpusExpected Expected,
+        string RoundTrip)
+    {
+        public static ValidateCorpusFixture Parse(JsonElement item)
+        {
+            if (item.ValueKind != JsonValueKind.Object)
+            {
+                throw new InvalidDataException("corpus fixture entries must be objects.");
+            }
+
+            string id = ReadRequiredString(item, "id");
+            string path = ReadRequiredString(item, "path");
+            string source = ReadRequiredString(item, "source");
+            string license = ReadRequiredString(item, "license");
+            string kind = ReadRequiredString(item, "kind");
+            string version = ReadRequiredString(item, "version");
+            string profileId = ReadRequiredString(item, "profile");
+            string expectedValue = ReadRequiredString(item, "expected");
+            string roundTrip = ReadRequiredString(item, "roundTrip");
+            OdfComplianceProfile profile = OdfComplianceProfiles.Find(profileId) ??
+                throw new InvalidDataException("unknown corpus fixture profile: " + profileId);
+            ValidateCorpusExpected expected = ParseExpected(expectedValue);
+            return new ValidateCorpusFixture(id, path, source, license, kind, version, profile, expected, roundTrip);
+        }
+
+        private static ValidateCorpusExpected ParseExpected(string value)
+        {
+            if (string.Equals(value, "valid", StringComparison.OrdinalIgnoreCase))
+            {
+                return ValidateCorpusExpected.Valid;
+            }
+
+            if (string.Equals(value, "invalid", StringComparison.OrdinalIgnoreCase))
+            {
+                return ValidateCorpusExpected.Invalid;
+            }
+
+            throw new InvalidDataException("corpus fixture expected must be valid or invalid.");
+        }
+
+        private static string ReadRequiredString(JsonElement item, string propertyName)
+        {
+            if (!item.TryGetProperty(propertyName, out JsonElement value) ||
+                value.ValueKind != JsonValueKind.String ||
+                string.IsNullOrWhiteSpace(value.GetString()))
+            {
+                throw new InvalidDataException("corpus fixture requires " + propertyName + ".");
+            }
+
+            return value.GetString()!;
         }
     }
 
