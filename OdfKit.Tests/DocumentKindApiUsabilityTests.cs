@@ -208,15 +208,17 @@ public class DocumentKindApiUsabilityTests
         using var database = OdfDatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:hsqldb");
         database.AddTable("Customers", "SELECT * FROM Customers");
+        database.AddTable("Scratch", "SELECT 1");
+        Assert.True(database.RemoveTable("Scratch"));
 
         using OdfDatabaseDocument loaded = RoundTrip(database, "database.odb", OdfDatabaseDocument.Load);
-        IReadOnlyList<OdfDatabaseTableInfo> tables = loaded.GetTables();
 
         Assert.Equal("application/vnd.oasis.opendocument.database", loaded.Package.MimeType);
         Assert.Equal("sdbc:embedded:hsqldb", loaded.ConnectionHref);
-        Assert.Single(tables);
-        Assert.Equal("Customers", tables[0].Name);
-        Assert.Equal("SELECT * FROM Customers", tables[0].Command);
+        Assert.Single(loaded.Tables);
+        Assert.Equal("Customers", loaded.Tables[0].Name);
+        Assert.Equal("SELECT * FROM Customers", loaded.FindTable("Customers")?.Command);
+        Assert.Null(loaded.FindTable("Scratch"));
     }
 
     /// <summary>

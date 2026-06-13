@@ -35,7 +35,7 @@
 | flat / ZIP 雙向互轉 | package entries、meta/settings/styles/font-face-decls | `OdfPackage` | `PackageRoundTripTests` | complete | 更大型文件 corpus 尚未加入。 |
 | 簽章邊界 | 未編輯保存保留，內容修改移除過期簽章 | `OdfPackage`、`OdfSigner`、`OdfDocument.GetSignatureSummary`、`OdfDocument.VerifySignaturesAsync` | `DomTest`、`AdvancedSecurityTests`、`OdfSecurityBoundaryTests` | complete | 無。 |
 | 加密邊界 | manifest encryption metadata、解密、重新加密保存 | `OdfEncryption`、`OdfSaveOptions`、`OdfLoadOptions`、CLI `sanitize --password --output-password` | `EncryptionTests`、`OdfSecurityBoundaryTests`、`CliTests` | validated | 仍需更多跨應用加密文件 corpus。 |
-| 全格式最小 round-trip | 17 種 extension 最小 create / load / save / validate | `OdfDocumentFactory`、`OdfDocument`、format wrappers | `OdfFormatRoundTripTests`、`tests/fixtures/corpus/manifest.json`、`docs/odf-format-support.md` | complete | 高階語意 API 依格式成熟度不同；ODC 已有基礎圖表資料來源 API，ODF formula 已有 MathML XML 讀寫 API，ODI / ODB 仍是最小 story。 |
+| 全格式最小 round-trip | 17 種 extension 最小 create / load / save / validate | `OdfDocumentFactory`、`OdfDocument`、format wrappers | `OdfFormatRoundTripTests`、`tests/fixtures/corpus/manifest.json`、`docs/odf-format-support.md` | complete | 高階語意 API 依格式成熟度不同；ODC 已有基礎圖表資料來源 API，ODF formula 已有 MathML XML 讀寫 API，ODB 已有基礎資料表管理 API，ODI 仍是最小 story。 |
 
 ## 現階段結論
 
@@ -46,4 +46,4 @@ profile rule validation、package / flat XML 驗證、全格式最小 round-trip
 - 擴大更接近真實世界文件的 positive / negative corpus。
 - 依 [odf-official-corpus-sources.md](odf-official-corpus-sources.md) 擴大 ODF Toolkit / ODF Validator parity matrix 的官方與真實 corpus 覆蓋。
 - 擴充更多跨應用加密文件 corpus 與 policy automation。
-- 繼續擴充 ODC 的完整圖表模型、ODF formula 的 MathML 語意 helper，以及 ODI 與 ODB 的高階語意 API。
+- 繼續擴充 ODC 的完整圖表模型、ODF formula 的 MathML 語意 helper、ODI 的影像語意 API 與 ODB 的完整資料庫模型。

@@ -76,6 +76,11 @@ public class OdfDatabaseDocument : OdfDocument
     }
 
     /// <summary>
+    /// 取得目前宣告的資料表描述清單。
+    /// </summary>
+    public IReadOnlyList<OdfDatabaseTableInfo> Tables => GetTables();
+
+    /// <summary>
     /// 設定資料來源連線參照。
     /// </summary>
     /// <param name="href">連線資源路徑或 URL。</param>
@@ -120,6 +125,29 @@ public class OdfDatabaseDocument : OdfDocument
     }
 
     /// <summary>
+    /// 依名稱尋找資料表描述。
+    /// </summary>
+    /// <param name="name">資料表名稱。</param>
+    /// <returns>符合名稱的資料表描述；找不到時為 <see langword="null"/>。</returns>
+    public OdfDatabaseTableInfo? FindTable(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("資料表名稱不能為空。", nameof(name));
+        }
+
+        foreach (OdfDatabaseTableInfo table in GetTables())
+        {
+            if (string.Equals(table.Name, name, StringComparison.Ordinal))
+            {
+                return table;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// 新增資料表描述。
     /// </summary>
     /// <param name="name">資料表名稱。</param>
@@ -142,6 +170,39 @@ public class OdfDatabaseDocument : OdfDocument
 
         tableRepresentations.AppendChild(table);
         return table;
+    }
+
+    /// <summary>
+    /// 移除指定名稱的資料表描述。
+    /// </summary>
+    /// <param name="name">資料表名稱。</param>
+    /// <returns>如果成功移除資料表描述，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveTable(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("資料表名稱不能為空。", nameof(name));
+        }
+
+        OdfNode? tableRepresentations = FindChildElement(GetDatabaseNode(), "table-representations", DatabaseNamespace);
+        if (tableRepresentations is null)
+        {
+            return false;
+        }
+
+        foreach (OdfNode child in new List<OdfNode>(tableRepresentations.Children))
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "table-representation" &&
+                child.NamespaceUri == DatabaseNamespace &&
+                string.Equals(child.GetAttribute("name", DatabaseNamespace), name, StringComparison.Ordinal))
+            {
+                tableRepresentations.RemoveChild(child);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static OdfDatabaseDocument EnsureDatabase(OdfDocument document)
