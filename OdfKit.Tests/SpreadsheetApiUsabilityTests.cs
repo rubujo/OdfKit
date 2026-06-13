@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Spreadsheet;
+using OdfKit.Styles;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -86,5 +88,43 @@ public class SpreadsheetApiUsabilityTests
         stream.Position = 0;
 
         Assert.Throws<InvalidOperationException>(() => SpreadsheetDocument.Load(stream, "text.odt"));
+    }
+
+    /// <summary>
+    /// 驗證串流寫入器會將列高與最佳列高設定輸出為自動列樣式。
+    /// </summary>
+    [Fact]
+    public void WriteStartRow_Height_WritesAutomaticRowStyle()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new OdsStreamWriter(stream))
+        {
+            writer.WriteStartSheet("資料");
+            writer.WriteColumn(OdfLength.FromCentimeters(2.5));
+            writer.WriteStartRow(height: 18.5, useOptimalHeight: true);
+            writer.WriteCell("列高");
+            writer.WriteEndRow();
+            writer.WriteEndSheet();
+        }
+
+        stream.Position = 0;
+        using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        string contentXml = ReadZipEntry(zip, "content.xml");
+        string stylesXml = ReadZipEntry(zip, "styles.xml");
+
+        Assert.Contains("table:style-name=\"ro_auto_1\"", contentXml);
+        Assert.Contains("style:name=\"ro_auto_1\"", stylesXml);
+        Assert.Contains("style:family=\"table-row\"", stylesXml);
+        Assert.Contains("style:row-height=\"18.5pt\"", stylesXml);
+        Assert.Contains("style:use-optimal-row-height=\"true\"", stylesXml);
+    }
+
+    private static string ReadZipEntry(ZipArchive zip, string entryName)
+    {
+        var entry = zip.GetEntry(entryName);
+        Assert.NotNull(entry);
+        using var stream = entry.Open();
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
     }
 }

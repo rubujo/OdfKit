@@ -22,7 +22,9 @@ public class OdsStreamWriter : IDisposable
     private bool _isSheetStarted;
     private bool _disposed;
     private readonly System.Collections.Generic.List<(string styleName, OdfLength width)> _columnStyles = [];
+    private readonly System.Collections.Generic.List<(string styleName, OdfLength? height, bool useOptimalHeight)> _rowStyles = [];
     private int _autoColumnStyleIndex = 0;
+    private int _autoRowStyleIndex = 0;
     private OdfVersion _version = OdfVersionInfo.DefaultVersion;
 
     /// <summary>
@@ -140,10 +142,23 @@ public class OdsStreamWriter : IDisposable
         if (_disposed) return;
         if (_isRowStarted) WriteEndRow();
         _isRowStarted = true;
-        _writer.WriteStartElement("table", "table-row", OdfNamespaces.Table);
-        if (!string.IsNullOrEmpty(styleName))
+
+        string? resolvedStyleName = styleName;
+        if (height.HasValue || useOptimalHeight)
         {
-            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            resolvedStyleName = string.IsNullOrEmpty(styleName)
+                ? $"ro_auto_{++_autoRowStyleIndex}"
+                : styleName;
+            OdfLength? rowHeight = height.HasValue
+                ? OdfLength.FromPoints(height.Value)
+                : (OdfLength?)null;
+            _rowStyles.Add((resolvedStyleName!, rowHeight, useOptimalHeight));
+        }
+
+        _writer.WriteStartElement("table", "table-row", OdfNamespaces.Table);
+        if (!string.IsNullOrEmpty(resolvedStyleName))
+        {
+            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, resolvedStyleName);
         }
     }
 
@@ -337,6 +352,24 @@ public class OdsStreamWriter : IDisposable
                 writer.WriteStartElement("style", "table-column-properties", OdfNamespaces.Style);
                 writer.WriteAttributeString("style", "column-width", OdfNamespaces.Style, style.width.ToString());
                 writer.WriteEndElement(); // table-column-properties
+                writer.WriteEndElement(); // style
+            }
+
+            foreach (var style in _rowStyles)
+            {
+                writer.WriteStartElement("style", "style", OdfNamespaces.Style);
+                writer.WriteAttributeString("style", "name", OdfNamespaces.Style, style.styleName);
+                writer.WriteAttributeString("style", "family", OdfNamespaces.Style, "table-row");
+                writer.WriteStartElement("style", "table-row-properties", OdfNamespaces.Style);
+                if (style.height.HasValue)
+                {
+                    writer.WriteAttributeString("style", "row-height", OdfNamespaces.Style, style.height.Value.ToString());
+                }
+                if (style.useOptimalHeight)
+                {
+                    writer.WriteAttributeString("style", "use-optimal-row-height", OdfNamespaces.Style, "true");
+                }
+                writer.WriteEndElement(); // table-row-properties
                 writer.WriteEndElement(); // style
             }
             writer.WriteEndElement();
