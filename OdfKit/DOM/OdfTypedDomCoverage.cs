@@ -23,6 +23,8 @@ public static class OdfTypedDomCoverage
     {
         OdfSchemaSet resolvedSchema = schema ?? OdfSchemaRegistry.Latest;
         List<OdfTypedDomElementCoverage> elements = [];
+        IReadOnlyList<OdfTypedDomChildElementRelationCoverage> childElementRelations =
+            BuildChildElementRelations(resolvedSchema);
         Dictionary<string, int> wrapperPropertyTypeCounts = new(StringComparer.Ordinal);
         foreach (OdfElementDefinition definition in resolvedSchema.Elements.Values
             .OrderBy(element => element.Name.NamespaceUri, StringComparer.Ordinal)
@@ -61,11 +63,145 @@ public static class OdfTypedDomCoverage
             resolvedSchema.SourceUrl.ToString(),
             resolvedSchema.SourceDate,
             elements,
+            childElementRelations,
             resolvedSchema.Attributes.Count,
             attributeValueTypeCounts,
             wrapperPropertyTypeCounts
                 .OrderBy(pair => pair.Key, StringComparer.Ordinal)
                 .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal));
+    }
+
+    private static IReadOnlyList<OdfTypedDomChildElementRelationCoverage> BuildChildElementRelations(OdfSchemaSet schema)
+    {
+        var relations = new Dictionary<string, OdfTypedDomChildElementRelationCoverage>(StringComparer.Ordinal);
+        foreach (OdfSchemaPatternDefinition pattern in schema.Patterns.Values)
+        {
+            foreach (OdfSchemaPatternNode root in pattern.Roots)
+            {
+                CollectParentElementRelations(root, schema, relations, []);
+            }
+        }
+
+        return relations.Values
+            .OrderBy(relation => relation.ParentNamespaceUri, StringComparer.Ordinal)
+            .ThenBy(relation => relation.ParentLocalName, StringComparer.Ordinal)
+            .ThenBy(relation => relation.ChildNamespaceUri, StringComparer.Ordinal)
+            .ThenBy(relation => relation.ChildLocalName, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static void CollectParentElementRelations(
+        OdfSchemaPatternNode node,
+        OdfSchemaSet schema,
+        Dictionary<string, OdfTypedDomChildElementRelationCoverage> relations,
+        HashSet<string> visitedRefs)
+    {
+        if (node.Kind == OdfSchemaPatternNodeKind.Element)
+        {
+            CollectDirectChildElementRelations(node, schema, relations, []);
+            return;
+        }
+
+        if (node.Kind == OdfSchemaPatternNodeKind.Ref)
+        {
+            foreach (OdfSchemaPatternNode root in ResolvePatternRoots(node.ReferenceName, schema, visitedRefs))
+            {
+                CollectParentElementRelations(root, schema, relations, visitedRefs);
+            }
+
+            return;
+        }
+
+        foreach (OdfSchemaPatternNode child in node.Children)
+        {
+            CollectParentElementRelations(child, schema, relations, visitedRefs);
+        }
+    }
+
+    private static void CollectDirectChildElementRelations(
+        OdfSchemaPatternNode parent,
+        OdfSchemaSet schema,
+        Dictionary<string, OdfTypedDomChildElementRelationCoverage> relations,
+        HashSet<string> visitedRefs)
+    {
+        foreach (OdfSchemaPatternNode child in parent.Children)
+        {
+            CollectDirectChildElementRelations(parent, child, schema, relations, visitedRefs);
+        }
+    }
+
+    private static void CollectDirectChildElementRelations(
+        OdfSchemaPatternNode parent,
+        OdfSchemaPatternNode node,
+        OdfSchemaSet schema,
+        Dictionary<string, OdfTypedDomChildElementRelationCoverage> relations,
+        HashSet<string> visitedRefs)
+    {
+        if (node.Kind == OdfSchemaPatternNodeKind.Attribute)
+        {
+            return;
+        }
+
+        if (node.Kind == OdfSchemaPatternNodeKind.Element)
+        {
+            if (!string.IsNullOrWhiteSpace(parent.NamespaceUri) &&
+                !string.IsNullOrWhiteSpace(parent.LocalName) &&
+                !string.IsNullOrWhiteSpace(node.NamespaceUri) &&
+                !string.IsNullOrWhiteSpace(node.LocalName))
+            {
+                string key = string.Join(
+                    "\u001f",
+                    parent.NamespaceUri,
+                    parent.LocalName,
+                    node.NamespaceUri,
+                    node.LocalName);
+                relations[key] = new OdfTypedDomChildElementRelationCoverage(
+                    parent.NamespaceUri,
+                    parent.LocalName,
+                    node.NamespaceUri,
+                    node.LocalName,
+                    node.Occurrence);
+            }
+
+            return;
+        }
+
+        if (node.Kind == OdfSchemaPatternNodeKind.Ref)
+        {
+            foreach (OdfSchemaPatternNode root in ResolvePatternRoots(node.ReferenceName, schema, visitedRefs))
+            {
+                CollectDirectChildElementRelations(parent, root, schema, relations, visitedRefs);
+            }
+
+            return;
+        }
+
+        foreach (OdfSchemaPatternNode child in node.Children)
+        {
+            CollectDirectChildElementRelations(parent, child, schema, relations, visitedRefs);
+        }
+    }
+
+    private static IEnumerable<OdfSchemaPatternNode> ResolvePatternRoots(
+        string referenceName,
+        OdfSchemaSet schema,
+        HashSet<string> visitedRefs)
+    {
+        if (string.IsNullOrWhiteSpace(referenceName) || !visitedRefs.Add(referenceName))
+        {
+            yield break;
+        }
+
+        OdfSchemaPatternDefinition? pattern = schema.FindPattern(referenceName);
+        if (pattern is not null)
+        {
+            foreach (OdfSchemaPatternNode root in pattern.Roots)
+            {
+                yield return root;
+            }
+        }
+
+        visitedRefs.Remove(referenceName);
     }
 
     private static int CountDeclaredPublicProperties(Type type)
@@ -495,6 +631,7 @@ public static class OdfTypedDomCoverage
 public sealed class OdfTypedDomCoverageReport
 {
     private readonly IReadOnlyList<OdfTypedDomElementCoverage> elements;
+    private readonly IReadOnlyList<OdfTypedDomChildElementRelationCoverage> childElementRelations;
     private readonly IReadOnlyDictionary<string, int> attributeValueTypeCounts;
     private readonly IReadOnlyDictionary<string, int> wrapperPropertyTypeCounts;
 
@@ -505,6 +642,7 @@ public sealed class OdfTypedDomCoverageReport
     /// <param name="schemaSourceUrl">schema 來源 URL。</param>
     /// <param name="schemaSourceDate">schema 來源日期。</param>
     /// <param name="elements">元素覆蓋清單。</param>
+    /// <param name="childElementRelations">schema 直接子元素關係清單。</param>
     /// <param name="schemaAttributeCount">schema 屬性總數。</param>
     /// <param name="attributeValueTypeCounts">schema 屬性值類型分布。</param>
     /// <param name="wrapperPropertyTypeCounts">wrapper 屬性 CLR 類型分布。</param>
@@ -513,6 +651,7 @@ public sealed class OdfTypedDomCoverageReport
         string schemaSourceUrl,
         string schemaSourceDate,
         IReadOnlyList<OdfTypedDomElementCoverage> elements,
+        IReadOnlyList<OdfTypedDomChildElementRelationCoverage> childElementRelations,
         int schemaAttributeCount,
         IReadOnlyDictionary<string, int> attributeValueTypeCounts,
         IReadOnlyDictionary<string, int> wrapperPropertyTypeCounts)
@@ -521,6 +660,7 @@ public sealed class OdfTypedDomCoverageReport
         SchemaSourceUrl = schemaSourceUrl ?? throw new ArgumentNullException(nameof(schemaSourceUrl));
         SchemaSourceDate = schemaSourceDate ?? throw new ArgumentNullException(nameof(schemaSourceDate));
         this.elements = elements ?? throw new ArgumentNullException(nameof(elements));
+        this.childElementRelations = childElementRelations ?? throw new ArgumentNullException(nameof(childElementRelations));
         SchemaAttributeCount = schemaAttributeCount;
         this.attributeValueTypeCounts = attributeValueTypeCounts ?? throw new ArgumentNullException(nameof(attributeValueTypeCounts));
         this.wrapperPropertyTypeCounts = wrapperPropertyTypeCounts ?? throw new ArgumentNullException(nameof(wrapperPropertyTypeCounts));
@@ -545,6 +685,11 @@ public sealed class OdfTypedDomCoverageReport
     /// 取得 schema 元素總數。
     /// </summary>
     public int SchemaElementCount => elements.Count;
+
+    /// <summary>
+    /// 取得 schema 中具名直接子元素關係總數。
+    /// </summary>
+    public int SchemaChildElementRelationCount => childElementRelations.Count;
 
     /// <summary>
     /// 取得具備專門 wrapper 的 schema 元素數。
@@ -579,6 +724,11 @@ public sealed class OdfTypedDomCoverageReport
     public IReadOnlyList<OdfTypedDomElementCoverage> Elements => elements;
 
     /// <summary>
+    /// 取得 schema 直接子元素關係清單。
+    /// </summary>
+    public IReadOnlyList<OdfTypedDomChildElementRelationCoverage> ChildElementRelations => childElementRelations;
+
+    /// <summary>
     /// 取得 schema 屬性值類型分布。
     /// </summary>
     public IReadOnlyDictionary<string, int> AttributeValueTypeCounts => attributeValueTypeCounts;
@@ -605,6 +755,7 @@ public sealed class OdfTypedDomCoverageReport
                 typedElementCount = TypedElementCount,
                 fallbackElementCount = FallbackElementCount,
                 typedElementRatio = TypedElementRatio.ToString("0.0000", CultureInfo.InvariantCulture),
+                schemaChildElementRelationCount = SchemaChildElementRelationCount,
                 schemaAttributeCount = SchemaAttributeCount,
                 wrapperPropertyCount = WrapperPropertyCount
             },
@@ -619,9 +770,70 @@ public sealed class OdfTypedDomCoverageReport
                 wrapperType = element.WrapperType,
                 hasTypedWrapper = element.HasTypedWrapper,
                 wrapperPropertyCount = element.WrapperPropertyCount
+            }).ToArray(),
+            childElementRelations = ChildElementRelations.Select(relation => new
+            {
+                parentNamespaceUri = relation.ParentNamespaceUri,
+                parentLocalName = relation.ParentLocalName,
+                childNamespaceUri = relation.ChildNamespaceUri,
+                childLocalName = relation.ChildLocalName,
+                occurrence = relation.Occurrence
             }).ToArray()
         };
     }
+}
+
+/// <summary>
+/// 表示 schema 中一組父元素與直接子元素的覆蓋關係。
+/// </summary>
+public sealed class OdfTypedDomChildElementRelationCoverage
+{
+    /// <summary>
+    /// 初始化 schema 子元素關係覆蓋項目。
+    /// </summary>
+    /// <param name="parentNamespaceUri">父元素命名空間 URI。</param>
+    /// <param name="parentLocalName">父元素區域名稱。</param>
+    /// <param name="childNamespaceUri">子元素命名空間 URI。</param>
+    /// <param name="childLocalName">子元素區域名稱。</param>
+    /// <param name="occurrence">schema 中記錄的出現次數。</param>
+    public OdfTypedDomChildElementRelationCoverage(
+        string parentNamespaceUri,
+        string parentLocalName,
+        string childNamespaceUri,
+        string childLocalName,
+        string occurrence)
+    {
+        ParentNamespaceUri = parentNamespaceUri ?? throw new ArgumentNullException(nameof(parentNamespaceUri));
+        ParentLocalName = parentLocalName ?? throw new ArgumentNullException(nameof(parentLocalName));
+        ChildNamespaceUri = childNamespaceUri ?? throw new ArgumentNullException(nameof(childNamespaceUri));
+        ChildLocalName = childLocalName ?? throw new ArgumentNullException(nameof(childLocalName));
+        Occurrence = string.IsNullOrWhiteSpace(occurrence) ? "exactlyOne" : occurrence;
+    }
+
+    /// <summary>
+    /// 取得父元素命名空間 URI。
+    /// </summary>
+    public string ParentNamespaceUri { get; }
+
+    /// <summary>
+    /// 取得父元素區域名稱。
+    /// </summary>
+    public string ParentLocalName { get; }
+
+    /// <summary>
+    /// 取得子元素命名空間 URI。
+    /// </summary>
+    public string ChildNamespaceUri { get; }
+
+    /// <summary>
+    /// 取得子元素區域名稱。
+    /// </summary>
+    public string ChildLocalName { get; }
+
+    /// <summary>
+    /// 取得 schema 中記錄的出現次數。
+    /// </summary>
+    public string Occurrence { get; }
 }
 
 /// <summary>

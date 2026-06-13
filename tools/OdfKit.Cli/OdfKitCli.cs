@@ -211,6 +211,7 @@ public static class OdfKitCli
         output.WriteLine("schema-elements: " + report.SchemaElementCount.ToString(CultureInfo.InvariantCulture));
         output.WriteLine("typed-elements: " + report.TypedElementCount.ToString(CultureInfo.InvariantCulture));
         output.WriteLine("fallback-elements: " + report.FallbackElementCount.ToString(CultureInfo.InvariantCulture));
+        output.WriteLine("schema-child-element-relations: " + report.SchemaChildElementRelationCount.ToString(CultureInfo.InvariantCulture));
         output.WriteLine("schema-attributes: " + report.SchemaAttributeCount.ToString(CultureInfo.InvariantCulture));
         output.WriteLine("wrapper-properties: " + report.WrapperPropertyCount.ToString(CultureInfo.InvariantCulture));
         output.WriteLine("wrapper-property-types:");

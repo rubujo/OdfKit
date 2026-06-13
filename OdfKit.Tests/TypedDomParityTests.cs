@@ -265,6 +265,7 @@ public class TypedDomParityTests
 
         Assert.True(report.SchemaElementCount >= 550, "schema element count too low: " + report.SchemaElementCount);
         Assert.True(report.TypedElementCount >= 550, "typed element count too low: " + report.TypedElementCount);
+        Assert.True(report.SchemaChildElementRelationCount >= 2000, "schema child element relation count too low: " + report.SchemaChildElementRelationCount);
         Assert.True(report.SchemaAttributeCount >= 100, "schema attribute count too low: " + report.SchemaAttributeCount);
         Assert.Contains(
             report.Elements,
@@ -272,6 +273,18 @@ public class TypedDomParityTests
                 element.LocalName == "p" &&
                 element.HasTypedWrapper &&
                 element.WrapperType.Contains("TextPElement", StringComparison.Ordinal));
+        Assert.Contains(
+            report.ChildElementRelations,
+            relation => relation.ParentNamespaceUri == OdfNamespaces.Office &&
+                relation.ParentLocalName == "body" &&
+                relation.ChildNamespaceUri == OdfNamespaces.Office &&
+                relation.ChildLocalName == "text");
+        Assert.Contains(
+            report.ChildElementRelations,
+            relation => relation.ParentNamespaceUri == OdfNamespaces.Table &&
+                relation.ParentLocalName == "table" &&
+                relation.ChildNamespaceUri == OdfNamespaces.Table &&
+                relation.ChildLocalName == "table-row");
         Assert.Contains(report.AttributeValueTypeCounts, pair => pair.Key.Length > 0 && pair.Value > 0);
         Assert.True(report.WrapperPropertyTypeCounts["int"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["bool"] >= 10000);
@@ -354,6 +367,14 @@ public class TypedDomParityTests
         string json = JsonSerializer.Serialize(report.ToJsonModel());
         using JsonDocument document = JsonDocument.Parse(json);
         Assert.Equal(report.SchemaElementCount, document.RootElement.GetProperty("summary").GetProperty("schemaElementCount").GetInt32());
+        Assert.Equal(report.SchemaChildElementRelationCount, document.RootElement.GetProperty("summary").GetProperty("schemaChildElementRelationCount").GetInt32());
+        Assert.True(document.RootElement.GetProperty("childElementRelations").GetArrayLength() >= 2000);
+        Assert.Contains(
+            document.RootElement.GetProperty("childElementRelations").EnumerateArray(),
+            relation => relation.GetProperty("parentNamespaceUri").GetString() == OdfNamespaces.Office &&
+                relation.GetProperty("parentLocalName").GetString() == "body" &&
+                relation.GetProperty("childNamespaceUri").GetString() == OdfNamespaces.Office &&
+                relation.GetProperty("childLocalName").GetString() == "text");
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("int").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("bool").GetInt32() >= 10000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("time").GetInt32() >= 6);

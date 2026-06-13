@@ -4,6 +4,7 @@ using System.Text.Json;
 using OdfKit.Cli;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Text;
 using Xunit;
 
@@ -115,7 +116,15 @@ public class CliTests
         JsonElement summary = json.RootElement.GetProperty("summary");
         Assert.True(summary.GetProperty("schemaElementCount").GetInt32() >= 550);
         Assert.True(summary.GetProperty("typedElementCount").GetInt32() >= 550);
+        Assert.True(summary.GetProperty("schemaChildElementRelationCount").GetInt32() >= 2000);
         Assert.True(summary.GetProperty("schemaAttributeCount").GetInt32() >= 100);
+        Assert.True(json.RootElement.GetProperty("childElementRelations").GetArrayLength() >= 2000);
+        Assert.Contains(
+            json.RootElement.GetProperty("childElementRelations").EnumerateArray(),
+            relation => relation.GetProperty("parentNamespaceUri").GetString() == OdfNamespaces.Office &&
+                relation.GetProperty("parentLocalName").GetString() == "body" &&
+                relation.GetProperty("childNamespaceUri").GetString() == OdfNamespaces.Office &&
+                relation.GetProperty("childLocalName").GetString() == "text");
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("int").GetInt32() >= 1000);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("bool").GetInt32() >= 10000);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("time").GetInt32() >= 6);

@@ -7,7 +7,7 @@
 - `OdfNodeFactory.CreateElement(...)` 會先呼叫 generated factory，找不到 typed wrapper 時才回退到通用 `OdfElement`。
 - `OdfElement.cs` 保留常用手寫 wrapper，例如 text paragraph、heading、table cell、draw frame、office document 與 manifest file entry。
 - `GeneratedDomWrappers.g.cs` 由 ODF 1.4 schema metadata 產生，涵蓋大量 schema element wrapper、factory case 與 attribute property，且已重產生為第一批 typed datatype property。
-- `OdfTypedDomCoverage.Build()` 會產生 machine-readable schema-to-wrapper report，列出 schema element、wrapper type、fallback 狀態、wrapper property 數、schema attribute value type 分布與 wrapper property CLR type 分布。
+- `OdfTypedDomCoverage.Build()` 會產生 machine-readable schema-to-wrapper report，列出 schema element、wrapper type、fallback 狀態、schema child element relation、wrapper property 數、schema attribute value type 分布與 wrapper property CLR type 分布。
 - CLI `typed-dom-coverage --format json` 可輸出同一份 report，供 CI 或 release artifact 保存。
 - `eng/Test-OdfTypedDomCoverage.ps1` 會產生 `artifacts/typed-dom-coverage/odf-typed-dom-coverage.json`，GitHub Actions `Typed DOM coverage` workflow 會上傳同一份 artifact。
 - `OdfElement` 已提供 typed child facade，可用泛型 `ChildElements<TElement>()`、`DescendantElements<TElement>()`、`AppendElement<TElement>()` 與 typed insert helper 操作 generated 與手寫 wrapper，並保留未知節點與原始 DOM child list。
@@ -25,6 +25,7 @@
 | Generated typed element classes | 550 |
 | Generated factory cases | 590 |
 | Generated attribute properties | 100000 |
+| Schema child element relations in coverage report | 2000 |
 | Generated integer attribute properties | 1000 |
 | Generated boolean attribute properties | 10000 |
 | Generated decimal attribute properties | 100 |
@@ -109,7 +110,7 @@
 
 - 已有所有 typed wrapper 共用的泛型 child facade；尚未產生依 schema content model 展開的專屬 child collection property。
 - Attribute property 目前已有基底 typed helper，且 generated artifact 已包含 integer、boolean、decimal、date/dateTime、time、duration、length/percent、borderWidths、bounded percent、angle、foKeepTogether/foWrapOption、dr3dProjection/dr3dShadeMode、svgFillRule、tableBorderModel、textLabelFollowedBy/textListLevelPositionMode/textIndexScope/textTableType/textAnchorType/textNoteClass/textSelectPage/textReferenceFormat/textStartNumberingAt/textFootnotesPosition/textCaptionSequenceFormat/textNumberPosition/textPlaceholderType/textAnimation/textAnimationDirection/textKind、lineStyle/lineType/lineWidth/lineMode、fontFamilyGeneric/fontPitch/fontRelief/fontStretch/fontStyle/fontVariant/fontWeight、styleLineBreak/styleRepeat/styleDirection、formOrientation、tableDirection/tableOrientation、xLinkType/xLinkShow/xLinkActuate、numberStyle、tableOrder/tableType、style name/list、color、IRI reference、cell address/range address、cell range address list、vector3D、point3D、points、language/country/script tokens、namespacedToken、character、textEncoding、targetFrameName、XML name、style family、ODF version 與 media type 強型別 property；其他 ODF datatype 仍需補齊。
-- schema-to-wrapper coverage report 已可由 API / CLI 產生，並在 release pipeline 中固定保存 artifact。
+- schema-to-wrapper coverage report 已可由 API / CLI 產生，並包含 schema child relation coverage；release pipeline 會固定保存 artifact。
 - 尚未對 ODF Toolkit / ODFDOM 的 sample corpus 做逐項 API parity。
 - High-level facade 仍由 Text / Spreadsheet / Presentation / Drawing 等文件模型承接，不直接從 generated DOM 推導。
 
@@ -117,7 +118,7 @@
 
 Typed DOM parity 要升為 `complete`，至少需要：
 
-- 產生 machine-readable coverage report，列出 schema element / attribute 對應 wrapper。
+- 產生 machine-readable coverage report，列出 schema element / attribute 對應 wrapper 與 schema child element relation。
 - 所有 ODF 1.4 schema element 可由 factory 建立，並能 parse / serialize round-trip。
 - typed child facade 可支援 ODFDOM 風格的建立、插入、列舉與 round-trip user story。
 - 常用 datatype attribute 有強型別存取或明確保留為 string 的理由。
