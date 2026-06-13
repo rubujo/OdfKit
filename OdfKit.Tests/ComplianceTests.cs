@@ -1434,6 +1434,9 @@ namespace OdfKit.Tests
         [InlineData("example.fods", OdfDocumentKind.FlatSpreadsheet)]
         [InlineData("example.fodp", OdfDocumentKind.FlatPresentation)]
         [InlineData("example.fodg", OdfDocumentKind.FlatGraphics)]
+        [InlineData("example.fodc", OdfDocumentKind.FlatChart)]
+        [InlineData("example.fdf", OdfDocumentKind.FlatFormula)]
+        [InlineData("example.fodi", OdfDocumentKind.FlatImage)]
         public void DocumentKindDetectorRecognizesOdfExtensions(string fileName, OdfDocumentKind expected)
         {
             Assert.Equal(expected, OdfDocumentKindDetector.FromFileName(fileName));
@@ -1442,7 +1445,7 @@ namespace OdfKit.Tests
         [Fact]
         public void DocumentKindDetectorExposesSupportedFormatMetadata()
         {
-            Assert.Equal(17, OdfDocumentKindDetector.SupportedFormats.Count);
+            Assert.Equal(20, OdfDocumentKindDetector.SupportedFormats.Count);
 
             Assert.True(OdfDocumentKindDetector.TryGetFormatByFileName(".fods", out OdfFormatInfo? flatSpreadsheet));
             Assert.Equal(OdfDocumentKind.FlatSpreadsheet, flatSpreadsheet!.Kind);
@@ -1506,6 +1509,9 @@ namespace OdfKit.Tests
         [InlineData("spreadsheet", true, OdfDocumentKind.FlatSpreadsheet)]
         [InlineData("presentation", true, OdfDocumentKind.FlatPresentation)]
         [InlineData("drawing", true, OdfDocumentKind.FlatGraphics)]
+        [InlineData("chart", true, OdfDocumentKind.FlatChart)]
+        [InlineData("formula", true, OdfDocumentKind.FlatFormula)]
+        [InlineData("image", true, OdfDocumentKind.FlatImage)]
         public void DocumentKindDetectorRecognizesOfficeBodyKinds(string localName, bool flat, OdfDocumentKind expected)
         {
             Assert.Equal(expected, OdfDocumentKindDetector.FromOfficeBodyElement(localName, flat));

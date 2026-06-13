@@ -77,7 +77,7 @@
       "path": "generated/mathml-formula.odf",
       "source": "generated",
       "license": "generated-no-copyright",
-      "kind": "Formula",
+      "kind": "FlatFormula",
       "version": "1.4",
       "profile": "OASIS_ODF_1_4_Extended",
       "expected": "valid",
