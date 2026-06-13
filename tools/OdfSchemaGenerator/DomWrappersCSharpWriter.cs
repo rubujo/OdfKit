@@ -380,6 +380,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.Vector3D;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "point3D", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.Point3D;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -610,6 +616,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetVector3DAttributeValue",
                     "SetVector3DAttributeValue");
                 break;
+            case AttributeValueKind.Point3D:
+                writer.WriteLine($"        public OdfPoint3D? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetPoint3DAttributeValue",
+                    "SetPoint3DAttributeValue");
+                break;
             case AttributeValueKind.XmlName:
                 writer.WriteLine($"        public OdfXmlName? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -794,6 +809,7 @@ public sealed class DomWrappersCSharpWriter
         CellRangeAddress,
         CellRangeAddressList,
         Vector3D,
+        Point3D,
         XmlName,
         StyleFamily,
         OdfVersion,
