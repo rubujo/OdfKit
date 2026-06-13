@@ -961,6 +961,32 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的線條模式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的線條模式；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfLineMode? GetLineModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseLineMode(value, out OdfLineMode lineMode) ? lineMode : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的線條模式屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的線條模式。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetLineModeAttributeValue(string localName, string namespaceUri, OdfLineMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatLineMode(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -1115,6 +1141,32 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfLineType.Single => "single",
             OdfLineType.Double => "double",
             _ => throw new ArgumentOutOfRangeException(nameof(lineType), lineType, "未知的 ODF 線條類型。")
+        };
+    }
+
+    private static bool TryParseLineMode(string? value, out OdfLineMode lineMode)
+    {
+        switch (value)
+        {
+            case "continuous":
+                lineMode = OdfLineMode.Continuous;
+                return true;
+            case "skip-white-space":
+                lineMode = OdfLineMode.SkipWhiteSpace;
+                return true;
+            default:
+                lineMode = default;
+                return false;
+        }
+    }
+
+    private static string FormatLineMode(OdfLineMode lineMode)
+    {
+        return lineMode switch
+        {
+            OdfLineMode.Continuous => "continuous",
+            OdfLineMode.SkipWhiteSpace => "skip-white-space",
+            _ => throw new ArgumentOutOfRangeException(nameof(lineMode), lineMode, "未知的 ODF 線條模式。")
         };
     }
 

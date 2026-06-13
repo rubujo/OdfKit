@@ -242,6 +242,11 @@ public static class OdfTypedDomCoverage
             return "lineWidth";
         }
 
+        if (resolvedType == typeof(OdfLineMode))
+        {
+            return "lineMode";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";
