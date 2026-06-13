@@ -33,7 +33,10 @@ public class DocumentKindApiUsabilityTests
         Assert.Equal("application/vnd.oasis.opendocument.chart", loaded.Package.MimeType);
         Assert.Equal("bar", loaded.ChartClass);
         Assert.Equal("營收", loaded.ChartTitle);
-        Assert.NotNull(FindDescendant(loaded.ChartNode, "legend", OdfNamespaces.Chart));
+        Assert.Equal("top", loaded.LegendPosition);
+        Assert.Single(loaded.Series);
+        Assert.Equal("Sheet1.A1:A3", loaded.Series[0].ValuesCellRangeAddress);
+        Assert.Equal("Sheet1.A1", loaded.Series[0].LabelCellAddress);
         Assert.Equal(
             "Sheet1.A1:A3",
             FindDescendant(loaded.ChartNode, "series", OdfNamespaces.Chart)?.GetAttribute("values-cell-range-address", OdfNamespaces.Chart));

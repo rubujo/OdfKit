@@ -92,13 +92,47 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
     }
 
     /// <summary>
+    /// 取得或設定圖例位置。
+    /// </summary>
+    /// <remarks>常見值包含 <c>top</c>、<c>bottom</c>、<c>start</c> 與 <c>end</c>。</remarks>
+    public string? LegendPosition
+    {
+        get
+        {
+            OdfNode? legend = FindChildElement(GetChartNode(), "legend", OdfNamespaces.Chart);
+            return legend?.GetAttribute("legend-position", OdfNamespaces.Chart);
+        }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                OdfNode? existingLegend = FindChildElement(GetChartNode(), "legend", OdfNamespaces.Chart);
+                if (existingLegend is not null)
+                {
+                    GetChartNode().RemoveChild(existingLegend);
+                }
+
+                return;
+            }
+
+            string position = value!;
+            OdfNode legendNode = FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
+            legendNode.SetAttribute("legend-position", OdfNamespaces.Chart, position, "chart");
+        }
+    }
+
+    /// <summary>
+    /// 取得圖表中的資料序列摘要。
+    /// </summary>
+    public IReadOnlyList<OdfChartSeriesInfo> Series => GetSeries();
+
+    /// <summary>
     /// 設定圖例位置。
     /// </summary>
     /// <param name="position">圖例位置，例如 top、bottom、start 或 end。</param>
     public void SetLegend(string position)
     {
-        OdfNode legend = FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
-        legend.SetAttribute("legend-position", OdfNamespaces.Chart, position, "chart");
+        LegendPosition = position;
     }
 
     /// <summary>
@@ -123,6 +157,39 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
         }
 
         plotArea.AppendChild(series);
+        return series;
+    }
+
+    private IReadOnlyList<OdfChartSeriesInfo> GetSeries()
+    {
+        OdfNode? plotArea = FindChildElement(GetChartNode(), "plot-area", OdfNamespaces.Chart);
+        if (plotArea is null)
+        {
+            return [];
+        }
+
+        List<OdfChartSeriesInfo> series = [];
+        foreach (OdfNode child in plotArea.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.LocalName != "series" ||
+                child.NamespaceUri != OdfNamespaces.Chart)
+            {
+                continue;
+            }
+
+            string? valuesCellRangeAddress = child.GetAttribute("values-cell-range-address", OdfNamespaces.Chart);
+            if (string.IsNullOrWhiteSpace(valuesCellRangeAddress))
+            {
+                continue;
+            }
+
+            string rangeAddress = valuesCellRangeAddress!;
+            series.Add(new OdfChartSeriesInfo(
+                rangeAddress,
+                child.GetAttribute("label-cell-address", OdfNamespaces.Chart)));
+        }
+
         return series;
     }
 
@@ -232,4 +299,22 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
 
         return null;
     }
+}
+
+/// <summary>
+/// 表示圖表資料序列的高階摘要。
+/// </summary>
+/// <param name="valuesCellRangeAddress">資料值儲存格範圍位址。</param>
+/// <param name="labelCellAddress">選用的標籤儲存格位址。</param>
+public sealed class OdfChartSeriesInfo(string valuesCellRangeAddress, string? labelCellAddress)
+{
+    /// <summary>
+    /// 取得資料值儲存格範圍位址。
+    /// </summary>
+    public string ValuesCellRangeAddress { get; } = valuesCellRangeAddress ?? throw new ArgumentNullException(nameof(valuesCellRangeAddress));
+
+    /// <summary>
+    /// 取得選用的標籤儲存格位址。
+    /// </summary>
+    public string? LabelCellAddress { get; } = labelCellAddress;
 }
