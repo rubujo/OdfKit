@@ -282,6 +282,16 @@ public static class OdfTypedDomCoverage
             return "fontStretch";
         }
 
+        if (resolvedType == typeof(OdfStyleLineBreak))
+        {
+            return "styleLineBreak";
+        }
+
+        if (resolvedType == typeof(OdfStyleRepeat))
+        {
+            return "styleRepeat";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";

@@ -1169,6 +1169,58 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的斷行規則屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的斷行規則；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfStyleLineBreak? GetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseStyleLineBreak(value, out OdfStyleLineBreak lineBreak) ? lineBreak : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的斷行規則屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的斷行規則。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfStyleLineBreak value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatStyleLineBreak(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的背景重複屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的背景重複；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfStyleRepeat? GetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseStyleRepeat(value, out OdfStyleRepeat repeat) ? repeat : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的背景重複屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的背景重複。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfStyleRepeat value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatStyleRepeat(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -1619,6 +1671,62 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfFontStretch.ExtraExpanded => "extra-expanded",
             OdfFontStretch.UltraExpanded => "ultra-expanded",
             _ => throw new ArgumentOutOfRangeException(nameof(stretch), stretch, "未知的 ODF 字型伸縮。")
+        };
+    }
+
+    private static bool TryParseStyleLineBreak(string? value, out OdfStyleLineBreak lineBreak)
+    {
+        switch (value)
+        {
+            case "normal":
+                lineBreak = OdfStyleLineBreak.Normal;
+                return true;
+            case "strict":
+                lineBreak = OdfStyleLineBreak.Strict;
+                return true;
+            default:
+                lineBreak = default;
+                return false;
+        }
+    }
+
+    private static string FormatStyleLineBreak(OdfStyleLineBreak lineBreak)
+    {
+        return lineBreak switch
+        {
+            OdfStyleLineBreak.Normal => "normal",
+            OdfStyleLineBreak.Strict => "strict",
+            _ => throw new ArgumentOutOfRangeException(nameof(lineBreak), lineBreak, "未知的 ODF 斷行規則。")
+        };
+    }
+
+    private static bool TryParseStyleRepeat(string? value, out OdfStyleRepeat repeat)
+    {
+        switch (value)
+        {
+            case "no-repeat":
+                repeat = OdfStyleRepeat.NoRepeat;
+                return true;
+            case "repeat":
+                repeat = OdfStyleRepeat.Repeat;
+                return true;
+            case "stretch":
+                repeat = OdfStyleRepeat.Stretch;
+                return true;
+            default:
+                repeat = default;
+                return false;
+        }
+    }
+
+    private static string FormatStyleRepeat(OdfStyleRepeat repeat)
+    {
+        return repeat switch
+        {
+            OdfStyleRepeat.NoRepeat => "no-repeat",
+            OdfStyleRepeat.Repeat => "repeat",
+            OdfStyleRepeat.Stretch => "stretch",
+            _ => throw new ArgumentOutOfRangeException(nameof(repeat), repeat, "未知的 ODF 背景重複。")
         };
     }
 

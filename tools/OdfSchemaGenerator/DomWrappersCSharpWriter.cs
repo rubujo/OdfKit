@@ -303,6 +303,18 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.FontStretch;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "line-break")
+        {
+            return AttributeValueKind.StyleLineBreak;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "repeat")
+        {
+            return AttributeValueKind.StyleRepeat;
+        }
+
         AttributeValueKind valueKind = AttributeValueKind.Unknown;
         foreach (var child in node.Children)
         {
@@ -940,6 +952,24 @@ public sealed class DomWrappersCSharpWriter
                     "GetFontStretchAttributeValue",
                     "SetFontStretchAttributeValue");
                 break;
+            case AttributeValueKind.StyleLineBreak:
+                writer.WriteLine($"        public OdfStyleLineBreak? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleLineBreakAttributeValue",
+                    "SetStyleLineBreakAttributeValue");
+                break;
+            case AttributeValueKind.StyleRepeat:
+                writer.WriteLine($"        public OdfStyleRepeat? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleRepeatAttributeValue",
+                    "SetStyleRepeatAttributeValue");
+                break;
             case AttributeValueKind.XmlName:
                 writer.WriteLine($"        public OdfXmlName? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1146,6 +1176,8 @@ public sealed class DomWrappersCSharpWriter
         FontPitch,
         FontRelief,
         FontStretch,
+        StyleLineBreak,
+        StyleRepeat,
         XmlName,
         StyleFamily,
         OdfVersion,
