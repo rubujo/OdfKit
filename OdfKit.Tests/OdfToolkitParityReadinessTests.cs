@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using OdfKit.Cli;
+using OdfKit.Compliance;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -48,6 +49,28 @@ public class OdfToolkitParityReadinessTests
         Assert.Contains("https://github.com/openpreserve/odf-validator", sources, StringComparison.Ordinal);
         Assert.Contains("--baseline odf-validator", sources, StringComparison.Ordinal);
         Assert.Contains("Initialize-OdfExternalCorpus.ps1", sources, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 profile 來源文件列出所有內建 profile 的權威與驗證狀態。
+    /// </summary>
+    [Fact]
+    public void ProfileSourcesDocumentDeclaresBuiltInProfileVerificationStatus()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string document = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf-profile-sources.md"));
+
+        foreach (OdfComplianceProfile profile in OdfComplianceProfiles.BuiltIn)
+        {
+            Assert.Contains(profile.Id, document, StringComparison.Ordinal);
+            Assert.Contains(profile.AuthorityLevel.ToString(), document, StringComparison.Ordinal);
+            Assert.Contains(profile.VerificationStatus.ToString(), document, StringComparison.Ordinal);
+        }
+
+        Assert.Contains("NeedsActiveSource", document, StringComparison.Ordinal);
+        Assert.Contains("CompatibilityOnly", document, StringComparison.Ordinal);
+        Assert.Contains("不得在文件中標示為 official、verified 或 normative", document, StringComparison.Ordinal);
+        Assert.Contains("all-known", document, StringComparison.Ordinal);
     }
 
     /// <summary>
