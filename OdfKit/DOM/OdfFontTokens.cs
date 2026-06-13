@@ -1,6 +1,58 @@
 namespace OdfKit.DOM;
 
 /// <summary>
+/// 表示 ODF schema 中名為 <c>fontFamilyGeneric</c> 的通用字型家族 token。
+/// </summary>
+public enum OdfFontFamilyGeneric
+{
+    /// <summary>
+    /// 羅馬字型家族。
+    /// </summary>
+    Roman,
+
+    /// <summary>
+    /// 瑞士字型家族。
+    /// </summary>
+    Swiss,
+
+    /// <summary>
+    /// 現代字型家族。
+    /// </summary>
+    Modern,
+
+    /// <summary>
+    /// 裝飾字型家族。
+    /// </summary>
+    Decorative,
+
+    /// <summary>
+    /// 手寫字型家族。
+    /// </summary>
+    Script,
+
+    /// <summary>
+    /// 系統字型家族。
+    /// </summary>
+    System
+}
+
+/// <summary>
+/// 表示 ODF schema 中名為 <c>fontPitch</c> 的字型間距 token。
+/// </summary>
+public enum OdfFontPitch
+{
+    /// <summary>
+    /// 固定寬度字型間距。
+    /// </summary>
+    Fixed,
+
+    /// <summary>
+    /// 可變寬度字型間距。
+    /// </summary>
+    Variable
+}
+
+/// <summary>
 /// 表示 ODF schema 中名為 <c>fontStyle</c> 的字型樣式 token。
 /// </summary>
 public enum OdfFontStyle

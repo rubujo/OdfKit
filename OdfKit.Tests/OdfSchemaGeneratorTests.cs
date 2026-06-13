@@ -263,6 +263,8 @@ namespace OdfKit.Tests
                 "<define name=\"fontStyle\"><choice><value>normal</value><value>italic</value><value>oblique</value></choice></define>" +
                 "<define name=\"fontVariant\"><choice><value>normal</value><value>small-caps</value></choice></define>" +
                 "<define name=\"fontWeight\"><choice><value>normal</value><value>bold</value><value>100</value><value>200</value></choice></define>" +
+                "<define name=\"fontFamilyGeneric\"><choice><value>roman</value><value>swiss</value><value>modern</value></choice></define>" +
+                "<define name=\"fontPitch\"><choice><value>fixed</value><value>variable</value></choice></define>" +
                 "<define name=\"borderWidths\"><list><ref name=\"positiveLength\" /><ref name=\"positiveLength\" /><ref name=\"positiveLength\" /></list></define>" +
                 "<define name=\"length\"><data type=\"string\"><param name=\"pattern\">[0-9]+cm</param></data></define>" +
                 "<define name=\"percent\"><data type=\"string\"><param name=\"pattern\">[0-9]+%</param></data></define>" +
@@ -297,6 +299,8 @@ namespace OdfKit.Tests
                 "<attribute name=\"fo:font-style\"><ref name=\"fontStyle\" /></attribute>" +
                 "<attribute name=\"fo:font-variant\"><ref name=\"fontVariant\" /></attribute>" +
                 "<attribute name=\"fo:font-weight\"><ref name=\"fontWeight\" /></attribute>" +
+                "<attribute name=\"style:font-family-generic\"><ref name=\"fontFamilyGeneric\" /></attribute>" +
+                "<attribute name=\"style:font-pitch\"><ref name=\"fontPitch\" /></attribute>" +
                 "<attribute name=\"style:border-line-width\"><ref name=\"borderWidths\" /></attribute>" +
                 "<attribute name=\"draw:shape-id\"><ref name=\"IDREF\" /></attribute>" +
                 "<attribute name=\"draw:name-token\"><ref name=\"NCName\" /></attribute>" +
@@ -401,6 +405,10 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetFontVariantAttributeValue(\"font-variant\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfFontWeight? FontWeight", code);
             Assert.Contains("get => GetFontWeightAttributeValue(\"font-weight\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFontFamilyGeneric? FontFamilyGeneric", code);
+            Assert.Contains("get => GetFontFamilyGenericAttributeValue(\"font-family-generic\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfFontPitch? FontPitch", code);
+            Assert.Contains("get => GetFontPitchAttributeValue(\"font-pitch\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfBorderWidths? BorderLineWidth", code);
             Assert.Contains("get => GetBorderWidthsAttributeValue(\"border-line-width\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfXmlName? ShapeId", code);

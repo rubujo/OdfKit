@@ -1065,6 +1065,58 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的通用字型家族屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的通用字型家族；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfFontFamilyGeneric? GetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseFontFamilyGeneric(value, out OdfFontFamilyGeneric family) ? family : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的通用字型家族屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的通用字型家族。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfFontFamilyGeneric value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatFontFamilyGeneric(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的字型間距屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的字型間距；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfFontPitch? GetFontPitchAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseFontPitch(value, out OdfFontPitch pitch) ? pitch : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的字型間距屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的字型間距。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetFontPitchAttributeValue(string localName, string namespaceUri, OdfFontPitch value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatFontPitch(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -1363,6 +1415,74 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfFontWeight.Weight800 => "800",
             OdfFontWeight.Weight900 => "900",
             _ => throw new ArgumentOutOfRangeException(nameof(fontWeight), fontWeight, "未知的 ODF 字型粗細。")
+        };
+    }
+
+    private static bool TryParseFontFamilyGeneric(string? value, out OdfFontFamilyGeneric family)
+    {
+        switch (value)
+        {
+            case "roman":
+                family = OdfFontFamilyGeneric.Roman;
+                return true;
+            case "swiss":
+                family = OdfFontFamilyGeneric.Swiss;
+                return true;
+            case "modern":
+                family = OdfFontFamilyGeneric.Modern;
+                return true;
+            case "decorative":
+                family = OdfFontFamilyGeneric.Decorative;
+                return true;
+            case "script":
+                family = OdfFontFamilyGeneric.Script;
+                return true;
+            case "system":
+                family = OdfFontFamilyGeneric.System;
+                return true;
+            default:
+                family = default;
+                return false;
+        }
+    }
+
+    private static string FormatFontFamilyGeneric(OdfFontFamilyGeneric family)
+    {
+        return family switch
+        {
+            OdfFontFamilyGeneric.Roman => "roman",
+            OdfFontFamilyGeneric.Swiss => "swiss",
+            OdfFontFamilyGeneric.Modern => "modern",
+            OdfFontFamilyGeneric.Decorative => "decorative",
+            OdfFontFamilyGeneric.Script => "script",
+            OdfFontFamilyGeneric.System => "system",
+            _ => throw new ArgumentOutOfRangeException(nameof(family), family, "未知的 ODF 通用字型家族。")
+        };
+    }
+
+    private static bool TryParseFontPitch(string? value, out OdfFontPitch pitch)
+    {
+        switch (value)
+        {
+            case "fixed":
+                pitch = OdfFontPitch.Fixed;
+                return true;
+            case "variable":
+                pitch = OdfFontPitch.Variable;
+                return true;
+            default:
+                pitch = default;
+                return false;
+        }
+    }
+
+    private static string FormatFontPitch(OdfFontPitch pitch)
+    {
+        return pitch switch
+        {
+            OdfFontPitch.Fixed => "fixed",
+            OdfFontPitch.Variable => "variable",
+            _ => throw new ArgumentOutOfRangeException(nameof(pitch), pitch, "未知的 ODF 字型間距。")
         };
     }
 

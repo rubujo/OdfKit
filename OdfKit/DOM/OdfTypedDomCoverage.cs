@@ -262,6 +262,16 @@ public static class OdfTypedDomCoverage
             return "fontWeight";
         }
 
+        if (resolvedType == typeof(OdfFontFamilyGeneric))
+        {
+            return "fontFamilyGeneric";
+        }
+
+        if (resolvedType == typeof(OdfFontPitch))
+        {
+            return "fontPitch";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";

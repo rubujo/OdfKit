@@ -488,6 +488,18 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.FontWeight;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "fontFamilyGeneric", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.FontFamilyGeneric;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "fontPitch", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.FontPitch;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -880,6 +892,24 @@ public sealed class DomWrappersCSharpWriter
                     "GetFontWeightAttributeValue",
                     "SetFontWeightAttributeValue");
                 break;
+            case AttributeValueKind.FontFamilyGeneric:
+                writer.WriteLine($"        public OdfFontFamilyGeneric? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFontFamilyGenericAttributeValue",
+                    "SetFontFamilyGenericAttributeValue");
+                break;
+            case AttributeValueKind.FontPitch:
+                writer.WriteLine($"        public OdfFontPitch? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFontPitchAttributeValue",
+                    "SetFontPitchAttributeValue");
+                break;
             case AttributeValueKind.XmlName:
                 writer.WriteLine($"        public OdfXmlName? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1082,6 +1112,8 @@ public sealed class DomWrappersCSharpWriter
         FontStyle,
         FontVariant,
         FontWeight,
+        FontFamilyGeneric,
+        FontPitch,
         XmlName,
         StyleFamily,
         OdfVersion,
