@@ -63,6 +63,11 @@ public class OdfEncryptionInfo
     /// </summary>
     public Dictionary<string, string> ExtensionProperties { get; set; } = new(StringComparer.Ordinal);
 
+    /// <summary>
+    /// 取得 OpenPGP 加密金鑰描述集合，對應 manifest:encrypted-key。
+    /// </summary>
+    public List<OdfOpenPgpEncryptedKeyInfo> OpenPgpEncryptedKeys { get; } = [];
+
     internal bool HasChecksumType { get; set; }
     internal bool HasChecksum { get; set; }
     internal bool HasAlgorithmName { get; set; }
@@ -70,5 +75,57 @@ public class OdfEncryptionInfo
     internal bool HasKeyDerivationName { get; set; }
     internal bool HasIterationCount { get; set; }
     internal bool HasSalt { get; set; }
+}
+
+/// <summary>
+/// 表示 OpenPGP 加密收件者。
+/// </summary>
+public sealed class OdfOpenPgpRecipient
+{
+    /// <summary>
+    /// 取得或設定 OpenPGP 金鑰識別碼。
+    /// </summary>
+    public string KeyId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 取得或設定收件者顯示名稱或電子郵件。
+    /// </summary>
+    public string? Recipient { get; set; }
+
+    /// <summary>
+    /// 取得或設定供自訂提供者使用的公開金鑰資料。
+    /// </summary>
+    public byte[] PublicKey { get; set; } = [];
+}
+
+/// <summary>
+/// 表示 manifest:encrypted-key 中的 OpenPGP 加密金鑰資訊。
+/// </summary>
+public sealed class OdfOpenPgpEncryptedKeyInfo
+{
+    /// <summary>
+    /// 取得或設定 OpenPGP 金鑰識別碼。
+    /// </summary>
+    public string KeyId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 取得或設定收件者顯示名稱或電子郵件。
+    /// </summary>
+    public string? Recipient { get; set; }
+
+    /// <summary>
+    /// 取得或設定加密金鑰演算法名稱。
+    /// </summary>
+    public string AlgorithmName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 取得或設定加密後的工作階段金鑰封包。
+    /// </summary>
+    public byte[] KeyPacket { get; set; } = [];
+
+    /// <summary>
+    /// 取得其他 encrypted-key 擴充屬性。
+    /// </summary>
+    public Dictionary<string, string> ExtensionProperties { get; } = new(StringComparer.Ordinal);
 }
 

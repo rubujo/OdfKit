@@ -24,6 +24,11 @@ public static class OdfEncryption
     public const string BlowfishAlgorithmUri = "http://www.w3.org/2001/04/xmldsig-more#blowfish-cbc";
 
     /// <summary>
+    /// OpenPGP 加密演算法的識別 URI。
+    /// </summary>
+    public const string OpenPgpAlgorithmUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#openpgp";
+
+    /// <summary>
     /// 自訂實作以金鑰為基礎的金鑰衍生函式 PBKDF2，支援 SHA-1 與 SHA-256，確保跨平台行為一致。
     /// </summary>
     /// <param name="password">密碼位元組陣列</param>
@@ -304,6 +309,11 @@ public static class OdfEncryption
             {
                 decryptedPlaintext = cryptoProvider.Decrypt(ciphertext, entry.EncryptionInfo, package.LoadOptions);
             }
+            else if (entry.EncryptionInfo.OpenPgpEncryptedKeys.Count > 0 ||
+                string.Equals(entry.EncryptionInfo.AlgorithmName, OpenPgpAlgorithmUri, StringComparison.Ordinal))
+            {
+                throw new NotSupportedException("OpenPGP 加密項目必須透過 IOdfCryptographyProvider 解密。");
+            }
             else
             {
                 byte[] decryptedBytes = DecryptEntry(
@@ -387,6 +397,11 @@ public static class OdfEncryption
     /// <param name="algorithm">加密演算法，預設為 AES-256</param>
     public static void Encrypt(OdfPackage package, string password, OdfEncryptionAlgorithm algorithm = OdfEncryptionAlgorithm.Aes256)
     {
+        if (algorithm == OdfEncryptionAlgorithm.OpenPgp && package.SaveOptions.CryptographyProvider is null)
+        {
+            throw new NotSupportedException("OpenPGP 加密必須透過 IOdfCryptographyProvider 實作。");
+        }
+
         foreach (var entry in package.Entries.Values)
         {
             string name = entry.Name;

@@ -865,6 +865,40 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                             currentEncryptionInfo.Salt = Convert.FromBase64String(saltStr);
                         }
                     }
+                    else if (reader.LocalName == "encrypted-key" && reader.NamespaceURI == OdfNamespaces.Manifest && currentEncryptionInfo != null)
+                    {
+                        var encryptedKey = new OdfOpenPgpEncryptedKeyInfo
+                        {
+                            KeyId = reader.GetAttribute("key-id", OdfNamespaces.Manifest) ?? reader.GetAttribute("key-id") ?? string.Empty,
+                            Recipient = reader.GetAttribute("recipient", OdfNamespaces.Manifest) ?? reader.GetAttribute("recipient"),
+                            AlgorithmName = reader.GetAttribute("algorithm-name", OdfNamespaces.Manifest) ?? reader.GetAttribute("algorithm-name") ?? string.Empty
+                        };
+
+                        for (int i = 0; i < reader.AttributeCount; i++)
+                        {
+                            reader.MoveToAttribute(i);
+                            if (reader.NamespaceURI == OdfNamespaces.Manifest &&
+                                reader.LocalName is not "key-id" and not "recipient" and not "algorithm-name")
+                            {
+                                encryptedKey.ExtensionProperties[reader.LocalName] = reader.Value;
+                            }
+                        }
+                        reader.MoveToElement();
+
+                        if (reader.IsEmptyElement)
+                        {
+                            currentEncryptionInfo.OpenPgpEncryptedKeys.Add(encryptedKey);
+                            continue;
+                        }
+
+                        string keyPacket = reader.ReadElementContentAsString();
+                        if (!string.IsNullOrWhiteSpace(keyPacket))
+                        {
+                            encryptedKey.KeyPacket = Convert.FromBase64String(keyPacket.Trim());
+                        }
+                        currentEncryptionInfo.OpenPgpEncryptedKeys.Add(encryptedKey);
+                        continue;
+                    }
                     else if (reader.LocalName == "start-key-generation" && reader.NamespaceURI == OdfNamespaces.Manifest && currentEncryptionInfo != null)
                     {
                         string? startKeyGenName = reader.GetAttribute("start-key-generation-name", OdfNamespaces.Manifest) ?? reader.GetAttribute("start-key-generation-name");
@@ -1803,6 +1837,32 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                         writer.WriteAttributeString("manifest", "algorithm-name", OdfNamespaces.Manifest, info.AlgorithmName);
                         writer.WriteAttributeString("manifest", "initialisation-vector", OdfNamespaces.Manifest, Convert.ToBase64String(info.InitialisationVector));
                         writer.WriteEndElement(); // algorithm
+
+                        foreach (var encryptedKey in info.OpenPgpEncryptedKeys)
+                        {
+                            writer.WriteStartElement("encrypted-key", OdfNamespaces.Manifest);
+                            if (!string.IsNullOrEmpty(encryptedKey.KeyId))
+                            {
+                                writer.WriteAttributeString("manifest", "key-id", OdfNamespaces.Manifest, encryptedKey.KeyId);
+                            }
+                            if (!string.IsNullOrEmpty(encryptedKey.Recipient))
+                            {
+                                writer.WriteAttributeString("manifest", "recipient", OdfNamespaces.Manifest, encryptedKey.Recipient);
+                            }
+                            if (!string.IsNullOrEmpty(encryptedKey.AlgorithmName))
+                            {
+                                writer.WriteAttributeString("manifest", "algorithm-name", OdfNamespaces.Manifest, encryptedKey.AlgorithmName);
+                            }
+                            foreach (var prop in encryptedKey.ExtensionProperties)
+                            {
+                                writer.WriteAttributeString("manifest", prop.Key, OdfNamespaces.Manifest, prop.Value);
+                            }
+                            if (encryptedKey.KeyPacket.Length > 0)
+                            {
+                                writer.WriteString(Convert.ToBase64String(encryptedKey.KeyPacket));
+                            }
+                            writer.WriteEndElement(); // encrypted-key
+                        }
 
                         writer.WriteStartElement("key-derivation", OdfNamespaces.Manifest);
                         writer.WriteAttributeString("manifest", "key-derivation-name", OdfNamespaces.Manifest, info.KeyDerivationName);

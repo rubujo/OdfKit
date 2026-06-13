@@ -221,6 +221,63 @@ namespace OdfKit.Tests
             }
         }
 
+        [Fact]
+        public void TestOpenPgpProvider_ManifestEncryptedKeyRoundtrip()
+        {
+            var ms = new MemoryStream();
+            string originalContent = "<content>OpenPGP Provider Data</content>";
+            var provider = new MockOpenPgpCryptographyProvider();
+
+            using (var package = OdfPackage.Create(ms, true))
+            {
+                package.SetMimeType("application/vnd.oasis.opendocument.text");
+                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(originalContent), "text/xml");
+                package.SaveOptions.EncryptionAlgorithm = OdfEncryptionAlgorithm.OpenPgp;
+                package.SaveOptions.CryptographyProvider = provider;
+                package.SaveOptions.OpenPgpRecipients.Add(new OdfOpenPgpRecipient
+                {
+                    KeyId = "0123456789ABCDEF",
+                    Recipient = "測試收件者",
+                    PublicKey = [1, 2, 3]
+                });
+                package.Save();
+            }
+
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms, true))
+            {
+                var info = package.GetEntryEncryptionInfo("content.xml");
+                Assert.NotNull(info);
+                Assert.Equal(OdfEncryption.OpenPgpAlgorithmUri, info.AlgorithmName);
+                var encryptedKey = Assert.Single(info.OpenPgpEncryptedKeys);
+                Assert.Equal("0123456789ABCDEF", encryptedKey.KeyId);
+                Assert.Equal("測試收件者", encryptedKey.Recipient);
+                Assert.Equal(new byte[] { 1, 2, 3 }, encryptedKey.KeyPacket);
+            }
+
+            ms.Position = 0;
+            using (var package = OdfPackage.Open(ms, true, new OdfLoadOptions { CryptographyProvider = provider }))
+            {
+                using var stream = package.GetEntryStream("content.xml");
+                using var reader = new StreamReader(stream, Encoding.UTF8);
+                Assert.Equal(originalContent, reader.ReadToEnd());
+            }
+        }
+
+        [Fact]
+        public void TestOpenPgpWithoutProviderThrows()
+        {
+            using var ms = new MemoryStream();
+            using var package = OdfPackage.Create(ms, true);
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+            package.SaveOptions.EncryptionAlgorithm = OdfEncryptionAlgorithm.OpenPgp;
+            package.SaveOptions.Password = "password";
+
+            var exception = Assert.Throws<NotSupportedException>(() => package.Save());
+            Assert.Equal("OpenPGP 加密必須透過 IOdfCryptographyProvider 實作。", exception.Message);
+        }
+
         private class MockCryptographyProvider : IOdfCryptographyProvider
         {
             public bool CanHandle(OdfEncryptionInfo info)
@@ -257,6 +314,56 @@ namespace OdfKit.Tests
                     IterationCount = 0,
                     Salt = new byte[8]
                 };
+
+                return ciphertext;
+            }
+        }
+
+        private class MockOpenPgpCryptographyProvider : IOdfCryptographyProvider
+        {
+            public bool CanHandle(OdfEncryptionInfo info)
+            {
+                return info.AlgorithmName == OdfEncryption.OpenPgpAlgorithmUri ||
+                    info.OpenPgpEncryptedKeys.Count > 0;
+            }
+
+            public byte[] Decrypt(byte[] ciphertext, OdfEncryptionInfo info, OdfLoadOptions loadOptions)
+            {
+                byte[] plaintext = new byte[ciphertext.Length];
+                for (int i = 0; i < ciphertext.Length; i++)
+                {
+                    plaintext[i] = (byte)(ciphertext[i] ^ 0x33);
+                }
+                return plaintext;
+            }
+
+            public byte[] Encrypt(byte[] plaintext, string entryPath, OdfSaveOptions saveOptions, out OdfEncryptionInfo info)
+            {
+                byte[] ciphertext = new byte[plaintext.Length];
+                for (int i = 0; i < plaintext.Length; i++)
+                {
+                    ciphertext[i] = (byte)(plaintext[i] ^ 0x33);
+                }
+
+                var recipient = saveOptions.OpenPgpRecipients.Single();
+                info = new OdfEncryptionInfo
+                {
+                    AlgorithmName = OdfEncryption.OpenPgpAlgorithmUri,
+                    ChecksumType = "SHA256",
+                    Checksum = OdfEncryption.ComputeHash(plaintext, "SHA256"),
+                    InitialisationVector = [],
+                    KeyDerivationName = "OpenPGP",
+                    KeySize = 0,
+                    IterationCount = 0,
+                    Salt = []
+                };
+                info.OpenPgpEncryptedKeys.Add(new OdfOpenPgpEncryptedKeyInfo
+                {
+                    KeyId = recipient.KeyId,
+                    Recipient = recipient.Recipient,
+                    AlgorithmName = "OpenPGP",
+                    KeyPacket = recipient.PublicKey
+                });
 
                 return ciphertext;
             }

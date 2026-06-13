@@ -15,7 +15,10 @@ public enum OdfEncryptionAlgorithm
     Aes256,
 
     /// <summary>Blowfish 加密演算法</summary>
-    Blowfish
+    Blowfish,
+
+    /// <summary>OpenPGP 加密，須搭配自訂密碼學提供者</summary>
+    OpenPgp
 }
 
 /// <summary>
@@ -93,6 +96,11 @@ public class OdfSaveOptions
     /// 取得或設定自訂的密碼學提供者，用於加密文件項目。
     /// </summary>
     public IOdfCryptographyProvider? CryptographyProvider { get; set; }
+
+    /// <summary>
+    /// 取得 OpenPGP 加密收件者描述，供自訂密碼學提供者使用。
+    /// </summary>
+    public IList<OdfOpenPgpRecipient> OpenPgpRecipients { get; } = [];
 
     /// <summary>
     /// 取得預設的儲存選項執行個體。
