@@ -212,6 +212,11 @@ public static class OdfTypedDomCoverage
             return "character";
         }
 
+        if (resolvedType == typeof(OdfTextEncoding))
+        {
+            return "textEncoding";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";
