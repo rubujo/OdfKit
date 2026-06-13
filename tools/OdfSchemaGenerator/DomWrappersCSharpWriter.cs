@@ -29,6 +29,7 @@ public sealed class DomWrappersCSharpWriter
         writer.WriteLine("using System;");
         writer.WriteLine("using OdfKit.Core;");
         writer.WriteLine("using OdfKit.Compliance;");
+        writer.WriteLine("using OdfKit.Styles;");
         writer.WriteLine();
         writer.WriteLine("namespace OdfKit.DOM");
         writer.WriteLine("{");
@@ -301,6 +302,12 @@ public sealed class DomWrappersCSharpWriter
 
     private static AttributeValueKind InferValueKind(SchemaPatternNodeMetadata node, SchemaMetadata metadata, HashSet<string> visitedRefs)
     {
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            IsLengthReference(node.ReferenceName))
+        {
+            return AttributeValueKind.Length;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -412,6 +419,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetTimeAttributeValue",
                     "SetTimeAttributeValue");
                 break;
+            case AttributeValueKind.Length:
+                writer.WriteLine($"        public OdfLength? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetLengthAttributeValue",
+                    "SetLengthAttributeValue");
+                break;
             case AttributeValueKind.StyleFamily:
                 writer.WriteLine($"        public OdfStyleFamily? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -483,6 +499,17 @@ public sealed class DomWrappersCSharpWriter
             return char.ToUpper(p[0]) + p.Substring(1);
         });
         return string.Join("", pascalParts);
+    }
+
+    private static bool IsLengthReference(string? referenceName)
+    {
+        return referenceName is
+            "length" or
+            "nonNegativeLength" or
+            "positiveLength" or
+            "nonNegativePixelLength" or
+            "percent" or
+            "nonNegativePercent";
     }
 
     private static string? GetNamespacePrefix(string namespaceUri)
@@ -558,6 +585,7 @@ public sealed class DomWrappersCSharpWriter
         Decimal,
         DateTime,
         Time,
+        Length,
         StyleFamily,
         OdfVersion,
         MediaType

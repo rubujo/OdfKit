@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.Styles;
 
 namespace OdfKit.DOM;
 
@@ -109,6 +110,11 @@ public static class OdfTypedDomCoverage
         if (resolvedType == typeof(OdfTime))
         {
             return "time";
+        }
+
+        if (resolvedType == typeof(OdfLength))
+        {
+            return "length";
         }
 
         if (resolvedType == typeof(OdfStyleFamily))

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using OdfKit.Core;
 using OdfKit.Compliance;
+using OdfKit.Styles;
 
 namespace OdfKit.DOM;
 
@@ -221,6 +222,32 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     /// <param name="prefix">選用的命名空間前綴。</param>
     /// <param name="version">ODF 版本內容。</param>
     public void SetTimeAttributeValue(string localName, string namespaceUri, OdfTime value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, value.ToString(), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的長度屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的長度；若屬性不存在或格式無效則為 <see langword="null"/>。</returns>
+    public OdfLength? GetLengthAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return OdfLength.TryParse(value, out OdfLength parsed) ? (OdfLength?)parsed : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的長度屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的長度。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetLengthAttributeValue(string localName, string namespaceUri, OdfLength value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, value.ToString(), prefix, version);
     }
