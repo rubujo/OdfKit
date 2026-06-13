@@ -233,11 +233,13 @@ namespace OdfKit.Tests
         {
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateGrammar(
                 "<define name=\"positive-integer\"><data type=\"positiveInteger\" /></define>" +
+                "<define name=\"boolean\"><choice><value>true</value><value>false</value></choice></define>" +
                 "<define name=\"length\"><data type=\"string\"><param name=\"pattern\">[0-9]+cm</param></data></define>" +
                 "<define name=\"percent\"><data type=\"string\"><param name=\"pattern\">[0-9]+%</param></data></define>" +
                 "<define name=\"angle\"><data type=\"string\" /></define>" +
                 "<define name=\"typed-attributes\"><element name=\"table:calculation-settings\">" +
                 "<attribute name=\"table:number-columns-spanned\"><ref name=\"positive-integer\" /></attribute>" +
+                "<attribute name=\"table:enabled\"><ref name=\"boolean\" /></attribute>" +
                 "<attribute name=\"table:width\"><ref name=\"length\" /></attribute>" +
                 "<attribute name=\"table:scale\"><ref name=\"percent\" /></attribute>" +
                 "<attribute name=\"office:boolean-value\"><data type=\"boolean\" /></attribute>" +
@@ -269,6 +271,9 @@ namespace OdfKit.Tests
             Assert.Contains("public bool? BooleanValue", code);
             Assert.Contains("get => GetBooleanAttributeValue(\"boolean-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetBooleanAttributeValue(\"boolean-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", value.Value, \"office\", GetDocumentVersion());", code);
+            Assert.Contains("public bool? Enabled", code);
+            Assert.Contains("get => GetBooleanAttributeValue(\"enabled\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetBooleanAttributeValue(\"enabled\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", value.Value, \"table\", GetDocumentVersion());", code);
             Assert.Contains("public decimal? Value", code);
             Assert.Contains("get => GetDecimalAttributeValue(\"value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public DateTime? DateValue", code);

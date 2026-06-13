@@ -117,6 +117,7 @@ public class CliTests
         Assert.True(summary.GetProperty("typedElementCount").GetInt32() >= 550);
         Assert.True(summary.GetProperty("schemaAttributeCount").GetInt32() >= 100);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("int").GetInt32() >= 1000);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("bool").GetInt32() >= 10000);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("time").GetInt32() >= 6);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("length").GetInt32() >= 10000);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("duration").GetInt32() >= 1000);

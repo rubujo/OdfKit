@@ -314,6 +314,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.Angle;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "boolean", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.Boolean;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);

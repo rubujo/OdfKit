@@ -25,6 +25,7 @@
 | Generated factory cases | 590 |
 | Generated attribute properties | 100000 |
 | Generated integer attribute properties | 1000 |
+| Generated boolean attribute properties | 10000 |
 | Generated decimal attribute properties | 100 |
 | Generated date/time attribute properties | 100 |
 | Generated time attribute properties | 6 |
@@ -40,7 +41,7 @@
 ## ODFDOM parity gaps
 
 - 尚未產生完整 child collection facade；目前主要是 element wrapper 與 attribute property。
-- Attribute property 目前已有基底 typed helper，且 generated artifact 已包含 integer、decimal、date/dateTime、time、duration、length/percent、angle、style family、ODF version 與 media type 強型別 property；boolean 類屬性多落在手寫 wrapper 或 schema 共用型別邊界，其他 ODF datatype 仍需補齊。
+- Attribute property 目前已有基底 typed helper，且 generated artifact 已包含 integer、boolean、decimal、date/dateTime、time、duration、length/percent、angle、style family、ODF version 與 media type 強型別 property；其他 ODF datatype 仍需補齊。
 - schema-to-wrapper coverage report 已可由 API / CLI 產生，並在 release pipeline 中固定保存 artifact。
 - 尚未對 ODF Toolkit / ODFDOM 的 sample corpus 做逐項 API parity。
 - High-level facade 仍由 Text / Spreadsheet / Presentation / Drawing 等文件模型承接，不直接從 generated DOM 推導。

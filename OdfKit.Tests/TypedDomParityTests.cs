@@ -51,6 +51,7 @@ public class TypedDomParityTests
         int factoryCaseCount = Regex.Matches(generated, "case \".*\": return new .*Element\\(prefix\\);").Count;
         int stringPropertyCount = Regex.Matches(generated, @"public string\? \w+").Count;
         int intPropertyCount = Regex.Matches(generated, @"public int\? \w+").Count;
+        int boolPropertyCount = Regex.Matches(generated, @"public bool\? \w+").Count;
         int decimalPropertyCount = Regex.Matches(generated, @"public decimal\? \w+").Count;
         int dateTimePropertyCount = Regex.Matches(generated, @"public DateTime\? \w+").Count;
         int timePropertyCount = Regex.Matches(generated, @"public OdfTime\? \w+").Count;
@@ -60,12 +61,13 @@ public class TypedDomParityTests
         int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
         int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
         int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + durationPropertyCount + anglePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
+        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + durationPropertyCount + anglePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
         Assert.True(propertyCount >= 100000, "generated attribute property count regressed: " + propertyCount);
         Assert.True(intPropertyCount >= 1000, "generated integer attribute property count regressed: " + intPropertyCount);
+        Assert.True(boolPropertyCount >= 10000, "generated boolean attribute property count regressed: " + boolPropertyCount);
         Assert.True(decimalPropertyCount >= 100, "generated decimal attribute property count regressed: " + decimalPropertyCount);
         Assert.True(dateTimePropertyCount >= 100, "generated date/time attribute property count regressed: " + dateTimePropertyCount);
         Assert.True(timePropertyCount >= 6, "generated time attribute property count regressed: " + timePropertyCount);
@@ -96,6 +98,7 @@ public class TypedDomParityTests
                 element.WrapperType.Contains("TextPElement", StringComparison.Ordinal));
         Assert.Contains(report.AttributeValueTypeCounts, pair => pair.Key.Length > 0 && pair.Value > 0);
         Assert.True(report.WrapperPropertyTypeCounts["int"] >= 1000);
+        Assert.True(report.WrapperPropertyTypeCounts["bool"] >= 10000);
         Assert.True(report.WrapperPropertyTypeCounts["decimal"] >= 100);
         Assert.True(report.WrapperPropertyTypeCounts["dateTime"] >= 100);
         Assert.True(report.WrapperPropertyTypeCounts["time"] >= 6);
@@ -110,6 +113,7 @@ public class TypedDomParityTests
         using JsonDocument document = JsonDocument.Parse(json);
         Assert.Equal(report.SchemaElementCount, document.RootElement.GetProperty("summary").GetProperty("schemaElementCount").GetInt32());
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("int").GetInt32() >= 1000);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("bool").GetInt32() >= 10000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("time").GetInt32() >= 6);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("length").GetInt32() >= 10000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("duration").GetInt32() >= 1000);
