@@ -202,6 +202,11 @@ public static class OdfTypedDomCoverage
             return "languageTag";
         }
 
+        if (resolvedType == typeof(OdfNamespacedToken))
+        {
+            return "namespacedToken";
+        }
+
         if (resolvedType == typeof(OdfXmlName))
         {
             return "xmlName";

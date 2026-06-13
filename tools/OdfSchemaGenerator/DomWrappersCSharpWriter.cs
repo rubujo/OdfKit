@@ -416,6 +416,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.LanguageTag;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "namespacedToken", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.NamespacedToken;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -700,6 +706,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetLanguageTagAttributeValue",
                     "SetLanguageTagAttributeValue");
                 break;
+            case AttributeValueKind.NamespacedToken:
+                writer.WriteLine($"        public OdfNamespacedToken? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetNamespacedTokenAttributeValue",
+                    "SetNamespacedTokenAttributeValue");
+                break;
             case AttributeValueKind.XmlName:
                 writer.WriteLine($"        public OdfXmlName? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -890,6 +905,7 @@ public sealed class DomWrappersCSharpWriter
         CountryCode,
         ScriptCode,
         LanguageTag,
+        NamespacedToken,
         XmlName,
         StyleFamily,
         OdfVersion,
