@@ -81,6 +81,9 @@ public class TypedDomParityTests
         int xLinkTypePropertyCount = Regex.Matches(generated, @"public OdfXLinkType\? \w+").Count;
         int xLinkShowPropertyCount = Regex.Matches(generated, @"public OdfXLinkShow\? \w+").Count;
         int xLinkActuatePropertyCount = Regex.Matches(generated, @"public OdfXLinkActuate\? \w+").Count;
+        int numberStylePropertyCount = Regex.Matches(generated, @"public OdfNumberStyle\? \w+").Count;
+        int tableOrderPropertyCount = Regex.Matches(generated, @"public OdfTableOrder\? \w+").Count;
+        int tableTypePropertyCount = Regex.Matches(generated, @"public OdfTableType\? \w+").Count;
         int lineStylePropertyCount = Regex.Matches(generated, @"public OdfLineStyle\? \w+").Count;
         int lineTypePropertyCount = Regex.Matches(generated, @"public OdfLineType\? \w+").Count;
         int lineWidthPropertyCount = Regex.Matches(generated, @"public OdfLineWidth\? \w+").Count;
@@ -102,7 +105,7 @@ public class TypedDomParityTests
         int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
         int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
         int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + borderWidthsPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + styleNameListPropertyCount + colorPropertyCount + iriReferencePropertyCount + xLinkTypePropertyCount + xLinkShowPropertyCount + xLinkActuatePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + point3DPropertyCount + pointListPropertyCount + languageCodePropertyCount + countryCodePropertyCount + scriptCodePropertyCount + languageTagPropertyCount + namespacedTokenPropertyCount + characterPropertyCount + textEncodingPropertyCount + targetFrameNamePropertyCount + lineStylePropertyCount + lineTypePropertyCount + lineWidthPropertyCount + lineModePropertyCount + fontStylePropertyCount + fontVariantPropertyCount + fontWeightPropertyCount + fontFamilyGenericPropertyCount + fontPitchPropertyCount + fontReliefPropertyCount + fontStretchPropertyCount + styleLineBreakPropertyCount + styleRepeatPropertyCount + styleDirectionPropertyCount + formOrientationPropertyCount + tableDirectionPropertyCount + tableOrientationPropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
+        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + borderWidthsPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + styleNameListPropertyCount + colorPropertyCount + iriReferencePropertyCount + xLinkTypePropertyCount + xLinkShowPropertyCount + xLinkActuatePropertyCount + numberStylePropertyCount + tableOrderPropertyCount + tableTypePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + point3DPropertyCount + pointListPropertyCount + languageCodePropertyCount + countryCodePropertyCount + scriptCodePropertyCount + languageTagPropertyCount + namespacedTokenPropertyCount + characterPropertyCount + textEncodingPropertyCount + targetFrameNamePropertyCount + lineStylePropertyCount + lineTypePropertyCount + lineWidthPropertyCount + lineModePropertyCount + fontStylePropertyCount + fontVariantPropertyCount + fontWeightPropertyCount + fontFamilyGenericPropertyCount + fontPitchPropertyCount + fontReliefPropertyCount + fontStretchPropertyCount + styleLineBreakPropertyCount + styleRepeatPropertyCount + styleDirectionPropertyCount + formOrientationPropertyCount + tableDirectionPropertyCount + tableOrientationPropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -138,6 +141,9 @@ public class TypedDomParityTests
         Assert.True(xLinkTypePropertyCount >= 172, "generated XLink type attribute property count regressed: " + xLinkTypePropertyCount);
         Assert.True(xLinkShowPropertyCount >= 160, "generated XLink show attribute property count regressed: " + xLinkShowPropertyCount);
         Assert.True(xLinkActuatePropertyCount >= 167, "generated XLink actuate attribute property count regressed: " + xLinkActuatePropertyCount);
+        Assert.True(numberStylePropertyCount >= 109, "generated number style attribute property count regressed: " + numberStylePropertyCount);
+        Assert.True(tableOrderPropertyCount >= 108, "generated table order attribute property count regressed: " + tableOrderPropertyCount);
+        Assert.True(tableTypePropertyCount >= 102, "generated table type attribute property count regressed: " + tableTypePropertyCount);
         Assert.True(lineStylePropertyCount >= 534, "generated line style attribute property count regressed: " + lineStylePropertyCount);
         Assert.True(lineTypePropertyCount >= 433, "generated line type attribute property count regressed: " + lineTypePropertyCount);
         Assert.True(lineWidthPropertyCount >= 433, "generated line width attribute property count regressed: " + lineWidthPropertyCount);
@@ -210,6 +216,9 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["xLinkType"] >= 172);
         Assert.True(report.WrapperPropertyTypeCounts["xLinkShow"] >= 160);
         Assert.True(report.WrapperPropertyTypeCounts["xLinkActuate"] >= 167);
+        Assert.True(report.WrapperPropertyTypeCounts["numberStyle"] >= 109);
+        Assert.True(report.WrapperPropertyTypeCounts["tableOrder"] >= 108);
+        Assert.True(report.WrapperPropertyTypeCounts["tableType"] >= 102);
         Assert.True(report.WrapperPropertyTypeCounts["lineStyle"] >= 534);
         Assert.True(report.WrapperPropertyTypeCounts["lineType"] >= 433);
         Assert.True(report.WrapperPropertyTypeCounts["lineWidth"] >= 433);
@@ -264,6 +273,9 @@ public class TypedDomParityTests
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkType").GetInt32() >= 172);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkShow").GetInt32() >= 160);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkActuate").GetInt32() >= 167);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberStyle").GetInt32() >= 109);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableOrder").GetInt32() >= 108);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableType").GetInt32() >= 102);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineStyle").GetInt32() >= 534);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineType").GetInt32() >= 433);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineWidth").GetInt32() >= 433);
@@ -340,6 +352,9 @@ public class TypedDomParityTests
         cell.SetXLinkTypeAttributeValue("type", OdfNamespaces.XLink, OdfXLinkType.Simple, OdfNamespaces.GetPrefix(OdfNamespaces.XLink));
         cell.SetXLinkShowAttributeValue("show", OdfNamespaces.XLink, OdfXLinkShow.Embed, OdfNamespaces.GetPrefix(OdfNamespaces.XLink));
         cell.SetXLinkActuateAttributeValue("actuate", OdfNamespaces.XLink, OdfXLinkActuate.OnLoad, OdfNamespaces.GetPrefix(OdfNamespaces.XLink));
+        cell.SetNumberStyleAttributeValue("style", OdfNamespaces.Number, OdfNumberStyle.Long, OdfNamespaces.GetPrefix(OdfNamespaces.Number));
+        cell.SetTableOrderAttributeValue("order", OdfNamespaces.Table, OdfTableOrder.Descending, OdfNamespaces.GetPrefix(OdfNamespaces.Table));
+        cell.SetTableTypeAttributeValue("type", OdfNamespaces.Table, OdfTableType.RunningTotal, OdfNamespaces.GetPrefix(OdfNamespaces.Table));
         cell.SetLineStyleAttributeValue("text-underline-style", OdfNamespaces.Style, OdfLineStyle.LongDash, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
         cell.SetLineTypeAttributeValue("text-underline-type", OdfNamespaces.Style, OdfLineType.Double, OdfNamespaces.GetPrefix(OdfNamespaces.Style));
         cell.SetLineWidthAttributeValue("text-underline-width", OdfNamespaces.Style, new OdfLineWidth("150%"), OdfNamespaces.GetPrefix(OdfNamespaces.Style));
@@ -421,6 +436,12 @@ public class TypedDomParityTests
         Assert.Equal("embed", cell.GetAttribute("show", OdfNamespaces.XLink));
         Assert.Equal(OdfXLinkActuate.OnLoad, cell.GetXLinkActuateAttributeValue("actuate", OdfNamespaces.XLink));
         Assert.Equal("onLoad", cell.GetAttribute("actuate", OdfNamespaces.XLink));
+        Assert.Equal(OdfNumberStyle.Long, cell.GetNumberStyleAttributeValue("style", OdfNamespaces.Number));
+        Assert.Equal("long", cell.GetAttribute("style", OdfNamespaces.Number));
+        Assert.Equal(OdfTableOrder.Descending, cell.GetTableOrderAttributeValue("order", OdfNamespaces.Table));
+        Assert.Equal("descending", cell.GetAttribute("order", OdfNamespaces.Table));
+        Assert.Equal(OdfTableType.RunningTotal, cell.GetTableTypeAttributeValue("type", OdfNamespaces.Table));
+        Assert.Equal("running-total", cell.GetAttribute("type", OdfNamespaces.Table));
         Assert.Equal(OdfLineStyle.LongDash, cell.GetLineStyleAttributeValue("text-underline-style", OdfNamespaces.Style));
         Assert.Equal("long-dash", cell.GetAttribute("text-underline-style", OdfNamespaces.Style));
         Assert.Equal(OdfLineType.Double, cell.GetLineTypeAttributeValue("text-underline-type", OdfNamespaces.Style));
@@ -529,6 +550,12 @@ public class TypedDomParityTests
         Assert.Null(cell.GetXLinkShowAttributeValue("show", OdfNamespaces.XLink));
         cell.SetAttribute("actuate", OdfNamespaces.XLink, "manual");
         Assert.Null(cell.GetXLinkActuateAttributeValue("actuate", OdfNamespaces.XLink));
+        cell.SetAttribute("style", OdfNamespaces.Number, "medium");
+        Assert.Null(cell.GetNumberStyleAttributeValue("style", OdfNamespaces.Number));
+        cell.SetAttribute("order", OdfNamespaces.Table, "random");
+        Assert.Null(cell.GetTableOrderAttributeValue("order", OdfNamespaces.Table));
+        cell.SetAttribute("type", OdfNamespaces.Table, "custom");
+        Assert.Null(cell.GetTableTypeAttributeValue("type", OdfNamespaces.Table));
         cell.SetAttribute("text-underline-style", OdfNamespaces.Style, "unknown");
         Assert.Null(cell.GetLineStyleAttributeValue("text-underline-style", OdfNamespaces.Style));
         cell.SetAttribute("text-underline-type", OdfNamespaces.Style, "triple");

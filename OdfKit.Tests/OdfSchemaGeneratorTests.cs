@@ -279,6 +279,9 @@ namespace OdfKit.Tests
                 "<attribute name=\"xlink:type\"><value>simple</value></attribute>" +
                 "<attribute name=\"xlink:show\"><choice><value>embed</value><value>new</value><value>none</value><value>replace</value></choice></attribute>" +
                 "<attribute name=\"xlink:actuate\"><choice><value>onLoad</value><value>onRequest</value></choice></attribute>" +
+                "<attribute name=\"number:style\"><choice><value>short</value><value>long</value></choice></attribute>" +
+                "<attribute name=\"table:order\"><choice><value>ascending</value><value>descending</value></choice></attribute>" +
+                "<attribute name=\"table:type\"><choice><value>column</value><value>row</value><value>table</value><value>running-total</value></choice></attribute>" +
                 "<attribute name=\"draw:opacity\"><ref name=\"zeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"draw:shadow-offset\"><ref name=\"signedZeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"table:base-cell-address\"><ref name=\"cellAddress\" /></attribute>" +
@@ -361,12 +364,18 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfIriReference? Href", code);
             Assert.Contains("get => GetIriReferenceAttributeValue(\"href\", \"http://www.w3.org/1999/xlink\", GetDocumentVersion());", code);
             Assert.Contains("SetIriReferenceAttributeValue(\"href\", \"http://www.w3.org/1999/xlink\", value.Value, \"xlink\", GetDocumentVersion());", code);
-            Assert.Contains("public OdfXLinkType? Type", code);
+            Assert.Contains("public OdfXLinkType? XLinkType", code);
             Assert.Contains("get => GetXLinkTypeAttributeValue(\"type\", \"http://www.w3.org/1999/xlink\", GetDocumentVersion());", code);
             Assert.Contains("public OdfXLinkShow? Show", code);
             Assert.Contains("get => GetXLinkShowAttributeValue(\"show\", \"http://www.w3.org/1999/xlink\", GetDocumentVersion());", code);
             Assert.Contains("public OdfXLinkActuate? Actuate", code);
             Assert.Contains("get => GetXLinkActuateAttributeValue(\"actuate\", \"http://www.w3.org/1999/xlink\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfNumberStyle? Style", code);
+            Assert.Contains("get => GetNumberStyleAttributeValue(\"style\", \"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableOrder? Order", code);
+            Assert.Contains("get => GetTableOrderAttributeValue(\"order\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfTableType? TableType", code);
+            Assert.Contains("get => GetTableTypeAttributeValue(\"type\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfPercent? Opacity", code);
             Assert.Contains("get => GetPercentAttributeValue(\"opacity\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetPercentAttributeValue(\"opacity\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);

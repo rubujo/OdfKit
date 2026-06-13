@@ -242,6 +242,21 @@ public static class OdfTypedDomCoverage
             return "xLinkActuate";
         }
 
+        if (resolvedType == typeof(OdfNumberStyle))
+        {
+            return "numberStyle";
+        }
+
+        if (resolvedType == typeof(OdfTableOrder))
+        {
+            return "tableOrder";
+        }
+
+        if (resolvedType == typeof(OdfTableType))
+        {
+            return "tableType";
+        }
+
         if (resolvedType == typeof(OdfLineStyle))
         {
             return "lineStyle";

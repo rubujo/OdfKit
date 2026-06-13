@@ -309,6 +309,24 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.XLinkActuate;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" &&
+            node.LocalName == "style")
+        {
+            return AttributeValueKind.NumberStyle;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "order")
+        {
+            return AttributeValueKind.TableOrder;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:table:1.0" &&
+            node.LocalName == "type")
+        {
+            return AttributeValueKind.TableType;
+        }
+
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
             node.LocalName == "font-relief")
         {
@@ -777,6 +795,33 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetXLinkActuateAttributeValue",
                     "SetXLinkActuateAttributeValue");
+                break;
+            case AttributeValueKind.NumberStyle:
+                writer.WriteLine($"        public OdfNumberStyle? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetNumberStyleAttributeValue",
+                    "SetNumberStyleAttributeValue");
+                break;
+            case AttributeValueKind.TableOrder:
+                writer.WriteLine($"        public OdfTableOrder? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableOrderAttributeValue",
+                    "SetTableOrderAttributeValue");
+                break;
+            case AttributeValueKind.TableType:
+                writer.WriteLine($"        public OdfTableType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetTableTypeAttributeValue",
+                    "SetTableTypeAttributeValue");
                 break;
             case AttributeValueKind.Percent:
                 writer.WriteLine($"        public OdfPercent? {propName}");
@@ -1257,6 +1302,9 @@ public sealed class DomWrappersCSharpWriter
         XLinkType,
         XLinkShow,
         XLinkActuate,
+        NumberStyle,
+        TableOrder,
+        TableType,
         Percent,
         SignedPercent,
         CellAddress,

@@ -513,6 +513,84 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
     }
 
     /// <summary>
+    /// 取得具有 schema awareness 的數字樣式長短屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的數字樣式長短；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfNumberStyle? GetNumberStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseNumberStyle(value, out OdfNumberStyle style) ? style : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的數字樣式長短屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的數字樣式長短。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetNumberStyleAttributeValue(string localName, string namespaceUri, OdfNumberStyle value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatNumberStyle(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的表格排序方向屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的表格排序方向；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTableOrder? GetTableOrderAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTableOrder(value, out OdfTableOrder order) ? order : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的表格排序方向屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的表格排序方向。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTableOrderAttributeValue(string localName, string namespaceUri, OdfTableOrder value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTableOrder(value), prefix, version);
+    }
+
+    /// <summary>
+    /// 取得具有 schema awareness 的表格類型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的表格類型；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    public OdfTableType? GetTableTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return TryParseTableType(value, out OdfTableType type) ? type : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的表格類型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的表格類型。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetTableTypeAttributeValue(string localName, string namespaceUri, OdfTableType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, FormatTableType(value), prefix, version);
+    }
+
+    /// <summary>
     /// 取得具有 schema awareness 的 0 到 100 百分比屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱。</param>
@@ -1991,6 +2069,124 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
             OdfXLinkActuate.OnLoad => "onLoad",
             OdfXLinkActuate.OnRequest => "onRequest",
             _ => throw new ArgumentOutOfRangeException(nameof(actuate), actuate, "未知的 ODF XLink 觸發行為。")
+        };
+    }
+
+    private static bool TryParseNumberStyle(string? value, out OdfNumberStyle style)
+    {
+        switch (value)
+        {
+            case "short":
+                style = OdfNumberStyle.Short;
+                return true;
+            case "long":
+                style = OdfNumberStyle.Long;
+                return true;
+            default:
+                style = default;
+                return false;
+        }
+    }
+
+    private static string FormatNumberStyle(OdfNumberStyle style)
+    {
+        return style switch
+        {
+            OdfNumberStyle.Short => "short",
+            OdfNumberStyle.Long => "long",
+            _ => throw new ArgumentOutOfRangeException(nameof(style), style, "未知的 ODF 數字樣式長短。")
+        };
+    }
+
+    private static bool TryParseTableOrder(string? value, out OdfTableOrder order)
+    {
+        switch (value)
+        {
+            case "ascending":
+                order = OdfTableOrder.Ascending;
+                return true;
+            case "descending":
+                order = OdfTableOrder.Descending;
+                return true;
+            default:
+                order = default;
+                return false;
+        }
+    }
+
+    private static string FormatTableOrder(OdfTableOrder order)
+    {
+        return order switch
+        {
+            OdfTableOrder.Ascending => "ascending",
+            OdfTableOrder.Descending => "descending",
+            _ => throw new ArgumentOutOfRangeException(nameof(order), order, "未知的 ODF 表格排序方向。")
+        };
+    }
+
+    private static bool TryParseTableType(string? value, out OdfTableType type)
+    {
+        switch (value)
+        {
+            case "column":
+                type = OdfTableType.Column;
+                return true;
+            case "row":
+                type = OdfTableType.Row;
+                return true;
+            case "table":
+                type = OdfTableType.Table;
+                return true;
+            case "column-percentage":
+                type = OdfTableType.ColumnPercentage;
+                return true;
+            case "index":
+                type = OdfTableType.Index;
+                return true;
+            case "member-difference":
+                type = OdfTableType.MemberDifference;
+                return true;
+            case "member-percentage":
+                type = OdfTableType.MemberPercentage;
+                return true;
+            case "member-percentage-difference":
+                type = OdfTableType.MemberPercentageDifference;
+                return true;
+            case "none":
+                type = OdfTableType.None;
+                return true;
+            case "row-percentage":
+                type = OdfTableType.RowPercentage;
+                return true;
+            case "running-total":
+                type = OdfTableType.RunningTotal;
+                return true;
+            case "total-percentage":
+                type = OdfTableType.TotalPercentage;
+                return true;
+            default:
+                type = default;
+                return false;
+        }
+    }
+
+    private static string FormatTableType(OdfTableType type)
+    {
+        return type switch
+        {
+            OdfTableType.Column => "column",
+            OdfTableType.Row => "row",
+            OdfTableType.Table => "table",
+            OdfTableType.ColumnPercentage => "column-percentage",
+            OdfTableType.Index => "index",
+            OdfTableType.MemberDifference => "member-difference",
+            OdfTableType.MemberPercentage => "member-percentage",
+            OdfTableType.MemberPercentageDifference => "member-percentage-difference",
+            OdfTableType.None => "none",
+            OdfTableType.RowPercentage => "row-percentage",
+            OdfTableType.RunningTotal => "running-total",
+            OdfTableType.TotalPercentage => "total-percentage",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "未知的 ODF 表格類型。")
         };
     }
 
