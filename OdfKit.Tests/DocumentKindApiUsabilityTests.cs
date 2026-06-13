@@ -72,6 +72,10 @@ public class DocumentKindApiUsabilityTests
 
         Assert.Equal("application/vnd.oasis.opendocument.image", loaded.Package.MimeType);
         Assert.Equal(href, loaded.ImageHref);
+        Assert.NotNull(loaded.ImageInfo);
+        Assert.Equal(href, loaded.ImageInfo.Path);
+        Assert.Equal("image/png", loaded.ImageInfo.MediaType);
+        Assert.Equal(CreatePngBytes().Length, loaded.ImageInfo.Size);
         Assert.True(loaded.Package.HasEntry("Pictures/TinyPng.png"));
     }
 

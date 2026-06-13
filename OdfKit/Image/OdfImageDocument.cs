@@ -74,6 +74,33 @@ public class OdfImageDocument : OdfDocument
     }
 
     /// <summary>
+    /// 取得主要影像的封裝摘要資訊。
+    /// </summary>
+    public OdfImageInfo? ImageInfo
+    {
+        get
+        {
+            string? href = ImageHref;
+            if (string.IsNullOrWhiteSpace(href))
+            {
+                return null;
+            }
+
+            string path = href!;
+            if (!Package.HasEntry(path))
+            {
+                return null;
+            }
+
+            string mediaType = Package.Manifest.TryGetValue(path, out string? manifestMediaType)
+                ? manifestMediaType
+                : string.Empty;
+            long size = Package.ReadEntry(path).LongLength;
+            return new OdfImageInfo(path, mediaType, size);
+        }
+    }
+
+    /// <summary>
     /// 設定 ODI 文件的主要影像。
     /// </summary>
     /// <param name="imageBytes">圖片位元組陣列。</param>
@@ -191,4 +218,28 @@ public class OdfImageDocument : OdfDocument
 
         return null;
     }
+}
+
+/// <summary>
+/// 表示 ODI 主要影像的高階摘要。
+/// </summary>
+/// <param name="path">影像在 ODF 封裝中的路徑。</param>
+/// <param name="mediaType">影像媒體類型。</param>
+/// <param name="size">影像項目位元組大小。</param>
+public sealed class OdfImageInfo(string path, string mediaType, long size)
+{
+    /// <summary>
+    /// 取得影像在 ODF 封裝中的路徑。
+    /// </summary>
+    public string Path { get; } = path ?? throw new ArgumentNullException(nameof(path));
+
+    /// <summary>
+    /// 取得影像媒體類型。
+    /// </summary>
+    public string MediaType { get; } = mediaType ?? string.Empty;
+
+    /// <summary>
+    /// 取得影像項目位元組大小。
+    /// </summary>
+    public long Size { get; } = size;
 }
