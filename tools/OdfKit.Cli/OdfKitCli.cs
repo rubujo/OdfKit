@@ -119,6 +119,7 @@ public static class OdfKitCli
         ValidateCorpusOptions parsedOptions = options ?? throw new InvalidOperationException("validate-corpus options were not parsed.");
         ValidateCorpusManifest manifest = ValidateCorpusManifest.Load(parsedOptions.ManifestPath);
         ValidateBaselineExceptionSet baselineExceptions = ValidateBaselineExceptionSet.Load(parsedOptions.BaselineExceptionsPath);
+        baselineExceptions.EnsureAppliesTo(manifest);
         if (parsedOptions.MetadataOnly)
         {
             WriteValidateCorpusMetadataOnly(output, parsedOptions, manifest, baselineExceptions);
@@ -1546,12 +1547,30 @@ public static class OdfKitCli
             }
 
             List<ValidateBaselineExceptionEntry> parsed = [];
+            HashSet<string> keys = new(StringComparer.OrdinalIgnoreCase);
             foreach (JsonElement item in exceptions.EnumerateArray())
             {
-                parsed.Add(ValidateBaselineExceptionEntry.Parse(item));
+                ValidateBaselineExceptionEntry entry = ValidateBaselineExceptionEntry.Parse(item);
+                if (!keys.Add(entry.Key))
+                {
+                    throw new InvalidDataException("duplicate baseline exception: " + entry.Path);
+                }
+
+                parsed.Add(entry);
             }
 
             return new ValidateBaselineExceptionSet(parsed);
+        }
+
+        public void EnsureAppliesTo(ValidateCorpusManifest manifest)
+        {
+            foreach (ValidateBaselineExceptionEntry entry in entries)
+            {
+                if (!manifest.Fixtures.Any(fixture => entry.MatchesFixturePath(fixture.Path)))
+                {
+                    throw new InvalidDataException("baseline exception does not match any corpus fixture: " + entry.Path);
+                }
+            }
         }
 
         public bool Contains(
@@ -1586,6 +1605,12 @@ public static class OdfKitCli
         string? ProfileId,
         string Reason)
     {
+        public string Key => NormalizePath(Path) + "|" +
+            Baseline.ToString() + "|" +
+            OdfKitIsValid.ToString(CultureInfo.InvariantCulture) + "|" +
+            BaselineIsValid.ToString(CultureInfo.InvariantCulture) + "|" +
+            (ProfileId ?? string.Empty);
+
         public static ValidateBaselineExceptionEntry Parse(JsonElement item)
         {
             if (item.ValueKind != JsonValueKind.Object)
@@ -1619,6 +1644,11 @@ public static class OdfKitCli
                 BaselineIsValid == baselineIsValid &&
                 PathMatches(candidatePath) &&
                 (string.IsNullOrWhiteSpace(ProfileId) || string.Equals(ProfileId, profileId, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public bool MatchesFixturePath(string fixturePath)
+        {
+            return PathMatches(fixturePath);
         }
 
         private bool PathMatches(string candidatePath)

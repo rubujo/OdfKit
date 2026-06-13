@@ -131,4 +131,5 @@ corpus manifest 放在同一資料夾，建議命名為 `baseline-exceptions.jso
 ```
 
 `path` 若只填檔名，會對檔名比對；若包含 `/`，會以正斜線正規化後對完整路徑尾端比對。
+baseline exception 不可重複，且每筆都必須能對應到同一份 corpus manifest 的某個 fixture。
 沒有列入此 manifest 的 baseline mismatch 仍必須讓 parity job 失敗。

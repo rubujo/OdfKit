@@ -931,6 +931,106 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證 baseline exception manifest 不能包含重複例外。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusRejectsDuplicateBaselineExceptions()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string manifest = Path.Combine(root, "manifest.json");
+            string exceptions = Path.Combine(root, "baseline-exceptions.json");
+            WriteCorpusManifest(manifest, "fixture.odt", "valid");
+            File.WriteAllText(
+                exceptions,
+                "{\n" +
+                "  \"exceptions\": [\n" +
+                "    {\n" +
+                "      \"path\": \"fixture.odt\",\n" +
+                "      \"baseline\": \"command\",\n" +
+                "      \"odfKitIsValid\": true,\n" +
+                "      \"baselineIsValid\": false,\n" +
+                "      \"profileId\": \"" + OdfComplianceProfiles.OasisOdf14Extended.Id + "\",\n" +
+                "      \"reason\": \"第一筆。\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"path\": \"fixture.odt\",\n" +
+                "      \"baseline\": \"command\",\n" +
+                "      \"odfKitIsValid\": true,\n" +
+                "      \"baselineIsValid\": false,\n" +
+                "      \"profileId\": \"" + OdfComplianceProfiles.OasisOdf14Extended.Id + "\",\n" +
+                "      \"reason\": \"重複例外。\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n",
+                Encoding.UTF8);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                ["validate-corpus", manifest, "--metadata-only", "--baseline-exceptions", exceptions],
+                output,
+                error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains("duplicate baseline exception", error.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 baseline exception manifest 不能引用 manifest 之外的 fixture。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusRejectsUnusedBaselineExceptions()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string manifest = Path.Combine(root, "manifest.json");
+            string exceptions = Path.Combine(root, "baseline-exceptions.json");
+            WriteCorpusManifest(manifest, "fixture.odt", "valid");
+            File.WriteAllText(
+                exceptions,
+                "{\n" +
+                "  \"exceptions\": [\n" +
+                "    {\n" +
+                "      \"path\": \"missing.odt\",\n" +
+                "      \"baseline\": \"command\",\n" +
+                "      \"odfKitIsValid\": true,\n" +
+                "      \"baselineIsValid\": false,\n" +
+                "      \"profileId\": \"" + OdfComplianceProfiles.OasisOdf14Extended.Id + "\",\n" +
+                "      \"reason\": \"不存在於 manifest 的例外。\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n",
+                Encoding.UTF8);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                ["validate-corpus", manifest, "--metadata-only", "--baseline-exceptions", exceptions],
+                output,
+                error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains("does not match any corpus fixture", error.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
     /// 驗證 validate-corpus 對未文件化的 baseline 分類差異會失敗。
     /// </summary>
     [Fact]

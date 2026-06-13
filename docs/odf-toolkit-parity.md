@@ -134,4 +134,7 @@ corpus 完成線；外部 baseline mismatch 若未列入 documented exception，
 - profile
 - 暫時接受差異的原因
 
+baseline exception 不可重複，且每筆都必須對應到同一份 corpus manifest 的 fixture；
+過期或孤立的 exception 會讓 `validate-corpus` 失敗。
+
 沒有 documented exception 的 mismatch 代表 parity 失敗。
