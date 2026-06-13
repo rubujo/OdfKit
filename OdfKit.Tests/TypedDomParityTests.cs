@@ -959,6 +959,8 @@ public class TypedDomParityTests
         Assert.Contains("Coverage guard", document, StringComparison.Ordinal);
         Assert.Contains("Generated typed element classes", document, StringComparison.Ordinal);
         Assert.Contains("schema-to-wrapper coverage report", document, StringComparison.Ordinal);
+        Assert.Contains("schema-specific child collection", document, StringComparison.Ordinal);
+        Assert.Contains("ODFDOM 風格 sample usage parity tests", document, StringComparison.Ordinal);
     }
 
     private static string FindRepositoryRoot()
