@@ -442,6 +442,25 @@ namespace OdfKit.Tests
             Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
         }
 
+        [Fact]
+        public void OasisOdf14Corpus_Positive_DocumentContentWithOptionalOfficeBlocks()
+        {
+            string content =
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+                "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.4\">" +
+                "<office:font-face-decls/>" +
+                "<office:automatic-styles/>" +
+                "<office:body><office:text><text:p>Official content model order</text:p></office:text></office:body>" +
+                "</office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+
+            LogReport("OasisOdf14Corpus_Positive_DocumentContentWithOptionalOfficeBlocks", report);
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
+        }
+
         [Theory]
         [InlineData(OdfDocumentKind.Text, "document.odt")]
         [InlineData(OdfDocumentKind.Spreadsheet, "workbook.ods")]
@@ -567,6 +586,27 @@ namespace OdfKit.Tests
             Assert.Contains(report.Issues, issue =>
                 issue.RuleId == "ODF3101" &&
                 issue.PackagePath is "content.xml" or "settings.xml");
+        }
+
+        [Fact]
+        public void OasisOdf14Corpus_Negative_DocumentContentOptionalBlocksAfterBody()
+        {
+            string content =
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+                "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.4\">" +
+                "<office:body><office:text><text:p>Body is too early</text:p></office:text></office:body>" +
+                "<office:automatic-styles/>" +
+                "</office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+
+            LogReport("OasisOdf14Corpus_Negative_DocumentContentOptionalBlocksAfterBody", report);
+            Assert.False(report.IsValid);
+            Assert.Contains(report.Issues, issue =>
+                issue.RuleId == "ODF3101" &&
+                issue.PackagePath == "content.xml");
         }
 
         [Fact]
