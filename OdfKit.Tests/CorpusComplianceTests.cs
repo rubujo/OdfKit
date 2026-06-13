@@ -627,5 +627,29 @@ namespace OdfKit.Tests
                 issue.PackagePath == "content.xml" &&
                 issue.XPath == "/office:document-content[1]/office:body[1]/office:text[1]/text:not-in-schema[1]");
         }
+
+        [Fact]
+        public void OasisOdf14Corpus_Negative_StrictOdfNamespaceAttributeExtension()
+        {
+            string content =
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+                "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.4\">" +
+                "<office:body><office:text><text:p text:not-in-schema=\"x\">invalid attribute</text:p></office:text></office:body>" +
+                "</office:document-content>";
+            using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(
+                package,
+                OdfComplianceProfiles.OasisOdf14Strict,
+                "document.odt");
+
+            LogReport("OasisOdf14Corpus_Negative_StrictOdfNamespaceAttributeExtension", report);
+            Assert.False(report.IsValid);
+            Assert.Contains(report.Issues, issue =>
+                issue.RuleId == "DisallowInvalidOdfNamespaceExtensions" &&
+                issue.PackagePath == "content.xml" &&
+                issue.XPath == "/office:document-content[1]/office:body[1]/office:text[1]/text:p[1]/@not-in-schema");
+        }
     }
 }
