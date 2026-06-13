@@ -97,6 +97,8 @@ Corpus manifest 可用 CLI 執行：
 ```powershell
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus tests\fixtures\corpus\manifest.json --format json
 
+.\eng\Test-OdfCorpus.ps1
+
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus manifest.json `
   --root $env:ODFKIT_PARITY_CORPUS_ROOT `
   --baseline odf-validator `

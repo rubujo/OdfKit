@@ -49,6 +49,24 @@ public class OdfToolkitParityReadinessTests
     }
 
     /// <summary>
+    /// 驗證 corpus CI 腳本與 GitHub Actions 入口存在。
+    /// </summary>
+    [Fact]
+    public void CorpusCiEntryPointsExist()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string scriptPath = Path.Combine(repoRoot, "eng", "Test-OdfCorpus.ps1");
+        string workflowPath = Path.Combine(repoRoot, ".github", "workflows", "odf-corpus.yml");
+        string script = File.ReadAllText(scriptPath);
+        string workflow = File.ReadAllText(workflowPath);
+
+        Assert.Contains("validate-corpus", script, StringComparison.Ordinal);
+        Assert.Contains("ODFKIT_PARITY_CORPUS_ROOT", script, StringComparison.Ordinal);
+        Assert.Contains("ODFKIT_ODFVALIDATOR_JAR", script, StringComparison.Ordinal);
+        Assert.Contains("Test-OdfCorpus.ps1", workflow, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// 驗證 repo 內可提交 corpus manifest 可由 CLI 直接執行。
     /// </summary>
     [Fact]

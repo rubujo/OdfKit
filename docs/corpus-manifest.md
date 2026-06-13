@@ -74,6 +74,15 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus man
   --format json
 ```
 
+repo 也提供 CI 與本機共用腳本：
+
+```powershell
+.\eng\Test-OdfCorpus.ps1
+```
+
+此腳本必定執行內建 corpus；若設定 `ODFKIT_PARITY_CORPUS_ROOT`，則會同時執行外部 corpus。
+若再設定 `ODFKIT_ODFVALIDATOR_JAR`，外部 corpus 會加上 ODF Validator baseline。
+
 `validate-corpus` 會讀取 `fixtures` 陣列，逐一比對 `expected` 的 `valid` / `invalid`
 classification、`kind` 文件種類與 `version` ODF 版本。任一 fixture 與 manifest 宣告不一致，
 或未文件化的外部 baseline mismatch，都會讓 exit code 為 `1`。
