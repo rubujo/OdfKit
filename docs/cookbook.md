@@ -120,6 +120,30 @@ Console.WriteLine(loadedDrawing.Pages[0].Shapes[0].LocalName);
 Console.WriteLine(loadedDrawing.Pages[0].TextBoxes[0].Text);
 ```
 
+## 建立 ODI 影像文件
+
+```csharp
+using OdfKit.Image;
+using OdfKit.Styles;
+
+byte[] bytes = File.ReadAllBytes("photo.png");
+using OdfImageDocument image = OdfImageDocument.Create();
+image.SetImageLayout(
+    OdfLength.FromCentimeters(1),
+    OdfLength.FromCentimeters(2),
+    OdfLength.FromCentimeters(6),
+    OdfLength.FromCentimeters(4),
+    "ProductImage",
+    "產品照片",
+    "一張用於型錄的產品照片。");
+image.SetImage(bytes, "photo.png");
+image.Save("photo.odi");
+
+using OdfImageDocument loadedImage = OdfImageDocument.Load("photo.odi");
+Console.WriteLine(loadedImage.FrameTitle);
+Console.WriteLine(loadedImage.FrameWidth);
+```
+
 ## 建立 ODB 資料來源描述
 
 ```csharp

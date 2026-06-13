@@ -10,6 +10,7 @@ using OdfKit.Formula;
 using OdfKit.Image;
 using OdfKit.Presentation;
 using OdfKit.Spreadsheet;
+using OdfKit.Styles;
 using OdfKit.Text;
 using Xunit;
 
@@ -187,17 +188,39 @@ public class DocumentKindApiUsabilityTests
     {
         using var image = OdfImageDocument.Create();
         byte[] bytes = CreatePngBytes();
+        image.SetImageLayout(
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(2),
+            OdfLength.FromCentimeters(6),
+            OdfLength.FromCentimeters(4),
+            "ProductImage",
+            "產品照片",
+            "一張用於型錄的產品照片。");
         string href = image.SetImage(bytes, "TinyPng.png");
 
         using OdfImageDocument loaded = RoundTrip(image, "image.odi", OdfImageDocument.Load);
+        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "image.odi");
 
         Assert.Equal("application/vnd.oasis.opendocument.image", loaded.Package.MimeType);
+        Assert.True(report.IsValid, report.ToJson());
         Assert.Equal(href, loaded.ImageHref);
         Assert.NotNull(loaded.ImageInfo);
         Assert.Equal(href, loaded.ImageInfo.Path);
         Assert.Equal("image/png", loaded.ImageInfo.MediaType);
         Assert.Equal(bytes.Length, loaded.ImageInfo.Size);
         Assert.Equal(bytes, loaded.GetImageBytes());
+        Assert.Equal("ProductImage", loaded.FrameName);
+        Assert.Equal("產品照片", loaded.FrameTitle);
+        Assert.Equal("一張用於型錄的產品照片。", loaded.FrameDescription);
+        Assert.Equal(OdfLength.FromCentimeters(1), loaded.FrameX);
+        Assert.Equal(OdfLength.FromCentimeters(2), loaded.FrameY);
+        Assert.Equal(OdfLength.FromCentimeters(6), loaded.FrameWidth);
+        Assert.Equal(OdfLength.FromCentimeters(4), loaded.FrameHeight);
+        Assert.Equal(
+            "6cm",
+            FindDescendant(loaded.ImageNode, "frame", OdfNamespaces.Draw)?.GetAttribute("width", OdfNamespaces.Svg));
+        Assert.Equal("產品照片", FindDescendant(loaded.ImageNode, "title", OdfNamespaces.Svg)?.TextContent);
+        Assert.Equal("一張用於型錄的產品照片。", FindDescendant(loaded.ImageNode, "desc", OdfNamespaces.Svg)?.TextContent);
         Assert.True(loaded.Package.HasEntry("Pictures/TinyPng.png"));
     }
 

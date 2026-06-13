@@ -902,7 +902,16 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                 return false;
             }
 
-            var parts = path.Split('/');
+            string normalized = path.EndsWith("/", StringComparison.Ordinal)
+                ? path.Substring(0, path.Length - 1)
+                : path;
+
+            if (normalized.Length == 0)
+            {
+                return false;
+            }
+
+            var parts = normalized.Split('/');
             foreach (var part in parts)
             {
                 if (part.Length == 0 || part == "." || part == "..")

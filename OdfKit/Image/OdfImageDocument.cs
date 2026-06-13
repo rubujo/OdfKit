@@ -4,6 +4,7 @@ using System.IO;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Styles;
 
 namespace OdfKit.Image;
 
@@ -62,6 +63,11 @@ public class OdfImageDocument : OdfDocument
     public OdfNode ImageNode => GetImageNode();
 
     /// <summary>
+    /// 取得主要影像框架節點。
+    /// </summary>
+    public OdfNode? ImageFrame => FindPrimaryFrame(GetImageNode());
+
+    /// <summary>
     /// 取得主要影像參照路徑。
     /// </summary>
     public string? ImageHref
@@ -101,6 +107,69 @@ public class OdfImageDocument : OdfDocument
     }
 
     /// <summary>
+    /// 取得或設定主要影像框架名稱。
+    /// </summary>
+    public string? FrameName
+    {
+        get => ImageFrame?.GetAttribute("name", OdfNamespaces.Draw);
+        set => SetOptionalAttribute(EnsurePrimaryFrame(), "name", OdfNamespaces.Draw, value, "draw");
+    }
+
+    /// <summary>
+    /// 取得或設定主要影像框架標題。
+    /// </summary>
+    public string? FrameTitle
+    {
+        get => GetOptionalChildText(ImageFrame, "title", OdfNamespaces.Svg);
+        set => SetOptionalChildText(EnsurePrimaryFrame(), "title", OdfNamespaces.Svg, "svg", value);
+    }
+
+    /// <summary>
+    /// 取得或設定主要影像框架描述。
+    /// </summary>
+    public string? FrameDescription
+    {
+        get => GetOptionalChildText(ImageFrame, "desc", OdfNamespaces.Svg);
+        set => SetOptionalChildText(EnsurePrimaryFrame(), "desc", OdfNamespaces.Svg, "svg", value);
+    }
+
+    /// <summary>
+    /// 取得或設定主要影像框架的 X 軸座標位置。
+    /// </summary>
+    public OdfLength? FrameX
+    {
+        get => GetOptionalLength(ImageFrame, "x");
+        set => SetOptionalLength(EnsurePrimaryFrame(), "x", value);
+    }
+
+    /// <summary>
+    /// 取得或設定主要影像框架的 Y 軸座標位置。
+    /// </summary>
+    public OdfLength? FrameY
+    {
+        get => GetOptionalLength(ImageFrame, "y");
+        set => SetOptionalLength(EnsurePrimaryFrame(), "y", value);
+    }
+
+    /// <summary>
+    /// 取得或設定主要影像框架寬度。
+    /// </summary>
+    public OdfLength? FrameWidth
+    {
+        get => GetOptionalLength(ImageFrame, "width");
+        set => SetOptionalLength(EnsurePrimaryFrame(), "width", value);
+    }
+
+    /// <summary>
+    /// 取得或設定主要影像框架高度。
+    /// </summary>
+    public OdfLength? FrameHeight
+    {
+        get => GetOptionalLength(ImageFrame, "height");
+        set => SetOptionalLength(EnsurePrimaryFrame(), "height", value);
+    }
+
+    /// <summary>
     /// 取得主要影像的位元組內容。
     /// </summary>
     /// <returns>主要影像位元組；若文件未參照封裝內影像則為 <see langword="null"/>。</returns>
@@ -127,21 +196,69 @@ public class OdfImageDocument : OdfDocument
         string href = mediaManager.AddImage(imageBytes, preferredName);
 
         OdfNode imageRoot = GetImageNode();
+        OdfNode? existingFrame = FindPrimaryFrame(imageRoot);
         foreach (OdfNode child in new List<OdfNode>(imageRoot.Children))
         {
-            imageRoot.RemoveChild(child);
+            if (!ReferenceEquals(child, existingFrame))
+            {
+                imageRoot.RemoveChild(child);
+            }
         }
 
-        OdfNode frame = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
+        OdfNode frame = existingFrame ?? OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
+        foreach (OdfNode child in new List<OdfNode>(frame.Children))
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName is "title" or "desc" &&
+                child.NamespaceUri == OdfNamespaces.Svg)
+            {
+                continue;
+            }
+
+            frame.RemoveChild(child);
+        }
+
         OdfNode image = OdfNodeFactory.CreateElement("image", OdfNamespaces.Draw, "draw");
         image.SetAttribute("href", OdfNamespaces.XLink, href, "xlink");
         image.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
         image.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
         image.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
         frame.AppendChild(image);
-        imageRoot.AppendChild(frame);
+        if (frame.Parent is null)
+        {
+            imageRoot.AppendChild(frame);
+        }
 
         return href;
+    }
+
+    /// <summary>
+    /// 設定主要影像框架的版面與替代文字。
+    /// </summary>
+    /// <param name="x">X 軸座標位置。</param>
+    /// <param name="y">Y 軸座標位置。</param>
+    /// <param name="width">框架寬度。</param>
+    /// <param name="height">框架高度。</param>
+    /// <param name="name">選用的框架名稱。</param>
+    /// <param name="title">選用的框架標題。</param>
+    /// <param name="description">選用的框架描述。</param>
+    public void SetImageLayout(
+        OdfLength x,
+        OdfLength y,
+        OdfLength width,
+        OdfLength height,
+        string? name = null,
+        string? title = null,
+        string? description = null)
+    {
+        OdfNode frame = EnsurePrimaryFrame();
+        SetOptionalLength(frame, "x", x);
+        SetOptionalLength(frame, "y", y);
+        SetOptionalLength(frame, "width", width);
+        SetOptionalLength(frame, "height", height);
+        SetOptionalAttribute(frame, "name", OdfNamespaces.Draw, name, "draw");
+        SetOptionalChildText(frame, "title", OdfNamespaces.Svg, "svg", title);
+        SetOptionalChildText(frame, "desc", OdfNamespaces.Svg, "svg", description);
     }
 
     private static OdfImageDocument EnsureImage(OdfDocument document)
@@ -164,6 +281,7 @@ public class OdfImageDocument : OdfDocument
         return "<office:document-content " +
             "xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
             "xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" " +
+            "xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\" " +
             "xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
             "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
             "<office:body><office:image /></office:body>" +
@@ -211,6 +329,106 @@ public class OdfImageDocument : OdfDocument
     {
         OdfNode body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
         return FindOrCreateChild(body, "image", OdfNamespaces.Office, "office");
+    }
+
+    private OdfNode EnsurePrimaryFrame()
+    {
+        OdfNode imageRoot = GetImageNode();
+        OdfNode? frame = FindPrimaryFrame(imageRoot);
+        if (frame is not null)
+        {
+            return frame;
+        }
+
+        frame = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
+        imageRoot.AppendChild(frame);
+        return frame;
+    }
+
+    private static OdfNode? FindPrimaryFrame(OdfNode imageRoot) =>
+        FindDescendant(imageRoot, "frame", OdfNamespaces.Draw);
+
+    private static OdfLength? GetOptionalLength(OdfNode? frame, string localName)
+    {
+        string? value = frame?.GetAttribute(localName, OdfNamespaces.Svg);
+        return OdfLength.TryParse(value, out OdfLength length) ? length : (OdfLength?)null;
+    }
+
+    private static void SetOptionalLength(OdfNode frame, string localName, OdfLength? value)
+    {
+        if (value.HasValue)
+        {
+            frame.SetAttribute(localName, OdfNamespaces.Svg, value.Value.ToString(), "svg");
+            return;
+        }
+
+        frame.RemoveAttribute(localName, OdfNamespaces.Svg);
+    }
+
+    private static void SetOptionalAttribute(OdfNode node, string localName, string namespaceUri, string? value, string prefix)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            node.RemoveAttribute(localName, namespaceUri);
+            return;
+        }
+
+        node.SetAttribute(localName, namespaceUri, value!, prefix);
+    }
+
+    private static string? GetOptionalChildText(OdfNode? node, string localName, string namespaceUri)
+    {
+        OdfNode? child = node is null ? null : FindChild(node, localName, namespaceUri);
+        return child is null || string.IsNullOrEmpty(child.TextContent) ? null : child.TextContent;
+    }
+
+    private static void SetOptionalChildText(
+        OdfNode node,
+        string localName,
+        string namespaceUri,
+        string prefix,
+        string? value)
+    {
+        OdfNode? child = FindChild(node, localName, namespaceUri);
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            if (child is not null)
+            {
+                node.RemoveChild(child);
+            }
+
+            return;
+        }
+
+        child ??= OdfNodeFactory.CreateElement(localName, namespaceUri, prefix);
+        child.TextContent = value!;
+        if (child.Parent is null)
+        {
+            OdfNode? image = FindChild(node, "image", OdfNamespaces.Draw);
+            if (image is not null)
+            {
+                node.InsertBefore(child, image);
+            }
+            else
+            {
+                node.AppendChild(child);
+            }
+        }
+    }
+
+    private static OdfNode? FindChild(OdfNode node, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     private static OdfNode? FindDescendant(OdfNode node, string localName, string namespaceUri)

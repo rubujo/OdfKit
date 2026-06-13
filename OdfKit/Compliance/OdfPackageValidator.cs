@@ -250,7 +250,12 @@ public static class OdfPackageValidator
             return false;
         }
 
-        return path.Split('/').All(part => part.Length > 0 && part != "." && part != "..");
+        string normalized = path.EndsWith("/", StringComparison.Ordinal)
+            ? path.Substring(0, path.Length - 1)
+            : path;
+
+        return normalized.Length > 0 &&
+            normalized.Split('/').All(part => part.Length > 0 && part != "." && part != "..");
     }
 
     private static void ValidateManifest(
