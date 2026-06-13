@@ -164,6 +164,23 @@ Console.WriteLine(loadedChart.XAxisTitle);
 Console.WriteLine(loadedChart.Series[0].ValuesCellRangeAddress);
 ```
 
+## 建立 ODF 公式
+
+```csharp
+using OdfKit.Formula;
+
+using OdfFormulaDocument formula = OdfFormulaDocument.Create();
+formula.SetMathRow(
+    OdfMathToken.Identifier("x"),
+    OdfMathToken.Operator("="),
+    OdfMathToken.Number("1"));
+formula.Save("equation.odf");
+
+using OdfFormulaDocument loadedFormula = OdfFormulaDocument.Load("equation.odf");
+Console.WriteLine(loadedFormula.MathText);
+Console.WriteLine(loadedFormula.MathTokens[0].Text);
+```
+
 ## 建立 ODB 資料來源描述
 
 ```csharp

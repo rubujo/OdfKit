@@ -13,6 +13,8 @@ namespace OdfKit.Formula;
 /// </summary>
 public class OdfFormulaDocument : OdfDocument
 {
+    private const string MathMlNamespace = "http://www.w3.org/1998/Math/MathML";
+
     /// <summary>
     /// 使用指定的 ODF 封裝初始化 <see cref="OdfFormulaDocument"/> 類別的新執行個體。
     /// </summary>
@@ -74,12 +76,17 @@ public class OdfFormulaDocument : OdfDocument
     /// <summary>
     /// 取得目前的 MathML 根節點。
     /// </summary>
-    public OdfNode MathNode => FindOrCreateChild(GetFormulaNode(), "math", "http://www.w3.org/1998/Math/MathML", "math");
+    public OdfNode MathNode => FindOrCreateChild(GetFormulaNode(), "math", MathMlNamespace, "math");
 
     /// <summary>
     /// 取得 MathML 內容的純文字摘要。
     /// </summary>
     public string MathText => MathNode.TextContent;
+
+    /// <summary>
+    /// 取得目前 MathML row 中可辨識的 token 摘要。
+    /// </summary>
+    public IReadOnlyList<OdfMathToken> MathTokens => GetMathTokens();
 
     /// <summary>
     /// 取得或設定完整 MathML XML 字串。
@@ -113,7 +120,7 @@ public class OdfFormulaDocument : OdfDocument
 
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(mathMlXml));
         OdfNode math = OdfXmlReader.Parse(stream);
-        if (math.LocalName != "math" || math.NamespaceUri != "http://www.w3.org/1998/Math/MathML")
+        if (math.LocalName != "math" || math.NamespaceUri != MathMlNamespace)
         {
             throw new ArgumentException("MathML 根節點必須是 math:math。", nameof(mathMlXml));
         }
@@ -126,6 +133,63 @@ public class OdfFormulaDocument : OdfDocument
 
         formula.AppendChild(math);
         return math;
+    }
+
+    /// <summary>
+    /// 以一組語意 token 建立 MathML row。
+    /// </summary>
+    /// <param name="tokens">要寫入 row 的 MathML token。</param>
+    /// <returns>匯入後的 MathML 根節點。</returns>
+    /// <exception cref="ArgumentException">當 <paramref name="tokens"/> 為空時擲出。</exception>
+    /// <exception cref="ArgumentNullException">當任一 token 為 <see langword="null"/> 時擲出。</exception>
+    public OdfNode SetMathRow(params OdfMathToken[] tokens)
+    {
+        if (tokens is null)
+        {
+            throw new ArgumentNullException(nameof(tokens));
+        }
+
+        if (tokens.Length == 0)
+        {
+            throw new ArgumentException("MathML token 不能為空。", nameof(tokens));
+        }
+
+        OdfNode math = OdfNodeFactory.CreateElement("math", MathMlNamespace, "math");
+        OdfNode row = OdfNodeFactory.CreateElement("mrow", MathMlNamespace, "math");
+        foreach (OdfMathToken token in tokens)
+        {
+            if (token is null)
+            {
+                throw new ArgumentNullException(nameof(tokens), "MathML token 不能為 null。");
+            }
+
+            row.AppendChild(CreateMathTokenNode(token));
+        }
+
+        math.AppendChild(row);
+
+        OdfNode formula = GetFormulaNode();
+        foreach (OdfNode child in new List<OdfNode>(formula.Children))
+        {
+            formula.RemoveChild(child);
+        }
+
+        formula.AppendChild(math);
+        return math;
+    }
+
+    /// <summary>
+    /// 建立以識別名稱等於另一個識別名稱的簡單 MathML 等式。
+    /// </summary>
+    /// <param name="leftIdentifier">等號左側識別名稱。</param>
+    /// <param name="rightIdentifier">等號右側識別名稱。</param>
+    /// <returns>匯入後的 MathML 根節點。</returns>
+    public OdfNode SetIdentifierEquation(string leftIdentifier, string rightIdentifier)
+    {
+        return SetMathRow(
+            OdfMathToken.Identifier(leftIdentifier),
+            OdfMathToken.Operator("="),
+            OdfMathToken.Identifier(rightIdentifier));
     }
 
     private static OdfFormulaDocument EnsureFormula(OdfDocument document)
@@ -203,4 +267,144 @@ public class OdfFormulaDocument : OdfDocument
         OdfNode body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
         return FindOrCreateChild(body, "formula", OdfNamespaces.Office, "office");
     }
+
+    private IReadOnlyList<OdfMathToken> GetMathTokens()
+    {
+        OdfNode math = MathNode;
+        OdfNode tokenParent = FindChildElement(math, "mrow", MathMlNamespace) ?? math;
+        List<OdfMathToken> tokens = [];
+        foreach (OdfNode child in tokenParent.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != MathMlNamespace)
+            {
+                continue;
+            }
+
+            OdfMathToken? token = CreateTokenOrDefault(child);
+            if (token is not null)
+            {
+                tokens.Add(token);
+            }
+        }
+
+        return tokens.AsReadOnly();
+    }
+
+    private static OdfNode CreateMathTokenNode(OdfMathToken token)
+    {
+        OdfNode node = OdfNodeFactory.CreateElement(GetMathTokenElementName(token.Kind), MathMlNamespace, "math");
+        node.TextContent = token.Text;
+        return node;
+    }
+
+    private static OdfMathToken? CreateTokenOrDefault(OdfNode node)
+    {
+        return node.LocalName switch
+        {
+            "mi" => OdfMathToken.Identifier(node.TextContent),
+            "mn" => OdfMathToken.Number(node.TextContent),
+            "mo" => OdfMathToken.Operator(node.TextContent),
+            "mtext" => OdfMathToken.TextToken(node.TextContent),
+            _ => null
+        };
+    }
+
+    private static string GetMathTokenElementName(OdfMathTokenKind kind)
+    {
+        return kind switch
+        {
+            OdfMathTokenKind.Identifier => "mi",
+            OdfMathTokenKind.Number => "mn",
+            OdfMathTokenKind.Operator => "mo",
+            OdfMathTokenKind.Text => "mtext",
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "未知的 MathML token 類型。")
+        };
+    }
+
+    private static OdfNode? FindChildElement(OdfNode parent, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+}
+
+/// <summary>
+/// 表示可由高階公式 API 寫入的 MathML token 類型。
+/// </summary>
+public enum OdfMathTokenKind
+{
+    /// <summary>
+    /// MathML <c>mi</c> 識別名稱。
+    /// </summary>
+    Identifier,
+
+    /// <summary>
+    /// MathML <c>mn</c> 數值。
+    /// </summary>
+    Number,
+
+    /// <summary>
+    /// MathML <c>mo</c> 運算子。
+    /// </summary>
+    Operator,
+
+    /// <summary>
+    /// MathML <c>mtext</c> 文字。
+    /// </summary>
+    Text
+}
+
+/// <summary>
+/// 表示一個簡易 MathML token。
+/// </summary>
+/// <param name="kind">token 類型。</param>
+/// <param name="text">token 文字。</param>
+public sealed class OdfMathToken(OdfMathTokenKind kind, string text)
+{
+    /// <summary>
+    /// 取得 token 類型。
+    /// </summary>
+    public OdfMathTokenKind Kind { get; } = kind;
+
+    /// <summary>
+    /// 取得 token 文字。
+    /// </summary>
+    public string Text { get; } = text ?? throw new ArgumentNullException(nameof(text));
+
+    /// <summary>
+    /// 建立 MathML <c>mi</c> 識別名稱 token。
+    /// </summary>
+    /// <param name="text">識別名稱文字。</param>
+    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    public static OdfMathToken Identifier(string text) => new(OdfMathTokenKind.Identifier, text);
+
+    /// <summary>
+    /// 建立 MathML <c>mn</c> 數值 token。
+    /// </summary>
+    /// <param name="text">數值文字。</param>
+    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    public static OdfMathToken Number(string text) => new(OdfMathTokenKind.Number, text);
+
+    /// <summary>
+    /// 建立 MathML <c>mo</c> 運算子 token。
+    /// </summary>
+    /// <param name="text">運算子文字。</param>
+    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    public static OdfMathToken Operator(string text) => new(OdfMathTokenKind.Operator, text);
+
+    /// <summary>
+    /// 建立 MathML <c>mtext</c> 文字 token。
+    /// </summary>
+    /// <param name="text">文字內容。</param>
+    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    public static OdfMathToken TextToken(string text) => new(OdfMathTokenKind.Text, text);
 }

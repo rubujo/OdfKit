@@ -175,22 +175,35 @@ public class DocumentKindApiUsabilityTests
     }
 
     /// <summary>
-    /// 驗證 ODF 公式文件可設定 MathML 並 round-trip。
+    /// 驗證 ODF 公式文件可用語意 token 建立 MathML 並 round-trip。
     /// </summary>
     [Fact]
     public void CreateLoadFormulaWithMathMlRoot()
     {
         using var formula = OdfFormulaDocument.Create();
-        formula.MathMlXml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow></math>";
+        formula.SetMathRow(
+            OdfMathToken.Identifier("x"),
+            OdfMathToken.Operator("="),
+            OdfMathToken.Number("1"));
 
         using OdfFormulaDocument loaded = RoundTrip(formula, "formula.odf", OdfFormulaDocument.Load);
+        OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "formula.odf");
 
         Assert.Equal("application/vnd.oasis.opendocument.formula", loaded.Package.MimeType);
+        Assert.True(report.IsValid, report.ToJson());
         Assert.Equal("math", loaded.MathNode.LocalName);
+        Assert.Equal("http://www.w3.org/1998/Math/MathML", loaded.MathNode.NamespaceUri);
         Assert.Equal("x=1", loaded.MathText);
-        Assert.Contains("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"", loaded.MathMlXml, StringComparison.Ordinal);
-        Assert.Contains("<mi>x</mi>", loaded.MathMlXml, StringComparison.Ordinal);
+        Assert.Equal(3, loaded.MathTokens.Count);
+        Assert.Equal(OdfMathTokenKind.Identifier, loaded.MathTokens[0].Kind);
+        Assert.Equal("x", loaded.MathTokens[0].Text);
+        Assert.Equal(OdfMathTokenKind.Operator, loaded.MathTokens[1].Kind);
+        Assert.Equal("=", loaded.MathTokens[1].Text);
+        Assert.Equal(OdfMathTokenKind.Number, loaded.MathTokens[2].Kind);
+        Assert.Equal("1", loaded.MathTokens[2].Text);
         Assert.Equal("x", FindDescendant(loaded.MathNode, "mi", "http://www.w3.org/1998/Math/MathML")?.TextContent);
+        Assert.Equal("=", FindDescendant(loaded.MathNode, "mo", "http://www.w3.org/1998/Math/MathML")?.TextContent);
+        Assert.Equal("1", FindDescendant(loaded.MathNode, "mn", "http://www.w3.org/1998/Math/MathML")?.TextContent);
     }
 
     /// <summary>
