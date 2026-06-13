@@ -73,6 +73,18 @@
       "notes": "Small repo-local negative fixture covering duplicate style:columns inside ODF 1.4 style:page-layout-properties interleave content."
     },
     {
+      "id": "repo-generated-mathml-formula",
+      "path": "generated/mathml-formula.odf",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "Formula",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local flat XML fixture covering office:formula with MathML content."
+    },
+    {
       "id": "repo-generated-minimal-text",
       "path": "generated/minimal-text.odt",
       "source": "generated",
