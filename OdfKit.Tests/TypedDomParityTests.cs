@@ -38,6 +38,50 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 typed DOM 可用 ODFDOM 風格建立、插入、列舉並 round-trip 子元素。
+    /// </summary>
+    [Fact]
+    public void TypedDomChildFacadeSupportsOdfDomStyleUserStory()
+    {
+        OfficeDocumentContentElement document = new("office");
+        document.SetOdfVersionAttributeValue("version", OdfNamespaces.Office, OdfVersion.Odf14, "office");
+        OfficeBodyElement body = document.AppendElement(new OfficeBodyElement("office"));
+        OfficeTextElement text = body.AppendElement(new OfficeTextElement("office"));
+        TextPElement paragraph = text.AppendElement(new TextPElement("text"));
+        TextSpanElement emphasis = paragraph.AppendElement(new TextSpanElement("text"));
+        AnimationAnimateElement animation = paragraph.AppendElement(new AnimationAnimateElement("anim"));
+        TextSpanElement prefix = paragraph.InsertElementBefore(new TextSpanElement("text"), emphasis);
+        TextSpanElement suffix = paragraph.InsertElementAfter(new TextSpanElement("text"), emphasis);
+
+        prefix.TextContent = "Hello ";
+        emphasis.StyleName = "Emphasis";
+        emphasis.TextContent = "typed DOM";
+        suffix.TextContent = "!";
+        animation.Formula = "width * 2";
+
+        Assert.Same(body, document.ChildElements<OfficeBodyElement>().Single());
+        Assert.Same(paragraph, document.DescendantElements<TextPElement>().Single());
+        Assert.Equal([prefix, emphasis, suffix], paragraph.ChildElements<TextSpanElement>().ToArray());
+        Assert.Same(animation, paragraph.ChildElements<AnimationAnimateElement>().Single());
+        Assert.Equal("Hello typed DOM!", paragraph.TextContent);
+
+        using MemoryStream stream = new();
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OdfNode parsed = OdfXmlReader.Parse(stream);
+        OfficeDocumentContentElement parsedDocument = Assert.IsType<OfficeDocumentContentElement>(parsed);
+        TextPElement parsedParagraph = parsedDocument.DescendantElements<TextPElement>().Single();
+        TextSpanElement parsedEmphasis = parsedParagraph.ChildElements<TextSpanElement>().ElementAt(1);
+        AnimationAnimateElement parsedAnimation = parsedParagraph.ChildElements<AnimationAnimateElement>().Single();
+
+        Assert.Equal("typed DOM", parsedEmphasis.TextContent);
+        Assert.Equal("Emphasis", parsedEmphasis.StyleName);
+        Assert.Equal("width * 2", parsedAnimation.Formula);
+        Assert.Equal("Hello typed DOM!", parsedParagraph.TextContent);
+    }
+
+    /// <summary>
     /// 驗證 generated DOM wrapper 的 class、factory case 與屬性數量沒有意外退化。
     /// </summary>
     [Fact]
