@@ -54,7 +54,8 @@ public class TypedDomParityTests
         int dateTimePropertyCount = Regex.Matches(generated, @"public DateTime\? \w+").Count;
         int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
         int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + decimalPropertyCount + dateTimePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount;
+        int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
+        int propertyCount = stringPropertyCount + intPropertyCount + decimalPropertyCount + dateTimePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -64,6 +65,7 @@ public class TypedDomParityTests
         Assert.True(dateTimePropertyCount >= 100, "generated date/time attribute property count regressed: " + dateTimePropertyCount);
         Assert.True(styleFamilyPropertyCount >= 50, "generated style family attribute property count regressed: " + styleFamilyPropertyCount);
         Assert.True(odfVersionPropertyCount >= 50, "generated ODF version attribute property count regressed: " + odfVersionPropertyCount);
+        Assert.True(mediaTypePropertyCount >= 100, "generated media type attribute property count regressed: " + mediaTypePropertyCount);
     }
 
     /// <summary>
@@ -89,6 +91,7 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["dateTime"] >= 100);
         Assert.True(report.WrapperPropertyTypeCounts["styleFamily"] >= 50);
         Assert.True(report.WrapperPropertyTypeCounts["odfVersion"] >= 50);
+        Assert.True(report.WrapperPropertyTypeCounts["mediaType"] >= 100);
 
         string json = JsonSerializer.Serialize(report.ToJsonModel());
         using JsonDocument document = JsonDocument.Parse(json);
@@ -96,6 +99,7 @@ public class TypedDomParityTests
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("int").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleFamily").GetInt32() >= 50);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("odfVersion").GetInt32() >= 50);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("mediaType").GetInt32() >= 100);
         Assert.True(document.RootElement.GetProperty("elements").GetArrayLength() >= report.SchemaElementCount);
     }
 
@@ -142,6 +146,18 @@ public class TypedDomParityTests
         Assert.Equal("1.3", document.GetAttribute("version", OdfNamespaces.Office));
         document.SetAttribute("version", OdfNamespaces.Office, "2.0");
         Assert.Null(document.GetOdfVersionAttributeValue("version", OdfNamespaces.Office));
+
+        document.SetMediaTypeAttributeValue(
+            "mimetype",
+            OdfNamespaces.Office,
+            new OdfMediaType("application/vnd.oasis.opendocument.text"),
+            OdfNamespaces.GetPrefix(OdfNamespaces.Office));
+
+        Assert.Equal(
+            new OdfMediaType("application/vnd.oasis.opendocument.text"),
+            document.GetMediaTypeAttributeValue("mimetype", OdfNamespaces.Office));
+        document.SetAttribute("mimetype", OdfNamespaces.Office, "not a media type");
+        Assert.Null(document.GetMediaTypeAttributeValue("mimetype", OdfNamespaces.Office));
     }
 
     /// <summary>

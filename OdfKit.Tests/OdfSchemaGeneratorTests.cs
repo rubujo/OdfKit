@@ -239,6 +239,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"office:value\"><data type=\"decimal\" /></attribute>" +
                 "<attribute name=\"office:date-value\"><data type=\"dateTime\" /></attribute>" +
                 "<attribute name=\"office:version\"><value>1.4</value></attribute>" +
+                "<attribute name=\"office:mimetype\"><data type=\"string\" /></attribute>" +
                 "<attribute name=\"style:family\"><value>paragraph</value></attribute>" +
                 "<attribute name=\"table:name\"><data type=\"string\" /></attribute>" +
                 "</element></define>")));
@@ -265,6 +266,9 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfVersion? Version", code);
             Assert.Contains("get => GetOdfVersionAttributeValue(\"version\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetOdfVersionAttributeValue(\"version\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", value.Value, \"office\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfMediaType? Mimetype", code);
+            Assert.Contains("get => GetMediaTypeAttributeValue(\"mimetype\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetMediaTypeAttributeValue(\"mimetype\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", value.Value, \"office\", GetDocumentVersion());", code);
             Assert.Contains("public string? Name", code);
             Assert.Contains("get => GetAttributeValue(\"name\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
         }

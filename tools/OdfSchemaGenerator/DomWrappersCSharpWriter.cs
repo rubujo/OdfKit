@@ -283,6 +283,13 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.OdfVersion;
         }
 
+        if (node.LocalName == "media-type" ||
+            (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:office:1.0" &&
+                node.LocalName == "mimetype"))
+        {
+            return AttributeValueKind.MediaType;
+        }
+
         AttributeValueKind valueKind = AttributeValueKind.Unknown;
         foreach (var child in node.Children)
         {
@@ -413,6 +420,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetOdfVersionAttributeValue",
                     "SetOdfVersionAttributeValue");
                 break;
+            case AttributeValueKind.MediaType:
+                writer.WriteLine($"        public OdfMediaType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetMediaTypeAttributeValue",
+                    "SetMediaTypeAttributeValue");
+                break;
             default:
                 writer.WriteLine($"        public string? {propName}");
                 writer.WriteLine("        {");
@@ -532,7 +548,8 @@ public sealed class DomWrappersCSharpWriter
         Decimal,
         DateTime,
         StyleFamily,
-        OdfVersion
+        OdfVersion,
+        MediaType
     }
 
     private sealed class AttributePropertyMetadata

@@ -116,6 +116,11 @@ public static class OdfTypedDomCoverage
             return "odfVersion";
         }
 
+        if (resolvedType == typeof(OdfMediaType))
+        {
+            return "mediaType";
+        }
+
         return resolvedType.FullName ?? resolvedType.Name;
     }
 

@@ -251,6 +251,32 @@ public class OdfElement(string localName, string namespaceUri, string? prefix = 
         SetAttributeValue(localName, namespaceUri, OdfVersionInfo.ToVersionString(value), prefix, version);
     }
 
+    /// <summary>
+    /// 取得具有 schema awareness 的 MIME 類型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    /// <returns>解析後的 MIME 類型；若屬性不存在或格式無效則為 <see langword="null"/>。</returns>
+    public OdfMediaType? GetMediaTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
+    {
+        string? value = GetAttributeValue(localName, namespaceUri, version);
+        return OdfMediaType.TryParse(value, out OdfMediaType mediaType) ? mediaType : null;
+    }
+
+    /// <summary>
+    /// 設定具有 schema awareness 的 MIME 類型屬性。
+    /// </summary>
+    /// <param name="localName">屬性局部名稱。</param>
+    /// <param name="namespaceUri">屬性命名空間 URI。</param>
+    /// <param name="value">要寫入的 MIME 類型。</param>
+    /// <param name="prefix">選用的命名空間前綴。</param>
+    /// <param name="version">ODF 版本內容。</param>
+    public void SetMediaTypeAttributeValue(string localName, string namespaceUri, OdfMediaType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
+    {
+        SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);
+    }
+
     private static bool TryParseStyleFamily(string? value, out OdfStyleFamily family)
     {
         switch (value)
