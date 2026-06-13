@@ -56,6 +56,7 @@ public class TypedDomParityTests
         int dateTimePropertyCount = Regex.Matches(generated, @"public DateTime\? \w+").Count;
         int timePropertyCount = Regex.Matches(generated, @"public OdfTime\? \w+").Count;
         int lengthPropertyCount = Regex.Matches(generated, @"public OdfLength\? \w+").Count;
+        int borderWidthsPropertyCount = Regex.Matches(generated, @"public OdfBorderWidths\? \w+").Count;
         int durationPropertyCount = Regex.Matches(generated, @"public OdfDuration\? \w+").Count;
         int anglePropertyCount = Regex.Matches(generated, @"public OdfAngle\? \w+").Count;
         int styleNamePropertyCount = Regex.Matches(generated, @"public OdfStyleName\? \w+").Count;
@@ -81,7 +82,7 @@ public class TypedDomParityTests
         int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
         int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
         int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
-        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + styleNameListPropertyCount + colorPropertyCount + iriReferencePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + point3DPropertyCount + pointListPropertyCount + languageCodePropertyCount + countryCodePropertyCount + scriptCodePropertyCount + languageTagPropertyCount + namespacedTokenPropertyCount + characterPropertyCount + textEncodingPropertyCount + targetFrameNamePropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
+        int propertyCount = stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + borderWidthsPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + styleNameListPropertyCount + colorPropertyCount + iriReferencePropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + point3DPropertyCount + pointListPropertyCount + languageCodePropertyCount + countryCodePropertyCount + scriptCodePropertyCount + languageTagPropertyCount + namespacedTokenPropertyCount + characterPropertyCount + textEncodingPropertyCount + targetFrameNamePropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
@@ -92,6 +93,7 @@ public class TypedDomParityTests
         Assert.True(dateTimePropertyCount >= 100, "generated date/time attribute property count regressed: " + dateTimePropertyCount);
         Assert.True(timePropertyCount >= 6, "generated time attribute property count regressed: " + timePropertyCount);
         Assert.True(lengthPropertyCount >= 10000, "generated length attribute property count regressed: " + lengthPropertyCount);
+        Assert.True(borderWidthsPropertyCount >= 723, "generated border widths attribute property count regressed: " + borderWidthsPropertyCount);
         Assert.True(durationPropertyCount >= 1000, "generated duration attribute property count regressed: " + durationPropertyCount);
         Assert.True(anglePropertyCount >= 1000, "generated angle attribute property count regressed: " + anglePropertyCount);
         Assert.True(styleNamePropertyCount >= 1000, "generated style name attribute property count regressed: " + styleNamePropertyCount);
@@ -143,6 +145,7 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["dateTime"] >= 100);
         Assert.True(report.WrapperPropertyTypeCounts["time"] >= 6);
         Assert.True(report.WrapperPropertyTypeCounts["length"] >= 10000);
+        Assert.True(report.WrapperPropertyTypeCounts["borderWidths"] >= 723);
         Assert.True(report.WrapperPropertyTypeCounts["duration"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["angle"] >= 1000);
         Assert.True(report.WrapperPropertyTypeCounts["styleName"] >= 1000);
@@ -176,6 +179,7 @@ public class TypedDomParityTests
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("bool").GetInt32() >= 10000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("time").GetInt32() >= 6);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("length").GetInt32() >= 10000);
+        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("borderWidths").GetInt32() >= 723);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("duration").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("angle").GetInt32() >= 1000);
         Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleName").GetInt32() >= 1000);
@@ -220,6 +224,7 @@ public class TypedDomParityTests
         cell.SetDateTimeAttributeValue("date-value", OdfNamespaces.Office, utc, OdfNamespaces.GetPrefix(OdfNamespaces.Office));
         cell.SetTimeAttributeValue("time-value", OdfNamespaces.Office, new OdfTime(new TimeSpan(12, 30, 45), TimeSpan.Zero), OdfNamespaces.GetPrefix(OdfNamespaces.Office));
         cell.SetLengthAttributeValue("width", OdfNamespaces.Style, OdfLength.FromCentimeters(2.5), OdfNamespaces.GetPrefix(OdfNamespaces.Style));
+        cell.SetBorderWidthsAttributeValue("border-line-width", OdfNamespaces.Style, new OdfBorderWidths(OdfLength.FromPoints(0.5), OdfLength.FromPoints(1), OdfLength.FromPoints(0.5)), OdfNamespaces.GetPrefix(OdfNamespaces.Style));
         cell.SetDurationAttributeValue("duration", OdfNamespaces.Presentation, new OdfDuration("PT1H30M"), OdfNamespaces.GetPrefix(OdfNamespaces.Presentation));
         cell.SetAngleAttributeValue("rotation-angle", OdfNamespaces.Style, OdfAngle.FromDegrees(45.5m), OdfNamespaces.GetPrefix(OdfNamespaces.Style));
         cell.SetStyleNameAttributeValue("style-name", OdfNamespaces.Table, new OdfStyleName("CellStyle1"), OdfNamespaces.GetPrefix(OdfNamespaces.Table));
@@ -261,6 +266,9 @@ public class TypedDomParityTests
         Assert.Equal("12:30:45Z", cell.GetAttribute("time-value", OdfNamespaces.Office));
         Assert.Equal(OdfLength.FromCentimeters(2.5), cell.GetLengthAttributeValue("width", OdfNamespaces.Style));
         Assert.Equal("2.5cm", cell.GetAttribute("width", OdfNamespaces.Style));
+        OdfBorderWidths? borderWidths = cell.GetBorderWidthsAttributeValue("border-line-width", OdfNamespaces.Style);
+        Assert.Equal(new OdfBorderWidths("0.5pt 1pt 0.5pt"), borderWidths);
+        Assert.Equal(OdfLength.FromPoints(1), borderWidths!.Value.Spacing);
         Assert.Equal(new OdfDuration("PT1H30M"), cell.GetDurationAttributeValue("duration", OdfNamespaces.Presentation));
         Assert.Equal("PT1H30M", cell.GetAttribute("duration", OdfNamespaces.Presentation));
         OdfAngle? angle = cell.GetAngleAttributeValue("rotation-angle", OdfNamespaces.Style);
@@ -317,6 +325,10 @@ public class TypedDomParityTests
         Assert.Null(cell.GetTimeAttributeValue("time-value", OdfNamespaces.Office));
         cell.SetAttribute("width", OdfNamespaces.Style, "invalid-length");
         Assert.Null(cell.GetLengthAttributeValue("width", OdfNamespaces.Style));
+        cell.SetAttribute("border-line-width", OdfNamespaces.Style, "0.5pt 1pt");
+        Assert.Null(cell.GetBorderWidthsAttributeValue("border-line-width", OdfNamespaces.Style));
+        cell.SetAttribute("border-line-width", OdfNamespaces.Style, "0pt 1pt 0.5pt");
+        Assert.Null(cell.GetBorderWidthsAttributeValue("border-line-width", OdfNamespaces.Style));
         cell.SetAttribute("duration", OdfNamespaces.Presentation, "not-duration");
         Assert.Null(cell.GetDurationAttributeValue("duration", OdfNamespaces.Presentation));
         cell.SetAttribute("rotation-angle", OdfNamespaces.Style, "\u0001");

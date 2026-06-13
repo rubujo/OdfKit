@@ -303,6 +303,12 @@ public sealed class DomWrappersCSharpWriter
     private static AttributeValueKind InferValueKind(SchemaPatternNodeMetadata node, SchemaMetadata metadata, HashSet<string> visitedRefs)
     {
         if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "borderWidths", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.BorderWidths;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
             IsLengthReference(node.ReferenceName))
         {
             return AttributeValueKind.Length;
@@ -561,6 +567,15 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetLengthAttributeValue",
                     "SetLengthAttributeValue");
+                break;
+            case AttributeValueKind.BorderWidths:
+                writer.WriteLine($"        public OdfBorderWidths? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetBorderWidthsAttributeValue",
+                    "SetBorderWidthsAttributeValue");
                 break;
             case AttributeValueKind.Duration:
                 writer.WriteLine($"        public OdfDuration? {propName}");
@@ -932,6 +947,7 @@ public sealed class DomWrappersCSharpWriter
         DateTime,
         Time,
         Length,
+        BorderWidths,
         Duration,
         Angle,
         StyleName,
