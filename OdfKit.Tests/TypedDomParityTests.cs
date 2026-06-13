@@ -336,6 +336,55 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 typed DOM 可用 ODFDOM 風格建立與走訪內嵌 MathML 公式物件。
+    /// </summary>
+    [Fact]
+    public void TypedDomSupportsOdfDomStyleMathMlFormulaObjectTraversal()
+    {
+        const string mathNamespace = "http://www.w3.org/1998/Math/MathML";
+        OfficeDocumentContentElement document = new("office");
+        document.SetOdfVersionAttributeValue("version", OdfNamespaces.Office, OdfVersion.Odf14, "office");
+        OfficeBodyElement body = document.AppendElement(new OfficeBodyElement("office"));
+        OfficeTextElement text = body.AppendElement(new OfficeTextElement("office"));
+        TextPElement paragraph = text.AppendElement(new TextPElement("text"));
+        DrawObjectElement formulaObject = paragraph.AppendElement(new DrawObjectElement("draw"));
+        MathMLMathElement math = formulaObject.AppendElement(new MathMLMathElement("math"));
+        OdfElement row = math.AppendElement(new OdfElement("mrow", mathNamespace, "math"));
+        OdfElement identifier = row.AppendElement(new OdfElement("mi", mathNamespace, "math"));
+        OdfElement operatorElement = row.AppendElement(new OdfElement("mo", mathNamespace, "math"));
+        OdfElement number = row.AppendElement(new OdfElement("mn", mathNamespace, "math"));
+
+        formulaObject.SetIriReferenceAttributeValue("href", OdfNamespaces.XLink, new OdfIriReference("./Object 1"), "xlink");
+        formulaObject.SetXLinkTypeAttributeValue("type", OdfNamespaces.XLink, OdfXLinkType.Simple, "xlink");
+        formulaObject.SetXLinkShowAttributeValue("show", OdfNamespaces.XLink, OdfXLinkShow.Embed, "xlink");
+        formulaObject.SetXLinkActuateAttributeValue("actuate", OdfNamespaces.XLink, OdfXLinkActuate.OnLoad, "xlink");
+        identifier.TextContent = "x";
+        operatorElement.TextContent = "=";
+        number.TextContent = "1";
+
+        Assert.Equal([formulaObject], paragraph.ChildElements<DrawObjectElement>().ToArray());
+        Assert.Equal([math], formulaObject.MathMLMathChildElements.ToArray());
+        Assert.Equal("x=1", math.TextContent);
+        Assert.Equal(new OdfIriReference("./Object 1"), formulaObject.GetIriReferenceAttributeValue("href", OdfNamespaces.XLink));
+        Assert.Equal(OdfXLinkShow.Embed, formulaObject.GetXLinkShowAttributeValue("show", OdfNamespaces.XLink));
+
+        using MemoryStream stream = new();
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeDocumentContentElement parsedDocument = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream));
+        DrawObjectElement parsedObject = parsedDocument.DescendantElements<DrawObjectElement>().Single();
+        MathMLMathElement parsedMath = parsedObject.MathMLMathChildElements.Single();
+
+        Assert.Equal("x=1", parsedMath.TextContent);
+        Assert.Equal("mrow", parsedMath.Children.Single().LocalName);
+        Assert.Equal(mathNamespace, parsedMath.Children.Single().NamespaceUri);
+        Assert.Equal(new OdfIriReference("./Object 1"), parsedObject.GetIriReferenceAttributeValue("href", OdfNamespaces.XLink));
+        Assert.Equal(OdfXLinkType.Simple, parsedObject.GetXLinkTypeAttributeValue("type", OdfNamespaces.XLink));
+        Assert.Equal(OdfXLinkActuate.OnLoad, parsedObject.GetXLinkActuateAttributeValue("actuate", OdfNamespaces.XLink));
+    }
+
+    /// <summary>
     /// 驗證 generated DOM wrapper 的 class、factory case 與屬性數量沒有意外退化。
     /// </summary>
     [Fact]
