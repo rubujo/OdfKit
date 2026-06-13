@@ -597,6 +597,102 @@ public sealed class DomWrappersCSharpWriter
         }
 
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" &&
+            node.LocalName == "text-transform")
+        {
+            return AttributeValueKind.FoTextTransform;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "text-rotation-scale")
+        {
+            return AttributeValueKind.StyleTextRotationScale;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "text-combine")
+        {
+            return AttributeValueKind.StyleTextCombine;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" &&
+            node.LocalName == "fill")
+        {
+            return AttributeValueKind.DrawFill;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" &&
+            node.LocalName == "fill")
+        {
+            return AttributeValueKind.SmilFill;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" &&
+            node.LocalName == "fill-image-ref-point")
+        {
+            return AttributeValueKind.DrawFillImageRefPoint;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" &&
+            node.LocalName == "color-mode")
+        {
+            return AttributeValueKind.DrawColorMode;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "vertical-pos")
+        {
+            return AttributeValueKind.StyleVerticalPos;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "vertical-rel")
+        {
+            return AttributeValueKind.StyleVerticalRel;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "horizontal-pos")
+        {
+            return AttributeValueKind.StyleHorizontalPos;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "horizontal-rel")
+        {
+            return AttributeValueKind.StyleHorizontalRel;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "wrap")
+        {
+            return AttributeValueKind.StyleWrap;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "run-through")
+        {
+            return AttributeValueKind.StyleRunThrough;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:style:1.0" &&
+            node.LocalName == "wrap-contour-mode")
+        {
+            return AttributeValueKind.StyleWrapContourMode;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" &&
+            node.LocalName == "stroke-linejoin")
+        {
+            return AttributeValueKind.DrawStrokeLineJoin;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" &&
+            node.LocalName == "stroke-linecap")
+        {
+            return AttributeValueKind.SvgStrokeLineCap;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" &&
             node.LocalName == "keep-together")
         {
             return AttributeValueKind.FoKeepTogether;
@@ -1269,6 +1365,150 @@ public sealed class DomWrappersCSharpWriter
                     "GetPresentationTransitionStyleAttributeValue",
                     "SetPresentationTransitionStyleAttributeValue");
                 break;
+            case AttributeValueKind.FoTextTransform:
+                writer.WriteLine($"        public OdfFoTextTransform? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetFoTextTransformAttributeValue",
+                    "SetFoTextTransformAttributeValue");
+                break;
+            case AttributeValueKind.StyleTextRotationScale:
+                writer.WriteLine($"        public OdfStyleTextRotationScale? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleTextRotationScaleAttributeValue",
+                    "SetStyleTextRotationScaleAttributeValue");
+                break;
+            case AttributeValueKind.StyleTextCombine:
+                writer.WriteLine($"        public OdfStyleTextCombine? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleTextCombineAttributeValue",
+                    "SetStyleTextCombineAttributeValue");
+                break;
+            case AttributeValueKind.DrawFill:
+                writer.WriteLine($"        public OdfDrawFill? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDrawFillAttributeValue",
+                    "SetDrawFillAttributeValue");
+                break;
+            case AttributeValueKind.SmilFill:
+                writer.WriteLine($"        public OdfSmilFill? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetSmilFillAttributeValue",
+                    "SetSmilFillAttributeValue");
+                break;
+            case AttributeValueKind.DrawFillImageRefPoint:
+                writer.WriteLine($"        public OdfDrawFillImageRefPoint? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDrawFillImageRefPointAttributeValue",
+                    "SetDrawFillImageRefPointAttributeValue");
+                break;
+            case AttributeValueKind.DrawColorMode:
+                writer.WriteLine($"        public OdfDrawColorMode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDrawColorModeAttributeValue",
+                    "SetDrawColorModeAttributeValue");
+                break;
+            case AttributeValueKind.StyleVerticalPos:
+                writer.WriteLine($"        public OdfStyleVerticalPos? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleVerticalPosAttributeValue",
+                    "SetStyleVerticalPosAttributeValue");
+                break;
+            case AttributeValueKind.StyleVerticalRel:
+                writer.WriteLine($"        public OdfStyleVerticalRel? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleVerticalRelAttributeValue",
+                    "SetStyleVerticalRelAttributeValue");
+                break;
+            case AttributeValueKind.StyleHorizontalPos:
+                writer.WriteLine($"        public OdfStyleHorizontalPos? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleHorizontalPosAttributeValue",
+                    "SetStyleHorizontalPosAttributeValue");
+                break;
+            case AttributeValueKind.StyleHorizontalRel:
+                writer.WriteLine($"        public OdfStyleHorizontalRel? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleHorizontalRelAttributeValue",
+                    "SetStyleHorizontalRelAttributeValue");
+                break;
+            case AttributeValueKind.StyleWrap:
+                writer.WriteLine($"        public OdfStyleWrap? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleWrapAttributeValue",
+                    "SetStyleWrapAttributeValue");
+                break;
+            case AttributeValueKind.StyleRunThrough:
+                writer.WriteLine($"        public OdfStyleRunThrough? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleRunThroughAttributeValue",
+                    "SetStyleRunThroughAttributeValue");
+                break;
+            case AttributeValueKind.StyleWrapContourMode:
+                writer.WriteLine($"        public OdfStyleWrapContourMode? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleWrapContourModeAttributeValue",
+                    "SetStyleWrapContourModeAttributeValue");
+                break;
+            case AttributeValueKind.DrawStrokeLineJoin:
+                writer.WriteLine($"        public OdfDrawStrokeLineJoin? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDrawStrokeLineJoinAttributeValue",
+                    "SetDrawStrokeLineJoinAttributeValue");
+                break;
+            case AttributeValueKind.SvgStrokeLineCap:
+                writer.WriteLine($"        public OdfSvgStrokeLineCap? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetSvgStrokeLineCapAttributeValue",
+                    "SetSvgStrokeLineCapAttributeValue");
+                break;
             case AttributeValueKind.FoKeepTogether:
                 writer.WriteLine($"        public OdfFoKeepTogether? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -1877,6 +2117,7 @@ public sealed class DomWrappersCSharpWriter
             "urn:oasis:names:tc:opendocument:xmlns:meta:1.0" => "Meta",
             "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" => "Number",
             "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" => "Presentation",
+            "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" => "Smil",
             "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" => "Svg",
             "urn:oasis:names:tc:opendocument:xmlns:chart:1.0" => "Chart",
             "urn:oasis:names:tc:opendocument:xmlns:config:1.0" => "Config",
@@ -1959,6 +2200,22 @@ public sealed class DomWrappersCSharpWriter
         PresentationAction,
         PresentationTransitionType,
         PresentationTransitionStyle,
+        FoTextTransform,
+        StyleTextRotationScale,
+        StyleTextCombine,
+        DrawFill,
+        SmilFill,
+        DrawFillImageRefPoint,
+        DrawColorMode,
+        StyleVerticalPos,
+        StyleVerticalRel,
+        StyleHorizontalPos,
+        StyleHorizontalRel,
+        StyleWrap,
+        StyleRunThrough,
+        StyleWrapContourMode,
+        DrawStrokeLineJoin,
+        SvgStrokeLineCap,
         FoKeepTogether,
         FoWrapOption,
         Dr3dProjection,

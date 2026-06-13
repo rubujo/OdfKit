@@ -425,6 +425,86 @@ public static class OdfTypedDomCoverage
             return "presentationTransitionStyle";
         }
 
+        if (resolvedType == typeof(OdfFoTextTransform))
+        {
+            return "foTextTransform";
+        }
+
+        if (resolvedType == typeof(OdfStyleTextRotationScale))
+        {
+            return "styleTextRotationScale";
+        }
+
+        if (resolvedType == typeof(OdfStyleTextCombine))
+        {
+            return "styleTextCombine";
+        }
+
+        if (resolvedType == typeof(OdfDrawFill))
+        {
+            return "drawFill";
+        }
+
+        if (resolvedType == typeof(OdfSmilFill))
+        {
+            return "smilFill";
+        }
+
+        if (resolvedType == typeof(OdfDrawFillImageRefPoint))
+        {
+            return "drawFillImageRefPoint";
+        }
+
+        if (resolvedType == typeof(OdfDrawColorMode))
+        {
+            return "drawColorMode";
+        }
+
+        if (resolvedType == typeof(OdfStyleVerticalPos))
+        {
+            return "styleVerticalPos";
+        }
+
+        if (resolvedType == typeof(OdfStyleVerticalRel))
+        {
+            return "styleVerticalRel";
+        }
+
+        if (resolvedType == typeof(OdfStyleHorizontalPos))
+        {
+            return "styleHorizontalPos";
+        }
+
+        if (resolvedType == typeof(OdfStyleHorizontalRel))
+        {
+            return "styleHorizontalRel";
+        }
+
+        if (resolvedType == typeof(OdfStyleWrap))
+        {
+            return "styleWrap";
+        }
+
+        if (resolvedType == typeof(OdfStyleRunThrough))
+        {
+            return "styleRunThrough";
+        }
+
+        if (resolvedType == typeof(OdfStyleWrapContourMode))
+        {
+            return "styleWrapContourMode";
+        }
+
+        if (resolvedType == typeof(OdfDrawStrokeLineJoin))
+        {
+            return "drawStrokeLineJoin";
+        }
+
+        if (resolvedType == typeof(OdfSvgStrokeLineCap))
+        {
+            return "svgStrokeLineCap";
+        }
+
         if (resolvedType == typeof(OdfFoKeepTogether))
         {
             return "foKeepTogether";
