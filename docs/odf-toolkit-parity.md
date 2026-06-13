@@ -31,6 +31,7 @@
 | Typed DOM | generated DOM wrappers、`OdfNodeFactory`、`OdfTypedDomCoverage`、typed attribute helpers、schema-specific child collections | ODFDOM | partial | 以 [typed-dom-coverage.md](typed-dom-coverage.md)、CLI `typed-dom-coverage` 與 CI artifact 追蹤 wrapper / factory / attribute / child relation coverage；generated wrappers 已包含常用 datatype typed property、2,000+ schema-specific child collection property，且 repo 內已有 ODFDOM-style sample traversal 測試；外部 ODF Toolkit / ODFDOM 官方 sample corpus 仍需擴充。 |
 | Simple high-level API | Text / Spreadsheet / Presentation / Drawing facade | ODF Toolkit Simple API | partial | ODT / ODS / ODP / ODG 常見建立、讀取與有限修改有直接 facade。 |
 | Corpus | generated、positive、negative、unknown、security corpus | ODF Validator sample corpus | validated | repo 內已有封裝與 flat 主要格式的可執行 manifest 範本；大型或第三方 corpus 可用 `validate-corpus` 搭配外部路徑執行。 |
+| Foreign extension policy | extended profile warning、unknown XML round-trip、macro sanitization 邊界 | ODFDOM extension preservation | validated | 以 [foreign-extension-policy.md](foreign-extension-policy.md) 文件化 foreign namespace 隔離、保存與淨化邊界。 |
 
 ## 外部 baseline 執行
 
