@@ -44,6 +44,6 @@ profile rule validation、package / flat XML 驗證、全格式最小 round-trip
 入口，以及 unknown content 保真測試。後續重點應放在：
 
 - 擴大更接近真實世界文件的 positive / negative corpus。
-- 擴大 ODF Toolkit / ODF Validator parity matrix 的官方與真實 corpus 覆蓋。
+- 依 [odf-official-corpus-sources.md](odf-official-corpus-sources.md) 擴大 ODF Toolkit / ODF Validator parity matrix 的官方與真實 corpus 覆蓋。
 - 補齊 CLI sanitize 與更多 policy automation。
 - 繼續擴充 ODC、ODF formula、ODI 與 ODB 的高階語意 API。

@@ -11,6 +11,8 @@
 - ODF Validator：ODF Toolkit 提供的 conformance validator。
 - OASIS ODF TC tooling：ODF schema 與規格資料來源。
 
+官方 corpus 來源與 baseline 命名規則請見 [odf-official-corpus-sources.md](odf-official-corpus-sources.md)。
+
 ## Parity 等級
 
 - `complete`：OdfKit 有對應 API、測試與文件證據。

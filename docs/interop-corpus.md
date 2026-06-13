@@ -1,6 +1,6 @@
 # Interop Corpus
 
-本文件記錄目前 OdfKit 用來支撐相容性與 round-trip 宣稱的 corpus 類型。這不是外部檔案清單的完整快照，而是可維護的測試來源說明。fixture metadata 規則請見 [corpus-manifest.md](corpus-manifest.md)，ODF Toolkit / ODF Validator 對標線請見 [odf-toolkit-parity.md](odf-toolkit-parity.md)。
+本文件記錄目前 OdfKit 用來支撐相容性與 round-trip 宣稱的 corpus 類型。這不是外部檔案清單的完整快照，而是可維護的測試來源說明。fixture metadata 規則請見 [corpus-manifest.md](corpus-manifest.md)，官方 corpus 來源請見 [odf-official-corpus-sources.md](odf-official-corpus-sources.md)，ODF Toolkit / ODF Validator 對標線請見 [odf-toolkit-parity.md](odf-toolkit-parity.md)。
 
 ## Generated corpus
 

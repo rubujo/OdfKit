@@ -27,6 +27,24 @@ public class OdfToolkitParityReadinessTests
         Assert.Contains("validate-corpus", parity, StringComparison.Ordinal);
         Assert.Contains("baselineMismatchCount", parity, StringComparison.Ordinal);
         Assert.Contains("documented exception", parity, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("odf-official-corpus-sources.md", parity, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證官方 corpus 來源文件宣告 baseline 來源與命名邊界。
+    /// </summary>
+    [Fact]
+    public void OfficialCorpusSourcesDocumentDeclaresBaselineSources()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string sources = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf-official-corpus-sources.md"));
+
+        Assert.Contains("https://odftoolkit.org/", sources, StringComparison.Ordinal);
+        Assert.Contains("https://odftoolkit.org/conformance/ODFValidator.html", sources, StringComparison.Ordinal);
+        Assert.Contains("https://github.com/tdf/odftoolkit", sources, StringComparison.Ordinal);
+        Assert.Contains("https://github.com/openpreserve/odf-validator", sources, StringComparison.Ordinal);
+        Assert.Contains("--baseline odf-validator", sources, StringComparison.Ordinal);
+        Assert.Contains("Initialize-OdfExternalCorpus.ps1", sources, StringComparison.Ordinal);
     }
 
     /// <summary>
