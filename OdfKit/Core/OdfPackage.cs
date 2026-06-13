@@ -46,6 +46,7 @@ public enum OdfPackageMode
 /// </summary>
 public class OdfPackage : IDisposable, IAsyncDisposable
 {
+    private const string RdfMetadataPath = "META-INF/manifest.rdf";
     private readonly OdfPackageMode _mode;
         private Stream? _underlyingStream;
         private readonly bool _leaveOpen;
@@ -85,6 +86,11 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             get => _version;
             set => _version = value;
         }
+
+        /// <summary>
+        /// 取得封裝的 RDF metadata 集合，對應 <c>META-INF/manifest.rdf</c>。
+        /// </summary>
+        public OdfRdfMetadata RdfMetadata { get; private set; } = new();
 
         /// <summary>
         /// 取得一個值，指出目前封裝是否為單一 Flat XML 檔案。
@@ -376,6 +382,8 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             {
                 OdfEncryption.Decrypt(this, _loadOptions.Password ?? string.Empty);
             }
+
+            LoadRdfMetadata();
         }
 
         private void InitializeFlatXml(byte[] signature, int signatureLength)
@@ -1392,6 +1400,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                     // Write/update manifest before serialize
                     if (!_isFlatXml)
                     {
+                        SaveRdfMetadataToEntries();
                         SaveManifestToEntries();
                     }
 
@@ -1490,6 +1499,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                 {
                     if (!_isFlatXml)
                     {
+                        SaveRdfMetadataToEntries();
                         SaveManifestToEntries();
                     }
 
@@ -1664,6 +1674,36 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             }
 
             return previousOptions;
+        }
+
+        private void LoadRdfMetadata()
+        {
+            RdfMetadata = new OdfRdfMetadata();
+            if (!_entries.TryGetValue(RdfMetadataPath, out var entry))
+            {
+                return;
+            }
+
+            try
+            {
+                using var stream = entry.OpenReader();
+                RdfMetadata = OdfRdfParser.Parse(stream);
+            }
+            catch (XmlException ex)
+            {
+                throw new InvalidDataException("ODF RDF metadata 不是有效的 RDF/XML。", ex);
+            }
+        }
+
+        private void SaveRdfMetadataToEntries()
+        {
+            if (!RdfMetadata.IsDirty || RdfMetadata.Triples.Count == 0)
+            {
+                return;
+            }
+
+            byte[] content = OdfRdfParser.Serialize(RdfMetadata, _saveOptions.IndentXml);
+            WriteEntry(RdfMetadataPath, content, "application/rdf+xml");
         }
 
         internal void SaveManifestToEntries()
