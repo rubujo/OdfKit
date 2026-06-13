@@ -189,6 +189,74 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 typed DOM 可用 ODFDOM 風格建立巢狀清單與註腳內容。
+    /// </summary>
+    [Fact]
+    public void TypedDomSupportsOdfDomStyleListAndFootnoteTraversal()
+    {
+        OfficeDocumentContentElement document = new("office");
+        document.SetOdfVersionAttributeValue("version", OdfNamespaces.Office, OdfVersion.Odf14, "office");
+        OfficeBodyElement body = document.AppendElement(new OfficeBodyElement("office"));
+        OfficeTextElement text = body.AppendElement(new OfficeTextElement("office"));
+        TextHElement heading = text.AppendElement(new TextHElement("text"));
+        TextListElement list = text.AppendElement(new TextListElement("text"));
+        TextListItemElement firstItem = list.AppendElement(new TextListItemElement("text"));
+        TextPElement firstParagraph = firstItem.AppendElement(new TextPElement("text"));
+        firstParagraph.TextContent = "第一項";
+        TextNoteElement note = firstParagraph.AppendElement(new TextNoteElement("text"));
+        TextNoteCitationElement citation = note.AppendElement(new TextNoteCitationElement("text"));
+        TextNoteBodyElement noteBody = note.AppendElement(new TextNoteBodyElement("text"));
+        TextPElement noteParagraph = noteBody.AppendElement(new TextPElement("text"));
+        TextListElement nestedList = firstItem.AppendElement(new TextListElement("text"));
+        TextListItemElement nestedItem = nestedList.AppendElement(new TextListItemElement("text"));
+        TextPElement nestedParagraph = nestedItem.AppendElement(new TextPElement("text"));
+        TextListItemElement secondItem = list.AppendElement(new TextListItemElement("text"));
+        TextPElement secondParagraph = secondItem.AppendElement(new TextPElement("text"));
+
+        heading.OutlineLevel = 2;
+        heading.TextContent = "工作清單";
+        list.StyleName = "List_20_1";
+        note.SetTextNoteClassAttributeValue("note-class", OdfNamespaces.Text, OdfTextNoteClass.Footnote, "text");
+        citation.Label = "1";
+        citation.TextContent = "1";
+        noteParagraph.TextContent = "註腳說明";
+        nestedParagraph.TextContent = "巢狀項目";
+        secondParagraph.TextContent = "第二項";
+
+        Assert.Equal([heading], text.TextHChildElements.ToArray());
+        Assert.Equal([list], text.TextListChildElements.ToArray());
+        Assert.Equal([firstItem, secondItem], list.TextListItemChildElements.ToArray());
+        Assert.Equal([firstParagraph], firstItem.TextPChildElements.ToArray());
+        Assert.Equal([nestedList], firstItem.TextListChildElements.ToArray());
+        Assert.Equal([nestedItem], nestedList.TextListItemChildElements.ToArray());
+        Assert.Equal([note], firstParagraph.ChildElements<TextNoteElement>().ToArray());
+        Assert.Equal([citation], note.TextNoteCitationChildElements.ToArray());
+        Assert.Equal([noteBody], note.TextNoteBodyChildElements.ToArray());
+        Assert.Equal([noteParagraph], noteBody.ChildElements<TextPElement>().ToArray());
+        Assert.Equal(OdfTextNoteClass.Footnote, note.GetTextNoteClassAttributeValue("note-class", OdfNamespaces.Text));
+        Assert.Equal(2, heading.OutlineLevel);
+
+        using MemoryStream stream = new();
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeDocumentContentElement parsedDocument = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream));
+        OfficeTextElement parsedText = parsedDocument.OfficeBodyChildElements.Single().OfficeTextChildElements.Single();
+        TextListElement parsedList = parsedText.TextListChildElements.Single();
+        TextListItemElement parsedFirstItem = parsedList.TextListItemChildElements.First();
+        TextNoteElement parsedNote = parsedFirstItem.TextPChildElements.Single().ChildElements<TextNoteElement>().Single();
+
+        Assert.Equal("工作清單", parsedText.TextHChildElements.Single().TextContent);
+        Assert.Equal("List_20_1", parsedList.StyleName);
+        Assert.Equal("第一項1註腳說明", parsedFirstItem.TextPChildElements.Single().TextContent);
+        Assert.Equal("巢狀項目", parsedFirstItem.TextListChildElements.Single().TextListItemChildElements.Single().TextPChildElements.Single().TextContent);
+        Assert.Equal("第二項", parsedList.TextListItemChildElements.ElementAt(1).TextPChildElements.Single().TextContent);
+        Assert.Equal("1", parsedNote.TextNoteCitationChildElements.Single().Label);
+        Assert.Equal("註腳說明", parsedNote.TextNoteBodyChildElements.Single().ChildElements<TextPElement>().Single().TextContent);
+        Assert.Equal(OdfTextNoteClass.Footnote, parsedNote.GetTextNoteClassAttributeValue("note-class", OdfNamespaces.Text));
+    }
+
+    /// <summary>
     /// 驗證 generated DOM wrapper 的 class、factory case 與屬性數量沒有意外退化。
     /// </summary>
     [Fact]
