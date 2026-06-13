@@ -111,10 +111,17 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus man
   --baseline odf-validator `
   --baseline-jar C:\tools\odfvalidator.jar `
   --baseline-exceptions baseline-exceptions.json
+
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus manifest.json `
+  --metadata-only `
+  --baseline-exceptions baseline-exceptions.json `
+  --format json
 ```
 
 `validate-corpus` 會把 fixture 的 `expected`、`kind` 與 `version` 欄位視為 OdfKit
 corpus 完成線；外部 baseline mismatch 若未列入 documented exception，也會讓 job 失敗。
+`--metadata-only` 可在樣本檔案尚未存在時檢查來源 URI、授權欄位、profile、round-trip
+策略與 baseline exception manifest 格式。
 
 ## Documented exceptions
 

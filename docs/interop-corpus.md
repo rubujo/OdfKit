@@ -42,6 +42,7 @@
 - Classification mismatch 必須透過 `--baseline-exceptions` 指定的 JSON manifest 記錄為 documented exception，否則視為 parity failure。
 - 外部 corpus manifest 可用 `validate-corpus` 執行，並以 fixture 的 `expected`、`kind` 與 `version` 欄位作為完成線。
 - 外部 / 官方 fixture 必須提供 `sourceUri`，generated 或 OdfKit 自有樣本才可省略。
+- `validate-corpus --metadata-only` 可在樣本尚未下載時檢查外部 manifest 與 baseline exception metadata。
 - `validate-corpus` 會拒絕逃出 corpus root 的 fixture 路徑、重複 fixture id / path 與未知 round-trip 策略。
 - `eng/Test-OdfCorpus.ps1` 與 GitHub Actions `ODF corpus` workflow 會固定驗證內建 corpus；設定 `ODFKIT_PARITY_CORPUS_ROOT` 時可同時驗證外部 corpus。
 - `eng/Initialize-OdfExternalCorpus.ps1` 可建立外部 corpus manifest 與 baseline exception 範本。

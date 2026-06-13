@@ -78,6 +78,11 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus tes
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus manifest.json `
   --root $env:ODFKIT_PARITY_CORPUS_ROOT `
   --format json
+
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus manifest.json `
+  --metadata-only `
+  --baseline-exceptions baseline-exceptions.json `
+  --format json
 ```
 
 repo 也提供 CI 與本機共用腳本：
@@ -97,6 +102,10 @@ repo 也提供 CI 與本機共用腳本：
 `validate-corpus` 會讀取 `fixtures` 陣列，逐一比對 `expected` 的 `valid` / `invalid`
 classification、`kind` 文件種類與 `version` ODF 版本。任一 fixture 與 manifest 宣告不一致，
 或未文件化的外部 baseline mismatch，都會讓 exit code 為 `1`。
+
+`--metadata-only` 只檢查 manifest 與 baseline exception manifest 的結構與 metadata
+規則，不要求 fixture 檔案存在，也不執行 OdfKit 或外部 validator。這可用於官方或授權待確認
+corpus 在下載樣本前的來源、授權與 baseline 例外格式檢查。
 
 ## Baseline exception manifest
 

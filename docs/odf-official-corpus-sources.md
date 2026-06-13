@@ -21,7 +21,9 @@
    `source`、`sourceUri`、`license`、`kind`、`version`、`profile`、`expected` 與 `roundTrip`。
 4. 若 ODF Toolkit Validator 與 OdfKit classification 不一致，先確認是否為 OdfKit bug。
    只有確認為暫時接受的 baseline 差異時，才記錄到 `baseline-exceptions.json`。
-5. 使用 `eng/Test-OdfCorpus.ps1` 執行內建與外部 corpus。
+5. 在樣本尚未下載或授權仍待審核時，可先用 `validate-corpus --metadata-only`
+   檢查 manifest 與 baseline exception metadata。
+6. 使用 `eng/Test-OdfCorpus.ps1` 執行內建與外部 corpus。
 
 ## Baseline 命名
 
@@ -36,6 +38,7 @@ OPF 的 `odf-validator` 是另一套工具，不應混入同一份 baseline mani
 - 可追溯來源 URL。
 - manifest `sourceUri` 必須指向官方來源或可審核的上游樣本頁面。
 - 授權與可再散布判斷。
+- `validate-corpus --metadata-only` 可先通過 metadata gate。
 - `validate-corpus` 可執行 manifest。
 - 若啟用 ODF Toolkit Validator，必須有 baseline 結果或 documented exception。
 - 對每個 fixture 記錄 expected classification、kind、version 與 profile。

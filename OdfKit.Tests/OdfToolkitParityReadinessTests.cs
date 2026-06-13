@@ -116,6 +116,40 @@ public class OdfToolkitParityReadinessTests
     }
 
     /// <summary>
+    /// 驗證外部 corpus 範本可由 CLI metadata-only 模式檢查。
+    /// </summary>
+    [Fact]
+    public void ExternalCorpusTemplatesCanBeMetadataValidatedByCli()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string manifestPath = Path.Combine(repoRoot, "docs", "examples", "external-corpus", "manifest.json");
+        string exceptionsPath = Path.Combine(repoRoot, "docs", "examples", "external-corpus", "baseline-exceptions.json");
+        using StringWriter output = new();
+        using StringWriter error = new();
+
+        int exitCode = OdfKitCli.Run(
+            [
+                "validate-corpus",
+                manifestPath,
+                "--metadata-only",
+                "--format",
+                "json",
+                "--baseline-exceptions",
+                exceptionsPath
+            ],
+            output,
+            error);
+
+        Assert.Equal(0, exitCode);
+        Assert.Equal(string.Empty, error.ToString());
+        using JsonDocument json = JsonDocument.Parse(output.ToString());
+        JsonElement summary = json.RootElement.GetProperty("summary");
+        Assert.True(summary.GetProperty("metadataOnly").GetBoolean());
+        Assert.Equal(2, summary.GetProperty("fixtureCount").GetInt32());
+        Assert.Equal(1, summary.GetProperty("baselineExceptionCount").GetInt32());
+    }
+
+    /// <summary>
     /// 驗證 corpus CI 腳本與 GitHub Actions 入口存在。
     /// </summary>
     [Fact]

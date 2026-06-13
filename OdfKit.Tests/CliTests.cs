@@ -886,6 +886,51 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證 validate-corpus metadata-only 可檢查外部 manifest 而不要求 fixture 檔案存在。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusMetadataOnlyDoesNotRequireFixtureFiles()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string manifest = Path.Combine(root, "manifest.json");
+            WriteCorpusManifest(
+                manifest,
+                [
+                    new CorpusFixtureTemplate(
+                        "odf-validator-sample-valid",
+                        "odf-validator/samples/valid/text/sample.odt",
+                        "ODF Validator sample",
+                        "https://odftoolkit.org/conformance/ODFValidator.html",
+                        "external-review-required",
+                        "valid",
+                        "Text",
+                        "1.4",
+                        "semantic-equivalent")
+                ]);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest, "--metadata-only", "--format", "json"], output, error);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, error.ToString());
+            using JsonDocument json = JsonDocument.Parse(output.ToString());
+            JsonElement summary = json.RootElement.GetProperty("summary");
+            JsonElement fixture = json.RootElement.GetProperty("fixtures")[0];
+            Assert.True(summary.GetProperty("metadataOnly").GetBoolean());
+            Assert.Equal(1, summary.GetProperty("fixtureCount").GetInt32());
+            Assert.Equal("https://odftoolkit.org/conformance/ODFValidator.html", fixture.GetProperty("sourceUri").GetString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
     /// 驗證 validate-corpus 對未文件化的 baseline 分類差異會失敗。
     /// </summary>
     [Fact]

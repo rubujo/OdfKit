@@ -119,6 +119,12 @@ public static class OdfKitCli
         ValidateCorpusOptions parsedOptions = options ?? throw new InvalidOperationException("validate-corpus options were not parsed.");
         ValidateCorpusManifest manifest = ValidateCorpusManifest.Load(parsedOptions.ManifestPath);
         ValidateBaselineExceptionSet baselineExceptions = ValidateBaselineExceptionSet.Load(parsedOptions.BaselineExceptionsPath);
+        if (parsedOptions.MetadataOnly)
+        {
+            WriteValidateCorpusMetadataOnly(output, parsedOptions, manifest, baselineExceptions);
+            return 0;
+        }
+
         List<ValidateCorpusFixtureResult> results = [];
         foreach (ValidateCorpusFixture fixture in manifest.Fixtures)
         {
@@ -337,7 +343,7 @@ public static class OdfKitCli
         output.WriteLine("usage: odfkit <command> [arguments]");
         output.WriteLine("commands:");
         output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
-        output.WriteLine("  validate-corpus manifest.json [--root path] [--format text|json] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
+        output.WriteLine("  validate-corpus manifest.json [--root path] [--format text|json] [--quiet] [--metadata-only] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
         output.WriteLine("  info file.ods");
         output.WriteLine("  sanitize input.odt output.odt [--password value] [--output-password value] [--encryption aes256|blowfish]");
         output.WriteLine("  typed-dom-coverage [--format text|json]");
@@ -485,6 +491,7 @@ public static class OdfKitCli
         string? rootPath = null;
         ValidateOutputFormat format = ValidateOutputFormat.Text;
         bool quiet = false;
+        bool metadataOnly = false;
         ValidateBaselineKind baseline = ValidateBaselineKind.None;
         string? baselineJarPath = null;
         string? baselineCommandPath = null;
@@ -511,6 +518,9 @@ public static class OdfKitCli
                     break;
                 case "--quiet":
                     quiet = true;
+                    break;
+                case "--metadata-only":
+                    metadataOnly = true;
                     break;
                 case "--baseline":
                     if (!TryReadValue(args, ref i, error, "--baseline", out string? baselineValue) ||
@@ -591,6 +601,7 @@ public static class OdfKitCli
             resolvedRootPath,
             format,
             quiet,
+            metadataOnly,
             baseline,
             baselineJarPath,
             baselineCommandPath,
@@ -1057,6 +1068,51 @@ public static class OdfKitCli
         output.WriteLine(JsonSerializer.Serialize(model, JsonOptions));
     }
 
+    private static void WriteValidateCorpusMetadataOnly(
+        TextWriter output,
+        ValidateCorpusOptions options,
+        ValidateCorpusManifest manifest,
+        ValidateBaselineExceptionSet baselineExceptions)
+    {
+        if (options.Quiet)
+        {
+            return;
+        }
+
+        if (options.Format == ValidateOutputFormat.Json)
+        {
+            var model = new
+            {
+                summary = new
+                {
+                    metadataOnly = true,
+                    fixtureCount = manifest.Fixtures.Count,
+                    baselineExceptionCount = baselineExceptions.Count
+                },
+                fixtures = manifest.Fixtures.Select(fixture => new
+                {
+                    id = fixture.Id,
+                    path = fixture.Path,
+                    source = fixture.Source,
+                    sourceUri = fixture.SourceUri,
+                    license = fixture.License,
+                    kind = fixture.Kind,
+                    version = fixture.Version,
+                    profileId = fixture.Profile.Id,
+                    expected = FormatExpected(fixture.Expected),
+                    roundTrip = fixture.RoundTrip
+                }).ToArray()
+            };
+
+            output.WriteLine(JsonSerializer.Serialize(model, JsonOptions));
+            return;
+        }
+
+        output.WriteLine("metadata-only: True");
+        output.WriteLine("fixtures: " + manifest.Fixtures.Count.ToString(CultureInfo.InvariantCulture));
+        output.WriteLine("baseline-exceptions: " + baselineExceptions.Count.ToString(CultureInfo.InvariantCulture));
+    }
+
     private static bool ShouldFail(ValidateSummary summary, ValidateFailOn failOn)
     {
         if (summary.BaselineMismatchCount > 0)
@@ -1137,6 +1193,7 @@ public static class OdfKitCli
         string RootPath,
         ValidateOutputFormat Format,
         bool Quiet,
+        bool MetadataOnly,
         ValidateBaselineKind Baseline,
         string? BaselineJarPath,
         string? BaselineCommandPath,
@@ -1468,6 +1525,8 @@ public static class OdfKitCli
         {
             this.entries = entries;
         }
+
+        public int Count => entries.Count;
 
         public static ValidateBaselineExceptionSet Load(string? path)
         {
