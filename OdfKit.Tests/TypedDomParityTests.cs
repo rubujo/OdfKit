@@ -257,6 +257,85 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 typed DOM 可用 ODFDOM 風格建立簡報頁面、文字方塊、圖形與備忘稿。
+    /// </summary>
+    [Fact]
+    public void TypedDomSupportsOdfDomStylePresentationPageTraversal()
+    {
+        OfficeDocumentContentElement document = new("office");
+        document.SetOdfVersionAttributeValue("version", OdfNamespaces.Office, OdfVersion.Odf14, "office");
+        OfficeBodyElement body = document.AppendElement(new OfficeBodyElement("office"));
+        OfficePresentationElement presentation = body.AppendElement(new OfficePresentationElement("office"));
+        DrawPageElement page = presentation.AppendElement(new DrawPageElement("draw"));
+        DrawFrameElement titleFrame = page.AppendElement(new DrawFrameElement("draw"));
+        SvgTitleElement frameTitle = titleFrame.AppendElement(new SvgTitleElement("svg"));
+        DrawTextBoxElement titleBox = titleFrame.AppendElement(new DrawTextBoxElement("draw"));
+        TextPElement titleParagraph = titleBox.AppendElement(new TextPElement("text"));
+        DrawRectElement accentShape = page.AppendElement(new DrawRectElement("draw"));
+        PresentationNotesElement notes = page.AppendElement(new PresentationNotesElement("presentation"));
+        DrawFrameElement notesFrame = notes.AppendElement(new DrawFrameElement("draw"));
+        DrawTextBoxElement notesBox = notesFrame.AppendElement(new DrawTextBoxElement("draw"));
+        TextPElement notesParagraph = notesBox.AppendElement(new TextPElement("text"));
+
+        page.SetAttribute("name", OdfNamespaces.Draw, "Slide1", "draw");
+        page.SetPresentationTransitionTypeAttributeValue(
+            "transition-type",
+            OdfNamespaces.Presentation,
+            OdfPresentationTransitionType.Automatic,
+            "presentation");
+        page.SetPresentationSpeedAttributeValue(
+            "transition-speed",
+            OdfNamespaces.Presentation,
+            OdfPresentationSpeed.Fast,
+            "presentation");
+        titleFrame.SetLengthAttributeValue("x", OdfNamespaces.Svg, OdfLength.FromCentimeters(1), "svg");
+        titleFrame.SetLengthAttributeValue("y", OdfNamespaces.Svg, OdfLength.FromCentimeters(1), "svg");
+        titleFrame.SetLengthAttributeValue("width", OdfNamespaces.Svg, OdfLength.FromCentimeters(18), "svg");
+        titleFrame.SetLengthAttributeValue("height", OdfNamespaces.Svg, OdfLength.FromCentimeters(2), "svg");
+        frameTitle.TextContent = "首頁標題";
+        titleParagraph.TextContent = "ODFDOM 簡報 traversal";
+        accentShape.SetAttribute("name", OdfNamespaces.Draw, "Accent", "draw");
+        accentShape.SetLengthAttributeValue("x", OdfNamespaces.Svg, OdfLength.FromCentimeters(1), "svg");
+        accentShape.SetLengthAttributeValue("y", OdfNamespaces.Svg, OdfLength.FromCentimeters(4), "svg");
+        accentShape.SetLengthAttributeValue("width", OdfNamespaces.Svg, OdfLength.FromCentimeters(6), "svg");
+        accentShape.SetLengthAttributeValue("height", OdfNamespaces.Svg, OdfLength.FromCentimeters(1), "svg");
+        notesParagraph.TextContent = "講者備忘稿";
+
+        Assert.Equal([page], presentation.DrawPageChildElements.ToArray());
+        Assert.Equal([titleFrame], page.DrawFrameChildElements.ToArray());
+        Assert.Equal([accentShape], page.DrawRectChildElements.ToArray());
+        Assert.Equal([notes], page.PresentationNotesChildElements.ToArray());
+        Assert.Equal([frameTitle], titleFrame.SvgTitleChildElements.ToArray());
+        Assert.Equal([titleBox], titleFrame.DrawTextBoxChildElements.ToArray());
+        Assert.Equal([titleParagraph], titleBox.TextPChildElements.ToArray());
+        Assert.Equal([notesFrame], notes.DrawFrameChildElements.ToArray());
+        Assert.Equal([notesBox], notesFrame.DrawTextBoxChildElements.ToArray());
+        Assert.Equal(OdfPresentationTransitionType.Automatic, page.GetPresentationTransitionTypeAttributeValue("transition-type", OdfNamespaces.Presentation));
+        Assert.Equal(OdfPresentationSpeed.Fast, page.GetPresentationSpeedAttributeValue("transition-speed", OdfNamespaces.Presentation));
+        Assert.Equal(OdfLength.FromCentimeters(18), titleFrame.GetLengthAttributeValue("width", OdfNamespaces.Svg));
+
+        using MemoryStream stream = new();
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeDocumentContentElement parsedDocument = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream));
+        OfficePresentationElement parsedPresentation = parsedDocument.OfficeBodyChildElements.Single().OfficePresentationChildElements.Single();
+        DrawPageElement parsedPage = parsedPresentation.DrawPageChildElements.Single();
+        DrawFrameElement parsedTitleFrame = parsedPage.DrawFrameChildElements.Single();
+        PresentationNotesElement parsedNotes = parsedPage.PresentationNotesChildElements.Single();
+
+        Assert.Equal("Slide1", parsedPage.GetAttribute("name", OdfNamespaces.Draw));
+        Assert.Equal("首頁標題", parsedTitleFrame.SvgTitleChildElements.Single().TextContent);
+        Assert.Equal("ODFDOM 簡報 traversal", parsedTitleFrame.DrawTextBoxChildElements.Single().TextPChildElements.Single().TextContent);
+        Assert.Equal("Accent", parsedPage.DrawRectChildElements.Single().GetAttribute("name", OdfNamespaces.Draw));
+        Assert.Equal("講者備忘稿", parsedNotes.DrawFrameChildElements.Single().DrawTextBoxChildElements.Single().TextPChildElements.Single().TextContent);
+        Assert.Equal(OdfPresentationTransitionType.Automatic, parsedPage.GetPresentationTransitionTypeAttributeValue("transition-type", OdfNamespaces.Presentation));
+        Assert.Equal(OdfPresentationSpeed.Fast, parsedPage.GetPresentationSpeedAttributeValue("transition-speed", OdfNamespaces.Presentation));
+        Assert.Equal(OdfLength.FromCentimeters(1), parsedTitleFrame.GetLengthAttributeValue("x", OdfNamespaces.Svg));
+        Assert.Equal(OdfLength.FromCentimeters(1), parsedPage.DrawRectChildElements.Single().GetLengthAttributeValue("height", OdfNamespaces.Svg));
+    }
+
+    /// <summary>
     /// 驗證 generated DOM wrapper 的 class、factory case 與屬性數量沒有意外退化。
     /// </summary>
     [Fact]

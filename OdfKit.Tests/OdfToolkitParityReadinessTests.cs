@@ -31,6 +31,7 @@ public class OdfToolkitParityReadinessTests
         Assert.Contains("schema-specific child collection", parity, StringComparison.Ordinal);
         Assert.Contains("child relation coverage", parity, StringComparison.Ordinal);
         Assert.Contains("ODFDOM-style sample traversal", parity, StringComparison.Ordinal);
+        Assert.Contains("presentation page", parity, StringComparison.Ordinal);
         Assert.Contains("odf-official-corpus-sources.md", parity, StringComparison.Ordinal);
     }
 
