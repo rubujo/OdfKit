@@ -101,6 +101,21 @@ public class OdfImageDocument : OdfDocument
     }
 
     /// <summary>
+    /// 取得主要影像的位元組內容。
+    /// </summary>
+    /// <returns>主要影像位元組；若文件未參照封裝內影像則為 <see langword="null"/>。</returns>
+    public byte[]? GetImageBytes()
+    {
+        string? href = ImageHref;
+        if (string.IsNullOrWhiteSpace(href) || !Package.HasEntry(href!))
+        {
+            return null;
+        }
+
+        return Package.ReadEntry(href!);
+    }
+
+    /// <summary>
     /// 設定 ODI 文件的主要影像。
     /// </summary>
     /// <param name="imageBytes">圖片位元組陣列。</param>

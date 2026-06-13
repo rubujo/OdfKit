@@ -186,7 +186,8 @@ public class DocumentKindApiUsabilityTests
     public void CreateLoadImageWithEmbeddedPicture()
     {
         using var image = OdfImageDocument.Create();
-        string href = image.SetImage(CreatePngBytes(), "TinyPng.png");
+        byte[] bytes = CreatePngBytes();
+        string href = image.SetImage(bytes, "TinyPng.png");
 
         using OdfImageDocument loaded = RoundTrip(image, "image.odi", OdfImageDocument.Load);
 
@@ -195,7 +196,8 @@ public class DocumentKindApiUsabilityTests
         Assert.NotNull(loaded.ImageInfo);
         Assert.Equal(href, loaded.ImageInfo.Path);
         Assert.Equal("image/png", loaded.ImageInfo.MediaType);
-        Assert.Equal(CreatePngBytes().Length, loaded.ImageInfo.Size);
+        Assert.Equal(bytes.Length, loaded.ImageInfo.Size);
+        Assert.Equal(bytes, loaded.GetImageBytes());
         Assert.True(loaded.Package.HasEntry("Pictures/TinyPng.png"));
     }
 
