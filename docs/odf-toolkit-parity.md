@@ -26,7 +26,7 @@
 | Document factory | `OdfDocumentFactory`、typed wrappers | Simple API document load/create | complete | 17 種主要 extension 可最小 create / load / save / validate / round-trip。 |
 | Validator API | `OdfValidator`、`OdfPackageValidator`、`OdfFlatDocumentValidator` | ODF Validator | partial | 與外部 ODF Validator 對相同 corpus 的 valid / invalid classification 一致，差異需列入 documented exceptions。 |
 | External baseline | `OdfExternalValidator`、CLI `--baseline` | ODF Validator CLI | partial | 可選執行 ODF Validator JAR；未設定時一般測試與 CI 不受影響。 |
-| Typed DOM | generated DOM wrappers | ODFDOM | partial | 所有 ODF 1.4 schema element 可 create / parse / serialize，常用 attributes 可讀寫。 |
+| Typed DOM | generated DOM wrappers、`OdfNodeFactory` | ODFDOM | partial | 以 [typed-dom-coverage.md](typed-dom-coverage.md) 追蹤 wrapper / factory / attribute coverage，並逐步補 typed datatype。 |
 | Simple high-level API | Text / Spreadsheet / Presentation / Drawing facade | ODF Toolkit Simple API | partial | ODT / ODS / ODP / ODG 常見建立、讀取與有限修改有直接 facade。 |
 | Corpus | generated、positive、negative、unknown、security corpus | ODF Validator sample corpus | partial | 小型可提交 corpus 有 manifest；大型或第三方 corpus 用外部路徑。 |
 
