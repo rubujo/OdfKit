@@ -320,6 +320,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.Boolean;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            IsStyleNameReference(node.ReferenceName))
+        {
+            return AttributeValueKind.StyleName;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -459,6 +465,15 @@ public sealed class DomWrappersCSharpWriter
                     "GetAngleAttributeValue",
                     "SetAngleAttributeValue");
                 break;
+            case AttributeValueKind.StyleName:
+                writer.WriteLine($"        public OdfStyleName? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetStyleNameAttributeValue",
+                    "SetStyleNameAttributeValue");
+                break;
             case AttributeValueKind.StyleFamily:
                 writer.WriteLine($"        public OdfStyleFamily? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -543,6 +558,11 @@ public sealed class DomWrappersCSharpWriter
             "nonNegativePercent";
     }
 
+    private static bool IsStyleNameReference(string? referenceName)
+    {
+        return referenceName is "styleName" or "styleNameRef";
+    }
+
     private static string? GetNamespacePrefix(string namespaceUri)
     {
         return namespaceUri switch
@@ -619,6 +639,7 @@ public sealed class DomWrappersCSharpWriter
         Length,
         Duration,
         Angle,
+        StyleName,
         StyleFamily,
         OdfVersion,
         MediaType
