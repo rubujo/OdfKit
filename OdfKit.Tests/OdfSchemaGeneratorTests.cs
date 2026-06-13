@@ -282,6 +282,11 @@ namespace OdfKit.Tests
                 "<attribute name=\"number:style\"><choice><value>short</value><value>long</value></choice></attribute>" +
                 "<attribute name=\"table:order\"><choice><value>ascending</value><value>descending</value></choice></attribute>" +
                 "<attribute name=\"table:type\"><choice><value>column</value><value>row</value><value>table</value><value>running-total</value></choice></attribute>" +
+                "<attribute name=\"presentation:effect\"><choice><value>none</value><value>move-short</value></choice></attribute>" +
+                "<attribute name=\"presentation:speed\"><choice><value>slow</value><value>medium</value><value>fast</value></choice></attribute>" +
+                "<attribute name=\"presentation:action\"><choice><value>none</value><value>last-visited-page</value></choice></attribute>" +
+                "<attribute name=\"presentation:transition-type\"><choice><value>manual</value><value>automatic</value><value>semi-automatic</value></choice></attribute>" +
+                "<attribute name=\"presentation:transition-style\"><choice><value>none</value><value>interlocking-horizontal-right</value><value>melt</value></choice></attribute>" +
                 "<attribute name=\"fo:keep-together\"><choice><value>auto</value><value>always</value></choice></attribute>" +
                 "<attribute name=\"fo:wrap-option\"><choice><value>wrap</value><value>no-wrap</value></choice></attribute>" +
                 "<attribute name=\"dr3d:projection\"><choice><value>parallel</value><value>perspective</value></choice></attribute>" +
@@ -401,6 +406,16 @@ namespace OdfKit.Tests
             Assert.Contains("get => GetTableOrderAttributeValue(\"order\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfTableType? TableType", code);
             Assert.Contains("get => GetTableTypeAttributeValue(\"type\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfPresentationEffect? Effect", code);
+            Assert.Contains("get => GetPresentationEffectAttributeValue(\"effect\", \"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfPresentationSpeed? Speed", code);
+            Assert.Contains("get => GetPresentationSpeedAttributeValue(\"speed\", \"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfPresentationAction? Action", code);
+            Assert.Contains("get => GetPresentationActionAttributeValue(\"action\", \"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfPresentationTransitionType? TransitionType", code);
+            Assert.Contains("get => GetPresentationTransitionTypeAttributeValue(\"transition-type\", \"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfPresentationTransitionStyle? TransitionStyle", code);
+            Assert.Contains("get => GetPresentationTransitionStyleAttributeValue(\"transition-style\", \"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfFoKeepTogether? KeepTogether", code);
             Assert.Contains("get => GetFoKeepTogetherAttributeValue(\"keep-together\", \"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public OdfFoWrapOption? WrapOption", code);

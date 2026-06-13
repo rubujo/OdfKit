@@ -158,6 +158,11 @@ public class CliTests
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberStyle").GetInt32() >= 109);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableOrder").GetInt32() >= 108);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableType").GetInt32() >= 102);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationEffect").GetInt32() >= 131);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationSpeed").GetInt32() >= 231);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationAction").GetInt32() >= 125);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationTransitionType").GetInt32() >= 99);
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationTransitionStyle").GetInt32() >= 99);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foKeepTogether").GetInt32() >= 99);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foWrapOption").GetInt32() >= 100);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("dr3dProjection").GetInt32() >= 100);

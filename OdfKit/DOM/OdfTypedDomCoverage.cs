@@ -400,6 +400,31 @@ public static class OdfTypedDomCoverage
             return "tableType";
         }
 
+        if (resolvedType == typeof(OdfPresentationEffect))
+        {
+            return "presentationEffect";
+        }
+
+        if (resolvedType == typeof(OdfPresentationSpeed))
+        {
+            return "presentationSpeed";
+        }
+
+        if (resolvedType == typeof(OdfPresentationAction))
+        {
+            return "presentationAction";
+        }
+
+        if (resolvedType == typeof(OdfPresentationTransitionType))
+        {
+            return "presentationTransitionType";
+        }
+
+        if (resolvedType == typeof(OdfPresentationTransitionStyle))
+        {
+            return "presentationTransitionStyle";
+        }
+
         if (resolvedType == typeof(OdfFoKeepTogether))
         {
             return "foKeepTogether";

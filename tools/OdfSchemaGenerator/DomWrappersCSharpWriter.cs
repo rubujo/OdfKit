@@ -566,6 +566,36 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.TableType;
         }
 
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" &&
+            node.LocalName == "effect")
+        {
+            return AttributeValueKind.PresentationEffect;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" &&
+            (node.LocalName == "speed" || node.LocalName == "transition-speed"))
+        {
+            return AttributeValueKind.PresentationSpeed;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" &&
+            node.LocalName == "action")
+        {
+            return AttributeValueKind.PresentationAction;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" &&
+            node.LocalName == "transition-type")
+        {
+            return AttributeValueKind.PresentationTransitionType;
+        }
+
+        if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" &&
+            node.LocalName == "transition-style")
+        {
+            return AttributeValueKind.PresentationTransitionStyle;
+        }
+
         if (node.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" &&
             node.LocalName == "keep-together")
         {
@@ -1193,6 +1223,51 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetTableTypeAttributeValue",
                     "SetTableTypeAttributeValue");
+                break;
+            case AttributeValueKind.PresentationEffect:
+                writer.WriteLine($"        public OdfPresentationEffect? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetPresentationEffectAttributeValue",
+                    "SetPresentationEffectAttributeValue");
+                break;
+            case AttributeValueKind.PresentationSpeed:
+                writer.WriteLine($"        public OdfPresentationSpeed? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetPresentationSpeedAttributeValue",
+                    "SetPresentationSpeedAttributeValue");
+                break;
+            case AttributeValueKind.PresentationAction:
+                writer.WriteLine($"        public OdfPresentationAction? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetPresentationActionAttributeValue",
+                    "SetPresentationActionAttributeValue");
+                break;
+            case AttributeValueKind.PresentationTransitionType:
+                writer.WriteLine($"        public OdfPresentationTransitionType? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetPresentationTransitionTypeAttributeValue",
+                    "SetPresentationTransitionTypeAttributeValue");
+                break;
+            case AttributeValueKind.PresentationTransitionStyle:
+                writer.WriteLine($"        public OdfPresentationTransitionStyle? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetPresentationTransitionStyleAttributeValue",
+                    "SetPresentationTransitionStyleAttributeValue");
                 break;
             case AttributeValueKind.FoKeepTogether:
                 writer.WriteLine($"        public OdfFoKeepTogether? {propName}");
@@ -1879,6 +1954,11 @@ public sealed class DomWrappersCSharpWriter
         NumberStyle,
         TableOrder,
         TableType,
+        PresentationEffect,
+        PresentationSpeed,
+        PresentationAction,
+        PresentationTransitionType,
+        PresentationTransitionStyle,
         FoKeepTogether,
         FoWrapOption,
         Dr3dProjection,
