@@ -350,6 +350,18 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.SignedPercent;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "cellAddress", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.CellAddress;
+        }
+
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "cellRangeAddress", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.CellRangeAddress;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -534,6 +546,24 @@ public sealed class DomWrappersCSharpWriter
                     "GetSignedPercentAttributeValue",
                     "SetSignedPercentAttributeValue");
                 break;
+            case AttributeValueKind.CellAddress:
+                writer.WriteLine($"        public OdfCellAddressReference? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetCellAddressAttributeValue",
+                    "SetCellAddressAttributeValue");
+                break;
+            case AttributeValueKind.CellRangeAddress:
+                writer.WriteLine($"        public OdfCellRangeAddress? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetCellRangeAddressAttributeValue",
+                    "SetCellRangeAddressAttributeValue");
+                break;
             case AttributeValueKind.StyleFamily:
                 writer.WriteLine($"        public OdfStyleFamily? {propName}");
                 WriteNullableTypedAttributePropertyBody(
@@ -704,6 +734,8 @@ public sealed class DomWrappersCSharpWriter
         IriReference,
         Percent,
         SignedPercent,
+        CellAddress,
+        CellRangeAddress,
         StyleFamily,
         OdfVersion,
         MediaType

@@ -147,6 +147,16 @@ public static class OdfTypedDomCoverage
             return "percent";
         }
 
+        if (resolvedType == typeof(OdfCellAddressReference))
+        {
+            return "cellAddress";
+        }
+
+        if (resolvedType == typeof(OdfCellRangeAddress))
+        {
+            return "cellRangeAddress";
+        }
+
         if (resolvedType == typeof(OdfStyleFamily))
         {
             return "styleFamily";

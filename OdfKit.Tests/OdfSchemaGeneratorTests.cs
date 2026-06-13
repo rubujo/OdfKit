@@ -239,6 +239,8 @@ namespace OdfKit.Tests
                 "<define name=\"anyIRI\"><data type=\"anyURI\" /></define>" +
                 "<define name=\"zeroToHundredPercent\"><data type=\"string\"><param name=\"pattern\">([0-9]?[0-9](\\.[0-9]*)?|100(\\.0*)?|\\.[0-9]+)%</param></data></define>" +
                 "<define name=\"signedZeroToHundredPercent\"><data type=\"string\"><param name=\"pattern\">-?([0-9]?[0-9](\\.[0-9]*)?|100(\\.0*)?|\\.[0-9]+)%</param></data></define>" +
+                "<define name=\"cellAddress\"><data type=\"string\"><param name=\"pattern\">($?([^\\. ']+|'([^']|'')+'))?\\.$?[A-Z]+$?[0-9]+</param></data></define>" +
+                "<define name=\"cellRangeAddress\"><data type=\"string\"><param name=\"pattern\">($?([^\\. ']+|'([^']|'')+'))?\\.$?[A-Z]+$?[0-9]+(:($?([^\\. ']+|'([^']|'')+'))?\\.$?[A-Z]+$?[0-9]+)?</param></data></define>" +
                 "<define name=\"length\"><data type=\"string\"><param name=\"pattern\">[0-9]+cm</param></data></define>" +
                 "<define name=\"percent\"><data type=\"string\"><param name=\"pattern\">[0-9]+%</param></data></define>" +
                 "<define name=\"angle\"><data type=\"string\" /></define>" +
@@ -250,6 +252,8 @@ namespace OdfKit.Tests
                 "<attribute name=\"xlink:href\"><ref name=\"anyIRI\" /></attribute>" +
                 "<attribute name=\"draw:opacity\"><ref name=\"zeroToHundredPercent\" /></attribute>" +
                 "<attribute name=\"draw:shadow-offset\"><ref name=\"signedZeroToHundredPercent\" /></attribute>" +
+                "<attribute name=\"table:base-cell-address\"><ref name=\"cellAddress\" /></attribute>" +
+                "<attribute name=\"table:cell-range-address\"><ref name=\"cellRangeAddress\" /></attribute>" +
                 "<attribute name=\"table:width\"><ref name=\"length\" /></attribute>" +
                 "<attribute name=\"table:scale\"><ref name=\"percent\" /></attribute>" +
                 "<attribute name=\"office:boolean-value\"><data type=\"boolean\" /></attribute>" +
@@ -299,6 +303,12 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfPercent? ShadowOffset", code);
             Assert.Contains("get => GetSignedPercentAttributeValue(\"shadow-offset\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetSignedPercentAttributeValue(\"shadow-offset\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfCellAddressReference? BaseCellAddress", code);
+            Assert.Contains("get => GetCellAddressAttributeValue(\"base-cell-address\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetCellAddressAttributeValue(\"base-cell-address\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", value.Value, \"table\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfCellRangeAddress? CellRangeAddress", code);
+            Assert.Contains("get => GetCellRangeAddressAttributeValue(\"cell-range-address\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetCellRangeAddressAttributeValue(\"cell-range-address\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", value.Value, \"table\", GetDocumentVersion());", code);
             Assert.Contains("public decimal? Value", code);
             Assert.Contains("get => GetDecimalAttributeValue(\"value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public DateTime? DateValue", code);
