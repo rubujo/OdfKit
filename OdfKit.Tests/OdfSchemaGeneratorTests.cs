@@ -243,6 +243,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"office:value\"><data type=\"decimal\" /></attribute>" +
                 "<attribute name=\"office:date-value\"><data type=\"dateTime\" /></attribute>" +
                 "<attribute name=\"office:time-value\"><data type=\"time\" /></attribute>" +
+                "<attribute name=\"presentation:duration\"><data type=\"duration\" /></attribute>" +
                 "<attribute name=\"office:version\"><value>1.4</value></attribute>" +
                 "<attribute name=\"office:mimetype\"><data type=\"string\" /></attribute>" +
                 "<attribute name=\"style:family\"><value>paragraph</value></attribute>" +
@@ -273,6 +274,9 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfTime? TimeValue", code);
             Assert.Contains("get => GetTimeAttributeValue(\"time-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetTimeAttributeValue(\"time-value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", value.Value, \"office\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfDuration? Duration", code);
+            Assert.Contains("get => GetDurationAttributeValue(\"duration\", \"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\", GetDocumentVersion());", code);
+            Assert.Contains("SetDurationAttributeValue(\"duration\", \"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\", value.Value, \"presentation\", GetDocumentVersion());", code);
             Assert.Contains("public OdfStyleFamily? Family", code);
             Assert.Contains("get => GetStyleFamilyAttributeValue(\"family\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetStyleFamilyAttributeValue(\"family\", \"urn:oasis:names:tc:opendocument:xmlns:style:1.0\", value.Value, \"style\", GetDocumentVersion());", code);
@@ -653,7 +657,8 @@ namespace OdfKit.Tests
                 " xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"" +
                 " xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\"" +
                 " xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\"" +
-                " xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\">" +
+                " xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\"" +
+                " xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\">" +
                 body +
                 "</grammar>";
         }

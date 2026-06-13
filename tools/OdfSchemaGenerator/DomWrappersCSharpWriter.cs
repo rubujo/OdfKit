@@ -349,6 +349,7 @@ public sealed class DomWrappersCSharpWriter
             "decimal" or "double" or "float" => AttributeValueKind.Decimal,
             "date" or "datetime" => AttributeValueKind.DateTime,
             "time" => AttributeValueKind.Time,
+            "duration" => AttributeValueKind.Duration,
             "string" or "normalizedstring" or "token" or "language" or "name" or "ncname" or "id" or "idref" or "anyuri" => AttributeValueKind.String,
             _ => AttributeValueKind.String
         };
@@ -427,6 +428,15 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetLengthAttributeValue",
                     "SetLengthAttributeValue");
+                break;
+            case AttributeValueKind.Duration:
+                writer.WriteLine($"        public OdfDuration? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetDurationAttributeValue",
+                    "SetDurationAttributeValue");
                 break;
             case AttributeValueKind.StyleFamily:
                 writer.WriteLine($"        public OdfStyleFamily? {propName}");
@@ -586,6 +596,7 @@ public sealed class DomWrappersCSharpWriter
         DateTime,
         Time,
         Length,
+        Duration,
         StyleFamily,
         OdfVersion,
         MediaType

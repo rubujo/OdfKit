@@ -117,6 +117,11 @@ public static class OdfTypedDomCoverage
             return "length";
         }
 
+        if (resolvedType == typeof(OdfDuration))
+        {
+            return "duration";
+        }
+
         if (resolvedType == typeof(OdfStyleFamily))
         {
             return "styleFamily";
