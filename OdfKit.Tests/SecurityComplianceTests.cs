@@ -38,6 +38,49 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void TestXmlReaderRejectsLargeTextDoSCorpus()
+        {
+            string xml =
+                "<office:document-content xmlns:office=\"" + OdfNamespaces.Office + "\">" +
+                "  <office:body><office:text>" + new string('x', 512) + "</office:text></office:body>" +
+                "</office:document-content>";
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+            OdfLoadOptions options = new()
+            {
+                MaxXmlCharactersInDocument = 256
+            };
+
+            SecurityException exception = Assert.Throws<SecurityException>(() => OdfXmlReader.Parse(stream, options));
+            Assert.Contains("character limit exceeded", exception.Message);
+        }
+
+        [Fact]
+        public void TestDocumentLoadAppliesXmlCharacterLimit()
+        {
+            using var ms = new MemoryStream();
+            using (var package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                package.SetMimeType("application/vnd.oasis.opendocument.text");
+                string contentXml =
+                    "<office:document-content xmlns:office=\"" + OdfNamespaces.Office + "\">" +
+                    "  <office:body><office:text>" + new string('x', 1024) + "</office:text></office:body>" +
+                    "</office:document-content>";
+                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(contentXml), "text/xml");
+                package.Save();
+            }
+
+            ms.Position = 0;
+            OdfLoadOptions options = new()
+            {
+                MaxXmlCharactersInDocument = 512
+            };
+
+            SecurityException exception = Assert.Throws<SecurityException>(
+                () => OdfDocumentFactory.LoadDocument(ms, options, "large-text.odt"));
+            Assert.Contains("character limit exceeded", exception.Message);
+        }
+
+        [Fact]
         public void TestMacroSanitization_CleansPackageMacrosAndSignatures()
         {
             using var ms = new MemoryStream();

@@ -210,12 +210,12 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             if (Package.HasEntry(path))
             {
                 using var stream = Package.GetEntryStream(path);
-                return OdfXmlReader.Parse(stream);
+                return OdfXmlReader.Parse(stream, Package.LoadOptions);
             }
             else
             {
                 using var ms = new MemoryStream(Encoding.UTF8.GetBytes(defaultXml));
-                return OdfXmlReader.Parse(ms);
+                return OdfXmlReader.Parse(ms, Package.LoadOptions);
             }
         }
 

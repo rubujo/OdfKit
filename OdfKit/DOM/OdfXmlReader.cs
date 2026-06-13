@@ -35,7 +35,10 @@ public static class OdfXmlReader
             XmlResolver = null,                     // XXE 防禦
             IgnoreWhitespace = false,               // 保留有意義的空白
             IgnoreComments = false,
-            IgnoreProcessingInstructions = false
+            IgnoreProcessingInstructions = false,
+            MaxCharactersInDocument = options.MaxXmlCharactersInDocument > 0
+                ? options.MaxXmlCharactersInDocument
+                : 0
         };
 
         // StringPool 用於重複使用常見的字串執行個體 (例如元素與屬性名稱、命名空間)，
@@ -45,6 +48,7 @@ public static class OdfXmlReader
         OdfNode? rootNode = null;
         Stack<OdfNode> stack = new();
         int currentDepth = 0;
+        long xmlCharacterCount = 0;
 
         using (var reader = XmlReader.Create(stream, settings))
         {
@@ -65,6 +69,7 @@ public static class OdfXmlReader
                             string localName = pool.GetOrAdd(reader.LocalName);
                             string nsUri = pool.GetOrAdd(reader.NamespaceURI);
                             string prefix = pool.GetOrAdd(reader.Prefix);
+                            AddXmlCharacters(options, ref xmlCharacterCount, localName.Length + nsUri.Length + prefix.Length);
 
                             var node = OdfNodeFactory.CreateElement(localName, nsUri, prefix);
 
@@ -77,6 +82,10 @@ public static class OdfXmlReader
                                     string attrNsUri = pool.GetOrAdd(reader.NamespaceURI);
                                     string attrPrefix = pool.GetOrAdd(reader.Prefix);
                                     string attrValue = reader.Value; // 一般不在 StringPool 中快取屬性值，因為其值變化較大，除非是空值或布林值
+                                    AddXmlCharacters(
+                                        options,
+                                        ref xmlCharacterCount,
+                                        attrLocalName.Length + attrNsUri.Length + attrPrefix.Length + attrValue.Length);
 
                                     // 跳過命名空間宣告 (xmlns 或 xmlns:prefix)
                                     if (attrNsUri == "http://www.w3.org/2000/xmlns/" || attrLocalName == "xmlns" || attrPrefix == "xmlns")
@@ -121,6 +130,7 @@ public static class OdfXmlReader
                             if (stack.Count > 0)
                             {
                                 string commentVal = reader.Value;
+                                AddXmlCharacters(options, ref xmlCharacterCount, commentVal.Length);
                                 OdfNode commentNode = new(OdfNodeType.Comment, string.Empty, string.Empty)
                                 {
                                     TextContent = commentVal
@@ -132,6 +142,7 @@ public static class OdfXmlReader
                         case XmlNodeType.ProcessingInstruction:
                             if (stack.Count > 0)
                             {
+                                AddXmlCharacters(options, ref xmlCharacterCount, reader.Name.Length + reader.Value.Length);
                                 OdfNode instructionNode = new(OdfNodeType.ProcessingInstruction, reader.Name, string.Empty)
                                 {
                                     TextContent = reader.Value
@@ -146,6 +157,7 @@ public static class OdfXmlReader
                             if (stack.Count > 0)
                             {
                                 string textVal = reader.Value;
+                                AddXmlCharacters(options, ref xmlCharacterCount, textVal.Length);
                                 OdfNode textNode = new(OdfNodeType.Text, string.Empty, string.Empty)
                                 {
                                     TextContent = textVal
@@ -158,6 +170,13 @@ public static class OdfXmlReader
             }
             catch (XmlException ex)
             {
+                if (IsXmlSizeLimitExceeded(ex))
+                {
+                    throw new SecurityException(
+                        $"XML document character limit exceeded ({options.MaxXmlCharactersInDocument}). Potential XML DoS attack.",
+                        ex);
+                }
+
                 if (!options.StrictXmlParsing)
                 {
                     OdfKitDiagnostics.Warn($"Lax parsing XML exception: {ex.Message}. Attempting to salvage partial DOM tree.", ex);
@@ -175,5 +194,26 @@ public static class OdfXmlReader
         }
 
         return rootNode;
+    }
+
+    private static void AddXmlCharacters(OdfLoadOptions options, ref long total, long count)
+    {
+        if (options.MaxXmlCharactersInDocument <= 0 || count <= 0)
+        {
+            return;
+        }
+
+        total += count;
+        if (total > options.MaxXmlCharactersInDocument)
+        {
+            throw new SecurityException(
+                $"XML document character limit exceeded ({total} > {options.MaxXmlCharactersInDocument}). Potential XML DoS attack.");
+        }
+    }
+
+    private static bool IsXmlSizeLimitExceeded(XmlException exception)
+    {
+        return exception.Message.IndexOf(nameof(XmlReaderSettings.MaxCharactersInDocument), StringComparison.OrdinalIgnoreCase) >= 0 ||
+            exception.Message.IndexOf("maximum number of characters", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 }

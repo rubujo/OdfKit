@@ -36,6 +36,14 @@ public class OdfLoadOptions
     public long MaxTotalUncompressedSize { get; set; } = 1024 * 1024 * 1024;
 
     /// <summary>
+    /// 取得或設定單一 XML 文件可讀取的最大字元數限制（預設 64 MB，防禦 XML DoS）。
+    /// </summary>
+    /// <remarks>
+    /// 設為 0 或負值時停用此限制；一般應維持預設值，僅在受信任的大型文件情境中調整。
+    /// </remarks>
+    public long MaxXmlCharactersInDocument { get; set; } = 64 * 1024 * 1024;
+
+    /// <summary>
     /// 取得或設定用於解密加密 ODF 文件的密碼。
     /// </summary>
     public string? Password { get; set; }
