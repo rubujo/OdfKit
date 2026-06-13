@@ -236,6 +236,7 @@ namespace OdfKit.Tests
                 "<define name=\"boolean\"><choice><value>true</value><value>false</value></choice></define>" +
                 "<define name=\"styleNameRef\"><data type=\"NCName\" /></define>" +
                 "<define name=\"color\"><data type=\"string\"><param name=\"pattern\">#[0-9a-fA-F]{6}</param></data></define>" +
+                "<define name=\"anyIRI\"><data type=\"anyURI\" /></define>" +
                 "<define name=\"length\"><data type=\"string\"><param name=\"pattern\">[0-9]+cm</param></data></define>" +
                 "<define name=\"percent\"><data type=\"string\"><param name=\"pattern\">[0-9]+%</param></data></define>" +
                 "<define name=\"angle\"><data type=\"string\" /></define>" +
@@ -244,6 +245,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"table:enabled\"><ref name=\"boolean\" /></attribute>" +
                 "<attribute name=\"table:style-name\"><ref name=\"styleNameRef\" /></attribute>" +
                 "<attribute name=\"draw:fill-color\"><ref name=\"color\" /></attribute>" +
+                "<attribute name=\"xlink:href\"><ref name=\"anyIRI\" /></attribute>" +
                 "<attribute name=\"table:width\"><ref name=\"length\" /></attribute>" +
                 "<attribute name=\"table:scale\"><ref name=\"percent\" /></attribute>" +
                 "<attribute name=\"office:boolean-value\"><data type=\"boolean\" /></attribute>" +
@@ -284,6 +286,9 @@ namespace OdfKit.Tests
             Assert.Contains("public OdfColor? FillColor", code);
             Assert.Contains("get => GetColorAttributeValue(\"fill-color\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetColorAttributeValue(\"fill-color\", \"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\", value.Value, \"draw\", GetDocumentVersion());", code);
+            Assert.Contains("public OdfIriReference? Href", code);
+            Assert.Contains("get => GetIriReferenceAttributeValue(\"href\", \"http://www.w3.org/1999/xlink\", GetDocumentVersion());", code);
+            Assert.Contains("SetIriReferenceAttributeValue(\"href\", \"http://www.w3.org/1999/xlink\", value.Value, \"xlink\", GetDocumentVersion());", code);
             Assert.Contains("public decimal? Value", code);
             Assert.Contains("get => GetDecimalAttributeValue(\"value\", \"urn:oasis:names:tc:opendocument:xmlns:office:1.0\", GetDocumentVersion());", code);
             Assert.Contains("public DateTime? DateValue", code);
@@ -678,6 +683,7 @@ namespace OdfKit.Tests
                 " xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\"" +
                 " xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\"" +
                 " xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\"" +
+                " xmlns:xlink=\"http://www.w3.org/1999/xlink\"" +
                 " xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\"" +
                 " xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\">" +
                 body +

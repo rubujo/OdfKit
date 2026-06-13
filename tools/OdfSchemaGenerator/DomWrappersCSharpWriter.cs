@@ -332,6 +332,12 @@ public sealed class DomWrappersCSharpWriter
             return AttributeValueKind.Color;
         }
 
+        if ((node.Kind == "ref" || node.Kind == "parentRef") &&
+            string.Equals(node.ReferenceName, "anyIRI", StringComparison.Ordinal))
+        {
+            return AttributeValueKind.IriReference;
+        }
+
         if (node.Kind == "data" || node.Kind == "value")
         {
             return GetValueKind(node.DataType);
@@ -488,6 +494,15 @@ public sealed class DomWrappersCSharpWriter
                     prefix,
                     "GetColorAttributeValue",
                     "SetColorAttributeValue");
+                break;
+            case AttributeValueKind.IriReference:
+                writer.WriteLine($"        public OdfIriReference? {propName}");
+                WriteNullableTypedAttributePropertyBody(
+                    writer,
+                    attr,
+                    prefix,
+                    "GetIriReferenceAttributeValue",
+                    "SetIriReferenceAttributeValue");
                 break;
             case AttributeValueKind.StyleFamily:
                 writer.WriteLine($"        public OdfStyleFamily? {propName}");
@@ -656,6 +671,7 @@ public sealed class DomWrappersCSharpWriter
         Angle,
         StyleName,
         Color,
+        IriReference,
         StyleFamily,
         OdfVersion,
         MediaType

@@ -137,6 +137,11 @@ public static class OdfTypedDomCoverage
             return "color";
         }
 
+        if (resolvedType == typeof(OdfIriReference))
+        {
+            return "iriReference";
+        }
+
         if (resolvedType == typeof(OdfStyleFamily))
         {
             return "styleFamily";
