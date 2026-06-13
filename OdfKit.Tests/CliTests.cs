@@ -125,6 +125,7 @@ public class CliTests
                 relation.GetProperty("parentLocalName").GetString() == "body" &&
                 relation.GetProperty("childNamespaceUri").GetString() == OdfNamespaces.Office &&
                 relation.GetProperty("childLocalName").GetString() == "text");
+        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("childElementCollection").GetInt32() >= 2000);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("int").GetInt32() >= 1000);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("bool").GetInt32() >= 10000);
         Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("time").GetInt32() >= 6);

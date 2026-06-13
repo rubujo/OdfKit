@@ -27,6 +27,7 @@ public sealed class DomWrappersCSharpWriter
         writer.WriteLine("#nullable enable");
         writer.WriteLine("#pragma warning disable 1591 // Suppress CS1591 (missing XML comments) for generated DOM wrappers as they are machine-generated");
         writer.WriteLine("using System;");
+        writer.WriteLine("using System.Collections.Generic;");
         writer.WriteLine("using OdfKit.Core;");
         writer.WriteLine("using OdfKit.Compliance;");
         writer.WriteLine("using OdfKit.Styles;");
@@ -35,6 +36,7 @@ public sealed class DomWrappersCSharpWriter
         writer.WriteLine("{");
 
         var elementAttributes = ResolveAllElementAttributes(metadata);
+        var elementChildRelations = ResolveAllElementChildRelations(metadata);
 
         var sortedElements = metadata.Elements
             .OrderBy(e => e.NamespaceUri, StringComparer.Ordinal)
@@ -60,10 +62,13 @@ public sealed class DomWrappersCSharpWriter
             writer.WriteLine("    {");
             writer.WriteLine($"        public {className}(string? prefix = null) : base(\"{element.LocalName}\", \"{element.NamespaceUri}\", prefix) {{ }}");
 
+            var existingPropertyNames = new List<string>();
+
             // Write version-aware property accessors
             if (elementAttributes.TryGetValue((element.NamespaceUri, element.LocalName), out var attrs))
             {
                 var resolvedNames = ResolvePropertyNames(attrs);
+                existingPropertyNames.AddRange(resolvedNames.Values);
                 foreach (var attr in attrs.OrderBy(a => resolvedNames[a], StringComparer.Ordinal))
                 {
                     string propName = resolvedNames[attr];
@@ -72,6 +77,30 @@ public sealed class DomWrappersCSharpWriter
                 }
             }
 
+            if (elementChildRelations.TryGetValue((element.NamespaceUri, element.LocalName), out var childRelations))
+            {
+                WriteChildElementProperties(writer, childRelations, existingPropertyNames);
+            }
+
+            writer.WriteLine("    }");
+            writer.WriteLine();
+        }
+
+        foreach (var element in sortedElements)
+        {
+            string nsPrefix = GetNamespacePascalName(element.NamespaceUri);
+            string localPascal = ToPascalCase(element.LocalName);
+            string className = nsPrefix + localPascal + "Element";
+
+            if (!HandWrittenClasses.Contains(className) ||
+                !elementChildRelations.TryGetValue((element.NamespaceUri, element.LocalName), out var childRelations))
+            {
+                continue;
+            }
+
+            writer.WriteLine($"    public partial class {className}");
+            writer.WriteLine("    {");
+            WriteChildElementProperties(writer, childRelations, GetHandWrittenPropertyNames(className));
             writer.WriteLine("    }");
             writer.WriteLine();
         }
@@ -157,6 +186,216 @@ public sealed class DomWrappersCSharpWriter
         }
 
         return elementAttributes;
+    }
+
+    private static Dictionary<(string, string), List<ChildElementPropertyMetadata>> ResolveAllElementChildRelations(SchemaMetadata metadata)
+    {
+        var relations = new Dictionary<(string, string), List<ChildElementPropertyMetadata>>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var pattern in metadata.Patterns)
+        {
+            foreach (var node in pattern.PatternTree)
+            {
+                CollectParentElementChildRelations(node, metadata, relations, seen, new HashSet<string>());
+            }
+        }
+
+        return relations;
+    }
+
+    private static void CollectParentElementChildRelations(
+        SchemaPatternNodeMetadata node,
+        SchemaMetadata metadata,
+        Dictionary<(string, string), List<ChildElementPropertyMetadata>> relations,
+        HashSet<string> seen,
+        HashSet<string> visitedRefs)
+    {
+        if (node.Kind == "element")
+        {
+            CollectDirectChildElementRelations(node, metadata, relations, seen, new HashSet<string>());
+            return;
+        }
+
+        if (node.Kind == "ref" && !string.IsNullOrEmpty(node.ReferenceName) && visitedRefs.Add(node.ReferenceName))
+        {
+            var refPattern = metadata.Patterns.FirstOrDefault(pattern => pattern.Name == node.ReferenceName);
+            if (refPattern is not null)
+            {
+                foreach (var refNode in refPattern.PatternTree)
+                {
+                    CollectParentElementChildRelations(refNode, metadata, relations, seen, visitedRefs);
+                }
+            }
+
+            visitedRefs.Remove(node.ReferenceName);
+            return;
+        }
+
+        foreach (var child in node.Children)
+        {
+            CollectParentElementChildRelations(child, metadata, relations, seen, visitedRefs);
+        }
+    }
+
+    private static void CollectDirectChildElementRelations(
+        SchemaPatternNodeMetadata parent,
+        SchemaMetadata metadata,
+        Dictionary<(string, string), List<ChildElementPropertyMetadata>> relations,
+        HashSet<string> seen,
+        HashSet<string> visitedRefs)
+    {
+        foreach (var child in parent.Children)
+        {
+            CollectDirectChildElementRelations(parent, child, metadata, relations, seen, visitedRefs);
+        }
+    }
+
+    private static void CollectDirectChildElementRelations(
+        SchemaPatternNodeMetadata parent,
+        SchemaPatternNodeMetadata node,
+        SchemaMetadata metadata,
+        Dictionary<(string, string), List<ChildElementPropertyMetadata>> relations,
+        HashSet<string> seen,
+        HashSet<string> visitedRefs)
+    {
+        if (node.Kind == "attribute")
+        {
+            return;
+        }
+
+        if (node.Kind == "element")
+        {
+            if (!string.IsNullOrEmpty(parent.NamespaceUri) &&
+                !string.IsNullOrEmpty(parent.LocalName) &&
+                !string.IsNullOrEmpty(node.NamespaceUri) &&
+                !string.IsNullOrEmpty(node.LocalName))
+            {
+                string key = string.Join(
+                    "\u001f",
+                    parent.NamespaceUri,
+                    parent.LocalName,
+                    node.NamespaceUri,
+                    node.LocalName);
+                if (seen.Add(key))
+                {
+                    var parentKey = (parent.NamespaceUri, parent.LocalName);
+                    if (!relations.TryGetValue(parentKey, out var children))
+                    {
+                        children = new List<ChildElementPropertyMetadata>();
+                        relations[parentKey] = children;
+                    }
+
+                    children.Add(new ChildElementPropertyMetadata
+                    {
+                        NamespaceUri = node.NamespaceUri,
+                        LocalName = node.LocalName
+                    });
+                }
+            }
+
+            return;
+        }
+
+        if (node.Kind == "ref" && !string.IsNullOrEmpty(node.ReferenceName) && visitedRefs.Add(node.ReferenceName))
+        {
+            var refPattern = metadata.Patterns.FirstOrDefault(pattern => pattern.Name == node.ReferenceName);
+            if (refPattern is not null)
+            {
+                foreach (var refNode in refPattern.PatternTree)
+                {
+                    CollectDirectChildElementRelations(parent, refNode, metadata, relations, seen, visitedRefs);
+                }
+            }
+
+            visitedRefs.Remove(node.ReferenceName);
+            return;
+        }
+
+        foreach (var child in node.Children)
+        {
+            CollectDirectChildElementRelations(parent, child, metadata, relations, seen, visitedRefs);
+        }
+    }
+
+    private static void WriteChildElementProperties(
+        TextWriter writer,
+        List<ChildElementPropertyMetadata> childRelations,
+        IEnumerable<string> existingNames)
+    {
+        var usedNames = new HashSet<string>(existingNames, StringComparer.OrdinalIgnoreCase)
+        {
+            "NodeType", "LocalName", "NamespaceUri", "Prefix", "Parent", "Children",
+            "Attributes", "TextContent", "CloneNode", "ImportNode", "GetAttribute",
+            "SetAttribute", "RemoveAttribute", "AppendChild", "InsertBefore", "InsertAfter",
+            "RemoveChild", "GetDocumentVersion", "GetAttributeValue", "SetAttributeValue",
+            "ChildElements", "DescendantElements", "AppendElement", "InsertElementBefore",
+            "InsertElementAfter"
+        };
+
+        foreach (var child in childRelations
+            .OrderBy(relation => relation.NamespaceUri, StringComparer.Ordinal)
+            .ThenBy(relation => relation.LocalName, StringComparer.Ordinal))
+        {
+            string childClassName = GetElementClassName(child.NamespaceUri, child.LocalName);
+            string propertyName = childClassName.EndsWith("Element", StringComparison.Ordinal)
+                ? childClassName.Substring(0, childClassName.Length - "Element".Length) + "ChildElements"
+                : childClassName + "ChildElements";
+            if (!usedNames.Add(propertyName))
+            {
+                propertyName = childClassName + "SchemaChildElements";
+                int counter = 1;
+                while (!usedNames.Add(propertyName))
+                {
+                    propertyName = childClassName + "SchemaChildElements" + counter.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    counter++;
+                }
+            }
+
+            writer.WriteLine();
+            writer.WriteLine($"        public IEnumerable<{childClassName}> {propertyName}");
+            writer.WriteLine("        {");
+            writer.WriteLine($"            get => ChildElements<{childClassName}>();");
+            writer.WriteLine("        }");
+        }
+    }
+
+    private static IEnumerable<string> GetHandWrittenPropertyNames(string className)
+    {
+        return className switch
+        {
+            "TextPElement" => ["StyleName"],
+            "TextHElement" => ["StyleName", "OutlineLevel"],
+            "TextSpanElement" => ["StyleName"],
+            "TextListElement" => ["StyleName"],
+            "TextListItemElement" => ["StartValue"],
+            "TextSectionElement" => ["Name", "StyleName"],
+            "TextBookmarkElement" => ["Name"],
+            "TextNoteElement" => ["NoteClass", "Id"],
+            "OfficeAnnotationElement" => ["Creator", "Date"],
+            "TableTableElement" => ["Name", "StyleName"],
+            "TableTableRowElement" => ["StyleName"],
+            "TableTableCellElement" => ["ValueType", "Value", "Formula"],
+            "TableCoveredTableCellElement" => ["ValueType"],
+            "TableNamedRangeElement" => ["Name", "CellRangeAddress"],
+            "TableDatabaseRangeElement" => ["Name", "TargetRangeAddress"],
+            "DrawFrameElement" => ["Name", "StyleName", "TextAnchorType", "X", "Y", "Width", "Height"],
+            "DrawImageElement" => ["Href", "Type", "Show", "Actuate"],
+            "DrawObjectElement" => ["Href", "Type"],
+            "DrawShapeElement" => ["StyleName"],
+            "DrawGroupElement" => ["StyleName"],
+            "DrawConnectorElement" => ["StyleName"],
+            "StyleStyleElement" => ["Name", "Family", "ParentStyleName"],
+            "StyleDefaultStyleElement" => ["Family"],
+            "StyleMasterPageElement" => ["Name", "PageLayoutName"],
+            "StylePageLayoutElement" => ["Name"],
+            "OfficeDocumentElement" => ["Version"],
+            "OfficeDocumentContentElement" => ["Version"],
+            "ManifestManifestElement" => ["Version"],
+            "ManifestFileEntryElement" => ["FullPath", "MediaType"],
+            "ManifestEncryptionDataElement" => ["ChecksumType", "Checksum"],
+            _ => []
+        };
     }
 
     private static void FindElementNodes(SchemaPatternNodeMetadata node, List<SchemaPatternNodeMetadata> elementNodes)
@@ -1612,6 +1851,11 @@ public sealed class DomWrappersCSharpWriter
         return ToPascalCase(segment);
     }
 
+    private static string GetElementClassName(string namespaceUri, string localName)
+    {
+        return GetNamespacePascalName(namespaceUri) + ToPascalCase(localName) + "Element";
+    }
+
     private enum AttributeValueKind
     {
         Unknown,
@@ -1703,5 +1947,12 @@ public sealed class DomWrappersCSharpWriter
         public string LocalName { get; set; } = string.Empty;
 
         public AttributeValueKind ValueKind { get; set; }
+    }
+
+    private sealed class ChildElementPropertyMetadata
+    {
+        public string NamespaceUri { get; set; } = string.Empty;
+
+        public string LocalName { get; set; } = string.Empty;
     }
 }

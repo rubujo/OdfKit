@@ -218,6 +218,13 @@ public static class OdfTypedDomCoverage
     {
         Type? nullableType = Nullable.GetUnderlyingType(type);
         Type resolvedType = nullableType ?? type;
+        if (resolvedType.IsGenericType &&
+            resolvedType.GetGenericTypeDefinition() == typeof(IEnumerable<>) &&
+            typeof(OdfElement).IsAssignableFrom(resolvedType.GetGenericArguments()[0]))
+        {
+            return "childElementCollection";
+        }
+
         if (resolvedType == typeof(string))
         {
             return "string";

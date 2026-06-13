@@ -352,6 +352,7 @@ namespace OdfKit.Tests
                 "<attribute name=\"office:mimetype\"><data type=\"string\" /></attribute>" +
                 "<attribute name=\"style:family\"><value>paragraph</value></attribute>" +
                 "<attribute name=\"table:name\"><data type=\"string\" /></attribute>" +
+                "<element name=\"text:p\" />" +
                 "</element></define>")));
             SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
             using var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
@@ -360,6 +361,8 @@ namespace OdfKit.Tests
 
             string code = writer.ToString();
             Assert.Contains("public partial class TableCalculationSettingsElement : OdfElement", code);
+            Assert.Contains("public IEnumerable<TextPElement> TextPChildElements", code);
+            Assert.Contains("get => ChildElements<TextPElement>();", code);
             Assert.Contains("public int? NumberColumnsSpanned", code);
             Assert.Contains("get => GetNullableInt32AttributeValue(\"number-columns-spanned\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", GetDocumentVersion());", code);
             Assert.Contains("SetInt32AttributeValue(\"number-columns-spanned\", \"urn:oasis:names:tc:opendocument:xmlns:table:1.0\", value.Value, \"table\", GetDocumentVersion());", code);
