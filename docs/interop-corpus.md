@@ -5,6 +5,7 @@
 ## Generated corpus
 
 - `OdfFormatRoundTripTests`：建立 17 種主要 ODF extension 的最小文件，驗證 MIME、ODF 版本、document kind、載入與保存。
+- `InteropCorpusTests`：針對主要封裝格式驗證公開 validator 入口、document kind、ODF 版本、保存後重新開啟，以及未知 package entry 保留。
 - `OdfValidatorApiTests`：覆蓋 package 與 flat XML 驗證入口。
 - `PackageRoundTripTests`：覆蓋 flat XML / ZIP package 互轉、圖片與嵌入公式 round-trip。
 
@@ -21,6 +22,7 @@
 ## Unknown content corpus
 
 - `OdfPackageUnknownEntryTests` 覆蓋未知 package entries、`Configurations2`、`ObjectReplacements` 與未知 media entry 保存。
+- `InteropCorpusTests` 確認主要封裝格式在 validator 與 package save round-trip 後仍保留未知 binary entry。
 - `OdfUnknownXmlRoundTripTests` 覆蓋 foreign namespace、未知屬性、comments、processing instructions 與 prefix 保留。
 
 ## Security boundary corpus

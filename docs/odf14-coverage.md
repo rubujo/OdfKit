@@ -21,7 +21,7 @@
 | XML 安全讀取 | 禁用 DTD 與外部解析 | `OdfXmlReader`、validator XML readers | `SecurityComplianceTests`、`ComplianceTests` | validated | 仍可補更多大型 XML DoS corpus。 |
 | 官方 ODF 1.4 schema metadata | generated ODF 1.4 schema provider | `Odf14OfficialSchemaProvider.g.cs`、`OdfSchemaRegistry` | `ComplianceTests`、`OdfSchemaGeneratorTests` | validated | 需在 V2/V3 擴大 positive / negative corpus。 |
 | RELAX NG pattern engine | `RequireSchemaPatternValidation` | `OdfSchemaPatternValidator`、`OdfProfileRuleValidator` | `ComplianceTests`、`CorpusComplianceTests` | partial | engine 已可執行，但仍需更多官方 corpus 覆蓋複雜 content model。 |
-| package 文件驗證 | package root、core XML、manifest、profile rules | `OdfPackageValidator`、`OdfValidator.Validate(path/package)`、`OdfKit.Cli` | `ComplianceTests`、`CorpusComplianceTests`、`OdfValidatorApiTests`、`CliTests` | complete | CLI 輸出目前是文字摘要，尚未提供 JSON。 |
+| package 文件驗證 | package root、core XML、manifest、profile rules | `OdfPackageValidator`、`OdfValidator.Validate(path/package)`、`OdfKit.Cli` | `ComplianceTests`、`CorpusComplianceTests`、`OdfValidatorApiTests`、`CliTests` | complete | CLI 已提供文字與 JSON 驗證輸出。 |
 | flat XML 文件驗證 | `office:document`、flat extension、body kind | `OdfFlatDocumentValidator`、`OdfValidator.Validate(stream)` | `ComplianceTests`、`E2ETests`、`OdfValidatorApiTests` | complete | flat embedded object corpus 仍可增加。 |
 | strict profile | `OASIS_ODF_1_4_Strict`、ODF namespace extension 禁止 | `OdfComplianceProfiles.OasisOdf14Strict` | `CorpusComplianceTests`、`ComplianceTests` | validated | 需補更多官方 strict negative case。 |
 | extended profile | `OASIS_ODF_1_4_Extended`、foreign extension isolation | `OdfComplianceProfiles.OasisOdf14Extended` | `CorpusComplianceTests`、`OdfUnknownXmlRoundTripTests` | validated | foreign content 的可移除性目前以規則與 round-trip 測試支撐，尚未有完整文件化策略。 |
@@ -38,9 +38,9 @@
 ## 現階段結論
 
 OdfKit 已具備公開 validator 入口、ODF 1.4 預設版本策略、官方 schema metadata、
-profile rule validation、package / flat XML 驗證、全格式最小 round-trip、CLI 摘要
+profile rule validation、package / flat XML 驗證、全格式最小 round-trip、CLI 摘要與 JSON 輸出
 入口，以及 unknown content 保真測試。後續重點應放在：
 
 - 擴大更接近真實世界文件的 positive / negative corpus。
-- 讓 CLI 輸出支援機器可讀格式，例如 JSON。
+- 補齊 CLI sanitize 與更多 policy automation。
 - 繼續擴充 ODC、ODF formula、ODI 與 ODB 的高階語意 API。

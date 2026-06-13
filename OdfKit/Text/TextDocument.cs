@@ -2314,6 +2314,28 @@ public sealed class OdfParagraphCollection
     {
         return _document.AddParagraph(text);
     }
+
+    /// <summary>
+    /// 取得文件本文最上層段落清單。
+    /// </summary>
+    public IReadOnlyList<OdfParagraph> Items
+    {
+        get
+        {
+            List<OdfParagraph> paragraphs = [];
+            foreach (OdfNode child in _document.BodyTextRoot.Children)
+            {
+                if (child.NodeType is OdfNodeType.Element &&
+                    child.LocalName == "p" &&
+                    child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    paragraphs.Add(new OdfParagraph(child, _document));
+                }
+            }
+
+            return paragraphs.AsReadOnly();
+        }
+    }
 }
 
 /// <summary>
@@ -2342,6 +2364,28 @@ public sealed class OdfHeadingCollection
     {
         return _document.AddHeading(text, outlineLevel);
     }
+
+    /// <summary>
+    /// 取得文件本文最上層標題清單。
+    /// </summary>
+    public IReadOnlyList<OdfHeading> Items
+    {
+        get
+        {
+            List<OdfHeading> headings = [];
+            foreach (OdfNode child in _document.BodyTextRoot.Children)
+            {
+                if (child.NodeType is OdfNodeType.Element &&
+                    child.LocalName == "h" &&
+                    child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    headings.Add(new OdfHeading(child, _document));
+                }
+            }
+
+            return headings.AsReadOnly();
+        }
+    }
 }
 
 /// <summary>
@@ -2368,6 +2412,28 @@ public sealed class OdfListCollection
     public OdfList Add(string? styleName = null)
     {
         return _document.AddList(styleName);
+    }
+
+    /// <summary>
+    /// 取得文件本文最上層清單清單。
+    /// </summary>
+    public IReadOnlyList<OdfList> Items
+    {
+        get
+        {
+            List<OdfList> lists = [];
+            foreach (OdfNode child in _document.BodyTextRoot.Children)
+            {
+                if (child.NodeType is OdfNodeType.Element &&
+                    child.LocalName == "list" &&
+                    child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    lists.Add(new OdfList(child, _document));
+                }
+            }
+
+            return lists.AsReadOnly();
+        }
     }
 }
 
@@ -2396,6 +2462,28 @@ public sealed class OdfTextTableCollection
     public OdfTable Add(int rows, int columns)
     {
         return _document.AddTable(rows, columns);
+    }
+
+    /// <summary>
+    /// 取得文件本文最上層文字表格摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfTextTableInfo> Items
+    {
+        get
+        {
+            List<OdfTextTableInfo> tables = [];
+            foreach (OdfNode child in _document.BodyTextRoot.Children)
+            {
+                if (child.NodeType is OdfNodeType.Element &&
+                    child.LocalName == "table" &&
+                    child.NamespaceUri == OdfNamespaces.Table)
+                {
+                    tables.Add(OdfTextTableInfo.FromNode(child));
+                }
+            }
+
+            return tables.AsReadOnly();
+        }
     }
 }
 
@@ -2429,6 +2517,118 @@ public sealed class OdfTextImageCollection
         string path = media.AddImage(imageBytes, name);
         OdfParagraph paragraph = _document.AddParagraph();
         return _document.AddImage(paragraph, path, widthCm, heightCm, name);
+    }
+
+    /// <summary>
+    /// 取得文件本文中的圖片清單。
+    /// </summary>
+    public IReadOnlyList<OdfImage> Items
+    {
+        get
+        {
+            List<OdfImage> images = [];
+            CollectImages(_document.BodyTextRoot, images);
+            return images.AsReadOnly();
+        }
+    }
+
+    private static void CollectImages(OdfNode node, List<OdfImage> images)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "frame" &&
+                child.NamespaceUri == OdfNamespaces.Draw)
+            {
+                OdfNode? image = FindDescendant(child, "image", OdfNamespaces.Draw);
+                if (image is not null)
+                {
+                    images.Add(new OdfImage(child, image));
+                }
+            }
+
+            CollectImages(child, images);
+        }
+    }
+
+    private static OdfNode? FindDescendant(OdfNode node, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+
+            OdfNode? descendant = FindDescendant(child, localName, namespaceUri);
+            if (descendant is not null)
+            {
+                return descendant;
+            }
+        }
+
+        return null;
+    }
+}
+
+/// <summary>
+/// 表示文字文件中的表格摘要。
+/// </summary>
+public sealed class OdfTextTableInfo
+{
+    private OdfTextTableInfo(string? name, int rowCount, int columnCount)
+    {
+        Name = name;
+        RowCount = rowCount;
+        ColumnCount = columnCount;
+    }
+
+    /// <summary>
+    /// 取得表格名稱。
+    /// </summary>
+    public string? Name { get; }
+
+    /// <summary>
+    /// 取得表格列數。
+    /// </summary>
+    public int RowCount { get; }
+
+    /// <summary>
+    /// 取得表格最大欄數。
+    /// </summary>
+    public int ColumnCount { get; }
+
+    internal static OdfTextTableInfo FromNode(OdfNode tableNode)
+    {
+        int rowCount = 0;
+        int columnCount = 0;
+        foreach (OdfNode row in tableNode.Children)
+        {
+            if (row.NodeType is not OdfNodeType.Element ||
+                row.LocalName != "table-row" ||
+                row.NamespaceUri != OdfNamespaces.Table)
+            {
+                continue;
+            }
+
+            rowCount++;
+            int cells = 0;
+            foreach (OdfNode cell in row.Children)
+            {
+                if (cell.NodeType is OdfNodeType.Element &&
+                    (cell.LocalName == "table-cell" || cell.LocalName == "covered-table-cell") &&
+                    cell.NamespaceUri == OdfNamespaces.Table)
+                {
+                    cells++;
+                }
+            }
+
+            columnCount = Math.Max(columnCount, cells);
+        }
+
+        return new OdfTextTableInfo(tableNode.GetAttribute("name", OdfNamespaces.Table), rowCount, columnCount);
     }
 }
 
@@ -3194,6 +3394,28 @@ public class OdfList(OdfNode node, TextDocument doc)
             item.StartValue = startValue;
         }
     }
+
+    /// <summary>
+    /// 取得清單項目清單。
+    /// </summary>
+    public IReadOnlyList<OdfListItem> Items
+    {
+        get
+        {
+            List<OdfListItem> items = [];
+            foreach (OdfNode child in Node.Children)
+            {
+                if (child.NodeType is OdfNodeType.Element &&
+                    child.LocalName == "list-item" &&
+                    child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    items.Add(new OdfListItem(child, _doc));
+                }
+            }
+
+            return items.AsReadOnly();
+        }
+    }
 }
 
 /// <summary>
@@ -3253,6 +3475,28 @@ public class OdfListItem(OdfNode node, TextDocument doc)
         Node.AppendChild(listNode);
         return new OdfList(listNode, _doc);
     }
+
+    /// <summary>
+    /// 取得清單項目中的段落清單。
+    /// </summary>
+    public IReadOnlyList<OdfParagraph> Paragraphs
+    {
+        get
+        {
+            List<OdfParagraph> paragraphs = [];
+            foreach (OdfNode child in Node.Children)
+            {
+                if (child.NodeType is OdfNodeType.Element &&
+                    child.LocalName == "p" &&
+                    child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    paragraphs.Add(new OdfParagraph(child, _doc));
+                }
+            }
+
+            return paragraphs.AsReadOnly();
+        }
+    }
 }
 
 /// <summary>
@@ -3280,6 +3524,11 @@ public class OdfImage(OdfNode frameNode, OdfNode imageNode)
         get => FrameNode.GetAttribute("name", OdfNamespaces.Draw);
         set => FrameNode.SetAttribute("name", OdfNamespaces.Draw, value ?? string.Empty, "draw");
     }
+
+    /// <summary>
+    /// 取得圖片在 ODF 封裝中的參照路徑。
+    /// </summary>
+    public string? ImageHref => ImageNode.GetAttribute("href", OdfNamespaces.XLink);
 
     /// <summary>
     /// 取得或設定圖片的錨定類型。

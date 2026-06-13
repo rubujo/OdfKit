@@ -11,6 +11,10 @@ using TextDocument document = TextDocument.Create();
 document.Body.Headings.Add("會議記錄", 1);
 document.Body.Paragraphs.Add("今日討論 ODF 文件自動化。");
 document.Save("meeting.odt");
+
+using TextDocument loaded = TextDocument.Load("meeting.odt");
+Console.WriteLine(loaded.Body.Headings.Items[0].TextContent);
+Console.WriteLine(loaded.Body.Paragraphs.Items[0].TextContent);
 ```
 
 ## 建立 ODS
@@ -24,7 +28,14 @@ sheet.Cells["A1"].CellValue = "Name";
 sheet.Cells["B1"].CellValue = "Amount";
 sheet.Cells["A2"].CellValue = "ODF";
 sheet.Cells["B2"].CellValue = 42;
+sheet.Ranges["A1:B2"].NameAs("DataRange");
+sheet.FreezePanes(1, 0);
 workbook.Save("data.ods");
+
+using SpreadsheetDocument loadedWorkbook = SpreadsheetDocument.Load("data.ods");
+OdfTableSheet loadedSheet = loadedWorkbook.Worksheets["Data"];
+Console.WriteLine(loadedSheet.NamedRanges[0].Name);
+Console.WriteLine(loadedSheet.FrozenPanes.Rows);
 ```
 
 ## 讀取儲存格
@@ -64,6 +75,64 @@ slide.AddTextBox(
     OdfLength.FromCentimeters(2),
     "簡報標題");
 deck.Save("intro.odp");
+
+using PresentationDocument loadedDeck = PresentationDocument.Load("intro.odp");
+Console.WriteLine(loadedDeck.Slides[0].TextBoxes[0].Text);
+```
+
+## 讀取 ODP 圖片參照
+
+```csharp
+using OdfKit.Presentation;
+
+using PresentationDocument deck = PresentationDocument.Load("intro.odp");
+foreach (OdfPicture picture in deck.Slides[0].Pictures)
+{
+    Console.WriteLine(picture.ImageHref);
+}
+```
+
+## 建立並讀取 ODG
+
+```csharp
+using OdfKit.Drawing;
+using OdfKit.Presentation;
+using OdfKit.Styles;
+
+using DrawingDocument drawing = DrawingDocument.Create();
+OdfDrawPage page = drawing.Pages.Add("Canvas");
+page.AddShape(
+    OdfShapeType.Rectangle,
+    OdfLength.FromCentimeters(1),
+    OdfLength.FromCentimeters(1),
+    OdfLength.FromCentimeters(4),
+    OdfLength.FromCentimeters(2));
+page.AddTextBox(
+    OdfLength.FromCentimeters(1),
+    OdfLength.FromCentimeters(4),
+    OdfLength.FromCentimeters(6),
+    OdfLength.FromCentimeters(1),
+    "流程圖");
+drawing.Save("drawing.odg");
+
+using DrawingDocument loadedDrawing = DrawingDocument.Load("drawing.odg");
+Console.WriteLine(loadedDrawing.Pages[0].Shapes[0].LocalName);
+Console.WriteLine(loadedDrawing.Pages[0].TextBoxes[0].Text);
+```
+
+## 建立 ODB 資料來源描述
+
+```csharp
+using OdfKit.Database;
+
+using OdfDatabaseDocument database = OdfDatabaseDocument.Create();
+database.SetConnection("sdbc:embedded:hsqldb");
+database.AddTable("Customers", "SELECT * FROM Customers");
+database.Save("data.odb");
+
+using OdfDatabaseDocument loaded = OdfDatabaseDocument.Load("data.odb");
+Console.WriteLine(loaded.ConnectionHref);
+Console.WriteLine(loaded.GetTables()[0].Name);
 ```
 
 ## 驗證文件
@@ -108,6 +177,11 @@ writer.WriteEndSheet();
 
 ```powershell
 dotnet run --project tools/OdfKit.Cli -- validate file.odt
+dotnet run --project tools/OdfKit.Cli -- validate file.odt --format json
+dotnet run --project tools/OdfKit.Cli -- validate samples --recursive --fail-on warning
+dotnet run --project tools/OdfKit.Cli -- validate file.odt --profile OASIS_ODF_1_4_Extended
 dotnet run --project tools/OdfKit.Cli -- convert-flat file.odt file.fodt
 dotnet run --project tools/OdfKit.Cli -- pack file.fodt file.odt
 ```
+
+`validate` 在 CI 中可用 exit code 判斷結果：`0` 表示通過，`1` 表示驗證錯誤或 `--fail-on warning` 命中，`2` 表示參數或路徑錯誤。

@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using OdfKit.Compliance;
 using OdfKit.Core;
 
@@ -9,6 +11,12 @@ namespace OdfKit.Cli;
 /// </summary>
 public static class OdfKitCli
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        WriteIndented = false
+    };
+
     /// <summary>
     /// 執行命令列工具。
     /// </summary>
@@ -49,22 +57,43 @@ public static class OdfKitCli
 
     private static int Validate(string[] args, TextWriter output, TextWriter error)
     {
-        if (!RequireArity(args, 2, "validate file.odt", error))
+        if (!TryParseValidateOptions(args, error, out ValidateOptions? options))
         {
             return 2;
         }
 
-        OdfValidationReport report = OdfValidator.Validate(args[1]);
-        output.WriteLine(report.IsValid ? "valid" : "invalid");
-        output.WriteLine("kind: " + report.DocumentKind);
-        output.WriteLine("version: " + FormatVersion(report.DetectedVersion));
-        output.WriteLine("issues: " + report.Issues.Count.ToString(CultureInfo.InvariantCulture));
-        foreach (OdfValidationIssue issue in report.Issues)
+        ValidateOptions parsedOptions = options ?? throw new InvalidOperationException("validate options were not parsed.");
+        IReadOnlyList<string> files = ResolveValidateFiles(parsedOptions.Path, parsedOptions.Recursive);
+        if (files.Count == 0)
         {
-            output.WriteLine($"{issue.Severity}: {issue.RuleId} {issue.Message}");
+            error.WriteLine("no ODF files found: " + parsedOptions.Path);
+            return 2;
         }
 
-        return report.BlockingIssueCount > 0 ? 1 : 0;
+        List<ValidateFileResult> results = [];
+        foreach (string file in files)
+        {
+            OdfValidationReport report = OdfValidator.Validate(
+                file,
+                new OdfValidationOptions
+                {
+                    FileName = file,
+                    Profile = parsedOptions.Profile
+                });
+            results.Add(new ValidateFileResult(file, report));
+        }
+
+        ValidateSummary summary = ValidateSummary.Create(results);
+        if (parsedOptions.Format == ValidateOutputFormat.Json)
+        {
+            WriteValidateJson(output, summary, results);
+        }
+        else if (!parsedOptions.Quiet)
+        {
+            WriteValidateText(output, summary, results);
+        }
+
+        return ShouldFail(summary, parsedOptions.FailOn) ? 1 : 0;
     }
 
     private static int Info(string[] args, TextWriter output, TextWriter error)
@@ -149,11 +178,242 @@ public static class OdfKitCli
     {
         output.WriteLine("usage: odfkit <command> [arguments]");
         output.WriteLine("commands:");
-        output.WriteLine("  validate file.odt");
+        output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet]");
         output.WriteLine("  info file.ods");
         output.WriteLine("  convert-flat input.odt output.fodt");
         output.WriteLine("  pack input.fodt output.odt");
         output.WriteLine("  metadata file.odt");
+    }
+
+    private static bool TryParseValidateOptions(string[] args, TextWriter error, out ValidateOptions? options)
+    {
+        options = null;
+        string? path = null;
+        ValidateOutputFormat format = ValidateOutputFormat.Text;
+        ValidateFailOn failOn = ValidateFailOn.Error;
+        OdfComplianceProfile? profile = null;
+        bool recursive = false;
+        bool quiet = false;
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            string arg = args[i];
+            switch (arg)
+            {
+                case "--format":
+                    if (!TryReadValue(args, ref i, error, "--format", out string? formatValue) ||
+                        !TryParseFormat(formatValue, out format))
+                    {
+                        error.WriteLine("supported formats: text, json");
+                        return false;
+                    }
+                    break;
+                case "--profile":
+                    if (!TryReadValue(args, ref i, error, "--profile", out string? profileId))
+                    {
+                        return false;
+                    }
+
+                    profile = OdfComplianceProfiles.Find(profileId!);
+                    if (profile is null)
+                    {
+                        error.WriteLine("unknown profile: " + profileId);
+                        return false;
+                    }
+                    break;
+                case "--fail-on":
+                    if (!TryReadValue(args, ref i, error, "--fail-on", out string? failOnValue) ||
+                        !TryParseFailOn(failOnValue, out failOn))
+                    {
+                        error.WriteLine("supported fail-on values: error, warning");
+                        return false;
+                    }
+                    break;
+                case "--recursive":
+                    recursive = true;
+                    break;
+                case "--quiet":
+                    quiet = true;
+                    break;
+                default:
+                    if (arg.StartsWith("-", StringComparison.Ordinal))
+                    {
+                        error.WriteLine("unknown option: " + arg);
+                        return false;
+                    }
+
+                    if (path is not null)
+                    {
+                        error.WriteLine("usage: odfkit validate file-or-folder [options]");
+                        return false;
+                    }
+
+                    path = arg;
+                    break;
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            error.WriteLine("usage: odfkit validate file-or-folder [options]");
+            return false;
+        }
+
+        if (!File.Exists(path) && !Directory.Exists(path))
+        {
+            error.WriteLine("path not found: " + path);
+            return false;
+        }
+
+        options = new ValidateOptions(path, format, failOn, profile, recursive, quiet);
+        return true;
+    }
+
+    private static bool TryReadValue(string[] args, ref int index, TextWriter error, string optionName, out string? value)
+    {
+        value = null;
+        if (index + 1 >= args.Length)
+        {
+            error.WriteLine("missing value for " + optionName);
+            return false;
+        }
+
+        value = args[++index];
+        return true;
+    }
+
+    private static bool TryParseFormat(string? value, out ValidateOutputFormat format)
+    {
+        if (string.Equals(value, "json", StringComparison.OrdinalIgnoreCase))
+        {
+            format = ValidateOutputFormat.Json;
+            return true;
+        }
+
+        if (string.Equals(value, "text", StringComparison.OrdinalIgnoreCase))
+        {
+            format = ValidateOutputFormat.Text;
+            return true;
+        }
+
+        format = ValidateOutputFormat.Text;
+        return false;
+    }
+
+    private static bool TryParseFailOn(string? value, out ValidateFailOn failOn)
+    {
+        if (string.Equals(value, "warning", StringComparison.OrdinalIgnoreCase))
+        {
+            failOn = ValidateFailOn.Warning;
+            return true;
+        }
+
+        if (string.Equals(value, "error", StringComparison.OrdinalIgnoreCase))
+        {
+            failOn = ValidateFailOn.Error;
+            return true;
+        }
+
+        failOn = ValidateFailOn.Error;
+        return false;
+    }
+
+    private static IReadOnlyList<string> ResolveValidateFiles(string path, bool recursive)
+    {
+        if (File.Exists(path))
+        {
+            return [Path.GetFullPath(path)];
+        }
+
+        SearchOption searchOption = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+        return Directory.EnumerateFiles(path, "*", searchOption)
+            .Where(file => OdfDocumentKindDetector.TryGetFormatByFileName(file, out _))
+            .OrderBy(file => file, StringComparer.OrdinalIgnoreCase)
+            .Select(Path.GetFullPath)
+            .ToArray();
+    }
+
+    private static void WriteValidateText(
+        TextWriter output,
+        ValidateSummary summary,
+        IReadOnlyList<ValidateFileResult> results)
+    {
+        foreach (ValidateFileResult result in results)
+        {
+            OdfValidationReport report = result.Report;
+            output.WriteLine(report.IsValid ? "valid" : "invalid");
+            output.WriteLine("path: " + result.Path);
+            output.WriteLine("kind: " + report.DocumentKind);
+            output.WriteLine("version: " + FormatVersion(report.DetectedVersion));
+            output.WriteLine("issues: " + report.Issues.Count.ToString(CultureInfo.InvariantCulture));
+            foreach (OdfValidationIssue issue in report.Issues)
+            {
+                output.WriteLine($"{issue.Severity}: {issue.RuleId} {issue.Message}");
+            }
+        }
+
+        if (results.Count > 1)
+        {
+            output.WriteLine("summary: files=" + summary.FileCount.ToString(CultureInfo.InvariantCulture) +
+                " valid=" + summary.ValidCount.ToString(CultureInfo.InvariantCulture) +
+                " invalid=" + summary.InvalidCount.ToString(CultureInfo.InvariantCulture) +
+                " warnings=" + summary.WarningCount.ToString(CultureInfo.InvariantCulture) +
+                " errors=" + summary.ErrorCount.ToString(CultureInfo.InvariantCulture) +
+                " fatal=" + summary.FatalCount.ToString(CultureInfo.InvariantCulture));
+        }
+    }
+
+    private static void WriteValidateJson(
+        TextWriter output,
+        ValidateSummary summary,
+        IReadOnlyList<ValidateFileResult> results)
+    {
+        var model = new
+        {
+            summary = new
+            {
+                fileCount = summary.FileCount,
+                validCount = summary.ValidCount,
+                invalidCount = summary.InvalidCount,
+                infoCount = summary.InfoCount,
+                warningCount = summary.WarningCount,
+                errorCount = summary.ErrorCount,
+                fatalCount = summary.FatalCount,
+                blockingIssueCount = summary.BlockingIssueCount
+            },
+            files = results.Select(result => new
+            {
+                path = result.Path,
+                documentKind = result.Report.DocumentKind.ToString(),
+                detectedVersion = result.Report.DetectedVersion.ToString(),
+                isValid = result.Report.IsValid,
+                infoCount = result.Report.InfoCount,
+                warningCount = result.Report.WarningCount,
+                errorCount = result.Report.ErrorCount,
+                fatalCount = result.Report.FatalCount,
+                blockingIssueCount = result.Report.BlockingIssueCount,
+                issues = result.Report.Issues.Select(issue => new
+                {
+                    severity = issue.Severity.ToString(),
+                    ruleId = issue.RuleId,
+                    message = issue.Message,
+                    packagePath = issue.PackagePath,
+                    xPath = issue.XPath,
+                    requiredVersion = issue.RequiredVersion?.ToString(),
+                    profileId = issue.ProfileId,
+                    suggestedFix = issue.SuggestedFix
+                }).ToArray()
+            }).ToArray()
+        };
+
+        output.WriteLine(JsonSerializer.Serialize(model, JsonOptions));
+    }
+
+    private static bool ShouldFail(ValidateSummary summary, ValidateFailOn failOn)
+    {
+        return failOn == ValidateFailOn.Warning
+            ? summary.WarningCount > 0 || summary.ErrorCount > 0 || summary.FatalCount > 0
+            : summary.ErrorCount > 0 || summary.FatalCount > 0;
     }
 
     private static string FormatVersion(OdfVersion version)
@@ -167,5 +427,61 @@ public static class OdfKitCli
             OdfVersion.Odf14 => "1.4",
             _ => "unknown"
         };
+    }
+
+    private enum ValidateOutputFormat
+    {
+        Text,
+        Json
+    }
+
+    private enum ValidateFailOn
+    {
+        Error,
+        Warning
+    }
+
+    private sealed record ValidateOptions(
+        string Path,
+        ValidateOutputFormat Format,
+        ValidateFailOn FailOn,
+        OdfComplianceProfile? Profile,
+        bool Recursive,
+        bool Quiet);
+
+    private sealed record ValidateFileResult(string Path, OdfValidationReport Report);
+
+    private sealed class ValidateSummary
+    {
+        public int FileCount { get; private init; }
+
+        public int ValidCount { get; private init; }
+
+        public int InvalidCount { get; private init; }
+
+        public int InfoCount { get; private init; }
+
+        public int WarningCount { get; private init; }
+
+        public int ErrorCount { get; private init; }
+
+        public int FatalCount { get; private init; }
+
+        public int BlockingIssueCount { get; private init; }
+
+        public static ValidateSummary Create(IReadOnlyList<ValidateFileResult> results)
+        {
+            return new ValidateSummary
+            {
+                FileCount = results.Count,
+                ValidCount = results.Count(result => result.Report.IsValid),
+                InvalidCount = results.Count(result => !result.Report.IsValid),
+                InfoCount = results.Sum(result => result.Report.InfoCount),
+                WarningCount = results.Sum(result => result.Report.WarningCount),
+                ErrorCount = results.Sum(result => result.Report.ErrorCount),
+                FatalCount = results.Sum(result => result.Report.FatalCount),
+                BlockingIssueCount = results.Sum(result => result.Report.BlockingIssueCount)
+            };
+        }
     }
 }

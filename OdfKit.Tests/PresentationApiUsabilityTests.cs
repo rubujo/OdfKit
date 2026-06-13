@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Presentation;
@@ -33,7 +34,7 @@ public class PresentationApiUsabilityTests
             OdfLength.FromCentimeters(4),
             OdfLength.FromCentimeters(4),
             OdfLength.FromCentimeters(3));
-        slide.AddPicture(
+        OdfPicture picture = slide.AddPicture(
             CreatePngBytes(),
             OdfLength.FromCentimeters(6),
             OdfLength.FromCentimeters(4),
@@ -58,6 +59,11 @@ public class PresentationApiUsabilityTests
         Assert.Equal("Intro", loaded.Slides[0].Name);
         Assert.Equal("講者備忘", loaded.Slides[0].SpeakerNotes);
         Assert.Equal("application/vnd.oasis.opendocument.presentation", loaded.Package.MimeType);
+        Assert.Single(loaded.Slides[0].TextBoxes);
+        Assert.Equal("標題", loaded.Slides[0].TextBoxes[0].Text);
+        Assert.Single(loaded.Slides[0].Pictures);
+        Assert.Equal(picture.ImageHref, loaded.Slides[0].Pictures[0].ImageHref);
+        Assert.Contains(loaded.Slides[0].Shapes, shape => shape.LocalName == "rect");
     }
 
     /// <summary>

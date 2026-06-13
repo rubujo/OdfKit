@@ -14,7 +14,7 @@
     <Version>1.0.0</Version>
     <Authors>OdfKit Contributors</Authors>
     <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
-    <Description>A managed, high-performance ODF (Open Document Format) processing library for .NET.</Description>
+    <Description>A managed, high-performance ODF (OpenDocument Format) processing library for .NET.</Description>
     <ProjectUrl>https://github.com/OdfKit/OdfKit</ProjectUrl>
     <RepositoryUrl>https://github.com/OdfKit/OdfKit</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

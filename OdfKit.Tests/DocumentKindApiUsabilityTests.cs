@@ -82,15 +82,13 @@ public class DocumentKindApiUsabilityTests
         database.AddTable("Customers", "SELECT * FROM Customers");
 
         using OdfDatabaseDocument loaded = RoundTrip(database, "database.odb", OdfDatabaseDocument.Load);
-        const string databaseNamespace = "urn:oasis:names:tc:opendocument:xmlns:database:1.0";
+        IReadOnlyList<OdfDatabaseTableInfo> tables = loaded.GetTables();
 
         Assert.Equal("application/vnd.oasis.opendocument.database", loaded.Package.MimeType);
-        Assert.Equal(
-            "sdbc:embedded:hsqldb",
-            FindDescendant(loaded.DatabaseNode, "connection-resource", databaseNamespace)?.GetAttribute("href", OdfNamespaces.XLink));
-        Assert.Equal(
-            "Customers",
-            FindDescendant(loaded.DatabaseNode, "table-representation", databaseNamespace)?.GetAttribute("name", databaseNamespace));
+        Assert.Equal("sdbc:embedded:hsqldb", loaded.ConnectionHref);
+        Assert.Single(tables);
+        Assert.Equal("Customers", tables[0].Name);
+        Assert.Equal("SELECT * FROM Customers", tables[0].Command);
     }
 
     /// <summary>

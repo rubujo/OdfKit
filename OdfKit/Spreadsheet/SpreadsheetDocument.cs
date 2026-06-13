@@ -822,6 +822,19 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
     }
 
     /// <summary>
+    /// 取得目前工作表的凍結窗格設定。
+    /// </summary>
+    public OdfFrozenPanes FrozenPanes
+    {
+        get
+        {
+            int frozenRows = ParseNonNegativeInt(TableNode.GetAttribute("frozen-rows", OdfNamespaces.Table));
+            int frozenColumns = ParseNonNegativeInt(TableNode.GetAttribute("frozen-columns", OdfNamespaces.Table));
+            return new OdfFrozenPanes(frozenRows, frozenColumns);
+        }
+    }
+
+    /// <summary>
     /// 新增清單型資料驗證，並套用到指定範圍。
     /// </summary>
     /// <param name="range">要套用的儲存格範圍。</param>
@@ -1303,6 +1316,37 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
     }
 
     /// <summary>
+    /// 取得此工作表中的命名範圍清單。
+    /// </summary>
+    public IReadOnlyList<OdfNamedRangeInfo> NamedRanges
+    {
+        get
+        {
+            OdfNode? namedExpressions = FindChildElement(TableNode, "named-expressions", OdfNamespaces.Table);
+            if (namedExpressions is null)
+            {
+                return [];
+            }
+
+            List<OdfNamedRangeInfo> ranges = [];
+            foreach (OdfNode child in namedExpressions.Children)
+            {
+                if (child.NodeType is OdfNodeType.Element &&
+                    child.LocalName == "named-range" &&
+                    child.NamespaceUri == OdfNamespaces.Table)
+                {
+                    string name = child.GetAttribute("name", OdfNamespaces.Table) ?? string.Empty;
+                    string address = child.GetAttribute("cell-range-address", OdfNamespaces.Table) ?? string.Empty;
+                    string? baseAddress = child.GetAttribute("base-cell-address", OdfNamespaces.Table);
+                    ranges.Add(new OdfNamedRangeInfo(name, address, baseAddress));
+                }
+            }
+
+            return ranges.AsReadOnly();
+        }
+    }
+
+    /// <summary>
     /// 新增具名運算式至此工作表。
     /// </summary>
     /// <param name="name">具名運算式的名稱</param>
@@ -1321,6 +1365,59 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
         namedExpressions.AppendChild(namedExpr);
     }
 
+    /// <summary>
+    /// 取得此工作表中的具名運算式清單。
+    /// </summary>
+    public IReadOnlyList<OdfNamedExpressionInfo> NamedExpressions
+    {
+        get
+        {
+            OdfNode? namedExpressions = FindChildElement(TableNode, "named-expressions", OdfNamespaces.Table);
+            if (namedExpressions is null)
+            {
+                return [];
+            }
+
+            List<OdfNamedExpressionInfo> expressions = [];
+            foreach (OdfNode child in namedExpressions.Children)
+            {
+                if (child.NodeType is OdfNodeType.Element &&
+                    child.LocalName == "named-expression" &&
+                    child.NamespaceUri == OdfNamespaces.Table)
+                {
+                    string name = child.GetAttribute("name", OdfNamespaces.Table) ?? string.Empty;
+                    string expression = child.GetAttribute("expression", OdfNamespaces.Table) ?? string.Empty;
+                    string? baseAddress = child.GetAttribute("base-cell-address", OdfNamespaces.Table);
+                    expressions.Add(new OdfNamedExpressionInfo(name, expression, baseAddress));
+                }
+            }
+
+            return expressions.AsReadOnly();
+        }
+    }
+
+    private static int ParseNonNegativeInt(string? value)
+    {
+        return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int result) && result > 0
+            ? result
+            : 0;
+    }
+
+    private static OdfNode? FindChildElement(OdfNode parent, string localName, string ns)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == ns)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
     private OdfNode FindOrCreateChild(OdfNode parent, string localName, string ns, string prefix)
     {
         foreach (var child in parent.Children)
@@ -1332,6 +1429,102 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
         parent.AppendChild(node);
         return node;
     }
+}
+
+/// <summary>
+/// 表示工作表凍結窗格設定。
+/// </summary>
+/// <param name="rows">凍結列數。</param>
+/// <param name="columns">凍結欄數。</param>
+public readonly struct OdfFrozenPanes(int rows, int columns) : IEquatable<OdfFrozenPanes>
+{
+    /// <summary>
+    /// 取得凍結列數。
+    /// </summary>
+    public int Rows { get; } = rows;
+
+    /// <summary>
+    /// 取得凍結欄數。
+    /// </summary>
+    public int Columns { get; } = columns;
+
+    /// <summary>
+    /// 取得是否有任何凍結窗格設定。
+    /// </summary>
+    public bool IsFrozen => Rows > 0 || Columns > 0;
+
+    /// <inheritdoc />
+    public bool Equals(OdfFrozenPanes other) => Rows == other.Rows && Columns == other.Columns;
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => obj is OdfFrozenPanes other && Equals(other);
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            return (Rows * 397) ^ Columns;
+        }
+    }
+
+    /// <summary>
+    /// 比較兩個 <see cref="OdfFrozenPanes"/> 執行個體是否相等。
+    /// </summary>
+    public static bool operator ==(OdfFrozenPanes left, OdfFrozenPanes right) => left.Equals(right);
+
+    /// <summary>
+    /// 比較兩個 <see cref="OdfFrozenPanes"/> 執行個體是否不相等。
+    /// </summary>
+    public static bool operator !=(OdfFrozenPanes left, OdfFrozenPanes right) => !left.Equals(right);
+}
+
+/// <summary>
+/// 表示工作表中的命名範圍。
+/// </summary>
+/// <param name="name">命名範圍名稱。</param>
+/// <param name="cellRangeAddress">ODF 儲存格範圍位址。</param>
+/// <param name="baseCellAddress">ODF 基準儲存格位址。</param>
+public sealed class OdfNamedRangeInfo(string name, string cellRangeAddress, string? baseCellAddress)
+{
+    /// <summary>
+    /// 取得命名範圍名稱。
+    /// </summary>
+    public string Name { get; } = name ?? string.Empty;
+
+    /// <summary>
+    /// 取得 ODF 儲存格範圍位址。
+    /// </summary>
+    public string CellRangeAddress { get; } = cellRangeAddress ?? string.Empty;
+
+    /// <summary>
+    /// 取得 ODF 基準儲存格位址。
+    /// </summary>
+    public string? BaseCellAddress { get; } = baseCellAddress;
+}
+
+/// <summary>
+/// 表示工作表中的具名運算式。
+/// </summary>
+/// <param name="name">具名運算式名稱。</param>
+/// <param name="expression">ODF 運算式。</param>
+/// <param name="baseCellAddress">ODF 基準儲存格位址。</param>
+public sealed class OdfNamedExpressionInfo(string name, string expression, string? baseCellAddress)
+{
+    /// <summary>
+    /// 取得具名運算式名稱。
+    /// </summary>
+    public string Name { get; } = name ?? string.Empty;
+
+    /// <summary>
+    /// 取得 ODF 運算式。
+    /// </summary>
+    public string Expression { get; } = expression ?? string.Empty;
+
+    /// <summary>
+    /// 取得 ODF 基準儲存格位址。
+    /// </summary>
+    public string? BaseCellAddress { get; } = baseCellAddress;
 }
 
 /// <summary>

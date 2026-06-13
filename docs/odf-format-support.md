@@ -15,23 +15,23 @@
 
 | Extension | MIME type | `OdfDocumentKind` | Detect | Create | Load | Save | Validate | Round-trip | High-level API | Test evidence |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | partial | `TextApiUsabilityTests`, `TextAdvancedFidelityTests`, `ComplianceTests` |
-| `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests` |
-| `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests` |
+| `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | partial | `TextApiUsabilityTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
+| `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `InteropCorpusTests` |
 | `.fodt` | `application/vnd.oasis.opendocument.text` | `FlatText` | complete | complete | complete | complete | validated | complete | package-level | `ComplianceTests`, `E2ETests`, `PackageRoundTripTests` |
-| `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | complete | complete | complete | complete | validated | complete | partial | `SpreadsheetApiUsabilityTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests` |
-| `.ots` | `application/vnd.oasis.opendocument.spreadsheet-template` | `SpreadsheetTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests` |
+| `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | complete | complete | complete | complete | validated | complete | partial | `SpreadsheetApiUsabilityTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests`, `InteropCorpusTests` |
+| `.ots` | `application/vnd.oasis.opendocument.spreadsheet-template` | `SpreadsheetTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.fods` | `application/vnd.oasis.opendocument.spreadsheet` | `FlatSpreadsheet` | complete | complete | complete | complete | validated | complete | package-level | `ComplianceTests`, `E2ETests`, `PackageRoundTripTests` |
-| `.odp` | `application/vnd.oasis.opendocument.presentation` | `Presentation` | complete | complete | complete | complete | validated | complete | partial | `PresentationApiUsabilityTests`, `PresentationAndRenderingTests`, `PresentationBoundaryTests` |
-| `.otp` | `application/vnd.oasis.opendocument.presentation-template` | `PresentationTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests` |
+| `.odp` | `application/vnd.oasis.opendocument.presentation` | `Presentation` | complete | complete | complete | complete | validated | complete | partial | `PresentationApiUsabilityTests`, `PresentationAndRenderingTests`, `PresentationBoundaryTests`, `InteropCorpusTests` |
+| `.otp` | `application/vnd.oasis.opendocument.presentation-template` | `PresentationTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.fodp` | `application/vnd.oasis.opendocument.presentation` | `FlatPresentation` | complete | complete | complete | complete | validated | complete | package-level | `ComplianceTests`, `PackageRoundTripTests` |
-| `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | complete | complete | complete | complete | validated | complete | partial | `DrawingApiUsabilityTests`, `ComplianceTests` |
-| `.otg` | `application/vnd.oasis.opendocument.graphics-template` | `GraphicsTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests` |
+| `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | complete | complete | complete | complete | validated | complete | partial | `DrawingApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.otg` | `application/vnd.oasis.opendocument.graphics-template` | `GraphicsTemplate` | complete | package-level | package-level | package-level | validated | package-level | planned | `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.fodg` | `application/vnd.oasis.opendocument.graphics` | `FlatGraphics` | complete | complete | complete | complete | validated | complete | package-level | `ComplianceTests`, `PackageRoundTripTests` |
-| `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `ComplianceTests` |
-| `.odf` | `application/vnd.oasis.opendocument.formula` | `Formula` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `PackageRoundTripTests` |
-| `.odi` | `application/vnd.oasis.opendocument.image` | `Image` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `ComplianceTests` |
-| `.odb` | `application/vnd.oasis.opendocument.database` | `Database` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `ComplianceTests` |
+| `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.odf` | `application/vnd.oasis.opendocument.formula` | `Formula` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `PackageRoundTripTests`, `InteropCorpusTests` |
+| `.odi` | `application/vnd.oasis.opendocument.image` | `Image` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.odb` | `application/vnd.oasis.opendocument.database` | `Database` | complete | complete | complete | complete | validated | complete | package-level | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
 
 ## 目前缺口
 

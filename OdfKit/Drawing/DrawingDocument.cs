@@ -326,6 +326,28 @@ public class OdfDrawPage(OdfNode node, DrawingDocument doc)
     }
 
     /// <summary>
+    /// 取得繪圖頁面上的文字方塊清單。
+    /// </summary>
+    public IReadOnlyList<OdfTextBox> TextBoxes => FindDrawingObjects(
+        node => ContainsDescendant(node, "text-box", OdfNamespaces.Draw),
+        node => new OdfTextBox(node, Document));
+
+    /// <summary>
+    /// 取得繪圖頁面上的圖片清單。
+    /// </summary>
+    public IReadOnlyList<OdfPicture> Pictures => FindDrawingObjects(
+        node => ContainsDescendant(node, "image", OdfNamespaces.Draw),
+        node => new OdfPicture(node, Document));
+
+    /// <summary>
+    /// 取得繪圖頁面上的一般圖形清單。
+    /// </summary>
+    public IReadOnlyList<OdfShape> Shapes => FindDrawingObjects(
+        node => node.NamespaceUri == OdfNamespaces.Draw &&
+            node.LocalName is "rect" or "ellipse" or "custom-shape" or "line" or "connector" or "polyline" or "g",
+        node => new OdfShape(node, Document));
+
+    /// <summary>
     /// 在繪圖頁面上新增文字方塊。
     /// </summary>
     /// <param name="x">X 軸座標位置</param>
@@ -499,6 +521,40 @@ public class OdfDrawPage(OdfNode node, DrawingDocument doc)
         node.SetAttribute("x2", OdfNamespaces.Svg, x2.ToString(), "svg");
         node.SetAttribute("y2", OdfNamespaces.Svg, y2.ToString(), "svg");
         return node;
+    }
+
+    private IReadOnlyList<T> FindDrawingObjects<T>(Func<OdfNode, bool> predicate, Func<OdfNode, T> factory)
+    {
+        List<T> objects = [];
+        foreach (OdfNode child in Node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element && predicate(child))
+            {
+                objects.Add(factory(child));
+            }
+        }
+
+        return objects.AsReadOnly();
+    }
+
+    private static bool ContainsDescendant(OdfNode node, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return true;
+            }
+
+            if (ContainsDescendant(child, localName, namespaceUri))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

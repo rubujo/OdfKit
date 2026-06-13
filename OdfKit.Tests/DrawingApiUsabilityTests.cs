@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -55,7 +56,7 @@ public class DrawingApiUsabilityTests
             OdfLength.FromCentimeters(5),
             OdfLength.FromCentimeters(5),
             OdfLength.FromCentimeters(5));
-        page.AddPicture(
+        OdfPicture picture = page.AddPicture(
             CreatePngBytes(),
             OdfLength.FromCentimeters(9),
             OdfLength.FromCentimeters(1),
@@ -87,6 +88,13 @@ public class DrawingApiUsabilityTests
         Assert.Equal("Canvas", loaded.Pages[0].Name);
         Assert.Equal("application/vnd.oasis.opendocument.graphics", loaded.Package.MimeType);
         Assert.True(loaded.Package.HasEntry("Pictures/drawing_image.png"));
+        Assert.Equal("流程圖", loaded.Pages[0].TextBoxes[0].Text);
+        Assert.Equal(picture.ImageHref, loaded.Pages[0].Pictures[0].ImageHref);
+        Assert.Contains(loaded.Pages[0].Shapes, shape => shape.LocalName == "rect");
+        Assert.Contains(loaded.Pages[0].Shapes, shape => shape.LocalName == "ellipse");
+        Assert.Contains(loaded.Pages[0].Shapes, shape => shape.LocalName == "line");
+        Assert.Contains(loaded.Pages[0].Shapes, shape => shape.LocalName == "connector");
+        Assert.Contains(loaded.Pages[0].Shapes, shape => shape.LocalName == "g");
         Assert.True(HasElement(loadedPage, "rect", OdfNamespaces.Draw));
         Assert.True(HasElement(loadedPage, "ellipse", OdfNamespaces.Draw));
         Assert.True(HasElement(loadedPage, "line", OdfNamespaces.Draw));

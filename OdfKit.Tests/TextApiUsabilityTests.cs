@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Text;
@@ -52,7 +53,14 @@ public class TextApiUsabilityTests
         Assert.Equal("OdfKit", loaded.Metadata.Creator);
         Assert.Equal("G4", loaded.Metadata.Subject);
         Assert.Equal("文字文件高階 API 測試", loaded.Metadata.Description);
-        Assert.Equal("Logo", image.Name);
+        Assert.Equal("本週摘要", loaded.Body.Headings.Items[0].TextContent);
+        Assert.Equal(1, loaded.Body.Headings.Items[0].OutlineLevel);
+        Assert.Contains(loaded.Body.Paragraphs.Items, item => item.TextContent.Contains("開頭", StringComparison.Ordinal));
+        Assert.Equal("完成項目", loaded.Body.Lists.Items[0].Items[0].Paragraphs[0].TextContent);
+        Assert.Equal(1, loaded.Body.Tables.Items[0].RowCount);
+        Assert.Equal(2, loaded.Body.Tables.Items[0].ColumnCount);
+        Assert.Equal("Logo", loaded.Body.Images.Items[0].Name);
+        Assert.Equal("Pictures/Logo.png", loaded.Body.Images.Items[0].ImageHref);
         Assert.Equal("application/vnd.oasis.opendocument.text", loaded.Package.MimeType);
     }
 

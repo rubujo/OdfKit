@@ -64,6 +64,18 @@ public class OdfDatabaseDocument : OdfDocument
     public OdfNode DatabaseNode => GetDatabaseNode();
 
     /// <summary>
+    /// 取得目前資料來源連線參照。
+    /// </summary>
+    public string? ConnectionHref
+    {
+        get
+        {
+            OdfNode? connection = FindChildElement(GetDatabaseNode(), "connection-resource", DatabaseNamespace);
+            return connection?.GetAttribute("href", OdfNamespaces.XLink);
+        }
+    }
+
+    /// <summary>
     /// 設定資料來源連線參照。
     /// </summary>
     /// <param name="href">連線資源路徑或 URL。</param>
@@ -77,6 +89,34 @@ public class OdfDatabaseDocument : OdfDocument
         OdfNode connection = FindOrCreateChild(GetDatabaseNode(), "connection-resource", DatabaseNamespace, "db");
         connection.SetAttribute("href", OdfNamespaces.XLink, href, "xlink");
         connection.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+    }
+
+    /// <summary>
+    /// 取得目前宣告的資料表描述清單。
+    /// </summary>
+    /// <returns>資料表描述清單。</returns>
+    public IReadOnlyList<OdfDatabaseTableInfo> GetTables()
+    {
+        OdfNode? tableRepresentations = FindChildElement(GetDatabaseNode(), "table-representations", DatabaseNamespace);
+        if (tableRepresentations is null)
+        {
+            return [];
+        }
+
+        List<OdfDatabaseTableInfo> tables = [];
+        foreach (OdfNode child in tableRepresentations.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "table-representation" &&
+                child.NamespaceUri == DatabaseNamespace)
+            {
+                tables.Add(new OdfDatabaseTableInfo(
+                    child.GetAttribute("name", DatabaseNamespace) ?? string.Empty,
+                    child.GetAttribute("command", DatabaseNamespace)));
+            }
+        }
+
+        return tables.AsReadOnly();
     }
 
     /// <summary>
@@ -172,4 +212,37 @@ public class OdfDatabaseDocument : OdfDocument
         OdfNode body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
         return FindOrCreateChild(body, "database", OdfNamespaces.Office, "office");
     }
+
+    private static OdfNode? FindChildElement(OdfNode parent, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+}
+
+/// <summary>
+/// 表示 ODB 資料表描述。
+/// </summary>
+/// <param name="name">資料表名稱。</param>
+/// <param name="command">資料表命令或來源名稱。</param>
+public sealed class OdfDatabaseTableInfo(string name, string? command)
+{
+    /// <summary>
+    /// 取得資料表名稱。
+    /// </summary>
+    public string Name { get; } = name ?? string.Empty;
+
+    /// <summary>
+    /// 取得資料表命令或來源名稱。
+    /// </summary>
+    public string? Command { get; } = command;
 }

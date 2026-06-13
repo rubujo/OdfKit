@@ -865,6 +865,30 @@ public class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// 取得投影片上的文字方塊清單。
+    /// </summary>
+    public IReadOnlyList<OdfTextBox> TextBoxes => FindDrawingObjects(
+        node => node.NamespaceUri == OdfNamespaces.Draw &&
+            ContainsDescendant(node, "text-box", OdfNamespaces.Draw),
+        node => new OdfTextBox(node, this));
+
+    /// <summary>
+    /// 取得投影片上的圖片清單。
+    /// </summary>
+    public IReadOnlyList<OdfPicture> Pictures => FindDrawingObjects(
+        node => node.NamespaceUri == OdfNamespaces.Draw &&
+            ContainsDescendant(node, "image", OdfNamespaces.Draw),
+        node => new OdfPicture(node, this));
+
+    /// <summary>
+    /// 取得投影片上的一般圖形清單。
+    /// </summary>
+    public IReadOnlyList<OdfShape> Shapes => FindDrawingObjects(
+        node => node.NamespaceUri == OdfNamespaces.Draw &&
+            node.LocalName is "rect" or "ellipse" or "custom-shape" or "line" or "connector" or "polyline",
+        node => new OdfShape(node, this));
+
+    /// <summary>
     /// 在投影片上新增一個預留位置（Placeholder）。
     /// </summary>
     /// <param name="type">預留位置類型</param>
@@ -1076,6 +1100,40 @@ public class OdfSlide(OdfNode node, PresentationDocument doc)
         frame.SetAttribute("anchor-type", OdfNamespaces.Draw, "page", "draw");
         return frame;
     }
+
+    private IReadOnlyList<T> FindDrawingObjects<T>(Func<OdfNode, bool> predicate, Func<OdfNode, T> factory)
+    {
+        List<T> objects = [];
+        foreach (OdfNode child in Node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element && predicate(child))
+            {
+                objects.Add(factory(child));
+            }
+        }
+
+        return objects.AsReadOnly();
+    }
+
+    private static bool ContainsDescendant(OdfNode node, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return true;
+            }
+
+            if (ContainsDescendant(child, localName, namespaceUri))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 /// <summary>
@@ -1100,6 +1158,11 @@ public class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     /// 取得所屬的 ODF 文件。
     /// </summary>
     public OdfDocument Document { get; } = doc;
+
+    /// <summary>
+    /// 取得圖形節點的區域名稱。
+    /// </summary>
+    public string LocalName => Node.LocalName;
 
     /// <summary>
     /// 取得或設定圖形的識別碼。
@@ -1276,6 +1339,32 @@ public class OdfTextBox(OdfNode node, OdfDocument doc, OdfSlide? slide) : OdfSha
     /// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
     /// <param name="doc">所屬的 ODF 文件執行個體</param>
     public OdfTextBox(OdfNode node, OdfDocument doc) : this(node, doc, null) { }
+
+    /// <summary>
+    /// 取得文字方塊中的純文字內容。
+    /// </summary>
+    public string Text => FindDescendant(Node, "p", OdfNamespaces.Text)?.TextContent ?? string.Empty;
+
+    private static OdfNode? FindDescendant(OdfNode node, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+
+            OdfNode? descendant = FindDescendant(child, localName, namespaceUri);
+            if (descendant is not null)
+            {
+                return descendant;
+            }
+        }
+
+        return null;
+    }
 }
 
 /// <summary>
@@ -1299,4 +1388,30 @@ public class OdfPicture(OdfNode node, OdfDocument doc, OdfSlide? slide) : OdfSha
     /// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
     /// <param name="doc">所屬的 ODF 文件執行個體</param>
     public OdfPicture(OdfNode node, OdfDocument doc) : this(node, doc, null) { }
+
+    /// <summary>
+    /// 取得圖片在 ODF 封裝中的參照路徑。
+    /// </summary>
+    public string? ImageHref => FindDescendant(Node, "image", OdfNamespaces.Draw)?.GetAttribute("href", OdfNamespaces.XLink);
+
+    private static OdfNode? FindDescendant(OdfNode node, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+
+            OdfNode? descendant = FindDescendant(child, localName, namespaceUri);
+            if (descendant is not null)
+            {
+                return descendant;
+            }
+        }
+
+        return null;
+    }
 }
