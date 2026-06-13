@@ -20,7 +20,8 @@ public static class OdfComplianceProfiles
     ];
 
     private static readonly string[] FlatExtensions = [
-        ".fodt", ".fods", ".fodp", ".fodg"
+        ".fodt", ".fods", ".fodp", ".fodg",
+        ".fodc", ".fdf", ".fodi"
     ];
 
     private static readonly string[] OpenDocumentMimeTypes = [

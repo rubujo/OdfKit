@@ -62,6 +62,29 @@ public class OdfValidatorApiTests
     }
 
     /// <summary>
+    /// 驗證補充的扁平 XML ODF 副檔名會映射到正確文件種類。
+    /// </summary>
+    [Theory]
+    [InlineData(OdfDocumentKind.FlatChart, "chart.fodc")]
+    [InlineData(OdfDocumentKind.FlatFormula, "formula.fdf")]
+    [InlineData(OdfDocumentKind.FlatImage, "image.fodi")]
+    public void FlatOdf_SupplementalExtensions_ValidateWithExpectedKind(OdfDocumentKind expectedKind, string fileName)
+    {
+        using var stream = new MemoryStream();
+        OdfDocumentFactory.WriteFlatXml(stream, expectedKind, leaveOpen: true);
+        stream.Position = 0;
+
+        OdfValidationReport report = OdfValidator.Validate(
+            stream,
+            fileName,
+            OdfComplianceProfiles.OasisOdf14Extended);
+
+        Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
+        Assert.Equal(expectedKind, report.DocumentKind);
+        Assert.Equal(OdfVersion.Odf14, report.DetectedVersion);
+    }
+
+    /// <summary>
     /// 驗證可用選項物件驗證已開啟的 ODF 封裝。
     /// </summary>
     [Fact]

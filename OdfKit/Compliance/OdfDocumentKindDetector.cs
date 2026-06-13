@@ -67,6 +67,9 @@ public static class OdfDocumentKindDetector
     private const string SpreadsheetMimeType = "application/vnd.oasis.opendocument.spreadsheet";
     private const string PresentationMimeType = "application/vnd.oasis.opendocument.presentation";
     private const string GraphicsMimeType = "application/vnd.oasis.opendocument.graphics";
+    private const string ChartMimeType = "application/vnd.oasis.opendocument.chart";
+    private const string FormulaMimeType = "application/vnd.oasis.opendocument.formula";
+    private const string ImageMimeType = "application/vnd.oasis.opendocument.image";
 
     private static readonly OdfFormatInfo[] FormatTable =
     [
@@ -79,14 +82,17 @@ public static class OdfDocumentKindDetector
         new(".otp", "application/vnd.oasis.opendocument.presentation-template", OdfDocumentKind.PresentationTemplate, OdfDocumentKind.Presentation, false),
         new(".odg", GraphicsMimeType, OdfDocumentKind.Graphics, OdfDocumentKind.Graphics, false),
         new(".otg", "application/vnd.oasis.opendocument.graphics-template", OdfDocumentKind.GraphicsTemplate, OdfDocumentKind.Graphics, false),
-        new(".odc", "application/vnd.oasis.opendocument.chart", OdfDocumentKind.Chart, OdfDocumentKind.Chart, false),
-        new(".odf", "application/vnd.oasis.opendocument.formula", OdfDocumentKind.Formula, OdfDocumentKind.Formula, false),
-        new(".odi", "application/vnd.oasis.opendocument.image", OdfDocumentKind.Image, OdfDocumentKind.Image, false),
+        new(".odc", ChartMimeType, OdfDocumentKind.Chart, OdfDocumentKind.Chart, false),
+        new(".odf", FormulaMimeType, OdfDocumentKind.Formula, OdfDocumentKind.Formula, false),
+        new(".odi", ImageMimeType, OdfDocumentKind.Image, OdfDocumentKind.Image, false),
         new(".odb", "application/vnd.oasis.opendocument.database", OdfDocumentKind.Database, OdfDocumentKind.Database, false),
         new(".fodt", TextMimeType, OdfDocumentKind.FlatText, OdfDocumentKind.Text, true),
         new(".fods", SpreadsheetMimeType, OdfDocumentKind.FlatSpreadsheet, OdfDocumentKind.Spreadsheet, true),
         new(".fodp", PresentationMimeType, OdfDocumentKind.FlatPresentation, OdfDocumentKind.Presentation, true),
-        new(".fodg", GraphicsMimeType, OdfDocumentKind.FlatGraphics, OdfDocumentKind.Graphics, true)
+        new(".fodg", GraphicsMimeType, OdfDocumentKind.FlatGraphics, OdfDocumentKind.Graphics, true),
+        new(".fodc", ChartMimeType, OdfDocumentKind.FlatChart, OdfDocumentKind.Chart, true),
+        new(".fdf", FormulaMimeType, OdfDocumentKind.FlatFormula, OdfDocumentKind.Formula, true),
+        new(".fodi", ImageMimeType, OdfDocumentKind.FlatImage, OdfDocumentKind.Image, true)
     ];
 
     private static readonly ReadOnlyCollection<OdfFormatInfo> SupportedFormatsValue = Array.AsReadOnly(FormatTable);
@@ -196,6 +202,9 @@ public static class OdfDocumentKindDetector
             OdfDocumentKind.Spreadsheet => OdfDocumentKind.FlatSpreadsheet,
             OdfDocumentKind.Presentation => OdfDocumentKind.FlatPresentation,
             OdfDocumentKind.Graphics => OdfDocumentKind.FlatGraphics,
+            OdfDocumentKind.Chart => OdfDocumentKind.FlatChart,
+            OdfDocumentKind.Formula => OdfDocumentKind.FlatFormula,
+            OdfDocumentKind.Image => OdfDocumentKind.FlatImage,
             _ => kind
         };
     }
@@ -213,6 +222,9 @@ public static class OdfDocumentKindDetector
             OdfDocumentKind.SpreadsheetTemplate or OdfDocumentKind.FlatSpreadsheet => OdfDocumentKind.Spreadsheet,
             OdfDocumentKind.PresentationTemplate or OdfDocumentKind.FlatPresentation => OdfDocumentKind.Presentation,
             OdfDocumentKind.GraphicsTemplate or OdfDocumentKind.FlatGraphics => OdfDocumentKind.Graphics,
+            OdfDocumentKind.FlatChart => OdfDocumentKind.Chart,
+            OdfDocumentKind.FlatFormula => OdfDocumentKind.Formula,
+            OdfDocumentKind.FlatImage => OdfDocumentKind.Image,
             _ => kind
         };
     }
@@ -267,7 +279,10 @@ public static class OdfDocumentKindDetector
         return kind == OdfDocumentKind.FlatText ||
             kind == OdfDocumentKind.FlatSpreadsheet ||
             kind == OdfDocumentKind.FlatPresentation ||
-            kind == OdfDocumentKind.FlatGraphics;
+            kind == OdfDocumentKind.FlatGraphics ||
+            kind == OdfDocumentKind.FlatChart ||
+            kind == OdfDocumentKind.FlatFormula ||
+            kind == OdfDocumentKind.FlatImage;
     }
 
     /// <summary>

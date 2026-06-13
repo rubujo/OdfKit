@@ -266,9 +266,9 @@ public static class OdfDocumentFactory
             OdfDocumentKind.Spreadsheet or OdfDocumentKind.SpreadsheetTemplate or OdfDocumentKind.FlatSpreadsheet => "spreadsheet",
             OdfDocumentKind.Presentation or OdfDocumentKind.PresentationTemplate or OdfDocumentKind.FlatPresentation => "presentation",
             OdfDocumentKind.Graphics or OdfDocumentKind.GraphicsTemplate or OdfDocumentKind.FlatGraphics => "drawing",
-            OdfDocumentKind.Chart => "chart",
-            OdfDocumentKind.Formula => "formula",
-            OdfDocumentKind.Image => "image",
+            OdfDocumentKind.Chart or OdfDocumentKind.FlatChart => "chart",
+            OdfDocumentKind.Formula or OdfDocumentKind.FlatFormula => "formula",
+            OdfDocumentKind.Image or OdfDocumentKind.FlatImage => "image",
             OdfDocumentKind.Database => "database",
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")
         };
@@ -282,6 +282,9 @@ public static class OdfDocumentFactory
             OdfDocumentKind.FlatSpreadsheet => OdfDocumentKind.Spreadsheet,
             OdfDocumentKind.FlatPresentation => OdfDocumentKind.Presentation,
             OdfDocumentKind.FlatGraphics => OdfDocumentKind.Graphics,
+            OdfDocumentKind.FlatChart => OdfDocumentKind.Chart,
+            OdfDocumentKind.FlatFormula => OdfDocumentKind.Formula,
+            OdfDocumentKind.FlatImage => OdfDocumentKind.Image,
             _ => kind
         };
     }

@@ -134,7 +134,22 @@ public enum OdfDocumentKind
     /// <summary>
     /// 單一 Flat XML 格式的 ODF 繪圖文件 (.fodg)。
     /// </summary>
-    FlatGraphics
+    FlatGraphics,
+
+    /// <summary>
+    /// 單一 Flat XML 格式的 ODF 圖表文件 (.fodc)。
+    /// </summary>
+    FlatChart,
+
+    /// <summary>
+    /// 單一 Flat XML 格式的 ODF 公式文件 (.fdf)。
+    /// </summary>
+    FlatFormula,
+
+    /// <summary>
+    /// 單一 Flat XML 格式的 ODF 影像文件 (.fodi)。
+    /// </summary>
+    FlatImage
 }
 
 /// <summary>
