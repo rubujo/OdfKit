@@ -188,6 +188,7 @@ using OdfKit.Database;
 
 using OdfDatabaseDocument database = OdfDatabaseDocument.Create();
 database.SetConnection("sdbc:embedded:hsqldb");
+database.AddDataSourceSetting("AppendTableAliasName", OdfDatabaseDataSourceSettingType.Boolean, "true");
 database.AddTable("Customers", "SELECT * FROM Customers");
 database.AddQuery(
     "ActiveCustomers",
@@ -199,6 +200,7 @@ database.Save("data.odb");
 
 using OdfDatabaseDocument loaded = OdfDatabaseDocument.Load("data.odb");
 Console.WriteLine(loaded.ConnectionHref);
+Console.WriteLine(loaded.FindDataSourceSetting("AppendTableAliasName")?.Values[0]);
 Console.WriteLine(loaded.Tables[0].Name);
 Console.WriteLine(loaded.FindQuery("ActiveCustomers")?.Command);
 ```

@@ -70,7 +70,7 @@ public class OdfDatabaseDocument : OdfDocument
     {
         get
         {
-            OdfNode? connection = FindChildElement(GetDatabaseNode(), "connection-resource", DatabaseNamespace);
+            OdfNode? connection = FindConnectionResource();
             return connection?.GetAttribute("href", OdfNamespaces.XLink);
         }
     }
@@ -86,6 +86,11 @@ public class OdfDatabaseDocument : OdfDocument
     public IReadOnlyList<OdfDatabaseQueryInfo> Queries => GetQueries();
 
     /// <summary>
+    /// 取得目前宣告的資料來源設定清單。
+    /// </summary>
+    public IReadOnlyList<OdfDatabaseDataSourceSettingInfo> DataSourceSettings => GetDataSourceSettings();
+
+    /// <summary>
     /// 設定資料來源連線參照。
     /// </summary>
     /// <param name="href">連線資源路徑或 URL。</param>
@@ -96,7 +101,9 @@ public class OdfDatabaseDocument : OdfDocument
             throw new ArgumentException("連線參照不能為空。", nameof(href));
         }
 
-        OdfNode connection = FindOrCreateChild(GetDatabaseNode(), "connection-resource", DatabaseNamespace, "db");
+        OdfNode dataSource = FindOrCreateDataSource();
+        OdfNode connectionData = FindOrCreateChild(dataSource, "connection-data", DatabaseNamespace, "db");
+        OdfNode connection = FindOrCreateChild(connectionData, "connection-resource", DatabaseNamespace, "db");
         connection.SetAttribute("href", OdfNamespaces.XLink, href, "xlink");
         connection.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
     }
@@ -161,6 +168,47 @@ public class OdfDatabaseDocument : OdfDocument
     }
 
     /// <summary>
+    /// 取得目前宣告的資料來源設定清單。
+    /// </summary>
+    /// <returns>資料來源設定清單。</returns>
+    public IReadOnlyList<OdfDatabaseDataSourceSettingInfo> GetDataSourceSettings()
+    {
+        OdfNode? settings = FindDataSourceSettings();
+        if (settings is null)
+        {
+            return [];
+        }
+
+        List<OdfDatabaseDataSourceSettingInfo> settingInfos = [];
+        foreach (OdfNode child in settings.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "data-source-setting" &&
+                child.NamespaceUri == DatabaseNamespace)
+            {
+                List<string> values = [];
+                foreach (OdfNode valueNode in child.Children)
+                {
+                    if (valueNode.NodeType is OdfNodeType.Element &&
+                        valueNode.LocalName == "data-source-setting-value" &&
+                        valueNode.NamespaceUri == DatabaseNamespace)
+                    {
+                        values.Add(valueNode.TextContent);
+                    }
+                }
+
+                settingInfos.Add(new OdfDatabaseDataSourceSettingInfo(
+                    child.GetAttribute("data-source-setting-name", DatabaseNamespace) ?? string.Empty,
+                    ParseDataSourceSettingType(child.GetAttribute("data-source-setting-type", DatabaseNamespace)),
+                    ParseNullableBoolean(child.GetAttribute("data-source-setting-is-list", DatabaseNamespace)),
+                    values));
+            }
+        }
+
+        return settingInfos.AsReadOnly();
+    }
+
+    /// <summary>
     /// 依名稱尋找資料表描述。
     /// </summary>
     /// <param name="name">資料表名稱。</param>
@@ -200,6 +248,29 @@ public class OdfDatabaseDocument : OdfDocument
             if (string.Equals(query.Name, name, StringComparison.Ordinal))
             {
                 return query;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 依名稱尋找資料來源設定。
+    /// </summary>
+    /// <param name="name">設定名稱。</param>
+    /// <returns>符合名稱的資料來源設定；找不到時為 <see langword="null"/>。</returns>
+    public OdfDatabaseDataSourceSettingInfo? FindDataSourceSetting(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("資料來源設定名稱不能為空。", nameof(name));
+        }
+
+        foreach (OdfDatabaseDataSourceSettingInfo setting in GetDataSourceSettings())
+        {
+            if (string.Equals(setting.Name, name, StringComparison.Ordinal))
+            {
+                return setting;
             }
         }
 
@@ -285,6 +356,76 @@ public class OdfDatabaseDocument : OdfDocument
     }
 
     /// <summary>
+    /// 新增資料來源設定。
+    /// </summary>
+    /// <param name="name">設定名稱。</param>
+    /// <param name="type">設定值型別。</param>
+    /// <param name="value">設定值。</param>
+    /// <returns>新增的資料來源設定節點。</returns>
+    /// <exception cref="InvalidOperationException">當尚未設定資料來源連線時擲出。</exception>
+    public OdfNode AddDataSourceSetting(string name, OdfDatabaseDataSourceSettingType type, string value)
+    {
+        return AddDataSourceSetting(name, type, isList: false, [value]);
+    }
+
+    /// <summary>
+    /// 新增資料來源設定。
+    /// </summary>
+    /// <param name="name">設定名稱。</param>
+    /// <param name="type">設定值型別。</param>
+    /// <param name="isList">設定值是否為清單。</param>
+    /// <param name="values">設定值清單。</param>
+    /// <returns>新增的資料來源設定節點。</returns>
+    /// <exception cref="InvalidOperationException">當尚未設定資料來源連線時擲出。</exception>
+    public OdfNode AddDataSourceSetting(
+        string name,
+        OdfDatabaseDataSourceSettingType type,
+        bool isList,
+        params string[] values)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("資料來源設定名稱不能為空。", nameof(name));
+        }
+
+        if (values is null)
+        {
+            throw new ArgumentNullException(nameof(values));
+        }
+
+        if (values.Length == 0)
+        {
+            throw new ArgumentException("資料來源設定值不能為空。", nameof(values));
+        }
+
+        if (FindConnectionResource() is null)
+        {
+            throw new InvalidOperationException("新增資料來源設定前必須先設定資料來源連線。");
+        }
+
+        OdfNode settings = FindOrCreateDataSourceSettings();
+        OdfNode setting = OdfNodeFactory.CreateElement("data-source-setting", DatabaseNamespace, "db");
+        setting.SetAttribute("data-source-setting-name", DatabaseNamespace, name, "db");
+        setting.SetAttribute("data-source-setting-type", DatabaseNamespace, ToDataSourceSettingTypeToken(type), "db");
+        setting.SetAttribute("data-source-setting-is-list", DatabaseNamespace, isList ? "true" : "false", "db");
+
+        foreach (string value in values)
+        {
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(values), "資料來源設定值不能為 null。");
+            }
+
+            OdfNode valueNode = OdfNodeFactory.CreateElement("data-source-setting-value", DatabaseNamespace, "db");
+            valueNode.TextContent = value;
+            setting.AppendChild(valueNode);
+        }
+
+        settings.AppendChild(setting);
+        return setting;
+    }
+
+    /// <summary>
     /// 移除指定名稱的資料表描述。
     /// </summary>
     /// <param name="name">資料表名稱。</param>
@@ -343,6 +484,39 @@ public class OdfDatabaseDocument : OdfDocument
                 string.Equals(child.GetAttribute("name", DatabaseNamespace), name, StringComparison.Ordinal))
             {
                 queries.RemoveChild(child);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 移除指定名稱的資料來源設定。
+    /// </summary>
+    /// <param name="name">設定名稱。</param>
+    /// <returns>如果成功移除資料來源設定，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveDataSourceSetting(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("資料來源設定名稱不能為空。", nameof(name));
+        }
+
+        OdfNode? settings = FindDataSourceSettings();
+        if (settings is null)
+        {
+            return false;
+        }
+
+        foreach (OdfNode child in new List<OdfNode>(settings.Children))
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "data-source-setting" &&
+                child.NamespaceUri == DatabaseNamespace &&
+                string.Equals(child.GetAttribute("data-source-setting-name", DatabaseNamespace), name, StringComparison.Ordinal))
+            {
+                settings.RemoveChild(child);
                 return true;
             }
         }
@@ -419,6 +593,65 @@ public class OdfDatabaseDocument : OdfDocument
         return FindOrCreateChild(body, "database", OdfNamespaces.Office, "office");
     }
 
+    private OdfNode FindOrCreateDataSource()
+    {
+        OdfNode database = GetDatabaseNode();
+        OdfNode? dataSource = FindChildElement(database, "data-source", DatabaseNamespace);
+        if (dataSource is not null)
+        {
+            return dataSource;
+        }
+
+        dataSource = OdfNodeFactory.CreateElement("data-source", DatabaseNamespace, "db");
+        OdfNode? firstAfterDataSource = FindFirstChildElement(
+            database,
+            ("forms", DatabaseNamespace),
+            ("reports", DatabaseNamespace),
+            ("queries", DatabaseNamespace),
+            ("table-representations", DatabaseNamespace),
+            ("schema-definition", DatabaseNamespace));
+        if (firstAfterDataSource is null)
+        {
+            database.AppendChild(dataSource);
+        }
+        else
+        {
+            database.InsertBefore(dataSource, firstAfterDataSource);
+        }
+
+        return dataSource;
+    }
+
+    private OdfNode FindOrCreateDataSourceSettings()
+    {
+        OdfNode dataSource = FindOrCreateDataSource();
+        OdfNode applicationSettings = FindOrCreateChild(dataSource, "application-connection-settings", DatabaseNamespace, "db");
+        return FindOrCreateChild(applicationSettings, "data-source-settings", DatabaseNamespace, "db");
+    }
+
+    private OdfNode? FindDataSourceSettings()
+    {
+        OdfNode? dataSource = FindChildElement(GetDatabaseNode(), "data-source", DatabaseNamespace);
+        OdfNode? applicationSettings = dataSource is null
+            ? null
+            : FindChildElement(dataSource, "application-connection-settings", DatabaseNamespace);
+        return applicationSettings is null
+            ? null
+            : FindChildElement(applicationSettings, "data-source-settings", DatabaseNamespace);
+    }
+
+    private OdfNode? FindConnectionResource()
+    {
+        OdfNode? dataSource = FindChildElement(GetDatabaseNode(), "data-source", DatabaseNamespace);
+        OdfNode? connectionData = dataSource is null
+            ? null
+            : FindChildElement(dataSource, "connection-data", DatabaseNamespace);
+        OdfNode? connection = connectionData is null
+            ? null
+            : FindChildElement(connectionData, "connection-resource", DatabaseNamespace);
+        return connection ?? FindChildElement(GetDatabaseNode(), "connection-resource", DatabaseNamespace);
+    }
+
     private static OdfNode? FindChildElement(OdfNode parent, string localName, string namespaceUri)
     {
         foreach (OdfNode child in parent.Children)
@@ -434,6 +667,27 @@ public class OdfDatabaseDocument : OdfDocument
         return null;
     }
 
+    private static OdfNode? FindFirstChildElement(OdfNode parent, params (string LocalName, string NamespaceUri)[] names)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element)
+            {
+                continue;
+            }
+
+            foreach ((string localName, string namespaceUri) in names)
+            {
+                if (child.LocalName == localName && child.NamespaceUri == namespaceUri)
+                {
+                    return child;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private static bool? ParseNullableBoolean(string? value)
     {
         if (value is null)
@@ -443,6 +697,34 @@ public class OdfDatabaseDocument : OdfDocument
 
         return string.Equals(value, "true", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(value, "1", StringComparison.Ordinal);
+    }
+
+    private static OdfDatabaseDataSourceSettingType ParseDataSourceSettingType(string? value)
+    {
+        return value switch
+        {
+            "boolean" => OdfDatabaseDataSourceSettingType.Boolean,
+            "double" => OdfDatabaseDataSourceSettingType.Double,
+            "int" => OdfDatabaseDataSourceSettingType.Int,
+            "long" => OdfDatabaseDataSourceSettingType.Long,
+            "short" => OdfDatabaseDataSourceSettingType.Short,
+            "string" => OdfDatabaseDataSourceSettingType.String,
+            _ => OdfDatabaseDataSourceSettingType.String
+        };
+    }
+
+    private static string ToDataSourceSettingTypeToken(OdfDatabaseDataSourceSettingType type)
+    {
+        return type switch
+        {
+            OdfDatabaseDataSourceSettingType.Boolean => "boolean",
+            OdfDatabaseDataSourceSettingType.Double => "double",
+            OdfDatabaseDataSourceSettingType.Int => "int",
+            OdfDatabaseDataSourceSettingType.Long => "long",
+            OdfDatabaseDataSourceSettingType.Short => "short",
+            OdfDatabaseDataSourceSettingType.String => "string",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "未知的資料來源設定型別。")
+        };
     }
 }
 
@@ -503,4 +785,38 @@ public sealed class OdfDatabaseQueryInfo(
     /// 取得 SQL escape processing 設定。
     /// </summary>
     public bool? EscapeProcessing { get; } = escapeProcessing;
+}
+
+/// <summary>
+/// 表示 ODB 資料來源設定描述。
+/// </summary>
+/// <param name="name">設定名稱。</param>
+/// <param name="type">設定值型別。</param>
+/// <param name="isList">設定值是否為清單。</param>
+/// <param name="values">設定值清單。</param>
+public sealed class OdfDatabaseDataSourceSettingInfo(
+    string name,
+    OdfDatabaseDataSourceSettingType type,
+    bool? isList,
+    IReadOnlyList<string> values)
+{
+    /// <summary>
+    /// 取得設定名稱。
+    /// </summary>
+    public string Name { get; } = name ?? string.Empty;
+
+    /// <summary>
+    /// 取得設定值型別。
+    /// </summary>
+    public OdfDatabaseDataSourceSettingType Type { get; } = type;
+
+    /// <summary>
+    /// 取得設定值是否為清單。
+    /// </summary>
+    public bool? IsList { get; } = isList;
+
+    /// <summary>
+    /// 取得設定值清單。
+    /// </summary>
+    public IReadOnlyList<string> Values { get; } = values ?? [];
 }

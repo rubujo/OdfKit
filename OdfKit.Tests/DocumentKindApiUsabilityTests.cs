@@ -258,6 +258,14 @@ public class DocumentKindApiUsabilityTests
     {
         using var database = OdfDatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:hsqldb");
+        database.AddDataSourceSetting("AppendTableAliasName", OdfDatabaseDataSourceSettingType.Boolean, "true");
+        database.AddDataSourceSetting(
+            "SuppressVersionColumns",
+            OdfDatabaseDataSourceSettingType.String,
+            isList: true,
+            "ROWVERSION",
+            "TIMESTAMP");
+        database.AddDataSourceSetting("ScratchSetting", OdfDatabaseDataSourceSettingType.String, "scratch");
         database.AddTable("Customers", "SELECT * FROM Customers");
         database.AddTable("Scratch", "SELECT 1");
         database.AddQuery(
@@ -269,13 +277,24 @@ public class DocumentKindApiUsabilityTests
         database.AddQuery("ScratchQuery", "SELECT 1");
         Assert.True(database.RemoveTable("Scratch"));
         Assert.True(database.RemoveQuery("ScratchQuery"));
+        Assert.True(database.RemoveDataSourceSetting("ScratchSetting"));
 
         using OdfDatabaseDocument loaded = RoundTrip(database, "database.odb", OdfDatabaseDocument.Load);
         OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "database.odb");
 
         Assert.Equal("application/vnd.oasis.opendocument.database", loaded.Package.MimeType);
-        Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
+        Assert.True(report.IsValid, report.ToJson());
         Assert.Equal("sdbc:embedded:hsqldb", loaded.ConnectionHref);
+        Assert.Equal(2, loaded.DataSourceSettings.Count);
+        Assert.Equal("AppendTableAliasName", loaded.DataSourceSettings[0].Name);
+        Assert.Equal(OdfDatabaseDataSourceSettingType.Boolean, loaded.DataSourceSettings[0].Type);
+        Assert.False(loaded.DataSourceSettings[0].IsList);
+        Assert.Equal(["true"], loaded.DataSourceSettings[0].Values);
+        Assert.Equal("SuppressVersionColumns", loaded.FindDataSourceSetting("SuppressVersionColumns")?.Name);
+        Assert.Equal(OdfDatabaseDataSourceSettingType.String, loaded.FindDataSourceSetting("SuppressVersionColumns")?.Type);
+        Assert.True(loaded.FindDataSourceSetting("SuppressVersionColumns")?.IsList);
+        Assert.Equal(["ROWVERSION", "TIMESTAMP"], loaded.FindDataSourceSetting("SuppressVersionColumns")?.Values);
+        Assert.Null(loaded.FindDataSourceSetting("ScratchSetting"));
         Assert.Single(loaded.Tables);
         Assert.Equal("Customers", loaded.Tables[0].Name);
         Assert.Equal("SELECT * FROM Customers", loaded.FindTable("Customers")?.Command);
