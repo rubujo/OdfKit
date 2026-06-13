@@ -44,8 +44,28 @@ public class OdfToolkitParityReadinessTests
         Assert.Contains("roundTrip", manifest, StringComparison.Ordinal);
         Assert.Contains("validate-corpus", manifest, StringComparison.Ordinal);
         Assert.Contains("tests/fixtures/corpus/manifest.json", manifest, StringComparison.Ordinal);
+        Assert.Contains("docs/examples/external-corpus/manifest.json", manifest, StringComparison.Ordinal);
         Assert.Contains("repo-generated-minimal-flat-text", manifest, StringComparison.Ordinal);
         Assert.Contains("generated-format-minimal", manifest, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證外部 corpus 範本宣告必要欄位與 baseline exception 格式。
+    /// </summary>
+    [Fact]
+    public void ExternalCorpusTemplatesDeclareRequiredShape()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string manifestPath = Path.Combine(repoRoot, "docs", "examples", "external-corpus", "manifest.json");
+        string exceptionsPath = Path.Combine(repoRoot, "docs", "examples", "external-corpus", "baseline-exceptions.json");
+        using JsonDocument manifest = JsonDocument.Parse(File.ReadAllText(manifestPath));
+        using JsonDocument exceptions = JsonDocument.Parse(File.ReadAllText(exceptionsPath));
+
+        JsonElement fixture = manifest.RootElement.GetProperty("fixtures")[0];
+        Assert.Equal("external-review-required", fixture.GetProperty("license").GetString());
+        Assert.Equal("ODF Validator sample", fixture.GetProperty("source").GetString());
+        Assert.Equal("semantic-equivalent", fixture.GetProperty("roundTrip").GetString());
+        Assert.Equal("odf-validator", exceptions.RootElement.GetProperty("exceptions")[0].GetProperty("baseline").GetString());
     }
 
     /// <summary>

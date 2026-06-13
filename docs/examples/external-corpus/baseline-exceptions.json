@@ -1,0 +1,12 @@
+{
+  "exceptions": [
+    {
+      "path": "odf-validator/samples/valid/text/sample.odt",
+      "baseline": "odf-validator",
+      "odfKitIsValid": true,
+      "baselineIsValid": false,
+      "profileId": "OASIS_ODF_1_4_Extended",
+      "reason": "Template only. Replace with a verified, temporary classification difference and link the upstream issue or local investigation notes."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "fixtures": [
+    {
+      "id": "odf-validator-sample-valid-text",
+      "path": "odf-validator/samples/valid/text/sample.odt",
+      "source": "ODF Validator sample",
+      "license": "external-review-required",
+      "kind": "Text",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Template entry. Replace path, license, version, and expected classification with verified external corpus metadata before enabling in CI."
+    },
+    {
+      "id": "odf-validator-sample-invalid-text",
+      "path": "odf-validator/samples/invalid/text/missing-version.odt",
+      "source": "ODF Validator sample",
+      "license": "external-review-required",
+      "kind": "Text",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "invalid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Template entry. Keep invalid fixtures external unless their license permits redistribution."
+    }
+  ]
+}

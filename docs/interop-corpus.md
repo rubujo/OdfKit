@@ -43,6 +43,7 @@
 - 外部 corpus manifest 可用 `validate-corpus` 執行，並以 fixture 的 `expected`、`kind` 與 `version` 欄位作為完成線。
 - `validate-corpus` 會拒絕逃出 corpus root 的 fixture 路徑、重複 fixture id / path 與未知 round-trip 策略。
 - `eng/Test-OdfCorpus.ps1` 與 GitHub Actions `ODF corpus` workflow 會固定驗證內建 corpus；設定 `ODFKIT_PARITY_CORPUS_ROOT` 時可同時驗證外部 corpus。
+- `docs/examples/external-corpus/` 提供外部 corpus manifest 與 baseline exception 範本。
 - repo 內建 `tests/fixtures/corpus/manifest.json` 作為可提交 manifest 的最小範本，覆蓋
   ODT、ODS、ODP、ODG，以及 `.fodt`、`.fods`、`.fodp`、`.fodg` 四種 flat ODF 格式。
 

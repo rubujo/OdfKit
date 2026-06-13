@@ -87,6 +87,8 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate sample.odt
 - repo 只提交小型、授權清楚、去識別化或 generated 的 fixtures。
 - 大型、第三方或授權不明 corpus 不提交；使用 `ODFKIT_PARITY_CORPUS_ROOT`
   指向本機資料夾。
+- 外部 corpus 可從 `docs/examples/external-corpus/manifest.json` 複製範本開始，
+  並以 `docs/examples/external-corpus/baseline-exceptions.json` 記錄暫時分類差異。
 - 每個 fixture 都要記錄來源、授權、預期 valid / invalid、ODF 版本、
   profile 與 round-trip 預期。
 - Corpus manifest 會拒絕重複 `id` / `path`、未知 `roundTrip` 策略與逃出 corpus root 的路徑。

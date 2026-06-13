@@ -4,6 +4,8 @@
 pull request 更新本文件或等價 manifest，避免測試樣本來源變成黑盒。
 
 repo 內可直接執行的範本 manifest 位於 `tests/fixtures/corpus/manifest.json`。
+外部 corpus 的範本位於 `docs/examples/external-corpus/manifest.json`，baseline 例外範本位於
+`docs/examples/external-corpus/baseline-exceptions.json`。
 
 ## 可提交條件
 
@@ -82,6 +84,8 @@ repo 也提供 CI 與本機共用腳本：
 
 此腳本必定執行內建 corpus；若設定 `ODFKIT_PARITY_CORPUS_ROOT`，則會同時執行外部 corpus。
 若再設定 `ODFKIT_ODFVALIDATOR_JAR`，外部 corpus 會加上 ODF Validator baseline。
+若外部 corpus 有已驗證的暫時分類差異，可用 `-BaselineExceptions` 指向
+`baseline-exceptions.json`。
 
 `validate-corpus` 會讀取 `fixtures` 陣列，逐一比對 `expected` 的 `valid` / `invalid`
 classification、`kind` 文件種類與 `version` ODF 版本。任一 fixture 與 manifest 宣告不一致，
