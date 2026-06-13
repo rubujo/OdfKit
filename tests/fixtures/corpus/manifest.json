@@ -61,6 +61,18 @@
       "notes": "Small repo-local fixture covering ODF 1.4 style:page-layout-properties interleave content in swapped child order."
     },
     {
+      "id": "repo-generated-page-layout-interleave-duplicate-flat-text",
+      "path": "generated/page-layout-interleave-duplicate.fodt",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatText",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Strict",
+      "expected": "invalid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local negative fixture covering duplicate style:columns inside ODF 1.4 style:page-layout-properties interleave content."
+    },
+    {
       "id": "repo-generated-minimal-text",
       "path": "generated/minimal-text.odt",
       "source": "generated",

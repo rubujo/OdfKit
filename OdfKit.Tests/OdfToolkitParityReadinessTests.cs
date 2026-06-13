@@ -211,14 +211,21 @@ public class OdfToolkitParityReadinessTests
         using JsonDocument json = JsonDocument.Parse(output.ToString());
         JsonElement summary = json.RootElement.GetProperty("summary");
         JsonElement fixture = json.RootElement.GetProperty("fixtures")[0];
-        Assert.Equal(9, summary.GetProperty("fixtureCount").GetInt32());
-        Assert.Equal(9, summary.GetProperty("passedCount").GetInt32());
+        Assert.Equal(10, summary.GetProperty("fixtureCount").GetInt32());
+        Assert.Equal(10, summary.GetProperty("passedCount").GetInt32());
+        Assert.Equal(9, summary.GetProperty("validCount").GetInt32());
+        Assert.Equal(1, summary.GetProperty("invalidCount").GetInt32());
         Assert.Equal("repo-generated-minimal-flat-text", fixture.GetProperty("id").GetString());
         Assert.True(fixture.GetProperty("kindMatches").GetBoolean());
         Assert.True(fixture.GetProperty("versionMatches").GetBoolean());
         Assert.Contains(
             json.RootElement.GetProperty("fixtures").EnumerateArray(),
             item => item.GetProperty("id").GetString() == "repo-generated-page-layout-interleave-flat-text" &&
+                item.GetProperty("passed").GetBoolean());
+        Assert.Contains(
+            json.RootElement.GetProperty("fixtures").EnumerateArray(),
+            item => item.GetProperty("id").GetString() == "repo-generated-page-layout-interleave-duplicate-flat-text" &&
+                item.GetProperty("expected").GetString() == "invalid" &&
                 item.GetProperty("passed").GetBoolean());
     }
 
