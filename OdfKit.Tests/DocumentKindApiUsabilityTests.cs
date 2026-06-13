@@ -17,6 +17,43 @@ namespace OdfKit.Tests;
 public class DocumentKindApiUsabilityTests
 {
     /// <summary>
+    /// 驗證文件層格式摘要會回報範本種類與內容種類。
+    /// </summary>
+    /// <param name="kind">要建立的 ODF 範本種類。</param>
+    /// <param name="contentKind">對應的內容種類。</param>
+    /// <param name="extension">預期副檔名。</param>
+    [Theory]
+    [InlineData(OdfDocumentKind.TextTemplate, OdfDocumentKind.Text, ".ott")]
+    [InlineData(OdfDocumentKind.SpreadsheetTemplate, OdfDocumentKind.Spreadsheet, ".ots")]
+    [InlineData(OdfDocumentKind.PresentationTemplate, OdfDocumentKind.Presentation, ".otp")]
+    [InlineData(OdfDocumentKind.GraphicsTemplate, OdfDocumentKind.Graphics, ".otg")]
+    public void DocumentFormatSummaryReportsTemplateKinds(
+        OdfDocumentKind kind,
+        OdfDocumentKind contentKind,
+        string extension)
+    {
+        using OdfDocument document = OdfDocument.Create(kind);
+
+        Assert.Equal(kind, document.DocumentKind);
+        Assert.Equal(contentKind, document.ContentKind);
+        Assert.True(document.IsTemplate);
+        Assert.False(document.IsFlatXml);
+        OdfFormatInfo format = Assert.IsType<OdfFormatInfo>(document.Format);
+        Assert.Equal(extension, format.Extension);
+        Assert.True(OdfDocumentKindDetector.IsTemplateKind(kind));
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfDocument loaded = OdfDocument.Load(stream, "template" + extension);
+        Assert.Equal(kind, loaded.DocumentKind);
+        Assert.Equal(contentKind, loaded.ContentKind);
+        Assert.True(loaded.IsTemplate);
+        Assert.Equal(extension, loaded.Format?.Extension);
+    }
+
+    /// <summary>
     /// 驗證 ODC 圖表可建立標題、圖例與序列佔位並 round-trip。
     /// </summary>
     [Fact]

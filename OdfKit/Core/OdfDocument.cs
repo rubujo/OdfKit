@@ -49,6 +49,33 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
     public OdfPackage Package { get; }
 
     /// <summary>
+    /// 取得目前封裝 MIME 類型所宣告的 ODF 文件種類。
+    /// </summary>
+    public OdfDocumentKind DocumentKind => OdfDocumentKindDetector.FromMimeType(Package.MimeType);
+
+    /// <summary>
+    /// 取得目前文件種類對應的格式描述；若 MIME 類型無法辨識則為 <see langword="null"/>。
+    /// </summary>
+    public OdfFormatInfo? Format => OdfDocumentKindDetector.TryGetFormatByKind(DocumentKind, out OdfFormatInfo? format)
+        ? format
+        : null;
+
+    /// <summary>
+    /// 取得目前文件在 <c>office:body</c> 下使用的內容種類。
+    /// </summary>
+    public OdfDocumentKind ContentKind => OdfDocumentKindDetector.ToContentKind(DocumentKind);
+
+    /// <summary>
+    /// 取得一個值，指出目前文件是否為 ODF 範本格式。
+    /// </summary>
+    public bool IsTemplate => OdfDocumentKindDetector.IsTemplateKind(DocumentKind);
+
+    /// <summary>
+    /// 取得一個值，指出目前文件是否為單一 XML (Flat XML) ODF 格式。
+    /// </summary>
+    public bool IsFlatXml => Package.IsFlatXml;
+
+    /// <summary>
     /// 取得或設定文件的內容 DOM 樹。
     /// </summary>
     public OdfNode ContentDom { get; protected set; } = null!;
