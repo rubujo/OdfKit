@@ -122,6 +122,53 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
     }
 
     /// <summary>
+    /// 取得或設定圖表資料來源是否包含標籤。
+    /// </summary>
+    /// <remarks>ODF 允許的常見值包含 <c>none</c>、<c>row</c>、<c>column</c> 與 <c>both</c>。</remarks>
+    public string? DataSourceHasLabels
+    {
+        get
+        {
+            OdfNode? plotArea = FindChildElement(GetChartNode(), "plot-area", OdfNamespaces.Chart);
+            return plotArea?.GetAttribute("data-source-has-labels", OdfNamespaces.Chart);
+        }
+        set
+        {
+            OdfNode? existingPlotArea = FindChildElement(GetChartNode(), "plot-area", OdfNamespaces.Chart);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                existingPlotArea?.RemoveAttribute("data-source-has-labels", OdfNamespaces.Chart);
+                return;
+            }
+
+            FindOrCreatePlotArea().SetAttribute("data-source-has-labels", OdfNamespaces.Chart, value!, "chart");
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定 X 軸分類標籤的儲存格範圍位址。
+    /// </summary>
+    public string? CategoriesCellRangeAddress
+    {
+        get
+        {
+            OdfNode? categories = FindCategoriesNode();
+            return categories?.GetAttribute("cell-range-address", OdfNamespaces.Table);
+        }
+        set
+        {
+            OdfNode? existingCategories = FindCategoriesNode();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                existingCategories?.RemoveAttribute("cell-range-address", OdfNamespaces.Table);
+                return;
+            }
+
+            SetCategories(value!);
+        }
+    }
+
+    /// <summary>
     /// 取得圖表中的資料序列摘要。
     /// </summary>
     public IReadOnlyList<OdfChartSeriesInfo> Series => GetSeries();
@@ -133,6 +180,22 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
     public void SetLegend(string position)
     {
         LegendPosition = position;
+    }
+
+    /// <summary>
+    /// 設定 X 軸分類標籤的儲存格範圍位址。
+    /// </summary>
+    /// <param name="cellRangeAddress">分類標籤的儲存格範圍位址。</param>
+    public void SetCategories(string cellRangeAddress)
+    {
+        if (string.IsNullOrWhiteSpace(cellRangeAddress))
+        {
+            throw new ArgumentException("分類標籤範圍位址不能為空。", nameof(cellRangeAddress));
+        }
+
+        OdfNode axis = FindOrCreateAxis("x");
+        OdfNode categories = FindOrCreateChild(axis, "categories", OdfNamespaces.Chart, "chart");
+        categories.SetAttribute("cell-range-address", OdfNamespaces.Table, cellRangeAddress, "table");
     }
 
     /// <summary>
@@ -148,7 +211,7 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
             throw new ArgumentException("資料範圍位址不能為空。", nameof(valuesCellRangeAddress));
         }
 
-        OdfNode plotArea = FindOrCreateChild(GetChartNode(), "plot-area", OdfNamespaces.Chart, "chart");
+        OdfNode plotArea = FindOrCreatePlotArea();
         OdfNode series = OdfNodeFactory.CreateElement("series", OdfNamespaces.Chart, "chart");
         series.SetAttribute("values-cell-range-address", OdfNamespaces.Chart, valuesCellRangeAddress, "chart");
         if (!string.IsNullOrWhiteSpace(labelCellAddress))
@@ -158,6 +221,74 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
 
         plotArea.AppendChild(series);
         return series;
+    }
+
+    private OdfNode FindOrCreatePlotArea()
+    {
+        return FindOrCreateChild(GetChartNode(), "plot-area", OdfNamespaces.Chart, "chart");
+    }
+
+    private OdfNode FindOrCreateAxis(string dimension)
+    {
+        OdfNode plotArea = FindOrCreatePlotArea();
+        foreach (OdfNode child in plotArea.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "axis" &&
+                child.NamespaceUri == OdfNamespaces.Chart &&
+                string.Equals(child.GetAttribute("dimension", OdfNamespaces.Chart), dimension, StringComparison.Ordinal))
+            {
+                return child;
+            }
+        }
+
+        OdfNode axis = OdfNodeFactory.CreateElement("axis", OdfNamespaces.Chart, "chart");
+        axis.SetAttribute("dimension", OdfNamespaces.Chart, dimension, "chart");
+        OdfNode? firstSeries = FindChildElement(plotArea, "series", OdfNamespaces.Chart);
+        if (firstSeries is null)
+        {
+            plotArea.AppendChild(axis);
+        }
+        else
+        {
+            plotArea.InsertBefore(axis, firstSeries);
+        }
+
+        return axis;
+    }
+
+    private OdfNode? FindCategoriesNode()
+    {
+        OdfNode? plotArea = FindChildElement(GetChartNode(), "plot-area", OdfNamespaces.Chart);
+        if (plotArea is null)
+        {
+            return null;
+        }
+
+        OdfNode? fallbackCategories = null;
+        foreach (OdfNode child in plotArea.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.LocalName != "axis" ||
+                child.NamespaceUri != OdfNamespaces.Chart)
+            {
+                continue;
+            }
+
+            OdfNode? categories = FindChildElement(child, "categories", OdfNamespaces.Chart);
+            if (categories is null)
+            {
+                continue;
+            }
+
+            fallbackCategories ??= categories;
+            if (string.Equals(child.GetAttribute("dimension", OdfNamespaces.Chart), "x", StringComparison.Ordinal))
+            {
+                return categories;
+            }
+        }
+
+        return fallbackCategories;
     }
 
     private IReadOnlyList<OdfChartSeriesInfo> GetSeries()

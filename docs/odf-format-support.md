@@ -46,7 +46,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
   主控文件格式摘要；完整主控文件專屬語意模型仍屬後續擴充。
 - `.fodt`、`.fods`、`.fodp` 與 `.fodg` 已可透過通用高階 factory 建立、
   載入、保存與 round-trip，並提供 Flat XML 格式摘要；完整 flat 專屬語意模型仍屬後續擴充。
-- `.odc` 已有圖表類型、標題、圖例位置與序列摘要 API；`.odf` 已有 MathML 根節點與純文字摘要 API；`.odi` 已有主要影像路徑、媒體類型與大小摘要 API；`.odb` 已有連線參照與資料表摘要 API。完整圖表、MathML、影像與資料庫語意模型仍屬後續擴充。
+- `.odc` 已有圖表類型、標題、圖例位置、資料來源標籤、分類範圍與序列摘要 API；`.odf` 已有 MathML 根節點與純文字摘要 API；`.odi` 已有主要影像路徑、媒體類型與大小摘要 API；`.odb` 已有連線參照與資料表摘要 API。完整圖表、MathML、影像與資料庫語意模型仍屬後續擴充。
 - 全格式最小 round-trip corpus 已由 `OdfFormatRoundTripTests` 覆蓋；後續仍需加入
   更接近真實文件的 corpus。
 - 外部 ODF Validator baseline 已可透過 CLI `validate --baseline odf-validator` 與

@@ -125,7 +125,7 @@ public class DocumentKindApiUsabilityTests
     }
 
     /// <summary>
-    /// 驗證 ODC 圖表可建立標題、圖例與序列佔位並 round-trip。
+    /// 驗證 ODC 圖表可建立標題、圖例、資料來源標籤、分類與序列佔位並 round-trip。
     /// </summary>
     [Fact]
     public void CreateLoadChartWithTitleLegendAndSeries()
@@ -133,7 +133,9 @@ public class DocumentKindApiUsabilityTests
         using var chart = OdfChartDocument.Create();
         chart.ChartClass = "bar";
         chart.ChartTitle = "營收";
+        chart.DataSourceHasLabels = "both";
         chart.SetLegend("top");
+        chart.SetCategories("Sheet1.A1:C1");
         chart.AddSeries("Sheet1.A1:A3", "Sheet1.A1");
 
         using OdfChartDocument loaded = RoundTrip(chart, "chart.odc", OdfChartDocument.Load);
@@ -141,10 +143,18 @@ public class DocumentKindApiUsabilityTests
         Assert.Equal("application/vnd.oasis.opendocument.chart", loaded.Package.MimeType);
         Assert.Equal("bar", loaded.ChartClass);
         Assert.Equal("營收", loaded.ChartTitle);
+        Assert.Equal("both", loaded.DataSourceHasLabels);
         Assert.Equal("top", loaded.LegendPosition);
+        Assert.Equal("Sheet1.A1:C1", loaded.CategoriesCellRangeAddress);
         Assert.Single(loaded.Series);
         Assert.Equal("Sheet1.A1:A3", loaded.Series[0].ValuesCellRangeAddress);
         Assert.Equal("Sheet1.A1", loaded.Series[0].LabelCellAddress);
+        Assert.Equal(
+            "both",
+            FindDescendant(loaded.ChartNode, "plot-area", OdfNamespaces.Chart)?.GetAttribute("data-source-has-labels", OdfNamespaces.Chart));
+        Assert.Equal(
+            "Sheet1.A1:C1",
+            FindDescendant(loaded.ChartNode, "categories", OdfNamespaces.Chart)?.GetAttribute("cell-range-address", OdfNamespaces.Table));
         Assert.Equal(
             "Sheet1.A1:A3",
             FindDescendant(loaded.ChartNode, "series", OdfNamespaces.Chart)?.GetAttribute("values-cell-range-address", OdfNamespaces.Chart));
