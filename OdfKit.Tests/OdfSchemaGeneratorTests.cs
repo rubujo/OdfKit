@@ -5,8 +5,7 @@ using System.Text.Json;
 using OdfKit.Tools.OdfSchemaGenerator;
 using Xunit;
 
-namespace OdfKit.Tests
-{
+namespace OdfKit.Tests;
     public class OdfSchemaGeneratorTests
     {
         [Fact]
@@ -1061,7 +1060,7 @@ namespace OdfKit.Tests
             string? directory = AppContext.BaseDirectory;
             while (!string.IsNullOrWhiteSpace(directory))
             {
-                if (File.Exists(Path.Combine(directory, "implementation_plan.md")))
+                if (File.Exists(Path.Combine(directory, "implementation_plan.md")) || File.Exists(Path.Combine(directory, "AGENTS.md")))
                 {
                     return directory;
                 }
@@ -1077,4 +1076,4 @@ namespace OdfKit.Tests
             return path.Replace("\\", "\\\\");
         }
     }
-}
+

@@ -45,7 +45,9 @@ public static class OdfEncryption
         }
 
         string normalizedHashName = hashName.Trim().ToLowerInvariant();
-        if (normalizedHashName is "sha256" or "sha-256" or "http://www.w3.org/2000/09/xmldsig#sha256")
+        if (normalizedHashName is "sha256" or "sha-256"
+            or "http://www.w3.org/2000/09/xmldsig#sha256"
+            or "http://www.w3.org/2001/04/xmlenc#sha256")
         {
             using (var hmac = new HMACSHA256(password))
             {
@@ -134,12 +136,16 @@ public static class OdfEncryption
         if (startKeyGenName is not null)
         {
             byte[] rawPassBytes = Encoding.UTF8.GetBytes(password);
-            if (startKeyGenName.Contains("sha256"))
+            if (startKeyGenName.EndsWith("#sha256", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(startKeyGenName, "sha256", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(startKeyGenName, "sha-256", StringComparison.OrdinalIgnoreCase))
             {
                 using (var sha = SHA256.Create())
                     pwdBytes = sha.ComputeHash(rawPassBytes);
             }
-            else if (startKeyGenName.Contains("sha1"))
+            else if (startKeyGenName.EndsWith("#sha1", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(startKeyGenName, "sha1", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(startKeyGenName, "sha-1", StringComparison.OrdinalIgnoreCase))
             {
                 using (var sha = SHA1.Create())
                     pwdBytes = sha.ComputeHash(rawPassBytes);
@@ -156,7 +162,10 @@ public static class OdfEncryption
 
         // 決定 PBKDF2 的雜湊名稱
         string hashName = "sha256";
-        if (startKeyGenName is not null && startKeyGenName.Contains("sha1"))
+        if (startKeyGenName is not null
+            && (startKeyGenName.EndsWith("#sha1", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(startKeyGenName, "sha1", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(startKeyGenName, "sha-1", StringComparison.Ordinal)))
         {
             hashName = "sha1";
         }
@@ -481,14 +490,23 @@ public static class OdfEncryption
     /// <returns>雜湊值位元組陣列</returns>
     public static byte[] ComputeHash(byte[] data, string checksumType)
     {
-        if (checksumType.IndexOf("sha256", StringComparison.OrdinalIgnoreCase) >= 0 || checksumType.IndexOf("sha-256", StringComparison.OrdinalIgnoreCase) >= 0)
+        bool isSha256 = string.Equals(checksumType, "SHA256", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(checksumType, "sha-256", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(checksumType, "http://www.w3.org/2000/09/xmldsig#sha256", StringComparison.Ordinal)
+            || string.Equals(checksumType, "http://www.w3.org/2001/04/xmlenc#sha256", StringComparison.Ordinal);
+
+        bool isSha1 = string.Equals(checksumType, "SHA1", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(checksumType, "sha-1", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(checksumType, "http://www.w3.org/2000/09/xmldsig#sha1", StringComparison.Ordinal);
+
+        if (isSha256)
         {
             using (var sha = SHA256.Create())
             {
                 return sha.ComputeHash(data);
             }
         }
-        else if (checksumType.IndexOf("sha1", StringComparison.OrdinalIgnoreCase) >= 0 || checksumType.IndexOf("sha-1", StringComparison.OrdinalIgnoreCase) >= 0)
+        else if (isSha1)
         {
             using (var sha = SHA1.Create())
             {

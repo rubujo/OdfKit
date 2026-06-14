@@ -361,13 +361,15 @@ public class OdsStreamWriter : IDisposable
                 writer.WriteAttributeString("style", "name", OdfNamespaces.Style, style.styleName);
                 writer.WriteAttributeString("style", "family", OdfNamespaces.Style, "table-row");
                 writer.WriteStartElement("style", "table-row-properties", OdfNamespaces.Style);
-                if (style.height.HasValue)
-                {
-                    writer.WriteAttributeString("style", "row-height", OdfNamespaces.Style, style.height.Value.ToString());
-                }
                 if (style.useOptimalHeight)
                 {
                     writer.WriteAttributeString("style", "use-optimal-row-height", OdfNamespaces.Style, "true");
+                }
+                else if (style.height.HasValue)
+                {
+                    string heightCm = style.height.Value.ToCentimeters()
+                        .ToString("F4", System.Globalization.CultureInfo.InvariantCulture) + "cm";
+                    writer.WriteAttributeString("style", "row-height", OdfNamespaces.Style, heightCm);
                 }
                 writer.WriteEndElement(); // table-row-properties
                 writer.WriteEndElement(); // style

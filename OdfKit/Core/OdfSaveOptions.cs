@@ -98,6 +98,26 @@ public class OdfSaveOptions
     public IOdfCryptographyProvider? CryptographyProvider { get; set; }
 
     /// <summary>
+    /// 取得或設定用於加密 ODF 1.3 OpenPGP 文件的金鑰提供者。
+    /// 設定此屬性後，<see cref="CryptographyProvider"/> 會自動更新為對應的
+    /// <see cref="OdfOpenPgpCryptographyProvider"/> 執行個體。
+    /// </summary>
+    public IOdfOpenPgpKeyProvider? OpenPgpKeyProvider
+    {
+        get => _openPgpKeyProvider;
+        set
+        {
+            _openPgpKeyProvider = value;
+            if (value is not null)
+            {
+                CryptographyProvider = new OdfOpenPgpCryptographyProvider(value);
+            }
+        }
+    }
+
+    private IOdfOpenPgpKeyProvider? _openPgpKeyProvider;
+
+    /// <summary>
     /// 取得 OpenPGP 加密收件者描述，供自訂密碼學提供者使用。
     /// </summary>
     public IList<OdfOpenPgpRecipient> OpenPgpRecipients { get; } = [];

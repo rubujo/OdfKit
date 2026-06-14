@@ -115,4 +115,46 @@ public class TextApiUsabilityTests
         return Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
     }
+
+    /// <summary>
+    /// 驗證可在段落中插入腳注並 round-trip。
+    /// </summary>
+    [Fact]
+    public void AddFootnote_PersistsNoteElementInOdt()
+    {
+        using var doc = TextDocument.Create();
+        var para = doc.AddParagraph("本文");
+        doc.AddFootnote(para, "1", "這是腳注內容。");
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(ms, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+        Assert.Contains("note-class", contentXml);
+        Assert.Contains("footnote", contentXml);
+        Assert.Contains("這是腳注內容。", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證可在段落中插入尾注並 round-trip。
+    /// </summary>
+    [Fact]
+    public void AddEndnote_PersistsNoteElementInOdt()
+    {
+        using var doc = TextDocument.Create();
+        var para = doc.AddParagraph("本文");
+        doc.AddEndnote(para, "i", "這是尾注內容。");
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(ms, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+        Assert.Contains("note-class", contentXml);
+        Assert.Contains("endnote", contentXml);
+        Assert.Contains("這是尾注內容。", contentXml);
+    }
 }

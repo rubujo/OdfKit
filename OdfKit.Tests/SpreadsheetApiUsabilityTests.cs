@@ -101,7 +101,7 @@ public class SpreadsheetApiUsabilityTests
         {
             writer.WriteStartSheet("資料");
             writer.WriteColumn(OdfLength.FromCentimeters(2.5));
-            writer.WriteStartRow(height: 18.5, useOptimalHeight: true);
+            writer.WriteStartRow(height: 18.5, useOptimalHeight: false);
             writer.WriteCell("列高");
             writer.WriteEndRow();
             writer.WriteEndSheet();
@@ -115,8 +115,7 @@ public class SpreadsheetApiUsabilityTests
         Assert.Contains("table:style-name=\"ro_auto_1\"", contentXml);
         Assert.Contains("style:name=\"ro_auto_1\"", stylesXml);
         Assert.Contains("style:family=\"table-row\"", stylesXml);
-        Assert.Contains("style:row-height=\"18.5pt\"", stylesXml);
-        Assert.Contains("style:use-optimal-row-height=\"true\"", stylesXml);
+        Assert.Contains("style:row-height=\"0.6526cm\"", stylesXml);
     }
 
     private static string ReadZipEntry(ZipArchive zip, string entryName)
@@ -126,5 +125,60 @@ public class SpreadsheetApiUsabilityTests
         using var stream = entry.Open();
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
+    }
+
+    /// <summary>
+    /// 驗證 SplitPanes 寫入 config-item 並可 round-trip。
+    /// </summary>
+    [Fact]
+    public void SplitPanes_WritesConfigItemsToSettingsXml()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        var sheet = workbook.Worksheets.Add("Sheet1");
+        sheet.SplitPanes(splitRow: 3, splitColumn: 2);
+
+        using var ms = new MemoryStream();
+        workbook.SaveToStream(ms);
+        ms.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(ms);
+        using var zip = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Read);
+        var entry = zip.GetEntry("settings.xml");
+        Assert.NotNull(entry);
+        using var reader = new StreamReader(entry!.Open());
+        string xml = reader.ReadToEnd();
+        Assert.Contains("HorizontalSplitMode", xml);
+        Assert.Contains("VerticalSplitMode", xml);
+    }
+
+    /// <summary>
+    /// 驗證 AddSparklineGroup 寫入 calcext:sparkline-groups 並可 round-trip。
+    /// </summary>
+    [Fact]
+    public void AddSparklineGroup_WritesCalcExtSparklineGroupXml()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        var sheet = workbook.Worksheets.Add("Data");
+        sheet.Cells["A1"].CellValue = 10d;
+        sheet.Cells["A2"].CellValue = 20d;
+        sheet.Cells["A3"].CellValue = 15d;
+
+        var dataRange = OdfCellRange.ParseExcel("A1:A3");
+        var hostCell = OdfCellAddress.ParseExcel("B1");
+        sheet.AddSparklineGroup(dataRange, hostCell, SparklineType.Line);
+
+        using var ms = new MemoryStream();
+        workbook.SaveToStream(ms);
+        ms.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(ms);
+        using var zip = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Read);
+        var entry = zip.GetEntry("content.xml");
+        Assert.NotNull(entry);
+        using var reader = new StreamReader(entry!.Open());
+        string xml = reader.ReadToEnd();
+        Assert.Contains("sparkline-groups", xml);
+        Assert.Contains("sparkline-group", xml);
+        Assert.Contains("dataRangeRef", xml);
     }
 }

@@ -18,6 +18,8 @@ public class TextDocument : OdfDocument
 {
     private OdfTextBody? _body;
     private OdfDocumentMetadata? _metadata;
+    private int _footnoteCounter;
+    private int _endnoteCounter;
 
     /// <summary>
     /// 取得或設定文字文件的本文根節點。
@@ -281,6 +283,53 @@ public class TextDocument : OdfDocument
         var fNode = OdfNodeFactory.CreateElement("variable-get", OdfNamespaces.Text, "text");
         fNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
         paragraph.Node.AppendChild(fNode);
+    }
+
+    /// <summary>
+    /// 在指定段落中插入腳注 (text:note, note-class="footnote")。
+    /// </summary>
+    /// <param name="paragraph">要插入腳注的段落。</param>
+    /// <param name="citation">腳注引用標記，例如 "1" 或 "*"。</param>
+    /// <param name="bodyText">腳注本文內容。</param>
+    public void AddFootnote(OdfParagraph paragraph, string citation, string bodyText)
+    {
+        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
+        if (citation is null) throw new ArgumentNullException(nameof(citation));
+        if (bodyText is null) throw new ArgumentNullException(nameof(bodyText));
+        AppendNote(paragraph, "footnote", $"ftn{_footnoteCounter++}", citation, bodyText);
+    }
+
+    /// <summary>
+    /// 在指定段落中插入尾注 (text:note, note-class="endnote")。
+    /// </summary>
+    /// <param name="paragraph">要插入尾注的段落。</param>
+    /// <param name="citation">尾注引用標記，例如 "i" 或 "a"。</param>
+    /// <param name="bodyText">尾注本文內容。</param>
+    public void AddEndnote(OdfParagraph paragraph, string citation, string bodyText)
+    {
+        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
+        if (citation is null) throw new ArgumentNullException(nameof(citation));
+        if (bodyText is null) throw new ArgumentNullException(nameof(bodyText));
+        AppendNote(paragraph, "endnote", $"etn{_endnoteCounter++}", citation, bodyText);
+    }
+
+    private static void AppendNote(OdfParagraph paragraph, string noteClass, string id, string citation, string bodyText)
+    {
+        var noteNode = OdfNodeFactory.CreateElement("note", OdfNamespaces.Text, "text");
+        noteNode.SetAttribute("note-class", OdfNamespaces.Text, noteClass, "text");
+        noteNode.SetAttribute("id", OdfNamespaces.Text, id, "text");
+
+        var citationNode = OdfNodeFactory.CreateElement("note-citation", OdfNamespaces.Text, "text");
+        citationNode.TextContent = citation;
+        noteNode.AppendChild(citationNode);
+
+        var bodyNode = OdfNodeFactory.CreateElement("note-body", OdfNamespaces.Text, "text");
+        var paraNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
+        paraNode.TextContent = bodyText;
+        bodyNode.AppendChild(paraNode);
+        noteNode.AppendChild(bodyNode);
+
+        paragraph.Node.AppendChild(noteNode);
     }
 
     /// <summary>

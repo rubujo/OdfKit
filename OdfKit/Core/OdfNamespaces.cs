@@ -59,6 +59,9 @@ public static class OdfNamespaces
     /// <summary>Ds 命名空間 URI</summary>
     public const string Ds = "http://www.w3.org/2000/09/xmldsig#";
 
+    /// <summary>CalcExt 命名空間 URI（LibreOffice 電子試算表計算擴充命名空間）</summary>
+    public const string CalcExt = "urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0";
+
     /// <summary>
     /// 取得指定命名空間 URI 的標準前綴。
     /// </summary>
@@ -86,6 +89,7 @@ public static class OdfNamespaces
             Manifest => "manifest",
             Dsig => "dsig",
             Ds => "ds",
+            CalcExt => "calcext",
             _ => string.Empty
         };
     }

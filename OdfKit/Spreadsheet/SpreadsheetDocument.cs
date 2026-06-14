@@ -499,6 +499,8 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
 
     private readonly SpreadsheetDocument _doc = doc;
 
+    internal SpreadsheetDocument Document => _doc;
+
     /// <summary>
     /// 取得或設定工作表的名稱。
     /// </summary>
@@ -748,7 +750,7 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
     /// <param name="styleName">要套用的格式樣式名稱</param>
     public void AddConditionalFormat(OdfCellRange range, string conditionValue, string styleName)
     {
-        const string calcextNs = "urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0";
+        const string calcextNs = OdfNamespaces.CalcExt;
         
         OdfNode? formatsNode = null;
         foreach (var child in TableNode.Children)
@@ -781,6 +783,67 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
 
         formatsNode.AppendChild(format);
     }
+
+    /// <summary>
+    /// 在工作表中新增 LibreOffice calcext 走勢圖群組。
+    /// </summary>
+    /// <param name="dataRange">走勢圖資料來源範圍。</param>
+    /// <param name="hostCell">顯示走勢圖的儲存格位址。</param>
+    /// <param name="type">走勢圖類型，預設為折線。</param>
+    /// <exception cref="ArgumentNullException">當 dataRange 為 null 時拋出。</exception>
+    public void AddSparklineGroup(OdfCellRange? dataRange, OdfCellAddress hostCell, SparklineType type = SparklineType.Line)
+    {
+        if (dataRange is null) throw new ArgumentNullException(nameof(dataRange));
+
+        const string calcextNs = OdfNamespaces.CalcExt;
+
+        OdfNode? groupsNode = null;
+        foreach (var child in TableNode.Children)
+        {
+            if (child.LocalName == "sparkline-groups" && child.NamespaceUri == calcextNs)
+            {
+                groupsNode = child;
+                break;
+            }
+        }
+        if (groupsNode is null)
+        {
+            groupsNode = new OdfNode(OdfNodeType.Element, "sparkline-groups", calcextNs, "calcext");
+            TableNode.AppendChild(groupsNode);
+        }
+
+        var groupNode = new OdfNode(OdfNodeType.Element, "sparkline-group", calcextNs, "calcext");
+        groupNode.SetAttribute("type", calcextNs, SparklineTypeToString(type), "calcext");
+        groupsNode.AppendChild(groupNode);
+
+        var sparklinesNode = new OdfNode(OdfNodeType.Element, "sparklines", calcextNs, "calcext");
+        groupNode.AppendChild(sparklinesNode);
+
+        var startAddr = dataRange.Value.StartAddress;
+        if (startAddr.SheetName is null)
+            startAddr = new OdfCellAddress(startAddr.Row, startAddr.Column, Name,
+                startAddr.IsRowAbsolute, startAddr.IsColumnAbsolute, startAddr.IsSheetAbsolute);
+        var endAddr = dataRange.Value.EndAddress;
+        if (endAddr.SheetName is null)
+            endAddr = new OdfCellAddress(endAddr.Row, endAddr.Column, Name,
+                endAddr.IsRowAbsolute, endAddr.IsColumnAbsolute, endAddr.IsSheetAbsolute);
+        var host = hostCell.SheetName is null
+            ? new OdfCellAddress(hostCell.Row, hostCell.Column, Name, true, true, true)
+            : hostCell;
+
+        var sparklineNode = new OdfNode(OdfNodeType.Element, "sparkline", calcextNs, "calcext");
+        sparklineNode.SetAttribute("dataRangeRef", calcextNs,
+            $"{startAddr.ToOdfString(false)}:{endAddr.ToOdfString(false)}", "calcext");
+        sparklineNode.SetAttribute("hostCellRef", calcextNs, host.ToOdfString(false), "calcext");
+        sparklinesNode.AppendChild(sparklineNode);
+    }
+
+    private static string SparklineTypeToString(SparklineType type) => type switch
+    {
+        SparklineType.Column => "column",
+        SparklineType.WinLoss => "stacked",
+        _ => "line"
+    };
 
     /// <summary>
     /// 新增資料庫範圍至此工作表。
@@ -819,6 +882,31 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
         SetConfigItem(sheetEntry, "VerticalSplitMode", "short", frozenColumns > 0 ? "2" : "0");
         SetConfigItem(sheetEntry, "HorizontalSplitPosition", "int", frozenRows.ToString(CultureInfo.InvariantCulture));
         SetConfigItem(sheetEntry, "VerticalSplitPosition", "int", frozenColumns.ToString(CultureInfo.InvariantCulture));
+    }
+
+    /// <summary>
+    /// 以分割模式（非凍結）分割工作表窗格。
+    /// </summary>
+    /// <param name="splitRow">水平分割線所在的列索引 (0 表示不分割)。</param>
+    /// <param name="splitColumn">垂直分割線所在的欄索引 (0 表示不分割)。</param>
+    /// <exception cref="ArgumentOutOfRangeException">當列索引或欄索引小於 0 時拋出。</exception>
+    public void SplitPanes(int splitRow, int splitColumn)
+    {
+        if (splitRow < 0) throw new ArgumentOutOfRangeException(nameof(splitRow));
+        if (splitColumn < 0) throw new ArgumentOutOfRangeException(nameof(splitColumn));
+
+        var viewSettings = _doc.GetOrCreateSettingsItemSet("view-settings");
+        var views = FindOrCreateChild(viewSettings, "config-item-map-indexed", OdfNamespaces.Config, "config");
+        views.SetAttribute("name", OdfNamespaces.Config, "Views", "config");
+        var viewEntry = FindOrCreateFirstChild(views, "config-item-map-entry", OdfNamespaces.Config, "config");
+        var tables = FindOrCreateChild(viewEntry, "config-item-map-named", OdfNamespaces.Config, "config");
+        tables.SetAttribute("name", OdfNamespaces.Config, "Tables", "config");
+        var sheetEntry = FindOrCreateNamedMapEntry(tables, Name);
+
+        SetConfigItem(sheetEntry, "HorizontalSplitMode", "short", splitRow > 0 ? "1" : "0");
+        SetConfigItem(sheetEntry, "VerticalSplitMode", "short", splitColumn > 0 ? "1" : "0");
+        SetConfigItem(sheetEntry, "HorizontalSplitPosition", "int", splitRow.ToString(CultureInfo.InvariantCulture));
+        SetConfigItem(sheetEntry, "VerticalSplitPosition", "int", splitColumn.ToString(CultureInfo.InvariantCulture));
     }
 
     /// <summary>
@@ -1144,6 +1232,65 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
             currentColIndex++;
         }
         return lastCell!;
+    }
+
+    /// <summary>
+    /// 嘗試以唯讀方式取得指定列與欄索引的儲存格 XML 節點，不修改 DOM 結構。
+    /// </summary>
+    /// <param name="row">以 0 為基準的列索引</param>
+    /// <param name="col">以 0 為基準的欄索引</param>
+    /// <returns>儲存格 XML 節點，若不存在則為 null</returns>
+    internal OdfNode? TryGetCellNode(int row, int col)
+    {
+        int currentRowIndex = 0;
+        OdfNode? targetRowNode = null;
+
+        foreach (var child in TableNode.Children)
+        {
+            if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
+            {
+                int repeatedCount = 1;
+                string? repStr = child.GetAttribute("number-rows-repeated", OdfNamespaces.Table);
+                if (!string.IsNullOrEmpty(repStr) && int.TryParse(repStr, out int rc))
+                {
+                    repeatedCount = rc;
+                }
+
+                if (row >= currentRowIndex && row < currentRowIndex + repeatedCount)
+                {
+                    targetRowNode = child;
+                    break;
+                }
+                currentRowIndex += repeatedCount;
+            }
+        }
+
+        if (targetRowNode is null)
+        {
+            return null;
+        }
+
+        int currentColIndex = 0;
+        foreach (var child in targetRowNode.Children)
+        {
+            if ((child.LocalName == "table-cell" || child.LocalName == "covered-table-cell") && child.NamespaceUri == OdfNamespaces.Table)
+            {
+                int repeatedCount = 1;
+                string? repStr = child.GetAttribute("number-columns-repeated", OdfNamespaces.Table);
+                if (!string.IsNullOrEmpty(repStr) && int.TryParse(repStr, out int rc))
+                {
+                    repeatedCount = rc;
+                }
+
+                if (col >= currentColIndex && col < currentColIndex + repeatedCount)
+                {
+                    return child;
+                }
+                currentColIndex += repeatedCount;
+            }
+        }
+
+        return null;
     }
 
     private OdfNode GetOrCreateCellNode(int row, int col)

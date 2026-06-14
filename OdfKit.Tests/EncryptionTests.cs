@@ -29,6 +29,7 @@ namespace OdfKit.Tests
         [Theory]
         [InlineData("sha256", "sha-256")]
         [InlineData("sha256", "http://www.w3.org/2000/09/xmldsig#sha256")]
+        [InlineData("sha256", "http://www.w3.org/2001/04/xmlenc#sha256")]
         [InlineData("sha1", "sha-1")]
         [InlineData("sha1", "http://www.w3.org/2000/09/xmldsig#sha1")]
         public void Pbkdf2_HashAlgorithm_AcceptsKnownAliases(string canonicalName, string aliasName)
@@ -367,6 +368,274 @@ namespace OdfKit.Tests
 
                 return ciphertext;
             }
+        }
+
+        /// <summary>
+        /// 測試當使用已知且支援的 SHA-256 雜湊類型時， <see cref="OdfEncryption.ComputeHash"/> 是否能正確返回 32 位元組的雜湊值。
+        /// </summary>
+        /// <param name="checksumType">總和檢查碼類型名稱或 URI</param>
+        [Theory]
+        [InlineData("SHA256")]
+        [InlineData("sha-256")]
+        [InlineData("http://www.w3.org/2000/09/xmldsig#sha256")]
+        [InlineData("http://www.w3.org/2001/04/xmlenc#sha256")]
+        public void ComputeHash_KnownSha256Types_ReturnsThirtyTwoBytes(string checksumType)
+        {
+            byte[] result = OdfEncryption.ComputeHash([1, 2, 3], checksumType);
+            Assert.Equal(32, result.Length);
+        }
+
+        /// <summary>
+        /// 測試當輸入未知的雜湊類型時， <see cref="OdfEncryption.ComputeHash"/> 是否會擲出 <see cref="NotSupportedException"/> 。
+        /// </summary>
+        [Fact]
+        public void ComputeHash_UnknownType_ThrowsNotSupportedException()
+        {
+            Assert.Throws<NotSupportedException>(() =>
+                OdfEncryption.ComputeHash([1], "sha2561"));
+        }
+
+        /// <summary>
+        /// 測試當輸入僅為局部匹配的雜湊類型（例如 "sha256extra"）時， <see cref="OdfEncryption.ComputeHash"/> 是否會正確擲出 <see cref="NotSupportedException"/> 。
+        /// </summary>
+        [Fact]
+        public void ComputeHash_UnknownType_ThrowsNotSupportedException_ForPartialMatch()
+        {
+            Assert.Throws<NotSupportedException>(() =>
+                OdfEncryption.ComputeHash([1], "sha256extra"));
+        }
+
+        /// <summary>
+        /// 測試使用精確的起始金鑰產生演算法名稱（例如結尾為 #sha256、等於 sha256 或 sha-256）進行解密時是否成功，而局部匹配的名稱則應失敗。
+        /// </summary>
+        [Fact]
+        public void DecryptEntry_WithPreciseStartKeyGenName_Succeeds()
+        {
+            byte[] plaintext = Encoding.UTF8.GetBytes("Test plaintext data for encryption");
+            byte[] ciphertext = OdfEncryption.EncryptEntry(plaintext, "MySecretPassword", OdfEncryptionAlgorithm.Aes256, out byte[] iv, out byte[] salt, out byte[] checksum);
+
+            // 標準的 xmldsig#sha256
+            byte[] decrypted1 = OdfEncryption.DecryptEntry(
+                ciphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1024, salt, iv, "http://www.w3.org/2000/09/xmldsig#sha256");
+            Assert.Equal(plaintext, decrypted1);
+
+            // 完全相等的 sha256
+            byte[] decrypted2 = OdfEncryption.DecryptEntry(
+                ciphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1024, salt, iv, "sha256");
+            Assert.Equal(plaintext, decrypted2);
+
+            // 結尾為 #sha256 但為其他前綴（例如 xmlenc）
+            byte[] decrypted3 = OdfEncryption.DecryptEntry(
+                ciphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1024, salt, iv, "http://www.w3.org/2001/04/xmlenc#sha256");
+            Assert.Equal(plaintext, decrypted3);
+
+            // 局部匹配的名稱應解密失敗，大多會擲出例外；若因隨機填補符合 PKCS7 格式，則重試以確保強健性
+            bool threw = false;
+            for (int i = 0; i < 5; i++)
+            {
+                byte[] tempCiphertext = OdfEncryption.EncryptEntry(plaintext, "MySecretPassword", OdfEncryptionAlgorithm.Aes256, out byte[] tempIv, out byte[] tempSalt, out _);
+                try
+                {
+                    OdfEncryption.DecryptEntry(
+                        tempCiphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1024, tempSalt, tempIv, "sha256extra");
+                }
+                catch (Exception)
+                {
+                    threw = true;
+                    break;
+                }
+            }
+            Assert.True(threw, "預期使用錯誤金鑰解密應擲出例外（因 PKCS7 填補驗證失敗）");
+        }
+
+        /// <summary>
+        /// 測試 Blowfish 演算法在使用精確的起始金鑰產生演算法名稱（例如結尾為 #sha1、等於 sha1 或 sha-1）進行解密時是否成功，而局部匹配的名稱則應失敗。
+        /// </summary>
+        [Fact]
+        public void DecryptEntry_Blowfish_WithPreciseStartKeyGenName_Succeeds()
+        {
+            byte[] plaintext = Encoding.UTF8.GetBytes("Test plaintext data for Blowfish");
+            byte[] ciphertext = OdfEncryption.EncryptEntry(plaintext, "BlowfishPassword", OdfEncryptionAlgorithm.Blowfish, out byte[] iv, out byte[] salt, out byte[] checksum);
+
+            // 標準的 xmldsig#sha1
+            byte[] decrypted1 = OdfEncryption.DecryptEntry(
+                ciphertext, "BlowfishPassword", OdfEncryption.BlowfishAlgorithmUri, "PBKDF2", 16, 1024, salt, iv, "http://www.w3.org/2000/09/xmldsig#sha1");
+            Assert.Equal(plaintext, decrypted1);
+
+            // 完全相等的 sha1
+            byte[] decrypted2 = OdfEncryption.DecryptEntry(
+                ciphertext, "BlowfishPassword", OdfEncryption.BlowfishAlgorithmUri, "PBKDF2", 16, 1024, salt, iv, "sha1");
+            Assert.Equal(plaintext, decrypted2);
+
+            // 局部匹配的名稱解密結果應為垃圾資料（與明文不符）
+            byte[] decryptedGarbage = OdfEncryption.DecryptEntry(
+                ciphertext, "BlowfishPassword", OdfEncryption.BlowfishAlgorithmUri, "PBKDF2", 16, 1024, salt, iv, "sha1extra");
+            Assert.NotEqual(plaintext, decryptedGarbage);
+        }
+
+        // ── OpenPGP 便利層測試 ────────────────────────────────────────────────────
+
+        /// <summary>
+        /// 模擬用的 PGP 金鑰提供者，不實際加密，直接傳回金鑰。
+        /// </summary>
+        private sealed class FakeOpenPgpKeyProvider : IOdfOpenPgpKeyProvider
+        {
+            /// <inheritdoc />
+            public byte[] EncryptSessionKey(byte[] sessionKey, OdfOpenPgpRecipient recipient)
+                => sessionKey;
+
+            /// <inheritdoc />
+            public byte[] DecryptSessionKey(byte[] encryptedKeyPacket, string keyId)
+                => encryptedKeyPacket;
+        }
+
+        /// <summary>
+        /// 測試 <see cref="OdfOpenPgpCryptographyProvider.CanHandle"/> 在傳入 OpenPGP 加密演算法名稱時，是否正確返回 <see langword="true"/> 。
+        /// </summary>
+        [Fact]
+        public void OdfOpenPgpCryptographyProvider_CanHandle_ReturnsTrueForOpenPgpEntry()
+        {
+            var provider = new OdfOpenPgpCryptographyProvider(new FakeOpenPgpKeyProvider());
+            var info = new OdfEncryptionInfo
+            {
+                AlgorithmName = OdfEncryption.OpenPgpAlgorithmUri
+            };
+            Assert.True(provider.CanHandle(info));
+        }
+
+        /// <summary>
+        /// 測試 <see cref="OdfOpenPgpCryptographyProvider.CanHandle"/> 在加密金鑰清單不為空時，是否正確返回 <see langword="true"/> 。
+        /// </summary>
+        [Fact]
+        public void OdfOpenPgpCryptographyProvider_CanHandle_ReturnsTrueWhenEncryptedKeysExist()
+        {
+            var provider = new OdfOpenPgpCryptographyProvider(new FakeOpenPgpKeyProvider());
+            var info = new OdfEncryptionInfo();
+            info.OpenPgpEncryptedKeys.Add(new OdfOpenPgpEncryptedKeyInfo
+            {
+                KeyId = "ABCD1234",
+                KeyPacket = [1, 2, 3]
+            });
+            Assert.True(provider.CanHandle(info));
+        }
+
+        /// <summary>
+        /// 測試以 <see cref="OdfOpenPgpCryptographyProvider"/> 進行 OpenPGP 加密與解密的完整流程是否能正確還原資料。
+        /// </summary>
+        [Fact]
+        public void OdfOpenPgpCryptographyProvider_EncryptDecrypt_RoundTrip()
+        {
+            var fakeProvider = new FakeOpenPgpKeyProvider();
+            var pgpProvider = new OdfOpenPgpCryptographyProvider(fakeProvider);
+
+            var saveOptions = new OdfSaveOptions
+            {
+                EncryptionAlgorithm = OdfEncryptionAlgorithm.OpenPgp
+            };
+            saveOptions.OpenPgpRecipients.Add(new OdfOpenPgpRecipient
+            {
+                KeyId = "TESTKEY1",
+                Recipient = "test@example.com"
+            });
+
+            byte[] plaintext = Encoding.UTF8.GetBytes("OdfKit OpenPGP round-trip test");
+
+            // 加密
+            byte[] ciphertext = pgpProvider.Encrypt(plaintext, "content/test.xml", saveOptions, out var info);
+
+            Assert.NotEqual(plaintext, ciphertext);
+            Assert.Single(info.OpenPgpEncryptedKeys);
+            Assert.Equal("TESTKEY1", info.OpenPgpEncryptedKeys[0].KeyId);
+
+            // 解密
+            byte[] decrypted = pgpProvider.Decrypt(ciphertext, info, new OdfLoadOptions());
+            Assert.Equal(plaintext, decrypted);
+        }
+
+        /// <summary>
+        /// 測試當有多個 OpenPGP 收件者時，所有加密後的金鑰封包是否皆能正確寫入加密資訊中。
+        /// </summary>
+        [Fact]
+        public void OdfOpenPgpCryptographyProvider_MultipleRecipients_AllKeysWrittenToEncryptionInfo()
+        {
+            var pgpProvider = new OdfOpenPgpCryptographyProvider(new FakeOpenPgpKeyProvider());
+            var saveOptions = new OdfSaveOptions
+            {
+                EncryptionAlgorithm = OdfEncryptionAlgorithm.OpenPgp
+            };
+            saveOptions.OpenPgpRecipients.Add(new OdfOpenPgpRecipient { KeyId = "KEY001" });
+            saveOptions.OpenPgpRecipients.Add(new OdfOpenPgpRecipient { KeyId = "KEY002" });
+
+            byte[] plaintext = [0x01, 0x02, 0x03];
+            pgpProvider.Encrypt(plaintext, "entry.xml", saveOptions, out var info);
+
+            Assert.Equal(2, info.OpenPgpEncryptedKeys.Count);
+            Assert.Contains(info.OpenPgpEncryptedKeys, k => k.KeyId == "KEY001");
+            Assert.Contains(info.OpenPgpEncryptedKeys, k => k.KeyId == "KEY002");
+        }
+
+        /// <summary>
+        /// 測試在解密時若無任何可用的私鑰能成功解密金鑰封包，是否正確擲出 <see cref="CryptographicException"/> 。
+        /// </summary>
+        [Fact]
+        public void OdfOpenPgpCryptographyProvider_Decrypt_NoValidKey_ThrowsCryptographicException()
+        {
+            var provider = new OdfOpenPgpCryptographyProvider(new ThrowingKeyProvider());
+            var info = new OdfEncryptionInfo
+            {
+                AlgorithmName = OdfEncryption.OpenPgpAlgorithmUri,
+                InitialisationVector = new byte[16]
+            };
+            info.OpenPgpEncryptedKeys.Add(new OdfOpenPgpEncryptedKeyInfo
+            {
+                KeyId = "BADKEY",
+                KeyPacket = [1, 2, 3]
+            });
+
+            Assert.Throws<CryptographicException>(() =>
+                provider.Decrypt(new byte[16], info, new OdfLoadOptions()));
+        }
+
+        /// <summary>
+        /// 模擬一個在任何操作下皆會擲出例外的金鑰提供者。
+        /// </summary>
+        private sealed class ThrowingKeyProvider : IOdfOpenPgpKeyProvider
+        {
+            /// <inheritdoc />
+            public byte[] EncryptSessionKey(byte[] sessionKey, OdfOpenPgpRecipient recipient)
+                => throw new InvalidOperationException("no key");
+
+            /// <inheritdoc />
+            public byte[] DecryptSessionKey(byte[] encryptedKeyPacket, string keyId)
+                => throw new InvalidOperationException("no private key available");
+        }
+
+        /// <summary>
+        /// 測試在 <see cref="OdfLoadOptions"/> 設定 OpenPgpKeyProvider 後，是否會自動建立對應的密碼學提供者執行個體。
+        /// </summary>
+        [Fact]
+        public void OdfLoadOptions_OpenPgpKeyProvider_AutoWiresCryptographyProvider()
+        {
+            var opts = new OdfLoadOptions
+            {
+                OpenPgpKeyProvider = new FakeOpenPgpKeyProvider()
+            };
+            Assert.NotNull(opts.CryptographyProvider);
+            Assert.IsType<OdfOpenPgpCryptographyProvider>(opts.CryptographyProvider);
+        }
+
+        /// <summary>
+        /// 測試在 <see cref="OdfSaveOptions"/> 設定 OpenPgpKeyProvider 後，是否會自動建立對應的密碼學提供者執行個體。
+        /// </summary>
+        [Fact]
+        public void OdfSaveOptions_OpenPgpKeyProvider_AutoWiresCryptographyProvider()
+        {
+            var opts = new OdfSaveOptions
+            {
+                OpenPgpKeyProvider = new FakeOpenPgpKeyProvider()
+            };
+            Assert.NotNull(opts.CryptographyProvider);
+            Assert.IsType<OdfOpenPgpCryptographyProvider>(opts.CryptographyProvider);
         }
     }
 }
