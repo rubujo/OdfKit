@@ -186,4 +186,70 @@ public class OdfBouncyCastleOpenPgpProviderTests
         Assert.Throws<CryptographicException>(
             () => provider.DecryptSessionKey(garbage, "test"));
     }
+
+    [Fact]
+    public void DecryptSessionKey_NullPacket_Throws_ArgumentNullException()
+    {
+        var (_, secKeyRingBytes) = GenerateRsaKeyRing();
+        var provider = new OdfBouncyCastleOpenPgpProvider(
+            secKeyRingBytes,
+            _ => Array.Empty<char>());
+
+        Assert.Throws<ArgumentNullException>(
+            () => provider.DecryptSessionKey(null!, "test"));
+    }
+
+    [Fact]
+    public void DecryptSessionKey_NullPassphraseFromProvider_Throws_ArgumentException()
+    {
+        var (pubKeyBytes, secKeyRingBytes) = GenerateRsaKeyRing();
+
+        var encProvider = new OdfBouncyCastleOpenPgpProvider(
+            secKeyRingBytes,
+            _ => Array.Empty<char>());
+
+        var recipient = new OdfOpenPgpRecipient { PublicKey = pubKeyBytes, KeyId = "test" };
+        byte[] packet = encProvider.EncryptSessionKey(RandomSessionKey(), recipient);
+
+        var nullPassProvider = new OdfBouncyCastleOpenPgpProvider(
+            secKeyRingBytes,
+            _ => null!);
+
+        Assert.Throws<ArgumentException>(
+            () => nullPassProvider.DecryptSessionKey(packet, recipient.KeyId));
+    }
+
+    [Fact]
+    public void OpenPgpDecrypt_WrongKey_ThrowsCryptographicException_NotSwallowed()
+    {
+        // 產生用金鑰 A 加密的封包
+        var (pubA, secA) = GenerateRsaKeyRing();
+        var (pubB, secB) = GenerateRsaKeyRing();
+
+        var provA = new OdfBouncyCastleOpenPgpProvider(
+            secA,
+            _ => Array.Empty<char>());
+
+        var wrongProv = new OdfBouncyCastleOpenPgpProvider(
+            secB,
+            _ => Array.Empty<char>());
+
+        var recipient = new OdfOpenPgpRecipient { PublicKey = pubA, KeyId = "a" };
+        byte[] packet = provA.EncryptSessionKey(RandomSessionKey(), recipient);
+
+        var pgpProvider = new OdfOpenPgpCryptographyProvider(wrongProv);
+        var info = new OdfEncryptionInfo
+        {
+            AlgorithmName = OdfEncryption.OpenPgpAlgorithmUri,
+            InitialisationVector = new byte[16],
+        };
+        info.OpenPgpEncryptedKeys.Add(new OdfOpenPgpEncryptedKeyInfo
+        {
+            KeyId = "a",
+            KeyPacket = packet
+        });
+
+        Assert.Throws<CryptographicException>(
+            () => pgpProvider.Decrypt(new byte[32], info, new OdfLoadOptions()));
+    }
 }

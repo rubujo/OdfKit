@@ -248,6 +248,7 @@ internal static class TtfReader
                 {
                     fs.Position = 8; // 跳過版本
                     uint numFonts = ReadUInt32BE(reader);
+                    if (numFonts > 256) return names; // 防禦性上限：真實 TTC 最多不超過 256 字型
                     List<uint> offsets = [];
                     for (int f = 0; f < numFonts; f++)
                     {

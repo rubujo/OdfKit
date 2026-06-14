@@ -378,8 +378,9 @@ public class DefaultFormulaEvaluator : IOdfFormulaEvaluator
                 _ => OdfFormulaError.Name
             };
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
+            OdfKitDiagnostics.Warn($"Formula function '{name}' threw unexpected exception: {ex.GetType().Name}");
             return OdfFormulaError.Value;
         }
     }
@@ -2117,11 +2118,12 @@ internal class OdfDomEvaluationContext : IEvaluationContext
             {
                 if (rowChild.NodeType == OdfNodeType.Element && rowChild.LocalName == "table-row" && rowChild.NamespaceUri == OdfNamespaces.Table)
                 {
+                    const int MaxRepeat = 10000;
                     int rowRepeated = 1;
                     string? rowRepeatedStr = rowChild.GetAttribute("number-rows-repeated", OdfNamespaces.Table);
-                    if (!string.IsNullOrEmpty(rowRepeatedStr) && int.TryParse(rowRepeatedStr, out int rRep))
+                    if (!string.IsNullOrEmpty(rowRepeatedStr) && int.TryParse(rowRepeatedStr, out int rRep) && rRep > 0)
                     {
-                        rowRepeated = rRep;
+                        rowRepeated = Math.Min(rRep, MaxRepeat);
                     }
 
                     bool hasActiveCells = false;
@@ -2154,9 +2156,9 @@ internal class OdfDomEvaluationContext : IEvaluationContext
                                 {
                                     int colRepeated = 1;
                                     string? colRepeatedStr = cellChild.GetAttribute("number-columns-repeated", OdfNamespaces.Table);
-                                    if (!string.IsNullOrEmpty(colRepeatedStr) && int.TryParse(colRepeatedStr, out int cRep))
+                                    if (!string.IsNullOrEmpty(colRepeatedStr) && int.TryParse(colRepeatedStr, out int cRep) && cRep > 0)
                                     {
-                                        colRepeated = cRep;
+                                        colRepeated = Math.Min(cRep, MaxRepeat);
                                     }
 
                                     bool isActiveCell = cellChild.GetAttribute("formula", OdfNamespaces.Table) != null ||

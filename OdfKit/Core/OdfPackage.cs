@@ -333,7 +333,8 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                 bool wasStored = false;
                 try
                 {
-                    var fieldInfo = typeof(ZipArchiveEntry).GetField("_compressionMethod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var fieldInfo = typeof(ZipArchiveEntry).GetField("_compressionMethod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                        ?? typeof(ZipArchiveEntry).GetField("m_compressionMethod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                     if (fieldInfo != null)
                     {
                         var val = fieldInfo.GetValue(entry);
@@ -345,6 +346,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                     }
                     else
                     {
+                        OdfKitDiagnostics.Warn($"[OdfPackage] 無法反射取得 ZipArchiveEntry 壓縮方式欄位 ( .NET {Environment.Version} )；讀取時將以 CompressedLength == Length 作為判斷基準。");
                         wasStored = (entry.CompressedLength == entry.Length);
                     }
                 }
@@ -2413,7 +2415,8 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                 }
                 try
                 {
-                    var fieldInfo = typeof(ZipArchiveEntry).GetField("_compressionMethod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var fieldInfo = typeof(ZipArchiveEntry).GetField("_compressionMethod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                        ?? typeof(ZipArchiveEntry).GetField("m_compressionMethod", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                     if (fieldInfo != null)
                     {
                         var val = fieldInfo.GetValue(_zipEntry);
@@ -2422,6 +2425,10 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                             int intVal = Convert.ToInt32(val);
                             return intVal == 0; // 0 is Stored
                         }
+                    }
+                    else
+                    {
+                        OdfKitDiagnostics.Warn($"[OdfPackage] 無法反射取得 ZipArchiveEntry 壓縮方式欄位 ( .NET {Environment.Version} )；讀取時將以 CompressedLength == Length 作為判斷基準。");
                     }
                 }
                 catch

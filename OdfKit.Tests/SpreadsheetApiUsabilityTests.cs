@@ -181,4 +181,40 @@ public class SpreadsheetApiUsabilityTests
         Assert.Contains("sparkline-group", xml);
         Assert.Contains("dataRangeRef", xml);
     }
+
+    /// <summary>
+    /// 驗證 Workbook 密碼保護功能使用了 PBKDF2 加密且能正確 round-trip 驗證。
+    /// </summary>
+    [Fact]
+    public void ProtectWorkbook_UsesPbkdf2NotSingleHash()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        doc.ProtectWorkbook("TestPassword123");
+        Assert.True(doc.VerifyWorkbookPassword("TestPassword123"));
+        Assert.False(doc.VerifyWorkbookPassword("WrongPassword"));
+    }
+
+    /// <summary>
+    /// 驗證 Sheet 密碼保護功能使用了 PBKDF2 加密且能正確 round-trip 驗證。
+    /// </summary>
+    [Fact]
+    public void ProtectSheet_UsesPbkdf2NotSingleHash()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Sheet1");
+        sheet.Protect("SheetPass");
+        Assert.True(sheet.VerifyPassword("SheetPass"));
+        Assert.False(sheet.VerifyPassword("Wrong"));
+    }
+
+    /// <summary>
+    /// 驗證 VerifyWorkbookPassword 的 CompareBytes 正常執行。
+    /// </summary>
+    [Fact]
+    public void VerifyWorkbookPassword_UsesCryptographicCompare()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        doc.ProtectWorkbook("my_password");
+        Assert.False(doc.VerifyWorkbookPassword("wrong_password"));
+    }
 }

@@ -185,16 +185,7 @@ public class SpreadsheetDocument : OdfDocument
             rng.GetBytes(salt);
         }
         byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password);
-        
-        byte[] input = new byte[salt.Length + passwordBytes.Length];
-        Buffer.BlockCopy(salt, 0, input, 0, salt.Length);
-        Buffer.BlockCopy(passwordBytes, 0, input, salt.Length, passwordBytes.Length);
-
-        byte[] hash;
-        using (var sha = System.Security.Cryptography.SHA256.Create())
-        {
-            hash = sha.ComputeHash(input);
-        }
+        byte[] hash = OdfEncryption.Pbkdf2(passwordBytes, salt, 50000, 32, "sha256");
 
         var docSettings = FindOrCreateSettingsNode(SettingsDom, "document-settings");
         
@@ -236,6 +227,9 @@ public class SpreadsheetDocument : OdfDocument
 
         var itemSalt = FindOrCreateConfigItemNode(entry, "WorkbookProtectionKeyDigestSalt", "string");
         itemSalt.TextContent = Convert.ToBase64String(salt);
+
+        var itemDerivation = FindOrCreateConfigItemNode(entry, "WorkbookProtectionKeyDerivation", "string");
+        itemDerivation.TextContent = "PBKDF2-SHA256-50000";
     }
 
     /// <summary>
@@ -265,6 +259,7 @@ public class SpreadsheetDocument : OdfDocument
         string? keyStr = FindConfigItemValue(entry, "WorkbookProtectionKey");
         string? algo = FindConfigItemValue(entry, "WorkbookProtectionKeyDigestAlgorithm");
         string? saltStr = FindConfigItemValue(entry, "WorkbookProtectionKeyDigestSalt");
+        string? derivation = FindConfigItemValue(entry, "WorkbookProtectionKeyDerivation");
 
         if (keyStr is null || algo is null || saltStr is null) return false;
 
@@ -277,8 +272,15 @@ public class SpreadsheetDocument : OdfDocument
         Buffer.BlockCopy(passwordBytes, 0, input, salt.Length, passwordBytes.Length);
 
         byte[] actualHash;
-        if (algo == "http://www.w3.org/2001/04/xmlenc#sha256")
+        if (derivation == "PBKDF2-SHA256-50000" &&
+            (algo == "http://www.w3.org/2001/04/xmlenc#sha256" || algo == "http://www.w3.org/2000/09/xmldsig#sha256"))
         {
+            actualHash = OdfEncryption.Pbkdf2(passwordBytes, salt, 50000, 32, "sha256");
+        }
+        else if (string.IsNullOrEmpty(derivation) &&
+                 (algo == "http://www.w3.org/2001/04/xmlenc#sha256" || algo == "http://www.w3.org/2000/09/xmldsig#sha256"))
+        {
+            // 向下相容：舊格式使用 SHA-256 單次雜湊
             using (var sha = System.Security.Cryptography.SHA256.Create())
             {
                 actualHash = sha.ComputeHash(input);
@@ -306,12 +308,7 @@ public class SpreadsheetDocument : OdfDocument
 
     private static bool CompareBytes(byte[] a, byte[] b)
     {
-        if (a.Length != b.Length) return false;
-        for (int i = 0; i < a.Length; i++)
-        {
-            if (a[i] != b[i]) return false;
-        }
-        return true;
+        return OdfEncryption.ByteArrayEquals(a, b);
     }
 
     /// <summary>
@@ -558,22 +555,15 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
         {
             rng.GetBytes(salt);
         }
-        byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password);
-        
-        byte[] input = new byte[salt.Length + passwordBytes.Length];
-        Buffer.BlockCopy(salt, 0, input, 0, salt.Length);
-        Buffer.BlockCopy(passwordBytes, 0, input, salt.Length, passwordBytes.Length);
 
-        byte[] hash;
-        using (var sha = System.Security.Cryptography.SHA256.Create())
-        {
-            hash = sha.ComputeHash(input);
-        }
+        byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password);
+        byte[] hash = OdfEncryption.Pbkdf2(passwordBytes, salt, 50000, 32, "sha256");
 
         TableNode.SetAttribute("protected", OdfNamespaces.Table, "true", "table");
         TableNode.SetAttribute("protection-key", OdfNamespaces.Table, Convert.ToBase64String(hash), "table");
         TableNode.SetAttribute("protection-key-digest-algorithm", OdfNamespaces.Table, "http://www.w3.org/2001/04/xmlenc#sha256", "table");
         TableNode.SetAttribute("protection-key-digest-salt", OdfNamespaces.Table, Convert.ToBase64String(salt), "table");
+        TableNode.SetAttribute("protection-key-derivation", OdfNamespaces.Table, "PBKDF2-SHA256-50000", "table");
     }
 
     /// <summary>
@@ -588,6 +578,7 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
         string? keyStr = TableNode.GetAttribute("protection-key", OdfNamespaces.Table);
         string? algo = TableNode.GetAttribute("protection-key-digest-algorithm", OdfNamespaces.Table);
         string? saltStr = TableNode.GetAttribute("protection-key-digest-salt", OdfNamespaces.Table);
+        string? derivation = TableNode.GetAttribute("protection-key-derivation", OdfNamespaces.Table);
 
         if (keyStr is null || algo is null || saltStr is null) return false;
 
@@ -600,8 +591,15 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
         Buffer.BlockCopy(passwordBytes, 0, input, salt.Length, passwordBytes.Length);
 
         byte[] actualHash;
-        if (algo == "http://www.w3.org/2001/04/xmlenc#sha256" || algo == "http://www.w3.org/2000/09/xmldsig#sha256")
+        if (derivation == "PBKDF2-SHA256-50000" &&
+            (algo == "http://www.w3.org/2001/04/xmlenc#sha256" || algo == "http://www.w3.org/2000/09/xmldsig#sha256"))
         {
+            actualHash = OdfEncryption.Pbkdf2(passwordBytes, salt, 50000, 32, "sha256");
+        }
+        else if (string.IsNullOrEmpty(derivation) &&
+                 (algo == "http://www.w3.org/2001/04/xmlenc#sha256" || algo == "http://www.w3.org/2000/09/xmldsig#sha256"))
+        {
+            // 向下相容：舊格式
             using (var sha = System.Security.Cryptography.SHA256.Create())
             {
                 actualHash = sha.ComputeHash(input);
@@ -617,12 +615,7 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
 
     private static bool CompareBytes(byte[] a, byte[] b)
     {
-        if (a.Length != b.Length) return false;
-        for (int i = 0; i < a.Length; i++)
-        {
-            if (a[i] != b[i]) return false;
-        }
-        return true;
+        return OdfEncryption.ByteArrayEquals(a, b);
     }
 
     /// <summary>

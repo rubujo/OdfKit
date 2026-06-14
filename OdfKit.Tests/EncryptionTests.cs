@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Xunit;
 using OdfKit.Core;
+using OdfKit.Compliance;
 
 namespace OdfKit.Tests
 {
@@ -416,17 +417,17 @@ namespace OdfKit.Tests
 
             // 標準的 xmldsig#sha256
             byte[] decrypted1 = OdfEncryption.DecryptEntry(
-                ciphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1024, salt, iv, "http://www.w3.org/2000/09/xmldsig#sha256");
+                ciphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50000, salt, iv, "http://www.w3.org/2000/09/xmldsig#sha256");
             Assert.Equal(plaintext, decrypted1);
 
             // 完全相等的 sha256
             byte[] decrypted2 = OdfEncryption.DecryptEntry(
-                ciphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1024, salt, iv, "sha256");
+                ciphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50000, salt, iv, "sha256");
             Assert.Equal(plaintext, decrypted2);
 
             // 結尾為 #sha256 但為其他前綴（例如 xmlenc）
             byte[] decrypted3 = OdfEncryption.DecryptEntry(
-                ciphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1024, salt, iv, "http://www.w3.org/2001/04/xmlenc#sha256");
+                ciphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50000, salt, iv, "http://www.w3.org/2001/04/xmlenc#sha256");
             Assert.Equal(plaintext, decrypted3);
 
             // 局部匹配的名稱應解密失敗，大多會擲出例外；若因隨機填補符合 PKCS7 格式，則重試以確保強健性
@@ -437,7 +438,7 @@ namespace OdfKit.Tests
                 try
                 {
                     OdfEncryption.DecryptEntry(
-                        tempCiphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1024, tempSalt, tempIv, "sha256extra");
+                        tempCiphertext, "MySecretPassword", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50000, tempSalt, tempIv, "sha256extra");
                 }
                 catch (Exception)
                 {
@@ -459,17 +460,17 @@ namespace OdfKit.Tests
 
             // 標準的 xmldsig#sha1
             byte[] decrypted1 = OdfEncryption.DecryptEntry(
-                ciphertext, "BlowfishPassword", OdfEncryption.BlowfishAlgorithmUri, "PBKDF2", 16, 1024, salt, iv, "http://www.w3.org/2000/09/xmldsig#sha1");
+                ciphertext, "BlowfishPassword", OdfEncryption.BlowfishAlgorithmUri, "PBKDF2", 16, 50000, salt, iv, "http://www.w3.org/2000/09/xmldsig#sha1");
             Assert.Equal(plaintext, decrypted1);
 
             // 完全相等的 sha1
             byte[] decrypted2 = OdfEncryption.DecryptEntry(
-                ciphertext, "BlowfishPassword", OdfEncryption.BlowfishAlgorithmUri, "PBKDF2", 16, 1024, salt, iv, "sha1");
+                ciphertext, "BlowfishPassword", OdfEncryption.BlowfishAlgorithmUri, "PBKDF2", 16, 50000, salt, iv, "sha1");
             Assert.Equal(plaintext, decrypted2);
 
             // 局部匹配的名稱解密結果應為垃圾資料（與明文不符）
             byte[] decryptedGarbage = OdfEncryption.DecryptEntry(
-                ciphertext, "BlowfishPassword", OdfEncryption.BlowfishAlgorithmUri, "PBKDF2", 16, 1024, salt, iv, "sha1extra");
+                ciphertext, "BlowfishPassword", OdfEncryption.BlowfishAlgorithmUri, "PBKDF2", 16, 50000, salt, iv, "sha1extra");
             Assert.NotEqual(plaintext, decryptedGarbage);
         }
 
@@ -636,6 +637,23 @@ namespace OdfKit.Tests
             };
             Assert.NotNull(opts.CryptographyProvider);
             Assert.IsType<OdfOpenPgpCryptographyProvider>(opts.CryptographyProvider);
+        }
+
+        /// <summary>
+        /// 測試在儲存加密文件時， PBKDF2 反覆運算次數是否確實為 50,000 次。
+        /// </summary>
+        [Fact]
+        public void Encrypt_PbkdfIterationCount_Is50000()
+        {
+            using var doc = OdfDocument.Create(OdfDocumentKind.Text);
+            using var ms = new MemoryStream();
+            doc.SaveToStream(ms, new OdfSaveOptions { Password = "test" });
+            ms.Position = 0;
+            using var zip = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Read);
+            var manifestEntry = zip.GetEntry("META-INF/manifest.xml")!;
+            using var sr = new System.IO.StreamReader(manifestEntry.Open());
+            string manifest = sr.ReadToEnd();
+            Assert.Contains("50000", manifest);
         }
     }
 }

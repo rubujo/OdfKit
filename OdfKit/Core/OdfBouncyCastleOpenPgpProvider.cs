@@ -78,7 +78,10 @@ public sealed class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
         (long pkeskKeyId, PublicKeyAlgorithmTag algorithm, byte[][] encMpis) = DecodePkeskPacket(encryptedKeyPacket);
 
         PgpSecretKey secretKey = FindSecretKey(pkeskKeyId);
-        char[] passphrase = _passphraseProvider(pkeskKeyId);
+        char[] passphrase = _passphraseProvider(pkeskKeyId)
+            ?? throw new ArgumentException(
+                "密語提供者回傳了 null；應回傳空陣列 (Array.Empty<char>()) 表示無密語保護。",
+                nameof(_passphraseProvider));
         PgpPrivateKey privateKey;
         try
         {
@@ -166,7 +169,7 @@ public sealed class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
         checksum &= 0xFFFF;
 
         byte[] payload = new byte[1 + sessionKey.Length + 2];
-        payload[0] = 9;
+        payload[0] = 9; // RFC 4880 §9.2：9 = AES-256，與 OdfEncryption 的 session key 演算法一致
         sessionKey.CopyTo(payload, 1);
         payload[payload.Length - 2] = (byte)(checksum >> 8);
         payload[payload.Length - 1] = (byte)(checksum & 0xFF);

@@ -135,9 +135,9 @@ public static class OdfPdfExporter
                 case "s":
                     int count = 1;
                     string? cStr = child.GetAttribute("c", OdfNamespaces.Text);
-                    if (!string.IsNullOrEmpty(cStr) && int.TryParse(cStr, out int c))
+                    if (!string.IsNullOrEmpty(cStr) && int.TryParse(cStr, out int c) && c > 0)
                     {
-                        count = c;
+                        count = Math.Min(c, 4096); // 防禦性上限：PDF 中不需超過 4096 個連續空白
                     }
                     parent.AddText(new string(' ', count));
                     break;
@@ -178,9 +178,9 @@ public static class OdfPdfExporter
                 case "s":
                     int count = 1;
                     string? cStr = child.GetAttribute("c", OdfNamespaces.Text);
-                    if (!string.IsNullOrEmpty(cStr) && int.TryParse(cStr, out int c))
+                    if (!string.IsNullOrEmpty(cStr) && int.TryParse(cStr, out int c) && c > 0)
                     {
-                        count = c;
+                        count = Math.Min(c, 4096); // 防禦性上限：PDF 中不需超過 4096 個連續空白
                     }
                     parent.AddText(new string(' ', count));
                     break;

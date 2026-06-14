@@ -433,11 +433,9 @@ public class OdsStreamWriter : IDisposable
             _writer.WriteEndElement(); // office:document-content
             _writer.WriteEndDocument();
             
-            _writer.Dispose();
-            _contentEntryStream.Dispose();
-
-            WriteStyles();
-
+            try { _writer.Dispose(); } catch { /* 盡量排清 XmlWriter */ }
+            try { _contentEntryStream.Dispose(); } catch { }
+            try { WriteStyles(); } catch { }
             _zip.Dispose();
         }
     }

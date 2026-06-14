@@ -22,6 +22,7 @@ namespace OdfKit.Core;
 public static class OdfSigner
     {
         private const string SignaturePath = "META-INF/documentsignatures.xml";
+        private static readonly HttpClient s_httpClient = new();
 
         /// <summary>
         /// 對 ODF 封裝中的關鍵檔案進行數位簽署，支援同僚聯署。
@@ -1192,17 +1193,12 @@ public static class OdfSigner
 
         private static bool StructuralEqual(byte[] a, byte[] b)
         {
-            if (a.Length != b.Length) return false;
-            for (int i = 0; i < a.Length; i++)
-            {
-                if (a[i] != b[i]) return false;
-            }
-            return true;
+            return OdfEncryption.ByteArrayEquals(a, b);
         }
 
         private static async Task<byte[]> DownloadCrlAsync(string url, HttpClient? httpClient)
         {
-            var client = httpClient ?? new HttpClient();
+            var client = httpClient ?? s_httpClient;
             return await client.GetByteArrayAsync(url);
         }
 
@@ -1241,7 +1237,7 @@ public static class OdfSigner
         {
             byte[] requestBytes = CreateTsaRequest(hash);
 
-            var client = httpClient ?? new HttpClient();
+            var client = httpClient ?? s_httpClient;
             using var request = new HttpRequestMessage(HttpMethod.Post, tsaUrl);
             request.Content = new ByteArrayContent(requestBytes);
             request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/timestamp-query");
@@ -1482,7 +1478,9 @@ public static class OdfSigner
 
             if (refTargetField == null || refTargetTypeField == null)
             {
-                throw new CryptographicException("Failed to locate required internal fields (_refTarget / _refTargetType) in Reference.");
+                throw new CryptographicException(
+                    "Failed to locate required internal fields (_refTarget / _refTargetType) in Reference. " +
+                    $"This reflection-based workaround may need updating for the current .NET runtime ({Environment.Version}).");
             }
 
             refTargetField.SetValue(reference, stream);

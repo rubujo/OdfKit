@@ -165,7 +165,7 @@ public static class OdfEncryption
         if (startKeyGenName is not null
             && (startKeyGenName.EndsWith("#sha1", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(startKeyGenName, "sha1", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(startKeyGenName, "sha-1", StringComparison.Ordinal)))
+                || string.Equals(startKeyGenName, "sha-1", StringComparison.OrdinalIgnoreCase)))
         {
             hashName = "sha1";
         }
@@ -234,13 +234,13 @@ public static class OdfEncryption
         {
             using (var sha = SHA256.Create())
                 preHashedPwd = sha.ComputeHash(pwdBytes);
-            derivedKey = Pbkdf2(preHashedPwd, salt, 1024, keySize, "sha256");
+            derivedKey = Pbkdf2(preHashedPwd, salt, 50000, keySize, "sha256");
         }
         else
         {
             using (var sha = SHA1.Create())
                 preHashedPwd = sha.ComputeHash(pwdBytes);
-            derivedKey = Pbkdf2(preHashedPwd, salt, 1024, keySize, "sha1");
+            derivedKey = Pbkdf2(preHashedPwd, salt, 50000, keySize, "sha1");
         }
 
         byte[] ciphertext;
@@ -316,7 +316,17 @@ public static class OdfEncryption
 
             if (cryptoProvider is not null)
             {
-                decryptedPlaintext = cryptoProvider.Decrypt(ciphertext, entry.EncryptionInfo, package.LoadOptions);
+                OdfLoadOptions loadOpts = package.LoadOptions;
+                if (loadOpts.CryptographyProvider is null)
+                {
+                    loadOpts = new OdfLoadOptions
+                    {
+                        CryptographyProvider = package.SaveOptions.CryptographyProvider,
+                        OpenPgpKeyProvider = package.SaveOptions.OpenPgpKeyProvider,
+                        Password = password
+                    };
+                }
+                decryptedPlaintext = cryptoProvider.Decrypt(ciphertext, entry.EncryptionInfo, loadOpts);
             }
             else if (entry.EncryptionInfo.OpenPgpEncryptedKeys.Count > 0 ||
                 string.Equals(entry.EncryptionInfo.AlgorithmName, OpenPgpAlgorithmUri, StringComparison.Ordinal))
@@ -377,22 +387,34 @@ public static class OdfEncryption
                     if (ByteArrayEquals(calculatedChecksum, entry.EncryptionInfo.Checksum))
                     {
                         decryptedPlaintext = decompressedBytes;
-                        goto AssignPlaintext;
                     }
-                }
-
-                byte[] rawCalculatedChecksum = ComputeHash(decryptedBytes, entry.EncryptionInfo.ChecksumType);
-                if (ByteArrayEquals(rawCalculatedChecksum, entry.EncryptionInfo.Checksum))
-                {
-                    decryptedPlaintext = decryptedBytes;
+                    else
+                    {
+                        byte[] rawCalculatedChecksum = ComputeHash(decryptedBytes, entry.EncryptionInfo.ChecksumType);
+                        if (ByteArrayEquals(rawCalculatedChecksum, entry.EncryptionInfo.Checksum))
+                        {
+                            decryptedPlaintext = decryptedBytes;
+                        }
+                        else
+                        {
+                            throw new CryptographicException("解密失敗：總和檢查碼不符或密碼無效。");
+                        }
+                    }
                 }
                 else
                 {
-                    throw new CryptographicException("解密失敗：總和檢查碼不符或密碼無效。");
+                    byte[] rawCalculatedChecksum = ComputeHash(decryptedBytes, entry.EncryptionInfo.ChecksumType);
+                    if (ByteArrayEquals(rawCalculatedChecksum, entry.EncryptionInfo.Checksum))
+                    {
+                        decryptedPlaintext = decryptedBytes;
+                    }
+                    else
+                    {
+                        throw new CryptographicException("解密失敗：總和檢查碼不符或密碼無效。");
+                    }
                 }
             }
 
-        AssignPlaintext:
             entry.SetContent(decryptedPlaintext);
             entry.EncryptionInfo = null;
         }
@@ -448,8 +470,7 @@ public static class OdfEncryption
 
                 byte[] iv;
                 byte[] salt;
-                byte[] dummyChecksum;
-                ciphertext = EncryptEntry(compressedPlaintext, password, algorithm, out iv, out salt, out dummyChecksum);
+                ciphertext = EncryptEntry(compressedPlaintext, password, algorithm, out iv, out salt, out _);
 
                 byte[] checksum = ComputeHash(plaintext, "SHA256");
 
@@ -461,7 +482,7 @@ public static class OdfEncryption
                     InitialisationVector = iv,
                     KeyDerivationName = "PBKDF2",
                     KeySize = algorithm == OdfEncryptionAlgorithm.Aes256 ? 32 : 16,
-                    IterationCount = 1024,
+                    IterationCount = 50000,
                     Salt = salt
                 };
 
@@ -529,7 +550,12 @@ public static class OdfEncryption
     {
         if (a is null || b is null) return a == b;
         if (a.Length != b.Length) return false;
-        return a.AsSpan().SequenceEqual(b);
+        int result = 0;
+        for (int i = 0; i < a.Length; i++)
+        {
+            result |= a[i] ^ b[i];
+        }
+        return result == 0;
     }
 }
 
@@ -620,6 +646,9 @@ internal class Blowfish
 
     public byte[] DecryptCbc(byte[] ciphertext, byte[] iv)
     {
+        if (ciphertext.Length % 8 != 0)
+            throw new CryptographicException(
+                $"Blowfish 密文長度 {ciphertext.Length} 不是區塊大小（8 位元組）的倍數。");
         byte[] plaintext = new byte[ciphertext.Length];
         uint ivL = ((uint)iv[0] << 24) | ((uint)iv[1] << 16) | ((uint)iv[2] << 8) | iv[3];
         uint ivR = ((uint)iv[4] << 24) | ((uint)iv[5] << 16) | ((uint)iv[6] << 8) | iv[7];
@@ -650,13 +679,14 @@ internal class Blowfish
 
         if (plaintext.Length == 0) return plaintext;
         int paddingLen = plaintext[plaintext.Length - 1];
-        if (paddingLen > 0 && paddingLen <= 8)
+        if (paddingLen > 0 && paddingLen <= 8 && paddingLen <= plaintext.Length)
         {
-            bool valid = true;
+            byte acc = 0;
             for (int i = plaintext.Length - paddingLen; i < plaintext.Length; i++)
             {
-                if (plaintext[i] != paddingLen) { valid = false; break; }
+                acc |= (byte)(plaintext[i] ^ paddingLen);
             }
+            bool valid = (acc == 0);
             if (valid)
             {
                 byte[] unpadded = new byte[plaintext.Length - paddingLen];

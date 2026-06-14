@@ -40,12 +40,21 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
             {
                 sessionKey = _keyProvider.DecryptSessionKey(encKey.KeyPacket, encKey.KeyId);
             }
-            catch
+            catch (Exception ex) when (ex is CryptographicException
+                                           or InvalidOperationException
+                                           or NotSupportedException)
             {
                 continue;
             }
 
-            return DecryptAes256Cbc(ciphertext, sessionKey, info.InitialisationVector);
+            try
+            {
+                return DecryptAes256Cbc(ciphertext, sessionKey, info.InitialisationVector);
+            }
+            finally
+            {
+                Array.Clear(sessionKey, 0, sessionKey.Length);
+            }
         }
 
         throw new CryptographicException("OpenPGP 解密失敗：無法以任何已知私鑰解密 Session Key。");
@@ -62,36 +71,43 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
             rng.GetBytes(iv);
         }
 
-        byte[] ciphertext = EncryptAes256Cbc(plaintext, sessionKey, iv);
-
-        byte[] checksum;
-        using (var sha = SHA256.Create())
+        try
         {
-            checksum = sha.ComputeHash(plaintext);
-        }
+            byte[] ciphertext = EncryptAes256Cbc(plaintext, sessionKey, iv);
 
-        info = new OdfEncryptionInfo
-        {
-            AlgorithmName = OdfEncryption.OpenPgpAlgorithmUri,
-            InitialisationVector = iv,
-            ChecksumType = "SHA256",
-            Checksum = checksum,
-            KeyDerivationName = string.Empty
-        };
-
-        foreach (var recipient in saveOptions.OpenPgpRecipients)
-        {
-            byte[] encryptedSessionKey = _keyProvider.EncryptSessionKey(sessionKey, recipient);
-            info.OpenPgpEncryptedKeys.Add(new OdfOpenPgpEncryptedKeyInfo
+            byte[] checksum;
+            using (var sha = SHA256.Create())
             {
-                KeyId = recipient.KeyId,
-                Recipient = recipient.Recipient,
-                AlgorithmName = OdfEncryption.OpenPgpAlgorithmUri,
-                KeyPacket = encryptedSessionKey
-            });
-        }
+                checksum = sha.ComputeHash(plaintext);
+            }
 
-        return ciphertext;
+            info = new OdfEncryptionInfo
+            {
+                AlgorithmName = OdfEncryption.OpenPgpAlgorithmUri,
+                InitialisationVector = iv,
+                ChecksumType = "SHA256",
+                Checksum = checksum,
+                KeyDerivationName = string.Empty
+            };
+
+            foreach (var recipient in saveOptions.OpenPgpRecipients)
+            {
+                byte[] encryptedSessionKey = (byte[])_keyProvider.EncryptSessionKey(sessionKey, recipient).Clone();
+                info.OpenPgpEncryptedKeys.Add(new OdfOpenPgpEncryptedKeyInfo
+                {
+                    KeyId = recipient.KeyId,
+                    Recipient = recipient.Recipient,
+                    AlgorithmName = OdfEncryption.OpenPgpAlgorithmUri,
+                    KeyPacket = encryptedSessionKey
+                });
+            }
+
+            return ciphertext;
+        }
+        finally
+        {
+            Array.Clear(sessionKey, 0, sessionKey.Length);
+        }
     }
 
     private static byte[] EncryptAes256Cbc(byte[] plaintext, byte[] key, byte[] iv)

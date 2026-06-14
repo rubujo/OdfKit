@@ -3,6 +3,8 @@ using System.IO;
 using System.Text;
 using OdfKit.Csv;
 using OdfKit.Spreadsheet;
+using OdfKit.Core;
+using OdfKit.DOM;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -72,5 +74,39 @@ public class CsvImportExportTests
         Assert.Contains("欄 B", csv);
         Assert.Contains("值一", csv);
         Assert.Contains("值二", csv);
+    }
+
+    /// <summary>
+    /// 驗證當 ODS 含有極大的 row 或 column 重複次數時， CSV 匯出器不會發生 OOM 且能在合理時間內返回。
+    /// </summary>
+    [Fact]
+    public void ScanCellValues_LargeRepeatCount_DoesNotOOM()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        var sheet = workbook.Worksheets.Add("Sheet1");
+        
+        // 建立一個有極大 rows-repeated 的 table-row 元素，並附帶一個 active cell
+        var tableNS = OdfNamespaces.Table;
+        var rowNode = OdfNodeFactory.CreateElement("table-row", tableNS, "table");
+        rowNode.SetAttribute("number-rows-repeated", tableNS, "2000000000", "table");
+        
+        var cellNode = OdfNodeFactory.CreateElement("table-cell", tableNS, "table");
+        cellNode.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
+        
+        var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
+        pNode.TextContent = "測試資料";
+        cellNode.AppendChild(pNode);
+        rowNode.AppendChild(cellNode);
+        
+        sheet.TableNode.AppendChild(rowNode);
+
+        using var ms = new MemoryStream();
+        var startTime = DateTime.UtcNow;
+        
+        // 執行匯出，驗證是否能在合理時間（e.g. 10秒）內返回，且不發生 OutOfMemoryException
+        OdfCsvExporter.ExportToStream(workbook, ms);
+        
+        var elapsed = DateTime.UtcNow - startTime;
+        Assert.True(elapsed.TotalSeconds < 10, $"匯出操作花費了 {elapsed.TotalSeconds} 秒，疑似發生無窮迴圈或處理過大重複次數。");
     }
 }

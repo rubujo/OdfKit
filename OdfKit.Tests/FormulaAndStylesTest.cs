@@ -1006,6 +1006,41 @@ namespace OdfKit.Tests
                 Assert.Equal("page", fieldNodes[3].GetAttribute("orientation", OdfNamespaces.Table));
             }
         }
+
+        /// <summary>
+        /// 驗證當公式遍歷表格遇到極大的 rows-repeated 時，不會發生 OOM 且在合理時間內返回。
+        /// </summary>
+        [Fact]
+        public void TraverseTable_LargeRowRepeatCount_DoesNotOOM()
+        {
+            using var pkg = OdfPackage.Create(new MemoryStream());
+            var doc = new SpreadsheetDocument(pkg);
+            var sheet = doc.AddSheet("Sheet1");
+
+            // 建立一個有極大 rows-repeated 的 table-row 元素，並附帶一個 active cell
+            var tableNS = OdfNamespaces.Table;
+            var rowNode = OdfNodeFactory.CreateElement("table-row", tableNS, "table");
+            rowNode.SetAttribute("number-rows-repeated", tableNS, "2000000000", "table");
+            
+            var cellNode = OdfNodeFactory.CreateElement("table-cell", tableNS, "table");
+            cellNode.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
+            
+            var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
+            pNode.TextContent = "10";
+            cellNode.AppendChild(pNode);
+            rowNode.AppendChild(cellNode);
+            
+            sheet.TableNode.AppendChild(rowNode);
+
+            var startTime = DateTime.UtcNow;
+            var evaluator = new DefaultFormulaEvaluator();
+            
+            // 建立 OdfDomEvaluationContext 時會呼叫 TraverseTable，驗證其是否在合理時間內返回
+            var domContext = new OdfDomEvaluationContext(doc.ContentDom, evaluator);
+            
+            var elapsed = DateTime.UtcNow - startTime;
+            Assert.True(elapsed.TotalSeconds < 10, $"TraverseTable 花費了 {elapsed.TotalSeconds} 秒，疑似發生 OOM 或未限制重複次數。");
+        }
     }
 
         #endregion

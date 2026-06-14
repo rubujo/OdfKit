@@ -225,7 +225,7 @@ namespace OdfKit.Tests
             // Casing mismatch in URI: startKeyGenName in DecryptEntry checks with EndsWith using StringComparison.OrdinalIgnoreCase
             // Let's verify if uppercase URI is handled
             byte[] decrypted = OdfEncryption.DecryptEntry(
-                ciphertext, "pwd", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1024, salt, iv,
+                ciphertext, "pwd", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50000, salt, iv,
                 "HTTP://WWW.W3.ORG/2000/09/XMLDSIG#SHA256");
             Assert.Equal(plaintext, decrypted);
 
@@ -233,7 +233,7 @@ namespace OdfKit.Tests
             Assert.Throws<CryptographicException>(() =>
             {
                 OdfEncryption.DecryptEntry(
-                    ciphertext, "pwd", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1024, salt, iv,
+                    ciphertext, "pwd", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50000, salt, iv,
                     "http://www.w3.org/2000/09/xmldsig#sha256 ");
             });
         }
