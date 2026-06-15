@@ -686,12 +686,15 @@ public static class OdfEncryption
     {
         if (a is null || b is null) return a == b;
         if (a.Length != b.Length) return false;
+#if NET5_0_OR_GREATER
+        return System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(a, b);
+#else
+        // netstandard2.0：CryptographicOperations 不存在，以 XOR 累加模擬恆定時間比較
         int result = 0;
         for (int i = 0; i < a.Length; i++)
-        {
             result |= a[i] ^ b[i];
-        }
         return result == 0;
+#endif
     }
 }
 
