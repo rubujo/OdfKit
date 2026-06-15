@@ -1,0 +1,115 @@
+using System;
+using System.IO;
+using System.Linq;
+using OdfKit.Core;
+using OdfKit.DOM;
+using OdfKit.Spreadsheet;
+using Xunit;
+
+namespace OdfKit.Tests;
+
+/// <summary>
+/// 鎖定試算表高階 API 的整合測試。
+/// </summary>
+public class SpreadsheetHighLevelApiTests
+{
+    /// <summary>
+    /// 驗證嵌入圖表建立 (AddChart) API 的正確性與封裝子文件結構。
+    /// </summary>
+    [Fact]
+    public void AddChartCreatesCorrectSubDocuments()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.AddSheet("Sheet1");
+
+        var chart = new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Line,
+            Title = "銷售折線圖",
+            DataRange = new OdfCellRange(0, 0, 9, 1, "Sheet1"), // A1:B10
+            HasLegend = true
+        };
+
+        // 錨定在 D1
+        document.AddChart("Sheet1", new OdfCellAddress(0, 3, "Sheet1"), chart);
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        
+        // 1. 驗證 content.xml 內的主框架參照
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string contentXml = reader.ReadToEnd();
+
+        Assert.Contains("table:shapes", contentXml);
+        Assert.Contains("draw:frame", contentXml);
+        Assert.Contains("draw:object xlink:href=\"./Object 1\"", contentXml);
+        Assert.Contains("table:start-cell-address=\"Sheet1.D1\"", contentXml);
+
+        // 2. 驗證 Object 1/mimetype 媒體類型
+        byte[] mimeBytes = package.ReadEntry("Object 1/mimetype");
+        string mimeText = System.Text.Encoding.UTF8.GetString(mimeBytes).Trim();
+        Assert.Equal("application/vnd.oasis.opendocument.chart", mimeText);
+
+        // 3. 驗證 Object 1/content.xml 內容
+        byte[] objContentBytes = package.ReadEntry("Object 1/content.xml");
+        string objContentXml = System.Text.Encoding.UTF8.GetString(objContentBytes);
+
+        Assert.Contains("chart:chart", objContentXml);
+        Assert.Contains("chart:class=\"chart:line\"", objContentXml);
+        Assert.Contains("table:cell-range-address=", objContentXml);
+        Assert.Contains("Sheet1", objContentXml);
+        Assert.Contains("A1", objContentXml);
+        Assert.Contains("B10", objContentXml);
+        Assert.Contains("銷售折線圖", objContentXml);
+        Assert.Contains("chart:legend-position=\"end\"", objContentXml);
+        Assert.Contains("chart:plot-area", objContentXml);
+        Assert.Contains("chart:axis", objContentXml);
+    }
+
+    /// <summary>
+    /// 驗證資料驗證 (AddDataValidation) API 的全域宣告與儲存格關聯。
+    /// </summary>
+    [Fact]
+    public void AddDataValidationAppliesCorrectRules()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.AddSheet("Sheet1");
+
+        var validation = new OdfDataValidation
+        {
+            ApplyTo = new OdfCellRange(0, 0, 9, 0, "Sheet1"), // A1:A10
+            Condition = OdfValidationCondition.IntegerBetween,
+            Formula1 = "1",
+            Formula2 = "100",
+            ErrorMessage = "請輸入 1 至 100 的整數！",
+            ErrorTitle = "無效輸入",
+            AlertStyle = OdfValidationAlertStyle.Stop
+        };
+
+        document.AddDataValidation("Sheet1", validation);
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string contentXml = reader.ReadToEnd();
+
+        // 1. 驗證全域的 content-validations 宣告與條件
+        Assert.Contains("table:content-validations", contentXml);
+        Assert.Contains("table:content-validation", contentXml);
+        Assert.Contains("table:name=\"val_1\"", contentXml);
+        Assert.Contains("condition=\"and:oooc:isInteger()and:oooc:isBetween(1,100)\"", contentXml);
+        Assert.Contains("table:error-message table:message=\"請輸入 1 至 100 的整數！\" table:title=\"無效輸入\" table:message-type=\"stop\"", contentXml);
+
+        // 2. 驗證 A1 儲存格已正確被附加了此驗證名稱
+        // 在 ODS 中列與欄均被展開，A1 為第 1 列 (row) 的第 1 個 cell
+        Assert.Contains("table:content-validation-name=\"val_1\"", contentXml);
+    }
+}
