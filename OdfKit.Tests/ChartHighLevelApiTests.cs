@@ -107,4 +107,146 @@ public class ChartHighLevelApiTests
         Assert.Contains("office:date-value=\"2026-06-15T12:00:00Z\"", xml);
         Assert.Contains("<text:p>2026-06-15T12:00:00Z</text:p>", xml);
     }
+
+    // ── V-1: SetDataRange / GetDataRange / InsertChart ──────────────────────
+
+    /// <summary>
+    /// 驗證 SetDataRange 正確設定 chart:chart 的 table:cell-range-address 屬性。
+    /// </summary>
+    [Fact]
+    public void SetDataRange_SetsChartCellRangeAttribute()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        var range = new OdfCellRange(0, 0, 4, 1);
+
+        chartDoc.SetDataRange("Sheet1", range);
+
+        string? attr = chartDoc.ChartNode.GetAttribute("cell-range-address", OdfNamespaces.Table);
+        Assert.Equal("Sheet1.$A$1:.$B$5", attr);
+    }
+
+    /// <summary>
+    /// 驗證 GetDataRange 能正確還原 SetDataRange 所設定的範圍。
+    /// </summary>
+    [Fact]
+    public void GetDataRange_ReturnsCorrectRange()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        var originalRange = new OdfCellRange(0, 0, 4, 2);
+
+        chartDoc.SetDataRange("Sales", originalRange);
+
+        var (sheetName, range) = chartDoc.GetDataRange();
+
+        Assert.Equal("Sales", sheetName);
+        Assert.True(range.HasValue);
+        var r = range!.Value;
+        Assert.Equal(0, r.StartAddress.Row);
+        Assert.Equal(0, r.StartAddress.Column);
+        Assert.Equal(4, r.EndAddress.Row);
+        Assert.Equal(2, r.EndAddress.Column);
+    }
+
+    /// <summary>
+    /// 驗證 SetDataRange 建立正確的 chart:data-source 與 chart:series 節點。
+    /// </summary>
+    [Fact]
+    public void SetDataRange_CreatesDataSourceAndSeriesNodes()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        // A1:C5：A 欄為標籤，B/C 欄為資料序列，第 1 列為標頭
+        var range = new OdfCellRange(0, 0, 4, 2);
+
+        chartDoc.SetDataRange("Sheet1", range, firstRowAsHeader: true, firstColumnAsLabel: true);
+
+        // 應有 2 個 series（B 欄、C 欄）
+        var series = chartDoc.Series;
+        Assert.Equal(2, series.Count);
+
+        // 第一個 series 的資料範圍
+        Assert.Equal("Sheet1.$B$2:.$B$5", series[0].ValuesCellRangeAddress);
+        Assert.Equal("Sheet1.$B$1", series[0].LabelCellAddress);
+
+        // 第二個 series
+        Assert.Equal("Sheet1.$C$2:.$C$5", series[1].ValuesCellRangeAddress);
+        Assert.Equal("Sheet1.$C$1", series[1].LabelCellAddress);
+
+        // X 軸分類範圍
+        string? catRange = chartDoc.CategoriesCellRangeAddress;
+        Assert.Equal("Sheet1.$A$2:.$A$5", catRange);
+    }
+
+    /// <summary>
+    /// 驗證 OdfTableSheet.InsertChart() 在 ODS 套件中建立嵌入圖表物件，
+    /// 並可透過 GetDataRange() 驗證資料繫結已正確持久化。
+    /// </summary>
+    [Fact]
+    public void InsertChart_EmbeddedChartDocumentPersistedInOds()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Data");
+
+        // 填入 3×4 資料：A1=標題列，B-D 欄 2~4 列
+        sheet.Cells["A1"].CellValue = "Name";
+        sheet.Cells["B1"].CellValue = "Q1";
+        sheet.Cells["C1"].CellValue = "Q2";
+        sheet.Cells["A2"].CellValue = "Alpha";
+        sheet.Cells["B2"].CellValue = 100d;
+        sheet.Cells["C2"].CellValue = 200d;
+        sheet.Cells["A3"].CellValue = "Beta";
+        sheet.Cells["B3"].CellValue = 150d;
+        sheet.Cells["C3"].CellValue = 250d;
+
+        var dataRange = new OdfCellRange(0, 0, 2, 2);
+        // InsertChart 回傳 OdfChartDocument，不可 Dispose（父文件管理生命週期）
+        OdfChartDocument chartDoc = sheet.InsertChart(dataRange, OdfChartType.Bar);
+
+        // 驗證資料繫結
+        var (sheetName, range) = chartDoc.GetDataRange();
+        Assert.Equal("Data", sheetName);
+        Assert.True(range.HasValue);
+        var r = range!.Value;
+        Assert.Equal(0, r.StartAddress.Row);
+        Assert.Equal(0, r.StartAddress.Column);
+        Assert.Equal(2, r.EndAddress.Row);
+        Assert.Equal(2, r.EndAddress.Column);
+
+        // 儲存後重新開啟，驗證嵌入物件的 content.xml 存在
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+
+        using var pkg = OdfPackage.Open(ms, leaveOpen: true);
+        Assert.True(pkg.HasEntry("Object 1/content.xml"));
+        Assert.True(pkg.HasEntry("Object 1/mimetype"));
+
+        using var contentStream = pkg.GetEntryStream("Object 1/content.xml");
+        using var reader = new System.IO.StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+
+        // 驗證 cell-range-address 正確寫入 content.xml
+        Assert.Contains("Data.$A$1:.$C$3", xml);
+        // 驗證 chart:series
+        Assert.Contains("chart:series", xml);
+    }
+
+    /// <summary>
+    /// 驗證 SetDataRange 與 GetDataRange 對帶空格工作表名稱的往返一致性。
+    /// </summary>
+    [Fact]
+    public void SetDataRange_SheetNameWithSpaces_RoundTrip()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        var range = new OdfCellRange(0, 0, 9, 3);
+
+        chartDoc.SetDataRange("My Sheet", range);
+
+        var (sheetName, result) = chartDoc.GetDataRange();
+        Assert.Equal("My Sheet", sheetName);
+        Assert.True(result.HasValue);
+        var r = result!.Value;
+        Assert.Equal(0, r.StartAddress.Row);
+        Assert.Equal(9, r.EndAddress.Row);
+        Assert.Equal(3, r.EndAddress.Column);
+    }
 }
