@@ -39,11 +39,11 @@ public class TextHighLevelApiTests
 
         // 1. 測試讀取追蹤修訂
         var changes = document.GetTrackedChanges().ToList();
-        var change = changes.FirstOrDefault(c => c.Id == changeId);
+        var change = changes.FirstOrDefault(c => c.RegionId == changeId);
         Assert.NotNull(change);
-        Assert.Equal("insertion", change.ChangeType);
-        Assert.Equal("CustomAuthor", change.Creator);
-        Assert.Equal(targetDate, change.Date);
+        Assert.Equal(OdfChangeType.Insertion, change.ChangeType);
+        Assert.Equal("CustomAuthor", change.Author);
+        Assert.Equal(targetDate, change.ChangedAt);
         Assert.Equal("新增修訂文字內容", change.Content);
 
         // 2. 測試安全處理 DateTime.MinValue 與 DateTime.MaxValue 邊界值
@@ -51,13 +51,13 @@ public class TextHighLevelApiTests
         var maxChangeId = document.AddTrackedChange("insertion", "MaxAuthor", DateTime.MaxValue);
 
         var boundaryChanges = document.GetTrackedChanges().ToList();
-        var minChange = boundaryChanges.FirstOrDefault(c => c.Id == minChangeId);
-        var maxChange = boundaryChanges.FirstOrDefault(c => c.Id == maxChangeId);
+        var minChange = boundaryChanges.FirstOrDefault(c => c.RegionId == minChangeId);
+        var maxChange = boundaryChanges.FirstOrDefault(c => c.RegionId == maxChangeId);
 
         Assert.NotNull(minChange);
-        Assert.Equal(DateTime.MinValue, minChange.Date);
+        Assert.Equal(DateTime.MinValue, minChange.ChangedAt);
         Assert.NotNull(maxChange);
-        Assert.Equal(DateTime.MaxValue, maxChange.Date);
+        Assert.Equal(DateTime.MaxValue, maxChange.ChangedAt);
 
         // 3. 測試接受所有修訂
         document.AcceptAllChanges();
@@ -88,10 +88,10 @@ public class TextHighLevelApiTests
         var changeId = document.AddTrackedChange("deletion", "DeleteAuthor", targetDate, extraContent: deletedPara);
 
         var changes = document.GetTrackedChanges().ToList();
-        var change = changes.FirstOrDefault(c => c.Id == changeId);
+        var change = changes.FirstOrDefault(c => c.RegionId == changeId);
         Assert.NotNull(change);
-        Assert.Equal("deletion", change.ChangeType);
-        Assert.Equal("DeleteAuthor", change.Creator);
+        Assert.Equal(OdfChangeType.Deletion, change.ChangeType);
+        Assert.Equal("DeleteAuthor", change.Author);
         Assert.Equal("被刪除的文字內容", change.Content);
     }
 

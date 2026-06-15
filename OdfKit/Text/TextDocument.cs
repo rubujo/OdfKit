@@ -1165,7 +1165,19 @@ public class TextDocument : OdfDocument
                 content = ExtractTextBetweenMarkers(BodyTextRoot, id!);
             }
 
-            list.Add(new OdfTrackedChange(id!, changeType, creator, date, content));
+            list.Add(new OdfTrackedChange
+            {
+                RegionId = id!,
+                ChangeType = changeType switch
+                {
+                    "deletion" => OdfChangeType.Deletion,
+                    "format-change" => OdfChangeType.FormatChange,
+                    _ => OdfChangeType.Insertion,
+                },
+                Author = creator,
+                ChangedAt = date,
+                Content = content,
+            });
         }
 
         return list;
