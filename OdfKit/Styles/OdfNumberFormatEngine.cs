@@ -19,7 +19,7 @@ public static class OdfNumberFormatEngine
     /// <returns>格式化後的字串。</returns>
     public static string Format(double value, OdfNode numberStyleNode)
     {
-        ArgumentNullException.ThrowIfNull(numberStyleNode);
+        if (numberStyleNode is null) throw new ArgumentNullException(nameof(numberStyleNode));
         string styleName = numberStyleNode.LocalName;
 
         if (styleName == "percentage-style")
@@ -42,7 +42,7 @@ public static class OdfNumberFormatEngine
     /// <returns>格式化後的字串。</returns>
     public static string Format(DateTime value, OdfNode dateStyleNode)
     {
-        ArgumentNullException.ThrowIfNull(dateStyleNode);
+        if (dateStyleNode is null) throw new ArgumentNullException(nameof(dateStyleNode));
         return dateStyleNode.LocalName == "time-style"
             ? FormatTime(value, dateStyleNode)
             : FormatDate(value, dateStyleNode);
@@ -231,7 +231,7 @@ public static class OdfNumberFormatEngine
                     string secStr = longS ? dt.Second.ToString("D2") : dt.Second.ToString();
                     if (dec > 0)
                     {
-                        secStr += "." + (dt.Millisecond / 1000.0).ToString("F" + dec, CultureInfo.InvariantCulture)[2..];
+                        secStr += "." + (dt.Millisecond / 1000.0).ToString("F" + dec, CultureInfo.InvariantCulture).Substring(2);
                     }
                     sb.Append(secStr);
                     break;

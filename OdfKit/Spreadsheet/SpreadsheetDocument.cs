@@ -3486,11 +3486,11 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
             string? cellStyleName = StyleName;
             if (string.IsNullOrEmpty(cellStyleName)) return DisplayText;
 
-            string? dataStyleName = FindDataStyleName(cellStyleName);
+            string? dataStyleName = FindDataStyleName(cellStyleName!);
             if (string.IsNullOrEmpty(dataStyleName)) return DisplayText;
 
-            OdfNode? formatNode = OdfKit.Styles.OdfNumberFormatEngine.FindFormatNode(_doc.ContentDom, dataStyleName)
-                ?? OdfKit.Styles.OdfNumberFormatEngine.FindFormatNode(_doc.StylesDom, dataStyleName);
+            OdfNode? formatNode = OdfKit.Styles.OdfNumberFormatEngine.FindFormatNode(_doc.ContentDom, dataStyleName!)
+                ?? OdfKit.Styles.OdfNumberFormatEngine.FindFormatNode(_doc.StylesDom, dataStyleName!);
             if (formatNode is null) return DisplayText;
 
             return ValueType switch
