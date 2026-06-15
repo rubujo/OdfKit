@@ -328,7 +328,7 @@ namespace OdfKit.Tests
 
             // Test raw < character (not a tag)
             string html1 = "A < B";
-            doc.AddHtmlFragment(p, html1);
+            p.AddHtmlFragment(html1);
             // Let's assert what the text content actually becomes to document it.
             // If the bug is present, "< B" might be lost or mangled. We will output this in our report.
             string text1 = p.TextContent;
@@ -336,13 +336,13 @@ namespace OdfKit.Tests
             // Test raw inequality in statement
             p = doc.AddParagraph();
             string html2 = "if (x < y && y > z)";
-            doc.AddHtmlFragment(p, html2);
+            p.AddHtmlFragment(html2);
             string text2 = p.TextContent;
 
             // Test < B > treated as tag
             p = doc.AddParagraph();
             string html3 = "a < b > c";
-            doc.AddHtmlFragment(p, html3);
+            p.AddHtmlFragment(html3);
             string text3 = p.TextContent;
 
             Trace.WriteLine($"html1: {html1} -> parsed: '{text1}'");
@@ -358,13 +358,13 @@ namespace OdfKit.Tests
 
             // Unclosed <b> tag should format subsequent text as bold but not throw or crash
             string html1 = "Hello <b>world how are you";
-            doc.AddHtmlFragment(p, html1);
+            p.AddHtmlFragment(html1);
             string text1 = p.TextContent;
 
             // Unclosed <a> tag
             p = doc.AddParagraph();
             string html2 = "Click <a href=\"http://test.com\">here for more text";
-            doc.AddHtmlFragment(p, html2);
+            p.AddHtmlFragment(html2);
             string text2 = p.TextContent;
 
             Trace.WriteLine($"unclosed b: {html1} -> parsed: '{text1}'");
@@ -379,13 +379,13 @@ namespace OdfKit.Tests
 
             // Nested script tag bypass
             string html1 = "<script><script>alert(1)</script></script>TextAfter";
-            doc.AddHtmlFragment(p, html1);
+            p.AddHtmlFragment(html1);
             string text1 = p.TextContent;
             
             // Script tag without closing tag
             p = doc.AddParagraph();
             string html2 = "Before <script src=unsafe.js alert(1) After";
-            doc.AddHtmlFragment(p, html2);
+            p.AddHtmlFragment(html2);
             string text2 = p.TextContent;
 
             Trace.WriteLine($"nested script: {html1} -> parsed: '{text1}'");

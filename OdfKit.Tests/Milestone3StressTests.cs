@@ -328,7 +328,7 @@ namespace OdfKit.Tests
                              "<script>var a = 1; console.log(a);</script> and <style>p { color: green; }</style>" +
                              "special &lt;characters&gt; &amp; &quot;quotes&quot;.";
 
-                doc.AddHtmlFragment(p, html);
+                p.AddHtmlFragment(html);
 
                 // Expected final plain text should contain decoded characters and NOT contain script or style block content
                 string plainText = p.TextContent;

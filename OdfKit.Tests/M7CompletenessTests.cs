@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Security;
 using System.Text;
@@ -25,7 +25,7 @@ namespace OdfKit.Tests
                 var p = doc.AddParagraph("Formula paragraph:");
                 
                 string mathMl = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>y</mi><mo>=</mo><mi>x</mi></math>";
-                doc.AddFormula(p, mathMl);
+                p.AddFormula(mathMl);
                 using var saveMs = new MemoryStream();
                 doc.SaveToStream(saveMs);
                 
@@ -73,7 +73,7 @@ namespace OdfKit.Tests
             {
                 var doc = new TextDocument(package);
                 var p = doc.AddParagraph();
-                Assert.Throws<ArgumentException>(() => doc.AddFormula(p, "<math><mi>x</mi></unclosed>"));
+                Assert.Throws<ArgumentException>(() => p.AddFormula("<math><mi>x</mi></unclosed>"));
             }
 
             // 3. Zip Slip Defense
@@ -218,7 +218,7 @@ namespace OdfKit.Tests
 
                 // 1. Ruby Layout
                 var p = doc.AddParagraph();
-                var ruby = doc.AddRuby(p, "漢字", "かんじ");
+                var ruby = p.AddRuby("漢字", "かんじ");
                 Assert.NotNull(ruby);
                 Assert.NotNull(ruby.RubyBaseNode);
                 Assert.NotNull(ruby.RubyTextNode);

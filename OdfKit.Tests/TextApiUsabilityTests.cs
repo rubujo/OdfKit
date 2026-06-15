@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using OdfKit.Compliance;
@@ -124,7 +124,7 @@ public class TextApiUsabilityTests
     {
         using var doc = TextDocument.Create();
         var para = doc.AddParagraph("本文");
-        doc.AddFootnote(para, "1", "這是腳注內容。");
+        para.AddFootnote("1", "這是腳注內容。");
 
         using var ms = new MemoryStream();
         doc.SaveToStream(ms);
@@ -145,7 +145,7 @@ public class TextApiUsabilityTests
     {
         using var doc = TextDocument.Create();
         var para = doc.AddParagraph("本文");
-        doc.AddEndnote(para, "i", "這是尾注內容。");
+        para.AddEndnote("i", "這是尾注內容。");
 
         using var ms = new MemoryStream();
         doc.SaveToStream(ms);

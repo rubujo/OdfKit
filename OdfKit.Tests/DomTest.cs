@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -298,14 +298,14 @@ namespace OdfKit.Tests
 
                 // Add Paragraph and Fields
                 var p = doc.AddParagraph("Some paragraph");
-                doc.AddDateField(p);
-                doc.AddTimeField(p);
-                doc.AddAuthorField(p);
-                doc.AddChapterField(p);
-                doc.AddSequenceField(p, "Illustration", "1");
-                doc.AddReferenceField(p, "ref1");
-                doc.AddVariableSetField(p, "myVar", "100");
-                doc.AddVariableGetField(p, "myVar");
+                p.AddDateField();
+                p.AddTimeField();
+                p.AddAuthorField();
+                p.AddChapterField();
+                p.AddSequenceField("Illustration", "1");
+                p.AddReferenceField("ref1");
+                p.AddVariableSetField("myVar", "100");
+                p.AddVariableGetField("myVar");
 
                 Assert.NotNull(FindDescendant(p.Node, "date", OdfNamespaces.Text));
                 Assert.NotNull(FindDescendant(p.Node, "time", OdfNamespaces.Text));
@@ -337,14 +337,14 @@ namespace OdfKit.Tests
                 Assert.NotNull(FindDescendant(doc.ContentRoot, "table-index", OdfNamespaces.Text));
 
                 // Bookmarks & hyperlink & Ruby & Image
-                doc.AddBookmark(p, "bookmark1");
-                doc.AddReferenceMark(p, "refmark1");
-                doc.AddHyperlink(p, "http://example.com", "link");
+                p.AddBookmark("bookmark1");
+                p.AddReferenceMark("refmark1");
+                p.AddHyperlink("http://example.com", "link");
 
-                var img = doc.AddImage(p, "Pictures/test.png", "5cm", "4cm", "img1");
+                var img = p.AddImage("Pictures/test.png", "5cm", "4cm", "img1");
                 Assert.NotNull(img);
 
-                doc.AddRuby(p, "base", "ruby");
+                p.AddRuby("base", "ruby");
 
                 var bmark = FindDescendant(p.Node, "bookmark", OdfNamespaces.Text);
                 Assert.NotNull(bmark);
@@ -431,7 +431,7 @@ namespace OdfKit.Tests
             {
                 var doc = new TextDocument(package);
                 var p = doc.AddParagraph("Formula paragraph:");
-                doc.AddFormula(p, "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>x</mi></math>");
+                p.AddFormula("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>x</mi></math>");
                 doc.AddTableOfContents();
                 doc.Save();
             }

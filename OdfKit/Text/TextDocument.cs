@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -197,7 +197,7 @@ public class TextDocument : OdfDocument
     /// 在指定的段落中新增日期欄位。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
-    public void AddDateField(OdfParagraph paragraph)
+    internal void AddDateField(OdfParagraph paragraph)
     {
         var fNode = OdfNodeFactory.CreateElement("date", OdfNamespaces.Text, "text");
         paragraph.Node.AppendChild(fNode);
@@ -207,7 +207,7 @@ public class TextDocument : OdfDocument
     /// 在指定的段落中新增時間欄位。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
-    public void AddTimeField(OdfParagraph paragraph)
+    internal void AddTimeField(OdfParagraph paragraph)
     {
         var fNode = OdfNodeFactory.CreateElement("time", OdfNamespaces.Text, "text");
         paragraph.Node.AppendChild(fNode);
@@ -217,7 +217,7 @@ public class TextDocument : OdfDocument
     /// 在指定的段落中新增作者名稱欄位。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
-    public void AddAuthorField(OdfParagraph paragraph)
+    internal void AddAuthorField(OdfParagraph paragraph)
     {
         var fNode = OdfNodeFactory.CreateElement("author-name", OdfNamespaces.Text, "text");
         paragraph.Node.AppendChild(fNode);
@@ -227,7 +227,7 @@ public class TextDocument : OdfDocument
     /// 在指定的段落中新增章節欄位。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
-    public void AddChapterField(OdfParagraph paragraph)
+    internal void AddChapterField(OdfParagraph paragraph)
     {
         var fNode = OdfNodeFactory.CreateElement("chapter", OdfNamespaces.Text, "text");
         paragraph.Node.AppendChild(fNode);
@@ -239,7 +239,7 @@ public class TextDocument : OdfDocument
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
     /// <param name="name">序號欄位的名稱</param>
     /// <param name="numFormat">序號的編號格式</param>
-    public void AddSequenceField(OdfParagraph paragraph, string name, string numFormat = "1")
+    internal void AddSequenceField(OdfParagraph paragraph, string name, string numFormat = "1")
     {
         var fNode = OdfNodeFactory.CreateElement("sequence", OdfNamespaces.Text, "text");
         fNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
@@ -252,7 +252,7 @@ public class TextDocument : OdfDocument
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
     /// <param name="refName">要參考的項目名稱</param>
-    public void AddReferenceField(OdfParagraph paragraph, string refName)
+    internal void AddReferenceField(OdfParagraph paragraph, string refName)
     {
         var fNode = OdfNodeFactory.CreateElement("reference-ref", OdfNamespaces.Text, "text");
         fNode.SetAttribute("ref-name", OdfNamespaces.Text, refName, "text");
@@ -265,7 +265,7 @@ public class TextDocument : OdfDocument
     /// <param name="paragraph">要新增欄位的段落執行個體。</param>
     /// <param name="bookmarkName">要參照的書籤名稱。</param>
     /// <param name="referenceFormat">參照格式，預設為 "text"。</param>
-    public void AddBookmarkReferenceField(OdfParagraph paragraph, string bookmarkName, string referenceFormat = "text")
+    internal void AddBookmarkReferenceField(OdfParagraph paragraph, string bookmarkName, string referenceFormat = "text")
     {
         if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
         if (string.IsNullOrEmpty(bookmarkName)) throw new ArgumentException("書籤名稱不可為空。", nameof(bookmarkName));
@@ -284,7 +284,7 @@ public class TextDocument : OdfDocument
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
     /// <param name="name">變數的名稱</param>
     /// <param name="value">變數的值</param>
-    public void AddVariableSetField(OdfParagraph paragraph, string name, string value)
+    internal void AddVariableSetField(OdfParagraph paragraph, string name, string value)
     {
         var fNode = OdfNodeFactory.CreateElement("variable-set", OdfNamespaces.Text, "text");
         fNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
@@ -297,7 +297,7 @@ public class TextDocument : OdfDocument
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
     /// <param name="name">變數的名稱</param>
-    public void AddVariableGetField(OdfParagraph paragraph, string name)
+    internal void AddVariableGetField(OdfParagraph paragraph, string name)
     {
         var fNode = OdfNodeFactory.CreateElement("variable-get", OdfNamespaces.Text, "text");
         fNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
@@ -310,7 +310,7 @@ public class TextDocument : OdfDocument
     /// <param name="paragraph">要插入腳注的段落。</param>
     /// <param name="citation">腳注引用標記，例如 "1" 或 "*"。</param>
     /// <param name="bodyText">腳注本文內容。</param>
-    public void AddFootnote(OdfParagraph paragraph, string citation, string bodyText)
+    internal void AddFootnote(OdfParagraph paragraph, string citation, string bodyText)
     {
         if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
         if (citation is null) throw new ArgumentNullException(nameof(citation));
@@ -324,7 +324,7 @@ public class TextDocument : OdfDocument
     /// <param name="paragraph">要插入尾注的段落。</param>
     /// <param name="citation">尾注引用標記，例如 "i" 或 "a"。</param>
     /// <param name="bodyText">尾注本文內容。</param>
-    public void AddEndnote(OdfParagraph paragraph, string citation, string bodyText)
+    internal void AddEndnote(OdfParagraph paragraph, string citation, string bodyText)
     {
         if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
         if (citation is null) throw new ArgumentNullException(nameof(citation));
@@ -435,7 +435,7 @@ public class TextDocument : OdfDocument
     /// <param name="key1">主要鍵值</param>
     /// <param name="key2">次要鍵值</param>
     /// <returns>建立的字母索引標記物件</returns>
-    public OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(OdfParagraph paragraph, string stringValue, string? key1 = null, string? key2 = null)
+    internal OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(OdfParagraph paragraph, string stringValue, string? key1 = null, string? key2 = null)
     {
         var markNode = OdfNodeFactory.CreateElement("alphabetical-index-mark", OdfNamespaces.Text, "text");
         markNode.SetAttribute("string-value", OdfNamespaces.Text, stringValue, "text");
@@ -456,7 +456,7 @@ public class TextDocument : OdfDocument
     /// <param name="title">文獻標題</param>
     /// <param name="year">出版年份</param>
     /// <returns>建立的文獻標記物件</returns>
-    public OdfBibliographyMark AddBibliographyMark(OdfParagraph paragraph, string identifier, string bibliographyType, string author, string title, string year)
+    internal OdfBibliographyMark AddBibliographyMark(OdfParagraph paragraph, string identifier, string bibliographyType, string author, string title, string year)
     {
         var markNode = OdfNodeFactory.CreateElement("bibliography-mark", OdfNamespaces.Text, "text");
         markNode.SetAttribute("identifier", OdfNamespaces.Text, identifier, "text");
@@ -487,7 +487,7 @@ public class TextDocument : OdfDocument
     /// </summary>
     /// <param name="paragraph">目標段落</param>
     /// <param name="name">書籤名稱</param>
-    public void AddBookmark(OdfParagraph paragraph, string name)
+    internal void AddBookmark(OdfParagraph paragraph, string name)
     {
         var bNode = OdfNodeFactory.CreateElement("bookmark", OdfNamespaces.Text, "text");
         bNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
@@ -499,7 +499,7 @@ public class TextDocument : OdfDocument
     /// </summary>
     /// <param name="paragraph">目標段落</param>
     /// <param name="name">參考標記名稱</param>
-    public void AddReferenceMark(OdfParagraph paragraph, string name)
+    internal void AddReferenceMark(OdfParagraph paragraph, string name)
     {
         var rNode = OdfNodeFactory.CreateElement("reference-mark", OdfNamespaces.Text, "text");
         rNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
@@ -512,7 +512,7 @@ public class TextDocument : OdfDocument
     /// <param name="paragraph">目標段落</param>
     /// <param name="url">超連結網址</param>
     /// <param name="text">連結顯示文字</param>
-    public void AddHyperlink(OdfParagraph paragraph, string url, string text)
+    internal void AddHyperlink(OdfParagraph paragraph, string url, string text)
     {
         var aNode = OdfNodeFactory.CreateElement("a", OdfNamespaces.Text, "text");
         aNode.SetAttribute("href", OdfNamespaces.XLink, url, "xlink");
@@ -529,7 +529,7 @@ public class TextDocument : OdfDocument
     /// <param name="height">圖片高度</param>
     /// <param name="name">圖片名稱</param>
     /// <returns>新建立的圖片物件</returns>
-    public OdfImage AddImage(OdfParagraph paragraph, string packagePath, OdfLength width, OdfLength height, string? name = null)
+    internal OdfImage AddImage(OdfParagraph paragraph, string packagePath, OdfLength width, OdfLength height, string? name = null)
     {
         var frameNode = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
         if (name is not null)
@@ -559,7 +559,7 @@ public class TextDocument : OdfDocument
     /// <param name="baseText">基礎文字</param>
     /// <param name="rubyText">注音（旁註）文字</param>
     /// <returns>新建立的旁註標記物件</returns>
-    public OdfRuby AddRuby(OdfParagraph paragraph, string baseText, string rubyText)
+    internal OdfRuby AddRuby(OdfParagraph paragraph, string baseText, string rubyText)
     {
         var rubyNode = OdfNodeFactory.CreateElement("ruby", OdfNamespaces.Text, "text");
         
@@ -789,7 +789,7 @@ public class TextDocument : OdfDocument
     /// </summary>
     /// <param name="paragraph">要插入公式的段落</param>
     /// <param name="mathMlXmlString">MathML 結構的 XML 字串內容</param>
-    public void AddFormula(OdfParagraph paragraph, string mathMlXmlString)
+    internal void AddFormula(OdfParagraph paragraph, string mathMlXmlString)
     {
         if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
         if (string.IsNullOrWhiteSpace(mathMlXmlString)) throw new ArgumentException("MathML XML content cannot be empty.", nameof(mathMlXmlString));
@@ -852,7 +852,7 @@ public class TextDocument : OdfDocument
     /// </summary>
     /// <param name="paragraph">要新增註解的段落</param>
     /// <param name="comment">註解物件執行個體</param>
-    public void AddComment(OdfParagraph paragraph, OdfComment comment)
+    internal void AddComment(OdfParagraph paragraph, OdfComment comment)
     {
         if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
         if (comment is null) throw new ArgumentNullException(nameof(comment));
@@ -915,7 +915,7 @@ public class TextDocument : OdfDocument
     /// 在指定的段落中新增頁碼欄位。
     /// </summary>
     /// <param name="paragraph">目標段落</param>
-    public void AddPageNumberField(OdfParagraph paragraph)
+    internal void AddPageNumberField(OdfParagraph paragraph)
     {
         var fNode = new OdfNode(OdfNodeType.Element, "page-number", OdfNamespaces.Text, "text");
         fNode.SetAttribute("select-page", OdfNamespaces.Text, "current", "text");
@@ -926,7 +926,7 @@ public class TextDocument : OdfDocument
     /// 在指定的段落中新增總頁數欄位。
     /// </summary>
     /// <param name="paragraph">目標段落</param>
-    public void AddPageCountField(OdfParagraph paragraph)
+    internal void AddPageCountField(OdfParagraph paragraph)
     {
         var fNode = new OdfNode(OdfNodeType.Element, "page-count", OdfNamespaces.Text, "text");
         fNode.SetAttribute("num-format", OdfNamespaces.Style, "1", "style");
@@ -1765,7 +1765,7 @@ public class TextDocument : OdfDocument
     /// </summary>
     /// <param name="paragraph">要加入 HTML 內容的段落</param>
     /// <param name="html">要解析的 HTML 字串片段</param>
-    public void AddHtmlFragment(OdfParagraph paragraph, string html)
+    internal void AddHtmlFragment(OdfParagraph paragraph, string html)
     {
         if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
         if (string.IsNullOrWhiteSpace(html)) return;
@@ -3195,6 +3195,111 @@ public class OdfParagraph
     {
         Doc.DeleteNode(Node);
     }
+
+    /// <summary>在段落中新增日期欄位。</summary>
+    public void AddDateField() => Doc.AddDateField(this);
+
+    /// <summary>在段落中新增時間欄位。</summary>
+    public void AddTimeField() => Doc.AddTimeField(this);
+
+    /// <summary>在段落中新增作者名稱欄位。</summary>
+    public void AddAuthorField() => Doc.AddAuthorField(this);
+
+    /// <summary>在段落中新增章節欄位。</summary>
+    public void AddChapterField() => Doc.AddChapterField(this);
+
+    /// <summary>在段落中新增序號欄位。</summary>
+    /// <param name="name">序號欄位名稱</param>
+    /// <param name="numFormat">編號格式</param>
+    public void AddSequenceField(string name, string numFormat = "1") => Doc.AddSequenceField(this, name, numFormat);
+
+    /// <summary>在段落中新增參考項目欄位。</summary>
+    /// <param name="refName">參考項目名稱</param>
+    public void AddReferenceField(string refName) => Doc.AddReferenceField(this, refName);
+
+    /// <summary>在段落中新增書籤參照欄位。</summary>
+    /// <param name="bookmarkName">書籤名稱</param>
+    /// <param name="referenceFormat">參照格式，預設為 "text"</param>
+    public void AddBookmarkReferenceField(string bookmarkName, string referenceFormat = "text") => Doc.AddBookmarkReferenceField(this, bookmarkName, referenceFormat);
+
+    /// <summary>在段落中設定變數欄位值。</summary>
+    /// <param name="name">變數名稱</param>
+    /// <param name="value">變數值</param>
+    public void AddVariableSetField(string name, string value) => Doc.AddVariableSetField(this, name, value);
+
+    /// <summary>在段落中取得變數欄位值。</summary>
+    /// <param name="name">變數名稱</param>
+    public void AddVariableGetField(string name) => Doc.AddVariableGetField(this, name);
+
+    /// <summary>在段落中插入腳注。</summary>
+    /// <param name="citation">腳注引用標記</param>
+    /// <param name="bodyText">腳注本文內容</param>
+    public void AddFootnote(string citation, string bodyText) => Doc.AddFootnote(this, citation, bodyText);
+
+    /// <summary>在段落中插入尾注。</summary>
+    /// <param name="citation">尾注引用標記</param>
+    /// <param name="bodyText">尾注本文內容</param>
+    public void AddEndnote(string citation, string bodyText) => Doc.AddEndnote(this, citation, bodyText);
+
+    /// <summary>在段落中新增字母索引標記。</summary>
+    /// <param name="stringValue">索引字串值</param>
+    /// <param name="key1">主要鍵值</param>
+    /// <param name="key2">次要鍵值</param>
+    public OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(string stringValue, string? key1 = null, string? key2 = null)
+        => Doc.AddAlphabeticalIndexMark(this, stringValue, key1, key2);
+
+    /// <summary>在段落中新增文獻標記。</summary>
+    /// <param name="identifier">文獻標記識別碼</param>
+    /// <param name="bibliographyType">文獻類型</param>
+    /// <param name="author">文獻作者</param>
+    /// <param name="title">文獻標題</param>
+    /// <param name="year">出版年份</param>
+    public OdfBibliographyMark AddBibliographyMark(string identifier, string bibliographyType, string author, string title, string year)
+        => Doc.AddBibliographyMark(this, identifier, bibliographyType, author, title, year);
+
+    /// <summary>在段落中新增書籤。</summary>
+    /// <param name="name">書籤名稱</param>
+    public void AddBookmark(string name) => Doc.AddBookmark(this, name);
+
+    /// <summary>在段落中新增參考標記。</summary>
+    /// <param name="name">參考標記名稱</param>
+    public void AddReferenceMark(string name) => Doc.AddReferenceMark(this, name);
+
+    /// <summary>在段落中新增超連結。</summary>
+    /// <param name="url">目標 URL</param>
+    /// <param name="text">顯示文字</param>
+    public void AddHyperlink(string url, string text) => Doc.AddHyperlink(this, url, text);
+
+    /// <summary>在段落中新增圖片。</summary>
+    /// <param name="packagePath">圖片在封裝包內的路徑</param>
+    /// <param name="width">圖片寬度</param>
+    /// <param name="height">圖片高度</param>
+    /// <param name="name">圖片名稱</param>
+    public OdfImage AddImage(string packagePath, OdfLength width, OdfLength height, string? name = null)
+        => Doc.AddImage(this, packagePath, width, height, name);
+
+    /// <summary>在段落中新增旁註標記（注音）。</summary>
+    /// <param name="baseText">基礎文字</param>
+    /// <param name="rubyText">注音文字</param>
+    public OdfRuby AddRuby(string baseText, string rubyText) => Doc.AddRuby(this, baseText, rubyText);
+
+    /// <summary>在段落中新增公式物件（MathML）。</summary>
+    /// <param name="mathMlXmlString">MathML XML 字串</param>
+    public void AddFormula(string mathMlXmlString) => Doc.AddFormula(this, mathMlXmlString);
+
+    /// <summary>在段落中新增批注。</summary>
+    /// <param name="comment">批注物件</param>
+    public void AddComment(OdfComment comment) => Doc.AddComment(this, comment);
+
+    /// <summary>在段落中解析並新增 HTML 片段。</summary>
+    /// <param name="html">HTML 字串片段</param>
+    public void AddHtmlFragment(string html) => Doc.AddHtmlFragment(this, html);
+
+    /// <summary>在段落中新增頁碼欄位。</summary>
+    public void AddPageNumberField() => Doc.AddPageNumberField(this);
+
+    /// <summary>在段落中新增總頁數欄位。</summary>
+    public void AddPageCountField() => Doc.AddPageCountField(this);
 }
 
 /// <summary>

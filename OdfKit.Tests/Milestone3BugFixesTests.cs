@@ -88,7 +88,7 @@ namespace OdfKit.Tests
                 "<STYLE type=\"text/css\">p { margin: 0; }</STYLE>" +
                 "World &lt;&gt;&amp;&quot;&apos;&#39;&#x27;";
 
-            doc.AddHtmlFragment(p, htmlWithScriptsAndStyles);
+            p.AddHtmlFragment(htmlWithScriptsAndStyles);
 
             // Reconstruct plain text to verify scripts and styles are gone, and entities are decoded
             string plainText = p.Node.TextContent;

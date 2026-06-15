@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -259,7 +259,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
-            doc.AddRuby(p, "振", "しん");
+            p.AddRuby("振", "しん");
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
@@ -275,7 +275,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
-            doc.AddRuby(p, "東", "とう");
+            p.AddRuby("東", "とう");
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
@@ -363,7 +363,7 @@ namespace OdfKit.Tests
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
             const string mathXml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></math>";
-            doc.AddFormula(p, mathXml);
+            p.AddFormula(mathXml);
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
@@ -378,7 +378,7 @@ namespace OdfKit.Tests
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
             const string mathXml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow><mi>a</mi><mo>=</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup></mrow></msqrt></mrow></math>";
-            doc.AddFormula(p, mathXml);
+            p.AddFormula(mathXml);
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
@@ -406,7 +406,7 @@ namespace OdfKit.Tests
             masterPage.AppendChild(header);
 
             var paragraph = new OdfParagraph(p, doc);
-            doc.AddFormula(paragraph, "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>π</mi></math>");
+            paragraph.AddFormula("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>π</mi></math>");
             doc.Save();
 
             var reloaded = RoundTrip(doc, pDoc => new TextDocument(pDoc));
@@ -421,7 +421,7 @@ namespace OdfKit.Tests
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
             const string mathXml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mo>&amp;</mo><mo>&lt;</mo><mo>&gt;</mo></math>";
-            doc.AddFormula(p, mathXml);
+            p.AddFormula(mathXml);
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
@@ -439,7 +439,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
-            doc.AddFormula(p, "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></math>");
+            p.AddFormula("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></math>");
             doc.Save();
 
             var reloaded = RoundTrip(doc, pDoc => new TextDocument(pDoc));
@@ -1411,7 +1411,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
-            doc.AddRuby(p, "", "");
+            p.AddRuby("", "");
             doc.Save();
 
             var reloaded = RoundTrip(doc, pDoc => new TextDocument(pDoc));
@@ -1453,7 +1453,7 @@ namespace OdfKit.Tests
             }
             mathXmlBuilder.Append("<mi>z</mi></mfrac></math>");
 
-            doc.AddFormula(p, mathXmlBuilder.ToString());
+            p.AddFormula(mathXmlBuilder.ToString());
             doc.Save();
 
             var reloaded = RoundTrip(doc, pDoc => new TextDocument(pDoc));
@@ -1468,7 +1468,7 @@ namespace OdfKit.Tests
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
             // XML parse error or invalid string structure
-            Assert.ThrowsAny<Exception>(() => doc.AddFormula(p, "<math><mi>x</mi>"));
+            Assert.ThrowsAny<Exception>(() => p.AddFormula("<math><mi>x</mi>"));
         }
 
         [Fact]
@@ -1721,7 +1721,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
-            doc.AddRuby(p, "漢", "かん");
+            p.AddRuby("漢", "かん");
 
             var rubyTextNode = p.Node.Descendants().First(d => d.LocalName == "ruby-text");
             var start = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
@@ -1799,10 +1799,10 @@ namespace OdfKit.Tests
             doc.AddTableOfContents(); // TOC
 
             var p1 = doc.AddParagraph("Header Title");
-            doc.AddRuby(p1, "大", "たい"); // Ruby CJK annotation
+            p1.AddRuby("大", "たい"); // Ruby CJK annotation
 
             var p2 = doc.AddParagraph();
-            doc.AddFormula(p2, "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>x</mi></math>"); // MathML object
+            p2.AddFormula("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>x</mi></math>"); // MathML object
 
             doc.Save();
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -78,8 +78,8 @@ namespace OdfKit.Tests
                 var p = doc.AddParagraph("Intro");
                 
                 doc.AddTableOfContents();
-                doc.AddPageNumberField(p);
-                doc.AddPageCountField(p);
+                p.AddPageNumberField();
+                p.AddPageCountField();
                 
                 doc.Save();
             }
@@ -189,7 +189,7 @@ namespace OdfKit.Tests
                 var p = doc.AddParagraph();
                 
                 string html = "This is <b>bold</b> and <i>italic</i> and <u>underline</u> and <a href=\"http://example.com\">a link</a>.";
-                doc.AddHtmlFragment(p, html);
+                p.AddHtmlFragment(html);
 
                 // Verify runs
                 var spans = new List<OdfNode>();
@@ -232,7 +232,7 @@ namespace OdfKit.Tests
                 var p = doc.AddParagraph();
                 
                 string html = "This is <b >bold</b > and <span style=\"font-weight: bold; font-style: italic;\">styled span</span> and <i   >italic</i   > and <em class=\"highlighted\">emphasized</em><br />new line.";
-                doc.AddHtmlFragment(p, html);
+                p.AddHtmlFragment(html);
 
                 // Verify spans
                 var spans = new List<OdfNode>();

@@ -1,4 +1,4 @@
-using OdfKit.Core;
+﻿using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Export;
 using OdfKit.Text;
@@ -58,7 +58,7 @@ public class HtmlExportTests
     {
         using var doc = TextDocument.Create();
         var para = doc.AddParagraph("本文內容");
-        doc.AddFootnote(para, "1", "腳注說明。");
+        para.AddFootnote("1", "腳注說明。");
 
         string html = OdfHtmlExporter.Export(doc);
 

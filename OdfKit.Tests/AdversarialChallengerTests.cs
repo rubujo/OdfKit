@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -155,7 +155,7 @@ namespace OdfKit.Tests
 
             // 1. Unclosed tags should apply styles to end of text
             string html1 = "Plain <b>Bold <i>BoldItalic";
-            doc.AddHtmlFragment(p, html1);
+            p.AddHtmlFragment(html1);
 
             // Verify children:
             // "Plain " (text node, no style)
@@ -169,7 +169,7 @@ namespace OdfKit.Tests
             // 2. Extra closing tags should be ignored safely
             p = doc.AddParagraph();
             string html2 = "Plain </b>Bold</i> Extra</i>";
-            doc.AddHtmlFragment(p, html2);
+            p.AddHtmlFragment(html2);
             Assert.Single(p.Node.Children);
             Assert.Equal("Plain Bold Extra", p.Node.TextContent);
         }
@@ -186,7 +186,7 @@ namespace OdfKit.Tests
             // Since spanStack accumulates styles additively, the inner normal span
             // will still inherit bold style from outer stack frame.
             string html = "<span style=\"font-weight: bold;\">OuterBold <span style=\"font-weight: normal;\">InnerNormal</span> StillBold</span>";
-            doc.AddHtmlFragment(p, html);
+            p.AddHtmlFragment(html);
 
             // Total children:
             // "OuterBold " (bold span)
@@ -219,7 +219,7 @@ namespace OdfKit.Tests
 
             // A less-than sign '<' that is not part of a tag (e.g., "A < B")
             string html = "A < B";
-            doc.AddHtmlFragment(p, html);
+            p.AddHtmlFragment(html);
 
             // Verify that the '<' is preserved!
             string plainText = p.Node.TextContent;
@@ -238,7 +238,7 @@ namespace OdfKit.Tests
 
             // Unclosed script tag:
             string html = "Visible text <script>var x = 1; More text that is lost";
-            doc.AddHtmlFragment(p, html);
+            p.AddHtmlFragment(html);
 
             string plainText = p.Node.TextContent;
             
@@ -256,7 +256,7 @@ namespace OdfKit.Tests
 
             // A script block wrapped in an HTML comment
             string html = "Hello <!-- <script>alert(1)</script> --> World";
-            doc.AddHtmlFragment(p, html);
+            p.AddHtmlFragment(html);
 
             string plainText = p.Node.TextContent;
 
@@ -274,7 +274,7 @@ namespace OdfKit.Tests
 
             // Nested script tag (lazy regex match will stop at the first closing tag)
             string html = "Hello <script>console.log(\"<script>alert(1)</script>\")</script> World";
-            doc.AddHtmlFragment(p, html);
+            p.AddHtmlFragment(html);
 
             string plainText = p.Node.TextContent;
 
@@ -296,7 +296,7 @@ namespace OdfKit.Tests
 
             // Script/style filter with mixed case
             string html = "Text <ScRiPt>alert(1)</sCrIpT> and <StYlE>body{}</sTyLe> End";
-            doc.AddHtmlFragment(p, html);
+            p.AddHtmlFragment(html);
 
             string plainText = p.Node.TextContent;
             Assert.Equal("Text  and  End", plainText);
@@ -319,7 +319,7 @@ namespace OdfKit.Tests
             // &amp -> &
             // &invalid; -> &invalid;
             string html = "A &apos; B &APOS; C &aPoS; D &#39; E &#x27; F &#X27; G &amp H &invalid; I";
-            doc.AddHtmlFragment(p, html);
+            p.AddHtmlFragment(html);
 
             string plainText = p.Node.TextContent;
 
@@ -345,7 +345,7 @@ namespace OdfKit.Tests
 
             // Nested tags of same type
             string html = "<b>Outer <b>Inner</b> OuterAgain</b>";
-            doc.AddHtmlFragment(p, html);
+            p.AddHtmlFragment(html);
 
             // Because the parser uses `isBold = !isClosing`, the first </b> sets `isBold = false`.
             // So "OuterAgain" will NOT be bold in the parser, which is a bug/limitation!
@@ -405,7 +405,7 @@ namespace OdfKit.Tests
             var p = doc.AddParagraph();
 
             string html = "<span style  =  '  FONT-WEIGHT  :  BOLD  ;  FONT-STYLE  :  ITALIC  ;  TEXT-DECORATION  :  UNDERLINE  ' >Formatted Text</span>";
-            doc.AddHtmlFragment(p, html);
+            p.AddHtmlFragment(html);
 
             // Verify that the parser correctly extracts bold, italic, and underline despite whitespace and uppercase.
             Assert.Single(p.Node.Children);
