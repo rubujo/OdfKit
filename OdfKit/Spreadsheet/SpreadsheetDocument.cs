@@ -2247,9 +2247,9 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     }
 
     /// <summary>
-    /// 取得或設定儲存格的原始數值或內容（字串格式）。
+    /// 取得或設定儲存格的原始數值（office:value 屬性，字串格式）。
     /// </summary>
-    public string Value
+    public string RawValue
     {
         get => Node.GetAttribute("value", OdfNamespaces.Office) ?? string.Empty;
         set => Node.SetAttribute("value", OdfNamespaces.Office, value, "office");
@@ -2264,15 +2264,15 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
         {
             return ValueType switch
             {
-                "float" => double.TryParse(Value, NumberStyles.Float, CultureInfo.InvariantCulture, out double number)
+                "float" => double.TryParse(RawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out double number)
                     ? number
                     : null,
                 "boolean" => bool.TryParse(Node.GetAttribute("boolean-value", OdfNamespaces.Office), out bool flag)
                     ? flag
                     : null,
                 "date" => Node.GetAttribute("date-value", OdfNamespaces.Office),
-                "string" => TextContent,
-                _ => string.IsNullOrEmpty(TextContent) ? null : TextContent
+                "string" => DisplayText,
+                _ => string.IsNullOrEmpty(DisplayText) ? null : DisplayText
             };
         }
         set
@@ -2321,9 +2321,9 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     }
 
     /// <summary>
-    /// 取得或設定儲存格顯示的文字內容。
+    /// 取得或設定儲存格顯示的文字內容（text:p 子節點的純文字）。
     /// </summary>
-    public string TextContent
+    public string DisplayText
     {
         get
         {
@@ -2343,6 +2343,18 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     }
 
     /// <summary>
+    /// 以指定型別 <typeparamref name="T"/> 取得儲存格值；轉換失敗時回傳預設值。
+    /// </summary>
+    public T? GetValue<T>()
+    {
+        object? val = CellValue;
+        if (val is null) return default;
+        if (val is T typed) return typed;
+        try { return (T)Convert.ChangeType(val, typeof(T), CultureInfo.InvariantCulture); }
+        catch { return default; }
+    }
+
+    /// <summary>
     /// 取得或設定儲存格的公式。
     /// </summary>
     public string Formula
@@ -2358,8 +2370,8 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     public void SetValue(double val)
     {
         ValueType = "float";
-        Value = val.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        TextContent = val.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        RawValue = val.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        DisplayText = val.ToString(System.Globalization.CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -2370,7 +2382,7 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     {
         ValueType = "boolean";
         Node.SetAttribute("boolean-value", OdfNamespaces.Office, val ? "true" : "false", "office");
-        TextContent = val ? "TRUE" : "FALSE";
+        DisplayText = val ? "TRUE" : "FALSE";
     }
 
     /// <summary>
@@ -2395,7 +2407,7 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
                 : date.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
         }
         Node.SetAttribute("date-value", OdfNamespaces.Office, isoDate, "office");
-        TextContent = isoDate;
+        DisplayText = isoDate;
     }
 
     /// <summary>
@@ -2405,7 +2417,7 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     public void SetValue(string text)
     {
         ValueType = "string";
-        TextContent = text;
+        DisplayText = text;
     }
 
     private void ClearValue()
@@ -2414,7 +2426,7 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
         Node.RemoveAttribute("value", OdfNamespaces.Office);
         Node.RemoveAttribute("boolean-value", OdfNamespaces.Office);
         Node.RemoveAttribute("date-value", OdfNamespaces.Office);
-        TextContent = string.Empty;
+        DisplayText = string.Empty;
     }
 
     private void SetCellTextContent(string text)

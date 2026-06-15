@@ -71,7 +71,7 @@ namespace OdfKit.Tests
                 Assert.Equal("application/vnd.oasis.opendocument.spreadsheet-template", package.MimeType);
                 var doc = new SpreadsheetDocument(package);
                 var sheet = doc.AddSheet("Sheet1");
-                sheet.GetCell(0, 0).Value = "Value";
+                sheet.GetCell(0, 0).RawValue = "Value";
                 doc.Save();
             }
 
@@ -953,11 +953,11 @@ namespace OdfKit.Tests
             {
                 var doc = new SpreadsheetDocument(package);
                 var sheet = doc.AddSheet("Template Grid");
-                sheet.GetCell(0, 0).Value = "ID";
-                sheet.GetCell(0, 1).Value = "Value";
+                sheet.GetCell(0, 0).RawValue = "ID";
+                sheet.GetCell(0, 1).RawValue = "Value";
                 // Let's create cells 1,0 and 1,1
-                sheet.GetCell(1, 0).Value = "";
-                sheet.GetCell(1, 1).Value = "";
+                sheet.GetCell(1, 0).RawValue = "";
+                sheet.GetCell(1, 1).RawValue = "";
                 doc.Save();
             }
 
@@ -970,8 +970,8 @@ namespace OdfKit.Tests
                 var doc = new SpreadsheetDocument(package);
                 var sheet = doc.GetSheet("Template Grid");
                 Assert.NotNull(sheet);
-                sheet.GetCell(1, 0).Value = "1";
-                sheet.GetCell(1, 1).Value = "100.25";
+                sheet.GetCell(1, 0).RawValue = "1";
+                sheet.GetCell(1, 1).RawValue = "100.25";
                 doc.Save();
             }
 
@@ -981,8 +981,8 @@ namespace OdfKit.Tests
                 var doc = new SpreadsheetDocument(packageRead);
                 var sheet = doc.GetSheet("Template Grid");
                 Assert.NotNull(sheet);
-                Assert.Equal("1", sheet.GetCell(1, 0).Value);
-                Assert.Equal("100.25", sheet.GetCell(1, 1).Value);
+                Assert.Equal("1", sheet.GetCell(1, 0).RawValue);
+                Assert.Equal("100.25", sheet.GetCell(1, 1).RawValue);
             }
         }
 

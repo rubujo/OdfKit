@@ -336,25 +336,15 @@ namespace OdfKit.Tests
                 Assert.NotNull(FindDescendant(doc.ContentRoot, "bibliography", OdfNamespaces.Text));
                 Assert.NotNull(FindDescendant(doc.ContentRoot, "table-index", OdfNamespaces.Text));
 
-                // Comments & bookmarks & hyperlink & Ruby & Image
-                doc.AddCommentStart(p, "comment1");
-                doc.AddCommentEnd(p, "comment1");
+                // Bookmarks & hyperlink & Ruby & Image
                 doc.AddBookmark(p, "bookmark1");
                 doc.AddReferenceMark(p, "refmark1");
                 doc.AddHyperlink(p, "http://example.com", "link");
-                
+
                 var img = doc.AddImage(p, "Pictures/test.png", "5cm", "4cm", "img1");
                 Assert.NotNull(img);
-                
+
                 doc.AddRuby(p, "base", "ruby");
-
-                var annStart = FindDescendant(p.Node, "annotation-start", OdfNamespaces.Office);
-                Assert.NotNull(annStart);
-                Assert.Equal("comment1", annStart.GetAttribute("name", OdfNamespaces.Office));
-
-                var annEnd = FindDescendant(p.Node, "annotation-end", OdfNamespaces.Office);
-                Assert.NotNull(annEnd);
-                Assert.Equal("comment1", annEnd.GetAttribute("name", OdfNamespaces.Office));
 
                 var bmark = FindDescendant(p.Node, "bookmark", OdfNamespaces.Text);
                 Assert.NotNull(bmark);

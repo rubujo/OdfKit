@@ -409,8 +409,8 @@ namespace OdfKit.Tests
                 
                 var cell = sheet.GetCell("A1");
                 cell.SetValue("Hello\nWorld\tWide");
-                // TextContent should preserve formatting and trigger wrap option
-                Assert.Contains("\n", cell.TextContent);
+                // DisplayText should preserve formatting and trigger wrap option
+                Assert.Contains("\n", cell.DisplayText);
                 
                 var range = OdfCellRange.ParseExcel("A1:A5");
                 sheet.AddConditionalFormat(range, "cell-content() > 5", "MyStyle");
@@ -477,13 +477,13 @@ namespace OdfKit.Tests
                 // Row 0 Col 0
                 var a1 = sheet.GetCell(0, 0);
                 Assert.Equal("string", a1.ValueType);
-                Assert.Equal("StringValue", a1.TextContent);
+                Assert.Equal("StringValue", a1.DisplayText);
 
                 // Row 0 Col 1
                 var b1 = sheet.GetCell(0, 1);
                 Assert.Equal("float", b1.ValueType);
-                Assert.Equal("123.45", b1.Value);
-                Assert.Equal("123.45", b1.TextContent);
+                Assert.Equal("123.45", b1.RawValue);
+                Assert.Equal("123.45", b1.DisplayText);
 
                 // Row 1 Col 0
                 var a2 = sheet.GetCell(1, 0);
@@ -494,7 +494,7 @@ namespace OdfKit.Tests
                 var b2 = sheet.GetCell(1, 1);
                 Assert.Equal("boolean", b2.ValueType);
                 Assert.Equal("true", b2.Node.GetAttribute("boolean-value", OdfNamespaces.Office));
-                Assert.Equal("TRUE", b2.TextContent);
+                Assert.Equal("TRUE", b2.DisplayText);
             }
         }
 

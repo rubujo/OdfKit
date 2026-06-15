@@ -423,6 +423,11 @@ public static class OdfEncryption
             {
                 cryptoProvider = package.LoadOptions.CryptographyProvider;
             }
+            else if (package.SaveOptions.CryptographyProvider is not null &&
+                package.SaveOptions.CryptographyProvider.CanHandle(entry.EncryptionInfo))
+            {
+                cryptoProvider = package.SaveOptions.CryptographyProvider;
+            }
 
             if (cryptoProvider is not null)
             {

@@ -546,7 +546,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
             var sheet = doc.AddSheet("Sheet1");
-            sheet.GetCell("A1").Value = "10";
+            sheet.GetCell("A1").RawValue = "10";
             
             var expressions = new OdfNode(OdfNodeType.Element, "named-expressions", OdfNamespaces.Table, "table");
             var namedRange = new OdfNode(OdfNodeType.Element, "named-range", OdfNamespaces.Table, "table");
@@ -1819,9 +1819,9 @@ namespace OdfKit.Tests
             var doc = new SpreadsheetDocument(package);
             var sheet = doc.AddSheet("Finance");
             
-            sheet.GetCell("A1").Value = "Revenue";
+            sheet.GetCell("A1").RawValue = "Revenue";
             sheet.GetCell("A2").SetValue(120000.0);
-            sheet.GetCell("B1").Value = "Expenses";
+            sheet.GetCell("B1").RawValue = "Expenses";
             sheet.GetCell("B2").SetValue(85000.0);
             
             // 1. Setup named range
@@ -1906,7 +1906,7 @@ namespace OdfKit.Tests
             var sheet = doc.AddSheet("Sheet1");
 
             // Populate some data cells
-            sheet.GetCell("A1").Value = "Year";
+            sheet.GetCell("A1").RawValue = "Year";
             sheet.GetCell("A2").SetValue(2025.0);
             sheet.GetCell("A3").SetValue(2026.0);
 

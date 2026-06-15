@@ -153,24 +153,24 @@ namespace OdfKit.Tests
                 Assert.True(sheet.IsColumnVisible(0));
 
                 // Verify cell values (indices are shifted / expanded)
-                Assert.Equal("Repeated", sheet.GetCell(0, 0).TextContent);
-                Assert.Equal("Repeated", sheet.GetCell(0, 4).TextContent);
-                Assert.Equal("Repeated", sheet.GetCell(2, 0).TextContent);
+                Assert.Equal("Repeated", sheet.GetCell(0, 0).DisplayText);
+                Assert.Equal("Repeated", sheet.GetCell(0, 4).DisplayText);
+                Assert.Equal("Repeated", sheet.GetCell(2, 0).DisplayText);
 
                 // Write to a middle cell to trigger split
                 var middleCell = sheet.GetCell(1, 2);
                 middleCell.SetValue("SplitTarget");
 
                 // Verify that only cell (1, 2) is modified, others remain "Repeated"
-                Assert.Equal("Repeated", sheet.GetCell(1, 0).TextContent);
-                Assert.Equal("Repeated", sheet.GetCell(1, 1).TextContent);
-                Assert.Equal("SplitTarget", sheet.GetCell(1, 2).TextContent);
-                Assert.Equal("Repeated", sheet.GetCell(1, 3).TextContent);
-                Assert.Equal("Repeated", sheet.GetCell(1, 4).TextContent);
+                Assert.Equal("Repeated", sheet.GetCell(1, 0).DisplayText);
+                Assert.Equal("Repeated", sheet.GetCell(1, 1).DisplayText);
+                Assert.Equal("SplitTarget", sheet.GetCell(1, 2).DisplayText);
+                Assert.Equal("Repeated", sheet.GetCell(1, 3).DisplayText);
+                Assert.Equal("Repeated", sheet.GetCell(1, 4).DisplayText);
 
                 // Ensure row 0 and 2 were not modified
-                Assert.Equal("Repeated", sheet.GetCell(0, 2).TextContent);
-                Assert.Equal("Repeated", sheet.GetCell(2, 2).TextContent);
+                Assert.Equal("Repeated", sheet.GetCell(0, 2).DisplayText);
+                Assert.Equal("Repeated", sheet.GetCell(2, 2).DisplayText);
             }
         }
 

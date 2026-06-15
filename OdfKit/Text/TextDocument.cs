@@ -483,30 +483,6 @@ public class TextDocument : OdfDocument
     }
 
     /// <summary>
-    /// 在指定的段落中新增註解的起始標記。
-    /// </summary>
-    /// <param name="paragraph">目標段落</param>
-    /// <param name="name">註解名稱</param>
-    public void AddCommentStart(OdfParagraph paragraph, string name)
-    {
-        var startNode = OdfNodeFactory.CreateElement("annotation-start", OdfNamespaces.Office, "office");
-        startNode.SetAttribute("name", OdfNamespaces.Office, name, "office");
-        paragraph.Node.AppendChild(startNode);
-    }
-
-    /// <summary>
-    /// 在指定的段落中新增註解的結束標記。
-    /// </summary>
-    /// <param name="paragraph">目標段落</param>
-    /// <param name="name">註解名稱</param>
-    public void AddCommentEnd(OdfParagraph paragraph, string name)
-    {
-        var endNode = OdfNodeFactory.CreateElement("annotation-end", OdfNamespaces.Office, "office");
-        endNode.SetAttribute("name", OdfNamespaces.Office, name, "office");
-        paragraph.Node.AppendChild(endNode);
-    }
-
-    /// <summary>
     /// 在指定的段落中新增書籤。
     /// </summary>
     /// <param name="paragraph">目標段落</param>
