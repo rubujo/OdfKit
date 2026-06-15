@@ -357,7 +357,7 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
         try
         {
             using Stream stream = Package.GetEntryStream(DocumentSignaturesPath);
-            int signatureCount = CountSignatureElements(stream);
+            int signatureCount = CountSignatureElements(stream, Package.LoadOptions.MaxXmlCharactersInDocument);
             return OdfDocumentSignatureSummary.Readable(DocumentSignaturesPath, signatureCount);
         }
         catch (Exception ex) when (ex is IOException || ex is InvalidDataException || ex is XmlException)
@@ -396,12 +396,13 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
         return OdfSigner.VerifySignaturesAsync(Package, options);
     }
 
-    private static int CountSignatureElements(Stream stream)
+    private static int CountSignatureElements(Stream stream, long maxCharsInDocument = 0)
     {
         XmlReaderSettings settings = new()
         {
             DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null
+            XmlResolver = null,
+            MaxCharactersInDocument = maxCharsInDocument > 0 ? maxCharsInDocument : 0
         };
 
         int count = 0;

@@ -1587,7 +1587,7 @@ public static class OdfSigner
     /// <summary>
     /// 自訂的 <see cref="SignedXml"/> 子類別，手動尋找符合參考 URI ID 的項目，以繞過 .NET Core 中 GetElementById 的結構描述解析限制。
     /// </summary>
-    public class XadesSignedXml : SignedXml
+    internal sealed class XadesSignedXml : SignedXml
     {
         /// <summary>
         /// 使用指定的 XML 文件初始化 <see cref="XadesSignedXml"/> 類別的新執行個體。

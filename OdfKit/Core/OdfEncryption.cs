@@ -423,25 +423,10 @@ public static class OdfEncryption
             {
                 cryptoProvider = package.LoadOptions.CryptographyProvider;
             }
-            else if (package.SaveOptions.CryptographyProvider is not null &&
-                     package.SaveOptions.CryptographyProvider.CanHandle(entry.EncryptionInfo))
-            {
-                cryptoProvider = package.SaveOptions.CryptographyProvider;
-            }
 
             if (cryptoProvider is not null)
             {
-                OdfLoadOptions loadOpts = package.LoadOptions;
-                if (loadOpts.CryptographyProvider is null)
-                {
-                    loadOpts = new OdfLoadOptions
-                    {
-                        CryptographyProvider = package.SaveOptions.CryptographyProvider,
-                        OpenPgpKeyProvider = package.SaveOptions.OpenPgpKeyProvider,
-                        Password = password
-                    };
-                }
-                decryptedPlaintext = cryptoProvider.Decrypt(ciphertext, entry.EncryptionInfo, loadOpts);
+                decryptedPlaintext = cryptoProvider.Decrypt(ciphertext, entry.EncryptionInfo, package.LoadOptions);
             }
             else if (entry.EncryptionInfo.OpenPgpEncryptedKeys.Count > 0 ||
                 string.Equals(entry.EncryptionInfo.AlgorithmName, OpenPgpAlgorithmUri, StringComparison.Ordinal))

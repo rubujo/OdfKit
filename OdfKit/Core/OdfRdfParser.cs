@@ -13,13 +13,14 @@ internal static class OdfRdfParser
     private const string RdfNamespace = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     private static readonly XNamespace RdfNs = RdfNamespace;
 
-    public static OdfRdfMetadata Parse(Stream stream)
+    public static OdfRdfMetadata Parse(Stream stream, long maxCharsInDocument = 0)
     {
         var metadata = new OdfRdfMetadata();
         var settings = new XmlReaderSettings
         {
             DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null
+            XmlResolver = null,
+            MaxCharactersInDocument = maxCharsInDocument > 0 ? maxCharsInDocument : 0
         };
 
         XDocument document;

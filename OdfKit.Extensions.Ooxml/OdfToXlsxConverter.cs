@@ -63,6 +63,7 @@ public static class OdfToXlsxConverter
 
     private static Dictionary<(int Row, int Col), object> ScanCellValues(OdfTableSheet sheet)
     {
+        const int MaxRepeat = 1_048_576; // Excel 最大列數，防止 OOM DoS
         var values = new Dictionary<(int Row, int Col), object>();
         int currentRowIndex = 0;
         foreach (var rowChild in sheet.TableNode.Children)
@@ -71,9 +72,9 @@ public static class OdfToXlsxConverter
             {
                 int rowRepeatedCount = 1;
                 string? rowRepStr = rowChild.GetAttribute("number-rows-repeated", OdfNamespaces.Table);
-                if (!string.IsNullOrEmpty(rowRepStr) && int.TryParse(rowRepStr, out int rrc))
+                if (!string.IsNullOrEmpty(rowRepStr) && int.TryParse(rowRepStr, out int rrc) && rrc > 0)
                 {
-                    rowRepeatedCount = rrc;
+                    rowRepeatedCount = Math.Min(rrc, MaxRepeat);
                 }
 
                 var rowCells = new List<(int Col, object Val)>();
@@ -84,9 +85,9 @@ public static class OdfToXlsxConverter
                     {
                         int colRepeatedCount = 1;
                         string? colRepStr = cellChild.GetAttribute("number-columns-repeated", OdfNamespaces.Table);
-                        if (!string.IsNullOrEmpty(colRepStr) && int.TryParse(colRepStr, out int crc))
+                        if (!string.IsNullOrEmpty(colRepStr) && int.TryParse(colRepStr, out int crc) && crc > 0)
                         {
-                            colRepeatedCount = crc;
+                            colRepeatedCount = Math.Min(crc, MaxRepeat);
                         }
 
                         object? cellValue = GetCellValueFromNode(cellChild);

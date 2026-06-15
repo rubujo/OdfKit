@@ -6,7 +6,7 @@ namespace OdfKit.Core;
 /// <summary>
 /// 包含 ODF 封裝項目的加密與解密詳細資訊。
 /// </summary>
-public class OdfEncryptionInfo
+public sealed class OdfEncryptionInfo
 {
     /// <summary>
     /// 取得或設定總和檢查碼類型，預設為 SHA256 。

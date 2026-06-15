@@ -44,7 +44,7 @@ public enum OdfPackageMode
 /// <summary>
 /// 表示 ODF 文件的實體封裝。
 /// </summary>
-public class OdfPackage : IDisposable, IAsyncDisposable
+public sealed class OdfPackage : IDisposable, IAsyncDisposable
 {
     private const string RdfMetadataPath = "META-INF/manifest.rdf";
     private readonly OdfPackageMode _mode;
@@ -394,7 +394,8 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             {
                 DtdProcessing = DtdProcessing.Prohibit,
                 XmlResolver = null,
-                CloseInput = !_leaveOpen
+                CloseInput = !_leaveOpen,
+                MaxCharactersInDocument = _loadOptions.MaxXmlCharactersInDocument > 0 ? _loadOptions.MaxXmlCharactersInDocument : 0
             };
 
             XDocument doc;
@@ -688,7 +689,8 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             {
                 DtdProcessing = DtdProcessing.Prohibit,
                 XmlResolver = null,
-                IgnoreWhitespace = true
+                IgnoreWhitespace = true,
+                MaxCharactersInDocument = _loadOptions.MaxXmlCharactersInDocument > 0 ? _loadOptions.MaxXmlCharactersInDocument : 0
             };
 
             OdfPackageEntry? currentEntry = null;
@@ -1734,7 +1736,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             try
             {
                 using var stream = entry.OpenReader();
-                RdfMetadata = OdfRdfParser.Parse(stream);
+                RdfMetadata = OdfRdfParser.Parse(stream, _loadOptions.MaxXmlCharactersInDocument);
             }
             catch (XmlException ex)
             {
@@ -2099,7 +2101,8 @@ public class OdfPackage : IDisposable, IAsyncDisposable
             var xmlSettings = new XmlReaderSettings
             {
                 DtdProcessing = DtdProcessing.Prohibit,
-                XmlResolver = null
+                XmlResolver = null,
+                MaxCharactersInDocument = _loadOptions.MaxXmlCharactersInDocument > 0 ? _loadOptions.MaxXmlCharactersInDocument : 0
             };
 
             // Read content.xml
@@ -2346,7 +2349,7 @@ public class OdfPackage : IDisposable, IAsyncDisposable
         /// 釋放封裝持有的資源。
         /// </summary>
         /// <param name="disposing">若為 <see langword="true"/>，則釋放受控資源。</param>
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {

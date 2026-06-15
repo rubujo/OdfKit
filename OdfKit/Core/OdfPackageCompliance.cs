@@ -7,7 +7,7 @@ namespace OdfKit.Core;
 /// <summary>
 /// 表示資訊清單（Manifest）檔案項目中的合規性問題。
 /// </summary>
-public class OdfManifestFileEntryIssue
+public sealed class OdfManifestFileEntryIssue
 {
     /// <summary>
     /// 取得或設定項目的完整路徑。
@@ -39,7 +39,7 @@ public class OdfManifestFileEntryIssue
 /// <param name="namespaceUri">命名空間 URI</param>
 /// <param name="localName">區域名稱</param>
 /// <param name="version">版本字串</param>
-public class OdfManifestRootInfo(string namespaceUri, string localName, string? version)
+public sealed class OdfManifestRootInfo(string namespaceUri, string localName, string? version)
 {
     /// <summary>
     /// 取得命名空間 URI。
