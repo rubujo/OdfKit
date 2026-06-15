@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>OdfKit.Extensions.Pdf</RootNamespace>
+    <AssemblyName>OdfKit.Extensions.Pdf</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Version>1.0.0</Version>
+    <Authors>OdfKit Contributors</Authors>
+    <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
+    <Description>PDF export extension for OdfKit using PDFsharp-MigraDoc.</Description>
+    <ProjectUrl>https://github.com/OdfKit/OdfKit</ProjectUrl>
+    <RepositoryUrl>https://github.com/OdfKit/OdfKit</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PDFsharp-MigraDoc" Version="6.2.4" />
+  </ItemGroup>
+</Project>

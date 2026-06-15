@@ -13,6 +13,10 @@
   </Folder>
   <Project Path="OdfKit/OdfKit.csproj" />
   <Project Path="OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj" />
+  <Project Path="OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj" />
+  <Project Path="OdfKit.Extensions.Imaging/OdfKit.Extensions.Imaging.csproj" />
+  <Project Path="OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj" />
+  <Project Path="OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj" />
   <Project Path="OdfKit.Tests/OdfKit.Tests.csproj" />
   <Project Path="OdfKit.Tests/MockSoffice/MockSoffice.csproj" />
   <Project Path="tools/OdfKit.Cli/OdfKit.Cli.csproj" />

@@ -3,6 +3,10 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("OdfKit.Extensions.Rendering")]
 [assembly: InternalsVisibleTo("OdfKit.Tests")]
+[assembly: InternalsVisibleTo("OdfKit.Extensions.Pdf")]
+[assembly: InternalsVisibleTo("OdfKit.Extensions.Imaging")]
+[assembly: InternalsVisibleTo("OdfKit.Extensions.Ooxml")]
+[assembly: InternalsVisibleTo("OdfKit.Extensions.Html")]
 
 namespace OdfKit.Core;
 
