@@ -355,7 +355,7 @@ namespace OdfKit.Tests
                 // Add master page boundary invalid values
                 Assert.Throws<ArgumentException>(() => doc.AddMasterPage(null!, "PM1"));
                 Assert.Throws<ArgumentException>(() => doc.AddMasterPage("", "PM1"));
-                Assert.Throws<ArgumentException>(() => doc.AddMasterPage("Master1", null!));
+                Assert.Throws<ArgumentException>(() => doc.AddMasterPage("Master1", (string)null!));
                 Assert.Throws<ArgumentException>(() => doc.AddMasterPage("Master1", ""));
 
                 // Valid Master Page

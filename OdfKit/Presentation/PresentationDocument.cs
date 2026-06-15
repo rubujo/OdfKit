@@ -108,7 +108,7 @@ public enum OdfAnimationType
 /// <summary>
 /// 表示 ODF 簡報文件（Presentation Document）的類別。
 /// </summary>
-public class PresentationDocument : OdfDocument
+public partial class PresentationDocument : OdfDocument
 {
     private readonly List<OdfSlide> _slides = [];
     private OdfSlideCollection? _slideCollection;
@@ -679,7 +679,7 @@ public sealed class OdfSlideCollection : IReadOnlyList<OdfSlide>
 /// </summary>
 /// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
 /// <param name="doc">所屬的簡報文件執行個體</param>
-public class OdfSlide(OdfNode node, PresentationDocument doc)
+public partial class OdfSlide(OdfNode node, PresentationDocument doc)
 {
     /// <summary>
     /// 取得底層的 ODF 節點。
