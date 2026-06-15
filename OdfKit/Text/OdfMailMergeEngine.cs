@@ -191,24 +191,27 @@ public class OdfMailMergeEngine(TextDocument doc)
     {
         result = null;
         if (obj is null) return false;
-        
+
         string[] parts = path.Split('.');
         object current = obj;
-        
+
         foreach (var part in parts)
         {
             if (current is null) return false;
-            
+
             if (current is IDictionary dict)
             {
                 if (dict.Contains(part))
-                {
                     current = dict[part]!;
-                }
                 else
-                {
                     return false;
-                }
+            }
+            else if (current is IReadOnlyDictionary<string, object?> roDict)
+            {
+                if (roDict.TryGetValue(part, out var val))
+                    current = val!;
+                else
+                    return false;
             }
             else
             {
@@ -221,13 +224,9 @@ public class OdfMailMergeEngine(TextDocument doc)
                 }
 
                 if (prop is not null)
-                {
                     current = prop.GetValue(current)!;
-                }
                 else
-                {
                     return false;
-                }
             }
         }
         result = current;
@@ -238,9 +237,9 @@ public class OdfMailMergeEngine(TextDocument doc)
     {
         if (obj is null) return null;
         if (obj is IDictionary dict)
-        {
             return dict.Contains(key) ? dict[key] : null;
-        }
+        if (obj is IReadOnlyDictionary<string, object?> roDict)
+            return roDict.TryGetValue(key, out var val) ? val : null;
         var type = obj.GetType();
         var cacheKey = (type, key);
         if (!_propertyCache.TryGetValue(cacheKey, out var prop))

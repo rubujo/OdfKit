@@ -7,7 +7,9 @@ using System.Xml.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Forms;
 using OdfKit.Styles;
+#pragma warning disable CS0618 // 允許在舊版 MailMerge(object) 的呼叫端
 
 namespace OdfKit.Text;
 
@@ -105,7 +107,7 @@ public class TextDocument : OdfDocument
     /// <returns>內容 XML 字串</returns>
     protected override string GetDefaultContentXml()
     {
-        return "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:meta=\"urn:oasis:names:tc:opendocument:xmlns:meta:1.0\" xmlns:number=\"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\" xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\" xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\" xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"" + OdfVersionInfo.DefaultVersionString + "\"><office:body><office:text></office:text></office:body></office:document-content>";
+        return "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:meta=\"urn:oasis:names:tc:opendocument:xmlns:meta:1.0\" xmlns:number=\"urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0\" xmlns:presentation=\"urn:oasis:names:tc:opendocument:xmlns:presentation:1.0\" xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\" xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" xmlns:form=\"urn:oasis:names:tc:opendocument:xmlns:form:1.0\" office:version=\"" + OdfVersionInfo.DefaultVersionString + "\"><office:body><office:text></office:text></office:body></office:document-content>";
     }
 
     /// <summary>
@@ -194,6 +196,54 @@ public class TextDocument : OdfDocument
     }
 
     /// <summary>
+    /// 以多層級樣式定義建立清單，樣式寫入 styles.xml 的 office:styles 區段。
+    /// </summary>
+    /// <param name="styleName">清單樣式名稱，必須唯一。</param>
+    /// <param name="levels">各層級的樣式設定；Level 屬性需從 1 開始連續遞增。</param>
+    /// <returns>新建立的清單（已套用樣式名稱）。</returns>
+    public OdfList AddListWithStyle(string styleName, IReadOnlyList<OdfListLevelStyle> levels)
+    {
+        var officeStyles = FindOrCreateChild(StylesDom, "styles", OdfNamespaces.Office, "office");
+        var listStyleNode = OdfNodeFactory.CreateElement("list-style", OdfNamespaces.Text, "text");
+        listStyleNode.SetAttribute("name", OdfNamespaces.Style, styleName, "style");
+
+        foreach (var lvl in levels)
+        {
+            OdfNode levelNode;
+            if (lvl.Type == OdfListLevelType.Bullet)
+            {
+                levelNode = OdfNodeFactory.CreateElement("list-level-style-bullet", OdfNamespaces.Text, "text");
+                levelNode.SetAttribute("bullet-char", OdfNamespaces.Text, lvl.BulletChar ?? "•", "text");
+            }
+            else
+            {
+                levelNode = OdfNodeFactory.CreateElement("list-level-style-number", OdfNamespaces.Text, "text");
+                levelNode.SetAttribute("num-format", OdfNamespaces.Fo, lvl.NumFormat, "fo");
+                if (!string.IsNullOrEmpty(lvl.NumPrefix))
+                    levelNode.SetAttribute("num-prefix", OdfNamespaces.Text, lvl.NumPrefix!, "text");
+                if (lvl.NumSuffix is not null)
+                    levelNode.SetAttribute("num-suffix", OdfNamespaces.Text, lvl.NumSuffix, "text");
+            }
+            levelNode.SetAttribute("level", OdfNamespaces.Text, lvl.Level.ToString(), "text");
+
+            var propsNode = OdfNodeFactory.CreateElement("list-level-properties", OdfNamespaces.Style, "style");
+            var alignNode = OdfNodeFactory.CreateElement("list-level-label-alignment", OdfNamespaces.Style, "style");
+            alignNode.SetAttribute("label-followed-by", OdfNamespaces.Text, "listtab", "text");
+            if (lvl.IndentLeft.Value > 0)
+                alignNode.SetAttribute("margin-left", OdfNamespaces.Fo, lvl.IndentLeft.ToString(), "fo");
+            if (lvl.FirstLineIndent.Value != 0)
+                alignNode.SetAttribute("text-indent", OdfNamespaces.Fo, lvl.FirstLineIndent.ToString(), "fo");
+            propsNode.AppendChild(alignNode);
+            levelNode.AppendChild(propsNode);
+
+            listStyleNode.AppendChild(levelNode);
+        }
+
+        officeStyles.AppendChild(listStyleNode);
+        return AddList(styleName);
+    }
+
+    /// <summary>
     /// 在指定的段落中新增日期欄位。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
@@ -256,6 +306,22 @@ public class TextDocument : OdfDocument
     {
         var fNode = OdfNodeFactory.CreateElement("reference-ref", OdfNamespaces.Text, "text");
         fNode.SetAttribute("ref-name", OdfNamespaces.Text, refName, "text");
+        paragraph.Node.AppendChild(fNode);
+    }
+
+    /// <summary>
+    /// 在指定的段落中新增序號交互參照欄位 (<c>text:sequence-ref</c>)。
+    /// </summary>
+    /// <param name="paragraph">目標段落</param>
+    /// <param name="sequenceName">序號欄位名稱（需與 AddSequenceField 使用的 name 相同）</param>
+    /// <param name="referenceFormat">參照格式，預設為 "value"（顯示數值）</param>
+    internal void AddSequenceRefField(OdfParagraph paragraph, string sequenceName, string referenceFormat = "value")
+    {
+        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
+        if (string.IsNullOrEmpty(sequenceName)) throw new ArgumentException("序號欄位名稱不可為空。", nameof(sequenceName));
+        var fNode = OdfNodeFactory.CreateElement("sequence-ref", OdfNamespaces.Text, "text");
+        fNode.SetAttribute("ref-name", OdfNamespaces.Text, sequenceName, "text");
+        fNode.SetAttribute("reference-format", OdfNamespaces.Text, referenceFormat, "text");
         paragraph.Node.AppendChild(fNode);
     }
 
@@ -588,6 +654,38 @@ public class TextDocument : OdfDocument
         return new OdfPageSetup(this);
     }
 
+    /// <summary>
+    /// 新增一個具名頁面樣式（master-page + page-layout），並可選擇性地配置其設定。
+    /// </summary>
+    /// <param name="name">主頁面樣式名稱（例如 "Landscape"）</param>
+    /// <param name="configure">可選的頁面設定回呼</param>
+    public OdfPageStyle AddPageStyle(string name, Action<OdfPageSetup>? configure = null)
+    {
+        string layoutName = $"MPL_{name}";
+        var setup = new OdfPageSetup(this, name, layoutName);
+        setup.EnsureNodes();
+        configure?.Invoke(setup);
+        return new OdfPageStyle(name);
+    }
+
+    /// <summary>
+    /// 取得所有已定義的主頁面樣式名稱清單。
+    /// </summary>
+    public IReadOnlyList<string> GetPageStyleNames()
+    {
+        var masterStyles = FindOrCreateChild(StylesDom, "master-styles", OdfNamespaces.Office, "office");
+        var names = new List<string>();
+        foreach (var child in masterStyles.Children)
+        {
+            if (child.LocalName == "master-page" && child.NamespaceUri == OdfNamespaces.Style)
+            {
+                string? n = child.GetAttribute("name", OdfNamespaces.Style);
+                if (!string.IsNullOrEmpty(n)) names.Add(n!);
+            }
+        }
+        return names;
+    }
+
     #endregion
 
     #region TOC (Table of Contents)
@@ -771,13 +869,78 @@ public class TextDocument : OdfDocument
     #region MailMerge Implementation
 
     /// <summary>
-    /// 執行郵件合併作業。
+    /// 執行郵件合併作業（舊版 API，請改用強型別版本）。
     /// </summary>
     /// <param name="dataSource">包含資料來源屬性的物件</param>
+    [Obsolete("請改用 MailMerge<T>(T dataSource) 或 MailMerge(IReadOnlyDictionary<string, object?>) 以獲得型別安全。")]
     public void MailMerge(object dataSource)
     {
         var engine = new OdfMailMergeEngine(this);
         engine.Execute(BodyTextRoot, dataSource);
+    }
+
+    /// <summary>
+    /// 以強型別資料來源物件執行郵件合併，屬性名稱對應文件中的合併欄位名稱。
+    /// </summary>
+    /// <typeparam name="T">資料來源型別。</typeparam>
+    /// <param name="dataSource">合併資料來源物件。</param>
+    public void MailMerge<T>(T dataSource) where T : notnull
+    {
+        var engine = new OdfMailMergeEngine(this);
+        engine.Execute(BodyTextRoot, dataSource);
+    }
+
+    /// <summary>
+    /// 以字典資料來源執行郵件合併，Key 對應文件中的合併欄位名稱。
+    /// </summary>
+    /// <param name="dataSource">以欄位名稱為 Key 的資料字典。</param>
+    public void MailMerge(IReadOnlyDictionary<string, object?> dataSource)
+    {
+        var engine = new OdfMailMergeEngine(this);
+        engine.Execute(BodyTextRoot, dataSource);
+    }
+
+    /// <summary>
+    /// 以強型別記錄集合執行批次郵件合併，每筆記錄產生獨立的文件副本。
+    /// </summary>
+    /// <typeparam name="T">記錄型別；屬性名稱對應文件中的合併欄位名稱。</typeparam>
+    /// <param name="records">資料記錄集合。</param>
+    /// <returns>每筆記錄對應一個已合併的 <see cref="TextDocument"/>；呼叫端負責 Dispose。</returns>
+    public IReadOnlyList<TextDocument> MailMerge<T>(IEnumerable<T> records) where T : notnull
+    {
+        var result = new List<TextDocument>();
+        foreach (T record in records)
+        {
+            TextDocument clone = CloneTextDocument();
+            new OdfMailMergeEngine(clone).Execute(clone.BodyTextRoot, record);
+            result.Add(clone);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 以字典記錄集合執行批次郵件合併，每筆記錄產生獨立的文件副本。
+    /// </summary>
+    /// <param name="records">字典記錄集合，Key 對應合併欄位名稱。</param>
+    /// <returns>每筆記錄對應一個已合併的 <see cref="TextDocument"/>；呼叫端負責 Dispose。</returns>
+    public IReadOnlyList<TextDocument> MailMerge(IEnumerable<IReadOnlyDictionary<string, object?>> records)
+    {
+        var result = new List<TextDocument>();
+        foreach (var record in records)
+        {
+            TextDocument clone = CloneTextDocument();
+            new OdfMailMergeEngine(clone).Execute(clone.BodyTextRoot, record);
+            result.Add(clone);
+        }
+        return result;
+    }
+
+    private TextDocument CloneTextDocument()
+    {
+        using var ms = new MemoryStream();
+        SaveToStream(ms);
+        ms.Position = 0;
+        return (TextDocument)OdfDocumentFactory.LoadDocument(ms);
     }
 
     #endregion
@@ -2106,6 +2269,176 @@ public class TextDocument : OdfDocument
     }
 
     #endregion
+
+    #region 表單控制項（Form Controls）
+
+    /// <summary>
+    /// 在文件中加入表單控制項（draw:frame + office:forms 定義）。
+    /// </summary>
+    /// <param name="type">控制項類型。</param>
+    /// <param name="name">控制項名稱（唯一識別字）。</param>
+    /// <param name="x">控制項左邊距。</param>
+    /// <param name="y">控制項上邊距。</param>
+    /// <param name="width">控制項寬度。</param>
+    /// <param name="height">控制項高度。</param>
+    /// <param name="label">控制項標籤文字（核取方塊、按鈕）或預設值（文字欄位）。</param>
+    /// <param name="listItems">下拉式清單選項（僅 ListBox 有效）。</param>
+    /// <returns>描述新控制項的 <see cref="OdfFormControl"/> 物件。</returns>
+    public OdfFormControl AddFormControl(
+        OdfControlType type,
+        string name,
+        OdfLength x,
+        OdfLength y,
+        OdfLength width,
+        OdfLength height,
+        string label = "",
+        IReadOnlyList<string>? listItems = null)
+    {
+        if (string.IsNullOrEmpty(name))
+            throw new ArgumentException("控制項名稱不可為空。", nameof(name));
+
+        // 1. 建立/取得 <office:forms><form:form>
+        OdfNode formsNode = FindOrCreateFormsNode();
+        OdfNode formNode  = FindOrCreateChild(formsNode, "form", OdfNamespaces.Form, "form");
+        if (string.IsNullOrEmpty(formNode.GetAttribute("name", OdfNamespaces.Form)))
+            formNode.SetAttribute("name", OdfNamespaces.Form, "Form1", "form");
+        formNode.SetAttribute("apply-design-mode", OdfNamespaces.Form, "false", "form");
+
+        // 2. 建立控制項 form:* 元素
+        string elemName = type switch
+        {
+            OdfControlType.CheckBox => "checkbox",
+            OdfControlType.ListBox  => "listbox",
+            OdfControlType.Button   => "button",
+            _                       => "text",
+        };
+        OdfNode ctrlNode = new OdfNode(OdfNodeType.Element, elemName, OdfNamespaces.Form, "form");
+        ctrlNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        ctrlNode.SetAttribute("id",   OdfNamespaces.Form, name, "form");
+        if (!string.IsNullOrEmpty(label))
+            ctrlNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
+        if (type == OdfControlType.TextBox && !string.IsNullOrEmpty(label))
+            ctrlNode.SetAttribute("value", OdfNamespaces.Form, label, "form");
+        if (type == OdfControlType.CheckBox)
+            ctrlNode.SetAttribute("current-state", OdfNamespaces.Form, "unchecked", "form");
+
+        if (type == OdfControlType.ListBox && listItems is not null)
+        {
+            foreach (string item in listItems)
+            {
+                OdfNode optNode = new OdfNode(OdfNodeType.Element, "option", OdfNamespaces.Form, "form");
+                optNode.SetAttribute("label", OdfNamespaces.Form, item, "form");
+                ctrlNode.AppendChild(optNode);
+            }
+        }
+        formNode.AppendChild(ctrlNode);
+
+        // 3. 建立 draw:frame 錨點段落
+        OdfNode para  = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+        OdfNode frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
+        frame.SetAttribute("name",        OdfNamespaces.Draw, $"ctrl-{name}", "draw");
+        frame.SetAttribute("anchor-type", OdfNamespaces.Text, "paragraph", "text");
+        frame.SetAttribute("x",           OdfNamespaces.Svg,  x.ToString(),      "svg");
+        frame.SetAttribute("y",           OdfNamespaces.Svg,  y.ToString(),      "svg");
+        frame.SetAttribute("width",       OdfNamespaces.Svg,  width.ToString(),  "svg");
+        frame.SetAttribute("height",      OdfNamespaces.Svg,  height.ToString(), "svg");
+        frame.SetAttribute("z-index",     OdfNamespaces.Draw, "0", "draw");
+
+        OdfNode ctrlRef = new OdfNode(OdfNodeType.Element, "control", OdfNamespaces.Draw, "draw");
+        ctrlRef.SetAttribute("control", OdfNamespaces.Draw, name, "draw");
+        frame.AppendChild(ctrlRef);
+        para.AppendChild(frame);
+        BodyTextRoot.AppendChild(para);
+
+        return new OdfFormControl
+        {
+            ControlType = type,
+            Name        = name,
+            Label       = label,
+            X           = x,
+            Y           = y,
+            Width       = width,
+            Height      = height,
+            ListItems   = listItems ?? [],
+        };
+    }
+
+    /// <summary>
+    /// 取得文件中所有表單控制項。
+    /// </summary>
+    /// <returns>控制項清單；若無表單則回傳空清單。</returns>
+    public IReadOnlyList<OdfFormControl> GetFormControls()
+    {
+        var result = new List<OdfFormControl>();
+        OdfNode? formsNode = FindFormsNode();
+        if (formsNode is null) return result;
+
+        foreach (OdfNode formNode in formsNode.Children)
+        {
+            if (formNode.LocalName != "form" || formNode.NamespaceUri != OdfNamespaces.Form)
+                continue;
+
+            foreach (OdfNode ctrl in formNode.Children)
+            {
+                if (ctrl.NamespaceUri != OdfNamespaces.Form) continue;
+
+                OdfControlType type = ctrl.LocalName switch
+                {
+                    "checkbox" => OdfControlType.CheckBox,
+                    "listbox"  => OdfControlType.ListBox,
+                    "button"   => OdfControlType.Button,
+                    _          => OdfControlType.TextBox,
+                };
+
+                var items = new List<string>();
+                foreach (OdfNode child in ctrl.Children)
+                {
+                    if (child.LocalName == "option" && child.NamespaceUri == OdfNamespaces.Form)
+                    {
+                        string? optLabel = child.GetAttribute("label", OdfNamespaces.Form);
+                        if (!string.IsNullOrEmpty(optLabel)) items.Add(optLabel!);
+                    }
+                }
+
+                result.Add(new OdfFormControl
+                {
+                    ControlType = type,
+                    Name        = ctrl.GetAttribute("name",          OdfNamespaces.Form) ?? string.Empty,
+                    Label       = ctrl.GetAttribute("label",         OdfNamespaces.Form) ?? string.Empty,
+                    Value       = ctrl.GetAttribute("value",         OdfNamespaces.Form),
+                    IsChecked   = ctrl.GetAttribute("current-state", OdfNamespaces.Form) == "checked",
+                    ListItems   = items,
+                });
+            }
+        }
+
+        return result;
+    }
+
+    private OdfNode FindOrCreateFormsNode()
+    {
+        OdfNode? existing = FindFormsNode();
+        if (existing is not null) return existing;
+
+        OdfNode formsNode = new OdfNode(OdfNodeType.Element, "forms", OdfNamespaces.Office, "office");
+        if (BodyTextRoot.Children.Count > 0)
+            BodyTextRoot.InsertBefore(formsNode, BodyTextRoot.Children[0]);
+        else
+            BodyTextRoot.AppendChild(formsNode);
+        return formsNode;
+    }
+
+    private OdfNode? FindFormsNode()
+    {
+        foreach (OdfNode child in BodyTextRoot.Children)
+        {
+            if (child.LocalName == "forms" && child.NamespaceUri == OdfNamespaces.Office)
+                return child;
+        }
+        return null;
+    }
+
+    #endregion
 }
 
 /// <summary>
@@ -2139,12 +2472,30 @@ public enum OdfLayoutGridMode
 /// <summary>
 /// 表示文字文件的頁面設定。
 /// </summary>
-/// <param name="doc">所屬的文字文件</param>
-public class OdfPageSetup(TextDocument doc)
+public class OdfPageSetup
 {
-    private readonly TextDocument _doc = doc;
+    private readonly TextDocument _doc;
+    private readonly string _masterPageName;
+    private readonly string _pageLayoutName;
+
+    /// <summary>使用預設主頁面（Standard / Mpm1）初始化。</summary>
+    public OdfPageSetup(TextDocument doc) : this(doc, "Standard", "Mpm1") { }
+
+    internal OdfPageSetup(TextDocument doc, string masterPageName, string pageLayoutName)
+    {
+        _doc = doc;
+        _masterPageName = masterPageName;
+        _pageLayoutName = pageLayoutName;
+    }
+
     private OdfNode ContentDom => _doc.ContentDom;
     private OdfNode StylesDom => _doc.StylesDom;
+
+    internal void EnsureNodes()
+    {
+        _ = FindOrCreatePageLayoutProperties();
+        _ = FindOrCreateMasterPage();
+    }
 
     /// <summary>
     /// 取得或設定頁面寬度（公分）。
@@ -2384,13 +2735,12 @@ public class OdfPageSetup(TextDocument doc)
         var autoStyles = FindOrCreateChild(_doc.StylesDom, "automatic-styles", OdfNamespaces.Office, "office");
         foreach (var child in autoStyles.Children)
         {
-            if (child.LocalName == "page-layout" && child.NamespaceUri == OdfNamespaces.Style)
-            {
+            if (child.LocalName == "page-layout" && child.NamespaceUri == OdfNamespaces.Style &&
+                child.GetAttribute("name", OdfNamespaces.Style) == _pageLayoutName)
                 return child;
-            }
         }
         var pageLayout = new OdfNode(OdfNodeType.Element, "page-layout", OdfNamespaces.Style, "style");
-        pageLayout.SetAttribute("name", OdfNamespaces.Style, "Mpm1", "style");
+        pageLayout.SetAttribute("name", OdfNamespaces.Style, _pageLayoutName, "style");
         autoStyles.AppendChild(pageLayout);
         return pageLayout;
     }
@@ -2401,9 +2751,7 @@ public class OdfPageSetup(TextDocument doc)
         foreach (var child in layoutNode.Children)
         {
             if (child.LocalName == "page-layout-properties" && child.NamespaceUri == OdfNamespaces.Style)
-            {
                 return child;
-            }
         }
         var props = new OdfNode(OdfNodeType.Element, "page-layout-properties", OdfNamespaces.Style, "style");
         layoutNode.AppendChild(props);
@@ -2415,14 +2763,13 @@ public class OdfPageSetup(TextDocument doc)
         var masterStyles = FindOrCreateChild(_doc.StylesDom, "master-styles", OdfNamespaces.Office, "office");
         foreach (var child in masterStyles.Children)
         {
-            if (child.LocalName == "master-page" && child.NamespaceUri == OdfNamespaces.Style)
-            {
+            if (child.LocalName == "master-page" && child.NamespaceUri == OdfNamespaces.Style &&
+                child.GetAttribute("name", OdfNamespaces.Style) == _masterPageName)
                 return child;
-            }
         }
         var masterPage = new OdfNode(OdfNodeType.Element, "master-page", OdfNamespaces.Style, "style");
-        masterPage.SetAttribute("name", OdfNamespaces.Style, "Standard", "style");
-        masterPage.SetAttribute("page-layout-name", OdfNamespaces.Style, "Mpm1", "style");
+        masterPage.SetAttribute("name", OdfNamespaces.Style, _masterPageName, "style");
+        masterPage.SetAttribute("page-layout-name", OdfNamespaces.Style, _pageLayoutName, "style");
         masterStyles.AppendChild(masterPage);
         return masterPage;
     }
@@ -2542,6 +2889,17 @@ public class OdfPageSetup(TextDocument doc)
         AddToDom(_doc.ContentDom);
         if (_doc.StylesDom is not null) AddToDom(_doc.StylesDom);
     }
+}
+
+/// <summary>
+/// 代表文字文件中的一個具名頁面樣式（master-page）。
+/// </summary>
+public sealed class OdfPageStyle
+{
+    /// <summary>取得主頁面樣式名稱。</summary>
+    public string Name { get; }
+
+    internal OdfPageStyle(string name) { Name = name; }
 }
 
 /// <summary>
@@ -2985,6 +3343,16 @@ public sealed class OdfDocumentMetadata
         get => _document.Description;
         set => _document.Description = value;
     }
+
+    /// <summary>
+    /// 取得或設定文件語言（BCP-47 語言標籤，例如 "zh-TW"、"en-US"）。
+    /// 對應 ODF 的 <c>dc:language</c> 元素。
+    /// </summary>
+    public string? Language
+    {
+        get => _document.Language;
+        set => _document.Language = value;
+    }
 }
 
 /// <summary>
@@ -3229,6 +3597,12 @@ public class OdfParagraph
     /// <param name="refName">參考項目名稱</param>
     public void AddReferenceField(string refName) => Doc.AddReferenceField(this, refName);
 
+    /// <summary>在段落中新增序號交互參照欄位。</summary>
+    /// <param name="sequenceName">序號欄位名稱</param>
+    /// <param name="referenceFormat">參照格式，預設為 "value"</param>
+    public void AddSequenceRefField(string sequenceName, string referenceFormat = "value")
+        => Doc.AddSequenceRefField(this, sequenceName, referenceFormat);
+
     /// <summary>在段落中新增書籤參照欄位。</summary>
     /// <param name="bookmarkName">書籤名稱</param>
     /// <param name="referenceFormat">參照格式，預設為 "text"</param>
@@ -3312,6 +3686,20 @@ public class OdfParagraph
 
     /// <summary>在段落中新增總頁數欄位。</summary>
     public void AddPageCountField() => Doc.AddPageCountField(this);
+
+    /// <summary>
+    /// 在此段落前插入分頁符號，並可選擇性地切換頁面樣式。
+    /// </summary>
+    /// <param name="masterPageName">要切換的主頁面樣式名稱；null 表示只插入分頁。</param>
+    /// <param name="pageNumber">新頁碼起始值；null 表示繼續。</param>
+    public void BreakPageBefore(string? masterPageName = null, int? pageNumber = null)
+    {
+        Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "break-before", OdfNamespaces.Fo, "page", "fo");
+        if (pageNumber.HasValue)
+            Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "page-number", OdfNamespaces.Style, pageNumber.Value.ToString(), "style");
+        if (!string.IsNullOrEmpty(masterPageName))
+            Doc.StyleEngine.GetOrCreateLocalStyle(Node, "paragraph").SetAttribute("master-page-name", OdfNamespaces.Style, masterPageName!, "style");
+    }
 }
 
 /// <summary>
@@ -3567,6 +3955,21 @@ public class OdfTable
     }
 
     /// <summary>
+    /// 取得或設定表格的無障礙摘要說明（對應 ODF <c>table:summary</c> 屬性）。
+    /// </summary>
+    public string? Summary
+    {
+        get => Node.GetAttribute("summary", OdfNamespaces.Table);
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+                Node.RemoveAttribute("summary", OdfNamespaces.Table);
+            else
+                Node.SetAttribute("summary", OdfNamespaces.Table, value!, "table");
+        }
+    }
+
+    /// <summary>
     /// 合併表格中的儲存格。
     /// </summary>
     /// <param name="startRow">起始列索引</param>
@@ -3745,6 +4148,40 @@ public class OdfTable
 }
 
 /// <summary>
+/// 清單層級的類型。
+/// </summary>
+public enum OdfListLevelType
+{
+    /// <summary>編號清單</summary>
+    Number,
+    /// <summary>項目符號清單</summary>
+    Bullet,
+}
+
+/// <summary>
+/// 定義多層級清單樣式的單一層級設定。
+/// </summary>
+public sealed class OdfListLevelStyle
+{
+    /// <summary>層級（1–10）。</summary>
+    public int Level { get; init; } = 1;
+    /// <summary>層級類型（編號或項目符號）。</summary>
+    public OdfListLevelType Type { get; init; } = OdfListLevelType.Number;
+    /// <summary>項目符號字元（僅 Bullet 類型有效）。</summary>
+    public string? BulletChar { get; init; }
+    /// <summary>編號格式（"1"、"a"、"A"、"i"、"I"）。</summary>
+    public string NumFormat { get; init; } = "1";
+    /// <summary>編號前綴文字。</summary>
+    public string? NumPrefix { get; init; }
+    /// <summary>編號後綴文字（預設為 "."）。</summary>
+    public string? NumSuffix { get; init; } = ".";
+    /// <summary>左側縮排量。</summary>
+    public OdfLength IndentLeft { get; init; }
+    /// <summary>首行縮排量（負值表示懸掛縮排）。</summary>
+    public OdfLength FirstLineIndent { get; init; }
+}
+
+/// <summary>
 /// 表示文字文件中的清單。
 /// </summary>
 public class OdfList
@@ -3801,6 +4238,68 @@ public class OdfList
             item.AddParagraph(text);
         }
         return item;
+    }
+
+    /// <summary>
+    /// 在指定層級新增清單項目（1-based）。層級 1 直接加入此清單；
+    /// 層級 2 以上則自動建立/沿用巢狀清單結構。
+    /// </summary>
+    /// <param name="text">項目文字內容。</param>
+    /// <param name="level">目標層級，從 1 開始，最大值為 10。</param>
+    /// <returns>新建立的清單項目。</returns>
+    public OdfListItem AddItem(string text, int level = 1)
+    {
+        if (level < 1) level = 1;
+        if (level > 10) level = 10;
+        if (level == 1) return AddListItem(text);
+
+        OdfNode currentList = Node;
+        for (int l = 1; l < level; l++)
+        {
+            var lastItem = FindLastListItem(currentList);
+            if (lastItem is null)
+            {
+                var parentItem = OdfNodeFactory.CreateElement("list-item", OdfNamespaces.Text, "text");
+                currentList.AppendChild(parentItem);
+                lastItem = parentItem;
+            }
+            OdfNode? nestedList = FindNestedList(lastItem);
+            if (nestedList is null)
+            {
+                nestedList = OdfNodeFactory.CreateElement("list", OdfNamespaces.Text, "text");
+                if (!string.IsNullOrEmpty(StyleName))
+                    nestedList.SetAttribute("style-name", OdfNamespaces.Text, StyleName!, "text");
+                lastItem.AppendChild(nestedList);
+            }
+            currentList = nestedList;
+        }
+
+        var itemNode = OdfNodeFactory.CreateElement("list-item", OdfNamespaces.Text, "text");
+        currentList.AppendChild(itemNode);
+        var item = new OdfListItem(itemNode, _doc);
+        item.AddParagraph(text);
+        return item;
+    }
+
+    private static OdfNode? FindLastListItem(OdfNode listNode)
+    {
+        OdfNode? last = null;
+        foreach (var child in listNode.Children)
+        {
+            if (child.LocalName == "list-item" && child.NamespaceUri == OdfNamespaces.Text)
+                last = child;
+        }
+        return last;
+    }
+
+    private static OdfNode? FindNestedList(OdfNode itemNode)
+    {
+        foreach (var child in itemNode.Children)
+        {
+            if (child.LocalName == "list" && child.NamespaceUri == OdfNamespaces.Text)
+                return child;
+        }
+        return null;
     }
 
     /// <summary>
@@ -3996,6 +4495,55 @@ public class OdfImage(OdfNode frameNode, OdfNode imageNode)
     {
         get => ImageNode.GetAttribute("clip", OdfNamespaces.Fo);
         set => ImageNode.SetAttribute("clip", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+    }
+
+    /// <summary>
+    /// 取得或設定圖片的無障礙替代文字（對應 <c>&lt;svg:desc&gt;</c>）。
+    /// </summary>
+    public string? AltText
+    {
+        get => FindSvgChildText("desc");
+        set => SetSvgChildText("desc", value);
+    }
+
+    /// <summary>
+    /// 取得或設定圖片的無障礙標題（對應 <c>&lt;svg:title&gt;</c>）。
+    /// </summary>
+    public string? AccessibilityTitle
+    {
+        get => FindSvgChildText("title");
+        set => SetSvgChildText("title", value);
+    }
+
+    private string? FindSvgChildText(string localName)
+    {
+        foreach (var child in FrameNode.Children)
+        {
+            if (child.LocalName == localName && child.NamespaceUri == OdfNamespaces.Svg)
+                return child.TextContent;
+        }
+        return null;
+    }
+
+    private void SetSvgChildText(string localName, string? text)
+    {
+        foreach (var child in FrameNode.Children)
+        {
+            if (child.LocalName == localName && child.NamespaceUri == OdfNamespaces.Svg)
+            {
+                if (string.IsNullOrEmpty(text))
+                    FrameNode.RemoveChild(child);
+                else
+                    child.TextContent = text!;
+                return;
+            }
+        }
+        if (!string.IsNullOrEmpty(text))
+        {
+            var node = OdfNodeFactory.CreateElement(localName, OdfNamespaces.Svg, "svg");
+            node.TextContent = text!;
+            FrameNode.AppendChild(node);
+        }
     }
 }
 

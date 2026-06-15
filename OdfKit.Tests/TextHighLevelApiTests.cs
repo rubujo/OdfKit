@@ -133,6 +133,94 @@ public class TextHighLevelApiTests
         Assert.Contains("xlink:actuate=\"onLoad\"", contentXml);
     }
 
+    /// <summary>
+    /// 驗證欄位代碼插入 API：頁碼、總頁數、日期、序號參照、腳注、尾注。
+    /// </summary>
+    [Fact]
+    public void FieldCodeApiWorksCorrectly()
+    {
+        using var document = TextDocument.Create();
+
+        // 1. 頁碼欄位
+        var p1 = document.AddParagraph("頁碼：");
+        p1.AddPageNumberField();
+
+        // 2. 總頁數欄位
+        var p2 = document.AddParagraph("共 ");
+        p2.AddPageCountField();
+
+        // 3. 日期欄位
+        var p3 = document.AddParagraph("日期：");
+        p3.AddDateField();
+
+        // 4. 序號欄位 + 交互參照
+        var p4 = document.AddParagraph("圖 ");
+        p4.AddSequenceField("Figure", "1");
+        var p5 = document.AddParagraph("參見圖 ");
+        p5.AddSequenceRefField("Figure");
+
+        // 5. 腳注
+        var p6 = document.AddParagraph("有腳注文字");
+        p6.AddFootnote("1", "這是腳注內容");
+
+        // 6. 尾注
+        var p7 = document.AddParagraph("有尾注文字");
+        p7.AddEndnote("i", "這是尾注內容");
+
+        var contentXml = SaveAndGetContentXml(document);
+        Assert.Contains("text:page-number", contentXml);
+        Assert.Contains("text:page-count", contentXml);
+        Assert.Contains("text:date", contentXml);
+        Assert.Contains("text:sequence", contentXml);
+        Assert.Contains("text:sequence-ref", contentXml);
+        Assert.Contains("text:ref-name=\"Figure\"", contentXml);
+        Assert.Contains("text:note-class=\"footnote\"", contentXml);
+        Assert.Contains("這是腳注內容", contentXml);
+        Assert.Contains("text:note-class=\"endnote\"", contentXml);
+        Assert.Contains("這是尾注內容", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 AddPageStyle / GetPageStyleNames / BreakPageBefore API。
+    /// </summary>
+    [Fact]
+    public void PageStyleAndBreakApiWorksCorrectly()
+    {
+        using var document = TextDocument.Create();
+
+        // 1. 新增橫向頁面樣式
+        var landscape = document.AddPageStyle("Landscape", setup =>
+        {
+            setup.PageWidth = 29.7;
+            setup.PageHeight = 21.0;
+        });
+        Assert.Equal("Landscape", landscape.Name);
+
+        // 2. GetPageStyleNames 應包含 Standard 和 Landscape
+        var names = document.GetPageStyleNames();
+        Assert.Contains("Standard", names);
+        Assert.Contains("Landscape", names);
+
+        // 3. BreakPageBefore 切換至 Landscape
+        var p1 = document.AddParagraph("直向內容");
+        var p2 = document.AddParagraph("橫向內容");
+        p2.BreakPageBefore("Landscape");
+
+        var stylesXml = SaveAndGetStylesXml(document);
+        Assert.Contains("style:name=\"Landscape\"", stylesXml);
+        Assert.Contains("style:name=\"MPL_Landscape\"", stylesXml);
+
+        var contentXml = SaveAndGetContentXml(document);
+        Assert.Contains("style:master-page-name=\"Landscape\"", contentXml);
+        Assert.Contains("fo:break-before=\"page\"", contentXml);
+
+        // 4. BreakPageBefore 不帶 masterPageName — 純分頁
+        var p3 = document.AddParagraph("另一段");
+        p3.BreakPageBefore();
+        var contentXml2 = SaveAndGetContentXml(document);
+        Assert.Contains("fo:break-before=\"page\"", contentXml2);
+    }
+
     private static string SaveAndGetContentXml(TextDocument document)
     {
         using var stream = new MemoryStream();
@@ -142,6 +230,18 @@ public class TextHighLevelApiTests
         using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
         using Stream contentStream = package.GetEntryStream("content.xml");
         using var reader = new StreamReader(contentStream);
+        return reader.ReadToEnd();
+    }
+
+    private static string SaveAndGetStylesXml(TextDocument document)
+    {
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream stylesStream = package.GetEntryStream("styles.xml");
+        using var reader = new StreamReader(stylesStream);
         return reader.ReadToEnd();
     }
 }

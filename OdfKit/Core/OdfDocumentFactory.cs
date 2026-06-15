@@ -201,7 +201,7 @@ public static class OdfDocumentFactory
         package.Version = version;
         package.SetMimeType(mimeType);
         package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(CreateContentXml(kind, versionText)), "text/xml");
-        package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes(CreateStylesXml(versionText)), "text/xml");
+        package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes(CreateStylesXml(versionText, kind)), "text/xml");
         package.WriteEntry("meta.xml", Encoding.UTF8.GetBytes(CreateMetaXml(versionText)), "text/xml");
         package.WriteEntry("settings.xml", Encoding.UTF8.GetBytes(CreateSettingsXml(versionText)), "text/xml");
     }
@@ -216,12 +216,20 @@ public static class OdfDocumentFactory
             " /></office:body></office:document-content>";
     }
 
-    private static string CreateStylesXml(string version)
+    private static string CreateStylesXml(string version, OdfDocumentKind kind)
     {
+        string masterStyles = IsTextDocumentKind(kind)
+            ? "<office:master-styles><style:master-page style:name=\"Standard\" style:page-layout-name=\"Mpm1\"/></office:master-styles>"
+            : "<office:master-styles />";
         return "<office:document-styles" +
             CommonNamespaceAttributes +
-            " office:version=\"" + version + "\"><office:styles /><office:automatic-styles /><office:master-styles /></office:document-styles>";
+            " office:version=\"" + version + "\"><office:styles /><office:automatic-styles />" + masterStyles + "</office:document-styles>";
     }
+
+    private static bool IsTextDocumentKind(OdfDocumentKind kind) =>
+        kind == OdfDocumentKind.Text ||
+        kind == OdfDocumentKind.TextTemplate ||
+        kind == OdfDocumentKind.TextMaster;
 
     private static string CreateMetaXml(string version)
     {
