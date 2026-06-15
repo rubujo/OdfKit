@@ -2782,6 +2782,71 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     }
 
     /// <summary>
+    /// 設定儲存格的超連結。
+    /// </summary>
+    /// <param name="url">超連結 URL</param>
+    /// <param name="displayText">連結顯示文字；為 null 時使用現有文字內容或 URL 本身</param>
+    public void SetHyperlink(string url, string? displayText = null)
+    {
+        string text = displayText ?? (string.IsNullOrEmpty(DisplayText) ? url : DisplayText);
+
+        var toRemove = new List<OdfNode>();
+        foreach (var child in Node.Children)
+            if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
+                toRemove.Add(child);
+        foreach (var child in toRemove) Node.RemoveChild(child);
+
+        var aNode = new OdfNode(OdfNodeType.Element, "a", OdfNamespaces.Text, "text");
+        aNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+        aNode.SetAttribute("href", OdfNamespaces.XLink, url, "xlink");
+        aNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = text });
+
+        var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+        pNode.AppendChild(aNode);
+        Node.AppendChild(pNode);
+        ValueType = "string";
+    }
+
+    /// <summary>
+    /// 取得儲存格的超連結 URL；若無超連結則回傳 null。
+    /// </summary>
+    public string? GetHyperlinkUrl()
+    {
+        foreach (var child in Node.Children)
+        {
+            if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text) continue;
+            foreach (var inner in child.Children)
+            {
+                if (inner.LocalName == "a" && inner.NamespaceUri == OdfNamespaces.Text)
+                    return inner.GetAttribute("href", OdfNamespaces.XLink);
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 移除儲存格的超連結，保留顯示文字。
+    /// </summary>
+    public void RemoveHyperlink()
+    {
+        foreach (var child in Node.Children)
+        {
+            if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text) continue;
+            var toUnwrap = new List<OdfNode>();
+            foreach (var inner in child.Children)
+                if (inner.LocalName == "a" && inner.NamespaceUri == OdfNamespaces.Text)
+                    toUnwrap.Add(inner);
+            foreach (var aNode in toUnwrap)
+            {
+                string linkText = aNode.TextContent;
+                child.InsertBefore(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = linkText }, aNode);
+                child.RemoveChild(aNode);
+            }
+            break;
+        }
+    }
+
+    /// <summary>
     /// 設定此儲存格的四面框線樣式。
     /// </summary>
     /// <param name="top">上框線</param>

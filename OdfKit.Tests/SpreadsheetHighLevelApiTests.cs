@@ -112,4 +112,54 @@ public class SpreadsheetHighLevelApiTests
         // 在 ODS 中列與欄均被展開，A1 為第 1 列 (row) 的第 1 個 cell
         Assert.Contains("table:content-validation-name=\"val_1\"", contentXml);
     }
+
+    /// <summary>
+    /// 驗證儲存格超連結 SetHyperlink / GetHyperlinkUrl / RemoveHyperlink API。
+    /// </summary>
+    [Fact]
+    public void CellHyperlinkApiWorksCorrectly()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.AddSheet("Sheet1");
+
+        // 1. SetHyperlink 帶顯示文字
+        var cell = sheet.GetCell(0, 0);
+        cell.SetHyperlink("https://example.com", "範例網站");
+        Assert.Equal("https://example.com", cell.GetHyperlinkUrl());
+        Assert.Equal("範例網站", cell.DisplayText);
+        Assert.Equal("string", cell.ValueType);
+
+        // 2. SetHyperlink 不帶顯示文字 — 使用 URL 本身
+        var cell2 = sheet.GetCell(0, 1);
+        cell2.SetHyperlink("https://odfkit.dev");
+        Assert.Equal("https://odfkit.dev", cell2.GetHyperlinkUrl());
+        Assert.Equal("https://odfkit.dev", cell2.DisplayText);
+
+        // 3. 覆蓋既有超連結 URL，保留顯示文字
+        cell.SetHyperlink("https://new.example.com");
+        Assert.Equal("https://new.example.com", cell.GetHyperlinkUrl());
+        Assert.Equal("範例網站", cell.DisplayText);
+
+        // 4. RemoveHyperlink — 保留顯示文字，移除 text:a
+        cell.RemoveHyperlink();
+        Assert.Null(cell.GetHyperlinkUrl());
+        Assert.Equal("範例網站", cell.DisplayText);
+
+        // 5. GetHyperlinkUrl on plain cell returns null
+        var cell3 = sheet.GetCell(0, 2);
+        cell3.SetValue("普通文字");
+        Assert.Null(cell3.GetHyperlinkUrl());
+
+        // 6. XML 結構驗證
+        using var stream = new MemoryStream();
+        doc.SaveToStream(stream);
+        stream.Position = 0;
+        using var pkg = OdfKit.Core.OdfPackage.Open(stream, leaveOpen: true);
+        using var contentStream = pkg.GetEntryStream("content.xml");
+        using var reader = new System.IO.StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+        Assert.Contains("xlink:href=\"https://odfkit.dev\"", xml);
+        Assert.Contains("xlink:type=\"simple\"", xml);
+        Assert.Contains("text:a", xml);
+    }
 }
