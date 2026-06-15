@@ -608,6 +608,45 @@ public class SpreadsheetDocument : OdfDocument
             }
         }
     }
+
+    private readonly Dictionary<string, string> _richTextStyleCache = new(StringComparer.Ordinal);
+
+    internal string GetOrCreateCharacterStyle(bool bold, bool italic, bool underline, OdfColor? color, string? fontFamily)
+    {
+        string key = $"b:{bold}|i:{italic}|u:{underline}|c:{color?.Value ?? ""}|f:{fontFamily ?? ""}";
+        if (_richTextStyleCache.TryGetValue(key, out string? cached)) return cached;
+
+        var autoStyles = ContentDom.FindChildElement("automatic-styles", OdfNamespaces.Office);
+        if (autoStyles is null)
+        {
+            autoStyles = new OdfNode(OdfNodeType.Element, "automatic-styles", OdfNamespaces.Office, "office");
+            if (ContentDom.Children.Count > 0)
+                ContentDom.InsertBefore(autoStyles, ContentDom.Children[0]);
+            else
+                ContentDom.AppendChild(autoStyles);
+        }
+
+        int idx = _richTextStyleCache.Count + 1;
+        string styleName;
+        do { styleName = $"RT{idx++}"; } while (StyleEngine.StyleExists(styleName));
+
+        var styleNode = new OdfNode(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
+        styleNode.SetAttribute("name", OdfNamespaces.Style, styleName);
+        styleNode.SetAttribute("family", OdfNamespaces.Style, "text");
+
+        var props = new OdfNode(OdfNodeType.Element, "text-properties", OdfNamespaces.Style, "style");
+        if (bold) props.SetAttribute("font-weight", OdfNamespaces.Fo, "bold", "fo");
+        if (italic) props.SetAttribute("font-style", OdfNamespaces.Fo, "italic", "fo");
+        if (underline) props.SetAttribute("text-underline-style", OdfNamespaces.Style, "solid", "style");
+        if (color.HasValue) props.SetAttribute("color", OdfNamespaces.Fo, color.Value.Value, "fo");
+        if (!string.IsNullOrEmpty(fontFamily)) props.SetAttribute("font-name", OdfNamespaces.Style, fontFamily!, "style");
+        styleNode.AppendChild(props);
+        autoStyles.AppendChild(styleNode);
+        StyleEngine.RebuildStyleIndex();
+
+        _richTextStyleCache[key] = styleName;
+        return styleName;
+    }
 }
 
 /// <summary>
@@ -2458,6 +2497,47 @@ public sealed class OdfCellRangeSelection
 }
 
 /// <summary>
+/// 表示 ODS 儲存格富文字中的一個格式片段。
+/// </summary>
+public sealed class OdfRichTextRun
+{
+    /// <summary>片段的純文字。</summary>
+    public string Text { get; init; } = string.Empty;
+    /// <summary>是否粗體。</summary>
+    public bool Bold { get; init; }
+    /// <summary>是否斜體。</summary>
+    public bool Italic { get; init; }
+    /// <summary>是否底線。</summary>
+    public bool Underline { get; init; }
+    /// <summary>文字色彩；null 表示繼承預設色彩。</summary>
+    public OdfColor? Color { get; init; }
+    /// <summary>字型名稱；null 表示繼承。</summary>
+    public string? FontFamily { get; init; }
+}
+
+/// <summary>
+/// 代表 ODS 儲存格的富文字內容，由多個 <see cref="OdfRichTextRun"/> 組成。
+/// </summary>
+public sealed class OdfRichText
+{
+    private readonly List<OdfRichTextRun> _runs = new();
+
+    /// <summary>取得所有格式片段。</summary>
+    public IReadOnlyList<OdfRichTextRun> Runs => _runs;
+
+    /// <summary>新增一個格式片段。</summary>
+    public void AddRun(string text, bool bold = false, bool italic = false,
+        OdfColor? color = null, string? fontFamily = null, bool underline = false)
+    {
+        _runs.Add(new OdfRichTextRun
+        {
+            Text = text, Bold = bold, Italic = italic, Underline = underline,
+            Color = color, FontFamily = fontFamily,
+        });
+    }
+}
+
+/// <summary>
 /// 表示 ODS 儲存格批注（office:annotation）的資料。
 /// </summary>
 public sealed class OdfCellAnnotation
@@ -2859,6 +2939,77 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
             }
             break;
         }
+    }
+
+    /// <summary>
+    /// 取得儲存格的富文字內容；若為純文字或空白則回傳 null。
+    /// </summary>
+    public OdfRichText? GetRichText()
+    {
+        OdfRichText? richText = null;
+        foreach (var child in Node.Children)
+        {
+            if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text) continue;
+            bool hasSpans = false;
+            foreach (var inner in child.Children)
+            {
+                if (inner.LocalName == "span" && inner.NamespaceUri == OdfNamespaces.Text) { hasSpans = true; break; }
+            }
+            if (!hasSpans) continue;
+
+            richText ??= new OdfRichText();
+            foreach (var inner in child.Children)
+            {
+                if (inner.LocalName == "span" && inner.NamespaceUri == OdfNamespaces.Text)
+                {
+                    string styleName = inner.GetAttribute("style-name", OdfNamespaces.Text) ?? string.Empty;
+                    bool bold = _doc.StyleEngine.GetStyleProperty(styleName, "font-weight", OdfNamespaces.Fo, "text") == "bold";
+                    bool italic = _doc.StyleEngine.GetStyleProperty(styleName, "font-style", OdfNamespaces.Fo, "text") == "italic";
+                    bool underline = _doc.StyleEngine.GetStyleProperty(styleName, "text-underline-style", OdfNamespaces.Style, "text") != null;
+                    string? colorVal = _doc.StyleEngine.GetStyleProperty(styleName, "color", OdfNamespaces.Fo, "text");
+                    OdfColor? color = colorVal != null && OdfColor.TryParse(colorVal, out OdfColor c) ? c : (OdfColor?)null;
+                    string? fontName = _doc.StyleEngine.GetStyleProperty(styleName, "font-name", OdfNamespaces.Style, "text");
+                    richText.AddRun(inner.TextContent, bold, italic, color, fontName, underline);
+                }
+                else if (inner.NodeType == OdfNodeType.Text && !string.IsNullOrEmpty(inner.TextContent))
+                {
+                    richText.AddRun(inner.TextContent);
+                }
+            }
+        }
+        return richText;
+    }
+
+    /// <summary>
+    /// 設定儲存格的富文字內容，取代現有文字。
+    /// </summary>
+    public void SetRichText(OdfRichText richText)
+    {
+        var toRemove = new List<OdfNode>();
+        foreach (var child in Node.Children)
+            if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
+                toRemove.Add(child);
+        foreach (var child in toRemove) Node.RemoveChild(child);
+
+        var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+        foreach (var run in richText.Runs)
+        {
+            bool hasFormatting = run.Bold || run.Italic || run.Underline || run.Color.HasValue || !string.IsNullOrEmpty(run.FontFamily);
+            if (hasFormatting)
+            {
+                string styleName = _doc.GetOrCreateCharacterStyle(run.Bold, run.Italic, run.Underline, run.Color, run.FontFamily);
+                var span = new OdfNode(OdfNodeType.Element, "span", OdfNamespaces.Text, "text");
+                span.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
+                span.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = run.Text });
+                pNode.AppendChild(span);
+            }
+            else
+            {
+                pNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = run.Text });
+            }
+        }
+        Node.AppendChild(pNode);
+        ValueType = "string";
     }
 
     /// <summary>

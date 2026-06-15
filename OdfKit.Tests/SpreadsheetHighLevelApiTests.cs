@@ -208,4 +208,55 @@ public class SpreadsheetHighLevelApiTests
         Assert.Contains("XML 驗證批注", xml);
         Assert.Contains("Bob", xml);
     }
+
+    /// <summary>
+    /// 驗證儲存格富文字 SetRichText / GetRichText API。
+    /// </summary>
+    [Fact]
+    public void CellRichTextApiWorksCorrectly()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.AddSheet("Sheet1");
+
+        // 1. SetRichText 包含粗體、斜體、色彩
+        var cell = sheet.GetCell(0, 0);
+        var rt = new OdfRichText();
+        rt.AddRun("普通", bold: false);
+        rt.AddRun("粗體", bold: true);
+        rt.AddRun("紅色", color: new OdfKit.DOM.OdfColor("#ff0000"));
+        cell.SetRichText(rt);
+        Assert.Equal("string", cell.ValueType);
+
+        // 2. GetRichText 應回傳 3 個 run
+        var read = cell.GetRichText();
+        Assert.NotNull(read);
+        Assert.Equal(3, read.Runs.Count);
+        Assert.Equal("普通", read.Runs[0].Text);
+        Assert.False(read.Runs[1].Color.HasValue);
+        Assert.True(read.Runs[1].Bold);
+        Assert.Equal("#ff0000", read.Runs[2].Color?.Value);
+
+        // 3. 純文字儲存格 GetRichText 回傳 null
+        var cell2 = sheet.GetCell(0, 1);
+        cell2.SetValue("pure text");
+        Assert.Null(cell2.GetRichText());
+
+        // 4. 相同格式的 run 共用同一個樣式名稱（XML 去重）
+        var cell3 = sheet.GetCell(0, 2);
+        var rt2 = new OdfRichText();
+        rt2.AddRun("A", bold: true);
+        rt2.AddRun("B", bold: true);
+        cell3.SetRichText(rt2);
+
+        using var stream = new MemoryStream();
+        doc.SaveToStream(stream);
+        stream.Position = 0;
+        using var pkg = OdfKit.Core.OdfPackage.Open(stream, leaveOpen: true);
+        using var contentStream = pkg.GetEntryStream("content.xml");
+        using var reader = new System.IO.StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+        Assert.Contains("text:span", xml);
+        Assert.Contains("font-weight=\"bold\"", xml);
+        Assert.Contains("#ff0000", xml);
+    }
 }
