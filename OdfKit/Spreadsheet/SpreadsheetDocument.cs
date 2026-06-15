@@ -699,24 +699,25 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
 /// <summary>
 /// 表示 ODF 試算表中的工作表。
 /// </summary>
-/// <remarks>
-/// 初始化 <see cref="OdfTableSheet"/> 類別的新執行個體。
-/// </remarks>
-/// <param name="tableNode">工作表 XML 節點</param>
-/// <param name="doc">試算表文件</param>
-public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
+public class OdfTableSheet
 {
     private OdfCellCollection? _cells;
     private OdfRowCollection? _rows;
     private OdfColumnCollection? _columns;
     private OdfRangeCollection? _ranges;
 
+    internal OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
+    {
+        TableNode = tableNode ?? throw new ArgumentNullException(nameof(tableNode));
+        _doc = doc ?? throw new ArgumentNullException(nameof(doc));
+    }
+
     /// <summary>
     /// 取得代表此工作表的 XML 節點。
     /// </summary>
-    internal OdfNode TableNode { get; } = tableNode;
+    internal OdfNode TableNode { get; }
 
-    private readonly SpreadsheetDocument _doc = doc;
+    private readonly SpreadsheetDocument _doc;
 
     internal SpreadsheetDocument Document => _doc;
 
@@ -1900,7 +1901,7 @@ public sealed class OdfRowCollection
     /// 初始化 <see cref="OdfRowCollection"/> 類別的新執行個體。
     /// </summary>
     /// <param name="sheet">所屬工作表。</param>
-    public OdfRowCollection(OdfTableSheet sheet)
+    internal OdfRowCollection(OdfTableSheet sheet)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
     }
@@ -1925,7 +1926,7 @@ public sealed class OdfSheetRow
     /// </summary>
     /// <param name="sheet">所屬工作表。</param>
     /// <param name="index">以 0 為基準的列索引。</param>
-    public OdfSheetRow(OdfTableSheet sheet, int index)
+    internal OdfSheetRow(OdfTableSheet sheet, int index)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
         Index = index;
@@ -1964,7 +1965,7 @@ public sealed class OdfRowCellCollection
     /// </summary>
     /// <param name="sheet">所屬工作表。</param>
     /// <param name="row">以 0 為基準的列索引。</param>
-    public OdfRowCellCollection(OdfTableSheet sheet, int row)
+    internal OdfRowCellCollection(OdfTableSheet sheet, int row)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
         _row = row;
@@ -1989,7 +1990,7 @@ public sealed class OdfColumnCollection
     /// 初始化 <see cref="OdfColumnCollection"/> 類別的新執行個體。
     /// </summary>
     /// <param name="sheet">所屬工作表。</param>
-    public OdfColumnCollection(OdfTableSheet sheet)
+    internal OdfColumnCollection(OdfTableSheet sheet)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
     }
@@ -2014,7 +2015,7 @@ public sealed class OdfSheetColumn
     /// </summary>
     /// <param name="sheet">所屬工作表。</param>
     /// <param name="index">以 0 為基準的欄索引。</param>
-    public OdfSheetColumn(OdfTableSheet sheet, int index)
+    internal OdfSheetColumn(OdfTableSheet sheet, int index)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
         Index = index;
@@ -2063,7 +2064,7 @@ public sealed class OdfRangeCollection
     /// 初始化 <see cref="OdfRangeCollection"/> 類別的新執行個體。
     /// </summary>
     /// <param name="sheet">所屬工作表。</param>
-    public OdfRangeCollection(OdfTableSheet sheet)
+    internal OdfRangeCollection(OdfTableSheet sheet)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
     }
@@ -2099,7 +2100,7 @@ public sealed class OdfCellRangeSelection
     /// </summary>
     /// <param name="sheet">所屬工作表。</param>
     /// <param name="range">儲存格範圍。</param>
-    public OdfCellRangeSelection(OdfTableSheet sheet, OdfCellRange range)
+    internal OdfCellRangeSelection(OdfTableSheet sheet, OdfCellRange range)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
         Range = EnsureSheetName(range, sheet.Name);
@@ -2187,7 +2188,7 @@ public sealed class OdfCellCollection
     /// 初始化 <see cref="OdfCellCollection"/> 類別的新執行個體。
     /// </summary>
     /// <param name="sheet">所屬工作表。</param>
-    public OdfCellCollection(OdfTableSheet sheet)
+    internal OdfCellCollection(OdfTableSheet sheet)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
     }

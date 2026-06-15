@@ -2920,19 +2920,23 @@ public sealed class OdfDocumentMetadata
 /// <summary>
 /// 表示文字文件中的段落。
 /// </summary>
-/// <param name="node">與此段落相關聯的 OdfNode 節點</param>
-/// <param name="doc">取得所屬的文字文件</param>
-public class OdfParagraph(OdfNode node, TextDocument doc)
+public class OdfParagraph
 {
+    internal OdfParagraph(OdfNode node, TextDocument doc)
+    {
+        Node = node ?? throw new ArgumentNullException(nameof(node));
+        Doc = doc ?? throw new ArgumentNullException(nameof(doc));
+    }
+
     /// <summary>
     /// 取得與此段落相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    public OdfNode Node { get; }
 
     /// <summary>
     /// 取得所屬的文字文件。
     /// </summary>
-    protected readonly TextDocument Doc = doc;
+    protected readonly TextDocument Doc;
 
     /// <summary>
     /// 取得或設定段落的文字內容。
@@ -3138,10 +3142,10 @@ public class OdfParagraph(OdfNode node, TextDocument doc)
 /// <summary>
 /// 表示文字文件中的標題。
 /// </summary>
-/// <param name="node">與此標題相關聯的 OdfNode 節點</param>
-/// <param name="doc">所屬的文字文件</param>
-public class OdfHeading(OdfNode node, TextDocument doc) : OdfParagraph(node, doc)
+public class OdfHeading : OdfParagraph
 {
+    internal OdfHeading(OdfNode node, TextDocument doc) : base(node, doc) { }
+
     /// <summary>
     /// 取得或設定標題的大綱階層。
     /// </summary>
@@ -3155,16 +3159,20 @@ public class OdfHeading(OdfNode node, TextDocument doc) : OdfParagraph(node, doc
 /// <summary>
 /// 表示段落中的文字片段（Span）。
 /// </summary>
-/// <param name="node">與此文字片段相關聯的 OdfNode 節點</param>
-/// <param name="doc">取得所屬的文字文件</param>
-public class OdfTextRun(OdfNode node, TextDocument doc)
+public class OdfTextRun
 {
+    internal OdfTextRun(OdfNode node, TextDocument doc)
+    {
+        Node = node ?? throw new ArgumentNullException(nameof(node));
+        _doc = doc ?? throw new ArgumentNullException(nameof(doc));
+    }
+
     /// <summary>
     /// 取得與此文字片段相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    public OdfNode Node { get; }
 
-    private readonly TextDocument _doc = doc;
+    private readonly TextDocument _doc;
 
     /// <summary>
     /// 取得或設定文字片段的內文。
@@ -3312,16 +3320,20 @@ public class OdfTextRun(OdfNode node, TextDocument doc)
 /// <summary>
 /// 表示文字文件中的多欄版面配置區段。
 /// </summary>
-/// <param name="node">與此區段相關聯的 OdfNode 節點</param>
-/// <param name="doc">取得所屬的文字文件</param>
-public class OdfSection(OdfNode node, TextDocument doc)
+public class OdfSection
 {
+    internal OdfSection(OdfNode node, TextDocument doc)
+    {
+        Node = node ?? throw new ArgumentNullException(nameof(node));
+        _doc = doc ?? throw new ArgumentNullException(nameof(doc));
+    }
+
     /// <summary>
     /// 取得與此區段相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    public OdfNode Node { get; }
 
-    private readonly TextDocument _doc = doc;
+    private readonly TextDocument _doc;
 
     /// <summary>
     /// 取得或設定此區段的書寫模式。
@@ -3560,16 +3572,20 @@ public class OdfTable
 /// <summary>
 /// 表示文字文件中的清單。
 /// </summary>
-/// <param name="node">與此清單相關聯的 OdfNode 節點</param>
-/// <param name="doc">所屬的文字文件</param>
-public class OdfList(OdfNode node, TextDocument doc)
+public class OdfList
 {
+    internal OdfList(OdfNode node, TextDocument doc)
+    {
+        Node = node ?? throw new ArgumentNullException(nameof(node));
+        _doc = doc ?? throw new ArgumentNullException(nameof(doc));
+    }
+
     /// <summary>
     /// 取得與此清單相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    public OdfNode Node { get; }
 
-    private readonly TextDocument _doc = doc;
+    private readonly TextDocument _doc;
 
     /// <summary>
     /// 取得或設定此清單的樣式名稱。
