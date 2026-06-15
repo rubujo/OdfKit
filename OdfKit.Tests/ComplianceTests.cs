@@ -1872,8 +1872,8 @@ namespace OdfKit.Tests
         }
 
         [Theory]
-        [InlineData(OdfDocumentKind.Chart, "OdfChartDocument")]
-        [InlineData(OdfDocumentKind.Formula, "OdfFormulaDocument")]
+        [InlineData(OdfDocumentKind.Chart, "ChartDocument")]
+        [InlineData(OdfDocumentKind.Formula, "FormulaDocument")]
         [InlineData(OdfDocumentKind.Image, nameof(OdfImageDocument))]
         [InlineData(OdfDocumentKind.Database, nameof(OdfDatabaseDocument))]
         public void HighLevelFactoryCreatesPackageLevelDocuments(OdfDocumentKind kind, string expectedTypeName)

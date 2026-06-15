@@ -373,8 +373,8 @@ public static class OdfDocumentFactory
             OdfDocumentKind.Spreadsheet => new SpreadsheetDocument(package),
             OdfDocumentKind.Presentation => new PresentationDocument(package),
             OdfDocumentKind.Graphics => new DrawingDocument(package),
-            OdfDocumentKind.Chart => new OdfChartDocument(package),
-            OdfDocumentKind.Formula => new OdfFormulaDocument(package),
+            OdfDocumentKind.Chart => new ChartDocument(package),
+            OdfDocumentKind.Formula => new FormulaDocument(package),
             OdfDocumentKind.Image => new OdfImageDocument(package),
             OdfDocumentKind.Database => new OdfDatabaseDocument(package),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")

@@ -1215,8 +1215,8 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             {
                 Type t when t == typeof(Presentation.PresentationDocument) => "application/vnd.oasis.opendocument.presentation",
                 Type t when t == typeof(Spreadsheet.SpreadsheetDocument) => "application/vnd.oasis.opendocument.spreadsheet",
-                Type t when t == typeof(OdfKit.Chart.OdfChartDocument) => "application/vnd.oasis.opendocument.chart",
-                Type t when t == typeof(OdfKit.Formula.OdfFormulaDocument) => "application/vnd.oasis.opendocument.formula",
+                Type t when t == typeof(OdfKit.Chart.OdfChartDocument) || t == typeof(OdfKit.Chart.ChartDocument) => "application/vnd.oasis.opendocument.chart",
+                Type t when t == typeof(OdfKit.Formula.OdfFormulaDocument) || t == typeof(OdfKit.Formula.FormulaDocument) => "application/vnd.oasis.opendocument.formula",
                 _ => "application/vnd.oasis.opendocument.text"
             };
 
