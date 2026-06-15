@@ -7,13 +7,15 @@ using Org.BouncyCastle.Crypto.Encodings;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Agreement;
+using Org.BouncyCastle.Crypto.Generators;
 
 namespace OdfKit.Core;
 
 /// <summary>
 /// 以 BouncyCastle.Cryptography 為底層，實作 ODF 1.3 OpenPGP Session Key 加解密。
-/// 支援 RSA（PKCS#1 v1.5 盲簽）及 ElGamal 公開金鑰演算法。
-/// ECDH（Ed25519 / X25519）計畫於後續版本支援。
+/// 支援 RSA（PKCS#1 v1.5 盲簽）、ElGamal 及 ECDH（X25519 / Curve25519 及傳統 EC 曲線）公開金鑰演算法。
 /// </summary>
 public sealed class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
 {
@@ -21,6 +23,19 @@ public sealed class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
     private readonly Func<long, char[]>? _passphraseProvider;
 
     private static readonly SecureRandom s_rng = new();
+
+    // Curve25519 OID 1.3.6.1.4.1.3029.1.5.1 的 DER 內容位元組（不含 tag 0x06 與 length）
+    private static readonly byte[] s_curve25519OidBytes =
+        new byte[] { 0x2B, 0x06, 0x01, 0x04, 0x01, 0x97, 0x55, 0x01, 0x05, 0x01 };
+
+    // RFC 6637 §8 KDF Param 中固定的 "Anonymous Sender    "（20 bytes，含尾部空格）
+    private static readonly byte[] s_ecdhAnonSender =
+        new byte[]
+        {
+            0x41, 0x6E, 0x6F, 0x6E, 0x79, 0x6D, 0x6F, 0x75,
+            0x73, 0x20, 0x53, 0x65, 0x6E, 0x64, 0x65, 0x72,
+            0x20, 0x20, 0x20, 0x20,
+        };
 
     /// <summary>
     /// 建立僅支援加密（無法解密）的提供者實例。
@@ -96,7 +111,7 @@ public sealed class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
             Array.Clear(passphrase, 0, passphrase.Length);
         }
 
-        byte[] payload = DecryptPayload(privateKey, algorithm, encMpis);
+        byte[] payload = DecryptPayload(privateKey, secretKey.PublicKey, algorithm, encMpis);
         return ExtractAndVerifySessionKey(payload);
     }
 
@@ -153,9 +168,68 @@ public sealed class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
                 byte[] enc = cipher.ProcessBlock(payload, 0, payload.Length);
                 return new byte[][] { enc };
             }
+            case PublicKeyAlgorithmTag.ECDH:
+            {
+                AsymmetricKeyParameter rawKey = encKey.GetKey();
+                byte[] fingerprint = encKey.GetFingerprint();
+
+                if (rawKey is X25519PublicKeyParameters x25519Pub)
+                {
+                    // ── X25519 路徑 ──────────────────────────────────────────────────
+                    var kpGen = new X25519KeyPairGenerator();
+                    kpGen.Init(new X25519KeyGenerationParameters(s_rng));
+                    AsymmetricCipherKeyPair ephKp = kpGen.GenerateKeyPair();
+                    var ephPriv = (X25519PrivateKeyParameters)ephKp.Private;
+                    var ephPub  = (X25519PublicKeyParameters)ephKp.Public;
+
+                    byte[] sharedZ = new byte[32];
+                    ephPriv.GenerateSecret(x25519Pub, sharedZ, 0);
+
+                    byte[] kek     = ComputeEcdhKdf(sharedZ, s_curve25519OidBytes, fingerprint);
+                    byte[] padded  = ApplyEcdhPkcs5Padding(payload);
+                    byte[] wrapped = AesKeyWrap128(kek, padded);
+
+                    // 封包格式：0x40 || ephPub(32 bytes) || wrappedLen(1 byte) || wrapped
+                    byte[] ephPubRaw = ephPub.GetEncoded(); // 32 bytes
+                    byte[] result = new byte[1 + 32 + 1 + wrapped.Length];
+                    result[0] = 0x40;
+                    Array.Copy(ephPubRaw, 0, result, 1, 32);
+                    result[33] = (byte)wrapped.Length;
+                    Array.Copy(wrapped, 0, result, 34, wrapped.Length);
+                    return new byte[][] { result };
+                }
+                else if (rawKey is ECPublicKeyParameters ecPub)
+                {
+                    // ── 傳統 EC 曲線路徑（P-256 / P-384 / P-521）────────────────────
+                    var kpGen2 = new ECKeyPairGenerator();
+                    kpGen2.Init(new ECKeyGenerationParameters(ecPub.Parameters, s_rng));
+                    AsymmetricCipherKeyPair ephKp2 = kpGen2.GenerateKeyPair();
+                    var ephPriv2 = (ECPrivateKeyParameters)ephKp2.Private;
+                    var ephPub2  = (ECPublicKeyParameters)ephKp2.Public;
+
+                    var agreement = new ECDHCBasicAgreement();
+                    agreement.Init(ephPriv2);
+                    byte[] sharedZ2 = agreement.CalculateAgreement(ecPub).ToByteArrayUnsigned();
+
+                    byte[] oidBytes2 = GetEcCurveOidBytes(ecPub);
+                    byte[] kek2      = ComputeEcdhKdf(sharedZ2, oidBytes2, fingerprint);
+                    byte[] padded2   = ApplyEcdhPkcs5Padding(payload);
+                    byte[] wrapped2  = AesKeyWrap128(kek2, padded2);
+
+                    // 封包格式：0x04 || X || Y（未壓縮點）|| wrappedLen(1 byte) || wrapped
+                    byte[] point = ephPub2.Q.GetEncoded(false);
+                    byte[] result2 = new byte[point.Length + 1 + wrapped2.Length];
+                    Array.Copy(point, 0, result2, 0, point.Length);
+                    result2[point.Length] = (byte)wrapped2.Length;
+                    Array.Copy(wrapped2, 0, result2, point.Length + 1, wrapped2.Length);
+                    return new byte[][] { result2 };
+                }
+                throw new NotSupportedException(
+                    $"不支援的 ECDH 金鑰類型：{rawKey.GetType().Name}。目前支援 X25519 及傳統 EC 曲線。");
+            }
             default:
                 throw new NotSupportedException(
-                    $"不支援的 OpenPGP 公鑰演算法：{encKey.Algorithm}。目前支援 RSA 及 ElGamal。");
+                    $"不支援的 OpenPGP 公鑰演算法：{encKey.Algorithm}。目前支援 RSA、ElGamal 及 ECDH。");
         }
     }
 
@@ -273,7 +347,7 @@ public sealed class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
         return key;
     }
 
-    private static byte[] DecryptPayload(PgpPrivateKey privateKey, PublicKeyAlgorithmTag algorithm, byte[][] encData)
+    private static byte[] DecryptPayload(PgpPrivateKey privateKey, PgpPublicKey publicKey, PublicKeyAlgorithmTag algorithm, byte[][] encData)
     {
         // encData[0] 包含完整的加密資料：RSA 為單一密文區塊，ElGamal 為 c1+c2 相鄰位元組。
         byte[] enc = encData[0];
@@ -294,10 +368,145 @@ public sealed class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
                 cipher.Init(false, privateKey.Key);
                 return cipher.ProcessBlock(enc, 0, enc.Length);
             }
+            case PublicKeyAlgorithmTag.ECDH:
+            {
+                byte[] fingerprint = publicKey.GetFingerprint(); // 真實 fingerprint，KDF 必須與加密端一致
+                AsymmetricKeyParameter key = privateKey.Key;
+
+                if (key is X25519PrivateKeyParameters x25519Priv)
+                {
+                    // ── X25519 路徑 ──────────────────────────────────────────────────
+                    // 格式：0x40 || ephPub(32) || wrappedLen(1) || wrapped
+                    if (enc.Length < 35)
+                        throw new CryptographicException("ECDH X25519 封包資料長度不足。");
+                    byte[] ephPubRaw = new byte[32];
+                    Array.Copy(enc, 1, ephPubRaw, 0, 32); // 略過首位 0x40
+                    var ephPub = new X25519PublicKeyParameters(ephPubRaw, 0);
+
+                    byte[] sharedZ = new byte[32];
+                    x25519Priv.GenerateSecret(ephPub, sharedZ, 0);
+
+                    byte[] kek = ComputeEcdhKdf(sharedZ, s_curve25519OidBytes, fingerprint);
+                    int wrapLen = enc[33];
+                    byte[] wrapped = new byte[wrapLen];
+                    Array.Copy(enc, 34, wrapped, 0, wrapLen);
+                    return RemoveEcdhPkcs5Padding(AesKeyUnwrap128(kek, wrapped));
+                }
+                else if (key is ECPrivateKeyParameters ecPriv)
+                {
+                    // ── 傳統 EC 曲線路徑 ─────────────────────────────────────────────
+                    // 格式：0x04 || X || Y（點長度由曲線 field size 決定）|| wrappedLen(1) || wrapped
+                    int coordBytes = (ecPriv.Parameters.Curve.FieldSize + 7) / 8;
+                    int pointLen   = 1 + 2 * coordBytes; // 0x04 + X + Y
+                    if (enc.Length < pointLen + 1)
+                        throw new CryptographicException("ECDH 傳統曲線封包資料長度不足。");
+
+                    byte[] pointBytes = new byte[pointLen];
+                    Array.Copy(enc, 0, pointBytes, 0, pointLen);
+                    var ephPoint = ecPriv.Parameters.Curve.DecodePoint(pointBytes);
+                    var ephPub   = new ECPublicKeyParameters(ephPoint, ecPriv.Parameters);
+
+                    var agreement = new ECDHCBasicAgreement();
+                    agreement.Init(ecPriv);
+                    byte[] sharedZ = agreement.CalculateAgreement(ephPub).ToByteArrayUnsigned();
+
+                    byte[] oidBytes = GetEcCurveOidBytes(ecPriv);
+                    byte[] kek      = ComputeEcdhKdf(sharedZ, oidBytes, fingerprint);
+                    int wrapLen     = enc[pointLen];
+                    byte[] wrapped  = new byte[wrapLen];
+                    Array.Copy(enc, pointLen + 1, wrapped, 0, wrapLen);
+                    return RemoveEcdhPkcs5Padding(AesKeyUnwrap128(kek, wrapped));
+                }
+                throw new NotSupportedException($"不支援的 ECDH 金鑰類型：{key.GetType().Name}。");
+            }
             default:
                 throw new NotSupportedException(
-                    $"不支援的 OpenPGP 公鑰演算法：{algorithm}。目前支援 RSA 及 ElGamal。");
+                    $"不支援的 OpenPGP 公鑰演算法：{algorithm}。目前支援 RSA、ElGamal 及 ECDH。");
         }
+    }
+
+    /// <summary>
+    /// RFC 6637 §8 KDF：SHA-256( 00 00 00 01 || Z || oidLen || oid || 0x12 || 03 || 08 || 07 || anonSender || fingerprint )，
+    /// 取前 16 bytes 作為 AES-128 KEK。
+    /// </summary>
+    private static byte[] ComputeEcdhKdf(byte[] sharedZ, byte[] curveOidBytes, byte[] fingerprint)
+    {
+        // 總長度：4（counter）+ Z + 1（oidLen）+ oid + 4（alg/kdf/hash/sym）+ 20（anonSender）+ fingerprint
+        byte[] input = new byte[4 + sharedZ.Length + 1 + curveOidBytes.Length + 4 + 20 + fingerprint.Length];
+        int p = 0;
+        input[p++] = 0x00; input[p++] = 0x00; input[p++] = 0x00; input[p++] = 0x01;
+        Array.Copy(sharedZ, 0, input, p, sharedZ.Length);                 p += sharedZ.Length;
+        input[p++] = (byte)curveOidBytes.Length;
+        Array.Copy(curveOidBytes, 0, input, p, curveOidBytes.Length);     p += curveOidBytes.Length;
+        input[p++] = 0x12; // ECDiffieHellman = 18
+        input[p++] = 0x03; // KDF params count
+        input[p++] = 0x08; // SHA-256
+        input[p++] = 0x07; // AES-128
+        Array.Copy(s_ecdhAnonSender, 0, input, p, 20);                    p += 20;
+        Array.Copy(fingerprint, 0, input, p, fingerprint.Length);
+
+        using var sha = SHA256.Create();
+        byte[] hash = sha.ComputeHash(input);
+        byte[] kek = new byte[16];
+        Array.Copy(hash, 0, kek, 0, 16);
+        return kek;
+    }
+
+    /// <summary>從 ECKeyParameters 取得具名曲線的 OID 內容位元組（不含 DER tag/length）。</summary>
+    private static byte[] GetEcCurveOidBytes(ECKeyParameters ecKey)
+    {
+        if (ecKey.PublicKeyParamSet is { } oid)
+        {
+            byte[] der = oid.GetDerEncoded(); // 格式：0x06 || len || content
+            byte[] content = new byte[der.Length - 2];
+            Array.Copy(der, 2, content, 0, content.Length);
+            return content;
+        }
+        throw new NotSupportedException("ECDH KDF 需要具名曲線，不支援匿名曲線參數。");
+    }
+
+    /// <summary>
+    /// RFC 6637 AES key wrap 前置：以 PKCS#5（PKCS#7）填充至 8 bytes 的倍數。
+    /// padLen ∈ [1, 8]，確保無論原始長度為何都加 padding。
+    /// </summary>
+    private static byte[] ApplyEcdhPkcs5Padding(byte[] data)
+    {
+        int padLen = 8 - (data.Length % 8); // 結果 ∈ [1, 8]
+        byte[] padded = new byte[data.Length + padLen];
+        Array.Copy(data, 0, padded, 0, data.Length);
+        for (int i = data.Length; i < padded.Length; i++)
+            padded[i] = (byte)padLen;
+        return padded;
+    }
+
+    /// <summary>移除 PKCS#5 填充並驗證填充位元組。</summary>
+    private static byte[] RemoveEcdhPkcs5Padding(byte[] data)
+    {
+        if (data.Length == 0)
+            throw new CryptographicException("PKCS#5 解填充時資料為空。");
+        int padLen = data[data.Length - 1];
+        if (padLen < 1 || padLen > 8 || padLen > data.Length)
+            throw new CryptographicException($"PKCS#5 填充長度無效：{padLen}。");
+        for (int i = data.Length - padLen; i < data.Length; i++)
+            if (data[i] != (byte)padLen)
+                throw new CryptographicException("PKCS#5 填充位元組驗證失敗。");
+        byte[] result = new byte[data.Length - padLen];
+        Array.Copy(data, 0, result, 0, result.Length);
+        return result;
+    }
+
+    private static byte[] AesKeyWrap128(byte[] kek, byte[] plaintext)
+    {
+        var engine = new Rfc3394WrapEngine(new AesEngine());
+        engine.Init(true, new KeyParameter(kek));
+        return engine.Wrap(plaintext, 0, plaintext.Length);
+    }
+
+    private static byte[] AesKeyUnwrap128(byte[] kek, byte[] ciphertext)
+    {
+        var engine = new Rfc3394WrapEngine(new AesEngine());
+        engine.Init(false, new KeyParameter(kek));
+        return engine.Unwrap(ciphertext, 0, ciphertext.Length);
     }
 
     private static byte[] ExtractAndVerifySessionKey(byte[] payload)

@@ -252,4 +252,81 @@ public class OdfBouncyCastleOpenPgpProviderTests
         Assert.Throws<CryptographicException>(
             () => pgpProvider.Decrypt(new byte[32], info, new OdfLoadOptions()));
     }
+
+    // ── X25519 測試輔助方法與 Fact ──────────────────────────────────────────────
+
+    private static (byte[] publicKeyBytes, byte[] secretKeyRingBytes) GenerateX25519KeyRing()
+    {
+        // 主金鑰：RSA（用於驗證/簽章），加密子金鑰：X25519 ECDH
+        var rsaParams = new RsaKeyGenerationParameters(BigInteger.ValueOf(65537), s_rng, 2048, 80);
+        var rsaKpGen  = new RsaKeyPairGenerator();
+        rsaKpGen.Init(rsaParams);
+        var masterPgpKp = new PgpKeyPair(
+            PublicKeyAlgorithmTag.RsaGeneral,
+            rsaKpGen.GenerateKeyPair(),
+            new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+
+        var x25519Gen = new X25519KeyPairGenerator();
+        x25519Gen.Init(new X25519KeyGenerationParameters(s_rng));
+        var ecdhPgpKp = new PgpKeyPair(
+            PublicKeyAlgorithmTag.ECDH,
+            x25519Gen.GenerateKeyPair(),
+            new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+
+        var keyRingGen = new PgpKeyRingGenerator(
+            PgpSignature.DefaultCertification,
+            masterPgpKp,
+            "ecdh@odfkit.example",
+            SymmetricKeyAlgorithmTag.Aes256,
+            Array.Empty<char>(),
+            true,
+            null, null,
+            s_rng);
+        keyRingGen.AddSubKey(ecdhPgpKp);
+
+        var pubRing = keyRingGen.GeneratePublicKeyRing();
+        var secRing = keyRingGen.GenerateSecretKeyRing();
+
+        using var pubMs = new MemoryStream();
+        pubRing.Encode(pubMs);
+        using var secMs = new MemoryStream();
+        secRing.Encode(secMs);
+        return (pubMs.ToArray(), secMs.ToArray());
+    }
+
+    [Fact]
+    public void EcdhX25519RoundTrip_SessionKey_EncryptThenDecrypt_Succeeds()
+    {
+        var (pubKeyBytes, secKeyRingBytes) = GenerateX25519KeyRing();
+        var provider = new OdfBouncyCastleOpenPgpProvider(
+            secKeyRingBytes,
+            _ => Array.Empty<char>());
+        var recipient = new OdfOpenPgpRecipient
+        {
+            PublicKey = pubKeyBytes,
+            KeyId     = "ecdh-test",
+            Recipient = "ecdh@odfkit.example",
+        };
+        byte[] originalKey = RandomSessionKey();
+        byte[] packet      = provider.EncryptSessionKey(originalKey, recipient);
+        byte[] recovered   = provider.DecryptSessionKey(packet, recipient.KeyId);
+        Assert.Equal(originalKey, recovered);
+    }
+
+    [Fact]
+    public void EcdhX25519RoundTrip_MultipleSessionKeys_AllDecryptCorrectly()
+    {
+        var (pubKeyBytes, secKeyRingBytes) = GenerateX25519KeyRing();
+        var provider = new OdfBouncyCastleOpenPgpProvider(
+            secKeyRingBytes,
+            _ => Array.Empty<char>());
+        var recipient = new OdfOpenPgpRecipient { PublicKey = pubKeyBytes, KeyId = "ecdh-test" };
+        for (int i = 0; i < 5; i++)
+        {
+            byte[] originalKey = RandomSessionKey();
+            byte[] packet      = provider.EncryptSessionKey(originalKey, recipient);
+            byte[] recovered   = provider.DecryptSessionKey(packet, recipient.KeyId);
+            Assert.Equal(originalKey, recovered);
+        }
+    }
 }

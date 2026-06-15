@@ -18,7 +18,10 @@ public enum OdfEncryptionAlgorithm
     Blowfish,
 
     /// <summary>OpenPGP 加密，須搭配自訂密碼學提供者</summary>
-    OpenPgp
+    OpenPgp,
+
+    /// <summary>AES-256-GCM 認證加密模式，與 LibreOffice 25.8+ 相容</summary>
+    Aes256Gcm
 }
 
 /// <summary>

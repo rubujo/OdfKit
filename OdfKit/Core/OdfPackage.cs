@@ -866,6 +866,17 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                         {
                             currentEncryptionInfo.Salt = Convert.FromBase64String(saltStr);
                         }
+
+                        // 讀取 key-derivation 節點的所有其它擴充屬性
+                        for (int i = 0; i < reader.AttributeCount; i++)
+                        {
+                            reader.MoveToAttribute(i);
+                            if (reader.LocalName is not "key-derivation-name" and not "key-size" and not "iteration-count" and not "salt")
+                            {
+                                currentEncryptionInfo.ExtensionProperties[reader.LocalName] = reader.Value;
+                            }
+                        }
+                        reader.MoveToElement();
                     }
                     else if (reader.LocalName == "encrypted-key" && reader.NamespaceURI == OdfNamespaces.Manifest && currentEncryptionInfo != null)
                     {
@@ -1871,6 +1882,29 @@ public class OdfPackage : IDisposable, IAsyncDisposable
                         writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.KeySize.ToString(CultureInfo.InvariantCulture));
                         writer.WriteAttributeString("manifest", "iteration-count", OdfNamespaces.Manifest, info.IterationCount.ToString(CultureInfo.InvariantCulture));
                         writer.WriteAttributeString("manifest", "salt", OdfNamespaces.Manifest, Convert.ToBase64String(info.Salt));
+
+                        if (info.ExtensionProperties != null)
+                        {
+                            foreach (var prop in info.ExtensionProperties)
+                            {
+                                if (prop.Key == "kdf-name")
+                                {
+                                    writer.WriteAttributeString("loext", "kdf-name", "urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0", prop.Value);
+                                }
+                                else if (prop.Key == "argon2-t")
+                                {
+                                    writer.WriteAttributeString("loext", "argon2-t", "urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0", prop.Value);
+                                }
+                                else if (prop.Key == "argon2-m")
+                                {
+                                    writer.WriteAttributeString("loext", "argon2-m", "urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0", prop.Value);
+                                }
+                                else if (prop.Key == "argon2-p")
+                                {
+                                    writer.WriteAttributeString("loext", "argon2-p", "urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0", prop.Value);
+                                }
+                            }
+                        }
                         writer.WriteEndElement(); // key-derivation
 
                         if (!string.IsNullOrEmpty(info.StartKeyGenerationName) && info.StartKeySize.HasValue)

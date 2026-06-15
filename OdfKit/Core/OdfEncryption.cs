@@ -5,6 +5,10 @@ using System.Linq;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Engines;
 
 namespace OdfKit.Core;
 
@@ -27,6 +31,16 @@ public static class OdfEncryption
     /// OpenPGP 加密演算法的識別 URI。
     /// </summary>
     public const string OpenPgpAlgorithmUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#openpgp";
+
+    /// <summary>
+    /// AES-256-GCM 加密演算法的識別 URI。
+    /// </summary>
+    public const string Aes256GcmAlgorithmUri = "http://www.w3.org/2009/xmlenc11#aes256-gcm";
+
+    /// <summary>
+    /// Argon2id 金鑰衍生函數的識別 URI。
+    /// </summary>
+    public const string Argon2idDerivationUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#argon2id";
 
     /// <summary>
     /// 自訂實作以金鑰為基礎的金鑰衍生函式 PBKDF2，支援 SHA-1 與 SHA-256，確保跨平台行為一致。
@@ -102,31 +116,51 @@ public static class OdfEncryption
     }
 
     /// <summary>
-    /// 解密單個 ODF 加密項目的內容。
+    /// 解密單一封裝項目。支援 PBKDF2 搭配 AES/Blowfish 以及 Argon2id 搭配 AES-GCM。
     /// </summary>
-    /// <param name="ciphertext">要解密的密文位元組陣列</param>
-    /// <param name="password">解密密碼字串</param>
-    /// <param name="algorithmUri">加密演算法 URI</param>
-    /// <param name="derivationName">金鑰衍生函式名稱</param>
-    /// <param name="keySize">金鑰大小（位元組）</param>
-    /// <param name="iterationCount">金鑰衍生反覆運算次數</param>
-    /// <param name="salt">金鑰衍生鹽值</param>
-    /// <param name="iv">初始向量</param>
-    /// <param name="startKeyGenName">起始金鑰產生演算法名稱</param>
-    /// <returns>解密後的明文位元組陣列</returns>
-    public static byte[] DecryptEntry(byte[] ciphertext, string password, string algorithmUri, string derivationName, int keySize, int iterationCount, byte[] salt, byte[] iv, string? startKeyGenName = null)
+    /// <param name="ciphertext">加密的密文資料位元組陣列。</param>
+    /// <param name="password">解密密碼。</param>
+    /// <param name="algorithmUri">加密演算法的 XML 識別 URI。</param>
+    /// <param name="derivationName">金鑰衍生演算法的 XML 識別 URI。</param>
+    /// <param name="keySize">金鑰大小（以位元組為單位）。</param>
+    /// <param name="iterationCount">金鑰衍生的反覆運算次數。</param>
+    /// <param name="salt">金鑰衍生的鹽值（Salt）位元組陣列。</param>
+    /// <param name="iv">加密的初始向量（IV）位元組陣列。</param>
+    /// <param name="startKeyGenName">初始金鑰產生的演算法名稱（選填）。</param>
+    /// <param name="kdfName">金鑰衍生函數的名稱（選填，例如 "argon2id"）。</param>
+    /// <param name="argon2T">Argon2id 的時間複雜度/反覆運算次數（選填）。</param>
+    /// <param name="argon2M">Argon2id 的記憶體複雜度（單位為 KB，選填）。</param>
+    /// <param name="argon2P">Argon2id 的平行度/通道數（選填）。</param>
+    /// <returns>解密後的純文字資料位元組陣列。</returns>
+    public static byte[] DecryptEntry(
+        byte[] ciphertext,
+        string password,
+        string algorithmUri,
+        string derivationName,
+        int keySize,
+        int iterationCount,
+        byte[] salt,
+        byte[] iv,
+        string? startKeyGenName = null,
+        string? kdfName = null,
+        int argon2T = 3,
+        int argon2M = 65536,
+        int argon2P = 4)
     {
-        if (iterationCount > 50000)
+        bool isArgon2 = string.Equals(kdfName, "argon2id", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(derivationName, Argon2idDerivationUri, StringComparison.OrdinalIgnoreCase);
+
+        if (!isArgon2 && string.Equals(derivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase) && iterationCount > 50000)
         {
             throw new CryptographicException($"PBKDF2 反覆運算次數 {iterationCount} 超過最大限制 50000。");
         }
 
-        if (algorithmUri != Aes256AlgorithmUri && algorithmUri != BlowfishAlgorithmUri)
+        if (algorithmUri != Aes256AlgorithmUri && algorithmUri != BlowfishAlgorithmUri && algorithmUri != Aes256GcmAlgorithmUri)
         {
-            throw new NotSupportedException($"不支援的加密演算法： {algorithmUri}。 OdfKit 僅支援標準 AES-256-CBC 與 Blowfish-CBC。");
+            throw new NotSupportedException($"不支援的加密演算法： {algorithmUri}。 OdfKit 僅支援標準 AES-256-CBC、Blowfish-CBC 與 AES-256-GCM。");
         }
 
-        if (!string.Equals(derivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase))
+        if (!isArgon2 && !string.Equals(derivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase))
         {
             throw new NotSupportedException($"不支援的金鑰衍生函式： {derivationName}。");
         }
@@ -174,9 +208,49 @@ public static class OdfEncryption
             hashName = "sha1";
         }
 
-        byte[] derivedKey = Pbkdf2(pwdBytes, salt, iterationCount, keySize, hashName);
+        byte[] derivedKey;
+        if (isArgon2)
+        {
+            var builder = new Argon2Parameters.Builder(Argon2Parameters.Argon2id)
+                .WithVersion(Argon2Parameters.Version13)
+                .WithIterations(argon2T)
+                .WithMemoryAsKB(argon2M)
+                .WithParallelism(argon2P)
+                .WithSalt(salt);
 
-        if (algorithmUri == Aes256AlgorithmUri)
+            var generator = new Argon2BytesGenerator();
+            generator.Init(builder.Build());
+            derivedKey = new byte[keySize];
+            generator.GenerateBytes(pwdBytes, derivedKey, 0, derivedKey.Length);
+        }
+        else
+        {
+            derivedKey = Pbkdf2(pwdBytes, salt, iterationCount, keySize, hashName);
+        }
+
+        if (algorithmUri == Aes256GcmAlgorithmUri)
+        {
+            try
+            {
+                var cipher = new GcmBlockCipher(new AesEngine());
+                var parameters = new AeadParameters(new KeyParameter(derivedKey), 128, iv);
+                cipher.Init(false, parameters);
+
+                byte[] output = new byte[cipher.GetOutputSize(ciphertext.Length)];
+                int len = cipher.ProcessBytes(ciphertext, 0, ciphertext.Length, output, 0);
+                int finalLen = cipher.DoFinal(output, len);
+
+                byte[] decrypted = new byte[len + finalLen];
+                Buffer.BlockCopy(output, 0, decrypted, 0, decrypted.Length);
+                return decrypted;
+            }
+            catch (Exception ex)
+            {
+                throw new CryptographicException(
+                    $"GCM 解密失敗。診斷資訊：isArgon2={isArgon2}, kdfName='{kdfName}', derivationName='{derivationName}', derivedKeyLen={derivedKey?.Length}, ivLen={iv?.Length}, saltLen={salt?.Length}, ciphertextLen={ciphertext?.Length}. 原始錯誤：{ex.Message}", ex);
+            }
+        }
+        else if (algorithmUri == Aes256AlgorithmUri)
         {
             using (var aes = Aes.Create())
             {
@@ -206,19 +280,27 @@ public static class OdfEncryption
     }
 
     /// <summary>
-    /// 加密單個 ODF 項目的內容。
+    /// 加密單一封裝項目。支援傳統加密與 AES-GCM 加密，並產生對應的 IV、鹽值與驗證碼。
     /// </summary>
-    /// <param name="plaintext">要加密的明文位元組陣列</param>
-    /// <param name="password">加密密碼字串</param>
-    /// <param name="algorithm">加密演算法</param>
-    /// <param name="iv">輸出的初始向量</param>
-    /// <param name="salt">輸出的鹽值</param>
-    /// <param name="checksum">輸出的總和檢查碼</param>
-    /// <returns>加密後的密文位元組陣列</returns>
-    public static byte[] EncryptEntry(byte[] plaintext, string password, OdfEncryptionAlgorithm algorithm, out byte[] iv, out byte[] salt, out byte[] checksum)
+    /// <param name="plaintext">待加密的純文字資料位元組陣列。</param>
+    /// <param name="password">加密密碼。</param>
+    /// <param name="algorithm">加密演算法類型。</param>
+    /// <param name="iv">輸出參數，接收隨機產生的初始向量（IV）位元組陣列。</param>
+    /// <param name="salt">輸出參數，接收隨機產生的鹽值（Salt）位元組陣列。</param>
+    /// <param name="checksum">輸出參數，接收加密後計算出的驗證碼（Checksum）位元組陣列。</param>
+    /// <param name="iterationCount">金鑰衍生的反覆運算次數（預設為 50,000 次）。</param>
+    /// <returns>加密後的密文資料位元組陣列。</returns>
+    public static byte[] EncryptEntry(
+        byte[] plaintext,
+        string password,
+        OdfEncryptionAlgorithm algorithm,
+        out byte[] iv,
+        out byte[] salt,
+        out byte[] checksum,
+        int iterationCount = 50000)
     {
-        salt = new byte[16];
-        iv = new byte[algorithm == OdfEncryptionAlgorithm.Aes256 ? 16 : 8];
+        salt = new byte[algorithm == OdfEncryptionAlgorithm.Aes256Gcm ? 32 : 16];
+        iv = new byte[algorithm == OdfEncryptionAlgorithm.Aes256Gcm ? 12 : (algorithm == OdfEncryptionAlgorithm.Aes256 ? 16 : 8)];
         using (var rng = RandomNumberGenerator.Create())
         {
             rng.GetBytes(salt);
@@ -226,26 +308,59 @@ public static class OdfEncryption
         }
 
         byte[] pwdBytes = Encoding.UTF8.GetBytes(password);
-        int keySize = algorithm == OdfEncryptionAlgorithm.Aes256 ? 32 : 16;
+        int keySize = (algorithm == OdfEncryptionAlgorithm.Aes256 || algorithm == OdfEncryptionAlgorithm.Aes256Gcm) ? 32 : 16;
 
-        byte[] preHashedPwd;
         byte[] derivedKey;
-        if (algorithm == OdfEncryptionAlgorithm.Aes256)
+        if (algorithm == OdfEncryptionAlgorithm.Aes256Gcm)
         {
+            // 使用 Argon2id 衍生金鑰，參數相容於 LibreOffice 25.8+ loext
+            byte[] preHashedPwd;
             using (var sha = SHA256.Create())
                 preHashedPwd = sha.ComputeHash(pwdBytes);
-            derivedKey = Pbkdf2(preHashedPwd, salt, 50000, keySize, "sha256");
+
+            var builder = new Argon2Parameters.Builder(Argon2Parameters.Argon2id)
+                .WithVersion(Argon2Parameters.Version13)
+                .WithIterations(3)
+                .WithMemoryAsKB(65536)
+                .WithParallelism(4)
+                .WithSalt(salt);
+
+            var generator = new Argon2BytesGenerator();
+            generator.Init(builder.Build());
+            derivedKey = new byte[keySize];
+            generator.GenerateBytes(preHashedPwd, derivedKey, 0, derivedKey.Length);
+        }
+        else if (algorithm == OdfEncryptionAlgorithm.Aes256)
+        {
+            byte[] preHashedPwd;
+            using (var sha = SHA256.Create())
+                preHashedPwd = sha.ComputeHash(pwdBytes);
+            derivedKey = Pbkdf2(preHashedPwd, salt, iterationCount, keySize, "sha256");
         }
         else
         {
+            byte[] preHashedPwd;
             using (var sha = SHA1.Create())
                 preHashedPwd = sha.ComputeHash(pwdBytes);
-            derivedKey = Pbkdf2(preHashedPwd, salt, 50000, keySize, "sha1");
+            derivedKey = Pbkdf2(preHashedPwd, salt, iterationCount, keySize, "sha1");
         }
 
         byte[] ciphertext;
 
-        if (algorithm == OdfEncryptionAlgorithm.Aes256)
+        if (algorithm == OdfEncryptionAlgorithm.Aes256Gcm)
+        {
+            var cipher = new GcmBlockCipher(new AesEngine());
+            var parameters = new AeadParameters(new KeyParameter(derivedKey), 128, iv);
+            cipher.Init(true, parameters);
+
+            byte[] output = new byte[cipher.GetOutputSize(plaintext.Length)];
+            int len = cipher.ProcessBytes(plaintext, 0, plaintext.Length, output, 0);
+            int finalLen = cipher.DoFinal(output, len);
+
+            // BouncyCastle GcmBlockCipher 會自動將 tag 附在 output 尾端
+            ciphertext = output;
+        }
+        else if (algorithm == OdfEncryptionAlgorithm.Aes256)
         {
             using (var aes = Aes.Create())
             {
@@ -335,6 +450,27 @@ public static class OdfEncryption
             }
             else
             {
+                string? kdfName = null;
+                if (entry.EncryptionInfo.ExtensionProperties.TryGetValue("kdf-name", out string? kn))
+                {
+                    kdfName = kn;
+                }
+                int argon2T = 3;
+                if (entry.EncryptionInfo.ExtensionProperties.TryGetValue("argon2-t", out string? tStr) && int.TryParse(tStr, out int tVal))
+                {
+                    argon2T = tVal;
+                }
+                int argon2M = 65536;
+                if (entry.EncryptionInfo.ExtensionProperties.TryGetValue("argon2-m", out string? mStr) && int.TryParse(mStr, out int mVal))
+                {
+                    argon2M = mVal;
+                }
+                int argon2P = 4;
+                if (entry.EncryptionInfo.ExtensionProperties.TryGetValue("argon2-p", out string? pStr) && int.TryParse(pStr, out int pVal))
+                {
+                    argon2P = pVal;
+                }
+
                 byte[] decryptedBytes = DecryptEntry(
                     ciphertext,
                     password,
@@ -344,7 +480,11 @@ public static class OdfEncryption
                     entry.EncryptionInfo.IterationCount,
                     entry.EncryptionInfo.Salt,
                     entry.EncryptionInfo.InitialisationVector,
-                    entry.EncryptionInfo.StartKeyGenerationName
+                    entry.EncryptionInfo.StartKeyGenerationName,
+                    kdfName,
+                    argon2T,
+                    argon2M,
+                    argon2P
                 );
 
                 bool decompressedSuccessfully = false;
@@ -478,15 +618,26 @@ public static class OdfEncryption
                 {
                     ChecksumType = "SHA256",
                     Checksum = checksum,
-                    AlgorithmName = algorithm == OdfEncryptionAlgorithm.Aes256 ? Aes256AlgorithmUri : BlowfishAlgorithmUri,
+                    AlgorithmName = algorithm == OdfEncryptionAlgorithm.Aes256Gcm
+                        ? Aes256GcmAlgorithmUri
+                        : (algorithm == OdfEncryptionAlgorithm.Aes256 ? Aes256AlgorithmUri : BlowfishAlgorithmUri),
                     InitialisationVector = iv,
                     KeyDerivationName = "PBKDF2",
-                    KeySize = algorithm == OdfEncryptionAlgorithm.Aes256 ? 32 : 16,
+                    KeySize = (algorithm == OdfEncryptionAlgorithm.Aes256 || algorithm == OdfEncryptionAlgorithm.Aes256Gcm) ? 32 : 16,
                     IterationCount = 50000,
                     Salt = salt
                 };
 
-                if (algorithm == OdfEncryptionAlgorithm.Aes256)
+                if (algorithm == OdfEncryptionAlgorithm.Aes256Gcm)
+                {
+                    info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha256";
+                    info.StartKeySize = 32;
+                    info.ExtensionProperties["kdf-name"] = "argon2id";
+                    info.ExtensionProperties["argon2-t"] = "3";
+                    info.ExtensionProperties["argon2-m"] = "65536";
+                    info.ExtensionProperties["argon2-p"] = "4";
+                }
+                else if (algorithm == OdfEncryptionAlgorithm.Aes256)
                 {
                     info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha256";
                     info.StartKeySize = 32;

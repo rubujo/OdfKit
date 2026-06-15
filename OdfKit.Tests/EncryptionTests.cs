@@ -655,5 +655,43 @@ namespace OdfKit.Tests
             string manifest = sr.ReadToEnd();
             Assert.Contains("50000", manifest);
         }
+
+        /// <summary>
+        /// 測試 AES-256-GCM 與 Argon2id 金鑰衍生的加密及解密完整流程是否能正確還原資料，
+        /// 且 manifest.xml 中包含符合 loext 擴充格式的 xml 節點。
+        /// </summary>
+        [Fact]
+        public void Aes256Gcm_Argon2id_RoundTrip_Succeeds()
+        {
+            using var doc = OdfDocument.Create(OdfDocumentKind.Text);
+            using var ms = new MemoryStream();
+            var saveOpts = new OdfSaveOptions
+            {
+                Password = "my_gcm_password",
+                EncryptionAlgorithm = OdfEncryptionAlgorithm.Aes256Gcm
+            };
+            doc.SaveToStream(ms, saveOpts);
+
+            // 驗證 manifest.xml
+            ms.Position = 0;
+            using (var zip = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Read, true))
+            {
+                var manifestEntry = zip.GetEntry("META-INF/manifest.xml")!;
+                using var sr = new StreamReader(manifestEntry.Open());
+                string manifest = sr.ReadToEnd();
+                Assert.Contains("aes256-gcm", manifest);
+                Assert.Contains("argon2id", manifest);
+                Assert.Contains("argon2-t", manifest);
+                Assert.Contains("argon2-m", manifest);
+                Assert.Contains("argon2-p", manifest);
+            }
+
+            // 驗證解密載入
+            ms.Position = 0;
+            var loadOpts = new OdfLoadOptions { Password = "my_gcm_password" };
+            using var loadedDoc = OdfDocument.Load(ms, loadOpts);
+            Assert.NotNull(loadedDoc);
+            Assert.Equal(OdfDocumentKind.Text, loadedDoc.DocumentKind);
+        }
     }
 }
