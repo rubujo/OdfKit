@@ -108,6 +108,13 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
     public bool IsFlatXml => Package.IsFlatXml;
 
     /// <summary>
+    /// 取得或設定文件儲存時的目標 ODF 版本。
+    /// 若為 <see langword="null"/>（預設），則沿用現有 DOM 中的版本宣告。
+    /// 設定後，存檔時會覆寫 <c>office:version</c> 及 manifest 中的版本字串。
+    /// </summary>
+    public OdfVersion? TargetVersion { get; set; }
+
+    /// <summary>
     /// 取得或設定文件的內容 DOM 樹。
     /// </summary>
     internal OdfNode ContentDom { get; private protected set; } = null!;
@@ -493,10 +500,10 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
         /// <param name="name">屬性名稱。</param>
         /// <param name="value">屬性值。</param>
         /// <param name="type">ODF 中繼資料值類型，例如 string、float、boolean 或 date。</param>
-        public void SetCustomProperty(string name, object value, string type)
+        internal void SetCustomProperty(string name, object value, string type)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Property name cannot be empty.", nameof(name));
-            
+
             if (name.Contains(":"))
             {
                 string oldName = name;
@@ -505,7 +512,7 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             }
 
             var metaRoot = FindOrCreateMetaRoot();
-            
+
             OdfNode? existing = FindCustomPropertyNode(metaRoot, name);
             if (existing != null) metaRoot.RemoveChild(existing);
 
@@ -516,6 +523,21 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
             metaRoot.AppendChild(propNode);
         }
+
+        /// <summary>設定字串類型的自訂屬性。</summary>
+        public void SetCustomProperty(string name, string value) => SetCustomProperty(name, (object)value, "string");
+
+        /// <summary>設定整數類型的自訂屬性。</summary>
+        public void SetCustomProperty(string name, int value) => SetCustomProperty(name, (object)value, "float");
+
+        /// <summary>設定浮點數類型的自訂屬性。</summary>
+        public void SetCustomProperty(string name, double value) => SetCustomProperty(name, (object)value, "float");
+
+        /// <summary>設定布林類型的自訂屬性。</summary>
+        public void SetCustomProperty(string name, bool value) => SetCustomProperty(name, (object)value, "boolean");
+
+        /// <summary>設定日期類型的自訂屬性。</summary>
+        public void SetCustomProperty(string name, DateTime value) => SetCustomProperty(name, (object)value, "date");
 
         /// <summary>
         /// 取得自訂中繼資料屬性。
@@ -531,6 +553,43 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             string? type = propNode.GetAttribute("value-type", OdfNamespaces.Meta);
             string valStr = propNode.TextContent;
             return ParseValue(valStr, type);
+        }
+
+        /// <summary>
+        /// 以強型別讀取自訂中繼資料屬性，並轉換成指定型別。
+        /// </summary>
+        /// <typeparam name="T">目標型別（string、int、double、bool、DateTime）。</typeparam>
+        /// <param name="name">屬性名稱。</param>
+        /// <returns>轉換後的屬性值；若不存在或轉換失敗則為預設值。</returns>
+        public T? GetCustomProperty<T>(string name)
+        {
+            object? val = GetCustomProperty(name);
+            if (val is null) return default;
+            try { return (T)Convert.ChangeType(val, typeof(T)); }
+            catch { return default; }
+        }
+
+        /// <summary>
+        /// 取得所有自訂中繼資料屬性的字典。
+        /// </summary>
+        /// <returns>以屬性名稱為 Key 的唯讀字典。</returns>
+        public IReadOnlyDictionary<string, object?> GetAllCustomProperties()
+        {
+            var metaRoot = FindOrCreateMetaRoot();
+            var result = new Dictionary<string, object?>();
+            foreach (var child in metaRoot.Children)
+            {
+                if (child.LocalName == "user-defined" && child.NamespaceUri == OdfNamespaces.Meta)
+                {
+                    string? n = child.GetAttribute("name", OdfNamespaces.Meta);
+                    if (!string.IsNullOrEmpty(n))
+                    {
+                        string? type = child.GetAttribute("value-type", OdfNamespaces.Meta);
+                        result[n!] = ParseValue(child.TextContent, type);
+                    }
+                }
+            }
+            return result;
         }
 
         #endregion
@@ -1112,7 +1171,8 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
 
         private void ApplySaveVersionOptions(OdfSaveOptions options)
         {
-            if (options.ForceVersion is not OdfVersion forcedVersion)
+            OdfVersion? effectiveVersion = options.ForceVersion ?? TargetVersion;
+            if (effectiveVersion is not OdfVersion forcedVersion)
             {
                 return;
             }

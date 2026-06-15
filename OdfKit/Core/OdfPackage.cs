@@ -1784,6 +1784,7 @@ public sealed class OdfPackage : IDisposable, IAsyncDisposable
                 writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
                 writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "/");
                 writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, _mimetype ?? "application/vnd.oasis.opendocument.text");
+                writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, versionText);
                 writer.WriteEndElement();
 
                 // Collect directory entries
