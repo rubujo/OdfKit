@@ -2097,6 +2097,34 @@ public class TextDocument : OdfDocument
 }
 
 /// <summary>
+/// 指定頁面的使用方式。
+/// </summary>
+public enum OdfPageUsage
+{
+    /// <summary>套用至所有頁面（預設）。</summary>
+    All,
+    /// <summary>僅套用至左側頁面。</summary>
+    Left,
+    /// <summary>僅套用至右側頁面。</summary>
+    Right,
+    /// <summary>鏡像頁面，左右交替。</summary>
+    Mirrored,
+}
+
+/// <summary>
+/// 指定版面配置網格的模式。
+/// </summary>
+public enum OdfLayoutGridMode
+{
+    /// <summary>無網格。</summary>
+    None,
+    /// <summary>僅顯示行網格。</summary>
+    Line,
+    /// <summary>顯示行列網格。</summary>
+    Both,
+}
+
+/// <summary>
 /// 表示文字文件的頁面設定。
 /// </summary>
 /// <param name="doc">所屬的文字文件</param>
@@ -2137,19 +2165,32 @@ public class OdfPageSetup(TextDocument doc)
     }
 
     /// <summary>
-    /// 取得或設定頁面使用方式（例如 "all"、"left"、"right" 或 "mirrored"）。
+    /// 取得或設定頁面使用方式。
     /// </summary>
-    public string? PageUsage
+    public OdfPageUsage PageUsage
     {
         get
         {
             var props = FindOrCreatePageLayoutProperties();
-            return props.GetAttribute("page-usage", OdfNamespaces.Style);
+            return (props.GetAttribute("page-usage", OdfNamespaces.Style) ?? "all") switch
+            {
+                "left" => OdfPageUsage.Left,
+                "right" => OdfPageUsage.Right,
+                "mirrored" => OdfPageUsage.Mirrored,
+                _ => OdfPageUsage.All,
+            };
         }
         set
         {
             var props = FindOrCreatePageLayoutProperties();
-            props.SetAttribute("page-usage", OdfNamespaces.Style, value ?? "all", "style");
+            string str = value switch
+            {
+                OdfPageUsage.Left => "left",
+                OdfPageUsage.Right => "right",
+                OdfPageUsage.Mirrored => "mirrored",
+                _ => "all",
+            };
+            props.SetAttribute("page-usage", OdfNamespaces.Style, str, "style");
         }
     }
 
@@ -2192,10 +2233,27 @@ public class OdfPageSetup(TextDocument doc)
     /// <summary>
     /// 取得或設定頁面版面配置網格的模式。
     /// </summary>
-    public string? LayoutGridMode
+    public OdfLayoutGridMode LayoutGridMode
     {
-        get => GetPageStyleProp("layout-grid-mode");
-        set => SetPageStyleProp("layout-grid-mode", value);
+        get
+        {
+            return (GetPageStyleProp("layout-grid-mode") ?? "none") switch
+            {
+                "line" => OdfLayoutGridMode.Line,
+                "both" => OdfLayoutGridMode.Both,
+                _ => OdfLayoutGridMode.None,
+            };
+        }
+        set
+        {
+            string str = value switch
+            {
+                OdfLayoutGridMode.Line => "line",
+                OdfLayoutGridMode.Both => "both",
+                _ => "none",
+            };
+            SetPageStyleProp("layout-grid-mode", str);
+        }
     }
 
     /// <summary>
