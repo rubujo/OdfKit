@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using ClosedXML.Excel;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -48,10 +49,17 @@ public static class OdfToXlsxConverter
         }
     }
 
+    private sealed class CellFormula
+    {
+        public string ExcelFormula { get; }
+        public CellFormula(string f) => ExcelFormula = f;
+    }
+
     private static void SetXlCell(IXLCell cell, object? value)
     {
         switch (value)
         {
+            case CellFormula formula: cell.SetFormulaA1(formula.ExcelFormula); break;
             case double d: cell.Value = d; break;
             case int i: cell.Value = i; break;
             case bool b: cell.Value = b; break;
@@ -120,6 +128,11 @@ public static class OdfToXlsxConverter
 
     private static object? GetCellValueFromNode(OdfNode node)
     {
+        // 公式優先：若有 table:formula 屬性，翻譯後回傳
+        string? rawFormula = node.GetAttribute("formula", OdfNamespaces.Table);
+        if (!string.IsNullOrEmpty(rawFormula))
+            return new CellFormula(TranslateFormula(rawFormula!));
+
         string valueType = node.GetAttribute("value-type", OdfNamespaces.Office) ?? string.Empty;
         string value = node.GetAttribute("value", OdfNamespaces.Office) ?? string.Empty;
 
@@ -129,16 +142,12 @@ public static class OdfToXlsxConverter
         {
             case "float":
                 if (double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double number))
-                {
                     return number;
-                }
                 return null;
             case "boolean":
                 string? boolVal = node.GetAttribute("boolean-value", OdfNamespaces.Office);
                 if (bool.TryParse(boolVal, out bool flag))
-                {
                     return flag;
-                }
                 return null;
             case "date":
                 return node.GetAttribute("date-value", OdfNamespaces.Office);
@@ -147,6 +156,30 @@ public static class OdfToXlsxConverter
             default:
                 return string.IsNullOrEmpty(textContent) ? null : textContent;
         }
+    }
+
+    private static readonly Regex SheetRefRegex = new Regex(
+        @"([A-Za-z_一-龥][A-Za-z0-9_ 一-龥]*)\.(\$?[A-Z]+\$?[0-9]+(:\$?[A-Z]+\$?[0-9]+)?)",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// 將 OpenFormula 格式公式（of:= 或 oooc:= 前綴）翻譯為 Excel A1 格式公式。
+    /// </summary>
+    public static string TranslateFormula(string odtFormula)
+    {
+        string f = odtFormula;
+        // 去除命名空間前綴
+        if (f.StartsWith("of:=", StringComparison.Ordinal)) f = f.Substring(3); // 保留 "="
+        else if (f.StartsWith("of:", StringComparison.Ordinal)) f = "=" + f.Substring(3);
+        else if (f.StartsWith("oooc:=", StringComparison.Ordinal)) f = f.Substring(5);
+        else if (f.StartsWith("oooc:", StringComparison.Ordinal)) f = "=" + f.Substring(5);
+
+        if (!f.StartsWith("=", StringComparison.Ordinal)) f = "=" + f;
+
+        // 轉換工作表參照：Sheet.A1 → Sheet!A1
+        f = SheetRefRegex.Replace(f, "$1!$2");
+
+        return f;
     }
 
     private static string GetTextContent(OdfNode node)
