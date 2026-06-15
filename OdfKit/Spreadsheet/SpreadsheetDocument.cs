@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using OdfKit.Chart;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -799,6 +800,21 @@ public class OdfTableSheet
     }
 
     /// <summary>
+    /// 取得或設定工作表的無障礙摘要說明（對應 ODF <c>table:summary</c> 屬性）。
+    /// </summary>
+    public string? Summary
+    {
+        get => TableNode.GetAttribute("summary", OdfNamespaces.Table);
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+                TableNode.RemoveAttribute("summary", OdfNamespaces.Table);
+            else
+                TableNode.SetAttribute("summary", OdfNamespaces.Table, value!, "table");
+        }
+    }
+
+    /// <summary>
     /// 取得一個值，指出此工作表是否啟用保護。
     /// </summary>
     public bool IsProtected
@@ -1037,6 +1053,141 @@ public class OdfTableSheet
         format.AppendChild(condition);
 
         formatsNode.AppendChild(format);
+    }
+
+    /// <summary>
+    /// 新增色階條件格式（兩色或三色）。
+    /// </summary>
+    /// <param name="range">套用範圍。</param>
+    /// <param name="minColor">最小值對應色彩。</param>
+    /// <param name="maxColor">最大值對應色彩。</param>
+    /// <param name="midColor">中間值對應色彩（可選，設定時為三色色階）。</param>
+    public void AddColorScaleFormat(OdfCellRange range,
+        OdfColor minColor, OdfColor maxColor, OdfColor? midColor = null)
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        OdfNode formatsNode = FindOrCreateCalcExtConditionalFormats();
+        string rangeAddr = BuildConditionalRangeAddr(range);
+
+        var format = new OdfNode(OdfNodeType.Element, "conditional-format", calcextNs, "calcext");
+        format.SetAttribute("target-range-address", calcextNs, rangeAddr, "calcext");
+
+        var colorScale = new OdfNode(OdfNodeType.Element, "color-scale", calcextNs, "calcext");
+
+        var entryMin = new OdfNode(OdfNodeType.Element, "color-scale-entry", calcextNs, "calcext");
+        entryMin.SetAttribute("type",  calcextNs, "min",           "calcext");
+        entryMin.SetAttribute("color", calcextNs, minColor.Value,  "calcext");
+        colorScale.AppendChild(entryMin);
+
+        if (midColor.HasValue)
+        {
+            var entryMid = new OdfNode(OdfNodeType.Element, "color-scale-entry", calcextNs, "calcext");
+            entryMid.SetAttribute("type",  calcextNs, "percentile", "calcext");
+            entryMid.SetAttribute("value", calcextNs, "50",         "calcext");
+            entryMid.SetAttribute("color", calcextNs, midColor.Value.Value, "calcext");
+            colorScale.AppendChild(entryMid);
+        }
+
+        var entryMax = new OdfNode(OdfNodeType.Element, "color-scale-entry", calcextNs, "calcext");
+        entryMax.SetAttribute("type",  calcextNs, "max",           "calcext");
+        entryMax.SetAttribute("color", calcextNs, maxColor.Value,  "calcext");
+        colorScale.AppendChild(entryMax);
+
+        format.AppendChild(colorScale);
+        formatsNode.AppendChild(format);
+    }
+
+    /// <summary>
+    /// 新增資料橫條條件格式。
+    /// </summary>
+    /// <param name="range">套用範圍。</param>
+    /// <param name="positiveColor">正值橫條色彩。</param>
+    /// <param name="negativeColor">負值橫條色彩（可選）。</param>
+    public void AddDataBarFormat(OdfCellRange range,
+        OdfColor positiveColor, OdfColor? negativeColor = null)
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        OdfNode formatsNode = FindOrCreateCalcExtConditionalFormats();
+        string rangeAddr = BuildConditionalRangeAddr(range);
+
+        var format = new OdfNode(OdfNodeType.Element, "conditional-format", calcextNs, "calcext");
+        format.SetAttribute("target-range-address", calcextNs, rangeAddr, "calcext");
+
+        var dataBar = new OdfNode(OdfNodeType.Element, "data-bar", calcextNs, "calcext");
+        dataBar.SetAttribute("positive-color", calcextNs, positiveColor.Value, "calcext");
+        if (negativeColor.HasValue)
+            dataBar.SetAttribute("negative-color", calcextNs, negativeColor.Value.Value, "calcext");
+
+        format.AppendChild(dataBar);
+        formatsNode.AppendChild(format);
+    }
+
+    /// <summary>
+    /// 新增圖示集條件格式。
+    /// </summary>
+    /// <param name="range">套用範圍。</param>
+    /// <param name="iconSet">圖示集類型。</param>
+    public void AddIconSetFormat(OdfCellRange range, OdfIconSetType iconSet)
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        OdfNode formatsNode = FindOrCreateCalcExtConditionalFormats();
+        string rangeAddr = BuildConditionalRangeAddr(range);
+
+        var format = new OdfNode(OdfNodeType.Element, "conditional-format", calcextNs, "calcext");
+        format.SetAttribute("target-range-address", calcextNs, rangeAddr, "calcext");
+
+        string iconTypeName = iconSet switch
+        {
+            OdfIconSetType.ThreeArrows        => "3Arrows",
+            OdfIconSetType.ThreeTrafficLights => "3TrafficLights1",
+            OdfIconSetType.FourRating         => "4Rating",
+            OdfIconSetType.FiveRating         => "5Rating",
+            _                                 => "3Arrows",
+        };
+        int entryCount = iconSet is OdfIconSetType.FiveRating ? 5
+                       : iconSet is OdfIconSetType.FourRating  ? 4
+                       : 3;
+
+        var iconSetNode = new OdfNode(OdfNodeType.Element, "icon-set", calcextNs, "calcext");
+        iconSetNode.SetAttribute("icon-set-type", calcextNs, iconTypeName, "calcext");
+
+        for (int i = 0; i < entryCount; i++)
+        {
+            int pct = i == 0 ? 0 : (int)Math.Round(100.0 * i / entryCount);
+            var entry = new OdfNode(OdfNodeType.Element, "icon-set-entry", calcextNs, "calcext");
+            entry.SetAttribute("type",  calcextNs, "percent",              "calcext");
+            entry.SetAttribute("value", calcextNs, pct.ToString(),         "calcext");
+            iconSetNode.AppendChild(entry);
+        }
+
+        format.AppendChild(iconSetNode);
+        formatsNode.AppendChild(format);
+    }
+
+    private OdfNode FindOrCreateCalcExtConditionalFormats()
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        foreach (var child in TableNode.Children)
+        {
+            if (child.LocalName == "conditional-formats" && child.NamespaceUri == calcextNs)
+                return child;
+        }
+        var node = new OdfNode(OdfNodeType.Element, "conditional-formats", calcextNs, "calcext");
+        TableNode.AppendChild(node);
+        return node;
+    }
+
+    private string BuildConditionalRangeAddr(OdfCellRange range)
+    {
+        var startAddr = range.StartAddress;
+        if (startAddr.SheetName is null)
+            startAddr = new OdfCellAddress(startAddr.Row, startAddr.Column, Name,
+                startAddr.IsRowAbsolute, startAddr.IsColumnAbsolute, startAddr.IsSheetAbsolute);
+        var endAddr = range.EndAddress;
+        if (endAddr.SheetName is null)
+            endAddr = new OdfCellAddress(endAddr.Row, endAddr.Column, Name,
+                endAddr.IsRowAbsolute, endAddr.IsColumnAbsolute, endAddr.IsSheetAbsolute);
+        return $"{startAddr.ToOdfString(false)}:{endAddr.ToOdfString(false)}";
     }
 
     /// <summary>
@@ -2212,6 +2363,111 @@ public class OdfTableSheet
 
     #endregion
 
+    #region 圖表
+
+    /// <summary>
+    /// 在此工作表中插入一個與儲存格範圍資料繫結的圖表。
+    /// </summary>
+    /// <param name="dataRange">資料繫結的儲存格範圍。</param>
+    /// <param name="chartType">圖表類型，預設為條形圖。</param>
+    /// <param name="x">圖表框左邊距，預設 1cm。</param>
+    /// <param name="y">圖表框上邊距，預設 1cm。</param>
+    /// <param name="width">圖表框寬度，預設 12cm。</param>
+    /// <param name="height">圖表框高度，預設 7cm。</param>
+    /// <param name="firstRowAsHeader">資料首列作為序列標題，預設 true。</param>
+    /// <param name="firstColumnAsLabel">資料首欄作為 X 軸分類標籤，預設 true。</param>
+    /// <returns>
+    /// 可進一步設定的 <see cref="OdfChartDocument"/>。
+    /// 呼叫端修改後須呼叫 <c>Save()</c> 並在父文件儲存前保持物件存活；
+    /// 請勿對此物件呼叫 <c>Dispose()</c>（生命週期由父文件管理）。
+    /// </returns>
+    public OdfChartDocument InsertChart(
+        OdfCellRange dataRange,
+        OdfChartType chartType = OdfChartType.Bar,
+        OdfLength? x = null,
+        OdfLength? y = null,
+        OdfLength? width = null,
+        OdfLength? height = null,
+        bool firstRowAsHeader = true,
+        bool firstColumnAsLabel = true)
+    {
+        string xStr  = (x     ?? OdfLength.FromCentimeters(1)).ToString();
+        string yStr  = (y     ?? OdfLength.FromCentimeters(1)).ToString();
+        string wStr  = (width ?? OdfLength.FromCentimeters(12)).ToString();
+        string hStr  = (height ?? OdfLength.FromCentimeters(7)).ToString();
+
+        // 1. 唯一物件名稱
+        int objectIndex = 1;
+        while (_doc.Package.HasEntry($"Object {objectIndex}/content.xml"))
+            objectIndex++;
+        string objectName = $"Object {objectIndex}";
+        string objectDir  = $"{objectName}/";
+
+        // 2. 建立 table:shapes > draw:frame > draw:object
+        OdfNode shapesNode = FindOrCreateShapesNode();
+        var frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
+        frame.SetAttribute("z-index", OdfNamespaces.Draw, "0", "draw");
+        frame.SetAttribute("width",   OdfNamespaces.Svg, wStr, "svg");
+        frame.SetAttribute("height",  OdfNamespaces.Svg, hStr, "svg");
+        frame.SetAttribute("x",       OdfNamespaces.Svg, xStr, "svg");
+        frame.SetAttribute("y",       OdfNamespaces.Svg, yStr, "svg");
+
+        string anchorAddr = new OdfCellAddress(
+            dataRange.StartAddress.Row, dataRange.StartAddress.Column).ToOdfString(false);
+        frame.SetAttribute("start-cell-address", OdfNamespaces.Table, anchorAddr, "table");
+        frame.SetAttribute("end-cell-address",   OdfNamespaces.Table, anchorAddr, "table");
+        frame.SetAttribute("start-x", OdfNamespaces.Table, xStr, "table");
+        frame.SetAttribute("start-y", OdfNamespaces.Table, yStr, "table");
+        frame.SetAttribute("end-x",   OdfNamespaces.Table, wStr, "table");
+        frame.SetAttribute("end-y",   OdfNamespaces.Table, hStr, "table");
+
+        var objectNode = new OdfNode(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
+        objectNode.SetAttribute("href",    OdfNamespaces.XLink, $"./{objectName}", "xlink");
+        objectNode.SetAttribute("type",    OdfNamespaces.XLink, "simple", "xlink");
+        objectNode.SetAttribute("show",    OdfNamespaces.XLink, "embed", "xlink");
+        objectNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
+        frame.AppendChild(objectNode);
+        shapesNode.AppendChild(frame);
+
+        // 3. 寫入嵌入物件的 mimetype
+        byte[] mimeBytes = System.Text.Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.chart");
+        _doc.Package.WriteEntry($"{objectDir}mimetype", mimeBytes, string.Empty);
+
+        // 4. 建立 OdfChartDocument（共享父套件；以預設 content.xml 起始）
+        var chartDoc = new OdfChartDocument(_doc.Package, objectDir);
+
+        // 5. 設定圖表類型與資料繫結
+        chartDoc.ChartClass = chartType switch
+        {
+            OdfChartType.Line    => "chart:line",
+            OdfChartType.Pie     => "chart:pie",
+            OdfChartType.Area    => "chart:area",
+            OdfChartType.Scatter => "chart:scatter",
+            OdfChartType.Bubble  => "chart:bubble",
+            _                    => "chart:bar"
+        };
+        chartDoc.SetDataRange(Name, dataRange, firstRowAsHeader, firstColumnAsLabel);
+
+        // 6. 將圖表 DOM 持久化至套件
+        chartDoc.Save();
+
+        return chartDoc;
+    }
+
+    private OdfNode FindOrCreateShapesNode()
+    {
+        foreach (var child in TableNode.Children)
+        {
+            if (child.LocalName == "shapes" && child.NamespaceUri == OdfNamespaces.Table)
+                return child;
+        }
+        var shapesNode = new OdfNode(OdfNodeType.Element, "shapes", OdfNamespaces.Table, "table");
+        TableNode.AppendChild(shapesNode);
+        return shapesNode;
+    }
+
+    #endregion
+
 }
 
 /// <summary>
@@ -3220,8 +3476,87 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
         styleNode.AppendChild(mapNode);
     }
 
+    /// <summary>
+    /// 取得依套用數字格式樣式格式化後的顯示值；若無樣式定義則回傳 <see cref="DisplayText"/>。
+    /// </summary>
+    public string FormattedValue
+    {
+        get
+        {
+            string? cellStyleName = StyleName;
+            if (string.IsNullOrEmpty(cellStyleName)) return DisplayText;
+
+            string? dataStyleName = FindDataStyleName(cellStyleName);
+            if (string.IsNullOrEmpty(dataStyleName)) return DisplayText;
+
+            OdfNode? formatNode = OdfKit.Styles.OdfNumberFormatEngine.FindFormatNode(_doc.ContentDom, dataStyleName)
+                ?? OdfKit.Styles.OdfNumberFormatEngine.FindFormatNode(_doc.StylesDom, dataStyleName);
+            if (formatNode is null) return DisplayText;
+
+            return ValueType switch
+            {
+                "float" when double.TryParse(RawValue, System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out double dbl)
+                    => OdfKit.Styles.OdfNumberFormatEngine.Format(dbl, formatNode),
+                "date" when DateTime.TryParse(
+                    Node.GetAttribute("date-value", OdfNamespaces.Office),
+                    null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime dt)
+                    => OdfKit.Styles.OdfNumberFormatEngine.Format(dt, formatNode),
+                "boolean" when bool.TryParse(
+                    Node.GetAttribute("boolean-value", OdfNamespaces.Office), out bool flag)
+                    => flag ? "TRUE" : "FALSE",
+                _ => DisplayText
+            };
+        }
+    }
+
+    private string? FindDataStyleName(string cellStyle)
+    {
+        return SearchForDataStyle(_doc.ContentDom, cellStyle)
+            ?? SearchForDataStyle(_doc.StylesDom, cellStyle);
+    }
+
+    private static string? SearchForDataStyle(OdfNode root, string cellStyle)
+    {
+        foreach (var child in root.Children)
+        {
+            if (child.NamespaceUri == OdfNamespaces.Office
+                && (child.LocalName == "automatic-styles" || child.LocalName == "styles"))
+            {
+                foreach (var style in child.Children)
+                {
+                    if (style.NamespaceUri == OdfNamespaces.Style
+                        && style.LocalName == "style"
+                        && style.GetAttribute("name", OdfNamespaces.Style) == cellStyle)
+                    {
+                        return style.GetAttribute("data-style-name", OdfNamespaces.Style);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     private void SetStyleProperty(string propertiesElement, string propertyAttr, string propertyNs, string value, string propertyPrefix)
     {
         _doc.StyleEngine.SetLocalStyleProperty(Node, "table-cell", propertiesElement, propertyAttr, propertyNs, value, propertyPrefix);
     }
+}
+
+/// <summary>
+/// 圖示集條件格式的圖示集類型。
+/// </summary>
+public enum OdfIconSetType
+{
+    /// <summary>三箭頭（↑ →↓）</summary>
+    ThreeArrows,
+
+    /// <summary>三交通燈（●●●）</summary>
+    ThreeTrafficLights,
+
+    /// <summary>四評分（★★★★）</summary>
+    FourRating,
+
+    /// <summary>五評分（★★★★★）</summary>
+    FiveRating,
 }

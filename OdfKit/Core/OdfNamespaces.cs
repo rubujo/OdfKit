@@ -59,6 +59,9 @@ public static class OdfNamespaces
     /// <summary>Ds 命名空間 URI</summary>
     public const string Ds = "http://www.w3.org/2000/09/xmldsig#";
 
+    /// <summary>Form 命名空間 URI</summary>
+    public const string Form = "urn:oasis:names:tc:opendocument:xmlns:form:1.0";
+
     /// <summary>CalcExt 命名空間 URI（LibreOffice 電子試算表計算擴充命名空間）</summary>
     public const string CalcExt = "urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0";
 
@@ -90,6 +93,7 @@ public static class OdfNamespaces
             Dsig => "dsig",
             Ds => "ds",
             CalcExt => "calcext",
+            Form => "form",
             _ => string.Empty
         };
     }
