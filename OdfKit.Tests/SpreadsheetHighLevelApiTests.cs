@@ -259,4 +259,76 @@ public class SpreadsheetHighLevelApiTests
         Assert.Contains("font-weight=\"bold\"", xml);
         Assert.Contains("#ff0000", xml);
     }
+
+    /// <summary>
+    /// 驗證列欄群組 GroupRows / UngroupRows / GroupColumns / UngroupColumns API。
+    /// </summary>
+    [Fact]
+    public void RowColumnGroupApiWorksCorrectly()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.AddSheet("Sheet1");
+
+        // 填入資料（確保列節點已建立）
+        for (int r = 0; r < 5; r++)
+            sheet.GetCell(r, 0).SetValue(r + 1.0);
+
+        // 1. GroupRows — 群組第 1~3 列（collapsed = false）
+        sheet.GroupRows(1, 3);
+
+        // 2. 群組後儲存並驗證 XML
+        using var ms1 = new MemoryStream();
+        doc.SaveToStream(ms1);
+        ms1.Position = 0;
+        using (var pkg1 = OdfKit.Core.OdfPackage.Open(ms1, leaveOpen: true))
+        using (var cs1 = pkg1.GetEntryStream("content.xml"))
+        using (var r1 = new System.IO.StreamReader(cs1))
+        {
+            string xml1 = r1.ReadToEnd();
+            Assert.Contains("table:table-row-group", xml1);
+            Assert.Contains("table:display=\"true\"", xml1);
+        }
+
+        // 3. GroupRows collapsed
+        sheet.GroupRows(4, 4, collapsed: true);
+        using var ms2 = new MemoryStream();
+        doc.SaveToStream(ms2);
+        ms2.Position = 0;
+        using (var pkg2 = OdfKit.Core.OdfPackage.Open(ms2, leaveOpen: true))
+        using (var cs2 = pkg2.GetEntryStream("content.xml"))
+        using (var r2 = new System.IO.StreamReader(cs2))
+        {
+            string xml2 = r2.ReadToEnd();
+            Assert.Contains("table:display=\"false\"", xml2);
+        }
+
+        // 4. UngroupRows — 移除群組後 table-row-group 應消失
+        sheet.UngroupRows(1, 3);
+        sheet.UngroupRows(4, 4);
+        using var ms3 = new MemoryStream();
+        doc.SaveToStream(ms3);
+        ms3.Position = 0;
+        using (var pkg3 = OdfKit.Core.OdfPackage.Open(ms3, leaveOpen: true))
+        using (var cs3 = pkg3.GetEntryStream("content.xml"))
+        using (var r3 = new System.IO.StreamReader(cs3))
+        {
+            string xml3 = r3.ReadToEnd();
+            Assert.DoesNotContain("table:table-row-group", xml3);
+        }
+
+        // 5. GroupColumns
+        for (int c = 0; c < 4; c++)
+            sheet.GetCell(0, c).SetValue(c + 1.0);
+        sheet.GroupColumns(1, 2);
+        using var ms4 = new MemoryStream();
+        doc.SaveToStream(ms4);
+        ms4.Position = 0;
+        using (var pkg4 = OdfKit.Core.OdfPackage.Open(ms4, leaveOpen: true))
+        using (var cs4 = pkg4.GetEntryStream("content.xml"))
+        using (var r4 = new System.IO.StreamReader(cs4))
+        {
+            string xml4 = r4.ReadToEnd();
+            Assert.Contains("table:table-column-group", xml4);
+        }
+    }
 }
