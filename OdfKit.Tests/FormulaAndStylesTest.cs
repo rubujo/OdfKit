@@ -564,6 +564,161 @@ namespace OdfKit.Tests
             Assert.Equal(-99.55, Math.Round(ppmt, 2));
         }
 
+        [Fact]
+        public void TestOpenFormulaExtensions()
+        {
+            var context = new MockEvaluationContext();
+            var evaluator = new DefaultFormulaEvaluator();
+            context.Evaluator = evaluator;
+
+            // 1. Logical & Bitwise Functions
+            Assert.Equal(false, evaluator.Evaluate("NOT(TRUE)", context));
+            Assert.Equal(true, evaluator.Evaluate("XOR(TRUE, FALSE)", context));
+            Assert.Equal(false, evaluator.Evaluate("XOR(TRUE, TRUE)", context));
+            Assert.Equal(5.0, evaluator.Evaluate("IFERROR(5, 10)", context));
+            Assert.Equal(10.0, evaluator.Evaluate("IFERROR(NA(), 10)", context));
+            Assert.Equal(10.0, evaluator.Evaluate("IFNA(NA(), 10)", context));
+            Assert.Equal(5.0, evaluator.Evaluate("IFNA(5, 10)", context));
+            Assert.Equal("A", evaluator.Evaluate("IFS(1=2, \"B\", 2=2, \"A\")", context));
+            Assert.Equal("A", evaluator.Evaluate("SWITCH(2, 1, \"B\", 2, \"A\")", context));
+            Assert.Equal(2.0, evaluator.Evaluate("BITAND(6, 3)", context));
+            Assert.Equal(7.0, evaluator.Evaluate("BITOR(5, 3)", context));
+            Assert.Equal(6.0, evaluator.Evaluate("BITXOR(5, 3)", context));
+            Assert.Equal(8.0, evaluator.Evaluate("BITLSHIFT(2, 2)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("BITRSHIFT(8, 2)", context));
+
+            // 2. Information Functions
+            Assert.Equal(true, evaluator.Evaluate("ISNUMBER(123.45)", context));
+            Assert.Equal(false, evaluator.Evaluate("ISNUMBER(\"test\")", context));
+            Assert.Equal(true, evaluator.Evaluate("ISTEXT(\"test\")", context));
+            Assert.Equal(false, evaluator.Evaluate("ISTEXT(123)", context));
+            Assert.Equal(true, evaluator.Evaluate("ISBLANK(A99)", context));
+            Assert.Equal(true, evaluator.Evaluate("ISERROR(NA())", context));
+            Assert.Equal(true, evaluator.Evaluate("ISNA(NA())", context));
+            Assert.Equal(false, evaluator.Evaluate("ISNA(5)", context));
+            Assert.Equal(true, evaluator.Evaluate("ISLOGICAL(TRUE)", context));
+            Assert.Equal(1.0, evaluator.Evaluate("TYPE(123)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("TYPE(\"test\")", context));
+            Assert.Equal(true, evaluator.Evaluate("ISODD(3)", context));
+            Assert.Equal(false, evaluator.Evaluate("ISODD(4)", context));
+            Assert.Equal(true, evaluator.Evaluate("ISEVEN(4)", context));
+            Assert.Equal(false, evaluator.Evaluate("ISEVEN(3)", context));
+
+            // 3. String Functions
+            Assert.Equal("ABC", evaluator.Evaluate("CONCATENATE(\"A\", \"B\", \"C\")", context));
+            Assert.Equal("Abc", evaluator.Evaluate("SUBSTITUTE(\"abc\", \"a\", \"A\")", context));
+            Assert.Equal(2.0, evaluator.Evaluate("FIND(\"b\", \"abc\")", context));
+            Assert.Equal(2.0, evaluator.Evaluate("SEARCH(\"B\", \"abc\")", context));
+            Assert.Equal("aaa", evaluator.Evaluate("REPT(\"a\", 3)", context));
+            Assert.Equal(true, evaluator.Evaluate("EXACT(\"abc\", \"abc\")", context));
+            Assert.Equal(false, evaluator.Evaluate("EXACT(\"abc\", \"ABC\")", context));
+            Assert.Equal(65.0, evaluator.Evaluate("CODE(\"A\")", context));
+            Assert.Equal("A", evaluator.Evaluate("CHAR(65)", context));
+            Assert.Equal("123", evaluator.Evaluate("TEXT(123, \"0\")", context));
+
+            // 4. Math Functions
+            Assert.Equal(3.0, evaluator.Evaluate("INT(3.7)", context));
+            Assert.Equal(-1.0, evaluator.Evaluate("SIGN(-5)", context));
+            Assert.Equal(3.0, evaluator.Evaluate("ODD(1.2)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("EVEN(1.2)", context));
+            Assert.Equal(24.0, evaluator.Evaluate("PRODUCT(2, 3, 4)", context));
+            Assert.Equal(120.0, evaluator.Evaluate("FACT(5)", context));
+            Assert.Equal(10.0, evaluator.Evaluate("MROUND(11, 5)", context));
+            Assert.Equal(3.0, evaluator.Evaluate("ROUNDUP(2.1, 0)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("ROUNDDOWN(2.9, 0)", context));
+            Assert.True(evaluator.Evaluate("RAND()", context) is double);
+            Assert.Equal(5.0, evaluator.Evaluate("RANDBETWEEN(5, 5)", context));
+            Assert.Equal(Math.PI / 2.0, evaluator.Evaluate("ASIN(1)", context));
+            Assert.Equal(0.0, evaluator.Evaluate("ACOS(1)", context));
+            Assert.Equal(Math.PI / 4.0, evaluator.Evaluate("ATAN(1)", context));
+            Assert.Equal(Math.PI / 4.0, evaluator.Evaluate("ATAN2(1, 1)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("LOG10(100)", context));
+
+            // 5. Statistical Functions
+            var cellC1 = OdfCellAddress.ParseExcel("C1");
+            var cellC2 = OdfCellAddress.ParseExcel("C2");
+            var cellC3 = OdfCellAddress.ParseExcel("C3");
+            context.CellValues[cellC1] = 10.0;
+            context.CellValues[cellC2] = 20.0;
+            context.CellValues[cellC3] = 30.0;
+
+            Assert.Equal(3.0, evaluator.Evaluate("COUNTA(C1:C3)", context));
+            Assert.Equal(0.0, evaluator.Evaluate("COUNTBLANK(C1:C3)", context));
+            Assert.Equal(25.0, evaluator.Evaluate("AVERAGEIF(C1:C3, \">10\")", context));
+            Assert.Equal(20.0, evaluator.Evaluate("MEDIAN(C1:C3)", context));
+            Assert.Equal(10.0, evaluator.Evaluate("STDEV(C1:C3)", context));
+            Assert.Equal(100.0, evaluator.Evaluate("VAR(C1:C3)", context));
+            Assert.Equal(30.0, evaluator.Evaluate("LARGE(C1:C3, 1)", context));
+            Assert.Equal(10.0, evaluator.Evaluate("SMALL(C1:C3, 1)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("RANK(20, C1:C3)", context));
+            Assert.Equal(20.0, evaluator.Evaluate("PERCENTILE(C1:C3, 0.5)", context));
+            Assert.Equal(15.0, evaluator.Evaluate("QUARTILE(C1:C3, 1)", context));
+
+            // Setup multi criteria test
+            var cellD1 = OdfCellAddress.ParseExcel("D1");
+            var cellD2 = OdfCellAddress.ParseExcel("D2");
+            var cellD3 = OdfCellAddress.ParseExcel("D3");
+            context.CellValues[cellD1] = "A";
+            context.CellValues[cellD2] = "B";
+            context.CellValues[cellD3] = "A";
+
+            Assert.Equal(40.0, evaluator.Evaluate("SUMIFS(C1:C3, D1:D3, \"A\")", context));
+            Assert.Equal(20.0, evaluator.Evaluate("AVERAGEIFS(C1:C3, D1:D3, \"A\")", context));
+            Assert.Equal(2.0, evaluator.Evaluate("COUNTIFS(D1:D3, \"A\")", context));
+
+            // 6. Lookup Functions
+            // Setup lookup table
+            context.CellValues[OdfCellAddress.ParseExcel("E1")] = "X";
+            context.CellValues[OdfCellAddress.ParseExcel("F1")] = "Y";
+            context.CellValues[OdfCellAddress.ParseExcel("E2")] = 100.0;
+            context.CellValues[OdfCellAddress.ParseExcel("F2")] = 200.0;
+
+            Assert.Equal(200.0, evaluator.Evaluate("HLOOKUP(\"Y\", E1:F2, 2, FALSE)", context));
+            Assert.Equal(100.0, evaluator.Evaluate("INDEX(E1:F2, 2, 1)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("MATCH(\"Y\", E1:F1, 0)", context));
+            Assert.Equal(200.0, evaluator.Evaluate("OFFSET(E1, 1, 1)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("ROWS(E1:E2)", context));
+            Assert.Equal(2.0, evaluator.Evaluate("COLUMNS(E1:F1)", context));
+            Assert.Equal("Y", evaluator.Evaluate("CHOOSE(2, \"X\", \"Y\", \"Z\")", context));
+
+            // 7. Date & Time Functions
+            double date1 = (new DateTime(2026, 1, 1) - new DateTime(1899, 12, 30)).TotalDays;
+            double date2 = (new DateTime(2026, 12, 31) - new DateTime(1899, 12, 30)).TotalDays;
+            
+            var cellH1 = OdfCellAddress.ParseExcel("H1");
+            var cellH2 = OdfCellAddress.ParseExcel("H2");
+            context.CellValues[cellH1] = date1;
+            context.CellValues[cellH2] = date2;
+
+            Assert.Equal(11.0, evaluator.Evaluate("DATEDIF(H1, H2, \"M\")", context));
+            Assert.Equal(date1, evaluator.Evaluate("DATEVALUE(\"2026-01-01\")", context));
+            Assert.Equal(0.5, evaluator.Evaluate("TIMEVALUE(\"12:00:00\")", context));
+            Assert.Equal(5.0, evaluator.Evaluate("WEEKDAY(H1)", context));
+            Assert.Equal(1.0, evaluator.Evaluate("WEEKNUM(H1)", context));
+            Assert.Equal((new DateTime(2026, 1, 2) - new DateTime(1899, 12, 30)).TotalDays, evaluator.Evaluate("WORKDAY(H1, 1)", context));
+            Assert.Equal(261.0, evaluator.Evaluate("NETWORKDAYS(H1, H2)", context));
+            Assert.Equal((new DateTime(2026, 2, 1) - new DateTime(1899, 12, 30)).TotalDays, evaluator.Evaluate("EDATE(H1, 1)", context));
+            Assert.Equal((new DateTime(2026, 1, 31) - new DateTime(1899, 12, 30)).TotalDays, evaluator.Evaluate("EOMONTH(H1, 0)", context));
+
+            // 8. Financial Functions
+            Assert.Equal(10.0, evaluator.Evaluate("SLN(100, 50, 5)", context));
+            Assert.Equal(40.0, evaluator.Evaluate("DDB(100, 10, 5, 1)", context));
+
+            // IRR / MIRR
+            var cellI1 = OdfCellAddress.ParseExcel("I1");
+            var cellI2 = OdfCellAddress.ParseExcel("I2");
+            var cellI3 = OdfCellAddress.ParseExcel("I3");
+            context.CellValues[cellI1] = -100.0;
+            context.CellValues[cellI2] = 50.0;
+            context.CellValues[cellI3] = 60.0;
+
+            double irr = (double)evaluator.Evaluate("IRR(I1:I3)", context);
+            Assert.Equal(0.06, Math.Round(irr, 2));
+
+            double mirr = (double)evaluator.Evaluate("MIRR(I1:I3, 0.05, 0.05)", context);
+            Assert.Equal(0.06, Math.Round(mirr, 2));
+        }
+
         #endregion
 
         #region OdfNumberFormatter Tests
