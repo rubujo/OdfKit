@@ -525,11 +525,11 @@ public class TextDocument : OdfDocument
     /// </summary>
     /// <param name="paragraph">目標段落</param>
     /// <param name="packagePath">圖片在封裝包內的路徑</param>
-    /// <param name="widthCm">圖片寬度（公分）</param>
-    /// <param name="heightCm">圖片高度（公分）</param>
+    /// <param name="width">圖片寬度</param>
+    /// <param name="height">圖片高度</param>
     /// <param name="name">圖片名稱</param>
     /// <returns>新建立的圖片物件</returns>
-    public OdfImage AddImage(OdfParagraph paragraph, string packagePath, string widthCm, string heightCm, string? name = null)
+    public OdfImage AddImage(OdfParagraph paragraph, string packagePath, OdfLength width, OdfLength height, string? name = null)
     {
         var frameNode = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
         if (name is not null)
@@ -537,8 +537,8 @@ public class TextDocument : OdfDocument
             frameNode.SetAttribute("name", OdfNamespaces.Draw, name, "draw");
         }
         frameNode.SetAttribute("anchor-type", OdfNamespaces.Text, "paragraph", "text");
-        frameNode.SetAttribute("width", OdfNamespaces.Svg, widthCm, "svg");
-        frameNode.SetAttribute("height", OdfNamespaces.Svg, heightCm, "svg");
+        frameNode.SetAttribute("width", OdfNamespaces.Svg, width.ToString(), "svg");
+        frameNode.SetAttribute("height", OdfNamespaces.Svg, height.ToString(), "svg");
 
         var imageNode = OdfNodeFactory.CreateElement("image", OdfNamespaces.Draw, "draw");
         imageNode.SetAttribute("href", OdfNamespaces.XLink, packagePath, "xlink");
@@ -2797,16 +2797,16 @@ public sealed class OdfTextImageCollection
     /// 新增圖片至新的段落。
     /// </summary>
     /// <param name="imageBytes">圖片二進位內容。</param>
-    /// <param name="widthCm">圖片寬度，例如 <c>2cm</c>。</param>
-    /// <param name="heightCm">圖片高度，例如 <c>2cm</c>。</param>
+    /// <param name="width">圖片寬度。</param>
+    /// <param name="height">圖片高度。</param>
     /// <param name="name">選用的圖片名稱。</param>
     /// <returns>新增完成的圖片。</returns>
-    public OdfImage Add(byte[] imageBytes, string widthCm, string heightCm, string? name = null)
+    public OdfImage Add(byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
     {
         var media = new OdfMediaManager(_document.Package);
         string path = media.AddImage(imageBytes, name);
         OdfParagraph paragraph = _document.AddParagraph();
-        return _document.AddImage(paragraph, path, widthCm, heightCm, name);
+        return _document.AddImage(paragraph, path, width, height, name);
     }
 
     /// <summary>
