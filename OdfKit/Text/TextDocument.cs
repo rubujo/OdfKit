@@ -260,6 +260,25 @@ public class TextDocument : OdfDocument
     }
 
     /// <summary>
+    /// 在指定的段落中新增書籤參照欄位。
+    /// </summary>
+    /// <param name="paragraph">要新增欄位的段落執行個體。</param>
+    /// <param name="bookmarkName">要參照的書籤名稱。</param>
+    /// <param name="referenceFormat">參照格式，預設為 "text"。</param>
+    public void AddBookmarkReferenceField(OdfParagraph paragraph, string bookmarkName, string referenceFormat = "text")
+    {
+        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
+        if (string.IsNullOrEmpty(bookmarkName)) throw new ArgumentException("書籤名稱不可為空。", nameof(bookmarkName));
+
+        var fNode = OdfNodeFactory.CreateElement("bookmark-ref", OdfNamespaces.Text, "text");
+        fNode.SetAttribute("ref-name", OdfNamespaces.Text, bookmarkName, "text");
+        fNode.SetAttribute("reference-format", OdfNamespaces.Text, referenceFormat, "text");
+        fNode.TextContent = bookmarkName; // 預設顯示書籤名稱
+        paragraph.Node.AppendChild(fNode);
+    }
+
+
+    /// <summary>
     /// 在指定的段落中設定變數欄位值。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
@@ -962,6 +981,32 @@ public class TextDocument : OdfDocument
         return new OdfSection(section, this);
     }
 
+    /// <summary>
+    /// 在文件本文結尾新增一個指向外部子文件參照的區段（用於主文件）。
+    /// </summary>
+    /// <param name="name">區段名稱。</param>
+    /// <param name="subDocumentUri">外部子文件的相對或絕對 URI/路徑（將寫入 xlink:href）。</param>
+    /// <returns>新建立的區段物件。</returns>
+    public OdfSection AddSubDocumentReference(string name, string subDocumentUri)
+    {
+        if (string.IsNullOrEmpty(name)) throw new ArgumentException("區段名稱不可為空。", nameof(name));
+        if (string.IsNullOrEmpty(subDocumentUri)) throw new ArgumentException("子文件 URI 不可為空。", nameof(subDocumentUri));
+
+        var sectionNode = new OdfNode(OdfNodeType.Element, "section", OdfNamespaces.Text, "text");
+        sectionNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
+
+        var sourceNode = new OdfNode(OdfNodeType.Element, "section-source", OdfNamespaces.Text, "text");
+        sourceNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+        sourceNode.SetAttribute("href", OdfNamespaces.XLink, subDocumentUri, "xlink");
+        sourceNode.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
+        sourceNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
+
+        sectionNode.AppendChild(sourceNode);
+        BodyTextRoot.AppendChild(sectionNode);
+
+        return new OdfSection(sectionNode, this);
+    }
+
     #endregion
 
     #region Tracked Changes (Accept/Reject)
@@ -980,6 +1025,21 @@ public class TextDocument : OdfDocument
     /// <param name="targetFamily">目標樣式系列名稱</param>
     /// <returns>產生的修訂識別碼</returns>
     public string RecordTrackedChange(string changeType, OdfNode? extraContent = null, string? originalStyleName = null, string? targetFamily = null)
+    {
+        return AddTrackedChange(changeType, "Author", DateTime.UtcNow, extraContent, originalStyleName, targetFamily);
+    }
+
+    /// <summary>
+    /// 新增一個追蹤修訂記錄。
+    /// </summary>
+    /// <param name="changeType">修訂類型（"insertion"、"deletion" 或 "format-change"）。</param>
+    /// <param name="creator">建立者姓名。</param>
+    /// <param name="date">修訂時間。</param>
+    /// <param name="extraContent">修訂的附加內容節點。</param>
+    /// <param name="originalStyleName">原本的樣式名稱。</param>
+    /// <param name="targetFamily">目標樣式系列名稱。</param>
+    /// <returns>產生的修訂識別碼。</returns>
+    public string AddTrackedChange(string changeType, string creator, DateTime date, OdfNode? extraContent = null, string? originalStyleName = null, string? targetFamily = null)
     {
         OdfNode? tcNode = null;
         foreach (var child in BodyTextRoot.Children)
@@ -1025,17 +1085,164 @@ public class TextDocument : OdfDocument
         var changeInfo = new OdfNode(OdfNodeType.Element, "change-info", OdfNamespaces.Office, "office");
         typeNode.AppendChild(changeInfo);
 
-        var creator = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc");
-        creator.TextContent = "Author";
-        changeInfo.AppendChild(creator);
+        var creatorNode = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc");
+        creatorNode.TextContent = creator;
+        changeInfo.AppendChild(creatorNode);
 
-        var date = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc");
-        date.TextContent = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
-        changeInfo.AppendChild(date);
+        var dateNode = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc");
+        dateNode.TextContent = date == DateTime.MinValue ? "0001-01-01T00:00:00Z" :
+                               date == DateTime.MaxValue ? "9999-12-31T23:59:59.9999999Z" :
+                               date.ToString("yyyy-MM-ddTHH:mm:ssZ");
+        changeInfo.AppendChild(dateNode);
 
         tcNode.AppendChild(changedRegion);
         return changeId;
     }
+
+    /// <summary>
+    /// 接受文件中所有的追蹤修訂。
+    /// </summary>
+    public void AcceptAllChanges()
+    {
+        AcceptAllTrackedChanges();
+    }
+
+    /// <summary>
+    /// 拒絕文件中所有的追蹤修訂。
+    /// </summary>
+    public void RejectAllChanges()
+    {
+        RejectAllTrackedChanges();
+    }
+
+    /// <summary>
+    /// 取得文件中所有的追蹤修訂。
+    /// </summary>
+    /// <returns>追蹤修訂的集合。</returns>
+    public IEnumerable<OdfTrackedChange> GetTrackedChanges()
+    {
+        var list = new List<OdfTrackedChange>();
+        var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
+        if (tcNode is null) return list;
+
+        foreach (var changedRegion in tcNode.Children)
+        {
+            string? id = changedRegion.GetAttribute("id", OdfNamespaces.Text);
+            if (string.IsNullOrEmpty(id)) continue;
+
+            string changeType = "";
+            string creator = "";
+            DateTime date = DateTime.MinValue;
+            OdfNode? specNode = null;
+
+            foreach (var child in changedRegion.Children)
+            {
+                if ((child.LocalName == "insertion" || child.LocalName == "deletion" || child.LocalName == "format-change") && 
+                    child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    changeType = child.LocalName;
+                    specNode = child;
+                    break;
+                }
+            }
+
+            if (specNode is not null)
+            {
+                var changeInfo = FindChild(specNode, "change-info", OdfNamespaces.Office);
+                if (changeInfo is not null)
+                {
+                    var creatorNode = FindChild(changeInfo, "creator", OdfNamespaces.Dc);
+                    if (creatorNode is not null) creator = creatorNode.TextContent ?? "";
+
+                    var dateNode = FindChild(changeInfo, "date", OdfNamespaces.Dc);
+                    if (dateNode is not null)
+                    {
+                        var textContent = dateNode.TextContent;
+                        if (!string.IsNullOrEmpty(textContent))
+                        {
+                            if (textContent == "0001-01-01T00:00:00Z" || textContent.StartsWith("0001-01-01"))
+                            {
+                                date = DateTime.MinValue;
+                            }
+                            else if (textContent == "9999-12-31T23:59:59.9999999Z" || textContent.StartsWith("9999-12-31"))
+                            {
+                                date = DateTime.MaxValue;
+                            }
+                            else if (DateTime.TryParse(textContent, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AdjustToUniversal, out var parsedDate))
+                            {
+                                date = parsedDate;
+                            }
+                        }
+                    }
+                }
+            }
+
+            string content = "";
+            if (changeType == "deletion" && specNode is not null)
+            {
+                var sb = new System.Text.StringBuilder();
+                ExtractTextContentIgnoringChangeInfo(specNode, sb);
+                content = sb.ToString();
+            }
+            else if (changeType == "insertion" || changeType == "format-change")
+            {
+                content = ExtractTextBetweenMarkers(BodyTextRoot, id!);
+            }
+
+            list.Add(new OdfTrackedChange(id!, changeType, creator, date, content));
+        }
+
+        return list;
+    }
+
+    private void ExtractTextContentIgnoringChangeInfo(OdfNode node, System.Text.StringBuilder sb)
+    {
+        if (node.LocalName == "change-info" && node.NamespaceUri == OdfNamespaces.Office)
+        {
+            return;
+        }
+        if (node.NodeType == OdfNodeType.Text)
+        {
+            sb.Append(node.TextContent);
+        }
+        foreach (var child in node.Children)
+        {
+            ExtractTextContentIgnoringChangeInfo(child, sb);
+        }
+    }
+
+    private string ExtractTextBetweenMarkers(OdfNode root, string changeId)
+    {
+        var sb = new System.Text.StringBuilder();
+        bool collect = false;
+        ExtractTextBetweenMarkersRecursive(root, changeId, ref collect, sb);
+        return sb.ToString();
+    }
+
+    private void ExtractTextBetweenMarkersRecursive(OdfNode node, string changeId, ref bool collect, System.Text.StringBuilder sb)
+    {
+        if (node.LocalName == "change-start" && node.NamespaceUri == OdfNamespaces.Text && node.GetAttribute("change-id", OdfNamespaces.Text) == changeId)
+        {
+            collect = true;
+            return;
+        }
+        if (node.LocalName == "change-end" && node.NamespaceUri == OdfNamespaces.Text && node.GetAttribute("change-id", OdfNamespaces.Text) == changeId)
+        {
+            collect = false;
+            return;
+        }
+
+        if (collect && node.NodeType == OdfNodeType.Text)
+        {
+            sb.Append(node.TextContent);
+        }
+
+        foreach (var child in node.Children)
+        {
+            ExtractTextBetweenMarkersRecursive(child, changeId, ref collect, sb);
+        }
+    }
+
 
     /// <summary>
     /// 追蹤格式變更。
