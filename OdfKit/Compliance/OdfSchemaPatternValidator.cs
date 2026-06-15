@@ -143,14 +143,15 @@ public static class OdfSchemaPatternValidator
                     return !hasChildElements;
                 case OdfSchemaPatternNodeKind.Ref:
                     return ReferenceAllowsDirectText(node.ReferenceName, hasChildElements, context);
+                case OdfSchemaPatternNodeKind.Choice:
+                    return node.Children.Any(child => ContentAllowsDirectText(child, hasChildElements, context));
                 case OdfSchemaPatternNodeKind.Group:
                 case OdfSchemaPatternNodeKind.Interleave:
-                case OdfSchemaPatternNodeKind.Choice:
                 case OdfSchemaPatternNodeKind.Optional:
                 case OdfSchemaPatternNodeKind.ZeroOrMore:
                 case OdfSchemaPatternNodeKind.OneOrMore:
                 case OdfSchemaPatternNodeKind.Other:
-                    return node.Children.Any(child => ContentAllowsDirectText(child, hasChildElements, context));
+                    return node.Children.Any(child => ContentAllowsDirectText(child, false, context));
                 default:
                     return false;
             }
@@ -253,6 +254,7 @@ public static class OdfSchemaPatternValidator
             var attributes = element.Attributes()
                 .Where(attribute => !attribute.IsNamespaceDeclaration)
                 .ToList();
+
             if (attributeNodes.Count == 0)
             {
                 return attributes.Count == 0;
@@ -263,6 +265,7 @@ public static class OdfSchemaPatternValidator
                 attributes,
                 string.Empty,
                 context);
+
             return matches.Any(state => AllAttributesConsumed(state, attributes.Count));
         }
 
@@ -378,16 +381,7 @@ public static class OdfSchemaPatternValidator
                     return new HashSet<string>(StringComparer.Ordinal);
                 }
 
-                var matches = new HashSet<string>(StringComparer.Ordinal);
-                foreach (OdfSchemaPatternNode root in pattern.Roots)
-                {
-                    foreach (string matched in MatchAttributePatternNode(root, attributes, state, context))
-                    {
-                        matches.Add(matched);
-                    }
-                }
-
-                return matches;
+                return MatchAttributePatternSequence(pattern.Roots, attributes, state, context);
             }
             finally
             {
@@ -1043,9 +1037,7 @@ public static class OdfSchemaPatternValidator
                 case OdfSchemaPatternNodeKind.Empty:
                     return new HashSet<int> { index };
                 case OdfSchemaPatternNodeKind.Text:
-                    return IsSimpleTextNode(parent)
-                        ? new HashSet<int> { index }
-                        : new HashSet<int>();
+                    return new HashSet<int> { index };
                 case OdfSchemaPatternNodeKind.Data:
                     return IsSimpleTextNode(parent) && MatchesDataValue(node, parent.Value, context)
                         ? new HashSet<int> { index }
@@ -1078,7 +1070,8 @@ public static class OdfSchemaPatternValidator
                 return new HashSet<int>();
             }
 
-            return MatchesElementNode(node, childElements[index], context)
+            var childContext = new MatchContext(context.Schema);
+            return MatchesElementNode(node, childElements[index], childContext)
                 ? new HashSet<int> { index + 1 }
                 : new HashSet<int>();
         }
@@ -1111,7 +1104,6 @@ public static class OdfSchemaPatternValidator
                         matches.Add(matched);
                     }
                 }
-
                 return matches;
             }
             finally
