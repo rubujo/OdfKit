@@ -2458,6 +2458,21 @@ public sealed class OdfCellRangeSelection
 }
 
 /// <summary>
+/// 表示 ODS 儲存格批注（office:annotation）的資料。
+/// </summary>
+public sealed class OdfCellAnnotation
+{
+    /// <summary>批注的純文字內容。</summary>
+    public string Text { get; init; } = string.Empty;
+    /// <summary>批注作者。</summary>
+    public string? Author { get; init; }
+    /// <summary>批注的建立日期時間（UTC）。</summary>
+    public DateTime? Date { get; init; }
+    /// <summary>批注是否顯示。</summary>
+    public bool Visible { get; init; }
+}
+
+/// <summary>
 /// 提供工作表儲存格的索引入口。
 /// </summary>
 public sealed class OdfCellCollection
@@ -2844,6 +2859,79 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
             }
             break;
         }
+    }
+
+    /// <summary>
+    /// 取得儲存格的批注；若無批注則回傳 null。
+    /// </summary>
+    public OdfCellAnnotation? GetAnnotation()
+    {
+        foreach (var child in Node.Children)
+        {
+            if (child.LocalName != "annotation" || child.NamespaceUri != OdfNamespaces.Office) continue;
+            string text = string.Empty;
+            string? author = null;
+            DateTime? date = null;
+            bool visible = child.GetAttribute("display", OdfNamespaces.Office) == "true";
+
+            foreach (var inner in child.Children)
+            {
+                if (inner.LocalName == "creator" && inner.NamespaceUri == OdfNamespaces.Dc)
+                    author = inner.TextContent;
+                else if (inner.LocalName == "date" && inner.NamespaceUri == OdfNamespaces.Dc)
+                {
+                    if (DateTime.TryParse(inner.TextContent, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime dt))
+                        date = dt;
+                }
+                else if (inner.LocalName == "p" && inner.NamespaceUri == OdfNamespaces.Text)
+                    text = inner.TextContent;
+            }
+            return new OdfCellAnnotation { Text = text, Author = author, Date = date, Visible = visible };
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 設定儲存格的批注。若已有批注則覆蓋。
+    /// </summary>
+    /// <param name="text">批注內容</param>
+    /// <param name="author">作者名稱</param>
+    /// <param name="visible">是否顯示（預設為 false）</param>
+    public void SetAnnotation(string text, string? author = null, bool visible = false)
+    {
+        RemoveAnnotation();
+        var ann = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
+        ann.SetAttribute("display", OdfNamespaces.Office, visible ? "true" : "false", "office");
+
+        if (!string.IsNullOrEmpty(author))
+        {
+            var creator = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc");
+            creator.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = author! });
+            ann.AppendChild(creator);
+        }
+
+        var dateNode = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc");
+        dateNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty)
+            { TextContent = DateTime.UtcNow.ToString("O") });
+        ann.AppendChild(dateNode);
+
+        var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+        pNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = text });
+        ann.AppendChild(pNode);
+
+        Node.AppendChild(ann);
+    }
+
+    /// <summary>
+    /// 移除儲存格的批注。
+    /// </summary>
+    public void RemoveAnnotation()
+    {
+        var toRemove = new List<OdfNode>();
+        foreach (var child in Node.Children)
+            if (child.LocalName == "annotation" && child.NamespaceUri == OdfNamespaces.Office)
+                toRemove.Add(child);
+        foreach (var child in toRemove) Node.RemoveChild(child);
     }
 
     /// <summary>

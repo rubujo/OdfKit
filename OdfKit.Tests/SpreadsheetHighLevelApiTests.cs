@@ -162,4 +162,50 @@ public class SpreadsheetHighLevelApiTests
         Assert.Contains("xlink:type=\"simple\"", xml);
         Assert.Contains("text:a", xml);
     }
+
+    /// <summary>
+    /// 驗證儲存格批注 SetAnnotation / GetAnnotation / RemoveAnnotation API。
+    /// </summary>
+    [Fact]
+    public void CellAnnotationApiWorksCorrectly()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.AddSheet("Sheet1");
+
+        // 1. SetAnnotation 帶作者
+        var cell = sheet.GetCell(0, 0);
+        cell.SetAnnotation("這是批注", "Alice");
+        var ann = cell.GetAnnotation();
+        Assert.NotNull(ann);
+        Assert.Equal("這是批注", ann.Text);
+        Assert.Equal("Alice", ann.Author);
+        Assert.False(ann.Visible);
+
+        // 2. 覆蓋批注
+        cell.SetAnnotation("新批注", visible: true);
+        ann = cell.GetAnnotation();
+        Assert.Equal("新批注", ann!.Text);
+        Assert.True(ann.Visible);
+
+        // 3. RemoveAnnotation
+        cell.RemoveAnnotation();
+        Assert.Null(cell.GetAnnotation());
+
+        // 4. 無批注的儲存格回傳 null
+        var cell2 = sheet.GetCell(0, 1);
+        Assert.Null(cell2.GetAnnotation());
+
+        // 5. XML 結構驗證
+        cell.SetAnnotation("XML 驗證批注", "Bob");
+        using var stream = new MemoryStream();
+        doc.SaveToStream(stream);
+        stream.Position = 0;
+        using var pkg = OdfKit.Core.OdfPackage.Open(stream, leaveOpen: true);
+        using var contentStream = pkg.GetEntryStream("content.xml");
+        using var reader = new System.IO.StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+        Assert.Contains("office:annotation", xml);
+        Assert.Contains("XML 驗證批注", xml);
+        Assert.Contains("Bob", xml);
+    }
 }
