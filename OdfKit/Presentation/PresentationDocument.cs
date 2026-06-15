@@ -684,7 +684,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     /// <summary>
     /// 取得底層的 ODF 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    internal OdfNode Node { get; } = node;
 
     /// <summary>
     /// 取得所屬的簡報文件。
@@ -1147,7 +1147,7 @@ public class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     /// <summary>
     /// 取得底層的 ODF 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    internal OdfNode Node { get; } = node;
 
     /// <summary>
     /// 取得所屬的投影片執行個體。

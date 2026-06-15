@@ -97,7 +97,7 @@ public class OdfPlaceholderTemplate(OdfNode node)
     /// <summary>
     /// 取得底層的 ODF 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    internal OdfNode Node { get; } = node;
 
     /// <summary>
     /// 取得或設定預留位置的型態。

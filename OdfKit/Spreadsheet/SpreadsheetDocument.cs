@@ -21,7 +21,7 @@ public class SpreadsheetDocument : OdfDocument
     /// <summary>
     /// 取得活頁簿中所有工作表的根節點。
     /// </summary>
-    public OdfNode SheetsRoot { get; private set; } = null!;
+    internal OdfNode SheetsRoot { get; private set; } = null!;
 
     /// <summary>
     /// 初始化 <see cref="SpreadsheetDocument"/> 類別的新執行個體。
@@ -714,7 +714,7 @@ public class OdfTableSheet(OdfNode tableNode, SpreadsheetDocument doc)
     /// <summary>
     /// 取得代表此工作表的 XML 節點。
     /// </summary>
-    public OdfNode TableNode { get; } = tableNode;
+    internal OdfNode TableNode { get; } = tableNode;
 
     private readonly SpreadsheetDocument _doc = doc;
 
@@ -2223,7 +2223,7 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     /// <summary>
     /// 取得代表儲存格的 XML 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    internal OdfNode Node { get; } = node;
 
     /// <summary>
     /// 取得以 0 為基準的列索引。

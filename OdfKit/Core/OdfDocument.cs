@@ -110,47 +110,47 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
     /// <summary>
     /// 取得或設定文件的內容 DOM 樹。
     /// </summary>
-    public OdfNode ContentDom { get; protected set; } = null!;
+    internal OdfNode ContentDom { get; private protected set; } = null!;
 
     /// <summary>
     /// 取得或設定文件的樣式 DOM 樹。
     /// </summary>
-    public OdfNode StylesDom { get; protected set; } = null!;
+    internal OdfNode StylesDom { get; private protected set; } = null!;
 
     /// <summary>
     /// 取得或設定文件的樣式引擎。
     /// </summary>
-    public OdfStyleEngine StyleEngine { get; protected set; } = null!;
+    internal OdfStyleEngine StyleEngine { get; private protected set; } = null!;
 
     /// <summary>
     /// 取得或設定文件的中繼資料 DOM 樹。
     /// </summary>
-    public OdfNode MetaDom { get; protected set; } = null!;
+    internal OdfNode MetaDom { get; private protected set; } = null!;
 
     /// <summary>
     /// 取得或設定文件的設定值 DOM 樹。
     /// </summary>
-    public OdfNode SettingsDom { get; protected set; } = null!;
+    internal OdfNode SettingsDom { get; private protected set; } = null!;
 
     /// <summary>
     /// 取得或設定文件內容的根節點。
     /// </summary>
-    public OdfNode ContentRoot { get => ContentDom; protected set => ContentDom = value; }
+    internal OdfNode ContentRoot { get => ContentDom; private protected set => ContentDom = value; }
 
     /// <summary>
     /// 取得或設定文件樣式的根節點。
     /// </summary>
-    public OdfNode StylesRoot { get => StylesDom; protected set => StylesDom = value; }
+    internal OdfNode StylesRoot { get => StylesDom; private protected set => StylesDom = value; }
 
     /// <summary>
     /// 取得或設定文件中繼資料的根節點。
     /// </summary>
-    public OdfNode MetaRoot { get => MetaDom; protected set => MetaDom = value; }
+    internal OdfNode MetaRoot { get => MetaDom; private protected set => MetaDom = value; }
 
     /// <summary>
     /// 取得或設定文件設定值的根節點。
     /// </summary>
-    public OdfNode SettingsRoot { get => SettingsDom; protected set => SettingsDom = value; }
+    internal OdfNode SettingsRoot { get => SettingsDom; private protected set => SettingsDom = value; }
 
     private bool _isDisposed;
 
