@@ -35,9 +35,9 @@
 ## Phase 2（進行中）
 
 - [x] `OdfTrackedChangesEngine`（整合接受／拒絕）
-- `OdfSignatureSigner`（簽署管線）
-- `OdfPackageSaver` + `OdfPackageLoadContext`
-- `OdfManifestLoader`
+- [x] `OdfManifestLoader` + `OdfManifestLoadContext`
+- [ ] `OdfSignatureSigner`（簽署管線）
+- [ ] `OdfPackageSaver` + `OdfPackageLoadContext`
 
 ## Phase 3（後續）
 
