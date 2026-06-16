@@ -22,7 +22,6 @@ public sealed partial class OdfPackage
 {
     #region Saving and Atomic Save
 
-
     /// <summary>
     /// 將所有變更儲存回原來的檔案或資料流中。
     /// </summary>
@@ -38,7 +37,7 @@ public sealed partial class OdfPackage
         OdfSaveOptions previousOptions = UseSaveOptions(options);
         try
         {
-            // Process formulas and font embedding on save if configured
+            // 若已設定，於儲存時處理公式與字型嵌入
             ProcessSaveHooks();
 
             bool hasEncryption = _saveOptions.Password != null || _saveOptions.CryptographyProvider != null;
@@ -48,7 +47,7 @@ public sealed partial class OdfPackage
             }
             try
             {
-                // Write/update manifest before serialize
+                // 序列化前先寫入或更新 manifest
                 if (!_isFlatXml)
                 {
                     SaveRdfMetadataToEntries();
@@ -138,7 +137,7 @@ public sealed partial class OdfPackage
         OdfSaveOptions previousOptions = UseSaveOptions(options);
         try
         {
-            // Process formulas and font embedding on save if configured
+            // 若已設定，於儲存時處理公式與字型嵌入
             ProcessSaveHooks();
 
             bool hasEncryption = _saveOptions.Password != null || _saveOptions.CryptographyProvider != null;
@@ -148,6 +147,7 @@ public sealed partial class OdfPackage
             }
             try
             {
+                // 序列化前先寫入或更新 manifest
                 if (!_isFlatXml)
                 {
                     SaveRdfMetadataToEntries();
@@ -361,11 +361,11 @@ public sealed partial class OdfPackage
 
     internal void SaveManifestToEntries()
     {
-        // Build manifest.xml
+        // 建置 manifest.xml
         using var ms = new MemoryStream();
         var settings = new XmlWriterSettings
         {
-            Encoding = new UTF8Encoding(false), // UTF-8 without BOM
+            Encoding = new UTF8Encoding(false), // 不含 BOM 的 UTF-8
             Indent = _saveOptions.IndentXml
         };
 
@@ -384,14 +384,14 @@ public sealed partial class OdfPackage
             writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
             writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, versionText);
 
-            // Root entry
+            // 根項目
             writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
             writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "/");
             writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, _mimetype ?? "application/vnd.oasis.opendocument.text");
             writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, versionText);
             writer.WriteEndElement();
 
-            // Collect directory entries
+            // 收集目錄項目
             var directories = new Dictionary<string, string>(StringComparer.Ordinal);
             foreach (var key in _manifest.Keys)
             {
@@ -401,7 +401,7 @@ public sealed partial class OdfPackage
                     string dir = key.Substring(0, slashIdx + 1);
                     if (!directories.ContainsKey(dir))
                     {
-                        // Try to read mimetype for this directory
+                        // 嘗試讀取此目錄的 mimetype
                         string mimeKey = dir + "mimetype";
                         string mimeType = "";
                         if (_entries.TryGetValue(mimeKey, out var mimeEntry))
@@ -418,7 +418,7 @@ public sealed partial class OdfPackage
                 }
             }
 
-            // Rest of manifest sorted by key for deterministic output (required for digital signatures)
+            // 其餘 manifest 項目依鍵值排序以確保確定性輸出（數位簽章所需）
             var sortedKeys = new List<string>(_manifest.Keys);
             foreach (var dir in directories.Keys)
             {
@@ -457,7 +457,7 @@ public sealed partial class OdfPackage
                     writer.WriteStartElement("algorithm", OdfNamespaces.Manifest);
                     writer.WriteAttributeString("manifest", "algorithm-name", OdfNamespaces.Manifest, info.AlgorithmName);
                     writer.WriteAttributeString("manifest", "initialisation-vector", OdfNamespaces.Manifest, Convert.ToBase64String(info.InitialisationVector));
-                    writer.WriteEndElement(); // algorithm
+                    writer.WriteEndElement(); // algorithm 元素
 
                     foreach (var encryptedKey in info.OpenPgpEncryptedKeys)
                     {
@@ -482,7 +482,7 @@ public sealed partial class OdfPackage
                         {
                             writer.WriteString(Convert.ToBase64String(encryptedKey.KeyPacket));
                         }
-                        writer.WriteEndElement(); // encrypted-key
+                        writer.WriteEndElement(); // encrypted-key 元素
                     }
 
                     writer.WriteStartElement("key-derivation", OdfNamespaces.Manifest);
@@ -513,444 +513,32 @@ public sealed partial class OdfPackage
                             }
                         }
                     }
-                    writer.WriteEndElement(); // key-derivation
+                    writer.WriteEndElement(); // key-derivation 元素
 
                     if (!string.IsNullOrEmpty(info.StartKeyGenerationName) && info.StartKeySize.HasValue)
                     {
                         writer.WriteStartElement("start-key-generation", OdfNamespaces.Manifest);
                         writer.WriteAttributeString("manifest", "start-key-generation-name", OdfNamespaces.Manifest, info.StartKeyGenerationName);
                         writer.WriteAttributeString("manifest", "key-size", OdfNamespaces.Manifest, info.StartKeySize.Value.ToString(CultureInfo.InvariantCulture));
-                        writer.WriteEndElement(); // start-key-generation
+                        writer.WriteEndElement(); // start-key-generation 元素
                     }
 
-                    writer.WriteEndElement(); // encryption-data
+                    writer.WriteEndElement(); // encryption-data 元素
                 }
 
-                writer.WriteEndElement(); // file-entry
+                writer.WriteEndElement(); // file-entry 元素
             }
 
-            writer.WriteEndElement(); // manifest
+            writer.WriteEndElement(); // manifest 元素
             writer.WriteEndDocument();
         }
 
-        // WriteEntry handles signature removal; temporarily bypass it during internal manifest generation
+        // WriteEntry 會處理簽章移除；內部產生 manifest 時暫時略過
         var manifestEntryName = "META-INF/manifest.xml";
         var pkgEntry = new OdfPackageEntry(manifestEntryName, ms.ToArray());
         _entries[manifestEntryName] = pkgEntry;
         _manifest[manifestEntryName] = "text/xml";
     }
-
-    private void RemoveOutdatedSignatures()
-    {
-        // Invalid digital signatures are automatically cleared upon modification to prevent warnings
-        if (HasEntry("META-INF/documentsignatures.xml"))
-        {
-            // Temporarily bypass WriteEntry/RemoveEntry to avoid infinite recursion
-            _entries.Remove("META-INF/documentsignatures.xml");
-            _manifest.Remove("META-INF/documentsignatures.xml");
-            OdfKitDiagnostics.Info("Outdated digital signatures removed due to package edit.");
-        }
-    }
-
-    private void ProcessSaveHooks()
-    {
-        bool evaluateFormulas = _saveOptions.EvaluateFormulasOnSave;
-        bool embedFonts = _saveOptions.EmbedUsedFonts;
-
-        if (!evaluateFormulas && !embedFonts)
-        {
-            return;
-        }
-
-        OdfNode? contentRoot = null;
-        OdfNode? stylesRoot = null;
-
-        if (_entries.TryGetValue("content.xml", out var contentEntry))
-        {
-            try
-            {
-                using var stream = contentEntry.OpenReader();
-                contentRoot = OdfXmlReader.Parse(stream, _loadOptions);
-            }
-            catch (Exception ex)
-            {
-                OdfKitDiagnostics.Warn($"Failed to parse content.xml for save processing: {ex.Message}");
-            }
-        }
-
-        if (embedFonts && _entries.TryGetValue("styles.xml", out var stylesEntry))
-        {
-            try
-            {
-                using var stream = stylesEntry.OpenReader();
-                stylesRoot = OdfXmlReader.Parse(stream, _loadOptions);
-            }
-            catch (Exception ex)
-            {
-                OdfKitDiagnostics.Warn($"Failed to parse styles.xml for save processing: {ex.Message}");
-            }
-        }
-
-        bool contentModified = false;
-        bool stylesModified = false;
-
-        if (evaluateFormulas && contentRoot != null)
-        {
-            try
-            {
-                var evaluator = new DefaultFormulaEvaluator();
-                evaluator.EvaluateFormulasInDocument(contentRoot);
-                contentModified = true;
-            }
-            catch (Exception ex)
-            {
-                OdfKitDiagnostics.Warn($"Failed to evaluate formulas in document on save: {ex.Message}");
-            }
-        }
-
-        if (embedFonts && (contentRoot != null || stylesRoot != null))
-        {
-            try
-            {
-                var dummy = new OdfNode(OdfNodeType.Element, "dummy", string.Empty);
-                OdfFontResolver.EmbedFonts(this, contentRoot ?? dummy, stylesRoot ?? dummy);
-                if (contentRoot != null)
-                    contentModified = true;
-                if (stylesRoot != null)
-                    stylesModified = true;
-            }
-            catch (Exception ex)
-            {
-                OdfKitDiagnostics.Warn($"Failed to embed fonts in document on save: {ex.Message}");
-            }
-        }
-
-        if (contentModified && contentRoot != null)
-        {
-            try
-            {
-                using var ms = new MemoryStream();
-                OdfXmlWriter.Write(contentRoot, ms, _saveOptions);
-                WriteEntry("content.xml", ms.ToArray(), "text/xml");
-            }
-            catch (Exception ex)
-            {
-                OdfKitDiagnostics.Error($"Failed to write updated content.xml back to package on save: {ex.Message}", ex);
-            }
-        }
-
-        if (stylesModified && stylesRoot != null)
-        {
-            try
-            {
-                using var ms = new MemoryStream();
-                OdfXmlWriter.Write(stylesRoot, ms, _saveOptions);
-                WriteEntry("styles.xml", ms.ToArray(), "text/xml");
-            }
-            catch (Exception ex)
-            {
-                OdfKitDiagnostics.Error($"Failed to write updated styles.xml back to package on save: {ex.Message}", ex);
-            }
-        }
-    }
-
-    private void WriteToArchive(Stream targetStream)
-    {
-        if (_isFlatXml)
-        {
-            WriteFlatXmlToStream(targetStream);
-            return;
-        }
-
-        using var zip = new ZipArchive(targetStream, ZipArchiveMode.Create, true, Encoding.UTF8);
-
-        // 1. mimetype MUST be first and Stored (uncompressed)
-        if (_entries.TryGetValue("mimetype", out var mimeEntry))
-        {
-            var zipEntry = zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
-
-            // 啟用確定性輸出時，使用固定 ZIP 時間戳記。
-            if (_saveOptions.Deterministic)
-            {
-                zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
-            }
-
-            using (var entryStream = zipEntry.Open())
-            using (var src = mimeEntry.OpenReader())
-            {
-                src.CopyTo(entryStream);
-            }
-        }
-
-        // 2. Write all other entries
-        foreach (var kvp in _entries)
-        {
-            if (kvp.Key == "mimetype")
-                continue;
-
-            var compLevel = kvp.Value.IsCompressed ? _saveOptions.CompressionLevel : CompressionLevel.NoCompression;
-            var zipEntry = zip.CreateEntry(kvp.Key, compLevel);
-
-            if (_saveOptions.Deterministic)
-            {
-                zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
-            }
-
-            using (var entryStream = zipEntry.Open())
-            using (var src = kvp.Value.OpenReader())
-            {
-                src.CopyTo(entryStream);
-            }
-        }
-    }
-
-    private void WriteFlatXmlToStream(Stream targetStream)
-    {
-        var officeNs = XNamespace.Get(OdfNamespaces.Office);
-        var xmlSettings = new XmlReaderSettings
-        {
-            DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null,
-            MaxCharactersInDocument = _loadOptions.MaxXmlCharactersInDocument > 0 ? _loadOptions.MaxXmlCharactersInDocument : 0
-        };
-
-        // Read content.xml
-        XElement contentRoot;
-        if (_entries.TryGetValue("content.xml", out var contentEntry))
-        {
-            using var reader = XmlReader.Create(contentEntry.OpenReader(), xmlSettings);
-            contentRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid content.xml root");
-        }
-        else
-        {
-            throw new InvalidDataException("Missing virtual content.xml");
-        }
-
-        // Read styles.xml
-        XElement stylesRoot;
-        if (_entries.TryGetValue("styles.xml", out var stylesEntry))
-        {
-            using var reader = XmlReader.Create(stylesEntry.OpenReader(), xmlSettings);
-            stylesRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid styles.xml root");
-        }
-        else
-        {
-            stylesRoot = new XElement(officeNs + "document-styles");
-        }
-
-        // Read meta.xml
-        XElement metaRoot;
-        if (_entries.TryGetValue("meta.xml", out var metaEntry))
-        {
-            using var reader = XmlReader.Create(metaEntry.OpenReader(), xmlSettings);
-            metaRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid meta.xml root");
-        }
-        else
-        {
-            metaRoot = new XElement(officeNs + "document-meta");
-        }
-
-        // Read settings.xml
-        XElement settingsRoot;
-        if (_entries.TryGetValue("settings.xml", out var settingsEntry))
-        {
-            using var reader = XmlReader.Create(settingsEntry.OpenReader(), xmlSettings);
-            settingsRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid settings.xml root");
-        }
-        else
-        {
-            settingsRoot = new XElement(officeNs + "document-settings");
-        }
-
-        // Construct new office:document
-        var root = new XElement(officeNs + "document");
-
-        // Copy version and mimetype
-        string version = contentRoot.Attribute(officeNs + "version")?.Value ?? "1.3";
-        root.SetAttributeValue(officeNs + "version", version);
-        if (!string.IsNullOrEmpty(_mimetype))
-        {
-            root.SetAttributeValue(officeNs + "mimetype", _mimetype);
-        }
-
-        // Copy namespace declarations
-        CopyNamespaces(contentRoot, root);
-        CopyNamespaces(stylesRoot, root);
-        CopyNamespaces(metaRoot, root);
-        CopyNamespaces(settingsRoot, root);
-
-        // 1. meta
-        var metaElement = metaRoot.Element(officeNs + "meta");
-        if (metaElement != null)
-        {
-            root.Add(new XElement(metaElement));
-        }
-
-        // 2. settings
-        var settingsElement = settingsRoot.Element(officeNs + "settings");
-        if (settingsElement != null)
-        {
-            root.Add(new XElement(settingsElement));
-        }
-
-        // 3. font-face-decls
-        var contentFontDecls = contentRoot.Element(officeNs + "font-face-decls");
-        var stylesFontDecls = stylesRoot.Element(officeNs + "font-face-decls");
-        XElement? fontDecls = null;
-        if (stylesFontDecls != null)
-        {
-            fontDecls = new XElement(stylesFontDecls);
-        }
-        else if (contentFontDecls != null)
-        {
-            fontDecls = new XElement(contentFontDecls);
-        }
-        if (fontDecls != null)
-        {
-            root.Add(fontDecls);
-        }
-
-        // 4. styles
-        var stylesElement = stylesRoot.Element(officeNs + "styles");
-        if (stylesElement != null)
-        {
-            root.Add(new XElement(stylesElement));
-        }
-
-        // 5. automatic-styles
-        var combinedAutoStyles = new XElement(officeNs + "automatic-styles");
-        var contentAuto = contentRoot.Element(officeNs + "automatic-styles");
-        if (contentAuto != null)
-        {
-            combinedAutoStyles.Add(contentAuto.Elements());
-        }
-        var stylesAuto = stylesRoot.Element(officeNs + "automatic-styles");
-        if (stylesAuto != null)
-        {
-            foreach (var element in stylesAuto.Elements())
-            {
-                var nameAttr = element.Attribute(XName.Get("name", OdfNamespaces.Style));
-                if (nameAttr != null)
-                {
-                    var existing = combinedAutoStyles.Elements().FirstOrDefault(e => e.Attribute(XName.Get("name", OdfNamespaces.Style))?.Value == nameAttr.Value);
-                    if (existing != null)
-                        continue;
-                }
-                combinedAutoStyles.Add(new XElement(element));
-            }
-        }
-        if (combinedAutoStyles.HasElements)
-        {
-            root.Add(combinedAutoStyles);
-        }
-
-        // 6. master-styles
-        var masterStyles = stylesRoot.Element(officeNs + "master-styles");
-        if (masterStyles != null)
-        {
-            root.Add(new XElement(masterStyles));
-        }
-
-        // 7. body
-        var bodyElement = contentRoot.Element(officeNs + "body");
-        if (bodyElement != null)
-        {
-            root.Add(new XElement(bodyElement));
-        }
-
-        // Re-embed base64 images and sub-documents from virtual entries
-        var xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
-        var elementsWithHref = root.Descendants().Where(e => e.Attribute(xlinkNs + "href") != null).ToList();
-
-        foreach (var elem in elementsWithHref)
-        {
-            var hrefAttr = elem.Attribute(xlinkNs + "href")!;
-            string href = hrefAttr.Value;
-            if (href.StartsWith("Pictures/"))
-            {
-                if (_entries.TryGetValue(href, out var entry))
-                {
-                    byte[] imageBytes;
-                    using (var entryReader = entry.OpenReader())
-                    using (var ms = new MemoryStream())
-                    {
-                        entryReader.CopyTo(ms);
-                        imageBytes = ms.ToArray();
-                    }
-
-                    string base64 = Convert.ToBase64String(imageBytes);
-                    var binDataElement = new XElement(officeNs + "binary-data", base64);
-                    elem.Add(binDataElement);
-
-                    hrefAttr.Remove();
-                    elem.Attribute(xlinkNs + "type")?.Remove();
-                    elem.Attribute(xlinkNs + "show")?.Remove();
-                    elem.Attribute(xlinkNs + "actuate")?.Remove();
-                }
-            }
-            else
-            {
-                string normHref = href.TrimStart('.', '/').TrimEnd('/');
-                string subDocContentPath = $"{normHref}/content.xml";
-                if (_entries.TryGetValue(subDocContentPath, out var subDocEntry))
-                {
-                    string mimeType = "application/vnd.oasis.opendocument.formula";
-                    string subDocMimePath = $"{normHref}/mimetype";
-                    if (_entries.TryGetValue(subDocMimePath, out var mimeEntry))
-                    {
-                        using var mimeReader = new StreamReader(mimeEntry.OpenReader(), Encoding.UTF8);
-                        mimeType = mimeReader.ReadToEnd().Trim();
-                    }
-                    else if (_manifest.TryGetValue(normHref, out var m))
-                    {
-                        mimeType = m;
-                    }
-                    else if (_manifest.TryGetValue(normHref + "/", out var mSlash))
-                    {
-                        mimeType = mSlash;
-                    }
-
-                    XElement subDocRoot;
-                    using (var subReader = XmlReader.Create(subDocEntry.OpenReader(), xmlSettings))
-                    {
-                        subDocRoot = XDocument.Load(subReader).Root ?? throw new InvalidDataException($"Invalid {subDocContentPath} root");
-                    }
-
-                    var nestedDoc = new XElement(officeNs + "document");
-                    nestedDoc.SetAttributeValue(officeNs + "mimetype", mimeType);
-
-                    string subDocVersion = subDocRoot.Attribute(officeNs + "version")?.Value ?? "1.3";
-                    nestedDoc.SetAttributeValue(officeNs + "version", subDocVersion);
-
-                    CopyNamespaces(subDocRoot, nestedDoc);
-
-                    foreach (var child in subDocRoot.Elements())
-                    {
-                        nestedDoc.Add(new XElement(child));
-                    }
-
-                    elem.Add(nestedDoc);
-
-                    hrefAttr.Remove();
-                    elem.Attribute(xlinkNs + "type")?.Remove();
-                    elem.Attribute(xlinkNs + "show")?.Remove();
-                    elem.Attribute(xlinkNs + "actuate")?.Remove();
-                }
-            }
-        }
-
-        // Write consolidated XML tree to targetStream
-        var writerSettings = new XmlWriterSettings
-        {
-            Encoding = new UTF8Encoding(false),
-            Indent = _saveOptions.IndentXml
-        };
-        using (var writer = XmlWriter.Create(targetStream, writerSettings))
-        {
-            root.Save(writer);
-        }
-    }
-
 
     #endregion
 }
