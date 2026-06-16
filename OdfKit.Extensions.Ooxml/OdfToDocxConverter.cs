@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 using DocumentFormat.OpenXml;
@@ -32,7 +33,7 @@ public static class OdfToDocxConverter
         if (odtDocument is null) throw new ArgumentNullException(nameof(odtDocument));
         if (docxStream is null) throw new ArgumentNullException(nameof(docxStream));
 
-        var ctx = new ConversionContext(odtDocument.Package);
+        var ctx = new ConversionContext(odtDocument);
         var imagePartCache = new Dictionary<string, ImagePart>();
 
         using var wordDoc = WordprocessingDocument.Create(docxStream, WordprocessingDocumentType.Document, autoSave: false);
@@ -43,10 +44,69 @@ public static class OdfToDocxConverter
         AddDefaultStyles(mainPart);
 
         ConvertBodyNodes(odtDocument.BodyTextRoot, body, mainPart, ctx, odtDocument.Package, imagePartCache);
+        ConvertHeaderFooter(odtDocument, mainPart, body);
 
         EnsureBodyEndsWithParagraph(body);
 
         wordDoc.Save();
+    }
+
+    // -------------------------------------------------------------------------
+    // Header and footer conversion
+    // -------------------------------------------------------------------------
+
+    private static void ConvertHeaderFooter(TextDocument odtDocument, MainDocumentPart mainPart, WP.Body body)
+    {
+        string? headerText = ExtractHeaderFooterText(odtDocument, "header");
+        string? footerText = ExtractHeaderFooterText(odtDocument, "footer");
+        if (string.IsNullOrEmpty(headerText) && string.IsNullOrEmpty(footerText))
+        {
+            return;
+        }
+
+        var sectionProperties = body.Elements<WP.SectionProperties>().LastOrDefault();
+        if (sectionProperties is null)
+        {
+            sectionProperties = new WP.SectionProperties();
+            body.AppendChild(sectionProperties);
+        }
+
+        if (!string.IsNullOrEmpty(headerText))
+        {
+            HeaderPart headerPart = mainPart.AddNewPart<HeaderPart>();
+            headerPart.Header = new WP.Header(new WP.Paragraph(new WP.Run(new WP.Text(headerText!))));
+            headerPart.Header.Save();
+            sectionProperties.AppendChild(new WP.HeaderReference
+            {
+                Type = WP.HeaderFooterValues.Default,
+                Id = mainPart.GetIdOfPart(headerPart)
+            });
+        }
+
+        if (!string.IsNullOrEmpty(footerText))
+        {
+            FooterPart footerPart = mainPart.AddNewPart<FooterPart>();
+            footerPart.Footer = new WP.Footer(new WP.Paragraph(new WP.Run(new WP.Text(footerText!))));
+            footerPart.Footer.Save();
+            sectionProperties.AppendChild(new WP.FooterReference
+            {
+                Type = WP.HeaderFooterValues.Default,
+                Id = mainPart.GetIdOfPart(footerPart)
+            });
+        }
+    }
+
+    private static string? ExtractHeaderFooterText(TextDocument odtDocument, string localName)
+    {
+        foreach (var node in odtDocument.StylesDom.Descendants())
+        {
+            if (node.LocalName == localName && node.NamespaceUri == OdfNamespaces.Style)
+            {
+                return node.TextContent;
+            }
+        }
+
+        return null;
     }
 
     // -------------------------------------------------------------------------
@@ -57,17 +117,51 @@ public static class OdfToDocxConverter
     {
         private readonly Dictionary<string, StyleInfo> _styles = new Dictionary<string, StyleInfo>(StringComparer.Ordinal);
 
-        public ConversionContext(OdfPackage package)
+        public ConversionContext(TextDocument document)
         {
-            LoadStyles(package);
+            LoadStyles(document.Package);
+            LoadStyles(document.StylesDom);
+            LoadStyles(document.ContentDom);
+        }
+
+        private void LoadStyles(OdfNode root)
+        {
+            foreach (var node in root.Descendants())
+            {
+                if (node.LocalName != "style" || node.NamespaceUri != OdfNamespaces.Style)
+                {
+                    continue;
+                }
+
+                string name = node.GetAttribute("name", OdfNamespaces.Style) ?? string.Empty;
+                if (string.IsNullOrEmpty(name))
+                {
+                    continue;
+                }
+
+                var info = new StyleInfo
+                {
+                    Name = name,
+                    Family = node.GetAttribute("family", OdfNamespaces.Style) ?? string.Empty,
+                    ParentName = node.GetAttribute("parent-style-name", OdfNamespaces.Style)
+                };
+                ReadStyleProperties(node, info);
+                _styles[name] = info;
+            }
         }
 
         private void LoadStyles(OdfPackage package)
         {
-            if (!package.HasEntry("styles.xml")) return;
+            LoadStylesEntry(package, "styles.xml");
+            LoadStylesEntry(package, "content.xml");
+        }
+
+        private void LoadStylesEntry(OdfPackage package, string entryName)
+        {
+            if (!package.HasEntry(entryName)) return;
             try
             {
-                using var stream = package.GetEntryStream("styles.xml");
+                using var stream = package.GetEntryStream(entryName);
                 var settings = new XmlReaderSettings
                 {
                     DtdProcessing = DtdProcessing.Prohibit,
@@ -92,20 +186,32 @@ public static class OdfToDocxConverter
 
                     if (string.IsNullOrEmpty(name)) continue;
 
-                    var info = new StyleInfo { Name = name, Family = family };
+                    var info = new StyleInfo
+                    {
+                        Name = name,
+                        Family = family,
+                        ParentName = n.GetAttribute("parent-style-name", OdfNamespaces.Style)
+                    };
                     ReadStyleProperties(n, ns, info);
                     _styles[name] = info;
                 }
             }
             catch (XmlException)
             {
-                // Ignore malformed styles.xml — proceed with defaults
+                // 忽略格式不正確的樣式 XML，並繼續使用預設樣式。
             }
         }
 
         private static void ReadStyleProperties(XPathNavigator styleNode,
             XmlNamespaceManager ns, StyleInfo info)
         {
+            var paragraphProps = styleNode.SelectSingleNode("style:paragraph-properties", ns);
+            string? textAlign = paragraphProps?.GetAttribute("text-align", OdfNamespaces.Fo);
+            if (!string.IsNullOrEmpty(textAlign))
+            {
+                info.TextAlign = textAlign;
+            }
+
             var textProps = styleNode.SelectSingleNode("style:text-properties", ns);
             if (textProps == null) return;
 
@@ -117,10 +223,60 @@ public static class OdfToDocxConverter
 
             string? color = textProps.GetAttribute("color", OdfNamespaces.Fo);
             if (!string.IsNullOrEmpty(color) && color.StartsWith("#", StringComparison.Ordinal))
-                info.Color = color.Substring(1);
+                info.Color = color!.Substring(1);
 
             string? fontSize = textProps.GetAttribute("font-size", OdfNamespaces.Fo);
             if (!string.IsNullOrEmpty(fontSize) && fontSize.EndsWith("pt", StringComparison.OrdinalIgnoreCase))
+            {
+                string ptStr = fontSize!.Substring(0, fontSize.Length - 2);
+                if (double.TryParse(ptStr, System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out double pt))
+                    info.FontSizePt = pt;
+            }
+        }
+
+        private static void ReadStyleProperties(OdfNode styleNode, StyleInfo info)
+        {
+            foreach (var child in styleNode.Children)
+            {
+                if (child.LocalName == "paragraph-properties" && child.NamespaceUri == OdfNamespaces.Style)
+                {
+                    string? textAlign = child.GetAttribute("text-align", OdfNamespaces.Fo);
+                    if (!string.IsNullOrEmpty(textAlign))
+                    {
+                        info.TextAlign = textAlign;
+                    }
+                    break;
+                }
+            }
+
+            OdfNode? textProps = null;
+            foreach (var child in styleNode.Children)
+            {
+                if (child.LocalName == "text-properties" && child.NamespaceUri == OdfNamespaces.Style)
+                {
+                    textProps = child;
+                    break;
+                }
+            }
+
+            if (textProps is null)
+            {
+                return;
+            }
+
+            info.Bold = string.Equals(textProps.GetAttribute("font-weight", OdfNamespaces.Fo), "bold", StringComparison.OrdinalIgnoreCase);
+            info.Italic = string.Equals(textProps.GetAttribute("font-style", OdfNamespaces.Fo), "italic", StringComparison.OrdinalIgnoreCase);
+
+            string? underline = textProps.GetAttribute("text-underline-style", OdfNamespaces.Style);
+            info.Underline = !string.IsNullOrEmpty(underline) && !string.Equals(underline, "none", StringComparison.OrdinalIgnoreCase);
+
+            string? color = textProps.GetAttribute("color", OdfNamespaces.Fo);
+            if (color is { Length: > 0 } && color.StartsWith("#", StringComparison.Ordinal))
+                info.Color = color.Substring(1);
+
+            string? fontSize = textProps.GetAttribute("font-size", OdfNamespaces.Fo);
+            if (fontSize is { Length: > 0 } && fontSize.EndsWith("pt", StringComparison.OrdinalIgnoreCase))
             {
                 string ptStr = fontSize.Substring(0, fontSize.Length - 2);
                 if (double.TryParse(ptStr, System.Globalization.NumberStyles.Float,
@@ -129,19 +285,39 @@ public static class OdfToDocxConverter
             }
         }
 
-        public StyleInfo? GetStyle(string? name) =>
-            name != null && _styles.TryGetValue(name, out StyleInfo? s) ? s : null;
+        public StyleInfo? GetStyle(string? name)
+        {
+            return ResolveStyle(name, []);
+        }
+
+        private StyleInfo? ResolveStyle(string? name, HashSet<string> visited)
+        {
+            if (name is null || !_styles.TryGetValue(name, out StyleInfo? style))
+            {
+                return null;
+            }
+
+            if (!visited.Add(name))
+            {
+                return style;
+            }
+
+            StyleInfo? parent = ResolveStyle(style.ParentName, visited);
+            return MergeStyles(parent, style);
+        }
     }
 
     private sealed class StyleInfo
     {
         public string Name = string.Empty;
         public string Family = string.Empty;
+        public string? ParentName;
         public bool Bold;
         public bool Italic;
         public bool Underline;
         public string? Color;
         public double? FontSizePt;
+        public string? TextAlign;
     }
 
     // -------------------------------------------------------------------------
@@ -185,12 +361,12 @@ public static class OdfToDocxConverter
         if (!string.IsNullOrEmpty(styleName))
         {
             string docxStyle = MapOdtStyleToDocx(styleName!);
-            var pp = new WP.ParagraphProperties();
-            pp.AppendChild(new WP.ParagraphStyleId { Val = docxStyle });
-            para.AppendChild(pp);
+            WP.ParagraphProperties properties = GetOrCreateParagraphProperties(para);
+            properties.AppendChild(new WP.ParagraphStyleId { Val = docxStyle });
         }
 
         StyleInfo? styleInfo = ctx.GetStyle(styleName);
+        ApplyParagraphStyle(para, styleInfo);
         AppendRunsFromNode(node, para, styleInfo, mainPart, ctx, odtPackage, imagePartCache);
         return para;
     }
@@ -207,8 +383,47 @@ public static class OdfToDocxConverter
         pp.AppendChild(new WP.ParagraphStyleId { Val = "Heading" + level });
         para.AppendChild(pp);
 
+        string? styleName = node.GetAttribute("style-name", OdfNamespaces.Text);
+        ApplyParagraphStyle(para, ctx.GetStyle(styleName));
         AppendRunsFromNode(node, para, null, mainPart, ctx, odtPackage, imagePartCache);
         return para;
+    }
+
+    private static void ApplyParagraphStyle(WP.Paragraph paragraph, StyleInfo? styleInfo)
+    {
+        if (styleInfo?.TextAlign is null)
+        {
+            return;
+        }
+
+        WP.JustificationValues? justification = styleInfo.TextAlign switch
+        {
+            "center" => WP.JustificationValues.Center,
+            "end" or "right" => WP.JustificationValues.Right,
+            "justify" => WP.JustificationValues.Both,
+            "start" or "left" => WP.JustificationValues.Left,
+            _ => null
+        };
+        if (justification is null)
+        {
+            return;
+        }
+
+        WP.ParagraphProperties properties = GetOrCreateParagraphProperties(paragraph);
+        properties.AppendChild(new WP.Justification { Val = justification.Value });
+    }
+
+    private static WP.ParagraphProperties GetOrCreateParagraphProperties(WP.Paragraph paragraph)
+    {
+        WP.ParagraphProperties? properties = paragraph.GetFirstChild<WP.ParagraphProperties>();
+        if (properties is not null)
+        {
+            return properties;
+        }
+
+        properties = new WP.ParagraphProperties();
+        paragraph.PrependChild(properties);
+        return properties;
     }
 
     private static void AppendRunsFromNode(OdfNode node, WP.Paragraph para, StyleInfo? parentStyle,
@@ -309,6 +524,7 @@ public static class OdfToDocxConverter
             Underline = child.Underline || parent.Underline,
             Color = child.Color ?? parent.Color,
             FontSizePt = child.FontSizePt ?? parent.FontSizePt,
+            TextAlign = child.TextAlign ?? parent.TextAlign,
         };
     }
 
