@@ -36,12 +36,35 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
     public static OdfDocument Load(string path) => OdfDocumentFactory.LoadDocument(path);
 
     /// <summary>
+    /// 非同步從指定路徑載入 ODF 文件。
+    /// </summary>
+    /// <param name="path">ODF 文件路徑。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    public static Task<OdfDocument> LoadAsync(string path, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => Load(path), cancellationToken);
+    }
+
+    /// <summary>
     /// 從指定路徑與載入選項載入 ODF 文件。
     /// </summary>
     /// <param name="path">ODF 文件路徑。</param>
     /// <param name="options">載入選項，例如加密文件密碼與安全限制。</param>
     /// <returns>載入完成的 ODF 文件。</returns>
     public static OdfDocument Load(string path, OdfLoadOptions? options) => OdfDocumentFactory.LoadDocument(path, options);
+
+    /// <summary>
+    /// 非同步從指定路徑與載入選項載入 ODF 文件。
+    /// </summary>
+    /// <param name="path">ODF 文件路徑。</param>
+    /// <param name="options">載入選項，例如加密文件密碼與安全限制。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    public static Task<OdfDocument> LoadAsync(string path, OdfLoadOptions? options, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => Load(path, options), cancellationToken);
+    }
 
     /// <summary>
     /// 從指定資料流載入 ODF 文件。
@@ -52,6 +75,18 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
     public static OdfDocument Load(Stream stream, string? fileName = null) => OdfDocumentFactory.LoadDocument(stream, fileName);
 
     /// <summary>
+    /// 非同步從指定資料流載入 ODF 文件。
+    /// </summary>
+    /// <param name="stream">包含 ODF 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    public static Task<OdfDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => Load(stream, fileName), cancellationToken);
+    }
+
+    /// <summary>
     /// 從指定資料流與載入選項載入 ODF 文件。
     /// </summary>
     /// <param name="stream">包含 ODF 文件內容的資料流。</param>
@@ -60,6 +95,19 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
     /// <returns>載入完成的 ODF 文件。</returns>
     public static OdfDocument Load(Stream stream, OdfLoadOptions? options, string? fileName = null) =>
         OdfDocumentFactory.LoadDocument(stream, options, fileName);
+
+    /// <summary>
+    /// 非同步從指定資料流與載入選項載入 ODF 文件。
+    /// </summary>
+    /// <param name="stream">包含 ODF 文件內容的資料流。</param>
+    /// <param name="options">載入選項，例如加密文件密碼與安全限制。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options, string? fileName = null, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => Load(stream, options, fileName), cancellationToken);
+    }
 
     /// <summary>
     /// 取得與此文件相關聯的 ODF 封裝容器。
@@ -321,6 +369,18 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
         WriteDomToEntry("settings.xml", SettingsDom, options);
 
         await Package.SaveAsync(options, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 非同步將文件保存到指定檔案路徑。
+    /// </summary>
+    /// <param name="path">要寫入的檔案路徑。</param>
+    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步儲存作業的工作。</returns>
+    public Task SaveAsync(string path, OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => Save(path, options), cancellationToken);
     }
 
     private void WriteDomToEntry(string name, OdfNode node, OdfSaveOptions options)
@@ -645,6 +705,18 @@ public abstract class OdfDocument : IDisposable, IAsyncDisposable
             {
                 destinationStream.Position = 0;
             }
+        }
+
+        /// <summary>
+        /// 非同步將文件儲存至指定的資料流。
+        /// </summary>
+        /// <param name="destinationStream">要寫入文件封裝內容的目標資料流。</param>
+        /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+        /// <param name="cancellationToken">取消語彙基元。</param>
+        /// <returns>代表非同步儲存作業的工作。</returns>
+        public Task SaveAsync(Stream destinationStream, OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            return Task.Run(() => SaveToStream(destinationStream, options), cancellationToken);
         }
 
         #endregion
