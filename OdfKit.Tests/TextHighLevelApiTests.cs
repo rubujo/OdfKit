@@ -30,7 +30,7 @@ public class TextHighLevelApiTests
         var p = document.AddParagraph("起始");
         var startNode = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
         startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
-        var textNode = new OdfNode(OdfNodeType.Text, null, null, null) { TextContent = "新增修訂文字內容" };
+        var textNode = new OdfNode(OdfNodeType.Text, null!, null!, null!) { TextContent = "新增修訂文字內容" };
         var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
         endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
 
@@ -83,7 +83,7 @@ public class TextHighLevelApiTests
         
         // 模擬一個被刪除的段落節點內容
         var deletedPara = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
-        var deletedText = new OdfNode(OdfNodeType.Text, null, null, null) { TextContent = "被刪除的文字內容" };
+        var deletedText = new OdfNode(OdfNodeType.Text, null!, null!, null!) { TextContent = "被刪除的文字內容" };
         deletedPara.AppendChild(deletedText);
 
         var changeId = document.AddTrackedChange("deletion", "DeleteAuthor", targetDate, extraContent: deletedPara);

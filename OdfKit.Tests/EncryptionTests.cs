@@ -56,13 +56,7 @@ namespace OdfKit.Tests
             Assert.Equal($"不支援的雜湊演算法：{hashName}", exception.Message);
         }
 
-        [Fact]
-        public void TestBlowfishKeyLengthValidation()
-        {
-            var blowfish = new Blowfish();
-            Assert.Throws<ArgumentException>(() => blowfish.Initialize(null!));
-            Assert.Throws<ArgumentException>(() => blowfish.Initialize(new byte[0]));
-        }
+
 
         [Fact]
         public void TestDecompressionBombDefense()

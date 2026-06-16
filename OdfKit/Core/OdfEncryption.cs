@@ -9,6 +9,7 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Paddings;
 
 namespace OdfKit.Core;
 
@@ -53,66 +54,42 @@ public static class OdfEncryption
     /// <returns>衍生的金鑰位元組陣列</returns>
     public static byte[] Pbkdf2(byte[] password, byte[] salt, int iterations, int keyLength, string hashName)
     {
+        if (salt is null)
+        {
+            throw new NullReferenceException("Salt 不能為 null。");
+        }
         if (iterations > 50000)
         {
             throw new CryptographicException($"PBKDF2 反覆運算次數 {iterations} 超過最大限制 50000。");
         }
+        if (keyLength < 0)
+        {
+            throw new OverflowException("金鑰長度不能為負數。");
+        }
+
+        int effectiveIterations = iterations <= 0 ? 1 : iterations;
 
         string normalizedHashName = hashName.Trim().ToLowerInvariant();
+        Org.BouncyCastle.Crypto.IDigest digest;
         if (normalizedHashName is "sha256" or "sha-256"
             or "http://www.w3.org/2000/09/xmldsig#sha256"
             or "http://www.w3.org/2001/04/xmlenc#sha256")
         {
-            using (var hmac = new HMACSHA256(password))
-            {
-                return Pbkdf2Hmac(hmac, salt, iterations, keyLength);
-            }
+            digest = new Org.BouncyCastle.Crypto.Digests.Sha256Digest();
         }
-
-        if (normalizedHashName is "sha1" or "sha-1" or "http://www.w3.org/2000/09/xmldsig#sha1")
+        else if (normalizedHashName is "sha1" or "sha-1" or "http://www.w3.org/2000/09/xmldsig#sha1")
         {
-            using (var hmac = new HMACSHA1(password))
-            {
-                return Pbkdf2Hmac(hmac, salt, iterations, keyLength);
-            }
+            digest = new Org.BouncyCastle.Crypto.Digests.Sha1Digest();
         }
-
-        throw new NotSupportedException($"不支援的雜湊演算法：{hashName}");
-    }
-
-    private static byte[] Pbkdf2Hmac(HMAC hmac, byte[] salt, int iterations, int keyLength)
-    {
-        byte[] key = new byte[keyLength];
-        int hashLength = hmac.HashSize / 8;
-        int numBlocks = (keyLength + hashLength - 1) / hashLength;
-        byte[] blockBuf = new byte[salt.Length + 4];
-        Buffer.BlockCopy(salt, 0, blockBuf, 0, salt.Length);
-
-        for (int i = 1; i <= numBlocks; i++)
+        else
         {
-            blockBuf[salt.Length] = (byte)(i >> 24);
-            blockBuf[salt.Length + 1] = (byte)(i >> 16);
-            blockBuf[salt.Length + 2] = (byte)(i >> 8);
-            blockBuf[salt.Length + 3] = (byte)i;
-
-            byte[] u = hmac.ComputeHash(blockBuf);
-            byte[] f = new byte[hashLength];
-            Buffer.BlockCopy(u, 0, f, 0, hashLength);
-
-            for (int j = 1; j < iterations; j++)
-            {
-                u = hmac.ComputeHash(u);
-                for (int k = 0; k < hashLength; k++)
-                {
-                    f[k] ^= u[k];
-                }
-            }
-
-            int offset = (i - 1) * hashLength;
-            int count = Math.Min(hashLength, keyLength - offset);
-            Buffer.BlockCopy(f, 0, key, offset, count);
+            throw new NotSupportedException($"不支援的雜湊演算法：{hashName}");
         }
-        return key;
+
+        var generator = new Pkcs5S2ParametersGenerator(digest);
+        generator.Init(password, salt, effectiveIterations);
+        var keyParam = (KeyParameter)generator.GenerateDerivedMacParameters(keyLength * 8);
+        return keyParam.GetKey();
     }
 
     /// <summary>
@@ -273,9 +250,7 @@ public static class OdfEncryption
         }
         else
         {
-            var blowfish = new Blowfish();
-            blowfish.Initialize(derivedKey);
-            return blowfish.DecryptCbc(ciphertext, iv);
+            return DecryptBlowfishCbc(ciphertext, derivedKey, iv);
         }
     }
 
@@ -383,9 +358,7 @@ public static class OdfEncryption
         }
         else
         {
-            var blowfish = new Blowfish();
-            blowfish.Initialize(derivedKey);
-            ciphertext = blowfish.EncryptCbc(plaintext, iv);
+            ciphertext = EncryptBlowfishCbc(plaintext, derivedKey, iv);
         }
 
         using (var sha = SHA256.Create())
@@ -701,124 +674,16 @@ public static class OdfEncryption
         return result == 0;
 #endif
     }
-}
 
-internal class Blowfish
-{
-    private readonly uint[] _p = new uint[18];
-    private readonly uint[][] _s = [new uint[256], new uint[256], new uint[256], new uint[256]];
-
-    private uint F(uint x)
+    private static byte[] DecryptBlowfishCbc(byte[] ciphertext, byte[] key, byte[] iv)
     {
-        uint a = x >> 24;
-        uint b = (x >> 16) & 0xff;
-        uint c = (x >> 8) & 0xff;
-        uint d = x & 0xff;
-        uint y = _s[0][a] + _s[1][b];
-        y ^= _s[2][c];
-        y += _s[3][d];
-        return y;
-    }
-
-    private void Encrypt(ref uint xl, ref uint xr)
-    {
-        for (int i = 0; i < 16; i++)
-        {
-            xl ^= _p[i];
-            xr ^= F(xl);
-            uint temp = xl; xl = xr; xr = temp;
-        }
-        uint t = xl; xl = xr; xr = t;
-        xr ^= _p[16];
-        xl ^= _p[17];
-    }
-
-    private void Decrypt(ref uint xl, ref uint xr)
-    {
-        for (int i = 17; i > 1; i--)
-        {
-            xl ^= _p[i];
-            xr ^= F(xl);
-            uint temp = xl; xl = xr; xr = temp;
-        }
-        uint t = xl; xl = xr; xr = t;
-        xr ^= _p[1];
-        xl ^= _p[0];
-    }
-
-    public void Initialize(byte[] key)
-    {
-        if (key is null || key.Length == 0)
-        {
-            throw new ArgumentException("Blowfish 金鑰不能為空或 null。", nameof(key));
-        }
-        Array.Copy(BlowfishConstants.P, _p, 18);
-        for (int i = 0; i < 4; i++)
-        {
-            Array.Copy(BlowfishConstants.S[i], _s[i], 256);
-        }
-
-        int keyIndex = 0;
-        for (int i = 0; i < 18; i++)
-        {
-            uint data = 0;
-            for (int j = 0; j < 4; j++)
-            {
-                data = (data << 8) | key[keyIndex];
-                keyIndex = (keyIndex + 1) % key.Length;
-            }
-            _p[i] ^= data;
-        }
-
-        uint xl = 0, xr = 0;
-        for (int i = 0; i < 18; i += 2)
-        {
-            Encrypt(ref xl, ref xr);
-            _p[i] = xl;
-            _p[i + 1] = xr;
-        }
-        for (int i = 0; i < 4; i++)
-        {
-            for (int j = 0; j < 256; j += 2)
-            {
-                Encrypt(ref xl, ref xr);
-                _s[i][j] = xl;
-                _s[i][j + 1] = xr;
-            }
-        }
-    }
-
-    public byte[] DecryptCbc(byte[] ciphertext, byte[] iv)
-    {
-        if (ciphertext.Length % 8 != 0)
-            throw new CryptographicException(
-                $"Blowfish 密文長度 {ciphertext.Length} 不是區塊大小（8 位元組）的倍數。");
+        var engine = new BlowfishEngine();
+        var cipher = new CbcBlockCipher(engine);
+        cipher.Init(false, new ParametersWithIV(new KeyParameter(key), iv));
         byte[] plaintext = new byte[ciphertext.Length];
-        uint ivL = ((uint)iv[0] << 24) | ((uint)iv[1] << 16) | ((uint)iv[2] << 8) | iv[3];
-        uint ivR = ((uint)iv[4] << 24) | ((uint)iv[5] << 16) | ((uint)iv[6] << 8) | iv[7];
-
-        for (int offset = 0; offset < ciphertext.Length; offset += 8)
+        for (int i = 0; i < ciphertext.Length; i += 8)
         {
-            uint cL = ((uint)ciphertext[offset] << 24) | ((uint)ciphertext[offset + 1] << 16) | ((uint)ciphertext[offset + 2] << 8) | ciphertext[offset + 3];
-            uint cR = ((uint)ciphertext[offset + 4] << 24) | ((uint)ciphertext[offset + 5] << 16) | ((uint)ciphertext[offset + 6] << 8) | ciphertext[offset + 7];
-
-            uint pL = cL, pR = cR;
-            Decrypt(ref pL, ref pR);
-
-            pL ^= ivL;
-            pR ^= ivR;
-
-            plaintext[offset] = (byte)(pL >> 24);
-            plaintext[offset + 1] = (byte)(pL >> 16);
-            plaintext[offset + 2] = (byte)(pL >> 8);
-            plaintext[offset + 3] = (byte)pL;
-            plaintext[offset + 4] = (byte)(pR >> 24);
-            plaintext[offset + 5] = (byte)(pR >> 16);
-            plaintext[offset + 6] = (byte)(pR >> 8);
-            plaintext[offset + 7] = (byte)pR;
-
-            ivL = cL;
-            ivR = cR;
+            cipher.ProcessBlock(ciphertext, i, plaintext, i);
         }
 
         if (plaintext.Length == 0) return plaintext;
@@ -834,50 +699,24 @@ internal class Blowfish
             if (valid)
             {
                 byte[] unpadded = new byte[plaintext.Length - paddingLen];
-                Array.Copy(plaintext, 0, unpadded, 0, unpadded.Length);
+                Buffer.BlockCopy(plaintext, 0, unpadded, 0, unpadded.Length);
                 return unpadded;
             }
         }
         return plaintext;
     }
 
-    public byte[] EncryptCbc(byte[] plaintext, byte[] iv)
+    private static byte[] EncryptBlowfishCbc(byte[] plaintext, byte[] key, byte[] iv)
     {
-        int paddingLen = 8 - (plaintext.Length % 8);
-        byte[] padded = new byte[plaintext.Length + paddingLen];
-        Array.Copy(plaintext, 0, padded, 0, plaintext.Length);
-        for (int i = plaintext.Length; i < padded.Length; i++)
-        {
-            padded[i] = (byte)paddingLen;
-        }
-
-        byte[] ciphertext = new byte[padded.Length];
-        uint ivL = ((uint)iv[0] << 24) | ((uint)iv[1] << 16) | ((uint)iv[2] << 8) | iv[3];
-        uint ivR = ((uint)iv[4] << 24) | ((uint)iv[5] << 16) | ((uint)iv[6] << 8) | iv[7];
-
-        for (int offset = 0; offset < padded.Length; offset += 8)
-        {
-            uint pL = ((uint)padded[offset] << 24) | ((uint)padded[offset + 1] << 16) | ((uint)padded[offset + 2] << 8) | padded[offset + 3];
-            uint pR = ((uint)padded[offset + 4] << 24) | ((uint)padded[offset + 5] << 16) | ((uint)padded[offset + 6] << 8) | padded[offset + 7];
-
-            pL ^= ivL;
-            pR ^= ivR;
-
-            Encrypt(ref pL, ref pR);
-
-            ciphertext[offset] = (byte)(pL >> 24);
-            ciphertext[offset + 1] = (byte)(pL >> 16);
-            ciphertext[offset + 2] = (byte)(pL >> 8);
-            ciphertext[offset + 3] = (byte)pL;
-            ciphertext[offset + 4] = (byte)(pR >> 24);
-            ciphertext[offset + 5] = (byte)(pR >> 16);
-            ciphertext[offset + 6] = (byte)(pR >> 8);
-            ciphertext[offset + 7] = (byte)pR;
-
-            ivL = pL;
-            ivR = pR;
-        }
-        return ciphertext;
+        var engine = new BlowfishEngine();
+        var cipher = new PaddedBufferedBlockCipher(new CbcBlockCipher(engine), new Pkcs7Padding());
+        cipher.Init(true, new ParametersWithIV(new KeyParameter(key), iv));
+        byte[] output = new byte[cipher.GetOutputSize(plaintext.Length)];
+        int len = cipher.ProcessBytes(plaintext, 0, plaintext.Length, output, 0);
+        int finalLen = cipher.DoFinal(output, len);
+        byte[] result = new byte[len + finalLen];
+        Buffer.BlockCopy(output, 0, result, 0, result.Length);
+        return result;
     }
 }
 
