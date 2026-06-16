@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Forms;
 using OdfKit.Styles;
-#pragma warning disable CS0618 // 允許在舊版 MailMerge(object) 的呼叫端
 
 namespace OdfKit.Text;
 
@@ -52,6 +54,15 @@ public class TextDocument : OdfDocument
     }
 
     /// <summary>
+    /// 建立新的 ODT 文字文件 Fluent builder。
+    /// </summary>
+    /// <returns>新的 <see cref="TextDocumentBuilder"/> 執行個體。</returns>
+    public static TextDocumentBuilder Builder()
+    {
+        return new TextDocumentBuilder(Create());
+    }
+
+    /// <summary>
     /// 從指定路徑載入 ODT 文字文件。
     /// </summary>
     /// <param name="path">ODT 文件路徑。</param>
@@ -60,6 +71,17 @@ public class TextDocument : OdfDocument
     public new static TextDocument Load(string path)
     {
         return EnsureTextDocument(OdfDocumentFactory.LoadDocument(path));
+    }
+
+    /// <summary>
+    /// 非同步從指定路徑載入 ODT 文字文件。
+    /// </summary>
+    /// <param name="path">ODT 文件路徑。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextDocument"/>。</returns>
+    public new static Task<TextDocument> LoadAsync(string path, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => Load(path), cancellationToken);
     }
 
     /// <summary>
@@ -72,6 +94,18 @@ public class TextDocument : OdfDocument
     public new static TextDocument Load(Stream stream, string? fileName = null)
     {
         return EnsureTextDocument(OdfDocumentFactory.LoadDocument(stream, fileName));
+    }
+
+    /// <summary>
+    /// 非同步從指定資料流載入 ODT 文字文件。
+    /// </summary>
+    /// <param name="stream">包含 ODT 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextDocument"/>。</returns>
+    public new static Task<TextDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => Load(stream, fileName), cancellationToken);
     }
 
     /// <summary>
@@ -867,17 +901,6 @@ public class TextDocument : OdfDocument
     #endregion
 
     #region MailMerge Implementation
-
-    /// <summary>
-    /// 執行郵件合併作業（舊版 API，請改用強型別版本）。
-    /// </summary>
-    /// <param name="dataSource">包含資料來源屬性的物件</param>
-    [Obsolete("請改用 MailMerge<T>(T dataSource) 或 MailMerge(IReadOnlyDictionary<string, object?>) 以獲得型別安全。")]
-    public void MailMerge(object dataSource)
-    {
-        var engine = new OdfMailMergeEngine(this);
-        engine.Execute(BodyTextRoot, dataSource);
-    }
 
     /// <summary>
     /// 以強型別資料來源物件執行郵件合併，屬性名稱對應文件中的合併欄位名稱。
@@ -2560,17 +2583,17 @@ public class OdfPageSetup
     /// <summary>
     /// 取得或設定頁面的文字書寫模式。
     /// </summary>
-    public string? WritingMode
+    public OdfWritingMode WritingMode
     {
         get
         {
             var props = FindOrCreatePageLayoutProperties();
-            return props.GetAttribute("writing-mode", OdfNamespaces.Style);
+            return OdfWritingModeExtensions.FromOdfToken(props.GetAttribute("writing-mode", OdfNamespaces.Style));
         }
         set
         {
             var props = FindOrCreatePageLayoutProperties();
-            props.SetAttribute("writing-mode", OdfNamespaces.Style, value ?? "lr-tb", "style");
+            props.SetAttribute("writing-mode", OdfNamespaces.Style, value.ToOdfToken(), "style");
         }
     }
 
@@ -2952,7 +2975,7 @@ public sealed class OdfTextBody
 /// <summary>
 /// 提供段落新增入口。
 /// </summary>
-public sealed class OdfParagraphCollection
+public sealed class OdfParagraphCollection : IEnumerable<OdfParagraph>
 {
     private readonly TextDocument _document;
 
@@ -2996,12 +3019,26 @@ public sealed class OdfParagraphCollection
             return paragraphs.AsReadOnly();
         }
     }
+
+    /// <summary>
+    /// 取得段落列舉器，供 LINQ 查詢使用。
+    /// </summary>
+    /// <returns>段落列舉器。</returns>
+    public IEnumerator<OdfParagraph> GetEnumerator()
+    {
+        return Items.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }
 
 /// <summary>
 /// 提供標題新增入口。
 /// </summary>
-public sealed class OdfHeadingCollection
+public sealed class OdfHeadingCollection : IEnumerable<OdfHeading>
 {
     private readonly TextDocument _document;
 
@@ -3046,12 +3083,26 @@ public sealed class OdfHeadingCollection
             return headings.AsReadOnly();
         }
     }
+
+    /// <summary>
+    /// 取得標題列舉器，供 LINQ 查詢使用。
+    /// </summary>
+    /// <returns>標題列舉器。</returns>
+    public IEnumerator<OdfHeading> GetEnumerator()
+    {
+        return Items.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }
 
 /// <summary>
 /// 提供清單新增入口。
 /// </summary>
-public sealed class OdfListCollection
+public sealed class OdfListCollection : IEnumerable<OdfList>
 {
     private readonly TextDocument _document;
 
@@ -3095,12 +3146,26 @@ public sealed class OdfListCollection
             return lists.AsReadOnly();
         }
     }
+
+    /// <summary>
+    /// 取得清單列舉器，供 LINQ 查詢使用。
+    /// </summary>
+    /// <returns>清單列舉器。</returns>
+    public IEnumerator<OdfList> GetEnumerator()
+    {
+        return Items.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }
 
 /// <summary>
 /// 提供表格新增入口。
 /// </summary>
-public sealed class OdfTextTableCollection
+public sealed class OdfTextTableCollection : IEnumerable<OdfTextTableInfo>
 {
     private readonly TextDocument _document;
 
@@ -3145,12 +3210,26 @@ public sealed class OdfTextTableCollection
             return tables.AsReadOnly();
         }
     }
+
+    /// <summary>
+    /// 取得文字表格摘要列舉器，供 LINQ 查詢使用。
+    /// </summary>
+    /// <returns>文字表格摘要列舉器。</returns>
+    public IEnumerator<OdfTextTableInfo> GetEnumerator()
+    {
+        return Items.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }
 
 /// <summary>
 /// 提供圖片新增入口。
 /// </summary>
-public sealed class OdfTextImageCollection
+public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
 {
     private readonly TextDocument _document;
 
@@ -3190,6 +3269,20 @@ public sealed class OdfTextImageCollection
             CollectImages(_document.BodyTextRoot, images);
             return images.AsReadOnly();
         }
+    }
+
+    /// <summary>
+    /// 取得圖片列舉器，供 LINQ 查詢使用。
+    /// </summary>
+    /// <returns>圖片列舉器。</returns>
+    public IEnumerator<OdfImage> GetEnumerator()
+    {
+        return Items.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 
     private static void CollectImages(OdfNode node, List<OdfImage> images)
@@ -3369,7 +3462,7 @@ public class OdfParagraph
     /// <summary>
     /// 取得與此段落相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; }
+    internal OdfNode Node { get; }
 
     /// <summary>
     /// 取得所屬的文字文件。
@@ -3413,10 +3506,10 @@ public class OdfParagraph
     /// <summary>
     /// 取得或設定段落的書寫模式。
     /// </summary>
-    public string? WritingMode
+    public OdfWritingMode WritingMode
     {
-        get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "writing-mode", OdfNamespaces.Style, "paragraph");
-        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "writing-mode", OdfNamespaces.Style, value ?? string.Empty, "style");
+        get => OdfWritingModeExtensions.FromOdfToken(Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "writing-mode", OdfNamespaces.Style, "paragraph"));
+        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "writing-mode", OdfNamespaces.Style, value.ToOdfToken(), "style");
     }
 
     /// <summary>
@@ -3664,6 +3757,57 @@ public class OdfParagraph
     public OdfImage AddImage(string packagePath, OdfLength width, OdfLength height, string? name = null)
         => Doc.AddImage(this, packagePath, width, height, name);
 
+    /// <summary>
+    /// 在段落中新增浮動文字框。
+    /// </summary>
+    /// <param name="x">X 軸座標位置。</param>
+    /// <param name="y">Y 軸座標位置。</param>
+    /// <param name="width">文字框寬度。</param>
+    /// <param name="height">文字框高度。</param>
+    /// <param name="anchorType">錨定類型。</param>
+    /// <param name="wrap">文字環繞方式。</param>
+    /// <returns>新建立的浮動文字框。</returns>
+    public OdfFloatingTextBox AddFloatingTextBox(
+        OdfLength x,
+        OdfLength y,
+        OdfLength width,
+        OdfLength height,
+        OdfAnchorType anchorType = OdfAnchorType.Paragraph,
+        OdfTextWrap wrap = OdfTextWrap.Parallel)
+    {
+        var frame = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");
+        frame.SetAttribute("name", OdfNamespaces.Draw, "TextBox_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        frame.SetAttribute("anchor-type", OdfNamespaces.Text, ToAnchorTypeValue(anchorType), "text");
+        frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
+        frame.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
+        frame.SetAttribute("width", OdfNamespaces.Svg, width.ToString(), "svg");
+        frame.SetAttribute("height", OdfNamespaces.Svg, height.ToString(), "svg");
+        frame.SetAttribute("wrap", OdfNamespaces.Style, ToWrapValue(wrap), "style");
+
+        var textBox = OdfNodeFactory.CreateElement("text-box", OdfNamespaces.Draw, "draw");
+        frame.AppendChild(textBox);
+        Node.AppendChild(frame);
+
+        return new OdfFloatingTextBox(textBox, Doc);
+    }
+
+    private static string ToAnchorTypeValue(OdfAnchorType anchorType) => anchorType switch
+    {
+        OdfAnchorType.Page => "page",
+        OdfAnchorType.Character => "char",
+        OdfAnchorType.AsChar => "as-char",
+        _ => "paragraph",
+    };
+
+    private static string ToWrapValue(OdfTextWrap wrap) => wrap switch
+    {
+        OdfTextWrap.None => "none",
+        OdfTextWrap.Left => "left",
+        OdfTextWrap.Right => "right",
+        OdfTextWrap.Through => "run-through",
+        _ => "parallel",
+    };
+
     /// <summary>在段落中新增旁註標記（注音）。</summary>
     /// <param name="baseText">基礎文字</param>
     /// <param name="rubyText">注音文字</param>
@@ -3703,6 +3847,91 @@ public class OdfParagraph
 }
 
 /// <summary>
+/// 表示浮動文字框的文字環繞方式。
+/// </summary>
+public enum OdfTextWrap
+{
+    /// <summary>
+    /// 不環繞。
+    /// </summary>
+    None,
+
+    /// <summary>
+    /// 平行環繞。
+    /// </summary>
+    Parallel,
+
+    /// <summary>
+    /// 只允許左側環繞。
+    /// </summary>
+    Left,
+
+    /// <summary>
+    /// 只允許右側環繞。
+    /// </summary>
+    Right,
+
+    /// <summary>
+    /// 文字穿越物件。
+    /// </summary>
+    Through
+}
+
+/// <summary>
+/// 表示浮動物件的錨定類型。
+/// </summary>
+public enum OdfAnchorType
+{
+    /// <summary>
+    /// 錨定到頁面。
+    /// </summary>
+    Page,
+
+    /// <summary>
+    /// 錨定到段落。
+    /// </summary>
+    Paragraph,
+
+    /// <summary>
+    /// 錨定到字元。
+    /// </summary>
+    Character,
+
+    /// <summary>
+    /// 視為字元。
+    /// </summary>
+    AsChar
+}
+
+/// <summary>
+/// 表示 ODT 文件中的浮動文字框。
+/// </summary>
+public sealed class OdfFloatingTextBox
+{
+    private readonly OdfNode _textBoxNode;
+    private readonly TextDocument _document;
+
+    internal OdfFloatingTextBox(OdfNode textBoxNode, TextDocument document)
+    {
+        _textBoxNode = textBoxNode ?? throw new ArgumentNullException(nameof(textBoxNode));
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 新增文字框段落。
+    /// </summary>
+    /// <param name="text">段落文字。</param>
+    /// <returns>新建立的段落。</returns>
+    public OdfParagraph AddParagraph(string text = "")
+    {
+        var paragraphNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
+        paragraphNode.TextContent = text;
+        _textBoxNode.AppendChild(paragraphNode);
+        return new OdfParagraph(paragraphNode, _document);
+    }
+}
+
+/// <summary>
 /// 表示文字文件中的標題。
 /// </summary>
 public class OdfHeading : OdfParagraph
@@ -3733,7 +3962,7 @@ public class OdfTextRun
     /// <summary>
     /// 取得與此文字片段相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; }
+    internal OdfNode Node { get; }
 
     private readonly TextDocument _doc;
 
@@ -3834,6 +4063,15 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// 取得或設定文字片段的字色。
+    /// </summary>
+    public string? Color
+    {
+        get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "color", OdfNamespaces.Fo, "text");
+        set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "color", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+    }
+
+    /// <summary>
     /// 取得或設定文字片段的東亞（中日韓）字型名稱。
     /// </summary>
     public string? FontNameAsian
@@ -3894,7 +4132,7 @@ public class OdfSection
     /// <summary>
     /// 取得與此區段相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; }
+    internal OdfNode Node { get; }
 
     private readonly TextDocument _doc;
 
@@ -3918,7 +4156,7 @@ public class OdfTable
     /// <summary>
     /// 取得與此表格相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; }
+    internal OdfNode Node { get; }
 
     private readonly TextDocument _doc;
     private readonly int _rows;
@@ -4195,7 +4433,7 @@ public class OdfList
     /// <summary>
     /// 取得與此清單相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; }
+    internal OdfNode Node { get; }
 
     private readonly TextDocument _doc;
 
@@ -4318,6 +4556,17 @@ public class OdfList
     }
 
     /// <summary>
+    /// 設定清單的起始編號。
+    /// </summary>
+    /// <param name="value">起始編號；ODF 1.4 允許從 0 開始。</param>
+    /// <returns>目前清單執行個體。</returns>
+    public OdfList StartFrom(int value)
+    {
+        RestartNumbering(value);
+        return this;
+    }
+
+    /// <summary>
     /// 取得清單項目清單。
     /// </summary>
     public IReadOnlyList<OdfListItem> Items
@@ -4350,7 +4599,7 @@ public class OdfListItem(OdfNode node, TextDocument doc)
     /// <summary>
     /// 取得與此清單項目相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    internal OdfNode Node { get; } = node;
 
     private readonly TextDocument _doc = doc;
 
@@ -4437,6 +4686,25 @@ public class OdfImage(OdfNode frameNode, OdfNode imageNode)
     /// 取得圖片的影像節點。
     /// </summary>
     public OdfNode ImageNode { get; } = imageNode;
+
+    /// <summary>
+    /// 將此圖片標記為裝飾性，輔助技術應略過此物件。
+    /// </summary>
+    /// <param name="decorative">是否標記為裝飾性。</param>
+    /// <returns>目前圖片執行個體。</returns>
+    public OdfImage MarkAsDecorative(bool decorative = true)
+    {
+        if (decorative)
+        {
+            FrameNode.SetAttribute("decorative", OdfNamespaces.Draw, "true", "draw");
+        }
+        else
+        {
+            FrameNode.RemoveAttribute("decorative", OdfNamespaces.Draw);
+        }
+
+        return this;
+    }
 
     /// <summary>
     /// 取得或設定圖片的名稱。
@@ -4557,7 +4825,7 @@ public class OdfTableCell(OdfNode node, TextDocument doc)
     /// <summary>
     /// 取得與此儲存格相關聯的 OdfNode 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    internal OdfNode Node { get; } = node;
 
     private readonly TextDocument _doc = doc;
 
