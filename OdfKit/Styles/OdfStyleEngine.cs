@@ -247,10 +247,13 @@ public class OdfStyleEngine
     /// <param name="propAttrNsUri">屬性屬性的命名空間 URI</param>
     /// <param name="value">要設定的值</param>
     /// <param name="propAttrPrefix">屬性屬性的前綴</param>
-    public void SetLocalStyleProperty(OdfNode elementNode, string family, string propElementLocalName, string propAttrLocalName, string propAttrNsUri, string value, string? propAttrPrefix = null)
+    /// <param name="deferSave">是否延遲執行自動樣式去重與存檔</param>
+    public void SetLocalStyleProperty(OdfNode elementNode, string family, string propElementLocalName, string propAttrLocalName, string propAttrNsUri, string? value, string? propAttrPrefix = null, bool deferSave = false)
     {
         OnStyleChanging?.Invoke(elementNode, family);
         var styleNode = GetOrCreateLocalStyle(elementNode, family);
+        if (styleNode is null)
+            return;
 
         // 尋找或建立屬性元素（例如 style:text-properties）
         OdfNode? propsNode = null;
@@ -263,16 +266,113 @@ public class OdfStyleEngine
             }
         }
 
-        if (propsNode is null)
+        if (value == null)
         {
-            propsNode = new OdfNode(OdfNodeType.Element, propElementLocalName, OdfNamespaces.Style, "style");
-            styleNode.AppendChild(propsNode);
+            // 扁平化繼承鏈：如果存在 parent-style-name，將其屬性複製過來並打破繼承，以落實完全清除屬性
+            string? parentName = styleNode.GetAttribute("parent-style-name", OdfNamespaces.Style);
+            if (!string.IsNullOrEmpty(parentName))
+            {
+                OdfNode? parentNode = null;
+                if (_automaticStyles.TryGetValue(parentName!, out var autoStyle))
+                    parentNode = autoStyle;
+                else if (_commonStyles.TryGetValue(parentName!, out var commonStyle))
+                    parentNode = commonStyle;
+
+                if (parentNode is not null)
+                {
+                    // 1. 複製父樣式的所有屬性節點，但排除或移除要清除的屬性
+                    foreach (var child in parentNode.Children)
+                    {
+                        if (child.NodeType == OdfNodeType.Element)
+                        {
+                            var clonedChild = child.CloneNode(true);
+                            if (clonedChild.LocalName == propElementLocalName && clonedChild.NamespaceUri == OdfNamespaces.Style)
+                            {
+                                clonedChild.RemoveAttribute(propAttrLocalName, propAttrNsUri);
+                            }
+
+                            // 只有在子屬性節點還有屬性或子節點時才保留
+                            if (clonedChild.Attributes.Count > 0 || clonedChild.Children.Count > 0)
+                            {
+                                // 檢查 styleNode 是否已有同名子節點
+                                OdfNode? existingChild = null;
+                                foreach (var sc in styleNode.Children)
+                                {
+                                    if (sc.LocalName == clonedChild.LocalName && sc.NamespaceUri == clonedChild.NamespaceUri)
+                                    {
+                                        existingChild = sc;
+                                        break;
+                                    }
+                                }
+
+                                if (existingChild is not null)
+                                {
+                                    // 合併屬性且以局部編輯屬性優先
+                                    foreach (var attr in clonedChild.Attributes)
+                                    {
+                                        if (!existingChild.Attributes.ContainsKey(attr.Key))
+                                        {
+                                            existingChild.SetAttribute(attr.Key.LocalName, attr.Key.NamespaceUri, attr.Value);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    styleNode.AppendChild(clonedChild);
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. 繼承父樣式的 parent-style-name
+                    string? grandParentName = parentNode.GetAttribute("parent-style-name", OdfNamespaces.Style);
+                    if (!string.IsNullOrEmpty(grandParentName))
+                    {
+                        styleNode.SetAttribute("parent-style-name", OdfNamespaces.Style, grandParentName!);
+                    }
+                    else
+                    {
+                        styleNode.RemoveAttribute("parent-style-name", OdfNamespaces.Style);
+                    }
+                }
+            }
+
+            // 3. 確保在當前的 styleNode 中移除該屬性（無論是複製過來還是原本就存在）
+            propsNode = null;
+            foreach (var child in styleNode.Children)
+            {
+                if (child.NodeType == OdfNodeType.Element && child.LocalName == propElementLocalName && child.NamespaceUri == OdfNamespaces.Style)
+                {
+                    propsNode = child;
+                    break;
+                }
+            }
+
+            if (propsNode is not null)
+            {
+                propsNode.RemoveAttribute(propAttrLocalName, propAttrNsUri);
+                if (propsNode.Attributes.Count == 0 && propsNode.Children.Count == 0)
+                {
+                    styleNode.RemoveChild(propsNode);
+                }
+            }
+        }
+        else
+        {
+            if (propsNode is null)
+            {
+                propsNode = new OdfNode(OdfNodeType.Element, propElementLocalName, OdfNamespaces.Style, "style");
+                styleNode.AppendChild(propsNode);
+            }
+
+            propsNode.SetAttribute(propAttrLocalName, propAttrNsUri, value, propAttrPrefix);
         }
 
-        propsNode.SetAttribute(propAttrLocalName, propAttrNsUri, value, propAttrPrefix);
         elementNode.IsModified = true;
-
-        DeduplicateAndSaveStyles();
+        if (!deferSave)
+        {
+            DeduplicateAndSaveStyles();
+        }
     }
 
     /// <summary>
