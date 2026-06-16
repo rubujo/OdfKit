@@ -82,11 +82,10 @@ public static class OdfCsvExporter
             if (rowChild.LocalName == "table-row" && rowChild.NamespaceUri == OdfNamespaces.Table)
             {
                 int rowRepeatedCount = 1;
-                const int MaxRepeat = 10000; // 防禦性上限：超過此值的重複行/欄在 CSV 無意義
                 string? rowRepStr = rowChild.GetAttribute("number-rows-repeated", OdfNamespaces.Table);
                 if (!string.IsNullOrEmpty(rowRepStr) && int.TryParse(rowRepStr, out int rrc) && rrc > 0)
                 {
-                    rowRepeatedCount = Math.Min(rrc, MaxRepeat);
+                    rowRepeatedCount = Math.Min(rrc, OdfSpreadsheetLimits.CsvMaxRepeat);
                 }
 
                 var rowCells = new List<(int Col, object Val)>();
@@ -99,7 +98,7 @@ public static class OdfCsvExporter
                         string? colRepStr = cellChild.GetAttribute("number-columns-repeated", OdfNamespaces.Table);
                         if (!string.IsNullOrEmpty(colRepStr) && int.TryParse(colRepStr, out int crc) && crc > 0)
                         {
-                            colRepeatedCount = Math.Min(crc, MaxRepeat);
+                            colRepeatedCount = Math.Min(crc, OdfSpreadsheetLimits.CsvMaxRepeat);
                         }
 
                         object? cellValue = GetCellValueFromNode(cellChild);
