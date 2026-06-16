@@ -23,6 +23,14 @@ internal readonly struct OdfTableSheetMutationContext
 
     internal OdfNode GetOrCreateColumn(int col) =>
         _sheet.GetOrCreateColumnNode(col);
+
+    internal System.Collections.Generic.List<OdfNode> GetRowsList() =>
+        _sheet.GetRowsList();
+
+    internal System.Collections.Generic.List<OdfNode> GetCellsInRow(OdfNode rowNode) =>
+        _sheet.GetCellsInRow(rowNode);
+
+    internal OdfCell GetCell(int row, int col) => _sheet.GetCell(row, col);
 }
 
 public partial class OdfTableSheet

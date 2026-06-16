@@ -53,6 +53,12 @@
 - [x] `OdfTableSheetChartEngine`、`OdfTableSheetConditionalFormatEngine`、`OdfTableSheetRowColumnGroupEngine`
 - [x] `OdfTableSheetMutationContext` 協作存取器
 
+## Phase 5（已完成）
+
+- [x] `OdfTableSheetPrintSettingsEngine`、`OdfTableSheetVisibilityEngine`、`OdfTableSheetNamedRangeEngine`
+- [x] `OdfTableSheetViewEngine`、`OdfTableSheetLayoutEngine`、`OdfTableSheetDomHelper`
+- [x] `TextDocumentSearchReplaceEngine`、`TextDocumentHtmlFragmentEngine`
+
 ## 驗證
 
 每輪變更：`dotnet build` → `dotnet test`（1131+）→ `pwsh eng/Format-Safe.ps1` → GPG 簽署提交。

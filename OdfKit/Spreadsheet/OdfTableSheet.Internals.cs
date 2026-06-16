@@ -13,7 +13,7 @@ public partial class OdfTableSheet
     private static readonly HashSet<string> RowContainerNames = new(StringComparer.Ordinal)
         { "header-rows", "table-row-group" };
 
-    private List<OdfNode> GetRowsList()
+    internal List<OdfNode> GetRowsList()
     {
         var list = new List<OdfNode>();
         foreach (var child in TableNode.Children)
@@ -30,7 +30,7 @@ public partial class OdfTableSheet
         return list;
     }
 
-    private List<OdfNode> GetCellsInRow(OdfNode rowNode)
+    internal List<OdfNode> GetCellsInRow(OdfNode rowNode)
     {
         var list = new List<OdfNode>();
         foreach (var child in rowNode.Children)

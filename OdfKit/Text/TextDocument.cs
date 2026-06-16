@@ -533,7 +533,7 @@ public partial class TextDocument : OdfDocument
         return null;
     }
 
-    private static string DecodeHtmlEntities(string text)
+    internal static string DecodeHtmlEntities(string text)
     {
         if (string.IsNullOrEmpty(text))
             return text;
