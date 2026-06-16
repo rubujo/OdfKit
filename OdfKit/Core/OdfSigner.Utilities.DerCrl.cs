@@ -170,7 +170,7 @@ public static partial class OdfSigner
         return revokedSerials;
     }
 
-    private static List<string> GetCrlUrls(X509Certificate2 certificate)
+    internal static List<string> GetCrlUrls(X509Certificate2 certificate)
     {
         var urls = new List<string>();
         var ext = certificate.Extensions["2.5.29.31"];

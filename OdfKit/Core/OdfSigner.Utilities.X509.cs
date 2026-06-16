@@ -210,7 +210,7 @@ public static partial class OdfSigner
     /// <summary>
     /// 使用反射將原始 Stream 直接注入 SignedXml 的 Reference，以繞過新版 .NET Core 的 URI 解析限制。
     /// </summary>
-    private static void InjectReferenceStream(Reference reference, Stream stream)
+    internal static void InjectReferenceStream(Reference reference, Stream stream)
     {
         if (reference == null)
             throw new ArgumentNullException(nameof(reference));

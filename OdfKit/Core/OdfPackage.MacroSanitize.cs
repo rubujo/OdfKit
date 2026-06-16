@@ -21,65 +21,7 @@ public sealed partial class OdfPackage
         _lock.Wait();
         try
         {
-            // 1. Collect and remove macro-related entries (basic/ folder, macrosignatures, etc.)
-            var entriesToRemove = new List<string>();
-            foreach (var key in _entries.Keys)
-            {
-                if (key.StartsWith("basic/", StringComparison.OrdinalIgnoreCase) ||
-                    key.StartsWith("Scripts/", StringComparison.OrdinalIgnoreCase) ||
-                    key.Equals("macrosignatures.xml", StringComparison.OrdinalIgnoreCase) ||
-                    key.Equals("META-INF/macrosignatures.xml", StringComparison.OrdinalIgnoreCase))
-                {
-                    entriesToRemove.Add(key);
-                }
-            }
-
-            foreach (var key in entriesToRemove)
-            {
-                _entries.Remove(key);
-                _manifest.Remove(key);
-                OdfKitDiagnostics.Info($"Removed macro or signature entry: {key}");
-            }
-
-            // 2. Iterate and sanitize all XML files inside the package (excluding META-INF/manifest.xml)
-            var xmlEntries = new List<OdfPackageEntry>();
-            foreach (var entry in _entries.Values)
-            {
-                if (entry.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) &&
-                    !entry.Name.Equals("META-INF/manifest.xml", StringComparison.OrdinalIgnoreCase))
-                {
-                    xmlEntries.Add(entry);
-                }
-            }
-
-            foreach (var entry in xmlEntries)
-            {
-                try
-                {
-                    OdfNode root;
-                    using (var stream = entry.OpenReader())
-                    {
-                        root = OdfXmlReader.Parse(stream, _loadOptions);
-                    }
-
-                    if (SanitizeXmlNode(root))
-                    {
-                        using var ms = new MemoryStream();
-                        OdfXmlWriter.Write(root, ms, _saveOptions);
-
-                        byte[] sanitizedBytes = ms.ToArray();
-                        _entries[entry.Name] = new OdfPackageEntry(entry.Name, sanitizedBytes);
-                        OdfKitDiagnostics.Info($"Sanitized macro references in XML entry: {entry.Name}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    OdfKitDiagnostics.Warn($"Failed to sanitize XML entry '{entry.Name}': {ex.Message}");
-                }
-            }
-
-            // 3. Remove outdated document signatures
-            RemoveOutdatedSignatures();
+            OdfPackageMacroSanitizer.Sanitize(MacroSanitizeCollaborators);
         }
         finally
         {

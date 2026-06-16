@@ -15,7 +15,7 @@ public static partial class OdfSigner
         return OdfEncryption.ByteArrayEquals(a, b);
     }
 
-    private static async Task<byte[]> DownloadCrlAsync(string url, HttpClient? httpClient)
+    internal static async Task<byte[]> DownloadCrlAsync(string url, HttpClient? httpClient)
     {
         var client = httpClient ?? s_httpClient;
         return await client.GetByteArrayAsync(url);
@@ -52,7 +52,7 @@ public static partial class OdfSigner
         return request;
     }
 
-    private static async Task<byte[]> QueryTsaAsync(string tsaUrl, byte[] hash, HttpClient? httpClient)
+    internal static async Task<byte[]> QueryTsaAsync(string tsaUrl, byte[] hash, HttpClient? httpClient)
     {
         byte[] requestBytes = CreateTsaRequest(hash);
 
@@ -67,7 +67,7 @@ public static partial class OdfSigner
         return await response.Content.ReadAsByteArrayAsync();
     }
 
-    private static byte[] ExtractTimestampToken(byte[] responseBytes)
+    internal static byte[] ExtractTimestampToken(byte[] responseBytes)
     {
         var root = ParseDer(responseBytes);
         if (root.Tag != 0x30 || root.Children.Count < 1)

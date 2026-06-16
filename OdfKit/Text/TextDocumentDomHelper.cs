@@ -8,6 +8,20 @@ namespace OdfKit.Text;
 internal static class TextDocumentDomHelper
 {
     /// <summary>
+    /// 尋找直接子元素節點。
+    /// </summary>
+    internal static OdfNode? FindChildElement(OdfNode parent, string localName, string ns)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.LocalName == localName && child.NamespaceUri == ns)
+                return child;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// 尋找或建立直接子元素節點。
     /// </summary>
     internal static OdfNode FindOrCreateChild(OdfNode parent, string localName, string ns, string prefix)

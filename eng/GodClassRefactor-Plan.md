@@ -66,15 +66,22 @@
 - [x] `OdfPackageFlatXmlLoader`、`OdfPackageArchiveWriter`、`OdfPackageXmlNamespaceHelper`
 - [x] 擴充 `OdfPackageLoadCollaborators`／`OdfPackageSaveCollaborators`
 
-## 剩餘工作（Phase 7+）
+## Phase 7（已完成）
+
+- [x] `OdfSignatureSigner` 簽署實作遷移（`OdfSigner.Signing` 薄門面）
+- [x] `TextDocumentTrackChangesRecordingEngine`
+- [x] `FormulaLogicalFunctionHandlers`（邏輯函式 category 首輪遷移）
+- [x] `OdfPackageMacroSanitizer` + `OdfPackageMacroSanitizeCollaborators`
+
+## 剩餘工作（Phase 8+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `DefaultFormulaEvaluator` | ~4672 | 21 個 category partial → 獨立 handler |
+| `DefaultFormulaEvaluator` | ~4300 | 其餘 20 個 category partial → handler |
 | `OdfElement` | ~3333 | 屬性存取器／typed getter |
-| `OdfPackage` | ~1800 | `Metadata`、`MacroSanitize`、`Saving.Internals` |
-| `OdfSigner` | ~1679 | `Signing` partial、驗證剩餘邏輯 |
-| `TextDocument` | ~1200 | 核心 `TextDocument.cs`、追蹤修訂錄製 |
+| `OdfPackage` | ~1600 | `Metadata`、`Saving.Internals` |
+| `OdfSigner` | ~1300 | 驗證剩餘 partial |
+| `TextDocument` | ~1000 | 核心 `TextDocument.cs` |
 | `OdfDocument` | ~1493 | 合併／複製管線 |
 | `OdfTableSheet` | ~1185 | `Internals`、核心工作表邏輯 |
 

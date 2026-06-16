@@ -101,7 +101,7 @@ public static partial class OdfSigner
         }
     }
 
-    private static byte[] CanonicalizeSignatureValue(XmlElement signatureValueElem)
+    internal static byte[] CanonicalizeSignatureValue(XmlElement signatureValueElem)
     {
         var cleanDoc = new XmlDocument();
         var imported = (XmlElement)cleanDoc.ImportNode(signatureValueElem, true);
