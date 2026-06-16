@@ -59,6 +59,25 @@
 - [x] `OdfTableSheetViewEngine`、`OdfTableSheetLayoutEngine`、`OdfTableSheetDomHelper`
 - [x] `TextDocumentSearchReplaceEngine`、`TextDocumentHtmlFragmentEngine`
 
+## Phase 6（已完成）
+
+- [x] `TextDocumentMutationContext`、`TextDocumentDomHelper`
+- [x] `TextDocumentFormControlsEngine`、`TextDocumentFieldsEngine`、`TextDocumentNotesEngine`
+- [x] `OdfPackageFlatXmlLoader`、`OdfPackageArchiveWriter`、`OdfPackageXmlNamespaceHelper`
+- [x] 擴充 `OdfPackageLoadCollaborators`／`OdfPackageSaveCollaborators`
+
+## 剩餘工作（Phase 7+）
+
+| 型別 | 約略行數 | 待提取 |
+|------|----------|--------|
+| `DefaultFormulaEvaluator` | ~4672 | 21 個 category partial → 獨立 handler |
+| `OdfElement` | ~3333 | 屬性存取器／typed getter |
+| `OdfPackage` | ~1800 | `Metadata`、`MacroSanitize`、`Saving.Internals` |
+| `OdfSigner` | ~1679 | `Signing` partial、驗證剩餘邏輯 |
+| `TextDocument` | ~1200 | 核心 `TextDocument.cs`、追蹤修訂錄製 |
+| `OdfDocument` | ~1493 | 合併／複製管線 |
+| `OdfTableSheet` | ~1185 | `Internals`、核心工作表邏輯 |
+
 ## 驗證
 
 每輪變更：`dotnet build` → `dotnet test`（1131+）→ `pwsh eng/Format-Safe.ps1` → GPG 簽署提交。

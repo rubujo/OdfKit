@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 
@@ -58,8 +59,21 @@ public sealed partial class OdfPackage
 
         internal void LoadRdfMetadata() => _package.LoadRdfMetadata();
 
-        internal void InitializeFlatXml(byte[] signature, int signatureLength)
-            => _package.InitializeFlatXml(signature, signatureLength);
+        internal Dictionary<string, string> Manifest => _package._manifest;
+
+        internal OdfSaveOptions SaveOptions => _package._saveOptions;
+
+        internal OdfVersion Version
+        {
+            get => _package._version;
+            set => _package._version = value;
+        }
+
+        internal void WriteVirtualEntry(string name, byte[] content, string mediaType) =>
+            _package.WriteVirtualEntry(name, content, mediaType);
+
+        internal void InitializeFlatXml(byte[] signature, int signatureLength) =>
+            OdfPackageFlatXmlLoader.Initialize(this, signature, signatureLength);
 
         internal static int ReadStreamPrefix(Stream stream, byte[] buffer, int offset, int count)
             => ReadAll(stream, buffer, offset, count);

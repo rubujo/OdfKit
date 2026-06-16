@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,9 +23,17 @@ public sealed partial class OdfPackage
 
         internal OdfSaveOptions SaveOptions => _package._saveOptions;
 
+        internal OdfLoadOptions LoadOptions => _package._loadOptions;
+
         internal bool IsFlatXml => _package._isFlatXml;
 
         internal Stream? UnderlyingStream => _package._underlyingStream;
+
+        internal Dictionary<string, OdfPackageEntry> Entries => _package._entries;
+
+        internal Dictionary<string, string> Manifest => _package._manifest;
+
+        internal string? MimeType => _package._mimetype;
 
         internal bool HasActiveEncryption =>
             _package._saveOptions.Password != null || _package._saveOptions.CryptographyProvider != null;
@@ -35,7 +44,7 @@ public sealed partial class OdfPackage
 
         internal void SaveManifest() => _package.SaveManifestToEntries();
 
-        internal void WriteToArchive(Stream target) => _package.WriteToArchive(target);
+        internal void WriteToArchive(Stream target) => OdfPackageArchiveWriter.WriteToArchive(this, target);
 
         internal long EstimateArchiveSize()
         {
