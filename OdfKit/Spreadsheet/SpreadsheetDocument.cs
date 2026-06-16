@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -963,20 +963,7 @@ public class OdfTableSheet
     /// <param name="password">密碼明文</param>
     public void Protect(string password)
     {
-        byte[] salt = new byte[16];
-        using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(salt);
-        }
-
-        byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password);
-        byte[] hash = OdfEncryption.Pbkdf2(passwordBytes, salt, 50000, 32, "sha256");
-
-        TableNode.SetAttribute("protected", OdfNamespaces.Table, "true", "table");
-        TableNode.SetAttribute("protection-key", OdfNamespaces.Table, Convert.ToBase64String(hash), "table");
-        TableNode.SetAttribute("protection-key-digest-algorithm", OdfNamespaces.Table, "http://www.w3.org/2001/04/xmlenc#sha256", "table");
-        TableNode.SetAttribute("protection-key-digest-salt", OdfNamespaces.Table, Convert.ToBase64String(salt), "table");
-        TableNode.SetAttribute("protection-key-derivation", OdfNamespaces.Table, "PBKDF2-SHA256-50000", "table");
+        OdfProtectionHelper.ProtectNode(TableNode, password, "table", OdfNamespaces.Table);
     }
 
     /// <summary>
@@ -986,46 +973,32 @@ public class OdfTableSheet
     /// <returns>若驗證成功則為 true，否則為 false</returns>
     public bool VerifyPassword(string password)
     {
+        return OdfProtectionHelper.VerifyPassword(TableNode, password, OdfNamespaces.Table);
+    }
+
+    /// <summary>
+    /// 解除工作表保護。
+    /// </summary>
+    public void Unprotect()
+    {
+        OdfProtectionHelper.UnprotectNode(TableNode, OdfNamespaces.Table);
+    }
+
+    /// <summary>
+    /// 嘗試以指定密碼解除工作表保護。
+    /// </summary>
+    /// <param name="password">密碼明文</param>
+    /// <returns>若解除成功則為 true，否則為 false。</returns>
+    public bool TryUnprotect(string password)
+    {
         if (!IsProtected)
             return true;
-
-        string? keyStr = TableNode.GetAttribute("protection-key", OdfNamespaces.Table);
-        string? algo = TableNode.GetAttribute("protection-key-digest-algorithm", OdfNamespaces.Table);
-        string? saltStr = TableNode.GetAttribute("protection-key-digest-salt", OdfNamespaces.Table);
-        string? derivation = TableNode.GetAttribute("protection-key-derivation", OdfNamespaces.Table);
-
-        if (keyStr is null || algo is null || saltStr is null)
-            return false;
-
-        byte[] salt = Convert.FromBase64String(saltStr);
-        byte[] expectedHash = Convert.FromBase64String(keyStr);
-        byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password);
-
-        byte[] input = new byte[salt.Length + passwordBytes.Length];
-        Buffer.BlockCopy(salt, 0, input, 0, salt.Length);
-        Buffer.BlockCopy(passwordBytes, 0, input, salt.Length, passwordBytes.Length);
-
-        byte[] actualHash;
-        if (derivation == "PBKDF2-SHA256-50000" &&
-            (algo == "http://www.w3.org/2001/04/xmlenc#sha256" || algo == "http://www.w3.org/2000/09/xmldsig#sha256"))
+        if (VerifyPassword(password))
         {
-            actualHash = OdfEncryption.Pbkdf2(passwordBytes, salt, 50000, 32, "sha256");
+            Unprotect();
+            return true;
         }
-        else if (string.IsNullOrEmpty(derivation) &&
-                 (algo == "http://www.w3.org/2001/04/xmlenc#sha256" || algo == "http://www.w3.org/2000/09/xmldsig#sha256"))
-        {
-            // 向下相容：舊格式
-            using (var sha = System.Security.Cryptography.SHA256.Create())
-            {
-                actualHash = sha.ComputeHash(input);
-            }
-        }
-        else
-        {
-            return false;
-        }
-
-        return CompareBytes(expectedHash, actualHash);
+        return false;
     }
 
     private static bool CompareBytes(byte[] a, byte[] b)
@@ -3145,6 +3118,115 @@ public sealed class OdfCellRangeSelection
     public OdfCellRange Range { get; }
 
     /// <summary>
+    /// 取得一個值，指出此範圍是否已啟用保護。
+    /// </summary>
+    public bool IsProtected
+    {
+        get
+        {
+            var node = FindProtectedRangeNode();
+            if (node is null)
+                return false;
+            return node.GetAttribute("protected", OdfNamespaces.Table) == "true";
+        }
+    }
+
+    /// <summary>
+    /// 以指定密碼保護此範圍，將其寫入工作表的受保護範圍對照表中。
+    /// </summary>
+    /// <param name="password">密碼明文。</param>
+    public void Protect(string password)
+    {
+        var rangesNode = _sheet.TableNode.Children.Find(c =>
+            c.NodeType == OdfNodeType.Element &&
+            c.LocalName == "protected-ranges" &&
+            c.NamespaceUri == OdfNamespaces.Table);
+
+        if (rangesNode is null)
+        {
+            rangesNode = OdfNodeFactory.CreateElement("protected-ranges", OdfNamespaces.Table, "table");
+            _sheet.TableNode.AppendChild(rangesNode);
+        }
+
+        var rangeNode = FindProtectedRangeNode();
+        if (rangeNode is null)
+        {
+            rangeNode = OdfNodeFactory.CreateElement("protected-range", OdfNamespaces.Table, "table");
+            string name = "range_protect_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+            rangeNode.SetAttribute("name", OdfNamespaces.Table, name, "table");
+            rangeNode.SetAttribute("cell-range-address", OdfNamespaces.Table, Range.ToOdfString(false), "table");
+            rangesNode.AppendChild(rangeNode);
+        }
+
+        OdfKit.Core.OdfProtectionHelper.ProtectNode(rangeNode, password, "table", OdfNamespaces.Table);
+    }
+
+    /// <summary>
+    /// 解除此範圍的保護。
+    /// </summary>
+    public void Unprotect()
+    {
+        var node = FindProtectedRangeNode();
+        if (node is not null)
+        {
+            var parent = node.Parent;
+            parent?.RemoveChild(node);
+            if (parent is not null && parent.Children.Count == 0)
+            {
+                parent.Parent?.RemoveChild(parent);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證給定密碼是否能解除此範圍的保護。
+    /// </summary>
+    /// <param name="password">要驗證的密碼。</param>
+    /// <returns>若驗證成功則為 true，否則為 false。</returns>
+    public bool VerifyPassword(string password)
+    {
+        var node = FindProtectedRangeNode();
+        if (node is null)
+            return false;
+        return OdfKit.Core.OdfProtectionHelper.VerifyPassword(node, password, OdfNamespaces.Table);
+    }
+
+    /// <summary>
+    /// 嘗試以指定密碼解除此範圍的保護。
+    /// </summary>
+    /// <param name="password">密碼明文。</param>
+    /// <returns>若解除成功則為 true，否則為 false。</returns>
+    public bool TryUnprotect(string password)
+    {
+        if (!IsProtected)
+            return true;
+        if (VerifyPassword(password))
+        {
+            Unprotect();
+            return true;
+        }
+        return false;
+    }
+
+    private OdfNode? FindProtectedRangeNode()
+    {
+        var rangesNode = _sheet.TableNode.Children.Find(c =>
+            c.NodeType == OdfNodeType.Element &&
+            c.LocalName == "protected-ranges" &&
+            c.NamespaceUri == OdfNamespaces.Table);
+
+        if (rangesNode is null)
+            return null;
+
+        string targetAddress = Range.ToOdfString(false);
+        return rangesNode.Children.Find(c =>
+            c.NodeType == OdfNodeType.Element &&
+            c.LocalName == "protected-range" &&
+            c.NamespaceUri == OdfNamespaces.Table &&
+            c.GetAttribute("cell-range-address", OdfNamespaces.Table) == targetAddress);
+    }
+
+    /// <summary>
     /// 合併此範圍的儲存格。
     /// </summary>
     public void Merge()
@@ -3415,6 +3497,13 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
             }
         }
     }
+
+    private OdfKit.Styles.OdfCellStyleProxy? _styleProxy;
+
+    /// <summary>
+    /// 取得此儲存格的高階樣式設定代理 Facade。
+    /// </summary>
+    public OdfKit.Styles.OdfCellStyleProxy Style => _styleProxy ??= new OdfKit.Styles.OdfCellStyleProxy(this);
 
     /// <summary>
     /// 取得或設定儲存格顯示的文字內容（text:p 子節點的純文字）。

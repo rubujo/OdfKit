@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -3035,6 +3035,26 @@ public sealed class OdfTextBody
     /// 取得圖片集合。
     /// </summary>
     public OdfTextImageCollection Images => _images ??= new OdfTextImageCollection(_document);
+
+    /// <summary>
+    /// 取得文件中的所有區段（Section）集合。
+    /// </summary>
+    public IReadOnlyList<OdfSection> Sections
+    {
+        get
+        {
+            var sections = new List<OdfSection>();
+            var nodes = _document.BodyTextRoot.Descendants()
+                .Where(n => n.NodeType == OdfNodeType.Element &&
+                            n.LocalName == "section" &&
+                            n.NamespaceUri == OdfNamespaces.Text);
+            foreach (var node in nodes)
+            {
+                sections.Add(new OdfSection(node, _document));
+            }
+            return sections;
+        }
+    }
 }
 
 /// <summary>
@@ -3516,7 +3536,7 @@ public sealed class OdfDocumentMetadata
 /// <summary>
 /// 表示文字文件中的段落。
 /// </summary>
-public class OdfParagraph
+public partial class OdfParagraph
 {
     internal OdfParagraph(OdfNode node, TextDocument doc)
     {
@@ -3558,6 +3578,16 @@ public class OdfParagraph
             Node.SetAttribute("style-name", OdfNamespaces.Text, value ?? string.Empty, "text");
         }
     }
+
+    internal TextDocument DocProperty => Doc;
+    internal OdfStyleEngine StyleEngine => Doc.StyleEngine;
+
+    private OdfKit.Styles.OdfParagraphStyleProxy? _styleProxy;
+
+    /// <summary>
+    /// 取得此段落的高階樣式設定代理 Facade。
+    /// </summary>
+    public OdfKit.Styles.OdfParagraphStyleProxy Style => _styleProxy ??= new OdfKit.Styles.OdfParagraphStyleProxy(this);
 
     /// <summary>
     /// 取得或設定段落的水平對齊方式。
@@ -3732,6 +3762,59 @@ public class OdfParagraph
     public void Delete()
     {
         Doc.DeleteNode(Node);
+    }
+
+    /// <summary>
+    /// 取得此段落的所有文字片段（Runs）。存取時會自動將直屬的文字節點分裂包裝為 span 節點。
+    /// </summary>
+    public System.Collections.Generic.IEnumerable<OdfTextRun> Runs
+    {
+        get
+        {
+            // 裂變同步：若存在直屬的 text 節點，則先將其包裝到一個全新的 <text:span> 中
+            var children = new System.Collections.Generic.List<OdfNode>(Node.Children);
+            foreach (var child in children)
+            {
+                if (child.NodeType == OdfNodeType.Text && !string.IsNullOrEmpty(child.TextContent))
+                {
+                    var spanNode = OdfNodeFactory.CreateElement("span", OdfNamespaces.Text, "text");
+                    Node.InsertBefore(spanNode, child);
+                    spanNode.AppendChild(child);
+                }
+            }
+
+            // 回傳所有的 text:span 節點包裝
+            foreach (var child in Node.Children)
+            {
+                if (child.NodeType == OdfNodeType.Element &&
+                    child.LocalName == "span" &&
+                    child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    yield return new OdfTextRun(child, Doc);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 清除此段落內的所有文字片段（移除所有的 span 節點）。
+    /// </summary>
+    public void ClearRuns()
+    {
+        var spans = new System.Collections.Generic.List<OdfNode>();
+        foreach (var child in Node.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == "span" &&
+                child.NamespaceUri == OdfNamespaces.Text)
+            {
+                spans.Add(child);
+            }
+        }
+        foreach (var span in spans)
+        {
+            Node.RemoveChild(span);
+        }
     }
 
     /// <summary>在段落中新增日期欄位。</summary>
@@ -4181,6 +4264,50 @@ public class OdfTextRun
     {
         _doc.DeleteNode(Node);
     }
+
+    /// <summary>
+    /// 設定此文字片段是否為粗體。
+    /// </summary>
+    /// <param name="bold">是否粗體。</param>
+    /// <returns>文字片段本身。</returns>
+    public OdfTextRun WithBold(bool bold = true)
+    {
+        IsBold = bold;
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此文字片段是否為斜體。
+    /// </summary>
+    /// <param name="italic">是否斜體。</param>
+    /// <returns>文字片段本身。</returns>
+    public OdfTextRun WithItalic(bool italic = true)
+    {
+        IsItalic = italic;
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此文字片段的西文、東亞及複雜字型大小。
+    /// </summary>
+    /// <param name="size">字型大小，例如 <c>12pt</c>。</param>
+    /// <returns>文字片段本身。</returns>
+    public OdfTextRun WithFontSize(string size)
+    {
+        SetFontSize(size);
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此文字片段的字色。
+    /// </summary>
+    /// <param name="hexColor">十六進位顏色字串，例如 <c>#FF0000</c>。</param>
+    /// <returns>文字片段本身。</returns>
+    public OdfTextRun WithColor(string hexColor)
+    {
+        Color = hexColor;
+        return this;
+    }
 }
 
 /// <summary>
@@ -4208,6 +4335,57 @@ public class OdfSection
     {
         get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "writing-mode", OdfNamespaces.Style, "section");
         set => _doc.StyleEngine.SetLocalStyleProperty(Node, "section", "section-properties", "writing-mode", OdfNamespaces.Style, value ?? string.Empty, "style");
+    }
+
+    /// <summary>
+    /// 取得此區段是否受保護。
+    /// </summary>
+    public bool IsProtected => Node.GetAttribute("protected", OdfNamespaces.Text) == "true";
+
+    /// <summary>
+    /// 以指定密碼保護此區段。
+    /// </summary>
+    /// <param name="password">密碼明文。</param>
+    public void Protect(string password)
+    {
+        OdfKit.Core.OdfProtectionHelper.ProtectNode(Node, password, "text", OdfNamespaces.Text);
+    }
+
+    /// <summary>
+    /// 解除此區段的密碼保護。
+    /// </summary>
+    public void Unprotect()
+    {
+        OdfKit.Core.OdfProtectionHelper.UnprotectNode(Node, OdfNamespaces.Text);
+    }
+
+    /// <summary>
+    /// 嘗試以指定密碼解除此區段的保護。
+    /// </summary>
+    /// <param name="password">密碼明文。</param>
+    /// <returns>若解除成功則為 true，否則為 false。</returns>
+    public bool TryUnprotect(string password)
+    {
+        if (!IsProtected)
+            return true;
+        if (OdfKit.Core.OdfProtectionHelper.VerifyPassword(Node, password, OdfNamespaces.Text))
+        {
+            Unprotect();
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 驗證指定密碼是否能成功解鎖此區段。
+    /// </summary>
+    /// <param name="password">密碼明文。</param>
+    /// <returns>若密碼正確或區段未受保護則為 true，否則為 false。</returns>
+    public bool VerifyPassword(string password)
+    {
+        if (!IsProtected)
+            return true;
+        return OdfKit.Core.OdfProtectionHelper.VerifyPassword(Node, password, OdfNamespaces.Text);
     }
 
     private string GetStyleName() => Node.GetAttribute("style-name", OdfNamespaces.Text) ?? string.Empty;

@@ -14,9 +14,45 @@ namespace OdfKit.Styles;
 public static class OdfFontResolver
 {
     private static readonly Dictionary<string, string> _fontMap = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, string> _fallbackMap = new(StringComparer.OrdinalIgnoreCase);
     private static readonly List<string> _customDirectories = [];
     private static bool _isScanned;
     private static readonly object _lock = new();
+
+    /// <summary>
+    /// 註冊字型替代對照規則（例如在無微軟字型之 Linux/Docker 上將 "MS YaHei" 映射至 "Noto Sans CJK TC"）。
+    /// </summary>
+    /// <param name="targetFont">要替代的目標字型名稱。</param>
+    /// <param name="replacementFont">用來替代的字型名稱。</param>
+    /// <exception cref="ArgumentNullException">當參數為空時拋出。</exception>
+    public static void RegisterFallback(string targetFont, string replacementFont)
+    {
+        if (string.IsNullOrEmpty(targetFont))
+            throw new ArgumentNullException(nameof(targetFont));
+        if (string.IsNullOrEmpty(replacementFont))
+            throw new ArgumentNullException(nameof(replacementFont));
+
+        lock (_lock)
+        {
+            _fallbackMap[targetFont] = replacementFont;
+        }
+    }
+
+    /// <summary>
+    /// 取得指定字型的實質替代字型名稱。若無替代規則則傳回原名稱。
+    /// </summary>
+    /// <param name="fontName">字型名稱。</param>
+    /// <returns>替代後或原字型名稱。</returns>
+    public static string MapFont(string fontName)
+    {
+        if (string.IsNullOrEmpty(fontName))
+            return fontName;
+
+        lock (_lock)
+        {
+            return _fallbackMap.TryGetValue(fontName, out string? replacement) ? replacement : fontName;
+        }
+    }
 
     /// <summary>
     /// 顯式註冊字型對應。

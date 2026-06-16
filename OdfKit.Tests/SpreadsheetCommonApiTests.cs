@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using OdfKit.Core;
@@ -184,6 +184,86 @@ public class SpreadsheetCommonApiTests
                 Assert.Null(props?.Attribute(styleNs + "row-height"));
             }
         }
+    }
+
+    /// <summary>
+    /// 驗證儲存格樣式代理 OdfCellStyleProxy 的屬性讀寫保真度與 local style 懒加載機制。
+    /// </summary>
+    [Fact]
+    public void OdfCellStyleProxyTest()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = workbook.Worksheets.Add("StyleTest");
+        OdfCell cell = sheet.GetCell(1, 1);
+
+        // 設定字型與填滿樣式
+        cell.Style.Font.IsBold = true;
+        cell.Style.Font.IsItalic = true;
+        cell.Style.Font.Size = "13pt";
+        cell.Style.Font.Color = "#0000FF";
+        cell.Style.Fill.Color = "#00FF00";
+        cell.Style.NumberFormat = "N1";
+
+        Assert.True(cell.Style.Font.IsBold);
+        Assert.True(cell.Style.Font.IsItalic);
+        Assert.Equal("13pt", cell.Style.Font.Size);
+        Assert.Equal("#0000FF", cell.Style.Font.Color);
+        Assert.Equal("#00FF00", cell.Style.Fill.Color);
+        Assert.Equal("N1", cell.Style.NumberFormat);
+
+        // 存檔與重新載入驗證
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = SpreadsheetDocument.Load(stream, "style.ods");
+        OdfCell loadedCell = loaded.Worksheets["StyleTest"].GetCell(1, 1);
+
+        Assert.True(loadedCell.Style.Font.IsBold);
+        Assert.True(loadedCell.Style.Font.IsItalic);
+        Assert.Equal("13pt", loadedCell.Style.Font.Size);
+        Assert.Equal("#0000FF", loadedCell.Style.Font.Color);
+        Assert.Equal("#00FF00", loadedCell.Style.Fill.Color);
+        Assert.Equal("N1", loadedCell.Style.NumberFormat);
+    }
+
+    /// <summary>
+    /// 驗證儲存格範圍受保護狀態設定與 <table:protected-ranges> XML 結構 round-trip 驗證。
+    /// </summary>
+    [Fact]
+    public void OdfCellRangeProtectionTest()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = workbook.Worksheets.Add("ProtectTest");
+        var rangeSelection = sheet.Ranges["B2:D4"];
+
+        Assert.False(rangeSelection.IsProtected);
+
+        // 保護範圍
+        rangeSelection.Protect("RangePass5566");
+        Assert.True(rangeSelection.IsProtected);
+        Assert.True(rangeSelection.VerifyPassword("RangePass5566"));
+        Assert.False(rangeSelection.VerifyPassword("WrongPass"));
+
+        // 存檔與載入驗證
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = SpreadsheetDocument.Load(stream, "protect.ods");
+        var loadedSheet = loaded.Worksheets["ProtectTest"];
+        var loadedRange = loadedSheet.Ranges["B2:D4"];
+
+        Assert.True(loadedRange.IsProtected);
+        Assert.True(loadedRange.VerifyPassword("RangePass5566"));
+        Assert.False(loadedRange.VerifyPassword("WrongPass"));
+
+        // 解除保護
+        Assert.False(loadedRange.TryUnprotect("WrongPass"));
+        Assert.True(loadedRange.IsProtected);
+
+        Assert.True(loadedRange.TryUnprotect("RangePass5566"));
+        Assert.False(loadedRange.IsProtected);
     }
 
     private static string ReadEntry(OdfPackage package, string path)

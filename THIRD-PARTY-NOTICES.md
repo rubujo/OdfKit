@@ -12,6 +12,7 @@ OdfKit 專案採用 [CC0-1.0 Universal](https://creativecommons.org/publicdomain
 | [System.Memory 等相容性支援](https://github.com/dotnet/runtime) | netstandard2.0 平台相容性支援 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [AngleSharp](https://github.com/AngleSharp/AngleSharp) | 用於 HTML 解析與轉換擴充（於 OdfKit.Extensions.Html 中使用） | [MIT](https://github.com/AngleSharp/AngleSharp/blob/master/LICENSE) |
 | [SkiaSharp](https://github.com/mono/SkiaSharp) / [HarfBuzzSharp](https://github.com/mono/SkiaSharp) | 跨平台圖像繪製與文字排版支援（於 OdfKit.Extensions.Imaging 中使用） | [MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |
+| [ScottPlot](https://github.com/ScottPlot/ScottPlot) | 記憶體內圖表繪製與 fallback 影像視覺化（於 OdfKit.Extensions.Imaging 中使用） | [MIT](https://github.com/ScottPlot/ScottPlot/blob/main/LICENSE) |
 | [ClosedXML](https://github.com/ClosedXML/ClosedXML) / [DocumentFormat.OpenXml](https://github.com/dotnet/Open-XML-SDK) | 用於 OOXML 格式（如 Excel）之整合與匯入匯出（於 OdfKit.Extensions.Ooxml 中使用） | [MIT](https://github.com/ClosedXML/ClosedXML/blob/master/LICENSE) / [MIT](https://github.com/dotnet/Open-XML-SDK/blob/main/LICENSE) |
 | [PDFsharp-MigraDoc](https://github.com/empira/PDFsharp) | PDF 相關處理、排版與繪製擴充（於 OdfKit.Extensions.Pdf 中使用） | [MIT](https://github.com/empira/PDFsharp/blob/master/LICENSE) |
 | [OASIS OpenDocument Relax-NG Schemas](https://www.oasis-open.org/committees/office/) | ODF 1.1 / 1.2 / 1.3 / 1.4 XML 結構驗證與代碼生成（置於 tools/OdfSchemaGenerator/schemas/） | [OASIS Copyright](https://www.oasis-open.org/committees/office/ipr.php) |

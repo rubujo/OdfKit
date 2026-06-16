@@ -72,10 +72,46 @@ public class LibreOfficeRenderer
         if (format is null)
             throw new ArgumentNullException(nameof(format));
 
+        string tempSandbox = Path.Combine(Path.GetTempPath(), "OdfKit_RenderDoc_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempSandbox);
+        try
+        {
+            string inputFileName = "document.odt";
+            if (document is PresentationDocument)
+                inputFileName = "document.odp";
+            else if (document is SpreadsheetDocument)
+                inputFileName = "document.ods";
+
+            string inputFilePath = Path.Combine(tempSandbox, inputFileName);
+            File.WriteAllBytes(inputFilePath, document.SaveToBytes());
+
+            ConvertFile(inputFilePath, outputPath, format);
+        }
+        finally
+        {
+            SafeCleanDirectory(tempSandbox);
+        }
+    }
+
+    /// <summary>
+    /// 使用系統安裝的 LibreOffice 將指定的實體檔案轉換為目標格式並輸出。
+    /// </summary>
+    /// <param name="inputFilePath">輸入檔案的實體絕對路徑。</param>
+    /// <param name="outputPath">輸出檔案的目標絕對路徑。</param>
+    /// <param name="format">要轉換的目標格式（例如 <c>pdf</c>）。</param>
+    public void ConvertFile(string inputFilePath, string outputPath, string format)
+    {
+        if (string.IsNullOrEmpty(inputFilePath))
+            throw new ArgumentNullException(nameof(inputFilePath));
+        if (string.IsNullOrEmpty(outputPath))
+            throw new ArgumentNullException(nameof(outputPath));
+        if (string.IsNullOrEmpty(format))
+            throw new ArgumentNullException(nameof(format));
+
         string? sandboxDir = null;
         try
         {
-            // Create a unique sandbox directory inside the OS temporary path, isolated by process ID
+            // 在系統臨時路徑中建立一個依行程 ID 隔離的唯一沙盒目錄
             string tempSandbox = Path.Combine(Path.GetTempPath(), "OdfKit_Render_" + Process.GetCurrentProcess().Id + "_" + Guid.NewGuid().ToString("N"));
             if (!Directory.Exists(tempSandbox))
             {
@@ -83,24 +119,16 @@ public class LibreOfficeRenderer
             }
             sandboxDir = tempSandbox;
 
-            // Define profile subdirectory for isolated LibreOffice configuration environment
             string profileDir = Path.Combine(sandboxDir, "profile");
             if (!Directory.Exists(profileDir))
             {
                 Directory.CreateDirectory(profileDir);
             }
 
-            // Write ODF bytes to input sandbox file
-            string inputFileName = "document.odt"; // safe fallback name
-            if (document is PresentationDocument)
-                inputFileName = "document.odp";
-            else if (document is SpreadsheetDocument)
-                inputFileName = "document.ods";
+            // 複製輸入檔案至沙盒中以防進程讀取衝突
+            string sandboxInputPath = Path.Combine(sandboxDir, Path.GetFileName(inputFilePath));
+            File.Copy(inputFilePath, sandboxInputPath, true);
 
-            string inputFilePath = Path.Combine(sandboxDir, inputFileName);
-            File.WriteAllBytes(inputFilePath, document.SaveToBytes());
-            // Force soffice to launch in a completely isolated profile, allowing safe parallel processing.
-            // Use standard forward slashes for the profile URI path.
             string profileUri = "file:///" + profileDir.Replace('\\', '/');
 
             var startInfo = new ProcessStartInfo
@@ -119,7 +147,7 @@ public class LibreOfficeRenderer
             startInfo.ArgumentList.Add(format);
             startInfo.ArgumentList.Add("--outdir");
             startInfo.ArgumentList.Add(sandboxDir);
-            startInfo.ArgumentList.Add(inputFilePath);
+            startInfo.ArgumentList.Add(sandboxInputPath);
 #else
             var args = new StringBuilder();
             args.Append("--headless");
@@ -128,7 +156,7 @@ public class LibreOfficeRenderer
             args.Append($" {EscapeArgument(format)}");
             args.Append(" --outdir");
             args.Append($" {EscapeArgument(sandboxDir)}");
-            args.Append($" {EscapeArgument(inputFilePath)}");
+            args.Append($" {EscapeArgument(sandboxInputPath)}");
             startInfo.Arguments = args.ToString();
 #endif
 
@@ -136,7 +164,6 @@ public class LibreOfficeRenderer
             {
                 process.Start();
 
-                // Read standard outputs to prevent output streams buffer lockups
                 var stdOutTask = process.StandardOutput.ReadToEndAsync();
                 var stdErrTask = process.StandardError.ReadToEndAsync();
 
@@ -167,7 +194,7 @@ public class LibreOfficeRenderer
                 }
             }
 
-            string expectedOutName = Path.GetFileNameWithoutExtension(inputFileName) + "." + format;
+            string expectedOutName = Path.GetFileNameWithoutExtension(sandboxInputPath) + "." + format;
             string convertedFilePath = Path.Combine(sandboxDir, expectedOutName);
 
             if (!File.Exists(convertedFilePath))
