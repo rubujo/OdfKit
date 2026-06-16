@@ -217,12 +217,15 @@ public static class OdfSigner
             // Import signature element into doc
             var xmlSignature = signedXml.GetXml();
 
-            // 6. If XAdES-T or XAdES-A, fetch timestamp and build unsigned properties
-            if (options.SignatureLevel == OdfSignatureLevel.XadesT || options.SignatureLevel == OdfSignatureLevel.XadesA)
+            bool requiresTimestamp = options.SignatureLevel is OdfSignatureLevel.XadesT or OdfSignatureLevel.XadesLT or OdfSignatureLevel.XadesA;
+            bool requiresLongTermValues = options.SignatureLevel is OdfSignatureLevel.XadesLT or OdfSignatureLevel.XadesA;
+
+            // 6. If XAdES-T/LT/A, fetch timestamp and build unsigned properties
+            if (requiresTimestamp)
             {
                 if (string.IsNullOrEmpty(options.TsaUrl))
                 {
-                    throw new CryptographicException("TSA URL must be configured for XAdES-T or XAdES-A.");
+                    throw new CryptographicException("TSA URL must be configured for XAdES-T, XAdES-LT, or XAdES-A.");
                 }
 
                 // Find the ds:SignatureValue element in the generated xmlSignature using relative XPath to support co-signing
@@ -271,8 +274,8 @@ public static class OdfSigner
                 unsignedProps.AppendChild(unsignedSigProps);
                 importedQualProps.AppendChild(unsignedProps);
 
-                // 7. If XAdES-A, add certificate values and revocation values
-                if (options.SignatureLevel == OdfSignatureLevel.XadesA)
+                // 7. If XAdES-LT/A, add certificate values and revocation values
+                if (requiresLongTermValues)
                 {
                     // Build certificate chain
                     var chain = new X509Chain();

@@ -24,6 +24,11 @@ public enum XadesLevel
     T,
 
     /// <summary>
+    /// 含憑證鏈與撤銷資訊的長效驗證 XAdES 簽章 (XAdES-LT)。
+    /// </summary>
+    LT,
+
+    /// <summary>
     /// 封存/長期驗證 XAdES 簽章 (XAdES-A)。
     /// </summary>
     A
@@ -50,9 +55,14 @@ public enum OdfSignatureLevel
     XadesT = 2,
 
     /// <summary>
+    /// 含憑證鏈與撤銷資訊的長效驗證 XAdES 簽章 (XAdES-LT)。
+    /// </summary>
+    XadesLT = 3,
+
+    /// <summary>
     /// 封存/長期驗證 XAdES 簽章 (XAdES-A)。
     /// </summary>
-    XadesA = 3
+    XadesA = 4
 }
 
 /// <summary>
@@ -66,7 +76,7 @@ public class OdfSigningOptions
     public OdfSignatureLevel SignatureLevel { get; set; } = OdfSignatureLevel.None;
 
     /// <summary>
-    /// 取得或設定 XAdES 標準層級（ None/XMLDSig, BES, T, A ）。
+    /// 取得或設定 XAdES 標準層級（ None/XMLDSig, BES, T, LT, A ）。
     /// </summary>
     public XadesLevel Level
     {
@@ -77,6 +87,7 @@ public class OdfSigningOptions
                 OdfSignatureLevel.None => XadesLevel.None,
                 OdfSignatureLevel.XadesBes => XadesLevel.BES,
                 OdfSignatureLevel.XadesT => XadesLevel.T,
+                OdfSignatureLevel.XadesLT => XadesLevel.LT,
                 OdfSignatureLevel.XadesA => XadesLevel.A,
                 _ => XadesLevel.None
             };
@@ -88,6 +99,7 @@ public class OdfSigningOptions
                 XadesLevel.None => OdfSignatureLevel.None,
                 XadesLevel.BES => OdfSignatureLevel.XadesBes,
                 XadesLevel.T => OdfSignatureLevel.XadesT,
+                XadesLevel.LT => OdfSignatureLevel.XadesLT,
                 XadesLevel.A => OdfSignatureLevel.XadesA,
                 _ => OdfSignatureLevel.None
             };
