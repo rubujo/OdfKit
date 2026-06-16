@@ -5,7 +5,6 @@ $sourcePath = Join-Path $textDir 'OdfParagraph.cs'
 $lines = [System.Collections.Generic.List[string]]@(Get-Content -Path $sourcePath -Encoding UTF8)
 
 $blocks = @(
-    @{ Start = 294; End = 372; File = 'OdfParagraph.Fields.cs'; Region = 'Fields & References' }
     @{ Start = 374; End = 468; File = 'OdfParagraph.EmbeddedContent.cs'; Region = 'Embedded Content & Layout' }
 )
 
@@ -46,7 +45,7 @@ function Write-PartialFile {
     Set-Content -Path $Path -Value $out -Encoding UTF8
 }
 
-$core = $lines[0..291] + '}'
+$core = $lines[0..372] + '}'
 Set-Content -Path $sourcePath -Value $core -Encoding UTF8
 Write-Host "Core OdfParagraph.cs: $($core.Count) lines"
 
