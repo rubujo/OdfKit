@@ -972,6 +972,70 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// 在投影片上新增影片物件。
+    /// </summary>
+    /// <param name="packagePath">影片在封裝包內的路徑。</param>
+    /// <param name="x">X 軸座標位置。</param>
+    /// <param name="y">Y 軸座標位置。</param>
+    /// <param name="width">寬度。</param>
+    /// <param name="height">高度。</param>
+    /// <param name="mimeType">影片 MIME 類型。</param>
+    /// <returns>新建立的媒體物件。</returns>
+    public OdfMediaObject AddVideo(
+        string packagePath,
+        OdfLength x,
+        OdfLength y,
+        OdfLength width,
+        OdfLength height,
+        string mimeType = "video/mp4")
+    {
+        return AddMedia(packagePath, x, y, width, height, mimeType);
+    }
+
+    /// <summary>
+    /// 在投影片上新增音訊物件。
+    /// </summary>
+    /// <param name="packagePath">音訊在封裝包內的路徑。</param>
+    /// <param name="x">X 軸座標位置。</param>
+    /// <param name="y">Y 軸座標位置。</param>
+    /// <param name="width">寬度。</param>
+    /// <param name="height">高度。</param>
+    /// <param name="mimeType">音訊 MIME 類型。</param>
+    /// <returns>新建立的媒體物件。</returns>
+    public OdfMediaObject AddAudio(
+        string packagePath,
+        OdfLength x,
+        OdfLength y,
+        OdfLength width,
+        OdfLength height,
+        string mimeType = "audio/mpeg")
+    {
+        return AddMedia(packagePath, x, y, width, height, mimeType);
+    }
+
+    private OdfMediaObject AddMedia(
+        string packagePath,
+        OdfLength x,
+        OdfLength y,
+        OdfLength width,
+        OdfLength height,
+        string mimeType)
+    {
+        if (string.IsNullOrWhiteSpace(packagePath)) throw new ArgumentException("封裝路徑不可為空白。", nameof(packagePath));
+        if (string.IsNullOrWhiteSpace(mimeType)) throw new ArgumentException("MIME 類型不可為空白。", nameof(mimeType));
+
+        var frame = CreateDrawingFrame(x, y, width, height);
+        var plugin = new OdfNode(OdfNodeType.Element, "plugin", OdfNamespaces.Draw, "draw");
+        plugin.SetAttribute("href", OdfNamespaces.XLink, packagePath, "xlink");
+        plugin.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+        plugin.SetAttribute("mime-type", OdfNamespaces.Draw, mimeType, "draw");
+        frame.AppendChild(plugin);
+        Node.AppendChild(frame);
+
+        return new OdfMediaObject(packagePath, mimeType);
+    }
+
+    /// <summary>
     /// 在投影片上新增基本圖形。
     /// </summary>
     /// <param name="shapeType">圖形類型</param>
@@ -1165,6 +1229,55 @@ public class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     public string LocalName => Node.LocalName;
 
     /// <summary>
+    /// 將此圖形標記為裝飾性，輔助技術應略過此物件。
+    /// </summary>
+    /// <param name="decorative">是否標記為裝飾性。</param>
+    /// <returns>目前圖形執行個體。</returns>
+    public OdfShape MarkAsDecorative(bool decorative = true)
+    {
+        if (decorative)
+        {
+            Node.SetAttribute("decorative", OdfNamespaces.Draw, "true", "draw");
+        }
+        else
+        {
+            Node.RemoveAttribute("decorative", OdfNamespaces.Draw);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// 在此圖形框架內建立嵌入表格。
+    /// </summary>
+    /// <param name="rows">列數。</param>
+    /// <param name="columns">欄數。</param>
+    /// <returns>新建立的嵌入表格。</returns>
+    public OdfEmbeddedTable AddEmbeddedTable(int rows, int columns)
+    {
+        if (rows < 1) throw new ArgumentOutOfRangeException(nameof(rows));
+        if (columns < 1) throw new ArgumentOutOfRangeException(nameof(columns));
+
+        var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
+        for (int row = 0; row < rows; row++)
+        {
+            var rowNode = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
+            for (int column = 0; column < columns; column++)
+            {
+                var cell = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table");
+                var paragraph = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+                cell.AppendChild(paragraph);
+                rowNode.AppendChild(cell);
+            }
+
+            table.AppendChild(rowNode);
+        }
+
+        Node.AppendChild(table);
+        return new OdfEmbeddedTable(table);
+    }
+
+    /// <summary>
     /// 取得或設定圖形的識別碼。
     /// </summary>
     public string Id
@@ -1315,6 +1428,63 @@ public class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
         mainSeq.SetAttribute("node-type", OdfNamespaces.Presentation, "main-sequence", "presentation");
         slideNode.AppendChild(mainSeq);
         return mainSeq;
+    }
+}
+
+/// <summary>
+/// 表示簡報投影片中的媒體物件。
+/// </summary>
+/// <param name="packagePath">媒體在封裝包內的路徑。</param>
+/// <param name="mimeType">媒體 MIME 類型。</param>
+public sealed class OdfMediaObject(string packagePath, string mimeType)
+{
+    /// <summary>
+    /// 取得媒體在封裝包內的路徑。
+    /// </summary>
+    public string PackagePath { get; } = packagePath;
+
+    /// <summary>
+    /// 取得媒體 MIME 類型。
+    /// </summary>
+    public string MimeType { get; } = mimeType;
+}
+
+/// <summary>
+/// 表示嵌入在圖形框架內的表格。
+/// </summary>
+public sealed class OdfEmbeddedTable
+{
+    private readonly OdfNode _tableNode;
+
+    internal OdfEmbeddedTable(OdfNode tableNode)
+    {
+        _tableNode = tableNode ?? throw new ArgumentNullException(nameof(tableNode));
+    }
+
+    /// <summary>
+    /// 設定指定儲存格的文字。
+    /// </summary>
+    /// <param name="row">列索引，採 0 為基準。</param>
+    /// <param name="column">欄索引，採 0 為基準。</param>
+    /// <param name="text">儲存格文字。</param>
+    /// <returns>目前嵌入表格。</returns>
+    public OdfEmbeddedTable SetCellText(int row, int column, string text)
+    {
+        OdfNode cell = GetCell(row, column);
+        OdfNode paragraph = cell.Children.First(child => child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text);
+        paragraph.TextContent = text;
+        return this;
+    }
+
+    private OdfNode GetCell(int row, int column)
+    {
+        if (row < 0) throw new ArgumentOutOfRangeException(nameof(row));
+        if (column < 0) throw new ArgumentOutOfRangeException(nameof(column));
+        if (row >= _tableNode.Children.Count) throw new ArgumentOutOfRangeException(nameof(row));
+
+        OdfNode rowNode = _tableNode.Children[row];
+        if (column >= rowNode.Children.Count) throw new ArgumentOutOfRangeException(nameof(column));
+        return rowNode.Children[column];
     }
 }
 

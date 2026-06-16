@@ -232,7 +232,7 @@ public class OdfPresentationPageLayout(OdfNode node)
     /// <summary>
     /// 取得底層的 ODF 節點。
     /// </summary>
-    public OdfNode Node { get; } = node;
+    internal OdfNode Node { get; } = node;
 
     /// <summary>
     /// 取得或設定簡報頁面版面配置的名稱。
@@ -383,7 +383,7 @@ public sealed class OdfMasterPage
     /// <summary>
     /// 取得底層的 ODF 節點。
     /// </summary>
-    public OdfNode Node { get; }
+    internal OdfNode Node { get; }
 
     /// <summary>
     /// 取得母片名稱。
