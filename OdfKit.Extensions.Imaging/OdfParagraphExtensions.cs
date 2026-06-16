@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Linq;
 using OdfKit.DOM;
-using OdfKit.Text;
 using OdfKit.Styles;
+using OdfKit.Text;
 
 namespace OdfKit.Extensions.Imaging;
 

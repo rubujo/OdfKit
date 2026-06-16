@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Core;
-using OdfKit.Spreadsheet;
 using OdfKit.Presentation;
+using OdfKit.Spreadsheet;
 
 namespace OdfKit.Extensions.Rendering;
 
