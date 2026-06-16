@@ -128,4 +128,10 @@ Merge-RegionIntoCore `
     -SourcePath (Join-Path $kit 'DOM\OdfElement.Clone.cs') `
     -RegionMarker '#region Clone'
 
+# 8. OdfDocument: Streaming -> Lifecycle（儲存與串流 API 同屬生命週期）
+Merge-RegionIntoCore `
+    -CorePath (Join-Path $kit 'Core\OdfDocument.Lifecycle.cs') `
+    -SourcePath (Join-Path $kit 'Core\OdfDocument.Streaming.cs') `
+    -RegionMarker '#region Web Streaming APIs'
+
 Write-Host 'Done.'

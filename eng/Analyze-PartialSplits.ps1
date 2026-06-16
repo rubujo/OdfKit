@@ -40,6 +40,9 @@ $reviewKeepPairs = [System.Collections.Generic.HashSet[string]]::new([StringComp
     'OdfPageSetup|OdfPageSetup.Infrastructure.cs'
     'OdfMailMergeEngine|OdfMailMergeEngine.Placeholders.cs'
     'OdfDrawPage|OdfDrawPage.Creation.cs'
+    'OdfSlide|OdfSlide.Animations.cs'
+    'OdfSlide|OdfSlide.DrawingObjects.cs'
+    'PresentationDocument|PresentationDocument.Transitions.cs'
 ) | ForEach-Object { [void]$reviewKeepPairs.Add($_) }
 
 function Get-PartialTypeName {
