@@ -4,11 +4,14 @@ using OdfKit.Styles;
 
 namespace OdfKit.DOM;
 
-public partial class OdfElement
+/// <summary>
+/// ODF 元素 schema 枚舉 token 靜態註冊表（部分檔案）。
+/// </summary>
+internal static partial class OdfElementSchemaRegistry
 {
-    #region Enum Parsers - Text Kind, Style, Form & Table
+    #region Schema Registry - Text Kind, Style, Form & Table
 
-    private static bool TryParseTextKind(string? value, out OdfTextKind kind)
+    internal static bool TryParseTextKind(string? value, out OdfTextKind kind)
     {
         switch (value)
         {
@@ -27,7 +30,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextKind(OdfTextKind kind)
+    internal static string FormatTextKind(OdfTextKind kind)
     {
         return kind switch
         {
@@ -38,7 +41,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseStyleDirection(string? value, out OdfStyleDirection direction)
+    internal static bool TryParseStyleDirection(string? value, out OdfStyleDirection direction)
     {
         switch (value)
         {
@@ -54,7 +57,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatStyleDirection(OdfStyleDirection direction)
+    internal static string FormatStyleDirection(OdfStyleDirection direction)
     {
         return direction switch
         {
@@ -64,7 +67,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseFormOrientation(string? value, out OdfFormOrientation orientation)
+    internal static bool TryParseFormOrientation(string? value, out OdfFormOrientation orientation)
     {
         switch (value)
         {
@@ -80,7 +83,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatFormOrientation(OdfFormOrientation orientation)
+    internal static string FormatFormOrientation(OdfFormOrientation orientation)
     {
         return orientation switch
         {
@@ -90,7 +93,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTableDirection(string? value, out OdfTableDirection direction)
+    internal static bool TryParseTableDirection(string? value, out OdfTableDirection direction)
     {
         switch (value)
         {
@@ -109,7 +112,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTableDirection(OdfTableDirection direction)
+    internal static string FormatTableDirection(OdfTableDirection direction)
     {
         return direction switch
         {
@@ -120,7 +123,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTableOrientation(string? value, out OdfTableOrientation orientation)
+    internal static bool TryParseTableOrientation(string? value, out OdfTableOrientation orientation)
     {
         switch (value)
         {
@@ -145,7 +148,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTableOrientation(OdfTableOrientation orientation)
+    internal static string FormatTableOrientation(OdfTableOrientation orientation)
     {
         return orientation switch
         {
@@ -158,7 +161,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseStyleFamily(string? value, out OdfStyleFamily family)
+    internal static bool TryParseStyleFamily(string? value, out OdfStyleFamily family)
     {
         switch (value)
         {
@@ -204,7 +207,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatStyleFamily(OdfStyleFamily family)
+    internal static string FormatStyleFamily(OdfStyleFamily family)
     {
         return family switch
         {

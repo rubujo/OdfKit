@@ -40,11 +40,11 @@
 - [x] `OdfPackageSaver` + `OdfPackageSaveCollaborators`
 - [x] `eng/Format-Safe.ps1` 安全格式化規範
 
-## Phase 3（進行中）
+## Phase 3（已完成）
 
 - [x] `FormulaBuiltinFunctionRegistry` 取代 `FunctionDispatch` 巨型 switch
 - [x] `OdfPackageLoader` + `OdfPackageZipLoader` 載入引擎
-- [ ] `OdfElement` 靜態 schema 註冊表
+- [x] `OdfElementSchemaRegistry` 靜態 enum token 註冊表（8 個 EnumParsers 遷移）
 
 ## 驗證
 

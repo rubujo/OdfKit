@@ -4,11 +4,14 @@ using OdfKit.Styles;
 
 namespace OdfKit.DOM;
 
-public partial class OdfElement
+/// <summary>
+/// ODF 元素 schema 枚舉 token 靜態註冊表（部分檔案）。
+/// </summary>
+internal static partial class OdfElementSchemaRegistry
 {
-    #region Enum Parsers - Text Numbering & Animation
+    #region Schema Registry - Text Numbering & Animation
 
-    private static bool TryParseTextStartNumberingAt(string? value, out OdfTextStartNumberingAt startNumberingAt)
+    internal static bool TryParseTextStartNumberingAt(string? value, out OdfTextStartNumberingAt startNumberingAt)
     {
         switch (value)
         {
@@ -27,7 +30,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextStartNumberingAt(OdfTextStartNumberingAt startNumberingAt)
+    internal static string FormatTextStartNumberingAt(OdfTextStartNumberingAt startNumberingAt)
     {
         return startNumberingAt switch
         {
@@ -38,7 +41,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextFootnotesPosition(string? value, out OdfTextFootnotesPosition position)
+    internal static bool TryParseTextFootnotesPosition(string? value, out OdfTextFootnotesPosition position)
     {
         switch (value)
         {
@@ -60,7 +63,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextFootnotesPosition(OdfTextFootnotesPosition position)
+    internal static string FormatTextFootnotesPosition(OdfTextFootnotesPosition position)
     {
         return position switch
         {
@@ -72,7 +75,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextCaptionSequenceFormat(string? value, out OdfTextCaptionSequenceFormat format)
+    internal static bool TryParseTextCaptionSequenceFormat(string? value, out OdfTextCaptionSequenceFormat format)
     {
         switch (value)
         {
@@ -91,7 +94,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextCaptionSequenceFormat(OdfTextCaptionSequenceFormat format)
+    internal static string FormatTextCaptionSequenceFormat(OdfTextCaptionSequenceFormat format)
     {
         return format switch
         {
@@ -102,7 +105,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextNumberPosition(string? value, out OdfTextNumberPosition position)
+    internal static bool TryParseTextNumberPosition(string? value, out OdfTextNumberPosition position)
     {
         switch (value)
         {
@@ -124,7 +127,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextNumberPosition(OdfTextNumberPosition position)
+    internal static string FormatTextNumberPosition(OdfTextNumberPosition position)
     {
         return position switch
         {
@@ -136,7 +139,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextPlaceholderType(string? value, out OdfTextPlaceholderType placeholderType)
+    internal static bool TryParseTextPlaceholderType(string? value, out OdfTextPlaceholderType placeholderType)
     {
         switch (value)
         {
@@ -161,7 +164,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextPlaceholderType(OdfTextPlaceholderType placeholderType)
+    internal static string FormatTextPlaceholderType(OdfTextPlaceholderType placeholderType)
     {
         return placeholderType switch
         {
@@ -174,7 +177,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextAnimation(string? value, out OdfTextAnimation animation)
+    internal static bool TryParseTextAnimation(string? value, out OdfTextAnimation animation)
     {
         switch (value)
         {
@@ -196,7 +199,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextAnimation(OdfTextAnimation animation)
+    internal static string FormatTextAnimation(OdfTextAnimation animation)
     {
         return animation switch
         {
@@ -208,7 +211,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextAnimationDirection(string? value, out OdfTextAnimationDirection direction)
+    internal static bool TryParseTextAnimationDirection(string? value, out OdfTextAnimationDirection direction)
     {
         switch (value)
         {
@@ -230,7 +233,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextAnimationDirection(OdfTextAnimationDirection direction)
+    internal static string FormatTextAnimationDirection(OdfTextAnimationDirection direction)
     {
         return direction switch
         {

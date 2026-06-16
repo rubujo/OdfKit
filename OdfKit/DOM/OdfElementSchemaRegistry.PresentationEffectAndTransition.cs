@@ -4,11 +4,14 @@ using OdfKit.Styles;
 
 namespace OdfKit.DOM;
 
-public partial class OdfElement
+/// <summary>
+/// ODF 元素 schema 枚舉 token 靜態註冊表（部分檔案）。
+/// </summary>
+internal static partial class OdfElementSchemaRegistry
 {
-    #region Enum Parsers - Presentation Effect & Transition
+    #region Schema Registry - Presentation Effect & Transition
 
-    private static bool TryParsePresentationEffect(string? value, out OdfPresentationEffect effect)
+    internal static bool TryParsePresentationEffect(string? value, out OdfPresentationEffect effect)
     {
         switch (value)
         {
@@ -69,7 +72,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatPresentationEffect(OdfPresentationEffect effect)
+    internal static string FormatPresentationEffect(OdfPresentationEffect effect)
     {
         return effect switch
         {
@@ -94,7 +97,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParsePresentationSpeed(string? value, out OdfPresentationSpeed speed)
+    internal static bool TryParsePresentationSpeed(string? value, out OdfPresentationSpeed speed)
     {
         switch (value)
         {
@@ -113,7 +116,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatPresentationSpeed(OdfPresentationSpeed speed)
+    internal static string FormatPresentationSpeed(OdfPresentationSpeed speed)
     {
         return speed switch
         {
@@ -124,7 +127,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParsePresentationAction(string? value, out OdfPresentationAction action)
+    internal static bool TryParsePresentationAction(string? value, out OdfPresentationAction action)
     {
         switch (value)
         {
@@ -173,7 +176,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatPresentationAction(OdfPresentationAction action)
+    internal static string FormatPresentationAction(OdfPresentationAction action)
     {
         return action switch
         {
@@ -194,7 +197,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParsePresentationTransitionType(string? value, out OdfPresentationTransitionType transitionType)
+    internal static bool TryParsePresentationTransitionType(string? value, out OdfPresentationTransitionType transitionType)
     {
         switch (value)
         {
@@ -213,7 +216,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatPresentationTransitionType(OdfPresentationTransitionType transitionType)
+    internal static string FormatPresentationTransitionType(OdfPresentationTransitionType transitionType)
     {
         return transitionType switch
         {

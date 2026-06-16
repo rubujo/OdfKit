@@ -46,7 +46,7 @@ public partial class OdfElement
     public OdfXLinkType? GetXLinkTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseXLinkType(value, out OdfXLinkType type) ? type : null;
+        return OdfElementSchemaRegistry.TryParseXLinkType(value, out OdfXLinkType type) ? type : null;
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetXLinkTypeAttributeValue(string localName, string namespaceUri, OdfXLinkType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatXLinkType(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatXLinkType(value), prefix, version);
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public partial class OdfElement
     public OdfXLinkShow? GetXLinkShowAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseXLinkShow(value, out OdfXLinkShow show) ? show : null;
+        return OdfElementSchemaRegistry.TryParseXLinkShow(value, out OdfXLinkShow show) ? show : null;
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetXLinkShowAttributeValue(string localName, string namespaceUri, OdfXLinkShow value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatXLinkShow(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatXLinkShow(value), prefix, version);
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public partial class OdfElement
     public OdfXLinkActuate? GetXLinkActuateAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseXLinkActuate(value, out OdfXLinkActuate actuate) ? actuate : null;
+        return OdfElementSchemaRegistry.TryParseXLinkActuate(value, out OdfXLinkActuate actuate) ? actuate : null;
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetXLinkActuateAttributeValue(string localName, string namespaceUri, OdfXLinkActuate value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatXLinkActuate(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatXLinkActuate(value), prefix, version);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public partial class OdfElement
     public OdfNumberStyle? GetNumberStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseNumberStyle(value, out OdfNumberStyle style) ? style : null;
+        return OdfElementSchemaRegistry.TryParseNumberStyle(value, out OdfNumberStyle style) ? style : null;
     }
 
     /// <summary>
@@ -137,7 +137,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetNumberStyleAttributeValue(string localName, string namespaceUri, OdfNumberStyle value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatNumberStyle(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatNumberStyle(value), prefix, version);
     }
 
     /// <summary>
@@ -150,7 +150,7 @@ public partial class OdfElement
     public OdfTableOrder? GetTableOrderAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTableOrder(value, out OdfTableOrder order) ? order : null;
+        return OdfElementSchemaRegistry.TryParseTableOrder(value, out OdfTableOrder order) ? order : null;
     }
 
     /// <summary>
@@ -163,7 +163,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTableOrderAttributeValue(string localName, string namespaceUri, OdfTableOrder value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTableOrder(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableOrder(value), prefix, version);
     }
 
     /// <summary>
@@ -176,7 +176,7 @@ public partial class OdfElement
     public OdfTableType? GetTableTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTableType(value, out OdfTableType type) ? type : null;
+        return OdfElementSchemaRegistry.TryParseTableType(value, out OdfTableType type) ? type : null;
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTableTypeAttributeValue(string localName, string namespaceUri, OdfTableType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTableType(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableType(value), prefix, version);
     }
 
     /// <summary>
@@ -202,7 +202,7 @@ public partial class OdfElement
     public OdfPresentationEffect? GetPresentationEffectAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParsePresentationEffect(value, out OdfPresentationEffect effect) ? effect : null;
+        return OdfElementSchemaRegistry.TryParsePresentationEffect(value, out OdfPresentationEffect effect) ? effect : null;
     }
 
     /// <summary>
@@ -215,7 +215,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetPresentationEffectAttributeValue(string localName, string namespaceUri, OdfPresentationEffect value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatPresentationEffect(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatPresentationEffect(value), prefix, version);
     }
 
     /// <summary>
@@ -228,7 +228,7 @@ public partial class OdfElement
     public OdfPresentationSpeed? GetPresentationSpeedAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParsePresentationSpeed(value, out OdfPresentationSpeed speed) ? speed : null;
+        return OdfElementSchemaRegistry.TryParsePresentationSpeed(value, out OdfPresentationSpeed speed) ? speed : null;
     }
 
     /// <summary>
@@ -241,7 +241,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetPresentationSpeedAttributeValue(string localName, string namespaceUri, OdfPresentationSpeed value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatPresentationSpeed(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatPresentationSpeed(value), prefix, version);
     }
 
     /// <summary>
@@ -254,7 +254,7 @@ public partial class OdfElement
     public OdfPresentationAction? GetPresentationActionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParsePresentationAction(value, out OdfPresentationAction action) ? action : null;
+        return OdfElementSchemaRegistry.TryParsePresentationAction(value, out OdfPresentationAction action) ? action : null;
     }
 
     /// <summary>
@@ -267,7 +267,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetPresentationActionAttributeValue(string localName, string namespaceUri, OdfPresentationAction value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatPresentationAction(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatPresentationAction(value), prefix, version);
     }
 
     /// <summary>
@@ -280,7 +280,7 @@ public partial class OdfElement
     public OdfPresentationTransitionType? GetPresentationTransitionTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParsePresentationTransitionType(value, out OdfPresentationTransitionType transitionType) ? transitionType : null;
+        return OdfElementSchemaRegistry.TryParsePresentationTransitionType(value, out OdfPresentationTransitionType transitionType) ? transitionType : null;
     }
 
     /// <summary>
@@ -293,7 +293,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetPresentationTransitionTypeAttributeValue(string localName, string namespaceUri, OdfPresentationTransitionType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatPresentationTransitionType(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatPresentationTransitionType(value), prefix, version);
     }
 
     /// <summary>
@@ -306,7 +306,7 @@ public partial class OdfElement
     public OdfPresentationTransitionStyle? GetPresentationTransitionStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParsePresentationTransitionStyle(value, out OdfPresentationTransitionStyle transitionStyle) ? transitionStyle : null;
+        return OdfElementSchemaRegistry.TryParsePresentationTransitionStyle(value, out OdfPresentationTransitionStyle transitionStyle) ? transitionStyle : null;
     }
 
     /// <summary>
@@ -319,7 +319,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetPresentationTransitionStyleAttributeValue(string localName, string namespaceUri, OdfPresentationTransitionStyle value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatPresentationTransitionStyle(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatPresentationTransitionStyle(value), prefix, version);
     }
 
     #endregion

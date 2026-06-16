@@ -19,7 +19,7 @@ public partial class OdfElement
     public OdfFoTextTransform? GetFoTextTransformAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfFoTextTransform textTransform) ? textTransform : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfFoTextTransform textTransform) ? textTransform : null;
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFoTextTransformAttributeValue(string localName, string namespaceUri, OdfFoTextTransform value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF FO 文字轉換。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF FO 文字轉換。"), prefix, version);
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public partial class OdfElement
     public OdfFoTextAlign? GetFoTextAlignAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfFoTextAlign textAlign) ? textAlign : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfFoTextAlign textAlign) ? textAlign : null;
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFoTextAlignAttributeValue(string localName, string namespaceUri, OdfFoTextAlign value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF FO 文字對齊。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF FO 文字對齊。"), prefix, version);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public partial class OdfElement
     public OdfStyleTextRotationScale? GetStyleTextRotationScaleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfStyleTextRotationScale scale) ? scale : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleTextRotationScale scale) ? scale : null;
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleTextRotationScaleAttributeValue(string localName, string namespaceUri, OdfStyleTextRotationScale value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 樣式文字旋轉縮放。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式文字旋轉縮放。"), prefix, version);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public partial class OdfElement
     public OdfStyleTextCombine? GetStyleTextCombineAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfStyleTextCombine textCombine) ? textCombine : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleTextCombine textCombine) ? textCombine : null;
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleTextCombineAttributeValue(string localName, string namespaceUri, OdfStyleTextCombine value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 樣式文字組合。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式文字組合。"), prefix, version);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public partial class OdfElement
     public OdfDrawFill? GetDrawFillAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfDrawFill fill) ? fill : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDrawFill fill) ? fill : null;
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetDrawFillAttributeValue(string localName, string namespaceUri, OdfDrawFill value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 繪圖填滿。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 繪圖填滿。"), prefix, version);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public partial class OdfElement
     public OdfSmilFill? GetSmilFillAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfSmilFill fill) ? fill : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfSmilFill fill) ? fill : null;
     }
 
     /// <summary>
@@ -162,7 +162,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetSmilFillAttributeValue(string localName, string namespaceUri, OdfSmilFill value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF SMIL 動畫填滿。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF SMIL 動畫填滿。"), prefix, version);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public partial class OdfElement
     public OdfDrawFillImageRefPoint? GetDrawFillImageRefPointAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfDrawFillImageRefPoint refPoint) ? refPoint : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDrawFillImageRefPoint refPoint) ? refPoint : null;
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetDrawFillImageRefPointAttributeValue(string localName, string namespaceUri, OdfDrawFillImageRefPoint value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 繪圖填滿圖片參照點。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 繪圖填滿圖片參照點。"), prefix, version);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public partial class OdfElement
     public OdfDrawColorMode? GetDrawColorModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfDrawColorMode colorMode) ? colorMode : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDrawColorMode colorMode) ? colorMode : null;
     }
 
     /// <summary>
@@ -214,7 +214,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetDrawColorModeAttributeValue(string localName, string namespaceUri, OdfDrawColorMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 繪圖色彩模式。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 繪圖色彩模式。"), prefix, version);
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public partial class OdfElement
     public OdfStyleVerticalAlign? GetStyleVerticalAlignAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfStyleVerticalAlign verticalAlign) ? verticalAlign : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleVerticalAlign verticalAlign) ? verticalAlign : null;
     }
 
     /// <summary>
@@ -240,7 +240,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleVerticalAlignAttributeValue(string localName, string namespaceUri, OdfStyleVerticalAlign value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 樣式垂直對齊。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式垂直對齊。"), prefix, version);
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public partial class OdfElement
     public OdfStyleVerticalPos? GetStyleVerticalPosAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfStyleVerticalPos pos) ? pos : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleVerticalPos pos) ? pos : null;
     }
 
     /// <summary>
@@ -266,7 +266,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleVerticalPosAttributeValue(string localName, string namespaceUri, OdfStyleVerticalPos value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 樣式垂直位置。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式垂直位置。"), prefix, version);
     }
 
     /// <summary>
@@ -279,7 +279,7 @@ public partial class OdfElement
     public OdfStyleVerticalRel? GetStyleVerticalRelAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfStyleVerticalRel rel) ? rel : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleVerticalRel rel) ? rel : null;
     }
 
     /// <summary>
@@ -292,7 +292,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleVerticalRelAttributeValue(string localName, string namespaceUri, OdfStyleVerticalRel value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 樣式垂直相對基準。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式垂直相對基準。"), prefix, version);
     }
 
     /// <summary>
@@ -305,7 +305,7 @@ public partial class OdfElement
     public OdfStyleHorizontalPos? GetStyleHorizontalPosAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfStyleHorizontalPos pos) ? pos : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleHorizontalPos pos) ? pos : null;
     }
 
     /// <summary>
@@ -318,7 +318,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleHorizontalPosAttributeValue(string localName, string namespaceUri, OdfStyleHorizontalPos value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 樣式水平位置。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式水平位置。"), prefix, version);
     }
 
     #endregion

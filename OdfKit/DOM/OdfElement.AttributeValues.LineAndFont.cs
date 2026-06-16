@@ -45,7 +45,7 @@ public partial class OdfElement
     public OdfLineMode? GetLineModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseLineMode(value, out OdfLineMode lineMode) ? lineMode : null;
+        return OdfElementSchemaRegistry.TryParseLineMode(value, out OdfLineMode lineMode) ? lineMode : null;
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetLineModeAttributeValue(string localName, string namespaceUri, OdfLineMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatLineMode(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatLineMode(value), prefix, version);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public partial class OdfElement
     public OdfFontStyle? GetFontStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseFontStyle(value, out OdfFontStyle fontStyle) ? fontStyle : null;
+        return OdfElementSchemaRegistry.TryParseFontStyle(value, out OdfFontStyle fontStyle) ? fontStyle : null;
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFontStyleAttributeValue(string localName, string namespaceUri, OdfFontStyle value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatFontStyle(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontStyle(value), prefix, version);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public partial class OdfElement
     public OdfFontVariant? GetFontVariantAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseFontVariant(value, out OdfFontVariant fontVariant) ? fontVariant : null;
+        return OdfElementSchemaRegistry.TryParseFontVariant(value, out OdfFontVariant fontVariant) ? fontVariant : null;
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFontVariantAttributeValue(string localName, string namespaceUri, OdfFontVariant value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatFontVariant(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontVariant(value), prefix, version);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public partial class OdfElement
     public OdfFontWeight? GetFontWeightAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseFontWeight(value, out OdfFontWeight fontWeight) ? fontWeight : null;
+        return OdfElementSchemaRegistry.TryParseFontWeight(value, out OdfFontWeight fontWeight) ? fontWeight : null;
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFontWeightAttributeValue(string localName, string namespaceUri, OdfFontWeight value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatFontWeight(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontWeight(value), prefix, version);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public partial class OdfElement
     public OdfFontFamilyGeneric? GetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseFontFamilyGeneric(value, out OdfFontFamilyGeneric family) ? family : null;
+        return OdfElementSchemaRegistry.TryParseFontFamilyGeneric(value, out OdfFontFamilyGeneric family) ? family : null;
     }
 
     /// <summary>
@@ -162,7 +162,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfFontFamilyGeneric value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatFontFamilyGeneric(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontFamilyGeneric(value), prefix, version);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public partial class OdfElement
     public OdfFontPitch? GetFontPitchAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseFontPitch(value, out OdfFontPitch pitch) ? pitch : null;
+        return OdfElementSchemaRegistry.TryParseFontPitch(value, out OdfFontPitch pitch) ? pitch : null;
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFontPitchAttributeValue(string localName, string namespaceUri, OdfFontPitch value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatFontPitch(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontPitch(value), prefix, version);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public partial class OdfElement
     public OdfFontRelief? GetFontReliefAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseFontRelief(value, out OdfFontRelief relief) ? relief : null;
+        return OdfElementSchemaRegistry.TryParseFontRelief(value, out OdfFontRelief relief) ? relief : null;
     }
 
     /// <summary>
@@ -214,7 +214,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFontReliefAttributeValue(string localName, string namespaceUri, OdfFontRelief value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatFontRelief(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontRelief(value), prefix, version);
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public partial class OdfElement
     public OdfFontStretch? GetFontStretchAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseFontStretch(value, out OdfFontStretch stretch) ? stretch : null;
+        return OdfElementSchemaRegistry.TryParseFontStretch(value, out OdfFontStretch stretch) ? stretch : null;
     }
 
     /// <summary>
@@ -240,7 +240,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFontStretchAttributeValue(string localName, string namespaceUri, OdfFontStretch value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatFontStretch(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFontStretch(value), prefix, version);
     }
 
     #endregion

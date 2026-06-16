@@ -330,7 +330,7 @@ public partial class OdfElement
     public OdfLineStyle? GetLineStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseLineStyle(value, out OdfLineStyle lineStyle) ? lineStyle : null;
+        return OdfElementSchemaRegistry.TryParseLineStyle(value, out OdfLineStyle lineStyle) ? lineStyle : null;
     }
 
     /// <summary>
@@ -343,7 +343,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetLineStyleAttributeValue(string localName, string namespaceUri, OdfLineStyle value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatLineStyle(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatLineStyle(value), prefix, version);
     }
 
     /// <summary>
@@ -356,7 +356,7 @@ public partial class OdfElement
     public OdfLineType? GetLineTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseLineType(value, out OdfLineType lineType) ? lineType : null;
+        return OdfElementSchemaRegistry.TryParseLineType(value, out OdfLineType lineType) ? lineType : null;
     }
 
     /// <summary>
@@ -369,7 +369,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetLineTypeAttributeValue(string localName, string namespaceUri, OdfLineType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatLineType(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatLineType(value), prefix, version);
     }
 
     #endregion

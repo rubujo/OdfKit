@@ -4,11 +4,14 @@ using OdfKit.Styles;
 
 namespace OdfKit.DOM;
 
-public partial class OdfElement
+/// <summary>
+/// ODF 元素 schema 枚舉 token 靜態註冊表（部分檔案）。
+/// </summary>
+internal static partial class OdfElementSchemaRegistry
 {
-    #region Enum Parsers - Presentation Transition Styles
+    #region Schema Registry - Presentation Transition Styles
 
-    private static bool TryParsePresentationTransitionStyle(string? value, out OdfPresentationTransitionStyle transitionStyle)
+    internal static bool TryParsePresentationTransitionStyle(string? value, out OdfPresentationTransitionStyle transitionStyle)
     {
         switch (value)
         {
@@ -213,7 +216,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatPresentationTransitionStyle(OdfPresentationTransitionStyle transitionStyle)
+    internal static string FormatPresentationTransitionStyle(OdfPresentationTransitionStyle transitionStyle)
     {
         return transitionStyle switch
         {

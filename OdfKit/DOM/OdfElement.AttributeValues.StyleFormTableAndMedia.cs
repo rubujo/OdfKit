@@ -20,7 +20,7 @@ public partial class OdfElement
     public OdfStyleLineBreak? GetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseStyleLineBreak(value, out OdfStyleLineBreak lineBreak) ? lineBreak : null;
+        return OdfElementSchemaRegistry.TryParseStyleLineBreak(value, out OdfStyleLineBreak lineBreak) ? lineBreak : null;
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfStyleLineBreak value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatStyleLineBreak(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleLineBreak(value), prefix, version);
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public partial class OdfElement
     public OdfStyleRepeat? GetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseStyleRepeat(value, out OdfStyleRepeat repeat) ? repeat : null;
+        return OdfElementSchemaRegistry.TryParseStyleRepeat(value, out OdfStyleRepeat repeat) ? repeat : null;
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfStyleRepeat value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatStyleRepeat(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleRepeat(value), prefix, version);
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public partial class OdfElement
     public OdfStyleDirection? GetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseStyleDirection(value, out OdfStyleDirection direction) ? direction : null;
+        return OdfElementSchemaRegistry.TryParseStyleDirection(value, out OdfStyleDirection direction) ? direction : null;
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfStyleDirection value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatStyleDirection(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleDirection(value), prefix, version);
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public partial class OdfElement
     public OdfFormOrientation? GetFormOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseFormOrientation(value, out OdfFormOrientation orientation) ? orientation : null;
+        return OdfElementSchemaRegistry.TryParseFormOrientation(value, out OdfFormOrientation orientation) ? orientation : null;
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFormOrientationAttributeValue(string localName, string namespaceUri, OdfFormOrientation value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatFormOrientation(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFormOrientation(value), prefix, version);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public partial class OdfElement
     public OdfTableDirection? GetTableDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTableDirection(value, out OdfTableDirection direction) ? direction : null;
+        return OdfElementSchemaRegistry.TryParseTableDirection(value, out OdfTableDirection direction) ? direction : null;
     }
 
     /// <summary>
@@ -137,7 +137,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTableDirectionAttributeValue(string localName, string namespaceUri, OdfTableDirection value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTableDirection(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableDirection(value), prefix, version);
     }
 
     /// <summary>
@@ -150,7 +150,7 @@ public partial class OdfElement
     public OdfTableOrientation? GetTableOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTableOrientation(value, out OdfTableOrientation orientation) ? orientation : null;
+        return OdfElementSchemaRegistry.TryParseTableOrientation(value, out OdfTableOrientation orientation) ? orientation : null;
     }
 
     /// <summary>
@@ -163,7 +163,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTableOrientationAttributeValue(string localName, string namespaceUri, OdfTableOrientation value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTableOrientation(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableOrientation(value), prefix, version);
     }
 
     /// <summary>
@@ -176,7 +176,7 @@ public partial class OdfElement
     public OdfStyleFamily? GetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseStyleFamily(value, out OdfStyleFamily family) ? family : null;
+        return OdfElementSchemaRegistry.TryParseStyleFamily(value, out OdfStyleFamily family) ? family : null;
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfStyleFamily value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatStyleFamily(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleFamily(value), prefix, version);
     }
 
     /// <summary>

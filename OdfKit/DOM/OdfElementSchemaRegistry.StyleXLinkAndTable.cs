@@ -4,11 +4,14 @@ using OdfKit.Styles;
 
 namespace OdfKit.DOM;
 
-public partial class OdfElement
+/// <summary>
+/// ODF 元素 schema 枚舉 token 靜態註冊表（部分檔案）。
+/// </summary>
+internal static partial class OdfElementSchemaRegistry
 {
-    #region Enum Parsers - Style, XLink & Table
+    #region Schema Registry - Style, XLink & Table
 
-    private static bool TryParseStyleLineBreak(string? value, out OdfStyleLineBreak lineBreak)
+    internal static bool TryParseStyleLineBreak(string? value, out OdfStyleLineBreak lineBreak)
     {
         switch (value)
         {
@@ -24,7 +27,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatStyleLineBreak(OdfStyleLineBreak lineBreak)
+    internal static string FormatStyleLineBreak(OdfStyleLineBreak lineBreak)
     {
         return lineBreak switch
         {
@@ -34,7 +37,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseStyleRepeat(string? value, out OdfStyleRepeat repeat)
+    internal static bool TryParseStyleRepeat(string? value, out OdfStyleRepeat repeat)
     {
         switch (value)
         {
@@ -53,7 +56,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatStyleRepeat(OdfStyleRepeat repeat)
+    internal static string FormatStyleRepeat(OdfStyleRepeat repeat)
     {
         return repeat switch
         {
@@ -64,7 +67,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseXLinkType(string? value, out OdfXLinkType type)
+    internal static bool TryParseXLinkType(string? value, out OdfXLinkType type)
     {
         switch (value)
         {
@@ -77,7 +80,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatXLinkType(OdfXLinkType type)
+    internal static string FormatXLinkType(OdfXLinkType type)
     {
         return type switch
         {
@@ -86,7 +89,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseXLinkShow(string? value, out OdfXLinkShow show)
+    internal static bool TryParseXLinkShow(string? value, out OdfXLinkShow show)
     {
         switch (value)
         {
@@ -108,7 +111,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatXLinkShow(OdfXLinkShow show)
+    internal static string FormatXLinkShow(OdfXLinkShow show)
     {
         return show switch
         {
@@ -120,7 +123,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseXLinkActuate(string? value, out OdfXLinkActuate actuate)
+    internal static bool TryParseXLinkActuate(string? value, out OdfXLinkActuate actuate)
     {
         switch (value)
         {
@@ -136,7 +139,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatXLinkActuate(OdfXLinkActuate actuate)
+    internal static string FormatXLinkActuate(OdfXLinkActuate actuate)
     {
         return actuate switch
         {
@@ -146,7 +149,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseNumberStyle(string? value, out OdfNumberStyle style)
+    internal static bool TryParseNumberStyle(string? value, out OdfNumberStyle style)
     {
         switch (value)
         {
@@ -162,7 +165,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatNumberStyle(OdfNumberStyle style)
+    internal static string FormatNumberStyle(OdfNumberStyle style)
     {
         return style switch
         {
@@ -172,7 +175,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTableOrder(string? value, out OdfTableOrder order)
+    internal static bool TryParseTableOrder(string? value, out OdfTableOrder order)
     {
         switch (value)
         {
@@ -188,7 +191,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTableOrder(OdfTableOrder order)
+    internal static string FormatTableOrder(OdfTableOrder order)
     {
         return order switch
         {
@@ -198,7 +201,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTableType(string? value, out OdfTableType type)
+    internal static bool TryParseTableType(string? value, out OdfTableType type)
     {
         switch (value)
         {
@@ -244,7 +247,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTableType(OdfTableType type)
+    internal static string FormatTableType(OdfTableType type)
     {
         return type switch
         {

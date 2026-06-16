@@ -19,7 +19,7 @@ public partial class OdfElement
     public OdfStyleScriptType? GetStyleScriptTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfStyleScriptType scriptType) ? scriptType : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleScriptType scriptType) ? scriptType : null;
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleScriptTypeAttributeValue(string localName, string namespaceUri, OdfStyleScriptType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 樣式文字系統類型。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式文字系統類型。"), prefix, version);
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public partial class OdfElement
     public OdfStyleTextEmphasize? GetStyleTextEmphasizeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfStyleTextEmphasize textEmphasize) ? textEmphasize : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleTextEmphasize textEmphasize) ? textEmphasize : null;
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetStyleTextEmphasizeAttributeValue(string localName, string namespaceUri, OdfStyleTextEmphasize value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 樣式文字強調標記。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 樣式文字強調標記。"), prefix, version);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public partial class OdfElement
     public OdfNumberCalendar? GetNumberCalendarAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseNumberCalendar(value, out OdfNumberCalendar calendar) ? calendar : null;
+        return OdfElementSchemaRegistry.TryParseNumberCalendar(value, out OdfNumberCalendar calendar) ? calendar : null;
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetNumberCalendarAttributeValue(string localName, string namespaceUri, OdfNumberCalendar value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatNumberCalendar(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatNumberCalendar(value), prefix, version);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public partial class OdfElement
     public OdfTableMemberType? GetTableMemberTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfTableMemberType memberType) ? memberType : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableMemberType memberType) ? memberType : null;
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTableMemberTypeAttributeValue(string localName, string namespaceUri, OdfTableMemberType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 表格成員類型。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格成員類型。"), prefix, version);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public partial class OdfElement
     public OdfTableGroupedBy? GetTableGroupedByAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfTableGroupedBy groupedBy) ? groupedBy : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableGroupedBy groupedBy) ? groupedBy : null;
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTableGroupedByAttributeValue(string localName, string namespaceUri, OdfTableGroupedBy value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 表格分組單位。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格分組單位。"), prefix, version);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public partial class OdfElement
     public OdfTableSortMode? GetTableSortModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfTableSortMode sortMode) ? sortMode : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableSortMode sortMode) ? sortMode : null;
     }
 
     /// <summary>
@@ -162,7 +162,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTableSortModeAttributeValue(string localName, string namespaceUri, OdfTableSortMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 表格排序模式。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格排序模式。"), prefix, version);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public partial class OdfElement
     public OdfTableConditionSource? GetTableConditionSourceAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfTableConditionSource conditionSource) ? conditionSource : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableConditionSource conditionSource) ? conditionSource : null;
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTableConditionSourceAttributeValue(string localName, string namespaceUri, OdfTableConditionSource value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 表格條件來源。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格條件來源。"), prefix, version);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public partial class OdfElement
     public OdfAnimationColorInterpolation? GetAnimationColorInterpolationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfAnimationColorInterpolation interpolation) ? interpolation : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfAnimationColorInterpolation interpolation) ? interpolation : null;
     }
 
     /// <summary>
@@ -214,7 +214,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetAnimationColorInterpolationAttributeValue(string localName, string namespaceUri, OdfAnimationColorInterpolation value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 動畫色彩插值。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 動畫色彩插值。"), prefix, version);
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public partial class OdfElement
     public OdfAnimationColorInterpolationDirection? GetAnimationColorInterpolationDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfAnimationColorInterpolationDirection direction) ? direction : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfAnimationColorInterpolationDirection direction) ? direction : null;
     }
 
     /// <summary>
@@ -240,7 +240,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetAnimationColorInterpolationDirectionAttributeValue(string localName, string namespaceUri, OdfAnimationColorInterpolationDirection value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 動畫色彩插值方向。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 動畫色彩插值方向。"), prefix, version);
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public partial class OdfElement
     public OdfDatabaseIsNullable? GetDatabaseIsNullableAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfDatabaseIsNullable isNullable) ? isNullable : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDatabaseIsNullable isNullable) ? isNullable : null;
     }
 
     /// <summary>
@@ -266,7 +266,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetDatabaseIsNullableAttributeValue(string localName, string namespaceUri, OdfDatabaseIsNullable value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 資料庫可空性。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 資料庫可空性。"), prefix, version);
     }
 
     /// <summary>
@@ -279,7 +279,7 @@ public partial class OdfElement
     public OdfDatabaseDataSourceSettingType? GetDatabaseDataSourceSettingTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfDatabaseDataSourceSettingType type) ? type : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDatabaseDataSourceSettingType type) ? type : null;
     }
 
     /// <summary>
@@ -292,7 +292,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetDatabaseDataSourceSettingTypeAttributeValue(string localName, string namespaceUri, OdfDatabaseDataSourceSettingType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 資料庫資料來源設定型別。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 資料庫資料來源設定型別。"), prefix, version);
     }
 
 

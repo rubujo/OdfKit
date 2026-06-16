@@ -18,7 +18,7 @@ public partial class OdfElement
     public OdfDrawNoHref? GetDrawNoHrefAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfDrawNoHref noHref) ? noHref : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDrawNoHref noHref) ? noHref : null;
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetDrawNoHrefAttributeValue(string localName, string namespaceUri, OdfDrawNoHref value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 繪圖無連結。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 繪圖無連結。"), prefix, version);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public partial class OdfElement
     public OdfTableFunction? GetTableFunctionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfTableFunction function) ? function : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableFunction function) ? function : null;
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTableFunctionAttributeValue(string localName, string namespaceUri, OdfTableFunction value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 表格彙總函式。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 表格彙總函式。"), prefix, version);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public partial class OdfElement
     public OdfDrawStrokeLineJoin? GetDrawStrokeLineJoinAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfDrawStrokeLineJoin lineJoin) ? lineJoin : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDrawStrokeLineJoin lineJoin) ? lineJoin : null;
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetDrawStrokeLineJoinAttributeValue(string localName, string namespaceUri, OdfDrawStrokeLineJoin value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF 繪圖線條接合。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF 繪圖線條接合。"), prefix, version);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public partial class OdfElement
     public OdfSvgStrokeLineCap? GetSvgStrokeLineCapAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseEnumToken(value, out OdfSvgStrokeLineCap lineCap) ? lineCap : null;
+        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfSvgStrokeLineCap lineCap) ? lineCap : null;
     }
 
     /// <summary>
@@ -109,7 +109,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetSvgStrokeLineCapAttributeValue(string localName, string namespaceUri, OdfSvgStrokeLineCap value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatEnumToken(value, "未知的 ODF SVG 線端樣式。"), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatEnumToken(value, "未知的 ODF SVG 線端樣式。"), prefix, version);
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public partial class OdfElement
     public OdfFoKeepTogether? GetFoKeepTogetherAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseFoKeepTogether(value, out OdfFoKeepTogether keepTogether) ? keepTogether : null;
+        return OdfElementSchemaRegistry.TryParseFoKeepTogether(value, out OdfFoKeepTogether keepTogether) ? keepTogether : null;
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFoKeepTogetherAttributeValue(string localName, string namespaceUri, OdfFoKeepTogether value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatFoKeepTogether(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFoKeepTogether(value), prefix, version);
     }
 
     /// <summary>
@@ -148,7 +148,7 @@ public partial class OdfElement
     public OdfFoWrapOption? GetFoWrapOptionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseFoWrapOption(value, out OdfFoWrapOption wrapOption) ? wrapOption : null;
+        return OdfElementSchemaRegistry.TryParseFoWrapOption(value, out OdfFoWrapOption wrapOption) ? wrapOption : null;
     }
 
     /// <summary>
@@ -161,7 +161,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetFoWrapOptionAttributeValue(string localName, string namespaceUri, OdfFoWrapOption value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatFoWrapOption(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFoWrapOption(value), prefix, version);
     }
 
     /// <summary>
@@ -174,7 +174,7 @@ public partial class OdfElement
     public OdfDr3dProjection? GetDr3dProjectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseDr3dProjection(value, out OdfDr3dProjection projection) ? projection : null;
+        return OdfElementSchemaRegistry.TryParseDr3dProjection(value, out OdfDr3dProjection projection) ? projection : null;
     }
 
     /// <summary>
@@ -187,7 +187,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetDr3dProjectionAttributeValue(string localName, string namespaceUri, OdfDr3dProjection value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatDr3dProjection(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatDr3dProjection(value), prefix, version);
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public partial class OdfElement
     public OdfDr3dShadeMode? GetDr3dShadeModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseDr3dShadeMode(value, out OdfDr3dShadeMode shadeMode) ? shadeMode : null;
+        return OdfElementSchemaRegistry.TryParseDr3dShadeMode(value, out OdfDr3dShadeMode shadeMode) ? shadeMode : null;
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetDr3dShadeModeAttributeValue(string localName, string namespaceUri, OdfDr3dShadeMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatDr3dShadeMode(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatDr3dShadeMode(value), prefix, version);
     }
 
     /// <summary>
@@ -226,7 +226,7 @@ public partial class OdfElement
     public OdfSvgFillRule? GetSvgFillRuleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseSvgFillRule(value, out OdfSvgFillRule fillRule) ? fillRule : null;
+        return OdfElementSchemaRegistry.TryParseSvgFillRule(value, out OdfSvgFillRule fillRule) ? fillRule : null;
     }
 
     /// <summary>
@@ -239,7 +239,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetSvgFillRuleAttributeValue(string localName, string namespaceUri, OdfSvgFillRule value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatSvgFillRule(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatSvgFillRule(value), prefix, version);
     }
 
     /// <summary>
@@ -252,7 +252,7 @@ public partial class OdfElement
     public OdfTableBorderModel? GetTableBorderModelAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTableBorderModel(value, out OdfTableBorderModel borderModel) ? borderModel : null;
+        return OdfElementSchemaRegistry.TryParseTableBorderModel(value, out OdfTableBorderModel borderModel) ? borderModel : null;
     }
 
     /// <summary>
@@ -265,7 +265,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTableBorderModelAttributeValue(string localName, string namespaceUri, OdfTableBorderModel value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTableBorderModel(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableBorderModel(value), prefix, version);
     }
 
     #endregion

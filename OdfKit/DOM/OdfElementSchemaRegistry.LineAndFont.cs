@@ -4,11 +4,14 @@ using OdfKit.Styles;
 
 namespace OdfKit.DOM;
 
-public partial class OdfElement
+/// <summary>
+/// ODF 元素 schema 枚舉 token 靜態註冊表（部分檔案）。
+/// </summary>
+internal static partial class OdfElementSchemaRegistry
 {
-    #region Enum Parsers - Line & Font
+    #region Schema Registry - Line & Font
 
-    private static bool TryParseLineStyle(string? value, out OdfLineStyle lineStyle)
+    internal static bool TryParseLineStyle(string? value, out OdfLineStyle lineStyle)
     {
         switch (value)
         {
@@ -42,7 +45,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatLineStyle(OdfLineStyle lineStyle)
+    internal static string FormatLineStyle(OdfLineStyle lineStyle)
     {
         return lineStyle switch
         {
@@ -58,7 +61,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseLineType(string? value, out OdfLineType lineType)
+    internal static bool TryParseLineType(string? value, out OdfLineType lineType)
     {
         switch (value)
         {
@@ -77,7 +80,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatLineType(OdfLineType lineType)
+    internal static string FormatLineType(OdfLineType lineType)
     {
         return lineType switch
         {
@@ -88,7 +91,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseLineMode(string? value, out OdfLineMode lineMode)
+    internal static bool TryParseLineMode(string? value, out OdfLineMode lineMode)
     {
         switch (value)
         {
@@ -104,7 +107,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatLineMode(OdfLineMode lineMode)
+    internal static string FormatLineMode(OdfLineMode lineMode)
     {
         return lineMode switch
         {
@@ -114,7 +117,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseFontStyle(string? value, out OdfFontStyle fontStyle)
+    internal static bool TryParseFontStyle(string? value, out OdfFontStyle fontStyle)
     {
         switch (value)
         {
@@ -133,7 +136,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatFontStyle(OdfFontStyle fontStyle)
+    internal static string FormatFontStyle(OdfFontStyle fontStyle)
     {
         return fontStyle switch
         {
@@ -144,7 +147,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseFontVariant(string? value, out OdfFontVariant fontVariant)
+    internal static bool TryParseFontVariant(string? value, out OdfFontVariant fontVariant)
     {
         switch (value)
         {
@@ -160,7 +163,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatFontVariant(OdfFontVariant fontVariant)
+    internal static string FormatFontVariant(OdfFontVariant fontVariant)
     {
         return fontVariant switch
         {
@@ -170,7 +173,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseFontWeight(string? value, out OdfFontWeight fontWeight)
+    internal static bool TryParseFontWeight(string? value, out OdfFontWeight fontWeight)
     {
         switch (value)
         {
@@ -213,7 +216,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatFontWeight(OdfFontWeight fontWeight)
+    internal static string FormatFontWeight(OdfFontWeight fontWeight)
     {
         return fontWeight switch
         {
@@ -232,7 +235,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseFontFamilyGeneric(string? value, out OdfFontFamilyGeneric family)
+    internal static bool TryParseFontFamilyGeneric(string? value, out OdfFontFamilyGeneric family)
     {
         switch (value)
         {
@@ -260,7 +263,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatFontFamilyGeneric(OdfFontFamilyGeneric family)
+    internal static string FormatFontFamilyGeneric(OdfFontFamilyGeneric family)
     {
         return family switch
         {
@@ -274,7 +277,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseFontPitch(string? value, out OdfFontPitch pitch)
+    internal static bool TryParseFontPitch(string? value, out OdfFontPitch pitch)
     {
         switch (value)
         {
@@ -290,7 +293,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatFontPitch(OdfFontPitch pitch)
+    internal static string FormatFontPitch(OdfFontPitch pitch)
     {
         return pitch switch
         {
@@ -300,7 +303,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseFontRelief(string? value, out OdfFontRelief relief)
+    internal static bool TryParseFontRelief(string? value, out OdfFontRelief relief)
     {
         switch (value)
         {
@@ -319,7 +322,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatFontRelief(OdfFontRelief relief)
+    internal static string FormatFontRelief(OdfFontRelief relief)
     {
         return relief switch
         {
@@ -330,7 +333,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseFontStretch(string? value, out OdfFontStretch stretch)
+    internal static bool TryParseFontStretch(string? value, out OdfFontStretch stretch)
     {
         switch (value)
         {
@@ -367,7 +370,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatFontStretch(OdfFontStretch stretch)
+    internal static string FormatFontStretch(OdfFontStretch stretch)
     {
         return stretch switch
         {

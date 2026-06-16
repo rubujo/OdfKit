@@ -4,11 +4,14 @@ using OdfKit.Styles;
 
 namespace OdfKit.DOM;
 
-public partial class OdfElement
+/// <summary>
+/// ODF 元素 schema 枚舉 token 靜態註冊表（部分檔案）。
+/// </summary>
+internal static partial class OdfElementSchemaRegistry
 {
-    #region Enum Parsers - Table Border & Text
+    #region Schema Registry - Table Border & Text
 
-    private static bool TryParseTableBorderModel(string? value, out OdfTableBorderModel borderModel)
+    internal static bool TryParseTableBorderModel(string? value, out OdfTableBorderModel borderModel)
     {
         switch (value)
         {
@@ -24,7 +27,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTableBorderModel(OdfTableBorderModel borderModel)
+    internal static string FormatTableBorderModel(OdfTableBorderModel borderModel)
     {
         return borderModel switch
         {
@@ -34,7 +37,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextLabelFollowedBy(string? value, out OdfTextLabelFollowedBy labelFollowedBy)
+    internal static bool TryParseTextLabelFollowedBy(string? value, out OdfTextLabelFollowedBy labelFollowedBy)
     {
         switch (value)
         {
@@ -53,7 +56,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextLabelFollowedBy(OdfTextLabelFollowedBy labelFollowedBy)
+    internal static string FormatTextLabelFollowedBy(OdfTextLabelFollowedBy labelFollowedBy)
     {
         return labelFollowedBy switch
         {
@@ -64,7 +67,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextListLevelPositionMode(string? value, out OdfTextListLevelPositionMode mode)
+    internal static bool TryParseTextListLevelPositionMode(string? value, out OdfTextListLevelPositionMode mode)
     {
         switch (value)
         {
@@ -80,7 +83,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextListLevelPositionMode(OdfTextListLevelPositionMode mode)
+    internal static string FormatTextListLevelPositionMode(OdfTextListLevelPositionMode mode)
     {
         return mode switch
         {
@@ -90,7 +93,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextIndexScope(string? value, out OdfTextIndexScope scope)
+    internal static bool TryParseTextIndexScope(string? value, out OdfTextIndexScope scope)
     {
         switch (value)
         {
@@ -106,7 +109,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextIndexScope(OdfTextIndexScope scope)
+    internal static string FormatTextIndexScope(OdfTextIndexScope scope)
     {
         return scope switch
         {
@@ -116,7 +119,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextTableType(string? value, out OdfTextTableType tableType)
+    internal static bool TryParseTextTableType(string? value, out OdfTextTableType tableType)
     {
         switch (value)
         {
@@ -135,7 +138,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextTableType(OdfTextTableType tableType)
+    internal static string FormatTextTableType(OdfTextTableType tableType)
     {
         return tableType switch
         {
@@ -146,7 +149,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextAnchorType(string? value, out OdfTextAnchorType anchorType)
+    internal static bool TryParseTextAnchorType(string? value, out OdfTextAnchorType anchorType)
     {
         switch (value)
         {
@@ -171,7 +174,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextAnchorType(OdfTextAnchorType anchorType)
+    internal static string FormatTextAnchorType(OdfTextAnchorType anchorType)
     {
         return anchorType switch
         {
@@ -184,7 +187,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextNoteClass(string? value, out OdfTextNoteClass noteClass)
+    internal static bool TryParseTextNoteClass(string? value, out OdfTextNoteClass noteClass)
     {
         switch (value)
         {
@@ -200,7 +203,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextNoteClass(OdfTextNoteClass noteClass)
+    internal static string FormatTextNoteClass(OdfTextNoteClass noteClass)
     {
         return noteClass switch
         {
@@ -210,7 +213,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextSelectPage(string? value, out OdfTextSelectPage selectPage)
+    internal static bool TryParseTextSelectPage(string? value, out OdfTextSelectPage selectPage)
     {
         switch (value)
         {
@@ -229,7 +232,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextSelectPage(OdfTextSelectPage selectPage)
+    internal static string FormatTextSelectPage(OdfTextSelectPage selectPage)
     {
         return selectPage switch
         {
@@ -240,7 +243,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseTextReferenceFormat(string? value, out OdfTextReferenceFormat format)
+    internal static bool TryParseTextReferenceFormat(string? value, out OdfTextReferenceFormat format)
     {
         switch (value)
         {
@@ -280,7 +283,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatTextReferenceFormat(OdfTextReferenceFormat format)
+    internal static string FormatTextReferenceFormat(OdfTextReferenceFormat format)
     {
         return format switch
         {

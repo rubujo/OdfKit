@@ -4,11 +4,14 @@ using OdfKit.Styles;
 
 namespace OdfKit.DOM;
 
-public partial class OdfElement
+/// <summary>
+/// ODF 元素 schema 枚舉 token 靜態註冊表（部分檔案）。
+/// </summary>
+internal static partial class OdfElementSchemaRegistry
 {
-    #region Enum Parsers - Calendar, FO & Draw 3D
+    #region Schema Registry - Calendar, FO & Draw 3D
 
-    private static bool TryParseNumberCalendar(string? value, out OdfNumberCalendar calendar)
+    internal static bool TryParseNumberCalendar(string? value, out OdfNumberCalendar calendar)
     {
         switch (value)
         {
@@ -42,7 +45,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatNumberCalendar(OdfNumberCalendar calendar)
+    internal static string FormatNumberCalendar(OdfNumberCalendar calendar)
     {
         return calendar switch
         {
@@ -58,7 +61,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseEnumToken<TEnum>(string? value, out TEnum result)
+    internal static bool TryParseEnumToken<TEnum>(string? value, out TEnum result)
         where TEnum : struct, Enum
     {
         if (!string.IsNullOrWhiteSpace(value))
@@ -77,7 +80,7 @@ public partial class OdfElement
         return false;
     }
 
-    private static string FormatEnumToken<TEnum>(TEnum value, string exceptionMessage)
+    internal static string FormatEnumToken<TEnum>(TEnum value, string exceptionMessage)
         where TEnum : struct, Enum
     {
         if (Enum.IsDefined(typeof(TEnum), value))
@@ -88,7 +91,7 @@ public partial class OdfElement
         throw new ArgumentOutOfRangeException(nameof(value), value, exceptionMessage);
     }
 
-    private static string ToOdfToken(string name)
+    internal static string ToOdfToken(string name)
     {
         var builder = new System.Text.StringBuilder(name.Length + 4);
         for (int index = 0; index < name.Length; index++)
@@ -105,7 +108,7 @@ public partial class OdfElement
         return builder.ToString();
     }
 
-    private static bool TryParseFoKeepTogether(string? value, out OdfFoKeepTogether keepTogether)
+    internal static bool TryParseFoKeepTogether(string? value, out OdfFoKeepTogether keepTogether)
     {
         switch (value)
         {
@@ -121,7 +124,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatFoKeepTogether(OdfFoKeepTogether keepTogether)
+    internal static string FormatFoKeepTogether(OdfFoKeepTogether keepTogether)
     {
         return keepTogether switch
         {
@@ -131,7 +134,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseFoWrapOption(string? value, out OdfFoWrapOption wrapOption)
+    internal static bool TryParseFoWrapOption(string? value, out OdfFoWrapOption wrapOption)
     {
         switch (value)
         {
@@ -147,7 +150,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatFoWrapOption(OdfFoWrapOption wrapOption)
+    internal static string FormatFoWrapOption(OdfFoWrapOption wrapOption)
     {
         return wrapOption switch
         {
@@ -157,7 +160,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseDr3dProjection(string? value, out OdfDr3dProjection projection)
+    internal static bool TryParseDr3dProjection(string? value, out OdfDr3dProjection projection)
     {
         switch (value)
         {
@@ -173,7 +176,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatDr3dProjection(OdfDr3dProjection projection)
+    internal static string FormatDr3dProjection(OdfDr3dProjection projection)
     {
         return projection switch
         {
@@ -183,7 +186,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseDr3dShadeMode(string? value, out OdfDr3dShadeMode shadeMode)
+    internal static bool TryParseDr3dShadeMode(string? value, out OdfDr3dShadeMode shadeMode)
     {
         switch (value)
         {
@@ -205,7 +208,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatDr3dShadeMode(OdfDr3dShadeMode shadeMode)
+    internal static string FormatDr3dShadeMode(OdfDr3dShadeMode shadeMode)
     {
         return shadeMode switch
         {
@@ -217,7 +220,7 @@ public partial class OdfElement
         };
     }
 
-    private static bool TryParseSvgFillRule(string? value, out OdfSvgFillRule fillRule)
+    internal static bool TryParseSvgFillRule(string? value, out OdfSvgFillRule fillRule)
     {
         switch (value)
         {
@@ -233,7 +236,7 @@ public partial class OdfElement
         }
     }
 
-    private static string FormatSvgFillRule(OdfSvgFillRule fillRule)
+    internal static string FormatSvgFillRule(OdfSvgFillRule fillRule)
     {
         return fillRule switch
         {

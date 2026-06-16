@@ -18,7 +18,7 @@ public partial class OdfElement
     public OdfTextLabelFollowedBy? GetTextLabelFollowedByAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTextLabelFollowedBy(value, out OdfTextLabelFollowedBy labelFollowedBy) ? labelFollowedBy : null;
+        return OdfElementSchemaRegistry.TryParseTextLabelFollowedBy(value, out OdfTextLabelFollowedBy labelFollowedBy) ? labelFollowedBy : null;
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTextLabelFollowedByAttributeValue(string localName, string namespaceUri, OdfTextLabelFollowedBy value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTextLabelFollowedBy(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextLabelFollowedBy(value), prefix, version);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public partial class OdfElement
     public OdfTextListLevelPositionMode? GetTextListLevelPositionModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTextListLevelPositionMode(value, out OdfTextListLevelPositionMode mode) ? mode : null;
+        return OdfElementSchemaRegistry.TryParseTextListLevelPositionMode(value, out OdfTextListLevelPositionMode mode) ? mode : null;
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTextListLevelPositionModeAttributeValue(string localName, string namespaceUri, OdfTextListLevelPositionMode value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTextListLevelPositionMode(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextListLevelPositionMode(value), prefix, version);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public partial class OdfElement
     public OdfTextIndexScope? GetTextIndexScopeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTextIndexScope(value, out OdfTextIndexScope scope) ? scope : null;
+        return OdfElementSchemaRegistry.TryParseTextIndexScope(value, out OdfTextIndexScope scope) ? scope : null;
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTextIndexScopeAttributeValue(string localName, string namespaceUri, OdfTextIndexScope value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTextIndexScope(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextIndexScope(value), prefix, version);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public partial class OdfElement
     public OdfTextTableType? GetTextTableTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTextTableType(value, out OdfTextTableType tableType) ? tableType : null;
+        return OdfElementSchemaRegistry.TryParseTextTableType(value, out OdfTextTableType tableType) ? tableType : null;
     }
 
     /// <summary>
@@ -109,7 +109,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTextTableTypeAttributeValue(string localName, string namespaceUri, OdfTextTableType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTextTableType(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextTableType(value), prefix, version);
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public partial class OdfElement
     public OdfTextAnchorType? GetTextAnchorTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTextAnchorType(value, out OdfTextAnchorType anchorType) ? anchorType : null;
+        return OdfElementSchemaRegistry.TryParseTextAnchorType(value, out OdfTextAnchorType anchorType) ? anchorType : null;
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTextAnchorTypeAttributeValue(string localName, string namespaceUri, OdfTextAnchorType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTextAnchorType(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextAnchorType(value), prefix, version);
     }
 
     /// <summary>
@@ -148,7 +148,7 @@ public partial class OdfElement
     public OdfTextNoteClass? GetTextNoteClassAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTextNoteClass(value, out OdfTextNoteClass noteClass) ? noteClass : null;
+        return OdfElementSchemaRegistry.TryParseTextNoteClass(value, out OdfTextNoteClass noteClass) ? noteClass : null;
     }
 
     /// <summary>
@@ -161,7 +161,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTextNoteClassAttributeValue(string localName, string namespaceUri, OdfTextNoteClass value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTextNoteClass(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextNoteClass(value), prefix, version);
     }
 
     /// <summary>
@@ -174,7 +174,7 @@ public partial class OdfElement
     public OdfTextSelectPage? GetTextSelectPageAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTextSelectPage(value, out OdfTextSelectPage selectPage) ? selectPage : null;
+        return OdfElementSchemaRegistry.TryParseTextSelectPage(value, out OdfTextSelectPage selectPage) ? selectPage : null;
     }
 
     /// <summary>
@@ -187,7 +187,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTextSelectPageAttributeValue(string localName, string namespaceUri, OdfTextSelectPage value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTextSelectPage(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextSelectPage(value), prefix, version);
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public partial class OdfElement
     public OdfTextReferenceFormat? GetTextReferenceFormatAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTextReferenceFormat(value, out OdfTextReferenceFormat format) ? format : null;
+        return OdfElementSchemaRegistry.TryParseTextReferenceFormat(value, out OdfTextReferenceFormat format) ? format : null;
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTextReferenceFormatAttributeValue(string localName, string namespaceUri, OdfTextReferenceFormat value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTextReferenceFormat(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextReferenceFormat(value), prefix, version);
     }
 
     /// <summary>
@@ -226,7 +226,7 @@ public partial class OdfElement
     public OdfTextStartNumberingAt? GetTextStartNumberingAtAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTextStartNumberingAt(value, out OdfTextStartNumberingAt startNumberingAt) ? startNumberingAt : null;
+        return OdfElementSchemaRegistry.TryParseTextStartNumberingAt(value, out OdfTextStartNumberingAt startNumberingAt) ? startNumberingAt : null;
     }
 
     /// <summary>
@@ -239,7 +239,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTextStartNumberingAtAttributeValue(string localName, string namespaceUri, OdfTextStartNumberingAt value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTextStartNumberingAt(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextStartNumberingAt(value), prefix, version);
     }
 
     /// <summary>
@@ -252,7 +252,7 @@ public partial class OdfElement
     public OdfTextFootnotesPosition? GetTextFootnotesPositionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return TryParseTextFootnotesPosition(value, out OdfTextFootnotesPosition position) ? position : null;
+        return OdfElementSchemaRegistry.TryParseTextFootnotesPosition(value, out OdfTextFootnotesPosition position) ? position : null;
     }
 
     /// <summary>
@@ -265,7 +265,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetTextFootnotesPositionAttributeValue(string localName, string namespaceUri, OdfTextFootnotesPosition value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, FormatTextFootnotesPosition(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTextFootnotesPosition(value), prefix, version);
     }
 
 
