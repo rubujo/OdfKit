@@ -23,7 +23,7 @@ public sealed partial class OdfPackage
         if (_underlyingStream == null)
             throw new InvalidOperationException("No input stream available.");
 
-        // Sniff signature: check if it is ZIP (PK\x03\x04)
+        // 嗅探簽章：檢查是否為 ZIP（PK\x03\x04）
         byte[] signature = new byte[4];
         int bytesRead = 0;
         if (_underlyingStream.CanSeek)
@@ -53,8 +53,8 @@ public sealed partial class OdfPackage
 
         if (!_underlyingStream.CanSeek)
         {
-            // If it is ZIP and non-seekable, we copy it to a seekable MemoryStream
-            // because ZipArchive requires a seekable stream to read the central directory.
+            // 若為 ZIP 且串流不可搜尋，複製到可搜尋的 MemoryStream
+            // 因為 ZipArchive 需要可搜尋串流才能讀取中央目錄
             var ms = new MemoryStream();
             ms.Write(signature, 0, bytesRead);
             _underlyingStream.CopyTo(ms);
@@ -66,7 +66,7 @@ public sealed partial class OdfPackage
             _underlyingStream = ms;
         }
 
-        // Register CodePages for ZIP filenames in .NET Standard 2.0 if needed
+        // 若需要，在 .NET Standard 2.0 註冊 ZIP 檔名的 CodePages
 #if NETSTANDARD2_0
             try
             {
@@ -74,14 +74,14 @@ public sealed partial class OdfPackage
             }
             catch
             {
-                // Fallback silently if platform doesn't support or reference is missing
+                // 若平台不支援或缺少參考則靜默略過
             }
 #endif
 
-        // Open ZIP archive
+        // 開啟 ZIP 封存
         _archive = new ZipArchive(_underlyingStream, ZipArchiveMode.Read, _leaveOpen, Encoding.UTF8);
 
-        // Zip DoS Defense: count entries
+        // Zip DoS 防禦：計算項目數量
         if (_archive.Entries.Count > _loadOptions.MaxZipEntries)
         {
             throw new SecurityException($"Zip archive contains too many entries ({_archive.Entries.Count} > {_loadOptions.MaxZipEntries}). Potential Zip DoS attack.");
@@ -91,9 +91,9 @@ public sealed partial class OdfPackage
 
         foreach (var entry in _archive.Entries)
         {
-            // Sanitize and check Zip Slip. If it is unsafe, we still store it in memory using the raw name
-            // so that the compliance validator can report it (as a Fatal ODF0200/ODF0201 issue),
-            // but any subsequent access to this entry via SanitizeEntryName will throw SecurityException.
+            // 清理並檢查 Zip Slip。若不安全，仍以原始名稱存入記憶體
+            // 以便合規驗證器回報（Fatal ODF0200/ODF0201 問題），
+            // 但之後透過 SanitizeEntryName 存取此項目將拋出 SecurityException
             string name;
             try
             {
@@ -104,7 +104,7 @@ public sealed partial class OdfPackage
                 name = entry.FullName;
             }
 
-            // Zip DoS Defense: entry size
+            // Zip DoS 防禦：項目大小
             if (entry.Length > _loadOptions.MaxEntrySize)
             {
                 throw new SecurityException($"Zip entry '{name}' exceeds size limit ({entry.Length} > {_loadOptions.MaxEntrySize} bytes).");
@@ -129,7 +129,7 @@ public sealed partial class OdfPackage
                 pkgEntry.IsCompressed = false;
             }
 
-            // Determine if it was stored without compression
+            // 判斷是否以未壓縮方式儲存
             bool wasStored = false;
             try
             {
@@ -166,7 +166,7 @@ public sealed partial class OdfPackage
             }
         }
 
-        // Load mimetype
+        // 載入 mimetype
         if (_entries.TryGetValue("mimetype", out var mimeEntry))
         {
             using var reader = new StreamReader(mimeEntry.OpenReader(), Encoding.UTF8);
@@ -177,7 +177,7 @@ public sealed partial class OdfPackage
             throw new InvalidDataException("Invalid ODF package: 'mimetype' file is missing.");
         }
 
-        // Load manifest
+        // 載入 manifest
         LoadManifest();
 
         if (_loadOptions.Password != null || _loadOptions.CryptographyProvider != null)
@@ -219,7 +219,7 @@ public sealed partial class OdfPackage
         var officeNs = XNamespace.Get(OdfNamespaces.Office);
         var xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
 
-        // Get mimetype
+        // 取得 mimetype
         var mimeAttr = root.Attribute(officeNs + "mimetype") ?? root.Attribute("mimetype");
         _mimetype = mimeAttr?.Value;
         if (string.IsNullOrEmpty(_mimetype) && _loadOptions.ValidateMimeType)
@@ -227,7 +227,7 @@ public sealed partial class OdfPackage
             throw new InvalidDataException("Invalid Flat XML: missing office:mimetype.");
         }
 
-        // Get office:version
+        // 取得 office:version
         var versionAttr = root.Attribute(officeNs + "version") ?? root.Attribute("version");
         string version = versionAttr?.Value ?? "1.3";
         _version = version switch
@@ -240,7 +240,7 @@ public sealed partial class OdfPackage
             _ => OdfVersion.Odf14
         };
 
-        // Extract nested office:document elements (embedded objects, e.g. formulas)
+        // 擷取巢狀 office:document 元素（內嵌物件，例如公式）
         var nestedDocs = doc.Descendants(officeNs + "document")
                             .Where(d => d != doc.Root)
                             .ToList();
@@ -308,7 +308,7 @@ public sealed partial class OdfPackage
             }
         }
 
-        // Extract office elements
+        // 擷取 office 元素
         var metaElement = root.Element(officeNs + "meta");
         var settingsElement = root.Element(officeNs + "settings");
         var stylesElement = root.Element(officeNs + "styles");
@@ -317,28 +317,28 @@ public sealed partial class OdfPackage
         var fontDeclsElement = root.Element(officeNs + "font-face-decls");
         var bodyElement = root.Element(officeNs + "body");
 
-        // Extract binary data (images)
+        // 擷取二進位資料（圖片）
         var binaryDataElements = doc.Descendants(officeNs + "binary-data").ToList();
         int imageCounter = 1;
         foreach (var binData in binaryDataElements)
         {
             string base64 = binData.Value;
-            // Clean up whitespace/newlines from base64 string
+            // 清除 Base64 字串中的空白與換行
             base64 = base64.Replace("\r", "").Replace("\n", "").Replace(" ", "").Replace("\t", "");
             byte[] bytes = Convert.FromBase64String(base64);
 
-            // Detect image format/extension
+            // 偵測圖片格式與副檔名
             OdfMediaManager.DetectImageFormat(bytes, out var mediaType, out var ext);
 
-            // Construct a virtual entry path, e.g. Pictures/image_1.png
+            // 建構虛擬項目路徑，例如 Pictures/image_1.png
             string imagePath = $"Pictures/image_{imageCounter++}{ext}";
 
-            // Add to virtual entries
+            // 加入虛擬項目
             _entries[imagePath] = new OdfPackageEntry(imagePath, bytes);
             _manifest[imagePath] = mediaType;
             _entryOrder.Add(imagePath);
 
-            // Replace <office:binary-data> with drawing reference in parent
+            // 在父節點中以繪圖參照取代 <office:binary-data>
             var parent = binData.Parent;
             if (parent != null)
             {
@@ -353,7 +353,7 @@ public sealed partial class OdfPackage
             }
         }
 
-        // Construct content.xml
+        // 建構 content.xml
         var contentRoot = new XElement(officeNs + "document-content",
             new XAttribute(officeNs + "version", version));
         CopyNamespaces(root, contentRoot);
@@ -371,7 +371,7 @@ public sealed partial class OdfPackage
             contentRoot.Add(new XElement(bodyElement));
         }
 
-        // Construct styles.xml
+        // 建構 styles.xml
         var stylesRoot = new XElement(officeNs + "document-styles",
             new XAttribute(officeNs + "version", version));
         CopyNamespaces(root, stylesRoot);
@@ -393,7 +393,7 @@ public sealed partial class OdfPackage
             stylesRoot.Add(new XElement(masterStylesElement));
         }
 
-        // Construct meta.xml
+        // 建構 meta.xml
         var metaRoot = new XElement(officeNs + "document-meta",
             new XAttribute(officeNs + "version", version));
         CopyNamespaces(root, metaRoot);
@@ -407,7 +407,7 @@ public sealed partial class OdfPackage
             metaRoot.Add(new XElement(officeNs + "meta"));
         }
 
-        // Construct settings.xml
+        // 建構 settings.xml
         var settingsRoot = new XElement(officeNs + "document-settings",
             new XAttribute(officeNs + "version", version));
         CopyNamespaces(root, settingsRoot);
@@ -616,7 +616,7 @@ public sealed partial class OdfPackage
 
                     currentEntry.EncryptionInfo = currentEncryptionInfo;
 
-                    // Load other attributes into ExtensionProperties
+                    // 將其他屬性載入 ExtensionProperties
                     for (int i = 0; i < reader.AttributeCount; i++)
                     {
                         reader.MoveToAttribute(i);

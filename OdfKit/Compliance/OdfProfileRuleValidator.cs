@@ -410,12 +410,12 @@ internal static class OdfProfileRuleValidator
         public string QualifiedName { get; } = qName;
         public string XPath { get; } = xpath;
 
-        // Track count of child element QNames seen in this frame
+        // 追蹤此堆疊框架中已見過的子元素 QName 計數
         public Dictionary<string, int> ChildCounts { get; } = new(StringComparer.Ordinal);
 
-        // Accessibility check accumulators
-        public bool HasAltText { get; set; }        // Set to true if svg:title or svg:desc is found inside this element
-        public bool HasTableHeaderRows { get; set; } // Set to true if table:table-header-rows is found inside table:table
+        // 無障礙檢查累加器
+        public bool HasAltText { get; set; }        // 若元素內找到 svg:title 或 svg:desc 則設為 true
+        public bool HasTableHeaderRows { get; set; } // 若 table:table 內找到 table:table-header-rows 則設為 true
         public List<ImageInfo> ChildImages { get; } = [];
     }
 
@@ -511,7 +511,7 @@ internal static class OdfProfileRuleValidator
                         }
                         else
                         {
-                            // Standalone image with no alternative text
+                            // 無替代文字的獨立圖片
                             issues.Add(new OdfValidationIssue(
                                 accessRule.DefaultSeverity,
                                 accessRule.Id,
@@ -543,7 +543,7 @@ internal static class OdfProfileRuleValidator
                         }
                         else if (!frame.HasAltText)
                         {
-                            // Standalone image with no alternative text
+                            // 無替代文字的獨立圖片
                             issues.Add(new OdfValidationIssue(
                                 accessRule.DefaultSeverity,
                                 accessRule.Id,
@@ -864,7 +864,7 @@ internal static class OdfProfileRuleValidator
         int colonIndex = value.IndexOf(':');
         if (colonIndex > 0)
         {
-            // Check if all characters before the colon are letters
+            // 檢查冒號前的字元是否皆為字母
             for (int i = 0; i < colonIndex; i++)
             {
                 char c = value[i];
