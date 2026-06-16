@@ -1,14 +1,14 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
-using A = DocumentFormat.OpenXml.Drawing;
-using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using DocumentFormat.OpenXml.Packaging;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
-using WP = DocumentFormat.OpenXml.Wordprocessing;
 using OdfKit.Text;
+using A = DocumentFormat.OpenXml.Drawing;
+using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using WP = DocumentFormat.OpenXml.Wordprocessing;
 
 namespace OdfKit.Conversion;
 

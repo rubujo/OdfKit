@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace OdfKit.Tools.OdfSchemaGenerator;
 
@@ -7,16 +7,21 @@ namespace OdfKit.Tools.OdfSchemaGenerator;
 /// </summary>
 public static class OdfSchemaGeneratorCli
 {
-    private const string Usage = "Usage: OdfSchemaGenerator [--format json|csharp|csharp-provider|dom-wrappers] [--output <file>] [--class-name <name>] [--source-url <uri>] [--source-date <date>] <schema.rng>";
+    private const string Usage = "Usage: OdfSchemaGenerator [--format json|csharp|csharp-provider|dom-wrappers] [--output <file>] [--class-name <name>] [--source-url <uri>] [--source-date <date>] [--version 1.0|1.1|1.2|1.3|1.4] <schema.rng>";
+
+    private static readonly string[] SupportedVersionStrings = ["1.0", "1.1", "1.2", "1.3", "1.4"];
 
     /// <summary>
     /// Runs the schema generator command.
     /// </summary>
     public static int Run(string[] args, TextWriter output, TextWriter error)
     {
-        if (args == null) throw new ArgumentNullException(nameof(args));
-        if (output == null) throw new ArgumentNullException(nameof(output));
-        if (error == null) throw new ArgumentNullException(nameof(error));
+        if (args == null)
+            throw new ArgumentNullException(nameof(args));
+        if (output == null)
+            throw new ArgumentNullException(nameof(output));
+        if (error == null)
+            throw new ArgumentNullException(nameof(error));
 
         if (!TryParse(args, error, out GeneratorOptions? options))
         {
@@ -45,6 +50,11 @@ public static class OdfSchemaGeneratorCli
             metadata.SourceDate = parsedOptions.SourceDate;
         }
 
+        if (!string.IsNullOrWhiteSpace(parsedOptions.Version))
+        {
+            metadata.Version = parsedOptions.Version;
+        }
+
         if (string.IsNullOrWhiteSpace(parsedOptions.OutputPath))
         {
             WriteMetadata(metadata, output, parsedOptions);
@@ -70,6 +80,7 @@ public static class OdfSchemaGeneratorCli
         string className = "GeneratedOdfSchemaMetadata";
         string sourceUrl = string.Empty;
         string sourceDate = string.Empty;
+        string version = string.Empty;
         string? schemaPath = null;
 
         for (int i = 0; i < args.Length; i++)
@@ -130,6 +141,17 @@ public static class OdfSchemaGeneratorCli
                 continue;
             }
 
+            if (string.Equals(arg, "--version", StringComparison.Ordinal))
+            {
+                if (!TryReadValue(args, ref i, error, "--version", out version))
+                {
+                    options = null;
+                    return false;
+                }
+
+                continue;
+            }
+
             if (arg.StartsWith("--", StringComparison.Ordinal))
             {
                 error.WriteLine("Unsupported option: " + arg);
@@ -177,7 +199,14 @@ public static class OdfSchemaGeneratorCli
             return false;
         }
 
-        options = new GeneratorOptions(format, outputPath, className, sourceUrl, sourceDate, schemaPath);
+        if (!string.IsNullOrWhiteSpace(version) && Array.IndexOf(SupportedVersionStrings, version) < 0)
+        {
+            error.WriteLine("Version must be one of: " + string.Join(", ", SupportedVersionStrings));
+            options = null;
+            return false;
+        }
+
+        options = new GeneratorOptions(format, outputPath, className, sourceUrl, sourceDate, version, schemaPath);
         return true;
     }
 
@@ -289,6 +318,7 @@ public static class OdfSchemaGeneratorCli
             string className,
             string sourceUrl,
             string sourceDate,
+            string version,
             string schemaPath)
         {
             Format = format;
@@ -296,6 +326,7 @@ public static class OdfSchemaGeneratorCli
             ClassName = className;
             SourceUrl = sourceUrl;
             SourceDate = sourceDate;
+            Version = version;
             SchemaPath = schemaPath;
         }
 
@@ -308,6 +339,8 @@ public static class OdfSchemaGeneratorCli
         public string SourceUrl { get; }
 
         public string SourceDate { get; }
+
+        public string Version { get; }
 
         public string SchemaPath { get; }
     }

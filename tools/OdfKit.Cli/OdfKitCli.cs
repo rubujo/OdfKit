@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using OdfKit.Compliance;
@@ -27,9 +27,12 @@ public static class OdfKitCli
     /// <returns>程序結束碼，0 表示成功。</returns>
     public static int Run(string[] args, TextWriter output, TextWriter error)
     {
-        if (args is null) throw new ArgumentNullException(nameof(args));
-        if (output is null) throw new ArgumentNullException(nameof(output));
-        if (error is null) throw new ArgumentNullException(nameof(error));
+        if (args is null)
+            throw new ArgumentNullException(nameof(args));
+        if (output is null)
+            throw new ArgumentNullException(nameof(output));
+        if (error is null)
+            throw new ArgumentNullException(nameof(error));
 
         try
         {

@@ -1,4 +1,4 @@
-namespace OdfKit.DOM;
+﻿namespace OdfKit.DOM;
 
 /// <summary>
 /// 表示 ODF <c>style:family</c> 屬性的官方樣式家族 token。

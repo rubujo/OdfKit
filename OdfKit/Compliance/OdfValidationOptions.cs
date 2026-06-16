@@ -1,4 +1,4 @@
-using OdfKit.Core;
+﻿using OdfKit.Core;
 
 namespace OdfKit.Compliance;
 

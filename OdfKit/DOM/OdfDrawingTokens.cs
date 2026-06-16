@@ -1,4 +1,4 @@
-namespace OdfKit.DOM;
+﻿namespace OdfKit.DOM;
 
 /// <summary>
 /// 表示 ODF schema 中 <c>dr3d:projection</c> 的 3D 投影 token。

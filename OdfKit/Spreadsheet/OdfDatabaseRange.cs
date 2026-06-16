@@ -1,6 +1,6 @@
-using System;
-using OdfKit.DOM;
+﻿using System;
 using OdfKit.Core;
+using OdfKit.DOM;
 
 namespace OdfKit.Spreadsheet;
 
@@ -59,7 +59,8 @@ public class OdfDatabaseRange(OdfNode node, SpreadsheetDocument doc)
             Node.RemoveChild(existingSort);
         }
 
-        if (rules is null || rules.Length == 0) return;
+        if (rules is null || rules.Length == 0)
+            return;
 
         var sortNode = new OdfNode(OdfNodeType.Element, "sort", OdfNamespaces.Table, "table");
         foreach (var rule in rules)
@@ -92,7 +93,8 @@ public class OdfDatabaseRange(OdfNode node, SpreadsheetDocument doc)
             Node.RemoveChild(existingFilter);
         }
 
-        if (conditions is null || conditions.Length == 0) return;
+        if (conditions is null || conditions.Length == 0)
+            return;
 
         var filterNode = new OdfNode(OdfNodeType.Element, "filter", OdfNamespaces.Table, "table");
         foreach (var cond in conditions)

@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using Xml = System.Xml;
 using PdfSharp.Pdf;
-using PdfSharp.Pdf.IO;
 using PdfSharp.Pdf.Advanced;
+using PdfSharp.Pdf.IO;
+using Xml = System.Xml;
 
 namespace OdfKit.Core;
 
@@ -36,7 +36,8 @@ public static class OdfHybridPdfHelper
     /// <returns>傳回提取出的 ODF 檔案位元組陣列；若未找到則為 <see langword="null"/></returns>
     public static byte[]? ExtractOdfFromPdf(Stream pdfStream, string? password = null)
     {
-        if (pdfStream is null) throw new ArgumentNullException(nameof(pdfStream));
+        if (pdfStream is null)
+            throw new ArgumentNullException(nameof(pdfStream));
 
         // 載入 PDF 文件（用於提取附件的匯入模式）
         using var document = string.IsNullOrEmpty(password)
@@ -65,31 +66,36 @@ public static class OdfHybridPdfHelper
         }
 
         var namesArray = embeddedFiles.Elements.GetArray("/Names");
-        if (namesArray is null) return null;
+        if (namesArray is null)
+            return null;
 
         // 逐一查看名稱樹狀陣列中的名稱值對
         for (int i = 0; i < namesArray.Elements.Count; i += 2)
         {
-            if (i + 1 >= namesArray.Elements.Count) break;
+            if (i + 1 >= namesArray.Elements.Count)
+                break;
 
             // 值是一個 Filespec 字典（間接或直接）
             var filespecRef = namesArray.Elements[i + 1] as PdfReference;
             var filespec = (filespecRef is not null ? filespecRef.Value : namesArray.Elements[i + 1]) as PdfDictionary;
-            if (filespec is null) continue;
+            if (filespec is null)
+                continue;
 
             var ef = filespec.Elements.GetDictionary("/EF");
-            if (ef is null) continue;
+            if (ef is null)
+                continue;
 
             // /F 鍵保存了實際的內嵌資料流物件
             var fItem = ef.Elements["/F"];
             var fRef = fItem as PdfReference;
             var streamDict = (fRef is not null ? fRef.Value : fItem) as PdfDictionary;
-            if (streamDict is null) continue;
+            if (streamDict is null)
+                continue;
 
             // 檢查名稱的副檔名（例如 .odt, .ods）
             string? fileName = filespec.Elements.GetString("/F");
-            if (fileName is not null && (fileName.EndsWith(".odt", StringComparison.OrdinalIgnoreCase) || 
-                                      fileName.EndsWith(".ods", StringComparison.OrdinalIgnoreCase) || 
+            if (fileName is not null && (fileName.EndsWith(".odt", StringComparison.OrdinalIgnoreCase) ||
+                                      fileName.EndsWith(".ods", StringComparison.OrdinalIgnoreCase) ||
                                       fileName.EndsWith(".odp", StringComparison.OrdinalIgnoreCase)))
             {
                 if (streamDict.Stream is not null)
@@ -116,7 +122,7 @@ public static class OdfHybridPdfHelper
         using var pdfSrc = new FileStream(pdfPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var odfSrc = new FileStream(odfPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var pdfDest = new FileStream(outputPdfPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
-        
+
         InjectOdfToPdf(pdfSrc, odfSrc, pdfDest, Path.GetFileName(odfPath), password);
     }
 
@@ -130,10 +136,14 @@ public static class OdfHybridPdfHelper
     /// <param name="password">PDF 密碼，若無則為 <see langword="null"/></param>
     public static void InjectOdfToPdf(Stream pdfStream, Stream odfStream, Stream outputPdfStream, string odfFileName, string? password = null)
     {
-        if (pdfStream is null) throw new ArgumentNullException(nameof(pdfStream));
-        if (odfStream is null) throw new ArgumentNullException(nameof(odfStream));
-        if (outputPdfStream is null) throw new ArgumentNullException(nameof(outputPdfStream));
-        if (string.IsNullOrWhiteSpace(odfFileName)) throw new ArgumentException("必須指定 ODF 檔名。", nameof(odfFileName));
+        if (pdfStream is null)
+            throw new ArgumentNullException(nameof(pdfStream));
+        if (odfStream is null)
+            throw new ArgumentNullException(nameof(odfStream));
+        if (outputPdfStream is null)
+            throw new ArgumentNullException(nameof(outputPdfStream));
+        if (string.IsNullOrWhiteSpace(odfFileName))
+            throw new ArgumentException("必須指定 ODF 檔名。", nameof(odfFileName));
 
         // 讀取 ODF 資料
         byte[] odfData;
@@ -178,7 +188,7 @@ public static class OdfHybridPdfHelper
         filespec.Elements.SetName("/Type", "/Filespec");
         filespec.Elements.SetString("/F", odfFileName);
         filespec.Elements.SetString("/UF", odfFileName);
-        
+
         // 新增 PDF/A-3 關聯性中繼資料
         filespec.Elements.SetName("/AFRelationship", "/Source");
 
@@ -188,7 +198,7 @@ public static class OdfHybridPdfHelper
 
         // 3. 將 Filespec 參考新增至 /Names -> /EmbeddedFiles Catalog 名稱樹
         PdfCatalog catalog = document.Internals.Catalog;
-        
+
         var names = catalog.Elements.GetDictionary("/Names");
         if (names is null)
         {

@@ -1,7 +1,7 @@
-using System.Security;
+﻿using System.Security;
 using System.Xml;
-using OdfKit.Core;
 using CommunityToolkit.HighPerformance.Buffers;
+using OdfKit.Core;
 
 namespace OdfKit.DOM;
 
@@ -26,7 +26,8 @@ public static class OdfXmlReader
     /// <exception cref="InvalidDataException">當 XML 結構無效 (例如找不到根元素) 時擲出</exception>
     public static OdfNode Parse(Stream stream, OdfLoadOptions? options = null)
     {
-        if (stream is null) throw new ArgumentNullException(nameof(stream));
+        if (stream is null)
+            throw new ArgumentNullException(nameof(stream));
         options ??= OdfLoadOptions.Default;
 
         XmlReaderSettings settings = new()
@@ -177,6 +178,11 @@ public static class OdfXmlReader
                         ex);
                 }
 
+                if (IsDtdException(ex))
+                {
+                    throw;
+                }
+
                 if (!options.StrictXmlParsing)
                 {
                     OdfKitDiagnostics.Warn($"Lax parsing XML exception: {ex.Message}. Attempting to salvage partial DOM tree.", ex);
@@ -215,5 +221,11 @@ public static class OdfXmlReader
     {
         return exception.Message.IndexOf(nameof(XmlReaderSettings.MaxCharactersInDocument), StringComparison.OrdinalIgnoreCase) >= 0 ||
             exception.Message.IndexOf("maximum number of characters", StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private static bool IsDtdException(XmlException exception)
+    {
+        // 檢查例外訊息中是否包含 DTD 相關關鍵字
+        return exception.Message.Contains("DTD", StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using OdfKit.DOM;
 using OdfKit.Core;
+using OdfKit.DOM;
 
 namespace OdfKit.Spreadsheet;
 

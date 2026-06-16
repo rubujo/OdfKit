@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -348,7 +348,8 @@ public partial class OdfSlide
     /// <returns>新增的動畫物件執行個體。</returns>
     public OdfAnimation AddEntranceEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, TimeSpan delay = default)
     {
-        if (string.IsNullOrEmpty(shapeId)) throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
+        if (string.IsNullOrEmpty(shapeId))
+            throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
 
         var mainSeq = AnimationRoot.Node;
         var stepPar = FindOrCreateStepParNode(mainSeq, trigger);
@@ -358,7 +359,7 @@ public partial class OdfSlide
 
         // 建立動畫效果包裝節點
         OdfNode effectPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
-        
+
         string beginVal = trigger switch
         {
             OdfAnimationTrigger.AfterPrevious => "prev.end" + (delay > TimeSpan.Zero ? $"+{delayStr}" : ""),
@@ -422,7 +423,8 @@ public partial class OdfSlide
     /// <returns>新增的動畫物件執行個體。</returns>
     public OdfAnimation AddExitEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, TimeSpan delay = default)
     {
-        if (string.IsNullOrEmpty(shapeId)) throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
+        if (string.IsNullOrEmpty(shapeId))
+            throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
 
         var mainSeq = AnimationRoot.Node;
         var stepPar = FindOrCreateStepParNode(mainSeq, trigger);
@@ -432,7 +434,7 @@ public partial class OdfSlide
 
         // 建立動畫效果包裝節點
         OdfNode effectPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
-        
+
         string beginVal = trigger switch
         {
             OdfAnimationTrigger.AfterPrevious => "prev.end" + (delay > TimeSpan.Zero ? $"+{delayStr}" : ""),
@@ -494,7 +496,8 @@ public partial class OdfSlide
     /// <returns>新增的動畫物件執行個體。</returns>
     public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect)
     {
-        if (string.IsNullOrEmpty(shapeId)) throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
+        if (string.IsNullOrEmpty(shapeId))
+            throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
 
         var mainSeq = AnimationRoot.Node;
         // 強調動畫一般為點擊觸發
@@ -529,11 +532,11 @@ public partial class OdfSlide
             OdfNode clickPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
             clickPar.SetAttribute("begin", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "on-click", "smil");
             clickPar.SetAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "indefinite", "smil");
-            
+
             // 需要用一個 anim:par smil:begin="0s" 來包裹這個點擊步驟
             OdfNode outerPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
             outerPar.SetAttribute("begin", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "0s", "smil");
-            
+
             outerPar.AppendChild(clickPar);
             mainSeq.AppendChild(outerPar);
             return clickPar;

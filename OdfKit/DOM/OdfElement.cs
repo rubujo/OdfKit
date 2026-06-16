@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using OdfKit.Core;
 using OdfKit.Compliance;
+using OdfKit.Core;
 using OdfKit.Styles;
 
 namespace OdfKit.DOM;
@@ -14,7 +14,7 @@ namespace OdfKit.DOM;
 /// <param name="localName">元素局部名稱</param>
 /// <param name="namespaceUri">元素命名空間 URI</param>
 /// <param name="prefix">選用的命名空間前綴</param>
-public class OdfElement(string localName, string namespaceUri, string? prefix = null) 
+public class OdfElement(string localName, string namespaceUri, string? prefix = null)
     : OdfNode(OdfNodeType.Element, localName, namespaceUri, prefix)
 {
     /// <summary>

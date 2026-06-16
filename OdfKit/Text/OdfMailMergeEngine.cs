@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using OdfKit.DOM;
 using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Formula;
 
 namespace OdfKit.Text;
@@ -24,8 +24,10 @@ public class OdfMailMergeEngine(TextDocument doc)
     /// <param name="dataSource">用來合併的資料來源物件</param>
     public void Execute(OdfNode root, object dataSource)
     {
-        if (root is null) throw new ArgumentNullException(nameof(root));
-        if (dataSource is null) return;
+        if (root is null)
+            throw new ArgumentNullException(nameof(root));
+        if (dataSource is null)
+            return;
 
         ReplacePlaceholders(root, dataSource);
     }
@@ -45,7 +47,7 @@ public class OdfMailMergeEngine(TextDocument doc)
         for (int i = 0; i < node.Children.Count; i++)
         {
             var child = node.Children[i];
-            
+
             if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
             {
                 string rowText = child.TextContent;
@@ -63,14 +65,14 @@ public class OdfMailMergeEngine(TextDocument doc)
                         foreach (var item in collection)
                         {
                             var clonedRow = child.CloneNode(true);
-                            
+
                             // 為同時支援重複列中的 {{items.name}} 與 {{name}}，
                             // 我們可以傳遞複合解析器或清除前綴。
                             // 支援包含或不包含前綴的解析方式。
                             ReplacePlaceholdersInClonedRow(clonedRow, item, collectionName, dataSource);
-                            
+
                             ShiftFormulasInRow(clonedRow, cloneIndex);
-                            
+
                             parent.Children.Insert(insertIdx++, clonedRow);
                             clonedRow.Parent = parent;
                             cloneIndex++;
@@ -97,7 +99,8 @@ public class OdfMailMergeEngine(TextDocument doc)
                 while (start != -1)
                 {
                     int end = text.IndexOf("}}", start);
-                    if (end == -1) break;
+                    if (end == -1)
+                        break;
 
                     string placeholder = text.Substring(start + 2, end - start - 2).Trim();
                     object? val = null;
@@ -157,7 +160,8 @@ public class OdfMailMergeEngine(TextDocument doc)
         while (start != -1)
         {
             int end = text.IndexOf("}}", start);
-            if (end == -1) break;
+            if (end == -1)
+                break;
             string path = text.Substring(start + 2, end - start - 2).Trim();
             int dotIdx = path.IndexOf('.');
             if (dotIdx > 0)
@@ -175,7 +179,8 @@ public class OdfMailMergeEngine(TextDocument doc)
         while (start != -1)
         {
             int end = text.IndexOf("}}", start);
-            if (end == -1) break;
+            if (end == -1)
+                break;
 
             string placeholder = text.Substring(start + 2, end - start - 2).Trim();
             TryResolveValuePath(dataSource, placeholder, out object? val);
@@ -190,14 +195,16 @@ public class OdfMailMergeEngine(TextDocument doc)
     private bool TryResolveValuePath(object obj, string path, out object? result)
     {
         result = null;
-        if (obj is null) return false;
+        if (obj is null)
+            return false;
 
         string[] parts = path.Split('.');
         object current = obj;
 
         foreach (var part in parts)
         {
-            if (current is null) return false;
+            if (current is null)
+                return false;
 
             if (current is IDictionary dict)
             {
@@ -235,7 +242,8 @@ public class OdfMailMergeEngine(TextDocument doc)
 
     private object? GetPropertyOrDictValue(object obj, string key)
     {
-        if (obj is null) return null;
+        if (obj is null)
+            return null;
         if (obj is IDictionary dict)
             return dict.Contains(key) ? dict[key] : null;
         if (obj is IReadOnlyDictionary<string, object?> roDict)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -169,8 +169,10 @@ public sealed class OdfQualifiedName : IEquatable<OdfQualifiedName>
     /// <param name="localName">區域元素或屬性名稱</param>
     public OdfQualifiedName(string namespaceUri, string localName)
     {
-        if (string.IsNullOrWhiteSpace(namespaceUri)) throw new ArgumentException("Namespace URI cannot be empty.", nameof(namespaceUri));
-        if (string.IsNullOrWhiteSpace(localName)) throw new ArgumentException("Local name cannot be empty.", nameof(localName));
+        if (string.IsNullOrWhiteSpace(namespaceUri))
+            throw new ArgumentException("Namespace URI cannot be empty.", nameof(namespaceUri));
+        if (string.IsNullOrWhiteSpace(localName))
+            throw new ArgumentException("Local name cannot be empty.", nameof(localName));
         NamespaceUri = namespaceUri;
         LocalName = localName;
     }
@@ -351,7 +353,8 @@ public sealed class OdfSchemaPatternDefinition
     /// <param name="roots">根節點集合</param>
     public OdfSchemaPatternDefinition(string name, IEnumerable<OdfSchemaPatternNode> roots)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Pattern name cannot be empty.", nameof(name));
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Pattern name cannot be empty.", nameof(name));
         Name = name;
         _roots = new List<OdfSchemaPatternNode>(roots ?? throw new ArgumentNullException(nameof(roots))).AsReadOnly();
     }
@@ -601,7 +604,8 @@ public sealed class OdfSchemaSet
     /// <returns>合併後的全新 <see cref="OdfSchemaSet"/> 執行個體</returns>
     public OdfSchemaSet MergeWith(OdfSchemaSet additional, bool overwriteExisting = false)
     {
-        if (additional is null) throw new ArgumentNullException(nameof(additional));
+        if (additional is null)
+            throw new ArgumentNullException(nameof(additional));
 
         var elements = new Dictionary<OdfQualifiedName, OdfElementDefinition>();
         foreach (var pair in _elements)

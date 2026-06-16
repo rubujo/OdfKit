@@ -1,4 +1,4 @@
-#pragma warning restore CS1591
+﻿#pragma warning restore CS1591
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +22,8 @@ public static class OdfFlatDocumentValidator
     /// <returns>驗證結果報告</returns>
     public static OdfValidationReport Validate(Stream stream, string? fileName = null, OdfComplianceProfile? profile = null)
     {
-        if (stream is null) throw new ArgumentNullException(nameof(stream));
+        if (stream is null)
+            throw new ArgumentNullException(nameof(stream));
 
         List<OdfValidationIssue> issues = [];
         string? profileId = profile?.Id;
@@ -34,7 +35,7 @@ public static class OdfFlatDocumentValidator
             ? ParseVersion(rootInfo.Version)
             : OdfVersion.Unknown;
         OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(detectedVersion);
-        if (detectedVersion != OdfVersion.Odf14 && detectedVersion != OdfVersion.Unknown)
+        if (!OdfSchemaRegistry.HasNativeSchema(detectedVersion) && detectedVersion != OdfVersion.Unknown)
         {
             issues.Add(new OdfValidationIssue(
                 OdfIssueSeverity.Warning,

@@ -1,4 +1,4 @@
-namespace OdfKit.DOM;
+﻿namespace OdfKit.DOM;
 
 /// <summary>
 /// 表示 ODF schema 中 <c>presentation:effect</c> 的簡報效果 token。

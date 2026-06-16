@@ -1,7 +1,7 @@
-using System.Text;
+﻿using System.Text;
 using System.Xml.Linq;
-using OdfKit.Core;
 using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit.DOM;
 
@@ -117,7 +117,7 @@ public class OdfNode
     /// 取得或設定節點的命名空間前綴。
     /// </summary>
     public string? Prefix { get; set; }
-    
+
     private string? _value; // 用於文字節點
 
     /// <summary>
@@ -136,7 +136,7 @@ public class OdfNode
     public Dictionary<OdfAttributeName, string> Attributes { get; } = new(OdfAttributeNameComparer.Instance);
 
     private readonly Dictionary<OdfAttributeName, string> _attributePrefixes = new(OdfAttributeNameComparer.Instance);
-    
+
     /// <summary>
     /// 取得或設定標記此節點是否被新增或修改 (Dirty Flag)，用於自動樣式去重。
     /// </summary>
@@ -260,7 +260,8 @@ public class OdfNode
     /// <exception cref="InvalidOperationException">當嘗試向文字或註解節點新增子節點時擲出</exception>
     public void AppendChild(OdfNode child)
     {
-        if (child is null) throw new ArgumentNullException(nameof(child));
+        if (child is null)
+            throw new ArgumentNullException(nameof(child));
         if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
             throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
@@ -281,8 +282,10 @@ public class OdfNode
     /// <exception cref="InvalidOperationException">當嘗試向文字或註解節點新增子節點，或參考節點不是此節點的子節點時擲出</exception>
     public void InsertBefore(OdfNode newChild, OdfNode refChild)
     {
-        if (newChild is null) throw new ArgumentNullException(nameof(newChild));
-        if (refChild is null) throw new ArgumentNullException(nameof(refChild));
+        if (newChild is null)
+            throw new ArgumentNullException(nameof(newChild));
+        if (refChild is null)
+            throw new ArgumentNullException(nameof(refChild));
         if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
             throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
@@ -309,8 +312,10 @@ public class OdfNode
     /// <exception cref="InvalidOperationException">當嘗試向文字或註解節點新增子節點，或參考節點不是此節點的子節點時擲出</exception>
     public void InsertAfter(OdfNode newChild, OdfNode refChild)
     {
-        if (newChild is null) throw new ArgumentNullException(nameof(newChild));
-        if (refChild is null) throw new ArgumentNullException(nameof(refChild));
+        if (newChild is null)
+            throw new ArgumentNullException(nameof(newChild));
+        if (refChild is null)
+            throw new ArgumentNullException(nameof(refChild));
         if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
             throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
@@ -335,7 +340,8 @@ public class OdfNode
     /// <exception cref="ArgumentNullException">當 <paramref name="child"/> 為 <see langword="null"/> 時擲出</exception>
     public void RemoveChild(OdfNode child)
     {
-        if (child is null) throw new ArgumentNullException(nameof(child));
+        if (child is null)
+            throw new ArgumentNullException(nameof(child));
         if (Children.Remove(child))
         {
             IsModified = true;
@@ -492,7 +498,7 @@ public class OdfNode
                     }
                 }
             }
-            
+
             if (versionStr is not null)
             {
                 return versionStr switch
@@ -553,7 +559,8 @@ public class OdfNode
     /// <returns>匯入後的新節點</returns>
     public static OdfNode ImportNode(OdfNode sourceNode, OdfPackage? sourcePackage, OdfPackage? destPackage)
     {
-        if (sourceNode is null) throw new ArgumentNullException(nameof(sourceNode));
+        if (sourceNode is null)
+            throw new ArgumentNullException(nameof(sourceNode));
 
         // 先深層複製節點結構
         OdfNode importedNode = sourceNode.CloneNode(true);
@@ -603,18 +610,18 @@ public class OdfNode
                 var entriesToCopy = sourcePackage.GetEntries()
                                                   .Where(e => e.Path.StartsWith(folderPrefix, StringComparison.OrdinalIgnoreCase))
                                                   .ToList();
-                
+
                 if (entriesToCopy.Count > 0)
                 {
                     string originalPrefix = normHref.StartsWith("Object", StringComparison.OrdinalIgnoreCase) ? "Object" : "Formula";
                     string newHref = $"{originalPrefix}_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
-                    
+
                     foreach (var entryInfo in entriesToCopy)
                     {
                         string srcPath = entryInfo.Path;
                         string relativePath = srcPath.Substring(folderPrefix.Length);
                         string destPath = $"{newHref}/{relativePath}";
-                        
+
                         try
                         {
                             byte[] bytes = sourcePackage.ReadEntry(srcPath);
@@ -630,7 +637,7 @@ public class OdfNode
                             OdfKitDiagnostics.Warn($"Failed to migrate embedded entry '{srcPath}' during node import: {ex.Message}");
                         }
                     }
-                    
+
                     node.Attributes[hrefKey] = newHref;
                     destPackage.SaveManifestToEntries();
                 }
@@ -659,7 +666,8 @@ public static class OdfNodeExtensions
     /// <returns>後代節點的列舉</returns>
     public static IEnumerable<OdfNode> Descendants(this OdfNode node)
     {
-        if (node is null) yield break;
+        if (node is null)
+            yield break;
         foreach (var child in node.Children)
         {
             yield return child;
@@ -679,7 +687,8 @@ public static class OdfNodeExtensions
     /// <returns>符合的第一個子元素；如果找不到，則為 <see langword="null"/></returns>
     public static OdfNode? FindChildElement(this OdfNode node, string localName, string nsUri)
     {
-        if (node is null) return null;
+        if (node is null)
+            return null;
         foreach (var child in node.Children)
         {
             if (child.NodeType == OdfNodeType.Element &&

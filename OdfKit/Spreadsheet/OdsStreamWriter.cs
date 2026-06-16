@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Xml;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Styles;
-using OdfKit.Compliance;
 
 namespace OdfKit.Spreadsheet;
 
@@ -59,10 +59,10 @@ public class OdsStreamWriter : IDisposable
     {
         _outputStream = outputStream ?? throw new ArgumentNullException(nameof(outputStream));
         _version = version;
-        
+
         // 包裝於 NonSeekableStreamWrapper 以強制 ZipArchive 使用資料流、非緩衝模式
         _zip = new ZipArchive(new NonSeekableStreamWrapper(_outputStream), ZipArchiveMode.Create, leaveOpen: true);
-        
+
         // 1. 先寫入未壓縮的 mimetype
         var mimeEntry = _zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
         using (var s = mimeEntry.Open())
@@ -77,7 +77,7 @@ public class OdsStreamWriter : IDisposable
         // 3. 開啟 content.xml 以進行資料流寫入
         var contentEntry = _zip.CreateEntry("content.xml", CompressionLevel.Fastest);
         _contentEntryStream = contentEntry.Open();
-        
+
         var settings = new XmlWriterSettings
         {
             Encoding = new UTF8Encoding(false),
@@ -93,7 +93,7 @@ public class OdsStreamWriter : IDisposable
         _writer.WriteAttributeString("xmlns", "table", null, OdfNamespaces.Table);
         _writer.WriteAttributeString("xmlns", "text", null, OdfNamespaces.Text);
         _writer.WriteAttributeString("xmlns", "style", null, OdfNamespaces.Style);
-        
+
         // 寫入 body 與 spreadsheet 包裝器
         _writer.WriteStartElement("office", "body", OdfNamespaces.Office);
         _writer.WriteStartElement("office", "spreadsheet", OdfNamespaces.Office);
@@ -105,8 +105,10 @@ public class OdsStreamWriter : IDisposable
     /// <param name="sheetName">工作表名稱</param>
     public void WriteStartSheet(string sheetName)
     {
-        if (_disposed) return;
-        if (_isSheetStarted) WriteEndSheet();
+        if (_disposed)
+            return;
+        if (_isSheetStarted)
+            WriteEndSheet();
         _writer.WriteStartElement("table", "table", OdfNamespaces.Table);
         _writer.WriteAttributeString("table", "name", OdfNamespaces.Table, sheetName);
         _isSheetStarted = true;
@@ -119,7 +121,8 @@ public class OdsStreamWriter : IDisposable
     /// <param name="styleName">樣式名稱，如果為 null 則自動產生</param>
     public void WriteColumn(OdfLength width, string? styleName = null)
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         string name = string.IsNullOrEmpty(styleName)
             ? $"co_auto_{++_autoColumnStyleIndex}"
             : styleName!;
@@ -139,8 +142,10 @@ public class OdsStreamWriter : IDisposable
     /// <param name="useOptimalHeight">是否使用最佳高度</param>
     public void WriteStartRow(double? height = null, string? styleName = null, bool useOptimalHeight = false)
     {
-        if (_disposed) return;
-        if (_isRowStarted) WriteEndRow();
+        if (_disposed)
+            return;
+        if (_isRowStarted)
+            WriteEndRow();
         _isRowStarted = true;
 
         string? resolvedStyleName = styleName;
@@ -169,7 +174,8 @@ public class OdsStreamWriter : IDisposable
     /// <param name="styleName">樣式名稱</param>
     public void WriteCell(string value, string? styleName = null)
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
         _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "string");
         if (!string.IsNullOrEmpty(styleName))
@@ -189,7 +195,8 @@ public class OdsStreamWriter : IDisposable
     /// <param name="styleName">樣式名稱</param>
     public void WriteCell(double value, string? styleName = null)
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
         _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "float");
         _writer.WriteAttributeString("office", "value", OdfNamespaces.Office, value.ToString(System.Globalization.CultureInfo.InvariantCulture));
@@ -211,10 +218,11 @@ public class OdsStreamWriter : IDisposable
     /// <param name="timezoneNaive">是否忽略時區轉換</param>
     public void WriteCell(DateTime value, string? styleName = null, bool timezoneNaive = false)
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
         _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "date");
-        
+
         string isoDate;
         if (value == DateTime.MinValue || value == DateTime.MaxValue)
         {
@@ -224,11 +232,11 @@ public class OdsStreamWriter : IDisposable
         }
         else
         {
-            isoDate = timezoneNaive 
+            isoDate = timezoneNaive
                 ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
                 : value.ToUniversalTime().ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
         }
-            
+
         _writer.WriteAttributeString("office", "date-value", OdfNamespaces.Office, isoDate);
         if (!string.IsNullOrEmpty(styleName))
         {
@@ -247,7 +255,8 @@ public class OdsStreamWriter : IDisposable
     /// <param name="styleName">樣式名稱</param>
     public void WriteCell(bool value, string? styleName = null)
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
         _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "boolean");
         _writer.WriteAttributeString("office", "boolean-value", OdfNamespaces.Office, value ? "true" : "false");
@@ -266,7 +275,8 @@ public class OdsStreamWriter : IDisposable
     /// </summary>
     public void WriteEndRow()
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         if (_isRowStarted)
         {
             _writer.WriteEndElement(); // table-row
@@ -279,8 +289,10 @@ public class OdsStreamWriter : IDisposable
     /// </summary>
     public void WriteEndSheet()
     {
-        if (_disposed) return;
-        if (_isRowStarted) WriteEndRow();
+        if (_disposed)
+            return;
+        if (_isRowStarted)
+            WriteEndRow();
         if (_isSheetStarted)
         {
             _writer.WriteEndElement(); // table:table
@@ -304,7 +316,7 @@ public class OdsStreamWriter : IDisposable
             writer.WriteStartDocument();
             writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
             writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, FormatVersion(_version));
-            
+
             writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
             writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "/");
             writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "application/vnd.oasis.opendocument.spreadsheet");
@@ -339,7 +351,7 @@ public class OdsStreamWriter : IDisposable
             writer.WriteAttributeString("xmlns", "text", null, OdfNamespaces.Text);
             writer.WriteAttributeString("xmlns", "table", null, OdfNamespaces.Table);
             writer.WriteAttributeString("xmlns", "fo", null, OdfNamespaces.Fo);
-            
+
             writer.WriteStartElement("office", "styles", OdfNamespaces.Office);
             writer.WriteEndElement();
 
@@ -396,7 +408,7 @@ public class OdsStreamWriter : IDisposable
             writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
             writer.WriteAttributeString("xmlns", "dc", null, OdfNamespaces.Dc);
             writer.WriteAttributeString("xmlns", "meta", null, OdfNamespaces.Meta);
-            
+
             writer.WriteStartElement("office", "meta", OdfNamespaces.Office);
             writer.WriteEndElement();
 
@@ -420,22 +432,30 @@ public class OdsStreamWriter : IDisposable
     /// <param name="disposing">為 true 則釋放受控與非受控資源；為 false 則僅釋放非受控資源</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         _disposed = true;
 
         if (disposing)
         {
-            if (_isSheetStarted) WriteEndSheet();
-            
+            if (_isSheetStarted)
+                WriteEndSheet();
+
             // 關閉 spreadsheet、body、document-content 標籤
             _writer.WriteEndElement(); // office:spreadsheet
             _writer.WriteEndElement(); // office:body
             _writer.WriteEndElement(); // office:document-content
             _writer.WriteEndDocument();
-            
-            try { _writer.Dispose(); } catch { /* 盡量排清 XmlWriter */ }
-            try { _contentEntryStream.Dispose(); } catch { }
-            try { WriteStyles(); } catch { }
+
+            try
+            { _writer.Dispose(); }
+            catch { /* 盡量排清 XmlWriter */ }
+            try
+            { _contentEntryStream.Dispose(); }
+            catch { }
+            try
+            { WriteStyles(); }
+            catch { }
             _zip.Dispose();
         }
     }

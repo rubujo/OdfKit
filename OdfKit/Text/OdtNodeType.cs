@@ -1,4 +1,4 @@
-namespace OdfKit.Text;
+﻿namespace OdfKit.Text;
 
 /// <summary>
 /// 表示 ODT 流式讀取器目前讀取到的文字元素類型。

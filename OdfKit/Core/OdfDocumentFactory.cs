@@ -1,4 +1,4 @@
-#pragma warning restore CS1591
+﻿#pragma warning restore CS1591
 
 using System;
 using System.IO;
@@ -58,7 +58,8 @@ public static class OdfDocumentFactory
     /// <returns>載入完成的 ODF 文件。</returns>
     public static OdfDocument LoadDocument(string path, OdfLoadOptions? options)
     {
-        if (path is null) throw new ArgumentNullException(nameof(path));
+        if (path is null)
+            throw new ArgumentNullException(nameof(path));
 
         OdfPackage package = OdfPackage.Open(path, options);
         return CreateDocumentWrapper(package, DetectDocumentKind(package, path));
@@ -84,7 +85,8 @@ public static class OdfDocumentFactory
     /// <returns>載入完成的 ODF 文件。</returns>
     public static OdfDocument LoadDocument(Stream stream, OdfLoadOptions? options, string? fileName = null)
     {
-        if (stream is null) throw new ArgumentNullException(nameof(stream));
+        if (stream is null)
+            throw new ArgumentNullException(nameof(stream));
 
         OdfPackage package = OdfPackage.Open(stream, options: options);
         return CreateDocumentWrapper(package, DetectDocumentKind(package, fileName));
@@ -106,8 +108,10 @@ public static class OdfDocumentFactory
         bool leaveOpen = false,
         OdfSaveOptions? options = null)
     {
-        if (stream is null) throw new ArgumentNullException(nameof(stream));
-        if (OdfDocumentKindDetector.IsFlatKind(kind)) throw new ArgumentException("扁平 ODF 類型必須使用 WriteFlatXml 建立。", nameof(kind));
+        if (stream is null)
+            throw new ArgumentNullException(nameof(stream));
+        if (OdfDocumentKindDetector.IsFlatKind(kind))
+            throw new ArgumentException("扁平 ODF 類型必須使用 WriteFlatXml 建立。", nameof(kind));
 
         var package = OdfPackage.Create(stream, leaveOpen, options);
         InitializeMinimalPackage(package, kind, version);
@@ -128,8 +132,10 @@ public static class OdfDocumentFactory
         OdfVersion version = OdfVersion.Odf14,
         OdfSaveOptions? options = null)
     {
-        if (path is null) throw new ArgumentNullException(nameof(path));
-        if (OdfDocumentKindDetector.IsFlatKind(kind)) throw new ArgumentException("扁平 ODF 類型必須使用 WriteFlatXml 建立。", nameof(kind));
+        if (path is null)
+            throw new ArgumentNullException(nameof(path));
+        if (OdfDocumentKindDetector.IsFlatKind(kind))
+            throw new ArgumentException("扁平 ODF 類型必須使用 WriteFlatXml 建立。", nameof(kind));
 
         var package = OdfPackage.Create(path, options);
         InitializeMinimalPackage(package, kind, version);
@@ -149,7 +155,8 @@ public static class OdfDocumentFactory
         OdfVersion version = OdfVersion.Odf14,
         bool leaveOpen = true)
     {
-        if (stream is null) throw new ArgumentNullException(nameof(stream));
+        if (stream is null)
+            throw new ArgumentNullException(nameof(stream));
 
         OdfDocumentKind flatKind = OdfDocumentKindDetector.ToFlatKind(kind);
         if (!OdfDocumentKindDetector.IsFlatKind(flatKind))
@@ -192,8 +199,10 @@ public static class OdfDocumentFactory
         OdfDocumentKind kind,
         OdfVersion version = OdfVersion.Odf14)
     {
-        if (package is null) throw new ArgumentNullException(nameof(package));
-        if (OdfDocumentKindDetector.IsFlatKind(kind)) throw new ArgumentException("扁平 ODF 類型無法儲存為封裝 ODF 類型。", nameof(kind));
+        if (package is null)
+            throw new ArgumentNullException(nameof(package));
+        if (OdfDocumentKindDetector.IsFlatKind(kind))
+            throw new ArgumentException("扁平 ODF 類型無法儲存為封裝 ODF 類型。", nameof(kind));
 
         string mimeType = GetMimeType(kind);
         string versionText = FormatVersion(version);

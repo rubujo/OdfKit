@@ -1,0 +1,9 @@
+{
+  "version": "1.2",
+  "schemaPath": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.2-os-schema.rng",
+  "sourceUrl": "https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-schema.rng",
+  "sourceDate": "2026-06-16",
+  "outputPath": "OdfKit/Compliance/Generated/Odf12OfficialSchemaProvider.g.cs",
+  "className": "Odf12OfficialSchemaMetadata",
+  "format": "csharp-provider"
+}

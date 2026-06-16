@@ -1,4 +1,4 @@
-namespace OdfKit.Core;
+﻿namespace OdfKit.Core;
 
 /// <summary>
 /// 提供常用 ODF XML 命名空間 URI 的常數與公用程式方法。

@@ -1,4 +1,4 @@
-namespace OdfKit.Spreadsheet;
+﻿namespace OdfKit.Spreadsheet;
 
 /// <summary>
 /// 表示 ODS 圖表類型的列舉。

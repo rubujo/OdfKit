@@ -1,4 +1,4 @@
-namespace OdfKit.DOM;
+﻿namespace OdfKit.DOM;
 
 /// <summary>
 /// 表示 ODF schema 中 <c>fo:keep-together</c> 的段落分頁保持 token。

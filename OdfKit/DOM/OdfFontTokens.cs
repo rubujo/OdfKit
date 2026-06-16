@@ -1,4 +1,4 @@
-namespace OdfKit.DOM;
+﻿namespace OdfKit.DOM;
 
 /// <summary>
 /// 表示 ODF schema 中名為 <c>fontFamilyGeneric</c> 的通用字型家族 token。

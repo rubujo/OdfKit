@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -9,13 +9,13 @@ using System.Xml.Linq;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
-using C = DocumentFormat.OpenXml.Drawing.Charts;
-using Xdr = DocumentFormat.OpenXml.Drawing.Spreadsheet;
-using A = DocumentFormat.OpenXml.Drawing;
-using S = DocumentFormat.OpenXml.Spreadsheet;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
+using A = DocumentFormat.OpenXml.Drawing;
+using C = DocumentFormat.OpenXml.Drawing.Charts;
+using S = DocumentFormat.OpenXml.Spreadsheet;
+using Xdr = DocumentFormat.OpenXml.Drawing.Spreadsheet;
 
 namespace OdfKit.Conversion;
 
@@ -32,8 +32,10 @@ public static class OdfToXlsxConverter
     /// <exception cref="ArgumentNullException">當任一必要參數為 null 時引發。</exception>
     public static void Convert(OdfKit.Spreadsheet.SpreadsheetDocument odsWorkbook, Stream xlsxStream)
     {
-        if (odsWorkbook is null) throw new ArgumentNullException(nameof(odsWorkbook));
-        if (xlsxStream is null) throw new ArgumentNullException(nameof(xlsxStream));
+        if (odsWorkbook is null)
+            throw new ArgumentNullException(nameof(odsWorkbook));
+        if (xlsxStream is null)
+            throw new ArgumentNullException(nameof(xlsxStream));
 
         using var xlWorkbook = new XLWorkbook();
         var chartSpecs = new List<ChartSpec>();
@@ -1082,13 +1084,27 @@ public static class OdfToXlsxConverter
     {
         switch (value)
         {
-            case CellFormula formula: cell.SetFormulaA1(formula.ExcelFormula); break;
-            case double d: cell.Value = d; break;
-            case int i: cell.Value = i; break;
-            case bool b: cell.Value = b; break;
-            case DateTime dt: cell.Value = dt; break;
-            case string str: cell.Value = str; break;
-            default: cell.Value = value?.ToString() ?? string.Empty; break;
+            case CellFormula formula:
+                cell.SetFormulaA1(formula.ExcelFormula);
+                break;
+            case double d:
+                cell.Value = d;
+                break;
+            case int i:
+                cell.Value = i;
+                break;
+            case bool b:
+                cell.Value = b;
+                break;
+            case DateTime dt:
+                cell.Value = dt;
+                break;
+            case string str:
+                cell.Value = str;
+                break;
+            default:
+                cell.Value = value?.ToString() ?? string.Empty;
+                break;
         }
     }
 
@@ -1212,10 +1228,14 @@ public static class OdfToXlsxConverter
             ? XLBorderStyleValues.Dashed
             : XLBorderStyleValues.Thin;
 
-        if (side is null || side == "top") border.TopBorder = style;
-        if (side is null || side == "bottom") border.BottomBorder = style;
-        if (side is null || side == "left") border.LeftBorder = style;
-        if (side is null || side == "right") border.RightBorder = style;
+        if (side is null || side == "top")
+            border.TopBorder = style;
+        if (side is null || side == "bottom")
+            border.BottomBorder = style;
+        if (side is null || side == "left")
+            border.LeftBorder = style;
+        if (side is null || side == "right")
+            border.RightBorder = style;
     }
 
     private static void CopyDataValidations(OdfTableSheet sheet, IXLWorksheet xlSheet)
@@ -1546,12 +1566,17 @@ public static class OdfToXlsxConverter
     {
         string f = odtFormula;
         // 去除命名空間前綴
-        if (f.StartsWith("of:=", StringComparison.Ordinal)) f = f.Substring(3); // 保留 "="
-        else if (f.StartsWith("of:", StringComparison.Ordinal)) f = "=" + f.Substring(3);
-        else if (f.StartsWith("oooc:=", StringComparison.Ordinal)) f = f.Substring(5);
-        else if (f.StartsWith("oooc:", StringComparison.Ordinal)) f = "=" + f.Substring(5);
+        if (f.StartsWith("of:=", StringComparison.Ordinal))
+            f = f.Substring(3); // 保留 "="
+        else if (f.StartsWith("of:", StringComparison.Ordinal))
+            f = "=" + f.Substring(3);
+        else if (f.StartsWith("oooc:=", StringComparison.Ordinal))
+            f = f.Substring(5);
+        else if (f.StartsWith("oooc:", StringComparison.Ordinal))
+            f = "=" + f.Substring(5);
 
-        if (!f.StartsWith("=", StringComparison.Ordinal)) f = "=" + f;
+        if (!f.StartsWith("=", StringComparison.Ordinal))
+            f = "=" + f;
 
         // 轉換工作表參照：Sheet.A1 → Sheet!A1
         f = SheetRefRegex.Replace(f, "$1!$2");

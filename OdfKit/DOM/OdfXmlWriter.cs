@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Xml;
 using OdfKit.Core;
 
@@ -18,8 +18,10 @@ public static class OdfXmlWriter
     /// <exception cref="ArgumentNullException">當 <paramref name="rootNode"/> 或 <paramref name="stream"/> 為 <see langword="null"/> 時擲出</exception>
     public static void Write(OdfNode rootNode, Stream stream, OdfSaveOptions? options = null)
     {
-        if (rootNode is null) throw new ArgumentNullException(nameof(rootNode));
-        if (stream is null) throw new ArgumentNullException(nameof(stream));
+        if (rootNode is null)
+            throw new ArgumentNullException(nameof(rootNode));
+        if (stream is null)
+            throw new ArgumentNullException(nameof(stream));
         options ??= OdfSaveOptions.Default;
 
         XmlWriterSettings settings = new()
@@ -42,7 +44,7 @@ public static class OdfXmlWriter
             try
             {
                 writer.WriteStartDocument();
-                
+
                 // 遞迴寫入
                 WriteNode(rootNode, writer, nsDict, ref openElementsCount, isRoot: true);
 
@@ -147,7 +149,8 @@ public static class OdfXmlWriter
 
     private static string GetNamespacePrefix(string nsUri, string? preferredPrefix, Dictionary<string, string> nsDict)
     {
-        if (string.IsNullOrEmpty(nsUri)) return string.Empty;
+        if (string.IsNullOrEmpty(nsUri))
+            return string.Empty;
         if (nsDict.TryGetValue(nsUri, out string? prefix))
         {
             return prefix;
@@ -157,7 +160,8 @@ public static class OdfXmlWriter
 
     private static void CollectNamespaces(OdfNode node, Dictionary<string, string> nsDict)
     {
-        if (node.NodeType != OdfNodeType.Element) return;
+        if (node.NodeType != OdfNodeType.Element)
+            return;
 
         // 收集元素的命名空間
         if (!string.IsNullOrEmpty(node.NamespaceUri))

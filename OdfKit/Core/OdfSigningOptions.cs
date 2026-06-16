@@ -1,4 +1,4 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 
 namespace OdfKit.Core;

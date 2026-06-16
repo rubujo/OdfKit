@@ -1,4 +1,4 @@
-namespace OdfKit.Styles;
+﻿namespace OdfKit.Styles;
 
 /// <summary>
 /// 提供以數字建立 <see cref="OdfLength"/> 的擴充方法。

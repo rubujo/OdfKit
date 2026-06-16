@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -34,7 +34,8 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
     {
         foreach (var encKey in info.OpenPgpEncryptedKeys)
         {
-            if (encKey.KeyPacket.Length == 0) continue;
+            if (encKey.KeyPacket.Length == 0)
+                continue;
             byte[] sessionKey;
             try
             {

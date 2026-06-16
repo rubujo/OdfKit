@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -202,8 +202,10 @@ public class OdfNumberFormatter
     /// <returns>解析後的標準格式字串</returns>
     public static string ResolveStandardFormat(string format, CultureInfo culture)
     {
-        if (string.IsNullOrEmpty(format)) return "Standard";
-        if (format.Length > 2) return format;
+        if (string.IsNullOrEmpty(format))
+            return "Standard";
+        if (format.Length > 2)
+            return format;
 
         char specifier = format[0];
         int precision = -1;
@@ -293,17 +295,23 @@ public class OdfNumberFormatter
             string decimalPart = clean.Substring(dotIndex + 1);
 
             int zeros = 0;
-            foreach (char c in integerPart) if (c == '0') zeros++;
+            foreach (char c in integerPart)
+                if (c == '0')
+                    zeros++;
             info.MinIntegerDigits = Math.Max(1, zeros);
 
             int decCount = 0;
-            foreach (char c in decimalPart) if (c == '0' || c == '#') decCount++;
+            foreach (char c in decimalPart)
+                if (c == '0' || c == '#')
+                    decCount++;
             info.DecimalPlaces = decCount;
         }
         else
         {
             int zeros = 0;
-            foreach (char c in clean) if (c == '0') zeros++;
+            foreach (char c in clean)
+                if (c == '0')
+                    zeros++;
             info.MinIntegerDigits = Math.Max(1, zeros);
             info.DecimalPlaces = 0;
         }
@@ -314,12 +322,18 @@ public class OdfNumberFormatter
     private static bool ContainsCurrencySymbol(string pattern, out string symbol)
     {
         symbol = "$";
-        if (pattern.Contains("NT$")) { symbol = "NT$"; return true; }
-        if (pattern.Contains("$")) { symbol = "$"; return true; }
-        if (pattern.Contains("€")) { symbol = "€"; return true; }
-        if (pattern.Contains("£")) { symbol = "£"; return true; }
-        if (pattern.Contains("¥")) { symbol = "¥"; return true; }
-        if (pattern.Contains("¤")) { symbol = "$"; return true; }
+        if (pattern.Contains("NT$"))
+        { symbol = "NT$"; return true; }
+        if (pattern.Contains("$"))
+        { symbol = "$"; return true; }
+        if (pattern.Contains("€"))
+        { symbol = "€"; return true; }
+        if (pattern.Contains("£"))
+        { symbol = "£"; return true; }
+        if (pattern.Contains("¥"))
+        { symbol = "¥"; return true; }
+        if (pattern.Contains("¤"))
+        { symbol = "$"; return true; }
         return false;
     }
 
@@ -327,7 +341,8 @@ public class OdfNumberFormatter
     {
         foreach (char c in pattern)
         {
-            if ("yMdhHmst/:".IndexOf(c) >= 0) return true;
+            if ("yMdhHmst/:".IndexOf(c) >= 0)
+                return true;
         }
         return false;
     }
@@ -338,8 +353,10 @@ public class OdfNumberFormatter
         bool hasTime = false;
         foreach (char c in pattern)
         {
-            if ("yMd".IndexOf(c) >= 0) hasDate = true;
-            if ("hHms".IndexOf(c) >= 0) hasTime = true;
+            if ("yMd".IndexOf(c) >= 0)
+                hasDate = true;
+            if ("hHms".IndexOf(c) >= 0)
+                hasTime = true;
         }
         return hasTime && !hasDate;
     }
@@ -384,7 +401,8 @@ public class OdfNumberFormatter
             if ("yMdhHmst".IndexOf(c) >= 0)
             {
                 int len = 1;
-                while (i + len < pattern.Length && pattern[i + len] == c) len++;
+                while (i + len < pattern.Length && pattern[i + len] == c)
+                    len++;
                 tokens.Add(new DateTimeToken(pattern.Substring(i, len), false));
                 i += len;
             }
@@ -404,10 +422,14 @@ public class OdfNumberFormatter
         for (int i = 0; i < pattern.Length; i++)
         {
             char c = pattern[i];
-            if (c == '\'') { inQuote = !inQuote; continue; }
-            if (inQuote) continue;
-            if (c == '\\') { i++; continue; }
-            if ("0#.,".IndexOf(c) >= 0) sb.Append(c);
+            if (c == '\'')
+            { inQuote = !inQuote; continue; }
+            if (inQuote)
+                continue;
+            if (c == '\\')
+            { i++; continue; }
+            if ("0#.,".IndexOf(c) >= 0)
+                sb.Append(c);
         }
         return sb.ToString();
     }
@@ -442,7 +464,8 @@ public class OdfNumberFormatter
                     OdfNode numNode = new(OdfNodeType.Element, "number", OdfNamespaces.Number, "number");
                     numNode.SetAttribute("decimal-places", OdfNamespaces.Number, info.DecimalPlaces.ToString(CultureInfo.InvariantCulture), "number");
                     numNode.SetAttribute("min-integer-digits", OdfNamespaces.Number, info.MinIntegerDigits.ToString(CultureInfo.InvariantCulture), "number");
-                    if (info.Grouping) numNode.SetAttribute("grouping", OdfNamespaces.Number, "true", "number");
+                    if (info.Grouping)
+                        numNode.SetAttribute("grouping", OdfNamespaces.Number, "true", "number");
                     styleNode.AppendChild(numNode);
 
                     if (info.Type == FormatType.Percentage)
@@ -463,7 +486,8 @@ public class OdfNumberFormatter
                     OdfNode numNode = new(OdfNodeType.Element, "number", OdfNamespaces.Number, "number");
                     numNode.SetAttribute("decimal-places", OdfNamespaces.Number, info.DecimalPlaces.ToString(CultureInfo.InvariantCulture), "number");
                     numNode.SetAttribute("min-integer-digits", OdfNamespaces.Number, info.MinIntegerDigits.ToString(CultureInfo.InvariantCulture), "number");
-                    if (info.Grouping) numNode.SetAttribute("grouping", OdfNamespaces.Number, "true", "number");
+                    if (info.Grouping)
+                        numNode.SetAttribute("grouping", OdfNamespaces.Number, "true", "number");
                     styleNode.AppendChild(numNode);
                 }
                 break;
@@ -474,7 +498,8 @@ public class OdfNumberFormatter
                     bool is12Hour = false;
                     foreach (var t in info.DateTimeTokens)
                     {
-                        if (!t.IsLiteral && (t.Token == "tt" || t.Token == "t")) is12Hour = true;
+                        if (!t.IsLiteral && (t.Token == "tt" || t.Token == "t"))
+                            is12Hour = true;
                     }
 
                     foreach (var token in info.DateTimeTokens)
@@ -488,7 +513,8 @@ public class OdfNumberFormatter
                         else
                         {
                             OdfNode? partNode = CreateDateTimePartNode(token.Token, is12Hour);
-                            if (partNode is not null) styleNode.AppendChild(partNode);
+                            if (partNode is not null)
+                                styleNode.AppendChild(partNode);
                         }
                     }
                 }
@@ -580,12 +606,13 @@ public class OdfNumberFormatter
         foreach (var child in node.Children)
         {
             sb.Append('[').Append(child.LocalName).Append(':');
-            List<OdfAttributeName> attrs = [..child.Attributes.Keys];
+            List<OdfAttributeName> attrs = [.. child.Attributes.Keys];
             attrs.Sort((x, y) => string.Compare(x.LocalName, y.LocalName, StringComparison.Ordinal));
 
             foreach (var attr in attrs)
             {
-                if (attr.LocalName == "name" && attr.NamespaceUri == OdfNamespaces.Style) continue;
+                if (attr.LocalName == "name" && attr.NamespaceUri == OdfNamespaces.Style)
+                    continue;
                 sb.Append($"{attr.NamespaceUri}:{attr.LocalName}={child.Attributes[attr]};");
             }
 
@@ -607,7 +634,8 @@ public class OdfNumberFormatter
 
     private void ScanAndCacheStyles(OdfNode? parentNode)
     {
-        if (parentNode is null) return;
+        if (parentNode is null)
+            return;
         foreach (var child in parentNode.Children)
         {
             if (child.NamespaceUri == OdfNamespaces.Number &&
@@ -636,17 +664,20 @@ public class OdfNumberFormatter
     private OdfNode? FindStyleInDOM(string name)
     {
         var style = FindStyleInParent(FindChildElement(_contentRoot, "automatic-styles", OdfNamespaces.Office), name);
-        if (style is not null) return style;
+        if (style is not null)
+            return style;
 
         style = FindStyleInParent(FindChildElement(_stylesRoot, "automatic-styles", OdfNamespaces.Office), name);
-        if (style is not null) return style;
+        if (style is not null)
+            return style;
 
         return FindStyleInParent(FindChildElement(_stylesRoot, "styles", OdfNamespaces.Office), name);
     }
 
     private OdfNode? FindStyleInParent(OdfNode? parentNode, string name)
     {
-        if (parentNode is null) return null;
+        if (parentNode is null)
+            return null;
         foreach (var child in parentNode.Children)
         {
             if (child.NamespaceUri == OdfNamespaces.Number && child.GetAttribute("name", OdfNamespaces.Style) == name)

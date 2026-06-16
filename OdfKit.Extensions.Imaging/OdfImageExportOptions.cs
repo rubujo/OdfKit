@@ -1,4 +1,4 @@
-namespace OdfKit.Export;
+﻿namespace OdfKit.Export;
 
 /// <summary>
 /// 試算表影像匯出的選項設定。

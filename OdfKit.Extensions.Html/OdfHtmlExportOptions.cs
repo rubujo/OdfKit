@@ -1,4 +1,4 @@
-namespace OdfKit.Export;
+﻿namespace OdfKit.Export;
 
 /// <summary>
 /// HTML 匯出的選項設定。

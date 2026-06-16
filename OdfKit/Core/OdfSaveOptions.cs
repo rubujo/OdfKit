@@ -1,4 +1,4 @@
-#pragma warning restore CS1591
+﻿#pragma warning restore CS1591
 
 using System.Globalization;
 using System.IO.Compression;

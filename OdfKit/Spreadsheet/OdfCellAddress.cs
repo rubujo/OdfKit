@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using OdfKit.Core;
 
@@ -49,11 +49,13 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     /// <param name="isColumnAbsolute">欄索引是否為絕對參照</param>
     /// <param name="isSheetAbsolute">工作表名稱是否為絕對參照</param>
     /// <exception cref="ArgumentOutOfRangeException">當列索引或欄索引小於 0 時擲出</exception>
-    public OdfCellAddress(int row, int column, string? sheetName = null, 
+    public OdfCellAddress(int row, int column, string? sheetName = null,
         bool isRowAbsolute = false, bool isColumnAbsolute = false, bool isSheetAbsolute = false)
     {
-        if (row < 0) throw new ArgumentOutOfRangeException(nameof(row), "Row index must be non-negative.");
-        if (column < 0) throw new ArgumentOutOfRangeException(nameof(column), "Column index must be non-negative.");
+        if (row < 0)
+            throw new ArgumentOutOfRangeException(nameof(row), "Row index must be non-negative.");
+        if (column < 0)
+            throw new ArgumentOutOfRangeException(nameof(column), "Column index must be non-negative.");
 
         Row = row;
         Column = column;
@@ -198,7 +200,8 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
                 for (int j = span.Length - 1; j >= 0; j--)
                 {
                     char c = span[j];
-                    if (c == '\'') inQuotes = !inQuotes;
+                    if (c == '\'')
+                        inQuotes = !inQuotes;
                     if (!inQuotes && c == '.')
                     {
                         sepIndex = j;
@@ -214,7 +217,8 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
             for (int j = span.Length - 1; j >= 0; j--)
             {
                 char c = span[j];
-                if (c == '\'') inQuotes = !inQuotes;
+                if (c == '\'')
+                    inQuotes = !inQuotes;
                 if (!inQuotes && c == '!')
                 {
                     sepIndex = j;
@@ -322,9 +326,11 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
             else
                 sb.Append(SheetName).Append("!");
         }
-        if (IsColumnAbsolute) sb.Append("$");
+        if (IsColumnAbsolute)
+            sb.Append("$");
         sb.Append(IndexToColumnName(Column));
-        if (IsRowAbsolute) sb.Append("$");
+        if (IsRowAbsolute)
+            sb.Append("$");
         sb.Append(Row + 1);
         return sb.ToString();
     }
@@ -337,11 +343,13 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     public string ToOdfString(bool includeBrackets = false)
     {
         var sb = new StringBuilder();
-        if (includeBrackets) sb.Append("[");
+        if (includeBrackets)
+            sb.Append("[");
 
         if (!string.IsNullOrEmpty(SheetName))
         {
-            if (IsSheetAbsolute) sb.Append("$");
+            if (IsSheetAbsolute)
+                sb.Append("$");
             bool needsQuotes = SheetName!.Contains(" ") || SheetName.Contains("'") || SheetName.Contains("-") || SheetName.Contains(".");
             if (needsQuotes)
                 sb.Append("'").Append(SheetName.Replace("'", "''")).Append("'");
@@ -354,12 +362,15 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
             sb.Append("."); // Local reference prefix
         }
 
-        if (IsColumnAbsolute) sb.Append("$");
+        if (IsColumnAbsolute)
+            sb.Append("$");
         sb.Append(IndexToColumnName(Column));
-        if (IsRowAbsolute) sb.Append("$");
+        if (IsRowAbsolute)
+            sb.Append("$");
         sb.Append(Row + 1);
 
-        if (includeBrackets) sb.Append("]");
+        if (includeBrackets)
+            sb.Append("]");
         return sb.ToString();
     }
 
@@ -394,7 +405,8 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         {
             if (rowCount > 0) // Insertion
             {
-                if (Row >= insertRowIndex) newRow += rowCount;
+                if (Row >= insertRowIndex)
+                    newRow += rowCount;
             }
             else // Deletion
             {
@@ -411,7 +423,8 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         {
             if (colCount > 0) // Insertion
             {
-                if (Column >= insertColIndex) newCol += colCount;
+                if (Column >= insertColIndex)
+                    newCol += colCount;
             }
             else // Deletion
             {

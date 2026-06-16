@@ -154,9 +154,9 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack input.fodt out
   `OdfDocument` 的格式摘要屬性辨識；目前它們共用對應內容種類的高階
   wrapper，尚未提供完整變體專屬物件模型。
 - 圖表、公式、影像與資料庫文件已有基礎高階 story，但不是完整的辦公套件物件模型。
-- 舊版 ODF 文件的版本差異處理屬 best-effort；保存時可使用 `OdfSaveOptions.ForceVersion` 明確指定輸出版本。
+- ODF 1.1/1.2/1.3 schema 驗證已改為以 OASIS 官方獨立 RNG 衍生的真實版本專屬 schema；ODF 1.0 因 OASIS 從未發布獨立 RNG，仍維持以 1.4 schema 進行 best-effort 近似驗證（詳見 [docs/odf-official-corpus-sources.md](docs/odf-official-corpus-sources.md)）。保存時可使用 `OdfSaveOptions.ForceVersion` 明確指定輸出版本。
 - LibreOffice rendering 擴充仍需外部 LibreOffice 或相容執行檔，不屬於核心 OdfKit 的純 managed 路徑。
 
 ## 授權
 
-OdfKit 原創程式碼採用 CC0-1.0 Universal。第三方相依套件維持各自授權；主要相依套件包含 PDFsharp、CommunityToolkit.HighPerformance、System.Security.Cryptography.Xml 與 System.Security.Cryptography.Pkcs。
+OdfKit 專案採用 [CC0-1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.zh_TW)。第三方相依套件維持各自授權；主要相依套件包含 PDFsharp、CommunityToolkit.HighPerformance、System.Security.Cryptography.Xml 與 System.Security.Cryptography.Pkcs。

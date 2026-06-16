@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using OdfKit.DOM;
 using OdfKit.Core;
+using OdfKit.DOM;
 
 namespace OdfKit.Text;
 
@@ -42,7 +42,7 @@ public class OdfComment
     /// </summary>
     /// <param name="author">註解的作者</param>
     /// <param name="text">註解的內文</param>
-    public OdfComment(string author, string text) 
+    public OdfComment(string author, string text)
         : this(author, text, DateTime.UtcNow, Guid.NewGuid().ToString("N"))
     {
     }
@@ -79,7 +79,8 @@ public class OdfComment
     /// <param name="reply">要新增的回覆註解執行個體</param>
     public void AddReply(OdfComment reply)
     {
-        if (reply is null) throw new ArgumentNullException(nameof(reply));
+        if (reply is null)
+            throw new ArgumentNullException(nameof(reply));
         _replies.Add(reply);
     }
 
@@ -204,7 +205,8 @@ public class OdfComment
         {
             if (child.NamespaceUri == OdfNamespaces.Dc)
             {
-                if (child.LocalName == "creator") author = child.TextContent;
+                if (child.LocalName == "creator")
+                    author = child.TextContent;
                 else if (child.LocalName == "date" && DateTime.TryParse(child.TextContent, null, System.Globalization.DateTimeStyles.RoundtripKind, out var dt))
                 {
                     if (dt == DateTime.MinValue || dt == DateTime.MaxValue)
@@ -243,7 +245,8 @@ public class OdfComment
     /// <returns>解析後的 <see cref="OdfComment"/> 根註解物件</returns>
     public static OdfComment FromXmlNode(OdfNode node)
     {
-        if (node is null) throw new ArgumentNullException(nameof(node));
+        if (node is null)
+            throw new ArgumentNullException(nameof(node));
 
         // 識別所有候選 XML 節點
         IEnumerable<OdfNode> xmlNodes;
@@ -273,7 +276,7 @@ public class OdfComment
             if (child.LocalName == "annotation" && child.NamespaceUri == OdfNamespaces.Office)
             {
                 string originalName = child.GetAttribute("name", OdfNamespaces.Office) ?? Guid.NewGuid().ToString("N");
-                
+
                 // 產生唯一名稱
                 string uniqueName = originalName;
                 int counter = 1;

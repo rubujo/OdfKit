@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -237,12 +237,18 @@ internal static class OdfProfileRuleValidator
                 }
             }
 
-            // 當檢測版本非 1.4 時，暫時將 root 的 version 設為 1.4 以便 best-effort 匹配 1.4 schema
+            // 當 schema 並非該版本的官方真實 schema 時（目前僅 ODF 1.0／Unknown，因 OASIS
+            // 未發布獨立 RNG，退回以 ODF 1.4 schema 過濾近似），暫時將 root 的 version 改寫為
+            // 實際 pattern 內容所屬的 1.4，以便正確匹配 pattern。原生 1.1/1.2/1.3/1.4 驗證時
+            // schema 本身就是該版本的真實 schema，此處為 no-op。
+            string schemaVersionString = OdfSchemaRegistry.HasNativeSchema(schema.Version)
+                ? OdfVersionInfo.ToVersionString(schema.Version)
+                : OdfVersionInfo.ToVersionString(OdfVersion.Odf14);
             var versionAttr = document.Root.Attribute(XName.Get("version", OdfNamespaces.Office))
                 ?? document.Root.Attribute("version");
-            if (versionAttr is not null && versionAttr.Value != "1.4")
+            if (versionAttr is not null && versionAttr.Value != schemaVersionString)
             {
-                versionAttr.Value = "1.4";
+                versionAttr.Value = schemaVersionString;
             }
 
             List<string> patternNames = ResolveRootPatternNames(schema, document.Root, packagePath);
@@ -523,7 +529,8 @@ internal static class OdfProfileRuleValidator
             }
             else if (reader.NodeType == XmlNodeType.EndElement)
             {
-                if (stack.Count == 0) continue;
+                if (stack.Count == 0)
+                    continue;
                 var frame = stack.Pop();
 
                 if (accessRule is not null)
@@ -895,9 +902,9 @@ internal static class OdfProfileRuleValidator
 
         // 移除 foreign 屬性
         var foreignAttrs = element.Attributes()
-            .Where(a => !a.IsNamespaceDeclaration && 
+            .Where(a => !a.IsNamespaceDeclaration &&
                         !IsInfrastructureOrMathNamespace(a.Name.NamespaceName) &&
-                        (!IsStandardNamespace(a.Name.NamespaceName) || 
+                        (!IsStandardNamespace(a.Name.NamespaceName) ||
                          defaultSchema.FindAttribute(a.Name.NamespaceName, a.Name.LocalName) is null))
             .ToList();
         foreach (var attr in foreignAttrs)
@@ -913,7 +920,7 @@ internal static class OdfProfileRuleValidator
             {
                 SanitizeForeignContentForSchemaValidation(child);
             }
-            else if (!IsStandardNamespace(child.Name.NamespaceName) || 
+            else if (!IsStandardNamespace(child.Name.NamespaceName) ||
                      defaultSchema.FindElement(child.Name.NamespaceName, child.Name.LocalName) is null)
             {
                 child.Remove();

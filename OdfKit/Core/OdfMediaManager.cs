@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
@@ -119,7 +119,7 @@ public class OdfMediaManager
     /// <param name="extension">輸出的副檔名，包含前導句點</param>
     public static void DetectImageFormat(byte[] bytes, out string mimeType, out string extension)
     {
-        if (bytes.Length >= 8 && 
+        if (bytes.Length >= 8 &&
             bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47 &&
             bytes[4] == 0x0D && bytes[5] == 0x0A && bytes[6] == 0x1A && bytes[7] == 0x0A)
         {
@@ -143,7 +143,7 @@ public class OdfMediaManager
         }
 
         // WebP 格式 (RIFF....WEBP)
-        if (bytes.Length >= 12 && 
+        if (bytes.Length >= 12 &&
             bytes[0] == 0x52 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x46 && // RIFF
             bytes[8] == 0x57 && bytes[9] == 0x45 && bytes[10] == 0x42 && bytes[11] == 0x50) // WEBP
         {

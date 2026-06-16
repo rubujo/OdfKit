@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,7 +42,8 @@ public static class OdfPackageValidator
         OdfComplianceProfile? profile = null,
         string? fileName = null)
     {
-        if (package is null) throw new ArgumentNullException(nameof(package));
+        if (package is null)
+            throw new ArgumentNullException(nameof(package));
 
         List<OdfValidationIssue> issues = [];
         string? profileId = profile?.Id;
@@ -52,7 +53,7 @@ public static class OdfPackageValidator
         OdfDocumentKind bodyKind = DetectBodyKind(package, issues, profileId);
         OdfDocumentKind documentKind = mimeKind != OdfDocumentKind.Unknown ? mimeKind : bodyKind;
 
-        ValidateMimeType(mimeType, documentKind, profile, profileId, issues);
+        ValidateMimeType(mimeType, mimeKind, profile, profileId, issues);
         ValidateMimeTypeEntry(package, profileId, issues);
         ValidateBodyKind(mimeKind, bodyKind, profileId, issues);
         ValidateExtensionKind(extensionKind, mimeKind, fileName, profileId, issues);
@@ -61,7 +62,7 @@ public static class OdfPackageValidator
 
         OdfVersion detectedVersion = DetectVersion(package, issues, profileId);
         OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(detectedVersion);
-        if (detectedVersion != OdfVersion.Odf14 && detectedVersion != OdfVersion.Unknown)
+        if (!OdfSchemaRegistry.HasNativeSchema(detectedVersion) && detectedVersion != OdfVersion.Unknown)
         {
             issues.Add(new OdfValidationIssue(
                 OdfIssueSeverity.Warning,
@@ -80,7 +81,7 @@ public static class OdfPackageValidator
 
     private static void ValidateMimeType(
         string? mimeType,
-        OdfDocumentKind documentKind,
+        OdfDocumentKind mimeKind,
         OdfComplianceProfile? profile,
         string? profileId,
         List<OdfValidationIssue> issues)
@@ -96,7 +97,7 @@ public static class OdfPackageValidator
             return;
         }
 
-        if (documentKind == OdfDocumentKind.Unknown)
+        if (mimeKind == OdfDocumentKind.Unknown)
         {
             issues.Add(new OdfValidationIssue(
                 OdfIssueSeverity.Error,
@@ -463,12 +464,18 @@ public static class OdfPackageValidator
             ["entryPath"] = entryPath
         };
 
-        if (expectedMediaType is not null) details["expectedMediaType"] = expectedMediaType;
-        if (actualMediaType is not null) details["actualMediaType"] = actualMediaType;
-        if (expectedManifestEntry is not null) details["expectedManifestEntry"] = expectedManifestEntry;
-        if (actualManifestEntry is not null) details["actualManifestEntry"] = actualManifestEntry;
-        if (expectedPackageEntry is not null) details["expectedPackageEntry"] = expectedPackageEntry;
-        if (actualPackageEntry is not null) details["actualPackageEntry"] = actualPackageEntry;
+        if (expectedMediaType is not null)
+            details["expectedMediaType"] = expectedMediaType;
+        if (actualMediaType is not null)
+            details["actualMediaType"] = actualMediaType;
+        if (expectedManifestEntry is not null)
+            details["expectedManifestEntry"] = expectedManifestEntry;
+        if (actualManifestEntry is not null)
+            details["actualManifestEntry"] = actualManifestEntry;
+        if (expectedPackageEntry is not null)
+            details["expectedPackageEntry"] = expectedPackageEntry;
+        if (actualPackageEntry is not null)
+            details["actualPackageEntry"] = actualPackageEntry;
 
         return details;
     }
@@ -487,13 +494,20 @@ public static class OdfPackageValidator
             }
 
             List<string> missing = [];
-            if (!info.HasChecksumType) missing.Add("checksum-type");
-            if (!info.HasChecksum || info.Checksum.Length == 0) missing.Add("checksum");
-            if (!info.HasAlgorithmName) missing.Add("algorithm-name");
-            if (!info.HasInitialisationVector || info.InitialisationVector.Length == 0) missing.Add("initialisation-vector");
-            if (!info.HasKeyDerivationName) missing.Add("key-derivation-name");
-            if (!info.HasIterationCount || info.IterationCount <= 0) missing.Add("iteration-count");
-            if (!info.HasSalt || info.Salt.Length == 0) missing.Add("salt");
+            if (!info.HasChecksumType)
+                missing.Add("checksum-type");
+            if (!info.HasChecksum || info.Checksum.Length == 0)
+                missing.Add("checksum");
+            if (!info.HasAlgorithmName)
+                missing.Add("algorithm-name");
+            if (!info.HasInitialisationVector || info.InitialisationVector.Length == 0)
+                missing.Add("initialisation-vector");
+            if (!info.HasKeyDerivationName)
+                missing.Add("key-derivation-name");
+            if (!info.HasIterationCount || info.IterationCount <= 0)
+                missing.Add("iteration-count");
+            if (!info.HasSalt || info.Salt.Length == 0)
+                missing.Add("salt");
 
             if (missing.Count == 0)
             {

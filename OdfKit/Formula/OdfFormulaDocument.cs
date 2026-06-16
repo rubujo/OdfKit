@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -244,13 +244,13 @@ public class OdfFormulaDocument : OdfDocument
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
         var srcFormula = sourceDoc as OdfFormulaDocument ?? throw new ArgumentException("Source document must be a OdfFormulaDocument.");
-        
+
         var body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
         var destFormulaRoot = FindOrCreateChild(body, "formula", OdfNamespaces.Office, "office");
-        
+
         var srcBody = srcFormula.FindOrCreateChild(srcFormula.ContentDom, "body", OdfNamespaces.Office, "office");
         var srcFormulaRoot = srcFormula.FindOrCreateChild(srcBody, "formula", OdfNamespaces.Office, "office");
-        
+
         foreach (var child in srcFormulaRoot.Children)
         {
             if (child.NodeType == OdfNodeType.Element)

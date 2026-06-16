@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
-using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Paddings;
+using Org.BouncyCastle.Crypto.Parameters;
 
 namespace OdfKit.Core;
 
@@ -378,7 +378,8 @@ public static class OdfEncryption
     {
         foreach (var entry in package.Entries.Values)
         {
-            if (entry.EncryptionInfo is null) continue;
+            if (entry.EncryptionInfo is null)
+                continue;
 
             byte[] ciphertext;
             using (var stream = entry.OpenReader())
@@ -662,8 +663,10 @@ public static class OdfEncryption
     /// <returns>若兩者相等，則為 <see langword="true"/> ；否則為 <see langword="false"/></returns>
     public static bool ByteArrayEquals(byte[]? a, byte[]? b)
     {
-        if (a is null || b is null) return a == b;
-        if (a.Length != b.Length) return false;
+        if (a is null || b is null)
+            return a == b;
+        if (a.Length != b.Length)
+            return false;
 #if NET5_0_OR_GREATER
         return System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(a, b);
 #else
@@ -686,7 +689,8 @@ public static class OdfEncryption
             cipher.ProcessBlock(ciphertext, i, plaintext, i);
         }
 
-        if (plaintext.Length == 0) return plaintext;
+        if (plaintext.Length == 0)
+            return plaintext;
         int paddingLen = plaintext[plaintext.Length - 1];
         if (paddingLen > 0 && paddingLen <= 8 && paddingLen <= plaintext.Length)
         {

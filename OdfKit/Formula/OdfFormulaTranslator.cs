@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using OdfKit.Spreadsheet;
@@ -118,7 +118,8 @@ public static class OdfFormulaTranslator
             if (char.IsWhiteSpace(c))
             {
                 int start = i;
-                while (i < length && char.IsWhiteSpace(formula[i])) i++;
+                while (i < length && char.IsWhiteSpace(formula[i]))
+                    i++;
                 tokens.Add(new(TokenType.Whitespace, formula.Substring(start, i - start), start));
                 continue;
             }
@@ -130,10 +131,13 @@ public static class OdfFormulaTranslator
                 {
                     if (formula[i] == '"')
                     {
-                        if (i + 1 < length && formula[i + 1] == '"') i += 2; // 逸出引號 ""
-                        else { i++; break; }
+                        if (i + 1 < length && formula[i + 1] == '"')
+                            i += 2; // 逸出引號 ""
+                        else
+                        { i++; break; }
                     }
-                    else i++;
+                    else
+                        i++;
                 }
                 tokens.Add(new(TokenType.StringLiteral, formula.Substring(start, i - start), start));
                 continue;
@@ -146,8 +150,10 @@ public static class OdfFormulaTranslator
                 int bracketCount = 1;
                 while (i < length && bracketCount > 0)
                 {
-                    if (formula[i] == '[') bracketCount++;
-                    else if (formula[i] == ']') bracketCount--;
+                    if (formula[i] == '[')
+                        bracketCount++;
+                    else if (formula[i] == ']')
+                        bracketCount--;
                     i++;
                 }
                 tokens.Add(new(TokenType.CellReference, formula.Substring(start, i - start), start));
@@ -160,10 +166,14 @@ public static class OdfFormulaTranslator
                 continue;
             }
 
-            if (c == '(') { tokens.Add(new(TokenType.OpenParenthesis, "(", i++)); continue; }
-            if (c == ')') { tokens.Add(new(TokenType.CloseParenthesis, ")", i++)); continue; }
-            if (c == '{') { tokens.Add(new(TokenType.OpenBrace, "{", i++)); continue; }
-            if (c == '}') { tokens.Add(new(TokenType.CloseBrace, "}", i++)); continue; }
+            if (c == '(')
+            { tokens.Add(new(TokenType.OpenParenthesis, "(", i++)); continue; }
+            if (c == ')')
+            { tokens.Add(new(TokenType.CloseParenthesis, ")", i++)); continue; }
+            if (c == '{')
+            { tokens.Add(new(TokenType.OpenBrace, "{", i++)); continue; }
+            if (c == '}')
+            { tokens.Add(new(TokenType.CloseBrace, "}", i++)); continue; }
 
             if (c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '&' || c == '=')
             {
@@ -177,7 +187,8 @@ public static class OdfFormulaTranslator
                 if (i < length)
                 {
                     char next = formula[i];
-                    if ((c == '<' && (next == '>' || next == '=')) || (c == '>' && next == '=')) i++;
+                    if ((c == '<' && (next == '>' || next == '=')) || (c == '>' && next == '='))
+                        i++;
                 }
                 tokens.Add(new(TokenType.Operator, formula.Substring(start, i - start), start));
                 continue;
@@ -190,9 +201,12 @@ public static class OdfFormulaTranslator
                 while (i < length)
                 {
                     char next = formula[i];
-                    if (char.IsDigit(next)) i++;
-                    else if (next == '.' && !hasDecimal) { hasDecimal = true; i++; }
-                    else break;
+                    if (char.IsDigit(next))
+                        i++;
+                    else if (next == '.' && !hasDecimal)
+                    { hasDecimal = true; i++; }
+                    else
+                        break;
                 }
                 tokens.Add(new(TokenType.Number, formula.Substring(start, i - start), start));
                 continue;
@@ -208,7 +222,8 @@ public static class OdfFormulaTranslator
                 }
                 else
                 {
-                    while (i < length && (char.IsLetterOrDigit(formula[i]) || formula[i] == '_')) i++;
+                    while (i < length && (char.IsLetterOrDigit(formula[i]) || formula[i] == '_'))
+                        i++;
                     tokens.Add(new(TokenType.Identifier, formula.Substring(start, i - start), start));
                 }
                 continue;
@@ -234,21 +249,28 @@ public static class OdfFormulaTranslator
             {
                 if (formula[temp] == '\'')
                 {
-                    if (temp + 1 < length && formula[temp + 1] == '\'') temp += 2;
-                    else { temp++; break; }
+                    if (temp + 1 < length && formula[temp + 1] == '\'')
+                        temp += 2;
+                    else
+                    { temp++; break; }
                 }
-                else temp++;
+                else
+                    temp++;
             }
-            if (temp < length && formula[temp] == '!') sheetEnd = temp + 1;
+            if (temp < length && formula[temp] == '!')
+                sheetEnd = temp + 1;
         }
         else
         {
             int temp = i;
-            while (temp < length && (char.IsLetterOrDigit(formula[temp]) || formula[temp] == '_' || formula[temp] == '$')) temp++;
-            if (temp < length && formula[temp] == '!') sheetEnd = temp + 1;
+            while (temp < length && (char.IsLetterOrDigit(formula[temp]) || formula[temp] == '_' || formula[temp] == '$'))
+                temp++;
+            if (temp < length && formula[temp] == '!')
+                sheetEnd = temp + 1;
         }
 
-        if (sheetEnd != -1) i = sheetEnd;
+        if (sheetEnd != -1)
+            i = sheetEnd;
 
         // 處理欄範圍 (A:B) 或列範圍 (1:10)
         int rangeStart = i;
@@ -260,12 +282,13 @@ public static class OdfFormulaTranslator
         i = rangeStart; // 回滾
 
         // 處理標準儲存格 (A1) 或儲存格範圍 (A1:B10)
-        if (!ScanCellCoordinate(formula, ref i)) return false;
+        if (!ScanCellCoordinate(formula, ref i))
+            return false;
 
         if (i < length && formula[i] == ':')
         {
             int sepIndex = i++;
-            
+
             // 選擇性第二個工作表前綴
             int sheetEnd2 = -1;
             if (i < length && formula[i] == '\'')
@@ -275,21 +298,28 @@ public static class OdfFormulaTranslator
                 {
                     if (formula[temp] == '\'')
                     {
-                        if (temp + 1 < length && formula[temp + 1] == '\'') temp += 2;
-                        else { temp++; break; }
+                        if (temp + 1 < length && formula[temp + 1] == '\'')
+                            temp += 2;
+                        else
+                        { temp++; break; }
                     }
-                    else temp++;
+                    else
+                        temp++;
                 }
-                if (temp < length && formula[temp] == '!') sheetEnd2 = temp + 1;
+                if (temp < length && formula[temp] == '!')
+                    sheetEnd2 = temp + 1;
             }
             else
             {
                 int temp = i;
-                while (temp < length && (char.IsLetterOrDigit(formula[temp]) || formula[temp] == '_' || formula[temp] == '$')) temp++;
-                if (temp < length && formula[temp] == '!') sheetEnd2 = temp + 1;
+                while (temp < length && (char.IsLetterOrDigit(formula[temp]) || formula[temp] == '_' || formula[temp] == '$'))
+                    temp++;
+                if (temp < length && formula[temp] == '!')
+                    sheetEnd2 = temp + 1;
             }
 
-            if (sheetEnd2 != -1) i = sheetEnd2;
+            if (sheetEnd2 != -1)
+                i = sheetEnd2;
 
             if (!ScanCellCoordinate(formula, ref i))
             {
@@ -305,15 +335,21 @@ public static class OdfFormulaTranslator
     {
         int start = i;
         int length = formula.Length;
-        if (i < length && formula[i] == '$') i++;
+        if (i < length && formula[i] == '$')
+            i++;
         int colStart = i;
-        while (i < length && char.IsLetter(formula[i])) i++;
-        if (i == colStart || i >= length || formula[i] != ':') { i = start; return false; }
+        while (i < length && char.IsLetter(formula[i]))
+            i++;
+        if (i == colStart || i >= length || formula[i] != ':')
+        { i = start; return false; }
         i++; // 跳過 ':'
-        if (i < length && formula[i] == '$') i++;
+        if (i < length && formula[i] == '$')
+            i++;
         colStart = i;
-        while (i < length && char.IsLetter(formula[i])) i++;
-        if (i == colStart) { i = start; return false; }
+        while (i < length && char.IsLetter(formula[i]))
+            i++;
+        if (i == colStart)
+        { i = start; return false; }
         return true;
     }
 
@@ -321,15 +357,21 @@ public static class OdfFormulaTranslator
     {
         int start = i;
         int length = formula.Length;
-        if (i < length && formula[i] == '$') i++;
+        if (i < length && formula[i] == '$')
+            i++;
         int rowStart = i;
-        while (i < length && char.IsDigit(formula[i])) i++;
-        if (i == rowStart || i >= length || formula[i] != ':') { i = start; return false; }
+        while (i < length && char.IsDigit(formula[i]))
+            i++;
+        if (i == rowStart || i >= length || formula[i] != ':')
+        { i = start; return false; }
         i++; // 跳過 ':'
-        if (i < length && formula[i] == '$') i++;
+        if (i < length && formula[i] == '$')
+            i++;
         rowStart = i;
-        while (i < length && char.IsDigit(formula[i])) i++;
-        if (i == rowStart) { i = start; return false; }
+        while (i < length && char.IsDigit(formula[i]))
+            i++;
+        if (i == rowStart)
+        { i = start; return false; }
         return true;
     }
 
@@ -337,17 +379,24 @@ public static class OdfFormulaTranslator
     {
         int start = i;
         int length = formula.Length;
-        if (i < length && formula[i] == '$') i++;
+        if (i < length && formula[i] == '$')
+            i++;
         int colStart = i;
-        while (i < length && char.IsLetter(formula[i])) i++;
-        if (i == colStart) { i = start; return false; }
+        while (i < length && char.IsLetter(formula[i]))
+            i++;
+        if (i == colStart)
+        { i = start; return false; }
         int colLen = i - colStart;
-        if (colLen > 3) { i = start; return false; }
+        if (colLen > 3)
+        { i = start; return false; }
 
-        if (i < length && formula[i] == '$') i++;
+        if (i < length && formula[i] == '$')
+            i++;
         int rowStart = i;
-        while (i < length && char.IsDigit(formula[i])) i++;
-        if (i == rowStart) { i = start; return false; }
+        while (i < length && char.IsDigit(formula[i]))
+            i++;
+        if (i == rowStart)
+        { i = start; return false; }
 
         // 確保座標後的下一個字元不是識別碼字元
         if (i < length && (char.IsLetterOrDigit(formula[i]) || formula[i] == '_'))
@@ -366,10 +415,12 @@ public static class OdfFormulaTranslator
     /// <returns>ODF 樣式的公式字串</returns>
     public static string ExcelToOdfFormula(string excelFormula)
     {
-        if (string.IsNullOrEmpty(excelFormula)) return excelFormula;
+        if (string.IsNullOrEmpty(excelFormula))
+            return excelFormula;
 
         string inner = excelFormula;
-        if (excelFormula.StartsWith("=")) inner = excelFormula.Substring(1);
+        if (excelFormula.StartsWith("="))
+            inner = excelFormula.Substring(1);
 
         var tokens = Tokenize(inner);
         StringBuilder sb = new("oooc:=");
@@ -427,12 +478,16 @@ public static class OdfFormulaTranslator
     /// <returns>Excel 樣式的公式字串</returns>
     public static string OdfToExcelFormula(string odfFormula)
     {
-        if (string.IsNullOrEmpty(odfFormula)) return odfFormula;
+        if (string.IsNullOrEmpty(odfFormula))
+            return odfFormula;
 
         string inner = odfFormula;
-        if (odfFormula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase)) inner = odfFormula.Substring(6);
-        else if (odfFormula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase)) inner = odfFormula.Substring(4);
-        else if (odfFormula.StartsWith("=")) inner = odfFormula.Substring(1);
+        if (odfFormula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase))
+            inner = odfFormula.Substring(6);
+        else if (odfFormula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
+            inner = odfFormula.Substring(4);
+        else if (odfFormula.StartsWith("="))
+            inner = odfFormula.Substring(1);
 
         var tokens = Tokenize(inner);
         StringBuilder sb = new("=");
@@ -467,7 +522,8 @@ public static class OdfFormulaTranslator
                                 sb.Append(addr.ToExcelString());
                             }
                         }
-                        else sb.Append(raw);
+                        else
+                            sb.Append(raw);
                     }
                     catch
                     {
@@ -503,9 +559,12 @@ public static class OdfFormulaTranslator
         string prefix = "";
         string inner = formula;
 
-        if (formula.StartsWith("oooc:=")) { isOdf = true; prefix = "oooc:="; inner = formula.Substring(6); }
-        else if (formula.StartsWith("of:=")) { isOdf = true; prefix = "of:="; inner = formula.Substring(4); }
-        else if (formula.StartsWith("=")) { prefix = "="; inner = formula.Substring(1); }
+        if (formula.StartsWith("oooc:="))
+        { isOdf = true; prefix = "oooc:="; inner = formula.Substring(6); }
+        else if (formula.StartsWith("of:="))
+        { isOdf = true; prefix = "of:="; inner = formula.Substring(4); }
+        else if (formula.StartsWith("="))
+        { prefix = "="; inner = formula.Substring(1); }
 
         var tokens = Tokenize(inner);
         StringBuilder sb = new(prefix);
@@ -535,7 +594,8 @@ public static class OdfFormulaTranslator
                                 sb.Append('[').Append(shifted.ToOdfString(false)).Append(']');
                             }
                         }
-                        else sb.Append(token.Value);
+                        else
+                            sb.Append(token.Value);
                     }
                     else
                     {
@@ -579,7 +639,7 @@ public static class OdfFormulaTranslator
         if (newRow < 0 || newCol < 0)
             throw new ArgumentOutOfRangeException(nameof(addr), "Index offset results in out of bounds coordinate.");
 
-        return new OdfCellAddress(newRow, newCol, addr.SheetName, 
+        return new OdfCellAddress(newRow, newCol, addr.SheetName,
             addr.IsRowAbsolute, addr.IsColumnAbsolute, addr.IsSheetAbsolute);
     }
 

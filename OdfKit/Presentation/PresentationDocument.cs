@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -233,7 +233,7 @@ public partial class PresentationDocument : OdfDocument
     {
         var presentationNode = GetPresentationNode();
         var slideNode = new OdfNode(OdfNodeType.Element, "page", OdfNamespaces.Draw, "draw");
-        
+
         string slideName = name ?? $"Slide {_slides.Count + 1}";
         slideNode.SetAttribute("name", OdfNamespaces.Draw, slideName, "draw");
         slideNode.SetAttribute("master-page-name", OdfNamespaces.Draw, "Default", "draw");
@@ -472,7 +472,7 @@ public partial class PresentationDocument : OdfDocument
         var srcPres = sourceDoc as PresentationDocument ?? throw new ArgumentException("Source document must be a PresentationDocument.");
         var destPresNode = GetPresentationNode();
         var srcPresNode = srcPres.GetPresentationNode();
-        
+
         foreach (var child in srcPresNode.Children)
         {
             if (child.NodeType is OdfNodeType.Element)
@@ -496,8 +496,8 @@ public partial class PresentationDocument : OdfDocument
     {
         foreach (var child in parent.Children)
         {
-            if (child.NodeType is OdfNodeType.Element && 
-                string.Equals(child.LocalName, localName, StringComparison.Ordinal) && 
+            if (child.NodeType is OdfNodeType.Element &&
+                string.Equals(child.LocalName, localName, StringComparison.Ordinal) &&
                 string.Equals(child.NamespaceUri, nsUri, StringComparison.Ordinal))
             {
                 return child;
@@ -569,8 +569,8 @@ public partial class PresentationDocument : OdfDocument
         {
             foreach (var child in autoStyles.Children)
             {
-                if (child.LocalName is "presentation-page-layout" && 
-                    child.NamespaceUri == OdfNamespaces.Style && 
+                if (child.LocalName is "presentation-page-layout" &&
+                    child.NamespaceUri == OdfNamespaces.Style &&
                     child.GetAttribute("name", OdfNamespaces.Style) == name)
                 {
                     return new OdfPresentationPageLayout(child);
@@ -583,8 +583,8 @@ public partial class PresentationDocument : OdfDocument
         {
             foreach (var child in autoStyles.Children)
             {
-                if (child.LocalName is "presentation-page-layout" && 
-                    child.NamespaceUri == OdfNamespaces.Style && 
+                if (child.LocalName is "presentation-page-layout" &&
+                    child.NamespaceUri == OdfNamespaces.Style &&
                     child.GetAttribute("name", OdfNamespaces.Style) == name)
                 {
                     return new OdfPresentationPageLayout(child);
@@ -905,7 +905,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
         shapeNode.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
-        
+
         Node.AppendChild(shapeNode);
         var placeholder = new OdfPlaceholder(shapeNode, this)
         {
@@ -927,7 +927,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     {
         var frame = CreateDrawingFrame(x, y, w, h);
         OdfNode objNode = new(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
-        
+
         string href = subPath;
         if (!href.StartsWith("./"))
         {
@@ -937,12 +937,12 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
         {
             href = href.Substring(0, href.Length - 1);
         }
-        
+
         objNode.SetAttribute("href", OdfNamespaces.XLink, href, "xlink");
         objNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
         objNode.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
         objNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
-        
+
         frame.AppendChild(objNode);
         Node.AppendChild(frame);
         return new OdfShape(frame, this);
@@ -1021,8 +1021,10 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
         OdfLength height,
         string mimeType)
     {
-        if (string.IsNullOrWhiteSpace(packagePath)) throw new ArgumentException("封裝路徑不可為空白。", nameof(packagePath));
-        if (string.IsNullOrWhiteSpace(mimeType)) throw new ArgumentException("MIME 類型不可為空白。", nameof(mimeType));
+        if (string.IsNullOrWhiteSpace(packagePath))
+            throw new ArgumentException("封裝路徑不可為空白。", nameof(packagePath));
+        if (string.IsNullOrWhiteSpace(mimeType))
+            throw new ArgumentException("MIME 類型不可為空白。", nameof(mimeType));
 
         var frame = CreateDrawingFrame(x, y, width, height);
         var plugin = new OdfNode(OdfNodeType.Element, "plugin", OdfNamespaces.Draw, "draw");
@@ -1101,7 +1103,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         var frame = CreateDrawingFrame(x, y, w, h);
-        
+
         OdfMediaManager mediaManager = new(Document.Package);
         string imageHref = mediaManager.AddImage(imageBytes, "slide_image.png");
 
@@ -1110,7 +1112,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
         imgNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
         imgNode.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
         imgNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
-        
+
         frame.AppendChild(imgNode);
         Node.AppendChild(frame);
         return new OdfPicture(frame, this);
@@ -1255,8 +1257,10 @@ public class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     /// <returns>新建立的嵌入表格。</returns>
     public OdfEmbeddedTable AddEmbeddedTable(int rows, int columns)
     {
-        if (rows < 1) throw new ArgumentOutOfRangeException(nameof(rows));
-        if (columns < 1) throw new ArgumentOutOfRangeException(nameof(columns));
+        if (rows < 1)
+            throw new ArgumentOutOfRangeException(nameof(rows));
+        if (columns < 1)
+            throw new ArgumentOutOfRangeException(nameof(columns));
 
         var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
         for (int row = 0; row < rows; row++)
@@ -1478,12 +1482,16 @@ public sealed class OdfEmbeddedTable
 
     private OdfNode GetCell(int row, int column)
     {
-        if (row < 0) throw new ArgumentOutOfRangeException(nameof(row));
-        if (column < 0) throw new ArgumentOutOfRangeException(nameof(column));
-        if (row >= _tableNode.Children.Count) throw new ArgumentOutOfRangeException(nameof(row));
+        if (row < 0)
+            throw new ArgumentOutOfRangeException(nameof(row));
+        if (column < 0)
+            throw new ArgumentOutOfRangeException(nameof(column));
+        if (row >= _tableNode.Children.Count)
+            throw new ArgumentOutOfRangeException(nameof(row));
 
         OdfNode rowNode = _tableNode.Children[row];
-        if (column >= rowNode.Children.Count) throw new ArgumentOutOfRangeException(nameof(column));
+        if (column >= rowNode.Children.Count)
+            throw new ArgumentOutOfRangeException(nameof(column));
         return rowNode.Children[column];
     }
 }

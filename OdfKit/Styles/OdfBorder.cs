@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 
 namespace OdfKit.Styles;
@@ -117,7 +117,8 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
     /// <returns>代表目前結構的字串</returns>
     public override string ToString()
     {
-        if (Style == BorderStyle.None) return "none";
+        if (Style == BorderStyle.None)
+            return "none";
         string hexColor = $"#{Color.R:X2}{Color.G:X2}{Color.B:X2}";
         return $"{Width.ToString()} {Style.ToString().ToLowerInvariant()} {hexColor}";
     }

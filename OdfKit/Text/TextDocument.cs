@@ -171,7 +171,7 @@ public class TextDocument : OdfDocument
             startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
             var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
             endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
-            
+
             BodyTextRoot.AppendChild(startNode);
             BodyTextRoot.AppendChild(pNode);
             BodyTextRoot.AppendChild(endNode);
@@ -201,7 +201,7 @@ public class TextDocument : OdfDocument
             startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
             var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
             endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
-            
+
             BodyTextRoot.AppendChild(startNode);
             BodyTextRoot.AppendChild(hNode);
             BodyTextRoot.AppendChild(endNode);
@@ -351,8 +351,10 @@ public class TextDocument : OdfDocument
     /// <param name="referenceFormat">參照格式，預設為 "value"（顯示數值）</param>
     internal void AddSequenceRefField(OdfParagraph paragraph, string sequenceName, string referenceFormat = "value")
     {
-        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
-        if (string.IsNullOrEmpty(sequenceName)) throw new ArgumentException("序號欄位名稱不可為空。", nameof(sequenceName));
+        if (paragraph is null)
+            throw new ArgumentNullException(nameof(paragraph));
+        if (string.IsNullOrEmpty(sequenceName))
+            throw new ArgumentException("序號欄位名稱不可為空。", nameof(sequenceName));
         var fNode = OdfNodeFactory.CreateElement("sequence-ref", OdfNamespaces.Text, "text");
         fNode.SetAttribute("ref-name", OdfNamespaces.Text, sequenceName, "text");
         fNode.SetAttribute("reference-format", OdfNamespaces.Text, referenceFormat, "text");
@@ -367,8 +369,10 @@ public class TextDocument : OdfDocument
     /// <param name="referenceFormat">參照格式，預設為 "text"。</param>
     internal void AddBookmarkReferenceField(OdfParagraph paragraph, string bookmarkName, string referenceFormat = "text")
     {
-        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
-        if (string.IsNullOrEmpty(bookmarkName)) throw new ArgumentException("書籤名稱不可為空。", nameof(bookmarkName));
+        if (paragraph is null)
+            throw new ArgumentNullException(nameof(paragraph));
+        if (string.IsNullOrEmpty(bookmarkName))
+            throw new ArgumentException("書籤名稱不可為空。", nameof(bookmarkName));
 
         var fNode = OdfNodeFactory.CreateElement("bookmark-ref", OdfNamespaces.Text, "text");
         fNode.SetAttribute("ref-name", OdfNamespaces.Text, bookmarkName, "text");
@@ -412,9 +416,12 @@ public class TextDocument : OdfDocument
     /// <param name="bodyText">腳注本文內容。</param>
     internal void AddFootnote(OdfParagraph paragraph, string citation, string bodyText)
     {
-        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
-        if (citation is null) throw new ArgumentNullException(nameof(citation));
-        if (bodyText is null) throw new ArgumentNullException(nameof(bodyText));
+        if (paragraph is null)
+            throw new ArgumentNullException(nameof(paragraph));
+        if (citation is null)
+            throw new ArgumentNullException(nameof(citation));
+        if (bodyText is null)
+            throw new ArgumentNullException(nameof(bodyText));
         AppendNote(paragraph, "footnote", $"ftn{_footnoteCounter++}", citation, bodyText);
     }
 
@@ -426,9 +433,12 @@ public class TextDocument : OdfDocument
     /// <param name="bodyText">尾注本文內容。</param>
     internal void AddEndnote(OdfParagraph paragraph, string citation, string bodyText)
     {
-        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
-        if (citation is null) throw new ArgumentNullException(nameof(citation));
-        if (bodyText is null) throw new ArgumentNullException(nameof(bodyText));
+        if (paragraph is null)
+            throw new ArgumentNullException(nameof(paragraph));
+        if (citation is null)
+            throw new ArgumentNullException(nameof(citation));
+        if (bodyText is null)
+            throw new ArgumentNullException(nameof(bodyText));
         AppendNote(paragraph, "endnote", $"etn{_endnoteCounter++}", citation, bodyText);
     }
 
@@ -460,7 +470,7 @@ public class TextDocument : OdfDocument
     {
         var idxNode = OdfNodeFactory.CreateElement("alphabetical-index", OdfNamespaces.Text, "text");
         idxNode.SetAttribute("name", OdfNamespaces.Text, title, "text");
-        
+
         var sourceNode = OdfNodeFactory.CreateElement("alphabetical-index-source", OdfNamespaces.Text, "text");
         idxNode.AppendChild(sourceNode);
 
@@ -484,7 +494,7 @@ public class TextDocument : OdfDocument
     {
         var bibNode = OdfNodeFactory.CreateElement("bibliography", OdfNamespaces.Text, "text");
         bibNode.SetAttribute("name", OdfNamespaces.Text, title, "text");
-        
+
         var sourceNode = OdfNodeFactory.CreateElement("bibliography-source", OdfNamespaces.Text, "text");
         bibNode.AppendChild(sourceNode);
 
@@ -539,9 +549,11 @@ public class TextDocument : OdfDocument
     {
         var markNode = OdfNodeFactory.CreateElement("alphabetical-index-mark", OdfNamespaces.Text, "text");
         markNode.SetAttribute("string-value", OdfNamespaces.Text, stringValue, "text");
-        if (key1 is not null) markNode.SetAttribute("key1", OdfNamespaces.Text, key1, "text");
-        if (key2 is not null) markNode.SetAttribute("key2", OdfNamespaces.Text, key2, "text");
-        
+        if (key1 is not null)
+            markNode.SetAttribute("key1", OdfNamespaces.Text, key1, "text");
+        if (key2 is not null)
+            markNode.SetAttribute("key2", OdfNamespaces.Text, key2, "text");
+
         paragraph.Node.AppendChild(markNode);
         return new OdfAlphabeticalIndexMark(markNode);
     }
@@ -662,7 +674,7 @@ public class TextDocument : OdfDocument
     internal OdfRuby AddRuby(OdfParagraph paragraph, string baseText, string rubyText)
     {
         var rubyNode = OdfNodeFactory.CreateElement("ruby", OdfNamespaces.Text, "text");
-        
+
         var baseNode = OdfNodeFactory.CreateElement("ruby-base", OdfNamespaces.Text, "text");
         baseNode.TextContent = baseText;
         rubyNode.AppendChild(baseNode);
@@ -714,7 +726,8 @@ public class TextDocument : OdfDocument
             if (child.LocalName == "master-page" && child.NamespaceUri == OdfNamespaces.Style)
             {
                 string? n = child.GetAttribute("name", OdfNamespaces.Style);
-                if (!string.IsNullOrEmpty(n)) names.Add(n!);
+                if (!string.IsNullOrEmpty(n))
+                    names.Add(n!);
             }
         }
         return names;
@@ -740,12 +753,12 @@ public class TextDocument : OdfDocument
         tocNode.AppendChild(sourceNode);
 
         var bodyNode = OdfNodeFactory.CreateElement("index-body", OdfNamespaces.Text, "text");
-        
+
         var titlePara = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
         titlePara.SetAttribute("style-name", OdfNamespaces.Text, "Contents_20_Heading", "text");
         titlePara.TextContent = title;
         bodyNode.AppendChild(titlePara);
-        
+
         tocNode.AppendChild(bodyNode);
         BodyTextRoot.AppendChild(tocNode);
 
@@ -807,7 +820,7 @@ public class TextDocument : OdfDocument
                         Text = replacement
                     };
                     styleAction(midRun);
-                    
+
                     var right = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = text.Substring(index + search.Length) };
 
                     var parent = node.Parent;
@@ -854,13 +867,13 @@ public class TextDocument : OdfDocument
                 {
                     var match = regex.Match(text);
                     int index = match.Index;
-                    
+
                     var left = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = text.Substring(0, index) };
                     var mid = new OdfNode(OdfNodeType.Element, "span", OdfNamespaces.Text, "text");
                     var midRun = new OdfTextRun(mid, this);
                     midRun.Text = regex.Replace(match.Value, replacement);
                     styleAction(midRun);
-                    
+
                     var right = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = text.Substring(index + match.Length) };
 
                     var parent = node.Parent;
@@ -977,8 +990,10 @@ public class TextDocument : OdfDocument
     /// <param name="mathMlXmlString">MathML 結構的 XML 字串內容</param>
     internal void AddFormula(OdfParagraph paragraph, string mathMlXmlString)
     {
-        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
-        if (string.IsNullOrWhiteSpace(mathMlXmlString)) throw new ArgumentException("MathML XML content cannot be empty.", nameof(mathMlXmlString));
+        if (paragraph is null)
+            throw new ArgumentNullException(nameof(paragraph));
+        if (string.IsNullOrWhiteSpace(mathMlXmlString))
+            throw new ArgumentException("MathML XML content cannot be empty.", nameof(mathMlXmlString));
 
         // 驗證 mathMlXmlString 是否為格式正確的 XML
         try
@@ -995,7 +1010,7 @@ public class TextDocument : OdfDocument
 
         Package.WriteEntry($"{folder}/content.xml", System.Text.Encoding.UTF8.GetBytes(mathDocXml), "text/xml");
         Package.WriteEntry($"{folder}/mimetype", System.Text.Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.formula"), "application/vnd.oasis.opendocument.formula");
-        
+
         Package.SaveManifestToEntries();
 
         var frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
@@ -1040,8 +1055,10 @@ public class TextDocument : OdfDocument
     /// <param name="comment">註解物件執行個體</param>
     internal void AddComment(OdfParagraph paragraph, OdfComment comment)
     {
-        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
-        if (comment is null) throw new ArgumentNullException(nameof(comment));
+        if (paragraph is null)
+            throw new ArgumentNullException(nameof(paragraph));
+        if (comment is null)
+            throw new ArgumentNullException(nameof(comment));
 
         var node = comment.ToXmlNode();
         if (node.LocalName == "annotation-list")
@@ -1151,8 +1168,10 @@ public class TextDocument : OdfDocument
     /// <returns>新建立的區段物件。</returns>
     public OdfSection AddSubDocumentReference(string name, string subDocumentUri)
     {
-        if (string.IsNullOrEmpty(name)) throw new ArgumentException("區段名稱不可為空。", nameof(name));
-        if (string.IsNullOrEmpty(subDocumentUri)) throw new ArgumentException("子文件 URI 不可為空。", nameof(subDocumentUri));
+        if (string.IsNullOrEmpty(name))
+            throw new ArgumentException("區段名稱不可為空。", nameof(name));
+        if (string.IsNullOrEmpty(subDocumentUri))
+            throw new ArgumentException("子文件 URI 不可為空。", nameof(subDocumentUri));
 
         var sectionNode = new OdfNode(OdfNodeType.Element, "section", OdfNamespaces.Text, "text");
         sectionNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
@@ -1285,12 +1304,14 @@ public class TextDocument : OdfDocument
     {
         var list = new List<OdfTrackedChange>();
         var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
-        if (tcNode is null) return list;
+        if (tcNode is null)
+            return list;
 
         foreach (var changedRegion in tcNode.Children)
         {
             string? id = changedRegion.GetAttribute("id", OdfNamespaces.Text);
-            if (string.IsNullOrEmpty(id)) continue;
+            if (string.IsNullOrEmpty(id))
+                continue;
 
             string changeType = "";
             string creator = "";
@@ -1299,7 +1320,7 @@ public class TextDocument : OdfDocument
 
             foreach (var child in changedRegion.Children)
             {
-                if ((child.LocalName == "insertion" || child.LocalName == "deletion" || child.LocalName == "format-change") && 
+                if ((child.LocalName == "insertion" || child.LocalName == "deletion" || child.LocalName == "format-change") &&
                     child.NamespaceUri == OdfNamespaces.Text)
                 {
                     changeType = child.LocalName;
@@ -1314,7 +1335,8 @@ public class TextDocument : OdfDocument
                 if (changeInfo is not null)
                 {
                     var creatorNode = FindChild(changeInfo, "creator", OdfNamespaces.Dc);
-                    if (creatorNode is not null) creator = creatorNode.TextContent ?? "";
+                    if (creatorNode is not null)
+                        creator = creatorNode.TextContent ?? "";
 
                     var dateNode = FindChild(changeInfo, "date", OdfNamespaces.Dc);
                     if (dateNode is not null)
@@ -1425,7 +1447,8 @@ public class TextDocument : OdfDocument
     /// <param name="family">樣式系列名稱</param>
     public void TrackFormatChange(OdfNode node, string family)
     {
-        if (!TrackedChanges) return;
+        if (!TrackedChanges)
+            return;
 
         string styleAttr = "style-name";
         string styleNs = family switch
@@ -1472,7 +1495,8 @@ public class TextDocument : OdfDocument
     /// <param name="node">要刪除的 ODF 節點</param>
     public void DeleteNode(OdfNode node)
     {
-        if (node.Parent is null) return;
+        if (node.Parent is null)
+            return;
         var parent = node.Parent;
 
         if (TrackedChanges)
@@ -1497,7 +1521,7 @@ public class TextDocument : OdfDocument
     private List<OdfNode> FindAffectedNodesForFormatChange(string changeId)
     {
         List<OdfNode> affected = [];
-        
+
         // 從修訂追蹤中尋找 targetFamily
         string? targetFamily = null;
         var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
@@ -1520,10 +1544,11 @@ public class TextDocument : OdfDocument
         }
 
         var startNode = FindChangeNode(BodyTextRoot, "change-start", changeId);
-        if (startNode is null || startNode.Parent is null) return affected;
+        if (startNode is null || startNode.Parent is null)
+            return affected;
 
         var parent = startNode.Parent;
-        
+
         if (targetFamily == "paragraph")
         {
             affected.Add(parent);
@@ -1539,9 +1564,12 @@ public class TextDocument : OdfDocument
                 bool collect = false;
                 foreach (var child in parent.Children)
                 {
-                    if (child == startNode) { collect = true; continue; }
-                    if (child == endNode) { collect = false; break; }
-                    if (collect) siblingsBetween.Add(child);
+                    if (child == startNode)
+                    { collect = true; continue; }
+                    if (child == endNode)
+                    { collect = false; break; }
+                    if (collect)
+                        siblingsBetween.Add(child);
                 }
 
                 if (siblingsBetween.Count > 0)
@@ -1568,9 +1596,12 @@ public class TextDocument : OdfDocument
                 bool collect = false;
                 foreach (var child in parent.Children)
                 {
-                    if (child == startNode) { collect = true; continue; }
-                    if (child == endNode) { collect = false; break; }
-                    if (collect) affected.Add(child);
+                    if (child == startNode)
+                    { collect = true; continue; }
+                    if (child == endNode)
+                    { collect = false; break; }
+                    if (collect)
+                        affected.Add(child);
                 }
             }
         }
@@ -1589,7 +1620,8 @@ public class TextDocument : OdfDocument
     public void AcceptAllTrackedChanges()
     {
         var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
-        if (tcNode is null) return;
+        if (tcNode is null)
+            return;
 
         var changes = new Dictionary<string, string>(StringComparer.Ordinal);
         ExtractTrackedChangesMeta(tcNode, changes);
@@ -1614,7 +1646,8 @@ public class TextDocument : OdfDocument
     public void RejectAllTrackedChanges()
     {
         var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
-        if (tcNode is null) return;
+        if (tcNode is null)
+            return;
 
         var changes = new Dictionary<string, string>(StringComparer.Ordinal);
         ExtractTrackedChangesMeta(tcNode, changes);
@@ -1685,12 +1718,14 @@ public class TextDocument : OdfDocument
     public void AcceptChange(string changeId)
     {
         var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
-        if (tcNode is null) return;
+        if (tcNode is null)
+            return;
 
         var changes = new Dictionary<string, string>(StringComparer.Ordinal);
         ExtractTrackedChangesMeta(tcNode, changes);
 
-        if (!changes.TryGetValue(changeId, out var type)) return;
+        if (!changes.TryGetValue(changeId, out var type))
+            return;
 
         if (type == "deletion")
         {
@@ -1709,8 +1744,10 @@ public class TextDocument : OdfDocument
                 break;
             }
         }
-        if (regionToRemove is not null) tcNode.RemoveChild(regionToRemove);
-        if (tcNode.Children.Count == 0) BodyTextRoot.RemoveChild(tcNode);
+        if (regionToRemove is not null)
+            tcNode.RemoveChild(regionToRemove);
+        if (tcNode.Children.Count == 0)
+            BodyTextRoot.RemoveChild(tcNode);
     }
 
     /// <summary>
@@ -1720,12 +1757,14 @@ public class TextDocument : OdfDocument
     public void RejectChange(string changeId)
     {
         var tcNode = FindChild(BodyTextRoot, "tracked-changes", OdfNamespaces.Text);
-        if (tcNode is null) return;
+        if (tcNode is null)
+            return;
 
         var changes = new Dictionary<string, string>(StringComparer.Ordinal);
         ExtractTrackedChangesMeta(tcNode, changes);
 
-        if (!changes.TryGetValue(changeId, out var type)) return;
+        if (!changes.TryGetValue(changeId, out var type))
+            return;
 
         if (type == "insertion")
         {
@@ -1790,8 +1829,10 @@ public class TextDocument : OdfDocument
                 break;
             }
         }
-        if (regionToRemove is not null) tcNode.RemoveChild(regionToRemove);
-        if (tcNode.Children.Count == 0) BodyTextRoot.RemoveChild(tcNode);
+        if (regionToRemove is not null)
+            tcNode.RemoveChild(regionToRemove);
+        if (tcNode.Children.Count == 0)
+            BodyTextRoot.RemoveChild(tcNode);
     }
 
     private void RestoreDeletedContent(OdfNode tcNode, string changeId)
@@ -1812,7 +1853,8 @@ public class TextDocument : OdfDocument
             }
         }
 
-        if (deletionContent is null) return;
+        if (deletionContent is null)
+            return;
 
         OdfNode? startNode = FindChangeNode(BodyTextRoot, "change-start", changeId);
         if (startNode is not null && startNode.Parent is not null)
@@ -1838,7 +1880,8 @@ public class TextDocument : OdfDocument
         foreach (var child in root.Children)
         {
             var found = FindChangeNode(child, localName, changeId);
-            if (found is not null) return found;
+            if (found is not null)
+                return found;
         }
         return null;
     }
@@ -1848,8 +1891,8 @@ public class TextDocument : OdfDocument
         for (int i = node.Children.Count - 1; i >= 0; i--)
         {
             var child = node.Children[i];
-            if ((child.LocalName == "change-start" || child.LocalName == "change-end") && 
-                child.NamespaceUri == OdfNamespaces.Text && 
+            if ((child.LocalName == "change-start" || child.LocalName == "change-end") &&
+                child.NamespaceUri == OdfNamespaces.Text &&
                 child.GetAttribute("change-id", OdfNamespaces.Text) == changeId)
             {
                 node.RemoveChild(child);
@@ -1866,7 +1909,8 @@ public class TextDocument : OdfDocument
         foreach (var changedRegion in tcNode.Children)
         {
             string? id = changedRegion.GetAttribute("id", OdfNamespaces.Text);
-            if (string.IsNullOrEmpty(id)) continue;
+            if (string.IsNullOrEmpty(id))
+                continue;
 
             foreach (var spec in changedRegion.Children)
             {
@@ -1965,8 +2009,10 @@ public class TextDocument : OdfDocument
     /// <param name="html">要解析的 HTML 字串片段</param>
     internal void AddHtmlFragment(OdfParagraph paragraph, string html)
     {
-        if (paragraph is null) throw new ArgumentNullException(nameof(paragraph));
-        if (string.IsNullOrWhiteSpace(html)) return;
+        if (paragraph is null)
+            throw new ArgumentNullException(nameof(paragraph));
+        if (string.IsNullOrWhiteSpace(html))
+            return;
 
         // 移除所有 HTML 註解
         html = Regex.Replace(html, @"<!--[\s\S]*?-->", "");
@@ -2076,7 +2122,7 @@ public class TextDocument : OdfDocument
                         if (styleMatch.Success)
                         {
                             string styleStr = styleMatch.Groups[1].Success ? styleMatch.Groups[1].Value : styleMatch.Groups[2].Value;
-                            
+
                             var boldMatch = Regex.Match(styleStr, @"font-weight\s*:\s*([^;]+)", RegexOptions.IgnoreCase);
                             if (boldMatch.Success)
                             {
@@ -2139,9 +2185,12 @@ public class TextDocument : OdfDocument
 
                 foreach (var state in spanStack)
                 {
-                    if (state.Bold.HasValue) activeBold = state.Bold.Value;
-                    if (state.Italic.HasValue) activeItalic = state.Italic.Value;
-                    if (state.Underline.HasValue) activeUnderline = state.Underline.Value;
+                    if (state.Bold.HasValue)
+                        activeBold = state.Bold.Value;
+                    if (state.Italic.HasValue)
+                        activeItalic = state.Italic.Value;
+                    if (state.Underline.HasValue)
+                        activeUnderline = state.Underline.Value;
                 }
 
                 if (currentHref is not null)
@@ -2215,7 +2264,7 @@ public class TextDocument : OdfDocument
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
         var srcText = sourceDoc as TextDocument ?? throw new ArgumentException("Source document must be a TextDocument.");
-        
+
         foreach (var child in srcText.BodyTextRoot.Children)
         {
             if (child.NodeType == OdfNodeType.Element)
@@ -2243,7 +2292,8 @@ public class TextDocument : OdfDocument
 
     private static string DecodeHtmlEntities(string text)
     {
-        if (string.IsNullOrEmpty(text)) return text;
+        if (string.IsNullOrEmpty(text))
+            return text;
         string decoded = System.Net.WebUtility.HtmlDecode(text);
         if (decoded.Contains("&apos;"))
         {
@@ -2273,8 +2323,10 @@ public class TextDocument : OdfDocument
                 if (child.LocalName == "font-face" && child.NamespaceUri == OdfNamespaces.Style && child.GetAttribute("name", OdfNamespaces.Style) == name)
                 {
                     child.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
-                    if (genericFamily is not null) child.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
-                    if (pitch is not null) child.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
+                    if (genericFamily is not null)
+                        child.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
+                    if (pitch is not null)
+                        child.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
                     return;
                 }
             }
@@ -2282,13 +2334,16 @@ public class TextDocument : OdfDocument
             var fontFace = new OdfNode(OdfNodeType.Element, "font-face", OdfNamespaces.Style, "style");
             fontFace.SetAttribute("name", OdfNamespaces.Style, name, "style");
             fontFace.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
-            if (genericFamily is not null) fontFace.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
-            if (pitch is not null) fontFace.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
+            if (genericFamily is not null)
+                fontFace.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
+            if (pitch is not null)
+                fontFace.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
             fontDecls.AppendChild(fontFace);
         }
 
         AddToDom(ContentDom);
-        if (StylesDom is not null) AddToDom(StylesDom);
+        if (StylesDom is not null)
+            AddToDom(StylesDom);
     }
 
     #endregion
@@ -2322,7 +2377,7 @@ public class TextDocument : OdfDocument
 
         // 1. 建立/取得 <office:forms><form:form>
         OdfNode formsNode = FindOrCreateFormsNode();
-        OdfNode formNode  = FindOrCreateChild(formsNode, "form", OdfNamespaces.Form, "form");
+        OdfNode formNode = FindOrCreateChild(formsNode, "form", OdfNamespaces.Form, "form");
         if (string.IsNullOrEmpty(formNode.GetAttribute("name", OdfNamespaces.Form)))
             formNode.SetAttribute("name", OdfNamespaces.Form, "Form1", "form");
         formNode.SetAttribute("apply-design-mode", OdfNamespaces.Form, "false", "form");
@@ -2331,13 +2386,13 @@ public class TextDocument : OdfDocument
         string elemName = type switch
         {
             OdfControlType.CheckBox => "checkbox",
-            OdfControlType.ListBox  => "listbox",
-            OdfControlType.Button   => "button",
-            _                       => "text",
+            OdfControlType.ListBox => "listbox",
+            OdfControlType.Button => "button",
+            _ => "text",
         };
         OdfNode ctrlNode = new OdfNode(OdfNodeType.Element, elemName, OdfNamespaces.Form, "form");
         ctrlNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
-        ctrlNode.SetAttribute("id",   OdfNamespaces.Form, name, "form");
+        ctrlNode.SetAttribute("id", OdfNamespaces.Form, name, "form");
         if (!string.IsNullOrEmpty(label))
             ctrlNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
         if (type == OdfControlType.TextBox && !string.IsNullOrEmpty(label))
@@ -2357,15 +2412,15 @@ public class TextDocument : OdfDocument
         formNode.AppendChild(ctrlNode);
 
         // 3. 建立 draw:frame 錨點段落
-        OdfNode para  = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+        OdfNode para = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
         OdfNode frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-        frame.SetAttribute("name",        OdfNamespaces.Draw, $"ctrl-{name}", "draw");
+        frame.SetAttribute("name", OdfNamespaces.Draw, $"ctrl-{name}", "draw");
         frame.SetAttribute("anchor-type", OdfNamespaces.Text, "paragraph", "text");
-        frame.SetAttribute("x",           OdfNamespaces.Svg,  x.ToString(),      "svg");
-        frame.SetAttribute("y",           OdfNamespaces.Svg,  y.ToString(),      "svg");
-        frame.SetAttribute("width",       OdfNamespaces.Svg,  width.ToString(),  "svg");
-        frame.SetAttribute("height",      OdfNamespaces.Svg,  height.ToString(), "svg");
-        frame.SetAttribute("z-index",     OdfNamespaces.Draw, "0", "draw");
+        frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
+        frame.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
+        frame.SetAttribute("width", OdfNamespaces.Svg, width.ToString(), "svg");
+        frame.SetAttribute("height", OdfNamespaces.Svg, height.ToString(), "svg");
+        frame.SetAttribute("z-index", OdfNamespaces.Draw, "0", "draw");
 
         OdfNode ctrlRef = new OdfNode(OdfNodeType.Element, "control", OdfNamespaces.Draw, "draw");
         ctrlRef.SetAttribute("control", OdfNamespaces.Draw, name, "draw");
@@ -2376,13 +2431,13 @@ public class TextDocument : OdfDocument
         return new OdfFormControl
         {
             ControlType = type,
-            Name        = name,
-            Label       = label,
-            X           = x,
-            Y           = y,
-            Width       = width,
-            Height      = height,
-            ListItems   = listItems ?? [],
+            Name = name,
+            Label = label,
+            X = x,
+            Y = y,
+            Width = width,
+            Height = height,
+            ListItems = listItems ?? [],
         };
     }
 
@@ -2394,7 +2449,8 @@ public class TextDocument : OdfDocument
     {
         var result = new List<OdfFormControl>();
         OdfNode? formsNode = FindFormsNode();
-        if (formsNode is null) return result;
+        if (formsNode is null)
+            return result;
 
         foreach (OdfNode formNode in formsNode.Children)
         {
@@ -2403,14 +2459,15 @@ public class TextDocument : OdfDocument
 
             foreach (OdfNode ctrl in formNode.Children)
             {
-                if (ctrl.NamespaceUri != OdfNamespaces.Form) continue;
+                if (ctrl.NamespaceUri != OdfNamespaces.Form)
+                    continue;
 
                 OdfControlType type = ctrl.LocalName switch
                 {
                     "checkbox" => OdfControlType.CheckBox,
-                    "listbox"  => OdfControlType.ListBox,
-                    "button"   => OdfControlType.Button,
-                    _          => OdfControlType.TextBox,
+                    "listbox" => OdfControlType.ListBox,
+                    "button" => OdfControlType.Button,
+                    _ => OdfControlType.TextBox,
                 };
 
                 var items = new List<string>();
@@ -2419,18 +2476,19 @@ public class TextDocument : OdfDocument
                     if (child.LocalName == "option" && child.NamespaceUri == OdfNamespaces.Form)
                     {
                         string? optLabel = child.GetAttribute("label", OdfNamespaces.Form);
-                        if (!string.IsNullOrEmpty(optLabel)) items.Add(optLabel!);
+                        if (!string.IsNullOrEmpty(optLabel))
+                            items.Add(optLabel!);
                     }
                 }
 
                 result.Add(new OdfFormControl
                 {
                     ControlType = type,
-                    Name        = ctrl.GetAttribute("name",          OdfNamespaces.Form) ?? string.Empty,
-                    Label       = ctrl.GetAttribute("label",         OdfNamespaces.Form) ?? string.Empty,
-                    Value       = ctrl.GetAttribute("value",         OdfNamespaces.Form),
-                    IsChecked   = ctrl.GetAttribute("current-state", OdfNamespaces.Form) == "checked",
-                    ListItems   = items,
+                    Name = ctrl.GetAttribute("name", OdfNamespaces.Form) ?? string.Empty,
+                    Label = ctrl.GetAttribute("label", OdfNamespaces.Form) ?? string.Empty,
+                    Value = ctrl.GetAttribute("value", OdfNamespaces.Form),
+                    IsChecked = ctrl.GetAttribute("current-state", OdfNamespaces.Form) == "checked",
+                    ListItems = items,
                 });
             }
         }
@@ -2441,7 +2499,8 @@ public class TextDocument : OdfDocument
     private OdfNode FindOrCreateFormsNode()
     {
         OdfNode? existing = FindFormsNode();
-        if (existing is not null) return existing;
+        if (existing is not null)
+            return existing;
 
         OdfNode formsNode = new OdfNode(OdfNodeType.Element, "forms", OdfNamespaces.Office, "office");
         if (BodyTextRoot.Children.Count > 0)
@@ -2831,7 +2890,8 @@ public class OdfPageSetup
 
         if (value is null)
         {
-            if (target is not null) mp.RemoveChild(target);
+            if (target is not null)
+                mp.RemoveChild(target);
         }
         else
         {
@@ -2840,7 +2900,7 @@ public class OdfPageSetup
                 target = new OdfNode(OdfNodeType.Element, localName, OdfNamespaces.Style, "style");
                 mp.AppendChild(target);
             }
-            
+
             OdfNode? pNode = null;
             foreach (var child in target.Children)
             {
@@ -2895,8 +2955,10 @@ public class OdfPageSetup
                 if (child.LocalName == "font-face" && child.NamespaceUri == OdfNamespaces.Style && child.GetAttribute("name", OdfNamespaces.Style) == name)
                 {
                     child.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
-                    if (genericFamily is not null) child.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
-                    if (pitch is not null) child.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
+                    if (genericFamily is not null)
+                        child.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
+                    if (pitch is not null)
+                        child.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
                     return;
                 }
             }
@@ -2904,13 +2966,16 @@ public class OdfPageSetup
             var fontFace = new OdfNode(OdfNodeType.Element, "font-face", OdfNamespaces.Style, "style");
             fontFace.SetAttribute("name", OdfNamespaces.Style, name, "style");
             fontFace.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
-            if (genericFamily is not null) fontFace.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
-            if (pitch is not null) fontFace.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
+            if (genericFamily is not null)
+                fontFace.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
+            if (pitch is not null)
+                fontFace.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
             fontDecls.AppendChild(fontFace);
         }
 
         AddToDom(_doc.ContentDom);
-        if (_doc.StylesDom is not null) AddToDom(_doc.StylesDom);
+        if (_doc.StylesDom is not null)
+            AddToDom(_doc.StylesDom);
     }
 }
 
@@ -3608,7 +3673,7 @@ public class OdfParagraph
             startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
             var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
             endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
-            
+
             Node.AppendChild(startNode);
             Node.AppendChild(spanNode);
             Node.AppendChild(endNode);
@@ -4252,8 +4317,9 @@ public class OdfTable
 
             for (int c = startCol; c < startCol + colSpan; c++)
             {
-                if (r == startRow && c == startCol) continue;
-                
+                if (r == startRow && c == startCol)
+                    continue;
+
                 var cellToRemove = cellsInRow[c];
                 var coveredNode = new OdfNode(OdfNodeType.Element, "covered-table-cell", OdfNamespaces.Table, "table");
                 rowNode.InsertBefore(coveredNode, cellToRemove);
@@ -4487,9 +4553,12 @@ public class OdfList
     /// <returns>新建立的清單項目。</returns>
     public OdfListItem AddItem(string text, int level = 1)
     {
-        if (level < 1) level = 1;
-        if (level > 10) level = 10;
-        if (level == 1) return AddListItem(text);
+        if (level < 1)
+            level = 1;
+        if (level > 10)
+            level = 10;
+        if (level == 1)
+            return AddListItem(text);
 
         OdfNode currentList = Node;
         for (int l = 1; l < level; l++)

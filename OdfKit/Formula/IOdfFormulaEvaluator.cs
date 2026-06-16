@@ -1,4 +1,4 @@
-using OdfKit.Spreadsheet;
+﻿using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula;
 

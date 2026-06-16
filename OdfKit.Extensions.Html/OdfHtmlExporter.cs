@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,7 +34,8 @@ public static class OdfHtmlExporter
     /// <exception cref="ArgumentNullException">當 document 為 null 時引發。</exception>
     public static string Export(TextDocument document, OdfHtmlExportOptions? options = null)
     {
-        if (document is null) throw new ArgumentNullException(nameof(document));
+        if (document is null)
+            throw new ArgumentNullException(nameof(document));
         options ??= new OdfHtmlExportOptions();
 
         var context = BrowsingContext.New(Configuration.Default);
@@ -83,36 +84,36 @@ public static class OdfHtmlExporter
             switch (child.LocalName)
             {
                 case "h":
-                {
-                    int level = int.TryParse(child.GetAttribute("outline-level", OdfNamespaces.Text), out int l) ? l : 1;
-                    level = level < 1 ? 1 : (level > 6 ? 6 : level);
-                    var hElem = htmlDoc.CreateElement($"h{level}");
-                    hElem.TextContent = child.TextContent ?? string.Empty;
-                    parent.AppendChild(hElem);
-                    break;
-                }
-                case "p":
-                {
-                    var pElem = htmlDoc.CreateElement("p");
-                    ConvertParagraphContent(child, pElem, htmlDoc);
-                    parent.AppendChild(pElem);
-                    break;
-                }
-                case "list":
-                {
-                    var ul = htmlDoc.CreateElement("ul");
-                    foreach (var item in child.Children)
                     {
-                        if (item.LocalName == "list-item" && item.NamespaceUri == OdfNamespaces.Text)
-                        {
-                            var li = htmlDoc.CreateElement("li");
-                            li.TextContent = item.TextContent ?? string.Empty;
-                            ul.AppendChild(li);
-                        }
+                        int level = int.TryParse(child.GetAttribute("outline-level", OdfNamespaces.Text), out int l) ? l : 1;
+                        level = level < 1 ? 1 : (level > 6 ? 6 : level);
+                        var hElem = htmlDoc.CreateElement($"h{level}");
+                        hElem.TextContent = child.TextContent ?? string.Empty;
+                        parent.AppendChild(hElem);
+                        break;
                     }
-                    parent.AppendChild(ul);
-                    break;
-                }
+                case "p":
+                    {
+                        var pElem = htmlDoc.CreateElement("p");
+                        ConvertParagraphContent(child, pElem, htmlDoc);
+                        parent.AppendChild(pElem);
+                        break;
+                    }
+                case "list":
+                    {
+                        var ul = htmlDoc.CreateElement("ul");
+                        foreach (var item in child.Children)
+                        {
+                            if (item.LocalName == "list-item" && item.NamespaceUri == OdfNamespaces.Text)
+                            {
+                                var li = htmlDoc.CreateElement("li");
+                                li.TextContent = item.TextContent ?? string.Empty;
+                                ul.AppendChild(li);
+                            }
+                        }
+                        parent.AppendChild(ul);
+                        break;
+                    }
                 default:
                     ConvertBodyNodes(child, parent, htmlDoc);
                     break;

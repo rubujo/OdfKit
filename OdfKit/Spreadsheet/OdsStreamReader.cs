@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -42,7 +42,8 @@ public sealed class OdsStreamReader : IDisposable
     /// <param name="stream">ODS 檔案資料流（需為 ZIP 相容格式）</param>
     public OdsStreamReader(Stream stream)
     {
-        if (stream is null) throw new ArgumentNullException(nameof(stream));
+        if (stream is null)
+            throw new ArgumentNullException(nameof(stream));
         _zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: false);
         ScanSheetNames();
     }
@@ -53,7 +54,8 @@ public sealed class OdsStreamReader : IDisposable
     /// <param name="path">ODS 檔案路徑</param>
     public OdsStreamReader(string path)
     {
-        if (path is null) throw new ArgumentNullException(nameof(path));
+        if (path is null)
+            throw new ArgumentNullException(nameof(path));
         _zip = ZipFile.OpenRead(path);
         ScanSheetNames();
     }
@@ -135,7 +137,8 @@ public sealed class OdsStreamReader : IDisposable
                 if (!_xmlReader.IsEmptyElement)
                 {
                     using var sub = _xmlReader.ReadSubtree();
-                    while (sub.Read()) { }
+                    while (sub.Read())
+                    { }
                 }
             }
         }
@@ -143,7 +146,8 @@ public sealed class OdsStreamReader : IDisposable
 
     private bool ReadNextRow()
     {
-        if (_xmlReader is null) return false;
+        if (_xmlReader is null)
+            return false;
 
         while (_xmlReader.Read())
         {
@@ -194,10 +198,10 @@ public sealed class OdsStreamReader : IDisposable
                     int colRepeat = ParseRepeat(rowSub.GetAttribute("number-columns-repeated", OdfNamespaces.Table), MaxColRepeat);
 
                     string? valueType = rowSub.GetAttribute("value-type", OdfNamespaces.Office);
-                    string? numValue  = rowSub.GetAttribute("value", OdfNamespaces.Office);
+                    string? numValue = rowSub.GetAttribute("value", OdfNamespaces.Office);
                     string? dateValue = rowSub.GetAttribute("date-value", OdfNamespaces.Office);
                     string? boolValue = rowSub.GetAttribute("boolean-value", OdfNamespaces.Office);
-                    string? formula   = rowSub.GetAttribute("formula", OdfNamespaces.Table);
+                    string? formula = rowSub.GetAttribute("formula", OdfNamespaces.Table);
 
                     string? textContent = null;
                     if (!rowSub.IsEmptyElement)
@@ -237,7 +241,8 @@ public sealed class OdsStreamReader : IDisposable
         {
             int maxCol = -1;
             foreach (var (col, _) in cells)
-                if (col > maxCol) maxCol = col;
+                if (col > maxCol)
+                    maxCol = col;
 
             for (int i = 0; i <= maxCol; i++)
                 _currentRowData.Add(null);
@@ -293,7 +298,8 @@ public sealed class OdsStreamReader : IDisposable
     /// <param name="ordinal">欄位索引（0-based）</param>
     public object? GetValue(int ordinal)
     {
-        if (ordinal < 0 || ordinal >= _currentRowData.Count) return null;
+        if (ordinal < 0 || ordinal >= _currentRowData.Count)
+            return null;
         return _currentRowData[ordinal];
     }
 

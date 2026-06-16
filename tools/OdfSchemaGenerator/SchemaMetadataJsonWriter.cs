@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 
@@ -14,8 +14,10 @@ public sealed class SchemaMetadataJsonWriter
     /// </summary>
     public void Write(SchemaMetadata metadata, TextWriter writer)
     {
-        if (metadata == null) throw new ArgumentNullException(nameof(metadata));
-        if (writer == null) throw new ArgumentNullException(nameof(writer));
+        if (metadata == null)
+            throw new ArgumentNullException(nameof(metadata));
+        if (writer == null)
+            throw new ArgumentNullException(nameof(writer));
 
         writer.WriteLine("{");
         writer.Write("  \"source\": ");

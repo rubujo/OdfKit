@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Text;
-using OdfKit.DOM;
 using OdfKit.Core;
+using OdfKit.DOM;
 
 namespace OdfKit.Styles;
 
@@ -19,7 +19,8 @@ public static class OdfNumberFormatEngine
     /// <returns>格式化後的字串。</returns>
     public static string Format(double value, OdfNode numberStyleNode)
     {
-        if (numberStyleNode is null) throw new ArgumentNullException(nameof(numberStyleNode));
+        if (numberStyleNode is null)
+            throw new ArgumentNullException(nameof(numberStyleNode));
         string styleName = numberStyleNode.LocalName;
 
         if (styleName == "percentage-style")
@@ -42,7 +43,8 @@ public static class OdfNumberFormatEngine
     /// <returns>格式化後的字串。</returns>
     public static string Format(DateTime value, OdfNode dateStyleNode)
     {
-        if (dateStyleNode is null) throw new ArgumentNullException(nameof(dateStyleNode));
+        if (dateStyleNode is null)
+            throw new ArgumentNullException(nameof(dateStyleNode));
         return dateStyleNode.LocalName == "time-style"
             ? FormatTime(value, dateStyleNode)
             : FormatDate(value, dateStyleNode);
@@ -57,11 +59,14 @@ public static class OdfNumberFormatEngine
     /// <returns>格式化後的字串；若找不到對應樣式則回傳原始值的字串表示。</returns>
     public static string Format(object? value, string styleName, OdfNode stylesDom)
     {
-        if (value is null) return string.Empty;
-        if (string.IsNullOrEmpty(styleName)) return value.ToString() ?? string.Empty;
+        if (value is null)
+            return string.Empty;
+        if (string.IsNullOrEmpty(styleName))
+            return value.ToString() ?? string.Empty;
 
         OdfNode? formatNode = FindFormatNode(stylesDom, styleName);
-        if (formatNode is null) return value.ToString() ?? string.Empty;
+        if (formatNode is null)
+            return value.ToString() ?? string.Empty;
 
         return value switch
         {
@@ -91,10 +96,12 @@ public static class OdfNumberFormatEngine
                 && IsFormatStyleElement(child.LocalName))
             {
                 string? name = child.GetAttribute("name", OdfNamespaces.Style);
-                if (name == styleName) return child;
+                if (name == styleName)
+                    return child;
             }
             var found = FindInTree(child, styleName);
-            if (found is not null) return found;
+            if (found is not null)
+                return found;
         }
         return null;
     }
@@ -108,7 +115,8 @@ public static class OdfNumberFormatEngine
         var sb = new StringBuilder();
         foreach (var child in styleNode.Children)
         {
-            if (child.NamespaceUri != OdfNamespaces.Number) continue;
+            if (child.NamespaceUri != OdfNamespaces.Number)
+                continue;
             switch (child.LocalName)
             {
                 case "number":
@@ -135,7 +143,8 @@ public static class OdfNumberFormatEngine
         var sb = new StringBuilder();
         foreach (var child in styleNode.Children)
         {
-            if (child.NamespaceUri != OdfNamespaces.Number) continue;
+            if (child.NamespaceUri != OdfNamespaces.Number)
+                continue;
             switch (child.LocalName)
             {
                 case "number":
@@ -179,7 +188,8 @@ public static class OdfNumberFormatEngine
         var sb = new StringBuilder();
         foreach (var child in styleNode.Children)
         {
-            if (child.NamespaceUri != OdfNamespaces.Number) continue;
+            if (child.NamespaceUri != OdfNamespaces.Number)
+                continue;
             switch (child.LocalName)
             {
                 case "year":
@@ -213,7 +223,8 @@ public static class OdfNumberFormatEngine
         var sb = new StringBuilder();
         foreach (var child in styleNode.Children)
         {
-            if (child.NamespaceUri != OdfNamespaces.Number) continue;
+            if (child.NamespaceUri != OdfNamespaces.Number)
+                continue;
             switch (child.LocalName)
             {
                 case "hours":

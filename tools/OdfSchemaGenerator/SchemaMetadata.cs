@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace OdfKit.Tools.OdfSchemaGenerator;
 
@@ -16,6 +16,11 @@ public sealed class SchemaMetadata
     /// Gets or sets the schema source date.
     /// </summary>
     public string SourceDate { get; set; } = "generated";
+
+    /// <summary>
+    /// Gets or sets the ODF version string (e.g. "1.1", "1.2", "1.3", "1.4") this schema represents.
+    /// </summary>
+    public string Version { get; set; } = "1.4";
 
     /// <summary>
     /// Gets the extracted elements.

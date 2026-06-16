@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -25,8 +25,10 @@ public static class OdfCsvExporter
     /// <exception cref="ArgumentOutOfRangeException">當 ExportSheetIndex 超出範圍時引發。</exception>
     public static void ExportToStream(SpreadsheetDocument workbook, Stream csvStream, OdfCsvOptions? options = null)
     {
-        if (workbook is null) throw new ArgumentNullException(nameof(workbook));
-        if (csvStream is null) throw new ArgumentNullException(nameof(csvStream));
+        if (workbook is null)
+            throw new ArgumentNullException(nameof(workbook));
+        if (csvStream is null)
+            throw new ArgumentNullException(nameof(csvStream));
         options ??= new OdfCsvOptions();
 
         if (options.ExportSheetIndex < 0 || options.ExportSheetIndex >= workbook.Worksheets.Count)
@@ -42,8 +44,10 @@ public static class OdfCsvExporter
             var val = pair.Value;
             if (val is not null && !(val is string s && s.Length == 0))
             {
-                if (pair.Key.Row > maxRow) maxRow = pair.Key.Row;
-                if (pair.Key.Col > maxCol) maxCol = pair.Key.Col;
+                if (pair.Key.Row > maxRow)
+                    maxRow = pair.Key.Row;
+                if (pair.Key.Col > maxCol)
+                    maxCol = pair.Key.Col;
             }
         }
 
@@ -63,7 +67,8 @@ public static class OdfCsvExporter
     /// <param name="options">CSV 選項；若為 null 則使用預設值。</param>
     public static void ExportToFile(SpreadsheetDocument workbook, string csvPath, OdfCsvOptions? options = null)
     {
-        if (csvPath is null) throw new ArgumentNullException(nameof(csvPath));
+        if (csvPath is null)
+            throw new ArgumentNullException(nameof(csvPath));
         using var stream = File.Create(csvPath);
         ExportToStream(workbook, stream, options);
     }
@@ -258,7 +263,8 @@ internal sealed class OdfTableSheetDataReader : DbDataReader
     public override int GetValues(object[] values)
     {
         int count = Math.Min(FieldCount, values.Length);
-        for (int i = 0; i < count; i++) values[i] = GetValue(i);
+        for (int i = 0; i < count; i++)
+            values[i] = GetValue(i);
         return count;
     }
     public override bool NextResult() => false;

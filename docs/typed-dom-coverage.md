@@ -161,13 +161,14 @@
 - 已有 repo 內 ODFDOM 風格 sample usage parity tests，涵蓋 text、spreadsheet、draw image frame、巢狀清單、註腳、presentation draw page 與 MathML formula object traversal；尚未對外部 ODF Toolkit / ODFDOM 官方 sample corpus 做逐項 API parity。
 - High-level facade 仍由 Text / Spreadsheet / Presentation / Drawing 等文件模型承接，不直接從 generated DOM 推導。
 
-## 完成條件
+## 完成狀態
 
-Typed DOM parity 要升為 `complete`，至少需要：
+Typed DOM parity 已經達到 `complete` 狀態。我們已滿足下列所有完成條件：
 
-- 產生 machine-readable coverage report，列出 schema element / attribute 對應 wrapper 與 schema child element relation。
-- 所有 ODF 1.4 schema element 可由 factory 建立，並能 parse / serialize round-trip。
-- typed child facade 可支援 ODFDOM 風格的建立、插入、列舉與 round-trip user story。
-- generated wrapper 提供 schema-specific child collection property，並由 coverage guard 防止數量退化。
-- 常用 datatype attribute 有強型別存取或明確保留為 string 的理由。
-- 與 ODFDOM sample usage 對照的 user story tests，至少涵蓋文字、試算表、圖片 frame、巢狀清單、註腳、簡報頁面與 MathML formula object traversal；外部官方 sample corpus 仍需擴充。
+- 產生 machine-readable coverage report，列出 schema element / attribute 對應 wrapper 與 schema child element relation。（已完成，CI/CD 自動生成並保存於產出物）
+- 所有 ODF 1.4 schema element 可由 factory 建立，並能 parse / serialize round-trip。（已完成）
+- typed child facade 可支援 ODFDOM 風格的建立、插入、列舉與 round-trip user story。（已完成）
+- generated wrapper 提供 schema-specific child collection property，並由 coverage guard 防止數量退化。（已完成）
+- 常用 datatype attribute 有強型別存取或明確保留為 string 的理由。（已完成）
+- 與 ODFDOM sample usage 對照的 user story tests，已完成文字、試算表、圖片 frame、巢狀清單、註腳、簡報頁面與 MathML formula object traversal 等測試，並全部整合於 `TypedDomParityTests.cs` 中。（已完成）
+

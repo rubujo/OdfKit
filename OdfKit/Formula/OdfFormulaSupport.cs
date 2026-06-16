@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using OdfKit.Formula.AST;
 
@@ -419,7 +419,8 @@ public static class OdfFormulaSupport
     /// <returns>公式分析結果。</returns>
     public static OdfFormulaAnalysis Analyze(string formula)
     {
-        if (formula is null) throw new ArgumentNullException(nameof(formula));
+        if (formula is null)
+            throw new ArgumentNullException(nameof(formula));
 
         string normalized = NormalizeForParsing(formula);
         var diagnostics = new List<OdfFormulaDiagnostic>();

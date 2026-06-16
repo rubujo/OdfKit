@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -86,13 +86,14 @@ public abstract class OdfIndex
     protected OdfNode FindOrCreateChild(OdfNode parent, string localName, string ns, string prefix)
     {
         var existing = FindChild(parent, localName, ns);
-        if (existing is not null) return existing;
+        if (existing is not null)
+            return existing;
 
         var child = OdfNodeFactory.CreateElement(localName, ns, prefix);
         parent.AppendChild(child);
         return child;
     }
-    
+
     /// <summary>
     /// 更新索引內容。
     /// </summary>
@@ -154,11 +155,13 @@ public class OdfTableOfContents : OdfIndex
     public override void Update()
     {
         var body = FindChild(Node, "index-body", OdfNamespaces.Text);
-        if (body is null) return;
+        if (body is null)
+            return;
 
         var title = FindChild(body, "index-title", OdfNamespaces.Text) ?? body.Children.FirstOrDefault(c => c.LocalName == "p" && c.NamespaceUri == OdfNamespaces.Text);
         body.Children.Clear();
-        if (title is not null) body.AppendChild(title);
+        if (title is not null)
+            body.AppendChild(title);
 
         var headings = new List<OdfHeadingInfo>();
         ScanHeadings(Doc.BodyTextRoot, headings);
@@ -182,7 +185,8 @@ public class OdfTableOfContents : OdfIndex
 
         foreach (var heading in headings)
         {
-            if (heading.Level > maxLevel) continue;
+            if (heading.Level > maxLevel)
+                continue;
 
             templates.TryGetValue(heading.Level, out var template);
             var entryPara = BuildTocEntryParagraph(heading, template);
@@ -199,20 +203,20 @@ public class OdfTableOfContents : OdfIndex
 
     private void ScanHeadings(OdfNode node, List<OdfHeadingInfo> headings)
     {
-        if (node.NodeType == OdfNodeType.Element && 
-            node.LocalName == "h" && 
+        if (node.NodeType == OdfNodeType.Element &&
+            node.LocalName == "h" &&
             node.NamespaceUri == OdfNamespaces.Text)
         {
             int level = int.TryParse(node.GetAttribute("outline-level", OdfNamespaces.Text), out var lvl) ? lvl : 1;
-            
+
             string? anchor = null;
-            var refMark = FindChild(node, "reference-mark", OdfNamespaces.Text) ?? 
+            var refMark = FindChild(node, "reference-mark", OdfNamespaces.Text) ??
                           FindChild(node, "reference-mark-start", OdfNamespaces.Text);
             if (refMark is not null)
             {
                 anchor = refMark.GetAttribute("name", OdfNamespaces.Text);
             }
-            
+
             if (string.IsNullOrEmpty(anchor))
             {
                 anchor = $"_Toc_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
@@ -223,10 +227,10 @@ public class OdfTableOfContents : OdfIndex
                 else
                     node.AppendChild(newRef);
             }
-            
+
             headings.Add(new OdfHeadingInfo(node.TextContent, level, anchor!));
         }
-        
+
         foreach (var child in node.Children)
         {
             if (child.LocalName == "index-body" && child.NamespaceUri == OdfNamespaces.Text)
@@ -372,11 +376,13 @@ public class OdfAlphabeticalIndex : OdfIndex
     public override void Update()
     {
         var body = FindChild(Node, "index-body", OdfNamespaces.Text);
-        if (body is null) return;
+        if (body is null)
+            return;
 
         var title = FindChild(body, "index-title", OdfNamespaces.Text) ?? body.Children.FirstOrDefault(c => c.LocalName == "p" && c.NamespaceUri == OdfNamespaces.Text);
         body.Children.Clear();
-        if (title is not null) body.AppendChild(title);
+        if (title is not null)
+            body.AppendChild(title);
 
         var marks = new List<OdfIndexMarkInfo>();
         ScanIndexMarks(Doc.BodyTextRoot, marks);
@@ -644,11 +650,13 @@ public class OdfBibliography : OdfIndex
     public override void Update()
     {
         var body = FindChild(Node, "index-body", OdfNamespaces.Text);
-        if (body is null) return;
+        if (body is null)
+            return;
 
         var title = FindChild(body, "index-title", OdfNamespaces.Text) ?? body.Children.FirstOrDefault(c => c.LocalName == "p" && c.NamespaceUri == OdfNamespaces.Text);
         body.Children.Clear();
-        if (title is not null) body.AppendChild(title);
+        if (title is not null)
+            body.AppendChild(title);
 
         var rawMarks = new List<OdfBibliographyMarkInfo>();
         ScanBibliographyMarks(Doc.BodyTextRoot, rawMarks);
@@ -693,13 +701,13 @@ public class OdfBibliography : OdfIndex
 
     private void ScanBibliographyMarks(OdfNode node, List<OdfBibliographyMarkInfo> rawMarks)
     {
-        if (node.NodeType == OdfNodeType.Element && 
-            node.LocalName == "bibliography-mark" && 
+        if (node.NodeType == OdfNodeType.Element &&
+            node.LocalName == "bibliography-mark" &&
             node.NamespaceUri == OdfNamespaces.Text)
         {
             string id = node.GetAttribute("identifier", OdfNamespaces.Text) ?? "Ref";
             string type = node.GetAttribute("bibliography-type", OdfNamespaces.Text) ?? "book";
-            
+
             var meta = new Dictionary<string, string>();
             foreach (var attr in node.Attributes)
             {
@@ -708,7 +716,7 @@ public class OdfBibliography : OdfIndex
                     meta[attr.Key.LocalName] = attr.Value;
                 }
             }
-            
+
             rawMarks.Add(new OdfBibliographyMarkInfo(id, type, meta));
         }
 
@@ -751,10 +759,13 @@ public class OdfBibliography : OdfIndex
         {
             // 預設遞補格式：[Identifier] Author, Title (Year)
             string text = $"[{bib.Identifier}] ";
-            if (bib.Metadata.TryGetValue("author", out var author)) text += $"{author}, ";
-            if (bib.Metadata.TryGetValue("title", out var title)) text += $"\"{title}\"";
-            if (bib.Metadata.TryGetValue("year", out var year)) text += $" ({year})";
-            
+            if (bib.Metadata.TryGetValue("author", out var author))
+                text += $"{author}, ";
+            if (bib.Metadata.TryGetValue("title", out var title))
+                text += $"\"{title}\"";
+            if (bib.Metadata.TryGetValue("year", out var year))
+                text += $" ({year})";
+
             p.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = text });
         }
 

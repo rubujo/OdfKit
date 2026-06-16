@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -65,9 +65,12 @@ public class LibreOfficeRenderer
     /// <exception cref="FileNotFoundException">當轉檔完成後找不到預期的目標檔案時擲出</exception>
     public void Convert(OdfDocument document, string outputPath, string format)
     {
-        if (document is null) throw new ArgumentNullException(nameof(document));
-        if (string.IsNullOrEmpty(outputPath)) throw new ArgumentNullException(nameof(outputPath));
-        if (format is null) throw new ArgumentNullException(nameof(format));
+        if (document is null)
+            throw new ArgumentNullException(nameof(document));
+        if (string.IsNullOrEmpty(outputPath))
+            throw new ArgumentNullException(nameof(outputPath));
+        if (format is null)
+            throw new ArgumentNullException(nameof(format));
 
         string? sandboxDir = null;
         try
@@ -89,15 +92,17 @@ public class LibreOfficeRenderer
 
             // Write ODF bytes to input sandbox file
             string inputFileName = "document.odt"; // safe fallback name
-            if (document is PresentationDocument) inputFileName = "document.odp";
-            else if (document is SpreadsheetDocument) inputFileName = "document.ods";
-            
+            if (document is PresentationDocument)
+                inputFileName = "document.odp";
+            else if (document is SpreadsheetDocument)
+                inputFileName = "document.ods";
+
             string inputFilePath = Path.Combine(sandboxDir, inputFileName);
             File.WriteAllBytes(inputFilePath, document.SaveToBytes());
             // Force soffice to launch in a completely isolated profile, allowing safe parallel processing.
             // Use standard forward slashes for the profile URI path.
             string profileUri = "file:///" + profileDir.Replace('\\', '/');
-            
+
             var startInfo = new ProcessStartInfo
             {
                 FileName = LibreOfficePath,
@@ -174,7 +179,7 @@ public class LibreOfficeRenderer
             {
                 File.Delete(outputPath);
             }
-            
+
             string? outDir = Path.GetDirectoryName(outputPath);
             if (!string.IsNullOrEmpty(outDir))
             {
@@ -200,13 +205,15 @@ public class LibreOfficeRenderer
             ];
             foreach (var path in paths)
             {
-                if (File.Exists(path)) return path;
+                if (File.Exists(path))
+                    return path;
             }
         }
         else if (OperatingSystem.IsMacOS())
         {
             var path = "/Applications/LibreOffice.app/Contents/MacOS/soffice";
-            if (File.Exists(path)) return path;
+            if (File.Exists(path))
+                return path;
         }
         else if (OperatingSystem.IsLinux())
         {
@@ -216,7 +223,8 @@ public class LibreOfficeRenderer
             ];
             foreach (var path in paths)
             {
-                if (File.Exists(path)) return path;
+                if (File.Exists(path))
+                    return path;
             }
         }
 #else

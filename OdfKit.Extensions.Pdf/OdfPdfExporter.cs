@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
@@ -58,38 +58,39 @@ public static class OdfPdfExporter
 
         foreach (var node in odfDoc.BodyTextRoot.Children)
         {
-            if (node.NamespaceUri != OdfNamespaces.Text) continue;
+            if (node.NamespaceUri != OdfNamespaces.Text)
+                continue;
 
             switch (node.LocalName)
             {
                 case "h":
-                {
-                    int level = int.TryParse(node.GetAttribute("outline-level", OdfNamespaces.Text), out int l) ? l : 1;
-                    string styleName = level == 1 ? StyleNames.Heading1
-                        : level == 2 ? StyleNames.Heading2
-                        : StyleNames.Heading3;
-                    var para = section.AddParagraph(node.TextContent ?? string.Empty, styleName);
-                    break;
-                }
-                case "p":
-                {
-                    var para = section.AddParagraph();
-                    ConvertParagraphContent(node, para);
-                    break;
-                }
-                case "list":
-                {
-                    foreach (var item in node.Children)
                     {
-                        if (item.LocalName == "list-item")
-                        {
-                            var para = section.AddParagraph(item.TextContent ?? string.Empty);
-                            para.Format.LeftIndent = "1cm";
-                            para.Format.FirstLineIndent = "-0.5cm";
-                        }
+                        int level = int.TryParse(node.GetAttribute("outline-level", OdfNamespaces.Text), out int l) ? l : 1;
+                        string styleName = level == 1 ? StyleNames.Heading1
+                            : level == 2 ? StyleNames.Heading2
+                            : StyleNames.Heading3;
+                        var para = section.AddParagraph(node.TextContent ?? string.Empty, styleName);
+                        break;
                     }
-                    break;
-                }
+                case "p":
+                    {
+                        var para = section.AddParagraph();
+                        ConvertParagraphContent(node, para);
+                        break;
+                    }
+                case "list":
+                    {
+                        foreach (var item in node.Children)
+                        {
+                            if (item.LocalName == "list-item")
+                            {
+                                var para = section.AddParagraph(item.TextContent ?? string.Empty);
+                                para.Format.LeftIndent = "1cm";
+                                para.Format.FirstLineIndent = "-0.5cm";
+                            }
+                        }
+                        break;
+                    }
             }
         }
 
@@ -120,7 +121,8 @@ public static class OdfPdfExporter
 
         if (child.NodeType == OdfNodeType.Element)
         {
-            if (child.NamespaceUri != OdfNamespaces.Text) return;
+            if (child.NamespaceUri != OdfNamespaces.Text)
+                return;
 
             switch (child.LocalName)
             {
@@ -163,7 +165,8 @@ public static class OdfPdfExporter
 
         if (child.NodeType == OdfNodeType.Element)
         {
-            if (child.NamespaceUri != OdfNamespaces.Text) return;
+            if (child.NamespaceUri != OdfNamespaces.Text)
+                return;
 
             switch (child.LocalName)
             {

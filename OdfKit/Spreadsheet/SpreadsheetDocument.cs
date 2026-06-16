@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -223,7 +223,7 @@ public class SpreadsheetDocument : OdfDocument
         byte[] hash = OdfEncryption.Pbkdf2(passwordBytes, salt, 50000, 32, "sha256");
 
         var docSettings = FindOrCreateSettingsNode(SettingsDom, "document-settings");
-        
+
         OdfNode? mapNode = null;
         foreach (var child in docSettings.Children)
         {
@@ -239,7 +239,7 @@ public class SpreadsheetDocument : OdfDocument
             mapNode.SetAttribute("name", OdfNamespaces.Config, "WorkbookSettings", "config");
             docSettings.AppendChild(mapNode);
         }
-        
+
         OdfNode? entry = null;
         if (mapNode.Children.Count > 0)
         {
@@ -274,10 +274,12 @@ public class SpreadsheetDocument : OdfDocument
     /// <returns>若驗證成功則為 true，否則為 false</returns>
     public bool VerifyWorkbookPassword(string password)
     {
-        if (!WorkbookStructureProtected) return true;
+        if (!WorkbookStructureProtected)
+            return true;
 
         var docSettings = FindSettingsNode(SettingsDom, "document-settings");
-        if (docSettings is null) return false;
+        if (docSettings is null)
+            return false;
 
         OdfNode? mapNode = null;
         foreach (var child in docSettings.Children)
@@ -288,7 +290,8 @@ public class SpreadsheetDocument : OdfDocument
                 break;
             }
         }
-        if (mapNode is null || mapNode.Children.Count == 0) return false;
+        if (mapNode is null || mapNode.Children.Count == 0)
+            return false;
         var entry = mapNode.Children[0];
 
         string? keyStr = FindConfigItemValue(entry, "WorkbookProtectionKey");
@@ -296,7 +299,8 @@ public class SpreadsheetDocument : OdfDocument
         string? saltStr = FindConfigItemValue(entry, "WorkbookProtectionKeyDigestSalt");
         string? derivation = FindConfigItemValue(entry, "WorkbookProtectionKeyDerivation");
 
-        if (keyStr is null || algo is null || saltStr is null) return false;
+        if (keyStr is null || algo is null || saltStr is null)
+            return false;
 
         byte[] salt = Convert.FromBase64String(saltStr);
         byte[] expectedHash = Convert.FromBase64String(keyStr);
@@ -356,7 +360,7 @@ public class SpreadsheetDocument : OdfDocument
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
         var srcSpreadsheet = sourceDoc as SpreadsheetDocument ?? throw new ArgumentException("Source document must be a SpreadsheetDocument.");
-        
+
         foreach (var child in srcSpreadsheet.SheetsRoot.Children)
         {
             if (child.NodeType == OdfNodeType.Element)
@@ -430,11 +434,14 @@ public class SpreadsheetDocument : OdfDocument
     /// <param name="chart">圖表設定物件。</param>
     public void AddChart(string sheetName, OdfCellAddress anchor, OdfChartDefinition chart)
     {
-        if (string.IsNullOrEmpty(sheetName)) throw new ArgumentException("工作表名稱不可為空。", nameof(sheetName));
-        if (chart is null) throw new ArgumentNullException(nameof(chart));
+        if (string.IsNullOrEmpty(sheetName))
+            throw new ArgumentException("工作表名稱不可為空。", nameof(sheetName));
+        if (chart is null)
+            throw new ArgumentNullException(nameof(chart));
 
         var sheet = GetSheet(sheetName);
-        if (sheet is null) throw new KeyNotFoundException($"找不到名稱為 '{sheetName}' 的工作表。");
+        if (sheet is null)
+            throw new KeyNotFoundException($"找不到名稱為 '{sheetName}' 的工作表。");
 
         // 1. 尋找或建立 table:shapes
         OdfNode? shapesNode = null;
@@ -583,11 +590,14 @@ public class SpreadsheetDocument : OdfDocument
     /// <param name="validation">資料驗證設定物件。</param>
     public void AddDataValidation(string sheetName, OdfDataValidation validation)
     {
-        if (string.IsNullOrEmpty(sheetName)) throw new ArgumentException("工作表名稱不可為空。", nameof(sheetName));
-        if (validation is null) throw new ArgumentNullException(nameof(validation));
+        if (string.IsNullOrEmpty(sheetName))
+            throw new ArgumentException("工作表名稱不可為空。", nameof(sheetName));
+        if (validation is null)
+            throw new ArgumentNullException(nameof(validation));
 
         var sheet = GetSheet(sheetName);
-        if (sheet is null) throw new KeyNotFoundException($"找不到名稱為 '{sheetName}' 的工作表。");
+        if (sheet is null)
+            throw new KeyNotFoundException($"找不到名稱為 '{sheetName}' 的工作表。");
 
         // 1. 取得或建立 table:content-validations 節點
         OdfNode? validationsNode = null;
@@ -624,7 +634,8 @@ public class SpreadsheetDocument : OdfDocument
                     break;
                 }
             }
-            if (nameExists) validationIndex++;
+            if (nameExists)
+                validationIndex++;
         } while (nameExists);
 
         // 3. 建立 table:content-validation
@@ -683,7 +694,8 @@ public class SpreadsheetDocument : OdfDocument
     internal string GetOrCreateCharacterStyle(bool bold, bool italic, bool underline, OdfColor? color, string? fontFamily)
     {
         string key = $"b:{bold}|i:{italic}|u:{underline}|c:{color?.Value ?? ""}|f:{fontFamily ?? ""}";
-        if (_richTextStyleCache.TryGetValue(key, out string? cached)) return cached;
+        if (_richTextStyleCache.TryGetValue(key, out string? cached))
+            return cached;
 
         var autoStyles = ContentDom.FindChildElement("automatic-styles", OdfNamespaces.Office);
         if (autoStyles is null)
@@ -697,18 +709,24 @@ public class SpreadsheetDocument : OdfDocument
 
         int idx = _richTextStyleCache.Count + 1;
         string styleName;
-        do { styleName = $"RT{idx++}"; } while (StyleEngine.StyleExists(styleName));
+        do
+        { styleName = $"RT{idx++}"; } while (StyleEngine.StyleExists(styleName));
 
         var styleNode = new OdfNode(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
         styleNode.SetAttribute("name", OdfNamespaces.Style, styleName);
         styleNode.SetAttribute("family", OdfNamespaces.Style, "text");
 
         var props = new OdfNode(OdfNodeType.Element, "text-properties", OdfNamespaces.Style, "style");
-        if (bold) props.SetAttribute("font-weight", OdfNamespaces.Fo, "bold", "fo");
-        if (italic) props.SetAttribute("font-style", OdfNamespaces.Fo, "italic", "fo");
-        if (underline) props.SetAttribute("text-underline-style", OdfNamespaces.Style, "solid", "style");
-        if (color.HasValue) props.SetAttribute("color", OdfNamespaces.Fo, color.Value.Value, "fo");
-        if (!string.IsNullOrEmpty(fontFamily)) props.SetAttribute("font-name", OdfNamespaces.Style, fontFamily!, "style");
+        if (bold)
+            props.SetAttribute("font-weight", OdfNamespaces.Fo, "bold", "fo");
+        if (italic)
+            props.SetAttribute("font-style", OdfNamespaces.Fo, "italic", "fo");
+        if (underline)
+            props.SetAttribute("text-underline-style", OdfNamespaces.Style, "solid", "style");
+        if (color.HasValue)
+            props.SetAttribute("color", OdfNamespaces.Fo, color.Value.Value, "fo");
+        if (!string.IsNullOrEmpty(fontFamily))
+            props.SetAttribute("font-name", OdfNamespaces.Style, fontFamily!, "style");
         styleNode.AppendChild(props);
         autoStyles.AppendChild(styleNode);
         StyleEngine.RebuildStyleIndex();
@@ -968,14 +986,16 @@ public class OdfTableSheet
     /// <returns>若驗證成功則為 true，否則為 false</returns>
     public bool VerifyPassword(string password)
     {
-        if (!IsProtected) return true;
+        if (!IsProtected)
+            return true;
 
         string? keyStr = TableNode.GetAttribute("protection-key", OdfNamespaces.Table);
         string? algo = TableNode.GetAttribute("protection-key-digest-algorithm", OdfNamespaces.Table);
         string? saltStr = TableNode.GetAttribute("protection-key-digest-salt", OdfNamespaces.Table);
         string? derivation = TableNode.GetAttribute("protection-key-derivation", OdfNamespaces.Table);
 
-        if (keyStr is null || algo is null || saltStr is null) return false;
+        if (keyStr is null || algo is null || saltStr is null)
+            return false;
 
         byte[] salt = Convert.FromBase64String(saltStr);
         byte[] expectedHash = Convert.FromBase64String(keyStr);
@@ -1096,18 +1116,19 @@ public class OdfTableSheet
         {
             for (int c = startCol; c <= endCol; c++)
             {
-                if (r == startRow && c == startCol) continue;
-                
+                if (r == startRow && c == startCol)
+                    continue;
+
                 var coveredNode = new OdfNode(OdfNodeType.Element, "covered-table-cell", OdfNamespaces.Table, "table");
                 ReplaceCellNode(r, c, coveredNode);
-                
+
                 if (outerBorder.HasValue)
                 {
                     var cellBorderTop = (r == startRow) ? outerBorder.Value : OdfBorder.None;
                     var cellBorderBottom = (r == endRow) ? outerBorder.Value : OdfBorder.None;
                     var cellBorderLeft = (c == startCol) ? outerBorder.Value : OdfBorder.None;
                     var cellBorderRight = (c == endCol) ? outerBorder.Value : OdfBorder.None;
-                    
+
                     var coveredCell = new OdfCell(coveredNode, r, c, _doc);
                     coveredCell.SetBorders(cellBorderTop, cellBorderBottom, cellBorderLeft, cellBorderRight);
                 }
@@ -1158,7 +1179,8 @@ public class OdfTableSheet
             {
                 weight += (c <= 127) ? 1.0 : 1.85;
             }
-            if (weight > maxWeight) maxWeight = weight;
+            if (weight > maxWeight)
+                maxWeight = weight;
         }
 
         double totalChars = maxWeight + 1.5;
@@ -1175,7 +1197,7 @@ public class OdfTableSheet
     public void AddConditionalFormat(OdfCellRange range, string conditionValue, string styleName)
     {
         const string calcextNs = OdfNamespaces.CalcExt;
-        
+
         OdfNode? formatsNode = null;
         foreach (var child in TableNode.Children)
         {
@@ -1193,9 +1215,11 @@ public class OdfTableSheet
 
         var format = new OdfNode(OdfNodeType.Element, "conditional-format", calcextNs, "calcext");
         var startAddr = range.StartAddress;
-        if (startAddr.SheetName is null) startAddr = new OdfCellAddress(startAddr.Row, startAddr.Column, Name, startAddr.IsRowAbsolute, startAddr.IsColumnAbsolute, startAddr.IsSheetAbsolute);
+        if (startAddr.SheetName is null)
+            startAddr = new OdfCellAddress(startAddr.Row, startAddr.Column, Name, startAddr.IsRowAbsolute, startAddr.IsColumnAbsolute, startAddr.IsSheetAbsolute);
         var endAddr = range.EndAddress;
-        if (endAddr.SheetName is null) endAddr = new OdfCellAddress(endAddr.Row, endAddr.Column, Name, endAddr.IsRowAbsolute, endAddr.IsColumnAbsolute, endAddr.IsSheetAbsolute);
+        if (endAddr.SheetName is null)
+            endAddr = new OdfCellAddress(endAddr.Row, endAddr.Column, Name, endAddr.IsRowAbsolute, endAddr.IsColumnAbsolute, endAddr.IsSheetAbsolute);
 
         string rangeAddr = $"{startAddr.ToOdfString(false)}:{endAddr.ToOdfString(false)}";
         format.SetAttribute("target-range-address", calcextNs, rangeAddr, "calcext");
@@ -1228,22 +1252,22 @@ public class OdfTableSheet
         var colorScale = new OdfNode(OdfNodeType.Element, "color-scale", calcextNs, "calcext");
 
         var entryMin = new OdfNode(OdfNodeType.Element, "color-scale-entry", calcextNs, "calcext");
-        entryMin.SetAttribute("type",  calcextNs, "min",           "calcext");
-        entryMin.SetAttribute("color", calcextNs, minColor.Value,  "calcext");
+        entryMin.SetAttribute("type", calcextNs, "min", "calcext");
+        entryMin.SetAttribute("color", calcextNs, minColor.Value, "calcext");
         colorScale.AppendChild(entryMin);
 
         if (midColor.HasValue)
         {
             var entryMid = new OdfNode(OdfNodeType.Element, "color-scale-entry", calcextNs, "calcext");
-            entryMid.SetAttribute("type",  calcextNs, "percentile", "calcext");
-            entryMid.SetAttribute("value", calcextNs, "50",         "calcext");
+            entryMid.SetAttribute("type", calcextNs, "percentile", "calcext");
+            entryMid.SetAttribute("value", calcextNs, "50", "calcext");
             entryMid.SetAttribute("color", calcextNs, midColor.Value.Value, "calcext");
             colorScale.AppendChild(entryMid);
         }
 
         var entryMax = new OdfNode(OdfNodeType.Element, "color-scale-entry", calcextNs, "calcext");
-        entryMax.SetAttribute("type",  calcextNs, "max",           "calcext");
-        entryMax.SetAttribute("color", calcextNs, maxColor.Value,  "calcext");
+        entryMax.SetAttribute("type", calcextNs, "max", "calcext");
+        entryMax.SetAttribute("color", calcextNs, maxColor.Value, "calcext");
         colorScale.AppendChild(entryMax);
 
         format.AppendChild(colorScale);
@@ -1291,14 +1315,14 @@ public class OdfTableSheet
 
         string iconTypeName = iconSet switch
         {
-            OdfIconSetType.ThreeArrows        => "3Arrows",
+            OdfIconSetType.ThreeArrows => "3Arrows",
             OdfIconSetType.ThreeTrafficLights => "3TrafficLights1",
-            OdfIconSetType.FourRating         => "4Rating",
-            OdfIconSetType.FiveRating         => "5Rating",
-            _                                 => "3Arrows",
+            OdfIconSetType.FourRating => "4Rating",
+            OdfIconSetType.FiveRating => "5Rating",
+            _ => "3Arrows",
         };
         int entryCount = iconSet is OdfIconSetType.FiveRating ? 5
-                       : iconSet is OdfIconSetType.FourRating  ? 4
+                       : iconSet is OdfIconSetType.FourRating ? 4
                        : 3;
 
         var iconSetNode = new OdfNode(OdfNodeType.Element, "icon-set", calcextNs, "calcext");
@@ -1308,8 +1332,8 @@ public class OdfTableSheet
         {
             int pct = i == 0 ? 0 : (int)Math.Round(100.0 * i / entryCount);
             var entry = new OdfNode(OdfNodeType.Element, "icon-set-entry", calcextNs, "calcext");
-            entry.SetAttribute("type",  calcextNs, "percent",              "calcext");
-            entry.SetAttribute("value", calcextNs, pct.ToString(),         "calcext");
+            entry.SetAttribute("type", calcextNs, "percent", "calcext");
+            entry.SetAttribute("value", calcextNs, pct.ToString(), "calcext");
             iconSetNode.AppendChild(entry);
         }
 
@@ -1352,7 +1376,8 @@ public class OdfTableSheet
     /// <exception cref="ArgumentNullException">當 dataRange 為 null 時拋出。</exception>
     public void AddSparklineGroup(OdfCellRange? dataRange, OdfCellAddress hostCell, SparklineType type = SparklineType.Line)
     {
-        if (dataRange is null) throw new ArgumentNullException(nameof(dataRange));
+        if (dataRange is null)
+            throw new ArgumentNullException(nameof(dataRange));
 
         const string calcextNs = OdfNamespaces.CalcExt;
 
@@ -1423,8 +1448,10 @@ public class OdfTableSheet
     /// <exception cref="ArgumentOutOfRangeException">當列數或欄數小於 0 時擲出。</exception>
     public void FreezePanes(int frozenRows, int frozenColumns)
     {
-        if (frozenRows < 0) throw new ArgumentOutOfRangeException(nameof(frozenRows));
-        if (frozenColumns < 0) throw new ArgumentOutOfRangeException(nameof(frozenColumns));
+        if (frozenRows < 0)
+            throw new ArgumentOutOfRangeException(nameof(frozenRows));
+        if (frozenColumns < 0)
+            throw new ArgumentOutOfRangeException(nameof(frozenColumns));
 
         TableNode.SetAttribute("frozen-rows", OdfNamespaces.Table, frozenRows.ToString(CultureInfo.InvariantCulture), "table");
         TableNode.SetAttribute("frozen-columns", OdfNamespaces.Table, frozenColumns.ToString(CultureInfo.InvariantCulture), "table");
@@ -1451,8 +1478,10 @@ public class OdfTableSheet
     /// <exception cref="ArgumentOutOfRangeException">當列索引或欄索引小於 0 時拋出。</exception>
     public void SplitPanes(int splitRow, int splitColumn)
     {
-        if (splitRow < 0) throw new ArgumentOutOfRangeException(nameof(splitRow));
-        if (splitColumn < 0) throw new ArgumentOutOfRangeException(nameof(splitColumn));
+        if (splitRow < 0)
+            throw new ArgumentOutOfRangeException(nameof(splitRow));
+        if (splitColumn < 0)
+            throw new ArgumentOutOfRangeException(nameof(splitColumn));
 
         var viewSettings = _doc.GetOrCreateSettingsItemSet("view-settings");
         var views = FindOrCreateChild(viewSettings, "config-item-map-indexed", OdfNamespaces.Config, "config");
@@ -1489,8 +1518,10 @@ public class OdfTableSheet
     /// <param name="allowedValues">允許的值。</param>
     public void AddValidationList(OdfCellRange range, string name, params string[] allowedValues)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("驗證名稱不可空白。", nameof(name));
-        if (allowedValues is null || allowedValues.Length == 0) throw new ArgumentException("驗證清單至少需要一個允許值。", nameof(allowedValues));
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("驗證名稱不可空白。", nameof(name));
+        if (allowedValues is null || allowedValues.Length == 0)
+            throw new ArgumentException("驗證清單至少需要一個允許值。", nameof(allowedValues));
 
         var validations = FindOrCreateChild(TableNode, "content-validations", OdfNamespaces.Table, "table");
         var validation = FindOrCreateNamedChild(validations, "content-validation", name);
@@ -1617,7 +1648,8 @@ public class OdfTableSheet
             if (RowContainerNames.Contains(child.LocalName) && child.NamespaceUri == OdfNamespaces.Table)
             {
                 foreach (var inner in child.Children)
-                    if (inner.LocalName == "table-row" && inner.NamespaceUri == OdfNamespaces.Table) list.Add(inner);
+                    if (inner.LocalName == "table-row" && inner.NamespaceUri == OdfNamespaces.Table)
+                        list.Add(inner);
             }
             else if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
                 list.Add(child);
@@ -1739,10 +1771,12 @@ public class OdfTableSheet
             {
                 foreach (var hr in child.Children)
                 {
-                    if (hr.LocalName != "table-row" || hr.NamespaceUri != OdfNamespaces.Table) continue;
+                    if (hr.LocalName != "table-row" || hr.NamespaceUri != OdfNamespaces.Table)
+                        continue;
                     int rep = 1;
                     string? rs = hr.GetAttribute("number-rows-repeated", OdfNamespaces.Table);
-                    if (!string.IsNullOrEmpty(rs) && int.TryParse(rs, out int rc)) rep = rc;
+                    if (!string.IsNullOrEmpty(rs) && int.TryParse(rs, out int rc))
+                        rep = rc;
                     if (row >= currentRowIndex && row < currentRowIndex + rep)
                         return (forWrite && rep > 1) ? SplitRepeatedRow(hr, row, currentRowIndex, rep) : hr;
                     currentRowIndex += rep;
@@ -1816,7 +1850,8 @@ public class OdfTableSheet
             {
                 foreach (var row in child.Children)
                 {
-                    if (row.LocalName != "table-row" || row.NamespaceUri != OdfNamespaces.Table) continue;
+                    if (row.LocalName != "table-row" || row.NamespaceUri != OdfNamespaces.Table)
+                        continue;
                     foreach (var item in EnumerateExistingCellsInRow(row, rowIndex))
                     {
                         yield return item;
@@ -1891,14 +1926,18 @@ public class OdfTableSheet
             {
                 foreach (var hr in child.Children)
                 {
-                    if (hr.LocalName != "table-row" || hr.NamespaceUri != OdfNamespaces.Table) continue;
+                    if (hr.LocalName != "table-row" || hr.NamespaceUri != OdfNamespaces.Table)
+                        continue;
                     int rep = 1;
                     string? rs = hr.GetAttribute("number-rows-repeated", OdfNamespaces.Table);
-                    if (!string.IsNullOrEmpty(rs) && int.TryParse(rs, out int rc)) rep = rc;
-                    if (row >= currentRowIndex && row < currentRowIndex + rep) { targetRowNode = hr; break; }
+                    if (!string.IsNullOrEmpty(rs) && int.TryParse(rs, out int rc))
+                        rep = rc;
+                    if (row >= currentRowIndex && row < currentRowIndex + rep)
+                    { targetRowNode = hr; break; }
                     currentRowIndex += rep;
                 }
-                if (targetRowNode is not null) break;
+                if (targetRowNode is not null)
+                    break;
             }
             else if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
             {
@@ -2247,7 +2286,8 @@ public class OdfTableSheet
     public OdfCellRange? GetPrintArea()
     {
         string? attr = TableNode.GetAttribute("print-ranges", OdfNamespaces.Table);
-        if (string.IsNullOrEmpty(attr)) return null;
+        if (string.IsNullOrEmpty(attr))
+            return null;
         return OdfCellRange.TryParse(attr!, out var r) ? r : (OdfCellRange?)null;
     }
 
@@ -2294,7 +2334,8 @@ public class OdfTableSheet
     public void ClearPrintTitleRows()
     {
         OdfNode? headerRows = FindChildElement(TableNode, "header-rows", OdfNamespaces.Table);
-        if (headerRows is null) return;
+        if (headerRows is null)
+            return;
 
         // 把 header-rows 內的列移回 TableNode 主體
         OdfNode? insertAfter = headerRows;
@@ -2347,7 +2388,8 @@ public class OdfTableSheet
     public void ClearPrintTitleColumns()
     {
         OdfNode? headerCols = FindChildElement(TableNode, "header-columns", OdfNamespaces.Table);
-        if (headerCols is null) return;
+        if (headerCols is null)
+            return;
 
         OdfNode? insertAfter = headerCols;
         foreach (var child in new List<OdfNode>(headerCols.Children))
@@ -2432,8 +2474,10 @@ public class OdfTableSheet
         OdfNode? autoStylesSection = null;
         foreach (var child in _doc.StylesDom.Children)
         {
-            if (child.LocalName == "master-styles" && child.NamespaceUri == OdfNamespaces.Office) masterStylesSection = child;
-            else if (child.LocalName == "automatic-styles" && child.NamespaceUri == OdfNamespaces.Office) autoStylesSection = child;
+            if (child.LocalName == "master-styles" && child.NamespaceUri == OdfNamespaces.Office)
+                masterStylesSection = child;
+            else if (child.LocalName == "automatic-styles" && child.NamespaceUri == OdfNamespaces.Office)
+                autoStylesSection = child;
         }
 
         autoStylesSection ??= new OdfNode(OdfNodeType.Element, "automatic-styles", OdfNamespaces.Office, "office");
@@ -2461,7 +2505,8 @@ public class OdfTableSheet
             var mp = new OdfNode(OdfNodeType.Element, "master-page", OdfNamespaces.Style, "style");
             mp.SetAttribute("name", OdfNamespaces.Style, masterPageName, "style");
             mp.SetAttribute("page-layout-name", OdfNamespaces.Style, pageLayoutName, "style");
-            if (masterStylesSection.Parent is null) _doc.StylesDom.AppendChild(masterStylesSection);
+            if (masterStylesSection.Parent is null)
+                _doc.StylesDom.AppendChild(masterStylesSection);
             masterStylesSection.AppendChild(mp);
         }
 
@@ -2474,7 +2519,8 @@ public class OdfTableSheet
         }
 
         // Page layout not found — create it
-        if (autoStylesSection.Parent is null) _doc.StylesDom.AppendChild(autoStylesSection);
+        if (autoStylesSection.Parent is null)
+            _doc.StylesDom.AppendChild(autoStylesSection);
         var pageLayout = new OdfNode(OdfNodeType.Element, "page-layout", OdfNamespaces.Style, "style");
         pageLayout.SetAttribute("name", OdfNamespaces.Style, pageLayoutName, "style");
         var plProps = new OdfNode(OdfNodeType.Element, "page-layout-properties", OdfNamespaces.Style, "style");
@@ -2522,11 +2568,13 @@ public class OdfTableSheet
     {
         foreach (var child in new List<OdfNode>(TableNode.Children))
         {
-            if (child.LocalName != "table-row-group" || child.NamespaceUri != OdfNamespaces.Table) continue;
+            if (child.LocalName != "table-row-group" || child.NamespaceUri != OdfNamespaces.Table)
+                continue;
             OdfNode? insertAfter = child;
             foreach (var row in new List<OdfNode>(child.Children))
             {
-                if (row.LocalName != "table-row" || row.NamespaceUri != OdfNamespaces.Table) continue;
+                if (row.LocalName != "table-row" || row.NamespaceUri != OdfNamespaces.Table)
+                    continue;
                 child.RemoveChild(row);
                 TableNode.InsertAfter(row, insertAfter);
                 insertAfter = row;
@@ -2568,11 +2616,13 @@ public class OdfTableSheet
     {
         foreach (var child in new List<OdfNode>(TableNode.Children))
         {
-            if (child.LocalName != "table-column-group" || child.NamespaceUri != OdfNamespaces.Table) continue;
+            if (child.LocalName != "table-column-group" || child.NamespaceUri != OdfNamespaces.Table)
+                continue;
             OdfNode? insertAfter = child;
             foreach (var col in new List<OdfNode>(child.Children))
             {
-                if (col.LocalName != "table-column" || col.NamespaceUri != OdfNamespaces.Table) continue;
+                if (col.LocalName != "table-column" || col.NamespaceUri != OdfNamespaces.Table)
+                    continue;
                 child.RemoveChild(col);
                 TableNode.InsertAfter(col, insertAfter);
                 insertAfter = col;
@@ -2611,40 +2661,40 @@ public class OdfTableSheet
         bool firstRowAsHeader = true,
         bool firstColumnAsLabel = true)
     {
-        string xStr  = (x     ?? OdfLength.FromCentimeters(1)).ToString();
-        string yStr  = (y     ?? OdfLength.FromCentimeters(1)).ToString();
-        string wStr  = (width ?? OdfLength.FromCentimeters(12)).ToString();
-        string hStr  = (height ?? OdfLength.FromCentimeters(7)).ToString();
+        string xStr = (x ?? OdfLength.FromCentimeters(1)).ToString();
+        string yStr = (y ?? OdfLength.FromCentimeters(1)).ToString();
+        string wStr = (width ?? OdfLength.FromCentimeters(12)).ToString();
+        string hStr = (height ?? OdfLength.FromCentimeters(7)).ToString();
 
         // 1. 唯一物件名稱
         int objectIndex = 1;
         while (_doc.Package.HasEntry($"Object {objectIndex}/content.xml"))
             objectIndex++;
         string objectName = $"Object {objectIndex}";
-        string objectDir  = $"{objectName}/";
+        string objectDir = $"{objectName}/";
 
         // 2. 建立 table:shapes > draw:frame > draw:object
         OdfNode shapesNode = FindOrCreateShapesNode();
         var frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
         frame.SetAttribute("z-index", OdfNamespaces.Draw, "0", "draw");
-        frame.SetAttribute("width",   OdfNamespaces.Svg, wStr, "svg");
-        frame.SetAttribute("height",  OdfNamespaces.Svg, hStr, "svg");
-        frame.SetAttribute("x",       OdfNamespaces.Svg, xStr, "svg");
-        frame.SetAttribute("y",       OdfNamespaces.Svg, yStr, "svg");
+        frame.SetAttribute("width", OdfNamespaces.Svg, wStr, "svg");
+        frame.SetAttribute("height", OdfNamespaces.Svg, hStr, "svg");
+        frame.SetAttribute("x", OdfNamespaces.Svg, xStr, "svg");
+        frame.SetAttribute("y", OdfNamespaces.Svg, yStr, "svg");
 
         string anchorAddr = new OdfCellAddress(
             dataRange.StartAddress.Row, dataRange.StartAddress.Column).ToOdfString(false);
         frame.SetAttribute("start-cell-address", OdfNamespaces.Table, anchorAddr, "table");
-        frame.SetAttribute("end-cell-address",   OdfNamespaces.Table, anchorAddr, "table");
+        frame.SetAttribute("end-cell-address", OdfNamespaces.Table, anchorAddr, "table");
         frame.SetAttribute("start-x", OdfNamespaces.Table, xStr, "table");
         frame.SetAttribute("start-y", OdfNamespaces.Table, yStr, "table");
-        frame.SetAttribute("end-x",   OdfNamespaces.Table, wStr, "table");
-        frame.SetAttribute("end-y",   OdfNamespaces.Table, hStr, "table");
+        frame.SetAttribute("end-x", OdfNamespaces.Table, wStr, "table");
+        frame.SetAttribute("end-y", OdfNamespaces.Table, hStr, "table");
 
         var objectNode = new OdfNode(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
-        objectNode.SetAttribute("href",    OdfNamespaces.XLink, $"./{objectName}", "xlink");
-        objectNode.SetAttribute("type",    OdfNamespaces.XLink, "simple", "xlink");
-        objectNode.SetAttribute("show",    OdfNamespaces.XLink, "embed", "xlink");
+        objectNode.SetAttribute("href", OdfNamespaces.XLink, $"./{objectName}", "xlink");
+        objectNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+        objectNode.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
         objectNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
         frame.AppendChild(objectNode);
         shapesNode.AppendChild(frame);
@@ -2659,12 +2709,12 @@ public class OdfTableSheet
         // 5. 設定圖表類型與資料繫結
         chartDoc.ChartClass = chartType switch
         {
-            OdfChartType.Line    => "chart:line",
-            OdfChartType.Pie     => "chart:pie",
-            OdfChartType.Area    => "chart:area",
+            OdfChartType.Line => "chart:line",
+            OdfChartType.Pie => "chart:pie",
+            OdfChartType.Area => "chart:area",
             OdfChartType.Scatter => "chart:scatter",
-            OdfChartType.Bubble  => "chart:bubble",
-            _                    => "chart:bar"
+            OdfChartType.Bubble => "chart:bubble",
+            _ => "chart:bar"
         };
         chartDoc.SetDataRange(Name, dataRange, firstRowAsHeader, firstColumnAsLabel);
 
@@ -3108,8 +3158,12 @@ public sealed class OdfRichText
     {
         _runs.Add(new OdfRichTextRun
         {
-            Text = text, Bold = bold, Italic = italic, Underline = underline,
-            Color = color, FontFamily = fontFamily,
+            Text = text,
+            Bold = bold,
+            Italic = italic,
+            Underline = underline,
+            Color = color,
+            FontFamily = fontFamily,
         });
     }
 }
@@ -3303,9 +3357,12 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     public T? GetValue<T>()
     {
         object? val = CellValue;
-        if (val is null) return default;
-        if (val is T typed) return typed;
-        try { return (T)Convert.ChangeType(val, typeof(T), CultureInfo.InvariantCulture); }
+        if (val is null)
+            return default;
+        if (val is T typed)
+            return typed;
+        try
+        { return (T)Convert.ChangeType(val, typeof(T), CultureInfo.InvariantCulture); }
         catch { return default; }
     }
 
@@ -3351,13 +3408,13 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
         string isoDate;
         if (date == DateTime.MinValue || date == DateTime.MaxValue)
         {
-            isoDate = useTimezoneNaive 
+            isoDate = useTimezoneNaive
                 ? date.ToString("yyyy-MM-ddTHH:mm:ss")
                 : date.ToString("yyyy-MM-ddTHH:mm:ss") + "Z";
         }
         else
         {
-            isoDate = useTimezoneNaive 
+            isoDate = useTimezoneNaive
                 ? date.ToString("yyyy-MM-ddTHH:mm:ss")
                 : date.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
         }
@@ -3399,7 +3456,7 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
 
         var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
         bool needsWrap = false;
-        
+
         int i = 0;
         while (i < text.Length)
         {
@@ -3468,7 +3525,8 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
         foreach (var child in Node.Children)
             if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
                 toRemove.Add(child);
-        foreach (var child in toRemove) Node.RemoveChild(child);
+        foreach (var child in toRemove)
+            Node.RemoveChild(child);
 
         var aNode = new OdfNode(OdfNodeType.Element, "a", OdfNamespaces.Text, "text");
         aNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
@@ -3488,7 +3546,8 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     {
         foreach (var child in Node.Children)
         {
-            if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text) continue;
+            if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text)
+                continue;
             foreach (var inner in child.Children)
             {
                 if (inner.LocalName == "a" && inner.NamespaceUri == OdfNamespaces.Text)
@@ -3505,7 +3564,8 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     {
         foreach (var child in Node.Children)
         {
-            if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text) continue;
+            if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text)
+                continue;
             var toUnwrap = new List<OdfNode>();
             foreach (var inner in child.Children)
                 if (inner.LocalName == "a" && inner.NamespaceUri == OdfNamespaces.Text)
@@ -3528,13 +3588,16 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
         OdfRichText? richText = null;
         foreach (var child in Node.Children)
         {
-            if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text) continue;
+            if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text)
+                continue;
             bool hasSpans = false;
             foreach (var inner in child.Children)
             {
-                if (inner.LocalName == "span" && inner.NamespaceUri == OdfNamespaces.Text) { hasSpans = true; break; }
+                if (inner.LocalName == "span" && inner.NamespaceUri == OdfNamespaces.Text)
+                { hasSpans = true; break; }
             }
-            if (!hasSpans) continue;
+            if (!hasSpans)
+                continue;
 
             richText ??= new OdfRichText();
             foreach (var inner in child.Children)
@@ -3568,7 +3631,8 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
         foreach (var child in Node.Children)
             if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
                 toRemove.Add(child);
-        foreach (var child in toRemove) Node.RemoveChild(child);
+        foreach (var child in toRemove)
+            Node.RemoveChild(child);
 
         var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
         foreach (var run in richText.Runs)
@@ -3598,7 +3662,8 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     {
         foreach (var child in Node.Children)
         {
-            if (child.LocalName != "annotation" || child.NamespaceUri != OdfNamespaces.Office) continue;
+            if (child.LocalName != "annotation" || child.NamespaceUri != OdfNamespaces.Office)
+                continue;
             string text = string.Empty;
             string? author = null;
             DateTime? date = null;
@@ -3642,7 +3707,7 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
 
         var dateNode = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc");
         dateNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty)
-            { TextContent = DateTime.UtcNow.ToString("O") });
+        { TextContent = DateTime.UtcNow.ToString("O") });
         ann.AppendChild(dateNode);
 
         var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
@@ -3661,7 +3726,8 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
         foreach (var child in Node.Children)
             if (child.LocalName == "annotation" && child.NamespaceUri == OdfNamespaces.Office)
                 toRemove.Add(child);
-        foreach (var child in toRemove) Node.RemoveChild(child);
+        foreach (var child in toRemove)
+            Node.RemoveChild(child);
     }
 
     /// <summary>
@@ -3673,10 +3739,14 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     /// <param name="right">右框線</param>
     public void SetBorders(OdfBorder? top, OdfBorder? bottom, OdfBorder? left, OdfBorder? right)
     {
-        if (top.HasValue) SetStyleProperty("table-cell-properties", "border-top", OdfNamespaces.Fo, top.Value.ToString(), "fo");
-        if (bottom.HasValue) SetStyleProperty("table-cell-properties", "border-bottom", OdfNamespaces.Fo, bottom.Value.ToString(), "fo");
-        if (left.HasValue) SetStyleProperty("table-cell-properties", "border-left", OdfNamespaces.Fo, left.Value.ToString(), "fo");
-        if (right.HasValue) SetStyleProperty("table-cell-properties", "border-right", OdfNamespaces.Fo, right.Value.ToString(), "fo");
+        if (top.HasValue)
+            SetStyleProperty("table-cell-properties", "border-top", OdfNamespaces.Fo, top.Value.ToString(), "fo");
+        if (bottom.HasValue)
+            SetStyleProperty("table-cell-properties", "border-bottom", OdfNamespaces.Fo, bottom.Value.ToString(), "fo");
+        if (left.HasValue)
+            SetStyleProperty("table-cell-properties", "border-left", OdfNamespaces.Fo, left.Value.ToString(), "fo");
+        if (right.HasValue)
+            SetStyleProperty("table-cell-properties", "border-right", OdfNamespaces.Fo, right.Value.ToString(), "fo");
     }
 
     /// <summary>
@@ -3706,14 +3776,17 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
         get
         {
             string? cellStyleName = StyleName;
-            if (string.IsNullOrEmpty(cellStyleName)) return DisplayText;
+            if (string.IsNullOrEmpty(cellStyleName))
+                return DisplayText;
 
             string? dataStyleName = FindDataStyleName(cellStyleName!);
-            if (string.IsNullOrEmpty(dataStyleName)) return DisplayText;
+            if (string.IsNullOrEmpty(dataStyleName))
+                return DisplayText;
 
             OdfNode? formatNode = OdfKit.Styles.OdfNumberFormatEngine.FindFormatNode(_doc.ContentDom, dataStyleName!)
                 ?? OdfKit.Styles.OdfNumberFormatEngine.FindFormatNode(_doc.StylesDom, dataStyleName!);
-            if (formatNode is null) return DisplayText;
+            if (formatNode is null)
+                return DisplayText;
 
             return ValueType switch
             {

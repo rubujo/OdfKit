@@ -1,4 +1,4 @@
-namespace OdfKit.Spreadsheet;
+﻿namespace OdfKit.Spreadsheet;
 
 /// <summary>
 /// 定義 LibreOffice calcext 走勢圖的類型。

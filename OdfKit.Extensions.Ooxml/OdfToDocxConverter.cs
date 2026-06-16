@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,10 +9,10 @@ using DocumentFormat.OpenXml.Packaging;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Text;
-using WP = DocumentFormat.OpenXml.Wordprocessing;
 using A = DocumentFormat.OpenXml.Drawing;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
+using WP = DocumentFormat.OpenXml.Wordprocessing;
 
 namespace OdfKit.Conversion;
 
@@ -30,8 +30,10 @@ public static class OdfToDocxConverter
     /// <exception cref="ArgumentNullException">任一必要參數為 null 時引發。</exception>
     public static void Convert(TextDocument odtDocument, Stream docxStream)
     {
-        if (odtDocument is null) throw new ArgumentNullException(nameof(odtDocument));
-        if (docxStream is null) throw new ArgumentNullException(nameof(docxStream));
+        if (odtDocument is null)
+            throw new ArgumentNullException(nameof(odtDocument));
+        if (docxStream is null)
+            throw new ArgumentNullException(nameof(docxStream));
 
         var ctx = new ConversionContext(odtDocument);
         var imagePartCache = new Dictionary<string, ImagePart>();
@@ -158,7 +160,8 @@ public static class OdfToDocxConverter
 
         private void LoadStylesEntry(OdfPackage package, string entryName)
         {
-            if (!package.HasEntry(entryName)) return;
+            if (!package.HasEntry(entryName))
+                return;
             try
             {
                 using var stream = package.GetEntryStream(entryName);
@@ -184,7 +187,8 @@ public static class OdfToDocxConverter
                     string name = n.GetAttribute("name", OdfNamespaces.Style) ?? string.Empty;
                     string family = n.GetAttribute("family", OdfNamespaces.Style) ?? string.Empty;
 
-                    if (string.IsNullOrEmpty(name)) continue;
+                    if (string.IsNullOrEmpty(name))
+                        continue;
 
                     var info = new StyleInfo
                     {
@@ -213,7 +217,8 @@ public static class OdfToDocxConverter
             }
 
             var textProps = styleNode.SelectSingleNode("style:text-properties", ns);
-            if (textProps == null) return;
+            if (textProps == null)
+                return;
 
             info.Bold = string.Equals(textProps.GetAttribute("font-weight", OdfNamespaces.Fo), "bold", StringComparison.OrdinalIgnoreCase);
             info.Italic = string.Equals(textProps.GetAttribute("font-style", OdfNamespaces.Fo), "italic", StringComparison.OrdinalIgnoreCase);
@@ -377,7 +382,8 @@ public static class OdfToDocxConverter
         var para = new WP.Paragraph();
         string? levelAttr = node.GetAttribute("outline-level", OdfNamespaces.Text);
         int level = 1;
-        if (int.TryParse(levelAttr, out int lv)) level = lv < 1 ? 1 : (lv > 6 ? 6 : lv);
+        if (int.TryParse(levelAttr, out int lv))
+            level = lv < 1 ? 1 : (lv > 6 ? 6 : lv);
 
         var pp = new WP.ParagraphProperties();
         pp.AppendChild(new WP.ParagraphStyleId { Val = "Heading" + level });
@@ -435,7 +441,8 @@ public static class OdfToDocxConverter
             if (child.NodeType == OdfNodeType.Text)
             {
                 string txt = child.TextContent ?? string.Empty;
-                if (txt.Length > 0) para.AppendChild(MakeRun(txt, parentStyle));
+                if (txt.Length > 0)
+                    para.AppendChild(MakeRun(txt, parentStyle));
             }
             else if (child.NodeType == OdfNodeType.Element)
             {
@@ -455,7 +462,8 @@ public static class OdfToDocxConverter
                 else if (child.LocalName == "tab" && child.NamespaceUri == OdfNamespaces.Text)
                 {
                     var run = new WP.Run(new WP.TabChar());
-                    if (parentStyle != null) run.RunProperties = BuildRunProps(parentStyle);
+                    if (parentStyle != null)
+                        run.RunProperties = BuildRunProps(parentStyle);
                     para.AppendChild(run);
                 }
                 else if (child.LocalName == "line-break" && child.NamespaceUri == OdfNamespaces.Text)
@@ -465,7 +473,8 @@ public static class OdfToDocxConverter
                 else if (child.LocalName == "frame" && child.NamespaceUri == OdfNamespaces.Draw)
                 {
                     var drawing = TryConvertImage(child, mainPart, odtPackage, imagePartCache);
-                    if (drawing != null) para.AppendChild(new WP.Run(drawing));
+                    if (drawing != null)
+                        para.AppendChild(new WP.Run(drawing));
                 }
                 else
                 {
@@ -479,9 +488,11 @@ public static class OdfToDocxConverter
         bool hasContent = false;
         foreach (var el in para.ChildElements)
         {
-            if (el is WP.Run || el is WP.Hyperlink) { hasContent = true; break; }
+            if (el is WP.Run || el is WP.Hyperlink)
+            { hasContent = true; break; }
         }
-        if (!hasContent) para.AppendChild(new WP.Run());
+        if (!hasContent)
+            para.AppendChild(new WP.Run());
     }
 
     private static WP.Run MakeRun(string text, StyleInfo? style)
@@ -491,7 +502,8 @@ public static class OdfToDocxConverter
         if (style != null)
         {
             var rp = BuildRunProps(style);
-            if (rp.HasChildren) run.RunProperties = rp;
+            if (rp.HasChildren)
+                run.RunProperties = rp;
         }
         return run;
     }
@@ -499,10 +511,14 @@ public static class OdfToDocxConverter
     private static WP.RunProperties BuildRunProps(StyleInfo style)
     {
         var rp = new WP.RunProperties();
-        if (style.Bold) rp.AppendChild(new WP.Bold());
-        if (style.Italic) rp.AppendChild(new WP.Italic());
-        if (style.Underline) rp.AppendChild(new WP.Underline { Val = WP.UnderlineValues.Single });
-        if (!string.IsNullOrEmpty(style.Color)) rp.AppendChild(new WP.Color { Val = style.Color });
+        if (style.Bold)
+            rp.AppendChild(new WP.Bold());
+        if (style.Italic)
+            rp.AppendChild(new WP.Italic());
+        if (style.Underline)
+            rp.AppendChild(new WP.Underline { Val = WP.UnderlineValues.Single });
+        if (!string.IsNullOrEmpty(style.Color))
+            rp.AppendChild(new WP.Color { Val = style.Color });
         if (style.FontSizePt.HasValue)
         {
             int halfPoints = (int)(style.FontSizePt.Value * 2);
@@ -513,8 +529,10 @@ public static class OdfToDocxConverter
 
     private static StyleInfo? MergeStyles(StyleInfo? parent, StyleInfo? child)
     {
-        if (parent == null) return child;
-        if (child == null) return parent;
+        if (parent == null)
+            return child;
+        if (child == null)
+            return parent;
         return new StyleInfo
         {
             Name = child.Name,
@@ -563,7 +581,8 @@ public static class OdfToDocxConverter
                         row.AppendChild(cell);
                     }
                 }
-                if (row.HasChildren) table.AppendChild(row);
+                if (row.HasChildren)
+                    table.AppendChild(row);
             }
         }
 
@@ -586,10 +605,12 @@ public static class OdfToDocxConverter
                 break;
             }
         }
-        if (imageNode == null) return null;
+        if (imageNode == null)
+            return null;
 
         string? href = imageNode.GetAttribute("href", OdfNamespaces.XLink);
-        if (string.IsNullOrEmpty(href)) return null;
+        if (string.IsNullOrEmpty(href))
+            return null;
 
         if (!imagePartCache.TryGetValue(href!, out ImagePart? imagePart))
         {
@@ -647,14 +668,16 @@ public static class OdfToDocxConverter
                                     new A.Offset { X = 0, Y = 0 },
                                     new A.Extents { Cx = cx, Cy = cy }),
                                 new A.PresetGeometry(
-                                    new A.AdjustValueList()) { Preset = A.ShapeTypeValues.Rectangle })))
+                                    new A.AdjustValueList())
+                                { Preset = A.ShapeTypeValues.Rectangle })))
                     { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" }))
             { DistanceFromTop = 0, DistanceFromBottom = 0, DistanceFromLeft = 0, DistanceFromRight = 0 });
     }
 
     private static long ParseEmu(string? attrValue, long fallback)
     {
-        if (string.IsNullOrEmpty(attrValue)) return fallback;
+        if (string.IsNullOrEmpty(attrValue))
+            return fallback;
 
         if (attrValue!.Length > 2 && string.Equals(attrValue.Substring(attrValue.Length - 2), "cm", StringComparison.OrdinalIgnoreCase))
         {
@@ -677,10 +700,14 @@ public static class OdfToDocxConverter
     private static string GuessContentType(string href)
     {
         string lower = href.ToLowerInvariant();
-        if (lower.EndsWith(".png", StringComparison.Ordinal)) return "image/png";
-        if (lower.EndsWith(".jpg", StringComparison.Ordinal) || lower.EndsWith(".jpeg", StringComparison.Ordinal)) return "image/jpeg";
-        if (lower.EndsWith(".gif", StringComparison.Ordinal)) return "image/gif";
-        if (lower.EndsWith(".svg", StringComparison.Ordinal)) return "image/svg+xml";
+        if (lower.EndsWith(".png", StringComparison.Ordinal))
+            return "image/png";
+        if (lower.EndsWith(".jpg", StringComparison.Ordinal) || lower.EndsWith(".jpeg", StringComparison.Ordinal))
+            return "image/jpeg";
+        if (lower.EndsWith(".gif", StringComparison.Ordinal))
+            return "image/gif";
+        if (lower.EndsWith(".svg", StringComparison.Ordinal))
+            return "image/svg+xml";
         return "image/png";
     }
 
@@ -717,8 +744,10 @@ public static class OdfToDocxConverter
         if (halfPoints.HasValue || bold)
         {
             var rp = new WP.StyleRunProperties();
-            if (halfPoints.HasValue) rp.AppendChild(new WP.FontSize { Val = halfPoints.Value.ToString() });
-            if (bold) rp.AppendChild(new WP.Bold());
+            if (halfPoints.HasValue)
+                rp.AppendChild(new WP.FontSize { Val = halfPoints.Value.ToString() });
+            if (bold)
+                rp.AppendChild(new WP.Bold());
             style.AppendChild(rp);
         }
 
@@ -734,21 +763,37 @@ public static class OdfToDocxConverter
         bool lastIsPara = false;
         foreach (var el in body.ChildElements)
             lastIsPara = el is WP.Paragraph;
-        if (!lastIsPara) body.AppendChild(new WP.Paragraph());
+        if (!lastIsPara)
+            body.AppendChild(new WP.Paragraph());
     }
 
     private static string MapOdtStyleToDocx(string odtStyleName)
     {
         switch (odtStyleName)
         {
-            case "Heading_20_1": case "Heading 1": return "Heading1";
-            case "Heading_20_2": case "Heading 2": return "Heading2";
-            case "Heading_20_3": case "Heading 3": return "Heading3";
-            case "Heading_20_4": case "Heading 4": return "Heading4";
-            case "Heading_20_5": case "Heading 5": return "Heading5";
-            case "Heading_20_6": case "Heading 6": return "Heading6";
-            case "Text_20_Body": case "Text Body": return "Normal";
-            default: return "Normal";
+            case "Heading_20_1":
+            case "Heading 1":
+                return "Heading1";
+            case "Heading_20_2":
+            case "Heading 2":
+                return "Heading2";
+            case "Heading_20_3":
+            case "Heading 3":
+                return "Heading3";
+            case "Heading_20_4":
+            case "Heading 4":
+                return "Heading4";
+            case "Heading_20_5":
+            case "Heading 5":
+                return "Heading5";
+            case "Heading_20_6":
+            case "Heading 6":
+                return "Heading6";
+            case "Text_20_Body":
+            case "Text Body":
+                return "Normal";
+            default:
+                return "Normal";
         }
     }
 }

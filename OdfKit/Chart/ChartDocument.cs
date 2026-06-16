@@ -1,7 +1,7 @@
-using System;
-using System.IO;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;

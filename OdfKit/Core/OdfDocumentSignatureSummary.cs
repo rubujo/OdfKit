@@ -1,4 +1,4 @@
-namespace OdfKit.Core;
+﻿namespace OdfKit.Core;
 
 /// <summary>
 /// 表示文件層數位簽章項目的摘要狀態。

@@ -1,4 +1,4 @@
-using OdfKit.Styles;
+﻿using OdfKit.Styles;
 
 namespace OdfKit.Spreadsheet;
 
@@ -22,7 +22,8 @@ public sealed class SpreadsheetDocumentBuilder
     /// <returns>目前 builder 執行個體。</returns>
     public SpreadsheetDocumentBuilder AddSheet(string name, Action<OdfSheetBuilder> configure)
     {
-        if (configure is null) throw new ArgumentNullException(nameof(configure));
+        if (configure is null)
+            throw new ArgumentNullException(nameof(configure));
         OdfTableSheet sheet = _document.Worksheets.Add(name);
         configure(new OdfSheetBuilder(sheet));
         return this;
@@ -89,8 +90,10 @@ public sealed class OdfSheetBuilder
         int startRow = 1,
         int startColumn = 1)
     {
-        if (items is null) throw new ArgumentNullException(nameof(items));
-        if (selector is null) throw new ArgumentNullException(nameof(selector));
+        if (items is null)
+            throw new ArgumentNullException(nameof(items));
+        if (selector is null)
+            throw new ArgumentNullException(nameof(selector));
         EnsureOneBasedIndex(startRow, nameof(startRow));
         EnsureOneBasedIndex(startColumn, nameof(startColumn));
 
@@ -127,7 +130,8 @@ public sealed class OdfSheetBuilder
         int startRow = 1,
         int startColumn = 1)
     {
-        if (headers is null) throw new ArgumentNullException(nameof(headers));
+        if (headers is null)
+            throw new ArgumentNullException(nameof(headers));
         EnsureOneBasedIndex(startRow, nameof(startRow));
         EnsureOneBasedIndex(startColumn, nameof(startColumn));
 
@@ -150,7 +154,8 @@ public sealed class OdfSheetBuilder
     public OdfSheetBuilder SetColumnWidth(int columnIndex, double widthCm)
     {
         EnsureOneBasedIndex(columnIndex, nameof(columnIndex));
-        if (widthCm <= 0) throw new ArgumentOutOfRangeException(nameof(widthCm));
+        if (widthCm <= 0)
+            throw new ArgumentOutOfRangeException(nameof(widthCm));
 
         _sheet.SetColumnWidth(columnIndex - 1, OdfLength.FromCentimeters(widthCm));
         return this;

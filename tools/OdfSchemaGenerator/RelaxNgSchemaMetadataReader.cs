@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,7 +19,8 @@ public sealed class RelaxNgSchemaMetadataReader
     /// </summary>
     public SchemaMetadata ReadFile(string path)
     {
-        if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Schema path cannot be empty.", nameof(path));
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException("Schema path cannot be empty.", nameof(path));
 
         string fullPath = Path.GetFullPath(path);
         string rootDirectory = Path.GetDirectoryName(fullPath) ?? Directory.GetCurrentDirectory();
@@ -33,7 +34,8 @@ public sealed class RelaxNgSchemaMetadataReader
     /// </summary>
     public SchemaMetadata Read(Stream stream, string source)
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        if (stream == null)
+            throw new ArgumentNullException(nameof(stream));
 
         string baseDirectory = string.IsNullOrWhiteSpace(source)
             ? Directory.GetCurrentDirectory()

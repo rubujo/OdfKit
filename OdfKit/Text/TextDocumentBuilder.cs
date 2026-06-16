@@ -1,4 +1,4 @@
-using OdfKit.Core;
+﻿using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Text;
@@ -22,7 +22,8 @@ public sealed class TextDocumentBuilder
     /// <returns>目前 builder 執行個體。</returns>
     public TextDocumentBuilder WithMetadata(Action<TextDocumentMetadataBuilder> configure)
     {
-        if (configure is null) throw new ArgumentNullException(nameof(configure));
+        if (configure is null)
+            throw new ArgumentNullException(nameof(configure));
         configure(new TextDocumentMetadataBuilder(_document.Metadata));
         return this;
     }
@@ -65,7 +66,8 @@ public sealed class TextDocumentBuilder
     /// <returns>目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddParagraph(Action<TextParagraphBuilder> configure)
     {
-        if (configure is null) throw new ArgumentNullException(nameof(configure));
+        if (configure is null)
+            throw new ArgumentNullException(nameof(configure));
         OdfParagraph paragraph = _document.Body.Paragraphs.Add();
         configure(new TextParagraphBuilder(_document, paragraph));
         return this;
@@ -78,7 +80,8 @@ public sealed class TextDocumentBuilder
     /// <returns>目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddList(Action<TextListBuilder> configure)
     {
-        if (configure is null) throw new ArgumentNullException(nameof(configure));
+        if (configure is null)
+            throw new ArgumentNullException(nameof(configure));
         OdfList list = _document.Body.Lists.Add();
         configure(new TextListBuilder(list));
         return this;
@@ -95,10 +98,14 @@ public sealed class TextDocumentBuilder
 
     internal static void ApplyTextRunFormatting(TextDocument document, OdfTextRun run, TextRunFormattingBuilder format)
     {
-        if (format.BoldValue.HasValue) run.IsBold = format.BoldValue.Value;
-        if (format.ItalicValue.HasValue) run.IsItalic = format.ItalicValue.Value;
-        if (format.UnderlineValue.HasValue) run.IsUnderline = format.UnderlineValue.Value;
-        if (format.FontSizeValue.HasValue) run.SetFontSize(ToPointString(format.FontSizeValue.Value));
+        if (format.BoldValue.HasValue)
+            run.IsBold = format.BoldValue.Value;
+        if (format.ItalicValue.HasValue)
+            run.IsItalic = format.ItalicValue.Value;
+        if (format.UnderlineValue.HasValue)
+            run.IsUnderline = format.UnderlineValue.Value;
+        if (format.FontSizeValue.HasValue)
+            run.SetFontSize(ToPointString(format.FontSizeValue.Value));
         if (format.ColorValue is not null)
         {
             document.StyleEngine.SetLocalStyleProperty(
@@ -264,7 +271,8 @@ public sealed class TextParagraphBuilder
     /// <returns>目前 builder 執行個體。</returns>
     public TextParagraphBuilder Append(string text, Action<TextRunFormattingBuilder> configure)
     {
-        if (configure is null) throw new ArgumentNullException(nameof(configure));
+        if (configure is null)
+            throw new ArgumentNullException(nameof(configure));
         var format = new TextRunFormattingBuilder();
         configure(format);
         OdfTextRun run = _paragraph.AddTextRun(text);

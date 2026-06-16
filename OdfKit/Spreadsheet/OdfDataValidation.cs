@@ -1,4 +1,4 @@
-namespace OdfKit.Spreadsheet;
+﻿namespace OdfKit.Spreadsheet;
 
 /// <summary>
 /// 表示 ODS 資料驗證條件的列舉。

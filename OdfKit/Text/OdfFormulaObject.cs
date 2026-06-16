@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using OdfKit.Core;
@@ -94,13 +94,16 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
         get
         {
             string? folder = FormulaFolder;
-            if (folder is null || folder.Length == 0) return string.Empty;
+            if (folder is null || folder.Length == 0)
+                return string.Empty;
             string contentPath = $"{folder.TrimEnd('/')}/content.xml";
-            if (!_doc.Package.HasEntry(contentPath)) return string.Empty;
-            
+            if (!_doc.Package.HasEntry(contentPath))
+                return string.Empty;
+
             var bytes = _doc.Package.ReadEntry(contentPath);
-            if (bytes is null) return string.Empty;
-            
+            if (bytes is null)
+                return string.Empty;
+
             string xml = Encoding.UTF8.GetString(bytes);
             return ExtractFormulaContent(xml);
         }
@@ -132,17 +135,22 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
 
     private string ExtractFormulaContent(string documentXml)
     {
-        if (string.IsNullOrWhiteSpace(documentXml)) return string.Empty;
-        
+        if (string.IsNullOrWhiteSpace(documentXml))
+            return string.Empty;
+
         int start = documentXml.IndexOf("<office:formula>");
-        if (start == -1) start = documentXml.IndexOf("<office:formula ");
-        if (start == -1) return string.Empty;
+        if (start == -1)
+            start = documentXml.IndexOf("<office:formula ");
+        if (start == -1)
+            return string.Empty;
 
         int closeTagStart = documentXml.IndexOf('>', start);
-        if (closeTagStart == -1) return string.Empty;
+        if (closeTagStart == -1)
+            return string.Empty;
 
         int end = documentXml.IndexOf("</office:formula>", closeTagStart);
-        if (end == -1) return string.Empty;
+        if (end == -1)
+            return string.Empty;
 
         return documentXml.Substring(closeTagStart + 1, end - closeTagStart - 1).Trim();
     }

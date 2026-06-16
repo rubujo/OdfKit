@@ -1,4 +1,4 @@
-namespace OdfKit.Core;
+﻿namespace OdfKit.Core;
 
 /// <summary>
 /// 定義 ODF 1.3 OpenPGP 加密模式所需的 Session Key 加解密提供者。

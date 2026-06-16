@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
-using OdfKit.Core;
 using OdfNamespaces = OdfKit.Core.OdfNamespaces;
 
 namespace OdfKit.Presentation;

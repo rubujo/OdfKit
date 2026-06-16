@@ -12,6 +12,10 @@
 | ODF Toolkit source | `https://github.com/tdf/odftoolkit` | ODF Toolkit、ODFDOM 與 Validator 原始碼來源。 | no |
 | ODF Validator Maven metadata | `https://mvnrepository.com/artifact/org.odftoolkit/odfvalidator` | 檢查可取得版本與 artifact 名稱。 | no |
 | OPF odf-validator | `https://github.com/openpreserve/odf-validator` | 獨立保存用途 validator；名稱相近但不是 ODF Toolkit baseline。 | no |
+| OASIS ODF 1.1 RNG schema | `https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng` | OASIS Standard（2007-02-01）官方獨立 RELAX NG schema，`OdfSchemaRegistry`／`OdfComplianceProfiles.OasisOdf11` 用以產生真實 ODF 1.1 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-schema-v1.1.rng`） |
+| OASIS ODF 1.2 RNG schema | `https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-schema.rng` | OASIS Standard（2011-09-29）官方獨立 RELAX NG schema，供 `ISO_IEC_26300` profile 使用真實 ODF 1.2 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-v1.2-os-schema.rng`） |
+| OASIS ODF 1.3 RNG schema | `https://docs.oasis-open.org/office/OpenDocument/v1.3/os/schemas/OpenDocument-v1.3-schema.rng` | OASIS Standard（2021-04-27）官方獨立 RELAX NG schema，`OdfComplianceProfiles.OasisOdf13` 用以產生真實 ODF 1.3 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-v1.3-schema.rng`） |
+| OASIS ODF 1.0 規格文件 | `https://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf` | 已查證：OASIS 官方目錄（`docs.oasis-open.org/office/v1.0/`）僅提供規格 PDF，從未發布獨立 RNG schema 檔案。因此 ODF 1.0 沒有真實 schema 可用，`OdfSchemaRegistry` 維持以 ODF 1.4 schema 進行 best-effort 近似驗證，屬於已知限制。 | no（無 RNG 可下載） |
 
 ## 採集流程
 

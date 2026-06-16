@@ -1,4 +1,4 @@
-#pragma warning restore CS1591
+﻿#pragma warning restore CS1591
 
 using System;
 using System.Collections.Generic;
@@ -78,6 +78,38 @@ public static class OdfComplianceProfiles
         [.. PackagedExtensions, .. FlatExtensions],
         OpenDocumentMimeTypes,
         [.. StandardRules, Rule("RequireForeignExtensionIsolation", "Foreign extensions must use non-ODF namespaces and remain removable.", OdfIssueSeverity.Warning), Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)]);
+
+    /// <summary>
+    /// 取得 OASIS OpenDocument v1.1 一致性規範。
+    /// </summary>
+    public static OdfComplianceProfile OasisOdf11 { get; } = new(
+        "OASIS_ODF_1_1",
+        "International",
+        "OASIS",
+        new Uri("https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng"),
+        "2007-02-01",
+        OdfPolicyAuthorityLevel.Normative,
+        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfVersionRange.Exact(OdfVersion.Odf11),
+        [.. PackagedExtensions, .. FlatExtensions],
+        OpenDocumentMimeTypes,
+        [.. StandardRules, Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)]);
+
+    /// <summary>
+    /// 取得 OASIS OpenDocument v1.3 一致性規範。
+    /// </summary>
+    public static OdfComplianceProfile OasisOdf13 { get; } = new(
+        "OASIS_ODF_1_3",
+        "International",
+        "OASIS",
+        new Uri("https://docs.oasis-open.org/office/OpenDocument/v1.3/os/schemas/OpenDocument-v1.3-schema.rng"),
+        "2021-04-27",
+        OdfPolicyAuthorityLevel.Normative,
+        OdfProfileVerificationStatus.VerifiedOfficial,
+        OdfVersionRange.Exact(OdfVersion.Odf13),
+        [.. PackagedExtensions, .. FlatExtensions],
+        OpenDocumentMimeTypes,
+        [.. StandardRules, Rule("RequireSchemaPatternValidation", "ODF XML entries must validate against the normative schema patterns.", OdfIssueSeverity.Error)]);
 
     /// <summary>
     /// 取得 ISO/IEC 26300 一致性規範（初版對應於 ODF 1.2 基準）。
@@ -191,6 +223,8 @@ public static class OdfComplianceProfiles
     public static IReadOnlyList<OdfComplianceProfile> BuiltIn { get; } = [
         OasisOdf14Strict,
         OasisOdf14Extended,
+        OasisOdf11,
+        OasisOdf13,
         IsoIec26300,
         EuInteroperableEurope,
         EuOfficeDocumentExchange,

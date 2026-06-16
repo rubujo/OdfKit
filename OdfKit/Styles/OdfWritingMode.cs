@@ -1,4 +1,4 @@
-namespace OdfKit.Styles;
+﻿namespace OdfKit.Styles;
 
 /// <summary>
 /// 表示 ODF 書寫方向。

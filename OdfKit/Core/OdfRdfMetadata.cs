@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace OdfKit.Core;
@@ -37,7 +37,8 @@ public sealed class OdfRdfMetadata
     /// <exception cref="ArgumentNullException">當 <paramref name="triple"/> 為 <see langword="null"/> 時拋出。</exception>
     public void AddTriple(OdfRdfTriple triple)
     {
-        if (triple is null) throw new ArgumentNullException(nameof(triple));
+        if (triple is null)
+            throw new ArgumentNullException(nameof(triple));
         _triples.Add(triple);
         IsDirty = true;
     }
@@ -82,9 +83,12 @@ public sealed class OdfRdfTriple
     /// <exception cref="ArgumentException">當任一必要值為空白時拋出。</exception>
     public OdfRdfTriple(string subject, string predicate, string objectValue, bool isLiteral)
     {
-        if (string.IsNullOrWhiteSpace(subject)) throw new ArgumentException("RDF 主詞不可為空白。", nameof(subject));
-        if (string.IsNullOrWhiteSpace(predicate)) throw new ArgumentException("RDF 述詞不可為空白。", nameof(predicate));
-        if (string.IsNullOrWhiteSpace(objectValue)) throw new ArgumentException("RDF 受詞不可為空白。", nameof(objectValue));
+        if (string.IsNullOrWhiteSpace(subject))
+            throw new ArgumentException("RDF 主詞不可為空白。", nameof(subject));
+        if (string.IsNullOrWhiteSpace(predicate))
+            throw new ArgumentException("RDF 述詞不可為空白。", nameof(predicate));
+        if (string.IsNullOrWhiteSpace(objectValue))
+            throw new ArgumentException("RDF 受詞不可為空白。", nameof(objectValue));
 
         Subject = subject;
         Predicate = predicate;

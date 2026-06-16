@@ -121,6 +121,54 @@
       "notes": "Small repo-local negative fixture covering an invalid draw:decorative boolean value (\"yes\" instead of \"true\"/\"false\") on style:graphic-properties."
     },
     {
+      "id": "repo-generated-odf11-minimal-text",
+      "path": "generated/odf11-minimal-text.fodt",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatText",
+      "version": "1.1",
+      "profile": "OASIS_ODF_1_1",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local fixture validating against the real ODF 1.1 schema derived from the official OASIS RNG, not the 1.4-filtered approximation."
+    },
+    {
+      "id": "repo-generated-odf12-minimal-text",
+      "path": "generated/odf12-minimal-text.fodt",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatText",
+      "version": "1.2",
+      "profile": "ISO_IEC_26300",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local fixture validating against the real ODF 1.2 schema derived from the official OASIS RNG, not the 1.4-filtered approximation."
+    },
+    {
+      "id": "repo-generated-odf13-minimal-text",
+      "path": "generated/odf13-minimal-text.fodt",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatText",
+      "version": "1.3",
+      "profile": "OASIS_ODF_1_3",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local fixture validating against the real ODF 1.3 schema derived from the official OASIS RNG, not the 1.4-filtered approximation."
+    },
+    {
+      "id": "repo-generated-odf12-invalid-decorative",
+      "path": "generated/odf12-invalid-decorative.fodg",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatGraphics",
+      "version": "1.2",
+      "profile": "ISO_IEC_26300",
+      "expected": "invalid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Negative fixture proving the real ODF 1.2 schema is enforced: draw:decorative is an ODF 1.4-only accessibility attribute and must be rejected under the official ODF 1.2 RNG, unlike the previous 1.4-filtered approximation which would have accepted it."
+    },
+    {
       "id": "repo-generated-mathml-formula",
       "path": "generated/mathml-formula.odf",
       "source": "generated",

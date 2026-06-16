@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using OdfKit.Spreadsheet;
 using Sylvan.Data.Csv;
@@ -19,7 +19,8 @@ public static class OdfCsvImporter
     /// <exception cref="ArgumentNullException">當 csvStream 為 null 時引發。</exception>
     public static SpreadsheetDocument ImportFromStream(Stream csvStream, OdfCsvOptions? options = null)
     {
-        if (csvStream is null) throw new ArgumentNullException(nameof(csvStream));
+        if (csvStream is null)
+            throw new ArgumentNullException(nameof(csvStream));
         options ??= new OdfCsvOptions();
 
         var workbook = SpreadsheetDocument.Create();
@@ -64,7 +65,8 @@ public static class OdfCsvImporter
     /// <returns>包含 CSV 資料的新 SpreadsheetDocument 執行個體。</returns>
     public static SpreadsheetDocument ImportFromFile(string csvPath, OdfCsvOptions? options = null)
     {
-        if (csvPath is null) throw new ArgumentNullException(nameof(csvPath));
+        if (csvPath is null)
+            throw new ArgumentNullException(nameof(csvPath));
         using var stream = File.OpenRead(csvPath);
         return ImportFromStream(stream, options);
     }

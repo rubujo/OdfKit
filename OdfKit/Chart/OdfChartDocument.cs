@@ -1,7 +1,7 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Collections.Generic;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -248,7 +248,8 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
         {
             OdfNode xAxis = FindOrCreateAxis("x");
             OdfNode? existingCat = FindChildElement(xAxis, "categories", OdfNamespaces.Chart);
-            if (existingCat is not null) xAxis.RemoveChild(existingCat);
+            if (existingCat is not null)
+                xAxis.RemoveChild(existingCat);
 
             string catRange = BuildAbsoluteRange(sheetName,
                 dataRowStart, range.StartAddress.Column,
@@ -261,7 +262,8 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
         // 5. 為每個資料欄新增 <chart:series>
         for (int col = dataColStart; col <= range.EndAddress.Column; col++)
         {
-            if (dataRowStart > range.EndAddress.Row) break;
+            if (dataRowStart > range.EndAddress.Row)
+                break;
 
             string dataRange = BuildAbsoluteRange(sheetName,
                 dataRowStart, col, range.EndAddress.Row, col);
@@ -291,14 +293,17 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
             return (null, null);
 
         string s = addr!.Trim();
-        if (s.StartsWith("[", StringComparison.Ordinal)) s = s.Substring(1);
-        if (s.EndsWith("]", StringComparison.Ordinal)) s = s.Substring(0, s.Length - 1);
+        if (s.StartsWith("[", StringComparison.Ordinal))
+            s = s.Substring(1);
+        if (s.EndsWith("]", StringComparison.Ordinal))
+            s = s.Substring(0, s.Length - 1);
 
         int colon = s.IndexOf(':');
-        if (colon < 0) return (null, null);
+        if (colon < 0)
+            return (null, null);
 
         string startPart = s.Substring(0, colon);
-        string endPart   = s.Substring(colon + 1);
+        string endPart = s.Substring(colon + 1);
 
         if (!TryParseOdfCell(startPart, out string? sheetName, out int startRow, out int startCol))
             return (null, null);
@@ -314,7 +319,8 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
     private OdfNode FindOrCreateDataSource(OdfNode chart)
     {
         OdfNode? ds = FindChildElement(chart, "data-source", OdfNamespaces.Chart);
-        if (ds is not null) return ds;
+        if (ds is not null)
+            return ds;
         ds = OdfNodeFactory.CreateElement("data-source", OdfNamespaces.Chart, "chart");
         OdfNode? plotArea = FindChildElement(chart, "plot-area", OdfNamespaces.Chart);
         if (plotArea is not null)
@@ -327,21 +333,22 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
     private static string BuildAbsoluteCell(string sheetName, int row, int col)
     {
         string colName = ColumnIndexToName(col);
-        string prefix  = string.IsNullOrEmpty(sheetName) ? "." : $"{EscapeSheetName(sheetName)}.";
+        string prefix = string.IsNullOrEmpty(sheetName) ? "." : $"{EscapeSheetName(sheetName)}.";
         return $"{prefix}${colName}${row + 1}";
     }
 
     private static string BuildAbsoluteRange(string sheetName, int startRow, int startCol, int endRow, int endCol)
     {
         string start = BuildAbsoluteCell(sheetName, startRow, startCol);
-        string end   = BuildAbsoluteCell(string.Empty, endRow, endCol);
+        string end = BuildAbsoluteCell(string.Empty, endRow, endCol);
         return $"{start}:{end}";
     }
 
     private static string EscapeSheetName(string name)
     {
         bool needsQuotes = name.Contains(' ') || name.Contains('\'') || name.Contains('-') || name.Contains('.');
-        if (!needsQuotes) return name;
+        if (!needsQuotes)
+            return name;
         return "'" + name.Replace("'", "''") + "'";
     }
 
@@ -360,18 +367,22 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
 
     private static bool TryParseOdfCell(string part, out string? sheetName, out int row, out int col)
     {
-        sheetName = null; row = 0; col = 0;
+        sheetName = null;
+        row = 0;
+        col = 0;
         string s = part.Trim();
 
         // 剝除前置 $ (絕對工作表參照)
-        if (s.StartsWith("$", StringComparison.Ordinal)) s = s.Substring(1);
+        if (s.StartsWith("$", StringComparison.Ordinal))
+            s = s.Substring(1);
 
         // 分離 sheet 與 cell：以第一個 '.' 為分隔
         int dot = s.IndexOf('.');
-        if (dot < 0) return false;
+        if (dot < 0)
+            return false;
 
         string sheetPart = s.Substring(0, dot);
-        string cellPart  = s.Substring(dot + 1);
+        string cellPart = s.Substring(dot + 1);
 
         // 處理帶引號的工作表名稱
         if (sheetPart.StartsWith("'", StringComparison.Ordinal) &&
@@ -383,11 +394,14 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
         // 解析儲存格：去除 $，分離字母與數字
         cellPart = cellPart.Replace("$", "");
         int i = 0;
-        while (i < cellPart.Length && char.IsLetter(cellPart[i])) i++;
-        if (i == 0 || i >= cellPart.Length) return false;
+        while (i < cellPart.Length && char.IsLetter(cellPart[i]))
+            i++;
+        if (i == 0 || i >= cellPart.Length)
+            return false;
 
         string colStr = cellPart.Substring(0, i);
-        if (!int.TryParse(cellPart.Substring(i), out int rowNum) || rowNum < 1) return false;
+        if (!int.TryParse(cellPart.Substring(i), out int rowNum) || rowNum < 1)
+            return false;
 
         col = ColumnNameToIndex(colStr);
         row = rowNum - 1;
@@ -678,7 +692,7 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
                "</office:chart>" +
                "</office:body>" +
                "</office:document-content>";
-     }
+    }
 
     /// <summary>
     /// 取得預設的樣式 XML 字串。
@@ -703,13 +717,13 @@ public class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
         var srcChart = sourceDoc as OdfChartDocument ?? throw new ArgumentException("Source document must be a OdfChartDocument.");
-        
+
         var body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
         var destChartRoot = FindOrCreateChild(body, "chart", OdfNamespaces.Office, "office");
-        
+
         var srcBody = srcChart.FindOrCreateChild(srcChart.ContentDom, "body", OdfNamespaces.Office, "office");
         var srcChartRoot = srcChart.FindOrCreateChild(srcBody, "chart", OdfNamespaces.Office, "office");
-        
+
         foreach (var child in srcChartRoot.Children)
         {
             if (child.NodeType is OdfNodeType.Element)

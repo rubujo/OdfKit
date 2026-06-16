@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 
 namespace OdfKit.Spreadsheet;
@@ -41,7 +41,7 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
     /// </summary>
     /// <param name="other">要比較的另一個執行個體</param>
     /// <returns>如果兩個執行個體相等則為 true，否則為 false</returns>
-    public bool Equals(OdfCellRange other) => 
+    public bool Equals(OdfCellRange other) =>
         StartAddress == other.StartAddress && EndAddress == other.EndAddress;
 
     /// <summary>
@@ -127,7 +127,7 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
         // Propagate sheet name if missing on the end coordinate
         if (end.SheetName is null && start.SheetName is not null)
         {
-            end = new OdfCellAddress(end.Row, end.Column, start.SheetName, 
+            end = new OdfCellAddress(end.Row, end.Column, start.SheetName,
                 end.IsRowAbsolute, end.IsColumnAbsolute, start.IsSheetAbsolute);
         }
 
@@ -153,7 +153,7 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
 
         if (end.SheetName is null && start.SheetName is not null)
         {
-            end = new OdfCellAddress(end.Row, end.Column, start.SheetName, 
+            end = new OdfCellAddress(end.Row, end.Column, start.SheetName,
                 end.IsRowAbsolute, end.IsColumnAbsolute, start.IsSheetAbsolute);
         }
 
@@ -166,8 +166,10 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
         for (int i = 0; i < str.Length; i++)
         {
             char c = str[i];
-            if (c == '\'') inQuotes = !inQuotes;
-            if (!inQuotes && c == ':') return i;
+            if (c == '\'')
+                inQuotes = !inQuotes;
+            if (!inQuotes && c == ':')
+                return i;
         }
         return -1;
     }
@@ -223,7 +225,8 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
     /// <returns>相交的 <see cref="OdfCellRange"/>，如果不相交則為 null</returns>
     public OdfCellRange? Intersect(OdfCellRange other)
     {
-        if (!Intersects(other)) return null;
+        if (!Intersects(other))
+            return null;
 
         int minRow1 = Math.Min(StartAddress.Row, EndAddress.Row);
         int maxRow1 = Math.Max(StartAddress.Row, EndAddress.Row);
@@ -272,7 +275,7 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
         }
 
         var startStr = StartAddress.ToExcelString();
-        
+
         string endStr;
         if (StartAddress.SheetName is not null && string.Equals(StartAddress.SheetName, EndAddress.SheetName, StringComparison.OrdinalIgnoreCase))
         {
@@ -295,10 +298,11 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
     public string ToOdfString(bool includeBrackets = false)
     {
         var sb = new StringBuilder();
-        if (includeBrackets) sb.Append("[");
+        if (includeBrackets)
+            sb.Append("[");
 
         var startStr = StartAddress.ToOdfString(false);
-        
+
         string endStr;
         if (StartAddress.SheetName is not null && string.Equals(StartAddress.SheetName, EndAddress.SheetName, StringComparison.OrdinalIgnoreCase))
         {
@@ -312,7 +316,8 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
 
         sb.Append(startStr).Append(":").Append(endStr);
 
-        if (includeBrackets) sb.Append("]");
+        if (includeBrackets)
+            sb.Append("]");
         return sb.ToString();
     }
 

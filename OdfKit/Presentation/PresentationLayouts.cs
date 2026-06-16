@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
-using OdfKit.Core;
 using OdfNamespaces = OdfKit.Core.OdfNamespaces;
 
 namespace OdfKit.Presentation;
@@ -410,8 +410,10 @@ public partial class PresentationDocument
     /// <returns>新增的母片執行個體。</returns>
     public OdfMasterPage AddMasterPage(string name, OdfMasterPageDefinition def)
     {
-        if (string.IsNullOrEmpty(name)) throw new ArgumentException("母片名稱不可為空。", nameof(name));
-        if (def is null) throw new ArgumentNullException(nameof(def));
+        if (string.IsNullOrEmpty(name))
+            throw new ArgumentException("母片名稱不可為空。", nameof(name));
+        if (def is null)
+            throw new ArgumentNullException(nameof(def));
 
         // 取得或建立 master-styles 節點
         OdfNode? masterStyles = null;
@@ -478,7 +480,7 @@ public partial class PresentationDocument
         }
         var slide = Slides[slideIndex];
         string? layoutName = slide.PresentationPageLayoutName;
-        
+
         return layoutName switch
         {
             "AL1T1" or "layout_TitleOnly" => OdfPresentationLayout.TitleOnly,

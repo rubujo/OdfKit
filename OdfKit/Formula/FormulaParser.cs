@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using OdfKit.Spreadsheet;
 using OdfKit.Formula.AST;
+using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula;
 
@@ -114,10 +114,14 @@ public ref struct Tokenizer(ReadOnlySpan<char> formula)
         char current = _formula[_index];
 
         // 1. 括號與分隔符號
-        if (current == '(') { _index++; return new(FormulaTokenType.OpenParen, _formula.Slice(_index - 1, 1)); }
-        if (current == ')') { _index++; return new(FormulaTokenType.CloseParen, _formula.Slice(_index - 1, 1)); }
-        if (current == ',' || current == ';') { _index++; return new(FormulaTokenType.Separator, _formula.Slice(_index - 1, 1)); }
-        if (current == ':') { _index++; return new(FormulaTokenType.Colon, _formula.Slice(_index - 1, 1)); }
+        if (current == '(')
+        { _index++; return new(FormulaTokenType.OpenParen, _formula.Slice(_index - 1, 1)); }
+        if (current == ')')
+        { _index++; return new(FormulaTokenType.CloseParen, _formula.Slice(_index - 1, 1)); }
+        if (current == ',' || current == ';')
+        { _index++; return new(FormulaTokenType.Separator, _formula.Slice(_index - 1, 1)); }
+        if (current == ':')
+        { _index++; return new(FormulaTokenType.Colon, _formula.Slice(_index - 1, 1)); }
 
         // 2. 字串常值
         if (current == '"')
@@ -209,7 +213,8 @@ public ref struct Tokenizer(ReadOnlySpan<char> formula)
                 {
                     _index++;
                 }
-                if (_index < _formula.Length) _index++; // 跳過結束引號
+                if (_index < _formula.Length)
+                    _index++; // 跳過結束引號
             }
 
             while (_index < _formula.Length)
@@ -237,7 +242,7 @@ public ref struct Tokenizer(ReadOnlySpan<char> formula)
             }
 
             var identSpan = _formula.Slice(start, _index - start);
-            
+
             // 快速檢查是否為邏輯常值
             bool isFunctionCall = false;
             int peekIdx = _index;
@@ -364,7 +369,7 @@ public ref struct FormulaParser
     private AstNode ParseTerm()
     {
         var node = ParseFactor();
-        while (_currentToken.Type == FormulaTokenType.Operator && 
+        while (_currentToken.Type == FormulaTokenType.Operator &&
               (_currentToken.Span.Equals("+", StringComparison.Ordinal) || _currentToken.Span.Equals("-", StringComparison.Ordinal)))
         {
             string op = _currentToken.Span.ToString();
@@ -379,7 +384,7 @@ public ref struct FormulaParser
     private AstNode ParseFactor()
     {
         var node = ParsePower();
-        while (_currentToken.Type == FormulaTokenType.Operator && 
+        while (_currentToken.Type == FormulaTokenType.Operator &&
               (_currentToken.Span.Equals("*", StringComparison.Ordinal) || _currentToken.Span.Equals("/", StringComparison.Ordinal)))
         {
             string op = _currentToken.Span.ToString();
@@ -406,7 +411,7 @@ public ref struct FormulaParser
     // 優先權 6：單元運算 (+, -, %)
     private AstNode ParseUnary()
     {
-        if (_currentToken.Type == FormulaTokenType.Operator && 
+        if (_currentToken.Type == FormulaTokenType.Operator &&
            (_currentToken.Span.Equals("+", StringComparison.Ordinal) || _currentToken.Span.Equals("-", StringComparison.Ordinal)))
         {
             char op = _currentToken.Span[0];

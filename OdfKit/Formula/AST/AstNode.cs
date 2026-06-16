@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using OdfKit.Spreadsheet;
 
@@ -199,11 +199,13 @@ public class UnaryNode(char op, AstNode child) : AstNode
     public override object Evaluate(IEvaluationContext context)
     {
         var val = child.Evaluate(context);
-        if (val is OdfFormulaError err) return err;
+        if (val is OdfFormulaError err)
+            return err;
 
         if (op == '%')
         {
-            if (val is double d) return d / 100.0;
+            if (val is double d)
+                return d / 100.0;
             if (val is string s && double.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsed))
                 return parsed / 100.0;
             return OdfFormulaError.Value;
@@ -242,10 +244,12 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
     public override object Evaluate(IEvaluationContext context)
     {
         var leftVal = left.Evaluate(context);
-        if (leftVal is OdfFormulaError) return leftVal;
+        if (leftVal is OdfFormulaError)
+            return leftVal;
 
         var rightVal = right.Evaluate(context);
-        if (rightVal is OdfFormulaError) return rightVal;
+        if (rightVal is OdfFormulaError)
+            return rightVal;
 
         if (op == "&")
         {
@@ -280,15 +284,19 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
 
     private static string FormatValue(object val)
     {
-        if (val is bool b) return b ? "TRUE" : "FALSE";
+        if (val is bool b)
+            return b ? "TRUE" : "FALSE";
         return val.ToString() ?? "";
     }
 
     private static bool TryCoerceDouble(object val, out double result)
     {
-        if (val is double d) { result = d; return true; }
-        if (val is bool b) { result = b ? 1.0 : 0.0; return true; }
-        if (val is string s) return double.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out result);
+        if (val is double d)
+        { result = d; return true; }
+        if (val is bool b)
+        { result = b ? 1.0 : 0.0; return true; }
+        if (val is string s)
+            return double.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out result);
         result = 0;
         return false;
     }
@@ -405,8 +413,10 @@ public class NamedRangeNode(string name) : AstNode
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
         var val = context.GetNamedRangeOrExpressionValue(Name);
-        if (val is OdfCellRange r) return [r];
-        if (val is string s && OdfCellRange.TryParse(s, out var range)) return [range];
+        if (val is OdfCellRange r)
+            return [r];
+        if (val is string s && OdfCellRange.TryParse(s, out var range))
+            return [range];
         return [];
     }
 

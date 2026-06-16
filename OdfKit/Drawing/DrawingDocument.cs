@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -7,8 +7,8 @@ using System.Text;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
-using OdfKit.Styles;
 using OdfKit.Presentation;
+using OdfKit.Styles;
 
 namespace OdfKit.Drawing;
 
@@ -140,7 +140,7 @@ public class DrawingDocument : OdfDocument
     {
         var drawingNode = GetDrawingNode();
         var pageNode = OdfNodeFactory.CreateElement("page", OdfNamespaces.Draw, "draw");
-        
+
         string pageName = name ?? $"Page {_pages.Count + 1}";
         pageNode.SetAttribute("name", OdfNamespaces.Draw, pageName, "draw");
 
@@ -161,7 +161,8 @@ public class DrawingDocument : OdfDocument
     /// <returns>新增的路徑圖形執行個體</returns>
     public OdfShape AddPath(string svgPathData, OdfLength x, OdfLength y, OdfLength width, OdfLength height)
     {
-        if (Pages.Count == 0) AddPage();
+        if (Pages.Count == 0)
+            AddPage();
         return Pages[0].AddPath(svgPathData, x, y, width, height);
     }
 
@@ -172,7 +173,8 @@ public class DrawingDocument : OdfDocument
     /// <returns>新增的多邊形圖形執行個體</returns>
     public OdfShape AddPolygon(IEnumerable<(OdfLength X, OdfLength Y)> points)
     {
-        if (Pages.Count == 0) AddPage();
+        if (Pages.Count == 0)
+            AddPage();
         return Pages[0].AddPolygon(points);
     }
 
@@ -185,7 +187,8 @@ public class DrawingDocument : OdfDocument
     /// <returns>新增的連接線圖形執行個體</returns>
     public OdfShape AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType = OdfConnectorType.Standard)
     {
-        if (Pages.Count == 0) AddPage();
+        if (Pages.Count == 0)
+            AddPage();
         return Pages[0].AddConnector(startShapeId, endShapeId, connectorType);
     }
 
@@ -200,7 +203,8 @@ public class DrawingDocument : OdfDocument
     /// <returns>新增的自定義幾何圖形執行個體</returns>
     public OdfShape AddCustomShape(string shapeType, OdfLength x, OdfLength y, OdfLength width, OdfLength height)
     {
-        if (Pages.Count == 0) AddPage();
+        if (Pages.Count == 0)
+            AddPage();
         return Pages[0].AddCustomShape(shapeType, x, y, width, height);
     }
 
@@ -256,7 +260,7 @@ public class DrawingDocument : OdfDocument
         var srcDraw = sourceDoc as DrawingDocument ?? throw new ArgumentException("Source document must be a DrawingDocument.");
         var destDrawNode = GetDrawingNode();
         var srcDrawNode = srcDraw.GetDrawingNode();
-        
+
         foreach (var child in srcDrawNode.Children)
         {
             if (child.NodeType is OdfNodeType.Element)
@@ -280,8 +284,8 @@ public class DrawingDocument : OdfDocument
     {
         foreach (var child in parent.Children)
         {
-            if (child.NodeType is OdfNodeType.Element && 
-                string.Equals(child.LocalName, localName, StringComparison.Ordinal) && 
+            if (child.NodeType is OdfNodeType.Element &&
+                string.Equals(child.LocalName, localName, StringComparison.Ordinal) &&
                 string.Equals(child.NamespaceUri, nsUri, StringComparison.Ordinal))
             {
                 return child;
@@ -547,7 +551,8 @@ public class OdfDrawPage(OdfNode node, DrawingDocument doc)
     /// <returns>新增的路徑圖形執行個體</returns>
     public OdfShape AddPath(string svgPathData, OdfLength x, OdfLength y, OdfLength width, OdfLength height)
     {
-        if (svgPathData is null) throw new ArgumentNullException(nameof(svgPathData));
+        if (svgPathData is null)
+            throw new ArgumentNullException(nameof(svgPathData));
 
         var shapeNode = OdfNodeFactory.CreateElement("path", OdfNamespaces.Draw, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
@@ -569,9 +574,11 @@ public class OdfDrawPage(OdfNode node, DrawingDocument doc)
     /// <returns>新增的多邊形圖形執行個體</returns>
     public OdfShape AddPolygon(IEnumerable<(OdfLength X, OdfLength Y)> points)
     {
-        if (points is null) throw new ArgumentNullException(nameof(points));
+        if (points is null)
+            throw new ArgumentNullException(nameof(points));
         var ptList = points.ToList();
-        if (ptList.Count == 0) throw new ArgumentException("頂點集合不可為空。", nameof(points));
+        if (ptList.Count == 0)
+            throw new ArgumentException("頂點集合不可為空。", nameof(points));
 
         double minX = double.MaxValue;
         double maxX = double.MinValue;
@@ -582,10 +589,14 @@ public class OdfDrawPage(OdfNode node, DrawingDocument doc)
         {
             double px = p.X.ToPoints();
             double py = p.Y.ToPoints();
-            if (px < minX) minX = px;
-            if (px > maxX) maxX = px;
-            if (py < minY) minY = py;
-            if (py > maxY) maxY = py;
+            if (px < minX)
+                minX = px;
+            if (px > maxX)
+                maxX = px;
+            if (py < minY)
+                minY = py;
+            if (py > maxY)
+                maxY = py;
         }
 
         double widthPoints = maxX - minX;
@@ -605,8 +616,10 @@ public class OdfDrawPage(OdfNode node, DrawingDocument doc)
 
         int vbWidth = (int)Math.Round(widthPoints);
         int vbHeight = (int)Math.Round(heightPoints);
-        if (vbWidth <= 0) vbWidth = 1000;
-        if (vbHeight <= 0) vbHeight = 1000;
+        if (vbWidth <= 0)
+            vbWidth = 1000;
+        if (vbHeight <= 0)
+            vbHeight = 1000;
 
         shapeNode.SetAttribute("viewBox", OdfNamespaces.Svg, $"0 0 {vbWidth} {vbHeight}", "svg");
 
@@ -633,8 +646,10 @@ public class OdfDrawPage(OdfNode node, DrawingDocument doc)
     /// <returns>新增的連接線圖形執行個體</returns>
     public OdfShape AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType = OdfConnectorType.Standard)
     {
-        if (string.IsNullOrEmpty(startShapeId)) throw new ArgumentException("起點圖形識別碼不可為空。", nameof(startShapeId));
-        if (string.IsNullOrEmpty(endShapeId)) throw new ArgumentException("終點圖形識別碼不可為空。", nameof(endShapeId));
+        if (string.IsNullOrEmpty(startShapeId))
+            throw new ArgumentException("起點圖形識別碼不可為空。", nameof(startShapeId));
+        if (string.IsNullOrEmpty(endShapeId))
+            throw new ArgumentException("終點圖形識別碼不可為空。", nameof(endShapeId));
 
         var connectorNode = OdfNodeFactory.CreateElement("connector", OdfNamespaces.Draw, "draw");
         connectorNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
@@ -665,7 +680,8 @@ public class OdfDrawPage(OdfNode node, DrawingDocument doc)
     /// <returns>新增的自定義幾何圖形執行個體</returns>
     public OdfShape AddCustomShape(string shapeType, OdfLength x, OdfLength y, OdfLength width, OdfLength height)
     {
-        if (string.IsNullOrEmpty(shapeType)) throw new ArgumentException("幾何類型不可為空。", nameof(shapeType));
+        if (string.IsNullOrEmpty(shapeType))
+            throw new ArgumentException("幾何類型不可為空。", nameof(shapeType));
 
         var shapeNode = OdfNodeFactory.CreateElement("custom-shape", OdfNamespaces.Draw, "draw");
         shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");

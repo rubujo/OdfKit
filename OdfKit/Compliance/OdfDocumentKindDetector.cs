@@ -1,7 +1,7 @@
-#pragma warning restore CS1591
+﻿#pragma warning restore CS1591
 using System;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 

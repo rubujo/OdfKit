@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -27,9 +27,12 @@ public static class OdfFontResolver
     /// <exception cref="FileNotFoundException">當找不到指定的字型檔案時拋出</exception>
     public static void RegisterFont(string fontName, string filePath)
     {
-        if (string.IsNullOrEmpty(fontName)) throw new ArgumentNullException(nameof(fontName));
-        if (string.IsNullOrEmpty(filePath)) throw new ArgumentNullException(nameof(filePath));
-        if (!File.Exists(filePath)) throw new FileNotFoundException("找不到字型檔案。", filePath);
+        if (string.IsNullOrEmpty(fontName))
+            throw new ArgumentNullException(nameof(fontName));
+        if (string.IsNullOrEmpty(filePath))
+            throw new ArgumentNullException(nameof(filePath));
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException("找不到字型檔案。", filePath);
 
         lock (_lock)
         {
@@ -45,8 +48,10 @@ public static class OdfFontResolver
     /// <exception cref="DirectoryNotFoundException">當找不到指定的字型目錄時拋出</exception>
     public static void RegisterFontDirectory(string directoryPath)
     {
-        if (string.IsNullOrEmpty(directoryPath)) throw new ArgumentNullException(nameof(directoryPath));
-        if (!Directory.Exists(directoryPath)) throw new DirectoryNotFoundException($"找不到字型目錄：'{directoryPath}'");
+        if (string.IsNullOrEmpty(directoryPath))
+            throw new ArgumentNullException(nameof(directoryPath));
+        if (!Directory.Exists(directoryPath))
+            throw new DirectoryNotFoundException($"找不到字型目錄：'{directoryPath}'");
 
         lock (_lock)
         {
@@ -62,7 +67,8 @@ public static class OdfFontResolver
     /// <returns>字型檔案的絕對路徑，若無法解析則為 null</returns>
     public static string? ResolveFontPath(string fontName)
     {
-        if (string.IsNullOrEmpty(fontName)) return null;
+        if (string.IsNullOrEmpty(fontName))
+            return null;
 
         lock (_lock)
         {
@@ -95,7 +101,8 @@ public static class OdfFontResolver
         foreach (var fontFace in fontFaces)
         {
             string? fontName = fontFace.GetAttribute("name", OdfNamespaces.Style);
-            if (string.IsNullOrEmpty(fontName)) continue;
+            if (string.IsNullOrEmpty(fontName))
+                continue;
 
             string? fontPath = ResolveFontPath(fontName!);
             if (fontPath is null)
@@ -168,27 +175,30 @@ public static class OdfFontResolver
 
     private static void ScanSystemFonts()
     {
-        List<string> scanDirs = [.._customDirectories];
+        List<string> scanDirs = [.. _customDirectories];
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             scanDirs.Add(@"C:\Windows\Fonts");
             string userFonts = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Microsoft\Windows\Fonts");
-            if (Directory.Exists(userFonts)) scanDirs.Add(userFonts);
+            if (Directory.Exists(userFonts))
+                scanDirs.Add(userFonts);
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             scanDirs.Add("/usr/share/fonts");
             scanDirs.Add("/usr/local/share/fonts");
             string userFonts = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local/share/fonts");
-            if (Directory.Exists(userFonts)) scanDirs.Add(userFonts);
+            if (Directory.Exists(userFonts))
+                scanDirs.Add(userFonts);
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             scanDirs.Add("/Library/Fonts");
             scanDirs.Add("/System/Library/Fonts");
             string userFonts = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library/Fonts");
-            if (Directory.Exists(userFonts)) scanDirs.Add(userFonts);
+            if (Directory.Exists(userFonts))
+                scanDirs.Add(userFonts);
         }
 
         foreach (var dir in scanDirs)
@@ -201,7 +211,8 @@ public static class OdfFontResolver
 
     private static void ScanDirectory(string dirPath)
     {
-        if (!Directory.Exists(dirPath)) return;
+        if (!Directory.Exists(dirPath))
+            return;
         try
         {
             var files = Directory.GetFiles(dirPath, "*.*", SearchOption.AllDirectories);
@@ -248,7 +259,8 @@ internal static class TtfReader
                 {
                     fs.Position = 8; // 跳過版本
                     uint numFonts = ReadUInt32BE(reader);
-                    if (numFonts > 256) return names; // 防禦性上限：真實 TTC 最多不超過 256 字型
+                    if (numFonts > 256)
+                        return names; // 防禦性上限：真實 TTC 最多不超過 256 字型
                     List<uint> offsets = [];
                     for (int f = 0; f < numFonts; f++)
                     {
@@ -303,7 +315,8 @@ internal static class TtfReader
             }
         }
 
-        if (nameTableOffset == 0 || nameTableLength == 0) return names;
+        if (nameTableOffset == 0 || nameTableLength == 0)
+            return names;
 
         fs.Position = nameTableOffset;
         ushort format = ReadUInt16BE(reader);
@@ -353,14 +366,16 @@ internal static class TtfReader
     private static ushort ReadUInt16BE(BinaryReader reader)
     {
         byte[] bytes = reader.ReadBytes(2);
-        if (BitConverter.IsLittleEndian) Array.Reverse(bytes);
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(bytes);
         return BitConverter.ToUInt16(bytes, 0);
     }
 
     private static uint ReadUInt32BE(BinaryReader reader)
     {
         byte[] bytes = reader.ReadBytes(4);
-        if (BitConverter.IsLittleEndian) Array.Reverse(bytes);
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(bytes);
         return BitConverter.ToUInt32(bytes, 0);
     }
 }

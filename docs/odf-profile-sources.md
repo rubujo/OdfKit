@@ -18,7 +18,9 @@
 |---|---|---:|---|---|---|---|
 | `OASIS_ODF_1_4_Strict` | `https://docs.oasis-open.org/office/OpenDocument/v1.4/os/` | `2025-10-06` | `Normative` | `VerifiedOfficial` | `1.4` | 嚴格一致性，不允許 ODF namespace 偽裝擴充。 |
 | `OASIS_ODF_1_4_Extended` | `https://docs.oasis-open.org/office/OpenDocument/v1.4/os/` | `2025-10-06` | `Normative` | `VerifiedOfficial` | `1.4` | 允許 foreign namespace，但要求可隔離與可移除。 |
-| `ISO_IEC_26300` | `https://www.iso.org/standard/66363.html` | `2015` | `Normative` | `VerifiedOfficial` | `1.2` | 對應 ODF 1.2 baseline。 |
+| `OASIS_ODF_1_1` | `https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng` | `2007-02-01` | `Normative` | `VerifiedOfficial` | `1.1` | 以 OASIS 官方獨立 RNG 衍生的真實 ODF 1.1 schema 驗證，非從 1.4 過濾的近似值。 |
+| `OASIS_ODF_1_3` | `https://docs.oasis-open.org/office/OpenDocument/v1.3/os/schemas/OpenDocument-v1.3-schema.rng` | `2021-04-27` | `Normative` | `VerifiedOfficial` | `1.3` | 以 OASIS 官方獨立 RNG 衍生的真實 ODF 1.3 schema 驗證，非從 1.4 過濾的近似值。 |
+| `ISO_IEC_26300` | `https://www.iso.org/standard/66363.html` | `2015` | `Normative` | `VerifiedOfficial` | `1.2` | 對應 ODF 1.2 baseline；自 schema pattern 改採真實的官方 ODF 1.2 RNG（`https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-schema.rng`）後，不再是過去從 1.4 schema 過濾出的近似值。 |
 | `EU_InteroperableEurope` | `https://eur-lex.europa.eu/eli/reg/2024/903/oj` | `2024-03-13` | `Normative` | `VerifiedOfficial` | `all-known` | 以互通性與可檢查 metadata / accessibility 規則呈現。 |
 | `EU_OfficeDocumentExchange` | `https://eur-lex.europa.eu/eli/reg/2024/903/oj` | `2024-03-13` | `Compatibility` | `OfficialButIndirect` | `all-known` | OdfKit 的辦公室文件交換相容性映射，不宣稱為獨立官方 ODF profile。 |
 | `ROC_Taiwan_ODF_CNS15251` | `null` | `null` | `Draft` | `NeedsActiveSource` | `all-known` | 等待可追溯的有效 CNS15251 / ODF mapping 來源後才能升級。 |

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Xml.Linq;
 using ClosedXML.Excel;
@@ -24,7 +24,8 @@ public static class XlsxToOdfConverter
     /// <exception cref="ArgumentNullException">當 xlsxStream 為 null 時引發。</exception>
     public static OdfKit.Spreadsheet.SpreadsheetDocument Convert(Stream xlsxStream)
     {
-        if (xlsxStream is null) throw new ArgumentNullException(nameof(xlsxStream));
+        if (xlsxStream is null)
+            throw new ArgumentNullException(nameof(xlsxStream));
 
         var odsWorkbook = OdfKit.Spreadsheet.SpreadsheetDocument.Create();
         using var workbookStream = new MemoryStream();
@@ -210,7 +211,8 @@ public static class XlsxToOdfConverter
     private static void CopySheetData(IXLWorksheet xlSheet, OdfTableSheet odsSheet)
     {
         var usedRange = xlSheet.RangeUsed();
-        if (usedRange is null) return;
+        if (usedRange is null)
+            return;
 
         foreach (var xlRow in usedRange.Rows())
         {

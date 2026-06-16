@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using OdfKit.Core;
@@ -56,7 +56,8 @@ public class OdfStyleEngine
             foreach (var child in contentAuto.Children)
             {
                 string? name = child.GetAttribute("name", OdfNamespaces.Style);
-                if (name is not null) _automaticStyles[name] = child;
+                if (name is not null)
+                    _automaticStyles[name] = child;
             }
         }
 
@@ -67,7 +68,8 @@ public class OdfStyleEngine
             foreach (var child in stylesAuto.Children)
             {
                 string? name = child.GetAttribute("name", OdfNamespaces.Style);
-                if (name is not null) _automaticStyles[name] = child;
+                if (name is not null)
+                    _automaticStyles[name] = child;
             }
         }
 
@@ -85,7 +87,8 @@ public class OdfStyleEngine
                 else if (child.LocalName == "default-style" && child.NamespaceUri == OdfNamespaces.Style)
                 {
                     string? family = child.GetAttribute("family", OdfNamespaces.Style);
-                    if (family is not null) _defaultStyles[family] = child;
+                    if (family is not null)
+                        _defaultStyles[family] = child;
                 }
             }
         }
@@ -134,13 +137,15 @@ public class OdfStyleEngine
         if (_automaticStyles.TryGetValue(styleName!, out var styleNode))
         {
             string? val = FindPropertyInStyleNode(styleNode, propertyLocalName, propertyNsUri);
-            if (val is not null) return val;
+            if (val is not null)
+                return val;
 
             string? parentName = styleNode.GetAttribute("parent-style-name", OdfNamespaces.Style);
             if (!string.IsNullOrEmpty(parentName))
             {
                 val = GetStylePropertyInternal(parentName, propertyLocalName, propertyNsUri, styleFamily, visited);
-                if (val is not null) return val;
+                if (val is not null)
+                    return val;
             }
         }
 
@@ -148,13 +153,15 @@ public class OdfStyleEngine
         if (_commonStyles.TryGetValue(styleName!, out styleNode))
         {
             string? val = FindPropertyInStyleNode(styleNode, propertyLocalName, propertyNsUri);
-            if (val is not null) return val;
+            if (val is not null)
+                return val;
 
             string? parentName = styleNode.GetAttribute("parent-style-name", OdfNamespaces.Style);
             if (!string.IsNullOrEmpty(parentName))
             {
                 val = GetStylePropertyInternal(parentName, propertyLocalName, propertyNsUri, styleFamily, visited);
-                if (val is not null) return val;
+                if (val is not null)
+                    return val;
             }
         }
 
@@ -180,7 +187,8 @@ public class OdfStyleEngine
                 child.NamespaceUri == OdfNamespaces.Style)
             {
                 string? val = child.GetAttribute(propertyLocalName, propertyNsUri);
-                if (val is not null) return val;
+                if (val is not null)
+                    return val;
             }
         }
         return null;
@@ -197,7 +205,8 @@ public class OdfStyleEngine
     /// <exception cref="ArgumentNullException">當 <paramref name="elementNode"/> 為 null 時拋出</exception>
     public OdfNode GetOrCreateLocalStyle(OdfNode elementNode, string family)
     {
-        if (elementNode is null) throw new ArgumentNullException(nameof(elementNode));
+        if (elementNode is null)
+            throw new ArgumentNullException(nameof(elementNode));
 
         if (_localStyles.TryGetValue(elementNode, out var styleNode))
         {
@@ -271,7 +280,8 @@ public class OdfStyleEngine
     /// </summary>
     public void DeduplicateAndSaveStyles()
     {
-        if (_localStyles.Count == 0) return;
+        if (_localStyles.Count == 0)
+            return;
 
         // 尋找或在 content.xml 中建立 <office:automatic-styles>
         var contentAuto = FindChildElement(_contentRoot, "automatic-styles", OdfNamespaces.Office);
@@ -301,13 +311,15 @@ public class OdfStyleEngine
             OdfNode localStyle = kvp.Value;
 
             // 僅在節點被修改時寫入（Dirty 旗標檢查）
-            if (!elementNode.IsModified) continue;
+            if (!elementNode.IsModified)
+                continue;
 
             string family = localStyle.GetAttribute("family", OdfNamespaces.Style) ?? "text";
 
             // 將屬性序列化為字串以作為雜湊金鑰
             string styleKey = SerializeStyleProperties(localStyle);
-            if (string.IsNullOrEmpty(styleKey)) continue;
+            if (string.IsNullOrEmpty(styleKey))
+                continue;
 
             if (!uniqueStyles.TryGetValue(styleKey, out string? styleName))
             {
@@ -357,13 +369,13 @@ public class OdfStyleEngine
         sb.Append($"family:{styleNode.GetAttribute("family", OdfNamespaces.Style)}|");
         sb.Append($"parent:{styleNode.GetAttribute("parent-style-name", OdfNamespaces.Style)}|");
 
-        List<OdfNode> propNodes = [..styleNode.Children];
+        List<OdfNode> propNodes = [.. styleNode.Children];
         propNodes.Sort((x, y) => string.Compare(x.LocalName, y.LocalName, StringComparison.Ordinal));
 
         foreach (var pNode in propNodes)
         {
             sb.Append($"[{pNode.LocalName}:");
-            List<OdfAttributeName> attrs = [..pNode.Attributes.Keys];
+            List<OdfAttributeName> attrs = [.. pNode.Attributes.Keys];
             attrs.Sort((x, y) => string.Compare(x.LocalName, y.LocalName, StringComparison.Ordinal));
 
             foreach (var attr in attrs)

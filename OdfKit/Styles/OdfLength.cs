@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 
 namespace OdfKit.Styles;
@@ -234,7 +234,8 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     /// <exception cref="NotSupportedException">當長度單位轉換不支援時拋出</exception>
     public double ConvertTo(OdfUnit targetUnit)
     {
-        if (Unit == targetUnit) return Value;
+        if (Unit == targetUnit)
+            return Value;
         if (Unit is OdfUnit.Unspecified || targetUnit is OdfUnit.Unspecified)
         {
             return Value; // 如果未指定，則視為 1:1 比率
