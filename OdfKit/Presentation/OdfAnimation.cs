@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using OdfKit.DOM;
 using OdfKit.Styles;
 

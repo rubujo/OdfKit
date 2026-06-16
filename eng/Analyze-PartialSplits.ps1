@@ -27,23 +27,19 @@ $keepTypes = [System.Collections.Generic.HashSet[string]]::new([StringComparer]:
     'OdsStreamWriter'
 ) | ForEach-Object { [void]$keepTypes.Add($_) }
 
-# 已評估為合理拆分的雙檔 partial（含實際邏輯邊界）
-$reviewKeepPairs = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+# 已評估完成：雙檔拆分具實際邏輯邊界，永久保留
+$validatedDualKeepTypes = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 @(
-    'OdfParagraph|OdfParagraph.EmbeddedContent.cs'
-    'OdfCell|OdfCell.Hyperlink.cs'
-    'OdfCell|OdfCell.Formatting.cs'
-    'OdfChartDocument|OdfChartDocument.SeriesAxis.cs'
-    'OdfChartDocument|OdfChartDocument.DataRange.cs'
-    'OdfFormulaDocument|OdfFormulaDocument.Infrastructure.cs'
-    'OdfImageDocument|OdfImageDocument.Infrastructure.cs'
-    'OdfPageSetup|OdfPageSetup.Infrastructure.cs'
-    'OdfMailMergeEngine|OdfMailMergeEngine.Placeholders.cs'
-    'OdfDrawPage|OdfDrawPage.Creation.cs'
-    'OdfSlide|OdfSlide.Animations.cs'
-    'OdfSlide|OdfSlide.DrawingObjects.cs'
-    'PresentationDocument|PresentationDocument.Transitions.cs'
-) | ForEach-Object { [void]$reviewKeepPairs.Add($_) }
+    'OdfFormulaDocument'
+    'OdfImageDocument'
+    'OdfPageSetup'
+    'OdfParagraph'
+    'OdfSlide'
+    'OdfCell'
+    'OdfChartDocument'
+    'OdfDrawPage'
+    'OdfMailMergeEngine'
+) | ForEach-Object { [void]$validatedDualKeepTypes.Add($_) }
 
 function Get-PartialTypeName {
     param([string[]]$Lines)
@@ -68,13 +64,9 @@ function Get-RecommendedAction {
 
     if ($PartCount -eq 1) { return 'N/A' }
     if ($keepTypes.Contains($TypeName)) { return 'KEEP' }
+    if ($validatedDualKeepTypes.Contains($TypeName)) { return 'KEEP' }
 
-    # 小型 struct / 值型別：總行數低且檔案數少，合併收益高
-    if ($TypeName -eq 'OdfCellAddress' -and $PartCount -le 3 -and $TotalLines -lt 600) {
-        return 'MERGE'
-    }
-
-    # 極小 helper partial（< 90 行）且非獨立公開 API
+    # 極小 helper partial（< 90 行）且檔名暗示可合併
     if ($MinPart -lt 90 -and $MaxPart -gt 150) {
         $smallFiles = $FileNames | Where-Object { $_ -match '\.(Helpers|Candidates|Primitive)\.cs$' }
         if ($smallFiles.Count -gt 0) {
@@ -82,21 +74,7 @@ function Get-RecommendedAction {
         }
     }
 
-    # 雙檔且總量適中：若已在白名單則保留
-    if ($PartCount -eq 2 -and $TotalLines -lt 550) {
-        $allKept = $true
-        foreach ($file in $FileNames) {
-            $key = "$TypeName|$file"
-            if (-not $reviewKeepPairs.Contains($key)) {
-                $allKept = $false
-                break
-            }
-        }
-        if ($allKept) { return 'KEEP' }
-    }
-
     if ($Pattern -eq 'MANY-SMALL' -and $TotalLines -lt 450) { return 'MERGE' }
-    if ($TotalLines -lt 500 -and $PartCount -le 3 -and $MinPart -gt 100) { return 'REVIEW' }
     return 'REVIEW'
 }
 
@@ -149,12 +127,20 @@ $report = foreach ($g in $groups) {
 }
 
 Write-Host '=== Multi-file partial types ==='
-$report | Where-Object { $_.Parts -gt 1 } | Sort-Object Action, TotalLines | Format-Table -AutoSize -Wrap
+$report | Where-Object { $_.Parts -gt 1 } | Sort-Object TotalLines -Descending | Format-Table -AutoSize -Wrap
 
 $mergeCount = ($report | Where-Object { $_.Action -match '^MERGE' }).Count
 $keepCount = ($report | Where-Object { $_.Action -eq 'KEEP' }).Count
 $reviewCount = ($report | Where-Object { $_.Action -eq 'REVIEW' }).Count
+$multiCount = ($report | Where-Object Parts -gt 1).Count
 
 Write-Host "`nTotal partial types: $($groups.Count)"
-Write-Host "Multi-file partial types: $(($report | Where-Object Parts -gt 1).Count)"
+Write-Host "Multi-file partial types: $multiCount"
 Write-Host "Recommended MERGE: $mergeCount | KEEP: $keepCount | REVIEW: $reviewCount"
+
+if ($mergeCount -eq 0 -and $reviewCount -eq 0) {
+    Write-Host 'Status: COMPLETE — 所有 partial 拆分已評估完成，弱拆分已合併，其餘為合理邊界保留。'
+}
+elseif ($mergeCount -gt 0 -or $reviewCount -gt 0) {
+    Write-Host 'Status: PENDING — 尚有 MERGE 或 REVIEW 項目待處理。'
+}
