@@ -73,6 +73,54 @@
       "notes": "Small repo-local negative fixture covering duplicate style:columns inside ODF 1.4 style:page-layout-properties interleave content."
     },
     {
+      "id": "repo-generated-odf14-decorative-image",
+      "path": "generated/odf14-decorative-image.fodg",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatGraphics",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "ODF 1.4 fixture covering draw:decorative accessibility attribute on style:graphic-properties, unknown to ODF 1.2 schemas."
+    },
+    {
+      "id": "repo-generated-odf14-table-in-shape",
+      "path": "generated/odf14-table-in-shape.fodg",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatGraphics",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "ODF 1.4 fixture covering table:table embedded inside a draw:frame shape, not allowed by ODF 1.2 schemas."
+    },
+    {
+      "id": "repo-generated-odf14-zero-based-list",
+      "path": "generated/odf14-zero-based-list.fodt",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatText",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "ODF 1.4 fixture covering text:start-value=\"0\" on text:list-level-style-number, valid because ODF 1.4 widened the datatype from positiveInteger to nonNegativeInteger."
+    },
+    {
+      "id": "repo-generated-odf14-invalid-decorative-bad-value",
+      "path": "generated/odf14-invalid-decorative-bad-value.fodg",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatGraphics",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "invalid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local negative fixture covering an invalid draw:decorative boolean value (\"yes\" instead of \"true\"/\"false\") on style:graphic-properties."
+    },
+    {
       "id": "repo-generated-mathml-formula",
       "path": "generated/mathml-formula.odf",
       "source": "generated",

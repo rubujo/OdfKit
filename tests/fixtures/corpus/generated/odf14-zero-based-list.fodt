@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  office:mimetype="application/vnd.oasis.opendocument.text"
+  office:version="1.4">
+  <office:styles>
+    <text:list-style style:name="ZeroBasedList">
+      <text:list-level-style-number text:level="1" text:start-value="0" style:num-format="1"/>
+    </text:list-style>
+  </office:styles>
+  <office:body>
+    <office:text>
+      <text:list text:style-name="ZeroBasedList">
+        <text:list-item><text:p>零起算第一項</text:p></text:list-item>
+        <text:list-item><text:p>第二項</text:p></text:list-item>
+        <text:list-item><text:p>第三項</text:p></text:list-item>
+      </text:list>
+    </office:text>
+  </office:body>
+</office:document>

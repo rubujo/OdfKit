@@ -1,0 +1,39 @@
+{
+  "description": "ODF 1.4 與 ODF 1.2 schema 差異文件化清單。Apache ODF Toolkit 0.13.0（2026/1/23 發布）僅支援 ODF 1.2 schema 驗證，下列 ODF 1.4 新增結構在以 ODF Toolkit／ODF 1.2 schema 為基準的驗證器下會被視為「未知屬性」或「不允許的結構」，屬於已知且預期的基準差異，不代表 OdfKit 驗證邏輯有誤。",
+  "differences": [
+    {
+      "id": "odf14-draw-decorative",
+      "feature": "draw:decorative",
+      "context": "style:graphic-properties（draw:frame / draw:rect / draw:ellipse 等繪圖物件樣式）",
+      "odf12Schema": "未定義此屬性，屬於未知屬性，ODF 1.2 schema 驗證器會回報 schema 不符或忽略。",
+      "odf14Schema": "OASIS ODF 1.4 §19.220 新增，值限定為 boolean（\"true\"/\"false\"），用於無障礙標記裝飾性圖形物件（EN 301 549 合規）。",
+      "affectedFixtures": [
+        "generated/odf14-decorative-image.fodg",
+        "generated/odf14-invalid-decorative-bad-value.fodg"
+      ],
+      "notes": "OdfKit 以 ODF 1.4 RELAX NG schema 驗證，正確接受合法布林值並拒絕非 \"true\"/\"false\" 的值（例如 \"yes\"）。對標 ODF Toolkit（ODF 1.2）執行同一 fixture 時，預期分類差異為已知基準例外。"
+    },
+    {
+      "id": "odf14-table-in-shape",
+      "feature": "draw:frame > table:table",
+      "context": "draw:frame 形狀內嵌入 table:table 元素",
+      "odf12Schema": "ODF 1.2 schema 的 draw:frame 內容模型不允許 table:table 子元素，會被驗證器拒絕。",
+      "odf14Schema": "OASIS ODF 1.4 新增形狀內嵌入表格的版面配置能力，draw:frame 內容模型允許 table:table。",
+      "affectedFixtures": [
+        "generated/odf14-table-in-shape.fodg"
+      ],
+      "notes": "對標 ODF Toolkit（ODF 1.2）執行此 fixture 預期回報 invalid，屬於已知基準差異而非 OdfKit 缺陷。"
+    },
+    {
+      "id": "odf14-zero-based-list-start-value",
+      "feature": "text:start-value",
+      "context": "text:list-level-style-number（清單樣式起始值）",
+      "odf12Schema": "ODF 1.2 schema 將 text:start-value 限定為 positiveInteger（必須 >= 1），\"0\" 為非法值。",
+      "odf14Schema": "OASIS ODF 1.4 放寬資料型別為 nonNegativeInteger（允許 >= 0），支援零起算清單。",
+      "affectedFixtures": [
+        "generated/odf14-zero-based-list.fodt"
+      ],
+      "notes": "對標 ODF Toolkit（ODF 1.2）執行此 fixture 預期回報 invalid（\"0\" 不符 positiveInteger），屬於已知基準差異而非 OdfKit 缺陷。"
+    }
+  ]
+}
