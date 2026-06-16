@@ -135,7 +135,7 @@ public partial class OdfTableSheet
         return targetColNode;
     }
 
-    private OdfNode GetOrCreateRowNodeInternal(int row, bool forWrite)
+    internal OdfNode GetOrCreateRowNodeInternal(int row, bool forWrite)
     {
         int currentRowIndex = 0;
         foreach (var child in TableNode.Children)

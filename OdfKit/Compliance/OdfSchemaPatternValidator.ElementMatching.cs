@@ -11,17 +11,18 @@ public static partial class OdfSchemaPatternValidator
     private static bool MatchesRootNode(
         OdfSchemaPatternNode node,
         XElement element,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var syntheticDocument = new XElement(XName.Get("document", "urn:odfkit:internal"));
         var rootElements = new[] { element };
-        return MatchContentNode(node, syntheticDocument, rootElements, 0, context).Contains(rootElements.Length);
+        return OdfSchemaPatternContentMatcher.MatchContentNode(node, syntheticDocument, rootElements, 0, context)
+            .Contains(rootElements.Length);
     }
 
-    private static bool MatchesElementNode(
+    internal static bool MatchesElementNode(
         OdfSchemaPatternNode node,
         XElement element,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         if (node.Kind == OdfSchemaPatternNodeKind.Ref)
         {
@@ -34,8 +35,9 @@ public static partial class OdfSchemaPatternValidator
         }
 
         var childElements = element.Elements().ToList();
-        List<OdfSchemaPatternNode> attributeNodes = GetAttributeNodes(node.Children, context);
-        if (!MatchesAttributePatterns(attributeNodes, element, context))
+        List<OdfSchemaPatternNode> attributeNodes =
+            OdfSchemaPatternAttributeMatcher.GetAttributeNodes(node.Children, context);
+        if (!OdfSchemaPatternAttributeMatcher.MatchesAttributePatterns(attributeNodes, element, context))
         {
             return false;
         }
@@ -44,14 +46,15 @@ public static partial class OdfSchemaPatternValidator
             string.IsNullOrEmpty(node.NamespaceUri) &&
             string.IsNullOrEmpty(node.LocalName);
         var contentNodes = node.Children
-            .Select(child => childNameClassesDescribeElementName && IsAttributeNameClassPattern(child)
+            .Select(child => childNameClassesDescribeElementName &&
+                OdfSchemaPatternAttributeMatcher.IsAttributeNameClassPattern(child)
                 ? null
-                : StripAttributePatterns(child, context))
+                : OdfSchemaPatternAttributeMatcher.StripAttributePatterns(child, context))
             .Where(child => child != null)
             .Cast<OdfSchemaPatternNode>()
             .ToList();
         if (HasSignificantDirectText(element) &&
-            !ContentAllowsDirectText(contentNodes, childElements.Count > 0, context))
+            !OdfSchemaPatternContentMatcher.ContentAllowsDirectText(contentNodes, childElements.Count > 0, context))
         {
             return false;
         }
@@ -61,7 +64,8 @@ public static partial class OdfSchemaPatternValidator
             return childElements.Count == 0;
         }
 
-        var matchesResult = MatchSequence(contentNodes, element, childElements, 0, context);
+        var matchesResult = OdfSchemaPatternContentMatcher.MatchSequence(
+            contentNodes, element, childElements, 0, context);
         bool isSeqMatch = matchesResult.Contains(childElements.Count);
         return isSeqMatch;
     }
@@ -73,72 +77,10 @@ public static partial class OdfSchemaPatternValidator
             .Any(text => !string.IsNullOrWhiteSpace(text.Value));
     }
 
-    private static bool ContentAllowsDirectText(
-        IReadOnlyList<OdfSchemaPatternNode> nodes,
-        bool hasChildElements,
-        MatchContext context)
-    {
-        return nodes.Any(node => ContentAllowsDirectText(node, hasChildElements, context));
-    }
-
-    private static bool ContentAllowsDirectText(
-        OdfSchemaPatternNode node,
-        bool hasChildElements,
-        MatchContext context)
-    {
-        switch (node.Kind)
-        {
-            case OdfSchemaPatternNodeKind.Mixed:
-                return true;
-            case OdfSchemaPatternNodeKind.NotAllowed:
-                return false;
-            case OdfSchemaPatternNodeKind.Text:
-            case OdfSchemaPatternNodeKind.Data:
-            case OdfSchemaPatternNodeKind.Value:
-            case OdfSchemaPatternNodeKind.List:
-                return !hasChildElements;
-            case OdfSchemaPatternNodeKind.Ref:
-                return ReferenceAllowsDirectText(node.ReferenceName, hasChildElements, context);
-            case OdfSchemaPatternNodeKind.Choice:
-                return node.Children.Any(child => ContentAllowsDirectText(child, hasChildElements, context));
-            case OdfSchemaPatternNodeKind.Group:
-            case OdfSchemaPatternNodeKind.Interleave:
-            case OdfSchemaPatternNodeKind.Optional:
-            case OdfSchemaPatternNodeKind.ZeroOrMore:
-            case OdfSchemaPatternNodeKind.OneOrMore:
-            case OdfSchemaPatternNodeKind.Other:
-                return node.Children.Any(child => ContentAllowsDirectText(child, false, context));
-            default:
-                return false;
-        }
-    }
-
-    private static bool ReferenceAllowsDirectText(
-        string referenceName,
-        bool hasChildElements,
-        MatchContext context)
-    {
-        if (string.IsNullOrWhiteSpace(referenceName) || !context.EnterReference(referenceName))
-        {
-            return false;
-        }
-
-        try
-        {
-            OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
-            return pattern != null &&
-                pattern.Roots.Any(root => ContentAllowsDirectText(root, hasChildElements, context));
-        }
-        finally
-        {
-            context.LeaveReference(referenceName);
-        }
-    }
-
     private static bool MatchesReference(
         string referenceName,
         XElement element,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         if (string.IsNullOrWhiteSpace(referenceName))
         {
@@ -183,7 +125,8 @@ public static partial class OdfSchemaPatternValidator
         {
             if (string.IsNullOrEmpty(node.LocalName) && string.IsNullOrEmpty(node.NamespaceUri))
             {
-                List<OdfSchemaPatternNode> nameClassNodes = GetNameClassNodes(node.Children);
+                List<OdfSchemaPatternNode> nameClassNodes =
+                    OdfSchemaPatternAttributeMatcher.GetNameClassNodes(node.Children);
                 return nameClassNodes.Count > 0 &&
                     nameClassNodes.Any(child => MatchesNameClassNode(child, namespaceUri, localName));
             }

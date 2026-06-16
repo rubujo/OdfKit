@@ -1,7 +1,4 @@
-﻿using System;
-using OdfKit.Chart;
-using OdfKit.Core;
-using OdfKit.DOM;
+﻿using OdfKit.Chart;
 using OdfKit.Styles;
 
 namespace OdfKit.Spreadsheet;
@@ -9,7 +6,6 @@ namespace OdfKit.Spreadsheet;
 public partial class OdfTableSheet
 {
     #region 圖表
-
 
     /// <summary>
     /// 在此工作表中插入一個與儲存格範圍資料繫結的圖表。
@@ -35,83 +31,17 @@ public partial class OdfTableSheet
         OdfLength? width = null,
         OdfLength? height = null,
         bool firstRowAsHeader = true,
-        bool firstColumnAsLabel = true)
-    {
-        string xStr = (x ?? OdfLength.FromCentimeters(1)).ToString();
-        string yStr = (y ?? OdfLength.FromCentimeters(1)).ToString();
-        string wStr = (width ?? OdfLength.FromCentimeters(12)).ToString();
-        string hStr = (height ?? OdfLength.FromCentimeters(7)).ToString();
-
-        // 1. 唯一物件名稱
-        int objectIndex = 1;
-        while (_doc.Package.HasEntry($"Object {objectIndex}/content.xml"))
-            objectIndex++;
-        string objectName = $"Object {objectIndex}";
-        string objectDir = $"{objectName}/";
-
-        // 2. 建立 table:shapes > draw:frame > draw:object
-        OdfNode shapesNode = FindOrCreateShapesNode();
-        var frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-        frame.SetAttribute("z-index", OdfNamespaces.Draw, "0", "draw");
-        frame.SetAttribute("width", OdfNamespaces.Svg, wStr, "svg");
-        frame.SetAttribute("height", OdfNamespaces.Svg, hStr, "svg");
-        frame.SetAttribute("x", OdfNamespaces.Svg, xStr, "svg");
-        frame.SetAttribute("y", OdfNamespaces.Svg, yStr, "svg");
-
-        string anchorAddr = new OdfCellAddress(
-            dataRange.StartAddress.Row, dataRange.StartAddress.Column).ToOdfString(false);
-        frame.SetAttribute("start-cell-address", OdfNamespaces.Table, anchorAddr, "table");
-        frame.SetAttribute("end-cell-address", OdfNamespaces.Table, anchorAddr, "table");
-        frame.SetAttribute("start-x", OdfNamespaces.Table, xStr, "table");
-        frame.SetAttribute("start-y", OdfNamespaces.Table, yStr, "table");
-        frame.SetAttribute("end-x", OdfNamespaces.Table, wStr, "table");
-        frame.SetAttribute("end-y", OdfNamespaces.Table, hStr, "table");
-
-        var objectNode = new OdfNode(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
-        objectNode.SetAttribute("href", OdfNamespaces.XLink, $"./{objectName}", "xlink");
-        objectNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
-        objectNode.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
-        objectNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
-        frame.AppendChild(objectNode);
-        shapesNode.AppendChild(frame);
-
-        // 3. 寫入嵌入物件的 mimetype
-        byte[] mimeBytes = System.Text.Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.chart");
-        _doc.Package.WriteEntry($"{objectDir}mimetype", mimeBytes, string.Empty);
-
-        // 4. 建立 OdfChartDocument（共享父套件；以預設 content.xml 起始）
-        var chartDoc = new OdfChartDocument(_doc.Package, objectDir);
-
-        // 5. 設定圖表類型與資料繫結
-        chartDoc.ChartClass = chartType switch
-        {
-            OdfChartType.Line => "chart:line",
-            OdfChartType.Pie => "chart:pie",
-            OdfChartType.Area => "chart:area",
-            OdfChartType.Scatter => "chart:scatter",
-            OdfChartType.Bubble => "chart:bubble",
-            _ => "chart:bar"
-        };
-        chartDoc.SetDataRange(Name, dataRange, firstRowAsHeader, firstColumnAsLabel);
-
-        // 6. 將圖表 DOM 持久化至套件
-        chartDoc.Save();
-
-        return chartDoc;
-    }
-
-    private OdfNode FindOrCreateShapesNode()
-    {
-        foreach (var child in TableNode.Children)
-        {
-            if (child.LocalName == "shapes" && child.NamespaceUri == OdfNamespaces.Table)
-                return child;
-        }
-        var shapesNode = new OdfNode(OdfNodeType.Element, "shapes", OdfNamespaces.Table, "table");
-        TableNode.AppendChild(shapesNode);
-        return shapesNode;
-    }
-
+        bool firstColumnAsLabel = true) =>
+        OdfTableSheetChartEngine.InsertChart(
+            MutationContext,
+            dataRange,
+            chartType,
+            x,
+            y,
+            width,
+            height,
+            firstRowAsHeader,
+            firstColumnAsLabel);
 
     #endregion
 }

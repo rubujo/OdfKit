@@ -20,9 +20,9 @@
 | 2 | `DefaultFormulaEvaluator` | ~4763 | **1** | `FormulaCoercion`；還原 `Matrix`/`Lookup` partial |
 | 3 | `OdfSigner` | ~1668 | **1** | `OdfSignatureVerifier`（驗證管線） |
 | 4 | `OdfPackage` | ~2615 | **2** | `OdfManifestLoader`、`OdfPackageSaver` + mutation context |
-| 5 | `OdfSchemaPatternValidator` | ~2664 | **2** | 屬性/內容比對子驗證器 |
+| 5 | `OdfSchemaPatternValidator` | ~2664 | **4** | 屬性/內容比對子驗證器 |
 | 6 | `OdfElement` | ~5533 | **3** | enum parser / typed attribute 靜態註冊表（不破壞 DOM 聚合根） |
-| 7 | `OdfTableSheet` | ~2082 | **3** | 圖表、條件格式、列欄群組引擎 |
+| 7 | `OdfTableSheet` | ~2082 | **4** | 圖表、條件格式、列欄群組引擎 |
 
 ## Phase 1（已完成）
 
@@ -45,6 +45,13 @@
 - [x] `FormulaBuiltinFunctionRegistry` 取代 `FunctionDispatch` 巨型 switch
 - [x] `OdfPackageLoader` + `OdfPackageZipLoader` 載入引擎
 - [x] `OdfElementSchemaRegistry` 靜態 enum token 註冊表（8 個 EnumParsers 遷移）
+
+## Phase 4（已完成）
+
+- [x] `OdfSchemaPatternAttributeMatcher` + `OdfSchemaPatternContentMatcher` 子驗證器
+- [x] `OdfSchemaPatternMatchContext` 比對狀態提取
+- [x] `OdfTableSheetChartEngine`、`OdfTableSheetConditionalFormatEngine`、`OdfTableSheetRowColumnGroupEngine`
+- [x] `OdfTableSheetMutationContext` 協作存取器
 
 ## 驗證
 

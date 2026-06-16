@@ -4,16 +4,16 @@ using System.Xml.Linq;
 
 namespace OdfKit.Compliance;
 
-public static partial class OdfSchemaPatternValidator
+internal static partial class OdfSchemaPatternContentMatcher
 {
     #region Content Matching - Sequence
 
-    private static HashSet<int> MatchSequence(
+    internal static HashSet<int> MatchSequence(
         IReadOnlyList<OdfSchemaPatternNode> nodes,
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int startIndex,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var indices = new HashSet<int> { startIndex };
         foreach (OdfSchemaPatternNode node in nodes)
@@ -38,12 +38,12 @@ public static partial class OdfSchemaPatternValidator
         return indices;
     }
 
-    private static HashSet<int> MatchContentNode(
+    internal static HashSet<int> MatchContentNode(
         OdfSchemaPatternNode node,
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int index,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         switch (node.Kind)
         {
@@ -76,19 +76,19 @@ public static partial class OdfSchemaPatternValidator
             case OdfSchemaPatternNodeKind.Text:
                 return new HashSet<int> { index };
             case OdfSchemaPatternNodeKind.Data:
-                return IsSimpleTextNode(parent) && MatchesDataValue(node, parent.Value, context)
+                return OdfSchemaPatternValidator.IsSimpleTextNode(parent) && OdfSchemaPatternValidator.MatchesDataValue(node, parent.Value, context)
                     ? new HashSet<int> { index }
                     : new HashSet<int>();
             case OdfSchemaPatternNodeKind.Value:
-                return IsSimpleTextNode(parent) && MatchesLiteralValue(node, parent.Value)
+                return OdfSchemaPatternValidator.IsSimpleTextNode(parent) && OdfSchemaPatternValidator.MatchesLiteralValue(node, parent.Value)
                     ? new HashSet<int> { index }
                     : new HashSet<int>();
             case OdfSchemaPatternNodeKind.List:
-                return IsSimpleTextNode(parent) && MatchesListValue(node.Children, parent.Value, context)
+                return OdfSchemaPatternValidator.IsSimpleTextNode(parent) && OdfSchemaPatternValidator.MatchesListValue(node.Children, parent.Value, context)
                     ? new HashSet<int> { index }
                     : new HashSet<int>();
             case OdfSchemaPatternNodeKind.Attribute:
-                return MatchesAttributeNode(node, parent, context)
+                return OdfSchemaPatternAttributeMatcher.MatchesAttributeNode(node, parent, context)
                     ? new HashSet<int> { index }
                     : new HashSet<int>();
             default:
@@ -100,15 +100,15 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternNode node,
         IReadOnlyList<XElement> childElements,
         int index,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         if (index >= childElements.Count)
         {
             return new HashSet<int>();
         }
 
-        var childContext = new MatchContext(context.Schema);
-        return MatchesElementNode(node, childElements[index], childContext)
+        var childContext = new OdfSchemaPatternMatchContext(context.Schema);
+        return OdfSchemaPatternValidator.MatchesElementNode(node, childElements[index], childContext)
             ? new HashSet<int> { index + 1 }
             : new HashSet<int>();
     }
@@ -118,7 +118,7 @@ public static partial class OdfSchemaPatternValidator
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int index,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         if (string.IsNullOrWhiteSpace(referenceName) || !context.EnterReference(referenceName))
         {
@@ -154,7 +154,7 @@ public static partial class OdfSchemaPatternValidator
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int index,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var matches = new HashSet<int>();
         foreach (OdfSchemaPatternNode child in node.Children)
@@ -173,7 +173,7 @@ public static partial class OdfSchemaPatternValidator
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int index,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var matches = new HashSet<int>();
         var used = new bool[node.Children.Count];

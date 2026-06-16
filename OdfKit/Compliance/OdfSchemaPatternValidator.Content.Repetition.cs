@@ -6,20 +6,82 @@ using System.Xml.Linq;
 
 namespace OdfKit.Compliance;
 
-public static partial class OdfSchemaPatternValidator
+internal static partial class OdfSchemaPatternContentMatcher
 {
     #region Content Matching - Repetition
 
+    internal static bool ContentAllowsDirectText(
+        IReadOnlyList<OdfSchemaPatternNode> nodes,
+        bool hasChildElements,
+        OdfSchemaPatternMatchContext context)
+    {
+        return nodes.Any(node => ContentAllowsDirectText(node, hasChildElements, context));
+    }
+
+    internal static bool ContentAllowsDirectText(
+        OdfSchemaPatternNode node,
+        bool hasChildElements,
+        OdfSchemaPatternMatchContext context)
+    {
+        switch (node.Kind)
+        {
+            case OdfSchemaPatternNodeKind.Mixed:
+                return true;
+            case OdfSchemaPatternNodeKind.NotAllowed:
+                return false;
+            case OdfSchemaPatternNodeKind.Text:
+            case OdfSchemaPatternNodeKind.Data:
+            case OdfSchemaPatternNodeKind.Value:
+            case OdfSchemaPatternNodeKind.List:
+                return !hasChildElements;
+            case OdfSchemaPatternNodeKind.Ref:
+                return ReferenceAllowsDirectText(node.ReferenceName, hasChildElements, context);
+            case OdfSchemaPatternNodeKind.Choice:
+                return node.Children.Any(child => ContentAllowsDirectText(child, hasChildElements, context));
+            case OdfSchemaPatternNodeKind.Group:
+            case OdfSchemaPatternNodeKind.Interleave:
+            case OdfSchemaPatternNodeKind.Optional:
+            case OdfSchemaPatternNodeKind.ZeroOrMore:
+            case OdfSchemaPatternNodeKind.OneOrMore:
+            case OdfSchemaPatternNodeKind.Other:
+                return node.Children.Any(child => ContentAllowsDirectText(child, false, context));
+            default:
+                return false;
+        }
+    }
+
+    private static bool ReferenceAllowsDirectText(
+        string referenceName,
+        bool hasChildElements,
+        OdfSchemaPatternMatchContext context)
+    {
+        if (string.IsNullOrWhiteSpace(referenceName) || !context.EnterReference(referenceName))
+        {
+            return false;
+        }
+
+        try
+        {
+            OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
+            return pattern != null &&
+                pattern.Roots.Any(root => ContentAllowsDirectText(root, hasChildElements, context));
+        }
+        finally
+        {
+            context.LeaveReference(referenceName);
+        }
+    }
+
     private static bool ContentNodeCanMatchEmpty(
         OdfSchemaPatternNode node,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         return ContentNodeCanMatchEmpty(node, context, new HashSet<string>(StringComparer.Ordinal));
     }
 
     private static bool ContentNodeCanMatchEmpty(
         OdfSchemaPatternNode node,
-        MatchContext context,
+        OdfSchemaPatternMatchContext context,
         HashSet<string> visitingReferences)
     {
         switch (node.Kind)
@@ -49,7 +111,7 @@ public static partial class OdfSchemaPatternValidator
 
     private static bool ReferenceCanMatchEmpty(
         string referenceName,
-        MatchContext context,
+        OdfSchemaPatternMatchContext context,
         HashSet<string> visitingReferences)
     {
         if (string.IsNullOrWhiteSpace(referenceName) ||
@@ -98,7 +160,7 @@ public static partial class OdfSchemaPatternValidator
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int index,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var matches = new HashSet<int> { index };
         foreach (int matched in MatchSequence(node.Children, parent, childElements, index, context))
@@ -114,7 +176,7 @@ public static partial class OdfSchemaPatternValidator
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int index,
-        MatchContext context,
+        OdfSchemaPatternMatchContext context,
         bool requireOne)
     {
         var matches = new HashSet<int>();

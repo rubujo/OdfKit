@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace OdfKit.Compliance;
 
-public static partial class OdfSchemaPatternValidator
+internal static partial class OdfSchemaPatternContentMatcher
 {
     #region Content Matching - Interleave
 
@@ -13,7 +13,7 @@ public static partial class OdfSchemaPatternValidator
         XElement parent,
         IReadOnlyList<XElement> childElements,
         int index,
-        MatchContext context,
+        OdfSchemaPatternMatchContext context,
         bool[] used,
         bool[] oneOrMoreSatisfied,
         HashSet<string> visited,
@@ -162,7 +162,7 @@ public static partial class OdfSchemaPatternValidator
         IReadOnlyList<OdfSchemaPatternNode> nodes,
         IReadOnlyList<bool> used,
         IReadOnlyList<bool> oneOrMoreSatisfied,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         for (int i = 0; i < nodes.Count; i++)
         {

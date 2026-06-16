@@ -41,7 +41,7 @@ public static partial class OdfSchemaPatternValidator
                 $"Schema pattern '{patternName}' is not available.");
         }
 
-        var context = new MatchContext(schema);
+        var context = new OdfSchemaPatternMatchContext(schema);
         foreach (OdfSchemaPatternNode root in pattern.Roots)
         {
             if (MatchesRootNode(root, element, context))

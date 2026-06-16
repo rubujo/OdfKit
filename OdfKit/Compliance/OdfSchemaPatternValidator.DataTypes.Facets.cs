@@ -150,7 +150,7 @@ public static partial class OdfSchemaPatternValidator
         XElement element,
         OdfSchemaSet schema)
     {
-        var context = new MatchContext(schema);
+        var context = new OdfSchemaPatternMatchContext(schema);
         foreach (OdfSchemaPatternNode root in pattern.Roots)
         {
             if (PatternMatchesElementName(root, element, context))
@@ -164,7 +164,7 @@ public static partial class OdfSchemaPatternValidator
     private static bool PatternMatchesElementName(
         OdfSchemaPatternNode node,
         XElement element,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         if (node.Kind == OdfSchemaPatternNodeKind.Ref)
         {
@@ -225,22 +225,6 @@ public static partial class OdfSchemaPatternValidator
         }
 
         return false;
-    }
-
-    private sealed class MatchContext
-    {
-        private readonly HashSet<string> _activeReferences = new HashSet<string>(StringComparer.Ordinal);
-
-        public MatchContext(OdfSchemaSet schema)
-        {
-            Schema = schema;
-        }
-
-        public OdfSchemaSet Schema { get; }
-
-        public bool EnterReference(string referenceName) => _activeReferences.Add(referenceName);
-
-        public void LeaveReference(string referenceName) => _activeReferences.Remove(referenceName);
     }
 
     #endregion

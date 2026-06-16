@@ -98,7 +98,7 @@ public partial class OdfTableSheet
         rowNode.RemoveChild(oldCell);
     }
 
-    private OdfNode GetOrCreateColumnNode(int col)
+    internal OdfNode GetOrCreateColumnNode(int col)
     {
         int currentColIndex = 0;
         OdfNode? insertBeforeNode = null;

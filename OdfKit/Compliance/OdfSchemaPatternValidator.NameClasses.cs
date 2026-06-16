@@ -41,7 +41,7 @@ public static partial class OdfSchemaPatternValidator
         return allowed;
     }
 
-    private static bool MatchesNameClassNode(
+    internal static bool MatchesNameClassNode(
         OdfSchemaPatternNode node,
         string namespaceUri,
         string localName)
@@ -82,10 +82,10 @@ public static partial class OdfSchemaPatternValidator
             .Any(child => MatchesNameClassNode(child, namespaceUri, localName, insideExcept: false));
     }
 
-    private static bool MatchAttributeValueNodes(
+    internal static bool MatchAttributeValueNodes(
         IReadOnlyList<OdfSchemaPatternNode> nodes,
         string value,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         foreach (OdfSchemaPatternNode node in nodes)
         {
@@ -101,7 +101,7 @@ public static partial class OdfSchemaPatternValidator
     private static bool MatchAttributeValueNode(
         OdfSchemaPatternNode node,
         string value,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         switch (node.Kind)
         {
@@ -135,15 +135,15 @@ public static partial class OdfSchemaPatternValidator
         }
     }
 
-    private static bool IsSimpleTextNode(XElement element)
+    internal static bool IsSimpleTextNode(XElement element)
     {
         return !element.Elements().Any();
     }
 
-    private static bool MatchesListValue(
+    internal static bool MatchesListValue(
         IReadOnlyList<OdfSchemaPatternNode> nodes,
         string value,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         string[] tokens = SplitListTokens(value);
         if (nodes.Count == 0)
@@ -158,7 +158,7 @@ public static partial class OdfSchemaPatternValidator
         IReadOnlyList<OdfSchemaPatternNode> nodes,
         IReadOnlyList<string> tokens,
         int startIndex,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var indices = new HashSet<int> { startIndex };
         foreach (OdfSchemaPatternNode node in nodes)
@@ -187,7 +187,7 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternNode node,
         IReadOnlyList<string> tokens,
         int index,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         switch (node.Kind)
         {
@@ -228,7 +228,7 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternNode node,
         IReadOnlyList<string> tokens,
         int index,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var matches = new HashSet<int>();
         foreach (OdfSchemaPatternNode child in node.Children)
@@ -246,7 +246,7 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternNode node,
         IReadOnlyList<string> tokens,
         int index,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var matches = new HashSet<int> { index };
         foreach (int matched in MatchListSequence(node.Children, tokens, index, context))
@@ -261,7 +261,7 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternNode node,
         IReadOnlyList<string> tokens,
         int index,
-        MatchContext context,
+        OdfSchemaPatternMatchContext context,
         bool requireOne)
     {
         var matches = new HashSet<int>();
@@ -303,7 +303,7 @@ public static partial class OdfSchemaPatternValidator
         string referenceName,
         IReadOnlyList<string> tokens,
         int index,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         if (string.IsNullOrWhiteSpace(referenceName) || !context.EnterReference(referenceName))
         {

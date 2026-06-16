@@ -5,14 +5,14 @@ using System.Xml.Linq;
 
 namespace OdfKit.Compliance;
 
-public static partial class OdfSchemaPatternValidator
+internal static partial class OdfSchemaPatternAttributeMatcher
 {
     #region Attribute Patterns - Matching
 
-    private static bool MatchesAttributePatterns(
+    internal static bool MatchesAttributePatterns(
         IReadOnlyList<OdfSchemaPatternNode> attributeNodes,
         XElement element,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var attributes = element.Attributes()
             .Where(attribute => !attribute.IsNamespaceDeclaration)
@@ -36,7 +36,7 @@ public static partial class OdfSchemaPatternValidator
         IReadOnlyList<OdfSchemaPatternNode> nodes,
         IReadOnlyList<XAttribute> attributes,
         string state,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var states = new HashSet<string>(StringComparer.Ordinal) { state };
         foreach (OdfSchemaPatternNode node in nodes)
@@ -65,7 +65,7 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternNode node,
         IReadOnlyList<XAttribute> attributes,
         string state,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         switch (node.Kind)
         {
@@ -99,7 +99,7 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternNode node,
         IReadOnlyList<XAttribute> attributes,
         string state,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var matches = new HashSet<string>(StringComparer.Ordinal);
         for (int i = 0; i < attributes.Count; i++)
@@ -116,7 +116,7 @@ public static partial class OdfSchemaPatternValidator
             }
 
             List<OdfSchemaPatternNode> valueNodes = GetAttributeValueNodes(node.Children);
-            if (valueNodes.Count == 0 || MatchAttributeValueNodes(valueNodes, attribute.Value, context))
+            if (valueNodes.Count == 0 || OdfSchemaPatternValidator.MatchAttributeValueNodes(valueNodes, attribute.Value, context))
             {
                 matches.Add(ConsumeAttribute(state, i));
             }
@@ -129,7 +129,7 @@ public static partial class OdfSchemaPatternValidator
         string referenceName,
         IReadOnlyList<XAttribute> attributes,
         string state,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         if (string.IsNullOrWhiteSpace(referenceName) || !context.EnterReference(referenceName))
         {
@@ -156,7 +156,7 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternNode node,
         IReadOnlyList<XAttribute> attributes,
         string state,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var matches = new HashSet<string>(StringComparer.Ordinal);
         foreach (OdfSchemaPatternNode child in node.Children)
@@ -174,7 +174,7 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternNode node,
         IReadOnlyList<XAttribute> attributes,
         string state,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         var matches = new HashSet<string>(StringComparer.Ordinal) { state };
         foreach (string matched in MatchAttributePatternSequence(node.Children, attributes, state, context))
@@ -189,7 +189,7 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternNode node,
         IReadOnlyList<XAttribute> attributes,
         string state,
-        MatchContext context,
+        OdfSchemaPatternMatchContext context,
         bool requireOne)
     {
         var matches = new HashSet<string>(StringComparer.Ordinal);
@@ -260,10 +260,10 @@ public static partial class OdfSchemaPatternValidator
         return consumed;
     }
 
-    private static bool MatchesAttributeNode(
+    internal static bool MatchesAttributeNode(
         OdfSchemaPatternNode node,
         XElement element,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         if (node.Kind == OdfSchemaPatternNodeKind.Ref)
         {
@@ -281,7 +281,7 @@ public static partial class OdfSchemaPatternValidator
             foreach (XAttribute attribute in candidates)
             {
                 List<OdfSchemaPatternNode> valueNodes = GetAttributeValueNodes(node.Children);
-                if (valueNodes.Count == 0 || MatchAttributeValueNodes(valueNodes, attribute.Value, context))
+                if (valueNodes.Count == 0 || OdfSchemaPatternValidator.MatchAttributeValueNodes(valueNodes, attribute.Value, context))
                 {
                     return true;
                 }

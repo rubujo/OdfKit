@@ -15,7 +15,7 @@ public static partial class OdfSchemaPatternValidator
         return (value ?? string.Empty).Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    private static bool MatchesLiteralValue(OdfSchemaPatternNode node, string value)
+    internal static bool MatchesLiteralValue(OdfSchemaPatternNode node, string value)
     {
         if (!MatchesDataType(node, value))
         {
@@ -25,10 +25,10 @@ public static partial class OdfSchemaPatternValidator
         return LiteralValuesEqual(node.DataType, value, node.Value);
     }
 
-    private static bool MatchesDataValue(
+    internal static bool MatchesDataValue(
         OdfSchemaPatternNode node,
         string value,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         if (!MatchesDataType(node, value))
         {
@@ -43,7 +43,7 @@ public static partial class OdfSchemaPatternValidator
     private static bool MatchesDataExcept(
         OdfSchemaPatternNode node,
         string value,
-        MatchContext context)
+        OdfSchemaPatternMatchContext context)
     {
         return node.Children.Any(child => MatchAttributeValueNode(child, value, context));
     }
