@@ -19,7 +19,7 @@ public partial class DefaultFormulaEvaluator
             if (val is OdfFormulaError err)
                 return err;
 
-            foreach (var item in FlattenValues(val))
+            foreach (var item in FormulaCoercion.FlattenValues(val))
             {
                 sb.Append(item?.ToString() ?? "");
             }
@@ -40,7 +40,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 2)
         {
             var countVal = arguments[1].Evaluate(context);
-            if (!TryCoerceDouble(countVal, out double d) || d < 0)
+            if (!FormulaCoercion.TryCoerceDouble(countVal, out double d) || d < 0)
                 return OdfFormulaError.Value;
             count = (int)d;
         }
@@ -62,7 +62,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 2)
         {
             var countVal = arguments[1].Evaluate(context);
-            if (!TryCoerceDouble(countVal, out double d) || d < 0)
+            if (!FormulaCoercion.TryCoerceDouble(countVal, out double d) || d < 0)
                 return OdfFormulaError.Value;
             count = (int)d;
         }
@@ -83,7 +83,7 @@ public partial class DefaultFormulaEvaluator
         var startVal = arguments[1].Evaluate(context);
         var lenVal = arguments[2].Evaluate(context);
 
-        if (!TryCoerceDouble(startVal, out double startD) || !TryCoerceDouble(lenVal, out double lenD))
+        if (!FormulaCoercion.TryCoerceDouble(startVal, out double startD) || !FormulaCoercion.TryCoerceDouble(lenVal, out double lenD))
             return OdfFormulaError.Value;
 
         int start = (int)startD;
@@ -122,7 +122,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 4)
         {
             var instVal = arguments[3].Evaluate(context);
-            if (!TryCoerceDouble(instVal, out double d) || d <= 0)
+            if (!FormulaCoercion.TryCoerceDouble(instVal, out double d) || d <= 0)
                 return OdfFormulaError.Value;
             int instance = (int)d;
 
@@ -159,7 +159,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 3)
         {
             var startVal = arguments[2].Evaluate(context);
-            if (!TryCoerceDouble(startVal, out double d) || d <= 0)
+            if (!FormulaCoercion.TryCoerceDouble(startVal, out double d) || d <= 0)
                 return OdfFormulaError.Value;
             startIdx = (int)d;
         }
@@ -189,7 +189,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 3)
         {
             var startVal = arguments[2].Evaluate(context);
-            if (!TryCoerceDouble(startVal, out double d) || d <= 0)
+            if (!FormulaCoercion.TryCoerceDouble(startVal, out double d) || d <= 0)
                 return OdfFormulaError.Value;
             startIdx = (int)d;
         }
@@ -213,7 +213,7 @@ public partial class DefaultFormulaEvaluator
             return err2;
 
         string text = textVal?.ToString() ?? "";
-        if (!TryCoerceDouble(timesVal, out double d) || d < 0)
+        if (!FormulaCoercion.TryCoerceDouble(timesVal, out double d) || d < 0)
             return OdfFormulaError.Value;
         int times = (int)d;
 
@@ -263,7 +263,7 @@ public partial class DefaultFormulaEvaluator
         if (val is OdfFormulaError err)
             return err;
 
-        if (!TryCoerceDouble(val, out double d) || d < 1 || d > 255)
+        if (!FormulaCoercion.TryCoerceDouble(val, out double d) || d < 1 || d > 255)
             return OdfFormulaError.Value;
         return ((char)(int)d).ToString();
     }

@@ -16,7 +16,7 @@ public partial class DefaultFormulaEvaluator
         foreach (var arg in arguments)
         {
             var val = arg.Evaluate(context);
-            foreach (var innerVal in FlattenValues(val))
+            foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
                 if (innerVal != null && (!(innerVal is string s) || s.Length > 0))
                 {
@@ -33,7 +33,7 @@ public partial class DefaultFormulaEvaluator
             return OdfFormulaError.Value;
         var val = arguments[0].Evaluate(context);
         int count = 0;
-        foreach (var innerVal in FlattenValues(val))
+        foreach (var innerVal in FormulaCoercion.FlattenValues(val))
         {
             if (innerVal == null || (innerVal is string s && s.Length == 0))
             {
@@ -84,7 +84,7 @@ public partial class DefaultFormulaEvaluator
                     if (r < avgValues.GetLength(0) && c < avgValues.GetLength(1))
                     {
                         object avgVal = avgValues[r, c];
-                        if (TryCoerceDouble(avgVal, out double num))
+                        if (FormulaCoercion.TryCoerceDouble(avgVal, out double num))
                         {
                             sum += num;
                             count++;
@@ -143,7 +143,7 @@ public partial class DefaultFormulaEvaluator
                 }
                 if (allMatch)
                 {
-                    if (TryCoerceDouble(sumValues[r, c], out double num))
+                    if (FormulaCoercion.TryCoerceDouble(sumValues[r, c], out double num))
                     {
                         sum += num;
                     }
@@ -201,7 +201,7 @@ public partial class DefaultFormulaEvaluator
                 }
                 if (allMatch)
                 {
-                    if (TryCoerceDouble(avgValues[r, c], out double num))
+                    if (FormulaCoercion.TryCoerceDouble(avgValues[r, c], out double num))
                     {
                         sum += num;
                         count++;

@@ -17,9 +17,9 @@ public partial class DefaultFormulaEvaluator
             var val = arg.Evaluate(context);
             if (val is OdfFormulaError err)
                 return err;
-            foreach (var item in FlattenValues(val))
+            foreach (var item in FormulaCoercion.FlattenValues(val))
             {
-                if (TryCoerceDouble(item, out double d))
+                if (FormulaCoercion.TryCoerceDouble(item, out double d))
                 {
                     nums.Add(d);
                 }
@@ -51,9 +51,9 @@ public partial class DefaultFormulaEvaluator
                 error = err;
                 return nums;
             }
-            foreach (var item in FlattenValues(val))
+            foreach (var item in FormulaCoercion.FlattenValues(val))
             {
-                if (TryCoerceDouble(item, out double d))
+                if (FormulaCoercion.TryCoerceDouble(item, out double d))
                 {
                     nums.Add(d);
                 }
@@ -115,7 +115,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count != 2)
             return OdfFormulaError.Value;
         var kVal = arguments[1].Evaluate(context);
-        if (!TryCoerceDouble(kVal, out double kD))
+        if (!FormulaCoercion.TryCoerceDouble(kVal, out double kD))
             return OdfFormulaError.Value;
         int k = (int)kD;
 
@@ -124,9 +124,9 @@ public partial class DefaultFormulaEvaluator
             return err;
 
         var nums = new List<double>();
-        foreach (var item in FlattenValues(val))
+        foreach (var item in FormulaCoercion.FlattenValues(val))
         {
-            if (TryCoerceDouble(item, out double d))
+            if (FormulaCoercion.TryCoerceDouble(item, out double d))
             {
                 nums.Add(d);
             }
@@ -143,7 +143,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count != 2)
             return OdfFormulaError.Value;
         var kVal = arguments[1].Evaluate(context);
-        if (!TryCoerceDouble(kVal, out double kD))
+        if (!FormulaCoercion.TryCoerceDouble(kVal, out double kD))
             return OdfFormulaError.Value;
         int k = (int)kD;
 
@@ -152,9 +152,9 @@ public partial class DefaultFormulaEvaluator
             return err;
 
         var nums = new List<double>();
-        foreach (var item in FlattenValues(val))
+        foreach (var item in FormulaCoercion.FlattenValues(val))
         {
-            if (TryCoerceDouble(item, out double d))
+            if (FormulaCoercion.TryCoerceDouble(item, out double d))
             {
                 nums.Add(d);
             }
@@ -171,7 +171,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count < 2 || arguments.Count > 3)
             return OdfFormulaError.Value;
         var numVal = arguments[0].Evaluate(context);
-        if (!TryCoerceDouble(numVal, out double number))
+        if (!FormulaCoercion.TryCoerceDouble(numVal, out double number))
             return OdfFormulaError.Value;
 
         var refVal = arguments[1].Evaluate(context);
@@ -182,15 +182,15 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 3)
         {
             var orderVal = arguments[2].Evaluate(context);
-            if (!TryCoerceDouble(orderVal, out double oD))
+            if (!FormulaCoercion.TryCoerceDouble(orderVal, out double oD))
                 return OdfFormulaError.Value;
             ascending = oD != 0;
         }
 
         var nums = new List<double>();
-        foreach (var item in FlattenValues(refVal))
+        foreach (var item in FormulaCoercion.FlattenValues(refVal))
         {
-            if (TryCoerceDouble(item, out double d))
+            if (FormulaCoercion.TryCoerceDouble(item, out double d))
             {
                 nums.Add(d);
             }
@@ -216,7 +216,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count != 2)
             return OdfFormulaError.Value;
         var pVal = arguments[1].Evaluate(context);
-        if (!TryCoerceDouble(pVal, out double p) || p < 0 || p > 1)
+        if (!FormulaCoercion.TryCoerceDouble(pVal, out double p) || p < 0 || p > 1)
             return OdfFormulaError.Num;
 
         var val = arguments[0].Evaluate(context);
@@ -224,9 +224,9 @@ public partial class DefaultFormulaEvaluator
             return err;
 
         var nums = new List<double>();
-        foreach (var item in FlattenValues(val))
+        foreach (var item in FormulaCoercion.FlattenValues(val))
         {
-            if (TryCoerceDouble(item, out double d))
+            if (FormulaCoercion.TryCoerceDouble(item, out double d))
                 nums.Add(d);
         }
         if (nums.Count == 0)
@@ -246,7 +246,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count != 2)
             return OdfFormulaError.Value;
         var qVal = arguments[1].Evaluate(context);
-        if (!TryCoerceDouble(qVal, out double qD))
+        if (!FormulaCoercion.TryCoerceDouble(qVal, out double qD))
             return OdfFormulaError.Value;
         int q = (int)qD;
         if (q < 0 || q > 4)
@@ -257,9 +257,9 @@ public partial class DefaultFormulaEvaluator
             return err;
 
         var nums = new List<double>();
-        foreach (var item in FlattenValues(val))
+        foreach (var item in FormulaCoercion.FlattenValues(val))
         {
-            if (TryCoerceDouble(item, out double d))
+            if (FormulaCoercion.TryCoerceDouble(item, out double d))
                 nums.Add(d);
         }
         if (nums.Count == 0)

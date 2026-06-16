@@ -116,7 +116,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 2)
         {
             var typeVal = arguments[1].Evaluate(context);
-            if (!TryCoerceDouble(typeVal, out double tD))
+            if (!FormulaCoercion.TryCoerceDouble(typeVal, out double tD))
                 return OdfFormulaError.Value;
             type = (int)tD;
         }
@@ -148,7 +148,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 2)
         {
             var typeVal = arguments[1].Evaluate(context);
-            if (!TryCoerceDouble(typeVal, out double tD))
+            if (!FormulaCoercion.TryCoerceDouble(typeVal, out double tD))
                 return OdfFormulaError.Value;
             type = (int)tD;
         }
@@ -182,7 +182,7 @@ public partial class DefaultFormulaEvaluator
         var startVal = arguments[0].Evaluate(context);
         var daysVal = arguments[1].Evaluate(context);
 
-        if (!TryCoerceDateTime(startVal, out DateTime current) || !TryCoerceDouble(daysVal, out double daysD))
+        if (!TryCoerceDateTime(startVal, out DateTime current) || !FormulaCoercion.TryCoerceDouble(daysVal, out double daysD))
             return OdfFormulaError.Value;
 
         int days = (int)daysD;
@@ -191,7 +191,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 3)
         {
             var holVal = arguments[2].Evaluate(context);
-            foreach (var item in FlattenValues(holVal))
+            foreach (var item in FormulaCoercion.FlattenValues(holVal))
             {
                 if (TryCoerceDateTime(item, out DateTime hDate))
                 {
@@ -229,7 +229,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 3)
         {
             var holVal = arguments[2].Evaluate(context);
-            foreach (var item in FlattenValues(holVal))
+            foreach (var item in FormulaCoercion.FlattenValues(holVal))
             {
                 if (TryCoerceDateTime(item, out DateTime hDate))
                 {
@@ -268,7 +268,7 @@ public partial class DefaultFormulaEvaluator
         var startVal = arguments[0].Evaluate(context);
         var mVal = arguments[1].Evaluate(context);
 
-        if (!TryCoerceDateTime(startVal, out DateTime dt) || !TryCoerceDouble(mVal, out double mD))
+        if (!TryCoerceDateTime(startVal, out DateTime dt) || !FormulaCoercion.TryCoerceDouble(mVal, out double mD))
             return OdfFormulaError.Value;
 
         int months = (int)mD;
@@ -290,7 +290,7 @@ public partial class DefaultFormulaEvaluator
         var startVal = arguments[0].Evaluate(context);
         var mVal = arguments[1].Evaluate(context);
 
-        if (!TryCoerceDateTime(startVal, out DateTime dt) || !TryCoerceDouble(mVal, out double mD))
+        if (!TryCoerceDateTime(startVal, out DateTime dt) || !FormulaCoercion.TryCoerceDouble(mVal, out double mD))
             return OdfFormulaError.Value;
 
         int months = (int)mD;

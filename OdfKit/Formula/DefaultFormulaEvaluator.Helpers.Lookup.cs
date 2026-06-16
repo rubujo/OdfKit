@@ -24,7 +24,7 @@ public partial class DefaultFormulaEvaluator
         var range = rangeNode.Range;
 
         var rowIndexVal = arguments[2].Evaluate(context);
-        if (!TryCoerceDouble(rowIndexVal, out double rowD))
+        if (!FormulaCoercion.TryCoerceDouble(rowIndexVal, out double rowD))
             return OdfFormulaError.Value;
         int rowIndex = (int)rowD;
 
@@ -32,7 +32,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 4)
         {
             var lookupTypeVal = arguments[3].Evaluate(context);
-            rangeLookup = CoerceToBool(lookupTypeVal);
+            rangeLookup = FormulaCoercion.CoerceToBool(lookupTypeVal);
         }
 
         object[,] table = context.GetRangeValues(range);
@@ -48,7 +48,7 @@ public partial class DefaultFormulaEvaluator
         {
             for (int c = 0; c < tableCols; c++)
             {
-                if (CompareValues(table[0, c], lookupValue) == 0)
+                if (FormulaCoercion.CompareValues(table[0, c], lookupValue) == 0)
                 {
                     return table[targetRow, c] ?? string.Empty;
                 }
@@ -61,7 +61,7 @@ public partial class DefaultFormulaEvaluator
             for (int c = 0; c < tableCols; c++)
             {
                 object cellVal = table[0, c];
-                int comp = CompareValues(cellVal, lookupValue);
+                int comp = FormulaCoercion.CompareValues(cellVal, lookupValue);
                 if (comp == 0)
                 {
                     return table[targetRow, c] ?? string.Empty;
@@ -95,7 +95,7 @@ public partial class DefaultFormulaEvaluator
         int tableCols = table.GetLength(1);
 
         var rowVal = arguments[1].Evaluate(context);
-        if (!TryCoerceDouble(rowVal, out double rowD))
+        if (!FormulaCoercion.TryCoerceDouble(rowVal, out double rowD))
             return OdfFormulaError.Value;
         int rowNum = (int)rowD;
 
@@ -103,7 +103,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 3)
         {
             var colVal = arguments[2].Evaluate(context);
-            if (!TryCoerceDouble(colVal, out double colD))
+            if (!FormulaCoercion.TryCoerceDouble(colVal, out double colD))
                 return OdfFormulaError.Value;
             colNum = (int)colD;
         }
@@ -148,7 +148,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 3)
         {
             var mtVal = arguments[2].Evaluate(context);
-            if (!TryCoerceDouble(mtVal, out double mtD))
+            if (!FormulaCoercion.TryCoerceDouble(mtVal, out double mtD))
                 return OdfFormulaError.Value;
             matchType = (int)mtD;
         }
@@ -162,7 +162,7 @@ public partial class DefaultFormulaEvaluator
         {
             for (int i = 0; i < length; i++)
             {
-                if (CompareValues(GetElement(i), lookupValue) == 0)
+                if (FormulaCoercion.CompareValues(GetElement(i), lookupValue) == 0)
                 {
                     return (double)(i + 1);
                 }
@@ -174,7 +174,7 @@ public partial class DefaultFormulaEvaluator
             int matchedIdx = -1;
             for (int i = 0; i < length; i++)
             {
-                int comp = CompareValues(GetElement(i), lookupValue);
+                int comp = FormulaCoercion.CompareValues(GetElement(i), lookupValue);
                 if (comp == 0)
                 {
                     return (double)(i + 1);
@@ -197,7 +197,7 @@ public partial class DefaultFormulaEvaluator
             int matchedIdx = -1;
             for (int i = 0; i < length; i++)
             {
-                int comp = CompareValues(GetElement(i), lookupValue);
+                int comp = FormulaCoercion.CompareValues(GetElement(i), lookupValue);
                 if (comp == 0)
                 {
                     return (double)(i + 1);
@@ -244,7 +244,7 @@ public partial class DefaultFormulaEvaluator
 
         var rowsVal = arguments[1].Evaluate(context);
         var colsVal = arguments[2].Evaluate(context);
-        if (!TryCoerceDouble(rowsVal, out double rowsD) || !TryCoerceDouble(colsVal, out double colsD))
+        if (!FormulaCoercion.TryCoerceDouble(rowsVal, out double rowsD) || !FormulaCoercion.TryCoerceDouble(colsVal, out double colsD))
             return OdfFormulaError.Value;
 
         int rowOffset = (int)rowsD;
@@ -254,7 +254,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count >= 4)
         {
             var hVal = arguments[3].Evaluate(context);
-            if (!TryCoerceDouble(hVal, out double hD) || hD <= 0)
+            if (!FormulaCoercion.TryCoerceDouble(hVal, out double hD) || hD <= 0)
                 return OdfFormulaError.Value;
             height = (int)hD;
         }
@@ -263,7 +263,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 5)
         {
             var wVal = arguments[4].Evaluate(context);
-            if (!TryCoerceDouble(wVal, out double wD) || wD <= 0)
+            if (!FormulaCoercion.TryCoerceDouble(wVal, out double wD) || wD <= 0)
                 return OdfFormulaError.Value;
             width = (int)wD;
         }
@@ -396,7 +396,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count < 2)
             return OdfFormulaError.Value;
         var indexVal = arguments[0].Evaluate(context);
-        if (!TryCoerceDouble(indexVal, out double idxD))
+        if (!FormulaCoercion.TryCoerceDouble(indexVal, out double idxD))
             return OdfFormulaError.Value;
         int idx = (int)idxD;
         if (idx < 1 || idx >= arguments.Count)

@@ -21,7 +21,6 @@ namespace OdfKit.Core;
 /// </summary>
 public static partial class OdfSigner
 {
-    private const string SignaturePath = "META-INF/documentsignatures.xml";
     private static readonly HttpClient s_httpClient = new();
 
     /// <summary>
@@ -72,6 +71,6 @@ public static partial class OdfSigner
     /// <returns>詳細的數位簽章驗證結果</returns>
     public static OdfSignatureValidationResult VerifySignatures(OdfPackage package, OdfSigningOptions? options = null)
     {
-        return VerifySignaturesAsync(package, options).GetAwaiter().GetResult();
+        return OdfSignatureVerifier.VerifySignaturesAsync(package, options).GetAwaiter().GetResult();
     }
 }

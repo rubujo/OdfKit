@@ -20,9 +20,9 @@ public partial class DefaultFormulaEvaluator
             if (val is OdfFormulaError err)
                 return err;
 
-            foreach (var innerVal in FlattenValues(val))
+            foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
-                if (TryCoerceDouble(innerVal, out double d))
+                if (FormulaCoercion.TryCoerceDouble(innerVal, out double d))
                 {
                     sum += d;
                 }
@@ -42,9 +42,9 @@ public partial class DefaultFormulaEvaluator
             if (val is OdfFormulaError err)
                 return err;
 
-            foreach (var innerVal in FlattenValues(val))
+            foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
-                if (TryCoerceDouble(innerVal, out double d))
+                if (FormulaCoercion.TryCoerceDouble(innerVal, out double d))
                 {
                     sum += d;
                     count++;
@@ -64,7 +64,7 @@ public partial class DefaultFormulaEvaluator
             if (val is OdfFormulaError)
                 continue;
 
-            foreach (var innerVal in FlattenValues(val))
+            foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
                 if (innerVal is double || (innerVal is string s && double.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out _)))
                 {
@@ -115,7 +115,7 @@ public partial class DefaultFormulaEvaluator
                     if (r < sumValues.GetLength(0) && c < sumValues.GetLength(1))
                     {
                         object sumVal = sumValues[r, c];
-                        if (TryCoerceDouble(sumVal, out double num))
+                        if (FormulaCoercion.TryCoerceDouble(sumVal, out double num))
                         {
                             sum += num;
                         }
@@ -176,9 +176,9 @@ public partial class DefaultFormulaEvaluator
             var val = arg.Evaluate(context);
             if (val is OdfFormulaError err)
                 return err;
-            foreach (var innerVal in FlattenValues(val))
+            foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
-                if (TryCoerceDouble(innerVal, out double d))
+                if (FormulaCoercion.TryCoerceDouble(innerVal, out double d))
                 {
                     if (d > max)
                         max = d;
@@ -198,9 +198,9 @@ public partial class DefaultFormulaEvaluator
             var val = arg.Evaluate(context);
             if (val is OdfFormulaError err)
                 return err;
-            foreach (var innerVal in FlattenValues(val))
+            foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
-                if (TryCoerceDouble(innerVal, out double d))
+                if (FormulaCoercion.TryCoerceDouble(innerVal, out double d))
                 {
                     if (d < min)
                         min = d;

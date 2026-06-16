@@ -50,9 +50,9 @@ public static partial class OdfSigner
         XmlElement root;
         var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null };
 
-        if (package.HasEntry(SignaturePath))
+        if (package.HasEntry(OdfSignerConstants.SignaturePath))
         {
-            using var stream = package.GetEntryStream(SignaturePath);
+            using var stream = package.GetEntryStream(OdfSignerConstants.SignaturePath);
             using var reader = XmlReader.Create(stream, settings);
             doc.Load(reader);
             root = doc.DocumentElement ?? throw new CryptographicException("Invalid signature file structure.");
@@ -65,7 +65,7 @@ public static partial class OdfSigner
         }
 
         // 於簽署前在封裝資訊清單中預先註冊簽章項目，以穩定 META-INF/manifest.xml
-        package.WriteEntry(SignaturePath, Array.Empty<byte>(), "text/xml");
+        package.WriteEntry(OdfSignerConstants.SignaturePath, Array.Empty<byte>(), "text/xml");
         package.SaveManifestToEntries();
 
         // 2. 以自訂封裝解析器設定 XadesSignedXml
@@ -335,7 +335,7 @@ public static partial class OdfSigner
             doc.Save(writer);
         }
 
-        package.WriteEntry(SignaturePath, ms.ToArray(), "text/xml");
+        package.WriteEntry(OdfSignerConstants.SignaturePath, ms.ToArray(), "text/xml");
         OdfKitDiagnostics.Info($"Added digital signature to package using certificate: {certificate.Subject}");
     }
 

@@ -17,9 +17,9 @@ public partial class DefaultFormulaEvaluator
         var salvageVal = arguments[1].Evaluate(context);
         var lifeVal = arguments[2].Evaluate(context);
 
-        if (!TryCoerceDouble(costVal, out double cost) ||
-            !TryCoerceDouble(salvageVal, out double salvage) ||
-            !TryCoerceDouble(lifeVal, out double life))
+        if (!FormulaCoercion.TryCoerceDouble(costVal, out double cost) ||
+            !FormulaCoercion.TryCoerceDouble(salvageVal, out double salvage) ||
+            !FormulaCoercion.TryCoerceDouble(lifeVal, out double life))
         {
             return OdfFormulaError.Value;
         }
@@ -38,10 +38,10 @@ public partial class DefaultFormulaEvaluator
         var lifeVal = arguments[2].Evaluate(context);
         var periodVal = arguments[3].Evaluate(context);
 
-        if (!TryCoerceDouble(costVal, out double cost) ||
-            !TryCoerceDouble(salvageVal, out double salvage) ||
-            !TryCoerceDouble(lifeVal, out double life) ||
-            !TryCoerceDouble(periodVal, out double period))
+        if (!FormulaCoercion.TryCoerceDouble(costVal, out double cost) ||
+            !FormulaCoercion.TryCoerceDouble(salvageVal, out double salvage) ||
+            !FormulaCoercion.TryCoerceDouble(lifeVal, out double life) ||
+            !FormulaCoercion.TryCoerceDouble(periodVal, out double period))
         {
             return OdfFormulaError.Value;
         }
@@ -50,7 +50,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 5)
         {
             var factorVal = arguments[4].Evaluate(context);
-            if (!TryCoerceDouble(factorVal, out factor))
+            if (!FormulaCoercion.TryCoerceDouble(factorVal, out factor))
                 return OdfFormulaError.Value;
         }
 
@@ -82,9 +82,9 @@ public partial class DefaultFormulaEvaluator
             return err;
 
         var cfs = new List<double>();
-        foreach (var item in FlattenValues(valNode))
+        foreach (var item in FormulaCoercion.FlattenValues(valNode))
         {
-            if (TryCoerceDouble(item, out double d))
+            if (FormulaCoercion.TryCoerceDouble(item, out double d))
             {
                 cfs.Add(d);
             }
@@ -97,7 +97,7 @@ public partial class DefaultFormulaEvaluator
         if (arguments.Count == 2)
         {
             var guessVal = arguments[1].Evaluate(context);
-            if (!TryCoerceDouble(guessVal, out guess))
+            if (!FormulaCoercion.TryCoerceDouble(guessVal, out guess))
                 return OdfFormulaError.Value;
         }
 
@@ -144,13 +144,13 @@ public partial class DefaultFormulaEvaluator
 
         if (valNode is OdfFormulaError err)
             return err;
-        if (!TryCoerceDouble(fRateVal, out double fRate) || !TryCoerceDouble(rRateVal, out double rRate))
+        if (!FormulaCoercion.TryCoerceDouble(fRateVal, out double fRate) || !FormulaCoercion.TryCoerceDouble(rRateVal, out double rRate))
             return OdfFormulaError.Value;
 
         var cfs = new List<double>();
-        foreach (var item in FlattenValues(valNode))
+        foreach (var item in FormulaCoercion.FlattenValues(valNode))
         {
-            if (TryCoerceDouble(item, out double d))
+            if (FormulaCoercion.TryCoerceDouble(item, out double d))
             {
                 cfs.Add(d);
             }

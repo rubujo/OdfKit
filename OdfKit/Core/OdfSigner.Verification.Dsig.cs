@@ -262,7 +262,7 @@ public static partial class OdfSigner
     /// <param name="package">要驗證的 ODF 封裝</param>
     /// <param name="options">簽署選項</param>
     /// <returns>代表非同步作業的工作，其結果包含詳細的數位簽章驗證結果</returns>
-    public static async Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfPackage package, OdfSigningOptions? options = null)
+    internal static async Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfPackage package, OdfSigningOptions? options = null)
     {
         options ??= new OdfSigningOptions();
         var result = new OdfSignatureValidationResult { IsValid = true };
@@ -270,7 +270,7 @@ public static partial class OdfSigner
         if (package == null)
             throw new ArgumentNullException(nameof(package));
 
-        if (!package.HasEntry(SignaturePath))
+        if (!package.HasEntry(OdfSignerConstants.SignaturePath))
         {
             result.IsValid = false;
             return result;
@@ -279,7 +279,7 @@ public static partial class OdfSigner
         try
         {
             var doc = new XmlDocument();
-            using (var stream = package.GetEntryStream(SignaturePath))
+            using (var stream = package.GetEntryStream(OdfSignerConstants.SignaturePath))
             {
                 var readerSettings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null };
                 using var reader = XmlReader.Create(stream, readerSettings);

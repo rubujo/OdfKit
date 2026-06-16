@@ -26,7 +26,7 @@ public partial class DefaultFormulaEvaluator
                 "TRUE" => true,
                 "FALSE" => false,
                 "NA" => arguments.Count == 0 ? OdfFormulaError.NA : OdfFormulaError.Value,
-                "NOT" => arguments.Count == 1 ? (object)!CoerceToBool(arguments[0].Evaluate(context)) : OdfFormulaError.Value,
+                "NOT" => arguments.Count == 1 ? (object)!FormulaCoercion.CoerceToBool(arguments[0].Evaluate(context)) : OdfFormulaError.Value,
                 "XOR" => EvaluateXor(arguments, context),
                 "IFERROR" => EvaluateIfError(arguments, context),
                 "IFNA" => EvaluateIfNa(arguments, context),

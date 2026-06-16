@@ -185,12 +185,12 @@ public partial class TextDocument
             if (changeType == "deletion" && specNode is not null)
             {
                 var sb = new System.Text.StringBuilder();
-                ExtractTextContentIgnoringChangeInfo(specNode, sb);
+                OdfTrackedChangeTextExtractor.ExtractTextContentIgnoringChangeInfo(specNode, sb);
                 content = sb.ToString();
             }
             else if (changeType == "insertion" || changeType == "format-change")
             {
-                content = ExtractTextBetweenMarkers(BodyTextRoot, id!);
+                content = OdfTrackedChangeTextExtractor.ExtractTextBetweenMarkers(BodyTextRoot, id!);
             }
 
             list.Add(new OdfTrackedChange

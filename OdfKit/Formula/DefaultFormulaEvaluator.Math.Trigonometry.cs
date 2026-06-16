@@ -16,7 +16,7 @@ public partial class DefaultFormulaEvaluator
         var val = arguments[0].Evaluate(context);
         if (val is OdfFormulaError err)
             return err;
-        if (!TryCoerceDouble(val, out double d) || d < -1 || d > 1)
+        if (!FormulaCoercion.TryCoerceDouble(val, out double d) || d < -1 || d > 1)
             return OdfFormulaError.Value;
         return Math.Asin(d);
     }
@@ -28,7 +28,7 @@ public partial class DefaultFormulaEvaluator
         var val = arguments[0].Evaluate(context);
         if (val is OdfFormulaError err)
             return err;
-        if (!TryCoerceDouble(val, out double d) || d < -1 || d > 1)
+        if (!FormulaCoercion.TryCoerceDouble(val, out double d) || d < -1 || d > 1)
             return OdfFormulaError.Value;
         return Math.Acos(d);
     }
@@ -40,7 +40,7 @@ public partial class DefaultFormulaEvaluator
         var val = arguments[0].Evaluate(context);
         if (val is OdfFormulaError err)
             return err;
-        if (!TryCoerceDouble(val, out double d))
+        if (!FormulaCoercion.TryCoerceDouble(val, out double d))
             return OdfFormulaError.Value;
         return Math.Atan(d);
     }
@@ -57,7 +57,7 @@ public partial class DefaultFormulaEvaluator
         if (yVal is OdfFormulaError err2)
             return err2;
 
-        if (!TryCoerceDouble(xVal, out double x) || !TryCoerceDouble(yVal, out double y))
+        if (!FormulaCoercion.TryCoerceDouble(xVal, out double x) || !FormulaCoercion.TryCoerceDouble(yVal, out double y))
             return OdfFormulaError.Value;
         if (x == 0 && y == 0)
             return OdfFormulaError.Div0;
@@ -71,7 +71,7 @@ public partial class DefaultFormulaEvaluator
         var val = arguments[0].Evaluate(context);
         if (val is OdfFormulaError err)
             return err;
-        if (!TryCoerceDouble(val, out double d) || d <= 0)
+        if (!FormulaCoercion.TryCoerceDouble(val, out double d) || d <= 0)
             return OdfFormulaError.Value;
         return Math.Log10(d);
     }
@@ -121,7 +121,7 @@ public partial class DefaultFormulaEvaluator
                 for (int i = 0; i < arrays.Count; i++)
                 {
                     object cellVal = arrays[i][r, c];
-                    if (TryCoerceDouble(cellVal, out double d))
+                    if (FormulaCoercion.TryCoerceDouble(cellVal, out double d))
                     {
                         term *= d;
                     }

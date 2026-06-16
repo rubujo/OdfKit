@@ -19,7 +19,7 @@ public partial class DefaultFormulaEvaluator
         if (testVal is OdfFormulaError)
             return testVal;
 
-        bool test = CoerceToBool(testVal);
+        bool test = FormulaCoercion.CoerceToBool(testVal);
 
         if (test)
         {
@@ -45,9 +45,9 @@ public partial class DefaultFormulaEvaluator
             if (val is OdfFormulaError err)
                 return err;
 
-            foreach (var innerVal in FlattenValues(val))
+            foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
-                if (TryCoerceToBool(innerVal, out bool b))
+                if (FormulaCoercion.TryCoerceToBool(innerVal, out bool b))
                 {
                     hasLogical = true;
                     result &= b;
@@ -72,9 +72,9 @@ public partial class DefaultFormulaEvaluator
             if (val is OdfFormulaError err)
                 return err;
 
-            foreach (var innerVal in FlattenValues(val))
+            foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
-                if (TryCoerceToBool(innerVal, out bool b))
+                if (FormulaCoercion.TryCoerceToBool(innerVal, out bool b))
                 {
                     hasLogical = true;
                     result |= b;
@@ -96,9 +96,9 @@ public partial class DefaultFormulaEvaluator
             var val = arg.Evaluate(context);
             if (val is OdfFormulaError err)
                 return err;
-            foreach (var item in FlattenValues(val))
+            foreach (var item in FormulaCoercion.FlattenValues(val))
             {
-                if (TryCoerceToBool(item, out bool b))
+                if (FormulaCoercion.TryCoerceToBool(item, out bool b))
                 {
                     hasLogical = true;
                     if (b)
@@ -142,7 +142,7 @@ public partial class DefaultFormulaEvaluator
             var condVal = arguments[i].Evaluate(context);
             if (condVal is OdfFormulaError err)
                 return err;
-            if (CoerceToBool(condVal))
+            if (FormulaCoercion.CoerceToBool(condVal))
             {
                 return arguments[i + 1].Evaluate(context);
             }
@@ -166,7 +166,7 @@ public partial class DefaultFormulaEvaluator
             var caseVal = arguments[valIdx].Evaluate(context);
             if (caseVal is OdfFormulaError caseErr)
                 return caseErr;
-            if (CompareValues(exprVal, caseVal) == 0)
+            if (FormulaCoercion.CompareValues(exprVal, caseVal) == 0)
             {
                 return arguments[resIdx].Evaluate(context);
             }
@@ -268,7 +268,7 @@ public partial class DefaultFormulaEvaluator
         var val = arguments[0].Evaluate(context);
         if (val is OdfFormulaError err)
             return err;
-        if (!TryCoerceDouble(val, out double d))
+        if (!FormulaCoercion.TryCoerceDouble(val, out double d))
             return OdfFormulaError.Value;
         long n = (long)Math.Truncate(d);
         return Math.Abs(n % 2) == 1;
@@ -281,7 +281,7 @@ public partial class DefaultFormulaEvaluator
         var val = arguments[0].Evaluate(context);
         if (val is OdfFormulaError err)
             return err;
-        if (!TryCoerceDouble(val, out double d))
+        if (!FormulaCoercion.TryCoerceDouble(val, out double d))
             return OdfFormulaError.Value;
         long n = (long)Math.Truncate(d);
         return n % 2 == 0;
@@ -297,7 +297,7 @@ public partial class DefaultFormulaEvaluator
             return err1;
         if (v2 is OdfFormulaError err2)
             return err2;
-        if (!TryCoerceDouble(v1, out double d1) || !TryCoerceDouble(v2, out double d2))
+        if (!FormulaCoercion.TryCoerceDouble(v1, out double d1) || !FormulaCoercion.TryCoerceDouble(v2, out double d2))
             return OdfFormulaError.Value;
         if (d1 < 0 || d2 < 0)
             return OdfFormulaError.Value;
@@ -314,7 +314,7 @@ public partial class DefaultFormulaEvaluator
             return err1;
         if (v2 is OdfFormulaError err2)
             return err2;
-        if (!TryCoerceDouble(v1, out double d1) || !TryCoerceDouble(v2, out double d2))
+        if (!FormulaCoercion.TryCoerceDouble(v1, out double d1) || !FormulaCoercion.TryCoerceDouble(v2, out double d2))
             return OdfFormulaError.Value;
         if (d1 < 0 || d2 < 0)
             return OdfFormulaError.Value;
@@ -331,7 +331,7 @@ public partial class DefaultFormulaEvaluator
             return err1;
         if (v2 is OdfFormulaError err2)
             return err2;
-        if (!TryCoerceDouble(v1, out double d1) || !TryCoerceDouble(v2, out double d2))
+        if (!FormulaCoercion.TryCoerceDouble(v1, out double d1) || !FormulaCoercion.TryCoerceDouble(v2, out double d2))
             return OdfFormulaError.Value;
         if (d1 < 0 || d2 < 0)
             return OdfFormulaError.Value;
@@ -348,7 +348,7 @@ public partial class DefaultFormulaEvaluator
             return err1;
         if (v2 is OdfFormulaError err2)
             return err2;
-        if (!TryCoerceDouble(v1, out double d1) || !TryCoerceDouble(v2, out double d2))
+        if (!FormulaCoercion.TryCoerceDouble(v1, out double d1) || !FormulaCoercion.TryCoerceDouble(v2, out double d2))
             return OdfFormulaError.Value;
         if (d1 < 0 || d2 < 0)
             return OdfFormulaError.Value;
@@ -365,7 +365,7 @@ public partial class DefaultFormulaEvaluator
             return err1;
         if (v2 is OdfFormulaError err2)
             return err2;
-        if (!TryCoerceDouble(v1, out double d1) || !TryCoerceDouble(v2, out double d2))
+        if (!FormulaCoercion.TryCoerceDouble(v1, out double d1) || !FormulaCoercion.TryCoerceDouble(v2, out double d2))
             return OdfFormulaError.Value;
         if (d1 < 0 || d2 < 0)
             return OdfFormulaError.Value;

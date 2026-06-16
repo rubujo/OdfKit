@@ -38,7 +38,7 @@ public partial class DefaultFormulaEvaluator
 
         // Resolve field column index
         int fieldCol = -1;
-        if (TryCoerceDouble(fieldVal, out double colD))
+        if (FormulaCoercion.TryCoerceDouble(fieldVal, out double colD))
         {
             fieldCol = (int)colD - 1;
         }
@@ -126,7 +126,7 @@ public partial class DefaultFormulaEvaluator
             if (rowMatches)
             {
                 object cellVal = db[r, fieldCol];
-                if (TryCoerceDouble(cellVal, out double val))
+                if (FormulaCoercion.TryCoerceDouble(cellVal, out double val))
                 {
                     selectedValues.Add(val);
                 }

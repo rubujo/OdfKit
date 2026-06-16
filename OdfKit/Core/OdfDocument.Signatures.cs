@@ -78,7 +78,7 @@ public abstract partial class OdfDocument
     /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果。</returns>
     public Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfSigningOptions? options = null)
     {
-        return OdfSigner.VerifySignaturesAsync(Package, options);
+        return OdfSignatureVerifier.VerifySignaturesAsync(Package, options);
     }
 
     private static int CountSignatureElements(Stream stream, long maxCharsInDocument = 0)

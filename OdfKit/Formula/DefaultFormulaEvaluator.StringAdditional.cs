@@ -92,7 +92,7 @@ public partial class DefaultFormulaEvaluator
             return err4;
 
         string oldText = valText.ToString() ?? "";
-        if (!TryCoerceDouble(valStart, out double startD) || !TryCoerceDouble(valLen, out double lenD))
+        if (!FormulaCoercion.TryCoerceDouble(valStart, out double startD) || !FormulaCoercion.TryCoerceDouble(valLen, out double lenD))
             return OdfFormulaError.Value;
 
         int startIndex = (int)startD - 1;

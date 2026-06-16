@@ -79,7 +79,7 @@ public partial class DefaultFormulaEvaluator
         if (valD is OdfFormulaError err3)
             return err3;
 
-        if (!TryCoerceDouble(valY, out double yD) || !TryCoerceDouble(valM, out double mD) || !TryCoerceDouble(valD, out double dD))
+        if (!FormulaCoercion.TryCoerceDouble(valY, out double yD) || !FormulaCoercion.TryCoerceDouble(valM, out double mD) || !FormulaCoercion.TryCoerceDouble(valD, out double dD))
             return OdfFormulaError.Value;
 
         int y = (int)yD;
@@ -182,7 +182,7 @@ public partial class DefaultFormulaEvaluator
         if (valS is OdfFormulaError err3)
             return err3;
 
-        if (!TryCoerceDouble(valH, out double h) || !TryCoerceDouble(valM, out double m) || !TryCoerceDouble(valS, out double s))
+        if (!FormulaCoercion.TryCoerceDouble(valH, out double h) || !FormulaCoercion.TryCoerceDouble(valM, out double m) || !FormulaCoercion.TryCoerceDouble(valS, out double s))
             return OdfFormulaError.Value;
 
         return (h * 3600.0 + m * 60.0 + s) / 86400.0;
@@ -214,7 +214,7 @@ public partial class DefaultFormulaEvaluator
         var val = arguments[0].Evaluate(context);
         if (val is OdfFormulaError err)
             return err;
-        if (!TryCoerceDouble(val, out double yearValue))
+        if (!FormulaCoercion.TryCoerceDouble(val, out double yearValue))
             return OdfFormulaError.Value;
 
         int year = (int)yearValue;
