@@ -40,11 +40,11 @@
 - [x] `OdfPackageSaver` + `OdfPackageSaveCollaborators`
 - [x] `eng/Format-Safe.ps1` 安全格式化規範
 
-## Phase 3（後續）
+## Phase 3（進行中）
 
-- `OdfPackageLoader` 完整載入引擎
-- `FormulaBuiltinFunctionRegistry` 取代 `FunctionDispatch` 巨型 switch
-- `OdfElement` 靜態 schema 註冊表
+- [x] `FormulaBuiltinFunctionRegistry` 取代 `FunctionDispatch` 巨型 switch
+- [x] `OdfPackageLoader` + `OdfPackageZipLoader` 載入引擎
+- [ ] `OdfElement` 靜態 schema 註冊表
 
 ## 驗證
 
