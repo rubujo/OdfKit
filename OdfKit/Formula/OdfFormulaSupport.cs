@@ -362,6 +362,10 @@ public static class OdfFormulaSupport
         new("EDATE", "DateTime", OdfFormulaSupportLevel.Evaluated),
         new("EOMONTH", "DateTime", OdfFormulaSupportLevel.Evaluated),
 
+        // LibreOffice Extension Functions
+        new("ORG.OPENOFFICE.EASTERSUNDAY", "LibreOffice", OdfFormulaSupportLevel.Evaluated),
+        new("ORG.OPENOFFICE.ISOMITTED", "LibreOffice", OdfFormulaSupportLevel.Evaluated),
+
         // Matrix Functions
         new("TRANSPOSE", "Matrix", OdfFormulaSupportLevel.Evaluated),
 

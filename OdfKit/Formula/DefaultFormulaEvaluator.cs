@@ -438,6 +438,8 @@ public class DefaultFormulaEvaluator : IOdfFormulaEvaluator
                 "NETWORKDAYS" => EvaluateNetWorkDays(arguments, context),
                 "EDATE" => EvaluateEDate(arguments, context),
                 "EOMONTH" => EvaluateEOMonth(arguments, context),
+                "ORG.OPENOFFICE.EASTERSUNDAY" => EvaluateOpenOfficeEasterSunday(arguments, context),
+                "ORG.OPENOFFICE.ISOMITTED" => EvaluateOpenOfficeIsOmitted(arguments),
 
                 // 7. Matrix Functions
                 "TRANSPOSE" => EvaluateTranspose(arguments, context),
@@ -2659,6 +2661,39 @@ public class DefaultFormulaEvaluator : IOdfFormulaEvaluator
         if (val is OdfFormulaError err) return err;
         if (!TryCoerceDateTime(val, out DateTime dt)) return OdfFormulaError.Value;
         return (double)dt.Year;
+    }
+
+    private static object EvaluateOpenOfficeEasterSunday(List<AstNode> arguments, IEvaluationContext context)
+    {
+        if (arguments.Count != 1) return OdfFormulaError.Value;
+        var val = arguments[0].Evaluate(context);
+        if (val is OdfFormulaError err) return err;
+        if (!TryCoerceDouble(val, out double yearValue)) return OdfFormulaError.Value;
+
+        int year = (int)yearValue;
+        if (year < 1 || year > 9999) return OdfFormulaError.Num;
+
+        int a = year % 19;
+        int b = year / 100;
+        int c = year % 100;
+        int d = b / 4;
+        int e = b % 4;
+        int f = (b + 8) / 25;
+        int g = (b - f + 1) / 3;
+        int h = (19 * a + b - d - g + 15) % 30;
+        int i = c / 4;
+        int k = c % 4;
+        int l = (32 + 2 * e + 2 * i - h - k) % 7;
+        int m = (a + 11 * h + 22 * l) / 451;
+        int month = (h + l - 7 * m + 114) / 31;
+        int day = ((h + l - 7 * m + 114) % 31) + 1;
+
+        return (new DateTime(year, month, day) - Epoch).TotalDays;
+    }
+
+    private static object EvaluateOpenOfficeIsOmitted(List<AstNode> arguments)
+    {
+        return arguments.Count == 0;
     }
 
     #endregion
