@@ -4,6 +4,7 @@ using System.Linq;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
+using OdfKit.Styles;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -111,6 +112,75 @@ public class SpreadsheetHighLevelApiTests
         // 2. 驗證 A1 儲存格已正確被附加了此驗證名稱
         // 在 ODS 中列與欄均被展開，A1 為第 1 列 (row) 的第 1 個 cell
         Assert.Contains("table:content-validation-name=\"val_1\"", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證列印範圍、標題列欄、分頁符與縮放設定會寫入 ODS XML。
+    /// </summary>
+    [Fact]
+    public void PrintSettingsApiWritesExpectedXml()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Sheet1");
+
+        for (int row = 0; row < 4; row++)
+        {
+            for (int column = 0; column < 4; column++)
+            {
+                sheet.GetCell(row, column).SetValue(row * 10d + column);
+            }
+        }
+
+        sheet.SetPrintArea(new OdfCellRange(0, 0, 9, 2));
+        sheet.SetPrintTitleRows(0, 0);
+        sheet.SetPrintTitleColumns(0, 0);
+        sheet.InsertRowPageBreak(afterRow: 1);
+        sheet.InsertColumnPageBreak(afterCol: 1);
+        sheet.SetFitToPage(maxPagesWide: 1, maxPagesTall: 0);
+
+        Assert.NotNull(sheet.GetPrintArea());
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var contentReader = new StreamReader(contentStream);
+        string contentXml = contentReader.ReadToEnd();
+
+        using Stream stylesStream = package.GetEntryStream("styles.xml");
+        using var stylesReader = new StreamReader(stylesStream);
+        string stylesXml = stylesReader.ReadToEnd();
+
+        Assert.Contains("table:print-ranges=", contentXml);
+        Assert.Contains("table:header-rows", contentXml);
+        Assert.Contains("table:header-columns", contentXml);
+        Assert.Contains("fo:break-before=\"page\"", contentXml);
+        Assert.Contains("style:scale-to-pages=\"1\"", stylesXml);
+    }
+
+    /// <summary>
+    /// 驗證工作表可設定 RTL 書寫方向。
+    /// </summary>
+    [Fact]
+    public void SheetWritingModeWritesTableStyle()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("RTL");
+        sheet.WritingMode = OdfWritingMode.RlTb;
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream stylesStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(stylesStream);
+        string contentXml = reader.ReadToEnd();
+
+        Assert.Equal(OdfWritingMode.RlTb, sheet.WritingMode);
+        Assert.Contains("style:writing-mode=\"rl-tb\"", contentXml);
     }
 
     /// <summary>

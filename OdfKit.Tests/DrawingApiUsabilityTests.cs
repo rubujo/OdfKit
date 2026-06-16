@@ -121,6 +121,59 @@ public class DrawingApiUsabilityTests
         Assert.Throws<InvalidOperationException>(() => DrawingDocument.Load(stream, "text.odt"));
     }
 
+    /// <summary>
+    /// 驗證圖形可標記為 ODF 1.4 裝飾性物件。
+    /// </summary>
+    [Fact]
+    public void ShapeMarkAsDecorative_WritesDrawDecorativeAttribute()
+    {
+        using var drawing = DrawingDocument.Create();
+        OdfDrawPage page = drawing.Pages.Add("Canvas");
+        page.AddShape(OdfShapeType.Rectangle, 1.Cm(), 1.Cm(), 2.Cm(), 2.Cm())
+            .MarkAsDecorative();
+
+        using var stream = new MemoryStream();
+        drawing.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream content = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(content);
+        string xml = reader.ReadToEnd();
+
+        Assert.Contains("draw:decorative=\"true\"", xml);
+    }
+
+    /// <summary>
+    /// 驗證圖形框架可嵌入表格。
+    /// </summary>
+    [Fact]
+    public void ShapeEmbeddedTable_WritesTableInsideShape()
+    {
+        using var drawing = DrawingDocument.Create();
+        OdfDrawPage page = drawing.Pages.Add("Canvas");
+        page.AddTextBox(1.Cm(), 1.Cm(), 4.Cm(), 2.Cm(), string.Empty)
+            .AddEmbeddedTable(1, 2)
+            .SetCellText(0, 0, "欄一")
+            .SetCellText(0, 1, "欄二");
+
+        using var stream = new MemoryStream();
+        drawing.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream content = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(content);
+        string xml = reader.ReadToEnd();
+
+        Assert.Contains("draw:text-box", xml);
+        Assert.Contains("table:table", xml);
+        Assert.Contains("table:table-row", xml);
+        Assert.Contains("table:table-cell", xml);
+        Assert.Contains("欄一", xml);
+        Assert.Contains("欄二", xml);
+    }
+
     private static bool HasElement(OdfNode node, string localName, string namespaceUri)
     {
         return FindElement(node, localName, namespaceUri) is not null;

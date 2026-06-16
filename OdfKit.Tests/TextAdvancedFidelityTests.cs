@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using OdfKit.Core;
+using OdfKit.Styles;
 using OdfKit.Text;
 using Xunit;
 
@@ -20,10 +21,10 @@ public class TextAdvancedFidelityTests
         using var document = TextDocument.Create();
         document.TrackedChanges = true;
 
-        document.GetDefaultPageSetup().WritingMode = "tb-rl";
+        document.GetDefaultPageSetup().WritingMode = OdfWritingMode.TbRl;
         OdfHeading heading = document.Body.Headings.Add("進階文字", 1);
         OdfParagraph paragraph = document.Body.Paragraphs.Add("漢字本文");
-        paragraph.WritingMode = "tb-rl";
+        paragraph.WritingMode = OdfWritingMode.TbRl;
         document.AddDateField(paragraph);
         document.AddPageNumberField(paragraph);
         document.AddComment(

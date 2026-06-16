@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Spreadsheet;
@@ -217,4 +218,105 @@ public class SpreadsheetApiUsabilityTests
         doc.ProtectWorkbook("my_password");
         Assert.False(doc.VerifyWorkbookPassword("wrong_password"));
     }
+
+    /// <summary>
+    /// 驗證工作表集合與儲存格列舉可直接使用 LINQ 查詢。
+    /// </summary>
+    [Fact]
+    public void WorksheetAndCellCollectionsSupportLinqQueries()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = workbook.Worksheets.Add("Data");
+        sheet.Cells["A1"].CellValue = "名稱";
+        sheet.Cells["B1"].CellValue = 10d;
+        sheet.Cells["C1"].Formula = "of:=[.B1]*2";
+
+        var names = workbook.Worksheets.Select(item => item.Name).ToArray();
+        var usedValues = sheet.UsedCells
+            .Select(cell => cell.CellValue)
+            .Where(value => value is not null)
+            .ToArray();
+        var rangeAddresses = sheet.GetRange(OdfCellRange.ParseExcel("A1:B1"))
+            .Select(cell => (cell.Row, cell.Column))
+            .ToArray();
+
+        Assert.Equal(["Data"], names);
+        Assert.Equal("Data", workbook.Worksheets.Find("Data")?.Name);
+        Assert.Equal(new object?[] { "名稱", 10d }, usedValues);
+        Assert.Equal(new (int Row, int Column)[] { (0, 0), (0, 1) }, rangeAddresses);
+    }
+
+    /// <summary>
+    /// 驗證 OdfLength 數字擴充方法可建立常用長度。
+    /// </summary>
+    [Fact]
+    public void OdfLengthNumericExtensionsCreateLengths()
+    {
+        Assert.Equal(OdfLength.FromCentimeters(1), 1.Cm());
+        Assert.Equal(OdfLength.FromMillimeters(2), 2.Mm());
+        Assert.Equal(OdfLength.FromPoints(12), 12.Pt());
+        Assert.Equal("1.5cm", 1.5.Cm().ToString());
+    }
+
+    /// <summary>
+    /// 驗證試算表文件可用非同步 API 儲存與載入。
+    /// </summary>
+    [Fact]
+    public async Task SpreadsheetAsyncSaveAndLoadRoundTrips()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        workbook.Worksheets.Add("Async").Cells["A1"].CellValue = "完成";
+
+        await using var stream = new MemoryStream();
+        await workbook.SaveAsync(stream, cancellationToken: TestContext.Current.CancellationToken);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = await SpreadsheetDocument.LoadAsync(
+            stream,
+            "async.ods",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("完成", loaded.Worksheets["Async"].Cells["A1"].CellValue);
+    }
+
+    /// <summary>
+    /// 驗證試算表 Fluent builder 可匯入資料表並設定工作表選項。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetDocumentBuilderImportsTableAndSheetOptions()
+    {
+        var products = new[]
+        {
+            new ProductRow("鍵盤", 1200d, 5),
+            new ProductRow("滑鼠", 650d, 12),
+        };
+
+        using SpreadsheetDocument workbook = SpreadsheetDocument.Builder()
+            .AddSheet("產品目錄", sheet => sheet
+                .ImportTable(
+                    products,
+                    product => [product.Name, product.Price, product.Stock],
+                    ["名稱", "單價", "庫存"])
+                .SetFormula("D2", "of:=[.B2]*[.C2]")
+                .SetColumnWidth(1, 4.5)
+                .FreezeAt(2, 1))
+            .Build();
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+        OdfTableSheet sheet = loaded.Worksheets["產品目錄"];
+
+        Assert.Equal("名稱", sheet.Cells["A1"].CellValue);
+        Assert.Equal("鍵盤", sheet.Cells["A2"].CellValue);
+        Assert.Equal(1200d, sheet.Cells["B2"].CellValue);
+        Assert.Equal(12d, sheet.Cells["C3"].CellValue);
+        Assert.Equal("of:=[.B2]*[.C2]", sheet.Cells["D2"].Formula);
+        Assert.Equal(new OdfFrozenPanes(1, 0), sheet.FrozenPanes);
+        Assert.Contains(sheet.UsedCells, cell => cell.CellValue?.Equals("滑鼠") == true);
+    }
+
+    private sealed record ProductRow(string Name, double Price, int Stock);
 }

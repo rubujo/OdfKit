@@ -103,6 +103,123 @@ public class TextApiUsabilityTests
         Assert.Throws<InvalidOperationException>(() => TextDocument.Load(stream, "sheet.ods"));
     }
 
+    /// <summary>
+    /// 驗證文字文件 Body 集合可直接使用 LINQ 查詢。
+    /// </summary>
+    [Fact]
+    public void BodyCollectionsSupportLinqQueries()
+    {
+        using var doc = TextDocument.Create();
+        doc.Body.Headings.Add("標題", 1);
+        doc.Body.Paragraphs.Add("第一段");
+        doc.Body.Paragraphs.Add("");
+        doc.Body.Lists.Add().AddListItem("項目");
+        doc.Body.Tables.Add(1, 1);
+
+        var nonEmptyParagraphs = doc.Body.Paragraphs
+            .Where(paragraph => paragraph.TextContent.Length > 0)
+            .ToArray();
+        var headingTexts = doc.Body.Headings.Select(heading => heading.TextContent).ToArray();
+
+        Assert.Single(nonEmptyParagraphs);
+        Assert.Equal("第一段", nonEmptyParagraphs[0].TextContent);
+        Assert.Equal(["標題"], headingTexts);
+        Assert.Single(doc.Body.Lists);
+        Assert.Single(doc.Body.Tables);
+    }
+
+    /// <summary>
+    /// 驗證文字文件可用非同步 API 儲存到路徑並載入。
+    /// </summary>
+    [Fact]
+    public async Task TextAsyncSaveAndLoadByPathRoundTrips()
+    {
+        string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".odt");
+        try
+        {
+            using (var doc = TextDocument.Create())
+            {
+                doc.Body.Paragraphs.Add("非同步段落");
+                await doc.SaveAsync(path, cancellationToken: TestContext.Current.CancellationToken);
+            }
+
+            using TextDocument loaded = await TextDocument.LoadAsync(path, TestContext.Current.CancellationToken);
+
+            Assert.Equal("非同步段落", loaded.Body.Paragraphs.Single().TextContent);
+        }
+        finally
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證文字圖片可標記為 ODF 1.4 裝飾性物件。
+    /// </summary>
+    [Fact]
+    public void ImageMarkAsDecorative_WritesDrawDecorativeAttribute()
+    {
+        using var doc = TextDocument.Create();
+        doc.Body.Images.Add(CreatePngBytes(), "1cm", "1cm", "Decorative")
+            .MarkAsDecorative();
+
+        using var stream = new MemoryStream();
+        doc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+
+        Assert.Contains("draw:decorative=\"true\"", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證文字文件 Fluent builder 可建立中繼資料、標題、段落片段與清單。
+    /// </summary>
+    [Fact]
+    public void TextDocumentBuilderCreatesMetadataParagraphRunsAndList()
+    {
+        using TextDocument document = TextDocument.Builder()
+            .WithMetadata(metadata => metadata
+                .Title("季報")
+                .Author("OdfKit")
+                .Subject("營運摘要")
+                .Description("2026 年第一季財務狀況。"))
+            .AddHeading("第一季財務摘要", level: 1)
+            .AddParagraph("本報告涵蓋 2026 年第一季的財務狀況。", format => format.FontSize(11))
+            .AddParagraph(paragraph => paragraph
+                .Append("總收入：")
+                .Append("NT$ 1,200,000", format => format.Bold().Color("#C00000"))
+                .Append("，較去年同期成長 12.3%。"))
+            .AddList(list => list
+                .Item("硬體銷售：NT$ 800,000")
+                .Item("軟體授權：NT$ 400,000"))
+            .Build();
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using TextDocument loaded = TextDocument.Load(stream);
+
+        Assert.Equal("季報", loaded.Metadata.Title);
+        Assert.Equal("OdfKit", loaded.Metadata.Creator);
+        Assert.Equal("營運摘要", loaded.Metadata.Subject);
+        Assert.Equal("第一季財務摘要", loaded.Body.Headings.Single().TextContent);
+        Assert.Contains(loaded.Body.Paragraphs, paragraph => paragraph.TextContent.Contains("NT$ 1,200,000", StringComparison.Ordinal));
+        Assert.Equal("硬體銷售：NT$ 800,000", loaded.Body.Lists.Single().Items[0].Paragraphs[0].TextContent);
+
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+
+        Assert.Contains("#C00000", contentXml);
+        Assert.Contains("11pt", contentXml);
+    }
+
     private static string ReadEntry(OdfPackage package, string path)
     {
         using Stream stream = package.GetEntryStream(path);

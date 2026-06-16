@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Styles;
 using OdfKit.Text;
 using Xunit;
 
@@ -219,6 +220,127 @@ public class TextHighLevelApiTests
         p3.BreakPageBefore();
         var contentXml2 = SaveAndGetContentXml(document);
         Assert.Contains("fo:break-before=\"page\"", contentXml2);
+    }
+
+    /// <summary>
+    /// 驗證段落可插入浮動文字框並輸出 draw:text-box 結構。
+    /// </summary>
+    [Fact]
+    public void FloatingTextBoxApiWritesDrawTextBox()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("本文");
+        paragraph.AddFloatingTextBox(
+                OdfLength.Parse("3cm"),
+                OdfLength.Parse("0cm"),
+                OdfLength.Parse("6cm"),
+                OdfLength.Parse("4cm"),
+                OdfAnchorType.Paragraph,
+                OdfTextWrap.Parallel)
+            .AddParagraph("文字框內容");
+
+        string contentXml = SaveAndGetContentXml(document);
+
+        Assert.Contains("draw:text-box", contentXml);
+        Assert.Contains("text:anchor-type=\"paragraph\"", contentXml);
+        Assert.Contains("svg:x=\"3cm\"", contentXml);
+        Assert.Contains("svg:width=\"6cm\"", contentXml);
+        Assert.Contains("style:wrap=\"parallel\"", contentXml);
+        Assert.Contains("文字框內容", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 ODT 流式寫入器會輸出基本文字文件結構。
+    /// </summary>
+    [Fact]
+    public void OdtStreamWriterWritesTextStructure()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new OdtStreamWriter(stream))
+        {
+            writer.AddHeading("章節標題", 2);
+            writer.AddParagraph("一般段落", "BodyStyle");
+            writer.BeginList("ListStyle");
+            writer.AddListItem("第一項");
+            writer.AddListItem("第二項");
+            writer.EndList();
+            writer.AddPageBreak();
+        }
+
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string contentXml = reader.ReadToEnd();
+
+        Assert.Contains("office:version=\"1.4\"", contentXml);
+        Assert.Contains("text:h", contentXml);
+        Assert.Contains("text:outline-level=\"2\"", contentXml);
+        Assert.Contains("text:style-name=\"BodyStyle\"", contentXml);
+        Assert.Contains("text:list", contentXml);
+        Assert.Contains("text:list-item", contentXml);
+        Assert.Contains("style:name=\"OdtStreamPageBreak\"", contentXml);
+        Assert.Contains("fo:break-before=\"page\"", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 ODT 流式讀取器可逐一讀出大型文字文件元素。
+    /// </summary>
+    [Fact]
+    public void OdtStreamReaderReadsTextElements()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new OdtStreamWriter(stream))
+        {
+            writer.AddHeading("章節標題", 3);
+            writer.AddParagraph("一般段落", "BodyStyle");
+            writer.BeginList();
+            writer.AddListItem("清單項目");
+            writer.EndList();
+        }
+
+        stream.Position = 0;
+        using var odtReader = new OdtStreamReader(stream);
+
+        Assert.True(odtReader.Read());
+        Assert.Equal(OdtNodeType.Heading, odtReader.NodeType);
+        Assert.Equal(3, odtReader.HeadingLevel);
+        Assert.Equal("章節標題", odtReader.Text);
+
+        Assert.True(odtReader.Read());
+        Assert.Equal(OdtNodeType.Paragraph, odtReader.NodeType);
+        Assert.Equal("BodyStyle", odtReader.StyleName);
+        Assert.Equal("一般段落", odtReader.Text);
+
+        Assert.True(odtReader.Read());
+        Assert.Equal(OdtNodeType.ListItem, odtReader.NodeType);
+        Assert.Equal("清單項目", odtReader.Text);
+
+        Assert.False(odtReader.Read());
+    }
+
+    /// <summary>
+    /// 驗證 ODT 流式寫入大量段落時不會累積完整 DOM。
+    /// </summary>
+    [Fact]
+    public void OdtStreamWriterKeepsLargeParagraphGenerationLowMemory()
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+        long before = GC.GetTotalMemory(forceFullCollection: true);
+
+        using (var writer = new OdtStreamWriter(Stream.Null))
+        {
+            for (int i = 0; i < 100_000; i++)
+            {
+                writer.AddParagraph("大型段落測試");
+            }
+        }
+
+        long after = GC.GetTotalMemory(forceFullCollection: true);
+        long retainedBytes = Math.Max(0, after - before);
+        Assert.True(retainedBytes < 20 * 1024 * 1024, $"保留記憶體過高：{retainedBytes:N0} bytes。");
     }
 
     private static string SaveAndGetContentXml(TextDocument document)

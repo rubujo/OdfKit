@@ -223,7 +223,7 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public async Task TestXadesASigningAndVerificationWithRevocation()
+        public async Task TestXadesLtSigningAndVerificationWithRevocation()
         {
             // Build CDP DER bytes for the test URL "http://mockcrl.com/revocation.crl"
             var cdpBytes = new byte[] {
@@ -275,7 +275,7 @@ namespace OdfKit.Tests
             using var httpClient = new HttpClient(mockHandler);
             using var ms = new MemoryStream();
             
-            // 1. Sign package as XAdES-A (which downloads and embeds the CRL)
+            // 1. Sign package as XAdES-LT, which downloads and embeds the CRL.
             using (var package = OdfPackage.Create(ms, leaveOpen: true))
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
@@ -283,7 +283,7 @@ namespace OdfKit.Tests
                 
                 var options = new OdfSigningOptions
                 {
-                    Level = XadesLevel.A,
+                    Level = XadesLevel.LT,
                     TsaUrl = "http://mocktsa.com/tsa",
                     HttpClient = httpClient,
                     CheckRevocation = true,
@@ -333,7 +333,7 @@ namespace OdfKit.Tests
                     
                     var optionsRevoked = new OdfSigningOptions
                     {
-                        Level = XadesLevel.A,
+                        Level = XadesLevel.LT,
                         TsaUrl = "http://mocktsa.com/tsa",
                         HttpClient = httpClient,
                         CheckRevocation = true,

@@ -179,4 +179,51 @@ public class PresentationHighLevelApiTests
         Assert.Contains(slide.Placeholders, p => p.PlaceholderType == OdfPlaceholderType.Title);
         Assert.Contains(slide.Placeholders, p => p.PlaceholderType == OdfPlaceholderType.Outline);
     }
+
+    /// <summary>
+    /// 驗證投影片可建立影片與音訊 plugin 物件。
+    /// </summary>
+    [Fact]
+    public void MediaObjectApiWritesDrawPlugin()
+    {
+        using var document = PresentationDocument.Create();
+        OdfSlide slide = document.AddSlide();
+
+        OdfMediaObject video = slide.AddVideo(
+            "Media/demo.mp4",
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("10cm"),
+            OdfLength.Parse("7cm"));
+        OdfMediaObject audio = slide.AddAudio(
+            "Media/narration.mp3",
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("10cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("1cm"));
+
+        Assert.Equal("Media/demo.mp4", video.PackagePath);
+        Assert.Equal("video/mp4", video.MimeType);
+        Assert.Equal("audio/mpeg", audio.MimeType);
+
+        string contentXml = SaveAndGetContentXml(document);
+
+        Assert.Contains("draw:plugin", contentXml);
+        Assert.Contains("xlink:href=\"Media/demo.mp4\"", contentXml);
+        Assert.Contains("draw:mime-type=\"video/mp4\"", contentXml);
+        Assert.Contains("xlink:href=\"Media/narration.mp3\"", contentXml);
+        Assert.Contains("draw:mime-type=\"audio/mpeg\"", contentXml);
+    }
+
+    private static string SaveAndGetContentXml(PresentationDocument document)
+    {
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        return reader.ReadToEnd();
+    }
 }

@@ -237,7 +237,7 @@ namespace OdfKit.Tests
 
                 // 2. Writing Mode & Page Layout Grid
                 var pageSetup = doc.GetDefaultPageSetup();
-                pageSetup.WritingMode = "tb-rl";
+                pageSetup.WritingMode = OdfWritingMode.TbRl;
                 pageSetup.LayoutGridMode = OdfLayoutGridMode.Both;
                 pageSetup.LayoutGridBaseHeight = "0.5cm";
                 pageSetup.LayoutGridBaseWidth = "0.5cm";
@@ -247,7 +247,7 @@ namespace OdfKit.Tests
                 pageSetup.LayoutGridDisplay = true;
                 pageSetup.LayoutGridPrint = true;
 
-                Assert.Equal("tb-rl", pageSetup.WritingMode);
+                Assert.Equal(OdfWritingMode.TbRl, pageSetup.WritingMode);
                 Assert.Equal(OdfLayoutGridMode.Both, pageSetup.LayoutGridMode);
                 Assert.Equal("0.5cm", pageSetup.LayoutGridBaseHeight);
                 Assert.Equal("0.5cm", pageSetup.LayoutGridBaseWidth);

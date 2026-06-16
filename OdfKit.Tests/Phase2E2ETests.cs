@@ -296,12 +296,12 @@ namespace OdfKit.Tests
             var doc = new TextDocument(package);
             var pSetup = doc.GetDefaultPageSetup();
             // CJK vertical writing mode setting
-            pSetup.WritingMode = "tb-rl";
+            pSetup.WritingMode = OdfWritingMode.TbRl;
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
             var reloadedSetup = reloaded.GetDefaultPageSetup();
-            Assert.Equal("tb-rl", reloadedSetup.WritingMode);
+            Assert.Equal(OdfWritingMode.TbRl, reloadedSetup.WritingMode);
         }
 
         [Fact]
@@ -1420,17 +1420,15 @@ namespace OdfKit.Tests
         }
 
         [Fact]
-        public void F3_Boundary_VerticalWritingModeInvalidValue()
+        public void F3_Boundary_VerticalWritingModeDefaultsToLrTbWhenUnset()
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
             var pSetup = doc.GetDefaultPageSetup();
-            // Invalid writing mode should not crash but round-trip or behave fallback
-            pSetup.WritingMode = "invalid-mode";
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
-            Assert.Equal("invalid-mode", reloaded.GetDefaultPageSetup().WritingMode);
+            Assert.Equal(OdfWritingMode.LrTb, reloaded.GetDefaultPageSetup().WritingMode);
         }
 
         [Fact]
@@ -1794,7 +1792,7 @@ namespace OdfKit.Tests
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
-            doc.GetDefaultPageSetup().WritingMode = "tb-rl"; // CJK vertical writing mode layout
+            doc.GetDefaultPageSetup().WritingMode = OdfWritingMode.TbRl; // CJK vertical writing mode layout
             
             doc.AddTableOfContents(); // TOC
 
@@ -1807,7 +1805,7 @@ namespace OdfKit.Tests
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
-            Assert.Equal("tb-rl", reloaded.GetDefaultPageSetup().WritingMode);
+            Assert.Equal(OdfWritingMode.TbRl, reloaded.GetDefaultPageSetup().WritingMode);
             Assert.NotNull(reloaded.BodyTextRoot.Descendants().FirstOrDefault(d => d.LocalName == "ruby"));
             Assert.Contains(reloaded.Package.GetEntries(), e => e.Path.StartsWith("Formula_"));
         }

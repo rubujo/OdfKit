@@ -90,4 +90,34 @@ public class OpenFormulaSupportTests
 
         Assert.Equal("=SUM(A1:A3)", serialized);
     }
+
+    /// <summary>
+    /// 驗證 LibreOffice EASTERSUNDAY 擴充函式可回傳 ODF 日期序號。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeEasterSundayEvaluatesToDateSerial()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new FormulaAndStylesTest.MockEvaluationContext();
+        double expected = (new DateTime(2026, 4, 5) - new DateTime(1899, 12, 30)).TotalDays;
+
+        object result = evaluator.Evaluate("ORG.OPENOFFICE.EASTERSUNDAY(2026)", context);
+
+        Assert.Equal(expected, Assert.IsType<double>(result));
+        Assert.True(OdfFormulaSupport.IsFunctionSupported("ORG.OPENOFFICE.EASTERSUNDAY"));
+    }
+
+    /// <summary>
+    /// 驗證 LibreOffice ISOMITTED 擴充函式依引數數量回傳結果。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeIsOmittedEvaluatesByArgumentCount()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new FormulaAndStylesTest.MockEvaluationContext();
+
+        Assert.Equal(true, evaluator.Evaluate("ORG.OPENOFFICE.ISOMITTED()", context));
+        Assert.Equal(false, evaluator.Evaluate("ORG.OPENOFFICE.ISOMITTED(1)", context));
+        Assert.True(OdfFormulaSupport.IsFunctionSupported("ORG.OPENOFFICE.ISOMITTED"));
+    }
 }

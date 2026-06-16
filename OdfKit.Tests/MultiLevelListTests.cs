@@ -229,4 +229,20 @@ public class MultiLevelListTests
         Assert.Contains("style:list-level-label-alignment", stylesXml);
         Assert.Contains("text:label-followed-by=\"listtab\"", stylesXml);
     }
+
+    /// <summary>
+    /// 驗證清單可從 0 開始編號。
+    /// </summary>
+    [Fact]
+    public void StartFromZero_WritesTextStartValue()
+    {
+        using var doc = TextDocument.Create();
+        OdfList list = doc.Body.Lists.Add();
+        list.AddItem("零號項目");
+        list.StartFrom(0);
+
+        string xml = GetContentXml(doc);
+
+        Assert.Contains("text:start-value=\"0\"", xml);
+    }
 }
