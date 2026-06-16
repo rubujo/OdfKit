@@ -27,7 +27,7 @@ public static partial class OdfSigner
     /// <param name="certificate">用於簽署的 X.509 憑證</param>
     /// <param name="options">簽署選項</param>
     /// <returns>代表非同步作業的工作</returns>
-    public static async Task SignAsync(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options)
+    internal static async Task SignCoreAsync(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options)
     {
         if (package == null)
             throw new ArgumentNullException(nameof(package));

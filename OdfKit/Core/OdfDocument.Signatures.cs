@@ -25,7 +25,8 @@ public abstract partial class OdfDocument
         WriteDomToEntry("meta.xml", MetaDom, OdfSaveOptions.Default);
         WriteDomToEntry("settings.xml", SettingsDom, OdfSaveOptions.Default);
 
-        OdfSigner.Sign(Package, certificate);
+        OdfSignatureSigner.SignAsync(Package, certificate, new OdfSigningOptions { Level = XadesLevel.None })
+            .GetAwaiter().GetResult();
     }
 
     /// <summary>

@@ -41,7 +41,19 @@ public static partial class OdfSigner
     /// <param name="options">簽署選項</param>
     public static void Sign(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options)
     {
-        SignAsync(package, certificate, options).GetAwaiter().GetResult();
+        OdfSignatureSigner.SignAsync(package, certificate, options).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// 對 ODF 封裝中的關鍵檔案進行數位簽署（非同步）。
+    /// </summary>
+    /// <param name="package">要簽署的 ODF 封裝</param>
+    /// <param name="certificate">用於簽署的 X.509 憑證</param>
+    /// <param name="options">簽署選項</param>
+    /// <returns>代表非同步作業的工作</returns>
+    public static Task SignAsync(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options)
+    {
+        return OdfSignatureSigner.SignAsync(package, certificate, options);
     }
     /// <summary>
     /// 驗證 ODF 封裝中的所有數位簽章。

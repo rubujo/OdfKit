@@ -32,12 +32,13 @@
 - [x] `OdfSignatureVerifier` 驗證管線（薄門面，委派 `OdfSigner` partial）
 - [x] `dotnet build` / `dotnet test` / `dotnet format`
 
-## Phase 2（進行中）
+## Phase 2（已完成）
 
 - [x] `OdfTrackedChangesEngine`（整合接受／拒絕）
 - [x] `OdfManifestLoader` + `OdfManifestLoadContext`
-- [ ] `OdfSignatureSigner`（簽署管線）
-- [ ] `OdfPackageSaver` + `OdfPackageLoadContext`
+- [x] `OdfSignatureSigner`（簽署管線薄門面）
+- [x] `OdfPackageSaver` + `OdfPackageSaveCollaborators`
+- [x] `eng/Format-Safe.ps1` 安全格式化規範
 
 ## Phase 3（後續）
 
@@ -47,4 +48,4 @@
 
 ## 驗證
 
-每輪變更：`dotnet build` → `dotnet test`（1131+）→ `dotnet format` → GPG 簽署提交。
+每輪變更：`dotnet build` → `dotnet test`（1131+）→ `pwsh eng/Format-Safe.ps1` → GPG 簽署提交。

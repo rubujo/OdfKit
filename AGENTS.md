@@ -30,7 +30,10 @@
   - 必須小心檢查註解中標點符號的使用，不可遺留任何不需要或重複的標點符號（如重複的句點、不對稱括號、結尾贅餘的標點符號等），文字應保持精簡俐落。
 - **可空性 (Nullability)**：專案已啟用可空類型標記 (`<Nullable>enable</Nullable>`)，請撰寫 Null 安全的程式碼。
 - **異常處理**：針對 ZIP 串流解析、XML 讀寫等底層操作，務必進行防禦性異常攔截與資源釋放。
-- **程式碼排版與格式化**：在提交任何變更前，必須在專案根目錄下執行 `dotnet format` 進行代碼格式化，確保其完全符合 `.editorconfig` 規範。
+- **程式碼排版與格式化**：在提交任何變更前，必須執行安全格式化腳本 `eng/Format-Safe.ps1`，確保其完全符合 `.editorconfig` 規範。
+  - **禁止**在方案根目錄直接執行 `dotnet format`（無專案範圍）：`OdfKit.Tests` 為雙 TFM（`net10.0` + `net8.0`），全方案格式化會觸發 IDE multi-target 合併失敗，將 `<<<<<<< TODO: 取消合併專案 …` 標記寫入 `.cs` 並導致 **CS8300**。
+  - 格式化後必須通過 `eng/Test-MergeConflictMarkers.ps1`（已內建於 `Format-Safe.ps1`）。
+  - 若僅修改函式庫，使用 `pwsh eng/Format-Safe.ps1`；需連同測試檔排版時，加上 `-IncludeTests`（測試專案僅執行 `whitespace`，不套用 analyzer 程式碼修正）。
 
 ### B. ODF 與 XML 協定規格
 - **命名空間處理**：一律使用與前綴無關的 `NamespaceURI` + `LocalName` 作為 XML 節點與屬性的比對基準。
@@ -64,9 +67,17 @@
   ```powershell
   dotnet test
   ```
-- **格式化程式碼**：
+- **安全格式化程式碼**（提交前必用）：
   ```powershell
-  dotnet format
+  pwsh eng/Format-Safe.ps1
+  ```
+- **含測試專案排版**（僅 whitespace）：
+  ```powershell
+  pwsh eng/Format-Safe.ps1 -IncludeTests
+  ```
+- **檢查合併衝突標記**：
+  ```powershell
+  pwsh eng/Test-MergeConflictMarkers.ps1
   ```
 
 ---
