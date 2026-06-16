@@ -6,7 +6,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Attribute Values (B2)
+    #region Attribute Values - Geometry, Locale & Line
 
     /// <summary>
     /// 取得具有 schema awareness 的三維向量屬性。

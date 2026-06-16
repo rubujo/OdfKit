@@ -8,7 +8,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Attribute Values (B1b)
+    #region Attribute Values - Text Caption & Address
 
     /// <summary>
     /// 取得具有 schema awareness 的文字標號序列格式屬性。

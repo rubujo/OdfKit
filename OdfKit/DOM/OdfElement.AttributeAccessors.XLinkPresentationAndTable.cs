@@ -8,7 +8,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Attribute Accessors (A)
+    #region Attribute Accessors - XLink, Presentation & Table
 
     /// <summary>
     /// 取得具有 schema awareness 的 IRI 參照屬性。

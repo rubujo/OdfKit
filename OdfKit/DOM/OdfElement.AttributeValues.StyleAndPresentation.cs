@@ -7,7 +7,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Attribute Values (A1)
+    #region Attribute Values - Style & Presentation
 
     /// <summary>
     /// 取得具有 schema awareness 的樣式水平相對基準屬性。

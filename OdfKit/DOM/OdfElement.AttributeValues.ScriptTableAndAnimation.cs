@@ -7,7 +7,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Attribute Values (A2)
+    #region Attribute Values - Script, Table & Animation
 
     /// <summary>
     /// 取得具有 schema awareness 的樣式文字系統類型屬性。

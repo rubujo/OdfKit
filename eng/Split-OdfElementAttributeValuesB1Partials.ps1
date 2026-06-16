@@ -1,13 +1,13 @@
 #Requires -Version 7.0
 $ErrorActionPreference = 'Stop'
 $domDir = Join-Path $PSScriptRoot '..\OdfKit\DOM'
-$sourcePath = Join-Path $domDir 'OdfElement.AttributeValues.B1.cs'
+$sourcePath = Join-Path $domDir 'OdfElement.AttributeValues.DrawFoAndTextList.cs'
 $lines = [System.Collections.Generic.List[string]]@(Get-Content -Path $sourcePath -Encoding UTF8)
 $lineCount = $lines.Count
 
 $files = @(
-    @{ Start = 11; End = 530; File = 'OdfElement.AttributeValues.B1a.cs'; Region = 'Attribute Values (B1a)' }
-    @{ Start = 531; End = ($lineCount - 3); File = 'OdfElement.AttributeValues.B1b.cs'; Region = 'Attribute Values (B1b)' }
+    @{ Start = 11; End = 530; File = 'OdfElement.AttributeValues.DrawFoAndTextList.cs'; Region = 'Attribute Values - Draw, FO & Text List' }
+    @{ Start = 531; End = ($lineCount - 3); File = 'OdfElement.AttributeValues.TextCaptionAndAddress.cs'; Region = 'Attribute Values - Text Caption & Address' }
 )
 
 function Get-UsingsForBlock {

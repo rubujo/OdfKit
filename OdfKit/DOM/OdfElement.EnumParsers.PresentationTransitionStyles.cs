@@ -6,7 +6,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Enum Parsers (B2)
+    #region Enum Parsers - Presentation Transition Styles
 
     private static bool TryParsePresentationTransitionStyle(string? value, out OdfPresentationTransitionStyle transitionStyle)
     {

@@ -55,7 +55,10 @@ function Write-PartialFile {
 
 # Core: class fields, ctor, public sheet API, dispose (lines 15-301, 420-461)
 $coreBody = $lines[14..300] + $lines[419..460]
-$coreBody = $coreBody | ForEach-Object { $_ -replace '^public class OdsStreamWriter', 'public partial class OdsStreamWriter' }
+$coreBody = $coreBody | ForEach-Object {
+    $_ -replace '^public class OdsStreamWriter', 'public partial class OdsStreamWriter' `
+       -replace '^public partial class OdsStreamWriter$', 'public partial class OdsStreamWriter : IDisposable'
+}
 Write-PartialFile -Path $sourcePath -RegionName 'Stream Writing' -BodyLines $coreBody -IncludeClassDoc
 Write-Host "Core OdsStreamWriter.cs: $($coreBody.Count) body lines"
 
@@ -70,7 +73,7 @@ $wrapperOut.Add('using System.IO;')
 $wrapperOut.Add('')
 $wrapperOut.Add('namespace OdfKit.Spreadsheet;')
 $wrapperOut.Add('')
-$wrapperOut.AddRange($wrapperBody)
+foreach ($line in $wrapperBody) { [void]$wrapperOut.Add([string]$line) }
 Set-Content -Path (Join-Path $sheetDir 'NonSeekableStreamWrapper.cs') -Value $wrapperOut -Encoding UTF8
 Write-Host "  NonSeekableStreamWrapper.cs: $($wrapperBody.Count) body lines"
 Write-Host 'Done.'

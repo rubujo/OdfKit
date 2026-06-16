@@ -46,10 +46,10 @@ function Write-PartialFile {
 }
 
 $files = @(
-    @{ Start = 12; File = 'OdfElement.EnumParsers.A.cs'; Region = 'Enum Parsers (A)' }
-    @{ Start = 644; File = 'OdfElement.EnumParsers.B.cs'; Region = 'Enum Parsers (B)' }
-    @{ Start = 1138; File = 'OdfElement.EnumParsers.C.cs'; Region = 'Enum Parsers (C)' }
-    @{ Start = 1663; File = 'OdfElement.EnumParsers.D.cs'; Region = 'Enum Parsers (D)' }
+    @{ Start = 12; File = 'OdfElement.EnumParsers.LineStyleAndXLink.cs'; Region = 'Enum Parsers - Line, Style & XLink' }
+    @{ Start = 644; File = 'OdfElement.EnumParsers.PresentationEffectsAndTransitions.cs'; Region = 'Enum Parsers - Presentation Effects & Transitions' }
+    @{ Start = 1138; File = 'OdfElement.EnumParsers.CalendarDrawAndTableText.cs'; Region = 'Enum Parsers - Calendar, Draw & Table Text' }
+    @{ Start = 1663; File = 'OdfElement.EnumParsers.TextNumberingAndKind.cs'; Region = 'Enum Parsers - Text Numbering & Kind' }
 )
 for ($i = 0; $i -lt $files.Count; $i++) {
     $start = $files[$i].Start - 1

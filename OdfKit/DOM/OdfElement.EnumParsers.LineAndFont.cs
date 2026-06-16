@@ -6,7 +6,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Enum Parsers (A1)
+    #region Enum Parsers - Line & Font
 
     private static bool TryParseLineStyle(string? value, out OdfLineStyle lineStyle)
     {

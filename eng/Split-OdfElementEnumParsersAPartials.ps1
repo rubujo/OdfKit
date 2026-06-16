@@ -1,13 +1,13 @@
 #Requires -Version 7.0
 $ErrorActionPreference = 'Stop'
 $domDir = Join-Path $PSScriptRoot '..\OdfKit\DOM'
-$sourcePath = Join-Path $domDir 'OdfElement.EnumParsers.A.cs'
+$sourcePath = Join-Path $domDir 'OdfElement.EnumParsers.LineStyleAndXLink.cs'
 $lines = [System.Collections.Generic.List[string]]@(Get-Content -Path $sourcePath -Encoding UTF8)
 $lineCount = $lines.Count
 
 $files = @(
-    @{ Start = 11; End = 385; File = 'OdfElement.EnumParsers.A1.cs'; Region = 'Enum Parsers (A1)' }
-    @{ Start = 387; End = ($lineCount - 3); File = 'OdfElement.EnumParsers.A2.cs'; Region = 'Enum Parsers (A2)' }
+    @{ Start = 11; End = 385; File = 'OdfElement.EnumParsers.LineAndFont.cs'; Region = 'Enum Parsers - Line & Font' }
+    @{ Start = 387; End = ($lineCount - 3); File = 'OdfElement.EnumParsers.StyleXLinkAndTable.cs'; Region = 'Enum Parsers - Style, XLink & Table' }
 )
 
 function Get-UsingsForBlock {

@@ -1,13 +1,13 @@
 #Requires -Version 7.0
 $ErrorActionPreference = 'Stop'
 $domDir = Join-Path $PSScriptRoot '..\OdfKit\DOM'
-$sourcePath = Join-Path $domDir 'OdfElement.AttributeValues.DrawFoAndTextList.cs'
+$sourcePath = Join-Path $domDir 'OdfElement.AttributeValues.LineFontStyleAndMedia.cs'
 $lines = [System.Collections.Generic.List[string]]@(Get-Content -Path $sourcePath -Encoding UTF8)
 $lineCount = $lines.Count
 
 $files = @(
-    @{ Start = 11; End = 269; File = 'OdfElement.AttributeValues.DrawFoAndStroke.cs'; Region = 'Attribute Values - Draw, FO & Stroke' }
-    @{ Start = 271; End = ($lineCount - 3); File = 'OdfElement.AttributeValues.TextListAndReference.cs'; Region = 'Attribute Values - Text List & Reference' }
+    @{ Start = 13; End = 245; File = 'OdfElement.AttributeValues.LineAndFont.cs'; Region = 'Attribute Values - Line & Font' }
+    @{ Start = 247; End = ($lineCount - 3); File = 'OdfElement.AttributeValues.StyleFormTableAndMedia.cs'; Region = 'Attribute Values - Style, Form, Table & Media' }
 )
 
 function Get-UsingsForBlock {
@@ -16,8 +16,8 @@ function Get-UsingsForBlock {
     [void]$needed.Add('System')
     [void]$needed.Add('OdfKit.DOM')
     if ($Text -match 'OdfCompliance|OdfValidator|OdfVersion') { [void]$needed.Add('OdfKit.Compliance') }
-    if ($Text -match 'OdfPackage|OdfNode|OdfNamespaces|OdfCellAddress') { [void]$needed.Add('OdfKit.Core') }
-    if ($Text -match 'OdfLength|OdfStyle|OdfPercent') { [void]$needed.Add('OdfKit.Styles') }
+    if ($Text -match 'OdfPackage|OdfNode|OdfNamespaces|OdfMediaType') { [void]$needed.Add('OdfKit.Core') }
+    if ($Text -match 'OdfLength|OdfStyle|OdfFont|OdfLine') { [void]$needed.Add('OdfKit.Styles') }
 
     $order = @('System', 'OdfKit.Compliance', 'OdfKit.Core', 'OdfKit.DOM', 'OdfKit.Styles')
     $result = @()
@@ -53,5 +53,5 @@ foreach ($block in $files) {
 }
 
 Remove-Item -Path $sourcePath -Force
-Write-Host 'Removed OdfElement.AttributeValues.DrawFoAndTextList.cs'
+Write-Host 'Removed OdfElement.AttributeValues.LineFontStyleAndMedia.cs'
 Write-Host 'Done.'

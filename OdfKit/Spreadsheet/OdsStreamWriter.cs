@@ -12,8 +12,9 @@ namespace OdfKit.Spreadsheet;
 /// <summary>
 /// 提供以資料流方式寫入 ODS 試算表文件的功能，以支援高效能、低記憶體耗用的寫入作業。
 /// </summary>
-public class OdsStreamWriter : IDisposable
+public partial class OdsStreamWriter : IDisposable
 {
+    #region Stream Writing
     private readonly Stream _outputStream;
     private readonly ZipArchive _zip;
     private readonly Stream _contentEntryStream;
@@ -299,124 +300,6 @@ public class OdsStreamWriter : IDisposable
             _isSheetStarted = false;
         }
     }
-
-    private void WriteDefaultMetaFiles()
-    {
-        WriteManifest();
-        // 此處不寫入 styles.xml
-        WriteMeta();
-    }
-
-    private void WriteManifest()
-    {
-        var entry = _zip.CreateEntry("META-INF/manifest.xml", CompressionLevel.Optimal);
-        using (var stream = entry.Open())
-        using (var writer = XmlWriter.Create(stream))
-        {
-            writer.WriteStartDocument();
-            writer.WriteStartElement("manifest", "manifest", OdfNamespaces.Manifest);
-            writer.WriteAttributeString("manifest", "version", OdfNamespaces.Manifest, FormatVersion(_version));
-
-            writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
-            writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "/");
-            writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "application/vnd.oasis.opendocument.spreadsheet");
-            writer.WriteEndElement();
-
-            writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
-            writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "content.xml");
-            writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "text/xml");
-            writer.WriteEndElement();
-
-            writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
-            writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "styles.xml");
-            writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "text/xml");
-            writer.WriteEndElement();
-
-            writer.WriteEndElement();
-            writer.WriteEndDocument();
-        }
-    }
-
-    private void WriteStyles()
-    {
-        var entry = _zip.CreateEntry("styles.xml", CompressionLevel.Optimal);
-        using (var stream = entry.Open())
-        using (var writer = XmlWriter.Create(stream))
-        {
-            writer.WriteStartDocument();
-            writer.WriteStartElement("office", "document-styles", OdfNamespaces.Office);
-            writer.WriteAttributeString("office", "version", OdfNamespaces.Office, FormatVersion(_version));
-            writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
-            writer.WriteAttributeString("xmlns", "style", null, OdfNamespaces.Style);
-            writer.WriteAttributeString("xmlns", "text", null, OdfNamespaces.Text);
-            writer.WriteAttributeString("xmlns", "table", null, OdfNamespaces.Table);
-            writer.WriteAttributeString("xmlns", "fo", null, OdfNamespaces.Fo);
-
-            writer.WriteStartElement("office", "styles", OdfNamespaces.Office);
-            writer.WriteEndElement();
-
-            writer.WriteStartElement("office", "automatic-styles", OdfNamespaces.Office);
-            foreach (var style in _columnStyles)
-            {
-                writer.WriteStartElement("style", "style", OdfNamespaces.Style);
-                writer.WriteAttributeString("style", "name", OdfNamespaces.Style, style.styleName);
-                writer.WriteAttributeString("style", "family", OdfNamespaces.Style, "table-column");
-                writer.WriteStartElement("style", "table-column-properties", OdfNamespaces.Style);
-                writer.WriteAttributeString("style", "column-width", OdfNamespaces.Style, style.width.ToString());
-                writer.WriteEndElement(); // table-column-properties
-                writer.WriteEndElement(); // style
-            }
-
-            foreach (var style in _rowStyles)
-            {
-                writer.WriteStartElement("style", "style", OdfNamespaces.Style);
-                writer.WriteAttributeString("style", "name", OdfNamespaces.Style, style.styleName);
-                writer.WriteAttributeString("style", "family", OdfNamespaces.Style, "table-row");
-                writer.WriteStartElement("style", "table-row-properties", OdfNamespaces.Style);
-                if (style.useOptimalHeight)
-                {
-                    writer.WriteAttributeString("style", "use-optimal-row-height", OdfNamespaces.Style, "true");
-                }
-                else if (style.height.HasValue)
-                {
-                    string heightCm = style.height.Value.ToCentimeters()
-                        .ToString("F4", System.Globalization.CultureInfo.InvariantCulture) + "cm";
-                    writer.WriteAttributeString("style", "row-height", OdfNamespaces.Style, heightCm);
-                }
-                writer.WriteEndElement(); // table-row-properties
-                writer.WriteEndElement(); // style
-            }
-            writer.WriteEndElement();
-
-            writer.WriteStartElement("office", "master-styles", OdfNamespaces.Office);
-            writer.WriteEndElement();
-
-            writer.WriteEndElement();
-            writer.WriteEndDocument();
-        }
-    }
-
-    private void WriteMeta()
-    {
-        var entry = _zip.CreateEntry("meta.xml", CompressionLevel.Optimal);
-        using (var stream = entry.Open())
-        using (var writer = XmlWriter.Create(stream))
-        {
-            writer.WriteStartDocument();
-            writer.WriteStartElement("office", "document-meta", OdfNamespaces.Office);
-            writer.WriteAttributeString("office", "version", OdfNamespaces.Office, FormatVersion(_version));
-            writer.WriteAttributeString("xmlns", "office", null, OdfNamespaces.Office);
-            writer.WriteAttributeString("xmlns", "dc", null, OdfNamespaces.Dc);
-            writer.WriteAttributeString("xmlns", "meta", null, OdfNamespaces.Meta);
-
-            writer.WriteStartElement("office", "meta", OdfNamespaces.Office);
-            writer.WriteEndElement();
-
-            writer.WriteEndElement();
-            writer.WriteEndDocument();
-        }
-    }
-
     /// <summary>
     /// 關閉所有底層資料流並釋放 <see cref="OdsStreamWriter"/> 使用的資源。
     /// </summary>
@@ -459,44 +342,6 @@ public class OdsStreamWriter : IDisposable
             _zip.Dispose();
         }
     }
-}
 
-internal class NonSeekableStreamWrapper(Stream baseStream) : Stream
-{
-    private readonly Stream _baseStream = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
-
-    public override bool CanRead => _baseStream.CanRead;
-    public override bool CanSeek => false;
-    public override bool CanWrite => _baseStream.CanWrite;
-    public override long Length => throw new NotSupportedException();
-    public override long Position
-    {
-        get => throw new NotSupportedException();
-        set => throw new NotSupportedException();
-    }
-
-    public override void Flush() => _baseStream.Flush();
-
-    public override int Read(byte[] buffer, int offset, int count) => _baseStream.Read(buffer, offset, count);
-
-    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
-
-    public override void SetLength(long value) => throw new NotSupportedException();
-
-    public override void Write(byte[] buffer, int offset, int count) => _baseStream.Write(buffer, offset, count);
-
-    public override System.Threading.Tasks.Task WriteAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
-    {
-        return _baseStream.WriteAsync(buffer, offset, count, cancellationToken);
-    }
-
-    public override System.Threading.Tasks.Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
-    {
-        return _baseStream.ReadAsync(buffer, offset, count, cancellationToken);
-    }
-
-    public override System.Threading.Tasks.Task FlushAsync(System.Threading.CancellationToken cancellationToken)
-    {
-        return _baseStream.FlushAsync(cancellationToken);
-    }
+    #endregion
 }

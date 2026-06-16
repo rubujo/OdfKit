@@ -6,7 +6,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Enum Parsers (B1)
+    #region Enum Parsers - Presentation Effect & Transition
 
     private static bool TryParsePresentationEffect(string? value, out OdfPresentationEffect effect)
     {

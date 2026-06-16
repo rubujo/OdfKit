@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 $ErrorActionPreference = 'Stop'
 $domDir = Join-Path $PSScriptRoot '..\OdfKit\DOM'
-$sourcePath = Join-Path $domDir 'OdfElement.AttributeValues.B.cs'
+$sourcePath = Join-Path $domDir 'OdfElement.AttributeValues.DrawGeometryTextAndLine.cs'
 $lines = [System.Collections.Generic.List[string]]@(Get-Content -Path $sourcePath -Encoding UTF8)
 
 $sectionStarts = @(13, 825, 1188)
@@ -47,9 +47,9 @@ function Write-PartialFile {
 }
 
 $files = @(
-    @{ Start = 13; File = 'OdfElement.AttributeValues.B1.cs'; Region = 'Attribute Values (B1)' }
-    @{ Start = 825; File = 'OdfElement.AttributeValues.B2.cs'; Region = 'Attribute Values (B2)' }
-    @{ Start = 1188; File = 'OdfElement.AttributeValues.B3.cs'; Region = 'Attribute Values (B3)' }
+    @{ Start = 13; File = 'OdfElement.AttributeValues.DrawFoAndTextList.cs'; Region = 'Attribute Values - Draw, FO & Text List' }
+    @{ Start = 825; File = 'OdfElement.AttributeValues.GeometryLocaleAndLine.cs'; Region = 'Attribute Values - Geometry, Locale & Line' }
+    @{ Start = 1188; File = 'OdfElement.AttributeValues.LineFontStyleAndMedia.cs'; Region = 'Attribute Values - Line, Font, Style & Media' }
 )
 for ($i = 0; $i -lt $files.Count; $i++) {
     $start = $files[$i].Start - 1

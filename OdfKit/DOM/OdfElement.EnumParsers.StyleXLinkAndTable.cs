@@ -6,7 +6,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Enum Parsers (A2)
+    #region Enum Parsers - Style, XLink & Table
 
     private static bool TryParseStyleLineBreak(string? value, out OdfStyleLineBreak lineBreak)
     {

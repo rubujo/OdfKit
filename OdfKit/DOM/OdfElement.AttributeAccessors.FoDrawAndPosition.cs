@@ -7,7 +7,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Attribute Accessors (B)
+    #region Attribute Accessors - FO, Draw & Position
 
     /// <summary>
     /// 取得具有 schema awareness 的 FO 文字轉換屬性。

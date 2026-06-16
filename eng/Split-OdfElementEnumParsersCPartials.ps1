@@ -1,13 +1,13 @@
 #Requires -Version 7.0
 $ErrorActionPreference = 'Stop'
 $domDir = Join-Path $PSScriptRoot '..\OdfKit\DOM'
-$sourcePath = Join-Path $domDir 'OdfElement.EnumParsers.C.cs'
+$sourcePath = Join-Path $domDir 'OdfElement.EnumParsers.CalendarDrawAndTableText.cs'
 $lines = [System.Collections.Generic.List[string]]@(Get-Content -Path $sourcePath -Encoding UTF8)
 $lineCount = $lines.Count
 
 $files = @(
-    @{ Start = 10; End = 243; File = 'OdfElement.EnumParsers.C1.cs'; Region = 'Enum Parsers (C1)' }
-    @{ Start = 245; End = ($lineCount - 3); File = 'OdfElement.EnumParsers.C2.cs'; Region = 'Enum Parsers (C2)' }
+    @{ Start = 10; End = 243; File = 'OdfElement.EnumParsers.CalendarFoAndDraw3d.cs'; Region = 'Enum Parsers - Calendar, FO & Draw 3D' }
+    @{ Start = 245; End = ($lineCount - 3); File = 'OdfElement.EnumParsers.TableBorderAndText.cs'; Region = 'Enum Parsers - Table Border & Text' }
 )
 
 function Get-UsingsForBlock {
@@ -52,5 +52,5 @@ foreach ($block in $files) {
 }
 
 Remove-Item -Path $sourcePath -Force
-Write-Host 'Removed OdfElement.EnumParsers.C.cs'
+Write-Host 'Removed OdfElement.EnumParsers.CalendarDrawAndTableText.cs'
 Write-Host 'Done.'

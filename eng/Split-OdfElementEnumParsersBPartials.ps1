@@ -1,13 +1,13 @@
 #Requires -Version 7.0
 $ErrorActionPreference = 'Stop'
 $domDir = Join-Path $PSScriptRoot '..\OdfKit\DOM'
-$sourcePath = Join-Path $domDir 'OdfElement.EnumParsers.B.cs'
+$sourcePath = Join-Path $domDir 'OdfElement.EnumParsers.PresentationEffectsAndTransitions.cs'
 $lines = [System.Collections.Generic.List[string]]@(Get-Content -Path $sourcePath -Encoding UTF8)
 $lineCount = $lines.Count
 
 $files = @(
-    @{ Start = 10; End = 224; File = 'OdfElement.EnumParsers.B1.cs'; Region = 'Enum Parsers (B1)' }
-    @{ Start = 226; End = ($lineCount - 3); File = 'OdfElement.EnumParsers.B2.cs'; Region = 'Enum Parsers (B2)' }
+    @{ Start = 10; End = 224; File = 'OdfElement.EnumParsers.PresentationEffectAndTransition.cs'; Region = 'Enum Parsers - Presentation Effect & Transition' }
+    @{ Start = 226; End = ($lineCount - 3); File = 'OdfElement.EnumParsers.PresentationTransitionStyles.cs'; Region = 'Enum Parsers - Presentation Transition Styles' }
 )
 
 function Get-UsingsForBlock {
@@ -52,5 +52,5 @@ foreach ($block in $files) {
 }
 
 Remove-Item -Path $sourcePath -Force
-Write-Host 'Removed OdfElement.EnumParsers.B.cs'
+Write-Host 'Removed OdfElement.EnumParsers.PresentationEffectsAndTransitions.cs'
 Write-Host 'Done.'

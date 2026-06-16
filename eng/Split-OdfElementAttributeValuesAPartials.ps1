@@ -1,13 +1,13 @@
 #Requires -Version 7.0
 $ErrorActionPreference = 'Stop'
 $domDir = Join-Path $PSScriptRoot '..\OdfKit\DOM'
-$sourcePath = Join-Path $domDir 'OdfElement.AttributeValues.A.cs'
+$sourcePath = Join-Path $domDir 'OdfElement.AttributeValues.StyleAndScriptTable.cs'
 $lines = [System.Collections.Generic.List[string]]@(Get-Content -Path $sourcePath -Encoding UTF8)
 $lineCount = $lines.Count
 
 $files = @(
-    @{ Start = 13; End = 271; File = 'OdfElement.AttributeValues.A1.cs'; Region = 'Attribute Values (A1)' }
-    @{ Start = 273; End = ($lineCount - 3); File = 'OdfElement.AttributeValues.A2.cs'; Region = 'Attribute Values (A2)' }
+    @{ Start = 13; End = 271; File = 'OdfElement.AttributeValues.StyleAndPresentation.cs'; Region = 'Attribute Values - Style & Presentation' }
+    @{ Start = 273; End = ($lineCount - 3); File = 'OdfElement.AttributeValues.ScriptTableAndAnimation.cs'; Region = 'Attribute Values - Script, Table & Animation' }
 )
 
 function Get-UsingsForBlock {
@@ -53,5 +53,5 @@ foreach ($block in $files) {
 }
 
 Remove-Item -Path $sourcePath -Force
-Write-Host 'Removed OdfElement.AttributeValues.A.cs'
+Write-Host 'Removed OdfElement.AttributeValues.StyleAndScriptTable.cs'
 Write-Host 'Done.'

@@ -6,8 +6,8 @@ $lines = [System.Collections.Generic.List[string]]@(Get-Content -Path $sourcePat
 $lineCount = $lines.Count
 
 $files = @(
-    @{ Start = 12; End = 322; File = 'OdfElement.AttributeAccessors.A.cs'; Region = 'Attribute Accessors (A)' }
-    @{ Start = 324; End = ($lineCount - 3); File = 'OdfElement.AttributeAccessors.B.cs'; Region = 'Attribute Accessors (B)' }
+    @{ Start = 12; End = 322; File = 'OdfElement.AttributeAccessors.XLinkPresentationAndTable.cs'; Region = 'Attribute Accessors - XLink, Presentation & Table' }
+    @{ Start = 324; End = ($lineCount - 3); File = 'OdfElement.AttributeAccessors.FoDrawAndPosition.cs'; Region = 'Attribute Accessors - FO, Draw & Position' }
 )
 
 function Get-UsingsForBlock {

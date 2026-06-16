@@ -6,7 +6,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Enum Parsers (C2)
+    #region Enum Parsers - Table Border & Text
 
     private static bool TryParseTableBorderModel(string? value, out OdfTableBorderModel borderModel)
     {

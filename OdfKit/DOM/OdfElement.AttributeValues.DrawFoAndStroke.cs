@@ -6,7 +6,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Attribute Values (B1a1)
+    #region Attribute Values - Draw, FO & Stroke
 
     /// <summary>
     /// 取得具有 schema awareness 的繪圖無連結屬性。

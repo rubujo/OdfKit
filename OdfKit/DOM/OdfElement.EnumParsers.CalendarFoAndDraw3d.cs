@@ -6,7 +6,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Enum Parsers (C1)
+    #region Enum Parsers - Calendar, FO & Draw 3D
 
     private static bool TryParseNumberCalendar(string? value, out OdfNumberCalendar calendar)
     {

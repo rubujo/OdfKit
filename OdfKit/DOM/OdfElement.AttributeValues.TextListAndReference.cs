@@ -6,7 +6,7 @@ namespace OdfKit.DOM;
 
 public partial class OdfElement
 {
-    #region Attribute Values (B1a2)
+    #region Attribute Values - Text List & Reference
 
     /// <summary>
     /// 取得具有 schema awareness 的文字清單標籤後接屬性。

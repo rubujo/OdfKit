@@ -50,8 +50,8 @@ Write-FileWithUsings -Path $sourcePath -BodyLines $core -SkipUsings
 Write-Host "Core OdfElement.cs: $($core.Count) lines"
 
 $files = @(
-    @{ Start = 1110; End = 1656; File = 'OdfElement.AttributeValues.A.cs'; Region = 'Attribute Values (A)' }
-    @{ Start = 1657; End = 3300; File = 'OdfElement.AttributeValues.B.cs'; Region = 'Attribute Values (B)' }
+    @{ Start = 1110; End = 1656; File = 'OdfElement.AttributeValues.StyleAndScriptTable.cs'; Region = 'Attribute Values - Style & Script Table' }
+    @{ Start = 1657; End = 3300; File = 'OdfElement.AttributeValues.DrawGeometryTextAndLine.cs'; Region = 'Attribute Values - Draw, Geometry, Text & Line' }
     @{ Start = 3301; File = 'OdfElement.EnumParsers.cs'; Region = 'Enum Parsers' }
 )
 for ($i = 0; $i -lt $files.Count; $i++) {
