@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using OdfKit.Chart;
 using OdfKit.Compliance;
 using OdfKit.Core;
@@ -47,6 +49,15 @@ public class SpreadsheetDocument : OdfDocument
     }
 
     /// <summary>
+    /// 建立新的 ODS 試算表文件 Fluent builder。
+    /// </summary>
+    /// <returns>新的 <see cref="SpreadsheetDocumentBuilder"/> 執行個體。</returns>
+    public static SpreadsheetDocumentBuilder Builder()
+    {
+        return new SpreadsheetDocumentBuilder(Create());
+    }
+
+    /// <summary>
     /// 從指定路徑載入 ODS 試算表文件。
     /// </summary>
     /// <param name="path">ODS 文件路徑。</param>
@@ -55,6 +66,17 @@ public class SpreadsheetDocument : OdfDocument
     public new static SpreadsheetDocument Load(string path)
     {
         return EnsureSpreadsheet(OdfDocumentFactory.LoadDocument(path));
+    }
+
+    /// <summary>
+    /// 非同步從指定路徑載入 ODS 試算表文件。
+    /// </summary>
+    /// <param name="path">ODS 文件路徑。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/>。</returns>
+    public new static Task<SpreadsheetDocument> LoadAsync(string path, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => Load(path), cancellationToken);
     }
 
     /// <summary>
@@ -67,6 +89,18 @@ public class SpreadsheetDocument : OdfDocument
     public new static SpreadsheetDocument Load(Stream stream, string? fileName = null)
     {
         return EnsureSpreadsheet(OdfDocumentFactory.LoadDocument(stream, fileName));
+    }
+
+    /// <summary>
+    /// 非同步從指定資料流載入 ODS 試算表文件。
+    /// </summary>
+    /// <param name="stream">包含 ODS 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/>。</returns>
+    public new static Task<SpreadsheetDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => Load(stream, fileName), cancellationToken);
     }
 
     /// <summary>
@@ -492,8 +526,8 @@ public class SpreadsheetDocument : OdfDocument
             sb.Append("</text:p></chart:title>");
         }
 
-        // 加入 plot-area 包含基本的 axis
         sb.Append("<chart:plot-area chart:data-source-has-labels=\"both\">");
+        AppendChartSeriesXml(sb, chart, chartClass);
         sb.Append("<chart:axis chart:dimension=\"x\" chart:name=\"primary-x\"/>");
         sb.Append("<chart:axis chart:dimension=\"y\" chart:name=\"primary-y\"/>");
         sb.Append("</chart:plot-area>");
@@ -506,6 +540,40 @@ public class SpreadsheetDocument : OdfDocument
         sb.Append("</chart:chart></office:chart></office:body></office:document-content>");
 
         Package.WriteEntry($"{objectDir}content.xml", System.Text.Encoding.UTF8.GetBytes(sb.ToString()), "text/xml");
+    }
+
+    private static void AppendChartSeriesXml(System.Text.StringBuilder sb, OdfChartDefinition chart, string chartClass)
+    {
+        OdfCellRange range = chart.DataRange;
+        int minRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
+        int maxRow = Math.Max(range.StartAddress.Row, range.EndAddress.Row);
+        int minColumn = Math.Min(range.StartAddress.Column, range.EndAddress.Column);
+        int maxColumn = Math.Max(range.StartAddress.Column, range.EndAddress.Column);
+        string? sheetName = range.StartAddress.SheetName ?? range.EndAddress.SheetName;
+        if (maxRow <= minRow || maxColumn <= minColumn)
+        {
+            return;
+        }
+
+        string labelAddress = new OdfCellAddress(minRow, minColumn + 1, sheetName).ToOdfString(false);
+        string categoryRange = ToFullOdfRange(sheetName, minRow + 1, minColumn, maxRow, minColumn);
+        string valueRange = ToFullOdfRange(sheetName, minRow + 1, minColumn + 1, maxRow, minColumn + 1);
+        sb.Append("<chart:series chart:class=\"");
+        sb.Append(System.Security.SecurityElement.Escape(chartClass));
+        sb.Append("\" chart:label-cell-address=\"");
+        sb.Append(System.Security.SecurityElement.Escape(labelAddress));
+        sb.Append("\" chart:values-cell-range-address=\"");
+        sb.Append(System.Security.SecurityElement.Escape(valueRange));
+        sb.Append("\"><chart:domain table:cell-range-address=\"");
+        sb.Append(System.Security.SecurityElement.Escape(categoryRange));
+        sb.Append("\"/></chart:series>");
+    }
+
+    private static string ToFullOdfRange(string? sheetName, int startRow, int startColumn, int endRow, int endColumn)
+    {
+        string start = new OdfCellAddress(startRow, startColumn, sheetName).ToOdfString(false);
+        string end = new OdfCellAddress(endRow, endColumn, sheetName).ToOdfString(false);
+        return start + ":" + end;
     }
 
     /// <summary>
@@ -722,6 +790,16 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
     }
 
     /// <summary>
+    /// 尋找指定名稱的工作表。
+    /// </summary>
+    /// <param name="name">工作表名稱。</param>
+    /// <returns>找到的工作表；找不到時為 null。</returns>
+    public OdfTableSheet? Find(string name)
+    {
+        return _document.GetSheet(name);
+    }
+
+    /// <summary>
     /// 取得工作表列舉器。
     /// </summary>
     /// <returns>工作表列舉器。</returns>
@@ -791,6 +869,11 @@ public class OdfTableSheet
     public OdfRangeCollection Ranges => _ranges ??= new OdfRangeCollection(this);
 
     /// <summary>
+    /// 取得此工作表中已使用的儲存格列舉。
+    /// </summary>
+    public IEnumerable<OdfCell> UsedCells => GetUsedCells();
+
+    /// <summary>
     /// 取得或設定工作表是否顯示。
     /// </summary>
     public bool Visible
@@ -811,6 +894,40 @@ public class OdfTableSheet
                 TableNode.RemoveAttribute("summary", OdfNamespaces.Table);
             else
                 TableNode.SetAttribute("summary", OdfNamespaces.Table, value!, "table");
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定工作表的書寫方向。
+    /// </summary>
+    public OdfWritingMode WritingMode
+    {
+        get
+        {
+            string? directValue = TableNode.GetAttribute("writing-mode", OdfNamespaces.Style);
+            if (!string.IsNullOrEmpty(directValue))
+            {
+                return OdfWritingModeExtensions.FromOdfToken(directValue);
+            }
+
+            return OdfWritingModeExtensions.FromOdfToken(_doc.StyleEngine.GetStyleProperty(
+                TableNode.GetAttribute("style-name", OdfNamespaces.Table) ?? string.Empty,
+                "writing-mode",
+                OdfNamespaces.Style,
+                "table"));
+        }
+        set
+        {
+            string token = value.ToOdfToken();
+            TableNode.SetAttribute("writing-mode", OdfNamespaces.Style, token, "style");
+            _doc.StyleEngine.SetLocalStyleProperty(
+            TableNode,
+            "table",
+            "table-properties",
+            "writing-mode",
+            OdfNamespaces.Style,
+            token,
+            "style");
         }
     }
 
@@ -921,6 +1038,42 @@ public class OdfTableSheet
             throw new FormatException($"Invalid cell address: '{address}'");
         }
         return GetCell(addr.Row, addr.Column);
+    }
+
+    /// <summary>
+    /// 取得指定範圍中的儲存格列舉。
+    /// </summary>
+    /// <param name="range">要列舉的儲存格範圍。</param>
+    /// <returns>範圍內的儲存格列舉。</returns>
+    public IEnumerable<OdfCell> GetRange(OdfCellRange range)
+    {
+        int startRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
+        int endRow = Math.Max(range.StartAddress.Row, range.EndAddress.Row);
+        int startCol = Math.Min(range.StartAddress.Column, range.EndAddress.Column);
+        int endCol = Math.Max(range.StartAddress.Column, range.EndAddress.Column);
+
+        for (int row = startRow; row <= endRow; row++)
+        {
+            for (int col = startCol; col <= endCol; col++)
+            {
+                yield return GetCell(row, col);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 取得此工作表中已使用的儲存格列舉。
+    /// </summary>
+    /// <returns>已使用儲存格列舉。</returns>
+    public IEnumerable<OdfCell> GetUsedCells()
+    {
+        foreach ((OdfNode node, int row, int column) in EnumerateExistingCells())
+        {
+            if (IsUsedCell(node))
+            {
+                yield return new OdfCell(node, row, column, _doc);
+            }
+        }
     }
 
     /// <summary>
@@ -1652,6 +1805,73 @@ public class OdfTableSheet
             currentColIndex++;
         }
         return lastCell!;
+    }
+
+    private IEnumerable<(OdfNode Node, int Row, int Column)> EnumerateExistingCells()
+    {
+        int rowIndex = 0;
+        foreach (var child in TableNode.Children)
+        {
+            if (RowContainerNames.Contains(child.LocalName) && child.NamespaceUri == OdfNamespaces.Table)
+            {
+                foreach (var row in child.Children)
+                {
+                    if (row.LocalName != "table-row" || row.NamespaceUri != OdfNamespaces.Table) continue;
+                    foreach (var item in EnumerateExistingCellsInRow(row, rowIndex))
+                    {
+                        yield return item;
+                    }
+                    rowIndex += GetRepeatCount(row, "number-rows-repeated");
+                }
+            }
+            else if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
+            {
+                foreach (var item in EnumerateExistingCellsInRow(child, rowIndex))
+                {
+                    yield return item;
+                }
+                rowIndex += GetRepeatCount(child, "number-rows-repeated");
+            }
+        }
+    }
+
+    private IEnumerable<(OdfNode Node, int Row, int Column)> EnumerateExistingCellsInRow(OdfNode rowNode, int row)
+    {
+        int columnIndex = 0;
+        foreach (var child in rowNode.Children)
+        {
+            if ((child.LocalName == "table-cell" || child.LocalName == "covered-table-cell") &&
+                child.NamespaceUri == OdfNamespaces.Table)
+            {
+                yield return (child, row, columnIndex);
+                columnIndex += GetRepeatCount(child, "number-columns-repeated");
+            }
+        }
+    }
+
+    private static int GetRepeatCount(OdfNode node, string attributeName)
+    {
+        string? repeatValue = node.GetAttribute(attributeName, OdfNamespaces.Table);
+        return int.TryParse(repeatValue, out int count) && count > 0 ? count : 1;
+    }
+
+    private static bool IsUsedCell(OdfNode cellNode)
+    {
+        if (!string.IsNullOrEmpty(cellNode.TextContent))
+        {
+            return true;
+        }
+
+        foreach (var attribute in cellNode.Attributes)
+        {
+            if (attribute.Key.NamespaceUri != OdfNamespaces.Table ||
+                attribute.Key.LocalName != "number-columns-repeated")
+            {
+                return true;
+            }
+        }
+
+        return cellNode.Children.Count > 0;
     }
 
     /// <summary>
@@ -2969,6 +3189,8 @@ public class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
     public int Column { get; } = col;
 
     private readonly SpreadsheetDocument _doc = doc;
+
+    internal SpreadsheetDocument Document => _doc;
 
     /// <summary>
     /// 取得或設定儲存格資料值的型態。
