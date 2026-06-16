@@ -1,4 +1,4 @@
-﻿#pragma warning restore CS1591
+#pragma warning restore CS1591
 
 using System;
 using System.Collections.Generic;
@@ -367,4 +367,20 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         }
         GC.SuppressFinalize(this);
     }
+
+    #region Zoom & View Settings (settings.xml)
+
+
+    /// <summary>
+    /// 取得或設定文件檢視縮放百分比。
+    /// </summary>
+    public double ZoomLevel
+    {
+        get => GetZoomLevelInternal();
+        set => SetZoomLevelInternal(value);
+    }
+
+
+    #endregion
+
 }
