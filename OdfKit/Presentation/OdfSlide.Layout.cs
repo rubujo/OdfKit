@@ -18,6 +18,20 @@ public partial class OdfSlide
     public void SetLayout(OdfPresentationLayout layout) =>
         Document.SetLayout(RequireSlideIndex(), layout);
 
+    /// <summary>
+    /// 設定此投影片使用的母片名稱。
+    /// </summary>
+    /// <param name="masterPageName">母片名稱。</param>
+    public void SetMasterPage(string masterPageName) =>
+        Document.SetMasterPage(RequireSlideIndex(), masterPageName);
+
+    /// <summary>
+    /// 將指定名稱的投影片版面配置套用至此投影片。
+    /// </summary>
+    /// <param name="layoutName">版面配置名稱。</param>
+    public void ApplyPresentationPageLayout(string layoutName) =>
+        Document.ApplyPresentationPageLayout(RequireSlideIndex(), layoutName);
+
     private int RequireSlideIndex()
     {
         System.Collections.Generic.IReadOnlyList<OdfSlide> slides = Document.GetSlidesSnapshot();

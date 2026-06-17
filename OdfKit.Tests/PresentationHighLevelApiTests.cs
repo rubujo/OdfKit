@@ -326,6 +326,52 @@ public class PresentationHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證母片進階編輯與依名稱套用版面配置 API。
+    /// </summary>
+    [Fact]
+    public void MasterAndLayoutAdvancedEditing_WorksCorrectly()
+    {
+        using var document = PresentationDocument.Create();
+        document.AddSlide();
+
+        document.AddMasterPage("BrandMaster", new OdfMasterPageDefinition { Name = "BrandMaster" });
+        OdfMasterPage master = document.GetMasterPage("BrandMaster");
+        master.BackgroundColor = "#112233";
+        master.PageLayoutName = "PM1";
+
+        OdfPresentationPageLayout customLayout = document.CreatePresentationPageLayout("CustomTitleBody");
+        customLayout.AddPlaceholder(
+            OdfPlaceholderType.Title,
+            OdfLength.Parse("2cm"), OdfLength.Parse("1.5cm"),
+            OdfLength.Parse("20cm"), OdfLength.Parse("3cm"));
+        customLayout.AddPlaceholder(
+            OdfPlaceholderType.Outline,
+            OdfLength.Parse("2cm"), OdfLength.Parse("5cm"),
+            OdfLength.Parse("20cm"), OdfLength.Parse("10cm"));
+
+        document.Slides[0].SetMasterPage("BrandMaster");
+        document.ApplyPresentationPageLayout(0, "CustomTitleBody");
+
+        OdfPresentationPageLayoutInfo layoutInfo = Assert.Single(
+            document.GetPresentationPageLayouts(),
+            info => info.Name == "CustomTitleBody");
+        Assert.Equal(2, layoutInfo.PlaceholderCount);
+        Assert.Equal(2, document.Slides[0].Placeholders.Count);
+        Assert.Equal("CustomTitleBody", document.Slides[0].PresentationPageLayoutName);
+
+        document.SetLayout(0, OdfPresentationLayout.TitleOnly);
+        OdfPresentationPageLayoutInfo standardLayout = Assert.Single(
+            document.GetPresentationPageLayouts(),
+            info => info.Name == "layout_TitleOnly");
+        Assert.Equal(1, standardLayout.PlaceholderCount);
+        Assert.Single(document.Slides[0].Placeholders);
+
+        OdfMasterPage reloadedMaster = document.GetMasterPage("BrandMaster");
+        Assert.Equal("#112233", reloadedMaster.BackgroundColor);
+        Assert.Equal("PM1", reloadedMaster.PageLayoutName);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="PresentationDocument.GetLayouts"/> 可讀回各投影片版面配置。
     /// </summary>
     [Fact]

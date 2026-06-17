@@ -51,7 +51,7 @@ public sealed class OdfMasterPageDefinition
 /// <summary>
 /// 表示投影片母片包裝的類別。
 /// </summary>
-public sealed class OdfMasterPage
+public sealed partial class OdfMasterPage
 {
     /// <summary>
     /// 取得底層的 ODF 節點。
@@ -208,9 +208,6 @@ public partial class PresentationDocument
             throw new ArgumentOutOfRangeException(nameof(slideIndex), "投影片索引超出範圍。");
         }
 
-        var slide = Slides[slideIndex];
-
-        // 1. 設定版面配置屬性值
         string layoutName = layout switch
         {
             OdfPresentationLayout.TitleOnly => "layout_TitleOnly",
@@ -218,41 +215,7 @@ public partial class PresentationDocument
             OdfPresentationLayout.TitleAndBody => "layout_TitleAndBody",
             _ => "layout_Blank"
         };
-        slide.PresentationPageLayoutName = layoutName;
-
-        // 2. 清除該投影片既有之預留位置（Placeholder）圖形節點
-        var toRemove = new List<OdfNode>();
-        foreach (var child in slide.Node.Children)
-        {
-            if (child.NodeType == OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Draw)
-            {
-                if (child.GetAttribute("placeholder", OdfNamespaces.Presentation) == "true")
-                {
-                    toRemove.Add(child);
-                }
-            }
-        }
-        foreach (var node in toRemove)
-        {
-            slide.Node.RemoveChild(node);
-        }
-
-        // 3. 依據版面重新建立預留位置
-        switch (layout)
-        {
-            case OdfPresentationLayout.TitleOnly:
-                slide.AddPlaceholder(OdfPlaceholderType.Title, OdfLength.Parse("2.0cm"), OdfLength.Parse("1.5cm"), OdfLength.Parse("24.0cm"), OdfLength.Parse("3.0cm"));
-                break;
-            case OdfPresentationLayout.TitleAndSubtitle:
-                slide.AddPlaceholder(OdfPlaceholderType.Title, OdfLength.Parse("2.0cm"), OdfLength.Parse("1.5cm"), OdfLength.Parse("24.0cm"), OdfLength.Parse("3.0cm"));
-                slide.AddPlaceholder(OdfPlaceholderType.Subtitle, OdfLength.Parse("2.0cm"), OdfLength.Parse("5.0cm"), OdfLength.Parse("24.0cm"), OdfLength.Parse("10.0cm"));
-                break;
-            case OdfPresentationLayout.TitleAndBody:
-                slide.AddPlaceholder(OdfPlaceholderType.Title, OdfLength.Parse("2.0cm"), OdfLength.Parse("1.5cm"), OdfLength.Parse("24.0cm"), OdfLength.Parse("3.0cm"));
-                slide.AddPlaceholder(OdfPlaceholderType.Outline, OdfLength.Parse("2.0cm"), OdfLength.Parse("5.0cm"), OdfLength.Parse("24.0cm"), OdfLength.Parse("12.0cm"));
-                break;
-            default: // Blank
-                break;
-        }
+        EnsureStandardPresentationPageLayout(layoutName, layout);
+        ApplyPresentationPageLayout(slideIndex, layoutName);
     }
 }
