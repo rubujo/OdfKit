@@ -473,6 +473,40 @@ public class OoxmlConversionTests
     }
 
     /// <summary>
+    /// 驗證 DOCX 轉換後的追蹤修訂可列舉並接受。
+    /// </summary>
+    [Fact]
+    public void DocxToOdt_TrackedChangesCanBeAcceptedAfterConversion()
+    {
+        var changedAt = new DocumentFormat.OpenXml.DateTimeValue(new DateTime(2026, 6, 16, 8, 0, 0, DateTimeKind.Utc));
+        using var docxStream = new MemoryStream();
+        using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
+        {
+            var mainPart = wordDocument.AddMainDocumentPart();
+            mainPart.Document = new WP.Document(new WP.Body(
+                new WP.Paragraph(
+                    new WP.InsertedRun(new WP.Run(new WP.Text("轉換插入"))) { Author = "Alice", Date = changedAt })));
+        }
+
+        docxStream.Position = 0;
+        using TextDocument odtDocument = DocxToOdtConverter.Convert(docxStream);
+
+        var changes = odtDocument.GetTrackedChanges().ToList();
+        Assert.Single(changes);
+        Assert.Equal(OdfChangeType.Insertion, changes[0].ChangeType);
+        Assert.Equal("Alice", changes[0].Author);
+        Assert.Equal("轉換插入", changes[0].Content);
+
+        odtDocument.AcceptAllChanges();
+
+        Assert.Empty(odtDocument.GetTrackedChanges());
+        string contentXml = SaveTextContentXml(odtDocument);
+        Assert.Contains("轉換插入", contentXml);
+        Assert.DoesNotContain("text:change-start", contentXml);
+        Assert.DoesNotContain("text:tracked-changes", contentXml);
+    }
+
+    /// <summary>
     /// 驗證 XLSX → ODS 反向轉換會保留公式。
     /// </summary>
     [Fact]

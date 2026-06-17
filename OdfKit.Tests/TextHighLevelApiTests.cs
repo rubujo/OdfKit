@@ -99,6 +99,120 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證表格儲存格內的刪除修訂可拒絕並還原內容。
+    /// </summary>
+    [Fact]
+    public void TrackedChangesTableCellDeletionCanBeRejected()
+    {
+        using var document = TextDocument.Create();
+        document.TrackedChanges = false;
+
+        OdfTable table = document.AddTable(1, 1);
+        OdfParagraph cellParagraph = table.GetCell(0, 0).AddParagraph("儲存格刪除測試");
+
+        document.TrackedChanges = true;
+        document.DeleteNode(cellParagraph.Node);
+
+        OdfTrackedChange deletion = document.GetTrackedChanges().Single(c => c.ChangeType == OdfChangeType.Deletion);
+        Assert.Equal("儲存格刪除測試", deletion.Content);
+
+        document.RejectChange(deletion.RegionId);
+
+        Assert.Empty(document.GetTrackedChanges());
+        string contentXml = SaveAndGetContentXml(document);
+        Assert.Contains("儲存格刪除測試", contentXml);
+        Assert.DoesNotContain("change-start", contentXml);
+        Assert.DoesNotContain("change-end", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證表格儲存格內的刪除修訂可接受並清除標記。
+    /// </summary>
+    [Fact]
+    public void TrackedChangesTableCellDeletionCanBeAccepted()
+    {
+        using var document = TextDocument.Create();
+        document.TrackedChanges = false;
+
+        OdfTable table = document.AddTable(1, 1);
+        OdfParagraph cellParagraph = table.GetCell(0, 0).AddParagraph("接受刪除");
+
+        document.TrackedChanges = true;
+        document.DeleteNode(cellParagraph.Node);
+
+        string changeId = document.GetTrackedChanges().Single(c => c.ChangeType == OdfChangeType.Deletion).RegionId;
+        document.AcceptChange(changeId);
+
+        Assert.Empty(document.GetTrackedChanges());
+        string contentXml = SaveAndGetContentXml(document);
+        Assert.DoesNotContain("接受刪除", contentXml);
+        Assert.DoesNotContain("change-start", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證可讀取 LibreOffice 慣用之內嵌修訂中繼資料屬性。
+    /// </summary>
+    [Fact]
+    public void TrackedChangesReadsLibreOfficeStyleInlineMetadata()
+    {
+        using var document = TextDocument.Create();
+        var targetDate = new DateTime(2026, 6, 16, 8, 30, 0, DateTimeKind.Utc);
+
+        var tcNode = new OdfNode(OdfNodeType.Element, "tracked-changes", OdfNamespaces.Text, "text");
+        if (document.BodyTextRoot.Children.Count > 0)
+        {
+            document.BodyTextRoot.InsertBefore(tcNode, document.BodyTextRoot.Children[0]);
+        }
+        else
+        {
+            document.BodyTextRoot.AppendChild(tcNode);
+        }
+
+        var changedRegion = new OdfNode(OdfNodeType.Element, "changed-region", OdfNamespaces.Text, "text");
+        changedRegion.SetAttribute("id", OdfNamespaces.Text, "lo_ct_1", "text");
+        var insertion = new OdfNode(OdfNodeType.Element, "insertion", OdfNamespaces.Text, "text");
+        insertion.SetAttribute("change-author", OdfNamespaces.Text, "LibreWriter", "text");
+        insertion.SetAttribute("change-date-and-time", OdfNamespaces.Text, "2026-06-16T08:30:00Z", "text");
+        changedRegion.AppendChild(insertion);
+        tcNode.AppendChild(changedRegion);
+
+        var paragraph = document.AddParagraph(string.Empty);
+        var startNode = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
+        startNode.SetAttribute("change-id", OdfNamespaces.Text, "lo_ct_1", "text");
+        var textNode = new OdfNode(OdfNodeType.Text, null!, null!, null!) { TextContent = "LO 修訂文字" };
+        var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
+        endNode.SetAttribute("change-id", OdfNamespaces.Text, "lo_ct_1", "text");
+        paragraph.Node.AppendChild(startNode);
+        paragraph.Node.AppendChild(textNode);
+        paragraph.Node.AppendChild(endNode);
+
+        OdfTrackedChange change = document.GetTrackedChanges().Single();
+        Assert.Equal("LibreWriter", change.Author);
+        Assert.Equal(targetDate, change.ChangedAt);
+        Assert.Equal("LO 修訂文字", change.Content);
+    }
+
+    /// <summary>
+    /// 驗證寫入的修訂中繼資料同時包含內嵌屬性與 office:change-info。
+    /// </summary>
+    [Fact]
+    public void TrackedChangesWriteDualMetadataForLibreOfficeInterop()
+    {
+        using var document = TextDocument.Create();
+        document.TrackedChanges = true;
+
+        OdfParagraph paragraph = document.AddParagraph(string.Empty);
+        paragraph.AddTextRun("雙重中繼資料");
+
+        string contentXml = SaveAndGetContentXml(document);
+        Assert.Contains("text:change-author=\"Author\"", contentXml);
+        Assert.Contains("text:change-date-and-time=", contentXml);
+        Assert.Contains("office:change-info", contentXml);
+        Assert.Contains("dc:creator", contentXml);
+        Assert.Contains("dc:date", contentXml);
+    }
+
+    /// <summary>
     /// 驗證追蹤修訂中的刪除類型內容提取。
     /// </summary>
     [Fact]

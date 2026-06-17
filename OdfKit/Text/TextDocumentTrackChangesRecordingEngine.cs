@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -61,19 +60,7 @@ internal static class TextDocumentTrackChangesRecordingEngine
         }
 
         changedRegion.AppendChild(typeNode);
-
-        var changeInfo = new OdfNode(OdfNodeType.Element, "change-info", OdfNamespaces.Office, "office");
-        typeNode.AppendChild(changeInfo);
-
-        var creatorNode = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc");
-        creatorNode.TextContent = creator;
-        changeInfo.AppendChild(creatorNode);
-
-        var dateNode = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc");
-        dateNode.TextContent = date == DateTime.MinValue ? "0001-01-01T00:00:00Z" :
-                               date == DateTime.MaxValue ? "9999-12-31T23:59:59.9999999Z" :
-                               date.ToString("yyyy-MM-ddTHH:mm:ssZ");
-        changeInfo.AppendChild(dateNode);
+        OdfTrackedChangeMetadataReader.Write(typeNode, creator, date);
 
         tcNode.AppendChild(changedRegion);
         return changeId;
@@ -97,8 +84,6 @@ internal static class TextDocumentTrackChangesRecordingEngine
                 continue;
 
             string changeType = "";
-            string creator = "";
-            DateTime date = DateTime.MinValue;
             OdfNode? specNode = null;
 
             foreach (OdfNode child in changedRegion.Children)
@@ -112,31 +97,7 @@ internal static class TextDocumentTrackChangesRecordingEngine
                 }
             }
 
-            if (specNode is not null)
-            {
-                OdfNode? changeInfo = TextDocumentDomHelper.FindChildElement(specNode, "change-info", OdfNamespaces.Office);
-                if (changeInfo is not null)
-                {
-                    OdfNode? creatorNode = TextDocumentDomHelper.FindChildElement(changeInfo, "creator", OdfNamespaces.Dc);
-                    if (creatorNode is not null)
-                        creator = creatorNode.TextContent ?? "";
-
-                    OdfNode? dateNode = TextDocumentDomHelper.FindChildElement(changeInfo, "date", OdfNamespaces.Dc);
-                    if (dateNode is not null)
-                    {
-                        string? textContent = dateNode.TextContent;
-                        if (!string.IsNullOrEmpty(textContent))
-                        {
-                            if (textContent == "0001-01-01T00:00:00Z" || textContent.StartsWith("0001-01-01"))
-                                date = DateTime.MinValue;
-                            else if (textContent == "9999-12-31T23:59:59.9999999Z" || textContent.StartsWith("9999-12-31"))
-                                date = DateTime.MaxValue;
-                            else if (DateTime.TryParse(textContent, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out DateTime parsedDate))
-                                date = parsedDate;
-                        }
-                    }
-                }
-            }
+            (string creator, DateTime date) = OdfTrackedChangeMetadataReader.Read(specNode);
 
             string content = "";
             if (changeType == "deletion" && specNode is not null)
