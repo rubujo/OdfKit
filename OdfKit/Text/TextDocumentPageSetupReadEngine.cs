@@ -34,7 +34,9 @@ internal static class TextDocumentPageSetupReadEngine
                 ReadHeaderFooterText(child, "header"),
                 ReadHeaderFooterText(child, "header-left"),
                 ReadHeaderFooterText(child, "footer"),
-                ReadHeaderFooterText(child, "footer-left")));
+                ReadHeaderFooterText(child, "footer-left"),
+                ReadHeaderFooterText(child, "header-first"),
+                ReadHeaderFooterText(child, "footer-first")));
         }
 
         return setups.AsReadOnly();

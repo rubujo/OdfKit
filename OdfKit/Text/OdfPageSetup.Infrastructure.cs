@@ -65,30 +65,69 @@ public partial class OdfPageSetup
         return masterPage;
     }
 
+    internal string? GetHeaderFooterRegionText(string localName) => GetHeaderFooterText(localName);
+
+    internal void SetHeaderFooterRegionText(string localName, string? value) => SetHeaderFooterText(localName, value);
+
+    internal OdfParagraph GetOrCreateHeaderFooterParagraph(string localName)
+    {
+        OdfNode region = FindOrCreateHeaderFooterRegion(localName);
+        OdfNode? paragraphNode = null;
+        foreach (OdfNode child in region.Children)
+        {
+            if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
+            {
+                paragraphNode = child;
+                break;
+            }
+        }
+
+        if (paragraphNode is null)
+        {
+            paragraphNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+            region.AppendChild(paragraphNode);
+        }
+
+        return new OdfParagraph(paragraphNode, _doc);
+    }
+
+    private OdfNode FindOrCreateHeaderFooterRegion(string localName)
+    {
+        var masterPage = FindOrCreateMasterPage();
+        foreach (OdfNode child in masterPage.Children)
+        {
+            if (child.LocalName == localName && child.NamespaceUri == OdfNamespaces.Style)
+                return child;
+        }
+
+        var region = new OdfNode(OdfNodeType.Element, localName, OdfNamespaces.Style, "style");
+        masterPage.AppendChild(region);
+        return region;
+    }
+
     private string? GetHeaderFooterText(string localName)
     {
-        var mp = FindOrCreateMasterPage();
-        foreach (var child in mp.Children)
+        var masterPage = FindOrCreateMasterPage();
+        foreach (OdfNode child in masterPage.Children)
         {
             if (child.LocalName == localName && child.NamespaceUri == OdfNamespaces.Style)
             {
-                foreach (var p in child.Children)
+                foreach (OdfNode paragraph in child.Children)
                 {
-                    if (p.LocalName == "p" && p.NamespaceUri == OdfNamespaces.Text)
-                    {
-                        return p.TextContent;
-                    }
+                    if (paragraph.LocalName == "p" && paragraph.NamespaceUri == OdfNamespaces.Text)
+                        return paragraph.TextContent;
                 }
             }
         }
+
         return null;
     }
 
     private void SetHeaderFooterText(string localName, string? value)
     {
-        var mp = FindOrCreateMasterPage();
+        var masterPage = FindOrCreateMasterPage();
         OdfNode? target = null;
-        foreach (var child in mp.Children)
+        foreach (OdfNode child in masterPage.Children)
         {
             if (child.LocalName == localName && child.NamespaceUri == OdfNamespaces.Style)
             {
@@ -100,32 +139,103 @@ public partial class OdfPageSetup
         if (value is null)
         {
             if (target is not null)
-                mp.RemoveChild(target);
+                masterPage.RemoveChild(target);
+            return;
         }
-        else
-        {
-            if (target is null)
-            {
-                target = new OdfNode(OdfNodeType.Element, localName, OdfNamespaces.Style, "style");
-                mp.AppendChild(target);
-            }
 
-            OdfNode? pNode = null;
-            foreach (var child in target.Children)
+        target ??= FindOrCreateHeaderFooterRegion(localName);
+
+        OdfNode? paragraphNode = null;
+        foreach (OdfNode child in target.Children)
+        {
+            if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
             {
-                if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
+                paragraphNode = child;
+                break;
+            }
+        }
+
+        if (paragraphNode is null)
+        {
+            paragraphNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+            target.AppendChild(paragraphNode);
+        }
+
+        paragraphNode.TextContent = value;
+    }
+
+    private OdfNode FindOrCreateHeaderFooterStyleNode(string styleLocalName)
+    {
+        var layoutNode = FindOrCreatePageLayoutNode();
+        foreach (OdfNode child in layoutNode.Children)
+        {
+            if (child.LocalName == styleLocalName && child.NamespaceUri == OdfNamespaces.Style)
+                return child;
+        }
+
+        var styleNode = new OdfNode(OdfNodeType.Element, styleLocalName, OdfNamespaces.Style, "style");
+        layoutNode.AppendChild(styleNode);
+        return styleNode;
+    }
+
+    private OdfNode FindOrCreateHeaderFooterProperties(string styleLocalName)
+    {
+        var styleNode = FindOrCreateHeaderFooterStyleNode(styleLocalName);
+        foreach (OdfNode child in styleNode.Children)
+        {
+            if (child.LocalName == "header-footer-properties" && child.NamespaceUri == OdfNamespaces.Style)
+                return child;
+        }
+
+        var properties = new OdfNode(OdfNodeType.Element, "header-footer-properties", OdfNamespaces.Style, "style");
+        styleNode.AppendChild(properties);
+        return properties;
+    }
+
+    private string? GetHeaderFooterLayoutProp(string styleLocalName, string attributeName)
+    {
+        var layoutNode = FindOrCreatePageLayoutNode();
+        foreach (OdfNode child in layoutNode.Children)
+        {
+            if (child.LocalName != styleLocalName || child.NamespaceUri != OdfNamespaces.Style)
+                continue;
+
+            foreach (OdfNode properties in child.Children)
+            {
+                if (properties.LocalName == "header-footer-properties" && properties.NamespaceUri == OdfNamespaces.Style)
                 {
-                    pNode = child;
-                    break;
+                    return properties.GetAttribute(attributeName, OdfNamespaces.Fo)
+                        ?? properties.GetAttribute(attributeName, OdfNamespaces.Style);
                 }
             }
-            if (pNode is null)
-            {
-                pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
-                target.AppendChild(pNode);
-            }
-            pNode.TextContent = value;
         }
+
+        return null;
+    }
+
+    private bool? GetHeaderFooterDynamicSpacing(string styleLocalName)
+    {
+        string? value = GetHeaderFooterLayoutProp(styleLocalName, "dynamic-spacing");
+        return value switch
+        {
+            "true" => true,
+            "false" => false,
+            _ => null,
+        };
+    }
+
+    private void SetHeaderFooterLayoutProp(string styleLocalName, string attributeName, string? value)
+    {
+        var properties = FindOrCreateHeaderFooterProperties(styleLocalName);
+        string ns = attributeName == "dynamic-spacing" ? OdfNamespaces.Style : OdfNamespaces.Fo;
+        string prefix = attributeName == "dynamic-spacing" ? "style" : "fo";
+        if (value is null)
+        {
+            properties.RemoveAttribute(attributeName, ns);
+            return;
+        }
+
+        properties.SetAttribute(attributeName, ns, value, prefix);
     }
 
     private OdfNode FindOrCreateChild(OdfNode parent, string localName, string ns, string prefix)

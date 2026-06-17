@@ -463,6 +463,63 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="TextDocument.GetPageSetup"/> 可依名稱取得主頁面樣式設定。
+    /// </summary>
+    [Fact]
+    public void GetPageSetup_ReturnsNamedMasterPage()
+    {
+        using var document = TextDocument.Create();
+        document.AddPageStyle("Landscape");
+
+        OdfPageSetup landscape = document.GetPageSetup("Landscape");
+        Assert.Equal("Landscape", landscape.MasterPageName);
+        landscape.HeaderText = "橫向頁首";
+
+        OdfPageSetupInfo info = Assert.Single(document.GetPageSetups(), s => s.Name == "Landscape");
+        Assert.Equal("橫向頁首", info.HeaderText);
+    }
+
+    /// <summary>
+    /// 驗證頁首頁尾欄位混排與首頁專用區域寫入。
+    /// </summary>
+    [Fact]
+    public void HeaderFooterAdvancedEditing_WritesFieldsAndFirstPageRegions()
+    {
+        using var document = TextDocument.Create();
+        OdfPageSetup setup = document.GetDefaultPageSetup();
+
+        OdfParagraph footerParagraph = setup.Footer.GetOrCreateParagraph();
+        footerParagraph.TextContent = "第 ";
+        setup.Footer.AddPageNumberField();
+        footerParagraph.AddTextRun(" 頁，共 ");
+        setup.Footer.AddPageCountField();
+        footerParagraph.AddTextRun(" 頁");
+
+        setup.HeaderFirst.Text = "首頁專用頁首";
+        setup.FooterFirst.Text = "首頁專用頁尾";
+        setup.HeaderMinHeight = "1.2cm";
+        setup.FooterMinHeight = "0.8cm";
+        setup.HeaderDynamicSpacing = true;
+
+        string stylesXml = SaveAndGetStylesXml(document);
+        Assert.Contains("style:header-first", stylesXml);
+        Assert.Contains("style:footer-first", stylesXml);
+        Assert.Contains("首頁專用頁首", stylesXml);
+        Assert.Contains("首頁專用頁尾", stylesXml);
+        Assert.Contains("text:page-number", stylesXml);
+        Assert.Contains("text:page-count", stylesXml);
+        Assert.Contains("style:header-style", stylesXml);
+        Assert.Contains("style:footer-style", stylesXml);
+        Assert.Contains("fo:min-height=\"1.2cm\"", stylesXml);
+        Assert.Contains("fo:min-height=\"0.8cm\"", stylesXml);
+        Assert.Contains("style:dynamic-spacing=\"true\"", stylesXml);
+
+        OdfPageSetupInfo pageSetup = Assert.Single(document.GetPageSetups());
+        Assert.Equal("首頁專用頁首", pageSetup.HeaderFirstText);
+        Assert.Equal("首頁專用頁尾", pageSetup.FooterFirstText);
+    }
+
+    /// <summary>
     /// 驗證主文件子文件參照 (text:section-source) 的插入。
     /// </summary>
     [Fact]

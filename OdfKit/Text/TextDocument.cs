@@ -268,6 +268,42 @@ public partial class TextDocument : OdfDocument
     }
 
     /// <summary>
+    /// 依主頁面樣式名稱取得可編輯的頁面設定。
+    /// </summary>
+    /// <param name="masterPageName">主頁面樣式名稱（例如 <c>Standard</c> 或 <c>Landscape</c>）。</param>
+    /// <returns>對應的頁面設定物件。</returns>
+    /// <exception cref="ArgumentException">找不到指定名稱的主頁面樣式時擲出。</exception>
+    public OdfPageSetup GetPageSetup(string masterPageName)
+    {
+        if (string.IsNullOrWhiteSpace(masterPageName))
+            throw new ArgumentException("主頁面樣式名稱不可為空白。", nameof(masterPageName));
+
+        string? layoutName = ResolveMasterPageLayoutName(masterPageName);
+        if (layoutName is null)
+            throw new ArgumentException($"找不到主頁面樣式「{masterPageName}」。", nameof(masterPageName));
+
+        return new OdfPageSetup(this, masterPageName, layoutName);
+    }
+
+    private string? ResolveMasterPageLayoutName(string masterPageName)
+    {
+        OdfNode masterStyles = FindOrCreateChild(StylesDom, "master-styles", OdfNamespaces.Office, "office");
+        foreach (OdfNode child in masterStyles.Children)
+        {
+            if (child.LocalName != "master-page" || child.NamespaceUri != OdfNamespaces.Style)
+                continue;
+
+            string? name = child.GetAttribute("name", OdfNamespaces.Style);
+            if (!string.Equals(name, masterPageName, StringComparison.Ordinal))
+                continue;
+
+            return child.GetAttribute("page-layout-name", OdfNamespaces.Style);
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// 新增一個具名頁面樣式（master-page + page-layout），並可選擇性地配置其設定。
     /// </summary>
     /// <param name="name">主頁面樣式名稱（例如 "Landscape"）</param>
