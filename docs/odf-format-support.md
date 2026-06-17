@@ -40,10 +40,10 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 | `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | complete | complete | complete | complete | validated | complete | complete | `DrawingApiUsabilityTests`, `DrawingHighLevelApiTests`, `FourFormatApiScenarioTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.otg` | `application/vnd.oasis.opendocument.graphics-template` | `GraphicsTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.fodg` | `application/vnd.oasis.opendocument.graphics` | `FlatGraphics` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests` |
-| `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | complete | complete | complete | complete | validated | complete | usable | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
-| `.odf` | `application/vnd.oasis.opendocument.formula` | `Formula` | complete | complete | complete | complete | validated | complete | usable | `DocumentKindApiUsabilityTests`, `PackageRoundTripTests`, `InteropCorpusTests` |
-| `.odi` | `application/vnd.oasis.opendocument.image` | `Image` | complete | complete | complete | complete | validated | complete | usable | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
-| `.odb` | `application/vnd.oasis.opendocument.database` | `Database` | complete | complete | complete | complete | validated | complete | usable | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | complete | complete | complete | complete | validated | complete | usable | `ChartHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.odf` | `application/vnd.oasis.opendocument.formula` | `Formula` | complete | complete | complete | complete | validated | complete | usable | `FormulaHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `PackageRoundTripTests`, `InteropCorpusTests` |
+| `.odi` | `application/vnd.oasis.opendocument.image` | `Image` | complete | complete | complete | complete | validated | complete | usable | `ImageHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.odb` | `application/vnd.oasis.opendocument.database` | `Database` | complete | complete | complete | complete | validated | complete | usable | `DatabaseHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.fodc` | `application/vnd.oasis.opendocument.chart` | `FlatChart` | complete | complete | complete | complete | validated | complete | usable-variant | `OdfFormatRoundTripTests`, `CorpusComplianceTests` |
 | `.fdf` | `application/vnd.oasis.opendocument.formula` | `FlatFormula` | complete | complete | complete | complete | validated | complete | usable-variant | `OdfFormatRoundTripTests`, corpus manifest |
 | `.fodi` | `application/vnd.oasis.opendocument.image` | `FlatImage` | complete | complete | complete | complete | validated | complete | usable-variant | `OdfFormatRoundTripTests`, `CorpusComplianceTests` |
@@ -61,8 +61,9 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - ODC／嵌入圖表已補強 `OdfChartDocument.GetChartDefinition`；ODB 已補強 `AddForm`／`GetForms` 表單元件 API（`DatabaseHighLevelApiTests`）。
 - ODF 已補強 `GetMathTokens` 讀取 API；ODI 已補強 `GetImageFrames`／`AddImageFrame`（`FormulaHighLevelApiTests`、`ImageHighLevelApiTests`）。
 - LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；CALCEXT-1 基礎 ✅：工作表層與 `SpreadsheetDocument.GetConditionalFormats`／`GetSparklineGroups` 文件層聚合讀取。
-- `.odc`、`.odf`、`.odi`、`.odb` 標為 `usable`：已有摘要與常用編輯 API；
-  完整語意模型仍屬 Wave 2 DEPTH-2。
+- `.odc`、`.odf`、`.odi`、`.odb` 標為 `usable`：已有摘要與常用編輯 API，
+  `SecondaryFormatApiScenarioTests` 已背書連線／圖表軸／公式 token／多框架影像等場景；
+  完整語意模型（例如 ODC chart style 物件模型）仍屬 Wave 2 DEPTH-2 延伸。
 - RDF-1 基礎 ✅：`manifest.rdf` 文件層往返、`pkg:` ontology 同步；corpus 含 `repo-generated-manifest-rdf-text`（`RdfMetadataTests`）。
 - LOEXT-1 基礎 ✅：`loext:decorative` 載入映射至 `draw:decorative`（`OdfLoExtInteropEngine`、`LoExtInteropTests`）。
 - repo 內 corpus 已擴充至 200+ fixtures（`tools/OdfCorpusGenerator` + 手工負向／版本特例）；
