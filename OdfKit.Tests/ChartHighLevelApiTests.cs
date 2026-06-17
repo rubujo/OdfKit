@@ -231,6 +231,49 @@ public class ChartHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfChartDocument.GetChartDefinition"/> 可讀回已設定的圖表屬性。
+    /// </summary>
+    [Fact]
+    public void GetChartDefinition_RoundTripsAfterSetDataRange()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.ChartClass = "chart:bar";
+        chartDoc.ChartTitle = "季度銷售";
+        chartDoc.SetLegend("end");
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 5, 2));
+
+        OdfChartDefinition definition = chartDoc.GetChartDefinition();
+        Assert.Equal(OdfChartType.Bar, definition.ChartType);
+        Assert.Equal("季度銷售", definition.Title);
+        Assert.True(definition.HasLegend);
+        Assert.Equal("Sales", definition.DataRange.StartAddress.SheetName);
+        Assert.Equal(5, definition.DataRange.EndAddress.Row);
+        Assert.Equal(2, definition.DataRange.EndAddress.Column);
+    }
+
+    /// <summary>
+    /// 驗證嵌入 ODS 圖表可透過 <see cref="OdfChartDocument.GetChartDefinition"/> 讀回摘要。
+    /// </summary>
+    [Fact]
+    public void GetChartDefinition_RoundTripsForEmbeddedChart()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = doc.AddSheet("Data");
+        sheet.GetCell(0, 0).SetValue("標題");
+        sheet.GetCell(0, 1).SetValue("數值");
+        sheet.GetCell(1, 0).SetValue("A");
+        sheet.GetCell(1, 1).SetValue(10d);
+
+        OdfChartDocument chartDoc = sheet.InsertChart(new OdfCellRange(0, 0, 1, 1), OdfChartType.Line);
+        chartDoc.ChartTitle = "嵌入折線圖";
+
+        OdfChartDefinition definition = chartDoc.GetChartDefinition();
+        Assert.Equal(OdfChartType.Line, definition.ChartType);
+        Assert.Equal("嵌入折線圖", definition.Title);
+        Assert.Equal("Data", definition.DataRange.StartAddress.SheetName);
+    }
+
+    /// <summary>
     /// 驗證 SetDataRange 與 GetDataRange 對帶空格工作表名稱的往返一致性。
     /// </summary>
     [Fact]

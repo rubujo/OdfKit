@@ -127,44 +127,6 @@ public class ChartDocument : OdfChartDocument
     }
 
     /// <summary>
-    /// 取得目前圖表的設定定義資訊。
-    /// </summary>
-    /// <returns>包含圖表屬性的 <see cref="OdfChartDefinition"/> 執行個體。</returns>
-    public OdfChartDefinition GetChartDefinition()
-    {
-        string chartClass = ChartClass;
-        OdfChartType chartType = chartClass switch
-        {
-            "chart:line" or "line" => OdfChartType.Line,
-            "chart:pie" or "pie" => OdfChartType.Pie,
-            "chart:area" or "area" => OdfChartType.Area,
-            "chart:scatter" or "scatter" => OdfChartType.Scatter,
-            "chart:bubble" or "bubble" => OdfChartType.Bubble,
-            _ => OdfChartType.Bar
-        };
-
-        OdfCellRange dataRange = default;
-        string? rangeAddress = ChartNode.GetAttribute("cell-range-address", OdfNamespaces.Table);
-        if (!string.IsNullOrEmpty(rangeAddress))
-        {
-            string cleanAddress = rangeAddress!;
-            if (cleanAddress.StartsWith("[") && cleanAddress.EndsWith("]"))
-            {
-                cleanAddress = cleanAddress.Substring(1, cleanAddress.Length - 2);
-            }
-            dataRange = OdfCellRange.ParseOdf(cleanAddress);
-        }
-
-        return new OdfChartDefinition
-        {
-            ChartType = chartType,
-            Title = ChartTitle ?? string.Empty,
-            HasLegend = LegendPosition is not null,
-            DataRange = dataRange
-        };
-    }
-
-    /// <summary>
     /// 更新圖表內嵌的本地資料表格（本地快取資料）。
     /// </summary>
     /// <param name="data">二維資料集合，包含標籤與數值。</param>

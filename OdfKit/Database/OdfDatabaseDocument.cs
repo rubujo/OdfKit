@@ -112,6 +112,11 @@ public partial class OdfDatabaseDocument : OdfDocument
     public IReadOnlyList<OdfDatabaseDataSourceSettingInfo> DataSourceSettings => GetDataSourceSettings();
 
     /// <summary>
+    /// 取得目前宣告的表單元件清單。
+    /// </summary>
+    public IReadOnlyList<OdfDatabaseFormInfo> Forms => GetForms();
+
+    /// <summary>
     /// 設定資料來源連線參照。
     /// </summary>
     /// <param name="href">連線資源路徑或 URL。</param>
@@ -276,6 +281,46 @@ public partial class OdfDatabaseDocument : OdfDocument
     }
 
     /// <summary>
+    /// 取得目前宣告的表單元件清單。
+    /// </summary>
+    /// <returns>表單元件清單。</returns>
+    public IReadOnlyList<OdfDatabaseFormInfo> GetForms()
+    {
+        OdfNode? formsNode = FindChildElement(GetDatabaseNode(), "forms", DatabaseNamespace);
+        if (formsNode is null)
+        {
+            return [];
+        }
+
+        List<OdfDatabaseFormInfo> forms = [];
+        CollectFormComponents(formsNode, forms);
+        return forms.AsReadOnly();
+    }
+
+    /// <summary>
+    /// 依名稱尋找表單元件。
+    /// </summary>
+    /// <param name="name">表單名稱。</param>
+    /// <returns>符合名稱的表單元件；找不到時為 <see langword="null"/>。</returns>
+    public OdfDatabaseFormInfo? FindForm(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("表單名稱不能為空。", nameof(name));
+        }
+
+        foreach (OdfDatabaseFormInfo form in GetForms())
+        {
+            if (string.Equals(form.Name, name, StringComparison.Ordinal))
+            {
+                return form;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// 依名稱尋找資料來源設定。
     /// </summary>
     /// <param name="name">設定名稱。</param>
@@ -296,5 +341,30 @@ public partial class OdfDatabaseDocument : OdfDocument
         }
 
         return null;
+    }
+
+    private static void CollectFormComponents(OdfNode parent, List<OdfDatabaseFormInfo> forms)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != DatabaseNamespace)
+            {
+                continue;
+            }
+
+            if (child.LocalName == "component")
+            {
+                forms.Add(new OdfDatabaseFormInfo(
+                    child.GetAttribute("name", DatabaseNamespace) ?? string.Empty,
+                    child.GetAttribute("href", OdfNamespaces.XLink),
+                    child.GetAttribute("title", DatabaseNamespace),
+                    child.GetAttribute("description", DatabaseNamespace),
+                    ParseNullableBoolean(child.GetAttribute("as-template", DatabaseNamespace))));
+            }
+            else if (child.LocalName == "component-collection")
+            {
+                CollectFormComponents(child, forms);
+            }
+        }
     }
 }

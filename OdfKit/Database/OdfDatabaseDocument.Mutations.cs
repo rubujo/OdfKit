@@ -157,6 +157,58 @@ public partial class OdfDatabaseDocument
         return setting;
     }
 
+    /// <summary>
+    /// 新增表單元件描述。
+    /// </summary>
+    /// <param name="name">表單名稱。</param>
+    /// <param name="href">選用的表單資源參照路徑。</param>
+    /// <param name="title">選用的顯示標題。</param>
+    /// <param name="description">選用的描述文字。</param>
+    /// <param name="asTemplate">選用的範本標記。</param>
+    /// <returns>新增的表單元件節點。</returns>
+    public OdfNode AddForm(
+        string name,
+        string? href = null,
+        string? title = null,
+        string? description = null,
+        bool? asTemplate = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("表單名稱不能為空。", nameof(name));
+        }
+
+        OdfNode forms = FindOrCreateChild(GetDatabaseNode(), "forms", DatabaseNamespace, "db");
+        OdfNode component = OdfNodeFactory.CreateElement("component", DatabaseNamespace, "db");
+        component.SetAttribute("name", DatabaseNamespace, name, "db");
+
+        if (!string.IsNullOrWhiteSpace(href))
+        {
+            component.SetAttribute("href", OdfNamespaces.XLink, href!, "xlink");
+            component.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+            component.SetAttribute("show", OdfNamespaces.XLink, "none", "xlink");
+            component.SetAttribute("actuate", OdfNamespaces.XLink, "onRequest", "xlink");
+        }
+
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            component.SetAttribute("title", DatabaseNamespace, title!, "db");
+        }
+
+        if (!string.IsNullOrWhiteSpace(description))
+        {
+            component.SetAttribute("description", DatabaseNamespace, description!, "db");
+        }
+
+        if (asTemplate is not null)
+        {
+            component.SetAttribute("as-template", DatabaseNamespace, asTemplate.Value ? "true" : "false", "db");
+        }
+
+        forms.AppendChild(component);
+        return component;
+    }
+
     #endregion
 
     #region Remove Operations
@@ -228,6 +280,27 @@ public partial class OdfDatabaseDocument
     }
 
     /// <summary>
+    /// 移除指定名稱的表單元件。
+    /// </summary>
+    /// <param name="name">表單名稱。</param>
+    /// <returns>如果成功移除表單元件，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveForm(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("表單名稱不能為空。", nameof(name));
+        }
+
+        OdfNode? formsNode = FindChildElement(GetDatabaseNode(), "forms", DatabaseNamespace);
+        if (formsNode is null)
+        {
+            return false;
+        }
+
+        return RemoveNamedComponent(formsNode, name);
+    }
+
+    /// <summary>
     /// 移除指定名稱的資料來源設定。
     /// </summary>
     /// <param name="name">設定名稱。</param>
@@ -253,6 +326,31 @@ public partial class OdfDatabaseDocument
                 string.Equals(child.GetAttribute("data-source-setting-name", DatabaseNamespace), name, StringComparison.Ordinal))
             {
                 settings.RemoveChild(child);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool RemoveNamedComponent(OdfNode parent, string name)
+    {
+        foreach (OdfNode child in new List<OdfNode>(parent.Children))
+        {
+            if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != DatabaseNamespace)
+            {
+                continue;
+            }
+
+            if (child.LocalName == "component" &&
+                string.Equals(child.GetAttribute("name", DatabaseNamespace), name, StringComparison.Ordinal))
+            {
+                parent.RemoveChild(child);
+                return true;
+            }
+
+            if (child.LocalName == "component-collection" && RemoveNamedComponent(child, name))
+            {
                 return true;
             }
         }
