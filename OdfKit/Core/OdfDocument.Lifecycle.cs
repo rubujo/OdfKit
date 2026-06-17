@@ -57,9 +57,16 @@ public abstract partial class OdfDocument
     /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步儲存作業的工作。</returns>
-    public Task SaveAsync(string path, OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task SaveAsync(string path, OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
     {
-        return Task.Run(() => Save(path, options), cancellationToken);
+        if (path is null)
+            throw new ArgumentNullException(nameof(path));
+
+        options ??= OdfSaveOptions.Default;
+        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
+
+        using FileStream stream = new(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
+        await Package.SaveToStreamAsync(stream, options, cancellationToken).ConfigureAwait(false);
     }
 
     #endregion
@@ -104,9 +111,27 @@ public abstract partial class OdfDocument
     /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步儲存作業的工作。</returns>
-    public Task SaveAsync(Stream destinationStream, OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
+    public Task SaveAsync(Stream destinationStream, OdfSaveOptions? options = null, CancellationToken cancellationToken = default) =>
+        SaveToStreamAsync(destinationStream, options, cancellationToken);
+
+    /// <summary>
+    /// 非同步將文件儲存至指定的資料流。
+    /// </summary>
+    /// <param name="destinationStream">要寫入文件封裝內容的目標資料流。</param>
+    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步儲存作業的工作。</returns>
+    public async Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
     {
-        return Task.Run(() => SaveToStream(destinationStream, options), cancellationToken);
+        if (destinationStream is null)
+            throw new ArgumentNullException(nameof(destinationStream));
+
+        options ??= OdfSaveOptions.Default;
+        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
+        await Package.SaveToStreamAsync(destinationStream, options, cancellationToken).ConfigureAwait(false);
+
+        if (destinationStream.CanSeek)
+            destinationStream.Position = 0;
     }
 
     #endregion
