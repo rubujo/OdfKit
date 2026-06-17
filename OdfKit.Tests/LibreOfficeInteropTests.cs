@@ -2,7 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using OdfKit.Chart;
+using OdfKit.Core;
 using OdfKit.Presentation;
 using OdfKit.Spreadsheet;
 using OdfKit.Styles;
@@ -16,6 +18,62 @@ namespace OdfKit.Tests;
 /// </summary>
 public class LibreOfficeInteropTests
 {
+    /// <summary>
+    /// 驗證含追蹤修訂的 ODT 可由 LibreOffice 26.x headless 模式載入、轉換並由 OdfKit 重新讀取。
+    /// </summary>
+    [Fact]
+    public void LibreOffice26Headless_LoadsTrackedChangesOdt()
+    {
+        string? sofficePath = FindLibreOffice26Soffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過追蹤修訂實機互通性測試。");
+        }
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeTrackedChanges_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            string odtPath = Path.Combine(tempRoot, "interop-tracked-changes.odt");
+            CreateTrackedChangesDocument(odtPath);
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt", odtPath);
+            string txtPath = Path.Combine(outputDir, "interop-tracked-changes.txt");
+            Assert.True(File.Exists(txtPath), "LibreOffice 應輸出追蹤修訂 ODT 的文字轉換結果。");
+            string txt = File.ReadAllText(txtPath);
+            Assert.Contains("OdfKit-TrackedChanges-Marker", txt);
+            Assert.Contains("表格追蹤修訂", txt);
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "odt", odtPath);
+            string roundTripPath = Path.Combine(outputDir, "interop-tracked-changes.odt");
+            Assert.True(File.Exists(roundTripPath), "LibreOffice 應輸出追蹤修訂 ODT 往返結果。");
+
+            using TextDocument document = TextDocument.Load(roundTripPath);
+            string contentXml = ReadContentXml(document);
+            Assert.Contains("OdfKit-TrackedChanges-Marker", contentXml);
+            Assert.Contains("表格追蹤修訂", contentXml);
+
+            var changes = document.GetTrackedChanges().ToList();
+            if (changes.Count > 0)
+            {
+                Assert.Contains(changes, change => change.ChangeType == OdfChangeType.Insertion);
+                document.AcceptAllChanges();
+                Assert.Empty(document.GetTrackedChanges());
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
     /// <summary>
     /// 驗證 ODT、ODS 與 ODP 可由 LibreOffice 26.x headless 模式載入並轉換。
     /// </summary>
@@ -76,6 +134,29 @@ public class LibreOfficeInteropTests
         document.AddParagraph("LibreOffice 26 互通性文字");
         document.AddParagraph("OdfKit-LibreOffice-26-Interop-Marker");
         document.Save(path);
+    }
+
+    private static void CreateTrackedChangesDocument(string path)
+    {
+        using var document = TextDocument.Create();
+        document.TrackedChanges = true;
+        document.AddParagraph("OdfKit-TrackedChanges-Marker");
+
+        OdfTable table = document.AddTable(1, 1);
+        table.GetCell(0, 0).AddParagraph(string.Empty).AddTextRun("表格追蹤修訂");
+        document.Save(path);
+    }
+
+    private static string ReadContentXml(TextDocument document)
+    {
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream, Encoding.UTF8);
+        return reader.ReadToEnd();
     }
 
     private static void CreateSpreadsheetWithChart(string path)
