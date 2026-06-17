@@ -166,4 +166,134 @@ public class ConditionalFormatTests
         Assert.Contains("calcext:icon-set", xml);
         Assert.Contains("calcext:icon-set-type=\"3TrafficLights1\"", xml);
     }
+
+    /// <summary>
+    /// 驗證兩色色階寫入後可透過 <see cref="OdfTableSheet.ConditionalFormats"/> 讀回。
+    /// </summary>
+    [Fact]
+    public void GetConditionalFormats_ColorScaleTwoColor_RoundTrips()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Sheet1");
+        var range = new OdfCellRange(0, 0, 9, 0);
+
+        sheet.AddColorScaleFormat(range,
+            minColor: new OdfColor("#FF0000"),
+            maxColor: new OdfColor("#00FF00"));
+
+        Assert.Single(sheet.ConditionalFormats);
+        var format = sheet.ConditionalFormats[0];
+        Assert.Equal(OdfConditionalFormatKind.ColorScale, format.Kind);
+        Assert.Equal("#FF0000", format.MinColor?.Value);
+        Assert.Equal("#00FF00", format.MaxColor?.Value);
+        Assert.Null(format.MidColor);
+        Assert.True(format.TryGetTargetRange(out var parsed));
+        Assert.Equal(0, parsed.StartAddress.Row);
+        Assert.Equal(9, parsed.EndAddress.Row);
+    }
+
+    /// <summary>
+    /// 驗證三色色階、資料橫條與圖示集可透過讀取 API 列舉。
+    /// </summary>
+    [Fact]
+    public void GetConditionalFormats_AllThreeKinds_EnumeratesCorrectly()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Sheet1");
+
+        sheet.AddColorScaleFormat(
+            new OdfCellRange(0, 0, 9, 0),
+            new OdfColor("#FF0000"),
+            new OdfColor("#00FF00"),
+            new OdfColor("#FFFF00"));
+        sheet.AddDataBarFormat(
+            new OdfCellRange(0, 1, 9, 1),
+            new OdfColor("#4472C4"),
+            new OdfColor("#FF0000"));
+        sheet.AddIconSetFormat(new OdfCellRange(0, 2, 9, 2), OdfIconSetType.FiveRating);
+
+        Assert.Equal(3, sheet.ConditionalFormats.Count);
+
+        var colorScale = sheet.ConditionalFormats[0];
+        Assert.Equal(OdfConditionalFormatKind.ColorScale, colorScale.Kind);
+        Assert.Equal("#FFFF00", colorScale.MidColor?.Value);
+
+        var dataBar = sheet.ConditionalFormats[1];
+        Assert.Equal(OdfConditionalFormatKind.DataBar, dataBar.Kind);
+        Assert.Equal("#4472C4", dataBar.PositiveColor?.Value);
+        Assert.Equal("#FF0000", dataBar.NegativeColor?.Value);
+
+        var iconSet = sheet.ConditionalFormats[2];
+        Assert.Equal(OdfConditionalFormatKind.IconSet, iconSet.Kind);
+        Assert.Equal(OdfIconSetType.FiveRating, iconSet.IconSetType);
+        Assert.Equal("5Rating", iconSet.IconSetTypeName);
+    }
+
+    /// <summary>
+    /// 驗證單一條件格式寫入後可透過讀取 API 讀回。
+    /// </summary>
+    [Fact]
+    public void GetConditionalFormats_SimpleCondition_RoundTrips()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Sheet1");
+        sheet.AddConditionalFormat(new OdfCellRange(1, 1, 5, 3), "cell-content()>=100", "GoodStyle");
+
+        Assert.Single(sheet.ConditionalFormats);
+        var format = sheet.ConditionalFormats[0];
+        Assert.Equal(OdfConditionalFormatKind.Condition, format.Kind);
+        Assert.Equal("cell-content()>=100", format.ConditionValue);
+        Assert.Equal("GoodStyle", format.StyleName);
+    }
+
+    /// <summary>
+    /// 驗證走勢圖群組寫入後可透過 <see cref="OdfTableSheet.SparklineGroups"/> 讀回。
+    /// </summary>
+    [Fact]
+    public void GetSparklineGroups_AfterAdd_RoundTrips()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Data");
+        sheet.Cells["A1"].CellValue = 10d;
+        sheet.Cells["A2"].CellValue = 20d;
+        sheet.Cells["A3"].CellValue = 15d;
+
+        var dataRange = OdfCellRange.ParseExcel("A1:A3");
+        var hostCell = OdfCellAddress.ParseExcel("B1");
+        sheet.AddSparklineGroup(dataRange, hostCell, SparklineType.Line);
+
+        Assert.Single(sheet.SparklineGroups);
+        var group = sheet.SparklineGroups[0];
+        Assert.Equal(SparklineType.Line, group.Type);
+        Assert.Single(group.Sparklines);
+
+        var sparkline = group.Sparklines[0];
+        Assert.True(sparkline.TryGetDataRange(out var parsedRange));
+        Assert.Equal(0, parsedRange.StartAddress.Row);
+        Assert.Equal(2, parsedRange.EndAddress.Row);
+        Assert.True(sparkline.TryGetHostCell(out var parsedHost));
+        Assert.Equal(0, parsedHost.Row);
+        Assert.Equal(1, parsedHost.Column);
+    }
+
+    /// <summary>
+    /// 驗證載入既有 ODS 後可讀取 calcext 條件格式（save/load round-trip）。
+    /// </summary>
+    [Fact]
+    public void GetConditionalFormats_AfterSaveLoad_PreservesRules()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Sheet1");
+        sheet.AddDataBarFormat(new OdfCellRange(0, 0, 4, 0), new OdfColor("#638EC6"));
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+
+        using var loaded = SpreadsheetDocument.Load(ms);
+        var loadedSheet = loaded.Worksheets[0];
+        Assert.Single(loadedSheet.ConditionalFormats);
+        Assert.Equal(OdfConditionalFormatKind.DataBar, loadedSheet.ConditionalFormats[0].Kind);
+        Assert.Equal("#638EC6", loadedSheet.ConditionalFormats[0].PositiveColor?.Value);
+    }
 }

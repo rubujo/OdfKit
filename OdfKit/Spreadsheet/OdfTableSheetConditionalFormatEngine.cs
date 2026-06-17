@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OdfKit.Chart;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -10,6 +11,84 @@ namespace OdfKit.Spreadsheet;
 /// </summary>
 internal static class OdfTableSheetConditionalFormatEngine
 {
+    /// <summary>
+    /// 列舉工作表中的 LibreOffice calcext 條件格式規則。
+    /// </summary>
+    internal static IReadOnlyList<OdfConditionalFormatInfo> GetConditionalFormats(
+        OdfTableSheetMutationContext context)
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        OdfNode? formatsNode = OdfTableSheetDomHelper.FindChildElement(
+            context.TableNode, "conditional-formats", calcextNs);
+        if (formatsNode is null)
+            return [];
+
+        List<OdfConditionalFormatInfo> formats = [];
+        foreach (OdfNode child in formatsNode.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.LocalName is not "conditional-format" ||
+                child.NamespaceUri != calcextNs)
+                continue;
+
+            string targetRange = child.GetAttribute("target-range-address", calcextNs) ?? string.Empty;
+            OdfConditionalFormatInfo? info = TryParseConditionalFormat(child, targetRange, calcextNs);
+            if (info is not null)
+                formats.Add(info);
+        }
+
+        return formats.AsReadOnly();
+    }
+
+    /// <summary>
+    /// 列舉工作表中的 LibreOffice calcext 走勢圖群組。
+    /// </summary>
+    internal static IReadOnlyList<OdfSparklineGroupInfo> GetSparklineGroups(
+        OdfTableSheetMutationContext context)
+    {
+        const string calcextNs = OdfNamespaces.CalcExt;
+        OdfNode? groupsNode = OdfTableSheetDomHelper.FindChildElement(
+            context.TableNode, "sparkline-groups", calcextNs);
+        if (groupsNode is null)
+            return [];
+
+        List<OdfSparklineGroupInfo> groups = [];
+        foreach (OdfNode groupNode in groupsNode.Children)
+        {
+            if (groupNode.NodeType is not OdfNodeType.Element ||
+                groupNode.LocalName is not "sparkline-group" ||
+                groupNode.NamespaceUri != calcextNs)
+                continue;
+
+            string typeAttr = groupNode.GetAttribute("type", calcextNs) ?? "line";
+            SparklineType type = ParseSparklineType(typeAttr);
+            List<OdfSparklineInfo> sparklines = [];
+
+            foreach (OdfNode child in groupNode.Children)
+            {
+                if (child.NodeType is not OdfNodeType.Element ||
+                    child.LocalName is not "sparklines" ||
+                    child.NamespaceUri != calcextNs)
+                    continue;
+
+                foreach (OdfNode sparklineNode in child.Children)
+                {
+                    if (sparklineNode.NodeType is not OdfNodeType.Element ||
+                        sparklineNode.LocalName is not "sparkline" ||
+                        sparklineNode.NamespaceUri != calcextNs)
+                        continue;
+
+                    string dataRangeRef = sparklineNode.GetAttribute("dataRangeRef", calcextNs) ?? string.Empty;
+                    string hostCellRef = sparklineNode.GetAttribute("hostCellRef", calcextNs) ?? string.Empty;
+                    sparklines.Add(new OdfSparklineInfo(dataRangeRef, hostCellRef));
+                }
+            }
+
+            groups.Add(new OdfSparklineGroupInfo(type, sparklines.AsReadOnly()));
+        }
+
+        return groups.AsReadOnly();
+    }
     /// <summary>
     /// 新增條件格式。
     /// </summary>
@@ -226,5 +305,114 @@ internal static class OdfTableSheetConditionalFormatEngine
         SparklineType.Column => "column",
         SparklineType.WinLoss => "stacked",
         _ => "line"
+    };
+
+    private static SparklineType ParseSparklineType(string value) => value switch
+    {
+        "column" => SparklineType.Column,
+        "stacked" => SparklineType.WinLoss,
+        _ => SparklineType.Line
+    };
+
+    private static OdfConditionalFormatInfo? TryParseConditionalFormat(
+        OdfNode formatNode, string targetRange, string calcextNs)
+    {
+        foreach (OdfNode child in formatNode.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != calcextNs)
+                continue;
+
+            switch (child.LocalName)
+            {
+                case "condition":
+                    return new OdfConditionalFormatInfo(
+                        OdfConditionalFormatKind.Condition,
+                        targetRange,
+                        conditionValue: child.GetAttribute("value", calcextNs),
+                        styleName: child.GetAttribute("style-name", calcextNs));
+
+                case "color-scale":
+                    return ParseColorScaleFormat(targetRange, child, calcextNs);
+
+                case "data-bar":
+                    return ParseDataBarFormat(targetRange, child, calcextNs);
+
+                case "icon-set":
+                    return ParseIconSetFormat(targetRange, child, calcextNs);
+            }
+        }
+
+        return null;
+    }
+
+    private static OdfConditionalFormatInfo ParseColorScaleFormat(
+        string targetRange, OdfNode colorScaleNode, string calcextNs)
+    {
+        OdfColor? minColor = null;
+        OdfColor? maxColor = null;
+        OdfColor? midColor = null;
+
+        foreach (OdfNode entry in colorScaleNode.Children)
+        {
+            if (entry.NodeType is not OdfNodeType.Element ||
+                entry.LocalName is not "color-scale-entry" ||
+                entry.NamespaceUri != calcextNs)
+                continue;
+
+            string entryType = entry.GetAttribute("type", calcextNs) ?? string.Empty;
+            OdfColor? color = OdfElementComplexAttributeAccess.GetColor(
+                entry.GetAttribute("color", calcextNs));
+
+            switch (entryType)
+            {
+                case "min":
+                    minColor = color;
+                    break;
+                case "max":
+                    maxColor = color;
+                    break;
+                case "percentile":
+                    midColor = color;
+                    break;
+            }
+        }
+
+        return new OdfConditionalFormatInfo(
+            OdfConditionalFormatKind.ColorScale,
+            targetRange,
+            minColor: minColor,
+            maxColor: maxColor,
+            midColor: midColor);
+    }
+
+    private static OdfConditionalFormatInfo ParseDataBarFormat(
+        string targetRange, OdfNode dataBarNode, string calcextNs) =>
+        new(
+            OdfConditionalFormatKind.DataBar,
+            targetRange,
+            positiveColor: OdfElementComplexAttributeAccess.GetColor(
+                dataBarNode.GetAttribute("positive-color", calcextNs)),
+            negativeColor: OdfElementComplexAttributeAccess.GetColor(
+                dataBarNode.GetAttribute("negative-color", calcextNs)));
+
+    private static OdfConditionalFormatInfo ParseIconSetFormat(
+        string targetRange, OdfNode iconSetNode, string calcextNs)
+    {
+        string? typeName = iconSetNode.GetAttribute("icon-set-type", calcextNs);
+        OdfIconSetType? iconSetType = TryParseIconSetType(typeName);
+        return new OdfConditionalFormatInfo(
+            OdfConditionalFormatKind.IconSet,
+            targetRange,
+            iconSetTypeName: typeName,
+            iconSetType: iconSetType);
+    }
+
+    private static OdfIconSetType? TryParseIconSetType(string? typeName) => typeName switch
+    {
+        "3Arrows" => OdfIconSetType.ThreeArrows,
+        "3TrafficLights1" => OdfIconSetType.ThreeTrafficLights,
+        "4Rating" => OdfIconSetType.FourRating,
+        "5Rating" => OdfIconSetType.FiveRating,
+        _ => null
     };
 }

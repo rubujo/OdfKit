@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OdfKit.Chart;
 using OdfKit.DOM;
 
@@ -7,6 +8,18 @@ namespace OdfKit.Spreadsheet;
 public partial class OdfTableSheet
 {
     #region ConditionalFormats
+
+    /// <summary>
+    /// 取得此工作表中的 LibreOffice calcext 條件格式規則清單。
+    /// </summary>
+    public IReadOnlyList<OdfConditionalFormatInfo> ConditionalFormats =>
+        OdfTableSheetConditionalFormatEngine.GetConditionalFormats(MutationContext);
+
+    /// <summary>
+    /// 取得此工作表中的 LibreOffice calcext 走勢圖群組清單。
+    /// </summary>
+    public IReadOnlyList<OdfSparklineGroupInfo> SparklineGroups =>
+        OdfTableSheetConditionalFormatEngine.GetSparklineGroups(MutationContext);
 
     /// <summary>
     /// 新增條件格式。
