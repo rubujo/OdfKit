@@ -75,6 +75,53 @@ public class LibreOfficeInteropTests
     }
 
     /// <summary>
+    /// 驗證含 <c>table:tracked-changes</c> 的 ODS 可由 LibreOffice 26.x headless 模式載入並往返。
+    /// </summary>
+    [Fact]
+    public void LibreOffice26Headless_LoadsTrackedChangesOds()
+    {
+        string? sofficePath = FindLibreOffice26Soffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過 ODS 追蹤修訂實機互通性測試。");
+        }
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeTrackedChangesOds_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            string odsPath = Path.Combine(tempRoot, "interop-tracked-changes.ods");
+            CreateTrackedChangesSpreadsheet(odsPath);
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "ods", odsPath);
+            string roundTripPath = Path.Combine(outputDir, "interop-tracked-changes.ods");
+            Assert.True(File.Exists(roundTripPath), "LibreOffice 應輸出追蹤修訂 ODS 往返結果。");
+
+            using SpreadsheetDocument document = SpreadsheetDocument.Load(roundTripPath);
+            string contentXml = ReadSpreadsheetContentXml(document);
+            Assert.Contains("OdfKit-TrackedChanges-Ods-Marker", contentXml);
+            Assert.Contains("table:tracked-changes", contentXml);
+
+            if (document.GetTrackedChanges().Count > 0)
+            {
+                document.AcceptAllChanges();
+                Assert.Empty(document.GetTrackedChanges());
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
     /// 驗證 ODT、ODS 與 ODP 可由 LibreOffice 26.x headless 模式載入並轉換。
     /// </summary>
     [Fact]
@@ -145,6 +192,33 @@ public class LibreOfficeInteropTests
         OdfTable table = document.AddTable(1, 1);
         table.GetCell(0, 0).AddParagraph(string.Empty).AddTextRun("表格追蹤修訂");
         document.Save(path);
+    }
+
+    private static void CreateTrackedChangesSpreadsheet(string path)
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.TrackedChanges = false;
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = "OdfKit-TrackedChanges-Ods-Marker";
+        sheet.Cells["A2"].CellValue = 100d;
+        sheet.Cells["B2"].CellValue = 200d;
+        sheet.Cells["C2"].Formula = "of:=[.A2]+[.B2]";
+
+        document.TrackedChanges = true;
+        sheet.Cells["C2"].Formula = "of:=[.A2]*[.B2]";
+        document.Save(path);
+    }
+
+    private static string ReadSpreadsheetContentXml(SpreadsheetDocument document)
+    {
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream, Encoding.UTF8);
+        return reader.ReadToEnd();
     }
 
     private static string ReadContentXml(TextDocument document)

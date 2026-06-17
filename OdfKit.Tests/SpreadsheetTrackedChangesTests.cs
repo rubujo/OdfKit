@@ -144,6 +144,57 @@ public class SpreadsheetTrackedChangesTests
     }
 
     /// <summary>
+    /// 驗證公式變更可記錄為 <c>table:cell-content-change</c> 並接受或拒絕。
+    /// </summary>
+    [Fact]
+    public void FormulaChangeCanBeRecordedAcceptedOrRejected()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.TrackedChanges = false;
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = 10d;
+        sheet.Cells["B1"].CellValue = 20d;
+        sheet.Cells["C1"].Formula = "of:=[.A1]+[.B1]";
+
+        document.TrackedChanges = true;
+        sheet.Cells["C1"].Formula = "of:=[.A1]*[.B1]";
+        OdfSpreadsheetTrackedChangeInfo change = document.GetTrackedChanges().Single();
+        Assert.Equal(OdfSpreadsheetChangeKind.CellContentChange, change.Kind);
+        Assert.Equal("of:=[.A1]+[.B1]", change.PreviousFormula);
+        Assert.Equal("of:=[.A1]*[.B1]", sheet.Cells["C1"].Formula);
+
+        document.RejectChange(change.ChangeId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Equal("of:=[.A1]+[.B1]", sheet.Cells["C1"].Formula);
+
+        sheet.Cells["C1"].Formula = "of:=[.A1]*[.B1]";
+        change = document.GetTrackedChanges().Single();
+        document.AcceptChange(change.ChangeId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Equal("of:=[.A1]*[.B1]", sheet.Cells["C1"].Formula);
+    }
+
+    /// <summary>
+    /// 驗證可載入含公式快照的 <c>table:cell-content-change</c> 並讀回修訂摘要。
+    /// </summary>
+    [Fact]
+    public void LoadReadsExistingFormulaCellContentChange()
+    {
+        using var stream = new MemoryStream();
+        WriteFormulaTrackedChangesOds(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument document = SpreadsheetDocument.Load(stream);
+        OdfSpreadsheetTrackedChangeInfo change = document.GetTrackedChanges().Single();
+
+        Assert.Equal("chg-formula", change.ChangeId);
+        Assert.Equal("of:=[.A1]+[.B1]", change.PreviousFormula);
+        Assert.Equal("Sheet1", change.CellAddress?.SheetName);
+        Assert.Equal(0, change.CellAddress?.Row);
+        Assert.Equal(2, change.CellAddress?.Column);
+    }
+
+    /// <summary>
     /// 驗證儲存格移動可記錄為 <c>table:movement</c> 並接受或拒絕。
     /// </summary>
     [Fact]
@@ -175,6 +226,35 @@ public class SpreadsheetTrackedChangesTests
         document.AcceptChange(movement.ChangeId);
         Assert.Empty(document.GetTrackedChanges());
         Assert.Equal("來源", sheet.Cells["B2"].CellValue);
+    }
+
+    private static void WriteFormulaTrackedChangesOds(Stream stream)
+    {
+        const string contentXml =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+            "xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" " +
+            "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" " +
+            "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" office:version=\"1.4\">" +
+            "<office:body><office:spreadsheet>" +
+            "<table:tracked-changes table:track-changes=\"true\">" +
+            "<table:cell-content-change table:id=\"chg-formula\" table:acceptance-state=\"pending\">" +
+            "<table:cell-address table:column=\"2\" table:row=\"0\" table:table=\"0\"/>" +
+            "<office:change-info><dc:creator>Tester</dc:creator><dc:date>2026-06-17T10:00:00Z</dc:date></office:change-info>" +
+            "<table:previous><table:change-track-table-cell table:formula=\"of:=[.A1]+[.B1]\" office:value-type=\"float\" office:value=\"30\"><text:p>30</text:p></table:change-track-table-cell></table:previous>" +
+            "</table:cell-content-change></table:tracked-changes>" +
+            "<table:table table:name=\"Sheet1\"><table:table-row><table:table-cell office:value-type=\"float\" office:value=\"30\" table:formula=\"of:=[.A1]*[.B1]\"><text:p>30</text:p></table:table-cell></table:table-row></table:table>" +
+            "</office:spreadsheet></office:body></office:document-content>";
+
+        using OdfPackage package = OdfPackage.Create(stream, leaveOpen: true);
+        package.SetMimeType("application/vnd.oasis.opendocument.spreadsheet");
+        package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(contentXml), "text/xml");
+        package.WriteEntry(
+            "styles.xml",
+            Encoding.UTF8.GetBytes(
+                "<office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:styles/></office:document-styles>"),
+            "text/xml");
+        package.Save();
     }
 
     private static void WriteTrackedChangesOds(Stream stream)

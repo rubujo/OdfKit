@@ -81,9 +81,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         }
         set
         {
-            OdfNode? previousSnapshot = _doc.TrackedChanges && !string.IsNullOrEmpty(_sheetName)
-                ? Node.CloneNode(deep: true)
-                : null;
+            OdfNode? previousSnapshot = CaptureTrackingSnapshot();
 
             switch (value)
             {
@@ -107,15 +105,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
                     break;
             }
 
-            if (previousSnapshot is not null)
-            {
-                SpreadsheetDocumentTrackedChangesEngine.RecordCellContentChange(
-                    _doc,
-                    _sheetName,
-                    Row,
-                    Column,
-                    previousSnapshot);
-            }
+            PublishTrackingSnapshot(previousSnapshot);
         }
     }
 
@@ -188,7 +178,20 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     public string Formula
     {
         get => Node.GetAttribute("formula", OdfNamespaces.Table) ?? string.Empty;
-        set => Node.SetAttribute("formula", OdfNamespaces.Table, value, "table");
+        set
+        {
+            string normalized = value ?? string.Empty;
+            if (string.Equals(Formula, normalized, StringComparison.Ordinal))
+                return;
+
+            OdfNode? previousSnapshot = CaptureTrackingSnapshot();
+            if (string.IsNullOrEmpty(normalized))
+                Node.RemoveAttribute("formula", OdfNamespaces.Table);
+            else
+                Node.SetAttribute("formula", OdfNamespaces.Table, normalized, "table");
+
+            PublishTrackingSnapshot(previousSnapshot);
+        }
     }
 
     /// <summary>
@@ -246,6 +249,24 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     {
         ValueType = "string";
         DisplayText = text;
+    }
+
+    private OdfNode? CaptureTrackingSnapshot() =>
+        _doc.TrackedChanges && !string.IsNullOrEmpty(_sheetName)
+            ? Node.CloneNode(deep: true)
+            : null;
+
+    private void PublishTrackingSnapshot(OdfNode? previousSnapshot)
+    {
+        if (previousSnapshot is not null)
+        {
+            SpreadsheetDocumentTrackedChangesEngine.RecordCellContentChange(
+                _doc,
+                _sheetName,
+                Row,
+                Column,
+                previousSnapshot);
+        }
     }
 
     private void ClearValue()

@@ -12,6 +12,7 @@ namespace OdfKit.Spreadsheet;
 /// <param name="cellAddress">受影響儲存格位址；非儲存格內容變更時為 <see langword="null"/>。</param>
 /// <param name="previousContent">變更前的顯示文字；無法取得時為 <see langword="null"/>。</param>
 /// <param name="acceptanceState">接受狀態（<c>pending</c>、<c>accepted</c> 或 <c>rejected</c>）。</param>
+/// <param name="previousFormula">變更前的公式（<c>table:formula</c>）；無法取得時為 <see langword="null"/>。</param>
 /// <param name="sheetName">結構修訂所在工作表名稱。</param>
 /// <param name="structuralType">結構修訂類型（<c>row</c>、<c>column</c> 或 <c>table</c>）。</param>
 /// <param name="structuralPosition">結構修訂起始位置（以 0 為基準）。</param>
@@ -26,6 +27,7 @@ public sealed class OdfSpreadsheetTrackedChangeInfo(
     OdfCellAddress? cellAddress,
     string? previousContent,
     string acceptanceState,
+    string? previousFormula = null,
     string? sheetName = null,
     string? structuralType = null,
     int? structuralPosition = null,
@@ -62,6 +64,11 @@ public sealed class OdfSpreadsheetTrackedChangeInfo(
     /// 取得變更前的顯示文字。
     /// </summary>
     public string? PreviousContent { get; } = previousContent;
+
+    /// <summary>
+    /// 取得變更前的公式。
+    /// </summary>
+    public string? PreviousFormula { get; } = previousFormula;
 
     /// <summary>
     /// 取得接受狀態。

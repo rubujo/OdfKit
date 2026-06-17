@@ -226,6 +226,9 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
             string? previousContent = kind == OdfSpreadsheetChangeKind.CellContentChange
                 ? ReadPreviousDisplayText(child)
                 : null;
+            string? previousFormula = kind == OdfSpreadsheetChangeKind.CellContentChange
+                ? ReadPreviousFormula(child)
+                : null;
             (string? sheetName, string? structuralType, int? position, int? count) = ReadStructuralAttributes(document, child);
             OdfCellAddress? sourceAddress = null;
             OdfCellAddress? targetAddress = null;
@@ -244,6 +247,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
                 cellAddress,
                 previousContent,
                 acceptanceState,
+                previousFormula,
                 sheetName,
                 structuralType,
                 position,
@@ -427,6 +431,12 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
     {
         OdfNode? trackCell = FindPreviousTrackCell(changeNode);
         return trackCell is null ? null : ReadTrackCellDisplayText(trackCell);
+    }
+
+    private static string? ReadPreviousFormula(OdfNode changeNode)
+    {
+        OdfNode? trackCell = FindPreviousTrackCell(changeNode);
+        return trackCell?.GetAttribute("formula", OdfNamespaces.Table);
     }
 
     private static OdfNode? FindPreviousTrackCell(OdfNode changeNode)
