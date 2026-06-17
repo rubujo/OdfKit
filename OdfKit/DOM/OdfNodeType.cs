@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OdfKit.Core;
 
 namespace OdfKit.DOM;
 
@@ -66,8 +67,7 @@ public struct OdfAttributeName(string localName, string namespaceUri) : IEquatab
     /// 傳回此執行個體的雜湊碼。
     /// </summary>
     /// <returns>32 位元有號整數雜湊碼</returns>
-    public override int GetHashCode() =>
-        (LocalName?.GetHashCode() ?? 0) ^ (NamespaceUri?.GetHashCode() ?? 0);
+    public override int GetHashCode() => OdfHashing.Combine(LocalName, NamespaceUri);
 }
 
 /// <summary>

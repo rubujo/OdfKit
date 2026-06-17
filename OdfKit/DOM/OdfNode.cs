@@ -55,6 +55,11 @@ public partial class OdfNode
     public bool IsModified { get; set; }
 
     /// <summary>
+    /// 此節點在父節點 <see cref="Children"/> 清單中的快取索引；-1 表示尚未建立或已脫離父節點。
+    /// </summary>
+    internal int SiblingIndex { get; set; } = -1;
+
+    /// <summary>
     /// 初始化 <see cref="OdfNode"/> 類別的新執行個體。
     /// </summary>
     /// <param name="nodeType">節點類型</param>
@@ -106,6 +111,16 @@ public partial class OdfNode
             if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
             {
                 return _value ?? string.Empty;
+            }
+
+            if (Children.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            if (Children.Count == 1)
+            {
+                return Children[0].TextContent;
             }
 
             var sb = new StringBuilder();

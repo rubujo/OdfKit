@@ -54,10 +54,8 @@ internal static class OdfPackageZipLoader
 
             byte[] entryBytes;
             using (Stream entryStream = entry.Open())
-            using (var ms = new MemoryStream())
             {
-                entryStream.CopyTo(ms);
-                entryBytes = ms.ToArray();
+                entryBytes = ReadEntryBytes(entryStream, entry.Length);
             }
 
             var pkgEntry = new OdfPackageEntry(name, entryBytes);
@@ -119,10 +117,8 @@ internal static class OdfPackageZipLoader
 
             byte[] entryBytes;
             using (Stream entryStream = entry.Open())
-            using (var ms = new MemoryStream())
             {
-                await entryStream.CopyToAsync(ms, 81920, cancellationToken).ConfigureAwait(false);
-                entryBytes = ms.ToArray();
+                entryBytes = await ReadEntryBytesAsync(entryStream, entry.Length, cancellationToken).ConfigureAwait(false);
             }
 
             var pkgEntry = new OdfPackageEntry(name, entryBytes);
@@ -199,6 +195,90 @@ internal static class OdfPackageZipLoader
             OdfKitDiagnostics.Warn($"註冊 ZIP 檔名編碼提供者失敗，將使用預設編碼：{ex.Message}", ex);
         }
 #endif
+    }
+
+    private static byte[] ReadEntryBytes(Stream entryStream, long entryLength)
+    {
+        if (entryLength <= 0)
+        {
+            return [];
+        }
+
+        if (entryLength > int.MaxValue)
+        {
+            throw new SecurityException($"Zip entry size {entryLength} exceeds supported in-memory limit.");
+        }
+
+        var entryBytes = new byte[(int)entryLength];
+        int offset = 0;
+        while (offset < entryBytes.Length)
+        {
+            int read = entryStream.Read(entryBytes, offset, entryBytes.Length - offset);
+            if (read == 0)
+            {
+                break;
+            }
+
+            offset += read;
+        }
+
+        if (offset == entryBytes.Length)
+        {
+            return entryBytes;
+        }
+
+        if (offset == 0)
+        {
+            return [];
+        }
+
+        var trimmed = new byte[offset];
+        Buffer.BlockCopy(entryBytes, 0, trimmed, 0, offset);
+        return trimmed;
+    }
+
+    private static async Task<byte[]> ReadEntryBytesAsync(
+        Stream entryStream,
+        long entryLength,
+        CancellationToken cancellationToken)
+    {
+        if (entryLength <= 0)
+        {
+            return [];
+        }
+
+        if (entryLength > int.MaxValue)
+        {
+            throw new SecurityException($"Zip entry size {entryLength} exceeds supported in-memory limit.");
+        }
+
+        var entryBytes = new byte[(int)entryLength];
+        int offset = 0;
+        while (offset < entryBytes.Length)
+        {
+            int read = await entryStream.ReadAsync(entryBytes, offset, entryBytes.Length - offset, cancellationToken)
+                .ConfigureAwait(false);
+            if (read == 0)
+            {
+                break;
+            }
+
+            offset += read;
+        }
+
+        if (offset == entryBytes.Length)
+        {
+            return entryBytes;
+        }
+
+        if (offset == 0)
+        {
+            return [];
+        }
+
+        var trimmed = new byte[offset];
+        Buffer.BlockCopy(entryBytes, 0, trimmed, 0, offset);
+        return trimmed;
     }
 
     private static bool TryDetectStoredCompression(ZipArchiveEntry entry)
