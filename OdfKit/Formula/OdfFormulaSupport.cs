@@ -226,7 +226,7 @@ public static class OdfFormulaSupport
 
         try
         {
-            var parser = new FormulaParser(CleanFormulaPrefix(normalized));
+            var parser = new FormulaParser(FormulaPrefixNormalizer.RemovePrefix(normalized));
             AstNode ast = parser.Parse();
             serialized = ast.Serialize();
         }
@@ -305,29 +305,9 @@ public static class OdfFormulaSupport
         return formula;
     }
 
-    private static string CleanFormulaPrefix(string formula)
-    {
-        if (formula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase))
-        {
-            return formula.Substring(6);
-        }
-
-        if (formula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
-        {
-            return formula.Substring(4);
-        }
-
-        if (formula.StartsWith("=", StringComparison.Ordinal))
-        {
-            return formula.Substring(1);
-        }
-
-        return formula;
-    }
-
     private static List<string> ExtractFunctionNames(string normalizedFormula, List<OdfFormulaDiagnostic> diagnostics)
     {
-        string text = CleanFormulaPrefix(normalizedFormula);
+        string text = FormulaPrefixNormalizer.RemovePrefix(normalizedFormula);
         List<FormulaToken> tokens = OdfFormulaTranslator.Tokenize(text);
         var functions = new List<string>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

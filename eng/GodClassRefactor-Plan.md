@@ -93,13 +93,19 @@
 - [x] `DefaultFormulaEvaluator` 全部 category handler 遷移完成
 - [x] 修正 `Migrate-FormulaCategoryHandler.ps1` using 標頭排版
 
-## 剩餘工作（Phase 11+）
+## Phase 11（已完成）
+
+- [x] `FormulaBuiltinFunctionRegistry` 內建註冊表自給自足（移除 `FunctionRegistry` partial）
+- [x] `FormulaDocumentEvaluationEngine`、`FormulaPrefixNormalizer`
+- [x] `DefaultFormulaEvaluator` 收斂為薄門面（刪除 20 個 category stub partial）
+- [x] `OdfPackageRdfMetadataEngine`、`OdfPackageSaveHooksEngine`、`OdfPackageSignaturePurgeEngine`
+
+## 剩餘工作（Phase 12+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `DefaultFormulaEvaluator` | ~200 | 核心評估器本體（非 category partial） |
 | `OdfElement` | ~3333 | 屬性存取器／typed getter |
-| `OdfPackage` | ~1400 | RDF Metadata 載入、`Saving.Internals` |
+| `OdfPackage` | ~1100 | 其餘 `Saving`／`Loading` partial |
 | `OdfSigner` | ~1300 | 驗證剩餘 partial |
 | `TextDocument` | ~1000 | 核心 `TextDocument.cs` |
 | `OdfDocument` | ~1493 | 合併／複製管線 |

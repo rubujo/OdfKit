@@ -41,9 +41,16 @@ public sealed partial class OdfPackage
         internal bool HasActiveEncryption =>
             _package._saveOptions.Password != null || _package._saveOptions.CryptographyProvider != null;
 
-        internal void ProcessSaveHooks() => _package.ProcessSaveHooks();
+        internal OdfPackage Package => _package;
 
-        internal void SaveRdfMetadata() => _package.SaveRdfMetadataToEntries();
+        internal OdfRdfMetadata RdfMetadata => _package.RdfMetadata;
+
+        internal void ProcessSaveHooks() => OdfPackageSaveHooksEngine.Process(this);
+
+        internal void SaveRdfMetadata() => OdfPackageRdfMetadataEngine.Save(this);
+
+        internal void WriteEntry(string name, byte[] content, string mediaType) =>
+            _package.WriteEntry(name, content, mediaType);
 
         internal void SaveManifest() => OdfPackageManifestWriter.WriteManifest(this);
 

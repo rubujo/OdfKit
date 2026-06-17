@@ -49,7 +49,7 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
                 formula = OdfFormulaTranslator.OdfToExcelFormula(formula);
             }
 
-            formula = CleanFormulaPrefix(formula!);
+            formula = FormulaPrefixNormalizer.RemovePrefix(formula!);
 
             object result = Evaluate(formula!, context);
             _cache[cellAddress] = result;
@@ -64,17 +64,6 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
         {
             _evaluatingStack.Remove(cellAddress);
         }
-    }
-
-    private static string CleanFormulaPrefix(string formula)
-    {
-        if (formula.StartsWith("oooc:=", StringComparison.OrdinalIgnoreCase))
-            return formula.Substring(6);
-        if (formula.StartsWith("of:=", StringComparison.OrdinalIgnoreCase))
-            return formula.Substring(4);
-        if (formula.StartsWith("="))
-            return formula.Substring(1);
-        return formula;
     }
 
     /// <summary>
@@ -112,72 +101,11 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
     /// </summary>
     /// <param name="contentRoot">文件的內容根節點</param>
     public void EvaluateFormulasInDocument(OdfNode contentRoot)
-    {
-        var context = new OdfDomEvaluationContext(contentRoot, this);
-        var addresses = new List<OdfCellAddress>(context.CellFormulas.Keys);
+        => FormulaDocumentEvaluationEngine.EvaluateFormulasInDocument(contentRoot, this);
 
-        foreach (var addr in addresses)
-        {
-            object result = context.GetCellValue(addr);
-            if (context.CellNodes.TryGetValue(addr, out var cellNode))
-            {
-                if (result is OdfFormulaError err)
-                {
-                    string errStr = err.ToErrorString();
-                    OdfKitDiagnostics.Warn($"Formula evaluation error at {addr.ToExcelString()}: {errStr}");
-
-                    cellNode.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
-                    cellNode.SetAttribute("string-value", OdfNamespaces.Office, errStr, "office");
-                    cellNode.RemoveAttribute("value", OdfNamespaces.Office);
-                    cellNode.RemoveAttribute("boolean-value", OdfNamespaces.Office);
-                    UpdateCellDisplayText(cellNode, errStr);
-                }
-                else if (result is double d)
-                {
-                    cellNode.SetAttribute("value-type", OdfNamespaces.Office, "float", "office");
-                    cellNode.SetAttribute("value", OdfNamespaces.Office, d.ToString(System.Globalization.CultureInfo.InvariantCulture), "office");
-                    cellNode.RemoveAttribute("string-value", OdfNamespaces.Office);
-                    cellNode.RemoveAttribute("boolean-value", OdfNamespaces.Office);
-                    UpdateCellDisplayText(cellNode, d.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                }
-                else if (result is bool b)
-                {
-                    cellNode.SetAttribute("value-type", OdfNamespaces.Office, "boolean", "office");
-                    cellNode.SetAttribute("boolean-value", OdfNamespaces.Office, b ? "true" : "false", "office");
-                    cellNode.RemoveAttribute("value", OdfNamespaces.Office);
-                    cellNode.RemoveAttribute("string-value", OdfNamespaces.Office);
-                    UpdateCellDisplayText(cellNode, b ? "TRUE" : "FALSE");
-                }
-                else
-                {
-                    string str = result?.ToString() ?? "";
-                    cellNode.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
-                    cellNode.SetAttribute("string-value", OdfNamespaces.Office, str, "office");
-                    cellNode.RemoveAttribute("value", OdfNamespaces.Office);
-                    cellNode.RemoveAttribute("boolean-value", OdfNamespaces.Office);
-                    UpdateCellDisplayText(cellNode, str);
-                }
-            }
-        }
-    }
-
-    private void UpdateCellDisplayText(OdfNode cellNode, string text)
-    {
-        OdfNode? pNode = null;
-        foreach (var child in cellNode.Children)
-        {
-            if (child.NodeType == OdfNodeType.Element && child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
-            {
-                pNode = child;
-                break;
-            }
-        }
-
-        if (pNode == null)
-        {
-            pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
-            cellNode.AppendChild(pNode);
-        }
-        pNode.TextContent = text;
-    }
+    /// <summary>
+    /// 評估所有支援之公式函式的中央分派方法。
+    /// </summary>
+    internal static object EvaluateFunction(string name, List<AstNode> arguments, IEvaluationContext context)
+        => FormulaBuiltinFunctionRegistry.Evaluate(name, arguments, context);
 }

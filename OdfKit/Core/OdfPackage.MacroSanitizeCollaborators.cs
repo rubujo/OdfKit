@@ -26,6 +26,7 @@ public sealed partial class OdfPackage
 
         internal OdfSaveOptions SaveOptions => _package._saveOptions;
 
-        internal void RemoveOutdatedSignatures() => _package.RemoveOutdatedSignatures();
+        internal void RemoveOutdatedSignatures()
+            => OdfPackageSignaturePurgeEngine.RemoveOutdatedSignatures(Entries, Manifest);
     }
 }

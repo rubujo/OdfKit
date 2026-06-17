@@ -57,7 +57,7 @@ public sealed partial class OdfPackage
 
         internal void LoadManifest() => _package.LoadManifest();
 
-        internal void LoadRdfMetadata() => _package.LoadRdfMetadata();
+        internal void LoadRdfMetadata() => _package.SetRdfMetadata(OdfPackageRdfMetadataEngine.Load(this));
 
         internal Dictionary<string, string> Manifest => _package._manifest;
 

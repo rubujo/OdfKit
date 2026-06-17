@@ -92,6 +92,8 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// </summary>
     public OdfRdfMetadata RdfMetadata { get; private set; } = new();
 
+    internal void SetRdfMetadata(OdfRdfMetadata metadata) => RdfMetadata = metadata;
+
     /// <summary>
     /// 取得一個值，指出目前封裝是否為單一 Flat XML 檔案。
     /// </summary>
