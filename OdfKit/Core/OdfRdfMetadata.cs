@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OdfKit.Core;
 
@@ -44,6 +45,90 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// 依主詞與述詞篩選 RDF triples。
+    /// </summary>
+    /// <param name="subject">主詞 IRI；為 <see langword="null"/> 時不篩選主詞。</param>
+    /// <param name="predicate">述詞 IRI；為 <see langword="null"/> 時不篩選述詞。</param>
+    /// <returns>符合條件的 triple 清單。</returns>
+    public IReadOnlyList<OdfRdfTriple> FindTriples(string? subject = null, string? predicate = null)
+    {
+        IEnumerable<OdfRdfTriple> query = _triples;
+        if (subject is not null)
+        {
+            query = query.Where(triple => triple.Subject == subject);
+        }
+
+        if (predicate is not null)
+        {
+            query = query.Where(triple => triple.Predicate == predicate);
+        }
+
+        return query.ToArray();
+    }
+
+    /// <summary>
+    /// 嘗試取得指定主詞與述詞的 literal 受詞。
+    /// </summary>
+    /// <param name="subject">主詞 IRI。</param>
+    /// <param name="predicate">述詞 IRI。</param>
+    /// <param name="value">literal 受詞值。</param>
+    /// <returns>若存在 literal triple 則為 <see langword="true"/>。</returns>
+    public bool TryGetLiteral(string subject, string predicate, out string value)
+    {
+        OdfRdfTriple? triple = _triples.FirstOrDefault(candidate =>
+            candidate.Subject == subject &&
+            candidate.Predicate == predicate &&
+            candidate.IsLiteral);
+        if (triple is null)
+        {
+            value = string.Empty;
+            return false;
+        }
+
+        value = triple.ObjectValue;
+        return true;
+    }
+
+    /// <summary>
+    /// 建立文件主詞與封裝組件之間的 <c>pkg:hasPart</c> 關聯。
+    /// </summary>
+    /// <param name="documentSubject">文件主詞 IRI（通常為空字串或 <c>./</c>）。</param>
+    /// <param name="partPath">組件相對路徑。</param>
+    public void LinkDocumentPart(string documentSubject, string partPath)
+    {
+        AddTriple(documentSubject, OdfPkgRdfPredicates.HasPart, partPath, isLiteral: false);
+    }
+
+    /// <summary>
+    /// 設定封裝組件的 <c>pkg:mimeType</c> literal。
+    /// </summary>
+    /// <param name="partSubject">組件主詞 IRI。</param>
+    /// <param name="mimeType">MIME 類型。</param>
+    public void SetPartMimeType(string partSubject, string mimeType)
+    {
+        AddTriple(partSubject, OdfPkgRdfPredicates.MimeType, mimeType, isLiteral: true);
+    }
+
+    /// <summary>
+    /// 移除符合主詞與述詞的 RDF triples。
+    /// </summary>
+    /// <param name="subject">主詞 IRI。</param>
+    /// <param name="predicate">述詞 IRI；為 <see langword="null"/> 時移除該主詞的全部 triples。</param>
+    /// <returns>移除的 triple 數量。</returns>
+    public int RemoveTriples(string subject, string? predicate = null)
+    {
+        int removed = _triples.RemoveAll(triple =>
+            triple.Subject == subject &&
+            (predicate is null || triple.Predicate == predicate));
+        if (removed > 0)
+        {
+            IsDirty = true;
+        }
+
+        return removed;
+    }
+
+    /// <summary>
     /// 清除全部 RDF triples。
     /// </summary>
     public void Clear()
@@ -83,8 +168,8 @@ public sealed class OdfRdfTriple
     /// <exception cref="ArgumentException">當任一必要值為空白時拋出。</exception>
     public OdfRdfTriple(string subject, string predicate, string objectValue, bool isLiteral)
     {
-        if (string.IsNullOrWhiteSpace(subject))
-            throw new ArgumentException("RDF 主詞不可為空白。", nameof(subject));
+        if (subject is null)
+            throw new ArgumentNullException(nameof(subject));
         if (string.IsNullOrWhiteSpace(predicate))
             throw new ArgumentException("RDF 述詞不可為空白。", nameof(predicate));
         if (string.IsNullOrWhiteSpace(objectValue))

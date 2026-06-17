@@ -31,9 +31,7 @@ internal static class OdfRdfParser
 
         foreach (var description in document.Descendants(RdfNs + "Description"))
         {
-            string? subject = GetRdfAttribute(description, "about") ??
-                GetRdfAttribute(description, "nodeID");
-            if (string.IsNullOrWhiteSpace(subject))
+            if (!TryGetDescriptionSubject(description, out string? subject))
             {
                 continue;
             }
@@ -124,6 +122,19 @@ internal static class OdfRdfParser
     private static string? GetRdfAttribute(XElement element, string localName)
     {
         return element.Attribute(RdfNs + localName)?.Value;
+    }
+
+    private static bool TryGetDescriptionSubject(XElement description, out string? subject)
+    {
+        XAttribute? about = description.Attribute(RdfNs + "about");
+        if (about is not null)
+        {
+            subject = about.Value;
+            return true;
+        }
+
+        subject = GetRdfAttribute(description, "nodeID");
+        return !string.IsNullOrWhiteSpace(subject);
     }
 
     private static (string NamespaceUri, string LocalName) SplitPredicate(string predicate)

@@ -80,6 +80,33 @@ public class RdfMetadataTests
         Assert.Contains(reopened.RdfMetadata.Triples, triple => triple.Predicate == "urn:odfkit:test#preview" && !triple.IsLiteral);
     }
 
+    /// <summary>
+    /// 驗證 pkg ontology 便利 API 可建立、查詢與移除 triples。
+    /// </summary>
+    [Fact]
+    public void RdfMetadata_PkgOntologyHelpersRoundTrip()
+    {
+        using var stream = new MemoryStream();
+        using (var package = OdfPackage.Create(stream, leaveOpen: true))
+        {
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+            package.RdfMetadata.LinkDocumentPart(string.Empty, "content.xml");
+            package.RdfMetadata.SetPartMimeType("content.xml", "text/xml");
+            package.Save();
+        }
+
+        stream.Position = 0;
+        using var reopened = OdfPackage.Open(stream, leaveOpen: true);
+
+        Assert.Single(reopened.RdfMetadata.FindTriples(string.Empty, OdfPkgRdfPredicates.HasPart));
+        Assert.True(reopened.RdfMetadata.TryGetLiteral("content.xml", OdfPkgRdfPredicates.MimeType, out string mimeType));
+        Assert.Equal("text/xml", mimeType);
+
+        Assert.Equal(1, reopened.RdfMetadata.RemoveTriples("content.xml", OdfPkgRdfPredicates.MimeType));
+        Assert.False(reopened.RdfMetadata.TryGetLiteral("content.xml", OdfPkgRdfPredicates.MimeType, out _));
+    }
+
     [Fact]
     public void RdfMetadata_Load_RejectsDtd()
     {
