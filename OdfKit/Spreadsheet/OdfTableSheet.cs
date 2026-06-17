@@ -192,7 +192,7 @@ public partial class OdfTableSheet
     public OdfCell GetCell(int row, int col)
     {
         var cellNode = GetOrCreateCellNode(row, col);
-        return new OdfCell(cellNode, row, col, _doc);
+        return new OdfCell(cellNode, row, col, _doc, Name);
     }
 
     /// <summary>
@@ -241,7 +241,7 @@ public partial class OdfTableSheet
         {
             if (OdfTableSheetDomAccessEngine.IsUsedCell(node))
             {
-                yield return new OdfCell(node, row, column, _doc);
+                yield return new OdfCell(node, row, column, _doc, Name);
             }
         }
     }
@@ -279,7 +279,7 @@ public partial class OdfTableSheet
                     var cellBorderLeft = (c == startCol) ? outerBorder.Value : OdfBorder.None;
                     var cellBorderRight = (c == endCol) ? outerBorder.Value : OdfBorder.None;
 
-                    var coveredCell = new OdfCell(coveredNode, r, c, _doc);
+                    var coveredCell = new OdfCell(coveredNode, r, c, _doc, Name);
                     coveredCell.SetBorders(cellBorderTop, cellBorderBottom, cellBorderLeft, cellBorderRight);
                 }
             }

@@ -87,7 +87,7 @@ public static class OdfImageExporter
                 var cellNode = sheet.TryGetCellNode(r, c);
                 if (cellNode is not null)
                 {
-                    var cell = new OdfCell(cellNode, r, c, sheet.Document);
+                    var cell = new OdfCell(cellNode, r, c, sheet.Document, sheet.Name);
                     object? val = cell.CellValue;
                     if (val is not null)
                     {

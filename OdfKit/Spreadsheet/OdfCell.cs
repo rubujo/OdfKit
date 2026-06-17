@@ -18,7 +18,8 @@ namespace OdfKit.Spreadsheet;
 /// <param name="row">以 0 為基準的列索引</param>
 /// <param name="col">以 0 為基準的欄索引</param>
 /// <param name="doc">試算表文件</param>
-public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc)
+/// <param name="sheetName">所在工作表名稱。</param>
+public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc, string sheetName = "")
 {
     /// <summary>
     /// 取得代表儲存格的 XML 節點。
@@ -36,6 +37,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     public int Column { get; } = col;
 
     private readonly SpreadsheetDocument _doc = doc;
+    private readonly string _sheetName = sheetName ?? string.Empty;
 
     internal SpreadsheetDocument Document => _doc;
 
@@ -79,6 +81,10 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         }
         set
         {
+            OdfNode? previousSnapshot = _doc.TrackedChanges && !string.IsNullOrEmpty(_sheetName)
+                ? Node.CloneNode(deep: true)
+                : null;
+
             switch (value)
             {
                 case null:
@@ -99,6 +105,16 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
                 default:
                     SetValue(value.ToString() ?? string.Empty);
                     break;
+            }
+
+            if (previousSnapshot is not null)
+            {
+                SpreadsheetDocumentTrackedChangesEngine.RecordCellContentChange(
+                    _doc,
+                    _sheetName,
+                    Row,
+                    Column,
+                    previousSnapshot);
             }
         }
     }

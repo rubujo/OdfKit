@@ -356,5 +356,29 @@ public class SpreadsheetApiUsabilityTests
         Assert.Equal(OdfChartType.Line, chart.ChartType);
     }
 
+    /// <summary>
+    /// 驗證試算表追蹤修訂可在儲存後重新載入。
+    /// </summary>
+    [Fact]
+    public void TrackedCellChangesSurviveRoundTrip()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        workbook.TrackedChanges = false;
+        workbook.Worksheets.Add("庫存").Cells["A1"].CellValue = "100";
+        workbook.TrackedChanges = true;
+        workbook.Worksheets["庫存"].Cells["A1"].CellValue = "120";
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+
+        Assert.True(loaded.TrackedChanges);
+        OdfSpreadsheetTrackedChangeInfo change = Assert.Single(loaded.GetTrackedChanges());
+        Assert.Equal("100", change.PreviousContent);
+        Assert.Equal("120", loaded.Worksheets["庫存"].Cells["A1"].CellValue);
+    }
+
     private sealed record ProductRow(string Name, double Price, int Stock);
 }
