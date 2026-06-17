@@ -7,7 +7,7 @@
 | 層級 | 完成線指標 | 現況 |
 |------|-----------|------|
 | Tier 1 規範可信 | Validator + Profile + Corpus；Unknown 保真 round-trip | corpus 219 fixtures；validate-corpus 全綠 |
-| Tier 2 語意可用 | 四主格式高階 API 深度；變體與特殊格式專屬模型 | 17 格式高階 API 多為 `usable` / `package-only` |
+| Tier 2 語意可用 | 四主格式高階 API 深度；變體與特殊格式專屬模型 | 四主格式 High-level = `complete` ✅；其餘多為 `usable` / `usable-variant` / `package-only` |
 | Tier 3 互通可驗 | LibreOffice 實機驗收；OOXML 視覺 golden file | 自動化有、外部視覺驗收未完成 |
 | Tier 4 產品就緒 | NuGet 發佈；統一開發者體驗 | 原始碼 repo 為主 |
 
@@ -46,7 +46,7 @@
 | LOEXT-1 | 基礎 ✅ | `loext:decorative` 讀取映射、`OdfNamespaces.LoExt`；`LoExtInteropTests` 覆蓋 ODT/ODP/ODG |
 | CALCEXT-1 | 基礎 ✅ | 工作表與文件層 calcext 讀取 API（條件格式、走勢圖）；`ConditionalFormatTests`、`SpreadsheetHighLevelApiTests` |
 
-目標：四主格式 High-level 欄位升為 `complete`。
+目標：四主格式 High-level 欄位升為 `complete`（✅ 已達成；見 `docs/odf-format-support.md` 矩陣）。
 
 ### VAR-1 驗收
 

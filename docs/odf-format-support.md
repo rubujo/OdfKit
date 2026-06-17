@@ -18,7 +18,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 
 ### 高階 API 層（Wave 1 分級）
 
-- `complete`：日常辦公自動化不需下沉 DOM（Wave 2 目標，目前尚無）。
+- `complete`：日常辦公自動化不需下沉 DOM；四主格式（ODT／ODS／ODP／ODG）已達此分級。
 - `usable`：常用建立／編輯 API 可用，仍有明確語意缺口。
 - `package-only`：僅封裝層 round-trip；高階語意模型尚未專屬化或仍共用基底 wrapper。
 - `usable-variant`：具專屬 typed 文件類別與 `Create`/`Load` 入口；語意 API 繼承基底格式（Wave 2 VAR-1）。
@@ -27,17 +27,17 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 
 | Extension | MIME type | `OdfDocumentKind` | Detect | Create | Load | Save | Validate | Round-trip | High-level API | Test evidence |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | usable | `TextApiUsabilityTests`, `FourFormatApiScenarioTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | complete | `TextApiUsabilityTests`, `TextHighLevelApiTests`, `FourFormatApiScenarioTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.fodt` | `application/vnd.oasis.opendocument.text` | `FlatText` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests` |
-| `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | complete | complete | complete | complete | validated | complete | usable | `SpreadsheetApiUsabilityTests`, `FourFormatApiScenarioTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests`, `InteropCorpusTests` |
+| `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | complete | complete | complete | complete | validated | complete | complete | `SpreadsheetApiUsabilityTests`, `SpreadsheetHighLevelApiTests`, `ChartHighLevelApiTests`, `FourFormatApiScenarioTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests`, `InteropCorpusTests` |
 | `.ots` | `application/vnd.oasis.opendocument.spreadsheet-template` | `SpreadsheetTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.fods` | `application/vnd.oasis.opendocument.spreadsheet` | `FlatSpreadsheet` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests` |
-| `.odp` | `application/vnd.oasis.opendocument.presentation` | `Presentation` | complete | complete | complete | complete | validated | complete | usable | `PresentationApiUsabilityTests`, `FourFormatApiScenarioTests`, `PresentationAndRenderingTests`, `PresentationBoundaryTests`, `InteropCorpusTests` |
+| `.odp` | `application/vnd.oasis.opendocument.presentation` | `Presentation` | complete | complete | complete | complete | validated | complete | complete | `PresentationApiUsabilityTests`, `PresentationHighLevelApiTests`, `FourFormatApiScenarioTests`, `PresentationAndRenderingTests`, `PresentationBoundaryTests`, `InteropCorpusTests` |
 | `.otp` | `application/vnd.oasis.opendocument.presentation-template` | `PresentationTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.fodp` | `application/vnd.oasis.opendocument.presentation` | `FlatPresentation` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests` |
-| `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | complete | complete | complete | complete | validated | complete | usable | `DrawingApiUsabilityTests`, `FourFormatApiScenarioTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | complete | complete | complete | complete | validated | complete | complete | `DrawingApiUsabilityTests`, `DrawingHighLevelApiTests`, `FourFormatApiScenarioTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.otg` | `application/vnd.oasis.opendocument.graphics-template` | `GraphicsTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.fodg` | `application/vnd.oasis.opendocument.graphics` | `FlatGraphics` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests` |
 | `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | complete | complete | complete | complete | validated | complete | usable | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
@@ -52,11 +52,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 
 - 統一的 `OdfDocument.Load` / `OdfDocument.Create` 與
   `OdfDocumentFactory.LoadDocument` / `CreateDocument` 高階入口已建立。
-- ODT、ODS、ODP、ODG 標為 `usable`：已有常用高階 API 與 `FourFormatApiScenarioTests` 場景背書，但尚非完整辦公套件物件模型（Wave 2 `complete` 目標）。升級 `complete` 前仍須補齊：
-  - **ODT**：頁首頁尾進階編輯（書籤／超連結／參考標記／腳注尾注／索引／註解／表格結構修訂讀取 `GetBookmarks`／`GetHyperlinks`／`GetReferenceMarks`／`GetFootnotes`／`GetEndnotes`／`GetPageSetups`／`GetIndexInfos`／`GetIndexMarks`／`GetCommentInfos`／`GetTableStructuralChanges` 已補；表格結構修訂寫入 `OdfTable.InsertRows`／`DeleteRows`／`InsertColumns`／`DeleteColumns` 已補；索引進階寫入 `UpdateIndexes`、`OdfTableOfContents.AddEntryTemplate` 已補；頁首頁尾進階寫入 `GetPageSetup`、`OdfPageHeaderFooter` 欄位混排、`HeaderFirst`／`FooterFirst`、頁首頁尾邊距 `HeaderMinHeight`／`FooterMinHeight` 已補）
-  - **ODS**：樞紐表重算（見 non-goals）、圖表進階編輯（命名範圍／具名運算式／資料庫範圍／列印範圍／樞紐表／凍結／分割窗格讀取 `GetNamedRanges`／`GetNamedExpressions`／`GetDatabaseRanges`／`GetPrintAreas`／`GetPivotTables`／`GetFrozenPanes`／`GetSplitPanes` 已補；嵌入圖表編輯 `GetEmbeddedChartDocument`、`OdfChartDocument.SetChartType`／`ApplyDefinition`／`ClearSeries` 已補；軸樣式與序列個別屬性 `GetAxisInfo`／`SetAxisLogarithmic`／`SetAxisGrid`／`GetSeriesEditor` 已補）
-  - **ODP**：母片列舉 `GetMasterPages`、切換效果與持續時間讀取 `GetSlideTransition`／`GetSlideTransitions`、動畫時間軸摘要（dur／begin／序號）與文件層聚合 `GetAnimations`／`GetPlaceholderInfos`／`GetSpeakerNotes`／`GetLayouts` 已補；動畫時間軸寫入 `Add*Effect` 持續時間參數與 `OdfAnimation.SetDuration`／`SetDelay` 已補；投影片層版面寫入 `OdfSlide.SetLayout`／`GetLayout` 已補；母片／版面配置進階寫入 `GetMasterPage`、`OdfMasterPage.BackgroundColor`／`PageLayoutName`、`GetPresentationPageLayouts`、`ApplyPresentationPageLayout`、`OdfSlide.SetMasterPage` 已補）
-  - **ODG**：圖層／文字方塊／圖片／圖層指派／連接線路由點讀取 `GetGroups`／`GetLayers`／`GetTextBoxes`／`GetPictures`／`GetShapeLayerAssignments`／`GetConnectors` 之 `Points` 已補；連接線路由寫入 `OdfShape.SetConnectorRoutePoints`、群組進階寫入 `OdfDrawPage.GroupShapes`、`OdfDrawGroup.AddConnector` 已補）
+- ODT、ODS、ODP、ODG 高階 API 已升為 `complete`（Wave 2 DEPTH 目標 ✅）：常用讀寫 API 與 `FourFormatApiScenarioTests` 進階寫入場景已背書；仍非全功能辦公套件物件模型（例如 ODS 樞紐表重算見 non-goals、圖表 chart style 物件模型仍屬 DEPTH-2 延伸）。
 - `.ott`、`.ots`、`.otp`、`.otg`、`.odm` 與 Flat 變體標為 `usable-variant`（VAR-1 ✅）：
   具專屬 typed 文件類別與 `Create`/`Load` 入口；語意 API 繼承四主格式基底類別。
 - ODT `text:tracked-changes` 已支援段落與表格儲存格插入／格式變更記錄；LO 互通測試已備（`TrackedChangesInteropTests`）。

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using OdfKit.Chart;
 using OdfKit.Core;
 using OdfKit.Drawing;
 using OdfKit.Presentation;
@@ -12,7 +13,7 @@ using Xunit;
 namespace OdfKit.Tests;
 
 /// <summary>
-/// 驗證四主格式（ODT／ODS／ODP／ODG）Wave 2 DEPTH-1 讀取 API 的整合場景。
+/// 驗證四主格式（ODT／ODS／ODP／ODG）Wave 2 高階 API 的整合場景。
 /// </summary>
 public class FourFormatApiScenarioTests
 {
@@ -224,6 +225,170 @@ public class FourFormatApiScenarioTests
         Assert.Equal("清單", info.Name);
         Assert.Single(info.FilterConditions);
         Assert.Equal("完成", info.FilterConditions[0].Value);
+    }
+
+    /// <summary>
+    /// 驗證 ODT 頁首頁尾進階寫入 API 可於儲存／載入後讀回。
+    /// </summary>
+    [Fact]
+    public void TextScenario_HeaderFooterAdvancedEditingSurvivesRoundTrip()
+    {
+        using var stream = new MemoryStream();
+        using (TextDocument document = TextDocument.Create())
+        {
+            document.AddPageStyle("Landscape");
+            OdfPageSetup landscape = document.GetPageSetup("Landscape");
+            landscape.HeaderFirst.Text = "首頁專用頁首";
+            landscape.FooterMinHeight = "0.9cm";
+
+            OdfParagraph footerParagraph = document.GetDefaultPageSetup().Footer.GetOrCreateParagraph();
+            footerParagraph.TextContent = "第 ";
+            document.GetDefaultPageSetup().Footer.AddPageNumberField();
+
+            document.SaveToStream(stream);
+        }
+
+        stream.Position = 0;
+        using TextDocument loaded = TextDocument.Load(stream);
+
+        OdfPageSetupInfo landscapeInfo = Assert.Single(
+            loaded.GetPageSetups(),
+            setup => setup.Name == "Landscape");
+        Assert.Equal("首頁專用頁首", landscapeInfo.HeaderFirstText);
+
+        OdfPageSetupInfo standardInfo = Assert.Single(
+            loaded.GetPageSetups(),
+            setup => setup.Name == "Standard");
+        Assert.Equal("第 ", standardInfo.FooterText);
+    }
+
+    /// <summary>
+    /// 驗證 ODS 圖表軸與序列進階寫入 API 可於嵌入圖表往返後讀回。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetScenario_ChartAdvancedEditingSurvivesRoundTrip()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = workbook.AddSheet("銷售");
+        sheet.GetCell(0, 0).SetValue("季度");
+        sheet.GetCell(1, 0).SetValue("Q1");
+        sheet.GetCell(2, 0).SetValue("Q2");
+        sheet.GetCell(0, 1).SetValue("銷售額");
+        sheet.GetCell(1, 1).SetValue(100d);
+        sheet.GetCell(2, 1).SetValue(200d);
+
+        OdfChartDocument chartDoc = sheet.InsertChart(
+            new OdfCellRange(0, 0, 2, 1, "銷售"),
+            OdfChartType.Bar);
+        chartDoc.ChartTitle = "季度銷售";
+        chartDoc.SetAxisMaximum("y", 500);
+        chartDoc.SetAxisGrid("y", OdfChartGridKind.Major, true);
+        if (chartDoc.SeriesCount > 0)
+            chartDoc.GetSeriesEditor(0).SeriesClass = "chart:bar";
+        chartDoc.Save();
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+        OdfChartDocument reloadedChart = loaded.GetEmbeddedChartDocument(Assert.Single(loaded.GetEmbeddedCharts()));
+        OdfChartAxisInfo? axisInfo = reloadedChart.GetAxisInfo("y");
+        Assert.NotNull(axisInfo);
+        Assert.Equal(500, axisInfo!.Maximum);
+        Assert.True(axisInfo.HasMajorGrid);
+        if (reloadedChart.SeriesCount > 0)
+            Assert.Equal("chart:bar", reloadedChart.Series[0].SeriesClass);
+    }
+
+    /// <summary>
+    /// 驗證 ODP 母片與版面配置進階寫入 API 可於儲存／載入後讀回。
+    /// </summary>
+    [Fact]
+    public void PresentationScenario_MasterAndLayoutAdvancedEditingSurvivesRoundTrip()
+    {
+        using var stream = new MemoryStream();
+        using (var document = PresentationDocument.Create())
+        {
+            document.AddSlide();
+            document.AddMasterPage("BrandMaster", new OdfMasterPageDefinition { Name = "BrandMaster" });
+            OdfMasterPage master = document.GetMasterPage("BrandMaster");
+            master.BackgroundColor = "#445566";
+
+            OdfPresentationPageLayout layout = document.CreatePresentationPageLayout("SceneLayout");
+            layout.AddPlaceholder(
+                OdfPlaceholderType.Title,
+                OdfLength.Parse("2cm"), OdfLength.Parse("1.5cm"),
+                OdfLength.Parse("20cm"), OdfLength.Parse("3cm"));
+
+            document.Slides[0].SetMasterPage("BrandMaster");
+            document.ApplyPresentationPageLayout(0, "SceneLayout");
+            document.SaveToStream(stream);
+        }
+
+        stream.Position = 0;
+        using PresentationDocument loaded = PresentationDocument.Load(stream);
+
+        Assert.Equal("#445566", loaded.GetMasterPage("BrandMaster").BackgroundColor);
+        Assert.Equal("BrandMaster", loaded.Slides[0].MasterPageName);
+        Assert.Equal("SceneLayout", loaded.Slides[0].PresentationPageLayoutName);
+        Assert.Single(loaded.Slides[0].Placeholders);
+    }
+
+    /// <summary>
+    /// 驗證 ODG 群組與連接線路由進階寫入 API 可於儲存／載入後讀回。
+    /// </summary>
+    [Fact]
+    public void DrawingScenario_GroupAndConnectorAdvancedEditingSurvivesRoundTrip()
+    {
+        const string routePoints = "0cm 0cm 2cm 1cm 4cm 0cm";
+        using var stream = new MemoryStream();
+        string groupName;
+        using (var document = DrawingDocument.Create())
+        {
+            OdfDrawPage page = document.AddPage("場景頁");
+            OdfShape first = page.AddShape(
+                OdfShapeType.Rectangle,
+                OdfLength.Parse("1cm"),
+                OdfLength.Parse("1cm"),
+                OdfLength.Parse("3cm"),
+                OdfLength.Parse("2cm"));
+            OdfShape second = page.AddShape(
+                OdfShapeType.Rectangle,
+                OdfLength.Parse("6cm"),
+                OdfLength.Parse("1cm"),
+                OdfLength.Parse("3cm"),
+                OdfLength.Parse("2cm"));
+            OdfDrawGroup group = page.GroupShapes([first.Id, second.Id], "流程群組");
+            groupName = group.Name;
+
+            OdfShape startShape = page.AddShape(
+                OdfShapeType.Rectangle,
+                OdfLength.Parse("1cm"),
+                OdfLength.Parse("5cm"),
+                OdfLength.Parse("2cm"),
+                OdfLength.Parse("1cm"));
+            OdfShape endShape = page.AddShape(
+                OdfShapeType.Rectangle,
+                OdfLength.Parse("8cm"),
+                OdfLength.Parse("5cm"),
+                OdfLength.Parse("2cm"),
+                OdfLength.Parse("1cm"));
+            OdfShape connector = document.AddConnector(startShape.Id, endShape.Id, OdfConnectorType.Standard);
+            connector.SetConnectorRoutePoints(routePoints);
+
+            document.SaveToStream(stream);
+        }
+
+        stream.Position = 0;
+        using DrawingDocument loaded = DrawingDocument.Load(stream);
+        OdfDrawPage loadedPage = loaded.Pages[0];
+
+        OdfGroupInfo groupInfo = Assert.Single(loadedPage.GetGroups(), group => group.Name == groupName);
+        Assert.Equal(groupName, groupInfo.Name);
+
+        OdfConnectorInfo connectorInfo = Assert.Single(loadedPage.GetConnectors());
+        Assert.Equal(routePoints, connectorInfo.Points);
     }
 
     /// <summary>
