@@ -82,11 +82,11 @@
 
 ## Wave 3 — 互通與視覺驗收
 
-| Phase | 產出 |
-|-------|------|
-| X-2 | LibreOffice interop 矩陣 + `eng/Test-LibreOfficeInterop.ps1` |
-| Q-3 | OOXML golden file 視覺 diff |
-| REN-1 | 渲染 backend 部署指南 |
+| Phase | 狀態 | 產出 |
+|-------|------|------|
+| X-2 | 基礎 ✅ | `docs/libreoffice-interop-matrix.md`、`eng/Test-LibreOfficeInterop.ps1`；四主格式 + 追蹤修訂 LO 26.x headless 矩陣 |
+| Q-3 | 待辦 | OOXML golden file 視覺 diff |
+| REN-1 | 待辦 | 渲染 backend 部署指南 |
 
 ## Wave 4 — 產品化
 

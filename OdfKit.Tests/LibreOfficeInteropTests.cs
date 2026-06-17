@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using OdfKit.Chart;
 using OdfKit.Core;
+using OdfKit.Drawing;
 using OdfKit.Presentation;
 using OdfKit.Spreadsheet;
 using OdfKit.Styles;
@@ -122,7 +123,7 @@ public class LibreOfficeInteropTests
     }
 
     /// <summary>
-    /// 驗證 ODT、ODS 與 ODP 可由 LibreOffice 26.x headless 模式載入並轉換。
+    /// 驗證 ODT、ODS、ODP 與 ODG 可由 LibreOffice 26.x headless 模式載入並轉換。
     /// </summary>
     [Fact]
     public void LibreOffice26Headless_LoadsGeneratedDocuments()
@@ -144,10 +145,12 @@ public class LibreOfficeInteropTests
             string odtPath = Path.Combine(tempRoot, "interop-text.odt");
             string odsPath = Path.Combine(tempRoot, "interop-chart.ods");
             string odpPath = Path.Combine(tempRoot, "interop-animation.odp");
+            string odgPath = Path.Combine(tempRoot, "interop-drawing.odg");
 
             CreateTextDocument(odtPath);
             CreateSpreadsheetWithChart(odsPath);
             CreatePresentationWithAnimation(odpPath);
+            CreateDrawingDocument(odgPath);
 
             RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt", odtPath);
             string txtPath = Path.Combine(outputDir, "interop-text.txt");
@@ -164,6 +167,12 @@ public class LibreOfficeInteropTests
             Assert.True(File.Exists(fodpPath), "LibreOffice 應輸出 ODP 至 FODP 轉換結果。");
             string fodpXml = File.ReadAllText(fodpPath);
             Assert.Contains("ooo-entrance-fade-in", fodpXml);
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "fodg", odgPath);
+            string fodgPath = Path.Combine(outputDir, "interop-drawing.fodg");
+            Assert.True(File.Exists(fodgPath), "LibreOffice 應輸出 ODG 至 FODG 轉換結果。");
+            string fodgXml = File.ReadAllText(fodgPath);
+            Assert.Contains("OdfKit-LibreOffice-26-Interop-Marker", fodgXml);
         }
         finally
         {
@@ -265,6 +274,19 @@ public class LibreOfficeInteropTests
             OdfLength.Parse("10cm"),
             OdfLength.Parse("2cm"));
         slide.AddEntranceEffect(placeholder.Id, OdfAnimationEffect.Fade, OdfAnimationTrigger.OnClick);
+        document.Save(path);
+    }
+
+    private static void CreateDrawingDocument(string path)
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("互通頁");
+        page.AddTextBox(
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("8cm"),
+            OdfLength.Parse("3cm"),
+            "OdfKit-LibreOffice-26-Interop-Marker");
         document.Save(path);
     }
 

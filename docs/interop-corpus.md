@@ -34,6 +34,8 @@
 
 - `OdfKit.Extensions.Rendering` 與相關測試使用可替換的 LibreOffice finder。
 - 這部分屬可選 rendering 擴充，不是核心 OdfKit 建立、載入、保存與驗證能力的必要條件。
+- LibreOffice 26.x 實機互通矩陣見 [libreoffice-interop-matrix.md](libreoffice-interop-matrix.md)；
+  執行 `pwsh eng/Test-LibreOfficeInterop.ps1`（需本機 LibreOffice 26.x，否則略過）。
 
 ## ODF Toolkit parity corpus
 
