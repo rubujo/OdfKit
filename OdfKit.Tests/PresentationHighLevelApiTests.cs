@@ -135,6 +135,38 @@ public class PresentationHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證動畫持續時間與延遲可透過建立參數與 <see cref="OdfAnimation.SetDuration"/>／<see cref="OdfAnimation.SetDelay"/> 寫入。
+    /// </summary>
+    [Fact]
+    public void AnimationTiming_RoundTripsAfterWrite()
+    {
+        using var document = PresentationDocument.Create();
+        OdfSlide slide = document.AddSlide();
+        OdfPlaceholder placeholder = slide.AddPlaceholder(
+            OdfPlaceholderType.Title,
+            OdfLength.Parse("1.0cm"),
+            OdfLength.Parse("1.0cm"),
+            OdfLength.Parse("10.0cm"),
+            OdfLength.Parse("2.0cm"));
+        string shapeId = placeholder.Id;
+
+        OdfAnimation entrance = slide.AddEntranceEffect(
+            shapeId,
+            OdfAnimationEffect.Fade,
+            OdfAnimationTrigger.OnClick,
+            delay: TimeSpan.FromSeconds(0.25),
+            duration: TimeSpan.FromSeconds(1.25));
+        entrance.SetDuration(TimeSpan.FromSeconds(2.0));
+        entrance.SetDelay(TimeSpan.FromSeconds(0.75));
+
+        OdfAnimationInfo info = Assert.Single(slide.GetAnimations());
+        Assert.Equal("2s", info.Duration);
+        Assert.Equal("0.75s", info.Begin);
+        Assert.True(info.TryGetDurationSeconds(out double seconds));
+        Assert.Equal(2.0, seconds, 2);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="PresentationDocument.GetPlaceholderInfos"/> 與 <see cref="PresentationDocument.GetSpeakerNotes"/> 可讀回投影片內容。
     /// </summary>
     [Fact]

@@ -16,8 +16,14 @@ public partial class OdfSlide
     /// <param name="effect">動畫效果類型。</param>
     /// <param name="trigger">動畫觸發方式。</param>
     /// <param name="delay">動畫延遲啟動時間。</param>
+    /// <param name="duration">動畫持續時間；預設為 0.5 秒。</param>
     /// <returns>新增的動畫物件執行個體。</returns>
-    public OdfAnimation AddEntranceEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, TimeSpan delay = default)
+    public OdfAnimation AddEntranceEffect(
+        string shapeId,
+        OdfAnimationEffect effect,
+        OdfAnimationTrigger trigger,
+        TimeSpan delay = default,
+        TimeSpan duration = default)
     {
         if (string.IsNullOrEmpty(shapeId))
             throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
@@ -25,8 +31,9 @@ public partial class OdfSlide
         var mainSeq = AnimationRoot.Node;
         var stepPar = FindOrCreateStepParNode(mainSeq, trigger);
 
-        string delayStr = $"{delay.TotalSeconds:F2}s";
-        string durStr = "0.5s";
+        TimeSpan effectiveDuration = duration == default ? TimeSpan.FromSeconds(0.5) : duration;
+        string delayStr = OdfSmilTime.FormatDelay(delay);
+        string durStr = OdfSmilTime.FormatDuration(effectiveDuration);
 
         // 建立動畫效果包裝節點
         OdfNode effectPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
@@ -91,8 +98,14 @@ public partial class OdfSlide
     /// <param name="effect">動畫效果類型。</param>
     /// <param name="trigger">動畫觸發方式。</param>
     /// <param name="delay">動畫延遲啟動時間。</param>
+    /// <param name="duration">動畫持續時間；預設為 0.5 秒。</param>
     /// <returns>新增的動畫物件執行個體。</returns>
-    public OdfAnimation AddExitEffect(string shapeId, OdfAnimationEffect effect, OdfAnimationTrigger trigger, TimeSpan delay = default)
+    public OdfAnimation AddExitEffect(
+        string shapeId,
+        OdfAnimationEffect effect,
+        OdfAnimationTrigger trigger,
+        TimeSpan delay = default,
+        TimeSpan duration = default)
     {
         if (string.IsNullOrEmpty(shapeId))
             throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
@@ -100,8 +113,9 @@ public partial class OdfSlide
         var mainSeq = AnimationRoot.Node;
         var stepPar = FindOrCreateStepParNode(mainSeq, trigger);
 
-        string delayStr = $"{delay.TotalSeconds:F2}s";
-        string durStr = "0.5s";
+        TimeSpan effectiveDuration = duration == default ? TimeSpan.FromSeconds(0.5) : duration;
+        string delayStr = OdfSmilTime.FormatDelay(delay);
+        string durStr = OdfSmilTime.FormatDuration(effectiveDuration);
 
         // 建立動畫效果包裝節點
         OdfNode effectPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
@@ -164,8 +178,9 @@ public partial class OdfSlide
     /// </summary>
     /// <param name="shapeId">目標圖形識別碼。</param>
     /// <param name="effect">動畫效果類型。</param>
+    /// <param name="duration">動畫持續時間；預設為 0.5 秒。</param>
     /// <returns>新增的動畫物件執行個體。</returns>
-    public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect)
+    public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, TimeSpan duration = default)
     {
         if (string.IsNullOrEmpty(shapeId))
             throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
@@ -174,7 +189,8 @@ public partial class OdfSlide
         // 強調動畫一般為點擊觸發
         var stepPar = FindOrCreateStepParNode(mainSeq, OdfAnimationTrigger.OnClick);
 
-        string durStr = "0.5s";
+        TimeSpan effectiveDuration = duration == default ? TimeSpan.FromSeconds(0.5) : duration;
+        string durStr = OdfSmilTime.FormatDuration(effectiveDuration);
 
         // 建立動畫效果包裝節點
         OdfNode effectPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");

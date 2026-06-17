@@ -172,6 +172,34 @@ public class DrawingHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfShape.SetConnectorRoutePoints(string)"/> 可寫入連接線路由頂點。
+    /// </summary>
+    [Fact]
+    public void SetConnectorRoutePoints_RoundTripsAfterAdd()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("Page1");
+        OdfShape startShape = page.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("2cm"));
+        OdfShape endShape = page.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.Parse("5cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("2cm"));
+
+        OdfShape connectorShape = document.AddConnector(startShape.Id, endShape.Id, OdfConnectorType.Lines);
+        connectorShape.SetConnectorRoutePoints("0cm 0cm 2cm 1cm 4cm 0cm");
+
+        OdfConnectorInfo connector = Assert.Single(page.GetConnectors());
+        Assert.Equal("0cm 0cm 2cm 1cm 4cm 0cm", connector.Points);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="OdfDrawPage.GetPolygons"/> 可讀回已建立的多邊形圖形。
     /// </summary>
     [Fact]

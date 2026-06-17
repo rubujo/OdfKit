@@ -7,7 +7,7 @@ namespace OdfKit.Presentation;
 /// <summary>
 /// 表示高階簡報動畫效果的類別。
 /// </summary>
-public sealed class OdfAnimation
+public sealed partial class OdfAnimation
 {
     /// <summary>
     /// 取得底層的 ODF 動畫節點。

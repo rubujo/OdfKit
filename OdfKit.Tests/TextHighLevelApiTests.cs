@@ -338,6 +338,33 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfTable.InsertRows"/> 與 <see cref="OdfTable.DeleteColumns"/> 在啟用追蹤修訂時會記錄結構變更。
+    /// </summary>
+    [Fact]
+    public void TableStructureChanges_RecordedWhenTrackedChangesEnabled()
+    {
+        using var document = TextDocument.Create();
+        document.TrackedChanges = true;
+        OdfTable table = document.AddTable(2, 2);
+
+        table.InsertRows(1, 2);
+        table.DeleteColumns(0, 1);
+
+        IReadOnlyList<OdfTableStructuralChangeInfo> changes = document.GetTableStructuralChanges();
+        Assert.Equal(2, changes.Count);
+
+        OdfTableStructuralChangeInfo rowInsertion = changes.First(c => c.Kind == OdfTableStructuralChangeKind.Insertion);
+        Assert.Equal("row", rowInsertion.StructuralType);
+        Assert.Equal(1, rowInsertion.Position);
+        Assert.Equal(2, rowInsertion.Count);
+        Assert.Equal("Author", rowInsertion.Author);
+
+        OdfTableStructuralChangeInfo columnDeletion = changes.First(c => c.Kind == OdfTableStructuralChangeKind.Deletion);
+        Assert.Equal("column", columnDeletion.StructuralType);
+        Assert.Equal(0, columnDeletion.Position);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="TextDocument.GetTableStructuralChanges"/> 可讀回表格結構修訂。
     /// </summary>
     [Fact]

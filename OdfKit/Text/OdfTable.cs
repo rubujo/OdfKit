@@ -9,7 +9,7 @@ namespace OdfKit.Text;
 /// <summary>
 /// 表示文字文件中的表格。
 /// </summary>
-public class OdfTable
+public partial class OdfTable
 {
     /// <summary>
     /// 取得與此表格相關聯的 OdfNode 節點。

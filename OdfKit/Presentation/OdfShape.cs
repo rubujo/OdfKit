@@ -11,7 +11,7 @@ namespace OdfKit.Presentation;
 /// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
 /// <param name="doc">所屬的文件執行個體</param>
 /// <param name="slide">所屬的投影片執行個體，若不屬於簡報投影片則為 <c>null</c></param>
-public class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
+public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
 {
     /// <summary>
     /// 取得底層的 ODF 節點。
