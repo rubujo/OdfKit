@@ -237,9 +237,9 @@ public partial class OdfTableSheet
     /// <returns>已使用儲存格列舉。</returns>
     public IEnumerable<OdfCell> GetUsedCells()
     {
-        foreach ((OdfNode node, int row, int column) in EnumerateExistingCells())
+        foreach ((OdfNode node, int row, int column) in OdfTableSheetDomAccessEngine.EnumerateExistingCells(TableNode))
         {
-            if (IsUsedCell(node))
+            if (OdfTableSheetDomAccessEngine.IsUsedCell(node))
             {
                 yield return new OdfCell(node, row, column, _doc);
             }

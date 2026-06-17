@@ -139,13 +139,19 @@
 - [x] `OdfDocumentMergeCollaborators` 協作存取器
 - [x] `OdfDocument.Merging` 收斂為薄門面
 
-## 剩餘工作（Phase 18+）
+## Phase 18（已完成）
+
+- [x] `OdfTableSheetDomAccessEngine`（列／欄／儲存格 DOM 存取與列舉）
+- [x] `OdfTableSheetRepeatSplitEngine`（重複列／欄／儲存格拆分）
+- [x] `OdfTableSheetMutationContext` 改委派 DomAccessEngine
+- [x] `OdfTableSheet.Internals`／`Internals.CellAccess` 收斂為薄門面
+
+## 剩餘工作（Phase 19+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `OdfTableSheet` | ~1185 | `Internals`、核心工作表邏輯 |
-| `OdfPackage` | ~900 | 公開 API 項目讀寫（需保留薄門面） |
 | `OdfDocument` | ~1200 | Helpers／Metadata／Lifecycle |
+| `OdfPackage` | ~900 | 公開 API 項目讀寫（需保留薄門面） |
 | `OdfElement` | ~640 | Wrapper partial（typed DOM 元素，低優先） |
 
 ## 驗證

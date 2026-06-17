@@ -1,5 +1,4 @@
-﻿using OdfKit.Core;
-using OdfKit.DOM;
+﻿using OdfKit.DOM;
 
 namespace OdfKit.Spreadsheet;
 
@@ -19,16 +18,16 @@ internal readonly struct OdfTableSheetMutationContext
     internal string SheetName => _sheet.Name;
 
     internal OdfNode GetOrCreateRow(int row, bool forWrite) =>
-        _sheet.GetOrCreateRowNodeInternal(row, forWrite);
+        OdfTableSheetDomAccessEngine.GetOrCreateRowNode(TableNode, row, forWrite);
 
     internal OdfNode GetOrCreateColumn(int col) =>
-        _sheet.GetOrCreateColumnNode(col);
+        OdfTableSheetDomAccessEngine.GetOrCreateColumnNode(TableNode, col);
 
     internal System.Collections.Generic.List<OdfNode> GetRowsList() =>
-        _sheet.GetRowsList();
+        OdfTableSheetDomAccessEngine.GetRowsList(TableNode);
 
     internal System.Collections.Generic.List<OdfNode> GetCellsInRow(OdfNode rowNode) =>
-        _sheet.GetCellsInRow(rowNode);
+        OdfTableSheetDomAccessEngine.GetCellsInRow(rowNode);
 
     internal OdfCell GetCell(int row, int col) => _sheet.GetCell(row, col);
 }
