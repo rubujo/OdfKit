@@ -253,6 +253,18 @@ public partial class PresentationDocument
     public IReadOnlyList<OdfSlideAnimationInfo> GetAnimations() =>
         PresentationDocumentAnimationReadEngine.GetAnimations(this);
 
+    /// <summary>
+    /// 取得簡報中所有投影片的預留位置摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfSlidePlaceholderInfo> GetPlaceholderInfos() =>
+        PresentationDocumentPlaceholderReadEngine.GetPlaceholders(this);
+
+    /// <summary>
+    /// 取得簡報中所有含內容的主講人備忘錄摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfSlideSpeakerNotesInfo> GetSpeakerNotes() =>
+        PresentationDocumentSpeakerNotesReadEngine.GetSpeakerNotes(this);
+
     #endregion
 
 }

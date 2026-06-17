@@ -399,6 +399,14 @@ public class TextHighLevelApiTests
         Assert.Contains("這是腳注內容", contentXml);
         Assert.Contains("text:note-class=\"endnote\"", contentXml);
         Assert.Contains("這是尾注內容", contentXml);
+
+        OdfFootnoteInfo footnote = Assert.Single(document.GetFootnotes());
+        Assert.Equal("1", footnote.Citation);
+        Assert.Equal("這是腳注內容", footnote.BodyText);
+
+        OdfFootnoteInfo endnote = Assert.Single(document.GetEndnotes());
+        Assert.Equal("i", endnote.Citation);
+        Assert.Equal("這是尾注內容", endnote.BodyText);
     }
 
     /// <summary>

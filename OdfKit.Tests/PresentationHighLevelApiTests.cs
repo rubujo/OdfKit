@@ -126,6 +126,33 @@ public class PresentationHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="PresentationDocument.GetPlaceholderInfos"/> 與 <see cref="PresentationDocument.GetSpeakerNotes"/> 可讀回投影片內容。
+    /// </summary>
+    [Fact]
+    public void GetPlaceholderInfosAndSpeakerNotes_RoundTripsAfterAdd()
+    {
+        using var document = PresentationDocument.Create();
+        OdfSlide slide = document.AddSlide();
+        slide.AddPlaceholder(
+            OdfPlaceholderType.Title,
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("20cm"),
+            OdfLength.Parse("3cm"));
+        slide.SpeakerNotes = "主講人備忘錄內容";
+
+        OdfPlaceholderInfo placeholder = Assert.Single(slide.GetPlaceholderInfos());
+        Assert.Equal(OdfPlaceholderType.Title, placeholder.PlaceholderType);
+
+        OdfSlidePlaceholderInfo documentPlaceholder = Assert.Single(document.GetPlaceholderInfos());
+        Assert.Equal(0, documentPlaceholder.SlideIndex);
+        Assert.Equal(OdfPlaceholderType.Title, documentPlaceholder.Placeholder.PlaceholderType);
+
+        OdfSlideSpeakerNotesInfo notes = Assert.Single(document.GetSpeakerNotes());
+        Assert.Equal("主講人備忘錄內容", notes.NotesText);
+    }
+
+    /// <summary>
     /// 驗證投影片切換效果設定與 XML 結構。
     /// </summary>
     [Fact]

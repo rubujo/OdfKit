@@ -104,6 +104,18 @@ public partial class TextDocument
         TextDocumentReferenceMarkReadEngine.GetReferenceMarks(BodyTextRoot);
 
     /// <summary>
+    /// 取得文件中所有腳注的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfFootnoteInfo> GetFootnotes() =>
+        TextDocumentFootnoteReadEngine.GetFootnotes(BodyTextRoot);
+
+    /// <summary>
+    /// 取得文件中所有尾注的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfFootnoteInfo> GetEndnotes() =>
+        TextDocumentFootnoteReadEngine.GetEndnotes(BodyTextRoot);
+
+    /// <summary>
     /// 在指定的段落中新增書籤。
     /// </summary>
     /// <param name="paragraph">目標段落</param>

@@ -24,6 +24,9 @@ internal static class OdfDrawPageShapeReadEngine
     internal static IReadOnlyList<OdfGroupInfo> GetGroups(OdfDrawPage page) =>
         CollectGroups(page.Node, page.Name);
 
+    internal static IReadOnlyList<OdfDrawTextBoxInfo> GetTextBoxes(OdfDrawPage page) =>
+        CollectTextBoxes(page.Node, page.Name);
+
     private static List<OdfPathInfo> CollectPaths(OdfNode parent, string pageName)
     {
         List<OdfPathInfo> paths = [];
@@ -146,6 +149,73 @@ internal static class OdfDrawPageShapeReadEngine
 
             CollectGroupsRecursive(child, pageName, groups);
         }
+    }
+
+    private static List<OdfDrawTextBoxInfo> CollectTextBoxes(OdfNode parent, string pageName)
+    {
+        List<OdfDrawTextBoxInfo> textBoxes = [];
+        WalkDrawingNodes(parent, node =>
+        {
+            if (!ContainsDescendant(node, "text-box", OdfNamespaces.Draw))
+                return;
+
+            textBoxes.Add(new OdfDrawTextBoxInfo(
+                pageName,
+                node.GetAttribute("id", OdfNamespaces.Draw) ?? string.Empty,
+                ExtractTextBoxContent(node),
+                node.GetAttribute("x", OdfNamespaces.Svg),
+                node.GetAttribute("y", OdfNamespaces.Svg),
+                node.GetAttribute("width", OdfNamespaces.Svg),
+                node.GetAttribute("height", OdfNamespaces.Svg)));
+        });
+
+        return textBoxes;
+    }
+
+    private static string ExtractTextBoxContent(OdfNode container)
+    {
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName is "text-box" &&
+                child.NamespaceUri == OdfNamespaces.Draw)
+            {
+                foreach (OdfNode paragraph in child.Children)
+                {
+                    if (paragraph.NodeType is OdfNodeType.Element &&
+                        paragraph.LocalName is "p" &&
+                        paragraph.NamespaceUri == OdfNamespaces.Text)
+                        return paragraph.TextContent ?? string.Empty;
+                }
+            }
+
+            if (child.NodeType is OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Draw)
+            {
+                string nested = ExtractTextBoxContent(child);
+                if (!string.IsNullOrEmpty(nested))
+                    return nested;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private static bool ContainsDescendant(OdfNode node, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+                return true;
+
+            if (child.NodeType is OdfNodeType.Element &&
+                child.NamespaceUri == OdfNamespaces.Draw &&
+                ContainsDescendant(child, localName, namespaceUri))
+                return true;
+        }
+
+        return false;
     }
 
     private static void WalkDrawingNodes(OdfNode parent, System.Action<OdfNode> visit)

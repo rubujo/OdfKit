@@ -270,6 +270,24 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetPrintAreas"/> 可讀回各工作表列印範圍。
+    /// </summary>
+    [Fact]
+    public void GetPrintAreas_RoundTripsAfterSet()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Report");
+        sheet.SetPrintArea(new OdfCellRange(0, 0, 9, 4));
+
+        Assert.Single(document.GetPrintAreas());
+        OdfSheetPrintAreaInfo area = document.GetPrintAreas()[0];
+        Assert.Equal("Report", area.SheetName);
+        Assert.True(area.TryGetRange(out OdfCellRange range));
+        Assert.Equal(9, range.EndAddress.Row);
+        Assert.Equal(4, range.EndAddress.Column);
+    }
+
+    /// <summary>
     /// 驗證列印範圍、標題列欄、分頁符與縮放設定會寫入 ODS XML。
     /// </summary>
     [Fact]

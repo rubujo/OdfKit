@@ -270,6 +270,32 @@ public class DrawingHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfDrawPage.GetTextBoxes"/> 可讀回已建立的文字方塊。
+    /// </summary>
+    [Fact]
+    public void GetTextBoxes_RoundTripsAfterAdd()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("標籤頁");
+        page.AddTextBox(
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("8cm"),
+            OdfLength.Parse("3cm"),
+            "流程圖標籤");
+
+        IReadOnlyList<OdfDrawTextBoxInfo> textBoxes = page.GetTextBoxes();
+        Assert.Single(textBoxes);
+        OdfDrawTextBoxInfo info = textBoxes[0];
+        Assert.Equal("標籤頁", info.PageName);
+        Assert.Equal("流程圖標籤", info.Text);
+        Assert.True(info.TryGetWidth(out OdfLength width));
+        Assert.Equal(OdfLength.Parse("8cm").ToPoints(), width.ToPoints(), 0.001);
+
+        Assert.Single(document.GetTextBoxes());
+    }
+
+    /// <summary>
     /// 驗證新增自定義圖形 (AddCustomShape) API 的建立與幾何節點結構。
     /// </summary>
     [Fact]

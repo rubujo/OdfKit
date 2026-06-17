@@ -175,6 +175,12 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// 取得投影片中所有預留位置的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfPlaceholderInfo> GetPlaceholderInfos() =>
+        OdfSlidePlaceholderReadEngine.GetPlaceholders(this);
+
+    /// <summary>
     /// 取得投影片中所有預留位置的唯讀清單。
     /// </summary>
     public IReadOnlyList<OdfPlaceholder> Placeholders

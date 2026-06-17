@@ -56,6 +56,12 @@ public partial class SpreadsheetDocument
         SpreadsheetDocumentDatabaseRangeReadEngine.GetDatabaseRanges(this);
 
     /// <summary>
+    /// 取得試算表中所有已設定列印範圍的工作表摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfSheetPrintAreaInfo> GetPrintAreas() =>
+        SpreadsheetDocumentPrintAreaReadEngine.GetPrintAreas(this);
+
+    /// <summary>
     /// 新增命名範圍。
     /// </summary>
     /// <param name="name">命名範圍的名稱</param>
