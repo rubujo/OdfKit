@@ -25,10 +25,10 @@ namespace OdfKit.Tests
                 writer.WriteStartSheet("Sheet1");
                 // 1. Pass non-default column width
                 writer.WriteColumn(OdfLength.FromCentimeters(5.5), "ColStyle");
-                
+
                 // 2. Pass height and optimal height to row
                 writer.WriteStartRow(height: 15.0, styleName: "RowStyle", useOptimalHeight: true);
-                
+
                 writer.WriteCell("Value");
                 writer.WriteEndRow();
                 writer.WriteEndSheet();
@@ -48,7 +48,7 @@ namespace OdfKit.Tests
             Assert.DoesNotContain("5.5", xml);
             Assert.DoesNotContain("15", xml);
             Assert.DoesNotContain("optimal-row-height", xml);
-            
+
             // Check that styles were written as attributes, even though they aren't defined anywhere
             Assert.Contains("table:style-name=\"ColStyle\"", xml);
             Assert.Contains("table:style-name=\"RowStyle\"", xml);
@@ -58,26 +58,26 @@ namespace OdfKit.Tests
         public void TestOdsStreamWriterStateViolations()
         {
             using var ms = new MemoryStream();
-            
+
             // Writing cells out of order should not crash the writer but will result in invalid ODF XML schema structure.
             using (var writer = new OdsStreamWriter(ms))
             {
                 // Write a cell directly without a sheet or row started
                 writer.WriteCell("OrphanCell1");
-                
+
                 writer.WriteStartSheet("Sheet1");
                 // Write a cell without a row started
                 writer.WriteCell("OrphanCell2");
-                
+
                 writer.WriteStartRow();
                 writer.WriteCell("NormalCell");
                 writer.WriteEndRow();
-                
+
                 // Write a column AFTER starting/ending a row (invalid ODF schema ordering)
                 writer.WriteColumn(OdfLength.FromCentimeters(2.0));
-                
+
                 writer.WriteEndSheet();
-                
+
                 // Write cell after sheet has ended
                 writer.WriteCell("OrphanCell3");
             }
@@ -135,7 +135,7 @@ namespace OdfKit.Tests
             // If the XML list has multiple independent comment threads (multiple roots),
             // verify that it only returns the first root, silently discarding the rest.
             var container = new OdfNode(OdfNodeType.Element, "annotation-list", string.Empty);
-            
+
             var thread1Node = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
             thread1Node.SetAttribute("name", OdfNamespaces.Office, "T1", "office");
             var creator1 = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc") { TextContent = "Author1" };
@@ -155,11 +155,11 @@ namespace OdfKit.Tests
 
             var rootComment = OdfComment.FromXmlNode(container);
             Assert.NotNull(rootComment);
-            
+
             // It parses and returns Thread 1 root, but Thread 2 root is completely lost.
             Assert.Equal("T1", rootComment.Name);
             Assert.Equal("Thread 1 Root", rootComment.Text);
-            
+
             // Confirm thread 2 root is not in replies either
             Assert.Empty(rootComment.Replies);
         }
@@ -193,7 +193,7 @@ namespace OdfKit.Tests
             var rootComment = OdfComment.FromXmlNode(container);
             Assert.NotNull(rootComment);
             Assert.Equal("RootNode", rootComment.Name);
-            
+
             // The orphan node is silently discarded
             Assert.Empty(rootComment.Replies);
         }
@@ -220,7 +220,7 @@ namespace OdfKit.Tests
             // Deserialize
             var parsed = OdfComment.FromXmlNode(xmlNode);
             Assert.NotNull(parsed);
-            
+
             // Check that the chain is still intact
             var check = parsed;
             int count = 0;
@@ -238,7 +238,7 @@ namespace OdfKit.Tests
             // A comment with complex formatting and newlines
             string text = "Line 1\nLine 2\r\nLine 3\n\nLine 4\r\n\r\nLine 5";
             var root = new OdfComment("Author", text);
-            
+
             var xmlNode = root.ToXmlNode();
             Assert.NotNull(xmlNode);
 

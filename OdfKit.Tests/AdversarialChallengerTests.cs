@@ -66,11 +66,11 @@ namespace OdfKit.Tests
             // annotation name="A" annotation-parent="B"
             // annotation name="B" annotation-parent="A"
             var container = new OdfNode(OdfNodeType.Element, "annotation-list", string.Empty);
-            
+
             var aNode = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
             aNode.SetAttribute("name", OdfNamespaces.Office, "A", "office");
             aNode.SetAttribute("annotation-parent", OdfNamespaces.Office, "B", "office");
-            
+
             var bNode = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
             bNode.SetAttribute("name", OdfNamespaces.Office, "B", "office");
             bNode.SetAttribute("annotation-parent", OdfNamespaces.Office, "A", "office");
@@ -98,7 +98,7 @@ namespace OdfKit.Tests
             // Actually, commentsMap["A"] == parsed, commentsMap["B"] == Replies[0].
             // Let's assert:
             Assert.Same(parsed, parsed.Replies[0].Replies[0]); // It is an in-memory object cycle!
-            
+
             // Now, since there is an in-memory object cycle, calling ToXmlNode() on parsed must detect it and throw!
             Assert.Throws<InvalidOperationException>(() => parsed.ToXmlNode());
         }
@@ -133,7 +133,8 @@ namespace OdfKit.Tests
         private int CountOccurrences(OdfNode node, string text)
         {
             int count = 0;
-            if (node.NodeType == OdfNodeType.Text && node.TextContent.Contains(text)) count++;
+            if (node.NodeType == OdfNodeType.Text && node.TextContent.Contains(text))
+                count++;
             foreach (var child in node.Children)
             {
                 count += CountOccurrences(child, text);
@@ -193,7 +194,7 @@ namespace OdfKit.Tests
             // "InnerNormal" (bold span - because bold state from outer span is inherited additively)
             // " StillBold" (bold span)
             Assert.Equal(3, p.Node.Children.Count);
-            
+
             // Let's verify that even "InnerNormal" is marked as bold.
             // To do this, we can check that it has style-name or textrun style settings.
             // Actually, we can check the node content and its properties or style resolution.
@@ -201,7 +202,7 @@ namespace OdfKit.Tests
             using var writeStream = new MemoryStream();
             OdfXmlWriter.Write(p.Node, writeStream, new OdfSaveOptions());
             string xml = Encoding.UTF8.GetString(writeStream.ToArray());
-            
+
             // Both "OuterBold ", "InnerNormal", and " StillBold" are wrapped in <span> elements with a style.
             // We can assert that the span for "InnerNormal" has a style name.
             Assert.Contains("OuterBold", xml);
@@ -223,7 +224,7 @@ namespace OdfKit.Tests
 
             // Verify that the '<' is preserved!
             string plainText = p.Node.TextContent;
-            
+
             // The '<' is preserved because the tokenRegex correctly parses it without loss.
             Assert.Equal("A < B", plainText);
         }
@@ -241,7 +242,7 @@ namespace OdfKit.Tests
             p.AddHtmlFragment(html);
 
             string plainText = p.Node.TextContent;
-            
+
             // The text after '<script>' is entirely ignored because 'inScriptOrStyle' is never reset.
             Assert.Equal("Visible text ", plainText); // Everything after <script> is LOST!
         }
@@ -329,7 +330,7 @@ namespace OdfKit.Tests
             Assert.Contains("D ' E", plainText);
             Assert.Contains("E ' F", plainText);
             Assert.Contains("F ' G", plainText);
-            
+
             // WebUtility.HtmlDecode may or may not decode "&amp" without semicolon, or "&aPoS;".
             // Let's check what they actually evaluate to.
             LogDiagnostics($"Decoded text: {plainText}");
@@ -351,14 +352,14 @@ namespace OdfKit.Tests
             // So "OuterAgain" will NOT be bold in the parser, which is a bug/limitation!
             // Let's verify this behavior:
             Assert.Equal(3, p.Node.Children.Count);
-            
+
             // "Outer " is span (bold)
             // "Inner" is span (bold)
             // " OuterAgain" is text node (NOT bold) because isBold became false!
             Assert.Equal("Outer ", p.Node.Children[0].TextContent);
             Assert.Equal("Inner", p.Node.Children[1].TextContent);
             Assert.Equal(" OuterAgain", p.Node.Children[2].TextContent);
-            
+
             // Children[2] is a text node (plain text), not an element span node.
             Assert.Equal(OdfNodeType.Text, p.Node.Children[2].NodeType);
         }
@@ -367,7 +368,7 @@ namespace OdfKit.Tests
         public void TestOdfCommentMultipleRootsInAnnotationList()
         {
             var container = new OdfNode(OdfNodeType.Element, "annotation-list", string.Empty);
-            
+
             // Root 1
             var root1Node = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
             root1Node.SetAttribute("name", OdfNamespaces.Office, "root1", "office");
@@ -390,7 +391,7 @@ namespace OdfKit.Tests
             // Parsing from container
             var parsed = OdfComment.FromXmlNode(container);
             Assert.NotNull(parsed);
-            
+
             // Only root1 is returned. root2 is ignored/lost.
             Assert.Equal("root1", parsed.Name);
             Assert.Empty(parsed.Replies);
@@ -417,7 +418,7 @@ namespace OdfKit.Tests
             using var writeStream = new MemoryStream();
             OdfXmlWriter.Write(p.Node, writeStream, new OdfSaveOptions());
             string xml = Encoding.UTF8.GetString(writeStream.ToArray());
-            
+
             // Check that it's styled (it should have a style-name)
             Assert.Contains("style-name", xml);
         }

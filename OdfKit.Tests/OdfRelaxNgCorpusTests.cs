@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -39,7 +39,7 @@ public class OdfRelaxNgCorpusTests
     [Fact]
     public void TestTextParagraphWithStyleName()
     {
-        string content = 
+        string content =
             "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
             "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" " +
             "office:version=\"1.4\">" +
@@ -63,7 +63,7 @@ public class OdfRelaxNgCorpusTests
     [Fact]
     public void TestPlainSpanElement()
     {
-        string content = 
+        string content =
             "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
             "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" " +
             "office:version=\"1.4\">" +
@@ -89,7 +89,7 @@ public class OdfRelaxNgCorpusTests
     [Fact]
     public void TestSpanElementWithStyleName()
     {
-        string content = 
+        string content =
             "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
             "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" " +
             "office:version=\"1.4\">" +
@@ -115,7 +115,7 @@ public class OdfRelaxNgCorpusTests
     [Fact]
     public void ValidateComplexSpreadsheetDocumentRngPatterns()
     {
-        string content = 
+        string content =
             "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
             "xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" " +
             "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" " +
@@ -154,7 +154,7 @@ public class OdfRelaxNgCorpusTests
     public void ValidateDrawingElementsRngPatterns()
     {
         // 加上必填的 draw:master-page-name 屬性，且將子元素 text-box 替換為符合 ODF 規格的 text:p
-        string content = 
+        string content =
             "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
             "xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" " +
             "xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\" " +
@@ -184,7 +184,7 @@ public class OdfRelaxNgCorpusTests
     [Fact]
     public void ValidatePageLayoutPropertiesRngPatterns()
     {
-        string content = 
+        string content =
             "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
             "office:version=\"1.4\">" +
             "  <office:body>" +
@@ -192,7 +192,7 @@ public class OdfRelaxNgCorpusTests
             "  </office:body>" +
             "</office:document-content>";
 
-        string styles = 
+        string styles =
             "<office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
             "xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" " +
             "xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" " +

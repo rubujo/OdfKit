@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -186,7 +186,7 @@ public class PackageRoundTripTests
         var docOutput = XDocument.Load(msFlatOutput);
         var binaryData = docOutput.Descendants(OfficeNs + "binary-data").FirstOrDefault();
         Assert.NotNull(binaryData);
-        
+
         string base64Cleaned = binaryData.Value.Replace("\r", "").Replace("\n", "").Replace(" ", "").Replace("\t", "");
         Assert.Equal(Base64Image, base64Cleaned);
     }

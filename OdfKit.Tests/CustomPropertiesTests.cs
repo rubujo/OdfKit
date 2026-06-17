@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.Text;
@@ -134,7 +134,8 @@ public class CustomPropertiesTests
         var all = doc.GetAllCustomProperties();
         int count = 0;
         foreach (var kvp in all)
-            if (kvp.Key == "Title") count++;
+            if (kvp.Key == "Title")
+                count++;
         Assert.Equal(1, count);
     }
 

@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Text;

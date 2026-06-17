@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using OdfKit.Core;
@@ -22,7 +22,7 @@ public class DrawingHighLevelApiTests
     public void AddPathApiWorksCorrectly()
     {
         using var document = DrawingDocument.Create();
-        
+
         var pathData = "M 10 10 L 20 20 Z";
         var shape = document.AddPath(
             pathData,
@@ -76,14 +76,14 @@ public class DrawingHighLevelApiTests
         // 驗證相對坐標 points 屬性與 viewBox
         var viewBox = shape.Node.GetAttribute("viewBox", OdfNamespaces.Svg);
         Assert.NotNull(viewBox);
-        
+
         var pointsStr = shape.Node.GetAttribute("points", OdfNamespaces.Draw);
         Assert.NotNull(pointsStr);
 
         // points 應該是以空白分隔的頂點座標對
         var ptParts = pointsStr.Split(' ');
         Assert.Equal(3, ptParts.Length);
-        
+
         // 第一個頂點為相對 (0,0) 位置
         Assert.Equal("0,0", ptParts[0]);
     }

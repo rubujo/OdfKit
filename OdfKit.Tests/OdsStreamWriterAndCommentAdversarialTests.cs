@@ -25,10 +25,10 @@ namespace OdfKit.Tests
             {
                 writer.WriteStartSheet("Sheet1");
                 writer.WriteStartRow();
-                
+
                 // This should not throw if the implementation is robust to MinValue under any timezone
                 writer.WriteCell(DateTime.MinValue, timezoneNaive: false);
-                
+
                 writer.WriteEndRow();
                 writer.WriteEndSheet();
             }
@@ -55,12 +55,12 @@ namespace OdfKit.Tests
             Assert.True(package.HasEntry("content.xml"));
             using var s = package.GetEntryStream("content.xml");
             var root = OdfXmlReader.Parse(s);
-            
+
             // Find all table-column elements
             var columns = new List<OdfNode>();
             FindNodesByLocalName(root, "table-column", columns);
             Assert.NotEmpty(columns);
-            
+
             var colNode = columns[0];
             string? styleName = colNode.GetAttribute("style-name", OdfNamespaces.Table);
             Assert.Equal("co1", styleName);
@@ -71,11 +71,11 @@ namespace OdfKit.Tests
         {
             // Verify memory usage and performance when writing 1,000,000 cells (100,000 rows x 10 columns)
             var nullStream = Stream.Null;
-            
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
-            
+
             long startMemory = GC.GetTotalMemory(true);
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -100,14 +100,14 @@ namespace OdfKit.Tests
             }
 
             watch.Stop();
-            
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
-            
+
             long endMemory = GC.GetTotalMemory(true);
             long diffMemory = endMemory - startMemory;
-            
+
             // Retained memory increase must be less than 5 MB
             Assert.True(diffMemory < 5 * 1024 * 1024, $"Retained memory increased by {diffMemory / 1024.0 / 1024.0:F2} MB");
             // Must complete within 10 seconds for 1M cells
@@ -123,7 +123,8 @@ namespace OdfKit.Tests
             {
                 // Call WriteCell before WriteStartSheet or WriteStartRow
                 // It should not crash the execution on invocation.
-                var exception = Record.Exception(() => {
+                var exception = Record.Exception(() =>
+                {
                     writer.WriteCell("NoSheetRowCell");
                 });
                 Assert.Null(exception);
@@ -136,7 +137,7 @@ namespace OdfKit.Tests
         public void TestDateTimeMinValueBoundaryXmlWellFormedness()
         {
             using var ms = new MemoryStream();
-            
+
             using (var writer = new OdsStreamWriter(ms))
             {
                 writer.WriteStartSheet("Sheet1");
@@ -149,7 +150,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using var package = OdfPackage.Open(ms);
             using var s = package.GetEntryStream("content.xml");
-            
+
             var exception = Record.Exception(() => OdfXmlReader.Parse(s));
             // In modern .NET (Core/8/10), DateTime boundary conversions are clamped safely.
             // The XML must always be well-formed and parse without exceptions.
@@ -160,7 +161,7 @@ namespace OdfKit.Tests
         public void TestDateTimeMaxValueBoundaryXmlWellFormedness()
         {
             using var ms = new MemoryStream();
-            
+
             using (var writer = new OdsStreamWriter(ms))
             {
                 writer.WriteStartSheet("Sheet1");
@@ -173,7 +174,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using var package = OdfPackage.Open(ms);
             using var s = package.GetEntryStream("content.xml");
-            
+
             var exception = Record.Exception(() => OdfXmlReader.Parse(s));
             // In modern .NET (Core/8/10), DateTime boundary conversions are clamped safely.
             // The XML must always be well-formed and parse without exceptions.
@@ -188,13 +189,13 @@ namespace OdfKit.Tests
             {
                 // Wrong sequence: write cell without starting row/sheet
                 writer.WriteCell("OrphanCell");
-                
+
                 // Write column after writing rows
                 writer.WriteStartSheet("Sheet1");
                 writer.WriteStartRow();
                 writer.WriteCell("Cell");
                 writer.WriteColumn(OdfLength.FromCentimeters(3.0), "col1");
-                
+
                 // End row and sheet multiple times
                 writer.WriteEndRow();
                 writer.WriteEndRow();
@@ -205,7 +206,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using var package = OdfPackage.Open(ms);
             using var s = package.GetEntryStream("content.xml");
-            
+
             // XML should still be structurally well-formed (tags are balanced)
             var exception = Record.Exception(() => OdfXmlReader.Parse(s));
             Assert.Null(exception);
@@ -231,10 +232,10 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Open(ms);
             using var s = package.GetEntryStream("styles.xml");
             var root = OdfXmlReader.Parse(s);
-            
+
             var styles = new List<OdfNode>();
             FindNodesByLocalName(root, "style", styles);
-            
+
             // Count how many style declarations have style:name="custom_col"
             int matchCount = 0;
             foreach (var style in styles)
@@ -306,17 +307,19 @@ namespace OdfKit.Tests
 
             // Serialize
             var xmlNode = root.ToXmlNode();
-            
+
             // Deserialize
             var parsedRoot = OdfComment.FromXmlNode(xmlNode);
-            
+
             // Find left and right replies in the deserialized root
             OdfComment? parsedLeft = null;
             OdfComment? parsedRight = null;
             foreach (var reply in parsedRoot.Replies)
             {
-                if (reply.Text == "Left") parsedLeft = reply;
-                if (reply.Text == "Right") parsedRight = reply;
+                if (reply.Text == "Left")
+                    parsedLeft = reply;
+                if (reply.Text == "Right")
+                    parsedRight = reply;
             }
 
             Assert.NotNull(parsedLeft);
@@ -327,7 +330,7 @@ namespace OdfKit.Tests
             // the DAG is flattened into a tree structure, so the shared reply is only attached to one of the parents.
             Assert.Single(parsedLeft.Replies);
             Assert.Empty(parsedRight.Replies);
-            
+
             Assert.Equal("Bottom", parsedLeft.Replies[0].Text);
         }
 
@@ -338,10 +341,10 @@ namespace OdfKit.Tests
             // We construct two comments with the same Name and serialize/deserialize.
             var root = new OdfComment("Author", "Root", DateTime.UtcNow, "duplicate_id");
             var reply = new OdfComment("Author", "Reply", DateTime.UtcNow, "duplicate_id");
-            
+
             // If we serialize them in a list
             var container = new OdfNode(OdfNodeType.Element, "annotation-list", string.Empty);
-            
+
             var xmlRoot = root.ToXmlNode();
             var xmlReply = reply.ToXmlNode();
             container.AppendChild(xmlRoot);
@@ -389,8 +392,10 @@ namespace OdfKit.Tests
             OdfComment? parsedRight = null;
             foreach (var reply in parsedRoot.Replies)
             {
-                if (reply.Text == "Left") parsedLeft = reply;
-                if (reply.Text == "Right") parsedRight = reply;
+                if (reply.Text == "Left")
+                    parsedLeft = reply;
+                if (reply.Text == "Right")
+                    parsedRight = reply;
             }
 
             Assert.NotNull(parsedLeft);

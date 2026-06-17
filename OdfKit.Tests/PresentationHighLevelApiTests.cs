@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using OdfKit.Core;
@@ -100,7 +100,7 @@ public class PresentationHighLevelApiTests
     {
         using var document = PresentationDocument.Create();
         document.AddSlide();
-        
+
         // 1. 設定切換效果為 Push
         document.SetSlideTransition(0, OdfSlideTransition.Push);
         var slide = document.Slides[0];
@@ -122,7 +122,7 @@ public class PresentationHighLevelApiTests
     {
         using var document = PresentationDocument.Create();
         document.AddSlide();
-        
+
         var def = new OdfMasterPageDefinition
         {
             Name = "CustomMaster",
@@ -137,7 +137,7 @@ public class PresentationHighLevelApiTests
         // 驗證母片樣式 XML 結構
         var masterStyles = document.StylesRoot.Children.FirstOrDefault(c => c.LocalName == "master-styles" && c.NamespaceUri == OdfNamespaces.Office);
         Assert.NotNull(masterStyles);
-        
+
         var pageNode = masterStyles.Children.FirstOrDefault(c => c.LocalName == "master-page" && c.GetAttribute("name", OdfNamespaces.Style) == "CustomMaster");
         Assert.NotNull(pageNode);
 
@@ -166,7 +166,7 @@ public class PresentationHighLevelApiTests
         // 2. 設定版面為 TitleOnly，驗證自動生成一個 Title 預留位置
         document.SetLayout(0, OdfPresentationLayout.TitleOnly);
         Assert.Equal(OdfPresentationLayout.TitleOnly, document.GetLayout(0));
-        
+
         var slide = document.Slides[0];
         Assert.Single(slide.Placeholders);
         Assert.Equal(OdfPlaceholderType.Title, slide.Placeholders[0].PlaceholderType);
@@ -174,7 +174,7 @@ public class PresentationHighLevelApiTests
         // 3. 設定版面為 TitleAndBody，驗證舊預留位置清除並生成 Title 與 Outline 預留位置
         document.SetLayout(0, OdfPresentationLayout.TitleAndBody);
         Assert.Equal(OdfPresentationLayout.TitleAndBody, document.GetLayout(0));
-        
+
         Assert.Equal(2, slide.Placeholders.Count);
         Assert.Contains(slide.Placeholders, p => p.PlaceholderType == OdfPlaceholderType.Title);
         Assert.Contains(slide.Placeholders, p => p.PlaceholderType == OdfPlaceholderType.Outline);

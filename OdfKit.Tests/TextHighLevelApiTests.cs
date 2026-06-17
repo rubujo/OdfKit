@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using OdfKit.Core;
@@ -80,7 +80,7 @@ public class TextHighLevelApiTests
         document.TrackedChanges = true;
 
         var targetDate = new DateTime(2026, 6, 15, 12, 0, 0, DateTimeKind.Utc);
-        
+
         // 模擬一個被刪除的段落節點內容
         var deletedPara = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
         var deletedText = new OdfNode(OdfNodeType.Text, null!, null!, null!) { TextContent = "被刪除的文字內容" };
@@ -104,7 +104,7 @@ public class TextHighLevelApiTests
     {
         using var document = TextDocument.Create();
         var p = document.AddParagraph("書籤測試");
-        
+
         document.AddBookmark(p, "MyTestBookmark");
         document.AddBookmarkReferenceField(p, "MyTestBookmark", "text");
 
@@ -122,7 +122,7 @@ public class TextHighLevelApiTests
     public void SubDocumentReferenceIsInsertedCorrectly()
     {
         using var document = TextDocument.Create();
-        
+
         document.AddSubDocumentReference("SubSec1", "subdocument_1.odt");
 
         var contentXml = SaveAndGetContentXml(document);

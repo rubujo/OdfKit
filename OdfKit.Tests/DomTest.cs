@@ -124,7 +124,8 @@ namespace OdfKit.Tests
         public void TestDigitalSignatures()
         {
             var logs = new List<string>();
-            EventHandler<OdfDiagnosticsEventArgs> logHandler = (sender, e) => {
+            EventHandler<OdfDiagnosticsEventArgs> logHandler = (sender, e) =>
+            {
                 string msg = $"[DIAGNOSTIC] {e.Level}: {e.Message} {(e.Exception != null ? e.Exception.ToString() : "")}";
                 Console.WriteLine(msg);
                 logs.Add(msg);
@@ -168,7 +169,7 @@ namespace OdfKit.Tests
                             using var sr = new StreamReader(s);
                             sigXml = sr.ReadToEnd();
                         }
-                        catch {}
+                        catch { }
                         throw new Exception("Signature verification failed. Logs:\n" + string.Join("\n", logs) + "\nSignature XML:\n" + sigXml);
                     }
                     Assert.Single(certs);
@@ -275,7 +276,8 @@ namespace OdfKit.Tests
                         return child;
                     }
                     var found = FindDescendant(child, localName, namespaceUri);
-                    if (found != null) return found;
+                    if (found != null)
+                        return found;
                 }
                 return null;
             }
@@ -284,7 +286,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Create(new MemoryStream()))
             {
                 var doc = new TextDocument(package);
-                
+
                 // AddHeading
                 var heading = doc.AddHeading("Introduction", 1);
                 Assert.NotNull(heading);
@@ -311,7 +313,7 @@ namespace OdfKit.Tests
                 Assert.NotNull(FindDescendant(p.Node, "time", OdfNamespaces.Text));
                 Assert.NotNull(FindDescendant(p.Node, "author-name", OdfNamespaces.Text));
                 Assert.NotNull(FindDescendant(p.Node, "chapter", OdfNamespaces.Text));
-                
+
                 var seq = FindDescendant(p.Node, "sequence", OdfNamespaces.Text);
                 Assert.NotNull(seq);
                 Assert.Equal("Illustration", seq.GetAttribute("name", OdfNamespaces.Text));
@@ -440,11 +442,11 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms, leaveOpen: true))
             {
                 var doc = new TextDocument(package);
-                
+
                 // Verify MathML frame and object exists
                 var bodyText = doc.BodyTextRoot;
                 Assert.NotNull(bodyText);
-                
+
                 OdfNode? frame = null;
                 foreach (var child in bodyText.Children)
                 {
@@ -585,7 +587,8 @@ namespace OdfKit.Tests
                         return child;
                     }
                     var found = FindElement(child, localName);
-                    if (found != null) return found;
+                    if (found != null)
+                        return found;
                 }
                 return null;
             }
@@ -605,7 +608,7 @@ namespace OdfKit.Tests
             root.Prefix = "o";
             pNode.Prefix = "t";
             pNode.SetAttribute("style-name", OdfNamespaces.Text, "NewStyle", "t"); // 雖然給定 t，但 lookup 依然基於 URI
-            
+
             // 4. 寫回並重新解析驗證，以確保 prefix 獨立性與 unknown elements/attributes 的保留
             using var writeStream = new MemoryStream();
             OdfXmlWriter.Write(root, writeStream, new OdfSaveOptions { IndentXml = true });

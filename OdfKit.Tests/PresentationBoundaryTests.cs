@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -46,7 +46,7 @@ namespace OdfKit.Tests
             {
                 var doc = new PresentationDocument(package);
                 var layout = doc.CreatePresentationPageLayout("BoundaryLayout");
-                
+
                 // Add a placeholder with normal coordinates
                 var ph = layout.AddPlaceholder(OdfPlaceholderType.Subtitle, OdfLength.Parse("2cm"), OdfLength.Parse("3cm"), OdfLength.Parse("12cm"), OdfLength.Parse("4cm"));
                 Assert.Equal("2cm", ph.X?.ToString());
@@ -67,7 +67,7 @@ namespace OdfKit.Tests
                 Assert.Single(layout.Placeholders);
 
                 var ph = layout.Placeholders[0];
-                
+
                 // CRITICAL OBSERVATION: If setting X = null sets it to string.Empty instead of removing it,
                 // then parsing it back returns OdfUnit.Unspecified (value=0) instead of null.
                 // We verify if it returns null or OdfUnit.Unspecified.
@@ -138,7 +138,7 @@ namespace OdfKit.Tests
 
                 // Add thumbnail with negative and zero coordinates
                 notes.AddSlideThumbnail(OdfLength.Parse("-5cm"), OdfLength.Parse("0cm"), OdfLength.Parse("10cm"), OdfLength.Parse("8cm"));
-                
+
                 doc.Save();
             }
 
@@ -232,7 +232,7 @@ namespace OdfKit.Tests
                 Assert.Null(par1.Begin);
 
                 Assert.Equal(2, par1.Children.Count);
-                
+
                 var effect1 = par1.Children[0];
                 Assert.Equal("target1", effect1.TargetElement);
                 Assert.Equal("0.00s", effect1.Dur);
@@ -376,7 +376,7 @@ namespace OdfKit.Tests
             {
                 var doc = new PresentationDocument(package);
                 var slide = doc.AddSlide("Slide1");
-                
+
                 // Add a text box
                 var textBox = slide.AddTextBox(OdfLength.Parse("1cm"), OdfLength.Parse("2cm"), OdfLength.Parse("10cm"), OdfLength.Parse("5cm"), "Sample text");
                 Assert.NotNull(textBox);
@@ -392,7 +392,7 @@ namespace OdfKit.Tests
                 // Create a standalone shape without slide
                 var standaloneShapeNode = new OdfNode(OdfNodeType.Element, "rect", OdfNamespaces.Draw, "draw");
                 var standaloneShape = new OdfShape(standaloneShapeNode, doc);
-                
+
                 // Animating a shape without slide should throw InvalidOperationException
                 Assert.Throws<InvalidOperationException>(() => standaloneShape.Animate(OdfAnimationType.FadeIn, OdfLength.FromInches(1), OdfLength.FromInches(0)));
 

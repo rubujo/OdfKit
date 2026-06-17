@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -50,7 +50,8 @@ namespace OdfKit.Tests
                     }
                     finally
                     {
-                        if (File.Exists(outPath)) File.Delete(outPath);
+                        if (File.Exists(outPath))
+                            File.Delete(outPath);
                     }
                 }, TestContext.Current.CancellationToken));
             }
@@ -78,7 +79,7 @@ namespace OdfKit.Tests
 
             string? sandboxDir = null;
             TimeoutException? caughtTimeout = null;
-            
+
             sandboxDir = await CaptureSandboxDirAsync(() =>
             {
                 caughtTimeout = Assert.Throws<TimeoutException>(() =>
@@ -96,7 +97,9 @@ namespace OdfKit.Tests
             bool isLeaked = Directory.Exists(sandboxDir);
             if (isLeaked)
             {
-                try { Directory.Delete(sandboxDir, true); } catch { }
+                try
+                { Directory.Delete(sandboxDir, true); }
+                catch { }
             }
 
             Assert.False(isLeaked, $"Vulnerability: Sandbox directory '{sandboxDir}' was leaked on timeout.");
@@ -127,14 +130,16 @@ namespace OdfKit.Tests
             });
 
             Assert.NotNull(sandboxDir);
-            
+
             // Wait a brief moment
             Thread.Sleep(500);
 
             bool isLeaked = Directory.Exists(sandboxDir);
             if (isLeaked)
             {
-                try { Directory.Delete(sandboxDir, true); } catch { }
+                try
+                { Directory.Delete(sandboxDir, true); }
+                catch { }
             }
 
             Assert.False(isLeaked, $"Vulnerability: Sandbox directory '{sandboxDir}' was leaked on process exit code error.");
@@ -174,7 +179,8 @@ namespace OdfKit.Tests
             bool foundMerged = arguments.Contains("pdf-delay --foo=bar");
             Assert.True(foundMerged, "Expected format to be passed as a single argument containing space.");
 
-            if (File.Exists(outPath)) File.Delete(outPath);
+            if (File.Exists(outPath))
+                File.Delete(outPath);
         }
 
         [Fact]
@@ -213,7 +219,8 @@ namespace OdfKit.Tests
                         var dirs = Directory.GetDirectories(tempPath, searchPattern);
                         foreach (var dir in dirs)
                         {
-                            if (existingDirs.Contains(dir)) continue;
+                            if (existingDirs.Contains(dir))
+                                continue;
 
                             string argsFile = Path.Combine(dir, "arguments.txt");
                             if (File.Exists(argsFile))
@@ -241,7 +248,8 @@ namespace OdfKit.Tests
                         }
                     }
                     catch { }
-                    if (detectedDir != null) break;
+                    if (detectedDir != null)
+                        break;
                     await Task.Delay(10);
                 }
             }, TestContext.Current.CancellationToken);
@@ -271,13 +279,16 @@ namespace OdfKit.Tests
             bool isLeaked = Directory.Exists(detectedDir);
             if (isLeaked)
             {
-                try { Directory.Delete(detectedDir, true); } catch { }
+                try
+                { Directory.Delete(detectedDir, true); }
+                catch { }
             }
 
             // Assert that the sandbox directory was leaked on active lock during cleanup
             Assert.True(isLeaked, "Expected sandbox directory to be leaked when a file handle lock was active during cleanup.");
 
-            if (File.Exists(outPath)) File.Delete(outPath);
+            if (File.Exists(outPath))
+                File.Delete(outPath);
         }
 
         [Fact]
@@ -307,7 +318,7 @@ namespace OdfKit.Tests
                 {
                     renderer.Convert(doc, outPath, formatWithInjection);
                 }
-                catch {}
+                catch { }
             }, args => args.Any(arg => arg.Contains("InjectedDir")));
 
             Assert.NotEmpty(arguments);
@@ -316,7 +327,8 @@ namespace OdfKit.Tests
             bool hasInjectedArg = arguments.Contains("--outdir") && arguments.Contains("C:\\InjectedDir") && arguments.IndexOf("--outdir") != arguments.LastIndexOf("--outdir");
             Assert.False(hasInjectedArg, "Expected argument injection to be prevented.");
 
-            if (File.Exists(outPath)) File.Delete(outPath);
+            if (File.Exists(outPath))
+                File.Delete(outPath);
         }
 
         [Fact]
@@ -346,7 +358,7 @@ namespace OdfKit.Tests
                 {
                     renderer.Convert(doc, outPath, formatWithInjection);
                 }
-                catch {}
+                catch { }
             }, args => args.Any(arg => arg.Contains("InjectedDir")));
 
             Assert.NotEmpty(arguments);
@@ -356,7 +368,8 @@ namespace OdfKit.Tests
             Assert.True(arguments.Count >= 4, "Expected at least 4 arguments.");
             Assert.Contains("InjectedDir", arguments[3]);
 
-            if (File.Exists(outPath)) File.Delete(outPath);
+            if (File.Exists(outPath))
+                File.Delete(outPath);
         }
 
         private static void LogDebug(string message)
@@ -366,7 +379,7 @@ namespace OdfKit.Tests
                 string logPath = Path.Combine(Path.GetTempPath(), "OdfKit_test_debug_log.txt");
                 File.AppendAllText(logPath, $"[{DateTime.UtcNow:O}] {message}\n");
             }
-            catch {}
+            catch { }
         }
 
         private async Task<string?> CaptureSandboxDirAsync(Action runAction)
@@ -390,7 +403,8 @@ namespace OdfKit.Tests
                         var dirs = Directory.GetDirectories(tempPath, searchPattern);
                         foreach (var dir in dirs)
                         {
-                            if (existingDirs.Contains(dir)) continue;
+                            if (existingDirs.Contains(dir))
+                                continue;
 
                             if (Directory.Exists(Path.Combine(dir, "profile")))
                             {
@@ -404,7 +418,8 @@ namespace OdfKit.Tests
                     {
                         LogDebug($"CaptureSandboxDirAsync watcher exception: {ex.Message}");
                     }
-                    if (detectedDir != null) break;
+                    if (detectedDir != null)
+                        break;
                     await Task.Delay(10);
                 }
                 LogDebug("CaptureSandboxDirAsync watcher finished");
@@ -455,7 +470,8 @@ namespace OdfKit.Tests
                         var dirs = Directory.GetDirectories(tempPath, searchPattern);
                         foreach (var dir in dirs)
                         {
-                            if (existingDirs.Contains(dir)) continue;
+                            if (existingDirs.Contains(dir))
+                                continue;
 
                             string argsFile = Path.Combine(dir, "arguments.txt");
                             if (File.Exists(argsFile))
@@ -484,7 +500,8 @@ namespace OdfKit.Tests
                                             lockStream = null;
                                         }
                                     }
-                                    if (capturedArgs != null) break;
+                                    if (capturedArgs != null)
+                                        break;
                                 }
                                 catch (Exception ex)
                                 {
@@ -502,7 +519,8 @@ namespace OdfKit.Tests
                     {
                         LogDebug($"Exception listing directories: {ex.Message}");
                     }
-                    if (capturedArgs != null) break;
+                    if (capturedArgs != null)
+                        break;
                     await Task.Delay(10);
                 }
                 LogDebug("Watcher task finished");
@@ -532,7 +550,9 @@ namespace OdfKit.Tests
 
             if (detectedDir != null && Directory.Exists(detectedDir))
             {
-                try { Directory.Delete(detectedDir, true); } catch { }
+                try
+                { Directory.Delete(detectedDir, true); }
+                catch { }
             }
 
             LogDebug($"CaptureArgumentsAsync finished, returning {(capturedArgs != null ? capturedArgs.Count.ToString() : "null")} arguments");
@@ -613,7 +633,8 @@ namespace OdfKit.Tests
             }
             finally
             {
-                if (File.Exists(outPath)) File.Delete(outPath);
+                if (File.Exists(outPath))
+                    File.Delete(outPath);
             }
         }
 
@@ -633,20 +654,20 @@ namespace OdfKit.Tests
             };
 
             string outPath = Path.Combine(Path.GetTempPath(), "OdfKit_Diagnostics_" + Guid.NewGuid().ToString("N") + ".pdf");
-            
+
             // Subscribing to diagnostics event
             OdfDiagnosticsEventArgs? loggedArgs = null;
             EventHandler<OdfDiagnosticsEventArgs> handler = (sender, args) =>
             {
                 loggedArgs = args;
             };
-            
+
             OdfKitDiagnostics.Log += handler;
             try
             {
                 // Format "pdf-simulate-error" will exit with code 1 and output "Simulated soffice error." to stderr
                 var ex = Assert.Throws<InvalidOperationException>(() => renderer.Convert(doc, outPath, "pdf-simulate-error"));
-                
+
                 // Assert that the exception message ONLY reports the exit code, but NOT the actual stderr text
                 Assert.Contains("exited with code 1", ex.Message);
                 Assert.DoesNotContain("Simulated soffice error", ex.Message);
@@ -657,7 +678,8 @@ namespace OdfKit.Tests
             finally
             {
                 OdfKitDiagnostics.Log -= handler;
-                if (File.Exists(outPath)) File.Delete(outPath);
+                if (File.Exists(outPath))
+                    File.Delete(outPath);
             }
         }
 
@@ -669,7 +691,7 @@ namespace OdfKit.Tests
 
             int parallelCount = 20;
             var tasks = new List<Task>();
-            
+
             var tempPath = Path.GetTempPath();
             var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
@@ -691,7 +713,7 @@ namespace OdfKit.Tests
                     };
 
                     string outPath = Path.Combine(Path.GetTempPath(), $"OdfKit_Stress_Out_{index}_" + Guid.NewGuid().ToString("N") + ".pdf");
-                    
+
                     int scenario = index % 3;
                     try
                     {
@@ -717,7 +739,8 @@ namespace OdfKit.Tests
                     }
                     finally
                     {
-                        if (File.Exists(outPath)) File.Delete(outPath);
+                        if (File.Exists(outPath))
+                            File.Delete(outPath);
                     }
                 }, TestContext.Current.CancellationToken));
             }
@@ -786,7 +809,7 @@ namespace OdfKit.Tests
             };
 
             string outPath = Path.Combine(Path.GetTempPath(), "OdfKit_Metachar_" + Guid.NewGuid().ToString("N") + ".pdf");
-            
+
             // Injection payload with various shell and control characters
             string formatWithMetachars = "pdf&dir|whoami<input>output%temp% --foo";
 
@@ -796,7 +819,7 @@ namespace OdfKit.Tests
                 {
                     renderer.Convert(doc, outPath, formatWithMetachars);
                 }
-                catch {}
+                catch { }
             }, args => args.Any(arg => arg.Contains("whoami") || arg.Contains("&dir") || arg.Contains("--foo")));
 
             Assert.NotEmpty(arguments);
@@ -823,7 +846,8 @@ namespace OdfKit.Tests
                 Assert.Fail($"Expected format containing shell metacharacters to be passed as a single intact argument. {sb}");
             }
 
-            if (File.Exists(outPath)) File.Delete(outPath);
+            if (File.Exists(outPath))
+                File.Delete(outPath);
         }
     }
 }

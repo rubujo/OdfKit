@@ -21,7 +21,7 @@ namespace OdfKit.Tests
         public void TestOdsStreamWriterDateTimeLimits()
         {
             using var ms = new MemoryStream();
-            
+
             // Test 1: timezoneNaive = true does not convert to UTC and should not throw on MinValue/MaxValue
             using (var writer = new OdsStreamWriter(ms))
             {
@@ -96,7 +96,7 @@ namespace OdfKit.Tests
         {
             using var ms = new MemoryStream();
             using var writer = new OdsStreamWriter(ms);
-            
+
             // Writing a cell without starting a sheet or row does not throw, but generates malformed XML.
             // Let's verify that it executes without exception (but writes invalid nested XML structure).
             writer.WriteCell("OrphanCell");
@@ -127,7 +127,7 @@ namespace OdfKit.Tests
             // Ensure DAG (diamond) configurations are supported and avoid duplicate serialization of same comment.
             var xmlNode = root.ToXmlNode();
             Assert.NotNull(xmlNode);
-            
+
             // Find shared comments in the tree - should only be serialized once (count is 2: 1 for annotation, 1 for p text)
             int count = CountNodesWithText(xmlNode, "Shared");
             Assert.Equal(2, count);
@@ -136,7 +136,8 @@ namespace OdfKit.Tests
         private static int CountNodesWithText(OdfNode node, string text)
         {
             int count = 0;
-            if (node.TextContent == text) count++;
+            if (node.TextContent == text)
+                count++;
             foreach (var child in node.Children)
             {
                 count += CountNodesWithText(child, text);
@@ -151,7 +152,7 @@ namespace OdfKit.Tests
             // The formula translator should NOT split A100_Name, so it remains unchanged, while B2 shifts to B3.
             string formula1 = "=A100_Name + B2";
             string shifted1 = OdfFormulaTranslator.TranslateFormulaOffset(formula1, 1, 0);
-            
+
             Assert.Equal("=A100_Name + B3", shifted1);
 
             // Case 2: identifier looks like cell coordinate (e.g. SUM1 or TRUE1)
@@ -168,13 +169,13 @@ namespace OdfKit.Tests
             // Verify streaming high cell count is fast and uses minimal memory growth
             int rowCount = 20000;
             int colCount = 10; // 200,000 cells total
-            
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
             long memoryBefore = GC.GetTotalMemory(true);
-            
+
             var stopwatch = Stopwatch.StartNew();
-            
+
             using (var writer = new OdsStreamWriter(Stream.Null))
             {
                 writer.WriteStartSheet("StressSheet");
@@ -189,16 +190,16 @@ namespace OdfKit.Tests
                 }
                 writer.WriteEndSheet();
             }
-            
+
             stopwatch.Stop();
             GC.Collect();
             GC.WaitForPendingFinalizers();
             long memoryAfter = GC.GetTotalMemory(true);
             long memoryGrowth = memoryAfter - memoryBefore;
-            
+
             // Performance assertion: 200,000 cells should write in less than 2 seconds
             Assert.True(stopwatch.ElapsedMilliseconds < 2000, $"Writing took too long: {stopwatch.ElapsedMilliseconds} ms");
-            
+
             // Memory assertion: memory growth should be minimal (e.g. less than 15 MB) since it is streamed
             // Note: GC memory may fluctuate, so we keep the threshold reasonable, but it should be very low.
             Assert.True(memoryGrowth < 15 * 1024 * 1024, $"Memory growth too high: {memoryGrowth / (1024.0 * 1024.0):F2} MB");
@@ -213,11 +214,11 @@ namespace OdfKit.Tests
             {
                 root.AddReply("Author", $"Reply {i}");
             }
-            
+
             var sw = Stopwatch.StartNew();
             var xmlNode = root.ToXmlNode();
             sw.Stop();
-            
+
             Assert.NotNull(xmlNode);
             Assert.True(sw.ElapsedMilliseconds < 1000, $"Flat replies serialization took too long: {sw.ElapsedMilliseconds} ms");
 
@@ -227,12 +228,12 @@ namespace OdfKit.Tests
             var c2 = new OdfComment("A", "C2");
             var c3 = new OdfComment("A", "C3");
             var c4 = new OdfComment("A", "C4");
-            
+
             c1.AddReply(c2);
             c2.AddReply(c3);
             c3.AddReply(c4);
             c4.AddReply(c2); // cycle back to c2
-            
+
             Assert.Throws<InvalidOperationException>(() => c1.ToXmlNode());
 
             // 3. Deep Nesting Stack Overflow Risk (Review-only stress test)
@@ -247,7 +248,7 @@ namespace OdfKit.Tests
                 current.AddReply(reply);
                 current = reply;
             }
-            
+
             // Serialize and measure depth
             // If it doesn't crash the stack, verify it succeeds.
             var nestedXml = deepRoot.ToXmlNode();
@@ -260,29 +261,29 @@ namespace OdfKit.Tests
             // Construct a mini Odf document package
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
-            
+
             // Create a table with template row
             var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
-            
+
             // Row with placeholder containing repeating collection name and properties
             var row = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
-            
+
             var cell1 = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table");
             var p1 = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
             p1.TextContent = "{{items.Name}}";
             cell1.AppendChild(p1);
-            
+
             // Cell with formula to shift
             var cell2 = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table");
             cell2.SetAttribute("formula", OdfNamespaces.Table, "oooc:=[.A1]+[.B1]");
             var p2 = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
             p2.TextContent = "{{items.Value}}";
             cell2.AppendChild(p2);
-            
+
             row.AppendChild(cell1);
             row.AppendChild(cell2);
             table.AppendChild(row);
-            
+
             // DataSource with 1000 items
             var itemsList = new List<Dictionary<string, object>>();
             for (int i = 0; i < 1000; i++)
@@ -297,25 +298,25 @@ namespace OdfKit.Tests
             {
                 { "items", itemsList }
             };
-            
+
             var engine = new OdfMailMergeEngine(doc);
             var sw = Stopwatch.StartNew();
             engine.Execute(table, dataSource);
             sw.Stop();
-            
+
             // The template row should be removed, and 1000 rows inserted
             Assert.Equal(1000, table.Children.Count);
-            
+
             // Verify correct values and shifted formulas
             var firstMergedRow = table.Children[0];
             Assert.Equal("Item_0", firstMergedRow.Children[0].TextContent);
             Assert.Equal("oooc:=[.A1]+[.B1]", firstMergedRow.Children[1].GetAttribute("formula", OdfNamespaces.Table));
-            
+
             var lastMergedRow = table.Children[999];
             Assert.Equal("Item_999", lastMergedRow.Children[0].TextContent);
             // Formula in row index 999 should be shifted by 999: oooc:=[.A1000]+[.B1000]
             Assert.Equal("oooc:=[.A1000]+[.B1000]", lastMergedRow.Children[1].GetAttribute("formula", OdfNamespaces.Table));
-            
+
             // Verify performance: 1000 rows should merge and shift formulas in < 1 second
             Assert.True(sw.ElapsedMilliseconds < 1000, $"Mail merge took too long: {sw.ElapsedMilliseconds} ms");
         }
@@ -332,7 +333,7 @@ namespace OdfKit.Tests
             // Let's assert what the text content actually becomes to document it.
             // If the bug is present, "< B" might be lost or mangled. We will output this in our report.
             string text1 = p.TextContent;
-            
+
             // Test raw inequality in statement
             p = doc.AddParagraph();
             string html2 = "if (x < y && y > z)";
@@ -381,7 +382,7 @@ namespace OdfKit.Tests
             string html1 = "<script><script>alert(1)</script></script>TextAfter";
             p.AddHtmlFragment(html1);
             string text1 = p.TextContent;
-            
+
             // Script tag without closing tag
             p = doc.AddParagraph();
             string html2 = "Before <script src=unsafe.js alert(1) After";
@@ -397,7 +398,7 @@ namespace OdfKit.Tests
         {
             // Create an XML document containing a cycle: c1 -> c2 -> c1
             var container = new OdfNode(OdfNodeType.Element, "annotation-list", string.Empty);
-            
+
             var c1Node = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
             c1Node.SetAttribute("name", OdfNamespaces.Office, "c1", "office");
             c1Node.SetAttribute("annotation-parent", OdfNamespaces.Office, "c2", "office");

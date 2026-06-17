@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -177,11 +177,13 @@ namespace OdfKit.Tests
             // and the XML structure has to map to one parent.
             // Specifically, only one of the replies should contain the shared comment.
             int totalSharedOccurrences = 0;
-            if (ContainsReply(parsedReply1, "SharedComment")) totalSharedOccurrences++;
-            if (ContainsReply(parsedReply2, "SharedComment")) totalSharedOccurrences++;
+            if (ContainsReply(parsedReply1, "SharedComment"))
+                totalSharedOccurrences++;
+            if (ContainsReply(parsedReply2, "SharedComment"))
+                totalSharedOccurrences++;
 
             LogStressResult($"[OdfComment Diamond] Shared comment occurrences in parsed tree: {totalSharedOccurrences}");
-            
+
             // As per our logic chain, parentMap only retains the last occurrence's parent (reply2)
             // So it should be present in only one parent.
             Assert.Equal(1, totalSharedOccurrences);
@@ -191,7 +193,8 @@ namespace OdfKit.Tests
         {
             foreach (var r in parent.Replies)
             {
-                if (r.Text == text) return true;
+                if (r.Text == text)
+                    return true;
             }
             return false;
         }
@@ -324,7 +327,7 @@ namespace OdfKit.Tests
             LogStressResult($"[OdfMailMerge Stress] Merged {itemsCount} items in {sw.ElapsedMilliseconds} ms.");
 
             Assert.Equal(itemsCount, table.Children.Count);
-            
+
             // Check formula in last row (index 24999 should shift by 24999: oooc:=[.A25000]*1.1)
             Assert.Equal("oooc:=[.A25000]*1.1", table.Children[itemsCount - 1].Children[1].GetAttribute("formula", OdfNamespaces.Table));
 
@@ -345,7 +348,7 @@ namespace OdfKit.Tests
             {
                 File.AppendAllText(logPath, $"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ssZ} - {message}\n");
             }
-            catch {}
+            catch { }
             Console.WriteLine(message);
         }
     }

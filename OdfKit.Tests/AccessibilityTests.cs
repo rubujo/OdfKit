@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using OdfKit.Core;
 using OdfKit.Spreadsheet;
 using OdfKit.Styles;

@@ -123,7 +123,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
             var p = doc.AddParagraph("Initial ");
-            
+
             // Manually build tracked changes DOM structures
             var tcNode = new OdfNode(OdfNodeType.Element, "tracked-changes", OdfNamespaces.Text, "text");
             var changedRegion = new OdfNode(OdfNodeType.Element, "changed-region", OdfNamespaces.Text, "text");
@@ -309,7 +309,7 @@ namespace OdfKit.Tests
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
-            
+
             // Grid-locked page styling for East Asian scripts
             var autoStyles = doc.StylesDom.Children[0];
             var pageLayout = new OdfNode(OdfNodeType.Element, "page-layout", OdfNamespaces.Style, "style");
@@ -334,7 +334,7 @@ namespace OdfKit.Tests
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
-            
+
             // Set font fallback configuration for CJK
             var fontDecls = doc.ContentDom.Children.FirstOrDefault(c => c.LocalName == "font-face-decls" && c.NamespaceUri == OdfNamespaces.Office);
             if (fontDecls == null)
@@ -394,12 +394,12 @@ namespace OdfKit.Tests
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
-            
+
             // Build header/footer and insert MathML
             var styles = doc.StylesDom;
             var masterPage = styles.Descendants().FirstOrDefault(d => d.LocalName == "master-page" && d.NamespaceUri == OdfNamespaces.Style);
             Assert.NotNull(masterPage);
-            
+
             var header = new OdfNode(OdfNodeType.Element, "header", OdfNamespaces.Style, "style");
             var p = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
             header.AppendChild(p);
@@ -457,7 +457,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
             var sheet = doc.AddSheet("Sheet1");
-            
+
             // Named expression definition at spreadsheet-level
             var expressions = new OdfNode(OdfNodeType.Element, "named-expressions", OdfNamespaces.Table, "table");
             var namedRange = new OdfNode(OdfNodeType.Element, "named-range", OdfNamespaces.Table, "table");
@@ -480,7 +480,7 @@ namespace OdfKit.Tests
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
-            
+
             var dbRanges = new OdfNode(OdfNodeType.Element, "database-ranges", OdfNamespaces.Table, "table");
             var dbRange = new OdfNode(OdfNodeType.Element, "database-range", OdfNamespaces.Table, "table");
             dbRange.SetAttribute("name", OdfNamespaces.Table, "MyDatabase", "table");
@@ -503,11 +503,11 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
             var expressions = new OdfNode(OdfNodeType.Element, "named-expressions", OdfNamespaces.Table, "table");
-            
+
             var range1 = new OdfNode(OdfNodeType.Element, "named-range", OdfNamespaces.Table, "table");
             range1.SetAttribute("name", OdfNamespaces.Table, "R1", "table");
             range1.SetAttribute("cell-range-address", OdfNamespaces.Table, "Sheet1.A1", "table");
-            
+
             var range2 = new OdfNode(OdfNodeType.Element, "named-range", OdfNamespaces.Table, "table");
             range2.SetAttribute("name", OdfNamespaces.Table, "R2", "table");
             range2.SetAttribute("cell-range-address", OdfNamespaces.Table, "Sheet1.B2", "table");
@@ -547,7 +547,7 @@ namespace OdfKit.Tests
             var doc = new SpreadsheetDocument(package);
             var sheet = doc.AddSheet("Sheet1");
             sheet.GetCell("A1").RawValue = "10";
-            
+
             var expressions = new OdfNode(OdfNodeType.Element, "named-expressions", OdfNamespaces.Table, "table");
             var namedRange = new OdfNode(OdfNodeType.Element, "named-range", OdfNamespaces.Table, "table");
             namedRange.SetAttribute("name", OdfNamespaces.Table, "TaxRate", "table");
@@ -568,7 +568,7 @@ namespace OdfKit.Tests
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
-            
+
             var dbRanges = new OdfNode(OdfNodeType.Element, "database-ranges", OdfNamespaces.Table, "table");
             var dbRange = new OdfNode(OdfNodeType.Element, "database-range", OdfNamespaces.Table, "table");
             dbRange.SetAttribute("name", OdfNamespaces.Table, "DataToSort", "table");
@@ -597,7 +597,7 @@ namespace OdfKit.Tests
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
-            
+
             var dbRanges = new OdfNode(OdfNodeType.Element, "database-ranges", OdfNamespaces.Table, "table");
             var dbRange = new OdfNode(OdfNodeType.Element, "database-range", OdfNamespaces.Table, "table");
             dbRange.SetAttribute("name", OdfNamespaces.Table, "DataToFilter", "table");
@@ -666,7 +666,7 @@ namespace OdfKit.Tests
             var doc = new SpreadsheetDocument(package);
             var dbRanges = new OdfNode(OdfNodeType.Element, "database-ranges", OdfNamespaces.Table, "table");
             var dbRange = new OdfNode(OdfNodeType.Element, "database-range", OdfNamespaces.Table, "table");
-            
+
             var sort = new OdfNode(OdfNodeType.Element, "sort", OdfNamespaces.Table, "table");
             var key1 = new OdfNode(OdfNodeType.Element, "sort-key", OdfNamespaces.Table, "table");
             key1.SetAttribute("field-number", OdfNamespaces.Table, "0", "table");
@@ -693,7 +693,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
             var sheet = doc.AddSheet("Sheet1");
-            
+
             var dataPilots = new OdfNode(OdfNodeType.Element, "data-pilot-tables", OdfNamespaces.Table, "table");
             var pilotTable = new OdfNode(OdfNodeType.Element, "data-pilot-table", OdfNamespaces.Table, "table");
             pilotTable.SetAttribute("name", OdfNamespaces.Table, "PivotTable1", "table");
@@ -748,7 +748,7 @@ namespace OdfKit.Tests
             var sheet = doc.AddSheet("Sheet1");
             var dataPilots = new OdfNode(OdfNodeType.Element, "data-pilot-tables", OdfNamespaces.Table, "table");
             var pilotTable = new OdfNode(OdfNodeType.Element, "data-pilot-table", OdfNamespaces.Table, "table");
-            
+
             var fields = new OdfNode(OdfNodeType.Element, "data-pilot-field", OdfNamespaces.Table, "table");
             fields.SetAttribute("source-name", OdfNamespaces.Table, "Sales", "table");
             pilotTable.AppendChild(fields);
@@ -796,7 +796,7 @@ namespace OdfKit.Tests
 
             var field = new OdfNode(OdfNodeType.Element, "data-pilot-field", OdfNamespaces.Table, "table");
             field.SetAttribute("orientation", OdfNamespaces.Table, "data", "table");
-            
+
             var function = new OdfNode(OdfNodeType.Element, "data-pilot-subtotal", OdfNamespaces.Table, "table");
             function.SetAttribute("function", OdfNamespaces.Table, "sum", "table");
             field.AppendChild(function);
@@ -841,7 +841,7 @@ namespace OdfKit.Tests
             var doc = new SpreadsheetDocument(package);
             var sheet = doc.AddSheet("Sheet1");
             var range = new OdfCellRange(0, 0, 0, 0, "Sheet1");
-            
+
             sheet.AddConditionalFormat(range, "cell-content() > 10", "Red");
             sheet.AddConditionalFormat(range, "cell-content() < 0", "Blue");
             doc.Save();
@@ -858,7 +858,7 @@ namespace OdfKit.Tests
             var doc = new SpreadsheetDocument(package);
             var sheet = doc.AddSheet("Sheet1");
             var range = new OdfCellRange(1, 1, 1, 1, "Sheet1");
-            
+
             // Build visual cell style mappings
             sheet.AddConditionalFormat(range, "is-true()", "AlertStyle");
             doc.Save();
@@ -1011,7 +1011,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
             var slide = doc.AddSlide("Slide1");
-            
+
             // Build presentation placeholders
             var frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
             frame.SetAttribute("class", OdfNamespaces.Presentation, "title", "presentation");
@@ -1209,7 +1209,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new DrawingDocument(package);
             var page = doc.AddPage("Page1");
-            
+
             var shape = page.AddShape(OdfShapeType.Ellipse, OdfLength.FromCentimeters(0), OdfLength.FromCentimeters(0), OdfLength.FromCentimeters(4), OdfLength.FromCentimeters(4));
             shape.Node.SetAttribute("fill", OdfNamespaces.Draw, "gradient", "draw");
             shape.Node.SetAttribute("fill-gradient-name", OdfNamespaces.Draw, "RedToBlue", "draw");
@@ -1437,7 +1437,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
-            
+
             // Build a very deep nested fraction
             var mathXmlBuilder = new StringBuilder("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mfrac>");
             for (int i = 0; i < 50; i++)
@@ -1474,16 +1474,16 @@ namespace OdfKit.Tests
         {
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
-            
+
             var expressions = new OdfNode(OdfNodeType.Element, "named-expressions", OdfNamespaces.Table, "table");
             var namedRange = new OdfNode(OdfNodeType.Element, "named-range", OdfNamespaces.Table, "table");
-            
+
             // Named range names must not start with numbers or contain spaces in ODF/Excel specs.
             // We verify validation flags it, or custom exceptions are handled.
             namedRange.SetAttribute("name", OdfNamespaces.Table, "1Invalid Name", "table");
             expressions.AppendChild(namedRange);
             doc.SheetsRoot.AppendChild(expressions);
-            
+
             // Validate schema directly to catch invalid naming format
             using var ms = new MemoryStream();
             doc.Package.Save(ms);
@@ -1625,7 +1625,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new PresentationDocument(package);
             var slide = doc.AddSlide("Slide1");
-            
+
             var largeNotes = new string('A', 100000);
             slide.SpeakerNotes = largeNotes;
             doc.Save();
@@ -1697,7 +1697,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
             var h = doc.AddHeading("Tracked Heading", 1);
-            
+
             // Wrap the heading contents in change start/end tags
             var start = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
             start.SetAttribute("change-id", OdfNamespaces.Text, "ch1", "text");
@@ -1757,7 +1757,7 @@ namespace OdfKit.Tests
             var doc = new SpreadsheetDocument(package);
             var sheet = doc.AddSheet("Sheet1");
             var range = new OdfCellRange(0, 0, 0, 0, "Sheet1");
-            
+
             // Conditional format using Named Range TaxRate
             sheet.AddConditionalFormat(range, "cell-content() > TaxRate", "Red");
             doc.Save();
@@ -1774,7 +1774,7 @@ namespace OdfKit.Tests
             var doc = new PresentationDocument(package);
             var slide = doc.AddSlide("Slide1");
             slide.SpeakerNotes = "TOC Reference Section";
-            
+
             // Presentations don't typically host text document TOC elements, but package manifest preservation holds
             doc.Save();
             var reloaded = RoundTrip(doc, p => new PresentationDocument(p));
@@ -1793,7 +1793,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
             doc.GetDefaultPageSetup().WritingMode = OdfWritingMode.TbRl; // CJK vertical writing mode layout
-            
+
             doc.AddTableOfContents(); // TOC
 
             var p1 = doc.AddParagraph("Header Title");
@@ -1816,12 +1816,12 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new SpreadsheetDocument(package);
             var sheet = doc.AddSheet("Finance");
-            
+
             sheet.GetCell("A1").RawValue = "Revenue";
             sheet.GetCell("A2").SetValue(120000.0);
             sheet.GetCell("B1").RawValue = "Expenses";
             sheet.GetCell("B2").SetValue(85000.0);
-            
+
             // 1. Setup named range
             var expressions = new OdfNode(OdfNodeType.Element, "named-expressions", OdfNamespaces.Table, "table");
             var range = new OdfNode(OdfNodeType.Element, "named-range", OdfNamespaces.Table, "table");

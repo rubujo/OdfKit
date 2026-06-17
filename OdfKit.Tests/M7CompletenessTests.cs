@@ -17,25 +17,25 @@ namespace OdfKit.Tests
         {
             // 1. MathML preservation in Flat XML
             string flatXmlTemplate = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><office:document xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:mimetype=\"application/vnd.oasis.opendocument.text\" office:version=\"1.3\"><office:body><office:text/></office:body></office:document>";
-            
+
             using var ms = new MemoryStream(Encoding.UTF8.GetBytes(flatXmlTemplate));
             using (var package = OdfPackage.Open(ms, leaveOpen: true))
             {
                 var doc = new TextDocument(package);
                 var p = doc.AddParagraph("Formula paragraph:");
-                
+
                 string mathMl = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>y</mi><mo>=</mo><mi>x</mi></math>";
                 p.AddFormula(mathMl);
                 using var saveMs = new MemoryStream();
                 doc.SaveToStream(saveMs);
-                
+
                 // Read back saved Flat XML
                 saveMs.Position = 0;
                 using (var loadPackage = OdfPackage.Open(saveMs, leaveOpen: true))
                 {
                     Assert.True(loadPackage.IsFlatXml);
                     var loadDoc = new TextDocument(loadPackage);
-                    
+
                     // Find formula object
                     OdfNode? formulaObjNode = null;
                     foreach (var child in loadDoc.BodyTextRoot.Children)
@@ -58,10 +58,10 @@ namespace OdfKit.Tests
                         }
                     }
                     Assert.NotNull(formulaObjNode);
-                    
+
                     var formulaObj = new OdfFormulaObject(formulaObjNode.Parent!, formulaObjNode, loadDoc);
                     string loadedMathMl = formulaObj.MathMlXmlString;
-                    
+
                     string expected = mathMl.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace("\t", "");
                     string actual = loadedMathMl.Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace("\t", "");
                     Assert.Equal(expected, actual);
@@ -83,7 +83,7 @@ namespace OdfKit.Tests
                 var frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
                 var obj = new OdfNode(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
                 var formulaObj = new OdfFormulaObject(frame, obj, doc);
-                
+
                 Assert.Throws<InvalidOperationException>(() => formulaObj.FormulaFolder = "../Traversal");
                 Assert.Throws<InvalidOperationException>(() => formulaObj.FormulaFolder = "/Absolute");
                 Assert.Throws<InvalidOperationException>(() => formulaObj.FormulaFolder = @"\\UNC\path");
@@ -101,7 +101,7 @@ namespace OdfKit.Tests
                 // 1. Insertion tracking
                 var p = doc.AddParagraph("Initial Text");
                 var run = p.AddTextRun("Formatted Run");
-                
+
                 // 2. Format tracking via direct style-name assignment
                 run.StyleName = "T1";
                 p.StyleName = "P1";
@@ -134,17 +134,18 @@ namespace OdfKit.Tests
                 // Format change test
                 var p = doc.AddParagraph("Format Test");
                 p.StyleName = "OriginalStyle";
-                
+
                 // Verify original style name was registered
                 p.StyleName = "NewStyle"; // triggers format-change revision
 
                 OdfNode? tcNode = null;
                 foreach (var child in doc.BodyTextRoot.Children)
                 {
-                    if (child.LocalName == "tracked-changes") tcNode = child;
+                    if (child.LocalName == "tracked-changes")
+                        tcNode = child;
                 }
                 Assert.NotNull(tcNode);
-                
+
                 string? changeId = null;
                 foreach (var region in tcNode.Children)
                 {
@@ -159,11 +160,12 @@ namespace OdfKit.Tests
                 // Now test Accept Change
                 doc.TrackedChanges = true;
                 p.StyleName = "NewStyle2";
-                
+
                 tcNode = null;
                 foreach (var child in doc.BodyTextRoot.Children)
                 {
-                    if (child.LocalName == "tracked-changes") tcNode = child;
+                    if (child.LocalName == "tracked-changes")
+                        tcNode = child;
                 }
                 Assert.NotNull(tcNode);
 
@@ -182,7 +184,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Create(new MemoryStream()))
             {
                 var doc = new TextDocument(package);
-                
+
                 // Add p1 while TrackedChanges is false, so it's not marked for insertion purging
                 doc.TrackedChanges = false;
                 var p1 = doc.AddParagraph("Para 1");
@@ -200,7 +202,8 @@ namespace OdfKit.Tests
                 bool p2Exists = false;
                 foreach (var child in doc.BodyTextRoot.Children)
                 {
-                    if (child.TextContent == "Para 2") p2Exists = true;
+                    if (child.TextContent == "Para 2")
+                        p2Exists = true;
                 }
                 Assert.False(p2Exists);
 
@@ -259,7 +262,7 @@ namespace OdfKit.Tests
 
                 // 3. CJK Fonts Fallback & Font Face declarations
                 doc.ApplyCjkFontFallback();
-                
+
                 var run = p.AddTextRun("CJK Text");
                 run.SetFont("Arial", "Microsoft JhengHei", "Microsoft JhengHei");
                 run.SetFontSize("12pt", "14pt", "14pt");
@@ -318,7 +321,7 @@ namespace OdfKit.Tests
                 }
             }
             Assert.NotNull(bodyNode);
-            
+
             OdfNode? chartRoot = null;
             foreach (var child in bodyNode.Children)
             {
@@ -329,7 +332,7 @@ namespace OdfKit.Tests
                 }
             }
             Assert.NotNull(chartRoot);
-            
+
             int chartCount = 0;
             foreach (var child in chartRoot.Children)
             {
@@ -376,7 +379,7 @@ namespace OdfKit.Tests
                 }
             }
             Assert.NotNull(bodyNode);
-            
+
             OdfNode? formulaRoot = null;
             foreach (var child in bodyNode.Children)
             {
@@ -387,7 +390,7 @@ namespace OdfKit.Tests
                 }
             }
             Assert.NotNull(formulaRoot);
-            
+
             int mathCount = 0;
             foreach (var child in formulaRoot.Children)
             {

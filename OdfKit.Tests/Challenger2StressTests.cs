@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Security;
@@ -190,7 +190,8 @@ public class Challenger2StressTests
     private static string ReadZipEntry(ZipArchive zip, string entryName)
     {
         var entry = zip.GetEntry(entryName);
-        if (entry is null) return string.Empty;
+        if (entry is null)
+            return string.Empty;
         using var stream = entry.Open();
         using var reader = new StreamReader(stream, Encoding.UTF8);
         return reader.ReadToEnd();

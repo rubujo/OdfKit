@@ -48,7 +48,7 @@ namespace OdfKit.Tests
             // Row 5,000,000, Column 500,000
             var original = new OdfCellAddress(4999999, 499999);
             string excelStr = original.ToExcelString();
-            
+
             var parsed = OdfCellAddress.ParseExcel(excelStr);
             Assert.Equal(original.Row, parsed.Row);
             Assert.Equal(original.Column, parsed.Column);
@@ -74,7 +74,7 @@ namespace OdfKit.Tests
             Assert.Throws<FormatException>(() => OdfCellAddress.ParseExcel("A1$"));
             Assert.Throws<FormatException>(() => OdfCellAddress.ParseExcel("$A$1$1"));
             Assert.Throws<FormatException>(() => OdfCellAddress.ParseExcel("A1:B2"));
-            
+
             // Out of bounds (row 0 or negative rows/columns)
             Assert.Throws<ArgumentOutOfRangeException>(() => OdfCellAddress.ParseExcel("A0"));
             Assert.Throws<FormatException>(() => OdfCellAddress.ParseExcel("A-5")); // '-' is not parsed as digit, throws FormatException
@@ -157,7 +157,7 @@ namespace OdfKit.Tests
         public void TestRangeContainsAndIntersects()
         {
             var range = OdfCellRange.ParseExcel("Sheet1!B2:D4");
-            
+
             // Containment
             Assert.True(range.Contains(OdfCellAddress.ParseExcel("Sheet1!B2")));
             Assert.True(range.Contains(OdfCellAddress.ParseExcel("Sheet1!C3")));
@@ -301,7 +301,7 @@ namespace OdfKit.Tests
             }
 
             string originalExcel = sbExcel.ToString();
-            
+
             // Translate to ODF
             string odfFormula = OdfFormulaTranslator.ExcelToOdfFormula(originalExcel);
             Assert.StartsWith("oooc:=IF([.A1]>0;", odfFormula);
@@ -339,7 +339,7 @@ namespace OdfKit.Tests
             // Excel formula with string literals and double quote escaping
             string excel = "=CONCAT(\"Hello, \"\"world\"\"!\", A1, \" ; [B2] \")";
             string odf = OdfFormulaTranslator.ExcelToOdfFormula(excel);
-            
+
             // Brackets inside string literals should not be parsed as cell references!
             // Let's verify that the translated ODF formula does not convert [B2] into a reference
             Assert.Contains("\" ; [B2] \"", odf);

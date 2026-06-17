@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using OdfKit.Csv;
@@ -84,28 +84,28 @@ public class CsvImportExportTests
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("Sheet1");
-        
+
         // 建立一個有極大 rows-repeated 的 table-row 元素，並附帶一個 active cell
         var tableNS = OdfNamespaces.Table;
         var rowNode = OdfNodeFactory.CreateElement("table-row", tableNS, "table");
         rowNode.SetAttribute("number-rows-repeated", tableNS, "2000000000", "table");
-        
+
         var cellNode = OdfNodeFactory.CreateElement("table-cell", tableNS, "table");
         cellNode.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
-        
+
         var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
         pNode.TextContent = "測試資料";
         cellNode.AppendChild(pNode);
         rowNode.AppendChild(cellNode);
-        
+
         sheet.TableNode.AppendChild(rowNode);
 
         using var ms = new MemoryStream();
         var startTime = DateTime.UtcNow;
-        
+
         // 執行匯出，驗證是否能在合理時間（e.g. 10秒）內返回，且不發生 OutOfMemoryException
         OdfCsvExporter.ExportToStream(workbook, ms);
-        
+
         var elapsed = DateTime.UtcNow - startTime;
         Assert.True(elapsed.TotalSeconds < 10, $"匯出操作花費了 {elapsed.TotalSeconds} 秒，疑似發生無窮迴圈或處理過大重複次數。");
     }

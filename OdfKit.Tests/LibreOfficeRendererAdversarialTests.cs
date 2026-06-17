@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -48,7 +48,8 @@ namespace OdfKit.Tests
                     }
                     finally
                     {
-                        if (File.Exists(outPath)) File.Delete(outPath);
+                        if (File.Exists(outPath))
+                            File.Delete(outPath);
                     }
                 }, TestContext.Current.CancellationToken));
             }
@@ -61,7 +62,8 @@ namespace OdfKit.Tests
             {
                 int finalCount = Process.GetProcessesByName("MockSoffice").Length;
                 leakedCount = finalCount - initialCount;
-                if (leakedCount <= 0) break;
+                if (leakedCount <= 0)
+                    break;
                 Thread.Sleep(500);
             }
 
@@ -93,7 +95,8 @@ namespace OdfKit.Tests
             }
             finally
             {
-                if (File.Exists(outPath)) File.Delete(outPath);
+                if (File.Exists(outPath))
+                    File.Delete(outPath);
             }
         }
 
@@ -101,7 +104,8 @@ namespace OdfKit.Tests
         public void TestStandardErrorCapturedInException()
         {
             string mockSoffice = GetMockSofficePath();
-            if (string.IsNullOrEmpty(mockSoffice)) return;
+            if (string.IsNullOrEmpty(mockSoffice))
+                return;
 
             using var package = OdfPackage.Create(new MemoryStream());
             var doc = new TextDocument(package);
@@ -113,10 +117,10 @@ namespace OdfKit.Tests
             };
 
             string outPath = Path.Combine(Path.GetTempPath(), "OdfKit_Adversarial_Out_" + Guid.NewGuid().ToString("N") + ".pdf");
-            
+
             // Format "pdf-simulate-error" will exit with code 1 and output "Simulated soffice error." to stderr
             var ex = Assert.Throws<InvalidOperationException>(() => renderer.Convert(doc, outPath, "pdf-simulate-error"));
-            
+
             // Assert that the exception message captures the process exit status (since stderr output is not captured by implementation)
             Assert.Contains("exited with code 1", ex.Message);
         }
@@ -155,7 +159,8 @@ namespace OdfKit.Tests
                     }
                     finally
                     {
-                        if (File.Exists(outPath)) File.Delete(outPath);
+                        if (File.Exists(outPath))
+                            File.Delete(outPath);
                     }
                 }, TestContext.Current.CancellationToken));
             }
@@ -196,7 +201,9 @@ namespace OdfKit.Tests
             bool isLeaked = Directory.Exists(sandboxDir);
             if (isLeaked)
             {
-                try { Directory.Delete(sandboxDir, true); } catch { }
+                try
+                { Directory.Delete(sandboxDir, true); }
+                catch { }
             }
 
             Assert.False(isLeaked, $"Vulnerability: Sandbox directory '{sandboxDir}' was leaked on invalid output path failure.");
@@ -225,7 +232,8 @@ namespace OdfKit.Tests
             }
             finally
             {
-                if (File.Exists(outPath)) File.Delete(outPath);
+                if (File.Exists(outPath))
+                    File.Delete(outPath);
             }
         }
 
@@ -248,7 +256,8 @@ namespace OdfKit.Tests
                         var dirs = Directory.GetDirectories(tempPath, searchPattern);
                         foreach (var dir in dirs)
                         {
-                            if (existingDirs.Contains(dir)) continue;
+                            if (existingDirs.Contains(dir))
+                                continue;
 
                             if (Directory.Exists(Path.Combine(dir, "profile")))
                             {
@@ -258,7 +267,8 @@ namespace OdfKit.Tests
                         }
                     }
                     catch { }
-                    if (detectedDir != null) break;
+                    if (detectedDir != null)
+                        break;
                     await Task.Delay(10);
                 }
             });

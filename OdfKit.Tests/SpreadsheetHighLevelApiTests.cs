@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using OdfKit.Core;
@@ -39,7 +39,7 @@ public class SpreadsheetHighLevelApiTests
         stream.Position = 0;
 
         using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
-        
+
         // 1. 驗證 content.xml 內的主框架參照
         using Stream contentStream = package.GetEntryStream("content.xml");
         using var reader = new StreamReader(contentStream);

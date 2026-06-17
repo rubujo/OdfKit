@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 
 namespace OdfKit.Tests;
@@ -15,7 +15,7 @@ public static class MockSofficeFinder
     public static string GetMockSofficePath()
     {
         string baseDir = AppContext.BaseDirectory;
-        
+
         // 優先在測試建置輸出目錄的 MockSoffice 子目錄下尋找
         string[] possiblePaths =
         [

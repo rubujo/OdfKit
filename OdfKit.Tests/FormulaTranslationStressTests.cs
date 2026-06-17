@@ -20,7 +20,7 @@ namespace OdfKit.Tests
             Assert.Null(addr.SheetName);
             Assert.False(addr.IsRowAbsolute);
             Assert.False(addr.IsColumnAbsolute);
-            
+
             Assert.Equal("XFD1048576", addr.ToExcelString());
             Assert.Equal(".XFD1048576", addr.ToOdfString(false));
             Assert.Equal("[.XFD1048576]", addr.ToOdfString(true));
@@ -35,7 +35,7 @@ namespace OdfKit.Tests
             Assert.Null(addr.SheetName);
             Assert.False(addr.IsRowAbsolute);
             Assert.False(addr.IsColumnAbsolute);
-            
+
             Assert.Equal("XFD1048576", addr.ToExcelString());
             Assert.Equal(".XFD1048576", addr.ToOdfString(false));
         }
@@ -109,7 +109,7 @@ namespace OdfKit.Tests
             // Negative rows/columns cannot exist in the standard syntax (hyphen '-' is not a letter or digit)
             Assert.Throws<FormatException>(() => OdfCellAddress.ParseExcel("A-1"));
             Assert.Throws<FormatException>(() => OdfCellAddress.ParseExcel("-A1"));
-            
+
             // Row index must be positive (0 is parsed but throws ArgumentOutOfRangeException in constructor)
             Assert.Throws<ArgumentOutOfRangeException>(() => OdfCellAddress.ParseExcel("A0"));
             Assert.Throws<ArgumentOutOfRangeException>(() => OdfCellAddress.ParseOdf(".A0"));
@@ -305,7 +305,7 @@ namespace OdfKit.Tests
             // Lowercase function names should be normalized to uppercase when followed by '('
             string excelInput = "=sum(a1:b2) + average(c3, d4) + lowercasefunc(1, 2)";
             string expectedOdf = "oooc:=SUM([.A1:.B2]) + AVERAGE([.C3]; [.D4]) + LOWERCASEFUNC(1; 2)";
-            
+
             string odfResult = OdfFormulaTranslator.ExcelToOdfFormula(excelInput);
             Assert.Equal(expectedOdf, odfResult);
 

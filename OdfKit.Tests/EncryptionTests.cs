@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Security;
 using System.Security.Cryptography;
@@ -70,7 +70,7 @@ namespace OdfKit.Tests
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(originalContent), "text/xml");
-                
+
                 package.SaveOptions.Password = password;
                 package.SaveOptions.EncryptionAlgorithm = OdfEncryptionAlgorithm.Aes256;
                 package.Save();
@@ -105,7 +105,7 @@ namespace OdfKit.Tests
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(originalContent), "text/xml");
-                
+
                 package.SaveOptions.Password = password;
                 package.SaveOptions.EncryptionAlgorithm = OdfEncryptionAlgorithm.Aes256;
                 package.Save();
@@ -147,7 +147,7 @@ namespace OdfKit.Tests
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(originalContent), "text/xml");
-                
+
                 package.SaveOptions.Password = password;
                 package.SaveOptions.EncryptionAlgorithm = OdfEncryptionAlgorithm.Blowfish;
                 package.Save();

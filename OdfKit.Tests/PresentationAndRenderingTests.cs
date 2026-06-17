@@ -25,7 +25,7 @@ namespace OdfKit.Tests
         {
             var date = new DateTime(2026, 6, 9, 12, 0, 0, DateTimeKind.Utc);
             var comment = new OdfComment("John Doe", "Parent comment text", date, "comment_id_123");
-            
+
             comment.AddReply("Jane Smith", "First reply text");
             comment.AddReply(new OdfComment("Alice Green", "Second reply text", date.AddMinutes(5), "reply_id_456"));
 
@@ -55,10 +55,10 @@ namespace OdfKit.Tests
             Assert.Equal(comment.Date, roundtrip.Date);
             Assert.Equal(comment.Name, roundtrip.Name);
             Assert.Equal(comment.Replies.Count, roundtrip.Replies.Count);
-            
+
             Assert.Equal(comment.Replies[0].Author, roundtrip.Replies[0].Author);
             Assert.Equal(comment.Replies[0].Text, roundtrip.Replies[0].Text);
-            
+
             Assert.Equal(comment.Replies[1].Author, roundtrip.Replies[1].Author);
             Assert.Equal(comment.Replies[1].Text, roundtrip.Replies[1].Text);
             Assert.Equal(comment.Replies[1].Name, roundtrip.Replies[1].Name);
@@ -76,11 +76,11 @@ namespace OdfKit.Tests
             {
                 var doc = new TextDocument(package);
                 var p = doc.AddParagraph("Intro");
-                
+
                 doc.AddTableOfContents();
                 p.AddPageNumberField();
                 p.AddPageCountField();
-                
+
                 doc.Save();
             }
 
@@ -115,7 +115,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Create(ms, leaveOpen: true))
             {
                 var doc = new TextDocument(package);
-                
+
                 // Construct text:tracked-changes and inline change-start/change-end
                 // Structure:
                 // <text:tracked-changes>
@@ -123,9 +123,9 @@ namespace OdfKit.Tests
                 //   <text:changed-region text:id="ch2"><text:deletion/></text:changed-region>
                 // </text:tracked-changes>
                 // <text:p>Hello <text:change-start text:change-id="ch1"/>inserted text<text:change-end text:change-id="ch1"/> and <text:change-start text:change-id="ch2"/>deleted text<text:change-end text:change-id="ch2"/>.</text:p>
-                
+
                 var trackedChanges = new OdfNode(OdfNodeType.Element, "tracked-changes", OdfNamespaces.Text, "text");
-                
+
                 var cr1 = new OdfNode(OdfNodeType.Element, "changed-region", OdfNamespaces.Text, "text");
                 cr1.SetAttribute("id", OdfNamespaces.Text, "ch1", "text");
                 cr1.AppendChild(new OdfNode(OdfNodeType.Element, "insertion", OdfNamespaces.Text, "text"));
@@ -139,13 +139,13 @@ namespace OdfKit.Tests
                 doc.BodyTextRoot.AppendChild(trackedChanges);
 
                 var p = doc.AddParagraph("Hello ");
-                
+
                 var cs1 = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
                 cs1.SetAttribute("change-id", OdfNamespaces.Text, "ch1", "text");
                 p.Node.AppendChild(cs1);
-                
+
                 p.Node.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = "inserted text" });
-                
+
                 var ce1 = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
                 ce1.SetAttribute("change-id", OdfNamespaces.Text, "ch1", "text");
                 p.Node.AppendChild(ce1);
@@ -174,7 +174,7 @@ namespace OdfKit.Tests
                 Assert.DoesNotContain("deleted text", p.TextContent);
                 Assert.Equal("Hello inserted text and .", p.TextContent);
                 Assert.Null(FindNodeByLocalName(doc.BodyTextRoot, "tracked-changes"));
-                
+
                 doc.Save();
             }
         }
@@ -187,7 +187,7 @@ namespace OdfKit.Tests
             {
                 var doc = new TextDocument(package);
                 var p = doc.AddParagraph();
-                
+
                 string html = "This is <b>bold</b> and <i>italic</i> and <u>underline</u> and <a href=\"http://example.com\">a link</a>.";
                 p.AddHtmlFragment(html);
 
@@ -230,7 +230,7 @@ namespace OdfKit.Tests
             {
                 var doc = new TextDocument(package);
                 var p = doc.AddParagraph();
-                
+
                 string html = "This is <b >bold</b > and <span style=\"font-weight: bold; font-style: italic;\">styled span</span> and <i   >italic</i   > and <em class=\"highlighted\">emphasized</em><br />new line.";
                 p.AddHtmlFragment(html);
 
@@ -341,10 +341,10 @@ namespace OdfKit.Tests
                 var mapNode = FindMapNode(settingsNode, "WorkbookSettings");
                 Assert.NotNull(mapNode);
                 var entry = mapNode.Children[0];
-                
+
                 var structItem = FindConfigItemNode(entry, "StructureProtected");
                 Assert.Equal("true", structItem?.TextContent);
-                
+
                 var keyItem = FindConfigItemNode(entry, "WorkbookProtectionKey");
                 Assert.NotNull(keyItem?.TextContent);
 
@@ -386,13 +386,13 @@ namespace OdfKit.Tests
                 // B2 is covered-table-cell
                 var b2 = sheet.GetCell(1, 1);
                 Assert.Equal("covered-table-cell", b2.Node.LocalName);
-                
+
                 // Top-left is A1, Bottom-right is B2
                 // B2 (row=1, col=1) is bottom and right boundary, so top=None, bottom=1pt, left=None, right=1pt
                 var b2StyleName = b2.Node.GetAttribute("style-name", OdfNamespaces.Table);
                 var b2BorderBottom = doc.StyleEngine.GetStyleProperty(b2StyleName!, "border-bottom", OdfNamespaces.Fo, "table-cell");
                 var b2BorderRight = doc.StyleEngine.GetStyleProperty(b2StyleName!, "border-right", OdfNamespaces.Fo, "table-cell");
-                
+
                 Assert.Equal("1pt solid #000000", b2BorderBottom);
                 Assert.Equal("1pt solid #000000", b2BorderRight);
             }
@@ -406,12 +406,12 @@ namespace OdfKit.Tests
             {
                 var doc = new SpreadsheetDocument(package);
                 var sheet = doc.AddSheet("Sheet1");
-                
+
                 var cell = sheet.GetCell("A1");
                 cell.SetValue("Hello\nWorld\tWide");
                 // DisplayText should preserve formatting and trigger wrap option
                 Assert.Contains("\n", cell.DisplayText);
-                
+
                 var range = OdfCellRange.ParseExcel("A1:A5");
                 sheet.AddConditionalFormat(range, "cell-content() > 5", "MyStyle");
 
@@ -427,10 +427,10 @@ namespace OdfKit.Tests
 
                 var formatsNode = FindNodeByLocalName(sheet.TableNode, "conditional-formats");
                 Assert.NotNull(formatsNode);
-                
+
                 var format = formatsNode.Children[0];
                 Assert.Equal("Sheet1.A1:Sheet1.A5", format.GetAttribute("target-range-address", format.NamespaceUri));
-                
+
                 var condition = format.Children[0];
                 Assert.Equal("cell-content() > 5", condition.GetAttribute("value", condition.NamespaceUri));
                 Assert.Equal("MyStyle", condition.GetAttribute("style-name", condition.NamespaceUri));
@@ -446,11 +446,11 @@ namespace OdfKit.Tests
         {
             using var ms = new MemoryStream();
             var testDate = new DateTime(2026, 6, 9, 8, 30, 0, DateTimeKind.Utc);
-            
+
             using (var writer = new OdsStreamWriter(ms))
             {
                 writer.WriteStartSheet("StreamingSheet");
-                
+
                 writer.WriteColumn(OdfLength.Parse("3cm"));
                 writer.WriteColumn(OdfLength.Parse("4cm"));
 
@@ -514,9 +514,9 @@ namespace OdfKit.Tests
 
                 var s1 = doc.AddSlide("First Slide");
                 s1.SpeakerNotes = "These are speaker notes for slide 1.";
-                
+
                 s1.AddTextBox(OdfLength.Parse("2cm"), OdfLength.Parse("2cm"), OdfLength.Parse("10cm"), OdfLength.Parse("4cm"), "Hello Presentation");
-                
+
                 var shape = s1.AddShape(OdfShapeType.Rectangle, OdfLength.Parse("3cm"), OdfLength.Parse("8cm"), OdfLength.Parse("5cm"), OdfLength.Parse("5cm"));
                 shape.Animate(OdfAnimationType.FadeIn, OdfLength.Parse("1.5in"), OdfLength.Parse("0.5in"));
 
@@ -526,7 +526,7 @@ namespace OdfKit.Tests
 
                 // Manage slides
                 var s3 = doc.AddSlide("Third Slide");
-                
+
                 // Clone slide 0
                 var cloned = doc.CloneSlide(0);
                 Assert.Equal("First Slide_Clone", cloned.Name);
@@ -558,7 +558,7 @@ namespace OdfKit.Tests
                 var s1 = doc.Slides[2];
                 var rectNode = FindNodeByLocalName(s1.Node, "rect");
                 Assert.NotNull(rectNode);
-                
+
                 var seqNode = FindNodeByLocalName(s1.Node, "seq");
                 Assert.NotNull(seqNode);
                 Assert.Equal("main-sequence", seqNode.GetAttribute("node-type", OdfNamespaces.Presentation));
@@ -593,7 +593,7 @@ namespace OdfKit.Tests
             try
             {
                 renderer.Convert(doc, outPath, "pdf");
-                
+
                 Assert.True(File.Exists(outPath));
                 string content = File.ReadAllText(outPath);
                 Assert.Contains("%PDF-1.4", content);
@@ -601,7 +601,8 @@ namespace OdfKit.Tests
             }
             finally
             {
-                if (File.Exists(outPath)) File.Delete(outPath);
+                if (File.Exists(outPath))
+                    File.Delete(outPath);
             }
         }
 
@@ -624,7 +625,7 @@ namespace OdfKit.Tests
             };
 
             string outPath = Path.Combine(Path.GetTempPath(), "OdfKit_Test_Out_" + Guid.NewGuid().ToString("N") + ".pdf");
-            
+
             // Format containing "simulate-timeout" will cause MockSoffice to sleep 5s
             var ex = Assert.Throws<TimeoutException>(() => renderer.Convert(doc, outPath, "pdf-simulate-timeout"));
             Assert.Contains("timed out", ex.Message);
@@ -649,7 +650,7 @@ namespace OdfKit.Tests
             };
 
             string outPath = Path.Combine(Path.GetTempPath(), "OdfKit_Test_Out_" + Guid.NewGuid().ToString("N") + ".pdf");
-            
+
             // Format containing "simulate-error" will cause MockSoffice to exit with code 1
             var ex = Assert.Throws<InvalidOperationException>(() => renderer.Convert(doc, outPath, "pdf-simulate-error"));
             Assert.Contains("exited with code 1", ex.Message);
@@ -766,10 +767,10 @@ namespace OdfKit.Tests
                 var slide = doc.Slides[0];
                 var notes = slide.SpeakerNotesPage;
                 Assert.Equal("Hello speaker notes", notes.SpeakerNotesText);
-                
+
                 // Expect thumbnail and shape
                 Assert.Equal(2, notes.Shapes.Count); // Note frame + shape
-                
+
                 var handout = doc.HandoutPage;
                 Assert.Single(handout.Shapes); // Text box frame
                 Assert.Equal("Handout Header", handout.Shapes[0].Node.TextContent.Trim());
@@ -803,7 +804,7 @@ namespace OdfKit.Tests
                 var doc = new PresentationDocument(package);
                 var slide = doc.Slides[0];
                 var rootSeq = slide.AnimationRoot;
-                
+
                 Assert.Single(rootSeq.Children);
                 var seq = rootSeq.Children[0];
                 Assert.Equal(OdfAnimationNodeType.Sequence, seq.Type);
@@ -828,10 +829,10 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Create(ms, leaveOpen: true))
             {
                 var doc = new PresentationDocument(package);
-                
+
                 var chartDoc = doc.CreateEmbeddedDocument<OdfKit.Chart.OdfChartDocument>("Object 1");
                 Assert.NotNull(chartDoc);
-                
+
                 var formulaDoc = doc.CreateEmbeddedDocument<OdfKit.Formula.OdfFormulaDocument>("Object 2");
                 Assert.NotNull(formulaDoc);
 
@@ -846,7 +847,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms))
             {
                 var doc = new PresentationDocument(package);
-                
+
                 var chartDoc = doc.GetEmbeddedDocument<OdfKit.Chart.OdfChartDocument>("Object 1");
                 Assert.NotNull(chartDoc);
                 Assert.Equal("application/vnd.oasis.opendocument.chart", chartDoc.Package.Manifest["Object 1/"]);
@@ -906,18 +907,21 @@ namespace OdfKit.Tests
 
         private OdfNode? FindNodeByLocalName(OdfNode parent, string name)
         {
-            if (parent.LocalName == name) return parent;
+            if (parent.LocalName == name)
+                return parent;
             foreach (var child in parent.Children)
             {
                 var found = FindNodeByLocalName(child, name);
-                if (found != null) return found;
+                if (found != null)
+                    return found;
             }
             return null;
         }
 
         private void FindNodesByLocalName(OdfNode parent, string name, List<OdfNode> result)
         {
-            if (parent.LocalName == name) result.Add(parent);
+            if (parent.LocalName == name)
+                result.Add(parent);
             foreach (var child in parent.Children)
             {
                 FindNodesByLocalName(child, name, result);
@@ -931,7 +935,8 @@ namespace OdfKit.Tests
                 if (child.LocalName == "config-item-map-named" && child.GetAttribute("name", child.NamespaceUri) == name)
                     return child;
                 var found = FindMapNode(child, name);
-                if (found != null) return found;
+                if (found != null)
+                    return found;
             }
             return null;
         }
@@ -943,7 +948,8 @@ namespace OdfKit.Tests
                 if (child.LocalName == "config-item" && child.GetAttribute("name", child.NamespaceUri) == name)
                     return child;
                 var found = FindConfigItemNode(child, name);
-                if (found != null) return found;
+                if (found != null)
+                    return found;
             }
             return null;
         }

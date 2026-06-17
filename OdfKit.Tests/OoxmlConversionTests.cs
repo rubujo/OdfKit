@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using A = DocumentFormat.OpenXml.Drawing;
@@ -89,7 +89,8 @@ public class OoxmlConversionTests
         bool hasWordDocument = false;
         foreach (var entry in zip.Entries)
         {
-            if (entry.FullName == "word/document.xml") { hasWordDocument = true; break; }
+            if (entry.FullName == "word/document.xml")
+            { hasWordDocument = true; break; }
         }
         Assert.True(hasWordDocument, "DOCX 應包含 word/document.xml");
 

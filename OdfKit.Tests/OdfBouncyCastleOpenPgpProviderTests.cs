@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Security.Cryptography;
 using OdfKit.Core;
@@ -259,7 +259,7 @@ public class OdfBouncyCastleOpenPgpProviderTests
     {
         // 主金鑰：RSA（用於驗證/簽章），加密子金鑰：X25519 ECDH
         var rsaParams = new RsaKeyGenerationParameters(BigInteger.ValueOf(65537), s_rng, 2048, 80);
-        var rsaKpGen  = new RsaKeyPairGenerator();
+        var rsaKpGen = new RsaKeyPairGenerator();
         rsaKpGen.Init(rsaParams);
         var masterPgpKp = new PgpKeyPair(
             PublicKeyAlgorithmTag.RsaGeneral,
@@ -304,12 +304,12 @@ public class OdfBouncyCastleOpenPgpProviderTests
         var recipient = new OdfOpenPgpRecipient
         {
             PublicKey = pubKeyBytes,
-            KeyId     = "ecdh-test",
+            KeyId = "ecdh-test",
             Recipient = "ecdh@odfkit.example",
         };
         byte[] originalKey = RandomSessionKey();
-        byte[] packet      = provider.EncryptSessionKey(originalKey, recipient);
-        byte[] recovered   = provider.DecryptSessionKey(packet, recipient.KeyId);
+        byte[] packet = provider.EncryptSessionKey(originalKey, recipient);
+        byte[] recovered = provider.DecryptSessionKey(packet, recipient.KeyId);
         Assert.Equal(originalKey, recovered);
     }
 
@@ -324,8 +324,8 @@ public class OdfBouncyCastleOpenPgpProviderTests
         for (int i = 0; i < 5; i++)
         {
             byte[] originalKey = RandomSessionKey();
-            byte[] packet      = provider.EncryptSessionKey(originalKey, recipient);
-            byte[] recovered   = provider.DecryptSessionKey(packet, recipient.KeyId);
+            byte[] packet = provider.EncryptSessionKey(originalKey, recipient);
+            byte[] recovered = provider.DecryptSessionKey(packet, recipient.KeyId);
             Assert.Equal(originalKey, recovered);
         }
     }

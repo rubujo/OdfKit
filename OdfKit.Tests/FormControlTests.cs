@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using OdfKit.Core;
 using OdfKit.Forms;
 using OdfKit.Styles;
@@ -12,9 +12,9 @@ namespace OdfKit.Tests;
 /// </summary>
 public class FormControlTests
 {
-    private static readonly OdfLength Cm1  = OdfLength.FromCentimeters(1);
-    private static readonly OdfLength Cm2  = OdfLength.FromCentimeters(2);
-    private static readonly OdfLength Cm4  = OdfLength.FromCentimeters(4);
+    private static readonly OdfLength Cm1 = OdfLength.FromCentimeters(1);
+    private static readonly OdfLength Cm2 = OdfLength.FromCentimeters(2);
+    private static readonly OdfLength Cm4 = OdfLength.FromCentimeters(4);
     private static readonly OdfLength Cm08 = OdfLength.FromCentimeters(0.8);
 
     /// <summary>
@@ -79,8 +79,8 @@ public class FormControlTests
     {
         using var doc = TextDocument.Create();
         doc.AddFormControl(OdfControlType.CheckBox, "chk1", Cm1, Cm1, Cm4, Cm08, "同意");
-        doc.AddFormControl(OdfControlType.TextBox,  "txt1", Cm1, Cm2, Cm4, Cm08, "預設");
-        doc.AddFormControl(OdfControlType.Button,   "btn1", Cm1, Cm1, Cm2, Cm08, "送出");
+        doc.AddFormControl(OdfControlType.TextBox, "txt1", Cm1, Cm2, Cm4, Cm08, "預設");
+        doc.AddFormControl(OdfControlType.Button, "btn1", Cm1, Cm1, Cm2, Cm08, "送出");
 
         var controls = doc.GetFormControls();
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -929,7 +929,7 @@ namespace OdfKit.Tests
             {
                 // Verify package opened correctly as template kind
                 Assert.Equal("application/vnd.oasis.opendocument.text-template", package.MimeType);
-                
+
                 // Perform real-world substitution
                 var doc = new TextDocument(package);
                 doc.ReplaceText("[Name]", "Antigravity Specialist Agent");
@@ -994,7 +994,7 @@ namespace OdfKit.Tests
 
             flatMs.Position = 0;
             var doc = XDocument.Load(flatMs);
-            
+
             // Add actual rich text structures (sections, lists, tables) into office:text body
             var body = doc.Root?.Element(OfficeNs + "body");
             var officeText = body?.Element(OfficeNs + "text");

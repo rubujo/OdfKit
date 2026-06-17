@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -33,7 +33,8 @@ namespace OdfKit.Tests
                         return Evaluator.EvaluateCell(address, this);
                     }
                 }
-                if (CellValues.TryGetValue(address, out var val)) return val;
+                if (CellValues.TryGetValue(address, out var val))
+                    return val;
                 return 0.0;
             }
 
@@ -69,7 +70,8 @@ namespace OdfKit.Tests
 
             public object GetNamedRangeOrExpressionValue(string name)
             {
-                if (NamedValues.TryGetValue(name, out var val)) return val;
+                if (NamedValues.TryGetValue(name, out var val))
+                    return val;
                 return 0.0;
             }
         }
@@ -419,7 +421,7 @@ namespace OdfKit.Tests
             // Modify raw value in context, but do not clear cache
             context.CellValues[a1] = 99.0;
             context.CellFormulas.Remove(a1); // remove formula to simulate change
-            
+
             // Re-evaluating should return the cached 10.0 value
             result = evaluator.EvaluateCell(a1, context);
             Assert.Equal(10.0, result);
@@ -481,7 +483,7 @@ namespace OdfKit.Tests
             // Date/Time Functions
             double dateVal = (new DateTime(2026, 6, 12) - new DateTime(1899, 12, 30)).TotalDays;
             Assert.Equal(dateVal, evaluator.Evaluate("DATE(2026, 6, 12)", context));
-            
+
             var dateCell = OdfCellAddress.ParseExcel("B1");
             context.CellValues[dateCell] = dateVal;
             Assert.Equal(12.0, evaluator.Evaluate("DAY(B1)", context));
@@ -518,15 +520,15 @@ namespace OdfKit.Tests
             context.CellValues[OdfCellAddress.ParseExcel("A10")] = "Name";
             context.CellValues[OdfCellAddress.ParseExcel("B10")] = "Age";
             context.CellValues[OdfCellAddress.ParseExcel("C10")] = "Salary";
-            
+
             context.CellValues[OdfCellAddress.ParseExcel("A11")] = "Alice";
             context.CellValues[OdfCellAddress.ParseExcel("B11")] = 30.0;
             context.CellValues[OdfCellAddress.ParseExcel("C11")] = 1000.0;
-            
+
             context.CellValues[OdfCellAddress.ParseExcel("A12")] = "Bob";
             context.CellValues[OdfCellAddress.ParseExcel("B12")] = 40.0;
             context.CellValues[OdfCellAddress.ParseExcel("C12")] = 2000.0;
-            
+
             context.CellValues[OdfCellAddress.ParseExcel("A13")] = "Charlie";
             context.CellValues[OdfCellAddress.ParseExcel("B13")] = 30.0;
             context.CellValues[OdfCellAddress.ParseExcel("C13")] = 3000.0;
@@ -684,7 +686,7 @@ namespace OdfKit.Tests
             // 7. Date & Time Functions
             double date1 = (new DateTime(2026, 1, 1) - new DateTime(1899, 12, 30)).TotalDays;
             double date2 = (new DateTime(2026, 12, 31) - new DateTime(1899, 12, 30)).TotalDays;
-            
+
             var cellH1 = OdfCellAddress.ParseExcel("H1");
             var cellH2 = OdfCellAddress.ParseExcel("H2");
             context.CellValues[cellH1] = date1;
@@ -760,15 +762,17 @@ namespace OdfKit.Tests
             {
                 // Write a dummy file to pass the exists validation
                 File.WriteAllBytes(dummyPath, new byte[] { 0x00, 0x01, 0x00, 0x00 });
-                
+
                 OdfFontResolver.RegisterFont("MyDummyFont", dummyPath);
-                
+
                 string? resolved = OdfFontResolver.ResolveFontPath("MyDummyFont");
                 Assert.Equal(dummyPath, resolved);
             }
             finally
             {
-                try { File.Delete(dummyPath); } catch {}
+                try
+                { File.Delete(dummyPath); }
+                catch { }
             }
 
             // 2. Test Font Embedding ZIP package writing mock
@@ -776,29 +780,31 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Create(ms, leaveOpen: true))
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.spreadsheet");
-                
+
                 // Construct a mock <style:font-face> node
                 var fontFace = new OdfNode(OdfNodeType.Element, "font-face", OdfNamespaces.Style, "style");
                 fontFace.SetAttribute("name", OdfNamespaces.Style, "Arial");
-                
+
                 // Let's register Arial with a temp file so the resolver will find it during embedding
                 string tempArialPath = Path.Combine(Path.GetTempPath(), "temp_arial.ttf");
                 try
                 {
                     File.WriteAllBytes(tempArialPath, new byte[] { 0x00, 0x01, 0x00, 0x00 });
                     OdfFontResolver.RegisterFont("Arial", tempArialPath);
-                    
+
                     OdfFontResolver.EmbedFonts(package, fontFace, fontFace);
-                    
+
                     // Verify ZIP entry was written
                     Assert.True(package.HasEntry("Fonts/Arial.ttf"));
-                    
+
                     // Verify manifest entry exists
                     Assert.Contains("Fonts/Arial.ttf", package.Manifest.Keys);
                 }
                 finally
                 {
-                    try { File.Delete(tempArialPath); } catch {}
+                    try
+                    { File.Delete(tempArialPath); }
+                    catch { }
                 }
             }
         }
@@ -809,11 +815,11 @@ namespace OdfKit.Tests
             // Create an in-memory package representing a spreadsheet
             using var ms = new MemoryStream();
             var saveOptions = new OdfSaveOptions { EvaluateFormulasOnSave = true };
-            
+
             using (var package = OdfPackage.Create(ms, leaveOpen: true, options: saveOptions))
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.spreadsheet");
-                
+
                 // Construct a simple spreadsheet content.xml with cells and formulas
                 string contentXml = @"<office:document-content 
                     xmlns:office=""urn:oasis:names:tc:opendocument:xmlns:office:1.0"" 
@@ -848,13 +854,13 @@ namespace OdfKit.Tests
             {
                 using var stream = package.GetEntryStream("content.xml");
                 var root = OdfXmlReader.Parse(stream);
-                
+
                 // Let's traverse to find the third cell
                 OdfNode? table = FindNode(root, "table");
                 Assert.NotNull(table);
                 OdfNode? row = FindNode(table, "table-row");
                 Assert.NotNull(row);
-                
+
                 var cells = new List<OdfNode>();
                 foreach (var child in row.Children)
                 {
@@ -863,14 +869,14 @@ namespace OdfKit.Tests
                         cells.Add(child);
                     }
                 }
-                
+
                 Assert.Equal(3, cells.Count);
                 var formulaCell = cells[2];
-                
+
                 // Assert that formula was evaluated to 15.0
                 Assert.Equal("float", formulaCell.GetAttribute("value-type", OdfNamespaces.Office));
                 Assert.Equal("15", formulaCell.GetAttribute("value", OdfNamespaces.Office));
-                
+
                 OdfNode? p = FindNode(formulaCell, "p");
                 Assert.NotNull(p);
                 Assert.Equal("15", p.TextContent);
@@ -882,7 +888,7 @@ namespace OdfKit.Tests
         {
             using var ms = new MemoryStream();
             var saveOptions = new OdfSaveOptions { EmbedUsedFonts = true };
-            
+
             // Register a dummy Arial font path for resolving
             string dummyArialPath = Path.Combine(Path.GetTempPath(), "dummy_save_arial.ttf");
             File.WriteAllBytes(dummyArialPath, new byte[] { 0x00, 0x01, 0x00, 0x00 });
@@ -893,7 +899,7 @@ namespace OdfKit.Tests
                 using (var package = OdfPackage.Create(ms, leaveOpen: true, options: saveOptions))
                 {
                     package.SetMimeType("application/vnd.oasis.opendocument.text");
-                    
+
                     // Simple content.xml with style:font-face Arial
                     string contentXml = @"<office:document-content 
                         xmlns:office=""urn:oasis:names:tc:opendocument:xmlns:office:1.0"" 
@@ -921,7 +927,7 @@ namespace OdfKit.Tests
                     var root = OdfXmlReader.Parse(stream);
                     OdfNode? fontFace = FindNode(root, "font-face");
                     Assert.NotNull(fontFace);
-                    
+
                     OdfNode? uriNode = FindNode(fontFace, "font-face-uri");
                     Assert.NotNull(uriNode);
                     Assert.Equal("Fonts/Arial.ttf", uriNode.GetAttribute("href", OdfNamespaces.XLink));
@@ -929,7 +935,9 @@ namespace OdfKit.Tests
             }
             finally
             {
-                try { File.Delete(dummyArialPath); } catch {}
+                try
+                { File.Delete(dummyArialPath); }
+                catch { }
             }
         }
 
@@ -942,7 +950,8 @@ namespace OdfKit.Tests
             foreach (var child in parent.Children)
             {
                 var found = FindNode(child, name);
-                if (found != null) return found;
+                if (found != null)
+                    return found;
             }
             return null;
         }
@@ -955,51 +964,51 @@ namespace OdfKit.Tests
             using (var ms = new MemoryStream())
             {
                 using (var package = OdfPackage.Create(ms, leaveOpen: true))
-            {
-                var doc = new SpreadsheetDocument(package);
-                var sheet = doc.AddSheet("VisibilitySheet");
-                
-                sheet.SetRowVisible(0, false);
-                sheet.SetRowVisible(1, true);
-
-                sheet.SetColumnVisible(0, false);
-                sheet.SetColumnVisible(1, true);
-
-                doc.Save();
-            }
-
-            ms.Position = 0;
-            using (var package = OdfPackage.Open(ms, leaveOpen: true))
-            {
-                var doc = new SpreadsheetDocument(package);
-                var sheet = doc.GetSheet("VisibilitySheet");
-                Assert.NotNull(sheet);
-
-                // Let's check row visibility
-                var rows = new List<OdfNode>();
-                foreach (var child in sheet.TableNode.Children)
                 {
-                    if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
-                        rows.Add(child);
+                    var doc = new SpreadsheetDocument(package);
+                    var sheet = doc.AddSheet("VisibilitySheet");
+
+                    sheet.SetRowVisible(0, false);
+                    sheet.SetRowVisible(1, true);
+
+                    sheet.SetColumnVisible(0, false);
+                    sheet.SetColumnVisible(1, true);
+
+                    doc.Save();
                 }
 
-                Assert.True(rows.Count > 1);
-                Assert.Equal("collapse", rows[0].GetAttribute("visibility", OdfNamespaces.Table));
-                Assert.Equal("visible", rows[1].GetAttribute("visibility", OdfNamespaces.Table));
-
-                // Check column visibility
-                var cols = new List<OdfNode>();
-                foreach (var child in sheet.TableNode.Children)
+                ms.Position = 0;
+                using (var package = OdfPackage.Open(ms, leaveOpen: true))
                 {
-                    if (child.LocalName == "table-column" && child.NamespaceUri == OdfNamespaces.Table)
-                        cols.Add(child);
+                    var doc = new SpreadsheetDocument(package);
+                    var sheet = doc.GetSheet("VisibilitySheet");
+                    Assert.NotNull(sheet);
+
+                    // Let's check row visibility
+                    var rows = new List<OdfNode>();
+                    foreach (var child in sheet.TableNode.Children)
+                    {
+                        if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
+                            rows.Add(child);
+                    }
+
+                    Assert.True(rows.Count > 1);
+                    Assert.Equal("collapse", rows[0].GetAttribute("visibility", OdfNamespaces.Table));
+                    Assert.Equal("visible", rows[1].GetAttribute("visibility", OdfNamespaces.Table));
+
+                    // Check column visibility
+                    var cols = new List<OdfNode>();
+                    foreach (var child in sheet.TableNode.Children)
+                    {
+                        if (child.LocalName == "table-column" && child.NamespaceUri == OdfNamespaces.Table)
+                            cols.Add(child);
+                    }
+                    Assert.True(cols.Count > 1);
+                    Assert.Equal("collapse", cols[0].GetAttribute("visibility", OdfNamespaces.Table));
+                    Assert.Equal("visible", cols[1].GetAttribute("visibility", OdfNamespaces.Table));
                 }
-                Assert.True(cols.Count > 1);
-                Assert.Equal("collapse", cols[0].GetAttribute("visibility", OdfNamespaces.Table));
-                Assert.Equal("visible", cols[1].GetAttribute("visibility", OdfNamespaces.Table));
             }
         }
-    }
 
         [Fact]
         public void TestReferenceModelUnionAndIntersection()
@@ -1071,13 +1080,15 @@ namespace OdfKit.Tests
 
                 var dbRangeNode = dbRange.Node;
                 Assert.Equal("SalesData", dbRangeNode.GetAttribute("name", OdfNamespaces.Table));
-                
+
                 OdfNode? sortNode = null;
                 OdfNode? filterNode = null;
                 foreach (var child in dbRangeNode.Children)
                 {
-                    if (child.LocalName == "sort" && child.NamespaceUri == OdfNamespaces.Table) sortNode = child;
-                    if (child.LocalName == "filter" && child.NamespaceUri == OdfNamespaces.Table) filterNode = child;
+                    if (child.LocalName == "sort" && child.NamespaceUri == OdfNamespaces.Table)
+                        sortNode = child;
+                    if (child.LocalName == "filter" && child.NamespaceUri == OdfNamespaces.Table)
+                        filterNode = child;
                 }
                 Assert.NotNull(sortNode);
                 Assert.NotNull(filterNode);
@@ -1110,9 +1121,9 @@ namespace OdfKit.Tests
                 Assert.Equal("Sheet1.A1", mapNode.GetAttribute("base-cell-address", OdfNamespaces.Style));
 
                 var pivotBuilder = new OdfPivotTableBuilder(
-                    "MyPivot", 
-                    new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(9, 3, "Sheet1")), 
-                    new OdfCellAddress(12, 0, "Sheet1"), 
+                    "MyPivot",
+                    new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(9, 3, "Sheet1")),
+                    new OdfCellAddress(12, 0, "Sheet1"),
                     sheet
                 );
                 pivotBuilder
@@ -1135,17 +1146,19 @@ namespace OdfKit.Tests
                 Assert.Single(dataPilotTablesNode.Children);
                 var pivotNode = dataPilotTablesNode.Children[0];
                 Assert.Equal("MyPivot", pivotNode.GetAttribute("name", OdfNamespaces.Table));
-                
+
                 OdfNode? srcRangeNode = null;
                 var fieldNodes = new List<OdfNode>();
                 foreach (var child in pivotNode.Children)
                 {
-                    if (child.LocalName == "source-cell-range" && child.NamespaceUri == OdfNamespaces.Table) srcRangeNode = child;
-                    if (child.LocalName == "data-pilot-field" && child.NamespaceUri == OdfNamespaces.Table) fieldNodes.Add(child);
+                    if (child.LocalName == "source-cell-range" && child.NamespaceUri == OdfNamespaces.Table)
+                        srcRangeNode = child;
+                    if (child.LocalName == "data-pilot-field" && child.NamespaceUri == OdfNamespaces.Table)
+                        fieldNodes.Add(child);
                 }
                 Assert.NotNull(srcRangeNode);
                 Assert.Equal("Sheet1.A1:.D10", srcRangeNode.GetAttribute("cell-range-address", OdfNamespaces.Table));
-                
+
                 Assert.Equal(4, fieldNodes.Count);
                 Assert.Equal("Category", fieldNodes[0].GetAttribute("source-field-name", OdfNamespaces.Table));
                 Assert.Equal("row", fieldNodes[0].GetAttribute("orientation", OdfNamespaces.Table));
@@ -1176,23 +1189,23 @@ namespace OdfKit.Tests
             var tableNS = OdfNamespaces.Table;
             var rowNode = OdfNodeFactory.CreateElement("table-row", tableNS, "table");
             rowNode.SetAttribute("number-rows-repeated", tableNS, "2000000000", "table");
-            
+
             var cellNode = OdfNodeFactory.CreateElement("table-cell", tableNS, "table");
             cellNode.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
-            
+
             var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
             pNode.TextContent = "10";
             cellNode.AppendChild(pNode);
             rowNode.AppendChild(cellNode);
-            
+
             sheet.TableNode.AppendChild(rowNode);
 
             var startTime = DateTime.UtcNow;
             var evaluator = new DefaultFormulaEvaluator();
-            
+
             // 建立 OdfDomEvaluationContext 時會呼叫 TraverseTable，驗證其是否在合理時間內返回
             var domContext = new OdfDomEvaluationContext(doc.ContentDom, evaluator);
-            
+
             var elapsed = DateTime.UtcNow - startTime;
             Assert.True(elapsed.TotalSeconds < 10, $"TraverseTable 花費了 {elapsed.TotalSeconds} 秒，疑似發生 OOM 或未限制重複次數。");
         }

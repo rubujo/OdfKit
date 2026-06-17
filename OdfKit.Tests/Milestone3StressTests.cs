@@ -20,23 +20,23 @@ namespace OdfKit.Tests
         {
             // Discard data to isolate writer and ZipArchive memory usage from MemoryStream buffers.
             var nullStream = Stream.Null;
-            
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
-            
+
             long startMemory = GC.GetTotalMemory(true);
-            
+
             using (var writer = new OdsStreamWriter(nullStream))
             {
                 writer.WriteStartSheet("StressSheet");
-                
+
                 // Write column widths
                 for (int c = 0; c < 10; c++)
                 {
                     writer.WriteColumn(OdfLength.FromCentimeters(2.5));
                 }
-                
+
                 // Write 50,000 rows, 10 cells each = 500,000 cells
                 for (int r = 0; r < 50000; r++)
                 {
@@ -56,17 +56,17 @@ namespace OdfKit.Tests
                     }
                     writer.WriteEndRow();
                 }
-                
+
                 writer.WriteEndSheet();
             }
-            
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
-            
+
             long endMemory = GC.GetTotalMemory(true);
             long diffMemory = endMemory - startMemory;
-            
+
             // Assert that the retained memory increase is very small, e.g., less than 5 MB
             Assert.True(diffMemory < 5 * 1024 * 1024, $"Retained memory increased by {diffMemory / 1024.0 / 1024.0:F2} MB, which is too high for a stream writer.");
         }
@@ -86,7 +86,7 @@ namespace OdfKit.Tests
                 writer.WriteEndRow();
                 writer.WriteEndSheet();
             }
-            
+
             // Reopen zip and verify content.xml
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
@@ -94,7 +94,7 @@ namespace OdfKit.Tests
                 Assert.True(package.HasEntry("content.xml"));
                 Assert.True(package.HasEntry("styles.xml"));
                 Assert.True(package.HasEntry("mimetype"));
-                
+
                 // Read mimetype
                 using (var s = package.GetEntryStream("mimetype"))
                 using (var sr = new StreamReader(s))
@@ -102,29 +102,29 @@ namespace OdfKit.Tests
                     string mime = sr.ReadToEnd();
                     Assert.Equal("application/vnd.oasis.opendocument.spreadsheet", mime);
                 }
-                
+
                 // Parse content.xml
                 using (var s = package.GetEntryStream("content.xml"))
                 {
                     var root = OdfXmlReader.Parse(s);
                     Assert.NotNull(root);
-                    
+
                     // Verify the cells are present
                     var cells = new List<OdfNode>();
                     FindNodesByLocalName(root, "table-cell", cells);
                     Assert.Equal(4, cells.Count);
-                    
+
                     Assert.Equal("Hello <XML> & \"Quotes\" & 'Apos'", cells[0].TextContent);
                     Assert.Equal("string", cells[0].GetAttribute("value-type", OdfNamespaces.Office));
-                    
+
                     Assert.Equal("123.45", cells[1].TextContent);
                     Assert.Equal("float", cells[1].GetAttribute("value-type", OdfNamespaces.Office));
                     Assert.Equal("123.45", cells[1].GetAttribute("value", OdfNamespaces.Office));
-                    
+
                     Assert.Equal("TRUE", cells[2].TextContent);
                     Assert.Equal("boolean", cells[2].GetAttribute("value-type", OdfNamespaces.Office));
                     Assert.Equal("true", cells[2].GetAttribute("boolean-value", OdfNamespaces.Office));
-                    
+
                     Assert.Equal("2026-06-09T08:00:00Z", cells[3].TextContent);
                     Assert.Equal("date", cells[3].GetAttribute("value-type", OdfNamespaces.Office));
                     Assert.Equal("2026-06-09T08:00:00Z", cells[3].GetAttribute("date-value", OdfNamespaces.Office));
@@ -141,17 +141,17 @@ namespace OdfKit.Tests
                 // Write empty sheet
                 writer.WriteStartSheet("EmptySheet");
                 writer.WriteEndSheet();
-                
+
                 // Write sheet with no row end
                 writer.WriteStartSheet("NoRowEndSheet");
                 writer.WriteStartRow();
                 writer.WriteCell("Cell");
-                
+
                 writer.WriteStartSheet("AutoClosedSheet");
                 writer.WriteStartRow();
                 writer.WriteCell("Value");
             }
-            
+
             // Reopen and check if it parses correctly
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
@@ -160,11 +160,11 @@ namespace OdfKit.Tests
                 {
                     var root = OdfXmlReader.Parse(s);
                     Assert.NotNull(root);
-                    
+
                     var tables = new List<OdfNode>();
                     FindNodesByLocalName(root, "table", tables);
                     Assert.Equal(3, tables.Count);
-                    
+
                     Assert.Equal("EmptySheet", tables[0].GetAttribute("name", OdfNamespaces.Table));
                     Assert.Equal("NoRowEndSheet", tables[1].GetAttribute("name", OdfNamespaces.Table));
                     Assert.Equal("AutoClosedSheet", tables[2].GetAttribute("name", OdfNamespaces.Table));
@@ -188,20 +188,20 @@ namespace OdfKit.Tests
                 current.AddReply(reply);
                 current = reply;
             }
-            
+
             // Serialize to XML node
             var xmlNode = root.ToXmlNode();
-            
+
             // Since they are now flat, XML depth is 4 (accounts for annotation-list, annotation, p and text node)
             int depth = GetNodeDepth(xmlNode);
             Assert.Equal(4, depth);
-            
+
             // Re-render to XML byte stream and try parsing.
             // Since they are flat, it should parse successfully without throwing SecurityException.
             using var ms = new MemoryStream();
             OdfXmlWriter.Write(xmlNode, ms, new OdfSaveOptions());
             ms.Position = 0;
-            
+
             var parsed = OdfXmlReader.Parse(ms);
             Assert.NotNull(parsed);
         }
@@ -211,11 +211,11 @@ namespace OdfKit.Tests
         {
             var comment1 = new OdfComment("Author1", "Comment 1");
             var comment2 = new OdfComment("Author2", "Comment 2");
-            
+
             // Verify cycle is allowed to be constructed by API
             comment1.AddReply(comment2);
             comment2.AddReply(comment1);
-            
+
             Assert.Contains(comment2, comment1.Replies);
             Assert.Contains(comment1, comment2.Replies);
 
@@ -231,24 +231,24 @@ namespace OdfKit.Tests
             {
                 root.AddReply(new OdfComment("Author", $"Reply {i}"));
             }
-            
+
             Assert.Equal(10000, root.Replies.Count);
-            
+
             // Measure time to serialize
             var watch = System.Diagnostics.Stopwatch.StartNew();
             var xmlNode = root.ToXmlNode();
             watch.Stop();
-            
+
             Assert.True(watch.ElapsedMilliseconds < 500, $"Serialization of 10k flat replies took {watch.ElapsedMilliseconds} ms, which is too slow.");
-            
+
             // Re-render and parse back
             using var ms = new MemoryStream();
             OdfXmlWriter.Write(xmlNode, ms, new OdfSaveOptions());
             ms.Position = 0;
-            
+
             var parsed = OdfXmlReader.Parse(ms);
             Assert.NotNull(parsed);
-            
+
             var parsedComment = OdfComment.FromXmlNode(parsed);
             Assert.Equal(10000, parsedComment.Replies.Count);
         }
@@ -374,20 +374,20 @@ namespace OdfKit.Tests
         {
             using var doc = new TextDocument(OdfPackage.Create(new MemoryStream()));
             var p = doc.AddParagraph("Customer: {{customerName}}");
-            
+
             var tableNode = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
             doc.BodyTextRoot.AppendChild(tableNode);
-            
+
             var rowNode = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table-row");
             tableNode.AppendChild(rowNode);
-            
+
             var cellNode = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table-cell");
             rowNode.AppendChild(cellNode);
-            
+
             var cellPara = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
             cellPara.TextContent = "Item: {{items.name}} - Price: {{items.price}}";
             cellNode.AppendChild(cellPara);
-            
+
             var dataSource = new Dictionary<string, object>
             {
                 { "customerName", "Alice" },
@@ -398,15 +398,15 @@ namespace OdfKit.Tests
                     }
                 }
             };
-            
+
             doc.MailMerge(dataSource);
-            
+
             Assert.Equal("Customer: Alice", p.Node.TextContent);
-            
+
             var rows = new List<OdfNode>();
             FindNodesByLocalName(doc.BodyTextRoot, "table-row", rows);
             Assert.Equal(2, rows.Count);
-            
+
             Assert.Equal("Item: Pen - Price: 1.5", rows[0].TextContent);
             Assert.Equal("Item: Notebook - Price: 3", rows[1].TextContent);
         }
@@ -417,18 +417,18 @@ namespace OdfKit.Tests
             using var doc = new TextDocument(OdfPackage.Create(new MemoryStream()));
             var tableNode = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
             doc.BodyTextRoot.AppendChild(tableNode);
-            
+
             var rowNode = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table-row");
             tableNode.AppendChild(rowNode);
-            
+
             var cellNode = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table-cell");
             cellNode.SetAttribute("formula", OdfNamespaces.Table, "oooc:=SUM([.B1:.D1])");
             rowNode.AppendChild(cellNode);
-            
+
             var cellPara = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
             cellPara.TextContent = "Item: {{items.name}}";
             cellNode.AppendChild(cellPara);
-            
+
             var dataSource = new Dictionary<string, object>
             {
                 { "items", new List<Dictionary<string, object>>
@@ -438,19 +438,19 @@ namespace OdfKit.Tests
                     }
                 }
             };
-            
+
             doc.MailMerge(dataSource);
-            
+
             var rows = new List<OdfNode>();
             FindNodesByLocalName(doc.BodyTextRoot, "table-row", rows);
             Assert.Equal(2, rows.Count);
-            
+
             var cell1 = rows[0].Children[0];
             var cell2 = rows[1].Children[0];
-            
+
             string? formula1 = cell1.GetAttribute("formula", OdfNamespaces.Table);
             string? formula2 = cell2.GetAttribute("formula", OdfNamespaces.Table);
-            
+
             Assert.Equal("oooc:=SUM([.B1:.D1])", formula1);
             Assert.Equal("oooc:=SUM([.B2:.D2])", formula2); // Fails if formula shifting isn't implemented
         }
@@ -461,16 +461,16 @@ namespace OdfKit.Tests
             using var doc = new TextDocument(OdfPackage.Create(new MemoryStream()));
             var tableNode = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
             doc.BodyTextRoot.AppendChild(tableNode);
-            
+
             var rowNode = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table-row");
             tableNode.AppendChild(rowNode);
-            
+
             var cellNode1 = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table-cell");
             var cellPara1 = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
             cellPara1.TextContent = "Item: {{items.name}}";
             cellNode1.AppendChild(cellPara1);
             rowNode.AppendChild(cellNode1);
-            
+
             var cellNode2 = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table-cell");
             var cellPara2 = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
             cellPara2.TextContent = "Sku: {{items.sku}}";
@@ -482,17 +482,17 @@ namespace OdfKit.Tests
             {
                 itemsList.Add(new MergeItem { Name = $"Item {i}", Sku = $"SKU-{i}" });
             }
-            
+
             var dataSource = new { items = itemsList };
-            
+
             var watch = System.Diagnostics.Stopwatch.StartNew();
             doc.MailMerge(dataSource);
             watch.Stop();
-            
+
             var rows = new List<OdfNode>();
             FindNodesByLocalName(doc.BodyTextRoot, "table-row", rows);
             Assert.Equal(5000, rows.Count);
-            
+
             Assert.True(watch.ElapsedMilliseconds < 1500, $"MailMerge of 5000 items took {watch.ElapsedMilliseconds} ms, indicating a potential performance bottleneck.");
         }
 
@@ -502,22 +502,22 @@ namespace OdfKit.Tests
             using var doc = new TextDocument(OdfPackage.Create(new MemoryStream()));
             var tableNode = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
             doc.BodyTextRoot.AppendChild(tableNode);
-            
+
             var rowNode = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table-row");
             tableNode.AppendChild(rowNode);
-            
+
             var cellNode1 = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table-cell");
             var cellPara1 = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
             cellPara1.TextContent = "Manager: {{managerName}}"; // Parent placeholder
             cellNode1.AppendChild(cellPara1);
             rowNode.AppendChild(cellNode1);
-            
+
             var cellNode2 = new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table-cell");
             var cellPara2 = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
             cellPara2.TextContent = "Item: {{items.name}}"; // Collection placeholder
             cellNode2.AppendChild(cellPara2);
             rowNode.AppendChild(cellNode2);
-            
+
             var dataSource = new Dictionary<string, object>
             {
                 { "managerName", "Bob" },
@@ -527,13 +527,13 @@ namespace OdfKit.Tests
                     }
                 }
             };
-            
+
             doc.MailMerge(dataSource);
-            
+
             var rows = new List<OdfNode>();
             FindNodesByLocalName(doc.BodyTextRoot, "table-row", rows);
             Assert.Single(rows);
-            
+
             Assert.Equal("Manager: Bob", rows[0].Children[0].TextContent); // Fails if managerName is cleared
         }
 

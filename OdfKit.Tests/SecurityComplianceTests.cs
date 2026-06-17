@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Security;
 using System.Text;
@@ -91,7 +91,7 @@ namespace OdfKit.Tests
                 package.WriteEntry("META-INF/macrosignatures.xml", Encoding.UTF8.GetBytes("<sig/>"), "text/xml");
                 package.WriteEntry("META-INF/documentsignatures.xml", Encoding.UTF8.GetBytes("<sig/>"), "text/xml");
 
-                string contentXml = 
+                string contentXml =
                     "<office:document-content xmlns:office=\"" + OdfNamespaces.Office + "\" " +
                     "xmlns:xlink=\"" + OdfNamespaces.XLink + "\" xmlns:script=\"urn:oasis:names:tc:opendocument:xmlns:script:1.0\" " +
                     "xmlns:draw=\"" + OdfNamespaces.Draw + "\">" +
@@ -158,7 +158,7 @@ namespace OdfKit.Tests
                 package.WriteEntry("META-INF/macrosignatures.xml", Encoding.UTF8.GetBytes("<sig/>"), "text/xml");
                 package.WriteEntry("META-INF/documentsignatures.xml", Encoding.UTF8.GetBytes("<sig/>"), "text/xml");
 
-                string contentXml = 
+                string contentXml =
                     "<office:document-content xmlns:office=\"" + OdfNamespaces.Office + "\" " +
                     "xmlns:xlink=\"" + OdfNamespaces.XLink + "\" xmlns:script=\"urn:oasis:names:tc:opendocument:xmlns:script:1.0\" " +
                     "xmlns:draw=\"" + OdfNamespaces.Draw + "\">" +
@@ -263,7 +263,7 @@ namespace OdfKit.Tests
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
 
-                string contentXml = 
+                string contentXml =
                     "<office:document-content xmlns:office=\"" + OdfNamespaces.Office + "\" " +
                     "xmlns:xlink=\"" + OdfNamespaces.XLink + "\" xmlns:draw=\"" + OdfNamespaces.Draw + "\">" +
                     "  <office:body>" +
@@ -312,7 +312,7 @@ namespace OdfKit.Tests
                     {
                         var testDate = new DateTime(2026, 6, 11, 8, 16, 35, DateTimeKind.Utc);
                         doc.CreationDate = testDate;
-                        
+
                         Assert.Equal(testDate, doc.CreationDate);
 
                         doc.SetCustomProperty("MyDate", testDate, "date");
@@ -348,7 +348,7 @@ namespace OdfKit.Tests
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
 
-                string contentXml = 
+                string contentXml =
                     "<office:document-content xmlns:office=\"" + OdfNamespaces.Office + "\">" +
                     "  <!-- start of body -->" +
                     "  <office:body>" +
@@ -371,7 +371,7 @@ namespace OdfKit.Tests
 
                 var bodyNode = FindNode(docNode, "body");
                 Assert.NotNull(bodyNode);
-                
+
                 OdfNode? startOfBodyComment = null;
                 foreach (var child in docNode.Children)
                 {
@@ -395,11 +395,13 @@ namespace OdfKit.Tests
 
         private OdfNode? FindNode(OdfNode parent, string localName)
         {
-            if (parent.LocalName == localName) return parent;
+            if (parent.LocalName == localName)
+                return parent;
             foreach (var child in parent.Children)
             {
                 var found = FindNode(child, localName);
-                if (found != null) return found;
+                if (found != null)
+                    return found;
             }
             return null;
         }

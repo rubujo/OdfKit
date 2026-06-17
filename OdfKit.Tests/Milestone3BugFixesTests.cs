@@ -17,7 +17,7 @@ namespace OdfKit.Tests
         {
             var root = new OdfComment("Author", "Root");
             var current = root;
-            
+
             // Build a very deep comment chain (160 levels)
             for (int i = 1; i <= 160; i++)
             {
@@ -81,7 +81,7 @@ namespace OdfKit.Tests
             var p = doc.AddParagraph();
 
             // 1. Script/Style filter tests (case-insensitively, with attributes and content)
-            string htmlWithScriptsAndStyles = 
+            string htmlWithScriptsAndStyles =
                 "Hello <script type=\"text/javascript\">var x = 1;</script>" +
                 "<style>body { color: red; }</style>" +
                 "<SCRIPT src=\"foo.js\" />" +
@@ -92,7 +92,7 @@ namespace OdfKit.Tests
 
             // Reconstruct plain text to verify scripts and styles are gone, and entities are decoded
             string plainText = p.Node.TextContent;
-            
+
             // "Hello " and "World <>&\"''''"
             Assert.Contains("Hello ", plainText);
             Assert.Contains("World <>&\"'''", plainText);
@@ -187,7 +187,7 @@ namespace OdfKit.Tests
                 writer.WriteEndRow();
                 writer.WriteEndSheet();
             }
-            
+
             // Just running to the end without throwing ArgumentOutOfRangeException is a success
             Assert.True(ms.Length > 0);
         }
@@ -198,7 +198,7 @@ namespace OdfKit.Tests
             using var ms = new MemoryStream();
             using var package = OdfPackage.Create(ms);
             var doc = new TextDocument(package);
-            
+
             // 1. FormatMetaDate / ParseMetaDate
             doc.CreationDate = DateTime.MinValue;
             Assert.Equal(DateTime.MinValue, doc.CreationDate);
@@ -233,7 +233,7 @@ namespace OdfKit.Tests
             using var package = OdfPackage.Create(ms);
             var doc = new SpreadsheetDocument(package);
             var sheet = doc.AddSheet("Sheet1");
-            
+
             var cell1 = sheet.GetCell(0, 0);
             cell1.SetValue(DateTime.MinValue, useTimezoneNaive: false);
             Assert.Equal("date", cell1.ValueType);

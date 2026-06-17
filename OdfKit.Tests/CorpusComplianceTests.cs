@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -360,12 +360,12 @@ namespace OdfKit.Tests
         public void CrossVersionSchemaLookup_DetectsCorrectRequiredVersion()
         {
             string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" office:version=\"1.2\"><office:body><office:text><text:custom-new-element /></office:text></office:body></office:document-content>";
-            
+
             var customElement = new OdfElementDefinition(
                 new OdfQualifiedName(OdfNamespaces.Text, "custom-new-element"),
                 OdfSchemaElementRole.Element,
                 OdfVersionRange.AllKnown);
-            
+
             var schema13 = new OdfSchemaSet(
                 OdfVersion.Odf13,
                 new Uri("https://example.invalid/custom.rng"),
@@ -380,7 +380,7 @@ namespace OdfKit.Tests
                 OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.IsoIec26300);
                 LogReport("CrossVersionSchemaLookup_DetectsCorrectRequiredVersion", report);
                 Assert.False(report.IsValid);
-                Assert.Contains(report.Issues, issue => issue.RuleId == "RequireOdfNamespaceValidity" && 
+                Assert.Contains(report.Issues, issue => issue.RuleId == "RequireOdfNamespaceValidity" &&
                                                         issue.RequiredVersion == OdfVersion.Odf13 &&
                                                         issue.XPath == "/office:document-content[1]/office:body[1]/office:text[1]/text:custom-new-element[1]");
             }
