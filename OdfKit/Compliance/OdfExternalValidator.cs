@@ -36,6 +36,10 @@ public static class OdfExternalValidator
     /// <summary>
     /// 非同步使用 ODF Toolkit 的 ODF Validator JAR 驗證指定文件。
     /// </summary>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在外部子程序等待與 stdout／stderr 讀取期間協作檢查取消語彙。
+    /// </remarks>
     /// <param name="filePath">要驗證的 ODF 文件路徑。</param>
     /// <param name="jarPath">ODF Validator JAR 路徑。若未提供，會讀取 <c>ODFKIT_ODFVALIDATOR_JAR</c>。</param>
     /// <param name="javaPath">Java 執行檔路徑。預設使用 <c>java</c>。</param>
@@ -93,6 +97,10 @@ public static class OdfExternalValidator
     /// <summary>
     /// 非同步執行可選外部驗證命令並以結束碼判定 valid / invalid。
     /// </summary>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在外部子程序等待與 stdout／stderr 讀取期間協作檢查取消語彙。
+    /// </remarks>
     /// <param name="commandPath">外部命令路徑。</param>
     /// <param name="filePath">要驗證的 ODF 文件路徑。</param>
     /// <param name="timeoutMilliseconds">外部程序逾時毫秒數。</param>

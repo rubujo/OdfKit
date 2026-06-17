@@ -26,6 +26,7 @@ public static partial class OdfSigner
     /// <param name="package">要簽署的 ODF 封裝</param>
     /// <param name="certificate">用於簽署的 X.509 憑證</param>
     /// <param name="options">簽署選項</param>
+    /// <remarks>在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="SignAsync(OdfPackage, X509Certificate2, OdfSigningOptions, CancellationToken)"/> 以避免阻塞執行緒。</remarks>
     public static void Sign(OdfPackage package, X509Certificate2 certificate, OdfSigningOptions options)
     {
         SignAsync(package, certificate, options).GetAwaiter().GetResult();
@@ -54,6 +55,10 @@ public static partial class OdfSigner
     /// <param name="options">簽署選項。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步簽署作業的工作。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 寫入與 HTTP（TSA／CRL）期間協作檢查取消語彙。
+    /// </remarks>
     public static Task SignAsync(
         OdfPackage package,
         X509Certificate2 certificate,
@@ -99,6 +104,10 @@ public static partial class OdfSigner
     /// <param name="options">簽署選項。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在簽章解析與 HTTP（CRL）期間協作檢查取消語彙。
+    /// </remarks>
     public static Task<OdfSignatureValidationResult> VerifySignaturesAsync(
         OdfPackage package,
         OdfSigningOptions? options = null,

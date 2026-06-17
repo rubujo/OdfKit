@@ -33,6 +33,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="path">ODF 文件路徑。</param>
     /// <returns>載入完成的 ODF 文件。</returns>
+    /// <remarks>在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="LoadAsync(string, CancellationToken)"/> 以避免阻塞執行緒。</remarks>
     public static OdfDocument Load(string path) => OdfDocumentFactory.LoadDocument(path);
 
     /// <summary>
@@ -41,6 +42,10 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <param name="path">ODF 文件路徑。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
+    /// </remarks>
     public static Task<OdfDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken);
 
@@ -59,6 +64,10 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <param name="options">載入選項，例如加密文件密碼與安全限制。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
+    /// </remarks>
     public static Task<OdfDocument> LoadAsync(string path, OdfLoadOptions? options, CancellationToken cancellationToken = default) =>
         OdfDocumentFactory.LoadDocumentAsync(path, options, cancellationToken);
 
@@ -77,6 +86,10 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
+    /// </remarks>
     public static Task<OdfDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken);
 

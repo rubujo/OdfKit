@@ -79,6 +79,10 @@ public partial class TextDocument : OdfDocument
     /// <param name="path">ODT 文件路徑。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextDocument"/>。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
+    /// </remarks>
     public new static async Task<TextDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         EnsureTextDocument(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 

@@ -197,6 +197,10 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// <param name="options">載入選項。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 解壓與 manifest 載入期間協作檢查取消語彙。
+    /// </remarks>
     public static async Task<OdfPackage> OpenAsync(
         string path,
         OdfLoadOptions? options = null,
@@ -224,6 +228,10 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// <param name="options">載入選項。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 解壓與 manifest 載入期間協作檢查取消語彙。
+    /// </remarks>
     public static async Task<OdfPackage> OpenAsync(
         Stream stream,
         bool leaveOpen = false,

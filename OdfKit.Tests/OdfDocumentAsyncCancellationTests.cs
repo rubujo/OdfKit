@@ -59,6 +59,70 @@ public class OdfDocumentAsyncCancellationTests
     }
 
     /// <summary>
+    /// 預先取消的語彙應使 LoadAsync(stream) 拋出 OperationCanceledException。
+    /// </summary>
+    [Fact]
+    public async Task LoadAsync_Stream_PreCancelledToken_ThrowsOperationCanceledException()
+    {
+        await using var source = await CreateMinimalOdtStreamAsync(TestContext.Current.CancellationToken);
+        source.Position = 0;
+
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await using var _ = await OdfDocument.LoadAsync(source, "test.odt", cts.Token);
+        });
+    }
+
+    /// <summary>
+    /// 預先取消的語彙應使 LoadAsync(path) 拋出 OperationCanceledException。
+    /// </summary>
+    [Fact]
+    public async Task LoadAsync_Path_PreCancelledToken_ThrowsOperationCanceledException()
+    {
+        string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".odt");
+        try
+        {
+            using var doc = TextDocument.Create();
+            doc.Body.Paragraphs.Add("取消測試");
+            await doc.SaveAsync(path, cancellationToken: TestContext.Current.CancellationToken);
+
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            {
+                await using var _ = await OdfDocument.LoadAsync(path, cts.Token);
+            });
+        }
+        finally
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+        }
+    }
+
+    /// <summary>
+    /// 預先取消的語彙應使 VerifySignaturesAsync 拋出 OperationCanceledException。
+    /// </summary>
+    [Fact]
+    public async Task VerifySignaturesAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    {
+        using var doc = TextDocument.Create();
+        doc.Body.Paragraphs.Add("簽章驗證取消測試");
+
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await doc.VerifySignaturesAsync(cancellationToken: cts.Token);
+        });
+    }
+
+    /// <summary>
     /// 未取消時 SaveAsync(stream) 應成功寫入可載入的 ODF 文件。
     /// </summary>
     [Fact]
@@ -73,5 +137,16 @@ public class OdfDocumentAsyncCancellationTests
         destination.Position = 0;
         await using OdfDocument loaded = await OdfDocument.LoadAsync(destination, "test.odt", TestContext.Current.CancellationToken);
         Assert.IsType<TextDocument>(loaded);
+    }
+
+    private static async Task<MemoryStream> CreateMinimalOdtStreamAsync(CancellationToken cancellationToken)
+    {
+        using var doc = TextDocument.Create();
+        doc.Body.Paragraphs.Add("載入取消測試");
+
+        var destination = new MemoryStream();
+        await doc.SaveAsync(destination, cancellationToken: cancellationToken);
+        destination.Position = 0;
+        return destination;
     }
 }

@@ -13,6 +13,7 @@ public abstract partial class OdfDocument
     /// 儲存文件至 ODF 封裝容器中。
     /// </summary>
     /// <param name="options">儲存設定選項</param>
+    /// <remarks>在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="SaveAsync(OdfSaveOptions?, CancellationToken)"/> 以避免阻塞執行緒。</remarks>
     public virtual void Save(OdfSaveOptions? options = null)
     {
         options ??= OdfSaveOptions.Default;
@@ -43,6 +44,10 @@ public abstract partial class OdfDocument
     /// <param name="options">儲存設定選項</param>
     /// <param name="cancellationToken">取消語彙</param>
     /// <returns>代表非同步作業的 Task 執行個體</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 寫入與串流 I/O 期間協作檢查取消語彙。
+    /// </remarks>
     public virtual async Task SaveAsync(OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
     {
         options ??= OdfSaveOptions.Default;
@@ -57,6 +62,10 @@ public abstract partial class OdfDocument
     /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步儲存作業的工作。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 寫入與檔案 I/O 期間協作檢查取消語彙。
+    /// </remarks>
     public async Task SaveAsync(string path, OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
     {
         if (path is null)
@@ -121,6 +130,10 @@ public abstract partial class OdfDocument
     /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步儲存作業的工作。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 寫入與串流 I/O 期間協作檢查取消語彙。
+    /// </remarks>
     public async Task SaveToStreamAsync(Stream destinationStream, OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
     {
         if (destinationStream is null)

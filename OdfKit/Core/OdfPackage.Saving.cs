@@ -45,6 +45,10 @@ public sealed partial class OdfPackage
     /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
     /// <param name="cancellationToken">取消語彙</param>
     /// <returns>代表非同步作業的工作</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 寫入與串流 I/O 期間協作檢查取消語彙。
+    /// </remarks>
     public async Task SaveAsync(OdfSaveOptions? options, CancellationToken cancellationToken = default)
     {
         if (_mode == OdfPackageMode.Read)
@@ -100,6 +104,10 @@ public sealed partial class OdfPackage
     /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
     /// <param name="cancellationToken">取消語彙</param>
     /// <returns>代表非同步作業的工作</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 ZIP 寫入與串流 I/O 期間協作檢查取消語彙。
+    /// </remarks>
     public async Task SaveToStreamAsync(
         Stream destinationStream,
         OdfSaveOptions? options,

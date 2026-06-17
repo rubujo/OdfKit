@@ -29,6 +29,10 @@ public abstract partial class OdfDocument
     /// <param name="certificate">用於簽章的憑證。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步簽章作業的工作。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 DOM 寫入、ZIP 寫入與 HTTP（TSA／CRL）期間協作檢查取消語彙。
+    /// </remarks>
     public async Task SignAsync(X509Certificate2 certificate, CancellationToken cancellationToken = default)
     {
         StyleEngine.DeduplicateAndSaveStyles();
@@ -58,6 +62,7 @@ public abstract partial class OdfDocument
             int signatureCount = CountSignatureElements(stream, Package.LoadOptions.MaxXmlCharactersInDocument);
             return OdfDocumentSignatureSummary.Readable(DocumentSignaturesPath, signatureCount);
         }
+        // 簽章摘要為最佳努力查詢：無法讀取時回傳 Unreadable，不向上拋出。
         catch (Exception ex) when (ex is IOException || ex is InvalidDataException || ex is XmlException)
         {
             return OdfDocumentSignatureSummary.Unreadable(DocumentSignaturesPath, ex.Message);
@@ -90,6 +95,10 @@ public abstract partial class OdfDocument
     /// <param name="options">簽章驗證選項；若為 <see langword="null"/>，則使用預設選項。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果。</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在簽章解析與 HTTP（CRL）期間協作檢查取消語彙。
+    /// </remarks>
     public Task<OdfSignatureValidationResult> VerifySignaturesAsync(
         OdfSigningOptions? options = null,
         CancellationToken cancellationToken = default)
