@@ -86,7 +86,7 @@ public partial class OdfFormulaDocument
         return FindOrCreateChild(body, "formula", OdfNamespaces.Office, "office");
     }
 
-    private IReadOnlyList<OdfMathToken> GetMathTokens()
+    private IReadOnlyList<OdfMathToken> ReadMathTokens()
     {
         OdfNode math = MathNode;
         OdfNode tokenParent = FindChildElement(math, "mrow", MathMlNamespace) ?? math;

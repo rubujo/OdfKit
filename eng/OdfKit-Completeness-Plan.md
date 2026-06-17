@@ -38,7 +38,7 @@
 | Phase | 狀態 | 產出 |
 |-------|------|------|
 | VAR-1 | ✅ | `*TemplateDocument`、`TextMasterDocument`、`Flat*Document`、factory 分派、`DocumentKindApiUsabilityTests` |
-| DEPTH-1/2 | 進行中 | DEPTH-1 四主格式讀取 API 已齊；DEPTH-2 已補 ODC `GetChartDefinition`、ODB 表單 API；ODF/ODI 待深化 |
+| DEPTH-1/2 | 基礎 ✅ | DEPTH-1 四主格式讀取 API 已齊；DEPTH-2 已補 ODC/ODB/ODF/ODI 讀取與表單／框架 API |
 | DEPTH-1-TC | 基礎 ✅ | ODT/ODS `tracked-changes` 內容／表格／結構／移動；LO 互通測試已備 |
 | RDF-1 | 待辦 | 核心 `manifest.rdf` / `pkg:` ontology parity（不依賴外部 RDF 引擎） |
 | RDF-2 | 選用 | `OdfKit.Extensions.Rdf` + `dotNetRdf.Core` SPARQL 橋接 |

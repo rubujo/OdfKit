@@ -107,7 +107,7 @@ public partial class OdfFormulaDocument : OdfDocument
     /// <summary>
     /// 取得目前 MathML row 中可辨識的 token 摘要。
     /// </summary>
-    public IReadOnlyList<OdfMathToken> MathTokens => GetMathTokens();
+    public IReadOnlyList<OdfMathToken> MathTokens => ReadMathTokens();
 
     /// <summary>
     /// 取得或設定完整 MathML XML 字串。

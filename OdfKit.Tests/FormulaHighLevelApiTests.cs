@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -32,6 +33,28 @@ public class FormulaHighLevelApiTests
         formulaDoc.SetMathML(newMathml);
         Assert.Equal("x+y", formulaDoc.MathText);
         Assert.Contains("<mi>x</mi>", formulaDoc.GetMathML());
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfFormulaDocument.GetMathTokens"/> 可讀回 SetMathRow 寫入的 token。
+    /// </summary>
+    [Fact]
+    public void GetMathTokens_RoundTripsAfterSetMathRow()
+    {
+        using var formulaDoc = FormulaDocument.Create("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow/></math>");
+        formulaDoc.SetMathRow(
+            OdfMathToken.Identifier("a"),
+            OdfMathToken.Operator("+"),
+            OdfMathToken.Number("1"));
+
+        var tokens = formulaDoc.GetMathTokens().ToList();
+        Assert.Equal(3, tokens.Count);
+        Assert.Equal(OdfMathTokenKind.Identifier, tokens[0].Kind);
+        Assert.Equal("a", tokens[0].Text);
+        Assert.Equal(OdfMathTokenKind.Operator, tokens[1].Kind);
+        Assert.Equal("+", tokens[1].Text);
+        Assert.Equal(OdfMathTokenKind.Number, tokens[2].Kind);
+        Assert.Equal("1", tokens[2].Text);
     }
 
     /// <summary>
