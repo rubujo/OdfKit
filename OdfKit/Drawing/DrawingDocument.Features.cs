@@ -28,4 +28,10 @@ public partial class DrawingDocument
     /// </summary>
     public IReadOnlyList<OdfCustomShapeInfo> GetCustomShapes() =>
         GetPagesSnapshot().SelectMany(p => p.GetCustomShapes()).ToList().AsReadOnly();
+
+    /// <summary>
+    /// 取得文件中所有繪圖頁面的群組圖形摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfGroupInfo> GetGroups() =>
+        GetPagesSnapshot().SelectMany(p => p.GetGroups()).ToList().AsReadOnly();
 }

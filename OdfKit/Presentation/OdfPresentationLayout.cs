@@ -76,6 +76,39 @@ public sealed class OdfMasterPage
 public partial class PresentationDocument
 {
     /// <summary>
+    /// 取得簡報中所有投影片母片的清單。
+    /// </summary>
+    /// <returns>依 <c>office:master-styles</c> 內 <c>style:master-page</c> 順序排列的母片清單。</returns>
+    public IReadOnlyList<OdfMasterPage> GetMasterPages()
+    {
+        OdfNode? masterStyles = null;
+        foreach (OdfNode child in StylesRoot.Children)
+        {
+            if (child.LocalName == "master-styles" && child.NamespaceUri == OdfNamespaces.Office)
+            {
+                masterStyles = child;
+                break;
+            }
+        }
+
+        if (masterStyles is null)
+            return [];
+
+        List<OdfMasterPage> pages = [];
+        foreach (OdfNode child in masterStyles.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.LocalName is not "master-page" ||
+                child.NamespaceUri != OdfNamespaces.Style)
+                continue;
+
+            pages.Add(new OdfMasterPage(child));
+        }
+
+        return pages.AsReadOnly();
+    }
+
+    /// <summary>
     /// 在簡報中新增一個投影片母片。
     /// </summary>
     /// <param name="name">母片名稱。</param>

@@ -170,6 +170,45 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetConditionalFormats"/> 可聚合所有工作表的條件格式規則。
+    /// </summary>
+    [Fact]
+    public void GetConditionalFormats_AggregatesAllSheets()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet1 = document.AddSheet("Sheet1");
+        OdfTableSheet sheet2 = document.AddSheet("Sheet2");
+        sheet1.AddDataBarFormat(new OdfCellRange(0, 0, 4, 0), new OdfColor("#638EC6"));
+        sheet2.AddColorScaleFormat(
+            new OdfCellRange(0, 0, 2, 0),
+            new OdfColor("#ff0000"),
+            new OdfColor("#00ff00"));
+
+        Assert.Equal(2, document.GetConditionalFormats().Count);
+        Assert.Contains(document.GetConditionalFormats(), f => f.Kind == OdfConditionalFormatKind.DataBar);
+        Assert.Contains(document.GetConditionalFormats(), f => f.Kind == OdfConditionalFormatKind.ColorScale);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetSparklineGroups"/> 可聚合所有工作表的走勢圖群組。
+    /// </summary>
+    [Fact]
+    public void GetSparklineGroups_AggregatesAllSheets()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = 10d;
+        sheet.Cells["A2"].CellValue = 20d;
+        sheet.AddSparklineGroup(
+            OdfCellRange.ParseExcel("A1:A2"),
+            OdfCellAddress.ParseExcel("B1"),
+            SparklineType.Line);
+
+        Assert.Single(document.GetSparklineGroups());
+        Assert.Equal(SparklineType.Line, document.GetSparklineGroups()[0].Type);
+    }
+
+    /// <summary>
     /// 驗證列印範圍、標題列欄、分頁符與縮放設定會寫入 ODS XML。
     /// </summary>
     [Fact]

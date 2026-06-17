@@ -44,7 +44,7 @@
 | RDF-2 | 選用 | `OdfKit.Extensions.Rdf` + `dotNetRdf.Core` SPARQL 橋接 |
 | DX-1 | 基礎 ✅ | `PresentationDocumentBuilder`、`DrawingDocumentBuilder`、`OdfFormulaBuilder`；cookbook 已補 Builder 範例 |
 | LOEXT-1 | 基礎 ✅ | `loext:decorative` 讀取映射、`OdfNamespaces.LoExt`；`LoExtInteropTests` 覆蓋 ODT/ODP/ODG |
-| CALCEXT-1 | 選用 | calcext 讀取 API（列舉／解析色階、橫條、圖示集、sparkline） |
+| CALCEXT-1 | 基礎 ✅ | 工作表與文件層 calcext 讀取 API（條件格式、走勢圖）；`ConditionalFormatTests`、`SpreadsheetHighLevelApiTests` |
 
 目標：四主格式 High-level 欄位升為 `complete`。
 
@@ -65,7 +65,7 @@
 | `loext` | `decorative` 讀取映射 | 基礎 ✅ LOEXT-1 | 載入正規化為 `draw:decorative`；寫入用標準屬性 |
 | `calcext` | 色階／資料橫條／圖示集條件格式 | ✅ 寫入 + OOXML 橋接 | `OdfTableSheetConditionalFormatEngine`、`OdfToXlsxConverter` |
 | `calcext` | Sparkline（`sparkline-groups`） | ✅ 寫入 | `AddSparklineGroup` |
-| `calcext` | 既有規則讀取／列舉 API | 選用 CALCEXT-1 | 載入後 DOM 保真 round-trip 已可用 |
+| `calcext` | 既有規則讀取／列舉 API | 基礎 ✅ CALCEXT-1 | `OdfTableSheet.ConditionalFormats`／`SparklineGroups` 與 `SpreadsheetDocument.GetConditionalFormats`／`GetSparklineGroups` |
 | ODF 標準 | `text:tracked-changes`（ODT） | 基礎 ✅（段落／表格儲存格）；LO 互通測試已備 | `TextDocument` accept/reject/record API |
 | — | `table:tracked-changes`（ODS） | 基礎 ✅（內容／公式／結構／移動）；LO 互通測試已備 | `SpreadsheetDocument` tracked-changes API |
 | — | Writer Navigator 書籤擴充、pivot 重算 | 不納入 | 見 non-goals |

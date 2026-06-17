@@ -184,6 +184,25 @@ public class FourFormatApiScenarioTests
     }
 
     /// <summary>
+    /// 驗證 ODP 儲存／載入後可列舉投影片母片。
+    /// </summary>
+    [Fact]
+    public void PresentationScenario_GetMasterPagesSurvivesRoundTrip()
+    {
+        using var document = PresentationDocument.Create();
+        document.AddSlide();
+        document.AddMasterPage("SceneMaster", new OdfMasterPageDefinition { BackgroundColor = "#112233" });
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using PresentationDocument loaded = PresentationDocument.Load(stream);
+        OdfMasterPage master = Assert.Single(loaded.GetMasterPages());
+        Assert.Equal("SceneMaster", master.Name);
+    }
+
+    /// <summary>
     /// 驗證 ODT 儲存／載入會保留自訂 RDF triple 並同步標準 <c>pkg:</c> ontology。
     /// </summary>
     [Fact]

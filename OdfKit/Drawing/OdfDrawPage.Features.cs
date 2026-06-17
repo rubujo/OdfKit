@@ -27,4 +27,10 @@ public partial class OdfDrawPage
     /// </summary>
     public IReadOnlyList<OdfCustomShapeInfo> GetCustomShapes() =>
         OdfDrawPageShapeReadEngine.GetCustomShapes(this);
+
+    /// <summary>
+    /// 取得此繪圖頁面上所有群組圖形的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfGroupInfo> GetGroups() =>
+        OdfDrawPageShapeReadEngine.GetGroups(this);
 }

@@ -216,6 +216,32 @@ public class DrawingHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfDrawPage.GetGroups"/> 可讀回已建立的群組圖形。
+    /// </summary>
+    [Fact]
+    public void GetGroups_RoundTripsAfterAdd()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("群組頁");
+        OdfDrawGroup group = page.AddGroup("流程群組");
+        group.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("3cm"),
+            OdfLength.Parse("2cm"));
+
+        IReadOnlyList<OdfGroupInfo> groups = page.GetGroups();
+        Assert.Single(groups);
+        OdfGroupInfo info = groups[0];
+        Assert.Equal("群組頁", info.PageName);
+        Assert.Equal("流程群組", info.Name);
+        Assert.False(string.IsNullOrEmpty(info.Id));
+
+        Assert.Single(document.GetGroups());
+    }
+
+    /// <summary>
     /// 驗證新增自定義圖形 (AddCustomShape) API 的建立與幾何節點結構。
     /// </summary>
     [Fact]

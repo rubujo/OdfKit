@@ -21,6 +21,9 @@ internal static class OdfDrawPageShapeReadEngine
     internal static IReadOnlyList<OdfCustomShapeInfo> GetCustomShapes(OdfDrawPage page) =>
         CollectCustomShapes(page.Node, page.Name);
 
+    internal static IReadOnlyList<OdfGroupInfo> GetGroups(OdfDrawPage page) =>
+        CollectGroups(page.Node, page.Name);
+
     private static List<OdfPathInfo> CollectPaths(OdfNode parent, string pageName)
     {
         List<OdfPathInfo> paths = [];
@@ -117,6 +120,32 @@ internal static class OdfDrawPageShapeReadEngine
         });
 
         return shapes;
+    }
+
+    private static List<OdfGroupInfo> CollectGroups(OdfNode parent, string pageName)
+    {
+        List<OdfGroupInfo> groups = [];
+        CollectGroupsRecursive(parent, pageName, groups);
+        return groups;
+    }
+
+    private static void CollectGroupsRecursive(OdfNode parent, string pageName, List<OdfGroupInfo> groups)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != OdfNamespaces.Draw)
+                continue;
+
+            if (child.LocalName is not "g")
+                continue;
+
+            groups.Add(new OdfGroupInfo(
+                pageName,
+                child.GetAttribute("id", OdfNamespaces.Draw) ?? string.Empty,
+                child.GetAttribute("name", OdfNamespaces.Draw)));
+
+            CollectGroupsRecursive(child, pageName, groups);
+        }
     }
 
     private static void WalkDrawingNodes(OdfNode parent, System.Action<OdfNode> visit)

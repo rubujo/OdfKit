@@ -26,6 +26,18 @@ public partial class SpreadsheetDocument
         SpreadsheetDocumentEmbeddedChartReadEngine.GetEmbeddedCharts(this);
 
     /// <summary>
+    /// 取得試算表中所有工作表的 LibreOffice calcext 條件格式規則摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfConditionalFormatInfo> GetConditionalFormats() =>
+        SpreadsheetDocumentConditionalFormatReadEngine.GetConditionalFormats(this);
+
+    /// <summary>
+    /// 取得試算表中所有工作表的 LibreOffice calcext 走勢圖群組摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfSparklineGroupInfo> GetSparklineGroups() =>
+        SpreadsheetDocumentConditionalFormatReadEngine.GetSparklineGroups(this);
+
+    /// <summary>
     /// 新增命名範圍。
     /// </summary>
     /// <param name="name">命名範圍的名稱</param>

@@ -54,17 +54,17 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
   `OdfDocumentFactory.LoadDocument` / `CreateDocument` 高階入口已建立。
 - ODT、ODS、ODP、ODG 標為 `usable`：已有常用高階 API 與 `FourFormatApiScenarioTests` 場景背書，但尚非完整辦公套件物件模型（Wave 2 `complete` 目標）。升級 `complete` 前仍須補齊：
   - **ODT**：索引／書籤進階、頁首頁尾完整模型、修訂結構變更（列／欄插入刪除）讀寫 API
-  - **ODS**：樞紐表重算（見 non-goals）、完整圖表編輯模型、進階條件格式讀取（CALCEXT-1）
-  - **ODP**：投影片母片／版面配置完整 API、動畫時間軸進階編輯
-  - **ODG**：圖層、連接線路由進階、群組圖形完整讀寫 API
+  - **ODS**：樞紐表重算（見 non-goals）、完整圖表編輯模型
+  - **ODP**：版面配置進階編輯、動畫時間軸進階編輯（母片列舉 `GetMasterPages` 已補）
+  - **ODG**：圖層、連接線路由進階、群組圖形寫入進階（群組讀取 `GetGroups` 已補）
 - `.ott`、`.ots`、`.otp`、`.otg`、`.odm` 與 Flat 變體標為 `usable-variant`（VAR-1 ✅）：
   具專屬 typed 文件類別與 `Create`/`Load` 入口；語意 API 繼承四主格式基底類別。
 - ODT `text:tracked-changes` 已支援段落與表格儲存格插入／格式變更記錄；LO 互通測試已備（`TrackedChangesInteropTests`）。
 - ODS `table:tracked-changes` 已支援儲存格內容／公式變更、列／欄插入刪除與儲存格移動；LO 互通測試已新增（需本機 LibreOffice 26.x）。
-- ODG 已補強路徑、多邊形、連接線與自定義幾何圖形讀取 API（`GetPaths`／`GetConnectors`／`GetPolygons`／`GetCustomShapes`）；測試見 `DrawingHighLevelApiTests`。
+- ODG 已補強路徑、多邊形、連接線、自定義幾何與群組圖形讀取 API（`GetPaths`／`GetConnectors`／`GetPolygons`／`GetCustomShapes`／`GetGroups`）；測試見 `DrawingHighLevelApiTests`。
 - ODC／嵌入圖表已補強 `OdfChartDocument.GetChartDefinition`；ODB 已補強 `AddForm`／`GetForms` 表單元件 API（`DatabaseHighLevelApiTests`）。
 - ODF 已補強 `GetMathTokens` 讀取 API；ODI 已補強 `GetImageFrames`／`AddImageFrame`（`FormulaHighLevelApiTests`、`ImageHighLevelApiTests`）。
-- LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；calcext 讀取 API 為選用 CALCEXT-1。
+- LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；CALCEXT-1 基礎 ✅：工作表層與 `SpreadsheetDocument.GetConditionalFormats`／`GetSparklineGroups` 文件層聚合讀取。
 - `.odc`、`.odf`、`.odi`、`.odb` 標為 `usable`：已有摘要與常用編輯 API；
   完整語意模型仍屬 Wave 2 DEPTH-2。
 - RDF-1 基礎 ✅：`manifest.rdf` 文件層往返、`pkg:` ontology 同步；corpus 含 `repo-generated-manifest-rdf-text`（`RdfMetadataTests`）。

@@ -178,6 +178,10 @@ public class PresentationHighLevelApiTests
         // 2. 套用母片至投影片
         document.SetMasterPage(0, "CustomMaster");
         Assert.Equal("CustomMaster", document.Slides[0].MasterPageName);
+
+        // 3. 列舉母片
+        IReadOnlyList<OdfMasterPage> masterPages = document.GetMasterPages();
+        Assert.Contains(masterPages, page => page.Name == "CustomMaster");
     }
 
     /// <summary>
