@@ -124,34 +124,7 @@ public partial class OdfNode
             }
 
             var sb = new StringBuilder();
-            foreach (var child in Children)
-            {
-                if (child.NodeType == OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Text)
-                {
-                    if (child.LocalName == "line-break")
-                    {
-                        sb.Append('\n');
-                        continue;
-                    }
-                    if (child.LocalName == "tab")
-                    {
-                        sb.Append('\t');
-                        continue;
-                    }
-                    if (child.LocalName == "s")
-                    {
-                        int count = 1;
-                        string? cAttr = child.GetAttribute("c", OdfNamespaces.Text);
-                        if (cAttr is not null && int.TryParse(cAttr, out var parsedCount))
-                        {
-                            count = parsedCount;
-                        }
-                        sb.Append(' ', count);
-                        continue;
-                    }
-                }
-                sb.Append(child.TextContent);
-            }
+            WriteTextContentTo(new StringBuilderTextSink(sb));
             return sb.ToString();
         }
         set

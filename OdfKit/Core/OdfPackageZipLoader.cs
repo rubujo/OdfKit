@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -197,11 +198,13 @@ internal static class OdfPackageZipLoader
 #endif
     }
 
+    private const int ReadBufferSize = 81920;
+
     private static byte[] ReadEntryBytes(Stream entryStream, long entryLength)
     {
         if (entryLength <= 0)
         {
-            return [];
+            return ReadEntryBytesGrowable(entryStream, ReadEntryBytesCore);
         }
 
         if (entryLength > int.MaxValue)
@@ -209,32 +212,10 @@ internal static class OdfPackageZipLoader
             throw new SecurityException($"Zip entry size {entryLength} exceeds supported in-memory limit.");
         }
 
-        var entryBytes = new byte[(int)entryLength];
-        int offset = 0;
-        while (offset < entryBytes.Length)
-        {
-            int read = entryStream.Read(entryBytes, offset, entryBytes.Length - offset);
-            if (read == 0)
-            {
-                break;
-            }
-
-            offset += read;
-        }
-
-        if (offset == entryBytes.Length)
-        {
-            return entryBytes;
-        }
-
-        if (offset == 0)
-        {
-            return [];
-        }
-
-        var trimmed = new byte[offset];
-        Buffer.BlockCopy(entryBytes, 0, trimmed, 0, offset);
-        return trimmed;
+        return ReadEntryBytesWithPool(
+            entryStream,
+            (int)entryLength,
+            static (stream, buffer, offset, count) => stream.Read(buffer, offset, count));
     }
 
     private static async Task<byte[]> ReadEntryBytesAsync(
@@ -244,7 +225,7 @@ internal static class OdfPackageZipLoader
     {
         if (entryLength <= 0)
         {
-            return [];
+            return await ReadEntryBytesGrowableAsync(entryStream, cancellationToken).ConfigureAwait(false);
         }
 
         if (entryLength > int.MaxValue)
@@ -252,33 +233,157 @@ internal static class OdfPackageZipLoader
             throw new SecurityException($"Zip entry size {entryLength} exceeds supported in-memory limit.");
         }
 
-        var entryBytes = new byte[(int)entryLength];
-        int offset = 0;
-        while (offset < entryBytes.Length)
+        return await ReadEntryBytesWithPoolAsync(
+            entryStream,
+            (int)entryLength,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private static byte[] ReadEntryBytesWithPool(
+        Stream entryStream,
+        int capacity,
+        Func<Stream, byte[], int, int, int> read)
+    {
+        byte[] rented = ArrayPool<byte>.Shared.Rent(capacity);
+        try
         {
-            int read = await entryStream.ReadAsync(entryBytes, offset, entryBytes.Length - offset, cancellationToken)
-                .ConfigureAwait(false);
-            if (read == 0)
+            int offset = 0;
+            while (offset < capacity)
             {
-                break;
+                int bytesRead = read(entryStream, rented, offset, capacity - offset);
+                if (bytesRead == 0)
+                {
+                    break;
+                }
+
+                offset += bytesRead;
             }
 
-            offset += read;
+            return CopyToOwnedArray(rented, offset);
         }
-
-        if (offset == entryBytes.Length)
+        finally
         {
-            return entryBytes;
+            ArrayPool<byte>.Shared.Return(rented);
         }
+    }
 
-        if (offset == 0)
+    private static async Task<byte[]> ReadEntryBytesWithPoolAsync(
+        Stream entryStream,
+        int capacity,
+        CancellationToken cancellationToken)
+    {
+        byte[] rented = ArrayPool<byte>.Shared.Rent(capacity);
+        try
+        {
+            int offset = 0;
+            while (offset < capacity)
+            {
+                int bytesRead = await entryStream
+                    .ReadAsync(rented, offset, capacity - offset, cancellationToken)
+                    .ConfigureAwait(false);
+                if (bytesRead == 0)
+                {
+                    break;
+                }
+
+                offset += bytesRead;
+            }
+
+            return CopyToOwnedArray(rented, offset);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(rented);
+        }
+    }
+
+    private static byte[] ReadEntryBytesGrowable(
+        Stream entryStream,
+        Func<Stream, byte[], int, int, int> read)
+    {
+        byte[] rented = ArrayPool<byte>.Shared.Rent(ReadBufferSize);
+        try
+        {
+            int count = 0;
+            int rentedLength = rented.Length;
+            while (true)
+            {
+                if (count == rentedLength)
+                {
+                    byte[] larger = ArrayPool<byte>.Shared.Rent(rentedLength * 2);
+                    Buffer.BlockCopy(rented, 0, larger, 0, count);
+                    ArrayPool<byte>.Shared.Return(rented);
+                    rented = larger;
+                    rentedLength = larger.Length;
+                }
+
+                int bytesRead = read(entryStream, rented, count, rentedLength - count);
+                if (bytesRead == 0)
+                {
+                    break;
+                }
+
+                count += bytesRead;
+            }
+
+            return CopyToOwnedArray(rented, count);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(rented);
+        }
+    }
+
+    private static async Task<byte[]> ReadEntryBytesGrowableAsync(Stream entryStream, CancellationToken cancellationToken)
+    {
+        byte[] rented = ArrayPool<byte>.Shared.Rent(ReadBufferSize);
+        try
+        {
+            int count = 0;
+            int rentedLength = rented.Length;
+            while (true)
+            {
+                if (count == rentedLength)
+                {
+                    byte[] larger = ArrayPool<byte>.Shared.Rent(rentedLength * 2);
+                    Buffer.BlockCopy(rented, 0, larger, 0, count);
+                    ArrayPool<byte>.Shared.Return(rented);
+                    rented = larger;
+                    rentedLength = larger.Length;
+                }
+
+                int bytesRead = await entryStream
+                    .ReadAsync(rented, count, rentedLength - count, cancellationToken)
+                    .ConfigureAwait(false);
+                if (bytesRead == 0)
+                {
+                    break;
+                }
+
+                count += bytesRead;
+            }
+
+            return CopyToOwnedArray(rented, count);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(rented);
+        }
+    }
+
+    private static int ReadEntryBytesCore(Stream stream, byte[] buffer, int offset, int count) =>
+        stream.Read(buffer, offset, count);
+
+    private static byte[] CopyToOwnedArray(byte[] source, int length)
+    {
+        if (length == 0)
         {
             return [];
         }
 
-        var trimmed = new byte[offset];
-        Buffer.BlockCopy(entryBytes, 0, trimmed, 0, offset);
-        return trimmed;
+        var owned = new byte[length];
+        Buffer.BlockCopy(source, 0, owned, 0, length);
+        return owned;
     }
 
     private static bool TryDetectStoredCompression(ZipArchiveEntry entry)

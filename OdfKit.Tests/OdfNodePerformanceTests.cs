@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Buffers;
+using System.Collections.Generic;
+
 using OdfKit.Core;
 using OdfKit.DOM;
 using Xunit;
@@ -48,6 +50,23 @@ public class OdfNodePerformanceTests
         paragraph.AppendChild(text);
 
         Assert.Equal("快速路徑", paragraph.TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfNode.TryWriteTextContent"/> 與 <see cref="OdfNode.TextContent"/> 結果一致。
+    /// </summary>
+    [Fact]
+    public void TryWriteTextContent_MatchesTextContent_ForMixedChildren()
+    {
+        var paragraph = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+        paragraph.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = "Hello" });
+        paragraph.AppendChild(new OdfNode(OdfNodeType.Element, "line-break", OdfNamespaces.Text, "text"));
+        paragraph.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = "World" });
+
+        var bufferWriter = new ArrayBufferWriter<char>();
+        Assert.True(paragraph.TryWriteTextContent(bufferWriter));
+
+        Assert.Equal(paragraph.TextContent, new string(bufferWriter.WrittenSpan));
     }
 
     /// <summary>

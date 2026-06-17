@@ -29,18 +29,20 @@
 
 驗收：`dotnet test` 全綠；`OdfNodePerformanceTests`。
 
-## Phase PERF-2 — 中期（planned）
+## Phase PERF-2 — 中期（✅ 本輪，2b 延後）
 
-| ID | 變更 | 說明 |
+| ID | 變更 | 狀態 |
 |----|------|------|
-| PERF-2a | `TextContent` 提供 `TryWriteTextContent(IBufferWriter<char>)` | 高頻讀取零配置 API |
-| PERF-2b | 大型 DOM 改雙向鏈結或 `LinkedList<OdfNode>` | 需全面評估與 schema 產生器相容性 |
-| PERF-2c | ZIP 讀取 `ArrayPool<byte>` 過渡緩衝 | 當 entry 必須複製為自有陣列時減少 LOH 暫存 |
+| PERF-2a | `TryWriteTextContent(IBufferWriter<char>)` + `WriteTextContentTo` 共用邏輯 | ✅ |
+| PERF-2b | 大型 DOM 改雙向鏈結或 `LinkedList<OdfNode>` | ⏸️ 延後（PERF-1d `SiblingIndex` 已涵蓋常見路徑） |
+| PERF-2c | ZIP 讀取 `ArrayPool<byte>` 過渡緩衝 + 可成長讀取 | ✅ |
 
-## Phase PERF-3 — 基準與監控（planned）
+驗收：`dotnet test` 全綠；`OdfNodePerformanceTests.TryWriteTextContent_*`。
 
-- 新增 `OdfKit.Benchmarks` 或 `eng/Benchmark-*.ps1`（公式剖析、XML 載入、百萬列 `OdsStreamWriter`）
-- CI 可選效能回歸門檻（非阻擋性）
+## Phase PERF-3 — 基準與監控（✅ 初版）
+
+- `eng/Benchmark-Performance.ps1`：執行 DOM／公式／封裝相關測試子集並輸出耗時
+- 後續可選：獨立 `OdfKit.Benchmarks` 專案、CI 非阻擋性回歸門檻
 
 ## 全程約束
 
