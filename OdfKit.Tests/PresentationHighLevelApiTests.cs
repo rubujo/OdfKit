@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OdfKit.Core;
@@ -90,6 +91,34 @@ public class PresentationHighLevelApiTests
         var emphasisNode = emphasisAnim.Node;
         Assert.Equal("par", emphasisNode.LocalName);
         Assert.Equal("emphasis", emphasisNode.GetAttribute("preset-class", OdfNamespaces.Presentation));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfSlide.GetAnimations"/> 可讀回已建立的動畫效果。
+    /// </summary>
+    [Fact]
+    public void GetAnimations_RoundTripsAfterAdd()
+    {
+        using var document = PresentationDocument.Create();
+        OdfSlide slide = document.AddSlide();
+        OdfPlaceholder placeholder = slide.AddPlaceholder(
+            OdfPlaceholderType.Title,
+            OdfLength.Parse("1.0cm"),
+            OdfLength.Parse("1.0cm"),
+            OdfLength.Parse("10.0cm"),
+            OdfLength.Parse("2.0cm"));
+        string shapeId = placeholder.Id;
+        Assert.False(string.IsNullOrEmpty(shapeId));
+
+        slide.AddEntranceEffect(shapeId, OdfAnimationEffect.Fade, OdfAnimationTrigger.OnClick, TimeSpan.FromSeconds(0.5));
+        slide.AddExitEffect(shapeId, OdfAnimationEffect.Zoom, OdfAnimationTrigger.WithPrevious, TimeSpan.FromSeconds(1.0));
+        slide.AddEmphasisEffect(shapeId, OdfAnimationEffect.Appear);
+
+        IReadOnlyList<OdfAnimationInfo> animations = slide.GetAnimations();
+        Assert.Equal(3, animations.Count);
+        Assert.Contains(animations, a => a.Kind == OdfAnimationKind.Entrance && a.TargetElementId == shapeId && a.Effect == OdfAnimationEffect.Fade);
+        Assert.Contains(animations, a => a.Kind == OdfAnimationKind.Exit && a.Effect == OdfAnimationEffect.Zoom && a.Trigger == OdfAnimationTrigger.WithPrevious);
+        Assert.Contains(animations, a => a.Kind == OdfAnimationKind.Emphasis && a.PresetId == "ooo-emphasis-fade");
     }
 
     /// <summary>

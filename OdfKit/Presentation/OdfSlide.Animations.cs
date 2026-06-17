@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -254,6 +255,12 @@ public partial class OdfSlide
         }
         return null;
     }
+
+    /// <summary>
+    /// 取得此投影片上所有動畫效果的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfAnimationInfo> GetAnimations() =>
+        OdfSlideAnimationReadEngine.GetAnimations(this);
 
     #endregion
 }

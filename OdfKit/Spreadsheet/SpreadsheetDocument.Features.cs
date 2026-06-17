@@ -14,6 +14,18 @@ public partial class SpreadsheetDocument
     #region Named Ranges, Charts & Validation
 
     /// <summary>
+    /// 取得試算表中所有資料驗證規則的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfDataValidationInfo> GetDataValidations() =>
+        SpreadsheetDocumentDataValidationReadEngine.GetDataValidations(this);
+
+    /// <summary>
+    /// 取得試算表中所有嵌入圖表的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfEmbeddedChartInfo> GetEmbeddedCharts() =>
+        SpreadsheetDocumentEmbeddedChartReadEngine.GetEmbeddedCharts(this);
+
+    /// <summary>
     /// 新增命名範圍。
     /// </summary>
     /// <param name="name">命名範圍的名稱</param>

@@ -115,6 +115,61 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetDataValidations"/> 可讀回資料驗證規則。
+    /// </summary>
+    [Fact]
+    public void GetDataValidations_RoundTripsAfterAdd()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.AddSheet("Sheet1");
+        document.AddDataValidation("Sheet1", new OdfDataValidation
+        {
+            ApplyTo = new OdfCellRange(0, 0, 4, 0, "Sheet1"),
+            Condition = OdfValidationCondition.IntegerBetween,
+            Formula1 = "1",
+            Formula2 = "50",
+            ErrorMessage = "範圍錯誤",
+            ErrorTitle = "輸入錯誤",
+            AlertStyle = OdfValidationAlertStyle.Warning,
+        });
+
+        Assert.Single(document.GetDataValidations());
+        OdfDataValidationInfo info = document.GetDataValidations()[0];
+        Assert.Equal("val_1", info.Name);
+        Assert.True(info.TryGetCondition(out OdfValidationCondition condition));
+        Assert.Equal(OdfValidationCondition.IntegerBetween, condition);
+        Assert.Equal("範圍錯誤", info.ErrorMessage);
+        Assert.Equal("warning", info.AlertStyle);
+        Assert.Equal(5, info.AppliedRanges.Count);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetEmbeddedCharts"/> 可讀回嵌入圖表摘要。
+    /// </summary>
+    [Fact]
+    public void GetEmbeddedCharts_RoundTripsAfterAdd()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.AddSheet("Sheet1");
+        document.AddChart("Sheet1", new OdfCellAddress(0, 3, "Sheet1"), new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Bar,
+            Title = "季度銷售",
+            DataRange = new OdfCellRange(0, 0, 5, 1, "Sheet1"),
+            HasLegend = true,
+        });
+
+        Assert.Single(document.GetEmbeddedCharts());
+        OdfEmbeddedChartInfo chart = document.GetEmbeddedCharts()[0];
+        Assert.Equal("Sheet1", chart.SheetName);
+        Assert.Equal(OdfChartType.Bar, chart.ChartType);
+        Assert.Equal("季度銷售", chart.Title);
+        Assert.Equal("Object 1/", chart.ObjectPath);
+        Assert.True(chart.TryGetAnchorAddress(out OdfCellAddress anchor));
+        Assert.Equal(3, anchor.Column);
+    }
+
+    /// <summary>
     /// 驗證列印範圍、標題列欄、分頁符與縮放設定會寫入 ODS XML。
     /// </summary>
     [Fact]

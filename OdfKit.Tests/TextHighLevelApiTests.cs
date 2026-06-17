@@ -150,6 +150,42 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證格式變更修訂可讀取，並可接受或拒絕以還原樣式。
+    /// </summary>
+    [Fact]
+    public void FormatChangeTrackedRevisionCanBeAcceptedOrRejected()
+    {
+        using var document = TextDocument.Create();
+        document.TrackedChanges = false;
+
+        OdfParagraph paragraph = document.AddParagraph("格式修訂測試");
+        paragraph.StyleName = "OriginalStyle";
+
+        document.TrackedChanges = true;
+        paragraph.StyleName = "NewStyle";
+
+        OdfTrackedChange formatChange = document.GetTrackedChanges().Single(c => c.ChangeType == OdfChangeType.FormatChange);
+        Assert.Equal("格式修訂測試", formatChange.Content);
+
+        document.RejectChange(formatChange.RegionId);
+        Assert.Equal("OriginalStyle", paragraph.StyleName);
+        Assert.Empty(document.GetTrackedChanges());
+
+        document.TrackedChanges = true;
+        paragraph.StyleName = "AcceptedStyle";
+
+        formatChange = document.GetTrackedChanges().Single(c => c.ChangeType == OdfChangeType.FormatChange);
+        document.AcceptChange(formatChange.RegionId);
+
+        Assert.Equal("AcceptedStyle", paragraph.StyleName);
+        Assert.Empty(document.GetTrackedChanges());
+
+        string contentXml = SaveAndGetContentXml(document);
+        Assert.DoesNotContain("format-change", contentXml);
+        Assert.DoesNotContain("change-start", contentXml);
+    }
+
+    /// <summary>
     /// 驗證可讀取 LibreOffice 慣用之內嵌修訂中繼資料屬性。
     /// </summary>
     [Fact]
