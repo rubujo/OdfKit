@@ -34,7 +34,7 @@ public partial class TextDocument
             => _document.FindOrCreateChild(parent, localName, ns, prefix);
 
         internal void RemapStylesInNodes(OdfNode node, Dictionary<string, string> renameMap)
-            => _document.RemapStylesInNodes(node, renameMap);
+            => OdfDocumentStyleRemapEngine.RemapStylesInNodes(node, renameMap);
 
         internal OdfNode FindOrCreateSettingsNode(OdfNode root, string name)
             => _document.FindOrCreateSettingsNode(root, name);

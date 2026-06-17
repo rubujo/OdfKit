@@ -132,15 +132,21 @@
 - [x] `TextDocumentPageFieldsEngine`、`TextDocumentCjkFontEngine`、`TextDocumentFontFaceEngine`
 - [x] `TextDocument.cs` 收斂為薄門面（`DecodeHtmlEntities` 遷至 `TextDocumentDomHelper`）
 
-## 剩餘工作（Phase 17+）
+## Phase 17（已完成）
+
+- [x] `OdfDocumentMergeEngine`（`AppendDocument` 與樣式合併管線）
+- [x] `OdfDocumentStyleRemapEngine`（`RemapStylesInNodes` 遷移）
+- [x] `OdfDocumentMergeCollaborators` 協作存取器
+- [x] `OdfDocument.Merging` 收斂為薄門面
+
+## 剩餘工作（Phase 18+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `OdfElement` | ~640 | Wrapper partial（typed DOM 元素，低優先） |
-| `OdfPackage` | ~900 | 公開 API 項目讀寫（需保留薄門面） |
-| `TextDocument` | ~1000 | 核心 `TextDocument.cs` |
-| `OdfDocument` | ~1493 | 合併／複製管線 |
 | `OdfTableSheet` | ~1185 | `Internals`、核心工作表邏輯 |
+| `OdfPackage` | ~900 | 公開 API 項目讀寫（需保留薄門面） |
+| `OdfDocument` | ~1200 | Helpers／Metadata／Lifecycle |
+| `OdfElement` | ~640 | Wrapper partial（typed DOM 元素，低優先） |
 
 ## 驗證
 
