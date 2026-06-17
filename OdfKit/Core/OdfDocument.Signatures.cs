@@ -20,10 +20,7 @@ public abstract partial class OdfDocument
     public void Sign(X509Certificate2 certificate)
     {
         StyleEngine.DeduplicateAndSaveStyles();
-        WriteDomToEntry("content.xml", ContentDom, OdfSaveOptions.Default);
-        WriteDomToEntry("styles.xml", StylesDom, OdfSaveOptions.Default);
-        WriteDomToEntry("meta.xml", MetaDom, OdfSaveOptions.Default);
-        WriteDomToEntry("settings.xml", SettingsDom, OdfSaveOptions.Default);
+        OdfDocumentPersistenceEngine.WriteAllDomEntries(PersistenceCollaborators, OdfSaveOptions.Default);
 
         OdfSignatureSigner.SignAsync(Package, certificate, new OdfSigningOptions { Level = XadesLevel.None })
             .GetAwaiter().GetResult();

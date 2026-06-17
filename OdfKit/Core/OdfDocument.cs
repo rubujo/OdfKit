@@ -305,30 +305,6 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     }
 
 
-    private void ApplySaveVersionOptions(OdfSaveOptions options)
-    {
-        OdfVersion? effectiveVersion = options.ForceVersion ?? TargetVersion;
-        if (effectiveVersion is not OdfVersion forcedVersion)
-        {
-            return;
-        }
-
-        string version = OdfVersionInfo.ToVersionString(forcedVersion);
-        Package.Version = forcedVersion;
-        SetDocumentRootVersion(ContentDom, version);
-        SetDocumentRootVersion(StylesDom, version);
-        SetDocumentRootVersion(MetaDom, version);
-        SetDocumentRootVersion(SettingsDom, version);
-    }
-
-    private static void SetDocumentRootVersion(OdfNode node, string version)
-    {
-        if (node.NodeType == OdfNodeType.Element)
-        {
-            node.SetAttribute("version", OdfNamespaces.Office, version, "office");
-        }
-    }
-
     /// <summary>
     /// 釋放文件與底層封裝資源。
     /// </summary>
@@ -376,8 +352,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// </summary>
     public double ZoomLevel
     {
-        get => GetZoomLevelInternal();
-        set => SetZoomLevelInternal(value);
+        get => OdfDocumentSettingsEngine.GetZoomLevel(SettingsDom);
+        set => OdfDocumentSettingsEngine.SetZoomLevel(SettingsDom, value);
     }
 
 

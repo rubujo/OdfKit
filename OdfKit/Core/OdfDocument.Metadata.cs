@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
@@ -9,14 +8,13 @@ public abstract partial class OdfDocument
 {
     #region Metadata API (meta.xml)
 
-
     /// <summary>
     /// 取得或設定文件標題。
     /// </summary>
     public string? Title
     {
-        get => GetMetaElementText("dc:title");
-        set => SetMetaElementText("dc:title", value);
+        get => OdfDocumentMetadataEngine.GetMetaElementText(MetaDom, "dc:title");
+        set => OdfDocumentMetadataEngine.SetMetaElementText(MetaDom, "dc:title", value);
     }
 
     /// <summary>
@@ -24,8 +22,8 @@ public abstract partial class OdfDocument
     /// </summary>
     public string? Creator
     {
-        get => GetMetaElementText("dc:creator");
-        set => SetMetaElementText("dc:creator", value);
+        get => OdfDocumentMetadataEngine.GetMetaElementText(MetaDom, "dc:creator");
+        set => OdfDocumentMetadataEngine.SetMetaElementText(MetaDom, "dc:creator", value);
     }
 
     /// <summary>
@@ -33,8 +31,8 @@ public abstract partial class OdfDocument
     /// </summary>
     public string? Description
     {
-        get => GetMetaElementText("dc:description");
-        set => SetMetaElementText("dc:description", value);
+        get => OdfDocumentMetadataEngine.GetMetaElementText(MetaDom, "dc:description");
+        set => OdfDocumentMetadataEngine.SetMetaElementText(MetaDom, "dc:description", value);
     }
 
     /// <summary>
@@ -42,8 +40,8 @@ public abstract partial class OdfDocument
     /// </summary>
     public string? Subject
     {
-        get => GetMetaElementText("dc:subject");
-        set => SetMetaElementText("dc:subject", value);
+        get => OdfDocumentMetadataEngine.GetMetaElementText(MetaDom, "dc:subject");
+        set => OdfDocumentMetadataEngine.SetMetaElementText(MetaDom, "dc:subject", value);
     }
 
     /// <summary>
@@ -51,8 +49,8 @@ public abstract partial class OdfDocument
     /// </summary>
     public string? Language
     {
-        get => GetMetaElementText("dc:language");
-        set => SetMetaElementText("dc:language", value);
+        get => OdfDocumentMetadataEngine.GetMetaElementText(MetaDom, "dc:language");
+        set => OdfDocumentMetadataEngine.SetMetaElementText(MetaDom, "dc:language", value);
     }
 
     /// <summary>
@@ -60,8 +58,8 @@ public abstract partial class OdfDocument
     /// </summary>
     public DateTime? CreationDate
     {
-        get => ParseMetaDate(GetMetaElementText("meta:creation-date"));
-        set => SetMetaElementText("meta:creation-date", FormatMetaDate(value));
+        get => OdfDocumentMetadataEngine.ParseMetaDate(OdfDocumentMetadataEngine.GetMetaElementText(MetaDom, "meta:creation-date"));
+        set => OdfDocumentMetadataEngine.SetMetaElementText(MetaDom, "meta:creation-date", OdfDocumentMetadataEngine.FormatMetaDate(value));
     }
 
     /// <summary>
@@ -69,8 +67,8 @@ public abstract partial class OdfDocument
     /// </summary>
     public DateTime? ModificationDate
     {
-        get => ParseMetaDate(GetMetaElementText("dc:date"));
-        set => SetMetaElementText("dc:date", FormatMetaDate(value));
+        get => OdfDocumentMetadataEngine.ParseMetaDate(OdfDocumentMetadataEngine.GetMetaElementText(MetaDom, "dc:date"));
+        set => OdfDocumentMetadataEngine.SetMetaElementText(MetaDom, "dc:date", OdfDocumentMetadataEngine.FormatMetaDate(value));
     }
 
     /// <summary>
@@ -80,30 +78,7 @@ public abstract partial class OdfDocument
     /// <param name="value">屬性值。</param>
     /// <param name="type">ODF 中繼資料值類型，例如 string、float、boolean 或 date。</param>
     internal void SetCustomProperty(string name, object value, string type)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Property name cannot be empty.", nameof(name));
-
-        if (name.Contains(":"))
-        {
-            string oldName = name;
-            name = name.Replace(":", "_");
-            OdfKitDiagnostics.Warn($"Custom property name '{oldName}' contains invalid character ':'. Renamed to '{name}' for Excel compatibility.");
-        }
-
-        var metaRoot = FindOrCreateMetaRoot();
-
-        OdfNode? existing = FindCustomPropertyNode(metaRoot, name);
-        if (existing != null)
-            metaRoot.RemoveChild(existing);
-
-        var propNode = new OdfNode(OdfNodeType.Element, "user-defined", OdfNamespaces.Meta, "meta");
-        propNode.SetAttribute("name", OdfNamespaces.Meta, name, "meta");
-        propNode.SetAttribute("value-type", OdfNamespaces.Meta, type, "meta");
-        propNode.TextContent = FormatValue(value, type);
-
-        metaRoot.AppendChild(propNode);
-    }
+        => OdfDocumentMetadataEngine.SetCustomProperty(MetaDom, name, value, type);
 
     /// <summary>設定字串類型的自訂屬性。</summary>
     public void SetCustomProperty(string name, string value) => SetCustomProperty(name, (object)value, "string");
@@ -126,16 +101,7 @@ public abstract partial class OdfDocument
     /// <param name="name">屬性名稱。</param>
     /// <returns>屬性值；若不存在則為 <see langword="null"/>。</returns>
     public object? GetCustomProperty(string name)
-    {
-        var metaRoot = FindOrCreateMetaRoot();
-        var propNode = FindCustomPropertyNode(metaRoot, name);
-        if (propNode == null)
-            return null;
-
-        string? type = propNode.GetAttribute("value-type", OdfNamespaces.Meta);
-        string valStr = propNode.TextContent;
-        return ParseValue(valStr, type);
-    }
+        => OdfDocumentMetadataEngine.GetCustomProperty(MetaDom, name);
 
     /// <summary>
     /// 以強型別讀取自訂中繼資料屬性，並轉換成指定型別。
@@ -158,94 +124,17 @@ public abstract partial class OdfDocument
     /// </summary>
     /// <returns>以屬性名稱為 Key 的唯讀字典。</returns>
     public IReadOnlyDictionary<string, object?> GetAllCustomProperties()
-    {
-        var metaRoot = FindOrCreateMetaRoot();
-        var result = new Dictionary<string, object?>();
-        foreach (var child in metaRoot.Children)
-        {
-            if (child.LocalName == "user-defined" && child.NamespaceUri == OdfNamespaces.Meta)
-            {
-                string? n = child.GetAttribute("name", OdfNamespaces.Meta);
-                if (!string.IsNullOrEmpty(n))
-                {
-                    string? type = child.GetAttribute("value-type", OdfNamespaces.Meta);
-                    result[n!] = ParseValue(child.TextContent, type);
-                }
-            }
-        }
-        return result;
-    }
-
+        => OdfDocumentMetadataEngine.GetAllCustomProperties(MetaDom);
 
     #endregion
 
     #region Statistics & Document Structure Diagnostics
 
-
     /// <summary>
     /// 更新文件統計中繼資料。
     /// </summary>
     protected virtual void UpdateDocumentStatistics()
-    {
-        int wordCount = 0;
-        int charCount = 0;
-        int paragraphCount = 0;
-        int tableCount = 0;
-        int imageCount = 0;
-
-        TraverseForStats(ContentDom, ref wordCount, ref charCount, ref paragraphCount, ref tableCount, ref imageCount);
-
-        var metaRoot = FindOrCreateMetaRoot();
-        OdfNode? statNode = null;
-        foreach (var child in metaRoot.Children)
-        {
-            if (child.LocalName == "document-statistic" && child.NamespaceUri == OdfNamespaces.Meta)
-            {
-                statNode = child;
-                break;
-            }
-        }
-
-        if (statNode == null)
-        {
-            statNode = new OdfNode(OdfNodeType.Element, "document-statistic", OdfNamespaces.Meta, "meta");
-            metaRoot.AppendChild(statNode);
-        }
-
-        statNode.SetAttribute("word-count", OdfNamespaces.Meta, wordCount.ToString(), "meta");
-        statNode.SetAttribute("character-count", OdfNamespaces.Meta, charCount.ToString(), "meta");
-        statNode.SetAttribute("paragraph-count", OdfNamespaces.Meta, paragraphCount.ToString(), "meta");
-        statNode.SetAttribute("table-count", OdfNamespaces.Meta, tableCount.ToString(), "meta");
-        statNode.SetAttribute("image-count", OdfNamespaces.Meta, imageCount.ToString(), "meta");
-        statNode.SetAttribute("page-count", OdfNamespaces.Meta, "1", "meta"); // Layout engine placeholder
-    }
-
-    private void TraverseForStats(OdfNode node, ref int words, ref int chars, ref int paragraphs, ref int tables, ref int images)
-    {
-        if (node.NodeType == OdfNodeType.Text)
-        {
-            string text = node.TextContent;
-            chars += text.Length;
-
-            string[] parts = text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
-            words += parts.Length;
-            return;
-        }
-
-        if (node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text)
-            paragraphs++;
-        else if (node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table)
-            tables++;
-        else if (node.LocalName == "image" && node.NamespaceUri == OdfNamespaces.Draw)
-            images++;
-
-        foreach (var child in node.Children)
-        {
-            TraverseForStats(child, ref words, ref chars, ref paragraphs, ref tables, ref images);
-        }
-    }
-
+        => OdfDocumentMetadataEngine.UpdateDocumentStatistics(MetaDom, ContentDom);
 
     #endregion
-
 }

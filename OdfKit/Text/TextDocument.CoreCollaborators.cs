@@ -37,15 +37,15 @@ public partial class TextDocument
             => OdfDocumentStyleRemapEngine.RemapStylesInNodes(node, renameMap);
 
         internal OdfNode FindOrCreateSettingsNode(OdfNode root, string name)
-            => _document.FindOrCreateSettingsNode(root, name);
+            => OdfDocumentSettingsEngine.FindOrCreateSettingsNode(root, name);
 
         internal OdfNode FindOrCreateMapNode(OdfNode setNode, string name)
-            => _document.FindOrCreateMapNode(setNode, name);
+            => OdfDocumentSettingsEngine.FindOrCreateMapNode(setNode, name);
 
         internal OdfNode FindOrCreateMapEntryNode(OdfNode mapNode)
-            => _document.FindOrCreateMapEntryNode(mapNode);
+            => OdfDocumentSettingsEngine.FindOrCreateMapEntryNode(mapNode);
 
         internal OdfNode FindOrCreateConfigItemNode(OdfNode entryNode, string name, string type)
-            => _document.FindOrCreateConfigItemNode(entryNode, name, type);
+            => OdfDocumentSettingsEngine.FindOrCreateConfigItemNode(entryNode, name, type);
     }
 }

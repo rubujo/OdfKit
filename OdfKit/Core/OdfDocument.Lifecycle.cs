@@ -2,17 +2,12 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
-using OdfKit.Core;
-using OdfKit.DOM;
-using OdfKit.Styles;
 
 namespace OdfKit.Core;
 
 public abstract partial class OdfDocument
 {
     #region Package Lifecycle & Persistence
-
 
     /// <summary>
     /// 儲存文件至 ODF 封裝容器中。
@@ -21,16 +16,7 @@ public abstract partial class OdfDocument
     public virtual void Save(OdfSaveOptions? options = null)
     {
         options ??= OdfSaveOptions.Default;
-
-        StyleEngine.DeduplicateAndSaveStyles();
-        UpdateDocumentStatistics();
-        ApplySaveVersionOptions(options);
-
-        WriteDomToEntry("content.xml", ContentDom, options);
-        WriteDomToEntry("styles.xml", StylesDom, options);
-        WriteDomToEntry("meta.xml", MetaDom, options);
-        WriteDomToEntry("settings.xml", SettingsDom, options);
-
+        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
         Package.Save(options);
     }
 
@@ -45,14 +31,7 @@ public abstract partial class OdfDocument
             throw new ArgumentNullException(nameof(path));
 
         options ??= OdfSaveOptions.Default;
-        StyleEngine.DeduplicateAndSaveStyles();
-        UpdateDocumentStatistics();
-        ApplySaveVersionOptions(options);
-
-        WriteDomToEntry("content.xml", ContentDom, options);
-        WriteDomToEntry("styles.xml", StylesDom, options);
-        WriteDomToEntry("meta.xml", MetaDom, options);
-        WriteDomToEntry("settings.xml", SettingsDom, options);
+        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
 
         using FileStream stream = new(path, FileMode.Create, FileAccess.Write, FileShare.None);
         Package.SaveToStream(stream, options);
@@ -67,16 +46,7 @@ public abstract partial class OdfDocument
     public virtual async Task SaveAsync(OdfSaveOptions? options = null, CancellationToken cancellationToken = default)
     {
         options ??= OdfSaveOptions.Default;
-
-        StyleEngine.DeduplicateAndSaveStyles();
-        UpdateDocumentStatistics();
-        ApplySaveVersionOptions(options);
-
-        WriteDomToEntry("content.xml", ContentDom, options);
-        WriteDomToEntry("styles.xml", StylesDom, options);
-        WriteDomToEntry("meta.xml", MetaDom, options);
-        WriteDomToEntry("settings.xml", SettingsDom, options);
-
+        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
         await Package.SaveAsync(options, cancellationToken).ConfigureAwait(false);
     }
 
@@ -92,19 +62,9 @@ public abstract partial class OdfDocument
         return Task.Run(() => Save(path, options), cancellationToken);
     }
 
-    private void WriteDomToEntry(string name, OdfNode node, OdfSaveOptions options)
-    {
-        using var ms = new MemoryStream();
-        OdfXmlWriter.Write(node, ms, options);
-        string path = string.IsNullOrEmpty(SubPath) ? name : SubPath + name;
-        Package.WriteEntry(path, ms.ToArray(), "text/xml");
-    }
-
-
     #endregion
 
     #region Web Streaming APIs
-
 
     /// <summary>
     /// 將文件儲存為 ODF 封裝位元組陣列。
@@ -128,15 +88,7 @@ public abstract partial class OdfDocument
             throw new ArgumentNullException(nameof(destinationStream));
 
         options ??= OdfSaveOptions.Default;
-        StyleEngine.DeduplicateAndSaveStyles();
-        UpdateDocumentStatistics();
-        ApplySaveVersionOptions(options);
-
-        WriteDomToEntry("content.xml", ContentDom, options);
-        WriteDomToEntry("styles.xml", StylesDom, options);
-        WriteDomToEntry("meta.xml", MetaDom, options);
-        WriteDomToEntry("settings.xml", SettingsDom, options);
-
+        OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
         Package.SaveToStream(destinationStream, options);
 
         if (destinationStream.CanSeek)
@@ -157,7 +109,5 @@ public abstract partial class OdfDocument
         return Task.Run(() => SaveToStream(destinationStream, options), cancellationToken);
     }
 
-
     #endregion
-
 }

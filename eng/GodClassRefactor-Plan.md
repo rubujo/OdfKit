@@ -146,11 +146,18 @@
 - [x] `OdfTableSheetMutationContext` 改委派 DomAccessEngine
 - [x] `OdfTableSheet.Internals`／`Internals.CellAccess` 收斂為薄門面
 
-## 剩餘工作（Phase 19+）
+## Phase 19（已完成）
+
+- [x] `OdfDocumentMetadataEngine`（meta.xml 中繼資料與統計）
+- [x] `OdfDocumentSettingsEngine`（settings.xml 設定與縮放）
+- [x] `OdfDocumentPersistenceEngine`（儲存管線與 DOM 寫入）
+- [x] `OdfDocumentPersistenceCollaborators` 協作存取器
+- [x] `OdfDocument.Helpers`／`Metadata`／`Lifecycle` 收斂為薄門面
+
+## 剩餘工作（Phase 20+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `OdfDocument` | ~1200 | Helpers／Metadata／Lifecycle |
 | `OdfPackage` | ~900 | 公開 API 項目讀寫（需保留薄門面） |
 | `OdfElement` | ~640 | Wrapper partial（typed DOM 元素，低優先） |
 
