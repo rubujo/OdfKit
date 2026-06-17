@@ -75,7 +75,8 @@ internal static class OdfDrawPageShapeReadEngine
                 node.GetAttribute("x1", OdfNamespaces.Svg),
                 node.GetAttribute("y1", OdfNamespaces.Svg),
                 node.GetAttribute("x2", OdfNamespaces.Svg),
-                node.GetAttribute("y2", OdfNamespaces.Svg)));
+                node.GetAttribute("y2", OdfNamespaces.Svg),
+                node.GetAttribute("points", OdfNamespaces.Draw)));
         });
 
         return connectors;

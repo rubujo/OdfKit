@@ -55,6 +55,12 @@ public partial class TextDocument
         TextDocumentTrackChangesRecordingEngine.GetTrackedChanges(this, MutationContext);
 
     /// <summary>
+    /// 取得文件中所有表格結構修訂（列／欄插入刪除）的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfTableStructuralChangeInfo> GetTableStructuralChanges() =>
+        TextDocumentTableStructuralChangeReadEngine.GetTableStructuralChanges(BodyTextRoot);
+
+    /// <summary>
     /// 追蹤格式變更。
     /// </summary>
     /// <param name="node">發生變更的 ODF 節點</param>

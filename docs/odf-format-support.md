@@ -53,15 +53,15 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - 統一的 `OdfDocument.Load` / `OdfDocument.Create` 與
   `OdfDocumentFactory.LoadDocument` / `CreateDocument` 高階入口已建立。
 - ODT、ODS、ODP、ODG 標為 `usable`：已有常用高階 API 與 `FourFormatApiScenarioTests` 場景背書，但尚非完整辦公套件物件模型（Wave 2 `complete` 目標）。升級 `complete` 前仍須補齊：
-  - **ODT**：索引進階編輯、頁首頁尾進階編輯、修訂結構變更（列／欄插入刪除）讀寫 API（書籤／超連結／參考標記／腳注尾注／索引摘要讀取 `GetBookmarks`／`GetHyperlinks`／`GetReferenceMarks`／`GetFootnotes`／`GetEndnotes`／`GetPageSetups`／`GetIndexInfos`／`GetIndexMarks` 已補）
+  - **ODT**：索引進階編輯、頁首頁尾進階編輯、修訂結構變更寫入 API（書籤／超連結／參考標記／腳注尾注／索引／註解／表格結構修訂讀取 `GetBookmarks`／`GetHyperlinks`／`GetReferenceMarks`／`GetFootnotes`／`GetEndnotes`／`GetPageSetups`／`GetIndexInfos`／`GetIndexMarks`／`GetCommentInfos`／`GetTableStructuralChanges` 已補）
   - **ODS**：樞紐表重算（見 non-goals）、完整圖表編輯模型（命名範圍／具名運算式／資料庫範圍／列印範圍／樞紐表／凍結／分割窗格讀取 `GetNamedRanges`／`GetNamedExpressions`／`GetDatabaseRanges`／`GetPrintAreas`／`GetPivotTables`／`GetFrozenPanes`／`GetSplitPanes` 已補）
-  - **ODP**：版面配置進階編輯、動畫時間軸進階編輯（母片列舉 `GetMasterPages`、切換效果讀取 `GetSlideTransition`／`GetSlideTransitions`、文件層動畫／預留位置／備忘錄／版面聚合 `GetAnimations`／`GetPlaceholderInfos`／`GetSpeakerNotes`／`GetLayouts` 已補）
-  - **ODG**：連接線路由進階、群組圖形寫入進階（群組／圖層／文字方塊／圖片／圖層指派讀取 `GetGroups`／`GetLayers`／`GetTextBoxes`／`GetPictures`／`GetShapeLayerAssignments` 已補）
+  - **ODP**：版面配置進階編輯、動畫時間軸進階寫入（母片列舉 `GetMasterPages`、切換效果與持續時間讀取 `GetSlideTransition`／`GetSlideTransitions`、動畫時間軸摘要（dur／begin／序號）與文件層聚合 `GetAnimations`／`GetPlaceholderInfos`／`GetSpeakerNotes`／`GetLayouts` 已補）
+  - **ODG**：連接線路由進階寫入、群組圖形寫入進階（群組／圖層／文字方塊／圖片／圖層指派／連接線路由點讀取 `GetGroups`／`GetLayers`／`GetTextBoxes`／`GetPictures`／`GetShapeLayerAssignments`／`GetConnectors` 之 `Points` 已補）
 - `.ott`、`.ots`、`.otp`、`.otg`、`.odm` 與 Flat 變體標為 `usable-variant`（VAR-1 ✅）：
   具專屬 typed 文件類別與 `Create`/`Load` 入口；語意 API 繼承四主格式基底類別。
 - ODT `text:tracked-changes` 已支援段落與表格儲存格插入／格式變更記錄；LO 互通測試已備（`TrackedChangesInteropTests`）。
 - ODS `table:tracked-changes` 已支援儲存格內容／公式變更、列／欄插入刪除與儲存格移動；LO 互通測試已新增（需本機 LibreOffice 26.x）。
-- ODG 已補強路徑、多邊形、連接線、自定義幾何、群組、圖層、文字方塊、圖片與圖層指派讀取 API（`GetPaths`／`GetConnectors`／`GetPolygons`／`GetCustomShapes`／`GetGroups`／`GetLayers`／`GetTextBoxes`／`GetPictures`／`GetShapeLayerAssignments`）；測試見 `DrawingHighLevelApiTests`。
+- ODG 已補強路徑、多邊形、連接線（含 `draw:points` 路由）、自定義幾何、群組、圖層、文字方塊、圖片與圖層指派讀取 API（`GetPaths`／`GetConnectors`／`GetPolygons`／`GetCustomShapes`／`GetGroups`／`GetLayers`／`GetTextBoxes`／`GetPictures`／`GetShapeLayerAssignments`）；測試見 `DrawingHighLevelApiTests`。
 - ODC／嵌入圖表已補強 `OdfChartDocument.GetChartDefinition`；ODB 已補強 `AddForm`／`GetForms` 表單元件 API（`DatabaseHighLevelApiTests`）。
 - ODF 已補強 `GetMathTokens` 讀取 API；ODI 已補強 `GetImageFrames`／`AddImageFrame`（`FormulaHighLevelApiTests`、`ImageHighLevelApiTests`）。
 - LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；CALCEXT-1 基礎 ✅：工作表層與 `SpreadsheetDocument.GetConditionalFormats`／`GetSparklineGroups` 文件層聚合讀取。

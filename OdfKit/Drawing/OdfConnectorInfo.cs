@@ -14,6 +14,7 @@ namespace OdfKit.Drawing;
 /// <param name="startY">起點 Y 座標原文（座標模式）。</param>
 /// <param name="endX">終點 X 座標原文（座標模式）。</param>
 /// <param name="endY">終點 Y 座標原文（座標模式）。</param>
+/// <param name="points">自訂路由頂點座標字串（<c>draw:points</c>）。</param>
 public sealed class OdfConnectorInfo(
     string pageName,
     string id,
@@ -23,7 +24,8 @@ public sealed class OdfConnectorInfo(
     string? startX,
     string? startY,
     string? endX,
-    string? endY)
+    string? endY,
+    string? points = null)
 {
     /// <summary>
     /// 取得所在繪圖頁面名稱。
@@ -69,6 +71,11 @@ public sealed class OdfConnectorInfo(
     /// 取得終點 Y 座標原文。
     /// </summary>
     public string? EndY { get; } = endY;
+
+    /// <summary>
+    /// 取得自訂路由頂點座標字串。
+    /// </summary>
+    public string? Points { get; } = points;
 
     /// <summary>
     /// 取得此連接線是否以圖形識別碼連結起訖端點。

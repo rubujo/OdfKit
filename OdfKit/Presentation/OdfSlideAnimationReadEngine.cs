@@ -17,6 +17,20 @@ internal static class OdfSlideAnimationReadEngine
     {
         List<OdfAnimationInfo> animations = [];
         CollectAnimations(slide.AnimationRoot.Node, animations);
+        for (int index = 0; index < animations.Count; index++)
+        {
+            OdfAnimationInfo current = animations[index];
+            animations[index] = new OdfAnimationInfo(
+                current.Kind,
+                current.TargetElementId,
+                current.Effect,
+                current.Trigger,
+                current.PresetId,
+                current.Duration,
+                current.Begin,
+                index);
+        }
+
         return animations.AsReadOnly();
     }
 
@@ -61,7 +75,9 @@ internal static class OdfSlideAnimationReadEngine
             targetElementId!,
             ParseEffect(presetId, kind),
             ResolveEffectTrigger(effectPar),
-            presetId));
+            presetId,
+            effectPar.GetAttribute("dur", SmilNs),
+            effectPar.GetAttribute("begin", SmilNs)));
     }
 
     private static string? FindTargetElementId(OdfNode effectPar)

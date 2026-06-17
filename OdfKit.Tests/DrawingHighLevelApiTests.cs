@@ -158,7 +158,8 @@ public class DrawingHighLevelApiTests
             OdfLength.Parse("3cm"),
             OdfLength.Parse("2cm"));
 
-        document.AddConnector(startShape.Id, endShape.Id, OdfConnectorType.Curve);
+        OdfShape connectorShape = document.AddConnector(startShape.Id, endShape.Id, OdfConnectorType.Curve);
+        connectorShape.Node.SetAttribute("points", OdfNamespaces.Draw, "0cm 0cm 1cm 1cm 2cm 0cm", "draw");
 
         IReadOnlyList<OdfConnectorInfo> connectors = page.GetConnectors();
         Assert.Single(connectors);
@@ -167,6 +168,7 @@ public class DrawingHighLevelApiTests
         Assert.Equal(startShape.Id, connector.StartShapeId);
         Assert.Equal(endShape.Id, connector.EndShapeId);
         Assert.Equal(OdfConnectorType.Curve, connector.ConnectorType);
+        Assert.Equal("0cm 0cm 1cm 1cm 2cm 0cm", connector.Points);
     }
 
     /// <summary>

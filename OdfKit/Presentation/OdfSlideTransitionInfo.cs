@@ -6,10 +6,12 @@
 /// <param name="slideIndex">投影片索引位置。</param>
 /// <param name="slideName">投影片名稱。</param>
 /// <param name="transition">投影片切換效果類型。</param>
+/// <param name="duration">切換持續時間原文（<c>smil:dur</c>）。</param>
 public sealed class OdfSlideTransitionInfo(
     int slideIndex,
     string slideName,
-    OdfSlideTransition transition)
+    OdfSlideTransition transition,
+    string? duration = null)
 {
     /// <summary>
     /// 取得投影片索引位置。
@@ -25,4 +27,9 @@ public sealed class OdfSlideTransitionInfo(
     /// 取得投影片切換效果類型。
     /// </summary>
     public OdfSlideTransition Transition { get; } = transition;
+
+    /// <summary>
+    /// 取得切換持續時間原文。
+    /// </summary>
+    public string? Duration { get; } = duration;
 }

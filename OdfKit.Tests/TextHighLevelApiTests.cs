@@ -319,6 +319,65 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="TextDocument.GetCommentInfos"/> 可讀回註解摘要。
+    /// </summary>
+    [Fact]
+    public void GetCommentInfos_RoundTripsAfterAdd()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("註解段落");
+        document.AddComment(
+            paragraph,
+            new OdfComment("審閱者", "請修訂措辭", new DateTime(2026, 6, 17, 8, 0, 0, DateTimeKind.Utc), "comment-1"));
+
+        OdfCommentInfo info = Assert.Single(document.GetCommentInfos());
+        Assert.Equal("comment-1", info.Name);
+        Assert.Equal("審閱者", info.Author);
+        Assert.Equal("請修訂措辭", info.Text);
+        Assert.Equal(0, info.ReplyCount);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.GetTableStructuralChanges"/> 可讀回表格結構修訂。
+    /// </summary>
+    [Fact]
+    public void GetTableStructuralChanges_ReadsInsertionAndDeletion()
+    {
+        using var document = TextDocument.Create();
+        OdfTable table = document.AddTable(2, 2);
+
+        var insertion = new OdfNode(OdfNodeType.Element, "insertion", OdfNamespaces.Table, "table");
+        insertion.SetAttribute("id", OdfNamespaces.Table, "tc_row_ins", "table");
+        insertion.SetAttribute("type", OdfNamespaces.Table, "row", "table");
+        insertion.SetAttribute("position", OdfNamespaces.Table, "1", "table");
+        insertion.SetAttribute("count", OdfNamespaces.Table, "2", "table");
+        OdfTrackedChangeMetadataReader.Write(insertion, "Editor", new DateTime(2026, 6, 17, 9, 0, 0, DateTimeKind.Utc));
+        table.Node.AppendChild(insertion);
+
+        var deletion = new OdfNode(OdfNodeType.Element, "deletion", OdfNamespaces.Table, "table");
+        deletion.SetAttribute("id", OdfNamespaces.Table, "tc_col_del", "table");
+        deletion.SetAttribute("type", OdfNamespaces.Table, "column", "table");
+        deletion.SetAttribute("position", OdfNamespaces.Table, "0", "table");
+        deletion.SetAttribute("acceptance-state", OdfNamespaces.Table, "pending", "table");
+        OdfTrackedChangeMetadataReader.Write(deletion, "Reviewer", new DateTime(2026, 6, 17, 10, 0, 0, DateTimeKind.Utc));
+        table.Node.AppendChild(deletion);
+
+        Assert.Equal(2, document.GetTableStructuralChanges().Count);
+        OdfTableStructuralChangeInfo rowInsertion = document.GetTableStructuralChanges()
+            .First(c => c.ChangeId == "tc_row_ins");
+        Assert.Equal(OdfTableStructuralChangeKind.Insertion, rowInsertion.Kind);
+        Assert.Equal("row", rowInsertion.StructuralType);
+        Assert.Equal(1, rowInsertion.Position);
+        Assert.Equal(2, rowInsertion.Count);
+        Assert.Equal("Editor", rowInsertion.Author);
+
+        OdfTableStructuralChangeInfo columnDeletion = document.GetTableStructuralChanges()
+            .First(c => c.ChangeId == "tc_col_del");
+        Assert.Equal(OdfTableStructuralChangeKind.Deletion, columnDeletion.Kind);
+        Assert.Equal("column", columnDeletion.StructuralType);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="TextDocument.GetIndexInfos"/> 與 <see cref="TextDocument.GetIndexMarks"/> 可讀回索引與標記。
     /// </summary>
     [Fact]

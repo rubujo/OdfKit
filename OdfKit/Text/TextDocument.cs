@@ -383,6 +383,12 @@ public partial class TextDocument : OdfDocument
     public List<OdfComment> GetComments()
         => TextDocumentCommentsEngine.GetComments(BodyTextRoot);
 
+    /// <summary>
+    /// 取得文件中所有註解的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfCommentInfo> GetCommentInfos() =>
+        TextDocumentCommentReadEngine.GetCommentInfos(BodyTextRoot);
+
 
     #endregion
 

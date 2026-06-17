@@ -120,6 +120,15 @@ public class PresentationHighLevelApiTests
         Assert.Contains(animations, a => a.Kind == OdfAnimationKind.Exit && a.Effect == OdfAnimationEffect.Zoom && a.Trigger == OdfAnimationTrigger.WithPrevious);
         Assert.Contains(animations, a => a.Kind == OdfAnimationKind.Emphasis && a.PresetId == "ooo-emphasis-fade");
 
+        OdfAnimationInfo entrance = animations.First(a => a.Kind == OdfAnimationKind.Entrance);
+        Assert.Equal(0, entrance.SequenceIndex);
+        Assert.Equal("0.5s", entrance.Duration);
+        Assert.True(entrance.TryGetDurationSeconds(out double entranceSeconds));
+        Assert.Equal(0.5, entranceSeconds, 2);
+        Assert.Equal("0.50s", entrance.Begin);
+        Assert.True(entrance.TryGetDelaySeconds(out double entranceDelay));
+        Assert.Equal(0.5, entranceDelay, 2);
+
         IReadOnlyList<OdfSlideAnimationInfo> documentAnimations = document.GetAnimations();
         Assert.Equal(3, documentAnimations.Count);
         Assert.All(documentAnimations, item => Assert.Equal(0, item.SlideIndex));
@@ -267,6 +276,8 @@ public class PresentationHighLevelApiTests
         OdfSlideTransitionInfo second = document.GetSlideTransitions()[1];
         Assert.Equal(1, second.SlideIndex);
         Assert.Equal(OdfSlideTransition.Wipe, second.Transition);
+
+        Assert.False(string.IsNullOrEmpty(first.Duration));
     }
 
     /// <summary>

@@ -18,7 +18,11 @@ internal static class PresentationDocumentTransitionReadEngine
             if (transition == OdfSlideTransition.None)
                 continue;
 
-            transitions.Add(new OdfSlideTransitionInfo(slideIndex, slide.Name, transition));
+            transitions.Add(new OdfSlideTransitionInfo(
+                slideIndex,
+                slide.Name,
+                transition,
+                slide.Node.GetAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0")));
         }
 
         return transitions.AsReadOnly();
