@@ -160,12 +160,14 @@
 - [x] `OdfPackageEntryCollaborators` 協作存取器
 - [x] `OdfPackage.PublicApi` 收斂為薄門面
 
-## 剩餘工作（可選）
+## Phase 21（已完成）
 
-| 型別 | 約略行數 | 待提取 |
-|------|----------|--------|
-| `OdfElement` | ~640 | Wrapper partial（typed DOM 元素，低優先，可略過） |
+- [x] `OdfElement.TextWrappers`、`TableWrappers`、`DrawWrappers`、`StyleWrappers`、`OfficeWrappers`、`ManifestWrappers` partial 拆分
+- [x] `eng/Split-OdfElementPartials.ps1` 自動化腳本
+- [x] `OdfElement.cs` 核心收斂（typed DOM wrapper 遷出）
 
 ## 驗證
 
-每輪變更：`dotnet build` → `dotnet test`（1131+）→ `pwsh eng/Format-Safe.ps1` → GPG 簽署提交。
+每輪變更：`dotnet build` → `dotnet test`（1154+）→ `pwsh eng/Format-Safe.ps1` → GPG 簽署提交。
+
+相關計畫：非同步／`CancellationToken` 統一見 [`eng/AsyncRefactor-Plan.md`](AsyncRefactor-Plan.md)（Phase 1–8 及後續強化均已完成）。
