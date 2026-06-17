@@ -44,7 +44,7 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 
 ## 非目標（Wave 3 尚未涵蓋）
 
-- 像素級視覺 diff（Q-3 OOXML golden file）
+- 像素級視覺 diff（見 [ooxml-visual-golden-matrix.md](ooxml-visual-golden-matrix.md)）
 - Microsoft Word / Excel 開啟驗收
 - 全 17 種 extension 逐一 LO 轉換（目前聚焦四主格式與追蹤修訂）
 - 動畫播放、圖表樣式、樞紐表重算等編輯器行為驗證

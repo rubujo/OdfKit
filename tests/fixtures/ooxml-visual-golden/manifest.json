@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "description": "OOXML 轉換視覺 golden 場景清單（Wave 3 Q-3）。baseline 為 LibreOffice 匯出 PDF，candidate 為 Microsoft Office 匯出 PDF。",
+  "thresholdPercent": 5.0,
+  "scenarios": [
+    {
+      "id": "odt-docx-word-pdf",
+      "sourceFormat": "odt",
+      "targetFormat": "docx",
+      "converter": "OdfToDocxConverter",
+      "baselineRenderer": "libreoffice-pdf",
+      "candidateRenderer": "microsoft-word-pdf",
+      "test": "OfficeInteropConversionTests.WordAndLibreOffice_RenderConvertedDocxToPdf",
+      "sampleFeatures": ["heading", "styled-run", "table", "header-footer"]
+    },
+    {
+      "id": "ods-xlsx-excel-pdf",
+      "sourceFormat": "ods",
+      "targetFormat": "xlsx",
+      "converter": "OdfToXlsxConverter",
+      "baselineRenderer": "libreoffice-pdf",
+      "candidateRenderer": "microsoft-excel-pdf",
+      "test": "OfficeInteropConversionTests.ExcelAndLibreOffice_RenderConvertedXlsxToPdf",
+      "sampleFeatures": ["formula", "embedded-chart", "data-validation"]
+    }
+  ]
+}
