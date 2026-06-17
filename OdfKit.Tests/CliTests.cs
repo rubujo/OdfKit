@@ -5,6 +5,7 @@ using OdfKit.Cli;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Spreadsheet;
 using OdfKit.Text;
 using Xunit;
 
@@ -32,6 +33,7 @@ public class CliTests
         Assert.Contains("sanitize", output.ToString());
         Assert.Contains("typed-dom-coverage", output.ToString());
         Assert.Contains("convert-flat", output.ToString());
+        Assert.Contains("convert-csv", output.ToString());
         Assert.Contains("--baseline odf-validator", output.ToString());
         Assert.Equal(string.Empty, error.ToString());
     }
@@ -1177,6 +1179,44 @@ public class CliTests
         finally
         {
             TryDelete(path);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 convert-csv 可在 ODS 與 CSV 之間轉換。
+    /// </summary>
+    [Fact]
+    public void ConvertCsvRoundTripsSpreadsheetData()
+    {
+        string odsPath = CreateTempPath(".ods");
+        string csvPath = CreateTempPath(".csv");
+        string roundTripPath = CreateTempPath(".ods");
+        try
+        {
+            using (SpreadsheetDocument workbook = SpreadsheetDocument.Create())
+            {
+                OdfTableSheet sheet = workbook.Worksheets.Add("Data");
+                sheet.Cells[0, 0].CellValue = "名稱";
+                sheet.Cells[0, 1].CellValue = "數量";
+                sheet.Cells[1, 0].CellValue = "蘋果";
+                sheet.Cells[1, 1].CellValue = "10";
+                workbook.Save(odsPath);
+            }
+
+            AssertCommand(["convert-csv", odsPath, csvPath], 0, "direction: ods-to-csv");
+            string csv = File.ReadAllText(csvPath, Encoding.UTF8);
+            Assert.Contains("名稱", csv);
+            Assert.Contains("蘋果", csv);
+
+            AssertCommand(["convert-csv", csvPath, roundTripPath], 0, "direction: csv-to-ods");
+            using SpreadsheetDocument loaded = SpreadsheetDocument.Load(roundTripPath);
+            Assert.Equal("蘋果", loaded.Worksheets[0].Cells[1, 0].CellValue);
+        }
+        finally
+        {
+            TryDelete(odsPath);
+            TryDelete(csvPath);
+            TryDelete(roundTripPath);
         }
     }
 

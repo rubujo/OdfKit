@@ -1,9 +1,12 @@
 ﻿using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.Csv;
 using OdfKit.DOM;
+using OdfKit.Spreadsheet;
 
 namespace OdfKit.Cli;
 
@@ -51,6 +54,7 @@ public static class OdfKitCli
                 "sanitize" => Sanitize(args, output, error),
                 "typed-dom-coverage" => TypedDomCoverage(args, output, error),
                 "convert-flat" => ConvertFlat(args, output, error),
+                "convert-csv" => ConvertCsv(args, output, error),
                 "pack" => Pack(args, output, error),
                 _ => UnknownCommand(args[0], error)
             };
@@ -285,6 +289,74 @@ public static class OdfKitCli
         return 0;
     }
 
+    private static int ConvertCsv(string[] args, TextWriter output, TextWriter error)
+    {
+        if (!TryParseConvertCsvOptions(args, error, out ConvertCsvOptions? options))
+        {
+            return 2;
+        }
+
+        ConvertCsvOptions parsedOptions = options ?? throw new InvalidOperationException("convert-csv options were not parsed.");
+        if (!File.Exists(parsedOptions.InputPath))
+        {
+            error.WriteLine("path not found: " + parsedOptions.InputPath);
+            return 2;
+        }
+
+        string inputExtension = Path.GetExtension(parsedOptions.InputPath);
+        string outputExtension = Path.GetExtension(parsedOptions.OutputPath);
+        var csvOptions = new OdfCsvOptions
+        {
+            Delimiter = parsedOptions.Delimiter,
+            ExportSheetIndex = parsedOptions.SheetIndex,
+            SheetName = parsedOptions.SheetName,
+            Encoding = parsedOptions.Encoding
+        };
+
+        if (IsCsvExtension(inputExtension) && IsSpreadsheetExtension(outputExtension))
+        {
+            using SpreadsheetDocument workbook = OdfCsvImporter.ImportFromFile(parsedOptions.InputPath, csvOptions);
+            workbook.Save(parsedOptions.OutputPath);
+            output.WriteLine("wrote: " + parsedOptions.OutputPath);
+            output.WriteLine("direction: csv-to-ods");
+            return 0;
+        }
+
+        if (IsSpreadsheetExtension(inputExtension) && IsCsvExtension(outputExtension))
+        {
+            using SpreadsheetDocument workbook = LoadSpreadsheetForCsvExport(parsedOptions.InputPath);
+            OdfCsvExporter.ExportToFile(workbook, parsedOptions.OutputPath, csvOptions);
+            output.WriteLine("wrote: " + parsedOptions.OutputPath);
+            output.WriteLine("direction: ods-to-csv");
+            output.WriteLine("sheet-index: " + parsedOptions.SheetIndex.ToString(CultureInfo.InvariantCulture));
+            return 0;
+        }
+
+        error.WriteLine("usage: odfkit convert-csv input.(ods|fods|csv) output.(csv|ods) [--delimiter char] [--sheet index] [--sheet-name name]");
+        return 2;
+    }
+
+    private static SpreadsheetDocument LoadSpreadsheetForCsvExport(string path)
+    {
+        OdfDocumentKind kind = OdfDocumentKindDetector.FromFileName(path);
+        return kind switch
+        {
+            OdfDocumentKind.Spreadsheet => SpreadsheetDocument.Load(path),
+            OdfDocumentKind.FlatSpreadsheet => FlatSpreadsheetDocument.Load(path),
+            OdfDocumentKind.SpreadsheetTemplate => SpreadsheetTemplateDocument.Load(path),
+            _ => throw new InvalidOperationException("輸入檔案不是可匯出的 ODS 試算表。")
+        };
+    }
+
+    private static bool IsCsvExtension(string extension) =>
+        string.Equals(extension, ".csv", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(extension, ".tsv", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsSpreadsheetExtension(string extension) =>
+        string.Equals(extension, ".ods", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(extension, ".fods", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(extension, ".ots", StringComparison.OrdinalIgnoreCase);
+
     private static int Pack(string[] args, TextWriter output, TextWriter error)
     {
         if (!RequireArity(args, 3, "pack input.fodt output.odt", error))
@@ -352,6 +424,7 @@ public static class OdfKitCli
         output.WriteLine("  sanitize input.odt output.odt [--password value] [--output-password value] [--encryption aes256|blowfish]");
         output.WriteLine("  typed-dom-coverage [--format text|json]");
         output.WriteLine("  convert-flat input.odt output.fodt");
+        output.WriteLine("  convert-csv input.ods output.csv [--delimiter ,] [--sheet 0] [--sheet-name Sheet1]");
         output.WriteLine("  pack input.fodt output.odt");
         output.WriteLine("  metadata file.odt");
     }
@@ -638,6 +711,109 @@ public static class OdfKitCli
         }
 
         return true;
+    }
+
+    private static bool TryParseConvertCsvOptions(string[] args, TextWriter error, out ConvertCsvOptions? options)
+    {
+        options = null;
+        string? inputPath = null;
+        string? outputPath = null;
+        char delimiter = ',';
+        int sheetIndex = 0;
+        string sheetName = "Sheet1";
+        Encoding encoding = new UTF8Encoding(false);
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            string arg = args[i];
+            switch (arg)
+            {
+                case "--delimiter":
+                    if (!TryReadValue(args, ref i, error, "--delimiter", out string? delimiterValue) ||
+                        string.IsNullOrEmpty(delimiterValue))
+                    {
+                        error.WriteLine("delimiter must be a single character");
+                        return false;
+                    }
+
+                    delimiter = delimiterValue[0];
+                    break;
+                case "--sheet":
+                    if (!TryReadValue(args, ref i, error, "--sheet", out string? sheetValue) ||
+                        !int.TryParse(sheetValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out sheetIndex) ||
+                        sheetIndex < 0)
+                    {
+                        error.WriteLine("sheet must be a non-negative integer");
+                        return false;
+                    }
+                    break;
+                case "--sheet-name":
+                    if (!TryReadValue(args, ref i, error, "--sheet-name", out string? sheetNameValue) ||
+                        string.IsNullOrWhiteSpace(sheetNameValue))
+                    {
+                        return false;
+                    }
+
+                    sheetName = sheetNameValue;
+                    break;
+                case "--encoding":
+                    if (!TryReadValue(args, ref i, error, "--encoding", out string? encodingValue) ||
+                        !TryParseCsvEncoding(encodingValue, out encoding))
+                    {
+                        error.WriteLine("supported encodings: utf8, utf8bom");
+                        return false;
+                    }
+                    break;
+                default:
+                    if (arg.StartsWith("-", StringComparison.Ordinal))
+                    {
+                        error.WriteLine("unknown option: " + arg);
+                        return false;
+                    }
+
+                    if (inputPath is null)
+                    {
+                        inputPath = arg;
+                    }
+                    else if (outputPath is null)
+                    {
+                        outputPath = arg;
+                    }
+                    else
+                    {
+                        error.WriteLine("usage: odfkit convert-csv input.(ods|fods|csv) output.(csv|ods) [options]");
+                        return false;
+                    }
+                    break;
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(inputPath) || string.IsNullOrWhiteSpace(outputPath))
+        {
+            error.WriteLine("usage: odfkit convert-csv input.(ods|fods|csv) output.(csv|ods) [options]");
+            return false;
+        }
+
+        options = new ConvertCsvOptions(inputPath, outputPath, delimiter, sheetIndex, sheetName, encoding);
+        return true;
+    }
+
+    private static bool TryParseCsvEncoding(string? value, out Encoding encoding)
+    {
+        if (string.Equals(value, "utf8bom", StringComparison.OrdinalIgnoreCase))
+        {
+            encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
+            return true;
+        }
+
+        if (string.Equals(value, "utf8", StringComparison.OrdinalIgnoreCase))
+        {
+            encoding = new UTF8Encoding(false);
+            return true;
+        }
+
+        encoding = new UTF8Encoding(false);
+        return false;
     }
 
     private static bool TryParseSanitizeOptions(string[] args, TextWriter error, out SanitizeOptions? options)
@@ -1212,6 +1388,14 @@ public static class OdfKitCli
         string? InputPassword,
         string? OutputPassword,
         OdfEncryptionAlgorithm EncryptionAlgorithm);
+
+    private sealed record ConvertCsvOptions(
+        string InputPath,
+        string OutputPath,
+        char Delimiter,
+        int SheetIndex,
+        string SheetName,
+        Encoding Encoding);
 
     private sealed record ValidateFileResult(
         string Path,
