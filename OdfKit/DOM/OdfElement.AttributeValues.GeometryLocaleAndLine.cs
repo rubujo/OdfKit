@@ -18,7 +18,7 @@ public partial class OdfElement
     public OdfVector3D? GetVector3DAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfVector3D.TryParse(value, out OdfVector3D vector) ? vector : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfVector3D>(value, OdfVector3D.TryParse);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public partial class OdfElement
     public OdfPoint3D? GetPoint3DAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfPoint3D.TryParse(value, out OdfPoint3D point) ? point : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfPoint3D>(value, OdfPoint3D.TryParse);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public partial class OdfElement
     public OdfPointList? GetPointListAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfPointList.TryParse(value, out OdfPointList pointList) ? pointList : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfPointList>(value, OdfPointList.TryParse);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public partial class OdfElement
     public OdfXmlName? GetXmlNameAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfXmlName.TryParse(value, out OdfXmlName xmlName) ? xmlName : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfXmlName>(value, OdfXmlName.TryParse);
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public partial class OdfElement
     public OdfLanguageCode? GetLanguageCodeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfLanguageCode.TryParse(value, out OdfLanguageCode languageCode) ? languageCode : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfLanguageCode>(value, OdfLanguageCode.TryParse);
     }
 
     /// <summary>
@@ -148,7 +148,7 @@ public partial class OdfElement
     public OdfCountryCode? GetCountryCodeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfCountryCode.TryParse(value, out OdfCountryCode countryCode) ? countryCode : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfCountryCode>(value, OdfCountryCode.TryParse);
     }
 
     /// <summary>
@@ -174,7 +174,7 @@ public partial class OdfElement
     public OdfScriptCode? GetScriptCodeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfScriptCode.TryParse(value, out OdfScriptCode scriptCode) ? scriptCode : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfScriptCode>(value, OdfScriptCode.TryParse);
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public partial class OdfElement
     public OdfLanguageTag? GetLanguageTagAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfLanguageTag.TryParse(value, out OdfLanguageTag languageTag) ? languageTag : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfLanguageTag>(value, OdfLanguageTag.TryParse);
     }
 
     /// <summary>
@@ -226,7 +226,7 @@ public partial class OdfElement
     public OdfNamespacedToken? GetNamespacedTokenAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfNamespacedToken.TryParse(value, out OdfNamespacedToken namespacedToken) ? namespacedToken : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfNamespacedToken>(value, OdfNamespacedToken.TryParse);
     }
 
     /// <summary>
@@ -252,7 +252,7 @@ public partial class OdfElement
     public OdfCharacter? GetCharacterAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfCharacter.TryParse(value, out OdfCharacter character) ? character : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfCharacter>(value, OdfCharacter.TryParse);
     }
 
     /// <summary>
@@ -278,7 +278,7 @@ public partial class OdfElement
     public OdfTextEncoding? GetTextEncodingAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfTextEncoding.TryParse(value, out OdfTextEncoding textEncoding) ? textEncoding : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfTextEncoding>(value, OdfTextEncoding.TryParse);
     }
 
     /// <summary>
@@ -304,7 +304,7 @@ public partial class OdfElement
     public OdfTargetFrameName? GetTargetFrameNameAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfTargetFrameName.TryParse(value, out OdfTargetFrameName targetFrameName) ? targetFrameName : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfTargetFrameName>(value, OdfTargetFrameName.TryParse);
     }
 
     /// <summary>

@@ -202,7 +202,7 @@ public partial class OdfElement
     public OdfVersion? GetOdfVersionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfVersionInfo.TryParseVersionString(value, out OdfVersion parsed) ? parsed : null;
+        return OdfElementDomainAttributeAccess.GetVersion(value);
     }
 
     /// <summary>
@@ -215,7 +215,7 @@ public partial class OdfElement
     /// <param name="version">ODF 版本內容。</param>
     public void SetOdfVersionAttributeValue(string localName, string namespaceUri, OdfVersion value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
-        SetAttributeValue(localName, namespaceUri, OdfVersionInfo.ToVersionString(value), prefix, version);
+        SetAttributeValue(localName, namespaceUri, OdfElementDomainAttributeAccess.FormatVersion(value), prefix, version);
     }
 
     /// <summary>
@@ -228,7 +228,7 @@ public partial class OdfElement
     public OdfMediaType? GetMediaTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfMediaType.TryParse(value, out OdfMediaType mediaType) ? mediaType : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfMediaType>(value, OdfMediaType.TryParse);
     }
 
     /// <summary>

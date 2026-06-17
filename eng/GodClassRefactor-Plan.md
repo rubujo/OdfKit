@@ -119,11 +119,16 @@
 - [x] `OdfElementEnumAttributeAccess`（schema 枚舉 token getter 委派）
 - [x] `eng/Migrate-OdfElementEnumAttributeAccess.ps1`（10 個 Attribute partial 遷移腳本）
 
-## 剩餘工作（Phase 15+）
+## Phase 15（已完成）
+
+- [x] `OdfElementDomainAttributeAccess`（幾何／語系／儲存格位址／百分比等領域值引擎）
+- [x] `eng/Migrate-OdfElementDomainAttributeAccess.ps1`（5 個 Attribute partial 遷移腳本）
+
+## 剩餘工作（Phase 16+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `OdfElement` | ~2800 | 幾何／語系／儲存格位址等 AttributeValues |
+| `OdfElement` | ~2600 | Wrapper partial（Text／Table／Style 等） |
 | `OdfPackage` | ~900 | 公開 API 項目讀寫（需保留薄門面） |
 | `TextDocument` | ~1000 | 核心 `TextDocument.cs` |
 | `OdfDocument` | ~1493 | 合併／複製管線 |

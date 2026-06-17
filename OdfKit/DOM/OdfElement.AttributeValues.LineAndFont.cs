@@ -19,7 +19,7 @@ public partial class OdfElement
     public OdfLineWidth? GetLineWidthAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfLineWidth.TryParse(value, out OdfLineWidth lineWidth) ? lineWidth : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfLineWidth>(value, OdfLineWidth.TryParse);
     }
 
     /// <summary>

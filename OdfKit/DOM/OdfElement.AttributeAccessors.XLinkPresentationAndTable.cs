@@ -20,7 +20,7 @@ public partial class OdfElement
     public OdfIriReference? GetIriReferenceAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfIriReference.TryParse(value, out OdfIriReference iriReference) ? iriReference : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfIriReference>(value, OdfIriReference.TryParse);
     }
 
     /// <summary>

@@ -176,7 +176,7 @@ public partial class OdfElement
     public OdfPercent? GetPercentAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfPercent.TryParse(value, out OdfPercent percent) ? percent : null;
+        return OdfElementDomainAttributeAccess.GetPercent(value);
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public partial class OdfElement
     public OdfPercent? GetSignedPercentAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfPercent.TryParse(value, allowNegative: true, out OdfPercent percent) ? percent : null;
+        return OdfElementDomainAttributeAccess.GetSignedPercent(value);
     }
 
     /// <summary>
@@ -234,7 +234,7 @@ public partial class OdfElement
     public OdfCellAddressReference? GetCellAddressAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfCellAddressReference.TryParse(value, out OdfCellAddressReference cellAddress) ? cellAddress : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfCellAddressReference>(value, OdfCellAddressReference.TryParse);
     }
 
     /// <summary>
@@ -260,7 +260,7 @@ public partial class OdfElement
     public OdfCellRangeAddress? GetCellRangeAddressAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfCellRangeAddress.TryParse(value, out OdfCellRangeAddress cellRangeAddress) ? cellRangeAddress : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfCellRangeAddress>(value, OdfCellRangeAddress.TryParse);
     }
 
     /// <summary>
@@ -286,7 +286,7 @@ public partial class OdfElement
     public OdfCellRangeAddressList? GetCellRangeAddressListAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfCellRangeAddressList.TryParse(value, out OdfCellRangeAddressList cellRangeAddressList) ? cellRangeAddressList : null;
+        return OdfElementDomainAttributeAccess.GetNullable<OdfCellRangeAddressList>(value, OdfCellRangeAddressList.TryParse);
     }
 
     /// <summary>
