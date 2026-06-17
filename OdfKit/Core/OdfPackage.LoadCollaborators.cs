@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Threading;
+using System.Threading.Tasks;
 using OdfKit.Compliance;
 
 namespace OdfKit.Core;
@@ -74,6 +76,12 @@ public sealed partial class OdfPackage
 
         internal void InitializeFlatXml(byte[] signature, int signatureLength) =>
             OdfPackageFlatXmlLoader.Initialize(this, signature, signatureLength);
+
+        internal Task InitializeFlatXmlAsync(
+            byte[] signature,
+            int signatureLength,
+            CancellationToken cancellationToken = default) =>
+            OdfPackageFlatXmlLoader.InitializeAsync(this, signature, signatureLength, cancellationToken);
 
         internal static int ReadStreamPrefix(Stream stream, byte[] buffer, int offset, int count)
             => ReadAll(stream, buffer, offset, count);

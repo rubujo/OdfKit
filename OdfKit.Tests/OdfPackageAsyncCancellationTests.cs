@@ -53,4 +53,46 @@ public class OdfPackageAsyncCancellationTests
         using var loaded = OdfPackage.Open(destination, leaveOpen: true);
         Assert.True(loaded.HasEntry("content.xml"));
     }
+
+    /// <summary>
+    /// 預先取消的語彙應使 OpenAsync 拋出 OperationCanceledException。
+    /// </summary>
+    [Fact]
+    public async Task OpenAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    {
+        await using var source = await CreateMinimalPackageStreamAsync(TestContext.Current.CancellationToken);
+
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await using var _ = await OdfPackage.OpenAsync(source, leaveOpen: true, cancellationToken: cts.Token);
+        });
+    }
+
+    /// <summary>
+    /// 未取消時 OpenAsync 應成功載入可讀取的 ODF 封裝。
+    /// </summary>
+    [Fact]
+    public async Task OpenAsync_DefaultToken_CompletesSuccessfully()
+    {
+        await using var source = await CreateMinimalPackageStreamAsync(TestContext.Current.CancellationToken);
+        source.Position = 0;
+
+        await using var loaded = await OdfPackage.OpenAsync(source, leaveOpen: true, cancellationToken: TestContext.Current.CancellationToken);
+        Assert.True(loaded.HasEntry("content.xml"));
+    }
+
+    private static async Task<MemoryStream> CreateMinimalPackageStreamAsync(CancellationToken cancellationToken)
+    {
+        var package = OdfPackage.Create(new MemoryStream());
+        package.SetMimeType("application/vnd.oasis.opendocument.text");
+        package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(MinimalContentXml), "text/xml");
+
+        var destination = new MemoryStream();
+        await package.SaveToStreamAsync(destination, cancellationToken: cancellationToken);
+        destination.Position = 0;
+        return destination;
+    }
 }

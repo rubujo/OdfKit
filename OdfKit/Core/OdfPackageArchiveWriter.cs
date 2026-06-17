@@ -111,7 +111,7 @@ internal static class OdfPackageArchiveWriter
         }
     }
 
-    private static Task CopyEntryContentAsync(Stream source, Stream destination, CancellationToken cancellationToken)
+    private static Task CopyEntryContentAsync(Stream source, Stream destination, CancellationToken cancellationToken = default)
     {
         return source.CopyToAsync(destination, 81920, cancellationToken);
     }

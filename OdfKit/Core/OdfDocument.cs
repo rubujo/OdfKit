@@ -41,10 +41,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <param name="path">ODF 文件路徑。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
-    public static Task<OdfDocument> LoadAsync(string path, CancellationToken cancellationToken = default)
-    {
-        return Task.Run(() => Load(path), cancellationToken);
-    }
+    public static Task<OdfDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+        OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken);
 
     /// <summary>
     /// 從指定路徑與載入選項載入 ODF 文件。
@@ -61,10 +59,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <param name="options">載入選項，例如加密文件密碼與安全限制。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
-    public static Task<OdfDocument> LoadAsync(string path, OdfLoadOptions? options, CancellationToken cancellationToken = default)
-    {
-        return Task.Run(() => Load(path, options), cancellationToken);
-    }
+    public static Task<OdfDocument> LoadAsync(string path, OdfLoadOptions? options, CancellationToken cancellationToken = default) =>
+        OdfDocumentFactory.LoadDocumentAsync(path, options, cancellationToken);
 
     /// <summary>
     /// 從指定資料流載入 ODF 文件。
@@ -81,10 +77,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
-    public static Task<OdfDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default)
-    {
-        return Task.Run(() => Load(stream, fileName), cancellationToken);
-    }
+    public static Task<OdfDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+        OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken);
 
     /// <summary>
     /// 從指定資料流與載入選項載入 ODF 文件。
@@ -104,10 +98,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
-    public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options, string? fileName = null, CancellationToken cancellationToken = default)
-    {
-        return Task.Run(() => Load(stream, options, fileName), cancellationToken);
-    }
+    public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options, string? fileName = null, CancellationToken cancellationToken = default) =>
+        OdfDocumentFactory.LoadDocumentAsync(stream, options, fileName, cancellationToken);
 
     /// <summary>
     /// 取得與此文件相關聯的 ODF 封裝容器。

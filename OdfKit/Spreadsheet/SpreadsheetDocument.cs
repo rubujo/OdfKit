@@ -74,10 +74,8 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <param name="path">ODS 文件路徑。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/>。</returns>
-    public new static Task<SpreadsheetDocument> LoadAsync(string path, CancellationToken cancellationToken = default)
-    {
-        return Task.Run(() => Load(path), cancellationToken);
-    }
+    public new static async Task<SpreadsheetDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+        EnsureSpreadsheet(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// 從指定資料流載入 ODS 試算表文件。
@@ -98,10 +96,8 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
     /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/>。</returns>
-    public new static Task<SpreadsheetDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default)
-    {
-        return Task.Run(() => Load(stream, fileName), cancellationToken);
-    }
+    public new static async Task<SpreadsheetDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+        EnsureSpreadsheet(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// 取得工作表集合。

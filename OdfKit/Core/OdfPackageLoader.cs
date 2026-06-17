@@ -2,6 +2,8 @@
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OdfKit.Core;
 
@@ -35,6 +37,44 @@ internal static class OdfPackageLoader
         Stream underlying = ctx.UnderlyingStream!;
         ctx.Archive = new ZipArchive(underlying, ZipArchiveMode.Read, ctx.LeaveOpen, Encoding.UTF8);
         OdfPackageZipLoader.LoadEntries(ctx.Archive, ctx);
+        LoadMimeType(ctx);
+
+        ctx.LoadManifest();
+
+        if (ctx.LoadOptions.Password != null || ctx.LoadOptions.CryptographyProvider != null)
+            OdfEncryption.Decrypt(package, ctx.LoadOptions.Password ?? string.Empty);
+
+        ctx.LoadRdfMetadata();
+    }
+
+    /// <summary>
+    /// 非同步執行完整載入流程：格式嗅探、ZIP／Flat XML、manifest、解密與 RDF。
+    /// </summary>
+    internal static async Task InitializeAsync(OdfPackage package, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        OdfPackage.OdfPackageLoadCollaborators ctx = package.LoadCollaborators;
+        if (ctx.UnderlyingStream is null)
+            throw new InvalidOperationException("No input stream available.");
+
+        byte[] signature = new byte[4];
+        int bytesRead = ReadSignaturePrefix(ctx, signature);
+
+        if (!IsZipSignature(signature, bytesRead))
+        {
+            ctx.IsFlatXml = true;
+            await ctx.InitializeFlatXmlAsync(signature, bytesRead, cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        await OdfPackageZipLoader.EnsureSeekableStreamAsync(ctx, signature, bytesRead, cancellationToken)
+            .ConfigureAwait(false);
+        OdfPackageZipLoader.RegisterCodePagesIfNeeded();
+
+        Stream underlying = ctx.UnderlyingStream!;
+        ctx.Archive = new ZipArchive(underlying, ZipArchiveMode.Read, ctx.LeaveOpen, Encoding.UTF8);
+        await OdfPackageZipLoader.LoadEntriesAsync(ctx.Archive, ctx, cancellationToken).ConfigureAwait(false);
         LoadMimeType(ctx);
 
         ctx.LoadManifest();

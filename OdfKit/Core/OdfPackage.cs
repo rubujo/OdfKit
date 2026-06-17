@@ -191,6 +191,66 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// 非同步從指定的檔案路徑開啟既有的 ODF 封裝。
+    /// </summary>
+    /// <param name="path">ODF 檔案的路徑。</param>
+    /// <param name="options">載入選項。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
+    public static async Task<OdfPackage> OpenAsync(
+        string path,
+        OdfLoadOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        OdfPackage package = new(OdfPackageMode.ReadWrite, stream, false, options, null);
+        try
+        {
+            await package.InitializeLoadAsync(cancellationToken).ConfigureAwait(false);
+            return package;
+        }
+        catch
+        {
+            await package.DisposeAsync().ConfigureAwait(false);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// 非同步從指定的資料流開啟既有的 ODF 封裝。
+    /// </summary>
+    /// <param name="stream">包含 ODF 封裝資料的資料流。</param>
+    /// <param name="leaveOpen">若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/>。</param>
+    /// <param name="options">載入選項。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
+    public static async Task<OdfPackage> OpenAsync(
+        Stream stream,
+        bool leaveOpen = false,
+        OdfLoadOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        OdfPackage package = new(OdfPackageMode.ReadWrite, stream, leaveOpen, options, null);
+        try
+        {
+            await package.InitializeLoadAsync(cancellationToken).ConfigureAwait(false);
+            return package;
+        }
+        catch
+        {
+            if (!leaveOpen)
+            {
+                if (stream is IAsyncDisposable asyncDisposable)
+                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+                else
+                    stream.Dispose();
+            }
+
+            throw;
+        }
+    }
+
+    /// <summary>
     /// 在指定的檔案路徑建立一個新的 ODF 封裝。
     /// </summary>
     /// <param name="path">要建立的檔案路徑</param>

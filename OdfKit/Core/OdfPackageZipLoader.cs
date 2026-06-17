@@ -4,6 +4,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Security;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OdfKit.Core;
 
@@ -73,6 +75,71 @@ internal static class OdfPackageZipLoader
     }
 
     /// <summary>
+    /// 非同步自 ZIP 封存讀取所有項目至載入內容，支援協作式取消。
+    /// </summary>
+    internal static async Task LoadEntriesAsync(
+        ZipArchive archive,
+        OdfPackage.OdfPackageLoadCollaborators ctx,
+        CancellationToken cancellationToken = default)
+    {
+        if (archive.Entries.Count > ctx.LoadOptions.MaxZipEntries)
+        {
+            throw new SecurityException(
+                $"Zip archive contains too many entries ({archive.Entries.Count} > {ctx.LoadOptions.MaxZipEntries}). Potential Zip DoS attack.");
+        }
+
+        long totalUncompressedSize = 0;
+
+        foreach (ZipArchiveEntry entry in archive.Entries)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            string name;
+            try
+            {
+                name = OdfPackage.SanitizeEntryName(entry.FullName);
+            }
+            catch (SecurityException)
+            {
+                name = entry.FullName;
+            }
+
+            if (entry.Length > ctx.LoadOptions.MaxEntrySize)
+            {
+                throw new SecurityException(
+                    $"Zip entry '{name}' exceeds size limit ({entry.Length} > {ctx.LoadOptions.MaxEntrySize} bytes).");
+            }
+
+            totalUncompressedSize += entry.Length;
+            if (totalUncompressedSize > ctx.LoadOptions.MaxTotalUncompressedSize)
+            {
+                throw new SecurityException(
+                    $"Zip archive total uncompressed size exceeds limit ({totalUncompressedSize} > {ctx.LoadOptions.MaxTotalUncompressedSize} bytes).");
+            }
+
+            byte[] entryBytes;
+            using (Stream entryStream = entry.Open())
+            using (var ms = new MemoryStream())
+            {
+                await entryStream.CopyToAsync(ms, 81920, cancellationToken).ConfigureAwait(false);
+                entryBytes = ms.ToArray();
+            }
+
+            var pkgEntry = new OdfPackageEntry(name, entryBytes);
+            if (entry.CompressedLength == entry.Length && entry.Length > 0)
+                pkgEntry.IsCompressed = false;
+
+            pkgEntry.WasStoredInZip = TryDetectStoredCompression(entry);
+            if (ctx.Entries.ContainsKey(name))
+                ctx.DuplicateEntryNames.Add(name);
+
+            ctx.Entries[name] = pkgEntry;
+            if (!ctx.EntryOrder.Contains(name))
+                ctx.EntryOrder.Add(name);
+        }
+    }
+
+    /// <summary>
     /// 確保底層串流可搜尋，供 ZipArchive 讀取中央目錄。
     /// </summary>
     internal static void EnsureSeekableStream(
@@ -87,6 +154,29 @@ internal static class OdfPackageZipLoader
         var ms = new MemoryStream();
         ms.Write(signature, 0, bytesRead);
         underlying.CopyTo(ms);
+        ms.Position = 0;
+        if (!ctx.LeaveOpen)
+            underlying.Dispose();
+
+        ctx.UnderlyingStream = ms;
+    }
+
+    /// <summary>
+    /// 非同步確保底層串流可搜尋，供 ZipArchive 讀取中央目錄。
+    /// </summary>
+    internal static async Task EnsureSeekableStreamAsync(
+        OdfPackage.OdfPackageLoadCollaborators ctx,
+        byte[] signature,
+        int bytesRead,
+        CancellationToken cancellationToken = default)
+    {
+        Stream? underlying = ctx.UnderlyingStream;
+        if (underlying is null || underlying.CanSeek)
+            return;
+
+        var ms = new MemoryStream();
+        ms.Write(signature, 0, bytesRead);
+        await underlying.CopyToAsync(ms, 81920, cancellationToken).ConfigureAwait(false);
         ms.Position = 0;
         if (!ctx.LeaveOpen)
             underlying.Dispose();

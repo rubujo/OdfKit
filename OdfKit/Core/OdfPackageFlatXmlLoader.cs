@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using OdfKit.Compliance;
@@ -222,5 +224,38 @@ internal static class OdfPackageFlatXmlLoader
         ctx.WriteVirtualEntry("settings.xml", ToUtf8Bytes(settingsRoot), "text/xml");
         if (!string.IsNullOrEmpty(ctx.MimeType))
             ctx.WriteVirtualEntry("mimetype", Encoding.UTF8.GetBytes(ctx.MimeType), string.Empty);
+    }
+
+    /// <summary>
+    /// 非同步將 Flat XML 串流解析為虛擬 ZIP 項目結構；不可搜尋串流會先緩衝至記憶體。
+    /// </summary>
+    internal static async Task InitializeAsync(
+        OdfPackage.OdfPackageLoadCollaborators ctx,
+        byte[] signature,
+        int signatureLength,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (ctx.UnderlyingStream is null)
+            throw new InvalidOperationException("No input stream available.");
+
+        if (!ctx.UnderlyingStream.CanSeek)
+        {
+            var ms = new MemoryStream();
+            if (signatureLength > 0)
+                ms.Write(signature, 0, signatureLength);
+
+            await ctx.UnderlyingStream.CopyToAsync(ms, 81920, cancellationToken).ConfigureAwait(false);
+            ms.Position = 0;
+            if (!ctx.LeaveOpen)
+                ctx.UnderlyingStream.Dispose();
+
+            ctx.UnderlyingStream = ms;
+            Initialize(ctx, Array.Empty<byte>(), 0);
+            return;
+        }
+
+        Initialize(ctx, signature, signatureLength);
     }
 }
