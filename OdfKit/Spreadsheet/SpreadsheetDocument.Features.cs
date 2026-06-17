@@ -62,6 +62,18 @@ public partial class SpreadsheetDocument
         SpreadsheetDocumentPrintAreaReadEngine.GetPrintAreas(this);
 
     /// <summary>
+    /// 取得試算表中所有工作表的樞紐分析表摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfPivotTableInfo> GetPivotTables() =>
+        SpreadsheetDocumentPivotTableReadEngine.GetPivotTables(this);
+
+    /// <summary>
+    /// 取得試算表中所有已設定凍結窗格的工作表摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfSheetFrozenPanesInfo> GetFrozenPanes() =>
+        SpreadsheetDocumentFrozenPanesReadEngine.GetFrozenPanes(this);
+
+    /// <summary>
     /// 新增命名範圍。
     /// </summary>
     /// <param name="name">命名範圍的名稱</param>

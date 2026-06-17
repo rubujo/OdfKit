@@ -296,6 +296,36 @@ public class DrawingHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfDrawPage.GetPictures"/> 可讀回已新增的圖片。
+    /// </summary>
+    [Fact]
+    public void GetPictures_RoundTripsAfterAdd()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("圖片頁");
+        page.AddPicture(
+            CreatePngBytes(),
+            OdfLength.Parse("3cm"),
+            OdfLength.Parse("4cm"),
+            OdfLength.Parse("5cm"),
+            OdfLength.Parse("6cm"));
+
+        IReadOnlyList<OdfDrawPictureInfo> pictures = page.GetPictures();
+        Assert.Single(pictures);
+        OdfDrawPictureInfo info = pictures[0];
+        Assert.Equal("圖片頁", info.PageName);
+        Assert.StartsWith("Pictures/", info.Href);
+        Assert.True(info.TryGetWidth(out OdfLength width));
+        Assert.Equal(OdfLength.Parse("5cm").ToPoints(), width.ToPoints(), 0.001);
+
+        Assert.Single(document.GetPictures());
+    }
+
+    private static byte[] CreatePngBytes() =>
+        Convert.FromBase64String(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
+
+    /// <summary>
     /// 驗證新增自定義圖形 (AddCustomShape) API 的建立與幾何節點結構。
     /// </summary>
     [Fact]

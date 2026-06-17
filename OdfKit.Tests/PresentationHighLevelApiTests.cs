@@ -248,6 +248,30 @@ public class PresentationHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="PresentationDocument.GetLayouts"/> 可讀回各投影片版面配置。
+    /// </summary>
+    [Fact]
+    public void GetLayouts_RoundTripsAfterSetLayout()
+    {
+        using var document = PresentationDocument.Create();
+        document.AddSlide();
+        document.AddSlide();
+        document.SetLayout(0, OdfPresentationLayout.TitleOnly);
+        document.SetLayout(1, OdfPresentationLayout.TitleAndBody);
+
+        Assert.Equal(2, document.GetLayouts().Count);
+        OdfSlideLayoutInfo first = document.GetLayouts()[0];
+        Assert.Equal(0, first.SlideIndex);
+        Assert.Equal(OdfPresentationLayout.TitleOnly, first.Layout);
+        Assert.Equal("layout_TitleOnly", first.LayoutName);
+
+        OdfSlideLayoutInfo second = document.GetLayouts()[1];
+        Assert.Equal(1, second.SlideIndex);
+        Assert.Equal(OdfPresentationLayout.TitleAndBody, second.Layout);
+        Assert.Equal("layout_TitleAndBody", second.LayoutName);
+    }
+
+    /// <summary>
     /// 驗證投影片可建立影片與音訊 plugin 物件。
     /// </summary>
     [Fact]

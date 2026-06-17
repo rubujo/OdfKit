@@ -27,6 +27,9 @@ internal static class OdfDrawPageShapeReadEngine
     internal static IReadOnlyList<OdfDrawTextBoxInfo> GetTextBoxes(OdfDrawPage page) =>
         CollectTextBoxes(page.Node, page.Name);
 
+    internal static IReadOnlyList<OdfDrawPictureInfo> GetPictures(OdfDrawPage page) =>
+        CollectPictures(page.Node, page.Name);
+
     private static List<OdfPathInfo> CollectPaths(OdfNode parent, string pageName)
     {
         List<OdfPathInfo> paths = [];
@@ -170,6 +173,55 @@ internal static class OdfDrawPageShapeReadEngine
         });
 
         return textBoxes;
+    }
+
+    private static List<OdfDrawPictureInfo> CollectPictures(OdfNode parent, string pageName)
+    {
+        List<OdfDrawPictureInfo> pictures = [];
+        WalkDrawingNodes(parent, node =>
+        {
+            if (!ContainsDescendant(node, "image", OdfNamespaces.Draw))
+                return;
+
+            string? href = FindImageHref(node);
+            if (string.IsNullOrEmpty(href))
+                return;
+
+            pictures.Add(new OdfDrawPictureInfo(
+                pageName,
+                node.GetAttribute("id", OdfNamespaces.Draw) ?? string.Empty,
+                href!,
+                node.GetAttribute("x", OdfNamespaces.Svg),
+                node.GetAttribute("y", OdfNamespaces.Svg),
+                node.GetAttribute("width", OdfNamespaces.Svg),
+                node.GetAttribute("height", OdfNamespaces.Svg)));
+        });
+
+        return pictures;
+    }
+
+    private static string? FindImageHref(OdfNode container)
+    {
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "image" &&
+                child.NamespaceUri == OdfNamespaces.Draw)
+            {
+                string? href = child.GetAttribute("href", OdfNamespaces.XLink);
+                if (!string.IsNullOrEmpty(href))
+                    return href;
+            }
+
+            if (child.NodeType is OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Draw)
+            {
+                string? nested = FindImageHref(child);
+                if (!string.IsNullOrEmpty(nested))
+                    return nested;
+            }
+        }
+
+        return null;
     }
 
     private static string ExtractTextBoxContent(OdfNode container)

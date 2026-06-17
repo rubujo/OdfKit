@@ -45,4 +45,10 @@ public partial class OdfDrawPage
     /// </summary>
     public IReadOnlyList<OdfDrawTextBoxInfo> GetTextBoxes() =>
         OdfDrawPageShapeReadEngine.GetTextBoxes(this);
+
+    /// <summary>
+    /// 取得此繪圖頁面上所有圖片的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfDrawPictureInfo> GetPictures() =>
+        OdfDrawPageShapeReadEngine.GetPictures(this);
 }

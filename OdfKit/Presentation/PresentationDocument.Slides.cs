@@ -265,6 +265,12 @@ public partial class PresentationDocument
     public IReadOnlyList<OdfSlideSpeakerNotesInfo> GetSpeakerNotes() =>
         PresentationDocumentSpeakerNotesReadEngine.GetSpeakerNotes(this);
 
+    /// <summary>
+    /// 取得簡報中所有投影片的版面配置摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfSlideLayoutInfo> GetLayouts() =>
+        PresentationDocumentLayoutReadEngine.GetLayouts(this);
+
     #endregion
 
 }

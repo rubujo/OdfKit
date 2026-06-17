@@ -270,6 +270,57 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetPivotTables"/> 可讀回樞紐分析表欄位、排序與篩選設定。
+    /// </summary>
+    [Fact]
+    public void GetPivotTables_RoundTripsAfterBuild()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Sheet1");
+        var sourceRange = new OdfCellRange(
+            new OdfCellAddress(0, 0, "Sheet1"),
+            new OdfCellAddress(9, 3, "Sheet1"));
+
+        new OdfPivotTableBuilder("SalesPivot", sourceRange, new OdfCellAddress(12, 0, "Sheet1"), sheet)
+            .AddRowField("Category")
+            .AddColumnField("Region")
+            .AddDataField("Sales", OdfPivotFunction.Sum)
+            .AddPageField("Year")
+            .AddSortInfo("Sales", ascending: false)
+            .AddFilter("Category", OdfPivotFilterOperator.Equal, "Electronics")
+            .Build();
+
+        Assert.Single(document.GetPivotTables());
+        OdfPivotTableInfo info = document.GetPivotTables()[0];
+        Assert.Equal("Sheet1", info.SheetName);
+        Assert.Equal("SalesPivot", info.Name);
+        Assert.Equal(4, info.Fields.Count);
+        Assert.Contains(info.Fields, f => f.Orientation == "row" && f.SourceFieldName == "Category");
+        Assert.Contains(info.Fields, f => f.Orientation == "data" && f.Function == "sum");
+        Assert.Single(info.SortFields);
+        Assert.False(info.SortFields[0].Ascending);
+        Assert.Single(info.FilterConditions);
+        Assert.Equal("=", info.FilterConditions[0].Operator);
+        Assert.Equal("Electronics", info.FilterConditions[0].Value);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetFrozenPanes"/> 可讀回各工作表凍結窗格設定。
+    /// </summary>
+    [Fact]
+    public void GetFrozenPanes_RoundTripsAfterFreeze()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Report");
+        sheet.FreezePanes(2, 1);
+
+        Assert.Single(document.GetFrozenPanes());
+        OdfSheetFrozenPanesInfo info = document.GetFrozenPanes()[0];
+        Assert.Equal("Report", info.SheetName);
+        Assert.Equal(new OdfFrozenPanes(2, 1), info.FrozenPanes);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="SpreadsheetDocument.GetPrintAreas"/> 可讀回各工作表列印範圍。
     /// </summary>
     [Fact]
