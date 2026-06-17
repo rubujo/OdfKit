@@ -38,6 +38,8 @@
   執行 `pwsh eng/Test-LibreOfficeInterop.ps1`（需本機 LibreOffice 26.x，否則略過）。
 - OOXML 視覺 golden 矩陣見 [ooxml-visual-golden-matrix.md](ooxml-visual-golden-matrix.md)；
   執行 `pwsh eng/Test-OoxmlVisualGolden.ps1`（需 Windows + Office COM + LO + Python，否則略過）。
+- 渲染 backend 部署見 [rendering-backend-deployment.md](rendering-backend-deployment.md)；
+  執行 `pwsh eng/Test-RenderingBackends.ps1`（Mock 單元測試，不需真實 LO）。
 
 ## ODF Toolkit parity corpus
 

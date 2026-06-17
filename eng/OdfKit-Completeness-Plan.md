@@ -8,7 +8,7 @@
 |------|-----------|------|
 | Tier 1 規範可信 | Validator + Profile + Corpus；Unknown 保真 round-trip | corpus 219 fixtures；validate-corpus 全綠 |
 | Tier 2 語意可用 | 四主格式高階 API 深度；變體與特殊格式專屬模型 | 四主格式 High-level = `complete` ✅；其餘多為 `usable` / `usable-variant` / `package-only` |
-| Tier 3 互通可驗 | LibreOffice 實機驗收；OOXML 視覺 golden file | 自動化有、外部視覺驗收未完成 |
+| Tier 3 互通可驗 | LibreOffice 實機驗收；OOXML 視覺 golden file | Wave 3 X-2／Q-3／REN-1 基礎 ✅；外部 Office 視覺驗收為可選環境 |
 | Tier 4 產品就緒 | NuGet 發佈；統一開發者體驗 | 原始碼 repo 為主 |
 
 明確非目標維持 [`docs/udx-non-goals.md`](../docs/udx-non-goals.md)：物理分頁引擎、樞紐重算引擎、SmartArt 佈局器、JSON Collaboration operations merge。
@@ -86,7 +86,7 @@
 |-------|------|------|
 | X-2 | 基礎 ✅ | `docs/libreoffice-interop-matrix.md`、`eng/Test-LibreOfficeInterop.ps1`；四主格式 + 追蹤修訂 LO 26.x headless 矩陣 |
 | Q-3 | 基礎 ✅ | `docs/ooxml-visual-golden-matrix.md`、`eng/Test-OoxmlVisualGolden.ps1`、`eng/scripts/PdfVisualDiff.py`；ODT→DOCX、ODS→XLSX 雙路徑 PDF 像素比對 |
-| REN-1 | 待辦 | 渲染 backend 部署指南 |
+| REN-1 | 基礎 ✅ | `docs/rendering-backend-deployment.md`、`eng/Test-RenderingBackends.ps1`；LocalProcess / Unoserver / HttpRenderer 選型與部署 |
 
 ## Wave 4 — 產品化
 
