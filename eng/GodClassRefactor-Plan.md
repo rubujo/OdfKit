@@ -73,13 +73,19 @@
 - [x] `FormulaLogicalFunctionHandlers`（邏輯函式 category 首輪遷移）
 - [x] `OdfPackageMacroSanitizer` + `OdfPackageMacroSanitizeCollaborators`
 
-## 剩餘工作（Phase 8+）
+## Phase 8（已完成）
+
+- [x] `OdfPackageManifestWriter`（`SaveManifestToEntries` 遷移）
+- [x] `FormulaStringFunctionHandlers`、`FormulaMatrixFunctionHandlers`、`FormulaDatabaseFunctionHandlers`
+- [x] `eng/Migrate-FormulaCategoryHandler.ps1` category 遷移腳本
+
+## 剩餘工作（Phase 9+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `DefaultFormulaEvaluator` | ~4300 | 其餘 20 個 category partial → handler |
+| `DefaultFormulaEvaluator` | ~3500 | Statistical、Math、Lookup、DateTime、Financial 等 category |
 | `OdfElement` | ~3333 | 屬性存取器／typed getter |
-| `OdfPackage` | ~1600 | `Metadata`、`Saving.Internals` |
+| `OdfPackage` | ~1400 | RDF Metadata 載入、`Saving.Internals` |
 | `OdfSigner` | ~1300 | 驗證剩餘 partial |
 | `TextDocument` | ~1000 | 核心 `TextDocument.cs` |
 | `OdfDocument` | ~1493 | 合併／複製管線 |

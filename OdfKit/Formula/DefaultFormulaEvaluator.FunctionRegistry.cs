@@ -48,24 +48,24 @@ public partial class DefaultFormulaEvaluator
             ["BITRSHIFT"] = FormulaLogicalFunctionHandlers.EvaluateBitRShift,
 
             // String
-            ["CONCAT"] = EvaluateConcat,
-            ["CONCATENATE"] = EvaluateConcat,
-            ["SUBSTITUTE"] = EvaluateSubstitute,
-            ["FIND"] = EvaluateFind,
-            ["SEARCH"] = EvaluateSearch,
-            ["REPT"] = EvaluateRept,
-            ["EXACT"] = EvaluateExact,
-            ["CODE"] = EvaluateCode,
-            ["CHAR"] = EvaluateChar,
-            ["TEXT"] = EvaluateText,
-            ["LEFT"] = EvaluateLeft,
-            ["RIGHT"] = EvaluateRight,
-            ["MID"] = EvaluateMid,
-            ["LEN"] = EvaluateLen,
-            ["LOWER"] = EvaluateLower,
-            ["UPPER"] = EvaluateUpper,
-            ["TRIM"] = EvaluateTrim,
-            ["REPLACE"] = EvaluateReplace,
+            ["CONCAT"] = FormulaStringFunctionHandlers.EvaluateConcat,
+            ["CONCATENATE"] = FormulaStringFunctionHandlers.EvaluateConcat,
+            ["SUBSTITUTE"] = FormulaStringFunctionHandlers.EvaluateSubstitute,
+            ["FIND"] = FormulaStringFunctionHandlers.EvaluateFind,
+            ["SEARCH"] = FormulaStringFunctionHandlers.EvaluateSearch,
+            ["REPT"] = FormulaStringFunctionHandlers.EvaluateRept,
+            ["EXACT"] = FormulaStringFunctionHandlers.EvaluateExact,
+            ["CODE"] = FormulaStringFunctionHandlers.EvaluateCode,
+            ["CHAR"] = FormulaStringFunctionHandlers.EvaluateChar,
+            ["TEXT"] = FormulaStringFunctionHandlers.EvaluateText,
+            ["LEFT"] = FormulaStringFunctionHandlers.EvaluateLeft,
+            ["RIGHT"] = FormulaStringFunctionHandlers.EvaluateRight,
+            ["MID"] = FormulaStringFunctionHandlers.EvaluateMid,
+            ["LEN"] = FormulaStringFunctionHandlers.EvaluateLen,
+            ["LOWER"] = FormulaStringFunctionHandlers.EvaluateLower,
+            ["UPPER"] = FormulaStringFunctionHandlers.EvaluateUpper,
+            ["TRIM"] = FormulaStringFunctionHandlers.EvaluateTrim,
+            ["REPLACE"] = FormulaStringFunctionHandlers.EvaluateReplace,
 
             // Statistical
             ["SUM"] = EvaluateSum,
@@ -165,14 +165,14 @@ public partial class DefaultFormulaEvaluator
             ["ORG.OPENOFFICE.ISOMITTED"] = static (args, _) => EvaluateOpenOfficeIsOmitted(args),
 
             // Matrix
-            ["TRANSPOSE"] = EvaluateTranspose,
+            ["TRANSPOSE"] = FormulaMatrixFunctionHandlers.EvaluateTranspose,
 
             // Database
-            ["DSUM"] = EvaluateDSum,
-            ["DAVERAGE"] = EvaluateDAverage,
-            ["DCOUNT"] = EvaluateDCount,
-            ["DMAX"] = EvaluateDMax,
-            ["DMIN"] = EvaluateDMin,
+            ["DSUM"] = FormulaDatabaseFunctionHandlers.EvaluateDSum,
+            ["DAVERAGE"] = FormulaDatabaseFunctionHandlers.EvaluateDAverage,
+            ["DCOUNT"] = FormulaDatabaseFunctionHandlers.EvaluateDCount,
+            ["DMAX"] = FormulaDatabaseFunctionHandlers.EvaluateDMax,
+            ["DMIN"] = FormulaDatabaseFunctionHandlers.EvaluateDMin,
 
             // Financial
             ["PMT"] = EvaluatePmt,

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 
@@ -35,6 +36,8 @@ public sealed partial class OdfPackage
 
         internal string? MimeType => _package._mimetype;
 
+        internal OdfVersion Version => _package._version;
+
         internal bool HasActiveEncryption =>
             _package._saveOptions.Password != null || _package._saveOptions.CryptographyProvider != null;
 
@@ -42,7 +45,7 @@ public sealed partial class OdfPackage
 
         internal void SaveRdfMetadata() => _package.SaveRdfMetadataToEntries();
 
-        internal void SaveManifest() => _package.SaveManifestToEntries();
+        internal void SaveManifest() => OdfPackageManifestWriter.WriteManifest(this);
 
         internal void WriteToArchive(Stream target) => OdfPackageArchiveWriter.WriteToArchive(this, target);
 
