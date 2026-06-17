@@ -110,6 +110,78 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// 依目前封裝項目同步 <c>pkg:hasPart</c> 與 <c>pkg:mimeType</c> triples。
+    /// </summary>
+    /// <param name="entryPaths">封裝項目路徑集合。</param>
+    /// <param name="mediaTypes">項目路徑對應的 MIME 類型對照表。</param>
+    /// <param name="documentSubject">文件主詞 IRI；為 <see langword="null"/> 時沿用既有 <c>pkg:hasPart</c> 主詞或空字串。</param>
+    /// <returns>新增或更新的 triple 數量。</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="entryPaths"/> 或 <paramref name="mediaTypes"/> 為 <see langword="null"/> 時拋出。</exception>
+    public int SyncWithPackageEntries(
+        IEnumerable<string> entryPaths,
+        IReadOnlyDictionary<string, string> mediaTypes,
+        string? documentSubject = null)
+    {
+        if (entryPaths is null)
+            throw new ArgumentNullException(nameof(entryPaths));
+        if (mediaTypes is null)
+            throw new ArgumentNullException(nameof(mediaTypes));
+
+        string docSubject = ResolveDocumentSubject(documentSubject);
+        HashSet<string> desiredParts = [];
+        foreach (string path in entryPaths)
+        {
+            if (!ShouldSyncEntry(path))
+                continue;
+
+            desiredParts.Add(NormalizePartPath(path));
+        }
+
+        int changed = 0;
+        changed += RemoveStaleHasParts(docSubject, desiredParts);
+        changed += RemoveStaleMimeTypes(desiredParts);
+
+        HashSet<string> linkedParts = new(GetLinkedPartPaths(docSubject), StringComparer.Ordinal);
+        foreach (string partPath in desiredParts)
+        {
+            if (!linkedParts.Contains(partPath))
+            {
+                LinkDocumentPart(docSubject, partPath);
+                linkedParts.Add(partPath);
+                changed++;
+            }
+
+            if (!mediaTypes.TryGetValue(partPath, out string? mediaType) || string.IsNullOrEmpty(mediaType))
+                continue;
+
+            string partSubject = FindPartSubject(partPath) ?? partPath;
+            if (TryGetLiteral(partSubject, OdfPkgRdfPredicates.MimeType, out string currentMimeType) &&
+                currentMimeType == mediaType)
+                continue;
+
+            changed += RemoveTriples(partSubject, OdfPkgRdfPredicates.MimeType);
+            SetPartMimeType(partSubject, mediaType);
+            changed++;
+        }
+
+        return changed;
+    }
+
+    /// <summary>
+    /// 取得指定文件主詞已連結的封裝組件路徑。
+    /// </summary>
+    /// <param name="documentSubject">文件主詞 IRI。</param>
+    /// <returns>已正規化之組件路徑集合。</returns>
+    public IReadOnlyList<string> GetLinkedPartPaths(string documentSubject)
+    {
+        return FindTriples(documentSubject, OdfPkgRdfPredicates.HasPart)
+            .Where(triple => !triple.IsLiteral)
+            .Select(triple => NormalizePartPath(triple.ObjectValue))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    /// <summary>
     /// 移除符合主詞與述詞的 RDF triples。
     /// </summary>
     /// <param name="subject">主詞 IRI。</param>
@@ -150,6 +222,79 @@ public sealed class OdfRdfMetadata
     internal void AcceptChanges()
     {
         IsDirty = false;
+    }
+
+    private static bool ShouldSyncEntry(string path) =>
+        !string.IsNullOrEmpty(path) &&
+        !string.Equals(path, "mimetype", StringComparison.Ordinal) &&
+        !string.Equals(path, "META-INF/manifest.xml", StringComparison.Ordinal) &&
+        !string.Equals(path, "META-INF/manifest.rdf", StringComparison.Ordinal) &&
+        !path.EndsWith("/", StringComparison.Ordinal);
+
+    private static string NormalizePartPath(string path)
+    {
+        if (path.StartsWith("./", StringComparison.Ordinal))
+            return path.Substring(2);
+        return path;
+    }
+
+    private string ResolveDocumentSubject(string? documentSubject)
+    {
+        if (documentSubject is not null)
+            return documentSubject;
+
+        return _triples
+            .Where(triple => triple.Predicate == OdfPkgRdfPredicates.HasPart)
+            .GroupBy(triple => triple.Subject)
+            .OrderByDescending(group => group.Count())
+            .Select(group => group.Key)
+            .FirstOrDefault() ?? string.Empty;
+    }
+
+    private int RemoveStaleHasParts(string documentSubject, HashSet<string> desiredParts)
+    {
+        List<OdfRdfTriple> staleTriples = _triples
+            .Where(triple =>
+                triple.Subject == documentSubject &&
+                triple.Predicate == OdfPkgRdfPredicates.HasPart &&
+                !triple.IsLiteral &&
+                !desiredParts.Contains(NormalizePartPath(triple.ObjectValue)))
+            .ToList();
+
+        foreach (OdfRdfTriple triple in staleTriples)
+            _triples.Remove(triple);
+
+        if (staleTriples.Count > 0)
+            IsDirty = true;
+
+        return staleTriples.Count;
+    }
+
+    private int RemoveStaleMimeTypes(HashSet<string> desiredParts)
+    {
+        List<OdfRdfTriple> staleTriples = _triples
+            .Where(triple =>
+                triple.Predicate == OdfPkgRdfPredicates.MimeType &&
+                triple.IsLiteral &&
+                !desiredParts.Contains(NormalizePartPath(triple.Subject)))
+            .ToList();
+
+        foreach (OdfRdfTriple triple in staleTriples)
+            _triples.Remove(triple);
+
+        if (staleTriples.Count > 0)
+            IsDirty = true;
+
+        return staleTriples.Count;
+    }
+
+    private string? FindPartSubject(string normalizedPartPath)
+    {
+        OdfRdfTriple? triple = _triples.FirstOrDefault(candidate =>
+            candidate.Predicate == OdfPkgRdfPredicates.MimeType &&
+            candidate.IsLiteral &&
+            NormalizePartPath(candidate.Subject) == normalizedPartPath);
+        return triple?.Subject;
     }
 }
 

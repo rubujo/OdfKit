@@ -107,6 +107,92 @@ public class RdfMetadataTests
         Assert.False(reopened.RdfMetadata.TryGetLiteral("content.xml", OdfPkgRdfPredicates.MimeType, out _));
     }
 
+    /// <summary>
+    /// 驗證 SyncWithPackageEntries 會為封裝項目建立 pkg:hasPart 與 pkg:mimeType。
+    /// </summary>
+    [Fact]
+    public void SyncWithPackageEntries_AddsHasPartAndMimeTypeForEntries()
+    {
+        using var stream = new MemoryStream();
+        using (var package = OdfPackage.Create(stream, leaveOpen: true))
+        {
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+            package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes("<styles/>"), "text/xml");
+            package.RdfMetadata.AddTriple(
+                string.Empty,
+                "http://purl.org/dc/elements/1.1/title",
+                "保留標題");
+
+            int changed = package.SyncRdfMetadataWithEntries();
+
+            Assert.True(changed >= 4);
+            Assert.Equal(2, package.RdfMetadata.GetLinkedPartPaths(string.Empty).Count);
+            Assert.True(package.RdfMetadata.TryGetLiteral("content.xml", OdfPkgRdfPredicates.MimeType, out string contentMime));
+            Assert.Equal("text/xml", contentMime);
+            Assert.Contains(
+                package.RdfMetadata.Triples,
+                triple => triple.Predicate == "http://purl.org/dc/elements/1.1/title");
+        }
+    }
+
+    /// <summary>
+    /// 驗證新增與移除封裝項目後，同步會更新 pkg triples。
+    /// </summary>
+    [Fact]
+    public void SyncWithPackageEntries_ReflectsAddedAndRemovedEntries()
+    {
+        using var stream = new MemoryStream();
+        using (var package = OdfPackage.Create(stream, leaveOpen: true))
+        {
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+            package.RdfMetadata.LinkDocumentPart(string.Empty, "content.xml");
+            package.RdfMetadata.SetPartMimeType("content.xml", "text/xml");
+
+            package.WriteEntry("meta.xml", Encoding.UTF8.GetBytes("<meta/>"), "text/xml");
+            package.SyncRdfMetadataWithEntries();
+            Assert.Contains("meta.xml", package.RdfMetadata.GetLinkedPartPaths(string.Empty));
+
+            package.RemoveEntry("meta.xml");
+            package.SyncRdfMetadataWithEntries();
+            Assert.DoesNotContain("meta.xml", package.RdfMetadata.GetLinkedPartPaths(string.Empty));
+            Assert.False(package.RdfMetadata.TryGetLiteral("meta.xml", OdfPkgRdfPredicates.MimeType, out _));
+        }
+    }
+
+    /// <summary>
+    /// 驗證儲存時會自動同步 manifest.rdf 與封裝項目。
+    /// </summary>
+    [Fact]
+    public void Save_AutoSyncsManifestRdfWithPackageEntries()
+    {
+        using var stream = new MemoryStream();
+        using (var package = OdfPackage.Create(stream, leaveOpen: true))
+        {
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+            package.RdfMetadata.LinkDocumentPart(string.Empty, "content.xml");
+            package.RdfMetadata.SetPartMimeType("content.xml", "text/xml");
+            package.Save();
+        }
+
+        stream.Position = 0;
+        using (var package = OdfPackage.Open(stream, leaveOpen: true))
+        {
+            package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes("<styles/>"), "text/xml");
+            package.Save();
+        }
+
+        stream.Position = 0;
+        using var reopened = OdfPackage.Open(stream, leaveOpen: true);
+
+        Assert.Contains("content.xml", reopened.RdfMetadata.GetLinkedPartPaths(string.Empty));
+        Assert.Contains("styles.xml", reopened.RdfMetadata.GetLinkedPartPaths(string.Empty));
+        Assert.True(reopened.RdfMetadata.TryGetLiteral("styles.xml", OdfPkgRdfPredicates.MimeType, out string stylesMime));
+        Assert.Equal("text/xml", stylesMime);
+    }
+
     [Fact]
     public void RdfMetadata_Load_RejectsDtd()
     {

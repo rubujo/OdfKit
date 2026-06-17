@@ -37,7 +37,16 @@ internal static class OdfPackageRdfMetadataEngine
     /// </summary>
     internal static void Save(OdfPackage.OdfPackageSaveCollaborators ctx)
     {
-        if (!ctx.RdfMetadata.IsDirty || ctx.RdfMetadata.Triples.Count == 0)
+        bool hadRdfEntry = ctx.Entries.ContainsKey(RdfMetadataPath);
+        if (ctx.RdfMetadata.Triples.Count > 0 || ctx.RdfMetadata.IsDirty)
+        {
+            ctx.RdfMetadata.SyncWithPackageEntries(ctx.Entries.Keys, ctx.Manifest);
+        }
+
+        if (ctx.RdfMetadata.Triples.Count == 0)
+            return;
+
+        if (!ctx.RdfMetadata.IsDirty && !hadRdfEntry)
             return;
 
         byte[] content = OdfRdfParser.Serialize(ctx.RdfMetadata, ctx.SaveOptions.IndentXml);
