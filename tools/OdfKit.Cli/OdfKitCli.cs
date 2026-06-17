@@ -1,8 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Csv;
@@ -16,12 +14,7 @@ namespace OdfKit.Cli;
 /// </summary>
 public static class OdfKitCli
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        WriteIndented = true
-    };
+    private static JsonSerializerOptions JsonOptions => OdfJsonSerializerOptions.HumanReadable;
 
     /// <summary>
     /// 執行命令列工具。

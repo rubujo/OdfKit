@@ -71,6 +71,34 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證表格儲存格內的追蹤修訂可讀取並接受。
+    /// </summary>
+    [Fact]
+    public void TrackedChangesWorkInsideTableCells()
+    {
+        using var document = TextDocument.Create();
+        document.TrackedChanges = true;
+
+        OdfTable table = document.AddTable(1, 1);
+        OdfParagraph cellParagraph = table.GetCell(0, 0).AddParagraph(string.Empty);
+        cellParagraph.AddTextRun("儲存格修訂文字");
+
+        var changes = document.GetTrackedChanges().ToList();
+        Assert.Single(changes);
+        Assert.Equal(OdfChangeType.Insertion, changes[0].ChangeType);
+        Assert.Equal("儲存格修訂文字", changes[0].Content);
+
+        document.AcceptAllChanges();
+
+        Assert.Empty(document.GetTrackedChanges());
+        string contentXml = SaveAndGetContentXml(document);
+        Assert.Contains("儲存格修訂文字", contentXml);
+        Assert.Contains("table:table-cell", contentXml);
+        Assert.DoesNotContain("change-start", contentXml);
+        Assert.DoesNotContain("change-end", contentXml);
+    }
+
+    /// <summary>
     /// 驗證追蹤修訂中的刪除類型內容提取。
     /// </summary>
     [Fact]

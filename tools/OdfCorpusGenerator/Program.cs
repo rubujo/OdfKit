@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Serialization;
 using OdfKit.Compliance;
 using OdfKit.Core;
 
@@ -150,12 +149,7 @@ internal static class Program
 
 internal sealed class CorpusManifestDocument
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
+    private static JsonSerializerOptions JsonOptions => OdfJsonSerializerOptions.Manifest;
 
     public List<CorpusFixtureEntry> Fixtures { get; set; } = [];
 

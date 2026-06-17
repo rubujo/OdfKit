@@ -887,7 +887,7 @@ public class TypedDomParityTests
         Assert.True(report.WrapperPropertyTypeCounts["odfVersion"] >= 50);
         Assert.True(report.WrapperPropertyTypeCounts["mediaType"] >= 100);
 
-        string json = JsonSerializer.Serialize(report.ToJsonModel());
+        string json = JsonSerializer.Serialize(report.ToJsonModel(), OdfJsonSerializerOptions.Compact);
         using JsonDocument document = JsonDocument.Parse(json);
         Assert.Equal(report.SchemaElementCount, document.RootElement.GetProperty("summary").GetProperty("schemaElementCount").GetInt32());
         Assert.Equal(report.SchemaChildElementRelationCount, document.RootElement.GetProperty("summary").GetProperty("schemaChildElementRelationCount").GetInt32());
