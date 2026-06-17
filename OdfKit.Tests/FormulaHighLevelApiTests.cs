@@ -15,6 +15,32 @@ namespace OdfKit.Tests;
 public class FormulaHighLevelApiTests
 {
     /// <summary>
+    /// 驗證公式 Fluent builder 可建立 token row 並 round-trip。
+    /// </summary>
+    [Fact]
+    public void OdfFormulaBuilderCreatesTokenRowAndRoundTrips()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+            .WithTokens(
+                OdfMathToken.Identifier("E"),
+                OdfMathToken.Operator("="),
+                OdfMathToken.Identifier("mc"),
+                OdfMathToken.Operator("^"),
+                OdfMathToken.Number("2"))
+            .Build();
+
+        Assert.Equal("E=mc^2", formula.MathText);
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
+        Assert.Equal(5, loaded.GetMathTokens().Count);
+        Assert.Equal("E", loaded.GetMathTokens()[0].Text);
+    }
+
+    /// <summary>
     /// 驗證建立公式文件、設定與獲取 MathML。
     /// </summary>
     [Fact]

@@ -60,6 +60,21 @@ sheet.Cells["A3"].Formula = "of:=SUM([.A1:.A2])";
 workbook.Save("calc.ods");
 ```
 
+## 建立 ODP（Fluent Builder）
+
+```csharp
+using OdfKit.Presentation;
+
+using PresentationDocument deck = PresentationDocument.Builder()
+    .WithMetadata(metadata => metadata.Title("產品簡報"))
+    .AddSlide("開場", slide => slide
+        .AddTitle("歡迎使用 OdfKit")
+        .WithSpeakerNotes("介紹產品定位")
+        .WithTransition(OdfTransitionType.Fade))
+    .Build();
+deck.Save("intro.odp");
+```
+
 ## 建立 ODP
 
 ```csharp
@@ -90,6 +105,20 @@ foreach (OdfPicture picture in deck.Slides[0].Pictures)
 {
     Console.WriteLine(picture.ImageHref);
 }
+```
+
+## 建立 ODG（Fluent Builder）
+
+```csharp
+using OdfKit.Drawing;
+
+using DrawingDocument drawing = DrawingDocument.Builder()
+    .WithMetadata(metadata => metadata.Title("流程圖草稿"))
+    .AddPage("主畫布", page => page
+        .AddRectangle(1, 1, 4, 2)
+        .AddTextBox("開始", 1, 4, 3, 1))
+    .Build();
+drawing.Save("drawing.odg");
 ```
 
 ## 建立並讀取 ODG
@@ -162,6 +191,17 @@ chart.Save("revenue.odc");
 using OdfChartDocument loadedChart = OdfChartDocument.Load("revenue.odc");
 Console.WriteLine(loadedChart.XAxisTitle);
 Console.WriteLine(loadedChart.Series[0].ValuesCellRangeAddress);
+```
+
+## 建立 ODF 公式（Fluent Builder）
+
+```csharp
+using OdfKit.Formula;
+
+using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+    .WithIdentifierEquation("F", "ma")
+    .Build();
+formula.Save("equation.odf");
 ```
 
 ## 建立 ODF 公式

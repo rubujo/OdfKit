@@ -17,6 +17,33 @@ namespace OdfKit.Tests;
 public class DrawingApiUsabilityTests
 {
     /// <summary>
+    /// 驗證繪圖 Fluent builder 可建立頁面、圖形與文字方塊。
+    /// </summary>
+    [Fact]
+    public void DrawingDocumentBuilderCreatesPageShapesAndTextBox()
+    {
+        using DrawingDocument drawing = DrawingDocument.Builder()
+            .WithMetadata(metadata => metadata.Title("流程圖草稿"))
+            .AddPage("主畫布", page => page
+                .AddRectangle(1, 1, 4, 2)
+                .AddTextBox("開始", 1, 4, 3, 1)
+                .AddPath("M 0 0 L 2 2 Z", 6, 1, 3, 3))
+            .Build();
+
+        using var stream = new MemoryStream();
+        drawing.SaveToStream(stream);
+        stream.Position = 0;
+
+        using DrawingDocument loaded = DrawingDocument.Load(stream);
+
+        Assert.Equal("流程圖草稿", loaded.Title);
+        Assert.Equal("主畫布", loaded.Pages[0].Name);
+        Assert.Single(loaded.Pages[0].Shapes, shape => shape.LocalName == "rect");
+        Assert.Equal("開始", loaded.Pages[0].TextBoxes[0].Text);
+        Assert.Contains(loaded.GetPaths(), path => path.SvgPathData == "M 0 0 L 2 2 Z");
+    }
+
+    /// <summary>
     /// 驗證可用 pages collection 建立常見 ODG 內容並 round-trip。
     /// </summary>
     [Fact]

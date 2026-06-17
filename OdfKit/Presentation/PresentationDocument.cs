@@ -49,6 +49,15 @@ public partial class PresentationDocument : OdfDocument
     }
 
     /// <summary>
+    /// 建立新的 ODP 簡報文件 Fluent builder。
+    /// </summary>
+    /// <returns>新的 <see cref="PresentationDocumentBuilder"/> 執行個體。</returns>
+    public static PresentationDocumentBuilder Builder()
+    {
+        return new PresentationDocumentBuilder(Create());
+    }
+
+    /// <summary>
     /// 建立新的 ODP 簡報文件。
     /// </summary>
     /// <returns>新的 <see cref="PresentationDocument"/> 執行個體。</returns>

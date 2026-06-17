@@ -50,6 +50,15 @@ public partial class DrawingDocument : OdfDocument
     }
 
     /// <summary>
+    /// 建立新的 ODG 繪圖文件 Fluent builder。
+    /// </summary>
+    /// <returns>新的 <see cref="DrawingDocumentBuilder"/> 執行個體。</returns>
+    public static DrawingDocumentBuilder Builder()
+    {
+        return new DrawingDocumentBuilder(Create());
+    }
+
+    /// <summary>
     /// 建立新的 ODG 繪圖文件。
     /// </summary>
     /// <returns>新的 <see cref="DrawingDocument"/> 執行個體。</returns>

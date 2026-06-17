@@ -39,6 +39,15 @@ public partial class OdfFormulaDocument : OdfDocument
     }
 
     /// <summary>
+    /// 建立新的 ODF 公式文件 Fluent builder。
+    /// </summary>
+    /// <returns>新的 <see cref="OdfFormulaBuilder"/> 執行個體。</returns>
+    public static OdfFormulaBuilder Builder()
+    {
+        return new OdfFormulaBuilder(Create());
+    }
+
+    /// <summary>
     /// 建立新的 ODF 公式文件。
     /// </summary>
     /// <returns>新的 <see cref="OdfFormulaDocument"/> 執行個體。</returns>

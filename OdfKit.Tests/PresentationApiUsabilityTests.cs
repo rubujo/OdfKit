@@ -17,6 +17,35 @@ namespace OdfKit.Tests;
 public class PresentationApiUsabilityTests
 {
     /// <summary>
+    /// 驗證簡報 Fluent builder 可建立中繼資料、投影片與切換效果。
+    /// </summary>
+    [Fact]
+    public void PresentationDocumentBuilderCreatesMetadataSlidesAndTransitions()
+    {
+        using PresentationDocument deck = PresentationDocument.Builder()
+            .WithMetadata(metadata => metadata
+                .Title("產品簡報")
+                .Author("OdfKit"))
+            .AddSlide("開場", slide => slide
+                .AddTitle("歡迎使用 OdfKit")
+                .WithSpeakerNotes("介紹產品定位")
+                .WithTransition(OdfTransitionType.Fade))
+            .Build();
+
+        using var stream = new MemoryStream();
+        deck.SaveToStream(stream);
+        stream.Position = 0;
+
+        using PresentationDocument loaded = PresentationDocument.Load(stream);
+
+        Assert.Equal("產品簡報", loaded.Title);
+        Assert.Equal("OdfKit", loaded.Creator);
+        Assert.Equal("開場", loaded.Slides[0].Name);
+        Assert.Equal("歡迎使用 OdfKit", loaded.Slides[0].TextBoxes[0].Text);
+        Assert.Equal("介紹產品定位", loaded.Slides[0].SpeakerNotes);
+    }
+
+    /// <summary>
     /// 驗證可用 slides collection 建立常見 ODP 內容並 round-trip。
     /// </summary>
     [Fact]

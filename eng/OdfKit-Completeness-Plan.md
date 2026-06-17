@@ -42,7 +42,7 @@
 | DEPTH-1-TC | 基礎 ✅ | ODT/ODS `tracked-changes` 內容／表格／結構／移動；LO 互通測試已備 |
 | RDF-1 | 基礎 ✅ | 核心 `manifest.rdf` / `pkg:` ontology parity；文件層往返與 corpus fixture |
 | RDF-2 | 選用 | `OdfKit.Extensions.Rdf` + `dotNetRdf.Core` SPARQL 橋接 |
-| DX-1 | 待辦 | Presentation/Drawing Builder、`OdfFormulaBuilder`、cookbook |
+| DX-1 | 基礎 ✅ | `PresentationDocumentBuilder`、`DrawingDocumentBuilder`、`OdfFormulaBuilder`；cookbook 已補 Builder 範例 |
 | LOEXT-1 | 低優先 | `loext:decorative` 讀取映射、`OdfNamespaces.LoExt`、manifest `xmlns:loext` 對照 LO 26.x |
 | CALCEXT-1 | 選用 | calcext 讀取 API（列舉／解析色階、橫條、圖示集、sparkline） |
 
