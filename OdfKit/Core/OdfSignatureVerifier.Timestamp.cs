@@ -7,10 +7,8 @@ using System.Xml;
 
 namespace OdfKit.Core;
 
-public static partial class OdfSigner
+internal static partial class OdfSignatureVerifier
 {
-    #region Verification - Timestamp & References
-
     private static bool VerifySignatureTimestamp(
         XmlNode signatureNode,
         XmlNamespaceManager nsManager,
@@ -57,13 +55,13 @@ public static partial class OdfSigner
             return false;
         }
 
-        byte[] sigBytes = CanonicalizeSignatureValue(signatureValueElem);
+        byte[] sigBytes = OdfSignatureTsaClient.CanonicalizeSignatureValue(signatureValueElem);
 
         using var sha256 = SHA256.Create();
         byte[] calculatedHash = sha256.ComputeHash(sigBytes);
 
         byte[]? embeddedHash = null;
-        var tstInfo = ParseDer(signedCms.ContentInfo.Content);
+        var tstInfo = OdfSignatureDerCodec.Parse(signedCms.ContentInfo.Content);
         if (tstInfo.Tag == 0x30 && tstInfo.Children.Count >= 3)
         {
             var messageImprint = tstInfo.Children[2];
@@ -74,7 +72,7 @@ public static partial class OdfSigner
             }
         }
 
-        if (embeddedHash == null || !StructuralEqual(calculatedHash, embeddedHash))
+        if (embeddedHash == null || !OdfEncryption.ByteArrayEquals(calculatedHash, embeddedHash))
         {
             singleResult.IsTimestampValid = false;
             singleResult.ErrorCode = "TIMESTAMP_IMPRINT_MISMATCH";
@@ -84,36 +82,4 @@ public static partial class OdfSigner
 
         return true;
     }
-
-    private static void CollectCheckedReferences(XadesSignedXml signedXml, OdfSingleSignatureValidationResult singleResult)
-    {
-        if (signedXml.SignedInfo == null)
-            return;
-
-        foreach (Reference reference in signedXml.SignedInfo.References)
-        {
-            string? uri = reference.Uri;
-            if (uri != null && !uri.StartsWith("#"))
-            {
-                string entryName = uri.Replace('\\', '/').TrimStart('/');
-                singleResult.CheckedReferences.Add(entryName);
-            }
-        }
-    }
-
-    internal static byte[] CanonicalizeSignatureValue(XmlElement signatureValueElem)
-    {
-        var cleanDoc = new XmlDocument();
-        var imported = (XmlElement)cleanDoc.ImportNode(signatureValueElem, true);
-        cleanDoc.AppendChild(imported);
-
-        var transform = new XmlDsigExcC14NTransform();
-        transform.LoadInput(imported.SelectNodes("descendant-or-self::node()")!);
-        using var tsStream = (Stream)transform.GetOutput(typeof(Stream));
-        using var tsMs = new MemoryStream();
-        tsStream.CopyTo(tsMs);
-        return tsMs.ToArray();
-    }
-
-    #endregion
 }

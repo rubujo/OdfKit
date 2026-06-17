@@ -157,7 +157,7 @@ internal static class OdfSignatureSigner
                 var reference = new Reference(file) { DigestMethod = SignedXml.XmlDsigSHA256Url };
                 Stream stream = package.GetEntryStream(file);
                 openStreams.Add(stream);
-                OdfSigner.InjectReferenceStream(reference, stream);
+                OdfSignatureX509Utilities.InjectReferenceStream(reference, stream);
                 signedXml.AddReference(reference);
             }
 
@@ -186,13 +186,13 @@ internal static class OdfSignatureSigner
             var sigValElem = xmlSignature.SelectSingleNode(".//ds:SignatureValue", nsManager) as XmlElement
                 ?? throw new CryptographicException("ds:SignatureValue element was not found in computed signature.");
 
-            byte[] sigValueBytes = OdfSigner.CanonicalizeSignatureValue(sigValElem);
+            byte[] sigValueBytes = OdfSignatureTsaClient.CanonicalizeSignatureValue(sigValElem);
 
             using var sha256 = SHA256.Create();
             byte[] sigHash = sha256.ComputeHash(sigValueBytes);
 
-            byte[] tsaResponse = await OdfSigner.QueryTsaAsync(options.TsaUrl!, sigHash, options.HttpClient);
-            byte[] tsToken = OdfSigner.ExtractTimestampToken(tsaResponse);
+            byte[] tsaResponse = await OdfSignatureTsaClient.QueryTsaAsync(options.TsaUrl!, sigHash, options.HttpClient);
+            byte[] tsToken = OdfSignatureTsaClient.ExtractTimestampToken(tsaResponse);
 
             var importedQualProps = xmlSignature.SelectSingleNode(".//xades:QualifyingProperties", nsManager) as XmlElement
                 ?? throw new CryptographicException("xades:QualifyingProperties element was not found in computed signature.");
@@ -243,14 +243,14 @@ internal static class OdfSignatureSigner
                 var downloadedCrls = new HashSet<string>();
                 foreach (X509Certificate2 chainCert in chainCerts)
                 {
-                    foreach (string url in OdfSigner.GetCrlUrls(chainCert))
+                    foreach (string url in OdfSignatureCrlUtilities.GetCrlUrls(chainCert))
                     {
                         if (!downloadedCrls.Add(url))
                             continue;
 
                         try
                         {
-                            byte[] crlBytes = await OdfSigner.DownloadCrlAsync(url, options.HttpClient);
+                            byte[] crlBytes = await OdfSignatureTsaClient.DownloadCrlAsync(url, options.HttpClient);
                             if (crlBytes is { Length: > 0 })
                             {
                                 var encapCrl = doc.CreateElement("xades", "EncapsulatedCRLValue", "http://uri.etsi.org/01903/v1.3.2#");

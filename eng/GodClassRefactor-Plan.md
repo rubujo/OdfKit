@@ -100,13 +100,18 @@
 - [x] `DefaultFormulaEvaluator` 收斂為薄門面（刪除 20 個 category stub partial）
 - [x] `OdfPackageRdfMetadataEngine`、`OdfPackageSaveHooksEngine`、`OdfPackageSignaturePurgeEngine`
 
-## 剩餘工作（Phase 12+）
+## Phase 12（已完成）
+
+- [x] `OdfSignatureVerifier` 驗證實作遷移（反轉薄門面委派方向）
+- [x] `OdfSignatureDerCodec`、`OdfSignatureCrlUtilities`、`OdfSignatureX509Utilities`、`OdfSignatureTsaClient`
+- [x] `OdfSigner` 收斂為公開 API 薄門面（刪除 6 個 verification／utility partial）
+
+## 剩餘工作（Phase 13+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
 | `OdfElement` | ~3333 | 屬性存取器／typed getter |
 | `OdfPackage` | ~1100 | 其餘 `Saving`／`Loading` partial |
-| `OdfSigner` | ~1300 | 驗證剩餘 partial |
 | `TextDocument` | ~1000 | 核心 `TextDocument.cs` |
 | `OdfDocument` | ~1493 | 合併／複製管線 |
 | `OdfTableSheet` | ~1185 | `Internals`、核心工作表邏輯 |

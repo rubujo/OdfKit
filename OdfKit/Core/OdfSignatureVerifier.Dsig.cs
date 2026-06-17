@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace OdfKit.Core;
 
-public static partial class OdfSigner
+internal static partial class OdfSignatureVerifier
 {
-    #region Verification - XML DSig & Certificate Chain
-
     private static bool TryCollectEmbeddedCrls(
         XmlNode signatureNode,
         XmlNamespaceManager nsManager,
@@ -85,7 +84,7 @@ public static partial class OdfSigner
                         {
                             var stream = package.GetEntryStream(entryName);
                             openStreams.Add(stream);
-                            InjectReferenceStream(reference, stream);
+                            OdfSignatureX509Utilities.InjectReferenceStream(reference, stream);
                         }
                     }
                 }
@@ -139,15 +138,15 @@ public static partial class OdfSigner
         singleResult.ValidationSteps.Add("4. Verifying certificate trust chain...");
         var chain = new X509Chain();
         chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-        foreach (var embeddedCertificate in GetEmbeddedCertificates(signatureNode, nsManager))
+        foreach (var embeddedCertificate in OdfSignatureX509Utilities.GetEmbeddedCertificates(signatureNode, nsManager))
         {
-            if (!StructuralEqual(embeddedCertificate.RawData, cert.RawData))
+            if (!OdfEncryption.ByteArrayEquals(embeddedCertificate.RawData, cert.RawData))
                 chain.ChainPolicy.ExtraStore.Add(embeddedCertificate);
         }
 
         foreach (var extraCertificate in options.ExtraCertificates)
         {
-            if (!StructuralEqual(extraCertificate.RawData, cert.RawData))
+            if (!OdfEncryption.ByteArrayEquals(extraCertificate.RawData, cert.RawData))
                 chain.ChainPolicy.ExtraStore.Add(extraCertificate);
         }
 
@@ -182,10 +181,6 @@ public static partial class OdfSigner
 
         return true;
     }
-
-    #endregion
-
-    #region Verification - Single Signature
 
     private static async Task<bool> VerifySingleSignatureAsync(
         XmlNode signatureNode,
@@ -223,7 +218,7 @@ public static partial class OdfSigner
                 return false;
 
             singleResult.ValidationSteps.Add("3. Verifying signing certificate digest...");
-            if (!VerifySigningCertificateDigest((XmlElement)signatureNode, cert, out string? digestError))
+            if (!OdfSignatureX509Utilities.VerifySigningCertificateDigest((XmlElement)signatureNode, cert, out string? digestError))
             {
                 singleResult.ErrorCode = "CERTIFICATE_DIGEST_MISMATCH";
                 singleResult.ErrorMessage = digestError;
@@ -251,83 +246,19 @@ public static partial class OdfSigner
         }
     }
 
-    #endregion
-
-
-    #region Verification
-
-    /// <summary>
-    /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果（非同步）。
-    /// </summary>
-    /// <param name="package">要驗證的 ODF 封裝</param>
-    /// <param name="options">簽署選項</param>
-    /// <returns>代表非同步作業的工作，其結果包含詳細的數位簽章驗證結果</returns>
-    internal static async Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfPackage package, OdfSigningOptions? options = null)
+    private static void CollectCheckedReferences(XadesSignedXml signedXml, OdfSingleSignatureValidationResult singleResult)
     {
-        options ??= new OdfSigningOptions();
-        var result = new OdfSignatureValidationResult { IsValid = true };
+        if (signedXml.SignedInfo == null)
+            return;
 
-        if (package == null)
-            throw new ArgumentNullException(nameof(package));
-
-        if (!package.HasEntry(OdfSignerConstants.SignaturePath))
+        foreach (Reference reference in signedXml.SignedInfo.References)
         {
-            result.IsValid = false;
-            return result;
-        }
-
-        try
-        {
-            var doc = new XmlDocument();
-            using (var stream = package.GetEntryStream(OdfSignerConstants.SignaturePath))
+            string? uri = reference.Uri;
+            if (uri != null && !uri.StartsWith("#"))
             {
-                var readerSettings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null };
-                using var reader = XmlReader.Create(stream, readerSettings);
-                doc.Load(reader);
+                string entryName = uri.Replace('\\', '/').TrimStart('/');
+                singleResult.CheckedReferences.Add(entryName);
             }
-
-            var nsManager = new XmlNamespaceManager(doc.NameTable);
-            nsManager.AddNamespace("ds", OdfNamespaces.Ds);
-            nsManager.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
-
-            var signatureNodes = doc.SelectNodes("//ds:Signature", nsManager);
-            if (signatureNodes == null || signatureNodes.Count == 0)
-            {
-                result.IsValid = false;
-                return result;
-            }
-
-            bool overallValid = true;
-
-            foreach (XmlNode signatureNode in signatureNodes)
-            {
-                var singleResult = new OdfSingleSignatureValidationResult
-                {
-                    SignatureId = (signatureNode as XmlElement)?.GetAttribute("Id"),
-                    IsSignatureValid = false,
-                    IsCertificateValid = false,
-                    IsChainValid = false,
-                    IsTimestampValid = true,
-                    IsRevocationValid = true
-                };
-                result.Signatures.Add(singleResult);
-                singleResult.ValidationSteps.Add($"Starting verification for signature ID: {singleResult.SignatureId}");
-
-                if (!await VerifySingleSignatureAsync(signatureNode, doc, package, options, nsManager, singleResult))
-                    overallValid = false;
-            }
-
-            result.IsValid = overallValid;
-            return result;
-        }
-        catch (Exception ex)
-        {
-            OdfKitDiagnostics.Error("Error during digital signature verification", ex);
-            result.IsValid = false;
-            return result;
         }
     }
-
-    #endregion
-
 }

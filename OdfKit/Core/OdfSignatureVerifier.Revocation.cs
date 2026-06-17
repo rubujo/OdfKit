@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace OdfKit.Core;
 
-public static partial class OdfSigner
+internal static partial class OdfSignatureVerifier
 {
-    #region Verification - Revocation
-
     private static async Task<bool> VerifyRevocationStatusAsync(
         List<X509Certificate2> chainCerts,
         List<byte[]> embeddedCrls,
@@ -26,7 +23,7 @@ public static partial class OdfSigner
             X509Certificate2? issuerCert = null;
             foreach (var c in chainCerts)
             {
-                if (StructuralEqual(c.SubjectName.RawData, chainCert.IssuerName.RawData))
+                if (OdfEncryption.ByteArrayEquals(c.SubjectName.RawData, chainCert.IssuerName.RawData))
                 {
                     issuerCert = c;
                     break;
@@ -53,21 +50,21 @@ public static partial class OdfSigner
             {
                 try
                 {
-                    var tbsNode = GetTbsNode(crlBytes);
+                    var tbsNode = OdfSignatureDerCodec.GetTbsNode(crlBytes);
                     if (tbsNode != null)
                     {
-                        var crlIssuer = GetCrlIssuerDer(tbsNode);
-                        if (crlIssuer != null && StructuralEqual(crlIssuer, chainCert.IssuerName.RawData))
+                        var crlIssuer = OdfSignatureDerCodec.GetCrlIssuerDer(tbsNode);
+                        if (crlIssuer != null && OdfEncryption.ByteArrayEquals(crlIssuer, chainCert.IssuerName.RawData))
                         {
-                            if (!VerifyCrlSignature(crlBytes, issuerCert))
+                            if (!OdfSignatureCrlUtilities.VerifyCrlSignature(crlBytes, issuerCert))
                             {
                                 singleResult.ErrorCode = "CRL_SIGNATURE_INVALID";
                                 throw new CryptographicException("Embedded CRL signature is invalid.");
                             }
 
                             checkedAnyCrl = true;
-                            var revoked = GetRevokedSerialNumbers(crlBytes);
-                            if (revoked.Contains(NormalizeHexSerial(chainCert.SerialNumber)))
+                            var revoked = OdfSignatureCrlUtilities.GetRevokedSerialNumbers(crlBytes);
+                            if (revoked.Contains(OdfSignatureDerCodec.NormalizeHexSerial(chainCert.SerialNumber)))
                             {
                                 isRevoked = true;
                                 singleResult.ErrorCode = "CERTIFICATE_REVOKED";
@@ -101,7 +98,7 @@ public static partial class OdfSigner
 
             if (options.CheckRevocation)
             {
-                var urls = GetCrlUrls(chainCert);
+                var urls = OdfSignatureCrlUtilities.GetCrlUrls(chainCert);
                 if (urls.Count == 0 && !checkedAnyCrl)
                 {
                     singleResult.IsRevocationValid = false;
@@ -117,19 +114,19 @@ public static partial class OdfSigner
                 {
                     try
                     {
-                        byte[] crlBytes = await DownloadCrlAsync(url, options.HttpClient);
-                        var tbsNode = GetTbsNode(crlBytes);
+                        byte[] crlBytes = await OdfSignatureTsaClient.DownloadCrlAsync(url, options.HttpClient);
+                        var tbsNode = OdfSignatureDerCodec.GetTbsNode(crlBytes);
                         if (tbsNode != null)
                         {
-                            if (!VerifyCrlSignature(crlBytes, issuerCert))
+                            if (!OdfSignatureCrlUtilities.VerifyCrlSignature(crlBytes, issuerCert))
                             {
                                 singleResult.ErrorCode = "CRL_SIGNATURE_INVALID";
                                 throw new CryptographicException("Downloaded CRL signature is invalid.");
                             }
 
                             onlineCrlCheckedSuccessfully = true;
-                            var revoked = GetRevokedSerialNumbers(crlBytes);
-                            if (revoked.Contains(NormalizeHexSerial(chainCert.SerialNumber)))
+                            var revoked = OdfSignatureCrlUtilities.GetRevokedSerialNumbers(crlBytes);
+                            if (revoked.Contains(OdfSignatureDerCodec.NormalizeHexSerial(chainCert.SerialNumber)))
                             {
                                 isRevoked = true;
                                 singleResult.ErrorCode = "CERTIFICATE_REVOKED";
@@ -168,6 +165,4 @@ public static partial class OdfSigner
 
         return true;
     }
-
-    #endregion
 }

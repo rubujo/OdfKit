@@ -1,18 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Numerics;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Cryptography.Xml;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 
@@ -21,8 +9,6 @@ namespace OdfKit.Core;
 /// </summary>
 public static partial class OdfSigner
 {
-    private static readonly HttpClient s_httpClient = new();
-
     /// <summary>
     /// 對 ODF 封裝中的關鍵檔案進行數位簽署，支援同僚聯署。
     /// </summary>
@@ -55,6 +41,7 @@ public static partial class OdfSigner
     {
         return OdfSignatureSigner.SignAsync(package, certificate, options);
     }
+
     /// <summary>
     /// 驗證 ODF 封裝中的所有數位簽章。
     /// </summary>
@@ -68,9 +55,7 @@ public static partial class OdfSigner
         foreach (var sig in result.Signatures)
         {
             if (sig.Certificate != null)
-            {
                 certificates.Add(sig.Certificate);
-            }
         }
         return result.IsValid;
     }
@@ -85,4 +70,13 @@ public static partial class OdfSigner
     {
         return OdfSignatureVerifier.VerifySignaturesAsync(package, options).GetAwaiter().GetResult();
     }
+
+    /// <summary>
+    /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果（非同步）。
+    /// </summary>
+    /// <param name="package">要驗證的 ODF 封裝</param>
+    /// <param name="options">簽署選項</param>
+    /// <returns>代表非同步作業的工作，其結果包含詳細的數位簽章驗證結果</returns>
+    internal static Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfPackage package, OdfSigningOptions? options = null)
+        => OdfSignatureVerifier.VerifySignaturesAsync(package, options);
 }
