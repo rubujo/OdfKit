@@ -67,7 +67,7 @@
 | `calcext` | Sparkline（`sparkline-groups`） | ✅ 寫入 | `AddSparklineGroup` |
 | `calcext` | 既有規則讀取／列舉 API | 選用 CALCEXT-1 | 載入後 DOM 保真 round-trip 已可用 |
 | ODF 標準 | `text:tracked-changes`（ODT） | 基礎 ✅；完備化 DEPTH-1-TC | `TextDocument` accept/reject/record API |
-| — | `table:tracked-changes`（ODS） | 未實作 | DEPTH-1-TC 範圍 |
+| — | `table:tracked-changes`（ODS） | 基礎 ✅（內容／結構／移動）；公式與 LO 互通待辦 | `SpreadsheetDocument` tracked-changes API |
 | — | Writer Navigator 書籤擴充、pivot 重算 | 不納入 | 見 non-goals |
 
 ### RDF 與協作邊界（Wave 2 起）

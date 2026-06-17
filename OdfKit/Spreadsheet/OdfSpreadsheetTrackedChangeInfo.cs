@@ -12,6 +12,12 @@ namespace OdfKit.Spreadsheet;
 /// <param name="cellAddress">受影響儲存格位址；非儲存格內容變更時為 <see langword="null"/>。</param>
 /// <param name="previousContent">變更前的顯示文字；無法取得時為 <see langword="null"/>。</param>
 /// <param name="acceptanceState">接受狀態（<c>pending</c>、<c>accepted</c> 或 <c>rejected</c>）。</param>
+/// <param name="sheetName">結構修訂所在工作表名稱。</param>
+/// <param name="structuralType">結構修訂類型（<c>row</c>、<c>column</c> 或 <c>table</c>）。</param>
+/// <param name="structuralPosition">結構修訂起始位置（以 0 為基準）。</param>
+/// <param name="structuralCount">結構修訂影響數量。</param>
+/// <param name="sourceAddress">移動修訂來源位址。</param>
+/// <param name="targetAddress">移動修訂目標位址。</param>
 public sealed class OdfSpreadsheetTrackedChangeInfo(
     string changeId,
     OdfSpreadsheetChangeKind kind,
@@ -19,7 +25,13 @@ public sealed class OdfSpreadsheetTrackedChangeInfo(
     DateTime changedAt,
     OdfCellAddress? cellAddress,
     string? previousContent,
-    string acceptanceState)
+    string acceptanceState,
+    string? sheetName = null,
+    string? structuralType = null,
+    int? structuralPosition = null,
+    int? structuralCount = null,
+    OdfCellAddress? sourceAddress = null,
+    OdfCellAddress? targetAddress = null)
 {
     /// <summary>
     /// 取得修訂識別碼。
@@ -55,4 +67,34 @@ public sealed class OdfSpreadsheetTrackedChangeInfo(
     /// 取得接受狀態。
     /// </summary>
     public string AcceptanceState { get; } = acceptanceState ?? "pending";
+
+    /// <summary>
+    /// 取得結構修訂所在工作表名稱。
+    /// </summary>
+    public string? SheetName { get; } = sheetName;
+
+    /// <summary>
+    /// 取得結構修訂類型。
+    /// </summary>
+    public string? StructuralType { get; } = structuralType;
+
+    /// <summary>
+    /// 取得結構修訂起始位置。
+    /// </summary>
+    public int? StructuralPosition { get; } = structuralPosition;
+
+    /// <summary>
+    /// 取得結構修訂影響數量。
+    /// </summary>
+    public int? StructuralCount { get; } = structuralCount;
+
+    /// <summary>
+    /// 取得移動修訂來源位址。
+    /// </summary>
+    public OdfCellAddress? SourceAddress { get; } = sourceAddress;
+
+    /// <summary>
+    /// 取得移動修訂目標位址。
+    /// </summary>
+    public OdfCellAddress? TargetAddress { get; } = targetAddress;
 }

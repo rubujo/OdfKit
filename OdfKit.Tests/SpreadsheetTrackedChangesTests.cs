@@ -67,6 +67,116 @@ public class SpreadsheetTrackedChangesTests
         Assert.Equal(0, change.CellAddress?.Column);
     }
 
+    /// <summary>
+    /// 驗證列插入與刪除結構修訂可記錄並接受或拒絕。
+    /// </summary>
+    [Fact]
+    public void RowInsertionAndDeletionChangesCanBeRecordedAcceptedOrRejected()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.TrackedChanges = false;
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = "第一列";
+        sheet.Cells["A2"].CellValue = "第二列";
+
+        document.TrackedChanges = true;
+        sheet.InsertRows(1, 1);
+        OdfSpreadsheetTrackedChangeInfo insertion = document.GetTrackedChanges().Single(c => c.Kind == OdfSpreadsheetChangeKind.Insertion);
+        Assert.Equal("row", insertion.StructuralType);
+        Assert.Equal(1, insertion.StructuralPosition);
+        Assert.Equal("Data", insertion.SheetName);
+
+        document.RejectChange(insertion.ChangeId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Equal("第二列", sheet.Cells["A2"].CellValue);
+
+        sheet.InsertRows(1, 1);
+        insertion = document.GetTrackedChanges().Single(c => c.Kind == OdfSpreadsheetChangeKind.Insertion);
+        document.AcceptChange(insertion.ChangeId);
+        Assert.Empty(document.GetTrackedChanges());
+
+        sheet.DeleteRows(0, 1);
+        OdfSpreadsheetTrackedChangeInfo deletion = document.GetTrackedChanges().Single(c => c.Kind == OdfSpreadsheetChangeKind.Deletion);
+        Assert.Equal("row", deletion.StructuralType);
+        Assert.Equal(0, deletion.StructuralPosition);
+
+        document.RejectChange(deletion.ChangeId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Equal("第一列", sheet.Cells["A1"].CellValue);
+    }
+
+    /// <summary>
+    /// 驗證欄插入與刪除結構修訂可記錄並接受或拒絕。
+    /// </summary>
+    [Fact]
+    public void ColumnInsertionAndDeletionChangesCanBeRecordedAcceptedOrRejected()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.TrackedChanges = false;
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = "欄 A";
+        sheet.Cells["B1"].CellValue = "欄 B";
+
+        document.TrackedChanges = true;
+        sheet.InsertColumns(1, 1);
+        OdfSpreadsheetTrackedChangeInfo insertion = document.GetTrackedChanges().Single(c => c.Kind == OdfSpreadsheetChangeKind.Insertion);
+        Assert.Equal("column", insertion.StructuralType);
+        Assert.Equal(1, insertion.StructuralPosition);
+        Assert.Equal("Data", insertion.SheetName);
+
+        document.RejectChange(insertion.ChangeId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Equal("欄 B", sheet.Cells["B1"].CellValue);
+
+        sheet.InsertColumns(1, 1);
+        insertion = document.GetTrackedChanges().Single(c => c.Kind == OdfSpreadsheetChangeKind.Insertion);
+        document.AcceptChange(insertion.ChangeId);
+        Assert.Empty(document.GetTrackedChanges());
+
+        sheet.DeleteColumns(0, 1);
+        OdfSpreadsheetTrackedChangeInfo deletion = document.GetTrackedChanges().Single(c => c.Kind == OdfSpreadsheetChangeKind.Deletion);
+        Assert.Equal("column", deletion.StructuralType);
+        Assert.Equal(0, deletion.StructuralPosition);
+
+        document.RejectChange(deletion.ChangeId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Equal("欄 A", sheet.Cells["A1"].CellValue);
+    }
+
+    /// <summary>
+    /// 驗證儲存格移動可記錄為 <c>table:movement</c> 並接受或拒絕。
+    /// </summary>
+    [Fact]
+    public void CellMovementChangeCanBeRecordedAcceptedOrRejected()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.TrackedChanges = false;
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = "來源";
+
+        document.TrackedChanges = true;
+        sheet.MoveCell(0, 0, 1, 1);
+        OdfSpreadsheetTrackedChangeInfo movement = document.GetTrackedChanges().Single(c => c.Kind == OdfSpreadsheetChangeKind.Movement);
+        Assert.Equal("Data", movement.SheetName);
+        Assert.NotNull(movement.SourceAddress);
+        Assert.NotNull(movement.TargetAddress);
+        Assert.Equal(0, movement.SourceAddress.Value.Row);
+        Assert.Equal(0, movement.SourceAddress.Value.Column);
+        Assert.Equal(1, movement.TargetAddress.Value.Row);
+        Assert.Equal(1, movement.TargetAddress.Value.Column);
+        Assert.Equal("來源", sheet.Cells["B2"].CellValue);
+
+        document.RejectChange(movement.ChangeId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Equal("來源", sheet.Cells["A1"].CellValue);
+
+        sheet.MoveCell(0, 0, 1, 1);
+        movement = document.GetTrackedChanges().Single(c => c.Kind == OdfSpreadsheetChangeKind.Movement);
+        document.AcceptChange(movement.ChangeId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Equal("來源", sheet.Cells["B2"].CellValue);
+    }
+
     private static void WriteTrackedChangesOds(Stream stream)
     {
         const string contentXml =

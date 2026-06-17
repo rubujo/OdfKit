@@ -13,6 +13,23 @@ internal static class OdfTableSheetDomAccessEngine
         { "header-rows", "table-row-group" };
 
     /// <summary>
+    /// 取得工作表中所有欄定義節點的清單（僅含連續的 <c>table:table-column</c>）。
+    /// </summary>
+    internal static List<OdfNode> GetColumnsList(OdfNode tableNode)
+    {
+        var list = new List<OdfNode>();
+        foreach (OdfNode child in tableNode.Children)
+        {
+            if (child.LocalName == "table-column" && child.NamespaceUri == OdfNamespaces.Table)
+                list.Add(child);
+            else
+                break;
+        }
+
+        return list;
+    }
+
+    /// <summary>
     /// 取得工作表中所有列節點的清單（展開列容器）。
     /// </summary>
     internal static List<OdfNode> GetRowsList(OdfNode tableNode)
