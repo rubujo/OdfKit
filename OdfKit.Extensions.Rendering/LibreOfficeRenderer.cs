@@ -184,7 +184,11 @@ public class LibreOfficeRenderer
                             process.WaitForExit(5000);
                         }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        OdfKitDiagnostics.Warn($"LibreOffice 逾時後終止程序失敗：{ex.Message}", ex);
+                    }
+
                     throw new TimeoutException("LibreOffice conversion process timed out.");
                 }
 

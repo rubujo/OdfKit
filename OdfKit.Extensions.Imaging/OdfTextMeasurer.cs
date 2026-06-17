@@ -115,9 +115,10 @@ public static class OdfTextMeasurer
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
             // 發生任何異常時回退至 SkiaSharp 量測
+            OdfKit.Core.OdfKitDiagnostics.Warn($"GDI+ 字型量測失敗，回退至 SkiaSharp：{ex.Message}", ex);
         }
 
         // 3. Fallback 回退：使用 SkiaSharp 量測

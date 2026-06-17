@@ -332,13 +332,24 @@ public partial class OdsStreamWriter : IDisposable
 
             try
             { _writer.Dispose(); }
-            catch { /* 盡量排清 XmlWriter */ }
+            catch (Exception ex)
+            {
+                OdfKitDiagnostics.Warn($"OdsStreamWriter 釋放 XmlWriter 時發生次要錯誤：{ex.Message}", ex);
+            }
+
             try
             { _contentEntryStream.Dispose(); }
-            catch { }
+            catch (Exception ex)
+            {
+                OdfKitDiagnostics.Warn($"OdsStreamWriter 釋放 content 串流時發生次要錯誤：{ex.Message}", ex);
+            }
+
             try
             { WriteStyles(); }
-            catch { }
+            catch (Exception ex)
+            {
+                OdfKitDiagnostics.Warn($"OdsStreamWriter 於 Dispose 寫入 styles.xml 失敗：{ex.Message}", ex);
+            }
             _zip.Dispose();
         }
     }

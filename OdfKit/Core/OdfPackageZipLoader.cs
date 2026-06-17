@@ -194,9 +194,9 @@ internal static class OdfPackageZipLoader
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
-        catch
+        catch (Exception ex)
         {
-            // 若平台不支援或缺少參考則靜默略過
+            OdfKitDiagnostics.Warn($"註冊 ZIP 檔名編碼提供者失敗，將使用預設編碼：{ex.Message}", ex);
         }
 #endif
     }
@@ -226,8 +226,11 @@ internal static class OdfPackageZipLoader
             int intVal = Convert.ToInt32(val);
             return intVal == 0;
         }
-        catch
+        catch (Exception ex)
         {
+            OdfKitDiagnostics.Warn(
+                $"反射讀取 ZipArchiveEntry 壓縮方式失敗，改用 CompressedLength == Length 判斷：{ex.Message}",
+                ex);
             return entry.CompressedLength == entry.Length;
         }
     }

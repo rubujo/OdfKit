@@ -63,9 +63,9 @@ public static class OdfXmlWriter
                     }
                     writer.Flush();
                 }
-                catch
+                catch (Exception salvageEx)
                 {
-                    // 忽略救援嘗試時的次要錯誤
+                    OdfKitDiagnostics.Warn($"XML 序列化救援關閉標籤時發生次要錯誤：{salvageEx.Message}", salvageEx);
                 }
                 throw;
             }

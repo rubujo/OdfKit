@@ -128,9 +128,10 @@ public static class XlsxToOdfConverter
                 }
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             // 保留工作表資料轉換；圖表解析失敗時不應中斷整份 XLSX 匯入。
+            OdfKit.Core.OdfKitDiagnostics.Warn($"XLSX 圖表解析失敗，已略過圖表匯入：{ex.Message}", ex);
         }
     }
 

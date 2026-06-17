@@ -122,9 +122,10 @@ public static partial class OdfEncryption
                 {
                     throw;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // 容錯驗證
+                    // 非 deflate 或解壓失敗時改以原始解密位元組驗證 checksum。
+                    OdfKitDiagnostics.Warn($"加密項目 deflate 容錯驗證失敗，改以原始位元組驗證：{ex.Message}", ex);
                 }
 
                 if (decompressedSuccessfully && decompressedBytes is not null)

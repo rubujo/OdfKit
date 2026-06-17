@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using OdfKit.Core;
 
 namespace OdfKit.Compliance;
 
@@ -203,8 +204,9 @@ public static class OdfExternalValidator
             if (!process.HasExited)
                 process.Kill();
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException ex)
         {
+            OdfKitDiagnostics.Warn($"終止外部驗證子程序時發生次要錯誤：{ex.Message}", ex);
         }
     }
 
