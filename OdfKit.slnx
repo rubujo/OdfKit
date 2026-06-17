@@ -21,4 +21,5 @@
   <Project Path="OdfKit.Tests/MockSoffice/MockSoffice.csproj" />
   <Project Path="tools/OdfKit.Cli/OdfKit.Cli.csproj" />
   <Project Path="tools/OdfSchemaGenerator/OdfSchemaGenerator.csproj" />
+  <Project Path="tools/OdfCorpusGenerator/OdfCorpusGenerator.csproj" />
 </Solution>

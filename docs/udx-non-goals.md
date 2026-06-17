@@ -15,3 +15,7 @@
 ## 3. SmartArt 智慧圖形與複雜形狀佈局器
 * **說明**：ODF 規格對 SmartArt 與複合三維圖形的定義極為模糊，且 Microsoft Office 與 LibreOffice 對此類圖形的 XML 實作互不相容。
 * **決策**：OdfKit 不予支援 SmartArt 佈局器封裝，以避免跨平台開檔時的版面混亂。
+
+## 4. ODF Toolkit 風格 JSON Collaboration operations merge
+* **說明**：ODF Toolkit 0.10+ 的 Collaboration API 將 ODT 語意變更序列化為 JSON operations（`addParagraph`、`delete`、`format` 等），供 web office 場景做變更交換與 merge。這與 OdfKit 核心已支援的 `META-INF/manifest.rdf` 封裝 RDF metadata 屬不同層次；後者由核心 `OdfRdfMetadata` 負責，前者需另行設計 Position 模型與 merge 語意。
+* **決策**：Wave 1–3 不納入 JSON Collaboration operations merge。ODT 規格內建的 `text:tracked-changes` 讀寫與接受／拒絕屬 Wave 2 `DEPTH-1-TC` 正常深化範圍。若未來需要 ODF Toolkit JSON 相容，列為 Wave 4 選用延伸套件 `OdfKit.Extensions.Collaboration`，不放入核心 `OdfKit`。

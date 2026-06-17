@@ -385,6 +385,100 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 <c>office:text</c> content model facade 可依語意順序建立與列舉區塊內容。
+    /// </summary>
+    [Fact]
+    public void OfficeTextContentModelFacadeSupportsBlockContentAppendAndEnumeration()
+    {
+        OfficeTextElement text = new("office");
+        TextPElement paragraph = text.AppendParagraph("段落");
+        TextHElement heading = text.AppendHeading("標題", 2);
+        TextListElement list = text.AppendList("List_20_1");
+        TextListItemElement item = list.AppendElement(new TextListItemElement("text"));
+        item.AppendElement(new TextPElement("text")).TextContent = "清單項";
+        TableTableElement table = text.AppendTable("內嵌表格");
+        table.AppendRow().AppendElement(new TableTableCellElement("table"))
+            .AppendElement(new TextPElement("text")).TextContent = "A1";
+
+        OdfElement[] blockContent = text.BlockContentChildElements.ToArray();
+        Assert.Equal([paragraph, heading, list, table], blockContent);
+        Assert.Equal("段落", paragraph.TextContent);
+        Assert.Equal(2, heading.OutlineLevel);
+        Assert.Equal("清單項", list.TextListItemChildElements.Single().TextPChildElements.Single().TextContent);
+        Assert.Equal("A1", table.TableTableRowChildElements.Single().TableTableCellChildElements.Single().TextPChildElements.Single().TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 <c>table:table</c> content model facade 可分隔欄位與列結構並 round-trip。
+    /// </summary>
+    [Fact]
+    public void TableContentModelFacadeSupportsColumnAndRowStructure()
+    {
+        TableTableElement table = new("table");
+        table.Name = "Sheet1";
+        TableTableColumnElement column = table.AppendColumn();
+        TableTableRowElement row = table.AppendRow();
+        TableTableCellElement cell = row.AppendElement(new TableTableCellElement("table"));
+        cell.AppendElement(new TextPElement("text")).TextContent = "資料";
+
+        Assert.Single(table.ColumnStructureChildElements);
+        Assert.Single(table.RowStructureChildElements);
+        Assert.Same(column, table.TableTableColumnsChildElements.Single().TableTableColumnChildElements.Single());
+        Assert.Same(row, table.TableTableRowChildElements.Single());
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office"))
+            .AppendElement(new OfficeSpreadsheetElement("office"))
+            .AppendElement(table);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        TableTableElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<TableTableElement>()
+            .Single();
+        Assert.Equal("Sheet1", parsed.Name);
+        Assert.Equal("資料", parsed.TableTableRowChildElements.Single().TableTableCellChildElements.Single().TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 <c>draw:page</c> content model facade 可建立形狀與備忘稿並 round-trip。
+    /// </summary>
+    [Fact]
+    public void DrawPageContentModelFacadeSupportsShapeAndNotesAppend()
+    {
+        DrawPageElement page = new("draw");
+        page.SetAttribute("name", OdfNamespaces.Draw, "Slide1", "draw");
+        DrawFrameElement frame = page.AppendFrame("Title");
+        DrawRectElement rectangle = page.AppendRectangle("Accent");
+        PresentationNotesElement notes = page.AppendNotes();
+        notes.AppendElement(new DrawFrameElement("draw"))
+            .AppendElement(new DrawTextBoxElement("draw"))
+            .AppendElement(new TextPElement("text"))
+            .TextContent = "備忘稿";
+
+        OdfElement[] shapes = page.ShapeContentChildElements.ToArray();
+        Assert.Equal([frame, rectangle], shapes);
+        Assert.Single(page.PageAnnotationChildElements);
+        Assert.Equal("Title", frame.GetAttribute("name", OdfNamespaces.Draw));
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office"))
+            .AppendElement(new OfficePresentationElement("office"))
+            .AppendElement(page);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        DrawPageElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<DrawPageElement>()
+            .Single();
+        Assert.Equal("Slide1", parsed.GetAttribute("name", OdfNamespaces.Draw));
+        Assert.Equal("Accent", parsed.DrawRectChildElements.Single().GetAttribute("name", OdfNamespaces.Draw));
+        Assert.Equal("備忘稿", parsed.PresentationNotesChildElements.Single().DrawFrameChildElements.Single().DrawTextBoxChildElements.Single().TextPChildElements.Single().TextContent);
+    }
+
+    /// <summary>
     /// 驗證 generated DOM wrapper 的 class、factory case 與屬性數量沒有意外退化。
     /// </summary>
     [Fact]

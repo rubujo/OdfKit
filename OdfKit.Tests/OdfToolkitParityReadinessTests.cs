@@ -212,9 +212,10 @@ public class OdfToolkitParityReadinessTests
         using JsonDocument json = JsonDocument.Parse(output.ToString());
         JsonElement summary = json.RootElement.GetProperty("summary");
         JsonElement fixture = json.RootElement.GetProperty("fixtures")[0];
-        Assert.Equal(19, summary.GetProperty("fixtureCount").GetInt32());
-        Assert.Equal(19, summary.GetProperty("passedCount").GetInt32());
-        Assert.Equal(16, summary.GetProperty("validCount").GetInt32());
+        int fixtureCount = summary.GetProperty("fixtureCount").GetInt32();
+        Assert.True(fixtureCount >= 200, $"corpus fixtureCount 應 ≥ 200，實際為 {fixtureCount}。");
+        Assert.Equal(fixtureCount, summary.GetProperty("passedCount").GetInt32());
+        Assert.Equal(fixtureCount - 3, summary.GetProperty("validCount").GetInt32());
         Assert.Equal(3, summary.GetProperty("invalidCount").GetInt32());
         Assert.Equal("repo-generated-minimal-flat-text", fixture.GetProperty("id").GetString());
         Assert.True(fixture.GetProperty("kindMatches").GetBoolean());

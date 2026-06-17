@@ -152,9 +152,22 @@
 
 這些數字不是產品宣稱，而是退化保護。若 schema generator 改版導致數字下降，必須在同一變更說明原因，並更新本文件。
 
+## ODFDOM sample parity 勾選表（Wave 1 M-3）
+
+| Sample 情境 | 狀態 | 測試 |
+|---|---|---|
+| Text body 段落／標題／清單 | complete | `TypedDomSupportsOdfDomStyleUserStory`、`OfficeTextContentModelFacadeSupportsBlockContentAppendAndEnumeration` |
+| Spreadsheet table 列舉 | complete | `SchemaSpecificChildCollectionsSupportOdfDomSampleTraversal` |
+| Image frame / SVG 替代文字 | complete | `TypedDomSupportsOdfDomStyleImageFrameTraversal` |
+| 巢狀清單 / 註腳 | complete | `TypedDomSupportsOdfDomStyleNestedListAndFootnoteTraversal` |
+| Presentation draw page | complete | `TypedDomSupportsOdfDomStylePresentationPageTraversal`、`DrawPageContentModelFacadeSupportsShapeAndNotesAppend` |
+| MathML formula object | complete | `TypedDomSupportsOdfDomStyleMathMlFormulaObjectTraversal` |
+| `table:table` 欄列結構 facade | complete | `TableContentModelFacadeSupportsColumnAndRowStructure` |
+| 外部 ODFDOM 官方 sample corpus 逐項 API | planned | 待 Wave 2 外部 corpus 對照 |
+
 ## ODFDOM parity gaps
 
-- 已有所有 typed wrapper 共用的泛型 child facade，且 generated wrapper 已產生依 schema child element relation 展開的專屬 child collection property；尚未產生帶有更高階語意排序 / choice group 的 content model facade。
+- 已有所有 typed wrapper 共用的泛型 child facade，且 generated wrapper 已產生依 schema child element relation 展開的專屬 child collection property；Wave 1 已為 `office:text`、`table:table`、`draw:page` 新增手寫 content model facade，完整 schema generator 產出仍屬後續擴充。
 - Attribute property 目前已有基底 typed helper，且 generated artifact 已包含 integer、boolean、decimal、date/dateTime、time、duration、length/percent、borderWidths、bounded percent、angle、foKeepTogether/foWrapOption/foTextTransform/foTextAlign、dr3dProjection/dr3dShadeMode、svgFillRule/svgStrokeLineCap、tableBorderModel、textLabelFollowedBy/textListLevelPositionMode/textIndexScope/textTableType/textAnchorType/textNoteClass/textSelectPage/textReferenceFormat/textStartNumberingAt/textFootnotesPosition/textCaptionSequenceFormat/textNumberPosition/textPlaceholderType/textAnimation/textAnimationDirection/textKind、drawFill/drawFillImageRefPoint/drawColorMode/drawStrokeLineJoin、lineStyle/lineType/lineWidth/lineMode、fontFamilyGeneric/fontPitch/fontRelief/fontStretch/fontStyle/fontVariant/fontWeight、styleLineBreak/styleRepeat/styleDirection/styleWritingMode/styleTextRotationScale/styleTextCombine/styleVerticalAlign/styleVerticalPos/styleVerticalRel/styleHorizontalPos/styleHorizontalRel/styleWrap/styleRunThrough/styleWrapContourMode/styleScriptType/styleTextEmphasize、formOrientation、tableDirection/tableOrientation/tableDisplayMemberMode/tableLayoutMode、databaseRule、xLinkType/xLinkShow/xLinkActuate、numberStyle/numberTransliterationStyle、tableOrder/tableType、presentationEffect/presentationSpeed/presentationAction/presentationTransitionType/presentationTransitionStyle/presentationPresetClass、style name/list、color、IRI reference、cell address/range address、cell range address list、vector3D、point3D、points、language/country/script tokens、namespacedToken、character、textEncoding、targetFrameName、XML name、style family、ODF version 與 media type 強型別 property；其他 ODF datatype 仍需補齊。
 - Schema token attribute 目前已補 `number:calendar`、表格成員 / 群組 / 排序 / 條件來源 / 函式、資料庫 nullable / datasource setting、動畫色彩插值與 `draw:nohref`；開放字串或複合 grammar 的屬性仍保守維持 `string?`。
 - schema-to-wrapper coverage report 已可由 API / CLI 產生，並包含 schema child relation coverage；release pipeline 會固定保存 artifact。
