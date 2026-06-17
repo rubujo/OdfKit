@@ -106,12 +106,18 @@
 - [x] `OdfSignatureDerCodec`、`OdfSignatureCrlUtilities`、`OdfSignatureX509Utilities`、`OdfSignatureTsaClient`
 - [x] `OdfSigner` 收斂為公開 API 薄門面（刪除 6 個 verification／utility partial）
 
-## 剩餘工作（Phase 13+）
+## Phase 13（已完成）
+
+- [x] `OdfPackageXmlMacroSanitizer`（`SanitizeXmlNode` 實作遷移）
+- [x] `OdfPackageEntryNameSanitizer`（Zip Slip 防禦 `SanitizeEntryName` 遷移）
+- [x] `OdfPackage.MacroSanitize` 收斂為公開 API 薄門面
+
+## 剩餘工作（Phase 14+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
 | `OdfElement` | ~3333 | 屬性存取器／typed getter |
-| `OdfPackage` | ~1100 | 其餘 `Saving`／`Loading` partial |
+| `OdfPackage` | ~900 | 公開 API 項目讀寫（需保留薄門面） |
 | `TextDocument` | ~1000 | 核心 `TextDocument.cs` |
 | `OdfDocument` | ~1493 | 合併／複製管線 |
 | `OdfTableSheet` | ~1185 | `Internals`、核心工作表邏輯 |

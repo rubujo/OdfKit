@@ -52,7 +52,7 @@ internal static class OdfPackageMacroSanitizer
                 using (Stream stream = entry.OpenReader())
                     root = OdfXmlReader.Parse(stream, ctx.LoadOptions);
 
-                if (OdfPackage.SanitizeXmlNode(root))
+                if (OdfPackageXmlMacroSanitizer.SanitizeNode(root))
                 {
                     using var ms = new MemoryStream();
                     OdfXmlWriter.Write(root, ms, ctx.SaveOptions);
