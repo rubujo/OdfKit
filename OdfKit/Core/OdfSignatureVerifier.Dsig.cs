@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -188,7 +189,8 @@ internal static partial class OdfSignatureVerifier
         OdfPackage package,
         OdfSigningOptions options,
         XmlNamespaceManager nsManager,
-        OdfSingleSignatureValidationResult singleResult)
+        OdfSingleSignatureValidationResult singleResult,
+        CancellationToken cancellationToken = default)
     {
         var signedXml = new XadesSignedXml(doc)
         {
@@ -228,7 +230,8 @@ internal static partial class OdfSignatureVerifier
             if (!TryBuildCertificateChain(signatureNode, cert, options, nsManager, singleResult, out List<X509Certificate2> chainCerts))
                 return false;
 
-            if (!await VerifyRevocationStatusAsync(chainCerts, embeddedCrls, options, singleResult))
+            if (!await VerifyRevocationStatusAsync(chainCerts, embeddedCrls, options, singleResult, cancellationToken)
+                .ConfigureAwait(false))
                 return false;
 
             if (!VerifySignatureTimestamp(signatureNode, nsManager, options, singleResult))

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
-using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
@@ -16,14 +17,28 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 使用指定的 X.509 憑證對文件進行數位簽章。
     /// </summary>
-    /// <param name="certificate">用於簽章的憑證</param>
+    /// <param name="certificate">用於簽章的憑證。</param>
     public void Sign(X509Certificate2 certificate)
+    {
+        SignAsync(certificate).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// 非同步使用指定的 X.509 憑證對文件進行數位簽章。
+    /// </summary>
+    /// <param name="certificate">用於簽章的憑證。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步簽章作業的工作。</returns>
+    public async Task SignAsync(X509Certificate2 certificate, CancellationToken cancellationToken = default)
     {
         StyleEngine.DeduplicateAndSaveStyles();
         OdfDocumentPersistenceEngine.WriteAllDomEntries(PersistenceCollaborators, OdfSaveOptions.Default);
 
-        OdfSignatureSigner.SignAsync(Package, certificate, new OdfSigningOptions { Level = XadesLevel.None })
-            .GetAwaiter().GetResult();
+        await OdfSigner.SignAsync(
+            Package,
+            certificate,
+            new OdfSigningOptions { Level = XadesLevel.None },
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -73,10 +88,13 @@ public abstract partial class OdfDocument
     /// 非同步驗證文件中的所有數位簽章，並傳回詳細驗證結果。
     /// </summary>
     /// <param name="options">簽章驗證選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
     /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果。</returns>
-    public Task<OdfSignatureValidationResult> VerifySignaturesAsync(OdfSigningOptions? options = null)
+    public Task<OdfSignatureValidationResult> VerifySignaturesAsync(
+        OdfSigningOptions? options = null,
+        CancellationToken cancellationToken = default)
     {
-        return OdfSignatureVerifier.VerifySignaturesAsync(Package, options);
+        return OdfSigner.VerifySignaturesAsync(Package, options, cancellationToken);
     }
 
     private static int CountSignatureElements(Stream stream, long maxCharsInDocument = 0)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -12,13 +13,17 @@ internal static partial class OdfSignatureVerifier
     /// <summary>
     /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果（非同步）。
     /// </summary>
-    /// <param name="package">要驗證的 ODF 封裝</param>
-    /// <param name="options">簽署選項</param>
-    /// <returns>代表非同步作業的工作，其結果包含詳細的數位簽章驗證結果</returns>
+    /// <param name="package">要驗證的 ODF 封裝。</param>
+    /// <param name="options">簽署選項。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果。</returns>
     internal static async Task<OdfSignatureValidationResult> VerifySignaturesAsync(
         OdfPackage package,
-        OdfSigningOptions? options = null)
+        OdfSigningOptions? options = null,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         options ??= new OdfSigningOptions();
         var result = new OdfSignatureValidationResult { IsValid = true };
 
@@ -56,6 +61,8 @@ internal static partial class OdfSignatureVerifier
 
             foreach (XmlNode signatureNode in signatureNodes)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var singleResult = new OdfSingleSignatureValidationResult
                 {
                     SignatureId = (signatureNode as XmlElement)?.GetAttribute("Id"),
@@ -68,7 +75,8 @@ internal static partial class OdfSignatureVerifier
                 result.Signatures.Add(singleResult);
                 singleResult.ValidationSteps.Add($"Starting verification for signature ID: {singleResult.SignatureId}");
 
-                if (!await VerifySingleSignatureAsync(signatureNode, doc, package, options, nsManager, singleResult))
+                if (!await VerifySingleSignatureAsync(signatureNode, doc, package, options, nsManager, singleResult, cancellationToken)
+                    .ConfigureAwait(false))
                     overallValid = false;
             }
 

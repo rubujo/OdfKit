@@ -9,6 +9,7 @@ using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using OdfKit.Compliance;
@@ -23,15 +24,19 @@ internal static class OdfSignatureSigner
     /// <summary>
     /// 對 ODF 封裝中的關鍵檔案進行數位簽署（非同步）。
     /// </summary>
-    /// <param name="package">要簽署的 ODF 封裝</param>
-    /// <param name="certificate">用於簽署的 X.509 憑證</param>
-    /// <param name="options">簽署選項</param>
-    /// <returns>代表非同步作業的工作</returns>
+    /// <param name="package">要簽署的 ODF 封裝。</param>
+    /// <param name="certificate">用於簽署的 X.509 憑證。</param>
+    /// <param name="options">簽署選項。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步簽署作業的工作。</returns>
     internal static async Task SignAsync(
         OdfPackage package,
         X509Certificate2 certificate,
-        OdfSigningOptions options)
+        OdfSigningOptions options,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (package is null)
             throw new ArgumentNullException(nameof(package));
         if (certificate is null)
@@ -191,7 +196,11 @@ internal static class OdfSignatureSigner
             using var sha256 = SHA256.Create();
             byte[] sigHash = sha256.ComputeHash(sigValueBytes);
 
-            byte[] tsaResponse = await OdfSignatureTsaClient.QueryTsaAsync(options.TsaUrl!, sigHash, options.HttpClient);
+            byte[] tsaResponse = await OdfSignatureTsaClient.QueryTsaAsync(
+                options.TsaUrl!,
+                sigHash,
+                options.HttpClient,
+                cancellationToken).ConfigureAwait(false);
             byte[] tsToken = OdfSignatureTsaClient.ExtractTimestampToken(tsaResponse);
 
             var importedQualProps = xmlSignature.SelectSingleNode(".//xades:QualifyingProperties", nsManager) as XmlElement
@@ -243,14 +252,21 @@ internal static class OdfSignatureSigner
                 var downloadedCrls = new HashSet<string>();
                 foreach (X509Certificate2 chainCert in chainCerts)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     foreach (string url in OdfSignatureCrlUtilities.GetCrlUrls(chainCert))
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         if (!downloadedCrls.Add(url))
                             continue;
 
                         try
                         {
-                            byte[] crlBytes = await OdfSignatureTsaClient.DownloadCrlAsync(url, options.HttpClient);
+                            byte[] crlBytes = await OdfSignatureTsaClient.DownloadCrlAsync(
+                                url,
+                                options.HttpClient,
+                                cancellationToken).ConfigureAwait(false);
                             if (crlBytes is { Length: > 0 })
                             {
                                 var encapCrl = doc.CreateElement("xades", "EncapsulatedCRLValue", "http://uri.etsi.org/01903/v1.3.2#");

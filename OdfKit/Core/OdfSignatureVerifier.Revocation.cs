@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OdfKit.Core;
@@ -12,11 +13,13 @@ internal static partial class OdfSignatureVerifier
         List<X509Certificate2> chainCerts,
         List<byte[]> embeddedCrls,
         OdfSigningOptions options,
-        OdfSingleSignatureValidationResult singleResult)
+        OdfSingleSignatureValidationResult singleResult,
+        CancellationToken cancellationToken = default)
     {
         singleResult.ValidationSteps.Add("5. Verifying revocation status...");
         foreach (var chainCert in chainCerts)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (chainCert.Subject == chainCert.Issuer)
                 continue;
 
@@ -112,9 +115,14 @@ internal static partial class OdfSignatureVerifier
 
                 foreach (var url in urls)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     try
                     {
-                        byte[] crlBytes = await OdfSignatureTsaClient.DownloadCrlAsync(url, options.HttpClient);
+                        byte[] crlBytes = await OdfSignatureTsaClient.DownloadCrlAsync(
+                            url,
+                            options.HttpClient,
+                            cancellationToken).ConfigureAwait(false);
                         var tbsNode = OdfSignatureDerCodec.GetTbsNode(crlBytes);
                         if (tbsNode != null)
                         {

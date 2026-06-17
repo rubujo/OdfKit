@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -15,14 +16,27 @@ internal static class OdfSignatureTsaClient
 {
     private static readonly HttpClient s_httpClient = new();
 
-    internal static async Task<byte[]> DownloadCrlAsync(string url, HttpClient? httpClient)
+    internal static async Task<byte[]> DownloadCrlAsync(
+        string url,
+        HttpClient? httpClient,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var client = httpClient ?? s_httpClient;
-        return await client.GetByteArrayAsync(url);
+        using HttpResponseMessage response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
     }
 
-    internal static async Task<byte[]> QueryTsaAsync(string tsaUrl, byte[] hash, HttpClient? httpClient)
+    internal static async Task<byte[]> QueryTsaAsync(
+        string tsaUrl,
+        byte[] hash,
+        HttpClient? httpClient,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         byte[] requestBytes = CreateTsaRequest(hash);
 
         var client = httpClient ?? s_httpClient;
@@ -30,10 +44,10 @@ internal static class OdfSignatureTsaClient
         request.Content = new ByteArrayContent(requestBytes);
         request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/timestamp-query");
 
-        using var response = await client.SendAsync(request);
+        using HttpResponseMessage response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadAsByteArrayAsync();
+        return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
     }
 
     internal static byte[] ExtractTimestampToken(byte[] responseBytes)
