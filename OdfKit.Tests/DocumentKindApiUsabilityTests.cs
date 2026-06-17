@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using OdfKit.Chart;
 using OdfKit.Compliance;
@@ -29,10 +30,10 @@ public class DocumentKindApiUsabilityTests
     /// <param name="expectedType">預期的高階 wrapper 類型。</param>
     /// <param name="extension">預期副檔名。</param>
     [Theory]
-    [InlineData(OdfDocumentKind.FlatText, OdfDocumentKind.Text, typeof(TextDocument), ".fodt")]
-    [InlineData(OdfDocumentKind.FlatSpreadsheet, OdfDocumentKind.Spreadsheet, typeof(SpreadsheetDocument), ".fods")]
-    [InlineData(OdfDocumentKind.FlatPresentation, OdfDocumentKind.Presentation, typeof(PresentationDocument), ".fodp")]
-    [InlineData(OdfDocumentKind.FlatGraphics, OdfDocumentKind.Graphics, typeof(DrawingDocument), ".fodg")]
+    [InlineData(OdfDocumentKind.FlatText, OdfDocumentKind.Text, typeof(FlatTextDocument), ".fodt")]
+    [InlineData(OdfDocumentKind.FlatSpreadsheet, OdfDocumentKind.Spreadsheet, typeof(FlatSpreadsheetDocument), ".fods")]
+    [InlineData(OdfDocumentKind.FlatPresentation, OdfDocumentKind.Presentation, typeof(FlatPresentationDocument), ".fodp")]
+    [InlineData(OdfDocumentKind.FlatGraphics, OdfDocumentKind.Graphics, typeof(FlatGraphicsDocument), ".fodg")]
     public void DocumentFormatSummaryReportsFlatXmlKinds(
         OdfDocumentKind kind,
         OdfDocumentKind contentKind,
@@ -68,17 +69,19 @@ public class DocumentKindApiUsabilityTests
     /// <param name="contentKind">對應的內容種類。</param>
     /// <param name="extension">預期副檔名。</param>
     [Theory]
-    [InlineData(OdfDocumentKind.TextTemplate, OdfDocumentKind.Text, ".ott")]
-    [InlineData(OdfDocumentKind.SpreadsheetTemplate, OdfDocumentKind.Spreadsheet, ".ots")]
-    [InlineData(OdfDocumentKind.PresentationTemplate, OdfDocumentKind.Presentation, ".otp")]
-    [InlineData(OdfDocumentKind.GraphicsTemplate, OdfDocumentKind.Graphics, ".otg")]
+    [InlineData(OdfDocumentKind.TextTemplate, OdfDocumentKind.Text, typeof(TextTemplateDocument), ".ott")]
+    [InlineData(OdfDocumentKind.SpreadsheetTemplate, OdfDocumentKind.Spreadsheet, typeof(SpreadsheetTemplateDocument), ".ots")]
+    [InlineData(OdfDocumentKind.PresentationTemplate, OdfDocumentKind.Presentation, typeof(PresentationTemplateDocument), ".otp")]
+    [InlineData(OdfDocumentKind.GraphicsTemplate, OdfDocumentKind.Graphics, typeof(GraphicsTemplateDocument), ".otg")]
     public void DocumentFormatSummaryReportsTemplateKinds(
         OdfDocumentKind kind,
         OdfDocumentKind contentKind,
+        Type expectedType,
         string extension)
     {
         using OdfDocument document = OdfDocument.Create(kind);
 
+        Assert.IsType(expectedType, document);
         Assert.Equal(kind, document.DocumentKind);
         Assert.Equal(contentKind, document.ContentKind);
         Assert.True(document.IsTemplate);
@@ -92,6 +95,7 @@ public class DocumentKindApiUsabilityTests
         stream.Position = 0;
 
         using OdfDocument loaded = OdfDocument.Load(stream, "template" + extension);
+        Assert.IsType(expectedType, loaded);
         Assert.Equal(kind, loaded.DocumentKind);
         Assert.Equal(contentKind, loaded.ContentKind);
         Assert.True(loaded.IsTemplate);
@@ -106,6 +110,7 @@ public class DocumentKindApiUsabilityTests
     {
         using OdfDocument document = OdfDocument.Create(OdfDocumentKind.TextMaster);
 
+        Assert.IsType<TextMasterDocument>(document);
         Assert.Equal(OdfDocumentKind.TextMaster, document.DocumentKind);
         Assert.Equal(OdfDocumentKind.Text, document.ContentKind);
         Assert.False(document.IsTemplate);
@@ -119,6 +124,7 @@ public class DocumentKindApiUsabilityTests
         stream.Position = 0;
 
         using OdfDocument loaded = OdfDocument.Load(stream, "master.odm");
+        Assert.IsType<TextMasterDocument>(loaded);
         Assert.Equal(OdfDocumentKind.TextMaster, loaded.DocumentKind);
         Assert.Equal(OdfDocumentKind.Text, loaded.ContentKind);
         Assert.True(loaded.IsMasterDocument);
@@ -306,6 +312,46 @@ public class DocumentKindApiUsabilityTests
         Assert.Equal("只列出啟用中的客戶。", loaded.FindQuery("ActiveCustomers")?.Description);
         Assert.True(loaded.FindQuery("ActiveCustomers")?.EscapeProcessing);
         Assert.Null(loaded.FindQuery("ScratchQuery"));
+    }
+
+    /// <summary>
+    /// 驗證主控文字文件可列舉外部子文件參照並 round-trip。
+    /// </summary>
+    [Fact]
+    public void TextMasterDocumentEnumeratesSubDocumentReferences()
+    {
+        using var master = TextMasterDocument.Create();
+        master.AddSubDocumentReference("Chapter1", "chapter1.odt");
+        master.AddSubDocumentReference("Chapter2", "chapters/chapter2.odt");
+
+        using var stream = new MemoryStream();
+        master.SaveToStream(stream);
+        stream.Position = 0;
+
+        using TextMasterDocument loaded = TextMasterDocument.Load(stream, "master.odm");
+        IReadOnlyList<OdfSubDocumentReference> references = loaded.GetSubDocumentReferences();
+
+        Assert.Equal(2, references.Count);
+        Assert.Equal("Chapter1", references[0].SectionName);
+        Assert.Equal("chapter1.odt", references[0].Href);
+        Assert.Equal("Chapter2", references[1].SectionName);
+        Assert.Equal("chapters/chapter2.odt", references[1].Href);
+    }
+
+    /// <summary>
+    /// 驗證基底 typed 載入入口不會接受變體格式。
+    /// </summary>
+    [Fact]
+    public void BaseTypedLoadRejectsVariantDocumentKinds()
+    {
+        using var stream = new MemoryStream();
+        using (OdfDocument template = OdfDocument.Create(OdfDocumentKind.TextTemplate))
+        {
+            template.SaveToStream(stream);
+        }
+
+        stream.Position = 0;
+        Assert.Throws<InvalidOperationException>(() => TextDocument.Load(stream, "template.ott"));
     }
 
     /// <summary>

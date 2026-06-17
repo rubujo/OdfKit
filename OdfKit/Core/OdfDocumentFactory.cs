@@ -453,15 +453,27 @@ public static class OdfDocumentFactory
 
     private static OdfDocument CreateDocumentWrapper(OdfPackage package, OdfDocumentKind kind)
     {
-        return OdfDocumentKindDetector.ToContentKind(kind) switch
+        return kind switch
         {
             OdfDocumentKind.Text => new TextDocument(package),
+            OdfDocumentKind.TextTemplate => new TextTemplateDocument(package),
+            OdfDocumentKind.TextMaster => new TextMasterDocument(package),
+            OdfDocumentKind.FlatText => new FlatTextDocument(package),
             OdfDocumentKind.Spreadsheet => new SpreadsheetDocument(package),
+            OdfDocumentKind.SpreadsheetTemplate => new SpreadsheetTemplateDocument(package),
+            OdfDocumentKind.FlatSpreadsheet => new FlatSpreadsheetDocument(package),
             OdfDocumentKind.Presentation => new PresentationDocument(package),
+            OdfDocumentKind.PresentationTemplate => new PresentationTemplateDocument(package),
+            OdfDocumentKind.FlatPresentation => new FlatPresentationDocument(package),
             OdfDocumentKind.Graphics => new DrawingDocument(package),
+            OdfDocumentKind.GraphicsTemplate => new GraphicsTemplateDocument(package),
+            OdfDocumentKind.FlatGraphics => new FlatGraphicsDocument(package),
             OdfDocumentKind.Chart => new ChartDocument(package),
+            OdfDocumentKind.FlatChart => new FlatChartDocument(package),
             OdfDocumentKind.Formula => new FormulaDocument(package),
+            OdfDocumentKind.FlatFormula => new FlatFormulaDocument(package),
             OdfDocumentKind.Image => new OdfImageDocument(package),
+            OdfDocumentKind.FlatImage => new FlatImageDocument(package),
             OdfDocumentKind.Database => new OdfDatabaseDocument(package),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")
         };

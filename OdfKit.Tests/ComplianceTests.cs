@@ -1846,14 +1846,14 @@ namespace OdfKit.Tests
 
         [Theory]
         [InlineData(OdfDocumentKind.Text, typeof(TextDocument))]
-        [InlineData(OdfDocumentKind.TextTemplate, typeof(TextDocument))]
-        [InlineData(OdfDocumentKind.TextMaster, typeof(TextDocument))]
+        [InlineData(OdfDocumentKind.TextTemplate, typeof(TextTemplateDocument))]
+        [InlineData(OdfDocumentKind.TextMaster, typeof(TextMasterDocument))]
         [InlineData(OdfDocumentKind.Spreadsheet, typeof(SpreadsheetDocument))]
-        [InlineData(OdfDocumentKind.SpreadsheetTemplate, typeof(SpreadsheetDocument))]
+        [InlineData(OdfDocumentKind.SpreadsheetTemplate, typeof(SpreadsheetTemplateDocument))]
         [InlineData(OdfDocumentKind.Presentation, typeof(PresentationDocument))]
-        [InlineData(OdfDocumentKind.PresentationTemplate, typeof(PresentationDocument))]
+        [InlineData(OdfDocumentKind.PresentationTemplate, typeof(PresentationTemplateDocument))]
         [InlineData(OdfDocumentKind.Graphics, typeof(DrawingDocument))]
-        [InlineData(OdfDocumentKind.GraphicsTemplate, typeof(DrawingDocument))]
+        [InlineData(OdfDocumentKind.GraphicsTemplate, typeof(GraphicsTemplateDocument))]
         public void HighLevelFactoryCreatesTypedDocuments(OdfDocumentKind kind, Type expectedType)
         {
             using OdfDocument document = OdfDocumentFactory.CreateDocument(kind);

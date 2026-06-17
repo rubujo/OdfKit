@@ -117,7 +117,7 @@ public class ChartDocument : OdfChartDocument
 
     private static ChartDocument EnsureChart(OdfDocument document)
     {
-        if (document is ChartDocument chart)
+        if (document is ChartDocument chart && document.DocumentKind == OdfDocumentKind.Chart)
         {
             return chart;
         }

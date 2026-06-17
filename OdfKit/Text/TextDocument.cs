@@ -120,7 +120,7 @@ public partial class TextDocument : OdfDocument
 
     private static TextDocument EnsureTextDocument(OdfDocument document)
     {
-        if (document is TextDocument textDocument)
+        if (document is TextDocument textDocument && document.DocumentKind == OdfDocumentKind.Text)
         {
             return textDocument;
         }

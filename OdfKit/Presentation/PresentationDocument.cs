@@ -106,7 +106,7 @@ public partial class PresentationDocument : OdfDocument
 
     private static PresentationDocument EnsurePresentation(OdfDocument document)
     {
-        if (document is PresentationDocument presentation)
+        if (document is PresentationDocument presentation && document.DocumentKind == OdfDocumentKind.Presentation)
         {
             return presentation;
         }

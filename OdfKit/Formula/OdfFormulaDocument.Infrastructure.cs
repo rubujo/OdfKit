@@ -12,7 +12,7 @@ public partial class OdfFormulaDocument
 
     private static OdfFormulaDocument EnsureFormula(OdfDocument document)
     {
-        if (document is OdfFormulaDocument formula)
+        if (document is OdfFormulaDocument formula && document.DocumentKind == OdfDocumentKind.Formula)
         {
             return formula;
         }

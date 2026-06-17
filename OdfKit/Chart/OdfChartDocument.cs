@@ -222,7 +222,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     }
     private static OdfChartDocument EnsureChart(OdfDocument document)
     {
-        if (document is OdfChartDocument chart)
+        if (document is OdfChartDocument chart && document.DocumentKind == OdfDocumentKind.Chart)
         {
             return chart;
         }

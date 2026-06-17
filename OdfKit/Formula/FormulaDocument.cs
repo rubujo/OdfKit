@@ -89,7 +89,7 @@ public class FormulaDocument : OdfFormulaDocument
 
     private static FormulaDocument EnsureFormula(OdfDocument document)
     {
-        if (document is FormulaDocument formula)
+        if (document is FormulaDocument formula && document.DocumentKind == OdfDocumentKind.Formula)
         {
             return formula;
         }

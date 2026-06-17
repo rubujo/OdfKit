@@ -35,16 +35,40 @@
 
 ## Wave 2 — 高階語意 API 深度
 
-| Phase | 產出 |
-|-------|------|
-| VAR-1 | `*TemplateDocument`、`MasterDocument`、`Flat*Document` |
-| DEPTH-1/2 | ODT/ODS/ODP/ODG + ODC/ODF/ODI/ODB checklist 驅動 API |
-| DEPTH-1-TC | ODT `text:tracked-changes` 完備化（接受／拒絕、表格層、LO 互通） |
-| RDF-1 | 核心 `manifest.rdf` / `pkg:` ontology parity（不依賴外部 RDF 引擎） |
-| RDF-2 | `OdfKit.Extensions.Rdf` + `dotNetRdf.Core` SPARQL 橋接（選用） |
-| DX-1 | Presentation/Drawing Builder、`OdfFormulaBuilder`、cookbook |
+| Phase | 狀態 | 產出 |
+|-------|------|------|
+| VAR-1 | ✅ | `*TemplateDocument`、`TextMasterDocument`、`Flat*Document`、factory 分派、`DocumentKindApiUsabilityTests` |
+| DEPTH-1/2 | 進行中 | ODT/ODS/ODP/ODG + ODC/ODF/ODI/ODB checklist 驅動 API |
+| DEPTH-1-TC | 進行中 | ODT `text:tracked-changes` 完備化（接受／拒絕、表格層、LO 互通） |
+| RDF-1 | 待辦 | 核心 `manifest.rdf` / `pkg:` ontology parity（不依賴外部 RDF 引擎） |
+| RDF-2 | 選用 | `OdfKit.Extensions.Rdf` + `dotNetRdf.Core` SPARQL 橋接 |
+| DX-1 | 待辦 | Presentation/Drawing Builder、`OdfFormulaBuilder`、cookbook |
+| LOEXT-1 | 低優先 | `loext:decorative` 讀取映射、`OdfNamespaces.LoExt`、manifest `xmlns:loext` 對照 LO 26.x |
+| CALCEXT-1 | 選用 | calcext 讀取 API（列舉／解析色階、橫條、圖示集、sparkline） |
 
 目標：四主格式 High-level 欄位升為 `complete`。
+
+### VAR-1 驗收
+
+- `OdfDocumentFactory.CreateDocumentWrapper` 依完整 `OdfDocumentKind` 回傳專屬型別
+- 範本／主控／Flat 變體具備 `Create` / `Load` / `LoadAsync` typed 入口
+- 基底 `TextDocument.Load` 等僅接受封裝主格式（`.odt` 等），變體須使用專屬型別載入
+- `TextMasterDocument.GetSubDocumentReferences` 可列舉 `text:section-source` 參照
+
+### LibreOffice 私有擴充互通邊界
+
+策略：**只跟進影響「能否開啟／正確保存真實世界文件」的擴充**；純編輯器外觀或進階功能不納入。
+
+| 命名空間 | 能力 | 狀態 | 位置 |
+|---------|------|------|------|
+| `loext` | Argon2id 加密參數（`kdf-name`、`argon2-t/m/p`） | ✅ 已完成 | `OdfEncryption`、`OdfPackageManifestWriter`、`EncryptionTests` |
+| `loext` | `decorative` 讀取映射 | 待辦 LOEXT-1 | 寫入已用標準 `draw:decorative` |
+| `calcext` | 色階／資料橫條／圖示集條件格式 | ✅ 寫入 + OOXML 橋接 | `OdfTableSheetConditionalFormatEngine`、`OdfToXlsxConverter` |
+| `calcext` | Sparkline（`sparkline-groups`） | ✅ 寫入 | `AddSparklineGroup` |
+| `calcext` | 既有規則讀取／列舉 API | 選用 CALCEXT-1 | 載入後 DOM 保真 round-trip 已可用 |
+| ODF 標準 | `text:tracked-changes`（ODT） | 基礎 ✅；完備化 DEPTH-1-TC | `TextDocument` accept/reject/record API |
+| — | `table:tracked-changes`（ODS） | 未實作 | DEPTH-1-TC 範圍 |
+| — | Writer Navigator 書籤擴充、pivot 重算 | 不納入 | 見 non-goals |
 
 ### RDF 與協作邊界（Wave 2 起）
 

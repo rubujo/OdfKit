@@ -107,7 +107,7 @@ public class DrawingDocument : OdfDocument
 
     private static DrawingDocument EnsureDrawing(OdfDocument document)
     {
-        if (document is DrawingDocument drawing)
+        if (document is DrawingDocument drawing && document.DocumentKind == OdfDocumentKind.Graphics)
         {
             return drawing;
         }

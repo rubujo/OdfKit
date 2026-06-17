@@ -13,7 +13,7 @@ public partial class OdfImageDocument
 
     private static OdfImageDocument EnsureImage(OdfDocument document)
     {
-        if (document is OdfImageDocument image)
+        if (document is OdfImageDocument image && document.DocumentKind == OdfDocumentKind.Image)
         {
             return image;
         }

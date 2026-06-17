@@ -110,7 +110,7 @@ public partial class SpreadsheetDocument : OdfDocument
 
     private static SpreadsheetDocument EnsureSpreadsheet(OdfDocument document)
     {
-        if (document is SpreadsheetDocument spreadsheet)
+        if (document is SpreadsheetDocument spreadsheet && document.DocumentKind == OdfDocumentKind.Spreadsheet)
         {
             return spreadsheet;
         }
