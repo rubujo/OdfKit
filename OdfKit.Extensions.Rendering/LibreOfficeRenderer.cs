@@ -118,7 +118,7 @@ public class LibreOfficeRenderer
     /// <exception cref="InvalidOperationException">當 LibreOffice 進程結束但傳回非零的錯誤碼時擲出。</exception>
     /// <exception cref="FileNotFoundException">當轉檔完成後找不到預期的目標檔案時擲出。</exception>
     /// <exception cref="OperationCanceledException">當作業因 <paramref name="cancellationToken"/> 取消時擲出。</exception>
-    public async Task ConvertFileAsync(
+    public virtual async Task ConvertFileAsync(
         string inputFilePath,
         string outputPath,
         string format,

@@ -45,7 +45,7 @@ namespace OdfKit.Tests
             package.SetMimeType("application/vnd.oasis.opendocument.text");
             package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
 
-            await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None });
+            await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
 
             using var signatureStream = package.GetEntryStream("META-INF/documentsignatures.xml");
             var document = new XmlDocument();
@@ -67,14 +67,14 @@ namespace OdfKit.Tests
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
                 package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes("<styles/>"), "text/xml");
 
-                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None });
+                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
             {
-                var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true });
+                var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true }, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.True(result.IsValid, result.Signatures.FirstOrDefault()?.ErrorMessage);
                 Assert.Single(result.Signatures);
 
@@ -98,7 +98,7 @@ namespace OdfKit.Tests
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
 
-                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.BES });
+                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.BES }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -126,7 +126,7 @@ namespace OdfKit.Tests
                 }
 
                 // Verify validation result
-                var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true });
+                var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true }, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.True(result.IsValid, result.Signatures.FirstOrDefault()?.ErrorMessage);
                 Assert.Single(result.Signatures);
 
@@ -190,7 +190,7 @@ namespace OdfKit.Tests
                     HttpClient = httpClient
                 };
 
-                await OdfSigner.SignAsync(package, signerCert, options);
+                await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -215,7 +215,7 @@ namespace OdfKit.Tests
 
                 // Verify signature and timestamp validate successfully
                 var options = new OdfSigningOptions { HttpClient = httpClient, AllowUntrustedRoot = true, AllowUntrustedTimestamp = true };
-                var result = await OdfSigner.VerifySignaturesAsync(package, options);
+                var result = await OdfSigner.VerifySignaturesAsync(package, options, cancellationToken: TestContext.Current.CancellationToken);
 
                 Assert.True(result.IsValid, result.Signatures.FirstOrDefault()?.ErrorMessage);
                 Assert.Single(result.Signatures);
@@ -292,7 +292,7 @@ namespace OdfKit.Tests
                 };
                 options.ExtraCertificates.Add(signerCA);
 
-                await OdfSigner.SignAsync(package, signerCert, options);
+                await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -319,7 +319,7 @@ namespace OdfKit.Tests
                 // Verify package validation passes when certificate is clean
                 var options = new OdfSigningOptions { HttpClient = httpClient, CheckRevocation = true, AllowUntrustedRoot = true, AllowUntrustedTimestamp = true };
                 options.ExtraCertificates.Add(signerCA);
-                var result = await OdfSigner.VerifySignaturesAsync(package, options);
+                var result = await OdfSigner.VerifySignaturesAsync(package, options, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.True(result.IsValid, result.Signatures.FirstOrDefault()?.ErrorMessage);
                 Assert.True(result.Signatures[0].IsRevocationValid);
 
@@ -341,14 +341,14 @@ namespace OdfKit.Tests
                         AllowUntrustedRoot = true
                     };
                     optionsRevoked.ExtraCertificates.Add(signerCA);
-                    await OdfSigner.SignAsync(packageRevoked, signerCert, optionsRevoked);
+                    await OdfSigner.SignAsync(packageRevoked, signerCert, optionsRevoked, cancellationToken: TestContext.Current.CancellationToken);
                     packageRevoked.Save();
                 }
 
                 msRevoked.Position = 0;
                 using (var packageRevoked = OdfPackage.Open(msRevoked))
                 {
-                    var resultRevoked = await OdfSigner.VerifySignaturesAsync(packageRevoked, options);
+                    var resultRevoked = await OdfSigner.VerifySignaturesAsync(packageRevoked, options, cancellationToken: TestContext.Current.CancellationToken);
                     Assert.False(resultRevoked.IsValid);
                     Assert.False(resultRevoked.Signatures[0].IsRevocationValid);
                     Assert.Contains("revoked", resultRevoked.Signatures[0].ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
@@ -433,7 +433,7 @@ namespace OdfKit.Tests
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
 
-                await OdfSigner.SignAsync(package, certA, new OdfSigningOptions { Level = XadesLevel.BES });
+                await OdfSigner.SignAsync(package, certA, new OdfSigningOptions { Level = XadesLevel.BES }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -441,7 +441,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms, leaveOpen: true))
             {
-                await OdfSigner.SignAsync(package, certB, new OdfSigningOptions { Level = XadesLevel.BES });
+                await OdfSigner.SignAsync(package, certB, new OdfSigningOptions { Level = XadesLevel.BES }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -449,7 +449,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
             {
-                var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true });
+                var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true }, cancellationToken: TestContext.Current.CancellationToken);
 
                 Assert.Equal(2, result.Signatures.Count);
 
@@ -524,7 +524,7 @@ namespace OdfKit.Tests
                     AllowUntrustedRoot = true
                 };
 
-                await OdfSigner.SignAsync(package, signerCert, options);
+                await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -532,7 +532,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms))
             {
                 var options = new OdfSigningOptions { HttpClient = httpClient, CheckRevocation = true, AllowUntrustedRoot = true };
-                var result = await OdfSigner.VerifySignaturesAsync(package, options);
+                var result = await OdfSigner.VerifySignaturesAsync(package, options, cancellationToken: TestContext.Current.CancellationToken);
 
                 Assert.False(result.IsValid);
                 Assert.False(result.Signatures[0].IsRevocationValid);
@@ -579,7 +579,7 @@ namespace OdfKit.Tests
                     HttpClient = httpClient
                 };
 
-                await OdfSigner.SignAsync(package, signerCert, options);
+                await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -588,13 +588,13 @@ namespace OdfKit.Tests
             {
                 // Verify that it fails by default (AllowUntrustedTimestamp = false)
                 var optionsDefault = new OdfSigningOptions { HttpClient = httpClient, AllowUntrustedRoot = true, AllowUntrustedTimestamp = false };
-                var resultDefault = await OdfSigner.VerifySignaturesAsync(package, optionsDefault);
+                var resultDefault = await OdfSigner.VerifySignaturesAsync(package, optionsDefault, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.False(resultDefault.IsValid);
                 Assert.False(resultDefault.Signatures[0].IsTimestampValid);
 
                 // Verify that it only passes when AllowUntrustedTimestamp = true
                 var optionsAllowed = new OdfSigningOptions { HttpClient = httpClient, AllowUntrustedRoot = true, AllowUntrustedTimestamp = true };
-                var resultAllowed = await OdfSigner.VerifySignaturesAsync(package, optionsAllowed);
+                var resultAllowed = await OdfSigner.VerifySignaturesAsync(package, optionsAllowed, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.True(resultAllowed.IsValid, resultAllowed.Signatures.FirstOrDefault()?.ErrorMessage);
                 Assert.True(resultAllowed.Signatures[0].IsTimestampValid);
             }
@@ -611,14 +611,14 @@ namespace OdfKit.Tests
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
 
-                await OdfSigner.SignAsync(package, expiredCert, new OdfSigningOptions { Level = XadesLevel.None });
+                await OdfSigner.SignAsync(package, expiredCert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
             {
-                var result = await OdfSigner.VerifySignaturesAsync(package);
+                var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.False(result.IsValid, "Verification should fail for expired certificate");
                 Assert.False(result.Signatures[0].IsCertificateValid);
                 Assert.Contains("expired", result.Signatures[0].ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
@@ -644,14 +644,14 @@ namespace OdfKit.Tests
                         package.SetMimeType("application/vnd.oasis.opendocument.text");
                         package.WriteEntry("content.xml", Encoding.UTF8.GetBytes($"<content id='{localIndex}'/>"), "text/xml");
 
-                        await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.BES });
+                        await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.BES }, cancellationToken: TestContext.Current.CancellationToken);
                         package.Save();
                     }
 
                     ms.Position = 0;
                     using (var package = OdfPackage.Open(ms))
                     {
-                        var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true });
+                        var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true }, cancellationToken: TestContext.Current.CancellationToken);
                         Assert.True(result.IsValid, $"Signature verification failed for index {localIndex}: {result.Signatures.FirstOrDefault()?.ErrorMessage}");
                     }
                 }, TestContext.Current.CancellationToken);
@@ -1046,14 +1046,14 @@ namespace OdfKit.Tests
             {
                 ms.Position = 0;
                 using var package = OdfPackage.Open(ms, leaveOpen: true);
-                await OdfSigner.SignAsync(package, certs[i], new OdfSigningOptions { Level = XadesLevel.None });
+                await OdfSigner.SignAsync(package, certs[i], new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
             {
-                var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true });
+                var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true }, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.True(result.IsValid, result.Signatures.FirstOrDefault()?.ErrorMessage);
                 Assert.Equal(CoSignerCount, result.Signatures.Count);
                 for (int i = 0; i < CoSignerCount; i++)
@@ -1100,7 +1100,7 @@ namespace OdfKit.Tests
                     pkg = OdfPackage.Open(ms, leaveOpen: true);
                 }
 
-                await OdfSigner.SignAsync(pkg, cert, new OdfSigningOptions { Level = XadesLevel.None });
+                await OdfSigner.SignAsync(pkg, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
 
                 lock (ms)
                 {
@@ -1114,7 +1114,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
             {
-                var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true });
+                var result = await OdfSigner.VerifySignaturesAsync(package, new OdfSigningOptions { AllowUntrustedRoot = true }, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.True(result.IsValid, result.Signatures.FirstOrDefault()?.ErrorMessage);
                 Assert.Equal(CoSignerCount, result.Signatures.Count);
                 foreach (var sig in result.Signatures)
@@ -1139,14 +1139,14 @@ namespace OdfKit.Tests
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None });
+                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
             {
-                var result = await OdfSigner.VerifySignaturesAsync(package);
+                var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.False(result.IsValid);
                 Assert.Single(result.Signatures);
 
@@ -1167,14 +1167,14 @@ namespace OdfKit.Tests
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None });
+                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
             {
-                var result = await OdfSigner.VerifySignaturesAsync(package);
+                var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.False(result.IsValid);
                 Assert.Single(result.Signatures);
 
@@ -1195,7 +1195,7 @@ namespace OdfKit.Tests
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.BES });
+                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.BES }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -1229,7 +1229,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
             {
-                var result = await OdfSigner.VerifySignaturesAsync(package);
+                var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.False(result.IsValid);
                 Assert.Single(result.Signatures);
 
@@ -1249,7 +1249,7 @@ namespace OdfKit.Tests
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None });
+                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -1285,7 +1285,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
             {
-                var result = await OdfSigner.VerifySignaturesAsync(package);
+                var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.False(result.IsValid);
 
                 var sig = result.Signatures[0];
@@ -1304,7 +1304,7 @@ namespace OdfKit.Tests
             {
                 package.SetMimeType("application/vnd.oasis.opendocument.text");
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None });
+                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -1321,7 +1321,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms))
             {
-                var result = await OdfSigner.VerifySignaturesAsync(package);
+                var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.False(result.IsValid);
 
                 var sig = result.Signatures[0];
@@ -1373,7 +1373,7 @@ namespace OdfKit.Tests
                     HttpClient = httpClient
                 };
 
-                await OdfSigner.SignAsync(package, signerCert, options);
+                await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -1410,7 +1410,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms))
             {
                 var options = new OdfSigningOptions { HttpClient = httpClient, AllowUntrustedRoot = true, AllowUntrustedTimestamp = true };
-                var result = await OdfSigner.VerifySignaturesAsync(package, options);
+                var result = await OdfSigner.VerifySignaturesAsync(package, options, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.False(result.IsValid);
 
                 var sig = result.Signatures[0];
@@ -1457,7 +1457,7 @@ namespace OdfKit.Tests
                 packageA.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<contentA/>"), "text/xml");
 
                 var options = new OdfSigningOptions { Level = XadesLevel.T, TsaUrl = "http://mocktsa.com/tsa", HttpClient = httpClient };
-                await OdfSigner.SignAsync(packageA, signerCert, options);
+                await OdfSigner.SignAsync(packageA, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
                 packageA.Save();
             }
 
@@ -1467,7 +1467,7 @@ namespace OdfKit.Tests
                 packageB.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<contentB/>"), "text/xml");
 
                 var options = new OdfSigningOptions { Level = XadesLevel.T, TsaUrl = "http://mocktsa.com/tsa", HttpClient = httpClient };
-                await OdfSigner.SignAsync(packageB, signerCert, options);
+                await OdfSigner.SignAsync(packageB, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
                 packageB.Save();
             }
 
@@ -1531,7 +1531,7 @@ namespace OdfKit.Tests
                 var encapB = docB.SelectSingleNode("//xades:SignatureTimeStamp/xades:EncapsulatedTimeStamp", ns)?.InnerText;
 
                 var options = new OdfSigningOptions { HttpClient = httpClient, AllowUntrustedRoot = true, AllowUntrustedTimestamp = true };
-                var result = await OdfSigner.VerifySignaturesAsync(packageA, options);
+                var result = await OdfSigner.VerifySignaturesAsync(packageA, options, cancellationToken: TestContext.Current.CancellationToken);
 
                 var sigValElem = doc.SelectSingleNode("//ds:SignatureValue", ns) as XmlElement;
                 var cleanDoc = new XmlDocument();
@@ -1622,7 +1622,7 @@ namespace OdfKit.Tests
                 package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
 
                 var options = new OdfSigningOptions { Level = XadesLevel.T, TsaUrl = "http://mocktsa.com/tsa", HttpClient = httpClient };
-                await OdfSigner.SignAsync(package, signerCert, options);
+                await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -1726,7 +1726,7 @@ namespace OdfKit.Tests
                 };
                 options.ExtraCertificates.Add(signerCA);
 
-                await OdfSigner.SignAsync(package, signerCert, options);
+                await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -1742,7 +1742,7 @@ namespace OdfKit.Tests
                 };
                 options.ExtraCertificates.Add(signerCA);
 
-                var result = await OdfSigner.VerifySignaturesAsync(package, options);
+                var result = await OdfSigner.VerifySignaturesAsync(package, options, cancellationToken: TestContext.Current.CancellationToken);
                 Assert.False(result.IsValid);
                 Assert.False(result.Signatures[0].IsRevocationValid);
                 Assert.Equal("CRL_SIGNATURE_INVALID", result.Signatures[0].ErrorCode);
@@ -1790,7 +1790,7 @@ namespace OdfKit.Tests
                     TsaUrl = "http://mocktsa.com/tsa",
                     HttpClient = httpClient
                 };
-                await OdfSigner.SignAsync(package, certA, options);
+                await OdfSigner.SignAsync(package, certA, options, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -1804,7 +1804,7 @@ namespace OdfKit.Tests
                     TsaUrl = "http://mocktsa.com/tsa",
                     HttpClient = httpClient
                 };
-                await OdfSigner.SignAsync(package, certB, options);
+                await OdfSigner.SignAsync(package, certB, options, cancellationToken: TestContext.Current.CancellationToken);
                 package.Save();
             }
 
@@ -1818,7 +1818,7 @@ namespace OdfKit.Tests
                     AllowUntrustedRoot = true,
                     AllowUntrustedTimestamp = true
                 };
-                var result = await OdfSigner.VerifySignaturesAsync(package, options);
+                var result = await OdfSigner.VerifySignaturesAsync(package, options, cancellationToken: TestContext.Current.CancellationToken);
 
                 Assert.True(result.IsValid, result.Signatures.FirstOrDefault(s => !s.IsSignatureValid)?.ErrorMessage);
                 Assert.Equal(2, result.Signatures.Count);
