@@ -132,6 +132,35 @@ public class PresentationApiUsabilityTests
         Assert.Throws<InvalidOperationException>(() => PresentationDocument.Load(stream, "text.odt"));
     }
 
+    /// <summary>
+    /// 驗證簡報可讀回投影片動畫效果摘要。
+    /// </summary>
+    [Fact]
+    public void ReadAnimationsAfterRoundTrip()
+    {
+        using var deck = PresentationDocument.Create();
+        OdfSlide slide = deck.Slides.Add("動畫");
+        OdfTextBox textBox = slide.AddTextBox(
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(6),
+            OdfLength.FromCentimeters(2),
+            "標題");
+        string shapeId = textBox.Id;
+        slide.AddEntranceEffect(shapeId, OdfAnimationEffect.Fade, OdfAnimationTrigger.OnClick);
+
+        using var stream = new MemoryStream();
+        deck.SaveToStream(stream);
+        stream.Position = 0;
+
+        using PresentationDocument loaded = PresentationDocument.Load(stream);
+        OdfAnimationInfo animation = Assert.Single(loaded.Slides[0].GetAnimations());
+
+        Assert.Equal(OdfAnimationKind.Entrance, animation.Kind);
+        Assert.Equal(shapeId, animation.TargetElementId);
+        Assert.Equal(OdfAnimationTrigger.OnClick, animation.Trigger);
+    }
+
     private static byte[] CreatePngBytes()
     {
         return Convert.FromBase64String(

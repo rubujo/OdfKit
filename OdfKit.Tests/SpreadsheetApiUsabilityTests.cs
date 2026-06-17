@@ -318,5 +318,43 @@ public class SpreadsheetApiUsabilityTests
         Assert.Contains(sheet.UsedCells, cell => cell.CellValue?.Equals("滑鼠") == true);
     }
 
+    /// <summary>
+    /// 驗證試算表可讀回資料驗證規則與嵌入圖表摘要。
+    /// </summary>
+    [Fact]
+    public void ReadDataValidationsAndEmbeddedChartsAfterRoundTrip()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        workbook.Worksheets.Add("銷售");
+        workbook.AddDataValidation("銷售", new OdfDataValidation
+        {
+            ApplyTo = new OdfCellRange(0, 0, 0, 0, "銷售"),
+            Condition = OdfValidationCondition.IntegerBetween,
+            Formula1 = "1",
+            Formula2 = "99",
+            ErrorMessage = "請輸入 1 至 99",
+        });
+        workbook.AddChart("銷售", new OdfCellAddress(0, 2, "銷售"), new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Line,
+            Title = "趨勢",
+            DataRange = new OdfCellRange(0, 0, 3, 1, "銷售"),
+        });
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+
+        OdfDataValidationInfo validation = Assert.Single(loaded.GetDataValidations());
+        Assert.True(validation.TryGetCondition(out OdfValidationCondition condition));
+        Assert.Equal(OdfValidationCondition.IntegerBetween, condition);
+
+        OdfEmbeddedChartInfo chart = Assert.Single(loaded.GetEmbeddedCharts());
+        Assert.Equal("趨勢", chart.Title);
+        Assert.Equal(OdfChartType.Line, chart.ChartType);
+    }
+
     private sealed record ProductRow(string Name, double Price, int Stock);
 }

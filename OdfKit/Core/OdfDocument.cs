@@ -241,6 +241,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
             SubPath += "/";
         }
         LoadXmlTrees();
+        OdfLoExtInteropEngine.NormalizeLoadedDocument(ContentDom, StylesDom);
         StyleEngine = new OdfStyleEngine(ContentDom, StylesDom);
     }
 

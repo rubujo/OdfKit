@@ -65,6 +65,9 @@ public static class OdfNamespaces
     /// <summary>CalcExt 命名空間 URI（LibreOffice 電子試算表計算擴充命名空間）</summary>
     public const string CalcExt = "urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0";
 
+    /// <summary>LoExt 命名空間 URI（LibreOffice 實驗性 Office 擴充命名空間）</summary>
+    public const string LoExt = "urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0";
+
     /// <summary>封裝 RDF metadata 的 Pkg 命名空間 URI（ODF 1.2 meta/pkg ontology）</summary>
     public const string Pkg = OdfPkgRdfPredicates.NamespaceUri;
 
@@ -96,6 +99,7 @@ public static class OdfNamespaces
             Dsig => "dsig",
             Ds => "ds",
             CalcExt => "calcext",
+            LoExt => "loext",
             Form => "form",
             Pkg => "pkg",
             _ => string.Empty

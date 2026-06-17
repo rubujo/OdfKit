@@ -22,6 +22,11 @@ public class OdfImage(OdfNode frameNode, OdfNode imageNode)
     public OdfNode ImageNode { get; } = imageNode;
 
     /// <summary>
+    /// 取得此圖片是否標記為裝飾性（含 LibreOffice <c>loext:decorative</c> 相容讀取）。
+    /// </summary>
+    public bool IsDecorative => OdfLoExtInteropEngine.IsDecorative(FrameNode);
+
+    /// <summary>
     /// 將此圖片標記為裝飾性，輔助技術應略過此物件。
     /// </summary>
     /// <param name="decorative">是否標記為裝飾性。</param>
@@ -37,6 +42,7 @@ public class OdfImage(OdfNode frameNode, OdfNode imageNode)
             FrameNode.RemoveAttribute("decorative", OdfNamespaces.Draw);
         }
 
+        FrameNode.RemoveAttribute("decorative", OdfNamespaces.LoExt);
         return this;
     }
 

@@ -34,6 +34,11 @@ public class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     public string LocalName => Node.LocalName;
 
     /// <summary>
+    /// 取得此圖形是否標記為裝飾性（含 LibreOffice <c>loext:decorative</c> 相容讀取）。
+    /// </summary>
+    public bool IsDecorative => OdfLoExtInteropEngine.IsDecorative(Node);
+
+    /// <summary>
     /// 將此圖形標記為裝飾性，輔助技術應略過此物件。
     /// </summary>
     /// <param name="decorative">是否標記為裝飾性。</param>
@@ -49,6 +54,7 @@ public class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
             Node.RemoveAttribute("decorative", OdfNamespaces.Draw);
         }
 
+        Node.RemoveAttribute("decorative", OdfNamespaces.LoExt);
         return this;
     }
 
