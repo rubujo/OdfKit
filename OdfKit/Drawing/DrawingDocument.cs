@@ -17,7 +17,7 @@ namespace OdfKit.Drawing;
 /// <summary>
 /// 表示 ODF 繪圖文件（Drawing Document）的類別。
 /// </summary>
-public class DrawingDocument : OdfDocument
+public partial class DrawingDocument : OdfDocument
 {
     private readonly List<OdfDrawPage> _pages = [];
     private OdfDrawPageCollection? _pageCollection;

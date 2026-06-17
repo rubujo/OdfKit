@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OdfKit.Core;
@@ -108,6 +109,110 @@ public class DrawingHighLevelApiTests
         Assert.Equal(startShape.Id, connector.Node.GetAttribute("start-shape", OdfNamespaces.Draw));
         Assert.Equal(endShape.Id, connector.Node.GetAttribute("end-shape", OdfNamespaces.Draw));
         Assert.Equal("curve", connector.Node.GetAttribute("type", OdfNamespaces.Draw));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfDrawPage.GetPaths"/> 可讀回已建立的路徑圖形。
+    /// </summary>
+    [Fact]
+    public void GetPaths_RoundTripsAfterAdd()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("路徑頁");
+        document.AddPath(
+            "M 10 10 L 20 20 Z",
+            OdfLength.Parse("1.0cm"),
+            OdfLength.Parse("2.0cm"),
+            OdfLength.Parse("10.0cm"),
+            OdfLength.Parse("5.0cm"));
+
+        IReadOnlyList<OdfPathInfo> paths = page.GetPaths();
+        Assert.Single(paths);
+        OdfPathInfo path = paths[0];
+        Assert.Equal("路徑頁", path.PageName);
+        Assert.Equal("M 10 10 L 20 20 Z", path.SvgPathData);
+        Assert.True(path.TryGetX(out OdfLength x));
+        Assert.Equal(OdfLength.Parse("1cm").ToPoints(), x.ToPoints(), 0.001);
+
+        Assert.Single(document.GetPaths());
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfDrawPage.GetConnectors"/> 可讀回圖形連結連接線。
+    /// </summary>
+    [Fact]
+    public void GetConnectors_RoundTripsAfterAdd()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage();
+        OdfShape startShape = page.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("3cm"),
+            OdfLength.Parse("2cm"));
+        OdfShape endShape = page.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.Parse("10cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("3cm"),
+            OdfLength.Parse("2cm"));
+
+        document.AddConnector(startShape.Id, endShape.Id, OdfConnectorType.Curve);
+
+        IReadOnlyList<OdfConnectorInfo> connectors = page.GetConnectors();
+        Assert.Single(connectors);
+        OdfConnectorInfo connector = connectors[0];
+        Assert.True(connector.IsShapeLinked);
+        Assert.Equal(startShape.Id, connector.StartShapeId);
+        Assert.Equal(endShape.Id, connector.EndShapeId);
+        Assert.Equal(OdfConnectorType.Curve, connector.ConnectorType);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfDrawPage.GetPolygons"/> 可讀回已建立的多邊形圖形。
+    /// </summary>
+    [Fact]
+    public void GetPolygons_RoundTripsAfterAdd()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage();
+        document.AddPolygon(
+        [
+            (OdfLength.Parse("2.0cm"), OdfLength.Parse("2.0cm")),
+            (OdfLength.Parse("12.0cm"), OdfLength.Parse("2.0cm")),
+            (OdfLength.Parse("7.0cm"), OdfLength.Parse("7.0cm")),
+        ]);
+
+        IReadOnlyList<OdfPolygonInfo> polygons = page.GetPolygons();
+        Assert.Single(polygons);
+        OdfPolygonInfo polygon = polygons[0];
+        Assert.Contains("0,0", polygon.Points);
+        Assert.True(polygon.TryGetX(out OdfLength x));
+        Assert.Equal(OdfLength.Parse("2cm").ToPoints(), x.ToPoints(), 0.001);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfDrawPage.GetCustomShapes"/> 可讀回自定義幾何圖形。
+    /// </summary>
+    [Fact]
+    public void GetCustomShapes_RoundTripsAfterAdd()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage();
+        document.AddCustomShape(
+            "smiley",
+            OdfLength.Parse("2.0cm"),
+            OdfLength.Parse("2.0cm"),
+            OdfLength.Parse("5.0cm"),
+            OdfLength.Parse("5.0cm"));
+
+        IReadOnlyList<OdfCustomShapeInfo> shapes = page.GetCustomShapes();
+        Assert.Single(shapes);
+        OdfCustomShapeInfo shape = shapes[0];
+        Assert.Equal("smiley", shape.GeometryType);
+        Assert.True(shape.TryGetWidth(out OdfLength width));
+        Assert.Equal(OdfLength.Parse("5cm").ToPoints(), width.ToPoints(), 0.001);
     }
 
     /// <summary>

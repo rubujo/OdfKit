@@ -57,6 +57,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
   具專屬 typed 文件類別與 `Create`/`Load` 入口；語意 API 繼承四主格式基底類別。
 - ODT `text:tracked-changes` 已支援段落與表格儲存格插入／格式變更記錄；LO 互通測試已備（`TrackedChangesInteropTests`）。
 - ODS `table:tracked-changes` 已支援儲存格內容／公式變更、列／欄插入刪除與儲存格移動；LO 互通測試已新增（需本機 LibreOffice 26.x）。
+- ODG 已補強路徑、多邊形、連接線與自定義幾何圖形讀取 API（`GetPaths`／`GetConnectors`／`GetPolygons`／`GetCustomShapes`）；測試見 `DrawingHighLevelApiTests`。
 - LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；calcext 讀取 API 為選用 CALCEXT-1。
 - `.odc`、`.odf`、`.odi`、`.odb` 標為 `usable`：已有摘要與常用編輯 API；
   完整語意模型仍屬 Wave 2 DEPTH-2。
