@@ -79,11 +79,18 @@
 - [x] `FormulaStringFunctionHandlers`、`FormulaMatrixFunctionHandlers`、`FormulaDatabaseFunctionHandlers`
 - [x] `eng/Migrate-FormulaCategoryHandler.ps1` category 遷移腳本
 
-## 剩餘工作（Phase 9+）
+## Phase 9（已完成）
+
+- [x] `FormulaStatisticalFunctionHandlers`（Statistical + Helpers.Statistical.\*）
+- [x] `FormulaLookupFunctionHandlers`（Lookup + Helpers.Lookup）
+- [x] `FormulaMathFunctionHandlers`（Math.Standard + Math.Rounding + Math.Trigonometry）
+- [x] `DefaultFormulaEvaluator.FunctionRegistry` 委派更新
+
+## 剩餘工作（Phase 10+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `DefaultFormulaEvaluator` | ~3500 | Statistical、Math、Lookup、DateTime、Financial 等 category |
+| `DefaultFormulaEvaluator` | ~1200 | DateTime、Financial category |
 | `OdfElement` | ~3333 | 屬性存取器／typed getter |
 | `OdfPackage` | ~1400 | RDF Metadata 載入、`Saving.Internals` |
 | `OdfSigner` | ~1300 | 驗證剩餘 partial |
