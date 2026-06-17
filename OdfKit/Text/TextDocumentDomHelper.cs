@@ -1,4 +1,5 @@
-﻿using OdfKit.DOM;
+﻿using System;
+using OdfKit.DOM;
 
 namespace OdfKit.Text;
 
@@ -35,5 +36,21 @@ internal static class TextDocumentDomHelper
         var node = new OdfNode(OdfNodeType.Element, localName, ns, prefix);
         parent.AppendChild(node);
         return node;
+    }
+
+    /// <summary>
+    /// 解碼 HTML 實體字串（含 <c>&amp;apos;</c> 變體）。
+    /// </summary>
+    internal static string DecodeHtmlEntities(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text;
+
+        string decoded = System.Net.WebUtility.HtmlDecode(text);
+        if (decoded.Contains("&apos;"))
+            decoded = decoded.Replace("&apos;", "'");
+        if (decoded.Contains("&APOS;"))
+            decoded = decoded.Replace("&APOS;", "'");
+        return decoded;
     }
 }

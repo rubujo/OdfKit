@@ -151,7 +151,7 @@ internal static class TextDocumentHtmlFragmentEngine
                 if (inScriptOrStyle)
                     continue;
 
-                string decodedText = TextDocument.DecodeHtmlEntities(text);
+                string decodedText = TextDocumentDomHelper.DecodeHtmlEntities(text);
 
                 bool activeBold = isBold;
                 bool activeItalic = isItalic;

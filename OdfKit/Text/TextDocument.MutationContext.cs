@@ -25,7 +25,7 @@ internal readonly struct TextDocumentMutationContext
     internal string NextEndnoteId() => _document.AllocateEndnoteId();
 
     internal void SetUpdateFieldsWhenOpening(bool update) =>
-        _document.SetUpdateFieldsWhenOpeningInternal(update);
+        TextDocumentSettingsEngine.SetUpdateFieldsWhenOpening(_document.CoreCollaborators, update);
 }
 
 public partial class TextDocument
@@ -38,6 +38,4 @@ public partial class TextDocument
     internal string AllocateFootnoteId() => $"ftn{_footnoteCounter++}";
 
     internal string AllocateEndnoteId() => $"etn{_endnoteCounter++}";
-
-    internal void SetUpdateFieldsWhenOpeningInternal(bool update) => SetUpdateFieldsWhenOpening(update);
 }

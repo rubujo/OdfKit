@@ -124,11 +124,19 @@
 - [x] `OdfElementDomainAttributeAccess`（幾何／語系／儲存格位址／百分比等領域值引擎）
 - [x] `eng/Migrate-OdfElementDomainAttributeAccess.ps1`（5 個 Attribute partial 遷移腳本）
 
-## 剩餘工作（Phase 16+）
+## Phase 16（已完成）
+
+- [x] `TextDocumentCoreCollaborators` 協作存取器
+- [x] `TextDocumentSettingsEngine`、`TextDocumentTocEngine`、`TextDocumentFormulaEngine`
+- [x] `TextDocumentCommentsEngine`、`TextDocumentContentMergeEngine`、`TextDocumentMailMergeBatchEngine`
+- [x] `TextDocumentPageFieldsEngine`、`TextDocumentCjkFontEngine`、`TextDocumentFontFaceEngine`
+- [x] `TextDocument.cs` 收斂為薄門面（`DecodeHtmlEntities` 遷至 `TextDocumentDomHelper`）
+
+## 剩餘工作（Phase 17+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `OdfElement` | ~2600 | Wrapper partial（Text／Table／Style 等） |
+| `OdfElement` | ~640 | Wrapper partial（typed DOM 元素，低優先） |
 | `OdfPackage` | ~900 | 公開 API 項目讀寫（需保留薄門面） |
 | `TextDocument` | ~1000 | 核心 `TextDocument.cs` |
 | `OdfDocument` | ~1493 | 合併／複製管線 |

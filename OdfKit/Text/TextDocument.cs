@@ -6,7 +6,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
+
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -181,16 +181,7 @@ public partial class TextDocument : OdfDocument
     /// 套用中日韓（CJK）字型遞補設定。
     /// </summary>
     public void ApplyCjkFontFallback()
-    {
-        // 宣告預設的中日韓字型，若不存在則新增
-        AddFontFace("PMingLiU", "PMingLiU", "system-serif", "variable");
-        AddFontFace("Microsoft JhengHei", "Microsoft JhengHei", "system-sans-serif", "variable");
-        AddFontFace("MS Mincho", "MS Mincho", "system-serif", "variable");
-        AddFontFace("MS Gothic", "MS Gothic", "system-sans-serif", "variable");
-        AddFontFace("SimSun", "SimSun", "system-serif", "variable");
-        AddFontFace("Microsoft YaHei", "Microsoft YaHei", "system-sans-serif", "variable");
-        AddFontFace("Malgun Gothic", "Malgun Gothic", "system-sans-serif", "variable");
-    }
+        => TextDocumentCjkFontEngine.ApplyFontFallback(CoreCollaborators);
 
 
     #endregion
@@ -204,22 +195,14 @@ public partial class TextDocument : OdfDocument
     /// </summary>
     /// <param name="paragraph">目標段落</param>
     internal void AddPageNumberField(OdfParagraph paragraph)
-    {
-        var fNode = new OdfNode(OdfNodeType.Element, "page-number", OdfNamespaces.Text, "text");
-        fNode.SetAttribute("select-page", OdfNamespaces.Text, "current", "text");
-        paragraph.Node.AppendChild(fNode);
-    }
+        => TextDocumentPageFieldsEngine.AddPageNumberField(paragraph);
 
     /// <summary>
     /// 在指定的段落中新增總頁數欄位。
     /// </summary>
     /// <param name="paragraph">目標段落</param>
     internal void AddPageCountField(OdfParagraph paragraph)
-    {
-        var fNode = new OdfNode(OdfNodeType.Element, "page-count", OdfNamespaces.Text, "text");
-        fNode.SetAttribute("num-format", OdfNamespaces.Style, "1", "style");
-        paragraph.Node.AppendChild(fNode);
-    }
+        => TextDocumentPageFieldsEngine.AddPageCountField(paragraph);
 
 
     #endregion
@@ -235,19 +218,7 @@ public partial class TextDocument : OdfDocument
     /// <param name="options">合併設定選項</param>
     /// <param name="renameMap">變更樣式名稱的映射字典</param>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
-    {
-        var srcText = sourceDoc as TextDocument ?? throw new ArgumentException("Source document must be a TextDocument.");
-
-        foreach (var child in srcText.BodyTextRoot.Children)
-        {
-            if (child.NodeType == OdfNodeType.Element)
-            {
-                var imported = OdfNode.ImportNode(child, srcText.Package, Package);
-                RemapStylesInNodes(imported, renameMap);
-                BodyTextRoot.AppendChild(imported);
-            }
-        }
-    }
+        => TextDocumentContentMergeEngine.MergeContentNodes(CoreCollaborators, sourceDoc, renameMap);
 
 
     #endregion
@@ -263,36 +234,7 @@ public partial class TextDocument : OdfDocument
     /// <param name="outlineLevel">目錄的大綱階層上限</param>
     /// <returns>新建立的目錄物件</returns>
     public OdfTableOfContents AddTableOfContents(string title = "Table of Contents", int outlineLevel = 10)
-    {
-        var tocNode = OdfNodeFactory.CreateElement("table-of-content", OdfNamespaces.Text, "text");
-        tocNode.SetAttribute("name", OdfNamespaces.Text, title, "text");
-
-        var sourceNode = OdfNodeFactory.CreateElement("table-of-content-source", OdfNamespaces.Text, "text");
-        sourceNode.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(), "text");
-        tocNode.AppendChild(sourceNode);
-
-        var bodyNode = OdfNodeFactory.CreateElement("index-body", OdfNamespaces.Text, "text");
-
-        var titlePara = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
-        titlePara.SetAttribute("style-name", OdfNamespaces.Text, "Contents_20_Heading", "text");
-        titlePara.TextContent = title;
-        bodyNode.AppendChild(titlePara);
-
-        tocNode.AppendChild(bodyNode);
-        BodyTextRoot.AppendChild(tocNode);
-
-        SetUpdateFieldsWhenOpening(true);
-        return new OdfTableOfContents(tocNode, this);
-    }
-
-    private void SetUpdateFieldsWhenOpening(bool update)
-    {
-        var sc = FindOrCreateSettingsNode(SettingsDom, "view-settings");
-        var map = FindOrCreateMapNode(sc, "Views");
-        var entry = FindOrCreateMapEntryNode(map);
-        var item = FindOrCreateConfigItemNode(entry, "UpdateFieldsWhenOpening", "boolean");
-        item.TextContent = update ? "true" : "false";
-    }
+        => TextDocumentTocEngine.AddTableOfContents(this, CoreCollaborators, title, outlineLevel);
 
 
     #endregion
@@ -307,41 +249,7 @@ public partial class TextDocument : OdfDocument
     /// <param name="paragraph">要插入公式的段落</param>
     /// <param name="mathMlXmlString">MathML 結構的 XML 字串內容</param>
     internal void AddFormula(OdfParagraph paragraph, string mathMlXmlString)
-    {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
-        if (string.IsNullOrWhiteSpace(mathMlXmlString))
-            throw new ArgumentException("MathML XML content cannot be empty.", nameof(mathMlXmlString));
-
-        // 驗證 mathMlXmlString 是否為格式正確的 XML
-        try
-        {
-            XElement.Parse(mathMlXmlString);
-        }
-        catch (Exception ex)
-        {
-            throw new ArgumentException("Invalid MathML XML: " + ex.Message, nameof(mathMlXmlString), ex);
-        }
-
-        string folder = $"Formula_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
-        string mathDocXml = $"<office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:math=\"http://www.w3.org/1998/Math/MathML\"><office:body><office:formula>{mathMlXmlString}</office:formula></office:body></office:document-meta>";
-
-        Package.WriteEntry($"{folder}/content.xml", System.Text.Encoding.UTF8.GetBytes(mathDocXml), "text/xml");
-        Package.WriteEntry($"{folder}/mimetype", System.Text.Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.formula"), "application/vnd.oasis.opendocument.formula");
-
-        Package.SaveManifestToEntries();
-
-        var frame = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-        frame.SetAttribute("width", OdfNamespaces.Svg, "2cm", "svg");
-        frame.SetAttribute("height", OdfNamespaces.Svg, "1cm", "svg");
-        frame.SetAttribute("anchor-type", OdfNamespaces.Text, "as-char", "text");
-
-        var obj = new OdfNode(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
-        obj.SetAttribute("href", OdfNamespaces.XLink, folder, "xlink");
-        frame.AppendChild(obj);
-
-        paragraph.Node.AppendChild(frame);
-    }
+        => TextDocumentFormulaEngine.AddFormula(CoreCollaborators, paragraph, mathMlXmlString);
 
 
     #endregion
@@ -460,61 +368,14 @@ public partial class TextDocument : OdfDocument
     /// <param name="paragraph">要新增註解的段落</param>
     /// <param name="comment">註解物件執行個體</param>
     internal void AddComment(OdfParagraph paragraph, OdfComment comment)
-    {
-        if (paragraph is null)
-            throw new ArgumentNullException(nameof(paragraph));
-        if (comment is null)
-            throw new ArgumentNullException(nameof(comment));
-
-        var node = comment.ToXmlNode();
-        if (node.LocalName == "annotation-list")
-        {
-            foreach (var child in new List<OdfNode>(node.Children))
-            {
-                paragraph.Node.AppendChild(child);
-            }
-        }
-        else
-        {
-            paragraph.Node.AppendChild(node);
-        }
-    }
+        => TextDocumentCommentsEngine.AddComment(paragraph, comment);
 
     /// <summary>
     /// 取得文件中所有註解的列表。
     /// </summary>
     /// <returns>註解物件列表</returns>
     public List<OdfComment> GetComments()
-    {
-        List<OdfComment> list = [];
-        FindCommentsRecursive(BodyTextRoot, list);
-        return list;
-    }
-
-    private void FindCommentsRecursive(OdfNode node, List<OdfComment> list)
-    {
-        if (node.LocalName == "annotation" && node.NamespaceUri == OdfNamespaces.Office)
-        {
-            // 檢查是否為最上層註解（沒有 annotation-parent）
-            string? parent = node.GetAttribute("annotation-parent", OdfNamespaces.Office);
-            if (string.IsNullOrEmpty(parent))
-            {
-                try
-                {
-                    list.Add(OdfComment.FromXmlNode(node));
-                }
-                catch (Exception ex)
-                {
-                    OdfKitDiagnostics.Warn($"Failed to parse comment node: {ex.Message}");
-                }
-            }
-        }
-
-        foreach (var child in node.Children)
-        {
-            FindCommentsRecursive(child, list);
-        }
-    }
+        => TextDocumentCommentsEngine.GetComments(BodyTextRoot);
 
 
     #endregion
@@ -522,32 +383,6 @@ public partial class TextDocument : OdfDocument
 
     #region XML Helper
 
-
-    private OdfNode? FindChild(OdfNode parent, string localName, string ns)
-    {
-        foreach (var child in parent.Children)
-        {
-            if (child.LocalName == localName && child.NamespaceUri == ns)
-                return child;
-        }
-        return null;
-    }
-
-    internal static string DecodeHtmlEntities(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-            return text;
-        string decoded = System.Net.WebUtility.HtmlDecode(text);
-        if (decoded.Contains("&apos;"))
-        {
-            decoded = decoded.Replace("&apos;", "'");
-        }
-        if (decoded.Contains("&APOS;"))
-        {
-            decoded = decoded.Replace("&APOS;", "'");
-        }
-        return decoded;
-    }
 
     /// <summary>
     /// 在文件中新增字型宣告項目。
@@ -557,37 +392,7 @@ public partial class TextDocument : OdfDocument
     /// <param name="genericFamily">泛用字型系列</param>
     /// <param name="pitch">字距模式</param>
     public void AddFontFace(string name, string fontFamily, string? genericFamily = null, string? pitch = null)
-    {
-        void AddToDom(OdfNode domRoot)
-        {
-            var fontDecls = FindOrCreateChild(domRoot, "font-face-decls", OdfNamespaces.Office, "office");
-            foreach (var child in fontDecls.Children)
-            {
-                if (child.LocalName == "font-face" && child.NamespaceUri == OdfNamespaces.Style && child.GetAttribute("name", OdfNamespaces.Style) == name)
-                {
-                    child.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
-                    if (genericFamily is not null)
-                        child.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
-                    if (pitch is not null)
-                        child.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
-                    return;
-                }
-            }
-
-            var fontFace = new OdfNode(OdfNodeType.Element, "font-face", OdfNamespaces.Style, "style");
-            fontFace.SetAttribute("name", OdfNamespaces.Style, name, "style");
-            fontFace.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
-            if (genericFamily is not null)
-                fontFace.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
-            if (pitch is not null)
-                fontFace.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
-            fontDecls.AppendChild(fontFace);
-        }
-
-        AddToDom(ContentDom);
-        if (StylesDom is not null)
-            AddToDom(StylesDom);
-    }
+        => TextDocumentFontFaceEngine.AddFontFace(CoreCollaborators, name, fontFamily, genericFamily, pitch);
 
 
     #endregion
@@ -624,16 +429,7 @@ public partial class TextDocument : OdfDocument
     /// <param name="records">資料記錄集合。</param>
     /// <returns>每筆記錄對應一個已合併的 <see cref="TextDocument"/>；呼叫端負責 Dispose。</returns>
     public IReadOnlyList<TextDocument> MailMerge<T>(IEnumerable<T> records) where T : notnull
-    {
-        var result = new List<TextDocument>();
-        foreach (T record in records)
-        {
-            TextDocument clone = CloneTextDocument();
-            new OdfMailMergeEngine(clone).Execute(clone.BodyTextRoot, record);
-            result.Add(clone);
-        }
-        return result;
-    }
+        => TextDocumentMailMergeBatchEngine.MailMerge(this, records);
 
     /// <summary>
     /// 以字典記錄集合執行批次郵件合併，每筆記錄產生獨立的文件副本。
@@ -641,24 +437,7 @@ public partial class TextDocument : OdfDocument
     /// <param name="records">字典記錄集合，Key 對應合併欄位名稱。</param>
     /// <returns>每筆記錄對應一個已合併的 <see cref="TextDocument"/>；呼叫端負責 Dispose。</returns>
     public IReadOnlyList<TextDocument> MailMerge(IEnumerable<IReadOnlyDictionary<string, object?>> records)
-    {
-        var result = new List<TextDocument>();
-        foreach (var record in records)
-        {
-            TextDocument clone = CloneTextDocument();
-            new OdfMailMergeEngine(clone).Execute(clone.BodyTextRoot, record);
-            result.Add(clone);
-        }
-        return result;
-    }
-
-    private TextDocument CloneTextDocument()
-    {
-        using var ms = new MemoryStream();
-        SaveToStream(ms);
-        ms.Position = 0;
-        return (TextDocument)OdfDocumentFactory.LoadDocument(ms);
-    }
+        => TextDocumentMailMergeBatchEngine.MailMerge(this, records);
 
 
     #endregion
