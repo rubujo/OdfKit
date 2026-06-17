@@ -242,6 +242,34 @@ public class DrawingHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfDrawPage.GetLayers"/> 可讀回繪圖頁面圖層定義。
+    /// </summary>
+    [Fact]
+    public void GetLayers_RoundTripsAfterAdd()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("圖層頁");
+
+        var layerSet = OdfNodeFactory.CreateElement("layer-set", OdfNamespaces.Draw, "draw");
+        var layerNode = OdfNodeFactory.CreateElement("layer", OdfNamespaces.Draw, "draw");
+        layerNode.SetAttribute("name", OdfNamespaces.Draw, "背景", "draw");
+        layerNode.SetAttribute("display", OdfNamespaces.Draw, "screen", "draw");
+        layerNode.SetAttribute("protected", OdfNamespaces.Draw, "true", "draw");
+        layerSet.AppendChild(layerNode);
+        page.Node.AppendChild(layerSet);
+
+        IReadOnlyList<OdfLayerInfo> layers = page.GetLayers();
+        Assert.Single(layers);
+        OdfLayerInfo layer = layers[0];
+        Assert.Equal("圖層頁", layer.PageName);
+        Assert.Equal("背景", layer.Name);
+        Assert.True(layer.IsProtected);
+        Assert.Equal("screen", layer.Display);
+
+        Assert.Single(document.GetLayers());
+    }
+
+    /// <summary>
     /// 驗證新增自定義圖形 (AddCustomShape) API 的建立與幾何節點結構。
     /// </summary>
     [Fact]

@@ -184,6 +184,33 @@ public partial class PresentationDocument
 
     #region Slide Transitions
 
+    private const string SmilNamespace = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0";
+
+    /// <summary>
+    /// 取得指定索引投影片的切換效果。
+    /// </summary>
+    /// <param name="slideIndex">投影片索引位置。</param>
+    /// <returns>投影片切換效果類型；未設定時為 <see cref="OdfSlideTransition.None"/>。</returns>
+    public OdfSlideTransition GetSlideTransition(int slideIndex)
+    {
+        if (slideIndex < 0 || slideIndex >= Slides.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(slideIndex), "投影片索引超出範圍。");
+        }
+
+        string? typeAttr = Slides[slideIndex].Node.GetAttribute("type", SmilNamespace);
+        if (string.IsNullOrEmpty(typeAttr))
+            return OdfSlideTransition.None;
+
+        return typeAttr switch
+        {
+            "push" => OdfSlideTransition.Push,
+            "wipe" => OdfSlideTransition.Wipe,
+            "zoom" => OdfSlideTransition.Zoom,
+            _ => OdfSlideTransition.Fade,
+        };
+    }
+
     /// <summary>
     /// 設定指定索引投影片的切換效果。
     /// </summary>
@@ -201,9 +228,9 @@ public partial class PresentationDocument
 
         if (transition == OdfSlideTransition.None)
         {
-            slideNode.RemoveAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-            slideNode.RemoveAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-            slideNode.RemoveAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
+            slideNode.RemoveAttribute("type", SmilNamespace);
+            slideNode.RemoveAttribute("subtype", SmilNamespace);
+            slideNode.RemoveAttribute("dur", SmilNamespace);
             slideNode.RemoveAttribute("transition-type", OdfKit.Core.OdfNamespaces.Presentation);
         }
         else

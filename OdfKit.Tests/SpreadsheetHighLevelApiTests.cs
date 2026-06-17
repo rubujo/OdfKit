@@ -209,6 +209,42 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetNamedRanges"/> 可聚合文件層與工作表層命名範圍。
+    /// </summary>
+    [Fact]
+    public void GetNamedRanges_AggregatesDocumentAndSheetScopes()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Sheet1");
+        document.AddNamedRange(
+            "GlobalRange",
+            new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(2, 0, "Sheet1")));
+        sheet.AddNamedRange(
+            "LocalRange",
+            new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(1, 0, "Sheet1")));
+
+        Assert.Equal(2, document.GetNamedRanges().Count);
+        Assert.Contains(document.GetNamedRanges(), r => r.Name == "GlobalRange");
+        Assert.Contains(document.GetNamedRanges(), r => r.Name == "LocalRange");
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetNamedExpressions"/> 可聚合文件層與工作表層具名運算式。
+    /// </summary>
+    [Fact]
+    public void GetNamedExpressions_AggregatesDocumentAndSheetScopes()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Sheet1");
+        document.AddNamedExpression("GlobalSum", "SUM(Sheet1.A1:Sheet1.A3)");
+        sheet.AddNamedExpression("LocalCount", "of:=COUNTA([.A1:.A3])", new OdfCellAddress(0, 0, "Sheet1"));
+
+        Assert.Equal(2, document.GetNamedExpressions().Count);
+        Assert.Contains(document.GetNamedExpressions(), e => e.Name == "GlobalSum");
+        Assert.Contains(document.GetNamedExpressions(), e => e.Name == "LocalCount");
+    }
+
+    /// <summary>
     /// 驗證列印範圍、標題列欄、分頁符與縮放設定會寫入 ODS XML。
     /// </summary>
     [Fact]

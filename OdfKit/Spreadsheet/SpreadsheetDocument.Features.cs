@@ -38,6 +38,18 @@ public partial class SpreadsheetDocument
         SpreadsheetDocumentConditionalFormatReadEngine.GetSparklineGroups(this);
 
     /// <summary>
+    /// 取得試算表中所有命名範圍的摘要清單（含文件層與各工作表層）。
+    /// </summary>
+    public IReadOnlyList<OdfNamedRangeInfo> GetNamedRanges() =>
+        SpreadsheetDocumentNamedRangeReadEngine.GetNamedRanges(this);
+
+    /// <summary>
+    /// 取得試算表中所有具名運算式的摘要清單（含文件層與各工作表層）。
+    /// </summary>
+    public IReadOnlyList<OdfNamedExpressionInfo> GetNamedExpressions() =>
+        SpreadsheetDocumentNamedRangeReadEngine.GetNamedExpressions(this);
+
+    /// <summary>
     /// 新增命名範圍。
     /// </summary>
     /// <param name="name">命名範圍的名稱</param>

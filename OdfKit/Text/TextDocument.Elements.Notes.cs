@@ -85,6 +85,13 @@ public partial class TextDocument
         TextDocumentNotesEngine.AddTableIndex(MutationContext);
 
     /// <summary>
+    /// 取得文件中所有書籤的摘要清單。
+    /// </summary>
+    /// <returns>依文件樹深度優先順序排列的書籤清單。</returns>
+    public IReadOnlyList<OdfBookmarkInfo> GetBookmarks() =>
+        TextDocumentBookmarkReadEngine.GetBookmarks(BodyTextRoot);
+
+    /// <summary>
     /// 在指定的段落中新增書籤。
     /// </summary>
     /// <param name="paragraph">目標段落</param>

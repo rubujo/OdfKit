@@ -34,4 +34,10 @@ public partial class DrawingDocument
     /// </summary>
     public IReadOnlyList<OdfGroupInfo> GetGroups() =>
         GetPagesSnapshot().SelectMany(p => p.GetGroups()).ToList().AsReadOnly();
+
+    /// <summary>
+    /// 取得文件中所有繪圖頁面的圖層摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfLayerInfo> GetLayers() =>
+        GetPagesSnapshot().SelectMany(p => p.GetLayers()).ToList().AsReadOnly();
 }

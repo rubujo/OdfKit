@@ -137,8 +137,11 @@ public class PresentationHighLevelApiTests
         Assert.Equal("fromBottom", slide.Node.GetAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"));
         Assert.Equal("automatic", slide.Node.GetAttribute("transition-type", OdfNamespaces.Presentation));
 
+        Assert.Equal(OdfSlideTransition.Push, document.GetSlideTransition(0));
+
         // 2. 移除切換效果
         document.SetSlideTransition(0, OdfSlideTransition.None);
+        Assert.Equal(OdfSlideTransition.None, document.GetSlideTransition(0));
         Assert.Null(slide.Node.GetAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"));
         Assert.Null(slide.Node.GetAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"));
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OdfKit.Core;
@@ -291,6 +292,11 @@ public class TextHighLevelApiTests
         Assert.Contains("text:ref-name=\"MyTestBookmark\"", contentXml);
         Assert.Contains("text:reference-format=\"text\"", contentXml);
         Assert.Contains("bookmark-ref", contentXml);
+
+        IReadOnlyList<OdfBookmarkInfo> bookmarks = document.GetBookmarks();
+        OdfBookmarkInfo bookmark = Assert.Single(bookmarks);
+        Assert.Equal("MyTestBookmark", bookmark.Name);
+        Assert.Equal(OdfBookmarkKind.Inline, bookmark.Kind);
     }
 
     /// <summary>

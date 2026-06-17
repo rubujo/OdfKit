@@ -33,4 +33,10 @@ public partial class OdfDrawPage
     /// </summary>
     public IReadOnlyList<OdfGroupInfo> GetGroups() =>
         OdfDrawPageShapeReadEngine.GetGroups(this);
+
+    /// <summary>
+    /// 取得此繪圖頁面上所有圖層的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfLayerInfo> GetLayers() =>
+        OdfDrawPageLayerReadEngine.GetLayers(this);
 }
