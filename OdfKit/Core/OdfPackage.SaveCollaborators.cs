@@ -56,6 +56,9 @@ public sealed partial class OdfPackage
 
         internal void WriteToArchive(Stream target) => OdfPackageArchiveWriter.WriteToArchive(this, target);
 
+        internal Task WriteToArchiveAsync(Stream target, CancellationToken cancellationToken = default) =>
+            OdfPackageArchiveWriter.WriteToArchiveAsync(this, target, cancellationToken);
+
         internal long EstimateArchiveSize()
         {
             long estimated = 0;

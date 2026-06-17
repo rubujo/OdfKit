@@ -3,6 +3,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using OdfKit.DOM;
@@ -56,6 +58,74 @@ internal static class OdfPackageArchiveWriter
             using (Stream src = kvp.Value.OpenReader())
                 src.CopyTo(entryStream);
         }
+    }
+
+    /// <summary>
+    /// 將封裝項目非同步寫入目標串流（ZIP 或 Flat XML），支援協作式取消。
+    /// </summary>
+    internal static async Task WriteToArchiveAsync(
+        OdfPackage.OdfPackageSaveCollaborators ctx,
+        Stream targetStream,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (ctx.IsFlatXml)
+        {
+            await WriteFlatXmlToStreamAsync(ctx, targetStream, cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        using var zip = new ZipArchive(targetStream, ZipArchiveMode.Create, true, Encoding.UTF8);
+
+        if (ctx.Entries.TryGetValue("mimetype", out OdfPackageEntry? mimeEntry))
+        {
+            ZipArchiveEntry zipEntry = zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
+
+            if (ctx.SaveOptions.Deterministic)
+                zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+            using (Stream entryStream = zipEntry.Open())
+            using (Stream src = mimeEntry.OpenReader())
+                await CopyEntryContentAsync(src, entryStream, cancellationToken).ConfigureAwait(false);
+        }
+
+        foreach (KeyValuePair<string, OdfPackageEntry> kvp in ctx.Entries)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (kvp.Key == "mimetype")
+                continue;
+
+            CompressionLevel compLevel = kvp.Value.IsCompressed
+                ? ctx.SaveOptions.CompressionLevel
+                : CompressionLevel.NoCompression;
+            ZipArchiveEntry zipEntry = zip.CreateEntry(kvp.Key, compLevel);
+
+            if (ctx.SaveOptions.Deterministic)
+                zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+            using (Stream entryStream = zipEntry.Open())
+            using (Stream src = kvp.Value.OpenReader())
+                await CopyEntryContentAsync(src, entryStream, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private static Task CopyEntryContentAsync(Stream source, Stream destination, CancellationToken cancellationToken)
+    {
+        return source.CopyToAsync(destination, 81920, cancellationToken);
+    }
+
+    private static async Task WriteFlatXmlToStreamAsync(
+        OdfPackage.OdfPackageSaveCollaborators ctx,
+        Stream targetStream,
+        CancellationToken cancellationToken = default)
+    {
+        using var buffer = new MemoryStream();
+        WriteFlatXmlToStream(ctx, buffer);
+        cancellationToken.ThrowIfCancellationRequested();
+        buffer.Position = 0;
+        await buffer.CopyToAsync(targetStream, 81920, cancellationToken).ConfigureAwait(false);
     }
 
     private static void WriteFlatXmlToStream(OdfPackage.OdfPackageSaveCollaborators ctx, Stream targetStream)

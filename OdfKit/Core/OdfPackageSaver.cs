@@ -40,7 +40,7 @@ internal static class OdfPackageSaver
     internal static async Task SaveToUnderlyingStreamAsync(
         OdfPackage package,
         bool includeRdfMetadata,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
         await RunEncryptedPipelineAsync(package, async () =>
@@ -53,7 +53,7 @@ internal static class OdfPackageSaver
             Stream temp = CreateTempStream(ctx, ctx.EstimateArchiveSize(), async: true);
             try
             {
-                await Task.Run(() => ctx.WriteToArchive(temp), cancellationToken).ConfigureAwait(false);
+                await ctx.WriteToArchiveAsync(temp, cancellationToken).ConfigureAwait(false);
                 underlying.SetLength(0);
                 temp.Position = 0;
                 await temp.CopyToAsync(underlying, 81920, cancellationToken).ConfigureAwait(false);
@@ -92,7 +92,7 @@ internal static class OdfPackageSaver
         OdfPackage package,
         Stream destination,
         bool includeRdfMetadata,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         if (destination is null)
             throw new ArgumentNullException(nameof(destination));
@@ -101,7 +101,7 @@ internal static class OdfPackageSaver
         await RunEncryptedPipelineAsync(package, async () =>
         {
             PrepareMetadata(ctx, includeRdfMetadata);
-            await Task.Run(() => ctx.WriteToArchive(destination), cancellationToken).ConfigureAwait(false);
+            await ctx.WriteToArchiveAsync(destination, cancellationToken).ConfigureAwait(false);
         }).ConfigureAwait(false);
     }
 
