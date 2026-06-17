@@ -51,4 +51,10 @@ public partial class OdfDrawPage
     /// </summary>
     public IReadOnlyList<OdfDrawPictureInfo> GetPictures() =>
         OdfDrawPageShapeReadEngine.GetPictures(this);
+
+    /// <summary>
+    /// 取得此繪圖頁面上所有圖形圖層指派的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfDrawShapeLayerInfo> GetShapeLayerAssignments() =>
+        OdfDrawPageShapeReadEngine.GetShapeLayerAssignments(this);
 }

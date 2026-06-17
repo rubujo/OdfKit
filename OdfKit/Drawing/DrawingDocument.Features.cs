@@ -52,4 +52,10 @@ public partial class DrawingDocument
     /// </summary>
     public IReadOnlyList<OdfDrawPictureInfo> GetPictures() =>
         GetPagesSnapshot().SelectMany(p => p.GetPictures()).ToList().AsReadOnly();
+
+    /// <summary>
+    /// 取得文件中所有繪圖頁面的圖形圖層指派摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfDrawShapeLayerInfo> GetShapeLayerAssignments() =>
+        GetPagesSnapshot().SelectMany(p => p.GetShapeLayerAssignments()).ToList().AsReadOnly();
 }

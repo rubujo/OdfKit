@@ -248,6 +248,28 @@ public class PresentationHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="PresentationDocument.GetSlideTransitions"/> 可讀回各投影片切換效果。
+    /// </summary>
+    [Fact]
+    public void GetSlideTransitions_RoundTripsAfterSet()
+    {
+        using var document = PresentationDocument.Create();
+        document.AddSlide();
+        document.AddSlide();
+        document.SetSlideTransition(0, OdfSlideTransition.Push);
+        document.SetSlideTransition(1, OdfSlideTransition.Wipe);
+
+        Assert.Equal(2, document.GetSlideTransitions().Count);
+        OdfSlideTransitionInfo first = document.GetSlideTransitions()[0];
+        Assert.Equal(0, first.SlideIndex);
+        Assert.Equal(OdfSlideTransition.Push, first.Transition);
+
+        OdfSlideTransitionInfo second = document.GetSlideTransitions()[1];
+        Assert.Equal(1, second.SlideIndex);
+        Assert.Equal(OdfSlideTransition.Wipe, second.Transition);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="PresentationDocument.GetLayouts"/> 可讀回各投影片版面配置。
     /// </summary>
     [Fact]

@@ -43,6 +43,92 @@ internal static class OdfTableSheetViewEngine
         return new OdfFrozenPanes(frozenRows, frozenColumns);
     }
 
+    internal static OdfSplitPanes GetSplitPanes(OdfTableSheetMutationContext context)
+    {
+        OdfNode? sheetEntry = FindSheetViewConfigEntry(context.Document.SettingsDom, context.SheetName);
+        if (sheetEntry is null)
+            return new OdfSplitPanes(0, 0);
+
+        int splitRows = ReadSplitAxis(sheetEntry, "HorizontalSplitMode", "HorizontalSplitPosition");
+        int splitColumns = ReadSplitAxis(sheetEntry, "VerticalSplitMode", "VerticalSplitPosition");
+        return new OdfSplitPanes(splitRows, splitColumns);
+    }
+
+    private static int ReadSplitAxis(OdfNode sheetEntry, string modeName, string positionName)
+    {
+        string? mode = ReadConfigItemValue(sheetEntry, modeName);
+        if (mode != "1")
+            return 0;
+
+        return OdfTableSheetDomHelper.ParseNonNegativeInt(ReadConfigItemValue(sheetEntry, positionName));
+    }
+
+    private static OdfNode? FindSheetViewConfigEntry(OdfNode settingsDom, string sheetName)
+    {
+        OdfNode? viewSettings = OdfDocumentSettingsEngine.FindSettingsNode(settingsDom, "view-settings");
+        if (viewSettings is null)
+            return null;
+
+        OdfNode? viewsMap = FindNamedConfigChild(viewSettings, "config-item-map-indexed", "Views");
+        if (viewsMap is null)
+            return null;
+
+        OdfNode? viewEntry = FindFirstConfigChild(viewsMap, "config-item-map-entry");
+        if (viewEntry is null)
+            return null;
+
+        OdfNode? tablesMap = FindNamedConfigChild(viewEntry, "config-item-map-named", "Tables");
+        if (tablesMap is null)
+            return null;
+
+        return FindNamedConfigChild(tablesMap, "config-item-map-entry", sheetName);
+    }
+
+    private static OdfNode? FindNamedConfigChild(OdfNode parent, string localName, string name)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.LocalName != localName ||
+                child.NamespaceUri != OdfNamespaces.Config)
+                continue;
+
+            if (child.GetAttribute("name", OdfNamespaces.Config) == name)
+                return child;
+        }
+
+        return null;
+    }
+
+    private static OdfNode? FindFirstConfigChild(OdfNode parent, string localName)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == OdfNamespaces.Config)
+                return child;
+        }
+
+        return null;
+    }
+
+    private static string? ReadConfigItemValue(OdfNode entry, string name)
+    {
+        foreach (OdfNode child in entry.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.LocalName != "config-item" ||
+                child.NamespaceUri != OdfNamespaces.Config)
+                continue;
+
+            if (child.GetAttribute("name", OdfNamespaces.Config) == name)
+                return child.TextContent;
+        }
+
+        return null;
+    }
+
     internal static void AddValidationList(
         OdfTableSheetMutationContext context,
         OdfCellRange range,

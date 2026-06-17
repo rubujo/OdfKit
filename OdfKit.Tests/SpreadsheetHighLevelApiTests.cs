@@ -305,6 +305,22 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetSplitPanes"/> 可讀回各工作表分割窗格設定。
+    /// </summary>
+    [Fact]
+    public void GetSplitPanes_RoundTripsAfterSplit()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Report");
+        sheet.SplitPanes(3, 2);
+
+        Assert.Single(document.GetSplitPanes());
+        OdfSheetSplitPanesInfo info = document.GetSplitPanes()[0];
+        Assert.Equal("Report", info.SheetName);
+        Assert.Equal(new OdfSplitPanes(3, 2), info.SplitPanes);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="SpreadsheetDocument.GetFrozenPanes"/> 可讀回各工作表凍結窗格設定。
     /// </summary>
     [Fact]

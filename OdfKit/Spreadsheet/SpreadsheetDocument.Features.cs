@@ -74,6 +74,12 @@ public partial class SpreadsheetDocument
         SpreadsheetDocumentFrozenPanesReadEngine.GetFrozenPanes(this);
 
     /// <summary>
+    /// 取得試算表中所有已設定分割窗格的工作表摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfSheetSplitPanesInfo> GetSplitPanes() =>
+        SpreadsheetDocumentSplitPanesReadEngine.GetSplitPanes(this);
+
+    /// <summary>
     /// 新增命名範圍。
     /// </summary>
     /// <param name="name">命名範圍的名稱</param>

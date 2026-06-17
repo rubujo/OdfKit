@@ -319,6 +319,29 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="TextDocument.GetIndexInfos"/> 與 <see cref="TextDocument.GetIndexMarks"/> 可讀回索引與標記。
+    /// </summary>
+    [Fact]
+    public void GetIndexInfosAndMarks_RoundTripsAfterAdd()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("索引條目");
+        document.AddAlphabeticalIndexMark(paragraph, "關鍵字", "K", "1");
+        document.AddAlphabeticalIndex("術語索引");
+        document.AddTableOfContents("文件目錄", 2);
+
+        Assert.Equal(2, document.GetIndexInfos().Count);
+        Assert.Contains(document.GetIndexInfos(), i => i.Kind == OdfIndexKind.AlphabeticalIndex && i.Name == "術語索引");
+        Assert.Contains(document.GetIndexInfos(), i => i.Kind == OdfIndexKind.TableOfContents);
+
+        OdfDocumentIndexMarkInfo mark = Assert.Single(document.GetIndexMarks());
+        Assert.Equal(OdfIndexMarkKind.Alphabetical, mark.Kind);
+        Assert.Equal("關鍵字", mark.Term);
+        Assert.Equal("K", mark.Key1);
+        Assert.Equal("1", mark.Key2);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="TextDocument.GetPageSetups"/> 可讀回頁首頁尾設定。
     /// </summary>
     [Fact]

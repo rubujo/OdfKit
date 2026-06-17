@@ -30,6 +30,9 @@ internal static class OdfDrawPageShapeReadEngine
     internal static IReadOnlyList<OdfDrawPictureInfo> GetPictures(OdfDrawPage page) =>
         CollectPictures(page.Node, page.Name);
 
+    internal static IReadOnlyList<OdfDrawShapeLayerInfo> GetShapeLayerAssignments(OdfDrawPage page) =>
+        CollectShapeLayerAssignments(page.Node, page.Name);
+
     private static List<OdfPathInfo> CollectPaths(OdfNode parent, string pageName)
     {
         List<OdfPathInfo> paths = [];
@@ -198,6 +201,25 @@ internal static class OdfDrawPageShapeReadEngine
         });
 
         return pictures;
+    }
+
+    private static List<OdfDrawShapeLayerInfo> CollectShapeLayerAssignments(OdfNode parent, string pageName)
+    {
+        List<OdfDrawShapeLayerInfo> assignments = [];
+        WalkDrawingNodes(parent, node =>
+        {
+            string? layerName = node.GetAttribute("layer", OdfNamespaces.Draw);
+            if (string.IsNullOrEmpty(layerName))
+                return;
+
+            assignments.Add(new OdfDrawShapeLayerInfo(
+                pageName,
+                node.GetAttribute("id", OdfNamespaces.Draw) ?? string.Empty,
+                node.LocalName ?? string.Empty,
+                layerName!));
+        });
+
+        return assignments;
     }
 
     private static string? FindImageHref(OdfNode container)

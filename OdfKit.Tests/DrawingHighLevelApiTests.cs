@@ -270,6 +270,32 @@ public class DrawingHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfDrawPage.GetShapeLayerAssignments"/> 可讀回圖形圖層指派。
+    /// </summary>
+    [Fact]
+    public void GetShapeLayerAssignments_RoundTripsAfterAssign()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("圖層頁");
+        OdfShape shape = page.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("3cm"),
+            OdfLength.Parse("4cm"));
+        shape.Node.SetAttribute("layer", OdfNamespaces.Draw, "背景", "draw");
+
+        IReadOnlyList<OdfDrawShapeLayerInfo> assignments = page.GetShapeLayerAssignments();
+        Assert.Single(assignments);
+        OdfDrawShapeLayerInfo info = assignments[0];
+        Assert.Equal("圖層頁", info.PageName);
+        Assert.Equal("背景", info.LayerName);
+        Assert.Equal("rect", info.ShapeType);
+
+        Assert.Single(document.GetShapeLayerAssignments());
+    }
+
+    /// <summary>
     /// 驗證 <see cref="OdfDrawPage.GetTextBoxes"/> 可讀回已建立的文字方塊。
     /// </summary>
     [Fact]

@@ -31,6 +31,12 @@ public partial class OdfTableSheet
         OdfTableSheetViewEngine.GetFrozenPanes(MutationContext);
 
     /// <summary>
+    /// 取得目前工作表的分割窗格設定（非凍結模式）。
+    /// </summary>
+    public OdfSplitPanes ViewSplitPanes =>
+        OdfTableSheetViewEngine.GetSplitPanes(MutationContext);
+
+    /// <summary>
     /// 新增清單型資料驗證，並套用到指定範圍。
     /// </summary>
     /// <param name="range">要套用的儲存格範圍。</param>

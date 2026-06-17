@@ -49,6 +49,18 @@ public partial class TextDocument
         TextDocumentNotesEngine.GetIndexes(this, BodyTextRoot);
 
     /// <summary>
+    /// 取得文件中所有索引的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfIndexInfo> GetIndexInfos() =>
+        TextDocumentIndexReadEngine.GetIndexInfos(BodyTextRoot);
+
+    /// <summary>
+    /// 取得文件中所有索引標記的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfDocumentIndexMarkInfo> GetIndexMarks() =>
+        TextDocumentIndexReadEngine.GetIndexMarks(BodyTextRoot);
+
+    /// <summary>
     /// 在指定的段落中新增字母索引標記。
     /// </summary>
     /// <param name="paragraph">要新增標記的段落執行個體</param>

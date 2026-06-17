@@ -271,6 +271,12 @@ public partial class PresentationDocument
     public IReadOnlyList<OdfSlideLayoutInfo> GetLayouts() =>
         PresentationDocumentLayoutReadEngine.GetLayouts(this);
 
+    /// <summary>
+    /// 取得簡報中所有已設定切換效果的投影片摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfSlideTransitionInfo> GetSlideTransitions() =>
+        PresentationDocumentTransitionReadEngine.GetSlideTransitions(this);
+
     #endregion
 
 }
