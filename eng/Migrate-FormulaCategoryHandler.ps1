@@ -68,7 +68,7 @@ $usingLinq = if ($needsLinq) { "using System.Linq;`r`n" } else { '' }
 $content = @"
 ﻿using System;
 using System.Collections.Generic;
-$usingLinq using OdfKit.Core;
+$usingLinq`r`nusing OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Formula.AST;
 
