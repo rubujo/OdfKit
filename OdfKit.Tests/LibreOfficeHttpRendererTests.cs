@@ -76,7 +76,7 @@ public class LibreOfficeHttpRendererTests
 
         output.Position = 0;
         using var reader = new StreamReader(output);
-        string result = await reader.ReadToEndAsync();
+        string result = await reader.ReadToEndAsync(TestContext.Current.CancellationToken);
         Assert.Equal("MOCK PDF CONTENT", result);
     }
 
@@ -106,7 +106,7 @@ public class LibreOfficeHttpRendererTests
         var t4 = renderer.ConvertAsync(doc, Stream.Null, "pdf", TestContext.Current.CancellationToken);
 
         // 給一些時間讓執行緒進入 Wait
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // 雖然有 4 個任務在執行，但由於限流，最多只能有 2 個能同時在 backend 中執行
         Assert.True(mockBackend.MaxConcurrentCallsObserved <= 2,
@@ -138,7 +138,7 @@ public class LibreOfficeHttpRendererTests
         var runTask = renderer.ConvertAsync(doc, Stream.Null, "pdf", cts.Token);
 
         // 延遲一段時間後執行取消
-        await Task.Delay(50);
+        await Task.Delay(50, TestContext.Current.CancellationToken);
         cts.Cancel();
 
         // 驗證應拋出 TaskCanceledException 或 OperationCanceledException 異常

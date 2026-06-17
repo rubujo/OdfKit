@@ -131,7 +131,8 @@ public class OdfSecurityBoundaryTests
     {
         using OdfDocument document = OdfDocument.Create(OdfDocumentKind.Text);
 
-        OdfSignatureValidationResult result = await document.VerifySignaturesAsync();
+        OdfSignatureValidationResult result = await document.VerifySignaturesAsync(
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.False(result.IsValid);
         Assert.Empty(result.Signatures);
