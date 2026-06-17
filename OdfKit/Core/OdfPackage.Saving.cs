@@ -79,7 +79,7 @@ public sealed partial class OdfPackage
         OdfSaveOptions previousOptions = UseSaveOptions(options);
         try
         {
-            OdfPackageSaver.SaveToStream(this, destinationStream, includeRdfMetadata: false);
+            OdfPackageSaver.SaveToStream(this, destinationStream, includeRdfMetadata: true);
         }
         finally
         {
@@ -117,7 +117,7 @@ public sealed partial class OdfPackage
         OdfSaveOptions previousOptions = UseSaveOptions(options);
         try
         {
-            await OdfPackageSaver.SaveToStreamAsync(this, destinationStream, includeRdfMetadata: false, cancellationToken)
+            await OdfPackageSaver.SaveToStreamAsync(this, destinationStream, includeRdfMetadata: true, cancellationToken)
                 .ConfigureAwait(false);
         }
         finally

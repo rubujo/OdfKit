@@ -40,7 +40,7 @@
 | VAR-1 | ✅ | `*TemplateDocument`、`TextMasterDocument`、`Flat*Document`、factory 分派、`DocumentKindApiUsabilityTests` |
 | DEPTH-1/2 | 基礎 ✅ | DEPTH-1 四主格式讀取 API 已齊；DEPTH-2 已補 ODC/ODB/ODF/ODI 讀取與表單／框架 API |
 | DEPTH-1-TC | 基礎 ✅ | ODT/ODS `tracked-changes` 內容／表格／結構／移動；LO 互通測試已備 |
-| RDF-1 | 待辦 | 核心 `manifest.rdf` / `pkg:` ontology parity（不依賴外部 RDF 引擎） |
+| RDF-1 | 基礎 ✅ | 核心 `manifest.rdf` / `pkg:` ontology parity；文件層往返與 corpus fixture |
 | RDF-2 | 選用 | `OdfKit.Extensions.Rdf` + `dotNetRdf.Core` SPARQL 橋接 |
 | DX-1 | 待辦 | Presentation/Drawing Builder、`OdfFormulaBuilder`、cookbook |
 | LOEXT-1 | 低優先 | `loext:decorative` 讀取映射、`OdfNamespaces.LoExt`、manifest `xmlns:loext` 對照 LO 26.x |
@@ -74,7 +74,7 @@
 
 | 能力 | 位置 | 說明 |
 |------|------|------|
-| `manifest.rdf` triple CRUD | 核心 `OdfKit` | 已實作；RDF-1 深化 `pkg:` 語意與 corpus 對照 |
+| `manifest.rdf` triple CRUD | 核心 `OdfKit` | 基礎 ✅；`pkg:hasPart`／`pkg:mimeType` 同步、文件層往返、`repo-generated-manifest-rdf-text` corpus |
 | SPARQL 查詢 | `OdfKit.Extensions.Rdf` | RDF-2；`OdfRdfMetadata` 橋接 dotNetRDF `IGraph` |
 | ODT change tracking | `TextDocument` API | 已有基礎；DEPTH-1-TC 補測試與表格／互通 |
 | JSON Collaboration ops | 不納入 Wave 2–3 | 見 udx-non-goals §4；Wave 4 選用 `Extensions.Collaboration` |

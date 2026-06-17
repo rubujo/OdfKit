@@ -2,7 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.Text;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -193,6 +195,59 @@ public class RdfMetadataTests
         Assert.Equal("text/xml", stylesMime);
     }
 
+    /// <summary>
+    /// 驗證 <see cref="TextDocument"/> 儲存／載入會保留自訂 RDF triple 並同步標準 <c>pkg:</c> ontology。
+    /// </summary>
+    [Fact]
+    public void TextDocument_SaveLoad_PreservesCustomRdfTriplesAndPkgOntology()
+    {
+        const string title = "文件層 RDF 標題";
+        const string dublinCoreTitle = OdfNamespaces.Dc + "title";
+
+        using var stream = new MemoryStream();
+        using (TextDocument document = TextDocument.Create())
+        {
+            document.Package.RdfMetadata.AddTriple(string.Empty, dublinCoreTitle, title);
+            document.Package.RdfMetadata.LinkDocumentPart(string.Empty, "content.xml");
+            document.SaveToStream(stream);
+        }
+
+        stream.Position = 0;
+        using TextDocument loaded = TextDocument.Load(stream);
+
+        Assert.True(loaded.Package.HasEntry("META-INF/manifest.rdf"));
+        Assert.True(loaded.Package.RdfMetadata.TryGetLiteral(string.Empty, dublinCoreTitle, out string loadedTitle));
+        Assert.Equal(title, loadedTitle);
+        Assert.Contains("content.xml", loaded.Package.RdfMetadata.GetLinkedPartPaths(string.Empty));
+        Assert.True(
+            loaded.Package.RdfMetadata.TryGetLiteral("content.xml", OdfPkgRdfPredicates.MimeType, out string mimeType));
+        Assert.Equal("text/xml", mimeType);
+    }
+
+    /// <summary>
+    /// 驗證 corpus 內含 <c>manifest.rdf</c> 的 ODT fixture 可載入並通過驗證。
+    /// </summary>
+    [Fact]
+    public void CorpusFixture_ManifestRdfText_LoadsAndValidates()
+    {
+        string fixturePath = Path.Combine(FindRepositoryRoot(), "tests", "fixtures", "corpus", "generated", "manifest-rdf-text.odt");
+        Assert.True(File.Exists(fixturePath), $"缺少 corpus fixture：{fixturePath}");
+
+        using TextDocument document = TextDocument.Load(fixturePath);
+
+        Assert.True(document.Package.HasEntry("META-INF/manifest.rdf"));
+        Assert.True(
+            document.Package.RdfMetadata.TryGetLiteral(
+                string.Empty,
+                OdfNamespaces.Dc + "title",
+                out string title));
+        Assert.Equal("RDF Corpus Fixture", title);
+        Assert.Contains("content.xml", document.Package.RdfMetadata.GetLinkedPartPaths(string.Empty));
+
+        OdfValidationReport report = OdfValidator.Validate(document.Package, options: null);
+        Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues.Select(issue => issue.Message)));
+    }
+
     [Fact]
     public void RdfMetadata_Load_RejectsDtd()
     {
@@ -216,5 +271,19 @@ public class RdfMetadataTests
         stream.Position = 0;
 
         Assert.Throws<InvalidDataException>(() => OdfPackage.Open(stream, leaveOpen: true));
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        DirectoryInfo? current = new(AppContext.BaseDirectory);
+        while (current is not null)
+        {
+            if (File.Exists(Path.Combine(current.FullName, "OdfKit.slnx")))
+                return current.FullName;
+
+            current = current.Parent;
+        }
+
+        throw new InvalidOperationException("找不到 repository root。");
     }
 }

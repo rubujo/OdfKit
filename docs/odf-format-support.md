@@ -27,17 +27,17 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 
 | Extension | MIME type | `OdfDocumentKind` | Detect | Create | Load | Save | Validate | Round-trip | High-level API | Test evidence |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | usable | `TextApiUsabilityTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | usable | `TextApiUsabilityTests`, `FourFormatApiScenarioTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.fodt` | `application/vnd.oasis.opendocument.text` | `FlatText` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests` |
-| `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | complete | complete | complete | complete | validated | complete | usable | `SpreadsheetApiUsabilityTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests`, `InteropCorpusTests` |
+| `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | complete | complete | complete | complete | validated | complete | usable | `SpreadsheetApiUsabilityTests`, `FourFormatApiScenarioTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests`, `InteropCorpusTests` |
 | `.ots` | `application/vnd.oasis.opendocument.spreadsheet-template` | `SpreadsheetTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.fods` | `application/vnd.oasis.opendocument.spreadsheet` | `FlatSpreadsheet` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests` |
-| `.odp` | `application/vnd.oasis.opendocument.presentation` | `Presentation` | complete | complete | complete | complete | validated | complete | usable | `PresentationApiUsabilityTests`, `PresentationAndRenderingTests`, `PresentationBoundaryTests`, `InteropCorpusTests` |
+| `.odp` | `application/vnd.oasis.opendocument.presentation` | `Presentation` | complete | complete | complete | complete | validated | complete | usable | `PresentationApiUsabilityTests`, `FourFormatApiScenarioTests`, `PresentationAndRenderingTests`, `PresentationBoundaryTests`, `InteropCorpusTests` |
 | `.otp` | `application/vnd.oasis.opendocument.presentation-template` | `PresentationTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.fodp` | `application/vnd.oasis.opendocument.presentation` | `FlatPresentation` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests` |
-| `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | complete | complete | complete | complete | validated | complete | usable | `DrawingApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | complete | complete | complete | complete | validated | complete | usable | `DrawingApiUsabilityTests`, `FourFormatApiScenarioTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.otg` | `application/vnd.oasis.opendocument.graphics-template` | `GraphicsTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests` |
 | `.fodg` | `application/vnd.oasis.opendocument.graphics` | `FlatGraphics` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests` |
 | `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | complete | complete | complete | complete | validated | complete | usable | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
@@ -52,7 +52,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 
 - 統一的 `OdfDocument.Load` / `OdfDocument.Create` 與
   `OdfDocumentFactory.LoadDocument` / `CreateDocument` 高階入口已建立。
-- ODT、ODS、ODP、ODG 標為 `usable`：已有常用高階 API，但尚非完整辦公套件物件模型（Wave 2 `complete` 目標）。
+- ODT、ODS、ODP、ODG 標為 `usable`：已有常用高階 API 與 `FourFormatApiScenarioTests` 場景背書，但尚非完整辦公套件物件模型（Wave 2 `complete` 目標）。
 - `.ott`、`.ots`、`.otp`、`.otg`、`.odm` 與 Flat 變體標為 `usable-variant`（VAR-1 ✅）：
   具專屬 typed 文件類別與 `Create`/`Load` 入口；語意 API 繼承四主格式基底類別。
 - ODT `text:tracked-changes` 已支援段落與表格儲存格插入／格式變更記錄；LO 互通測試已備（`TrackedChangesInteropTests`）。
@@ -63,6 +63,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；calcext 讀取 API 為選用 CALCEXT-1。
 - `.odc`、`.odf`、`.odi`、`.odb` 標為 `usable`：已有摘要與常用編輯 API；
   完整語意模型仍屬 Wave 2 DEPTH-2。
+- RDF-1 基礎 ✅：`manifest.rdf` 文件層往返、`pkg:` ontology 同步；corpus 含 `repo-generated-manifest-rdf-text`（`RdfMetadataTests`）。
 - repo 內 corpus 已擴充至 200+ fixtures（`tools/OdfCorpusGenerator` + 手工負向／版本特例）；
   外部 ODF Validator baseline corpus 仍可依 `ODFKIT_PARITY_CORPUS_ROOT` 選用擴充。
 - Typed DOM 已新增 `office:text`、`table:table`、`draw:page` content model facade（Wave 1 M-3）；
