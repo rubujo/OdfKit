@@ -45,7 +45,7 @@ public partial class OdfElement
     public OdfLineMode? GetLineModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseLineMode(value, out OdfLineMode lineMode) ? lineMode : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfLineMode>(value, OdfElementSchemaRegistry.TryParseLineMode);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public partial class OdfElement
     public OdfFontStyle? GetFontStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseFontStyle(value, out OdfFontStyle fontStyle) ? fontStyle : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfFontStyle>(value, OdfElementSchemaRegistry.TryParseFontStyle);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public partial class OdfElement
     public OdfFontVariant? GetFontVariantAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseFontVariant(value, out OdfFontVariant fontVariant) ? fontVariant : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfFontVariant>(value, OdfElementSchemaRegistry.TryParseFontVariant);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public partial class OdfElement
     public OdfFontWeight? GetFontWeightAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseFontWeight(value, out OdfFontWeight fontWeight) ? fontWeight : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfFontWeight>(value, OdfElementSchemaRegistry.TryParseFontWeight);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public partial class OdfElement
     public OdfFontFamilyGeneric? GetFontFamilyGenericAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseFontFamilyGeneric(value, out OdfFontFamilyGeneric family) ? family : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfFontFamilyGeneric>(value, OdfElementSchemaRegistry.TryParseFontFamilyGeneric);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public partial class OdfElement
     public OdfFontPitch? GetFontPitchAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseFontPitch(value, out OdfFontPitch pitch) ? pitch : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfFontPitch>(value, OdfElementSchemaRegistry.TryParseFontPitch);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public partial class OdfElement
     public OdfFontRelief? GetFontReliefAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseFontRelief(value, out OdfFontRelief relief) ? relief : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfFontRelief>(value, OdfElementSchemaRegistry.TryParseFontRelief);
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public partial class OdfElement
     public OdfFontStretch? GetFontStretchAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseFontStretch(value, out OdfFontStretch stretch) ? stretch : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfFontStretch>(value, OdfElementSchemaRegistry.TryParseFontStretch);
     }
 
     /// <summary>

@@ -46,7 +46,7 @@ public partial class OdfElement
     public OdfXLinkType? GetXLinkTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseXLinkType(value, out OdfXLinkType type) ? type : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfXLinkType>(value, OdfElementSchemaRegistry.TryParseXLinkType);
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public partial class OdfElement
     public OdfXLinkShow? GetXLinkShowAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseXLinkShow(value, out OdfXLinkShow show) ? show : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfXLinkShow>(value, OdfElementSchemaRegistry.TryParseXLinkShow);
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public partial class OdfElement
     public OdfXLinkActuate? GetXLinkActuateAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseXLinkActuate(value, out OdfXLinkActuate actuate) ? actuate : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfXLinkActuate>(value, OdfElementSchemaRegistry.TryParseXLinkActuate);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public partial class OdfElement
     public OdfNumberStyle? GetNumberStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseNumberStyle(value, out OdfNumberStyle style) ? style : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfNumberStyle>(value, OdfElementSchemaRegistry.TryParseNumberStyle);
     }
 
     /// <summary>
@@ -150,7 +150,7 @@ public partial class OdfElement
     public OdfTableOrder? GetTableOrderAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTableOrder(value, out OdfTableOrder order) ? order : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTableOrder>(value, OdfElementSchemaRegistry.TryParseTableOrder);
     }
 
     /// <summary>
@@ -176,7 +176,7 @@ public partial class OdfElement
     public OdfTableType? GetTableTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTableType(value, out OdfTableType type) ? type : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTableType>(value, OdfElementSchemaRegistry.TryParseTableType);
     }
 
     /// <summary>
@@ -202,7 +202,7 @@ public partial class OdfElement
     public OdfPresentationEffect? GetPresentationEffectAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParsePresentationEffect(value, out OdfPresentationEffect effect) ? effect : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfPresentationEffect>(value, OdfElementSchemaRegistry.TryParsePresentationEffect);
     }
 
     /// <summary>
@@ -228,7 +228,7 @@ public partial class OdfElement
     public OdfPresentationSpeed? GetPresentationSpeedAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParsePresentationSpeed(value, out OdfPresentationSpeed speed) ? speed : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfPresentationSpeed>(value, OdfElementSchemaRegistry.TryParsePresentationSpeed);
     }
 
     /// <summary>
@@ -254,7 +254,7 @@ public partial class OdfElement
     public OdfPresentationAction? GetPresentationActionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParsePresentationAction(value, out OdfPresentationAction action) ? action : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfPresentationAction>(value, OdfElementSchemaRegistry.TryParsePresentationAction);
     }
 
     /// <summary>
@@ -280,7 +280,7 @@ public partial class OdfElement
     public OdfPresentationTransitionType? GetPresentationTransitionTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParsePresentationTransitionType(value, out OdfPresentationTransitionType transitionType) ? transitionType : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfPresentationTransitionType>(value, OdfElementSchemaRegistry.TryParsePresentationTransitionType);
     }
 
     /// <summary>
@@ -306,7 +306,7 @@ public partial class OdfElement
     public OdfPresentationTransitionStyle? GetPresentationTransitionStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParsePresentationTransitionStyle(value, out OdfPresentationTransitionStyle transitionStyle) ? transitionStyle : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfPresentationTransitionStyle>(value, OdfElementSchemaRegistry.TryParsePresentationTransitionStyle);
     }
 
     /// <summary>

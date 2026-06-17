@@ -18,7 +18,7 @@ public partial class OdfElement
     public OdfTextLabelFollowedBy? GetTextLabelFollowedByAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextLabelFollowedBy(value, out OdfTextLabelFollowedBy labelFollowedBy) ? labelFollowedBy : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextLabelFollowedBy>(value, OdfElementSchemaRegistry.TryParseTextLabelFollowedBy);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public partial class OdfElement
     public OdfTextListLevelPositionMode? GetTextListLevelPositionModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextListLevelPositionMode(value, out OdfTextListLevelPositionMode mode) ? mode : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextListLevelPositionMode>(value, OdfElementSchemaRegistry.TryParseTextListLevelPositionMode);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public partial class OdfElement
     public OdfTextIndexScope? GetTextIndexScopeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextIndexScope(value, out OdfTextIndexScope scope) ? scope : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextIndexScope>(value, OdfElementSchemaRegistry.TryParseTextIndexScope);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public partial class OdfElement
     public OdfTextTableType? GetTextTableTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextTableType(value, out OdfTextTableType tableType) ? tableType : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextTableType>(value, OdfElementSchemaRegistry.TryParseTextTableType);
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public partial class OdfElement
     public OdfTextAnchorType? GetTextAnchorTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextAnchorType(value, out OdfTextAnchorType anchorType) ? anchorType : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextAnchorType>(value, OdfElementSchemaRegistry.TryParseTextAnchorType);
     }
 
     /// <summary>
@@ -148,7 +148,7 @@ public partial class OdfElement
     public OdfTextNoteClass? GetTextNoteClassAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextNoteClass(value, out OdfTextNoteClass noteClass) ? noteClass : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextNoteClass>(value, OdfElementSchemaRegistry.TryParseTextNoteClass);
     }
 
     /// <summary>
@@ -174,7 +174,7 @@ public partial class OdfElement
     public OdfTextSelectPage? GetTextSelectPageAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextSelectPage(value, out OdfTextSelectPage selectPage) ? selectPage : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextSelectPage>(value, OdfElementSchemaRegistry.TryParseTextSelectPage);
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public partial class OdfElement
     public OdfTextReferenceFormat? GetTextReferenceFormatAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextReferenceFormat(value, out OdfTextReferenceFormat format) ? format : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextReferenceFormat>(value, OdfElementSchemaRegistry.TryParseTextReferenceFormat);
     }
 
     /// <summary>
@@ -226,7 +226,7 @@ public partial class OdfElement
     public OdfTextStartNumberingAt? GetTextStartNumberingAtAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextStartNumberingAt(value, out OdfTextStartNumberingAt startNumberingAt) ? startNumberingAt : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextStartNumberingAt>(value, OdfElementSchemaRegistry.TryParseTextStartNumberingAt);
     }
 
     /// <summary>
@@ -252,7 +252,7 @@ public partial class OdfElement
     public OdfTextFootnotesPosition? GetTextFootnotesPositionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextFootnotesPosition(value, out OdfTextFootnotesPosition position) ? position : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextFootnotesPosition>(value, OdfElementSchemaRegistry.TryParseTextFootnotesPosition);
     }
 
     /// <summary>

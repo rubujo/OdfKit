@@ -19,7 +19,7 @@ public partial class OdfElement
     public OdfStyleHorizontalRel? GetStyleHorizontalRelAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleHorizontalRel rel) ? rel : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleHorizontalRel>(value);
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public partial class OdfElement
     public OdfStyleWritingMode? GetStyleWritingModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleWritingMode writingMode) ? writingMode : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleWritingMode>(value);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public partial class OdfElement
     public OdfStyleWrap? GetStyleWrapAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleWrap wrap) ? wrap : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleWrap>(value);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public partial class OdfElement
     public OdfStyleRunThrough? GetStyleRunThroughAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleRunThrough runThrough) ? runThrough : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleRunThrough>(value);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public partial class OdfElement
     public OdfStyleWrapContourMode? GetStyleWrapContourModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleWrapContourMode mode) ? mode : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleWrapContourMode>(value);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public partial class OdfElement
     public OdfTableDisplayMemberMode? GetTableDisplayMemberModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableDisplayMemberMode mode) ? mode : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableDisplayMemberMode>(value);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public partial class OdfElement
     public OdfTableLayoutMode? GetTableLayoutModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableLayoutMode mode) ? mode : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableLayoutMode>(value);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public partial class OdfElement
     public OdfDatabaseRule? GetDatabaseRuleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDatabaseRule rule) ? rule : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfDatabaseRule>(value);
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public partial class OdfElement
     public OdfPresentationPresetClass? GetPresentationPresetClassAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfPresentationPresetClass presetClass) ? presetClass : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfPresentationPresetClass>(value);
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public partial class OdfElement
     public OdfNumberTransliterationStyle? GetNumberTransliterationStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfNumberTransliterationStyle transliterationStyle) ? transliterationStyle : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfNumberTransliterationStyle>(value);
     }
 
     /// <summary>

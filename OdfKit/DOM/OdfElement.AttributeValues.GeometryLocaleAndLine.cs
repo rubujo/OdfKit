@@ -330,7 +330,7 @@ public partial class OdfElement
     public OdfLineStyle? GetLineStyleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseLineStyle(value, out OdfLineStyle lineStyle) ? lineStyle : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfLineStyle>(value, OdfElementSchemaRegistry.TryParseLineStyle);
     }
 
     /// <summary>
@@ -356,7 +356,7 @@ public partial class OdfElement
     public OdfLineType? GetLineTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseLineType(value, out OdfLineType lineType) ? lineType : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfLineType>(value, OdfElementSchemaRegistry.TryParseLineType);
     }
 
     /// <summary>

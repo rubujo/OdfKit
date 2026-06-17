@@ -19,7 +19,7 @@ public partial class OdfElement
     public OdfStyleScriptType? GetStyleScriptTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleScriptType scriptType) ? scriptType : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleScriptType>(value);
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public partial class OdfElement
     public OdfStyleTextEmphasize? GetStyleTextEmphasizeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleTextEmphasize textEmphasize) ? textEmphasize : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleTextEmphasize>(value);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public partial class OdfElement
     public OdfNumberCalendar? GetNumberCalendarAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseNumberCalendar(value, out OdfNumberCalendar calendar) ? calendar : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfNumberCalendar>(value, OdfElementSchemaRegistry.TryParseNumberCalendar);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public partial class OdfElement
     public OdfTableMemberType? GetTableMemberTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableMemberType memberType) ? memberType : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableMemberType>(value);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public partial class OdfElement
     public OdfTableGroupedBy? GetTableGroupedByAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableGroupedBy groupedBy) ? groupedBy : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableGroupedBy>(value);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public partial class OdfElement
     public OdfTableSortMode? GetTableSortModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableSortMode sortMode) ? sortMode : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableSortMode>(value);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public partial class OdfElement
     public OdfTableConditionSource? GetTableConditionSourceAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableConditionSource conditionSource) ? conditionSource : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableConditionSource>(value);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public partial class OdfElement
     public OdfAnimationColorInterpolation? GetAnimationColorInterpolationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfAnimationColorInterpolation interpolation) ? interpolation : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfAnimationColorInterpolation>(value);
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public partial class OdfElement
     public OdfAnimationColorInterpolationDirection? GetAnimationColorInterpolationDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfAnimationColorInterpolationDirection direction) ? direction : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfAnimationColorInterpolationDirection>(value);
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public partial class OdfElement
     public OdfDatabaseIsNullable? GetDatabaseIsNullableAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDatabaseIsNullable isNullable) ? isNullable : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfDatabaseIsNullable>(value);
     }
 
     /// <summary>
@@ -279,7 +279,7 @@ public partial class OdfElement
     public OdfDatabaseDataSourceSettingType? GetDatabaseDataSourceSettingTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDatabaseDataSourceSettingType type) ? type : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfDatabaseDataSourceSettingType>(value);
     }
 
     /// <summary>

@@ -19,7 +19,7 @@ public partial class OdfElement
     public OdfFoTextTransform? GetFoTextTransformAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfFoTextTransform textTransform) ? textTransform : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfFoTextTransform>(value);
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public partial class OdfElement
     public OdfFoTextAlign? GetFoTextAlignAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfFoTextAlign textAlign) ? textAlign : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfFoTextAlign>(value);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public partial class OdfElement
     public OdfStyleTextRotationScale? GetStyleTextRotationScaleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleTextRotationScale scale) ? scale : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleTextRotationScale>(value);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public partial class OdfElement
     public OdfStyleTextCombine? GetStyleTextCombineAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleTextCombine textCombine) ? textCombine : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleTextCombine>(value);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public partial class OdfElement
     public OdfDrawFill? GetDrawFillAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDrawFill fill) ? fill : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawFill>(value);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public partial class OdfElement
     public OdfSmilFill? GetSmilFillAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfSmilFill fill) ? fill : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfSmilFill>(value);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public partial class OdfElement
     public OdfDrawFillImageRefPoint? GetDrawFillImageRefPointAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDrawFillImageRefPoint refPoint) ? refPoint : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawFillImageRefPoint>(value);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public partial class OdfElement
     public OdfDrawColorMode? GetDrawColorModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDrawColorMode colorMode) ? colorMode : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawColorMode>(value);
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public partial class OdfElement
     public OdfStyleVerticalAlign? GetStyleVerticalAlignAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleVerticalAlign verticalAlign) ? verticalAlign : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleVerticalAlign>(value);
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public partial class OdfElement
     public OdfStyleVerticalPos? GetStyleVerticalPosAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleVerticalPos pos) ? pos : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleVerticalPos>(value);
     }
 
     /// <summary>
@@ -279,7 +279,7 @@ public partial class OdfElement
     public OdfStyleVerticalRel? GetStyleVerticalRelAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleVerticalRel rel) ? rel : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleVerticalRel>(value);
     }
 
     /// <summary>
@@ -305,7 +305,7 @@ public partial class OdfElement
     public OdfStyleHorizontalPos? GetStyleHorizontalPosAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfStyleHorizontalPos pos) ? pos : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfStyleHorizontalPos>(value);
     }
 
     /// <summary>

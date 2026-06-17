@@ -18,7 +18,7 @@ public partial class OdfElement
     public OdfDrawNoHref? GetDrawNoHrefAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDrawNoHref noHref) ? noHref : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawNoHref>(value);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public partial class OdfElement
     public OdfTableFunction? GetTableFunctionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfTableFunction function) ? function : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfTableFunction>(value);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public partial class OdfElement
     public OdfDrawStrokeLineJoin? GetDrawStrokeLineJoinAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfDrawStrokeLineJoin lineJoin) ? lineJoin : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfDrawStrokeLineJoin>(value);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public partial class OdfElement
     public OdfSvgStrokeLineCap? GetSvgStrokeLineCapAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseEnumToken(value, out OdfSvgStrokeLineCap lineCap) ? lineCap : null;
+        return OdfElementEnumAttributeAccess.GetEnumToken<OdfSvgStrokeLineCap>(value);
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public partial class OdfElement
     public OdfFoKeepTogether? GetFoKeepTogetherAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseFoKeepTogether(value, out OdfFoKeepTogether keepTogether) ? keepTogether : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfFoKeepTogether>(value, OdfElementSchemaRegistry.TryParseFoKeepTogether);
     }
 
     /// <summary>
@@ -148,7 +148,7 @@ public partial class OdfElement
     public OdfFoWrapOption? GetFoWrapOptionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseFoWrapOption(value, out OdfFoWrapOption wrapOption) ? wrapOption : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfFoWrapOption>(value, OdfElementSchemaRegistry.TryParseFoWrapOption);
     }
 
     /// <summary>
@@ -174,7 +174,7 @@ public partial class OdfElement
     public OdfDr3dProjection? GetDr3dProjectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseDr3dProjection(value, out OdfDr3dProjection projection) ? projection : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfDr3dProjection>(value, OdfElementSchemaRegistry.TryParseDr3dProjection);
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public partial class OdfElement
     public OdfDr3dShadeMode? GetDr3dShadeModeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseDr3dShadeMode(value, out OdfDr3dShadeMode shadeMode) ? shadeMode : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfDr3dShadeMode>(value, OdfElementSchemaRegistry.TryParseDr3dShadeMode);
     }
 
     /// <summary>
@@ -226,7 +226,7 @@ public partial class OdfElement
     public OdfSvgFillRule? GetSvgFillRuleAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseSvgFillRule(value, out OdfSvgFillRule fillRule) ? fillRule : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfSvgFillRule>(value, OdfElementSchemaRegistry.TryParseSvgFillRule);
     }
 
     /// <summary>
@@ -252,7 +252,7 @@ public partial class OdfElement
     public OdfTableBorderModel? GetTableBorderModelAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTableBorderModel(value, out OdfTableBorderModel borderModel) ? borderModel : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTableBorderModel>(value, OdfElementSchemaRegistry.TryParseTableBorderModel);
     }
 
     /// <summary>

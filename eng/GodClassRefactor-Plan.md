@@ -112,11 +112,18 @@
 - [x] `OdfPackageEntryNameSanitizer`（Zip Slip 防禦 `SanitizeEntryName` 遷移）
 - [x] `OdfPackage.MacroSanitize` 收斂為公開 API 薄門面
 
-## 剩餘工作（Phase 14+）
+## Phase 14（已完成）
+
+- [x] `OdfElementPrimitiveAttributeAccess`（int／bool／decimal 解析引擎）
+- [x] `OdfElementComplexAttributeAccess`（DateTime／OdfLength／OdfColor 等複合型別引擎）
+- [x] `OdfElementEnumAttributeAccess`（schema 枚舉 token getter 委派）
+- [x] `eng/Migrate-OdfElementEnumAttributeAccess.ps1`（10 個 Attribute partial 遷移腳本）
+
+## 剩餘工作（Phase 15+）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `OdfElement` | ~3333 | 屬性存取器／typed getter |
+| `OdfElement` | ~2800 | 幾何／語系／儲存格位址等 AttributeValues |
 | `OdfPackage` | ~900 | 公開 API 項目讀寫（需保留薄門面） |
 | `TextDocument` | ~1000 | 核心 `TextDocument.cs` |
 | `OdfDocument` | ~1493 | 合併／複製管線 |

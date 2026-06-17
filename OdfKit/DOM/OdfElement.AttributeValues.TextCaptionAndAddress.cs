@@ -20,7 +20,7 @@ public partial class OdfElement
     public OdfTextCaptionSequenceFormat? GetTextCaptionSequenceFormatAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextCaptionSequenceFormat(value, out OdfTextCaptionSequenceFormat format) ? format : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextCaptionSequenceFormat>(value, OdfElementSchemaRegistry.TryParseTextCaptionSequenceFormat);
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public partial class OdfElement
     public OdfTextNumberPosition? GetTextNumberPositionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextNumberPosition(value, out OdfTextNumberPosition position) ? position : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextNumberPosition>(value, OdfElementSchemaRegistry.TryParseTextNumberPosition);
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public partial class OdfElement
     public OdfTextPlaceholderType? GetTextPlaceholderTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextPlaceholderType(value, out OdfTextPlaceholderType placeholderType) ? placeholderType : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextPlaceholderType>(value, OdfElementSchemaRegistry.TryParseTextPlaceholderType);
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public partial class OdfElement
     public OdfTextAnimation? GetTextAnimationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextAnimation(value, out OdfTextAnimation animation) ? animation : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextAnimation>(value, OdfElementSchemaRegistry.TryParseTextAnimation);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public partial class OdfElement
     public OdfTextAnimationDirection? GetTextAnimationDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextAnimationDirection(value, out OdfTextAnimationDirection direction) ? direction : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextAnimationDirection>(value, OdfElementSchemaRegistry.TryParseTextAnimationDirection);
     }
 
     /// <summary>
@@ -150,7 +150,7 @@ public partial class OdfElement
     public OdfTextKind? GetTextKindAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTextKind(value, out OdfTextKind kind) ? kind : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTextKind>(value, OdfElementSchemaRegistry.TryParseTextKind);
     }
 
     /// <summary>

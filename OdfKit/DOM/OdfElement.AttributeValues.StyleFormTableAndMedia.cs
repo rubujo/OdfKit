@@ -20,7 +20,7 @@ public partial class OdfElement
     public OdfStyleLineBreak? GetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseStyleLineBreak(value, out OdfStyleLineBreak lineBreak) ? lineBreak : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfStyleLineBreak>(value, OdfElementSchemaRegistry.TryParseStyleLineBreak);
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public partial class OdfElement
     public OdfStyleRepeat? GetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseStyleRepeat(value, out OdfStyleRepeat repeat) ? repeat : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfStyleRepeat>(value, OdfElementSchemaRegistry.TryParseStyleRepeat);
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public partial class OdfElement
     public OdfStyleDirection? GetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseStyleDirection(value, out OdfStyleDirection direction) ? direction : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfStyleDirection>(value, OdfElementSchemaRegistry.TryParseStyleDirection);
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public partial class OdfElement
     public OdfFormOrientation? GetFormOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseFormOrientation(value, out OdfFormOrientation orientation) ? orientation : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfFormOrientation>(value, OdfElementSchemaRegistry.TryParseFormOrientation);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public partial class OdfElement
     public OdfTableDirection? GetTableDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTableDirection(value, out OdfTableDirection direction) ? direction : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTableDirection>(value, OdfElementSchemaRegistry.TryParseTableDirection);
     }
 
     /// <summary>
@@ -150,7 +150,7 @@ public partial class OdfElement
     public OdfTableOrientation? GetTableOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseTableOrientation(value, out OdfTableOrientation orientation) ? orientation : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfTableOrientation>(value, OdfElementSchemaRegistry.TryParseTableOrientation);
     }
 
     /// <summary>
@@ -176,7 +176,7 @@ public partial class OdfElement
     public OdfStyleFamily? GetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
-        return OdfElementSchemaRegistry.TryParseStyleFamily(value, out OdfStyleFamily family) ? family : null;
+        return OdfElementEnumAttributeAccess.GetNullable<OdfStyleFamily>(value, OdfElementSchemaRegistry.TryParseStyleFamily);
     }
 
     /// <summary>
