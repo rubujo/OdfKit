@@ -43,7 +43,7 @@
 | RDF-1 | 基礎 ✅ | 核心 `manifest.rdf` / `pkg:` ontology parity；文件層往返與 corpus fixture |
 | RDF-2 | 選用 | `OdfKit.Extensions.Rdf` + `dotNetRdf.Core` SPARQL 橋接 |
 | DX-1 | 基礎 ✅ | `PresentationDocumentBuilder`、`DrawingDocumentBuilder`、`OdfFormulaBuilder`；cookbook 已補 Builder 範例 |
-| LOEXT-1 | 低優先 | `loext:decorative` 讀取映射、`OdfNamespaces.LoExt`、manifest `xmlns:loext` 對照 LO 26.x |
+| LOEXT-1 | 基礎 ✅ | `loext:decorative` 讀取映射、`OdfNamespaces.LoExt`；`LoExtInteropTests` 覆蓋 ODT/ODP/ODG |
 | CALCEXT-1 | 選用 | calcext 讀取 API（列舉／解析色階、橫條、圖示集、sparkline） |
 
 目標：四主格式 High-level 欄位升為 `complete`。
@@ -62,7 +62,7 @@
 | 命名空間 | 能力 | 狀態 | 位置 |
 |---------|------|------|------|
 | `loext` | Argon2id 加密參數（`kdf-name`、`argon2-t/m/p`） | ✅ 已完成 | `OdfEncryption`、`OdfPackageManifestWriter`、`EncryptionTests` |
-| `loext` | `decorative` 讀取映射 | 待辦 LOEXT-1 | 寫入已用標準 `draw:decorative` |
+| `loext` | `decorative` 讀取映射 | 基礎 ✅ LOEXT-1 | 載入正規化為 `draw:decorative`；寫入用標準屬性 |
 | `calcext` | 色階／資料橫條／圖示集條件格式 | ✅ 寫入 + OOXML 橋接 | `OdfTableSheetConditionalFormatEngine`、`OdfToXlsxConverter` |
 | `calcext` | Sparkline（`sparkline-groups`） | ✅ 寫入 | `AddSparklineGroup` |
 | `calcext` | 既有規則讀取／列舉 API | 選用 CALCEXT-1 | 載入後 DOM 保真 round-trip 已可用 |

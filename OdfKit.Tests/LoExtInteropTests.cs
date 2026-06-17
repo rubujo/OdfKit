@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using OdfKit.Core;
+using OdfKit.Drawing;
 using OdfKit.Presentation;
 using OdfKit.Text;
 using Xunit;
@@ -32,6 +33,24 @@ public class LoExtInteropTests
         string contentXml = ReadContentXml(document);
         Assert.Contains("draw:decorative=\"true\"", contentXml);
         Assert.DoesNotContain("loext:decorative", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證載入含 <c>loext:decorative</c> 的 ODG 圖形時會正規化並可讀回。
+    /// </summary>
+    [Fact]
+    public void LoadMapsLoExtDecorativeDrawingShapeToDrawDecorative()
+    {
+        using var stream = new MemoryStream();
+        WriteLoExtDecorativeOdg(stream);
+        stream.Position = 0;
+
+        using DrawingDocument document = DrawingDocument.Load(stream);
+        OdfShape shape = document.Pages[0].Shapes.Single();
+
+        Assert.True(shape.IsDecorative);
+        Assert.Null(shape.Node.GetAttribute("decorative", OdfNamespaces.LoExt));
+        Assert.Equal("true", shape.Node.GetAttribute("decorative", OdfNamespaces.Draw));
     }
 
     /// <summary>
@@ -70,6 +89,23 @@ public class LoExtInteropTests
             "</office:text></office:body></office:document-content>";
 
         WriteMinimalPackage(stream, "application/vnd.oasis.opendocument.text", contentXml);
+    }
+
+    private static void WriteLoExtDecorativeOdg(Stream stream)
+    {
+        const string contentXml =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+            "xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" " +
+            "xmlns:loext=\"urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0\" " +
+            "office:version=\"1.4\">" +
+            "<office:body><office:drawing>" +
+            "<draw:page draw:name=\"Page1\">" +
+            "<draw:rect loext:decorative=\"true\" svg:width=\"2cm\" svg:height=\"2cm\" " +
+            "xmlns:svg=\"urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0\"/>" +
+            "</draw:page></office:drawing></office:body></office:document-content>";
+
+        WriteMinimalPackage(stream, "application/vnd.oasis.opendocument.graphics", contentXml);
     }
 
     private static void WriteLoExtDecorativeOdp(Stream stream)
