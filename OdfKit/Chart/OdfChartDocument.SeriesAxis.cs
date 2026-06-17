@@ -229,7 +229,10 @@ public partial class OdfChartDocument
             string rangeAddress = valuesCellRangeAddress!;
             series.Add(new OdfChartSeriesInfo(
                 rangeAddress,
-                child.GetAttribute("label-cell-address", OdfNamespaces.Chart)));
+                child.GetAttribute("label-cell-address", OdfNamespaces.Chart),
+                child.GetAttribute("class", OdfNamespaces.Chart),
+                child.GetAttribute("style-name", OdfNamespaces.Chart),
+                child.GetAttribute("attached-axis", OdfNamespaces.Chart)));
         }
 
         return series;

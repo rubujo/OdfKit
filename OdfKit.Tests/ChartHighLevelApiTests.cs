@@ -274,6 +274,66 @@ public class ChartHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證座標軸進階屬性與序列個別屬性寫入。
+    /// </summary>
+    [Fact]
+    public void AxisAndSeriesAdvancedEditing_WritesAttributes()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
+
+        chartDoc.SetAxisTitle("y", "銷售額");
+        chartDoc.SetAxisLogarithmic("y", true);
+        chartDoc.SetAxisMinimum("y", 0);
+        chartDoc.SetAxisMaximum("y", 1000);
+        chartDoc.SetAxisReverseDirection("y", true);
+        chartDoc.SetAxisDisplayLabels("y", true);
+        chartDoc.SetAxisGrid("y", OdfChartGridKind.Major, true);
+        chartDoc.SetAxisStyleName("y", "AxisStyle1");
+
+        Assert.Equal(2, chartDoc.SeriesCount);
+        OdfChartSeries series = chartDoc.GetSeriesEditor(0);
+        series.SeriesClass = "chart:line";
+        series.StyleName = "SeriesStyle1";
+        series.AttachedAxis = "primary-y";
+
+        using var stream = new MemoryStream();
+        chartDoc.SaveToStream(stream);
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+
+        Assert.Contains("chart:logarithmic=\"true\"", xml);
+        Assert.Contains("chart:minimum=\"0\"", xml);
+        Assert.Contains("chart:maximum=\"1000\"", xml);
+        Assert.Contains("chart:reverse-direction=\"true\"", xml);
+        Assert.Contains("chart:display-label=\"true\"", xml);
+        Assert.Contains("chart:grid chart:class=\"major\"", xml);
+        Assert.Contains("chart:style-name=\"AxisStyle1\"", xml);
+        Assert.Contains("chart:class=\"chart:line\"", xml);
+        Assert.Contains("chart:style-name=\"SeriesStyle1\"", xml);
+        Assert.Contains("chart:attached-axis=\"primary-y\"", xml);
+
+        OdfChartAxisInfo? axisInfo = chartDoc.GetAxisInfo("y");
+        Assert.NotNull(axisInfo);
+        Assert.Equal("銷售額", axisInfo!.Title);
+        Assert.True(axisInfo.Logarithmic);
+        Assert.True(axisInfo.ReverseDirection);
+        Assert.Equal(0, axisInfo.Minimum);
+        Assert.Equal(1000, axisInfo.Maximum);
+        Assert.True(axisInfo.DisplayLabels);
+        Assert.True(axisInfo.HasMajorGrid);
+        Assert.Equal("AxisStyle1", axisInfo.StyleName);
+
+        OdfChartSeriesInfo seriesInfo = chartDoc.Series[0];
+        Assert.Equal("chart:line", seriesInfo.SeriesClass);
+        Assert.Equal("SeriesStyle1", seriesInfo.StyleName);
+        Assert.Equal("primary-y", seriesInfo.AttachedAxis);
+    }
+
+    /// <summary>
     /// 驗證 SetDataRange 與 GetDataRange 對帶空格工作表名稱的往返一致性。
     /// </summary>
     [Fact]

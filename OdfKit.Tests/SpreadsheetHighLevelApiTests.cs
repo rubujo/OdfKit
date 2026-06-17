@@ -170,6 +170,36 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證嵌入圖表可設定座標軸與序列進階屬性。
+    /// </summary>
+    [Fact]
+    public void GetEmbeddedChartDocument_AllowsAxisAndSeriesAdvancedEditing()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.AddSheet("Sheet1");
+        document.AddChart("Sheet1", new OdfCellAddress(0, 3, "Sheet1"), new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Bar,
+            Title = "季度銷售",
+            DataRange = new OdfCellRange(0, 0, 5, 1, "Sheet1"),
+        });
+
+        OdfChartDocument chartDoc = document.GetEmbeddedChartDocument(Assert.Single(document.GetEmbeddedCharts()));
+        chartDoc.SetAxisGrid("y", OdfChartGridKind.Major, true);
+        chartDoc.SetAxisMaximum("y", 500);
+
+        if (chartDoc.SeriesCount > 0)
+        {
+            chartDoc.GetSeriesEditor(0).SeriesClass = "chart:bar";
+        }
+
+        OdfChartAxisInfo? axisInfo = chartDoc.GetAxisInfo("y");
+        Assert.NotNull(axisInfo);
+        Assert.True(axisInfo!.HasMajorGrid);
+        Assert.Equal(500, axisInfo.Maximum);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="SpreadsheetDocument.GetEmbeddedCharts"/> 可讀回嵌入圖表摘要。
     /// </summary>
     [Fact]
