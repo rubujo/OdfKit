@@ -45,8 +45,7 @@ public sealed class LocalProcessBackend : ILibreOfficeConversionBackend
 
             string outputFilePath = Path.Combine(tempSandbox, $"converted.{convertTo}");
 
-            // 在背景 Task 執行本地 soffice 轉換進程，避免阻塞非同步執行緒
-            await Task.Run(() => _renderer.ConvertFile(inputFilePath, outputFilePath, convertTo), ct).ConfigureAwait(false);
+            await _renderer.ConvertFileAsync(inputFilePath, outputFilePath, convertTo, ct).ConfigureAwait(false);
 
             if (!File.Exists(outputFilePath))
             {

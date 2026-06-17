@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Core;
 using OdfKit.Presentation;
@@ -101,12 +102,36 @@ public class LibreOfficeRenderer
     /// <param name="format">要轉換的目標格式（例如 <c>pdf</c>）。</param>
     public void ConvertFile(string inputFilePath, string outputPath, string format)
     {
+        ConvertFileAsync(inputFilePath, outputPath, format, default).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// 使用系統安裝的 LibreOffice 將指定的實體檔案非同步轉換為目標格式並輸出。
+    /// </summary>
+    /// <param name="inputFilePath">輸入檔案的實體絕對路徑。</param>
+    /// <param name="outputPath">輸出檔案的目標絕對路徑。</param>
+    /// <param name="format">要轉換的目標格式（例如 <c>pdf</c>）。</param>
+    /// <param name="cancellationToken">用於取消轉檔作業的權杖。</param>
+    /// <returns>代表非同步轉檔作業的工作。</returns>
+    /// <exception cref="ArgumentNullException">當輸入或輸出路徑為 null 或空字串時擲出。</exception>
+    /// <exception cref="TimeoutException">當 LibreOffice 轉檔執行程序超時未回應時擲出。</exception>
+    /// <exception cref="InvalidOperationException">當 LibreOffice 進程結束但傳回非零的錯誤碼時擲出。</exception>
+    /// <exception cref="FileNotFoundException">當轉檔完成後找不到預期的目標檔案時擲出。</exception>
+    /// <exception cref="OperationCanceledException">當作業因 <paramref name="cancellationToken"/> 取消時擲出。</exception>
+    public async Task ConvertFileAsync(
+        string inputFilePath,
+        string outputPath,
+        string format,
+        CancellationToken cancellationToken = default)
+    {
         if (string.IsNullOrEmpty(inputFilePath))
             throw new ArgumentNullException(nameof(inputFilePath));
         if (string.IsNullOrEmpty(outputPath))
             throw new ArgumentNullException(nameof(outputPath));
         if (string.IsNullOrEmpty(format))
             throw new ArgumentNullException(nameof(format));
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         string? sandboxDir = null;
         try
@@ -164,33 +189,19 @@ public class LibreOfficeRenderer
             {
                 process.Start();
 
-                var stdOutTask = process.StandardOutput.ReadToEndAsync();
-                var stdErrTask = process.StandardError.ReadToEndAsync();
+                Task<string> stdOutTask = process.StandardOutput.ReadToEndAsync();
+                Task<string> stdErrTask = process.StandardError.ReadToEndAsync();
 
-                bool exited = process.WaitForExit((int)Timeout.TotalMilliseconds);
+                bool exited = await WaitForProcessExitAsync(process, (int)Timeout.TotalMilliseconds, cancellationToken)
+                    .ConfigureAwait(false);
                 if (!exited)
                 {
-                    try
-                    {
-                        var killMethod = typeof(Process).GetMethod("Kill", [typeof(bool)]);
-                        if (killMethod is not null)
-                        {
-                            killMethod.Invoke(process, [true]);
-                            process.WaitForExit(5000);
-                        }
-                        else
-                        {
-                            process.Kill();
-                            process.WaitForExit(5000);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        OdfKitDiagnostics.Warn($"LibreOffice 逾時後終止程序失敗：{ex.Message}", ex);
-                    }
-
+                    TryKillLibreOfficeProcess(process);
                     throw new TimeoutException("LibreOffice conversion process timed out.");
                 }
+
+                _ = await stdOutTask.ConfigureAwait(false);
+                _ = await stdErrTask.ConfigureAwait(false);
 
                 if (process.ExitCode != 0)
                 {
@@ -222,6 +233,68 @@ public class LibreOfficeRenderer
         finally
         {
             SafeCleanDirectory(sandboxDir);
+        }
+    }
+
+    private static async Task<bool> WaitForProcessExitAsync(
+        Process process,
+        int timeoutMilliseconds,
+        CancellationToken cancellationToken)
+    {
+#if NET5_0_OR_GREATER
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutCts.CancelAfter(timeoutMilliseconds);
+        try
+        {
+            await process.WaitForExitAsync(timeoutCts.Token).ConfigureAwait(false);
+            return true;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            TryKillLibreOfficeProcess(process);
+            throw;
+        }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
+#else
+        DateTime deadline = DateTime.UtcNow.AddMilliseconds(timeoutMilliseconds);
+        while (!process.HasExited)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (DateTime.UtcNow >= deadline)
+                return false;
+
+            await Task.Delay(50, cancellationToken).ConfigureAwait(false);
+        }
+
+        return true;
+#endif
+    }
+
+    private static void TryKillLibreOfficeProcess(Process process)
+    {
+        try
+        {
+            if (process.HasExited)
+                return;
+
+            var killMethod = typeof(Process).GetMethod("Kill", [typeof(bool)]);
+            if (killMethod is not null)
+            {
+                killMethod.Invoke(process, [true]);
+                process.WaitForExit(5000);
+            }
+            else
+            {
+                process.Kill();
+                process.WaitForExit(5000);
+            }
+        }
+        catch (Exception ex)
+        {
+            OdfKitDiagnostics.Warn($"LibreOffice 逾時後終止程序失敗：{ex.Message}", ex);
         }
     }
 

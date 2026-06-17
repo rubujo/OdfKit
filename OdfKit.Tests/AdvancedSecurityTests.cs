@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using OdfKit.Compliance;
@@ -143,11 +144,11 @@ namespace OdfKit.Tests
             using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
 
             // Setup Mock HTTP handler to intercept TSA requests and return valid timestamp responses
-            var mockHandler = new MockHttpMessageHandler(request =>
+            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
             {
                 if (request.RequestUri?.AbsoluteUri == "http://mocktsa.com/tsa")
                 {
-                    byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
 
                     // Extract hash from TSA request
                     var root = ParseDer(reqBytes);
@@ -247,12 +248,12 @@ namespace OdfKit.Tests
 
             bool triggerRevocation = false;
 
-            var mockHandler = new MockHttpMessageHandler(request =>
+            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
             {
                 string url = request.RequestUri?.AbsoluteUri ?? "";
                 if (url == "http://mocktsa.com/tsa")
                 {
-                    byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
                     var root = ParseDer(reqBytes);
                     byte[] hash = root.Children[1].Children[1].Value;
                     byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
@@ -482,12 +483,12 @@ namespace OdfKit.Tests
 
             byte[] revokedCrlBytes = CreateMockCrlBytes(signerCA, new List<string> { "00" });
 
-            var mockHandler = new MockHttpMessageHandler(request =>
+            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
             {
                 string url = request.RequestUri?.AbsoluteUri ?? "";
                 if (url == "http://mocktsa.com/tsa")
                 {
-                    byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
                     var root = ParseDer(reqBytes);
                     byte[] hash = root.Children[1].Children[1].Value;
                     byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
@@ -544,11 +545,11 @@ namespace OdfKit.Tests
             using var signerCert = GenerateSelfSignedCertificate("XadesTTestSigner", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
             using var tsaCert = GenerateSelfSignedCertificate("ExpiredOrUntrustedTSA", DateTimeOffset.UtcNow.AddDays(-10), DateTimeOffset.UtcNow.AddDays(-1));
 
-            var mockHandler = new MockHttpMessageHandler(request =>
+            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
             {
                 if (request.RequestUri?.AbsoluteUri == "http://mocktsa.com/tsa")
                 {
-                    byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
                     var root = ParseDer(reqBytes);
                     byte[] hash = root.Children[1].Children[1].Value;
                     byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
@@ -1335,11 +1336,11 @@ namespace OdfKit.Tests
             using var signerCert = GenerateSelfSignedCertificate("SignerCert", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
             using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
 
-            var mockHandler = new MockHttpMessageHandler(request =>
+            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
             {
                 if (request.RequestUri?.AbsoluteUri == "http://mocktsa.com/tsa")
                 {
-                    byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
                     var root = ParseDer(reqBytes);
                     byte[] hash = root.Children[1].Children[1].Value;
                     byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
@@ -1424,11 +1425,11 @@ namespace OdfKit.Tests
             using var signerCert = GenerateSelfSignedCertificate("SignerCert", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
             using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
 
-            var mockHandler = new MockHttpMessageHandler(request =>
+            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
             {
                 if (request.RequestUri?.AbsoluteUri == "http://mocktsa.com/tsa")
                 {
-                    byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
                     var root = ParseDer(reqBytes);
                     byte[] hash = root.Children[1].Children[1].Value;
                     byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
@@ -1597,9 +1598,9 @@ namespace OdfKit.Tests
             using var signerCert = GenerateSelfSignedCertificate("SignerCert", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
             using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
 
-            var mockHandler = new MockHttpMessageHandler(request =>
+            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
             {
-                byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
                 var root = ParseDer(reqBytes);
                 byte[] hash = root.Children[1].Children[1].Value;
                 byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
@@ -1682,7 +1683,7 @@ namespace OdfKit.Tests
             // Generate mock CRL but with completely invalid signature (fake)
             byte[] fakeCrlBytes = CreateMockCrlBytes(signerCA, new List<string>(), useInvalidSignature: true);
 
-            var mockHandler = new MockHttpMessageHandler(request =>
+            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
             {
                 string url = request.RequestUri?.AbsoluteUri ?? "";
                 if (url == "http://mockcrl.com/revocation.crl")
@@ -1691,7 +1692,7 @@ namespace OdfKit.Tests
                 }
                 else if (url == "http://mocktsa.com/tsa")
                 {
-                    byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
                     var root = ParseDer(reqBytes);
                     byte[] hash = root.Children[1].Children[1].Value;
                     byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
@@ -1755,11 +1756,11 @@ namespace OdfKit.Tests
             using var certB = GenerateSelfSignedCertificate("SignerB", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
             using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
 
-            var mockHandler = new MockHttpMessageHandler(request =>
+            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
             {
                 if (request.RequestUri?.AbsoluteUri == "http://mocktsa.com/tsa")
                 {
-                    byte[] reqBytes = request.Content!.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
                     var root = ParseDer(reqBytes);
                     byte[] hash = root.Children[1].Children[1].Value;
                     byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
@@ -1833,16 +1834,21 @@ namespace OdfKit.Tests
 
     public class MockHttpMessageHandler : HttpMessageHandler
     {
-        public Func<HttpRequestMessage, HttpResponseMessage> HandlerFunc { get; set; }
+        private readonly Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> _handlerFunc;
 
         public MockHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> handlerFunc)
+            : this((request, _) => Task.FromResult(handlerFunc(request)))
         {
-            HandlerFunc = handlerFunc;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+        public MockHttpMessageHandler(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> handlerFunc)
         {
-            return Task.FromResult(HandlerFunc(request));
+            _handlerFunc = handlerFunc;
+        }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            return _handlerFunc(request, cancellationToken);
         }
     }
 
