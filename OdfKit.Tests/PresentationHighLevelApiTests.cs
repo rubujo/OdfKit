@@ -119,6 +119,10 @@ public class PresentationHighLevelApiTests
         Assert.Contains(animations, a => a.Kind == OdfAnimationKind.Entrance && a.TargetElementId == shapeId && a.Effect == OdfAnimationEffect.Fade);
         Assert.Contains(animations, a => a.Kind == OdfAnimationKind.Exit && a.Effect == OdfAnimationEffect.Zoom && a.Trigger == OdfAnimationTrigger.WithPrevious);
         Assert.Contains(animations, a => a.Kind == OdfAnimationKind.Emphasis && a.PresetId == "ooo-emphasis-fade");
+
+        IReadOnlyList<OdfSlideAnimationInfo> documentAnimations = document.GetAnimations();
+        Assert.Equal(3, documentAnimations.Count);
+        Assert.All(documentAnimations, item => Assert.Equal(0, item.SlideIndex));
     }
 
     /// <summary>

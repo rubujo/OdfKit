@@ -300,6 +300,42 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="TextDocument.GetHyperlinks"/> 與 <see cref="TextDocument.GetReferenceMarks"/> 可讀回內嵌標記。
+    /// </summary>
+    [Fact]
+    public void GetHyperlinksAndReferenceMarks_RoundTripsAfterAdd()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("連結測試");
+        paragraph.AddReferenceMark("RefA");
+        paragraph.AddHyperlink("https://example.com", "範例連結");
+
+        OdfReferenceMarkInfo referenceMark = Assert.Single(document.GetReferenceMarks());
+        Assert.Equal("RefA", referenceMark.Name);
+
+        OdfHyperlinkInfo hyperlink = Assert.Single(document.GetHyperlinks());
+        Assert.Equal("https://example.com", hyperlink.Url);
+        Assert.Equal("範例連結", hyperlink.DisplayText);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.GetPageSetups"/> 可讀回頁首頁尾設定。
+    /// </summary>
+    [Fact]
+    public void GetPageSetups_RoundTripsAfterConfigure()
+    {
+        using var document = TextDocument.Create();
+        OdfPageSetup setup = document.GetDefaultPageSetup();
+        setup.HeaderText = "文件頁首";
+        setup.FooterText = "文件頁尾";
+
+        OdfPageSetupInfo pageSetup = Assert.Single(document.GetPageSetups());
+        Assert.Equal("Standard", pageSetup.Name);
+        Assert.Equal("文件頁首", pageSetup.HeaderText);
+        Assert.Equal("文件頁尾", pageSetup.FooterText);
+    }
+
+    /// <summary>
     /// 驗證主文件子文件參照 (text:section-source) 的插入。
     /// </summary>
     [Fact]

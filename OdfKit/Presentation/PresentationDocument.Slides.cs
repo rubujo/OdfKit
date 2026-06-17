@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -245,6 +246,12 @@ public partial class PresentationDocument
             slide.SetTransition(type, OdfLength.Parse("72pt"));
         }
     }
+
+    /// <summary>
+    /// 取得簡報中所有投影片的動畫效果摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfSlideAnimationInfo> GetAnimations() =>
+        PresentationDocumentAnimationReadEngine.GetAnimations(this);
 
     #endregion
 

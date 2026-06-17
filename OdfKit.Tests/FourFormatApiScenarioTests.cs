@@ -203,6 +203,30 @@ public class FourFormatApiScenarioTests
     }
 
     /// <summary>
+    /// 驗證 ODS 資料庫範圍讀取 API 可於儲存／載入後讀回篩選條件。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetScenario_GetDatabaseRangesSurvivesRoundTrip()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        workbook.AddSheet("資料");
+        OdfDatabaseRange range = workbook.AddDatabaseRange(
+            "清單",
+            new OdfCellRange(new OdfCellAddress(0, 0, "資料"), new OdfCellAddress(4, 1, "資料")));
+        range.SetFilter((0, "=", "完成"));
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+        OdfDatabaseRangeInfo info = Assert.Single(loaded.GetDatabaseRanges());
+        Assert.Equal("清單", info.Name);
+        Assert.Single(info.FilterConditions);
+        Assert.Equal("完成", info.FilterConditions[0].Value);
+    }
+
+    /// <summary>
     /// 驗證 ODT 儲存／載入會保留自訂 RDF triple 並同步標準 <c>pkg:</c> ontology。
     /// </summary>
     [Fact]

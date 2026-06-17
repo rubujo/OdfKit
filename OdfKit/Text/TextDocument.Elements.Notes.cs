@@ -92,6 +92,18 @@ public partial class TextDocument
         TextDocumentBookmarkReadEngine.GetBookmarks(BodyTextRoot);
 
     /// <summary>
+    /// 取得文件中所有超連結的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfHyperlinkInfo> GetHyperlinks() =>
+        TextDocumentHyperlinkReadEngine.GetHyperlinks(BodyTextRoot);
+
+    /// <summary>
+    /// 取得文件中所有參考標記的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfReferenceMarkInfo> GetReferenceMarks() =>
+        TextDocumentReferenceMarkReadEngine.GetReferenceMarks(BodyTextRoot);
+
+    /// <summary>
     /// 在指定的段落中新增書籤。
     /// </summary>
     /// <param name="paragraph">目標段落</param>

@@ -50,6 +50,12 @@ public partial class SpreadsheetDocument
         SpreadsheetDocumentNamedRangeReadEngine.GetNamedExpressions(this);
 
     /// <summary>
+    /// 取得試算表中所有資料庫範圍的摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfDatabaseRangeInfo> GetDatabaseRanges() =>
+        SpreadsheetDocumentDatabaseRangeReadEngine.GetDatabaseRanges(this);
+
+    /// <summary>
     /// 新增命名範圍。
     /// </summary>
     /// <param name="name">命名範圍的名稱</param>

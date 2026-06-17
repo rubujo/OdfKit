@@ -245,6 +245,31 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetDatabaseRanges"/> 可讀回資料庫範圍、排序與篩選設定。
+    /// </summary>
+    [Fact]
+    public void GetDatabaseRanges_RoundTripsAfterAdd()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.AddSheet("Sheet1");
+        OdfDatabaseRange dbRange = document.AddDatabaseRange(
+            "SalesData",
+            new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(9, 2, "Sheet1")));
+        dbRange.SetSort((0, true), (1, false));
+        dbRange.SetFilter((0, "=", "Active"), (2, ">", "100"));
+
+        Assert.Single(document.GetDatabaseRanges());
+        OdfDatabaseRangeInfo info = document.GetDatabaseRanges()[0];
+        Assert.Equal("SalesData", info.Name);
+        Assert.Equal(2, info.SortRules.Count);
+        Assert.Equal(0, info.SortRules[0].FieldNumber);
+        Assert.True(info.SortRules[0].Ascending);
+        Assert.Equal(2, info.FilterConditions.Count);
+        Assert.Equal("=", info.FilterConditions[0].Operator);
+        Assert.Equal("Active", info.FilterConditions[0].Value);
+    }
+
+    /// <summary>
     /// 驗證列印範圍、標題列欄、分頁符與縮放設定會寫入 ODS XML。
     /// </summary>
     [Fact]

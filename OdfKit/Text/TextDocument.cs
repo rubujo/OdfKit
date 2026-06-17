@@ -282,6 +282,12 @@ public partial class TextDocument : OdfDocument
     }
 
     /// <summary>
+    /// 取得所有主頁面樣式的頁首頁尾摘要清單。
+    /// </summary>
+    public IReadOnlyList<OdfPageSetupInfo> GetPageSetups() =>
+        TextDocumentPageSetupReadEngine.GetPageSetups(StylesDom);
+
+    /// <summary>
     /// 取得所有已定義的主頁面樣式名稱清單。
     /// </summary>
     public IReadOnlyList<string> GetPageStyleNames()
