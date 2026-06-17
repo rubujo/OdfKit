@@ -39,7 +39,7 @@
 |-------|------|------|
 | VAR-1 | ✅ | `*TemplateDocument`、`TextMasterDocument`、`Flat*Document`、factory 分派、`DocumentKindApiUsabilityTests` |
 | DEPTH-1/2 | 進行中 | ODT/ODS/ODP/ODG + ODC/ODF/ODI/ODB checklist 驅動 API |
-| DEPTH-1-TC | 進行中 | ODT `text:tracked-changes` 完備化（接受／拒絕、表格層、LO 互通） |
+| DEPTH-1-TC | 基礎 ✅ | ODT/ODS `tracked-changes` 內容／表格／結構／移動；LO 互通測試已備 |
 | RDF-1 | 待辦 | 核心 `manifest.rdf` / `pkg:` ontology parity（不依賴外部 RDF 引擎） |
 | RDF-2 | 選用 | `OdfKit.Extensions.Rdf` + `dotNetRdf.Core` SPARQL 橋接 |
 | DX-1 | 待辦 | Presentation/Drawing Builder、`OdfFormulaBuilder`、cookbook |
@@ -66,7 +66,7 @@
 | `calcext` | 色階／資料橫條／圖示集條件格式 | ✅ 寫入 + OOXML 橋接 | `OdfTableSheetConditionalFormatEngine`、`OdfToXlsxConverter` |
 | `calcext` | Sparkline（`sparkline-groups`） | ✅ 寫入 | `AddSparklineGroup` |
 | `calcext` | 既有規則讀取／列舉 API | 選用 CALCEXT-1 | 載入後 DOM 保真 round-trip 已可用 |
-| ODF 標準 | `text:tracked-changes`（ODT） | 基礎 ✅；完備化 DEPTH-1-TC | `TextDocument` accept/reject/record API |
+| ODF 標準 | `text:tracked-changes`（ODT） | 基礎 ✅（段落／表格儲存格）；LO 互通測試已備 | `TextDocument` accept/reject/record API |
 | — | `table:tracked-changes`（ODS） | 基礎 ✅（內容／公式／結構／移動）；LO 互通測試已備 | `SpreadsheetDocument` tracked-changes API |
 | — | Writer Navigator 書籤擴充、pivot 重算 | 不納入 | 見 non-goals |
 

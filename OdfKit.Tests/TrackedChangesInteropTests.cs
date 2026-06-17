@@ -54,6 +54,52 @@ public class TrackedChangesInteropTests
     }
 
     /// <summary>
+    /// 驗證表格儲存格文字插入可記錄追蹤修訂並接受或拒絕。
+    /// </summary>
+    [Fact]
+    public void TableCellInsertionCanBeRecordedAcceptedOrRejected()
+    {
+        using TextDocument document = TextDocument.Create();
+        document.TrackedChanges = true;
+        OdfTable table = document.AddTable(1, 1);
+        table.GetCell(0, 0).AddParagraph("表格新增文字");
+
+        OdfTrackedChange change = document.GetTrackedChanges().Single();
+        Assert.Equal(OdfChangeType.Insertion, change.ChangeType);
+        Assert.Equal("表格新增文字", change.Content);
+
+        document.RejectChange(change.RegionId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.DoesNotContain("表格新增文字", ReadContentXml(document));
+
+        table.GetCell(0, 0).AddParagraph("再次新增");
+        change = document.GetTrackedChanges().Single();
+        document.AcceptChange(change.RegionId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Contains("再次新增", ReadContentXml(document));
+    }
+
+    /// <summary>
+    /// 驗證表格儲存格格式變更可記錄追蹤修訂並拒絕還原。
+    /// </summary>
+    [Fact]
+    public void TableCellFormatChangeCanBeRecordedAndRejected()
+    {
+        using TextDocument document = TextDocument.Create();
+        document.TrackedChanges = false;
+        OdfTable table = document.AddTable(1, 1);
+        table.SetCellStyle(0, 0, "CellStyleA");
+
+        document.TrackedChanges = true;
+        table.SetCellStyle(0, 0, "CellStyleB");
+
+        OdfTrackedChange change = document.GetTrackedChanges().Single(c => c.ChangeType == OdfChangeType.FormatChange);
+        document.RejectChange(change.RegionId);
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Contains("CellStyleA", ReadContentXml(document));
+    }
+
+    /// <summary>
     /// 驗證可載入 LibreOffice 風格 ODT 封裝中的表格追蹤修訂並接受。
     /// </summary>
     [Fact]

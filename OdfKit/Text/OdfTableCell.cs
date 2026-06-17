@@ -35,8 +35,11 @@ public class OdfTableCell(OdfNode node, TextDocument doc)
     public OdfParagraph AddParagraph(string text)
     {
         var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
-        pNode.TextContent = text;
         Node.AppendChild(pNode);
-        return new OdfParagraph(pNode, _doc);
+        var paragraph = new OdfParagraph(pNode, _doc);
+        if (!string.IsNullOrEmpty(text))
+            paragraph.AddTextRun(text);
+
+        return paragraph;
     }
 }

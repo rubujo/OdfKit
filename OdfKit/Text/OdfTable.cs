@@ -145,7 +145,10 @@ public class OdfTable
     /// <param name="styleName">樣式名稱</param>
     public void SetCellStyle(int row, int col, string styleName)
     {
-        var cellNode = GetCellNode(row, col);
+        OdfNode cellNode = GetCellNode(row, col);
+        if (_doc.TrackedChanges)
+            _doc.TrackFormatChange(cellNode, "table-cell");
+
         cellNode.SetAttribute("style-name", OdfNamespaces.Table, styleName, "table");
     }
 
