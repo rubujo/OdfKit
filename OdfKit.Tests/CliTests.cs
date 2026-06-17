@@ -303,6 +303,54 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證 validate 的 JSON 輸出保留可讀的 Unicode 文字，而非 \uXXXX 跳脫序列。
+    /// </summary>
+    [Fact]
+    public void ValidateJsonOutputPreservesReadableUnicodeText()
+    {
+        string path = CreateTempPath(".odt");
+        try
+        {
+            using (FileStream stream = File.Create(path))
+            {
+                using OdfPackage package = OdfPackage.Create(stream, leaveOpen: true);
+                package.SetMimeType("application/vnd.oasis.opendocument.text");
+                package.WriteEntry(
+                    "content.xml",
+                    Encoding.UTF8.GetBytes(
+                        "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"><office:body><office:text /></office:body></office:document-content>"),
+                    "text/xml");
+                package.Save();
+            }
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                ["validate", path, "--format", "json", "--profile", OdfComplianceProfiles.OasisOdf14Strict.Id],
+                output,
+                error);
+
+            Assert.NotEqual(0, exitCode);
+            string json = output.ToString();
+            Assert.Contains("加入或修正", json);
+            Assert.DoesNotContain("\\u52a0", json);
+
+            using JsonDocument document = JsonDocument.Parse(json);
+            string? suggestedFix = document.RootElement
+                .GetProperty("files")[0]
+                .GetProperty("issues")[0]
+                .GetProperty("suggestedFix")
+                .GetString();
+            Assert.Contains("加入或修正", suggestedFix);
+        }
+        finally
+        {
+            TryDelete(path);
+        }
+    }
+
+    /// <summary>
     /// 驗證 validate 可輸出穩定 JSON 結果。
     /// </summary>
     [Fact]
