@@ -53,10 +53,10 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - 統一的 `OdfDocument.Load` / `OdfDocument.Create` 與
   `OdfDocumentFactory.LoadDocument` / `CreateDocument` 高階入口已建立。
 - ODT、ODS、ODP、ODG 標為 `usable`：已有常用高階 API 與 `FourFormatApiScenarioTests` 場景背書，但尚非完整辦公套件物件模型（Wave 2 `complete` 目標）。升級 `complete` 前仍須補齊：
-  - **ODT**：索引進階編輯、頁首頁尾進階編輯（書籤／超連結／參考標記／腳注尾注／索引／註解／表格結構修訂讀取 `GetBookmarks`／`GetHyperlinks`／`GetReferenceMarks`／`GetFootnotes`／`GetEndnotes`／`GetPageSetups`／`GetIndexInfos`／`GetIndexMarks`／`GetCommentInfos`／`GetTableStructuralChanges` 已補；表格結構修訂寫入 `OdfTable.InsertRows`／`DeleteRows`／`InsertColumns`／`DeleteColumns` 已補）
-  - **ODS**：樞紐表重算（見 non-goals）、完整圖表編輯模型（命名範圍／具名運算式／資料庫範圍／列印範圍／樞紐表／凍結／分割窗格讀取 `GetNamedRanges`／`GetNamedExpressions`／`GetDatabaseRanges`／`GetPrintAreas`／`GetPivotTables`／`GetFrozenPanes`／`GetSplitPanes` 已補）
-  - **ODP**：版面配置進階編輯（母片列舉 `GetMasterPages`、切換效果與持續時間讀取 `GetSlideTransition`／`GetSlideTransitions`、動畫時間軸摘要（dur／begin／序號）與文件層聚合 `GetAnimations`／`GetPlaceholderInfos`／`GetSpeakerNotes`／`GetLayouts` 已補；動畫時間軸寫入 `Add*Effect` 持續時間參數與 `OdfAnimation.SetDuration`／`SetDelay` 已補）
-  - **ODG**：群組圖形寫入進階（群組／圖層／文字方塊／圖片／圖層指派／連接線路由點讀取 `GetGroups`／`GetLayers`／`GetTextBoxes`／`GetPictures`／`GetShapeLayerAssignments`／`GetConnectors` 之 `Points` 已補；連接線路由寫入 `OdfShape.SetConnectorRoutePoints` 已補）
+  - **ODT**：頁首頁尾進階編輯（書籤／超連結／參考標記／腳注尾注／索引／註解／表格結構修訂讀取 `GetBookmarks`／`GetHyperlinks`／`GetReferenceMarks`／`GetFootnotes`／`GetEndnotes`／`GetPageSetups`／`GetIndexInfos`／`GetIndexMarks`／`GetCommentInfos`／`GetTableStructuralChanges` 已補；表格結構修訂寫入 `OdfTable.InsertRows`／`DeleteRows`／`InsertColumns`／`DeleteColumns` 已補；索引進階寫入 `UpdateIndexes`、`OdfTableOfContents.AddEntryTemplate` 已補）
+  - **ODS**：樞紐表重算（見 non-goals）、圖表進階編輯（命名範圍／具名運算式／資料庫範圍／列印範圍／樞紐表／凍結／分割窗格讀取 `GetNamedRanges`／`GetNamedExpressions`／`GetDatabaseRanges`／`GetPrintAreas`／`GetPivotTables`／`GetFrozenPanes`／`GetSplitPanes` 已補；嵌入圖表編輯 `GetEmbeddedChartDocument`、`OdfChartDocument.SetChartType`／`ApplyDefinition`／`ClearSeries` 已補）
+  - **ODP**：母片列舉 `GetMasterPages`、切換效果與持續時間讀取 `GetSlideTransition`／`GetSlideTransitions`、動畫時間軸摘要（dur／begin／序號）與文件層聚合 `GetAnimations`／`GetPlaceholderInfos`／`GetSpeakerNotes`／`GetLayouts` 已補；動畫時間軸寫入 `Add*Effect` 持續時間參數與 `OdfAnimation.SetDuration`／`SetDelay` 已補；投影片層版面寫入 `OdfSlide.SetLayout`／`GetLayout` 已補）
+  - **ODG**：圖層／文字方塊／圖片／圖層指派／連接線路由點讀取 `GetGroups`／`GetLayers`／`GetTextBoxes`／`GetPictures`／`GetShapeLayerAssignments`／`GetConnectors` 之 `Points` 已補；連接線路由寫入 `OdfShape.SetConnectorRoutePoints`、群組進階寫入 `OdfDrawPage.GroupShapes`、`OdfDrawGroup.AddConnector` 已補）
 - `.ott`、`.ots`、`.otp`、`.otg`、`.odm` 與 Flat 變體標為 `usable-variant`（VAR-1 ✅）：
   具專屬 typed 文件類別與 `Create`/`Load` 入口；語意 API 繼承四主格式基底類別。
 - ODT `text:tracked-changes` 已支援段落與表格儲存格插入／格式變更記錄；LO 互通測試已備（`TrackedChangesInteropTests`）。

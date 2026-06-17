@@ -49,6 +49,15 @@ public partial class TextDocument
         TextDocumentNotesEngine.GetIndexes(this, BodyTextRoot);
 
     /// <summary>
+    /// 重新產生文件中所有索引的內容。
+    /// </summary>
+    public void UpdateIndexes()
+    {
+        foreach (OdfIndex index in GetIndexes())
+            index.Update();
+    }
+
+    /// <summary>
     /// 取得文件中所有索引的摘要清單。
     /// </summary>
     public IReadOnlyList<OdfIndexInfo> GetIndexInfos() =>

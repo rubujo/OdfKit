@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using OdfKit.Chart;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
@@ -141,6 +142,31 @@ public class SpreadsheetHighLevelApiTests
         Assert.Equal("範圍錯誤", info.ErrorMessage);
         Assert.Equal("warning", info.AlertStyle);
         Assert.Equal(5, info.AppliedRanges.Count);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.GetEmbeddedChartDocument"/> 可取得並編輯嵌入圖表。
+    /// </summary>
+    [Fact]
+    public void GetEmbeddedChartDocument_AllowsEditingTitleAndType()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.AddSheet("Sheet1");
+        document.AddChart("Sheet1", new OdfCellAddress(0, 3, "Sheet1"), new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Bar,
+            Title = "原始標題",
+            DataRange = new OdfCellRange(0, 0, 3, 1, "Sheet1"),
+        });
+
+        OdfEmbeddedChartInfo chartInfo = Assert.Single(document.GetEmbeddedCharts());
+        OdfChartDocument chartDoc = document.GetEmbeddedChartDocument(chartInfo);
+        chartDoc.SetChartType(OdfChartType.Line);
+        chartDoc.ChartTitle = "修訂標題";
+
+        Assert.Equal("chart:line", chartDoc.ChartClass);
+        Assert.Equal("修訂標題", chartDoc.ChartTitle);
+        Assert.Equal(OdfChartType.Line, chartDoc.GetChartDefinition().ChartType);
     }
 
     /// <summary>

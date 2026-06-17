@@ -172,6 +172,36 @@ public class DrawingHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfDrawPage.GroupShapes"/> 可將圖形合併為群組。
+    /// </summary>
+    [Fact]
+    public void GroupShapes_MovesShapesIntoNewGroup()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("Page1");
+        OdfShape first = page.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("2cm"));
+        OdfShape second = page.AddShape(
+            OdfShapeType.Ellipse,
+            OdfLength.Parse("4cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("2cm"));
+
+        OdfDrawGroup group = page.GroupShapes([first.Id, second.Id], "流程群組");
+        Assert.Equal("流程群組", group.Name);
+        Assert.Equal(2, group.Node.Children.Count);
+
+        OdfGroupInfo groupInfo = Assert.Single(page.GetGroups());
+        Assert.Equal(group.Id, groupInfo.Id);
+        Assert.Equal("流程群組", groupInfo.Name);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="OdfShape.SetConnectorRoutePoints(string)"/> 可寫入連接線路由頂點。
     /// </summary>
     [Fact]

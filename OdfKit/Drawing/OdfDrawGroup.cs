@@ -74,6 +74,41 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
         return new OdfShape(shapeNode, Document);
     }
 
+    /// <summary>
+    /// 在群組內新增連接線。
+    /// </summary>
+    /// <param name="startShapeId">起點圖形識別碼。</param>
+    /// <param name="endShapeId">終點圖形識別碼。</param>
+    /// <param name="connectorType">連接線幾何類型。</param>
+    /// <returns>新增的連接線圖形執行個體。</returns>
+    public OdfShape AddConnector(
+        string startShapeId,
+        string endShapeId,
+        OdfConnectorType connectorType = OdfConnectorType.Standard)
+    {
+        if (string.IsNullOrEmpty(startShapeId))
+            throw new ArgumentException("起點圖形識別碼不可為空。", nameof(startShapeId));
+        if (string.IsNullOrEmpty(endShapeId))
+            throw new ArgumentException("終點圖形識別碼不可為空。", nameof(endShapeId));
+
+        var connectorNode = OdfNodeFactory.CreateElement("connector", OdfNamespaces.Draw, "draw");
+        connectorNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        connectorNode.SetAttribute("start-shape", OdfNamespaces.Draw, startShapeId, "draw");
+        connectorNode.SetAttribute("end-shape", OdfNamespaces.Draw, endShapeId, "draw");
+
+        string typeVal = connectorType switch
+        {
+            OdfConnectorType.Lines => "lines",
+            OdfConnectorType.Straight => "straight",
+            OdfConnectorType.Curve => "curve",
+            _ => "standard",
+        };
+        connectorNode.SetAttribute("type", OdfNamespaces.Draw, typeVal, "draw");
+
+        Node.AppendChild(connectorNode);
+        return new OdfShape(connectorNode, Document);
+    }
+
     private static OdfNode CreateDrawingFrame(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         var frame = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Draw, "draw");

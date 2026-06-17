@@ -313,6 +313,19 @@ public class PresentationHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfSlide.SetLayout"/> 可於投影片層設定版面配置。
+    /// </summary>
+    [Fact]
+    public void SlideSetLayout_RoundTripsThroughGetLayout()
+    {
+        using var document = PresentationDocument.Create();
+        OdfSlide slide = document.AddSlide();
+
+        slide.SetLayout(OdfPresentationLayout.TitleAndSubtitle);
+        Assert.Equal(OdfPresentationLayout.TitleAndSubtitle, slide.GetLayout());
+    }
+
+    /// <summary>
     /// 驗證 <see cref="PresentationDocument.GetLayouts"/> 可讀回各投影片版面配置。
     /// </summary>
     [Fact]

@@ -405,6 +405,24 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="TextDocument.UpdateIndexes"/> 可重新產生字母索引內容。
+    /// </summary>
+    [Fact]
+    public void UpdateIndexes_RegeneratesAlphabeticalIndexBody()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("索引條目");
+        document.AddAlphabeticalIndexMark(paragraph, "關鍵字", "K", "1");
+        OdfAlphabeticalIndex index = document.AddAlphabeticalIndex("術語索引");
+
+        document.UpdateIndexes();
+
+        OdfNode? body = index.BodyNode;
+        Assert.NotNull(body);
+        Assert.Contains(body.Children, child => child.TextContent?.Contains("關鍵字") == true);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="TextDocument.GetIndexInfos"/> 與 <see cref="TextDocument.GetIndexMarks"/> 可讀回索引與標記。
     /// </summary>
     [Fact]
