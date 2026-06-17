@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Presentation;
@@ -64,6 +66,53 @@ public class PresentationApiUsabilityTests
         Assert.Single(loaded.Slides[0].Pictures);
         Assert.Equal(picture.ImageHref, loaded.Slides[0].Pictures[0].ImageHref);
         Assert.Contains(loaded.Slides[0].Shapes, shape => shape.LocalName == "rect");
+    }
+
+    /// <summary>
+    /// 驗證可用 LoadAsync 非同步載入 ODP 並 round-trip。
+    /// </summary>
+    [Fact]
+    public async Task LoadAsync_RoundTripsPresentationContent()
+    {
+        using var deck = PresentationDocument.Create();
+        deck.Slides.Add("AsyncIntro").AddTextBox(
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(8),
+            OdfLength.FromCentimeters(2),
+            "非同步標題");
+
+        await using var stream = new MemoryStream();
+        await deck.SaveAsync(stream, cancellationToken: TestContext.Current.CancellationToken);
+        stream.Position = 0;
+
+        await using var loaded = await PresentationDocument.LoadAsync(stream, cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Single(loaded.Slides);
+        Assert.Equal("AsyncIntro", loaded.Slides[0].Name);
+        Assert.Equal("非同步標題", loaded.Slides[0].TextBoxes[0].Text);
+    }
+
+    /// <summary>
+    /// 預先取消的語彙應使 PresentationDocument.LoadAsync 拋出 OperationCanceledException。
+    /// </summary>
+    [Fact]
+    public async Task LoadAsync_PreCancelledToken_ThrowsOperationCanceledException()
+    {
+        await using var stream = new MemoryStream();
+        using (OdfPackage package = OdfDocumentFactory.CreatePackage(stream, OdfDocumentKind.Presentation, leaveOpen: true))
+        {
+            package.Save();
+        }
+
+        stream.Position = 0;
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await using var _ = await PresentationDocument.LoadAsync(stream, cancellationToken: cts.Token);
+        });
     }
 
     /// <summary>

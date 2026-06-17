@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using OdfKit.Compliance;
 using OdfKit.Core;
 
@@ -56,6 +58,15 @@ public class FormulaDocument : OdfFormulaDocument
     }
 
     /// <summary>
+    /// 非同步從指定檔案路徑載入高階公式文件。
+    /// </summary>
+    /// <param name="path">ODF 公式文件路徑。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的高階 <see cref="FormulaDocument"/>。</returns>
+    public new static async Task<FormulaDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+        EnsureFormula(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
+
+    /// <summary>
     /// 從指定資料流載入高階公式文件。
     /// </summary>
     /// <param name="stream">包含 ODF 公式文件內容的資料流。</param>
@@ -65,6 +76,16 @@ public class FormulaDocument : OdfFormulaDocument
     {
         return EnsureFormula(OdfDocumentFactory.LoadDocument(stream, fileName));
     }
+
+    /// <summary>
+    /// 非同步從指定資料流載入高階公式文件。
+    /// </summary>
+    /// <param name="stream">包含 ODF 公式文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的高階 <see cref="FormulaDocument"/>。</returns>
+    public new static async Task<FormulaDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+        EnsureFormula(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     private static FormulaDocument EnsureFormula(OdfDocument document)
     {
