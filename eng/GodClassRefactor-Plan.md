@@ -154,12 +154,17 @@
 - [x] `OdfDocumentPersistenceCollaborators` 協作存取器
 - [x] `OdfDocument.Helpers`／`Metadata`／`Lifecycle` 收斂為薄門面
 
-## 剩餘工作（Phase 20+）
+## Phase 20（已完成）
+
+- [x] `OdfPackageEntryAccessEngine`（封裝項目讀寫、媒體修剪與內嵌物件）
+- [x] `OdfPackageEntryCollaborators` 協作存取器
+- [x] `OdfPackage.PublicApi` 收斂為薄門面
+
+## 剩餘工作（可選）
 
 | 型別 | 約略行數 | 待提取 |
 |------|----------|--------|
-| `OdfPackage` | ~900 | 公開 API 項目讀寫（需保留薄門面） |
-| `OdfElement` | ~640 | Wrapper partial（typed DOM 元素，低優先） |
+| `OdfElement` | ~640 | Wrapper partial（typed DOM 元素，低優先，可略過） |
 
 ## 驗證
 

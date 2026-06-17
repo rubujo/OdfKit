@@ -50,7 +50,7 @@ public sealed partial class OdfPackage
         internal void SaveRdfMetadata() => OdfPackageRdfMetadataEngine.Save(this);
 
         internal void WriteEntry(string name, byte[] content, string mediaType) =>
-            _package.WriteEntry(name, content, mediaType);
+            OdfPackageEntryAccessEngine.WriteEntry(_package.EntryCollaborators, name, content, mediaType);
 
         internal void SaveManifest() => OdfPackageManifestWriter.WriteManifest(this);
 

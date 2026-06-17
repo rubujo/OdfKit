@@ -122,10 +122,7 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// <param name="name">項目的相對路徑名稱</param>
     /// <returns>若該項目已加密，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool IsEntryEncrypted(string name)
-    {
-        name = SanitizeEntryName(name);
-        return _entries.TryGetValue(name, out var entry) && entry.EncryptionInfo != null;
-    }
+        => OdfPackageEntryAccessEngine.IsEntryEncrypted(EntryCollaborators, name);
 
     /// <summary>
     /// 取得指定項目的加密詳細資訊。
@@ -133,10 +130,7 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// <param name="name">項目的相對路徑名稱</param>
     /// <returns>項目的加密資訊；若未加密則為 <see langword="null"/></returns>
     public OdfEncryptionInfo? GetEntryEncryptionInfo(string name)
-    {
-        name = SanitizeEntryName(name);
-        return _entries.TryGetValue(name, out var entry) ? entry.EncryptionInfo : null;
-    }
+        => OdfPackageEntryAccessEngine.GetEntryEncryptionInfo(EntryCollaborators, name);
 
     private OdfPackage(OdfPackageMode mode, Stream? underlyingStream, bool leaveOpen, OdfLoadOptions? loadOptions, OdfSaveOptions? saveOptions)
     {

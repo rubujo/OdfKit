@@ -70,7 +70,7 @@ public sealed partial class OdfPackage
         }
 
         internal void WriteVirtualEntry(string name, byte[] content, string mediaType) =>
-            _package.WriteVirtualEntry(name, content, mediaType);
+            OdfPackageEntryAccessEngine.WriteVirtualEntry(_package.EntryCollaborators, name, content, mediaType);
 
         internal void InitializeFlatXml(byte[] signature, int signatureLength) =>
             OdfPackageFlatXmlLoader.Initialize(this, signature, signatureLength);

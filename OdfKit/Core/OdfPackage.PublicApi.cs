@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
-using System.Text;
-using OdfKit.DOM;
 
 namespace OdfKit.Core;
 
@@ -11,16 +7,13 @@ public sealed partial class OdfPackage
 {
     #region Public API
 
-
     /// <summary>
     /// 檢查封裝中是否包含指定名稱的項目。
     /// </summary>
     /// <param name="name">項目的相對路徑名稱</param>
     /// <returns>若項目存在則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool HasEntry(string name)
-    {
-        return _entries.ContainsKey(SanitizeEntryName(name));
-    }
+        => OdfPackageEntryAccessEngine.HasEntry(EntryCollaborators, name);
 
     /// <summary>
     /// 提供 ODF 封裝中實體項目的基本資訊。
@@ -44,9 +37,7 @@ public sealed partial class OdfPackage
     /// </summary>
     /// <returns>所有項目的資訊集合</returns>
     public IEnumerable<OdfPackageEntryInfo> GetEntries()
-    {
-        return _entries.Keys.Select(k => new OdfPackageEntryInfo(k));
-    }
+        => OdfPackageEntryAccessEngine.GetEntries(EntryCollaborators);
 
     /// <summary>
     /// 讀取指定路徑項目的完整內容位元組。
@@ -54,12 +45,7 @@ public sealed partial class OdfPackage
     /// <param name="path">項目的相對路徑名稱</param>
     /// <returns>項目的位元組陣列內容</returns>
     public byte[] ReadEntry(string path)
-    {
-        using var stream = GetEntryStream(path);
-        using var ms = new MemoryStream();
-        stream.CopyTo(ms);
-        return ms.ToArray();
-    }
+        => OdfPackageEntryAccessEngine.ReadEntry(EntryCollaborators, path);
 
     /// <summary>
     /// 將目前 ODF 封裝儲存到指定的目標資料流中。
@@ -77,16 +63,7 @@ public sealed partial class OdfPackage
     /// <param name="name">項目的相對路徑名稱</param>
     /// <returns>代表項目內容的資料流</returns>
     public Stream GetEntryStream(string name)
-    {
-        name = SanitizeEntryName(name);
-
-        if (_entries.TryGetValue(name, out var entry))
-        {
-            return entry.OpenReader();
-        }
-
-        throw new FileNotFoundException($"Entry '{name}' not found in ODF package.");
-    }
+        => OdfPackageEntryAccessEngine.GetEntryStream(EntryCollaborators, name);
 
     /// <summary>
     /// 將指定的位元組內容寫入或覆寫封裝中的項目。
@@ -95,25 +72,7 @@ public sealed partial class OdfPackage
     /// <param name="content">要寫入的位元組內容</param>
     /// <param name="mediaType">項目的 MIME 媒體類型</param>
     public void WriteEntry(string name, byte[] content, string mediaType)
-    {
-        name = SanitizeEntryName(name);
-        OdfPackageEntry entry = new(name, content);
-        _entries[name] = entry;
-        _manifest[name] = mediaType;
-
-        if (name.EndsWith("/mimetype") && name.Length > 9)
-        {
-            string folder = name.Substring(0, name.Length - 8); // keeps the trailing slash
-            string mimeText = Encoding.UTF8.GetString(content).Trim();
-            _manifest[folder] = mimeText;
-        }
-
-        // Clear signature on edit, except when writing signature itself or manifest
-        if (name != "META-INF/documentsignatures.xml" && name != "META-INF/manifest.xml")
-        {
-            RemoveOutdatedSignatures();
-        }
-    }
+        => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, content, mediaType);
 
     /// <summary>
     /// 將指定的資料流內容寫入或覆寫封裝中的項目。
@@ -122,118 +81,39 @@ public sealed partial class OdfPackage
     /// <param name="contentStream">要寫入的內容來源資料流</param>
     /// <param name="mediaType">項目的 MIME 媒體類型</param>
     public void WriteEntry(string name, Stream contentStream, string mediaType)
-    {
-        name = SanitizeEntryName(name);
-        OdfPackageEntry entry = new(name, contentStream);
-        _entries[name] = entry;
-        _manifest[name] = mediaType;
-
-        if (name.EndsWith("/mimetype") && name.Length > 9)
-        {
-            string folder = name.Substring(0, name.Length - 8); // keeps the trailing slash
-            byte[] bytes;
-            using (MemoryStream ms = new())
-            {
-                contentStream.CopyTo(ms);
-                bytes = ms.ToArray();
-            }
-            entry.SetContent(bytes);
-            string mimeText = Encoding.UTF8.GetString(bytes).Trim();
-            _manifest[folder] = mimeText;
-        }
-
-        if (name != "META-INF/documentsignatures.xml" && name != "META-INF/manifest.xml")
-        {
-            RemoveOutdatedSignatures();
-        }
-    }
+        => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, contentStream, mediaType);
 
     /// <summary>
     /// 從封裝中移除指定的項目。
     /// </summary>
     /// <param name="name">要移除的項目相對路徑名稱</param>
     public void RemoveEntry(string name)
-    {
-        name = SanitizeEntryName(name);
-        _entries.Remove(name);
-        _manifest.Remove(name);
-
-        if (name != "META-INF/documentsignatures.xml" && name != "META-INF/manifest.xml")
-        {
-            RemoveOutdatedSignatures();
-        }
-    }
+        => OdfPackageEntryAccessEngine.RemoveEntry(EntryCollaborators, name);
 
     /// <summary>
     /// 清理封裝中未被參照的圖片等媒體檔案。
     /// </summary>
     /// <param name="referencedMediaPaths">所有目前正被參照的媒體檔案路徑集合</param>
     public void PruneUnusedMedia(IEnumerable<string> referencedMediaPaths)
-    {
-        HashSet<string> referencedSet = new(StringComparer.Ordinal);
-        foreach (var path in referencedMediaPaths)
-        {
-            referencedSet.Add(SanitizeEntryName(path));
-        }
-
-        List<string> keysToRemove = [];
-        foreach (var key in _entries.Keys)
-        {
-            if (key.StartsWith("Pictures/", StringComparison.OrdinalIgnoreCase))
-            {
-                if (!referencedSet.Contains(key))
-                {
-                    keysToRemove.Add(key);
-                }
-            }
-        }
-
-        foreach (var key in keysToRemove)
-        {
-            RemoveEntry(key);
-            OdfKitDiagnostics.Info($"Pruned unused media entry: {key}");
-        }
-    }
+        => OdfPackageEntryAccessEngine.PruneUnusedMedia(EntryCollaborators, referencedMediaPaths);
 
     /// <summary>
     /// 設定 ODF 封裝的主要 MIME 媒體類型。
     /// </summary>
     /// <param name="mimetype">媒體類型字串</param>
     public void SetMimeType(string mimetype)
-    {
-        _mimetype = mimetype;
-        WriteEntry("mimetype", Encoding.UTF8.GetBytes(mimetype), string.Empty);
-        // Mimetype itself does not compression
-        if (_entries.TryGetValue("mimetype", out var mimeEntry))
-        {
-            mimeEntry.IsCompressed = false;
-        }
-    }
-
+        => OdfPackageEntryAccessEngine.SetMimeType(EntryCollaborators, mimetype);
 
     #endregion
 
     #region Embedded Objects Extraction
-
 
     /// <summary>
     /// 取得此封裝中所內嵌的 ODF 物件資料夾路徑清單。
     /// </summary>
     /// <returns>內嵌物件路徑的集合</returns>
     public IEnumerable<string> GetEmbeddedObjects()
-    {
-        List<string> list = [];
-        foreach (var kvp in _manifest)
-        {
-            // Embedded objects have media types starting with application/vnd.oasis.opendocument.*
-            // and full paths that represent folders (registered in manifest with '/' at end or as parents)
-            if (kvp.Key != "/" && kvp.Value.StartsWith("application/vnd.oasis.opendocument.", StringComparison.Ordinal))
-            {
-                list.Add(kvp.Key);
-            }
-        }
-        return list;
-    }
+        => OdfPackageEntryAccessEngine.GetEmbeddedObjects(EntryCollaborators);
 
     /// <summary>
     /// 擷取內嵌物件的主要內容 XML 資料流。
@@ -241,16 +121,7 @@ public sealed partial class OdfPackage
     /// <param name="objectName">內嵌物件的路徑名稱</param>
     /// <returns>內嵌物件內容的資料流</returns>
     public Stream ExtractObjectStream(string objectName)
-    {
-        // 內嵌物件資料流為資料夾結構。我們會在其路徑（如 objectName/）下尋找相關項目。
-        // 一般而言，內嵌物件在其子路徑下會包含 content.xml、styles.xml 等項目。
-        // 若使用者要求物件主體本身，則擲出例外狀況或傳回子封裝。
-        // 對於一般的內嵌擷取，使用者可透過 GetEntryStream 並搭配 objectName + "/content.xml" 來取得。
-        string path = SanitizeEntryName(objectName);
-        return GetEntryStream(path + "/content.xml");
-    }
-
+        => OdfPackageEntryAccessEngine.ExtractObjectStream(EntryCollaborators, objectName);
 
     #endregion
-
 }
