@@ -109,17 +109,26 @@ public static partial class OdfEncryption
         byte[] derivedKey;
         if (isArgon2)
         {
-            var builder = new Argon2Parameters.Builder(Argon2Parameters.Argon2id)
-                .WithVersion(Argon2Parameters.Version13)
-                .WithIterations(argon2T)
-                .WithMemoryAsKB(argon2M)
-                .WithParallelism(argon2P)
-                .WithSalt(salt);
+            int effectiveParallelism = Math.Max(1, Math.Min(argon2P, Environment.ProcessorCount));
+            Argon2ConcurrencyGate.Wait();
+            try
+            {
+                var builder = new Argon2Parameters.Builder(Argon2Parameters.Argon2id)
+                    .WithVersion(Argon2Parameters.Version13)
+                    .WithIterations(argon2T)
+                    .WithMemoryAsKB(argon2M)
+                    .WithParallelism(effectiveParallelism)
+                    .WithSalt(salt);
 
-            var generator = new Argon2BytesGenerator();
-            generator.Init(builder.Build());
-            derivedKey = new byte[keySize];
-            generator.GenerateBytes(pwdBytes, derivedKey, 0, derivedKey.Length);
+                var generator = new Argon2BytesGenerator();
+                generator.Init(builder.Build());
+                derivedKey = new byte[keySize];
+                generator.GenerateBytes(pwdBytes, derivedKey, 0, derivedKey.Length);
+            }
+            finally
+            {
+                Argon2ConcurrencyGate.Release();
+            }
         }
         else
         {

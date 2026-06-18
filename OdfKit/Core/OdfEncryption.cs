@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Modes;
@@ -42,6 +43,13 @@ public static partial class OdfEncryption
     /// Argon2id 金鑰衍生函數的識別 URI。
     /// </summary>
     public const string Argon2idDerivationUri = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0#argon2id";
+
+    /// <summary>
+    /// 同時進行 Argon2id 衍生運算的上限，避免高併發解密耗盡 ThreadPool（PERF-4k）。
+    /// </summary>
+    private static readonly int Argon2MaxConcurrentOperations = Math.Max(1, Environment.ProcessorCount / 2);
+
+    private static readonly SemaphoreSlim Argon2ConcurrencyGate = new(Argon2MaxConcurrentOperations, Argon2MaxConcurrentOperations);
 
     /// <summary>
     /// 自訂實作以金鑰為基礎的金鑰衍生函式 PBKDF2，支援 SHA-1 與 SHA-256，確保跨平台行為一致。

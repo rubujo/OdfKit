@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using OdfKit.Chart;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -26,13 +25,7 @@ public static class OdfChartRenderer
 
         foreach (var sheet in document.Worksheets)
         {
-            var frames = sheet.TableNode.Descendants()
-                .Where(c => c.NodeType == OdfNodeType.Element &&
-                            c.LocalName == "frame" &&
-                            c.NamespaceUri == OdfNamespaces.Draw)
-                .ToList();
-
-            foreach (var frame in frames)
+            foreach (var frame in EnumerateDrawFrames(sheet.TableNode))
             {
                 var objNode = frame.Children.Find(c =>
                     c.NodeType == OdfNodeType.Element &&
@@ -46,25 +39,19 @@ public static class OdfChartRenderer
                 if (string.IsNullOrEmpty(href))
                     continue;
 
-                // 移除 ./ 前綴取得物件目錄名稱（例如 Object 1）
                 string objectName = href!.TrimStart('.', '/');
                 string objectDir = $"{objectName}/";
 
                 if (!document.Package.HasEntry($"{objectDir}content.xml"))
                     continue;
 
-                // 1. 載入嵌入的 OdfChartDocument
                 var chartDoc = new OdfChartDocument(document.Package, objectDir);
-
-                // 2. 讀取圖表配置
                 string chartClass = chartDoc.ChartClass;
                 string? title = chartDoc.ChartTitle;
                 string? categoriesAddr = chartDoc.CategoriesCellRangeAddress;
                 var seriesList = chartDoc.Series;
 
-                // 3. 讀取單元格資料
-                var categoriesData = GetRangeValues(document, categoriesAddr);
-                string[] categories = categoriesData.Select(c => c?.ToString() ?? string.Empty).ToArray();
+                string[] categories = GetRangeStrings(document, categoriesAddr);
 
                 var plot = new ScottPlot.Plot();
                 if (!string.IsNullOrEmpty(title))
@@ -72,16 +59,12 @@ public static class OdfChartRenderer
                     plot.Title(title!);
                 }
 
-                // 4. 依圖表類型使用 ScottPlot 5.1.58 進行繪圖
                 if (chartClass.Contains("pie"))
                 {
-                    // 圓餅圖：一般只取第一組數值
                     if (seriesList.Count > 0)
                     {
                         var series = seriesList[0];
-                        var valuesData = GetRangeValues(document, series.ValuesCellRangeAddress);
-                        double[] values = valuesData.Select(ToDouble).ToArray();
-
+                        double[] values = GetRangeDoubles(document, series.ValuesCellRangeAddress);
                         var pies = plot.Add.Pie(values);
                         if (categories.Length == values.Length)
                         {
@@ -89,19 +72,18 @@ public static class OdfChartRenderer
                             {
                                 pies.Slices[i].Label = categories[i];
                             }
+
                             plot.ShowLegend();
                         }
                     }
                 }
                 else if (chartClass.Contains("line") || chartClass.Contains("scatter"))
                 {
-                    // 折線圖
                     for (int s = 0; s < seriesList.Count; s++)
                     {
                         var series = seriesList[s];
-                        var valuesData = GetRangeValues(document, series.ValuesCellRangeAddress);
-                        double[] values = valuesData.Select(ToDouble).ToArray();
-                        double[] xs = Enumerable.Range(0, values.Length).Select(x => (double)x).ToArray();
+                        double[] values = GetRangeDoubles(document, series.ValuesCellRangeAddress);
+                        double[] xs = CreateIndexAxis(values.Length);
 
                         string seriesName = GetSeriesName(document, series.LabelCellAddress) ?? $"Series {s + 1}";
                         var scatter = plot.Add.Scatter(xs, values);
@@ -112,16 +94,15 @@ public static class OdfChartRenderer
                             plot.Axes.Bottom.SetTicks(xs, categories);
                         }
                     }
+
                     plot.ShowLegend();
                 }
                 else
                 {
-                    // 預設與長條圖 (chart:bar)
                     for (int s = 0; s < seriesList.Count; s++)
                     {
                         var series = seriesList[s];
-                        var valuesData = GetRangeValues(document, series.ValuesCellRangeAddress);
-                        double[] values = valuesData.Select(ToDouble).ToArray();
+                        double[] values = GetRangeDoubles(document, series.ValuesCellRangeAddress);
 
                         string seriesName = GetSeriesName(document, series.LabelCellAddress) ?? $"Series {s + 1}";
                         var barPlot = plot.Add.Bars(values);
@@ -129,21 +110,19 @@ public static class OdfChartRenderer
 
                         if (s == 0 && categories.Length == values.Length)
                         {
-                            double[] xs = Enumerable.Range(0, values.Length).Select(x => (double)x).ToArray();
-                            plot.Axes.Bottom.SetTicks(xs, categories);
+                            plot.Axes.Bottom.SetTicks(CreateIndexAxis(values.Length), categories);
                         }
                     }
+
                     plot.ShowLegend();
                 }
 
-                // 5. 輸出靜態 PNG 並寫回封裝
                 (int wPx, int hPx) = ParseDimensions(frame);
                 byte[] pngBytes = plot.GetImageBytes(wPx, hPx, ScottPlot.ImageFormat.Png);
 
                 string fallbackImagePath = $"Pictures/chart-fallback-{objectName}.png";
                 document.Package.WriteEntry(fallbackImagePath, pngBytes, "image/png");
 
-                // 6. 在 XML 裡插入 draw:image 節點
                 var imgNode = frame.Children.Find(c =>
                     c.NodeType == OdfNodeType.Element &&
                     c.LocalName == "image" &&
@@ -163,43 +142,122 @@ public static class OdfChartRenderer
         }
     }
 
-    private static List<object?> GetRangeValues(SpreadsheetDocument doc, string? rangeAddress)
+    private static IEnumerable<OdfNode> EnumerateDrawFrames(OdfNode root)
     {
-        var values = new List<object?>();
-        if (string.IsNullOrEmpty(rangeAddress))
-            return values;
-
-        if (OdfCellRange.TryParse(rangeAddress!, out var cellRange))
+        var stack = new Stack<OdfNode>();
+        stack.Push(root);
+        while (stack.Count > 0)
         {
-            string? sheetName = cellRange.StartAddress.SheetName ?? cellRange.EndAddress.SheetName;
-            if (string.IsNullOrEmpty(sheetName))
+            OdfNode node = stack.Pop();
+            foreach (var child in node.Children)
             {
-                var firstSheet = doc.Worksheets.FirstOrDefault();
-                sheetName = firstSheet?.Name;
-            }
-
-            if (!string.IsNullOrEmpty(sheetName))
-            {
-                var sheet = doc.GetSheet(sheetName!);
-                if (sheet is not null)
+                if (child.NodeType != OdfNodeType.Element)
                 {
-                    int minRow = Math.Min(cellRange.StartAddress.Row, cellRange.EndAddress.Row);
-                    int maxRow = Math.Max(cellRange.StartAddress.Row, cellRange.EndAddress.Row);
-                    int minCol = Math.Min(cellRange.StartAddress.Column, cellRange.EndAddress.Column);
-                    int maxCol = Math.Max(cellRange.StartAddress.Column, cellRange.EndAddress.Column);
-
-                    for (int r = minRow; r <= maxRow; r++)
-                    {
-                        for (int c = minCol; c <= maxCol; c++)
-                        {
-                            var cell = sheet.GetCell(r, c);
-                            values.Add(cell?.CellValue);
-                        }
-                    }
+                    continue;
                 }
+
+                if (child.LocalName == "frame" && child.NamespaceUri == OdfNamespaces.Draw)
+                {
+                    yield return child;
+                }
+
+                stack.Push(child);
             }
         }
-        return values;
+    }
+
+    private static string[] GetRangeStrings(SpreadsheetDocument doc, string? rangeAddress)
+    {
+        if (!TryGetRangeBounds(doc, rangeAddress, out OdfTableSheet? sheet, out int minRow, out int maxRow, out int minCol, out int maxCol))
+        {
+            return Array.Empty<string>();
+        }
+
+        int length = (maxRow - minRow + 1) * (maxCol - minCol + 1);
+        var result = new string[length];
+        int index = 0;
+        for (int r = minRow; r <= maxRow; r++)
+        {
+            for (int c = minCol; c <= maxCol; c++)
+            {
+                object? value = sheet!.GetCell(r, c)?.CellValue;
+                result[index++] = value?.ToString() ?? string.Empty;
+            }
+        }
+
+        return result;
+    }
+
+    private static double[] GetRangeDoubles(SpreadsheetDocument doc, string? rangeAddress)
+    {
+        if (!TryGetRangeBounds(doc, rangeAddress, out OdfTableSheet? sheet, out int minRow, out int maxRow, out int minCol, out int maxCol))
+        {
+            return Array.Empty<double>();
+        }
+
+        int length = (maxRow - minRow + 1) * (maxCol - minCol + 1);
+        var result = new double[length];
+        int index = 0;
+        for (int r = minRow; r <= maxRow; r++)
+        {
+            for (int c = minCol; c <= maxCol; c++)
+            {
+                result[index++] = ToDouble(sheet!.GetCell(r, c)?.CellValue);
+            }
+        }
+
+        return result;
+    }
+
+    private static bool TryGetRangeBounds(
+        SpreadsheetDocument doc,
+        string? rangeAddress,
+        out OdfTableSheet? sheet,
+        out int minRow,
+        out int maxRow,
+        out int minCol,
+        out int maxCol)
+    {
+        sheet = null;
+        minRow = maxRow = minCol = maxCol = 0;
+        if (string.IsNullOrEmpty(rangeAddress) || !OdfCellRange.TryParse(rangeAddress!, out var cellRange))
+        {
+            return false;
+        }
+
+        string? sheetName = cellRange.StartAddress.SheetName ?? cellRange.EndAddress.SheetName;
+        if (string.IsNullOrEmpty(sheetName))
+        {
+            sheetName = doc.Worksheets.Count > 0 ? doc.Worksheets[0].Name : null;
+        }
+
+        if (string.IsNullOrEmpty(sheetName))
+        {
+            return false;
+        }
+
+        sheet = doc.GetSheet(sheetName!);
+        if (sheet is null)
+        {
+            return false;
+        }
+
+        minRow = Math.Min(cellRange.StartAddress.Row, cellRange.EndAddress.Row);
+        maxRow = Math.Max(cellRange.StartAddress.Row, cellRange.EndAddress.Row);
+        minCol = Math.Min(cellRange.StartAddress.Column, cellRange.EndAddress.Column);
+        maxCol = Math.Max(cellRange.StartAddress.Column, cellRange.EndAddress.Column);
+        return true;
+    }
+
+    private static double[] CreateIndexAxis(int length)
+    {
+        var xs = new double[length];
+        for (int i = 0; i < length; i++)
+        {
+            xs[i] = i;
+        }
+
+        return xs;
     }
 
     private static string? GetSeriesName(SpreadsheetDocument doc, string? labelCellAddress)
@@ -210,19 +268,18 @@ public static class OdfChartRenderer
         if (OdfCellAddress.TryParse(labelCellAddress!, out var address))
         {
             string? sheetName = address.SheetName;
-            if (string.IsNullOrEmpty(sheetName))
+            if (string.IsNullOrEmpty(sheetName) && doc.Worksheets.Count > 0)
             {
-                var firstSheet = doc.Worksheets.FirstOrDefault();
-                sheetName = firstSheet?.Name;
+                sheetName = doc.Worksheets[0].Name;
             }
 
             if (!string.IsNullOrEmpty(sheetName))
             {
                 var sheet = doc.GetSheet(sheetName!);
-                var cell = sheet?.GetCell(address.Row, address.Column);
-                return cell?.CellValue?.ToString();
+                return sheet?.GetCell(address.Row, address.Column)?.CellValue?.ToString();
             }
         }
+
         return null;
     }
 
@@ -243,6 +300,7 @@ public static class OdfChartRenderer
         {
             return parsed;
         }
+
         return 0.0;
     }
 
@@ -276,6 +334,7 @@ public static class OdfChartRenderer
         {
             return double.TryParse(s.Substring(0, s.Length - 2), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out cm);
         }
+
         if (s.EndsWith("in"))
         {
             if (double.TryParse(s.Substring(0, s.Length - 2), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double inches))
@@ -284,6 +343,7 @@ public static class OdfChartRenderer
                 return true;
             }
         }
+
         return double.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out cm);
     }
 }

@@ -32,11 +32,10 @@ public static class OdfXmlWriter
             CloseOutput = false
         };
 
-        // 1. 預先掃描 DOM 樹以收集所有命名空間及其前綴
         Dictionary<string, string> nsDict = new(StringComparer.Ordinal);
         CollectNamespaces(rootNode, nsDict);
 
-        // 確保標準 XML 命名空間不會被明確宣告為 xmlns:xml
+        // 確保標準 XML 命名空間不會被重複宣告為 xmlns:xml
         nsDict.Remove("http://www.w3.org/XML/1998/namespace");
 
         using (var writer = XmlWriter.Create(stream, settings))
@@ -46,7 +45,7 @@ public static class OdfXmlWriter
             {
                 writer.WriteStartDocument();
 
-                // 遞迴寫入（深度上限與 OdfXmlReader.MaxElementDepth 對稱，PERF-4i）
+                // 單次走訪寫入；命名空間於根元素一次宣告（PERF-4j：避免子元素插入 xmlns 破壞屬性順序）
                 WriteNode(rootNode, writer, nsDict, ref openElementsCount, isRoot: true, depth: 1);
 
                 writer.WriteEndDocument();
@@ -56,18 +55,19 @@ public static class OdfXmlWriter
                 OdfKitDiagnostics.Warn($"Exception during XML serialization: {ex.Message}. Force-closing open tags to salvage XML structure.", ex);
                 try
                 {
-                    // 自動關閉任何未關閉的標籤以保持 XML 結構有效
                     while (openElementsCount > 0)
                     {
                         writer.WriteEndElement();
                         openElementsCount--;
                     }
+
                     writer.Flush();
                 }
                 catch (Exception salvageEx)
                 {
                     OdfKitDiagnostics.Warn($"XML 序列化救援關閉標籤時發生次要錯誤：{salvageEx.Message}", salvageEx);
                 }
+
                 throw;
             }
         }
@@ -105,7 +105,6 @@ public static class OdfXmlWriter
             return;
         }
 
-        // 寫入開始元素
         string prefix = GetNamespacePrefix(node.NamespaceUri, node.Prefix, nsDict);
         if (!string.IsNullOrEmpty(node.NamespaceUri))
         {
@@ -115,27 +114,24 @@ public static class OdfXmlWriter
         {
             writer.WriteStartElement(node.LocalName);
         }
+
         openElementsCount++;
 
-        // 如果是根元素，則在最上層宣告所有收集到的命名空間
         if (isRoot)
         {
             foreach (var ns in nsDict)
             {
                 if (string.IsNullOrEmpty(ns.Value))
                 {
-                    // 預設命名空間宣告
                     writer.WriteAttributeString("xmlns", ns.Key);
                 }
                 else
                 {
-                    // 前綴命名空間宣告 (xmlns:prefix="uri")
                     writer.WriteAttributeString("xmlns", ns.Value, "http://www.w3.org/2000/xmlns/", ns.Key);
                 }
             }
         }
 
-        // 寫入屬性
         foreach (var attr in node.Attributes)
         {
             string attrPrefix = GetNamespacePrefix(attr.Key.NamespaceUri, node.GetAttributePrefix(attr.Key), nsDict);
@@ -149,69 +145,74 @@ public static class OdfXmlWriter
             }
         }
 
-        // 寫入子節點
         foreach (var child in node.Children)
         {
             WriteNode(child, writer, nsDict, ref openElementsCount, isRoot: false, depth: depth + 1);
         }
 
-        // 寫入結束元素
         writer.WriteEndElement();
         openElementsCount--;
     }
 
-    private static string GetNamespacePrefix(string nsUri, string? preferredPrefix, Dictionary<string, string> nsDict)
+    private static string GetNamespacePrefix(string? nsUri, string? preferredPrefix, Dictionary<string, string> nsDict)
     {
-        if (string.IsNullOrEmpty(nsUri))
+        if (nsUri is not { Length: > 0 })
+        {
             return string.Empty;
+        }
+
         if (nsDict.TryGetValue(nsUri, out string? prefix))
         {
             return prefix;
         }
+
         return preferredPrefix ?? string.Empty;
     }
 
     private static void CollectNamespaces(OdfNode node, Dictionary<string, string> nsDict)
     {
-        if (node.NodeType != OdfNodeType.Element)
-            return;
+        var stack = new Stack<OdfNode>();
+        stack.Push(node);
 
-        // 收集元素的命名空間
-        if (!string.IsNullOrEmpty(node.NamespaceUri))
+        while (stack.Count > 0)
         {
-            if (!nsDict.ContainsKey(node.NamespaceUri))
+            OdfNode current = stack.Pop();
+            if (current.NodeType != OdfNodeType.Element)
             {
-                // 後備使用標準前綴，接著是節點的前綴，最後產生一個
-                string prefix = OdfNamespaces.GetPrefix(node.NamespaceUri);
+                continue;
+            }
+
+            if (!string.IsNullOrEmpty(current.NamespaceUri) &&
+                !nsDict.ContainsKey(current.NamespaceUri))
+            {
+                string prefix = OdfNamespaces.GetPrefix(current.NamespaceUri);
                 if (string.IsNullOrEmpty(prefix))
                 {
-                    prefix = node.Prefix ?? $"ns{nsDict.Count + 1}";
+                    prefix = current.Prefix ?? $"ns{nsDict.Count + 1}";
                 }
-                nsDict[node.NamespaceUri] = prefix;
-            }
-        }
 
-        // 收集屬性的命名空間
-        foreach (var attr in node.Attributes.Keys)
-        {
-            if (!string.IsNullOrEmpty(attr.NamespaceUri))
+                nsDict[current.NamespaceUri] = prefix;
+            }
+
+            foreach (var attr in current.Attributes.Keys)
             {
-                if (!nsDict.ContainsKey(attr.NamespaceUri))
+                if (!string.IsNullOrEmpty(attr.NamespaceUri) &&
+                    !nsDict.ContainsKey(attr.NamespaceUri))
                 {
                     string prefix = OdfNamespaces.GetPrefix(attr.NamespaceUri);
                     if (string.IsNullOrEmpty(prefix))
                     {
-                        prefix = node.GetAttributePrefix(attr) ?? $"ns{nsDict.Count + 1}";
+                        prefix = current.GetAttributePrefix(attr) ?? $"ns{nsDict.Count + 1}";
                     }
+
                     nsDict[attr.NamespaceUri] = prefix;
                 }
             }
-        }
 
-        // 遞迴子節點
-        foreach (var child in node.Children)
-        {
-            CollectNamespaces(child, nsDict);
+            for (int i = current.Children.Count - 1; i >= 0; i--)
+            {
+                stack.Push(current.Children[i]);
+            }
         }
     }
 }

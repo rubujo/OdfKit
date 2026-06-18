@@ -45,7 +45,7 @@
 
 後續可選：CI 非阻擋性回歸門檻（比對上次基準輸出）。
 
-## Phase PERF-4 — 全案掃描報告驗證與修正（✅ 本輪，4g 等延後）
+## Phase PERF-4 — 全案掃描報告驗證與修正（✅ 完成；PERF-2b 仍延後）
 
 以下對照「終極完滿版」掃描報告逐項驗證現況（2026-06-18）。
 
@@ -64,8 +64,8 @@
 |--------|----------|------|-----------|
 | A. `OdfStyleEngine.FindPropertyInStyleNode` O(N) | ✅ 問題成立 | 每次查詢遍歷子節點 | **4d** Rebuild 時展平快取 |
 | B. `InsertBefore`/`InsertAfter` IndexOf | ⚠️ 部分成立 | PERF-1d 快取索引；`List.Insert` 仍 O(N) | 2b 延後 |
-| C. `OdfToXlsxConverter.ScanCellValues` 全表字典 | ✅ 問題成立 | 仍一次載入 `Dictionary<(Row,Col),CellData>` | **4g** 延後（大改） |
-| D. `OdfToDocxConverter.LoadStyles` 全樹 Descendants | ✅ 問題成立 | 三輪 `root.Descendants()` | **4h** 延後（限縮走訪區段） |
+| C. `OdfToXlsxConverter.ScanCellValues` 全表字典 | ✅ 已修正 | `EnumerateSheetCells` 流式寫入 | **4g** ✅ |
+| D. `OdfToDocxConverter.LoadStyles` 全樹 Descendants | ✅ 已修正 | 限縮 `office:styles` 區段 | **4h** ✅ |
 | E. `OdfAttributeName` XOR 雜湊 | ❌ 報告過時 | 已為 `OdfHashing.Combine` | — |
 
 ### 3. 架構冗餘與雙重 DOM
@@ -73,15 +73,15 @@
 | 報告項 | 驗證結果 | 現況 | PERF-4 ID |
 |--------|----------|------|-----------|
 | A. `OdfHtmlExporter` AngleSharp 雙重 DOM | ✅ 問題成立 | 匯出仍建立完整 AngleSharp 樹 | **4e** 改 `StringBuilder` 直寫 |
-| B. `OdfChartRenderer` ToList/ToArray | ✅ 問題成立 | `Descendants().ToList()`、多處 `.ToArray()` | **4f** 延後（ScottPlot API 限制） |
+| B. `OdfChartRenderer` ToList/ToArray | ✅ 已修正 | `EnumerateDrawFrames`、預先配置陣列 | **4f** ✅ |
 
 ### 4. 穩健性與安全
 
 | 報告項 | 驗證結果 | 現況 | PERF-4 ID |
 |--------|----------|------|-----------|
 | A. `OdfXmlWriter.WriteNode` 遞迴 StackOverflow | ✅ 問題成立 | 讀取有 `MaxElementDepth=256`，寫入無對稱防護 | **4i** 寫入深度限制 |
-| B. `CollectNamespaces` 額外全樹走訪 | ✅ 問題成立 | 寫入前仍預掃 namespace | 4j 延後（動態宣告） |
-| C. Argon2id `argon2P=4` 執行緒飢餓 | ⚠️ 情境成立 | 預設來自檔案 metadata；高併發解密可能競爭 ThreadPool | 4k 延後（併發閘道） |
+| B. `CollectNamespaces` 遞迴 StackOverflow 風險 | ✅ 已修正 | 迭代式 `Stack` 收集 + 根元素批次宣告 xmlns | **4j** ✅ |
+| C. Argon2id `argon2P=4` 執行緒飢餓 | ✅ 已緩解 | `SemaphoreSlim` 閘道 + 平行度上限 | **4k** ✅ |
 
 ### PERF-4 實作優先序
 
@@ -93,7 +93,9 @@
 | 2 | 4c | 點陣圖匯出略過 `OdfCell` 配置 | ✅ |
 | 3 | 4d | 樣式屬性 Rebuild 展平快取 | ✅ |
 | 4 | 4i | `OdfXmlWriter` 深度限制 | ✅ |
-| — | 4f/4j/4k | 圖表陣列、動態 xmlns、Argon2 閘道 | 延後 |
+| 6 | 4f | 圖表 `EnumerateDrawFrames`、預先配置陣列 | ✅ |
+| 6 | 4j | XmlWriter 迭代式命名空間收集、根元素批次 xmlns | ✅ |
+| 6 | 4k | Argon2 `SemaphoreSlim` 併發閘道 | ✅ |
 | 5 | 4g | ODS→XLSX `EnumerateSheetCells` 流式寫入；樞紐表 `TryGetCellAt` | ✅ |
 | 5 | 4h | ODT→DOCX 限縮 `office:automatic-styles`／`office:styles` 走訪 | ✅ |
 
