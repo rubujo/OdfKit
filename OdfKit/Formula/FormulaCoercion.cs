@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using OdfKit.Formula.AST;
 
 namespace OdfKit.Formula;
@@ -52,6 +53,7 @@ internal static class FormulaCoercion
     /// <summary>
     /// 嘗試將值轉換為 <see cref="double"/>。
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryCoerceDouble(object val, out double result)
     {
         if (val is double d)

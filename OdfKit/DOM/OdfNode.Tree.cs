@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace OdfKit.DOM;
 
@@ -25,9 +24,7 @@ public partial class OdfNode
 
         IsModified = true;
         child.Parent?.RemoveChild(child);
-        child.Parent = this;
-        Children.Add(child);
-        child.SiblingIndex = Children.Count - 1;
+        Children.Append(child);
     }
 
     /// <summary>
@@ -48,17 +45,14 @@ public partial class OdfNode
             throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
         }
 
-        int index = ResolveChildIndex(refChild);
-        if (index == -1)
+        if (refChild.Parent != this)
         {
             throw new InvalidOperationException("Reference node is not a child of this node.");
         }
 
         IsModified = true;
         newChild.Parent?.RemoveChild(newChild);
-        newChild.Parent = this;
-        Children.Insert(index, newChild);
-        ReindexChildrenFrom(index);
+        Children.InsertBefore(newChild, refChild);
     }
 
     /// <summary>
@@ -79,18 +73,14 @@ public partial class OdfNode
             throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
         }
 
-        int index = ResolveChildIndex(refChild);
-        if (index == -1)
+        if (refChild.Parent != this)
         {
             throw new InvalidOperationException("Reference node is not a child of this node.");
         }
 
         IsModified = true;
         newChild.Parent?.RemoveChild(newChild);
-        newChild.Parent = this;
-        int insertIndex = index + 1;
-        Children.Insert(insertIndex, newChild);
-        ReindexChildrenFrom(insertIndex);
+        Children.InsertAfter(newChild, refChild);
     }
 
     /// <summary>
@@ -103,22 +93,13 @@ public partial class OdfNode
         if (child is null)
             throw new ArgumentNullException(nameof(child));
 
-        int index = TryGetCachedChildIndex(child);
-        if (index < 0)
-        {
-            index = Children.IndexOf(child);
-        }
-
-        if (index < 0)
+        if (child.Parent != this)
         {
             return;
         }
 
-        Children.RemoveAt(index);
         IsModified = true;
-        child.Parent = null;
-        child.SiblingIndex = -1;
-        ReindexChildrenFrom(index);
+        Children.Remove(child);
     }
 
     /// <summary>
@@ -139,39 +120,4 @@ public partial class OdfNode
 
 
     #endregion
-
-    private int ResolveChildIndex(OdfNode refChild)
-    {
-        int cached = TryGetCachedChildIndex(refChild);
-        if (cached >= 0)
-        {
-            return cached;
-        }
-
-        int index = Children.IndexOf(refChild);
-        if (index >= 0)
-        {
-            ReindexChildrenFrom(0);
-        }
-
-        return index;
-    }
-
-    private int TryGetCachedChildIndex(OdfNode child)
-    {
-        if (child.Parent != this || child.SiblingIndex < 0 || child.SiblingIndex >= Children.Count)
-        {
-            return -1;
-        }
-
-        return ReferenceEquals(Children[child.SiblingIndex], child) ? child.SiblingIndex : -1;
-    }
-
-    private void ReindexChildrenFrom(int startIndex)
-    {
-        for (int i = startIndex; i < Children.Count; i++)
-        {
-            Children[i].SiblingIndex = i;
-        }
-    }
 }

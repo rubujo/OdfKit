@@ -28,12 +28,12 @@
 
 驗收：`dotnet test` 全綠；`OdfNodePerformanceTests`。
 
-## Phase PERF-2 — 中期（✅，2b 延後）
+## Phase PERF-2 — 中期（✅）
 
 | ID | 變更 | 狀態 |
 |----|------|------|
 | PERF-2a | `TryWriteTextContent(IBufferWriter<char>)` + `WriteTextContentTo` 共用邏輯 | ✅ |
-| PERF-2b | 大型 DOM 改雙向鏈結或 `LinkedList<OdfNode>` | ⏸️ 延後（PERF-1d 已涵蓋常見路徑） |
+| PERF-2b | `OdfNodeChildList` 雙向鏈結子節點；插入／移除 O(1) + 延遲索引快取 | ✅（見 PERF-5a） |
 | PERF-2c | ZIP 讀取 `ArrayPool<byte>` 過渡緩衝 + 可成長讀取 | ✅ |
 
 ## Phase PERF-3 — 基準與監控（✅）
@@ -45,7 +45,27 @@
 
 後續可選：CI 非阻擋性回歸門檻（比對上次基準輸出）。
 
-## Phase PERF-4 — 全案掃描報告驗證與修正（✅ 完成；PERF-2b 仍延後）
+## Phase PERF-5 — 深度最佳化路線圖（2026-06-18 評估報告）
+
+> **效能結論（報告驗證 ✅）**：1277 項測試約 1 分 20 s 全綠，核心庫效能已屬健康；先前 PERF-4 關鍵瓶頸已根除。
+
+| ID | 報告項 | 正確性判定 | 實作策略 | 狀態 |
+|----|--------|------------|----------|------|
+| **5a** | A. 雙向鏈結 DOM（PERF-2b） | ✅ 正確：`List.Insert` 仍為 O(N)；`SiblingIndex` 僅加速定位 | `OdfNodeChildList` + `FirstChild`/`NextSibling` 指標；`IList` + `Find` 相容 | ✅ |
+| **5b** | B. JIT `AggressiveInlining` | ✅ 正確但效益質性（約 5–10% 微觀）；過度標註會膨脹 IL | 僅標註 `OdfHashing.Combine`、`TryCoerceDouble` 等極熱路徑 | ✅ |
+| **5c** | C. 執行緒專屬 `StringPool` | ✅ 正確：單次 `Parse` 內池化有效，跨檔案需執行緒池 | `ThreadLocal` + 4096 次重置，避免無界成長 | ✅ |
+| **5d** | D. SIMD 統計累加 | ⚠️ 部分正確：僅連續 `double[]`/`object[,]` 純數值陣列可向量化的；混合型別仍走原路徑 | `FormulaNumericAggregation.Sum`；`SUM` 對純數值矩陣快速路徑 | ✅ |
+| **5e** | E. Native AOT 裁剪相容 | ✅ 方向正確；完整 AOT 需大量後續（Source Generator、trim root） | 反射 API 標註 `[RequiresUnreferencedCode]`／`[RequiresDynamicCode]` | 🔶 初步 |
+
+**5a 取捨**：隨機索引 `Children[i]` 在快取失效後需 O(n) 重建；插入／刪除為 O(1)。試算表連續 `InsertAfter` 為主要受益場景（`DomInsertBenchmarks`）。
+
+**5d 限制**：`AVERAGE`、`COUNT` 等尚未全面向量化；需先展平為連續數值緩衝，混合儲存格仍用 `FlattenValues`。
+
+**5e 後續**：`GetEmbeddedDocument<T>` 改工廠註冊表；XML 序列化評估 `XmlSerializer` source generator；BouncyCastle 保留動態路徑並文件化。
+
+驗收：`dotnet test` 全綠；`OdfNodePerformanceTests`、`DomInsertBenchmarks`。
+
+## Phase PERF-4 — 全案掃描報告驗證與修正（✅ 完成）
 
 以下對照「終極完滿版」掃描報告逐項驗證現況（2026-06-18）。
 

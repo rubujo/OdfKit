@@ -23,6 +23,12 @@ internal static class FormulaStatisticalFunctionHandlers
             if (val is OdfFormulaError err)
                 return err;
 
+            if (val is object[,] matrix && FormulaNumericAggregation.TrySumMatrix(matrix, out double matrixSum))
+            {
+                sum += matrixSum;
+                continue;
+            }
+
             foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
                 if (FormulaCoercion.TryCoerceDouble(innerVal, out double d))

@@ -1,4 +1,6 @@
-﻿namespace OdfKit.Core;
+﻿using System.Runtime.CompilerServices;
+
+namespace OdfKit.Core;
 
 /// <summary>
 /// 跨 TFM 安全的雜湊合併輔助（避免 netstandard2.0 對 <see cref="HashCode"/> 的執行期相依）。
@@ -8,6 +10,7 @@ internal static class OdfHashing
     /// <summary>
     /// 合併兩個字串欄位的雜湊碼。
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static int Combine(string? first, string? second)
     {
         unchecked

@@ -38,9 +38,9 @@ public partial class OdfNode
     public OdfNode? Parent { get; internal set; }
 
     /// <summary>
-    /// 取得此節點的子節點清單。
+    /// 取得此節點的子節點集合（雙向鏈結串列；插入／移除為 O(1)）。
     /// </summary>
-    public List<OdfNode> Children { get; } = [];
+    public OdfNodeChildList Children { get; }
 
     /// <summary>
     /// 取得此節點的屬性字典。
@@ -72,6 +72,7 @@ public partial class OdfNode
         LocalName = localName;
         NamespaceUri = namespaceUri;
         Prefix = prefix;
+        Children = new OdfNodeChildList(this);
     }
 
     /// <summary>

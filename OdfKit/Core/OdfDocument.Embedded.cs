@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -20,6 +21,10 @@ public abstract partial class OdfDocument
     /// <typeparam name="T">嵌入式文件 wrapper 類型。</typeparam>
     /// <param name="subPath">封裝中的子路徑。</param>
     /// <returns>嵌入式文件 wrapper。</returns>
+#if !NETSTANDARD2_0
+    [RequiresUnreferencedCode("以反射建立嵌入式文件類型；Native AOT 需改為編譯期註冊建構函式。")]
+    [RequiresDynamicCode("以反射建立嵌入式文件類型；Native AOT 需改為編譯期註冊建構函式。")]
+#endif
     public T GetEmbeddedDocument<T>(string subPath) where T : OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
@@ -51,6 +56,10 @@ public abstract partial class OdfDocument
     /// <typeparam name="T">嵌入式文件 wrapper 類型。</typeparam>
     /// <param name="subPath">封裝中的子路徑。</param>
     /// <returns>建立完成的嵌入式文件 wrapper。</returns>
+#if !NETSTANDARD2_0
+    [RequiresUnreferencedCode("以反射建立嵌入式文件類型；Native AOT 需改為編譯期註冊建構函式。")]
+    [RequiresDynamicCode("以反射建立嵌入式文件類型；Native AOT 需改為編譯期註冊建構函式。")]
+#endif
     public T CreateEmbeddedDocument<T>(string subPath) where T : OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))

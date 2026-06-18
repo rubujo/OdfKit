@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -19,6 +20,9 @@ public static class OdfTypedDomCoverage
     /// </summary>
     /// <param name="schema">要檢查的 schema；若為 <see langword="null"/>，則使用最新 schema。</param>
     /// <returns>typed DOM 覆蓋報告。</returns>
+#if !NETSTANDARD2_0
+    [RequiresUnreferencedCode("以反射掃描 typed DOM 包裝類型屬性；Native AOT 需改為原始碼產生器。")]
+#endif
     public static OdfTypedDomCoverageReport Build(OdfSchemaSet? schema = null)
     {
         OdfSchemaSet resolvedSchema = schema ?? OdfSchemaRegistry.Latest;

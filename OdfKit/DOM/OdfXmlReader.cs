@@ -42,10 +42,6 @@ public static class OdfXmlReader
                 : 0
         };
 
-        // StringPool 用於重複使用常見的字串執行個體 (例如元素與屬性名稱、命名空間)，
-        // 以在解析大型 XML 檔案時大幅減少 GC 記憶體配置。
-        StringPool pool = new();
-
         OdfNode? rootNode = null;
         Stack<OdfNode> stack = new();
         int currentDepth = 0;
@@ -67,9 +63,9 @@ public static class OdfXmlReader
                                 throw new SecurityException($"XML element nesting depth limit exceeded ({currentDepth} > {MaxElementDepth}). Potential StackOverflow attack.");
                             }
 
-                            string localName = pool.GetOrAdd(reader.LocalName);
-                            string nsUri = pool.GetOrAdd(reader.NamespaceURI);
-                            string prefix = pool.GetOrAdd(reader.Prefix);
+                            string localName = OdfXmlStringPools.GetOrAdd(reader.LocalName);
+                            string nsUri = OdfXmlStringPools.GetOrAdd(reader.NamespaceURI);
+                            string prefix = OdfXmlStringPools.GetOrAdd(reader.Prefix);
                             AddXmlCharacters(options, ref xmlCharacterCount, localName.Length + nsUri.Length + prefix.Length);
 
                             var node = OdfNodeFactory.CreateElement(localName, nsUri, prefix);
@@ -79,9 +75,9 @@ public static class OdfXmlReader
                             {
                                 while (reader.MoveToNextAttribute())
                                 {
-                                    string attrLocalName = pool.GetOrAdd(reader.LocalName);
-                                    string attrNsUri = pool.GetOrAdd(reader.NamespaceURI);
-                                    string attrPrefix = pool.GetOrAdd(reader.Prefix);
+                                    string attrLocalName = OdfXmlStringPools.GetOrAdd(reader.LocalName);
+                                    string attrNsUri = OdfXmlStringPools.GetOrAdd(reader.NamespaceURI);
+                                    string attrPrefix = OdfXmlStringPools.GetOrAdd(reader.Prefix);
                                     string attrValue = reader.Value; // 一般不在 StringPool 中快取屬性值，因為其值變化較大，除非是空值或布林值
                                     AddXmlCharacters(
                                         options,
