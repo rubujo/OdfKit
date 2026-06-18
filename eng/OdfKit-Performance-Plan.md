@@ -39,10 +39,21 @@
 
 驗收：`dotnet test` 全綠；`OdfNodePerformanceTests.TryWriteTextContent_*`。
 
-## Phase PERF-3 — 基準與監控（✅ 初版）
+## Phase PERF-3 — 基準與監控（✅）
 
-- `eng/Benchmark-Performance.ps1`：執行 DOM／公式／封裝相關測試子集並輸出耗時
-- 後續可選：獨立 `OdfKit.Benchmarks` 專案、CI 非阻擋性回歸門檻
+| ID | 變更 | 狀態 |
+|----|------|------|
+| PERF-3a | `eng/Benchmark-Performance.ps1` 測試子集計時 | ✅ |
+| PERF-3b | `OdfKit.Benchmarks`（BenchmarkDotNet） | ✅ |
+
+基準類別：`FormulaParseBenchmarks`、`DomTextContentBenchmarks`、`DomInsertBenchmarks`、`OdfPackageLoadBenchmarks`、`OdsStreamWriterBenchmarks`。
+
+```powershell
+dotnet run --project OdfKit.Benchmarks -c Release
+pwsh eng/Benchmark-Performance.ps1 -Configuration Release
+```
+
+後續可選：CI 非阻擋性回歸門檻（比對上次基準輸出）。
 
 ## 全程約束
 
