@@ -82,4 +82,37 @@ internal static class OdfElementContentModel
             Dr3dSceneElement => true,
             _ => false
         };
+
+    /// <summary>
+    /// 判斷元素是否屬於 <c>office:chart</c> 主要 content group。
+    /// </summary>
+    /// <param name="element">要檢查的元素。</param>
+    /// <returns>若為圖表主要內容則為 <see langword="true"/>。</returns>
+    internal static bool IsChartMainContent(OdfElement element) =>
+        element is ChartChartElement;
+
+    /// <summary>
+    /// 判斷元素是否屬於 <c>office:image</c> 主要 content group。
+    /// </summary>
+    /// <param name="element">要檢查的元素。</param>
+    /// <returns>若為影像框架內容則為 <see langword="true"/>。</returns>
+    internal static bool IsImageFrameContent(OdfElement element) =>
+        element is DrawFrameElement;
+
+    /// <summary>
+    /// 判斷元素是否屬於 <c>office:spreadsheet</c> 主要 content group。
+    /// </summary>
+    /// <param name="element">要檢查的元素。</param>
+    /// <returns>若為試算表主要內容則為 <see langword="true"/>。</returns>
+    internal static bool IsSpreadsheetTableContent(OdfElement element) =>
+        element is TableTableElement;
+
+    /// <summary>
+    /// 判斷元素是否屬於 <c>office:database</c> 元件 content group。
+    /// </summary>
+    /// <param name="element">要檢查的元素。</param>
+    /// <returns>若為資料庫元件子元素則為 <see langword="true"/>。</returns>
+    internal static bool IsDatabaseComponentContent(OdfElement element) =>
+        element is DatabaseDataSourceElement or DatabaseFormsElement or DatabaseReportsElement or
+        DatabaseQueriesElement or DatabaseTableRepresentationsElement or DatabaseSchemaDefinitionElement;
 }

@@ -479,6 +479,113 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 <c>office:chart</c> content model facade 可建立圖表並 round-trip。
+    /// </summary>
+    [Fact]
+    public void OfficeChartContentModelFacadeSupportsChartAppendAndEnumeration()
+    {
+        OfficeChartElement chartBody = new("office");
+        ChartChartElement chart = chartBody.AppendChart();
+        chart.ChartClass = "chart:bar";
+
+        Assert.Single(chartBody.ChartMainChildElements);
+        Assert.Same(chart, chartBody.ChartChartChildElements.Single());
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office")).AppendElement(chartBody);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeChartElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<OfficeChartElement>()
+            .Single();
+        Assert.Equal("chart:bar", parsed.ChartChartChildElements.Single().ChartClass);
+    }
+
+    /// <summary>
+    /// 驗證 <c>office:image</c> content model facade 可建立影像框架並 round-trip。
+    /// </summary>
+    [Fact]
+    public void OfficeImageContentModelFacadeSupportsFrameAppendAndEnumeration()
+    {
+        OfficeImageElement imageBody = new("office");
+        DrawFrameElement frame = imageBody.AppendImageFrame("PrimaryFrame");
+
+        Assert.Single(imageBody.ImageFrameChildElements);
+        Assert.Equal("PrimaryFrame", frame.GetAttribute("name", OdfNamespaces.Draw));
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office")).AppendElement(imageBody);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeImageElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<OfficeImageElement>()
+            .Single();
+        Assert.Equal("PrimaryFrame", parsed.DrawFrameChildElements.Single().GetAttribute("name", OdfNamespaces.Draw));
+    }
+
+    /// <summary>
+    /// 驗證 <c>office:database</c> content model facade 可建立元件容器並 round-trip。
+    /// </summary>
+    [Fact]
+    public void OfficeDatabaseContentModelFacadeSupportsComponentContainers()
+    {
+        OfficeDatabaseElement databaseBody = new("office");
+        databaseBody.EnsureDataSource();
+        databaseBody.EnsureForms();
+        databaseBody.EnsureQueries();
+
+        OdfElement[] components = databaseBody.DatabaseComponentChildElements.ToArray();
+        Assert.Equal(3, components.Length);
+        Assert.IsType<DatabaseDataSourceElement>(components[0]);
+        Assert.IsType<DatabaseFormsElement>(components[1]);
+        Assert.IsType<DatabaseQueriesElement>(components[2]);
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office")).AppendElement(databaseBody);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeDatabaseElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<OfficeDatabaseElement>()
+            .Single();
+        Assert.Single(parsed.DatabaseDataSourceChildElements);
+        Assert.Single(parsed.DatabaseFormsChildElements);
+        Assert.Single(parsed.DatabaseQueriesChildElements);
+    }
+
+    /// <summary>
+    /// 驗證 <c>office:spreadsheet</c> content model facade 可建立工作表並 round-trip。
+    /// </summary>
+    [Fact]
+    public void OfficeSpreadsheetContentModelFacadeSupportsTableAppendAndEnumeration()
+    {
+        OfficeSpreadsheetElement spreadsheet = new("office");
+        TableTableElement sheet = spreadsheet.AppendTable("Sheet1");
+        sheet.AppendRow().AppendElement(new TableTableCellElement("table"))
+            .AppendElement(new TextPElement("text")).TextContent = "A1";
+
+        Assert.Single(spreadsheet.SpreadsheetTableChildElements);
+        Assert.Equal("Sheet1", sheet.Name);
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office")).AppendElement(spreadsheet);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeSpreadsheetElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<OfficeSpreadsheetElement>()
+            .Single();
+        Assert.Equal("Sheet1", parsed.TableTableChildElements.Single().Name);
+        Assert.Equal("A1", parsed.TableTableChildElements.Single().TableTableRowChildElements.Single().TableTableCellChildElements.Single().TextContent);
+    }
+
+    /// <summary>
     /// 驗證 generated DOM wrapper 的 class、factory case 與屬性數量沒有意外退化。
     /// </summary>
     [Fact]
