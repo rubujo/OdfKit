@@ -105,6 +105,7 @@ public static class XlsxToOdfConverter
         }
 
         S.SharedStringTable? sharedStrings = workbookPart.SharedStringTablePart?.SharedStringTable;
+        OpenXmlStylesheetContext? stylesheet = BuildOpenXmlStylesheetContext(workbookPart);
         bool firstSheet = true;
 
         foreach (S.Sheet sheet in workbookPart.Workbook.Sheets.Elements<S.Sheet>())
@@ -146,7 +147,7 @@ public static class XlsxToOdfConverter
                 odsSheet = odsWorkbook.Worksheets.Add(sheetName!);
             }
 
-            CopySheetDataFromOpenXml(sheetData, odsSheet, sharedStrings);
+            CopySheetDataFromOpenXml(sheetData, odsSheet, sharedStrings, stylesheet);
             CopyDataValidationsFromOpenXml(worksheetPart.Worksheet, odsSheet);
             CopyConditionalFormatsFromOpenXml(worksheetPart.Worksheet, odsSheet);
         }
@@ -386,7 +387,11 @@ public static class XlsxToOdfConverter
         return fallback;
     }
 
-    private static void CopySheetDataFromOpenXml(S.SheetData sheetData, OdfTableSheet odsSheet, S.SharedStringTable? sharedStrings)
+    private static void CopySheetDataFromOpenXml(
+        S.SheetData sheetData,
+        OdfTableSheet odsSheet,
+        S.SharedStringTable? sharedStrings,
+        OpenXmlStylesheetContext? stylesheet)
     {
         foreach (S.Row row in sheetData.Elements<S.Row>())
         {
@@ -411,8 +416,145 @@ public static class XlsxToOdfConverter
                 {
                     odsCell.CellValue = value;
                 }
+
+                CopyCellStyleFromOpenXml(cell, odsCell, stylesheet);
             }
         }
+    }
+
+    private static OpenXmlStylesheetContext? BuildOpenXmlStylesheetContext(WorkbookPart workbookPart)
+    {
+        S.Stylesheet? stylesheet = workbookPart.WorkbookStylesPart?.Stylesheet;
+        if (stylesheet is null)
+        {
+            return null;
+        }
+
+        return new OpenXmlStylesheetContext
+        {
+            Fonts = stylesheet.Fonts?.Elements<S.Font>().ToList() ?? [],
+            Fills = stylesheet.Fills?.Elements<S.Fill>().ToList() ?? [],
+            Borders = stylesheet.Borders?.Elements<S.Border>().ToList() ?? [],
+            CellFormats = stylesheet.CellFormats?.Elements<S.CellFormat>().ToList() ?? [],
+        };
+    }
+
+    private static void CopyCellStyleFromOpenXml(S.Cell cell, OdfCell odsCell, OpenXmlStylesheetContext? stylesheet)
+    {
+        if (stylesheet is null || cell.StyleIndex is null)
+        {
+            return;
+        }
+
+        int styleIndex = (int)cell.StyleIndex.Value;
+        if (styleIndex < 0 || styleIndex >= stylesheet.CellFormats.Count)
+        {
+            return;
+        }
+
+        S.CellFormat cellFormat = stylesheet.CellFormats[styleIndex];
+        if (cellFormat.FontId is not null)
+        {
+            int fontId = (int)cellFormat.FontId.Value;
+            if (fontId >= 0 && fontId < stylesheet.Fonts.Count)
+            {
+                CopyFontFromOpenXml(stylesheet.Fonts[fontId], odsCell);
+            }
+        }
+
+        if (cellFormat.FillId is not null)
+        {
+            int fillId = (int)cellFormat.FillId.Value;
+            if (fillId >= 0 && fillId < stylesheet.Fills.Count)
+            {
+                CopyFillFromOpenXml(stylesheet.Fills[fillId], odsCell);
+            }
+        }
+
+        if (cellFormat.BorderId is not null)
+        {
+            int borderId = (int)cellFormat.BorderId.Value;
+            if (borderId >= 0 && borderId < stylesheet.Borders.Count)
+            {
+                CopyBorderFromOpenXml(stylesheet.Borders[borderId], odsCell);
+            }
+        }
+    }
+
+    private static void CopyFontFromOpenXml(S.Font font, OdfCell odsCell)
+    {
+        if (font.Bold is not null && (font.Bold.Val is null || font.Bold.Val.Value))
+        {
+            SetCellStyleProperty(odsCell, "text-properties", "font-weight", OdfNamespaces.Fo, "bold", "fo");
+        }
+
+        if (font.Italic is not null && (font.Italic.Val is null || font.Italic.Val.Value))
+        {
+            SetCellStyleProperty(odsCell, "text-properties", "font-style", OdfNamespaces.Fo, "italic", "fo");
+        }
+
+        string? underline = font.Underline?.Val?.InnerText;
+        if (!string.IsNullOrEmpty(underline) &&
+            !string.Equals(underline, "none", StringComparison.OrdinalIgnoreCase))
+        {
+            SetCellStyleProperty(odsCell, "text-properties", "text-underline-style", OdfNamespaces.Style, "solid", "style");
+        }
+
+        if (font.Color?.Rgb?.Value is { Length: > 0 } fontColor)
+        {
+            SetCellStyleProperty(odsCell, "text-properties", "color", OdfNamespaces.Fo, ParseOpenXmlRgb(fontColor, "#000000"), "fo");
+        }
+    }
+
+    private static void CopyFillFromOpenXml(S.Fill fill, OdfCell odsCell)
+    {
+        S.PatternFill? patternFill = fill.PatternFill;
+        if (patternFill is null)
+        {
+            return;
+        }
+
+        string? patternType = patternFill.PatternType?.InnerText;
+        if (!string.IsNullOrEmpty(patternType) &&
+            !string.Equals(patternType, "solid", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(patternType, "darkGray", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (patternFill.ForegroundColor?.Rgb?.Value is { Length: > 0 } backgroundColor)
+        {
+            SetCellStyleProperty(
+                odsCell,
+                "table-cell-properties",
+                "background-color",
+                OdfNamespaces.Fo,
+                ParseOpenXmlRgb(backgroundColor, "#FFFFFF"),
+                "fo");
+        }
+    }
+
+    private static void CopyBorderFromOpenXml(S.Border border, OdfCell odsCell)
+    {
+        CopyOpenXmlBorderSide(odsCell, "border-top", border.TopBorder);
+        CopyOpenXmlBorderSide(odsCell, "border-bottom", border.BottomBorder);
+        CopyOpenXmlBorderSide(odsCell, "border-left", border.LeftBorder);
+        CopyOpenXmlBorderSide(odsCell, "border-right", border.RightBorder);
+    }
+
+    private static void CopyOpenXmlBorderSide(OdfCell odsCell, string propertyName, S.BorderPropertiesType? borderSide)
+    {
+        string? styleText = borderSide?.Style?.InnerText;
+        if (string.IsNullOrEmpty(styleText) || string.Equals(styleText, "none", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        string lineStyle = styleText.Contains("dash", StringComparison.OrdinalIgnoreCase) ? "dashed" : "solid";
+        string color = borderSide?.Color?.Rgb?.Value is { Length: > 0 } rgb
+            ? ParseOpenXmlRgb(rgb, "#000000")
+            : "#000000";
+        SetCellStyleProperty(odsCell, "table-cell-properties", propertyName, OdfNamespaces.Fo, $"0.75pt {lineStyle} {color}", "fo");
     }
 
     private static object? ReadOpenXmlCellValue(S.Cell cell, S.SharedStringTable? sharedStrings)
@@ -849,6 +991,14 @@ public static class XlsxToOdfConverter
         Row,
         Column,
         Page
+    }
+
+    private sealed class OpenXmlStylesheetContext
+    {
+        public List<S.Font> Fonts { get; init; } = [];
+        public List<S.Fill> Fills { get; init; } = [];
+        public List<S.Border> Borders { get; init; } = [];
+        public List<S.CellFormat> CellFormats { get; init; } = [];
     }
 
     private sealed class PivotCacheInfo

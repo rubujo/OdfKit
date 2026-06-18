@@ -1131,6 +1131,60 @@ public class OoxmlConversionTests
     }
 
     /// <summary>
+    /// 驗證含樞紐表的 XLSX → ODS fallback 路徑可還原基本儲存格格式。
+    /// </summary>
+    [Fact]
+    public void XlsxToOdf_PivotFallbackPreservesBasicCellFormatting()
+    {
+        using var odsDocument = OdfSpreadsheetDocument.Create();
+        var sheet = odsDocument.Worksheets.Add("Sales");
+        sheet.Cells["A1"].CellValue = "Category";
+        sheet.Cells["B1"].CellValue = "Region";
+        sheet.Cells["C1"].CellValue = "Sales";
+        sheet.Cells["A2"].CellValue = "Hardware";
+        sheet.Cells["B2"].CellValue = "North";
+        sheet.Cells["C2"].CellValue = 120d;
+        sheet.Cells["A3"].CellValue = "Software";
+        sheet.Cells["B3"].CellValue = "South";
+        sheet.Cells["C3"].CellValue = 80d;
+
+        OdfCell formattedCell = sheet.Cells["D1"];
+        formattedCell.CellValue = "格式";
+        odsDocument.StyleEngine.SetLocalStyleProperty(formattedCell.Node, "table-cell", "text-properties", "font-weight", OdfNamespaces.Fo, "bold", "fo");
+        odsDocument.StyleEngine.SetLocalStyleProperty(formattedCell.Node, "table-cell", "text-properties", "font-style", OdfNamespaces.Fo, "italic", "fo");
+        odsDocument.StyleEngine.SetLocalStyleProperty(formattedCell.Node, "table-cell", "text-properties", "text-underline-style", OdfNamespaces.Style, "solid", "style");
+        odsDocument.StyleEngine.SetLocalStyleProperty(formattedCell.Node, "table-cell", "text-properties", "color", OdfNamespaces.Fo, "#FF0000", "fo");
+        odsDocument.StyleEngine.SetLocalStyleProperty(formattedCell.Node, "table-cell", "table-cell-properties", "background-color", OdfNamespaces.Fo, "#FFFF00", "fo");
+        odsDocument.StyleEngine.SetLocalStyleProperty(formattedCell.Node, "table-cell", "table-cell-properties", "border-top", OdfNamespaces.Fo, "0.75pt solid #000000", "fo");
+
+        new OdfPivotTableBuilder(
+            "SalesPivot",
+            new OdfCellRange(0, 0, 2, 2, "Sales"),
+            new OdfCellAddress(5, 0, "Sales"),
+            sheet)
+            .AddRowField("Category")
+            .AddColumnField("Region")
+            .AddDataField("Sales", OdfPivotFunction.Sum)
+            .Build();
+
+        using var xlsxStream = new MemoryStream();
+        OdfToXlsxConverter.Convert(odsDocument, xlsxStream);
+        xlsxStream.Position = 0;
+
+        using OdfSpreadsheetDocument converted = XlsxToOdfConverter.Convert(xlsxStream);
+        string contentXml = SaveSpreadsheetContentXml(converted);
+
+        Assert.Contains("table:data-pilot-table", contentXml);
+        Assert.Contains("style:family=\"table-cell\"", contentXml);
+        Assert.Contains("fo:font-weight=\"bold\"", contentXml);
+        Assert.Contains("fo:font-style=\"italic\"", contentXml);
+        Assert.Contains("style:text-underline-style=\"solid\"", contentXml);
+        Assert.Contains("fo:color=\"#FF0000\"", contentXml);
+        Assert.Contains("fo:background-color=\"#FFFF00\"", contentXml);
+        Assert.Contains("fo:border-top=\"0.75pt solid #000000\"", contentXml);
+    }
+
+    /// <summary>
     /// 驗證 ODT → DOCX → ODT 往返可保留段落內嵌圖片。
     /// </summary>
     [Fact]
