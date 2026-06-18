@@ -99,15 +99,6 @@ public class FormulaDocument : OdfFormulaDocument
     }
 
     /// <summary>
-    /// 取得 MathML 的 XML 字串。
-    /// </summary>
-    /// <returns>MathML XML 字串。</returns>
-    public string GetMathML()
-    {
-        return MathMlXml;
-    }
-
-    /// <summary>
     /// 設定 MathML 的 XML 字串。
     /// </summary>
     /// <param name="mathml">格式正確的 MathML XML。</param>

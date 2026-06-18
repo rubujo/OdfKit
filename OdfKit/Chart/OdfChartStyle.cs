@@ -72,7 +72,7 @@ public sealed class OdfChartStyle
         }
         else
         {
-            properties.SetAttribute(attributeName, namespaceUri, value, prefix);
+            properties.SetAttribute(attributeName, namespaceUri, value!, prefix);
         }
 
         _document.StyleEngine.RebuildStyleIndex();

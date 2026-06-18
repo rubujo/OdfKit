@@ -110,8 +110,31 @@ public partial class OdfFormulaDocument
 
     private static OdfNode CreateMathTokenNode(OdfMathToken token)
     {
-        OdfNode node = OdfNodeFactory.CreateElement(GetMathTokenElementName(token.Kind), MathMlNamespace, "math");
+        return token.Kind switch
+        {
+            OdfMathTokenKind.Superscript => CreateScriptNode("msup", token),
+            OdfMathTokenKind.Subscript => CreateScriptNode("msub", token),
+            _ => CreateLeafMathTokenNode(token),
+        };
+    }
+
+    private static OdfNode CreateLeafMathTokenNode(OdfMathToken token)
+    {
+        OdfNode node = OdfNodeFactory.CreateElement(GetLeafMathTokenElementName(token.Kind), MathMlNamespace, "math");
         node.TextContent = token.Text;
+        return node;
+    }
+
+    private static OdfNode CreateScriptNode(string elementName, OdfMathToken token)
+    {
+        if (token.Base is null || token.Script is null)
+        {
+            throw new InvalidOperationException("上標或下標 token 必須包含底數與指數。");
+        }
+
+        OdfNode node = OdfNodeFactory.CreateElement(elementName, MathMlNamespace, "math");
+        node.AppendChild(CreateMathTokenNode(token.Base));
+        node.AppendChild(CreateMathTokenNode(token.Script));
         return node;
     }
 
@@ -123,11 +146,41 @@ public partial class OdfFormulaDocument
             "mn" => OdfMathToken.Number(node.TextContent),
             "mo" => OdfMathToken.Operator(node.TextContent),
             "mtext" => OdfMathToken.TextToken(node.TextContent),
+            "msup" => CreateScriptToken(node, OdfMathTokenKind.Superscript),
+            "msub" => CreateScriptToken(node, OdfMathTokenKind.Subscript),
             _ => null
         };
     }
 
-    private static string GetMathTokenElementName(OdfMathTokenKind kind)
+    private static OdfMathToken? CreateScriptToken(OdfNode node, OdfMathTokenKind kind)
+    {
+        List<OdfNode> children = [];
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element && child.NamespaceUri == MathMlNamespace)
+            {
+                children.Add(child);
+            }
+        }
+
+        if (children.Count < 2)
+        {
+            return null;
+        }
+
+        OdfMathToken? baseToken = CreateTokenOrDefault(children[0]);
+        OdfMathToken? scriptToken = CreateTokenOrDefault(children[1]);
+        if (baseToken is null || scriptToken is null)
+        {
+            return null;
+        }
+
+        return kind == OdfMathTokenKind.Subscript
+            ? OdfMathToken.Subscript(baseToken, scriptToken)
+            : OdfMathToken.Superscript(baseToken, scriptToken);
+    }
+
+    private static string GetLeafMathTokenElementName(OdfMathTokenKind kind)
     {
         return kind switch
         {
@@ -135,7 +188,7 @@ public partial class OdfFormulaDocument
             OdfMathTokenKind.Number => "mn",
             OdfMathTokenKind.Operator => "mo",
             OdfMathTokenKind.Text => "mtext",
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "未知的 MathML token 類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "未知的 MathML 葉節點 token 類型。")
         };
     }
 

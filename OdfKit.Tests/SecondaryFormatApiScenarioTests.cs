@@ -84,6 +84,7 @@ public class SecondaryFormatApiScenarioTests
             escapeProcessing: true);
         database.AddDataSourceSetting("DatabaseName", OdfDatabaseDataSourceSettingType.String, "sales_db");
         database.AddForm("CustomerForm", "forms/CustomerForm", "客戶表單", "維護客戶資料。");
+        database.AddReport("SalesReport", "reports/SalesReport", "銷售報表", "每月銷售摘要。");
 
         using var stream = new MemoryStream();
         database.SaveToStream(stream);
@@ -108,6 +109,10 @@ public class SecondaryFormatApiScenarioTests
         OdfDatabaseFormInfo form = Assert.Single(loaded.GetForms());
         Assert.Equal("CustomerForm", form.Name);
         Assert.Equal("客戶表單", form.Title);
+
+        OdfDatabaseReportInfo report = Assert.Single(loaded.GetReports());
+        Assert.Equal("SalesReport", report.Name);
+        Assert.Equal("銷售報表", report.Title);
     }
 
     /// <summary>
@@ -118,11 +123,12 @@ public class SecondaryFormatApiScenarioTests
     {
         using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
             .WithTokens(
-                OdfMathToken.Identifier("F"),
+                OdfMathToken.Identifier("E"),
                 OdfMathToken.Operator("="),
                 OdfMathToken.Identifier("m"),
-                OdfMathToken.Operator("*"),
-                OdfMathToken.Identifier("a"))
+                OdfMathToken.Superscript(
+                    OdfMathToken.Identifier("c"),
+                    OdfMathToken.Number("2")))
             .Build();
 
         using var stream = new MemoryStream();
@@ -130,12 +136,13 @@ public class SecondaryFormatApiScenarioTests
         stream.Position = 0;
 
         using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
-        Assert.Equal("F=m*a", loaded.MathText);
-        Assert.Equal(5, loaded.GetMathTokens().Count);
-        Assert.Equal("F", loaded.GetMathTokens()[0].Text);
-        Assert.Equal("a", loaded.GetMathTokens()[4].Text);
+        Assert.Equal(4, loaded.GetMathTokens().Count);
+        Assert.Equal(OdfMathTokenKind.Superscript, loaded.GetMathTokens()[3].Kind);
+        Assert.Equal("c", loaded.GetMathTokens()[3].Base?.Text);
+        Assert.Equal("2", loaded.GetMathTokens()[3].Script?.Text);
+        Assert.Contains("msup", loaded.GetMathML());
         Assert.Equal("math", loaded.MathNode.LocalName);
-        Assert.Equal("F", FindMathChild(loaded.MathNode, "mi")?.TextContent);
+        Assert.Equal("E", FindMathChild(loaded.MathNode, "mi")?.TextContent);
     }
 
     /// <summary>
@@ -181,10 +188,23 @@ public class SecondaryFormatApiScenarioTests
         Assert.True(primaryFrame.TryGetWidth(out OdfLength width));
         Assert.Equal(OdfLength.FromCentimeters(6), width);
 
-        OdfImageFrameInfo secondaryFrame = loaded.GetImageFrames()[1];
-        Assert.Equal("SecondaryFrame", secondaryFrame.Name);
-        Assert.Equal("附圖", secondaryFrame.Title);
+        Assert.True(loaded.UpdateImageFrame(
+            "SecondaryFrame",
+            OdfLength.FromCentimeters(8),
+            OdfLength.FromCentimeters(2),
+            OdfLength.FromCentimeters(4),
+            OdfLength.FromCentimeters(4),
+            "更新附圖"));
+
+        OdfImageFrameInfo? secondaryFrame = loaded.TryGetImageFrame("SecondaryFrame");
+        Assert.NotNull(secondaryFrame);
+        Assert.Equal("更新附圖", secondaryFrame!.Title);
+        Assert.True(secondaryFrame.TryGetX(out OdfLength x));
+        Assert.Equal(OdfLength.FromCentimeters(8), x);
         Assert.Equal(secondary.Length, secondaryFrame.Size);
+
+        Assert.True(loaded.RemoveImageFrame("SecondaryFrame"));
+        Assert.Single(loaded.GetImageFrames());
     }
 
     private static byte[] CreatePngBytes() =>

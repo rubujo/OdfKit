@@ -25,5 +25,15 @@ public enum OdfMathTokenKind
     /// <summary>
     /// MathML <c>mtext</c> 文字。
     /// </summary>
-    Text
+    Text,
+
+    /// <summary>
+    /// MathML <c>msup</c> 上標。
+    /// </summary>
+    Superscript,
+
+    /// <summary>
+    /// MathML <c>msub</c> 下標。
+    /// </summary>
+    Subscript
 }

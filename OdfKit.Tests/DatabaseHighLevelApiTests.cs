@@ -39,6 +39,33 @@ public class DatabaseHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfDatabaseDocument.GetReports"/> 可讀回已新增的報表元件。
+    /// </summary>
+    [Fact]
+    public void GetReports_RoundTripsAfterAdd()
+    {
+        using var database = OdfDatabaseDocument.Create();
+        database.AddReport(
+            "SalesReport",
+            "reports/SalesReport",
+            "銷售報表",
+            "每月銷售摘要。",
+            asTemplate: false);
+        database.AddReport("DraftReport", "reports/DraftReport");
+
+        Assert.Equal(2, database.GetReports().Count);
+        OdfDatabaseReportInfo? report = database.FindReport("SalesReport");
+        Assert.NotNull(report);
+        Assert.Equal("reports/SalesReport", report!.Href);
+        Assert.Equal("銷售報表", report.Title);
+        Assert.Equal("每月銷售摘要。", report.Description);
+        Assert.False(report.AsTemplate);
+
+        Assert.True(database.RemoveReport("DraftReport"));
+        Assert.Single(database.Reports);
+    }
+
+    /// <summary>
     /// 驗證表單元件可於儲存後重新載入。
     /// </summary>
     [Fact]

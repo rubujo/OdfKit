@@ -77,6 +77,47 @@ public class ImageHighLevelApiTests
         Assert.Equal("SecondaryFrame", loaded.GetImageFrames()[1].Name);
     }
 
+    /// <summary>
+    /// 驗證 <see cref="OdfImageDocument.UpdateImageFrame"/> 與 <see cref="OdfImageDocument.RemoveImageFrame"/> 可編輯多框架文件。
+    /// </summary>
+    [Fact]
+    public void UpdateAndRemoveImageFrame_EditsMultiFrameDocument()
+    {
+        using var image = OdfImageDocument.Create();
+        image.SetImage(CreatePngBytes(), "Primary.png");
+        image.AddImageFrame(
+            CreateAlternatePngBytes(),
+            OdfLength.FromCentimeters(7),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(3),
+            OdfLength.FromCentimeters(3),
+            "Secondary.png",
+            "SecondaryFrame",
+            "附圖");
+
+        Assert.True(image.UpdateImageFrame(
+            "SecondaryFrame",
+            OdfLength.FromCentimeters(8),
+            OdfLength.FromCentimeters(2),
+            OdfLength.FromCentimeters(4),
+            OdfLength.FromCentimeters(4),
+            "更新附圖",
+            "已調整版面。"));
+
+        OdfImageFrameInfo? updated = image.TryGetImageFrame("SecondaryFrame");
+        Assert.NotNull(updated);
+        Assert.Equal("更新附圖", updated!.Title);
+        Assert.Equal("已調整版面。", updated.Description);
+        Assert.True(updated.TryGetX(out OdfLength x));
+        Assert.Equal(OdfLength.FromCentimeters(8), x);
+        Assert.True(updated.TryGetWidth(out OdfLength width));
+        Assert.Equal(OdfLength.FromCentimeters(4), width);
+
+        Assert.True(image.RemoveImageFrame("SecondaryFrame"));
+        Assert.Single(image.GetImageFrames());
+        Assert.Null(image.TryGetImageFrame("SecondaryFrame"));
+    }
+
     private static byte[] CreatePngBytes() =>
         System.Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");

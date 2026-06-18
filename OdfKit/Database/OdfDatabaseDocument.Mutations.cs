@@ -209,6 +209,58 @@ public partial class OdfDatabaseDocument
         return component;
     }
 
+    /// <summary>
+    /// 新增報表元件描述。
+    /// </summary>
+    /// <param name="name">報表名稱。</param>
+    /// <param name="href">選用的報表資源參照路徑。</param>
+    /// <param name="title">選用的顯示標題。</param>
+    /// <param name="description">選用的描述文字。</param>
+    /// <param name="asTemplate">選用的範本標記。</param>
+    /// <returns>新增的報表元件節點。</returns>
+    public OdfNode AddReport(
+        string name,
+        string? href = null,
+        string? title = null,
+        string? description = null,
+        bool? asTemplate = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("報表名稱不能為空。", nameof(name));
+        }
+
+        OdfNode reports = FindOrCreateChild(GetDatabaseNode(), "reports", DatabaseNamespace, "db");
+        OdfNode component = OdfNodeFactory.CreateElement("component", DatabaseNamespace, "db");
+        component.SetAttribute("name", DatabaseNamespace, name, "db");
+
+        if (!string.IsNullOrWhiteSpace(href))
+        {
+            component.SetAttribute("href", OdfNamespaces.XLink, href!, "xlink");
+            component.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+            component.SetAttribute("show", OdfNamespaces.XLink, "none", "xlink");
+            component.SetAttribute("actuate", OdfNamespaces.XLink, "onRequest", "xlink");
+        }
+
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            component.SetAttribute("title", DatabaseNamespace, title!, "db");
+        }
+
+        if (!string.IsNullOrWhiteSpace(description))
+        {
+            component.SetAttribute("description", DatabaseNamespace, description!, "db");
+        }
+
+        if (asTemplate is not null)
+        {
+            component.SetAttribute("as-template", DatabaseNamespace, asTemplate.Value ? "true" : "false", "db");
+        }
+
+        reports.AppendChild(component);
+        return component;
+    }
+
     #endregion
 
     #region Remove Operations
@@ -277,6 +329,27 @@ public partial class OdfDatabaseDocument
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// 移除指定名稱的報表元件。
+    /// </summary>
+    /// <param name="name">報表名稱。</param>
+    /// <returns>如果成功移除報表元件，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveReport(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("報表名稱不能為空。", nameof(name));
+        }
+
+        OdfNode? reportsNode = FindChildElement(GetDatabaseNode(), "reports", DatabaseNamespace);
+        if (reportsNode is null)
+        {
+            return false;
+        }
+
+        return RemoveNamedComponent(reportsNode, name);
     }
 
     /// <summary>
