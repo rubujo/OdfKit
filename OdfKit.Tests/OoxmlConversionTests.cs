@@ -574,6 +574,64 @@ public class OoxmlConversionTests
     }
 
     /// <summary>
+    /// 驗證 DOCX → ODT 反向轉換可保留格式變更追蹤修訂（段落與字元）。
+    /// </summary>
+    [Fact]
+    public void DocxToOdt_PreservesFormatChangeRevision()
+    {
+        var changedAt = new DocumentFormat.OpenXml.DateTimeValue(new DateTime(2026, 6, 16, 8, 0, 0, DateTimeKind.Utc));
+        using var docxStream = new MemoryStream();
+        using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
+        {
+            var mainPart = wordDocument.AddMainDocumentPart();
+            mainPart.Document = new WP.Document(new WP.Body(
+                new WP.Paragraph(
+                    new WP.ParagraphProperties(
+                        new WP.ParagraphStyleId { Val = "NewStyle" },
+                        new WP.ParagraphPropertiesChange
+                        {
+                            Author = "Alice",
+                            Date = changedAt,
+                            Id = "0",
+                            ParagraphPropertiesExtended = new WP.ParagraphPropertiesExtended(
+                                new WP.ParagraphStyleId { Val = "Normal" }),
+                        }),
+                    new WP.Run(new WP.Text("段落格式"))),
+                new WP.Paragraph(
+                    new WP.Run(
+                        new WP.RunProperties(
+                            new WP.Bold(),
+                            new WP.RunPropertiesChange
+                            {
+                                Author = "Bob",
+                                Date = changedAt,
+                                Id = "1",
+                                PreviousRunProperties = new WP.PreviousRunProperties(),
+                            }),
+                        new WP.Text("字元格式")))));
+        }
+
+        docxStream.Position = 0;
+        using TextDocument odtDocument = DocxToOdtConverter.Convert(docxStream);
+        string contentXml = SaveTextContentXml(odtDocument);
+
+        Assert.Contains("text:format-change", contentXml);
+        Assert.Contains("text:change-start", contentXml);
+        Assert.Contains("text:change-end", contentXml);
+        Assert.Contains("target-family=\"paragraph\"", contentXml);
+        Assert.Contains("target-family=\"text\"", contentXml);
+        Assert.Contains("段落格式", contentXml);
+        Assert.Contains("字元格式", contentXml);
+
+        var formatChanges = odtDocument.GetTrackedChanges()
+            .Where(change => change.ChangeType == OdfChangeType.FormatChange)
+            .ToList();
+        Assert.Equal(2, formatChanges.Count);
+        Assert.Contains(formatChanges, change => change.Author == "Alice");
+        Assert.Contains(formatChanges, change => change.Author == "Bob");
+    }
+
+    /// <summary>
     /// 驗證 DOCX 轉換後的追蹤修訂可列舉並接受。
     /// </summary>
     [Fact]
@@ -1095,6 +1153,46 @@ public class OoxmlConversionTests
         Assert.Contains("draw:frame", contentXml);
         Assert.Contains("draw:image", contentXml);
         Assert.Contains("Pictures/", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 ODT → DOCX → ODT 往返可保留格式變更追蹤修訂。
+    /// </summary>
+    [Fact]
+    public void OdtToDocxToOdt_PreservesFormatChangeRevision()
+    {
+        using var original = TextDocument.Create();
+        original.TrackedChanges = false;
+
+        OdfParagraph paragraph = original.AddParagraph("段落格式");
+        paragraph.StyleName = "OriginalStyle";
+
+        OdfParagraph characterParagraph = original.AddParagraph();
+        OdfTextRun characterRun = characterParagraph.AddTextRun("字元格式");
+
+        original.TrackedChanges = true;
+        paragraph.StyleName = "NewStyle";
+        characterRun.IsBold = true;
+
+        using var docxStream = new MemoryStream();
+        OdfToDocxConverter.Convert(original, docxStream);
+        docxStream.Position = 0;
+
+        using TextDocument converted = DocxToOdtConverter.Convert(docxStream);
+        string contentXml = SaveTextContentXml(converted);
+
+        Assert.Contains("text:format-change", contentXml);
+        Assert.Contains("text:change-start", contentXml);
+        Assert.Contains("text:change-end", contentXml);
+        Assert.Contains("段落格式", contentXml);
+        Assert.Contains("字元格式", contentXml);
+
+        var formatChanges = converted.GetTrackedChanges()
+            .Where(change => change.ChangeType == OdfChangeType.FormatChange)
+            .ToList();
+        Assert.Equal(2, formatChanges.Count);
+        Assert.Contains(formatChanges, change => change.Content == "段落格式");
+        Assert.Contains(formatChanges, change => change.Content == "字元格式");
     }
 
     /// <summary>

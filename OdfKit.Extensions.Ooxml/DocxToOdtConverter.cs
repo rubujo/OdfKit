@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -85,6 +86,29 @@ public static class DocxToOdtConverter
             : odtDocument.AddParagraph();
         ApplyParagraphProperties(paragraph.ParagraphProperties, odtParagraph);
 
+        WP.ParagraphPropertiesChange? paragraphFormatChange =
+            paragraph.ParagraphProperties?.GetFirstChild<WP.ParagraphPropertiesChange>();
+        string? paragraphFormatChangeId = null;
+        if (paragraphFormatChange is not null)
+        {
+            string? originalStyleName = MapDocxParagraphStyleToOdt(
+                paragraphFormatChange.ParagraphPropertiesExtended?.GetFirstChild<WP.ParagraphStyleId>()?.Val?.Value);
+            paragraphFormatChangeId = odtDocument.AddTrackedChange(
+                "format-change",
+                paragraphFormatChange.Author?.Value ?? "Author",
+                paragraphFormatChange.Date?.Value ?? DateTime.UtcNow,
+                originalStyleName: originalStyleName,
+                targetFamily: "paragraph");
+            PrependChangeStart(odtParagraph.Node, paragraphFormatChangeId);
+
+            string? newStyleName = MapDocxParagraphStyleToOdt(
+                paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value);
+            if (!string.IsNullOrEmpty(newStyleName))
+            {
+                odtParagraph.Node.SetAttribute("style-name", OdfNamespaces.Text, newStyleName, "text");
+            }
+        }
+
         foreach (var child in paragraph.ChildElements)
         {
             if (child is WP.Run run)
@@ -101,9 +125,16 @@ public static class DocxToOdtConverter
             }
         }
 
-        if (!odtParagraph.Node.Children.Any())
+        if (!odtParagraph.Node.Children.Any(child =>
+                child.NodeType == OdfNodeType.Text ||
+                (child.NodeType == OdfNodeType.Element && child.LocalName is not ("change-start" or "change-end"))))
         {
             AppendText(odtParagraph.Node, paragraph.InnerText ?? string.Empty);
+        }
+
+        if (paragraphFormatChangeId is not null)
+        {
+            AppendChangeEnd(odtParagraph.Node, paragraphFormatChangeId);
         }
     }
 
@@ -247,13 +278,41 @@ public static class DocxToOdtConverter
             return;
         }
 
-        if (properties is null || !HasRunFormatting(properties))
+        WP.RunPropertiesChange? formatChange = properties?.GetFirstChild<WP.RunPropertiesChange>();
+        bool hasFormatting = properties is not null && HasRunFormatting(properties);
+        if (formatChange is not null)
+        {
+            string? originalStyleName = CreateTextStyleFromPreviousRunProperties(
+                odtDocument, formatChange.PreviousRunProperties);
+            string changeId = odtDocument.AddTrackedChange(
+                "format-change",
+                formatChange.Author?.Value ?? "Author",
+                formatChange.Date?.Value ?? DateTime.UtcNow,
+                originalStyleName: originalStyleName,
+                targetFamily: "text");
+
+            OdfTextRun run = odtParagraph.AddTextRun(text);
+            if (hasFormatting)
+            {
+                ApplyRunFormattingToTextRun(run, properties!);
+            }
+
+            WrapNodeWithChangeMarkers(odtParagraph.Node, run.Node, changeId);
+            return;
+        }
+
+        if (!hasFormatting)
         {
             AppendText(odtParagraph.Node, text);
             return;
         }
 
-        OdfTextRun run = odtParagraph.AddTextRun(text);
+        OdfTextRun formattedRun = odtParagraph.AddTextRun(text);
+        ApplyRunFormattingToTextRun(formattedRun, properties!);
+    }
+
+    private static void ApplyRunFormattingToTextRun(OdfTextRun run, WP.RunProperties properties)
+    {
         if (properties.Bold is not null)
         {
             run.IsBold = properties.Bold.Val is null || properties.Bold.Val.Value;
@@ -269,7 +328,8 @@ public static class DocxToOdtConverter
             run.IsUnderline = true;
         }
 
-        if (properties.Color?.Val?.Value is { Length: > 0 } color && !string.Equals(color, "auto", StringComparison.OrdinalIgnoreCase))
+        if (properties.Color?.Val?.Value is { Length: > 0 } color &&
+            !string.Equals(color, "auto", StringComparison.OrdinalIgnoreCase))
         {
             run.Color = "#" + color;
         }
@@ -281,6 +341,61 @@ public static class DocxToOdtConverter
         }
     }
 
+    private static string? CreateTextStyleFromPreviousRunProperties(
+        TextDocument odtDocument, WP.PreviousRunProperties? previous)
+    {
+        if (previous is null || !HasPreviousRunFormatting(previous))
+        {
+            return null;
+        }
+
+        var tempSpan = new OdfNode(OdfNodeType.Element, "span", OdfNamespaces.Text, "text");
+        ApplyRunFormattingToStyleEngine(odtDocument, tempSpan, previous);
+        return tempSpan.GetAttribute("style-name", OdfNamespaces.Text);
+    }
+
+    private static void ApplyRunFormattingToStyleEngine(
+        TextDocument odtDocument, OdfNode targetNode, OpenXmlCompositeElement properties)
+    {
+        if (properties.GetFirstChild<WP.Bold>() is { } bold)
+        {
+            bool isBold = bold.Val is null || bold.Val.Value;
+            odtDocument.StyleEngine.SetLocalStyleProperty(
+                targetNode, "text", "text-properties", "font-weight", OdfNamespaces.Fo, isBold ? "bold" : "normal", "fo", deferSave: true);
+        }
+
+        if (properties.GetFirstChild<WP.Italic>() is { } italic)
+        {
+            bool isItalic = italic.Val is null || italic.Val.Value;
+            odtDocument.StyleEngine.SetLocalStyleProperty(
+                targetNode, "text", "text-properties", "font-style", OdfNamespaces.Fo, isItalic ? "italic" : "normal", "fo", deferSave: true);
+        }
+
+        WP.Underline? underline = properties.GetFirstChild<WP.Underline>();
+        if (underline?.Val is not null && underline.Val.Value != WP.UnderlineValues.None)
+        {
+            odtDocument.StyleEngine.SetLocalStyleProperty(
+                targetNode, "text", "text-properties", "text-underline-style", OdfNamespaces.Style, "solid", "style", deferSave: true);
+        }
+
+        if (properties.GetFirstChild<WP.Color>()?.Val?.Value is { Length: > 0 } color &&
+            !string.Equals(color, "auto", StringComparison.OrdinalIgnoreCase))
+        {
+            odtDocument.StyleEngine.SetLocalStyleProperty(
+                targetNode, "text", "text-properties", "color", OdfNamespaces.Fo, "#" + color, "fo", deferSave: true);
+        }
+
+        if (properties.GetFirstChild<WP.FontSize>()?.Val?.Value is { Length: > 0 } halfPoints &&
+            double.TryParse(halfPoints, out double sizeValue))
+        {
+            string fontSize = (sizeValue / 2d).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "pt";
+            odtDocument.StyleEngine.SetLocalStyleProperty(
+                targetNode, "text", "text-properties", "font-size", OdfNamespaces.Fo, fontSize, "fo", deferSave: true);
+        }
+
+        odtDocument.StyleEngine.DeduplicateAndSaveStyles();
+    }
+
     private static bool HasRunFormatting(WP.RunProperties properties)
     {
         return properties.Bold is not null ||
@@ -288,6 +403,35 @@ public static class DocxToOdtConverter
             properties.Underline is not null ||
             properties.Color is not null ||
             properties.FontSize is not null;
+    }
+
+    private static bool HasPreviousRunFormatting(WP.PreviousRunProperties properties)
+    {
+        return properties.GetFirstChild<WP.Bold>() is not null ||
+            properties.GetFirstChild<WP.Italic>() is not null ||
+            properties.GetFirstChild<WP.Underline>() is not null ||
+            properties.GetFirstChild<WP.Color>() is not null ||
+            properties.GetFirstChild<WP.FontSize>() is not null;
+    }
+
+    private static string? MapDocxParagraphStyleToOdt(string? docxStyleId)
+    {
+        if (string.IsNullOrEmpty(docxStyleId))
+        {
+            return null;
+        }
+
+        return docxStyleId switch
+        {
+            "Heading1" => "Heading_20_1",
+            "Heading2" => "Heading_20_2",
+            "Heading3" => "Heading_20_3",
+            "Heading4" => "Heading_20_4",
+            "Heading5" => "Heading_20_5",
+            "Heading6" => "Heading_20_6",
+            "Normal" => null,
+            _ => docxStyleId,
+        };
     }
 
     private static void AppendText(OdfNode parent, string text)
@@ -298,6 +442,20 @@ public static class DocxToOdtConverter
         }
 
         parent.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = text });
+    }
+
+    private static void PrependChangeStart(OdfNode paragraphNode, string changeId)
+    {
+        var startNode = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
+        startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+        if (paragraphNode.Children.Count > 0)
+        {
+            paragraphNode.InsertBefore(startNode, paragraphNode.Children[0]);
+        }
+        else
+        {
+            paragraphNode.AppendChild(startNode);
+        }
     }
 
     private static void AppendChangeStart(OdfNode paragraphNode, string changeId)
@@ -312,6 +470,16 @@ public static class DocxToOdtConverter
         var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
         endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
         paragraphNode.AppendChild(endNode);
+    }
+
+    private static void WrapNodeWithChangeMarkers(OdfNode parent, OdfNode node, string changeId)
+    {
+        var startNode = new OdfNode(OdfNodeType.Element, "change-start", OdfNamespaces.Text, "text");
+        startNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+        var endNode = new OdfNode(OdfNodeType.Element, "change-end", OdfNamespaces.Text, "text");
+        endNode.SetAttribute("change-id", OdfNamespaces.Text, changeId, "text");
+        parent.InsertBefore(startNode, node);
+        parent.InsertAfter(endNode, node);
     }
 
     private static void ConvertTable(WP.Table wordTable, TextDocument odtDocument)
