@@ -1,8 +1,8 @@
 # OdfKit NuGet 與雙 TFM 相容矩陣
 
-本文件為 Wave 4 **REL-1** 產出，說明可發佈套件、目標框架與建議的消費端矩陣。
+本文件為 Wave 4 **REL-1** 產出，說明可封裝套件、目標框架與建議的消費端矩陣。
 
-## 可發佈套件（1.0.0）
+## 可封裝套件（0.0.1）
 
 | 套件 ID | 說明 | 相依 |
 |---------|------|------|
@@ -13,7 +13,7 @@
 | `OdfKit.Extensions.Pdf` | PDF 匯出 | `OdfKit` |
 | `OdfKit.Extensions.Rendering` | LibreOffice 程序後端渲染 | `OdfKit` |
 
-**非 NuGet 發佈**：`OdfKit.Cli`、`OdfSchemaGenerator`、`OdfCorpusGenerator`、`OdfKit.Benchmarks`、`OdfKit.Tests`（`IsPackable=false` 或開發工具）。
+**非套件發佈**：`OdfKit.Cli`、`OdfSchemaGenerator`、`OdfCorpusGenerator`、`OdfKit.Benchmarks`、`OdfKit.Tests`（`IsPackable=false` 或開發工具）。
 
 ## 程式庫目標框架（雙 TFM）
 
@@ -23,7 +23,7 @@
 | `OdfKit.Tests` | `net10.0;net8.0` | 單元／整合測試（非套件） |
 | `OdfKit.Cli` | `net10.0;net8.0` | 命令列工具（非套件） |
 
-每個可發佈 `.nupkg` 內含：
+每個 `.nupkg` 內含：
 
 - `lib/net10.0/<Assembly>.dll`
 - `lib/netstandard2.0/<Assembly>.dll`
@@ -37,11 +37,19 @@
 | .NET 8 LTS | `net10.0` 或 `netstandard2.0` | ✅ `OdfKit.Tests` net8.0 全綠 |
 | .NET Standard 2.0 相容專案（含 .NET Framework 4.6.1+） | `netstandard2.0` | ✅ 程式庫雙 TFM 建置；消費端煙霧見 `eng/Test-NuGetPack.ps1` |
 
-## 安裝（發佈後）
+## 發佈與安裝策略
+
+| 管道 | 說明 |
+|------|------|
+| **GitHub 原始碼** | 主要使用方式（clone、`ProjectReference`） |
+| **GitHub Release** | 附加 `.nupkg`／`.snupkg` 資產，供本機 NuGet feed |
+| **nuget.org** | **非目前目標** |
+
+自 GitHub Release 下載後：
 
 ```powershell
-dotnet add package OdfKit
-dotnet add package OdfKit.Extensions.Ooxml
+dotnet nuget add source C:\path\to\release-assets --name odfkit-github-release
+dotnet add package OdfKit --version 0.0.1 --source odfkit-github-release
 ```
 
 本機驗證封裝：
@@ -51,15 +59,14 @@ pwsh eng/Pack-NuGet.ps1 -Configuration Release
 pwsh eng/Test-NuGetPack.ps1 -Configuration Release
 ```
 
-發佈至 nuget.org 流程見 [`nuget-publishing.md`](nuget-publishing.md)。
+GitHub Release 發佈流程見 [`github-release-publishing.md`](github-release-publishing.md)。
 
 ## 版本與授權
 
-- **版本**：`1.0.0`（與各 `.csproj` 之 `<Version>` 同步）
+- **版本**：`0.0.1`（權威來源：`eng/OdfKit.Package.props`）
 - **授權**：CC0-1.0（專案原創程式碼）；第三方套件維持其原授權（見 `THIRD-PARTY-NOTICES.md`）
 
 ## 已知限制
 
 - Extensions 依賴原生或重型套件（如 SkiaSharp、PDFsharp、ClosedXML），消費端須自行處理執行環境相依。
 - `OdfKit.Extensions.Rendering` 需本機 LibreOffice 或相容程序後端，見 [`rendering-backend-deployment.md`](rendering-backend-deployment.md)。
-- NuGet 上尚未發佈至 nuget.org 時，請使用本機 `artifacts/nuget` 或私有 feed。

@@ -14,7 +14,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
 try {
-    dotnet build -c $Configuration
+    dotnet build -c $Configuration --no-restore
 
     $commonArgs = @(
         "run",

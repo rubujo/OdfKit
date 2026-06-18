@@ -2,22 +2,50 @@ name: NuGet pack
 
 on:
   pull_request:
+    paths:
+      - 'OdfKit/**'
+      - 'OdfKit.Extensions.*/**'
+      - 'eng/OdfKit.Package.props'
+      - 'eng/Get-PackageVersion.ps1'
+      - 'eng/Pack-NuGet.ps1'
+      - 'eng/Test-NuGetPack.ps1'
+      - '.github/actions/setup-dotnet-odfkit/**'
+      - '.github/workflows/nuget-pack.yml'
   push:
     branches:
       - main
+    paths:
+      - 'OdfKit/**'
+      - 'OdfKit.Extensions.*/**'
+      - 'eng/OdfKit.Package.props'
+      - 'eng/Get-PackageVersion.ps1'
+      - 'eng/Pack-NuGet.ps1'
+      - 'eng/Test-NuGetPack.ps1'
+      - '.github/actions/setup-dotnet-odfkit/**'
+      - '.github/workflows/nuget-pack.yml'
   workflow_dispatch:
+
+concurrency:
+  group: nuget-pack-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   validate-nuget-pack:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: ./.github/actions/setup-dotnet-odfkit
         with:
-          dotnet-version: 10.0.x
+          dotnet-versions: |
+            10.0.x
+            8.0.x
+          cache-key-suffix: '-nuget-pack'
 
       - name: Validate NuGet pack structure and consumer smoke
         shell: pwsh

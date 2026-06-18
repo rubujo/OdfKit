@@ -35,6 +35,12 @@ New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 
 Push-Location $repoRoot
 try {
+    Write-Host "還原 NuGet 相依…"
+    foreach ($relative in $packableProjects) {
+        dotnet restore $relative
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+
     foreach ($relative in $packableProjects) {
         $project = Join-Path $repoRoot $relative
         if (-not (Test-Path -LiteralPath $project)) {
@@ -42,7 +48,7 @@ try {
         }
 
         Write-Host "封裝：$relative"
-        dotnet pack $project -c $Configuration -o $outDir
+        dotnet pack $project -c $Configuration -o $outDir --no-restore
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 

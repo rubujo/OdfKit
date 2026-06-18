@@ -2,22 +2,43 @@ name: ODF corpus
 
 on:
   pull_request:
+    paths:
+      - 'OdfKit/**'
+      - 'tools/OdfKit.Cli/**'
+      - 'tests/fixtures/corpus/**'
+      - 'eng/Test-OdfCorpus.ps1'
+      - '.github/actions/setup-dotnet-odfkit/**'
+      - '.github/workflows/odf-corpus.yml'
   push:
     branches:
       - main
+    paths:
+      - 'OdfKit/**'
+      - 'tools/OdfKit.Cli/**'
+      - 'tests/fixtures/corpus/**'
+      - 'eng/Test-OdfCorpus.ps1'
+      - '.github/actions/setup-dotnet-odfkit/**'
+      - '.github/workflows/odf-corpus.yml'
   workflow_dispatch:
+
+concurrency:
+  group: odf-corpus-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   validate-corpus:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: ./.github/actions/setup-dotnet-odfkit
         with:
-          dotnet-version: 10.0.x
+          cache-key-suffix: '-odf-corpus'
 
       - name: Validate ODF corpus
         shell: pwsh

@@ -9,7 +9,7 @@
 | Tier 1 規範可信 | Validator + Profile + Corpus；Unknown 保真 round-trip | corpus 219 fixtures；validate-corpus 全綠 |
 | Tier 2 語意可用 | 四主格式高階 API 深度；變體與特殊格式專屬模型 | 四主格式 High-level = `complete` ✅；其餘多為 `usable` / `usable-variant` / `package-only` |
 | Tier 3 互通可驗 | LibreOffice 實機驗收；OOXML 視覺 golden file | Wave 3 X-2／Q-3／REN-1 基礎 ✅；外部 Office 視覺驗收為可選環境 |
-| Tier 4 產品就緒 | NuGet 發佈；統一開發者體驗 | 原始碼 repo 為主 |
+| Tier 4 產品就緒 | GitHub Release 套件資產；統一開發者體驗 | 原始碼 repo 為主；**非 nuget.org** |
 
 明確非目標維持 [`docs/udx-non-goals.md`](../docs/udx-non-goals.md)：物理分頁引擎、樞紐重算引擎、SmartArt 佈局器、JSON Collaboration operations merge。
 
@@ -92,12 +92,12 @@
 
 | Phase | 狀態 | 產出 |
 |-------|------|------|
-| REL-1 | ✅ | 相容矩陣、`Pack`／`Test-NuGetPack`／`Publish-NuGet.ps1`、`docs/nuget-publishing.md`、`.github/workflows/nuget-pack.yml`、`NuGetPackagingTests` |
+| REL-1 | ✅ | 相容矩陣、`Pack`／`Test-NuGetPack`／`Publish-GitHubRelease.ps1`、`docs/github-release-publishing.md`、`.github/workflows/nuget-pack.yml`（Actions v6/v5/v7）、`NuGetPackagingTests` |
 | COLLAB-1（選用） | planned | ODT → JSON operations 匯出（對標 ODF Toolkit CLI） |
 | COLLAB-2（選用） | planned | JSON operations → ODT 單向 merge + golden file 對照 |
 | QC-ongoing | planned | 季度 OASIS RNG diff、本檔案季度檢視 |
 
-REL-1 驗收：`pwsh eng/Test-NuGetPack.ps1`；六套件雙 TFM `.nupkg` + net8.0 消費端煙霧；`pwsh eng/Publish-NuGet.ps1` 乾跑；CI `nuget-pack.yml`。
+REL-1 驗收：`pwsh eng/Test-NuGetPack.ps1`；六套件雙 TFM `.nupkg`（v0.0.1）+ net8.0 消費端煙霧；`pwsh eng/Publish-GitHubRelease.ps1` 乾跑；CI `nuget-pack.yml`。
 
 ## 高階 API 分級定義
 
@@ -120,5 +120,5 @@ REL-1 驗收：`pwsh eng/Test-NuGetPack.ps1`；六套件雙 TFM `.nupkg` + net8.
 1. Tier 1–4 指標表全綠
 2. 四主格式 High-level = `complete`；其餘有明確 `usable` 或 `package-only`
 3. 測試無回歸；corpus 與 interop 可選 CI 全綠
-4. NuGet 穩定版 + cookbook 覆蓋主要場景
+4. GitHub Release 套件資產（v0.0.1）+ cookbook 覆蓋主要場景
 5. non-goals 邊界於 README 與 udx-non-goals 明確揭露

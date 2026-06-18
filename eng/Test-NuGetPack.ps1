@@ -17,6 +17,7 @@ $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
+$packageVersion = & (Join-Path $PSScriptRoot "Get-PackageVersion.ps1")
 $outDir = Join-Path $repoRoot "artifacts/nuget"
 $expectedTfms = @("net10.0", "netstandard2.0")
 
@@ -37,7 +38,7 @@ try {
     }
 
     foreach ($pkg in $expectedPackages) {
-        $nupkgPath = Join-Path $outDir "$($pkg.Id).1.0.0.nupkg"
+        $nupkgPath = Join-Path $outDir "$($pkg.Id).$packageVersion.nupkg"
         if (-not (Test-Path -LiteralPath $nupkgPath)) {
             throw "缺少套件：$nupkgPath"
         }
@@ -57,7 +58,7 @@ try {
         }
 
         if ($pkg.RequireSnupkg) {
-            $snupkg = Join-Path $outDir "$($pkg.Id).1.0.0.snupkg"
+            $snupkg = Join-Path $outDir "$($pkg.Id).$packageVersion.snupkg"
             if (-not (Test-Path -LiteralPath $snupkg)) {
                 throw "缺少符號套件：$snupkg"
             }
@@ -74,7 +75,7 @@ try {
     dotnet new console -n NuGetConsumerSmoke -o $smokeDir -f net8.0 --force
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    dotnet add $smokeDir package OdfKit --version 1.0.0 --source $outDir
+    dotnet add $smokeDir package OdfKit --version $packageVersion --source $outDir
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     @"

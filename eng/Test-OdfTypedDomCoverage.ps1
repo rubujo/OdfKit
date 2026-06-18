@@ -10,7 +10,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
 try {
-    dotnet build -c $Configuration
+    dotnet build -c $Configuration --no-restore
 
     $resolvedOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
     $outputDirectory = Split-Path -Parent $resolvedOutputPath
