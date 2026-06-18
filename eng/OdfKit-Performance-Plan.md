@@ -54,7 +54,7 @@
 | **5b** | B. JIT `AggressiveInlining` | ✅ 正確但效益質性（約 5–10% 微觀）；過度標註會膨脹 IL | 僅標註 `OdfHashing.Combine`、`TryCoerceDouble` 等極熱路徑 | ✅ |
 | **5c** | C. 執行緒專屬 `StringPool` | ✅ 正確：單次 `Parse` 內池化有效，跨檔案需執行緒池 | `ThreadLocal` + 4096 次重置，避免無界成長 | ✅ |
 | **5d** | D. SIMD 統計累加 | ⚠️ 部分正確：僅連續 `double[]`/`object[,]` 純數值陣列可向量化的；混合型別仍走原路徑 | `SUM`/`AVERAGE`/`COUNT` + `SUMIF`/`COUNTIF` 純數值等號快速路徑 | ✅ |
-| **5e** | E. Native AOT 裁剪相容 | ✅ 方向正確；完整 AOT 需大量後續（Source Generator、trim root） | `IsTrimmable`、`TrimSmoke`、`BouncyCastle` AOT 標記、工廠註冊表 | 🔶 深化中 |
+| **5e** | E. Native AOT 裁剪相容 | ✅ 方向正確；完整 AOT 需大量後續（Source Generator、trim root） | `IsTrimmable`、`TrimSmoke`（13 API 根）、`BouncyCastle` trim root、`OdfEmbeddedDocumentFactory` | ✅ |
 
 **5a 取捨**：隨機索引 `Children[i]` 在快取失效後需 O(n) 重建；插入／刪除為 O(1)。試算表連續 `InsertAfter` 為主要受益場景（`DomInsertBenchmarks`）。
 
@@ -62,7 +62,11 @@
 
 **5d 限制**：`SUMIF`/`COUNTIF` 快速路徑僅涵蓋純數值矩陣 + 等號條件；比較運算子與字串條件仍走 `CriteriaMatcher`。
 
-**5e 後續**：`PublishAot` 全量驗證；未註冊類型反射後備；XML Source Generator；BouncyCastle 靜態演算法註冊或整包保留。
+**5e 驗收**（2026-06-18）：`pwsh eng/Test-TrimSmoke.ps1` 通過（`PublishTrimmed` + `SelfContained`、15 個 API 根）；CI `performance-benchmark.yml` 非阻擋執行。`TrimmerRootAssembly` 保留 `BouncyCastle.Cryptography`；`OdfEmbeddedDocumentFactory` 涵蓋所有內建文件類型。
+
+**5e 建置注意**（2026-06 網路資料驗證）：OdfKit（621 檔）冷編譯時 SDK `CAxxxx` analyzer 可佔編譯時間大部分（[Meziantou](https://www.meziantou.net/understanding-the-impact-of-roslyn-analyzers-on-the-build-time.htm)、[dev.to 2026](https://dev.to/florinvica/9-things-that-silently-kill-your-net-build-time-and-how-to-fix-each-one-3kb4)）；本機實測 `RunAnalyzers=false` 約 71 s、`RunAnalyzers=true` 可達數十分鐘。已於根目錄 `Directory.Build.props` 套用微軟建議：本機 `RunAnalyzersDuringBuild=false`、CI（`GITHUB_ACTIONS`/`CI`）=true、`UseSharedCompilation` + `RestoreUseStaticGraphEvaluation`。診斷：`pwsh eng/Build-AnalyzerReport.ps1` → [MSBuild Log Viewer](https://msbuildlog.com/) 檢視 Analyzer Summary。`eng/Ensure-OdfKitBuilt.ps1` + `Test-TrimSmoke.ps1` 僅建置 net10.0；publish 加 `-p:RunAnalyzers=false`（CI 已驗證後）。
+
+**5e 已知限制（後續選用）**：`Test-TrimSmoke.ps1 -PublishAot` 可能因 BouncyCastle／`OdfTypedDomCoverage` 反射而失敗；未註冊嵌入式類型仍走反射後備；XML Source Generator 尚未實作。
 
 驗收：`dotnet test` 全綠；`OdfNodePerformanceTests`、`DomInsertBenchmarks`。
 

@@ -1,0 +1,25 @@
+<Project>
+  <!--
+    方案層級建置最佳化（PERF-5e / 建置效能）。
+    依據：
+    - https://learn.microsoft.com/en-us/visualstudio/code-quality/disable-code-analysis
+    - https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/overview
+    - https://www.meziantou.net/understanding-the-impact-of-roslyn-analyzers-on-the-build-time.htm
+    - https://dev.to/florinvica/9-things-that-silently-kill-your-net-build-time-and-how-to-fix-each-one-3kb4
+  -->
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <UseSharedCompilation>true</UseSharedCompilation>
+    <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
+
+    <!-- 本機關閉 build-time analyzer；CI（GitHub Actions / CI 環境變數）維持完整 CA 檢查。 -->
+    <RunAnalyzersDuringBuild Condition="'$(GITHUB_ACTIONS)' == 'true' OR '$(CI)' == 'true'">true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringBuild Condition="'$(GITHUB_ACTIONS)' != 'true' AND '$(CI)' != 'true'">false</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis Condition="'$(BuildingInsideVisualStudio)' == 'true'">true</RunAnalyzersDuringLiveAnalysis>
+
+    <!-- CI 產出 binlog 時可檢視 Analyzer Summary（需搭配 /bl）。 -->
+    <ReportAnalyzer Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ReportAnalyzer>
+
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>

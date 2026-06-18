@@ -8,10 +8,30 @@
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <IsPackable>false</IsPackable>
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+
+  <!-- PublishTrimmed 需要 RID；僅 publish 管線套用，避免 dotnet build 連帶要求 OdfKit 產出 win-x64 參考組件。 -->
+  <PropertyGroup Condition="'$(GenerateRuntimeConfigurationFiles)' == 'true' OR '$(PublishDir)' != ''">
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PublishAot)' == 'true'">
+    <PublishAot>true</PublishAot>
+    <SelfContained>true</SelfContained>
+    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\OdfKit\OdfKit.csproj" />
+    <!-- 僅建置 net10.0 參考，避免 publish 時連帶編譯 netstandard2.0（621 檔 × 2 加倍耗時）。 -->
+    <ProjectReference Include="..\..\OdfKit\OdfKit.csproj">
+      <SetTargetFramework>TargetFramework=net10.0</SetTargetFramework>
+    </ProjectReference>
+  </ItemGroup>
+
+  <!-- BouncyCastle 密碼學路徑尚未完全 trimming 化；整包保留以避免 IL 連結器誤裁（PERF-5e）。 -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="BouncyCastle.Cryptography" />
   </ItemGroup>
 
 </Project>
