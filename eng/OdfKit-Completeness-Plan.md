@@ -29,7 +29,7 @@
 
 ### M-3 驗收
 
-- `office:text`、`table:table`、`draw:page` content model facade 可 append / enumerate
+- `office:text`、`table:table`、`draw:page` 與次格式 `office:chart`／`office:image`／`office:database`／`office:spreadsheet` content model facade 可 append / enumerate
 - `TypedDomParityTests` 新增 content model user story
 - typed-dom coverage guard 不退化
 
@@ -41,7 +41,7 @@
 | DEPTH-1/2 | 基礎 ✅ | DEPTH-1 四主格式讀取 API 已齊；DEPTH-2 已補 ODC/ODB/ODF/ODI 讀取與表單／框架 API |
 | DEPTH-1-TC | 基礎 ✅ | ODT/ODS `tracked-changes` 內容／表格／結構／移動；LO 互通測試已備 |
 | RDF-1 | 基礎 ✅ | 核心 `manifest.rdf` / `pkg:` ontology parity；文件層往返與 corpus fixture |
-| RDF-2 | 選用 | `OdfKit.Extensions.Rdf` + `dotNetRdf.Core` SPARQL 橋接 |
+| RDF-2 | ✅ | `OdfKit.Extensions.Rdf` + `dotNetRdf.Core` SPARQL 橋接 |
 | DX-1 | 基礎 ✅ | `PresentationDocumentBuilder`、`DrawingDocumentBuilder`、`OdfFormulaBuilder`；cookbook 已補 Builder 範例 |
 | LOEXT-1 | 基礎 ✅ | `loext:decorative` 讀取映射、`OdfNamespaces.LoExt`；`LoExtInteropTests` 覆蓋 ODT/ODP/ODG |
 | CALCEXT-1 | 基礎 ✅ | 工作表與文件層 calcext 讀取 API（條件格式、走勢圖）；`ConditionalFormatTests`、`SpreadsheetHighLevelApiTests` |
