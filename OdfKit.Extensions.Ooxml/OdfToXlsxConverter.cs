@@ -74,17 +74,16 @@ public static class OdfToXlsxConverter
 
     private static void CopySheetData(OdfTableSheet odsSheet, IXLWorksheet xlSheet)
     {
-        var cellValues = ScanCellValues(odsSheet);
-        foreach (var pair in cellValues)
+        foreach (var (row, col, data) in EnumerateSheetCells(odsSheet))
         {
-            var val = pair.Value.Value;
-            var xlCell = xlSheet.Cell(pair.Key.Row + 1, pair.Key.Col + 1);
+            var val = data.Value;
+            var xlCell = xlSheet.Cell(row + 1, col + 1);
             if (val is not null && !(val is string s && s.Length == 0))
             {
                 SetXlCell(xlCell, val);
             }
 
-            ApplyCellStyle(odsSheet, xlCell, pair.Value.StyleName);
+            ApplyCellStyle(odsSheet, xlCell, data.StyleName);
         }
 
         CopyDataValidations(odsSheet, xlSheet);
@@ -658,7 +657,6 @@ public static class OdfToXlsxConverter
 
     private static IEnumerable<PivotSpec> ReadPivotSpecs(OdfTableSheet sheet)
     {
-        var cellValues = ScanCellValues(sheet);
         foreach (var pivotNode in sheet.TableNode.Descendants())
         {
             if (pivotNode.LocalName != "data-pilot-table" || pivotNode.NamespaceUri != OdfNamespaces.Table)
@@ -677,7 +675,7 @@ public static class OdfToXlsxConverter
             string name = pivotNode.GetAttribute("name", OdfNamespaces.Table) ?? "PivotTable";
             string targetAddress = pivotNode.GetAttribute("target-range-address", OdfNamespaces.Table) ?? string.Empty;
             string targetRef = NormalizePivotTargetRef(targetAddress, sheet.Name);
-            var fields = ReadPivotFields(pivotNode, sourceRange, cellValues);
+            var fields = ReadPivotFields(sheet, pivotNode, sourceRange);
             if (fields.Count == 0)
             {
                 continue;
@@ -695,9 +693,9 @@ public static class OdfToXlsxConverter
     }
 
     private static List<PivotFieldSpec> ReadPivotFields(
+        OdfTableSheet sheet,
         OdfNode pivotNode,
-        OdfCellRange sourceRange,
-        IReadOnlyDictionary<(int Row, int Col), CellData> cellValues)
+        OdfCellRange sourceRange)
     {
         int startCol = Math.Min(sourceRange.StartAddress.Column, sourceRange.EndAddress.Column);
         int endCol = Math.Max(sourceRange.StartAddress.Column, sourceRange.EndAddress.Column);
@@ -706,7 +704,7 @@ public static class OdfToXlsxConverter
         for (int col = startCol; col <= endCol; col++)
         {
             string fallbackName = "Field" + (col - startCol + 1).ToString(CultureInfo.InvariantCulture);
-            string name = cellValues.TryGetValue((headerRow, col), out CellData? data)
+            string name = TryGetCellAt(sheet, headerRow, col, out CellData data)
                 ? System.Convert.ToString(data.Value, CultureInfo.InvariantCulture) ?? fallbackName
                 : fallbackName;
             fields.Add(new PivotFieldSpec { Name = name });
@@ -1109,63 +1107,123 @@ public static class OdfToXlsxConverter
         }
     }
 
-    private static Dictionary<(int Row, int Col), CellData> ScanCellValues(OdfTableSheet sheet)
+    private const int MaxTableRepeat = 1_048_576;
+
+    /// <summary>
+    /// 以流式方式列舉工作表儲存格，避免全表 <c>Dictionary</c> 快取（PERF-4g）。
+    /// </summary>
+    private static IEnumerable<(int Row, int Col, CellData Data)> EnumerateSheetCells(OdfTableSheet sheet)
     {
-        const int MaxRepeat = 1_048_576; // Excel 最大列數，防止 OOM DoS
-        var values = new Dictionary<(int Row, int Col), CellData>();
         int currentRowIndex = 0;
         foreach (var rowChild in sheet.TableNode.Children)
         {
-            if (rowChild.LocalName == "table-row" && rowChild.NamespaceUri == OdfNamespaces.Table)
+            if (rowChild.LocalName != "table-row" || rowChild.NamespaceUri != OdfNamespaces.Table)
             {
-                int rowRepeatedCount = 1;
-                string? rowRepStr = rowChild.GetAttribute("number-rows-repeated", OdfNamespaces.Table);
-                if (!string.IsNullOrEmpty(rowRepStr) && int.TryParse(rowRepStr, out int rrc) && rrc > 0)
-                {
-                    rowRepeatedCount = Math.Min(rrc, MaxRepeat);
-                }
-
-                var rowCells = new List<(int Col, CellData Data)>();
-                int currentColIndex = 0;
-                foreach (var cellChild in rowChild.Children)
-                {
-                    if ((cellChild.LocalName == "table-cell" || cellChild.LocalName == "covered-table-cell") && cellChild.NamespaceUri == OdfNamespaces.Table)
-                    {
-                        int colRepeatedCount = 1;
-                        string? colRepStr = cellChild.GetAttribute("number-columns-repeated", OdfNamespaces.Table);
-                        if (!string.IsNullOrEmpty(colRepStr) && int.TryParse(colRepStr, out int crc) && crc > 0)
-                        {
-                            colRepeatedCount = Math.Min(crc, MaxRepeat);
-                        }
-
-                        object? cellValue = GetCellValueFromNode(cellChild);
-                        string? styleName = cellChild.GetAttribute("style-name", OdfNamespaces.Table);
-                        if (cellValue is not null || !string.IsNullOrEmpty(styleName))
-                        {
-                            var data = new CellData { Value = cellValue, StyleName = styleName };
-                            for (int i = 0; i < colRepeatedCount; i++)
-                            {
-                                rowCells.Add((currentColIndex + i, data));
-                            }
-                        }
-
-                        currentColIndex += colRepeatedCount;
-                    }
-                }
-
-                for (int r = 0; r < rowRepeatedCount; r++)
-                {
-                    int actualRow = currentRowIndex + r;
-                    foreach (var cell in rowCells)
-                    {
-                        values[(actualRow, cell.Col)] = cell.Data;
-                    }
-                }
-
-                currentRowIndex += rowRepeatedCount;
+                continue;
             }
+
+            int rowRepeatedCount = GetRepeatCount(rowChild, "number-rows-repeated");
+            var rowCells = new List<(int Col, CellData Data)>();
+            int currentColIndex = 0;
+            foreach (var cellChild in rowChild.Children)
+            {
+                if ((cellChild.LocalName != "table-cell" && cellChild.LocalName != "covered-table-cell") ||
+                    cellChild.NamespaceUri != OdfNamespaces.Table)
+                {
+                    continue;
+                }
+
+                int colRepeatedCount = GetRepeatCount(cellChild, "number-columns-repeated");
+                object? cellValue = GetCellValueFromNode(cellChild);
+                string? styleName = cellChild.GetAttribute("style-name", OdfNamespaces.Table);
+                if (cellValue is not null || !string.IsNullOrEmpty(styleName))
+                {
+                    var data = new CellData { Value = cellValue, StyleName = styleName };
+                    for (int i = 0; i < colRepeatedCount; i++)
+                    {
+                        rowCells.Add((currentColIndex + i, data));
+                    }
+                }
+
+                currentColIndex += colRepeatedCount;
+            }
+
+            for (int r = 0; r < rowRepeatedCount; r++)
+            {
+                int actualRow = currentRowIndex + r;
+                foreach (var cell in rowCells)
+                {
+                    yield return (actualRow, cell.Col, cell.Data);
+                }
+            }
+
+            currentRowIndex += rowRepeatedCount;
         }
-        return values;
+    }
+
+    /// <summary>
+    /// 按需讀取單一儲存格（供樞紐表標題列等稀疏查詢）。
+    /// </summary>
+    private static bool TryGetCellAt(OdfTableSheet sheet, int targetRow, int targetCol, out CellData data)
+    {
+        data = new CellData();
+        int currentRowIndex = 0;
+        foreach (var rowChild in sheet.TableNode.Children)
+        {
+            if (rowChild.LocalName != "table-row" || rowChild.NamespaceUri != OdfNamespaces.Table)
+            {
+                continue;
+            }
+
+            int rowRepeatedCount = GetRepeatCount(rowChild, "number-rows-repeated");
+            if (targetRow < currentRowIndex || targetRow >= currentRowIndex + rowRepeatedCount)
+            {
+                currentRowIndex += rowRepeatedCount;
+                continue;
+            }
+
+            int currentColIndex = 0;
+            foreach (var cellChild in rowChild.Children)
+            {
+                if ((cellChild.LocalName != "table-cell" && cellChild.LocalName != "covered-table-cell") ||
+                    cellChild.NamespaceUri != OdfNamespaces.Table)
+                {
+                    continue;
+                }
+
+                int colRepeatedCount = GetRepeatCount(cellChild, "number-columns-repeated");
+                if (targetCol < currentColIndex || targetCol >= currentColIndex + colRepeatedCount)
+                {
+                    currentColIndex += colRepeatedCount;
+                    continue;
+                }
+
+                object? cellValue = GetCellValueFromNode(cellChild);
+                string? styleName = cellChild.GetAttribute("style-name", OdfNamespaces.Table);
+                if (cellValue is null && string.IsNullOrEmpty(styleName))
+                {
+                    return false;
+                }
+
+                data = new CellData { Value = cellValue, StyleName = styleName };
+                return true;
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    private static int GetRepeatCount(OdfNode node, string attributeLocalName)
+    {
+        string? repeat = node.GetAttribute(attributeLocalName, OdfNamespaces.Table);
+        if (!string.IsNullOrEmpty(repeat) && int.TryParse(repeat, out int count) && count > 0)
+        {
+            return Math.Min(count, MaxTableRepeat);
+        }
+
+        return 1;
     }
 
     private static void ApplyCellStyle(OdfTableSheet odsSheet, IXLCell xlCell, string? styleName)

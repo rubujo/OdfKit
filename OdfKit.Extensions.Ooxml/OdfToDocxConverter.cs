@@ -100,11 +100,81 @@ public static class OdfToDocxConverter
 
     private static string? ExtractHeaderFooterText(TextDocument odtDocument, string localName)
     {
-        foreach (var node in odtDocument.StylesDom.Descendants())
+        string? fromStyles = FindStyleNamespaceText(odtDocument.StylesDom, localName);
+        if (!string.IsNullOrEmpty(fromStyles))
         {
-            if (node.LocalName == localName && node.NamespaceUri == OdfNamespaces.Style)
+            return fromStyles;
+        }
+
+        return FindStyleNamespaceText(odtDocument.ContentDom, localName);
+    }
+
+    private static string? FindStyleNamespaceText(OdfNode root, string localName)
+    {
+        string? fromStyles = FindHeaderFooterInOfficeSection(root, "styles", localName);
+        if (!string.IsNullOrEmpty(fromStyles))
+        {
+            return fromStyles;
+        }
+
+        return FindHeaderFooterInMasterStyles(root, localName);
+    }
+
+    private static string? FindHeaderFooterInOfficeSection(OdfNode root, string sectionLocalName, string localName)
+    {
+        OdfNode? section = FindOfficeChildSection(root, sectionLocalName);
+        if (section is null)
+        {
+            return null;
+        }
+
+        foreach (var child in section.Children)
+        {
+            if (child.LocalName == localName && child.NamespaceUri == OdfNamespaces.Style)
             {
-                return node.TextContent;
+                return child.TextContent;
+            }
+        }
+
+        return null;
+    }
+
+    private static string? FindHeaderFooterInMasterStyles(OdfNode root, string localName)
+    {
+        OdfNode? masterStyles = FindOfficeChildSection(root, "master-styles");
+        if (masterStyles is null)
+        {
+            return null;
+        }
+
+        foreach (var masterPage in masterStyles.Children)
+        {
+            if (masterPage.LocalName != "master-page" || masterPage.NamespaceUri != OdfNamespaces.Style)
+            {
+                continue;
+            }
+
+            foreach (var child in masterPage.Children)
+            {
+                if (child.LocalName == localName && child.NamespaceUri == OdfNamespaces.Style)
+                {
+                    return child.TextContent;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static OdfNode? FindOfficeChildSection(OdfNode root, string localName)
+    {
+        foreach (var child in root.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == OdfNamespaces.Office)
+            {
+                return child;
             }
         }
 
@@ -128,7 +198,18 @@ public static class OdfToDocxConverter
 
         private void LoadStyles(OdfNode root)
         {
-            foreach (var node in root.Descendants())
+            RegisterStylesFromSection(FindOfficeChildSection(root, "automatic-styles"));
+            RegisterStylesFromSection(FindOfficeChildSection(root, "styles"));
+        }
+
+        private void RegisterStylesFromSection(OdfNode? section)
+        {
+            if (section is null)
+            {
+                return;
+            }
+
+            foreach (var node in section.Children)
             {
                 if (node.LocalName != "style" || node.NamespaceUri != OdfNamespaces.Style)
                 {
@@ -141,15 +222,24 @@ public static class OdfToDocxConverter
                     continue;
                 }
 
-                var info = new StyleInfo
-                {
-                    Name = name,
-                    Family = node.GetAttribute("family", OdfNamespaces.Style) ?? string.Empty,
-                    ParentName = node.GetAttribute("parent-style-name", OdfNamespaces.Style)
-                };
-                ReadStyleProperties(node, info);
-                _styles[name] = info;
+                RegisterStyleNode(
+                    name,
+                    node.GetAttribute("family", OdfNamespaces.Style) ?? string.Empty,
+                    node.GetAttribute("parent-style-name", OdfNamespaces.Style),
+                    node);
             }
+        }
+
+        private void RegisterStyleNode(string name, string family, string? parentName, OdfNode node)
+        {
+            var info = new StyleInfo
+            {
+                Name = name,
+                Family = family,
+                ParentName = parentName
+            };
+            ReadStyleProperties(node, info);
+            _styles[name] = info;
         }
 
         private void LoadStyles(OdfPackage package)

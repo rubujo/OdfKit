@@ -93,7 +93,9 @@
 | 2 | 4c | 點陣圖匯出略過 `OdfCell` 配置 | ✅ |
 | 3 | 4d | 樣式屬性 Rebuild 展平快取 | ✅ |
 | 4 | 4i | `OdfXmlWriter` 深度限制 | ✅ |
-| — | 4g/4h/4f/4j/4k | OOXML 流式、DOCX 樣式走訪、圖表陣列、動態 xmlns、Argon2 閘道 | 延後 |
+| — | 4f/4j/4k | 圖表陣列、動態 xmlns、Argon2 閘道 | 延後 |
+| 5 | 4g | ODS→XLSX `EnumerateSheetCells` 流式寫入；樞紐表 `TryGetCellAt` | ✅ |
+| 5 | 4h | ODT→DOCX 限縮 `office:automatic-styles`／`office:styles` 走訪 | ✅ |
 
 驗收：`dotnet test` 全綠；`HtmlExportTests`、`EncryptionTests`、`OdfNodePerformanceTests`。
 
