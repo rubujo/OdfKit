@@ -470,6 +470,7 @@ public static class OdfToDocxConverter
 
         StyleInfo? styleInfo = ctx.GetStyle(styleName);
         ApplyParagraphStyle(para, styleInfo);
+        TryApplyParagraphFormatChangeRevision(para, node, ctx, trackedChanges);
         AppendRunsFromNode(node, para, styleInfo, mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
         return para;
     }
@@ -496,6 +497,12 @@ public static class OdfToDocxConverter
 
     private static void ApplyParagraphStyle(WP.Paragraph paragraph, StyleInfo? styleInfo)
     {
+        WP.ParagraphProperties properties = GetOrCreateParagraphProperties(paragraph);
+        ApplyParagraphStyleToProperties(properties, styleInfo);
+    }
+
+    private static void ApplyParagraphStyleToProperties(WP.ParagraphProperties properties, StyleInfo? styleInfo)
+    {
         if (styleInfo?.TextAlign is null)
         {
             return;
@@ -514,8 +521,78 @@ public static class OdfToDocxConverter
             return;
         }
 
-        WP.ParagraphProperties properties = GetOrCreateParagraphProperties(paragraph);
         properties.AppendChild(new WP.Justification { Val = justification.Value });
+    }
+
+    private static void ApplyParagraphStyleToExtendedProperties(WP.ParagraphPropertiesExtended properties,
+        StyleInfo? styleInfo)
+    {
+        if (styleInfo?.TextAlign is null)
+        {
+            return;
+        }
+
+        WP.JustificationValues? justification = styleInfo.TextAlign switch
+        {
+            "center" => WP.JustificationValues.Center,
+            "end" or "right" => WP.JustificationValues.Right,
+            "justify" => WP.JustificationValues.Both,
+            "start" or "left" => WP.JustificationValues.Left,
+            _ => null
+        };
+        if (justification is null)
+        {
+            return;
+        }
+
+        properties.AppendChild(new WP.Justification { Val = justification.Value });
+    }
+
+    private static void TryApplyParagraphFormatChangeRevision(WP.Paragraph paragraph, OdfNode paragraphNode,
+        ConversionContext ctx, TrackedChangeRegistry trackedChanges)
+    {
+        foreach (OdfNode child in paragraphNode.Children)
+        {
+            if (child.NodeType != OdfNodeType.Element)
+            {
+                continue;
+            }
+
+            if (child.LocalName != "change-start" || child.NamespaceUri != OdfNamespaces.Text)
+            {
+                continue;
+            }
+
+            string? changeId = child.GetAttribute("change-id", OdfNamespaces.Text);
+            if (string.IsNullOrEmpty(changeId) ||
+                !trackedChanges.TryGet(changeId!, out TrackedChangeEntry? entry) ||
+                entry.ChangeType != "format-change" ||
+                entry.TargetFamily != "paragraph")
+            {
+                continue;
+            }
+
+            var oldParagraphProperties = new WP.ParagraphPropertiesExtended();
+            if (entry.OriginalStyleName is { Length: > 0 } originalStyleName)
+            {
+                oldParagraphProperties.AppendChild(
+                    new WP.ParagraphStyleId { Val = MapOdtStyleToDocx(originalStyleName) });
+            }
+
+            ApplyParagraphStyleToExtendedProperties(oldParagraphProperties, ctx.GetStyle(entry.OriginalStyleName));
+
+            var change = new WP.ParagraphPropertiesChange
+            {
+                Author = string.IsNullOrEmpty(entry.Author) ? "Author" : entry.Author,
+                Date = ToOpenXmlDate(entry.ChangedAt),
+                Id = trackedChanges.GetRevisionId(entry.ChangeId),
+                ParagraphPropertiesExtended = oldParagraphProperties,
+            };
+
+            WP.ParagraphProperties properties = GetOrCreateParagraphProperties(paragraph);
+            properties.AppendChild(change);
+            return;
+        }
     }
 
     private static WP.ParagraphProperties GetOrCreateParagraphProperties(WP.Paragraph paragraph)
@@ -533,7 +610,8 @@ public static class OdfToDocxConverter
 
     private static void AppendRunsFromNode(OdfNode node, OpenXmlCompositeElement runTarget, StyleInfo? parentStyle,
         MainDocumentPart mainPart, ConversionContext ctx, OdfPackage odtPackage,
-        Dictionary<string, ImagePart> imagePartCache, TrackedChangeRegistry trackedChanges)
+        Dictionary<string, ImagePart> imagePartCache, TrackedChangeRegistry trackedChanges,
+        TrackedChangeEntry? formatChangeRevision = null)
     {
         for (int i = 0; i < node.Children.Count; i++)
         {
@@ -543,7 +621,7 @@ public static class OdfToDocxConverter
                 string txt = child.TextContent ?? string.Empty;
                 if (txt.Length > 0)
                 {
-                    runTarget.AppendChild(MakeRun(txt, parentStyle));
+                    runTarget.AppendChild(MakeRun(txt, parentStyle, ctx, formatChangeRevision, trackedChanges));
                 }
             }
             else if (child.NodeType == OdfNodeType.Element)
@@ -584,10 +662,15 @@ public static class OdfToDocxConverter
 
                         i = SkipToChangeEnd(node, i + 1, changeId!);
                     }
+                    else if (entry.ChangeType == "format-change" && entry.TargetFamily == "text")
+                    {
+                        i = AppendRunsUntilChangeEnd(node, i + 1, changeId!, runTarget, parentStyle,
+                            mainPart, ctx, odtPackage, imagePartCache, trackedChanges, entry);
+                    }
                     else
                     {
                         i = AppendRunsUntilChangeEnd(node, i + 1, changeId!, runTarget, parentStyle,
-                            mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+                            mainPart, ctx, odtPackage, imagePartCache, trackedChanges, formatChangeRevision);
                     }
                 }
                 else if (child.LocalName == "change-end" && child.NamespaceUri == OdfNamespaces.Text)
@@ -599,22 +682,18 @@ public static class OdfToDocxConverter
                     string? spanStyleName = child.GetAttribute("style-name", OdfNamespaces.Text);
                     StyleInfo? spanStyle = ctx.GetStyle(spanStyleName);
                     AppendRunsFromNode(child, runTarget, MergeStyles(parentStyle, spanStyle),
-                        mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+                        mainPart, ctx, odtPackage, imagePartCache, trackedChanges, formatChangeRevision);
                 }
                 else if (child.LocalName == "s" && child.NamespaceUri == OdfNamespaces.Text)
                 {
                     string? countAttr = child.GetAttribute("c", OdfNamespaces.Text);
                     int count = int.TryParse(countAttr, out int c) ? c : 1;
-                    runTarget.AppendChild(MakeRun(new string(' ', count), parentStyle));
+                    runTarget.AppendChild(MakeRun(new string(' ', count), parentStyle, ctx, formatChangeRevision, trackedChanges));
                 }
                 else if (child.LocalName == "tab" && child.NamespaceUri == OdfNamespaces.Text)
                 {
                     var run = new WP.Run(new WP.TabChar());
-                    if (parentStyle != null)
-                    {
-                        run.RunProperties = BuildRunProps(parentStyle);
-                    }
-
+                    run.RunProperties = BuildRunProperties(parentStyle, ctx, formatChangeRevision, trackedChanges);
                     runTarget.AppendChild(run);
                 }
                 else if (child.LocalName == "line-break" && child.NamespaceUri == OdfNamespaces.Text)
@@ -634,7 +713,7 @@ public static class OdfToDocxConverter
                     string? textContent = child.TextContent;
                     if (!string.IsNullOrEmpty(textContent))
                     {
-                        runTarget.AppendChild(MakeRun(textContent!, parentStyle));
+                        runTarget.AppendChild(MakeRun(textContent!, parentStyle, ctx, formatChangeRevision, trackedChanges));
                     }
                 }
             }
@@ -662,7 +741,7 @@ public static class OdfToDocxConverter
     private static int AppendRunsUntilChangeEnd(OdfNode parent, int startIndex, string changeId,
         OpenXmlCompositeElement runTarget, StyleInfo? parentStyle, MainDocumentPart mainPart,
         ConversionContext ctx, OdfPackage odtPackage, Dictionary<string, ImagePart> imagePartCache,
-        TrackedChangeRegistry trackedChanges)
+        TrackedChangeRegistry trackedChanges, TrackedChangeEntry? formatChangeRevision = null)
     {
         for (int i = startIndex; i < parent.Children.Count; i++)
         {
@@ -673,7 +752,8 @@ public static class OdfToDocxConverter
                 return i;
             }
 
-            ProcessChildAsRuns(child, runTarget, parentStyle, mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+            ProcessChildAsRuns(child, runTarget, parentStyle, mainPart, ctx, odtPackage, imagePartCache,
+                trackedChanges, formatChangeRevision);
         }
 
         return parent.Children.Count - 1;
@@ -681,14 +761,15 @@ public static class OdfToDocxConverter
 
     private static void ProcessChildAsRuns(OdfNode child, OpenXmlCompositeElement runTarget, StyleInfo? parentStyle,
         MainDocumentPart mainPart, ConversionContext ctx, OdfPackage odtPackage,
-        Dictionary<string, ImagePart> imagePartCache, TrackedChangeRegistry trackedChanges)
+        Dictionary<string, ImagePart> imagePartCache, TrackedChangeRegistry trackedChanges,
+        TrackedChangeEntry? formatChangeRevision = null)
     {
         if (child.NodeType == OdfNodeType.Text)
         {
             string txt = child.TextContent ?? string.Empty;
             if (txt.Length > 0)
             {
-                runTarget.AppendChild(MakeRun(txt, parentStyle));
+                runTarget.AppendChild(MakeRun(txt, parentStyle, ctx, formatChangeRevision, trackedChanges));
             }
 
             return;
@@ -739,11 +820,18 @@ public static class OdfToDocxConverter
                     });
                 }
             }
+            else if (entry.ChangeType == "format-change" && entry.TargetFamily == "text" &&
+                     child.Parent is OdfNode parentNodeForText)
+            {
+                int startIndex = parentNodeForText.Children.IndexOf(child) + 1;
+                AppendRunsUntilChangeEnd(parentNodeForText, startIndex, changeId!, runTarget, parentStyle,
+                    mainPart, ctx, odtPackage, imagePartCache, trackedChanges, entry);
+            }
             else if (child.Parent is OdfNode parentNode)
             {
                 int startIndex = parentNode.Children.IndexOf(child) + 1;
                 AppendRunsUntilChangeEnd(parentNode, startIndex, changeId!, runTarget, parentStyle,
-                    mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+                    mainPart, ctx, odtPackage, imagePartCache, trackedChanges, formatChangeRevision);
             }
 
             return;
@@ -759,7 +847,7 @@ public static class OdfToDocxConverter
             string? spanStyleName = child.GetAttribute("style-name", OdfNamespaces.Text);
             StyleInfo? spanStyle = ctx.GetStyle(spanStyleName);
             AppendRunsFromNode(child, runTarget, MergeStyles(parentStyle, spanStyle),
-                mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+                mainPart, ctx, odtPackage, imagePartCache, trackedChanges, formatChangeRevision);
             return;
         }
 
@@ -767,18 +855,14 @@ public static class OdfToDocxConverter
         {
             string? countAttr = child.GetAttribute("c", OdfNamespaces.Text);
             int count = int.TryParse(countAttr, out int c) ? c : 1;
-            runTarget.AppendChild(MakeRun(new string(' ', count), parentStyle));
+            runTarget.AppendChild(MakeRun(new string(' ', count), parentStyle, ctx, formatChangeRevision, trackedChanges));
             return;
         }
 
         if (child.LocalName == "tab" && child.NamespaceUri == OdfNamespaces.Text)
         {
             var run = new WP.Run(new WP.TabChar());
-            if (parentStyle != null)
-            {
-                run.RunProperties = BuildRunProps(parentStyle);
-            }
-
+            run.RunProperties = BuildRunProperties(parentStyle, ctx, formatChangeRevision, trackedChanges);
             runTarget.AppendChild(run);
             return;
         }
@@ -803,7 +887,7 @@ public static class OdfToDocxConverter
         string? textContent = child.TextContent;
         if (!string.IsNullOrEmpty(textContent))
         {
-            runTarget.AppendChild(MakeRun(textContent!, parentStyle));
+            runTarget.AppendChild(MakeRun(textContent!, parentStyle, ctx, formatChangeRevision, trackedChanges));
         }
     }
 
@@ -839,17 +923,82 @@ public static class OdfToDocxConverter
         return new DateTimeValue(changedAt.ToUniversalTime());
     }
 
-    private static WP.Run MakeRun(string text, StyleInfo? style)
+    private static WP.Run MakeRun(string text, StyleInfo? style, ConversionContext ctx,
+        TrackedChangeEntry? formatChangeRevision = null, TrackedChangeRegistry? trackedChanges = null)
     {
         var runText = new WP.Text { Text = text, Space = SpaceProcessingModeValues.Preserve };
         var run = new WP.Run(runText);
-        if (style != null)
+        WP.RunProperties? runProperties = BuildRunProperties(style, ctx, formatChangeRevision, trackedChanges);
+        if (runProperties is not null)
         {
-            var rp = BuildRunProps(style);
-            if (rp.HasChildren)
-                run.RunProperties = rp;
+            run.RunProperties = runProperties;
         }
+
         return run;
+    }
+
+    private static WP.RunProperties? BuildRunProperties(StyleInfo? style, ConversionContext ctx,
+        TrackedChangeEntry? formatChangeRevision = null, TrackedChangeRegistry? trackedChanges = null)
+    {
+        WP.RunProperties? runProperties = style is not null ? BuildRunProps(style) : null;
+        if (formatChangeRevision is null || trackedChanges is null)
+        {
+            return runProperties;
+        }
+
+        runProperties ??= new WP.RunProperties();
+        AppendRunFormatChangeRevision(runProperties, formatChangeRevision, ctx, trackedChanges);
+        return runProperties;
+    }
+
+    private static void AppendRunFormatChangeRevision(WP.RunProperties runProperties, TrackedChangeEntry entry,
+        ConversionContext ctx, TrackedChangeRegistry trackedChanges)
+    {
+        StyleInfo? oldStyle = ctx.GetStyle(entry.OriginalStyleName);
+        WP.PreviousRunProperties previousRunProperties = oldStyle is not null
+            ? BuildPreviousRunProps(oldStyle)
+            : new WP.PreviousRunProperties();
+
+        var change = new WP.RunPropertiesChange
+        {
+            Author = string.IsNullOrEmpty(entry.Author) ? "Author" : entry.Author,
+            Date = ToOpenXmlDate(entry.ChangedAt),
+            Id = trackedChanges.GetRevisionId(entry.ChangeId),
+            PreviousRunProperties = previousRunProperties,
+        };
+        runProperties.AppendChild(change);
+    }
+
+    private static WP.PreviousRunProperties BuildPreviousRunProps(StyleInfo style)
+    {
+        var previousRunProperties = new WP.PreviousRunProperties();
+        if (style.Bold)
+        {
+            previousRunProperties.AppendChild(new WP.Bold());
+        }
+
+        if (style.Italic)
+        {
+            previousRunProperties.AppendChild(new WP.Italic());
+        }
+
+        if (style.Underline)
+        {
+            previousRunProperties.AppendChild(new WP.Underline { Val = WP.UnderlineValues.Single });
+        }
+
+        if (!string.IsNullOrEmpty(style.Color))
+        {
+            previousRunProperties.AppendChild(new WP.Color { Val = style.Color });
+        }
+
+        if (style.FontSizePt.HasValue)
+        {
+            int halfPoints = (int)(style.FontSizePt.Value * 2);
+            previousRunProperties.AppendChild(new WP.FontSize { Val = halfPoints.ToString() });
+        }
+
+        return previousRunProperties;
     }
 
     private static WP.RunProperties BuildRunProps(StyleInfo style)
@@ -1144,23 +1293,31 @@ public static class OdfToDocxConverter
 
     private sealed class TrackedChangeEntry
     {
-        public TrackedChangeEntry(string changeType, string author, DateTime changedAt, OdfNode specNode)
+        public TrackedChangeEntry(string changeId, string changeType, string author, DateTime changedAt, OdfNode specNode)
         {
+            ChangeId = changeId;
             ChangeType = changeType;
             Author = author;
             ChangedAt = changedAt;
             SpecNode = specNode;
+            OriginalStyleName = specNode.GetAttribute("style-name", OdfNamespaces.Text);
+            TargetFamily = specNode.GetAttribute("target-family", OdfNamespaces.Text) ?? string.Empty;
         }
 
+        public string ChangeId { get; }
         public string ChangeType { get; }
         public string Author { get; }
         public DateTime ChangedAt { get; }
         public OdfNode SpecNode { get; }
+        public string? OriginalStyleName { get; }
+        public string TargetFamily { get; }
     }
 
     private sealed class TrackedChangeRegistry
     {
         private readonly Dictionary<string, TrackedChangeEntry> _entries = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, string> _revisionIds = new(StringComparer.Ordinal);
+        private int _nextRevisionId;
 
         public static TrackedChangeRegistry From(OdfNode bodyTextRoot)
         {
@@ -1201,7 +1358,7 @@ public static class OdfToDocxConverter
                     }
 
                     (string author, DateTime changedAt) = OdfTrackedChangeMetadataReader.Read(spec);
-                    registry._entries[id!] = new TrackedChangeEntry(spec.LocalName, author, changedAt, spec);
+                    registry._entries[id!] = new TrackedChangeEntry(id!, spec.LocalName, author, changedAt, spec);
                     break;
                 }
             }
@@ -1211,5 +1368,17 @@ public static class OdfToDocxConverter
 
         public bool TryGet(string changeId, out TrackedChangeEntry entry) =>
             _entries.TryGetValue(changeId, out entry!);
+
+        public string GetRevisionId(string changeId)
+        {
+            if (!_revisionIds.TryGetValue(changeId, out string? revisionId))
+            {
+                revisionId = _nextRevisionId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                _revisionIds[changeId] = revisionId;
+                _nextRevisionId++;
+            }
+
+            return revisionId;
+        }
     }
 }

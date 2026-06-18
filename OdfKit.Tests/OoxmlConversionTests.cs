@@ -281,6 +281,51 @@ public class OoxmlConversionTests
     }
 
     /// <summary>
+    /// 驗證 ODT → DOCX 轉換可保留格式變更追蹤修訂（段落與字元）。
+    /// </summary>
+    [Fact]
+    public void OdtToDocx_PreservesFormatChangeRevision()
+    {
+        using var odtDoc = TextDocument.Create();
+        odtDoc.TrackedChanges = false;
+
+        OdfParagraph paragraph = odtDoc.AddParagraph("段落格式");
+        paragraph.StyleName = "OriginalStyle";
+
+        OdfParagraph characterParagraph = odtDoc.AddParagraph();
+        OdfTextRun characterRun = characterParagraph.AddTextRun("字元格式");
+
+        odtDoc.TrackedChanges = true;
+        paragraph.StyleName = "NewStyle";
+        characterRun.IsBold = true;
+
+        using var docxStream = new MemoryStream();
+        OdfToDocxConverter.Convert(odtDoc, docxStream);
+        docxStream.Position = 0;
+
+        using var wordDocument = WordprocessingDocument.Open(docxStream, false);
+        var mainPart = Assert.IsType<MainDocumentPart>(wordDocument.MainDocumentPart);
+        WP.Document document = Assert.IsType<WP.Document>(mainPart.Document);
+        WP.Body body = Assert.IsType<WP.Body>(document.Body);
+
+        WP.Paragraph paragraphWithFormatChange = body.Elements<WP.Paragraph>()
+            .First(p => p.InnerText == "段落格式");
+        WP.ParagraphProperties paragraphProperties =
+            Assert.IsType<WP.ParagraphProperties>(paragraphWithFormatChange.ParagraphProperties);
+        WP.ParagraphPropertiesChange paragraphFormatChange =
+            Assert.IsType<WP.ParagraphPropertiesChange>(paragraphProperties.GetFirstChild<WP.ParagraphPropertiesChange>());
+        WP.ParagraphPropertiesExtended previousParagraphProperties =
+            Assert.IsType<WP.ParagraphPropertiesExtended>(paragraphFormatChange.ParagraphPropertiesExtended);
+        Assert.Equal("Normal", previousParagraphProperties.GetFirstChild<WP.ParagraphStyleId>()?.Val?.Value);
+
+        WP.Run characterFormattedRun = body.Descendants<WP.Run>()
+            .First(run => run.InnerText == "字元格式");
+        WP.RunProperties runProperties = Assert.IsType<WP.RunProperties>(characterFormattedRun.RunProperties);
+        Assert.NotNull(runProperties.GetFirstChild<WP.RunPropertiesChange>());
+        Assert.NotNull(runProperties.GetFirstChild<WP.Bold>());
+    }
+
+    /// <summary>
     /// 驗證 ODT → DOCX 轉換可保留 content.xml 自動樣式中的字元格式。
     /// </summary>
     [Fact]
