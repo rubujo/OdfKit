@@ -68,5 +68,5 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - LOEXT-1 基礎 ✅：`loext:decorative` 載入映射至 `draw:decorative`（`OdfLoExtInteropEngine`、`LoExtInteropTests`）。
 - repo 內 corpus 已擴充至 200+ fixtures（`tools/OdfCorpusGenerator` + 手工負向／版本特例）；
   外部 ODF Validator baseline corpus 仍可依 `ODFKIT_PARITY_CORPUS_ROOT` 選用擴充。
-- Typed DOM 已新增 `office:text`、`table:table`、`draw:page` 與次格式 `office:chart`／`office:image`／`office:database`／`office:spreadsheet` content model facade（Wave 1 M-3）；
+- Typed DOM 已新增 `office:text`、`table:table`、`draw:page`、`office:presentation`／`office:drawing` 與次格式 `office:chart`／`office:image`／`office:database`／`office:spreadsheet` content model facade（Wave 1 M-3）；
   `tools/OdfSchemaGenerator/oasis-odf14-dom-wrappers.json` 供手動重產 DOM wrappers。

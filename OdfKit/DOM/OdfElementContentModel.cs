@@ -115,4 +115,12 @@ internal static class OdfElementContentModel
     internal static bool IsDatabaseComponentContent(OdfElement element) =>
         element is DatabaseDataSourceElement or DatabaseFormsElement or DatabaseReportsElement or
         DatabaseQueriesElement or DatabaseTableRepresentationsElement or DatabaseSchemaDefinitionElement;
+
+    /// <summary>
+    /// 判斷元素是否屬於 <c>office:presentation</c> 或 <c>office:drawing</c> 主要 content group。
+    /// </summary>
+    /// <param name="element">要檢查的元素。</param>
+    /// <returns>若為繪圖頁面主要內容則為 <see langword="true"/>。</returns>
+    internal static bool IsOfficeDrawPageMainContent(OdfElement element) =>
+        element is DrawPageElement;
 }

@@ -479,6 +479,70 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 <c>office:presentation</c> content model facade 可建立投影片頁面並 round-trip。
+    /// </summary>
+    [Fact]
+    public void OfficePresentationContentModelFacadeSupportsPageAppendAndEnumeration()
+    {
+        OfficePresentationElement presentation = new("office");
+        DrawPageElement slide1 = presentation.AppendPage("Slide1");
+        slide1.AppendRectangle("Title");
+        DrawPageElement slide2 = presentation.AppendPage("Slide2");
+
+        OdfElement[] pages = presentation.PresentationPageChildElements.ToArray();
+        Assert.Equal(2, pages.Length);
+        Assert.Same(slide1, pages[0]);
+        Assert.Same(slide2, pages[1]);
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office")).AppendElement(presentation);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficePresentationElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<OfficePresentationElement>()
+            .Single();
+        string[] slideNames = parsed.PresentationPageChildElements
+            .Select(page => page.GetAttribute("name", OdfNamespaces.Draw) ?? string.Empty)
+            .ToArray();
+        Assert.Equal(["Slide1", "Slide2"], slideNames);
+        Assert.Equal("Title", parsed.DrawPageChildElements.First().DrawRectChildElements.Single().GetAttribute("name", OdfNamespaces.Draw));
+    }
+
+    /// <summary>
+    /// 驗證 <c>office:drawing</c> content model facade 可建立繪圖頁面並 round-trip。
+    /// </summary>
+    [Fact]
+    public void OfficeDrawingContentModelFacadeSupportsPageAppendAndEnumeration()
+    {
+        OfficeDrawingElement drawing = new("office");
+        DrawPageElement page1 = drawing.AppendPage("Page1");
+        page1.AppendFrame("Logo");
+        DrawPageElement page2 = drawing.AppendPage("Page2");
+
+        OdfElement[] pages = drawing.DrawingPageChildElements.ToArray();
+        Assert.Equal(2, pages.Length);
+        Assert.Same(page1, pages[0]);
+        Assert.Same(page2, pages[1]);
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office")).AppendElement(drawing);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeDrawingElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<OfficeDrawingElement>()
+            .Single();
+        string[] pageNames = parsed.DrawingPageChildElements
+            .Select(page => page.GetAttribute("name", OdfNamespaces.Draw) ?? string.Empty)
+            .ToArray();
+        Assert.Equal(["Page1", "Page2"], pageNames);
+        Assert.Equal("Logo", parsed.DrawPageChildElements.First().DrawFrameChildElements.Single().GetAttribute("name", OdfNamespaces.Draw));
+    }
+
+    /// <summary>
     /// 驗證 <c>office:chart</c> content model facade 可建立圖表並 round-trip。
     /// </summary>
     [Fact]

@@ -29,7 +29,7 @@
 
 ### M-3 驗收
 
-- `office:text`、`table:table`、`draw:page` 與次格式 `office:chart`／`office:image`／`office:database`／`office:spreadsheet` content model facade 可 append / enumerate
+- `office:text`、`table:table`、`draw:page`、`office:presentation`／`office:drawing` 與次格式 `office:chart`／`office:image`／`office:database`／`office:spreadsheet` content model facade 可 append / enumerate
 - `TypedDomParityTests` 新增 content model user story
 - typed-dom coverage guard 不退化
 
