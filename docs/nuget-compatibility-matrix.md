@@ -51,6 +51,8 @@ pwsh eng/Pack-NuGet.ps1 -Configuration Release
 pwsh eng/Test-NuGetPack.ps1 -Configuration Release
 ```
 
+發佈至 nuget.org 流程見 [`nuget-publishing.md`](nuget-publishing.md)。
+
 ## 版本與授權
 
 - **版本**：`1.0.0`（與各 `.csproj` 之 `<Version>` 同步）

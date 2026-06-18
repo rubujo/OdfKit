@@ -32,7 +32,11 @@ dotnet add package OdfKit.Extensions.Ooxml
 ```powershell
 pwsh eng/Pack-NuGet.ps1 -Configuration Release
 pwsh eng/Test-NuGetPack.ps1 -Configuration Release
+pwsh eng/Publish-NuGet.ps1          # 乾跑
+pwsh eng/Publish-NuGet.ps1 -Push    # 需 NUGET_API_KEY
 ```
+
+詳見 [docs/nuget-publishing.md](docs/nuget-publishing.md)。
 
 ### 原始碼
 

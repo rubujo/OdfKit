@@ -92,12 +92,12 @@
 
 | Phase | 狀態 | 產出 |
 |-------|------|------|
-| REL-1 | 基礎 ✅ | `docs/nuget-compatibility-matrix.md`、`eng/OdfKit.Package.props`、`eng/Pack-NuGet.ps1`、`eng/Test-NuGetPack.ps1`、`NuGetPackagingTests` |
+| REL-1 | ✅ | 相容矩陣、`Pack`／`Test-NuGetPack`／`Publish-NuGet.ps1`、`docs/nuget-publishing.md`、`.github/workflows/nuget-pack.yml`、`NuGetPackagingTests` |
 | COLLAB-1（選用） | planned | ODT → JSON operations 匯出（對標 ODF Toolkit CLI） |
 | COLLAB-2（選用） | planned | JSON operations → ODT 單向 merge + golden file 對照 |
 | QC-ongoing | planned | 季度 OASIS RNG diff、本檔案季度檢視 |
 
-REL-1 驗收：`pwsh eng/Test-NuGetPack.ps1`；六套件雙 TFM `.nupkg` + net8.0 消費端煙霧建置。
+REL-1 驗收：`pwsh eng/Test-NuGetPack.ps1`；六套件雙 TFM `.nupkg` + net8.0 消費端煙霧；`pwsh eng/Publish-NuGet.ps1` 乾跑；CI `nuget-pack.yml`。
 
 ## 高階 API 分級定義
 
