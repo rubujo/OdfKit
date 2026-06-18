@@ -38,6 +38,9 @@ Logs/
 [Aa]gents_backup/
 [Tt]emp/
 TestResults/
+BenchmarkDotNet.Artifacts/
+agent-tools/
+terminals/
 
 # Roslyn cache directories
 .ilc/
