@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using OdfKit.Chart;
 using OdfKit.Core;
@@ -32,35 +36,175 @@ public static class XlsxToOdfConverter
         xlsxStream.CopyTo(workbookStream);
         workbookStream.Position = 0;
 
-        using var xlWorkbook = new XLWorkbook(workbookStream);
+        if (HasPivotTables(workbookStream))
+        {
+            workbookStream.Position = 0;
+            CopyWorkbookFromOpenXml(workbookStream, odsWorkbook);
+        }
+        else
+        {
+            workbookStream.Position = 0;
+            using var xlWorkbook = new XLWorkbook(workbookStream);
+            bool firstSheet = true;
+
+            foreach (var xlSheet in xlWorkbook.Worksheets)
+            {
+                OdfTableSheet odsSheet;
+                if (firstSheet)
+                {
+                    odsSheet = odsWorkbook.Worksheets.Count > 0
+                        ? odsWorkbook.Worksheets[0]
+                        : odsWorkbook.Worksheets.Add(xlSheet.Name);
+                    if (odsSheet.Name != xlSheet.Name)
+                    {
+                        odsSheet.Name = xlSheet.Name;
+                    }
+
+                    firstSheet = false;
+                }
+                else
+                {
+                    odsSheet = odsWorkbook.Worksheets.Add(xlSheet.Name);
+                }
+
+                CopySheetData(xlSheet, odsSheet);
+                CopyDataValidations(xlSheet, odsSheet);
+                CopyConditionalFormats(xlSheet, odsSheet);
+            }
+        }
+
+        workbookStream.Position = 0;
+        CopyCharts(workbookStream, odsWorkbook);
+        workbookStream.Position = 0;
+        CopyPivotTables(workbookStream, odsWorkbook);
+
+        return odsWorkbook;
+    }
+
+    private static bool HasPivotTables(Stream xlsxStream)
+    {
+        using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false);
+        WorkbookPart? workbookPart = spreadsheet.WorkbookPart;
+        if (workbookPart?.Workbook is null)
+        {
+            return false;
+        }
+
+        return workbookPart.Workbook.Descendants<S.PivotCaches>()
+            .SelectMany(element => element.Elements<S.PivotCache>())
+            .Any();
+    }
+
+    private static void CopyWorkbookFromOpenXml(Stream xlsxStream, OdfKit.Spreadsheet.SpreadsheetDocument odsWorkbook)
+    {
+        using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false);
+        WorkbookPart? workbookPart = spreadsheet.WorkbookPart;
+        if (workbookPart?.Workbook?.Sheets is null)
+        {
+            return;
+        }
+
+        S.SharedStringTable? sharedStrings = workbookPart.SharedStringTablePart?.SharedStringTable;
         bool firstSheet = true;
 
-        foreach (var xlSheet in xlWorkbook.Worksheets)
+        foreach (S.Sheet sheet in workbookPart.Workbook.Sheets.Elements<S.Sheet>())
         {
+            string? sheetName = sheet.Name?.Value;
+            string? relationshipId = sheet.Id?.Value;
+            if (string.IsNullOrEmpty(sheetName) || string.IsNullOrEmpty(relationshipId))
+            {
+                continue;
+            }
+
+            if (workbookPart.GetPartById(relationshipId!) is not WorksheetPart worksheetPart ||
+                worksheetPart.Worksheet is null)
+            {
+                continue;
+            }
+
+            S.SheetData? sheetData = worksheetPart.Worksheet.GetFirstChild<S.SheetData>();
+            if (sheetData is null)
+            {
+                continue;
+            }
+
             OdfTableSheet odsSheet;
             if (firstSheet)
             {
                 odsSheet = odsWorkbook.Worksheets.Count > 0
                     ? odsWorkbook.Worksheets[0]
-                    : odsWorkbook.Worksheets.Add(xlSheet.Name);
-                if (odsSheet.Name != xlSheet.Name)
-                    odsSheet.Name = xlSheet.Name;
+                    : odsWorkbook.Worksheets.Add(sheetName!);
+                if (odsSheet.Name != sheetName)
+                {
+                    odsSheet.Name = sheetName!;
+                }
+
                 firstSheet = false;
             }
             else
             {
-                odsSheet = odsWorkbook.Worksheets.Add(xlSheet.Name);
+                odsSheet = odsWorkbook.Worksheets.Add(sheetName!);
             }
 
-            CopySheetData(xlSheet, odsSheet);
-            CopyDataValidations(xlSheet, odsSheet);
-            CopyConditionalFormats(xlSheet, odsSheet);
+            CopySheetDataFromOpenXml(sheetData, odsSheet, sharedStrings);
+        }
+    }
+
+    private static void CopySheetDataFromOpenXml(S.SheetData sheetData, OdfTableSheet odsSheet, S.SharedStringTable? sharedStrings)
+    {
+        foreach (S.Row row in sheetData.Elements<S.Row>())
+        {
+            foreach (S.Cell cell in row.Elements<S.Cell>())
+            {
+                string? cellReference = cell.CellReference?.Value;
+                if (string.IsNullOrEmpty(cellReference))
+                {
+                    continue;
+                }
+
+                OdfCellAddress address = OdfCellAddress.ParseExcel(cellReference!);
+                OdfCell odsCell = odsSheet.Cells[address.Row, address.Column];
+                string? formulaText = cell.CellFormula?.Text;
+                if (!string.IsNullOrWhiteSpace(formulaText))
+                {
+                    odsCell.Formula = TranslateFormulaToOdf(formulaText!);
+                }
+
+                object? value = ReadOpenXmlCellValue(cell, sharedStrings);
+                if (value is not null)
+                {
+                    odsCell.CellValue = value;
+                }
+            }
+        }
+    }
+
+    private static object? ReadOpenXmlCellValue(S.Cell cell, S.SharedStringTable? sharedStrings)
+    {
+        string? rawValue = cell.CellValue?.Text;
+        if (string.IsNullOrEmpty(rawValue))
+        {
+            return cell.InlineString?.Text?.Text;
         }
 
-        workbookStream.Position = 0;
-        CopyCharts(workbookStream, odsWorkbook);
+        if (cell.DataType?.Value == S.CellValues.SharedString && sharedStrings is not null &&
+            int.TryParse(rawValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out int sharedIndex))
+        {
+            S.SharedStringItem? item = sharedStrings.Elements<S.SharedStringItem>().ElementAtOrDefault(sharedIndex);
+            return item?.InnerText;
+        }
 
-        return odsWorkbook;
+        if (cell.DataType?.Value == S.CellValues.Boolean)
+        {
+            return rawValue == "1";
+        }
+
+        if (double.TryParse(rawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out double number))
+        {
+            return number;
+        }
+
+        return rawValue;
     }
 
     private static void CopyCharts(Stream xlsxStream, OdfKit.Spreadsheet.SpreadsheetDocument odsWorkbook)
@@ -200,6 +344,287 @@ public static class XlsxToOdfConverter
         return new OdfCellRange(
             new OdfCellAddress(range.StartAddress.Row, range.StartAddress.Column, actualSheet),
             new OdfCellAddress(range.EndAddress.Row, range.EndAddress.Column, actualSheet));
+    }
+
+    private static void CopyPivotTables(Stream xlsxStream, OdfKit.Spreadsheet.SpreadsheetDocument odsWorkbook)
+    {
+        try
+        {
+            using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, false);
+            WorkbookPart? workbookPart = spreadsheet.WorkbookPart;
+            if (workbookPart?.Workbook is null)
+            {
+                return;
+            }
+
+            XNamespace spreadsheetNs = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+            XNamespace relationshipNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+            Dictionary<uint, PivotCacheInfo> cacheInfoById = BuildPivotCacheMap(workbookPart, spreadsheetNs, relationshipNs);
+            if (cacheInfoById.Count == 0)
+            {
+                return;
+            }
+
+            S.Sheets? sheets = workbookPart.Workbook.Sheets;
+            if (sheets is null)
+            {
+                return;
+            }
+
+            foreach (S.Sheet sheet in sheets.Elements<S.Sheet>())
+            {
+                string? sheetName = sheet.Name?.Value;
+                string? sheetRelationshipId = sheet.Id?.Value;
+                if (string.IsNullOrEmpty(sheetName) || string.IsNullOrEmpty(sheetRelationshipId))
+                {
+                    continue;
+                }
+
+                if (workbookPart.GetPartById(sheetRelationshipId!) is not WorksheetPart worksheetPart)
+                {
+                    continue;
+                }
+
+                OdfTableSheet? odsSheet = odsWorkbook.Worksheets.Find(sheetName!);
+                if (odsSheet is null)
+                {
+                    continue;
+                }
+
+                foreach (PivotTablePart pivotPart in worksheetPart.PivotTableParts)
+                {
+                    ApplyPivotTable(pivotPart, cacheInfoById, odsSheet, sheetName!, spreadsheetNs);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OdfKitDiagnostics.Warn($"XLSX 樞紐分析表解析失敗，已略過樞紐表匯入：{ex.Message}", ex);
+        }
+    }
+
+    private static Dictionary<uint, PivotCacheInfo> BuildPivotCacheMap(
+        WorkbookPart workbookPart,
+        XNamespace spreadsheetNs,
+        XNamespace relationshipNs)
+    {
+        var map = new Dictionary<uint, PivotCacheInfo>();
+        using (Stream workbookStream = workbookPart.GetStream(FileMode.Open, FileAccess.Read))
+        {
+            XDocument workbookXml = XDocument.Load(workbookStream);
+            foreach (XElement cacheElement in workbookXml.Descendants(spreadsheetNs + "pivotCache"))
+            {
+                string? cacheIdText = cacheElement.Attribute("cacheId")?.Value;
+                string? relationshipId = cacheElement.Attribute(relationshipNs + "id")?.Value;
+                if (!uint.TryParse(cacheIdText, NumberStyles.Integer, CultureInfo.InvariantCulture, out uint cacheId) ||
+                    string.IsNullOrEmpty(relationshipId) ||
+                    workbookPart.GetPartById(relationshipId!) is not PivotTableCacheDefinitionPart cachePart)
+                {
+                    continue;
+                }
+
+                PivotCacheInfo? cacheInfo = ReadPivotCacheInfo(cachePart, spreadsheetNs);
+                if (cacheInfo is not null)
+                {
+                    map[cacheId] = cacheInfo;
+                }
+            }
+        }
+
+        return map;
+    }
+
+    private static PivotCacheInfo? ReadPivotCacheInfo(PivotTableCacheDefinitionPart cachePart, XNamespace spreadsheetNs)
+    {
+        using Stream cacheStream = cachePart.GetStream(FileMode.Open, FileAccess.Read);
+        XDocument cacheXml = XDocument.Load(cacheStream);
+        XElement? worksheetSource = cacheXml.Descendants(spreadsheetNs + "worksheetSource").FirstOrDefault();
+        string? rangeRef = worksheetSource?.Attribute("ref")?.Value;
+        if (string.IsNullOrWhiteSpace(rangeRef))
+        {
+            return null;
+        }
+
+        string? sheetName = worksheetSource?.Attribute("sheet")?.Value;
+        string sourceRef = string.IsNullOrWhiteSpace(sheetName) || rangeRef!.IndexOf('!') >= 0
+            ? rangeRef!
+            : sheetName + "!" + rangeRef;
+
+        List<string> fieldNames = cacheXml.Descendants(spreadsheetNs + "cacheField")
+            .Select(element => element.Attribute("name")?.Value)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name!)
+            .ToList();
+        if (fieldNames.Count == 0)
+        {
+            return null;
+        }
+
+        return new PivotCacheInfo(sourceRef!, fieldNames);
+    }
+
+    private static void ApplyPivotTable(
+        PivotTablePart pivotPart,
+        IReadOnlyDictionary<uint, PivotCacheInfo> cacheInfoById,
+        OdfTableSheet odsSheet,
+        string sheetName,
+        XNamespace spreadsheetNs)
+    {
+        using Stream pivotStream = pivotPart.GetStream(FileMode.Open, FileAccess.Read);
+        XDocument pivotXml = XDocument.Load(pivotStream);
+        XElement? root = pivotXml.Root;
+        if (root is null)
+        {
+            return;
+        }
+
+        string name = root.Attribute("name")?.Value ?? "PivotTable";
+        string? cacheIdText = root.Attribute("cacheId")?.Value;
+        if (!uint.TryParse(cacheIdText, NumberStyles.Integer, CultureInfo.InvariantCulture, out uint cacheId) ||
+            !cacheInfoById.TryGetValue(cacheId, out PivotCacheInfo? cacheInfo))
+        {
+            return;
+        }
+
+        if (!OdfCellRange.TryParse(cacheInfo.SourceRef, out OdfCellRange sourceRange))
+        {
+            return;
+        }
+
+        sourceRange = EnsureRangeSheet(sourceRange, sheetName);
+        if (!TryParsePivotTargetStart(root.Element(spreadsheetNs + "location")?.Attribute("ref")?.Value, sheetName, out OdfCellAddress targetStart))
+        {
+            targetStart = new OdfCellAddress(5, 0, sheetName);
+        }
+
+        var builder = new OdfPivotTableBuilder(name, sourceRange, targetStart, odsSheet);
+        foreach (XElement fieldElement in root.Descendants(spreadsheetNs + "rowFields").Elements(spreadsheetNs + "field"))
+        {
+            AddPivotFieldByIndex(builder, cacheInfo, fieldElement.Attribute("x")?.Value, PivotFieldOrientation.Row);
+        }
+
+        foreach (XElement fieldElement in root.Descendants(spreadsheetNs + "colFields").Elements(spreadsheetNs + "field"))
+        {
+            AddPivotFieldByIndex(builder, cacheInfo, fieldElement.Attribute("x")?.Value, PivotFieldOrientation.Column);
+        }
+
+        foreach (XElement fieldElement in root.Descendants(spreadsheetNs + "pageFields").Elements(spreadsheetNs + "field"))
+        {
+            AddPivotFieldByIndex(builder, cacheInfo, fieldElement.Attribute("x")?.Value, PivotFieldOrientation.Page);
+        }
+
+        foreach (XElement dataFieldElement in root.Descendants(spreadsheetNs + "dataFields").Elements(spreadsheetNs + "dataField"))
+        {
+            AddPivotDataFieldByIndex(builder, cacheInfo, dataFieldElement);
+        }
+
+        builder.Build();
+    }
+
+    private static void AddPivotFieldByIndex(
+        OdfPivotTableBuilder builder,
+        PivotCacheInfo cacheInfo,
+        string? indexText,
+        PivotFieldOrientation orientation)
+    {
+        if (!int.TryParse(indexText, NumberStyles.Integer, CultureInfo.InvariantCulture, out int index) ||
+            index < 0 ||
+            index >= cacheInfo.FieldNames.Count)
+        {
+            return;
+        }
+
+        string fieldName = cacheInfo.FieldNames[index];
+        switch (orientation)
+        {
+            case PivotFieldOrientation.Row:
+                builder.AddRowField(fieldName);
+                break;
+            case PivotFieldOrientation.Column:
+                builder.AddColumnField(fieldName);
+                break;
+            case PivotFieldOrientation.Page:
+                builder.AddPageField(fieldName);
+                break;
+        }
+    }
+
+    private static void AddPivotDataFieldByIndex(
+        OdfPivotTableBuilder builder,
+        PivotCacheInfo cacheInfo,
+        XElement dataFieldElement)
+    {
+        string? fieldIndexText = dataFieldElement.Attribute("fld")?.Value;
+        if (!int.TryParse(fieldIndexText, NumberStyles.Integer, CultureInfo.InvariantCulture, out int index) ||
+            index < 0 ||
+            index >= cacheInfo.FieldNames.Count)
+        {
+            return;
+        }
+
+        string fieldName = cacheInfo.FieldNames[index];
+        string subtotal = dataFieldElement.Attribute("subtotal")?.Value ?? "sum";
+        builder.AddDataField(fieldName, MapPivotSubtotal(subtotal));
+    }
+
+    private static OdfPivotFunction MapPivotSubtotal(string subtotal)
+    {
+        return subtotal.ToLowerInvariant() switch
+        {
+            "count" => OdfPivotFunction.Count,
+            "average" => OdfPivotFunction.Average,
+            "max" => OdfPivotFunction.Max,
+            "min" => OdfPivotFunction.Min,
+            _ => OdfPivotFunction.Sum
+        };
+    }
+
+    private static bool TryParsePivotTargetStart(string? locationRef, string sheetName, out OdfCellAddress targetStart)
+    {
+        targetStart = default;
+        if (string.IsNullOrWhiteSpace(locationRef))
+        {
+            return false;
+        }
+
+        string location = locationRef!;
+        int colonIndex = location.IndexOf(':', 0);
+        string firstCell = colonIndex >= 0 ? location.Substring(0, colonIndex) : location;
+        if (OdfCellAddress.TryParse(firstCell, out targetStart))
+        {
+            if (targetStart.SheetName is null)
+            {
+                targetStart = new OdfCellAddress(targetStart.Row, targetStart.Column, sheetName);
+            }
+
+            return true;
+        }
+
+        if (OdfCellAddress.TryParse(sheetName + "!" + firstCell, out targetStart))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private enum PivotFieldOrientation
+    {
+        Row,
+        Column,
+        Page
+    }
+
+    private sealed class PivotCacheInfo
+    {
+        public PivotCacheInfo(string sourceRef, IReadOnlyList<string> fieldNames)
+        {
+            SourceRef = sourceRef;
+            FieldNames = fieldNames;
+        }
+
+        public string SourceRef { get; }
+        public IReadOnlyList<string> FieldNames { get; }
     }
 
     private sealed class ChartSpec

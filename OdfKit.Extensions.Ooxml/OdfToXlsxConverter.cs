@@ -781,6 +781,7 @@ public static class OdfToXlsxConverter
             string worksheetRelPath = "xl/worksheets/_rels/sheet" + sheetIndex.ToString(CultureInfo.InvariantCulture) + ".xml.rels";
             string cachePath = "xl/pivotCache/pivotCacheDefinition" + cacheIndex.ToString(CultureInfo.InvariantCulture) + ".xml";
             string pivotPath = "xl/pivotTables/pivotTable" + cacheIndex.ToString(CultureInfo.InvariantCulture) + ".xml";
+            string pivotRelPath = "xl/pivotTables/_rels/pivotTable" + cacheIndex.ToString(CultureInfo.InvariantCulture) + ".xml.rels";
 
             string cacheRelId = AddRelationship(
                 workbookRels,
@@ -798,8 +799,15 @@ public static class OdfToXlsxConverter
                 "../pivotTables/pivotTable" + cacheIndex.ToString(CultureInfo.InvariantCulture) + ".xml");
             worksheet.Root!.Add(new XElement(spreadsheetNs + "pivotTableDefinition", new XAttribute(relNs + "id", pivotRelId)));
 
+            XDocument pivotRels = ReadOrCreateRelsXml(archive, pivotRelPath);
+            AddRelationship(
+                pivotRels,
+                "http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheDefinition",
+                "../pivotCache/pivotCacheDefinition" + cacheIndex.ToString(CultureInfo.InvariantCulture) + ".xml");
+
             WriteZipXml(archive, cachePath, BuildPivotCacheDefinitionXml(spec, cacheIndex));
             WriteZipXml(archive, pivotPath, BuildPivotTableDefinitionXml(spec, cacheIndex));
+            WriteZipXml(archive, pivotRelPath, pivotRels);
             WriteZipXml(archive, worksheetPath, worksheet);
             WriteZipXml(archive, worksheetRelPath, worksheetRels);
             AddContentTypeOverride(contentTypes, "/" + cachePath, "application/vnd.openxmlformats-officedocument.spreadsheetml.pivotCacheDefinition+xml");
@@ -817,6 +825,7 @@ public static class OdfToXlsxConverter
         XNamespace ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
         int sheetSeparator = spec.SourceRef.IndexOf('!');
         string sheetName = sheetSeparator >= 0 ? spec.SourceRef.Substring(0, sheetSeparator) : spec.SheetName;
+        string rangeRef = sheetSeparator >= 0 ? spec.SourceRef.Substring(sheetSeparator + 1) : spec.SourceRef;
         return new XDocument(
             new XElement(ns + "pivotCacheDefinition",
                 new XAttribute("refreshOnLoad", "1"),
@@ -828,7 +837,7 @@ public static class OdfToXlsxConverter
                 new XElement(ns + "cacheSource",
                     new XAttribute("type", "worksheet"),
                     new XElement(ns + "worksheetSource",
-                        new XAttribute("ref", spec.SourceRef),
+                        new XAttribute("ref", rangeRef),
                         new XAttribute("sheet", sheetName.Replace("'", string.Empty)))),
                 new XElement(ns + "cacheFields",
                     new XAttribute("count", spec.Fields.Count),

@@ -21,7 +21,7 @@
       "baselineRenderer": "libreoffice-pdf",
       "candidateRenderer": "microsoft-excel-pdf",
       "test": "OfficeInteropConversionTests.ExcelAndLibreOffice_RenderConvertedXlsxToPdf",
-      "sampleFeatures": ["formula", "embedded-chart", "data-validation"]
+      "sampleFeatures": ["formula", "embedded-chart", "data-validation", "pivot-table-roundtrip"]
     }
   ]
 }

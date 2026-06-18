@@ -908,7 +908,8 @@ public class OoxmlConversionTests
 
         Assert.Contains("pivotCache", workbookXml);
         Assert.Contains("worksheetSource", cacheXml);
-        Assert.Contains("ref=\"Sales!A1:C3\"", cacheXml);
+        Assert.Contains("ref=\"A1:C3\"", cacheXml);
+        Assert.Contains("sheet=\"Sales\"", cacheXml);
         Assert.Contains("name=\"Category\"", cacheXml);
         Assert.Contains("name=\"Region\"", cacheXml);
         Assert.Contains("name=\"Sales\"", cacheXml);
@@ -920,6 +921,101 @@ public class OoxmlConversionTests
         Assert.Contains("dataFields", pivotXml);
         Assert.Contains("dataField name=\"Sum of Sales\" fld=\"2\" subtotal=\"sum\"", pivotXml);
         Assert.Contains("pivotTableDefinition", worksheetXml);
+    }
+
+    /// <summary>
+    /// 驗證 XLSX → ODS 反向轉換可還原基本樞紐分析表結構。
+    /// </summary>
+    [Fact]
+    public void XlsxToOdf_PreservesPivotTableStructure()
+    {
+        using var odsDocument = OdfSpreadsheetDocument.Create();
+        var sheet = odsDocument.Worksheets.Add("Sales");
+        sheet.Cells["A1"].CellValue = "Category";
+        sheet.Cells["B1"].CellValue = "Region";
+        sheet.Cells["C1"].CellValue = "Sales";
+        sheet.Cells["A2"].CellValue = "Hardware";
+        sheet.Cells["B2"].CellValue = "North";
+        sheet.Cells["C2"].CellValue = 120d;
+        sheet.Cells["A3"].CellValue = "Software";
+        sheet.Cells["B3"].CellValue = "South";
+        sheet.Cells["C3"].CellValue = 80d;
+
+        new OdfPivotTableBuilder(
+            "SalesPivot",
+            new OdfCellRange(0, 0, 2, 2, "Sales"),
+            new OdfCellAddress(5, 0, "Sales"),
+            sheet)
+            .AddRowField("Category")
+            .AddColumnField("Region")
+            .AddDataField("Sales", OdfPivotFunction.Sum)
+            .Build();
+
+        using var xlsxStream = new MemoryStream();
+        OdfToXlsxConverter.Convert(odsDocument, xlsxStream);
+        xlsxStream.Position = 0;
+
+        using OdfSpreadsheetDocument converted = XlsxToOdfConverter.Convert(xlsxStream);
+        OdfPivotTableInfo pivot = Assert.Single(converted.GetPivotTables());
+        Assert.Equal("SalesPivot", pivot.Name);
+        Assert.Equal("Sales", pivot.SheetName);
+        Assert.Contains(pivot.Fields, field => field.SourceFieldName == "Category" && field.Orientation == "row");
+        Assert.Contains(pivot.Fields, field => field.SourceFieldName == "Region" && field.Orientation == "column");
+        Assert.Contains(pivot.Fields, field => field.SourceFieldName == "Sales" && field.Orientation == "data" && field.Function == "sum");
+    }
+
+    /// <summary>
+    /// 驗證 ODT → DOCX → ODT 往返可保留段落內嵌圖片。
+    /// </summary>
+    [Fact]
+    public void OdtToDocxToOdt_PreservesInlineImage()
+    {
+        using var original = TextDocument.Create();
+        var paragraph = original.AddParagraph();
+        paragraph.AddTextRun("往返圖片");
+        var media = new OdfMediaManager(original.Package);
+        string path = media.AddImage(CreateOnePixelPng(), "roundtrip.png");
+        paragraph.AddImage(path, OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(1), "roundtrip.png");
+
+        using var docxStream = new MemoryStream();
+        OdfToDocxConverter.Convert(original, docxStream);
+        docxStream.Position = 0;
+
+        using TextDocument converted = DocxToOdtConverter.Convert(docxStream);
+        string contentXml = SaveTextContentXml(converted);
+        Assert.Contains("往返圖片", contentXml);
+        Assert.Contains("draw:frame", contentXml);
+        Assert.Contains("draw:image", contentXml);
+        Assert.Contains("Pictures/", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 ODT → DOCX → ODT 往返可保留追蹤修訂插入與刪除。
+    /// </summary>
+    [Fact]
+    public void OdtToDocxToOdt_PreservesTrackedInsertionAndDeletion()
+    {
+        using var original = TextDocument.Create();
+        var paragraph = original.AddParagraph();
+        paragraph.AddTextRun("保留");
+        OdfTextRun deleteRun = paragraph.AddTextRun("刪除");
+        original.TrackedChanges = true;
+        original.DeleteNode(deleteRun.Node);
+        paragraph.AddTextRun("新增");
+
+        using var docxStream = new MemoryStream();
+        OdfToDocxConverter.Convert(original, docxStream);
+        docxStream.Position = 0;
+
+        using TextDocument converted = DocxToOdtConverter.Convert(docxStream);
+        string contentXml = SaveTextContentXml(converted);
+
+        Assert.Contains("text:tracked-changes", contentXml);
+        Assert.Contains("text:insertion", contentXml);
+        Assert.Contains("text:deletion", contentXml);
+        Assert.Contains("新增", contentXml);
+        Assert.Contains("刪除", contentXml);
+        Assert.Contains("保留", contentXml);
     }
 
     /// <summary>
