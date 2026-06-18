@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "benchmarks": {
+    "DomInsertBenchmarks.SequentialInsertAfter": {
+      "meanNanoseconds": 123900,
+      "toleranceRatio": 0.4,
+      "unit": "us",
+      "note": "2000 列 InsertAfter，Release，2026-06-18 本機 BenchmarkDotNet"
+    }
+  }
+}

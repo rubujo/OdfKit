@@ -128,4 +128,120 @@ internal static class FormulaNumericAggregation
             ArrayPool<double>.Shared.Return(buffer);
         }
     }
+
+    /// <summary>
+    /// 當條件欄與加總欄皆為純數值矩陣且條件為等號時，以配置池化緩衝區加速 SUMIF。
+    /// </summary>
+    internal static bool TrySumIfNumericEqual(
+        object[,] criteriaRange,
+        object[,] sumRange,
+        double criterion,
+        out double sum)
+    {
+        sum = 0;
+        int rows = criteriaRange.GetLength(0);
+        int cols = criteriaRange.GetLength(1);
+        if (rows != sumRange.GetLength(0) || cols != sumRange.GetLength(1))
+        {
+            return false;
+        }
+
+        int total = rows * cols;
+        if (total == 0)
+        {
+            return true;
+        }
+
+        double[] criteriaBuffer = ArrayPool<double>.Shared.Rent(total);
+        double[] sumBuffer = ArrayPool<double>.Shared.Rent(total);
+        try
+        {
+            int offset = 0;
+            for (int r = 0; r < rows; r++)
+            {
+                for (int c = 0; c < cols; c++)
+                {
+                    object? criteriaCell = criteriaRange[r, c];
+                    object? sumCell = sumRange[r, c];
+                    if (criteriaCell is null || sumCell is null)
+                    {
+                        return false;
+                    }
+
+                    if (!FormulaCoercion.TryCoerceDouble(criteriaCell, out double criteriaValue) ||
+                        !FormulaCoercion.TryCoerceDouble(sumCell, out double sumValue))
+                    {
+                        return false;
+                    }
+
+                    criteriaBuffer[offset] = criteriaValue;
+                    sumBuffer[offset] = sumValue;
+                    offset++;
+                }
+            }
+
+            for (int i = 0; i < total; i++)
+            {
+                if (criteriaBuffer[i] == criterion)
+                {
+                    sum += sumBuffer[i];
+                }
+            }
+
+            return true;
+        }
+        finally
+        {
+            ArrayPool<double>.Shared.Return(criteriaBuffer);
+            ArrayPool<double>.Shared.Return(sumBuffer);
+        }
+    }
+
+    /// <summary>
+    /// 當範圍為純數值矩陣且條件為等號時，加速 COUNTIF 計數。
+    /// </summary>
+    internal static bool TryCountIfNumericEqual(object[,] range, double criterion, out int count)
+    {
+        count = 0;
+        int rows = range.GetLength(0);
+        int cols = range.GetLength(1);
+        int total = rows * cols;
+        if (total == 0)
+        {
+            return true;
+        }
+
+        double[] buffer = ArrayPool<double>.Shared.Rent(total);
+        try
+        {
+            int offset = 0;
+            for (int r = 0; r < rows; r++)
+            {
+                for (int c = 0; c < cols; c++)
+                {
+                    object? cell = range[r, c];
+                    if (cell is null || !FormulaCoercion.TryCoerceDouble(cell, out double value))
+                    {
+                        return false;
+                    }
+
+                    buffer[offset++] = value;
+                }
+            }
+
+            for (int i = 0; i < total; i++)
+            {
+                if (buffer[i] == criterion)
+                {
+                    count++;
+                }
+            }
+
+            return true;
+        }
+        finally
+        {
+            ArrayPool<double>.Shared.Return(buffer);
+        }
+    }
 }

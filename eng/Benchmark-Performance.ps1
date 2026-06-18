@@ -41,6 +41,10 @@ try {
     Write-Host "提示：以 Release 組態重複執行可比較 PERF 變更前後差異。"
     Write-Host "BenchmarkDotNet 微基準："
     Write-Host "  dotnet run --project OdfKit.Benchmarks -c $Configuration"
+    Write-Host "基準回歸比對（PERF-3c）："
+    Write-Host "  pwsh eng/Benchmark-Regression.ps1 -Configuration $Configuration"
+    Write-Host "Trim 煙霧測試（PERF-5e）："
+    Write-Host "  pwsh eng/Test-TrimSmoke.ps1 -Configuration $Configuration"
     Write-Host "快速煙霧（單次迭代）："
     Write-Host "  dotnet run --project OdfKit.Benchmarks -c $Configuration -- --filter *FormulaParse* --job short --warmupCount 0 --iterationCount 1"
 }

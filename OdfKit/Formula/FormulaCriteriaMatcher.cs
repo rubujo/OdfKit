@@ -48,6 +48,21 @@ internal class CriteriaMatcher
         return val;
     }
 
+    /// <summary>
+    /// 若條件為純數值等號比對（<c>=</c> 且運算元為 <see cref="double"/>），傳回該門檻值。
+    /// </summary>
+    internal bool TryGetNumericEqualityCriterion(out double value)
+    {
+        if (_op == "=" && _operand is double numericOperand)
+        {
+            value = numericOperand;
+            return true;
+        }
+
+        value = 0;
+        return false;
+    }
+
     public bool Matches(object cellVal)
     {
         if (cellVal == null || cellVal is OdfFormulaError)

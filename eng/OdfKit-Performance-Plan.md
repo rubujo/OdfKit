@@ -42,8 +42,7 @@
 |----|------|------|
 | PERF-3a | `eng/Benchmark-Performance.ps1` 測試子集計時 | ✅ |
 | PERF-3b | `OdfKit.Benchmarks`（BenchmarkDotNet） | ✅ |
-
-後續可選：CI 非阻擋性回歸門檻（比對上次基準輸出）。
+| PERF-3c | `eng/Benchmark-Regression.ps1` + 基準線 JSON；CI `performance-benchmark.yml`（非阻擋） | ✅ |
 
 ## Phase PERF-5 — 深度最佳化路線圖（2026-06-18 評估報告）
 
@@ -54,16 +53,16 @@
 | **5a** | A. 雙向鏈結 DOM（PERF-2b） | ✅ 正確：`List.Insert` 仍為 O(N)；`SiblingIndex` 僅加速定位 | `OdfNodeChildList` + `FirstChild`/`NextSibling` 指標；`IList` + `Find` 相容 | ✅ |
 | **5b** | B. JIT `AggressiveInlining` | ✅ 正確但效益質性（約 5–10% 微觀）；過度標註會膨脹 IL | 僅標註 `OdfHashing.Combine`、`TryCoerceDouble` 等極熱路徑 | ✅ |
 | **5c** | C. 執行緒專屬 `StringPool` | ✅ 正確：單次 `Parse` 內池化有效，跨檔案需執行緒池 | `ThreadLocal` + 4096 次重置，避免無界成長 | ✅ |
-| **5d** | D. SIMD 統計累加 | ⚠️ 部分正確：僅連續 `double[]`/`object[,]` 純數值陣列可向量化的；混合型別仍走原路徑 | `ArrayPool<double>` 展平；`SUM`/`AVERAGE`/`COUNT` 矩陣快速路徑 | ✅ |
-| **5e** | E. Native AOT 裁剪相容 | ✅ 方向正確；完整 AOT 需大量後續（Source Generator、trim root） | `OdfEmbeddedDocumentFactory` 工廠註冊表；反射僅作未註冊類型後備 | 🔶 深化中 |
+| **5d** | D. SIMD 統計累加 | ⚠️ 部分正確：僅連續 `double[]`/`object[,]` 純數值陣列可向量化的；混合型別仍走原路徑 | `SUM`/`AVERAGE`/`COUNT` + `SUMIF`/`COUNTIF` 純數值等號快速路徑 | ✅ |
+| **5e** | E. Native AOT 裁剪相容 | ✅ 方向正確；完整 AOT 需大量後續（Source Generator、trim root） | `IsTrimmable`、`TrimSmoke`、`BouncyCastle` AOT 標記、工廠註冊表 | 🔶 深化中 |
 
 **5a 取捨**：隨機索引 `Children[i]` 在快取失效後需 O(n) 重建；插入／刪除為 O(1)。試算表連續 `InsertAfter` 為主要受益場景（`DomInsertBenchmarks`）。
 
 **5a 基準**（`DomInsertBenchmarks.SequentialInsertAfter`，2000 列、`Release`）：**~124 µs／次**、配置 ~641 KB／次（2026-06-18 本機）。
 
-**5d 限制**：混合儲存格（不可 `TryCoerceDouble` 的字串／空值）仍走 `FlattenValues`；`SUMIF` 等條件聚合未向量化。
+**5d 限制**：`SUMIF`/`COUNTIF` 快速路徑僅涵蓋純數值矩陣 + 等號條件；比較運算子與字串條件仍走 `CriteriaMatcher`。
 
-**5e 後續**：未註冊類型仍走反射後備；XML 序列化評估 Source Generator；BouncyCastle 保留動態路徑並文件化；trim root 設定。
+**5e 後續**：`PublishAot` 全量驗證；未註冊類型反射後備；XML Source Generator；BouncyCastle 靜態演算法註冊或整包保留。
 
 驗收：`dotnet test` 全綠；`OdfNodePerformanceTests`、`DomInsertBenchmarks`。
 

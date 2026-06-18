@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
 using Org.BouncyCastle.Bcpg;
@@ -17,6 +18,13 @@ namespace OdfKit.Core;
 /// 以 BouncyCastle.Cryptography 為底層，實作 ODF 1.3 OpenPGP Session Key 加解密。
 /// 支援 RSA（PKCS#1 v1.5 盲簽）、ElGamal 及 ECDH（X25519 / Curve25519 及傳統 EC 曲線）公開金鑰演算法。
 /// </summary>
+/// <remarks>
+/// Native AOT：BouncyCastle 演算法實作依賴執行期組裝探索，裁剪時須保留完整 <c>Org.BouncyCastle</c> 組件或改用靜態註冊表。
+/// </remarks>
+#if !NETSTANDARD2_0
+[RequiresUnreferencedCode("BouncyCastle OpenPGP 路徑尚未完成 trimming 相容；Native AOT 需保留 Org.BouncyCastle 組件。")]
+[RequiresDynamicCode("BouncyCastle 密碼學實作依賴動態程式碼產生。")]
+#endif
 public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
 {
     private readonly byte[]? _secretKeyRingData;

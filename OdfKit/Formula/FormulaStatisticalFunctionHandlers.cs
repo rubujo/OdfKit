@@ -121,11 +121,17 @@ internal static class FormulaStatisticalFunctionHandlers
         object[,] rangeValues = context.GetRangeValues(range);
         object[,] sumValues = context.GetRangeValues(sumRange);
 
+        var criteria = new CriteriaMatcher(criteriaVal);
+        if (criteria.TryGetNumericEqualityCriterion(out double numericCriterion) &&
+            FormulaNumericAggregation.TrySumIfNumericEqual(rangeValues, sumValues, numericCriterion, out double fastSum))
+        {
+            return fastSum;
+        }
+
         int rows = rangeValues.GetLength(0);
         int cols = rangeValues.GetLength(1);
 
         double sum = 0;
-        var criteria = new CriteriaMatcher(criteriaVal);
 
         for (int r = 0; r < rows; r++)
         {
@@ -163,11 +169,18 @@ internal static class FormulaStatisticalFunctionHandlers
             return err;
 
         object[,] rangeValues = context.GetRangeValues(range);
+
+        var criteria = new CriteriaMatcher(criteriaVal);
+        if (criteria.TryGetNumericEqualityCriterion(out double numericCriterion) &&
+            FormulaNumericAggregation.TryCountIfNumericEqual(rangeValues, numericCriterion, out int fastCount))
+        {
+            return (double)fastCount;
+        }
+
         int rows = rangeValues.GetLength(0);
         int cols = rangeValues.GetLength(1);
 
         int count = 0;
-        var criteria = new CriteriaMatcher(criteriaVal);
 
         for (int r = 0; r < rows; r++)
         {
