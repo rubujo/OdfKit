@@ -27,6 +27,7 @@ $libraryProjects = @(
     'OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj',
     'OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj',
     'OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj',
+    'OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj',
     'tools/OdfKit.Cli/OdfKit.Cli.csproj',
     'tools/OdfSchemaGenerator/OdfSchemaGenerator.csproj'
 )

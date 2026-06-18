@@ -28,7 +28,8 @@ $expectedPackages = @(
     @{ Id = "OdfKit.Extensions.Ooxml"; Assembly = "OdfKit.Extensions.Ooxml.dll"; RequireSnupkg = $false },
     @{ Id = "OdfKit.Extensions.Pdf"; Assembly = "OdfKit.Extensions.Pdf.dll"; RequireSnupkg = $false },
     @{ Id = "OdfKit.Extensions.Rendering"; Assembly = "OdfKit.Extensions.Rendering.dll"; RequireSnupkg = $false },
-    @{ Id = "OdfKit.Extensions.Rdf"; Assembly = "OdfKit.Extensions.Rdf.dll"; RequireSnupkg = $false }
+    @{ Id = "OdfKit.Extensions.Rdf"; Assembly = "OdfKit.Extensions.Rdf.dll"; RequireSnupkg = $false },
+    @{ Id = "OdfKit.Extensions.Collaboration"; Assembly = "OdfKit.Extensions.Collaboration.dll"; RequireSnupkg = $false }
 )
 
 Push-Location $repoRoot

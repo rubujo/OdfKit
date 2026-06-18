@@ -25,7 +25,8 @@ $packableProjects = @(
     "OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj",
     "OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj",
     "OdfKit.Extensions.Rendering/OdfKit.Extensions.Rendering.csproj",
-    "OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj"
+    "OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj",
+    "OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj"
 )
 
 if (Test-Path -LiteralPath $outDir) {

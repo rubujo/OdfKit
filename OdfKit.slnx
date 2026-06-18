@@ -18,6 +18,7 @@
   <Project Path="OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj" />
   <Project Path="OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj" />
   <Project Path="OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj" />
+  <Project Path="OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj" />
   <Project Path="OdfKit.Tests/OdfKit.Tests.csproj" />
   <Project Path="OdfKit.Tests/MockSoffice/MockSoffice.csproj" />
   <Project Path="tools/OdfKit.Cli/OdfKit.Cli.csproj" />
