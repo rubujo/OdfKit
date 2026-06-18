@@ -1010,6 +1010,69 @@ public class OoxmlConversionTests
     }
 
     /// <summary>
+    /// 驗證含樞紐表的 XLSX → ODS fallback 路徑可還原資料驗證與條件格式。
+    /// </summary>
+    [Fact]
+    public void XlsxToOdf_PivotFallbackPreservesDataValidationAndConditionalFormat()
+    {
+        using var odsDocument = OdfSpreadsheetDocument.Create();
+        var sheet = odsDocument.Worksheets.Add("Sales");
+        sheet.Cells["A1"].CellValue = "Category";
+        sheet.Cells["B1"].CellValue = "Region";
+        sheet.Cells["C1"].CellValue = "Sales";
+        sheet.Cells["A2"].CellValue = "Hardware";
+        sheet.Cells["B2"].CellValue = "North";
+        sheet.Cells["C2"].CellValue = 120d;
+        sheet.Cells["A3"].CellValue = "Software";
+        sheet.Cells["B3"].CellValue = "South";
+        sheet.Cells["C3"].CellValue = 80d;
+        sheet.Cells["D1"].CellValue = 10d;
+        sheet.Cells["D2"].CellValue = 20d;
+
+        new OdfPivotTableBuilder(
+            "SalesPivot",
+            new OdfCellRange(0, 0, 2, 2, "Sales"),
+            new OdfCellAddress(5, 0, "Sales"),
+            sheet)
+            .AddRowField("Category")
+            .AddColumnField("Region")
+            .AddDataField("Sales", OdfPivotFunction.Sum)
+            .Build();
+
+        odsDocument.AddDataValidation("Sales", new OdfDataValidation
+        {
+            ApplyTo = new OdfCellRange(0, 4, 1, 4, "Sales"),
+            Condition = OdfValidationCondition.IntegerBetween,
+            Formula1 = "1",
+            Formula2 = "100",
+            ErrorTitle = "無效輸入",
+            ErrorMessage = "請輸入 1 至 100 的整數！",
+            AlertStyle = OdfValidationAlertStyle.Stop
+        });
+
+        sheet.AddColorScaleFormat(
+            new OdfCellRange(0, 3, 1, 3, "Sales"),
+            new OdfColor("#FF0000"),
+            new OdfColor("#00FF00"));
+
+        using var xlsxStream = new MemoryStream();
+        OdfToXlsxConverter.Convert(odsDocument, xlsxStream);
+        xlsxStream.Position = 0;
+
+        using OdfSpreadsheetDocument converted = XlsxToOdfConverter.Convert(xlsxStream);
+        string contentXml = SaveSpreadsheetContentXml(converted);
+
+        Assert.Contains("table:data-pilot-table", contentXml);
+        Assert.Contains("table:content-validations", contentXml);
+        Assert.Contains("condition=\"and:oooc:isInteger()and:oooc:isBetween(1,100)\"", contentXml);
+        Assert.Contains("請輸入 1 至 100 的整數！", contentXml);
+        Assert.Contains("calcext:conditional-formats", contentXml);
+        Assert.Contains("calcext:color-scale", contentXml);
+        Assert.Contains("calcext:color=\"#FF0000\"", contentXml);
+        Assert.Contains("calcext:color=\"#00FF00\"", contentXml);
+    }
+
+    /// <summary>
     /// 驗證 ODT → DOCX → ODT 往返可保留段落內嵌圖片。
     /// </summary>
     [Fact]

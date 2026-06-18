@@ -147,7 +147,243 @@ public static class XlsxToOdfConverter
             }
 
             CopySheetDataFromOpenXml(sheetData, odsSheet, sharedStrings);
+            CopyDataValidationsFromOpenXml(worksheetPart.Worksheet, odsSheet);
+            CopyConditionalFormatsFromOpenXml(worksheetPart.Worksheet, odsSheet);
         }
+    }
+
+    private static void CopyDataValidationsFromOpenXml(S.Worksheet worksheet, OdfTableSheet odsSheet)
+    {
+        S.DataValidations? dataValidations = worksheet.GetFirstChild<S.DataValidations>();
+        if (dataValidations is null)
+        {
+            return;
+        }
+
+        foreach (S.DataValidation validation in dataValidations.Elements<S.DataValidation>())
+        {
+            if (!string.Equals(validation.Operator?.InnerText, "between", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            OdfValidationCondition? condition = ResolveOpenXmlValidationCondition(validation.Type?.InnerText);
+            if (!condition.HasValue)
+            {
+                continue;
+            }
+
+            string formula1 = validation.Formula1?.Text ?? string.Empty;
+            string formula2 = validation.Formula2?.Text ?? string.Empty;
+            string? sqref = validation.SequenceOfReferences?.InnerText;
+            if (string.IsNullOrWhiteSpace(sqref))
+            {
+                continue;
+            }
+
+            foreach (string reference in SplitSqref(sqref))
+            {
+                if (!OdfCellRange.TryParse(reference, out OdfCellRange range))
+                {
+                    continue;
+                }
+
+                odsSheet.Document.AddDataValidation(odsSheet.Name, new OdfDataValidation
+                {
+                    ApplyTo = EnsureRangeSheet(range, odsSheet.Name),
+                    Condition = condition.Value,
+                    Formula1 = formula1,
+                    Formula2 = formula2,
+                    ErrorTitle = validation.ErrorTitle?.Value ?? string.Empty,
+                    ErrorMessage = validation.Error?.Value ?? string.Empty,
+                    AlertStyle = ResolveOpenXmlValidationAlertStyle(validation.ErrorStyle?.InnerText)
+                });
+            }
+        }
+    }
+
+    private static OdfValidationCondition? ResolveOpenXmlValidationCondition(string? typeText)
+    {
+        if (string.Equals(typeText, "whole", StringComparison.OrdinalIgnoreCase))
+        {
+            return OdfValidationCondition.IntegerBetween;
+        }
+
+        if (string.Equals(typeText, "decimal", StringComparison.OrdinalIgnoreCase))
+        {
+            return OdfValidationCondition.DecimalBetween;
+        }
+
+        if (string.Equals(typeText, "textLength", StringComparison.OrdinalIgnoreCase))
+        {
+            return OdfValidationCondition.TextLengthBetween;
+        }
+
+        return null;
+    }
+
+    private static OdfValidationAlertStyle ResolveOpenXmlValidationAlertStyle(string? errorStyle)
+    {
+        if (string.Equals(errorStyle, "warning", StringComparison.OrdinalIgnoreCase))
+        {
+            return OdfValidationAlertStyle.Warning;
+        }
+
+        if (string.Equals(errorStyle, "information", StringComparison.OrdinalIgnoreCase))
+        {
+            return OdfValidationAlertStyle.Information;
+        }
+
+        return OdfValidationAlertStyle.Stop;
+    }
+
+    private static void CopyConditionalFormatsFromOpenXml(S.Worksheet worksheet, OdfTableSheet odsSheet)
+    {
+        foreach (S.ConditionalFormatting conditionalFormatting in worksheet.Elements<S.ConditionalFormatting>())
+        {
+            string? sqref = conditionalFormatting.SequenceOfReferences?.InnerText;
+            if (string.IsNullOrWhiteSpace(sqref))
+            {
+                continue;
+            }
+
+            string firstReference = SplitSqref(sqref).FirstOrDefault() ?? string.Empty;
+            if (!OdfCellRange.TryParse(firstReference, out OdfCellRange range))
+            {
+                continue;
+            }
+
+            OdfCellRange odfRange = EnsureRangeSheet(range, odsSheet.Name);
+            foreach (S.ConditionalFormattingRule rule in conditionalFormatting.Elements<S.ConditionalFormattingRule>())
+            {
+                string? ruleType = rule.Type?.InnerText;
+                if (string.Equals(ruleType, "colorScale", StringComparison.OrdinalIgnoreCase))
+                {
+                    CopyColorScaleFromOpenXml(rule, odfRange, odsSheet);
+                }
+                else if (string.Equals(ruleType, "dataBar", StringComparison.OrdinalIgnoreCase))
+                {
+                    CopyDataBarFromOpenXml(rule, odfRange, odsSheet);
+                }
+                else if (string.Equals(ruleType, "iconSet", StringComparison.OrdinalIgnoreCase))
+                {
+                    CopyIconSetFromOpenXml(rule, odfRange, odsSheet);
+                }
+            }
+        }
+    }
+
+    private static void CopyColorScaleFromOpenXml(S.ConditionalFormattingRule rule, OdfCellRange range, OdfTableSheet odsSheet)
+    {
+        S.ColorScale? colorScale = rule.GetFirstChild<S.ColorScale>();
+        if (colorScale is null)
+        {
+            return;
+        }
+
+        List<S.Color> colors = colorScale.Elements<S.Color>().ToList();
+        if (colors.Count < 2)
+        {
+            return;
+        }
+
+        string minColor = ParseOpenXmlRgb(colors[0].Rgb?.Value, "#FF0000");
+        string maxColor = ParseOpenXmlRgb(colors[colors.Count - 1].Rgb?.Value, "#00FF00");
+        if (colors.Count >= 3)
+        {
+            string midColor = ParseOpenXmlRgb(colors[1].Rgb?.Value, "#FFFF00");
+            odsSheet.AddColorScaleFormat(range, new OdfColor(minColor), new OdfColor(maxColor), new OdfColor(midColor));
+        }
+        else
+        {
+            odsSheet.AddColorScaleFormat(range, new OdfColor(minColor), new OdfColor(maxColor));
+        }
+    }
+
+    private static void CopyDataBarFromOpenXml(S.ConditionalFormattingRule rule, OdfCellRange range, OdfTableSheet odsSheet)
+    {
+        S.DataBar? dataBar = rule.GetFirstChild<S.DataBar>();
+        if (dataBar is null)
+        {
+            return;
+        }
+
+        List<S.Color> colors = dataBar.Elements<S.Color>().ToList();
+        string positiveColor = colors.Count > 0
+            ? ParseOpenXmlRgb(colors[0].Rgb?.Value, "#638EC6")
+            : "#638EC6";
+        string? negativeColor = colors.Count > 1
+            ? ParseOpenXmlRgb(colors[1].Rgb?.Value, "#FF0000")
+            : null;
+
+        odsSheet.AddDataBarFormat(
+            range,
+            new OdfColor(positiveColor),
+            negativeColor is null ? null : new OdfColor(negativeColor));
+    }
+
+    private static void CopyIconSetFromOpenXml(S.ConditionalFormattingRule rule, OdfCellRange range, OdfTableSheet odsSheet)
+    {
+        S.IconSet? iconSet = rule.GetFirstChild<S.IconSet>();
+        if (iconSet is null)
+        {
+            return;
+        }
+
+        odsSheet.AddIconSetFormat(range, MapOpenXmlIconSet(iconSet.IconSetValue?.InnerText));
+    }
+
+    private static OdfIconSetType MapOpenXmlIconSet(string? iconSetValue)
+    {
+        if (string.Equals(iconSetValue, "3TrafficLights1", StringComparison.OrdinalIgnoreCase))
+        {
+            return OdfIconSetType.ThreeTrafficLights;
+        }
+
+        if (string.Equals(iconSetValue, "4Rating", StringComparison.OrdinalIgnoreCase))
+        {
+            return OdfIconSetType.FourRating;
+        }
+
+        if (string.Equals(iconSetValue, "5Rating", StringComparison.OrdinalIgnoreCase))
+        {
+            return OdfIconSetType.FiveRating;
+        }
+
+        return OdfIconSetType.ThreeArrows;
+    }
+
+    private static IEnumerable<string> SplitSqref(string sqref)
+    {
+        foreach (string part in sqref.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
+        {
+            string trimmed = part.Trim();
+            if (trimmed.Length > 0)
+            {
+                yield return trimmed;
+            }
+        }
+    }
+
+    private static string ParseOpenXmlRgb(string? rgb, string fallback)
+    {
+        if (string.IsNullOrWhiteSpace(rgb))
+        {
+            return fallback;
+        }
+
+        string value = rgb!.Trim();
+        if (value.Length == 8)
+        {
+            return "#" + value.Substring(2, 6);
+        }
+
+        if (value.Length == 6)
+        {
+            return "#" + value;
+        }
+
+        return fallback;
     }
 
     private static void CopySheetDataFromOpenXml(S.SheetData sheetData, OdfTableSheet odsSheet, S.SharedStringTable? sharedStrings)
