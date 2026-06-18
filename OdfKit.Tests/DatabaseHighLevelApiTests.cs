@@ -66,6 +66,28 @@ public class DatabaseHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證報表元件可於儲存後重新載入。
+    /// </summary>
+    [Fact]
+    public void ReportsPersistAfterSaveAndLoad()
+    {
+        using var database = OdfDatabaseDocument.Create();
+        database.SetConnection("sdbc:embedded:hsqldb");
+        database.AddReport("SalesReport", "reports/SalesReport", "銷售報表", "每月銷售摘要。");
+
+        using var stream = new MemoryStream();
+        database.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        OdfDatabaseReportInfo report = Assert.Single(loaded.GetReports());
+        Assert.Equal("SalesReport", report.Name);
+        Assert.Equal("reports/SalesReport", report.Href);
+        Assert.Equal("銷售報表", report.Title);
+        Assert.Equal("每月銷售摘要。", report.Description);
+    }
+
+    /// <summary>
     /// 驗證表單元件可於儲存後重新載入。
     /// </summary>
     [Fact]

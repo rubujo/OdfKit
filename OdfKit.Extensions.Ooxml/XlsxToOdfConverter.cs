@@ -182,7 +182,7 @@ public static class XlsxToOdfConverter
                 continue;
             }
 
-            foreach (string reference in SplitSqref(sqref))
+            foreach (string reference in SplitSqref(sqref!))
             {
                 if (!OdfCellRange.TryParse(reference, out OdfCellRange range))
                 {
@@ -248,7 +248,7 @@ public static class XlsxToOdfConverter
                 continue;
             }
 
-            string firstReference = SplitSqref(sqref).FirstOrDefault() ?? string.Empty;
+            string firstReference = SplitSqref(sqref!).FirstOrDefault() ?? string.Empty;
             if (!OdfCellRange.TryParse(firstReference, out OdfCellRange range))
             {
                 continue;

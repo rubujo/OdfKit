@@ -69,6 +69,30 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// 移除指定名稱的圖表自動樣式。
+    /// </summary>
+    /// <param name="name">樣式名稱。</param>
+    /// <returns>若成功移除則為 <see langword="true"/>；找不到或非圖表樣式時為 <see langword="false"/>。</returns>
+    public bool RemoveChartStyle(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("樣式名稱不可為空白。", nameof(name));
+        }
+
+        OdfNode? styleNode = FindAutomaticStyleNode(name);
+        if (styleNode is null ||
+            !string.Equals(styleNode.GetAttribute("family", OdfNamespaces.Style), "chart", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        styleNode.Parent?.RemoveChild(styleNode);
+        StyleEngine.RebuildStyleIndex();
+        return true;
+    }
+
+    /// <summary>
     /// 取得文件中所有圖表自動樣式的摘要清單。
     /// </summary>
     /// <returns>圖表樣式摘要清單。</returns>

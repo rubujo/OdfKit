@@ -115,6 +115,35 @@ public class FormulaHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證下標 MathML token 可寫入並於儲存／載入後讀回。
+    /// </summary>
+    [Fact]
+    public void SubscriptToken_RoundTripsAfterSaveAndLoad()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+            .WithTokens(
+                OdfMathToken.Identifier("H"),
+                OdfMathToken.Subscript(
+                    OdfMathToken.Number("2"),
+                    OdfMathToken.Number("2")))
+            .Build();
+
+        Assert.Contains("msub", formula.GetMathML());
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
+        Assert.Equal(2, loaded.GetMathTokens().Count);
+        OdfMathToken subscript = loaded.GetMathTokens()[1];
+        Assert.Equal(OdfMathTokenKind.Subscript, subscript.Kind);
+        Assert.Equal("2", subscript.Base?.Text);
+        Assert.Equal("2", subscript.Script?.Text);
+        Assert.Contains("msub", loaded.GetMathML());
+    }
+
+    /// <summary>
     /// 驗證公式文件的 Round-trip 載入與儲存。
     /// </summary>
     [Fact]

@@ -105,7 +105,7 @@ public static class DocxToOdtConverter
                 paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value);
             if (!string.IsNullOrEmpty(newStyleName))
             {
-                odtParagraph.Node.SetAttribute("style-name", OdfNamespaces.Text, newStyleName, "text");
+                odtParagraph.Node.SetAttribute("style-name", OdfNamespaces.Text, newStyleName!, "text");
             }
         }
 

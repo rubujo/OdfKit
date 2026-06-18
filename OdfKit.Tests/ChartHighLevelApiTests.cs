@@ -364,6 +364,25 @@ public class ChartHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfChartDocument.RemoveChartStyle"/> 可移除圖表自動樣式。
+    /// </summary>
+    [Fact]
+    public void RemoveChartStyle_RemovesAutomaticStyle()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
+
+        OdfChartStyle style = chartDoc.CreateChartStyle("TempStyle");
+        style.FillColor = "#ABCDEF";
+        chartDoc.GetSeriesEditor(0).StyleName = "TempStyle";
+
+        Assert.True(chartDoc.RemoveChartStyle("TempStyle"));
+        Assert.Empty(chartDoc.GetChartStyles());
+        Assert.Null(chartDoc.TryGetChartStyle("TempStyle"));
+        Assert.False(chartDoc.RemoveChartStyle("TempStyle"));
+    }
+
+    /// <summary>
     /// 驗證 SetDataRange 與 GetDataRange 對帶空格工作表名稱的往返一致性。
     /// </summary>
     [Fact]

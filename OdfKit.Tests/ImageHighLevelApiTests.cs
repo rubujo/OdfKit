@@ -118,6 +118,52 @@ public class ImageHighLevelApiTests
         Assert.Null(image.TryGetImageFrame("SecondaryFrame"));
     }
 
+    /// <summary>
+    /// 驗證框架更新與移除可於儲存／載入後保留。
+    /// </summary>
+    [Fact]
+    public void UpdateAndRemoveImageFrame_PersistAfterSaveAndLoad()
+    {
+        using var image = OdfImageDocument.Create();
+        image.SetImage(CreatePngBytes(), "Primary.png");
+        image.AddImageFrame(
+            CreateAlternatePngBytes(),
+            OdfLength.FromCentimeters(7),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(3),
+            OdfLength.FromCentimeters(3),
+            "Secondary.png",
+            "SecondaryFrame",
+            "附圖");
+
+        using var stream = new MemoryStream();
+        image.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = OdfImageDocument.Load(stream, "gallery.odi");
+        Assert.True(loaded.UpdateImageFrame(
+            "SecondaryFrame",
+            OdfLength.FromCentimeters(8),
+            OdfLength.FromCentimeters(2),
+            OdfLength.FromCentimeters(4),
+            OdfLength.FromCentimeters(4),
+            "更新附圖"));
+
+        using var updatedStream = new MemoryStream();
+        loaded.SaveToStream(updatedStream);
+        updatedStream.Position = 0;
+
+        using var reloaded = OdfImageDocument.Load(updatedStream, "gallery.odi");
+        OdfImageFrameInfo? frame = reloaded.TryGetImageFrame("SecondaryFrame");
+        Assert.NotNull(frame);
+        Assert.Equal("更新附圖", frame!.Title);
+        Assert.True(frame.TryGetX(out OdfLength x));
+        Assert.Equal(OdfLength.FromCentimeters(8), x);
+
+        Assert.True(reloaded.RemoveImageFrame("SecondaryFrame"));
+        Assert.Single(reloaded.GetImageFrames());
+    }
+
     private static byte[] CreatePngBytes() =>
         System.Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
