@@ -134,12 +134,19 @@ public static partial class OdfEncryption
                 var parameters = new AeadParameters(new KeyParameter(derivedKey), 128, iv);
                 cipher.Init(false, parameters);
 
-                byte[] output = new byte[cipher.GetOutputSize(ciphertext.Length)];
+                int outputSize = cipher.GetOutputSize(ciphertext.Length);
+                byte[] output = new byte[outputSize];
                 int len = cipher.ProcessBytes(ciphertext, 0, ciphertext.Length, output, 0);
                 int finalLen = cipher.DoFinal(output, len);
+                int totalLen = len + finalLen;
 
-                byte[] decrypted = new byte[len + finalLen];
-                Buffer.BlockCopy(output, 0, decrypted, 0, decrypted.Length);
+                if (totalLen == output.Length)
+                {
+                    return output;
+                }
+
+                byte[] decrypted = new byte[totalLen];
+                Buffer.BlockCopy(output, 0, decrypted, 0, totalLen);
                 return decrypted;
             }
             catch (Exception ex)

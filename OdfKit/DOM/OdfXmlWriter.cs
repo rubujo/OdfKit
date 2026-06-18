@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security;
+using System.Text;
 using System.Xml;
 using OdfKit.Core;
 
@@ -45,8 +46,8 @@ public static class OdfXmlWriter
             {
                 writer.WriteStartDocument();
 
-                // 遞迴寫入
-                WriteNode(rootNode, writer, nsDict, ref openElementsCount, isRoot: true);
+                // 遞迴寫入（深度上限與 OdfXmlReader.MaxElementDepth 對稱，PERF-4i）
+                WriteNode(rootNode, writer, nsDict, ref openElementsCount, isRoot: true, depth: 1);
 
                 writer.WriteEndDocument();
             }
@@ -72,8 +73,20 @@ public static class OdfXmlWriter
         }
     }
 
-    private static void WriteNode(OdfNode node, XmlWriter writer, Dictionary<string, string> nsDict, ref int openElementsCount, bool isRoot)
+    private static void WriteNode(
+        OdfNode node,
+        XmlWriter writer,
+        Dictionary<string, string> nsDict,
+        ref int openElementsCount,
+        bool isRoot,
+        int depth)
     {
+        if (depth > OdfXmlReader.MaxElementDepth)
+        {
+            throw new SecurityException(
+                $"XML element nesting depth limit exceeded during serialization ({depth} > {OdfXmlReader.MaxElementDepth}).");
+        }
+
         if (node.NodeType == OdfNodeType.Comment)
         {
             writer.WriteComment(node.TextContent);
@@ -139,7 +152,7 @@ public static class OdfXmlWriter
         // 寫入子節點
         foreach (var child in node.Children)
         {
-            WriteNode(child, writer, nsDict, ref openElementsCount, isRoot: false);
+            WriteNode(child, writer, nsDict, ref openElementsCount, isRoot: false, depth: depth + 1);
         }
 
         // 寫入結束元素

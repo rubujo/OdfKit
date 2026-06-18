@@ -1,11 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.Net;
 using System.Text;
-using AngleSharp;
-using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Text;
@@ -15,6 +9,9 @@ namespace OdfKit.Export;
 /// <summary>
 /// 將 TextDocument 匯出為 HTML 的工具類別。
 /// </summary>
+/// <remarks>
+/// 以 <see cref="StringBuilder"/> 直接輸出 HTML，避免 AngleSharp 雙重 DOM 配置（PERF-4e）。
+/// </remarks>
 public static class OdfHtmlExporter
 {
     private const string DefaultCss =
@@ -38,46 +35,45 @@ public static class OdfHtmlExporter
             throw new ArgumentNullException(nameof(document));
         options ??= new OdfHtmlExportOptions();
 
-        var context = BrowsingContext.New(Configuration.Default);
-        var parser = context.GetService<IHtmlParser>()!;
-        var htmlDoc = parser.ParseDocument(string.Empty);
-
+        var sb = new StringBuilder(4096);
         if (options.FullPage)
         {
-            var meta = htmlDoc.CreateElement("meta");
-            meta.SetAttribute("charset", options.Charset);
-            htmlDoc.Head!.AppendChild(meta);
+            sb.Append("<!DOCTYPE html>\n<html><head>");
+            sb.Append("<meta charset=\"");
+            sb.Append(WebUtility.HtmlEncode(options.Charset));
+            sb.Append("\">");
 
             if (!string.IsNullOrEmpty(options.Title))
             {
-                var titleElem = htmlDoc.CreateElement("title");
-                titleElem.TextContent = options.Title;
-                htmlDoc.Head.AppendChild(titleElem);
+                sb.Append("<title>");
+                sb.Append(WebUtility.HtmlEncode(options.Title));
+                sb.Append("</title>");
             }
 
             if (options.InlineStyles)
             {
-                var style = htmlDoc.CreateElement("style");
-                style.TextContent = DefaultCss;
-                htmlDoc.Head.AppendChild(style);
+                sb.Append("<style>");
+                sb.Append(DefaultCss);
+                sb.Append("</style>");
             }
+
+            sb.Append("</head><body>");
+            ConvertBodyNodes(document.BodyTextRoot, sb);
+            sb.Append("</body></html>");
+            return sb.ToString();
         }
 
-        var body = htmlDoc.Body!;
-        ConvertBodyNodes(document.BodyTextRoot, body, htmlDoc);
-
-        return options.FullPage
-            ? "<!DOCTYPE html>\n" + htmlDoc.DocumentElement.OuterHtml
-            : body.InnerHtml;
+        ConvertBodyNodes(document.BodyTextRoot, sb);
+        return sb.ToString();
     }
 
-    private static void ConvertBodyNodes(OdfNode odfNode, IElement parent, IHtmlDocument htmlDoc)
+    private static void ConvertBodyNodes(OdfNode odfNode, StringBuilder sb)
     {
         foreach (var child in odfNode.Children)
         {
             if (child.NamespaceUri != OdfNamespaces.Text)
             {
-                ConvertBodyNodes(child, parent, htmlDoc);
+                ConvertBodyNodes(child, sb);
                 continue;
             }
 
@@ -87,68 +83,93 @@ public static class OdfHtmlExporter
                     {
                         int level = int.TryParse(child.GetAttribute("outline-level", OdfNamespaces.Text), out int l) ? l : 1;
                         level = level < 1 ? 1 : (level > 6 ? 6 : level);
-                        var hElem = htmlDoc.CreateElement($"h{level}");
-                        hElem.TextContent = child.TextContent ?? string.Empty;
-                        parent.AppendChild(hElem);
+                        sb.Append('<').Append('h').Append(level).Append('>');
+                        AppendEncodedText(sb, child.TextContent);
+                        sb.Append("</h").Append(level).Append('>');
                         break;
                     }
                 case "p":
                     {
-                        var pElem = htmlDoc.CreateElement("p");
-                        ConvertParagraphContent(child, pElem, htmlDoc);
-                        parent.AppendChild(pElem);
+                        sb.Append("<p>");
+                        ConvertParagraphContent(child, sb);
+                        sb.Append("</p>");
                         break;
                     }
                 case "list":
                     {
-                        var ul = htmlDoc.CreateElement("ul");
+                        sb.Append("<ul>");
                         foreach (var item in child.Children)
                         {
                             if (item.LocalName == "list-item" && item.NamespaceUri == OdfNamespaces.Text)
                             {
-                                var li = htmlDoc.CreateElement("li");
-                                li.TextContent = item.TextContent ?? string.Empty;
-                                ul.AppendChild(li);
+                                sb.Append("<li>");
+                                AppendEncodedText(sb, item.TextContent);
+                                sb.Append("</li>");
                             }
                         }
-                        parent.AppendChild(ul);
+
+                        sb.Append("</ul>");
                         break;
                     }
                 default:
-                    ConvertBodyNodes(child, parent, htmlDoc);
+                    ConvertBodyNodes(child, sb);
                     break;
             }
         }
     }
 
-    private static void ConvertParagraphContent(OdfNode para, IElement pElem, IHtmlDocument htmlDoc)
+    private static void ConvertParagraphContent(OdfNode para, StringBuilder sb)
     {
+        bool wroteContent = false;
         foreach (var child in para.Children)
         {
             if (child.NodeType == OdfNodeType.Text)
             {
-                pElem.AppendChild(htmlDoc.CreateTextNode(child.TextContent ?? string.Empty));
+                AppendEncodedText(sb, child.TextContent);
+                wroteContent = true;
             }
             else if (child.LocalName == "span" && child.NamespaceUri == OdfNamespaces.Text)
             {
-                var span = htmlDoc.CreateElement("span");
-                ConvertParagraphContent(child, span, htmlDoc);
-                pElem.AppendChild(span);
+                sb.Append("<span>");
+                ConvertParagraphContent(child, sb);
+                sb.Append("</span>");
+                wroteContent = true;
             }
             else if (child.LocalName == "note" && child.NamespaceUri == OdfNamespaces.Text)
             {
-                var noteClass = child.GetAttribute("note-class", OdfNamespaces.Text);
-                var citation = child.Children
-                    .FirstOrDefault(c => c.LocalName == "note-citation" && c.NamespaceUri == OdfNamespaces.Text)?.TextContent ?? string.Empty;
-                var sup = htmlDoc.CreateElement("sup");
-                sup.SetAttribute("title", noteClass ?? string.Empty);
-                sup.TextContent = citation;
-                pElem.AppendChild(sup);
+                string? noteClass = child.GetAttribute("note-class", OdfNamespaces.Text);
+                string citation = string.Empty;
+                foreach (var noteChild in child.Children)
+                {
+                    if (noteChild.LocalName == "note-citation" && noteChild.NamespaceUri == OdfNamespaces.Text)
+                    {
+                        citation = noteChild.TextContent ?? string.Empty;
+                        break;
+                    }
+                }
+
+                sb.Append("<sup title=\"");
+                sb.Append(WebUtility.HtmlEncode(noteClass ?? string.Empty));
+                sb.Append("\">");
+                AppendEncodedText(sb, citation);
+                sb.Append("</sup>");
+                wroteContent = true;
             }
         }
-        if (!pElem.HasChildNodes)
+
+        if (!wroteContent)
         {
-            pElem.TextContent = para.TextContent ?? string.Empty;
+            AppendEncodedText(sb, para.TextContent);
         }
+    }
+
+    private static void AppendEncodedText(StringBuilder sb, string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        sb.Append(WebUtility.HtmlEncode(text));
     }
 }

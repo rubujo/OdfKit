@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Spreadsheet;
 using SkiaSharp;
 
@@ -87,15 +89,10 @@ public static class OdfImageExporter
                 var cellNode = sheet.TryGetCellNode(r, c);
                 if (cellNode is not null)
                 {
-                    var cell = new OdfCell(cellNode, r, c, sheet.Document, sheet.Name);
-                    object? val = cell.CellValue;
-                    if (val is not null)
+                    string? text = TryGetCellDisplayText(cellNode);
+                    if (!string.IsNullOrEmpty(text))
                     {
-                        string text = val.ToString() ?? string.Empty;
-                        if (text.Length > 0)
-                        {
-                            canvas.DrawText(text, x + 3, y + rowHeight - 4, font, textPaint);
-                        }
+                        canvas.DrawText(text, x + 3, y + rowHeight - 4, font, textPaint);
                     }
                 }
             }
@@ -104,5 +101,35 @@ public static class OdfImageExporter
         using var image = surface.Snapshot();
         using var data = image.Encode(format, quality);
         data.SaveTo(stream);
+    }
+
+    private static string? TryGetCellDisplayText(OdfNode cellNode)
+    {
+        string? valueType = cellNode.GetAttribute("value-type", OdfNamespaces.Office);
+        if (valueType is "float")
+        {
+            return cellNode.GetAttribute("value", OdfNamespaces.Office);
+        }
+
+        if (valueType is "boolean")
+        {
+            return cellNode.GetAttribute("boolean-value", OdfNamespaces.Office);
+        }
+
+        if (valueType is "date")
+        {
+            return cellNode.GetAttribute("date-value", OdfNamespaces.Office);
+        }
+
+        foreach (var child in cellNode.Children)
+        {
+            if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
+            {
+                return child.TextContent;
+            }
+        }
+
+        string? text = cellNode.TextContent;
+        return string.IsNullOrEmpty(text) ? null : text;
     }
 }

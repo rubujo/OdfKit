@@ -27,6 +27,9 @@ public partial class OdfStyleEngine
     // 由記憶體中包裝器建立/修改的臨時局部樣式
     private readonly Dictionary<OdfNode, OdfNode> _localStyles = [];
 
+    // 樣式節點直接屬性展平快取（PERF-4d）
+    private readonly Dictionary<OdfNode, Dictionary<OdfAttributeName, string?>> _directStyleProperties = new();
+
     /// <summary>
     /// 初始化 <see cref="OdfStyleEngine"/> 類別的新執行個體。
     /// </summary>
@@ -48,6 +51,7 @@ public partial class OdfStyleEngine
         _automaticStyles.Clear();
         _commonStyles.Clear();
         _defaultStyles.Clear();
+        _directStyleProperties.Clear();
 
         // 1. 掃描 content.xml 的 automatic-styles
         var contentAuto = FindChildElement(_contentRoot, "automatic-styles", OdfNamespaces.Office);
@@ -57,7 +61,10 @@ public partial class OdfStyleEngine
             {
                 string? name = child.GetAttribute("name", OdfNamespaces.Style);
                 if (name is not null)
+                {
                     _automaticStyles[name] = child;
+                    CacheDirectStyleProperties(child);
+                }
             }
         }
 
@@ -69,7 +76,10 @@ public partial class OdfStyleEngine
             {
                 string? name = child.GetAttribute("name", OdfNamespaces.Style);
                 if (name is not null)
+                {
                     _automaticStyles[name] = child;
+                    CacheDirectStyleProperties(child);
+                }
             }
         }
 
@@ -83,15 +93,40 @@ public partial class OdfStyleEngine
                 {
                     string name = child.GetAttribute("name", OdfNamespaces.Style)!;
                     _commonStyles[name] = child;
+                    CacheDirectStyleProperties(child);
                 }
                 else if (child.LocalName == "default-style" && child.NamespaceUri == OdfNamespaces.Style)
                 {
                     string? family = child.GetAttribute("family", OdfNamespaces.Style);
                     if (family is not null)
+                    {
                         _defaultStyles[family] = child;
+                        CacheDirectStyleProperties(child);
+                    }
                 }
             }
         }
+    }
+
+    private void CacheDirectStyleProperties(OdfNode styleNode)
+    {
+        var map = new Dictionary<OdfAttributeName, string?>(OdfAttributeNameComparer.Instance);
+        foreach (var child in styleNode.Children)
+        {
+            if (child.NodeType != OdfNodeType.Element ||
+                !child.LocalName.EndsWith("-properties", StringComparison.Ordinal) ||
+                child.NamespaceUri != OdfNamespaces.Style)
+            {
+                continue;
+            }
+
+            foreach (var attr in child.Attributes)
+            {
+                map[attr.Key] = attr.Value;
+            }
+        }
+
+        _directStyleProperties[styleNode] = map;
     }
 
     /// <summary>
@@ -180,6 +215,15 @@ public partial class OdfStyleEngine
 
     private string? FindPropertyInStyleNode(OdfNode styleNode, string propertyLocalName, string propertyNsUri)
     {
+        if (_directStyleProperties.TryGetValue(styleNode, out Dictionary<OdfAttributeName, string?>? map))
+        {
+            var key = new OdfAttributeName(propertyLocalName, propertyNsUri);
+            if (map.TryGetValue(key, out string? cached))
+            {
+                return cached;
+            }
+        }
+
         foreach (var child in styleNode.Children)
         {
             if (child.NodeType == OdfNodeType.Element &&
@@ -191,6 +235,7 @@ public partial class OdfStyleEngine
                     return val;
             }
         }
+
         return null;
     }
     private OdfNode? FindChildElement(OdfNode parent, string localName, string nsUri)

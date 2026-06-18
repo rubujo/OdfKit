@@ -13,24 +13,39 @@ internal static class FormulaCoercion
     /// <summary>
     /// 將儲存格值、陣列或參照清單展平為單一值序列。
     /// </summary>
+    /// <remarks>
+    /// 使用明確堆疊迭代，避免巢狀 <c>yield return</c> 配置多層狀態機（PERF-4a）。
+    /// </remarks>
     public static IEnumerable<object> FlattenValues(object val)
     {
-        if (val is OdfReferenceList refList)
+        var stack = new Stack<object>();
+        stack.Push(val);
+        while (stack.Count > 0)
         {
-            foreach (object r in refList.References)
+            object current = stack.Pop();
+            if (current is OdfReferenceList refList)
             {
-                foreach (object item in FlattenValues(r))
-                    yield return item;
+                for (int i = refList.References.Count - 1; i >= 0; i--)
+                {
+                    stack.Push(refList.References[i]);
+                }
             }
-        }
-        else if (val is object[,] arr)
-        {
-            foreach (object item in arr)
-                yield return item;
-        }
-        else
-        {
-            yield return val;
+            else if (current is object[,] arr)
+            {
+                int rows = arr.GetLength(0);
+                int cols = arr.GetLength(1);
+                for (int r = rows - 1; r >= 0; r--)
+                {
+                    for (int c = cols - 1; c >= 0; c--)
+                    {
+                        stack.Push(arr[r, c]);
+                    }
+                }
+            }
+            else
+            {
+                yield return current;
+            }
         }
     }
 
