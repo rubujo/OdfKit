@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\eng\OdfKit.Package.props" />
   <PropertyGroup>
+    <PackageId>OdfKit.Extensions.Ooxml</PackageId>
     <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -8,13 +10,7 @@
     <AssemblyName>OdfKit.Extensions.Ooxml</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>1.0.0</Version>
-    <Authors>OdfKit Contributors</Authors>
-    <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
-    <Description>OOXML (XLSX) conversion extension for OdfKit using ClosedXML.</Description>
-    <ProjectUrl>https://github.com/OdfKit/OdfKit</ProjectUrl>
-    <RepositoryUrl>https://github.com/OdfKit/OdfKit</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
+    <Description>OOXML (XLSX / DOCX) conversion extension for OdfKit using ClosedXML and Open XML SDK.</Description>
   </PropertyGroup>
 
   <ItemGroup>

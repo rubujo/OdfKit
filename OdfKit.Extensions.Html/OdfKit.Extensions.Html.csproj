@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\eng\OdfKit.Package.props" />
   <PropertyGroup>
+    <PackageId>OdfKit.Extensions.Html</PackageId>
     <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -8,13 +10,7 @@
     <AssemblyName>OdfKit.Extensions.Html</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>1.0.0</Version>
-    <Authors>OdfKit Contributors</Authors>
-    <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
     <Description>HTML export extension for OdfKit using AngleSharp.</Description>
-    <ProjectUrl>https://github.com/OdfKit/OdfKit</ProjectUrl>
-    <RepositoryUrl>https://github.com/OdfKit/OdfKit</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>

@@ -90,12 +90,14 @@
 
 ## Wave 4 — 產品化
 
-| Phase | 產出 |
-|-------|------|
-| REL-1 | NuGet 穩定版、雙 TFM 相容矩陣 |
-| COLLAB-1（選用） | ODT → JSON operations 匯出（對標 ODF Toolkit CLI） |
-| COLLAB-2（選用） | JSON operations → ODT 單向 merge + golden file 對照 |
-| QC-ongoing | 季度 OASIS RNG diff、本檔案季度檢視 |
+| Phase | 狀態 | 產出 |
+|-------|------|------|
+| REL-1 | 基礎 ✅ | `docs/nuget-compatibility-matrix.md`、`eng/OdfKit.Package.props`、`eng/Pack-NuGet.ps1`、`eng/Test-NuGetPack.ps1`、`NuGetPackagingTests` |
+| COLLAB-1（選用） | planned | ODT → JSON operations 匯出（對標 ODF Toolkit CLI） |
+| COLLAB-2（選用） | planned | JSON operations → ODT 單向 merge + golden file 對照 |
+| QC-ongoing | planned | 季度 OASIS RNG diff、本檔案季度檢視 |
+
+REL-1 驗收：`pwsh eng/Test-NuGetPack.ps1`；六套件雙 TFM `.nupkg` + net8.0 消費端煙霧建置。
 
 ## 高階 API 分級定義
 
