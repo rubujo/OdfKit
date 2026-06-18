@@ -13,6 +13,7 @@ using OdfKit.Conversion;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
+using OdfKit.Styles;
 using OdfKit.Text;
 using Xunit;
 using OdfSpreadsheetDocument = OdfKit.Spreadsheet.SpreadsheetDocument;
@@ -222,6 +223,61 @@ public class OoxmlConversionTests
         Assert.Contains(paragraphs, paragraph =>
             paragraph.InnerText.Contains("左右對齊段落", StringComparison.Ordinal) &&
             paragraph.ParagraphProperties?.Justification?.Val?.Value == WP.JustificationValues.Both);
+    }
+
+    /// <summary>
+    /// 驗證 ODT → DOCX 轉換可保留段落內嵌圖片。
+    /// </summary>
+    [Fact]
+    public void OdtToDocx_PreservesInlineImage()
+    {
+        using var odtDoc = TextDocument.Create();
+        var paragraph = odtDoc.AddParagraph();
+        paragraph.AddTextRun("圖片前");
+        var media = new OdfMediaManager(odtDoc.Package);
+        string path = media.AddImage(CreateOnePixelPng(), "pixel.png");
+        paragraph.AddImage(path, OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(1), "pixel.png");
+
+        using var docxStream = new MemoryStream();
+        OdfToDocxConverter.Convert(odtDoc, docxStream);
+        docxStream.Position = 0;
+
+        using var wordDocument = WordprocessingDocument.Open(docxStream, false);
+        var mainPart = Assert.IsType<MainDocumentPart>(wordDocument.MainDocumentPart);
+        Assert.NotEmpty(mainPart.ImageParts);
+
+        WP.Document document = Assert.IsType<WP.Document>(mainPart.Document);
+        WP.Body body = Assert.IsType<WP.Body>(document.Body);
+        Assert.Contains(body.Descendants<WP.Text>(), text => text.Text == "圖片前");
+        Assert.NotEmpty(body.Descendants<WP.Drawing>());
+    }
+
+    /// <summary>
+    /// 驗證 ODT → DOCX 轉換可保留追蹤修訂插入與刪除標記。
+    /// </summary>
+    [Fact]
+    public void OdtToDocx_PreservesTrackedInsertionAndDeletion()
+    {
+        using var odtDoc = TextDocument.Create();
+        var paragraph = odtDoc.AddParagraph();
+        paragraph.AddTextRun("保留");
+        OdfTextRun deleteRun = paragraph.AddTextRun("刪除");
+        odtDoc.TrackedChanges = true;
+        odtDoc.DeleteNode(deleteRun.Node);
+        paragraph.AddTextRun("新增");
+
+        using var docxStream = new MemoryStream();
+        OdfToDocxConverter.Convert(odtDoc, docxStream);
+        docxStream.Position = 0;
+
+        using var wordDocument = WordprocessingDocument.Open(docxStream, false);
+        var mainPart = Assert.IsType<MainDocumentPart>(wordDocument.MainDocumentPart);
+        WP.Document document = Assert.IsType<WP.Document>(mainPart.Document);
+        WP.Body body = Assert.IsType<WP.Body>(document.Body);
+
+        Assert.Contains(body.Descendants<WP.Text>(), text => text.Text == "保留");
+        Assert.Contains(body.Descendants<WP.InsertedRun>(), run => run.InnerText == "新增");
+        Assert.Contains(body.Descendants<WP.DeletedRun>(), run => run.InnerText == "刪除");
     }
 
     /// <summary>

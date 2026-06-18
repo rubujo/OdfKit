@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 using DocumentFormat.OpenXml;
@@ -18,7 +19,7 @@ namespace OdfKit.Conversion;
 
 /// <summary>
 /// 將 <see cref="TextDocument"/> (ODT) 轉換為 DOCX 格式的轉換器。
-/// 支援段落樣式、字元格式、標題、表格與圖片。
+/// 支援段落樣式、字元格式、標題、表格、圖片與追蹤修訂。
 /// </summary>
 public static class OdfToDocxConverter
 {
@@ -37,6 +38,7 @@ public static class OdfToDocxConverter
 
         var ctx = new ConversionContext(odtDocument);
         var imagePartCache = new Dictionary<string, ImagePart>();
+        var trackedChanges = TrackedChangeRegistry.From(odtDocument.BodyTextRoot);
 
         using var wordDoc = WordprocessingDocument.Create(docxStream, WordprocessingDocumentType.Document, autoSave: false);
         var mainPart = wordDoc.AddMainDocumentPart();
@@ -45,7 +47,7 @@ public static class OdfToDocxConverter
 
         AddDefaultStyles(mainPart);
 
-        ConvertBodyNodes(odtDocument.BodyTextRoot, body, mainPart, ctx, odtDocument.Package, imagePartCache);
+        ConvertBodyNodes(odtDocument.BodyTextRoot, body, mainPart, ctx, odtDocument.Package, imagePartCache, trackedChanges);
         ConvertHeaderFooter(odtDocument, mainPart, body);
 
         EnsureBodyEndsWithParagraph(body);
@@ -421,34 +423,40 @@ public static class OdfToDocxConverter
 
     private static void ConvertBodyNodes(OdfNode parent, OpenXmlElement target,
         MainDocumentPart mainPart, ConversionContext ctx, OdfPackage odtPackage,
-        Dictionary<string, ImagePart> imagePartCache)
+        Dictionary<string, ImagePart> imagePartCache, TrackedChangeRegistry trackedChanges)
     {
         foreach (var child in parent.Children)
         {
             if (child.NamespaceUri == OdfNamespaces.Text)
             {
+                if (child.LocalName == "tracked-changes")
+                {
+                    continue;
+                }
+
                 if (child.LocalName == "p")
                 {
-                    target.AppendChild(ConvertParagraph(child, mainPart, ctx, odtPackage, imagePartCache));
+                    target.AppendChild(ConvertParagraph(child, mainPart, ctx, odtPackage, imagePartCache, trackedChanges));
                 }
                 else if (child.LocalName == "h")
                 {
-                    target.AppendChild(ConvertHeading(child, mainPart, ctx, odtPackage, imagePartCache));
+                    target.AppendChild(ConvertHeading(child, mainPart, ctx, odtPackage, imagePartCache, trackedChanges));
                 }
                 else if (child.LocalName == "section")
                 {
-                    ConvertBodyNodes(child, target, mainPart, ctx, odtPackage, imagePartCache);
+                    ConvertBodyNodes(child, target, mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
                 }
             }
             else if (child.LocalName == "table" && child.NamespaceUri == OdfNamespaces.Table)
             {
-                target.AppendChild(ConvertTable(child, mainPart, ctx, odtPackage, imagePartCache));
+                target.AppendChild(ConvertTable(child, mainPart, ctx, odtPackage, imagePartCache, trackedChanges));
             }
         }
     }
 
     private static WP.Paragraph ConvertParagraph(OdfNode node, MainDocumentPart mainPart,
-        ConversionContext ctx, OdfPackage odtPackage, Dictionary<string, ImagePart> imagePartCache)
+        ConversionContext ctx, OdfPackage odtPackage, Dictionary<string, ImagePart> imagePartCache,
+        TrackedChangeRegistry trackedChanges)
     {
         var para = new WP.Paragraph();
         string? styleName = node.GetAttribute("style-name", OdfNamespaces.Text);
@@ -462,12 +470,13 @@ public static class OdfToDocxConverter
 
         StyleInfo? styleInfo = ctx.GetStyle(styleName);
         ApplyParagraphStyle(para, styleInfo);
-        AppendRunsFromNode(node, para, styleInfo, mainPart, ctx, odtPackage, imagePartCache);
+        AppendRunsFromNode(node, para, styleInfo, mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
         return para;
     }
 
     private static WP.Paragraph ConvertHeading(OdfNode node, MainDocumentPart mainPart,
-        ConversionContext ctx, OdfPackage odtPackage, Dictionary<string, ImagePart> imagePartCache)
+        ConversionContext ctx, OdfPackage odtPackage, Dictionary<string, ImagePart> imagePartCache,
+        TrackedChangeRegistry trackedChanges)
     {
         var para = new WP.Paragraph();
         string? levelAttr = node.GetAttribute("outline-level", OdfNamespaces.Text);
@@ -481,7 +490,7 @@ public static class OdfToDocxConverter
 
         string? styleName = node.GetAttribute("style-name", OdfNamespaces.Text);
         ApplyParagraphStyle(para, ctx.GetStyle(styleName));
-        AppendRunsFromNode(node, para, null, mainPart, ctx, odtPackage, imagePartCache);
+        AppendRunsFromNode(node, para, null, mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
         return para;
     }
 
@@ -522,67 +531,312 @@ public static class OdfToDocxConverter
         return properties;
     }
 
-    private static void AppendRunsFromNode(OdfNode node, WP.Paragraph para, StyleInfo? parentStyle,
+    private static void AppendRunsFromNode(OdfNode node, OpenXmlCompositeElement runTarget, StyleInfo? parentStyle,
         MainDocumentPart mainPart, ConversionContext ctx, OdfPackage odtPackage,
-        Dictionary<string, ImagePart> imagePartCache)
+        Dictionary<string, ImagePart> imagePartCache, TrackedChangeRegistry trackedChanges)
     {
-        foreach (var child in node.Children)
+        for (int i = 0; i < node.Children.Count; i++)
         {
+            OdfNode child = node.Children[i];
             if (child.NodeType == OdfNodeType.Text)
             {
                 string txt = child.TextContent ?? string.Empty;
                 if (txt.Length > 0)
-                    para.AppendChild(MakeRun(txt, parentStyle));
+                {
+                    runTarget.AppendChild(MakeRun(txt, parentStyle));
+                }
             }
             else if (child.NodeType == OdfNodeType.Element)
             {
-                if (child.LocalName == "span" && child.NamespaceUri == OdfNamespaces.Text)
+                if (child.LocalName == "change-start" && child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    string? changeId = child.GetAttribute("change-id", OdfNamespaces.Text);
+                    if (string.IsNullOrEmpty(changeId) || !trackedChanges.TryGet(changeId!, out TrackedChangeEntry? entry))
+                    {
+                        continue;
+                    }
+
+                    if (entry.ChangeType == "insertion")
+                    {
+                        var insertedRun = new WP.InsertedRun
+                        {
+                            Author = string.IsNullOrEmpty(entry.Author) ? "Author" : entry.Author,
+                            Date = ToOpenXmlDate(entry.ChangedAt)
+                        };
+                        i = AppendRunsUntilChangeEnd(node, i + 1, changeId!, insertedRun, parentStyle,
+                            mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+                        if (insertedRun.HasChildren)
+                        {
+                            runTarget.AppendChild(insertedRun);
+                        }
+                    }
+                    else if (entry.ChangeType == "deletion")
+                    {
+                        string deletedText = ExtractDeletionText(entry.SpecNode);
+                        if (deletedText.Length > 0)
+                        {
+                            runTarget.AppendChild(new WP.DeletedRun(new WP.Run(new WP.DeletedText(deletedText)))
+                            {
+                                Author = string.IsNullOrEmpty(entry.Author) ? "Author" : entry.Author,
+                                Date = ToOpenXmlDate(entry.ChangedAt)
+                            });
+                        }
+
+                        i = SkipToChangeEnd(node, i + 1, changeId!);
+                    }
+                    else
+                    {
+                        i = AppendRunsUntilChangeEnd(node, i + 1, changeId!, runTarget, parentStyle,
+                            mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+                    }
+                }
+                else if (child.LocalName == "change-end" && child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    continue;
+                }
+                else if (child.LocalName == "span" && child.NamespaceUri == OdfNamespaces.Text)
                 {
                     string? spanStyleName = child.GetAttribute("style-name", OdfNamespaces.Text);
                     StyleInfo? spanStyle = ctx.GetStyle(spanStyleName);
-                    AppendRunsFromNode(child, para, MergeStyles(parentStyle, spanStyle),
-                        mainPart, ctx, odtPackage, imagePartCache);
+                    AppendRunsFromNode(child, runTarget, MergeStyles(parentStyle, spanStyle),
+                        mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
                 }
                 else if (child.LocalName == "s" && child.NamespaceUri == OdfNamespaces.Text)
                 {
                     string? countAttr = child.GetAttribute("c", OdfNamespaces.Text);
                     int count = int.TryParse(countAttr, out int c) ? c : 1;
-                    para.AppendChild(MakeRun(new string(' ', count), parentStyle));
+                    runTarget.AppendChild(MakeRun(new string(' ', count), parentStyle));
                 }
                 else if (child.LocalName == "tab" && child.NamespaceUri == OdfNamespaces.Text)
                 {
                     var run = new WP.Run(new WP.TabChar());
                     if (parentStyle != null)
+                    {
                         run.RunProperties = BuildRunProps(parentStyle);
-                    para.AppendChild(run);
+                    }
+
+                    runTarget.AppendChild(run);
                 }
                 else if (child.LocalName == "line-break" && child.NamespaceUri == OdfNamespaces.Text)
                 {
-                    para.AppendChild(new WP.Run(new WP.Break { Type = WP.BreakValues.TextWrapping }));
+                    runTarget.AppendChild(new WP.Run(new WP.Break { Type = WP.BreakValues.TextWrapping }));
                 }
                 else if (child.LocalName == "frame" && child.NamespaceUri == OdfNamespaces.Draw)
                 {
-                    var drawing = TryConvertImage(child, mainPart, odtPackage, imagePartCache);
+                    WP.Drawing? drawing = TryConvertImage(child, mainPart, odtPackage, imagePartCache);
                     if (drawing != null)
-                        para.AppendChild(new WP.Run(drawing));
+                    {
+                        runTarget.AppendChild(new WP.Run(drawing));
+                    }
                 }
                 else
                 {
                     string? textContent = child.TextContent;
                     if (!string.IsNullOrEmpty(textContent))
-                        para.AppendChild(MakeRun(textContent!, parentStyle));
+                    {
+                        runTarget.AppendChild(MakeRun(textContent!, parentStyle));
+                    }
                 }
             }
         }
 
-        bool hasContent = false;
-        foreach (var el in para.ChildElements)
+        if (runTarget is WP.Paragraph para)
         {
-            if (el is WP.Run || el is WP.Hyperlink)
-            { hasContent = true; break; }
+            bool hasContent = false;
+            foreach (OpenXmlElement el in para.ChildElements)
+            {
+                if (el is WP.Run or WP.Hyperlink or WP.InsertedRun or WP.DeletedRun)
+                {
+                    hasContent = true;
+                    break;
+                }
+            }
+
+            if (!hasContent)
+            {
+                para.AppendChild(new WP.Run());
+            }
         }
-        if (!hasContent)
-            para.AppendChild(new WP.Run());
+    }
+
+    private static int AppendRunsUntilChangeEnd(OdfNode parent, int startIndex, string changeId,
+        OpenXmlCompositeElement runTarget, StyleInfo? parentStyle, MainDocumentPart mainPart,
+        ConversionContext ctx, OdfPackage odtPackage, Dictionary<string, ImagePart> imagePartCache,
+        TrackedChangeRegistry trackedChanges)
+    {
+        for (int i = startIndex; i < parent.Children.Count; i++)
+        {
+            OdfNode child = parent.Children[i];
+            if (child.LocalName == "change-end" && child.NamespaceUri == OdfNamespaces.Text &&
+                child.GetAttribute("change-id", OdfNamespaces.Text) == changeId)
+            {
+                return i;
+            }
+
+            ProcessChildAsRuns(child, runTarget, parentStyle, mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+        }
+
+        return parent.Children.Count - 1;
+    }
+
+    private static void ProcessChildAsRuns(OdfNode child, OpenXmlCompositeElement runTarget, StyleInfo? parentStyle,
+        MainDocumentPart mainPart, ConversionContext ctx, OdfPackage odtPackage,
+        Dictionary<string, ImagePart> imagePartCache, TrackedChangeRegistry trackedChanges)
+    {
+        if (child.NodeType == OdfNodeType.Text)
+        {
+            string txt = child.TextContent ?? string.Empty;
+            if (txt.Length > 0)
+            {
+                runTarget.AppendChild(MakeRun(txt, parentStyle));
+            }
+
+            return;
+        }
+
+        if (child.NodeType != OdfNodeType.Element)
+        {
+            return;
+        }
+
+        if (child.LocalName == "change-start" && child.NamespaceUri == OdfNamespaces.Text)
+        {
+            string? changeId = child.GetAttribute("change-id", OdfNamespaces.Text);
+            if (string.IsNullOrEmpty(changeId) || !trackedChanges.TryGet(changeId!, out TrackedChangeEntry? entry))
+            {
+                return;
+            }
+
+            if (entry.ChangeType == "insertion")
+            {
+                var insertedRun = new WP.InsertedRun
+                {
+                    Author = string.IsNullOrEmpty(entry.Author) ? "Author" : entry.Author,
+                    Date = ToOpenXmlDate(entry.ChangedAt)
+                };
+                OdfNode? parent = child.Parent;
+                if (parent is not null)
+                {
+                    int startIndex = parent.Children.IndexOf(child) + 1;
+                    AppendRunsUntilChangeEnd(parent, startIndex, changeId!, insertedRun, parentStyle,
+                        mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+                }
+
+                if (insertedRun.HasChildren)
+                {
+                    runTarget.AppendChild(insertedRun);
+                }
+            }
+            else if (entry.ChangeType == "deletion")
+            {
+                string deletedText = ExtractDeletionText(entry.SpecNode);
+                if (deletedText.Length > 0)
+                {
+                    runTarget.AppendChild(new WP.DeletedRun(new WP.Run(new WP.DeletedText(deletedText)))
+                    {
+                        Author = string.IsNullOrEmpty(entry.Author) ? "Author" : entry.Author,
+                        Date = ToOpenXmlDate(entry.ChangedAt)
+                    });
+                }
+            }
+            else if (child.Parent is OdfNode parentNode)
+            {
+                int startIndex = parentNode.Children.IndexOf(child) + 1;
+                AppendRunsUntilChangeEnd(parentNode, startIndex, changeId!, runTarget, parentStyle,
+                    mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+            }
+
+            return;
+        }
+
+        if (child.LocalName == "change-end" && child.NamespaceUri == OdfNamespaces.Text)
+        {
+            return;
+        }
+
+        if (child.LocalName == "span" && child.NamespaceUri == OdfNamespaces.Text)
+        {
+            string? spanStyleName = child.GetAttribute("style-name", OdfNamespaces.Text);
+            StyleInfo? spanStyle = ctx.GetStyle(spanStyleName);
+            AppendRunsFromNode(child, runTarget, MergeStyles(parentStyle, spanStyle),
+                mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
+            return;
+        }
+
+        if (child.LocalName == "s" && child.NamespaceUri == OdfNamespaces.Text)
+        {
+            string? countAttr = child.GetAttribute("c", OdfNamespaces.Text);
+            int count = int.TryParse(countAttr, out int c) ? c : 1;
+            runTarget.AppendChild(MakeRun(new string(' ', count), parentStyle));
+            return;
+        }
+
+        if (child.LocalName == "tab" && child.NamespaceUri == OdfNamespaces.Text)
+        {
+            var run = new WP.Run(new WP.TabChar());
+            if (parentStyle != null)
+            {
+                run.RunProperties = BuildRunProps(parentStyle);
+            }
+
+            runTarget.AppendChild(run);
+            return;
+        }
+
+        if (child.LocalName == "line-break" && child.NamespaceUri == OdfNamespaces.Text)
+        {
+            runTarget.AppendChild(new WP.Run(new WP.Break { Type = WP.BreakValues.TextWrapping }));
+            return;
+        }
+
+        if (child.LocalName == "frame" && child.NamespaceUri == OdfNamespaces.Draw)
+        {
+            WP.Drawing? drawing = TryConvertImage(child, mainPart, odtPackage, imagePartCache);
+            if (drawing != null)
+            {
+                runTarget.AppendChild(new WP.Run(drawing));
+            }
+
+            return;
+        }
+
+        string? textContent = child.TextContent;
+        if (!string.IsNullOrEmpty(textContent))
+        {
+            runTarget.AppendChild(MakeRun(textContent!, parentStyle));
+        }
+    }
+
+    private static int SkipToChangeEnd(OdfNode parent, int startIndex, string changeId)
+    {
+        for (int i = startIndex; i < parent.Children.Count; i++)
+        {
+            OdfNode child = parent.Children[i];
+            if (child.LocalName == "change-end" && child.NamespaceUri == OdfNamespaces.Text &&
+                child.GetAttribute("change-id", OdfNamespaces.Text) == changeId)
+            {
+                return i;
+            }
+        }
+
+        return parent.Children.Count - 1;
+    }
+
+    private static string ExtractDeletionText(OdfNode deletionSpec)
+    {
+        var builder = new StringBuilder();
+        OdfTrackedChangeTextExtractor.ExtractTextContentIgnoringChangeInfo(deletionSpec, builder);
+        return builder.ToString();
+    }
+
+    private static DateTimeValue? ToOpenXmlDate(DateTime changedAt)
+    {
+        if (changedAt == DateTime.MinValue)
+        {
+            return null;
+        }
+
+        return new DateTimeValue(changedAt.ToUniversalTime());
     }
 
     private static WP.Run MakeRun(string text, StyleInfo? style)
@@ -641,7 +895,8 @@ public static class OdfToDocxConverter
     // -------------------------------------------------------------------------
 
     private static WP.Table ConvertTable(OdfNode tableNode, MainDocumentPart mainPart,
-        ConversionContext ctx, OdfPackage odtPackage, Dictionary<string, ImagePart> imagePartCache)
+        ConversionContext ctx, OdfPackage odtPackage, Dictionary<string, ImagePart> imagePartCache,
+        TrackedChangeRegistry trackedChanges)
     {
         var table = new WP.Table();
         var tableProps = new WP.TableProperties(
@@ -666,7 +921,7 @@ public static class OdfToDocxConverter
                     {
                         var cell = new WP.TableCell();
                         var cellPara = new WP.Paragraph();
-                        AppendRunsFromNode(cellNode, cellPara, null, mainPart, ctx, odtPackage, imagePartCache);
+                        AppendRunsFromNode(cellNode, cellPara, null, mainPart, ctx, odtPackage, imagePartCache, trackedChanges);
                         cell.AppendChild(cellPara);
                         row.AppendChild(cell);
                     }
@@ -885,5 +1140,76 @@ public static class OdfToDocxConverter
             default:
                 return "Normal";
         }
+    }
+
+    private sealed class TrackedChangeEntry
+    {
+        public TrackedChangeEntry(string changeType, string author, DateTime changedAt, OdfNode specNode)
+        {
+            ChangeType = changeType;
+            Author = author;
+            ChangedAt = changedAt;
+            SpecNode = specNode;
+        }
+
+        public string ChangeType { get; }
+        public string Author { get; }
+        public DateTime ChangedAt { get; }
+        public OdfNode SpecNode { get; }
+    }
+
+    private sealed class TrackedChangeRegistry
+    {
+        private readonly Dictionary<string, TrackedChangeEntry> _entries = new(StringComparer.Ordinal);
+
+        public static TrackedChangeRegistry From(OdfNode bodyTextRoot)
+        {
+            var registry = new TrackedChangeRegistry();
+            OdfNode? trackedChangesNode = null;
+            foreach (OdfNode child in bodyTextRoot.Children)
+            {
+                if (child.LocalName == "tracked-changes" && child.NamespaceUri == OdfNamespaces.Text)
+                {
+                    trackedChangesNode = child;
+                    break;
+                }
+            }
+
+            if (trackedChangesNode is null)
+            {
+                return registry;
+            }
+
+            foreach (OdfNode changedRegion in trackedChangesNode.Children)
+            {
+                string? id = changedRegion.GetAttribute("id", OdfNamespaces.Text);
+                if (string.IsNullOrEmpty(id))
+                {
+                    continue;
+                }
+
+                foreach (OdfNode spec in changedRegion.Children)
+                {
+                    if (spec.NamespaceUri != OdfNamespaces.Text)
+                    {
+                        continue;
+                    }
+
+                    if (spec.LocalName is not ("insertion" or "deletion" or "format-change"))
+                    {
+                        continue;
+                    }
+
+                    (string author, DateTime changedAt) = OdfTrackedChangeMetadataReader.Read(spec);
+                    registry._entries[id!] = new TrackedChangeEntry(spec.LocalName, author, changedAt, spec);
+                    break;
+                }
+            }
+
+            return registry;
+        }
+
+        public bool TryGet(string changeId, out TrackedChangeEntry entry) =>
+            _entries.TryGetValue(changeId, out entry!);
     }
 }

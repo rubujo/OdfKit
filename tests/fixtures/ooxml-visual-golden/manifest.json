@@ -11,7 +11,7 @@
       "baselineRenderer": "libreoffice-pdf",
       "candidateRenderer": "microsoft-word-pdf",
       "test": "OfficeInteropConversionTests.WordAndLibreOffice_RenderConvertedDocxToPdf",
-      "sampleFeatures": ["heading", "styled-run", "table", "header-footer"]
+      "sampleFeatures": ["heading", "styled-run", "table", "header-footer", "tracked-changes-forward"]
     },
     {
       "id": "ods-xlsx-excel-pdf",
