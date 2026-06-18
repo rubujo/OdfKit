@@ -33,6 +33,7 @@
     <ProjectReference Include="..\OdfKit.Extensions.Imaging\OdfKit.Extensions.Imaging.csproj" />
     <ProjectReference Include="..\OdfKit.Extensions.Ooxml\OdfKit.Extensions.Ooxml.csproj" />
     <ProjectReference Include="..\OdfKit.Extensions.Html\OdfKit.Extensions.Html.csproj" />
+    <ProjectReference Include="..\OdfKit.Extensions.Rdf\OdfKit.Extensions.Rdf.csproj" />
     <ProjectReference Include="..\tools\OdfKit.Cli\OdfKit.Cli.csproj" />
     <ProjectReference Include="..\tools\OdfSchemaGenerator\OdfSchemaGenerator.csproj" />
     <ProjectReference Include="MockSoffice\MockSoffice.csproj" ReferenceOutputAssembly="false" OutputItemType="None" />

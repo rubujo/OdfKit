@@ -15,6 +15,7 @@ OdfKit 專案採用 [CC0-1.0 Universal](https://creativecommons.org/publicdomain
 | [ScottPlot](https://github.com/ScottPlot/ScottPlot) | 記憶體內圖表繪製與 fallback 影像視覺化（於 OdfKit.Extensions.Imaging 中使用） | [MIT](https://github.com/ScottPlot/ScottPlot/blob/main/LICENSE) |
 | [ClosedXML](https://github.com/ClosedXML/ClosedXML) / [DocumentFormat.OpenXml](https://github.com/dotnet/Open-XML-SDK) | 用於 OOXML 格式（如 Excel）之整合與匯入匯出（於 OdfKit.Extensions.Ooxml 中使用） | [MIT](https://github.com/ClosedXML/ClosedXML/blob/master/LICENSE) / [MIT](https://github.com/dotnet/Open-XML-SDK/blob/main/LICENSE) |
 | [PDFsharp-MigraDoc](https://github.com/empira/PDFsharp) | PDF 相關處理、排版與繪製擴充（於 OdfKit.Extensions.Pdf 中使用） | [MIT](https://github.com/empira/PDFsharp/blob/master/LICENSE) |
+| [dotNetRdf.Core](https://github.com/dotnetrdf/dotnetrdf) | RDF 圖形與 SPARQL 查詢橋接（於 OdfKit.Extensions.Rdf 中使用） | [MIT](https://github.com/dotnetrdf/dotnetrdf/blob/master/License.txt) |
 | [OASIS OpenDocument Relax-NG Schemas](https://www.oasis-open.org/committees/office/) | ODF 1.1 / 1.2 / 1.3 / 1.4 XML 結構驗證與代碼生成（置於 tools/OdfSchemaGenerator/schemas/） | [OASIS Copyright](https://www.oasis-open.org/committees/office/ipr.php) |
 
 分發包含上述相依套件的應用程式時，請依各套件之授權條款，保留其必要的授權與著作權聲明。

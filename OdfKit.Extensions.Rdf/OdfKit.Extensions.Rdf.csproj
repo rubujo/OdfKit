@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\eng\OdfKit.Package.props" />
+  <PropertyGroup>
+    <PackageId>OdfKit.Extensions.Rdf</PackageId>
+    <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>OdfKit.Extensions.Rdf</RootNamespace>
+    <AssemblyName>OdfKit.Extensions.Rdf</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Description>dotNetRDF SPARQL bridge for OdfKit manifest.rdf metadata.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dotNetRdf.Core" Version="3.5.1" />
+  </ItemGroup>
+</Project>
