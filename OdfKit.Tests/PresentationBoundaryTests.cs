@@ -280,12 +280,8 @@ namespace OdfKit.Tests
             var ex4 = Assert.Throws<SecurityException>(() => doc.CreateEmbeddedDocument<OdfFormulaDocument>(@"\\UNC\Path"));
 
             // Attempt to get embedded document with traversal paths
-            // It will throw TargetInvocationException wrapping SecurityException since constructors are invoked via reflection
-            var ex5 = Assert.Throws<TargetInvocationException>(() => doc.GetEmbeddedDocument<OdfChartDocument>("../EvilChart"));
-            Assert.IsType<SecurityException>(ex5.InnerException);
-
-            var ex6 = Assert.Throws<TargetInvocationException>(() => doc.GetEmbeddedDocument<OdfFormulaDocument>("SubFolder/../../EvilFormula"));
-            Assert.IsType<SecurityException>(ex6.InnerException);
+            Assert.Throws<SecurityException>(() => doc.GetEmbeddedDocument<OdfChartDocument>("../EvilChart"));
+            Assert.Throws<SecurityException>(() => doc.GetEmbeddedDocument<OdfFormulaDocument>("SubFolder/../../EvilFormula"));
         }
 
         #endregion

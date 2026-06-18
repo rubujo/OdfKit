@@ -51,6 +51,13 @@ internal static class FormulaStatisticalFunctionHandlers
             if (val is OdfFormulaError err)
                 return err;
 
+            if (val is object[,] matrix && FormulaNumericAggregation.TryScanNumericMatrix(matrix, out var scan))
+            {
+                sum += scan.Sum;
+                count += scan.Count;
+                continue;
+            }
+
             foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
                 if (FormulaCoercion.TryCoerceDouble(innerVal, out double d))
@@ -72,6 +79,12 @@ internal static class FormulaStatisticalFunctionHandlers
             var val = arg.Evaluate(context);
             if (val is OdfFormulaError)
                 continue;
+
+            if (val is object[,] matrix && FormulaNumericAggregation.TryScanNumericMatrix(matrix, out var scan))
+            {
+                count += scan.Count;
+                continue;
+            }
 
             foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {

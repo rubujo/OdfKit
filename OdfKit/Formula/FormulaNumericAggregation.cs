@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Buffers;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace OdfKit.Formula;
@@ -8,6 +9,23 @@ namespace OdfKit.Formula;
 /// </summary>
 internal static class FormulaNumericAggregation
 {
+    /// <summary>
+    /// 純數值矩陣掃描結果。
+    /// </summary>
+    internal readonly struct NumericMatrixScan
+    {
+        internal NumericMatrixScan(double sum, int count, bool success)
+        {
+            Sum = sum;
+            Count = count;
+            Success = success;
+        }
+
+        internal double Sum { get; }
+        internal int Count { get; }
+        internal bool Success { get; }
+    }
+
     /// <summary>
     /// 以 SIMD 加速連續 <see cref="double"/> 陣列的總和；不足一個向量寬度時退回純量累加。
     /// </summary>
@@ -52,39 +70,62 @@ internal static class FormulaNumericAggregation
     /// </summary>
     internal static bool TrySumMatrix(object[,] matrix, out double sum)
     {
+        if (!TryScanNumericMatrix(matrix, out NumericMatrixScan scan))
+        {
+            sum = 0;
+            return false;
+        }
+
+        sum = scan.Sum;
+        return true;
+    }
+
+    /// <summary>
+    /// 嘗試對可完全轉為 <see cref="double"/> 的二維陣列計算總和與有效計數。
+    /// </summary>
+    internal static bool TryScanNumericMatrix(object[,] matrix, out NumericMatrixScan scan)
+    {
         int rows = matrix.GetLength(0);
         int cols = matrix.GetLength(1);
         int total = rows * cols;
         if (total == 0)
         {
-            sum = 0;
+            scan = new NumericMatrixScan(0, 0, true);
             return true;
         }
 
-        var buffer = new double[total];
-        int offset = 0;
-        for (int r = 0; r < rows; r++)
+        double[] buffer = ArrayPool<double>.Shared.Rent(total);
+        try
         {
-            for (int c = 0; c < cols; c++)
+            int offset = 0;
+            for (int r = 0; r < rows; r++)
             {
-                object? cell = matrix[r, c];
-                if (cell is null || cell is string)
+                for (int c = 0; c < cols; c++)
                 {
-                    sum = 0;
-                    return false;
-                }
+                    object? cell = matrix[r, c];
+                    if (cell is null)
+                    {
+                        scan = default;
+                        return false;
+                    }
 
-                if (!FormulaCoercion.TryCoerceDouble(cell, out double value))
-                {
-                    sum = 0;
-                    return false;
-                }
+                    if (!FormulaCoercion.TryCoerceDouble(cell, out double value))
+                    {
+                        scan = default;
+                        return false;
+                    }
 
-                buffer[offset++] = value;
+                    buffer[offset++] = value;
+                }
             }
-        }
 
-        sum = Sum(buffer);
-        return true;
+            double sum = Sum(buffer.AsSpan(0, total));
+            scan = new NumericMatrixScan(sum, total, true);
+            return true;
+        }
+        finally
+        {
+            ArrayPool<double>.Shared.Return(buffer);
+        }
     }
 }

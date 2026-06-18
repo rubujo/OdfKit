@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
+using System.Reflection;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using OdfKit.Compliance;
-using OdfKit.Core;
-using OdfKit.DOM;
-using OdfKit.Styles;
 
 namespace OdfKit.Core;
 
@@ -21,10 +15,6 @@ public abstract partial class OdfDocument
     /// <typeparam name="T">嵌入式文件 wrapper 類型。</typeparam>
     /// <param name="subPath">封裝中的子路徑。</param>
     /// <returns>嵌入式文件 wrapper。</returns>
-#if !NETSTANDARD2_0
-    [RequiresUnreferencedCode("以反射建立嵌入式文件類型；Native AOT 需改為編譯期註冊建構函式。")]
-    [RequiresDynamicCode("以反射建立嵌入式文件類型；Native AOT 需改為編譯期註冊建構函式。")]
-#endif
     public T GetEmbeddedDocument<T>(string subPath) where T : OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
@@ -32,22 +22,12 @@ public abstract partial class OdfDocument
         if (!subPath.EndsWith("/"))
             subPath += "/";
 
-        var ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage), typeof(string) });
-        if (ctor != null)
+        if (OdfEmbeddedDocumentFactory.TryCreate(Package, subPath, out T document))
         {
-            return (T)ctor.Invoke(new object[] { Package, subPath });
+            return document;
         }
-        else
-        {
-            ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage) });
-            if (ctor != null)
-            {
-                var doc = (T)ctor.Invoke(new object[] { Package });
-                doc.SubPath = subPath;
-                return doc;
-            }
-        }
-        throw new InvalidOperationException($"Type {typeof(T).Name} does not have a compatible constructor.");
+
+        return CreateEmbeddedViaReflection<T>(Package, subPath);
     }
 
     /// <summary>
@@ -56,10 +36,6 @@ public abstract partial class OdfDocument
     /// <typeparam name="T">嵌入式文件 wrapper 類型。</typeparam>
     /// <param name="subPath">封裝中的子路徑。</param>
     /// <returns>建立完成的嵌入式文件 wrapper。</returns>
-#if !NETSTANDARD2_0
-    [RequiresUnreferencedCode("以反射建立嵌入式文件類型；Native AOT 需改為編譯期註冊建構函式。")]
-    [RequiresDynamicCode("以反射建立嵌入式文件類型；Native AOT 需改為編譯期註冊建構函式。")]
-#endif
     public T CreateEmbeddedDocument<T>(string subPath) where T : OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
@@ -67,40 +43,41 @@ public abstract partial class OdfDocument
         if (!subPath.EndsWith("/"))
             subPath += "/";
 
-        string mimeType = typeof(T) switch
-        {
-            Type t when t == typeof(Presentation.PresentationDocument) => "application/vnd.oasis.opendocument.presentation",
-            Type t when t == typeof(Spreadsheet.SpreadsheetDocument) => "application/vnd.oasis.opendocument.spreadsheet",
-            Type t when t == typeof(OdfKit.Chart.OdfChartDocument) || t == typeof(OdfKit.Chart.ChartDocument) => "application/vnd.oasis.opendocument.chart",
-            Type t when t == typeof(OdfKit.Formula.OdfFormulaDocument) || t == typeof(OdfKit.Formula.FormulaDocument) => "application/vnd.oasis.opendocument.formula",
-            _ => "application/vnd.oasis.opendocument.text"
-        };
-
+        string mimeType = OdfEmbeddedDocumentFactory.GetMimeType<T>();
         string mimePath = subPath + "mimetype";
         Package.WriteEntry(mimePath, Encoding.UTF8.GetBytes(mimeType), "");
 
         T doc;
-        var ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage), typeof(string) });
-        if (ctor != null)
+        if (!OdfEmbeddedDocumentFactory.TryCreate(Package, subPath, out doc))
         {
-            doc = (T)ctor.Invoke(new object[] { Package, subPath });
-        }
-        else
-        {
-            ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage) });
-            if (ctor != null)
-            {
-                doc = (T)ctor.Invoke(new object[] { Package });
-                doc.SubPath = subPath;
-            }
-            else
-            {
-                throw new InvalidOperationException($"Type {typeof(T).Name} does not have a compatible constructor.");
-            }
+            doc = CreateEmbeddedViaReflection<T>(Package, subPath);
         }
 
         doc.Save();
         return doc;
+    }
+
+#if !NETSTANDARD2_0
+    [RequiresUnreferencedCode("未註冊的嵌入式文件類型仍以反射建立；請呼叫 OdfEmbeddedDocumentFactory 註冊。")]
+    [RequiresDynamicCode("未註冊的嵌入式文件類型仍以反射建立；請呼叫 OdfEmbeddedDocumentFactory 註冊。")]
+#endif
+    private static T CreateEmbeddedViaReflection<T>(OdfPackage package, string subPath) where T : OdfDocument
+    {
+        var ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage), typeof(string) });
+        if (ctor is not null)
+        {
+            return (T)ctor.Invoke(new object[] { package, subPath });
+        }
+
+        ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage) });
+        if (ctor is not null)
+        {
+            var doc = (T)ctor.Invoke(new object[] { package });
+            doc.SubPath = subPath;
+            return doc;
+        }
+
+        throw new InvalidOperationException($"Type {typeof(T).Name} does not have a compatible constructor.");
     }
 
     #endregion
