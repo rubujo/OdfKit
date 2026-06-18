@@ -30,8 +30,18 @@ public class SecondaryFormatApiScenarioTests
         chartDoc.SetAxisTitle("y", "銷售額");
         chartDoc.SetAxisMaximum("y", 500);
         chartDoc.SetAxisGrid("y", OdfChartGridKind.Major, true);
+        OdfChartStyle axisStyle = chartDoc.CreateChartStyle("AxisGridStyle");
+        axisStyle.StrokeColor = "#808080";
+        chartDoc.SetAxisStyleName("y", "AxisGridStyle");
         if (chartDoc.SeriesCount > 0)
-            chartDoc.GetSeriesEditor(0).SeriesClass = "chart:bar";
+        {
+            OdfChartStyle seriesStyle = chartDoc.CreateChartStyle("SeriesBarStyle");
+            seriesStyle.FillColor = "#3366CC";
+            seriesStyle.StrokeColor = "#000000";
+            OdfChartSeries series = chartDoc.GetSeriesEditor(0);
+            series.SeriesClass = "chart:bar";
+            series.StyleName = "SeriesBarStyle";
+        }
 
         using var stream = new MemoryStream();
         chartDoc.SaveToStream(stream);
@@ -44,7 +54,17 @@ public class SecondaryFormatApiScenarioTests
         Assert.Equal(500, axisInfo.Maximum);
         Assert.True(axisInfo.HasMajorGrid);
         if (loaded.SeriesCount > 0)
+        {
             Assert.Equal("chart:bar", loaded.Series[0].SeriesClass);
+            Assert.Equal("SeriesBarStyle", loaded.Series[0].StyleName);
+            OdfChartStyleInfo? seriesStyle = loaded.TryGetChartStyle("SeriesBarStyle");
+            Assert.NotNull(seriesStyle);
+            Assert.Equal("#3366CC", seriesStyle!.FillColor);
+        }
+
+        OdfChartStyleInfo? axisStyleInfo = loaded.TryGetChartStyle("AxisGridStyle");
+        Assert.NotNull(axisStyleInfo);
+        Assert.Equal("#808080", axisStyleInfo!.StrokeColor);
     }
 
     /// <summary>

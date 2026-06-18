@@ -334,6 +334,36 @@ public class ChartHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證圖表自動樣式可建立、指派至序列並於儲存／載入後讀回。
+    /// </summary>
+    [Fact]
+    public void ChartStyle_CreateAssignAndRoundTrip()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
+
+        OdfChartStyle seriesStyle = chartDoc.CreateChartStyle("SeriesRed");
+        seriesStyle.FillColor = "#FF0000";
+        seriesStyle.StrokeColor = "#000000";
+        seriesStyle.StrokeWidth = "0.05cm";
+
+        chartDoc.GetSeriesEditor(0).StyleName = "SeriesRed";
+
+        using var stream = new MemoryStream();
+        chartDoc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfChartDocument loaded = OdfChartDocument.Load(stream);
+        OdfChartStyleInfo? styleInfo = loaded.TryGetChartStyle("SeriesRed");
+        Assert.NotNull(styleInfo);
+        Assert.Equal("#FF0000", styleInfo!.FillColor);
+        Assert.Equal("#000000", styleInfo.StrokeColor);
+        Assert.Equal("0.05cm", styleInfo.StrokeWidth);
+        Assert.Equal("SeriesRed", loaded.Series[0].StyleName);
+        Assert.Single(loaded.GetChartStyles());
+    }
+
+    /// <summary>
     /// 驗證 SetDataRange 與 GetDataRange 對帶空格工作表名稱的往返一致性。
     /// </summary>
     [Fact]
