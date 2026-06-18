@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -302,11 +303,7 @@ public static class OdfToDocxConverter
             XmlNamespaceManager ns, StyleInfo info)
         {
             var paragraphProps = styleNode.SelectSingleNode("style:paragraph-properties", ns);
-            string? textAlign = paragraphProps?.GetAttribute("text-align", OdfNamespaces.Fo);
-            if (!string.IsNullOrEmpty(textAlign))
-            {
-                info.TextAlign = textAlign;
-            }
+            ReadParagraphLayoutProperties(paragraphProps, info);
 
             var textProps = styleNode.SelectSingleNode("style:text-properties", ns);
             if (textProps == null)
@@ -338,11 +335,7 @@ public static class OdfToDocxConverter
             {
                 if (child.LocalName == "paragraph-properties" && child.NamespaceUri == OdfNamespaces.Style)
                 {
-                    string? textAlign = child.GetAttribute("text-align", OdfNamespaces.Fo);
-                    if (!string.IsNullOrEmpty(textAlign))
-                    {
-                        info.TextAlign = textAlign;
-                    }
+                    ReadParagraphLayoutProperties(child, info);
                     break;
                 }
             }
@@ -415,6 +408,10 @@ public static class OdfToDocxConverter
         public string? Color;
         public double? FontSizePt;
         public string? TextAlign;
+        public string? MarginLeft;
+        public string? MarginRight;
+        public string? MarginTop;
+        public string? LineHeight;
     }
 
     // -------------------------------------------------------------------------
@@ -501,51 +498,142 @@ public static class OdfToDocxConverter
         ApplyParagraphStyleToProperties(properties, styleInfo);
     }
 
+    private static void ReadParagraphLayoutProperties(XPathNavigator? paragraphProps, StyleInfo info)
+    {
+        if (paragraphProps is null)
+        {
+            return;
+        }
+
+        AssignParagraphLayoutProperties(
+            info,
+            paragraphProps.GetAttribute("text-align", OdfNamespaces.Fo),
+            paragraphProps.GetAttribute("margin-left", OdfNamespaces.Fo),
+            paragraphProps.GetAttribute("margin-right", OdfNamespaces.Fo),
+            paragraphProps.GetAttribute("margin-top", OdfNamespaces.Fo),
+            paragraphProps.GetAttribute("line-height", OdfNamespaces.Fo));
+    }
+
+    private static void ReadParagraphLayoutProperties(OdfNode? paragraphProps, StyleInfo info)
+    {
+        if (paragraphProps is null)
+        {
+            return;
+        }
+
+        AssignParagraphLayoutProperties(
+            info,
+            paragraphProps.GetAttribute("text-align", OdfNamespaces.Fo),
+            paragraphProps.GetAttribute("margin-left", OdfNamespaces.Fo),
+            paragraphProps.GetAttribute("margin-right", OdfNamespaces.Fo),
+            paragraphProps.GetAttribute("margin-top", OdfNamespaces.Fo),
+            paragraphProps.GetAttribute("line-height", OdfNamespaces.Fo));
+    }
+
+    private static void AssignParagraphLayoutProperties(
+        StyleInfo info,
+        string? textAlign,
+        string? marginLeft,
+        string? marginRight,
+        string? marginTop,
+        string? lineHeight)
+    {
+        if (!string.IsNullOrEmpty(textAlign))
+        {
+            info.TextAlign = textAlign;
+        }
+
+        if (!string.IsNullOrEmpty(marginLeft))
+        {
+            info.MarginLeft = marginLeft;
+        }
+
+        if (!string.IsNullOrEmpty(marginRight))
+        {
+            info.MarginRight = marginRight;
+        }
+
+        if (!string.IsNullOrEmpty(marginTop))
+        {
+            info.MarginTop = marginTop;
+        }
+
+        if (!string.IsNullOrEmpty(lineHeight))
+        {
+            info.LineHeight = lineHeight;
+        }
+    }
+
     private static void ApplyParagraphStyleToProperties(WP.ParagraphProperties properties, StyleInfo? styleInfo)
     {
-        if (styleInfo?.TextAlign is null)
+        if (styleInfo is null)
         {
             return;
         }
 
-        WP.JustificationValues? justification = styleInfo.TextAlign switch
+        if (styleInfo.TextAlign is not null)
         {
-            "center" => WP.JustificationValues.Center,
-            "end" or "right" => WP.JustificationValues.Right,
-            "justify" => WP.JustificationValues.Both,
-            "start" or "left" => WP.JustificationValues.Left,
-            _ => null
-        };
-        if (justification is null)
-        {
-            return;
+            WP.JustificationValues? justification = styleInfo.TextAlign switch
+            {
+                "center" => WP.JustificationValues.Center,
+                "end" or "right" => WP.JustificationValues.Right,
+                "justify" => WP.JustificationValues.Both,
+                "start" or "left" => WP.JustificationValues.Left,
+                _ => null,
+            };
+            if (justification is not null)
+            {
+                properties.AppendChild(new WP.Justification { Val = justification.Value });
+            }
         }
 
-        properties.AppendChild(new WP.Justification { Val = justification.Value });
+        int? leftTwips = OoxmlUnitConverter.TryParseOdfLengthToTwips(styleInfo.MarginLeft);
+        int? rightTwips = OoxmlUnitConverter.TryParseOdfLengthToTwips(styleInfo.MarginRight);
+        if (leftTwips is not null || rightTwips is not null)
+        {
+            var indentation = new WP.Indentation();
+            if (leftTwips is not null)
+            {
+                indentation.Left = leftTwips.Value.ToString(CultureInfo.InvariantCulture);
+            }
+
+            if (rightTwips is not null)
+            {
+                indentation.Right = rightTwips.Value.ToString(CultureInfo.InvariantCulture);
+            }
+
+            properties.AppendChild(indentation);
+        }
+
+        int? beforeTwips = OoxmlUnitConverter.TryParseOdfLengthToTwips(styleInfo.MarginTop);
+        (int? lineTwips, bool isAutoRule) = OoxmlUnitConverter.TryParseOdfLineHeight(styleInfo.LineHeight);
+        if (beforeTwips is not null || lineTwips is not null)
+        {
+            WP.SpacingBetweenLines spacing = properties.GetFirstChild<WP.SpacingBetweenLines>()
+                ?? properties.AppendChild(new WP.SpacingBetweenLines());
+            if (beforeTwips is not null)
+            {
+                spacing.Before = beforeTwips.Value.ToString(CultureInfo.InvariantCulture);
+            }
+
+            if (lineTwips is not null)
+            {
+                spacing.Line = lineTwips.Value.ToString(CultureInfo.InvariantCulture);
+                spacing.LineRule = isAutoRule ? WP.LineSpacingRuleValues.Auto : WP.LineSpacingRuleValues.Exact;
+            }
+        }
     }
 
     private static void ApplyParagraphStyleToExtendedProperties(WP.ParagraphPropertiesExtended properties,
         StyleInfo? styleInfo)
     {
-        if (styleInfo?.TextAlign is null)
+        var wrapper = new WP.ParagraphProperties();
+        ApplyParagraphStyleToProperties(wrapper, styleInfo);
+        foreach (OpenXmlElement child in wrapper.ChildElements.ToList())
         {
-            return;
+            child.Remove();
+            properties.AppendChild(child);
         }
-
-        WP.JustificationValues? justification = styleInfo.TextAlign switch
-        {
-            "center" => WP.JustificationValues.Center,
-            "end" or "right" => WP.JustificationValues.Right,
-            "justify" => WP.JustificationValues.Both,
-            "start" or "left" => WP.JustificationValues.Left,
-            _ => null
-        };
-        if (justification is null)
-        {
-            return;
-        }
-
-        properties.AppendChild(new WP.Justification { Val = justification.Value });
     }
 
     private static void TryApplyParagraphFormatChangeRevision(WP.Paragraph paragraph, OdfNode paragraphNode,
@@ -680,7 +768,7 @@ public static class OdfToDocxConverter
                 else if (child.LocalName == "span" && child.NamespaceUri == OdfNamespaces.Text)
                 {
                     string? spanStyleName = child.GetAttribute("style-name", OdfNamespaces.Text);
-                    StyleInfo? spanStyle = ctx.GetStyle(spanStyleName);
+                    StyleInfo? spanStyle = ResolveSpanStyle(ctx, spanStyleName);
                     AppendRunsFromNode(child, runTarget, MergeStyles(parentStyle, spanStyle),
                         mainPart, ctx, odtPackage, imagePartCache, trackedChanges, formatChangeRevision);
                 }
@@ -845,7 +933,7 @@ public static class OdfToDocxConverter
         if (child.LocalName == "span" && child.NamespaceUri == OdfNamespaces.Text)
         {
             string? spanStyleName = child.GetAttribute("style-name", OdfNamespaces.Text);
-            StyleInfo? spanStyle = ctx.GetStyle(spanStyleName);
+            StyleInfo? spanStyle = ResolveSpanStyle(ctx, spanStyleName);
             AppendRunsFromNode(child, runTarget, MergeStyles(parentStyle, spanStyle),
                 mainPart, ctx, odtPackage, imagePartCache, trackedChanges, formatChangeRevision);
             return;
@@ -1004,6 +1092,13 @@ public static class OdfToDocxConverter
     private static WP.RunProperties BuildRunProps(StyleInfo style)
     {
         var rp = new WP.RunProperties();
+        if (string.Equals(style.Family, "text", StringComparison.OrdinalIgnoreCase) &&
+            !string.IsNullOrEmpty(style.Name) &&
+            !IsAutoGeneratedOdfStyleName(style.Name, "text"))
+        {
+            rp.AppendChild(new WP.RunStyle { Val = MapOdtStyleToDocx(style.Name) });
+        }
+
         if (style.Bold)
             rp.AppendChild(new WP.Bold());
         if (style.Italic)
@@ -1036,6 +1131,10 @@ public static class OdfToDocxConverter
             Color = child.Color ?? parent.Color,
             FontSizePt = child.FontSizePt ?? parent.FontSizePt,
             TextAlign = child.TextAlign ?? parent.TextAlign,
+            MarginLeft = child.MarginLeft ?? parent.MarginLeft,
+            MarginRight = child.MarginRight ?? parent.MarginRight,
+            MarginTop = child.MarginTop ?? parent.MarginTop,
+            LineHeight = child.LineHeight ?? parent.LineHeight,
         };
     }
 
@@ -1261,6 +1360,41 @@ public static class OdfToDocxConverter
             body.AppendChild(new WP.Paragraph());
     }
 
+    private static StyleInfo? ResolveSpanStyle(ConversionContext ctx, string? spanStyleName)
+    {
+        StyleInfo? spanStyle = ctx.GetStyle(spanStyleName);
+        if (spanStyle is not null || string.IsNullOrEmpty(spanStyleName))
+        {
+            return spanStyle;
+        }
+
+        return new StyleInfo
+        {
+            Name = spanStyleName!,
+            Family = "text",
+        };
+    }
+
+    private static bool IsAutoGeneratedOdfStyleName(string styleName, string family)
+    {
+        if (string.IsNullOrEmpty(styleName))
+        {
+            return true;
+        }
+
+        string suffix = styleName.Length > 1 ? styleName.Substring(1) : string.Empty;
+        return family.ToLowerInvariant() switch
+        {
+            "paragraph" => styleName.Length > 1 &&
+                styleName[0] == 'P' &&
+                int.TryParse(suffix, NumberStyles.Integer, CultureInfo.InvariantCulture, out _),
+            "text" => styleName.Length > 1 &&
+                styleName[0] == 'T' &&
+                int.TryParse(suffix, NumberStyles.Integer, CultureInfo.InvariantCulture, out _),
+            _ => false,
+        };
+    }
+
     private static string MapOdtStyleToDocx(string odtStyleName)
     {
         switch (odtStyleName)
@@ -1287,8 +1421,18 @@ public static class OdfToDocxConverter
             case "Text Body":
                 return "Normal";
             default:
-                return "Normal";
+                return SanitizeDocxStyleId(odtStyleName);
         }
+    }
+
+    private static string SanitizeDocxStyleId(string styleName)
+    {
+        if (string.IsNullOrWhiteSpace(styleName))
+        {
+            return "Normal";
+        }
+
+        return styleName.Replace(" ", "_");
     }
 
     private sealed class TrackedChangeEntry

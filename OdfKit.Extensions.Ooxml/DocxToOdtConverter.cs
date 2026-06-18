@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using DocumentFormat.OpenXml;
@@ -84,7 +85,7 @@ public static class DocxToOdtConverter
         OdfParagraph odtParagraph = headingLevel > 0
             ? odtDocument.AddHeading(string.Empty, headingLevel)
             : odtDocument.AddParagraph();
-        ApplyParagraphProperties(paragraph.ParagraphProperties, odtParagraph);
+        ApplyParagraphProperties(paragraph.ParagraphProperties, odtParagraph, odtDocument, applyStyleName: headingLevel == 0);
 
         WP.ParagraphPropertiesChange? paragraphFormatChange =
             paragraph.ParagraphProperties?.GetFirstChild<WP.ParagraphPropertiesChange>();
@@ -138,30 +139,254 @@ public static class DocxToOdtConverter
         }
     }
 
-    private static void ApplyParagraphProperties(WP.ParagraphProperties? properties, OdfParagraph odtParagraph)
+    private readonly struct ParagraphLayoutProperties
     {
-        if (properties?.Justification?.Val is null)
+        internal string? TextAlign { get; init; }
+
+        internal string? MarginLeft { get; init; }
+
+        internal string? MarginRight { get; init; }
+
+        internal string? MarginTop { get; init; }
+
+        internal string? LineHeight { get; init; }
+
+        internal bool HasAny =>
+            TextAlign is not null ||
+            MarginLeft is not null ||
+            MarginRight is not null ||
+            MarginTop is not null ||
+            LineHeight is not null;
+    }
+
+    private static void ApplyParagraphProperties(
+        WP.ParagraphProperties? properties,
+        OdfParagraph odtParagraph,
+        TextDocument odtDocument,
+        bool applyStyleName = true)
+    {
+        if (properties is null)
         {
             return;
         }
 
-        WP.JustificationValues value = properties.Justification.Val.Value;
-        if (value == WP.JustificationValues.Center)
+        ParagraphLayoutProperties layout = ReadParagraphLayout(properties);
+        string? mappedStyle = null;
+        if (applyStyleName)
         {
-            odtParagraph.HorizontalAlignment = "center";
+            string? styleId = properties.GetFirstChild<WP.ParagraphStyleId>()?.Val?.Value
+                ?? properties.ParagraphStyleId?.Val?.Value;
+            mappedStyle = MapDocxParagraphStyleToOdt(styleId);
         }
-        else if (value == WP.JustificationValues.Right)
+
+        if (!string.IsNullOrEmpty(mappedStyle))
         {
-            odtParagraph.HorizontalAlignment = "end";
+            if (layout.HasAny)
+            {
+                EnsureNamedParagraphStyleLayout(odtDocument, mappedStyle!, layout);
+            }
+
+            odtParagraph.StyleName = mappedStyle;
+            return;
         }
-        else if (value == WP.JustificationValues.Both)
+
+        if (layout.HasAny)
         {
-            odtParagraph.HorizontalAlignment = "justify";
+            ApplyParagraphLayoutViaLocalStyle(odtParagraph, layout);
         }
-        else
+    }
+
+    private static ParagraphLayoutProperties ReadParagraphLayout(WP.ParagraphProperties properties)
+    {
+        string? textAlign = null;
+        if (properties.Justification?.Val is not null)
         {
-            odtParagraph.HorizontalAlignment = "start";
+            WP.JustificationValues value = properties.Justification.Val.Value;
+            if (value == WP.JustificationValues.Center)
+            {
+                textAlign = "center";
+            }
+            else if (value == WP.JustificationValues.Right)
+            {
+                textAlign = "end";
+            }
+            else if (value == WP.JustificationValues.Both)
+            {
+                textAlign = "justify";
+            }
+            else
+            {
+                textAlign = "start";
+            }
         }
+
+        string? marginLeft = null;
+        string? marginRight = null;
+        WP.Indentation? indentation = properties.GetFirstChild<WP.Indentation>();
+        if (TryReadOpenXmlTwips(indentation?.Left, out int leftTwips))
+        {
+            marginLeft = OoxmlUnitConverter.TryFormatTwipsAsOdfCentimeters(leftTwips);
+        }
+
+        if (TryReadOpenXmlTwips(indentation?.Right, out int rightTwips))
+        {
+            marginRight = OoxmlUnitConverter.TryFormatTwipsAsOdfCentimeters(rightTwips);
+        }
+
+        string? marginTop = null;
+        string? lineHeight = null;
+        WP.SpacingBetweenLines? spacing = properties.GetFirstChild<WP.SpacingBetweenLines>();
+        if (TryReadOpenXmlTwips(spacing?.Before, out int beforeTwips))
+        {
+            marginTop = OoxmlUnitConverter.TryFormatTwipsAsOdfCentimeters(beforeTwips);
+        }
+
+        if (TryReadOpenXmlTwips(spacing?.Line, out int lineTwips))
+        {
+            bool isAutoRule = spacing?.LineRule?.Value == WP.LineSpacingRuleValues.Auto;
+            lineHeight = OoxmlUnitConverter.TryFormatLineHeightFromTwips(lineTwips, isAutoRule);
+        }
+
+        return new ParagraphLayoutProperties
+        {
+            TextAlign = textAlign,
+            MarginLeft = marginLeft,
+            MarginRight = marginRight,
+            MarginTop = marginTop,
+            LineHeight = lineHeight,
+        };
+    }
+
+    private static void EnsureNamedParagraphStyleLayout(
+        TextDocument odtDocument,
+        string styleName,
+        ParagraphLayoutProperties layout)
+    {
+        OdfNode autoStyles = TextDocumentDomHelper.FindOrCreateChild(
+            odtDocument.ContentDom, "automatic-styles", OdfNamespaces.Office, "office");
+
+        OdfNode? styleNode = FindAutomaticStyleByName(autoStyles, styleName);
+        if (styleNode is null)
+        {
+            styleNode = new OdfNode(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
+            styleNode.SetAttribute("name", OdfNamespaces.Style, styleName, "style");
+            styleNode.SetAttribute("family", OdfNamespaces.Style, "paragraph", "style");
+            autoStyles.AppendChild(styleNode);
+        }
+
+        OdfNode propsNode = GetOrCreateParagraphPropertiesNode(styleNode);
+        if (layout.TextAlign is not null)
+        {
+            propsNode.SetAttribute("text-align", OdfNamespaces.Fo, layout.TextAlign, "fo");
+        }
+
+        if (layout.MarginLeft is not null)
+        {
+            propsNode.SetAttribute("margin-left", OdfNamespaces.Fo, layout.MarginLeft, "fo");
+        }
+
+        if (layout.MarginRight is not null)
+        {
+            propsNode.SetAttribute("margin-right", OdfNamespaces.Fo, layout.MarginRight, "fo");
+        }
+
+        if (layout.MarginTop is not null)
+        {
+            propsNode.SetAttribute("margin-top", OdfNamespaces.Fo, layout.MarginTop, "fo");
+        }
+
+        if (layout.LineHeight is not null)
+        {
+            propsNode.SetAttribute("line-height", OdfNamespaces.Fo, layout.LineHeight, "fo");
+        }
+
+        odtDocument.StyleEngine.RebuildStyleIndex();
+    }
+
+    private static void ApplyParagraphLayoutViaLocalStyle(
+        OdfParagraph odtParagraph,
+        ParagraphLayoutProperties layout)
+    {
+        OdfStyleEngine styleEngine = odtParagraph.StyleEngine;
+        OdfNode paragraphNode = odtParagraph.Node;
+        if (layout.TextAlign is not null)
+        {
+            styleEngine.SetLocalStyleProperty(
+                paragraphNode, "paragraph", "paragraph-properties", "text-align", OdfNamespaces.Fo, layout.TextAlign, "fo", deferSave: true);
+        }
+
+        if (layout.MarginLeft is not null)
+        {
+            styleEngine.SetLocalStyleProperty(
+                paragraphNode, "paragraph", "paragraph-properties", "margin-left", OdfNamespaces.Fo, layout.MarginLeft, "fo", deferSave: true);
+        }
+
+        if (layout.MarginRight is not null)
+        {
+            styleEngine.SetLocalStyleProperty(
+                paragraphNode, "paragraph", "paragraph-properties", "margin-right", OdfNamespaces.Fo, layout.MarginRight, "fo", deferSave: true);
+        }
+
+        if (layout.MarginTop is not null)
+        {
+            styleEngine.SetLocalStyleProperty(
+                paragraphNode, "paragraph", "paragraph-properties", "margin-top", OdfNamespaces.Fo, layout.MarginTop, "fo", deferSave: true);
+        }
+
+        if (layout.LineHeight is not null)
+        {
+            styleEngine.SetLocalStyleProperty(
+                paragraphNode, "paragraph", "paragraph-properties", "line-height", OdfNamespaces.Fo, layout.LineHeight, "fo", deferSave: true);
+        }
+
+        styleEngine.DeduplicateAndSaveStyles();
+    }
+
+    private static OdfNode? FindAutomaticStyleByName(OdfNode autoStyles, string styleName)
+    {
+        foreach (OdfNode child in autoStyles.Children)
+        {
+            if (string.Equals(child.GetAttribute("name", OdfNamespaces.Style), styleName, StringComparison.Ordinal))
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private static OdfNode GetOrCreateParagraphPropertiesNode(OdfNode styleNode)
+    {
+        foreach (OdfNode child in styleNode.Children)
+        {
+            if (child.LocalName == "paragraph-properties" && child.NamespaceUri == OdfNamespaces.Style)
+            {
+                return child;
+            }
+        }
+
+        var propsNode = new OdfNode(OdfNodeType.Element, "paragraph-properties", OdfNamespaces.Style, "style");
+        styleNode.AppendChild(propsNode);
+        return propsNode;
+    }
+
+    private static bool TryReadOpenXmlTwips(OpenXmlSimpleType? value, out int twips)
+    {
+        twips = 0;
+        if (value is null)
+        {
+            return false;
+        }
+
+        if (value is Int32Value int32Value)
+        {
+            twips = int32Value.Value;
+            return true;
+        }
+
+        string? text = value.InnerText;
+        return !string.IsNullOrEmpty(text) &&
+            int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out twips);
     }
 
     private static void AppendInsertedRun(TextDocument odtDocument, OdfNode paragraphNode, WP.InsertedRun insertedRun)
@@ -271,6 +496,26 @@ public static class DocxToOdtConverter
         return string.Concat(run.Descendants<WP.Text>().Select(node => node.Text));
     }
 
+    private readonly struct TextFormattingProperties
+    {
+        internal bool? Bold { get; init; }
+
+        internal bool? Italic { get; init; }
+
+        internal bool? Underline { get; init; }
+
+        internal string? Color { get; init; }
+
+        internal string? FontSize { get; init; }
+
+        internal bool HasAny =>
+            Bold is not null ||
+            Italic is not null ||
+            Underline is not null ||
+            Color is not null ||
+            FontSize is not null;
+    }
+
     private static void AppendRunText(TextDocument odtDocument, OdfParagraph odtParagraph, string text, WP.RunProperties? properties)
     {
         if (string.IsNullOrEmpty(text))
@@ -292,11 +537,7 @@ public static class DocxToOdtConverter
                 targetFamily: "text");
 
             OdfTextRun run = odtParagraph.AddTextRun(text);
-            if (hasFormatting)
-            {
-                ApplyRunFormattingToTextRun(run, properties!);
-            }
-
+            ApplyRunPropertiesToTextRun(odtDocument, run, properties);
             WrapNodeWithChangeMarkers(odtParagraph.Node, run.Node, changeId);
             return;
         }
@@ -308,37 +549,174 @@ public static class DocxToOdtConverter
         }
 
         OdfTextRun formattedRun = odtParagraph.AddTextRun(text);
-        ApplyRunFormattingToTextRun(formattedRun, properties!);
+        ApplyRunPropertiesToTextRun(odtDocument, formattedRun, properties);
     }
 
-    private static void ApplyRunFormattingToTextRun(OdfTextRun run, WP.RunProperties properties)
+    private static void ApplyRunPropertiesToTextRun(
+        TextDocument odtDocument,
+        OdfTextRun run,
+        WP.RunProperties? properties)
     {
+        if (properties is null)
+        {
+            return;
+        }
+
+        TextFormattingProperties formatting = ReadTextFormatting(properties);
+        string? mappedStyle = MapDocxCharacterStyleToOdt(
+            properties.GetFirstChild<WP.RunStyle>()?.Val?.Value);
+        if (!string.IsNullOrEmpty(mappedStyle))
+        {
+            if (formatting.HasAny)
+            {
+                EnsureNamedTextStyleFormatting(odtDocument, mappedStyle!, formatting);
+            }
+
+            run.StyleName = mappedStyle;
+            return;
+        }
+
+        if (formatting.HasAny)
+        {
+            ApplyTextFormattingViaLocalStyle(run, formatting);
+        }
+    }
+
+    private static TextFormattingProperties ReadTextFormatting(WP.RunProperties properties)
+    {
+        bool? bold = null;
         if (properties.Bold is not null)
         {
-            run.IsBold = properties.Bold.Val is null || properties.Bold.Val.Value;
+            bold = properties.Bold.Val is null || properties.Bold.Val.Value;
         }
 
+        bool? italic = null;
         if (properties.Italic is not null)
         {
-            run.IsItalic = properties.Italic.Val is null || properties.Italic.Val.Value;
+            italic = properties.Italic.Val is null || properties.Italic.Val.Value;
         }
 
+        bool? underline = null;
         if (properties.Underline?.Val is not null && properties.Underline.Val.Value != WP.UnderlineValues.None)
         {
-            run.IsUnderline = true;
+            underline = true;
         }
 
-        if (properties.Color?.Val?.Value is { Length: > 0 } color &&
-            !string.Equals(color, "auto", StringComparison.OrdinalIgnoreCase))
+        string? color = null;
+        if (properties.Color?.Val?.Value is { Length: > 0 } rawColor &&
+            !string.Equals(rawColor, "auto", StringComparison.OrdinalIgnoreCase))
         {
-            run.Color = "#" + color;
+            color = "#" + rawColor;
         }
 
+        string? fontSize = null;
         if (properties.FontSize?.Val?.Value is { Length: > 0 } halfPoints &&
-            double.TryParse(halfPoints, out double sizeValue))
+            double.TryParse(halfPoints, NumberStyles.Float, CultureInfo.InvariantCulture, out double sizeValue))
         {
-            run.FontSize = (sizeValue / 2d).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "pt";
+            fontSize = (sizeValue / 2d).ToString("0.##", CultureInfo.InvariantCulture) + "pt";
         }
+
+        return new TextFormattingProperties
+        {
+            Bold = bold,
+            Italic = italic,
+            Underline = underline,
+            Color = color,
+            FontSize = fontSize,
+        };
+    }
+
+    private static void EnsureNamedTextStyleFormatting(
+        TextDocument odtDocument,
+        string styleName,
+        TextFormattingProperties formatting)
+    {
+        OdfNode autoStyles = TextDocumentDomHelper.FindOrCreateChild(
+            odtDocument.ContentDom, "automatic-styles", OdfNamespaces.Office, "office");
+
+        OdfNode? styleNode = FindAutomaticStyleByName(autoStyles, styleName);
+        if (styleNode is null)
+        {
+            styleNode = new OdfNode(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
+            styleNode.SetAttribute("name", OdfNamespaces.Style, styleName, "style");
+            styleNode.SetAttribute("family", OdfNamespaces.Style, "text", "style");
+            autoStyles.AppendChild(styleNode);
+        }
+
+        OdfNode propsNode = GetOrCreateTextPropertiesNode(styleNode);
+        if (formatting.Bold is not null)
+        {
+            propsNode.SetAttribute("font-weight", OdfNamespaces.Fo, formatting.Bold.Value ? "bold" : "normal", "fo");
+        }
+
+        if (formatting.Italic is not null)
+        {
+            propsNode.SetAttribute("font-style", OdfNamespaces.Fo, formatting.Italic.Value ? "italic" : "normal", "fo");
+        }
+
+        if (formatting.Underline is not null)
+        {
+            propsNode.SetAttribute(
+                "text-underline-style",
+                OdfNamespaces.Style,
+                formatting.Underline.Value ? "solid" : "none",
+                "style");
+        }
+
+        if (formatting.Color is not null)
+        {
+            propsNode.SetAttribute("color", OdfNamespaces.Fo, formatting.Color, "fo");
+        }
+
+        if (formatting.FontSize is not null)
+        {
+            propsNode.SetAttribute("font-size", OdfNamespaces.Fo, formatting.FontSize, "fo");
+        }
+
+        odtDocument.StyleEngine.RebuildStyleIndex();
+    }
+
+    private static void ApplyTextFormattingViaLocalStyle(OdfTextRun run, TextFormattingProperties formatting)
+    {
+        if (formatting.Bold is not null)
+        {
+            run.IsBold = formatting.Bold.Value;
+        }
+
+        if (formatting.Italic is not null)
+        {
+            run.IsItalic = formatting.Italic.Value;
+        }
+
+        if (formatting.Underline is not null)
+        {
+            run.IsUnderline = formatting.Underline.Value;
+        }
+
+        if (formatting.Color is not null)
+        {
+            run.Color = formatting.Color;
+        }
+
+        if (formatting.FontSize is not null)
+        {
+            run.FontSize = formatting.FontSize;
+        }
+    }
+
+    private static OdfNode GetOrCreateTextPropertiesNode(OdfNode styleNode)
+    {
+        foreach (OdfNode child in styleNode.Children)
+        {
+            if (child.LocalName == "text-properties" && child.NamespaceUri == OdfNamespaces.Style)
+            {
+                return child;
+            }
+        }
+
+        var propsNode = new OdfNode(OdfNodeType.Element, "text-properties", OdfNamespaces.Style, "style");
+        styleNode.AppendChild(propsNode);
+        return propsNode;
     }
 
     private static string? CreateTextStyleFromPreviousRunProperties(
@@ -398,7 +776,8 @@ public static class DocxToOdtConverter
 
     private static bool HasRunFormatting(WP.RunProperties properties)
     {
-        return properties.Bold is not null ||
+        return properties.GetFirstChild<WP.RunStyle>() is not null ||
+            properties.Bold is not null ||
             properties.Italic is not null ||
             properties.Underline is not null ||
             properties.Color is not null ||
@@ -412,6 +791,20 @@ public static class DocxToOdtConverter
             properties.GetFirstChild<WP.Underline>() is not null ||
             properties.GetFirstChild<WP.Color>() is not null ||
             properties.GetFirstChild<WP.FontSize>() is not null;
+    }
+
+    private static string? MapDocxCharacterStyleToOdt(string? docxStyleId)
+    {
+        if (string.IsNullOrEmpty(docxStyleId))
+        {
+            return null;
+        }
+
+        return docxStyleId switch
+        {
+            "DefaultParagraphFont" => null,
+            _ => docxStyleId,
+        };
     }
 
     private static string? MapDocxParagraphStyleToOdt(string? docxStyleId)

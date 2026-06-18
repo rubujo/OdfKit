@@ -226,6 +226,156 @@ public class OoxmlConversionTests
     }
 
     /// <summary>
+    /// 驗證 ODT → DOCX 轉換可保留自訂段落樣式名稱。
+    /// </summary>
+    [Fact]
+    public void OdtToDocx_PreservesCustomParagraphStyleName()
+    {
+        using var odtDoc = TextDocument.Create();
+        OdfParagraph paragraph = odtDoc.AddParagraph("自訂樣式段落");
+        paragraph.StyleName = "CustomBlock";
+
+        using var docxStream = new MemoryStream();
+        OdfToDocxConverter.Convert(odtDoc, docxStream);
+        docxStream.Position = 0;
+
+        using var wordDocument = WordprocessingDocument.Open(docxStream, false);
+        var mainPart = Assert.IsType<MainDocumentPart>(wordDocument.MainDocumentPart);
+        WP.Document document = Assert.IsType<WP.Document>(mainPart.Document);
+        WP.Body body = Assert.IsType<WP.Body>(document.Body);
+        WP.Paragraph paragraphElement = Assert.IsType<WP.Paragraph>(body.Elements<WP.Paragraph>().Single());
+
+        Assert.Equal("CustomBlock", paragraphElement.ParagraphProperties?.ParagraphStyleId?.Val?.Value);
+    }
+
+    /// <summary>
+    /// 驗證 ODT → DOCX 轉換可保留段落縮排、段前距與行距。
+    /// </summary>
+    [Fact]
+    public void OdtToDocx_PreservesParagraphIndentationAndSpacing()
+    {
+        using var odtDoc = TextDocument.Create();
+        OdfParagraph paragraph = odtDoc.AddParagraph("縮排段落");
+        paragraph.Style.MarginLeft = "1.5cm";
+        paragraph.Style.MarginRight = "0.5cm";
+        paragraph.Style.LineSpacing = "14pt";
+        paragraph.StyleEngine.SetLocalStyleProperty(
+            paragraph.Node,
+            "paragraph",
+            "paragraph-properties",
+            "margin-top",
+            OdfNamespaces.Fo,
+            "0.75cm",
+            "fo");
+
+        using var docxStream = new MemoryStream();
+        OdfToDocxConverter.Convert(odtDoc, docxStream);
+        docxStream.Position = 0;
+
+        using var wordDocument = WordprocessingDocument.Open(docxStream, false);
+        var mainPart = Assert.IsType<MainDocumentPart>(wordDocument.MainDocumentPart);
+        WP.Document document = Assert.IsType<WP.Document>(mainPart.Document);
+        WP.Body body = Assert.IsType<WP.Body>(document.Body);
+        WP.ParagraphProperties properties = Assert.IsType<WP.Paragraph>(
+            body.Elements<WP.Paragraph>().Single()).ParagraphProperties
+            ?? throw new InvalidDataException("DOCX 段落缺少屬性。");
+
+        WP.SpacingBetweenLines spacing = properties.GetFirstChild<WP.SpacingBetweenLines>()
+            ?? throw new InvalidDataException("DOCX 段落缺少間距屬性。");
+
+        Assert.Equal("850", properties.Indentation?.Left?.Value);
+        Assert.Equal("283", properties.Indentation?.Right?.Value);
+        Assert.Equal("425", spacing.Before?.Value);
+        Assert.Equal("280", spacing.Line?.Value);
+        Assert.Equal(WP.LineSpacingRuleValues.Exact, spacing.LineRule?.Value);
+    }
+
+    /// <summary>
+    /// 驗證 DOCX → ODT 轉換可保留段落樣式名稱與縮排。
+    /// </summary>
+    [Fact]
+    public void DocxToOdt_PreservesParagraphStyleNameAndIndentation()
+    {
+        using var docxStream = new MemoryStream();
+        using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
+        {
+            MainDocumentPart mainPart = wordDocument.AddMainDocumentPart();
+            mainPart.Document = new WP.Document(new WP.Body(
+                new WP.Paragraph(
+                    new WP.ParagraphProperties(
+                        new WP.ParagraphStyleId { Val = "CustomBlock" },
+                        new WP.Indentation { Left = "850", Right = "283" },
+                        new WP.SpacingBetweenLines
+                        {
+                            Before = "425",
+                            Line = "280",
+                            LineRule = WP.LineSpacingRuleValues.Exact,
+                        }),
+                    new WP.Run(new WP.Text("縮排段落")))));
+            wordDocument.Save();
+        }
+
+        docxStream.Position = 0;
+        using TextDocument odtDocument = DocxToOdtConverter.Convert(docxStream);
+        OdfParagraph paragraph = Assert.Single(odtDocument.Body.Paragraphs.Items);
+
+        Assert.Equal("CustomBlock", paragraph.StyleName);
+        Assert.Equal("1.499cm", paragraph.Style.MarginLeft);
+        Assert.Equal("0.499cm", paragraph.Style.MarginRight);
+        Assert.Equal("14pt", paragraph.Style.LineSpacing);
+        Assert.Equal("縮排段落", paragraph.TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 DOCX → ODT → DOCX 往返可保留段落樣式名稱與縮排行距。
+    /// </summary>
+    [Fact]
+    public void DocxToOdtToDocx_RoundTripPreservesParagraphStyleAndIndentation()
+    {
+        using var docxStream = new MemoryStream();
+        using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
+        {
+            MainDocumentPart mainPart = wordDocument.AddMainDocumentPart();
+            mainPart.Document = new WP.Document(new WP.Body(
+                new WP.Paragraph(
+                    new WP.ParagraphProperties(
+                        new WP.ParagraphStyleId { Val = "CustomBlock" },
+                        new WP.Indentation { Left = "850", Right = "283" },
+                        new WP.SpacingBetweenLines
+                        {
+                            Before = "425",
+                            Line = "280",
+                            LineRule = WP.LineSpacingRuleValues.Exact,
+                        }),
+                    new WP.Run(new WP.Text("縮排段落")))));
+            wordDocument.Save();
+        }
+
+        docxStream.Position = 0;
+        using TextDocument odtDocument = DocxToOdtConverter.Convert(docxStream);
+        using var roundTripStream = new MemoryStream();
+        OdfToDocxConverter.Convert(odtDocument, roundTripStream);
+        roundTripStream.Position = 0;
+
+        using var roundTripDocx = WordprocessingDocument.Open(roundTripStream, false);
+        var roundTripMainPart = Assert.IsType<MainDocumentPart>(roundTripDocx.MainDocumentPart);
+        WP.Document document = Assert.IsType<WP.Document>(roundTripMainPart.Document);
+        WP.Body body = Assert.IsType<WP.Body>(document.Body);
+        WP.ParagraphProperties properties = Assert.IsType<WP.Paragraph>(
+            body.Elements<WP.Paragraph>().Single()).ParagraphProperties
+            ?? throw new InvalidDataException("DOCX 段落缺少屬性。");
+        WP.SpacingBetweenLines spacing = properties.GetFirstChild<WP.SpacingBetweenLines>()
+            ?? throw new InvalidDataException("DOCX 段落缺少間距屬性。");
+
+        Assert.Equal("CustomBlock", properties.ParagraphStyleId?.Val?.Value);
+        Assert.Equal("850", properties.Indentation?.Left?.Value);
+        Assert.Equal("283", properties.Indentation?.Right?.Value);
+        Assert.Equal("425", spacing.Before?.Value);
+        Assert.Equal("280", spacing.Line?.Value);
+        Assert.Equal(WP.LineSpacingRuleValues.Exact, spacing.LineRule?.Value);
+    }
+
+    /// <summary>
     /// 驗證 ODT → DOCX 轉換可保留段落內嵌圖片。
     /// </summary>
     [Fact]
@@ -316,13 +466,106 @@ public class OoxmlConversionTests
             Assert.IsType<WP.ParagraphPropertiesChange>(paragraphProperties.GetFirstChild<WP.ParagraphPropertiesChange>());
         WP.ParagraphPropertiesExtended previousParagraphProperties =
             Assert.IsType<WP.ParagraphPropertiesExtended>(paragraphFormatChange.ParagraphPropertiesExtended);
-        Assert.Equal("Normal", previousParagraphProperties.GetFirstChild<WP.ParagraphStyleId>()?.Val?.Value);
+        Assert.Equal("OriginalStyle", previousParagraphProperties.GetFirstChild<WP.ParagraphStyleId>()?.Val?.Value);
 
         WP.Run characterFormattedRun = body.Descendants<WP.Run>()
             .First(run => run.InnerText == "字元格式");
         WP.RunProperties runProperties = Assert.IsType<WP.RunProperties>(characterFormattedRun.RunProperties);
         Assert.NotNull(runProperties.GetFirstChild<WP.RunPropertiesChange>());
         Assert.NotNull(runProperties.GetFirstChild<WP.Bold>());
+    }
+
+    /// <summary>
+    /// 驗證 ODT → DOCX 轉換可保留自訂字元樣式名稱。
+    /// </summary>
+    [Fact]
+    public void OdtToDocx_PreservesCustomCharacterStyleName()
+    {
+        using var odtDoc = TextDocument.Create();
+        OdfParagraph paragraph = odtDoc.AddParagraph();
+        OdfTextRun run = paragraph.AddTextRun("強調文字");
+        run.StyleName = "CustomEmphasis";
+
+        using var docxStream = new MemoryStream();
+        OdfToDocxConverter.Convert(odtDoc, docxStream);
+        docxStream.Position = 0;
+
+        using var wordDocument = WordprocessingDocument.Open(docxStream, false);
+        var mainPart = Assert.IsType<MainDocumentPart>(wordDocument.MainDocumentPart);
+        WP.Document document = Assert.IsType<WP.Document>(mainPart.Document);
+        WP.Body body = Assert.IsType<WP.Body>(document.Body);
+        WP.Run formattedRun = Assert.IsType<WP.Run>(
+            body.Descendants<WP.Run>().First(runElement => runElement.InnerText == "強調文字"));
+
+        Assert.Equal("CustomEmphasis", formattedRun.RunProperties?.GetFirstChild<WP.RunStyle>()?.Val?.Value);
+    }
+
+    /// <summary>
+    /// 驗證 DOCX → ODT 轉換可保留字元樣式名稱與粗體格式。
+    /// </summary>
+    [Fact]
+    public void DocxToOdt_PreservesCharacterStyleNameAndFormatting()
+    {
+        using var docxStream = new MemoryStream();
+        using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
+        {
+            MainDocumentPart mainPart = wordDocument.AddMainDocumentPart();
+            mainPart.Document = new WP.Document(new WP.Body(
+                new WP.Paragraph(
+                    new WP.Run(
+                        new WP.RunProperties(
+                            new WP.RunStyle { Val = "CustomEmphasis" },
+                            new WP.Bold()),
+                        new WP.Text("強調文字")))));
+            wordDocument.Save();
+        }
+
+        docxStream.Position = 0;
+        using TextDocument odtDocument = DocxToOdtConverter.Convert(docxStream);
+        OdfParagraph paragraph = Assert.Single(odtDocument.Body.Paragraphs.Items);
+        OdfTextRun run = Assert.Single(paragraph.Runs);
+
+        Assert.Equal("CustomEmphasis", run.StyleName);
+        Assert.True(run.IsBold);
+        Assert.Equal("強調文字", run.Text);
+    }
+
+    /// <summary>
+    /// 驗證 DOCX → ODT → DOCX 往返可保留字元樣式名稱與粗體格式。
+    /// </summary>
+    [Fact]
+    public void DocxToOdtToDocx_RoundTripPreservesCharacterStyleAndFormatting()
+    {
+        using var docxStream = new MemoryStream();
+        using (var wordDocument = WordprocessingDocument.Create(docxStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, autoSave: true))
+        {
+            MainDocumentPart mainPart = wordDocument.AddMainDocumentPart();
+            mainPart.Document = new WP.Document(new WP.Body(
+                new WP.Paragraph(
+                    new WP.Run(
+                        new WP.RunProperties(
+                            new WP.RunStyle { Val = "CustomEmphasis" },
+                            new WP.Bold()),
+                        new WP.Text("強調文字")))));
+            wordDocument.Save();
+        }
+
+        docxStream.Position = 0;
+        using TextDocument odtDocument = DocxToOdtConverter.Convert(docxStream);
+        using var roundTripStream = new MemoryStream();
+        OdfToDocxConverter.Convert(odtDocument, roundTripStream);
+        roundTripStream.Position = 0;
+
+        using var roundTripDocx = WordprocessingDocument.Open(roundTripStream, false);
+        var roundTripMainPart = Assert.IsType<MainDocumentPart>(roundTripDocx.MainDocumentPart);
+        WP.Document document = Assert.IsType<WP.Document>(roundTripMainPart.Document);
+        WP.Body body = Assert.IsType<WP.Body>(document.Body);
+        WP.Run formattedRun = Assert.IsType<WP.Run>(
+            body.Descendants<WP.Run>().First(runElement => runElement.InnerText == "強調文字"));
+        WP.RunProperties properties = Assert.IsType<WP.RunProperties>(formattedRun.RunProperties);
+
+        Assert.Equal("CustomEmphasis", properties.GetFirstChild<WP.RunStyle>()?.Val?.Value);
+        Assert.NotNull(properties.GetFirstChild<WP.Bold>());
     }
 
     /// <summary>
