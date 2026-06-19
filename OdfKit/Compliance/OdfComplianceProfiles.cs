@@ -12,11 +12,11 @@ namespace OdfKit.Compliance;
 public static class OdfComplianceProfiles
 {
     private static readonly string[] PackagedExtensions = [
-        ".odt", ".ott", ".odm",
+        ".odt", ".ott", ".odm", ".oth",
         ".ods", ".ots",
         ".odp", ".otp",
         ".odg", ".otg",
-        ".odc", ".odf", ".odi", ".odb"
+        ".odc", ".otc", ".odf", ".otf", ".odi", ".oti", ".odb"
     ];
 
     private static readonly string[] FlatExtensions = [
@@ -28,6 +28,7 @@ public static class OdfComplianceProfiles
         "application/vnd.oasis.opendocument.text",
         "application/vnd.oasis.opendocument.text-template",
         "application/vnd.oasis.opendocument.text-master",
+        "application/vnd.oasis.opendocument.text-web",
         "application/vnd.oasis.opendocument.spreadsheet",
         "application/vnd.oasis.opendocument.spreadsheet-template",
         "application/vnd.oasis.opendocument.presentation",
@@ -35,8 +36,11 @@ public static class OdfComplianceProfiles
         "application/vnd.oasis.opendocument.graphics",
         "application/vnd.oasis.opendocument.graphics-template",
         "application/vnd.oasis.opendocument.chart",
+        "application/vnd.oasis.opendocument.chart-template",
         "application/vnd.oasis.opendocument.formula",
+        "application/vnd.oasis.opendocument.formula-template",
         "application/vnd.oasis.opendocument.image",
+        "application/vnd.oasis.opendocument.image-template",
         "application/vnd.oasis.opendocument.database"
     ];
 

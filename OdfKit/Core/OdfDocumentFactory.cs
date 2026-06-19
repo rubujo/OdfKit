@@ -307,7 +307,8 @@ public static class OdfDocumentFactory
     private static bool IsTextDocumentKind(OdfDocumentKind kind) =>
         kind == OdfDocumentKind.Text ||
         kind == OdfDocumentKind.TextTemplate ||
-        kind == OdfDocumentKind.TextMaster;
+        kind == OdfDocumentKind.TextMaster ||
+        kind == OdfDocumentKind.TextWeb;
 
     private static string CreateMetaXml(string version)
     {
@@ -337,9 +338,13 @@ public static class OdfDocumentFactory
             OdfDocumentKind.Graphics => "application/vnd.oasis.opendocument.graphics",
             OdfDocumentKind.GraphicsTemplate => "application/vnd.oasis.opendocument.graphics-template",
             OdfDocumentKind.Chart => "application/vnd.oasis.opendocument.chart",
+            OdfDocumentKind.ChartTemplate => "application/vnd.oasis.opendocument.chart-template",
             OdfDocumentKind.Formula => "application/vnd.oasis.opendocument.formula",
+            OdfDocumentKind.FormulaTemplate => "application/vnd.oasis.opendocument.formula-template",
             OdfDocumentKind.Image => "application/vnd.oasis.opendocument.image",
+            OdfDocumentKind.ImageTemplate => "application/vnd.oasis.opendocument.image-template",
             OdfDocumentKind.Database => "application/vnd.oasis.opendocument.database",
+            OdfDocumentKind.TextWeb => "application/vnd.oasis.opendocument.text-web",
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")
         };
     }
@@ -348,13 +353,13 @@ public static class OdfDocumentFactory
     {
         return kind switch
         {
-            OdfDocumentKind.Text or OdfDocumentKind.TextTemplate or OdfDocumentKind.TextMaster or OdfDocumentKind.FlatText => "text",
+            OdfDocumentKind.Text or OdfDocumentKind.TextTemplate or OdfDocumentKind.TextMaster or OdfDocumentKind.TextWeb or OdfDocumentKind.FlatText => "text",
             OdfDocumentKind.Spreadsheet or OdfDocumentKind.SpreadsheetTemplate or OdfDocumentKind.FlatSpreadsheet => "spreadsheet",
             OdfDocumentKind.Presentation or OdfDocumentKind.PresentationTemplate or OdfDocumentKind.FlatPresentation => "presentation",
             OdfDocumentKind.Graphics or OdfDocumentKind.GraphicsTemplate or OdfDocumentKind.FlatGraphics => "drawing",
-            OdfDocumentKind.Chart or OdfDocumentKind.FlatChart => "chart",
-            OdfDocumentKind.Formula or OdfDocumentKind.FlatFormula => "formula",
-            OdfDocumentKind.Image or OdfDocumentKind.FlatImage => "image",
+            OdfDocumentKind.Chart or OdfDocumentKind.ChartTemplate or OdfDocumentKind.FlatChart => "chart",
+            OdfDocumentKind.Formula or OdfDocumentKind.FormulaTemplate or OdfDocumentKind.FlatFormula => "formula",
+            OdfDocumentKind.Image or OdfDocumentKind.ImageTemplate or OdfDocumentKind.FlatImage => "image",
             OdfDocumentKind.Database => "database",
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")
         };
@@ -469,12 +474,16 @@ public static class OdfDocumentFactory
             OdfDocumentKind.GraphicsTemplate => new GraphicsTemplateDocument(package),
             OdfDocumentKind.FlatGraphics => new FlatGraphicsDocument(package),
             OdfDocumentKind.Chart => new ChartDocument(package),
+            OdfDocumentKind.ChartTemplate => new ChartTemplateDocument(package),
             OdfDocumentKind.FlatChart => new FlatChartDocument(package),
             OdfDocumentKind.Formula => new FormulaDocument(package),
+            OdfDocumentKind.FormulaTemplate => new FormulaTemplateDocument(package),
             OdfDocumentKind.FlatFormula => new FlatFormulaDocument(package),
             OdfDocumentKind.Image => new OdfImageDocument(package),
+            OdfDocumentKind.ImageTemplate => new ImageTemplateDocument(package),
             OdfDocumentKind.FlatImage => new FlatImageDocument(package),
             OdfDocumentKind.Database => new OdfDatabaseDocument(package),
+            OdfDocumentKind.TextWeb => new TextWebDocument(package),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")
         };
     }

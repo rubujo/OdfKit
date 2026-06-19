@@ -25,7 +25,7 @@
 | Area | OdfKit surface | Baseline | Status | Completion criteria |
 |---|---|---|---|---|
 | Package API | `OdfPackage` | ODF Toolkit package handling | complete | 可開啟、建立、保存 ZIP / flat XML，並保留 unknown entries。 |
-| Document factory | `OdfDocumentFactory`、typed wrappers | Simple API document load/create | complete | 17 種主要 extension 可最小 create / load / save / validate / round-trip。 |
+| Document factory | `OdfDocumentFactory`、typed wrappers | Simple API document load/create | complete | 24 種主要 extension 可最小 create / load / save / validate / round-trip。 |
 | Validator API | `OdfValidator`、`OdfPackageValidator`、`OdfFlatDocumentValidator` | ODF Validator | complete | `validate-corpus` 可執行 manifest 並比對 expected classification、kind 與 version；已包含官方 1.1/1.2/1.3/1.4 真實 RNG 驗證並已於 CI 中執行。 |
 | External baseline | `OdfExternalValidator`、CLI `--baseline` | ODF Validator CLI | complete | 可選執行 ODF Validator JAR；`validate` 與 `validate-corpus` 都會把未文件化 baseline mismatch 視為失敗，並支援 documented exception manifest。 |
 | Typed DOM | generated DOM wrappers、`OdfNodeFactory`、`OdfTypedDomCoverage`、typed attribute helpers、schema-specific child collections | ODFDOM | complete | 以 [typed-dom-coverage.md](typed-dom-coverage.md)、CLI `typed-dom-coverage` 與 CI artifact 追蹤 child relation coverage；generated wrappers 已包含常用 datatype typed property、2,000+ schema-specific child collection property，且 repo 內已有完整型別與符合 ODFDOM-style sample traversal 的測試。 |

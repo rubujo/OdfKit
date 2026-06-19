@@ -92,7 +92,11 @@ public static class OdfDocumentKindDetector
         new(".fodg", GraphicsMimeType, OdfDocumentKind.FlatGraphics, OdfDocumentKind.Graphics, true),
         new(".fodc", ChartMimeType, OdfDocumentKind.FlatChart, OdfDocumentKind.Chart, true),
         new(".fdf", FormulaMimeType, OdfDocumentKind.FlatFormula, OdfDocumentKind.Formula, true),
-        new(".fodi", ImageMimeType, OdfDocumentKind.FlatImage, OdfDocumentKind.Image, true)
+        new(".fodi", ImageMimeType, OdfDocumentKind.FlatImage, OdfDocumentKind.Image, true),
+        new(".oth", "application/vnd.oasis.opendocument.text-web", OdfDocumentKind.TextWeb, OdfDocumentKind.Text, false),
+        new(".otc", "application/vnd.oasis.opendocument.chart-template", OdfDocumentKind.ChartTemplate, OdfDocumentKind.Chart, false),
+        new(".otf", "application/vnd.oasis.opendocument.formula-template", OdfDocumentKind.FormulaTemplate, OdfDocumentKind.Formula, false),
+        new(".oti", "application/vnd.oasis.opendocument.image-template", OdfDocumentKind.ImageTemplate, OdfDocumentKind.Image, false)
     ];
 
     private static readonly ReadOnlyCollection<OdfFormatInfo> SupportedFormatsValue = Array.AsReadOnly(FormatTable);
@@ -218,13 +222,13 @@ public static class OdfDocumentKindDetector
     {
         return kind switch
         {
-            OdfDocumentKind.TextTemplate or OdfDocumentKind.TextMaster or OdfDocumentKind.FlatText => OdfDocumentKind.Text,
+            OdfDocumentKind.TextTemplate or OdfDocumentKind.TextMaster or OdfDocumentKind.TextWeb or OdfDocumentKind.FlatText => OdfDocumentKind.Text,
             OdfDocumentKind.SpreadsheetTemplate or OdfDocumentKind.FlatSpreadsheet => OdfDocumentKind.Spreadsheet,
             OdfDocumentKind.PresentationTemplate or OdfDocumentKind.FlatPresentation => OdfDocumentKind.Presentation,
             OdfDocumentKind.GraphicsTemplate or OdfDocumentKind.FlatGraphics => OdfDocumentKind.Graphics,
-            OdfDocumentKind.FlatChart => OdfDocumentKind.Chart,
-            OdfDocumentKind.FlatFormula => OdfDocumentKind.Formula,
-            OdfDocumentKind.FlatImage => OdfDocumentKind.Image,
+            OdfDocumentKind.ChartTemplate or OdfDocumentKind.FlatChart => OdfDocumentKind.Chart,
+            OdfDocumentKind.FormulaTemplate or OdfDocumentKind.FlatFormula => OdfDocumentKind.Formula,
+            OdfDocumentKind.ImageTemplate or OdfDocumentKind.FlatImage => OdfDocumentKind.Image,
             _ => kind
         };
     }
@@ -295,7 +299,11 @@ public static class OdfDocumentKindDetector
         return kind == OdfDocumentKind.TextTemplate ||
             kind == OdfDocumentKind.SpreadsheetTemplate ||
             kind == OdfDocumentKind.PresentationTemplate ||
-            kind == OdfDocumentKind.GraphicsTemplate;
+            kind == OdfDocumentKind.GraphicsTemplate ||
+            kind == OdfDocumentKind.TextWeb ||
+            kind == OdfDocumentKind.ChartTemplate ||
+            kind == OdfDocumentKind.FormulaTemplate ||
+            kind == OdfDocumentKind.ImageTemplate;
     }
 
     /// <summary>

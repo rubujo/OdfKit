@@ -149,7 +149,27 @@ public enum OdfDocumentKind
     /// <summary>
     /// 單一 Flat XML 格式的 ODF 影像文件 (.fodi)。
     /// </summary>
-    FlatImage
+    FlatImage,
+
+    /// <summary>
+    /// ODF 網頁範本文件 (.oth)。
+    /// </summary>
+    TextWeb,
+
+    /// <summary>
+    /// ODF 圖表範本文件 (.otc)。
+    /// </summary>
+    ChartTemplate,
+
+    /// <summary>
+    /// ODF 公式範本文件 (.otf)。
+    /// </summary>
+    FormulaTemplate,
+
+    /// <summary>
+    /// ODF 影像範本文件 (.oti)。
+    /// </summary>
+    ImageTemplate
 }
 
 /// <summary>

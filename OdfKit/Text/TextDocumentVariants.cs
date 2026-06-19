@@ -179,6 +179,71 @@ public sealed class TextMasterDocument : TextDocument
 }
 
 /// <summary>
+/// 表示 ODF 網頁範本文件（OTH）。
+/// </summary>
+public sealed class TextWebDocument : TextDocument
+{
+    /// <summary>
+    /// 初始化 <see cref="TextWebDocument"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="package">ODF 封裝。</param>
+    public TextWebDocument(OdfPackage package) : base(package)
+    {
+    }
+
+    /// <summary>
+    /// 建立新的 OTH 網頁範本文件。
+    /// </summary>
+    /// <returns>新的 <see cref="TextWebDocument"/> 執行個體。</returns>
+    public static new TextWebDocument Create()
+    {
+        return (TextWebDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.TextWeb);
+    }
+
+    /// <summary>
+    /// 從指定路徑載入 OTH 網頁範本文件。
+    /// </summary>
+    /// <param name="path">OTH 文件路徑。</param>
+    /// <returns>載入完成的 <see cref="TextWebDocument"/> 執行個體。</returns>
+    public static new TextWebDocument Load(string path) =>
+        Ensure(OdfDocumentFactory.LoadDocument(path));
+
+    /// <summary>
+    /// 非同步從指定路徑載入 OTH 網頁範本文件。
+    /// </summary>
+    /// <param name="path">OTH 文件路徑。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextWebDocument"/>。</returns>
+    public static new async Task<TextWebDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+        Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
+
+    /// <summary>
+    /// 從指定資料流載入 OTH 網頁範本文件。
+    /// </summary>
+    /// <param name="stream">包含 OTH 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>載入完成的 <see cref="TextWebDocument"/> 執行個體。</returns>
+    public static new TextWebDocument Load(Stream stream, string? fileName = null) =>
+        Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
+
+    /// <summary>
+    /// 非同步從指定資料流載入 OTH 網頁範本文件。
+    /// </summary>
+    /// <param name="stream">包含 OTH 文件內容的資料流。</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">取消語彙基元。</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextWebDocument"/>。</returns>
+    public static new async Task<TextWebDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+        Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+
+    private static TextWebDocument Ensure(OdfDocument document) =>
+        OdfDocumentVariantSupport.EnsureKind<TextWebDocument>(
+            document,
+            OdfDocumentKind.TextWeb,
+            "指定的 ODF 文件不是 OTH 網頁範本。");
+}
+
+/// <summary>
 /// 表示 ODF 扁平 XML 文字文件（FODT）。
 /// </summary>
 public sealed class FlatTextDocument : TextDocument
