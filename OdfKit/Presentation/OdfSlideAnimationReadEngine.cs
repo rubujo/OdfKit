@@ -119,7 +119,7 @@ internal static class OdfSlideAnimationReadEngine
                 current.LocalName != "par")
                 continue;
 
-            if (current.GetAttribute("begin", SmilNs) == "on-click")
+            if (current.GetAttribute("node-type", OdfNamespaces.Presentation) == "on-click")
                 return current;
         }
 

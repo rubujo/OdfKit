@@ -764,7 +764,8 @@ public static class PptxToOdpConverter
         }
 
         var animationNodes = timing.Descendants<OpenXmlCompositeElement>()
-            .Where(e => e is P.AnimateEffect || e is P.Animate || e is P.SetBehavior || e is P.AnimateColor || e is P.AnimateMotion || e is P.AnimateRotation || e is P.AnimateScale);
+            .Where(e => e is P.AnimateEffect || e is P.Animate || e is P.AnimateColor || e is P.AnimateMotion || e is P.AnimateRotation || e is P.AnimateScale ||
+                (e is P.SetBehavior setBehavior && setBehavior.Parent?.Elements<P.AnimateEffect>().Any() != true));
 
         foreach (OpenXmlCompositeElement effect in animationNodes)
         {

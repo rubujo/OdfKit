@@ -243,9 +243,28 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
 
     private static OdfNode FindOrCreateAnimationSequence(OdfNode slideNode)
     {
+        const string AnimNs = "urn:oasis:names:tc:opendocument:xmlns:animation:1.0";
+
+        OdfNode? timingRoot = null;
         foreach (var child in slideNode.Children)
         {
-            if (child.NodeType is OdfNodeType.Element && child.LocalName is "seq" && child.NamespaceUri is "urn:oasis:names:tc:opendocument:xmlns:animation:1.0")
+            if (child.NodeType is OdfNodeType.Element && child.LocalName is "par" && child.NamespaceUri is AnimNs &&
+                child.GetAttribute("node-type", OdfNamespaces.Presentation) is "timing-root")
+            {
+                timingRoot = child;
+                break;
+            }
+        }
+        if (timingRoot is null)
+        {
+            timingRoot = new OdfNode(OdfNodeType.Element, "par", AnimNs, "anim");
+            timingRoot.SetAttribute("node-type", OdfNamespaces.Presentation, "timing-root", "presentation");
+            slideNode.AppendChild(timingRoot);
+        }
+
+        foreach (var child in timingRoot.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element && child.LocalName is "seq" && child.NamespaceUri is AnimNs)
             {
                 string? nodeType = child.GetAttribute("node-type", OdfNamespaces.Presentation);
                 if (nodeType is "main-sequence")
@@ -255,9 +274,9 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
             }
         }
 
-        OdfNode mainSeq = new(OdfNodeType.Element, "seq", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
+        OdfNode mainSeq = new(OdfNodeType.Element, "seq", AnimNs, "anim");
         mainSeq.SetAttribute("node-type", OdfNamespaces.Presentation, "main-sequence", "presentation");
-        slideNode.AppendChild(mainSeq);
+        timingRoot.AppendChild(mainSeq);
         return mainSeq;
     }
 }

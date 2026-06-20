@@ -217,8 +217,7 @@ public partial class OdfSlide
         if (trigger == OdfAnimationTrigger.OnClick)
         {
             OdfNode clickPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
-            clickPar.SetAttribute("begin", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "on-click", "smil");
-            clickPar.SetAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "indefinite", "smil");
+            clickPar.SetAttribute("node-type", OdfKit.Core.OdfNamespaces.Presentation, "on-click", "presentation");
 
             // 需要用一個 anim:par smil:begin="0s" 來包裹這個點擊步驟
             OdfNode outerPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
@@ -239,8 +238,7 @@ public partial class OdfSlide
 
             // 若找不到，則建立一個預設的 on-click 步驟
             OdfNode clickPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
-            clickPar.SetAttribute("begin", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "on-click", "smil");
-            clickPar.SetAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "indefinite", "smil");
+            clickPar.SetAttribute("node-type", OdfKit.Core.OdfNamespaces.Presentation, "on-click", "presentation");
 
             OdfNode outerPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
             outerPar.SetAttribute("begin", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "0s", "smil");
@@ -262,7 +260,7 @@ public partial class OdfSlide
                 {
                     if (innerChild.LocalName == "par" &&
                         innerChild.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:animation:1.0" &&
-                        innerChild.GetAttribute("begin", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0") == "on-click")
+                        innerChild.GetAttribute("node-type", OdfKit.Core.OdfNamespaces.Presentation) == "on-click")
                     {
                         return innerChild;
                     }

@@ -545,6 +545,7 @@ public static class OdpToPptxConverter
         themePart.Theme.Save();
 
         SlideLayoutPart layoutPart = masterPart.AddNewPart<SlideLayoutPart>();
+        layoutPart.AddPart(masterPart);
         P.CommonSlideData layoutCommonSlideData = CreateCommonSlideData();
         layoutCommonSlideData.Background = new P.Background(
             new P.BackgroundStyleReference(new A.SchemeColor { Val = A.SchemeColorValues.Background2 }) { Index = 1U });
@@ -740,8 +741,8 @@ public static class OdpToPptxConverter
         uint timeNodeId = 1;
         var mainSequenceChildren = new P.ChildTimeNodeList();
 
-        P.ParallelTimeNode? currentGroup = null;
         P.ChildTimeNodeList? currentGroupChildren = null;
+        P.TimeNodeValues currentGroupNodeType = P.TimeNodeValues.ClickEffect;
 
         foreach (OdfKit.Presentation.OdfAnimationInfo animation in animations)
         {
@@ -753,26 +754,19 @@ public static class OdpToPptxConverter
             }
 
             // 判斷是否需要建立新的動畫群組。OnClick 或 AfterPrevious 動畫，或是第一個動畫時，開啟新群組。
-            bool startNewGroup = currentGroup is null ||
+            bool startNewGroup = currentGroupChildren is null ||
                                  animation.Trigger == OdfKit.Presentation.OdfAnimationTrigger.OnClick ||
                                  animation.Trigger == OdfKit.Presentation.OdfAnimationTrigger.AfterPrevious;
 
             if (startNewGroup)
             {
-                if (currentGroup is not null)
+                if (currentGroupChildren is not null)
                 {
-                    mainSequenceChildren.Append(currentGroup);
+                    mainSequenceChildren.Append(WrapAnimationStep(currentGroupChildren, ref timeNodeId));
                 }
 
                 currentGroupChildren = new P.ChildTimeNodeList();
-                currentGroup = new P.ParallelTimeNode(
-                    new P.CommonTimeNode
-                    {
-                        Id = timeNodeId++,
-                        Duration = IndefiniteDuration,
-                        NodeType = ReadAnimationNodeType(animation.Trigger),
-                        ChildTimeNodeList = currentGroupChildren,
-                    });
+                currentGroupNodeType = ReadAnimationNodeType(animation.Trigger);
             }
 
             // 逐段落動畫展開，或者單一圖形動畫
@@ -780,18 +774,18 @@ public static class OdpToPptxConverter
             {
                 for (int i = 0; i < pCount; i++)
                 {
-                    currentGroupChildren!.Append(CreateAnimationEffectNode(animation, targetShapeId, ref timeNodeId, i));
+                    currentGroupChildren!.Append(CreateAnimationEffectNode(animation, targetShapeId, currentGroupNodeType, ref timeNodeId, i));
                 }
             }
             else
             {
-                currentGroupChildren!.Append(CreateAnimationEffectNode(animation, targetShapeId, ref timeNodeId));
+                currentGroupChildren!.Append(CreateAnimationEffectNode(animation, targetShapeId, currentGroupNodeType, ref timeNodeId));
             }
         }
 
-        if (currentGroup is not null)
+        if (currentGroupChildren is not null)
         {
-            mainSequenceChildren.Append(currentGroup);
+            mainSequenceChildren.Append(WrapAnimationStep(currentGroupChildren, ref timeNodeId));
         }
 
         var mainSequence = new P.SequenceTimeNode(
@@ -801,7 +795,11 @@ public static class OdpToPptxConverter
                 Duration = IndefiniteDuration,
                 NodeType = P.TimeNodeValues.MainSequence,
                 ChildTimeNodeList = mainSequenceChildren,
-            })
+            },
+            new P.PreviousConditionList(
+                new P.Condition { Event = P.TriggerEventValues.OnPrevious, Delay = "0", TargetElement = new P.TargetElement(new P.SlideTarget()) }),
+            new P.NextConditionList(
+                new P.Condition { Event = P.TriggerEventValues.OnNext, Delay = "0", TargetElement = new P.TargetElement(new P.SlideTarget()) }))
         {
             Concurrent = true,
             NextAction = P.NextActionValues.Seek,
@@ -820,6 +818,30 @@ public static class OdpToPptxConverter
         return new P.Timing(
             new P.TimeNodeList(root),
             CreateAnimationBuildList(animations, animationTargets, animationNodes));
+    }
+
+    /// <summary>
+    /// 將一組動畫效果節點，依 PowerPoint 實際輸出的巢狀結構包裝為主序列下的一個步驟（外層 indefinite 延遲、內層 0 秒延遲的兩層 par）。
+    /// </summary>
+    private static P.ParallelTimeNode WrapAnimationStep(P.ChildTimeNodeList groupChildren, ref uint timeNodeId)
+    {
+        P.CommonTimeNode middleTimeNode = new()
+        {
+            Id = timeNodeId++,
+            Fill = P.TimeNodeFillValues.Hold,
+            StartConditionList = new P.StartConditionList(new P.Condition { Delay = "0" }),
+            ChildTimeNodeList = groupChildren,
+        };
+        var middleGroup = new P.ParallelTimeNode(middleTimeNode);
+
+        P.CommonTimeNode outerTimeNode = new()
+        {
+            Id = timeNodeId++,
+            Fill = P.TimeNodeFillValues.Hold,
+            StartConditionList = new P.StartConditionList(new P.Condition { Delay = "indefinite" }),
+            ChildTimeNodeList = new P.ChildTimeNodeList(middleGroup),
+        };
+        return new P.ParallelTimeNode(outerTimeNode);
     }
 
     /// <summary>
@@ -877,51 +899,78 @@ public static class OdpToPptxConverter
     private static P.ParallelTimeNode CreateAnimationEffectNode(
         OdfKit.Presentation.OdfAnimationInfo animation,
         uint targetShapeId,
+        P.TimeNodeValues groupNodeType,
         ref uint timeNodeId,
         int? paragraphIndex = null)
     {
         string duration = FormatAnimationDuration(animation);
         string? delay = FormatAnimationDelay(animation);
+        string shapeIdText = targetShapeId.ToString(CultureInfo.InvariantCulture);
+
         P.CommonTimeNode behaviorTimeNode = new()
         {
             Id = timeNodeId++,
             Duration = duration,
         };
-        SetAnimationStart(behaviorTimeNode, delay);
 
-        var shapeTarget = new P.ShapeTarget { ShapeId = targetShapeId.ToString(CultureInfo.InvariantCulture) };
-        if (paragraphIndex.HasValue)
+        P.ShapeTarget CreateShapeTarget()
         {
-            var txEl = new OpenXmlUnknownElement("p", "txEl", "http://schemas.openxmlformats.org/presentationml/2006/main");
-            var pRg = new OpenXmlUnknownElement("p", "pRg", "http://schemas.openxmlformats.org/presentationml/2006/main");
-            pRg.SetAttribute(new OpenXmlAttribute("st", "", paragraphIndex.Value.ToString(CultureInfo.InvariantCulture)));
-            pRg.SetAttribute(new OpenXmlAttribute("end", "", paragraphIndex.Value.ToString(CultureInfo.InvariantCulture)));
-            txEl.Append(pRg);
-            shapeTarget.Append(txEl);
+            var shapeTarget = new P.ShapeTarget { ShapeId = shapeIdText };
+            if (paragraphIndex.HasValue)
+            {
+                var txEl = new OpenXmlUnknownElement("p", "txEl", "http://schemas.openxmlformats.org/presentationml/2006/main");
+                var pRg = new OpenXmlUnknownElement("p", "pRg", "http://schemas.openxmlformats.org/presentationml/2006/main");
+                pRg.SetAttribute(new OpenXmlAttribute("st", "", paragraphIndex.Value.ToString(CultureInfo.InvariantCulture)));
+                pRg.SetAttribute(new OpenXmlAttribute("end", "", paragraphIndex.Value.ToString(CultureInfo.InvariantCulture)));
+                txEl.Append(pRg);
+                shapeTarget.Append(txEl);
+            }
+            return shapeTarget;
         }
 
         var animateEffect = new P.AnimateEffect(
             new P.CommonBehavior(
                 behaviorTimeNode,
-                new P.TargetElement(shapeTarget)))
+                new P.TargetElement(CreateShapeTarget())))
         {
             Transition = ReadAnimationTransition(animation.Kind),
             Filter = ReadAnimationFilter(animation.Effect),
         };
 
-        var childList = new P.ChildTimeNodeList(animateEffect);
+        var childList = new P.ChildTimeNodeList();
+        if (animation.Kind is OdfKit.Presentation.OdfAnimationKind.Entrance or OdfKit.Presentation.OdfAnimationKind.Exit)
+        {
+            string visibility = animation.Kind == OdfKit.Presentation.OdfAnimationKind.Entrance ? "visible" : "hidden";
+            P.CommonTimeNode setTimeNode = new()
+            {
+                Id = timeNodeId++,
+                Duration = "1",
+                Fill = P.TimeNodeFillValues.Hold,
+                StartConditionList = new P.StartConditionList(new P.Condition { Delay = "0" }),
+            };
+            var setBehavior = new P.SetBehavior(
+                new P.CommonBehavior(
+                    setTimeNode,
+                    new P.TargetElement(CreateShapeTarget()),
+                    new P.AttributeNameList(new P.AttributeName("style.visibility"))),
+                new P.ToVariantValue(new P.StringVariantValue { Val = visibility }));
+            childList.Append(setBehavior);
+        }
+        childList.Append(animateEffect);
+
         P.CommonTimeNode effectTimeNode = new()
         {
             Id = timeNodeId++,
             PresetId = ReadAnimationPresetId(animation),
             PresetClass = ReadAnimationPresetClass(animation.Kind),
-            Duration = duration,
-            NodeType = ReadAnimationNodeType(animation.Trigger),
+            PresetSubtype = 0,
+            Fill = P.TimeNodeFillValues.Hold,
+            GroupId = 0U,
+            NodeType = groupNodeType,
+            StartConditionList = new P.StartConditionList(new P.Condition { Delay = delay ?? "0" }),
             ChildTimeNodeList = childList,
         };
-        SetAnimationStart(effectTimeNode, delay);
-        return new P.ParallelTimeNode(
-            effectTimeNode);
+        return new P.ParallelTimeNode(effectTimeNode);
     }
 
     /// <summary>
@@ -929,11 +978,8 @@ public static class OdpToPptxConverter
     /// </summary>
     private static void SetAnimationStart(P.CommonTimeNode timeNode, string? delay)
     {
-        if (!string.IsNullOrWhiteSpace(delay))
-        {
-            timeNode.StartConditionList = new P.StartConditionList(
-                new P.Condition { Delay = delay });
-        }
+        timeNode.StartConditionList = new P.StartConditionList(
+            new P.Condition { Delay = delay ?? "0" });
     }
 
     /// <summary>

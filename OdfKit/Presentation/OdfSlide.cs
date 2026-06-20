@@ -193,10 +193,29 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     {
         get
         {
-            OdfNode? mainSeq = null;
+            const string AnimNs = "urn:oasis:names:tc:opendocument:xmlns:animation:1.0";
+
+            OdfNode? timingRoot = null;
             foreach (var child in Node.Children)
             {
-                if (child.NodeType is OdfNodeType.Element && child.LocalName is "seq" && child.NamespaceUri is "urn:oasis:names:tc:opendocument:xmlns:animation:1.0")
+                if (child.NodeType is OdfNodeType.Element && child.LocalName is "par" && child.NamespaceUri is AnimNs &&
+                    child.GetAttribute("node-type", OdfNamespaces.Presentation) is "timing-root")
+                {
+                    timingRoot = child;
+                    break;
+                }
+            }
+            if (timingRoot is null)
+            {
+                timingRoot = new OdfNode(OdfNodeType.Element, "par", AnimNs, "anim");
+                timingRoot.SetAttribute("node-type", OdfNamespaces.Presentation, "timing-root", "presentation");
+                Node.AppendChild(timingRoot);
+            }
+
+            OdfNode? mainSeq = null;
+            foreach (var child in timingRoot.Children)
+            {
+                if (child.NodeType is OdfNodeType.Element && child.LocalName is "seq" && child.NamespaceUri is AnimNs)
                 {
                     string? nodeType = child.GetAttribute("node-type", OdfNamespaces.Presentation);
                     if (nodeType is "main-sequence")
@@ -208,9 +227,9 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
             }
             if (mainSeq is null)
             {
-                mainSeq = new OdfNode(OdfNodeType.Element, "seq", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
+                mainSeq = new OdfNode(OdfNodeType.Element, "seq", AnimNs, "anim");
                 mainSeq.SetAttribute("node-type", OdfNamespaces.Presentation, "main-sequence", "presentation");
-                Node.AppendChild(mainSeq);
+                timingRoot.AppendChild(mainSeq);
             }
             return new OdfAnimationNode(mainSeq);
         }

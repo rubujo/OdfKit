@@ -1379,8 +1379,7 @@ public class ManagedPptxConversionTests
             $"Expected {expectedPoints}pt but got {actualPoints}pt from '{actual}'.");
     }
     private static string? GetAnimationDelay(P.AnimateEffect effect)
-        => effect.CommonBehavior?
-            .CommonTimeNode?
+        => (effect.Parent?.Parent as P.CommonTimeNode)?
             .StartConditionList?
             .Elements<P.Condition>()
             .Select(condition => condition.Delay?.Value)
