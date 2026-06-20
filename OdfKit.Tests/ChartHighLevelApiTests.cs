@@ -37,7 +37,7 @@ public class ChartHighLevelApiTests
 
         // 驗證 XML 屬性
         string? cellRange = chartDoc.ChartNode.GetAttribute("cell-range-address", OdfNamespaces.Table);
-        Assert.Equal("[LocalTable.A1:.B5]", cellRange);
+        Assert.Equal("LocalTable.A1:.B5", cellRange);
 
         // 驗證 GetChartDefinition
         var readDef = chartDoc.GetChartDefinition();

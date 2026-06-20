@@ -479,7 +479,7 @@ namespace OdfKit.Tests
                 // Verify embedded formula content.xml exists and is preserved
                 Assert.True(package.HasEntry($"{href}/content.xml"));
                 Assert.True(package.HasEntry($"{href}/mimetype"));
-                Assert.Equal("application/vnd.oasis.opendocument.formula", package.Manifest[$"{href}/mimetype"]);
+                Assert.Equal("application/vnd.oasis.opendocument.formula", package.Manifest[$"{href}/"]);
 
                 // Verify TOC exists
                 OdfNode? toc = null;

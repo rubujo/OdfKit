@@ -78,10 +78,16 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
                     throw new InvalidOperationException("Invalid formula folder path specified (Zip Slip defense).");
                 }
                 ObjectNode.SetAttribute("href", OdfNamespaces.XLink, value, "xlink");
+                ObjectNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+                ObjectNode.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
+                ObjectNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
             }
             else
             {
                 ObjectNode.RemoveAttribute("href", OdfNamespaces.XLink);
+                ObjectNode.RemoveAttribute("type", OdfNamespaces.XLink);
+                ObjectNode.RemoveAttribute("show", OdfNamespaces.XLink);
+                ObjectNode.RemoveAttribute("actuate", OdfNamespaces.XLink);
             }
         }
     }
@@ -122,13 +128,16 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
                 throw new InvalidOperationException("Invalid formula folder path specified (Zip Slip defense).");
             }
 
-            string mathDocXml = $"<office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:math=\"http://www.w3.org/1998/Math/MathML\"><office:body><office:formula>{value}</office:formula></office:body></office:document-meta>";
+            string mathDocXml = $"<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:math=\"http://www.w3.org/1998/Math/MathML\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:body><office:formula>{value}</office:formula></office:body></office:document-content>";
+            string stylesXml = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:styles/><office:automatic-styles/><office:master-styles/></office:document-styles>";
 
             string contentPath = $"{folder.TrimEnd('/')}/content.xml";
+            string stylesPath = $"{folder.TrimEnd('/')}/styles.xml";
             string mimePath = $"{folder.TrimEnd('/')}/mimetype";
 
             _doc.Package.WriteEntry(contentPath, Encoding.UTF8.GetBytes(mathDocXml), "text/xml");
-            _doc.Package.WriteEntry(mimePath, Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.formula"), "application/vnd.oasis.opendocument.formula");
+            _doc.Package.WriteEntry(stylesPath, Encoding.UTF8.GetBytes(stylesXml), "text/xml");
+            _doc.Package.WriteEntry(mimePath, Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.formula"), string.Empty);
             _doc.Package.SaveManifestToEntries();
         }
     }

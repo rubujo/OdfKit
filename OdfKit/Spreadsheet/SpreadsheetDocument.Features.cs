@@ -221,7 +221,7 @@ public partial class SpreadsheetDocument
             _ => "chart:bar"
         };
 
-        string dataRangeStr = chart.DataRange.ToOdfString(true);
+        string dataRangeStr = chart.DataRange.ToOdfString(false);
 
         var sb = new System.Text.StringBuilder();
         sb.Append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");

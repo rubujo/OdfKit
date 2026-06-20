@@ -91,7 +91,7 @@ public partial class TextDocument
         sb.Append("<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.3\">");
         sb.Append("<office:body><office:chart>");
 
-        string dataRangeStr = chart.DataRange.ToOdfString(true);
+        string dataRangeStr = chart.DataRange.ToOdfString(false);
         sb.Append($"<chart:chart chart:class=\"{chartClass}\"");
         if (!string.IsNullOrEmpty(dataRangeStr))
         {
