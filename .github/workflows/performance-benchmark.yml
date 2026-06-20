@@ -1,38 +1,19 @@
 name: Performance benchmark
 
 on:
-  pull_request:
-    paths:
-      - 'OdfKit/**'
-      - 'OdfKit.Benchmarks/**'
-      - 'eng/Benchmark-Regression.ps1'
-      - 'eng/baselines/**'
-      - '.github/workflows/performance-benchmark.yml'
-  push:
-    branches:
-      - main
-    paths:
-      - 'OdfKit/**'
-      - 'OdfKit.Benchmarks/**'
-      - 'eng/Benchmark-Regression.ps1'
-      - 'eng/baselines/**'
-      - '.github/workflows/performance-benchmark.yml'
   workflow_dispatch:
-
-concurrency:
-  group: performance-benchmark-${{ github.ref }}
-  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
   benchmark-regression:
+    name: Benchmark Regression
     runs-on: windows-latest
-    continue-on-error: true
+    timeout-minutes: 45
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup .NET
         uses: ./.github/actions/setup-dotnet-odfkit
@@ -41,24 +22,6 @@ jobs:
             10.0.x
           cache-key-suffix: '-perf-benchmark'
 
-      - name: Benchmark regression (non-blocking)
+      - name: Run benchmark regression
         shell: pwsh
         run: ./eng/Benchmark-Regression.ps1 -Configuration Release
-
-  trim-smoke:
-    runs-on: windows-latest
-    continue-on-error: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup .NET
-        uses: ./.github/actions/setup-dotnet-odfkit
-        with:
-          dotnet-versions: |
-            10.0.x
-          cache-key-suffix: '-trim-smoke'
-
-      - name: Trim smoke (non-blocking)
-        shell: pwsh
-        run: ./eng/Test-TrimSmoke.ps1 -Configuration Release

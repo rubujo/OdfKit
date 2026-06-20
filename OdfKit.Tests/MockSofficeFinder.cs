@@ -33,6 +33,23 @@ public static class MockSofficeFinder
         {
             if (File.Exists(path))
             {
+#if !NETFRAMEWORK
+                if (!OperatingSystem.IsWindows())
+                {
+                    try
+                    {
+                        File.SetUnixFileMode(
+                            path,
+                            UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute |
+                            UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
+                            UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+                    }
+                    catch
+                    {
+                        // 略過權限設定異常，由 OS 後續處理
+                    }
+                }
+#endif
                 return path;
             }
         }

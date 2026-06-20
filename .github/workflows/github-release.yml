@@ -1,0 +1,57 @@
+name: GitHub Release CD
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: github-release-${{ github.ref }}
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+            8.0.x
+          cache-key-suffix: '-release'
+
+      - name: Verify Tag matches Props Version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $expectedVersion = $tag.TrimStart('v')
+          $packageVersion = & (Join-Path "eng" "Get-PackageVersion.ps1")
+          Write-Host "Git Tag: $tag"
+          Write-Host "Props Version: $packageVersion"
+          if ($expectedVersion -ne $packageVersion) {
+              Write-Error "錯誤：Git Tag 版本 ($tag) 與 eng/OdfKit.Package.props 中的版本 ($packageVersion) 不一致！請先更新 props 檔案中的版本。"
+              exit 1
+          }
+
+      - name: Run consumer smoke test & validations
+        shell: pwsh
+        run: ./eng/Test-NuGetPack.ps1 -Configuration Release
+
+      - name: Pack NuGet Packages
+        shell: pwsh
+        run: ./eng/Pack-NuGet.ps1 -Configuration Release
+
+      - name: Create GitHub Release and Upload Assets
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./eng/Publish-GitHubRelease.ps1 -CreateRelease -Tag "${{ github.ref_name }}" -SkipValidation

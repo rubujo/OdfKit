@@ -1,0 +1,43 @@
+name: Trim smoke validation
+
+on:
+  pull_request:
+    paths:
+      - 'OdfKit/**'
+      - 'eng/Test-TrimSmoke.ps1'
+      - '.github/workflows/trim-smoke.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'OdfKit/**'
+      - 'eng/Test-TrimSmoke.ps1'
+      - '.github/workflows/trim-smoke.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: trim-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate-trim-smoke:
+    name: Native AOT Trim Smoke
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+          cache-key-suffix: '-trim-smoke'
+
+      - name: Run trim smoke (blocking)
+        shell: pwsh
+        run: ./eng/Test-TrimSmoke.ps1 -Configuration Release

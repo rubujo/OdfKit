@@ -27,27 +27,24 @@ pwsh eng/Pack-NuGet.ps1 -Configuration Release
 
 輸出：`artifacts/nuget/`（檔名含目前版本，例如 `OdfKit.0.0.1.nupkg`）。
 
-## 3. 乾跑 Release 準備
+## 3. 發佈步驟 (自動化 CD)
 
-```powershell
-pwsh eng/Publish-GitHubRelease.ps1
-```
+本專案現已導入 **Git Tag 觸發的自動化 CD 發佈流程**。發佈步驟如下：
 
-會驗證封裝、依 `eng/OdfKit.Package.props` 推導標籤（例如 `v0.0.1`），並產生 `artifacts/OdfKit-nuget-packages.zip`。
-
-## 4. 建立 GitHub Release
-
-需已安裝並登入 [GitHub CLI](https://cli.github.com/)（`gh auth login`）：
-
-```powershell
-pwsh eng/Publish-GitHubRelease.ps1 -CreateRelease
-```
-
-亦可手動指定標籤：
-
-```powershell
-pwsh eng/Publish-GitHubRelease.ps1 -CreateRelease -Tag v0.0.1 -Title "OdfKit 0.0.1"
-```
+1. **更新 props 檔版本號**：在 `eng/OdfKit.Package.props` 中更新 `<Version>`（例如改為 `0.0.2`）。
+2. **提交變更並 Push**：將版本變更提交並推送到 GitHub 的 `main` 分支。
+3. **本機或線上打 Tag 觸發 CD**：
+   在命令列中建立並推送對應的 Git Tag（格式必須為 `v*`，例如 `v0.0.2`，且必須與 props 中的版本號完全一致）：
+   ```powershell
+   git tag v0.0.2
+   git push origin v0.0.2
+   ```
+4. **追蹤發佈進度**：
+   GitHub Actions 的 `GitHub Release CD` 工作流會被自動觸發。它會：
+   - 驗證 Tag 版本與 props 檔版本是否對等。
+   - 執行 NuGet 封裝結構檢查與消費端煙霧測試。
+   - 在雲端自動進行 NuGet 打包。
+   - 自動在 GitHub 上建立 Release，並利用 `GITHUB_TOKEN` 將 `.nupkg`、`.snupkg` 以及打包好的 ZIP 資產上傳至該 Release 中。
 
 ## 5. 消費端：自 Release 安裝套件
 

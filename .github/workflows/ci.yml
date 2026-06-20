@@ -1,0 +1,54 @@
+name: CI Build & Test
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'OdfKit/**'
+      - 'OdfKit.Extensions.*/**'
+      - 'OdfKit.Tests/**'
+      - 'eng/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'OdfKit/**'
+      - 'OdfKit.Extensions.*/**'
+      - 'OdfKit.Tests/**'
+      - 'eng/**'
+      - '.github/workflows/ci.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build & Test (${{ matrix.os }} - ${{ matrix.framework }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        framework: [net8.0, net10.0]
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          dotnet-versions: |
+            10.0.x
+            8.0.x
+          cache-key-suffix: '-ci-test'
+
+      - name: Build & Run Tests
+        shell: pwsh
+        run: |
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f ${{ matrix.framework }} --logger "console;verbosity=normal"
