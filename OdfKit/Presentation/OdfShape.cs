@@ -87,7 +87,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
         }
 
         Node.AppendChild(table);
-        return new OdfEmbeddedTable(table);
+        return new OdfEmbeddedTable(table, Document);
     }
 
     /// <summary>
@@ -123,6 +123,24 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
             Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "stroke", OdfNamespaces.Draw, "solid", "draw");
             Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "stroke-color", OdfNamespaces.Svg, value ?? string.Empty, "svg");
         }
+    }
+
+    /// <summary>
+    /// 取得或設定圖形的邊框寬度，例如 <c>1.5pt</c>。
+    /// </summary>
+    public string? StrokeWidth
+    {
+        get => Document.StyleEngine.GetStyleProperty(Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "stroke-width", OdfNamespaces.Svg, "graphic");
+        set => Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "stroke-width", OdfNamespaces.Svg, value, "svg");
+    }
+
+    /// <summary>
+    /// 取得或設定圖形的邊框線條樣式，例如 <c>solid</c>、<c>dash</c> 或 <c>none</c>。
+    /// </summary>
+    public string? StrokeStyle
+    {
+        get => Document.StyleEngine.GetStyleProperty(Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "stroke", OdfNamespaces.Draw, "graphic");
+        set => Document.StyleEngine.SetLocalStyleProperty(Node, "graphic", "graphic-properties", "stroke", OdfNamespaces.Draw, value, "draw");
     }
 
     /// <summary>

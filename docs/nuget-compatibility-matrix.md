@@ -7,7 +7,7 @@
 | 套件 ID | 說明 | 相依 |
 |---------|------|------|
 | `OdfKit` | 核心 ODF 處理程式庫 | — |
-| `OdfKit.Extensions.Html` | HTML 匯出 | `OdfKit` |
+| `OdfKit.Extensions.Html` | HTML / Markdown / RTF managed 匯出 | `OdfKit` |
 | `OdfKit.Extensions.Imaging` | 影像渲染（SkiaSharp） | `OdfKit` |
 | `OdfKit.Extensions.Ooxml` | OOXML 轉換（DOCX / XLSX） | `OdfKit` |
 | `OdfKit.Extensions.Pdf` | PDF 匯出 | `OdfKit` |

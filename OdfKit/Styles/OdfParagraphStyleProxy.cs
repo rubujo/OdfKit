@@ -56,4 +56,31 @@ public sealed class OdfParagraphStyleProxy
         get => _paragraph.StyleEngine.GetStyleProperty(_paragraph.StyleName ?? string.Empty, "margin-right", OdfNamespaces.Fo, "paragraph");
         set => _paragraph.StyleEngine.SetLocalStyleProperty(_paragraph.Node, "paragraph", "paragraph-properties", "margin-right", OdfNamespaces.Fo, value ?? string.Empty, "fo");
     }
+
+    /// <summary>
+    /// 取得或設定段落上方間距（對應 <c>fo:margin-top</c> 屬性）。
+    /// </summary>
+    public string? MarginTop
+    {
+        get => _paragraph.StyleEngine.GetStyleProperty(_paragraph.StyleName ?? string.Empty, "margin-top", OdfNamespaces.Fo, "paragraph");
+        set => _paragraph.StyleEngine.SetLocalStyleProperty(_paragraph.Node, "paragraph", "paragraph-properties", "margin-top", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+    }
+
+    /// <summary>
+    /// 取得或設定段落下方間距（對應 <c>fo:margin-bottom</c> 屬性）。
+    /// </summary>
+    public string? MarginBottom
+    {
+        get => _paragraph.StyleEngine.GetStyleProperty(_paragraph.StyleName ?? string.Empty, "margin-bottom", OdfNamespaces.Fo, "paragraph");
+        set => _paragraph.StyleEngine.SetLocalStyleProperty(_paragraph.Node, "paragraph", "paragraph-properties", "margin-bottom", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+    }
+
+    /// <summary>
+    /// 取得或設定段落首行縮排（對應 <c>fo:text-indent</c> 屬性）。
+    /// </summary>
+    public string? TextIndent
+    {
+        get => _paragraph.TextIndent;
+        set => _paragraph.TextIndent = value;
+    }
 }

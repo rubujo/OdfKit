@@ -45,6 +45,7 @@ flowchart LR
 
 `LibreOfficeRenderer` 預設搜尋：
 
+- `ODFKIT_SOFFICE_PATH`、`LIBREOFFICE_PATH`（可指向 `soffice` 檔案、安裝根目錄、`program` 目錄，或 LibreOffice Portable 根目錄）
 - Windows：`C:\Program Files\LibreOffice\program\soffice.exe`
 - macOS：`/Applications/LibreOffice.app/Contents/MacOS/soffice`
 - Linux：`/usr/bin/soffice`、`/usr/bin/libreoffice`
@@ -68,7 +69,19 @@ using OdfKit.Extensions.Rendering;
 using OdfKit.Text;
 
 using TextDocument document = TextDocument.Create();
-document.AddParagraph("轉為 PDF");
+document.AddParagraph("高 fidelity fallback 轉為 PDF");
+
+await document.ConvertToPdfAsync("out.pdf", cancellationToken);
+```
+
+`LibreOfficeConversionFormats` 提供常用 fallback 格式常數。跨格式輸出預設應優先使用
+[`managed-first-conversion-strategy.md`](managed-first-conversion-strategy.md) 中列出的 managed
+路徑；本套件保留 LibreOffice 作為高 fidelity 或未 managed 化格式的 fallback。
+
+### 串流後端範例
+
+```csharp
+using OdfKit.Extensions.Rendering;
 
 var backend = new LocalProcessBackend();
 using MemoryStream input = new();
@@ -124,7 +137,8 @@ await renderer.ConvertAsync(document, output, "pdf", cancellationToken);
 
 - 預設後端：`UnoserverRestBackend`
 - 預設 `maxConcurrentCalls = 4`（`SemaphoreSlim` 節流）
-- 自動依文件型別選副檔名：`odt` / `ods` / `odp`
+- 自動依 ODF 文件種類選副檔名：`odt` / `ott` / `odm` / `ods` / `ots` / `odp` /
+  `otp` / `odg` / `otg` / `odc` / `odf` / `odi` / `odb` 與 Flat XML 變體
 
 單元測試以 `ILibreOfficeConversionBackend` mock 驗證併發與取消，無需真實 LibreOffice。
 
@@ -157,7 +171,10 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 
 ## 限制與非目標
 
-- 不提供內建 SVG／純托管向量渲染（仍依 LibreOffice 轉檔）
+- 本套件不代表 OdfKit 的主要轉檔策略；已 managed 化的 HTML / Markdown / RTF / PDF /
+  OOXML / CSV 路徑應優先使用對應 extension
+- 不提供完整物理分頁或像素級版面渲染；ODG -> SVG 的 managed 向量匯出基礎由
+  `OdfKit.Extensions.Html` 提供，高保真頁面渲染仍可 fallback 到 LibreOffice
 - `OdfKit.Extensions.Imaging` 的 SkiaSharp 文字量測與本套件無直接相依
 - 不保證與所有 LibreOffice 版本像素級一致；互通驗收以 26.x 為準
 

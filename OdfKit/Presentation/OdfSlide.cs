@@ -62,6 +62,32 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// 取得或設定投影片背景色（例如 <c>#FFFFFF</c>）。
+    /// </summary>
+    public string? BackgroundColor
+    {
+        get
+        {
+            string? styleName = Node.GetAttribute("style-name", OdfNamespaces.Draw);
+            return string.IsNullOrWhiteSpace(styleName)
+                ? null
+                : Document.StyleEngine.GetStyleProperty(styleName!, "fill-color", OdfNamespaces.Draw, "drawing-page");
+        }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                Document.StyleEngine.SetLocalStyleProperty(Node, "drawing-page", "drawing-page-properties", "fill", OdfNamespaces.Draw, null, "draw");
+                Document.StyleEngine.SetLocalStyleProperty(Node, "drawing-page", "drawing-page-properties", "fill-color", OdfNamespaces.Draw, null, "draw");
+                return;
+            }
+
+            Document.StyleEngine.SetLocalStyleProperty(Node, "drawing-page", "drawing-page-properties", "fill", OdfNamespaces.Draw, "solid", "draw");
+            Document.StyleEngine.SetLocalStyleProperty(Node, "drawing-page", "drawing-page-properties", "fill-color", OdfNamespaces.Draw, value, "draw");
+        }
+    }
+
+    /// <summary>
     /// 取得或設定投影片頁首使用的樣式名稱。
     /// </summary>
     public string? UseHeaderName
@@ -142,6 +168,22 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     {
         get => SpeakerNotesPage.SpeakerNotesText;
         set => SpeakerNotesPage.SpeakerNotesText = value;
+    }
+
+    /// <summary>
+    /// 取得投影片備忘錄的段落文字。
+    /// </summary>
+    public IReadOnlyList<string> SpeakerNoteParagraphs => SpeakerNotesPage.SpeakerNoteParagraphs;
+
+    /// <summary>
+    /// 以多段落形式設定投影片備忘錄文字。
+    /// </summary>
+    /// <param name="paragraphs">段落文字集合。</param>
+    /// <returns>目前投影片。</returns>
+    public OdfSlide SetSpeakerNotes(IEnumerable<string> paragraphs)
+    {
+        SpeakerNotesPage.SetSpeakerNotes(paragraphs);
+        return this;
     }
 
     /// <summary>

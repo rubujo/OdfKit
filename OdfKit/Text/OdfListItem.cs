@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -24,11 +25,11 @@ public class OdfListItem(OdfNode node, TextDocument doc)
     /// </summary>
     public int? StartValue
     {
-        get => int.TryParse(Node.GetAttribute("start-value", OdfNamespaces.Text), out var val) ? val : null;
+        get => int.TryParse(Node.GetAttribute("start-value", OdfNamespaces.Text), NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : null;
         set
         {
             if (value.HasValue)
-                Node.SetAttribute("start-value", OdfNamespaces.Text, value.Value.ToString(), "text");
+                Node.SetAttribute("start-value", OdfNamespaces.Text, value.Value.ToString(CultureInfo.InvariantCulture), "text");
             else
                 Node.RemoveAttribute("start-value", OdfNamespaces.Text);
         }

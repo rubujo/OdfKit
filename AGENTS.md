@@ -79,6 +79,11 @@
   ```powershell
   pwsh eng/Test-MergeConflictMarkers.ps1
   ```
+- **稽核提交簽署金鑰**：
+  ```powershell
+  pwsh eng/Test-GpgSignatures.ps1
+  ```
+- **測試套件分層與整理準則**：見 [`docs/testing-strategy.md`](docs/testing-strategy.md)。
 
 ---
 

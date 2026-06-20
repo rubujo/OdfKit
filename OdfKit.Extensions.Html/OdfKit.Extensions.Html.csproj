@@ -10,10 +10,14 @@
     <AssemblyName>OdfKit.Extensions.Html</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>HTML export extension for OdfKit (StringBuilder direct output).</Description>
+    <Description>Managed HTML, Markdown, and RTF export extension for OdfKit.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Markdig" Version="1.3.1" />
   </ItemGroup>
 </Project>

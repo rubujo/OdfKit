@@ -82,19 +82,43 @@ public partial class OdfSlide
     /// <param name="text">文字內容</param>
     /// <returns>新增的文字方塊圖形執行個體</returns>
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, string text)
+        => AddTextBox(x, y, w, h, new[] { text });
+
+    /// <summary>
+    /// 在投影片上新增多段落文字方塊。
+    /// </summary>
+    /// <param name="x">X 軸座標位置</param>
+    /// <param name="y">Y 軸座標位置</param>
+    /// <param name="w">寬度</param>
+    /// <param name="h">高度</param>
+    /// <param name="paragraphs">段落文字集合。</param>
+    /// <returns>新增的文字方塊圖形執行個體</returns>
+    public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, IEnumerable<string> paragraphs)
     {
+        if (paragraphs is null)
+            throw new ArgumentNullException(nameof(paragraphs));
+
         var frame = CreateDrawingFrame(x, y, w, h);
         OdfNode textBoxNode = new(OdfNodeType.Element, "text-box", OdfNamespaces.Draw, "draw");
         frame.AppendChild(textBoxNode);
 
-        OdfNode pNode = new(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
-        pNode.TextContent = text;
-        textBoxNode.AppendChild(pNode);
+        bool addedParagraph = false;
+        foreach (string paragraph in paragraphs)
+        {
+            OdfNode pNode = new(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+            pNode.TextContent = paragraph ?? string.Empty;
+            textBoxNode.AppendChild(pNode);
+            addedParagraph = true;
+        }
+
+        if (!addedParagraph)
+        {
+            textBoxNode.AppendChild(new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text"));
+        }
 
         Node.AppendChild(frame);
         return new OdfTextBox(frame, this);
     }
-
     /// <summary>
     /// 在投影片上新增影片物件。
     /// </summary>
@@ -191,6 +215,27 @@ public partial class OdfSlide
     }
 
     /// <summary>
+    /// 在投影片上新增直線圖形。
+    /// </summary>
+    /// <param name="x1">起點 X 軸座標位置。</param>
+    /// <param name="y1">起點 Y 軸座標位置。</param>
+    /// <param name="x2">終點 X 軸座標位置。</param>
+    /// <param name="y2">終點 Y 軸座標位置。</param>
+    /// <returns>新增的直線圖形執行個體。</returns>
+    public OdfShape AddLine(OdfLength x1, OdfLength y1, OdfLength x2, OdfLength y2)
+    {
+        OdfNode shapeNode = new(OdfNodeType.Element, "line", OdfNamespaces.Draw, "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        shapeNode.SetAttribute("x1", OdfNamespaces.Svg, x1.ToString(), "svg");
+        shapeNode.SetAttribute("y1", OdfNamespaces.Svg, y1.ToString(), "svg");
+        shapeNode.SetAttribute("x2", OdfNamespaces.Svg, x2.ToString(), "svg");
+        shapeNode.SetAttribute("y2", OdfNamespaces.Svg, y2.ToString(), "svg");
+
+        Node.AppendChild(shapeNode);
+        return new OdfShape(shapeNode, this);
+    }
+
+    /// <summary>
     /// 在投影片上新增折線圖形。
     /// </summary>
     /// <param name="points">點座標集合</param>
@@ -223,8 +268,9 @@ public partial class OdfSlide
     /// <param name="y">Y 軸座標位置</param>
     /// <param name="w">寬度</param>
     /// <param name="h">高度</param>
+    /// <param name="altText">選用的圖片替代文字。</param>
     /// <returns>新增的圖片圖形執行個體</returns>
-    public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
+    public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h, string? altText = null)
     {
         var frame = CreateDrawingFrame(x, y, w, h);
 
@@ -239,7 +285,9 @@ public partial class OdfSlide
 
         frame.AppendChild(imgNode);
         Node.AppendChild(frame);
-        return new OdfPicture(frame, this);
+        var picture = new OdfPicture(frame, this);
+        picture.AltText = altText;
+        return picture;
     }
 
     /// <summary>
@@ -248,6 +296,15 @@ public partial class OdfSlide
     /// <param name="type">切換效果類型</param>
     /// <param name="duration">持續時間</param>
     public void SetTransition(OdfTransitionType type, OdfLength duration)
+        => SetTransition(type, duration, OdfTransitionSpeed.Medium);
+
+    /// <summary>
+    /// 設定投影片切換動畫效果與速度。
+    /// </summary>
+    /// <param name="type">切換效果類型。</param>
+    /// <param name="duration">持續時間。</param>
+    /// <param name="speed">切換速度。</param>
+    public void SetTransition(OdfTransitionType type, OdfLength duration, OdfTransitionSpeed speed)
     {
         string durStr = $"{duration.ToPoints() / 72.0:F2}s";
 
@@ -277,6 +334,12 @@ public partial class OdfSlide
 
         Node.SetAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", durStr, "smil");
         Node.SetAttribute("transition-type", OdfNamespaces.Presentation, "automatic", "presentation");
+        Node.SetAttribute("transition-speed", OdfNamespaces.Presentation, speed switch
+        {
+            OdfTransitionSpeed.Slow => "slow",
+            OdfTransitionSpeed.Fast => "fast",
+            _ => "medium",
+        }, "presentation");
     }
 
     private OdfNode CreateDrawingFrame(OdfLength x, OdfLength y, OdfLength w, OdfLength h)

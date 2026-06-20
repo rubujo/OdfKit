@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -41,11 +42,11 @@ public partial class OdfPageSetup
         get
         {
             string? val = GetPageProp("page-width");
-            if (val is not null && val.EndsWith("cm") && double.TryParse(val.Substring(0, val.Length - 2), out var d))
+            if (TryParseCentimeterLength(val, out var d))
                 return d;
             return 21.0;
         }
-        set => SetPageProp("page-width", $"{value}cm");
+        set => SetPageProp("page-width", FormatCentimeterLength(value));
     }
 
     /// <summary>
@@ -56,12 +57,26 @@ public partial class OdfPageSetup
         get
         {
             string? val = GetPageProp("page-height");
-            if (val is not null && val.EndsWith("cm") && double.TryParse(val.Substring(0, val.Length - 2), out var d))
+            if (TryParseCentimeterLength(val, out var d))
                 return d;
             return 29.7;
         }
-        set => SetPageProp("page-height", $"{value}cm");
+        set => SetPageProp("page-height", FormatCentimeterLength(value));
     }
+
+    private static bool TryParseCentimeterLength(string? value, out double result)
+    {
+        result = 0;
+        return value is not null &&
+            value.EndsWith("cm", StringComparison.Ordinal) &&
+            double.TryParse(
+                value.Substring(0, value.Length - 2),
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture,
+                out result);
+    }
+
+    private static string FormatCentimeterLength(double value) => value.ToString(CultureInfo.InvariantCulture) + "cm";
 
     /// <summary>
     /// 取得或設定頁面使用方式。
@@ -187,8 +202,8 @@ public partial class OdfPageSetup
     /// </summary>
     public int? LayoutGridLines
     {
-        get => int.TryParse(GetPageStyleProp("layout-grid-lines"), out var val) ? val : null;
-        set => SetPageStyleProp("layout-grid-lines", value?.ToString());
+        get => int.TryParse(GetPageStyleProp("layout-grid-lines"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : null;
+        set => SetPageStyleProp("layout-grid-lines", value?.ToString(CultureInfo.InvariantCulture));
     }
 
     /// <summary>
@@ -196,8 +211,8 @@ public partial class OdfPageSetup
     /// </summary>
     public int? LayoutGridCharacters
     {
-        get => int.TryParse(GetPageStyleProp("layout-grid-characters"), out var val) ? val : null;
-        set => SetPageStyleProp("layout-grid-characters", value?.ToString());
+        get => int.TryParse(GetPageStyleProp("layout-grid-characters"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : null;
+        set => SetPageStyleProp("layout-grid-characters", value?.ToString(CultureInfo.InvariantCulture));
     }
 
     /// <summary>

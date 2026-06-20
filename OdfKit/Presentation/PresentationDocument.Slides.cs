@@ -151,6 +151,19 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// 取得投影片尺寸。
+    /// </summary>
+    /// <returns>投影片寬度與高度。</returns>
+    public (OdfLength Width, OdfLength Height) GetSlideSize()
+    {
+        var pageLayoutProps = GetDefaultPageLayoutProperties();
+        string? width = pageLayoutProps.GetAttribute("page-width", OdfNamespaces.Fo);
+        string? height = pageLayoutProps.GetAttribute("page-height", OdfNamespaces.Fo);
+        return (
+            string.IsNullOrWhiteSpace(width) ? OdfLength.FromCentimeters(28) : OdfLength.Parse(width),
+            string.IsNullOrWhiteSpace(height) ? OdfLength.FromCentimeters(21) : OdfLength.Parse(height));
+    }
+    /// <summary>
     /// 設定投影片的方向。
     /// </summary>
     /// <param name="orientation">投影片方向列舉值</param>

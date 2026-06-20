@@ -87,14 +87,17 @@
 | X-2 | 基礎 ✅ | `docs/libreoffice-interop-matrix.md`、`eng/Test-LibreOfficeInterop.ps1`；四主格式 + 追蹤修訂 LO 26.x headless 矩陣 |
 | Q-3 | 基礎 ✅ | `docs/ooxml-visual-golden-matrix.md`、`eng/Test-OoxmlVisualGolden.ps1`、`eng/scripts/PdfVisualDiff.py`；ODT→DOCX、ODS→XLSX 雙路徑 PDF 像素比對 |
 | REN-1 | 基礎 ✅ | `docs/rendering-backend-deployment.md`、`eng/Test-RenderingBackends.ps1`；LocalProcess / Unoserver / HttpRenderer 選型與部署 |
+| CONV-1 | 基礎 ✅ | `docs/managed-first-conversion-strategy.md`；ODT→Markdown/RTF（含表格／註腳／超連結／圖片參照／註解基礎／段落對齊、縮排、間距、行距、分頁、typographic symbols/spacing、nonbreaking/optional hyphen controls／inline 粗斜體底線刪除線上標下標字號色彩）、Markdown→ODT（GitHub/GitLab/CommonMark/Basic flavor options，段落／標題／清單／表格／超連結／圖片參照／粗體／斜體／粗斜體／GitHub-GitLab 刪除線／HTML span 樣式／註解與 footnote 往返基礎）、RTF→ODT（段落／段落對齊 `\\ql`/`\\qc`/`\\qr`/`\\qj`／段落縮排 `\\li`/`\\ri`/`\\fi`／段落間距與行距 `\\sb`/`\\sa`/`\\sl`／分頁 `\\page`／typographic symbols/spacing `\\emdash`/`\\endash`/quotes/`\\enspace`/`\\emspace`/`\\qmspace`/`\\bullet`／Unicode escapes `\\uN` with `\\ucN` fallback skip／ANSI hex escapes `\\'hh`／nonbreaking/optional hyphen controls `\\~`/`\\_`/`\\-`／表格／inline 粗斜體底線刪除線上標下標字號色彩與 `\\plain` 重設／註腳／超連結／exporter 圖片參照、RTF `\\pict` PNG/JPEG 圖片與 goal 尺寸、標準 annotation group 註解基礎）、ODG→SVG（幾何／文字 run 粗斜體字號色彩／樣式色彩／線條呈現／opacity／transform／線性命名漸層／漸層角度／放射漸層／封裝圖片 data URI／frame/image rect 裁切／draw:contour-path 與 draw:contour-polygon 非矩形裁切／相容 enhanced-path custom-shape／modifier/equation 與常見公式函式展開／`A`/`B`/`G`/`T`/`U`/`V`/`W`/`X`/`Y` arc commands 與 `N`/`F`/`S` state command 安全處理／LibreOffice 風格 custom-shape corpus regression）、ODP↔PPTX（投影片與名稱／slide size／基本 slide layout type／slide placeholder type/text／投影片背景色／ODP→PPTX theme palette 與 font scheme 萃取／PPTX theme scheme color、font scheme token、background style reference 與 shape fill/line style matrix reference 解析／文字框與多段落 API/轉換／段落對齊／基本圖形與形狀文字、line API 與 solid fill/stroke color/width/dash 與 line direction/flip／圖片與替代文字／裁切／講者備忘多段落 API/轉換／slide transition type/duration/speed／基礎 object animation duration/delay timing 與 build list／混合文字 run 粗斜體底線刪除線上標下標字號色彩／嵌入表格文字與文字樣式、合併儲存格、儲存格背景色、全邊框與 table theme style id）淨室轉換基礎；格式 token、頁面尺寸與數值輸出採 invariant/ordinal 原則，LibreOffice 降為 fallback |
 
 ## Wave 4 — 產品化
 
 | Phase | 狀態 | 產出 |
 |-------|------|------|
 | REL-1 | ✅ | 相容矩陣、`Pack`／`Test-NuGetPack`／`Publish-GitHubRelease.ps1`、`docs/github-release-publishing.md`、`.github/workflows/nuget-pack.yml`（Actions v6/v5/v7）、`NuGetPackagingTests` |
-| COLLAB-1（選用） | planned | ODT → JSON operations 匯出（對標 ODF Toolkit CLI） |
+| COLLAB-1（選用） | 基礎 ✅ | `OdfKit.Extensions.Collaboration`：`OdtOperationsExporter` ODT → JSON operations 匯出（對標 ODF Toolkit CLI）；`CollaborationOperationsTests` |
 | COLLAB-2（選用） | planned | JSON operations → ODT 單向 merge + golden file 對照 |
+| TEST-STRUCT | ✅ | `docs/testing-strategy.md`；測試檔重命名、稀疏檔合併與 E2E 去重盤點完成 |
+| GPG-AUDIT | ✅ | `eng/Test-GpgSignatures.ps1`；repo 專屬金鑰簽署稽核 |
 | QC-ongoing | planned | 季度 OASIS RNG diff、本檔案季度檢視 |
 
 REL-1 驗收：`pwsh eng/Test-NuGetPack.ps1`；六套件雙 TFM `.nupkg`（v0.0.1）+ net8.0 消費端煙霧；`pwsh eng/Publish-GitHubRelease.ps1` 乾跑；CI `nuget-pack.yml`。
@@ -113,7 +116,7 @@ REL-1 驗收：`pwsh eng/Test-NuGetPack.ps1`；六套件雙 TFM `.nupkg`（v0.0.
 
 - 協作者提取優先（[`eng/GodClassRefactor-Plan.md`](GodClassRefactor-Plan.md)）
 - 公開 `*Async` 必須 `CancellationToken cancellationToken = default`（[`eng/AsyncRefactor-Plan.md`](AsyncRefactor-Plan.md)）
-- 提交前 `pwsh eng/Format-Safe.ps1`；GPG 簽署；正體中文 Conventional Commits
+- 提交前 `pwsh eng/Format-Safe.ps1`；`pwsh eng/Test-GpgSignatures.ps1`；GPG 簽署；正體中文 Conventional Commits
 
 ## 完滿 Exit Criteria
 

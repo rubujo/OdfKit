@@ -29,33 +29,97 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     /// </summary>
     public string SpeakerNotesText
     {
+        get => string.Join(Environment.NewLine, SpeakerNoteParagraphs);
+        set => SetSpeakerNotes(value is null ? [] : [value]);
+    }
+
+    /// <summary>
+    /// 取得主講人備忘錄的段落文字。
+    /// </summary>
+    public IReadOnlyList<string> SpeakerNoteParagraphs
+    {
         get
         {
-            var textBox = FindTextBoxInNotes(Node);
-            return textBox?.TextContent ?? string.Empty;
-        }
-        set
-        {
-            var textBox = FindTextBoxInNotes(Node);
+            OdfNode? textBox = FindTextBoxInNotes(Node);
             if (textBox is null)
             {
-                OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-                frame.SetAttribute("class", OdfNamespaces.Presentation, "notes", "presentation");
-                frame.SetAttribute("x", OdfNamespaces.Svg, "2cm", "svg");
-                frame.SetAttribute("y", OdfNamespaces.Svg, "15cm", "svg");
-                frame.SetAttribute("width", OdfNamespaces.Svg, "20cm", "svg");
-                frame.SetAttribute("height", OdfNamespaces.Svg, "10cm", "svg");
-
-                OdfNode box = new(OdfNodeType.Element, "text-box", OdfNamespaces.Draw, "draw");
-                frame.AppendChild(box);
-                Node.AppendChild(frame);
-                textBox = box;
+                return [];
             }
 
-            textBox.Children.Clear();
-            OdfNode p = new(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
-            p.TextContent = value;
-            textBox.AppendChild(p);
+            var paragraphs = new List<string>();
+            AddParagraphs(textBox, paragraphs);
+            if (paragraphs.Count == 0 && !string.IsNullOrEmpty(textBox.TextContent))
+            {
+                paragraphs.Add(textBox.TextContent);
+            }
+
+            return paragraphs.AsReadOnly();
+        }
+    }
+
+    /// <summary>
+    /// 以多段落形式設定主講人備忘錄文字。
+    /// </summary>
+    /// <param name="paragraphs">段落文字集合。</param>
+    /// <returns>目前備忘錄頁面。</returns>
+    public OdfNotesPage SetSpeakerNotes(IEnumerable<string> paragraphs)
+    {
+        if (paragraphs is null)
+            throw new ArgumentNullException(nameof(paragraphs));
+
+        OdfNode textBox = GetOrCreateSpeakerNotesTextBox();
+        textBox.Children.Clear();
+        foreach (string? paragraphText in paragraphs)
+        {
+            OdfNode paragraph = new(OdfNodeType.Element, "p", OdfNamespaces.Text, "text")
+            {
+                TextContent = paragraphText ?? string.Empty,
+            };
+            textBox.AppendChild(paragraph);
+        }
+
+        if (textBox.Children.Count == 0)
+        {
+            textBox.AppendChild(new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text"));
+        }
+
+        return this;
+    }
+
+    private OdfNode GetOrCreateSpeakerNotesTextBox()
+    {
+        OdfNode? textBox = FindTextBoxInNotes(Node);
+        if (textBox is not null)
+        {
+            return textBox;
+        }
+
+        OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
+        frame.SetAttribute("class", OdfNamespaces.Presentation, "notes", "presentation");
+        frame.SetAttribute("x", OdfNamespaces.Svg, "2cm", "svg");
+        frame.SetAttribute("y", OdfNamespaces.Svg, "15cm", "svg");
+        frame.SetAttribute("width", OdfNamespaces.Svg, "20cm", "svg");
+        frame.SetAttribute("height", OdfNamespaces.Svg, "10cm", "svg");
+
+        textBox = new OdfNode(OdfNodeType.Element, "text-box", OdfNamespaces.Draw, "draw");
+        frame.AppendChild(textBox);
+        Node.AppendChild(frame);
+        return textBox;
+    }
+
+    private static void AddParagraphs(OdfNode node, List<string> paragraphs)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == "p" &&
+                child.NamespaceUri == OdfNamespaces.Text)
+            {
+                paragraphs.Add(child.TextContent);
+                continue;
+            }
+
+            AddParagraphs(child, paragraphs);
         }
     }
 
@@ -194,8 +258,9 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     /// <param name="y">Y 軸座標位置</param>
     /// <param name="w">寬度</param>
     /// <param name="h">高度</param>
+    /// <param name="altText">選用的圖片替代文字。</param>
     /// <returns>新增的圖片圖形執行個體</returns>
-    public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
+    public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h, string? altText = null)
     {
         OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
         frame.SetAttribute("id", OdfNamespaces.Draw, "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
@@ -216,7 +281,9 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
 
         frame.AppendChild(imgNode);
         Node.AppendChild(frame);
-        return new OdfPicture(frame, Slide.Document);
+        var picture = new OdfPicture(frame, Slide.Document);
+        picture.AltText = altText;
+        return picture;
     }
 
     private static OdfNode? FindTextBoxInNotes(OdfNode notesNode)

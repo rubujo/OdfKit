@@ -59,7 +59,7 @@ public static class OdfChartRenderer
                     plot.Title(title!);
                 }
 
-                if (chartClass.Contains("pie"))
+                if (chartClass.Contains("pie", StringComparison.OrdinalIgnoreCase))
                 {
                     if (seriesList.Count > 0)
                     {
@@ -77,7 +77,8 @@ public static class OdfChartRenderer
                         }
                     }
                 }
-                else if (chartClass.Contains("line") || chartClass.Contains("scatter"))
+                else if (chartClass.Contains("line", StringComparison.OrdinalIgnoreCase) ||
+                    chartClass.Contains("scatter", StringComparison.OrdinalIgnoreCase))
                 {
                     for (int s = 0; s < seriesList.Count; s++)
                     {

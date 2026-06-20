@@ -73,6 +73,27 @@ public enum OdfTransitionType
 }
 
 /// <summary>
+/// 表示投影片切換速度。
+/// </summary>
+public enum OdfTransitionSpeed
+{
+    /// <summary>
+    /// 慢速。
+    /// </summary>
+    Slow,
+
+    /// <summary>
+    /// 中速。
+    /// </summary>
+    Medium,
+
+    /// <summary>
+    /// 快速。
+    /// </summary>
+    Fast
+}
+
+/// <summary>
 /// 表示動畫效果類型的列舉。
 /// </summary>
 public enum OdfAnimationType

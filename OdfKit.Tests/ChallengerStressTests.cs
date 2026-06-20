@@ -229,13 +229,20 @@ namespace OdfKit.Tests
                 "HTTP://WWW.W3.ORG/2000/09/XMLDSIG#SHA256");
             Assert.Equal(plaintext, decrypted);
 
-            // Whitespace in startKeyGenName will fail EndsWith check
-            Assert.Throws<CryptographicException>(() =>
+            // startKeyGenName 中的空格將導致 EndsWith 檢查失敗，預期會拋出 CryptographicException
+            // 或者因為解密金鑰錯誤而解密出損壞的亂碼資料。
+            try
             {
-                OdfEncryption.DecryptEntry(
-                    ciphertext, "pwd", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50000, salt, iv,
-                    "http://www.w3.org/2000/09/xmldsig#sha256 ");
-            });
+                byte[] decryptedWrong = OdfEncryption.DecryptEntry(
+                     ciphertext, "pwd", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50000, salt, iv,
+                     "http://www.w3.org/2000/09/xmldsig#sha256 ");
+                // 若解密未拋出例外（機率極低之 PKCS7 填充巧合對齊），則解密出的資料必定不等於明文
+                Assert.NotEqual(plaintext, decryptedWrong);
+            }
+            catch (CryptographicException)
+            {
+                // 預期的例外路徑
+            }
         }
     }
 }

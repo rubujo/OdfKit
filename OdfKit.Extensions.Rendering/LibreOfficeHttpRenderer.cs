@@ -3,8 +3,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Core;
-using OdfKit.Presentation;
-using OdfKit.Spreadsheet;
 
 namespace OdfKit.Extensions.Rendering;
 
@@ -49,11 +47,7 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
         if (string.IsNullOrEmpty(targetFormat))
             throw new ArgumentNullException(nameof(targetFormat));
 
-        string ext = "odt";
-        if (document is SpreadsheetDocument)
-            ext = "ods";
-        else if (document is PresentationDocument)
-            ext = "odp";
+        string ext = LibreOfficeRenderer.GetInputExtension(document);
 
         // 儲存文件為位元組陣列
         byte[] docBytes = document.SaveToBytes();

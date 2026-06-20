@@ -73,6 +73,15 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// 取得或設定段落首行縮排（對應 <c>fo:text-indent</c> 屬性）。
+    /// </summary>
+    public string? TextIndent
+    {
+        get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "text-indent", OdfNamespaces.Fo, "paragraph");
+        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "text-indent", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+    }
+
+    /// <summary>
     /// 取得或設定段落的書寫模式。
     /// </summary>
     public OdfWritingMode WritingMode

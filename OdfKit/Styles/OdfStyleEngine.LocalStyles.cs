@@ -36,7 +36,7 @@ public partial class OdfStyleEngine
         string styleNs = family switch
         {
             "table-cell" or "table-row" or "table-column" => OdfNamespaces.Table,
-            "graphic" => OdfNamespaces.Draw,
+            "graphic" or "drawing-page" => OdfNamespaces.Draw,
             _ => OdfNamespaces.Text
         };
 
@@ -264,7 +264,7 @@ public partial class OdfStyleEngine
             string styleNs = family switch
             {
                 "table-cell" or "table-row" or "table-column" => OdfNamespaces.Table,
-                "graphic" => OdfNamespaces.Draw,
+                "graphic" or "drawing-page" => OdfNamespaces.Draw,
                 _ => OdfNamespaces.Text
             };
             string stylePrefix = OdfNamespaces.GetPrefix(styleNs);

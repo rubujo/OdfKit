@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -27,28 +28,35 @@ public class OdfTextBox(OdfNode node, OdfDocument doc, OdfSlide? slide) : OdfSha
     public OdfTextBox(OdfNode node, OdfDocument doc) : this(node, doc, null) { }
 
     /// <summary>
-    /// 取得文字方塊中的純文字內容。
+    /// 取得文字方塊中的純文字內容。多段落會以 <see cref="Environment.NewLine"/> 串接。
     /// </summary>
-    public string Text => FindDescendant(Node, "p", OdfNamespaces.Text)?.TextContent ?? string.Empty;
+    public string Text => string.Join(Environment.NewLine, Paragraphs);
 
-    private static OdfNode? FindDescendant(OdfNode node, string localName, string namespaceUri)
+    /// <summary>
+    /// 取得文字方塊中的段落文字清單。
+    /// </summary>
+    public IReadOnlyList<string> Paragraphs
+    {
+        get
+        {
+            var paragraphs = new List<string>();
+            AddParagraphs(Node, paragraphs);
+            return paragraphs.AsReadOnly();
+        }
+    }
+
+    private static void AddParagraphs(OdfNode node, List<string> paragraphs)
     {
         foreach (OdfNode child in node.Children)
         {
             if (child.NodeType is OdfNodeType.Element &&
-                child.LocalName == localName &&
-                child.NamespaceUri == namespaceUri)
+                child.LocalName == "p" &&
+                child.NamespaceUri == OdfNamespaces.Text)
             {
-                return child;
+                paragraphs.Add(child.TextContent);
             }
 
-            OdfNode? descendant = FindDescendant(child, localName, namespaceUri);
-            if (descendant is not null)
-            {
-                return descendant;
-            }
+            AddParagraphs(child, paragraphs);
         }
-
-        return null;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -16,7 +17,7 @@ public class OdfHeading : OdfParagraph
     /// </summary>
     public int OutlineLevel
     {
-        get => int.TryParse(Node.GetAttribute("outline-level", OdfNamespaces.Text), out var lvl) ? lvl : 1;
-        set => Node.SetAttribute("outline-level", OdfNamespaces.Text, value.ToString(), "text");
+        get => int.TryParse(Node.GetAttribute("outline-level", OdfNamespaces.Text), NumberStyles.Integer, CultureInfo.InvariantCulture, out var lvl) ? lvl : 1;
+        set => Node.SetAttribute("outline-level", OdfNamespaces.Text, value.ToString(CultureInfo.InvariantCulture), "text");
     }
 }

@@ -120,6 +120,42 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// 取得或設定一個值，指出文字片段是否加上刪除線。
+    /// </summary>
+    public bool IsStrikethrough
+    {
+        get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "text-line-through-style", OdfNamespaces.Style, "text") == "solid";
+        set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "text-line-through-style", OdfNamespaces.Style, value ? "solid" : "none", "style");
+    }
+
+    /// <summary>
+    /// 取得或設定文字片段的位置，例如 <c>baseline</c>、<c>super</c> 或 <c>sub</c>。
+    /// </summary>
+    public string? TextPosition
+    {
+        get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "text-position", OdfNamespaces.Style, "text");
+        set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "text-position", OdfNamespaces.Style, value ?? string.Empty, "style");
+    }
+
+    /// <summary>
+    /// 取得或設定一個值，指出文字片段是否為上標。
+    /// </summary>
+    public bool IsSuperscript
+    {
+        get => string.Equals(TextPosition, "super", StringComparison.OrdinalIgnoreCase);
+        set => TextPosition = value ? "super" : "baseline";
+    }
+
+    /// <summary>
+    /// 取得或設定一個值，指出文字片段是否為下標。
+    /// </summary>
+    public bool IsSubscript
+    {
+        get => string.Equals(TextPosition, "sub", StringComparison.OrdinalIgnoreCase);
+        set => TextPosition = value ? "sub" : "baseline";
+    }
+
+    /// <summary>
     /// 取得或設定文字片段的字色。
     /// </summary>
     public string? Color
@@ -193,6 +229,39 @@ public class OdfTextRun
     public OdfTextRun WithItalic(bool italic = true)
     {
         IsItalic = italic;
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此文字片段是否加上刪除線。
+    /// </summary>
+    /// <param name="strikethrough">是否加上刪除線。</param>
+    /// <returns>文字片段本身。</returns>
+    public OdfTextRun WithStrikethrough(bool strikethrough = true)
+    {
+        IsStrikethrough = strikethrough;
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此文字片段是否為上標。
+    /// </summary>
+    /// <param name="superscript">是否為上標。</param>
+    /// <returns>文字片段本身。</returns>
+    public OdfTextRun WithSuperscript(bool superscript = true)
+    {
+        IsSuperscript = superscript;
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此文字片段是否為下標。
+    /// </summary>
+    /// <param name="subscript">是否為下標。</param>
+    /// <returns>文字片段本身。</returns>
+    public OdfTextRun WithSubscript(bool subscript = true)
+    {
+        IsSubscript = subscript;
         return this;
     }
 

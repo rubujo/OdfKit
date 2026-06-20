@@ -16,6 +16,7 @@
 
 ```powershell
 pwsh eng/Test-NuGetPack.ps1 -Configuration Release
+pwsh eng/Test-GpgSignatures.ps1
 ```
 
 ## 2. 封裝
@@ -64,5 +65,5 @@ dotnet add package OdfKit --version 0.0.1 --source odfkit-github-release
 ## 版本策略
 
 - 目前版本：**0.0.1**（`eng/OdfKit.Package.props`）
-- 發佈前：`dotnet test` 全綠、`pwsh eng/Format-Safe.ps1`、GPG 簽署提交
+- 發佈前：`dotnet test` 全綠、`pwsh eng/Format-Safe.ps1`、`pwsh eng/Test-GpgSignatures.ps1`
 - Git 標籤格式：`v{Version}`（例如 `v0.0.1`）

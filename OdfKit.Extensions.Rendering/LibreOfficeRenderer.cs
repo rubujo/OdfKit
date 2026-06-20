@@ -4,11 +4,49 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using OdfKit.Compliance;
 using OdfKit.Core;
-using OdfKit.Presentation;
-using OdfKit.Spreadsheet;
 
 namespace OdfKit.Extensions.Rendering;
+
+/// <summary>
+/// 提供 LibreOffice <c>--convert-to</c> 常用輸出格式常數。
+/// </summary>
+public static class LibreOfficeConversionFormats
+{
+    /// <summary>Portable Document Format。</summary>
+    public const string Pdf = "pdf";
+
+    /// <summary>Rich Text Format。</summary>
+    public const string Rtf = "rtf";
+
+    /// <summary>HTML 文件。</summary>
+    public const string Html = "html";
+
+    /// <summary>Markdown 文件。</summary>
+    public const string Markdown = "md";
+
+    /// <summary>Microsoft Word Open XML 文件。</summary>
+    public const string Docx = "docx";
+
+    /// <summary>Microsoft Excel Open XML 活頁簿。</summary>
+    public const string Xlsx = "xlsx";
+
+    /// <summary>Microsoft PowerPoint Open XML 簡報。</summary>
+    public const string Pptx = "pptx";
+
+    /// <summary>逗號分隔值文字檔。</summary>
+    public const string Csv = "csv";
+
+    /// <summary>Scalable Vector Graphics。</summary>
+    public const string Svg = "svg";
+
+    /// <summary>PNG 點陣圖片。</summary>
+    public const string Png = "png";
+
+    /// <summary>JPEG 點陣圖片。</summary>
+    public const string Jpeg = "jpg";
+}
 
 /// <summary>
 /// 提供將 ODF 文件轉檔與轉譯為其他格式的擴充方法。
@@ -22,8 +60,36 @@ public static class LibreOfficeRendererExtensions
     /// <param name="outputPath">輸出 PDF 檔案的目標路徑</param>
     public static void ConvertToPdf(this OdfDocument document, string outputPath)
     {
-        var renderer = new LibreOfficeRenderer();
-        renderer.Convert(document, outputPath, "pdf");
+        document.ConvertToLibreOfficeFormat(outputPath, LibreOfficeConversionFormats.Pdf);
+    }
+
+    /// <summary>
+    /// 使用指定的 LibreOffice renderer 將文件轉換為 PDF 格式。
+    /// </summary>
+    /// <param name="document">要轉換的 OdfDocument 來源文件。</param>
+    /// <param name="outputPath">輸出 PDF 檔案的目標路徑。</param>
+    /// <param name="renderer">要使用的 LibreOffice renderer。</param>
+    public static void ConvertToPdf(this OdfDocument document, string outputPath, LibreOfficeRenderer renderer)
+    {
+        document.ConvertToLibreOfficeFormat(outputPath, LibreOfficeConversionFormats.Pdf, renderer);
+    }
+
+    /// <summary>
+    /// 非同步將指定文件轉換為 PDF 格式。
+    /// </summary>
+    /// <param name="document">要轉換的 OdfDocument 來源文件。</param>
+    /// <param name="outputPath">輸出 PDF 檔案的目標路徑。</param>
+    /// <param name="cancellationToken">用於取消轉檔作業的權杖。</param>
+    /// <returns>代表非同步轉檔作業的工作。</returns>
+    public static Task ConvertToPdfAsync(
+        this OdfDocument document,
+        string outputPath,
+        CancellationToken cancellationToken = default)
+    {
+        return document.ConvertToLibreOfficeFormatAsync(
+            outputPath,
+            LibreOfficeConversionFormats.Pdf,
+            cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -34,8 +100,42 @@ public static class LibreOfficeRendererExtensions
     /// <param name="format">輸出圖片的格式，預設為 png</param>
     public static void ConvertToImage(this OdfDocument document, string outputPath, string format = "png")
     {
-        var renderer = new LibreOfficeRenderer();
-        renderer.Convert(document, outputPath, format);
+        document.ConvertToLibreOfficeFormat(outputPath, format);
+    }
+
+    /// <summary>
+    /// 使用 LibreOffice 將指定文件轉換為任意 <c>--convert-to</c> 目標格式。
+    /// </summary>
+    /// <param name="document">要轉換的 OdfDocument 來源文件。</param>
+    /// <param name="outputPath">輸出檔案的目標路徑。</param>
+    /// <param name="format">LibreOffice 目標格式，例如 <c>pdf</c>、<c>docx</c> 或 <c>html</c>。</param>
+    /// <param name="renderer">可選用的自訂 renderer；未提供時使用預設 renderer。</param>
+    public static void ConvertToLibreOfficeFormat(
+        this OdfDocument document,
+        string outputPath,
+        string format,
+        LibreOfficeRenderer? renderer = null)
+    {
+        (renderer ?? new LibreOfficeRenderer()).Convert(document, outputPath, format);
+    }
+
+    /// <summary>
+    /// 非同步使用 LibreOffice 將指定文件轉換為任意 <c>--convert-to</c> 目標格式。
+    /// </summary>
+    /// <param name="document">要轉換的 OdfDocument 來源文件。</param>
+    /// <param name="outputPath">輸出檔案的目標路徑。</param>
+    /// <param name="format">LibreOffice 目標格式，例如 <c>pdf</c>、<c>docx</c> 或 <c>html</c>。</param>
+    /// <param name="renderer">可選用的自訂 renderer；未提供時使用預設 renderer。</param>
+    /// <param name="cancellationToken">用於取消轉檔作業的權杖。</param>
+    /// <returns>代表非同步轉檔作業的工作。</returns>
+    public static Task ConvertToLibreOfficeFormatAsync(
+        this OdfDocument document,
+        string outputPath,
+        string format,
+        LibreOfficeRenderer? renderer = null,
+        CancellationToken cancellationToken = default)
+    {
+        return (renderer ?? new LibreOfficeRenderer()).ConvertAsync(document, outputPath, format, cancellationToken);
     }
 }
 
@@ -66,6 +166,23 @@ public class LibreOfficeRenderer
     /// <exception cref="FileNotFoundException">當轉檔完成後找不到預期的目標檔案時擲出</exception>
     public void Convert(OdfDocument document, string outputPath, string format)
     {
+        ConvertAsync(document, outputPath, format, default).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// 使用 LibreOffice 將 ODF 文件非同步轉換為指定的目標格式並輸出。
+    /// </summary>
+    /// <param name="document">要轉檔的 OdfDocument 來源文件。</param>
+    /// <param name="outputPath">輸出檔案的目標路徑。</param>
+    /// <param name="format">要轉換的目標格式，例如 <c>pdf</c>。</param>
+    /// <param name="cancellationToken">用於取消轉檔作業的權杖。</param>
+    /// <returns>代表非同步轉檔作業的工作。</returns>
+    public virtual async Task ConvertAsync(
+        OdfDocument document,
+        string outputPath,
+        string format,
+        CancellationToken cancellationToken = default)
+    {
         if (document is null)
             throw new ArgumentNullException(nameof(document));
         if (string.IsNullOrEmpty(outputPath))
@@ -77,16 +194,11 @@ public class LibreOfficeRenderer
         Directory.CreateDirectory(tempSandbox);
         try
         {
-            string inputFileName = "document.odt";
-            if (document is PresentationDocument)
-                inputFileName = "document.odp";
-            else if (document is SpreadsheetDocument)
-                inputFileName = "document.ods";
-
+            string inputFileName = "document." + GetInputExtension(document);
             string inputFilePath = Path.Combine(tempSandbox, inputFileName);
-            File.WriteAllBytes(inputFilePath, document.SaveToBytes());
+            await WriteAllBytesAsync(inputFilePath, document.SaveToBytes(), cancellationToken).ConfigureAwait(false);
 
-            ConvertFile(inputFilePath, outputPath, format);
+            await ConvertFileAsync(inputFilePath, outputPath, format, cancellationToken).ConfigureAwait(false);
         }
         finally
         {
@@ -209,7 +321,7 @@ public class LibreOfficeRenderer
                 }
             }
 
-            string expectedOutName = Path.GetFileNameWithoutExtension(sandboxInputPath) + "." + format;
+            string expectedOutName = Path.GetFileNameWithoutExtension(sandboxInputPath) + "." + GetOutputExtension(format);
             string convertedFilePath = Path.Combine(sandboxDir, expectedOutName);
 
             if (!File.Exists(convertedFilePath))
@@ -300,11 +412,19 @@ public class LibreOfficeRenderer
 
     private static string DefaultLibreOfficePath()
     {
+        string? configured = ResolveConfiguredLibreOfficePath();
+        if (!string.IsNullOrEmpty(configured))
+        {
+            return configured!;
+        }
+
 #if NET10_0
         if (OperatingSystem.IsWindows())
         {
             string[] paths = [
+                @"C:\Program Files\LibreOffice\program\soffice.com",
                 @"C:\Program Files\LibreOffice\program\soffice.exe",
+                @"C:\Program Files (x86)\LibreOffice\program\soffice.com",
                 @"C:\Program Files (x86)\LibreOffice\program\soffice.exe"
             ];
             foreach (var path in paths)
@@ -335,7 +455,9 @@ public class LibreOfficeRenderer
         if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
         {
             string[] paths = [
+                @"C:\Program Files\LibreOffice\program\soffice.com",
                 @"C:\Program Files\LibreOffice\program\soffice.exe",
+                @"C:\Program Files (x86)\LibreOffice\program\soffice.com",
                 @"C:\Program Files (x86)\LibreOffice\program\soffice.exe"
             ];
             foreach (var path in paths)
@@ -363,9 +485,87 @@ public class LibreOfficeRenderer
         return "soffice"; // Fallback to PATH resolution
     }
 
-    private string EscapePath(string path)
+    /// <summary>
+    /// 取得 LibreOffice 轉檔時應使用的來源 ODF 副檔名。
+    /// </summary>
+    /// <param name="document">來源 ODF 文件。</param>
+    /// <returns>不含前導句點的副檔名。</returns>
+    public static string GetInputExtension(OdfDocument document)
     {
-        return path.Replace("\"", "\\\"");
+        if (document is null)
+            throw new ArgumentNullException(nameof(document));
+
+        return OdfDocumentKindDetector.TryGetFormatByKind(document.DocumentKind, out OdfFormatInfo? format)
+            ? format!.Extension.TrimStart('.')
+            : "odt";
+    }
+
+    private static string GetOutputExtension(string format)
+    {
+        string trimmed = format.Trim();
+        int colonIndex = trimmed.IndexOf(':');
+        if (colonIndex >= 0)
+        {
+            trimmed = trimmed.Substring(0, colonIndex);
+        }
+
+        return trimmed.Trim().TrimStart('.');
+    }
+
+    private static string? ResolveConfiguredLibreOfficePath()
+    {
+        foreach (string variable in new[] { "ODFKIT_SOFFICE_PATH", "LIBREOFFICE_PATH" })
+        {
+            foreach (string candidate in ExpandLibreOfficeCandidate(Environment.GetEnvironmentVariable(variable)))
+            {
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static string[] ExpandLibreOfficeCandidate(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Array.Empty<string>();
+        }
+
+        string candidate = value!.Trim().Trim('"');
+        if (File.Exists(candidate))
+        {
+            return new[] { candidate };
+        }
+
+        if (!Directory.Exists(candidate))
+        {
+            return new[] { candidate };
+        }
+
+        return new[]
+        {
+            Path.Combine(candidate, "soffice.com"),
+            Path.Combine(candidate, "soffice.exe"),
+            Path.Combine(candidate, "program", "soffice.com"),
+            Path.Combine(candidate, "program", "soffice.exe"),
+            Path.Combine(candidate, "App", "libreoffice", "program", "soffice.com"),
+            Path.Combine(candidate, "App", "libreoffice", "program", "soffice.exe")
+        };
+    }
+
+    private static Task WriteAllBytesAsync(string path, byte[] bytes, CancellationToken cancellationToken)
+    {
+#if NET5_0_OR_GREATER
+        return File.WriteAllBytesAsync(path, bytes, cancellationToken);
+#else
+        cancellationToken.ThrowIfCancellationRequested();
+        File.WriteAllBytes(path, bytes);
+        return Task.CompletedTask;
+#endif
     }
 
     private static string EscapeArgument(string arg)

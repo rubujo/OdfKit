@@ -1,4 +1,5 @@
-﻿using OdfKit.Styles;
+﻿using System.Collections.Generic;
+using OdfKit.Styles;
 using OdfKit.Text;
 
 namespace OdfKit.Presentation;
@@ -128,6 +129,30 @@ public sealed class OdfSlideBuilder
     }
 
     /// <summary>
+    /// 新增多段落文字方塊。
+    /// </summary>
+    /// <param name="paragraphs">段落文字集合。</param>
+    /// <param name="xCm">左側位置（公分）。</param>
+    /// <param name="yCm">上方位置（公分）。</param>
+    /// <param name="widthCm">寬度（公分）。</param>
+    /// <param name="heightCm">高度（公分）。</param>
+    /// <returns>目前 builder 執行個體。</returns>
+    public OdfSlideBuilder AddTextBox(
+        IEnumerable<string> paragraphs,
+        double xCm,
+        double yCm,
+        double widthCm,
+        double heightCm)
+    {
+        _slide.AddTextBox(
+            OdfLength.FromCentimeters(xCm),
+            OdfLength.FromCentimeters(yCm),
+            OdfLength.FromCentimeters(widthCm),
+            OdfLength.FromCentimeters(heightCm),
+            paragraphs);
+        return this;
+    }
+    /// <summary>
     /// 新增標題預留位置。
     /// </summary>
     /// <param name="xCm">左側位置（公分）。</param>
@@ -158,6 +183,17 @@ public sealed class OdfSlideBuilder
     public OdfSlideBuilder WithSpeakerNotes(string notes)
     {
         _slide.SpeakerNotes = notes;
+        return this;
+    }
+
+    /// <summary>
+    /// 設定多段落講者備忘文字。
+    /// </summary>
+    /// <param name="paragraphs">講者備忘段落集合。</param>
+    /// <returns>目前 builder 執行個體。</returns>
+    public OdfSlideBuilder WithSpeakerNotes(IEnumerable<string> paragraphs)
+    {
+        _slide.SetSpeakerNotes(paragraphs);
         return this;
     }
 
