@@ -24,7 +24,7 @@ public partial class OdfChartDocument
         if (index < 0 || index >= nodes.Count)
             throw new ArgumentOutOfRangeException(nameof(index), $"序列索引 {index} 超出範圍（共 {nodes.Count} 筆）。");
 
-        return new OdfChartSeries(nodes[index], index);
+        return new OdfChartSeries(this, nodes[index], index);
     }
 
     private IReadOnlyList<OdfNode> GetSeriesNodes()

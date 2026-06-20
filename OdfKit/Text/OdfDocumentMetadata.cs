@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -64,5 +64,14 @@ public sealed class OdfDocumentMetadata
     {
         get => _document.Language;
         set => _document.Language = value;
+    }
+
+    /// <summary>
+    /// 取得或設定文件來源範本中繼資料。
+    /// </summary>
+    public OdfTemplateMetadata? TemplateMetadata
+    {
+        get => _document.TemplateMetadata;
+        set => _document.TemplateMetadata = value;
     }
 }

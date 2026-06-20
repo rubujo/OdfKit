@@ -456,7 +456,7 @@ public static class OdfDocumentFactory
             : extensionKind;
     }
 
-    private static OdfDocument CreateDocumentWrapper(OdfPackage package, OdfDocumentKind kind)
+    internal static OdfDocument CreateDocumentWrapper(OdfPackage package, OdfDocumentKind kind)
     {
         return kind switch
         {

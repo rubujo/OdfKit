@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,13 +33,109 @@ internal static class OdfPackageFlatXmlLoader
                 : 0
         };
 
-        XDocument doc;
         Stream xmlStream = ctx.UnderlyingStream!;
         if (!ctx.UnderlyingStream!.CanSeek && signatureLength > 0)
             xmlStream = new PeekableStream(ctx.UnderlyingStream, signature, signatureLength, ctx.LeaveOpen);
 
+        var cleanXmlStream = new MemoryStream();
+        var binaryPaths = new Dictionary<int, string>();
+        int binaryCounter = 0;
+
         using (var reader = XmlReader.Create(xmlStream, settings))
-            doc = XDocument.Load(reader);
+        using (var writer = XmlWriter.Create(cleanXmlStream, new XmlWriterSettings { Encoding = new UTF8Encoding(false), CloseOutput = false, Indent = false }))
+        {
+            while (reader.Read())
+            {
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        bool isEmpty = reader.IsEmptyElement;
+                        if (reader.LocalName == "binary-data" && reader.NamespaceURI == OdfNamespaces.Office)
+                        {
+                            binaryCounter++;
+                            byte[] buffer = ArrayPool<byte>.Shared.Rent(65536);
+                            using (var binMs = new MemoryStream())
+                            {
+                                try
+                                {
+                                    int bytesRead;
+                                    while ((bytesRead = reader.ReadElementContentAsBase64(buffer, 0, buffer.Length)) > 0)
+                                    {
+                                        binMs.Write(buffer, 0, bytesRead);
+                                    }
+                                }
+                                finally
+                                {
+                                    ArrayPool<byte>.Shared.Return(buffer);
+                                }
+
+                                byte[] bytes = binMs.ToArray();
+                                OdfMediaManager.DetectImageFormat(bytes, out string mediaType, out string ext);
+                                string finalPath = $"Pictures/image_{binaryCounter}{ext}";
+                                binaryPaths[binaryCounter] = finalPath;
+
+                                ctx.Entries[finalPath] = new OdfPackageEntry(finalPath, bytes);
+                                ctx.Manifest[finalPath] = mediaType;
+                                ctx.EntryOrder.Add(finalPath);
+                            }
+
+                            writer.WriteStartElement("office", "binary-data", OdfNamespaces.Office);
+                            writer.WriteAttributeString("office", "binary-index", OdfNamespaces.Office, binaryCounter.ToString());
+                            writer.WriteEndElement();
+                        }
+                        else
+                        {
+                            writer.WriteStartElement(reader.Prefix, reader.LocalName, reader.NamespaceURI);
+                            if (reader.HasAttributes)
+                            {
+                                while (reader.MoveToNextAttribute())
+                                {
+                                    writer.WriteAttributeString(reader.Prefix, reader.LocalName, reader.NamespaceURI, reader.Value);
+                                }
+                                reader.MoveToElement();
+                            }
+                            if (isEmpty)
+                            {
+                                writer.WriteEndElement();
+                            }
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        writer.WriteEndElement();
+                        break;
+
+                    case XmlNodeType.Text:
+                        writer.WriteString(reader.Value);
+                        break;
+
+                    case XmlNodeType.SignificantWhitespace:
+                    case XmlNodeType.Whitespace:
+                        writer.WriteWhitespace(reader.Value);
+                        break;
+
+                    case XmlNodeType.CDATA:
+                        writer.WriteCData(reader.Value);
+                        break;
+
+                    case XmlNodeType.Comment:
+                        writer.WriteComment(reader.Value);
+                        break;
+
+                    case XmlNodeType.XmlDeclaration:
+                    case XmlNodeType.ProcessingInstruction:
+                        writer.WriteProcessingInstruction(reader.Name, reader.Value);
+                        break;
+                }
+            }
+        }
+
+        cleanXmlStream.Position = 0;
+        XDocument doc;
+        using (var cleanReader = XmlReader.Create(cleanXmlStream, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit }))
+        {
+            doc = XDocument.Load(cleanReader);
+        }
 
         XElement? root = doc.Root;
         if (root is null || root.Name.LocalName != "document" || root.Name.NamespaceName != OdfNamespaces.Office)
@@ -134,32 +231,23 @@ internal static class OdfPackageFlatXmlLoader
         XElement? bodyElement = root.Element(officeNs + "body");
 
         List<XElement> binaryDataElements = doc.Descendants(officeNs + "binary-data").ToList();
-        int imageCounter = 1;
         foreach (XElement binData in binaryDataElements)
         {
-            string base64 = binData.Value;
-            base64 = base64.Replace("\r", "").Replace("\n", "").Replace(" ", "").Replace("\t", "");
-            byte[] bytes = Convert.FromBase64String(base64);
-
-            OdfMediaManager.DetectImageFormat(bytes, out string mediaType, out string ext);
-
-            string imagePath = $"Pictures/image_{imageCounter++}{ext}";
-
-            ctx.Entries[imagePath] = new OdfPackageEntry(imagePath, bytes);
-            ctx.Manifest[imagePath] = mediaType;
-            ctx.EntryOrder.Add(imagePath);
-
-            XElement? binParent = binData.Parent;
-            if (binParent is not null)
+            XAttribute? indexAttr = binData.Attribute(officeNs + "binary-index") ?? binData.Attribute("binary-index");
+            if (indexAttr != null && int.TryParse(indexAttr.Value, out int idx) && binaryPaths.TryGetValue(idx, out string? imagePath))
             {
-                binData.Remove();
+                XElement? binParent = binData.Parent;
+                if (binParent is not null)
+                {
+                    binData.Remove();
 
-                xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
+                    xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
 
-                binParent.SetAttributeValue(xlinkNs + "href", imagePath);
-                binParent.SetAttributeValue(xlinkNs + "type", "simple");
-                binParent.SetAttributeValue(xlinkNs + "show", "embed");
-                binParent.SetAttributeValue(xlinkNs + "actuate", "onLoad");
+                    binParent.SetAttributeValue(xlinkNs + "href", imagePath);
+                    binParent.SetAttributeValue(xlinkNs + "type", "simple");
+                    binParent.SetAttributeValue(xlinkNs + "show", "embed");
+                    binParent.SetAttributeValue(xlinkNs + "actuate", "onLoad");
+                }
             }
         }
 

@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+using System.Buffers;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -263,16 +265,8 @@ internal static class OdfPackageArchiveWriter
             {
                 if (ctx.Entries.TryGetValue(href, out OdfPackageEntry? entry))
                 {
-                    byte[] imageBytes;
-                    using (Stream entryReader = entry.OpenReader())
-                    using (var ms = new MemoryStream())
-                    {
-                        entryReader.CopyTo(ms);
-                        imageBytes = ms.ToArray();
-                    }
-
-                    string base64 = Convert.ToBase64String(imageBytes);
-                    var binDataElement = new XElement(officeNs + "binary-data", base64);
+                    var binDataElement = new XElement(officeNs + "binary-data");
+                    binDataElement.SetAttributeValue("href", href);
                     elem.Add(binDataElement);
 
                     hrefAttr.Remove();
@@ -335,6 +329,89 @@ internal static class OdfPackageArchiveWriter
             Indent = ctx.SaveOptions.IndentXml
         };
         using (var writer = XmlWriter.Create(targetStream, writerSettings))
-            root.Save(writer);
+        {
+            WriteNodeStreaming(root, writer, ctx);
+        }
+    }
+
+    private static void WriteNodeStreaming(XNode node, XmlWriter writer, OdfPackage.OdfPackageSaveCollaborators ctx)
+    {
+        if (node is XElement element)
+        {
+            XNamespace officeNs = XNamespace.Get(OdfNamespaces.Office);
+            if (element.Name == officeNs + "binary-data" && element.Attribute("href") is XAttribute hrefAttr)
+            {
+                string href = hrefAttr.Value;
+                writer.WriteStartElement("office", "binary-data", OdfNamespaces.Office);
+
+                if (ctx.Entries.TryGetValue(href, out OdfPackageEntry? entry))
+                {
+                    byte[] buffer = ArrayPool<byte>.Shared.Rent(65536);
+                    try
+                    {
+                        using Stream stream = entry.OpenReader();
+                        int bytesRead;
+                        while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            writer.WriteBase64(buffer, 0, bytesRead);
+                        }
+                    }
+                    finally
+                    {
+                        ArrayPool<byte>.Shared.Return(buffer);
+                    }
+                }
+
+                writer.WriteEndElement();
+            }
+            else
+            {
+                if (element.Name.Namespace == XNamespace.None)
+                {
+                    writer.WriteStartElement(element.Name.LocalName);
+                }
+                else
+                {
+                    string elementPrefix = element.GetPrefixOfNamespace(element.Name.Namespace) ?? string.Empty;
+                    writer.WriteStartElement(elementPrefix, element.Name.LocalName, element.Name.NamespaceName);
+                }
+
+                foreach (XAttribute attr in element.Attributes())
+                {
+                    if (attr.Name.Namespace == XNamespace.None)
+                    {
+                        writer.WriteAttributeString(attr.Name.LocalName, attr.Value);
+                    }
+                    else
+                    {
+                        string attrPrefix = element.GetPrefixOfNamespace(attr.Name.Namespace) ?? string.Empty;
+                        writer.WriteAttributeString(attrPrefix, attr.Name.LocalName, attr.Name.NamespaceName, attr.Value);
+                    }
+                }
+
+                foreach (XNode child in element.Nodes())
+                {
+                    WriteNodeStreaming(child, writer, ctx);
+                }
+
+                writer.WriteEndElement();
+            }
+        }
+        else if (node is XText text)
+        {
+            writer.WriteString(text.Value);
+        }
+        else if (node is XComment comment)
+        {
+            writer.WriteComment(comment.Value);
+        }
+        else if (node is XCData cdata)
+        {
+            writer.WriteCData(cdata.Value);
+        }
+        else if (node is XProcessingInstruction pi)
+        {
+            writer.WriteProcessingInstruction(pi.Target, pi.Data);
+        }
     }
 }

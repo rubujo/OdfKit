@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using OdfKit.DOM;
 
@@ -69,6 +69,15 @@ public abstract partial class OdfDocument
     {
         get => OdfDocumentMetadataEngine.ParseMetaDate(OdfDocumentMetadataEngine.GetMetaElementText(MetaDom, "dc:date"));
         set => OdfDocumentMetadataEngine.SetMetaElementText(MetaDom, "dc:date", OdfDocumentMetadataEngine.FormatMetaDate(value));
+    }
+
+    /// <summary>
+    /// 取得或設定文件來源範本中繼資料。
+    /// </summary>
+    public OdfTemplateMetadata? TemplateMetadata
+    {
+        get => OdfDocumentMetadataEngine.GetTemplateMetadata(MetaDom);
+        set => OdfDocumentMetadataEngine.SetTemplateMetadata(MetaDom, value);
     }
 
     /// <summary>

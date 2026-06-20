@@ -9,10 +9,12 @@ namespace OdfKit.Chart;
 /// </summary>
 public sealed class OdfChartSeries
 {
+    private readonly OdfChartDocument _document;
     private readonly OdfNode _node;
 
-    internal OdfChartSeries(OdfNode seriesNode, int index)
+    internal OdfChartSeries(OdfChartDocument document, OdfNode seriesNode, int index)
     {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
         _node = seriesNode ?? throw new ArgumentNullException(nameof(seriesNode));
         Index = index;
     }
@@ -94,6 +96,34 @@ public sealed class OdfChartSeries
                 _node.RemoveAttribute("attached-axis", OdfNamespaces.Chart);
             else
                 _node.SetAttribute("attached-axis", OdfNamespaces.Chart, value!, "chart");
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定此資料序列的圖表自動樣式。
+    /// </summary>
+    public OdfChartStyle Style
+    {
+        get
+        {
+            string? name = StyleName;
+            if (string.IsNullOrEmpty(name))
+            {
+                name = $"series-style-{Index + 1}";
+                StyleName = name;
+            }
+            return _document.CreateChartStyle(name!);
+        }
+        set
+        {
+            if (value is null)
+            {
+                StyleName = null;
+            }
+            else
+            {
+                StyleName = value.Name;
+            }
         }
     }
 }

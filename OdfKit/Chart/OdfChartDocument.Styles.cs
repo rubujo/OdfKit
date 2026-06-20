@@ -8,6 +8,68 @@ namespace OdfKit.Chart;
 public partial class OdfChartDocument
 {
     /// <summary>
+    /// 取得或設定繪圖區的圖表自動樣式。
+    /// </summary>
+    public OdfChartStyle PlotAreaStyle
+    {
+        get
+        {
+            OdfNode plotArea = FindOrCreatePlotArea();
+            string? name = plotArea.GetAttribute("style-name", OdfNamespaces.Chart);
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "plot-area-style";
+                plotArea.SetAttribute("style-name", OdfNamespaces.Chart, name, "chart");
+            }
+            return CreateChartStyle(name!);
+        }
+        set
+        {
+            OdfNode plotArea = FindOrCreatePlotArea();
+            if (value is null)
+            {
+                plotArea.RemoveAttribute("style-name", OdfNamespaces.Chart);
+            }
+            else
+            {
+                plotArea.SetAttribute("style-name", OdfNamespaces.Chart, value.Name, "chart");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定主要 Y 軸格線的圖表自動樣式。
+    /// </summary>
+    public OdfChartStyle GridStyle
+    {
+        get
+        {
+            OdfNode axis = FindOrCreateAxis("y");
+            OdfNode grid = FindOrCreateChild(axis, "grid", OdfNamespaces.Chart, "chart");
+            string? name = grid.GetAttribute("style-name", OdfNamespaces.Chart);
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "grid-style";
+                grid.SetAttribute("style-name", OdfNamespaces.Chart, name, "chart");
+            }
+            return CreateChartStyle(name!);
+        }
+        set
+        {
+            OdfNode axis = FindOrCreateAxis("y");
+            OdfNode grid = FindOrCreateChild(axis, "grid", OdfNamespaces.Chart, "chart");
+            if (value is null)
+            {
+                grid.RemoveAttribute("style-name", OdfNamespaces.Chart);
+            }
+            else
+            {
+                grid.SetAttribute("style-name", OdfNamespaces.Chart, value.Name, "chart");
+            }
+        }
+    }
+
+    /// <summary>
     /// 建立或取得指定名稱的圖表自動樣式。
     /// </summary>
     /// <param name="name">樣式名稱。</param>
@@ -61,11 +123,23 @@ public partial class OdfChartDocument
             return null;
         }
 
+        string? fillVal = StyleEngine.GetStyleProperty(name, "fill", OdfNamespaces.Draw, "chart");
+        string? strokeVal = StyleEngine.GetStyleProperty(name, "stroke", OdfNamespaces.Draw, "chart");
+        string? threeDVal = StyleEngine.GetStyleProperty(name, "three-dimensional", OdfNamespaces.Chart, "chart");
+        string? angleOffsetVal = StyleEngine.GetStyleProperty(name, "angle-offset", OdfNamespaces.Chart, "chart");
+
+        bool? threeD = bool.TryParse(threeDVal, out bool b) ? b : null;
+        int? angleOffset = int.TryParse(angleOffsetVal, out int i) ? i : null;
+
         return new OdfChartStyleInfo(
             name,
             StyleEngine.GetStyleProperty(name, "fill-color", OdfNamespaces.Draw, "chart"),
             StyleEngine.GetStyleProperty(name, "stroke-color", OdfNamespaces.Svg, "chart"),
-            StyleEngine.GetStyleProperty(name, "stroke-width", OdfNamespaces.Svg, "chart"));
+            StyleEngine.GetStyleProperty(name, "stroke-width", OdfNamespaces.Svg, "chart"),
+            fillVal,
+            strokeVal,
+            threeD,
+            angleOffset);
     }
 
     /// <summary>
@@ -121,11 +195,23 @@ public partial class OdfChartDocument
                 continue;
             }
 
+            string? fillVal = StyleEngine.GetStyleProperty(name!, "fill", OdfNamespaces.Draw, "chart");
+            string? strokeVal = StyleEngine.GetStyleProperty(name!, "stroke", OdfNamespaces.Draw, "chart");
+            string? threeDVal = StyleEngine.GetStyleProperty(name!, "three-dimensional", OdfNamespaces.Chart, "chart");
+            string? angleOffsetVal = StyleEngine.GetStyleProperty(name!, "angle-offset", OdfNamespaces.Chart, "chart");
+
+            bool? threeD = bool.TryParse(threeDVal, out bool b) ? b : null;
+            int? angleOffset = int.TryParse(angleOffsetVal, out int i) ? i : null;
+
             styles.Add(new OdfChartStyleInfo(
                 name!,
                 StyleEngine.GetStyleProperty(name!, "fill-color", OdfNamespaces.Draw, "chart"),
                 StyleEngine.GetStyleProperty(name!, "stroke-color", OdfNamespaces.Svg, "chart"),
-                StyleEngine.GetStyleProperty(name!, "stroke-width", OdfNamespaces.Svg, "chart")));
+                StyleEngine.GetStyleProperty(name!, "stroke-width", OdfNamespaces.Svg, "chart"),
+                fillVal,
+                strokeVal,
+                threeD,
+                angleOffset));
         }
 
         return styles;

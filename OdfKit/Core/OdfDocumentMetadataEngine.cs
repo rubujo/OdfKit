@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using OdfKit.DOM;
@@ -6,7 +6,7 @@ using OdfKit.DOM;
 namespace OdfKit.Core;
 
 /// <summary>
-/// ODF 文件中繼資料（meta.xml）引擎（內部協作者）。
+/// ODF 文件中記資料（meta.xml）引擎（內部協作者）。
 /// </summary>
 internal static class OdfDocumentMetadataEngine
 {
@@ -212,6 +212,73 @@ internal static class OdfDocumentMetadataEngine
         statNode.SetAttribute("table-count", OdfNamespaces.Meta, tableCount.ToString(), "meta");
         statNode.SetAttribute("image-count", OdfNamespaces.Meta, imageCount.ToString(), "meta");
         statNode.SetAttribute("page-count", OdfNamespaces.Meta, "1", "meta");
+    }
+
+    /// <summary>
+    /// 取得文件的範本中繼資料。
+    /// </summary>
+    internal static OdfTemplateMetadata? GetTemplateMetadata(OdfNode metaDom)
+    {
+        var metaRoot = FindOrCreateMetaRoot(metaDom);
+        foreach (var child in metaRoot.Children)
+        {
+            if (child.LocalName == "template" && child.NamespaceUri == OdfNamespaces.Meta)
+            {
+                var meta = new OdfTemplateMetadata();
+                meta.Href = child.GetAttribute("href", OdfNamespaces.XLink);
+                meta.Title = child.GetAttribute("title", OdfNamespaces.XLink);
+                meta.Date = ParseMetaDate(child.GetAttribute("date", OdfNamespaces.Meta));
+                return meta;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 設定文件的範本中繼資料。
+    /// </summary>
+    internal static void SetTemplateMetadata(OdfNode metaDom, OdfTemplateMetadata? value)
+    {
+        var metaRoot = FindOrCreateMetaRoot(metaDom);
+        OdfNode? target = null;
+        foreach (var child in metaRoot.Children)
+        {
+            if (child.LocalName == "template" && child.NamespaceUri == OdfNamespaces.Meta)
+            {
+                target = child;
+                break;
+            }
+        }
+
+        if (value == null)
+        {
+            if (target != null)
+                metaRoot.RemoveChild(target);
+        }
+        else
+        {
+            if (target == null)
+            {
+                target = new OdfNode(OdfNodeType.Element, "template", OdfNamespaces.Meta, "meta");
+                metaRoot.AppendChild(target);
+            }
+            target.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+
+            if (value.Href != null)
+                target.SetAttribute("href", OdfNamespaces.XLink, value.Href, "xlink");
+            else
+                target.RemoveAttribute("href", OdfNamespaces.XLink);
+
+            if (value.Title != null)
+                target.SetAttribute("title", OdfNamespaces.XLink, value.Title, "xlink");
+            else
+                target.RemoveAttribute("title", OdfNamespaces.XLink);
+
+            if (value.Date != null)
+                target.SetAttribute("date", OdfNamespaces.Meta, FormatMetaDate(value.Date) ?? "", "meta");
+            else
+                target.RemoveAttribute("date", OdfNamespaces.Meta);
+        }
     }
 
     private static OdfNode? FindCustomPropertyNode(OdfNode metaRoot, string name)

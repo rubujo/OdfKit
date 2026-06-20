@@ -7,19 +7,42 @@ namespace OdfKit.Text;
 /// <summary>
 /// 表示文字文件中的圖片。
 /// </summary>
-/// <param name="frameNode">圖片的外框節點</param>
-/// <param name="imageNode">圖片的影像節點</param>
-public class OdfImage(OdfNode frameNode, OdfNode imageNode)
+public class OdfImage
 {
+    private readonly OdfDocument? _document;
+    private OdfImageLayout? _layout;
+
     /// <summary>
     /// 取得圖片的外框節點。
     /// </summary>
-    public OdfNode FrameNode { get; } = frameNode;
+    public OdfNode FrameNode { get; }
 
     /// <summary>
     /// 取得圖片的影像節點。
     /// </summary>
-    public OdfNode ImageNode { get; } = imageNode;
+    public OdfNode ImageNode { get; }
+
+    /// <summary>
+    /// 取得影像的版面配置設定（如框線、邊距、環繞、裁剪與透明度）。
+    /// </summary>
+    public OdfImageLayout Layout => _layout ??= new OdfImageLayout(this, _document);
+
+    /// <summary>
+    /// 初始化 <see cref="OdfImage"/> 類別的新執行個體。
+    /// </summary>
+    public OdfImage(OdfNode frameNode, OdfNode imageNode) : this(frameNode, imageNode, null)
+    {
+    }
+
+    /// <summary>
+    /// 使用指定的節點與文件初始化 <see cref="OdfImage"/> 類別的新執行個體。
+    /// </summary>
+    public OdfImage(OdfNode frameNode, OdfNode imageNode, OdfDocument? document)
+    {
+        FrameNode = frameNode ?? throw new ArgumentNullException(nameof(frameNode));
+        ImageNode = imageNode ?? throw new ArgumentNullException(nameof(imageNode));
+        _document = document;
+    }
 
     /// <summary>
     /// 取得此圖片是否標記為裝飾性（含 LibreOffice <c>loext:decorative</c> 相容讀取）。

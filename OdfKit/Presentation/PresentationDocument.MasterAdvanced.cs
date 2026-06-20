@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using OdfKit.Styles;
 
 namespace OdfKit.Presentation;
 

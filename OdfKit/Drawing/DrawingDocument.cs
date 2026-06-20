@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -65,6 +65,16 @@ public partial class DrawingDocument : OdfDocument
     public static DrawingDocument Create()
     {
         return (DrawingDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Graphics);
+    }
+
+    /// <summary>
+    /// 從指定的繪圖範本文件建立新的繪圖文件。
+    /// </summary>
+    /// <param name="template">繪圖範本文件。</param>
+    /// <returns>建立完成的 <see cref="DrawingDocument"/> 執行個體。</returns>
+    public static DrawingDocument CreateFromTemplate(GraphicsTemplateDocument template)
+    {
+        return (DrawingDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Graphics, "application/vnd.oasis.opendocument.graphics");
     }
 
     /// <summary>

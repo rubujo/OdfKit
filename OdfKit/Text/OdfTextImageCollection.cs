@@ -66,7 +66,7 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
         return GetEnumerator();
     }
 
-    private static void CollectImages(OdfNode node, List<OdfImage> images)
+    private void CollectImages(OdfNode node, List<OdfImage> images)
     {
         foreach (OdfNode child in node.Children)
         {
@@ -77,7 +77,7 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
                 OdfNode? image = FindDescendant(child, "image", OdfNamespaces.Draw);
                 if (image is not null)
                 {
-                    images.Add(new OdfImage(child, image));
+                    images.Add(new OdfImage(child, image, _document));
                 }
             }
 

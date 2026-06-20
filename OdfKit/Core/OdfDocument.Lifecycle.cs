@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 
@@ -145,6 +146,126 @@ public abstract partial class OdfDocument
 
         if (destinationStream.CanSeek)
             destinationStream.Position = 0;
+    }
+
+    #endregion
+
+    #region Template Instantiation API
+
+    /// <summary>
+    /// 從指定的範本建立文件封裝的基礎實作。
+    /// </summary>
+    internal static OdfDocument CreateFromTemplateInternal(OdfDocument template, OdfDocumentKind targetKind, string targetMimeType)
+    {
+        if (template == null)
+            throw new ArgumentNullException(nameof(template));
+
+        byte[] packageBytes = template.SaveToBytes();
+        var ms = new MemoryStream(packageBytes);
+        OdfPackage package = OdfPackage.Open(ms);
+
+        package.SetMimeType(targetMimeType);
+        package.Version = OdfVersion.Odf14;
+
+        OdfDocument newDoc = OdfDocumentFactory.CreateDocumentWrapper(package, targetKind);
+
+        if (newDoc.ContentDom != null)
+            newDoc.ContentDom.SetAttribute("version", OdfNamespaces.Office, "1.4", "office");
+        if (newDoc.StylesDom != null)
+            newDoc.StylesDom.SetAttribute("version", OdfNamespaces.Office, "1.4", "office");
+        if (newDoc.MetaDom != null)
+            newDoc.MetaDom.SetAttribute("version", OdfNamespaces.Office, "1.4", "office");
+        if (newDoc.SettingsDom != null)
+            newDoc.SettingsDom.SetAttribute("version", OdfNamespaces.Office, "1.4", "office");
+
+        newDoc.Creator = null;
+        newDoc.CreationDate = DateTime.UtcNow;
+        newDoc.ModificationDate = DateTime.UtcNow;
+        newDoc.TemplateMetadata = null;
+
+        return newDoc;
+    }
+
+    #endregion
+
+    #region Flat XML Conversion APIs
+
+    /// <summary>
+    /// 將文件儲存為單一 Flat XML 格式的檔案。
+    /// </summary>
+    /// <param name="path">要儲存的檔案路徑。</param>
+    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    public void SaveAsFlatXml(string path, OdfSaveOptions? options = null)
+    {
+        if (path is null)
+            throw new ArgumentNullException(nameof(path));
+
+        options ??= OdfSaveOptions.Default;
+        bool originalFlat = Package.IsFlatXml;
+        try
+        {
+            Package.IsFlatXml = true;
+            Save(path, options);
+        }
+        finally
+        {
+            Package.IsFlatXml = originalFlat;
+        }
+    }
+
+    /// <summary>
+    /// 將文件儲存為單一 Flat XML 格式並寫入指定的資料流。
+    /// </summary>
+    /// <param name="stream">目標資料流。</param>
+    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    public void SaveAsFlatXml(Stream stream, OdfSaveOptions? options = null)
+    {
+        if (stream is null)
+            throw new ArgumentNullException(nameof(stream));
+
+        options ??= OdfSaveOptions.Default;
+        bool originalFlat = Package.IsFlatXml;
+        try
+        {
+            Package.IsFlatXml = true;
+            SaveToStream(stream, options);
+        }
+        finally
+        {
+            Package.IsFlatXml = originalFlat;
+        }
+    }
+
+    /// <summary>
+    /// 從指定的 Flat XML 檔案載入 ODF 文件。
+    /// </summary>
+    /// <param name="path">Flat XML 檔案路徑。</param>
+    /// <param name="options">載入選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <returns>載入完成的 ODF 文件。</returns>
+    public static OdfDocument LoadFromFlatXml(string path, OdfLoadOptions? options = null)
+    {
+        if (path is null)
+            throw new ArgumentNullException(nameof(path));
+
+        var doc = OdfDocumentFactory.LoadDocument(path, options);
+        doc.Package.IsFlatXml = true;
+        return doc;
+    }
+
+    /// <summary>
+    /// 從指定的 Flat XML 資料流載入 ODF 文件。
+    /// </summary>
+    /// <param name="stream">Flat XML 資料流。</param>
+    /// <param name="options">載入選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <returns>載入完成 of ODF 文件。</returns>
+    public static OdfDocument LoadFromFlatXml(Stream stream, OdfLoadOptions? options = null)
+    {
+        if (stream is null)
+            throw new ArgumentNullException(nameof(stream));
+
+        var doc = OdfDocumentFactory.LoadDocument(stream, options);
+        doc.Package.IsFlatXml = true;
+        return doc;
     }
 
     #endregion

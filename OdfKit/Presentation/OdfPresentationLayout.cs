@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -48,30 +48,8 @@ public sealed class OdfMasterPageDefinition
     public string? BackgroundColor { get; init; }
 }
 
-/// <summary>
-/// 表示投影片母片包裝的類別。
-/// </summary>
-public sealed partial class OdfMasterPage
-{
-    /// <summary>
-    /// 取得底層的 ODF 節點。
-    /// </summary>
-    internal OdfNode Node { get; }
 
-    /// <summary>
-    /// 取得母片名稱。
-    /// </summary>
-    public string Name => Node.GetAttribute("name", OdfNamespaces.Style) ?? string.Empty;
 
-    /// <summary>
-    /// 初始化 <see cref="OdfMasterPage"/> 類別的新執行個體。
-    /// </summary>
-    /// <param name="node">底層的 <see cref="OdfNode"/> 執行個體。</param>
-    public OdfMasterPage(OdfNode node)
-    {
-        Node = node ?? throw new ArgumentNullException(nameof(node));
-    }
-}
 
 public partial class PresentationDocument
 {
@@ -79,7 +57,7 @@ public partial class PresentationDocument
     /// 取得簡報中所有投影片母片的清單。
     /// </summary>
     /// <returns>依 <c>office:master-styles</c> 內 <c>style:master-page</c> 順序排列的母片清單。</returns>
-    public IReadOnlyList<OdfMasterPage> GetMasterPages()
+    public new IReadOnlyList<OdfMasterPage> GetMasterPages()
     {
         OdfNode? masterStyles = null;
         foreach (OdfNode child in StylesRoot.Children)

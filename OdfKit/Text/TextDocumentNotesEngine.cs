@@ -169,7 +169,7 @@ internal static class TextDocumentNotesEngine
         frameNode.AppendChild(imageNode);
         paragraph.Node.AppendChild(frameNode);
 
-        return new OdfImage(frameNode, imageNode);
+        return new OdfImage(frameNode, imageNode, paragraph.DocProperty);
     }
 
     internal static OdfRuby AddRuby(TextDocument document, OdfParagraph paragraph, string baseText, string rubyText)
