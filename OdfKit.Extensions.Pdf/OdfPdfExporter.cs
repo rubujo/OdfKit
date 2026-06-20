@@ -54,6 +54,37 @@ public static class OdfPdfExporter
     private static Document BuildMigraDoc(TextDocument odfDoc)
     {
         var doc = new Document();
+
+        // 依作業系統決定預設的中文字型名稱，以防止中文在導出 PDF 時因為 Arial 字型不支援而顯示為方塊字
+        // 在 Windows 平台上使用標楷體 (DFKai-SB)，因為它是標準 .ttf 檔，能避開 PDFsharp 無法直接解析 .ttc (如微軟正黑體) 的 NullReferenceException 限制
+        string defaultChineseFont = "DFKai-SB";
+        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
+        {
+            defaultChineseFont = "PingFang TC";
+        }
+        else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
+        {
+            defaultChineseFont = "Noto Sans CJK TC";
+        }
+
+        // 套用中文字型至預設樣式
+        if (doc.Styles["Normal"] is Style normalStyle)
+        {
+            normalStyle.Font.Name = defaultChineseFont;
+        }
+        if (doc.Styles["Heading1"] is Style h1Style)
+        {
+            h1Style.Font.Name = defaultChineseFont;
+        }
+        if (doc.Styles["Heading2"] is Style h2Style)
+        {
+            h2Style.Font.Name = defaultChineseFont;
+        }
+        if (doc.Styles["Heading3"] is Style h3Style)
+        {
+            h3Style.Font.Name = defaultChineseFont;
+        }
+
         var section = doc.AddSection();
 
         foreach (var node in odfDoc.BodyTextRoot.Children)

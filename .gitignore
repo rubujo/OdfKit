@@ -90,6 +90,53 @@ nunit-agent*
 *.nuget.targets
 project.lock.json
 project.assets.json
+.ilc/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-agent*
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Visual Studio Code
+.vscode/
+
+# Compiled Utility resources
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# MSBuild
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Packages folder
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.assets.json
 
 # Tooling
 .tools/
@@ -98,3 +145,6 @@ project.assets.json
 
 # Project specifications
 implementation_plan.md
+
+# Samples output
+samples/output/

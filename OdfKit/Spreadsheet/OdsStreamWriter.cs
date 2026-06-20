@@ -61,8 +61,10 @@ public partial class OdsStreamWriter : IDisposable
         _outputStream = outputStream ?? throw new ArgumentNullException(nameof(outputStream));
         _version = version;
 
-        // 包裝於 NonSeekableStreamWrapper 以強制 ZipArchive 使用資料流、非緩衝模式
-        _zip = new ZipArchive(new NonSeekableStreamWrapper(_outputStream), ZipArchiveMode.Create, leaveOpen: true);
+        // 若底層資料流支援尋覽 (CanSeek)，則直接使用以避免 ZipArchive 強制寫入 Data Descriptor
+        // 這能確保 mimetype 檔案不含 Data Descriptor，符合 ODF 封裝規格以防止 LibreOffice 報錯毀損
+        Stream targetStream = _outputStream.CanSeek ? _outputStream : new NonSeekableStreamWrapper(_outputStream);
+        _zip = new ZipArchive(targetStream, ZipArchiveMode.Create, leaveOpen: true);
 
         // 1. 先寫入未壓縮的 mimetype
         var mimeEntry = _zip.CreateEntry("mimetype", CompressionLevel.NoCompression);

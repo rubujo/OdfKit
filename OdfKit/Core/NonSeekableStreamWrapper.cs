@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace OdfKit.Spreadsheet;
+namespace OdfKit.Core;
 
 internal class NonSeekableStreamWrapper(Stream baseStream) : Stream
 {

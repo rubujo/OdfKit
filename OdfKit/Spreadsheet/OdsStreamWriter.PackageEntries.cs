@@ -38,6 +38,11 @@ public partial class OdsStreamWriter
             writer.WriteEndElement();
 
             writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
+            writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "meta.xml");
+            writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "text/xml");
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("file-entry", OdfNamespaces.Manifest);
             writer.WriteAttributeString("manifest", "full-path", OdfNamespaces.Manifest, "styles.xml");
             writer.WriteAttributeString("manifest", "media-type", OdfNamespaces.Manifest, "text/xml");
             writer.WriteEndElement();

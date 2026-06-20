@@ -44,7 +44,11 @@ public sealed class OdtStreamWriter : IDisposable
 
         _ownedStream = ownsStream ? outputStream : null;
         _version = version;
-        _zip = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: true);
+
+        // 若底層資料流支援尋覽 (CanSeek)，則直接使用以避免 ZipArchive 強制寫入 Data Descriptor
+        // 這能確保 mimetype 檔案不含 Data Descriptor，符合 ODF 封裝規格以防止 LibreOffice 報錯毀損
+        Stream targetStream = outputStream.CanSeek ? outputStream : new NonSeekableStreamWrapper(outputStream);
+        _zip = new ZipArchive(targetStream, ZipArchiveMode.Create, leaveOpen: true);
 
         WriteMimeType();
         WriteManifest();
