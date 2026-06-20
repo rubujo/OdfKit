@@ -38,9 +38,9 @@ public class ConditionalFormatTests
         string xml = GetContentXml(doc);
 
         Assert.Contains("calcext:color-scale", xml);
-        Assert.Contains("calcext:type=\"min\"", xml);
+        Assert.Contains("calcext:type=\"minimum\"", xml);
         Assert.Contains("calcext:color=\"#FF0000\"", xml);
-        Assert.Contains("calcext:type=\"max\"", xml);
+        Assert.Contains("calcext:type=\"maximum\"", xml);
         Assert.Contains("calcext:color=\"#00FF00\"", xml);
         Assert.DoesNotContain("calcext:type=\"percentile\"", xml);
     }
@@ -89,10 +89,11 @@ public class ConditionalFormatTests
     }
 
     /// <summary>
-    /// 驗證資料橫條在未指定負值色彩時不寫入 negative-color 屬性。
+    /// 驗證資料橫條在未指定負值色彩時，仍會寫入 negative-color 屬性並套用預設色彩
+    /// （真實 LibreOffice 一律會寫出此屬性，省略會導致長條比例計算異常）。
     /// </summary>
     [Fact]
-    public void AddDataBarFormat_NoNegativeColor_DoesNotWriteNegativeAttr()
+    public void AddDataBarFormat_NoNegativeColor_WritesDefaultNegativeColor()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -101,7 +102,7 @@ public class ConditionalFormatTests
         string xml = GetContentXml(doc);
 
         Assert.Contains("calcext:data-bar", xml);
-        Assert.DoesNotContain("negative-color", xml);
+        Assert.Contains("calcext:negative-color=\"#ff0000\"", xml);
     }
 
     /// <summary>
@@ -120,7 +121,7 @@ public class ConditionalFormatTests
 
         Assert.Contains("calcext:icon-set", xml);
         Assert.Contains("calcext:icon-set-type=\"3Arrows\"", xml);
-        Assert.Contains("calcext:icon-set-entry", xml);
+        Assert.Contains("calcext:formatting-entry", xml);
     }
 
     /// <summary>
@@ -138,7 +139,7 @@ public class ConditionalFormatTests
         Assert.Contains("calcext:icon-set-type=\"5Rating\"", xml);
         int count = 0;
         int start = 0;
-        while ((start = xml.IndexOf("calcext:icon-set-entry", start, System.StringComparison.Ordinal)) >= 0)
+        while ((start = xml.IndexOf("calcext:formatting-entry", start, System.StringComparison.Ordinal)) >= 0)
         {
             count++;
             start++;

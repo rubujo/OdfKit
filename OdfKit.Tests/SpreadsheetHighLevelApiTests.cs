@@ -107,7 +107,7 @@ public class SpreadsheetHighLevelApiTests
         Assert.Contains("table:content-validations", contentXml);
         Assert.Contains("table:content-validation", contentXml);
         Assert.Contains("table:name=\"val_1\"", contentXml);
-        Assert.Contains("condition=\"and:oooc:isInteger()and:oooc:isBetween(1,100)\"", contentXml);
+        Assert.Contains("condition=\"of:cell-content-is-whole-number() and cell-content-is-between(1,100)\"", contentXml);
         Assert.Contains("table:error-message table:message=\"請輸入 1 至 100 的整數！\" table:title=\"無效輸入\" table:message-type=\"stop\"", contentXml);
 
         // 2. 驗證 A1 儲存格已正確被附加了此驗證名稱

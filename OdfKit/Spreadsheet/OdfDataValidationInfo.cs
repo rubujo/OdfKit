@@ -57,20 +57,19 @@ public sealed class OdfDataValidationInfo(
     /// <returns>若可辨識則為 <see langword="true"/>。</returns>
     public bool TryGetCondition(out OdfValidationCondition condition)
     {
-        if (ConditionExpression.Contains("isDecimal()", StringComparison.Ordinal))
+        if (ConditionExpression.Contains("cell-content-is-decimal-number()", StringComparison.Ordinal))
         {
             condition = OdfValidationCondition.DecimalBetween;
             return true;
         }
 
-        if (ConditionExpression.Contains("isText()", StringComparison.Ordinal) &&
-            ConditionExpression.Contains("oooc:len()", StringComparison.Ordinal))
+        if (ConditionExpression.Contains("cell-content-text-length-is-between(", StringComparison.Ordinal))
         {
             condition = OdfValidationCondition.TextLengthBetween;
             return true;
         }
 
-        if (ConditionExpression.Contains("isInteger()", StringComparison.Ordinal))
+        if (ConditionExpression.Contains("cell-content-is-whole-number()", StringComparison.Ordinal))
         {
             condition = OdfValidationCondition.IntegerBetween;
             return true;

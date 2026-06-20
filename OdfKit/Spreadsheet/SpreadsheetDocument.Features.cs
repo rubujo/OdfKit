@@ -375,13 +375,15 @@ public partial class SpreadsheetDocument
         validationNode.SetAttribute("name", OdfNamespaces.Table, validationName, "table");
         validationNode.SetAttribute("allow-empty-cell", OdfNamespaces.Table, "true", "table");
 
-        // 根據 Condition 決定 table:condition 屬性值
+        // 根據 Condition 決定 table:condition 屬性值（語法已用真實 LibreOffice 經 UNO API 建立驗證規則後
+        // 反向比對 content.xml 確認，與一般猜測的 "oooc:isXxx()" 語法不同）
         string conditionStr = validation.Condition switch
         {
-            OdfValidationCondition.DecimalBetween => $"and:oooc:isDecimal()and:oooc:isBetween({validation.Formula1},{validation.Formula2})",
-            OdfValidationCondition.TextLengthBetween => $"and:oooc:isText()and:oooc:isBetween(oooc:len(),{validation.Formula1},{validation.Formula2})",
-            _ => $"and:oooc:isInteger()and:oooc:isBetween({validation.Formula1},{validation.Formula2})"
+            OdfValidationCondition.DecimalBetween => $"of:cell-content-is-decimal-number() and cell-content-is-between({validation.Formula1},{validation.Formula2})",
+            OdfValidationCondition.TextLengthBetween => $"of:cell-content-text-length-is-between({validation.Formula1},{validation.Formula2})",
+            _ => $"of:cell-content-is-whole-number() and cell-content-is-between({validation.Formula1},{validation.Formula2})"
         };
+        validationNode.SetAttribute("base-cell-address", OdfNamespaces.Table, $"{sheetName}.A1", "table");
         validationNode.SetAttribute("condition", OdfNamespaces.Table, conditionStr, "table");
 
         // 4. 新增 table:error-message 子節點

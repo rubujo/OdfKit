@@ -1521,15 +1521,15 @@ public static class OdfToXlsxConverter
 
     private static ValidationRule? ParseValidationRule(string condition)
     {
-        Match match = Regex.Match(condition, @"isBetween\(([^,]+),([^)]+)\)", RegexOptions.CultureInvariant);
+        Match match = Regex.Match(condition, @"is-between\(([^,]+),([^)]+)\)", RegexOptions.CultureInvariant);
         if (!match.Success)
         {
             return null;
         }
 
         ValidationKind kind =
-            condition.IndexOf("isText()", StringComparison.OrdinalIgnoreCase) >= 0 ? ValidationKind.TextLengthBetween :
-            condition.IndexOf("isDecimal()", StringComparison.OrdinalIgnoreCase) >= 0 ? ValidationKind.DecimalBetween :
+            condition.IndexOf("text-length-is-between", StringComparison.OrdinalIgnoreCase) >= 0 ? ValidationKind.TextLengthBetween :
+            condition.IndexOf("is-decimal-number", StringComparison.OrdinalIgnoreCase) >= 0 ? ValidationKind.DecimalBetween :
             ValidationKind.IntegerBetween;
 
         return new ValidationRule

@@ -132,7 +132,8 @@ internal static class OdfTableSheetConditionalFormatEngine
         var colorScale = new OdfNode(OdfNodeType.Element, "color-scale", calcextNs, "calcext");
 
         var entryMin = new OdfNode(OdfNodeType.Element, "color-scale-entry", calcextNs, "calcext");
-        entryMin.SetAttribute("type", calcextNs, "min", "calcext");
+        entryMin.SetAttribute("value", calcextNs, "0", "calcext");
+        entryMin.SetAttribute("type", calcextNs, "minimum", "calcext");
         entryMin.SetAttribute("color", calcextNs, minColor.Value, "calcext");
         colorScale.AppendChild(entryMin);
 
@@ -146,7 +147,8 @@ internal static class OdfTableSheetConditionalFormatEngine
         }
 
         var entryMax = new OdfNode(OdfNodeType.Element, "color-scale-entry", calcextNs, "calcext");
-        entryMax.SetAttribute("type", calcextNs, "max", "calcext");
+        entryMax.SetAttribute("value", calcextNs, "0", "calcext");
+        entryMax.SetAttribute("type", calcextNs, "maximum", "calcext");
         entryMax.SetAttribute("color", calcextNs, maxColor.Value, "calcext");
         colorScale.AppendChild(entryMax);
 
@@ -171,9 +173,24 @@ internal static class OdfTableSheetConditionalFormatEngine
         format.SetAttribute("target-range-address", calcextNs, rangeAddr, "calcext");
 
         var dataBar = new OdfNode(OdfNodeType.Element, "data-bar", calcextNs, "calcext");
+        dataBar.SetAttribute("max-length", calcextNs, "100", "calcext");
+        dataBar.SetAttribute("negative-color", calcextNs,
+            negativeColor.HasValue ? negativeColor.Value.Value : "#ff0000", "calcext");
         dataBar.SetAttribute("positive-color", calcextNs, positiveColor.Value, "calcext");
-        if (negativeColor.HasValue)
-            dataBar.SetAttribute("negative-color", calcextNs, negativeColor.Value.Value, "calcext");
+        dataBar.SetAttribute("axis-color", calcextNs, "#000000", "calcext");
+
+        // calcext:data-bar 須帶 auto-minimum／auto-maximum 兩個 calcext:formatting-entry 子節點，
+        // 否則 LibreOffice 無法正確依資料範圍實際最小/最大值計算長條比例（已以真實 LibreOffice 內建
+        // 說明文件範例檔 conditionalformatting.ods 驗證；缺少時所有非最小值的長條會被錯誤地畫滿整格）。
+        var minEntry = new OdfNode(OdfNodeType.Element, "formatting-entry", calcextNs, "calcext");
+        minEntry.SetAttribute("value", calcextNs, "0", "calcext");
+        minEntry.SetAttribute("type", calcextNs, "auto-minimum", "calcext");
+        dataBar.AppendChild(minEntry);
+
+        var maxEntry = new OdfNode(OdfNodeType.Element, "formatting-entry", calcextNs, "calcext");
+        maxEntry.SetAttribute("value", calcextNs, "0", "calcext");
+        maxEntry.SetAttribute("type", calcextNs, "auto-maximum", "calcext");
+        dataBar.AppendChild(maxEntry);
 
         format.AppendChild(dataBar);
         formatsNode.AppendChild(format);
@@ -209,12 +226,15 @@ internal static class OdfTableSheetConditionalFormatEngine
         var iconSetNode = new OdfNode(OdfNodeType.Element, "icon-set", calcextNs, "calcext");
         iconSetNode.SetAttribute("icon-set-type", calcextNs, iconTypeName, "calcext");
 
+        // 子節點標籤名稱須為 calcext:formatting-entry，不是 calcext:icon-set-entry（已以真實
+        // LibreOffice 內建說明文件範例檔 conditionalformatting.ods 驗證；先前的錯誤標籤名稱會讓
+        // LibreOffice 完全不顯示任何圖示）。
         for (int i = 0; i < entryCount; i++)
         {
             int pct = i == 0 ? 0 : (int)Math.Round(100.0 * i / entryCount);
-            var entry = new OdfNode(OdfNodeType.Element, "icon-set-entry", calcextNs, "calcext");
-            entry.SetAttribute("type", calcextNs, "percent", "calcext");
+            var entry = new OdfNode(OdfNodeType.Element, "formatting-entry", calcextNs, "calcext");
             entry.SetAttribute("value", calcextNs, pct.ToString(), "calcext");
+            entry.SetAttribute("type", calcextNs, "percent", "calcext");
             iconSetNode.AppendChild(entry);
         }
 
@@ -365,10 +385,10 @@ internal static class OdfTableSheetConditionalFormatEngine
 
             switch (entryType)
             {
-                case "min":
+                case "minimum":
                     minColor = color;
                     break;
-                case "max":
+                case "maximum":
                     maxColor = color;
                     break;
                 case "percentile":

@@ -209,14 +209,18 @@ public static class OdfXmlWriter
                     nsDict[attr.NamespaceUri] = prefix;
                 }
 
-                // 公式／條件式屬性值內可帶有 "of:=" 前綴（OpenFormula）或 "oooc:" 前綴
-                // （OpenOffice.org Calc 內容驗證條件函式，例如 table:condition="and:oooc:isDecimal()..."）。
-                // 這些前綴只存在於屬性值字串內，不屬於 XML 結構化命名空間限定名稱，
-                // 須額外掃描屬性值才能正確補上對應的 xmlns 宣告。
+                // 公式／條件式屬性值內可帶有 "of:" 前綴（OpenFormula，用於 table:formula="of:=..." 與
+                // table:condition="of:cell-content-is-..."）或 "oooc:" 前綴（OpenOffice.org Calc 相容
+                // 公式，例如 table:formula="oooc:=..."）。這些前綴只存在於屬性值字串內，不屬於 XML
+                // 結構化命名空間限定名稱，須額外掃描屬性值才能正確補上對應的 xmlns 宣告。
+                // 注意："of:" 不可只比對 "of:="（公式賦值語法）：table:condition 內的條件函式（例如
+                // cell-content-is-decimal-number()、cell-content-is-in-list(...)）同樣以 "of:" 開頭
+                // 但沒有等號，曾經因為只檢查 "of:=" 而在「文件內沒有任何公式格、只有驗證規則」時遺漏宣告，
+                // 造成 LibreOffice 載入時整條驗證規則被靜默捨棄。
                 if (attrEntry.Value is { Length: > 3 } value)
                 {
                     if (!nsDict.ContainsKey(OdfNamespaces.Of) &&
-                        value.StartsWith("of:=", System.StringComparison.Ordinal))
+                        value.StartsWith("of:", System.StringComparison.Ordinal))
                     {
                         nsDict[OdfNamespaces.Of] = "of";
                     }

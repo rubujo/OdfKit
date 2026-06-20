@@ -140,12 +140,32 @@ internal static class OdfTableSheetViewEngine
         if (allowedValues is null || allowedValues.Length == 0)
             throw new ArgumentException("驗證清單至少需要一個允許值。", nameof(allowedValues));
 
-        var validations = OdfTableSheetDomHelper.FindOrCreateChild(
-            context.TableNode, "content-validations", OdfNamespaces.Table, "table");
+        // table:content-validations 須為 office:spreadsheet 的直接子節點（所有工作表共用的全域宣告），
+        // 不可放在個別 table:table 內部，否則真實 LibreOffice 會視為結構不合法並靜默捨棄整條規則。
+        var sheetsRoot = context.Document.SheetsRoot;
+        OdfNode? validations = null;
+        foreach (var child in sheetsRoot.Children)
+        {
+            if (child.LocalName == "content-validations" && child.NamespaceUri == OdfNamespaces.Table)
+            {
+                validations = child;
+                break;
+            }
+        }
+        if (validations is null)
+        {
+            validations = new OdfNode(OdfNodeType.Element, "content-validations", OdfNamespaces.Table, "table");
+            if (sheetsRoot.Children.Count > 0)
+                sheetsRoot.InsertBefore(validations, sheetsRoot.Children[0]);
+            else
+                sheetsRoot.AppendChild(validations);
+        }
         var validation = FindOrCreateNamedChild(validations, "content-validation", name);
         validation.SetAttribute("name", OdfNamespaces.Table, name, "table");
         validation.SetAttribute("condition", OdfNamespaces.Table, BuildValidationListCondition(allowedValues), "table");
         validation.SetAttribute("allow-empty-cell", OdfNamespaces.Table, "true", "table");
+        validation.SetAttribute("display-list", OdfNamespaces.Table, "unsorted", "table");
+        validation.SetAttribute("base-cell-address", OdfNamespaces.Table, $"{context.SheetName}.A1", "table");
 
         foreach (OdfCell cell in EnumerateCells(context, range))
             cell.Node.SetAttribute("content-validation-name", OdfNamespaces.Table, name, "table");
@@ -192,7 +212,7 @@ internal static class OdfTableSheetViewEngine
         var quoted = new List<string>();
         foreach (string value in values)
             quoted.Add("\"" + value.Replace("\"", "\"\"") + "\"");
-        return "cell-content-is-in-list(" + string.Join(";", quoted) + ")";
+        return "of:cell-content-is-in-list(" + string.Join(";", quoted) + ")";
     }
 
     private static OdfNode FindOrCreateNamedChild(OdfNode parent, string localName, string name)

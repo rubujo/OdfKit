@@ -953,7 +953,7 @@ public class OoxmlConversionTests
         string contentXml = SaveSpreadsheetContentXml(odsDocument);
 
         Assert.Contains("table:content-validations", contentXml);
-        Assert.Contains("condition=\"and:oooc:isInteger()and:oooc:isBetween(1,100)\"", contentXml);
+        Assert.Contains("condition=\"of:cell-content-is-whole-number() and cell-content-is-between(1,100)\"", contentXml);
         Assert.Contains("table:content-validation-name=\"val_1\"", contentXml);
         Assert.Contains("請輸入 1 至 100 的整數！", contentXml);
     }
@@ -1365,7 +1365,7 @@ public class OoxmlConversionTests
 
         Assert.Contains("table:data-pilot-table", contentXml);
         Assert.Contains("table:content-validations", contentXml);
-        Assert.Contains("condition=\"and:oooc:isInteger()and:oooc:isBetween(1,100)\"", contentXml);
+        Assert.Contains("condition=\"of:cell-content-is-whole-number() and cell-content-is-between(1,100)\"", contentXml);
         Assert.Contains("請輸入 1 至 100 的整數！", contentXml);
         Assert.Contains("calcext:conditional-formats", contentXml);
         Assert.Contains("calcext:color-scale", contentXml);
@@ -1639,7 +1639,7 @@ public class OoxmlConversionTests
         Assert.Contains("calcext:icon-set", contentXml);
         Assert.Contains("calcext:target-range-address=\"Sheet1.C1:Sheet1.C2\"", contentXml);
         Assert.Contains("calcext:icon-set-type=\"3TrafficLights1\"", contentXml);
-        Assert.Contains("calcext:icon-set-entry", contentXml);
+        Assert.Contains("calcext:formatting-entry", contentXml);
     }
 
     /// <summary>
