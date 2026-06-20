@@ -39,7 +39,7 @@ public class DrawingHighLevelApiTests
         Assert.Equal("10cm", shape.Node.GetAttribute("width", OdfNamespaces.Svg));
         Assert.Equal("5cm", shape.Node.GetAttribute("height", OdfNamespaces.Svg));
         Assert.Equal(pathData, shape.Node.GetAttribute("d", OdfNamespaces.Svg));
-        Assert.Equal("0 0 1000 1000", shape.Node.GetAttribute("viewBox", OdfNamespaces.Svg));
+        Assert.Equal("10 10 10 10", shape.Node.GetAttribute("viewBox", OdfNamespaces.Svg));
     }
 
     /// <summary>

@@ -169,10 +169,101 @@ public partial class OdfDrawPage
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, width.ToString(), "svg");
         shapeNode.SetAttribute("height", OdfNamespaces.Svg, height.ToString(), "svg");
         shapeNode.SetAttribute("d", OdfNamespaces.Svg, svgPathData, "svg");
-        shapeNode.SetAttribute("viewBox", OdfNamespaces.Svg, "0 0 1000 1000", "svg");
+        shapeNode.SetAttribute("viewBox", OdfNamespaces.Svg, ComputePathDataViewBox(svgPathData), "svg");
 
         Node.AppendChild(shapeNode);
         return new OdfShape(shapeNode, Document);
+    }
+
+    /// <summary>
+    /// 依據 SVG path data 內所有座標的邊界範圍計算 <c>svg:viewBox</c>。
+    /// </summary>
+    /// <remarks>
+    /// ODF/ODG 的 <c>draw:path</c> 形狀實際呈現範圍是 <c>d</c> 路徑資料在 <c>viewBox</c> 座標空間中所佔的範圍，
+    /// 再依 <c>viewBox</c> 到 <c>svg:width</c>/<c>svg:height</c> 的線性比例縮放。
+    /// 若 <c>viewBox</c> 與路徑資料實際座標範圍不一致，圖形會被錯誤縮放（例如僅佔邊界盒一小部分），
+    /// 這項落差在 LibreOffice 等真實渲染器中才會顯現，OdfKit 內部的結構性 round-trip 測試無法偵測。
+    /// </remarks>
+    private static string ComputePathDataViewBox(string svgPathData)
+    {
+        const string fallback = "0 0 1000 1000";
+        if (string.IsNullOrWhiteSpace(svgPathData))
+            return fallback;
+
+        double minX = double.MaxValue;
+        double maxX = double.MinValue;
+        double minY = double.MaxValue;
+        double maxY = double.MinValue;
+        bool isXCoordinate = true;
+        bool hasCoordinate = false;
+
+        int index = 0;
+        int length = svgPathData.Length;
+        while (index < length)
+        {
+            char c = svgPathData[index];
+            if (char.IsLetter(c))
+            {
+                isXCoordinate = true;
+                index++;
+                continue;
+            }
+
+            if (char.IsDigit(c) || c is '-' or '+' or '.')
+            {
+                int start = index;
+                index++;
+                while (index < length && (char.IsDigit(svgPathData[index]) || svgPathData[index] is '.' or 'e' or 'E' ||
+                    ((svgPathData[index] is '-' or '+') && (svgPathData[index - 1] is 'e' or 'E'))))
+                {
+                    index++;
+                }
+
+                string token = svgPathData.Substring(start, index - start);
+                if (double.TryParse(token, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double value))
+                {
+                    hasCoordinate = true;
+                    if (isXCoordinate)
+                    {
+                        if (value < minX)
+                            minX = value;
+                        if (value > maxX)
+                            maxX = value;
+                    }
+                    else
+                    {
+                        if (value < minY)
+                            minY = value;
+                        if (value > maxY)
+                            maxY = value;
+                    }
+
+                    isXCoordinate = !isXCoordinate;
+                }
+
+                continue;
+            }
+
+            index++;
+        }
+
+        if (!hasCoordinate)
+            return fallback;
+
+        double vbWidth = maxX - minX;
+        double vbHeight = maxY - minY;
+        if (vbWidth <= 0)
+            vbWidth = 1000;
+        if (vbHeight <= 0)
+            vbHeight = 1000;
+
+        return string.Format(
+            System.Globalization.CultureInfo.InvariantCulture,
+            "{0} {1} {2} {3}",
+            Math.Floor(minX),
+            Math.Floor(minY),
+            Math.Ceiling(vbWidth),
+            Math.Ceiling(vbHeight));
     }
 
     /// <summary>
@@ -299,12 +390,58 @@ public partial class OdfDrawPage
         shapeNode.SetAttribute("height", OdfNamespaces.Svg, height.ToString(), "svg");
 
         var geometryNode = OdfNodeFactory.CreateElement("enhanced-geometry", OdfNamespaces.Draw, "draw");
-        geometryNode.SetAttribute("type", OdfNamespaces.Draw, shapeType, "draw");
+
+        // 真實 LibreOffice 並不會單憑 draw:type 字串自動補齊 enhanced-path／viewBox／equation 等幾何資料，
+        // 缺少這些資料時形狀會完全不渲染（無任何錯誤訊息）。已以 LibreOffice UNO API 親手建立同名 preset
+        // 取得權威幾何資料；目前僅 "smiley" 有完整對照表並補上正確資料，其餘名稱維持原始僅含 draw:type
+        // 的最小骨架（呼叫端可自行後續補上 enhanced-path 等屬性，例如供應商自訂幾何或測試情境）。
+        if (PresetGeometries.TryGetValue(shapeType, out PresetGeometryData? preset))
+        {
+            geometryNode.SetAttribute("viewBox", OdfNamespaces.Svg, preset.ViewBox, "svg");
+            geometryNode.SetAttribute("glue-points", OdfNamespaces.Draw, preset.GluePoints, "draw");
+            geometryNode.SetAttribute("text-areas", OdfNamespaces.Draw, preset.TextAreas, "draw");
+            geometryNode.SetAttribute("type", OdfNamespaces.Draw, shapeType, "draw");
+            geometryNode.SetAttribute("modifiers", OdfNamespaces.Draw, preset.Modifiers, "draw");
+            geometryNode.SetAttribute("enhanced-path", OdfNamespaces.Draw, preset.EnhancedPath, "draw");
+            foreach ((string name, string formula) in preset.Equations)
+            {
+                var equationNode = OdfNodeFactory.CreateElement("equation", OdfNamespaces.Draw, "draw");
+                equationNode.SetAttribute("name", OdfNamespaces.Draw, name, "draw");
+                equationNode.SetAttribute("formula", OdfNamespaces.Draw, formula, "draw");
+                geometryNode.AppendChild(equationNode);
+            }
+        }
+        else
+        {
+            geometryNode.SetAttribute("type", OdfNamespaces.Draw, shapeType, "draw");
+        }
         shapeNode.AppendChild(geometryNode);
 
         Node.AppendChild(shapeNode);
         return new OdfShape(shapeNode, Document);
     }
+
+    private sealed record PresetGeometryData(
+        string ViewBox, string GluePoints, string TextAreas, string Modifiers, string EnhancedPath,
+        (string Name, string Formula)[] Equations);
+
+    // 權威來源：以 LibreOffice 26.x 透過 com.sun.star.drawing.CustomShape／CustomShapeGeometry UNO API
+    // 親手建立同名 preset 後存成 .odg 並反向比對 content.xml 取得的真實節點資料，非憑記憶或猜測。
+    private static readonly System.Collections.Generic.Dictionary<string, PresetGeometryData> PresetGeometries = new()
+    {
+        ["smiley"] = new PresetGeometryData(
+            ViewBox: "0 0 21600 21600",
+            GluePoints: "10800 0 3163 3163 0 10800 3163 18437 10800 21600 18437 18437 21600 10800 18437 3163",
+            TextAreas: "3163 3163 18437 18437",
+            Modifiers: "18520",
+            EnhancedPath: "U 10800 10800 10800 10800 0 360 Z N U 7305 7515 1000 1865 0 360 Z N U 14295 7515 1000 1865 0 360 Z N M 4870 ?f1 C 8680 ?f2 12920 ?f2 16730 ?f1 F N",
+            Equations: new[]
+            {
+                ("f0", "$0 -14510"),
+                ("f1", "18520-?f0 "),
+                ("f2", "14510+?f0 "),
+            }),
+    };
 
     /// <summary>
     /// 在繪圖頁面上新增群組。
