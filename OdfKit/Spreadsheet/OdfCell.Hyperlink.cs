@@ -174,7 +174,7 @@ public partial class OdfCell
                     author = inner.TextContent;
                 else if (inner.LocalName == "date" && inner.NamespaceUri == OdfNamespaces.Dc)
                 {
-                    if (DateTime.TryParse(inner.TextContent, null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime dt))
+                    if (DateTime.TryParse(inner.TextContent, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime dt))
                         date = dt;
                 }
                 else if (inner.LocalName == "p" && inner.NamespaceUri == OdfNamespaces.Text)

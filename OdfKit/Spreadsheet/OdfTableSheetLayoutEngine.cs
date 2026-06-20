@@ -77,6 +77,38 @@ internal static class OdfTableSheetLayoutEngine
         return OdfLength.Parse(val);
     }
 
+    internal static OdfLength? GetColumnWidth(OdfTableSheetMutationContext context, int col)
+    {
+        OdfNode? colNode = FindExistingColumnNode(context.TableNode, col);
+        string? styleName = colNode?.GetAttribute("style-name", OdfNamespaces.Table);
+        if (string.IsNullOrEmpty(styleName))
+            return null;
+        string? val = context.Document.StyleEngine.GetStyleProperty(styleName!, "column-width", OdfNamespaces.Style, "table-column");
+        if (string.IsNullOrEmpty(val))
+            return null;
+        return OdfLength.Parse(val);
+    }
+
+    /// <summary>
+    /// 唯讀查找已存在的欄節點，不會像 <c>GetOrCreateColumnNode</c> 一樣建立新欄。
+    /// </summary>
+    private static OdfNode? FindExistingColumnNode(OdfNode tableNode, int col)
+    {
+        int currentColIndex = 0;
+        foreach (var child in tableNode.Children)
+        {
+            if (child.LocalName != "table-column" || child.NamespaceUri != OdfNamespaces.Table)
+                continue;
+
+            int repeatedCount = OdfTableSheetRepeatSplitEngine.GetRepeatCount(child, "number-columns-repeated");
+            if (col >= currentColIndex && col < currentColIndex + repeatedCount)
+                return child;
+            currentColIndex += repeatedCount;
+        }
+
+        return null;
+    }
+
     private static OdfLength CalculateOptimalColumnWidth(IEnumerable<string> cellValues, double fontSizePt = 10)
     {
         double maxWeight = 0;

@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
 using OdfKit.Core;
 using OdfKit.Conversion;
@@ -1492,7 +1493,7 @@ public class ManagedPptxConversionTests
                         new P.TextBody(new A.BodyProperties(), new A.ListStyle(), new A.Paragraph()))
                 )
             );
-            masterPart.SlideMaster = new P.SlideMaster(masterCommon, new P.ColorMap { Background = A.ColorSchemeIndexValues.Light1 });
+            masterPart.SlideMaster = new P.SlideMaster(masterCommon, new P.ColorMap { Background1 = A.ColorSchemeIndexValues.Light1 });
 
             // Theme (用於 FormatScheme, EffectStyleList 等)
             var themePart = masterPart.AddNewPart<ThemePart>();
@@ -1511,11 +1512,13 @@ public class ManagedPptxConversionTests
                         new A.Accent6Color(new A.RgbColorModelHex { Val = "F79646" }),
                         new A.Hyperlink(new A.RgbColorModelHex { Val = "0000FF" }),
                         new A.FollowedHyperlinkColor(new A.RgbColorModelHex { Val = "800080" })
-                    ) { Name = "Office" },
+                    )
+                    { Name = "Office" },
                     new A.FontScheme(
                         new A.MajorFont(new A.LatinFont { Typeface = "Calibri" }),
                         new A.MinorFont(new A.LatinFont { Typeface = "Calibri" })
-                    ) { Name = "Office" },
+                    )
+                    { Name = "Office" },
                     new A.FormatScheme(
                         new A.FillStyleList(
                             new A.SolidFill(new A.SchemeColor { Val = A.SchemeColorValues.Accent1 }),
@@ -1528,14 +1531,16 @@ public class ManagedPptxConversionTests
                             new A.Outline(new A.SolidFill(new A.SchemeColor { Val = A.SchemeColorValues.Accent3 })) { Width = 28575 }
                         ),
                         new A.EffectStyleList(
-                            new A.EffectStyle(new A.EffectList(new A.OuterShadow { Dist = 38100L, Dir = 5400000, Algn = A.RectangleAlignmentValues.BottomLeft, Color = new A.SchemeColor { Val = A.SchemeColorValues.Dark2 } })),
+                            new A.EffectStyle(new A.EffectList(new A.OuterShadow(new A.SchemeColor { Val = A.SchemeColorValues.Dark2 }) { Distance = 38100L, Direction = 5400000, Alignment = A.RectangleAlignmentValues.BottomLeft })),
                             new A.EffectStyle(new A.EffectList()),
                             new A.EffectStyle(new A.EffectList())
                         ),
                         new A.BackgroundFillStyleList()
-                    ) { Name = "Office" }
+                    )
+                    { Name = "Office" }
                 )
-            ) { Name = "Office Theme" };
+            )
+            { Name = "Office Theme" };
 
             // Layout
             var layoutPart = masterPart.AddNewPart<SlideLayoutPart>();
@@ -1556,7 +1561,8 @@ public class ManagedPptxConversionTests
                             new P.TextBody(new A.BodyProperties(), new A.ListStyle(), new A.Paragraph()))
                     )
                 )
-            ) { Type = P.SlideLayoutValues.TitleOnly };
+            )
+            { Type = P.SlideLayoutValues.TitleOnly };
 
             // Slide
             var slidePart = presPart.AddNewPart<SlidePart>("rId2");
@@ -1581,7 +1587,7 @@ public class ManagedPptxConversionTests
                 new P.TextBody(
                     new A.BodyProperties(),
                     new A.ListStyle(),
-                    new P.Paragraph(new A.Run(new A.Text("Master Title Text"))))
+                    new A.Paragraph(new A.Run(new A.Text("Master Title Text"))))
             );
 
             // Timeline Animations
@@ -1598,7 +1604,8 @@ public class ManagedPptxConversionTests
                                             new P.CommonTimeNode { Duration = "1000" },
                                             new P.TargetElement(new P.ShapeTarget { ShapeId = "10" })
                                         )
-                                    ) { Transition = P.AnimateEffectTransitionValues.In, Filter = "fade" }
+                                    )
+                                    { Transition = P.AnimateEffectTransitionValues.In, Filter = "fade" }
                                 )
                             )
                         )
@@ -1630,15 +1637,15 @@ public class ManagedPptxConversionTests
         // 3. 驗證結果
         Assert.NotNull(odp);
         var slide = Assert.Single(odp.Slides);
-        
+
         // 驗證 Placeholder 繼承與 Theme 矩陣套用
-        var shape = Assert.Single(slide.TextBoxes);
-        Assert.Equal("Master Title Text", shape.Text);
-        
+        var shape = Assert.Single(slide.Placeholders);
+        Assert.Equal("Master Title Text", shape.Node.TextContent);
+
         // 驗證 FillColor 與 StrokeColor 來自 Style Reference 和 Theme Color
         Assert.Equal("#C0504D", shape.FillColor); // Accent2
         Assert.Equal("#4F81BD", shape.StrokeColor); // Accent1
-        
+
         // 驗證是否套用了 Theme 的 EffectStyle 中的陰影 (draw:shadow="visible", draw:shadow-color="#1F497D")
         string shadow = shape.Document.StyleEngine.GetStyleProperty(shape.Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "shadow", OdfNamespaces.Draw, "graphic");
         string shadowColor = shape.Document.StyleEngine.GetStyleProperty(shape.Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "shadow-color", OdfNamespaces.Draw, "graphic");
@@ -1646,7 +1653,6 @@ public class ManagedPptxConversionTests
         Assert.Equal("#1F497D", shadowColor); // Accent3 maps to effect style index 1, which has shadow using Dark2 (1F497D)
     }
 
-#if FALSE
     /// <summary>
     /// 驗證 ODP 轉換為 PPTX 時，是否支援進階的 Theme 母片、表格獨立邊框與背景填滿、以及段落動畫時序。
     /// </summary>
@@ -1709,7 +1715,7 @@ public class ManagedPptxConversionTests
 
         var presentationPart = pptx.PresentationPart;
         Assert.NotNull(presentationPart);
-        
+
         // 驗證 SlideMaster 與 SlideLayout 背景樣式參考
         var masterPart = Assert.Single(presentationPart.SlideMasterParts);
         Assert.NotNull(masterPart.SlideMaster.CommonSlideData?.Background?.BackgroundStyleReference);
@@ -1766,8 +1772,7 @@ public class ManagedPptxConversionTests
         {
             var buildParagraphs = buildList.Descendants<P.BuildParagraph>().ToList();
             Assert.NotEmpty(buildParagraphs);
-            Assert.Contains(buildParagraphs, bp => bp.GetAttribute("build", "")?.Value == "nestedParagraphsL1");
+            Assert.Contains(buildParagraphs, bp => bp.Build?.Value == P.ParagraphBuildValues.Paragraph);
         }
     }
-#endif
 }

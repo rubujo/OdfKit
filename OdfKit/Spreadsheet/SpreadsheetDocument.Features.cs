@@ -176,12 +176,13 @@ public partial class SpreadsheetDocument
         string objectDir = $"{objectName}/";
 
         // 3. 在 table:shapes 底下建立 draw:frame 與 draw:object
+        (double anchorXCm, double anchorYCm) = ComputeAnchorOffset(sheet, anchor);
         var frameNode = new OdfNode(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
         frameNode.SetAttribute("z-index", OdfNamespaces.Draw, "0", "draw");
         frameNode.SetAttribute("width", OdfNamespaces.Svg, "12cm", "svg");
         frameNode.SetAttribute("height", OdfNamespaces.Svg, "7cm", "svg");
-        frameNode.SetAttribute("x", OdfNamespaces.Svg, "1cm", "svg");
-        frameNode.SetAttribute("y", OdfNamespaces.Svg, "1cm", "svg");
+        frameNode.SetAttribute("x", OdfNamespaces.Svg, anchorXCm.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) + "cm", "svg");
+        frameNode.SetAttribute("y", OdfNamespaces.Svg, anchorYCm.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) + "cm", "svg");
 
         string anchorOdf = anchor.ToOdfString(false);
         frameNode.SetAttribute("start-cell-address", OdfNamespaces.Table, anchorOdf, "table");
@@ -254,6 +255,30 @@ public partial class SpreadsheetDocument
         sb.Append("</chart:chart></office:chart></office:body></office:document-content>");
 
         Package.WriteEntry($"{objectDir}content.xml", System.Text.Encoding.UTF8.GetBytes(sb.ToString()), "text/xml");
+    }
+
+    /// <summary>
+    /// 累加錨點儲存格前所有列高／欄寬，計算 draw:frame 的絕對 svg:x／svg:y 偏移（單位：公分）。
+    /// 未明確設定列高／欄寬的儲存格採用 LibreOffice Calc 預設值（列高 0.45cm、欄寬 2.267cm）估算。
+    /// </summary>
+    private static (double XCm, double YCm) ComputeAnchorOffset(OdfTableSheet sheet, OdfCellAddress anchor)
+    {
+        const double DefaultRowHeightCm = 0.45;
+        const double DefaultColumnWidthCm = 2.267;
+
+        double yCm = 0;
+        for (int row = 0; row < anchor.Row; row++)
+        {
+            yCm += sheet.GetRowHeight(row)?.ToCentimeters() ?? DefaultRowHeightCm;
+        }
+
+        double xCm = 0;
+        for (int col = 0; col < anchor.Column; col++)
+        {
+            xCm += sheet.GetColumnWidth(col)?.ToCentimeters() ?? DefaultColumnWidthCm;
+        }
+
+        return (xCm, yCm);
     }
 
     private static void AppendChartSeriesXml(System.Text.StringBuilder sb, OdfChartDefinition chart, string chartClass)

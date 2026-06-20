@@ -54,6 +54,16 @@ public partial class TextDocument : OdfDocument
     }
 
     /// <summary>
+    /// 從指定的文字範本文件建立新的文字文件。
+    /// </summary>
+    /// <param name="template">文字範本文件。</param>
+    /// <returns>建立完成的 <see cref="TextDocument"/> 執行個體。</returns>
+    public static TextDocument CreateFromTemplate(TextTemplateDocument template)
+    {
+        return (TextDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Text, "application/vnd.oasis.opendocument.text");
+    }
+
+    /// <summary>
     /// 建立新的 ODT 文字文件 Fluent builder。
     /// </summary>
     /// <returns>新的 <see cref="TextDocumentBuilder"/> 執行個體。</returns>

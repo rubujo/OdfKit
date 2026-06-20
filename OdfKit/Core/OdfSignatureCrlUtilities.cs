@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.X509;
+using BcX509Crl = Org.BouncyCastle.X509.X509Crl;
 
 namespace OdfKit.Core;
 
 /// <summary>
-/// CRL 擷取與驗證工具（內部協作者）。
+/// CRL 擷取與驗證工具（內部協作者）。底層 DER 解析委派至 BouncyCastle 的
+/// <see cref="Org.BouncyCastle.Asn1.X509"/> 型別模型，取代自製遞迴下降剖析器。
 /// </summary>
 internal static class OdfSignatureCrlUtilities
 {
@@ -16,47 +22,23 @@ internal static class OdfSignatureCrlUtilities
         var revokedSerials = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         try
         {
-            var root = OdfSignatureDerCodec.Parse(crlBytes);
-            if (root.Tag != 0x30 || root.Children.Count < 1)
-                return revokedSerials;
-
-            var tbsCertList = root.Children[0];
-            if (tbsCertList.Tag != 0x30)
-                return revokedSerials;
-
-            foreach (var child in tbsCertList.Children)
+            BcX509Crl crl = new X509CrlParser().ReadCrl(crlBytes)
+                ?? throw new CryptographicException("無法解析 CRL 內容。");
+            ISet<X509CrlEntry>? entries = crl.GetRevokedCertificates();
+            if (entries is null)
             {
-                if (child.Tag == 0x30)
-                {
-                    bool looksLikeRevoked = child.Children.Count > 0;
-                    foreach (var item in child.Children)
-                    {
-                        if (item.Tag != 0x30 || item.Children.Count < 2 || item.Children[0].Tag != 0x02)
-                        {
-                            looksLikeRevoked = false;
-                            break;
-                        }
-                    }
+                return revokedSerials;
+            }
 
-                    if (looksLikeRevoked)
-                    {
-                        foreach (var item in child.Children)
-                        {
-                            byte[] serialBytes = item.Children[0].Value;
-                            string hex = BitConverter.ToString(serialBytes).Replace("-", "").ToUpperInvariant();
-                            hex = hex.TrimStart('0');
-                            if (hex == "")
-                                hex = "0";
-                            revokedSerials.Add(hex);
-                        }
-                        break;
-                    }
-                }
+            foreach (X509CrlEntry entry in entries)
+            {
+                revokedSerials.Add(OdfSignatureDerCodec.NormalizeHexSerial(entry.SerialNumber.ToString(16)));
             }
         }
         catch
         {
         }
+
         return revokedSerials;
     }
 
@@ -69,25 +51,46 @@ internal static class OdfSignatureCrlUtilities
 
         try
         {
-            var cdpNode = OdfSignatureDerCodec.Parse(ext.RawData);
-            FindUrlsInCdpNode(cdpNode, urls);
+            var crlDistPoint = CrlDistPoint.GetInstance(Asn1Object.FromByteArray(ext.RawData));
+            foreach (DistributionPoint distributionPoint in crlDistPoint.GetDistributionPoints())
+            {
+                DistributionPointName? pointName = distributionPoint.DistributionPointName;
+                if (pointName is null || pointName.Type != DistributionPointName.FullName)
+                {
+                    continue;
+                }
+
+                var generalNames = GeneralNames.GetInstance(pointName.Name);
+                foreach (GeneralName generalName in generalNames.GetNames())
+                {
+                    if (generalName.TagNo != GeneralName.UniformResourceIdentifier)
+                    {
+                        continue;
+                    }
+
+                    string url = DerIA5String.GetInstance(generalName.Name).GetString();
+                    if (!urls.Contains(url))
+                    {
+                        urls.Add(url);
+                    }
+                }
+            }
         }
         catch
         {
-            string ascii = Encoding.ASCII.GetString(ext.RawData);
+            ExtractUrlsFromRawAscii(ext.RawData, urls);
+        }
+
+        return urls;
+    }
+
+    private static void ExtractUrlsFromRawAscii(byte[] rawData, List<string> urls)
+    {
+        string ascii = System.Text.Encoding.ASCII.GetString(rawData);
+        foreach (string scheme in new[] { "http://", "https://" })
+        {
             int idx = 0;
-            while ((idx = ascii.IndexOf("http://", idx, StringComparison.OrdinalIgnoreCase)) != -1)
-            {
-                int end = idx;
-                while (end < ascii.Length && ascii[end] >= 33 && ascii[end] <= 126)
-                    end++;
-                string url = ascii.Substring(idx, end - idx);
-                if (!urls.Contains(url))
-                    urls.Add(url);
-                idx = end;
-            }
-            idx = 0;
-            while ((idx = ascii.IndexOf("https://", idx, StringComparison.OrdinalIgnoreCase)) != -1)
+            while ((idx = ascii.IndexOf(scheme, idx, StringComparison.OrdinalIgnoreCase)) != -1)
             {
                 int end = idx;
                 while (end < ascii.Length && ascii[end] >= 33 && ascii[end] <= 126)
@@ -98,100 +101,39 @@ internal static class OdfSignatureCrlUtilities
                 idx = end;
             }
         }
-        return urls;
+    }
+
+    /// <summary>
+    /// 取得 CRL TBSCertList 內 issuer 欄位的 DER 編碼原始位元組，用於與 <see cref="X509Certificate2.IssuerName"/> 比對。
+    /// </summary>
+    internal static byte[]? GetCrlIssuerRawData(byte[] crlBytes)
+    {
+        try
+        {
+            CertificateList certificateList = CertificateList.GetInstance(Asn1Object.FromByteArray(crlBytes));
+            return certificateList.TbsCertList.Issuer.GetEncoded();
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     internal static bool VerifyCrlSignature(byte[] crlBytes, X509Certificate2 issuerCert)
     {
         try
         {
-            var root = OdfSignatureDerCodec.Parse(crlBytes);
-            if (root.Tag != 0x30 || root.Children.Count < 3)
-                return false;
-
-            var tbsCertList = root.Children[0];
-            var signatureAlgorithm = root.Children[1];
-            var signatureValue = root.Children[2];
-
-            if (signatureValue.Tag != 0x03 || signatureValue.Value.Length < 2)
-                return false;
-            byte[] signature = new byte[signatureValue.Value.Length - 1];
-            Buffer.BlockCopy(signatureValue.Value, 1, signature, 0, signature.Length);
-
-            if (signatureAlgorithm.Tag != 0x30 || signatureAlgorithm.Children.Count < 1)
-                return false;
-            var oidNode = signatureAlgorithm.Children[0];
-            if (oidNode.Tag != 0x06)
-                return false;
-            string oid = GetOidString(oidNode.Value);
-
-            HashAlgorithmName hashAlg;
-            if (oid == "1.2.840.113549.1.1.11" || oid == "1.2.840.10045.4.3.2")
-                hashAlg = HashAlgorithmName.SHA256;
-            else if (oid == "1.2.840.113549.1.1.12" || oid == "1.2.840.10045.4.3.3")
-                hashAlg = HashAlgorithmName.SHA384;
-            else if (oid == "1.2.840.113549.1.1.13" || oid == "1.2.840.10045.4.3.4")
-                hashAlg = HashAlgorithmName.SHA512;
-            else if (oid == "1.2.840.113549.1.1.5" || oid == "1.2.840.10045.4.1")
-                hashAlg = HashAlgorithmName.SHA1;
-            else
-                throw new CryptographicException($"Unsupported CRL signature algorithm OID: {oid}");
-
-            using var rsa = issuerCert.GetRSAPublicKey();
-            if (rsa != null)
-                return rsa.VerifyData(tbsCertList.RawBytes, signature, hashAlg, RSASignaturePadding.Pkcs1);
-
-            using var ecdsa = issuerCert.GetECDsaPublicKey();
-            if (ecdsa != null)
-                return ecdsa.VerifyData(tbsCertList.RawBytes, signature, hashAlg);
-
-            return false;
+            BcX509Crl crl = new X509CrlParser().ReadCrl(crlBytes)
+                ?? throw new CryptographicException("無法解析 CRL 內容。");
+            AsymmetricKeyParameter issuerPublicKey =
+                DotNetUtilities.FromX509Certificate(issuerCert).GetPublicKey();
+            crl.Verify(issuerPublicKey);
+            return true;
         }
         catch (Exception ex)
         {
             OdfKitDiagnostics.Warn($"CRL signature verification exception: {ex.Message}");
             return false;
         }
-    }
-
-    private static void FindUrlsInCdpNode(DerNode node, List<string> urls)
-    {
-        if (node.Tag == 0x86)
-        {
-            string url = Encoding.ASCII.GetString(node.Value);
-            if ((url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                 url.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) &&
-                !urls.Contains(url))
-            {
-                urls.Add(url);
-            }
-        }
-
-        foreach (var child in node.Children)
-            FindUrlsInCdpNode(child, urls);
-    }
-
-    private static string GetOidString(byte[] bytes)
-    {
-        if (bytes == null || bytes.Length == 0)
-            return "";
-        var sb = new StringBuilder();
-        byte first = bytes[0];
-        int firstVal = first / 40;
-        int secondVal = first % 40;
-        sb.Append(firstVal).Append('.').Append(secondVal);
-
-        long val = 0;
-        for (int i = 1; i < bytes.Length; i++)
-        {
-            byte b = bytes[i];
-            val = (val << 7) | (byte)(b & 0x7F);
-            if ((b & 0x80) == 0)
-            {
-                sb.Append('.').Append(val);
-                val = 0;
-            }
-        }
-        return sb.ToString();
     }
 }

@@ -52,7 +52,7 @@ public static class OdpToPptxConverter
         ThemePalette themePalette = CollectThemePalette(odpDocument);
 
         uint slideId = 256U;
-        uint shapeId = 1U;
+        uint shapeId = 2U; // id=1 保留給 CreateCommonSlideData 內隱含的群組圖形（nvGrpSpPr）
         foreach (OdfNode slideNode in GetSlides(odpDocument))
         {
             P.SlideLayoutValues layoutType = ReadSlideLayoutType(slideNode);
@@ -517,7 +517,13 @@ public static class OdpToPptxConverter
     /// </summary>
     private static P.CommonSlideData CreateCommonSlideData(string? name = null)
     {
-        var cSld = new P.CommonSlideData(new P.ShapeTree());
+        var shapeTree = new P.ShapeTree(
+            new P.NonVisualGroupShapeProperties(
+                new P.NonVisualDrawingProperties { Id = 1U, Name = string.Empty },
+                new P.NonVisualGroupShapeDrawingProperties(),
+                new P.ApplicationNonVisualDrawingProperties()),
+            new P.GroupShapeProperties(new A.TransformGroup()));
+        var cSld = new P.CommonSlideData(shapeTree);
         if (name != null)
         {
             cSld.Name = name;
@@ -857,8 +863,8 @@ public static class OdpToPptxConverter
                 ShapeId = targetShapeId.ToString(CultureInfo.InvariantCulture),
                 GroupId = 0U,
                 BuildLevel = 1,
+                Build = isByParagraph ? P.ParagraphBuildValues.Paragraph : P.ParagraphBuildValues.Whole,
             };
-            buildParagraph.SetAttribute(new OpenXmlAttribute("build", "", isByParagraph ? "nestedParagraphsL1" : "whole"));
             buildList.Append(buildParagraph);
         }
 
@@ -1029,10 +1035,10 @@ public static class OdpToPptxConverter
     private static int ReadAnimationPresetId(OdfKit.Presentation.OdfAnimationInfo animation)
         => animation.Effect switch
         {
-            OdfKit.Presentation.OdfAnimationEffect.Fade => 10,
-            OdfKit.Presentation.OdfAnimationEffect.Zoom => 16,
+            OdfKit.Presentation.OdfAnimationEffect.Fade => 9,
+            OdfKit.Presentation.OdfAnimationEffect.Zoom => 10,
             OdfKit.Presentation.OdfAnimationEffect.FlyIn => 2,
-            _ => animation.Kind == OdfKit.Presentation.OdfAnimationKind.Exit ? 1 : 1,
+            _ => 1,
         };
 
     /// <summary>
@@ -1122,6 +1128,12 @@ public static class OdpToPptxConverter
         if (string.IsNullOrWhiteSpace(styleName))
         {
             return null;
+        }
+
+        string? ownFillColor = document.StyleEngine.GetStyleProperty(styleName!, "fill-color", OdfNamespaces.Draw, "drawing-page");
+        if (!string.IsNullOrWhiteSpace(ownFillColor))
+        {
+            return NormalizeColor(ownFillColor);
         }
 
         string? masterName = document.StyleEngine.GetStyleProperty(styleName!, "master-page-name", OdfNamespaces.Presentation, "drawing-page");
@@ -1769,7 +1781,7 @@ public static class OdpToPptxConverter
         return properties;
     }
 
-    private static P.GraphicFrame CreateImage(
+    private static P.Picture CreateImage(
         OdfNode frame,
         OdfNode image,
         OdfPresentationDocument odpDocument,
@@ -1792,44 +1804,87 @@ public static class OdpToPptxConverter
 
         uint currentShapeId = shapeId++;
         RegisterAnimationTarget(frame, currentShapeId, animationTargets, animationNodes);
-        return new P.GraphicFrame(
-            new P.NonVisualGraphicFrameProperties(
-                new P.NonVisualDrawingProperties { Id = currentShapeId, Name = "Picture" },
-                new P.NonVisualGraphicFrameDrawingProperties(),
+        string? altText = FindDescendant(frame, "desc", OdfNamespaces.Svg)?.TextContent;
+        A.SourceRectangle? sourceRectangle = CreateCropSourceRectangle(frame, image);
+
+        var blipFill = new P.BlipFill();
+        blipFill.Append(new A.Blip { Embed = slidePart.GetIdOfPart(imagePart), CompressionState = A.BlipCompressionValues.Print });
+        if (sourceRectangle is not null)
+        {
+            blipFill.Append(sourceRectangle);
+        }
+
+        blipFill.Append(new A.Stretch(new A.FillRectangle()));
+
+        // PresentationML 圖片屬於 spTree 內容模型的直接選項（<p:pic>），
+        // 不可包在 <p:graphicFrame><a:graphic><a:graphicData> 內（該容器用於圖表／OLE物件／表格）。
+        return new P.Picture(
+            new P.NonVisualPictureProperties(
+                new P.NonVisualDrawingProperties { Id = currentShapeId, Name = "Picture", Description = altText },
+                new P.NonVisualPictureDrawingProperties(new A.PictureLocks { NoChangeAspect = true }),
                 new P.ApplicationNonVisualDrawingProperties()),
-            new P.Transform(
-                new A.Offset
-                {
-                    X = ToEmus(frame.GetAttribute("x", OdfNamespaces.Svg)),
-                    Y = ToEmus(frame.GetAttribute("y", OdfNamespaces.Svg)),
-                },
-                new A.Extents
-                {
-                    Cx = Math.Max(ToEmus(frame.GetAttribute("width", OdfNamespaces.Svg)), 1L),
-                    Cy = Math.Max(ToEmus(frame.GetAttribute("height", OdfNamespaces.Svg)), 1L),
-                }),
-            new A.Graphic(
-                new A.GraphicData(
-                    new P.Picture(
-                        new P.NonVisualPictureProperties(
-                            new P.NonVisualDrawingProperties { Id = currentShapeId, Name = "Picture" },
-                            new P.NonVisualPictureDrawingProperties(new A.PictureLocks { NoChangeAspect = true }),
-                            new P.ApplicationNonVisualDrawingProperties()),
-                        new P.BlipFill(
-                            new A.Blip { Embed = slidePart.GetIdOfPart(imagePart), CompressionState = A.BlipCompressionValues.Print },
-                            new A.Stretch(new A.FillRectangle())),
-                        new P.ShapeProperties(
-                            new A.Transform2D(
-                                new A.Offset { X = 0L, Y = 0L },
-                                new A.Extents
-                                {
-                                    Cx = Math.Max(ToEmus(frame.GetAttribute("width", OdfNamespaces.Svg)), 1L),
-                                    Cy = Math.Max(ToEmus(frame.GetAttribute("height", OdfNamespaces.Svg)), 1L),
-                                }),
-                            new A.PresetGeometry(new A.AdjustValueList()) { Preset = A.ShapeTypeValues.Rectangle })))
-                {
-                    Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture",
-                }));
+            blipFill,
+            new P.ShapeProperties(
+                new A.Transform2D(
+                    new A.Offset
+                    {
+                        X = ToEmus(frame.GetAttribute("x", OdfNamespaces.Svg)),
+                        Y = ToEmus(frame.GetAttribute("y", OdfNamespaces.Svg)),
+                    },
+                    new A.Extents
+                    {
+                        Cx = Math.Max(ToEmus(frame.GetAttribute("width", OdfNamespaces.Svg)), 1L),
+                        Cy = Math.Max(ToEmus(frame.GetAttribute("height", OdfNamespaces.Svg)), 1L),
+                    }),
+                new A.PresetGeometry(new A.AdjustValueList()) { Preset = A.ShapeTypeValues.Rectangle }));
+    }
+
+    /// <summary>
+    /// 依據 <c>fo:clip</c>（CSS <c>rect(top, right, bottom, left)</c> 語法）計算 PPTX 圖片來源裁切矩形。
+    /// </summary>
+    private static A.SourceRectangle? CreateCropSourceRectangle(OdfNode frame, OdfNode image)
+    {
+        string? clip = image.GetAttribute("clip", OdfNamespaces.Fo) ?? frame.GetAttribute("clip", OdfNamespaces.Fo);
+        if (string.IsNullOrWhiteSpace(clip))
+        {
+            return null;
+        }
+
+        string trimmed = clip!.Trim();
+        if (!trimmed.StartsWith("rect(", StringComparison.OrdinalIgnoreCase) || !trimmed.EndsWith(")", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        string[] parts = trimmed.Substring(5, trimmed.Length - 6).Split(',');
+        if (parts.Length != 4 ||
+            !OdfLength.TryParse(parts[0].Trim(), out OdfLength top) ||
+            !OdfLength.TryParse(parts[1].Trim(), out OdfLength right) ||
+            !OdfLength.TryParse(parts[2].Trim(), out OdfLength bottom) ||
+            !OdfLength.TryParse(parts[3].Trim(), out OdfLength left))
+        {
+            return null;
+        }
+
+        double widthPoints = OdfLength.TryParse(frame.GetAttribute("width", OdfNamespaces.Svg), out OdfLength width) ? width.ToPoints() : 0d;
+        double heightPoints = OdfLength.TryParse(frame.GetAttribute("height", OdfNamespaces.Svg), out OdfLength height) ? height.ToPoints() : 0d;
+        if (widthPoints <= 0d || heightPoints <= 0d)
+        {
+            return null;
+        }
+
+        int leftPercent = (int)Math.Round(left.ToPoints() / widthPoints * 100000d, MidpointRounding.AwayFromZero);
+        int topPercent = (int)Math.Round(top.ToPoints() / heightPoints * 100000d, MidpointRounding.AwayFromZero);
+        int rightPercent = (int)Math.Round((widthPoints - right.ToPoints()) / widthPoints * 100000d, MidpointRounding.AwayFromZero);
+        int bottomPercent = (int)Math.Round((heightPoints - bottom.ToPoints()) / heightPoints * 100000d, MidpointRounding.AwayFromZero);
+
+        return new A.SourceRectangle
+        {
+            Left = leftPercent,
+            Top = topPercent,
+            Right = rightPercent,
+            Bottom = bottomPercent,
+        };
     }
 
     private static P.Shape CreateObjectPlaceholder(
@@ -2090,9 +2145,21 @@ public static class OdpToPptxConverter
 
         string trimmed = value!.Trim();
         int space = trimmed.IndexOf(' ');
-        string percentStr = space >= 0 ? trimmed.Substring(0, space) : trimmed;
-        if (percentStr.EndsWith("%", StringComparison.Ordinal) &&
-            double.TryParse(percentStr.Substring(0, percentStr.Length - 1), NumberStyles.Float, CultureInfo.InvariantCulture, out double percent))
+        string head = space >= 0 ? trimmed.Substring(0, space) : trimmed;
+
+        // ODF 允許 "super"／"sub" 關鍵字單獨出現（不帶百分比），預設位移百分比為 33%。
+        if (string.Equals(head, "super", StringComparison.OrdinalIgnoreCase))
+        {
+            return 33;
+        }
+
+        if (string.Equals(head, "sub", StringComparison.OrdinalIgnoreCase))
+        {
+            return -33;
+        }
+
+        if (head.EndsWith("%", StringComparison.Ordinal) &&
+            double.TryParse(head.Substring(0, head.Length - 1), NumberStyles.Float, CultureInfo.InvariantCulture, out double percent))
         {
             return (int)Math.Round(percent, MidpointRounding.AwayFromZero);
         }
@@ -2169,16 +2236,16 @@ public static class OdpToPptxConverter
         {
             string dark1 = "000000";
             string light1 = "FFFFFF";
-            string dark2 = colors.Count > 0 ? colors[0] : "595959";
-            string light2 = colors.Count > 1 ? colors[1] : "E7E6E6";
-            string accent1 = colors.Count > 2 ? colors[2] : "4472C4";
-            string accent2 = colors.Count > 3 ? colors[3] : "ED7D31";
-            string accent3 = colors.Count > 4 ? colors[4] : "A5A5A5";
-            string accent4 = colors.Count > 5 ? colors[5] : "FFC000";
-            string accent5 = colors.Count > 6 ? colors[6] : "5B9BD5";
-            string accent6 = colors.Count > 7 ? colors[7] : "70AD47";
-            string hyperlink = colors.Count > 8 ? colors[8] : "0563C1";
-            string followedHyperlink = colors.Count > 9 ? colors[9] : "954F72";
+            string dark2 = "595959";
+            string light2 = "E7E6E6";
+            string accent1 = colors.Count > 0 ? colors[0] : "4472C4";
+            string accent2 = colors.Count > 1 ? colors[1] : "ED7D31";
+            string accent3 = colors.Count > 2 ? colors[2] : "A5A5A5";
+            string accent4 = colors.Count > 3 ? colors[3] : "FFC000";
+            string accent5 = colors.Count > 4 ? colors[4] : "5B9BD5";
+            string accent6 = colors.Count > 5 ? colors[5] : "70AD47";
+            string hyperlink = colors.Count > 6 ? colors[6] : "0563C1";
+            string followedHyperlink = colors.Count > 7 ? colors[7] : "954F72";
 
             string majorLatin = latinFonts.Count > 0 ? latinFonts[0] : "Calibri Light";
             string majorAsian = eastAsianFonts.Count > 0 ? eastAsianFonts[0] : "Microsoft JhengHei";

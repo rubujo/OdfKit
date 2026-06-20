@@ -67,6 +67,16 @@ public partial class PresentationDocument : OdfDocument
     }
 
     /// <summary>
+    /// 從指定的簡報範本文件建立新的簡報文件。
+    /// </summary>
+    /// <param name="template">簡報範本文件。</param>
+    /// <returns>建立完成的 <see cref="PresentationDocument"/> 執行個體。</returns>
+    public static PresentationDocument CreateFromTemplate(PresentationTemplateDocument template)
+    {
+        return (PresentationDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Presentation, "application/vnd.oasis.opendocument.presentation");
+    }
+
+    /// <summary>
     /// 從指定路徑載入 ODP 簡報文件。
     /// </summary>
     /// <param name="path">ODP 文件路徑。</param>

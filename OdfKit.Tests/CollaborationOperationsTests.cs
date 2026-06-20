@@ -61,4 +61,66 @@ public sealed class CollaborationOperationsTests
         Assert.Equal("addParagraph", paragraphOperation.GetProperty("name").GetString());
         Assert.Equal("CustomBlock", paragraphOperation.GetProperty("attrs").GetProperty("styleName").GetString());
     }
+
+    /// <summary>
+    /// 驗證 JSON operations 可單向 merge 重建段落與文字內容（COLLAB-2）。
+    /// </summary>
+    [Fact]
+    public void Merge_ReplaysAddParagraphAndAddTextOperations()
+    {
+        using TextDocument source = TextDocument.Create();
+        source.AddParagraph("第一段");
+        OdfParagraph second = source.AddParagraph("第二段");
+        second.StyleName = "CustomBlock";
+
+        string json = OdtOperationsExporter.ExportToJson(source);
+
+        using TextDocument merged = OdtOperationsImporter.Merge(json);
+
+        List<OdfParagraph> paragraphs = merged.Body.Paragraphs.ToList();
+        Assert.Equal(2, paragraphs.Count);
+        Assert.Equal("第一段", paragraphs[0].TextContent);
+        Assert.Equal("第二段", paragraphs[1].TextContent);
+        Assert.Equal("CustomBlock", paragraphs[1].StyleName);
+    }
+
+    /// <summary>
+    /// 驗證 addTab operation 可正確重播為定位字元。
+    /// </summary>
+    [Fact]
+    public void Merge_ReplaysAddTabOperation()
+    {
+        const string json = """
+            [
+                { "name": "addParagraph", "start": [0] },
+                { "name": "addText", "start": [0, 0], "text": "前" },
+                { "name": "addTab", "start": [0, 1] },
+                { "name": "addText", "start": [0, 2], "text": "後" }
+            ]
+            """;
+
+        using TextDocument merged = OdtOperationsImporter.Merge(json);
+
+        OdfParagraph paragraph = Assert.Single(merged.Body.Paragraphs);
+        Assert.Contains("前", paragraph.TextContent);
+        Assert.Contains("後", paragraph.TextContent);
+    }
+
+    /// <summary>
+    /// 驗證合併至既有文件時，新段落附加於文件結尾。
+    /// </summary>
+    [Fact]
+    public void Merge_AppendsOntoExistingDocument()
+    {
+        using TextDocument document = TextDocument.Create();
+        document.AddParagraph("既有段落");
+
+        const string json = """[{ "name": "addParagraph", "start": [0] }, { "name": "addText", "start": [0, 0], "text": "新增段落" }]""";
+        OdtOperationsImporter.Merge(document, json);
+
+        List<OdfParagraph> paragraphs = document.Body.Paragraphs.ToList();
+        Assert.Equal(2, paragraphs.Count);
+        Assert.Equal("既有段落", paragraphs[0].TextContent);
+        Assert.Equal("新增段落", paragraphs[1].TextContent);
+    }
 }

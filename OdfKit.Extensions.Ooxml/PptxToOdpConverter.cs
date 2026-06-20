@@ -107,9 +107,19 @@ public static class PptxToOdpConverter
     private static void ApplySlideLayout(SlidePart slidePart, OdfPresentationDocument document, int slideIndex)
     {
         OdfKit.Presentation.OdfPresentationLayout? layout = ReadSlideLayout(slidePart);
-        if (layout.HasValue)
+        if (!layout.HasValue)
         {
-            document.SetLayout(slideIndex, layout.Value);
+            return;
+        }
+
+        document.SetLayout(slideIndex, layout.Value);
+
+        // SetLayout 會依範本自動實例化空白預留位置；實際內容稍後由 ConvertSlide
+        // 從 PPTX shape 解析寫入，故先移除範本自動建立的空白預留位置，避免重複。
+        OdfKit.Presentation.OdfSlide slide = document.Slides[slideIndex];
+        foreach (OdfKit.Presentation.OdfPlaceholder placeholder in slide.Placeholders.ToList())
+        {
+            slide.Node.RemoveChild(placeholder.Node);
         }
     }
 
@@ -483,8 +493,9 @@ public static class PptxToOdpConverter
         A.EffectReference? effectRef = style?.EffectReference ?? matchingPlaceholder?.ShapeStyle?.EffectReference;
         if (effectRef is not null)
         {
-            string? shadowColor = ReadStyleReferenceColor(effectRef, themeColors) ??
-                themeColors.ResolveEffectStyleColor(effectRef.Index?.Value);
+            // EffectStyleList 範本內若已是具名 scheme color（非 phClr 佔位），陰影色彩須以範本本身
+            // 定義的顏色為準，不可被呼叫端 EffectReference 自身的色彩取代。
+            string? shadowColor = themeColors.ResolveEffectStyleColor(effectRef.Index?.Value);
             if (!string.IsNullOrWhiteSpace(shadowColor))
             {
                 shape.Document.StyleEngine.SetLocalStyleProperty(

@@ -75,7 +75,7 @@ public partial class OdfCell
                     => OdfKit.Styles.OdfNumberFormatEngine.Format(dbl, formatNode),
                 "date" when DateTime.TryParse(
                     Node.GetAttribute("date-value", OdfNamespaces.Office),
-                    null, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime dt)
+                    CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime dt)
                     => OdfKit.Styles.OdfNumberFormatEngine.Format(dt, formatNode),
                 "boolean" when bool.TryParse(
                     Node.GetAttribute("boolean-value", OdfNamespaces.Office), out bool flag)

@@ -8,7 +8,7 @@
 |------|-----------|------|
 | Tier 1 規範可信 | Validator + Profile + Corpus；Unknown 保真 round-trip | corpus 219 fixtures；validate-corpus 全綠 |
 | Tier 2 語意可用 | 四主格式高階 API 深度；變體與特殊格式專屬模型 | 四主格式 High-level = `complete` ✅；其餘多為 `usable` / `usable-variant` / `package-only` |
-| Tier 3 互通可驗 | LibreOffice 實機驗收；OOXML 視覺 golden file | Wave 3 X-2／Q-3／REN-1 基礎 ✅；外部 Office 視覺驗收為可選環境 |
+| Tier 3 互通可驗 | LibreOffice 實機驗收；OOXML 視覺 golden file | Wave 3 X-2／Q-3／REN-1 基礎 ✅；外部 Office 視覺驗收為可選環境。**2026-06-20 首次實機執行**：補齊本機 LibreOffice 26.x／Office COM／Python 依賴後首次真正執行（先前皆因環境缺失而 SKIP），發現並修正 2 個核心缺陷——(1) `SpreadsheetDocument.AddChart` 的 `svg:x`／`svg:y` 寫死 1cm 未依錨點儲存格計算，造成圖表與資料重疊；(2) **文件根節點從未宣告 `xmlns:of`（OpenFormula）命名空間**，導致任何含公式的 ODS 在真實 LibreOffice 開啟時公式求值失敗顯示 `Err:510`（此 bug 長期被前者的重疊問題遮蔽未被發現）。兩者皆已修正並以實機重新驗證。ODT→DOCX 視覺驗收通過；ODS→XLSX 因含圖表，與 Excel 圖表引擎本身渲染風格差異（非轉換邏輯缺陷）仍超出 5% 門檻，此差異屬於本文件已列為非目標的「圖表樣式進階視覺保真」。 |
 | Tier 4 產品就緒 | GitHub Release 套件資產；統一開發者體驗 | 原始碼 repo 為主；**非 nuget.org** |
 
 明確非目標維持 [`docs/udx-non-goals.md`](../docs/udx-non-goals.md)：物理分頁引擎、樞紐重算引擎、SmartArt 佈局器、JSON Collaboration operations merge。
@@ -95,9 +95,10 @@
 |-------|------|------|
 | REL-1 | ✅ | 相容矩陣、`Pack`／`Test-NuGetPack`／`Publish-GitHubRelease.ps1`、`docs/github-release-publishing.md`、`.github/workflows/nuget-pack.yml`（Actions v6/v5/v7）、`NuGetPackagingTests` |
 | COLLAB-1（選用） | 基礎 ✅ | `OdfKit.Extensions.Collaboration`：`OdtOperationsExporter` ODT → JSON operations 匯出（對標 ODF Toolkit CLI）；`CollaborationOperationsTests` |
-| COLLAB-2（選用） | planned | JSON operations → ODT 單向 merge + golden file 對照 |
+| COLLAB-2（選用） | 基礎 ✅ | `OdtOperationsImporter`：JSON operations（addParagraph／addText／addTab）單向 merge 至 `TextDocument`；`CollaborationOperationsTests` 涵蓋重播與既有文件附加場景 |
 | TEST-STRUCT | ✅ | `docs/testing-strategy.md`；測試檔重命名、稀疏檔合併與 E2E 去重盤點完成 |
 | GPG-AUDIT | ✅ | `eng/Test-GpgSignatures.ps1`；repo 專屬金鑰簽署稽核 |
+| SEC-DER-1 | ✅ | 移除自製遞迴下降 DER 解析器（`DerNode`、`OdfSignatureDerCodec.Parse`／`ParseInteger`／`GetTbsNode`／`GetCrlIssuerDer`），改用既有 `BouncyCastle.Cryptography` 依賴之 `Org.BouncyCastle.X509`／`Asn1.X509`／`Asn1.Tsp` 型別模型解析 CRL、CRL Distribution Points 與 RFC 3161 TSTInfo；`AdvancedSecurityTests`、`EncryptionTests` 等安全測試全綠 |
 | QC-ongoing | planned | 季度 OASIS RNG diff、本檔案季度檢視 |
 
 REL-1 驗收：`pwsh eng/Test-NuGetPack.ps1`；六套件雙 TFM `.nupkg`（v0.0.1）+ net8.0 消費端煙霧；`pwsh eng/Publish-GitHubRelease.ps1` 乾跑；CI `nuget-pack.yml`。

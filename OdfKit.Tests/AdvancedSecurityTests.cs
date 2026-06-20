@@ -405,10 +405,7 @@ namespace OdfKit.Tests
             var (rootCert, leafCert) = GenerateCertificateChain("XadesARootCA", "XadesATestSigner");
             byte[] revokedCrlBytes = CreateMockCrlBytes(rootCert, new List<string> { leafCert.SerialNumber });
 
-            var tbsNode = OdfSignatureDerCodec.GetTbsNode(revokedCrlBytes);
-            Assert.NotNull(tbsNode);
-
-            var crlIssuer = OdfSignatureDerCodec.GetCrlIssuerDer(tbsNode);
+            var crlIssuer = OdfSignatureCrlUtilities.GetCrlIssuerRawData(revokedCrlBytes);
             Assert.NotNull(crlIssuer);
 
             Assert.True(OdfEncryption.ByteArrayEquals(crlIssuer, leafCert.IssuerName.RawData));
@@ -1576,10 +1573,7 @@ namespace OdfKit.Tests
             // Create a CRL containing the leafCert's serial, signed with a completely fake/dummy signature
             byte[] revokedCrlBytes = CreateMockCrlBytes(rootCert, new List<string> { leafCert.SerialNumber }, useInvalidSignature: true);
 
-            var tbsNode = OdfSignatureDerCodec.GetTbsNode(revokedCrlBytes);
-            Assert.NotNull(tbsNode);
-
-            var crlIssuer = OdfSignatureDerCodec.GetCrlIssuerDer(tbsNode);
+            var crlIssuer = OdfSignatureCrlUtilities.GetCrlIssuerRawData(revokedCrlBytes);
             Assert.NotNull(crlIssuer);
 
             Assert.True(OdfEncryption.ByteArrayEquals(crlIssuer, leafCert.IssuerName.RawData));

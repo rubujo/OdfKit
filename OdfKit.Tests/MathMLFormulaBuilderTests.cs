@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Xunit;
 using OdfKit.Formula;
 
@@ -17,7 +17,7 @@ public class MathMLFormulaBuilderTests
     {
         var latex = @"\frac{a}{b}";
         var xml = OdfFormulaLatexConverter.Convert(latex);
-        
+
         Assert.Contains("<mfrac>", xml);
         Assert.Contains("<mi>a</mi>", xml);
         Assert.Contains("<mi>b</mi>", xml);
@@ -75,7 +75,7 @@ public class MathMLFormulaBuilderTests
     {
         var latex = @"\begin{matrix} a & b \\ c & d \end{matrix}";
         var xml = OdfFormulaLatexConverter.Convert(latex);
-        
+
         Assert.Contains("<mtable>", xml);
         Assert.Contains("<mtr>", xml);
         Assert.Contains("<mtd>", xml);
@@ -93,7 +93,7 @@ public class MathMLFormulaBuilderTests
     {
         var latex = @"\alpha + \beta = \theta";
         var xml = OdfFormulaLatexConverter.Convert(latex);
-        
+
         Assert.Contains("<mi>α</mi>", xml);
         Assert.Contains("<mi>β</mi>", xml);
         Assert.Contains("<mi>θ</mi>", xml);
@@ -130,7 +130,7 @@ public class MathMLFormulaBuilderTests
     {
         var latex = @"a + b = c";
         var doc = OdfFormulaDocument.FromLatex(latex);
-        
+
         Assert.NotNull(doc);
         var xml = doc.MathMlXml;
         Assert.Contains("<mi>a</mi>", xml);

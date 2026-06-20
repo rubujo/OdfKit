@@ -207,7 +207,7 @@ public class OdfComment
             {
                 if (child.LocalName == "creator")
                     author = child.TextContent;
-                else if (child.LocalName == "date" && DateTime.TryParse(child.TextContent, null, System.Globalization.DateTimeStyles.RoundtripKind, out var dt))
+                else if (child.LocalName == "date" && DateTime.TryParse(child.TextContent, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out var dt))
                 {
                     if (dt == DateTime.MinValue || dt == DateTime.MaxValue)
                     {

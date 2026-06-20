@@ -49,6 +49,16 @@ public partial class SpreadsheetDocument : OdfDocument
     }
 
     /// <summary>
+    /// 從指定的試算表範本文件建立新的試算表文件。
+    /// </summary>
+    /// <param name="template">試算表範本文件。</param>
+    /// <returns>建立完成的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
+    public static SpreadsheetDocument CreateFromTemplate(SpreadsheetTemplateDocument template)
+    {
+        return (SpreadsheetDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Spreadsheet, "application/vnd.oasis.opendocument.spreadsheet");
+    }
+
+    /// <summary>
     /// 建立新的 ODS 試算表文件 Fluent builder。
     /// </summary>
     /// <returns>新的 <see cref="SpreadsheetDocumentBuilder"/> 執行個體。</returns>

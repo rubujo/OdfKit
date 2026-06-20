@@ -11,7 +11,7 @@ using OdfKit.Text;
 using OdfKit.Styles;
 using OdfKit.Formula;
 
-// [assembly: CollectionBehavior(DisableTestParallelization = true)]
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace OdfKit.Tests
 {

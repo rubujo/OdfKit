@@ -53,5 +53,13 @@ public partial class OdfTableSheet
     public OdfLength? GetRowHeight(int row) =>
         OdfTableSheetLayoutEngine.GetRowHeight(MutationContext, row);
 
+    /// <summary>
+    /// 取得指定欄的固定寬度。
+    /// </summary>
+    /// <param name="column">以 0 為基準的欄索引</param>
+    /// <returns>欄寬度，若未設定則為 null</returns>
+    public OdfLength? GetColumnWidth(int column) =>
+        OdfTableSheetLayoutEngine.GetColumnWidth(MutationContext, column);
+
     #endregion
 }

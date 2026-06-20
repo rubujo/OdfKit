@@ -4,6 +4,8 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.Xml;
 using System.Xml;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.Tsp;
 
 namespace OdfKit.Core;
 
@@ -61,15 +63,14 @@ internal static partial class OdfSignatureVerifier
         byte[] calculatedHash = sha256.ComputeHash(sigBytes);
 
         byte[]? embeddedHash = null;
-        var tstInfo = OdfSignatureDerCodec.Parse(signedCms.ContentInfo.Content);
-        if (tstInfo.Tag == 0x30 && tstInfo.Children.Count >= 3)
+        try
         {
-            var messageImprint = tstInfo.Children[2];
-            if (messageImprint.Tag == 0x30 && messageImprint.Children.Count >= 2)
-            {
-                var hashedMessageNode = messageImprint.Children[1];
-                embeddedHash = hashedMessageNode.Value;
-            }
+            var tstInfo = TstInfo.GetInstance(Asn1Object.FromByteArray(signedCms.ContentInfo.Content));
+            embeddedHash = tstInfo.MessageImprint.GetHashedMessage();
+        }
+        catch (Exception ex)
+        {
+            OdfKitDiagnostics.Warn($"TSTInfo parsing exception: {ex.Message}");
         }
 
         if (embeddedHash == null || !OdfEncryption.ByteArrayEquals(calculatedHash, embeddedHash))

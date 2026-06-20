@@ -194,8 +194,9 @@ public static class OdfXmlWriter
                 nsDict[current.NamespaceUri] = prefix;
             }
 
-            foreach (var attr in current.Attributes.Keys)
+            foreach (var attrEntry in current.Attributes)
             {
+                OdfAttributeName attr = attrEntry.Key;
                 if (!string.IsNullOrEmpty(attr.NamespaceUri) &&
                     !nsDict.ContainsKey(attr.NamespaceUri))
                 {
@@ -206,6 +207,25 @@ public static class OdfXmlWriter
                     }
 
                     nsDict[attr.NamespaceUri] = prefix;
+                }
+
+                // 公式／條件式屬性值內可帶有 "of:=" 前綴（OpenFormula）或 "oooc:" 前綴
+                // （OpenOffice.org Calc 內容驗證條件函式，例如 table:condition="and:oooc:isDecimal()..."）。
+                // 這些前綴只存在於屬性值字串內，不屬於 XML 結構化命名空間限定名稱，
+                // 須額外掃描屬性值才能正確補上對應的 xmlns 宣告。
+                if (attrEntry.Value is { Length: > 3 } value)
+                {
+                    if (!nsDict.ContainsKey(OdfNamespaces.Of) &&
+                        value.StartsWith("of:=", System.StringComparison.Ordinal))
+                    {
+                        nsDict[OdfNamespaces.Of] = "of";
+                    }
+
+                    if (!nsDict.ContainsKey(OdfNamespaces.Oooc) &&
+                        value.Contains("oooc:", System.StringComparison.Ordinal))
+                    {
+                        nsDict[OdfNamespaces.Oooc] = "oooc";
+                    }
                 }
             }
 

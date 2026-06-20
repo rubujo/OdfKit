@@ -6,6 +6,8 @@ using System.Security.Cryptography.Xml;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.Tsp;
 
 namespace OdfKit.Core;
 
@@ -52,22 +54,25 @@ internal static class OdfSignatureTsaClient
 
     internal static byte[] ExtractTimestampToken(byte[] responseBytes)
     {
-        var root = OdfSignatureDerCodec.Parse(responseBytes);
-        if (root.Tag != 0x30 || root.Children.Count < 1)
-            throw new CryptographicException("Invalid TSA response structure (expected SEQUENCE).");
+        TimeStampResp response;
+        try
+        {
+            response = TimeStampResp.GetInstance(Asn1Object.FromByteArray(responseBytes));
+        }
+        catch (Exception ex)
+        {
+            throw new CryptographicException("Invalid TSA response structure (expected SEQUENCE).", ex);
+        }
 
-        var statusInfo = root.Children[0];
-        if (statusInfo.Tag != 0x30 || statusInfo.Children.Count < 1)
-            throw new CryptographicException("Invalid PKIStatusInfo structure.");
-
-        int status = OdfSignatureDerCodec.ParseInteger(statusInfo.Children[0].Value);
+        int status = response.Status.Status.IntValueExact;
         if (status != 0 && status != 1)
             throw new CryptographicException($"TSA request was rejected with status: {status}.");
 
-        if (root.Children.Count < 2)
+        Org.BouncyCastle.Asn1.Cms.ContentInfo? token = response.TimeStampToken;
+        if (token is null)
             throw new CryptographicException("TSA response does not contain a TimeStampToken.");
 
-        return root.Children[1].RawBytes;
+        return token.GetEncoded();
     }
 
     internal static byte[] CanonicalizeSignatureValue(XmlElement signatureValueElem)

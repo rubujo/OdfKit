@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <Compile Remove="MockSoffice\**" />
-    <Compile Remove="ManagedPptxConversionTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

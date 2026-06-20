@@ -764,7 +764,7 @@ public static class DocxToOdtConverter
         }
 
         if (properties.GetFirstChild<WP.FontSize>()?.Val?.Value is { Length: > 0 } halfPoints &&
-            double.TryParse(halfPoints, out double sizeValue))
+            double.TryParse(halfPoints, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double sizeValue))
         {
             string fontSize = (sizeValue / 2d).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "pt";
             odtDocument.StyleEngine.SetLocalStyleProperty(

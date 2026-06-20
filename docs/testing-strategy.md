@@ -45,7 +45,7 @@
 | 項目 | 狀態 | 結果 |
 |------|------|------|
 | TEST-STRUCT-1 | ✅ | 新增本測試策略文件，說明分層、命名與去重規則。 |
-| TEST-STRUCT-2 | ✅ | Phase / Milestone / Challenger / Adversarial 歷史檔名已改為長期領域命名；`DocsAndCorpusContractTests` 保留文件與 corpus 契約驗證但移除 ODF Toolkit parity readiness 歷史命名。 |
+| TEST-STRUCT-2 | ✅ | Phase / Milestone / Challenger / Adversarial 歷史檔名已改為長期領域命名；`DocsAndCorpusContractTests` 保留文件與 corpus 契約驗證但移除 ODF Toolkit parity readiness 歷史命名。**2026-06-20 補充**：先前重命名遺留 12 個逐字元重複的舊檔案未刪除，已 diff 驗證後移除，雙 TFM 測試數由 1688 降為 1483，零覆蓋率損失。 |
 | TEST-STRUCT-3 | ✅ | 四個單宣告稀疏檔已併入相鄰領域檔：`OdfFormatRoundTripTests`、`OdfUnknownXmlRoundTripTests` 併入 `PackageRoundTripTests`；`OoxmlVisualGoldenManifestTests` 併入 `OoxmlConversionTests`；`ChartFallbackRenderTests` 併入 `ChartHighLevelApiTests`。測試方法名與斷言保留。 |
 | TEST-STRUCT-4 | ✅ | `E2ETests` 與 `OdfFeatureE2ETests` 已完成主題盤點；未發現可安全刪除的大量完全重複測試，保留兩者但明確分層。 |
 

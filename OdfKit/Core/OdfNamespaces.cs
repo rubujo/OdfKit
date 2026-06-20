@@ -71,6 +71,12 @@ public static class OdfNamespaces
     /// <summary>封裝 RDF metadata 的 Pkg 命名空間 URI（ODF 1.2 meta/pkg ontology）</summary>
     public const string Pkg = OdfPkgRdfPredicates.NamespaceUri;
 
+    /// <summary>OpenFormula 命名空間 URI（ODF 1.2+ 公式語言，<c>table:formula</c> 等屬性值內 <c>of:=</c> 前綴所指涉的命名空間）</summary>
+    public const string Of = "urn:oasis:names:tc:opendocument:xmlns:of:1.2";
+
+    /// <summary>OpenOffice.org Calc 相容命名空間 URI（<c>table:condition</c> 內容驗證條件值內 <c>oooc:</c> 前綴所指涉的命名空間）</summary>
+    public const string Oooc = "http://openoffice.org/2004/calc";
+
     /// <summary>
     /// 取得指定命名空間 URI 的標準前綴。
     /// </summary>
@@ -102,6 +108,8 @@ public static class OdfNamespaces
             LoExt => "loext",
             Form => "form",
             Pkg => "pkg",
+            Of => "of",
+            Oooc => "oooc",
             _ => string.Empty
         };
     }

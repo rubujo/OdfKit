@@ -53,26 +53,22 @@ internal static partial class OdfSignatureVerifier
             {
                 try
                 {
-                    var tbsNode = OdfSignatureDerCodec.GetTbsNode(crlBytes);
-                    if (tbsNode != null)
+                    var crlIssuer = OdfSignatureCrlUtilities.GetCrlIssuerRawData(crlBytes);
+                    if (crlIssuer != null && OdfEncryption.ByteArrayEquals(crlIssuer, chainCert.IssuerName.RawData))
                     {
-                        var crlIssuer = OdfSignatureDerCodec.GetCrlIssuerDer(tbsNode);
-                        if (crlIssuer != null && OdfEncryption.ByteArrayEquals(crlIssuer, chainCert.IssuerName.RawData))
+                        if (!OdfSignatureCrlUtilities.VerifyCrlSignature(crlBytes, issuerCert))
                         {
-                            if (!OdfSignatureCrlUtilities.VerifyCrlSignature(crlBytes, issuerCert))
-                            {
-                                singleResult.ErrorCode = "CRL_SIGNATURE_INVALID";
-                                throw new CryptographicException("Embedded CRL signature is invalid.");
-                            }
+                            singleResult.ErrorCode = "CRL_SIGNATURE_INVALID";
+                            throw new CryptographicException("Embedded CRL signature is invalid.");
+                        }
 
-                            checkedAnyCrl = true;
-                            var revoked = OdfSignatureCrlUtilities.GetRevokedSerialNumbers(crlBytes);
-                            if (revoked.Contains(OdfSignatureDerCodec.NormalizeHexSerial(chainCert.SerialNumber)))
-                            {
-                                isRevoked = true;
-                                singleResult.ErrorCode = "CERTIFICATE_REVOKED";
-                                break;
-                            }
+                        checkedAnyCrl = true;
+                        var revoked = OdfSignatureCrlUtilities.GetRevokedSerialNumbers(crlBytes);
+                        if (revoked.Contains(OdfSignatureDerCodec.NormalizeHexSerial(chainCert.SerialNumber)))
+                        {
+                            isRevoked = true;
+                            singleResult.ErrorCode = "CERTIFICATE_REVOKED";
+                            break;
                         }
                     }
                 }
@@ -123,8 +119,8 @@ internal static partial class OdfSignatureVerifier
                             url,
                             options.HttpClient,
                             cancellationToken).ConfigureAwait(false);
-                        var tbsNode = OdfSignatureDerCodec.GetTbsNode(crlBytes);
-                        if (tbsNode != null)
+                        bool crlIsParseable = OdfSignatureCrlUtilities.GetCrlIssuerRawData(crlBytes) != null;
+                        if (crlIsParseable)
                         {
                             if (!OdfSignatureCrlUtilities.VerifyCrlSignature(crlBytes, issuerCert))
                             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml;
@@ -20,6 +21,20 @@ namespace OdfKit.Conversion;
 /// </summary>
 public static class XlsxToOdfConverter
 {
+    /// <summary>
+    /// 以禁用外部 DTD／實體解析的安全設定載入 XML 子部件，防禦 XXE。
+    /// </summary>
+    private static XDocument LoadXDocumentSafely(Stream stream)
+    {
+        var settings = new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+        };
+        using XmlReader reader = XmlReader.Create(stream, settings);
+        return XDocument.Load(reader);
+    }
+
     /// <summary>
     /// 從 XLSX 資料流讀取並建立對應的 SpreadsheetDocument。
     /// </summary>
@@ -660,7 +675,7 @@ public static class XlsxToOdfConverter
     private static ChartSpec? ReadChartSpec(ChartPart chartPart, string sheetName)
     {
         using Stream stream = chartPart.GetStream(FileMode.Open, FileAccess.Read);
-        XDocument xml = XDocument.Load(stream);
+        XDocument xml = LoadXDocumentSafely(stream);
         XNamespace chartNs = "http://schemas.openxmlformats.org/drawingml/2006/chart";
         XNamespace drawingNs = "http://schemas.openxmlformats.org/drawingml/2006/main";
 
@@ -789,7 +804,7 @@ public static class XlsxToOdfConverter
         var map = new Dictionary<uint, PivotCacheInfo>();
         using (Stream workbookStream = workbookPart.GetStream(FileMode.Open, FileAccess.Read))
         {
-            XDocument workbookXml = XDocument.Load(workbookStream);
+            XDocument workbookXml = LoadXDocumentSafely(workbookStream);
             foreach (XElement cacheElement in workbookXml.Descendants(spreadsheetNs + "pivotCache"))
             {
                 string? cacheIdText = cacheElement.Attribute("cacheId")?.Value;
@@ -815,7 +830,7 @@ public static class XlsxToOdfConverter
     private static PivotCacheInfo? ReadPivotCacheInfo(PivotTableCacheDefinitionPart cachePart, XNamespace spreadsheetNs)
     {
         using Stream cacheStream = cachePart.GetStream(FileMode.Open, FileAccess.Read);
-        XDocument cacheXml = XDocument.Load(cacheStream);
+        XDocument cacheXml = LoadXDocumentSafely(cacheStream);
         XElement? worksheetSource = cacheXml.Descendants(spreadsheetNs + "worksheetSource").FirstOrDefault();
         string? rangeRef = worksheetSource?.Attribute("ref")?.Value;
         if (string.IsNullOrWhiteSpace(rangeRef))
@@ -849,7 +864,7 @@ public static class XlsxToOdfConverter
         XNamespace spreadsheetNs)
     {
         using Stream pivotStream = pivotPart.GetStream(FileMode.Open, FileAccess.Read);
-        XDocument pivotXml = XDocument.Load(pivotStream);
+        XDocument pivotXml = LoadXDocumentSafely(pivotStream);
         XElement? root = pivotXml.Root;
         if (root is null)
         {
