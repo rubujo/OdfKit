@@ -148,7 +148,7 @@ namespace OdfKit.Tests
             string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.2\"><office:body><office:text/></office:body></office:document-content>";
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.IsoIec26300);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.IsoIec26300_2015);
             LogReport("IsoIec26300_Positive", report);
             Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.Message)));
         }
@@ -159,7 +159,7 @@ namespace OdfKit.Tests
             string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text/></office:body></office:document-content>";
             using MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content);
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.IsoIec26300, "test.odt");
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.IsoIec26300_2015, "test.odt");
             LogReport("IsoIec26300_Negative_VersionMismatch", report);
             Assert.False(report.IsValid);
             Assert.Contains(report.Issues, issue => issue.RuleId == "ODF1001" && issue.PackagePath == "test.odt" && issue.XPath == "/office:document-content[1]");
@@ -377,7 +377,7 @@ namespace OdfKit.Tests
             using (MemoryStream ms = CreatePackage("application/vnd.oasis.opendocument.text", content))
             using (OdfPackage package = OdfPackage.Open(ms))
             {
-                OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.IsoIec26300);
+                OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.IsoIec26300_2015);
                 LogReport("CrossVersionSchemaLookup_DetectsCorrectRequiredVersion", report);
                 Assert.False(report.IsValid);
                 Assert.Contains(report.Issues, issue => issue.RuleId == "RequireOdfNamespaceValidity" &&

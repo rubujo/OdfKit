@@ -26,7 +26,7 @@ namespace OdfKit.Tests
             {
                 "OASIS_ODF_1_4_Strict",
                 "OASIS_ODF_1_4_Extended",
-                "ISO_IEC_26300",
+                "ISO_IEC_26300_2015",
                 "EU_InteroperableEurope",
                 "EU_OfficeDocumentExchange",
                 "ROC_Taiwan_ODF_CNS15251",
@@ -42,17 +42,17 @@ namespace OdfKit.Tests
         [Fact]
         public void PolicyProfilesPreserveVerifiedAuthorityBoundaries()
         {
-            Assert.True(OdfComplianceProfiles.IsoIec26300.SupportedVersions.Contains(OdfVersion.Odf12));
-            Assert.False(OdfComplianceProfiles.IsoIec26300.SupportedVersions.Contains(OdfVersion.Odf14));
-            Assert.Equal(OdfPolicyAuthorityLevel.Normative, OdfComplianceProfiles.IsoIec26300.AuthorityLevel);
+            Assert.True(OdfComplianceProfiles.IsoIec26300_2015.SupportedVersions.Contains(OdfVersion.Odf12));
+            Assert.False(OdfComplianceProfiles.IsoIec26300_2015.SupportedVersions.Contains(OdfVersion.Odf14));
+            Assert.Equal(OdfPolicyAuthorityLevel.Normative, OdfComplianceProfiles.IsoIec26300_2015.AuthorityLevel);
 
             Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.EuOfficeDocumentExchange.AuthorityLevel);
             Assert.Contains(
                 OdfComplianceProfiles.EuOfficeDocumentExchange.Rules,
                 rule => rule.Id == "AllowPolicyScopedOdfPreference");
 
-            Assert.Equal(OdfPolicyAuthorityLevel.Draft, OdfComplianceProfiles.RocTaiwanOdfCns15251.AuthorityLevel);
-            Assert.Equal(OdfProfileVerificationStatus.NeedsActiveSource, OdfComplianceProfiles.RocTaiwanOdfCns15251.VerificationStatus);
+            Assert.Equal(OdfPolicyAuthorityLevel.Normative, OdfComplianceProfiles.RocTaiwanOdfCns15251.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.RocTaiwanOdfCns15251.VerificationStatus);
             Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.AuthorityLevel);
         }
 
@@ -89,7 +89,6 @@ namespace OdfKit.Tests
             OdfComplianceProfile[] policyProfiles =
             [
                 OdfComplianceProfiles.EuOfficeDocumentExchange,
-                OdfComplianceProfiles.RocTaiwanOdfCns15251,
                 OdfComplianceProfiles.RocTaiwanGovernmentOdfTools
             ];
 
@@ -102,8 +101,8 @@ namespace OdfKit.Tests
                     rule => rule.Id == "DisallowInvalidOdfNamespaceExtensions");
             }
 
-            Assert.Equal(OdfPolicyAuthorityLevel.Draft, OdfComplianceProfiles.RocTaiwanOdfCns15251.AuthorityLevel);
-            Assert.Equal(OdfProfileVerificationStatus.NeedsActiveSource, OdfComplianceProfiles.RocTaiwanOdfCns15251.VerificationStatus);
+            Assert.Equal(OdfPolicyAuthorityLevel.Normative, OdfComplianceProfiles.RocTaiwanOdfCns15251.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.RocTaiwanOdfCns15251.VerificationStatus);
             Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.AuthorityLevel);
             Assert.Equal(OdfProfileVerificationStatus.CompatibilityOnly, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.VerificationStatus);
             Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.EuOfficeDocumentExchange.AuthorityLevel);
@@ -1120,7 +1119,7 @@ namespace OdfKit.Tests
                 CreateDocumentContent("1.4"));
 
             using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.IsoIec26300);
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.IsoIec26300_2015);
 
             Assert.False(report.IsValid);
             Assert.Contains(report.Issues, issue => issue.RuleId == "ODF1001");
@@ -1742,7 +1741,7 @@ namespace OdfKit.Tests
                 "1.4",
                 "text");
 
-            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, "document.fodt", OdfComplianceProfiles.IsoIec26300);
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(ms, "document.fodt", OdfComplianceProfiles.IsoIec26300_2015);
 
             Assert.False(report.IsValid);
             Assert.Contains(report.Issues, issue => issue.RuleId == "ODF1001");
@@ -4186,6 +4185,63 @@ namespace OdfKit.Tests
                 OdfSchemaPatternValidator.ValidateElement(brokenImage, schema, "draw-image");
 
             Assert.False(result.IsMatch);
+        }
+
+        [Fact]
+        public void LocalizerResolvesCorrectTranslationsForRegisteredLanguages()
+        {
+            var enFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("en"));
+            Assert.Contains("alternative text", enFix);
+
+            var zhFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("zh-TW"));
+            Assert.Contains("為圖片加入 svg:title/svg:desc", zhFix);
+
+            var deFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("de"));
+            Assert.Contains("Alternativtext", deFix);
+        }
+
+        [Fact]
+        public void LocalizerCorrectlyFallsBackToParentCulture()
+        {
+            var atFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("de-AT"));
+            Assert.Contains("Alternativtext", atFix);
+
+            var ptBrFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("pt-BR"));
+            Assert.Contains("texto alternativo", ptBrFix);
+        }
+
+        [Fact]
+        public void LocalizerCorrectlyFallsBackToDefaultEnglishForUnregisteredCulture()
+        {
+            var jaFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("ja-JP"));
+            Assert.Contains("alternative text", jaFix);
+        }
+
+        [Fact]
+        public void ValidatorAutoDetectsLanguageBasedOnProfileTargetCulture()
+        {
+            // 使用含有事件監聽器（巨集）的內容，以觸發 DisallowMacroByDefault 規則
+            string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:script=\"urn:oasis:names:tc:opendocument:xmlns:script:1.0\" office:version=\"1.2\">" +
+                             "<office:scripts><office:event-listeners><script:event-listener script:event-name=\"dom-click\" script:language=\"ooo:script\" script:macro-name=\"MyMacro\" /></office:event-listeners></office:scripts>" +
+                             "<office:body><office:text/></office:body></office:document-content>";
+            using MemoryStream ms = new(System.Text.Encoding.UTF8.GetBytes(content));
+
+            OdfValidationReport reportDe = OdfFlatDocumentValidator.Validate(
+                ms,
+                "document.fodt",
+                OdfComplianceProfiles.DeGovernmentOdf);
+
+            // 德國 Profile 自動偵測德文，應包含德文 SuggestedFix
+            Assert.Contains(reportDe.Issues, issue => issue.RuleId == "DisallowMacroByDefault" && (issue.SuggestedFix.Contains("Entfernen") || issue.SuggestedFix.Contains("Makros")));
+
+            ms.Position = 0;
+            OdfValidationReport reportTw = OdfFlatDocumentValidator.Validate(
+                ms,
+                "document.fodt",
+                OdfComplianceProfiles.RocTaiwanOdfCns15251);
+
+            // 臺灣 CNS 15251 Profile 自動偵測繁中，應包含繁中 SuggestedFix
+            Assert.Contains(reportTw.Issues, issue => issue.RuleId == "DisallowMacroByDefault" && (issue.SuggestedFix.Contains("移除") || issue.SuggestedFix.Contains("巨集")));
         }
     }
 }

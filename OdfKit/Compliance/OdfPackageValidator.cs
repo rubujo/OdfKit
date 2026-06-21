@@ -35,16 +35,24 @@ public static partial class OdfPackageValidator
     /// <param name="package">ODF 套件</param>
     /// <param name="profile">相容性設定檔</param>
     /// <param name="fileName">檔案名稱</param>
+    /// <param name="culture">指定此問題生成時使用的文化特性，若為 null 則自動偵測</param>
     /// <returns>驗證結果報告</returns>
     public static OdfValidationReport Validate(
         OdfPackage package,
         OdfComplianceProfile? profile = null,
-        string? fileName = null)
+        string? fileName = null,
+        System.Globalization.CultureInfo? culture = null)
     {
         if (package is null)
             throw new ArgumentNullException(nameof(package));
 
         List<OdfValidationIssue> issues = [];
+
+        // 智慧偵測語系
+        System.Globalization.CultureInfo targetCulture = culture
+            ?? profile?.TargetCulture
+            ?? System.Globalization.CultureInfo.CurrentUICulture;
+
         string? profileId = profile?.Id;
         string? mimeType = package.MimeType;
         OdfDocumentKind mimeKind = OdfDocumentKindDetector.FromMimeType(mimeType);
@@ -74,6 +82,11 @@ public static partial class OdfPackageValidator
         ValidateProfileExtension(fileName, profile, profileId, issues);
         ValidateProfileVersion(detectedVersion, profile, profileId, issues, fileName, "/office:document-content[1]");
         OdfProfileRuleValidator.ValidatePackage(package, profile, schema, issues);
+
+        foreach (var issue in issues)
+        {
+            issue.Culture ??= targetCulture;
+        }
 
         return new OdfValidationReport(detectedVersion, documentKind, issues);
     }

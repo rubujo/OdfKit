@@ -333,6 +333,7 @@ public sealed class OdfPolicyRule(string id, string description, OdfIssueSeverit
 /// <param name="allowedExtensions">允許使用的檔案副檔名清單</param>
 /// <param name="allowedMimeTypes">允許使用的 MIME 類型清單</param>
 /// <param name="rules">此規範包含的合規性規則清單</param>
+/// <param name="targetCulture">此規範的目標文化特性，用於自動語系偵測</param>
 public sealed class OdfComplianceProfile(
     string id,
     string jurisdiction,
@@ -344,7 +345,8 @@ public sealed class OdfComplianceProfile(
     OdfVersionRange supportedVersions,
     IEnumerable<string> allowedExtensions,
     IEnumerable<string> allowedMimeTypes,
-    IEnumerable<OdfPolicyRule> rules)
+    IEnumerable<OdfPolicyRule> rules,
+    System.Globalization.CultureInfo? targetCulture = null)
 {
     /// <summary>
     /// 取得穩定的規範唯一識別碼。
@@ -400,4 +402,9 @@ public sealed class OdfComplianceProfile(
     /// 取得此規範所包含的合規性規則唯讀清單。
     /// </summary>
     public IReadOnlyList<OdfPolicyRule> Rules { get; } = new List<OdfPolicyRule>(rules ?? Array.Empty<OdfPolicyRule>()).AsReadOnly();
+
+    /// <summary>
+    /// 取得此規範的目標文化特性，用於自動語系偵測。
+    /// </summary>
+    public System.Globalization.CultureInfo? TargetCulture { get; } = targetCulture;
 }

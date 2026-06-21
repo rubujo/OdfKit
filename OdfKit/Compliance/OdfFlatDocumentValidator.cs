@@ -19,13 +19,24 @@ public static class OdfFlatDocumentValidator
     /// <param name="stream">文件串流</param>
     /// <param name="fileName">檔案名稱</param>
     /// <param name="profile">相容性設定檔</param>
+    /// <param name="culture">指定此問題生成時使用的文化特性，若為 null 則自動偵測</param>
     /// <returns>驗證結果報告</returns>
-    public static OdfValidationReport Validate(Stream stream, string? fileName = null, OdfComplianceProfile? profile = null)
+    public static OdfValidationReport Validate(
+        Stream stream,
+        string? fileName = null,
+        OdfComplianceProfile? profile = null,
+        System.Globalization.CultureInfo? culture = null)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
 
         List<OdfValidationIssue> issues = [];
+
+        // 智慧偵測語系
+        System.Globalization.CultureInfo targetCulture = culture
+            ?? profile?.TargetCulture
+            ?? System.Globalization.CultureInfo.CurrentUICulture;
+
         string? profileId = profile?.Id;
         OdfDocumentKind extensionKind = OdfDocumentKindDetector.FromFileName(fileName);
         FlatRootInfo? rootInfo = ReadRootInfo(stream, fileName, profileId, issues);
@@ -52,6 +63,11 @@ public static class OdfFlatDocumentValidator
         ValidateProfileExtension(fileName, profile, profileId, issues);
         ValidateVersion(detectedVersion, profile, fileName, profileId, issues);
         OdfProfileRuleValidator.ValidateFlatXml(stream, fileName, profile, schema, issues);
+
+        foreach (var issue in issues)
+        {
+            issue.Culture ??= targetCulture;
+        }
 
         return new OdfValidationReport(detectedVersion, documentKind, issues);
     }
