@@ -57,6 +57,11 @@ public class TextAdvancedFidelityTests
         Assert.Contains("text:date", contentXml);
         Assert.Contains("text:page-number", contentXml);
         Assert.Contains("text:table-of-content", contentXml);
+        Assert.Contains("text:table-of-content-entry-template", contentXml);
+        Assert.Contains("text:index-entry-page-number", contentXml);
+        Assert.Contains("text:index-entry-tab-stop", contentXml);
+        Assert.Contains("style:type=\"right\"", contentXml);
+        Assert.Contains("style:leader-char=\".\"", contentXml);
         Assert.Contains("text:alphabetical-index", contentXml);
         Assert.Contains("text:ruby", contentXml);
         Assert.Contains("text:change-start", contentXml);
@@ -173,4 +178,43 @@ public class TextAdvancedFidelityTests
         Assert.True(loadedSection.TryUnprotect("SecretPass123"));
         Assert.False(loadedSection.IsProtected);
     }
+
+    /// <summary>
+    /// 驗證自動更新設定項目（UpdateFieldsWhenOpening、LinkUpdateMode、AutoCalculate）在 settings.xml 中正確生成。
+    /// </summary>
+    [Fact]
+    public void DocumentSettingsAutoUpdateFeaturesTest()
+    {
+        using var document = TextDocument.Create();
+
+        // 設定
+        document.LinkUpdateMode = 1; // Always
+        document.AutoCalculate = false;
+        document.MutationContext.SetUpdateFieldsWhenOpening(true);
+
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = TextDocument.Load(stream);
+
+        // 驗證讀回值
+        Assert.Equal(1, loaded.LinkUpdateMode);
+        Assert.False(loaded.AutoCalculate);
+
+        using var saved = new MemoryStream();
+        loaded.SaveToStream(saved);
+        saved.Position = 0;
+        using OdfPackage package = OdfPackage.Open(saved, leaveOpen: true);
+        string settingsXml = ReadEntry(package, "settings.xml");
+
+        // 驗證正確的 XML 命名空間與結構
+        Assert.Contains("config:name=\"ooo:configuration-settings\"", settingsXml);
+        Assert.Contains("config:name=\"UpdateFieldsWhenOpening\"", settingsXml);
+        Assert.Contains("config:name=\"LinkUpdateMode\" config:type=\"short\">1</config:", settingsXml);
+        Assert.Contains("config:name=\"ooo:document-settings\"", settingsXml);
+        Assert.Contains("config:name=\"AutoCalculate\" config:type=\"boolean\">false</config:", settingsXml);
+    }
 }
+

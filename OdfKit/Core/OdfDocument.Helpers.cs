@@ -1,6 +1,8 @@
-﻿using OdfKit.DOM;
+﻿using OdfKit.Compliance;
+using OdfKit.DOM;
 
 namespace OdfKit.Core;
+
 
 public abstract partial class OdfDocument
 {
@@ -66,5 +68,43 @@ public abstract partial class OdfDocument
     protected OdfNode FindOrCreateConfigItemNode(OdfNode entryNode, string name, string type)
         => OdfDocumentSettingsEngine.FindOrCreateConfigItemNode(entryNode, name, type);
 
+    /// <summary>
+    /// 取得或設定外部連結更新模式。
+    /// 0 表示從不更新，1 表示自動更新，2 表示載入時確認（詢問）。
+    /// </summary>
+    public int LinkUpdateMode
+    {
+        get
+        {
+            var item = FindSettingsConfigItem("LinkUpdateMode");
+            if (item != null && int.TryParse(item.TextContent, out var val))
+                return val;
+            return 2; // 預設為 2 (On request)
+        }
+        set
+        {
+            OdfDocumentSettingsEngine.SetLinkUpdateMode(SettingsDom, value, ContentKind == OdfDocumentKind.Spreadsheet);
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定是否自動計算公式（試算表專屬，但可全域讀寫）。
+    /// </summary>
+    public bool AutoCalculate
+    {
+        get
+        {
+            var item = FindSettingsConfigItem("AutoCalculate");
+            if (item != null && bool.TryParse(item.TextContent, out var val))
+                return val;
+            return true; // 預設為 true
+        }
+        set
+        {
+            OdfDocumentSettingsEngine.SetAutoCalculate(SettingsDom, value);
+        }
+    }
+
     #endregion
 }
+

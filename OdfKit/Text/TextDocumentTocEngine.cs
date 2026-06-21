@@ -22,6 +22,40 @@ internal static class TextDocumentTocEngine
 
         OdfNode sourceNode = OdfNodeFactory.CreateElement("table-of-content-source", OdfNamespaces.Text, "text");
         sourceNode.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(), "text");
+
+        // 產生目錄條目範本以支援超連結與頁碼顯示
+        for (int i = 1; i <= outlineLevel; i++)
+        {
+            OdfNode entryTemplate = OdfNodeFactory.CreateElement("table-of-content-entry-template", OdfNamespaces.Text, "text");
+            entryTemplate.SetAttribute("outline-level", OdfNamespaces.Text, i.ToString(), "text");
+            entryTemplate.SetAttribute("style-name", OdfNamespaces.Text, $"Contents_{i}", "text");
+
+            // 1. 超連結起始
+            OdfNode linkStart = OdfNodeFactory.CreateElement("index-entry-link-start", OdfNamespaces.Text, "text");
+            linkStart.SetAttribute("style-name", OdfNamespaces.Text, "Index_20_Link", "text");
+            entryTemplate.AppendChild(linkStart);
+
+            // 2. 目錄文字
+            OdfNode indexText = OdfNodeFactory.CreateElement("index-entry-text", OdfNamespaces.Text, "text");
+            entryTemplate.AppendChild(indexText);
+
+            // 3. 定位點（置右且具有點狀引導符）
+            OdfNode tabStop = OdfNodeFactory.CreateElement("index-entry-tab-stop", OdfNamespaces.Text, "text");
+            tabStop.SetAttribute("type", OdfNamespaces.Style, "right", "style");
+            tabStop.SetAttribute("leader-char", OdfNamespaces.Style, ".", "style");
+            entryTemplate.AppendChild(tabStop);
+
+            // 4. 頁碼
+            OdfNode pageNum = OdfNodeFactory.CreateElement("index-entry-page-number", OdfNamespaces.Text, "text");
+            entryTemplate.AppendChild(pageNum);
+
+            // 5. 超連結結束
+            OdfNode linkEnd = OdfNodeFactory.CreateElement("index-entry-link-end", OdfNamespaces.Text, "text");
+            entryTemplate.AppendChild(linkEnd);
+
+            sourceNode.AppendChild(entryTemplate);
+        }
+
         tocNode.AppendChild(sourceNode);
 
         OdfNode bodyNode = OdfNodeFactory.CreateElement("index-body", OdfNamespaces.Text, "text");
@@ -38,3 +72,4 @@ internal static class TextDocumentTocEngine
         return new OdfTableOfContents(tocNode, document);
     }
 }
+

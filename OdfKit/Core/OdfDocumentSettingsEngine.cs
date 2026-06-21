@@ -124,7 +124,7 @@ internal static class OdfDocumentSettingsEngine
     /// </summary>
     internal static void SetZoomLevel(OdfNode settingsDom, double zoom)
     {
-        var setNode = FindOrCreateSettingsNode(settingsDom, "view-settings");
+        var setNode = FindOrCreateSettingsNode(settingsDom, "ooo:view-settings");
         var mapNode = FindOrCreateMapNode(setNode, "Views");
         var entryNode = FindOrCreateMapEntryNode(mapNode);
         var zoomNode = FindOrCreateConfigItemNode(entryNode, "ZoomValue", "int");
@@ -133,6 +133,38 @@ internal static class OdfDocumentSettingsEngine
         var zoomTypeNode = FindOrCreateConfigItemNode(entryNode, "ZoomType", "short");
         zoomTypeNode.TextContent = "0";
     }
+
+    /// <summary>
+    /// 設定開啟時是否更新欄位。
+    /// </summary>
+    internal static void SetUpdateFieldsWhenOpening(OdfNode settingsDom, bool update)
+    {
+        var setNode = FindOrCreateSettingsNode(settingsDom, "ooo:configuration-settings");
+        var item = FindOrCreateConfigItemNode(setNode, "UpdateFieldsWhenOpening", "boolean");
+        item.TextContent = update ? "true" : "false";
+    }
+
+    /// <summary>
+    /// 設定連結更新模式。
+    /// </summary>
+    internal static void SetLinkUpdateMode(OdfNode settingsDom, int mode, bool isSpreadsheet)
+    {
+        string setName = isSpreadsheet ? "ooo:document-settings" : "ooo:configuration-settings";
+        var setNode = FindOrCreateSettingsNode(settingsDom, setName);
+        var item = FindOrCreateConfigItemNode(setNode, "LinkUpdateMode", "short");
+        item.TextContent = mode.ToString();
+    }
+
+    /// <summary>
+    /// 設定是否自動計算公式。
+    /// </summary>
+    internal static void SetAutoCalculate(OdfNode settingsDom, bool auto)
+    {
+        var setNode = FindOrCreateSettingsNode(settingsDom, "ooo:document-settings");
+        var item = FindOrCreateConfigItemNode(setNode, "AutoCalculate", "boolean");
+        item.TextContent = auto ? "true" : "false";
+    }
+
 
     private static OdfNode? FindNodeByNameRecursive(OdfNode parent, string localName, string nameAttr)
     {

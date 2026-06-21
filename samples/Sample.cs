@@ -94,6 +94,10 @@ static void DemoTextDocument(string outputDir)
     // 插入目錄 (TOC)
     document.AddTableOfContents("文件目錄 (TOC)", 2);
 
+    // 設定其它自動更新選項：外部連結更新模式（2: 載入時確認/詢問）
+    document.LinkUpdateMode = 2;
+
+
     // 4. 強迫分頁，進入第三頁 (內容本文 - 直向)
     OdfParagraph bodyPara = document.Body.Paragraphs.Add();
     bodyPara.BreakPageBefore(); // 強迫分頁
@@ -241,8 +245,17 @@ static void DemoSpreadsheetDocument(string outputDir)
         DataRange = new OdfCellRange(0, 0, 4, 1, "銷售數據"), // A1:B5
         HasLegend = true
     };
-    // 錨定在 D1
     workbook.AddChart("銷售數據", new OdfCellAddress(0, 3, "銷售數據"), chartDef);
+
+    // 8. 新增資料篩選器 (AutoFilter) 展示
+    // 針對 A1:B5 的範圍，新增名為「銷售自動篩選」的篩選器，篩選條件為第 2 欄（索引 1）大於等於 200
+    sheet.Ranges["A1:B5"].AddFilter("銷售自動篩選", (1, ">=", "200"));
+
+    // 9. 設定其它自動更新選項：公式自動計算與外部連結自動更新（1: 自動）
+    workbook.AutoCalculate = true;
+    workbook.LinkUpdateMode = 1;
+
+
 
     // 6. 設定第二個工作表示範
     OdfTableSheet metaSheet = workbook.Worksheets.Add("說明頁面");

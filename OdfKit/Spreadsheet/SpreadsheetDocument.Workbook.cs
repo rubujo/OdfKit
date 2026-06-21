@@ -85,7 +85,7 @@ public partial class SpreadsheetDocument
         byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password);
         byte[] hash = OdfEncryption.Pbkdf2(passwordBytes, salt, 50000, 32, "sha256");
 
-        var docSettings = FindOrCreateSettingsNode(SettingsDom, "document-settings");
+        var docSettings = FindOrCreateSettingsNode(SettingsDom, "ooo:document-settings");
 
         OdfNode? mapNode = null;
         foreach (var child in docSettings.Children)
@@ -140,7 +140,7 @@ public partial class SpreadsheetDocument
         if (!WorkbookStructureProtected)
             return true;
 
-        var docSettings = FindSettingsNode(SettingsDom, "document-settings");
+        var docSettings = FindSettingsNode(SettingsDom, "ooo:document-settings");
         if (docSettings is null)
             return false;
 
