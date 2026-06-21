@@ -103,7 +103,7 @@ public class CsvImportExportTests
         using var ms = new MemoryStream();
         var startTime = DateTime.UtcNow;
 
-        // 執行匯出，驗證是否能在合理時間（e.g. 10秒）內返回，且不發生 OutOfMemoryException
+        // 執行匯出，驗證是否能在合理時間（例如 10 秒）內返回，且不發生 OutOfMemoryException
         OdfCsvExporter.ExportToStream(workbook, ms);
 
         var elapsed = DateTime.UtcNow - startTime;

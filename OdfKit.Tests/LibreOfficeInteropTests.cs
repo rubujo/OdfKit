@@ -45,7 +45,28 @@ public class LibreOfficeInteropTests
             RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt", odtPath);
             string txtPath = Path.Combine(outputDir, "interop-tracked-changes.txt");
             Assert.True(File.Exists(txtPath), "LibreOffice 應輸出追蹤修訂 ODT 的文字轉換結果。");
-            string txt = File.ReadAllText(txtPath);
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            string txt;
+            using (var stream = File.OpenRead(txtPath))
+            {
+                try
+                {
+                    var utf8Throw = System.Text.Encoding.GetEncoding("utf-8", System.Text.EncoderFallback.ExceptionFallback, System.Text.DecoderFallback.ExceptionFallback);
+                    using (var reader = new StreamReader(stream, utf8Throw, detectEncodingFromByteOrderMarks: true, bufferSize: 1024, leaveOpen: true))
+                    {
+                        txt = reader.ReadToEnd();
+                    }
+                }
+                catch (DecoderFallbackException)
+                {
+                    stream.Position = 0;
+                    int codePage = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ANSICodePage;
+                    using (var reader = new StreamReader(stream, System.Text.Encoding.GetEncoding(codePage), detectEncodingFromByteOrderMarks: true))
+                    {
+                        txt = reader.ReadToEnd();
+                    }
+                }
+            }
             Assert.Contains("OdfKit-TrackedChanges-Marker", txt);
             Assert.Contains("表格追蹤修訂", txt);
 

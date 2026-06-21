@@ -5,6 +5,7 @@ using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Styles;
 using OdfKit.Text;
 using PdfSharp.Fonts;
 
@@ -100,13 +101,14 @@ public static class OdfPdfExporter
                         string styleName = level == 1 ? StyleNames.Heading1
                             : level == 2 ? StyleNames.Heading2
                             : StyleNames.Heading3;
-                        var para = section.AddParagraph(node.TextContent ?? string.Empty, styleName);
+                        var para = section.AddParagraph(string.Empty, styleName);
+                        ConvertParagraphContent(node, para, defaultChineseFont);
                         break;
                     }
                 case "p":
                     {
                         var para = section.AddParagraph();
-                        ConvertParagraphContent(node, para);
+                        ConvertParagraphContent(node, para, defaultChineseFont);
                         break;
                     }
                 case "list":
@@ -115,9 +117,10 @@ public static class OdfPdfExporter
                         {
                             if (item.LocalName == "list-item")
                             {
-                                var para = section.AddParagraph(item.TextContent ?? string.Empty);
+                                var para = section.AddParagraph();
                                 para.Format.LeftIndent = "1cm";
                                 para.Format.FirstLineIndent = "-0.5cm";
+                                ConvertParagraphContent(item, para, defaultChineseFont);
                             }
                         }
                         break;
@@ -128,25 +131,25 @@ public static class OdfPdfExporter
         return doc;
     }
 
-    private static void ConvertParagraphContent(OdfNode odfPara, Paragraph migraPara)
+    private static void ConvertParagraphContent(OdfNode odfPara, Paragraph migraPara, string defaultFont)
     {
         bool hasChildren = false;
         foreach (var child in odfPara.Children)
         {
             hasChildren = true;
-            ProcessChildNode(child, migraPara);
+            ProcessChildNode(child, migraPara, defaultFont);
         }
         if (!hasChildren)
         {
-            migraPara.AddText(odfPara.TextContent ?? string.Empty);
+            AddSegmentedText(migraPara, odfPara.TextContent ?? string.Empty, defaultFont);
         }
     }
 
-    private static void ProcessChildNode(OdfNode child, Paragraph parent)
+    private static void ProcessChildNode(OdfNode child, Paragraph parent, string defaultFont)
     {
         if (child.NodeType == OdfNodeType.Text)
         {
-            parent.AddText(child.TextContent ?? string.Empty);
+            AddSegmentedText(parent, child.TextContent ?? string.Empty, defaultFont);
             return;
         }
 
@@ -161,7 +164,7 @@ public static class OdfPdfExporter
                     var fmt = parent.AddFormattedText();
                     foreach (var grandChild in child.Children)
                     {
-                        ProcessChildNode(grandChild, fmt);
+                        ProcessChildNode(grandChild, fmt, defaultFont);
                     }
                     break;
 
@@ -186,11 +189,11 @@ public static class OdfPdfExporter
         }
     }
 
-    private static void ProcessChildNode(OdfNode child, FormattedText parent)
+    private static void ProcessChildNode(OdfNode child, FormattedText parent, string defaultFont)
     {
         if (child.NodeType == OdfNodeType.Text)
         {
-            parent.AddText(child.TextContent ?? string.Empty);
+            AddSegmentedText(parent, child.TextContent ?? string.Empty, defaultFont);
             return;
         }
 
@@ -205,7 +208,7 @@ public static class OdfPdfExporter
                     var fmt = parent.AddFormattedText();
                     foreach (var grandChild in child.Children)
                     {
-                        ProcessChildNode(grandChild, fmt);
+                        ProcessChildNode(grandChild, fmt, defaultFont);
                     }
                     break;
 
@@ -226,6 +229,44 @@ public static class OdfPdfExporter
                 case "line-break":
                     parent.AddLineBreak();
                     break;
+            }
+        }
+    }
+
+    private static void AddSegmentedText(Paragraph paragraph, string text, string defaultFont)
+    {
+        var segments = OdfFontSegmenter.SegmentText(text, defaultFont);
+        foreach (var (segText, fontName) in segments)
+        {
+            if (fontName == defaultFont)
+            {
+                paragraph.AddText(segText);
+            }
+            else
+            {
+                OdfFontResolver.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
+                var run = paragraph.AddFormattedText();
+                run.Font.Name = fontName;
+                run.AddText(segText);
+            }
+        }
+    }
+
+    private static void AddSegmentedText(FormattedText formattedText, string text, string defaultFont)
+    {
+        var segments = OdfFontSegmenter.SegmentText(text, defaultFont);
+        foreach (var (segText, fontName) in segments)
+        {
+            if (fontName == defaultFont)
+            {
+                formattedText.AddText(segText);
+            }
+            else
+            {
+                OdfFontResolver.WarnIfUnresolvable(fontName, "CNS 11643 高位字面文字 PDF 匯出");
+                var run = formattedText.AddFormattedText();
+                run.Font.Name = fontName;
+                run.AddText(segText);
             }
         }
     }
@@ -236,7 +277,10 @@ internal sealed class OdfPdfFontResolver : IFontResolver
     public FontResolverInfo ResolveTypeface(string familyName, bool isBold, bool isItalic)
     {
         string? fontPath = Styles.OdfFontResolver.ResolveFontPath(familyName);
-        if (fontPath is not null)
+        // PDFsharp 不支援 TrueType Collection（.ttc）容器格式，直接餵入會拋出例外；
+        // 許多常見中文系統字型（微軟正黑體、新細明體等）正是以 .ttc 形式安裝，
+        // 須在此提前偵測並視為「找不到」，回退至安全的替代字型。
+        if (fontPath is not null && !Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
         {
             return new FontResolverInfo(familyName, isBold, isItalic);
         }
@@ -251,9 +295,15 @@ internal sealed class OdfPdfFontResolver : IFontResolver
     public byte[] GetFont(string faceName)
     {
         string? fontPath = Styles.OdfFontResolver.ResolveFontPath(faceName);
-        if (fontPath is not null && File.Exists(fontPath))
+        if (fontPath is not null && File.Exists(fontPath) && !Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
         {
             return File.ReadAllBytes(fontPath);
+        }
+
+        if (fontPath is not null && Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
+        {
+            OdfKitDiagnostics.Warn(
+                $"字型「{faceName}」對應的檔案為 PDFsharp 不支援的 TrueType Collection（.ttc）格式，已改用替代字型；輸出 PDF 中對應文字的字形可能與原始字型不同。");
         }
 
         string[] fallbacks = { "Arial", "Courier New", "Liberation Sans", "DejaVu Sans" };

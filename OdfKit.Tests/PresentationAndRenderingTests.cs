@@ -552,7 +552,9 @@ namespace OdfKit.Tests
 
                 // Check transition
                 var s2 = doc.Slides[1];
-                Assert.Equal("fade", s2.Node.GetAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"));
+                string? styleName = s2.Node.GetAttribute("style-name", OdfNamespaces.Draw);
+                Assert.NotNull(styleName);
+                Assert.Equal("fade", doc.StyleEngine.GetStyleProperty(styleName!, "type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "drawing-page"));
 
                 // Check shape and animation
                 var s1 = doc.Slides[2];

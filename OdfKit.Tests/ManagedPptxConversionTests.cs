@@ -1074,9 +1074,11 @@ public class ManagedPptxConversionTests
         OdfNode convertedSlide = Assert.Single(
             converted.ContentDom.Descendants(),
             node => node.LocalName == "page" && node.NamespaceUri == OdfNamespaces.Draw);
-        Assert.Equal("fade", convertedSlide.GetAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"));
-        Assert.Equal("2.50s", convertedSlide.GetAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"));
-        Assert.Equal("fast", convertedSlide.GetAttribute("transition-speed", OdfNamespaces.Presentation));
+        string? styleName = convertedSlide.GetAttribute("style-name", OdfNamespaces.Draw);
+        Assert.NotNull(styleName);
+        Assert.Equal("fade", converted.StyleEngine.GetStyleProperty(styleName!, "type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "drawing-page"));
+        Assert.Equal("PT2.50S", converted.StyleEngine.GetStyleProperty(styleName!, "duration", OdfNamespaces.Presentation, "drawing-page"));
+        Assert.Equal("fast", converted.StyleEngine.GetStyleProperty(styleName!, "transition-speed", OdfNamespaces.Presentation, "drawing-page"));
     }
 
     [Fact]

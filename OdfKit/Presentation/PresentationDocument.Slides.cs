@@ -212,7 +212,21 @@ public partial class PresentationDocument
             throw new ArgumentOutOfRangeException(nameof(slideIndex), "投影片索引超出範圍。");
         }
 
-        string? typeAttr = Slides[slideIndex].Node.GetAttribute("type", SmilNamespace);
+        var slide = Slides[slideIndex];
+        string? typeAttr = null;
+        string? styleName = slide.Node.GetAttribute("style-name", OdfNamespaces.Draw);
+        if (!string.IsNullOrWhiteSpace(styleName))
+        {
+            // 優先自樣式中的 drawing-page-properties 讀取轉場類型
+            typeAttr = StyleEngine.GetStyleProperty(styleName!, "type", SmilNamespace, "drawing-page");
+        }
+
+        // 回退自 draw:page 屬性讀取，以確保舊版本相容性
+        if (string.IsNullOrEmpty(typeAttr))
+        {
+            typeAttr = slide.Node.GetAttribute("type", SmilNamespace);
+        }
+
         if (string.IsNullOrEmpty(typeAttr))
             return OdfSlideTransition.None;
 
@@ -242,10 +256,18 @@ public partial class PresentationDocument
 
         if (transition == OdfSlideTransition.None)
         {
+            // 清理直接設定在 draw:page 上的舊屬性
             slideNode.RemoveAttribute("type", SmilNamespace);
             slideNode.RemoveAttribute("subtype", SmilNamespace);
             slideNode.RemoveAttribute("dur", SmilNamespace);
             slideNode.RemoveAttribute("transition-type", OdfKit.Core.OdfNamespaces.Presentation);
+
+            // 同步清理 style:drawing-page-properties 內的轉場相關屬性
+            StyleEngine.SetLocalStyleProperty(slideNode, "drawing-page", "drawing-page-properties", "type", SmilNamespace, null, "smil", deferSave: true);
+            StyleEngine.SetLocalStyleProperty(slideNode, "drawing-page", "drawing-page-properties", "subtype", SmilNamespace, null, "smil", deferSave: true);
+            StyleEngine.SetLocalStyleProperty(slideNode, "drawing-page", "drawing-page-properties", "transition-type", OdfKit.Core.OdfNamespaces.Presentation, null, "presentation", deferSave: true);
+            StyleEngine.SetLocalStyleProperty(slideNode, "drawing-page", "drawing-page-properties", "transition-speed", OdfKit.Core.OdfNamespaces.Presentation, null, "presentation", deferSave: true);
+            StyleEngine.SetLocalStyleProperty(slideNode, "drawing-page", "drawing-page-properties", "duration", OdfKit.Core.OdfNamespaces.Presentation, null, "presentation", deferSave: false);
         }
         else
         {

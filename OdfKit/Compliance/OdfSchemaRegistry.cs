@@ -39,7 +39,7 @@ public static class OdfSchemaRegistry
     public static OdfSchemaSet Odf14 => GetSchema(OdfVersion.Odf14);
 
     /// <summary>
-    /// Gets the clean default ODF 1.4 schema set.
+    /// 取得未經額外覆寫的預設 ODF 1.4 結構描述集。
     /// </summary>
     internal static OdfSchemaSet DefaultOdf14 => Odf14Default;
 

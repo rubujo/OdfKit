@@ -1066,9 +1066,11 @@ namespace OdfKit.Tests
 
             var reloaded = RoundTrip(doc, p => new PresentationDocument(p));
             var slideNode = reloaded.Slides[0].Node;
-            Assert.Equal("fade", slideNode.GetAttribute("type", smilNs));
-            Assert.Equal("fadeOverColor", slideNode.GetAttribute("subtype", smilNs));
-            Assert.Equal("2.00s", slideNode.GetAttribute("dur", smilNs));
+            string? styleName = slideNode.GetAttribute("style-name", OdfNamespaces.Draw);
+            Assert.NotNull(styleName);
+            Assert.Equal("fade", reloaded.StyleEngine.GetStyleProperty(styleName!, "type", smilNs.NamespaceName, "drawing-page"));
+            Assert.Equal("fadeOverColor", reloaded.StyleEngine.GetStyleProperty(styleName!, "subtype", smilNs.NamespaceName, "drawing-page"));
+            Assert.Equal("PT2.00S", reloaded.StyleEngine.GetStyleProperty(styleName!, "duration", OdfNamespaces.Presentation, "drawing-page"));
         }
 
         [Fact]
@@ -1140,8 +1142,10 @@ namespace OdfKit.Tests
 
             var reloaded = RoundTrip(doc, p => new PresentationDocument(p));
             var slideNode = reloaded.Slides[0].Node;
-            Assert.Equal("zoom", slideNode.GetAttribute("type", smilNs));
-            Assert.Equal("1.00s", slideNode.GetAttribute("dur", smilNs));
+            string? styleName = slideNode.GetAttribute("style-name", OdfNamespaces.Draw);
+            Assert.NotNull(styleName);
+            Assert.Equal("zoom", reloaded.StyleEngine.GetStyleProperty(styleName!, "type", smilNs.NamespaceName, "drawing-page"));
+            Assert.Equal("PT1.00S", reloaded.StyleEngine.GetStyleProperty(styleName!, "duration", OdfNamespaces.Presentation, "drawing-page"));
         }
         #endregion
 
@@ -1862,7 +1866,10 @@ namespace OdfKit.Tests
 
             var reloaded = RoundTrip(doc, p => new PresentationDocument(p));
             Assert.Equal("Brief outline of Q2 results", reloaded.Slides[0].SpeakerNotes);
-            Assert.Equal("1.00s", reloaded.Slides[0].Node.GetAttribute("dur", smilNs));
+            var slideNode = reloaded.Slides[0].Node;
+            string? styleName = slideNode.GetAttribute("style-name", OdfNamespaces.Draw);
+            Assert.NotNull(styleName);
+            Assert.Equal("PT1.00S", reloaded.StyleEngine.GetStyleProperty(styleName!, "duration", OdfNamespaces.Presentation, "drawing-page"));
             Assert.NotNull(reloaded.Slides[0].Node.Descendants().FirstOrDefault(d => d.LocalName == "par"));
         }
 

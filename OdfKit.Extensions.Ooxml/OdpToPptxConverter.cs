@@ -704,7 +704,7 @@ public static class OdpToPptxConverter
         }
 
         P.Slide slide = new(commonSlideData);
-        P.Transition? transition = CreateTransition(slideNode);
+        P.Transition? transition = CreateTransition(slideNode, odpDocument);
         if (transition is not null)
         {
             slide.Append(transition);
@@ -1101,18 +1101,36 @@ public static class OdpToPptxConverter
     /// <summary>
     /// 建立投影片轉場效果（Transition）。
     /// </summary>
-    private static P.Transition? CreateTransition(OdfNode slideNode)
+    private static P.Transition? CreateTransition(OdfNode slideNode, OdfPresentationDocument document)
     {
         string? smilType = slideNode.GetAttribute("type", SmilNamespace);
+        string? styleName = slideNode.GetAttribute("style-name", OdfNamespaces.Draw);
+        if (string.IsNullOrEmpty(smilType) && !string.IsNullOrWhiteSpace(styleName))
+        {
+            smilType = document.StyleEngine.GetStyleProperty(styleName!, "type", SmilNamespace, "drawing-page");
+        }
+
         if (string.IsNullOrWhiteSpace(smilType))
         {
             return null;
         }
 
+        string? durAttr = slideNode.GetAttribute("dur", SmilNamespace);
+        if (string.IsNullOrEmpty(durAttr) && !string.IsNullOrWhiteSpace(styleName))
+        {
+            durAttr = document.StyleEngine.GetStyleProperty(styleName!, "duration", OdfNamespaces.Presentation, "drawing-page");
+        }
+
+        string? speedAttr = slideNode.GetAttribute("transition-speed", OdfNamespaces.Presentation);
+        if (string.IsNullOrEmpty(speedAttr) && !string.IsNullOrWhiteSpace(styleName))
+        {
+            speedAttr = document.StyleEngine.GetStyleProperty(styleName!, "transition-speed", OdfNamespaces.Presentation, "drawing-page");
+        }
+
         var transition = new P.Transition
         {
-            Duration = FormatTransitionDuration(slideNode.GetAttribute("dur", SmilNamespace)),
-            Speed = ReadTransitionSpeed(slideNode.GetAttribute("transition-speed", OdfNamespaces.Presentation)),
+            Duration = FormatTransitionDuration(durAttr),
+            Speed = ReadTransitionSpeed(speedAttr),
         };
 
         transition.Append(smilType switch
@@ -1153,7 +1171,19 @@ public static class OdpToPptxConverter
         }
 
         string duration = value!.Trim();
-        if (duration.EndsWith("s", StringComparison.Ordinal) &&
+
+        // 支援 W3C XML Schema Duration 格式，例如 "PT2.50S" 或 "PT1S"
+        if (duration.StartsWith("PT", StringComparison.OrdinalIgnoreCase) && duration.EndsWith("S", StringComparison.OrdinalIgnoreCase))
+        {
+            string numberPart = duration.Substring(2, duration.Length - 3);
+            if (double.TryParse(numberPart, NumberStyles.Float, CultureInfo.InvariantCulture, out double secs))
+            {
+                return Math.Max(0, (int)Math.Round(secs * 1000d, MidpointRounding.AwayFromZero))
+                    .ToString(CultureInfo.InvariantCulture);
+            }
+        }
+
+        if (duration.EndsWith("s", StringComparison.OrdinalIgnoreCase) &&
             double.TryParse(duration.Substring(0, duration.Length - 1), NumberStyles.Float, CultureInfo.InvariantCulture, out double seconds))
         {
             return Math.Max(0, (int)Math.Round(seconds * 1000d, MidpointRounding.AwayFromZero))
@@ -1863,7 +1893,7 @@ public static class OdpToPptxConverter
         blipFill.Append(new A.Stretch(new A.FillRectangle()));
 
         // PresentationML 圖片屬於 spTree 內容模型的直接選項（<p:pic>），
-        // 不可包在 <p:graphicFrame><a:graphic><a:graphicData> 內（該容器用於圖表／OLE物件／表格）。
+        // 不可包在 <p:graphicFrame><a:graphic><a:graphicData> 內（該容器用於圖表／OLE 物件／表格）。
         return new P.Picture(
             new P.NonVisualPictureProperties(
                 new P.NonVisualDrawingProperties { Id = currentShapeId, Name = "Picture", Description = altText },

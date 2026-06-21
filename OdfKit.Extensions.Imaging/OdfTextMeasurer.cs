@@ -29,6 +29,46 @@ public static class OdfTextMeasurer
         if (string.IsNullOrEmpty(text))
             return OdfLength.FromCentimeters(0);
 
+        // 檢查是否含有高字面字元（第 2 字面或第 15/16 字面）
+        bool hasSupplementary = false;
+        for (int i = 0; i < text.Length; i++)
+        {
+            if (char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]))
+            {
+                int codePoint = char.ConvertToUtf32(text[i], text[i + 1]);
+                int plane = codePoint >> 16;
+                if (plane == 2 || plane == 3 || plane == 15 || plane == 16)
+                {
+                    hasSupplementary = true;
+                    break;
+                }
+            }
+        }
+
+        if (hasSupplementary)
+        {
+            double totalCm = 0;
+            var segments = OdfFontSegmenter.SegmentText(text, fontName);
+            foreach (var (segText, font) in segments)
+            {
+                if (font != fontName)
+                    OdfFontResolver.WarnIfUnresolvable(font, "CNS 11643 高位字面文字寬度量測");
+                var width = MeasureWidthSingle(segText, font, fontSizePoints, isBold, isItalic, writingMode);
+                totalCm += width.ToCentimeters();
+            }
+            return OdfLength.FromCentimeters(totalCm);
+        }
+        else
+        {
+            return MeasureWidthSingle(text, fontName, fontSizePoints, isBold, isItalic, writingMode);
+        }
+    }
+
+    private static OdfLength MeasureWidthSingle(string text, string fontName, double fontSizePoints, bool isBold, bool isItalic, OdfWritingMode writingMode)
+    {
+        if (string.IsNullOrEmpty(text))
+            return OdfLength.FromCentimeters(0);
+
         // 1. 字型替代映射
         string mappedFont = OdfFontResolver.MapFont(fontName);
         string? fontPath = OdfFontResolver.ResolveFontPath(mappedFont);

@@ -50,6 +50,15 @@ public static class OdfNamespaces
     /// <summary>Script 命名空間 URI</summary>
     public const string Script = "urn:oasis:names:tc:opendocument:xmlns:script:1.0";
 
+    /// <summary>Anim 命名空間 URI</summary>
+    public const string Anim = "urn:oasis:names:tc:opendocument:xmlns:animation:1.0";
+
+    /// <summary>Smil 命名空間 URI</summary>
+    public const string Smil = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0";
+
+    /// <summary>Xml 命名空間 URI</summary>
+    public const string Xml = "http://www.w3.org/XML/1998/namespace";
+
     /// <summary>Manifest 命名空間 URI</summary>
     public const string Manifest = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0";
 
@@ -101,6 +110,8 @@ public static class OdfNamespaces
             Chart => "chart",
             Config => "config",
             Script => "script",
+            Anim => "anim",
+            Smil => "smil",
             Manifest => "manifest",
             Dsig => "dsig",
             Ds => "ds",
@@ -110,6 +121,7 @@ public static class OdfNamespaces
             Pkg => "pkg",
             Of => "of",
             Oooc => "oooc",
+            Xml => "xml",
             _ => string.Empty
         };
     }

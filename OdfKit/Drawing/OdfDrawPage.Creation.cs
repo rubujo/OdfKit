@@ -55,7 +55,9 @@ public partial class OdfDrawPage
         };
 
         var shapeNode = OdfNodeFactory.CreateElement(localName, OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -108,7 +110,9 @@ public partial class OdfDrawPage
     public OdfShape AddPolyline(IEnumerable<System.Drawing.PointF> points, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         var shapeNode = OdfNodeFactory.CreateElement("polyline", OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -163,7 +167,9 @@ public partial class OdfDrawPage
             throw new ArgumentNullException(nameof(svgPathData));
 
         var shapeNode = OdfNodeFactory.CreateElement("path", OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, width.ToString(), "svg");
@@ -307,7 +313,9 @@ public partial class OdfDrawPage
         var h = OdfLength.FromPoints(heightPoints);
 
         var shapeNode = OdfNodeFactory.CreateElement("polygon", OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -351,7 +359,9 @@ public partial class OdfDrawPage
             throw new ArgumentException("終點圖形識別碼不可為空。", nameof(endShapeId));
 
         var connectorNode = OdfNodeFactory.CreateElement("connector", OdfNamespaces.Draw, "draw");
-        connectorNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        connectorNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        connectorNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         connectorNode.SetAttribute("start-shape", OdfNamespaces.Draw, startShapeId, "draw");
         connectorNode.SetAttribute("end-shape", OdfNamespaces.Draw, endShapeId, "draw");
 
@@ -383,7 +393,9 @@ public partial class OdfDrawPage
             throw new ArgumentException("幾何類型不可為空。", nameof(shapeType));
 
         var shapeNode = OdfNodeFactory.CreateElement("custom-shape", OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, width.ToString(), "svg");
@@ -451,7 +463,9 @@ public partial class OdfDrawPage
     public OdfDrawGroup AddGroup(string? name = null)
     {
         var groupNode = OdfNodeFactory.CreateElement("g", OdfNamespaces.Draw, "draw");
-        groupNode.SetAttribute("id", OdfNamespaces.Draw, "grp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "grp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        groupNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        groupNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         if (!string.IsNullOrWhiteSpace(name))
         {
             groupNode.SetAttribute("name", OdfNamespaces.Draw, name!, "draw");

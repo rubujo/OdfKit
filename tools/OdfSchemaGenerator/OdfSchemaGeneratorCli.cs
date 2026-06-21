@@ -3,7 +3,7 @@
 namespace OdfKit.Tools.OdfSchemaGenerator;
 
 /// <summary>
-/// Command-line entry point for deterministic ODF RELAX NG metadata generation.
+/// 確定性 ODF RELAX NG 結構描述中繼資料產生器的命令列進入點。
 /// </summary>
 public static class OdfSchemaGeneratorCli
 {
@@ -12,7 +12,7 @@ public static class OdfSchemaGeneratorCli
     private static readonly string[] SupportedVersionStrings = ["1.0", "1.1", "1.2", "1.3", "1.4"];
 
     /// <summary>
-    /// Runs the schema generator command.
+    /// 執行結構描述產生器命令。
     /// </summary>
     public static int Run(string[] args, TextWriter output, TextWriter error)
     {

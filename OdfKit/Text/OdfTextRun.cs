@@ -277,6 +277,19 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// 設定此文字片段的字型名稱。
+    /// </summary>
+    /// <param name="westernFont">西文字型名稱。</param>
+    /// <param name="asianFont">東亞（中日韓）字型名稱；未指定時沿用 <paramref name="westernFont"/>。</param>
+    /// <param name="complexFont">複雜文字字型名稱；未指定時沿用 <paramref name="westernFont"/>。</param>
+    /// <returns>文字片段本身。</returns>
+    public OdfTextRun WithFontName(string westernFont, string? asianFont = null, string? complexFont = null)
+    {
+        SetFont(westernFont, asianFont, complexFont);
+        return this;
+    }
+
+    /// <summary>
     /// 設定此文字片段的字色。
     /// </summary>
     /// <param name="hexColor">十六進位顏色字串，例如 <c>#FF0000</c>。</param>

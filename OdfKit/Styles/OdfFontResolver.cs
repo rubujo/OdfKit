@@ -16,8 +16,68 @@ public static class OdfFontResolver
     private static readonly Dictionary<string, string> _fontMap = new(StringComparer.OrdinalIgnoreCase);
     private static readonly Dictionary<string, string> _fallbackMap = new(StringComparer.OrdinalIgnoreCase);
     private static readonly List<string> _customDirectories = [];
+    private static readonly HashSet<string> _warnedMissingFonts = new(StringComparer.OrdinalIgnoreCase);
     private static bool _isScanned;
     private static readonly object _lock = new();
+
+    /// <summary>
+    /// 檢查指定字型名稱是否能成功解析出實際字型檔案；若找不到則發出一次性警告（同一名稱不重複記錄），
+    /// 避免使用者在缺少全字庫／花園明朝／字雲等超大字型時，毫無線索地得到顯示為空白方塊的文字。
+    /// </summary>
+    /// <param name="fontName">字型名稱。</param>
+    /// <param name="context">用於警告訊息的情境描述（例如觸發此字型查詢的功能名稱）。</param>
+    /// <returns>若該字型可成功解析則為 <see langword="true"/>。</returns>
+    public static bool WarnIfUnresolvable(string fontName, string context)
+    {
+        if (string.IsNullOrEmpty(fontName))
+            return false;
+
+        if (ResolveFontPath(fontName) is not null)
+            return true;
+
+        lock (_lock)
+        {
+            if (!_warnedMissingFonts.Add(fontName))
+                return false;
+        }
+
+        OdfKitDiagnostics.Warn(
+            $"找不到字型「{fontName}」對應的檔案（{context}）。此名稱通常用於顯示 CNS 11643 高位字面或其他罕見 Unicode 補充平面字元，" +
+            "若系統未安裝對應字型（例如全字庫、花園明朝、字雲），這些字元可能會顯示為空白方塊。" +
+            "可呼叫 OdfFontResolver.RegisterFont 或 RegisterFontDirectory 註冊實際字型檔案位置。");
+        return false;
+    }
+
+    /// <summary>
+    /// 檢查指定字型檔案是否為 TrueType Collection（.ttc）格式。PDFsharp 等部分渲染後端不支援直接讀取
+    /// TTC 容器，須在使用前偵測並改用替代字型，否則可能拋出例外或無法正確顯示文字。
+    /// </summary>
+    /// <param name="filePath">字型檔案路徑。</param>
+    /// <returns>若檔案以 TTC 簽章（'ttcf'）開頭則為 <see langword="true"/>。</returns>
+    public static bool IsTrueTypeCollection(string filePath)
+    {
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+            return false;
+
+        try
+        {
+            using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            byte[] signature = new byte[4];
+            if (fs.Read(signature, 0, 4) != 4)
+                return false;
+
+            // 'ttcf' 的大端序位元組序列。
+            return signature[0] == 0x74 && signature[1] == 0x74 && signature[2] == 0x63 && signature[3] == 0x66;
+        }
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
 
     /// <summary>
     /// 註冊字型替代對照規則（例如在無微軟字型之 Linux/Docker 上將 "MS YaHei" 映射至 "Noto Sans CJK TC"）。

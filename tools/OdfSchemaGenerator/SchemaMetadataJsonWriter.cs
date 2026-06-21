@@ -5,12 +5,12 @@ using System.Text;
 namespace OdfKit.Tools.OdfSchemaGenerator;
 
 /// <summary>
-/// Writes schema metadata as deterministic JSON.
+/// 將結構描述中繼資料寫成確定性的 JSON。
 /// </summary>
 public sealed class SchemaMetadataJsonWriter
 {
     /// <summary>
-    /// Writes schema metadata to a text writer.
+    /// 將結構描述中繼資料寫入文字寫入器。
     /// </summary>
     public void Write(SchemaMetadata metadata, TextWriter writer)
     {

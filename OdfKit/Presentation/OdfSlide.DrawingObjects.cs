@@ -24,13 +24,15 @@ public partial class OdfSlide
     public OdfPlaceholder AddPlaceholder(OdfPlaceholderType type, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode shapeNode = new(OdfNodeType.Element, "rect", OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
         shapeNode.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
 
-        Node.AppendChild(shapeNode);
+        AddDrawingObjectNode(shapeNode);
         var placeholder = new OdfPlaceholder(shapeNode, this)
         {
             PlaceholderType = type
@@ -68,7 +70,7 @@ public partial class OdfSlide
         objNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
 
         frame.AppendChild(objNode);
-        Node.AppendChild(frame);
+        AddDrawingObjectNode(frame);
         return new OdfShape(frame, this);
     }
 
@@ -116,7 +118,7 @@ public partial class OdfSlide
             textBoxNode.AppendChild(new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text"));
         }
 
-        Node.AppendChild(frame);
+        AddDrawingObjectNode(frame);
         return new OdfTextBox(frame, this);
     }
     /// <summary>
@@ -180,7 +182,7 @@ public partial class OdfSlide
         plugin.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
         plugin.SetAttribute("mime-type", OdfNamespaces.Draw, mimeType, "draw");
         frame.AppendChild(plugin);
-        Node.AppendChild(frame);
+        AddDrawingObjectNode(frame);
 
         return new OdfMediaObject(packagePath, mimeType);
     }
@@ -204,13 +206,15 @@ public partial class OdfSlide
         };
 
         OdfNode shapeNode = new(OdfNodeType.Element, localName, OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
         shapeNode.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
 
-        Node.AppendChild(shapeNode);
+        AddDrawingObjectNode(shapeNode);
         return new OdfShape(shapeNode, this);
     }
 
@@ -225,13 +229,15 @@ public partial class OdfSlide
     public OdfShape AddLine(OdfLength x1, OdfLength y1, OdfLength x2, OdfLength y2)
     {
         OdfNode shapeNode = new(OdfNodeType.Element, "line", OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x1", OdfNamespaces.Svg, x1.ToString(), "svg");
         shapeNode.SetAttribute("y1", OdfNamespaces.Svg, y1.ToString(), "svg");
         shapeNode.SetAttribute("x2", OdfNamespaces.Svg, x2.ToString(), "svg");
         shapeNode.SetAttribute("y2", OdfNamespaces.Svg, y2.ToString(), "svg");
 
-        Node.AppendChild(shapeNode);
+        AddDrawingObjectNode(shapeNode);
         return new OdfShape(shapeNode, this);
     }
 
@@ -247,7 +253,9 @@ public partial class OdfSlide
     public OdfShape AddPolyline(IEnumerable<System.Drawing.PointF> points, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode shapeNode = new(OdfNodeType.Element, "polyline", OdfNamespaces.Draw, "draw");
-        shapeNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        shapeNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        shapeNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         shapeNode.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         shapeNode.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
@@ -256,7 +264,7 @@ public partial class OdfSlide
         var pointsStr = string.Join(" ", points.Select(p => $"{p.X.ToString(System.Globalization.CultureInfo.InvariantCulture)},{p.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}"));
         shapeNode.SetAttribute("points", OdfNamespaces.Draw, pointsStr, "draw");
 
-        Node.AppendChild(shapeNode);
+        AddDrawingObjectNode(shapeNode);
         return new OdfShape(shapeNode, this);
     }
 
@@ -284,7 +292,7 @@ public partial class OdfSlide
         imgNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
 
         frame.AppendChild(imgNode);
-        Node.AppendChild(frame);
+        AddDrawingObjectNode(frame);
         var picture = new OdfPicture(frame, this);
         picture.AltText = altText;
         return picture;
@@ -306,51 +314,69 @@ public partial class OdfSlide
     /// <param name="speed">切換速度。</param>
     public void SetTransition(OdfTransitionType type, OdfLength duration, OdfTransitionSpeed speed)
     {
-        string durStr = $"{duration.ToPoints() / 72.0:F2}s";
+        string smilDurStr = $"{duration.ToPoints() / 72.0:F2}s";
+        string isoDurStr = $"PT{duration.ToPoints() / 72.0:F2}S";
+
+        // 先移除原本直接設定在 draw:page 節點上的屬性，確保舊文件升級時的 XML 乾淨合規
+        Node.RemoveAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
+        Node.RemoveAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
+        Node.RemoveAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
+        Node.RemoveAttribute("transition-type", OdfNamespaces.Presentation);
+        Node.RemoveAttribute("transition-speed", OdfNamespaces.Presentation);
+
+        string smilType = "";
+        string smilSubtype = "";
 
         switch (type)
         {
             case OdfTransitionType.Fade:
-                Node.SetAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "fade", "smil");
-                Node.SetAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "fadeOverColor", "smil");
+                smilType = "fade";
+                smilSubtype = "fadeOverColor";
                 break;
             case OdfTransitionType.Push:
-                Node.SetAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "push", "smil");
-                Node.SetAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "fromBottom", "smil");
+                smilType = "push";
+                smilSubtype = "fromBottom";
                 break;
             case OdfTransitionType.Wipe:
-                Node.SetAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "wipe", "smil");
-                Node.SetAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "leftToRight", "smil");
+                smilType = "wipe";
+                smilSubtype = "leftToRight";
                 break;
             case OdfTransitionType.Zoom:
-                Node.SetAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "zoom", "smil");
-                Node.SetAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "in", "smil");
+                smilType = "zoom";
+                smilSubtype = "in";
                 break;
             case OdfTransitionType.Split:
-                Node.SetAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "split", "smil");
-                Node.SetAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "horizontalOut", "smil");
+                smilType = "split";
+                smilSubtype = "horizontalOut";
                 break;
         }
 
-        Node.SetAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", durStr, "smil");
-        Node.SetAttribute("transition-type", OdfNamespaces.Presentation, "automatic", "presentation");
-        Node.SetAttribute("transition-speed", OdfNamespaces.Presentation, speed switch
+        string speedStr = speed switch
         {
             OdfTransitionSpeed.Slow => "slow",
             OdfTransitionSpeed.Fast => "fast",
             _ => "medium",
-        }, "presentation");
+        };
+
+        const string SmilNs = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0";
+        // 寫入到 style:drawing-page-properties 屬性中以符合規範
+        Document.StyleEngine.SetLocalStyleProperty(Node, "drawing-page", "drawing-page-properties", "type", SmilNs, smilType, "smil", deferSave: true);
+        Document.StyleEngine.SetLocalStyleProperty(Node, "drawing-page", "drawing-page-properties", "subtype", SmilNs, smilSubtype, "smil", deferSave: true);
+        Document.StyleEngine.SetLocalStyleProperty(Node, "drawing-page", "drawing-page-properties", "transition-type", OdfNamespaces.Presentation, "automatic", "presentation", deferSave: true);
+        Document.StyleEngine.SetLocalStyleProperty(Node, "drawing-page", "drawing-page-properties", "transition-speed", OdfNamespaces.Presentation, speedStr, "presentation", deferSave: true);
+        Document.StyleEngine.SetLocalStyleProperty(Node, "drawing-page", "drawing-page-properties", "duration", OdfNamespaces.Presentation, isoDurStr, "presentation", deferSave: false);
     }
 
     private OdfNode CreateDrawingFrame(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
-        frame.SetAttribute("id", OdfNamespaces.Draw, "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        var id = "frm_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+        frame.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
+        frame.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
         frame.SetAttribute("x", OdfNamespaces.Svg, x.ToString(), "svg");
         frame.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         frame.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
         frame.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
-        frame.SetAttribute("anchor-type", OdfNamespaces.Draw, "page", "draw");
         return frame;
     }
 
@@ -386,6 +412,30 @@ public partial class OdfSlide
         }
 
         return false;
+    }
+
+    private void AddDrawingObjectNode(OdfNode drawingNode)
+    {
+        OdfNode? refNode = null;
+        foreach (var child in Node.Children)
+        {
+            if (child.NamespaceUri == OdfNamespaces.Anim ||
+                (child.NamespaceUri == OdfNamespaces.Presentation && (child.LocalName == "notes" || child.LocalName == "animations")) ||
+                (child.NamespaceUri == OdfNamespaces.Office && child.LocalName == "annotation"))
+            {
+                refNode = child;
+                break;
+            }
+        }
+
+        if (refNode is not null)
+        {
+            Node.InsertBefore(drawingNode, refNode);
+        }
+        else
+        {
+            Node.AppendChild(drawingNode);
+        }
     }
 
     #endregion

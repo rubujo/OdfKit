@@ -6,12 +6,12 @@ using System.Linq;
 namespace OdfKit.Tools.OdfSchemaGenerator;
 
 /// <summary>
-/// Writes schema metadata as deterministic C# runtime seed code.
+/// 將結構描述中繼資料寫成確定性的 C# 執行階段種子程式碼。
 /// </summary>
 public sealed class SchemaMetadataCSharpWriter
 {
     /// <summary>
-    /// Writes a C# class that can create an OdfSchemaSet.
+    /// 寫出一個可建立 OdfSchemaSet 的 C# 類別。
     /// </summary>
     public void Write(SchemaMetadata metadata, TextWriter writer, string className = "GeneratedOdfSchemaMetadata")
     {
@@ -19,7 +19,7 @@ public sealed class SchemaMetadataCSharpWriter
     }
 
     /// <summary>
-    /// Writes a C# class plus the OdfKit runtime provider hook.
+    /// 寫出一個 C# 類別，並附加 OdfKit 執行階段提供者掛鉤。
     /// </summary>
     public void WriteProvider(SchemaMetadata metadata, TextWriter writer, string className = "GeneratedOdfSchemaMetadata")
     {

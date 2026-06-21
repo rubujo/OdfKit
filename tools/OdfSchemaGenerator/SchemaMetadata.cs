@@ -3,233 +3,233 @@
 namespace OdfKit.Tools.OdfSchemaGenerator;
 
 /// <summary>
-/// Represents schema metadata extracted from a RELAX NG file.
+/// 表示從 RELAX NG 檔案擷取的結構描述中繼資料。
 /// </summary>
 public sealed class SchemaMetadata
 {
     /// <summary>
-    /// Gets or sets the schema source path or URI.
+    /// 取得或設定結構描述的來源路徑或 URI。
     /// </summary>
     public string Source { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the schema source date.
+    /// 取得或設定結構描述的來源日期。
     /// </summary>
     public string SourceDate { get; set; } = "generated";
 
     /// <summary>
-    /// Gets or sets the ODF version string (e.g. "1.1", "1.2", "1.3", "1.4") this schema represents.
+    /// 取得或設定此結構描述所代表的 ODF 版本字串（例如 "1.1"、"1.2"、"1.3"、"1.4"）。
     /// </summary>
     public string Version { get; set; } = "1.4";
 
     /// <summary>
-    /// Gets the extracted elements.
+    /// 取得擷取出的元素。
     /// </summary>
     public List<SchemaNameMetadata> Elements { get; } = new();
 
     /// <summary>
-    /// Gets the extracted attributes.
+    /// 取得擷取出的屬性。
     /// </summary>
     public List<SchemaNameMetadata> Attributes { get; } = new();
 
     /// <summary>
-    /// Gets the extracted RELAX NG named patterns.
+    /// 取得擷取出的 RELAX NG 具名模式。
     /// </summary>
     public List<SchemaPatternMetadata> Patterns { get; } = new();
 
     /// <summary>
-    /// Gets relative references that could not be resolved on disk.
+    /// 取得無法在磁碟上解析的相對參照。
     /// </summary>
     public List<string> MissingReferences { get; } = new();
 
     /// <summary>
-    /// Gets absolute non-file references recorded but not fetched by the generator.
+    /// 取得已記錄但未由產生器擷取的絕對非檔案參照。
     /// </summary>
     public List<string> ExternalReferences { get; } = new();
 
     /// <summary>
-    /// Gets file references rejected because they resolve outside the schema root directory.
+    /// 取得因解析結果落在結構描述根目錄外而被拒絕的檔案參照。
     /// </summary>
     public List<string> RejectedReferences { get; } = new();
 }
 
 /// <summary>
-/// Represents one namespace-qualified schema name.
+/// 表示一個具命名空間限定的結構描述名稱。
 /// </summary>
 public sealed class SchemaNameMetadata
 {
     /// <summary>
-    /// Gets or sets the namespace URI.
+    /// 取得或設定命名空間 URI。
     /// </summary>
     public string NamespaceUri { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the local name.
+    /// 取得或設定本地名稱。
     /// </summary>
     public string LocalName { get; set; } = string.Empty;
 }
 
 /// <summary>
-/// Represents one named RELAX NG pattern and the patterns it references.
+/// 表示一個具名 RELAX NG 模式及其參照的其他模式。
 /// </summary>
 public sealed class SchemaPatternMetadata
 {
     /// <summary>
-    /// Gets or sets the pattern name.
+    /// 取得或設定模式名稱。
     /// </summary>
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets referenced pattern names.
+    /// 取得參照的模式名稱。
     /// </summary>
     public List<string> References { get; } = new();
 
     /// <summary>
-    /// Gets RELAX NG pattern kinds used by this named pattern.
+    /// 取得此具名模式所使用的 RELAX NG 模式種類。
     /// </summary>
     public List<string> PatternKinds { get; } = new();
 
     /// <summary>
-    /// Gets element names that can appear inside this pattern.
+    /// 取得可出現在此模式內的元素名稱。
     /// </summary>
     public List<SchemaPatternNameUseMetadata> ChildElements { get; } = new();
 
     /// <summary>
-    /// Gets attribute names that can appear inside this pattern.
+    /// 取得可出現在此模式內的屬性名稱。
     /// </summary>
     public List<SchemaPatternNameUseMetadata> Attributes { get; } = new();
 
     /// <summary>
-    /// Gets wildcard/name-class constraints used by this pattern.
+    /// 取得此模式所使用的萬用字元／名稱類別限制。
     /// </summary>
     public List<SchemaNameClassMetadata> NameClasses { get; } = new();
 
     /// <summary>
-    /// Gets root pattern nodes preserved from this named pattern.
+    /// 取得此具名模式保留下來的根模式節點。
     /// </summary>
     public List<SchemaPatternNodeMetadata> PatternTree { get; } = new();
 }
 
 /// <summary>
-/// Represents a namespace-qualified name used by a RELAX NG pattern.
+/// 表示 RELAX NG 模式所使用的具命名空間限定名稱。
 /// </summary>
 public sealed class SchemaPatternNameUseMetadata
 {
     /// <summary>
-    /// Gets or sets the namespace URI.
+    /// 取得或設定命名空間 URI。
     /// </summary>
     public string NamespaceUri { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the local name.
+    /// 取得或設定本地名稱。
     /// </summary>
     public string LocalName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the nearest RELAX NG occurrence wrapper.
+    /// 取得或設定最接近的 RELAX NG 出現次數包裝。
     /// </summary>
     public string Occurrence { get; set; } = "exactlyOne";
 }
 
 /// <summary>
-/// Represents a RELAX NG name class such as name, nsName, or anyName.
+/// 表示 RELAX NG 的名稱類別，例如 name、nsName 或 anyName。
 /// </summary>
 public sealed class SchemaNameClassMetadata
 {
     /// <summary>
-    /// Gets or sets the RELAX NG name class kind.
+    /// 取得或設定 RELAX NG 名稱類別種類。
     /// </summary>
     public string Kind { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the namespace URI when available.
+    /// 取得或設定可用時的命名空間 URI。
     /// </summary>
     public string NamespaceUri { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the local name when available.
+    /// 取得或設定可用時的本地名稱。
     /// </summary>
     public string LocalName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets a value indicating whether this name class appears under rng:except.
+    /// 取得或設定一個值，指出此名稱類別是否出現在 rng:except 之下。
     /// </summary>
     public bool IsExcept { get; set; }
 }
 
 /// <summary>
-/// Represents one RELAX NG pattern node with enough context for a future validator.
+/// 表示一個 RELAX NG 模式節點，並保留足夠的內容供未來的驗證器使用。
 /// </summary>
 public sealed class SchemaPatternNodeMetadata
 {
     /// <summary>
-    /// Gets or sets the RELAX NG pattern kind.
+    /// 取得或設定 RELAX NG 模式種類。
     /// </summary>
     public string Kind { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the nearest RELAX NG occurrence wrapper.
+    /// 取得或設定最接近的 RELAX NG 出現次數包裝。
     /// </summary>
     public string Occurrence { get; set; } = "exactlyOne";
 
     /// <summary>
-    /// Gets or sets the namespace URI when this node carries a qualified name.
+    /// 取得或設定此節點帶有限定名稱時的命名空間 URI。
     /// </summary>
     public string NamespaceUri { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the local name when this node carries a qualified name.
+    /// 取得或設定此節點帶有限定名稱時的本地名稱。
     /// </summary>
     public string LocalName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the referenced pattern name for rng:ref nodes.
+    /// 取得或設定 rng:ref 節點所參照的模式名稱。
     /// </summary>
     public string ReferenceName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the datatype name for rng:data nodes.
+    /// 取得或設定 rng:data 節點的資料型別名稱。
     /// </summary>
     public string DataType { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the RELAX NG datatype library URI for rng:data or rng:value nodes.
+    /// 取得或設定 rng:data 或 rng:value 節點所使用的 RELAX NG 資料型別函式庫 URI。
     /// </summary>
     public string DataTypeLibrary { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the literal value for rng:value nodes.
+    /// 取得或設定 rng:value 節點的文字值。
     /// </summary>
     public string Value { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets datatype parameters attached to rng:data nodes.
+    /// 取得附加在 rng:data 節點上的資料型別參數。
     /// </summary>
     public List<SchemaDatatypeParameterMetadata> DataParameters { get; } = new();
 
     /// <summary>
-    /// Gets name classes attached directly to this node.
+    /// 取得直接附加在此節點上的名稱類別。
     /// </summary>
     public List<SchemaNameClassMetadata> NameClasses { get; } = new();
 
     /// <summary>
-    /// Gets child pattern nodes.
+    /// 取得子模式節點。
     /// </summary>
     public List<SchemaPatternNodeMetadata> Children { get; } = new();
 }
 
 /// <summary>
-/// Represents one RELAX NG datatype parameter.
+/// 表示一個 RELAX NG 資料型別參數。
 /// </summary>
 public sealed class SchemaDatatypeParameterMetadata
 {
     /// <summary>
-    /// Gets or sets the parameter name.
+    /// 取得或設定參數名稱。
     /// </summary>
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the parameter value.
+    /// 取得或設定參數值。
     /// </summary>
     public string Value { get; set; } = string.Empty;
 }

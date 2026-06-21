@@ -8,14 +8,14 @@ using System.Xml.Linq;
 namespace OdfKit.Tools.OdfSchemaGenerator;
 
 /// <summary>
-/// Extracts deterministic ODF schema metadata from RELAX NG XML syntax.
+/// 從 RELAX NG XML 語法中擷取確定性的 ODF 結構描述中繼資料。
 /// </summary>
 public sealed class RelaxNgSchemaMetadataReader
 {
     private const string RelaxNgNamespace = "http://relaxng.org/ns/structure/1.0";
 
     /// <summary>
-    /// Reads schema metadata from a RELAX NG file and its relative include graph.
+    /// 從 RELAX NG 檔案及其相對 include 圖譜讀取結構描述中繼資料。
     /// </summary>
     public SchemaMetadata ReadFile(string path)
     {
@@ -30,7 +30,7 @@ public sealed class RelaxNgSchemaMetadataReader
     }
 
     /// <summary>
-    /// Reads schema metadata from a RELAX NG stream.
+    /// 從 RELAX NG 串流讀取結構描述中繼資料。
     /// </summary>
     public SchemaMetadata Read(Stream stream, string source)
     {
@@ -200,11 +200,16 @@ public sealed class RelaxNgSchemaMetadataReader
             "office" => "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
             "presentation" => "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0",
             "script" => "urn:oasis:names:tc:opendocument:xmlns:script:1.0",
+            "smil" => "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0",
             "style" => "urn:oasis:names:tc:opendocument:xmlns:style:1.0",
             "svg" => "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0",
             "table" => "urn:oasis:names:tc:opendocument:xmlns:table:1.0",
             "text" => "urn:oasis:names:tc:opendocument:xmlns:text:1.0",
+            "dc" => "http://purl.org/dc/elements/1.1/",
             "xlink" => "http://www.w3.org/1999/xlink",
+            "grddl" => "http://www.w3.org/2003/g/data-view#",
+            "xforms" => "http://www.w3.org/2002/xforms",
+            "xhtml" => "http://www.w3.org/1999/xhtml",
             _ => null
         };
     }

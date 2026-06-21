@@ -205,17 +205,23 @@ public class PresentationHighLevelApiTests
         // 1. 設定切換效果為 Push
         document.SetSlideTransition(0, OdfSlideTransition.Push);
         var slide = document.Slides[0];
-        Assert.Equal("push", slide.Node.GetAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"));
-        Assert.Equal("fromBottom", slide.Node.GetAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"));
-        Assert.Equal("automatic", slide.Node.GetAttribute("transition-type", OdfNamespaces.Presentation));
+        string? styleName = slide.Node.GetAttribute("style-name", OdfNamespaces.Draw);
+        Assert.NotNull(styleName);
+        Assert.Equal("push", document.StyleEngine.GetStyleProperty(styleName!, "type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "drawing-page"));
+        Assert.Equal("fromBottom", document.StyleEngine.GetStyleProperty(styleName!, "subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "drawing-page"));
+        Assert.Equal("automatic", document.StyleEngine.GetStyleProperty(styleName!, "transition-type", OdfNamespaces.Presentation, "drawing-page"));
 
         Assert.Equal(OdfSlideTransition.Push, document.GetSlideTransition(0));
 
         // 2. 移除切換效果
         document.SetSlideTransition(0, OdfSlideTransition.None);
         Assert.Equal(OdfSlideTransition.None, document.GetSlideTransition(0));
-        Assert.Null(slide.Node.GetAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"));
-        Assert.Null(slide.Node.GetAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"));
+        string? newStyleName = slide.Node.GetAttribute("style-name", OdfNamespaces.Draw);
+        if (newStyleName != null)
+        {
+            Assert.Null(document.StyleEngine.GetStyleProperty(newStyleName, "type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "drawing-page"));
+            Assert.Null(document.StyleEngine.GetStyleProperty(newStyleName, "subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "drawing-page"));
+        }
     }
 
     /// <summary>

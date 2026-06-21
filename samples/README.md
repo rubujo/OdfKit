@@ -1,7 +1,7 @@
 # OdfKit .NET 10.0 單檔 C# Script 範例使用說明
 
 本目錄包含了一個全新設計的 `OdfKit` 全功能使用範例。
-此範例採用 **C# 14** 與 **.NET 10.0** 引入的**單檔指令碼 (File-based apps)** 特性，您不需要建立傳統的 `.csproj` 專案檔，即可直接執行本範例程式碼。
+此範例採用 **C# 14** 與 **.NET 10.0** 引入的 **單檔指令碼 (File-based apps)** 特性，您不需要建立傳統的 `.csproj` 專案檔，即可直接執行本範例程式碼。
 
 ---
 
@@ -85,3 +85,4 @@
 | **`output_stream.ods`** | ODF 試算表 | 透過 `OdsStreamWriter` 大量串流寫入的明細表。 |
 | **`output_pdf.pdf`** | PDF 檔案 | 將 ODT 內容完美轉譯後的 PDF 格式文件。 |
 | **`output_html.html`** | HTML 網頁 | 將 ODT 內容轉換後的純 HTML 網頁。 |
+

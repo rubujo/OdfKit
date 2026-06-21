@@ -4141,5 +4141,51 @@ namespace OdfKit.Tests
                         })
                 });
         }
+
+        /// <summary>
+        /// 迴歸測試：<c>draw:image</c> 的內容模型為
+        /// <c>Choice(common-draw-data-attlist | office-binary-data)</c> 後接 <c>draw-text</c>。
+        /// 當圖片以 <c>xlink:href</c> 外部參照（而非內嵌 <c>office:binary-data</c>）表示時，
+        /// 屬性剝離邏輯曾誤將整個 choice 當作純屬性節點移除其中一個分支，使僅存的元素內容分支
+        /// （office-binary-data）變成強制要求，導致任何使用外部參照的合法圖片都被誤判為不合規。
+        /// </summary>
+        [Fact]
+        public void SchemaPatternValidator_DrawImageWithExternalHref_IsValid()
+        {
+            XNamespace draw = OdfNamespaces.Draw;
+            XNamespace xlink = OdfNamespaces.XLink;
+
+            var validImage = new XElement(draw + "image",
+                new XAttribute(xlink + "href", "Pictures/sample.png"),
+                new XAttribute(xlink + "type", "simple"),
+                new XAttribute(xlink + "show", "embed"),
+                new XAttribute(xlink + "actuate", "onLoad"));
+
+            OdfSchemaSet schema = OdfSchemaRegistry.Odf14;
+            OdfSchemaPatternValidationResult result =
+                OdfSchemaPatternValidator.ValidateElement(validImage, schema, "draw-image");
+
+            Assert.True(result.IsMatch);
+        }
+
+        /// <summary>
+        /// 迴歸測試的反例：確保上述修正沒有讓驗證變得過度寬鬆——缺少必填 <c>xlink:href</c>
+        /// 且沒有內嵌 <c>office:binary-data</c> 的 <c>draw:image</c> 仍必須判定為不合規。
+        /// </summary>
+        [Fact]
+        public void SchemaPatternValidator_DrawImageMissingHrefAndBinaryData_IsInvalid()
+        {
+            XNamespace draw = OdfNamespaces.Draw;
+            XNamespace xlink = OdfNamespaces.XLink;
+
+            var brokenImage = new XElement(draw + "image",
+                new XAttribute(xlink + "type", "simple"));
+
+            OdfSchemaSet schema = OdfSchemaRegistry.Odf14;
+            OdfSchemaPatternValidationResult result =
+                OdfSchemaPatternValidator.ValidateElement(brokenImage, schema, "draw-image");
+
+            Assert.False(result.IsMatch);
+        }
     }
 }

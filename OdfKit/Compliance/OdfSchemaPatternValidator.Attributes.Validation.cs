@@ -140,7 +140,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             return null;
         }
 
-        return new OdfSchemaPatternNode(
+        var strippedNode = new OdfSchemaPatternNode(
             node.Kind,
             node.Occurrence,
             node.NamespaceUri,
@@ -152,6 +152,29 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             strippedChildren,
             node.DataParameters.Select(parameter => new KeyValuePair<string, string>(parameter.Name, parameter.Value)),
             node.DataTypeLibrary);
+
+        // RNG 的 <choice> 可能混合「純屬性分支」（例如 common-draw-data-attlist，僅描述 xlink 屬性）
+        // 與「實際元素內容分支」（例如 office-binary-data，要求一個子元素）。剝離掉純屬性分支後，
+        // 若直接把僅存的內容分支當作強制要求，會誤判「選擇了屬性分支、因此沒有任何子內容」的合法情況為
+        // 不合規（因為原始 choice 本來就能單靠屬性分支以零內容滿足）。因此只要有任何分支被剝離掉，
+        // 代表這個 choice 存在一條不需要消耗子內容即可成立的路徑，剩餘內容分支須視為可選，而非必要。
+        if (node.Kind == OdfSchemaPatternNodeKind.Choice && strippedChildren.Count < node.Children.Count)
+        {
+            return new OdfSchemaPatternNode(
+                OdfSchemaPatternNodeKind.Optional,
+                "optional",
+                "",
+                "",
+                "",
+                "",
+                "",
+                Array.Empty<OdfSchemaNameClass>(),
+                new[] { strippedNode },
+                Array.Empty<KeyValuePair<string, string>>(),
+                null);
+        }
+
+        return strippedNode;
     }
 
     private static bool ContainsAttributePattern(

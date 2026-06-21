@@ -19,7 +19,14 @@ namespace OdfKit.Compliance
         {
             var elements = new List<OdfElementDefinition>
             {
+                new OdfElementDefinition(new OdfQualifiedName("http://purl.org/dc/elements/1.1/", "creator"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
+                new OdfElementDefinition(new OdfQualifiedName("http://purl.org/dc/elements/1.1/", "date"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
+                new OdfElementDefinition(new OdfQualifiedName("http://purl.org/dc/elements/1.1/", "description"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
+                new OdfElementDefinition(new OdfQualifiedName("http://purl.org/dc/elements/1.1/", "language"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
+                new OdfElementDefinition(new OdfQualifiedName("http://purl.org/dc/elements/1.1/", "subject"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
+                new OdfElementDefinition(new OdfQualifiedName("http://purl.org/dc/elements/1.1/", "title"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
                 new OdfElementDefinition(new OdfQualifiedName("http://www.w3.org/1998/Math/MathML", "math"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
+                new OdfElementDefinition(new OdfQualifiedName("http://www.w3.org/2002/xforms", "model"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
                 new OdfElementDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "animate"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
                 new OdfElementDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "animateColor"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
                 new OdfElementDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "animateMotion"), OdfSchemaElementRole.Element, OdfVersionRange.AllKnown),
@@ -615,11 +622,17 @@ namespace OdfKit.Compliance
 
             var attributes = new List<OdfAttributeDefinition>
             {
+                new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/1999/xhtml", "about"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/1999/xhtml", "content"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/1999/xhtml", "datatype"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/1999/xhtml", "property"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/1999/xlink", "actuate"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/1999/xlink", "href"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/1999/xlink", "show"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/1999/xlink", "title"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/1999/xlink", "type"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/2002/xforms", "bind"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/2003/g/data-view#", "transformation"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("http://www.w3.org/XML/1998/namespace", "id"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "audio-level"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "color-interpolation"), "string", OdfVersionRange.AllKnown),
@@ -1236,6 +1249,35 @@ namespace OdfKit.Compliance
                 new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:script:1.0", "event-name"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:script:1.0", "language"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:script:1.0", "macro-name"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "accelerate"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "accumulate"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "additive"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "attributeName"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "autoReverse"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "begin"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "by"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "calcMode"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "decelerate"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "direction"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "dur"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "end"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "endsync"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "fadeColor"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "fill"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "fillDefault"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "from"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "keySplines"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "keyTimes"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "mode"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "repeatCount"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "repeatDur"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "restart"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "restartDefault"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "subtype"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "targetElement"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "to"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "type"), "string", OdfVersionRange.AllKnown),
+                new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "values"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:style:1.0", "adjustment"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:style:1.0", "apply-style-name"), "string", OdfVersionRange.AllKnown),
                 new OdfAttributeDefinition(new OdfQualifiedName("urn:oasis:names:tc:opendocument:xmlns:style:1.0", "auto-text-indent"), "string", OdfVersionRange.AllKnown),
@@ -2116,7 +2158,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "calcMode", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -2263,7 +2305,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "type", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -2273,7 +2315,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "subtype", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -2284,7 +2326,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "direction", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -2309,7 +2351,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "fadeColor", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -2320,7 +2362,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "mode", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -4098,7 +4140,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "accumulate", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -4123,7 +4165,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "additive", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -4322,7 +4364,7 @@ namespace OdfKit.Compliance
                 }),
                 new OdfSchemaPatternDefinition("common-anim-named-target-attlist", new[]
                 {
-                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "", "", "", "",
+                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "attributeName", "", "", "",
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
@@ -4335,7 +4377,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "to", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -4349,7 +4391,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "calcMode", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -4391,7 +4433,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "targetElement", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -4421,7 +4463,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "values", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -4444,7 +4486,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "from", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -4455,7 +4497,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "by", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -4536,7 +4578,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "begin", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -4547,7 +4589,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "end", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -6274,7 +6316,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "dur", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -6302,7 +6344,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "endsync", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -6573,7 +6615,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "fillDefault", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -6621,7 +6663,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "fill", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -6891,13 +6933,13 @@ namespace OdfKit.Compliance
                 }),
                 new OdfSchemaPatternDefinition("common-in-content-meta-attlist", new[]
                 {
-                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "", "", "", "",
+                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "http://www.w3.org/1999/xhtml", "about", "", "", "",
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
                             new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Ref, "exactlyOne", "", "", "URIorSafeCURIE", "", ""),
                         }),
-                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "", "", "", "", "",
+                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "exactlyOne", "http://www.w3.org/1999/xhtml", "property", "", "", "",
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
@@ -7007,7 +7049,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "http://www.w3.org/1999/xhtml", "datatype", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -7018,7 +7060,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "http://www.w3.org/1999/xhtml", "content", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -7429,7 +7471,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "repeatDur", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -7440,7 +7482,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "repeatCount", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -7464,7 +7506,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "restartDefault", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -7502,7 +7544,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "restart", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -7670,7 +7712,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "keyTimes", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -7681,7 +7723,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "keySplines", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -8216,7 +8258,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "accelerate", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -8227,7 +8269,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "decelerate", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -8238,7 +8280,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "autoReverse", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -11243,7 +11285,7 @@ namespace OdfKit.Compliance
                 }),
                 new OdfSchemaPatternDefinition("dc-creator", new[]
                 {
-                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "", "", "", "", "",
+                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "http://purl.org/dc/elements/1.1/", "creator", "", "", "",
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
@@ -11252,7 +11294,7 @@ namespace OdfKit.Compliance
                 }),
                 new OdfSchemaPatternDefinition("dc-date", new[]
                 {
-                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "", "", "", "", "",
+                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "http://purl.org/dc/elements/1.1/", "date", "", "", "",
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
@@ -18907,7 +18949,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "http://www.w3.org/2003/g/data-view#", "transformation", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -19176,19 +19218,19 @@ namespace OdfKit.Compliance
                                 {
                                     new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Ref, "exactlyOne", "", "", "string", "", ""),
                                 }),
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "http://purl.org/dc/elements/1.1/", "title", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
                                     new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Ref, "exactlyOne", "", "", "string", "", ""),
                                 }),
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "http://purl.org/dc/elements/1.1/", "description", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
                                     new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Ref, "exactlyOne", "", "", "string", "", ""),
                                 }),
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "http://purl.org/dc/elements/1.1/", "subject", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -19392,7 +19434,7 @@ namespace OdfKit.Compliance
                                                 }),
                                         }),
                                 }),
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "http://purl.org/dc/elements/1.1/", "language", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -25285,7 +25327,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "type", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -25296,7 +25338,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "subtype", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -25307,7 +25349,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "direction", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -25332,7 +25374,7 @@ namespace OdfKit.Compliance
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
-                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "fadeColor", "", "", "",
                                         Array.Empty<OdfSchemaNameClass>(),
                                         new[]
                                         {
@@ -43428,7 +43470,7 @@ namespace OdfKit.Compliance
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {
-                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "", "", "", "", "",
+                            new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Attribute, "optional", "http://www.w3.org/2002/xforms", "bind", "", "", "",
                                 Array.Empty<OdfSchemaNameClass>(),
                                 new[]
                                 {
@@ -43438,7 +43480,7 @@ namespace OdfKit.Compliance
                 }),
                 new OdfSchemaPatternDefinition("xforms-model", new[]
                 {
-                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "", "", "", "", "",
+                    new OdfSchemaPatternNode(OdfSchemaPatternNodeKind.Element, "exactlyOne", "http://www.w3.org/2002/xforms", "model", "", "", "",
                         Array.Empty<OdfSchemaNameClass>(),
                         new[]
                         {

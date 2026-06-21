@@ -95,8 +95,12 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     /// </summary>
     public string Id
     {
-        get => Node.GetAttribute("id", OdfNamespaces.Draw) ?? string.Empty;
-        set => Node.SetAttribute("id", OdfNamespaces.Draw, value, "draw");
+        get => Node.GetAttribute("id", OdfNamespaces.Draw) ?? Node.GetAttribute("id", OdfNamespaces.Xml) ?? string.Empty;
+        set
+        {
+            Node.SetAttribute("id", OdfNamespaces.Draw, value, "draw");
+            Node.SetAttribute("id", OdfNamespaces.Xml, value, "xml");
+        }
     }
 
     /// <summary>
