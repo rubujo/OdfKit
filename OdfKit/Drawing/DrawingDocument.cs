@@ -294,7 +294,7 @@ public partial class DrawingDocument : OdfDocument
     /// </summary>
     /// <param name="sourceDoc">來源 ODF 文件</param>
     /// <param name="options">合併設定選項</param>
-    /// <param name="renameMap">樣式名稱重映射字典</param>
+    /// <param name="renameMap">樣式名稱變更的對照字典</param>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
         var srcDraw = sourceDoc as DrawingDocument ?? throw new ArgumentException("Source document must be a DrawingDocument.");

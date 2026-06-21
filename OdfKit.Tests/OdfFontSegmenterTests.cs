@@ -174,7 +174,7 @@ public class OdfFontSegmenterTests
     }
 
     /// <summary>
-    /// 驗證 GetSupplementaryPlaneFontName 是否將不需要進行超大型拆分映射的常規字型（如思源黑體、Noto Sans、微軟正黑體等）直接回傳原字型名稱。
+    /// 驗證 GetSupplementaryPlaneFontName 是否將不需要進行超大型拆分對照的常規字型（如思源黑體、Noto Sans、微軟正黑體等）直接回傳原字型名稱。
     /// </summary>
     [Fact]
     public void GetSupplementaryPlaneFontName_RegularFonts_ReturnsOriginalName()

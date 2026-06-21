@@ -1176,7 +1176,7 @@ namespace OdfKit.Tests
         }
 
         /// <summary>
-        /// 驗證當公式遍歷表格遇到極大的 rows-repeated 時，不會發生 OOM 且在合理時間內返回。
+        /// 驗證當公式遍歷表格遇到極大的 rows-repeated 時，不會發生 OOM 且在合理時間內傳回。
         /// </summary>
         [Fact]
         public void TraverseTable_LargeRowRepeatCount_DoesNotOOM()
@@ -1203,7 +1203,7 @@ namespace OdfKit.Tests
             var startTime = DateTime.UtcNow;
             var evaluator = new DefaultFormulaEvaluator();
 
-            // 建立 OdfDomEvaluationContext 時會呼叫 TraverseTable，驗證其是否在合理時間內返回
+            // 建立 OdfDomEvaluationContext 時會呼叫 TraverseTable，驗證其是否在合理時間內傳回
             var domContext = new OdfDomEvaluationContext(doc.ContentDom, evaluator);
 
             var elapsed = DateTime.UtcNow - startTime;

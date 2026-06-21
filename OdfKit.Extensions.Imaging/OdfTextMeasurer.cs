@@ -69,7 +69,7 @@ public static class OdfTextMeasurer
         if (string.IsNullOrEmpty(text))
             return OdfLength.FromCentimeters(0);
 
-        // 1. 字型替代映射
+        // 1. 字型替代對照
         string mappedFont = OdfFontResolver.MapFont(fontName);
         string? fontPath = OdfFontResolver.ResolveFontPath(mappedFont);
 

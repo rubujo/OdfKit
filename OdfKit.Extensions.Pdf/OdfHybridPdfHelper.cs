@@ -259,7 +259,7 @@ public static class OdfHybridPdfHelper
             // 載入至 XmlDocument
             var xmlDoc = new Xml.XmlDocument();
             var xmlSettings = new Xml.XmlReaderSettings { DtdProcessing = Xml.DtdProcessing.Prohibit, XmlResolver = null };
-            using (var reader = Xml.XmlReader.Create(new System.IO.StringReader(xmpText), xmlSettings))
+            using (var reader = Xml.XmlReader.Create(new StringReader(xmpText), xmlSettings))
             {
                 xmlDoc.Load(reader);
             }
@@ -297,7 +297,7 @@ public static class OdfHybridPdfHelper
                     </pdfaExtension:schemas>";
 
                 var tempDoc = new Xml.XmlDocument();
-                using (var reader = Xml.XmlReader.Create(new System.IO.StringReader(schemaSnippet), xmlSettings))
+                using (var reader = Xml.XmlReader.Create(new StringReader(schemaSnippet), xmlSettings))
                 {
                     tempDoc.Load(reader);
                 }

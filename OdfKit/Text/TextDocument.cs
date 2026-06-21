@@ -226,7 +226,7 @@ public partial class TextDocument : OdfDocument
     /// </summary>
     /// <param name="sourceDoc">來源 OdfDocument 文件</param>
     /// <param name="options">合併設定選項</param>
-    /// <param name="renameMap">變更樣式名稱的映射字典</param>
+    /// <param name="renameMap">變更樣式名稱的對照字典</param>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
         => TextDocumentContentMergeEngine.MergeContentNodes(CoreCollaborators, sourceDoc, renameMap);
 

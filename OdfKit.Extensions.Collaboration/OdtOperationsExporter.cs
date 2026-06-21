@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Text;
@@ -17,6 +18,7 @@ public static class OdtOperationsExporter
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = false,
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
     };
 
     /// <summary>

@@ -62,7 +62,7 @@ public class OdfValidatorApiTests
     }
 
     /// <summary>
-    /// 驗證補充的扁平 XML ODF 副檔名會映射到正確文件種類。
+    /// 驗證補充的扁平 XML ODF 副檔名會對應到正確文件種類。
     /// </summary>
     [Theory]
     [InlineData(OdfDocumentKind.FlatChart, "chart.fodc")]

@@ -146,7 +146,7 @@ public static class OdfFontSegmenter
             };
         }
 
-        // 5. 支援 Windows 系統字型 MingLiU (細明體) / PMingLiU (新細明體) 映射
+        // 5. 支援 Windows 系統字型 MingLiU (細明體) / PMingLiU (新細明體) 對照
         if (baseFontFamily.Contains("MingLiU", StringComparison.OrdinalIgnoreCase) ||
             baseFontFamily.Contains("細明", StringComparison.OrdinalIgnoreCase))
         {
@@ -160,7 +160,7 @@ public static class OdfFontSegmenter
             };
         }
 
-        // 6. 支援 Windows 系統字型 SimSun (中易宋體) / NSimSun 映射
+        // 6. 支援 Windows 系統字型 SimSun (中易宋體) / NSimSun 對照
         if (baseFontFamily.Contains("SimSun", StringComparison.OrdinalIgnoreCase) ||
             baseFontFamily.Contains("宋体", StringComparison.OrdinalIgnoreCase))
         {
@@ -172,7 +172,7 @@ public static class OdfFontSegmenter
             };
         }
 
-        // 其餘常規字型（如思源黑體、Noto Sans、微軟正黑體等）不進行任何拆分字型映射，直接返回原字型
+        // 其餘常規字型（如思源黑體、Noto Sans、微軟正黑體等）不進行任何拆分字型對照，直接傳回原字型
         return baseFontFamily;
     }
 }

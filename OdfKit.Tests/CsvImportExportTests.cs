@@ -77,7 +77,7 @@ public class CsvImportExportTests
     }
 
     /// <summary>
-    /// 驗證當 ODS 含有極大的 row 或 column 重複次數時， CSV 匯出器不會發生 OOM 且能在合理時間內返回。
+    /// 驗證當 ODS 含有極大的 row 或 column 重複次數時， CSV 匯出器不會發生 OOM 且能在合理時間內傳回。
     /// </summary>
     [Fact]
     public void ScanCellValues_LargeRepeatCount_DoesNotOOM()
@@ -103,7 +103,7 @@ public class CsvImportExportTests
         using var ms = new MemoryStream();
         var startTime = DateTime.UtcNow;
 
-        // 執行匯出，驗證是否能在合理時間（例如 10 秒）內返回，且不發生 OutOfMemoryException
+        // 執行匯出，驗證是否能在合理時間（例如 10 秒）內傳回，且不發生 OutOfMemoryException
         OdfCsvExporter.ExportToStream(workbook, ms);
 
         var elapsed = DateTime.UtcNow - startTime;

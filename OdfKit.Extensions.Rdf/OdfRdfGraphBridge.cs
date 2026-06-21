@@ -13,7 +13,7 @@ public static class OdfRdfGraphBridge
     /// 將 OdfKit RDF metadata 轉換為 dotNetRDF 圖形。
     /// </summary>
     /// <param name="metadata">來源 RDF metadata。</param>
-    /// <param name="baseUri">選用的封裝基底 URI；空白主詞會映射至此 URI。</param>
+    /// <param name="baseUri">選用的封裝基底 URI；空白主詞會對應至此 URI。</param>
     /// <returns>包含全部 triples 的圖形。</returns>
     /// <exception cref="ArgumentNullException">當 <paramref name="metadata"/> 為 <see langword="null"/> 時擲出。</exception>
     public static IGraph ToGraph(OdfRdfMetadata metadata, Uri? baseUri = null)

@@ -80,7 +80,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
-    /// 註冊字型替代對照規則（例如在無微軟字型之 Linux/Docker 上將 "MS YaHei" 映射至 "Noto Sans CJK TC"）。
+    /// 註冊字型替代對照規則（例如在無微軟字型之 Linux/Docker 上將 "MS YaHei" 對照至 "Noto Sans CJK TC"）。
     /// </summary>
     /// <param name="targetFont">要替代的目標字型名稱。</param>
     /// <param name="replacementFont">用來替代的字型名稱。</param>

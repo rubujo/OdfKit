@@ -339,6 +339,8 @@ public class LibreOfficeInteropTests
 
         string[] wellKnownCandidates =
         [
+            @"D:\Portable\PotableAppsPlatform\PortableApps\LibreOfficePortable\App\libreoffice\program\soffice.com",
+            @"D:\Portable\PotableAppsPlatform\PortableApps\LibreOfficePortable\App\libreoffice\program\soffice.exe",
             @"C:\Program Files\LibreOffice\program\soffice.com",
             @"C:\Program Files\LibreOffice\program\soffice.exe",
             @"C:\Program Files (x86)\LibreOffice\program\soffice.com",
@@ -458,5 +460,219 @@ public class LibreOfficeInteropTests
         string output = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
         Assert.True(process.ExitCode == 0, $"LibreOffice 轉換失敗，輸出：{output}");
         Assert.DoesNotContain("Error", output, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// 驗證官方範例 Sample.cs 可成功編譯執行，且其產生的 ODT、ODS、ODP 檔案可由 LibreOffice 完美載入與相容。
+    /// </summary>
+    [Fact]
+    public void LibreOffice26Headless_LoadsSampleGeneratedDocuments()
+    {
+        string? sofficePath = FindLibreOffice26Soffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過範例文件實機互通性測試。");
+        }
+
+        string slnRoot = FindSolutionRoot();
+        string sampleOutput = Path.Combine(slnRoot, "samples", "output");
+
+        // 1. 執行 dotnet run samples/Sample.cs
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = "dotnet",
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            WorkingDirectory = slnRoot
+        };
+        startInfo.ArgumentList.Add("run");
+        startInfo.ArgumentList.Add("samples/Sample.cs");
+
+        using (var process = Process.Start(startInfo) ?? throw new InvalidOperationException("無法啟動 dotnet run。"))
+        {
+            Assert.True(process.WaitForExit(90_000), "執行範例程式 Sample.cs 逾時。");
+            string runOutput = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
+            Assert.True(process.ExitCode == 0, $"執行範例程式 Sample.cs 失敗，輸出：{runOutput}");
+        }
+
+        // 2. 驗證預期產出的 ODF 檔案存在
+        string[] generatedFiles =
+        [
+            "output_text.odt",
+            "output_spreadsheet.ods",
+            "output_presentation.odp",
+            "output_stream.ods",
+            "output_stream.odt"
+        ];
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitSampleInterop_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            foreach (var fileName in generatedFiles)
+            {
+                string filePath = Path.Combine(sampleOutput, fileName);
+                Assert.True(File.Exists(filePath), $"範例產出檔案不存在：{filePath}");
+
+                // 3. 呼叫 LibreOffice 實機載入並轉為 PDF 以驗證相容性
+                RunSoffice(sofficePath!, userInstallationDir, outputDir, "pdf", filePath);
+                string pdfName = Path.GetFileNameWithoutExtension(fileName) + ".pdf";
+                string pdfPath = Path.Combine(outputDir, pdfName);
+                Assert.True(File.Exists(pdfPath), $"LibreOffice 應能成功將範例檔案 {fileName} 轉為 PDF。");
+            }
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證由 OdtStreamWriter 與 OdsStreamWriter 流式寫入產生的文件可由 LibreOffice 完美載入與相容。
+    /// </summary>
+    [Fact]
+    public void LibreOffice26Headless_LoadsStreamWriterGeneratedDocuments()
+    {
+        string? sofficePath = FindLibreOffice26Soffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過流式寫入文件實機互通性測試。");
+        }
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitStreamWriterInterop_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            // 1. 流式寫入 ODT
+            string odtPath = Path.Combine(tempRoot, "stream-text.odt");
+            using (var fs = new FileStream(odtPath, FileMode.Create, FileAccess.Write))
+            using (var writer = new OdtStreamWriter(fs))
+            {
+                writer.AddHeading("流式文字文件", 1);
+                writer.AddParagraph("這是一個使用 OdtStreamWriter 產生的流式文件。");
+            }
+
+            // 2. 流式寫入 ODS
+            string odsPath = Path.Combine(tempRoot, "stream-sheet.ods");
+            using (var fs = new FileStream(odsPath, FileMode.Create, FileAccess.Write))
+            using (var writer = new OdsStreamWriter(fs))
+            {
+                writer.WriteStartSheet("Sheet1");
+                writer.WriteStartRow();
+                writer.WriteCell("欄位一");
+                writer.WriteCell(123.45d);
+                writer.WriteEndRow();
+                writer.WriteEndSheet();
+            }
+
+            // 3. 呼叫 LibreOffice 實機驗證 ODT
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "pdf", odtPath);
+            Assert.True(File.Exists(Path.Combine(outputDir, "stream-text.pdf")), "LibreOffice 應能成功將流式 ODT 轉為 PDF。");
+
+            // 4. 呼叫 LibreOffice 實機驗證 ODS
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "pdf", odsPath);
+            Assert.True(File.Exists(Path.Combine(outputDir, "stream-sheet.pdf")), "LibreOffice 應能成功將流式 ODS 轉為 PDF。");
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證 CJK 增補平面與自造字罕見字寫入文件後，其 LibreOffice 實機開檔與轉檔內容的字元保真度。
+    /// </summary>
+    [Fact]
+    public void LibreOffice26Headless_LoadsSupplementaryPlaneFontDocument()
+    {
+        string? sofficePath = FindLibreOffice26Soffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過罕見字實機字元保真度測試。");
+        }
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitRareCharInterop_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            using var doc = TextDocument.Create();
+            var p = doc.Body.Paragraphs.Add();
+            p.AddTextRun("罕見字字型對照保真度測試：吉、𠮷、𠜎、𿿽。");
+
+            string odtPath = Path.Combine(tempRoot, "rare-chars.odt");
+            doc.Save(odtPath);
+
+            // 呼叫 LibreOffice 轉為純文字，強制以 UTF-8 輸出以防止罕見字遺失或轉為問號
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt:Text (encoded):UTF8", odtPath);
+            string txtPath = Path.Combine(outputDir, "rare-chars.txt");
+            Assert.True(File.Exists(txtPath), "LibreOffice 應成功轉換為文字檔案。");
+
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            string txt;
+            using (var stream = File.OpenRead(txtPath))
+            {
+                try
+                {
+                    var utf8Throw = System.Text.Encoding.GetEncoding("utf-8", System.Text.EncoderFallback.ExceptionFallback, System.Text.DecoderFallback.ExceptionFallback);
+                    using (var reader = new StreamReader(stream, utf8Throw, detectEncodingFromByteOrderMarks: true, bufferSize: 1024, leaveOpen: true))
+                    {
+                        txt = reader.ReadToEnd();
+                    }
+                }
+                catch (DecoderFallbackException)
+                {
+                    stream.Position = 0;
+                    // 若發生解碼失敗，退回至標準容錯 UTF-8 讀取（無效字元會解碼為 replacement character，但罕見字能被保留）
+                    using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
+                    {
+                        txt = reader.ReadToEnd();
+                    }
+                }
+            }
+
+            Assert.Contains("𠮷", txt);
+            Assert.Contains("𠜎", txt);
+            Assert.Contains("𿿽", txt);
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    private static string FindSolutionRoot()
+    {
+        string dir = AppDomain.CurrentDomain.BaseDirectory;
+        while (!string.IsNullOrEmpty(dir))
+        {
+            if (File.Exists(Path.Combine(dir, "OdfKit.slnx")) || Directory.Exists(Path.Combine(dir, "samples")))
+            {
+                return dir;
+            }
+            dir = Path.GetDirectoryName(dir)!;
+        }
+        throw new DirectoryNotFoundException("找不到專案方案根目錄。");
     }
 }

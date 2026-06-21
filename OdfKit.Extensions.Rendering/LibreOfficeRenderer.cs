@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -452,7 +453,7 @@ public class LibreOfficeRenderer
             }
         }
 #else
-        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             string[] paths = [
                 @"C:\Program Files\LibreOffice\program\soffice.com",
@@ -465,12 +466,12 @@ public class LibreOfficeRenderer
                 if (File.Exists(path)) return path;
             }
         }
-        else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             var path = "/Applications/LibreOffice.app/Contents/MacOS/soffice";
             if (File.Exists(path)) return path;
         }
-        else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             string[] paths = [
                 "/usr/bin/soffice",
@@ -656,7 +657,7 @@ public class LibreOfficeRenderer
                 }
                 else
                 {
-                    System.Threading.Thread.Sleep(100);
+                    Thread.Sleep(100);
                 }
             }
         }

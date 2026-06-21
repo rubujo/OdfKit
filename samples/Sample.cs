@@ -1,6 +1,10 @@
 #:project ../OdfKit/OdfKit.csproj
 #:project ../OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj
 #:project ../OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj
+#:project ../OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj
+#:project ../OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj
+#:project ../OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj
+#:project ../OdfKit.Extensions.Imaging/OdfKit.Extensions.Imaging.csproj
 
 using System;
 using System.IO;
@@ -14,6 +18,10 @@ using OdfKit.Spreadsheet;
 using OdfKit.Presentation;
 using OdfKit.Styles;
 using OdfKit.Export;
+using OdfKit.Csv;
+using OdfKit.Conversion;
+using OdfKit.Collaboration;
+using OdfKit.Extensions.Rdf;
 
 // =====================================================================
 // OdfKit .NET 10.0 全功能單檔 Script 示範程式碼
@@ -97,6 +105,10 @@ static void DemoTextDocument(string outputDir)
     
     p1.AddTextRun(" 這是粗體字色為藍色的文字。 ").WithBold().WithColor("#3498DB");
     p1.AddTextRun(" 這是斜體字色為紅色的文字。 ").WithItalic().WithColor("#E74C3C");
+
+    // 示範 CJK 增補平面與自造字字型分段對照
+    OdfParagraph pCjk = document.Body.Paragraphs.Add();
+    pCjk.AddTextRun(" 罕見字字型對照展示：吉 (常規字) 、 𠮷 (CJK Ext-B) 、 𠜎 (CJK Ext-B) 與 PUA 區域自造字 𿿽 。 ").WithBold();
 
     // 新增有序清單
     OdfList list = document.Body.Lists.Add();
@@ -219,8 +231,18 @@ static void DemoSpreadsheetDocument(string outputDir)
     }
 
     // 自動調整 A 欄與 B 欄的欄寬
-    sheet.Columns[0].AutoFit();
     sheet.Columns[1].AutoFit();
+
+    // 7. 新增嵌入圖表 (Chart) 展示
+    var chartDef = new OdfChartDefinition
+    {
+        ChartType = OdfChartType.Bar,
+        Title = "每月銷售額柱狀圖",
+        DataRange = new OdfCellRange(0, 0, 4, 1, "銷售數據"), // A1:B5
+        HasLegend = true
+    };
+    // 錨定在 D1
+    workbook.AddChart("銷售數據", new OdfCellAddress(0, 3, "銷售數據"), chartDef);
 
     // 6. 設定第二個工作表示範
     OdfTableSheet metaSheet = workbook.Worksheets.Add("說明頁面");
@@ -449,13 +471,9 @@ static void DemoMetadataAndSecurity(string outputDir)
     }
 }
 
-/// <summary>
-/// 示範 OdfKit 擴充套件的高階匯出功能，將 ODT 文件直接匯出為 PDF 檔案以及 HTML 網頁。
-/// </summary>
-/// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoExtensions(string outputDir)
 {
-    Console.WriteLine(" 6. 正在執行 PDF 與 HTML 轉換匯出展示 ⋯⋯");
+    Console.WriteLine(" 6. 正在執行 PDF、HTML、CSV、OOXML、協同編輯、RDF 與影像渲染等轉換匯出展示 ⋯⋯");
 
     // 建立臨時文字文件做為轉換來源
     using var tempDoc = TextDocument.Create();
@@ -479,6 +497,76 @@ static void DemoExtensions(string outputDir)
     string htmlContent = OdfHtmlExporter.Export(tempDoc);
     File.WriteAllText(htmlPath, htmlContent, System.Text.Encoding.UTF8);
     Console.WriteLine($"   已成功將 ODT 匯出至 HTML 網頁： {htmlPath} ");
+
+    // 1. 建立臨時試算表以供轉換與影像渲染示範
+    using var tempWorkbook = SpreadsheetDocument.Create();
+    var tempSheet = tempWorkbook.Worksheets.Add("Sheet1");
+    tempSheet.Cells["A1"].CellValue = "姓名";
+    tempSheet.Cells["B1"].CellValue = "成績";
+    tempSheet.Cells["A2"].CellValue = "張小明";
+    tempSheet.Cells["B2"].CellValue = 95d;
+    tempSheet.Cells["A3"].CellValue = "李小華";
+    tempSheet.Cells["B3"].CellValue = 88d;
+
+    // 2. 匯出成 CSV (使用核心庫 OdfCsvExporter)
+    string csvPath = Path.Combine(outputDir, "output_csv.csv");
+    OdfCsvExporter.ExportToFile(tempWorkbook, csvPath);
+    Console.WriteLine($"   已成功將 ODS 匯出至 CSV 檔案： {csvPath} ");
+
+    // 3. ODF 轉 OOXML 雙向互轉展示 (Ooxml.Extensions)
+    string docxPath = Path.Combine(outputDir, "output_docx.docx");
+    using (var docxStream = new FileStream(docxPath, FileMode.Create, FileAccess.ReadWrite))
+    {
+        OdfToDocxConverter.Convert(tempDoc, docxStream);
+    }
+    Console.WriteLine($"   已成功將 ODT 轉換為 Word DOCX： {docxPath} ");
+
+    string xlsxPath = Path.Combine(outputDir, "output_xlsx.xlsx");
+    using (var xlsxStream = new FileStream(xlsxPath, FileMode.Create, FileAccess.ReadWrite))
+    {
+        OdfToXlsxConverter.Convert(tempWorkbook, xlsxStream);
+    }
+    Console.WriteLine($"   已成功將 ODS 轉換為 Excel XLSX： {xlsxPath} ");
+
+    // 4. 協同編輯 (Collaboration) JSON 操作軌跡匯出與匯入
+    string opsJson = OdtOperationsExporter.ExportToJson(tempDoc);
+    Console.WriteLine($"   已成功將 ODT 本文內容匯出為協同編輯操作 JSON。長度： {opsJson.Length} 字元。");
+    using var importedDoc = OdtOperationsImporter.Merge(opsJson);
+    string importedOdtPath = Path.Combine(outputDir, "output_collaboration_imported.odt");
+    importedDoc.Save(importedOdtPath);
+    Console.WriteLine($"   已成功將操作 JSON 重新讀入並儲存為 ODT 檔案： {importedOdtPath} ");
+
+    // 5. RDF 語意中介資料注入與 SPARQL 查詢
+    string docUri = "http://example.org/documents/demo";
+    tempDoc.Package.RdfMetadata.AddTriple(docUri, "http://purl.org/dc/terms/title", "OdfKit RDF Demo Document", isLiteral: true);
+    tempDoc.Package.RdfMetadata.AddTriple(docUri, "http://purl.org/dc/terms/creator", "http://example.org/creator/antigravity", isLiteral: false);
+
+    string sparqlQuery = @"
+        SELECT ?p ?o
+        WHERE {
+            <http://example.org/documents/demo> ?p ?o .
+        }";
+    var resultSet = tempDoc.Package.RdfMetadata.SelectSparql(sparqlQuery);
+    Console.WriteLine($"   [RDF SPARQL 查詢結果] 共有 {resultSet.Count} 筆符合條件：");
+    foreach (var resultRow in resultSet.Results)
+    {
+        Console.WriteLine($"     - Predicate: {resultRow["p"]} | Object: {resultRow["o"]}");
+    }
+
+    // 6. Skia 影像渲染匯出為 PNG
+    string pngPath = Path.Combine(outputDir, "output_sheet_rendering.png");
+    using (var pngStream = new FileStream(pngPath, FileMode.Create, FileAccess.Write))
+    {
+        var imgOptions = new OdfImageExportOptions
+        {
+            ColumnCount = 2,
+            RowCount = 3,
+            CellWidthPx = 100,
+            CellHeightPx = 30
+        };
+        OdfImageExporter.ExportToPng(tempSheet, pngStream, imgOptions);
+    }
+    Console.WriteLine($"   已成功將 ODS 工作表格線渲染匯出為 PNG 圖片： {pngPath} ");
 }
 
 /// <summary>
@@ -488,7 +576,7 @@ static void DemoExtensions(string outputDir)
 static byte[] CreatePngBytes()
 {
     return Convert.FromBase64String(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==");
 }
 
 /// <summary>

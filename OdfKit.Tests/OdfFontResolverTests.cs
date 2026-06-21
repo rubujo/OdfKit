@@ -10,7 +10,7 @@ namespace OdfKit.Tests;
 public class OdfFontResolverTests
 {
     /// <summary>
-    /// 驗證字型替換對照規則的註冊與解析映射是否正確。
+    /// 驗證字型替換對照規則的註冊與解析對照是否正確。
     /// </summary>
     [Fact]
     public void RegisterFallback_And_MapFont_ResolvesCorrectly()
@@ -20,11 +20,11 @@ public class OdfFontResolverTests
         string replacement = "Noto Sans CJK TC";
         OdfFontResolver.RegisterFallback(target, replacement);
 
-        // 2. 驗證已註冊字型的替代映射
+        // 2. 驗證已註冊字型的替代對照
         string mapped = OdfFontResolver.MapFont(target);
         Assert.Equal(replacement, mapped);
 
-        // 3. 驗證未註冊字型映射應回傳原字型名稱
+        // 3. 驗證未註冊字型對照應回傳原字型名稱
         string unregistered = "Unregistered Font Family";
         string original = OdfFontResolver.MapFont(unregistered);
         Assert.Equal(unregistered, original);

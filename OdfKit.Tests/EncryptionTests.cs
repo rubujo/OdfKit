@@ -366,7 +366,7 @@ namespace OdfKit.Tests
         }
 
         /// <summary>
-        /// 測試當使用已知且支援的 SHA-256 雜湊類型時， <see cref="OdfEncryption.ComputeHash"/> 是否能正確返回 32 位元組的雜湊值。
+        /// 測試當使用已知且支援的 SHA-256 雜湊類型時， <see cref="OdfEncryption.ComputeHash"/> 是否能正確傳回 32 位元組的雜湊值。
         /// </summary>
         /// <param name="checksumType">總和檢查碼類型名稱或 URI</param>
         [Theory]
@@ -485,7 +485,7 @@ namespace OdfKit.Tests
         }
 
         /// <summary>
-        /// 測試 <see cref="OdfOpenPgpCryptographyProvider.CanHandle"/> 在傳入 OpenPGP 加密演算法名稱時，是否正確返回 <see langword="true"/> 。
+        /// 測試 <see cref="OdfOpenPgpCryptographyProvider.CanHandle"/> 在傳入 OpenPGP 加密演算法名稱時，是否正確傳回 <see langword="true"/> 。
         /// </summary>
         [Fact]
         public void OdfOpenPgpCryptographyProvider_CanHandle_ReturnsTrueForOpenPgpEntry()
@@ -499,7 +499,7 @@ namespace OdfKit.Tests
         }
 
         /// <summary>
-        /// 測試 <see cref="OdfOpenPgpCryptographyProvider.CanHandle"/> 在加密金鑰清單不為空時，是否正確返回 <see langword="true"/> 。
+        /// 測試 <see cref="OdfOpenPgpCryptographyProvider.CanHandle"/> 在加密金鑰清單不為空時，是否正確傳回 <see langword="true"/> 。
         /// </summary>
         [Fact]
         public void OdfOpenPgpCryptographyProvider_CanHandle_ReturnsTrueWhenEncryptedKeysExist()

@@ -283,7 +283,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// </summary>
     /// <param name="sourceDoc">來源 ODF 文件</param>
     /// <param name="options">合併設定選項</param>
-    /// <param name="renameMap">樣式名稱重映射字典</param>
+    /// <param name="renameMap">樣式名稱變更的對照字典</param>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
         var srcChart = sourceDoc as OdfChartDocument ?? throw new ArgumentException("Source document must be a OdfChartDocument.");

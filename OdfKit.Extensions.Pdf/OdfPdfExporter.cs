@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
@@ -59,11 +60,11 @@ public static class OdfPdfExporter
         // 依作業系統決定預設的中文字型名稱，以防止中文在導出 PDF 時因為 Arial 字型不支援而顯示為方塊字
         // 在 Windows 平台上使用標楷體 (DFKai-SB)，因為它是標準 .ttf 檔，能避開 PDFsharp 無法直接解析 .ttc (如微軟正黑體) 的 NullReferenceException 限制
         string defaultChineseFont = "DFKai-SB";
-        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             defaultChineseFont = "PingFang TC";
         }
-        else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             defaultChineseFont = "Noto Sans CJK TC";
         }

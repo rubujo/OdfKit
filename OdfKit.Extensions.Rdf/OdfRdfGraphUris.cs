@@ -6,7 +6,7 @@
 public static class OdfRdfGraphUris
 {
     /// <summary>
-    /// 預設封裝基底 URI；空白文件主詞會映射至此 URI。
+    /// 預設封裝基底 URI；空白文件主詞會對應至此 URI。
     /// </summary>
     public static Uri DefaultPackageBaseUri { get; } = new("urn:odfkit:odf-package:/");
 
