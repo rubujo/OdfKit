@@ -48,7 +48,7 @@ internal static class OdfEmbeddedDocumentFactory
         RegisterPackageOnly<OdfImageDocument>(package => new OdfImageDocument(package), "application/vnd.oasis.opendocument.image");
         RegisterPackageOnly<FlatImageDocument>(package => new FlatImageDocument(package), "application/vnd.oasis.opendocument.image");
 
-        RegisterPackageOnly<OdfDatabaseDocument>(package => new OdfDatabaseDocument(package), "application/vnd.oasis.opendocument.database");
+        RegisterPackageOnly<OdfDatabaseDocument>(package => new OdfDatabaseDocument(package), "application/vnd.oasis.opendocument.base");
 
         EmbeddedMimeTypes[typeof(OdfChartDocument)] = "application/vnd.oasis.opendocument.chart";
         EmbeddedMimeTypes[typeof(ChartDocument)] = "application/vnd.oasis.opendocument.chart";

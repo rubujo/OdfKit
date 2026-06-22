@@ -24,7 +24,10 @@ public partial class OdfDatabaseDocument : OdfDocument
     {
         if (string.IsNullOrEmpty(package.MimeType))
         {
-            package.SetMimeType("application/vnd.oasis.opendocument.database");
+            // 真實 LibreOffice 對 ODF 資料庫文件採用的正式 OASIS 註冊 MIME 媒體類型為
+            // application/vnd.oasis.opendocument.base（而非字面上看起來更直覺的 .database），
+            // 寫入錯誤的媒體類型會導致 LibreOffice 的封裝偵測篩選器拒絕載入檔案。
+            package.SetMimeType("application/vnd.oasis.opendocument.base");
         }
     }
 

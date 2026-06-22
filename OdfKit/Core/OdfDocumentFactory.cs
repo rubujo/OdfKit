@@ -343,7 +343,7 @@ public static class OdfDocumentFactory
             OdfDocumentKind.FormulaTemplate => "application/vnd.oasis.opendocument.formula-template",
             OdfDocumentKind.Image => "application/vnd.oasis.opendocument.image",
             OdfDocumentKind.ImageTemplate => "application/vnd.oasis.opendocument.image-template",
-            OdfDocumentKind.Database => "application/vnd.oasis.opendocument.database",
+            OdfDocumentKind.Database => "application/vnd.oasis.opendocument.base",
             OdfDocumentKind.TextWeb => "application/vnd.oasis.opendocument.text-web",
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")
         };

@@ -288,7 +288,7 @@ public class DocumentKindApiUsabilityTests
         using OdfDatabaseDocument loaded = RoundTrip(database, "database.odb", OdfDatabaseDocument.Load);
         OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "database.odb");
 
-        Assert.Equal("application/vnd.oasis.opendocument.database", loaded.Package.MimeType);
+        Assert.Equal("application/vnd.oasis.opendocument.base", loaded.Package.MimeType);
         Assert.True(report.IsValid, report.ToJson());
         Assert.Equal("sdbc:embedded:hsqldb", loaded.ConnectionHref);
         Assert.Equal(2, loaded.DataSourceSettings.Count);
