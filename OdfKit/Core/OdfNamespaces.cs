@@ -89,6 +89,15 @@ public static class OdfNamespaces
     /// <summary>MathML 命名空間 URI（<c>office:formula</c> 內嵌公式內容所使用的數學標記語言命名空間）</summary>
     public const string MathMl = "http://www.w3.org/1998/Math/MathML";
 
+    /// <summary>Dr3d 命名空間 URI（3D 繪圖物件，如 <c>dr3d:light</c>、<c>dr3d:scene</c>）</summary>
+    public const string Dr3d = "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0";
+
+    /// <summary>Database 命名空間 URI（ODB 資料庫文件結構描述）</summary>
+    public const string Database = "urn:oasis:names:tc:opendocument:xmlns:database:1.0";
+
+    /// <summary>Report 命名空間 URI（ODB 報表結構描述）</summary>
+    public const string Report = "urn:oasis:names:tc:opendocument:xmlns:report:1.0";
+
     /// <summary>
     /// 取得指定命名空間 URI 的標準前綴。
     /// </summary>
@@ -126,6 +135,9 @@ public static class OdfNamespaces
             Oooc => "oooc",
             MathMl => "math",
             Xml => "xml",
+            Dr3d => "dr3d",
+            Database => "db",
+            Report => "report",
             _ => string.Empty
         };
     }

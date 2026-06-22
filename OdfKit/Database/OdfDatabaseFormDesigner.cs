@@ -243,6 +243,314 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// 新增單選按鈕控制項（form:radio）。
+    /// </summary>
+    /// <param name="name">控制項名稱；同一群組內的單選按鈕應使用相同名稱。</param>
+    /// <param name="label">顯示的標籤文字。</param>
+    /// <param name="isSelected">預設選取狀態。</param>
+    /// <param name="x">X 軸座標位置。</param>
+    /// <param name="y">Y 軸座標位置。</param>
+    /// <param name="width">控制項寬度。</param>
+    /// <param name="height">控制項高度。</param>
+    /// <returns>代表新增的單選按鈕 OdfNode 節點。</returns>
+    public OdfNode AddRadioButton(
+        string name,
+        string label,
+        bool isSelected = false,
+        OdfLength? x = null,
+        OdfLength? y = null,
+        OdfLength? width = null,
+        OdfLength? height = null)
+    {
+        var id = $"control{_controlCounter++}";
+        var radioNode = OdfNodeFactory.CreateElement("radio", FormNamespace, "form");
+        radioNode.SetAttribute("name", FormNamespace, name, "form");
+        radioNode.SetAttribute("id", FormNamespace, id, "form");
+        radioNode.SetAttribute("label", FormNamespace, label, "form");
+        radioNode.SetAttribute("current-selected", FormNamespace, isSelected ? "true" : "false", "form");
+
+        _formNode.AppendChild(radioNode);
+        AddDrawControl(id, x, y, width, height);
+        return radioNode;
+    }
+
+    /// <summary>
+    /// 新增可編輯下拉組合方塊控制項（form:combobox）。
+    /// </summary>
+    /// <param name="name">控制項名稱。</param>
+    /// <param name="label">標籤文字。</param>
+    /// <param name="items">下拉選單的選項清單。</param>
+    /// <param name="x">X 軸座標位置。</param>
+    /// <param name="y">Y 軸座標位置。</param>
+    /// <param name="width">控制項寬度。</param>
+    /// <param name="height">控制項高度。</param>
+    /// <returns>代表新增的組合方塊 OdfNode 節點。</returns>
+    public OdfNode AddComboBox(
+        string name,
+        string label,
+        IEnumerable<string>? items = null,
+        OdfLength? x = null,
+        OdfLength? y = null,
+        OdfLength? width = null,
+        OdfLength? height = null)
+    {
+        var id = $"control{_controlCounter++}";
+        var comboNode = OdfNodeFactory.CreateElement("combobox", FormNamespace, "form");
+        comboNode.SetAttribute("name", FormNamespace, name, "form");
+        comboNode.SetAttribute("id", FormNamespace, id, "form");
+        AddLabelProperty(comboNode, label);
+
+        if (items is not null)
+        {
+            foreach (var item in items)
+            {
+                var option = OdfNodeFactory.CreateElement("item", FormNamespace, "form");
+                option.TextContent = item;
+                comboNode.AppendChild(option);
+            }
+        }
+
+        _formNode.AppendChild(comboNode);
+        AddDrawControl(id, x, y, width, height);
+        return comboNode;
+    }
+
+    /// <summary>
+    /// 新增數值輸入控制項（form:number）。
+    /// </summary>
+    /// <param name="name">控制項名稱。</param>
+    /// <param name="label">標籤文字。</param>
+    /// <param name="value">預設數值。</param>
+    /// <param name="x">X 軸座標位置。</param>
+    /// <param name="y">Y 軸座標位置。</param>
+    /// <param name="width">控制項寬度。</param>
+    /// <param name="height">控制項高度。</param>
+    /// <returns>代表新增的數值輸入 OdfNode 節點。</returns>
+    public OdfNode AddNumericField(
+        string name,
+        string label,
+        double? value = null,
+        OdfLength? x = null,
+        OdfLength? y = null,
+        OdfLength? width = null,
+        OdfLength? height = null)
+    {
+        var id = $"control{_controlCounter++}";
+        var numberNode = OdfNodeFactory.CreateElement("number", FormNamespace, "form");
+        numberNode.SetAttribute("name", FormNamespace, name, "form");
+        numberNode.SetAttribute("id", FormNamespace, id, "form");
+        if (value.HasValue)
+        {
+            string text = value.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            numberNode.SetAttribute("value", FormNamespace, text, "form");
+            numberNode.SetAttribute("current-value", FormNamespace, text, "form");
+        }
+
+        AddLabelProperty(numberNode, label);
+        _formNode.AppendChild(numberNode);
+        AddDrawControl(id, x, y, width, height);
+        return numberNode;
+    }
+
+    /// <summary>
+    /// 新增日期輸入控制項（form:date）。
+    /// </summary>
+    /// <param name="name">控制項名稱。</param>
+    /// <param name="label">標籤文字。</param>
+    /// <param name="value">預設日期。</param>
+    /// <param name="x">X 軸座標位置。</param>
+    /// <param name="y">Y 軸座標位置。</param>
+    /// <param name="width">控制項寬度。</param>
+    /// <param name="height">控制項高度。</param>
+    /// <returns>代表新增的日期輸入 OdfNode 節點。</returns>
+    public OdfNode AddDateField(
+        string name,
+        string label,
+        DateTime? value = null,
+        OdfLength? x = null,
+        OdfLength? y = null,
+        OdfLength? width = null,
+        OdfLength? height = null)
+    {
+        var id = $"control{_controlCounter++}";
+        var dateNode = OdfNodeFactory.CreateElement("date", FormNamespace, "form");
+        dateNode.SetAttribute("name", FormNamespace, name, "form");
+        dateNode.SetAttribute("id", FormNamespace, id, "form");
+        if (value.HasValue)
+        {
+            string text = value.Value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            dateNode.SetAttribute("value", FormNamespace, text, "form");
+            dateNode.SetAttribute("current-value", FormNamespace, text, "form");
+        }
+
+        AddLabelProperty(dateNode, label);
+        _formNode.AppendChild(dateNode);
+        AddDrawControl(id, x, y, width, height);
+        return dateNode;
+    }
+
+    /// <summary>
+    /// 新增時間輸入控制項（form:time）。
+    /// </summary>
+    /// <param name="name">控制項名稱。</param>
+    /// <param name="label">標籤文字。</param>
+    /// <param name="value">預設時間。</param>
+    /// <param name="x">X 軸座標位置。</param>
+    /// <param name="y">Y 軸座標位置。</param>
+    /// <param name="width">控制項寬度。</param>
+    /// <param name="height">控制項高度。</param>
+    /// <returns>代表新增的時間輸入 OdfNode 節點。</returns>
+    public OdfNode AddTimeField(
+        string name,
+        string label,
+        TimeSpan? value = null,
+        OdfLength? x = null,
+        OdfLength? y = null,
+        OdfLength? width = null,
+        OdfLength? height = null)
+    {
+        var id = $"control{_controlCounter++}";
+        var timeNode = OdfNodeFactory.CreateElement("time", FormNamespace, "form");
+        timeNode.SetAttribute("name", FormNamespace, name, "form");
+        timeNode.SetAttribute("id", FormNamespace, id, "form");
+        if (value.HasValue)
+        {
+            string text = value.Value.ToString("c", System.Globalization.CultureInfo.InvariantCulture);
+            timeNode.SetAttribute("value", FormNamespace, text, "form");
+            timeNode.SetAttribute("current-value", FormNamespace, text, "form");
+        }
+
+        AddLabelProperty(timeNode, label);
+        _formNode.AppendChild(timeNode);
+        AddDrawControl(id, x, y, width, height);
+        return timeNode;
+    }
+
+    /// <summary>
+    /// 為控制項繫結一個事件監聽器（<c>office:event-listeners</c>／<c>script:event-listener</c>）。
+    /// </summary>
+    /// <param name="controlNode">要繫結事件的控制項節點。</param>
+    /// <param name="eventName">事件名稱（例如 <c>form:approveaction</c>）。</param>
+    /// <param name="macroName">巨集名稱或位置。</param>
+    /// <param name="language">巨集語言，預設為 <c>ooo:script</c>。</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">當 <paramref name="eventName"/> 或 <paramref name="macroName"/> 為空白時擲出。</exception>
+    public void SetControlEvent(OdfNode controlNode, string eventName, string macroName, string language = "ooo:script")
+    {
+        if (controlNode is null)
+        {
+            throw new ArgumentNullException(nameof(controlNode));
+        }
+
+        if (string.IsNullOrWhiteSpace(eventName))
+        {
+            throw new ArgumentException("事件名稱不能為空。", nameof(eventName));
+        }
+
+        if (string.IsNullOrWhiteSpace(macroName))
+        {
+            throw new ArgumentException("巨集名稱不能為空。", nameof(macroName));
+        }
+
+        const string OfficeNs = "urn:oasis:names:tc:opendocument:xmlns:office:1.0";
+        const string ScriptNs = "urn:oasis:names:tc:opendocument:xmlns:script:1.0";
+
+        OdfNode listeners = FindOrCreateChild(controlNode, "event-listeners", OfficeNs, "office");
+        OdfNode? listener = null;
+        foreach (OdfNode child in listeners.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "event-listener" &&
+                child.NamespaceUri == ScriptNs &&
+                string.Equals(child.GetAttribute("event-name", ScriptNs), eventName, StringComparison.Ordinal))
+            {
+                listener = child;
+                break;
+            }
+        }
+
+        if (listener is null)
+        {
+            listener = OdfNodeFactory.CreateElement("event-listener", ScriptNs, "script");
+            listener.SetAttribute("event-name", ScriptNs, eventName, "script");
+            listeners.AppendChild(listener);
+        }
+
+        listener.SetAttribute("language", ScriptNs, language, "script");
+        listener.SetAttribute("macro-name", ScriptNs, macroName, "script");
+    }
+
+    /// <summary>
+    /// 設定控制項是否為必填（對應 <c>form:input-required</c>）。
+    /// </summary>
+    /// <param name="controlNode">控制項節點。</param>
+    /// <param name="required">是否必填。</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出。</exception>
+    public void SetControlRequired(OdfNode controlNode, bool required)
+    {
+        if (controlNode is null)
+        {
+            throw new ArgumentNullException(nameof(controlNode));
+        }
+
+        controlNode.SetAttribute("input-required", FormNamespace, required ? "true" : "false", "form");
+    }
+
+    /// <summary>
+    /// 設定控制項允許輸入的最大字元長度（對應 <c>form:max-length</c>）。
+    /// </summary>
+    /// <param name="controlNode">控制項節點。</param>
+    /// <param name="maxLength">最大字元長度；<c>0</c> 表示不限制。</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="maxLength"/> 為負數時擲出。</exception>
+    public void SetControlMaxLength(OdfNode controlNode, int maxLength)
+    {
+        if (controlNode is null)
+        {
+            throw new ArgumentNullException(nameof(controlNode));
+        }
+
+        if (maxLength < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxLength), "最大字元長度不能為負數。");
+        }
+
+        controlNode.SetAttribute("max-length", FormNamespace, maxLength.ToString(), "form");
+    }
+
+    /// <summary>
+    /// 新增群組框控制項（form:frame），用於以標題群組相關控制項。
+    /// </summary>
+    /// <param name="name">控制項名稱。</param>
+    /// <param name="label">群組框標題文字。</param>
+    /// <param name="x">X 軸座標位置。</param>
+    /// <param name="y">Y 軸座標位置。</param>
+    /// <param name="width">控制項寬度。</param>
+    /// <param name="height">控制項高度。</param>
+    /// <returns>代表新增的群組框 OdfNode 節點。</returns>
+    public OdfNode AddGroupBox(
+        string name,
+        string label,
+        OdfLength? x = null,
+        OdfLength? y = null,
+        OdfLength? width = null,
+        OdfLength? height = null)
+    {
+        var id = $"control{_controlCounter++}";
+        var frameNode = OdfNodeFactory.CreateElement("frame", FormNamespace, "form");
+        frameNode.SetAttribute("name", FormNamespace, name, "form");
+        frameNode.SetAttribute("id", FormNamespace, id, "form");
+        if (!string.IsNullOrWhiteSpace(label))
+        {
+            frameNode.SetAttribute("label", FormNamespace, label, "form");
+        }
+
+        _formNode.AppendChild(frameNode);
+        AddDrawControl(id, x, y, width, height);
+        return frameNode;
+    }
+
+    /// <summary>
     /// 定義報表結構，建立頁首、細節與群組首等區段。
     /// </summary>
     /// <param name="hasPageHeader">是否包含頁首區段。</param>
@@ -272,6 +580,23 @@ public sealed class OdfDatabaseFormDesigner
         {
             FindOrCreateChild(report, "detail", ReportNamespace, "report");
         }
+    }
+
+    private void AddLabelProperty(OdfNode controlNode, string? label)
+    {
+        if (string.IsNullOrEmpty(label))
+        {
+            return;
+        }
+
+        var props = OdfNodeFactory.CreateElement("properties", FormNamespace, "form");
+        controlNode.AppendChild(props);
+
+        var prop = OdfNodeFactory.CreateElement("property", FormNamespace, "form");
+        prop.SetAttribute("property-name", FormNamespace, "Label", "form");
+        prop.SetAttribute("value-type", OfficeNamespace, "string", "office");
+        prop.SetAttribute("string-value", FormNamespace, label!, "form");
+        props.AppendChild(prop);
     }
 
     private void AddDrawControl(string controlId, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)

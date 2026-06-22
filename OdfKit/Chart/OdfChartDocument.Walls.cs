@@ -33,6 +33,48 @@ public partial class OdfChartDocument
     public void SetFloorStyleName(string? styleName) =>
         SetPlotAreaPartStyleName("floor", styleName);
 
+    /// <summary>
+    /// 取得股票圖上漲標記（chart:stock-gain-marker）的樣式名稱。
+    /// </summary>
+    /// <returns>樣式名稱；若未設定則為 <see langword="null"/>。</returns>
+    public string? GetStockGainMarkerStyleName() =>
+        FindChildElement(FindOrCreatePlotArea(), "stock-gain-marker", OdfNamespaces.Chart)?.GetAttribute("style-name", OdfNamespaces.Chart);
+
+    /// <summary>
+    /// 設定股票圖上漲標記（chart:stock-gain-marker）的樣式名稱。
+    /// </summary>
+    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:stock-gain-marker 元素。</param>
+    public void SetStockGainMarkerStyleName(string? styleName) =>
+        SetPlotAreaPartStyleName("stock-gain-marker", styleName);
+
+    /// <summary>
+    /// 取得股票圖下跌標記（chart:stock-loss-marker）的樣式名稱。
+    /// </summary>
+    /// <returns>樣式名稱；若未設定則為 <see langword="null"/>。</returns>
+    public string? GetStockLossMarkerStyleName() =>
+        FindChildElement(FindOrCreatePlotArea(), "stock-loss-marker", OdfNamespaces.Chart)?.GetAttribute("style-name", OdfNamespaces.Chart);
+
+    /// <summary>
+    /// 設定股票圖下跌標記（chart:stock-loss-marker）的樣式名稱。
+    /// </summary>
+    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:stock-loss-marker 元素。</param>
+    public void SetStockLossMarkerStyleName(string? styleName) =>
+        SetPlotAreaPartStyleName("stock-loss-marker", styleName);
+
+    /// <summary>
+    /// 取得股票圖範圍線（chart:stock-range-line）的樣式名稱。
+    /// </summary>
+    /// <returns>樣式名稱；若未設定則為 <see langword="null"/>。</returns>
+    public string? GetStockRangeLineStyleName() =>
+        FindChildElement(FindOrCreatePlotArea(), "stock-range-line", OdfNamespaces.Chart)?.GetAttribute("style-name", OdfNamespaces.Chart);
+
+    /// <summary>
+    /// 設定股票圖範圍線（chart:stock-range-line）的樣式名稱。
+    /// </summary>
+    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:stock-range-line 元素。</param>
+    public void SetStockRangeLineStyleName(string? styleName) =>
+        SetPlotAreaPartStyleName("stock-range-line", styleName);
+
     private void SetPlotAreaPartStyleName(string localName, string? styleName)
     {
         OdfNode plotArea = FindOrCreatePlotArea();

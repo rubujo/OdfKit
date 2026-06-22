@@ -459,4 +459,134 @@ public class ChartHighLevelApiTests
         loaded.SetWallStyleName(null);
         Assert.Null(loaded.GetWallStyleName());
     }
+
+    /// <summary>
+    /// 驗證軸標籤格式相關樣式屬性（C-3）可往返。
+    /// </summary>
+    [Fact]
+    public void AxisLabelPositionStyle_RoundTripsAfterSaveAndLoad()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2));
+        chartDoc.SetAxisStyleName("y", "YAxisStyle");
+        OdfChartStyle style = chartDoc.CreateChartStyle("YAxisStyle");
+        style.LabelPosition = "outside-end";
+        style.LabelPositionNegative = "outside-start";
+        style.AxisLabelPosition = "near-axis";
+
+        using var stream = new MemoryStream();
+        chartDoc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfChartDocument loaded = OdfChartDocument.Load(stream);
+        OdfChartStyleInfo? info = loaded.TryGetChartStyle("YAxisStyle");
+        Assert.NotNull(info);
+
+        OdfChartStyle reopened = loaded.CreateChartStyle("YAxisStyle");
+        Assert.Equal("outside-end", reopened.LabelPosition);
+        Assert.Equal("outside-start", reopened.LabelPositionNegative);
+        Assert.Equal("near-axis", reopened.AxisLabelPosition);
+    }
+
+    /// <summary>
+    /// 驗證圖例對齊與圖例樣式（C-4）可往返。
+    /// </summary>
+    [Fact]
+    public void LegendAlignmentAndStyle_RoundTripsAfterSaveAndLoad()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2));
+        chartDoc.SetLegend("end");
+        chartDoc.LegendAlignment = "center";
+        chartDoc.LegendStyle.FillColor = "#EEEEEE";
+
+        using var stream = new MemoryStream();
+        chartDoc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfChartDocument loaded = OdfChartDocument.Load(stream);
+        Assert.Equal("center", loaded.LegendAlignment);
+        Assert.Equal("#EEEEEE", loaded.LegendStyle.FillColor);
+    }
+
+    /// <summary>
+    /// 驗證資料點樣式覆蓋（C-5）可新增、列舉並往返。
+    /// </summary>
+    [Fact]
+    public void SeriesDataPoints_RoundTripsAfterSaveAndLoad()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
+
+        OdfChartSeries series = chartDoc.GetSeriesEditor(0);
+        series.AddDataPoint(2, "PointStyleA");
+        series.AddDataPoint(1, "PointStyleB");
+
+        using var stream = new MemoryStream();
+        chartDoc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfChartDocument loaded = OdfChartDocument.Load(stream);
+        var points = loaded.GetSeriesEditor(0).GetDataPoints();
+        Assert.Equal(2, points.Count);
+        Assert.Equal(2, points[0].Repeated);
+        Assert.Equal("PointStyleA", points[0].StyleName);
+        Assert.Equal(1, points[1].Repeated);
+        Assert.Equal("PointStyleB", points[1].StyleName);
+
+        loaded.GetSeriesEditor(0).ClearDataPoints();
+        Assert.Empty(loaded.GetSeriesEditor(0).GetDataPoints());
+    }
+
+    /// <summary>
+    /// 驗證 3D 光源與投影／照明樣式設定（C-6）可往返。
+    /// </summary>
+    [Fact]
+    public void Lights_And_3DProjectionStyle_RoundTripsAfterSaveAndLoad()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2));
+        chartDoc.AddLight("(0 0 1)", "#FFFFFF", enabled: true, specular: false);
+        chartDoc.PlotAreaStyle.Projection = OdfDr3dProjection.Perspective;
+        chartDoc.PlotAreaStyle.LightingMode = true;
+
+        using var stream = new MemoryStream();
+        chartDoc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfChartDocument loaded = OdfChartDocument.Load(stream);
+        OdfChartLightInfo light = Assert.Single(loaded.GetLights());
+        Assert.Equal("(0 0 1)", light.Direction);
+        Assert.Equal("#FFFFFF", light.DiffuseColor);
+        Assert.True(light.Enabled);
+        Assert.False(light.Specular);
+
+        Assert.Equal(OdfDr3dProjection.Perspective, loaded.PlotAreaStyle.Projection);
+        Assert.True(loaded.PlotAreaStyle.LightingMode);
+
+        loaded.ClearLights();
+        Assert.Empty(loaded.GetLights());
+    }
+
+    /// <summary>
+    /// 驗證股票圖漲跌標記與範圍線樣式名稱（C-7）可往返。
+    /// </summary>
+    [Fact]
+    public void StockMarkerStyleNames_RoundTripAfterSaveAndLoad()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Stock", new OdfCellRange(0, 0, 4, 3));
+        chartDoc.SetStockGainMarkerStyleName("GainStyle");
+        chartDoc.SetStockLossMarkerStyleName("LossStyle");
+        chartDoc.SetStockRangeLineStyleName("RangeStyle");
+
+        using var stream = new MemoryStream();
+        chartDoc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfChartDocument loaded = OdfChartDocument.Load(stream);
+        Assert.Equal("GainStyle", loaded.GetStockGainMarkerStyleName());
+        Assert.Equal("LossStyle", loaded.GetStockLossMarkerStyleName());
+        Assert.Equal("RangeStyle", loaded.GetStockRangeLineStyleName());
+    }
 }

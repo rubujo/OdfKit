@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -96,6 +97,71 @@ public sealed class OdfChartSeries
                 _node.RemoveAttribute("attached-axis", OdfNamespaces.Chart);
             else
                 _node.SetAttribute("attached-axis", OdfNamespaces.Chart, value!, "chart");
+        }
+    }
+
+    /// <summary>
+    /// 取得此序列中所有資料點樣式覆蓋設定（<c>chart:data-point</c>）。
+    /// </summary>
+    /// <returns>資料點樣式覆蓋設定清單，依文件中出現順序排列。</returns>
+    public IReadOnlyList<OdfChartDataPointInfo> GetDataPoints()
+    {
+        List<OdfChartDataPointInfo> points = [];
+        foreach (OdfNode child in _node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "data-point" &&
+                child.NamespaceUri == OdfNamespaces.Chart)
+            {
+                string? repeatedAttr = child.GetAttribute("repeated", OdfNamespaces.Chart);
+                int repeated = int.TryParse(repeatedAttr, out int value) ? value : 1;
+                points.Add(new OdfChartDataPointInfo(repeated, child.GetAttribute("style-name", OdfNamespaces.Chart)));
+            }
+        }
+
+        return points;
+    }
+
+    /// <summary>
+    /// 新增一筆資料點樣式覆蓋設定（<c>chart:data-point</c>）。
+    /// </summary>
+    /// <param name="repeated">此筆設定套用的連續資料點數量，預設為 1。</param>
+    /// <param name="styleName">套用的樣式名稱；為 <see langword="null"/> 時不寫入樣式。</param>
+    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="repeated"/> 小於 1 時擲出。</exception>
+    public void AddDataPoint(int repeated = 1, string? styleName = null)
+    {
+        if (repeated < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(repeated), "重複次數必須至少為 1。");
+        }
+
+        OdfNode dataPoint = OdfNodeFactory.CreateElement("data-point", OdfNamespaces.Chart, "chart");
+        if (repeated > 1)
+        {
+            dataPoint.SetAttribute("repeated", OdfNamespaces.Chart, repeated.ToString(), "chart");
+        }
+
+        if (!string.IsNullOrWhiteSpace(styleName))
+        {
+            dataPoint.SetAttribute("style-name", OdfNamespaces.Chart, styleName!, "chart");
+        }
+
+        _node.AppendChild(dataPoint);
+    }
+
+    /// <summary>
+    /// 移除此序列中所有資料點樣式覆蓋設定。
+    /// </summary>
+    public void ClearDataPoints()
+    {
+        foreach (OdfNode child in new List<OdfNode>(_node.Children))
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "data-point" &&
+                child.NamespaceUri == OdfNamespaces.Chart)
+            {
+                _node.RemoveChild(child);
+            }
         }
     }
 

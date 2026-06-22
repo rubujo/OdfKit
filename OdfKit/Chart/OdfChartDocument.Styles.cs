@@ -70,6 +70,36 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// 取得或設定圖例的圖表自動樣式（背景色、邊框等）。
+    /// </summary>
+    public OdfChartStyle LegendStyle
+    {
+        get
+        {
+            OdfNode legend = FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
+            string? name = legend.GetAttribute("style-name", OdfNamespaces.Chart);
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "legend-style";
+                legend.SetAttribute("style-name", OdfNamespaces.Chart, name, "chart");
+            }
+            return CreateChartStyle(name!);
+        }
+        set
+        {
+            OdfNode legend = FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
+            if (value is null)
+            {
+                legend.RemoveAttribute("style-name", OdfNamespaces.Chart);
+            }
+            else
+            {
+                legend.SetAttribute("style-name", OdfNamespaces.Chart, value.Name, "chart");
+            }
+        }
+    }
+
+    /// <summary>
     /// 建立或取得指定名稱的圖表自動樣式。
     /// </summary>
     /// <param name="name">樣式名稱。</param>

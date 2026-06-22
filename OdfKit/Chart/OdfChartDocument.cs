@@ -143,6 +143,31 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     }
 
     /// <summary>
+    /// 取得或設定圖例的對齊方式（對應 <c>chart:legend-align</c>）。
+    /// </summary>
+    /// <remarks>常見值包含 <c>start</c>、<c>center</c> 與 <c>end</c>。</remarks>
+    public string? LegendAlignment
+    {
+        get
+        {
+            OdfNode? legend = FindChildElement(GetChartNode(), "legend", OdfNamespaces.Chart);
+            return legend?.GetAttribute("legend-align", OdfNamespaces.Chart);
+        }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                OdfNode? existingLegend = FindChildElement(GetChartNode(), "legend", OdfNamespaces.Chart);
+                existingLegend?.RemoveAttribute("legend-align", OdfNamespaces.Chart);
+                return;
+            }
+
+            OdfNode legendNode = FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
+            legendNode.SetAttribute("legend-align", OdfNamespaces.Chart, value!, "chart");
+        }
+    }
+
+    /// <summary>
     /// 取得或設定圖表資料來源是否包含標籤。
     /// </summary>
     /// <remarks>ODF 允許的常見值包含 <c>none</c>、<c>row</c>、<c>column</c> 與 <c>both</c>。</remarks>

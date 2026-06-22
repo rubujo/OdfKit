@@ -101,6 +101,75 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// 取得或設定座標軸刻度標籤的位置（對應 <c>chart:label-position</c>）。
+    /// </summary>
+    /// <remarks>常見值包含 <c>near-axis</c>、<c>near-axis-other-side</c>、<c>outside-start</c> 與 <c>outside-end</c>。</remarks>
+    public string? LabelPosition
+    {
+        get => _document.StyleEngine.GetStyleProperty(Name, "label-position", OdfNamespaces.Chart, "chart");
+        set => SetChartProperty("label-position", OdfNamespaces.Chart, value, "chart");
+    }
+
+    /// <summary>
+    /// 取得或設定座標軸負值刻度標籤的位置（對應 <c>chart:label-position-negative</c>）。
+    /// </summary>
+    public string? LabelPositionNegative
+    {
+        get => _document.StyleEngine.GetStyleProperty(Name, "label-position-negative", OdfNamespaces.Chart, "chart");
+        set => SetChartProperty("label-position-negative", OdfNamespaces.Chart, value, "chart");
+    }
+
+    /// <summary>
+    /// 取得或設定座標軸標籤相對於座標軸的對齊位置（對應 <c>chart:axis-label-position</c>）。
+    /// </summary>
+    /// <remarks>常見值包含 <c>near-axis</c>、<c>near-axis-other-side</c>、<c>outside-start</c> 與 <c>outside-end</c>。</remarks>
+    public string? AxisLabelPosition
+    {
+        get => _document.StyleEngine.GetStyleProperty(Name, "axis-label-position", OdfNamespaces.Chart, "chart");
+        set => SetChartProperty("axis-label-position", OdfNamespaces.Chart, value, "chart");
+    }
+
+    /// <summary>
+    /// 取得或設定 3D 投影模式（對應 <c>dr3d:projection</c>）。
+    /// </summary>
+    public OdfDr3dProjection? Projection
+    {
+        get
+        {
+            string? val = _document.StyleEngine.GetStyleProperty(Name, "projection", OdfNamespaces.Dr3d, "chart");
+            return val switch
+            {
+                "parallel" => OdfDr3dProjection.Parallel,
+                "perspective" => OdfDr3dProjection.Perspective,
+                _ => null,
+            };
+        }
+        set
+        {
+            string? token = value switch
+            {
+                OdfDr3dProjection.Parallel => "parallel",
+                OdfDr3dProjection.Perspective => "perspective",
+                _ => null,
+            };
+            SetGraphicProperty("projection", OdfNamespaces.Dr3d, token, "dr3d");
+        }
+    }
+
+    /// <summary>
+    /// 取得或設定是否啟用雙面光照模式（對應 <c>dr3d:lighting-mode</c>）。
+    /// </summary>
+    public bool? LightingMode
+    {
+        get
+        {
+            string? val = _document.StyleEngine.GetStyleProperty(Name, "lighting-mode", OdfNamespaces.Dr3d, "chart");
+            return bool.TryParse(val, out bool result) ? result : null;
+        }
+        set => SetGraphicProperty("lighting-mode", OdfNamespaces.Dr3d, value?.ToString().ToLowerInvariant(), "dr3d");
+    }
+
+    /// <summary>
     /// 建立此樣式的高階摘要。
     /// </summary>
     /// <returns>圖表樣式摘要。</returns>
