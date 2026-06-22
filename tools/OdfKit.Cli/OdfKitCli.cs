@@ -73,7 +73,7 @@ public static class OdfKitCli
         IReadOnlyList<string> files = ResolveValidateFiles(parsedOptions.Path, parsedOptions.Recursive);
         if (files.Count == 0)
         {
-            error.WriteLine("no ODF files found: " + parsedOptions.Path);
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_NoOdfFilesFound", parsedOptions.Path));
             return 2;
         }
 
@@ -243,7 +243,7 @@ public static class OdfKitCli
         SanitizeOptions parsedOptions = options ?? throw new InvalidOperationException("sanitize options were not parsed.");
         if (!File.Exists(parsedOptions.InputPath))
         {
-            error.WriteLine("path not found: " + parsedOptions.InputPath);
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_PathNotFound", parsedOptions.InputPath));
             return 2;
         }
 
@@ -295,7 +295,7 @@ public static class OdfKitCli
         ConvertCsvOptions parsedOptions = options ?? throw new InvalidOperationException("convert-csv options were not parsed.");
         if (!File.Exists(parsedOptions.InputPath))
         {
-            error.WriteLine("path not found: " + parsedOptions.InputPath);
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_PathNotFound", parsedOptions.InputPath));
             return 2;
         }
 
@@ -328,7 +328,7 @@ public static class OdfKitCli
             return 0;
         }
 
-        error.WriteLine("usage: odfkit convert-csv input.(ods|fods|csv) output.(csv|ods) [--delimiter char] [--sheet index] [--sheet-name name]");
+        error.WriteLine(OdfLocalizer.GetMessage("Cli_UsageConvertCsv"));
         return 2;
     }
 
@@ -374,7 +374,7 @@ public static class OdfKitCli
             return true;
         }
 
-        error.WriteLine("usage: odfkit " + usage);
+        error.WriteLine(OdfLocalizer.GetMessage("Cli_UsageWithCmd", usage));
         return false;
     }
 
@@ -406,14 +406,14 @@ public static class OdfKitCli
 
     private static int UnknownCommand(string command, TextWriter error)
     {
-        error.WriteLine("unknown command: " + command);
+        error.WriteLine(OdfLocalizer.GetMessage("Cli_UnknownCommand", command));
         return 2;
     }
 
     private static void WriteUsage(TextWriter output)
     {
-        output.WriteLine("usage: odfkit <command> [arguments]");
-        output.WriteLine("commands:");
+        output.WriteLine(OdfLocalizer.GetMessage("Cli_UsageGeneral"));
+        output.WriteLine(OdfLocalizer.GetMessage("Cli_CommandsHeader"));
         output.WriteLine("  validate file-or-folder [--format text|json] [--profile id] [--fail-on error|warning] [--recursive] [--quiet] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
         output.WriteLine("  validate-corpus manifest.json [--root path] [--format text|json] [--quiet] [--metadata-only] [--baseline odf-validator] [--baseline-jar path] [--baseline-command path] [--baseline-exceptions path]");
         output.WriteLine("  info file.ods");
@@ -448,7 +448,7 @@ public static class OdfKitCli
                     if (!TryReadValue(args, ref i, error, "--format", out string? formatValue) ||
                         !TryParseFormat(formatValue, out format))
                     {
-                        error.WriteLine("supported formats: text, json");
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_SupportedFormats"));
                         return false;
                     }
                     break;
@@ -461,7 +461,7 @@ public static class OdfKitCli
                     profile = OdfComplianceProfiles.Find(profileId!);
                     if (profile is null)
                     {
-                        error.WriteLine("unknown profile: " + profileId);
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_UnknownProfile", profileId));
                         return false;
                     }
                     break;
@@ -469,7 +469,7 @@ public static class OdfKitCli
                     if (!TryReadValue(args, ref i, error, "--fail-on", out string? failOnValue) ||
                         !TryParseFailOn(failOnValue, out failOn))
                     {
-                        error.WriteLine("supported fail-on values: error, warning");
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_SupportedFailOn"));
                         return false;
                     }
                     break;
@@ -483,7 +483,7 @@ public static class OdfKitCli
                     if (!TryReadValue(args, ref i, error, "--baseline", out string? baselineValue) ||
                         !TryParseBaseline(baselineValue, out baseline))
                     {
-                        error.WriteLine("supported baselines: none, odf-validator, command");
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_SupportedBaselines"));
                         return false;
                     }
                     break;
@@ -510,13 +510,13 @@ public static class OdfKitCli
                 default:
                     if (arg.StartsWith("-", StringComparison.Ordinal))
                     {
-                        error.WriteLine("unknown option: " + arg);
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_UnknownOption", arg));
                         return false;
                     }
 
                     if (path is not null)
                     {
-                        error.WriteLine("usage: odfkit validate file-or-folder [options]");
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_UsageValidate"));
                         return false;
                     }
 
@@ -527,7 +527,7 @@ public static class OdfKitCli
 
         if (string.IsNullOrWhiteSpace(path))
         {
-            error.WriteLine("usage: odfkit validate file-or-folder [options]");
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_UsageValidate"));
             return false;
         }
 
@@ -585,7 +585,7 @@ public static class OdfKitCli
                     if (!TryReadValue(args, ref i, error, "--format", out string? formatValue) ||
                         !TryParseFormat(formatValue, out format))
                     {
-                        error.WriteLine("supported formats: text, json");
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_SupportedFormats"));
                         return false;
                     }
                     break;
@@ -599,7 +599,7 @@ public static class OdfKitCli
                     if (!TryReadValue(args, ref i, error, "--baseline", out string? baselineValue) ||
                         !TryParseBaseline(baselineValue, out baseline))
                     {
-                        error.WriteLine("supported baselines: none, odf-validator, command");
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_SupportedBaselines"));
                         return false;
                     }
                     break;
@@ -626,7 +626,7 @@ public static class OdfKitCli
                 default:
                     if (arg.StartsWith("-", StringComparison.Ordinal))
                     {
-                        error.WriteLine("unknown option: " + arg);
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_UnknownOption", arg));
                         return false;
                     }
 
@@ -694,7 +694,7 @@ public static class OdfKitCli
                     if (!TryReadValue(args, ref i, error, "--format", out string? formatValue) ||
                         !TryParseFormat(formatValue, out format))
                     {
-                        error.WriteLine("supported formats: text, json");
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_SupportedFormats"));
                         return false;
                     }
                     break;
@@ -763,7 +763,7 @@ public static class OdfKitCli
                 default:
                     if (arg.StartsWith("-", StringComparison.Ordinal))
                     {
-                        error.WriteLine("unknown option: " + arg);
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_UnknownOption", arg));
                         return false;
                     }
 
@@ -852,7 +852,7 @@ public static class OdfKitCli
                 default:
                     if (arg.StartsWith("-", StringComparison.Ordinal))
                     {
-                        error.WriteLine("unknown option: " + arg);
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_UnknownOption", arg));
                         return false;
                     }
 

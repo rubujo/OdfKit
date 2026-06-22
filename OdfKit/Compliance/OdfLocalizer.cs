@@ -34,19 +34,32 @@ public static partial class OdfLocalizer
         }
 
         var dict = ResolveDictionary(culture ?? DefaultCulture ?? CultureInfo.CurrentUICulture);
-        if (dict is not null && dict.TryGetValue(ruleId, out var fix))
+
+        // 1. 優先嘗試查詢專屬的合規修復 Key (Rule_SuggestedFix_ODF0001)
+        string ruleKey = "Rule_SuggestedFix_" + ruleId;
+        if (dict is not null && dict.TryGetValue(ruleKey, out var fix))
+        {
+            return fix;
+        }
+
+        // 2. 後備相容：查詢既有的 Rule ID 鍵值
+        if (dict is not null && dict.TryGetValue(ruleId, out fix))
         {
             return fix;
         }
 
         // 若無匹配，回退到英文 (en) 預設翻譯
         var enDict = ResolveDictionary(CultureInfo.InvariantCulture);
-        if (enDict is not null && enDict.TryGetValue(ruleId, out var enFix))
+        if (enDict is not null && enDict.TryGetValue(ruleKey, out var enFix))
+        {
+            return enFix;
+        }
+        if (enDict is not null && enDict.TryGetValue(ruleId, out enFix))
         {
             return enFix;
         }
 
-        // 預設後備值
+        // 3. 最終防線：才進入 BuildDefaultSuggestedFix 返回硬編碼英文
         return BuildDefaultSuggestedFix(ruleId);
     }
 

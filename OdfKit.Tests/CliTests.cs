@@ -17,6 +17,11 @@ namespace OdfKit.Tests;
 /// </summary>
 public class CliTests
 {
+    public CliTests()
+    {
+        OdfLocalizer.DefaultCulture = new CultureInfo("en");
+    }
+
     /// <summary>
     /// 驗證 help 命令會列出主要子命令。
     /// </summary>
