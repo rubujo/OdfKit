@@ -55,8 +55,8 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     /// <summary>
     /// 列舉此元素的直接子元素，並只傳回指定的 typed DOM 元素型別。
     /// </summary>
-    /// <typeparam name="TElement">要篩選的 typed DOM 元素型別。</typeparam>
-    /// <returns>符合型別的直接子元素列舉。</returns>
+    /// <typeparam name="TElement">要篩選的 typed DOM 元素型別</typeparam>
+    /// <returns>符合型別的直接子元素列舉</returns>
     public IEnumerable<TElement> ChildElements<TElement>()
         where TElement : OdfElement
     {
@@ -72,8 +72,8 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     /// <summary>
     /// 列舉此元素的所有後代元素，並只傳回指定的 typed DOM 元素型別。
     /// </summary>
-    /// <typeparam name="TElement">要篩選的 typed DOM 元素型別。</typeparam>
-    /// <returns>符合型別的後代元素列舉。</returns>
+    /// <typeparam name="TElement">要篩選的 typed DOM 元素型別</typeparam>
+    /// <returns>符合型別的後代元素列舉</returns>
     public IEnumerable<TElement> DescendantElements<TElement>()
         where TElement : OdfElement
     {
@@ -89,9 +89,9 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     /// <summary>
     /// 將 typed DOM 元素加入此元素的子節點清單末尾，並傳回同一個元素以便串接設定。
     /// </summary>
-    /// <typeparam name="TElement">要加入的 typed DOM 元素型別。</typeparam>
-    /// <param name="child">要加入的 typed DOM 子元素。</param>
-    /// <returns>已加入的 typed DOM 子元素。</returns>
+    /// <typeparam name="TElement">要加入的 typed DOM 元素型別</typeparam>
+    /// <param name="child">要加入的 typed DOM 子元素</param>
+    /// <returns>已加入的 typed DOM 子元素</returns>
     public TElement AppendElement<TElement>(TElement child)
         where TElement : OdfElement
     {
@@ -102,10 +102,10 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     /// <summary>
     /// 在參考子節點之前插入 typed DOM 元素，並傳回同一個元素以便串接設定。
     /// </summary>
-    /// <typeparam name="TElement">要插入的 typed DOM 元素型別。</typeparam>
-    /// <param name="newChild">要插入的 typed DOM 子元素。</param>
-    /// <param name="refChild">參考子節點，新元素將插入在此節點之前。</param>
-    /// <returns>已插入的 typed DOM 子元素。</returns>
+    /// <typeparam name="TElement">要插入的 typed DOM 元素型別</typeparam>
+    /// <param name="newChild">要插入的 typed DOM 子元素</param>
+    /// <param name="refChild">參考子節點，新元素將插入在此節點之前</param>
+    /// <returns>已插入的 typed DOM 子元素</returns>
     public TElement InsertElementBefore<TElement>(TElement newChild, OdfNode refChild)
         where TElement : OdfElement
     {
@@ -116,10 +116,10 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     /// <summary>
     /// 在參考子節點之後插入 typed DOM 元素，並傳回同一個元素以便串接設定。
     /// </summary>
-    /// <typeparam name="TElement">要插入的 typed DOM 元素型別。</typeparam>
-    /// <param name="newChild">要插入的 typed DOM 子元素。</param>
-    /// <param name="refChild">參考子節點，新元素將插入在此節點之後。</param>
-    /// <returns>已插入的 typed DOM 子元素。</returns>
+    /// <typeparam name="TElement">要插入的 typed DOM 元素型別</typeparam>
+    /// <param name="newChild">要插入的 typed DOM 子元素</param>
+    /// <param name="refChild">參考子節點，新元素將插入在此節點之後</param>
+    /// <returns>已插入的 typed DOM 子元素</returns>
     public TElement InsertElementAfter<TElement>(TElement newChild, OdfNode refChild)
         where TElement : OdfElement
     {

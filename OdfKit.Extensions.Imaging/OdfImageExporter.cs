@@ -15,10 +15,10 @@ public static class OdfImageExporter
     /// <summary>
     /// 將工作表格線渲染並寫入 PNG 資料流。
     /// </summary>
-    /// <param name="sheet">來源工作表。</param>
-    /// <param name="pngStream">目標 PNG 資料流。</param>
-    /// <param name="options">影像匯出選項；若為 null 則使用預設值。</param>
-    /// <exception cref="ArgumentNullException">當任一必要參數為 null 時拋出。</exception>
+    /// <param name="sheet">來源工作表</param>
+    /// <param name="pngStream">目標 PNG 資料流</param>
+    /// <param name="options">影像匯出選項；若為 null 則使用預設值</param>
+    /// <exception cref="ArgumentNullException">當任一必要參數為 null 時拋出</exception>
     public static void ExportToPng(OdfTableSheet sheet, Stream pngStream, OdfImageExportOptions? options = null)
     {
         if (sheet is null)
@@ -31,10 +31,10 @@ public static class OdfImageExporter
     /// <summary>
     /// 將工作表格線渲染並寫入 JPEG 資料流。
     /// </summary>
-    /// <param name="sheet">來源工作表。</param>
-    /// <param name="jpegStream">目標 JPEG 資料流。</param>
-    /// <param name="quality">JPEG 壓縮品質，範圍為 1 至 100，預設為 90。</param>
-    /// <param name="options">影像匯出選項；若為 null 則使用預設值。</param>
+    /// <param name="sheet">來源工作表</param>
+    /// <param name="jpegStream">目標 JPEG 資料流</param>
+    /// <param name="quality">JPEG 壓縮品質，範圍為 1 至 100，預設為 90</param>
+    /// <param name="options">影像匯出選項；若為 null 則使用預設值</param>
     public static void ExportToJpeg(OdfTableSheet sheet, Stream jpegStream, int quality = 90, OdfImageExportOptions? options = null)
     {
         if (sheet is null)

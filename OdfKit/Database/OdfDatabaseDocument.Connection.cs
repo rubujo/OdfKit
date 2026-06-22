@@ -9,7 +9,7 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 取得目前資料來源連線的登入設定。
     /// </summary>
-    /// <returns>登入設定摘要；若未設定則為 <see langword="null"/>。</returns>
+    /// <returns>登入設定摘要；若未設定則為 <see langword="null"/></returns>
     public OdfDatabaseLoginInfo? GetLogin()
     {
         OdfNode? dataSource = FindChildElement(GetDatabaseNode(), "data-source", DatabaseNamespace);
@@ -30,11 +30,11 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 設定資料來源連線的登入設定。
     /// </summary>
-    /// <param name="userName">選用的使用者名稱。</param>
-    /// <param name="useSystemUser">選用的系統使用者帳號設定。</param>
-    /// <param name="isPasswordRequired">選用的密碼必填設定。</param>
-    /// <param name="loginTimeout">選用的登入逾時秒數。</param>
-    /// <returns>新增或更新後的登入設定節點。</returns>
+    /// <param name="userName">選用的使用者名稱</param>
+    /// <param name="useSystemUser">選用的系統使用者帳號設定</param>
+    /// <param name="isPasswordRequired">選用的密碼必填設定</param>
+    /// <param name="loginTimeout">選用的登入逾時秒數</param>
+    /// <returns>新增或更新後的登入設定節點</returns>
     public OdfNode SetLogin(
         string? userName = null,
         bool? useSystemUser = null,
@@ -71,7 +71,7 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 取得目前資料來源連線的驅動程式設定。
     /// </summary>
-    /// <returns>驅動程式設定摘要；若未設定則為 <see langword="null"/>。</returns>
+    /// <returns>驅動程式設定摘要；若未設定則為 <see langword="null"/></returns>
     public OdfDatabaseDriverSettingsInfo? GetDriverSettings()
     {
         OdfNode? dataSource = FindChildElement(GetDatabaseNode(), "data-source", DatabaseNamespace);
@@ -97,12 +97,12 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 設定資料來源連線的驅動程式設定。
     /// </summary>
-    /// <param name="showDeleted">選用的顯示已刪除資料列設定。</param>
-    /// <param name="isFirstRowHeaderLine">選用的第一列視為標頭列設定。</param>
-    /// <param name="parameterNameSubstitution">選用的具名參數替代設定。</param>
-    /// <param name="systemDriverSettings">選用的系統驅動程式設定字串。</param>
-    /// <param name="baseDn">選用的 LDAP base DN 設定。</param>
-    /// <returns>新增或更新後的驅動程式設定節點。</returns>
+    /// <param name="showDeleted">選用的顯示已刪除資料列設定</param>
+    /// <param name="isFirstRowHeaderLine">選用的第一列視為標頭列設定</param>
+    /// <param name="parameterNameSubstitution">選用的具名參數替代設定</param>
+    /// <param name="systemDriverSettings">選用的系統驅動程式設定字串</param>
+    /// <param name="baseDn">選用的 LDAP base DN 設定</param>
+    /// <returns>新增或更新後的驅動程式設定節點</returns>
     public OdfNode SetDriverSettings(
         bool? showDeleted = null,
         bool? isFirstRowHeaderLine = null,

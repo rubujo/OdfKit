@@ -28,9 +28,9 @@ public partial class PresentationDocument
     /// <summary>
     /// 將指定名稱的投影片版面配置套用至投影片，並依範本實例化預留位置。
     /// </summary>
-    /// <param name="slideIndex">投影片索引位置。</param>
-    /// <param name="layoutName">版面配置名稱（<c>presentation:page-layout-name</c>）。</param>
-    /// <exception cref="ArgumentException">找不到指定版面配置時擲出。</exception>
+    /// <param name="slideIndex">投影片索引位置</param>
+    /// <param name="layoutName">版面配置名稱（<c>presentation:page-layout-name</c>）</param>
+    /// <exception cref="ArgumentException">找不到指定版面配置時擲出</exception>
     public void ApplyPresentationPageLayout(int slideIndex, string layoutName)
     {
         if (string.IsNullOrWhiteSpace(layoutName))

@@ -15,22 +15,22 @@ public static partial class OdfEncryption
     #region Entry Encryption & Decryption
 
     /// <summary>
-    /// 解密單一封裝項目。支援 PBKDF2 搭配 AES/Blowfish 以及 Argon2id 搭配 AES-GCM。
+    /// 解密單一封裝專案。支援 PBKDF2 搭配 AES/Blowfish 以及 Argon2id 搭配 AES-GCM。
     /// </summary>
-    /// <param name="ciphertext">加密的密文資料位元組陣列。</param>
-    /// <param name="password">解密密碼。</param>
-    /// <param name="algorithmUri">加密演算法的 XML 識別 URI。</param>
-    /// <param name="derivationName">金鑰衍生演算法的 XML 識別 URI。</param>
-    /// <param name="keySize">金鑰大小（以位元組為單位）。</param>
-    /// <param name="iterationCount">金鑰衍生的反覆運算次數。</param>
-    /// <param name="salt">金鑰衍生的鹽值（Salt）位元組陣列。</param>
-    /// <param name="iv">加密的初始向量（IV）位元組陣列。</param>
-    /// <param name="startKeyGenName">初始金鑰產生的演算法名稱（選填）。</param>
-    /// <param name="kdfName">金鑰衍生函數的名稱（選填，例如 "argon2id"）。</param>
-    /// <param name="argon2T">Argon2id 的時間複雜度/反覆運算次數（選填）。</param>
-    /// <param name="argon2M">Argon2id 的記憶體複雜度（單位為 KB，選填）。</param>
-    /// <param name="argon2P">Argon2id 的平行度/通道數（選填）。</param>
-    /// <returns>解密後的純文字資料位元組陣列。</returns>
+    /// <param name="ciphertext">加密的密文資料位元組陣列</param>
+    /// <param name="password">解密密碼</param>
+    /// <param name="algorithmUri">加密演算法的 XML 識別 URI</param>
+    /// <param name="derivationName">金鑰衍生演算法的 XML 識別 URI</param>
+    /// <param name="keySize">金鑰大小（以位元組為單位）</param>
+    /// <param name="iterationCount">金鑰衍生的反覆運算次數</param>
+    /// <param name="salt">金鑰衍生的鹽值（Salt）位元組陣列</param>
+    /// <param name="iv">加密的初始向量（IV）位元組陣列</param>
+    /// <param name="startKeyGenName">初始金鑰產生的演算法名稱（選填）</param>
+    /// <param name="kdfName">金鑰衍生函數的名稱（選填，例如 "argon2id"）</param>
+    /// <param name="argon2T">Argon2id 的時間複雜度/反覆運算次數（選填）</param>
+    /// <param name="argon2M">Argon2id 的記憶體複雜度（單位為 KB，選填）</param>
+    /// <param name="argon2P">Argon2id 的平行度/通道數（選填）</param>
+    /// <returns>解密後的純文字資料位元組陣列</returns>
     public static byte[] DecryptEntry(
         byte[] ciphertext,
         string password,
@@ -193,16 +193,16 @@ public static partial class OdfEncryption
     }
 
     /// <summary>
-    /// 加密單一封裝項目。支援傳統加密與 AES-GCM 加密，並產生對應的 IV、鹽值與驗證碼。
+    /// 加密單一封裝專案。支援傳統加密與 AES-GCM 加密，並產生對應的 IV、鹽值與驗證碼。
     /// </summary>
-    /// <param name="plaintext">待加密的純文字資料位元組陣列。</param>
-    /// <param name="password">加密密碼。</param>
-    /// <param name="algorithm">加密演算法類型。</param>
-    /// <param name="iv">輸出參數，接收隨機產生的初始向量（IV）位元組陣列。</param>
-    /// <param name="salt">輸出參數，接收隨機產生的鹽值（Salt）位元組陣列。</param>
-    /// <param name="checksum">輸出參數，接收加密後計算出的驗證碼（Checksum）位元組陣列。</param>
-    /// <param name="iterationCount">金鑰衍生的反覆運算次數（預設為 50,000 次）。</param>
-    /// <returns>加密後的密文資料位元組陣列。</returns>
+    /// <param name="plaintext">待加密的純文字資料位元組陣列</param>
+    /// <param name="password">加密密碼</param>
+    /// <param name="algorithm">加密演算法類型</param>
+    /// <param name="iv">輸出參數，接收隨機產生的初始向量（IV）位元組陣列</param>
+    /// <param name="salt">輸出參數，接收隨機產生的鹽值（Salt）位元組陣列</param>
+    /// <param name="checksum">輸出參數，接收加密後計算出的驗證碼（Checksum）位元組陣列</param>
+    /// <param name="iterationCount">金鑰衍生的反覆運算次數（預設為 50,000 次）</param>
+    /// <returns>加密後的密文資料位元組陣列</returns>
     public static byte[] EncryptEntry(
         byte[] plaintext,
         string password,

@@ -5,16 +5,16 @@ namespace OdfKit.Drawing;
 /// <summary>
 /// 表示繪圖頁面上一條連接線的摘要資訊。
 /// </summary>
-/// <param name="pageName">所在繪圖頁面名稱。</param>
-/// <param name="id">連接線識別碼。</param>
-/// <param name="connectorType">連接線幾何類型。</param>
-/// <param name="startShapeId">起點圖形識別碼（圖形連結模式）。</param>
-/// <param name="endShapeId">終點圖形識別碼（圖形連結模式）。</param>
-/// <param name="startX">起點 X 座標原文（座標模式）。</param>
-/// <param name="startY">起點 Y 座標原文（座標模式）。</param>
-/// <param name="endX">終點 X 座標原文（座標模式）。</param>
-/// <param name="endY">終點 Y 座標原文（座標模式）。</param>
-/// <param name="points">自訂路由頂點座標字串（<c>draw:points</c>）。</param>
+/// <param name="pageName">所在繪圖頁面名稱</param>
+/// <param name="id">連接線識別碼</param>
+/// <param name="connectorType">連接線幾何類型</param>
+/// <param name="startShapeId">起點圖形識別碼（圖形連結模式）</param>
+/// <param name="endShapeId">終點圖形識別碼（圖形連結模式）</param>
+/// <param name="startX">起點 X 座標原文（座標模式）</param>
+/// <param name="startY">起點 Y 座標原文（座標模式）</param>
+/// <param name="endX">終點 X 座標原文（座標模式）</param>
+/// <param name="endY">終點 Y 座標原文（座標模式）</param>
+/// <param name="points">自訂路由頂點座標字串（<c>draw:points</c>）</param>
 public sealed class OdfConnectorInfo(
     string pageName,
     string id,
@@ -86,9 +86,9 @@ public sealed class OdfConnectorInfo(
     /// <summary>
     /// 嘗試將起點座標解析為 <see cref="OdfLength"/>。
     /// </summary>
-    /// <param name="x">解析成功時傳回的起點 X 座標。</param>
-    /// <param name="y">解析成功時傳回的起點 Y 座標。</param>
-    /// <returns>若兩座標皆可解析則為 <see langword="true"/>。</returns>
+    /// <param name="x">解析成功時傳回的起點 X 座標</param>
+    /// <param name="y">解析成功時傳回的起點 Y 座標</param>
+    /// <returns>若兩座標皆可解析則為 <see langword="true"/></returns>
     public bool TryGetStartPoint(out OdfLength x, out OdfLength y)
     {
         if (!OdfLength.TryParse(StartX, out x))
@@ -103,9 +103,9 @@ public sealed class OdfConnectorInfo(
     /// <summary>
     /// 嘗試將終點座標解析為 <see cref="OdfLength"/>。
     /// </summary>
-    /// <param name="x">解析成功時傳回的終點 X 座標。</param>
-    /// <param name="y">解析成功時傳回的終點 Y 座標。</param>
-    /// <returns>若兩座標皆可解析則為 <see langword="true"/>。</returns>
+    /// <param name="x">解析成功時傳回的終點 X 座標</param>
+    /// <param name="y">解析成功時傳回的終點 Y 座標</param>
+    /// <returns>若兩座標皆可解析則為 <see langword="true"/></returns>
     public bool TryGetEndPoint(out OdfLength x, out OdfLength y)
     {
         if (!OdfLength.TryParse(EndX, out x))

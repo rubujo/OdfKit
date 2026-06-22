@@ -14,8 +14,8 @@ public sealed class OdfCellRangeSelection
     /// <summary>
     /// 初始化 <see cref="OdfCellRangeSelection"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="sheet">所屬工作表。</param>
-    /// <param name="range">儲存格範圍。</param>
+    /// <param name="sheet">所屬工作表</param>
+    /// <param name="range">儲存格範圍</param>
     internal OdfCellRangeSelection(OdfTableSheet sheet, OdfCellRange range)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
@@ -44,7 +44,7 @@ public sealed class OdfCellRangeSelection
     /// <summary>
     /// 以指定密碼保護此範圍，將其寫入工作表的受保護範圍對照表中。
     /// </summary>
-    /// <param name="password">密碼明文。</param>
+    /// <param name="password">密碼明文</param>
     public void Protect(string password)
     {
         var rangesNode = _sheet.TableNode.Children.Find(c =>
@@ -91,8 +91,8 @@ public sealed class OdfCellRangeSelection
     /// <summary>
     /// 驗證給定密碼是否能解除此範圍的保護。
     /// </summary>
-    /// <param name="password">要驗證的密碼。</param>
-    /// <returns>若驗證成功則為 true，否則為 false。</returns>
+    /// <param name="password">要驗證的密碼</param>
+    /// <returns>若驗證成功則為 true，否則為 false</returns>
     public bool VerifyPassword(string password)
     {
         var node = FindProtectedRangeNode();
@@ -104,8 +104,8 @@ public sealed class OdfCellRangeSelection
     /// <summary>
     /// 嘗試以指定密碼解除此範圍的保護。
     /// </summary>
-    /// <param name="password">密碼明文。</param>
-    /// <returns>若解除成功則為 true，否則為 false。</returns>
+    /// <param name="password">密碼明文</param>
+    /// <returns>若解除成功則為 true，否則為 false</returns>
     public bool TryUnprotect(string password)
     {
         if (!IsProtected)
@@ -147,7 +147,7 @@ public sealed class OdfCellRangeSelection
     /// <summary>
     /// 將此範圍加入命名範圍。
     /// </summary>
-    /// <param name="name">命名範圍名稱。</param>
+    /// <param name="name">命名範圍名稱</param>
     public void NameAs(string name)
     {
         _sheet.AddNamedRange(name, Range);
@@ -156,8 +156,8 @@ public sealed class OdfCellRangeSelection
     /// <summary>
     /// 為此範圍新增篩選。
     /// </summary>
-    /// <param name="name">資料庫範圍名稱。</param>
-    /// <param name="conditions">篩選條件。</param>
+    /// <param name="name">資料庫範圍名稱</param>
+    /// <param name="conditions">篩選條件</param>
     public void AddFilter(string name, params (int fieldNumber, string op, string value)[] conditions)
     {
         _sheet.AddDatabaseRange(name, Range).SetFilter(conditions);
@@ -166,8 +166,8 @@ public sealed class OdfCellRangeSelection
     /// <summary>
     /// 為此範圍新增條件格式。
     /// </summary>
-    /// <param name="condition">條件運算式。</param>
-    /// <param name="styleName">套用的樣式名稱。</param>
+    /// <param name="condition">條件運算式</param>
+    /// <param name="styleName">套用的樣式名稱</param>
     public void AddConditionalFormat(string condition, string styleName)
     {
         _sheet.AddConditionalFormat(Range, condition, styleName);
@@ -176,8 +176,8 @@ public sealed class OdfCellRangeSelection
     /// <summary>
     /// 為此範圍新增清單型資料驗證。
     /// </summary>
-    /// <param name="name">驗證規則名稱。</param>
-    /// <param name="allowedValues">允許的值。</param>
+    /// <param name="name">驗證規則名稱</param>
+    /// <param name="allowedValues">允許的值</param>
     public void AddValidationList(string name, params string[] allowedValues)
     {
         _sheet.AddValidationList(Range, name, allowedValues);

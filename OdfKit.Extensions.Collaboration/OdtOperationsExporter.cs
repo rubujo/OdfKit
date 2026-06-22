@@ -24,9 +24,9 @@ public static class OdtOperationsExporter
     /// <summary>
     /// 將文字文件本文匯出為 JSON operations 陣列字串。
     /// </summary>
-    /// <param name="document">來源文字文件。</param>
-    /// <returns>JSON operations 陣列。</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="document"/> 為 null 時擲出。</exception>
+    /// <param name="document">來源文字文件</param>
+    /// <returns>JSON operations 陣列</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="document"/> 為 null 時擲出</exception>
     public static string ExportToJson(TextDocument document)
     {
         if (document is null)

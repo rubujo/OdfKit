@@ -23,7 +23,7 @@ public class OdfFormatRoundTripTests
     /// <summary>
     /// 驗證每種格式的最小文件可完成 package-level round-trip。
     /// </summary>
-    /// <param name="format">要驗證的格式資訊。</param>
+    /// <param name="format">要驗證的格式資訊</param>
     [Theory]
     [MemberData(nameof(SupportedFormats))]
     public void MinimalSupportedFormatRoundTrips(OdfFormatInfo format)

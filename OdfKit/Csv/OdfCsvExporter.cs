@@ -20,11 +20,11 @@ public static class OdfCsvExporter
     /// <summary>
     /// 將指定工作表的資料匯出為 CSV 並寫入資料流。
     /// </summary>
-    /// <param name="workbook">來源 SpreadsheetDocument 執行個體。</param>
-    /// <param name="csvStream">要寫入的目標資料流（不得為 null）。</param>
-    /// <param name="options">CSV 選項；若為 null 則使用預設值。</param>
-    /// <exception cref="ArgumentNullException">當任一必要參數為 null 時引發。</exception>
-    /// <exception cref="ArgumentOutOfRangeException">當 ExportSheetIndex 超出範圍時引發。</exception>
+    /// <param name="workbook">來源 SpreadsheetDocument 執行個體</param>
+    /// <param name="csvStream">要寫入的目標資料流（不得為 null）</param>
+    /// <param name="options">CSV 選項；若為 null 則使用預設值</param>
+    /// <exception cref="ArgumentNullException">當任一必要參數為 null 時引發</exception>
+    /// <exception cref="ArgumentOutOfRangeException">當 ExportSheetIndex 超出範圍時引發</exception>
     public static void ExportToStream(SpreadsheetDocument workbook, Stream csvStream, OdfCsvOptions? options = null)
     {
         if (workbook is null)
@@ -64,9 +64,9 @@ public static class OdfCsvExporter
     /// <summary>
     /// 將指定工作表的資料匯出為 CSV 檔案。
     /// </summary>
-    /// <param name="workbook">來源 SpreadsheetDocument 執行個體。</param>
-    /// <param name="csvPath">目標 CSV 檔案路徑。</param>
-    /// <param name="options">CSV 選項；若為 null 則使用預設值。</param>
+    /// <param name="workbook">來源 SpreadsheetDocument 執行個體</param>
+    /// <param name="csvPath">目標 CSV 檔案路徑</param>
+    /// <param name="options">CSV 選項；若為 null 則使用預設值</param>
     public static void ExportToFile(SpreadsheetDocument workbook, string csvPath, OdfCsvOptions? options = null)
     {
         if (csvPath is null)

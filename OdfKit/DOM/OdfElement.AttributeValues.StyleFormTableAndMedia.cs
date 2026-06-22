@@ -13,10 +13,10 @@ public partial class OdfElement
     /// <summary>
     /// 取得具有 schema awareness 的斷行規則屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="version">ODF 版本內容。</param>
-    /// <returns>解析後的斷行規則；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="version">ODF 版本內容</param>
+    /// <returns>解析後的斷行規則；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
     public OdfStyleLineBreak? GetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
@@ -26,11 +26,11 @@ public partial class OdfElement
     /// <summary>
     /// 設定具有 schema awareness 的斷行規則屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="value">要寫入的斷行規則。</param>
-    /// <param name="prefix">選用的命名空間前綴。</param>
-    /// <param name="version">ODF 版本內容。</param>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="value">要寫入的斷行規則</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <param name="version">ODF 版本內容</param>
     public void SetStyleLineBreakAttributeValue(string localName, string namespaceUri, OdfStyleLineBreak value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleLineBreak(value), prefix, version);
@@ -39,10 +39,10 @@ public partial class OdfElement
     /// <summary>
     /// 取得具有 schema awareness 的背景重複屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="version">ODF 版本內容。</param>
-    /// <returns>解析後的背景重複；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="version">ODF 版本內容</param>
+    /// <returns>解析後的背景重複；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
     public OdfStyleRepeat? GetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
@@ -52,11 +52,11 @@ public partial class OdfElement
     /// <summary>
     /// 設定具有 schema awareness 的背景重複屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="value">要寫入的背景重複。</param>
-    /// <param name="prefix">選用的命名空間前綴。</param>
-    /// <param name="version">ODF 版本內容。</param>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="value">要寫入的背景重複</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <param name="version">ODF 版本內容</param>
     public void SetStyleRepeatAttributeValue(string localName, string namespaceUri, OdfStyleRepeat value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleRepeat(value), prefix, version);
@@ -65,10 +65,10 @@ public partial class OdfElement
     /// <summary>
     /// 取得具有 schema awareness 的樣式方向屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="version">ODF 版本內容。</param>
-    /// <returns>解析後的樣式方向；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="version">ODF 版本內容</param>
+    /// <returns>解析後的樣式方向；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
     public OdfStyleDirection? GetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
@@ -78,11 +78,11 @@ public partial class OdfElement
     /// <summary>
     /// 設定具有 schema awareness 的樣式方向屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="value">要寫入的樣式方向。</param>
-    /// <param name="prefix">選用的命名空間前綴。</param>
-    /// <param name="version">ODF 版本內容。</param>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="value">要寫入的樣式方向</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <param name="version">ODF 版本內容</param>
     public void SetStyleDirectionAttributeValue(string localName, string namespaceUri, OdfStyleDirection value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleDirection(value), prefix, version);
@@ -91,10 +91,10 @@ public partial class OdfElement
     /// <summary>
     /// 取得具有 schema awareness 的表單方向屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="version">ODF 版本內容。</param>
-    /// <returns>解析後的表單方向；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="version">ODF 版本內容</param>
+    /// <returns>解析後的表單方向；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
     public OdfFormOrientation? GetFormOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
@@ -104,11 +104,11 @@ public partial class OdfElement
     /// <summary>
     /// 設定具有 schema awareness 的表單方向屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="value">要寫入的表單方向。</param>
-    /// <param name="prefix">選用的命名空間前綴。</param>
-    /// <param name="version">ODF 版本內容。</param>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="value">要寫入的表單方向</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <param name="version">ODF 版本內容</param>
     public void SetFormOrientationAttributeValue(string localName, string namespaceUri, OdfFormOrientation value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatFormOrientation(value), prefix, version);
@@ -117,10 +117,10 @@ public partial class OdfElement
     /// <summary>
     /// 取得具有 schema awareness 的表格方向屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="version">ODF 版本內容。</param>
-    /// <returns>解析後的表格方向；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="version">ODF 版本內容</param>
+    /// <returns>解析後的表格方向；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
     public OdfTableDirection? GetTableDirectionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
@@ -130,11 +130,11 @@ public partial class OdfElement
     /// <summary>
     /// 設定具有 schema awareness 的表格方向屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="value">要寫入的表格方向。</param>
-    /// <param name="prefix">選用的命名空間前綴。</param>
-    /// <param name="version">ODF 版本內容。</param>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="value">要寫入的表格方向</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <param name="version">ODF 版本內容</param>
     public void SetTableDirectionAttributeValue(string localName, string namespaceUri, OdfTableDirection value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableDirection(value), prefix, version);
@@ -143,10 +143,10 @@ public partial class OdfElement
     /// <summary>
     /// 取得具有 schema awareness 的表格方位屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="version">ODF 版本內容。</param>
-    /// <returns>解析後的表格方位；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="version">ODF 版本內容</param>
+    /// <returns>解析後的表格方位；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
     public OdfTableOrientation? GetTableOrientationAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
@@ -156,11 +156,11 @@ public partial class OdfElement
     /// <summary>
     /// 設定具有 schema awareness 的表格方位屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="value">要寫入的表格方位。</param>
-    /// <param name="prefix">選用的命名空間前綴。</param>
-    /// <param name="version">ODF 版本內容。</param>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="value">要寫入的表格方位</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <param name="version">ODF 版本內容</param>
     public void SetTableOrientationAttributeValue(string localName, string namespaceUri, OdfTableOrientation value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatTableOrientation(value), prefix, version);
@@ -169,10 +169,10 @@ public partial class OdfElement
     /// <summary>
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="version">ODF 版本內容。</param>
-    /// <returns>解析後的樣式家族；若屬性不存在或不是已知 token 則為 <see langword="null"/>。</returns>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="version">ODF 版本內容</param>
+    /// <returns>解析後的樣式家族；若屬性不存在或不是已知 token 則為 <see langword="null"/></returns>
     public OdfStyleFamily? GetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
@@ -182,11 +182,11 @@ public partial class OdfElement
     /// <summary>
     /// 設定具有 schema awareness 的樣式家族屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="value">要寫入的樣式家族。</param>
-    /// <param name="prefix">選用的命名空間前綴。</param>
-    /// <param name="version">ODF 版本內容。</param>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="value">要寫入的樣式家族</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <param name="version">ODF 版本內容</param>
     public void SetStyleFamilyAttributeValue(string localName, string namespaceUri, OdfStyleFamily value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementSchemaRegistry.FormatStyleFamily(value), prefix, version);
@@ -195,10 +195,10 @@ public partial class OdfElement
     /// <summary>
     /// 取得具有 schema awareness 的 ODF 版本屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="version">ODF 版本內容。</param>
-    /// <returns>解析後的 ODF 版本；若屬性不存在或不是已知版本則為 <see langword="null"/>。</returns>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="version">ODF 版本內容</param>
+    /// <returns>解析後的 ODF 版本；若屬性不存在或不是已知版本則為 <see langword="null"/></returns>
     public OdfVersion? GetOdfVersionAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
@@ -208,11 +208,11 @@ public partial class OdfElement
     /// <summary>
     /// 設定具有 schema awareness 的 ODF 版本屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="value">要寫入的 ODF 版本。</param>
-    /// <param name="prefix">選用的命名空間前綴。</param>
-    /// <param name="version">ODF 版本內容。</param>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="value">要寫入的 ODF 版本</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <param name="version">ODF 版本內容</param>
     public void SetOdfVersionAttributeValue(string localName, string namespaceUri, OdfVersion value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, OdfElementDomainAttributeAccess.FormatVersion(value), prefix, version);
@@ -221,10 +221,10 @@ public partial class OdfElement
     /// <summary>
     /// 取得具有 schema awareness 的 MIME 類型屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="version">ODF 版本內容。</param>
-    /// <returns>解析後的 MIME 類型；若屬性不存在或格式無效則為 <see langword="null"/>。</returns>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="version">ODF 版本內容</param>
+    /// <returns>解析後的 MIME 類型；若屬性不存在或格式無效則為 <see langword="null"/></returns>
     public OdfMediaType? GetMediaTypeAttributeValue(string localName, string namespaceUri, OdfVersion version = OdfVersion.Odf14)
     {
         string? value = GetAttributeValue(localName, namespaceUri, version);
@@ -234,11 +234,11 @@ public partial class OdfElement
     /// <summary>
     /// 設定具有 schema awareness 的 MIME 類型屬性。
     /// </summary>
-    /// <param name="localName">屬性局部名稱。</param>
-    /// <param name="namespaceUri">屬性命名空間 URI。</param>
-    /// <param name="value">要寫入的 MIME 類型。</param>
-    /// <param name="prefix">選用的命名空間前綴。</param>
-    /// <param name="version">ODF 版本內容。</param>
+    /// <param name="localName">屬性局部名稱</param>
+    /// <param name="namespaceUri">屬性命名空間 URI</param>
+    /// <param name="value">要寫入的 MIME 類型</param>
+    /// <param name="prefix">選用的命名空間前綴</param>
+    /// <param name="version">ODF 版本內容</param>
     public void SetMediaTypeAttributeValue(string localName, string namespaceUri, OdfMediaType value, string? prefix = null, OdfVersion version = OdfVersion.Odf14)
     {
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);

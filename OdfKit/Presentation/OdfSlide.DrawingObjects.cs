@@ -94,7 +94,7 @@ public partial class OdfSlide
     /// <param name="y">Y 軸座標位置</param>
     /// <param name="w">寬度</param>
     /// <param name="h">高度</param>
-    /// <param name="paragraphs">段落文字集合。</param>
+    /// <param name="paragraphs">段落文字集合</param>
     /// <returns>新增的文字方塊圖形執行個體</returns>
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, IEnumerable<string> paragraphs)
     {
@@ -125,13 +125,13 @@ public partial class OdfSlide
     /// <summary>
     /// 在投影片上新增影片物件。
     /// </summary>
-    /// <param name="packagePath">影片在封裝包內的路徑。</param>
-    /// <param name="x">X 軸座標位置。</param>
-    /// <param name="y">Y 軸座標位置。</param>
-    /// <param name="width">寬度。</param>
-    /// <param name="height">高度。</param>
-    /// <param name="mimeType">影片 MIME 類型。</param>
-    /// <returns>新建立的媒體物件。</returns>
+    /// <param name="packagePath">影片在封裝包內的路徑</param>
+    /// <param name="x">X 軸座標位置</param>
+    /// <param name="y">Y 軸座標位置</param>
+    /// <param name="width">寬度</param>
+    /// <param name="height">高度</param>
+    /// <param name="mimeType">影片 MIME 類型</param>
+    /// <returns>新建立的媒體物件</returns>
     public OdfMediaObject AddVideo(
         string packagePath,
         OdfLength x,
@@ -146,13 +146,13 @@ public partial class OdfSlide
     /// <summary>
     /// 在投影片上新增音訊物件。
     /// </summary>
-    /// <param name="packagePath">音訊在封裝包內的路徑。</param>
-    /// <param name="x">X 軸座標位置。</param>
-    /// <param name="y">Y 軸座標位置。</param>
-    /// <param name="width">寬度。</param>
-    /// <param name="height">高度。</param>
-    /// <param name="mimeType">音訊 MIME 類型。</param>
-    /// <returns>新建立的媒體物件。</returns>
+    /// <param name="packagePath">音訊在封裝包內的路徑</param>
+    /// <param name="x">X 軸座標位置</param>
+    /// <param name="y">Y 軸座標位置</param>
+    /// <param name="width">寬度</param>
+    /// <param name="height">高度</param>
+    /// <param name="mimeType">音訊 MIME 類型</param>
+    /// <returns>新建立的媒體物件</returns>
     public OdfMediaObject AddAudio(
         string packagePath,
         OdfLength x,
@@ -222,11 +222,11 @@ public partial class OdfSlide
     /// <summary>
     /// 在投影片上新增直線圖形。
     /// </summary>
-    /// <param name="x1">起點 X 軸座標位置。</param>
-    /// <param name="y1">起點 Y 軸座標位置。</param>
-    /// <param name="x2">終點 X 軸座標位置。</param>
-    /// <param name="y2">終點 Y 軸座標位置。</param>
-    /// <returns>新增的直線圖形執行個體。</returns>
+    /// <param name="x1">起點 X 軸座標位置</param>
+    /// <param name="y1">起點 Y 軸座標位置</param>
+    /// <param name="x2">終點 X 軸座標位置</param>
+    /// <param name="y2">終點 Y 軸座標位置</param>
+    /// <returns>新增的直線圖形執行個體</returns>
     public OdfShape AddLine(OdfLength x1, OdfLength y1, OdfLength x2, OdfLength y2)
     {
         OdfNode shapeNode = new(OdfNodeType.Element, "line", OdfNamespaces.Draw, "draw");
@@ -277,7 +277,7 @@ public partial class OdfSlide
     /// <param name="y">Y 軸座標位置</param>
     /// <param name="w">寬度</param>
     /// <param name="h">高度</param>
-    /// <param name="altText">選用的圖片替代文字。</param>
+    /// <param name="altText">選用的圖片替代文字</param>
     /// <returns>新增的圖片圖形執行個體</returns>
     public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h, string? altText = null)
     {
@@ -310,9 +310,9 @@ public partial class OdfSlide
     /// <summary>
     /// 設定投影片切換動畫效果與速度。
     /// </summary>
-    /// <param name="type">切換效果類型。</param>
-    /// <param name="duration">持續時間。</param>
-    /// <param name="speed">切換速度。</param>
+    /// <param name="type">切換效果類型</param>
+    /// <param name="duration">持續時間</param>
+    /// <param name="speed">切換速度</param>
     public void SetTransition(OdfTransitionType type, OdfLength duration, OdfTransitionSpeed speed)
     {
         string smilDurStr = $"{duration.ToPoints() / 72.0:F2}s";

@@ -7,8 +7,8 @@ namespace OdfKit.Database;
 /// <summary>
 /// 表示 ODB 資料表描述。
 /// </summary>
-/// <param name="name">資料表名稱。</param>
-/// <param name="command">資料表命令或來源名稱。</param>
+/// <param name="name">資料表名稱</param>
+/// <param name="command">資料表命令或來源名稱</param>
 public sealed class OdfDatabaseTableInfo(string name, string? command)
 {
     /// <summary>

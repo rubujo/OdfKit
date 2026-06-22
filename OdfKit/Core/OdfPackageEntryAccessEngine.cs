@@ -8,7 +8,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
-/// ODF 封裝項目讀寫引擎（內部協作者）。
+/// ODF 封裝專案讀寫引擎（內部協作者）。
 /// </summary>
 internal static class OdfPackageEntryAccessEngine
 {
@@ -16,7 +16,7 @@ internal static class OdfPackageEntryAccessEngine
     private const string ManifestPath = "META-INF/manifest.xml";
 
     /// <summary>
-    /// 檢查封裝中是否包含指定名稱的項目。
+    /// 檢查封裝中是否包含指定名稱的專案。
     /// </summary>
     internal static bool HasEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name)
     {
@@ -24,7 +24,7 @@ internal static class OdfPackageEntryAccessEngine
     }
 
     /// <summary>
-    /// 取得封裝中所有實體項目的路徑集合。
+    /// 取得封裝中所有實體專案的路徑集合。
     /// </summary>
     internal static IEnumerable<OdfPackage.OdfPackageEntryInfo> GetEntries(OdfPackage.OdfPackageEntryCollaborators ctx)
     {
@@ -32,7 +32,7 @@ internal static class OdfPackageEntryAccessEngine
     }
 
     /// <summary>
-    /// 讀取指定路徑項目的完整內容位元組。
+    /// 讀取指定路徑專案的完整內容位元組。
     /// </summary>
     internal static byte[] ReadEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string path)
     {
@@ -43,7 +43,7 @@ internal static class OdfPackageEntryAccessEngine
     }
 
     /// <summary>
-    /// 取得指定項目的唯讀資料流。
+    /// 取得指定專案的唯讀資料流。
     /// </summary>
     internal static Stream GetEntryStream(OdfPackage.OdfPackageEntryCollaborators ctx, string name)
     {
@@ -58,7 +58,7 @@ internal static class OdfPackageEntryAccessEngine
     }
 
     /// <summary>
-    /// 將指定的位元組內容寫入或覆寫封裝中的項目。
+    /// 將指定的位元組內容寫入或覆寫封裝中的專案。
     /// </summary>
     internal static void WriteEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name, byte[] content, string mediaType)
     {
@@ -81,7 +81,7 @@ internal static class OdfPackageEntryAccessEngine
     }
 
     /// <summary>
-    /// 將指定的資料流內容寫入或覆寫封裝中的項目。
+    /// 將指定的資料流內容寫入或覆寫封裝中的專案。
     /// </summary>
     internal static void WriteEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name, Stream contentStream, string mediaType)
     {
@@ -111,7 +111,7 @@ internal static class OdfPackageEntryAccessEngine
     }
 
     /// <summary>
-    /// 從封裝中移除指定的項目。
+    /// 從封裝中移除指定的專案。
     /// </summary>
     internal static void RemoveEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name)
     {
@@ -194,7 +194,7 @@ internal static class OdfPackageEntryAccessEngine
     }
 
     /// <summary>
-    /// 寫入虛擬項目（載入管線用，不觸發簽章清除）。
+    /// 寫入虛擬專案（載入管線用，不觸發簽章清除）。
     /// </summary>
     internal static void WriteVirtualEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name, byte[] content, string mediaType)
     {
@@ -206,7 +206,7 @@ internal static class OdfPackageEntryAccessEngine
     }
 
     /// <summary>
-    /// 判斷指定路徑的項目是否已加密。
+    /// 判斷指定路徑的專案是否已加密。
     /// </summary>
     internal static bool IsEntryEncrypted(OdfPackage.OdfPackageEntryCollaborators ctx, string name)
     {
@@ -215,7 +215,7 @@ internal static class OdfPackageEntryAccessEngine
     }
 
     /// <summary>
-    /// 取得指定項目的加密詳細資訊。
+    /// 取得指定專案的加密詳細資訊。
     /// </summary>
     internal static OdfEncryptionInfo? GetEntryEncryptionInfo(OdfPackage.OdfPackageEntryCollaborators ctx, string name)
     {

@@ -16,7 +16,7 @@ public sealed class OdfParagraphCollection : IEnumerable<OdfParagraph>
     /// <summary>
     /// 初始化 <see cref="OdfParagraphCollection"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">所屬文字文件。</param>
+    /// <param name="document">所屬文字文件</param>
     public OdfParagraphCollection(TextDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
@@ -25,8 +25,8 @@ public sealed class OdfParagraphCollection : IEnumerable<OdfParagraph>
     /// <summary>
     /// 新增段落。
     /// </summary>
-    /// <param name="text">段落文字。</param>
-    /// <returns>新增完成的段落。</returns>
+    /// <param name="text">段落文字</param>
+    /// <returns>新增完成的段落</returns>
     public OdfParagraph Add(string text = "")
     {
         return _document.AddParagraph(text);
@@ -57,7 +57,7 @@ public sealed class OdfParagraphCollection : IEnumerable<OdfParagraph>
     /// <summary>
     /// 取得段落列舉器，供 LINQ 查詢使用。
     /// </summary>
-    /// <returns>段落列舉器。</returns>
+    /// <returns>段落列舉器</returns>
     public IEnumerator<OdfParagraph> GetEnumerator()
     {
         return Items.GetEnumerator();

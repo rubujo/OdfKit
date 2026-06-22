@@ -5,9 +5,13 @@
 /// </summary>
 public enum OdfTableStructuralChangeKind
 {
-    /// <summary>插入列／欄或表格。</summary>
+    /// <summary>
+    /// 插入列／欄或表格
+    /// </summary>
     Insertion,
 
-    /// <summary>刪除列／欄或表格。</summary>
+    /// <summary>
+    /// 刪除列／欄或表格
+    /// </summary>
     Deletion,
 }

@@ -3,9 +3,9 @@
 /// <summary>
 /// 表示文字文件中一則腳注或尾注的摘要資訊。
 /// </summary>
-/// <param name="id">注腳識別碼。</param>
-/// <param name="citation">引用標記文字。</param>
-/// <param name="bodyText">注腳本文內容。</param>
+/// <param name="id">注腳識別碼</param>
+/// <param name="citation">引用標記文字</param>
+/// <param name="bodyText">注腳本文內容</param>
 public sealed class OdfFootnoteInfo(string id, string citation, string bodyText)
 {
     /// <summary>

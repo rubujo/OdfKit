@@ -12,8 +12,8 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     /// <summary>
     /// 以三段邊框線寬 lexical form 建立 <see cref="OdfBorderWidths"/>。
     /// </summary>
-    /// <param name="value">三段正長度字串，例如 <c>0.05pt 0.10pt 0.05pt</c>。</param>
-    /// <exception cref="ArgumentException">當字串不是三個 ODF <c>positiveLength</c> 值時擲回。</exception>
+    /// <param name="value">三段正長度字串，例如 <c>0.05pt 0.10pt 0.05pt</c></param>
+    /// <exception cref="ArgumentException">當字串不是三個 ODF <c>positiveLength</c> 值時擲回</exception>
     public OdfBorderWidths(string value)
     {
         if (!TryParseComponents(value, out OdfLength innerLineWidth, out OdfLength spacing, out OdfLength outerLineWidth))
@@ -30,10 +30,10 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     /// <summary>
     /// 以三個正長度值建立 <see cref="OdfBorderWidths"/>。
     /// </summary>
-    /// <param name="innerLineWidth">內側線寬。</param>
-    /// <param name="spacing">兩條線之間的間距。</param>
-    /// <param name="outerLineWidth">外側線寬。</param>
-    /// <exception cref="ArgumentException">當任一長度不是 ODF <c>positiveLength</c> 時擲回。</exception>
+    /// <param name="innerLineWidth">內側線寬</param>
+    /// <param name="spacing">兩條線之間的間距</param>
+    /// <param name="outerLineWidth">外側線寬</param>
+    /// <exception cref="ArgumentException">當任一長度不是 ODF <c>positiveLength</c> 時擲回</exception>
     public OdfBorderWidths(OdfLength innerLineWidth, OdfLength spacing, OdfLength outerLineWidth)
     {
         if (!IsPositiveLength(innerLineWidth) || !IsPositiveLength(spacing) || !IsPositiveLength(outerLineWidth))
@@ -70,9 +70,9 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     /// <summary>
     /// 嘗試解析三段邊框線寬字串。
     /// </summary>
-    /// <param name="value">三段邊框線寬字串。</param>
-    /// <param name="borderWidths">成功時傳回解析後的三段邊框線寬。</param>
-    /// <returns>若字串符合 ODF <c>borderWidths</c> 格式則為 <see langword="true"/>。</returns>
+    /// <param name="value">三段邊框線寬字串</param>
+    /// <param name="borderWidths">成功時傳回解析後的三段邊框線寬</param>
+    /// <returns>若字串符合 ODF <c>borderWidths</c> 格式則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfBorderWidths borderWidths)
     {
         if (TryParseComponents(value, out OdfLength innerLineWidth, out OdfLength spacing, out OdfLength outerLineWidth))
@@ -88,14 +88,14 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     /// <summary>
     /// 傳回原始三段邊框線寬字串。
     /// </summary>
-    /// <returns>三段邊框線寬字串。</returns>
+    /// <returns>三段邊框線寬字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// 判斷目前值是否等於另一組三段邊框線寬。
     /// </summary>
-    /// <param name="other">要比較的三段邊框線寬。</param>
-    /// <returns>若 lexical form 相同則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的三段邊框線寬</param>
+    /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfBorderWidths other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc />
@@ -107,17 +107,17 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     /// <summary>
     /// 判斷兩組三段邊框線寬是否相等。
     /// </summary>
-    /// <param name="left">左側三段邊框線寬。</param>
-    /// <param name="right">右側三段邊框線寬。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側三段邊框線寬</param>
+    /// <param name="right">右側三段邊框線寬</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfBorderWidths left, OdfBorderWidths right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩組三段邊框線寬是否不相等。
     /// </summary>
-    /// <param name="left">左側三段邊框線寬。</param>
-    /// <param name="right">右側三段邊框線寬。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側三段邊框線寬</param>
+    /// <param name="right">右側三段邊框線寬</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfBorderWidths left, OdfBorderWidths right) => !left.Equals(right);
 
     private OdfBorderWidths(string value, OdfLength innerLineWidth, OdfLength spacing, OdfLength outerLineWidth)

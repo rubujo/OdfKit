@@ -12,7 +12,7 @@ public sealed partial class OdfPackage
     /// <summary>
     /// 釋放封裝持有的資源。
     /// </summary>
-    /// <param name="disposing">若為 <see langword="true"/>，則釋放受控資源。</param>
+    /// <param name="disposing">若為 <see langword="true"/>，則釋放受控資源</param>
     private void Dispose(bool disposing)
     {
         if (!_isDisposed)
@@ -26,7 +26,7 @@ public sealed partial class OdfPackage
                     _underlyingStream?.Dispose();
                 }
 
-                // 釋放已載入的項目資料流
+                // 釋放已載入的專案資料流
                 foreach (var entry in _entries.Values)
                 {
                     entry.Dispose();

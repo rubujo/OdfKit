@@ -17,7 +17,7 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
     private readonly IReadOnlyList<OdfValidationIssue> _issues = new List<OdfValidationIssue>(issues ?? []).AsReadOnly();
 
     /// <summary>
-    /// 取得一個值，表示驗證的文件是否符合選取的檢查項目。
+    /// 取得一個值，表示驗證的文件是否符合選取的檢查專案。
     /// </summary>
     public bool IsValid => BlockingIssueCount == 0;
 
@@ -75,7 +75,7 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
     /// <summary>
     /// 建立可序列化的 JSON 匯出模型。
     /// </summary>
-    /// <returns>包含驗證報告摘要與問題清單的 JSON 匯出模型。</returns>
+    /// <returns>包含驗證報告摘要與問題清單的 JSON 匯出模型</returns>
     public OdfValidationReportJsonModel ToJsonModel()
     {
         return new OdfValidationReportJsonModel(
@@ -93,7 +93,7 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
     /// <summary>
     /// 將驗證報告匯出為穩定 JSON 字串。
     /// </summary>
-    /// <returns>JSON 格式的驗證報告。</returns>
+    /// <returns>JSON 格式的驗證報告</returns>
     public string ToJson()
     {
         OdfValidationReportJsonModel model = ToJsonModel();

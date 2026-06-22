@@ -13,7 +13,7 @@ public sealed class OdfSchemaPatternNode
     private readonly IReadOnlyList<OdfSchemaDatatypeParameter> _dataParameters;
 
     /// <summary>
-    /// 初始化模式節點中繼資料項目的新執行個體。
+    /// 初始化模式節點中繼資料專案的新執行個體。
     /// </summary>
     /// <param name="kind">模式節點種類</param>
     /// <param name="occurrence">出現機率/次數設定</param>

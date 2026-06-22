@@ -15,7 +15,9 @@ public partial class OdfPageSetup
     private readonly string _masterPageName;
     private readonly string _pageLayoutName;
 
-    /// <summary>使用預設主頁面（Standard / Mpm1）初始化。</summary>
+    /// <summary>
+    /// 使用預設主頁面（Standard / Mpm1）初始化
+    /// </summary>
     public OdfPageSetup(TextDocument doc) : this(doc, "Standard", "Mpm1") { }
 
     internal OdfPageSetup(TextDocument doc, string masterPageName, string pageLayoutName)

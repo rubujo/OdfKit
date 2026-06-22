@@ -18,9 +18,9 @@ public static class OdfRtfImporter
     /// <summary>
     /// 從 RTF 字串建立文字文件。
     /// </summary>
-    /// <param name="rtf">來源 RTF 內容。</param>
-    /// <returns>轉換後的文字文件。</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="rtf"/> 為 null 時引發。</exception>
+    /// <param name="rtf">來源 RTF 內容</param>
+    /// <returns>轉換後的文字文件</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="rtf"/> 為 null 時引發</exception>
     public static TextDocument Import(string rtf)
     {
         if (rtf is null)

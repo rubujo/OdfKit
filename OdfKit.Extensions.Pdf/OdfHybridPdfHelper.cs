@@ -132,7 +132,7 @@ public static class OdfHybridPdfHelper
     /// <param name="pdfStream">來源 PDF 檔案的資料流</param>
     /// <param name="odfStream">要注入的 ODF 檔案的資料流</param>
     /// <param name="outputPdfStream">接收輸出的混合 PDF 檔案資料流</param>
-    /// <param name="odfFileName">注入的 ODF 項目檔名</param>
+    /// <param name="odfFileName">注入的 ODF 專案檔名</param>
     /// <param name="password">PDF 密碼，若無則為 <see langword="null"/></param>
     public static void InjectOdfToPdf(Stream pdfStream, Stream odfStream, Stream outputPdfStream, string odfFileName, string? password = null)
     {

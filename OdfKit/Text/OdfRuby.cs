@@ -5,21 +5,21 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// 表示用於東亞注音（旁註標記）的 ruby 版面配置項目。
+/// 表示用於東亞注音（旁註標記）的 ruby 版面配置專案。
 /// </summary>
 /// <param name="node">基礎的 OdfNode 節點</param>
 /// <param name="doc">所屬的文字文件</param>
 public class OdfRuby(OdfNode node, TextDocument doc)
 {
     /// <summary>
-    /// 取得表示 ruby 項目的基礎 ODF 節點。
+    /// 取得表示 ruby 專案的基礎 ODF 節點。
     /// </summary>
     public OdfNode Node { get; } = node ?? throw new ArgumentNullException(nameof(node));
 
     private readonly TextDocument _doc = doc ?? throw new ArgumentNullException(nameof(doc));
 
     /// <summary>
-    /// 取得或設定與 ruby 項目關聯的樣式名稱。
+    /// 取得或設定與 ruby 專案關聯的樣式名稱。
     /// </summary>
     public string? StyleName
     {
@@ -64,7 +64,7 @@ public class OdfRuby(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
-    /// 取得或設定與 ruby 基底項目關聯的樣式名稱。
+    /// 取得或設定與 ruby 基底專案關聯的樣式名稱。
     /// </summary>
     public string? RubyBaseStyleName
     {
@@ -73,7 +73,7 @@ public class OdfRuby(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
-    /// 取得或設定與 ruby 文字項目關聯的樣式名稱。
+    /// 取得或設定與 ruby 文字專案關聯的樣式名稱。
     /// </summary>
     public string? RubyTextStyleName
     {

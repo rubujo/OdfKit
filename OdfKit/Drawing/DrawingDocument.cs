@@ -52,7 +52,7 @@ public partial class DrawingDocument : OdfDocument
     /// <summary>
     /// 建立新的 ODG 繪圖文件 Fluent builder。
     /// </summary>
-    /// <returns>新的 <see cref="DrawingDocumentBuilder"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="DrawingDocumentBuilder"/> 執行個體</returns>
     public static DrawingDocumentBuilder Builder()
     {
         return new DrawingDocumentBuilder(Create());
@@ -61,7 +61,7 @@ public partial class DrawingDocument : OdfDocument
     /// <summary>
     /// 建立新的 ODG 繪圖文件。
     /// </summary>
-    /// <returns>新的 <see cref="DrawingDocument"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="DrawingDocument"/> 執行個體</returns>
     public static DrawingDocument Create()
     {
         return (DrawingDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Graphics);
@@ -70,9 +70,9 @@ public partial class DrawingDocument : OdfDocument
     /// <summary>
     /// 從指定的繪圖範本文件建立新的繪圖文件。
     /// </summary>
-    /// <param name="template">繪圖範本文件。</param>
-    /// <param name="clearUserContent">是否清除範本中各頁面的文字內容，但保留版面配置與形狀結構。</param>
-    /// <returns>建立完成的 <see cref="DrawingDocument"/> 執行個體。</returns>
+    /// <param name="template">繪圖範本文件</param>
+    /// <param name="clearUserContent">是否清除範本中各頁面的文字內容，但保留版面配置與形狀結構</param>
+    /// <returns>建立完成的 <see cref="DrawingDocument"/> 執行個體</returns>
     public static DrawingDocument CreateFromTemplate(GraphicsTemplateDocument template, bool clearUserContent = false)
     {
         return (DrawingDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Graphics, "application/vnd.oasis.opendocument.graphics", clearUserContent);
@@ -87,9 +87,9 @@ public partial class DrawingDocument : OdfDocument
     /// <summary>
     /// 從指定路徑載入 ODG 繪圖文件。
     /// </summary>
-    /// <param name="path">ODG 文件路徑。</param>
-    /// <returns>載入完成的 <see cref="DrawingDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODG 繪圖時擲出。</exception>
+    /// <param name="path">ODG 文件路徑</param>
+    /// <returns>載入完成的 <see cref="DrawingDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODG 繪圖時擲出</exception>
     public new static DrawingDocument Load(string path)
     {
         return EnsureDrawing(OdfDocumentFactory.LoadDocument(path));
@@ -98,19 +98,19 @@ public partial class DrawingDocument : OdfDocument
     /// <summary>
     /// 非同步從指定路徑載入 ODG 繪圖文件。
     /// </summary>
-    /// <param name="path">ODG 文件路徑。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="DrawingDocument"/>。</returns>
+    /// <param name="path">ODG 文件路徑</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="DrawingDocument"/></returns>
     public new static async Task<DrawingDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         EnsureDrawing(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// 從指定資料流載入 ODG 繪圖文件。
     /// </summary>
-    /// <param name="stream">包含 ODG 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的 <see cref="DrawingDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODG 繪圖時擲出。</exception>
+    /// <param name="stream">包含 ODG 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的 <see cref="DrawingDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODG 繪圖時擲出</exception>
     public new static DrawingDocument Load(Stream stream, string? fileName = null)
     {
         return EnsureDrawing(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -119,10 +119,10 @@ public partial class DrawingDocument : OdfDocument
     /// <summary>
     /// 非同步從指定資料流載入 ODG 繪圖文件。
     /// </summary>
-    /// <param name="stream">包含 ODG 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="DrawingDocument"/>。</returns>
+    /// <param name="stream">包含 ODG 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="DrawingDocument"/></returns>
     public new static async Task<DrawingDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         EnsureDrawing(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 

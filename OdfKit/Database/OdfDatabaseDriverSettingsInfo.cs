@@ -3,11 +3,11 @@
 /// <summary>
 /// 表示資料庫連線的驅動程式設定摘要（<c>db:driver-settings</c>）。
 /// </summary>
-/// <param name="showDeleted">是否顯示已刪除的資料列。</param>
-/// <param name="isFirstRowHeaderLine">第一列是否視為標頭列（適用文字／CSV 等驅動程式）。</param>
-/// <param name="parameterNameSubstitution">是否支援具名參數替代為 <c>?</c> 佔位符。</param>
-/// <param name="systemDriverSettings">系統驅動程式設定字串。</param>
-/// <param name="baseDn">LDAP 連線的 base DN 設定。</param>
+/// <param name="showDeleted">是否顯示已刪除的資料列</param>
+/// <param name="isFirstRowHeaderLine">第一列是否視為標頭列（適用文字／CSV 等驅動程式）</param>
+/// <param name="parameterNameSubstitution">是否支援具名參數替代為 <c>?</c> 佔位符</param>
+/// <param name="systemDriverSettings">系統驅動程式設定字串</param>
+/// <param name="baseDn">LDAP 連線的 base DN 設定</param>
 public sealed class OdfDatabaseDriverSettingsInfo(
     bool? showDeleted,
     bool? isFirstRowHeaderLine,

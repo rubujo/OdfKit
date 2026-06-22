@@ -105,7 +105,7 @@ public sealed class OdfChartStyle
     /// <summary>
     /// 取得或設定座標軸刻度標籤的位置（對應 <c>chart:label-position</c>）。
     /// </summary>
-    /// <remarks>常見值包含 <c>near-axis</c>、<c>near-axis-other-side</c>、<c>outside-start</c> 與 <c>outside-end</c>。</remarks>
+    /// <remarks>常見值包含 <c>near-axis</c>、<c>near-axis-other-side</c>、<c>outside-start</c> 與 <c>outside-end</c></remarks>
     public string? LabelPosition
     {
         get => _document.StyleEngine.GetStyleProperty(Name, "label-position", OdfNamespaces.Chart, "chart");
@@ -124,7 +124,7 @@ public sealed class OdfChartStyle
     /// <summary>
     /// 取得或設定座標軸標籤相對於座標軸的對齊位置（對應 <c>chart:axis-label-position</c>）。
     /// </summary>
-    /// <remarks>常見值包含 <c>near-axis</c>、<c>near-axis-other-side</c>、<c>outside-start</c> 與 <c>outside-end</c>。</remarks>
+    /// <remarks>常見值包含 <c>near-axis</c>、<c>near-axis-other-side</c>、<c>outside-start</c> 與 <c>outside-end</c></remarks>
     public string? AxisLabelPosition
     {
         get => _document.StyleEngine.GetStyleProperty(Name, "axis-label-position", OdfNamespaces.Chart, "chart");
@@ -174,7 +174,7 @@ public sealed class OdfChartStyle
     /// <summary>
     /// 建立此樣式的高階摘要。
     /// </summary>
-    /// <returns>圖表樣式摘要。</returns>
+    /// <returns>圖表樣式摘要</returns>
     public OdfChartStyleInfo ToInfo() =>
         new(Name, FillColor, StrokeColor, StrokeWidth, Fill, Stroke, ThreeDimensional, AngleOffset);
 

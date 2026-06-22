@@ -10,8 +10,8 @@ public partial class OdfAnimation
     /// <summary>
     /// 設定動畫效果的持續時間，並同步更新子節點的 <c>smil:dur</c>。
     /// </summary>
-    /// <param name="duration">持續時間。</param>
-    /// <returns>目前動畫執行個體。</returns>
+    /// <param name="duration">持續時間</param>
+    /// <returns>目前動畫執行個體</returns>
     public OdfAnimation SetDuration(TimeSpan duration)
     {
         if (duration < TimeSpan.Zero)
@@ -26,8 +26,8 @@ public partial class OdfAnimation
     /// <summary>
     /// 設定動畫效果的延遲啟動時間，並依觸發方式更新 <c>smil:begin</c>。
     /// </summary>
-    /// <param name="delay">延遲時間。</param>
-    /// <returns>目前動畫執行個體。</returns>
+    /// <param name="delay">延遲時間</param>
+    /// <returns>目前動畫執行個體</returns>
     public OdfAnimation SetDelay(TimeSpan delay)
     {
         if (delay < TimeSpan.Zero)

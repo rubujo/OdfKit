@@ -45,8 +45,8 @@ public partial class DrawPageElement
     /// <summary>
     /// 在 <c>draw:page</c> 末尾新增框架。
     /// </summary>
-    /// <param name="name">選用的框架名稱。</param>
-    /// <returns>新增的 <c>draw:frame</c> 元素。</returns>
+    /// <param name="name">選用的框架名稱</param>
+    /// <returns>新增的 <c>draw:frame</c> 元素</returns>
     public DrawFrameElement AppendFrame(string? name = null)
     {
         DrawFrameElement frame = AppendElement(new DrawFrameElement("draw"));
@@ -61,8 +61,8 @@ public partial class DrawPageElement
     /// <summary>
     /// 在 <c>draw:page</c> 末尾新增矩形。
     /// </summary>
-    /// <param name="name">選用的形狀名稱。</param>
-    /// <returns>新增的 <c>draw:rect</c> 元素。</returns>
+    /// <param name="name">選用的形狀名稱</param>
+    /// <returns>新增的 <c>draw:rect</c> 元素</returns>
     public DrawRectElement AppendRectangle(string? name = null)
     {
         DrawRectElement rectangle = AppendElement(new DrawRectElement("draw"));
@@ -77,7 +77,7 @@ public partial class DrawPageElement
     /// <summary>
     /// 在 <c>draw:page</c> 末尾新增簡報備忘稿。
     /// </summary>
-    /// <returns>新增的 <c>presentation:notes</c> 元素。</returns>
+    /// <returns>新增的 <c>presentation:notes</c> 元素</returns>
     public PresentationNotesElement AppendNotes()
     {
         return AppendElement(new PresentationNotesElement("presentation"));

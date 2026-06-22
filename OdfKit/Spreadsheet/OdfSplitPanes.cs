@@ -5,8 +5,8 @@ namespace OdfKit.Spreadsheet;
 /// <summary>
 /// 表示工作表分割窗格設定（非凍結模式）。
 /// </summary>
-/// <param name="rows">水平分割線所在的列索引。</param>
-/// <param name="columns">垂直分割線所在的欄索引。</param>
+/// <param name="rows">水平分割線所在的列索引</param>
+/// <param name="columns">垂直分割線所在的欄索引</param>
 public readonly struct OdfSplitPanes(int rows, int columns) : IEquatable<OdfSplitPanes>
 {
     /// <summary>

@@ -11,15 +11,15 @@ public sealed class OdfValidationReportJsonModel
     /// <summary>
     /// 初始化 <see cref="OdfValidationReportJsonModel"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="isValid">文件是否通過驗證。</param>
-    /// <param name="detectedVersion">偵測到的 ODF 版本。</param>
-    /// <param name="documentKind">偵測到的文件種類。</param>
-    /// <param name="infoCount">資訊性問題數量。</param>
-    /// <param name="warningCount">警告問題數量。</param>
-    /// <param name="errorCount">錯誤問題數量。</param>
-    /// <param name="fatalCount">致命問題數量。</param>
-    /// <param name="blockingIssueCount">會讓驗證失敗的問題數量。</param>
-    /// <param name="issues">驗證問題匯出模型集合。</param>
+    /// <param name="isValid">文件是否通過驗證</param>
+    /// <param name="detectedVersion">偵測到的 ODF 版本</param>
+    /// <param name="documentKind">偵測到的文件種類</param>
+    /// <param name="infoCount">資訊性問題數量</param>
+    /// <param name="warningCount">警告問題數量</param>
+    /// <param name="errorCount">錯誤問題數量</param>
+    /// <param name="fatalCount">致命問題數量</param>
+    /// <param name="blockingIssueCount">會讓驗證失敗的問題數量</param>
+    /// <param name="issues">驗證問題匯出模型集合</param>
     public OdfValidationReportJsonModel(
         bool isValid,
         string detectedVersion,

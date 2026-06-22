@@ -32,8 +32,8 @@ public partial class OdfMailMergeEngine(TextDocument doc)
     /// </summary>
     /// <param name="root">郵件合併的根節點</param>
     /// <param name="dataSource">用來合併的資料來源物件</param>
-    /// <param name="options">郵件合併選項，若為 null 則使用預設值。</param>
-    /// <returns>郵件合併執行報告。</returns>
+    /// <param name="options">郵件合併選項，若為 null 則使用預設值</param>
+    /// <returns>郵件合併執行報告</returns>
     public OdfMailMergeReport Execute(OdfNode root, object dataSource, OdfMailMergeOptions? options)
     {
         if (root is null)

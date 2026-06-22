@@ -13,9 +13,9 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 取得指定子路徑的嵌入式 ODF 文件。
     /// </summary>
-    /// <typeparam name="T">嵌入式文件 wrapper 類型。</typeparam>
-    /// <param name="subPath">封裝中的子路徑。</param>
-    /// <returns>嵌入式文件 wrapper。</returns>
+    /// <typeparam name="T">嵌入式文件 wrapper 類型</typeparam>
+    /// <param name="subPath">封裝中的子路徑</param>
+    /// <returns>嵌入式文件 wrapper</returns>
     public T GetEmbeddedDocument<T>(string subPath) where T : OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
@@ -34,15 +34,15 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 建立指定子路徑的嵌入式 ODF 文件。
     /// </summary>
-    /// <typeparam name="T">嵌入式文件 wrapper 類型。</typeparam>
-    /// <param name="subPath">封裝中的子路徑。</param>
-    /// <returns>建立完成的嵌入式文件 wrapper。</returns>
+    /// <typeparam name="T">嵌入式文件 wrapper 類型</typeparam>
+    /// <param name="subPath">封裝中的子路徑</param>
+    /// <returns>建立完成的嵌入式文件 wrapper</returns>
     /// <remarks>
     /// 此方法會在建立時立即呼叫一次傳回文件的 <c>Save()</c> 以寫入最小骨架內容；
     /// 若呼叫端在取得傳回值後繼續修改其內容（例如設定公式或新增資料），
     /// 必須自行再次呼叫該嵌入式文件的 <c>Save()</c>，否則後續修改不會寫回封裝
     /// （外層文件的 <see cref="Save(OdfSaveOptions?)"/> 僅會持久化外層自身的
-    /// <c>content.xml</c> 等項目，不會連動儲存內嵌子文件）。
+    /// <c>content.xml</c> 等專案，不會連動儲存內嵌子文件）。
     /// </remarks>
     public T CreateEmbeddedDocument<T>(string subPath) where T : OdfDocument
     {

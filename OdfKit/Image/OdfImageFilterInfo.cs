@@ -5,8 +5,8 @@ namespace OdfKit.Image;
 /// <summary>
 /// 表示影像框架的濾鏡／特效設定。
 /// </summary>
-/// <param name="filterName">濾鏡名稱。</param>
-/// <param name="parameters">濾鏡參數鍵值集合。</param>
+/// <param name="filterName">濾鏡名稱</param>
+/// <param name="parameters">濾鏡參數鍵值集合</param>
 public sealed class OdfImageFilterInfo(string filterName, IReadOnlyDictionary<string, string>? parameters = null)
 {
     /// <summary>

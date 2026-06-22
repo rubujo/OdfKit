@@ -8,13 +8,13 @@ namespace OdfKit.DOM;
 public sealed class OdfTypedDomChildElementRelationCoverage
 {
     /// <summary>
-    /// 初始化 schema 子元素關係覆蓋項目。
+    /// 初始化 schema 子元素關係覆蓋專案。
     /// </summary>
-    /// <param name="parentNamespaceUri">父元素命名空間 URI。</param>
-    /// <param name="parentLocalName">父元素區域名稱。</param>
-    /// <param name="childNamespaceUri">子元素命名空間 URI。</param>
-    /// <param name="childLocalName">子元素區域名稱。</param>
-    /// <param name="occurrence">schema 中記錄的出現次數。</param>
+    /// <param name="parentNamespaceUri">父元素命名空間 URI</param>
+    /// <param name="parentLocalName">父元素區域名稱</param>
+    /// <param name="childNamespaceUri">子元素命名空間 URI</param>
+    /// <param name="childLocalName">子元素區域名稱</param>
+    /// <param name="occurrence">schema 中記錄的出現次數</param>
     public OdfTypedDomChildElementRelationCoverage(
         string parentNamespaceUri,
         string parentLocalName,

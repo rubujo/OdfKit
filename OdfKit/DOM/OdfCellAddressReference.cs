@@ -16,8 +16,8 @@ public readonly struct OdfCellAddressReference : IEquatable<OdfCellAddressRefere
     /// <summary>
     /// 以儲存格位址 lexical form 建立 <see cref="OdfCellAddressReference"/>。
     /// </summary>
-    /// <param name="value">儲存格位址，例如 <c>.A1</c>、<c>$Sheet1.$B$2</c> 或 <c>'My Sheet'.C3</c>。</param>
-    /// <exception cref="ArgumentException">當儲存格位址不符合 ODF <c>cellAddress</c> 格式時擲回。</exception>
+    /// <param name="value">儲存格位址，例如 <c>.A1</c>、<c>$Sheet1.$B$2</c> 或 <c>'My Sheet'.C3</c></param>
+    /// <exception cref="ArgumentException">當儲存格位址不符合 ODF <c>cellAddress</c> 格式時擲回</exception>
     public OdfCellAddressReference(string value)
     {
         if (!IsValid(value))
@@ -36,9 +36,9 @@ public readonly struct OdfCellAddressReference : IEquatable<OdfCellAddressRefere
     /// <summary>
     /// 嘗試解析儲存格位址。
     /// </summary>
-    /// <param name="value">儲存格位址字串。</param>
-    /// <param name="cellAddress">成功時傳回解析後的儲存格位址。</param>
-    /// <returns>若字串符合 ODF <c>cellAddress</c> 格式則為 <see langword="true"/>。</returns>
+    /// <param name="value">儲存格位址字串</param>
+    /// <param name="cellAddress">成功時傳回解析後的儲存格位址</param>
+    /// <returns>若字串符合 ODF <c>cellAddress</c> 格式則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfCellAddressReference cellAddress)
     {
         if (IsValid(value))
@@ -54,14 +54,14 @@ public readonly struct OdfCellAddressReference : IEquatable<OdfCellAddressRefere
     /// <summary>
     /// 傳回原始儲存格位址字串。
     /// </summary>
-    /// <returns>儲存格位址字串。</returns>
+    /// <returns>儲存格位址字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// 判斷目前值是否等於另一個儲存格位址。
     /// </summary>
-    /// <param name="other">要比較的儲存格位址。</param>
-    /// <returns>若 lexical form 相同則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的儲存格位址</param>
+    /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfCellAddressReference other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc />
@@ -73,17 +73,17 @@ public readonly struct OdfCellAddressReference : IEquatable<OdfCellAddressRefere
     /// <summary>
     /// 判斷兩個儲存格位址是否相等。
     /// </summary>
-    /// <param name="left">左側儲存格位址。</param>
-    /// <param name="right">右側儲存格位址。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側儲存格位址</param>
+    /// <param name="right">右側儲存格位址</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfCellAddressReference left, OdfCellAddressReference right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩個儲存格位址是否不相等。
     /// </summary>
-    /// <param name="left">左側儲存格位址。</param>
-    /// <param name="right">右側儲存格位址。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側儲存格位址</param>
+    /// <param name="right">右側儲存格位址</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfCellAddressReference left, OdfCellAddressReference right) => !left.Equals(right);
 
     private static bool IsValid(string? value)

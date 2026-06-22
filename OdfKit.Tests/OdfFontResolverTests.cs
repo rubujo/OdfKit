@@ -35,7 +35,7 @@ public class OdfFontResolverTests
     }
 
     /// <summary>
-    /// 驗證當註冊替代對照時傳入 Null 或空字串，應正確拋出 ArgumentNullException 異常。
+    /// 驗證當註冊替代對照時傳入 Null 或空字串，應正確拋出 ArgumentNullException 例外。
     /// </summary>
     [Fact]
     public void RegisterFallback_NullOrEmptyArguments_ThrowsArgumentNullException()

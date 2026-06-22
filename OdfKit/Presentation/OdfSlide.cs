@@ -178,8 +178,8 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     /// <summary>
     /// 以多段落形式設定投影片備忘錄文字。
     /// </summary>
-    /// <param name="paragraphs">段落文字集合。</param>
-    /// <returns>目前投影片。</returns>
+    /// <param name="paragraphs">段落文字集合</param>
+    /// <returns>目前投影片</returns>
     public OdfSlide SetSpeakerNotes(IEnumerable<string> paragraphs)
     {
         SpeakerNotesPage.SetSpeakerNotes(paragraphs);

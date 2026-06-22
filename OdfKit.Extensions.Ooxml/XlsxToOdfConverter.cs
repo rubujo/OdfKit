@@ -38,9 +38,9 @@ public static class XlsxToOdfConverter
     /// <summary>
     /// 從 XLSX 資料流讀取並建立對應的 SpreadsheetDocument。
     /// </summary>
-    /// <param name="xlsxStream">XLSX 來源資料流。</param>
-    /// <returns>轉換後的 SpreadsheetDocument 執行個體。</returns>
-    /// <exception cref="ArgumentNullException">當 xlsxStream 為 null 時引發。</exception>
+    /// <param name="xlsxStream">XLSX 來源資料流</param>
+    /// <returns>轉換後的 SpreadsheetDocument 執行個體</returns>
+    /// <exception cref="ArgumentNullException">當 xlsxStream 為 null 時引發</exception>
     public static OdfKit.Spreadsheet.SpreadsheetDocument Convert(Stream xlsxStream)
     {
         if (xlsxStream is null)
@@ -1266,8 +1266,8 @@ public static class XlsxToOdfConverter
     /// <summary>
     /// 將 Excel A1 格式公式翻譯為 OpenFormula 格式。
     /// </summary>
-    /// <param name="excelFormula">Excel A1 格式公式。</param>
-    /// <returns>含 <c>of:</c> 前綴的 OpenFormula 公式。</returns>
+    /// <param name="excelFormula">Excel A1 格式公式</param>
+    /// <returns>含 <c>of:</c> 前綴的 OpenFormula 公式</returns>
     public static string TranslateFormulaToOdf(string excelFormula)
     {
         if (string.IsNullOrWhiteSpace(excelFormula))

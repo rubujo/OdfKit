@@ -3,10 +3,10 @@
 /// <summary>
 /// 表示繪圖頁面上一個圖形圖層指派的摘要資訊。
 /// </summary>
-/// <param name="pageName">所在繪圖頁面名稱。</param>
-/// <param name="shapeId">圖形識別碼。</param>
-/// <param name="shapeType">圖形元素本地名稱（例如 frame、rect）。</param>
-/// <param name="layerName">指派的圖層名稱（<c>draw:layer</c>）。</param>
+/// <param name="pageName">所在繪圖頁面名稱</param>
+/// <param name="shapeId">圖形識別碼</param>
+/// <param name="shapeType">圖形元素本地名稱（例如 frame、rect）</param>
+/// <param name="layerName">指派的圖層名稱（<c>draw:layer</c>）</param>
 public sealed class OdfDrawShapeLayerInfo(
     string pageName,
     string shapeId,

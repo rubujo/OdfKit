@@ -29,7 +29,7 @@ public interface IOdfCryptographyProvider
     /// 加密指定的明文內容，並產生對應的加密資訊。
     /// </summary>
     /// <param name="plaintext">要加密的明文位元組陣列</param>
-    /// <param name="entryPath">該封裝項目的路徑</param>
+    /// <param name="entryPath">該封裝專案的路徑</param>
     /// <param name="saveOptions">儲存文件的選項，包含金鑰或密碼</param>
     /// <param name="info">輸出產生的加密資訊</param>
     /// <returns>加密後的密文位元組陣列</returns>

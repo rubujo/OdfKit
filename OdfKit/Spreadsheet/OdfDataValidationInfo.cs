@@ -6,12 +6,12 @@ namespace OdfKit.Spreadsheet;
 /// <summary>
 /// 表示試算表中一筆資料驗證規則的摘要資訊。
 /// </summary>
-/// <param name="name">規則名稱（<c>table:name</c>）。</param>
-/// <param name="conditionExpression">條件運算式原文（<c>table:condition</c>）。</param>
-/// <param name="errorMessage">錯誤訊息內容。</param>
-/// <param name="errorTitle">錯誤訊息標題。</param>
-/// <param name="alertStyle">警告樣式（<c>stop</c>、<c>warning</c>、<c>information</c>）。</param>
-/// <param name="appliedRanges">套用此規則的儲存格範圍清單。</param>
+/// <param name="name">規則名稱（<c>table:name</c>）</param>
+/// <param name="conditionExpression">條件運算式原文（<c>table:condition</c>）</param>
+/// <param name="errorMessage">錯誤訊息內容</param>
+/// <param name="errorTitle">錯誤訊息標題</param>
+/// <param name="alertStyle">警告樣式（<c>stop</c>、<c>warning</c>、<c>information</c>）</param>
+/// <param name="appliedRanges">套用此規則的儲存格範圍清單</param>
 public sealed class OdfDataValidationInfo(
     string name,
     string conditionExpression,
@@ -53,8 +53,8 @@ public sealed class OdfDataValidationInfo(
     /// <summary>
     /// 嘗試將 <see cref="ConditionExpression"/> 對應至 <see cref="OdfValidationCondition"/>。
     /// </summary>
-    /// <param name="condition">解析成功時傳回的條件類型。</param>
-    /// <returns>若可辨識則為 <see langword="true"/>。</returns>
+    /// <param name="condition">解析成功時傳回的條件類型</param>
+    /// <returns>若可辨識則為 <see langword="true"/></returns>
     public bool TryGetCondition(out OdfValidationCondition condition)
     {
         if (ConditionExpression.Contains("cell-content-is-decimal-number()", StringComparison.Ordinal))

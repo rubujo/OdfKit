@@ -28,13 +28,19 @@ public sealed class OdsStreamReader : IDisposable
     private readonly List<object?> _currentRowData = new List<object?>();
     private readonly List<string> _sheetNames = new List<string>();
 
-    /// <summary>工作表名稱清單（從 content.xml 頂層掃描取得）。</summary>
+    /// <summary>
+    /// 工作表名稱清單（從 content.xml 頂層掃描取得）
+    /// </summary>
     public IReadOnlyList<string> SheetNames => _sheetNames;
 
-    /// <summary>取得目前列號（0-based）。</summary>
+    /// <summary>
+    /// 取得目前列號（0-based）
+    /// </summary>
     public int RowIndex => _rowIndex;
 
-    /// <summary>取得目前列的欄位數。</summary>
+    /// <summary>
+    /// 取得目前列的欄位數
+    /// </summary>
     public int FieldCount => _currentRowData.Count;
 
     /// <summary>
@@ -83,7 +89,9 @@ public sealed class OdsStreamReader : IDisposable
         }
     }
 
-    /// <summary>切換至指定索引的工作表（必須在第一次 Read() 前呼叫）。</summary>
+    /// <summary>
+    /// 切換至指定索引的工作表（必須在第一次 Read() 前呼叫）
+    /// </summary>
     /// <param name="sheetIndex">工作表索引（0-based）</param>
     public void SelectSheet(int sheetIndex)
     {
@@ -95,7 +103,9 @@ public sealed class OdsStreamReader : IDisposable
         _selectedSheetIndex = sheetIndex;
     }
 
-    /// <summary>讀取下一列；回傳 false 代表工作表結束。</summary>
+    /// <summary>
+    /// 讀取下一列；回傳 false 代表工作表結束
+    /// </summary>
     public bool Read()
     {
         if (!_started)
@@ -295,7 +305,9 @@ public sealed class OdsStreamReader : IDisposable
         }
     }
 
-    /// <summary>取得目前列指定欄的原始值（float→double、boolean→bool、date→DateTime、其餘→string）。</summary>
+    /// <summary>
+    /// 取得目前列指定欄的原始值（float→double、boolean→bool、date→DateTime、其餘→string）
+    /// </summary>
     /// <param name="ordinal">欄位索引（0-based）</param>
     public object? GetValue(int ordinal)
     {

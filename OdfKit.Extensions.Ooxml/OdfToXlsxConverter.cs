@@ -27,9 +27,9 @@ public static class OdfToXlsxConverter
     /// <summary>
     /// 將 ODS 工作簿轉換並寫入 XLSX 資料流。
     /// </summary>
-    /// <param name="odsWorkbook">來源 ODS 工作簿。</param>
-    /// <param name="xlsxStream">要寫入 XLSX 的目標資料流。</param>
-    /// <exception cref="ArgumentNullException">當任一必要參數為 null 時引發。</exception>
+    /// <param name="odsWorkbook">來源 ODS 工作簿</param>
+    /// <param name="xlsxStream">要寫入 XLSX 的目標資料流</param>
+    /// <exception cref="ArgumentNullException">當任一必要參數為 null 時引發</exception>
     public static void Convert(OdfKit.Spreadsheet.SpreadsheetDocument odsWorkbook, Stream xlsxStream)
     {
         if (odsWorkbook is null)

@@ -19,7 +19,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 使用指定的 ODF 封裝初始化 <see cref="OdfDatabaseDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝。</param>
+    /// <param name="package">ODF 封裝</param>
     public OdfDatabaseDocument(OdfPackage package) : base(package)
     {
         if (string.IsNullOrEmpty(package.MimeType))
@@ -34,7 +34,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 建立新的 ODB 資料庫文件。
     /// </summary>
-    /// <returns>新的 <see cref="OdfDatabaseDocument"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="OdfDatabaseDocument"/> 執行個體</returns>
     public static OdfDatabaseDocument Create()
     {
         return (OdfDatabaseDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Database);
@@ -43,9 +43,9 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 從指定路徑載入 ODB 資料庫文件。
     /// </summary>
-    /// <param name="path">ODB 文件路徑。</param>
-    /// <returns>載入完成的 <see cref="OdfDatabaseDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODB 資料庫時擲出。</exception>
+    /// <param name="path">ODB 文件路徑</param>
+    /// <returns>載入完成的 <see cref="OdfDatabaseDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODB 資料庫時擲出</exception>
     public new static OdfDatabaseDocument Load(string path)
     {
         return EnsureDatabase(OdfDocumentFactory.LoadDocument(path));
@@ -54,19 +54,19 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 非同步從指定路徑載入 ODB 資料庫文件。
     /// </summary>
-    /// <param name="path">ODB 文件路徑。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfDatabaseDocument"/>。</returns>
+    /// <param name="path">ODB 文件路徑</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfDatabaseDocument"/></returns>
     public new static async Task<OdfDatabaseDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         EnsureDatabase(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// 從指定資料流載入 ODB 資料庫文件。
     /// </summary>
-    /// <param name="stream">包含 ODB 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的 <see cref="OdfDatabaseDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODB 資料庫時擲出。</exception>
+    /// <param name="stream">包含 ODB 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的 <see cref="OdfDatabaseDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODB 資料庫時擲出</exception>
     public new static OdfDatabaseDocument Load(Stream stream, string? fileName = null)
     {
         return EnsureDatabase(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -75,10 +75,10 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 非同步從指定資料流載入 ODB 資料庫文件。
     /// </summary>
-    /// <param name="stream">包含 ODB 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfDatabaseDocument"/>。</returns>
+    /// <param name="stream">包含 ODB 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfDatabaseDocument"/></returns>
     public new static async Task<OdfDatabaseDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         EnsureDatabase(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
@@ -122,7 +122,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 設定資料來源連線參照。
     /// </summary>
-    /// <param name="href">連線資源路徑或 URL。</param>
+    /// <param name="href">連線資源路徑或 URL</param>
     public void SetConnection(string href)
     {
         if (string.IsNullOrWhiteSpace(href))
@@ -140,7 +140,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 取得目前宣告的資料表描述清單。
     /// </summary>
-    /// <returns>資料表描述清單。</returns>
+    /// <returns>資料表描述清單</returns>
     public IReadOnlyList<OdfDatabaseTableInfo> GetTables()
     {
         OdfNode? tableRepresentations = FindChildElement(GetDatabaseNode(), "table-representations", DatabaseNamespace);
@@ -168,7 +168,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 取得目前宣告的查詢描述清單。
     /// </summary>
-    /// <returns>查詢描述清單。</returns>
+    /// <returns>查詢描述清單</returns>
     public IReadOnlyList<OdfDatabaseQueryInfo> GetQueries()
     {
         OdfNode? queries = FindChildElement(GetDatabaseNode(), "queries", DatabaseNamespace);
@@ -199,7 +199,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 取得目前宣告的資料來源設定清單。
     /// </summary>
-    /// <returns>資料來源設定清單。</returns>
+    /// <returns>資料來源設定清單</returns>
     public IReadOnlyList<OdfDatabaseDataSourceSettingInfo> GetDataSourceSettings()
     {
         OdfNode? settings = FindDataSourceSettings();
@@ -240,8 +240,8 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 依名稱尋找資料表描述。
     /// </summary>
-    /// <param name="name">資料表名稱。</param>
-    /// <returns>符合名稱的資料表描述；找不到時為 <see langword="null"/>。</returns>
+    /// <param name="name">資料表名稱</param>
+    /// <returns>符合名稱的資料表描述；找不到時為 <see langword="null"/></returns>
     public OdfDatabaseTableInfo? FindTable(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -263,8 +263,8 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 依名稱尋找查詢描述。
     /// </summary>
-    /// <param name="name">查詢名稱。</param>
-    /// <returns>符合名稱的查詢描述；找不到時為 <see langword="null"/>。</returns>
+    /// <param name="name">查詢名稱</param>
+    /// <returns>符合名稱的查詢描述；找不到時為 <see langword="null"/></returns>
     public OdfDatabaseQueryInfo? FindQuery(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -286,7 +286,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 取得目前宣告的表單元件清單。
     /// </summary>
-    /// <returns>表單元件清單。</returns>
+    /// <returns>表單元件清單</returns>
     public IReadOnlyList<OdfDatabaseFormInfo> GetForms()
     {
         OdfNode? formsNode = FindChildElement(GetDatabaseNode(), "forms", DatabaseNamespace);
@@ -303,8 +303,8 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 依名稱尋找表單元件。
     /// </summary>
-    /// <param name="name">表單名稱。</param>
-    /// <returns>符合名稱的表單元件；找不到時為 <see langword="null"/>。</returns>
+    /// <param name="name">表單名稱</param>
+    /// <returns>符合名稱的表單元件；找不到時為 <see langword="null"/></returns>
     public OdfDatabaseFormInfo? FindForm(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -326,8 +326,8 @@ public partial class OdfDatabaseDocument : OdfDocument
     /// <summary>
     /// 依名稱尋找資料來源設定。
     /// </summary>
-    /// <param name="name">設定名稱。</param>
-    /// <returns>符合名稱的資料來源設定；找不到時為 <see langword="null"/>。</returns>
+    /// <param name="name">設定名稱</param>
+    /// <returns>符合名稱的資料來源設定；找不到時為 <see langword="null"/></returns>
     public OdfDatabaseDataSourceSettingInfo? FindDataSourceSetting(string name)
     {
         if (string.IsNullOrWhiteSpace(name))

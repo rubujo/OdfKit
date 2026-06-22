@@ -27,9 +27,9 @@ public static class OdfToDocxConverter
     /// <summary>
     /// 將 ODT 文字文件轉換並寫入 DOCX 資料流。
     /// </summary>
-    /// <param name="odtDocument">來源 ODT 文字文件。</param>
-    /// <param name="docxStream">要寫入 DOCX 的目標資料流。</param>
-    /// <exception cref="ArgumentNullException">任一必要參數為 null 時引發。</exception>
+    /// <param name="odtDocument">來源 ODT 文字文件</param>
+    /// <param name="docxStream">要寫入 DOCX 的目標資料流</param>
+    /// <exception cref="ArgumentNullException">任一必要參數為 null 時引發</exception>
     public static void Convert(TextDocument odtDocument, Stream docxStream)
     {
         if (odtDocument is null)

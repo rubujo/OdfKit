@@ -18,7 +18,7 @@ public partial class OdfImageDocument : OdfDocument
     /// <summary>
     /// 使用指定的 ODF 封裝初始化 <see cref="OdfImageDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝。</param>
+    /// <param name="package">ODF 封裝</param>
     public OdfImageDocument(OdfPackage package) : base(package)
     {
         if (string.IsNullOrEmpty(package.MimeType))
@@ -30,7 +30,7 @@ public partial class OdfImageDocument : OdfDocument
     /// <summary>
     /// 建立新的 ODI 影像文件。
     /// </summary>
-    /// <returns>新的 <see cref="OdfImageDocument"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="OdfImageDocument"/> 執行個體</returns>
     public static OdfImageDocument Create()
     {
         return (OdfImageDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Image);
@@ -39,9 +39,9 @@ public partial class OdfImageDocument : OdfDocument
     /// <summary>
     /// 從指定路徑載入 ODI 影像文件。
     /// </summary>
-    /// <param name="path">ODI 文件路徑。</param>
-    /// <returns>載入完成的 <see cref="OdfImageDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODI 影像時擲出。</exception>
+    /// <param name="path">ODI 文件路徑</param>
+    /// <returns>載入完成的 <see cref="OdfImageDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODI 影像時擲出</exception>
     public new static OdfImageDocument Load(string path)
     {
         return EnsureImage(OdfDocumentFactory.LoadDocument(path));
@@ -50,19 +50,19 @@ public partial class OdfImageDocument : OdfDocument
     /// <summary>
     /// 非同步從指定路徑載入 ODI 影像文件。
     /// </summary>
-    /// <param name="path">ODI 文件路徑。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfImageDocument"/>。</returns>
+    /// <param name="path">ODI 文件路徑</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfImageDocument"/></returns>
     public new static async Task<OdfImageDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         EnsureImage(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// 從指定資料流載入 ODI 影像文件。
     /// </summary>
-    /// <param name="stream">包含 ODI 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的 <see cref="OdfImageDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODI 影像時擲出。</exception>
+    /// <param name="stream">包含 ODI 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的 <see cref="OdfImageDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODI 影像時擲出</exception>
     public new static OdfImageDocument Load(Stream stream, string? fileName = null)
     {
         return EnsureImage(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -71,10 +71,10 @@ public partial class OdfImageDocument : OdfDocument
     /// <summary>
     /// 非同步從指定資料流載入 ODI 影像文件。
     /// </summary>
-    /// <param name="stream">包含 ODI 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfImageDocument"/>。</returns>
+    /// <param name="stream">包含 ODI 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfImageDocument"/></returns>
     public new static async Task<OdfImageDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         EnsureImage(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
@@ -193,7 +193,7 @@ public partial class OdfImageDocument : OdfDocument
     /// <summary>
     /// 取得主要影像的位元組內容。
     /// </summary>
-    /// <returns>主要影像位元組；若文件未參照封裝內影像則為 <see langword="null"/>。</returns>
+    /// <returns>主要影像位元組；若文件未參照封裝內影像則為 <see langword="null"/></returns>
     public byte[]? GetImageBytes()
     {
         string? href = ImageHref;
@@ -208,9 +208,9 @@ public partial class OdfImageDocument : OdfDocument
     /// <summary>
     /// 設定 ODI 文件的主要影像。
     /// </summary>
-    /// <param name="imageBytes">圖片位元組陣列。</param>
-    /// <param name="preferredName">選用的偏好檔名。</param>
-    /// <returns>影像在 ODF 封裝中的路徑。</returns>
+    /// <param name="imageBytes">圖片位元組陣列</param>
+    /// <param name="preferredName">選用的偏好檔名</param>
+    /// <returns>影像在 ODF 封裝中的路徑</returns>
     public string SetImage(byte[] imageBytes, string? preferredName = "image.png")
     {
         OdfMediaManager mediaManager = new(Package);
@@ -256,13 +256,13 @@ public partial class OdfImageDocument : OdfDocument
     /// <summary>
     /// 設定主要影像框架的版面與替代文字。
     /// </summary>
-    /// <param name="x">X 軸座標位置。</param>
-    /// <param name="y">Y 軸座標位置。</param>
-    /// <param name="width">框架寬度。</param>
-    /// <param name="height">框架高度。</param>
-    /// <param name="name">選用的框架名稱。</param>
-    /// <param name="title">選用的框架標題。</param>
-    /// <param name="description">選用的框架描述。</param>
+    /// <param name="x">X 軸座標位置</param>
+    /// <param name="y">Y 軸座標位置</param>
+    /// <param name="width">框架寬度</param>
+    /// <param name="height">框架高度</param>
+    /// <param name="name">選用的框架名稱</param>
+    /// <param name="title">選用的框架標題</param>
+    /// <param name="description">選用的框架描述</param>
     public void SetImageLayout(
         OdfLength x,
         OdfLength y,

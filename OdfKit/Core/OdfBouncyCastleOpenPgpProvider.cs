@@ -60,7 +60,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
     /// <param name="passphraseProvider">
     /// 根據金鑰 ID（long）提供解鎖密語的委派函式；空陣列表示無密語保護。
     /// </param>
-    /// <exception cref="ArgumentNullException">任一參數為 null 時擲出。</exception>
+    /// <exception cref="ArgumentNullException">任一參數為 null 時擲出</exception>
     public OdfBouncyCastleOpenPgpProvider(byte[] secretKeyRingData, Func<long, char[]> passphraseProvider)
     {
         _secretKeyRingData = secretKeyRingData ?? throw new ArgumentNullException(nameof(secretKeyRingData));
@@ -68,10 +68,10 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
     }
 
     /// <inheritdoc />
-    /// <exception cref="ArgumentNullException"><paramref name="sessionKey"/> 或 <paramref name="recipient"/> 為 null。</exception>
-    /// <exception cref="ArgumentException">收件人未提供公鑰資料。</exception>
-    /// <exception cref="InvalidOperationException">公鑰資料中找不到可用於加密的子金鑰。</exception>
-    /// <exception cref="NotSupportedException">公鑰演算法不受支援（僅支援 RSA 及 ElGamal）。</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="sessionKey"/> 或 <paramref name="recipient"/> 為 null</exception>
+    /// <exception cref="ArgumentException">收件人未提供公鑰資料</exception>
+    /// <exception cref="InvalidOperationException">公鑰資料中找不到可用於加密的子金鑰</exception>
+    /// <exception cref="NotSupportedException">公鑰演算法不受支援（僅支援 RSA 及 ElGamal）</exception>
     public byte[] EncryptSessionKey(byte[] sessionKey, OdfOpenPgpRecipient recipient)
     {
         if (sessionKey is null)
@@ -90,8 +90,8 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
     }
 
     /// <inheritdoc />
-    /// <exception cref="InvalidOperationException">此實例以純加密模式建立，無法執行解密。</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="encryptedKeyPacket"/> 為 null。</exception>
+    /// <exception cref="InvalidOperationException">此實例以純加密模式建立，無法執行解密</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="encryptedKeyPacket"/> 為 null</exception>
     /// <exception cref="CryptographicException">
     /// PKESK 封包格式有誤、私鑰解鎖失敗、演算法不受支援，或總和檢查碼驗證失敗時擲出。
     /// </exception>

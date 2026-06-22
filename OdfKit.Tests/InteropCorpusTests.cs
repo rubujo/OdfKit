@@ -28,7 +28,7 @@ public class InteropCorpusTests
     /// <summary>
     /// 驗證每種主要封裝格式都可經由公開 validator 入口取得穩定報告。
     /// </summary>
-    /// <param name="format">要驗證的格式資訊。</param>
+    /// <param name="format">要驗證的格式資訊</param>
     [Theory]
     [MemberData(nameof(PackageCorpusFormats))]
     public void PackageCorpusValidatesThroughPublicEntryPoint(OdfFormatInfo format)
@@ -51,7 +51,7 @@ public class InteropCorpusTests
     /// <summary>
     /// 驗證每種主要封裝格式保存後會保留未知 package entry。
     /// </summary>
-    /// <param name="format">要驗證的格式資訊。</param>
+    /// <param name="format">要驗證的格式資訊</param>
     [Theory]
     [MemberData(nameof(PackageCorpusFormats))]
     public void PackageCorpusPreservesUnknownEntry(OdfFormatInfo format)

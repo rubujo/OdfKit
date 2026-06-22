@@ -21,12 +21,12 @@ public class OdfLoadOptions
     public bool ValidateMimeType { get; set; } = true;
 
     /// <summary>
-    /// 取得或設定 ZIP 封裝中的最大項目（Entries）數量限制（防禦 Zip DoS）。
+    /// 取得或設定 ZIP 封裝中的最大專案（Entries）數量限制（防禦 Zip DoS）。
     /// </summary>
     public int MaxZipEntries { get; set; } = 5000;
 
     /// <summary>
-    /// 取得或設定單個項目解壓後的最大位元組數限制（預設 500MB ，防禦 Zip Bomb）。
+    /// 取得或設定單個專案解壓後的最大位元組數限制（預設 500MB ，防禦 Zip Bomb）。
     /// </summary>
     public long MaxEntrySize { get; set; } = 500 * 1024 * 1024;
 
@@ -49,7 +49,7 @@ public class OdfLoadOptions
     public string? Password { get; set; }
 
     /// <summary>
-    /// 取得或設定自訂的密碼學提供者，用於解密文件項目。
+    /// 取得或設定自訂的密碼學提供者，用於解密文件專案。
     /// </summary>
     public IOdfCryptographyProvider? CryptographyProvider { get; set; }
 

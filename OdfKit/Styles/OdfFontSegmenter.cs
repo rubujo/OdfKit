@@ -12,9 +12,9 @@ public static class OdfFontSegmenter
     /// <summary>
     /// 將文字依照 Unicode 字面拆分為多個文字片段，並指派適當的字型名稱。
     /// </summary>
-    /// <param name="text">要分段的來源文字。</param>
-    /// <param name="defaultFontName">預設的字型名稱。</param>
-    /// <returns>文字片段與字型名稱的 Tuple 集合。</returns>
+    /// <param name="text">要分段的來源文字</param>
+    /// <param name="defaultFontName">預設的字型名稱</param>
+    /// <returns>文字片段與字型名稱的 Tuple 集合</returns>
     public static List<(string Text, string FontName)> SegmentText(string text, string defaultFontName)
     {
         var result = new List<(string Text, string FontName)>();
@@ -83,9 +83,9 @@ public static class OdfFontSegmenter
     /// <summary>
     /// 依據基礎字型名稱與 Unicode 平面，取得對應的字型名稱（支援全字庫、花園明朝與字雲等增補平面與罕見字字型）。
     /// </summary>
-    /// <param name="baseFontFamily">基礎字型名稱。</param>
-    /// <param name="plane">Unicode 平面（Plane）。</param>
-    /// <returns>對應的字型名稱。</returns>
+    /// <param name="baseFontFamily">基礎字型名稱</param>
+    /// <param name="plane">Unicode 平面（Plane）</param>
+    /// <returns>對應的字型名稱</returns>
     public static string GetSupplementaryPlaneFontName(string baseFontFamily, int plane)
     {
         if (string.IsNullOrEmpty(baseFontFamily))

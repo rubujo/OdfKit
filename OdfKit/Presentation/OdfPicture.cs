@@ -57,11 +57,11 @@ public class OdfPicture(OdfNode node, OdfDocument doc, OdfSlide? slide) : OdfSha
     /// <summary>
     /// 設定圖片裁切矩形。
     /// </summary>
-    /// <param name="top">可見區域上緣。</param>
-    /// <param name="right">可見區域右緣。</param>
-    /// <param name="bottom">可見區域下緣。</param>
-    /// <param name="left">可見區域左緣。</param>
-    /// <returns>目前圖片執行個體。</returns>
+    /// <param name="top">可見區域上緣</param>
+    /// <param name="right">可見區域右緣</param>
+    /// <param name="bottom">可見區域下緣</param>
+    /// <param name="left">可見區域左緣</param>
+    /// <returns>目前圖片執行個體</returns>
     public OdfPicture SetCrop(OdfLength top, OdfLength right, OdfLength bottom, OdfLength left)
     {
         CropClip = $"rect({top}, {right}, {bottom}, {left})";
@@ -71,7 +71,7 @@ public class OdfPicture(OdfNode node, OdfDocument doc, OdfSlide? slide) : OdfSha
     /// <summary>
     /// 清除圖片裁切設定。
     /// </summary>
-    /// <returns>目前圖片執行個體。</returns>
+    /// <returns>目前圖片執行個體</returns>
     public OdfPicture ClearCrop()
     {
         CropClip = null;

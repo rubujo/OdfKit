@@ -14,11 +14,11 @@ public static class OdfParagraphExtensions
     /// <summary>
     /// 當段落文字長度超出指定的物理限制時，自動縮小字型大小（Auto-Shrink），確保單行文字不溢出物理範圍。
     /// </summary>
-    /// <param name="paragraph">目標段落。</param>
-    /// <param name="maxWidthInCentimeters">最大可允許之物理寬度（公分）。</param>
-    /// <param name="fontName">量測採用的字型名稱。</param>
-    /// <param name="initialFontSizePoints">起始初始字級大小（以點 Pt 為單位）。</param>
-    /// <param name="writingMode">書寫模式（橫書或直書）。</param>
+    /// <param name="paragraph">目標段落</param>
+    /// <param name="maxWidthInCentimeters">最大可允許之物理寬度（公分）</param>
+    /// <param name="fontName">量測採用的字型名稱</param>
+    /// <param name="initialFontSizePoints">起始初始字級大小（以點 Pt 為單位）</param>
+    /// <param name="writingMode">書寫模式（橫書或直書）</param>
     public static void AutoShrinkToFit(this OdfParagraph paragraph, double maxWidthInCentimeters, string fontName, double initialFontSizePoints, OdfWritingMode writingMode = OdfWritingMode.LrTb)
     {
         if (paragraph is null)

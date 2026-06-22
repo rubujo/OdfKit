@@ -27,13 +27,13 @@ public partial class TextDocument
     /// <summary>
     /// 新增一個追蹤修訂記錄。
     /// </summary>
-    /// <param name="changeType">修訂類型（"insertion"、"deletion" 或 "format-change"）。</param>
-    /// <param name="creator">建立者姓名。</param>
-    /// <param name="date">修訂時間。</param>
-    /// <param name="extraContent">修訂的附加內容節點。</param>
-    /// <param name="originalStyleName">原本的樣式名稱。</param>
-    /// <param name="targetFamily">目標樣式系列名稱。</param>
-    /// <returns>產生的修訂識別碼。</returns>
+    /// <param name="changeType">修訂類型（"insertion"、"deletion" 或 "format-change"）</param>
+    /// <param name="creator">建立者姓名</param>
+    /// <param name="date">修訂時間</param>
+    /// <param name="extraContent">修訂的附加內容節點</param>
+    /// <param name="originalStyleName">原本的樣式名稱</param>
+    /// <param name="targetFamily">目標樣式系列名稱</param>
+    /// <returns>產生的修訂識別碼</returns>
     public string AddTrackedChange(string changeType, string creator, DateTime date, OdfNode? extraContent = null, string? originalStyleName = null, string? targetFamily = null) =>
         TextDocumentTrackChangesRecordingEngine.AddTrackedChange(MutationContext, changeType, creator, date, extraContent, originalStyleName, targetFamily);
 
@@ -50,7 +50,7 @@ public partial class TextDocument
     /// <summary>
     /// 取得文件中所有的追蹤修訂。
     /// </summary>
-    /// <returns>追蹤修訂的集合。</returns>
+    /// <returns>追蹤修訂的集合</returns>
     public IEnumerable<OdfTrackedChange> GetTrackedChanges() =>
         TextDocumentTrackChangesRecordingEngine.GetTrackedChanges(this, MutationContext);
 

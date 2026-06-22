@@ -5,20 +5,20 @@ namespace OdfKit.Spreadsheet;
 /// <summary>
 /// 表示 ODS 試算表上一筆追蹤修訂的摘要資訊。
 /// </summary>
-/// <param name="changeId">修訂識別碼（<c>table:id</c>）。</param>
-/// <param name="kind">修訂種類。</param>
-/// <param name="author">作者。</param>
-/// <param name="changedAt">修訂時間（UTC）。</param>
-/// <param name="cellAddress">受影響儲存格位址；非儲存格內容變更時為 <see langword="null"/>。</param>
-/// <param name="previousContent">變更前的顯示文字；無法取得時為 <see langword="null"/>。</param>
-/// <param name="acceptanceState">接受狀態（<c>pending</c>、<c>accepted</c> 或 <c>rejected</c>）。</param>
-/// <param name="previousFormula">變更前的公式（<c>table:formula</c>）；無法取得時為 <see langword="null"/>。</param>
-/// <param name="sheetName">結構修訂所在工作表名稱。</param>
-/// <param name="structuralType">結構修訂類型（<c>row</c>、<c>column</c> 或 <c>table</c>）。</param>
-/// <param name="structuralPosition">結構修訂起始位置（以 0 為基準）。</param>
-/// <param name="structuralCount">結構修訂影響數量。</param>
-/// <param name="sourceAddress">移動修訂來源位址。</param>
-/// <param name="targetAddress">移動修訂目標位址。</param>
+/// <param name="changeId">修訂識別碼（<c>table:id</c>）</param>
+/// <param name="kind">修訂種類</param>
+/// <param name="author">作者</param>
+/// <param name="changedAt">修訂時間（UTC）</param>
+/// <param name="cellAddress">受影響儲存格位址；非儲存格內容變更時為 <see langword="null"/></param>
+/// <param name="previousContent">變更前的顯示文字；無法取得時為 <see langword="null"/></param>
+/// <param name="acceptanceState">接受狀態（<c>pending</c>、<c>accepted</c> 或 <c>rejected</c>）</param>
+/// <param name="previousFormula">變更前的公式（<c>table:formula</c>）；無法取得時為 <see langword="null"/></param>
+/// <param name="sheetName">結構修訂所在工作表名稱</param>
+/// <param name="structuralType">結構修訂類型（<c>row</c>、<c>column</c> 或 <c>table</c>）</param>
+/// <param name="structuralPosition">結構修訂起始位置（以 0 為基準）</param>
+/// <param name="structuralCount">結構修訂影響數量</param>
+/// <param name="sourceAddress">移動修訂來源位址</param>
+/// <param name="targetAddress">移動修訂目標位址</param>
 public sealed class OdfSpreadsheetTrackedChangeInfo(
     string changeId,
     OdfSpreadsheetChangeKind kind,

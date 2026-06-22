@@ -5,9 +5,13 @@
 /// </summary>
 public enum OdfIndexMarkKind
 {
-    /// <summary>字母索引標記。</summary>
+    /// <summary>
+    /// 字母索引標記
+    /// </summary>
     Alphabetical,
 
-    /// <summary>文獻標記。</summary>
+    /// <summary>
+    /// 文獻標記
+    /// </summary>
     Bibliography,
 }

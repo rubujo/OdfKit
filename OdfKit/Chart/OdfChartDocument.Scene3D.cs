@@ -11,7 +11,7 @@ public partial class OdfChartDocument
     /// <summary>
     /// 取得 3D 圖表繪圖區中所有光源（<c>dr3d:light</c>）的摘要清單。
     /// </summary>
-    /// <returns>光源摘要清單，依文件中出現順序排列。</returns>
+    /// <returns>光源摘要清單，依文件中出現順序排列</returns>
     public IReadOnlyList<OdfChartLightInfo> GetLights()
     {
         List<OdfChartLightInfo> lights = [];
@@ -36,11 +36,11 @@ public partial class OdfChartDocument
     /// <summary>
     /// 新增一個 3D 圖表光源（<c>dr3d:light</c>）。
     /// </summary>
-    /// <param name="direction">光源方向向量，格式為 <c>(x y z)</c>。</param>
-    /// <param name="diffuseColor">選用的漫射色。</param>
-    /// <param name="enabled">選用的啟用狀態。</param>
-    /// <param name="specular">選用的反射光啟用狀態。</param>
-    /// <exception cref="ArgumentException">當 <paramref name="direction"/> 為空白時擲出。</exception>
+    /// <param name="direction">光源方向向量，格式為 <c>(x y z)</c></param>
+    /// <param name="diffuseColor">選用的漫射色</param>
+    /// <param name="enabled">選用的啟用狀態</param>
+    /// <param name="specular">選用的反射光啟用狀態</param>
+    /// <exception cref="ArgumentException">當 <paramref name="direction"/> 為空白時擲出</exception>
     public void AddLight(string direction, string? diffuseColor = null, bool? enabled = null, bool? specular = null)
     {
         if (string.IsNullOrWhiteSpace(direction))

@@ -21,8 +21,8 @@ public sealed class OdfFloatingTextBox
     /// <summary>
     /// 新增文字框段落。
     /// </summary>
-    /// <param name="text">段落文字。</param>
-    /// <returns>新建立的段落。</returns>
+    /// <param name="text">段落文字</param>
+    /// <returns>新建立的段落</returns>
     public OdfParagraph AddParagraph(string text = "")
     {
         var paragraphNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");

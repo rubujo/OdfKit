@@ -1081,7 +1081,7 @@ namespace OdfKit.Tests
                 OdfFontResolver.RegisterFontDirectory(customDir);
 
                 // TtfFontNameReader 讀出的內部名稱表固定為原始字型家族名稱「Arial」（與檔名無關），
-                // 但目錄掃描僅在該鍵尚未登錄時才會寫入 _fontMap（不會覆寫既有項目，見原始碼
+                // 但目錄掃描僅在該鍵尚未登錄時才會寫入 _fontMap（不會覆寫既有專案，見原始碼
                 // ScanDirectory 的 `if (!_fontMap.ContainsKey(name))` 判斷）。由於 "Arial" 鍵為整個
                 // 測試組件共用的靜態狀態，可能已被 FormulaAndStylesTest.cs 中其他測試登錄過
                 // 一個測試結束後即刪除的暫存路徑，故先以 RegisterFont 顯式覆寫為本次複製的真實路徑，

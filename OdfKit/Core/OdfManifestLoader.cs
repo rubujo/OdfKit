@@ -18,7 +18,7 @@ internal static class OdfManifestLoader
     /// 從 manifest 串流解析清單、加密中繼資料與版本資訊，並寫入指定的載入內容。
     /// </summary>
     /// <param name="stream">manifest.xml 內容串流</param>
-    /// <param name="context">載入內容（含封裝項目字典與輸出集合）</param>
+    /// <param name="context">載入內容（含封裝專案字典與輸出集合）</param>
     internal static void Parse(Stream stream, OdfManifestLoadContext context)
     {
         var settings = new XmlReaderSettings
@@ -333,7 +333,7 @@ internal static class OdfManifestLoader
 internal sealed class OdfManifestLoadContext
 {
     /// <summary>
-    /// 封裝內的項目字典（可變，用於附加加密中繼資料）。
+    /// 封裝內的專案字典（可變，用於附加加密中繼資料）。
     /// </summary>
     public Dictionary<string, OdfPackageEntry> Entries { get; set; } = null!;
 

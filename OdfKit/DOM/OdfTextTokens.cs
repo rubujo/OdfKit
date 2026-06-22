@@ -376,7 +376,7 @@ public enum OdfTextAnimationDirection
 }
 
 /// <summary>
-/// 表示 ODF schema 中 <c>text:kind</c> 的索引項目種類 token。
+/// 表示 ODF schema 中 <c>text:kind</c> 的索引專案種類 token。
 /// </summary>
 public enum OdfTextKind
 {

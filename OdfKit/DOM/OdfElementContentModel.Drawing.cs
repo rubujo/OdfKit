@@ -29,8 +29,8 @@ public partial class OfficeDrawingElement
     /// <summary>
     /// 在 <c>office:drawing</c> 主要 content 區段新增繪圖頁面。
     /// </summary>
-    /// <param name="name">選用的頁面名稱。</param>
-    /// <returns>新增的 <c>draw:page</c> 元素。</returns>
+    /// <param name="name">選用的頁面名稱</param>
+    /// <returns>新增的 <c>draw:page</c> 元素</returns>
     public DrawPageElement AppendPage(string? name = null)
     {
         DrawPageElement page = new("draw");

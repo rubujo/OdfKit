@@ -57,7 +57,7 @@ public partial class PresentationDocument
     /// <summary>
     /// 取得簡報中所有投影片母片的清單。
     /// </summary>
-    /// <returns>依 <c>office:master-styles</c> 內 <c>style:master-page</c> 順序排列的母片清單。</returns>
+    /// <returns>依 <c>office:master-styles</c> 內 <c>style:master-page</c> 順序排列的母片清單</returns>
     public new IReadOnlyList<OdfMasterPage> GetMasterPages()
     {
         OdfNode? masterStyles = null;
@@ -90,9 +90,9 @@ public partial class PresentationDocument
     /// <summary>
     /// 在簡報中新增一個投影片母片。
     /// </summary>
-    /// <param name="name">母片名稱。</param>
-    /// <param name="def">母片定義與設定。</param>
-    /// <returns>新增的母片執行個體。</returns>
+    /// <param name="name">母片名稱</param>
+    /// <param name="def">母片定義與設定</param>
+    /// <returns>新增的母片執行個體</returns>
     public OdfMasterPage AddMasterPage(string name, OdfMasterPageDefinition def)
     {
         if (string.IsNullOrEmpty(name))
@@ -137,8 +137,8 @@ public partial class PresentationDocument
     /// <summary>
     /// 設定指定索引投影片所使用的母片。
     /// </summary>
-    /// <param name="slideIndex">投影片索引位置。</param>
-    /// <param name="masterPageName">母片名稱。</param>
+    /// <param name="slideIndex">投影片索引位置</param>
+    /// <param name="masterPageName">母片名稱</param>
     public void SetMasterPage(int slideIndex, string masterPageName)
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)
@@ -155,8 +155,8 @@ public partial class PresentationDocument
     /// <summary>
     /// 取得指定索引投影片的版面配置型態。
     /// </summary>
-    /// <param name="slideIndex">投影片索引位置。</param>
-    /// <returns>投影片版面配置型態。</returns>
+    /// <param name="slideIndex">投影片索引位置</param>
+    /// <returns>投影片版面配置型態</returns>
     public OdfPresentationLayout GetLayout(int slideIndex)
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)
@@ -178,8 +178,8 @@ public partial class PresentationDocument
     /// <summary>
     /// 設定指定索引投影片的版面配置型態，並自動配置對應的預留位置。
     /// </summary>
-    /// <param name="slideIndex">投影片索引位置。</param>
-    /// <param name="layout">投影片版面配置型態。</param>
+    /// <param name="slideIndex">投影片索引位置</param>
+    /// <param name="layout">投影片版面配置型態</param>
     public void SetLayout(int slideIndex, OdfPresentationLayout layout)
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)

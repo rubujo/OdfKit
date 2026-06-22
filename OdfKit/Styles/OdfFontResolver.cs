@@ -25,9 +25,9 @@ public static class OdfFontResolver
     /// 檢查指定字型名稱是否能成功解析出實際字型檔案；若找不到則發出一次性警告（同一名稱不重複記錄），
     /// 避免使用者在缺少全字庫／花園明朝／字雲等超大字型時，毫無線索地得到顯示為空白方塊的文字。
     /// </summary>
-    /// <param name="fontName">字型名稱。</param>
-    /// <param name="context">用於警告訊息的情境描述（例如觸發此字型查詢的功能名稱）。</param>
-    /// <returns>若該字型可成功解析則為 <see langword="true"/>。</returns>
+    /// <param name="fontName">字型名稱</param>
+    /// <param name="context">用於警告訊息的情境描述（例如觸發此字型查詢的功能名稱）</param>
+    /// <returns>若該字型可成功解析則為 <see langword="true"/></returns>
     public static bool WarnIfUnresolvable(string fontName, string context)
     {
         if (string.IsNullOrEmpty(fontName))
@@ -53,8 +53,8 @@ public static class OdfFontResolver
     /// 檢查指定字型檔案是否為 TrueType Collection（.ttc）格式。PDFsharp 等部分渲染後端不支援直接讀取
     /// TTC 容器，須在使用前偵測並改用替代字型，否則可能拋出例外或無法正確顯示文字。
     /// </summary>
-    /// <param name="filePath">字型檔案路徑。</param>
-    /// <returns>若檔案以 TTC 簽章（'ttcf'）開頭則為 <see langword="true"/>。</returns>
+    /// <param name="filePath">字型檔案路徑</param>
+    /// <returns>若檔案以 TTC 簽章（'ttcf'）開頭則為 <see langword="true"/></returns>
     public static bool IsTrueTypeCollection(string filePath)
     {
         if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
@@ -83,9 +83,9 @@ public static class OdfFontResolver
     /// <summary>
     /// 註冊字型替代對照規則（例如在無微軟字型之 Linux/Docker 上將 "MS YaHei" 對照至 "Noto Sans CJK TC"）。
     /// </summary>
-    /// <param name="targetFont">要替代的目標字型名稱。</param>
-    /// <param name="replacementFont">用來替代的字型名稱。</param>
-    /// <exception cref="ArgumentNullException">當參數為空時拋出。</exception>
+    /// <param name="targetFont">要替代的目標字型名稱</param>
+    /// <param name="replacementFont">用來替代的字型名稱</param>
+    /// <exception cref="ArgumentNullException">當參數為空時拋出</exception>
     public static void RegisterFallback(string targetFont, string replacementFont)
     {
         if (string.IsNullOrEmpty(targetFont))
@@ -102,8 +102,8 @@ public static class OdfFontResolver
     /// <summary>
     /// 取得指定字型的實質替代字型名稱。若無替代規則則傳回原名稱。
     /// </summary>
-    /// <param name="fontName">字型名稱。</param>
-    /// <returns>替代後或原字型名稱。</returns>
+    /// <param name="fontName">字型名稱</param>
+    /// <returns>替代後或原字型名稱</returns>
     public static string MapFont(string fontName)
     {
         if (string.IsNullOrEmpty(fontName))
@@ -231,7 +231,7 @@ public static class OdfFontResolver
                 // 寫入套件並於指令清單中註冊
                 package.WriteEntry(zipPath, bytes, mediaType);
 
-                // 更新 DOM 項目 <style:font-face>
+                // 更新 DOM 專案 <style:font-face>
                 OdfNode? uriNode = null;
                 foreach (var child in fontFace.Children)
                 {

@@ -12,8 +12,8 @@ public readonly struct OdfDuration : IEquatable<OdfDuration>
     /// <summary>
     /// 以 XML Schema <c>duration</c> 字串建立 <see cref="OdfDuration"/>。
     /// </summary>
-    /// <param name="value">duration 字串，例如 <c>PT1H30M</c>。</param>
-    /// <exception cref="ArgumentException">當字串不是有效 XML Schema <c>duration</c> 時擲回。</exception>
+    /// <param name="value">duration 字串，例如 <c>PT1H30M</c></param>
+    /// <exception cref="ArgumentException">當字串不是有效 XML Schema <c>duration</c> 時擲回</exception>
     public OdfDuration(string value)
     {
         if (!IsValid(value))
@@ -32,9 +32,9 @@ public readonly struct OdfDuration : IEquatable<OdfDuration>
     /// <summary>
     /// 嘗試解析 XML Schema <c>duration</c> 字串。
     /// </summary>
-    /// <param name="value">要解析的字串。</param>
-    /// <param name="duration">成功時傳回解析後的 duration。</param>
-    /// <returns>若字串是有效 XML Schema <c>duration</c> 則為 <see langword="true"/>。</returns>
+    /// <param name="value">要解析的字串</param>
+    /// <param name="duration">成功時傳回解析後的 duration</param>
+    /// <returns>若字串是有效 XML Schema <c>duration</c> 則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfDuration duration)
     {
         if (IsValid(value))
@@ -50,8 +50,8 @@ public readonly struct OdfDuration : IEquatable<OdfDuration>
     /// <summary>
     /// 嘗試轉換為 <see cref="TimeSpan"/>。
     /// </summary>
-    /// <param name="timeSpan">成功時傳回對應的 <see cref="TimeSpan"/>。</param>
-    /// <returns>若目前 duration 可由 <see cref="TimeSpan"/> 表示則為 <see langword="true"/>。</returns>
+    /// <param name="timeSpan">成功時傳回對應的 <see cref="TimeSpan"/></param>
+    /// <returns>若目前 duration 可由 <see cref="TimeSpan"/> 表示則為 <see langword="true"/></returns>
     public bool TryGetTimeSpan(out TimeSpan timeSpan)
     {
         try
@@ -74,14 +74,14 @@ public readonly struct OdfDuration : IEquatable<OdfDuration>
     /// <summary>
     /// 傳回原始 duration 字串。
     /// </summary>
-    /// <returns>duration 字串。</returns>
+    /// <returns>duration 字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// 判斷目前值是否等於另一個 duration。
     /// </summary>
-    /// <param name="other">要比較的 duration。</param>
-    /// <returns>若 lexical form 相同則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的 duration</param>
+    /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfDuration other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc />
@@ -93,17 +93,17 @@ public readonly struct OdfDuration : IEquatable<OdfDuration>
     /// <summary>
     /// 判斷兩個 duration 是否相等。
     /// </summary>
-    /// <param name="left">左側 duration。</param>
-    /// <param name="right">右側 duration。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側 duration</param>
+    /// <param name="right">右側 duration</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfDuration left, OdfDuration right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩個 duration 是否不相等。
     /// </summary>
-    /// <param name="left">左側 duration。</param>
-    /// <param name="right">右側 duration。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側 duration</param>
+    /// <param name="right">右側 duration</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfDuration left, OdfDuration right) => !left.Equals(right);
 
     private static bool IsValid(string? value)

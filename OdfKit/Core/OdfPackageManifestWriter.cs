@@ -15,7 +15,7 @@ namespace OdfKit.Core;
 internal static class OdfPackageManifestWriter
 {
     /// <summary>
-    /// 將目前封裝狀態序列化為 META-INF/manifest.xml 虛擬項目。
+    /// 將目前封裝狀態序列化為 META-INF/manifest.xml 虛擬專案。
     /// </summary>
     internal static void WriteManifest(OdfPackage.OdfPackageSaveCollaborators ctx)
     {

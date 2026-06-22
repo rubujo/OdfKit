@@ -197,8 +197,8 @@ public static class OdfFormulaSupport
     /// <summary>
     /// 判斷預設評估器是否支援指定函式。
     /// </summary>
-    /// <param name="name">函式名稱。</param>
-    /// <returns>若支援則為 true，否則為 false。</returns>
+    /// <param name="name">函式名稱</param>
+    /// <returns>若支援則為 true，否則為 false</returns>
     public static bool IsFunctionSupported(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -212,8 +212,8 @@ public static class OdfFormulaSupport
     /// <summary>
     /// 分析公式是否可剖析，以及是否包含預設評估器不支援的函式。
     /// </summary>
-    /// <param name="formula">要分析的公式。</param>
-    /// <returns>公式分析結果。</returns>
+    /// <param name="formula">要分析的公式</param>
+    /// <returns>公式分析結果</returns>
     public static OdfFormulaAnalysis Analyze(string formula)
     {
         if (formula is null)
@@ -255,8 +255,8 @@ public static class OdfFormulaSupport
     /// <summary>
     /// 支援的公式會回傳重新序列化結果；不支援或無法剖析時保留原公式。
     /// </summary>
-    /// <param name="formula">要序列化的公式。</param>
-    /// <returns>安全的公式字串。</returns>
+    /// <param name="formula">要序列化的公式</param>
+    /// <returns>安全的公式字串</returns>
     public static string SerializePreservingUnsupported(string formula)
     {
         OdfFormulaAnalysis analysis = Analyze(formula);

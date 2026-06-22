@@ -20,7 +20,7 @@ public class OdfSecurityBoundaryTests
     private static readonly XNamespace CustomNs = "urn:odfkit:test:foreign";
 
     /// <summary>
-    /// 驗證未編輯內容時，單純封裝保存會保留既有文件簽章項目。
+    /// 驗證未編輯內容時，單純封裝保存會保留既有文件簽章專案。
     /// </summary>
     [Fact]
     public void SignaturePackageSaveWithoutContentEditsPreservesSignatureEntry()
@@ -102,7 +102,7 @@ public class OdfSecurityBoundaryTests
     }
 
     /// <summary>
-    /// 驗證文件層簽章摘要會安全回報無法解析的簽章項目。
+    /// 驗證文件層簽章摘要會安全回報無法解析的簽章專案。
     /// </summary>
     [Fact]
     public void DocumentSignatureSummaryReportsUnreadableSignatureEntry()

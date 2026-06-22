@@ -5,7 +5,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// 用於建構索引項目範本的建立器。
+/// 用於建構索引專案範本的建立器。
 /// </summary>
 /// <param name="template">目標範本 OdfNode 節點</param>
 public class OdfIndexTemplateBuilder(OdfNode template)
@@ -13,7 +13,7 @@ public class OdfIndexTemplateBuilder(OdfNode template)
     private readonly OdfNode _template = template;
 
     /// <summary>
-    /// 在範本中新增文字欄位項目。
+    /// 在範本中新增文字欄位專案。
     /// </summary>
     /// <returns>目前的建立器執行個體，以支援鏈結呼叫</returns>
     public OdfIndexTemplateBuilder AddText()
@@ -23,7 +23,7 @@ public class OdfIndexTemplateBuilder(OdfNode template)
     }
 
     /// <summary>
-    /// 在範本中新增定位點項目。
+    /// 在範本中新增定位點專案。
     /// </summary>
     /// <param name="type">定位類型</param>
     /// <param name="leaderChar">前置字元</param>
@@ -38,7 +38,7 @@ public class OdfIndexTemplateBuilder(OdfNode template)
     }
 
     /// <summary>
-    /// 在範本中新增頁碼項目。
+    /// 在範本中新增頁碼專案。
     /// </summary>
     /// <returns>目前的建立器執行個體，以支援鏈結呼叫</returns>
     public OdfIndexTemplateBuilder AddPageNumber()
@@ -48,7 +48,7 @@ public class OdfIndexTemplateBuilder(OdfNode template)
     }
 
     /// <summary>
-    /// 在範本中新增自訂文字字串項目。
+    /// 在範本中新增自訂文字字串專案。
     /// </summary>
     /// <param name="text">自訂的文字內容</param>
     /// <returns>目前的建立器執行個體，以支援鏈結呼叫</returns>

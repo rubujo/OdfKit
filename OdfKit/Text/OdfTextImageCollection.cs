@@ -17,7 +17,7 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
     /// <summary>
     /// 初始化 <see cref="OdfTextImageCollection"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">所屬文字文件。</param>
+    /// <param name="document">所屬文字文件</param>
     public OdfTextImageCollection(TextDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
@@ -26,11 +26,11 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
     /// <summary>
     /// 新增圖片至新的段落。
     /// </summary>
-    /// <param name="imageBytes">圖片二進位內容。</param>
-    /// <param name="width">圖片寬度。</param>
-    /// <param name="height">圖片高度。</param>
-    /// <param name="name">選用的圖片名稱。</param>
-    /// <returns>新增完成的圖片。</returns>
+    /// <param name="imageBytes">圖片二進位內容</param>
+    /// <param name="width">圖片寬度</param>
+    /// <param name="height">圖片高度</param>
+    /// <param name="name">選用的圖片名稱</param>
+    /// <returns>新增完成的圖片</returns>
     public OdfImage Add(byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
     {
         var media = new OdfMediaManager(_document.Package);
@@ -55,7 +55,7 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
     /// <summary>
     /// 取得圖片列舉器，供 LINQ 查詢使用。
     /// </summary>
-    /// <returns>圖片列舉器。</returns>
+    /// <returns>圖片列舉器</returns>
     public IEnumerator<OdfImage> GetEnumerator()
     {
         return Items.GetEnumerator();

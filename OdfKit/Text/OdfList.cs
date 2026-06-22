@@ -48,10 +48,10 @@ public class OdfList
     }
 
     /// <summary>
-    /// 在清單中新增清單項目。
+    /// 在清單中新增清單專案。
     /// </summary>
-    /// <param name="text">項目預設段落文字內容</param>
-    /// <returns>新建立的清單項目執行個體</returns>
+    /// <param name="text">專案預設段落文字內容</param>
+    /// <returns>新建立的清單專案執行個體</returns>
     public OdfListItem AddListItem(string text = "")
     {
         var itemNode = OdfNodeFactory.CreateElement("list-item", OdfNamespaces.Text, "text");
@@ -65,12 +65,12 @@ public class OdfList
     }
 
     /// <summary>
-    /// 在指定層級新增清單項目（1-based）。層級 1 直接加入此清單；
+    /// 在指定層級新增清單專案（1-based）。層級 1 直接加入此清單；
     /// 層級 2 以上則自動建立/沿用巢狀清單結構。
     /// </summary>
-    /// <param name="text">項目文字內容。</param>
-    /// <param name="level">目標層級，從 1 開始，最大值為 10。</param>
-    /// <returns>新建立的清單項目。</returns>
+    /// <param name="text">專案文字內容</param>
+    /// <param name="level">目標層級，從 1 開始，最大值為 10</param>
+    /// <returns>新建立的清單專案</returns>
     public OdfListItem AddItem(string text, int level = 1)
     {
         if (level < 1)
@@ -147,8 +147,8 @@ public class OdfList
     /// <summary>
     /// 設定清單的起始編號。
     /// </summary>
-    /// <param name="value">起始編號；ODF 1.4 允許從 0 開始。</param>
-    /// <returns>目前清單執行個體。</returns>
+    /// <param name="value">起始編號；ODF 1.4 允許從 0 開始</param>
+    /// <returns>目前清單執行個體</returns>
     public OdfList StartFrom(int value)
     {
         RestartNumbering(value);
@@ -156,7 +156,7 @@ public class OdfList
     }
 
     /// <summary>
-    /// 取得清單項目清單。
+    /// 取得清單專案清單。
     /// </summary>
     public IReadOnlyList<OdfListItem> Items
     {

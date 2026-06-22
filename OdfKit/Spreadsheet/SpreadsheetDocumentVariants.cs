@@ -14,7 +14,7 @@ public sealed class SpreadsheetTemplateDocument : SpreadsheetDocument
     /// <summary>
     /// 初始化 <see cref="SpreadsheetTemplateDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝。</param>
+    /// <param name="package">ODF 封裝</param>
     public SpreadsheetTemplateDocument(OdfPackage package) : base(package)
     {
     }
@@ -22,7 +22,7 @@ public sealed class SpreadsheetTemplateDocument : SpreadsheetDocument
     /// <summary>
     /// 建立新的 OTS 試算表範本文件。
     /// </summary>
-    /// <returns>新的 <see cref="SpreadsheetTemplateDocument"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="SpreadsheetTemplateDocument"/> 執行個體</returns>
     public static new SpreadsheetTemplateDocument Create()
     {
         return (SpreadsheetTemplateDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.SpreadsheetTemplate);
@@ -31,36 +31,36 @@ public sealed class SpreadsheetTemplateDocument : SpreadsheetDocument
     /// <summary>
     /// 從指定路徑載入 OTS 試算表範本文件。
     /// </summary>
-    /// <param name="path">OTS 文件路徑。</param>
-    /// <returns>載入完成的 <see cref="SpreadsheetTemplateDocument"/> 執行個體。</returns>
+    /// <param name="path">OTS 文件路徑</param>
+    /// <returns>載入完成的 <see cref="SpreadsheetTemplateDocument"/> 執行個體</returns>
     public static new SpreadsheetTemplateDocument Load(string path) =>
         Ensure(OdfDocumentFactory.LoadDocument(path));
 
     /// <summary>
     /// 非同步從指定路徑載入 OTS 試算表範本文件。
     /// </summary>
-    /// <param name="path">OTS 文件路徑。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetTemplateDocument"/>。</returns>
+    /// <param name="path">OTS 文件路徑</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetTemplateDocument"/></returns>
     public static new async Task<SpreadsheetTemplateDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// 從指定資料流載入 OTS 試算表範本文件。
     /// </summary>
-    /// <param name="stream">包含 OTS 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的 <see cref="SpreadsheetTemplateDocument"/> 執行個體。</returns>
+    /// <param name="stream">包含 OTS 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的 <see cref="SpreadsheetTemplateDocument"/> 執行個體</returns>
     public static new SpreadsheetTemplateDocument Load(Stream stream, string? fileName = null) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
     /// 非同步從指定資料流載入 OTS 試算表範本文件。
     /// </summary>
-    /// <param name="stream">包含 OTS 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetTemplateDocument"/>。</returns>
+    /// <param name="stream">包含 OTS 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetTemplateDocument"/></returns>
     public static new async Task<SpreadsheetTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
@@ -79,7 +79,7 @@ public sealed class FlatSpreadsheetDocument : SpreadsheetDocument
     /// <summary>
     /// 初始化 <see cref="FlatSpreadsheetDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝或扁平 XML 容器。</param>
+    /// <param name="package">ODF 封裝或扁平 XML 容器</param>
     public FlatSpreadsheetDocument(OdfPackage package) : base(package)
     {
     }
@@ -87,7 +87,7 @@ public sealed class FlatSpreadsheetDocument : SpreadsheetDocument
     /// <summary>
     /// 建立新的 FODS 扁平 XML 試算表文件。
     /// </summary>
-    /// <returns>新的 <see cref="FlatSpreadsheetDocument"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="FlatSpreadsheetDocument"/> 執行個體</returns>
     public static new FlatSpreadsheetDocument Create()
     {
         return (FlatSpreadsheetDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.FlatSpreadsheet);
@@ -96,36 +96,36 @@ public sealed class FlatSpreadsheetDocument : SpreadsheetDocument
     /// <summary>
     /// 從指定路徑載入 FODS 扁平 XML 試算表文件。
     /// </summary>
-    /// <param name="path">FODS 文件路徑。</param>
-    /// <returns>載入完成的 <see cref="FlatSpreadsheetDocument"/> 執行個體。</returns>
+    /// <param name="path">FODS 文件路徑</param>
+    /// <returns>載入完成的 <see cref="FlatSpreadsheetDocument"/> 執行個體</returns>
     public static new FlatSpreadsheetDocument Load(string path) =>
         Ensure(OdfDocumentFactory.LoadDocument(path));
 
     /// <summary>
     /// 非同步從指定路徑載入 FODS 扁平 XML 試算表文件。
     /// </summary>
-    /// <param name="path">FODS 文件路徑。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatSpreadsheetDocument"/>。</returns>
+    /// <param name="path">FODS 文件路徑</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatSpreadsheetDocument"/></returns>
     public static new async Task<FlatSpreadsheetDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// 從指定資料流載入 FODS 扁平 XML 試算表文件。
     /// </summary>
-    /// <param name="stream">包含 FODS 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的 <see cref="FlatSpreadsheetDocument"/> 執行個體。</returns>
+    /// <param name="stream">包含 FODS 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的 <see cref="FlatSpreadsheetDocument"/> 執行個體</returns>
     public static new FlatSpreadsheetDocument Load(Stream stream, string? fileName = null) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
     /// 非同步從指定資料流載入 FODS 扁平 XML 試算表文件。
     /// </summary>
-    /// <param name="stream">包含 FODS 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatSpreadsheetDocument"/>。</returns>
+    /// <param name="stream">包含 FODS 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatSpreadsheetDocument"/></returns>
     public static new async Task<FlatSpreadsheetDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 

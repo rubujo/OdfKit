@@ -38,7 +38,7 @@ public class OdfAlphabeticalIndex : OdfIndex
     }
 
     /// <summary>
-    /// 取得或設定一個值，指出是否合併相同的索引項目。
+    /// 取得或設定一個值，指出是否合併相同的索引專案。
     /// </summary>
     public bool CombineEntries
     {
@@ -68,7 +68,7 @@ public class OdfAlphabeticalIndex : OdfIndex
     }
 
     /// <summary>
-    /// 新增字母索引項目範本。
+    /// 新增字母索引專案範本。
     /// </summary>
     /// <param name="outlineLevel">大綱階層</param>
     /// <param name="styleName">樣式名稱</param>

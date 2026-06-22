@@ -6,14 +6,14 @@ namespace OdfKit.Presentation;
 /// <summary>
 /// 表示投影片上一筆動畫效果的摘要資訊。
 /// </summary>
-/// <param name="kind">動畫種類。</param>
-/// <param name="targetElementId">目標圖形識別碼。</param>
-/// <param name="effect">動畫效果類型。</param>
-/// <param name="trigger">動畫觸發方式。</param>
-/// <param name="presetId">LibreOffice 預設動畫識別碼原文。</param>
-/// <param name="duration">持續時間原文（<c>smil:dur</c>）。</param>
-/// <param name="begin">開始時間原文（<c>smil:begin</c>）。</param>
-/// <param name="sequenceIndex">在投影片動畫序列中的順序索引（以 0 為基準）。</param>
+/// <param name="kind">動畫種類</param>
+/// <param name="targetElementId">目標圖形識別碼</param>
+/// <param name="effect">動畫效果類型</param>
+/// <param name="trigger">動畫觸發方式</param>
+/// <param name="presetId">LibreOffice 預設動畫識別碼原文</param>
+/// <param name="duration">持續時間原文（<c>smil:dur</c>）</param>
+/// <param name="begin">開始時間原文（<c>smil:begin</c>）</param>
+/// <param name="sequenceIndex">在投影片動畫序列中的順序索引（以 0 為基準）</param>
 public sealed class OdfAnimationInfo(
     OdfAnimationKind kind,
     string targetElementId,
@@ -67,16 +67,16 @@ public sealed class OdfAnimationInfo(
     /// <summary>
     /// 嘗試將 <see cref="Duration"/> 解析為秒數。
     /// </summary>
-    /// <param name="seconds">解析成功時傳回的秒數。</param>
-    /// <returns>若可解析則為 <see langword="true"/>。</returns>
+    /// <param name="seconds">解析成功時傳回的秒數</param>
+    /// <returns>若可解析則為 <see langword="true"/></returns>
     public bool TryGetDurationSeconds(out double seconds) =>
         TryParseSmilSeconds(Duration, out seconds);
 
     /// <summary>
     /// 嘗試將 <see cref="Begin"/> 中的延遲偏移解析為秒數（僅支援純數值秒或 <c>prev.end+Ns</c> 形式）。
     /// </summary>
-    /// <param name="seconds">解析成功時傳回的延遲秒數。</param>
-    /// <returns>若可解析則為 <see langword="true"/>。</returns>
+    /// <param name="seconds">解析成功時傳回的延遲秒數</param>
+    /// <returns>若可解析則為 <see langword="true"/></returns>
     public bool TryGetDelaySeconds(out double seconds) =>
         TryParseSmilDelay(Begin, out seconds);
 

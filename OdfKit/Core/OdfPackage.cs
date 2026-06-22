@@ -104,7 +104,7 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// 取得封裝內部所有項目的媒體類型資訊清單。
+    /// 取得封裝內部所有專案的媒體類型資訊清單。
     /// </summary>
     public IReadOnlyDictionary<string, string> Manifest => _manifest;
     internal IReadOnlyDictionary<string, OdfPackageEntry> Entries => _entries;
@@ -117,18 +117,18 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     internal OdfSaveOptions SaveOptions => _saveOptions;
 
     /// <summary>
-    /// 判斷指定路徑的項目是否已加密。
+    /// 判斷指定路徑的專案是否已加密。
     /// </summary>
-    /// <param name="name">項目的相對路徑名稱</param>
-    /// <returns>若該項目已加密，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
+    /// <param name="name">專案的相對路徑名稱</param>
+    /// <returns>若該專案已加密，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool IsEntryEncrypted(string name)
         => OdfPackageEntryAccessEngine.IsEntryEncrypted(EntryCollaborators, name);
 
     /// <summary>
-    /// 取得指定項目的加密詳細資訊。
+    /// 取得指定專案的加密詳細資訊。
     /// </summary>
-    /// <param name="name">項目的相對路徑名稱</param>
-    /// <returns>項目的加密資訊；若未加密則為 <see langword="null"/></returns>
+    /// <param name="name">專案的相對路徑名稱</param>
+    /// <returns>專案的加密資訊；若未加密則為 <see langword="null"/></returns>
     public OdfEncryptionInfo? GetEntryEncryptionInfo(string name)
         => OdfPackageEntryAccessEngine.GetEntryEncryptionInfo(EntryCollaborators, name);
 
@@ -193,10 +193,10 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// <summary>
     /// 非同步從指定的檔案路徑開啟既有的 ODF 封裝。
     /// </summary>
-    /// <param name="path">ODF 檔案的路徑。</param>
-    /// <param name="options">載入選項。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
+    /// <param name="path">ODF 檔案的路徑</param>
+    /// <param name="options">載入選項</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與 manifest 載入期間協作檢查取消語彙。
@@ -223,11 +223,11 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// <summary>
     /// 非同步從指定的資料流開啟既有的 ODF 封裝。
     /// </summary>
-    /// <param name="stream">包含 ODF 封裝資料的資料流。</param>
-    /// <param name="leaveOpen">若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/>。</param>
-    /// <param name="options">載入選項。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
+    /// <param name="stream">包含 ODF 封裝資料的資料流</param>
+    /// <param name="leaveOpen">若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/></param>
+    /// <param name="options">載入選項</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與 manifest 載入期間協作檢查取消語彙。

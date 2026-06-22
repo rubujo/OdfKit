@@ -47,7 +47,9 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
         return kek;
     }
 
-    /// <summary>從 ECKeyParameters 取得具名曲線的 OID 內容位元組（不含 DER tag/length）。</summary>
+    /// <summary>
+    /// 從 ECKeyParameters 取得具名曲線的 OID 內容位元組（不含 DER tag/length）
+    /// </summary>
     private static byte[] GetEcCurveOidBytes(ECKeyParameters ecKey)
     {
         if (ecKey.PublicKeyParamSet is { } oid)
@@ -74,7 +76,9 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
         return padded;
     }
 
-    /// <summary>移除 PKCS#5 填充並驗證填充位元組。</summary>
+    /// <summary>
+    /// 移除 PKCS#5 填充並驗證填充位元組
+    /// </summary>
     private static byte[] RemoveEcdhPkcs5Padding(byte[] data)
     {
         if (data.Length == 0)

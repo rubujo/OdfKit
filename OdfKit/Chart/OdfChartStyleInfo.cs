@@ -3,14 +3,14 @@
 /// <summary>
 /// 表示圖表自動樣式的高階摘要。
 /// </summary>
-/// <param name="name">樣式名稱。</param>
-/// <param name="fillColor">填滿色（例如 <c>#FF0000</c>）。</param>
-/// <param name="strokeColor">筆觸色。</param>
-/// <param name="strokeWidth">筆觸寬度（例如 <c>0.05cm</c>）。</param>
-/// <param name="fill">填滿樣式（例如 <c>solid</c> 或 <c>none</c>）。</param>
-/// <param name="stroke">筆觸樣式（例如 <c>solid</c> 或 <c>none</c>）。</param>
-/// <param name="threeDimensional">指出是否為 3D 圖表。</param>
-/// <param name="angleOffset">3D 投影角度偏置。</param>
+/// <param name="name">樣式名稱</param>
+/// <param name="fillColor">填滿色（例如 <c>#FF0000</c>）</param>
+/// <param name="strokeColor">筆觸色</param>
+/// <param name="strokeWidth">筆觸寬度（例如 <c>0.05cm</c>）</param>
+/// <param name="fill">填滿樣式（例如 <c>solid</c> 或 <c>none</c>）</param>
+/// <param name="stroke">筆觸樣式（例如 <c>solid</c> 或 <c>none</c>）</param>
+/// <param name="threeDimensional">指出是否為 3D 圖表</param>
+/// <param name="angleOffset">3D 投影角度偏置</param>
 public sealed class OdfChartStyleInfo(
     string name,
     string? fillColor,

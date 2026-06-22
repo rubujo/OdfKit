@@ -3,12 +3,12 @@
 /// <summary>
 /// 表示文字文件中一個索引標記的摘要資訊。
 /// </summary>
-/// <param name="kind">索引標記類型。</param>
-/// <param name="term">索引詞彙或顯示文字。</param>
-/// <param name="key1">主要鍵值（字母索引）。</param>
-/// <param name="key2">次要鍵值（字母索引）。</param>
-/// <param name="identifier">文獻識別碼（文獻標記）。</param>
-/// <param name="bibliographyType">文獻類型（文獻標記）。</param>
+/// <param name="kind">索引標記類型</param>
+/// <param name="term">索引詞彙或顯示文字</param>
+/// <param name="key1">主要鍵值（字母索引）</param>
+/// <param name="key2">次要鍵值（字母索引）</param>
+/// <param name="identifier">文獻識別碼（文獻標記）</param>
+/// <param name="bibliographyType">文獻類型（文獻標記）</param>
 public sealed class OdfDocumentIndexMarkInfo(
     OdfIndexMarkKind kind,
     string term,

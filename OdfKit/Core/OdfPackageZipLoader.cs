@@ -12,12 +12,12 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
-/// ODF ZIP 封裝項目載入器（內部協作者）。
+/// ODF ZIP 封裝專案載入器（內部協作者）。
 /// </summary>
 internal static class OdfPackageZipLoader
 {
     /// <summary>
-    /// 自 ZIP 封存讀取所有項目至載入內容。
+    /// 自 ZIP 封存讀取所有專案至載入內容。
     /// </summary>
     internal static void LoadEntries(ZipArchive archive, OdfPackage.OdfPackageLoadCollaborators ctx)
     {
@@ -75,7 +75,7 @@ internal static class OdfPackageZipLoader
     }
 
     /// <summary>
-    /// 非同步自 ZIP 封存讀取所有項目至載入內容，支援協作式取消。
+    /// 非同步自 ZIP 封存讀取所有專案至載入內容，支援協作式取消。
     /// </summary>
     internal static async Task LoadEntriesAsync(
         ZipArchive archive,

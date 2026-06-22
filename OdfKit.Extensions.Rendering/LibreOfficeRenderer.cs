@@ -15,37 +15,59 @@ namespace OdfKit.Extensions.Rendering;
 /// </summary>
 public static class LibreOfficeConversionFormats
 {
-    /// <summary>Portable Document Format。</summary>
+    /// <summary>
+    /// Portable Document Format
+    /// </summary>
     public const string Pdf = "pdf";
 
-    /// <summary>Rich Text Format。</summary>
+    /// <summary>
+    /// Rich Text Format
+    /// </summary>
     public const string Rtf = "rtf";
 
-    /// <summary>HTML 文件。</summary>
+    /// <summary>
+    /// HTML 文件
+    /// </summary>
     public const string Html = "html";
 
-    /// <summary>Markdown 文件。</summary>
+    /// <summary>
+    /// Markdown 文件
+    /// </summary>
     public const string Markdown = "md";
 
-    /// <summary>Microsoft Word Open XML 文件。</summary>
+    /// <summary>
+    /// Microsoft Word Open XML 文件
+    /// </summary>
     public const string Docx = "docx";
 
-    /// <summary>Microsoft Excel Open XML 活頁簿。</summary>
+    /// <summary>
+    /// Microsoft Excel Open XML 活頁簿
+    /// </summary>
     public const string Xlsx = "xlsx";
 
-    /// <summary>Microsoft PowerPoint Open XML 簡報。</summary>
+    /// <summary>
+    /// Microsoft PowerPoint Open XML 簡報
+    /// </summary>
     public const string Pptx = "pptx";
 
-    /// <summary>逗號分隔值文字檔。</summary>
+    /// <summary>
+    /// 逗號分隔值文字檔
+    /// </summary>
     public const string Csv = "csv";
 
-    /// <summary>Scalable Vector Graphics。</summary>
+    /// <summary>
+    /// Scalable Vector Graphics
+    /// </summary>
     public const string Svg = "svg";
 
-    /// <summary>PNG 點陣圖片。</summary>
+    /// <summary>
+    /// PNG 點陣圖片
+    /// </summary>
     public const string Png = "png";
 
-    /// <summary>JPEG 點陣圖片。</summary>
+    /// <summary>
+    /// JPEG 點陣圖片
+    /// </summary>
     public const string Jpeg = "jpg";
 }
 
@@ -67,9 +89,9 @@ public static class LibreOfficeRendererExtensions
     /// <summary>
     /// 使用指定的 LibreOffice renderer 將文件轉換為 PDF 格式。
     /// </summary>
-    /// <param name="document">要轉換的 OdfDocument 來源文件。</param>
-    /// <param name="outputPath">輸出 PDF 檔案的目標路徑。</param>
-    /// <param name="renderer">要使用的 LibreOffice renderer。</param>
+    /// <param name="document">要轉換的 OdfDocument 來源文件</param>
+    /// <param name="outputPath">輸出 PDF 檔案的目標路徑</param>
+    /// <param name="renderer">要使用的 LibreOffice renderer</param>
     public static void ConvertToPdf(this OdfDocument document, string outputPath, LibreOfficeRenderer renderer)
     {
         document.ConvertToLibreOfficeFormat(outputPath, LibreOfficeConversionFormats.Pdf, renderer);
@@ -78,10 +100,10 @@ public static class LibreOfficeRendererExtensions
     /// <summary>
     /// 非同步將指定文件轉換為 PDF 格式。
     /// </summary>
-    /// <param name="document">要轉換的 OdfDocument 來源文件。</param>
-    /// <param name="outputPath">輸出 PDF 檔案的目標路徑。</param>
-    /// <param name="cancellationToken">用於取消轉檔作業的權杖。</param>
-    /// <returns>代表非同步轉檔作業的工作。</returns>
+    /// <param name="document">要轉換的 OdfDocument 來源文件</param>
+    /// <param name="outputPath">輸出 PDF 檔案的目標路徑</param>
+    /// <param name="cancellationToken">用於取消轉檔作業的權杖</param>
+    /// <returns>代表非同步轉檔作業的工作</returns>
     public static Task ConvertToPdfAsync(
         this OdfDocument document,
         string outputPath,
@@ -107,10 +129,10 @@ public static class LibreOfficeRendererExtensions
     /// <summary>
     /// 使用 LibreOffice 將指定文件轉換為任意 <c>--convert-to</c> 目標格式。
     /// </summary>
-    /// <param name="document">要轉換的 OdfDocument 來源文件。</param>
-    /// <param name="outputPath">輸出檔案的目標路徑。</param>
-    /// <param name="format">LibreOffice 目標格式，例如 <c>pdf</c>、<c>docx</c> 或 <c>html</c>。</param>
-    /// <param name="renderer">可選用的自訂 renderer；未提供時使用預設 renderer。</param>
+    /// <param name="document">要轉換的 OdfDocument 來源文件</param>
+    /// <param name="outputPath">輸出檔案的目標路徑</param>
+    /// <param name="format">LibreOffice 目標格式，例如 <c>pdf</c>、<c>docx</c> 或 <c>html</c></param>
+    /// <param name="renderer">可選用的自訂 renderer；未提供時使用預設 renderer</param>
     public static void ConvertToLibreOfficeFormat(
         this OdfDocument document,
         string outputPath,
@@ -123,12 +145,12 @@ public static class LibreOfficeRendererExtensions
     /// <summary>
     /// 非同步使用 LibreOffice 將指定文件轉換為任意 <c>--convert-to</c> 目標格式。
     /// </summary>
-    /// <param name="document">要轉換的 OdfDocument 來源文件。</param>
-    /// <param name="outputPath">輸出檔案的目標路徑。</param>
-    /// <param name="format">LibreOffice 目標格式，例如 <c>pdf</c>、<c>docx</c> 或 <c>html</c>。</param>
-    /// <param name="renderer">可選用的自訂 renderer；未提供時使用預設 renderer。</param>
-    /// <param name="cancellationToken">用於取消轉檔作業的權杖。</param>
-    /// <returns>代表非同步轉檔作業的工作。</returns>
+    /// <param name="document">要轉換的 OdfDocument 來源文件</param>
+    /// <param name="outputPath">輸出檔案的目標路徑</param>
+    /// <param name="format">LibreOffice 目標格式，例如 <c>pdf</c>、<c>docx</c> 或 <c>html</c></param>
+    /// <param name="renderer">可選用的自訂 renderer；未提供時使用預設 renderer</param>
+    /// <param name="cancellationToken">用於取消轉檔作業的權杖</param>
+    /// <returns>代表非同步轉檔作業的工作</returns>
     public static Task ConvertToLibreOfficeFormatAsync(
         this OdfDocument document,
         string outputPath,
@@ -173,11 +195,11 @@ public class LibreOfficeRenderer
     /// <summary>
     /// 使用 LibreOffice 將 ODF 文件非同步轉換為指定的目標格式並輸出。
     /// </summary>
-    /// <param name="document">要轉檔的 OdfDocument 來源文件。</param>
-    /// <param name="outputPath">輸出檔案的目標路徑。</param>
-    /// <param name="format">要轉換的目標格式，例如 <c>pdf</c>。</param>
-    /// <param name="cancellationToken">用於取消轉檔作業的權杖。</param>
-    /// <returns>代表非同步轉檔作業的工作。</returns>
+    /// <param name="document">要轉檔的 OdfDocument 來源文件</param>
+    /// <param name="outputPath">輸出檔案的目標路徑</param>
+    /// <param name="format">要轉換的目標格式，例如 <c>pdf</c></param>
+    /// <param name="cancellationToken">用於取消轉檔作業的權杖</param>
+    /// <returns>代表非同步轉檔作業的工作</returns>
     public virtual async Task ConvertAsync(
         OdfDocument document,
         string outputPath,
@@ -210,9 +232,9 @@ public class LibreOfficeRenderer
     /// <summary>
     /// 使用系統安裝的 LibreOffice 將指定的實體檔案轉換為目標格式並輸出。
     /// </summary>
-    /// <param name="inputFilePath">輸入檔案的實體絕對路徑。</param>
-    /// <param name="outputPath">輸出檔案的目標絕對路徑。</param>
-    /// <param name="format">要轉換的目標格式（例如 <c>pdf</c>）。</param>
+    /// <param name="inputFilePath">輸入檔案的實體絕對路徑</param>
+    /// <param name="outputPath">輸出檔案的目標絕對路徑</param>
+    /// <param name="format">要轉換的目標格式（例如 <c>pdf</c>）</param>
     public void ConvertFile(string inputFilePath, string outputPath, string format)
     {
         ConvertFileAsync(inputFilePath, outputPath, format, default).GetAwaiter().GetResult();
@@ -221,16 +243,16 @@ public class LibreOfficeRenderer
     /// <summary>
     /// 使用系統安裝的 LibreOffice 將指定的實體檔案非同步轉換為目標格式並輸出。
     /// </summary>
-    /// <param name="inputFilePath">輸入檔案的實體絕對路徑。</param>
-    /// <param name="outputPath">輸出檔案的目標絕對路徑。</param>
-    /// <param name="format">要轉換的目標格式（例如 <c>pdf</c>）。</param>
-    /// <param name="cancellationToken">用於取消轉檔作業的權杖。</param>
-    /// <returns>代表非同步轉檔作業的工作。</returns>
-    /// <exception cref="ArgumentNullException">當輸入或輸出路徑為 null 或空字串時擲出。</exception>
-    /// <exception cref="TimeoutException">當 LibreOffice 轉檔執行程序超時未回應時擲出。</exception>
-    /// <exception cref="InvalidOperationException">當 LibreOffice 進程結束但傳回非零的錯誤碼時擲出。</exception>
-    /// <exception cref="FileNotFoundException">當轉檔完成後找不到預期的目標檔案時擲出。</exception>
-    /// <exception cref="OperationCanceledException">當作業因 <paramref name="cancellationToken"/> 取消時擲出。</exception>
+    /// <param name="inputFilePath">輸入檔案的實體絕對路徑</param>
+    /// <param name="outputPath">輸出檔案的目標絕對路徑</param>
+    /// <param name="format">要轉換的目標格式（例如 <c>pdf</c>）</param>
+    /// <param name="cancellationToken">用於取消轉檔作業的權杖</param>
+    /// <returns>代表非同步轉檔作業的工作</returns>
+    /// <exception cref="ArgumentNullException">當輸入或輸出路徑為 null 或空字串時擲出</exception>
+    /// <exception cref="TimeoutException">當 LibreOffice 轉檔執行程序超時未回應時擲出</exception>
+    /// <exception cref="InvalidOperationException">當 LibreOffice 進程結束但傳回非零的錯誤碼時擲出</exception>
+    /// <exception cref="FileNotFoundException">當轉檔完成後找不到預期的目標檔案時擲出</exception>
+    /// <exception cref="OperationCanceledException">當作業因 <paramref name="cancellationToken"/> 取消時擲出</exception>
     public virtual async Task ConvertFileAsync(
         string inputFilePath,
         string outputPath,
@@ -489,8 +511,8 @@ public class LibreOfficeRenderer
     /// <summary>
     /// 取得 LibreOffice 轉檔時應使用的來源 ODF 副檔名。
     /// </summary>
-    /// <param name="document">來源 ODF 文件。</param>
-    /// <returns>不含前導句點的副檔名。</returns>
+    /// <param name="document">來源 ODF 文件</param>
+    /// <returns>不含前導句點的副檔名</returns>
     public static string GetInputExtension(OdfDocument document)
     {
         if (document is null)

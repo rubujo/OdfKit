@@ -30,7 +30,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <summary>
     /// 建立新的 ODC 圖表文件。
     /// </summary>
-    /// <returns>新的 <see cref="OdfChartDocument"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="OdfChartDocument"/> 執行個體</returns>
     public static OdfChartDocument Create()
     {
         return (OdfChartDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Chart);
@@ -39,9 +39,9 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <summary>
     /// 從指定路徑載入 ODC 圖表文件。
     /// </summary>
-    /// <param name="path">ODC 文件路徑。</param>
-    /// <returns>載入完成的 <see cref="OdfChartDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODC 圖表時擲出。</exception>
+    /// <param name="path">ODC 文件路徑</param>
+    /// <returns>載入完成的 <see cref="OdfChartDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODC 圖表時擲出</exception>
     public new static OdfChartDocument Load(string path)
     {
         return EnsureChart(OdfDocumentFactory.LoadDocument(path));
@@ -50,19 +50,19 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <summary>
     /// 非同步從指定路徑載入 ODC 圖表文件。
     /// </summary>
-    /// <param name="path">ODC 文件路徑。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfChartDocument"/>。</returns>
+    /// <param name="path">ODC 文件路徑</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfChartDocument"/></returns>
     public new static async Task<OdfChartDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         EnsureChart(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// 從指定資料流載入 ODC 圖表文件。
     /// </summary>
-    /// <param name="stream">包含 ODC 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的 <see cref="OdfChartDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODC 圖表時擲出。</exception>
+    /// <param name="stream">包含 ODC 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的 <see cref="OdfChartDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODC 圖表時擲出</exception>
     public new static OdfChartDocument Load(Stream stream, string? fileName = null)
     {
         return EnsureChart(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -71,10 +71,10 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <summary>
     /// 非同步從指定資料流載入 ODC 圖表文件。
     /// </summary>
-    /// <param name="stream">包含 ODC 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfChartDocument"/>。</returns>
+    /// <param name="stream">包含 ODC 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfChartDocument"/></returns>
     public new static async Task<OdfChartDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         EnsureChart(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
@@ -115,7 +115,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <summary>
     /// 取得或設定圖例位置。
     /// </summary>
-    /// <remarks>常見值包含 <c>top</c>、<c>bottom</c>、<c>start</c> 與 <c>end</c>。</remarks>
+    /// <remarks>常見值包含 <c>top</c>、<c>bottom</c>、<c>start</c> 與 <c>end</c></remarks>
     public string? LegendPosition
     {
         get
@@ -145,7 +145,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <summary>
     /// 取得或設定圖例的對齊方式（對應 <c>chart:legend-align</c>）。
     /// </summary>
-    /// <remarks>常見值包含 <c>start</c>、<c>center</c> 與 <c>end</c>。</remarks>
+    /// <remarks>常見值包含 <c>start</c>、<c>center</c> 與 <c>end</c></remarks>
     public string? LegendAlignment
     {
         get
@@ -170,7 +170,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <summary>
     /// 取得或設定圖表資料來源是否包含標籤。
     /// </summary>
-    /// <remarks>ODF 允許的常見值包含 <c>none</c>、<c>row</c>、<c>column</c> 與 <c>both</c>。</remarks>
+    /// <remarks>ODF 允許的常見值包含 <c>none</c>、<c>row</c>、<c>column</c> 與 <c>both</c></remarks>
     public string? DataSourceHasLabels
     {
         get
@@ -240,7 +240,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <summary>
     /// 設定圖例位置。
     /// </summary>
-    /// <param name="position">圖例位置，例如 top、bottom、start 或 end。</param>
+    /// <param name="position">圖例位置，例如 top、bottom、start 或 end</param>
     public void SetLegend(string position)
     {
         LegendPosition = position;

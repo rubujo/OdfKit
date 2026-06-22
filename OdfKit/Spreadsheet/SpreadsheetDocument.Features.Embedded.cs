@@ -14,13 +14,13 @@ public partial class SpreadsheetDocument
     /// <summary>
     /// 在指定工作表的儲存格位置插入影像框架。
     /// </summary>
-    /// <param name="sheetName">工作表名稱。</param>
-    /// <param name="anchor">影像左上角錨定的儲存格位置。</param>
-    /// <param name="imageBytes">影像的二進位資料位元組。</param>
-    /// <param name="width">影像寬度。</param>
-    /// <param name="height">影像高度。</param>
-    /// <param name="name">影像名稱。</param>
-    /// <returns>代表新建立影像框架的 OdfImage 物件。</returns>
+    /// <param name="sheetName">工作表名稱</param>
+    /// <param name="anchor">影像左上角錨定的儲存格位置</param>
+    /// <param name="imageBytes">影像的二進位資料位元組</param>
+    /// <param name="width">影像寬度</param>
+    /// <param name="height">影像高度</param>
+    /// <param name="name">影像名稱</param>
+    /// <returns>代表新建立影像框架的 OdfImage 物件</returns>
     public OdfImage AddImageFrame(string sheetName, OdfCellAddress anchor, byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
     {
         if (string.IsNullOrEmpty(sheetName))
@@ -87,12 +87,12 @@ public partial class SpreadsheetDocument
     /// <summary>
     /// 在指定工作表的儲存格位置插入圖表（支援自訂寬高）。
     /// </summary>
-    /// <param name="sheetName">工作表名稱。</param>
-    /// <param name="anchor">圖表左上角錨定的儲存格位置。</param>
-    /// <param name="chart">圖表設定物件。</param>
-    /// <param name="width">圖表寬度。</param>
-    /// <param name="height">圖表高度。</param>
-    /// <returns>代表圖表物件的 OdfNode 節點。</returns>
+    /// <param name="sheetName">工作表名稱</param>
+    /// <param name="anchor">圖表左上角錨定的儲存格位置</param>
+    /// <param name="chart">圖表設定物件</param>
+    /// <param name="width">圖表寬度</param>
+    /// <param name="height">圖表高度</param>
+    /// <returns>代表圖表物件的 OdfNode 節點</returns>
     public OdfNode AddChart(string sheetName, OdfCellAddress anchor, OdfChartDefinition chart, OdfLength width, OdfLength height)
     {
         if (string.IsNullOrEmpty(sheetName))

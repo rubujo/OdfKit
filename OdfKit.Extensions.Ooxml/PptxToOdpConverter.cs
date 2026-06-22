@@ -30,9 +30,9 @@ public static class PptxToOdpConverter
     /// <summary>
     /// 從 PPTX 資料流建立 ODP 簡報文件。
     /// </summary>
-    /// <param name="pptxStream">來源 PPTX 資料流。</param>
-    /// <returns>轉換後的 ODP 簡報文件。</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="pptxStream"/> 為 null 時引發。</exception>
+    /// <param name="pptxStream">來源 PPTX 資料流</param>
+    /// <returns>轉換後的 ODP 簡報文件</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="pptxStream"/> 為 null 時引發</exception>
     public static OdfPresentationDocument Convert(Stream pptxStream)
     {
         if (pptxStream is null)

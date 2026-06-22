@@ -10,7 +10,9 @@ public partial class OdfParagraph
 {
     #region Embedded Content & Layout
 
-    /// <summary>在段落中新增圖片。</summary>
+    /// <summary>
+    /// 在段落中新增圖片
+    /// </summary>
     /// <param name="packagePath">圖片在封裝包內的路徑</param>
     /// <param name="width">圖片寬度</param>
     /// <param name="height">圖片高度</param>
@@ -21,13 +23,13 @@ public partial class OdfParagraph
     /// <summary>
     /// 在段落中新增浮動文字框。
     /// </summary>
-    /// <param name="x">X 軸座標位置。</param>
-    /// <param name="y">Y 軸座標位置。</param>
-    /// <param name="width">文字框寬度。</param>
-    /// <param name="height">文字框高度。</param>
-    /// <param name="anchorType">錨定類型。</param>
-    /// <param name="wrap">文字環繞方式。</param>
-    /// <returns>新建立的浮動文字框。</returns>
+    /// <param name="x">X 軸座標位置</param>
+    /// <param name="y">Y 軸座標位置</param>
+    /// <param name="width">文字框寬度</param>
+    /// <param name="height">文字框高度</param>
+    /// <param name="anchorType">錨定類型</param>
+    /// <param name="wrap">文字環繞方式</param>
+    /// <returns>新建立的浮動文字框</returns>
     public OdfFloatingTextBox AddFloatingTextBox(
         OdfLength x,
         OdfLength y,
@@ -69,34 +71,46 @@ public partial class OdfParagraph
         _ => "parallel",
     };
 
-    /// <summary>在段落中新增旁註標記（注音）。</summary>
+    /// <summary>
+    /// 在段落中新增旁註標記（注音）
+    /// </summary>
     /// <param name="baseText">基礎文字</param>
     /// <param name="rubyText">注音文字</param>
     public OdfRuby AddRuby(string baseText, string rubyText) => Doc.AddRuby(this, baseText, rubyText);
 
-    /// <summary>在段落中新增公式物件（MathML）。</summary>
+    /// <summary>
+    /// 在段落中新增公式物件（MathML）
+    /// </summary>
     /// <param name="mathMlXmlString">MathML XML 字串</param>
     public void AddFormula(string mathMlXmlString) => Doc.AddFormula(this, mathMlXmlString);
 
-    /// <summary>在段落中新增批注。</summary>
+    /// <summary>
+    /// 在段落中新增批注
+    /// </summary>
     /// <param name="comment">批注物件</param>
     public void AddComment(OdfComment comment) => Doc.AddComment(this, comment);
 
-    /// <summary>在段落中解析並新增 HTML 片段。</summary>
+    /// <summary>
+    /// 在段落中解析並新增 HTML 片段
+    /// </summary>
     /// <param name="html">HTML 字串片段</param>
     public void AddHtmlFragment(string html) => Doc.AddHtmlFragment(this, html);
 
-    /// <summary>在段落中新增頁碼欄位。</summary>
+    /// <summary>
+    /// 在段落中新增頁碼欄位
+    /// </summary>
     public void AddPageNumberField() => Doc.AddPageNumberField(this);
 
-    /// <summary>在段落中新增總頁數欄位。</summary>
+    /// <summary>
+    /// 在段落中新增總頁數欄位
+    /// </summary>
     public void AddPageCountField() => Doc.AddPageCountField(this);
 
     /// <summary>
     /// 在此段落前插入分頁符號，並可選擇性地切換頁面樣式。
     /// </summary>
-    /// <param name="masterPageName">要切換的主頁面樣式名稱；null 表示只插入分頁。</param>
-    /// <param name="pageNumber">新頁碼起始值；null 表示繼續。</param>
+    /// <param name="masterPageName">要切換的主頁面樣式名稱；null 表示只插入分頁</param>
+    /// <param name="pageNumber">新頁碼起始值；null 表示繼續</param>
     public void BreakPageBefore(string? masterPageName = null, int? pageNumber = null)
     {
         Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "break-before", OdfNamespaces.Fo, "page", "fo");

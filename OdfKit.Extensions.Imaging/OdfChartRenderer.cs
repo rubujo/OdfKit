@@ -18,7 +18,7 @@ public static class OdfChartRenderer
     /// <summary>
     /// 自動將試算表文件內的 Chart 物件繪製為 PNG fallback 影像並回寫至 OdfPackage 封裝中，提升跨平台開檔相容性。
     /// </summary>
-    /// <param name="document">目標試算表文件。</param>
+    /// <param name="document">目標試算表文件</param>
     public static void RenderChartsToFallbackImages(this SpreadsheetDocument document)
     {
         if (document is null)

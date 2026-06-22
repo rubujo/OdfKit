@@ -18,8 +18,8 @@ public static class OdfTypedDomCoverage
     /// <summary>
     /// 依指定 schema 建立 machine-readable typed DOM 覆蓋報告。
     /// </summary>
-    /// <param name="schema">要檢查的 schema；若為 <see langword="null"/>，則使用最新 schema。</param>
-    /// <returns>typed DOM 覆蓋報告。</returns>
+    /// <param name="schema">要檢查的 schema；若為 <see langword="null"/>，則使用最新 schema</param>
+    /// <returns>typed DOM 覆蓋報告</returns>
 #if !NETSTANDARD2_0
     [RequiresUnreferencedCode("以反射掃描 typed DOM 包裝類型屬性；Native AOT 需改為原始碼產生器。")]
 #endif

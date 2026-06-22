@@ -11,8 +11,8 @@ public readonly struct OdfTextEncoding : IEquatable<OdfTextEncoding>
     /// <summary>
     /// 以文字編碼名稱 lexical form 建立 <see cref="OdfTextEncoding"/>。
     /// </summary>
-    /// <param name="value">文字編碼名稱，例如 <c>UTF-8</c> 或 <c>windows-1252</c>。</param>
-    /// <exception cref="ArgumentException">當文字編碼名稱不符合 ODF <c>textEncoding</c> 格式時擲回。</exception>
+    /// <param name="value">文字編碼名稱，例如 <c>UTF-8</c> 或 <c>windows-1252</c></param>
+    /// <exception cref="ArgumentException">當文字編碼名稱不符合 ODF <c>textEncoding</c> 格式時擲回</exception>
     public OdfTextEncoding(string value)
     {
         if (!IsValid(value))
@@ -31,9 +31,9 @@ public readonly struct OdfTextEncoding : IEquatable<OdfTextEncoding>
     /// <summary>
     /// 嘗試解析文字編碼名稱。
     /// </summary>
-    /// <param name="value">文字編碼名稱字串。</param>
-    /// <param name="textEncoding">成功時傳回解析後的文字編碼名稱。</param>
-    /// <returns>若字串符合 ODF <c>textEncoding</c> 格式則為 <see langword="true"/>。</returns>
+    /// <param name="value">文字編碼名稱字串</param>
+    /// <param name="textEncoding">成功時傳回解析後的文字編碼名稱</param>
+    /// <returns>若字串符合 ODF <c>textEncoding</c> 格式則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfTextEncoding textEncoding)
     {
         if (IsValid(value))
@@ -49,14 +49,14 @@ public readonly struct OdfTextEncoding : IEquatable<OdfTextEncoding>
     /// <summary>
     /// 傳回原始文字編碼名稱。
     /// </summary>
-    /// <returns>文字編碼名稱。</returns>
+    /// <returns>文字編碼名稱</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// 判斷目前值是否等於另一個文字編碼名稱。
     /// </summary>
-    /// <param name="other">要比較的文字編碼名稱。</param>
-    /// <returns>若 lexical form 相同則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的文字編碼名稱</param>
+    /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfTextEncoding other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc />
@@ -68,17 +68,17 @@ public readonly struct OdfTextEncoding : IEquatable<OdfTextEncoding>
     /// <summary>
     /// 判斷兩個文字編碼名稱是否相等。
     /// </summary>
-    /// <param name="left">左側文字編碼名稱。</param>
-    /// <param name="right">右側文字編碼名稱。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側文字編碼名稱</param>
+    /// <param name="right">右側文字編碼名稱</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfTextEncoding left, OdfTextEncoding right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩個文字編碼名稱是否不相等。
     /// </summary>
-    /// <param name="left">左側文字編碼名稱。</param>
-    /// <param name="right">右側文字編碼名稱。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側文字編碼名稱</param>
+    /// <param name="right">右側文字編碼名稱</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfTextEncoding left, OdfTextEncoding right) => !left.Equals(right);
 
     private static bool IsValid(string? value)

@@ -62,11 +62,11 @@ public sealed class OdfMathToken
     /// <summary>
     /// 建立一個附加指定 MathML 屬性的新 token（原 token 不會被修改）。
     /// </summary>
-    /// <param name="name">屬性名稱（例如 <c>mathvariant</c>）。</param>
-    /// <param name="value">屬性值。</param>
-    /// <returns>附加屬性後的新 <see cref="OdfMathToken"/>。</returns>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空白時擲出。</exception>
-    /// <exception cref="ArgumentNullException">當 <paramref name="value"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <param name="name">屬性名稱（例如 <c>mathvariant</c>）</param>
+    /// <param name="value">屬性值</param>
+    /// <returns>附加屬性後的新 <see cref="OdfMathToken"/></returns>
+    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空白時擲出</exception>
+    /// <exception cref="ArgumentNullException">當 <paramref name="value"/> 為 <see langword="null"/> 時擲出</exception>
     public OdfMathToken WithAttribute(string name, string value)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -95,37 +95,37 @@ public sealed class OdfMathToken
     /// <summary>
     /// 建立 MathML <c>mi</c> 識別名稱 token。
     /// </summary>
-    /// <param name="text">識別名稱文字。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="text">識別名稱文字</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Identifier(string text) => new(OdfMathTokenKind.Identifier, text, null, null);
 
     /// <summary>
     /// 建立 MathML <c>mn</c> 數值 token。
     /// </summary>
-    /// <param name="text">數值文字。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="text">數值文字</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Number(string text) => new(OdfMathTokenKind.Number, text, null, null);
 
     /// <summary>
     /// 建立 MathML <c>mo</c> 運算子 token。
     /// </summary>
-    /// <param name="text">運算子文字。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="text">運算子文字</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Operator(string text) => new(OdfMathTokenKind.Operator, text, null, null);
 
     /// <summary>
     /// 建立 MathML <c>mtext</c> 文字 token。
     /// </summary>
-    /// <param name="text">文字內容。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="text">文字內容</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken TextToken(string text) => new(OdfMathTokenKind.Text, text, null, null);
 
     /// <summary>
     /// 建立 MathML <c>msup</c> 上標 token。
     /// </summary>
-    /// <param name="baseToken">底數 token。</param>
-    /// <param name="scriptToken">上標 token。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="baseToken">底數 token</param>
+    /// <param name="scriptToken">上標 token</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Superscript(OdfMathToken baseToken, OdfMathToken scriptToken)
     {
         RequireNotNull(baseToken, nameof(baseToken));
@@ -136,9 +136,9 @@ public sealed class OdfMathToken
     /// <summary>
     /// 建立 MathML <c>msub</c> 下標 token。
     /// </summary>
-    /// <param name="baseToken">底數 token。</param>
-    /// <param name="scriptToken">下標 token。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="baseToken">底數 token</param>
+    /// <param name="scriptToken">下標 token</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Subscript(OdfMathToken baseToken, OdfMathToken scriptToken)
     {
         RequireNotNull(baseToken, nameof(baseToken));
@@ -149,9 +149,9 @@ public sealed class OdfMathToken
     /// <summary>
     /// 建立 MathML <c>mfrac</c> 分數 token。
     /// </summary>
-    /// <param name="numerator">分子 token。</param>
-    /// <param name="denominator">分母 token。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="numerator">分子 token</param>
+    /// <param name="denominator">分母 token</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Fraction(OdfMathToken numerator, OdfMathToken denominator)
     {
         RequireNotNull(numerator, nameof(numerator));
@@ -162,9 +162,9 @@ public sealed class OdfMathToken
     /// <summary>
     /// 建立 MathML <c>msqrt</c>（無索引）或 <c>mroot</c>（具索引）根號 token。
     /// </summary>
-    /// <param name="radicand">被開方數 token。</param>
-    /// <param name="index">選用的根指數 token；<see langword="null"/> 表示平方根。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="radicand">被開方數 token</param>
+    /// <param name="index">選用的根指數 token；<see langword="null"/> 表示平方根</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Radical(OdfMathToken radicand, OdfMathToken? index = null)
     {
         RequireNotNull(radicand, nameof(radicand));
@@ -174,25 +174,25 @@ public sealed class OdfMathToken
     /// <summary>
     /// 建立 MathML <c>mrow</c> 群組列 token。
     /// </summary>
-    /// <param name="children">群組中的子 token 清單。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="children">群組中的子 token 清單</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Row(params OdfMathToken[] children) =>
         new(OdfMathTokenKind.Row, string.Empty, null, null, RequireChildren(children, nameof(children)));
 
     /// <summary>
     /// 建立 MathML <c>mtable</c> 矩陣 token。
     /// </summary>
-    /// <param name="rows">矩陣的每一列，須為 <see cref="Row(OdfMathToken[])"/> 所建立的 token。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="rows">矩陣的每一列，須為 <see cref="Row(OdfMathToken[])"/> 所建立的 token</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Matrix(params OdfMathToken[] rows) =>
         new(OdfMathTokenKind.Matrix, string.Empty, null, null, RequireChildren(rows, nameof(rows)));
 
     /// <summary>
     /// 建立 MathML <c>munder</c> 下方標記 token。
     /// </summary>
-    /// <param name="baseToken">底數 token。</param>
-    /// <param name="under">下方標記 token。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="baseToken">底數 token</param>
+    /// <param name="under">下方標記 token</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Under(OdfMathToken baseToken, OdfMathToken under)
     {
         RequireNotNull(baseToken, nameof(baseToken));
@@ -203,9 +203,9 @@ public sealed class OdfMathToken
     /// <summary>
     /// 建立 MathML <c>mover</c> 上方標記 token。
     /// </summary>
-    /// <param name="baseToken">底數 token。</param>
-    /// <param name="over">上方標記 token。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="baseToken">底數 token</param>
+    /// <param name="over">上方標記 token</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Over(OdfMathToken baseToken, OdfMathToken over)
     {
         RequireNotNull(baseToken, nameof(baseToken));
@@ -216,10 +216,10 @@ public sealed class OdfMathToken
     /// <summary>
     /// 建立 MathML <c>munderover</c> 上下方標記 token。
     /// </summary>
-    /// <param name="baseToken">底數 token。</param>
-    /// <param name="under">下方標記 token。</param>
-    /// <param name="over">上方標記 token。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="baseToken">底數 token</param>
+    /// <param name="under">下方標記 token</param>
+    /// <param name="over">上方標記 token</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken UnderOver(OdfMathToken baseToken, OdfMathToken under, OdfMathToken over)
     {
         RequireNotNull(baseToken, nameof(baseToken));
@@ -231,10 +231,10 @@ public sealed class OdfMathToken
     /// <summary>
     /// 建立以括號包圍內容的群組 token（序列化為 <c>mrow</c> 搭配前後 <c>mo</c> 分隔符號）。
     /// </summary>
-    /// <param name="inner">括號內的內容 token。</param>
-    /// <param name="open">開括號文字，預設為 <c>(</c>。</param>
-    /// <param name="close">閉括號文字，預設為 <c>)</c>。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="inner">括號內的內容 token</param>
+    /// <param name="open">開括號文字，預設為 <c>(</c></param>
+    /// <param name="close">閉括號文字，預設為 <c>)</c></param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Fenced(OdfMathToken inner, string open = "(", string close = ")")
     {
         RequireNotNull(inner, nameof(inner));
@@ -244,9 +244,9 @@ public sealed class OdfMathToken
     /// <summary>
     /// 建立 MathML <c>mstyle</c> 樣式群組 token。
     /// </summary>
-    /// <param name="inner">樣式群組的內容 token。</param>
-    /// <param name="displayStyle">選用的 <c>displaystyle</c> 設定。</param>
-    /// <returns>新的 <see cref="OdfMathToken"/>。</returns>
+    /// <param name="inner">樣式群組的內容 token</param>
+    /// <param name="displayStyle">選用的 <c>displaystyle</c> 設定</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
     public static OdfMathToken Style(OdfMathToken inner, bool? displayStyle = null)
     {
         RequireNotNull(inner, nameof(inner));

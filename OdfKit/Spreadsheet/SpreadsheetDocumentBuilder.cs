@@ -18,9 +18,9 @@ public sealed class SpreadsheetDocumentBuilder
     /// <summary>
     /// 新增工作表並設定其內容。
     /// </summary>
-    /// <param name="name">工作表名稱。</param>
-    /// <param name="configure">工作表設定委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="name">工作表名稱</param>
+    /// <param name="configure">工作表設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public SpreadsheetDocumentBuilder AddSheet(string name, Action<OdfSheetBuilder> configure)
     {
         if (configure is null)
@@ -33,7 +33,7 @@ public sealed class SpreadsheetDocumentBuilder
     /// <summary>
     /// 建立並傳回試算表文件。
     /// </summary>
-    /// <returns>建立完成的試算表文件。</returns>
+    /// <returns>建立完成的試算表文件</returns>
     public SpreadsheetDocument Build()
     {
         return _document;
@@ -55,9 +55,9 @@ public sealed class OdfSheetBuilder
     /// <summary>
     /// 設定指定儲存格的值。
     /// </summary>
-    /// <param name="address">儲存格位址，例如 <c>A1</c>。</param>
-    /// <param name="value">儲存格值。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="address">儲存格位址，例如 <c>A1</c></param>
+    /// <param name="value">儲存格值</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSheetBuilder SetCell(string address, object? value)
     {
         _sheet.Cells[address].CellValue = value;
@@ -67,9 +67,9 @@ public sealed class OdfSheetBuilder
     /// <summary>
     /// 設定指定儲存格的公式。
     /// </summary>
-    /// <param name="address">儲存格位址，例如 <c>A1</c>。</param>
-    /// <param name="formula">ODF 公式文字。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="address">儲存格位址，例如 <c>A1</c></param>
+    /// <param name="formula">ODF 公式文字</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSheetBuilder SetFormula(string address, string formula)
     {
         _sheet.Cells[address].Formula = formula;
@@ -79,12 +79,12 @@ public sealed class OdfSheetBuilder
     /// <summary>
     /// 匯入列資料。
     /// </summary>
-    /// <typeparam name="T">資料項目型別。</typeparam>
-    /// <param name="items">要匯入的資料項目。</param>
-    /// <param name="selector">將資料項目轉為儲存格值陣列的委派。</param>
-    /// <param name="startRow">起始列，採 1 為基準。</param>
-    /// <param name="startColumn">起始欄，採 1 為基準。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <typeparam name="T">資料專案型別</typeparam>
+    /// <param name="items">要匯入的資料專案</param>
+    /// <param name="selector">將資料專案轉為儲存格值陣列的委派</param>
+    /// <param name="startRow">起始列，採 1 為基準</param>
+    /// <param name="startColumn">起始欄，採 1 為基準</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSheetBuilder ImportRows<T>(
         IEnumerable<T> items,
         Func<T, object?[]> selector,
@@ -117,13 +117,13 @@ public sealed class OdfSheetBuilder
     /// <summary>
     /// 匯入含標題列的資料表。
     /// </summary>
-    /// <typeparam name="T">資料項目型別。</typeparam>
-    /// <param name="items">要匯入的資料項目。</param>
-    /// <param name="rowSelector">將資料項目轉為儲存格值陣列的委派。</param>
-    /// <param name="headers">標題列文字。</param>
-    /// <param name="startRow">標題列起始列，採 1 為基準。</param>
-    /// <param name="startColumn">標題列起始欄，採 1 為基準。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <typeparam name="T">資料專案型別</typeparam>
+    /// <param name="items">要匯入的資料專案</param>
+    /// <param name="rowSelector">將資料專案轉為儲存格值陣列的委派</param>
+    /// <param name="headers">標題列文字</param>
+    /// <param name="startRow">標題列起始列，採 1 為基準</param>
+    /// <param name="startColumn">標題列起始欄，採 1 為基準</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSheetBuilder ImportTable<T>(
         IEnumerable<T> items,
         Func<T, object?[]> rowSelector,
@@ -149,9 +149,9 @@ public sealed class OdfSheetBuilder
     /// <summary>
     /// 設定欄寬。
     /// </summary>
-    /// <param name="columnIndex">欄索引，採 1 為基準。</param>
-    /// <param name="widthCm">欄寬，單位為公分。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="columnIndex">欄索引，採 1 為基準</param>
+    /// <param name="widthCm">欄寬，單位為公分</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSheetBuilder SetColumnWidth(int columnIndex, double widthCm)
     {
         EnsureOneBasedIndex(columnIndex, nameof(columnIndex));
@@ -165,9 +165,9 @@ public sealed class OdfSheetBuilder
     /// <summary>
     /// 凍結指定儲存格上方與左側的窗格。
     /// </summary>
-    /// <param name="row">作用儲存格列，採 1 為基準。</param>
-    /// <param name="column">作用儲存格欄，採 1 為基準。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="row">作用儲存格列，採 1 為基準</param>
+    /// <param name="column">作用儲存格欄，採 1 為基準</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSheetBuilder FreezeAt(int row, int column)
     {
         EnsureOneBasedIndex(row, nameof(row));

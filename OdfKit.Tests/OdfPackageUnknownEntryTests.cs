@@ -10,7 +10,7 @@ using Xunit;
 namespace OdfKit.Tests;
 
 /// <summary>
-/// 驗證高階文件保存流程不會刪除或改寫未知封裝項目。
+/// 驗證高階文件保存流程不會刪除或改寫未知封裝專案。
 /// </summary>
 public class OdfPackageUnknownEntryTests
 {

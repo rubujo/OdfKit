@@ -14,9 +14,9 @@ public static class OdfNumberFormatEngine
     /// <summary>
     /// 依 ODF 數字/貨幣/百分比格式定義節點格式化浮點數值。
     /// </summary>
-    /// <param name="value">要格式化的數值。</param>
-    /// <param name="numberStyleNode">格式定義根節點（例如 <c>number:number-style</c>）。</param>
-    /// <returns>格式化後的字串。</returns>
+    /// <param name="value">要格式化的數值</param>
+    /// <param name="numberStyleNode">格式定義根節點（例如 <c>number:number-style</c>）</param>
+    /// <returns>格式化後的字串</returns>
     public static string Format(double value, OdfNode numberStyleNode)
     {
         if (numberStyleNode is null)
@@ -38,9 +38,9 @@ public static class OdfNumberFormatEngine
     /// <summary>
     /// 依 ODF 日期/時間格式定義節點格式化日期時間值。
     /// </summary>
-    /// <param name="value">要格式化的日期時間值。</param>
-    /// <param name="dateStyleNode">格式定義根節點（例如 <c>number:date-style</c>）。</param>
-    /// <returns>格式化後的字串。</returns>
+    /// <param name="value">要格式化的日期時間值</param>
+    /// <param name="dateStyleNode">格式定義根節點（例如 <c>number:date-style</c>）</param>
+    /// <returns>格式化後的字串</returns>
     public static string Format(DateTime value, OdfNode dateStyleNode)
     {
         if (dateStyleNode is null)
@@ -53,10 +53,10 @@ public static class OdfNumberFormatEngine
     /// <summary>
     /// 依樣式名稱從文件樣式 DOM 查找對應格式節點並格式化。
     /// </summary>
-    /// <param name="value">要格式化的值（double、DateTime、bool、string）。</param>
-    /// <param name="styleName">ODF 數字樣式名稱（<c>style:data-style-name</c> 的值）。</param>
-    /// <param name="stylesDom">styles.xml 或 content.xml 的 DOM 根節點。</param>
-    /// <returns>格式化後的字串；若找不到對應樣式則回傳原始值的字串表示。</returns>
+    /// <param name="value">要格式化的值（double、DateTime、bool、string）</param>
+    /// <param name="styleName">ODF 數字樣式名稱（<c>style:data-style-name</c> 的值）</param>
+    /// <param name="stylesDom">styles.xml 或 content.xml 的 DOM 根節點</param>
+    /// <returns>格式化後的字串；若找不到對應樣式則回傳原始值的字串表示</returns>
     public static string Format(object? value, string styleName, OdfNode stylesDom)
     {
         if (value is null)

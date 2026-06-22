@@ -110,7 +110,7 @@ public class RdfMetadataTests
     }
 
     /// <summary>
-    /// 驗證 SyncWithPackageEntries 會為封裝項目建立 pkg:hasPart 與 pkg:mimeType。
+    /// 驗證 SyncWithPackageEntries 會為封裝專案建立 pkg:hasPart 與 pkg:mimeType。
     /// </summary>
     [Fact]
     public void SyncWithPackageEntries_AddsHasPartAndMimeTypeForEntries()
@@ -139,7 +139,7 @@ public class RdfMetadataTests
     }
 
     /// <summary>
-    /// 驗證新增與移除封裝項目後，同步會更新 pkg triples。
+    /// 驗證新增與移除封裝專案後，同步會更新 pkg triples。
     /// </summary>
     [Fact]
     public void SyncWithPackageEntries_ReflectsAddedAndRemovedEntries()
@@ -164,7 +164,7 @@ public class RdfMetadataTests
     }
 
     /// <summary>
-    /// 驗證儲存時會自動同步 manifest.rdf 與封裝項目。
+    /// 驗證儲存時會自動同步 manifest.rdf 與封裝專案。
     /// </summary>
     [Fact]
     public void Save_AutoSyncsManifestRdfWithPackageEntries()

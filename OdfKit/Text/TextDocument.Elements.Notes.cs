@@ -10,18 +10,18 @@ public partial class TextDocument
     /// <summary>
     /// 在指定段落中插入腳注 (text:note, note-class="footnote")。
     /// </summary>
-    /// <param name="paragraph">要插入腳注的段落。</param>
-    /// <param name="citation">腳注引用標記，例如 "1" 或 "*"。</param>
-    /// <param name="bodyText">腳注本文內容。</param>
+    /// <param name="paragraph">要插入腳注的段落</param>
+    /// <param name="citation">腳注引用標記，例如 "1" 或 "*"</param>
+    /// <param name="bodyText">腳注本文內容</param>
     internal void AddFootnote(OdfParagraph paragraph, string citation, string bodyText) =>
         TextDocumentNotesEngine.AddFootnote(MutationContext, paragraph, citation, bodyText);
 
     /// <summary>
     /// 在指定段落中插入尾注 (text:note, note-class="endnote")。
     /// </summary>
-    /// <param name="paragraph">要插入尾注的段落。</param>
-    /// <param name="citation">尾注引用標記，例如 "i" 或 "a"。</param>
-    /// <param name="bodyText">尾注本文內容。</param>
+    /// <param name="paragraph">要插入尾注的段落</param>
+    /// <param name="citation">尾注引用標記，例如 "i" 或 "a"</param>
+    /// <param name="bodyText">尾注本文內容</param>
     internal void AddEndnote(OdfParagraph paragraph, string citation, string bodyText) =>
         TextDocumentNotesEngine.AddEndnote(MutationContext, paragraph, citation, bodyText);
 
@@ -108,7 +108,7 @@ public partial class TextDocument
     /// <summary>
     /// 取得文件中所有書籤的摘要清單。
     /// </summary>
-    /// <returns>依文件樹深度優先順序排列的書籤清單。</returns>
+    /// <returns>依文件樹深度優先順序排列的書籤清單</returns>
     public IReadOnlyList<OdfBookmarkInfo> GetBookmarks() =>
         TextDocumentBookmarkReadEngine.GetBookmarks(BodyTextRoot);
 

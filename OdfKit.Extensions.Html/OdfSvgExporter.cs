@@ -20,9 +20,9 @@ public static class OdfSvgExporter
     /// <summary>
     /// 將指定繪圖文件匯出為 SVG 字串。
     /// </summary>
-    /// <param name="document">來源繪圖文件。</param>
-    /// <param name="options">SVG 匯出選項；若為 null 則使用預設值。</param>
-    /// <returns>SVG 內容字串。</returns>
+    /// <param name="document">來源繪圖文件</param>
+    /// <param name="options">SVG 匯出選項；若為 null 則使用預設值</param>
+    /// <returns>SVG 內容字串</returns>
     public static string Export(DrawingDocument document, OdfSvgExportOptions? options = null)
     {
         if (document is null)

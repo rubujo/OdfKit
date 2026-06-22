@@ -45,7 +45,7 @@ public partial class TableTableElement
     /// <summary>
     /// 取得或建立 <c>table:table-columns</c> 容器，供後續新增欄定義使用。
     /// </summary>
-    /// <returns>表格欄位容器元素。</returns>
+    /// <returns>表格欄位容器元素</returns>
     public TableTableColumnsElement EnsureTableColumns()
     {
         TableTableColumnsElement? existing = TableTableColumnsChildElements.FirstOrDefault();
@@ -60,7 +60,7 @@ public partial class TableTableElement
     /// <summary>
     /// 在欄位結構區段末尾新增單一欄定義。
     /// </summary>
-    /// <returns>新增的 <c>table:table-column</c> 元素。</returns>
+    /// <returns>新增的 <c>table:table-column</c> 元素</returns>
     public TableTableColumnElement AppendColumn()
     {
         TableTableColumnsElement columns = EnsureTableColumns();
@@ -70,7 +70,7 @@ public partial class TableTableElement
     /// <summary>
     /// 在列結構區段末尾新增表格列。
     /// </summary>
-    /// <returns>新增的 <c>table:table-row</c> 元素。</returns>
+    /// <returns>新增的 <c>table:table-row</c> 元素</returns>
     public TableTableRowElement AppendRow()
     {
         return AppendElement(new TableTableRowElement("table"));
@@ -81,7 +81,7 @@ public partial class TableTableElement
     /// <c>table:table-rows</c>／<c>table:table-row-group</c>）之前，即使呼叫時已存在資料列，
     /// 仍會插入在第一個資料列之前，而非單純附加於列結構區段末尾。
     /// </summary>
-    /// <returns>新增的 <c>table:table-header-rows</c> 元素。</returns>
+    /// <returns>新增的 <c>table:table-header-rows</c> 元素</returns>
     public TableTableHeaderRowsElement AppendHeaderRows()
     {
         var headerRows = new TableTableHeaderRowsElement("table");
@@ -100,9 +100,9 @@ public partial class TableTableElement
     /// <summary>
     /// 在欄位結構 choice group 的語意位置插入子元素。
     /// </summary>
-    /// <typeparam name="TElement">欄位結構元素型別。</typeparam>
-    /// <param name="element">要插入的元素。</param>
-    /// <returns>已插入的元素。</returns>
+    /// <typeparam name="TElement">欄位結構元素型別</typeparam>
+    /// <param name="element">要插入的元素</param>
+    /// <returns>已插入的元素</returns>
     public TElement InsertColumnStructure<TElement>(TElement element)
         where TElement : OdfElement
     {

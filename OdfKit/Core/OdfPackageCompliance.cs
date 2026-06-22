@@ -5,12 +5,12 @@ using System;
 namespace OdfKit.Core;
 
 /// <summary>
-/// 表示資訊清單（Manifest）檔案項目中的合規性問題。
+/// 表示資訊清單（Manifest）檔案專案中的合規性問題。
 /// </summary>
 public sealed class OdfManifestFileEntryIssue
 {
     /// <summary>
-    /// 取得或設定項目的完整路徑。
+    /// 取得或設定專案的完整路徑。
     /// </summary>
     public string? FullPath { get; set; }
 
@@ -31,7 +31,7 @@ public sealed class OdfManifestFileEntryIssue
 }
 
 /// <summary>
-/// 表示資訊清單根項目的資訊。
+/// 表示資訊清單根專案的資訊。
 /// </summary>
 /// <remarks>
 /// 建立新的 <see cref="OdfManifestRootInfo"/> 類別執行個體。

@@ -5,13 +5,13 @@ namespace OdfKit.Drawing;
 /// <summary>
 /// 表示繪圖頁面上一張圖片的摘要資訊。
 /// </summary>
-/// <param name="pageName">所在繪圖頁面名稱。</param>
-/// <param name="id">圖形識別碼。</param>
-/// <param name="href">圖片連結位址（<c>xlink:href</c>）。</param>
-/// <param name="x">邊界盒 X 座標原文。</param>
-/// <param name="y">邊界盒 Y 座標原文。</param>
-/// <param name="width">邊界盒寬度原文。</param>
-/// <param name="height">邊界盒高度原文。</param>
+/// <param name="pageName">所在繪圖頁面名稱</param>
+/// <param name="id">圖形識別碼</param>
+/// <param name="href">圖片連結位址（<c>xlink:href</c>）</param>
+/// <param name="x">邊界盒 X 座標原文</param>
+/// <param name="y">邊界盒 Y 座標原文</param>
+/// <param name="width">邊界盒寬度原文</param>
+/// <param name="height">邊界盒高度原文</param>
 public sealed class OdfDrawPictureInfo(
     string pageName,
     string id,

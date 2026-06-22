@@ -28,9 +28,9 @@ public static class OdpToPptxConverter
     /// <summary>
     /// 將 ODP 簡報文件轉換並寫入 PPTX 資料流。
     /// </summary>
-    /// <param name="odpDocument">來源 ODP 簡報文件。</param>
-    /// <param name="pptxStream">要寫入 PPTX 的目標資料流。</param>
-    /// <exception cref="ArgumentNullException">任一必要參數為 null 時引發。</exception>
+    /// <param name="odpDocument">來源 ODP 簡報文件</param>
+    /// <param name="pptxStream">要寫入 PPTX 的目標資料流</param>
+    /// <exception cref="ArgumentNullException">任一必要參數為 null 時引發</exception>
     public static void Convert(OdfPresentationDocument odpDocument, Stream pptxStream)
     {
         if (odpDocument is null)
@@ -852,10 +852,10 @@ public static class OdpToPptxConverter
     /// 效果節點的兩層巢狀 par，並不存在中層。先前固定套用三層 indefinite 結構是 PowerPoint
     /// MainSequence.Count 低估同一序列第二步驟的根因。
     /// </remarks>
-    /// <param name="groupChildren">此步驟的效果節點清單。</param>
-    /// <param name="outerDelay">外層 stCondLst 的延遲值（indefinite 或實際毫秒數字串）。</param>
-    /// <param name="flattenMiddleLayer">是否省略中層（AfterPrevious／WithPrevious 接續步驟應為 <see langword="true"/>）。</param>
-    /// <param name="timeNodeId">下一個可用的時間節點識別碼。</param>
+    /// <param name="groupChildren">此步驟的效果節點清單</param>
+    /// <param name="outerDelay">外層 stCondLst 的延遲值（indefinite 或實際毫秒數字串）</param>
+    /// <param name="flattenMiddleLayer">是否省略中層（AfterPrevious／WithPrevious 接續步驟應為 <see langword="true"/>）</param>
+    /// <param name="timeNodeId">下一個可用的時間節點識別碼</param>
     private static P.ParallelTimeNode WrapAnimationStep(P.ChildTimeNodeList groupChildren, string outerDelay, bool flattenMiddleLayer, ref uint timeNodeId)
     {
         P.ChildTimeNodeList outerChildren;

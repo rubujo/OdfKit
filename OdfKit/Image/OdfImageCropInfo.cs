@@ -6,10 +6,10 @@ namespace OdfKit.Image;
 /// <summary>
 /// 表示影像的裁切邊界（對應 <c>fo:clip</c> 屬性的 <c>rect(...)</c> 語法）。
 /// </summary>
-/// <param name="top">頂部裁切邊界。</param>
-/// <param name="right">右側裁切邊界。</param>
-/// <param name="bottom">底部裁切邊界。</param>
-/// <param name="left">左側裁切邊界。</param>
+/// <param name="top">頂部裁切邊界</param>
+/// <param name="right">右側裁切邊界</param>
+/// <param name="bottom">底部裁切邊界</param>
+/// <param name="left">左側裁切邊界</param>
 public sealed class OdfImageCropInfo(string top, string right, string bottom, string left)
 {
     /// <summary>
@@ -35,9 +35,9 @@ public sealed class OdfImageCropInfo(string top, string right, string bottom, st
     /// <summary>
     /// 嘗試將 <c>fo:clip</c> 屬性值剖析為 <see cref="OdfImageCropInfo"/>。
     /// </summary>
-    /// <param name="clip"><c>fo:clip</c> 屬性原文，格式為 <c>rect(top, right, bottom, left)</c>。</param>
-    /// <param name="crop">剖析成功時傳回的裁切邊界。</param>
-    /// <returns>若剖析成功則為 <see langword="true"/>。</returns>
+    /// <param name="clip"><c>fo:clip</c> 屬性原文，格式為 <c>rect(top, right, bottom, left)</c></param>
+    /// <param name="crop">剖析成功時傳回的裁切邊界</param>
+    /// <returns>若剖析成功則為 <see langword="true"/></returns>
     public static bool TryParse(string? clip, out OdfImageCropInfo? crop)
     {
         crop = null;
@@ -71,7 +71,7 @@ public sealed class OdfImageCropInfo(string top, string right, string bottom, st
     /// <summary>
     /// 將目前的裁切邊界格式化為 <c>fo:clip</c> 屬性值。
     /// </summary>
-    /// <returns><c>rect(top, right, bottom, left)</c> 格式的屬性字串。</returns>
+    /// <returns><c>rect(top, right, bottom, left)</c> 格式的屬性字串</returns>
     public override string ToString() =>
         string.Format(CultureInfo.InvariantCulture, "rect({0}, {1}, {2}, {3})", Top, Right, Bottom, Left);
 }

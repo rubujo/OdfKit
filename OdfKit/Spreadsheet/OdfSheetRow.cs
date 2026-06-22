@@ -14,8 +14,8 @@ public sealed class OdfSheetRow
     /// <summary>
     /// 初始化 <see cref="OdfSheetRow"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="sheet">所屬工作表。</param>
-    /// <param name="index">以 0 為基準的列索引。</param>
+    /// <param name="sheet">所屬工作表</param>
+    /// <param name="index">以 0 為基準的列索引</param>
     internal OdfSheetRow(OdfTableSheet sheet, int index)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));

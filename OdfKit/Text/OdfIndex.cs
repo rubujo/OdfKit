@@ -59,12 +59,12 @@ public abstract class OdfIndex
     protected abstract string GetSourceLocalName();
 
     /// <summary>
-    /// 尋找符合指定 XML 本地名稱與命名空間的第一個子項目。
+    /// 尋找符合指定 XML 本地名稱與命名空間的第一個子專案。
     /// </summary>
     /// <param name="parent">父節點</param>
     /// <param name="localName">XML 本地名稱</param>
     /// <param name="ns">命名空間 URI</param>
-    /// <returns>符合條件的子項目，若無則傳回 <c>null</c></returns>
+    /// <returns>符合條件的子專案，若無則傳回 <c>null</c></returns>
     protected OdfNode? FindChild(OdfNode parent, string localName, string ns)
     {
         foreach (var child in parent.Children)
@@ -76,7 +76,7 @@ public abstract class OdfIndex
     }
 
     /// <summary>
-    /// 尋找或建立符合指定 XML 本地名稱與命名空間的子項目。
+    /// 尋找或建立符合指定 XML 本地名稱與命名空間的子專案。
     /// </summary>
     /// <param name="parent">父節點</param>
     /// <param name="localName">XML 本地名稱</param>

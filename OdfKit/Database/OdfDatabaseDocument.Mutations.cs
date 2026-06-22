@@ -13,9 +13,9 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 新增資料表描述。
     /// </summary>
-    /// <param name="name">資料表名稱。</param>
-    /// <param name="command">選用的資料表命令或來源名稱。</param>
-    /// <returns>新增的資料表節點。</returns>
+    /// <param name="name">資料表名稱</param>
+    /// <param name="command">選用的資料表命令或來源名稱</param>
+    /// <returns>新增的資料表節點</returns>
     public OdfNode AddTable(string name, string? command = null)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -38,12 +38,12 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 新增查詢描述。
     /// </summary>
-    /// <param name="name">查詢名稱。</param>
-    /// <param name="command">查詢命令或 SQL 內容。</param>
-    /// <param name="title">選用的顯示標題。</param>
-    /// <param name="description">選用的描述文字。</param>
-    /// <param name="escapeProcessing">選用的 SQL escape processing 設定。</param>
-    /// <returns>新增的查詢節點。</returns>
+    /// <param name="name">查詢名稱</param>
+    /// <param name="command">查詢命令或 SQL 內容</param>
+    /// <param name="title">選用的顯示標題</param>
+    /// <param name="description">選用的描述文字</param>
+    /// <param name="escapeProcessing">選用的 SQL escape processing 設定</param>
+    /// <returns>新增的查詢節點</returns>
     public OdfNode AddQuery(
         string name,
         string command,
@@ -91,11 +91,11 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 新增資料來源設定。
     /// </summary>
-    /// <param name="name">設定名稱。</param>
-    /// <param name="type">設定值型別。</param>
-    /// <param name="value">設定值。</param>
-    /// <returns>新增的資料來源設定節點。</returns>
-    /// <exception cref="InvalidOperationException">當尚未設定資料來源連線時擲出。</exception>
+    /// <param name="name">設定名稱</param>
+    /// <param name="type">設定值型別</param>
+    /// <param name="value">設定值</param>
+    /// <returns>新增的資料來源設定節點</returns>
+    /// <exception cref="InvalidOperationException">當尚未設定資料來源連線時擲出</exception>
     public OdfNode AddDataSourceSetting(string name, OdfDatabaseDataSourceSettingType type, string value)
     {
         return AddDataSourceSetting(name, type, isList: false, [value]);
@@ -104,12 +104,12 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 新增資料來源設定。
     /// </summary>
-    /// <param name="name">設定名稱。</param>
-    /// <param name="type">設定值型別。</param>
-    /// <param name="isList">設定值是否為清單。</param>
-    /// <param name="values">設定值清單。</param>
-    /// <returns>新增的資料來源設定節點。</returns>
-    /// <exception cref="InvalidOperationException">當尚未設定資料來源連線時擲出。</exception>
+    /// <param name="name">設定名稱</param>
+    /// <param name="type">設定值型別</param>
+    /// <param name="isList">設定值是否為清單</param>
+    /// <param name="values">設定值清單</param>
+    /// <returns>新增的資料來源設定節點</returns>
+    /// <exception cref="InvalidOperationException">當尚未設定資料來源連線時擲出</exception>
     public OdfNode AddDataSourceSetting(
         string name,
         OdfDatabaseDataSourceSettingType type,
@@ -161,12 +161,12 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 新增表單元件描述。
     /// </summary>
-    /// <param name="name">表單名稱。</param>
-    /// <param name="href">選用的表單資源參照路徑。</param>
-    /// <param name="title">選用的顯示標題。</param>
-    /// <param name="description">選用的描述文字。</param>
-    /// <param name="asTemplate">選用的範本標記。</param>
-    /// <returns>新增的表單元件節點。</returns>
+    /// <param name="name">表單名稱</param>
+    /// <param name="href">選用的表單資源參照路徑</param>
+    /// <param name="title">選用的顯示標題</param>
+    /// <param name="description">選用的描述文字</param>
+    /// <param name="asTemplate">選用的範本標記</param>
+    /// <returns>新增的表單元件節點</returns>
     public OdfNode AddForm(
         string name,
         string? href = null,
@@ -213,12 +213,12 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 新增報表元件描述。
     /// </summary>
-    /// <param name="name">報表名稱。</param>
-    /// <param name="href">選用的報表資源參照路徑。</param>
-    /// <param name="title">選用的顯示標題。</param>
-    /// <param name="description">選用的描述文字。</param>
-    /// <param name="asTemplate">選用的範本標記。</param>
-    /// <returns>新增的報表元件節點。</returns>
+    /// <param name="name">報表名稱</param>
+    /// <param name="href">選用的報表資源參照路徑</param>
+    /// <param name="title">選用的顯示標題</param>
+    /// <param name="description">選用的描述文字</param>
+    /// <param name="asTemplate">選用的範本標記</param>
+    /// <returns>新增的報表元件節點</returns>
     public OdfNode AddReport(
         string name,
         string? href = null,
@@ -269,8 +269,8 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 移除指定名稱的資料表描述。
     /// </summary>
-    /// <param name="name">資料表名稱。</param>
-    /// <returns>如果成功移除資料表描述，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <param name="name">資料表名稱</param>
+    /// <returns>如果成功移除資料表描述，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool RemoveTable(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -302,8 +302,8 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 移除指定名稱的查詢描述。
     /// </summary>
-    /// <param name="name">查詢名稱。</param>
-    /// <returns>如果成功移除查詢描述，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <param name="name">查詢名稱</param>
+    /// <returns>如果成功移除查詢描述，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool RemoveQuery(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -335,8 +335,8 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 移除指定名稱的報表元件。
     /// </summary>
-    /// <param name="name">報表名稱。</param>
-    /// <returns>如果成功移除報表元件，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <param name="name">報表名稱</param>
+    /// <returns>如果成功移除報表元件，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool RemoveReport(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -356,8 +356,8 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 移除指定名稱的表單元件。
     /// </summary>
-    /// <param name="name">表單名稱。</param>
-    /// <returns>如果成功移除表單元件，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <param name="name">表單名稱</param>
+    /// <returns>如果成功移除表單元件，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool RemoveForm(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -377,8 +377,8 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 移除指定名稱的資料來源設定。
     /// </summary>
-    /// <param name="name">設定名稱。</param>
-    /// <returns>如果成功移除資料來源設定，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <param name="name">設定名稱</param>
+    /// <returns>如果成功移除資料來源設定，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool RemoveDataSourceSetting(string name)
     {
         if (string.IsNullOrWhiteSpace(name))

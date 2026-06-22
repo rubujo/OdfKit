@@ -19,7 +19,7 @@ public sealed class OdfMasterPage
     /// <summary>
     /// 初始化 <see cref="OdfMasterPage"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="node">底層的 <see cref="OdfNode"/> 執行個體。</param>
+    /// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
     public OdfMasterPage(OdfNode node)
     {
         _node = node ?? throw new ArgumentNullException(nameof(node));

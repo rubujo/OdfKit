@@ -20,8 +20,8 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
     /// <summary>
     /// 初始化 <see cref="UnoserverRestBackend"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="endpoint">unoserver-rest-api 轉換服務端點（例如 <c>http://localhost:2004/request</c>）。</param>
-    /// <param name="httpClient">可選用的自訂 HttpClient 執行個體。</param>
+    /// <param name="endpoint">unoserver-rest-api 轉換服務端點（例如 <c>http://localhost:2004/request</c>）</param>
+    /// <param name="httpClient">可選用的自訂 HttpClient 執行個體</param>
     public UnoserverRestBackend(string endpoint = "http://localhost:2004/request", HttpClient? httpClient = null)
     {
         _endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
@@ -71,7 +71,7 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
             }
         }
 
-        // 最後一次重試直接拋出異常
+        // 最後一次重試直接拋出例外
         return await SendRequestAsync(input, inputExtension, convertTo, ct).ConfigureAwait(false);
     }
 

@@ -75,7 +75,7 @@ public sealed class OdfSingleSignatureValidationResult
     public List<string> Warnings { get; } = [];
 
     /// <summary>
-    /// 取得此簽章所驗證的 ODF 封裝參考項目清單。
+    /// 取得此簽章所驗證的 ODF 封裝參考專案清單。
     /// </summary>
     public List<string> CheckedReferences { get; } = [];
 

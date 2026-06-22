@@ -27,8 +27,8 @@ public partial class OfficeSpreadsheetElement
     /// <summary>
     /// 在 <c>office:spreadsheet</c> 末尾新增工作表表格。
     /// </summary>
-    /// <param name="name">選用的表格名稱。</param>
-    /// <returns>新增的 <c>table:table</c> 元素。</returns>
+    /// <param name="name">選用的表格名稱</param>
+    /// <returns>新增的 <c>table:table</c> 元素</returns>
     public TableTableElement AppendTable(string? name = null)
     {
         TableTableElement table = AppendElement(new TableTableElement("table"));

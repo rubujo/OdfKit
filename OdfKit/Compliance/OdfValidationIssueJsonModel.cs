@@ -11,15 +11,15 @@ public sealed class OdfValidationIssueJsonModel
     /// <summary>
     /// 初始化 <see cref="OdfValidationIssueJsonModel"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="severity">問題嚴重性。</param>
-    /// <param name="ruleId">規則識別碼。</param>
-    /// <param name="message">問題說明訊息。</param>
-    /// <param name="packagePath">套件路徑。</param>
-    /// <param name="xPath">XML 位置。</param>
-    /// <param name="requiredVersion">所需 ODF 版本。</param>
-    /// <param name="profileId">相容性設定檔識別碼。</param>
-    /// <param name="suggestedFix">建議修復文字。</param>
-    /// <param name="details">結構化診斷細節。</param>
+    /// <param name="severity">問題嚴重性</param>
+    /// <param name="ruleId">規則識別碼</param>
+    /// <param name="message">問題說明訊息</param>
+    /// <param name="packagePath">套件路徑</param>
+    /// <param name="xPath">XML 位置</param>
+    /// <param name="requiredVersion">所需 ODF 版本</param>
+    /// <param name="profileId">相容性設定檔識別碼</param>
+    /// <param name="suggestedFix">建議修復文字</param>
+    /// <param name="details">結構化診斷細節</param>
     public OdfValidationIssueJsonModel(
         string severity,
         string ruleId,

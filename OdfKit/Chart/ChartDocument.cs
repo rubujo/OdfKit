@@ -19,7 +19,7 @@ public class ChartDocument : OdfChartDocument
     /// <summary>
     /// 使用指定的 ODF 封裝初始化 <see cref="ChartDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝執行個體。</param>
+    /// <param name="package">ODF 封裝執行個體</param>
     public ChartDocument(OdfPackage package) : base(package)
     {
     }
@@ -27,8 +27,8 @@ public class ChartDocument : OdfChartDocument
     /// <summary>
     /// 使用指定的 ODF 封裝與子路徑初始化 <see cref="ChartDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝執行個體。</param>
-    /// <param name="subPath">封裝內的子路徑。</param>
+    /// <param name="package">ODF 封裝執行個體</param>
+    /// <param name="subPath">封裝內的子路徑</param>
     public ChartDocument(OdfPackage package, string subPath) : base(package, subPath)
     {
     }
@@ -36,9 +36,9 @@ public class ChartDocument : OdfChartDocument
     /// <summary>
     /// 根據圖表定義建立新的高階圖表文件。
     /// </summary>
-    /// <param name="chartDefinition">圖表設定與定義資訊。</param>
-    /// <returns>建立完成的高階 <see cref="ChartDocument"/> 執行個體。</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="chartDefinition"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <param name="chartDefinition">圖表設定與定義資訊</param>
+    /// <returns>建立完成的高階 <see cref="ChartDocument"/> 執行個體</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="chartDefinition"/> 為 <see langword="null"/> 時擲出</exception>
     public static ChartDocument Create(OdfChartDefinition chartDefinition)
     {
         if (chartDefinition is null)
@@ -78,8 +78,8 @@ public class ChartDocument : OdfChartDocument
     /// <summary>
     /// 從指定檔案路徑載入高階圖表文件。
     /// </summary>
-    /// <param name="path">ODC 文件檔案路徑。</param>
-    /// <returns>載入完成的高階 <see cref="ChartDocument"/> 執行個體。</returns>
+    /// <param name="path">ODC 文件檔案路徑</param>
+    /// <returns>載入完成的高階 <see cref="ChartDocument"/> 執行個體</returns>
     public new static ChartDocument Load(string path)
     {
         return EnsureChart(OdfDocumentFactory.LoadDocument(path));
@@ -88,18 +88,18 @@ public class ChartDocument : OdfChartDocument
     /// <summary>
     /// 非同步從指定檔案路徑載入高階圖表文件。
     /// </summary>
-    /// <param name="path">ODC 文件檔案路徑。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的高階 <see cref="ChartDocument"/>。</returns>
+    /// <param name="path">ODC 文件檔案路徑</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的高階 <see cref="ChartDocument"/></returns>
     public new static async Task<ChartDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         EnsureChart(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// 從指定資料流載入高階圖表文件。
     /// </summary>
-    /// <param name="stream">包含 ODC 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的高階 <see cref="ChartDocument"/> 執行個體。</returns>
+    /// <param name="stream">包含 ODC 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的高階 <see cref="ChartDocument"/> 執行個體</returns>
     public new static ChartDocument Load(Stream stream, string? fileName = null)
     {
         return EnsureChart(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -108,10 +108,10 @@ public class ChartDocument : OdfChartDocument
     /// <summary>
     /// 非同步從指定資料流載入高階圖表文件。
     /// </summary>
-    /// <param name="stream">包含 ODC 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的高階 <see cref="ChartDocument"/>。</returns>
+    /// <param name="stream">包含 ODC 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的高階 <see cref="ChartDocument"/></returns>
     public new static async Task<ChartDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         EnsureChart(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
@@ -129,8 +129,8 @@ public class ChartDocument : OdfChartDocument
     /// <summary>
     /// 更新圖表內嵌的本地資料表格（本地快取資料）。
     /// </summary>
-    /// <param name="data">二維資料集合，包含標籤與數值。</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="data"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <param name="data">二維資料集合，包含標籤與數值</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="data"/> 為 <see langword="null"/> 時擲出</exception>
     public void UpdateData(IEnumerable<IEnumerable<object?>> data)
     {
         if (data is null)

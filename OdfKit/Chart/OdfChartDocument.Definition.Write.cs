@@ -11,7 +11,7 @@ public partial class OdfChartDocument
     /// <summary>
     /// 設定圖表類型。
     /// </summary>
-    /// <param name="chartType">圖表類型。</param>
+    /// <param name="chartType">圖表類型</param>
     public void SetChartType(OdfChartType chartType)
     {
         ChartClass = chartType switch
@@ -50,7 +50,7 @@ public partial class OdfChartDocument
     /// <summary>
     /// 將 <see cref="OdfChartDefinition"/> 套用至目前圖表。
     /// </summary>
-    /// <param name="definition">圖表定義。</param>
+    /// <param name="definition">圖表定義</param>
     public void ApplyDefinition(OdfChartDefinition definition)
     {
         if (definition is null)

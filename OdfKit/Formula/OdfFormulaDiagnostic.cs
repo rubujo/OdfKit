@@ -10,10 +10,10 @@ public sealed class OdfFormulaDiagnostic
     /// <summary>
     /// 初始化 <see cref="OdfFormulaDiagnostic"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="code">診斷代碼。</param>
-    /// <param name="message">診斷訊息。</param>
-    /// <param name="severity">嚴重性。</param>
-    /// <param name="position">公式中的字元位置，若無位置資訊則為 null。</param>
+    /// <param name="code">診斷代碼</param>
+    /// <param name="message">診斷訊息</param>
+    /// <param name="severity">嚴重性</param>
+    /// <param name="position">公式中的字元位置，若無位置資訊則為 null</param>
     public OdfFormulaDiagnostic(string code, string message, OdfFormulaDiagnosticSeverity severity, int? position = null)
     {
         Code = code;

@@ -186,7 +186,7 @@ public class LibreOfficeInteropTests
                 sheet.Cells["A3"].CellValue = "暫存修改 A3";
 
                 // 真機驗證重點：一次拒絕多筆待處理修訂後，待儲存的內容應已還原為原始值，
-                // 且 table:tracked-changes 節點應完全清空，不殘留任何待處理項目。
+                // 且 table:tracked-changes 節點應完全清空，不殘留任何待處理專案。
                 document.RejectAllChanges();
                 Assert.Empty(document.GetTrackedChanges());
                 Assert.Equal("原始 A2", sheet.Cells["A2"].CellValue);
@@ -1100,14 +1100,14 @@ public class LibreOfficeInteropTests
     /// <summary>
     /// 建立一個結構完整可被真實 LibreOffice 正確解碼的 4x4 藍色 PNG，內容與
     /// <see cref="CreateValidFourPixelRedPngBytes"/> 不同以避免 <see cref="OdfMediaManager"/> 的
-    /// SHA-256 重複資料刪除機制將兩者合併為同一個媒體項目。
+    /// SHA-256 重複資料刪除機制將兩者合併為同一個媒體專案。
     /// </summary>
     private static byte[] CreateValidFourPixelBluePngBytes() =>
         Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAE0lEQVR4nGNkYPjPAANMcBZeDgAx0wEH1s7nlgAAAABJRU5ErkJggg==");
 
     /// <summary>
-    /// 驗證目錄／字母索引／文獻目錄的項目範本建構與 <see cref="OdfIndex.Update"/> 重新產生內容後，
+    /// 驗證目錄／字母索引／文獻目錄的專案範本建構與 <see cref="OdfIndex.Update"/> 重新產生內容後，
     /// 仍可由真實 LibreOffice 26.x headless 模式載入並正確匯出純文字，且巢狀清單、列重複與
     /// 自訂字型宣告皆能往返保真（巢狀表格改由 OdfKit 自身 round-trip 驗證，原因詳見內文註解）。
     /// </summary>
@@ -1136,7 +1136,7 @@ public class LibreOfficeInteropTests
             Assert.True(File.Exists(txtPath), "LibreOffice 應輸出索引範本 ODT 的文字轉換結果。");
             string txt = File.ReadAllText(txtPath, Encoding.UTF8);
 
-            // 目錄項目範本（含定位點、頁碼）與更新後產生的標題文字
+            // 目錄專案範本（含定位點、頁碼）與更新後產生的標題文字
             Assert.Contains("索引範本互通章節", txt);
 
             // 字母索引：自訂範本（自訂前導字串 + 索引欄位）與排序後產生的詞條
@@ -1154,7 +1154,7 @@ public class LibreOfficeInteropTests
             // table:table 子元素），且會清除未被任何文字樣式參照的字型宣告（font-face-decls），
             // 此皆為 LibreOffice 本身已知行為而非 OdfKit 寫入端的缺陷；因此巢狀表格與字型宣告
             // 的語意正確性改以 OdfKit 自身的 round-trip 驗證（寫入端產生後，再由 OdfKit 重新
-            // 讀回確認結構保真），其餘項目仍透過真實 LibreOffice 26.x headless 模式驗證。
+            // 讀回確認結構保真），其餘專案仍透過真實 LibreOffice 26.x headless 模式驗證。
             using (TextDocument odfKitRoundTrip = TextDocument.Load(odtPath))
             {
                 string odfKitRoundTripXml = ReadContentXml(odfKitRoundTrip);
@@ -1264,7 +1264,7 @@ public class LibreOfficeInteropTests
             .AddList(list => list.Item("項目一").Item("項目二"))
             .Build();
 
-        // 2. 在段落中新增影像框架（AddImageFrame：經由 OdfMediaManager 寫入封裝媒體項目）
+        // 2. 在段落中新增影像框架（AddImageFrame：經由 OdfMediaManager 寫入封裝媒體專案）
         // 注意：此處使用 CRC 正確的單像素 PNG（非其他測試檔案共用、CRC 已知損毀的 IDAT 區塊樣本），
         // 避免真實 LibreOffice libpng 解碼器於完整文件轉換流程中對壞 CRC 影像輸出警告訊息。
         OdfParagraph imageParagraph = document.AddParagraph("影像框架段落");
@@ -2170,7 +2170,7 @@ public class LibreOfficeInteropTests
             OdfFormulaDocument reopenedFormula = reopenedDoc.GetEmbeddedDocument<OdfFormulaDocument>("Object 1");
             Assert.Equal("x=y", reopenedFormula.MathText);
 
-            // 驗證未加密封裝中的一般項目，IsEntryEncrypted 應正確回報 false。
+            // 驗證未加密封裝中的一般專案，IsEntryEncrypted 應正確回報 false。
             Assert.False(reopened.IsEntryEncrypted("content.xml"));
         }
         finally
@@ -2184,7 +2184,7 @@ public class LibreOfficeInteropTests
 
     /// <summary>
     /// 驗證 <see cref="OdfPackage.IsEntryEncrypted(string)"/> 能正確反映 <see cref="OdfEncryption.Encrypt"/>／
-    /// <see cref="OdfEncryption.Decrypt"/> 管線中項目的即時加密狀態，且經由 <c>OdfSaveOptions.Password</c>
+    /// <see cref="OdfEncryption.Decrypt"/> 管線中專案的即時加密狀態，且經由 <c>OdfSaveOptions.Password</c>
     /// 高階加密儲存管線產出的 ODT 檔案，其封裝結構（mimetype 未加密、manifest 含
     /// <c>manifest:encryption-data</c>）與真實 LibreOffice 26.x 自身建立的加密 ODF 文件慣例一致
     /// （已於既有 <c>EncryptionTests.cs</c> 以 OdfKit 自身解密驗證；本測試聚焦於 <c>IsEntryEncrypted</c>
@@ -2192,7 +2192,7 @@ public class LibreOfficeInteropTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <see cref="OdfPackage.IsEntryEncrypted(string)"/> 反映的是封裝項目「目前記憶體狀態」是否為加密的
+    /// <see cref="OdfPackage.IsEntryEncrypted(string)"/> 反映的是封裝專案「目前記憶體狀態」是否為加密的
     /// 位元組內容（即介於 <see cref="OdfEncryption.Encrypt"/> 與隨後的 <see cref="OdfEncryption.Decrypt"/>
     /// 之間的暫態），而非檔案本身是否曾被加密過：<c>OdfPackage.Save</c>／<c>Open</c> 的內部管線會在儲存時
     /// 加密、寫入封裝後立即解密回記憶體明文（<c>OdfPackageSaver.RunEncryptedPipeline</c>），載入時則在
@@ -2215,10 +2215,10 @@ public class LibreOfficeInteropTests
         var document = new TextDocument(package);
         document.AddParagraph("OdfKit-加密項目偵測標記");
 
-        // 儲存前先觸發中繼資料／DOM 寫回，確保 content.xml／styles.xml 等項目已存在於封裝中。
+        // 儲存前先觸發中繼資料／DOM 寫回，確保 content.xml／styles.xml 等專案已存在於封裝中。
         document.SaveToStream(new MemoryStream());
 
-        // 直接呼叫 OdfEncryption.Encrypt，驗證加密後項目立即被標記為已加密。
+        // 直接呼叫 OdfEncryption.Encrypt，驗證加密後專案立即被標記為已加密。
         OdfEncryption.Encrypt(package, password, OdfEncryptionAlgorithm.Aes256);
         Assert.True(package.IsEntryEncrypted("content.xml"), "呼叫 OdfEncryption.Encrypt 後，content.xml 項目應立即被標記為已加密。");
         Assert.True(package.IsEntryEncrypted("styles.xml"), "呼叫 OdfEncryption.Encrypt 後，styles.xml 項目應立即被標記為已加密。");
@@ -2257,17 +2257,17 @@ public class LibreOfficeInteropTests
     /// <summary>
     /// 驗證 <see cref="OdfFontResolver.RegisterFontDirectory"/> 註冊自訂目錄後能觸發字型重新掃描，
     /// 且 <c>OdfSaveOptions.EmbedUsedFonts</c> 儲存選項能將真實系統字型（Windows <c>arial.ttf</c>，
-    /// 複製一份至自訂目錄後以該目錄掃描解析）正確內嵌至 ODT 封裝的 <c>Fonts/</c> 項目，
+    /// 複製一份至自訂目錄後以該目錄掃描解析）正確內嵌至 ODT 封裝的 <c>Fonts/</c> 專案，
     /// 且內嵌字型後的文件仍可被真實 LibreOffice 26.x headless 模式開啟並轉出 PDF。
     /// </summary>
     /// <remarks>
     /// 真實 TTF 檔案的內部名稱表（由 <c>TtfFontNameReader</c> 讀出）固定為其原始字型家族名稱
     /// （此處為 "Arial"），與檔名無關；而 <see cref="OdfFontResolver.RegisterFontDirectory"/> 觸發的
-    /// 目錄掃描僅在該名稱尚未登錄時才會寫入 <c>_fontMap</c>（不會覆寫既有項目）。
+    /// 目錄掃描僅在該名稱尚未登錄時才會寫入 <c>_fontMap</c>（不會覆寫既有專案）。
     /// 由於 <c>OdfFontResolver</c> 的字型登錄表為整個測試組件共用的靜態狀態，
     /// <c>FormulaAndStylesTest.cs</c> 中既有測試會以同樣的 "Arial" 名稱註冊一個測試結束後即刪除的
     /// 暫存檔路徑；為避免平行執行時受該靜態狀態汙染影響（解析到已刪除的暫存路徑），
-    /// 本測試改用 <see cref="OdfFontResolver.RegisterFont"/>（顯式登錄，永遠覆寫既有項目）
+    /// 本測試改用 <see cref="OdfFontResolver.RegisterFont"/>（顯式登錄，永遠覆寫既有專案）
     /// 以獨一字型名稱直接登錄複製後的真實字型路徑，而不依賴目錄掃描的「尚未登錄才寫入」語意。
     /// </remarks>
     [Fact]
@@ -2339,7 +2339,7 @@ public class LibreOfficeInteropTests
 
     /// <summary>
     /// 驗證 <see cref="OdfPackage.PruneUnusedMedia(IEnumerable{string})"/> 能正確移除
-    /// 封裝中未被指定參照路徑集合納入的 <c>Pictures/</c> 媒體項目，且保留有參照的項目；移除後另存的 ODT
+    /// 封裝中未被指定參照路徑集合納入的 <c>Pictures/</c> 媒體專案，且保留有參照的專案；移除後另存的 ODT
     /// 文件仍可被真實 LibreOffice 26.x headless 模式開啟並轉出 PDF。
     /// </summary>
     /// <remarks>
@@ -2350,9 +2350,9 @@ public class LibreOfficeInteropTests
     /// <see cref="OdfPackage.PruneUnusedMedia(IEnumerable{string})"/>。
     /// </para>
     /// <para>
-    /// 重要：此方法僅單純依路徑清單比對移除 ZIP 媒體項目，不會檢查或同步移除 content.xml 中殘留的
+    /// 重要：此方法僅單純依路徑清單比對移除 ZIP 媒體專案，不會檢查或同步移除 content.xml 中殘留的
     /// <c>draw:image</c> DOM 參照節點。本測試刻意先移除孤立圖片對應的 <c>draw:frame</c> DOM 節點，
-    /// 再呼叫 <c>PruneUnusedMedia</c>，以驗證呼叫端必須自行確保兩者同步——若僅移除 ZIP 項目卻保留
+    /// 再呼叫 <c>PruneUnusedMedia</c>，以驗證呼叫端必須自行確保兩者同步——若僅移除 ZIP 專案卻保留
     /// DOM 參照，會產生指向不存在媒體的懸空連結，導致真實 LibreOffice 直接拒絕開啟整份文件
     /// （已於開發過程中以真機驗證重現此失效模式：錯誤訊息為 "source file could not be loaded"）。
     /// </para>
@@ -2384,8 +2384,8 @@ public class LibreOfficeInteropTests
 
                 // 新增內容不同的第二張圖片，並隨即移除其 draw:frame DOM 節點，模擬「使用者刪除了畫面上的
                 // 圖片元素，但底層媒體二進位資料仍殘留在封裝中」的情境：PruneUnusedMedia 只負責清理
-                // ZIP 媒體項目，呼叫端必須自行確保傳入的參照清單與目前 DOM 實際參照狀態一致，
-                // 否則殘留的 DOM 參照會指向已被刪除的項目而導致封裝損毀（真實 LibreOffice 將拒絕開啟）。
+                // ZIP 媒體專案，呼叫端必須自行確保傳入的參照清單與目前 DOM 實際參照狀態一致，
+                // 否則殘留的 DOM 參照會指向已被刪除的專案而導致封裝損毀（真實 LibreOffice 將拒絕開啟）。
                 OdfImage orphanedImage = document.Body.Images.Add(CreateValidFourPixelBluePngBytes(), OdfLength.Parse("1cm"), OdfLength.Parse("1cm"), "orphaned");
                 orphanedImage.FrameNode.Parent?.RemoveChild(orphanedImage.FrameNode);
 
@@ -2393,7 +2393,7 @@ public class LibreOfficeInteropTests
 
                 Assert.Equal(2, document.Package.Manifest.Keys.Count(key => key.StartsWith("Pictures/", StringComparison.Ordinal)));
 
-                // 僅將仍被參照的圖片路徑交給 PruneUnusedMedia，與目前 DOM 實際參照狀態一致地清理孤立媒體項目。
+                // 僅將仍被參照的圖片路徑交給 PruneUnusedMedia，與目前 DOM 實際參照狀態一致地清理孤立媒體專案。
                 document.Package.PruneUnusedMedia([keptImagePath]);
 
                 document.Save(odtPath);

@@ -19,14 +19,14 @@ public sealed class OdfTypedDomCoverageReport
     /// <summary>
     /// 初始化 typed DOM 覆蓋報告。
     /// </summary>
-    /// <param name="schemaVersion">schema 版本。</param>
-    /// <param name="schemaSourceUrl">schema 來源 URL。</param>
-    /// <param name="schemaSourceDate">schema 來源日期。</param>
-    /// <param name="elements">元素覆蓋清單。</param>
-    /// <param name="childElementRelations">schema 直接子元素關係清單。</param>
-    /// <param name="schemaAttributeCount">schema 屬性總數。</param>
-    /// <param name="attributeValueTypeCounts">schema 屬性值類型分布。</param>
-    /// <param name="wrapperPropertyTypeCounts">wrapper 屬性 CLR 類型分布。</param>
+    /// <param name="schemaVersion">schema 版本</param>
+    /// <param name="schemaSourceUrl">schema 來源 URL</param>
+    /// <param name="schemaSourceDate">schema 來源日期</param>
+    /// <param name="elements">元素覆蓋清單</param>
+    /// <param name="childElementRelations">schema 直接子元素關係清單</param>
+    /// <param name="schemaAttributeCount">schema 屬性總數</param>
+    /// <param name="attributeValueTypeCounts">schema 屬性值類型分布</param>
+    /// <param name="wrapperPropertyTypeCounts">wrapper 屬性 CLR 類型分布</param>
     public OdfTypedDomCoverageReport(
         string schemaVersion,
         string schemaSourceUrl,
@@ -122,7 +122,7 @@ public sealed class OdfTypedDomCoverageReport
     /// <summary>
     /// 建立適合 JSON 序列化的匿名模型。
     /// </summary>
-    /// <returns>可被 JSON 序列化的報告模型。</returns>
+    /// <returns>可被 JSON 序列化的報告模型</returns>
     public object ToJsonModel()
     {
         return new

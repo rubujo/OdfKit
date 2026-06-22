@@ -17,8 +17,8 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     /// <summary>
     /// 以三維向量 lexical form 建立 <see cref="OdfVector3D"/>。
     /// </summary>
-    /// <param name="value">三維向量字串，例如 <c>(1 0 -0.5)</c>。</param>
-    /// <exception cref="ArgumentException">當三維向量不符合 ODF <c>vector3D</c> 格式時擲回。</exception>
+    /// <param name="value">三維向量字串，例如 <c>(1 0 -0.5)</c></param>
+    /// <exception cref="ArgumentException">當三維向量不符合 ODF <c>vector3D</c> 格式時擲回</exception>
     public OdfVector3D(string value)
     {
         if (!TryParseComponents(value, out decimal x, out decimal y, out decimal z))
@@ -35,9 +35,9 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     /// <summary>
     /// 以三個座標值建立 <see cref="OdfVector3D"/>。
     /// </summary>
-    /// <param name="x">X 座標值。</param>
-    /// <param name="y">Y 座標值。</param>
-    /// <param name="z">Z 座標值。</param>
+    /// <param name="x">X 座標值</param>
+    /// <param name="y">Y 座標值</param>
+    /// <param name="z">Z 座標值</param>
     public OdfVector3D(decimal x, decimal y, decimal z)
     {
         X = x;
@@ -69,9 +69,9 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     /// <summary>
     /// 嘗試解析三維向量字串。
     /// </summary>
-    /// <param name="value">三維向量字串。</param>
-    /// <param name="vector">成功時傳回解析後的三維向量。</param>
-    /// <returns>若字串符合 ODF <c>vector3D</c> 格式則為 <see langword="true"/>。</returns>
+    /// <param name="value">三維向量字串</param>
+    /// <param name="vector">成功時傳回解析後的三維向量</param>
+    /// <returns>若字串符合 ODF <c>vector3D</c> 格式則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfVector3D vector)
     {
         if (TryParseComponents(value, out decimal x, out decimal y, out decimal z))
@@ -87,14 +87,14 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     /// <summary>
     /// 傳回原始三維向量字串。
     /// </summary>
-    /// <returns>三維向量字串。</returns>
+    /// <returns>三維向量字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// 判斷目前值是否等於另一個三維向量。
     /// </summary>
-    /// <param name="other">要比較的三維向量。</param>
-    /// <returns>若 lexical form 相同則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的三維向量</param>
+    /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfVector3D other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc />
@@ -106,17 +106,17 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     /// <summary>
     /// 判斷兩個三維向量是否相等。
     /// </summary>
-    /// <param name="left">左側三維向量。</param>
-    /// <param name="right">右側三維向量。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側三維向量</param>
+    /// <param name="right">右側三維向量</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfVector3D left, OdfVector3D right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩個三維向量是否不相等。
     /// </summary>
-    /// <param name="left">左側三維向量。</param>
-    /// <param name="right">右側三維向量。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側三維向量</param>
+    /// <param name="right">右側三維向量</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfVector3D left, OdfVector3D right) => !left.Equals(right);
 
     private OdfVector3D(string value, decimal x, decimal y, decimal z)

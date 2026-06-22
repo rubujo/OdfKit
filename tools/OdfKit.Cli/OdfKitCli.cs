@@ -20,10 +20,10 @@ public static class OdfKitCli
     /// <summary>
     /// 執行命令列工具。
     /// </summary>
-    /// <param name="args">命令列引數。</param>
-    /// <param name="output">標準輸出寫入器。</param>
-    /// <param name="error">標準錯誤寫入器。</param>
-    /// <returns>程序結束碼，0 表示成功。</returns>
+    /// <param name="args">命令列引數</param>
+    /// <param name="output">標準輸出寫入器</param>
+    /// <param name="error">標準錯誤寫入器</param>
+    /// <returns>程序結束碼，0 表示成功</returns>
     public static int Run(string[] args, TextWriter output, TextWriter error)
     {
         if (args is null)

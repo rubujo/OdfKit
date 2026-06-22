@@ -16,7 +16,7 @@ public abstract partial class OdfDocument
     /// 儲存文件至 ODF 封裝容器中。
     /// </summary>
     /// <param name="options">儲存設定選項</param>
-    /// <remarks>在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="SaveAsync(OdfSaveOptions?, CancellationToken)"/> 以避免阻塞執行緒。</remarks>
+    /// <remarks>在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="SaveAsync(OdfSaveOptions?, CancellationToken)"/> 以避免阻塞執行緒</remarks>
     public virtual void Save(OdfSaveOptions? options = null)
     {
         options ??= OdfSaveOptions.Default;
@@ -27,8 +27,8 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 將文件保存到指定檔案路徑。
     /// </summary>
-    /// <param name="path">要寫入的檔案路徑。</param>
-    /// <param name="options">儲存設定選項。</param>
+    /// <param name="path">要寫入的檔案路徑</param>
+    /// <param name="options">儲存設定選項</param>
     public void Save(string path, OdfSaveOptions? options = null)
     {
         if (path is null)
@@ -61,10 +61,10 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 非同步將文件保存到指定檔案路徑。
     /// </summary>
-    /// <param name="path">要寫入的檔案路徑。</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步儲存作業的工作。</returns>
+    /// <param name="path">要寫入的檔案路徑</param>
+    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步儲存作業的工作</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 寫入與檔案 I/O 期間協作檢查取消語彙。
@@ -119,20 +119,20 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 非同步將文件儲存至指定的資料流。
     /// </summary>
-    /// <param name="destinationStream">要寫入文件封裝內容的目標資料流。</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步儲存作業的工作。</returns>
+    /// <param name="destinationStream">要寫入文件封裝內容的目標資料流</param>
+    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步儲存作業的工作</returns>
     public Task SaveAsync(Stream destinationStream, OdfSaveOptions? options = null, CancellationToken cancellationToken = default) =>
         SaveToStreamAsync(destinationStream, options, cancellationToken);
 
     /// <summary>
     /// 非同步將文件儲存至指定的資料流。
     /// </summary>
-    /// <param name="destinationStream">要寫入文件封裝內容的目標資料流。</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步儲存作業的工作。</returns>
+    /// <param name="destinationStream">要寫入文件封裝內容的目標資料流</param>
+    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步儲存作業的工作</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 寫入與串流 I/O 期間協作檢查取消語彙。
@@ -157,9 +157,9 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 從指定的範本建立文件封裝的基礎實作。
     /// </summary>
-    /// <param name="template">範本文件。</param>
-    /// <param name="targetKind">目標文件種類。</param>
-    /// <param name="targetMimeType">目標 MIME 媒體類型。</param>
+    /// <param name="template">範本文件</param>
+    /// <param name="targetKind">目標文件種類</param>
+    /// <param name="targetMimeType">目標 MIME 媒體類型</param>
     /// <param name="clearUserContent">
     /// 是否清除範本中的使用者內容（例如文字文件的段落、試算表的資料列），但保留格式與版面配置
     /// （例如樣式、母片頁面、欄寬）。預設為 <see langword="false"/>，與既有完整複製行為相同。
@@ -217,7 +217,7 @@ public abstract partial class OdfDocument
     /// 遞迴清除指定節點底下所有 <c>text:p</c>／<c>text:span</c> 段落的文字內容，但保留節點結構
     /// （例如形狀、框架），用於簡報與繪圖範本清除使用者文字內容但保留版面配置。
     /// </summary>
-    /// <param name="node">要清除文字內容的根節點。</param>
+    /// <param name="node">要清除文字內容的根節點</param>
     protected static void ClearParagraphTextContentRecursive(OdfNode node)
     {
         foreach (OdfNode child in node.Children)
@@ -245,8 +245,8 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 將文件儲存為單一 Flat XML 格式的檔案。
     /// </summary>
-    /// <param name="path">要儲存的檔案路徑。</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <param name="path">要儲存的檔案路徑</param>
+    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
     public void SaveAsFlatXml(string path, OdfSaveOptions? options = null)
     {
         if (path is null)
@@ -268,8 +268,8 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 將文件儲存為單一 Flat XML 格式並寫入指定的資料流。
     /// </summary>
-    /// <param name="stream">目標資料流。</param>
-    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <param name="stream">目標資料流</param>
+    /// <param name="options">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
     public void SaveAsFlatXml(Stream stream, OdfSaveOptions? options = null)
     {
         if (stream is null)
@@ -291,9 +291,9 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 從指定的 Flat XML 檔案載入 ODF 文件。
     /// </summary>
-    /// <param name="path">Flat XML 檔案路徑。</param>
-    /// <param name="options">載入選項；若為 <see langword="null"/>，則使用預設選項。</param>
-    /// <returns>載入完成的 ODF 文件。</returns>
+    /// <param name="path">Flat XML 檔案路徑</param>
+    /// <param name="options">載入選項；若為 <see langword="null"/>，則使用預設選項</param>
+    /// <returns>載入完成的 ODF 文件</returns>
     public static OdfDocument LoadFromFlatXml(string path, OdfLoadOptions? options = null)
     {
         if (path is null)
@@ -307,9 +307,9 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 從指定的 Flat XML 資料流載入 ODF 文件。
     /// </summary>
-    /// <param name="stream">Flat XML 資料流。</param>
-    /// <param name="options">載入選項；若為 <see langword="null"/>，則使用預設選項。</param>
-    /// <returns>載入完成 of ODF 文件。</returns>
+    /// <param name="stream">Flat XML 資料流</param>
+    /// <param name="options">載入選項；若為 <see langword="null"/>，則使用預設選項</param>
+    /// <returns>載入完成 of ODF 文件</returns>
     public static OdfDocument LoadFromFlatXml(Stream stream, OdfLoadOptions? options = null)
     {
         if (stream is null)
@@ -323,10 +323,10 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 將一般 ZIP 封裝的 ODF 文件就地轉換為 Flat XML 格式。
     /// </summary>
-    /// <param name="sourcePath">來源 ZIP 封裝文件路徑。</param>
-    /// <param name="destinationPath">目標 Flat XML 文件路徑。</param>
-    /// <param name="loadOptions">載入選項；若為 <see langword="null"/>，則使用預設選項。</param>
-    /// <param name="saveOptions">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <param name="sourcePath">來源 ZIP 封裝文件路徑</param>
+    /// <param name="destinationPath">目標 Flat XML 文件路徑</param>
+    /// <param name="loadOptions">載入選項；若為 <see langword="null"/>，則使用預設選項</param>
+    /// <param name="saveOptions">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
     public static void ConvertZipToFlatXml(
         string sourcePath,
         string destinationPath,
@@ -345,10 +345,10 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 將 Flat XML 格式的 ODF 文件就地轉換為一般 ZIP 封裝格式。
     /// </summary>
-    /// <param name="sourcePath">來源 Flat XML 文件路徑。</param>
-    /// <param name="destinationPath">目標 ZIP 封裝文件路徑。</param>
-    /// <param name="loadOptions">載入選項；若為 <see langword="null"/>，則使用預設選項。</param>
-    /// <param name="saveOptions">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <param name="sourcePath">來源 Flat XML 文件路徑</param>
+    /// <param name="destinationPath">目標 ZIP 封裝文件路徑</param>
+    /// <param name="loadOptions">載入選項；若為 <see langword="null"/>，則使用預設選項</param>
+    /// <param name="saveOptions">儲存設定選項；若為 <see langword="null"/>，則使用預設選項</param>
     public static void ConvertFlatXmlToZip(
         string sourcePath,
         string destinationPath,

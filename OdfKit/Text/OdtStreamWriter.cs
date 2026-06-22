@@ -28,9 +28,9 @@ public sealed class OdtStreamWriter : IDisposable
     /// <summary>
     /// 初始化 <see cref="OdtStreamWriter"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="outputStream">用來輸出 ODT 文件的目標資料流。</param>
-    /// <param name="version">要寫入的 ODF 規格版本。</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="outputStream"/> 為 null 時擲出。</exception>
+    /// <param name="outputStream">用來輸出 ODT 文件的目標資料流</param>
+    /// <param name="version">要寫入的 ODF 規格版本</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="outputStream"/> 為 null 時擲出</exception>
     public OdtStreamWriter(Stream outputStream, OdfVersion version = OdfVersion.Odf14)
         : this(outputStream, version, ownsStream: false)
     {
@@ -66,9 +66,9 @@ public sealed class OdtStreamWriter : IDisposable
     /// <summary>
     /// 從檔案路徑初始化 <see cref="OdtStreamWriter"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="path">要建立或覆寫的 ODT 檔案路徑。</param>
-    /// <param name="version">要寫入的 ODF 規格版本。</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="path"/> 為 null 時擲出。</exception>
+    /// <param name="path">要建立或覆寫的 ODT 檔案路徑</param>
+    /// <param name="version">要寫入的 ODF 規格版本</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="path"/> 為 null 時擲出</exception>
     public OdtStreamWriter(string path, OdfVersion version = OdfVersion.Odf14)
         : this(CreateFileStream(path), version, ownsStream: true)
     {
@@ -77,8 +77,8 @@ public sealed class OdtStreamWriter : IDisposable
     /// <summary>
     /// 加入一個段落。
     /// </summary>
-    /// <param name="text">段落文字。</param>
-    /// <param name="styleName">段落樣式名稱。</param>
+    /// <param name="text">段落文字</param>
+    /// <param name="styleName">段落樣式名稱</param>
     public void AddParagraph(string text, string? styleName = null)
     {
         EnsureNotDisposed();
@@ -88,9 +88,9 @@ public sealed class OdtStreamWriter : IDisposable
     /// <summary>
     /// 加入標題段落。
     /// </summary>
-    /// <param name="text">標題文字。</param>
-    /// <param name="level">標題層級，範圍為 1 到 6。</param>
-    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="level"/> 不在 1 到 6 之間時擲出。</exception>
+    /// <param name="text">標題文字</param>
+    /// <param name="level">標題層級，範圍為 1 到 6</param>
+    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="level"/> 不在 1 到 6 之間時擲出</exception>
     public void AddHeading(string text, int level = 1)
     {
         EnsureNotDisposed();
@@ -105,8 +105,8 @@ public sealed class OdtStreamWriter : IDisposable
     /// <summary>
     /// 開始清單。
     /// </summary>
-    /// <param name="styleName">清單樣式名稱。</param>
-    /// <exception cref="InvalidOperationException">當清單已經開始時擲出。</exception>
+    /// <param name="styleName">清單樣式名稱</param>
+    /// <exception cref="InvalidOperationException">當清單已經開始時擲出</exception>
     public void BeginList(string? styleName = null)
     {
         EnsureNotDisposed();
@@ -125,10 +125,10 @@ public sealed class OdtStreamWriter : IDisposable
     }
 
     /// <summary>
-    /// 加入清單項目。
+    /// 加入清單專案。
     /// </summary>
-    /// <param name="text">清單項目文字。</param>
-    /// <exception cref="InvalidOperationException">當尚未呼叫 <see cref="BeginList(string?)"/> 時擲出。</exception>
+    /// <param name="text">清單專案文字</param>
+    /// <exception cref="InvalidOperationException">當尚未呼叫 <see cref="BeginList(string?)"/> 時擲出</exception>
     public void AddListItem(string text)
     {
         EnsureNotDisposed();

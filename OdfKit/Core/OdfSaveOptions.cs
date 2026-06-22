@@ -12,16 +12,24 @@ namespace OdfKit.Core;
 /// </summary>
 public enum OdfEncryptionAlgorithm
 {
-    /// <summary>AES-256 加密演算法</summary>
+    /// <summary>
+    /// AES-256 加密演算法
+    /// </summary>
     Aes256,
 
-    /// <summary>Blowfish 加密演算法</summary>
+    /// <summary>
+    /// Blowfish 加密演算法
+    /// </summary>
     Blowfish,
 
-    /// <summary>OpenPGP 加密，須搭配自訂密碼學提供者</summary>
+    /// <summary>
+    /// OpenPGP 加密，須搭配自訂密碼學提供者
+    /// </summary>
     OpenPgp,
 
-    /// <summary>AES-256-GCM 認證加密模式，與 LibreOffice 25.8+ 相容</summary>
+    /// <summary>
+    /// AES-256-GCM 認證加密模式，與 LibreOffice 25.8+ 相容
+    /// </summary>
     Aes256Gcm
 }
 
@@ -58,7 +66,7 @@ public class OdfSaveOptions
     /// 取得或設定是否裝載確定性輸出（Deterministic Save）。
     /// </summary>
     /// <remarks>
-    /// 啟用時，將所有 ZIP 封裝項目的 LastWriteTime 設為固定值（2026-01-01T00:00:00Z），
+    /// 啟用時，將所有 ZIP 封裝專案的 LastWriteTime 設為固定值（2026-01-01T00:00:00Z），
     /// 確保內容不變時，產出的二進位 ZIP 雜湊值（MD5/SHA256）完全相同。
     /// </remarks>
     public bool Deterministic { get; set; } = false;
@@ -101,7 +109,7 @@ public class OdfSaveOptions
     public string? Password { get; set; }
 
     /// <summary>
-    /// 取得或設定自訂的密碼學提供者，用於加密文件項目。
+    /// 取得或設定自訂的密碼學提供者，用於加密文件專案。
     /// </summary>
     public IOdfCryptographyProvider? CryptographyProvider { get; set; }
 

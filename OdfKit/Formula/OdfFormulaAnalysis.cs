@@ -11,11 +11,11 @@ public sealed class OdfFormulaAnalysis
     /// <summary>
     /// 初始化 <see cref="OdfFormulaAnalysis"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="originalFormula">原始公式。</param>
-    /// <param name="normalizedFormula">供剖析使用的標準化公式。</param>
-    /// <param name="serializedFormula">重新序列化的公式，若無法安全序列化則為 null。</param>
-    /// <param name="functions">公式中出現的函式名稱。</param>
-    /// <param name="diagnostics">診斷清單。</param>
+    /// <param name="originalFormula">原始公式</param>
+    /// <param name="normalizedFormula">供剖析使用的標準化公式</param>
+    /// <param name="serializedFormula">重新序列化的公式，若無法安全序列化則為 null</param>
+    /// <param name="functions">公式中出現的函式名稱</param>
+    /// <param name="diagnostics">診斷清單</param>
     public OdfFormulaAnalysis(
         string originalFormula,
         string normalizedFormula,

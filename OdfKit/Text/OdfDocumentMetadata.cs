@@ -14,7 +14,7 @@ public sealed class OdfDocumentMetadata
     /// <summary>
     /// 初始化 <see cref="OdfDocumentMetadata"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">所屬文件。</param>
+    /// <param name="document">所屬文件</param>
     public OdfDocumentMetadata(OdfDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));

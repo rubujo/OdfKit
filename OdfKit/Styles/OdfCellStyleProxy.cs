@@ -17,7 +17,7 @@ public sealed class OdfCellStyleProxy
     /// <summary>
     /// 初始化 <see cref="OdfCellStyleProxy"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="cell">目標儲存格。</param>
+    /// <param name="cell">目標儲存格</param>
     public OdfCellStyleProxy(OdfCell cell)
     {
         _cell = cell ?? throw new ArgumentNullException(nameof(cell));

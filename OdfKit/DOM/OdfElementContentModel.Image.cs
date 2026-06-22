@@ -28,8 +28,8 @@ public partial class OfficeImageElement
     /// <summary>
     /// 在 <c>office:image</c> 末尾新增影像框架。
     /// </summary>
-    /// <param name="name">選用的框架名稱。</param>
-    /// <returns>新增的 <c>draw:frame</c> 元素。</returns>
+    /// <param name="name">選用的框架名稱</param>
+    /// <returns>新增的 <c>draw:frame</c> 元素</returns>
     public DrawFrameElement AppendImageFrame(string? name = null)
     {
         DrawFrameElement frame = AppendElement(new DrawFrameElement("draw"));

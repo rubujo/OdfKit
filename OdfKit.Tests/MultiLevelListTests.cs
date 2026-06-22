@@ -81,7 +81,7 @@ public class MultiLevelListTests
     }
 
     /// <summary>
-    /// 驗證項目符號層級寫入 text:list-level-style-bullet 及 text:bullet-char。
+    /// 驗證專案符號層級寫入 text:list-level-style-bullet 及 text:bullet-char。
     /// </summary>
     [Fact]
     public void AddListWithStyle_BulletLevel_WritesBulletElement()
@@ -103,7 +103,7 @@ public class MultiLevelListTests
     }
 
     /// <summary>
-    /// 驗證回傳的 OdfList 已套用正確樣式名稱，並可新增第 1 層項目。
+    /// 驗證回傳的 OdfList 已套用正確樣式名稱，並可新增第 1 層專案。
     /// </summary>
     [Fact]
     public void AddListWithStyle_ReturnedList_HasCorrectStyleNameAndCanAddItems()

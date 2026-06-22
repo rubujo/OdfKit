@@ -7,8 +7,8 @@ namespace OdfKit.Presentation;
 /// <summary>
 /// 表示簡報投影片中的媒體物件。
 /// </summary>
-/// <param name="packagePath">媒體在封裝包內的路徑。</param>
-/// <param name="mimeType">媒體 MIME 類型。</param>
+/// <param name="packagePath">媒體在封裝包內的路徑</param>
+/// <param name="mimeType">媒體 MIME 類型</param>
 public sealed class OdfMediaObject(string packagePath, string mimeType)
 {
     /// <summary>

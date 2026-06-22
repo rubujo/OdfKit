@@ -180,7 +180,7 @@ public class TextAdvancedFidelityTests
     }
 
     /// <summary>
-    /// 驗證自動更新設定項目（UpdateFieldsWhenOpening、LinkUpdateMode、AutoCalculate）在 settings.xml 中正確生成。
+    /// 驗證自動更新設定專案（UpdateFieldsWhenOpening、LinkUpdateMode、AutoCalculate）在 settings.xml 中正確生成。
     /// </summary>
     [Fact]
     public void DocumentSettingsAutoUpdateFeaturesTest()

@@ -140,6 +140,11 @@ public static partial class OdfLocalizer
         }
     }
 
+    /// <summary>
+    /// 解析指定文化特性的本地化字典。
+    /// </summary>
+    /// <param name="culture">指定的文化特性</param>
+    /// <returns>對應文化特性的本地化字典；若皆無匹配，則回退至預設英文字典；若仍無則傳回 null</returns>
     private static Dictionary<string, string>? ResolveDictionary(CultureInfo culture)
     {
         var current = culture;
@@ -217,6 +222,11 @@ public static partial class OdfLocalizer
         return null;
     }
 
+    /// <summary>
+    /// 合併例外訊息字典至目標字典中。
+    /// </summary>
+    /// <param name="name">語系名稱</param>
+    /// <param name="target">要合併的目標字典</param>
     private static void MergeExceptionDictionary(string name, Dictionary<string, string> target)
     {
         if (ExceptionDictionaries.TryGetValue(name, out var excDict))
@@ -228,6 +238,11 @@ public static partial class OdfLocalizer
         }
     }
 
+    /// <summary>
+    /// 取得指定規則識別碼的預設硬編碼英文修復建議（作為最終 Fallback 備份防線）。
+    /// </summary>
+    /// <param name="ruleId">合規性規則的唯一識別碼</param>
+    /// <returns>硬編碼的英文修復建議字串</returns>
     private static string BuildDefaultSuggestedFix(string ruleId)
     {
         return ruleId switch

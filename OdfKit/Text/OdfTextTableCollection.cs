@@ -16,7 +16,7 @@ public sealed class OdfTextTableCollection : IEnumerable<OdfTextTableInfo>
     /// <summary>
     /// 初始化 <see cref="OdfTextTableCollection"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">所屬文字文件。</param>
+    /// <param name="document">所屬文字文件</param>
     public OdfTextTableCollection(TextDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
@@ -25,9 +25,9 @@ public sealed class OdfTextTableCollection : IEnumerable<OdfTextTableInfo>
     /// <summary>
     /// 新增表格。
     /// </summary>
-    /// <param name="rows">列數。</param>
-    /// <param name="columns">欄數。</param>
-    /// <returns>新增完成的表格。</returns>
+    /// <param name="rows">列數</param>
+    /// <param name="columns">欄數</param>
+    /// <returns>新增完成的表格</returns>
     public OdfTable Add(int rows, int columns)
     {
         return _document.AddTable(rows, columns);
@@ -58,7 +58,7 @@ public sealed class OdfTextTableCollection : IEnumerable<OdfTextTableInfo>
     /// <summary>
     /// 取得文字表格摘要列舉器，供 LINQ 查詢使用。
     /// </summary>
-    /// <returns>文字表格摘要列舉器。</returns>
+    /// <returns>文字表格摘要列舉器</returns>
     public IEnumerator<OdfTextTableInfo> GetEnumerator()
     {
         return Items.GetEnumerator();

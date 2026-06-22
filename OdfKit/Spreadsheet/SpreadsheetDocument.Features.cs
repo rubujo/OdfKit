@@ -138,9 +138,9 @@ public partial class SpreadsheetDocument
     /// <summary>
     /// 在指定工作表的儲存格位置插入圖表。
     /// </summary>
-    /// <param name="sheetName">工作表名稱。</param>
-    /// <param name="anchor">圖表左上角錨定的儲存格位置。</param>
-    /// <param name="chart">圖表設定物件。</param>
+    /// <param name="sheetName">工作表名稱</param>
+    /// <param name="anchor">圖表左上角錨定的儲存格位置</param>
+    /// <param name="chart">圖表設定物件</param>
     public void AddChart(string sheetName, OdfCellAddress anchor, OdfChartDefinition chart)
     {
         if (string.IsNullOrEmpty(sheetName))
@@ -320,8 +320,8 @@ public partial class SpreadsheetDocument
     /// <summary>
     /// 在指定的工作表中新增資料驗證規則。
     /// </summary>
-    /// <param name="sheetName">工作表名稱。</param>
-    /// <param name="validation">資料驗證設定物件。</param>
+    /// <param name="sheetName">工作表名稱</param>
+    /// <param name="validation">資料驗證設定物件</param>
     public void AddDataValidation(string sheetName, OdfDataValidation validation)
     {
         if (string.IsNullOrEmpty(sheetName))

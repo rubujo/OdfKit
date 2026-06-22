@@ -3,9 +3,9 @@
 /// <summary>
 /// 表示樞紐分析表一個篩選條件的摘要資訊。
 /// </summary>
-/// <param name="sourceFieldName">篩選欄位名稱（<c>table:source-field-name</c>）。</param>
-/// <param name="operator">比較運算子（<c>table:operator</c>）。</param>
-/// <param name="value">篩選值（<c>table:value</c>）。</param>
+/// <param name="sourceFieldName">篩選欄位名稱（<c>table:source-field-name</c>）</param>
+/// <param name="operator">比較運算子（<c>table:operator</c>）</param>
+/// <param name="value">篩選值（<c>table:value</c>）</param>
 public sealed class OdfPivotTableFilterConditionInfo(string sourceFieldName, string @operator, string value)
 {
     /// <summary>

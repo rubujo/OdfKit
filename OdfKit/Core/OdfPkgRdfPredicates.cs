@@ -5,12 +5,18 @@
 /// </summary>
 public static class OdfPkgRdfPredicates
 {
-    /// <summary>ODF 封裝 <c>pkg</c> 命名空間 URI。</summary>
+    /// <summary>
+    /// ODF 封裝 <c>pkg</c> 命名空間 URI
+    /// </summary>
     public const string NamespaceUri = "http://docs.oasis-open.org/ns/office/1.2/meta/pkg#";
 
-    /// <summary>文件與封裝組件之間的 <c>pkg:hasPart</c> 關聯。</summary>
+    /// <summary>
+    /// 文件與封裝組件之間的 <c>pkg:hasPart</c> 關聯
+    /// </summary>
     public const string HasPart = NamespaceUri + "hasPart";
 
-    /// <summary>封裝組件的 <c>pkg:mimeType</c> literal。</summary>
+    /// <summary>
+    /// 封裝組件的 <c>pkg:mimeType</c> literal
+    /// </summary>
     public const string MimeType = NamespaceUri + "mimeType";
 }

@@ -5,15 +5,23 @@
 /// </summary>
 public enum OdfIndexKind
 {
-    /// <summary>目錄（<c>text:table-of-content</c>）。</summary>
+    /// <summary>
+    /// 目錄（<c>text:table-of-content</c>）
+    /// </summary>
     TableOfContents,
 
-    /// <summary>字母索引（<c>text:alphabetical-index</c>）。</summary>
+    /// <summary>
+    /// 字母索引（<c>text:alphabetical-index</c>）
+    /// </summary>
     AlphabeticalIndex,
 
-    /// <summary>文獻目錄（<c>text:bibliography</c>）。</summary>
+    /// <summary>
+    /// 文獻目錄（<c>text:bibliography</c>）
+    /// </summary>
     Bibliography,
 
-    /// <summary>表格索引（<c>text:table-index</c>）。</summary>
+    /// <summary>
+    /// 表格索引（<c>text:table-index</c>）
+    /// </summary>
     TableIndex,
 }

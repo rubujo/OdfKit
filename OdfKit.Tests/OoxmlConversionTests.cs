@@ -1703,8 +1703,8 @@ public class OoxmlConversionTests
     /// <summary>
     /// 驗證 50 個常見公式可在 OpenFormula 與 Excel A1 格式之間雙向翻譯。
     /// </summary>
-    /// <param name="openFormula">OpenFormula 公式。</param>
-    /// <param name="excelFormula">Excel A1 公式。</param>
+    /// <param name="openFormula">OpenFormula 公式</param>
+    /// <param name="excelFormula">Excel A1 公式</param>
     [Theory]
     [InlineData("of:=SUM(A1:A10)", "=SUM(A1:A10)")]
     [InlineData("of:=AVERAGE(A1:A10)", "=AVERAGE(A1:A10)")]

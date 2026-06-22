@@ -11,8 +11,8 @@ internal static class OdfDocumentStyleRemapEngine
     /// <summary>
     /// 依樣式重新命名對照表重寫節點樹中的樣式參照。
     /// </summary>
-    /// <param name="node">要處理的根節點。</param>
-    /// <param name="renameMap">樣式重新命名對照表。</param>
+    /// <param name="node">要處理的根節點</param>
+    /// <param name="renameMap">樣式重新命名對照表</param>
     internal static void RemapStylesInNodes(OdfNode node, Dictionary<string, string> renameMap)
     {
         var styleNameAttr = new OdfAttributeName("style-name", OdfNamespaces.Text);

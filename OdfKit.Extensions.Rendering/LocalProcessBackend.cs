@@ -16,7 +16,7 @@ public sealed class LocalProcessBackend : ILibreOfficeConversionBackend
     /// <summary>
     /// 初始化 <see cref="LocalProcessBackend"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="renderer">可選用的自訂 LibreOfficeRenderer 實例。</param>
+    /// <param name="renderer">可選用的自訂 LibreOfficeRenderer 實例</param>
     public LocalProcessBackend(LibreOfficeRenderer? renderer = null)
     {
         _renderer = renderer ?? new LibreOfficeRenderer();

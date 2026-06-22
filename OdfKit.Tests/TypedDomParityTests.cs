@@ -671,7 +671,7 @@ public class TypedDomParityTests
     /// <summary>
     /// 驗證 <c>office:database</c> content model facade 在「先建立 <c>db:reports</c>，再建立
     /// <c>db:queries</c>」這種兩兩相鄰元件的最小反例情境下，仍會將 <c>db:queries</c> 插入在
-    /// <c>db:reports</c> 之後，而非插入之前。<c>InsertDatabaseComponent</c> 內部以
+    /// <c>db:reports</c> 之後，而非插入之前<c>InsertDatabaseComponent</c> 內部以
     /// 「尋找第一個屬於 reports／queries／table-representations／schema 任一類型的子元素」為插入
     /// 基準點，並未依個別呼叫的目標元件類型在規格序列中的相對位置調整搜尋範圍；若不限定範圍，
     /// 在僅有兩種元件、呼叫順序恰好是「先建立後面的，再建立前面的」以外的情境（例如本測試先建立

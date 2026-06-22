@@ -5,14 +5,14 @@ namespace OdfKit.Text;
 /// <summary>
 /// 表示 ODT 文件中一筆表格結構修訂的摘要資訊。
 /// </summary>
-/// <param name="changeId">修訂識別碼（<c>table:id</c>）。</param>
-/// <param name="kind">結構修訂種類。</param>
-/// <param name="structuralType">結構類型（<c>row</c>、<c>column</c> 或 <c>table</c>）。</param>
-/// <param name="position">起始位置（以 0 為基準）。</param>
-/// <param name="count">影響數量。</param>
-/// <param name="author">作者。</param>
-/// <param name="changedAt">修訂時間（UTC）。</param>
-/// <param name="acceptanceState">接受狀態（<c>pending</c>、<c>accepted</c> 或 <c>rejected</c>）。</param>
+/// <param name="changeId">修訂識別碼（<c>table:id</c>）</param>
+/// <param name="kind">結構修訂種類</param>
+/// <param name="structuralType">結構類型（<c>row</c>、<c>column</c> 或 <c>table</c>）</param>
+/// <param name="position">起始位置（以 0 為基準）</param>
+/// <param name="count">影響數量</param>
+/// <param name="author">作者</param>
+/// <param name="changedAt">修訂時間（UTC）</param>
+/// <param name="acceptanceState">接受狀態（<c>pending</c>、<c>accepted</c> 或 <c>rejected</c>）</param>
 public sealed class OdfTableStructuralChangeInfo(
     string changeId,
     OdfTableStructuralChangeKind kind,

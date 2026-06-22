@@ -12,10 +12,14 @@ public sealed class OdfRichText
 {
     private readonly List<OdfRichTextRun> _runs = new();
 
-    /// <summary>取得所有格式片段。</summary>
+    /// <summary>
+    /// 取得所有格式片段
+    /// </summary>
     public IReadOnlyList<OdfRichTextRun> Runs => _runs;
 
-    /// <summary>新增一個格式片段。</summary>
+    /// <summary>
+    /// 新增一個格式片段
+    /// </summary>
     public void AddRun(string text, bool bold = false, bool italic = false,
         OdfColor? color = null, string? fontFamily = null, bool underline = false)
     {

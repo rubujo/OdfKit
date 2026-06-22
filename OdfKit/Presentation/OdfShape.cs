@@ -42,8 +42,8 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     /// <summary>
     /// 將此圖形標記為裝飾性，輔助技術應略過此物件。
     /// </summary>
-    /// <param name="decorative">是否標記為裝飾性。</param>
-    /// <returns>目前圖形執行個體。</returns>
+    /// <param name="decorative">是否標記為裝飾性</param>
+    /// <returns>目前圖形執行個體</returns>
     public OdfShape MarkAsDecorative(bool decorative = true)
     {
         if (decorative)
@@ -62,9 +62,9 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     /// <summary>
     /// 在此圖形框架內建立嵌入表格。
     /// </summary>
-    /// <param name="rows">列數。</param>
-    /// <param name="columns">欄數。</param>
-    /// <returns>新建立的嵌入表格。</returns>
+    /// <param name="rows">列數</param>
+    /// <param name="columns">欄數</param>
+    /// <returns>新建立的嵌入表格</returns>
     public OdfEmbeddedTable AddEmbeddedTable(int rows, int columns)
     {
         if (rows < 1)

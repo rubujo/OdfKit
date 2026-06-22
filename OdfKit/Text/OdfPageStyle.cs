@@ -8,7 +8,9 @@ namespace OdfKit.Text;
 /// </summary>
 public sealed class OdfPageStyle
 {
-    /// <summary>取得主頁面樣式名稱。</summary>
+    /// <summary>
+    /// 取得主頁面樣式名稱
+    /// </summary>
     public string Name { get; }
 
     internal OdfPageStyle(string name) { Name = name; }

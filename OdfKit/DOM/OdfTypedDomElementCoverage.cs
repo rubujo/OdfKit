@@ -8,15 +8,15 @@ namespace OdfKit.DOM;
 public sealed class OdfTypedDomElementCoverage
 {
     /// <summary>
-    /// 初始化單一元素覆蓋項目。
+    /// 初始化單一元素覆蓋專案。
     /// </summary>
-    /// <param name="namespaceUri">元素命名空間 URI。</param>
-    /// <param name="localName">元素區域名稱。</param>
-    /// <param name="role">schema 角色。</param>
-    /// <param name="documentKind">文件種類。</param>
-    /// <param name="wrapperType">wrapper 型別名稱。</param>
-    /// <param name="hasTypedWrapper">是否具備專門 wrapper。</param>
-    /// <param name="wrapperPropertyCount">wrapper 宣告的公開屬性數。</param>
+    /// <param name="namespaceUri">元素命名空間 URI</param>
+    /// <param name="localName">元素區域名稱</param>
+    /// <param name="role">schema 角色</param>
+    /// <param name="documentKind">文件種類</param>
+    /// <param name="wrapperType">wrapper 型別名稱</param>
+    /// <param name="hasTypedWrapper">是否具備專門 wrapper</param>
+    /// <param name="wrapperPropertyCount">wrapper 宣告的公開屬性數</param>
     public OdfTypedDomElementCoverage(
         string namespaceUri,
         string localName,

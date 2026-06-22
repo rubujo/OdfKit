@@ -16,7 +16,7 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 取得目前宣告的報表元件清單。
     /// </summary>
-    /// <returns>報表元件清單。</returns>
+    /// <returns>報表元件清單</returns>
     public IReadOnlyList<OdfDatabaseReportInfo> GetReports()
     {
         OdfNode? reportsNode = FindChildElement(GetDatabaseNode(), "reports", DatabaseNamespace);
@@ -33,8 +33,8 @@ public partial class OdfDatabaseDocument
     /// <summary>
     /// 依名稱尋找報表元件。
     /// </summary>
-    /// <param name="name">報表名稱。</param>
-    /// <returns>符合名稱的報表元件；找不到時為 <see langword="null"/>。</returns>
+    /// <param name="name">報表名稱</param>
+    /// <returns>符合名稱的報表元件；找不到時為 <see langword="null"/></returns>
     public OdfDatabaseReportInfo? FindReport(string name)
     {
         if (string.IsNullOrWhiteSpace(name))

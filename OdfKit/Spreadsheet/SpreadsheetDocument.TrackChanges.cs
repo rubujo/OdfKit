@@ -19,21 +19,21 @@ public partial class SpreadsheetDocument
     /// <summary>
     /// 取得文件中所有追蹤修訂摘要。
     /// </summary>
-    /// <returns>追蹤修訂清單。</returns>
+    /// <returns>追蹤修訂清單</returns>
     public IReadOnlyList<OdfSpreadsheetTrackedChangeInfo> GetTrackedChanges() =>
         SpreadsheetDocumentTrackedChangesEngine.GetTrackedChanges(this);
 
     /// <summary>
     /// 接受指定的追蹤修訂。
     /// </summary>
-    /// <param name="changeId">修訂識別碼。</param>
+    /// <param name="changeId">修訂識別碼</param>
     public void AcceptChange(string changeId) =>
         SpreadsheetDocumentTrackedChangesEngine.AcceptChange(this, changeId);
 
     /// <summary>
     /// 拒絕指定的追蹤修訂。
     /// </summary>
-    /// <param name="changeId">修訂識別碼。</param>
+    /// <param name="changeId">修訂識別碼</param>
     public void RejectChange(string changeId) =>
         SpreadsheetDocumentTrackedChangesEngine.RejectChange(this, changeId);
 

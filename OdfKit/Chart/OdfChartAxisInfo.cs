@@ -3,16 +3,16 @@
 /// <summary>
 /// 表示圖表座標軸的高階摘要資訊。
 /// </summary>
-/// <param name="dimension">座標軸維度（例如 <c>x</c>、<c>y</c>）。</param>
-/// <param name="title">座標軸標題。</param>
-/// <param name="logarithmic">是否為對數刻度。</param>
-/// <param name="reverseDirection">是否反向顯示。</param>
-/// <param name="minimum">刻度最小值。</param>
-/// <param name="maximum">刻度最大值。</param>
-/// <param name="displayLabels">是否顯示刻度標籤。</param>
-/// <param name="hasMajorGrid">是否顯示主網格線。</param>
-/// <param name="hasMinorGrid">是否顯示次網格線。</param>
-/// <param name="styleName">樣式名稱。</param>
+/// <param name="dimension">座標軸維度（例如 <c>x</c>、<c>y</c>）</param>
+/// <param name="title">座標軸標題</param>
+/// <param name="logarithmic">是否為對數刻度</param>
+/// <param name="reverseDirection">是否反向顯示</param>
+/// <param name="minimum">刻度最小值</param>
+/// <param name="maximum">刻度最大值</param>
+/// <param name="displayLabels">是否顯示刻度標籤</param>
+/// <param name="hasMajorGrid">是否顯示主網格線</param>
+/// <param name="hasMinorGrid">是否顯示次網格線</param>
+/// <param name="styleName">樣式名稱</param>
 public sealed class OdfChartAxisInfo(
     string dimension,
     string? title,

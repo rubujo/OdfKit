@@ -3,9 +3,9 @@
 /// <summary>
 /// 表示繪圖頁面上一個群組圖形的摘要資訊。
 /// </summary>
-/// <param name="pageName">所在繪圖頁面名稱。</param>
-/// <param name="id">群組識別碼。</param>
-/// <param name="name">群組名稱（可選）。</param>
+/// <param name="pageName">所在繪圖頁面名稱</param>
+/// <param name="id">群組識別碼</param>
+/// <param name="name">群組名稱（可選）</param>
 public sealed class OdfGroupInfo(string pageName, string id, string? name)
 {
     /// <summary>

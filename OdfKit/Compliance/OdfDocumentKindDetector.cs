@@ -10,11 +10,11 @@ namespace OdfKit.Compliance;
 /// <summary>
 /// 描述單一 ODF 檔案格式的副檔名、MIME 類型與文件種類。
 /// </summary>
-/// <param name="extension">包含前導句點的檔案副檔名。</param>
-/// <param name="mimeType">ODF 封裝或扁平 XML 宣告的 MIME 類型。</param>
-/// <param name="kind">對應的 ODF 文件種類。</param>
-/// <param name="bodyKind">對應於 <c>office:body</c> 子元素的內容種類。</param>
-/// <param name="isFlatXml">是否為單一 XML (Flat XML) 格式。</param>
+/// <param name="extension">包含前導句點的檔案副檔名</param>
+/// <param name="mimeType">ODF 封裝或扁平 XML 宣告的 MIME 類型</param>
+/// <param name="kind">對應的 ODF 文件種類</param>
+/// <param name="bodyKind">對應於 <c>office:body</c> 子元素的內容種類</param>
+/// <param name="isFlatXml">是否為單一 XML (Flat XML) 格式</param>
 public sealed class OdfFormatInfo(
     string extension,
     string mimeType,
@@ -145,9 +145,9 @@ public static class OdfDocumentKindDetector
     /// <summary>
     /// 從 ODF MIME 類型取得格式描述。
     /// </summary>
-    /// <param name="mimeType">MIME 類型。</param>
-    /// <param name="format">成功時傳回格式描述。</param>
-    /// <returns>若 MIME 類型已知則傳回 <see langword="true"/>；否則傳回 <see langword="false"/>。</returns>
+    /// <param name="mimeType">MIME 類型</param>
+    /// <param name="format">成功時傳回格式描述</param>
+    /// <returns>若 MIME 類型已知則傳回 <see langword="true"/>；否則傳回 <see langword="false"/></returns>
     public static bool TryGetFormatByMimeType(string? mimeType, out OdfFormatInfo? format)
     {
         format = null;
@@ -157,9 +157,9 @@ public static class OdfDocumentKindDetector
     /// <summary>
     /// 從檔案名稱或副檔名取得格式描述。
     /// </summary>
-    /// <param name="fileName">檔案名稱或副檔名。</param>
-    /// <param name="format">成功時傳回格式描述。</param>
-    /// <returns>若副檔名已知則傳回 <see langword="true"/>；否則傳回 <see langword="false"/>。</returns>
+    /// <param name="fileName">檔案名稱或副檔名</param>
+    /// <param name="format">成功時傳回格式描述</param>
+    /// <returns>若副檔名已知則傳回 <see langword="true"/>；否則傳回 <see langword="false"/></returns>
     public static bool TryGetFormatByFileName(string? fileName, out OdfFormatInfo? format)
     {
         format = null;
@@ -175,9 +175,9 @@ public static class OdfDocumentKindDetector
     /// <summary>
     /// 從 ODF 文件種類取得格式描述。
     /// </summary>
-    /// <param name="kind">ODF 文件種類。</param>
-    /// <param name="format">成功時傳回格式描述。</param>
-    /// <returns>若文件種類已知則傳回 <see langword="true"/>；否則傳回 <see langword="false"/>。</returns>
+    /// <param name="kind">ODF 文件種類</param>
+    /// <param name="format">成功時傳回格式描述</param>
+    /// <returns>若文件種類已知則傳回 <see langword="true"/>；否則傳回 <see langword="false"/></returns>
     public static bool TryGetFormatByKind(OdfDocumentKind kind, out OdfFormatInfo? format)
     {
         format = FormatTable.FirstOrDefault(item => item.Kind == kind);
@@ -292,8 +292,8 @@ public static class OdfDocumentKindDetector
     /// <summary>
     /// 傳回指定的種類是否代表 ODF 範本文件。
     /// </summary>
-    /// <param name="kind">ODF 文件種類。</param>
-    /// <returns>若是 ODF 範本文件種類則傳回 <see langword="true"/>；否則傳回 <see langword="false"/>。</returns>
+    /// <param name="kind">ODF 文件種類</param>
+    /// <returns>若是 ODF 範本文件種類則傳回 <see langword="true"/>；否則傳回 <see langword="false"/></returns>
     public static bool IsTemplateKind(OdfDocumentKind kind)
     {
         return kind == OdfDocumentKind.TextTemplate ||
@@ -309,8 +309,8 @@ public static class OdfDocumentKindDetector
     /// <summary>
     /// 傳回指定的種類是否代表 ODF 主控文件。
     /// </summary>
-    /// <param name="kind">ODF 文件種類。</param>
-    /// <returns>若是 ODF 主控文件種類則傳回 <see langword="true"/>；否則傳回 <see langword="false"/>。</returns>
+    /// <param name="kind">ODF 文件種類</param>
+    /// <returns>若是 ODF 主控文件種類則傳回 <see langword="true"/>；否則傳回 <see langword="false"/></returns>
     public static bool IsMasterKind(OdfDocumentKind kind)
     {
         return kind == OdfDocumentKind.TextMaster;

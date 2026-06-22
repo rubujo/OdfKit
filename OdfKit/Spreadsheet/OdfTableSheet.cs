@@ -166,7 +166,7 @@ public partial class OdfTableSheet
     /// 嘗試以指定密碼解除工作表保護。
     /// </summary>
     /// <param name="password">密碼明文</param>
-    /// <returns>若解除成功則為 true，否則為 false。</returns>
+    /// <returns>若解除成功則為 true，否則為 false</returns>
     public bool TryUnprotect(string password)
     {
         if (!IsProtected)
@@ -214,8 +214,8 @@ public partial class OdfTableSheet
     /// <summary>
     /// 取得指定範圍中的儲存格列舉。
     /// </summary>
-    /// <param name="range">要列舉的儲存格範圍。</param>
-    /// <returns>範圍內的儲存格列舉。</returns>
+    /// <param name="range">要列舉的儲存格範圍</param>
+    /// <returns>範圍內的儲存格列舉</returns>
     public IEnumerable<OdfCell> GetRange(OdfCellRange range)
     {
         int startRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
@@ -235,7 +235,7 @@ public partial class OdfTableSheet
     /// <summary>
     /// 取得此工作表中已使用的儲存格列舉。
     /// </summary>
-    /// <returns>已使用儲存格列舉。</returns>
+    /// <returns>已使用儲存格列舉</returns>
     public IEnumerable<OdfCell> GetUsedCells()
     {
         foreach ((OdfNode node, int row, int column) in OdfTableSheetDomAccessEngine.EnumerateExistingCells(TableNode))

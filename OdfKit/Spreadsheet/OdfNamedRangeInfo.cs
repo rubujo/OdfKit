@@ -6,9 +6,9 @@ namespace OdfKit.Spreadsheet;
 /// <summary>
 /// 表示工作表中的命名範圍。
 /// </summary>
-/// <param name="name">命名範圍名稱。</param>
-/// <param name="cellRangeAddress">ODF 儲存格範圍位址。</param>
-/// <param name="baseCellAddress">ODF 基準儲存格位址。</param>
+/// <param name="name">命名範圍名稱</param>
+/// <param name="cellRangeAddress">ODF 儲存格範圍位址</param>
+/// <param name="baseCellAddress">ODF 基準儲存格位址</param>
 public sealed class OdfNamedRangeInfo(string name, string cellRangeAddress, string? baseCellAddress)
 {
     /// <summary>

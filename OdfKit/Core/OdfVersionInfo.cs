@@ -41,9 +41,9 @@ public static class OdfVersionInfo
     /// <summary>
     /// 嘗試將規格版本字串轉換為 <see cref="OdfVersion"/>。
     /// </summary>
-    /// <param name="value">版本字串，例如 <c>1.4</c>。</param>
-    /// <param name="version">轉換後的 ODF 版本。</param>
-    /// <returns>若版本字串可辨識則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    /// <param name="value">版本字串，例如 <c>1.4</c></param>
+    /// <param name="version">轉換後的 ODF 版本</param>
+    /// <returns>若版本字串可辨識則為 <see langword="true"/>，否則為 <see langword="false"/></returns>
     public static bool TryParseVersionString(string? value, out OdfVersion version)
     {
         version = value switch

@@ -5,7 +5,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// 用於建構文獻目錄項目範本的建立器。
+/// 用於建構文獻目錄專案範本的建立器。
 /// </summary>
 /// <param name="template">目標範本 OdfNode 節點</param>
 public class OdfBibliographyTemplateBuilder(OdfNode template)
@@ -13,7 +13,7 @@ public class OdfBibliographyTemplateBuilder(OdfNode template)
     private readonly OdfNode _template = template;
 
     /// <summary>
-    /// 在文獻範本中新增自訂文字字串項目。
+    /// 在文獻範本中新增自訂文字字串專案。
     /// </summary>
     /// <param name="text">自訂的文字內容</param>
     /// <returns>目前的建立器執行個體，以支援鏈結呼叫</returns>
@@ -26,7 +26,7 @@ public class OdfBibliographyTemplateBuilder(OdfNode template)
     }
 
     /// <summary>
-    /// 在文獻範本中新增文獻欄位項目。
+    /// 在文獻範本中新增文獻欄位專案。
     /// </summary>
     /// <param name="dataField">文獻資料欄位名稱</param>
     /// <returns>目前的建立器執行個體，以支援鏈結呼叫</returns>

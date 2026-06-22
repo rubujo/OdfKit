@@ -11,7 +11,7 @@ public static class MockSofficeFinder
     /// <summary>
     /// 取得 MockSoffice 的執行檔路徑。
     /// </summary>
-    /// <returns>MockSoffice 的完整檔案路徑；若找不到則回傳空字串。</returns>
+    /// <returns>MockSoffice 的完整檔案路徑；若找不到則回傳空字串</returns>
     public static string GetMockSofficePath()
     {
         string baseDir = AppContext.BaseDirectory;
@@ -46,7 +46,7 @@ public static class MockSofficeFinder
                     }
                     catch
                     {
-                        // 略過權限設定異常，由 OS 後續處理
+                        // 略過權限設定例外，由 OS 後續處理
                     }
                 }
 #endif

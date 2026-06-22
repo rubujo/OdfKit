@@ -12,9 +12,9 @@ public partial class OdfImageDocument
     /// <summary>
     /// 設定指定名稱影像框架的旋轉角度。
     /// </summary>
-    /// <param name="name">框架名稱。</param>
-    /// <param name="degrees">旋轉角度（度）；<see langword="null"/> 表示移除旋轉設定。</param>
-    /// <returns>若成功設定則為 <see langword="true"/>；找不到框架時為 <see langword="false"/>。</returns>
+    /// <param name="name">框架名稱</param>
+    /// <param name="degrees">旋轉角度（度）；<see langword="null"/> 表示移除旋轉設定</param>
+    /// <returns>若成功設定則為 <see langword="true"/>；找不到框架時為 <see langword="false"/></returns>
     public bool SetImageRotation(string name, double? degrees)
     {
         OdfNode? frame = FindFrameByName(name);
@@ -37,9 +37,9 @@ public partial class OdfImageDocument
     /// <summary>
     /// 設定指定名稱影像框架的裁切邊界。
     /// </summary>
-    /// <param name="name">框架名稱。</param>
-    /// <param name="crop">裁切邊界；<see langword="null"/> 表示移除既有裁切設定。</param>
-    /// <returns>若成功設定則為 <see langword="true"/>；找不到框架時為 <see langword="false"/>。</returns>
+    /// <param name="name">框架名稱</param>
+    /// <param name="crop">裁切邊界；<see langword="null"/> 表示移除既有裁切設定</param>
+    /// <returns>若成功設定則為 <see langword="true"/>；找不到框架時為 <see langword="false"/></returns>
     public bool SetImageCrop(string name, OdfImageCropInfo? crop)
     {
         OdfNode? frame = FindFrameByName(name);
@@ -62,8 +62,8 @@ public partial class OdfImageDocument
     /// <summary>
     /// 依名稱尋找影像框架摘要。
     /// </summary>
-    /// <param name="name">框架名稱（<c>draw:name</c>）。</param>
-    /// <returns>符合名稱的框架摘要；找不到時為 <see langword="null"/>。</returns>
+    /// <param name="name">框架名稱（<c>draw:name</c>）</param>
+    /// <returns>符合名稱的框架摘要；找不到時為 <see langword="null"/></returns>
     public OdfImageFrameInfo? TryGetImageFrame(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -85,14 +85,14 @@ public partial class OdfImageDocument
     /// <summary>
     /// 更新指定名稱影像框架的版面與中繼資料。
     /// </summary>
-    /// <param name="name">框架名稱。</param>
-    /// <param name="x">X 軸座標位置。</param>
-    /// <param name="y">Y 軸座標位置。</param>
-    /// <param name="width">框架寬度。</param>
-    /// <param name="height">框架高度。</param>
-    /// <param name="title">選用的框架標題。</param>
-    /// <param name="description">選用的框架描述。</param>
-    /// <returns>若成功更新則為 <see langword="true"/>；找不到框架時為 <see langword="false"/>。</returns>
+    /// <param name="name">框架名稱</param>
+    /// <param name="x">X 軸座標位置</param>
+    /// <param name="y">Y 軸座標位置</param>
+    /// <param name="width">框架寬度</param>
+    /// <param name="height">框架高度</param>
+    /// <param name="title">選用的框架標題</param>
+    /// <param name="description">選用的框架描述</param>
+    /// <returns>若成功更新則為 <see langword="true"/>；找不到框架時為 <see langword="false"/></returns>
     public bool UpdateImageFrame(
         string name,
         OdfLength x,
@@ -125,8 +125,8 @@ public partial class OdfImageDocument
     /// <summary>
     /// 移除指定名稱的影像框架。
     /// </summary>
-    /// <param name="name">框架名稱。</param>
-    /// <returns>若成功移除則為 <see langword="true"/>；找不到框架時為 <see langword="false"/>。</returns>
+    /// <param name="name">框架名稱</param>
+    /// <returns>若成功移除則為 <see langword="true"/>；找不到框架時為 <see langword="false"/></returns>
     public bool RemoveImageFrame(string name)
     {
         if (string.IsNullOrWhiteSpace(name))

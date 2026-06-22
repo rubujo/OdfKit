@@ -105,7 +105,7 @@ public sealed class OdfChartSeries
     /// <summary>
     /// 取得此序列中所有資料點樣式覆蓋設定（<c>chart:data-point</c>）。
     /// </summary>
-    /// <returns>資料點樣式覆蓋設定清單，依文件中出現順序排列。</returns>
+    /// <returns>資料點樣式覆蓋設定清單，依文件中出現順序排列</returns>
     public IReadOnlyList<OdfChartDataPointInfo> GetDataPoints()
     {
         List<OdfChartDataPointInfo> points = [];
@@ -127,9 +127,9 @@ public sealed class OdfChartSeries
     /// <summary>
     /// 新增一筆資料點樣式覆蓋設定（<c>chart:data-point</c>）。
     /// </summary>
-    /// <param name="repeated">此筆設定套用的連續資料點數量，預設為 1。</param>
-    /// <param name="styleName">套用的樣式名稱；為 <see langword="null"/> 時不寫入樣式。</param>
-    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="repeated"/> 小於 1 時擲出。</exception>
+    /// <param name="repeated">此筆設定套用的連續資料點數量，預設為 1</param>
+    /// <param name="styleName">套用的樣式名稱；為 <see langword="null"/> 時不寫入樣式</param>
+    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="repeated"/> 小於 1 時擲出</exception>
     public void AddDataPoint(int repeated = 1, string? styleName = null)
     {
         if (repeated < 1)

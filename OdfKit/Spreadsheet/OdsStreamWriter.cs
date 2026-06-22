@@ -76,7 +76,7 @@ public partial class OdsStreamWriter : IDisposable
             s.Write(bytes, 0, bytes.Length);
         }
 
-        // 2. 寫入預設的中階資料、樣式與資訊清單項目
+        // 2. 寫入預設的中階資料、樣式與資訊清單專案
         WriteDefaultMetaFiles();
 
         // 3. 開啟 content.xml 以進行資料流寫入

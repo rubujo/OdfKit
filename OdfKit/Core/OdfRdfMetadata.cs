@@ -22,11 +22,11 @@ public sealed class OdfRdfMetadata
     /// <summary>
     /// 新增一筆 RDF triple。
     /// </summary>
-    /// <param name="subject">主詞 IRI。</param>
-    /// <param name="predicate">述詞 IRI。</param>
-    /// <param name="objectValue">受詞值。</param>
-    /// <param name="isLiteral">受詞是否為 literal；若為 <see langword="false"/>，則視為資源 IRI。</param>
-    /// <exception cref="ArgumentException">當任一必要值為空白時拋出。</exception>
+    /// <param name="subject">主詞 IRI</param>
+    /// <param name="predicate">述詞 IRI</param>
+    /// <param name="objectValue">受詞值</param>
+    /// <param name="isLiteral">受詞是否為 literal；若為 <see langword="false"/>，則視為資源 IRI</param>
+    /// <exception cref="ArgumentException">當任一必要值為空白時拋出</exception>
     public void AddTriple(string subject, string predicate, string objectValue, bool isLiteral = true)
     {
         AddTriple(new OdfRdfTriple(subject, predicate, objectValue, isLiteral));
@@ -35,8 +35,8 @@ public sealed class OdfRdfMetadata
     /// <summary>
     /// 新增一筆 RDF triple。
     /// </summary>
-    /// <param name="triple">要新增的 RDF triple。</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="triple"/> 為 <see langword="null"/> 時拋出。</exception>
+    /// <param name="triple">要新增的 RDF triple</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="triple"/> 為 <see langword="null"/> 時拋出</exception>
     public void AddTriple(OdfRdfTriple triple)
     {
         if (triple is null)
@@ -48,9 +48,9 @@ public sealed class OdfRdfMetadata
     /// <summary>
     /// 依主詞與述詞篩選 RDF triples。
     /// </summary>
-    /// <param name="subject">主詞 IRI；為 <see langword="null"/> 時不篩選主詞。</param>
-    /// <param name="predicate">述詞 IRI；為 <see langword="null"/> 時不篩選述詞。</param>
-    /// <returns>符合條件的 triple 清單。</returns>
+    /// <param name="subject">主詞 IRI；為 <see langword="null"/> 時不篩選主詞</param>
+    /// <param name="predicate">述詞 IRI；為 <see langword="null"/> 時不篩選述詞</param>
+    /// <returns>符合條件的 triple 清單</returns>
     public IReadOnlyList<OdfRdfTriple> FindTriples(string? subject = null, string? predicate = null)
     {
         IEnumerable<OdfRdfTriple> query = _triples;
@@ -70,10 +70,10 @@ public sealed class OdfRdfMetadata
     /// <summary>
     /// 嘗試取得指定主詞與述詞的 literal 受詞。
     /// </summary>
-    /// <param name="subject">主詞 IRI。</param>
-    /// <param name="predicate">述詞 IRI。</param>
-    /// <param name="value">literal 受詞值。</param>
-    /// <returns>若存在 literal triple 則為 <see langword="true"/>。</returns>
+    /// <param name="subject">主詞 IRI</param>
+    /// <param name="predicate">述詞 IRI</param>
+    /// <param name="value">literal 受詞值</param>
+    /// <returns>若存在 literal triple 則為 <see langword="true"/></returns>
     public bool TryGetLiteral(string subject, string predicate, out string value)
     {
         OdfRdfTriple? triple = _triples.FirstOrDefault(candidate =>
@@ -93,8 +93,8 @@ public sealed class OdfRdfMetadata
     /// <summary>
     /// 建立文件主詞與封裝組件之間的 <c>pkg:hasPart</c> 關聯。
     /// </summary>
-    /// <param name="documentSubject">文件主詞 IRI（通常為空字串或 <c>./</c>）。</param>
-    /// <param name="partPath">組件相對路徑。</param>
+    /// <param name="documentSubject">文件主詞 IRI（通常為空字串或 <c>./</c>）</param>
+    /// <param name="partPath">組件相對路徑</param>
     public void LinkDocumentPart(string documentSubject, string partPath)
     {
         AddTriple(documentSubject, OdfPkgRdfPredicates.HasPart, partPath, isLiteral: false);
@@ -103,21 +103,21 @@ public sealed class OdfRdfMetadata
     /// <summary>
     /// 設定封裝組件的 <c>pkg:mimeType</c> literal。
     /// </summary>
-    /// <param name="partSubject">組件主詞 IRI。</param>
-    /// <param name="mimeType">MIME 類型。</param>
+    /// <param name="partSubject">組件主詞 IRI</param>
+    /// <param name="mimeType">MIME 類型</param>
     public void SetPartMimeType(string partSubject, string mimeType)
     {
         AddTriple(partSubject, OdfPkgRdfPredicates.MimeType, mimeType, isLiteral: true);
     }
 
     /// <summary>
-    /// 依目前封裝項目同步 <c>pkg:hasPart</c> 與 <c>pkg:mimeType</c> triples。
+    /// 依目前封裝專案同步 <c>pkg:hasPart</c> 與 <c>pkg:mimeType</c> triples。
     /// </summary>
-    /// <param name="entryPaths">封裝項目路徑集合。</param>
-    /// <param name="mediaTypes">項目路徑對應的 MIME 類型對照表。</param>
-    /// <param name="documentSubject">文件主詞 IRI；為 <see langword="null"/> 時沿用既有 <c>pkg:hasPart</c> 主詞或空字串。</param>
-    /// <returns>新增或更新的 triple 數量。</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="entryPaths"/> 或 <paramref name="mediaTypes"/> 為 <see langword="null"/> 時拋出。</exception>
+    /// <param name="entryPaths">封裝專案路徑集合</param>
+    /// <param name="mediaTypes">專案路徑對應的 MIME 類型對照表</param>
+    /// <param name="documentSubject">文件主詞 IRI；為 <see langword="null"/> 時沿用既有 <c>pkg:hasPart</c> 主詞或空字串</param>
+    /// <returns>新增或更新的 triple 數量</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="entryPaths"/> 或 <paramref name="mediaTypes"/> 為 <see langword="null"/> 時拋出</exception>
     public int SyncWithPackageEntries(
         IEnumerable<string> entryPaths,
         IReadOnlyDictionary<string, string> mediaTypes,
@@ -171,8 +171,8 @@ public sealed class OdfRdfMetadata
     /// <summary>
     /// 取得指定文件主詞已連結的封裝組件路徑。
     /// </summary>
-    /// <param name="documentSubject">文件主詞 IRI。</param>
-    /// <returns>已正規化之組件路徑集合。</returns>
+    /// <param name="documentSubject">文件主詞 IRI</param>
+    /// <returns>已正規化之組件路徑集合</returns>
     public IReadOnlyList<string> GetLinkedPartPaths(string documentSubject)
     {
         return FindTriples(documentSubject, OdfPkgRdfPredicates.HasPart)
@@ -185,9 +185,9 @@ public sealed class OdfRdfMetadata
     /// <summary>
     /// 移除符合主詞與述詞的 RDF triples。
     /// </summary>
-    /// <param name="subject">主詞 IRI。</param>
-    /// <param name="predicate">述詞 IRI；為 <see langword="null"/> 時移除該主詞的全部 triples。</param>
-    /// <returns>移除的 triple 數量。</returns>
+    /// <param name="subject">主詞 IRI</param>
+    /// <param name="predicate">述詞 IRI；為 <see langword="null"/> 時移除該主詞的全部 triples</param>
+    /// <returns>移除的 triple 數量</returns>
     public int RemoveTriples(string subject, string? predicate = null)
     {
         int removed = _triples.RemoveAll(triple =>
@@ -307,11 +307,11 @@ public sealed class OdfRdfTriple
     /// <summary>
     /// 以指定主詞、述詞與受詞建立新的 RDF triple。
     /// </summary>
-    /// <param name="subject">主詞 IRI。</param>
-    /// <param name="predicate">述詞 IRI。</param>
-    /// <param name="objectValue">受詞值。</param>
-    /// <param name="isLiteral">受詞是否為 literal；若為 <see langword="false"/>，則視為資源 IRI。</param>
-    /// <exception cref="ArgumentException">當任一必要值為空白時拋出。</exception>
+    /// <param name="subject">主詞 IRI</param>
+    /// <param name="predicate">述詞 IRI</param>
+    /// <param name="objectValue">受詞值</param>
+    /// <param name="isLiteral">受詞是否為 literal；若為 <see langword="false"/>，則視為資源 IRI</param>
+    /// <exception cref="ArgumentException">當任一必要值為空白時拋出</exception>
     public OdfRdfTriple(string subject, string predicate, string objectValue, bool isLiteral)
     {
         if (subject is null)

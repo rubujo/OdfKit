@@ -15,10 +15,10 @@ public partial class OdfChartDocument
     /// <summary>
     /// 將圖表資料來源綁定至試算表的儲存格範圍。
     /// </summary>
-    /// <param name="sheetName">工作表名稱。</param>
-    /// <param name="range">儲存格範圍。</param>
-    /// <param name="firstRowAsHeader">首列作為序列標題（header），預設 true。</param>
-    /// <param name="firstColumnAsLabel">首欄作為分類標籤（X 軸），預設 true。</param>
+    /// <param name="sheetName">工作表名稱</param>
+    /// <param name="range">儲存格範圍</param>
+    /// <param name="firstRowAsHeader">首列作為序列標題（header），預設 true</param>
+    /// <param name="firstColumnAsLabel">首欄作為分類標籤（X 軸），預設 true</param>
     public void SetDataRange(string sheetName, OdfKit.Spreadsheet.OdfCellRange range,
         bool firstRowAsHeader = true, bool firstColumnAsLabel = true)
     {
@@ -97,7 +97,7 @@ public partial class OdfChartDocument
     /// <summary>
     /// 取得圖表目前綁定的試算表儲存格範圍。
     /// </summary>
-    /// <returns>工作表名稱與儲存格範圍的元組；若未設定則兩者均為 null。</returns>
+    /// <returns>工作表名稱與儲存格範圍的元組；若未設定則兩者均為 null</returns>
     public (string? SheetName, OdfKit.Spreadsheet.OdfCellRange? Range) GetDataRange()
     {
         string? addr = ChartNode.GetAttribute("cell-range-address", OdfNamespaces.Table);

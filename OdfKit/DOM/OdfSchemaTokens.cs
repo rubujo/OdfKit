@@ -5,28 +5,44 @@
 /// </summary>
 public enum OdfNumberCalendar
 {
-    /// <summary>佛曆。</summary>
+    /// <summary>
+    /// 佛曆
+    /// </summary>
     Buddhist,
 
-    /// <summary>日本年號曆。</summary>
+    /// <summary>
+    /// 日本年號曆
+    /// </summary>
     Gengou,
 
-    /// <summary>公曆。</summary>
+    /// <summary>
+    /// 公曆
+    /// </summary>
     Gregorian,
 
-    /// <summary>韓文漢字曆。</summary>
+    /// <summary>
+    /// 韓文漢字曆
+    /// </summary>
     Hanja,
 
-    /// <summary>韓文漢字星期曆。</summary>
+    /// <summary>
+    /// 韓文漢字星期曆
+    /// </summary>
     HanjaYoil,
 
-    /// <summary>伊斯蘭曆。</summary>
+    /// <summary>
+    /// 伊斯蘭曆
+    /// </summary>
     Hijri,
 
-    /// <summary>猶太曆。</summary>
+    /// <summary>
+    /// 猶太曆
+    /// </summary>
     Jewish,
 
-    /// <summary>民國曆。</summary>
+    /// <summary>
+    /// 民國曆
+    /// </summary>
     Roc
 }
 
@@ -35,13 +51,19 @@ public enum OdfNumberCalendar
 /// </summary>
 public enum OdfTableMemberType
 {
-    /// <summary>具名成員。</summary>
+    /// <summary>
+    /// 具名成員
+    /// </summary>
     Named,
 
-    /// <summary>下一個成員。</summary>
+    /// <summary>
+    /// 下一個成員
+    /// </summary>
     Next,
 
-    /// <summary>前一個成員。</summary>
+    /// <summary>
+    /// 前一個成員
+    /// </summary>
     Previous
 }
 
@@ -50,25 +72,39 @@ public enum OdfTableMemberType
 /// </summary>
 public enum OdfTableGroupedBy
 {
-    /// <summary>依日分組。</summary>
+    /// <summary>
+    /// 依日分組
+    /// </summary>
     Days,
 
-    /// <summary>依小時分組。</summary>
+    /// <summary>
+    /// 依小時分組
+    /// </summary>
     Hours,
 
-    /// <summary>依分鐘分組。</summary>
+    /// <summary>
+    /// 依分鐘分組
+    /// </summary>
     Minutes,
 
-    /// <summary>依月份分組。</summary>
+    /// <summary>
+    /// 依月份分組
+    /// </summary>
     Months,
 
-    /// <summary>依季度分組。</summary>
+    /// <summary>
+    /// 依季度分組
+    /// </summary>
     Quarters,
 
-    /// <summary>依秒分組。</summary>
+    /// <summary>
+    /// 依秒分組
+    /// </summary>
     Seconds,
 
-    /// <summary>依年份分組。</summary>
+    /// <summary>
+    /// 依年份分組
+    /// </summary>
     Years
 }
 
@@ -77,16 +113,24 @@ public enum OdfTableGroupedBy
 /// </summary>
 public enum OdfTableSortMode
 {
-    /// <summary>依資料排序。</summary>
+    /// <summary>
+    /// 依資料排序
+    /// </summary>
     Data,
 
-    /// <summary>手動排序。</summary>
+    /// <summary>
+    /// 手動排序
+    /// </summary>
     Manual,
 
-    /// <summary>依名稱排序。</summary>
+    /// <summary>
+    /// 依名稱排序
+    /// </summary>
     Name,
 
-    /// <summary>不排序。</summary>
+    /// <summary>
+    /// 不排序
+    /// </summary>
     None
 }
 
@@ -95,10 +139,14 @@ public enum OdfTableSortMode
 /// </summary>
 public enum OdfTableConditionSource
 {
-    /// <summary>儲存格範圍。</summary>
+    /// <summary>
+    /// 儲存格範圍
+    /// </summary>
     CellRange,
 
-    /// <summary>自身。</summary>
+    /// <summary>
+    /// 自身
+    /// </summary>
     Self
 }
 
@@ -107,10 +155,14 @@ public enum OdfTableConditionSource
 /// </summary>
 public enum OdfAnimationColorInterpolation
 {
-    /// <summary>HSL 色彩空間。</summary>
+    /// <summary>
+    /// HSL 色彩空間
+    /// </summary>
     Hsl,
 
-    /// <summary>RGB 色彩空間。</summary>
+    /// <summary>
+    /// RGB 色彩空間
+    /// </summary>
     Rgb
 }
 
@@ -119,10 +171,14 @@ public enum OdfAnimationColorInterpolation
 /// </summary>
 public enum OdfAnimationColorInterpolationDirection
 {
-    /// <summary>順時針。</summary>
+    /// <summary>
+    /// 順時針
+    /// </summary>
     Clockwise,
 
-    /// <summary>逆時針。</summary>
+    /// <summary>
+    /// 逆時針
+    /// </summary>
     CounterClockwise
 }
 
@@ -131,10 +187,14 @@ public enum OdfAnimationColorInterpolationDirection
 /// </summary>
 public enum OdfDatabaseIsNullable
 {
-    /// <summary>不允許 null。</summary>
+    /// <summary>
+    /// 不允許 null
+    /// </summary>
     NoNulls,
 
-    /// <summary>允許 null。</summary>
+    /// <summary>
+    /// 允許 null
+    /// </summary>
     Nullable
 }
 
@@ -143,22 +203,34 @@ public enum OdfDatabaseIsNullable
 /// </summary>
 public enum OdfDatabaseDataSourceSettingType
 {
-    /// <summary>布林型別。</summary>
+    /// <summary>
+    /// 布林型別
+    /// </summary>
     Boolean,
 
-    /// <summary>雙精確度浮點型別。</summary>
+    /// <summary>
+    /// 雙精確度浮點型別
+    /// </summary>
     Double,
 
-    /// <summary>整數型別。</summary>
+    /// <summary>
+    /// 整數型別
+    /// </summary>
     Int,
 
-    /// <summary>長整數型別。</summary>
+    /// <summary>
+    /// 長整數型別
+    /// </summary>
     Long,
 
-    /// <summary>短整數型別。</summary>
+    /// <summary>
+    /// 短整數型別
+    /// </summary>
     Short,
 
-    /// <summary>字串型別。</summary>
+    /// <summary>
+    /// 字串型別
+    /// </summary>
     String
 }
 
@@ -167,7 +239,9 @@ public enum OdfDatabaseDataSourceSettingType
 /// </summary>
 public enum OdfDrawNoHref
 {
-    /// <summary>無連結。</summary>
+    /// <summary>
+    /// 無連結
+    /// </summary>
     Nohref
 }
 
@@ -176,39 +250,63 @@ public enum OdfDrawNoHref
 /// </summary>
 public enum OdfTableFunction
 {
-    /// <summary>自動函式。</summary>
+    /// <summary>
+    /// 自動函式
+    /// </summary>
     Auto,
 
-    /// <summary>平均值。</summary>
+    /// <summary>
+    /// 平均值
+    /// </summary>
     Average,
 
-    /// <summary>計數。</summary>
+    /// <summary>
+    /// 計數
+    /// </summary>
     Count,
 
-    /// <summary>數值計數。</summary>
+    /// <summary>
+    /// 數值計數
+    /// </summary>
     Countnums,
 
-    /// <summary>最大值。</summary>
+    /// <summary>
+    /// 最大值
+    /// </summary>
     Max,
 
-    /// <summary>最小值。</summary>
+    /// <summary>
+    /// 最小值
+    /// </summary>
     Min,
 
-    /// <summary>乘積。</summary>
+    /// <summary>
+    /// 乘積
+    /// </summary>
     Product,
 
-    /// <summary>樣本標準差。</summary>
+    /// <summary>
+    /// 樣本標準差
+    /// </summary>
     Stdev,
 
-    /// <summary>母體標準差。</summary>
+    /// <summary>
+    /// 母體標準差
+    /// </summary>
     Stdevp,
 
-    /// <summary>總和。</summary>
+    /// <summary>
+    /// 總和
+    /// </summary>
     Sum,
 
-    /// <summary>樣本變異數。</summary>
+    /// <summary>
+    /// 樣本變異數
+    /// </summary>
     Var,
 
-    /// <summary>母體變異數。</summary>
+    /// <summary>
+    /// 母體變異數
+    /// </summary>
     Varp
 }

@@ -92,8 +92,8 @@ public partial class OdfNode
     /// <summary>
     /// 取得指定屬性的原始命名空間前綴。
     /// </summary>
-    /// <param name="attributeName">屬性名稱。</param>
-    /// <returns>原始前綴；若未記錄則為 <see langword="null"/>。</returns>
+    /// <param name="attributeName">屬性名稱</param>
+    /// <returns>原始前綴；若未記錄則為 <see langword="null"/></returns>
     public string? GetAttributePrefix(OdfAttributeName attributeName)
     {
         return _attributePrefixes.TryGetValue(attributeName, out string? prefix) ? prefix : null;

@@ -8,70 +8,70 @@ public partial class OdfChartDocument
     /// <summary>
     /// 取得 3D 圖表牆面（chart:wall）的樣式名稱。
     /// </summary>
-    /// <returns>樣式名稱；若未設定則為 <see langword="null"/>。</returns>
+    /// <returns>樣式名稱；若未設定則為 <see langword="null"/></returns>
     public string? GetWallStyleName() =>
         FindChildElement(FindOrCreatePlotArea(), "wall", OdfNamespaces.Chart)?.GetAttribute("style-name", OdfNamespaces.Chart);
 
     /// <summary>
     /// 設定 3D 圖表牆面（chart:wall）的樣式名稱。
     /// </summary>
-    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:wall 元素。</param>
+    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:wall 元素</param>
     public void SetWallStyleName(string? styleName) =>
         SetPlotAreaPartStyleName("wall", styleName);
 
     /// <summary>
     /// 取得 3D 圖表地板（chart:floor）的樣式名稱。
     /// </summary>
-    /// <returns>樣式名稱；若未設定則為 <see langword="null"/>。</returns>
+    /// <returns>樣式名稱；若未設定則為 <see langword="null"/></returns>
     public string? GetFloorStyleName() =>
         FindChildElement(FindOrCreatePlotArea(), "floor", OdfNamespaces.Chart)?.GetAttribute("style-name", OdfNamespaces.Chart);
 
     /// <summary>
     /// 設定 3D 圖表地板（chart:floor）的樣式名稱。
     /// </summary>
-    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:floor 元素。</param>
+    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:floor 元素</param>
     public void SetFloorStyleName(string? styleName) =>
         SetPlotAreaPartStyleName("floor", styleName);
 
     /// <summary>
     /// 取得股票圖上漲標記（chart:stock-gain-marker）的樣式名稱。
     /// </summary>
-    /// <returns>樣式名稱；若未設定則為 <see langword="null"/>。</returns>
+    /// <returns>樣式名稱；若未設定則為 <see langword="null"/></returns>
     public string? GetStockGainMarkerStyleName() =>
         FindChildElement(FindOrCreatePlotArea(), "stock-gain-marker", OdfNamespaces.Chart)?.GetAttribute("style-name", OdfNamespaces.Chart);
 
     /// <summary>
     /// 設定股票圖上漲標記（chart:stock-gain-marker）的樣式名稱。
     /// </summary>
-    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:stock-gain-marker 元素。</param>
+    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:stock-gain-marker 元素</param>
     public void SetStockGainMarkerStyleName(string? styleName) =>
         SetPlotAreaPartStyleName("stock-gain-marker", styleName);
 
     /// <summary>
     /// 取得股票圖下跌標記（chart:stock-loss-marker）的樣式名稱。
     /// </summary>
-    /// <returns>樣式名稱；若未設定則為 <see langword="null"/>。</returns>
+    /// <returns>樣式名稱；若未設定則為 <see langword="null"/></returns>
     public string? GetStockLossMarkerStyleName() =>
         FindChildElement(FindOrCreatePlotArea(), "stock-loss-marker", OdfNamespaces.Chart)?.GetAttribute("style-name", OdfNamespaces.Chart);
 
     /// <summary>
     /// 設定股票圖下跌標記（chart:stock-loss-marker）的樣式名稱。
     /// </summary>
-    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:stock-loss-marker 元素。</param>
+    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:stock-loss-marker 元素</param>
     public void SetStockLossMarkerStyleName(string? styleName) =>
         SetPlotAreaPartStyleName("stock-loss-marker", styleName);
 
     /// <summary>
     /// 取得股票圖範圍線（chart:stock-range-line）的樣式名稱。
     /// </summary>
-    /// <returns>樣式名稱；若未設定則為 <see langword="null"/>。</returns>
+    /// <returns>樣式名稱；若未設定則為 <see langword="null"/></returns>
     public string? GetStockRangeLineStyleName() =>
         FindChildElement(FindOrCreatePlotArea(), "stock-range-line", OdfNamespaces.Chart)?.GetAttribute("style-name", OdfNamespaces.Chart);
 
     /// <summary>
     /// 設定股票圖範圍線（chart:stock-range-line）的樣式名稱。
     /// </summary>
-    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:stock-range-line 元素。</param>
+    /// <param name="styleName">樣式名稱；<see langword="null"/> 或空白會移除 chart:stock-range-line 元素</param>
     public void SetStockRangeLineStyleName(string? styleName) =>
         SetPlotAreaPartStyleName("stock-range-line", styleName);
 

@@ -14,8 +14,8 @@ namespace OdfKit.Compliance;
 /// <param name="xPath">與此問題相關的 XML 路徑（可用時）</param>
 /// <param name="requiredVersion">問題與版本相關時所需的 ODF 版本</param>
 /// <param name="profileId">發出此問題的相容性設定檔識別碼</param>
-/// <param name="details">可供工具處理的結構化診斷細節。</param>
-/// <param name="culture">指定此問題生成時使用的文化特性，用於 SuggestedFix 的本地化。</param>
+/// <param name="details">可供工具處理的結構化診斷細節</param>
+/// <param name="culture">指定此問題生成時使用的文化特性，用於 SuggestedFix 的本地化</param>
 public sealed class OdfValidationIssue(
     OdfIssueSeverity severity,
     string ruleId,
@@ -80,7 +80,7 @@ public sealed class OdfValidationIssue(
     /// <summary>
     /// 建立可序列化的 JSON 匯出模型。
     /// </summary>
-    /// <returns>包含驗證問題欄位的 JSON 匯出模型。</returns>
+    /// <returns>包含驗證問題欄位的 JSON 匯出模型</returns>
     public OdfValidationIssueJsonModel ToJsonModel()
     {
         return new OdfValidationIssueJsonModel(

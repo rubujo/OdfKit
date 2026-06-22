@@ -48,7 +48,7 @@ public class OdfSection
     /// <summary>
     /// 以指定密碼保護此區段。
     /// </summary>
-    /// <param name="password">密碼明文。</param>
+    /// <param name="password">密碼明文</param>
     public void Protect(string password)
     {
         OdfKit.Core.OdfProtectionHelper.ProtectNode(Node, password, "text", OdfNamespaces.Text);
@@ -65,8 +65,8 @@ public class OdfSection
     /// <summary>
     /// 嘗試以指定密碼解除此區段的保護。
     /// </summary>
-    /// <param name="password">密碼明文。</param>
-    /// <returns>若解除成功則為 true，否則為 false。</returns>
+    /// <param name="password">密碼明文</param>
+    /// <returns>若解除成功則為 true，否則為 false</returns>
     public bool TryUnprotect(string password)
     {
         if (!IsProtected)
@@ -82,8 +82,8 @@ public class OdfSection
     /// <summary>
     /// 驗證指定密碼是否能成功解鎖此區段。
     /// </summary>
-    /// <param name="password">密碼明文。</param>
-    /// <returns>若密碼正確或區段未受保護則為 true，否則為 false。</returns>
+    /// <param name="password">密碼明文</param>
+    /// <returns>若密碼正確或區段未受保護則為 true，否則為 false</returns>
     public bool VerifyPassword(string password)
     {
         if (!IsProtected)

@@ -20,8 +20,8 @@ public sealed class PresentationDocumentBuilder
     /// <summary>
     /// 設定文件中繼資料。
     /// </summary>
-    /// <param name="configure">中繼資料設定委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="configure">中繼資料設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public PresentationDocumentBuilder WithMetadata(Action<TextDocumentMetadataBuilder> configure)
     {
         if (configure is null)
@@ -33,9 +33,9 @@ public sealed class PresentationDocumentBuilder
     /// <summary>
     /// 新增投影片並設定其內容。
     /// </summary>
-    /// <param name="name">投影片名稱。</param>
-    /// <param name="configure">投影片設定委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="name">投影片名稱</param>
+    /// <param name="configure">投影片設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public PresentationDocumentBuilder AddSlide(string name, Action<OdfSlideBuilder> configure)
     {
         if (configure is null)
@@ -49,8 +49,8 @@ public sealed class PresentationDocumentBuilder
     /// <summary>
     /// 新增投影片並設定其內容。
     /// </summary>
-    /// <param name="configure">投影片設定委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="configure">投影片設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public PresentationDocumentBuilder AddSlide(Action<OdfSlideBuilder> configure)
     {
         return AddSlide($"Slide {_slideCount + 1}", configure);
@@ -59,7 +59,7 @@ public sealed class PresentationDocumentBuilder
     /// <summary>
     /// 建立並傳回簡報文件。
     /// </summary>
-    /// <returns>建立完成的簡報文件。</returns>
+    /// <returns>建立完成的簡報文件</returns>
     public PresentationDocument Build()
     {
         return _document;
@@ -81,12 +81,12 @@ public sealed class OdfSlideBuilder
     /// <summary>
     /// 新增標題文字方塊。
     /// </summary>
-    /// <param name="text">標題文字。</param>
-    /// <param name="xCm">左側位置（公分）。</param>
-    /// <param name="yCm">上方位置（公分）。</param>
-    /// <param name="widthCm">寬度（公分）。</param>
-    /// <param name="heightCm">高度（公分）。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">標題文字</param>
+    /// <param name="xCm">左側位置（公分）</param>
+    /// <param name="yCm">上方位置（公分）</param>
+    /// <param name="widthCm">寬度（公分）</param>
+    /// <param name="heightCm">高度（公分）</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSlideBuilder AddTitle(
         string text,
         double xCm = 1,
@@ -106,12 +106,12 @@ public sealed class OdfSlideBuilder
     /// <summary>
     /// 新增文字方塊。
     /// </summary>
-    /// <param name="text">文字內容。</param>
-    /// <param name="xCm">左側位置（公分）。</param>
-    /// <param name="yCm">上方位置（公分）。</param>
-    /// <param name="widthCm">寬度（公分）。</param>
-    /// <param name="heightCm">高度（公分）。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">文字內容</param>
+    /// <param name="xCm">左側位置（公分）</param>
+    /// <param name="yCm">上方位置（公分）</param>
+    /// <param name="widthCm">寬度（公分）</param>
+    /// <param name="heightCm">高度（公分）</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSlideBuilder AddTextBox(
         string text,
         double xCm,
@@ -131,12 +131,12 @@ public sealed class OdfSlideBuilder
     /// <summary>
     /// 新增多段落文字方塊。
     /// </summary>
-    /// <param name="paragraphs">段落文字集合。</param>
-    /// <param name="xCm">左側位置（公分）。</param>
-    /// <param name="yCm">上方位置（公分）。</param>
-    /// <param name="widthCm">寬度（公分）。</param>
-    /// <param name="heightCm">高度（公分）。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="paragraphs">段落文字集合</param>
+    /// <param name="xCm">左側位置（公分）</param>
+    /// <param name="yCm">上方位置（公分）</param>
+    /// <param name="widthCm">寬度（公分）</param>
+    /// <param name="heightCm">高度（公分）</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSlideBuilder AddTextBox(
         IEnumerable<string> paragraphs,
         double xCm,
@@ -155,11 +155,11 @@ public sealed class OdfSlideBuilder
     /// <summary>
     /// 新增標題預留位置。
     /// </summary>
-    /// <param name="xCm">左側位置（公分）。</param>
-    /// <param name="yCm">上方位置（公分）。</param>
-    /// <param name="widthCm">寬度（公分）。</param>
-    /// <param name="heightCm">高度（公分）。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="xCm">左側位置（公分）</param>
+    /// <param name="yCm">上方位置（公分）</param>
+    /// <param name="widthCm">寬度（公分）</param>
+    /// <param name="heightCm">高度（公分）</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSlideBuilder AddTitlePlaceholder(
         double xCm = 1,
         double yCm = 1,
@@ -178,8 +178,8 @@ public sealed class OdfSlideBuilder
     /// <summary>
     /// 設定講者備忘文字。
     /// </summary>
-    /// <param name="notes">講者備忘內容。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="notes">講者備忘內容</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSlideBuilder WithSpeakerNotes(string notes)
     {
         _slide.SpeakerNotes = notes;
@@ -189,8 +189,8 @@ public sealed class OdfSlideBuilder
     /// <summary>
     /// 設定多段落講者備忘文字。
     /// </summary>
-    /// <param name="paragraphs">講者備忘段落集合。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="paragraphs">講者備忘段落集合</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSlideBuilder WithSpeakerNotes(IEnumerable<string> paragraphs)
     {
         _slide.SetSpeakerNotes(paragraphs);
@@ -200,9 +200,9 @@ public sealed class OdfSlideBuilder
     /// <summary>
     /// 設定投影片切換效果。
     /// </summary>
-    /// <param name="type">切換類型。</param>
-    /// <param name="durationPoints">持續時間（點）。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="type">切換類型</param>
+    /// <param name="durationPoints">持續時間（點）</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSlideBuilder WithTransition(OdfTransitionType type, double durationPoints = 72)
     {
         _slide.SetTransition(type, OdfLength.FromPoints(durationPoints));
@@ -212,11 +212,11 @@ public sealed class OdfSlideBuilder
     /// <summary>
     /// 為指定圖形新增進場動畫。
     /// </summary>
-    /// <param name="shapeId">目標圖形識別碼。</param>
-    /// <param name="effect">動畫效果。</param>
-    /// <param name="trigger">觸發方式。</param>
-    /// <param name="delaySeconds">延遲秒數。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="shapeId">目標圖形識別碼</param>
+    /// <param name="effect">動畫效果</param>
+    /// <param name="trigger">觸發方式</param>
+    /// <param name="delaySeconds">延遲秒數</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfSlideBuilder AddEntranceEffect(
         string shapeId,
         OdfAnimationEffect effect,

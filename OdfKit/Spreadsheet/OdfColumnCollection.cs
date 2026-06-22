@@ -13,7 +13,7 @@ public sealed class OdfColumnCollection
     /// <summary>
     /// 初始化 <see cref="OdfColumnCollection"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="sheet">所屬工作表。</param>
+    /// <param name="sheet">所屬工作表</param>
     internal OdfColumnCollection(OdfTableSheet sheet)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
@@ -22,7 +22,7 @@ public sealed class OdfColumnCollection
     /// <summary>
     /// 依索引取得欄。
     /// </summary>
-    /// <param name="index">以 0 為基準的欄索引。</param>
-    /// <returns>指定欄。</returns>
+    /// <param name="index">以 0 為基準的欄索引</param>
+    /// <returns>指定欄</returns>
     public OdfSheetColumn this[int index] => new(_sheet, index);
 }

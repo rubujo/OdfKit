@@ -13,7 +13,7 @@ public partial class OdfStyleEngine
     /// <summary>
     /// 取得或建立特定 DOM 節點在記憶體中的局部編輯樣式節點。
     /// </summary>
-    /// <param name="elementNode">DOM 項目節點</param>
+    /// <param name="elementNode">DOM 專案節點</param>
     /// <param name="family">樣式家族</param>
     /// <returns>建立或取得的局部樣式節點</returns>
     /// <exception cref="ArgumentNullException">當 <paramref name="elementNode"/> 為 null 時拋出</exception>
@@ -54,7 +54,7 @@ public partial class OdfStyleEngine
     /// <summary>
     /// 設定局部樣式屬性。
     /// </summary>
-    /// <param name="elementNode">DOM 項目節點</param>
+    /// <param name="elementNode">DOM 專案節點</param>
     /// <param name="family">樣式家族</param>
     /// <param name="propElementLocalName">屬性元素的區域名稱</param>
     /// <param name="propAttrLocalName">屬性屬性的區域名稱</param>
@@ -259,7 +259,7 @@ public partial class OdfStyleEngine
                 _automaticStyles[styleName] = savedStyleNode;
             }
 
-            // 更新項目的樣式屬性
+            // 更新專案的樣式屬性
             string styleAttr = "style-name";
             string styleNs = family switch
             {

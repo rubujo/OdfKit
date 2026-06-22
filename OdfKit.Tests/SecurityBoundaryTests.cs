@@ -83,7 +83,7 @@ public class SecurityBoundaryTests
         Assert.Throws<CryptographicException>(() =>
             OdfEncryption.DecryptEntry(ciphertext, "pass", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 50001, salt, iv));
 
-        // 4. 測試 null 參數的防禦性異常攔截
+        // 4. 測試 null 參數的防禦性例外攔截
         Assert.Throws<NullReferenceException>(() =>
             OdfEncryption.DecryptEntry(null!, "pass", OdfEncryption.Aes256AlgorithmUri, "PBKDF2", 32, 1000, salt, iv));
 

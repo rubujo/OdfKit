@@ -154,7 +154,7 @@ public partial class PresentationDocument
     /// <summary>
     /// 取得投影片尺寸。
     /// </summary>
-    /// <returns>投影片寬度與高度。</returns>
+    /// <returns>投影片寬度與高度</returns>
     public (OdfLength Width, OdfLength Height) GetSlideSize()
     {
         var pageLayoutProps = GetDefaultPageLayoutProperties();
@@ -204,8 +204,8 @@ public partial class PresentationDocument
     /// <summary>
     /// 取得指定索引投影片的切換效果。
     /// </summary>
-    /// <param name="slideIndex">投影片索引位置。</param>
-    /// <returns>投影片切換效果類型；未設定時為 <see cref="OdfSlideTransition.None"/>。</returns>
+    /// <param name="slideIndex">投影片索引位置</param>
+    /// <returns>投影片切換效果類型；未設定時為 <see cref="OdfSlideTransition.None"/></returns>
     public OdfSlideTransition GetSlideTransition(int slideIndex)
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)
@@ -243,8 +243,8 @@ public partial class PresentationDocument
     /// <summary>
     /// 設定指定索引投影片的切換效果。
     /// </summary>
-    /// <param name="slideIndex">投影片索引位置。</param>
-    /// <param name="transition">投影片切換效果類型。</param>
+    /// <param name="slideIndex">投影片索引位置</param>
+    /// <param name="transition">投影片切換效果類型</param>
     public void SetSlideTransition(int slideIndex, OdfSlideTransition transition)
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)

@@ -20,8 +20,8 @@ public sealed class TextDocumentBuilder
     /// <summary>
     /// 設定文件中繼資料。
     /// </summary>
-    /// <param name="configure">中繼資料設定委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="configure">中繼資料設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextDocumentBuilder WithMetadata(Action<TextDocumentMetadataBuilder> configure)
     {
         if (configure is null)
@@ -33,9 +33,9 @@ public sealed class TextDocumentBuilder
     /// <summary>
     /// 新增標題。
     /// </summary>
-    /// <param name="text">標題文字。</param>
-    /// <param name="level">大綱階層。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">標題文字</param>
+    /// <param name="level">大綱階層</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextDocumentBuilder AddHeading(string text, int level = 1)
     {
         _document.Body.Headings.Add(text, level);
@@ -45,9 +45,9 @@ public sealed class TextDocumentBuilder
     /// <summary>
     /// 新增段落。
     /// </summary>
-    /// <param name="text">段落文字。</param>
-    /// <param name="configure">段落樣式設定委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">段落文字</param>
+    /// <param name="configure">段落樣式設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextDocumentBuilder AddParagraph(string text, Action<TextRunFormattingBuilder>? configure = null)
     {
         OdfParagraph paragraph = _document.Body.Paragraphs.Add(text);
@@ -64,8 +64,8 @@ public sealed class TextDocumentBuilder
     /// <summary>
     /// 新增由多個文字片段組成的段落。
     /// </summary>
-    /// <param name="configure">段落內容設定委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="configure">段落內容設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextDocumentBuilder AddParagraph(Action<TextParagraphBuilder> configure)
     {
         if (configure is null)
@@ -76,10 +76,10 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// 新增項目清單。
+    /// 新增專案清單。
     /// </summary>
-    /// <param name="configure">清單內容設定委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="configure">清單內容設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextDocumentBuilder AddList(Action<TextListBuilder> configure)
     {
         if (configure is null)
@@ -92,7 +92,7 @@ public sealed class TextDocumentBuilder
     /// <summary>
     /// 建立並傳回文字文件。
     /// </summary>
-    /// <returns>建立完成的文字文件。</returns>
+    /// <returns>建立完成的文字文件</returns>
     public TextDocument Build()
     {
         return _document;
@@ -198,8 +198,8 @@ public sealed class TextDocumentMetadataBuilder
     /// <summary>
     /// 設定標題。
     /// </summary>
-    /// <param name="value">標題。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="value">標題</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextDocumentMetadataBuilder Title(string value)
     {
         _metadata.Title = value;
@@ -209,8 +209,8 @@ public sealed class TextDocumentMetadataBuilder
     /// <summary>
     /// 設定作者。
     /// </summary>
-    /// <param name="value">作者。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="value">作者</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextDocumentMetadataBuilder Author(string value)
     {
         _metadata.Creator = value;
@@ -220,8 +220,8 @@ public sealed class TextDocumentMetadataBuilder
     /// <summary>
     /// 設定主旨。
     /// </summary>
-    /// <param name="value">主旨。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="value">主旨</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextDocumentMetadataBuilder Subject(string value)
     {
         _metadata.Subject = value;
@@ -231,8 +231,8 @@ public sealed class TextDocumentMetadataBuilder
     /// <summary>
     /// 設定描述。
     /// </summary>
-    /// <param name="value">描述。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="value">描述</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextDocumentMetadataBuilder Description(string value)
     {
         _metadata.Description = value;
@@ -257,8 +257,8 @@ public sealed class TextParagraphBuilder
     /// <summary>
     /// 新增純文字片段。
     /// </summary>
-    /// <param name="text">文字內容。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">文字內容</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextParagraphBuilder Append(string text)
     {
         _paragraph.AddTextRun(text);
@@ -268,9 +268,9 @@ public sealed class TextParagraphBuilder
     /// <summary>
     /// 新增帶格式的文字片段。
     /// </summary>
-    /// <param name="text">文字內容。</param>
-    /// <param name="configure">格式設定委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">文字內容</param>
+    /// <param name="configure">格式設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextParagraphBuilder Append(string text, Action<TextRunFormattingBuilder> configure)
     {
         if (configure is null)
@@ -297,7 +297,7 @@ public sealed class TextRunFormattingBuilder
     /// <summary>
     /// 設定文字為粗體。
     /// </summary>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <returns>目前 builder 執行個體</returns>
     public TextRunFormattingBuilder Bold()
     {
         BoldValue = true;
@@ -307,7 +307,7 @@ public sealed class TextRunFormattingBuilder
     /// <summary>
     /// 設定文字為斜體。
     /// </summary>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <returns>目前 builder 執行個體</returns>
     public TextRunFormattingBuilder Italic()
     {
         ItalicValue = true;
@@ -317,7 +317,7 @@ public sealed class TextRunFormattingBuilder
     /// <summary>
     /// 設定文字底線。
     /// </summary>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <returns>目前 builder 執行個體</returns>
     public TextRunFormattingBuilder Underline()
     {
         UnderlineValue = true;
@@ -327,8 +327,8 @@ public sealed class TextRunFormattingBuilder
     /// <summary>
     /// 設定文字大小。
     /// </summary>
-    /// <param name="points">點數大小。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="points">點數大小</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextRunFormattingBuilder FontSize(double points)
     {
         FontSizeValue = points;
@@ -338,8 +338,8 @@ public sealed class TextRunFormattingBuilder
     /// <summary>
     /// 設定文字色彩。
     /// </summary>
-    /// <param name="color">色彩值，格式為 <c>#RRGGBB</c>。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="color">色彩值，格式為 <c>#RRGGBB</c></param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextRunFormattingBuilder Color(string color)
     {
         if (!OdfColor.TryParse(color, out _))
@@ -365,10 +365,10 @@ public sealed class TextListBuilder
     }
 
     /// <summary>
-    /// 新增清單項目。
+    /// 新增清單專案。
     /// </summary>
-    /// <param name="text">項目文字。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">專案文字</param>
+    /// <returns>目前 builder 執行個體</returns>
     public TextListBuilder Item(string text)
     {
         _list.AddItem(text);

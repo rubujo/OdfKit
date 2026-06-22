@@ -24,11 +24,11 @@ internal static class OdfSignatureSigner
     /// <summary>
     /// 對 ODF 封裝中的關鍵檔案進行數位簽署（非同步）。
     /// </summary>
-    /// <param name="package">要簽署的 ODF 封裝。</param>
-    /// <param name="certificate">用於簽署的 X.509 憑證。</param>
-    /// <param name="options">簽署選項。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步簽署作業的工作。</returns>
+    /// <param name="package">要簽署的 ODF 封裝</param>
+    /// <param name="certificate">用於簽署的 X.509 憑證</param>
+    /// <param name="options">簽署選項</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步簽署作業的工作</returns>
     internal static async Task SignAsync(
         OdfPackage package,
         X509Certificate2 certificate,

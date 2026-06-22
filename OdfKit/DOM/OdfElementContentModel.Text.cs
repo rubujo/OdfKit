@@ -27,8 +27,8 @@ public partial class OfficeTextElement
     /// <summary>
     /// 在 <c>office:text</c> 末尾新增段落。
     /// </summary>
-    /// <param name="text">段落文字內容。</param>
-    /// <returns>新增的 <c>text:p</c> 元素。</returns>
+    /// <param name="text">段落文字內容</param>
+    /// <returns>新增的 <c>text:p</c> 元素</returns>
     public TextPElement AppendParagraph(string text = "")
     {
         TextPElement paragraph = AppendElement(new TextPElement("text"));
@@ -43,9 +43,9 @@ public partial class OfficeTextElement
     /// <summary>
     /// 在 <c>office:text</c> 末尾新增標題。
     /// </summary>
-    /// <param name="text">標題文字內容。</param>
-    /// <param name="outlineLevel">大綱階層，預設為 1。</param>
-    /// <returns>新增的 <c>text:h</c> 元素。</returns>
+    /// <param name="text">標題文字內容</param>
+    /// <param name="outlineLevel">大綱階層，預設為 1</param>
+    /// <returns>新增的 <c>text:h</c> 元素</returns>
     public TextHElement AppendHeading(string text, int outlineLevel = 1)
     {
         TextHElement heading = AppendElement(new TextHElement("text"));
@@ -55,10 +55,10 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
-    /// 在 <c>office:text</c> 末尾新增項目清單。
+    /// 在 <c>office:text</c> 末尾新增專案清單。
     /// </summary>
-    /// <param name="styleName">選用的清單樣式名稱。</param>
-    /// <returns>新增的 <c>text:list</c> 元素。</returns>
+    /// <param name="styleName">選用的清單樣式名稱</param>
+    /// <returns>新增的 <c>text:list</c> 元素</returns>
     public TextListElement AppendList(string? styleName = null)
     {
         TextListElement list = AppendElement(new TextListElement("text"));
@@ -73,8 +73,8 @@ public partial class OfficeTextElement
     /// <summary>
     /// 在 <c>office:text</c> 末尾新增表格。
     /// </summary>
-    /// <param name="name">選用的表格名稱。</param>
-    /// <returns>新增的 <c>table:table</c> 元素。</returns>
+    /// <param name="name">選用的表格名稱</param>
+    /// <returns>新增的 <c>table:table</c> 元素</returns>
     public TableTableElement AppendTable(string? name = null)
     {
         TableTableElement table = AppendElement(new TableTableElement("table"));
@@ -89,8 +89,8 @@ public partial class OfficeTextElement
     /// <summary>
     /// 在 <c>office:text</c> 末尾新增章節。
     /// </summary>
-    /// <param name="name">章節名稱。</param>
-    /// <returns>新增的 <c>text:section</c> 元素。</returns>
+    /// <param name="name">章節名稱</param>
+    /// <returns>新增的 <c>text:section</c> 元素</returns>
     public TextSectionElement AppendSection(string name)
     {
         TextSectionElement section = AppendElement(new TextSectionElement("text"));

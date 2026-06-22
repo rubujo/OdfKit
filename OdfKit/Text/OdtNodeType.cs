@@ -16,7 +16,7 @@ public enum OdtNodeType
     Heading,
 
     /// <summary>
-    /// 清單項目。
+    /// 清單專案。
     /// </summary>
     ListItem,
 

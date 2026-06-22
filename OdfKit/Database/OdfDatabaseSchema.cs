@@ -19,7 +19,7 @@ public sealed class OdfDatabaseSchema
     /// <summary>
     /// 初始化 <see cref="OdfDatabaseSchema"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">相關聯的 ODB 資料庫文件。</param>
+    /// <param name="document">相關聯的 ODB 資料庫文件</param>
     internal OdfDatabaseSchema(OdfDatabaseDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
@@ -34,9 +34,9 @@ public sealed class OdfDatabaseSchema
     /// <summary>
     /// 新增一個資料表結構至 Schema 中。
     /// </summary>
-    /// <param name="table">要新增的資料表結構。</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="table"/> 為 <see langword="null"/> 時擲出。</exception>
-    /// <exception cref="InvalidOperationException">當資料表名稱已存在於 Schema 中時擲出。</exception>
+    /// <param name="table">要新增的資料表結構</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="table"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <exception cref="InvalidOperationException">當資料表名稱已存在於 Schema 中時擲出</exception>
     public void AddTable(OdfSchemaTable table)
     {
         if (table is null)
@@ -56,9 +56,9 @@ public sealed class OdfDatabaseSchema
     /// <summary>
     /// 從 Schema 中移除指定名稱的資料表結構。
     /// </summary>
-    /// <param name="tableName">要移除的資料表名稱。</param>
-    /// <returns>如果成功移除，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
-    /// <exception cref="ArgumentException">當 <paramref name="tableName"/> 為空時擲出。</exception>
+    /// <param name="tableName">要移除的資料表名稱</param>
+    /// <returns>如果成功移除，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
+    /// <exception cref="ArgumentException">當 <paramref name="tableName"/> 為空時擲出</exception>
     public bool RemoveTable(string tableName)
     {
         if (string.IsNullOrWhiteSpace(tableName))
@@ -460,8 +460,8 @@ public sealed class OdfSchemaTable
     /// <summary>
     /// 初始化 <see cref="OdfSchemaTable"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="name">資料表名稱。</param>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空時擲出。</exception>
+    /// <param name="name">資料表名稱</param>
+    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空時擲出</exception>
     public OdfSchemaTable(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -505,11 +505,11 @@ public sealed class OdfSchemaColumn
     /// <summary>
     /// 初始化 <see cref="OdfSchemaColumn"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="name">欄位名稱。</param>
-    /// <param name="typeName">資料型別名稱。</param>
-    /// <param name="isNullable">是否允許為 null。</param>
-    /// <param name="isAutoIncrement">是否為自動遞增欄位。</param>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空時擲出。</exception>
+    /// <param name="name">欄位名稱</param>
+    /// <param name="typeName">資料型別名稱</param>
+    /// <param name="isNullable">是否允許為 null</param>
+    /// <param name="isAutoIncrement">是否為自動遞增欄位</param>
+    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空時擲出</exception>
     public OdfSchemaColumn(string name, string typeName = "VARCHAR", bool isNullable = true, bool isAutoIncrement = false)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -566,11 +566,11 @@ public sealed class OdfSchemaIndex
     /// <summary>
     /// 初始化 <see cref="OdfSchemaIndex"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="name">索引名稱。</param>
-    /// <param name="isUnique">是否為唯一索引。</param>
-    /// <param name="columns">索引所包含的欄位名稱清單。</param>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空時擲出。</exception>
-    /// <exception cref="ArgumentNullException">當 <paramref name="columns"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <param name="name">索引名稱</param>
+    /// <param name="isUnique">是否為唯一索引</param>
+    /// <param name="columns">索引所包含的欄位名稱清單</param>
+    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空時擲出</exception>
+    /// <exception cref="ArgumentNullException">當 <paramref name="columns"/> 為 <see langword="null"/> 時擲出</exception>
     public OdfSchemaIndex(string name, bool isUnique, IEnumerable<string> columns)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -607,9 +607,9 @@ public sealed class OdfSchemaPrimaryKey
     /// <summary>
     /// 初始化 <see cref="OdfSchemaPrimaryKey"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="name">主鍵約束名稱。</param>
-    /// <param name="columns">包含在主鍵中的欄位名稱清單。</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="columns"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <param name="name">主鍵約束名稱</param>
+    /// <param name="columns">包含在主鍵中的欄位名稱清單</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="columns"/> 為 <see langword="null"/> 時擲出</exception>
     public OdfSchemaPrimaryKey(string? name, IEnumerable<string> columns)
     {
         Name = name;
@@ -635,13 +635,13 @@ public sealed class OdfSchemaForeignKey
     /// <summary>
     /// 初始化 <see cref="OdfSchemaForeignKey"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="name">外鍵約束名稱。</param>
-    /// <param name="referencedTable">被參照的目標資料表名稱。</param>
-    /// <param name="keyColumns">外鍵與主鍵欄位對應清單。</param>
-    /// <param name="updateRule">更新規則。</param>
-    /// <param name="deleteRule">刪除規則。</param>
-    /// <exception cref="ArgumentException">當 <paramref name="referencedTable"/> 為空時擲出。</exception>
-    /// <exception cref="ArgumentNullException">當 <paramref name="keyColumns"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <param name="name">外鍵約束名稱</param>
+    /// <param name="referencedTable">被參照的目標資料表名稱</param>
+    /// <param name="keyColumns">外鍵與主鍵欄位對應清單</param>
+    /// <param name="updateRule">更新規則</param>
+    /// <param name="deleteRule">刪除規則</param>
+    /// <exception cref="ArgumentException">當 <paramref name="referencedTable"/> 為空時擲出</exception>
+    /// <exception cref="ArgumentNullException">當 <paramref name="keyColumns"/> 為 <see langword="null"/> 時擲出</exception>
     public OdfSchemaForeignKey(
         string? name,
         string referencedTable,
@@ -695,8 +695,8 @@ public sealed class OdfSchemaKeyMapping
     /// <summary>
     /// 初始化 <see cref="OdfSchemaKeyMapping"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="column">目前資料表欄位名稱。</param>
-    /// <param name="relatedColumn">參照資料表欄位名稱。</param>
+    /// <param name="column">目前資料表欄位名稱</param>
+    /// <param name="relatedColumn">參照資料表欄位名稱</param>
     public OdfSchemaKeyMapping(string column, string relatedColumn)
     {
         Column = column ?? string.Empty;

@@ -104,12 +104,12 @@ public class OdfComment
             var annotationNode = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
             annotationNode.SetAttribute("name", OdfNamespaces.Office, Name, "office");
 
-            // 建立者項目
+            // 建立者專案
             var creator = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc");
             creator.TextContent = Author;
             annotationNode.AppendChild(creator);
 
-            // 日期項目
+            // 日期專案
             var dateNode = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc");
             dateNode.TextContent = Date.ToString("yyyy-MM-ddTHH:mm:ssZ");
             annotationNode.AppendChild(dateNode);
@@ -162,12 +162,12 @@ public class OdfComment
                 annotationNode.SetAttribute("annotation-parent", OdfNamespaces.Office, frame.ParentName, "office");
             }
 
-            // 建立者項目
+            // 建立者專案
             var creator = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc");
             creator.TextContent = frame.Comment.Author;
             annotationNode.AppendChild(creator);
 
-            // 日期項目
+            // 日期專案
             var dateNode = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc");
             dateNode.TextContent = frame.Comment.Date.ToString("yyyy-MM-ddTHH:mm:ssZ");
             annotationNode.AppendChild(dateNode);
@@ -241,7 +241,7 @@ public class OdfComment
     }
 
     /// <summary>
-    /// 將標準的 ODF 1.3 XML 扁平同級項目還原解析為 <see cref="OdfComment"/> 物件樹的輔助方法。
+    /// 將標準的 ODF 1.3 XML 扁平同級專案還原解析為 <see cref="OdfComment"/> 物件樹的輔助方法。
     /// </summary>
     /// <param name="node">要解析的 <see cref="OdfNode"/> 節點</param>
     /// <returns>解析後的 <see cref="OdfComment"/> 根註解物件</returns>

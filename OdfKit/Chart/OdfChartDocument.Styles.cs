@@ -103,10 +103,10 @@ public partial class OdfChartDocument
     /// <summary>
     /// 建立或取得指定名稱的圖表自動樣式。
     /// </summary>
-    /// <param name="name">樣式名稱。</param>
-    /// <returns>可編輯的圖表樣式物件。</returns>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空白時擲出。</exception>
-    /// <exception cref="InvalidOperationException">當名稱已被非圖表樣式使用時擲出。</exception>
+    /// <param name="name">樣式名稱</param>
+    /// <returns>可編輯的圖表樣式物件</returns>
+    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空白時擲出</exception>
+    /// <exception cref="InvalidOperationException">當名稱已被非圖表樣式使用時擲出</exception>
     public OdfChartStyle CreateChartStyle(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -138,8 +138,8 @@ public partial class OdfChartDocument
     /// <summary>
     /// 嘗試取得指定名稱的圖表樣式摘要。
     /// </summary>
-    /// <param name="name">樣式名稱。</param>
-    /// <returns>圖表樣式摘要；若不存在或不是圖表樣式則為 <see langword="null"/>。</returns>
+    /// <param name="name">樣式名稱</param>
+    /// <returns>圖表樣式摘要；若不存在或不是圖表樣式則為 <see langword="null"/></returns>
     public OdfChartStyleInfo? TryGetChartStyle(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -176,8 +176,8 @@ public partial class OdfChartDocument
     /// <summary>
     /// 移除指定名稱的圖表自動樣式。
     /// </summary>
-    /// <param name="name">樣式名稱。</param>
-    /// <returns>若成功移除則為 <see langword="true"/>；找不到或非圖表樣式時為 <see langword="false"/>。</returns>
+    /// <param name="name">樣式名稱</param>
+    /// <returns>若成功移除則為 <see langword="true"/>；找不到或非圖表樣式時為 <see langword="false"/></returns>
     public bool RemoveChartStyle(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -200,7 +200,7 @@ public partial class OdfChartDocument
     /// <summary>
     /// 取得文件中所有圖表自動樣式的摘要清單。
     /// </summary>
-    /// <returns>圖表樣式摘要清單。</returns>
+    /// <returns>圖表樣式摘要清單</returns>
     public IReadOnlyList<OdfChartStyleInfo> GetChartStyles()
     {
         var styles = new List<OdfChartStyleInfo>();

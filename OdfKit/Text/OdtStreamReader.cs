@@ -22,8 +22,8 @@ public sealed class OdtStreamReader : IDisposable
     /// <summary>
     /// 從資料流初始化 <see cref="OdtStreamReader"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="stream">ODT 檔案資料流。</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="stream"/> 為 null 時擲出。</exception>
+    /// <param name="stream">ODT 檔案資料流</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="stream"/> 為 null 時擲出</exception>
     public OdtStreamReader(Stream stream)
     {
         if (stream is null)
@@ -37,8 +37,8 @@ public sealed class OdtStreamReader : IDisposable
     /// <summary>
     /// 從檔案路徑初始化 <see cref="OdtStreamReader"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="path">ODT 檔案路徑。</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="path"/> 為 null 時擲出。</exception>
+    /// <param name="path">ODT 檔案路徑</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="path"/> 為 null 時擲出</exception>
     public OdtStreamReader(string path)
     {
         if (path is null)
@@ -72,7 +72,7 @@ public sealed class OdtStreamReader : IDisposable
     /// <summary>
     /// 讀取下一個文字元素；回傳 false 代表文件結束。
     /// </summary>
-    /// <returns>若成功讀取元素則為 true，否則為 false。</returns>
+    /// <returns>若成功讀取元素則為 true，否則為 false</returns>
     public bool Read()
     {
         if (!_started)

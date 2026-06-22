@@ -3,10 +3,10 @@
 /// <summary>
 /// 表示簡報中某一投影片切換效果的摘要資訊。
 /// </summary>
-/// <param name="slideIndex">投影片索引位置。</param>
-/// <param name="slideName">投影片名稱。</param>
-/// <param name="transition">投影片切換效果類型。</param>
-/// <param name="duration">切換持續時間原文（<c>smil:dur</c>）。</param>
+/// <param name="slideIndex">投影片索引位置</param>
+/// <param name="slideName">投影片名稱</param>
+/// <param name="transition">投影片切換效果類型</param>
+/// <param name="duration">切換持續時間原文（<c>smil:dur</c>）</param>
 public sealed class OdfSlideTransitionInfo(
     int slideIndex,
     string slideName,

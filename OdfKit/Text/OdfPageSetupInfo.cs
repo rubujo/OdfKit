@@ -3,14 +3,14 @@
 /// <summary>
 /// 表示文字文件中一個主頁面樣式（<c>style:master-page</c>）的頁首頁尾摘要資訊。
 /// </summary>
-/// <param name="name">主頁面樣式名稱。</param>
-/// <param name="pageLayoutName">對應的頁面版面配置名稱。</param>
-/// <param name="headerText">頁首文字。</param>
-/// <param name="headerLeftText">左頁首文字。</param>
-/// <param name="footerText">頁尾文字。</param>
-/// <param name="footerLeftText">左頁尾文字。</param>
-/// <param name="headerFirstText">首頁頁首文字。</param>
-/// <param name="footerFirstText">首頁頁尾文字。</param>
+/// <param name="name">主頁面樣式名稱</param>
+/// <param name="pageLayoutName">對應的頁面版面配置名稱</param>
+/// <param name="headerText">頁首文字</param>
+/// <param name="headerLeftText">左頁首文字</param>
+/// <param name="footerText">頁尾文字</param>
+/// <param name="footerLeftText">左頁尾文字</param>
+/// <param name="headerFirstText">首頁頁首文字</param>
+/// <param name="footerFirstText">首頁頁尾文字</param>
 public sealed class OdfPageSetupInfo(
     string name,
     string? pageLayoutName,

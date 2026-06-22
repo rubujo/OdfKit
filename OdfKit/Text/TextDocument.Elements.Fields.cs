@@ -25,19 +25,19 @@ public partial class TextDocument
         TextDocumentFieldsEngine.AddHeading(this, MutationContext, text, outlineLevel);
 
     /// <summary>
-    /// 新增一個項目清單至文件本文結尾。
+    /// 新增一個專案清單至文件本文結尾。
     /// </summary>
-    /// <param name="styleName">項目清單樣式名稱</param>
-    /// <returns>新建立的清單項目</returns>
+    /// <param name="styleName">專案清單樣式名稱</param>
+    /// <returns>新建立的清單專案</returns>
     public OdfList AddList(string? styleName = null) =>
         TextDocumentFieldsEngine.AddList(this, MutationContext, styleName);
 
     /// <summary>
     /// 以多層級樣式定義建立清單，樣式寫入 styles.xml 的 office:styles 區段。
     /// </summary>
-    /// <param name="styleName">清單樣式名稱，必須唯一。</param>
-    /// <param name="levels">各層級的樣式設定；Level 屬性需從 1 開始連續遞增。</param>
-    /// <returns>新建立的清單（已套用樣式名稱）。</returns>
+    /// <param name="styleName">清單樣式名稱，必須唯一</param>
+    /// <param name="levels">各層級的樣式設定；Level 屬性需從 1 開始連續遞增</param>
+    /// <returns>新建立的清單（已套用樣式名稱）</returns>
     public OdfList AddListWithStyle(string styleName, IReadOnlyList<OdfListLevelStyle> levels) =>
         TextDocumentFieldsEngine.AddListWithStyle(this, MutationContext, styleName, levels);
 
@@ -79,10 +79,10 @@ public partial class TextDocument
         TextDocumentFieldsEngine.AddSequenceField(paragraph, name, numFormat);
 
     /// <summary>
-    /// 在指定的段落中新增參考項目欄位。
+    /// 在指定的段落中新增參考專案欄位。
     /// </summary>
     /// <param name="paragraph">要新增欄位的段落執行個體</param>
-    /// <param name="refName">要參考的項目名稱</param>
+    /// <param name="refName">要參考的專案名稱</param>
     internal void AddReferenceField(OdfParagraph paragraph, string refName) =>
         TextDocumentFieldsEngine.AddReferenceField(paragraph, refName);
 
@@ -98,9 +98,9 @@ public partial class TextDocument
     /// <summary>
     /// 在指定的段落中新增書籤參照欄位。
     /// </summary>
-    /// <param name="paragraph">要新增欄位的段落執行個體。</param>
-    /// <param name="bookmarkName">要參照的書籤名稱。</param>
-    /// <param name="referenceFormat">參照格式，預設為 "text"。</param>
+    /// <param name="paragraph">要新增欄位的段落執行個體</param>
+    /// <param name="bookmarkName">要參照的書籤名稱</param>
+    /// <param name="referenceFormat">參照格式，預設為 "text"</param>
     internal void AddBookmarkReferenceField(OdfParagraph paragraph, string bookmarkName, string referenceFormat = "text") =>
         TextDocumentFieldsEngine.AddBookmarkReferenceField(paragraph, bookmarkName, referenceFormat);
 
@@ -124,22 +124,22 @@ public partial class TextDocument
     /// <summary>
     /// 在指定的段落中新增資料庫欄位顯示欄位 (<c>text:database-display</c>)。
     /// </summary>
-    /// <param name="paragraph">要新增欄位的段落執行個體。</param>
-    /// <param name="tableName">資料表、查詢或指令名稱。</param>
-    /// <param name="columnName">要顯示的欄位名稱。</param>
-    /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"。</param>
-    /// <param name="databaseName">資料庫連線名稱。</param>
+    /// <param name="paragraph">要新增欄位的段落執行個體</param>
+    /// <param name="tableName">資料表、查詢或指令名稱</param>
+    /// <param name="columnName">要顯示的欄位名稱</param>
+    /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"</param>
+    /// <param name="databaseName">資料庫連線名稱</param>
     internal void AddDatabaseDisplayField(OdfParagraph paragraph, string tableName, string columnName, string? tableType = null, string? databaseName = null) =>
         TextDocumentFieldsEngine.AddDatabaseDisplayField(paragraph, tableName, columnName, tableType, databaseName);
 
     /// <summary>
     /// 在指定的段落中新增資料庫下一筆記錄欄位 (<c>text:database-next</c>)，用於合併列印或報表的逐筆換行。
     /// </summary>
-    /// <param name="paragraph">要新增欄位的段落執行個體。</param>
-    /// <param name="tableName">資料表、查詢或指令名稱。</param>
-    /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"。</param>
-    /// <param name="databaseName">資料庫連線名稱。</param>
-    /// <param name="condition">換行前的判斷條件式。</param>
+    /// <param name="paragraph">要新增欄位的段落執行個體</param>
+    /// <param name="tableName">資料表、查詢或指令名稱</param>
+    /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"</param>
+    /// <param name="databaseName">資料庫連線名稱</param>
+    /// <param name="condition">換行前的判斷條件式</param>
     internal void AddDatabaseNextField(OdfParagraph paragraph, string tableName, string? tableType = null, string? databaseName = null, string? condition = null) =>
         TextDocumentFieldsEngine.AddDatabaseNextField(paragraph, tableName, tableType, databaseName, condition);
 

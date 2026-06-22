@@ -18,7 +18,7 @@ namespace OdfKit.Spreadsheet;
 /// <param name="row">以 0 為基準的列索引</param>
 /// <param name="col">以 0 為基準的欄索引</param>
 /// <param name="doc">試算表文件</param>
-/// <param name="sheetName">所在工作表名稱。</param>
+/// <param name="sheetName">所在工作表名稱</param>
 public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc, string sheetName = "")
 {
     /// <summary>

@@ -213,8 +213,8 @@ public class OdfTextRun
     /// <summary>
     /// 設定此文字片段是否為粗體。
     /// </summary>
-    /// <param name="bold">是否粗體。</param>
-    /// <returns>文字片段本身。</returns>
+    /// <param name="bold">是否粗體</param>
+    /// <returns>文字片段本身</returns>
     public OdfTextRun WithBold(bool bold = true)
     {
         IsBold = bold;
@@ -224,8 +224,8 @@ public class OdfTextRun
     /// <summary>
     /// 設定此文字片段是否為斜體。
     /// </summary>
-    /// <param name="italic">是否斜體。</param>
-    /// <returns>文字片段本身。</returns>
+    /// <param name="italic">是否斜體</param>
+    /// <returns>文字片段本身</returns>
     public OdfTextRun WithItalic(bool italic = true)
     {
         IsItalic = italic;
@@ -235,8 +235,8 @@ public class OdfTextRun
     /// <summary>
     /// 設定此文字片段是否加上刪除線。
     /// </summary>
-    /// <param name="strikethrough">是否加上刪除線。</param>
-    /// <returns>文字片段本身。</returns>
+    /// <param name="strikethrough">是否加上刪除線</param>
+    /// <returns>文字片段本身</returns>
     public OdfTextRun WithStrikethrough(bool strikethrough = true)
     {
         IsStrikethrough = strikethrough;
@@ -246,8 +246,8 @@ public class OdfTextRun
     /// <summary>
     /// 設定此文字片段是否為上標。
     /// </summary>
-    /// <param name="superscript">是否為上標。</param>
-    /// <returns>文字片段本身。</returns>
+    /// <param name="superscript">是否為上標</param>
+    /// <returns>文字片段本身</returns>
     public OdfTextRun WithSuperscript(bool superscript = true)
     {
         IsSuperscript = superscript;
@@ -257,8 +257,8 @@ public class OdfTextRun
     /// <summary>
     /// 設定此文字片段是否為下標。
     /// </summary>
-    /// <param name="subscript">是否為下標。</param>
-    /// <returns>文字片段本身。</returns>
+    /// <param name="subscript">是否為下標</param>
+    /// <returns>文字片段本身</returns>
     public OdfTextRun WithSubscript(bool subscript = true)
     {
         IsSubscript = subscript;
@@ -268,8 +268,8 @@ public class OdfTextRun
     /// <summary>
     /// 設定此文字片段的西文、東亞及複雜字型大小。
     /// </summary>
-    /// <param name="size">字型大小，例如 <c>12pt</c>。</param>
-    /// <returns>文字片段本身。</returns>
+    /// <param name="size">字型大小，例如 <c>12pt</c></param>
+    /// <returns>文字片段本身</returns>
     public OdfTextRun WithFontSize(string size)
     {
         SetFontSize(size);
@@ -279,10 +279,10 @@ public class OdfTextRun
     /// <summary>
     /// 設定此文字片段的字型名稱。
     /// </summary>
-    /// <param name="westernFont">西文字型名稱。</param>
-    /// <param name="asianFont">東亞（中日韓）字型名稱；未指定時沿用 <paramref name="westernFont"/>。</param>
-    /// <param name="complexFont">複雜文字字型名稱；未指定時沿用 <paramref name="westernFont"/>。</param>
-    /// <returns>文字片段本身。</returns>
+    /// <param name="westernFont">西文字型名稱</param>
+    /// <param name="asianFont">東亞（中日韓）字型名稱；未指定時沿用 <paramref name="westernFont"/></param>
+    /// <param name="complexFont">複雜文字字型名稱；未指定時沿用 <paramref name="westernFont"/></param>
+    /// <returns>文字片段本身</returns>
     public OdfTextRun WithFontName(string westernFont, string? asianFont = null, string? complexFont = null)
     {
         SetFont(westernFont, asianFont, complexFont);
@@ -292,8 +292,8 @@ public class OdfTextRun
     /// <summary>
     /// 設定此文字片段的字色。
     /// </summary>
-    /// <param name="hexColor">十六進位顏色字串，例如 <c>#FF0000</c>。</param>
-    /// <returns>文字片段本身。</returns>
+    /// <param name="hexColor">十六進位顏色字串，例如 <c>#FF0000</c></param>
+    /// <returns>文字片段本身</returns>
     public OdfTextRun WithColor(string hexColor)
     {
         Color = hexColor;

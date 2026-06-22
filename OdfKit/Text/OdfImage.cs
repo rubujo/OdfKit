@@ -52,8 +52,8 @@ public class OdfImage
     /// <summary>
     /// 將此圖片標記為裝飾性，輔助技術應略過此物件。
     /// </summary>
-    /// <param name="decorative">是否標記為裝飾性。</param>
-    /// <returns>目前圖片執行個體。</returns>
+    /// <param name="decorative">是否標記為裝飾性</param>
+    /// <returns>目前圖片執行個體</returns>
     public OdfImage MarkAsDecorative(bool decorative = true)
     {
         if (decorative)

@@ -90,7 +90,7 @@ public class ConditionalFormatTests
 
     /// <summary>
     /// 驗證資料橫條在未指定負值色彩時，仍會寫入 negative-color 屬性並套用預設色彩
-    /// （真實 LibreOffice 一律會寫出此屬性，省略會導致長條比例計算異常）。
+    /// （真實 LibreOffice 一律會寫出此屬性，省略會導致長條比例計算例外）。
     /// </summary>
     [Fact]
     public void AddDataBarFormat_NoNegativeColor_WritesDefaultNegativeColor()

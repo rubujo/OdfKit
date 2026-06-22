@@ -13,9 +13,9 @@ public partial class OdfDrawPage
     /// <summary>
     /// 將指定圖形合併為新群組。
     /// </summary>
-    /// <param name="shapeIds">要群組的圖形識別碼集合。</param>
-    /// <param name="name">選用的群組名稱。</param>
-    /// <returns>新建立的群組執行個體。</returns>
+    /// <param name="shapeIds">要群組的圖形識別碼集合</param>
+    /// <param name="name">選用的群組名稱</param>
+    /// <returns>新建立的群組執行個體</returns>
     public OdfDrawGroup GroupShapes(IEnumerable<string> shapeIds, string? name = null)
     {
         if (shapeIds is null)

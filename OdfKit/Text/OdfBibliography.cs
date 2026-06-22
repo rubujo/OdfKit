@@ -29,7 +29,7 @@ public class OdfBibliography : OdfIndex
     protected override string GetSourceLocalName() => "bibliography-source";
 
     /// <summary>
-    /// 新增文獻目錄項目範本。
+    /// 新增文獻目錄專案範本。
     /// </summary>
     /// <param name="bibType">文獻類型</param>
     /// <param name="styleName">樣式名稱</param>

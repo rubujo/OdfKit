@@ -15,7 +15,7 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     /// <summary>
     /// 使用沒有時區 offset 的日內時間建立 <see cref="OdfTime"/>。
     /// </summary>
-    /// <param name="timeOfDay">日內時間，範圍必須大於等於 00:00:00 且小於 24:00:00。</param>
+    /// <param name="timeOfDay">日內時間，範圍必須大於等於 00:00:00 且小於 24:00:00</param>
     public OdfTime(TimeSpan timeOfDay)
         : this(timeOfDay, null)
     {
@@ -24,9 +24,9 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     /// <summary>
     /// 使用日內時間與選用時區 offset 建立 <see cref="OdfTime"/>。
     /// </summary>
-    /// <param name="timeOfDay">日內時間，範圍必須大於等於 00:00:00 且小於 24:00:00。</param>
-    /// <param name="offset">選用時區 offset，範圍必須在 -14:00 至 +14:00 之間。</param>
-    /// <exception cref="ArgumentOutOfRangeException">當日內時間或時區 offset 超出 XML Schema <c>time</c> 可接受範圍時擲回。</exception>
+    /// <param name="timeOfDay">日內時間，範圍必須大於等於 00:00:00 且小於 24:00:00</param>
+    /// <param name="offset">選用時區 offset，範圍必須在 -14:00 至 +14:00 之間</param>
+    /// <exception cref="ArgumentOutOfRangeException">當日內時間或時區 offset 超出 XML Schema <c>time</c> 可接受範圍時擲回</exception>
     public OdfTime(TimeSpan timeOfDay, TimeSpan? offset)
     {
         if (timeOfDay < TimeSpan.Zero || timeOfDay >= OneDay)
@@ -56,9 +56,9 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     /// <summary>
     /// 嘗試解析 XML Schema <c>time</c> 字串。
     /// </summary>
-    /// <param name="value">要解析的字串。</param>
-    /// <param name="time">成功時傳回解析後的時間值。</param>
-    /// <returns>若字串符合 XML Schema <c>time</c> 的常用 lexical form 則為 <see langword="true"/>。</returns>
+    /// <param name="value">要解析的字串</param>
+    /// <param name="time">成功時傳回解析後的時間值</param>
+    /// <returns>若字串符合 XML Schema <c>time</c> 的常用 lexical form 則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfTime time)
     {
         time = default;
@@ -99,7 +99,7 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     /// <summary>
     /// 傳回 XML Schema <c>time</c> 字串。
     /// </summary>
-    /// <returns>可寫入 ODF 屬性的時間字串。</returns>
+    /// <returns>可寫入 ODF 屬性的時間字串</returns>
     public override string ToString()
     {
         string formatted = FormatTimeOfDay(TimeOfDay);
@@ -127,8 +127,8 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     /// <summary>
     /// 判斷目前值是否等於另一個 ODF 時間。
     /// </summary>
-    /// <param name="other">要比較的 ODF 時間。</param>
-    /// <returns>若日內時間與時區 offset 都相等則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的 ODF 時間</param>
+    /// <returns>若日內時間與時區 offset 都相等則為 <see langword="true"/></returns>
     public bool Equals(OdfTime other) => TimeOfDay == other.TimeOfDay && Offset == other.Offset;
 
     /// <inheritdoc />
@@ -140,17 +140,17 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     /// <summary>
     /// 判斷兩個 ODF 時間是否相等。
     /// </summary>
-    /// <param name="left">左側 ODF 時間。</param>
-    /// <param name="right">右側 ODF 時間。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側 ODF 時間</param>
+    /// <param name="right">右側 ODF 時間</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfTime left, OdfTime right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩個 ODF 時間是否不相等。
     /// </summary>
-    /// <param name="left">左側 ODF 時間。</param>
-    /// <param name="right">右側 ODF 時間。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側 ODF 時間</param>
+    /// <param name="right">右側 ODF 時間</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfTime left, OdfTime right) => !left.Equals(right);
 
     private static bool TryReadOffset(ReadOnlySpan<char> text, out TimeSpan offset, out int offsetStart)

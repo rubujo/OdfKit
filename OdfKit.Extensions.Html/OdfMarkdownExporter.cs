@@ -15,10 +15,10 @@ public static class OdfMarkdownExporter
     /// <summary>
     /// 將 TextDocument 匯出為 Markdown 字串。
     /// </summary>
-    /// <param name="document">來源文字文件。</param>
-    /// <param name="options">Markdown 匯出選項；若為 null 則使用預設值。</param>
-    /// <returns>Markdown 內容字串。</returns>
-    /// <exception cref="ArgumentNullException">當 document 為 null 時引發。</exception>
+    /// <param name="document">來源文字文件</param>
+    /// <param name="options">Markdown 匯出選項；若為 null 則使用預設值</param>
+    /// <returns>Markdown 內容字串</returns>
+    /// <exception cref="ArgumentNullException">當 document 為 null 時引發</exception>
     public static string Export(TextDocument document, OdfMarkdownExportOptions? options = null)
     {
         if (document is null)

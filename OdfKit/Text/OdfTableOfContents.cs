@@ -56,11 +56,11 @@ public class OdfTableOfContents : OdfIndex
     }
 
     /// <summary>
-    /// 新增目錄項目範本。
+    /// 新增目錄專案範本。
     /// </summary>
-    /// <param name="outlineLevel">大綱階層。</param>
-    /// <param name="styleName">樣式名稱。</param>
-    /// <returns>用於建構範本的 <see cref="OdfIndexTemplateBuilder"/> 執行個體。</returns>
+    /// <param name="outlineLevel">大綱階層</param>
+    /// <param name="styleName">樣式名稱</param>
+    /// <returns>用於建構範本的 <see cref="OdfIndexTemplateBuilder"/> 執行個體</returns>
     public OdfIndexTemplateBuilder AddEntryTemplate(int outlineLevel, string styleName)
     {
         var src = FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");

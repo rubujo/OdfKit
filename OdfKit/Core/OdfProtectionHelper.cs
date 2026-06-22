@@ -13,10 +13,10 @@ internal static class OdfProtectionHelper
     /// <summary>
     /// 使用 PBKDF2-SHA256-50000 演算法對節點啟用保護並寫入密碼雜湊屬性。
     /// </summary>
-    /// <param name="node">要保護的 XML 節點。</param>
-    /// <param name="password">明文密碼。</param>
-    /// <param name="prefix">命名空間前綴。</param>
-    /// <param name="nsUri">命名空間 URI。</param>
+    /// <param name="node">要保護的 XML 節點</param>
+    /// <param name="password">明文密碼</param>
+    /// <param name="prefix">命名空間前綴</param>
+    /// <param name="nsUri">命名空間 URI</param>
     public static void ProtectNode(OdfNode node, string password, string prefix, string nsUri)
     {
         if (node is null)
@@ -43,10 +43,10 @@ internal static class OdfProtectionHelper
     /// <summary>
     /// 驗證給定密碼是否與節點上的雜湊值吻合。
     /// </summary>
-    /// <param name="node">受保護的 XML 節點。</param>
-    /// <param name="password">要驗證的密碼。</param>
-    /// <param name="nsUri">命名空間 URI。</param>
-    /// <returns>若驗證成功或節點未受保護則傳回 <see langword="true"/>；否則傳回 <see langword="false"/>。</returns>
+    /// <param name="node">受保護的 XML 節點</param>
+    /// <param name="password">要驗證的密碼</param>
+    /// <param name="nsUri">命名空間 URI</param>
+    /// <returns>若驗證成功或節點未受保護則傳回 <see langword="true"/>；否則傳回 <see langword="false"/></returns>
     public static bool VerifyPassword(OdfNode node, string password, string nsUri)
     {
         if (node is null)
@@ -97,8 +97,8 @@ internal static class OdfProtectionHelper
     /// <summary>
     /// 移除節點上的所有保護屬性，解除其唯讀限制。
     /// </summary>
-    /// <param name="node">受保護的 XML 節點。</param>
-    /// <param name="nsUri">命名空間 URI。</param>
+    /// <param name="node">受保護的 XML 節點</param>
+    /// <param name="nsUri">命名空間 URI</param>
     public static void UnprotectNode(OdfNode node, string nsUri)
     {
         if (node is null)

@@ -42,8 +42,8 @@ public sealed class OdfEmbeddedTable
     /// <summary>
     /// 設定表格範本／主題樣式名稱，並傳回目前嵌入表格以便鏈式呼叫。
     /// </summary>
-    /// <param name="templateName">表格範本名稱；傳入 null 或空白會清除。</param>
-    /// <returns>目前嵌入表格。</returns>
+    /// <param name="templateName">表格範本名稱；傳入 null 或空白會清除</param>
+    /// <returns>目前嵌入表格</returns>
     public OdfEmbeddedTable SetTemplateName(string? templateName)
     {
         TemplateName = templateName;
@@ -53,10 +53,10 @@ public sealed class OdfEmbeddedTable
     /// <summary>
     /// 設定指定儲存格的文字。
     /// </summary>
-    /// <param name="row">列索引，採 0 為基準。</param>
-    /// <param name="column">欄索引，採 0 為基準。</param>
-    /// <param name="text">儲存格文字。</param>
-    /// <returns>目前嵌入表格。</returns>
+    /// <param name="row">列索引，採 0 為基準</param>
+    /// <param name="column">欄索引，採 0 為基準</param>
+    /// <param name="text">儲存格文字</param>
+    /// <returns>目前嵌入表格</returns>
     public OdfEmbeddedTable SetCellText(int row, int column, string text)
     {
         OdfNode cell = GetCell(row, column);
@@ -71,16 +71,16 @@ public sealed class OdfEmbeddedTable
     /// <summary>
     /// 設定指定儲存格文字的常用樣式。
     /// </summary>
-    /// <param name="row">列索引，採 0 為基準。</param>
-    /// <param name="column">欄索引，採 0 為基準。</param>
-    /// <param name="bold">是否為粗體；傳入 <see langword="null"/> 表示不變更。</param>
-    /// <param name="italic">是否為斜體；傳入 <see langword="null"/> 表示不變更。</param>
-    /// <param name="underline">是否加上底線；傳入 <see langword="null"/> 表示不變更。</param>
-    /// <param name="strikethrough">是否加上刪除線；傳入 <see langword="null"/> 表示不變更。</param>
-    /// <param name="textPosition">文字位置，例如 <c>super</c> 或 <c>sub</c>；傳入 <see langword="null"/> 表示不變更。</param>
-    /// <param name="fontSize">字型大小，例如 <c>14pt</c>；傳入 <see langword="null"/> 表示不變更。</param>
-    /// <param name="color">文字色彩，例如 <c>#336699</c>；傳入 <see langword="null"/> 表示不變更。</param>
-    /// <returns>目前嵌入表格。</returns>
+    /// <param name="row">列索引，採 0 為基準</param>
+    /// <param name="column">欄索引，採 0 為基準</param>
+    /// <param name="bold">是否為粗體；傳入 <see langword="null"/> 表示不變更</param>
+    /// <param name="italic">是否為斜體；傳入 <see langword="null"/> 表示不變更</param>
+    /// <param name="underline">是否加上底線；傳入 <see langword="null"/> 表示不變更</param>
+    /// <param name="strikethrough">是否加上刪除線；傳入 <see langword="null"/> 表示不變更</param>
+    /// <param name="textPosition">文字位置，例如 <c>super</c> 或 <c>sub</c>；傳入 <see langword="null"/> 表示不變更</param>
+    /// <param name="fontSize">字型大小，例如 <c>14pt</c>；傳入 <see langword="null"/> 表示不變更</param>
+    /// <param name="color">文字色彩，例如 <c>#336699</c>；傳入 <see langword="null"/> 表示不變更</param>
+    /// <returns>目前嵌入表格</returns>
     public OdfEmbeddedTable SetCellTextStyle(
         int row,
         int column,
@@ -138,11 +138,11 @@ public sealed class OdfEmbeddedTable
     /// <summary>
     /// 設定指定儲存格的合併範圍，並將被覆蓋的格子轉為 <c>table:covered-table-cell</c>。
     /// </summary>
-    /// <param name="row">起始列索引，採 0 為基準。</param>
-    /// <param name="column">起始欄索引，採 0 為基準。</param>
-    /// <param name="rowSpan">列合併數。</param>
-    /// <param name="columnSpan">欄合併數。</param>
-    /// <returns>目前嵌入表格。</returns>
+    /// <param name="row">起始列索引，採 0 為基準</param>
+    /// <param name="column">起始欄索引，採 0 為基準</param>
+    /// <param name="rowSpan">列合併數</param>
+    /// <param name="columnSpan">欄合併數</param>
+    /// <returns>目前嵌入表格</returns>
     public OdfEmbeddedTable SetCellSpan(int row, int column, int rowSpan, int columnSpan)
     {
         if (rowSpan < 1)
@@ -191,10 +191,10 @@ public sealed class OdfEmbeddedTable
     /// <summary>
     /// 設定指定儲存格的背景色。
     /// </summary>
-    /// <param name="row">列索引，採 0 為基準。</param>
-    /// <param name="column">欄索引，採 0 為基準。</param>
-    /// <param name="color">背景色，例如 <c>#FFFF00</c>；傳入 <see langword="null"/> 或空字串會清除樣式值。</param>
-    /// <returns>目前嵌入表格。</returns>
+    /// <param name="row">列索引，採 0 為基準</param>
+    /// <param name="column">欄索引，採 0 為基準</param>
+    /// <param name="color">背景色，例如 <c>#FFFF00</c>；傳入 <see langword="null"/> 或空字串會清除樣式值</param>
+    /// <returns>目前嵌入表格</returns>
     public OdfEmbeddedTable SetCellBackgroundColor(int row, int column, string? color)
     {
         OdfNode cell = GetCell(row, column);
@@ -215,10 +215,10 @@ public sealed class OdfEmbeddedTable
     /// <summary>
     /// 設定指定儲存格四邊共用的框線。
     /// </summary>
-    /// <param name="row">列索引，採 0 為基準。</param>
-    /// <param name="column">欄索引，採 0 為基準。</param>
-    /// <param name="border">框線值，例如 <c>0.75pt solid #336699</c>；傳入 <see langword="null"/> 或空字串會清除樣式值。</param>
-    /// <returns>目前嵌入表格。</returns>
+    /// <param name="row">列索引，採 0 為基準</param>
+    /// <param name="column">欄索引，採 0 為基準</param>
+    /// <param name="border">框線值，例如 <c>0.75pt solid #336699</c>；傳入 <see langword="null"/> 或空字串會清除樣式值</param>
+    /// <returns>目前嵌入表格</returns>
     public OdfEmbeddedTable SetCellBorder(int row, int column, string? border)
     {
         OdfNode cell = GetCell(row, column);
@@ -239,10 +239,10 @@ public sealed class OdfEmbeddedTable
     /// <summary>
     /// 設定指定儲存格的左框線。
     /// </summary>
-    /// <param name="row">列索引，採 0 為基準。</param>
-    /// <param name="column">欄索引，採 0 為基準。</param>
-    /// <param name="border">框線值，例如 <c>0.75pt solid #336699</c>；傳入 <see langword="null"/> 或空字串會清除樣式值。</param>
-    /// <returns>目前嵌入表格。</returns>
+    /// <param name="row">列索引，採 0 為基準</param>
+    /// <param name="column">欄索引，採 0 為基準</param>
+    /// <param name="border">框線值，例如 <c>0.75pt solid #336699</c>；傳入 <see langword="null"/> 或空字串會清除樣式值</param>
+    /// <returns>目前嵌入表格</returns>
     public OdfEmbeddedTable SetCellBorderLeft(int row, int column, string? border)
     {
         OdfNode cell = GetCell(row, column);
@@ -263,10 +263,10 @@ public sealed class OdfEmbeddedTable
     /// <summary>
     /// 設定指定儲存格的右框線。
     /// </summary>
-    /// <param name="row">列索引，採 0 為基準。</param>
-    /// <param name="column">欄索引，採 0 為基準。</param>
-    /// <param name="border">框線值，例如 <c>0.75pt solid #336699</c>；傳入 <see langword="null"/> 或空字串會清除樣式值。</param>
-    /// <returns>目前嵌入表格。</returns>
+    /// <param name="row">列索引，採 0 為基準</param>
+    /// <param name="column">欄索引，採 0 為基準</param>
+    /// <param name="border">框線值，例如 <c>0.75pt solid #336699</c>；傳入 <see langword="null"/> 或空字串會清除樣式值</param>
+    /// <returns>目前嵌入表格</returns>
     public OdfEmbeddedTable SetCellBorderRight(int row, int column, string? border)
     {
         OdfNode cell = GetCell(row, column);
@@ -287,10 +287,10 @@ public sealed class OdfEmbeddedTable
     /// <summary>
     /// 設定指定儲存格的上框線。
     /// </summary>
-    /// <param name="row">列索引，採 0 為基準。</param>
-    /// <param name="column">欄索引，採 0 為基準。</param>
-    /// <param name="border">框線值，例如 <c>0.75pt solid #336699</c>；傳入 <see langword="null"/> 或空字串會清除樣式值。</param>
-    /// <returns>目前嵌入表格。</returns>
+    /// <param name="row">列索引，採 0 為基準</param>
+    /// <param name="column">欄索引，採 0 為基準</param>
+    /// <param name="border">框線值，例如 <c>0.75pt solid #336699</c>；傳入 <see langword="null"/> 或空字串會清除樣式值</param>
+    /// <returns>目前嵌入表格</returns>
     public OdfEmbeddedTable SetCellBorderTop(int row, int column, string? border)
     {
         OdfNode cell = GetCell(row, column);
@@ -311,10 +311,10 @@ public sealed class OdfEmbeddedTable
     /// <summary>
     /// 設定指定儲存格的下框線。
     /// </summary>
-    /// <param name="row">列索引，採 0 為基準。</param>
-    /// <param name="column">欄索引，採 0 為基準。</param>
-    /// <param name="border">框線值，例如 <c>0.75pt solid #336699</c>；傳入 <see langword="null"/> 或空字串會清除樣式值。</param>
-    /// <returns>目前嵌入表格。</returns>
+    /// <param name="row">列索引，採 0 為基準</param>
+    /// <param name="column">欄索引，採 0 為基準</param>
+    /// <param name="border">框線值，例如 <c>0.75pt solid #336699</c>；傳入 <see langword="null"/> 或空字串會清除樣式值</param>
+    /// <returns>目前嵌入表格</returns>
     public OdfEmbeddedTable SetCellBorderBottom(int row, int column, string? border)
     {
         OdfNode cell = GetCell(row, column);

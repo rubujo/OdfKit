@@ -8,12 +8,12 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
-/// 管理 ODF 封裝中的媒體項目（如圖片），提供重複資料刪除與格式偵測功能。
+/// 管理 ODF 封裝中的媒體專案（如圖片），提供重複資料刪除與格式偵測功能。
 /// </summary>
 public class OdfMediaManager
 {
     private readonly OdfPackage _package;
-    // 將 SHA-256 圖片雜湊對應至其 ZIP 項目路徑（例如 "Pictures/image_hash.png" ）的字典
+    // 將 SHA-256 圖片雜湊對應至其 ZIP 專案路徑（例如 "Pictures/image_hash.png" ）的字典
     private readonly Dictionary<string, string> _imageHashRegistry = new(StringComparer.Ordinal);
     private int _fallbackImageCounter;
 
@@ -75,7 +75,7 @@ public class OdfMediaManager
         // 2. 從幻數偵測圖片格式
         DetectImageFormat(imageBytes, out string mimeType, out string extension);
 
-        // 3. 解析項目路徑
+        // 3. 解析專案路徑
         string entryPath;
         if (!string.IsNullOrWhiteSpace(preferredName))
         {

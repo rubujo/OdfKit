@@ -11,7 +11,7 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 取得文件中所有的主控頁面（Master Page）。
     /// </summary>
-    /// <returns>主控頁面集合。</returns>
+    /// <returns>主控頁面集合</returns>
     public IEnumerable<OdfMasterPage> GetMasterPages()
     {
         var masterStyles = FindOrCreateChild(StylesDom, "master-styles", OdfNamespaces.Office, "office");
@@ -27,8 +27,8 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 新增一個指定名稱的主控頁面（Master Page）。
     /// </summary>
-    /// <param name="name">主控頁面的名稱。</param>
-    /// <returns>新增的主控頁面執行個體。</returns>
+    /// <param name="name">主控頁面的名稱</param>
+    /// <returns>新增的主控頁面執行個體</returns>
     public OdfMasterPage AddMasterPage(string name)
     {
         if (string.IsNullOrEmpty(name))

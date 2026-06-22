@@ -60,8 +60,8 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     /// <summary>
     /// 以多段落形式設定主講人備忘錄文字。
     /// </summary>
-    /// <param name="paragraphs">段落文字集合。</param>
-    /// <returns>目前備忘錄頁面。</returns>
+    /// <param name="paragraphs">段落文字集合</param>
+    /// <returns>目前備忘錄頁面</returns>
     public OdfNotesPage SetSpeakerNotes(IEnumerable<string> paragraphs)
     {
         if (paragraphs is null)
@@ -258,7 +258,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     /// <param name="y">Y 軸座標位置</param>
     /// <param name="w">寬度</param>
     /// <param name="h">高度</param>
-    /// <param name="altText">選用的圖片替代文字。</param>
+    /// <param name="altText">選用的圖片替代文字</param>
     /// <returns>新增的圖片圖形執行個體</returns>
     public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h, string? altText = null)
     {

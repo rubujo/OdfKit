@@ -7,11 +7,17 @@ namespace OdfKit.Text;
 /// </summary>
 public enum OdfChangeType
 {
-    /// <summary>插入。</summary>
+    /// <summary>
+    /// 插入
+    /// </summary>
     Insertion,
-    /// <summary>刪除。</summary>
+    /// <summary>
+    /// 刪除
+    /// </summary>
     Deletion,
-    /// <summary>格式變更。</summary>
+    /// <summary>
+    /// 格式變更
+    /// </summary>
     FormatChange,
 }
 

@@ -14,8 +14,8 @@ public sealed class OdfSheetColumn
     /// <summary>
     /// 初始化 <see cref="OdfSheetColumn"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="sheet">所屬工作表。</param>
-    /// <param name="index">以 0 為基準的欄索引。</param>
+    /// <param name="sheet">所屬工作表</param>
+    /// <param name="index">以 0 為基準的欄索引</param>
     internal OdfSheetColumn(OdfTableSheet sheet, int index)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
@@ -39,7 +39,7 @@ public sealed class OdfSheetColumn
     /// <summary>
     /// 設定欄寬。
     /// </summary>
-    /// <param name="width">欄寬。</param>
+    /// <param name="width">欄寬</param>
     public void SetWidth(OdfLength width)
     {
         _sheet.SetColumnWidth(Index, width);

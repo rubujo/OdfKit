@@ -13,8 +13,8 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     /// <summary>
     /// 以樣式名稱參照清單 lexical form 建立 <see cref="OdfStyleNameList"/>。
     /// </summary>
-    /// <param name="value">以空白分隔的樣式名稱參照清單。</param>
-    /// <exception cref="ArgumentException">當清單不符合 ODF <c>styleNameRefs</c> 格式時擲回。</exception>
+    /// <param name="value">以空白分隔的樣式名稱參照清單</param>
+    /// <exception cref="ArgumentException">當清單不符合 ODF <c>styleNameRefs</c> 格式時擲回</exception>
     public OdfStyleNameList(string value)
     {
         if (!TryParseItems(value, out OdfStyleName[] styleNames))
@@ -29,7 +29,7 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     /// <summary>
     /// 以樣式名稱集合建立 <see cref="OdfStyleNameList"/>。
     /// </summary>
-    /// <param name="styleNames">要寫入的樣式名稱集合。</param>
+    /// <param name="styleNames">要寫入的樣式名稱集合</param>
     public OdfStyleNameList(IEnumerable<OdfStyleName> styleNames)
     {
         OdfStyleName[] items = styleNames?.ToArray() ?? [];
@@ -50,9 +50,9 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     /// <summary>
     /// 嘗試解析樣式名稱參照清單。
     /// </summary>
-    /// <param name="value">樣式名稱參照清單字串。</param>
-    /// <param name="styleNameList">成功時傳回解析後的樣式名稱參照清單。</param>
-    /// <returns>若字串符合 ODF <c>styleNameRefs</c> 格式則為 <see langword="true"/>。</returns>
+    /// <param name="value">樣式名稱參照清單字串</param>
+    /// <param name="styleNameList">成功時傳回解析後的樣式名稱參照清單</param>
+    /// <returns>若字串符合 ODF <c>styleNameRefs</c> 格式則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfStyleNameList styleNameList)
     {
         if (TryParseItems(value, out OdfStyleName[] styleNames))
@@ -68,14 +68,14 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     /// <summary>
     /// 傳回原始樣式名稱參照清單字串。
     /// </summary>
-    /// <returns>樣式名稱參照清單字串。</returns>
+    /// <returns>樣式名稱參照清單字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// 判斷目前值是否等於另一個樣式名稱參照清單。
     /// </summary>
-    /// <param name="other">要比較的樣式名稱參照清單。</param>
-    /// <returns>若 lexical form 相同則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的樣式名稱參照清單</param>
+    /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfStyleNameList other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc />
@@ -87,17 +87,17 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     /// <summary>
     /// 判斷兩個樣式名稱參照清單是否相等。
     /// </summary>
-    /// <param name="left">左側樣式名稱參照清單。</param>
-    /// <param name="right">右側樣式名稱參照清單。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側樣式名稱參照清單</param>
+    /// <param name="right">右側樣式名稱參照清單</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfStyleNameList left, OdfStyleNameList right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩個樣式名稱參照清單是否不相等。
     /// </summary>
-    /// <param name="left">左側樣式名稱參照清單。</param>
-    /// <param name="right">右側樣式名稱參照清單。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側樣式名稱參照清單</param>
+    /// <param name="right">右側樣式名稱參照清單</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfStyleNameList left, OdfStyleNameList right) => !left.Equals(right);
 
     private OdfStyleNameList(string value, OdfStyleName[] styleNames)

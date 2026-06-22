@@ -9,7 +9,7 @@ public partial class OdfChartDocument
     /// <summary>
     /// 取得目前圖表的設定定義資訊。
     /// </summary>
-    /// <returns>包含圖表屬性的 <see cref="OdfChartDefinition"/> 執行個體。</returns>
+    /// <returns>包含圖表屬性的 <see cref="OdfChartDefinition"/> 執行個體</returns>
     public OdfChartDefinition GetChartDefinition()
     {
         OdfChartType chartType = ParseChartType(ChartClass);

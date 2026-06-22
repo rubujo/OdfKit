@@ -16,10 +16,10 @@ public static class OdfFormulaLatexConverter
     /// <summary>
     /// 將 LaTeX 公式字串轉換為標準 MathML XML 字串。
     /// </summary>
-    /// <param name="latex">LaTeX 公式字串。</param>
-    /// <returns>標準 MathML XML 字串。</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="latex"/> 為 <see langword="null"/> 時擲出。</exception>
-    /// <exception cref="ArgumentException">當 LaTeX 公式語法錯誤時擲出。</exception>
+    /// <param name="latex">LaTeX 公式字串</param>
+    /// <returns>標準 MathML XML 字串</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="latex"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <exception cref="ArgumentException">當 LaTeX 公式語法錯誤時擲出</exception>
     public static string Convert(string latex)
     {
         if (latex == null)

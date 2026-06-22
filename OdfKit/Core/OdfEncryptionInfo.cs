@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace OdfKit.Core;
 
 /// <summary>
-/// 包含 ODF 封裝項目的加密與解密詳細資訊。
+/// 包含 ODF 封裝專案的加密與解密詳細資訊。
 /// </summary>
 public sealed class OdfEncryptionInfo
 {

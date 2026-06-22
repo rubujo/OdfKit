@@ -119,7 +119,7 @@ public class LibreOfficeHttpRendererTests
     }
 
     /// <summary>
-    /// 驗證 CancellationToken 取消訊號能正確傳遞並拋出取消異常，防範無用背景運算耗費資源。
+    /// 驗證 CancellationToken 取消訊號能正確傳遞並拋出取消例外，防範無用背景運算耗費資源。
     /// </summary>
     [Fact]
     public async Task ConvertAsync_Cancellation_PropagatesToBackend()
@@ -141,7 +141,7 @@ public class LibreOfficeHttpRendererTests
         await Task.Delay(50, TestContext.Current.CancellationToken);
         cts.Cancel();
 
-        // 驗證應拋出 TaskCanceledException 或 OperationCanceledException 異常
+        // 驗證應拋出 TaskCanceledException 或 OperationCanceledException 例外
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await runTask);
     }
 }

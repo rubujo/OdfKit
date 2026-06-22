@@ -13,8 +13,8 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     /// <summary>
     /// 以儲存格範圍位址清單 lexical form 建立 <see cref="OdfCellRangeAddressList"/>。
     /// </summary>
-    /// <param name="value">以空白分隔的儲存格範圍位址清單。</param>
-    /// <exception cref="ArgumentException">當清單不符合 ODF <c>cellRangeAddressList</c> 格式時擲回。</exception>
+    /// <param name="value">以空白分隔的儲存格範圍位址清單</param>
+    /// <exception cref="ArgumentException">當清單不符合 ODF <c>cellRangeAddressList</c> 格式時擲回</exception>
     public OdfCellRangeAddressList(string value)
     {
         if (!TryParseItems(value, out OdfCellRangeAddress[] ranges))
@@ -29,8 +29,8 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     /// <summary>
     /// 以儲存格範圍位址集合建立 <see cref="OdfCellRangeAddressList"/>。
     /// </summary>
-    /// <param name="ranges">要寫入的儲存格範圍位址集合。</param>
-    /// <exception cref="ArgumentException">當集合未包含任何位址時擲回。</exception>
+    /// <param name="ranges">要寫入的儲存格範圍位址集合</param>
+    /// <exception cref="ArgumentException">當集合未包含任何位址時擲回</exception>
     public OdfCellRangeAddressList(IEnumerable<OdfCellRangeAddress> ranges)
     {
         OdfCellRangeAddress[] items = ranges?.ToArray() ?? [];
@@ -56,9 +56,9 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     /// <summary>
     /// 嘗試解析儲存格範圍位址清單。
     /// </summary>
-    /// <param name="value">儲存格範圍位址清單字串。</param>
-    /// <param name="cellRangeAddressList">成功時傳回解析後的儲存格範圍位址清單。</param>
-    /// <returns>若字串符合 ODF <c>cellRangeAddressList</c> 格式則為 <see langword="true"/>。</returns>
+    /// <param name="value">儲存格範圍位址清單字串</param>
+    /// <param name="cellRangeAddressList">成功時傳回解析後的儲存格範圍位址清單</param>
+    /// <returns>若字串符合 ODF <c>cellRangeAddressList</c> 格式則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfCellRangeAddressList cellRangeAddressList)
     {
         if (TryParseItems(value, out OdfCellRangeAddress[] ranges))
@@ -74,14 +74,14 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     /// <summary>
     /// 傳回原始儲存格範圍位址清單字串。
     /// </summary>
-    /// <returns>儲存格範圍位址清單字串。</returns>
+    /// <returns>儲存格範圍位址清單字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// 判斷目前值是否等於另一個儲存格範圍位址清單。
     /// </summary>
-    /// <param name="other">要比較的儲存格範圍位址清單。</param>
-    /// <returns>若 lexical form 相同則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的儲存格範圍位址清單</param>
+    /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfCellRangeAddressList other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc />
@@ -93,17 +93,17 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     /// <summary>
     /// 判斷兩個儲存格範圍位址清單是否相等。
     /// </summary>
-    /// <param name="left">左側儲存格範圍位址清單。</param>
-    /// <param name="right">右側儲存格範圍位址清單。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側儲存格範圍位址清單</param>
+    /// <param name="right">右側儲存格範圍位址清單</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfCellRangeAddressList left, OdfCellRangeAddressList right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩個儲存格範圍位址清單是否不相等。
     /// </summary>
-    /// <param name="left">左側儲存格範圍位址清單。</param>
-    /// <param name="right">右側儲存格範圍位址清單。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側儲存格範圍位址清單</param>
+    /// <param name="right">右側儲存格範圍位址清單</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfCellRangeAddressList left, OdfCellRangeAddressList right) => !left.Equals(right);
 
     private OdfCellRangeAddressList(string value, OdfCellRangeAddress[] ranges)

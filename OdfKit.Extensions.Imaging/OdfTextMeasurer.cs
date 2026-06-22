@@ -17,13 +17,13 @@ public static class OdfTextMeasurer
     /// <summary>
     /// 精確量測指定字型、大小與書寫模式下文字的物理寬度（回傳 <see cref="OdfLength"/> 封裝）。
     /// </summary>
-    /// <param name="text">要量測的文字內容。</param>
-    /// <param name="fontName">字型名稱。</param>
-    /// <param name="fontSizePoints">字型大小（以點 Pt 為單位）。</param>
-    /// <param name="isBold">是否為粗體。</param>
-    /// <param name="isItalic">是否為斜體。</param>
-    /// <param name="writingMode">書寫模式（橫書或直書）。</param>
-    /// <returns>量測後的物理長度 <see cref="OdfLength"/>。</returns>
+    /// <param name="text">要量測的文字內容</param>
+    /// <param name="fontName">字型名稱</param>
+    /// <param name="fontSizePoints">字型大小（以點 Pt 為單位）</param>
+    /// <param name="isBold">是否為粗體</param>
+    /// <param name="isItalic">是否為斜體</param>
+    /// <param name="writingMode">書寫模式（橫書或直書）</param>
+    /// <returns>量測後的物理長度 <see cref="OdfLength"/></returns>
     public static OdfLength MeasureWidth(string text, string fontName, double fontSizePoints, bool isBold = false, bool isItalic = false, OdfWritingMode writingMode = OdfWritingMode.LrTb)
     {
         if (string.IsNullOrEmpty(text))
@@ -157,7 +157,7 @@ public static class OdfTextMeasurer
         }
         catch (Exception ex)
         {
-            // 發生任何異常時回退至 SkiaSharp 量測
+            // 發生任何例外時回退至 SkiaSharp 量測
             OdfKit.Core.OdfKitDiagnostics.Warn($"GDI+ 字型量測失敗，回退至 SkiaSharp：{ex.Message}", ex);
         }
 

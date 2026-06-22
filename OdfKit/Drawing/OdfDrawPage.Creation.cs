@@ -72,11 +72,11 @@ public partial class OdfDrawPage
     /// <summary>
     /// 在繪圖頁面上新增線段。
     /// </summary>
-    /// <param name="x1">起點 X 軸座標位置。</param>
-    /// <param name="y1">起點 Y 軸座標位置。</param>
-    /// <param name="x2">終點 X 軸座標位置。</param>
-    /// <param name="y2">終點 Y 軸座標位置。</param>
-    /// <returns>新增的線段圖形執行個體。</returns>
+    /// <param name="x1">起點 X 軸座標位置</param>
+    /// <param name="y1">起點 Y 軸座標位置</param>
+    /// <param name="x2">終點 X 軸座標位置</param>
+    /// <param name="y2">終點 Y 軸座標位置</param>
+    /// <returns>新增的線段圖形執行個體</returns>
     public OdfShape AddLine(OdfLength x1, OdfLength y1, OdfLength x2, OdfLength y2)
     {
         var lineNode = CreateLineLikeNode("line", x1, y1, x2, y2);
@@ -87,11 +87,11 @@ public partial class OdfDrawPage
     /// <summary>
     /// 在繪圖頁面上新增連接線。
     /// </summary>
-    /// <param name="x1">起點 X 軸座標位置。</param>
-    /// <param name="y1">起點 Y 軸座標位置。</param>
-    /// <param name="x2">終點 X 軸座標位置。</param>
-    /// <param name="y2">終點 Y 軸座標位置。</param>
-    /// <returns>新增的連接線圖形執行個體。</returns>
+    /// <param name="x1">起點 X 軸座標位置</param>
+    /// <param name="y1">起點 Y 軸座標位置</param>
+    /// <param name="x2">終點 X 軸座標位置</param>
+    /// <param name="y2">終點 Y 軸座標位置</param>
+    /// <returns>新增的連接線圖形執行個體</returns>
     public OdfShape AddConnector(OdfLength x1, OdfLength y1, OdfLength x2, OdfLength y2)
     {
         var connectorNode = CreateLineLikeNode("connector", x1, y1, x2, y2);
@@ -130,12 +130,12 @@ public partial class OdfDrawPage
     /// <summary>
     /// 在繪圖頁面上新增圖片。
     /// </summary>
-    /// <param name="imageBytes">圖片的位元組陣列。</param>
-    /// <param name="x">X 軸座標位置。</param>
-    /// <param name="y">Y 軸座標位置。</param>
-    /// <param name="w">寬度。</param>
-    /// <param name="h">高度。</param>
-    /// <returns>新增的圖片圖形執行個體。</returns>
+    /// <param name="imageBytes">圖片的位元組陣列</param>
+    /// <param name="x">X 軸座標位置</param>
+    /// <param name="y">Y 軸座標位置</param>
+    /// <param name="w">寬度</param>
+    /// <param name="h">高度</param>
+    /// <returns>新增的圖片圖形執行個體</returns>
     public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         var frame = CreateDrawingFrame(x, y, w, h);
@@ -495,8 +495,8 @@ public partial class OdfDrawPage
     /// <summary>
     /// 在繪圖頁面上新增群組。
     /// </summary>
-    /// <param name="name">選用的群組名稱。</param>
-    /// <returns>新增的繪圖群組執行個體。</returns>
+    /// <param name="name">選用的群組名稱</param>
+    /// <returns>新增的繪圖群組執行個體</returns>
     public OdfDrawGroup AddGroup(string? name = null)
     {
         var groupNode = OdfNodeFactory.CreateElement("g", OdfNamespaces.Draw, "draw");

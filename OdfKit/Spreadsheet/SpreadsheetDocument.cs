@@ -42,7 +42,7 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <summary>
     /// 建立新的 ODS 試算表文件。
     /// </summary>
-    /// <returns>新的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="SpreadsheetDocument"/> 執行個體</returns>
     public static SpreadsheetDocument Create()
     {
         return (SpreadsheetDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Spreadsheet);
@@ -51,9 +51,9 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <summary>
     /// 從指定的試算表範本文件建立新的試算表文件。
     /// </summary>
-    /// <param name="template">試算表範本文件。</param>
-    /// <param name="clearUserContent">是否清除範本中各工作表的資料列，但保留欄寬與工作表結構。</param>
-    /// <returns>建立完成的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
+    /// <param name="template">試算表範本文件</param>
+    /// <param name="clearUserContent">是否清除範本中各工作表的資料列，但保留欄寬與工作表結構</param>
+    /// <returns>建立完成的 <see cref="SpreadsheetDocument"/> 執行個體</returns>
     public static SpreadsheetDocument CreateFromTemplate(SpreadsheetTemplateDocument template, bool clearUserContent = false)
     {
         return (SpreadsheetDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Spreadsheet, "application/vnd.oasis.opendocument.spreadsheet", clearUserContent);
@@ -86,7 +86,7 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <summary>
     /// 建立新的 ODS 試算表文件 Fluent builder。
     /// </summary>
-    /// <returns>新的 <see cref="SpreadsheetDocumentBuilder"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="SpreadsheetDocumentBuilder"/> 執行個體</returns>
     public static SpreadsheetDocumentBuilder Builder()
     {
         return new SpreadsheetDocumentBuilder(Create());
@@ -95,9 +95,9 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <summary>
     /// 從指定路徑載入 ODS 試算表文件。
     /// </summary>
-    /// <param name="path">ODS 文件路徑。</param>
-    /// <returns>載入完成的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODS 試算表時擲出。</exception>
+    /// <param name="path">ODS 文件路徑</param>
+    /// <returns>載入完成的 <see cref="SpreadsheetDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODS 試算表時擲出</exception>
     public new static SpreadsheetDocument Load(string path)
     {
         return EnsureSpreadsheet(OdfDocumentFactory.LoadDocument(path));
@@ -106,9 +106,9 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <summary>
     /// 非同步從指定路徑載入 ODS 試算表文件。
     /// </summary>
-    /// <param name="path">ODS 文件路徑。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/>。</returns>
+    /// <param name="path">ODS 文件路徑</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/></returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
@@ -119,10 +119,10 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <summary>
     /// 從指定資料流載入 ODS 試算表文件。
     /// </summary>
-    /// <param name="stream">包含 ODS 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODS 試算表時擲出。</exception>
+    /// <param name="stream">包含 ODS 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的 <see cref="SpreadsheetDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODS 試算表時擲出</exception>
     public new static SpreadsheetDocument Load(Stream stream, string? fileName = null)
     {
         return EnsureSpreadsheet(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -131,10 +131,10 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <summary>
     /// 非同步從指定資料流載入 ODS 試算表文件。
     /// </summary>
-    /// <param name="stream">包含 ODS 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/>。</returns>
+    /// <param name="stream">包含 ODS 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/></returns>
     public new static async Task<SpreadsheetDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         EnsureSpreadsheet(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 

@@ -13,7 +13,7 @@ public static partial class OdfEncryption
     #region Package Encryption & Decryption
 
     /// <summary>
-    /// 解密指定 ODF 封裝中的所有加密項目。
+    /// 解密指定 ODF 封裝中的所有加密專案。
     /// </summary>
     /// <param name="package">要解密的 ODF 封裝執行個體</param>
     /// <param name="password">解密密碼</param>
@@ -169,7 +169,7 @@ public static partial class OdfEncryption
     }
 
     /// <summary>
-    /// 加密指定 ODF 封裝中的所有適用項目。
+    /// 加密指定 ODF 封裝中的所有適用專案。
     /// </summary>
     /// <param name="package">要加密的 ODF 封裝執行個體</param>
     /// <param name="password">加密密碼</param>

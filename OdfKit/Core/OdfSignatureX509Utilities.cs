@@ -36,7 +36,7 @@ internal static class OdfSignatureX509Utilities
             }
             catch
             {
-                // 無效的內嵌憑證值將被忽略；若為必要項目，鏈驗證將失敗
+                // 無效的內嵌憑證值將被忽略；若為必要專案，鏈驗證將失敗
             }
         }
 

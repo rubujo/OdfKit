@@ -31,7 +31,7 @@ public sealed class OdfPageHeaderFooter
     /// <summary>
     /// 取得或建立此區域的段落節點，供進階混排編輯。
     /// </summary>
-    /// <returns>可追加欄位或文字的段落物件。</returns>
+    /// <returns>可追加欄位或文字的段落物件</returns>
     public OdfParagraph GetOrCreateParagraph() =>
         _setup.GetOrCreateHeaderFooterParagraph(_localName);
 

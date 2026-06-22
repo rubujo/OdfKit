@@ -16,14 +16,14 @@ public static class OdfExternalValidator
     /// <summary>
     /// 使用 ODF Toolkit 的 ODF Validator JAR 驗證指定文件。
     /// </summary>
-    /// <param name="filePath">要驗證的 ODF 文件路徑。</param>
-    /// <param name="jarPath">ODF Validator JAR 路徑。若未提供，會讀取 <c>ODFKIT_ODFVALIDATOR_JAR</c>。</param>
-    /// <param name="javaPath">Java 執行檔路徑。預設使用 <c>java</c>。</param>
-    /// <param name="timeoutMilliseconds">外部程序逾時毫秒數。</param>
-    /// <returns>外部驗證器執行結果。</returns>
-    /// <exception cref="ArgumentException">當文件路徑或 JAR 路徑未提供時擲出。</exception>
-    /// <exception cref="FileNotFoundException">當文件或 JAR 不存在時擲出。</exception>
-    /// <exception cref="TimeoutException">當外部程序逾時時擲出。</exception>
+    /// <param name="filePath">要驗證的 ODF 文件路徑</param>
+    /// <param name="jarPath">ODF Validator JAR 路徑。若未提供，會讀取 <c>ODFKIT_ODFVALIDATOR_JAR</c></param>
+    /// <param name="javaPath">Java 執行檔路徑。預設使用 <c>java</c></param>
+    /// <param name="timeoutMilliseconds">外部程序逾時毫秒數</param>
+    /// <returns>外部驗證器執行結果</returns>
+    /// <exception cref="ArgumentException">當文件路徑或 JAR 路徑未提供時擲出</exception>
+    /// <exception cref="FileNotFoundException">當文件或 JAR 不存在時擲出</exception>
+    /// <exception cref="TimeoutException">當外部程序逾時時擲出</exception>
     public static OdfExternalValidatorResult ValidateWithOdfValidator(
         string filePath,
         string? jarPath = null,
@@ -40,15 +40,15 @@ public static class OdfExternalValidator
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在外部子程序等待與 stdout／stderr 讀取期間協作檢查取消語彙。
     /// </remarks>
-    /// <param name="filePath">要驗證的 ODF 文件路徑。</param>
-    /// <param name="jarPath">ODF Validator JAR 路徑。若未提供，會讀取 <c>ODFKIT_ODFVALIDATOR_JAR</c>。</param>
-    /// <param name="javaPath">Java 執行檔路徑。預設使用 <c>java</c>。</param>
-    /// <param name="timeoutMilliseconds">外部程序逾時毫秒數。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步驗證作業的工作，其結果為外部驗證器執行結果。</returns>
-    /// <exception cref="ArgumentException">當文件路徑或 JAR 路徑未提供時擲出。</exception>
-    /// <exception cref="FileNotFoundException">當文件或 JAR 不存在時擲出。</exception>
-    /// <exception cref="TimeoutException">當外部程序逾時時擲出。</exception>
+    /// <param name="filePath">要驗證的 ODF 文件路徑</param>
+    /// <param name="jarPath">ODF Validator JAR 路徑。若未提供，會讀取 <c>ODFKIT_ODFVALIDATOR_JAR</c></param>
+    /// <param name="javaPath">Java 執行檔路徑。預設使用 <c>java</c></param>
+    /// <param name="timeoutMilliseconds">外部程序逾時毫秒數</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步驗證作業的工作，其結果為外部驗證器執行結果</returns>
+    /// <exception cref="ArgumentException">當文件路徑或 JAR 路徑未提供時擲出</exception>
+    /// <exception cref="FileNotFoundException">當文件或 JAR 不存在時擲出</exception>
+    /// <exception cref="TimeoutException">當外部程序逾時時擲出</exception>
     public static Task<OdfExternalValidatorResult> ValidateWithOdfValidatorAsync(
         string filePath,
         string? jarPath = null,
@@ -82,10 +82,10 @@ public static class OdfExternalValidator
     /// <summary>
     /// 執行可選外部驗證命令並以結束碼判定 valid / invalid。
     /// </summary>
-    /// <param name="commandPath">外部命令路徑。</param>
-    /// <param name="filePath">要驗證的 ODF 文件路徑。</param>
-    /// <param name="timeoutMilliseconds">外部程序逾時毫秒數。</param>
-    /// <returns>外部驗證器執行結果。</returns>
+    /// <param name="commandPath">外部命令路徑</param>
+    /// <param name="filePath">要驗證的 ODF 文件路徑</param>
+    /// <param name="timeoutMilliseconds">外部程序逾時毫秒數</param>
+    /// <returns>外部驗證器執行結果</returns>
     public static OdfExternalValidatorResult ValidateWithCommand(
         string commandPath,
         string filePath,
@@ -101,11 +101,11 @@ public static class OdfExternalValidator
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在外部子程序等待與 stdout／stderr 讀取期間協作檢查取消語彙。
     /// </remarks>
-    /// <param name="commandPath">外部命令路徑。</param>
-    /// <param name="filePath">要驗證的 ODF 文件路徑。</param>
-    /// <param name="timeoutMilliseconds">外部程序逾時毫秒數。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步驗證作業的工作，其結果為外部驗證器執行結果。</returns>
+    /// <param name="commandPath">外部命令路徑</param>
+    /// <param name="filePath">要驗證的 ODF 文件路徑</param>
+    /// <param name="timeoutMilliseconds">外部程序逾時毫秒數</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步驗證作業的工作，其結果為外部驗證器執行結果</returns>
     public static Task<OdfExternalValidatorResult> ValidateWithCommandAsync(
         string commandPath,
         string filePath,
@@ -233,9 +233,9 @@ public static class OdfExternalValidator
 /// <summary>
 /// 表示外部 ODF 驗證器執行結果。
 /// </summary>
-/// <param name="exitCode">程序結束碼。</param>
-/// <param name="standardOutput">標準輸出內容。</param>
-/// <param name="standardError">標準錯誤內容。</param>
+/// <param name="exitCode">程序結束碼</param>
+/// <param name="standardOutput">標準輸出內容</param>
+/// <param name="standardError">標準錯誤內容</param>
 public sealed class OdfExternalValidatorResult(
     int exitCode,
     string standardOutput,

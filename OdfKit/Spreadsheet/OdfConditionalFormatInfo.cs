@@ -5,17 +5,17 @@ namespace OdfKit.Spreadsheet;
 /// <summary>
 /// 表示工作表中一筆 LibreOffice calcext 條件格式規則的摘要資訊。
 /// </summary>
-/// <param name="kind">條件格式種類。</param>
-/// <param name="targetRangeAddress">ODF 目標範圍位址字串（<c>calcext:target-range-address</c>）。</param>
-/// <param name="conditionValue">條件運算式（僅 <see cref="OdfConditionalFormatKind.Condition"/> 時有值）。</param>
-/// <param name="styleName">要套用的樣式名稱（僅 <see cref="OdfConditionalFormatKind.Condition"/> 時有值）。</param>
-/// <param name="minColor">色階最小值色彩（僅 <see cref="OdfConditionalFormatKind.ColorScale"/> 時有值）。</param>
-/// <param name="maxColor">色階最大值色彩（僅 <see cref="OdfConditionalFormatKind.ColorScale"/> 時有值）。</param>
-/// <param name="midColor">色階中間值色彩（三色色階時有值）。</param>
-/// <param name="positiveColor">資料橫條正值色彩（僅 <see cref="OdfConditionalFormatKind.DataBar"/> 時有值）。</param>
-/// <param name="negativeColor">資料橫條負值色彩（可選）。</param>
-/// <param name="iconSetTypeName">圖示集類型名稱（<c>calcext:icon-set-type</c> 原文）。</param>
-/// <param name="iconSetType">已辨識的圖示集類型（無法對應時為 null）。</param>
+/// <param name="kind">條件格式種類</param>
+/// <param name="targetRangeAddress">ODF 目標範圍位址字串（<c>calcext:target-range-address</c>）</param>
+/// <param name="conditionValue">條件運算式（僅 <see cref="OdfConditionalFormatKind.Condition"/> 時有值）</param>
+/// <param name="styleName">要套用的樣式名稱（僅 <see cref="OdfConditionalFormatKind.Condition"/> 時有值）</param>
+/// <param name="minColor">色階最小值色彩（僅 <see cref="OdfConditionalFormatKind.ColorScale"/> 時有值）</param>
+/// <param name="maxColor">色階最大值色彩（僅 <see cref="OdfConditionalFormatKind.ColorScale"/> 時有值）</param>
+/// <param name="midColor">色階中間值色彩（三色色階時有值）</param>
+/// <param name="positiveColor">資料橫條正值色彩（僅 <see cref="OdfConditionalFormatKind.DataBar"/> 時有值）</param>
+/// <param name="negativeColor">資料橫條負值色彩（可選）</param>
+/// <param name="iconSetTypeName">圖示集類型名稱（<c>calcext:icon-set-type</c> 原文）</param>
+/// <param name="iconSetType">已辨識的圖示集類型（無法對應時為 null）</param>
 public sealed class OdfConditionalFormatInfo(
     OdfConditionalFormatKind kind,
     string targetRangeAddress,
@@ -87,8 +87,8 @@ public sealed class OdfConditionalFormatInfo(
     /// <summary>
     /// 嘗試將 <see cref="TargetRangeAddress"/> 解析為 <see cref="OdfCellRange"/>。
     /// </summary>
-    /// <param name="range">解析成功時傳回的儲存格範圍。</param>
-    /// <returns>若解析成功則為 true，否則為 false。</returns>
+    /// <param name="range">解析成功時傳回的儲存格範圍</param>
+    /// <returns>若解析成功則為 true，否則為 false</returns>
     public bool TryGetTargetRange(out OdfCellRange range) =>
         OdfCellRange.TryParse(TargetRangeAddress, out range);
 }

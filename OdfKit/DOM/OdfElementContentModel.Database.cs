@@ -28,7 +28,7 @@ public partial class OfficeDatabaseElement
     /// <summary>
     /// 取得或建立 <c>db:data-source</c> 節點。
     /// </summary>
-    /// <returns>資料來源元素。</returns>
+    /// <returns>資料來源元素</returns>
     public DatabaseDataSourceElement EnsureDataSource()
     {
         DatabaseDataSourceElement? existing = DatabaseDataSourceChildElements.FirstOrDefault();
@@ -49,28 +49,28 @@ public partial class OfficeDatabaseElement
     /// <summary>
     /// 取得或建立 <c>db:forms</c> 容器。
     /// </summary>
-    /// <returns>表單元件容器。</returns>
+    /// <returns>表單元件容器</returns>
     public DatabaseFormsElement EnsureForms() =>
         DatabaseFormsChildElements.FirstOrDefault() ?? InsertDatabaseComponent(new DatabaseFormsElement("db"), DatabaseComponentRank.Forms);
 
     /// <summary>
     /// 取得或建立 <c>db:reports</c> 容器。
     /// </summary>
-    /// <returns>報表元件容器。</returns>
+    /// <returns>報表元件容器</returns>
     public DatabaseReportsElement EnsureReports() =>
         DatabaseReportsChildElements.FirstOrDefault() ?? InsertDatabaseComponent(new DatabaseReportsElement("db"), DatabaseComponentRank.Reports);
 
     /// <summary>
     /// 取得或建立 <c>db:queries</c> 容器。
     /// </summary>
-    /// <returns>查詢容器。</returns>
+    /// <returns>查詢容器</returns>
     public DatabaseQueriesElement EnsureQueries() =>
         DatabaseQueriesChildElements.FirstOrDefault() ?? InsertDatabaseComponent(new DatabaseQueriesElement("db"), DatabaseComponentRank.Queries);
 
     /// <summary>
     /// 取得或建立 <c>db:table-representations</c> 容器。
     /// </summary>
-    /// <returns>資料表描述容器。</returns>
+    /// <returns>資料表描述容器</returns>
     public DatabaseTableRepresentationsElement EnsureTableRepresentations() =>
         DatabaseTableRepresentationsChildElements.FirstOrDefault()
         ?? InsertDatabaseComponent(new DatabaseTableRepresentationsElement("db"), DatabaseComponentRank.TableRepresentations);
@@ -94,10 +94,10 @@ public partial class OfficeDatabaseElement
     /// 將指定元件插入在第一個「排名晚於 <paramref name="rank"/>」的既有子元素之前，確保插入後
     /// 整體子元素順序仍符合規格規定的標準順序，不論呼叫端以何種順序呼叫各 <c>Ensure*</c> 方法。
     /// </summary>
-    /// <typeparam name="TElement">要插入的元件型別。</typeparam>
-    /// <param name="element">要插入的元件。</param>
-    /// <param name="rank">該元件在規格標準順序中的排名。</param>
-    /// <returns>已插入的元件。</returns>
+    /// <typeparam name="TElement">要插入的元件型別</typeparam>
+    /// <param name="element">要插入的元件</param>
+    /// <param name="rank">該元件在規格標準順序中的排名</param>
+    /// <returns>已插入的元件</returns>
     private TElement InsertDatabaseComponent<TElement>(TElement element, DatabaseComponentRank rank)
         where TElement : OdfElement
     {

@@ -258,7 +258,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// 在頁面設定中新增字型宣告項目。
+    /// 在頁面設定中新增字型宣告專案。
     /// </summary>
     /// <param name="name">字型代碼或別名</param>
     /// <param name="fontFamily">實際的字型名稱</param>

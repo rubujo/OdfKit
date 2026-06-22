@@ -15,7 +15,7 @@ public sealed class OdfParagraphStyleProxy
     /// <summary>
     /// 初始化 <see cref="OdfParagraphStyleProxy"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="paragraph">目標段落。</param>
+    /// <param name="paragraph">目標段落</param>
     public OdfParagraphStyleProxy(OdfParagraph paragraph)
     {
         _paragraph = paragraph ?? throw new ArgumentNullException(nameof(paragraph));

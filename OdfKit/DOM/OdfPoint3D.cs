@@ -17,8 +17,8 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     /// <summary>
     /// 以三維點 lexical form 建立 <see cref="OdfPoint3D"/>。
     /// </summary>
-    /// <param name="value">三維點字串，例如 <c>(1cm 0mm -0.5in)</c>。</param>
-    /// <exception cref="ArgumentException">當三維點不符合 ODF <c>point3D</c> 格式時擲回。</exception>
+    /// <param name="value">三維點字串，例如 <c>(1cm 0mm -0.5in)</c></param>
+    /// <exception cref="ArgumentException">當三維點不符合 ODF <c>point3D</c> 格式時擲回</exception>
     public OdfPoint3D(string value)
     {
         if (!TryParseComponents(value, out OdfLength x, out OdfLength y, out OdfLength z))
@@ -35,10 +35,10 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     /// <summary>
     /// 以三個帶單位座標值建立 <see cref="OdfPoint3D"/>。
     /// </summary>
-    /// <param name="x">X 座標值。</param>
-    /// <param name="y">Y 座標值。</param>
-    /// <param name="z">Z 座標值。</param>
-    /// <exception cref="ArgumentException">當任一座標不是 <c>cm</c>、<c>mm</c>、<c>in</c>、<c>pt</c> 或 <c>pc</c> 單位時擲回。</exception>
+    /// <param name="x">X 座標值</param>
+    /// <param name="y">Y 座標值</param>
+    /// <param name="z">Z 座標值</param>
+    /// <exception cref="ArgumentException">當任一座標不是 <c>cm</c>、<c>mm</c>、<c>in</c>、<c>pt</c> 或 <c>pc</c> 單位時擲回</exception>
     public OdfPoint3D(OdfLength x, OdfLength y, OdfLength z)
     {
         if (!IsAllowedUnit(x) || !IsAllowedUnit(y) || !IsAllowedUnit(z))
@@ -75,9 +75,9 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     /// <summary>
     /// 嘗試解析三維點字串。
     /// </summary>
-    /// <param name="value">三維點字串。</param>
-    /// <param name="point">成功時傳回解析後的三維點。</param>
-    /// <returns>若字串符合 ODF <c>point3D</c> 格式則為 <see langword="true"/>。</returns>
+    /// <param name="value">三維點字串</param>
+    /// <param name="point">成功時傳回解析後的三維點</param>
+    /// <returns>若字串符合 ODF <c>point3D</c> 格式則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfPoint3D point)
     {
         if (TryParseComponents(value, out OdfLength x, out OdfLength y, out OdfLength z))
@@ -93,14 +93,14 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     /// <summary>
     /// 傳回原始三維點字串。
     /// </summary>
-    /// <returns>三維點字串。</returns>
+    /// <returns>三維點字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// 判斷目前值是否等於另一個三維點。
     /// </summary>
-    /// <param name="other">要比較的三維點。</param>
-    /// <returns>若 lexical form 相同則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的三維點</param>
+    /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfPoint3D other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc />
@@ -112,17 +112,17 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     /// <summary>
     /// 判斷兩個三維點是否相等。
     /// </summary>
-    /// <param name="left">左側三維點。</param>
-    /// <param name="right">右側三維點。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側三維點</param>
+    /// <param name="right">右側三維點</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfPoint3D left, OdfPoint3D right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩個三維點是否不相等。
     /// </summary>
-    /// <param name="left">左側三維點。</param>
-    /// <param name="right">右側三維點。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側三維點</param>
+    /// <param name="right">右側三維點</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfPoint3D left, OdfPoint3D right) => !left.Equals(right);
 
     private OdfPoint3D(string value, OdfLength x, OdfLength y, OdfLength z)

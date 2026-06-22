@@ -13,8 +13,8 @@ public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
     /// <summary>
     /// 以線條寬度 lexical form 建立 <see cref="OdfLineWidth"/>。
     /// </summary>
-    /// <param name="value">線條寬度，例如 <c>auto</c>、<c>bold</c>、<c>150%</c>、<c>2pt</c> 或 <c>3</c>。</param>
-    /// <exception cref="ArgumentException">當字串不符合 ODF <c>lineWidth</c> 格式時擲回。</exception>
+    /// <param name="value">線條寬度，例如 <c>auto</c>、<c>bold</c>、<c>150%</c>、<c>2pt</c> 或 <c>3</c></param>
+    /// <exception cref="ArgumentException">當字串不符合 ODF <c>lineWidth</c> 格式時擲回</exception>
     public OdfLineWidth(string value)
     {
         if (!TryParseParts(value, out OdfLineWidthKind kind, out int? positiveInteger, out decimal? percent, out OdfLength? length))
@@ -57,9 +57,9 @@ public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
     /// <summary>
     /// 嘗試解析線條寬度字串。
     /// </summary>
-    /// <param name="value">線條寬度字串。</param>
-    /// <param name="lineWidth">成功時傳回解析後的線條寬度。</param>
-    /// <returns>若字串符合 ODF <c>lineWidth</c> 格式則為 <see langword="true"/>。</returns>
+    /// <param name="value">線條寬度字串</param>
+    /// <param name="lineWidth">成功時傳回解析後的線條寬度</param>
+    /// <returns>若字串符合 ODF <c>lineWidth</c> 格式則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfLineWidth lineWidth)
     {
         if (TryParseParts(value, out OdfLineWidthKind kind, out int? positiveInteger, out decimal? percent, out OdfLength? length))
@@ -75,14 +75,14 @@ public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
     /// <summary>
     /// 傳回原始線條寬度字串。
     /// </summary>
-    /// <returns>線條寬度字串。</returns>
+    /// <returns>線條寬度字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// 判斷目前值是否等於另一個線條寬度。
     /// </summary>
-    /// <param name="other">要比較的線條寬度。</param>
-    /// <returns>若 lexical form 相同則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的線條寬度</param>
+    /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfLineWidth other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc />
@@ -94,17 +94,17 @@ public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
     /// <summary>
     /// 判斷兩個線條寬度是否相等。
     /// </summary>
-    /// <param name="left">左側線條寬度。</param>
-    /// <param name="right">右側線條寬度。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側線條寬度</param>
+    /// <param name="right">右側線條寬度</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfLineWidth left, OdfLineWidth right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩個線條寬度是否不相等。
     /// </summary>
-    /// <param name="left">左側線條寬度。</param>
-    /// <param name="right">右側線條寬度。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側線條寬度</param>
+    /// <param name="right">右側線條寬度</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfLineWidth left, OdfLineWidth right) => !left.Equals(right);
 
     private OdfLineWidth(string value, OdfLineWidthKind kind, int? positiveInteger, decimal? percent, OdfLength? length)

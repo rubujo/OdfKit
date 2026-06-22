@@ -9,7 +9,7 @@ using System.Xml;
 namespace OdfKit.Core;
 
 /// <summary>
-/// 自訂的 <see cref="SignedXml"/> 子類別，手動尋找符合參考 URI ID 的項目，以繞過 .NET Core 中 GetElementById 的結構描述解析限制。
+/// 自訂的 <see cref="SignedXml"/> 子類別，手動尋找符合參考 URI ID 的專案，以繞過 .NET Core 中 GetElementById 的結構描述解析限制。
 /// </summary>
 internal sealed class XadesSignedXml : SignedXml
 {

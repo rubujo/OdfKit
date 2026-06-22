@@ -16,7 +16,7 @@ public sealed class OdfListCollection : IEnumerable<OdfList>
     /// <summary>
     /// 初始化 <see cref="OdfListCollection"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">所屬文字文件。</param>
+    /// <param name="document">所屬文字文件</param>
     public OdfListCollection(TextDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
@@ -25,8 +25,8 @@ public sealed class OdfListCollection : IEnumerable<OdfList>
     /// <summary>
     /// 新增清單。
     /// </summary>
-    /// <param name="styleName">選用的清單樣式名稱。</param>
-    /// <returns>新增完成的清單。</returns>
+    /// <param name="styleName">選用的清單樣式名稱</param>
+    /// <returns>新增完成的清單</returns>
     public OdfList Add(string? styleName = null)
     {
         return _document.AddList(styleName);
@@ -57,7 +57,7 @@ public sealed class OdfListCollection : IEnumerable<OdfList>
     /// <summary>
     /// 取得清單列舉器，供 LINQ 查詢使用。
     /// </summary>
-    /// <returns>清單列舉器。</returns>
+    /// <returns>清單列舉器</returns>
     public IEnumerator<OdfList> GetEnumerator()
     {
         return Items.GetEnumerator();

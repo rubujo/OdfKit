@@ -11,9 +11,9 @@ public partial class OdfChartDocument
     /// <summary>
     /// 取得指定資料序列的數據標籤設定。
     /// </summary>
-    /// <param name="seriesIndex">序列索引（從 0 起算）。</param>
-    /// <returns>數據標籤設定；若序列未定義數據標籤則為 <see langword="null"/>。</returns>
-    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="seriesIndex"/> 超出範圍時擲出。</exception>
+    /// <param name="seriesIndex">序列索引（從 0 起算）</param>
+    /// <returns>數據標籤設定；若序列未定義數據標籤則為 <see langword="null"/></returns>
+    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="seriesIndex"/> 超出範圍時擲出</exception>
     public OdfChartDataLabelInfo? GetSeriesDataLabels(int seriesIndex)
     {
         OdfNode seriesNode = GetSeriesNodeOrThrow(seriesIndex);
@@ -35,9 +35,9 @@ public partial class OdfChartDocument
     /// <summary>
     /// 設定指定資料序列的數據標籤。
     /// </summary>
-    /// <param name="seriesIndex">序列索引（從 0 起算）。</param>
-    /// <param name="info">數據標籤設定；傳入 <see langword="null"/> 表示移除既有設定。</param>
-    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="seriesIndex"/> 超出範圍時擲出。</exception>
+    /// <param name="seriesIndex">序列索引（從 0 起算）</param>
+    /// <param name="info">數據標籤設定；傳入 <see langword="null"/> 表示移除既有設定</param>
+    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="seriesIndex"/> 超出範圍時擲出</exception>
     public void SetSeriesDataLabels(int seriesIndex, OdfChartDataLabelInfo? info)
     {
         OdfNode seriesNode = GetSeriesNodeOrThrow(seriesIndex);

@@ -13,7 +13,7 @@ public sealed class OdfRowCollection
     /// <summary>
     /// 初始化 <see cref="OdfRowCollection"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="sheet">所屬工作表。</param>
+    /// <param name="sheet">所屬工作表</param>
     internal OdfRowCollection(OdfTableSheet sheet)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
@@ -22,7 +22,7 @@ public sealed class OdfRowCollection
     /// <summary>
     /// 依索引取得列。
     /// </summary>
-    /// <param name="index">以 0 為基準的列索引。</param>
-    /// <returns>指定列。</returns>
+    /// <param name="index">以 0 為基準的列索引</param>
+    /// <returns>指定列</returns>
     public OdfSheetRow this[int index] => new(_sheet, index);
 }

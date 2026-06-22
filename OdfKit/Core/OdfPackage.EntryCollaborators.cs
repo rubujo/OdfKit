@@ -5,12 +5,12 @@ namespace OdfKit.Core;
 public sealed partial class OdfPackage
 {
     /// <summary>
-    /// 供封裝項目讀寫引擎使用的內部協作存取器。
+    /// 供封裝專案讀寫引擎使用的內部協作存取器。
     /// </summary>
     internal OdfPackageEntryCollaborators EntryCollaborators => new(this);
 
     /// <summary>
-    /// 封裝項目讀寫管線的內部協作存取器。
+    /// 封裝專案讀寫管線的內部協作存取器。
     /// </summary>
     internal readonly struct OdfPackageEntryCollaborators
     {

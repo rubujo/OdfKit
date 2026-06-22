@@ -10,7 +10,7 @@ namespace OdfKit.Core;
 internal static class OdfDocumentSettingsEngine
 {
     /// <summary>
-    /// 尋找指定名稱的設定項目。
+    /// 尋找指定名稱的設定專案。
     /// </summary>
     internal static OdfNode? FindSettingsConfigItem(OdfNode settingsDom, string name)
     {
@@ -93,7 +93,7 @@ internal static class OdfDocumentSettingsEngine
     }
 
     /// <summary>
-    /// 尋找或建立設定項目節點。
+    /// 尋找或建立設定專案節點。
     /// </summary>
     internal static OdfNode FindOrCreateConfigItemNode(OdfNode entryNode, string name, string type)
     {

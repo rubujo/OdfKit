@@ -7,16 +7,24 @@
 /// </summary>
 public enum OdfFoTextTransform
 {
-    /// <summary>首字大寫。</summary>
+    /// <summary>
+    /// 首字大寫
+    /// </summary>
     Capitalize,
 
-    /// <summary>小寫。</summary>
+    /// <summary>
+    /// 小寫
+    /// </summary>
     Lowercase,
 
-    /// <summary>不轉換。</summary>
+    /// <summary>
+    /// 不轉換
+    /// </summary>
     None,
 
-    /// <summary>大寫。</summary>
+    /// <summary>
+    /// 大寫
+    /// </summary>
     Uppercase
 }
 
@@ -25,22 +33,34 @@ public enum OdfFoTextTransform
 /// </summary>
 public enum OdfFoTextAlign
 {
-    /// <summary>置中對齊。</summary>
+    /// <summary>
+    /// 置中對齊
+    /// </summary>
     Center,
 
-    /// <summary>結束端對齊。</summary>
+    /// <summary>
+    /// 結束端對齊
+    /// </summary>
     End,
 
-    /// <summary>左右對齊。</summary>
+    /// <summary>
+    /// 左右對齊
+    /// </summary>
     Justify,
 
-    /// <summary>靠左對齊。</summary>
+    /// <summary>
+    /// 靠左對齊
+    /// </summary>
     Left,
 
-    /// <summary>靠右對齊。</summary>
+    /// <summary>
+    /// 靠右對齊
+    /// </summary>
     Right,
 
-    /// <summary>起始端對齊。</summary>
+    /// <summary>
+    /// 起始端對齊
+    /// </summary>
     Start
 }
 
@@ -49,10 +69,14 @@ public enum OdfFoTextAlign
 /// </summary>
 public enum OdfStyleTextRotationScale
 {
-    /// <summary>固定縮放。</summary>
+    /// <summary>
+    /// 固定縮放
+    /// </summary>
     Fixed,
 
-    /// <summary>依行高縮放。</summary>
+    /// <summary>
+    /// 依行高縮放
+    /// </summary>
     LineHeight
 }
 
@@ -61,13 +85,19 @@ public enum OdfStyleTextRotationScale
 /// </summary>
 public enum OdfStyleTextCombine
 {
-    /// <summary>依字母組合。</summary>
+    /// <summary>
+    /// 依字母組合
+    /// </summary>
     Letters,
 
-    /// <summary>依行組合。</summary>
+    /// <summary>
+    /// 依行組合
+    /// </summary>
     Lines,
 
-    /// <summary>不組合。</summary>
+    /// <summary>
+    /// 不組合
+    /// </summary>
     None
 }
 
@@ -76,19 +106,29 @@ public enum OdfStyleTextCombine
 /// </summary>
 public enum OdfDrawFill
 {
-    /// <summary>不填滿。</summary>
+    /// <summary>
+    /// 不填滿
+    /// </summary>
     None,
 
-    /// <summary>純色填滿。</summary>
+    /// <summary>
+    /// 純色填滿
+    /// </summary>
     Solid,
 
-    /// <summary>陰影線填滿。</summary>
+    /// <summary>
+    /// 陰影線填滿
+    /// </summary>
     Hatch,
 
-    /// <summary>漸層填滿。</summary>
+    /// <summary>
+    /// 漸層填滿
+    /// </summary>
     Gradient,
 
-    /// <summary>點陣圖填滿。</summary>
+    /// <summary>
+    /// 點陣圖填滿
+    /// </summary>
     Bitmap
 }
 
@@ -97,22 +137,34 @@ public enum OdfDrawFill
 /// </summary>
 public enum OdfSmilFill
 {
-    /// <summary>移除動畫效果。</summary>
+    /// <summary>
+    /// 移除動畫效果
+    /// </summary>
     Remove,
 
-    /// <summary>凍結動畫效果。</summary>
+    /// <summary>
+    /// 凍結動畫效果
+    /// </summary>
     Freeze,
 
-    /// <summary>保留動畫效果。</summary>
+    /// <summary>
+    /// 保留動畫效果
+    /// </summary>
     Hold,
 
-    /// <summary>轉場填滿行為。</summary>
+    /// <summary>
+    /// 轉場填滿行為
+    /// </summary>
     Transition,
 
-    /// <summary>自動填滿行為。</summary>
+    /// <summary>
+    /// 自動填滿行為
+    /// </summary>
     Auto,
 
-    /// <summary>預設填滿行為。</summary>
+    /// <summary>
+    /// 預設填滿行為
+    /// </summary>
     Default
 }
 
@@ -121,31 +173,49 @@ public enum OdfSmilFill
 /// </summary>
 public enum OdfDrawFillImageRefPoint
 {
-    /// <summary>左上。</summary>
+    /// <summary>
+    /// 左上
+    /// </summary>
     TopLeft,
 
-    /// <summary>上方。</summary>
+    /// <summary>
+    /// 上方
+    /// </summary>
     Top,
 
-    /// <summary>右上。</summary>
+    /// <summary>
+    /// 右上
+    /// </summary>
     TopRight,
 
-    /// <summary>左側。</summary>
+    /// <summary>
+    /// 左側
+    /// </summary>
     Left,
 
-    /// <summary>中央。</summary>
+    /// <summary>
+    /// 中央
+    /// </summary>
     Center,
 
-    /// <summary>右側。</summary>
+    /// <summary>
+    /// 右側
+    /// </summary>
     Right,
 
-    /// <summary>左下。</summary>
+    /// <summary>
+    /// 左下
+    /// </summary>
     BottomLeft,
 
-    /// <summary>下方。</summary>
+    /// <summary>
+    /// 下方
+    /// </summary>
     Bottom,
 
-    /// <summary>右下。</summary>
+    /// <summary>
+    /// 右下
+    /// </summary>
     BottomRight
 }
 
@@ -154,16 +224,24 @@ public enum OdfDrawFillImageRefPoint
 /// </summary>
 public enum OdfDrawColorMode
 {
-    /// <summary>灰階模式。</summary>
+    /// <summary>
+    /// 灰階模式
+    /// </summary>
     Greyscale,
 
-    /// <summary>單色模式。</summary>
+    /// <summary>
+    /// 單色模式
+    /// </summary>
     Mono,
 
-    /// <summary>標準色彩模式。</summary>
+    /// <summary>
+    /// 標準色彩模式
+    /// </summary>
     Standard,
 
-    /// <summary>浮水印模式。</summary>
+    /// <summary>
+    /// 浮水印模式
+    /// </summary>
     Watermark
 }
 
@@ -172,22 +250,34 @@ public enum OdfDrawColorMode
 /// </summary>
 public enum OdfStyleVerticalAlign
 {
-    /// <summary>自動對齊。</summary>
+    /// <summary>
+    /// 自動對齊
+    /// </summary>
     Auto,
 
-    /// <summary>自動對齊。</summary>
+    /// <summary>
+    /// 自動對齊
+    /// </summary>
     Automatic,
 
-    /// <summary>基線對齊。</summary>
+    /// <summary>
+    /// 基線對齊
+    /// </summary>
     Baseline,
 
-    /// <summary>底部對齊。</summary>
+    /// <summary>
+    /// 底部對齊
+    /// </summary>
     Bottom,
 
-    /// <summary>置中對齊。</summary>
+    /// <summary>
+    /// 置中對齊
+    /// </summary>
     Middle,
 
-    /// <summary>頂部對齊。</summary>
+    /// <summary>
+    /// 頂部對齊
+    /// </summary>
     Top
 }
 
@@ -196,19 +286,29 @@ public enum OdfStyleVerticalAlign
 /// </summary>
 public enum OdfStyleVerticalPos
 {
-    /// <summary>置於下方。</summary>
+    /// <summary>
+    /// 置於下方
+    /// </summary>
     Below,
 
-    /// <summary>底部。</summary>
+    /// <summary>
+    /// 底部
+    /// </summary>
     Bottom,
 
-    /// <summary>從頂端起算。</summary>
+    /// <summary>
+    /// 從頂端起算
+    /// </summary>
     FromTop,
 
-    /// <summary>中間。</summary>
+    /// <summary>
+    /// 中間
+    /// </summary>
     Middle,
 
-    /// <summary>頂部。</summary>
+    /// <summary>
+    /// 頂部
+    /// </summary>
     Top
 }
 
@@ -217,40 +317,64 @@ public enum OdfStyleVerticalPos
 /// </summary>
 public enum OdfStyleVerticalRel
 {
-    /// <summary>基線。</summary>
+    /// <summary>
+    /// 基線
+    /// </summary>
     Baseline,
 
-    /// <summary>字元。</summary>
+    /// <summary>
+    /// 字元
+    /// </summary>
     Char,
 
-    /// <summary>框架。</summary>
+    /// <summary>
+    /// 框架
+    /// </summary>
     Frame,
 
-    /// <summary>框架內容。</summary>
+    /// <summary>
+    /// 框架內容
+    /// </summary>
     FrameContent,
 
-    /// <summary>行。</summary>
+    /// <summary>
+    /// 行
+    /// </summary>
     Line,
 
-    /// <summary>頁面。</summary>
+    /// <summary>
+    /// 頁面
+    /// </summary>
     Page,
 
-    /// <summary>頁面內容。</summary>
+    /// <summary>
+    /// 頁面內容
+    /// </summary>
     PageContent,
 
-    /// <summary>頁面內容底部。</summary>
+    /// <summary>
+    /// 頁面內容底部
+    /// </summary>
     PageContentBottom,
 
-    /// <summary>頁面內容頂部。</summary>
+    /// <summary>
+    /// 頁面內容頂部
+    /// </summary>
     PageContentTop,
 
-    /// <summary>段落。</summary>
+    /// <summary>
+    /// 段落
+    /// </summary>
     Paragraph,
 
-    /// <summary>段落內容。</summary>
+    /// <summary>
+    /// 段落內容
+    /// </summary>
     ParagraphContent,
 
-    /// <summary>文字。</summary>
+    /// <summary>
+    /// 文字
+    /// </summary>
     Text
 }
 
@@ -259,25 +383,39 @@ public enum OdfStyleVerticalRel
 /// </summary>
 public enum OdfStyleHorizontalPos
 {
-    /// <summary>置中。</summary>
+    /// <summary>
+    /// 置中
+    /// </summary>
     Center,
 
-    /// <summary>從內側起算。</summary>
+    /// <summary>
+    /// 從內側起算
+    /// </summary>
     FromInside,
 
-    /// <summary>從左側起算。</summary>
+    /// <summary>
+    /// 從左側起算
+    /// </summary>
     FromLeft,
 
-    /// <summary>內側。</summary>
+    /// <summary>
+    /// 內側
+    /// </summary>
     Inside,
 
-    /// <summary>左側。</summary>
+    /// <summary>
+    /// 左側
+    /// </summary>
     Left,
 
-    /// <summary>外側。</summary>
+    /// <summary>
+    /// 外側
+    /// </summary>
     Outside,
 
-    /// <summary>右側。</summary>
+    /// <summary>
+    /// 右側
+    /// </summary>
     Right
 }
 

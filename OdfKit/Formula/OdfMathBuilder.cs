@@ -14,8 +14,8 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加 MathML <c>mi</c> 識別名稱。
     /// </summary>
-    /// <param name="text">識別名稱文字。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">識別名稱文字</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Identifier(string text)
     {
         _tokens.Add(OdfMathToken.Identifier(text));
@@ -25,8 +25,8 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加 MathML <c>mn</c> 數值。
     /// </summary>
-    /// <param name="text">數值文字。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">數值文字</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Number(string text)
     {
         _tokens.Add(OdfMathToken.Number(text));
@@ -36,8 +36,8 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加 MathML <c>mo</c> 運算子。
     /// </summary>
-    /// <param name="text">運算子文字。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">運算子文字</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Operator(string text)
     {
         _tokens.Add(OdfMathToken.Operator(text));
@@ -47,8 +47,8 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加 MathML <c>mtext</c> 文字。
     /// </summary>
-    /// <param name="text">文字內容。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="text">文字內容</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Text(string text)
     {
         _tokens.Add(OdfMathToken.TextToken(text));
@@ -58,9 +58,9 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加分數（<c>mfrac</c>）。
     /// </summary>
-    /// <param name="numerator">分子組合委派。</param>
-    /// <param name="denominator">分母組合委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="numerator">分子組合委派</param>
+    /// <param name="denominator">分母組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Fraction(Action<OdfMathBuilder> numerator, Action<OdfMathBuilder> denominator)
     {
         _tokens.Add(OdfMathToken.Fraction(BuildSingle(numerator), BuildSingle(denominator)));
@@ -70,8 +70,8 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加平方根（<c>msqrt</c>）。
     /// </summary>
-    /// <param name="radicand">被開方數組合委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="radicand">被開方數組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Sqrt(Action<OdfMathBuilder> radicand)
     {
         _tokens.Add(OdfMathToken.Radical(BuildSingle(radicand)));
@@ -81,9 +81,9 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加具根指數的根號（<c>mroot</c>）。
     /// </summary>
-    /// <param name="radicand">被開方數組合委派。</param>
-    /// <param name="index">根指數組合委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="radicand">被開方數組合委派</param>
+    /// <param name="index">根指數組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Root(Action<OdfMathBuilder> radicand, Action<OdfMathBuilder> index)
     {
         _tokens.Add(OdfMathToken.Radical(BuildSingle(radicand), BuildSingle(index)));
@@ -93,8 +93,8 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加群組列（<c>mrow</c>）。
     /// </summary>
-    /// <param name="content">群組內容組合委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="content">群組內容組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Row(Action<OdfMathBuilder> content)
     {
         _tokens.Add(BuildRow(content));
@@ -104,9 +104,9 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加上標（<c>msup</c>）。
     /// </summary>
-    /// <param name="baseExpr">底數組合委派。</param>
-    /// <param name="script">上標組合委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="baseExpr">底數組合委派</param>
+    /// <param name="script">上標組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Superscript(Action<OdfMathBuilder> baseExpr, Action<OdfMathBuilder> script)
     {
         _tokens.Add(OdfMathToken.Superscript(BuildSingle(baseExpr), BuildSingle(script)));
@@ -116,9 +116,9 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加下標（<c>msub</c>）。
     /// </summary>
-    /// <param name="baseExpr">底數組合委派。</param>
-    /// <param name="script">下標組合委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="baseExpr">底數組合委派</param>
+    /// <param name="script">下標組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Subscript(Action<OdfMathBuilder> baseExpr, Action<OdfMathBuilder> script)
     {
         _tokens.Add(OdfMathToken.Subscript(BuildSingle(baseExpr), BuildSingle(script)));
@@ -128,9 +128,9 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加下方標記（<c>munder</c>）。
     /// </summary>
-    /// <param name="baseExpr">底數組合委派。</param>
-    /// <param name="under">下方標記組合委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="baseExpr">底數組合委派</param>
+    /// <param name="under">下方標記組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Under(Action<OdfMathBuilder> baseExpr, Action<OdfMathBuilder> under)
     {
         _tokens.Add(OdfMathToken.Under(BuildSingle(baseExpr), BuildSingle(under)));
@@ -140,9 +140,9 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加上方標記（<c>mover</c>）。
     /// </summary>
-    /// <param name="baseExpr">底數組合委派。</param>
-    /// <param name="over">上方標記組合委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="baseExpr">底數組合委派</param>
+    /// <param name="over">上方標記組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Over(Action<OdfMathBuilder> baseExpr, Action<OdfMathBuilder> over)
     {
         _tokens.Add(OdfMathToken.Over(BuildSingle(baseExpr), BuildSingle(over)));
@@ -152,10 +152,10 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加上下方標記（<c>munderover</c>）。
     /// </summary>
-    /// <param name="baseExpr">底數組合委派。</param>
-    /// <param name="under">下方標記組合委派。</param>
-    /// <param name="over">上方標記組合委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="baseExpr">底數組合委派</param>
+    /// <param name="under">下方標記組合委派</param>
+    /// <param name="over">上方標記組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder UnderOver(Action<OdfMathBuilder> baseExpr, Action<OdfMathBuilder> under, Action<OdfMathBuilder> over)
     {
         _tokens.Add(OdfMathToken.UnderOver(BuildSingle(baseExpr), BuildSingle(under), BuildSingle(over)));
@@ -165,10 +165,10 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加以括號包圍的群組。
     /// </summary>
-    /// <param name="inner">括號內容組合委派。</param>
-    /// <param name="open">開括號文字，預設為 <c>(</c>。</param>
-    /// <param name="close">閉括號文字，預設為 <c>)</c>。</param>
-    /// <returns>目前 builder 執行個體。</returns>
+    /// <param name="inner">括號內容組合委派</param>
+    /// <param name="open">開括號文字，預設為 <c>(</c></param>
+    /// <param name="close">閉括號文字，預設為 <c>)</c></param>
+    /// <returns>目前 builder 執行個體</returns>
     public OdfMathBuilder Fenced(Action<OdfMathBuilder> inner, string open = "(", string close = ")")
     {
         _tokens.Add(OdfMathToken.Fenced(BuildSingle(inner), open, close));
@@ -178,9 +178,9 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 附加矩陣（<c>mtable</c>）。
     /// </summary>
-    /// <param name="rows">每一列的儲存格組合委派。</param>
-    /// <returns>目前 builder 執行個體。</returns>
-    /// <exception cref="ArgumentException">當未提供任何列時擲出。</exception>
+    /// <param name="rows">每一列的儲存格組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    /// <exception cref="ArgumentException">當未提供任何列時擲出</exception>
     public OdfMathBuilder Matrix(params Action<OdfMathBuilder>[] rows)
     {
         if (rows is null || rows.Length == 0)
@@ -201,8 +201,8 @@ public sealed class OdfMathBuilder
     /// <summary>
     /// 將目前累積的 token 建立為單一 token（多個 token 會包裝為 <c>mrow</c>）。
     /// </summary>
-    /// <returns>建立完成的 <see cref="OdfMathToken"/>。</returns>
-    /// <exception cref="InvalidOperationException">當尚未附加任何 token 時擲出。</exception>
+    /// <returns>建立完成的 <see cref="OdfMathToken"/></returns>
+    /// <exception cref="InvalidOperationException">當尚未附加任何 token 時擲出</exception>
     public OdfMathToken Build()
     {
         if (_tokens.Count == 0)

@@ -8,10 +8,10 @@ namespace OdfKit.Database;
 /// <summary>
 /// 表示 ODB 資料來源設定描述。
 /// </summary>
-/// <param name="name">設定名稱。</param>
-/// <param name="type">設定值型別。</param>
-/// <param name="isList">設定值是否為清單。</param>
-/// <param name="values">設定值清單。</param>
+/// <param name="name">設定名稱</param>
+/// <param name="type">設定值型別</param>
+/// <param name="isList">設定值是否為清單</param>
+/// <param name="values">設定值清單</param>
 public sealed class OdfDatabaseDataSourceSettingInfo(
     string name,
     OdfDatabaseDataSourceSettingType type,

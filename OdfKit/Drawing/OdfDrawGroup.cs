@@ -10,8 +10,8 @@ namespace OdfKit.Drawing;
 /// <summary>
 /// 表示 ODF 繪圖群組。
 /// </summary>
-/// <param name="node">底層的 <see cref="OdfNode"/> 執行個體。</param>
-/// <param name="doc">所屬的 ODF 文件執行個體。</param>
+/// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
+/// <param name="doc">所屬的 ODF 文件執行個體</param>
 public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node, doc)
 {
     /// <summary>
@@ -26,12 +26,12 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
     /// <summary>
     /// 在群組內新增文字方塊。
     /// </summary>
-    /// <param name="x">X 軸座標位置。</param>
-    /// <param name="y">Y 軸座標位置。</param>
-    /// <param name="w">寬度。</param>
-    /// <param name="h">高度。</param>
-    /// <param name="text">文字內容。</param>
-    /// <returns>新增的文字方塊執行個體。</returns>
+    /// <param name="x">X 軸座標位置</param>
+    /// <param name="y">Y 軸座標位置</param>
+    /// <param name="w">寬度</param>
+    /// <param name="h">高度</param>
+    /// <param name="text">文字內容</param>
+    /// <returns>新增的文字方塊執行個體</returns>
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, string text)
     {
         var frame = CreateDrawingFrame(x, y, w, h);
@@ -49,12 +49,12 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
     /// <summary>
     /// 在群組內新增圖形。
     /// </summary>
-    /// <param name="shapeType">圖形類型。</param>
-    /// <param name="x">X 軸座標位置。</param>
-    /// <param name="y">Y 軸座標位置。</param>
-    /// <param name="w">寬度。</param>
-    /// <param name="h">高度。</param>
-    /// <returns>新增的圖形執行個體。</returns>
+    /// <param name="shapeType">圖形類型</param>
+    /// <param name="x">X 軸座標位置</param>
+    /// <param name="y">Y 軸座標位置</param>
+    /// <param name="w">寬度</param>
+    /// <param name="h">高度</param>
+    /// <returns>新增的圖形執行個體</returns>
     public OdfShape AddShape(OdfShapeType shapeType, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         string localName = shapeType switch
@@ -78,10 +78,10 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
     /// <summary>
     /// 在群組內新增連接線。
     /// </summary>
-    /// <param name="startShapeId">起點圖形識別碼。</param>
-    /// <param name="endShapeId">終點圖形識別碼。</param>
-    /// <param name="connectorType">連接線幾何類型。</param>
-    /// <returns>新增的連接線圖形執行個體。</returns>
+    /// <param name="startShapeId">起點圖形識別碼</param>
+    /// <param name="endShapeId">終點圖形識別碼</param>
+    /// <param name="connectorType">連接線幾何類型</param>
+    /// <returns>新增的連接線圖形執行個體</returns>
     public OdfShape AddConnector(
         string startShapeId,
         string endShapeId,

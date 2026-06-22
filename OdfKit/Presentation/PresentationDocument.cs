@@ -51,7 +51,7 @@ public partial class PresentationDocument : OdfDocument
     /// <summary>
     /// 建立新的 ODP 簡報文件 Fluent builder。
     /// </summary>
-    /// <returns>新的 <see cref="PresentationDocumentBuilder"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="PresentationDocumentBuilder"/> 執行個體</returns>
     public static PresentationDocumentBuilder Builder()
     {
         return new PresentationDocumentBuilder(Create());
@@ -60,7 +60,7 @@ public partial class PresentationDocument : OdfDocument
     /// <summary>
     /// 建立新的 ODP 簡報文件。
     /// </summary>
-    /// <returns>新的 <see cref="PresentationDocument"/> 執行個體。</returns>
+    /// <returns>新的 <see cref="PresentationDocument"/> 執行個體</returns>
     public static PresentationDocument Create()
     {
         return (PresentationDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Presentation);
@@ -69,9 +69,9 @@ public partial class PresentationDocument : OdfDocument
     /// <summary>
     /// 從指定的簡報範本文件建立新的簡報文件。
     /// </summary>
-    /// <param name="template">簡報範本文件。</param>
-    /// <param name="clearUserContent">是否清除範本中各投影片的文字內容，但保留版面配置與形狀結構。</param>
-    /// <returns>建立完成的 <see cref="PresentationDocument"/> 執行個體。</returns>
+    /// <param name="template">簡報範本文件</param>
+    /// <param name="clearUserContent">是否清除範本中各投影片的文字內容，但保留版面配置與形狀結構</param>
+    /// <returns>建立完成的 <see cref="PresentationDocument"/> 執行個體</returns>
     public static PresentationDocument CreateFromTemplate(PresentationTemplateDocument template, bool clearUserContent = false)
     {
         return (PresentationDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Presentation, "application/vnd.oasis.opendocument.presentation", clearUserContent);
@@ -86,9 +86,9 @@ public partial class PresentationDocument : OdfDocument
     /// <summary>
     /// 從指定路徑載入 ODP 簡報文件。
     /// </summary>
-    /// <param name="path">ODP 文件路徑。</param>
-    /// <returns>載入完成的 <see cref="PresentationDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODP 簡報時擲出。</exception>
+    /// <param name="path">ODP 文件路徑</param>
+    /// <returns>載入完成的 <see cref="PresentationDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODP 簡報時擲出</exception>
     public new static PresentationDocument Load(string path)
     {
         return EnsurePresentation(OdfDocumentFactory.LoadDocument(path));
@@ -97,19 +97,19 @@ public partial class PresentationDocument : OdfDocument
     /// <summary>
     /// 非同步從指定路徑載入 ODP 簡報文件。
     /// </summary>
-    /// <param name="path">ODP 文件路徑。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="PresentationDocument"/>。</returns>
+    /// <param name="path">ODP 文件路徑</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="PresentationDocument"/></returns>
     public new static async Task<PresentationDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         EnsurePresentation(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
     /// 從指定資料流載入 ODP 簡報文件。
     /// </summary>
-    /// <param name="stream">包含 ODP 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的 <see cref="PresentationDocument"/> 執行個體。</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODP 簡報時擲出。</exception>
+    /// <param name="stream">包含 ODP 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的 <see cref="PresentationDocument"/> 執行個體</returns>
+    /// <exception cref="InvalidOperationException">當指定文件不是 ODP 簡報時擲出</exception>
     public new static PresentationDocument Load(Stream stream, string? fileName = null)
     {
         return EnsurePresentation(OdfDocumentFactory.LoadDocument(stream, fileName));
@@ -118,10 +118,10 @@ public partial class PresentationDocument : OdfDocument
     /// <summary>
     /// 非同步從指定資料流載入 ODP 簡報文件。
     /// </summary>
-    /// <param name="stream">包含 ODP 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="PresentationDocument"/>。</returns>
+    /// <param name="stream">包含 ODP 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="PresentationDocument"/></returns>
     public new static async Task<PresentationDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         EnsurePresentation(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 

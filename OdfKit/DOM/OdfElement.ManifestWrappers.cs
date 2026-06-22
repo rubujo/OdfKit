@@ -20,7 +20,7 @@ public partial class ManifestManifestElement(string? prefix = null) : OdfElement
 public partial class ManifestFileEntryElement(string? prefix = null) : OdfElement("file-entry", OdfNamespaces.Manifest, prefix)
 {
     /// <summary>
-    /// 取得或設定檔案項目在套件中的完整路徑。
+    /// 取得或設定檔案專案在套件中的完整路徑。
     /// </summary>
     public string? FullPath
     {
@@ -35,7 +35,7 @@ public partial class ManifestFileEntryElement(string? prefix = null) : OdfElemen
     }
 
     /// <summary>
-    /// 取得或設定檔案項目的媒體類型。
+    /// 取得或設定檔案專案的媒體類型。
     /// </summary>
     public string? MediaType
     {

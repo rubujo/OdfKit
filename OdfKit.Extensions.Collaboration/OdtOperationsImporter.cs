@@ -16,9 +16,9 @@ public static class OdtOperationsImporter
     /// <summary>
     /// 將 JSON operations 陣列字串重播至新建立的文字文件。
     /// </summary>
-    /// <param name="operationsJson">JSON operations 陣列字串。</param>
-    /// <returns>套用 operations 後的文字文件。</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="operationsJson"/> 為 null 時擲出。</exception>
+    /// <param name="operationsJson">JSON operations 陣列字串</param>
+    /// <returns>套用 operations 後的文字文件</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="operationsJson"/> 為 null 時擲出</exception>
     public static TextDocument Merge(string operationsJson)
     {
         TextDocument document = TextDocument.Create();
@@ -29,9 +29,9 @@ public static class OdtOperationsImporter
     /// <summary>
     /// 將 JSON operations 陣列字串重播至既有的文字文件結尾。
     /// </summary>
-    /// <param name="document">目標文字文件。</param>
-    /// <param name="operationsJson">JSON operations 陣列字串。</param>
-    /// <exception cref="ArgumentNullException">當任一參數為 null 時擲出。</exception>
+    /// <param name="document">目標文字文件</param>
+    /// <param name="operationsJson">JSON operations 陣列字串</param>
+    /// <exception cref="ArgumentNullException">當任一參數為 null 時擲出</exception>
     public static void Merge(TextDocument document, string operationsJson)
     {
         if (document is null)

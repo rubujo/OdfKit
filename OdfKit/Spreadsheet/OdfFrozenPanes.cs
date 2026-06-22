@@ -6,8 +6,8 @@ namespace OdfKit.Spreadsheet;
 /// <summary>
 /// 表示工作表凍結窗格設定。
 /// </summary>
-/// <param name="rows">凍結列數。</param>
-/// <param name="columns">凍結欄數。</param>
+/// <param name="rows">凍結列數</param>
+/// <param name="columns">凍結欄數</param>
 public readonly struct OdfFrozenPanes(int rows, int columns) : IEquatable<OdfFrozenPanes>
 {
     /// <summary>

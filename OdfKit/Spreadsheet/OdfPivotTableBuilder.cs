@@ -10,17 +10,29 @@ namespace OdfKit.Spreadsheet;
 /// </summary>
 public enum OdfPivotFunction
 {
-    /// <summary>加總</summary>
+    /// <summary>
+    /// 加總
+    /// </summary>
     Sum,
-    /// <summary>計數</summary>
+    /// <summary>
+    /// 計數
+    /// </summary>
     Count,
-    /// <summary>平均值</summary>
+    /// <summary>
+    /// 平均值
+    /// </summary>
     Average,
-    /// <summary>最大值</summary>
+    /// <summary>
+    /// 最大值
+    /// </summary>
     Max,
-    /// <summary>最小值</summary>
+    /// <summary>
+    /// 最小值
+    /// </summary>
     Min,
-    /// <summary>計算公式（搭配 AddCalculatedField 使用）</summary>
+    /// <summary>
+    /// 計算公式（搭配 AddCalculatedField 使用）
+    /// </summary>
     Formula,
 }
 
@@ -29,17 +41,29 @@ public enum OdfPivotFunction
 /// </summary>
 public enum OdfPivotFilterOperator
 {
-    /// <summary>等於</summary>
+    /// <summary>
+    /// 等於
+    /// </summary>
     Equal,
-    /// <summary>不等於</summary>
+    /// <summary>
+    /// 不等於
+    /// </summary>
     NotEqual,
-    /// <summary>大於</summary>
+    /// <summary>
+    /// 大於
+    /// </summary>
     GreaterThan,
-    /// <summary>大於或等於</summary>
+    /// <summary>
+    /// 大於或等於
+    /// </summary>
     GreaterThanOrEqual,
-    /// <summary>小於</summary>
+    /// <summary>
+    /// 小於
+    /// </summary>
     LessThan,
-    /// <summary>小於或等於</summary>
+    /// <summary>
+    /// 小於或等於
+    /// </summary>
     LessThanOrEqual,
 }
 

@@ -20,7 +20,7 @@ public sealed class OdfTextBody
     /// <summary>
     /// 初始化 <see cref="OdfTextBody"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">所屬文字文件。</param>
+    /// <param name="document">所屬文字文件</param>
     public OdfTextBody(TextDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));

@@ -12,8 +12,8 @@ public readonly struct OdfNamespacedToken : IEquatable<OdfNamespacedToken>
     /// <summary>
     /// 以 QName lexical form 建立 <see cref="OdfNamespacedToken"/>。
     /// </summary>
-    /// <param name="value">QName 字串，例如 <c>draw:shape</c>。</param>
-    /// <exception cref="ArgumentException">當 QName 不符合 ODF <c>namespacedToken</c> 格式時擲回。</exception>
+    /// <param name="value">QName 字串，例如 <c>draw:shape</c></param>
+    /// <exception cref="ArgumentException">當 QName 不符合 ODF <c>namespacedToken</c> 格式時擲回</exception>
     public OdfNamespacedToken(string value)
     {
         if (!TryParseParts(value, out string? prefix, out string? localName))
@@ -44,9 +44,9 @@ public readonly struct OdfNamespacedToken : IEquatable<OdfNamespacedToken>
     /// <summary>
     /// 嘗試解析 QName 字串。
     /// </summary>
-    /// <param name="value">QName 字串。</param>
-    /// <param name="namespacedToken">成功時傳回解析後的命名空間 token。</param>
-    /// <returns>若字串符合 ODF <c>namespacedToken</c> 格式則為 <see langword="true"/>。</returns>
+    /// <param name="value">QName 字串</param>
+    /// <param name="namespacedToken">成功時傳回解析後的命名空間 token</param>
+    /// <returns>若字串符合 ODF <c>namespacedToken</c> 格式則為 <see langword="true"/></returns>
     public static bool TryParse(string? value, out OdfNamespacedToken namespacedToken)
     {
         if (TryParseParts(value, out string? prefix, out string? localName))
@@ -62,14 +62,14 @@ public readonly struct OdfNamespacedToken : IEquatable<OdfNamespacedToken>
     /// <summary>
     /// 傳回原始 QName 字串。
     /// </summary>
-    /// <returns>QName 字串。</returns>
+    /// <returns>QName 字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// 判斷目前值是否等於另一個命名空間 token。
     /// </summary>
-    /// <param name="other">要比較的命名空間 token。</param>
-    /// <returns>若 lexical form 相同則為 <see langword="true"/>。</returns>
+    /// <param name="other">要比較的命名空間 token</param>
+    /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfNamespacedToken other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
     /// <inheritdoc />
@@ -81,17 +81,17 @@ public readonly struct OdfNamespacedToken : IEquatable<OdfNamespacedToken>
     /// <summary>
     /// 判斷兩個命名空間 token 是否相等。
     /// </summary>
-    /// <param name="left">左側命名空間 token。</param>
-    /// <param name="right">右側命名空間 token。</param>
-    /// <returns>若兩者相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側命名空間 token</param>
+    /// <param name="right">右側命名空間 token</param>
+    /// <returns>若兩者相等則為 <see langword="true"/></returns>
     public static bool operator ==(OdfNamespacedToken left, OdfNamespacedToken right) => left.Equals(right);
 
     /// <summary>
     /// 判斷兩個命名空間 token 是否不相等。
     /// </summary>
-    /// <param name="left">左側命名空間 token。</param>
-    /// <param name="right">右側命名空間 token。</param>
-    /// <returns>若兩者不相等則為 <see langword="true"/>。</returns>
+    /// <param name="left">左側命名空間 token</param>
+    /// <param name="right">右側命名空間 token</param>
+    /// <returns>若兩者不相等則為 <see langword="true"/></returns>
     public static bool operator !=(OdfNamespacedToken left, OdfNamespacedToken right) => !left.Equals(right);
 
     private OdfNamespacedToken(string value, string prefix, string localName)

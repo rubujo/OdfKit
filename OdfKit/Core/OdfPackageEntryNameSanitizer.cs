@@ -5,15 +5,15 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
-/// ODF 封裝 ZIP 項目名稱淨化引擎（Zip Slip 防禦，內部協作者）。
+/// ODF 封裝 ZIP 專案名稱淨化引擎（Zip Slip 防禦，內部協作者）。
 /// </summary>
 internal static class OdfPackageEntryNameSanitizer
 {
     /// <summary>
-    /// 淨化與驗證 ZIP 項目名稱，防止目錄穿越攻擊（Zip Slip 漏洞防禦）。
+    /// 淨化與驗證 ZIP 專案名稱，防止目錄穿越攻擊（Zip Slip 漏洞防禦）。
     /// </summary>
-    /// <param name="name">原始項目名稱</param>
-    /// <returns>淨化後的標準項目名稱</returns>
+    /// <param name="name">原始專案名稱</param>
+    /// <returns>淨化後的標準專案名稱</returns>
     internal static string Sanitize(string name)
     {
         if (string.IsNullOrEmpty(name))

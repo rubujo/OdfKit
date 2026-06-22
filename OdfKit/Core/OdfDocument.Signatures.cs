@@ -17,7 +17,7 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 使用指定的 X.509 憑證對文件進行數位簽章。
     /// </summary>
-    /// <param name="certificate">用於簽章的憑證。</param>
+    /// <param name="certificate">用於簽章的憑證</param>
     public void Sign(X509Certificate2 certificate)
     {
         SignAsync(certificate).GetAwaiter().GetResult();
@@ -26,9 +26,9 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 非同步使用指定的 X.509 憑證對文件進行數位簽章。
     /// </summary>
-    /// <param name="certificate">用於簽章的憑證。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步簽章作業的工作。</returns>
+    /// <param name="certificate">用於簽章的憑證</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步簽章作業的工作</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 DOM 寫入、ZIP 寫入與 HTTP（TSA／CRL）期間協作檢查取消語彙。
@@ -46,9 +46,9 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// 取得文件封裝內數位簽章項目的摘要狀態。
+    /// 取得文件封裝內數位簽章專案的摘要狀態。
     /// </summary>
-    /// <returns>描述簽章項目存在狀態、可讀性與簽章數量的摘要。</returns>
+    /// <returns>描述簽章專案存在狀態、可讀性與簽章數量的摘要</returns>
     public OdfDocumentSignatureSummary GetSignatureSummary()
     {
         if (!Package.HasEntry(DocumentSignaturesPath))
@@ -82,8 +82,8 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 驗證文件中的所有數位簽章，並傳回詳細驗證結果。
     /// </summary>
-    /// <param name="options">簽章驗證選項；若為 <see langword="null"/>，則使用預設選項。</param>
-    /// <returns>詳細的數位簽章驗證結果。</returns>
+    /// <param name="options">簽章驗證選項；若為 <see langword="null"/>，則使用預設選項</param>
+    /// <returns>詳細的數位簽章驗證結果</returns>
     public OdfSignatureValidationResult VerifySignatures(OdfSigningOptions? options = null)
     {
         return OdfSigner.VerifySignatures(Package, options);
@@ -92,9 +92,9 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 非同步驗證文件中的所有數位簽章，並傳回詳細驗證結果。
     /// </summary>
-    /// <param name="options">簽章驗證選項；若為 <see langword="null"/>，則使用預設選項。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果。</returns>
+    /// <param name="options">簽章驗證選項；若為 <see langword="null"/>，則使用預設選項</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步驗證作業的工作，其結果包含詳細的數位簽章驗證結果</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在簽章解析與 HTTP（CRL）期間協作檢查取消語彙。

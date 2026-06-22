@@ -27,8 +27,8 @@ public static class OdfDocumentFactory
     /// <summary>
     /// 建立指定種類的高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="kind">要建立的 ODF 文件種類。</param>
-    /// <returns>建立完成的 ODF 文件。</returns>
+    /// <param name="kind">要建立的 ODF 文件種類</param>
+    /// <returns>建立完成的 ODF 文件</returns>
     public static OdfDocument CreateDocument(OdfDocumentKind kind)
     {
         OdfDocumentKind packageKind = OdfDocumentKindDetector.IsFlatKind(kind)
@@ -45,8 +45,8 @@ public static class OdfDocumentFactory
     /// <summary>
     /// 從指定路徑載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="path">ODF 文件路徑。</param>
-    /// <returns>載入完成的 ODF 文件。</returns>
+    /// <param name="path">ODF 文件路徑</param>
+    /// <returns>載入完成的 ODF 文件</returns>
     public static OdfDocument LoadDocument(string path)
     {
         return LoadDocument(path, options: null);
@@ -55,9 +55,9 @@ public static class OdfDocumentFactory
     /// <summary>
     /// 從指定路徑與載入選項載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="path">ODF 文件路徑。</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制。</param>
-    /// <returns>載入完成的 ODF 文件。</returns>
+    /// <param name="path">ODF 文件路徑</param>
+    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
+    /// <returns>載入完成的 ODF 文件</returns>
     public static OdfDocument LoadDocument(string path, OdfLoadOptions? options)
     {
         if (path is null)
@@ -70,9 +70,9 @@ public static class OdfDocumentFactory
     /// <summary>
     /// 非同步從指定路徑載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="path">ODF 文件路徑。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    /// <param name="path">ODF 文件路徑</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
     public static Task<OdfDocument> LoadDocumentAsync(string path, CancellationToken cancellationToken = default)
     {
         return LoadDocumentAsync(path, options: null, cancellationToken);
@@ -81,10 +81,10 @@ public static class OdfDocumentFactory
     /// <summary>
     /// 非同步從指定路徑與載入選項載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="path">ODF 文件路徑。</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    /// <param name="path">ODF 文件路徑</param>
+    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
     public static async Task<OdfDocument> LoadDocumentAsync(
         string path,
         OdfLoadOptions? options,
@@ -100,9 +100,9 @@ public static class OdfDocumentFactory
     /// <summary>
     /// 從指定資料流載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的 ODF 文件。</returns>
+    /// <param name="stream">包含 ODF 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的 ODF 文件</returns>
     public static OdfDocument LoadDocument(Stream stream, string? fileName = null)
     {
         return LoadDocument(stream, options: null, fileName);
@@ -111,10 +111,10 @@ public static class OdfDocumentFactory
     /// <summary>
     /// 從指定資料流與載入選項載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流。</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <returns>載入完成的 ODF 文件。</returns>
+    /// <param name="stream">包含 ODF 文件內容的資料流</param>
+    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>載入完成的 ODF 文件</returns>
     public static OdfDocument LoadDocument(Stream stream, OdfLoadOptions? options, string? fileName = null)
     {
         if (stream is null)
@@ -127,10 +127,10 @@ public static class OdfDocumentFactory
     /// <summary>
     /// 非同步從指定資料流載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    /// <param name="stream">包含 ODF 文件內容的資料流</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
     public static Task<OdfDocument> LoadDocumentAsync(
         Stream stream,
         string? fileName = null,
@@ -142,11 +142,11 @@ public static class OdfDocumentFactory
     /// <summary>
     /// 非同步從指定資料流與載入選項載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流。</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制。</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測。</param>
-    /// <param name="cancellationToken">取消語彙基元。</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
+    /// <param name="stream">包含 ODF 文件內容的資料流</param>
+    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
+    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
     public static async Task<OdfDocument> LoadDocumentAsync(
         Stream stream,
         OdfLoadOptions? options,

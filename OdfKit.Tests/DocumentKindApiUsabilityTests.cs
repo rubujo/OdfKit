@@ -25,10 +25,10 @@ public class DocumentKindApiUsabilityTests
     /// <summary>
     /// 驗證文件層格式摘要會回報 Flat XML 種類與高階 wrapper。
     /// </summary>
-    /// <param name="kind">要建立的 Flat XML ODF 種類。</param>
-    /// <param name="contentKind">對應的內容種類。</param>
-    /// <param name="expectedType">預期的高階 wrapper 類型。</param>
-    /// <param name="extension">預期副檔名。</param>
+    /// <param name="kind">要建立的 Flat XML ODF 種類</param>
+    /// <param name="contentKind">對應的內容種類</param>
+    /// <param name="expectedType">預期的高階 wrapper 類型</param>
+    /// <param name="extension">預期副檔名</param>
     [Theory]
     [InlineData(OdfDocumentKind.FlatText, OdfDocumentKind.Text, typeof(FlatTextDocument), ".fodt")]
     [InlineData(OdfDocumentKind.FlatSpreadsheet, OdfDocumentKind.Spreadsheet, typeof(FlatSpreadsheetDocument), ".fods")]
@@ -65,9 +65,9 @@ public class DocumentKindApiUsabilityTests
     /// <summary>
     /// 驗證文件層格式摘要會回報範本種類與內容種類。
     /// </summary>
-    /// <param name="kind">要建立的 ODF 範本種類。</param>
-    /// <param name="contentKind">對應的內容種類。</param>
-    /// <param name="extension">預期副檔名。</param>
+    /// <param name="kind">要建立的 ODF 範本種類</param>
+    /// <param name="contentKind">對應的內容種類</param>
+    /// <param name="extension">預期副檔名</param>
     [Theory]
     [InlineData(OdfDocumentKind.TextTemplate, OdfDocumentKind.Text, typeof(TextTemplateDocument), ".ott")]
     [InlineData(OdfDocumentKind.SpreadsheetTemplate, OdfDocumentKind.Spreadsheet, typeof(SpreadsheetTemplateDocument), ".ots")]

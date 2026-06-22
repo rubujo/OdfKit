@@ -8,15 +8,23 @@ namespace OdfKit.Spreadsheet;
 /// </summary>
 public enum OdfIconSetType
 {
-    /// <summary>三箭頭（↑ →↓）</summary>
+    /// <summary>
+    /// 三箭頭（↑ →↓）
+    /// </summary>
     ThreeArrows,
 
-    /// <summary>三交通燈（●●●）</summary>
+    /// <summary>
+    /// 三交通燈（●●●）
+    /// </summary>
     ThreeTrafficLights,
 
-    /// <summary>四評分（★★★★）</summary>
+    /// <summary>
+    /// 四評分（★★★★）
+    /// </summary>
     FourRating,
 
-    /// <summary>五評分（★★★★★）</summary>
+    /// <summary>
+    /// 五評分（★★★★★）
+    /// </summary>
     FiveRating,
 }

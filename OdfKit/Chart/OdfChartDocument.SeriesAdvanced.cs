@@ -16,9 +16,9 @@ public partial class OdfChartDocument
     /// <summary>
     /// 取得指定索引的可編輯資料序列。
     /// </summary>
-    /// <param name="index">序列索引（從 0 起算）。</param>
-    /// <returns>可編輯的序列物件。</returns>
-    /// <exception cref="ArgumentOutOfRangeException">索引超出範圍時擲出。</exception>
+    /// <param name="index">序列索引（從 0 起算）</param>
+    /// <returns>可編輯的序列物件</returns>
+    /// <exception cref="ArgumentOutOfRangeException">索引超出範圍時擲出</exception>
     public OdfChartSeries GetSeriesEditor(int index)
     {
         IReadOnlyList<OdfNode> nodes = GetSeriesNodes();

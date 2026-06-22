@@ -20,7 +20,7 @@ namespace OdfKit.Core;
 internal static class OdfPackageFlatXmlLoader
 {
     /// <summary>
-    /// 將 Flat XML 串流解析為虛擬 ZIP 項目結構。
+    /// 將 Flat XML 串流解析為虛擬 ZIP 專案結構。
     /// </summary>
     internal static void Initialize(OdfPackage.OdfPackageLoadCollaborators ctx, byte[] signature, int signatureLength)
     {
@@ -316,7 +316,7 @@ internal static class OdfPackageFlatXmlLoader
     }
 
     /// <summary>
-    /// 非同步將 Flat XML 串流解析為虛擬 ZIP 項目結構；不可搜尋串流會先緩衝至記憶體。
+    /// 非同步將 Flat XML 串流解析為虛擬 ZIP 專案結構；不可搜尋串流會先緩衝至記憶體。
     /// </summary>
     internal static async Task InitializeAsync(
         OdfPackage.OdfPackageLoadCollaborators ctx,

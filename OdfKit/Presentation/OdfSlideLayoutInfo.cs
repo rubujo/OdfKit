@@ -3,10 +3,10 @@
 /// <summary>
 /// 表示簡報中某一投影片版面配置的摘要資訊。
 /// </summary>
-/// <param name="slideIndex">投影片索引位置。</param>
-/// <param name="slideName">投影片名稱。</param>
-/// <param name="layoutName">原始版面配置名稱（<c>presentation:page-layout-name</c>）。</param>
-/// <param name="layout">高階版面配置型態。</param>
+/// <param name="slideIndex">投影片索引位置</param>
+/// <param name="slideName">投影片名稱</param>
+/// <param name="layoutName">原始版面配置名稱（<c>presentation:page-layout-name</c>）</param>
+/// <param name="layout">高階版面配置型態</param>
 public sealed class OdfSlideLayoutInfo(
     int slideIndex,
     string slideName,
