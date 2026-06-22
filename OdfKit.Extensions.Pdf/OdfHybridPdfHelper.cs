@@ -204,7 +204,7 @@ public static class OdfHybridPdfHelper
         {
             names = new PdfDictionary(document);
             document.Internals.AddObject(names);
-            catalog.Elements.SetObject("/Names", names);
+            catalog.Elements.SetReference("/Names", names);
         }
 
         var embeddedFiles = names.Elements.GetDictionary("/EmbeddedFiles");
@@ -212,7 +212,7 @@ public static class OdfHybridPdfHelper
         {
             embeddedFiles = new PdfDictionary(document);
             document.Internals.AddObject(embeddedFiles);
-            names.Elements.SetObject("/EmbeddedFiles", embeddedFiles);
+            names.Elements.SetReference("/EmbeddedFiles", embeddedFiles);
         }
 
         var namesArray = embeddedFiles.Elements.GetArray("/Names");
