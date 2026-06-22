@@ -154,30 +154,67 @@ public class DatabaseSchemaAndFormTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfDatabaseFormDesigner"/> 正確定義報表結構（Page Header, Detail, Group Header）。
+    /// 驗證 <see cref="OdfParagraph.AddDatabaseDisplayField"/>／<see cref="OdfParagraph.AddDatabaseNextField"/>
+    /// 產生合法的 <c>text:database-display</c>／<c>text:database-next</c> 結構（官方 ODF schema 元素）。
     /// </summary>
     [Fact]
-    public void FormDesigner_DefineReportStructure_CreatesCorrectStructure()
+    public void Paragraph_DatabaseFields_ProduceValidSchemaElements()
     {
         using var reportDoc = TextDocument.Create();
-        var designer = new OdfDatabaseFormDesigner(reportDoc);
 
-        designer.DefineReportStructure(hasPageHeader: true, hasDetail: true, hasGroupHeader: true, groupName: "SalesGroup");
+        var header = reportDoc.AddParagraph("客戶：");
+        header.AddDatabaseDisplayField("Customers", "CustomerName", tableType: "table", databaseName: "SalesDb");
 
+        var detail = reportDoc.AddParagraph("金額：");
+        detail.AddDatabaseDisplayField("Orders", "Amount");
+        detail.AddDatabaseNextField("Orders", condition: "true()");
+
+        var contentXml = SaveAndGetContentXml(reportDoc);
+
+        Assert.Contains("text:database-display", contentXml);
+        Assert.Contains("text:table-name=\"Customers\"", contentXml);
+        Assert.Contains("text:column-name=\"CustomerName\"", contentXml);
+        Assert.Contains("text:table-type=\"table\"", contentXml);
+        Assert.Contains("text:database-name=\"SalesDb\"", contentXml);
+
+        Assert.Contains("text:database-next", contentXml);
+        Assert.Contains("text:table-name=\"Orders\"", contentXml);
+        Assert.Contains("text:condition=\"true()\"", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證報表內容應建立為獨立 <see cref="TextDocument"/>（使用真實 ODF 欄位元素），
+    /// 再透過 <see cref="OdfDatabaseDocument.AddReport"/> 的 <c>xlink:href</c> 參照機制連結至 .odb 套件，
+    /// 取代先前基於虛構 <c>report:1.0</c> 命名空間的 <c>DefineReportStructure</c>。
+    /// </summary>
+    [Fact]
+    public void Database_ReportLinkedViaHref_ToTextDocumentBasedReport()
+    {
+        using var reportDoc = TextDocument.Create();
+        var p = reportDoc.AddParagraph("銷售人員：");
+        p.AddDatabaseDisplayField("Sales", "SalesPersonName", tableType: "table");
+
+        using var database = OdfDatabaseDocument.Create();
+        database.AddReport("SalesReport", href: "Reports/SalesReport/", title: "銷售報表");
+
+        OdfDatabaseReportInfo? report = database.FindReport("SalesReport");
+        Assert.NotNull(report);
+        Assert.Equal("Reports/SalesReport/", report!.Href);
+
+        var reportContentXml = SaveAndGetContentXml(reportDoc);
+        Assert.Contains("text:database-display", reportContentXml);
+        Assert.Contains("text:table-name=\"Sales\"", reportContentXml);
+    }
+
+    private static string SaveAndGetContentXml(TextDocument document)
+    {
         using var stream = new MemoryStream();
-        reportDoc.SaveToStream(stream);
+        document.SaveToStream(stream);
         stream.Position = 0;
 
         using var pkg = OdfPackage.Open(stream, leaveOpen: true);
         using var entryStream = pkg.GetEntryStream("content.xml");
         using var reader = new System.IO.StreamReader(entryStream);
-        string xml = reader.ReadToEnd();
-
-        Assert.Contains("report:report", xml);
-        Assert.Contains("report:page-header", xml);
-        Assert.Contains("report:detail", xml);
-        Assert.Contains("report:groups", xml);
-        Assert.Contains("report:group report:name=\"SalesGroup\"", xml);
-        Assert.Contains("report:group-header", xml);
+        return reader.ReadToEnd();
     }
 }

@@ -342,6 +342,22 @@ public partial class OdfParagraph
     /// <param name="name">變數名稱</param>
     public void AddVariableGetField(string name) => Doc.AddVariableGetField(this, name);
 
+    /// <summary>在段落中新增資料庫欄位顯示欄位（<c>text:database-display</c>），用於合併列印或報表內容綁定資料表欄位。</summary>
+    /// <param name="tableName">資料表、查詢或指令名稱</param>
+    /// <param name="columnName">要顯示的欄位名稱</param>
+    /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"</param>
+    /// <param name="databaseName">資料庫連線名稱</param>
+    public void AddDatabaseDisplayField(string tableName, string columnName, string? tableType = null, string? databaseName = null) =>
+        Doc.AddDatabaseDisplayField(this, tableName, columnName, tableType, databaseName);
+
+    /// <summary>在段落中新增資料庫下一筆記錄欄位（<c>text:database-next</c>），用於合併列印或報表的逐筆換行。</summary>
+    /// <param name="tableName">資料表、查詢或指令名稱</param>
+    /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"</param>
+    /// <param name="databaseName">資料庫連線名稱</param>
+    /// <param name="condition">換行前的判斷條件式</param>
+    public void AddDatabaseNextField(string tableName, string? tableType = null, string? databaseName = null, string? condition = null) =>
+        Doc.AddDatabaseNextField(this, tableName, tableType, databaseName, condition);
+
     /// <summary>在段落中插入腳注。</summary>
     /// <param name="citation">腳注引用標記</param>
     /// <param name="bodyText">腳注本文內容</param>

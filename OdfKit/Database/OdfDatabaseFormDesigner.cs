@@ -7,7 +7,15 @@ using OdfKit.Styles;
 namespace OdfKit.Database;
 
 /// <summary>
-/// 表示 ODB 資料庫的表單與報表設計器，用於建模表單屬性、常用控制項與報表結構。
+/// 表示 ODB 資料庫的表單設計器，用於建模表單屬性與常用控制項。
+/// <para>
+/// 報表內容（LibreOffice Base「使用嚮導建立報表」產生的型式）應改用 <see cref="OdfKit.Text.TextDocument"/>
+/// 搭配 <see cref="OdfKit.Text.OdfParagraph.AddDatabaseDisplayField"/>／
+/// <see cref="OdfKit.Text.OdfParagraph.AddDatabaseNextField"/> 建立為獨立文件，再透過
+/// <see cref="OdfKit.Database.OdfDatabaseDocument.AddReport"/> 的 href 參照機制連結至 .odb 套件。
+/// 不存在官方 OASIS ODF 報表結構 schema（先前版本的 <c>DefineReportStructure</c> 使用了虛構的
+/// <c>urn:oasis:names:tc:opendocument:xmlns:report:1.0</c> 命名空間，已移除）。
+/// </para>
 /// </summary>
 public sealed class OdfDatabaseFormDesigner
 {
@@ -16,7 +24,6 @@ public sealed class OdfDatabaseFormDesigner
     private const string TextNamespace = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
     private const string DrawNamespace = "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0";
     private const string SvgNamespace = "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0";
-    private const string ReportNamespace = "urn:oasis:names:tc:opendocument:xmlns:report:1.0";
 
     private readonly OdfDocument _document;
     private readonly OdfNode _formNode;
@@ -548,38 +555,6 @@ public sealed class OdfDatabaseFormDesigner
         _formNode.AppendChild(frameNode);
         AddDrawControl(id, x, y, width, height);
         return frameNode;
-    }
-
-    /// <summary>
-    /// 定義報表結構，建立頁首、細節與群組首等區段。
-    /// </summary>
-    /// <param name="hasPageHeader">是否包含頁首區段。</param>
-    /// <param name="hasDetail">是否包含資料明細區段。</param>
-    /// <param name="hasGroupHeader">是否包含群組首區段。</param>
-    /// <param name="groupName">群組區段的識別名稱。</param>
-    public void DefineReportStructure(bool hasPageHeader, bool hasDetail, bool hasGroupHeader, string? groupName = null)
-    {
-        var body = FindOrCreateChild(_document.ContentDom, "body", OfficeNamespace, "office");
-        var report = FindOrCreateChild(body, "report", ReportNamespace, "report");
-
-        if (hasPageHeader)
-        {
-            FindOrCreateChild(report, "page-header", ReportNamespace, "report");
-        }
-
-        if (hasGroupHeader && !string.IsNullOrEmpty(groupName))
-        {
-            var groups = FindOrCreateChild(report, "groups", ReportNamespace, "report");
-            var group = OdfNodeFactory.CreateElement("group", ReportNamespace, "report");
-            group.SetAttribute("name", ReportNamespace, groupName!, "report");
-            FindOrCreateChild(group, "group-header", ReportNamespace, "report");
-            groups.AppendChild(group);
-        }
-
-        if (hasDetail)
-        {
-            FindOrCreateChild(report, "detail", ReportNamespace, "report");
-        }
     }
 
     private void AddLabelProperty(OdfNode controlNode, string? label)

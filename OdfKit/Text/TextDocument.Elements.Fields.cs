@@ -121,5 +121,27 @@ public partial class TextDocument
     internal void AddVariableGetField(OdfParagraph paragraph, string name) =>
         TextDocumentFieldsEngine.AddVariableGetField(paragraph, name);
 
+    /// <summary>
+    /// 在指定的段落中新增資料庫欄位顯示欄位 (<c>text:database-display</c>)。
+    /// </summary>
+    /// <param name="paragraph">要新增欄位的段落執行個體。</param>
+    /// <param name="tableName">資料表、查詢或指令名稱。</param>
+    /// <param name="columnName">要顯示的欄位名稱。</param>
+    /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"。</param>
+    /// <param name="databaseName">資料庫連線名稱。</param>
+    internal void AddDatabaseDisplayField(OdfParagraph paragraph, string tableName, string columnName, string? tableType = null, string? databaseName = null) =>
+        TextDocumentFieldsEngine.AddDatabaseDisplayField(paragraph, tableName, columnName, tableType, databaseName);
+
+    /// <summary>
+    /// 在指定的段落中新增資料庫下一筆記錄欄位 (<c>text:database-next</c>)，用於合併列印或報表的逐筆換行。
+    /// </summary>
+    /// <param name="paragraph">要新增欄位的段落執行個體。</param>
+    /// <param name="tableName">資料表、查詢或指令名稱。</param>
+    /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"。</param>
+    /// <param name="databaseName">資料庫連線名稱。</param>
+    /// <param name="condition">換行前的判斷條件式。</param>
+    internal void AddDatabaseNextField(OdfParagraph paragraph, string tableName, string? tableType = null, string? databaseName = null, string? condition = null) =>
+        TextDocumentFieldsEngine.AddDatabaseNextField(paragraph, tableName, tableType, databaseName, condition);
+
     #endregion
 }

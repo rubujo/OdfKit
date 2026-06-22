@@ -183,4 +183,51 @@ internal static class TextDocumentFieldsEngine
         fNode.SetAttribute("name", OdfNamespaces.Text, name, "text");
         paragraph.Node.AppendChild(fNode);
     }
+
+    internal static void AddDatabaseDisplayField(
+        OdfParagraph paragraph,
+        string tableName,
+        string columnName,
+        string? tableType,
+        string? databaseName)
+    {
+        if (paragraph is null)
+            throw new ArgumentNullException(nameof(paragraph));
+        if (string.IsNullOrEmpty(tableName))
+            throw new ArgumentException("資料表名稱不可為空。", nameof(tableName));
+        if (string.IsNullOrEmpty(columnName))
+            throw new ArgumentException("欄位名稱不可為空。", nameof(columnName));
+
+        var fNode = OdfNodeFactory.CreateElement("database-display", OdfNamespaces.Text, "text");
+        fNode.SetAttribute("table-name", OdfNamespaces.Text, tableName, "text");
+        fNode.SetAttribute("column-name", OdfNamespaces.Text, columnName, "text");
+        if (!string.IsNullOrEmpty(tableType))
+            fNode.SetAttribute("table-type", OdfNamespaces.Text, tableType!, "text");
+        if (!string.IsNullOrEmpty(databaseName))
+            fNode.SetAttribute("database-name", OdfNamespaces.Text, databaseName!, "text");
+        paragraph.Node.AppendChild(fNode);
+    }
+
+    internal static void AddDatabaseNextField(
+        OdfParagraph paragraph,
+        string tableName,
+        string? tableType,
+        string? databaseName,
+        string? condition)
+    {
+        if (paragraph is null)
+            throw new ArgumentNullException(nameof(paragraph));
+        if (string.IsNullOrEmpty(tableName))
+            throw new ArgumentException("資料表名稱不可為空。", nameof(tableName));
+
+        var fNode = OdfNodeFactory.CreateElement("database-next", OdfNamespaces.Text, "text");
+        fNode.SetAttribute("table-name", OdfNamespaces.Text, tableName, "text");
+        if (!string.IsNullOrEmpty(tableType))
+            fNode.SetAttribute("table-type", OdfNamespaces.Text, tableType!, "text");
+        if (!string.IsNullOrEmpty(databaseName))
+            fNode.SetAttribute("database-name", OdfNamespaces.Text, databaseName!, "text");
+        if (!string.IsNullOrEmpty(condition))
+            fNode.SetAttribute("condition", OdfNamespaces.Text, condition!, "text");
+        paragraph.Node.AppendChild(fNode);
+    }
 }
