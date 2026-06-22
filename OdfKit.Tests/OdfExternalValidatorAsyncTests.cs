@@ -1,7 +1,10 @@
 ﻿using System.IO;
+using System.IO.Compression;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Compliance;
+using OdfKit.Text;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -171,5 +174,82 @@ public class OdfExternalValidatorAsyncTests
         {
             await OdfExternalValidator.ValidateWithOdfValidatorAsync(nonexistentDocumentPath, jarPath: "dummy.jar");
         });
+    }
+
+    /// <summary>
+    /// 真機驗證：當設定 <c>ODFKIT_ODFVALIDATOR_JAR</c> 指向真實的 ODF Toolkit Validator JAR 時，
+    /// <see cref="OdfExternalValidator.ValidateWithOdfValidator"/> 應正確回報合規文件為有效、結構毀損
+    /// 文件為無效（含實際的錯誤訊息內容），驗證真實 JAR 呼叫路徑，而非僅停留在參數防護邏輯。
+    /// </summary>
+    [Fact]
+    public void ValidateWithOdfValidator_RealJar_DetectsValidAndInvalidDocuments()
+    {
+        string? jarPath = Environment.GetEnvironmentVariable(OdfExternalValidator.OdfValidatorJarEnvironmentVariable);
+        if (string.IsNullOrWhiteSpace(jarPath) || !File.Exists(jarPath))
+        {
+            Assert.Skip("未設定 ODFKIT_ODFVALIDATOR_JAR 或檔案不存在，略過真實 ODF Validator JAR 驗收。");
+        }
+
+        string validPath = CreateValidOdtFile();
+        string invalidPath = CreateStructurallyInvalidOdtFile(validPath);
+        try
+        {
+            OdfExternalValidatorResult validResult = OdfExternalValidator.ValidateWithOdfValidator(validPath, jarPath);
+            Assert.Equal(0, validResult.ExitCode);
+            Assert.True(validResult.IsValid);
+
+            OdfExternalValidatorResult invalidResult = OdfExternalValidator.ValidateWithOdfValidator(invalidPath, jarPath);
+            Assert.NotEqual(0, invalidResult.ExitCode);
+            Assert.False(invalidResult.IsValid);
+            Assert.Contains("office:text", invalidResult.StandardOutput + invalidResult.StandardError);
+        }
+        finally
+        {
+            TryDelete(validPath);
+            TryDelete(invalidPath);
+        }
+    }
+
+    private static string CreateValidOdtFile()
+    {
+        string path = Path.Combine(Path.GetTempPath(), "odfkit_validator_valid_" + Guid.NewGuid().ToString("N") + ".odt");
+        using var document = TextDocument.Create();
+        document.Body.Headings.Add("ODF Validator 真機驗收標題", 1);
+        document.Body.Paragraphs.Add("這是用來驗證真實 ODF Toolkit Validator JAR 的合規文件內容。");
+        document.Save(path);
+        return path;
+    }
+
+    private static string CreateStructurallyInvalidOdtFile(string validOdtPath)
+    {
+        string invalidPath = Path.Combine(Path.GetTempPath(), "odfkit_validator_invalid_" + Guid.NewGuid().ToString("N") + ".odt");
+
+        var entries = new System.Collections.Generic.Dictionary<string, byte[]>();
+        using (var sourceArchive = ZipFile.OpenRead(validOdtPath))
+        {
+            foreach (var entry in sourceArchive.Entries)
+            {
+                using var entryStream = entry.Open();
+                using var buffer = new MemoryStream();
+                entryStream.CopyTo(buffer);
+                entries[entry.FullName] = buffer.ToArray();
+            }
+        }
+
+        string contentXml = Encoding.UTF8.GetString(entries["content.xml"]);
+        contentXml = contentXml.Replace("</office:text>", "</office:text><office:text>broken-nested-element");
+        entries["content.xml"] = Encoding.UTF8.GetBytes(contentXml);
+
+        using var destination = new FileStream(invalidPath, FileMode.Create, FileAccess.Write);
+        using var destinationArchive = new ZipArchive(destination, ZipArchiveMode.Create);
+        foreach (var pair in entries)
+        {
+            var compression = pair.Key == "mimetype" ? CompressionLevel.NoCompression : CompressionLevel.Optimal;
+            var newEntry = destinationArchive.CreateEntry(pair.Key, compression);
+            using var newEntryStream = newEntry.Open();
+            newEntryStream.Write(pair.Value, 0, pair.Value.Length);
+        }
+
+        return invalidPath;
     }
 }
