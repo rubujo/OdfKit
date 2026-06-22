@@ -1517,8 +1517,6 @@ public class LibreOfficeInteropTests
 
         string[] wellKnownCandidates =
         [
-            @"D:\Portable\PotableAppsPlatform\PortableApps\LibreOfficePortable\App\libreoffice\program\soffice.com",
-            @"D:\Portable\PotableAppsPlatform\PortableApps\LibreOfficePortable\App\libreoffice\program\soffice.exe",
             @"C:\Program Files\LibreOffice\program\soffice.com",
             @"C:\Program Files\LibreOffice\program\soffice.exe",
             @"C:\Program Files (x86)\LibreOffice\program\soffice.com",
@@ -1547,6 +1545,8 @@ public class LibreOfficeInteropTests
         yield return Path.Combine(value, "soffice.exe");
         yield return Path.Combine(value, "program", "soffice.com");
         yield return Path.Combine(value, "program", "soffice.exe");
+        yield return Path.Combine(value, "App", "libreoffice", "program", "soffice.com");
+        yield return Path.Combine(value, "App", "libreoffice", "program", "soffice.exe");
     }
 
     private static string? FindOnPath(string fileName)
