@@ -46,7 +46,33 @@ public static class OdfToXlsxConverter
             var xlSheet = xlWorkbook.Worksheets.Add(odsSheet.Name);
             CopySheetData(odsSheet, xlSheet);
             chartSpecs.AddRange(ReadChartSpecs(odsWorkbook, odsSheet));
-            pivotSpecs.AddRange(ReadPivotSpecs(odsSheet));
+        }
+
+        // 依 ODF 1.4 schema，table:data-pilot-tables 是 office:spreadsheet 的直接子節點
+        // （文件層級，與所有工作表同層），因此改透過 SpreadsheetDocument.GetPivotTables()
+        // 在文件層級一次讀取全部樞紐分析表，而非逐工作表於 table:table 節點內尋找。
+        foreach (OdfPivotTableInfo pivotInfo in odsWorkbook.GetPivotTables())
+        {
+            OdfTableSheet? pivotSheet = odsWorkbook.GetSheet(pivotInfo.SheetName);
+            if (pivotSheet is null || !pivotInfo.TryGetSourceRange(out OdfCellRange sourceRange))
+            {
+                continue;
+            }
+
+            var fields = ReadPivotFields(pivotSheet, pivotInfo, sourceRange);
+            if (fields.Count == 0)
+            {
+                continue;
+            }
+
+            pivotSpecs.Add(new PivotSpec
+            {
+                Name = pivotInfo.Name,
+                SheetName = pivotInfo.SheetName,
+                SourceRef = sourceRange.ToExcelString(),
+                TargetRef = NormalizePivotTargetRef(pivotInfo.TargetRangeAddress, pivotInfo.SheetName),
+                Fields = fields
+            });
         }
 
         if (chartSpecs.Count == 0 && pivotSpecs.Count == 0)
@@ -165,6 +191,8 @@ public static class OdfToXlsxConverter
                 .FirstOrDefault()
                 ?.Value ?? string.Empty;
 
+            bool hasLegend = chart.Elements(chartNs + "legend").Any();
+
             OdfCellRange? parsedRange = OdfCellRange.TryParse(dataRange.Trim('[', ']'), out OdfCellRange range)
                 ? range
                 : null;
@@ -175,6 +203,7 @@ public static class OdfToXlsxConverter
                 SheetName = sheetName,
                 ChartType = chartClass,
                 Title = title,
+                HasLegend = hasLegend,
                 DataRange = NormalizeChartRange(dataRange),
                 ParsedRange = parsedRange,
                 AnchorColumn = anchor.Column,
@@ -533,6 +562,12 @@ public static class OdfToXlsxConverter
             chart.Append(BuildChartTitle(spec.Title));
         }
         chart.Append(plotArea);
+        if (spec.HasLegend)
+        {
+            chart.Append(new C.Legend(
+                new C.LegendPosition { Val = C.LegendPositionValues.Right },
+                new C.Overlay { Val = false }));
+        }
         chart.Append(new C.PlotVisibleOnly { Val = true });
 
         return new C.ChartSpace(
@@ -546,16 +581,19 @@ public static class OdfToXlsxConverter
         {
             "line" => new C.LineChart(
                 new C.Grouping { Val = C.GroupingValues.Standard },
+                new C.VaryColors { Val = false },
                 BuildLineSeries(spec),
                 new C.AxisId { Val = 48650112U },
                 new C.AxisId { Val = 48672768U }),
+            // 圓餅圖天生即依資料點（類別）區分色彩，符合 ODF 與 Excel 預設慣例
             "pie" => new C.PieChart(
                 new C.VaryColors { Val = true },
                 BuildPieSeries(spec)),
+            // 長條圖每個資料系列維持單一色彩，否則會與圖例的單一色塊不一致
             _ => new C.BarChart(
                 new C.BarDirection { Val = C.BarDirectionValues.Column },
                 new C.BarGrouping { Val = C.BarGroupingValues.Clustered },
-                new C.VaryColors { Val = true },
+                new C.VaryColors { Val = false },
                 BuildBarSeries(spec),
                 new C.AxisId { Val = 48650112U },
                 new C.AxisId { Val = 48672768U })
@@ -655,46 +693,9 @@ public static class OdfToXlsxConverter
             new C.Overlay { Val = false });
     }
 
-    private static IEnumerable<PivotSpec> ReadPivotSpecs(OdfTableSheet sheet)
-    {
-        foreach (var pivotNode in sheet.TableNode.Descendants())
-        {
-            if (pivotNode.LocalName != "data-pilot-table" || pivotNode.NamespaceUri != OdfNamespaces.Table)
-            {
-                continue;
-            }
-
-            string sourceAddress = pivotNode.Children
-                .FirstOrDefault(child => child.LocalName == "source-cell-range" && child.NamespaceUri == OdfNamespaces.Table)
-                ?.GetAttribute("cell-range-address", OdfNamespaces.Table) ?? string.Empty;
-            if (!OdfCellRange.TryParse(sourceAddress, out OdfCellRange sourceRange))
-            {
-                continue;
-            }
-
-            string name = pivotNode.GetAttribute("name", OdfNamespaces.Table) ?? "PivotTable";
-            string targetAddress = pivotNode.GetAttribute("target-range-address", OdfNamespaces.Table) ?? string.Empty;
-            string targetRef = NormalizePivotTargetRef(targetAddress, sheet.Name);
-            var fields = ReadPivotFields(sheet, pivotNode, sourceRange);
-            if (fields.Count == 0)
-            {
-                continue;
-            }
-
-            yield return new PivotSpec
-            {
-                Name = name,
-                SheetName = sheet.Name,
-                SourceRef = sourceRange.ToExcelString(),
-                TargetRef = targetRef,
-                Fields = fields
-            };
-        }
-    }
-
     private static List<PivotFieldSpec> ReadPivotFields(
         OdfTableSheet sheet,
-        OdfNode pivotNode,
+        OdfPivotTableInfo pivotInfo,
         OdfCellRange sourceRange)
     {
         int startCol = Math.Min(sourceRange.StartAddress.Column, sourceRange.EndAddress.Column);
@@ -710,9 +711,9 @@ public static class OdfToXlsxConverter
             fields.Add(new PivotFieldSpec { Name = name });
         }
 
-        foreach (var fieldNode in pivotNode.Children.Where(child => child.LocalName == "data-pilot-field" && child.NamespaceUri == OdfNamespaces.Table))
+        foreach (OdfPivotTableFieldInfo fieldInfo in pivotInfo.Fields)
         {
-            string? name = fieldNode.GetAttribute("source-field-name", OdfNamespaces.Table);
+            string name = fieldInfo.SourceFieldName;
             if (string.IsNullOrEmpty(name))
             {
                 continue;
@@ -721,12 +722,12 @@ public static class OdfToXlsxConverter
             PivotFieldSpec? field = fields.FirstOrDefault(candidate => string.Equals(candidate.Name, name, StringComparison.OrdinalIgnoreCase));
             if (field is null)
             {
-                field = new PivotFieldSpec { Name = name! };
+                field = new PivotFieldSpec { Name = name };
                 fields.Add(field);
             }
 
-            field.Orientation = fieldNode.GetAttribute("orientation", OdfNamespaces.Table) ?? string.Empty;
-            field.Function = fieldNode.GetAttribute("function", OdfNamespaces.Table) ?? string.Empty;
+            field.Orientation = fieldInfo.Orientation;
+            field.Function = fieldInfo.Function ?? string.Empty;
         }
 
         return fields;
@@ -734,11 +735,24 @@ public static class OdfToXlsxConverter
 
     private static string NormalizePivotTargetRef(string targetAddress, string sheetName)
     {
-        if (OdfCellAddress.TryParse(targetAddress, out OdfCellAddress address))
+        // 依 ODF 1.4 schema，table:target-range-address 型別為 cellRangeAddress（範圍），
+        // 優先以範圍格式解析其起點；若為舊版本寫入之單一儲存格位址格式則回退解析，以維持
+        // 向下相容。
+        OdfCellAddress? address = null;
+        if (OdfCellRange.TryParse(targetAddress, out OdfCellRange parsedRange))
         {
-            string actualSheet = address.SheetName ?? sheetName;
-            var start = new OdfCellAddress(address.Row, address.Column, actualSheet);
-            var end = new OdfCellAddress(address.Row + 15, address.Column + 4, actualSheet);
+            address = parsedRange.StartAddress;
+        }
+        else if (OdfCellAddress.TryParse(targetAddress, out OdfCellAddress parsedAddress))
+        {
+            address = parsedAddress;
+        }
+
+        if (address.HasValue)
+        {
+            string actualSheet = address.Value.SheetName ?? sheetName;
+            var start = new OdfCellAddress(address.Value.Row, address.Value.Column, actualSheet);
+            var end = new OdfCellAddress(address.Value.Row + 15, address.Value.Column + 4, actualSheet);
             return new OdfCellRange(start, end).ToExcelString();
         }
 
@@ -1057,6 +1071,7 @@ public static class OdfToXlsxConverter
         public string SheetName { get; init; } = string.Empty;
         public string ChartType { get; init; } = "bar";
         public string Title { get; init; } = string.Empty;
+        public bool HasLegend { get; init; }
         public string DataRange { get; init; } = string.Empty;
         public OdfCellRange? ParsedRange { get; init; }
         public int AnchorColumn { get; init; } = ChartAnchor.Default.Column;

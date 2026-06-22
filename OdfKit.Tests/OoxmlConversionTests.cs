@@ -1157,6 +1157,11 @@ public class OoxmlConversionTests
         Assert.Contains("Data!B1", chartXml);
         Assert.Contains("Data!A2:A3", chartXml);
         Assert.Contains("Data!B2:B3", chartXml);
+
+        // 來源圖表定義 HasLegend = true，轉出的 OOXML 圖表必須包含圖例
+        Assert.Contains("<c:legend>", chartXml);
+        // 長條圖每個資料系列應維持單一色彩，不應逐資料點變色（否則與單一圖例色塊不一致）
+        Assert.Contains("<c:varyColors val=\"0\" />", chartXml);
     }
 
     /// <summary>
