@@ -6,7 +6,9 @@ using System.Runtime.InteropServices;
 using OdfKit.Chart;
 using OdfKit.Conversion;
 using OdfKit.Core;
+using OdfKit.Presentation;
 using OdfKit.Spreadsheet;
+using OdfKit.Styles;
 using OdfKit.Text;
 using Xunit;
 using OdfSpreadsheetDocument = OdfKit.Spreadsheet.SpreadsheetDocument;
@@ -122,6 +124,122 @@ public sealed class OfficeInteropConversionTests
         finally
         {
             TryDeleteDirectory(tempRoot);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 ODP → PPTX 轉換後，同一動畫序列中第二個步驟（接續前一個效果，AfterPrevious）
+    /// 不會被真實 PowerPoint 低估，<c>Slide.TimeLine.MainSequence.Count</c> 應正確回報 2。
+    /// </summary>
+    /// <remarks>
+    /// 已用真機 PowerPoint COM 親自建立等價的 OnClick 進場接 AfterPrevious 退場兩步驟動畫取得
+    /// 權威 <c>&lt;p:timing&gt;</c> 結構：點擊觸發步驟為外層 delay="indefinite"、中層 delay="0" 的
+    /// 三層巢狀 par；接續步驟僅有外層（delay 為相對最近一次點擊的實際累計毫秒數）直接包住效果
+    /// 節點的兩層巢狀 par，並無中層。OdpToPptxConverter 先前無論觸發類型一律套用三層 indefinite
+    /// 結構，是真實 PowerPoint MainSequence 低估第二步驟的根因，修正後以此測試鎖定。
+    /// </remarks>
+    [Fact]
+    public void PowerPoint_ChainedAnimationSecondStepReportsCorrectMainSequenceCount()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            Assert.Skip("Office COM 僅支援 Windows，略過 PowerPoint 實機驗收。");
+        }
+
+#pragma warning disable CA1416
+        Type? powerPointType = Type.GetTypeFromProgID("PowerPoint.Application");
+#pragma warning restore CA1416
+        if (powerPointType is null)
+        {
+            Assert.Skip("找不到 Microsoft PowerPoint COM，略過 PowerPoint 實機驗收。");
+        }
+
+        string tempRoot = CreateTempRoot();
+        try
+        {
+            string pptxPath = Path.Combine(tempRoot, "chained-animations.pptx");
+            using (PresentationDocument source = PresentationDocument.Create())
+            {
+                OdfSlide slide = source.AddSlide("Animations");
+                OdfShape shape = slide.AddShape(
+                    OdfShapeType.Rectangle,
+                    OdfLength.FromCentimeters(1),
+                    OdfLength.FromCentimeters(1),
+                    OdfLength.FromCentimeters(4),
+                    OdfLength.FromCentimeters(2));
+                slide.AddEntranceEffect(
+                    shape.Id,
+                    OdfAnimationEffect.Fade,
+                    OdfAnimationTrigger.OnClick,
+                    delay: TimeSpan.FromMilliseconds(150),
+                    duration: TimeSpan.FromMilliseconds(750));
+                slide.AddExitEffect(
+                    shape.Id,
+                    OdfAnimationEffect.Zoom,
+                    OdfAnimationTrigger.AfterPrevious,
+                    delay: TimeSpan.FromMilliseconds(400),
+                    duration: TimeSpan.FromMilliseconds(250));
+
+                using var pptxStream = new FileStream(pptxPath, FileMode.Create, FileAccess.ReadWrite);
+                OdpToPptxConverter.Convert(source, pptxStream);
+            }
+
+            int mainSequenceCount = ReadMainSequenceCount(powerPointType!, pptxPath);
+            Assert.Equal(2, mainSequenceCount);
+        }
+        finally
+        {
+            TryDeleteDirectory(tempRoot);
+        }
+    }
+
+    private static int ReadMainSequenceCount(Type powerPointType, string pptxPath)
+    {
+        const int MsoTrue = -1;
+        const int MsoFalse = 0;
+
+        dynamic? powerPoint = null;
+        dynamic? presentations = null;
+        dynamic? presentation = null;
+        dynamic? slides = null;
+        dynamic? slide = null;
+        dynamic? timeLine = null;
+        dynamic? mainSequence = null;
+        try
+        {
+            powerPoint = Activator.CreateInstance(powerPointType);
+            if (powerPoint is null)
+            {
+                throw new InvalidOperationException("無法啟動 Microsoft PowerPoint。");
+            }
+
+            powerPoint.Visible = MsoTrue;
+            presentations = powerPoint.Presentations;
+            presentation = presentations.Open(pptxPath, MsoTrue, MsoFalse, MsoFalse);
+            slides = presentation.Slides;
+            slide = slides[1];
+            timeLine = slide.TimeLine;
+            mainSequence = timeLine.MainSequence;
+            return (int)mainSequence.Count;
+        }
+        finally
+        {
+            try
+            {
+                presentation?.Close();
+            }
+            finally
+            {
+                powerPoint?.Quit();
+                ReleaseComObject(mainSequence);
+                ReleaseComObject(timeLine);
+                ReleaseComObject(slide);
+                ReleaseComObject(slides);
+                ReleaseComObject(presentation);
+                ReleaseComObject(presentations);
+                ReleaseComObject(powerPoint);
+                CollectComReferences();
+            }
         }
     }
 
