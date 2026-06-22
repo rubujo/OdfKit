@@ -1,7 +1,4 @@
-﻿#pragma warning disable CS1591
-#pragma warning restore CS1591
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -43,7 +40,7 @@ public static class OdfComplianceProfiles
         "application/vnd.oasis.opendocument.formula-template",
         "application/vnd.oasis.opendocument.image",
         "application/vnd.oasis.opendocument.image-template",
-        "application/vnd.oasis.opendocument.database"
+        "application/vnd.oasis.opendocument.base"
     ];
 
     private static readonly OdfPolicyRule[] StandardRules = [

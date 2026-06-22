@@ -85,7 +85,7 @@ public static class OdfDocumentKindDetector
         new(".odc", ChartMimeType, OdfDocumentKind.Chart, OdfDocumentKind.Chart, false),
         new(".odf", FormulaMimeType, OdfDocumentKind.Formula, OdfDocumentKind.Formula, false),
         new(".odi", ImageMimeType, OdfDocumentKind.Image, OdfDocumentKind.Image, false),
-        new(".odb", "application/vnd.oasis.opendocument.database", OdfDocumentKind.Database, OdfDocumentKind.Database, false),
+        new(".odb", "application/vnd.oasis.opendocument.base", OdfDocumentKind.Database, OdfDocumentKind.Database, false),
         new(".fodt", TextMimeType, OdfDocumentKind.FlatText, OdfDocumentKind.Text, true),
         new(".fods", SpreadsheetMimeType, OdfDocumentKind.FlatSpreadsheet, OdfDocumentKind.Spreadsheet, true),
         new(".fodp", PresentationMimeType, OdfDocumentKind.FlatPresentation, OdfDocumentKind.Presentation, true),

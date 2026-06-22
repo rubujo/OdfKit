@@ -137,12 +137,26 @@ public static partial class OdfPackageValidator
         OdfPackage package,
         OdfSchemaSet schema,
         List<OdfValidationIssue> issues,
-        string? profileId)
+        string? profileId,
+        OdfDocumentKind documentKind = OdfDocumentKind.Unknown)
     {
+        bool isFormulaKind = documentKind is OdfDocumentKind.Formula or OdfDocumentKind.FormulaTemplate or OdfDocumentKind.FlatFormula;
+
         foreach (var expected in GetExpectedXmlRootEntries(package))
         {
             XmlRootInfo? rootInfo = ReadRootInfo(package, expected.Key, issues, profileId);
             if (rootInfo is null)
+            {
+                continue;
+            }
+
+            // ODF 公式文件（application/vnd.oasis.opendocument.formula）的 content.xml 採用真實
+            // LibreOffice 慣用的特殊封裝慣例：根節點直接是裸 MathML math:math 元素，並不包裹於
+            // office:document-content 結構內。此為該文件類型獨有的合法形狀，非結構錯誤。
+            if (isFormulaKind &&
+                expected.Key == "content.xml" &&
+                rootInfo.NamespaceUri == "http://www.w3.org/1998/Math/MathML" &&
+                rootInfo.LocalName == "math")
             {
                 continue;
             }

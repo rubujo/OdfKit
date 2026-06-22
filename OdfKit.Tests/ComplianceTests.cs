@@ -1472,7 +1472,7 @@ namespace OdfKit.Tests
 
             Assert.True(OdfDocumentKindDetector.TryGetFormatByKind(OdfDocumentKind.Database, out OdfFormatInfo? database));
             Assert.Equal(".odb", database!.Extension);
-            Assert.Equal("application/vnd.oasis.opendocument.database", database.MimeType);
+            Assert.Equal("application/vnd.oasis.opendocument.base", database.MimeType);
             Assert.False(database.IsFlatXml);
             Assert.False(database.IsTemplate);
             Assert.False(database.IsMasterDocument);
@@ -1491,7 +1491,7 @@ namespace OdfKit.Tests
         [InlineData("application/vnd.oasis.opendocument.chart", OdfDocumentKind.Chart)]
         [InlineData("application/vnd.oasis.opendocument.formula", OdfDocumentKind.Formula)]
         [InlineData("application/vnd.oasis.opendocument.image", OdfDocumentKind.Image)]
-        [InlineData("application/vnd.oasis.opendocument.database", OdfDocumentKind.Database)]
+        [InlineData("application/vnd.oasis.opendocument.base", OdfDocumentKind.Database)]
         public void DocumentKindDetectorRecognizesOdfMimeTypes(string mimeType, OdfDocumentKind expected)
         {
             Assert.Equal(expected, OdfDocumentKindDetector.FromMimeType(mimeType));

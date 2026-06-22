@@ -140,6 +140,16 @@ internal static partial class OdfProfileRuleValidator
                 return;
             }
 
+            // ODF 公式文件（application/vnd.oasis.opendocument.formula）的 content.xml 採用真實
+            // LibreOffice 慣用的特殊封裝慣例：根節點直接是裸 MathML math:math 元素，並未包裹於
+            // office:document-content/office:body/office:formula 結構內。此為該文件類型獨有的合法
+            // 形狀（已透過真實 LibreOffice 26.x headless 驗證可正確開啟），schema pattern 比對應予豁免。
+            if (document.Root.Name.NamespaceName == "http://www.w3.org/1998/Math/MathML" &&
+                document.Root.Name.LocalName == "math")
+            {
+                return;
+            }
+
             // 為了防止 foreign elements 與 attributes 干擾 schema pattern 驗證，
             // 遞迴移除不屬於 ODF 標準命名空間的元素和屬性。
             SanitizeForeignContentForSchemaValidation(document.Root);

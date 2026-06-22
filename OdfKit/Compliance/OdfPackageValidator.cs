@@ -78,7 +78,7 @@ public static partial class OdfPackageValidator
                 fileName,
                 profileId: profileId));
         }
-        ValidateXmlRoots(package, schema, issues, profileId);
+        ValidateXmlRoots(package, schema, issues, profileId, documentKind);
         ValidateProfileExtension(fileName, profile, profileId, issues);
         ValidateProfileVersion(detectedVersion, profile, profileId, issues, fileName, "/office:document-content[1]");
         OdfProfileRuleValidator.ValidatePackage(package, profile, schema, issues);
