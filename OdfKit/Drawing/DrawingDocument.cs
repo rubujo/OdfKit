@@ -71,10 +71,17 @@ public partial class DrawingDocument : OdfDocument
     /// 從指定的繪圖範本文件建立新的繪圖文件。
     /// </summary>
     /// <param name="template">繪圖範本文件。</param>
+    /// <param name="clearUserContent">是否清除範本中各頁面的文字內容，但保留版面配置與形狀結構。</param>
     /// <returns>建立完成的 <see cref="DrawingDocument"/> 執行個體。</returns>
-    public static DrawingDocument CreateFromTemplate(GraphicsTemplateDocument template)
+    public static DrawingDocument CreateFromTemplate(GraphicsTemplateDocument template, bool clearUserContent = false)
     {
-        return (DrawingDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Graphics, "application/vnd.oasis.opendocument.graphics");
+        return (DrawingDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Graphics, "application/vnd.oasis.opendocument.graphics", clearUserContent);
+    }
+
+    /// <inheritdoc/>
+    protected override void ClearTemplateUserContent()
+    {
+        ClearParagraphTextContentRecursive(GetDrawingNode());
     }
 
     /// <summary>

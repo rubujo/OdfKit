@@ -33,9 +33,17 @@ public class OdfSection
     }
 
     /// <summary>
-    /// 取得此區段是否受保護。
+    /// 取得或設定此區段是否受保護（對應 <c>text:protected</c>）。
     /// </summary>
-    public bool IsProtected => Node.GetAttribute("protected", OdfNamespaces.Text) == "true";
+    /// <remarks>
+    /// 用於將範本中特定區段標記為唯讀，防止使用者在套用範本後誤改其內容；實際強制力取決於
+    /// 使用者端應用程式（例如 LibreOffice）是否遵循此標記，OdfKit 本身不會阻擋對受保護區段的程式化修改。
+    /// </remarks>
+    public bool IsProtected
+    {
+        get => Node.GetAttribute("protected", OdfNamespaces.Text) == "true";
+        set => Node.SetAttribute("protected", OdfNamespaces.Text, value ? "true" : "false", "text");
+    }
 
     /// <summary>
     /// 以指定密碼保護此區段。

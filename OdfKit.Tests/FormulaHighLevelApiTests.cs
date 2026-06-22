@@ -205,6 +205,33 @@ public class FormulaHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfMathToken.WithAttribute"/> 設定的 MathML 通用屬性可寫入並於儲存／載入後讀回。
+    /// </summary>
+    [Fact]
+    public void MathTokenAttributes_RoundTripAfterSaveAndLoad()
+    {
+        OdfMathToken identifier = OdfMathToken.Identifier("x")
+            .WithAttribute("mathvariant", "bold")
+            .WithAttribute("mathcolor", "#FF0000");
+
+        using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+            .WithTokens(identifier)
+            .Build();
+
+        Assert.Contains("mathvariant=\"bold\"", formula.GetMathML());
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
+        OdfMathToken token = Assert.Single(loaded.GetMathTokens());
+        Assert.NotNull(token.Attributes);
+        Assert.Equal("bold", token.Attributes!["mathvariant"]);
+        Assert.Equal("#FF0000", token.Attributes["mathcolor"]);
+    }
+
+    /// <summary>
     /// 驗證公式文件的 Round-trip 載入與儲存。
     /// </summary>
     [Fact]

@@ -70,10 +70,17 @@ public partial class PresentationDocument : OdfDocument
     /// 從指定的簡報範本文件建立新的簡報文件。
     /// </summary>
     /// <param name="template">簡報範本文件。</param>
+    /// <param name="clearUserContent">是否清除範本中各投影片的文字內容，但保留版面配置與形狀結構。</param>
     /// <returns>建立完成的 <see cref="PresentationDocument"/> 執行個體。</returns>
-    public static PresentationDocument CreateFromTemplate(PresentationTemplateDocument template)
+    public static PresentationDocument CreateFromTemplate(PresentationTemplateDocument template, bool clearUserContent = false)
     {
-        return (PresentationDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Presentation, "application/vnd.oasis.opendocument.presentation");
+        return (PresentationDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Presentation, "application/vnd.oasis.opendocument.presentation", clearUserContent);
+    }
+
+    /// <inheritdoc/>
+    protected override void ClearTemplateUserContent()
+    {
+        ClearParagraphTextContentRecursive(GetPresentationNode());
     }
 
     /// <summary>

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Text;
 using OdfKit.Spreadsheet;
 using OdfKit.Presentation;
@@ -127,5 +128,66 @@ public class TemplateRoundTripTests
             File.Delete(flatPath);
             File.Delete(roundTripZipPath);
         }
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.CreateFromTemplate(TextTemplateDocument, bool)"/> 的
+    /// <c>clearUserContent</c> 選項可清除範本段落內容但保留母片頁面樣式。
+    /// </summary>
+    [Fact]
+    public void TextTemplate_ClearUserContent_RemovesParagraphsKeepsMasterPage()
+    {
+        using var template = TextTemplateDocument.Create();
+        var masterPage = template.AddMasterPage("MyTemplateMaster");
+        masterPage.HeaderText = "Template Header";
+        template.AddParagraph("範本既有內容");
+
+        using var doc = TextDocument.CreateFromTemplate(template, clearUserContent: true);
+
+        Assert.Empty(doc.BodyTextRoot.Children);
+        var copiedMasterPage = doc.GetMasterPages().FirstOrDefault(m => m.Name == "MyTemplateMaster");
+        Assert.NotNull(copiedMasterPage);
+        Assert.Equal("Template Header", copiedMasterPage!.HeaderText);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.CreateFromTemplate(SpreadsheetTemplateDocument, bool)"/> 的
+    /// <c>clearUserContent</c> 選項可清除工作表資料列但保留欄寬設定。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetTemplate_ClearUserContent_RemovesRowsKeepsColumnWidth()
+    {
+        using var template = SpreadsheetTemplateDocument.Create();
+        var sheet = template.Worksheets.Add("Sheet1");
+        sheet.Cells["A1"].CellValue = "範本既有資料";
+        sheet.SetColumnWidth(0, OdfLength.FromCentimeters(5));
+
+        using var doc = SpreadsheetDocument.CreateFromTemplate(template, clearUserContent: true);
+
+        var copiedSheet = doc.Worksheets["Sheet1"];
+        Assert.True(string.IsNullOrEmpty(copiedSheet.Cells["A1"].CellValue?.ToString()));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfSection.IsProtected"/> 可寫入並於儲存／載入後讀回，
+    /// 用於將範本中特定區段標記為唯讀。
+    /// </summary>
+    [Fact]
+    public void Section_IsProtected_RoundTripsAfterSaveAndLoad()
+    {
+        using var doc = TextDocument.Create();
+        OdfSection section = doc.AddSection("ReadOnlySection", 1, OdfLength.FromCentimeters(0));
+        section.IsProtected = true;
+
+        using var stream = new MemoryStream();
+        doc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = TextDocument.Load(stream);
+        OdfNode? sectionNode = loaded.BodyTextRoot.Children
+            .FirstOrDefault(n => n.LocalName == "section" && n.GetAttribute("name", OdfNamespaces.Text) == "ReadOnlySection");
+        Assert.NotNull(sectionNode);
+        var reloadedSection = new OdfSection(sectionNode!, loaded);
+        Assert.True(reloadedSection.IsProtected);
     }
 }

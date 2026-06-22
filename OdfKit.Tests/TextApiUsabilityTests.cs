@@ -392,9 +392,10 @@ public class TextApiUsabilityTests
         Assert.NotEqual(reference, differentValue);
 
         // Deconstruct：可解構為個別變數
-        (string sectionName, string href) = reference;
+        (string sectionName, string href, string actuate) = reference;
         Assert.Equal("Chapter1", sectionName);
         Assert.Equal("chapter1.odt", href);
+        Assert.Equal("onLoad", actuate);
 
         // <Clone>$（With 表達式）：產生具有部分新值的複本，且不影響原始執行個體
         OdfSubDocumentReference clone = reference with { Href = "chapter1-revised.odt" };

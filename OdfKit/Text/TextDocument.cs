@@ -58,10 +58,20 @@ public partial class TextDocument : OdfDocument
     /// 從指定的文字範本文件建立新的文字文件。
     /// </summary>
     /// <param name="template">文字範本文件。</param>
+    /// <param name="clearUserContent">是否清除範本中的段落等使用者內容，但保留樣式與母片頁面。</param>
     /// <returns>建立完成的 <see cref="TextDocument"/> 執行個體。</returns>
-    public static TextDocument CreateFromTemplate(TextTemplateDocument template)
+    public static TextDocument CreateFromTemplate(TextTemplateDocument template, bool clearUserContent = false)
     {
-        return (TextDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Text, "application/vnd.oasis.opendocument.text");
+        return (TextDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Text, "application/vnd.oasis.opendocument.text", clearUserContent);
+    }
+
+    /// <inheritdoc/>
+    protected override void ClearTemplateUserContent()
+    {
+        foreach (OdfNode child in new List<OdfNode>(BodyTextRoot.Children))
+        {
+            BodyTextRoot.RemoveChild(child);
+        }
     }
 
     /// <summary>
@@ -385,8 +395,12 @@ public partial class TextDocument : OdfDocument
     /// </summary>
     /// <param name="name">區段名稱。</param>
     /// <param name="subDocumentUri">外部子文件的相對或絕對 URI/路徑（將寫入 xlink:href）。</param>
+    /// <param name="loadOnRequest">
+    /// 是否延遲載入子文件內容（寫入 <c>xlink:actuate="onRequest"</c>）；預設為 <see langword="false"/>，
+    /// 即開啟主控文件時立即載入（<c>xlink:actuate="onLoad"</c>）。
+    /// </param>
     /// <returns>新建立的區段物件。</returns>
-    public OdfSection AddSubDocumentReference(string name, string subDocumentUri)
+    public OdfSection AddSubDocumentReference(string name, string subDocumentUri, bool loadOnRequest = false)
     {
         if (string.IsNullOrEmpty(name))
             throw new ArgumentException("區段名稱不可為空。", nameof(name));
@@ -400,7 +414,7 @@ public partial class TextDocument : OdfDocument
         sourceNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
         sourceNode.SetAttribute("href", OdfNamespaces.XLink, subDocumentUri, "xlink");
         sourceNode.SetAttribute("show", OdfNamespaces.XLink, "embed", "xlink");
-        sourceNode.SetAttribute("actuate", OdfNamespaces.XLink, "onLoad", "xlink");
+        sourceNode.SetAttribute("actuate", OdfNamespaces.XLink, loadOnRequest ? "onRequest" : "onLoad", "xlink");
 
         sectionNode.AppendChild(sourceNode);
         BodyTextRoot.AppendChild(sectionNode);

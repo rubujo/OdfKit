@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Compliance;
+using OdfKit.DOM;
 
 namespace OdfKit.Core;
 
@@ -155,7 +157,18 @@ public abstract partial class OdfDocument
     /// <summary>
     /// 從指定的範本建立文件封裝的基礎實作。
     /// </summary>
-    internal static OdfDocument CreateFromTemplateInternal(OdfDocument template, OdfDocumentKind targetKind, string targetMimeType)
+    /// <param name="template">範本文件。</param>
+    /// <param name="targetKind">目標文件種類。</param>
+    /// <param name="targetMimeType">目標 MIME 媒體類型。</param>
+    /// <param name="clearUserContent">
+    /// 是否清除範本中的使用者內容（例如文字文件的段落、試算表的資料列），但保留格式與版面配置
+    /// （例如樣式、母片頁面、欄寬）。預設為 <see langword="false"/>，與既有完整複製行為相同。
+    /// </param>
+    internal static OdfDocument CreateFromTemplateInternal(
+        OdfDocument template,
+        OdfDocumentKind targetKind,
+        string targetMimeType,
+        bool clearUserContent = false)
     {
         if (template == null)
             throw new ArgumentNullException(nameof(template));
@@ -183,7 +196,46 @@ public abstract partial class OdfDocument
         newDoc.ModificationDate = DateTime.UtcNow;
         newDoc.TemplateMetadata = null;
 
+        if (clearUserContent)
+            newDoc.ClearTemplateUserContent();
+
         return newDoc;
+    }
+
+    /// <summary>
+    /// 清除範本實例化後的使用者內容，但保留格式與版面配置。
+    /// </summary>
+    /// <remarks>
+    /// 基底實作不做任何事；各文件種類（文字、試算表、簡報、繪圖）於對應的部分類別中覆寫，
+    /// 依各自的內容模型清除使用者資料。
+    /// </remarks>
+    protected virtual void ClearTemplateUserContent()
+    {
+    }
+
+    /// <summary>
+    /// 遞迴清除指定節點底下所有 <c>text:p</c>／<c>text:span</c> 段落的文字內容，但保留節點結構
+    /// （例如形狀、框架），用於簡報與繪圖範本清除使用者文字內容但保留版面配置。
+    /// </summary>
+    /// <param name="node">要清除文字內容的根節點。</param>
+    protected static void ClearParagraphTextContentRecursive(OdfNode node)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "p" &&
+                child.NamespaceUri == OdfNamespaces.Text)
+            {
+                foreach (OdfNode grandchild in new List<OdfNode>(child.Children))
+                {
+                    child.RemoveChild(grandchild);
+                }
+                child.TextContent = string.Empty;
+                continue;
+            }
+
+            ClearParagraphTextContentRecursive(child);
+        }
     }
 
     #endregion

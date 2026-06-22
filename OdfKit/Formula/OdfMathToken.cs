@@ -78,10 +78,16 @@ public sealed class OdfMathToken
             throw new ArgumentNullException(nameof(value));
         }
 
-        var merged = new Dictionary<string, string>(Attributes ?? new Dictionary<string, string>())
+        var merged = new Dictionary<string, string>();
+        if (Attributes is not null)
         {
-            [name] = value,
-        };
+            foreach (KeyValuePair<string, string> existing in Attributes)
+            {
+                merged[existing.Key] = existing.Value;
+            }
+        }
+
+        merged[name] = value;
         return new OdfMathToken(Kind, Text, Base, Script, Children, merged);
     }
 

@@ -126,7 +126,7 @@ public partial class OdfFormulaDocument
 
     private static OdfNode CreateMathTokenNode(OdfMathToken token)
     {
-        return token.Kind switch
+        OdfNode node = token.Kind switch
         {
             OdfMathTokenKind.Superscript => CreateScriptNode("msup", token),
             OdfMathTokenKind.Subscript => CreateScriptNode("msub", token),
@@ -141,6 +141,16 @@ public partial class OdfFormulaDocument
             OdfMathTokenKind.Style => CreateStyleNode(token),
             _ => CreateLeafMathTokenNode(token),
         };
+
+        if (token.Attributes is not null)
+        {
+            foreach (KeyValuePair<string, string> attribute in token.Attributes)
+            {
+                node.SetAttribute(attribute.Key, string.Empty, attribute.Value);
+            }
+        }
+
+        return node;
     }
 
     private static OdfNode CreateRadicalNode(OdfMathToken token)
@@ -250,7 +260,7 @@ public partial class OdfFormulaDocument
         OdfNode node = OdfNodeFactory.CreateElement("mstyle", MathMlNamespace, "math");
         if (!string.IsNullOrEmpty(token.Text))
         {
-            node.SetAttribute("displaystyle", MathMlNamespace, token.Text, "math");
+            node.SetAttribute("displaystyle", string.Empty, token.Text);
         }
 
         node.AppendChild(CreateMathTokenNode(token.Base));
@@ -277,9 +287,15 @@ public partial class OdfFormulaDocument
         return node;
     }
 
+    private static readonly string[] KnownMathAttributeNames =
+    [
+        "mathvariant", "mathsize", "mathcolor", "mathbackground",
+        "displaystyle", "stretchy", "lspace", "rspace",
+    ];
+
     private static OdfMathToken? CreateTokenOrDefault(OdfNode node)
     {
-        return node.LocalName switch
+        OdfMathToken? token = node.LocalName switch
         {
             "mi" => OdfMathToken.Identifier(node.TextContent),
             "mn" => OdfMathToken.Number(node.TextContent),
@@ -298,6 +314,23 @@ public partial class OdfFormulaDocument
             "mstyle" => CreateStyleToken(node),
             _ => null
         };
+
+        return token is null ? null : AttachKnownMathAttributes(token, node);
+    }
+
+    private static OdfMathToken AttachKnownMathAttributes(OdfMathToken token, OdfNode node)
+    {
+        OdfMathToken result = token;
+        foreach (string name in KnownMathAttributeNames)
+        {
+            string? value = node.GetAttribute(name, string.Empty);
+            if (value is not null)
+            {
+                result = result.WithAttribute(name, value);
+            }
+        }
+
+        return result;
     }
 
     private static OdfMathToken? CreateScriptToken(OdfNode node, OdfMathTokenKind kind)
@@ -436,7 +469,7 @@ public partial class OdfFormulaDocument
             return null;
         }
 
-        string? displayStyleAttr = node.GetAttribute("displaystyle", MathMlNamespace);
+        string? displayStyleAttr = node.GetAttribute("displaystyle", string.Empty);
         bool? displayStyle = displayStyleAttr switch
         {
             "true" => true,

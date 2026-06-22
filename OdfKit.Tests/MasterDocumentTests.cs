@@ -53,4 +53,32 @@ public class MasterDocumentTests
         var persisted = loaded.GetSubDocumentReferences();
         Assert.Equal(new[] { "Chapter3", "Chapter1", "Chapter2" }, persisted.Select(r => r.SectionName));
     }
+
+    /// <summary>
+    /// 驗證子文件參照的載入時機（<c>xlink:actuate</c>）可透過 <c>loadOnRequest</c> 參數指定，
+    /// 並透過 <see cref="TextMasterDocument.SetSubDocumentLoadOnRequest"/> 變更，於儲存／載入後保留。
+    /// </summary>
+    [Fact]
+    public void SubDocumentActuate_SetAndPersistAfterSaveAndLoad()
+    {
+        using var master = TextMasterDocument.Create();
+        master.AddSubDocumentReference("Chapter1", "chapter1.odt");
+        master.AddSubDocumentReference("Chapter2", "chapter2.odt", loadOnRequest: true);
+
+        var references = master.GetSubDocumentReferences();
+        Assert.Equal("onLoad", references.Single(r => r.SectionName == "Chapter1").Actuate);
+        Assert.Equal("onRequest", references.Single(r => r.SectionName == "Chapter2").Actuate);
+
+        Assert.True(master.SetSubDocumentLoadOnRequest("Chapter1", true));
+        Assert.False(master.SetSubDocumentLoadOnRequest("NotExist", true));
+
+        using var stream = new MemoryStream();
+        master.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = TextMasterDocument.Load(stream);
+        var persisted = loaded.GetSubDocumentReferences();
+        Assert.Equal("onRequest", persisted.Single(r => r.SectionName == "Chapter1").Actuate);
+        Assert.Equal("onRequest", persisted.Single(r => r.SectionName == "Chapter2").Actuate);
+    }
 }

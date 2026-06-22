@@ -52,10 +52,35 @@ public partial class SpreadsheetDocument : OdfDocument
     /// 從指定的試算表範本文件建立新的試算表文件。
     /// </summary>
     /// <param name="template">試算表範本文件。</param>
+    /// <param name="clearUserContent">是否清除範本中各工作表的資料列，但保留欄寬與工作表結構。</param>
     /// <returns>建立完成的 <see cref="SpreadsheetDocument"/> 執行個體。</returns>
-    public static SpreadsheetDocument CreateFromTemplate(SpreadsheetTemplateDocument template)
+    public static SpreadsheetDocument CreateFromTemplate(SpreadsheetTemplateDocument template, bool clearUserContent = false)
     {
-        return (SpreadsheetDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Spreadsheet, "application/vnd.oasis.opendocument.spreadsheet");
+        return (SpreadsheetDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Spreadsheet, "application/vnd.oasis.opendocument.spreadsheet", clearUserContent);
+    }
+
+    /// <inheritdoc/>
+    protected override void ClearTemplateUserContent()
+    {
+        foreach (OdfNode sheet in SheetsRoot.Children)
+        {
+            if (sheet.NodeType is not OdfNodeType.Element ||
+                sheet.LocalName != "table" ||
+                sheet.NamespaceUri != OdfNamespaces.Table)
+            {
+                continue;
+            }
+
+            foreach (OdfNode child in new List<OdfNode>(sheet.Children))
+            {
+                if (child.NodeType is OdfNodeType.Element &&
+                    child.LocalName == "table-row" &&
+                    child.NamespaceUri == OdfNamespaces.Table)
+                {
+                    sheet.RemoveChild(child);
+                }
+            }
+        }
     }
 
     /// <summary>

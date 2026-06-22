@@ -144,6 +144,34 @@ public sealed class TextMasterDocument : TextDocument
     }
 
     /// <summary>
+    /// 設定指定名稱外部子文件區段參照的載入時機。
+    /// </summary>
+    /// <param name="sectionName">區段名稱。</param>
+    /// <param name="loadOnRequest">
+    /// <see langword="true"/> 表示延遲載入（<c>xlink:actuate="onRequest"</c>）；
+    /// <see langword="false"/> 表示開啟主控文件時立即載入（<c>xlink:actuate="onLoad"</c>）。
+    /// </param>
+    /// <returns>若成功設定則為 <see langword="true"/>；找不到對應名稱的子文件參照時為 <see langword="false"/>。</returns>
+    /// <exception cref="ArgumentException">當 <paramref name="sectionName"/> 為空白時擲出。</exception>
+    public bool SetSubDocumentLoadOnRequest(string sectionName, bool loadOnRequest)
+    {
+        if (string.IsNullOrWhiteSpace(sectionName))
+        {
+            throw new ArgumentException("區段名稱不可為空。", nameof(sectionName));
+        }
+
+        OdfNode? section = FindSubDocumentSectionNode(BodyTextRoot, sectionName);
+        OdfNode? sectionSource = section?.FindChildElement("section-source", OdfNamespaces.Text);
+        if (sectionSource is null)
+        {
+            return false;
+        }
+
+        sectionSource.SetAttribute("actuate", OdfNamespaces.XLink, loadOnRequest ? "onRequest" : "onLoad", "xlink");
+        return true;
+    }
+
+    /// <summary>
     /// 移除指定名稱的外部子文件區段參照。
     /// </summary>
     /// <param name="sectionName">區段名稱。</param>
@@ -299,9 +327,12 @@ public sealed class TextMasterDocument : TextDocument
                     {
                         string? name = child.GetAttribute("name", OdfNamespaces.Text);
                         string? href = sectionChild.GetAttribute("href", OdfNamespaces.XLink);
+                        string actuate = sectionChild.GetAttribute("actuate", OdfNamespaces.XLink) is { Length: > 0 } actuateAttr
+                            ? actuateAttr
+                            : "onLoad";
                         if (name is { Length: > 0 } sectionName && href is { Length: > 0 } sectionHref)
                         {
-                            results.Add(new OdfSubDocumentReference(sectionName, sectionHref));
+                            results.Add(new OdfSubDocumentReference(sectionName, sectionHref, actuate));
                         }
                     }
                 }
