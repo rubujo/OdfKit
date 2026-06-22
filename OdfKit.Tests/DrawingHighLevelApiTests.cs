@@ -43,6 +43,35 @@ public class DrawingHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 AddPath 對含 H／V（單軸）與 A（橢圓弧）指令的路徑也能正確計算 viewBox，
+    /// 而非天真地將所有指令參數視為交替排列的 (x, y) 座標對。
+    /// </summary>
+    [Fact]
+    public void AddPathApiComputesCorrectViewBoxForSingleAxisAndArcCommands()
+    {
+        using var document = DrawingDocument.Create();
+
+        // H／V 僅有單一座標軸：H 50 應只影響 X 邊界，V 30 應只影響 Y 邊界
+        var hvShape = document.AddPath(
+            "M 0 0 H 50 V 30 Z",
+            OdfLength.Parse("0cm"),
+            OdfLength.Parse("0cm"),
+            OdfLength.Parse("5cm"),
+            OdfLength.Parse("3cm"));
+        Assert.Equal("0 0 50 30", hvShape.Node.GetAttribute("viewBox", OdfNamespaces.Svg));
+
+        // A 指令的 7 個參數中只有最後 2 個（端點座標）才是 (x, y)，
+        // 前 5 個（rx、ry、x-axis-rotation、large-arc-flag、sweep-flag）不應被誤判為座標
+        var arcShape = document.AddPath(
+            "M 10 10 A 5 5 0 0 1 20 20 Z",
+            OdfLength.Parse("0cm"),
+            OdfLength.Parse("0cm"),
+            OdfLength.Parse("5cm"),
+            OdfLength.Parse("5cm"));
+        Assert.Equal("10 10 10 10", arcShape.Node.GetAttribute("viewBox", OdfNamespaces.Svg));
+    }
+
+    /// <summary>
     /// 驗證新增多邊形 (AddPolygon) API 的邊界盒計算與坐標對齊。
     /// </summary>
     [Fact]
@@ -133,6 +162,10 @@ public class DrawingHighLevelApiTests
         Assert.Equal("M 10 10 L 20 20 Z", path.SvgPathData);
         Assert.True(path.TryGetX(out OdfLength x));
         Assert.Equal(OdfLength.Parse("1cm").ToPoints(), x.ToPoints(), 0.001);
+        Assert.True(path.TryGetY(out OdfLength y));
+        Assert.Equal(OdfLength.Parse("2cm").ToPoints(), y.ToPoints(), 0.001);
+        Assert.True(path.TryGetHeight(out OdfLength height));
+        Assert.Equal(OdfLength.Parse("5cm").ToPoints(), height.ToPoints(), 0.001);
 
         Assert.Single(document.GetPaths());
     }
@@ -169,6 +202,80 @@ public class DrawingHighLevelApiTests
         Assert.Equal(endShape.Id, connector.EndShapeId);
         Assert.Equal(OdfConnectorType.Curve, connector.ConnectorType);
         Assert.Equal("0cm 0cm 1cm 1cm 2cm 0cm", connector.Points);
+    }
+
+    /// <summary>
+    /// 驗證座標模式連接線（<see cref="OdfDrawPage.AddConnector(OdfLength, OdfLength, OdfLength, OdfLength)"/>）
+    /// 讀回後可透過 <see cref="OdfConnectorInfo.TryGetStartPoint"/> 與 <see cref="OdfConnectorInfo.TryGetEndPoint"/> 正確解析起訖座標。
+    /// </summary>
+    [Fact]
+    public void GetConnectors_CoordinateMode_TryGetStartAndEndPointSucceed()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage();
+        page.AddConnector(
+            OdfLength.Parse("4cm"),
+            OdfLength.Parse("5cm"),
+            OdfLength.Parse("9cm"),
+            OdfLength.Parse("6cm"));
+
+        OdfConnectorInfo connector = Assert.Single(page.GetConnectors());
+        Assert.False(connector.IsShapeLinked);
+
+        Assert.True(connector.TryGetStartPoint(out OdfLength startX, out OdfLength startY));
+        Assert.Equal(OdfLength.Parse("4cm").ToPoints(), startX.ToPoints(), 0.001);
+        Assert.Equal(OdfLength.Parse("5cm").ToPoints(), startY.ToPoints(), 0.001);
+
+        Assert.True(connector.TryGetEndPoint(out OdfLength endX, out OdfLength endY));
+        Assert.Equal(OdfLength.Parse("9cm").ToPoints(), endX.ToPoints(), 0.001);
+        Assert.Equal(OdfLength.Parse("6cm").ToPoints(), endY.ToPoints(), 0.001);
+    }
+
+    /// <summary>
+    /// 驗證圖形連結模式（無座標屬性）連接線的 <see cref="OdfConnectorInfo.TryGetStartPoint"/>
+    /// 與 <see cref="OdfConnectorInfo.TryGetEndPoint"/> 會因座標缺失而傳回 <see langword="false"/>。
+    /// </summary>
+    [Fact]
+    public void GetConnectors_ShapeLinkedMode_TryGetStartAndEndPointFail()
+    {
+        using var document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage();
+        OdfShape startShape = page.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("3cm"),
+            OdfLength.Parse("2cm"));
+        OdfShape endShape = page.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.Parse("10cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("3cm"),
+            OdfLength.Parse("2cm"));
+        document.AddConnector(startShape.Id, endShape.Id, OdfConnectorType.Standard);
+
+        OdfConnectorInfo connector = Assert.Single(page.GetConnectors());
+        Assert.False(connector.TryGetStartPoint(out _, out _));
+        Assert.False(connector.TryGetEndPoint(out _, out _));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="DrawingDocument.GetDrawingNode"/> 可取得繪圖節點，
+    /// 且重複呼叫會傳回同一個既存節點而非每次重建。
+    /// </summary>
+    [Fact]
+    public void GetDrawingNode_ReturnsSameUnderlyingNodeOnRepeatedCalls()
+    {
+        using var document = DrawingDocument.Create();
+        document.AddPage("頁面一");
+
+        OdfKit.DOM.OdfNode first = document.GetDrawingNode();
+        OdfKit.DOM.OdfNode second = document.GetDrawingNode();
+
+        Assert.Same(first, second);
+        Assert.Equal("drawing", first.LocalName);
+        Assert.Equal(OdfNamespaces.Office, first.NamespaceUri);
+        Assert.Contains(first.Children, child => child.LocalName is "page");
     }
 
     /// <summary>
@@ -250,6 +357,8 @@ public class DrawingHighLevelApiTests
         Assert.Contains("0,0", polygon.Points);
         Assert.True(polygon.TryGetX(out OdfLength x));
         Assert.Equal(OdfLength.Parse("2cm").ToPoints(), x.ToPoints(), 0.001);
+        Assert.True(polygon.TryGetY(out OdfLength y));
+        Assert.Equal(OdfLength.Parse("2cm").ToPoints(), y.ToPoints(), 0.001);
     }
 
     /// <summary>
@@ -273,6 +382,10 @@ public class DrawingHighLevelApiTests
         Assert.Equal("smiley", shape.GeometryType);
         Assert.True(shape.TryGetWidth(out OdfLength width));
         Assert.Equal(OdfLength.Parse("5cm").ToPoints(), width.ToPoints(), 0.001);
+        Assert.True(shape.TryGetY(out OdfLength y));
+        Assert.Equal(OdfLength.Parse("2cm").ToPoints(), y.ToPoints(), 0.001);
+        Assert.True(shape.TryGetHeight(out OdfLength height));
+        Assert.Equal(OdfLength.Parse("5cm").ToPoints(), height.ToPoints(), 0.001);
     }
 
     /// <summary>
@@ -377,6 +490,10 @@ public class DrawingHighLevelApiTests
         Assert.Equal("流程圖標籤", info.Text);
         Assert.True(info.TryGetWidth(out OdfLength width));
         Assert.Equal(OdfLength.Parse("8cm").ToPoints(), width.ToPoints(), 0.001);
+        Assert.True(info.TryGetY(out OdfLength y));
+        Assert.Equal(OdfLength.Parse("2cm").ToPoints(), y.ToPoints(), 0.001);
+        Assert.True(info.TryGetHeight(out OdfLength height));
+        Assert.Equal(OdfLength.Parse("3cm").ToPoints(), height.ToPoints(), 0.001);
 
         Assert.Single(document.GetTextBoxes());
     }
@@ -403,6 +520,10 @@ public class DrawingHighLevelApiTests
         Assert.StartsWith("Pictures/", info.Href);
         Assert.True(info.TryGetWidth(out OdfLength width));
         Assert.Equal(OdfLength.Parse("5cm").ToPoints(), width.ToPoints(), 0.001);
+        Assert.True(info.TryGetY(out OdfLength y));
+        Assert.Equal(OdfLength.Parse("4cm").ToPoints(), y.ToPoints(), 0.001);
+        Assert.True(info.TryGetHeight(out OdfLength height));
+        Assert.Equal(OdfLength.Parse("6cm").ToPoints(), height.ToPoints(), 0.001);
 
         Assert.Single(document.GetPictures());
     }

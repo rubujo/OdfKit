@@ -200,8 +200,13 @@ public partial class OdfDrawPage
         double maxX = double.MinValue;
         double minY = double.MaxValue;
         double maxY = double.MinValue;
-        bool isXCoordinate = true;
         bool hasCoordinate = false;
+
+        // 依目前指令字母決定每組參數中座標軸（X／Y）的排列方式，
+        // 而非天真假設所有指令的參數皆以 X、Y 交替排列
+        // （例如 H／V 僅有單一軸，A 的 7 個參數中只有最後 2 個才是端點座標）。
+        char command = 'M';
+        int paramIndexInGroup = 0;
 
         int index = 0;
         int length = svgPathData.Length;
@@ -210,7 +215,8 @@ public partial class OdfDrawPage
             char c = svgPathData[index];
             if (char.IsLetter(c))
             {
-                isXCoordinate = true;
+                command = c;
+                paramIndexInGroup = 0;
                 index++;
                 continue;
             }
@@ -228,23 +234,52 @@ public partial class OdfDrawPage
                 string token = svgPathData.Substring(start, index - start);
                 if (double.TryParse(token, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double value))
                 {
-                    hasCoordinate = true;
-                    if (isXCoordinate)
+                    char upperCommand = char.ToUpperInvariant(command);
+                    int groupSize = upperCommand switch
                     {
-                        if (value < minX)
-                            minX = value;
-                        if (value > maxX)
-                            maxX = value;
-                    }
-                    else
+                        'H' or 'V' => 1,
+                        'A' => 7,
+                        'C' => 6,
+                        'S' or 'Q' => 4,
+                        _ => 2 // M、L、T 與未知指令：成對的 (x, y)
+                    };
+
+                    // 在群組內判斷目前參數屬於哪個座標軸；A 指令僅最後兩個參數（索引 5、6）為 (x, y)
+                    bool isXCoordinate = upperCommand switch
                     {
-                        if (value < minY)
-                            minY = value;
-                        if (value > maxY)
-                            maxY = value;
+                        'H' => true,
+                        'V' => false,
+                        'A' => paramIndexInGroup == 5,
+                        _ => paramIndexInGroup % 2 == 0
+                    };
+                    bool isYCoordinate = upperCommand switch
+                    {
+                        'H' => false,
+                        'V' => true,
+                        'A' => paramIndexInGroup == 6,
+                        _ => paramIndexInGroup % 2 == 1
+                    };
+
+                    if (isXCoordinate || isYCoordinate)
+                    {
+                        hasCoordinate = true;
+                        if (isXCoordinate)
+                        {
+                            if (value < minX)
+                                minX = value;
+                            if (value > maxX)
+                                maxX = value;
+                        }
+                        else
+                        {
+                            if (value < minY)
+                                minY = value;
+                            if (value > maxY)
+                                maxY = value;
+                        }
                     }
 
-                    isXCoordinate = !isXCoordinate;
+                    paramIndexInGroup = (paramIndexInGroup + 1) % groupSize;
                 }
 
                 continue;
