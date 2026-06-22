@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using OdfKit.Core;
 using OdfKit.Database;
 using Xunit;
@@ -106,5 +108,67 @@ public class DatabaseHighLevelApiTests
         Assert.Equal("MainForm", form.Name);
         Assert.Equal("forms/MainForm", form.Href);
         Assert.Equal("主表單", form.Title);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfSchemaColumn"/> 的唯一值、預設值與檢查約束可於儲存／載入後保留。
+    /// </summary>
+    [Fact]
+    public void SchemaColumnConstraints_RoundTripAfterSaveAndLoad()
+    {
+        using var database = OdfDatabaseDocument.Create();
+        var schema = new OdfDatabaseSchema(database);
+
+        var table = new OdfSchemaTable("Customers");
+        table.Columns.Add(new OdfSchemaColumn("Id", "INTEGER", isNullable: false, isAutoIncrement: true));
+        table.Columns.Add(new OdfSchemaColumn("Email", "VARCHAR")
+        {
+            IsUnique = true,
+            DefaultValue = "unknown@example.com",
+            CheckConstraint = "Email LIKE '%@%'",
+        });
+        schema.AddTable(table);
+
+        using var stream = new MemoryStream();
+        database.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        var loadedSchema = new OdfDatabaseSchema(loaded);
+        OdfSchemaTable loadedTable = Assert.Single(loadedSchema.Tables);
+        OdfSchemaColumn emailColumn = loadedTable.Columns.Single(c => c.Name == "Email");
+
+        Assert.True(emailColumn.IsUnique);
+        Assert.Equal("unknown@example.com", emailColumn.DefaultValue);
+        Assert.Equal("Email LIKE '%@%'", emailColumn.CheckConstraint);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfSchemaIndex"/> 可於儲存／載入後保留索引定義。
+    /// </summary>
+    [Fact]
+    public void SchemaIndexes_RoundTripAfterSaveAndLoad()
+    {
+        using var database = OdfDatabaseDocument.Create();
+        var schema = new OdfDatabaseSchema(database);
+
+        var table = new OdfSchemaTable("Customers");
+        table.Columns.Add(new OdfSchemaColumn("Id", "INTEGER"));
+        table.Columns.Add(new OdfSchemaColumn("Email", "VARCHAR"));
+        table.Indexes.Add(new OdfSchemaIndex("IX_Customers_Email", isUnique: true, new List<string> { "Email" }));
+        schema.AddTable(table);
+
+        using var stream = new MemoryStream();
+        database.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        var loadedSchema = new OdfDatabaseSchema(loaded);
+        OdfSchemaTable loadedTable = Assert.Single(loadedSchema.Tables);
+        OdfSchemaIndex index = Assert.Single(loadedTable.Indexes);
+
+        Assert.Equal("IX_Customers_Email", index.Name);
+        Assert.True(index.IsUnique);
+        Assert.Equal("Email", Assert.Single(index.Columns));
     }
 }

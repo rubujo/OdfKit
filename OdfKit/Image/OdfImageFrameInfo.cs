@@ -15,6 +15,8 @@ namespace OdfKit.Image;
 /// <param name="y">Y 軸座標原文。</param>
 /// <param name="width">寬度原文。</param>
 /// <param name="height">高度原文。</param>
+/// <param name="rotationDegrees">旋轉角度（度）。</param>
+/// <param name="crop">裁切邊界。</param>
 public sealed class OdfImageFrameInfo(
     string? name,
     string? title,
@@ -25,7 +27,9 @@ public sealed class OdfImageFrameInfo(
     string? x,
     string? y,
     string? width,
-    string? height)
+    string? height,
+    double? rotationDegrees = null,
+    OdfImageCropInfo? crop = null)
 {
     /// <summary>
     /// 取得框架名稱。
@@ -76,6 +80,16 @@ public sealed class OdfImageFrameInfo(
     /// 取得高度原文。
     /// </summary>
     public string? Height { get; } = height;
+
+    /// <summary>
+    /// 取得旋轉角度（度）。
+    /// </summary>
+    public double? RotationDegrees { get; } = rotationDegrees;
+
+    /// <summary>
+    /// 取得裁切邊界。
+    /// </summary>
+    public OdfImageCropInfo? Crop { get; } = crop;
 
     /// <summary>
     /// 嘗試將 <see cref="X"/> 解析為 <see cref="OdfLength"/>。

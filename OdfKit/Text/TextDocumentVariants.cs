@@ -143,6 +143,146 @@ public sealed class TextMasterDocument : TextDocument
         return results;
     }
 
+    /// <summary>
+    /// 移除指定名稱的外部子文件區段參照。
+    /// </summary>
+    /// <param name="sectionName">區段名稱。</param>
+    /// <returns>若成功移除則為 <see langword="true"/>；找不到對應名稱的子文件參照時為 <see langword="false"/>。</returns>
+    /// <exception cref="ArgumentException">當 <paramref name="sectionName"/> 為空白時擲出。</exception>
+    public bool RemoveSubDocumentReference(string sectionName)
+    {
+        if (string.IsNullOrWhiteSpace(sectionName))
+        {
+            throw new ArgumentException("區段名稱不可為空。", nameof(sectionName));
+        }
+
+        OdfNode? section = FindSubDocumentSectionNode(BodyTextRoot, sectionName);
+        if (section?.Parent is null)
+        {
+            return false;
+        }
+
+        section.Parent.RemoveChild(section);
+        return true;
+    }
+
+    /// <summary>
+    /// 依指定名稱順序重新排列外部子文件區段參照。
+    /// </summary>
+    /// <param name="orderedSectionNames">期望的區段名稱排列順序。找不到的名稱會被忽略。</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="orderedSectionNames"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="InvalidOperationException">當指定的子文件參照分散於不同父節點下，無法重新排序時擲出。</exception>
+    public void ReorderSubDocumentReferences(IReadOnlyList<string> orderedSectionNames)
+    {
+        if (orderedSectionNames is null)
+        {
+            throw new ArgumentNullException(nameof(orderedSectionNames));
+        }
+
+        List<OdfNode> sections = [];
+        OdfNode? parent = null;
+        foreach (string name in orderedSectionNames)
+        {
+            OdfNode? section = FindSubDocumentSectionNode(BodyTextRoot, name);
+            if (section?.Parent is null)
+            {
+                continue;
+            }
+
+            if (parent is null)
+            {
+                parent = section.Parent;
+            }
+            else if (!ReferenceEquals(parent, section.Parent))
+            {
+                throw new InvalidOperationException($"區段 '{name}' 與其他子文件參照不在同一個父節點下，無法重新排序。");
+            }
+
+            sections.Add(section);
+        }
+
+        if (parent is null || sections.Count == 0)
+        {
+            return;
+        }
+
+        List<OdfNode> originalSiblings = new(parent.Children);
+        int earliestIndex = int.MaxValue;
+        foreach (OdfNode section in sections)
+        {
+            int index = originalSiblings.IndexOf(section);
+            if (index >= 0 && index < earliestIndex)
+            {
+                earliestIndex = index;
+            }
+        }
+
+        OdfNode? insertBeforeAnchor = null;
+        for (int i = earliestIndex + 1; i < originalSiblings.Count; i++)
+        {
+            if (!sections.Contains(originalSiblings[i]))
+            {
+                insertBeforeAnchor = originalSiblings[i];
+                break;
+            }
+        }
+
+        foreach (OdfNode section in sections)
+        {
+            parent.RemoveChild(section);
+        }
+
+        foreach (OdfNode section in sections)
+        {
+            if (insertBeforeAnchor is not null)
+            {
+                parent.InsertBefore(section, insertBeforeAnchor);
+            }
+            else
+            {
+                parent.AppendChild(section);
+            }
+        }
+    }
+
+    private static OdfNode? FindSubDocumentSectionNode(OdfNode node, string sectionName)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "section" &&
+                child.NamespaceUri == OdfNamespaces.Text &&
+                HasSectionSource(child) &&
+                string.Equals(child.GetAttribute("name", OdfNamespaces.Text), sectionName, StringComparison.Ordinal))
+            {
+                return child;
+            }
+
+            OdfNode? found = FindSubDocumentSectionNode(child, sectionName);
+            if (found is not null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool HasSectionSource(OdfNode sectionNode)
+    {
+        foreach (OdfNode child in sectionNode.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "section-source" &&
+                child.NamespaceUri == OdfNamespaces.Text)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static void CollectSubDocumentReferences(OdfNode node, List<OdfSubDocumentReference> results)
     {
         foreach (OdfNode child in node.Children)

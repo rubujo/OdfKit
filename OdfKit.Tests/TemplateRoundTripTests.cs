@@ -64,4 +64,68 @@ public class TemplateRoundTripTests
         Assert.NotNull(loadedMaster);
         Assert.Equal("Template Header", loadedMaster.HeaderText);
     }
+
+    /// <summary>
+    /// 驗證使用者欄位（範本變數）宣告可新增、更新並於儲存／載入後保留。
+    /// </summary>
+    [Fact]
+    public void UserFieldDeclarations_RoundTripAfterSaveAndLoad()
+    {
+        using var template = TextTemplateDocument.Create();
+        template.AddUserFieldDeclaration("CustomerName", "string", "預設客戶");
+        template.AddUserFieldDeclaration("OrderTotal", "float", "100");
+
+        Assert.True(template.SetUserFieldValue("CustomerName", "王小明"));
+        Assert.False(template.SetUserFieldValue("NotExist", "x"));
+
+        using var stream = new MemoryStream();
+        template.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = TextTemplateDocument.Load(stream);
+        var decls = loaded.GetUserFieldDeclarations();
+        Assert.Equal(2, decls.Count);
+
+        var customerName = decls.Single(d => d.Name == "CustomerName");
+        Assert.Equal("string", customerName.ValueType);
+        Assert.Equal("王小明", customerName.Value);
+
+        var orderTotal = decls.Single(d => d.Name == "OrderTotal");
+        Assert.Equal("float", orderTotal.ValueType);
+        Assert.Equal("100", orderTotal.Value);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfDocument.ConvertZipToFlatXml"/> 與 <see cref="OdfDocument.ConvertFlatXmlToZip"/> 的往返一致性。
+    /// </summary>
+    [Fact]
+    public void ConvertZipToFlatXmlAndBack_RoundTrips()
+    {
+        using var doc = TextDocument.Create();
+        doc.Title = "Flat XML 轉換測試";
+
+        string zipPath = Path.Combine(Path.GetTempPath(), $"odfkit-test-{Guid.NewGuid():N}.odt");
+        string flatPath = Path.Combine(Path.GetTempPath(), $"odfkit-test-{Guid.NewGuid():N}.fodt");
+        string roundTripZipPath = Path.Combine(Path.GetTempPath(), $"odfkit-test-{Guid.NewGuid():N}.odt");
+
+        try
+        {
+            doc.Save(zipPath);
+
+            OdfDocument.ConvertZipToFlatXml(zipPath, flatPath);
+            Assert.True(File.Exists(flatPath));
+            string flatContent = File.ReadAllText(flatPath);
+            Assert.Contains("<office:document", flatContent);
+
+            OdfDocument.ConvertFlatXmlToZip(flatPath, roundTripZipPath);
+            using var reloaded = TextDocument.Load(roundTripZipPath);
+            Assert.Equal("Flat XML 轉換測試", reloaded.Title);
+        }
+        finally
+        {
+            File.Delete(zipPath);
+            File.Delete(flatPath);
+            File.Delete(roundTripZipPath);
+        }
+    }
 }

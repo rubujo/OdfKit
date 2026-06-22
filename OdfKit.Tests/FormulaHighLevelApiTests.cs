@@ -144,6 +144,67 @@ public class FormulaHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證分數、根號 token 可寫入並於儲存／載入後讀回。
+    /// </summary>
+    [Fact]
+    public void FractionAndRadicalToken_RoundTripsAfterSaveAndLoad()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+            .WithTokens(
+                OdfMathToken.Fraction(OdfMathToken.Number("1"), OdfMathToken.Number("2")),
+                OdfMathToken.Operator("+"),
+                OdfMathToken.Radical(OdfMathToken.Number("9")))
+            .Build();
+
+        Assert.Contains("mfrac", formula.GetMathML());
+        Assert.Contains("msqrt", formula.GetMathML());
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
+        var tokens = loaded.GetMathTokens().ToList();
+        Assert.Equal(3, tokens.Count);
+
+        Assert.Equal(OdfMathTokenKind.Fraction, tokens[0].Kind);
+        Assert.Equal("1", tokens[0].Base?.Text);
+        Assert.Equal("2", tokens[0].Script?.Text);
+
+        Assert.Equal(OdfMathTokenKind.Radical, tokens[2].Kind);
+        Assert.Equal("9", tokens[2].Base?.Text);
+        Assert.Null(tokens[2].Script);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfMathBuilder"/> 可組合矩陣 token 並於儲存／載入後讀回。
+    /// </summary>
+    [Fact]
+    public void OdfMathBuilder_BuildsMatrixAndRoundTrips()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.FromBuilder(builder => builder
+            .Matrix(
+                row => row.Number("1").Number("2"),
+                row => row.Number("3").Number("4")));
+
+        Assert.Contains("mtable", formula.GetMathML());
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "matrix.odf");
+        var tokens = loaded.GetMathTokens().ToList();
+        OdfMathToken matrix = Assert.Single(tokens);
+        Assert.Equal(OdfMathTokenKind.Matrix, matrix.Kind);
+        Assert.NotNull(matrix.Children);
+        Assert.Equal(2, matrix.Children!.Count);
+        Assert.Equal(2, matrix.Children[0].Children?.Count);
+        Assert.Equal("1", matrix.Children[0].Children![0].Text);
+        Assert.Equal("4", matrix.Children[1].Children![1].Text);
+    }
+
+    /// <summary>
     /// 驗證公式文件的 Round-trip 載入與儲存。
     /// </summary>
     [Fact]

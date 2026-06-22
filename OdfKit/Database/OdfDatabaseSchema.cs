@@ -132,8 +132,17 @@ public sealed class OdfDatabaseSchema
                             var isNullable = !string.Equals(isNullableAttr, "no-nulls", StringComparison.OrdinalIgnoreCase);
                             var isAutoIncAttr = colChild.GetAttribute("is-autoincrement", DatabaseNamespace);
                             var isAutoInc = string.Equals(isAutoIncAttr, "true", StringComparison.OrdinalIgnoreCase);
+                            var isUniqueAttr = colChild.GetAttribute("is-unique", DatabaseNamespace);
+                            var isUnique = string.Equals(isUniqueAttr, "true", StringComparison.OrdinalIgnoreCase);
+                            var defaultValue = colChild.GetAttribute("default-value", DatabaseNamespace);
+                            var checkConstraint = colChild.GetAttribute("check-constraint", DatabaseNamespace);
 
-                            table.Columns.Add(new OdfSchemaColumn(colName, typeName, isNullable, isAutoInc));
+                            table.Columns.Add(new OdfSchemaColumn(colName, typeName, isNullable, isAutoInc)
+                            {
+                                IsUnique = isUnique,
+                                DefaultValue = string.IsNullOrEmpty(defaultValue) ? null : defaultValue,
+                                CheckConstraint = string.IsNullOrEmpty(checkConstraint) ? null : checkConstraint,
+                            });
                         }
                     }
                 }
@@ -191,6 +200,49 @@ public sealed class OdfDatabaseSchema
                     }
                 }
 
+                // 載入索引定義
+                var indicesNode = FindChildElement(child, "indices", DatabaseNamespace);
+                if (indicesNode is not null)
+                {
+                    foreach (var indexChild in indicesNode.Children)
+                    {
+                        if (indexChild.NodeType is OdfNodeType.Element &&
+                            indexChild.LocalName == "index" &&
+                            indexChild.NamespaceUri == DatabaseNamespace)
+                        {
+                            var indexName = indexChild.GetAttribute("name", DatabaseNamespace) ?? string.Empty;
+                            if (string.IsNullOrEmpty(indexName))
+                            {
+                                continue;
+                            }
+
+                            var isUniqueIndexAttr = indexChild.GetAttribute("unique", DatabaseNamespace);
+                            var isUniqueIndex = string.Equals(isUniqueIndexAttr, "true", StringComparison.OrdinalIgnoreCase);
+
+                            var indexColumns = new List<string>();
+                            var indexColumnsNode = FindChildElement(indexChild, "index-columns", DatabaseNamespace);
+                            if (indexColumnsNode is not null)
+                            {
+                                foreach (var icChild in indexColumnsNode.Children)
+                                {
+                                    if (icChild.NodeType is OdfNodeType.Element &&
+                                        icChild.LocalName == "index-column" &&
+                                        icChild.NamespaceUri == DatabaseNamespace)
+                                    {
+                                        var icName = icChild.GetAttribute("name", DatabaseNamespace) ?? string.Empty;
+                                        if (!string.IsNullOrEmpty(icName))
+                                        {
+                                            indexColumns.Add(icName);
+                                        }
+                                    }
+                                }
+                            }
+
+                            table.Indexes.Add(new OdfSchemaIndex(indexName, isUniqueIndex, indexColumns));
+                        }
+                    }
+                }
+
                 _tables.Add(table);
             }
         }
@@ -201,7 +253,7 @@ public sealed class OdfDatabaseSchema
         var body = FindOrCreateChild(_document.ContentDom, "body", OdfNamespaces.Office, "office");
         var database = FindOrCreateChild(body, "database", OdfNamespaces.Office, "office");
 
-        // 1. 同步寫入 schema-definition (實體結構層)
+        // 1. 同步寫入 schema-definition（實體結構層）
         var schemaDef = FindOrCreateChild(database, "schema-definition", DatabaseNamespace, "db");
         // 清空現有的 table-definitions
         var tableDefs = FindChildElement(schemaDef, "table-definitions", DatabaseNamespace);
@@ -212,7 +264,7 @@ public sealed class OdfDatabaseSchema
         tableDefs = OdfNodeFactory.CreateElement("table-definitions", DatabaseNamespace, "db");
         schemaDef.AppendChild(tableDefs);
 
-        // 2. 同步寫入 table-representations (表現層)
+        // 2. 同步寫入 table-representations（表現層）
         var tableReps = FindChildElement(database, "table-representations", DatabaseNamespace);
         if (tableReps is not null)
         {
@@ -250,6 +302,18 @@ public sealed class OdfDatabaseSchema
                 if (col.IsAutoIncrement)
                 {
                     colDef.SetAttribute("is-autoincrement", DatabaseNamespace, "true", "db");
+                }
+                if (col.IsUnique)
+                {
+                    colDef.SetAttribute("is-unique", DatabaseNamespace, "true", "db");
+                }
+                if (!string.IsNullOrEmpty(col.DefaultValue))
+                {
+                    colDef.SetAttribute("default-value", DatabaseNamespace, col.DefaultValue!, "db");
+                }
+                if (!string.IsNullOrEmpty(col.CheckConstraint))
+                {
+                    colDef.SetAttribute("check-constraint", DatabaseNamespace, col.CheckConstraint!, "db");
                 }
                 columnDefs.AppendChild(colDef);
             }
@@ -310,6 +374,35 @@ public sealed class OdfDatabaseSchema
                         keyColsNode.AppendChild(keyColNode);
                     }
                     keysNode.AppendChild(fkNode);
+                }
+            }
+
+            // 寫入索引定義
+            if (table.Indexes.Count > 0)
+            {
+                var indicesNode = OdfNodeFactory.CreateElement("indices", DatabaseNamespace, "db");
+                tableDef.AppendChild(indicesNode);
+
+                foreach (var index in table.Indexes)
+                {
+                    var indexNode = OdfNodeFactory.CreateElement("index", DatabaseNamespace, "db");
+                    indexNode.SetAttribute("name", DatabaseNamespace, index.Name, "db");
+                    if (index.IsUnique)
+                    {
+                        indexNode.SetAttribute("unique", DatabaseNamespace, "true", "db");
+                    }
+
+                    var indexColumnsNode = OdfNodeFactory.CreateElement("index-columns", DatabaseNamespace, "db");
+                    indexNode.AppendChild(indexColumnsNode);
+
+                    foreach (var indexColumn in index.Columns)
+                    {
+                        var indexColumnNode = OdfNodeFactory.CreateElement("index-column", DatabaseNamespace, "db");
+                        indexColumnNode.SetAttribute("name", DatabaseNamespace, indexColumn, "db");
+                        indexColumnsNode.AppendChild(indexColumnNode);
+                    }
+
+                    indicesNode.AppendChild(indexNode);
                 }
             }
 
@@ -396,6 +489,11 @@ public sealed class OdfSchemaTable
     /// 取得資料表的外鍵關聯定義清單。
     /// </summary>
     public List<OdfSchemaForeignKey> ForeignKeys { get; } = [];
+
+    /// <summary>
+    /// 取得資料表的索引定義清單。
+    /// </summary>
+    public List<OdfSchemaIndex> Indexes { get; } = [];
 }
 
 /// <summary>
@@ -442,6 +540,62 @@ public sealed class OdfSchemaColumn
     /// 取得或設定一個值，指示該欄位是否為自動遞增欄位。
     /// </summary>
     public bool IsAutoIncrement { get; set; }
+
+    /// <summary>
+    /// 取得或設定一個值，指示該欄位是否具有唯一值約束。
+    /// </summary>
+    public bool IsUnique { get; set; }
+
+    /// <summary>
+    /// 取得或設定欄位的預設值表達式。
+    /// </summary>
+    public string? DefaultValue { get; set; }
+
+    /// <summary>
+    /// 取得或設定欄位的檢查約束表達式。
+    /// </summary>
+    public string? CheckConstraint { get; set; }
+}
+
+/// <summary>
+/// 表示資料表索引定義模型。
+/// </summary>
+public sealed class OdfSchemaIndex
+{
+    /// <summary>
+    /// 初始化 <see cref="OdfSchemaIndex"/> 類別的新執行個體。
+    /// </summary>
+    /// <param name="name">索引名稱。</param>
+    /// <param name="isUnique">是否為唯一索引。</param>
+    /// <param name="columns">索引所包含的欄位名稱清單。</param>
+    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空時擲出。</exception>
+    /// <exception cref="ArgumentNullException">當 <paramref name="columns"/> 為 <see langword="null"/> 時擲出。</exception>
+    public OdfSchemaIndex(string name, bool isUnique, IEnumerable<string> columns)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("索引名稱不能為空。", nameof(name));
+        }
+
+        Name = name;
+        IsUnique = isUnique;
+        Columns = columns?.ToList() ?? throw new ArgumentNullException(nameof(columns));
+    }
+
+    /// <summary>
+    /// 取得索引名稱。
+    /// </summary>
+    public string Name { get; }
+
+    /// <summary>
+    /// 取得或設定一個值，指示該索引是否為唯一索引。
+    /// </summary>
+    public bool IsUnique { get; set; }
+
+    /// <summary>
+    /// 取得索引所包含的欄位名稱清單。
+    /// </summary>
+    public List<string> Columns { get; }
 }
 
 /// <summary>

@@ -130,8 +130,131 @@ public partial class OdfFormulaDocument
         {
             OdfMathTokenKind.Superscript => CreateScriptNode("msup", token),
             OdfMathTokenKind.Subscript => CreateScriptNode("msub", token),
+            OdfMathTokenKind.Fraction => CreateScriptNode("mfrac", token),
+            OdfMathTokenKind.Under => CreateScriptNode("munder", token),
+            OdfMathTokenKind.Over => CreateScriptNode("mover", token),
+            OdfMathTokenKind.Radical => CreateRadicalNode(token),
+            OdfMathTokenKind.Row => CreateRowNode("mrow", token),
+            OdfMathTokenKind.Matrix => CreateMatrixNode(token),
+            OdfMathTokenKind.UnderOver => CreateUnderOverNode(token),
+            OdfMathTokenKind.Fenced => CreateFencedNode(token),
+            OdfMathTokenKind.Style => CreateStyleNode(token),
             _ => CreateLeafMathTokenNode(token),
         };
+    }
+
+    private static OdfNode CreateRadicalNode(OdfMathToken token)
+    {
+        if (token.Base is null)
+        {
+            throw new InvalidOperationException("根號 token 必須包含被開方數。");
+        }
+
+        string elementName = token.Script is null ? "msqrt" : "mroot";
+        OdfNode node = OdfNodeFactory.CreateElement(elementName, MathMlNamespace, "math");
+        node.AppendChild(CreateMathTokenNode(token.Base));
+        if (token.Script is not null)
+        {
+            node.AppendChild(CreateMathTokenNode(token.Script));
+        }
+
+        return node;
+    }
+
+    private static OdfNode CreateRowNode(string elementName, OdfMathToken token)
+    {
+        if (token.Children is null || token.Children.Count == 0)
+        {
+            throw new InvalidOperationException("群組 token 必須包含至少一個子 token。");
+        }
+
+        OdfNode node = OdfNodeFactory.CreateElement(elementName, MathMlNamespace, "math");
+        foreach (OdfMathToken child in token.Children)
+        {
+            node.AppendChild(CreateMathTokenNode(child));
+        }
+
+        return node;
+    }
+
+    private static OdfNode CreateMatrixNode(OdfMathToken token)
+    {
+        if (token.Children is null || token.Children.Count == 0)
+        {
+            throw new InvalidOperationException("矩陣 token 必須包含至少一列。");
+        }
+
+        OdfNode table = OdfNodeFactory.CreateElement("mtable", MathMlNamespace, "math");
+        foreach (OdfMathToken rowToken in token.Children)
+        {
+            OdfNode rowNode = OdfNodeFactory.CreateElement("mtr", MathMlNamespace, "math");
+            IReadOnlyList<OdfMathToken> cells = rowToken.Children ?? [];
+            foreach (OdfMathToken cell in cells)
+            {
+                OdfNode cellNode = OdfNodeFactory.CreateElement("mtd", MathMlNamespace, "math");
+                cellNode.AppendChild(CreateMathTokenNode(cell));
+                rowNode.AppendChild(cellNode);
+            }
+
+            table.AppendChild(rowNode);
+        }
+
+        return table;
+    }
+
+    private static OdfNode CreateUnderOverNode(OdfMathToken token)
+    {
+        if (token.Children is null || token.Children.Count != 3)
+        {
+            throw new InvalidOperationException("上下方標記 token 必須包含底數、下方與上方共三個子 token。");
+        }
+
+        OdfNode node = OdfNodeFactory.CreateElement("munderover", MathMlNamespace, "math");
+        foreach (OdfMathToken child in token.Children)
+        {
+            node.AppendChild(CreateMathTokenNode(child));
+        }
+
+        return node;
+    }
+
+    private static OdfNode CreateFencedNode(OdfMathToken token)
+    {
+        if (token.Base is null)
+        {
+            throw new InvalidOperationException("括號群組 token 必須包含內容。");
+        }
+
+        string[] delimiters = token.Text.Split('|');
+        string open = delimiters.Length > 0 ? delimiters[0] : "(";
+        string close = delimiters.Length > 1 ? delimiters[1] : ")";
+
+        OdfNode row = OdfNodeFactory.CreateElement("mrow", MathMlNamespace, "math");
+        OdfNode openNode = OdfNodeFactory.CreateElement("mo", MathMlNamespace, "math");
+        openNode.TextContent = open;
+        row.AppendChild(openNode);
+        row.AppendChild(CreateMathTokenNode(token.Base));
+        OdfNode closeNode = OdfNodeFactory.CreateElement("mo", MathMlNamespace, "math");
+        closeNode.TextContent = close;
+        row.AppendChild(closeNode);
+        return row;
+    }
+
+    private static OdfNode CreateStyleNode(OdfMathToken token)
+    {
+        if (token.Base is null)
+        {
+            throw new InvalidOperationException("樣式群組 token 必須包含內容。");
+        }
+
+        OdfNode node = OdfNodeFactory.CreateElement("mstyle", MathMlNamespace, "math");
+        if (!string.IsNullOrEmpty(token.Text))
+        {
+            node.SetAttribute("displaystyle", MathMlNamespace, token.Text, "math");
+        }
+
+        node.AppendChild(CreateMathTokenNode(token.Base));
+        return node;
     }
 
     private static OdfNode CreateLeafMathTokenNode(OdfMathToken token)
@@ -164,21 +287,22 @@ public partial class OdfFormulaDocument
             "mtext" => OdfMathToken.TextToken(node.TextContent),
             "msup" => CreateScriptToken(node, OdfMathTokenKind.Superscript),
             "msub" => CreateScriptToken(node, OdfMathTokenKind.Subscript),
+            "mfrac" => CreateScriptToken(node, OdfMathTokenKind.Fraction),
+            "munder" => CreateScriptToken(node, OdfMathTokenKind.Under),
+            "mover" => CreateScriptToken(node, OdfMathTokenKind.Over),
+            "msqrt" => CreateRadicalToken(node, hasIndex: false),
+            "mroot" => CreateRadicalToken(node, hasIndex: true),
+            "mrow" => CreateRowToken(node),
+            "mtable" => CreateMatrixToken(node),
+            "munderover" => CreateUnderOverToken(node),
+            "mstyle" => CreateStyleToken(node),
             _ => null
         };
     }
 
     private static OdfMathToken? CreateScriptToken(OdfNode node, OdfMathTokenKind kind)
     {
-        List<OdfNode> children = [];
-        foreach (OdfNode child in node.Children)
-        {
-            if (child.NodeType is OdfNodeType.Element && child.NamespaceUri == MathMlNamespace)
-            {
-                children.Add(child);
-            }
-        }
-
+        List<OdfNode> children = CollectElementChildren(node);
         if (children.Count < 2)
         {
             return null;
@@ -191,9 +315,150 @@ public partial class OdfFormulaDocument
             return null;
         }
 
-        return kind == OdfMathTokenKind.Subscript
-            ? OdfMathToken.Subscript(baseToken, scriptToken)
-            : OdfMathToken.Superscript(baseToken, scriptToken);
+        return kind switch
+        {
+            OdfMathTokenKind.Subscript => OdfMathToken.Subscript(baseToken, scriptToken),
+            OdfMathTokenKind.Fraction => OdfMathToken.Fraction(baseToken, scriptToken),
+            OdfMathTokenKind.Under => OdfMathToken.Under(baseToken, scriptToken),
+            OdfMathTokenKind.Over => OdfMathToken.Over(baseToken, scriptToken),
+            _ => OdfMathToken.Superscript(baseToken, scriptToken),
+        };
+    }
+
+    private static OdfMathToken? CreateRadicalToken(OdfNode node, bool hasIndex)
+    {
+        List<OdfNode> children = CollectElementChildren(node);
+        if (children.Count == 0)
+        {
+            return null;
+        }
+
+        OdfMathToken? radicand = CreateTokenOrDefault(children[0]);
+        if (radicand is null)
+        {
+            return null;
+        }
+
+        if (!hasIndex || children.Count < 2)
+        {
+            return OdfMathToken.Radical(radicand);
+        }
+
+        OdfMathToken? index = CreateTokenOrDefault(children[1]);
+        return index is null ? OdfMathToken.Radical(radicand) : OdfMathToken.Radical(radicand, index);
+    }
+
+    private static OdfMathToken? CreateRowToken(OdfNode node)
+    {
+        List<OdfMathToken> tokens = [];
+        foreach (OdfNode child in CollectElementChildren(node))
+        {
+            OdfMathToken? token = CreateTokenOrDefault(child);
+            if (token is not null)
+            {
+                tokens.Add(token);
+            }
+        }
+
+        return tokens.Count == 0 ? null : OdfMathToken.Row(tokens.ToArray());
+    }
+
+    private static OdfMathToken? CreateMatrixToken(OdfNode node)
+    {
+        List<OdfMathToken> rows = [];
+        foreach (OdfNode rowNode in CollectElementChildren(node))
+        {
+            if (rowNode.LocalName != "mtr")
+            {
+                continue;
+            }
+
+            List<OdfMathToken> cells = [];
+            foreach (OdfNode cellNode in CollectElementChildren(rowNode))
+            {
+                if (cellNode.LocalName != "mtd")
+                {
+                    continue;
+                }
+
+                List<OdfNode> cellChildren = CollectElementChildren(cellNode);
+                if (cellChildren.Count == 0)
+                {
+                    continue;
+                }
+
+                OdfMathToken? cellToken = CreateTokenOrDefault(cellChildren[0]);
+                if (cellToken is not null)
+                {
+                    cells.Add(cellToken);
+                }
+            }
+
+            if (cells.Count > 0)
+            {
+                rows.Add(OdfMathToken.Row(cells.ToArray()));
+            }
+        }
+
+        return rows.Count == 0 ? null : OdfMathToken.Matrix(rows.ToArray());
+    }
+
+    private static OdfMathToken? CreateUnderOverToken(OdfNode node)
+    {
+        List<OdfNode> children = CollectElementChildren(node);
+        if (children.Count < 3)
+        {
+            return null;
+        }
+
+        OdfMathToken? baseToken = CreateTokenOrDefault(children[0]);
+        OdfMathToken? under = CreateTokenOrDefault(children[1]);
+        OdfMathToken? over = CreateTokenOrDefault(children[2]);
+        if (baseToken is null || under is null || over is null)
+        {
+            return null;
+        }
+
+        return OdfMathToken.UnderOver(baseToken, under, over);
+    }
+
+    private static OdfMathToken? CreateStyleToken(OdfNode node)
+    {
+        List<OdfNode> children = CollectElementChildren(node);
+        if (children.Count == 0)
+        {
+            return null;
+        }
+
+        OdfMathToken? inner = CreateTokenOrDefault(children[0]);
+        if (inner is null)
+        {
+            return null;
+        }
+
+        string? displayStyleAttr = node.GetAttribute("displaystyle", MathMlNamespace);
+        bool? displayStyle = displayStyleAttr switch
+        {
+            "true" => true,
+            "false" => false,
+            _ => null,
+        };
+
+        return OdfMathToken.Style(inner, displayStyle);
+    }
+
+    private static List<OdfNode> CollectElementChildren(OdfNode node)
+    {
+        List<OdfNode> children = [];
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element && child.NamespaceUri == MathMlNamespace)
+            {
+                children.Add(child);
+            }
+        }
+
+        return children;
     }
 
     private static string GetLeafMathTokenElementName(OdfMathTokenKind kind)

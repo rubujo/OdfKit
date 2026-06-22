@@ -172,6 +172,72 @@ public class ImageHighLevelApiTests
         Assert.Single(reloaded.GetImageFrames());
     }
 
+    /// <summary>
+    /// 驗證 <see cref="OdfImageDocument.SetImageFilter"/> 與 <see cref="OdfImageDocument.GetImageFilter"/> 的往返一致性。
+    /// </summary>
+    [Fact]
+    public void ImageFilter_RoundTripsAfterSetAndSave()
+    {
+        using var image = OdfImageDocument.Create();
+        image.SetImage(CreatePngBytes(), "Primary.png");
+        image.FrameName = "PrimaryFrame";
+
+        var filter = new OdfImageFilterInfo("grayscale", new System.Collections.Generic.Dictionary<string, string>
+        {
+            ["intensity"] = "0.5",
+        });
+        Assert.True(image.SetImageFilter("PrimaryFrame", filter));
+
+        using var stream = new MemoryStream();
+        image.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = OdfImageDocument.Load(stream, "gallery.odi");
+        OdfImageFilterInfo? readFilter = loaded.GetImageFilter("PrimaryFrame");
+        Assert.NotNull(readFilter);
+        Assert.Equal("grayscale", readFilter!.FilterName);
+        Assert.Equal("0.5", readFilter.Parameters["intensity"]);
+
+        Assert.True(loaded.SetImageFilter("PrimaryFrame", null));
+        Assert.Null(loaded.GetImageFilter("PrimaryFrame"));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfImageDocument.SetImageRotation"/> 與 <see cref="OdfImageDocument.SetImageCrop"/> 的往返一致性。
+    /// </summary>
+    [Fact]
+    public void ImageRotationAndCrop_RoundTripAfterSaveAndLoad()
+    {
+        using var image = OdfImageDocument.Create();
+        image.SetImage(CreatePngBytes(), "Primary.png");
+        image.FrameName = "PrimaryFrame";
+
+        Assert.True(image.SetImageRotation("PrimaryFrame", 90));
+        var crop = new OdfImageCropInfo("0.1cm", "0.2cm", "0.3cm", "0.4cm");
+        Assert.True(image.SetImageCrop("PrimaryFrame", crop));
+
+        using var stream = new MemoryStream();
+        image.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var loaded = OdfImageDocument.Load(stream, "gallery.odi");
+        OdfImageFrameInfo frame = Assert.Single(loaded.GetImageFrames());
+        Assert.NotNull(frame.RotationDegrees);
+        Assert.Equal(90, frame.RotationDegrees!.Value, 3);
+
+        Assert.NotNull(frame.Crop);
+        Assert.Equal("0.1cm", frame.Crop!.Top);
+        Assert.Equal("0.2cm", frame.Crop.Right);
+        Assert.Equal("0.3cm", frame.Crop.Bottom);
+        Assert.Equal("0.4cm", frame.Crop.Left);
+
+        Assert.True(loaded.SetImageRotation("PrimaryFrame", null));
+        Assert.True(loaded.SetImageCrop("PrimaryFrame", null));
+        OdfImageFrameInfo cleared = Assert.Single(loaded.GetImageFrames());
+        Assert.Null(cleared.RotationDegrees);
+        Assert.Null(cleared.Crop);
+    }
+
     private static byte[] CreatePngBytes() =>
         System.Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");

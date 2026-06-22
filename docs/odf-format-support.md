@@ -68,6 +68,11 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - `.odc`、`.odf`、`.odi`、`.odb` 標為 `usable`：已有摘要與常用編輯 API，
   `SecondaryFormatApiScenarioTests` 已背書連線／圖表軸／公式 token／多框架影像等場景；
   完整語意模型（例如 ODC chart style 物件模型）仍屬 Wave 2 DEPTH-2 延伸。
+- 次要格式與變體高階物件模型補完 Batch 1（P0/P1）已完成：ODC 數據標籤／牆面地板樣式、
+  ODB 欄位約束與索引、ODI 影像濾鏡與旋轉裁切、ODF 公式分數／根號／矩陣型別化 token 與
+  `OdfMathBuilder` fluent API、範本使用者欄位（`text:user-field-decls`）、ODM 主控文件子文件
+  CRUD 完整化、Flat XML ↔ ZIP 就地轉換 API；剩餘 P2 任務見
+  [docs/ODF_SECONDARY_FORMAT_COMPLETION_PLAN.md](ODF_SECONDARY_FORMAT_COMPLETION_PLAN.md)。
 - RDF-1 基礎 ✅：`manifest.rdf` 文件層往返、`pkg:` ontology 同步；corpus 含 `repo-generated-manifest-rdf-text`（`RdfMetadataTests`）。
 - LOEXT-1 基礎 ✅：`loext:decorative` 載入映射至 `draw:decorative`（`OdfLoExtInteropEngine`、`LoExtInteropTests`）。
 - repo 內 corpus 已擴充至 200+ fixtures（`tools/OdfCorpusGenerator` + 手工負向／版本特例）；

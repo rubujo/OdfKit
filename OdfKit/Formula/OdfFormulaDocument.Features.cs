@@ -46,4 +46,26 @@ public partial class OdfFormulaDocument
         var xml = OdfFormulaLatexConverter.Convert(latex);
         SetMathMl(xml);
     }
+
+    /// <summary>
+    /// 使用 <see cref="OdfMathBuilder"/> 組合委派建立並載入 <see cref="OdfFormulaDocument"/>。
+    /// </summary>
+    /// <param name="build">用於組合 MathML token 樹狀結構的委派。</param>
+    /// <returns>已載入組合結果的 <see cref="OdfFormulaDocument"/> 執行個體。</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="build"/> 為 <see langword="null"/> 時擲出。</exception>
+    public static OdfFormulaDocument FromBuilder(Action<OdfMathBuilder> build)
+    {
+        if (build is null)
+        {
+            throw new ArgumentNullException(nameof(build));
+        }
+
+        var mathBuilder = new OdfMathBuilder();
+        build(mathBuilder);
+        OdfMathToken root = mathBuilder.Build();
+
+        OdfFormulaDocument doc = Create();
+        doc.SetMathRow(root);
+        return doc;
+    }
 }

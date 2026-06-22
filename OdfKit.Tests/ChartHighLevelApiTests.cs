@@ -401,4 +401,62 @@ public class ChartHighLevelApiTests
         Assert.Equal(9, r.EndAddress.Row);
         Assert.Equal(3, r.EndAddress.Column);
     }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfChartDocument.SetSeriesDataLabels"/> 與 <see cref="OdfChartDocument.GetSeriesDataLabels"/> 的往返一致性。
+    /// </summary>
+    [Fact]
+    public void SeriesDataLabels_RoundTripsAfterSetAndSave()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
+
+        var labels = new OdfChartDataLabelInfo(showValue: true, showPercentage: true, showCategoryName: true, showLegendKey: false);
+        chartDoc.SetSeriesDataLabels(0, labels);
+
+        Assert.Null(chartDoc.GetSeriesDataLabels(1));
+
+        using var stream = new MemoryStream();
+        chartDoc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfChartDocument loaded = OdfChartDocument.Load(stream);
+        OdfChartDataLabelInfo? readLabels = loaded.GetSeriesDataLabels(0);
+        Assert.NotNull(readLabels);
+        Assert.True(readLabels!.ShowValue);
+        Assert.True(readLabels.ShowPercentage);
+        Assert.True(readLabels.ShowCategoryName);
+        Assert.False(readLabels.ShowLegendKey);
+
+        Assert.True(chartDoc.SeriesCount > 1);
+        chartDoc.SetSeriesDataLabels(0, null);
+        Assert.Null(chartDoc.GetSeriesDataLabels(0));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfChartDocument.SetWallStyleName"/> 與 <see cref="OdfChartDocument.SetFloorStyleName"/> 的往返一致性。
+    /// </summary>
+    [Fact]
+    public void WallAndFloorStyleName_RoundTripsAfterSetAndSave()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2));
+
+        chartDoc.SetWallStyleName("WallStyle1");
+        chartDoc.SetFloorStyleName("FloorStyle1");
+
+        Assert.Equal("WallStyle1", chartDoc.GetWallStyleName());
+        Assert.Equal("FloorStyle1", chartDoc.GetFloorStyleName());
+
+        using var stream = new MemoryStream();
+        chartDoc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfChartDocument loaded = OdfChartDocument.Load(stream);
+        Assert.Equal("WallStyle1", loaded.GetWallStyleName());
+        Assert.Equal("FloorStyle1", loaded.GetFloorStyleName());
+
+        loaded.SetWallStyleName(null);
+        Assert.Null(loaded.GetWallStyleName());
+    }
 }

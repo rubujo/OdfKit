@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -7,6 +8,56 @@ namespace OdfKit.Image;
 
 public partial class OdfImageDocument
 {
+    /// <summary>
+    /// 設定指定名稱影像框架的旋轉角度。
+    /// </summary>
+    /// <param name="name">框架名稱。</param>
+    /// <param name="degrees">旋轉角度（度）；<see langword="null"/> 表示移除旋轉設定。</param>
+    /// <returns>若成功設定則為 <see langword="true"/>；找不到框架時為 <see langword="false"/>。</returns>
+    public bool SetImageRotation(string name, double? degrees)
+    {
+        OdfNode? frame = FindFrameByName(name);
+        if (frame is null)
+        {
+            return false;
+        }
+
+        if (degrees is null)
+        {
+            frame.RemoveAttribute("transform", OdfNamespaces.Draw);
+            return true;
+        }
+
+        double radians = degrees.Value * System.Math.PI / 180.0;
+        frame.SetAttribute("transform", OdfNamespaces.Draw, $"rotate({radians.ToString(CultureInfo.InvariantCulture)})", "draw");
+        return true;
+    }
+
+    /// <summary>
+    /// 設定指定名稱影像框架的裁切邊界。
+    /// </summary>
+    /// <param name="name">框架名稱。</param>
+    /// <param name="crop">裁切邊界；<see langword="null"/> 表示移除既有裁切設定。</param>
+    /// <returns>若成功設定則為 <see langword="true"/>；找不到框架時為 <see langword="false"/>。</returns>
+    public bool SetImageCrop(string name, OdfImageCropInfo? crop)
+    {
+        OdfNode? frame = FindFrameByName(name);
+        OdfNode? image = frame is null ? null : FindChild(frame, "image", OdfNamespaces.Draw);
+        if (image is null)
+        {
+            return false;
+        }
+
+        if (crop is null)
+        {
+            image.RemoveAttribute("clip", OdfNamespaces.Fo);
+            return true;
+        }
+
+        image.SetAttribute("clip", OdfNamespaces.Fo, crop.ToString(), "fo");
+        return true;
+    }
+
     /// <summary>
     /// 依名稱尋找影像框架摘要。
     /// </summary>

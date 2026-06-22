@@ -268,5 +268,50 @@ public abstract partial class OdfDocument
         return doc;
     }
 
+    /// <summary>
+    /// 將一般 ZIP 封裝的 ODF 文件就地轉換為 Flat XML 格式。
+    /// </summary>
+    /// <param name="sourcePath">來源 ZIP 封裝文件路徑。</param>
+    /// <param name="destinationPath">目標 Flat XML 文件路徑。</param>
+    /// <param name="loadOptions">載入選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <param name="saveOptions">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    public static void ConvertZipToFlatXml(
+        string sourcePath,
+        string destinationPath,
+        OdfLoadOptions? loadOptions = null,
+        OdfSaveOptions? saveOptions = null)
+    {
+        if (sourcePath is null)
+            throw new ArgumentNullException(nameof(sourcePath));
+        if (destinationPath is null)
+            throw new ArgumentNullException(nameof(destinationPath));
+
+        using OdfDocument doc = OdfDocumentFactory.LoadDocument(sourcePath, loadOptions);
+        doc.SaveAsFlatXml(destinationPath, saveOptions);
+    }
+
+    /// <summary>
+    /// 將 Flat XML 格式的 ODF 文件就地轉換為一般 ZIP 封裝格式。
+    /// </summary>
+    /// <param name="sourcePath">來源 Flat XML 文件路徑。</param>
+    /// <param name="destinationPath">目標 ZIP 封裝文件路徑。</param>
+    /// <param name="loadOptions">載入選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    /// <param name="saveOptions">儲存設定選項；若為 <see langword="null"/>，則使用預設選項。</param>
+    public static void ConvertFlatXmlToZip(
+        string sourcePath,
+        string destinationPath,
+        OdfLoadOptions? loadOptions = null,
+        OdfSaveOptions? saveOptions = null)
+    {
+        if (sourcePath is null)
+            throw new ArgumentNullException(nameof(sourcePath));
+        if (destinationPath is null)
+            throw new ArgumentNullException(nameof(destinationPath));
+
+        using OdfDocument doc = LoadFromFlatXml(sourcePath, loadOptions);
+        doc.Package.IsFlatXml = false;
+        doc.Save(destinationPath, saveOptions);
+    }
+
     #endregion
 }

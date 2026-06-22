@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -42,6 +44,11 @@ internal static class OdfImageDocumentReadEngine
                 size = package.ReadEntry(href!).LongLength;
             }
 
+            double? rotationDegrees = ParseRotationDegrees(child.GetAttribute("transform", OdfNamespaces.Draw));
+            OdfImageCropInfo? crop = OdfImageCropInfo.TryParse(imageNode?.GetAttribute("clip", OdfNamespaces.Fo), out OdfImageCropInfo? parsedCrop)
+                ? parsedCrop
+                : null;
+
             frames.Add(new OdfImageFrameInfo(
                 child.GetAttribute("name", OdfNamespaces.Draw),
                 GetOptionalChildText(child, "title", OdfNamespaces.Svg),
@@ -52,8 +59,36 @@ internal static class OdfImageDocumentReadEngine
                 child.GetAttribute("x", OdfNamespaces.Svg),
                 child.GetAttribute("y", OdfNamespaces.Svg),
                 child.GetAttribute("width", OdfNamespaces.Svg),
-                child.GetAttribute("height", OdfNamespaces.Svg)));
+                child.GetAttribute("height", OdfNamespaces.Svg),
+                rotationDegrees,
+                crop));
         }
+    }
+
+    private static double? ParseRotationDegrees(string? transform)
+    {
+        if (string.IsNullOrWhiteSpace(transform))
+        {
+            return null;
+        }
+
+        int start = transform!.IndexOf("rotate(", StringComparison.OrdinalIgnoreCase);
+        if (start < 0)
+        {
+            return null;
+        }
+
+        start += "rotate(".Length;
+        int end = transform.IndexOf(')', start);
+        if (end < 0)
+        {
+            return null;
+        }
+
+        string radiansText = transform.Substring(start, end - start).Trim();
+        return double.TryParse(radiansText, NumberStyles.Float, CultureInfo.InvariantCulture, out double radians)
+            ? radians * 180.0 / Math.PI
+            : null;
     }
 
     private static OdfNode? FindChild(OdfNode node, string localName, string namespaceUri)
