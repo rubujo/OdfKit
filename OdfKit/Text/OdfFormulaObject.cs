@@ -130,13 +130,16 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
 
             string mathDocXml = $"<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:math=\"http://www.w3.org/1998/Math/MathML\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:body><office:formula>{value}</office:formula></office:body></office:document-content>";
             string stylesXml = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:styles/><office:automatic-styles/><office:master-styles/></office:document-styles>";
+            string metaXml = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:meta/></office:document-meta>";
 
             string contentPath = $"{folder.TrimEnd('/')}/content.xml";
             string stylesPath = $"{folder.TrimEnd('/')}/styles.xml";
+            string metaPath = $"{folder.TrimEnd('/')}/meta.xml";
             string mimePath = $"{folder.TrimEnd('/')}/mimetype";
 
             _doc.Package.WriteEntry(contentPath, Encoding.UTF8.GetBytes(mathDocXml), "text/xml");
             _doc.Package.WriteEntry(stylesPath, Encoding.UTF8.GetBytes(stylesXml), "text/xml");
+            _doc.Package.WriteEntry(metaPath, Encoding.UTF8.GetBytes(metaXml), "text/xml");
             _doc.Package.WriteEntry(mimePath, Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.formula"), string.Empty);
             _doc.Package.SaveManifestToEntries();
         }
