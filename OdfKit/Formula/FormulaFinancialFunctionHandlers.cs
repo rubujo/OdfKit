@@ -311,7 +311,7 @@ internal static class FormulaFinancialFunctionHandlers
             }
         }
 
-        // Secant method solver
+        // 割線法求解器
         double r0 = guess;
         double r1 = guess * 1.1 + 0.01;
 
@@ -385,7 +385,7 @@ internal static class FormulaFinancialFunctionHandlers
         if (per < 1 || per > nper)
             return OdfFormulaError.Value;
 
-        // Calculate standard PMT
+        // 計算標準每期付款額 (PMT)
         var pmtArgs = new List<AstNode> {
             new LiteralNode(rate),
             new LiteralNode(nper),
@@ -398,7 +398,7 @@ internal static class FormulaFinancialFunctionHandlers
             return pmtResult;
         double pmt = (double)pmtResult;
 
-        // Simple balance progression
+        // 簡易餘額遞進
         double balance = pv;
         double interest = 0;
 
@@ -432,7 +432,7 @@ internal static class FormulaFinancialFunctionHandlers
         if (arguments.Count < 4 || arguments.Count > 6)
             return OdfFormulaError.Value;
 
-        // PPMT = PMT - IPMT
+        // 每期本金償還額 (PPMT) = 每期付款額 (PMT) - 每期利息 (IPMT)
         var rate = arguments[0].Evaluate(context);
         var per = arguments[1].Evaluate(context);
         var nper = arguments[2].Evaluate(context);

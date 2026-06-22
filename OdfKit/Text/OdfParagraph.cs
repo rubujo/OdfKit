@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -234,7 +235,7 @@ public partial class OdfParagraph
         var node = OdfNodeFactory.CreateElement("s", OdfNamespaces.Text, "text");
         if (count > 1)
         {
-            node.SetAttribute("c", OdfNamespaces.Text, count.ToString(), "text");
+            node.SetAttribute("c", OdfNamespaces.Text, count.ToString(CultureInfo.InvariantCulture), "text");
         }
         Node.AppendChild(node);
     }

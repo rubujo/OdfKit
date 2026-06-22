@@ -41,7 +41,7 @@ internal static class FormulaBuiltinFunctionRegistry
     {
         return new Dictionary<string, FormulaBuiltinHandler>(StringComparer.OrdinalIgnoreCase)
         {
-            // Logical
+            // 邏輯
             ["IF"] = FormulaLogicalFunctionHandlers.EvaluateIf,
             ["AND"] = FormulaLogicalFunctionHandlers.EvaluateAnd,
             ["OR"] = FormulaLogicalFunctionHandlers.EvaluateOr,
@@ -74,7 +74,7 @@ internal static class FormulaBuiltinFunctionRegistry
             ["BITLSHIFT"] = FormulaLogicalFunctionHandlers.EvaluateBitLShift,
             ["BITRSHIFT"] = FormulaLogicalFunctionHandlers.EvaluateBitRShift,
 
-            // String
+            // 字串
             ["CONCAT"] = FormulaStringFunctionHandlers.EvaluateConcat,
             ["CONCATENATE"] = FormulaStringFunctionHandlers.EvaluateConcat,
             ["SUBSTITUTE"] = FormulaStringFunctionHandlers.EvaluateSubstitute,
@@ -94,7 +94,7 @@ internal static class FormulaBuiltinFunctionRegistry
             ["TRIM"] = FormulaStringFunctionHandlers.EvaluateTrim,
             ["REPLACE"] = FormulaStringFunctionHandlers.EvaluateReplace,
 
-            // Statistical
+            // 統計
             ["SUM"] = FormulaStatisticalFunctionHandlers.EvaluateSum,
             ["AVERAGE"] = FormulaStatisticalFunctionHandlers.EvaluateAverage,
             ["COUNT"] = FormulaStatisticalFunctionHandlers.EvaluateCount,
@@ -119,7 +119,7 @@ internal static class FormulaBuiltinFunctionRegistry
             ["MAX"] = FormulaStatisticalFunctionHandlers.EvaluateMax,
             ["MIN"] = FormulaStatisticalFunctionHandlers.EvaluateMin,
 
-            // Lookup
+            // 查閱
             ["VLOOKUP"] = FormulaLookupFunctionHandlers.EvaluateVLookup,
             ["HLOOKUP"] = FormulaLookupFunctionHandlers.EvaluateHLookup,
             ["INDEX"] = FormulaLookupFunctionHandlers.EvaluateIndex,
@@ -132,7 +132,7 @@ internal static class FormulaBuiltinFunctionRegistry
             ["COLUMNS"] = FormulaLookupFunctionHandlers.EvaluateColumns,
             ["CHOOSE"] = FormulaLookupFunctionHandlers.EvaluateChoose,
 
-            // Math
+            // 數學
             ["INT"] = FormulaMathFunctionHandlers.EvaluateInt,
             ["SIGN"] = FormulaMathFunctionHandlers.EvaluateSign,
             ["ODD"] = FormulaMathFunctionHandlers.EvaluateOdd,
@@ -168,7 +168,7 @@ internal static class FormulaBuiltinFunctionRegistry
             ["TAN"] = FormulaMathFunctionHandlers.EvaluateTan,
             ["TRUNC"] = FormulaMathFunctionHandlers.EvaluateTrunc,
 
-            // Date/Time
+            // 日期／時間
             ["DATE"] = FormulaDateTimeFunctionHandlers.EvaluateDate,
             ["DAY"] = FormulaDateTimeFunctionHandlers.EvaluateDay,
             ["HOUR"] = FormulaDateTimeFunctionHandlers.EvaluateHour,
@@ -191,17 +191,17 @@ internal static class FormulaBuiltinFunctionRegistry
             ["ORG.OPENOFFICE.EASTERSUNDAY"] = FormulaDateTimeFunctionHandlers.EvaluateOpenOfficeEasterSunday,
             ["ORG.OPENOFFICE.ISOMITTED"] = static (args, _) => FormulaDateTimeFunctionHandlers.EvaluateOpenOfficeIsOmitted(args),
 
-            // Matrix
+            // 矩陣
             ["TRANSPOSE"] = FormulaMatrixFunctionHandlers.EvaluateTranspose,
 
-            // Database
+            // 資料庫
             ["DSUM"] = FormulaDatabaseFunctionHandlers.EvaluateDSum,
             ["DAVERAGE"] = FormulaDatabaseFunctionHandlers.EvaluateDAverage,
             ["DCOUNT"] = FormulaDatabaseFunctionHandlers.EvaluateDCount,
             ["DMAX"] = FormulaDatabaseFunctionHandlers.EvaluateDMax,
             ["DMIN"] = FormulaDatabaseFunctionHandlers.EvaluateDMin,
 
-            // Financial
+            // 財務
             ["PMT"] = FormulaFinancialFunctionHandlers.EvaluatePmt,
             ["FV"] = FormulaFinancialFunctionHandlers.EvaluateFv,
             ["PV"] = FormulaFinancialFunctionHandlers.EvaluatePv,

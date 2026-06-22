@@ -246,7 +246,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
             throw new InvalidOperationException($"無法直接將相對單位 '{Unit}' 轉換為絕對單位 '{targetUnit}'。");
         }
 
-        // 將目前單位轉換為點 (72 點 = 1 英吋)
+        // 將目前單位轉換為點（72 點 = 1 英吋）
         double points = Unit switch
         {
             OdfUnit.Points => Value,

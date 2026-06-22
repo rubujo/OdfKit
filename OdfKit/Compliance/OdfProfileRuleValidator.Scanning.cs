@@ -91,7 +91,7 @@ internal static partial class OdfProfileRuleValidator
                 }
                 string qName = string.IsNullOrEmpty(prefix) ? reader.LocalName : $"{prefix}:{reader.LocalName}";
 
-                // 1. Calculate XPath
+                // 1. 計算 XPath
                 string currentXPath;
                 if (stack.Count > 0)
                 {
@@ -109,7 +109,7 @@ internal static partial class OdfProfileRuleValidator
                     currentXPath = $"/{qName}[1]";
                 }
 
-                // 2. Perform validation checks
+                // 2. 執行驗證檢查
                 ValidateOdfNamespaceElement(reader, packagePath, currentXPath, profile, schema, issues);
                 ValidateOdfNamespaceAttributes(reader, packagePath, currentXPath, profile, schema, issues);
                 ValidateForeignExtensionElement(reader, packagePath, currentXPath, profile, issues);
@@ -117,7 +117,7 @@ internal static partial class OdfProfileRuleValidator
                 ValidateMacroOrScriptAttributes(reader, packagePath, currentXPath, profile, issues);
                 ValidateExternalResourceAttributes(reader, packagePath, currentXPath, profile, issues);
 
-                // 3. Process accessibility metadata accumulation
+                // 3. 處理無障礙中介資料累加
                 if (accessRule is not null && stack.Count > 0)
                 {
                     var parent = stack.Peek();
@@ -134,7 +134,7 @@ internal static partial class OdfProfileRuleValidator
                     }
                 }
 
-                // 4. Handle stack push / empty elements
+                // 4. 處理堆疊推送／空元素
                 if (reader.IsEmptyElement)
                 {
                     if (accessRule is not null && reader.NamespaceURI == OdfNamespaces.Draw && reader.LocalName == "image")

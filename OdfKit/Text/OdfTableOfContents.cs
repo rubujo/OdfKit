@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -33,7 +34,7 @@ public class OdfTableOfContents : OdfIndex
     public int OutlineLevel
     {
         get => int.TryParse(SourceNode?.GetAttribute("outline-level", OdfNamespaces.Text), out var lvl) ? lvl : 10;
-        set => SourceNode?.SetAttribute("outline-level", OdfNamespaces.Text, value.ToString(), "text");
+        set => SourceNode?.SetAttribute("outline-level", OdfNamespaces.Text, value.ToString(CultureInfo.InvariantCulture), "text");
     }
 
     /// <summary>
@@ -64,7 +65,7 @@ public class OdfTableOfContents : OdfIndex
     {
         var src = FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
         var template = OdfNodeFactory.CreateElement("table-of-content-entry-template", OdfNamespaces.Text, "text");
-        template.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(), "text");
+        template.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(CultureInfo.InvariantCulture), "text");
         template.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
         src.AppendChild(template);
         return new OdfIndexTemplateBuilder(template);

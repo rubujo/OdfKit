@@ -183,20 +183,20 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         bool isColAbsolute = false;
         bool isRowAbsolute = false;
 
-        // 1. Separate Sheet Name and Cell coordinates
+        // 1. 分離工作表名稱與儲存格座標
         int sepIndex = -1;
         if (isOdfStyle)
         {
-            // ODF style: local sheet has dot prefix like '.A1'.
-            // Sheet-qualified reference has 'Sheet1.A1' or 'Sheet 1'.A1
-            // If it starts with '.' and contains no other '.', there is no sheet name.
+            // ODF 樣式：本地工作表具有點前綴，例如「.A1」。
+            // 限定工作表的參照具有 'Sheet1.A1' 或 'Sheet 1'.A1 形式
+            // 如果以「.」開頭且不包含其他「.」，則表示沒有工作表名稱。
             if (span.StartsWith(".") && span.Slice(1).IndexOf('.') == -1)
             {
                 sepIndex = 0;
             }
             else
             {
-                // Find the last dot '.' (handling single quotes for sheets with spaces)
+                // 尋找最後一個點「.」（處理含空格之工作表的單引號）
                 bool inQuotes = false;
                 for (int j = span.Length - 1; j >= 0; j--)
                 {
@@ -213,7 +213,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         }
         else
         {
-            // Excel style: Separator is '!'. Find last '!' outside single quotes
+            // Excel 樣式：分隔符號為「!」。尋找單引號外部最後一個「!」
             bool inQuotes = false;
             for (int j = span.Length - 1; j >= 0; j--)
             {
@@ -234,21 +234,21 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
             ReadOnlySpan<char> sheetSpan = span.Slice(0, sepIndex);
             cellSpan = span.Slice(sepIndex + 1);
 
-            // Process sheet name
+            // 處理工作表名稱
             if (!sheetSpan.IsEmpty)
             {
-                // Detect absolute sheet reference (prefixed with '$')
+                // 偵測絕對工作表參照（帶有「$」前綴）
                 if (sheetSpan.StartsWith("$"))
                 {
                     isSheetAbsolute = true;
                     sheetSpan = sheetSpan.Slice(1);
                 }
 
-                // Strip single quotes if present
+                // 若有單引號則予以剝除
                 if (sheetSpan.StartsWith("'") && sheetSpan.EndsWith("'"))
                 {
                     sheetSpan = sheetSpan.Slice(1, sheetSpan.Length - 2);
-                    // Unescape double single quotes ''
+                    // 將雙單引號 '' 還原為單引號
                     sheetName = sheetSpan.ToString().Replace("''", "'");
                 }
                 else
@@ -258,7 +258,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
             }
         }
 
-        // 2. Parse Column and Row components from cellSpan
+        // 2. 從 cellSpan 解析資料行與資料列組件
         int i = 0;
         if (i < cellSpan.Length && cellSpan[i] == '$')
         {
@@ -292,7 +292,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
 
         ReadOnlySpan<char> rowDigits = cellSpan.Slice(rowStart, i - rowStart);
 
-        // Convert column letters (A-Z, AA-ZZ) to 0-based index
+        // 將資料行字母 (A-Z, AA-ZZ) 轉換為以 0 為起始的索引
         int column = 0;
         for (int k = 0; k < colLetters.Length; k++)
         {
@@ -302,7 +302,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         }
         column--; // 0-based
 
-        // Convert row digits to 0-based index (1-based in text)
+        // 將資料列數字轉換為以 0 為起始的索引（文字中是以 1 為起始）
 #if NET10_0_OR_GREATER
         int row = int.Parse(rowDigits) - 1;
 #else
@@ -405,7 +405,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         int newRow = Row;
         int newCol = Column;
 
-        // Row shifts (rowCount can be negative for deletions)
+        // 資料列位移（刪除時 rowCount 可為負數）
         if (rowCount != 0)
         {
             if (rowCount > 0) // Insertion
@@ -423,7 +423,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
             }
         }
 
-        // Column shifts (colCount can be negative for deletions)
+        // 資料行位移（刪除時 colCount 可為負數）
         if (colCount != 0)
         {
             if (colCount > 0) // Insertion

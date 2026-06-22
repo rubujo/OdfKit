@@ -129,7 +129,7 @@ internal static class OdfSignatureSigner
 
             var serialNumber = doc.CreateElement("ds", "X509SerialNumber", OdfNamespaces.Ds);
             var bigSerial = BigInteger.Parse("0" + certificate.SerialNumber, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-            serialNumber.InnerText = bigSerial.ToString();
+            serialNumber.InnerText = bigSerial.ToString(CultureInfo.InvariantCulture);
             issuerSerial.AppendChild(serialNumber);
 
             cert.AppendChild(issuerSerial);

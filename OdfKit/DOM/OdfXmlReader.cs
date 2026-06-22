@@ -23,7 +23,7 @@ public static class OdfXmlReader
     /// <returns>解析完成的根元素節點</returns>
     /// <exception cref="ArgumentNullException">當 <paramref name="stream"/> 為 <see langword="null"/> 時擲出</exception>
     /// <exception cref="SecurityException">當 XML 巢狀深度超過限制時擲出</exception>
-    /// <exception cref="InvalidDataException">當 XML 結構無效 (例如找不到根元素) 時擲出</exception>
+    /// <exception cref="InvalidDataException">當 XML 結構無效（例如找不到根元素）時擲出</exception>
     public static OdfNode Parse(Stream stream, OdfLoadOptions? options = null)
     {
         if (stream is null)

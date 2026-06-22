@@ -206,11 +206,11 @@ internal static class OdfDocumentMetadataEngine
             metaRoot.AppendChild(statNode);
         }
 
-        statNode.SetAttribute("word-count", OdfNamespaces.Meta, wordCount.ToString(), "meta");
-        statNode.SetAttribute("character-count", OdfNamespaces.Meta, charCount.ToString(), "meta");
-        statNode.SetAttribute("paragraph-count", OdfNamespaces.Meta, paragraphCount.ToString(), "meta");
-        statNode.SetAttribute("table-count", OdfNamespaces.Meta, tableCount.ToString(), "meta");
-        statNode.SetAttribute("image-count", OdfNamespaces.Meta, imageCount.ToString(), "meta");
+        statNode.SetAttribute("word-count", OdfNamespaces.Meta, wordCount.ToString(CultureInfo.InvariantCulture), "meta");
+        statNode.SetAttribute("character-count", OdfNamespaces.Meta, charCount.ToString(CultureInfo.InvariantCulture), "meta");
+        statNode.SetAttribute("paragraph-count", OdfNamespaces.Meta, paragraphCount.ToString(CultureInfo.InvariantCulture), "meta");
+        statNode.SetAttribute("table-count", OdfNamespaces.Meta, tableCount.ToString(CultureInfo.InvariantCulture), "meta");
+        statNode.SetAttribute("image-count", OdfNamespaces.Meta, imageCount.ToString(CultureInfo.InvariantCulture), "meta");
         statNode.SetAttribute("page-count", OdfNamespaces.Meta, "1", "meta");
     }
 

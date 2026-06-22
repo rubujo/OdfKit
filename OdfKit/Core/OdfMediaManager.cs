@@ -170,7 +170,7 @@ public class OdfMediaManager
             return;
         }
 
-        // EMF 格式 (開頭 0x01 0x00 0x00 0x00，且偏移 40 處為 " EMF")
+        // EMF 格式（開頭 0x01 0x00 0x00 0x00，且偏移 40 處為 " EMF"）
         if (bytes.Length >= 44 &&
             bytes[0] == 0x01 && bytes[1] == 0x00 && bytes[2] == 0x00 && bytes[3] == 0x00 &&
             bytes[40] == 0x20 && bytes[41] == 0x45 && bytes[42] == 0x4D && bytes[43] == 0x46)

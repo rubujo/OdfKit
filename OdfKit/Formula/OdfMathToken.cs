@@ -14,13 +14,15 @@ public sealed class OdfMathToken
         string text,
         OdfMathToken? baseToken,
         OdfMathToken? scriptToken,
-        IReadOnlyList<OdfMathToken>? children = null)
+        IReadOnlyList<OdfMathToken>? children = null,
+        IReadOnlyDictionary<string, string>? attributes = null)
     {
         Kind = kind;
         Text = text ?? string.Empty;
         Base = baseToken;
         Script = scriptToken;
         Children = children;
+        Attributes = attributes;
     }
 
     /// <summary>
@@ -49,6 +51,39 @@ public sealed class OdfMathToken
     /// <see cref="OdfMathTokenKind.UnderOver"/>）的子 token 清單。
     /// </summary>
     public IReadOnlyList<OdfMathToken>? Children { get; }
+
+    /// <summary>
+    /// 取得此 token 上設定的 MathML 通用屬性（例如 <c>mathvariant</c>、<c>displaystyle</c>、
+    /// <c>mathsize</c>、<c>mathcolor</c>、<c>mathbackground</c>、<c>stretchy</c>、<c>lspace</c>、<c>rspace</c>）。
+    /// </summary>
+    public IReadOnlyDictionary<string, string>? Attributes { get; }
+
+    /// <summary>
+    /// 建立一個附加指定 MathML 屬性的新 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="name">屬性名稱（例如 <c>mathvariant</c>）。</param>
+    /// <param name="value">屬性值。</param>
+    /// <returns>附加屬性後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空白時擲出。</exception>
+    /// <exception cref="ArgumentNullException">當 <paramref name="value"/> 為 <see langword="null"/> 時擲出。</exception>
+    public OdfMathToken WithAttribute(string name, string value)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("屬性名稱不能為空。", nameof(name));
+        }
+
+        if (value is null)
+        {
+            throw new ArgumentNullException(nameof(value));
+        }
+
+        var merged = new Dictionary<string, string>(Attributes ?? new Dictionary<string, string>())
+        {
+            [name] = value,
+        };
+        return new OdfMathToken(Kind, Text, Base, Script, Children, merged);
+    }
 
     /// <summary>
     /// 建立 MathML <c>mi</c> 識別名稱 token。

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -138,7 +139,7 @@ public sealed class OdfChartSeries
         OdfNode dataPoint = OdfNodeFactory.CreateElement("data-point", OdfNamespaces.Chart, "chart");
         if (repeated > 1)
         {
-            dataPoint.SetAttribute("repeated", OdfNamespaces.Chart, repeated.ToString(), "chart");
+            dataPoint.SetAttribute("repeated", OdfNamespaces.Chart, repeated.ToString(CultureInfo.InvariantCulture), "chart");
         }
 
         if (!string.IsNullOrWhiteSpace(styleName))

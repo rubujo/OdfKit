@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -80,7 +81,7 @@ internal static class OdfPackageFlatXmlLoader
                             }
 
                             writer.WriteStartElement("office", "binary-data", OdfNamespaces.Office);
-                            writer.WriteAttributeString("office", "binary-index", OdfNamespaces.Office, binaryCounter.ToString());
+                            writer.WriteAttributeString("office", "binary-index", OdfNamespaces.Office, binaryCounter.ToString(CultureInfo.InvariantCulture));
                             writer.WriteEndElement();
                         }
                         else

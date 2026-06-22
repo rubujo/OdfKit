@@ -137,8 +137,8 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
 
     private static byte[] BuildSessionKeyPayload(byte[] sessionKey)
     {
-        // RFC 4880 §5.1：[1 byte algo][key bytes][2 bytes checksum]
-        // algo 9 = AES with 256-bit key（RFC 4880 §9.2）
+        // RFC 4880 §5.1：[1 位元組演算法][金鑰位元組][2 位元組總和檢查碼]
+        // 演算法 9 = 具 256 位元金鑰的 AES（RFC 4880 §9.2）
         int checksum = 0;
         foreach (byte b in sessionKey)
             checksum += b;

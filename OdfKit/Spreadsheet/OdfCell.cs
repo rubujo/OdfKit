@@ -325,7 +325,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
                 {
                     pNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = " " });
                     var sNode = new OdfNode(OdfNodeType.Element, "s", OdfNamespaces.Text, "text");
-                    sNode.SetAttribute("c", OdfNamespaces.Text, (spaceCount - 1).ToString(), "text");
+                    sNode.SetAttribute("c", OdfNamespaces.Text, (spaceCount - 1).ToString(CultureInfo.InvariantCulture), "text");
                     pNode.AppendChild(sNode);
                 }
             }

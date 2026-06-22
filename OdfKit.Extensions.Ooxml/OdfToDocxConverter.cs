@@ -57,7 +57,7 @@ public static class OdfToDocxConverter
     }
 
     // -------------------------------------------------------------------------
-    // Header and footer conversion
+    // 頁首與頁尾轉換
     // -------------------------------------------------------------------------
 
     private static void ConvertHeaderFooter(TextDocument odtDocument, MainDocumentPart mainPart, WP.Body body)
@@ -185,7 +185,7 @@ public static class OdfToDocxConverter
     }
 
     // -------------------------------------------------------------------------
-    // Style context
+    // 樣式內容
     // -------------------------------------------------------------------------
 
     private sealed class ConversionContext
@@ -415,7 +415,7 @@ public static class OdfToDocxConverter
     }
 
     // -------------------------------------------------------------------------
-    // Body traversal
+    // 主體走訪
     // -------------------------------------------------------------------------
 
     private static void ConvertBodyNodes(OdfNode parent, OpenXmlElement target,
@@ -1139,7 +1139,7 @@ public static class OdfToDocxConverter
     }
 
     // -------------------------------------------------------------------------
-    // Table conversion
+    // 表格轉換
     // -------------------------------------------------------------------------
 
     private static WP.Table ConvertTable(OdfNode tableNode, MainDocumentPart mainPart,
@@ -1183,7 +1183,7 @@ public static class OdfToDocxConverter
     }
 
     // -------------------------------------------------------------------------
-    // Image conversion
+    // 圖片轉換
     // -------------------------------------------------------------------------
 
     private static WP.Drawing? TryConvertImage(OdfNode frameNode, MainDocumentPart mainPart,
@@ -1305,7 +1305,7 @@ public static class OdfToDocxConverter
     }
 
     // -------------------------------------------------------------------------
-    // Styles
+    // 樣式
     // -------------------------------------------------------------------------
 
     private static void AddDefaultStyles(MainDocumentPart mainPart)
@@ -1348,7 +1348,7 @@ public static class OdfToDocxConverter
     }
 
     // -------------------------------------------------------------------------
-    // Helpers
+    // 輔助方法
     // -------------------------------------------------------------------------
 
     private static void EnsureBodyEndsWithParagraph(WP.Body body)

@@ -129,7 +129,7 @@ public class EmbeddedChartIntegrationTests
     }
 
     /// <summary>
-    /// 驗證在 TextDocument 中新增 AddChart 與 AddImageFrame API 能自動寫入 XML 與建立對象。
+    /// 驗證在 TextDocument 中新增 AddChart 與 AddImageFrame API 能自動寫入 XML 與建立物件。
     /// </summary>
     [Fact]
     public void TestTextDocumentAddChartAndImageFrame()

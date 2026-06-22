@@ -1,4 +1,5 @@
-﻿using OdfKit.Core;
+﻿using System.Globalization;
+using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Text;
@@ -21,13 +22,13 @@ internal static class TextDocumentTocEngine
         tocNode.SetAttribute("name", OdfNamespaces.Text, title, "text");
 
         OdfNode sourceNode = OdfNodeFactory.CreateElement("table-of-content-source", OdfNamespaces.Text, "text");
-        sourceNode.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(), "text");
+        sourceNode.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(CultureInfo.InvariantCulture), "text");
 
         // 產生目錄條目範本以支援超連結與頁碼顯示
         for (int i = 1; i <= outlineLevel; i++)
         {
             OdfNode entryTemplate = OdfNodeFactory.CreateElement("table-of-content-entry-template", OdfNamespaces.Text, "text");
-            entryTemplate.SetAttribute("outline-level", OdfNamespaces.Text, i.ToString(), "text");
+            entryTemplate.SetAttribute("outline-level", OdfNamespaces.Text, i.ToString(CultureInfo.InvariantCulture), "text");
             entryTemplate.SetAttribute("style-name", OdfNamespaces.Text, $"Contents_{i}", "text");
 
             // 1. 超連結起始

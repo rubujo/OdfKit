@@ -13,7 +13,7 @@ public static class OdfFormulaSupport
 
     private static readonly OdfFormulaFunctionInfo[] FunctionTable =
     [
-        // Logical Functions
+        // 邏輯函數
         new("IF", "Logical", OdfFormulaSupportLevel.Evaluated),
         new("AND", "Logical", OdfFormulaSupportLevel.Evaluated),
         new("OR", "Logical", OdfFormulaSupportLevel.Evaluated),
@@ -31,7 +31,7 @@ public static class OdfFormulaSupport
         new("BITLSHIFT", "Logical", OdfFormulaSupportLevel.Evaluated),
         new("BITRSHIFT", "Logical", OdfFormulaSupportLevel.Evaluated),
 
-        // Information Functions
+        // 資訊函數
         new("ISNUMBER", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISTEXT", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISBLANK", "Information", OdfFormulaSupportLevel.Evaluated),
@@ -44,7 +44,7 @@ public static class OdfFormulaSupport
         new("ISEVEN", "Information", OdfFormulaSupportLevel.Evaluated),
         new("NA", "Information", OdfFormulaSupportLevel.Evaluated),
 
-        // Text Functions
+        // 文字函數
         new("CONCAT", "Text", OdfFormulaSupportLevel.Evaluated),
         new("CONCATENATE", "Text", OdfFormulaSupportLevel.Evaluated),
         new("LEFT", "Text", OdfFormulaSupportLevel.Evaluated),
@@ -64,7 +64,7 @@ public static class OdfFormulaSupport
         new("CHAR", "Text", OdfFormulaSupportLevel.Evaluated),
         new("TEXT", "Text", OdfFormulaSupportLevel.Evaluated),
 
-        // Statistical Functions
+        // 統計函數
         new("SUM", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("AVERAGE", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("COUNT", "Statistical", OdfFormulaSupportLevel.Evaluated),
@@ -89,7 +89,7 @@ public static class OdfFormulaSupport
         new("MAX", "Statistical", OdfFormulaSupportLevel.Evaluated),
         new("MIN", "Statistical", OdfFormulaSupportLevel.Evaluated),
 
-        // Lookup Functions
+        // 查閱函數
         new("VLOOKUP", "Lookup", OdfFormulaSupportLevel.Evaluated),
         new("HLOOKUP", "Lookup", OdfFormulaSupportLevel.Evaluated),
         new("INDEX", "Lookup", OdfFormulaSupportLevel.Evaluated),
@@ -102,7 +102,7 @@ public static class OdfFormulaSupport
         new("COLUMNS", "Lookup", OdfFormulaSupportLevel.Evaluated),
         new("CHOOSE", "Lookup", OdfFormulaSupportLevel.Evaluated),
 
-        // Math Functions
+        // 數學函數
         new("ABS", "Math", OdfFormulaSupportLevel.Evaluated),
         new("SQRT", "Math", OdfFormulaSupportLevel.Evaluated),
         new("ROUND", "Math", OdfFormulaSupportLevel.Evaluated),
@@ -138,7 +138,7 @@ public static class OdfFormulaSupport
         new("LOG10", "Math", OdfFormulaSupportLevel.Evaluated),
         new("SUMPRODUCT", "Math", OdfFormulaSupportLevel.Evaluated),
 
-        // Date/Time Functions
+        // 日期／時間函數
         new("DATE", "DateTime", OdfFormulaSupportLevel.Evaluated),
         new("DAY", "DateTime", OdfFormulaSupportLevel.Evaluated),
         new("HOUR", "DateTime", OdfFormulaSupportLevel.Evaluated),
@@ -159,21 +159,21 @@ public static class OdfFormulaSupport
         new("EDATE", "DateTime", OdfFormulaSupportLevel.Evaluated),
         new("EOMONTH", "DateTime", OdfFormulaSupportLevel.Evaluated),
 
-        // LibreOffice Extension Functions
+        // LibreOffice 擴充函數
         new("ORG.OPENOFFICE.EASTERSUNDAY", "LibreOffice", OdfFormulaSupportLevel.Evaluated),
         new("ORG.OPENOFFICE.ISOMITTED", "LibreOffice", OdfFormulaSupportLevel.Evaluated),
 
-        // Matrix Functions
+        // 矩陣函數
         new("TRANSPOSE", "Matrix", OdfFormulaSupportLevel.Evaluated),
 
-        // Database Functions
+        // 資料庫函數
         new("DSUM", "Database", OdfFormulaSupportLevel.Evaluated),
         new("DAVERAGE", "Database", OdfFormulaSupportLevel.Evaluated),
         new("DCOUNT", "Database", OdfFormulaSupportLevel.Evaluated),
         new("DMAX", "Database", OdfFormulaSupportLevel.Evaluated),
         new("DMIN", "Database", OdfFormulaSupportLevel.Evaluated),
 
-        // Financial Functions
+        // 財務函數
         new("PMT", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("FV", "Financial", OdfFormulaSupportLevel.Evaluated),
         new("PV", "Financial", OdfFormulaSupportLevel.Evaluated),

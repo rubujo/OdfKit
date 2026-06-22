@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -39,7 +40,7 @@ internal static class TextDocumentFieldsEngine
     {
         var hNode = OdfNodeFactory.CreateElement("h", OdfNamespaces.Text, "text");
         hNode.TextContent = text;
-        hNode.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(), "text");
+        hNode.SetAttribute("outline-level", OdfNamespaces.Text, outlineLevel.ToString(CultureInfo.InvariantCulture), "text");
         if (context.TrackedChanges)
         {
             string changeId = context.RecordTrackedChange("insertion");
@@ -97,7 +98,7 @@ internal static class TextDocumentFieldsEngine
                     levelNode.SetAttribute("num-suffix", OdfNamespaces.Text, lvl.NumSuffix, "text");
             }
 
-            levelNode.SetAttribute("level", OdfNamespaces.Text, lvl.Level.ToString(), "text");
+            levelNode.SetAttribute("level", OdfNamespaces.Text, lvl.Level.ToString(CultureInfo.InvariantCulture), "text");
 
             var propsNode = OdfNodeFactory.CreateElement("list-level-properties", OdfNamespaces.Style, "style");
             var alignNode = OdfNodeFactory.CreateElement("list-level-label-alignment", OdfNamespaces.Style, "style");

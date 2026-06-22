@@ -522,7 +522,7 @@ public sealed class OdfDatabaseFormDesigner
             throw new ArgumentOutOfRangeException(nameof(maxLength), "最大字元長度不能為負數。");
         }
 
-        controlNode.SetAttribute("max-length", FormNamespace, maxLength.ToString(), "form");
+        controlNode.SetAttribute("max-length", FormNamespace, maxLength.ToString(System.Globalization.CultureInfo.InvariantCulture), "form");
     }
 
     /// <summary>

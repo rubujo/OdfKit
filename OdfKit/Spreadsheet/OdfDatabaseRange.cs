@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -66,7 +67,7 @@ public class OdfDatabaseRange(OdfNode node, SpreadsheetDocument doc)
         foreach (var rule in rules)
         {
             var sortBy = new OdfNode(OdfNodeType.Element, "sort-by", OdfNamespaces.Table, "table");
-            sortBy.SetAttribute("field-number", OdfNamespaces.Table, rule.fieldNumber.ToString(), "table");
+            sortBy.SetAttribute("field-number", OdfNamespaces.Table, rule.fieldNumber.ToString(CultureInfo.InvariantCulture), "table");
             sortBy.SetAttribute("order", OdfNamespaces.Table, rule.ascending ? "ascending" : "descending", "table");
             sortNode.AppendChild(sortBy);
         }
@@ -100,7 +101,7 @@ public class OdfDatabaseRange(OdfNode node, SpreadsheetDocument doc)
         foreach (var cond in conditions)
         {
             var filterCond = new OdfNode(OdfNodeType.Element, "filter-condition", OdfNamespaces.Table, "table");
-            filterCond.SetAttribute("field-number", OdfNamespaces.Table, cond.fieldNumber.ToString(), "table");
+            filterCond.SetAttribute("field-number", OdfNamespaces.Table, cond.fieldNumber.ToString(CultureInfo.InvariantCulture), "table");
             filterCond.SetAttribute("operator", OdfNamespaces.Table, cond.op, "table");
             filterCond.SetAttribute("value", OdfNamespaces.Table, cond.value, "table");
             filterNode.AppendChild(filterCond);

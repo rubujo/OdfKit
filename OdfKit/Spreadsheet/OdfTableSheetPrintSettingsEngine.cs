@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -161,7 +162,7 @@ internal static class OdfTableSheetPrintSettingsEngine
         }
         else
         {
-            props.SetAttribute("scale-to", OdfNamespaces.Style, $"{percent}%", "style");
+            props.SetAttribute("scale-to", OdfNamespaces.Style, $"{percent.ToString(CultureInfo.InvariantCulture)}%", "style");
             props.RemoveAttribute("scale-to-pages", OdfNamespaces.Style);
         }
     }

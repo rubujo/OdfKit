@@ -1,4 +1,5 @@
-﻿using OdfKit.Core;
+﻿using System.Globalization;
+using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Database;
@@ -61,7 +62,7 @@ public partial class OdfDatabaseDocument
 
         if (loginTimeout is not null)
         {
-            login.SetAttribute("login-timeout", DatabaseNamespace, loginTimeout.Value.ToString(), "db");
+            login.SetAttribute("login-timeout", DatabaseNamespace, loginTimeout.Value.ToString(CultureInfo.InvariantCulture), "db");
         }
 
         return login;

@@ -130,7 +130,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
 
     private static byte[] ExtractAndVerifySessionKey(byte[] payload)
     {
-        // payload = [1 byte algo][N bytes key][2 bytes checksum]
+        // 承載資料 = [1 位元組演算法][N 位元組金鑰][2 位元組總和檢查碼]
         if (payload.Length < 4)
             throw new CryptographicException(
                 $"解密後的 Session Key Payload 長度不足（{payload.Length} 位元組）。");

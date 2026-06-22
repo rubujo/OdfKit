@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -100,7 +101,7 @@ public partial class OdfParagraph
     {
         Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "break-before", OdfNamespaces.Fo, "page", "fo");
         if (pageNumber.HasValue)
-            Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "page-number", OdfNamespaces.Style, pageNumber.Value.ToString(), "style");
+            Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "page-number", OdfNamespaces.Style, pageNumber.Value.ToString(CultureInfo.InvariantCulture), "style");
         if (!string.IsNullOrEmpty(masterPageName))
             Doc.StyleEngine.GetOrCreateLocalStyle(Node, "paragraph").SetAttribute("master-page-name", OdfNamespaces.Style, masterPageName!, "style");
     }

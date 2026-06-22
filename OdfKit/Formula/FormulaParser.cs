@@ -43,7 +43,7 @@ public ref struct FormulaParser
         return node;
     }
 
-    // 優先權 1：邏輯運算 (比較)
+    // 優先權 1：邏輯運算（比較）
     private AstNode ParseExpression()
     {
         var node = ParseConcat();
@@ -170,7 +170,7 @@ public ref struct FormulaParser
         return node;
     }
 
-    // 優先權 7：主要運算式 (常值、括號、函式、儲存格/範圍)
+    // 優先權 7：主要運算式（常值、括號、函式、儲存格／範圍）
     private AstNode ParsePrimary()
     {
         if (_currentToken.Type == FormulaTokenType.Number)

@@ -40,7 +40,7 @@ internal static class FormulaDatabaseFunctionHandlers
         if (dbRows < 2 || dbCols < 1 || critRows < 2 || critCols < 1)
             return OdfFormulaError.Value;
 
-        // Resolve field column index
+        // 解析欄位資料行索引
         int fieldCol = -1;
         if (FormulaCoercion.TryCoerceDouble(fieldVal, out double colD))
         {
@@ -62,7 +62,7 @@ internal static class FormulaDatabaseFunctionHandlers
         if (fieldCol < 0 || fieldCol >= dbCols)
             return OdfFormulaError.Value;
 
-        // Map criteria columns
+        // 對應條件資料行
         var critColMap = new Dictionary<int, int>(); // critCol -> dbCol
         for (int c = 0; c < critCols; c++)
         {

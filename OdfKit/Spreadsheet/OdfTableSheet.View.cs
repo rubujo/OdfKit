@@ -18,8 +18,8 @@ public partial class OdfTableSheet
     /// <summary>
     /// 以分割模式（非凍結）分割工作表窗格。
     /// </summary>
-    /// <param name="splitRow">水平分割線所在的列索引 (0 表示不分割)。</param>
-    /// <param name="splitColumn">垂直分割線所在的欄索引 (0 表示不分割)。</param>
+    /// <param name="splitRow">水平分割線所在的列索引（0 表示不分割）。</param>
+    /// <param name="splitColumn">垂直分割線所在的欄索引（0 表示不分割）。</param>
     /// <exception cref="ArgumentOutOfRangeException">當列索引或欄索引小於 0 時拋出。</exception>
     public void SplitPanes(int splitRow, int splitColumn) =>
         OdfTableSheetViewEngine.SplitPanes(MutationContext, splitRow, splitColumn);

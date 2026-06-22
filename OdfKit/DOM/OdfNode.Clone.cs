@@ -12,7 +12,7 @@ public partial class OdfNode
     /// <summary>
     /// 複製當前節點。
     /// </summary>
-    /// <param name="deep">是否進行深層複製 (遞迴複製子節點)</param>
+    /// <param name="deep">是否進行深層複製（遞迴複製子節點）</param>
     /// <returns>複製的新節點</returns>
     public virtual OdfNode CloneNode(bool deep)
     {

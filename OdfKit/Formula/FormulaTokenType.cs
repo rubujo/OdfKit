@@ -23,7 +23,7 @@ public enum FormulaTokenType
     Bool,
 
     /// <summary>
-    /// 識別碼 (例如函式名稱、儲存格或範圍名稱)。
+    /// 識別碼（例如函式名稱、儲存格或範圍名稱）。
     /// </summary>
     Identifier,
 

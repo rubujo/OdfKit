@@ -135,7 +135,7 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
         }
         else
         {
-            // 字串比較 (不區分大小寫)
+            // 字串比較（不區分大小寫）
             comp = string.Compare(left.ToString(), right.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 

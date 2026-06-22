@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Presentation;
@@ -363,7 +364,7 @@ public partial class OdfDrawPage
         if (vbHeight <= 0)
             vbHeight = 1000;
 
-        shapeNode.SetAttribute("viewBox", OdfNamespaces.Svg, $"0 0 {vbWidth} {vbHeight}", "svg");
+        shapeNode.SetAttribute("viewBox", OdfNamespaces.Svg, $"0 0 {vbWidth.ToString(CultureInfo.InvariantCulture)} {vbHeight.ToString(CultureInfo.InvariantCulture)}", "svg");
 
         var relPoints = ptList.Select(p =>
         {

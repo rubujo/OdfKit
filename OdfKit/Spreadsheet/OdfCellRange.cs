@@ -124,7 +124,7 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
         var start = OdfCellAddress.ParseExcel(rangeStr.Substring(0, colonIdx));
         var end = OdfCellAddress.ParseExcel(rangeStr.Substring(colonIdx + 1));
 
-        // Propagate sheet name if missing on the end coordinate
+        // 若結束座標缺少工作表名稱，則予以傳遞
         if (end.SheetName is null && start.SheetName is not null)
         {
             end = new OdfCellAddress(end.Row, end.Column, start.SheetName,
@@ -181,7 +181,7 @@ public readonly struct OdfCellRange(OdfCellAddress start, OdfCellAddress end) : 
     /// <returns>如果包含則為 true，否則為 false</returns>
     public bool Contains(OdfCellAddress address)
     {
-        // Check sheet equivalence
+        // 檢查工作表是否等價
         if (!string.Equals(StartAddress.SheetName, address.SheetName, StringComparison.OrdinalIgnoreCase))
             return false;
 

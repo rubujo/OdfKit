@@ -18,7 +18,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
     private static (long KeyId, PublicKeyAlgorithmTag Algorithm, byte[][] EncData) DecodePkeskPacket(byte[] bytes)
     {
         // BC 2.6.x 的 PublicKeyEncSessionPacket.GetEncoded() 輸出格式：
-        // [packet header][version(1)][keyId(8)][algo(1)][raw encrypted bytes]
+        // [封包標頭][版本 (1)][金鑰識別碼 (8)][演算法 (1)][原始加密位元組]
         // 原始加密資料直接寫入，不含 MPI bit count header。
         int pos = 0;
         if (bytes.Length < 12)

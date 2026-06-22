@@ -132,7 +132,7 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     /// <summary>
     /// 複製目前元素，傳回新的類型元素執行個體。
     /// </summary>
-    /// <param name="deep">是否進行深層複製 (遞迴複製子節點)</param>
+    /// <param name="deep">是否進行深層複製（遞迴複製子節點）</param>
     /// <returns>複製的新元素</returns>
     public override OdfNode CloneNode(bool deep)
     {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
@@ -128,7 +129,7 @@ internal static class OdfDocumentSettingsEngine
         var mapNode = FindOrCreateMapNode(setNode, "Views");
         var entryNode = FindOrCreateMapEntryNode(mapNode);
         var zoomNode = FindOrCreateConfigItemNode(entryNode, "ZoomValue", "int");
-        zoomNode.TextContent = Math.Round(zoom).ToString();
+        zoomNode.TextContent = Math.Round(zoom).ToString(CultureInfo.InvariantCulture);
 
         var zoomTypeNode = FindOrCreateConfigItemNode(entryNode, "ZoomType", "short");
         zoomTypeNode.TextContent = "0";
@@ -152,7 +153,7 @@ internal static class OdfDocumentSettingsEngine
         string setName = isSpreadsheet ? "ooo:document-settings" : "ooo:configuration-settings";
         var setNode = FindOrCreateSettingsNode(settingsDom, setName);
         var item = FindOrCreateConfigItemNode(setNode, "LinkUpdateMode", "short");
-        item.TextContent = mode.ToString();
+        item.TextContent = mode.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>

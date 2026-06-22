@@ -46,7 +46,7 @@ internal class OdfPackageEntry : IDisposable
             }
             catch
             {
-                // Fallback
+                // 後備方案
             }
             return _zipEntry.CompressedLength == _zipEntry.Length;
         }
@@ -106,8 +106,8 @@ internal class OdfPackageEntry : IDisposable
 
         if (_zipEntry != null)
         {
-            // In ZipArchiveMode.Read, we can call Open() multiple times but it will return a new stream.
-            // We cache it in memory to support multiple reads or if archive gets closed.
+            // 在 ZipArchiveMode.Read 模式下，我們可以多次呼叫 Open()，但它會回傳新的資料流。
+            // 我們將其快取於記憶體中，以支援多次讀取或在封裝關閉時仍可存取。
             using var zipStream = _zipEntry.Open();
             var ms = new MemoryStream();
             zipStream.CopyTo(ms);

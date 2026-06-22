@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -93,8 +94,8 @@ public partial class OdfTable
             }
         }
         var targetCell = cellsInTargetRow[startCol];
-        targetCell.SetAttribute("number-rows-spanned", OdfNamespaces.Table, rowSpan.ToString(), "table");
-        targetCell.SetAttribute("number-columns-spanned", OdfNamespaces.Table, colSpan.ToString(), "table");
+        targetCell.SetAttribute("number-rows-spanned", OdfNamespaces.Table, rowSpan.ToString(CultureInfo.InvariantCulture), "table");
+        targetCell.SetAttribute("number-columns-spanned", OdfNamespaces.Table, colSpan.ToString(CultureInfo.InvariantCulture), "table");
 
         for (int r = startRow; r < startRow + rowSpan; r++)
         {
@@ -166,7 +167,7 @@ public partial class OdfTable
                 rows.Add(child);
         }
         var rowNode = rows[row];
-        rowNode.SetAttribute("number-rows-repeated", OdfNamespaces.Table, repeatCount.ToString(), "table");
+        rowNode.SetAttribute("number-rows-repeated", OdfNamespaces.Table, repeatCount.ToString(CultureInfo.InvariantCulture), "table");
     }
 
     private OdfNode GetCellNode(int row, int col)

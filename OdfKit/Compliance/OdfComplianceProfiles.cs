@@ -251,7 +251,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("en"));
 
     /// <summary>
-    /// 取得中華民國 (臺灣) ODF CNS15251 政策規範。
+    /// 取得中華民國（臺灣）ODF CNS15251 政策規範。
     /// </summary>
     public static OdfComplianceProfile RocTaiwanOdfCns15251 { get; } = new(
         "ROC_Taiwan_ODF_CNS15251",
@@ -278,7 +278,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("zh-TW"));
 
     /// <summary>
-    /// 取得中華民國 (臺灣) 政府 ODF 文件應用工具相容性規範。
+    /// 取得中華民國（臺灣）政府 ODF 文件應用工具相容性規範。
     /// </summary>
     public static OdfComplianceProfile RocTaiwanGovernmentOdfTools { get; } = new(
         "ROC_Taiwan_GovernmentODFTools",

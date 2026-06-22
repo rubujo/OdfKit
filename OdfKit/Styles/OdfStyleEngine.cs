@@ -83,7 +83,7 @@ public partial class OdfStyleEngine
             }
         }
 
-        // 3. 掃描 styles.xml 的 styles (常用樣式與預設樣式)
+        // 3. 掃描 styles.xml 的 styles（常用樣式與預設樣式）
         var commonStyles = FindChildElement(_stylesRoot, "styles", OdfNamespaces.Office);
         if (commonStyles is not null)
         {

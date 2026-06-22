@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -97,7 +98,7 @@ public sealed class OdfChartStyle
                 return result;
             return null;
         }
-        set => SetChartProperty("angle-offset", OdfNamespaces.Chart, value?.ToString(), "chart");
+        set => SetChartProperty("angle-offset", OdfNamespaces.Chart, value?.ToString(CultureInfo.InvariantCulture), "chart");
     }
 
     /// <summary>

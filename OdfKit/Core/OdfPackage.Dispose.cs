@@ -26,7 +26,7 @@ public sealed partial class OdfPackage
                     _underlyingStream?.Dispose();
                 }
 
-                // Dispose loaded entry streams
+                // 釋放已載入的項目資料流
                 foreach (var entry in _entries.Values)
                 {
                     entry.Dispose();
