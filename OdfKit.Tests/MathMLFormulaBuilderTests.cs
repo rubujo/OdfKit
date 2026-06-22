@@ -123,6 +123,67 @@ public class MathMLFormulaBuilderTests
     }
 
     /// <summary>
+    /// 驗證 WithMathML 即使輸入的 MathML XML 使用無前綴的預設命名空間宣告，
+    /// 寫回時仍會正規化為固定的 <c>math:</c> 前綴；並驗證 <c>content.xml</c> 實際寫入封裝時，
+    /// 根節點為裸 <c>math:math</c>（ODF 公式文件專屬封裝慣例，未以 office:document-content 包裹），
+    /// 此為真實 LibreOffice <c>math8</c> 匯入篩選器能成功開啟檔案的必要結構。
+    /// </summary>
+    [Fact]
+    public void WithMathMLNormalizesPrefixAndPersistsBareMathRoot()
+    {
+        using var formula = OdfFormulaDocument.Builder()
+            .WithMathML("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>x</mi><mo>+</mo><mi>y</mi></math>")
+            .Build();
+        using var stream = new System.IO.MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+        using var pkg = OdfKit.Core.OdfPackage.Open(stream, leaveOpen: true);
+        using var contentStream = pkg.GetEntryStream("content.xml");
+        using var reader = new System.IO.StreamReader(contentStream);
+        string content = reader.ReadToEnd();
+
+        Assert.Contains("xmlns:math=\"http://www.w3.org/1998/Math/MathML\"", content);
+        Assert.Contains("<math:math", content);
+        Assert.Contains("<math:mi>x</math:mi>", content);
+        Assert.DoesNotContain("office:document-content", content);
+        Assert.DoesNotContain("office:formula", content);
+    }
+
+    /// <summary>
+    /// 驗證 OdfFormulaDocument 可正確載入真實 LibreOffice 產生的 ODF 公式文件
+    /// （<c>content.xml</c> 根節點為裸 <c>math:math</c>，未以 office:document-content 包裹）。
+    /// 此結構複製自真實 LibreOffice 26.2 透過 private:factory/smath 轉存出的 content.xml，
+    /// 修正前 OdfKit 會將裸 math 根節點誤判為一般包裹結構，導致讀回的 MathText 永遠是空字串。
+    /// </summary>
+    [Fact]
+    public void LoadsRealLibreOfficeBareMathRootFormula()
+    {
+        string contentXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mi>x</mi><mo>+</mo><mi>y</mi></math>";
+
+        using var ms = new System.IO.MemoryStream();
+        using (var pkg = OdfKit.Core.OdfPackage.Create(ms, leaveOpen: true))
+        {
+            pkg.SetMimeType("application/vnd.oasis.opendocument.formula");
+            pkg.WriteEntry("content.xml", System.Text.Encoding.UTF8.GetBytes(contentXml), "text/xml");
+            pkg.Save();
+        }
+        ms.Position = 0;
+
+        using var formula = OdfFormulaDocument.Load(ms, "real-lo.odf");
+        Assert.Equal("x+y", formula.MathText);
+
+        // 重新儲存後，仍須維持真機相容的裸 math 根節點形狀（而非退化回包裹結構）。
+        using var resaved = new System.IO.MemoryStream();
+        formula.SaveToStream(resaved);
+        resaved.Position = 0;
+        using var resavedPkg = OdfKit.Core.OdfPackage.Open(resaved, leaveOpen: true);
+        using var resavedContentStream = resavedPkg.GetEntryStream("content.xml");
+        using var resavedReader = new System.IO.StreamReader(resavedContentStream);
+        string resavedContent = resavedReader.ReadToEnd();
+        Assert.DoesNotContain("office:document-content", resavedContent);
+    }
+
+    /// <summary>
     /// 測試 OdfFormulaDocument 高階 FromLatex Facade 入口方法。
     /// </summary>
     [Fact]
@@ -133,10 +194,10 @@ public class MathMLFormulaBuilderTests
 
         Assert.NotNull(doc);
         var xml = doc.MathMlXml;
-        Assert.Contains("<mi>a</mi>", xml);
-        Assert.Contains("<mo>+</mo>", xml);
-        Assert.Contains("<mi>b</mi>", xml);
-        Assert.Contains("<mo>=</mo>", xml);
-        Assert.Contains("<mi>c</mi>", xml);
+        Assert.Contains("<math:mi>a</math:mi>", xml);
+        Assert.Contains("<math:mo>+</math:mo>", xml);
+        Assert.Contains("<math:mi>b</math:mi>", xml);
+        Assert.Contains("<math:mo>=</math:mo>", xml);
+        Assert.Contains("<math:mi>c</math:mi>", xml);
     }
 }

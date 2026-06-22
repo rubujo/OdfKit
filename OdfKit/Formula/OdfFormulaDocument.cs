@@ -36,6 +36,36 @@ public partial class OdfFormulaDocument : OdfDocument
         {
             package.SetMimeType("application/vnd.oasis.opendocument.formula");
         }
+
+        NormalizeLoadedBareMathRoot();
+    }
+
+    /// <summary>
+    /// 真實 LibreOffice 產生的 ODF 公式文件，其 <c>content.xml</c> 根節點為裸 <c>math:math</c>
+    /// 元素，並未以 <c>office:document-content</c> 包裹（此為 ODF 公式文件專屬的封裝慣例，
+    /// 與其他文件類型不同）。OdfKit 內部一律以 <c>office:document-content/office:body/office:formula</c>
+    /// 結構表示內容樹，因此載入時若偵測到裸 math 根節點，須先正規化包裝，否則 <see cref="GetFormulaNode"/>
+    /// 等方法會在錯誤的節點上尋找子節點而讀不到任何公式內容。
+    /// </summary>
+    private void NormalizeLoadedBareMathRoot()
+    {
+        if (ContentRoot.NodeType != OdfNodeType.Element ||
+            ContentRoot.LocalName != "math" ||
+            ContentRoot.NamespaceUri != MathMlNamespace)
+        {
+            return;
+        }
+
+        OdfNode bareMath = ContentRoot;
+        OdfNode wrapped = OdfNodeFactory.CreateElement("document-content", OdfNamespaces.Office, "office");
+        wrapped.SetAttribute("version", OdfNamespaces.Office, OdfVersionInfo.DefaultVersionString, "office");
+        OdfNode body = OdfNodeFactory.CreateElement("body", OdfNamespaces.Office, "office");
+        OdfNode formulaNode = OdfNodeFactory.CreateElement("formula", OdfNamespaces.Office, "office");
+        wrapped.AppendChild(body);
+        body.AppendChild(formulaNode);
+        formulaNode.AppendChild(bareMath);
+
+        ContentRoot = wrapped;
     }
 
     /// <summary>

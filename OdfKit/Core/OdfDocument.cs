@@ -242,6 +242,12 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         }
         LoadXmlTrees();
         OdfLoExtInteropEngine.NormalizeLoadedDocument(ContentDom, StylesDom);
+
+        // 載入與正規化期間，XML 剖析器與正規化邏輯本身會將所有節點標記為已修改；
+        // 在此重設為乾淨基準狀態，讓 OdfStyleEngine 的 Dirty 旗標檢查只反映載入後的使用者編輯。
+        ContentDom.ResetModifiedState();
+        StylesDom.ResetModifiedState();
+
         StyleEngine = new OdfStyleEngine(ContentDom, StylesDom);
     }
 
@@ -285,6 +291,14 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// </summary>
     /// <returns>預設 content.xml 字串。</returns>
     protected abstract string GetDefaultContentXml();
+
+    /// <summary>
+    /// 取得儲存至封裝容器時，<c>content.xml</c> 實際應寫入的根節點。
+    /// 預設直接沿用 <see cref="ContentDom"/>；少數文件類型（例如 ODF 公式文件）的封裝格式
+    /// 與 OdfKit 內部慣用的 <c>office:document-content</c> 包裹結構不同，可覆寫此方法轉換輸出形狀。
+    /// </summary>
+    /// <returns>實際應序列化寫入 <c>content.xml</c> 的根節點。</returns>
+    internal virtual OdfNode GetContentXmlForPersistence() => ContentDom;
 
     /// <summary>
     /// 取得此文件類型的預設 styles.xml。

@@ -86,6 +86,22 @@ public partial class OdfFormulaDocument
         return FindOrCreateChild(body, "formula", OdfNamespaces.Office, "office");
     }
 
+    /// <summary>
+    /// 取得儲存至封裝容器時，<c>content.xml</c> 實際應寫入的根節點。
+    /// </summary>
+    /// <remarks>
+    /// 真實 LibreOffice 對 ODF 公式文件（<c>application/vnd.oasis.opendocument.formula</c>）
+    /// 的 <c>content.xml</c> 採用裸 <c>math:math</c> 根節點，並不包裹於
+    /// <c>office:document-content/office:body/office:formula</c> 結構內（與其他文件類型不同的封裝慣例）。
+    /// 若以 OdfKit 內部慣用的包裹結構直接寫出，LibreOffice 的 <c>math8</c> 匯入篩選器會回報
+    /// 「source file could not be loaded」並拒絕開啟。此處在序列化邊界轉換為真機相容的裸根節點形狀，
+    /// 內部 <see cref="OdfDocument.ContentDom"/> 仍維持包裹結構，不影響其餘共用基礎結構（統計、版本戳記等）。
+    /// </remarks>
+    internal override OdfNode GetContentXmlForPersistence()
+    {
+        return MathNode.CloneNode(true);
+    }
+
     private IReadOnlyList<OdfMathToken> ReadMathTokens()
     {
         OdfNode math = MathNode;

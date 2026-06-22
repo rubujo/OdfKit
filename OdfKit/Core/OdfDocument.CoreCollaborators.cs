@@ -26,6 +26,8 @@ public abstract partial class OdfDocument
 
         internal OdfNode ContentDom => _document.ContentDom;
 
+        internal OdfNode ContentXmlForPersistence => _document.GetContentXmlForPersistence();
+
         internal OdfNode StylesDom => _document.StylesDom;
 
         internal OdfNode MetaDom => _document.MetaDom;

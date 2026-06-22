@@ -26,7 +26,7 @@ internal static class OdfDocumentPersistenceEngine
     /// </summary>
     internal static void WriteAllDomEntries(OdfDocument.OdfDocumentPersistenceCollaborators ctx, OdfSaveOptions options)
     {
-        WriteDomToEntry(ctx, "content.xml", ctx.ContentDom, options);
+        WriteDomToEntry(ctx, "content.xml", ctx.ContentXmlForPersistence, options);
         WriteDomToEntry(ctx, "styles.xml", ctx.StylesDom, options);
         WriteDomToEntry(ctx, "meta.xml", ctx.MetaDom, options);
         WriteDomToEntry(ctx, "settings.xml", ctx.SettingsDom, options);

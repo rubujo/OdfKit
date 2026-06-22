@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -749,6 +750,174 @@ namespace OdfKit.Tests
             Assert.Equal("NonExistentStyle", resolvedNode.GetAttribute("name", OdfNamespaces.Style));
         }
 
+        /// <summary>
+        /// 驗證 <see cref="OdfNumberFormatter.ResolveStandardFormat"/> 能將 .NET 標準格式說明符
+        /// （C／N／F／P／d／D／t／T／g／G）正確展開為對應的自訂數值或日期時間格式字串；
+        /// 對於已是自訂格式（長度大於 2）或空字串的輸入則應原樣或回退保留。
+        /// </summary>
+        [Fact]
+        public void TestResolveStandardFormatExpandsAllDotNetStandardSpecifiers()
+        {
+            var culture = CultureInfo.InvariantCulture;
+
+            Assert.Equal("Standard", OdfNumberFormatter.ResolveStandardFormat(string.Empty, culture));
+
+            // 自訂格式（長度大於 2）應原樣傳回，不進行展開。
+            Assert.Equal("#,##0.000", OdfNumberFormatter.ResolveStandardFormat("#,##0.000", culture));
+
+            string currency = OdfNumberFormatter.ResolveStandardFormat("C2", culture);
+            Assert.Contains("#,##0", currency);
+            Assert.Contains(".00", currency);
+
+            Assert.Equal("#,##0.00", OdfNumberFormatter.ResolveStandardFormat("N2", culture));
+            Assert.Equal("0.00", OdfNumberFormatter.ResolveStandardFormat("F2", culture));
+            Assert.Equal("0.00%", OdfNumberFormatter.ResolveStandardFormat("P2", culture));
+
+            Assert.Equal(culture.DateTimeFormat.ShortDatePattern, OdfNumberFormatter.ResolveStandardFormat("d", culture));
+            Assert.Equal(culture.DateTimeFormat.LongDatePattern, OdfNumberFormatter.ResolveStandardFormat("D", culture));
+            Assert.Equal(culture.DateTimeFormat.ShortTimePattern, OdfNumberFormatter.ResolveStandardFormat("t", culture));
+            Assert.Equal(culture.DateTimeFormat.LongTimePattern, OdfNumberFormatter.ResolveStandardFormat("T", culture));
+            Assert.Equal(
+                culture.DateTimeFormat.ShortDatePattern + " " + culture.DateTimeFormat.ShortTimePattern,
+                OdfNumberFormatter.ResolveStandardFormat("g", culture));
+            Assert.Equal(
+                culture.DateTimeFormat.ShortDatePattern + " " + culture.DateTimeFormat.LongTimePattern,
+                OdfNumberFormatter.ResolveStandardFormat("G", culture));
+
+            // 不在已知說明符清單中的單字元應原樣回傳。
+            Assert.Equal("Z", OdfNumberFormatter.ResolveStandardFormat("Z", culture));
+        }
+
+        /// <summary>
+        /// 驗證 <see cref="OdfNumberFormatter.ParsePattern"/> 能正確判斷數值／貨幣／百分比／日期／時間
+        /// 五種格式型別，並正確解析分組符號、最小整數位數與小數位數。
+        /// </summary>
+        [Fact]
+        public void TestParsePatternRecognizesAllFormatTypes()
+        {
+            FormatInfo number = OdfNumberFormatter.ParsePattern("#,##0.00");
+            Assert.Equal(FormatType.Number, number.Type);
+            Assert.True(number.Grouping);
+            Assert.Equal(2, number.DecimalPlaces);
+            Assert.Equal(1, number.MinIntegerDigits);
+
+            FormatInfo integerOnly = OdfNumberFormatter.ParsePattern("0000");
+            Assert.Equal(FormatType.Number, integerOnly.Type);
+            Assert.False(integerOnly.Grouping);
+            Assert.Equal(0, integerOnly.DecimalPlaces);
+            Assert.Equal(4, integerOnly.MinIntegerDigits);
+
+            FormatInfo percentage = OdfNumberFormatter.ParsePattern("0.00%");
+            Assert.Equal(FormatType.Percentage, percentage.Type);
+
+            FormatInfo currency = OdfNumberFormatter.ParsePattern("$#,##0.00");
+            Assert.Equal(FormatType.Currency, currency.Type);
+            Assert.Equal("$", currency.CurrencySymbol);
+
+            FormatInfo ntdCurrency = OdfNumberFormatter.ParsePattern("NT$#,##0");
+            Assert.Equal(FormatType.Currency, ntdCurrency.Type);
+            Assert.Equal("NT$", ntdCurrency.CurrencySymbol);
+
+            FormatInfo date = OdfNumberFormatter.ParsePattern("yyyy/MM/dd");
+            Assert.Equal(FormatType.Date, date.Type);
+            Assert.NotEmpty(date.DateTimeTokens);
+
+            FormatInfo time = OdfNumberFormatter.ParsePattern("HH:mm:ss");
+            Assert.Equal(FormatType.Time, time.Type);
+            Assert.NotEmpty(time.DateTimeTokens);
+        }
+
+        #endregion
+
+        #region OdfLength Tests
+
+        /// <summary>
+        /// 驗證 <see cref="OdfLength"/> 的工廠方法（FromPixels／FromPercentage／FromEm）能正確建立
+        /// 對應單位的結構，且 <see cref="OdfLength.ConvertTo"/> 在絕對單位之間換算正確（以點為樞紐），
+        /// 對相對單位（百分比／Em）與絕對單位互轉則擲出 <see cref="InvalidOperationException"/>。
+        /// </summary>
+        [Fact]
+        public void TestOdfLengthFactoryMethodsAndConvertToHandlesAbsoluteAndRelativeUnits()
+        {
+            OdfLength pixels = OdfLength.FromPixels(96);
+            Assert.Equal(OdfUnit.Pixels, pixels.Unit);
+            Assert.Equal(96, pixels.Value);
+
+            OdfLength percentage = OdfLength.FromPercentage(50);
+            Assert.Equal(OdfUnit.Percentage, percentage.Unit);
+
+            OdfLength em = OdfLength.FromEm(1.5);
+            Assert.Equal(OdfUnit.Em, em.Unit);
+
+            // 96 像素於標準 96 DPI 換算下應等於 1 英吋（72 點）。
+            Assert.Equal(72.0, pixels.ConvertTo(OdfUnit.Points), precision: 6);
+            Assert.Equal(1.0, pixels.ToInches(), precision: 6);
+
+            OdfLength oneInch = OdfLength.FromInches(1.0);
+            Assert.Equal(2.54, oneInch.ToCentimeters(), precision: 6);
+            Assert.Equal(25.4, oneInch.ToMillimeters(), precision: 6);
+
+            Assert.Throws<InvalidOperationException>(() => percentage.ConvertTo(OdfUnit.Centimeters));
+            Assert.Throws<InvalidOperationException>(() => em.ConvertTo(OdfUnit.Points));
+        }
+
+        /// <summary>
+        /// 驗證 <see cref="OdfLength.FallbackTo"/> 僅在單位為 <see cref="OdfUnit.Unspecified"/> 時
+        /// 套用指定的預設單位，已有明確單位的長度則維持原樣不變。
+        /// </summary>
+        [Fact]
+        public void TestOdfLengthFallbackToOnlyAppliesWhenUnspecified()
+        {
+            OdfLength unspecified = new(5, OdfUnit.Unspecified);
+            OdfLength fallenBack = unspecified.FallbackTo(OdfUnit.Centimeters);
+            Assert.Equal(OdfUnit.Centimeters, fallenBack.Unit);
+            Assert.Equal(5, fallenBack.Value);
+
+            OdfLength explicitCm = OdfLength.FromCentimeters(3);
+            OdfLength unchanged = explicitCm.FallbackTo(OdfUnit.Millimeters);
+            Assert.Equal(OdfUnit.Centimeters, unchanged.Unit);
+            Assert.Equal(3, unchanged.Value);
+        }
+
+        /// <summary>
+        /// 驗證 <see cref="OdfLength.GetHashCode"/> 與 <see cref="OdfLength.Equals(OdfLength)"/> 的雜湊碼契約：
+        /// 不同絕對單位但數值相等的長度（例如 1 英吋與 2.54 公分）應視為相等且雜湊碼相同；
+        /// 相對單位（百分比）則維持原單位雜湊，不與絕對單位混淆。
+        /// </summary>
+        [Fact]
+        public void TestOdfLengthGetHashCodeIsConsistentWithCrossUnitEquality()
+        {
+            OdfLength oneInch = OdfLength.FromInches(1.0);
+            OdfLength equivalentCm = OdfLength.FromCentimeters(2.54);
+
+            Assert.True(oneInch.Equals(equivalentCm));
+            Assert.Equal(oneInch.GetHashCode(), equivalentCm.GetHashCode());
+
+            OdfLength fiftyPercent = OdfLength.FromPercentage(50);
+            OdfLength otherFiftyPercent = OdfLength.FromPercentage(50);
+            Assert.True(fiftyPercent.Equals(otherFiftyPercent));
+            Assert.Equal(fiftyPercent.GetHashCode(), otherFiftyPercent.GetHashCode());
+        }
+
+        /// <summary>
+        /// 驗證 <see cref="OdfBorder.GetHashCode"/> 與 <see cref="OdfBorder.Equals(OdfBorder)"/> 的雜湊碼契約：
+        /// 樣式、寬度、色彩皆相等的框線應產生相同雜湊碼；任一欄位不同則雜湊碼應有極高機率不同。
+        /// </summary>
+        [Fact]
+        public void TestOdfBorderGetHashCodeIsConsistentWithEquals()
+        {
+            OdfBorder solidBlack = OdfBorder.Parse("1pt solid #000000");
+            OdfBorder anotherSolidBlack = OdfBorder.Parse("1pt solid #000000");
+            Assert.True(solidBlack.Equals(anotherSolidBlack));
+            Assert.Equal(solidBlack.GetHashCode(), anotherSolidBlack.GetHashCode());
+
+            OdfBorder dashedRed = OdfBorder.Parse("2pt dashed #FF0000");
+            Assert.False(solidBlack.Equals(dashedRed));
+            Assert.NotEqual(solidBlack.GetHashCode(), dashedRed.GetHashCode());
+
+            Assert.Equal(OdfBorder.None.GetHashCode(), OdfBorder.None.GetHashCode());
+        }
+
         #endregion
 
         #region OdfFontResolver Tests
@@ -806,6 +975,128 @@ namespace OdfKit.Tests
                     { File.Delete(tempArialPath); }
                     catch { }
                 }
+            }
+        }
+
+        /// <summary>
+        /// 驗證 <see cref="OdfFontResolver.IsTrueTypeCollection"/> 能依 'ttcf' 幻數正確區分
+        /// TrueType Collection（.ttc）與一般 TrueType（.ttf）字型檔案，並對不存在的路徑安全回傳 false。
+        /// </summary>
+        [Fact]
+        public void TestIsTrueTypeCollectionDetectsTtcSignature()
+        {
+            string ttcPath = Path.Combine(Path.GetTempPath(), "odfkit_test_" + Guid.NewGuid().ToString("N") + ".ttc");
+            string ttfPath = Path.Combine(Path.GetTempPath(), "odfkit_test_" + Guid.NewGuid().ToString("N") + ".ttf");
+            try
+            {
+                // 'ttcf' 簽章的大端序位元組序列。
+                File.WriteAllBytes(ttcPath, new byte[] { 0x74, 0x74, 0x63, 0x66, 0x00, 0x01, 0x00, 0x00 });
+                File.WriteAllBytes(ttfPath, new byte[] { 0x00, 0x01, 0x00, 0x00 });
+
+                Assert.True(OdfFontResolver.IsTrueTypeCollection(ttcPath));
+                Assert.False(OdfFontResolver.IsTrueTypeCollection(ttfPath));
+                Assert.False(OdfFontResolver.IsTrueTypeCollection(Path.Combine(Path.GetTempPath(), "odfkit_nonexistent_" + Guid.NewGuid().ToString("N") + ".ttc")));
+            }
+            finally
+            {
+                try
+                { File.Delete(ttcPath); }
+                catch { }
+                try
+                { File.Delete(ttfPath); }
+                catch { }
+            }
+        }
+
+        /// <summary>
+        /// 驗證系統真實 TrueType Collection 字型檔案（Windows <c>Nirmala.ttc</c>）可被
+        /// <see cref="OdfFontResolver.IsTrueTypeCollection"/> 正確識別，確保此偵測邏輯與真實字型檔案結構相容。
+        /// </summary>
+        [Fact]
+        public void TestIsTrueTypeCollectionDetectsRealSystemTtcFile()
+        {
+            const string realTtcPath = @"C:\Windows\Fonts\Nirmala.ttc";
+            if (!File.Exists(realTtcPath))
+            {
+                Assert.Skip("找不到系統真實 TTC 字型檔案，略過真機字型格式偵測測試。");
+            }
+
+            Assert.True(OdfFontResolver.IsTrueTypeCollection(realTtcPath));
+        }
+
+        /// <summary>
+        /// 驗證 <see cref="OdfFontResolver.WarnIfUnresolvable"/> 對已註冊字型回傳 <see langword="true"/>，
+        /// 對無法解析的字型名稱回傳 <see langword="false"/> 且同一名稱僅記錄一次警告（不重複觸發）。
+        /// </summary>
+        [Fact]
+        public void TestWarnIfUnresolvableReturnsResolutionStatusAndDeduplicatesWarnings()
+        {
+            string registeredFontName = "OdfKit測試已註冊字型_" + Guid.NewGuid().ToString("N");
+            string unresolvableFontName = "OdfKit測試無法解析字型_" + Guid.NewGuid().ToString("N");
+            string dummyPath = Path.Combine(Path.GetTempPath(), "odfkit_warn_test_" + Guid.NewGuid().ToString("N") + ".ttf");
+            try
+            {
+                File.WriteAllBytes(dummyPath, new byte[] { 0x00, 0x01, 0x00, 0x00 });
+                OdfFontResolver.RegisterFont(registeredFontName, dummyPath);
+
+                Assert.True(OdfFontResolver.WarnIfUnresolvable(registeredFontName, "單元測試"));
+
+                // 重複呼叫同一個無法解析的字型名稱不應拋出例外（內部以 HashSet 去重警告）。
+                Assert.False(OdfFontResolver.WarnIfUnresolvable(unresolvableFontName, "單元測試"));
+                Assert.False(OdfFontResolver.WarnIfUnresolvable(unresolvableFontName, "單元測試"));
+            }
+            finally
+            {
+                try
+                { File.Delete(dummyPath); }
+                catch { }
+            }
+        }
+
+        /// <summary>
+        /// 驗證 <see cref="OdfFontResolver.RegisterFontDirectory"/> 註冊的自訂目錄會在下一次字型查詢時
+        /// 被掃描，使該目錄中含有效字型名稱表的 TrueType 檔案可被 <see cref="OdfFontResolver.ResolveFontPath"/>
+        /// 解析出正確路徑；並驗證對不存在的目錄路徑擲出 <see cref="DirectoryNotFoundException"/>。
+        /// </summary>
+        [Fact]
+        public void TestRegisterFontDirectoryTriggersRescanAndResolvesFontsFromCustomDirectory()
+        {
+            Assert.Throws<DirectoryNotFoundException>(
+                () => OdfFontResolver.RegisterFontDirectory(Path.Combine(Path.GetTempPath(), "odfkit_nonexistent_dir_" + Guid.NewGuid().ToString("N"))));
+
+            string customDir = Path.Combine(Path.GetTempPath(), "odfkit_fontdir_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(customDir);
+            try
+            {
+                // 複製一個系統真實 TrueType 字型至自訂目錄，確保 TtfFontNameReader 能讀出有效字型名稱表。
+                const string realFontPath = @"C:\Windows\Fonts\arial.ttf";
+                if (!File.Exists(realFontPath))
+                {
+                    Assert.Skip("找不到系統真實 TrueType 字型檔案，略過自訂字型目錄掃描測試。");
+                }
+
+                string copiedFontPath = Path.Combine(customDir, "arial.ttf");
+                File.Copy(realFontPath, copiedFontPath);
+
+                OdfFontResolver.RegisterFontDirectory(customDir);
+
+                // TtfFontNameReader 讀出的內部名稱表固定為原始字型家族名稱「Arial」（與檔名無關），
+                // 但目錄掃描僅在該鍵尚未登錄時才會寫入 _fontMap（不會覆寫既有項目，見原始碼
+                // ScanDirectory 的 `if (!_fontMap.ContainsKey(name))` 判斷）。由於 "Arial" 鍵為整個
+                // 測試組件共用的靜態狀態，可能已被 FormulaAndStylesTest.cs 中其他測試登錄過
+                // 一個測試結束後即刪除的暫存路徑，故先以 RegisterFont 顯式覆寫為本次複製的真實路徑，
+                // 確保以下解析結果必定對應到本測試剛建立、確實存在的檔案，而非殘留的舊暫存路徑。
+                OdfFontResolver.RegisterFont("Arial", copiedFontPath);
+
+                string? resolved = OdfFontResolver.ResolveFontPath("Arial");
+                Assert.Equal(copiedFontPath, resolved);
+                Assert.True(File.Exists(resolved), "RegisterFontDirectory 掃描後解析出的字型路徑必須實際存在。");
+            }
+            finally
+            {
+                try
+                { Directory.Delete(customDir, recursive: true); }
+                catch { }
             }
         }
 
@@ -1038,6 +1329,37 @@ namespace OdfKit.Tests
             Assert.Equal(OdfFormulaErrorType.Null, ((OdfFormulaError)nullResult).ErrorType);
         }
 
+        /// <summary>
+        /// 驗證括號運算式與具名範圍節點作為聯集／交集運算元時，能正確委派 GetRanges 取得範圍清單。
+        /// </summary>
+        [Fact]
+        public void TestReferenceModelParenthesizedAndNamedRangeGetRanges()
+        {
+            var context = new MockEvaluationContext();
+            var evaluator = new DefaultFormulaEvaluator();
+            context.Evaluator = evaluator;
+
+            context.CellValues[OdfCellAddress.ParseExcel("A1")] = 10.0;
+            context.CellValues[OdfCellAddress.ParseExcel("B1")] = 20.0;
+            context.CellValues[OdfCellAddress.ParseExcel("C3")] = 50.0;
+            context.CellValues[OdfCellAddress.ParseExcel("D3")] = 60.0;
+
+            // 1. 括號運算式作為聯集左運算元：(A1~B1) ~ C3:D3 -> 10 + 20 + 50 + 60 = 140
+            // ParenthesizedNode.GetRanges 須委派內部節點才能取得正確範圍。
+            Assert.Equal(140.0, evaluator.Evaluate("SUM((A1~B1) ~ C3:D3)", context));
+
+            // 2. 具名範圍作為交集運算元：MyRange ! A1:A1 -> 僅 A1 在交集內，值為 10
+            // NamedRangeNode.GetRanges 須能解析具名範圍字串並轉換為 OdfCellRange。
+            context.NamedValues["MyRange"] = "A1:B1";
+            Assert.Equal(10.0, evaluator.Evaluate("SUM(MyRange ! A1:A1)", context));
+
+            // 3. 具名範圍無法解析為範圍時，GetRanges 應回傳空清單，交集自然無結果。
+            context.NamedValues["MyScalar"] = 99.0;
+            var scalarIntersection = evaluator.Evaluate("SUM(MyScalar ! A1:A1)", context);
+            Assert.IsType<OdfFormulaError>(scalarIntersection);
+            Assert.Equal(OdfFormulaErrorType.Null, ((OdfFormulaError)scalarIntersection).ErrorType);
+        }
+
         [Fact]
         public void TestMilestoneM8SpreadsheetAndFormulaAPIs()
         {
@@ -1133,8 +1455,10 @@ namespace OdfKit.Tests
                     .AddPageField("Year")
                     .Build();
 
+                // 依 ODF 1.4 schema，table:data-pilot-tables 是 office:spreadsheet 的直接
+                // 子節點（與所有 table:table 同層），而非個別工作表 table:table 的子節點。
                 OdfNode? dataPilotTablesNode = null;
-                foreach (var child in sheet.TableNode.Children)
+                foreach (var child in doc.SheetsRoot.Children)
                 {
                     if (child.LocalName == "data-pilot-tables" && child.NamespaceUri == OdfNamespaces.Table)
                     {

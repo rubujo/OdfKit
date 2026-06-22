@@ -86,6 +86,9 @@ public static class OdfNamespaces
     /// <summary>OpenOffice.org Calc 相容命名空間 URI（<c>table:condition</c> 內容驗證條件值內 <c>oooc:</c> 前綴所指涉的命名空間）</summary>
     public const string Oooc = "http://openoffice.org/2004/calc";
 
+    /// <summary>MathML 命名空間 URI（<c>office:formula</c> 內嵌公式內容所使用的數學標記語言命名空間）</summary>
+    public const string MathMl = "http://www.w3.org/1998/Math/MathML";
+
     /// <summary>
     /// 取得指定命名空間 URI 的標準前綴。
     /// </summary>
@@ -121,6 +124,7 @@ public static class OdfNamespaces
             Pkg => "pkg",
             Of => "of",
             Oooc => "oooc",
+            MathMl => "math",
             Xml => "xml",
             _ => string.Empty
         };

@@ -52,13 +52,13 @@ public class FormulaHighLevelApiTests
         // 驗證 MathText 與 MathML
         Assert.Equal("E=mc2", formulaDoc.MathText);
         Assert.Contains("<math", formulaDoc.GetMathML());
-        Assert.Contains("<msup>", formulaDoc.GetMathML());
+        Assert.Contains("<math:msup>", formulaDoc.GetMathML());
 
         // 驗證 SetMathML
         string newMathml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>x</mi><mo>+</mo><mi>y</mi></math>";
         formulaDoc.SetMathML(newMathml);
         Assert.Equal("x+y", formulaDoc.MathText);
-        Assert.Contains("<mi>x</mi>", formulaDoc.GetMathML());
+        Assert.Contains("<math:mi>x</math:mi>", formulaDoc.GetMathML());
     }
 
     /// <summary>
@@ -158,6 +158,6 @@ public class FormulaHighLevelApiTests
 
         using var loadedDoc = FormulaDocument.Load(stream, "formula.odf");
         Assert.Equal("F=ma", loadedDoc.MathText);
-        Assert.Contains("<mi>F</mi>", loadedDoc.GetMathML());
+        Assert.Contains("<math:mi>F</math:mi>", loadedDoc.GetMathML());
     }
 }
