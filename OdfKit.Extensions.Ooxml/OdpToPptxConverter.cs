@@ -744,6 +744,13 @@ public static class OdpToPptxConverter
         P.ChildTimeNodeList? currentGroupChildren = null;
         P.TimeNodeValues currentGroupNodeType = P.TimeNodeValues.ClickEffect;
 
+        // 真機 PowerPoint 對「點擊觸發」步驟的外層延遲固定為 indefinite（等待下一次點擊），
+        // 但對「接續上一個效果」步驟的外層延遲是相對最近一次點擊起算的實際累計毫秒數，且不會
+        // 在外層與效果節點之間插入 delay=0 的中間層——這是修正 MainSequence 計數低估問題的關鍵。
+        int cumulativeMsSinceClick = 0;
+        int pendingGroupDelayMs = 0;
+        int pendingGroupDurationMs = 0;
+
         foreach (OdfKit.Presentation.OdfAnimationInfo animation in animations)
         {
             uint targetShapeId = animationTargets[animation.TargetElementId];
@@ -762,11 +769,22 @@ public static class OdpToPptxConverter
             {
                 if (currentGroupChildren is not null)
                 {
-                    mainSequenceChildren.Append(WrapAnimationStep(currentGroupChildren, ref timeNodeId));
+                    bool closingGroupIsAfterPrevious = currentGroupNodeType == P.TimeNodeValues.AfterEffect;
+                    string outerDelay = closingGroupIsAfterPrevious
+                        ? cumulativeMsSinceClick.ToString(CultureInfo.InvariantCulture)
+                        : "indefinite";
+                    mainSequenceChildren.Append(WrapAnimationStep(currentGroupChildren, outerDelay, closingGroupIsAfterPrevious, ref timeNodeId));
+
+                    int groupOwnEndMs = pendingGroupDelayMs + pendingGroupDurationMs;
+                    cumulativeMsSinceClick = closingGroupIsAfterPrevious
+                        ? cumulativeMsSinceClick + groupOwnEndMs
+                        : groupOwnEndMs;
                 }
 
                 currentGroupChildren = new P.ChildTimeNodeList();
                 currentGroupNodeType = ReadAnimationNodeType(animation.Trigger);
+                pendingGroupDelayMs = ParseMillisecondsOrZero(FormatAnimationDelay(animation));
+                pendingGroupDurationMs = int.Parse(FormatAnimationDuration(animation), CultureInfo.InvariantCulture);
             }
 
             // 逐段落動畫展開，或者單一圖形動畫
@@ -785,7 +803,11 @@ public static class OdpToPptxConverter
 
         if (currentGroupChildren is not null)
         {
-            mainSequenceChildren.Append(WrapAnimationStep(currentGroupChildren, ref timeNodeId));
+            bool lastGroupIsAfterPrevious = currentGroupNodeType == P.TimeNodeValues.AfterEffect;
+            string lastOuterDelay = lastGroupIsAfterPrevious
+                ? cumulativeMsSinceClick.ToString(CultureInfo.InvariantCulture)
+                : "indefinite";
+            mainSequenceChildren.Append(WrapAnimationStep(currentGroupChildren, lastOuterDelay, lastGroupIsAfterPrevious, ref timeNodeId));
         }
 
         var mainSequence = new P.SequenceTimeNode(
@@ -821,28 +843,53 @@ public static class OdpToPptxConverter
     }
 
     /// <summary>
-    /// 將一組動畫效果節點，依 PowerPoint 實際輸出的巢狀結構包裝為主序列下的一個步驟（外層 indefinite 延遲、內層 0 秒延遲的兩層 par）。
+    /// 將一組動畫效果節點，依 PowerPoint 實際輸出的巢狀結構包裝為主序列下的一個步驟。
     /// </summary>
-    private static P.ParallelTimeNode WrapAnimationStep(P.ChildTimeNodeList groupChildren, ref uint timeNodeId)
+    /// <remarks>
+    /// 已用真機 PowerPoint COM 親自建立兩步驟動畫（OnClick 進場接 AfterPrevious 退場）取得權威結構比對確認：
+    /// 點擊觸發（ClickEffect）步驟為外層 delay="indefinite"、中層 delay="0" 的三層巢狀 par；
+    /// 接續上一步驟（AfterEffect）步驟僅有外層（delay 為相對最近一次點擊的實際累計毫秒數）直接包住
+    /// 效果節點的兩層巢狀 par，並不存在中層。先前固定套用三層 indefinite 結構是 PowerPoint
+    /// MainSequence.Count 低估同一序列第二步驟的根因。
+    /// </remarks>
+    /// <param name="groupChildren">此步驟的效果節點清單。</param>
+    /// <param name="outerDelay">外層 stCondLst 的延遲值（indefinite 或實際毫秒數字串）。</param>
+    /// <param name="flattenMiddleLayer">是否省略中層（AfterPrevious／WithPrevious 接續步驟應為 <see langword="true"/>）。</param>
+    /// <param name="timeNodeId">下一個可用的時間節點識別碼。</param>
+    private static P.ParallelTimeNode WrapAnimationStep(P.ChildTimeNodeList groupChildren, string outerDelay, bool flattenMiddleLayer, ref uint timeNodeId)
     {
-        P.CommonTimeNode middleTimeNode = new()
+        P.ChildTimeNodeList outerChildren;
+        if (flattenMiddleLayer)
         {
-            Id = timeNodeId++,
-            Fill = P.TimeNodeFillValues.Hold,
-            StartConditionList = new P.StartConditionList(new P.Condition { Delay = "0" }),
-            ChildTimeNodeList = groupChildren,
-        };
-        var middleGroup = new P.ParallelTimeNode(middleTimeNode);
+            outerChildren = groupChildren;
+        }
+        else
+        {
+            P.CommonTimeNode middleTimeNode = new()
+            {
+                Id = timeNodeId++,
+                Fill = P.TimeNodeFillValues.Hold,
+                StartConditionList = new P.StartConditionList(new P.Condition { Delay = "0" }),
+                ChildTimeNodeList = groupChildren,
+            };
+            outerChildren = new P.ChildTimeNodeList(new P.ParallelTimeNode(middleTimeNode));
+        }
 
         P.CommonTimeNode outerTimeNode = new()
         {
             Id = timeNodeId++,
             Fill = P.TimeNodeFillValues.Hold,
-            StartConditionList = new P.StartConditionList(new P.Condition { Delay = "indefinite" }),
-            ChildTimeNodeList = new P.ChildTimeNodeList(middleGroup),
+            StartConditionList = new P.StartConditionList(new P.Condition { Delay = outerDelay }),
+            ChildTimeNodeList = outerChildren,
         };
         return new P.ParallelTimeNode(outerTimeNode);
     }
+
+    /// <summary>
+    /// 將動畫延遲字串（可能為 <see langword="null"/>）解析為毫秒數，無法解析時視為 0。
+    /// </summary>
+    private static int ParseMillisecondsOrZero(string? delay) =>
+        !string.IsNullOrEmpty(delay) && int.TryParse(delay, NumberStyles.Integer, CultureInfo.InvariantCulture, out int ms) ? ms : 0;
 
     /// <summary>
     /// 計算指定節點底下的段落數量。
@@ -894,7 +941,7 @@ public static class OdpToPptxConverter
     }
 
     /// <summary>
-    /// 建立動畫效果節點，並支援特定段落 index (逐段落動畫)。
+    /// 建立動畫效果節點，並支援特定段落 index（逐段落動畫）。
     /// </summary>
     private static P.ParallelTimeNode CreateAnimationEffectNode(
         OdfKit.Presentation.OdfAnimationInfo animation,
