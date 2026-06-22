@@ -108,6 +108,39 @@ internal static class OdfTableSheetDomAccessEngine
     }
 
     /// <summary>
+    /// 唯讀查找已存在的列節點，不會像 <see cref="GetOrCreateRowNode"/> 一樣在索引超出範圍時建立新列。
+    /// </summary>
+    internal static OdfNode? TryFindRowNode(OdfNode tableNode, int row)
+    {
+        int currentRowIndex = 0;
+        foreach (var child in tableNode.Children)
+        {
+            if (RowContainerNames.Contains(child.LocalName) && child.NamespaceUri == OdfNamespaces.Table)
+            {
+                foreach (var hr in child.Children)
+                {
+                    if (hr.LocalName != "table-row" || hr.NamespaceUri != OdfNamespaces.Table)
+                        continue;
+                    int rep = OdfTableSheetRepeatSplitEngine.GetRepeatCount(hr, "number-rows-repeated");
+                    if (row >= currentRowIndex && row < currentRowIndex + rep)
+                        return hr;
+                    currentRowIndex += rep;
+                }
+            }
+            else if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
+            {
+                int repeatedCount = OdfTableSheetRepeatSplitEngine.GetRepeatCount(child, "number-rows-repeated");
+
+                if (row >= currentRowIndex && row < currentRowIndex + repeatedCount)
+                    return child;
+                currentRowIndex += repeatedCount;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// 取得或建立指定欄索引的儲存格節點。
     /// </summary>
     internal static OdfNode GetOrCreateCellNode(OdfNode rowNode, int col, bool forWrite)

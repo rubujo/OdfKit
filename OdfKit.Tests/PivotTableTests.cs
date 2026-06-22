@@ -232,6 +232,48 @@ public class PivotTableTests
     }
 
     /// <summary>
+    /// 驗證 WithRowHeaders(false) 寫入 has-row-headers="false"。
+    /// </summary>
+    [Fact]
+    public void WithRowHeaders_False_WritesCorrectAttribute()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Sheet1");
+        var src = new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(5, 1, "Sheet1"));
+
+        new OdfPivotTableBuilder("P1", src, new OdfCellAddress(8, 0, "Sheet1"), sheet)
+            .WithRowHeaders(false)
+            .AddColumnField("A")
+            .Build();
+
+        string xml = GetContentXml(doc);
+        Assert.Contains("table:has-row-headers=\"false\"", xml);
+        // WithRowHeaders(false) 不應影響 has-column-headers，應維持預設 true。
+        Assert.Contains("table:has-column-headers=\"true\"", xml);
+    }
+
+    /// <summary>
+    /// 驗證 WithRowHeaders 與 WithColumnHeaders 可同時設為 false，且彼此互不干擾。
+    /// </summary>
+    [Fact]
+    public void WithRowHeadersAndWithColumnHeaders_BothFalse_WritesBothAttributes()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Sheet1");
+        var src = new OdfCellRange(new OdfCellAddress(0, 0, "Sheet1"), new OdfCellAddress(5, 1, "Sheet1"));
+
+        new OdfPivotTableBuilder("P1", src, new OdfCellAddress(8, 0, "Sheet1"), sheet)
+            .WithRowHeaders(false)
+            .WithColumnHeaders(false)
+            .AddDataField("A")
+            .Build();
+
+        string xml = GetContentXml(doc);
+        Assert.Contains("table:has-row-headers=\"false\"", xml);
+        Assert.Contains("table:has-column-headers=\"false\"", xml);
+    }
+
+    /// <summary>
     /// 驗證多個篩選條件可同時存在於同一個 table:filter 節點中。
     /// </summary>
     [Fact]

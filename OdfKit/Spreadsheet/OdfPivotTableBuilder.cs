@@ -183,8 +183,13 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     /// <returns>代表建置後之樞紐分析表的 XML 節點</returns>
     public OdfNode Build()
     {
+        // 依 ODF 1.4 schema（table-functions／office-spreadsheet-content-epilogue），
+        // table:data-pilot-tables 必須是 office:spreadsheet 的直接子節點（與所有 table:table
+        // 同層、置於其後），而非個別 table:table 的子節點；否則 LibreOffice 等應用程式重新儲存
+        // 文件時會視為結構不符規格而捨棄整段樞紐分析表定義。
+        OdfNode spreadsheetRoot = _sheet.Document.SheetsRoot;
         OdfNode? tablesContainer = null;
-        foreach (var child in _sheet.TableNode.Children)
+        foreach (var child in spreadsheetRoot.Children)
         {
             if (child.LocalName == "data-pilot-tables" && child.NamespaceUri == OdfNamespaces.Table)
             {
@@ -195,13 +200,19 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
         if (tablesContainer is null)
         {
             tablesContainer = new OdfNode(OdfNodeType.Element, "data-pilot-tables", OdfNamespaces.Table, "table");
-            _sheet.TableNode.AppendChild(tablesContainer);
+            spreadsheetRoot.AppendChild(tablesContainer);
         }
 
+        // 依 ODF 1.4 schema，table:target-range-address 與 table:buttons 屬性型別皆為
+        // cellRangeAddress／cellRangeAddressList（範圍），並非單一儲存格位址；雖然樞紐分析表的
+        // 目標起點在語意上是單一格，仍必須寫成起點與終點相同的範圍字串（例如 "Sheet1.A6:.A6"），
+        // 否則嚴格遵循 schema 的應用程式（如 LibreOffice 重新儲存時）會將其正規化為範圍格式，
+        // 導致前後格式不一致。
+        var targetRange = new OdfCellRange(_targetStart, _targetStart);
         var tableNode = new OdfNode(OdfNodeType.Element, "data-pilot-table", OdfNamespaces.Table, "table");
         tableNode.SetAttribute("name", OdfNamespaces.Table, _name, "table");
-        tableNode.SetAttribute("target-range-address", OdfNamespaces.Table, _targetStart.ToOdfString(false), "table");
-        tableNode.SetAttribute("buttons", OdfNamespaces.Table, _targetStart.ToOdfString(false), "table");
+        tableNode.SetAttribute("target-range-address", OdfNamespaces.Table, targetRange.ToOdfString(false), "table");
+        tableNode.SetAttribute("buttons", OdfNamespaces.Table, targetRange.ToOdfString(false), "table");
         tableNode.SetAttribute("has-column-headers", OdfNamespaces.Table, _hasColumnHeaders ? "true" : "false", "table");
         tableNode.SetAttribute("has-row-headers", OdfNamespaces.Table, _hasRowHeaders ? "true" : "false", "table");
 

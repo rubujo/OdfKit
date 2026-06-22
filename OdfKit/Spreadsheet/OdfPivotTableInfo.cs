@@ -79,10 +79,23 @@ public sealed class OdfPivotTableInfo(
         OdfCellRange.TryParse(SourceRangeAddress, out range);
 
     /// <summary>
-    /// 嘗試將 <see cref="TargetRangeAddress"/> 解析為 <see cref="OdfCellAddress"/>。
+    /// 嘗試將 <see cref="TargetRangeAddress"/> 解析為起點 <see cref="OdfCellAddress"/>。
     /// </summary>
     /// <param name="address">解析成功時傳回的儲存格位址。</param>
     /// <returns>若解析成功則為 <see langword="true"/>。</returns>
-    public bool TryGetTargetStart(out OdfCellAddress address) =>
-        OdfCellAddress.TryParse(TargetRangeAddress, out address);
+    /// <remarks>
+    /// 依 ODF 1.4 schema，<c>table:target-range-address</c> 的型別為 <c>cellRangeAddress</c>
+    /// （範圍），此方法會優先嘗試以範圍格式解析並取其起點；若該字串為單一儲存格位址格式
+    /// （例如舊版本寫入的文件），則回退以單一位址格式解析，以維持向下相容。
+    /// </remarks>
+    public bool TryGetTargetStart(out OdfCellAddress address)
+    {
+        if (OdfCellRange.TryParse(TargetRangeAddress, out OdfCellRange range))
+        {
+            address = range.StartAddress;
+            return true;
+        }
+
+        return OdfCellAddress.TryParse(TargetRangeAddress, out address);
+    }
 }

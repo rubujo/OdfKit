@@ -319,6 +319,50 @@ public class SpreadsheetApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfSheetBuilder.SetCell"/> 與 <see cref="OdfSheetBuilder.ImportRows"/>
+    /// 可直接呼叫（不透過 ImportTable），且儲存後可由真實 LibreOffice 慣例驗證的方式重新讀回。
+    /// </summary>
+    [Fact]
+    public void SheetBuilderSetCellAndImportRowsDirectlyWriteExpectedCells()
+    {
+        var rows = new[]
+        {
+            new ProductRow("鍵盤", 1200d, 5),
+            new ProductRow("滑鼠", 650d, 12),
+        };
+
+        using SpreadsheetDocument workbook = SpreadsheetDocument.Builder()
+            .AddSheet("資料", sheet => sheet
+                .SetCell("A1", "標題")
+                .SetCell("B1", 100)
+                .ImportRows(
+                    rows,
+                    row => [row.Name, row.Price, row.Stock],
+                    startRow: 2,
+                    startColumn: 1))
+            .Build();
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+        OdfTableSheet sheet = loaded.Worksheets["資料"];
+
+        // SetCell 直接呼叫應正確寫入指定位址的儲存格值。
+        Assert.Equal("標題", sheet.Cells["A1"].CellValue);
+        Assert.Equal(100d, sheet.Cells["B1"].CellValue);
+
+        // ImportRows 直接呼叫（非經由 ImportTable）應從指定起始列／欄寫入各資料列。
+        Assert.Equal("鍵盤", sheet.Cells["A2"].CellValue);
+        Assert.Equal(1200d, sheet.Cells["B2"].CellValue);
+        Assert.Equal(5d, sheet.Cells["C2"].CellValue);
+        Assert.Equal("滑鼠", sheet.Cells["A3"].CellValue);
+        Assert.Equal(650d, sheet.Cells["B3"].CellValue);
+        Assert.Equal(12d, sheet.Cells["C3"].CellValue);
+    }
+
+    /// <summary>
     /// 驗證試算表可讀回資料驗證規則與嵌入圖表摘要。
     /// </summary>
     [Fact]

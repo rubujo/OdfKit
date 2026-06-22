@@ -109,4 +109,84 @@ public class CsvImportExportTests
         var elapsed = DateTime.UtcNow - startTime;
         Assert.True(elapsed.TotalSeconds < 10, $"匯出操作花費了 {elapsed.TotalSeconds} 秒，疑似發生無窮迴圈或處理過大重複次數。");
     }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfCsvExporter.ExportToFile"/> 可正確寫入實體檔案路徑，內容與 ExportToStream 一致。
+    /// </summary>
+    [Fact]
+    public void ExportToFile_WritesCsvContentToDisk()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        var sheet = workbook.Worksheets.Add("Test");
+        sheet.Cells[0, 0].CellValue = "欄 A";
+        sheet.Cells[0, 1].CellValue = "欄 B";
+        sheet.Cells[1, 0].CellValue = "值一";
+        sheet.Cells[1, 1].CellValue = "值二";
+
+        string tempPath = Path.Combine(Path.GetTempPath(), "OdfKitCsvExport_" + Guid.NewGuid().ToString("N") + ".csv");
+        try
+        {
+            OdfCsvExporter.ExportToFile(workbook, tempPath);
+
+            Assert.True(File.Exists(tempPath), "ExportToFile 應在指定路徑建立 CSV 檔案。");
+            string csv = File.ReadAllText(tempPath, Encoding.UTF8);
+            Assert.Contains("欄 A", csv);
+            Assert.Contains("欄 B", csv);
+            Assert.Contains("值一", csv);
+            Assert.Contains("值二", csv);
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+                File.Delete(tempPath);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfCsvExporter.ExportToFile"/> 對 Null 路徑擲回 <see cref="ArgumentNullException"/>。
+    /// </summary>
+    [Fact]
+    public void ExportToFile_NullPath_ThrowsArgumentNullException()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        workbook.Worksheets.Add("Test");
+
+        Assert.Throws<ArgumentNullException>(() => OdfCsvExporter.ExportToFile(workbook, null!));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfCsvImporter.ImportFromFile"/> 可正確從實體檔案路徑讀取並建立試算表文件。
+    /// </summary>
+    [Fact]
+    public void ImportFromFile_ReadsCsvContentFromDisk()
+    {
+        string tempPath = Path.Combine(Path.GetTempPath(), "OdfKitCsvImport_" + Guid.NewGuid().ToString("N") + ".csv");
+        try
+        {
+            File.WriteAllText(tempPath, "名稱,數量,價格\n蘋果,10,25.5\n香蕉,5,12.0", Encoding.UTF8);
+
+            using var workbook = OdfCsvImporter.ImportFromFile(tempPath);
+
+            Assert.Equal(1, workbook.Worksheets.Count);
+            var sheet = workbook.Worksheets[0];
+            Assert.Equal("名稱", sheet.Cells[0, 0].CellValue);
+            Assert.Equal("蘋果", sheet.Cells[1, 0].CellValue);
+            Assert.Equal("香蕉", sheet.Cells[2, 0].CellValue);
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+                File.Delete(tempPath);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfCsvImporter.ImportFromFile"/> 對 Null 路徑擲回 <see cref="ArgumentNullException"/>。
+    /// </summary>
+    [Fact]
+    public void ImportFromFile_NullPath_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => OdfCsvImporter.ImportFromFile(null!));
+    }
+
 }

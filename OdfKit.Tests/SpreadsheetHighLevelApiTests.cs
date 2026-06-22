@@ -200,6 +200,58 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfChartDocument.ClearSeries"/> 與 <see cref="OdfChartDocument.ApplyDefinition"/>
+    /// 對嵌入圖表所做的修改，呼叫 <see cref="OdfChartDocument.Save"/> 後可正確持久化並於重新載入後讀回。
+    /// </summary>
+    [Fact]
+    public void EmbeddedChartDocument_ClearSeriesAndApplyDefinition_PersistsAfterSaveAndReload()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Sheet1");
+        sheet.Cells["A1"].CellValue = "月份";
+        sheet.Cells["B1"].CellValue = "營收";
+        sheet.Cells["A2"].CellValue = "一月";
+        sheet.Cells["B2"].CellValue = 120d;
+
+        document.AddChart("Sheet1", new OdfCellAddress(4, 0, "Sheet1"), new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Bar,
+            Title = "原始標題",
+            DataRange = new OdfCellRange(0, 0, 1, 1, "Sheet1"),
+            HasLegend = false,
+        });
+
+        OdfEmbeddedChartInfo chartInfo = Assert.Single(document.GetEmbeddedCharts());
+        OdfChartDocument chartDoc = document.GetEmbeddedChartDocument(chartInfo);
+
+        // ClearSeries 應移除既有資料序列，ApplyDefinition 應同時更新類型、標題與圖例。
+        chartDoc.ClearSeries();
+        chartDoc.ApplyDefinition(new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Line,
+            Title = "套用後標題",
+            DataRange = new OdfCellRange(0, 0, 1, 1, "Sheet1"),
+            HasLegend = true,
+        });
+
+        // 必須明確呼叫嵌入圖表文件自身的 Save，變更才會寫回共用封裝。
+        chartDoc.Save();
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+        OdfEmbeddedChartInfo loadedInfo = Assert.Single(loaded.GetEmbeddedCharts());
+        Assert.Equal(OdfChartType.Line, loadedInfo.ChartType);
+        Assert.Equal("套用後標題", loadedInfo.Title);
+
+        OdfChartDocument loadedChartDoc = loaded.GetEmbeddedChartDocument(loadedInfo);
+        Assert.Equal("top", loadedChartDoc.LegendPosition);
+        Assert.Equal(1, loadedChartDoc.SeriesCount);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="SpreadsheetDocument.GetEmbeddedCharts"/> 可讀回嵌入圖表摘要。
     /// </summary>
     [Fact]
@@ -358,6 +410,49 @@ public class SpreadsheetHighLevelApiTests
         Assert.Single(info.FilterConditions);
         Assert.Equal("=", info.FilterConditions[0].Operator);
         Assert.Equal("Electronics", info.FilterConditions[0].Value);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfPivotTableBuilder.WithRowHeaders"/> 設定，以及
+    /// <see cref="OdfPivotTableInfo.TryGetSourceRange"/>／<see cref="OdfPivotTableInfo.TryGetTargetStart"/>
+    /// 在文件實際儲存並重新載入後仍能正確讀回。
+    /// </summary>
+    [Fact]
+    public void GetPivotTables_WithRowHeadersFalse_PersistsAfterSaveAndReload()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Sheet1");
+        var sourceRange = new OdfCellRange(
+            new OdfCellAddress(0, 0, "Sheet1"),
+            new OdfCellAddress(9, 3, "Sheet1"));
+        var targetStart = new OdfCellAddress(12, 0, "Sheet1");
+
+        new OdfPivotTableBuilder("RowHeaderPivot", sourceRange, targetStart, sheet)
+            .WithRowHeaders(false)
+            .WithColumnHeaders(true)
+            .AddRowField("Category")
+            .AddDataField("Sales", OdfPivotFunction.Sum)
+            .Build();
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+        OdfPivotTableInfo info = Assert.Single(loaded.GetPivotTables());
+        Assert.Equal("Sheet1", info.SheetName);
+        Assert.False(info.HasRowHeaders);
+        Assert.True(info.HasColumnHeaders);
+
+        Assert.True(info.TryGetSourceRange(out OdfCellRange resolvedSourceRange));
+        Assert.Equal(sourceRange.StartAddress.Row, resolvedSourceRange.StartAddress.Row);
+        Assert.Equal(sourceRange.StartAddress.Column, resolvedSourceRange.StartAddress.Column);
+        Assert.Equal(sourceRange.EndAddress.Row, resolvedSourceRange.EndAddress.Row);
+        Assert.Equal(sourceRange.EndAddress.Column, resolvedSourceRange.EndAddress.Column);
+
+        Assert.True(info.TryGetTargetStart(out OdfCellAddress resolvedTargetStart));
+        Assert.Equal(targetStart.Row, resolvedTargetStart.Row);
+        Assert.Equal(targetStart.Column, resolvedTargetStart.Column);
     }
 
     /// <summary>
@@ -696,5 +791,42 @@ public class SpreadsheetHighLevelApiTests
             string xml4 = r4.ReadToEnd();
             Assert.Contains("table:table-column-group", xml4);
         }
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfCell.SetBorders"/> 寫入的框線樣式可儲存並於重新載入後正確讀回。
+    /// </summary>
+    [Fact]
+    public void SetBorders_WritesAndRoundTripsBorderStyles()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Sheet1");
+        OdfCell cell = sheet.Cells["A1"];
+        cell.CellValue = "邊框測試";
+
+        var topBorder = new OdfBorder(OdfBorder.BorderStyle.Solid, OdfLength.FromPoints(1), System.Drawing.Color.Black);
+        var bottomBorder = new OdfBorder(OdfBorder.BorderStyle.Double, OdfLength.FromPoints(2), System.Drawing.Color.Red);
+
+        // 僅設定上、下框線，左、右框線保留 null（不寫入該屬性）。
+        cell.SetBorders(top: topBorder, bottom: bottomBorder, left: null, right: null);
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+
+        Assert.Contains("fo:border-top=\"1pt solid #000000\"", xml);
+        Assert.Contains("fo:border-bottom=\"2pt double #FF0000\"", xml);
+        Assert.DoesNotContain("fo:border-left", xml);
+        Assert.DoesNotContain("fo:border-right", xml);
+
+        stream.Position = 0;
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+        OdfCell loadedCell = loaded.Worksheets["Sheet1"].Cells["A1"];
+        Assert.Equal("邊框測試", loadedCell.CellValue);
     }
 }

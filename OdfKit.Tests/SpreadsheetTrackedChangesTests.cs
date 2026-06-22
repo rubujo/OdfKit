@@ -228,6 +228,60 @@ public class SpreadsheetTrackedChangesTests
         Assert.Equal("來源", sheet.Cells["B2"].CellValue);
     }
 
+    /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.RejectAllChanges"/> 可一次拒絕多筆待處理修訂，並還原各儲存格原始內容。
+    /// </summary>
+    [Fact]
+    public void RejectAllChangesRevertsAllPendingChanges()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.TrackedChanges = false;
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = "原始 A1";
+        sheet.Cells["A2"].CellValue = "原始 A2";
+
+        document.TrackedChanges = true;
+        sheet.Cells["A1"].CellValue = "修改 A1";
+        sheet.Cells["A2"].CellValue = "修改 A2";
+
+        Assert.Equal(2, document.GetTrackedChanges().Count);
+
+        document.RejectAllChanges();
+
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Equal("原始 A1", sheet.Cells["A1"].CellValue);
+        Assert.Equal("原始 A2", sheet.Cells["A2"].CellValue);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.RejectAllChanges"/> 僅還原待處理修訂，已接受的修訂維持不變。
+    /// </summary>
+    [Fact]
+    public void RejectAllChangesSkipsAlreadyAcceptedChanges()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.TrackedChanges = false;
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = "原始 A1";
+        sheet.Cells["A2"].CellValue = "原始 A2";
+
+        document.TrackedChanges = true;
+        sheet.Cells["A1"].CellValue = "已接受 A1";
+        sheet.Cells["A2"].CellValue = "待拒絕 A2";
+
+        OdfSpreadsheetTrackedChangeInfo acceptedChange = document.GetTrackedChanges()
+            .Single(c => c.CellAddress?.Column == 0 && c.CellAddress?.Row == 0);
+        document.AcceptChange(acceptedChange.ChangeId);
+
+        Assert.Single(document.GetTrackedChanges());
+
+        document.RejectAllChanges();
+
+        Assert.Empty(document.GetTrackedChanges());
+        Assert.Equal("已接受 A1", sheet.Cells["A1"].CellValue);
+        Assert.Equal("原始 A2", sheet.Cells["A2"].CellValue);
+    }
+
     private static void WriteFormulaTrackedChangesOds(Stream stream)
     {
         const string contentXml =

@@ -45,7 +45,10 @@ internal static class OdfTableSheetLayoutEngine
 
     internal static bool IsRowOptimalHeight(OdfTableSheetMutationContext context, int row)
     {
-        var rowNode = context.GetOrCreateRow(row, forWrite: false);
+        // 唯讀查詢不應建立新列，避免在查詢超出現有資料範圍的列索引時，意外於文件中插入大量空白列。
+        OdfNode? rowNode = OdfTableSheetDomAccessEngine.TryFindRowNode(context.TableNode, row);
+        if (rowNode is null)
+            return false;
         string? styleName = rowNode.GetAttribute("style-name", OdfNamespaces.Table);
         if (styleName is null || styleName == "")
             return false;
@@ -67,7 +70,10 @@ internal static class OdfTableSheetLayoutEngine
 
     internal static OdfLength? GetRowHeight(OdfTableSheetMutationContext context, int row)
     {
-        var rowNode = context.GetOrCreateRow(row, forWrite: false);
+        // 唯讀查詢不應建立新列，避免在查詢超出現有資料範圍的列索引時，意外於文件中插入大量空白列。
+        OdfNode? rowNode = OdfTableSheetDomAccessEngine.TryFindRowNode(context.TableNode, row);
+        if (rowNode is null)
+            return null;
         string? styleName = rowNode.GetAttribute("style-name", OdfNamespaces.Table);
         if (styleName is null || styleName == "")
             return null;

@@ -175,6 +175,75 @@ namespace OdfKit.Tests
             Assert.False(range.Intersects(OdfCellRange.ParseExcel("Sheet2!B2:D4")));
         }
 
+        [Fact]
+        public void TestRangeIntersectComputesOverlapArea()
+        {
+            var range = OdfCellRange.ParseExcel("Sheet1!B2:D4");
+
+            // 部分重疊：重疊區應為 C3:D4。
+            var overlap = range.Intersect(OdfCellRange.ParseExcel("Sheet1!C3:E5"));
+            Assert.NotNull(overlap);
+            Assert.Equal("Sheet1!C3:D4", overlap!.Value.ToExcelString());
+
+            // 完全包含：重疊區應等於較小的範圍本身。
+            var contained = range.Intersect(OdfCellRange.ParseExcel("Sheet1!C3:C3"));
+            Assert.NotNull(contained);
+            Assert.Equal("Sheet1!C3", contained!.Value.ToExcelString());
+
+            // 不相交時應回傳 null。
+            Assert.Null(range.Intersect(OdfCellRange.ParseExcel("Sheet1!A1:A1")));
+
+            // 不同工作表時應視為不相交。
+            Assert.Null(range.Intersect(OdfCellRange.ParseExcel("Sheet2!B2:D4")));
+        }
+
+        [Fact]
+        public void TestCellAddressGetHashCodeConsistentWithEquals()
+        {
+            var addr1 = OdfCellAddress.ParseExcel("Sheet1!$B$2");
+            var addr2 = OdfCellAddress.ParseExcel("Sheet1!$B$2");
+            var addr3 = OdfCellAddress.ParseExcel("sheet1!$B$2"); // 工作表名稱應忽略大小寫。
+            var addr4 = OdfCellAddress.ParseExcel("Sheet1!B2"); // 缺少絕對參照旗標，應視為不同。
+
+            Assert.Equal(addr1, addr2);
+            Assert.Equal(addr1.GetHashCode(), addr2.GetHashCode());
+            Assert.Equal(addr1, addr3);
+            Assert.Equal(addr1.GetHashCode(), addr3.GetHashCode());
+            Assert.NotEqual(addr1, addr4);
+        }
+
+        [Fact]
+        public void TestCellRangeGetHashCodeConsistentWithEquals()
+        {
+            var range1 = OdfCellRange.ParseExcel("Sheet1!B2:D4");
+            var range2 = OdfCellRange.ParseExcel("Sheet1!B2:D4");
+            var range3 = OdfCellRange.ParseExcel("Sheet1!B2:D5");
+
+            Assert.Equal(range1, range2);
+            Assert.Equal(range1.GetHashCode(), range2.GetHashCode());
+            Assert.NotEqual(range1, range3);
+        }
+
+        [Fact]
+        public void TestFrozenPanesAndSplitPanesGetHashCodeConsistentWithEquals()
+        {
+            var frozen1 = new OdfFrozenPanes(2, 1);
+            var frozen2 = new OdfFrozenPanes(2, 1);
+            var frozen3 = new OdfFrozenPanes(3, 1);
+
+            Assert.Equal(frozen1, frozen2);
+            Assert.Equal(frozen1.GetHashCode(), frozen2.GetHashCode());
+            Assert.NotEqual(frozen1, frozen3);
+
+            var split1 = new OdfSplitPanes(5, 3);
+            var split2 = new OdfSplitPanes(5, 3);
+            var split3 = new OdfSplitPanes(5, 4);
+
+            Assert.Equal(split1, split2);
+            Assert.Equal(split1.GetHashCode(), split2.GetHashCode());
+            Assert.NotEqual(split1, split3);
+        }
+
         #endregion
 
         #region 3. Structural Shifting Stress Tests
