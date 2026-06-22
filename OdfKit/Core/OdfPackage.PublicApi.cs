@@ -94,6 +94,13 @@ public sealed partial class OdfPackage
     /// 清理封裝中未被參照的圖片等媒體檔案。
     /// </summary>
     /// <param name="referencedMediaPaths">所有目前正被參照的媒體檔案路徑集合</param>
+    /// <remarks>
+    /// 此方法僅依路徑清單比對移除 <c>Pictures/</c> 下的 ZIP 媒體項目，不會檢查或同步移除
+    /// <c>content.xml</c>／<c>styles.xml</c> 中殘留的 <c>draw:image</c> DOM 參照節點。
+    /// 呼叫端必須自行確保 <paramref name="referencedMediaPaths"/> 與目前 DOM 實際參照狀態一致，
+    /// 否則殘留的 DOM 參照會指向已被刪除的媒體項目而形成懸空連結，可能導致真實 ODF 應用程式
+    /// （例如 LibreOffice）拒絕開啟整份文件。
+    /// </remarks>
     public void PruneUnusedMedia(IEnumerable<string> referencedMediaPaths)
         => OdfPackageEntryAccessEngine.PruneUnusedMedia(EntryCollaborators, referencedMediaPaths);
 

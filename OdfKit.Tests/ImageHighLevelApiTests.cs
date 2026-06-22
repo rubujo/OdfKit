@@ -38,6 +38,10 @@ public class ImageHighLevelApiTests
         Assert.Equal(bytes.Length, frame.Size);
         Assert.True(frame.TryGetWidth(out OdfLength width));
         Assert.Equal(OdfLength.FromCentimeters(6), width);
+        Assert.True(frame.TryGetY(out OdfLength y));
+        Assert.Equal(OdfLength.FromCentimeters(2), y);
+        Assert.True(frame.TryGetHeight(out OdfLength height));
+        Assert.Equal(OdfLength.FromCentimeters(4), height);
     }
 
     /// <summary>
@@ -112,6 +116,10 @@ public class ImageHighLevelApiTests
         Assert.Equal(OdfLength.FromCentimeters(8), x);
         Assert.True(updated.TryGetWidth(out OdfLength width));
         Assert.Equal(OdfLength.FromCentimeters(4), width);
+        Assert.True(updated.TryGetY(out OdfLength y));
+        Assert.Equal(OdfLength.FromCentimeters(2), y);
+        Assert.True(updated.TryGetHeight(out OdfLength height));
+        Assert.Equal(OdfLength.FromCentimeters(4), height);
 
         Assert.True(image.RemoveImageFrame("SecondaryFrame"));
         Assert.Single(image.GetImageFrames());

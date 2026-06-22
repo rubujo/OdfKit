@@ -887,6 +887,18 @@ public class ManagedPptxConversionTests
         AssertLengthEquals(OdfLength.FromCentimeters(3), crop[1].ToString());
         AssertLengthEquals(OdfLength.FromCentimeters(2.4), crop[2].ToString());
         AssertLengthEquals(OdfLength.FromCentimeters(0.8), crop[3].ToString());
+
+        // 驗證 ClearCrop 清除裁切後，OOXML 轉換不應殘留過期的 a:srcRect 來源矩形。
+        roundTrippedPicture.ClearCrop();
+        Assert.Null(roundTrippedPicture.CropClip);
+
+        using var clearedPptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(converted, clearedPptxStream);
+        clearedPptxStream.Position = 0;
+        using PackagingPresentationDocument clearedPptx = PackagingPresentationDocument.Open(clearedPptxStream, false);
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(clearedPptx));
+        OpenXmlSlidePart clearedSlidePart = Assert.Single(clearedPptx.PresentationPart!.SlideParts);
+        Assert.Empty(clearedSlidePart.Slide!.Descendants<A.SourceRectangle>());
     }
     [Fact]
     public void PptxConvertersPreserveShapeFillAndStrokeColors()

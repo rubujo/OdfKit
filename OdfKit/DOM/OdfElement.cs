@@ -140,6 +140,15 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
         foreach (var attr in Attributes)
         {
             clone.Attributes[attr.Key] = attr.Value;
+
+            // 必須一併複製屬性的原始命名空間前綴；否則在序列化時，對於未登錄於
+            // OdfNamespaces 標準前綴對映表的命名空間（例如保留的第三方擴充屬性），
+            // 將因前綴資訊遺失而被改寫成自動產生的 "nsN" 佔位前綴。
+            string? attrPrefix = GetAttributePrefix(attr.Key);
+            if (attrPrefix is not null)
+            {
+                clone.SetAttribute(attr.Key.LocalName, attr.Key.NamespaceUri, attr.Value, attrPrefix);
+            }
         }
         if (deep)
         {

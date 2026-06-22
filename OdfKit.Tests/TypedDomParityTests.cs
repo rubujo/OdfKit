@@ -623,6 +623,183 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 <c>office:database</c> content model facade 的 <c>EnsureReports</c>／
+    /// <c>EnsureTableRepresentations</c> 即使在「逆序呼叫」（先建立順序較後的元件）時，
+    /// 仍會將子元素插入在符合 ODF 規格 <c>db:data-source, db:forms, db:reports, db:queries,
+    /// db:table-representations, db:schema</c> 正確順序的位置，並可正確 round-trip。
+    /// </summary>
+    [Fact]
+    public void OfficeDatabaseContentModelFacadeEnsureReportsAndTableRepresentationsPreserveCanonicalOrder()
+    {
+        OfficeDatabaseElement databaseBody = new("office");
+
+        // 刻意以反向順序呼叫：先建立順序較後的 table-representations，再建立 queries，
+        // 最後才建立 reports，藉此驗證插入邏輯是否仍能維持規格要求的正確子元素順序。
+        databaseBody.EnsureTableRepresentations();
+        databaseBody.EnsureQueries();
+        databaseBody.EnsureReports();
+
+        OdfElement[] components = databaseBody.DatabaseComponentChildElements.ToArray();
+        Assert.Equal(3, components.Length);
+        Assert.IsType<DatabaseReportsElement>(components[0]);
+        Assert.IsType<DatabaseQueriesElement>(components[1]);
+        Assert.IsType<DatabaseTableRepresentationsElement>(components[2]);
+
+        // 重複呼叫須回傳既有元素而非重複新增。
+        Assert.Same(components[0], databaseBody.EnsureReports());
+        Assert.Same(components[2], databaseBody.EnsureTableRepresentations());
+        Assert.Equal(3, databaseBody.DatabaseComponentChildElements.Count());
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office")).AppendElement(databaseBody);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeDatabaseElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<OfficeDatabaseElement>()
+            .Single();
+        OdfElement[] parsedComponents = parsed.DatabaseComponentChildElements.ToArray();
+        Assert.Equal(3, parsedComponents.Length);
+        Assert.IsType<DatabaseReportsElement>(parsedComponents[0]);
+        Assert.IsType<DatabaseQueriesElement>(parsedComponents[1]);
+        Assert.IsType<DatabaseTableRepresentationsElement>(parsedComponents[2]);
+    }
+
+    /// <summary>
+    /// 驗證 <c>office:database</c> content model facade 在「先建立 <c>db:reports</c>，再建立
+    /// <c>db:queries</c>」這種兩兩相鄰元件的最小反例情境下，仍會將 <c>db:queries</c> 插入在
+    /// <c>db:reports</c> 之後，而非插入之前。<c>InsertDatabaseComponent</c> 內部以
+    /// 「尋找第一個屬於 reports／queries／table-representations／schema 任一類型的子元素」為插入
+    /// 基準點，並未依個別呼叫的目標元件類型在規格序列中的相對位置調整搜尋範圍；若不限定範圍，
+    /// 在僅有兩種元件、呼叫順序恰好是「先建立後面的，再建立前面的」以外的情境（例如本測試先建立
+    /// reports 再建立 queries），插入邏輯仍只搜尋同一份清單，可能導致誤判插入點。
+    /// </summary>
+    [Fact]
+    public void OfficeDatabaseContentModelFacadeEnsureQueriesAfterReportsPreservesOrder()
+    {
+        OfficeDatabaseElement databaseBody = new("office");
+
+        databaseBody.EnsureReports();
+        databaseBody.EnsureQueries();
+
+        OdfElement[] components = databaseBody.DatabaseComponentChildElements.ToArray();
+        Assert.Equal(2, components.Length);
+        Assert.IsType<DatabaseReportsElement>(components[0]);
+        Assert.IsType<DatabaseQueriesElement>(components[1]);
+    }
+
+    /// <summary>
+    /// 驗證 <c>office:database</c> content model facade 的全部五個 <c>Ensure*</c> 方法
+    /// （資料來源、表單、報表、查詢、資料表描述），無論呼叫端以何種順序呼叫，最終子元素順序
+    /// 必定符合 ODF 規格規定的標準順序。逐一以完全反向（最後一個元件最先建立）的順序呼叫，
+    /// 這是最容易暴露插入點誤判的情境。
+    /// </summary>
+    [Fact]
+    public void OfficeDatabaseContentModelFacadeAllEnsureMethodsPreserveCanonicalOrderRegardlessOfCallOrder()
+    {
+        OfficeDatabaseElement databaseBody = new("office");
+
+        // 完全反向呼叫：先建立規格順序最後面的元件，再依序往前建立。
+        databaseBody.EnsureTableRepresentations();
+        databaseBody.EnsureQueries();
+        databaseBody.EnsureReports();
+        databaseBody.EnsureForms();
+        databaseBody.EnsureDataSource();
+
+        OdfElement[] components = databaseBody.DatabaseComponentChildElements.ToArray();
+        Assert.Equal(5, components.Length);
+        Assert.IsType<DatabaseDataSourceElement>(components[0]);
+        Assert.IsType<DatabaseFormsElement>(components[1]);
+        Assert.IsType<DatabaseReportsElement>(components[2]);
+        Assert.IsType<DatabaseQueriesElement>(components[3]);
+        Assert.IsType<DatabaseTableRepresentationsElement>(components[4]);
+    }
+
+    /// <summary>
+    /// 驗證 <c>office:text</c> content model facade 的 <c>AppendSection</c> 可正確建立具名章節，
+    /// 章節內可巢狀段落，並能完整 round-trip。
+    /// </summary>
+    [Fact]
+    public void OfficeTextContentModelFacadeAppendSectionCreatesNamedSectionAndRoundTrips()
+    {
+        OfficeTextElement textBody = new("office");
+        textBody.AppendParagraph("先導段落");
+        TextSectionElement section = textBody.AppendSection("Section1");
+        section.AppendElement(new TextPElement("text")).TextContent = "章節內文";
+
+        Assert.Equal("Section1", section.Name);
+        OdfElement[] blocks = textBody.BlockContentChildElements.ToArray();
+        Assert.Equal(2, blocks.Length);
+        Assert.IsType<TextSectionElement>(blocks[1]);
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office")).AppendElement(textBody);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        OfficeTextElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<OfficeTextElement>()
+            .Single();
+        TextSectionElement parsedSection = parsed.DescendantElements<TextSectionElement>().Single();
+        Assert.Equal("Section1", parsedSection.Name);
+        Assert.Equal("章節內文", parsedSection.TextPChildElements.Single().TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 <c>table:table</c> content model facade 的 <c>AppendHeaderRows</c>／
+    /// <c>EnsureTableColumns</c>／<c>InsertColumnStructure</c>：即使先新增資料列，
+    /// 後續才補建表頭列容器與欄位結構，仍會插入在符合 ODF 規格「欄位結構先於列結構」
+    /// 的正確位置，而非單純附加於末尾，並可完整 round-trip。
+    /// </summary>
+    [Fact]
+    public void TableTableContentModelFacadeAppendHeaderRowsAndEnsureTableColumnsInsertBeforeExistingRows()
+    {
+        TableTableElement table = new("table");
+
+        // 刻意先新增一般資料列，再回頭補建欄位結構與表頭列容器，
+        // 驗證 InsertColumnStructure 是否仍會插入在所有列結構之前。
+        TableTableRowElement dataRow = table.AppendRow();
+        dataRow.AppendElement(new TableTableCellElement("table"));
+
+        TableTableHeaderRowsElement headerRows = table.AppendHeaderRows();
+        headerRows.AppendElement(new TableTableRowElement("table"))
+            .AppendElement(new TableTableCellElement("table"));
+
+        TableTableColumnsElement columns = table.EnsureTableColumns();
+        columns.AppendElement(new TableTableColumnElement("table"));
+
+        // 欄位結構必須出現在所有列結構（表頭列、資料列）之前。
+        OdfElement[] columnStructures = table.ColumnStructureChildElements.ToArray();
+        OdfElement[] rowStructures = table.RowStructureChildElements.ToArray();
+        Assert.Single(columnStructures);
+        Assert.Equal(2, rowStructures.Length);
+        Assert.IsType<TableTableHeaderRowsElement>(rowStructures[0]);
+        Assert.IsType<TableTableRowElement>(rowStructures[1]);
+        Assert.True(table.Children.IndexOf(columns) < table.Children.IndexOf(headerRows));
+        Assert.True(table.Children.IndexOf(headerRows) < table.Children.IndexOf(dataRow));
+
+        // 再次呼叫 EnsureTableColumns 必須回傳既有容器，不可重複新增。
+        Assert.Same(columns, table.EnsureTableColumns());
+
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        OfficeSpreadsheetElement spreadsheet = document.AppendElement(new OfficeBodyElement("office"))
+            .AppendElement(new OfficeSpreadsheetElement("office"));
+        spreadsheet.AppendElement(table);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        TableTableElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<TableTableElement>()
+            .Single();
+        Assert.Single(parsed.TableTableColumnsChildElements);
+        Assert.Single(parsed.TableTableHeaderRowsChildElements);
+        Assert.Single(parsed.TableTableRowChildElements);
+    }
+
+    /// <summary>
     /// 驗證 <c>office:spreadsheet</c> content model facade 可建立工作表並 round-trip。
     /// </summary>
     [Fact]
@@ -1854,6 +2031,271 @@ public class TypedDomParityTests
         Assert.Contains("schema-to-wrapper coverage report", document, StringComparison.Ordinal);
         Assert.Contains("schema-specific child collection", document, StringComparison.Ordinal);
         Assert.Contains("ODFDOM 風格 sample usage parity tests", document, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 <c>OdfKit.DOM</c> 命名空間中以 lexical form 包裝字串值的型別，其 <c>GetHashCode</c>／
+    /// <c>Equals</c> 契約一致：相等的值必須產生相同雜湊碼，明顯不同的值雜湊碼應不同。
+    /// 涵蓋先前真機掃描比對中顯示零測試引用的全部型別，逐一確認並非真實缺口而是已有等價測試
+    /// 覆蓋（透過共用基礎設施）的假陰性。
+    /// </summary>
+    [Fact]
+    public void LexicalFormValueTypesGetHashCodeIsConsistentWithEquals()
+    {
+        AssertHashCodeContract(new OdfAngle("45.5"), new OdfAngle("45.5"), new OdfAngle("90"));
+        AssertHashCodeContract(new OdfCellAddressReference("'My Sheet'.$A$1"), new OdfCellAddressReference("'My Sheet'.$A$1"), new OdfCellAddressReference("'My Sheet'.$B$2"));
+        AssertHashCodeContract(new OdfCellRangeAddress("'My Sheet'.$A$1:'My Sheet'.$C$3"), new OdfCellRangeAddress("'My Sheet'.$A$1:'My Sheet'.$C$3"), new OdfCellRangeAddress("'My Sheet'.$A$1:'My Sheet'.$D$4"));
+        AssertHashCodeContract(
+            new OdfCellRangeAddressList("'My Sheet'.$A$1:'My Sheet'.$C$3 .D4:.E5"),
+            new OdfCellRangeAddressList("'My Sheet'.$A$1:'My Sheet'.$C$3 .D4:.E5"),
+            new OdfCellRangeAddressList("'My Sheet'.$A$1:'My Sheet'.$C$3"));
+        AssertHashCodeContract(new OdfCharacter("*"), new OdfCharacter("*"), new OdfCharacter("#"));
+        AssertHashCodeContract(new OdfColor("#112233"), new OdfColor("#112233"), new OdfColor("#445566"));
+        AssertHashCodeContract(new OdfCountryCode("TW"), new OdfCountryCode("TW"), new OdfCountryCode("JP"));
+        AssertHashCodeContract(new OdfDuration("PT1H30M"), new OdfDuration("PT1H30M"), new OdfDuration("PT2H"));
+        AssertHashCodeContract(new OdfPoint2D(0, 0), new OdfPoint2D(0, 0), new OdfPoint2D(10, -20));
+        AssertHashCodeContract(new OdfIriReference("Pictures/image.png"), new OdfIriReference("Pictures/image.png"), new OdfIriReference("Pictures/other.png"));
+        AssertHashCodeContract(new OdfLanguageCode("zh"), new OdfLanguageCode("zh"), new OdfLanguageCode("en"));
+        AssertHashCodeContract(new OdfLanguageTag("zh-Hant-TW"), new OdfLanguageTag("zh-Hant-TW"), new OdfLanguageTag("en-US"));
+        AssertHashCodeContract(new OdfLineWidth("150%"), new OdfLineWidth("150%"), new OdfLineWidth("200%"));
+        AssertHashCodeContract(new OdfMediaType("application/vnd.oasis.opendocument.text"), new OdfMediaType("application/vnd.oasis.opendocument.text"), new OdfMediaType("text/plain"));
+        AssertHashCodeContract(new OdfNamespacedToken("draw:shape"), new OdfNamespacedToken("draw:shape"), new OdfNamespacedToken("table:cell"));
+        AssertHashCodeContract(new OdfPercent("87.5%"), new OdfPercent("87.5%"), new OdfPercent("12.5%"));
+        AssertHashCodeContract(new OdfPointList([new OdfPoint2D(0, 0), new OdfPoint2D(10, -20)]), new OdfPointList([new OdfPoint2D(0, 0), new OdfPoint2D(10, -20)]), new OdfPointList([new OdfPoint2D(1, 1)]));
+        AssertHashCodeContract(new OdfScriptCode("Hant"), new OdfScriptCode("Hant"), new OdfScriptCode("Latn"));
+        AssertHashCodeContract(new OdfStyleName("CellStyle1"), new OdfStyleName("CellStyle1"), new OdfStyleName("Accent2"));
+        AssertHashCodeContract(
+            new OdfStyleNameList([new OdfStyleName("CellStyle1"), new OdfStyleName("Accent2")]),
+            new OdfStyleNameList([new OdfStyleName("CellStyle1"), new OdfStyleName("Accent2")]),
+            new OdfStyleNameList([new OdfStyleName("Accent2")]));
+        AssertHashCodeContract(new OdfTargetFrameName("_blank"), new OdfTargetFrameName("_blank"), new OdfTargetFrameName("_self"));
+        AssertHashCodeContract(new OdfTextEncoding("UTF-8"), new OdfTextEncoding("UTF-8"), new OdfTextEncoding("Big5"));
+        AssertHashCodeContract(new OdfTime(new TimeSpan(12, 30, 45), TimeSpan.Zero), new OdfTime(new TimeSpan(12, 30, 45), TimeSpan.Zero), new OdfTime(new TimeSpan(8, 0, 0), TimeSpan.Zero));
+        AssertHashCodeContract(new OdfXmlName("Shape1"), new OdfXmlName("Shape1"), new OdfXmlName("Shape2"));
+
+        // 多欄位複合結構：以 X／Y／Z 座標組合計算雜湊碼，而非單一 lexical form 字串。
+        AssertHashCodeContract(
+            new OdfPoint3D(OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(3)),
+            new OdfPoint3D(OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(3)),
+            new OdfPoint3D(OdfLength.FromCentimeters(4), OdfLength.FromCentimeters(5), OdfLength.FromCentimeters(6)));
+        AssertHashCodeContract(new OdfVector3D(1, 2, 3), new OdfVector3D(1, 2, 3), new OdfVector3D(7, 8, 9));
+        AssertHashCodeContract(
+            new OdfBorderWidths(OdfLength.FromPoints(0.5), OdfLength.FromPoints(1), OdfLength.FromPoints(0.5)),
+            new OdfBorderWidths(OdfLength.FromPoints(0.5), OdfLength.FromPoints(1), OdfLength.FromPoints(0.5)),
+            new OdfBorderWidths(OdfLength.FromPoints(1), OdfLength.FromPoints(2), OdfLength.FromPoints(1)));
+
+        // OdfAttributeName：以 localName ＋ namespaceUri 組合鍵計算雜湊碼。
+        var attr1 = new OdfAttributeName("href", OdfNamespaces.XLink);
+        var attr2 = new OdfAttributeName("href", OdfNamespaces.XLink);
+        var attr3 = new OdfAttributeName("name", OdfNamespaces.Table);
+        Assert.Equal(attr1, attr2);
+        Assert.Equal(attr1.GetHashCode(), attr2.GetHashCode());
+        Assert.NotEqual(attr1.GetHashCode(), attr3.GetHashCode());
+    }
+
+    /// <summary>
+    /// 驗證雜湊碼與相等性契約：相等的兩個值必須產生相同雜湊碼；明顯不同的第三個值雜湊碼應不同
+    /// （非嚴格要求，僅用於合理性檢查，避免實作恆傳回固定值）。
+    /// </summary>
+    private static void AssertHashCodeContract<T>(T value, T equalValue, T differentValue)
+        where T : IEquatable<T>
+    {
+        Assert.True(value.Equals(equalValue));
+        Assert.Equal(value.GetHashCode(), equalValue.GetHashCode());
+        Assert.NotEqual(value.GetHashCode(), differentValue.GetHashCode());
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfNodeChildList"/> 透過 <see cref="System.Collections.Generic.IList{T}"/>
+    /// 介面公開的 <c>Insert(int, OdfNode)</c>／<c>RemoveAt(int)</c>：插入後相鄰節點的雙向鏈結
+    /// （<c>PreviousSibling</c>／<c>NextSibling</c>）與 <c>SiblingIndex</c> 快取必須正確重新編號；
+    /// 移除後節點不可再透過 <c>Parent</c>／<c>SiblingIndex</c> 殘留懸空參照，且父節點的
+    /// <c>FirstChild</c>／<c>LastChild</c> 在邊界（移除首尾節點）情況下也必須正確更新。
+    /// </summary>
+    [Fact]
+    public void OdfNodeChildListInsertAndRemoveAtMaintainConsistentLinkedListState()
+    {
+        TextPElement parent = new("text");
+        var first = new TextSpanElement("text") { TextContent = "first" };
+        var second = new TextSpanElement("text") { TextContent = "second" };
+        var third = new TextSpanElement("text") { TextContent = "third" };
+        parent.Children.Add(first);
+        parent.Children.Add(second);
+        parent.Children.Add(third);
+
+        // Insert 於中間索引：驗證透過 IList<T> 介面插入與透過 InsertBefore 插入語意一致。
+        var inserted = new TextSpanElement("text") { TextContent = "inserted" };
+        parent.Children.Insert(1, inserted);
+        Assert.Equal(["first", "inserted", "second", "third"], parent.Children.Select(c => c.TextContent));
+        Assert.Same(first, inserted.PreviousSibling);
+        Assert.Same(second, inserted.NextSibling);
+        Assert.Equal(1, inserted.SiblingIndex);
+        Assert.Equal(2, second.SiblingIndex);
+        Assert.Equal(3, third.SiblingIndex);
+
+        // Insert 於末尾索引（index == Count）：應等同於 Append，而非擲出例外。
+        var appended = new TextSpanElement("text") { TextContent = "appended" };
+        parent.Children.Insert(parent.Children.Count, appended);
+        Assert.Same(parent, appended.Parent);
+        Assert.Same(third, appended.PreviousSibling);
+        Assert.Null(appended.NextSibling);
+        Assert.Same(appended, parent.Children[^1]);
+
+        // RemoveAt 移除中間節點：不可留下懸空參照，且前後相鄰節點需重新連結。
+        int insertedIndex = parent.Children.IndexOf(inserted);
+        parent.Children.RemoveAt(insertedIndex);
+        Assert.Null(inserted.Parent);
+        Assert.Null(inserted.PreviousSibling);
+        Assert.Null(inserted.NextSibling);
+        Assert.Equal(-1, inserted.SiblingIndex);
+        Assert.Equal(["first", "second", "third", "appended"], parent.Children.Select(c => c.TextContent));
+
+        // RemoveAt 移除首節點：父節點 FirstChild 須正確前移，不可指向已移除節點。
+        parent.Children.RemoveAt(0);
+        Assert.Equal(["second", "third", "appended"], parent.Children.Select(c => c.TextContent));
+        Assert.Same(second, parent.Children[0]);
+        Assert.Null(second.PreviousSibling);
+
+        // RemoveAt 移除尾節點：父節點 LastChild 須正確後移，不可指向已移除節點。
+        parent.Children.RemoveAt(parent.Children.Count - 1);
+        Assert.Equal(["second", "third"], parent.Children.Select(c => c.TextContent));
+        Assert.Same(third, parent.Children[^1]);
+        Assert.Null(third.NextSibling);
+
+        // 真機相容性：移除與插入後的最終樹狀結構仍須能完整序列化並由 OdfXmlReader 正確還原。
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office"))
+            .AppendElement(new OfficeTextElement("office"))
+            .AppendElement(parent);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+
+        TextPElement parsedParent = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<TextPElement>()
+            .Single();
+        Assert.Equal(["second", "third"], parsedParent.TextSpanChildElements.Select(c => c.TextContent));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfNode.ResetModifiedState"/> 會遞迴將節點本身及其所有子節點（含巢狀後代）
+    /// 的 <see cref="OdfNode.IsModified"/> 標記重設為 <see langword="false"/>，而不僅是頂層節點。
+    /// </summary>
+    [Fact]
+    public void ResetModifiedStateRecursivelyClearsIsModifiedOnNodeAndAllDescendants()
+    {
+        TextPElement paragraph = new("text");
+        TextSpanElement span = paragraph.AppendElement(new TextSpanElement("text"));
+        span.TextContent = "巢狀文字";
+        TextSpanElement nestedSpan = span.AppendElement(new TextSpanElement("text"));
+        nestedSpan.TextContent = "更深層的文字";
+
+        // AppendChild／SetAttribute／TextContent 設定均會標記 IsModified，新建立的節點樹預期全數為 true。
+        Assert.True(paragraph.IsModified);
+        Assert.True(span.IsModified);
+        Assert.True(nestedSpan.IsModified);
+
+        paragraph.ResetModifiedState();
+
+        Assert.False(paragraph.IsModified);
+        Assert.False(span.IsModified);
+        Assert.False(nestedSpan.IsModified);
+        // 文字節點本身（TextContent 內部建立的 Text 型別子節點）亦屬於子節點樹的一部分，須一併重設。
+        Assert.All(nestedSpan.Children, child => Assert.False(child.IsModified));
+
+        // 重設後再次修改，須能正確重新標記為已修改，確認旗標可逆向切換而非被永久鎖定。
+        nestedSpan.SetAttribute("style-name", OdfNamespaces.Text, "Emphasis", "text");
+        Assert.True(nestedSpan.IsModified);
+        Assert.False(paragraph.IsModified);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfPercent.FromPercent"/> 由數值建立的百分比，其 lexical form 與
+    /// <see cref="OdfPercent.Percent"/> 數值皆正確，並可由原生字串建構子產生的等價值互通比對。
+    /// </summary>
+    [Fact]
+    public void OdfPercentFromPercentProducesEquivalentLexicalFormAndValue()
+    {
+        OdfPercent fromValue = OdfPercent.FromPercent(42.5m);
+        Assert.Equal("42.5%", fromValue.Value);
+        Assert.Equal(42.5m, fromValue.Percent);
+        Assert.Equal(new OdfPercent("42.5%"), fromValue);
+
+        OdfPercent fromNegative = OdfPercent.FromPercent(-12.5m);
+        Assert.Equal(-12.5m, fromNegative.Percent);
+        Assert.Equal(new OdfPercent("-12.5%"), fromNegative);
+
+        OdfPercent fromInteger = OdfPercent.FromPercent(100m);
+        Assert.Equal("100%", fromInteger.Value);
+        Assert.Equal(new OdfPercent("100%"), fromInteger);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfDuration.TryGetTimeSpan"/> 可正確將合法 XML Schema duration 字串
+    /// （含年／月單位，依 <see cref="System.Xml.XmlConvert.ToTimeSpan(string)"/> 之近似換算規則）
+    /// 轉換為 <see cref="TimeSpan"/>；並在以 <see langword="default"/> 建構（<c>Value</c> 為
+    /// <see langword="null"/>，繞過建構子驗證）時安全傳回 <see langword="false"/> 而非擲出例外。
+    /// </summary>
+    [Fact]
+    public void OdfDurationTryGetTimeSpanConvertsValidDurationAndHandlesDefaultValueSafely()
+    {
+        var duration = new OdfDuration("PT1H30M");
+        Assert.True(duration.TryGetTimeSpan(out TimeSpan timeSpan));
+        Assert.Equal(new TimeSpan(1, 30, 0), timeSpan);
+
+        var negativeDuration = new OdfDuration("-PT15M");
+        Assert.True(negativeDuration.TryGetTimeSpan(out TimeSpan negativeTimeSpan));
+        Assert.Equal(TimeSpan.FromMinutes(-15), negativeTimeSpan);
+
+        // OdfDuration 建構子已透過 IsValid 驗證 lexical form 必定可由 XmlConvert.ToTimeSpan 換算，
+        // 故唯一能繞過驗證、使 Value 為 null 的途徑是 default(OdfDuration)；此時 TryGetTimeSpan
+        // 應安全傳回 false，而非讓 XmlConvert 對 null 字串擲出例外。
+        OdfDuration defaultDuration = default;
+        Assert.False(defaultDuration.TryGetTimeSpan(out TimeSpan fallbackTimeSpan));
+        Assert.Equal(default, fallbackTimeSpan);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfElement.CloneNode"/> 會一併複製屬性原始命名空間前綴，而非僅複製
+    /// 屬性值本身。先前 <c>OdfElement.CloneNode</c> 的覆寫版本直接以
+    /// <c>OdfNodeFactory.CreateElement</c> 建立新節點並逐一複製 <c>Attributes</c> 字典，未呼叫
+    /// 基底 <see cref="OdfNode.CloneNode"/> 亦未複製前綴記錄；對於未登錄於
+    /// <see cref="OdfNamespaces.GetPrefix(string)"/> 標準對映表的命名空間（例如保留原始前綴的
+    /// 第三方擴充屬性），複製後的節點在序列化時會遺失原始前綴，改用自動產生的 <c>nsN</c> 佔位
+    /// 前綴。由於文件樹中絕大多數節點皆為 <see cref="OdfElement"/> 子類別（透過虛擬呼叫多型
+    /// 分派至此覆寫版本），此問題會影響所有透過 <c>CloneNode</c>／<c>ImportNode</c> 的複製路徑
+    /// （例如版面拆列、追蹤修訂快照、跨文件匯入）。
+    /// </summary>
+    [Fact]
+    public void OdfElementCloneNodePreservesOriginalAttributeNamespacePrefix()
+    {
+        const string customNamespaceUri = "urn:example:third-party-extension:1.0";
+        TextPElement paragraph = new("text");
+        paragraph.SetAttribute("custom-flag", customNamespaceUri, "preserved", "ext");
+
+        OdfNode clone = paragraph.CloneNode(deep: true);
+
+        Assert.IsType<TextPElement>(clone);
+        Assert.Equal("preserved", clone.GetAttribute("custom-flag", customNamespaceUri));
+        Assert.Equal("ext", clone.GetAttributePrefix(new OdfAttributeName("custom-flag", customNamespaceUri)));
+
+        // 真機相容性：序列化後自訂前綴必須完整保留在輸出 XML 中，而非被改寫成自動產生的 nsN 佔位前綴。
+        using MemoryStream stream = new();
+        OfficeDocumentContentElement document = new("office");
+        document.AppendElement(new OfficeBodyElement("office"))
+            .AppendElement(new OfficeTextElement("office"))
+            .AppendElement((TextPElement)clone);
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        stream.Position = 0;
+        string xml = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+
+        Assert.Contains("ext:custom-flag=\"preserved\"", xml, StringComparison.Ordinal);
+        Assert.DoesNotContain("ns1:custom-flag", xml, StringComparison.Ordinal);
+
+        TextPElement parsedParagraph = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
+            .DescendantElements<TextPElement>()
+            .Single();
+        Assert.Equal("preserved", parsedParagraph.GetAttribute("custom-flag", customNamespaceUri));
     }
 
     private static string FindRepositoryRoot()

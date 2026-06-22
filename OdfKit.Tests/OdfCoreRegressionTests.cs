@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Xunit;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Text;
@@ -277,6 +278,120 @@ namespace OdfKit.Tests
             var node = new OdfNode(OdfNodeType.Element, localName, ns, prefix);
             parent.AppendChild(node);
             return node;
+        }
+
+        /// <summary>
+        /// 驗證 <see cref="OdfVersionInfo.ToVersionString"/> 能將所有已知 <see cref="OdfVersion"/>
+        /// 列舉值轉換為對應的規格版本字串，未知值則回退為 "unknown"。
+        /// </summary>
+        [Fact]
+        public void TestOdfVersionInfoToVersionStringCoversAllKnownVersions()
+        {
+            Assert.Equal("1.0", OdfVersionInfo.ToVersionString(OdfVersion.Odf10));
+            Assert.Equal("1.1", OdfVersionInfo.ToVersionString(OdfVersion.Odf11));
+            Assert.Equal("1.2", OdfVersionInfo.ToVersionString(OdfVersion.Odf12));
+            Assert.Equal("1.3", OdfVersionInfo.ToVersionString(OdfVersion.Odf13));
+            Assert.Equal("1.4", OdfVersionInfo.ToVersionString(OdfVersion.Odf14));
+            Assert.Equal("unknown", OdfVersionInfo.ToVersionString(OdfVersion.Unknown));
+        }
+
+        /// <summary>
+        /// 驗證 <see cref="OdfVersionInfo.TryParseVersionString"/> 能正確解析所有已知版本字串，
+        /// 且對於 <see langword="null"/>、空字串或未知字串正確回傳 <see langword="false"/> 與
+        /// <see cref="OdfVersion.Unknown"/>，並與 <see cref="OdfVersionInfo.ToVersionString"/> 互為反函式。
+        /// </summary>
+        [Fact]
+        public void TestOdfVersionInfoTryParseVersionStringRoundTripsAndRejectsUnknown()
+        {
+            Assert.True(OdfVersionInfo.TryParseVersionString("1.0", out OdfVersion v10));
+            Assert.Equal(OdfVersion.Odf10, v10);
+            Assert.True(OdfVersionInfo.TryParseVersionString("1.4", out OdfVersion v14));
+            Assert.Equal(OdfVersion.Odf14, v14);
+
+            Assert.False(OdfVersionInfo.TryParseVersionString("9.9", out OdfVersion invalid));
+            Assert.Equal(OdfVersion.Unknown, invalid);
+
+            Assert.False(OdfVersionInfo.TryParseVersionString(null, out OdfVersion fromNull));
+            Assert.Equal(OdfVersion.Unknown, fromNull);
+
+            Assert.False(OdfVersionInfo.TryParseVersionString(string.Empty, out OdfVersion fromEmpty));
+            Assert.Equal(OdfVersion.Unknown, fromEmpty);
+
+            foreach (OdfVersion known in new[] { OdfVersion.Odf10, OdfVersion.Odf11, OdfVersion.Odf12, OdfVersion.Odf13, OdfVersion.Odf14 })
+            {
+                string text = OdfVersionInfo.ToVersionString(known);
+                Assert.True(OdfVersionInfo.TryParseVersionString(text, out OdfVersion roundTripped));
+                Assert.Equal(known, roundTripped);
+            }
+        }
+
+        /// <summary>
+        /// 驗證 <see cref="OdfMediaManager.DetectImageFormat"/> 能依幻數正確辨識 PNG／JPEG／GIF／WebP／
+        /// BMP／TIFF（小端與大端）／EMF／WMF／SVG 等全部支援格式，且對無法識別的位元組正確回退為
+        /// <c>application/octet-stream</c>。
+        /// </summary>
+        [Fact]
+        public void TestOdfMediaManagerDetectImageFormatCoversAllKnownMagicBytes()
+        {
+            byte[] png = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00];
+            OdfMediaManager.DetectImageFormat(png, out string pngMime, out string pngExt);
+            Assert.Equal("image/png", pngMime);
+            Assert.Equal(".png", pngExt);
+
+            byte[] jpeg = [0xFF, 0xD8, 0xFF, 0xE0, 0x00];
+            OdfMediaManager.DetectImageFormat(jpeg, out string jpegMime, out string jpegExt);
+            Assert.Equal("image/jpeg", jpegMime);
+            Assert.Equal(".jpg", jpegExt);
+
+            byte[] gif = [0x47, 0x49, 0x46, 0x38, 0x39, 0x61];
+            OdfMediaManager.DetectImageFormat(gif, out string gifMime, out string gifExt);
+            Assert.Equal("image/gif", gifMime);
+            Assert.Equal(".gif", gifExt);
+
+            byte[] webp = [0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50];
+            OdfMediaManager.DetectImageFormat(webp, out string webpMime, out string webpExt);
+            Assert.Equal("image/webp", webpMime);
+            Assert.Equal(".webp", webpExt);
+
+            byte[] bmp = [0x42, 0x4D, 0x00, 0x00];
+            OdfMediaManager.DetectImageFormat(bmp, out string bmpMime, out string bmpExt);
+            Assert.Equal("image/bmp", bmpMime);
+            Assert.Equal(".bmp", bmpExt);
+
+            byte[] tiffLittleEndian = [0x49, 0x49, 0x2A, 0x00];
+            OdfMediaManager.DetectImageFormat(tiffLittleEndian, out string tiffLeMime, out string tiffLeExt);
+            Assert.Equal("image/tiff", tiffLeMime);
+            Assert.Equal(".tiff", tiffLeExt);
+
+            byte[] tiffBigEndian = [0x4D, 0x4D, 0x00, 0x2A];
+            OdfMediaManager.DetectImageFormat(tiffBigEndian, out string tiffBeMime, out string tiffBeExt);
+            Assert.Equal("image/tiff", tiffBeMime);
+            Assert.Equal(".tiff", tiffBeExt);
+
+            byte[] emf = new byte[44];
+            emf[0] = 0x01;
+            emf[40] = 0x20;
+            emf[41] = 0x45;
+            emf[42] = 0x4D;
+            emf[43] = 0x46;
+            OdfMediaManager.DetectImageFormat(emf, out string emfMime, out string emfExt);
+            Assert.Equal("image/x-emf", emfMime);
+            Assert.Equal(".emf", emfExt);
+
+            byte[] wmfPlaceable = [0xD7, 0xCD, 0xC6, 0x9A];
+            OdfMediaManager.DetectImageFormat(wmfPlaceable, out string wmfMime, out string wmfExt);
+            Assert.Equal("image/x-wmf", wmfMime);
+            Assert.Equal(".wmf", wmfExt);
+
+            byte[] svg = Encoding.UTF8.GetBytes("<?xml version=\"1.0\"?><svg xmlns=\"http://www.w3.org/2000/svg\"></svg>");
+            OdfMediaManager.DetectImageFormat(svg, out string svgMime, out string svgExt);
+            Assert.Equal("image/svg+xml", svgMime);
+            Assert.Equal(".svg", svgExt);
+
+            byte[] unrecognized = [0x00, 0x01, 0x02, 0x03];
+            OdfMediaManager.DetectImageFormat(unrecognized, out string fallbackMime, out string fallbackExt);
+            Assert.Equal("application/octet-stream", fallbackMime);
+            Assert.Equal(".bin", fallbackExt);
         }
     }
 }

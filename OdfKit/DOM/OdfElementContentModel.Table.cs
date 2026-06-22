@@ -73,16 +73,28 @@ public partial class TableTableElement
     /// <returns>新增的 <c>table:table-row</c> 元素。</returns>
     public TableTableRowElement AppendRow()
     {
-        return AppendRowStructure(new TableTableRowElement("table"));
+        return AppendElement(new TableTableRowElement("table"));
     }
 
     /// <summary>
-    /// 在列結構區段末尾新增表頭列容器。
+    /// 新增表頭列容器；表頭列固定置於所有一般資料列（<c>table:table-row</c>／
+    /// <c>table:table-rows</c>／<c>table:table-row-group</c>）之前，即使呼叫時已存在資料列，
+    /// 仍會插入在第一個資料列之前，而非單純附加於列結構區段末尾。
     /// </summary>
     /// <returns>新增的 <c>table:table-header-rows</c> 元素。</returns>
     public TableTableHeaderRowsElement AppendHeaderRows()
     {
-        return AppendRowStructure(new TableTableHeaderRowsElement("table"));
+        var headerRows = new TableTableHeaderRowsElement("table");
+        OdfNode? firstNonHeaderRow = Children.FirstOrDefault(child =>
+            child is OdfElement rowElement &&
+            OdfElementContentModel.IsTableRowStructure(rowElement) &&
+            rowElement is not TableTableHeaderRowsElement);
+        if (firstNonHeaderRow is null)
+        {
+            return AppendElement(headerRows);
+        }
+
+        return InsertElementBefore(headerRows, firstNonHeaderRow);
     }
 
     /// <summary>
@@ -102,11 +114,5 @@ public partial class TableTableElement
         }
 
         return InsertElementBefore(element, firstRowStructure);
-    }
-
-    private TElement AppendRowStructure<TElement>(TElement element)
-        where TElement : OdfElement
-    {
-        return AppendElement(element);
     }
 }

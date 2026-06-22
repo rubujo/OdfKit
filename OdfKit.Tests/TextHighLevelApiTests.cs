@@ -755,6 +755,114 @@ public class TextHighLevelApiTests
         Assert.True(retainedBytes < 20 * 1024 * 1024, $"保留記憶體過高：{retainedBytes:N0} bytes。");
     }
 
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.AddFontFace"/> 會同時於 content.xml 與 styles.xml 寫入字型宣告。
+    /// </summary>
+    [Fact]
+    public void AddFontFace_WritesFontFaceDeclInContentAndStylesXml()
+    {
+        using var document = TextDocument.Create();
+        document.AddFontFace("自訂字型", "Noto Sans TC", "swiss", "variable");
+
+        string contentXml = SaveAndGetContentXml(document);
+        string stylesXml = SaveAndGetStylesXml(document);
+
+        Assert.Contains("style:name=\"自訂字型\"", contentXml);
+        Assert.Contains("svg:font-family=\"Noto Sans TC\"", contentXml);
+        Assert.Contains("style:font-family-generic=\"swiss\"", contentXml);
+        Assert.Contains("style:font-pitch=\"variable\"", contentXml);
+        Assert.Contains("style:name=\"自訂字型\"", stylesXml);
+    }
+
+    /// <summary>
+    /// 驗證重複呼叫 <see cref="TextDocument.AddFontFace"/> 相同名稱時會更新既有宣告而非重複新增。
+    /// </summary>
+    [Fact]
+    public void AddFontFace_SameNameUpdatesExistingDeclaration()
+    {
+        using var document = TextDocument.Create();
+        document.AddFontFace("自訂字型", "Noto Sans TC");
+        document.AddFontFace("自訂字型", "Microsoft JhengHei");
+
+        string contentXml = SaveAndGetContentXml(document);
+        Assert.Contains("svg:font-family=\"Microsoft JhengHei\"", contentXml);
+        Assert.DoesNotContain("Noto Sans TC", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.GetComments"/> 可讀回文件中所有完整註解物件（含回覆）。
+    /// </summary>
+    [Fact]
+    public void GetComments_ReturnsFullCommentObjectsIncludingReplies()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("註解段落");
+        var comment = new OdfComment("審閱者", "請修訂措辭", new DateTime(2026, 6, 17, 8, 0, 0, DateTimeKind.Utc), "comment-1");
+        comment.AddReply("作者", "已修訂");
+        document.AddComment(paragraph, comment);
+
+        List<OdfComment> comments = document.GetComments();
+
+        OdfComment readBack = Assert.Single(comments);
+        Assert.Equal("審閱者", readBack.Author);
+        Assert.Equal("請修訂措辭", readBack.Text);
+        OdfComment reply = Assert.Single(readBack.Replies);
+        Assert.Equal("作者", reply.Author);
+        Assert.Equal("已修訂", reply.Text);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.GetIndexes"/> 可讀回文件中所有索引物件（字母索引與目錄）。
+    /// </summary>
+    [Fact]
+    public void GetIndexes_ReturnsAllIndexObjectsInDocument()
+    {
+        using var document = TextDocument.Create();
+        document.AddAlphabeticalIndex("術語索引");
+        document.AddTableOfContents("文件目錄", 2);
+
+        List<OdfIndex> indexes = document.GetIndexes();
+
+        Assert.Equal(2, indexes.Count);
+        Assert.Contains(indexes, i => i is OdfAlphabeticalIndex && i.Name == "術語索引");
+        Assert.Contains(indexes, i => i is OdfTableOfContents);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.RecordTrackedChange"/> 可記錄附帶額外內容與原始樣式名稱的修訂。
+    /// </summary>
+    [Fact]
+    public void RecordTrackedChange_RecordsChangeWithExtraContentAndOriginalStyle()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph deletedPara = document.AddParagraph("待刪除內容");
+
+        string changeId = document.RecordTrackedChange("deletion", deletedPara.Node, "OriginalStyle", "paragraph");
+
+        OdfTrackedChange change = document.GetTrackedChanges().Single(c => c.RegionId == changeId);
+        Assert.Equal(OdfChangeType.Deletion, change.ChangeType);
+        Assert.Equal("待刪除內容", change.Content);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.RejectAllChanges"/> 為 <see cref="TextDocument.RejectAllTrackedChanges"/> 之別名，可正確拒絕所有修訂。
+    /// </summary>
+    [Fact]
+    public void RejectAllChanges_RejectsAllTrackedChangesInDocument()
+    {
+        using var document = TextDocument.Create();
+        document.TrackedChanges = true;
+        document.AddParagraph("插入文字");
+
+        Assert.NotEmpty(document.GetTrackedChanges());
+
+        document.RejectAllChanges();
+
+        Assert.Empty(document.GetTrackedChanges());
+        string contentXml = SaveAndGetContentXml(document);
+        Assert.DoesNotContain("插入文字", contentXml);
+    }
+
     private static string SaveAndGetContentXml(TextDocument document)
     {
         using var stream = new MemoryStream();

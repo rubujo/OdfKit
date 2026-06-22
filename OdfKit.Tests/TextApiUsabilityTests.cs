@@ -274,4 +274,133 @@ public class TextApiUsabilityTests
         Assert.Contains("endnote", contentXml);
         Assert.Contains("這是尾注內容。", contentXml);
     }
+
+    /// <summary>
+    /// 驗證可在段落中插入文獻標記並 round-trip。
+    /// </summary>
+    [Fact]
+    public void AddBibliographyMark_PersistsAttributesInOdt()
+    {
+        using var doc = TextDocument.Create();
+        OdfParagraph para = doc.AddParagraph("依據文獻一所述");
+        OdfBibliographyMark mark = para.AddBibliographyMark("ref1", "article", "Ada Lovelace", "分析機之上的筆記", "1843");
+
+        Assert.Equal("ref1", mark.Identifier);
+        Assert.Equal("article", mark.BibliographyType);
+        Assert.Equal("Ada Lovelace", mark.Author);
+        Assert.Equal("分析機之上的筆記", mark.Title);
+        Assert.Equal("1843", mark.Year);
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(ms, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+        Assert.Contains("text:bibliography-mark", contentXml);
+        Assert.Contains("text:identifier=\"ref1\"", contentXml);
+        Assert.Contains("text:author=\"Ada Lovelace\"", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證可在段落中插入定位點（Tab）字元並 round-trip。
+    /// </summary>
+    [Fact]
+    public void AddTab_PersistsTabElementInOdt()
+    {
+        using var doc = TextDocument.Create();
+        OdfParagraph para = doc.AddParagraph("前段");
+        para.AddTextRun("左");
+        para.AddTab();
+        para.AddTextRun("右");
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(ms, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+        Assert.Contains("<text:tab", contentXml);
+
+        ms.Position = 0;
+        using TextDocument loaded = TextDocument.Load(ms);
+        OdfParagraph loadedPara = loaded.Body.Paragraphs.Single(p => p.TextContent.Contains("左", StringComparison.Ordinal));
+        Assert.Contains(loadedPara.Node.Children, child => child.LocalName == "tab");
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfTextRun.WithFontName"/> 可同時設定西文、東亞與複雜文字字型並 round-trip。
+    /// </summary>
+    [Fact]
+    public void WithFontName_SetsWesternAsianAndComplexFontsAndPersists()
+    {
+        using var doc = TextDocument.Create();
+        OdfParagraph para = doc.AddParagraph();
+        OdfTextRun run = para.AddTextRun("多語字型文字").WithFontName("Calibri", "微軟正黑體", "Arial");
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(ms, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+        Assert.Contains("Calibri", contentXml);
+        Assert.Contains("微軟正黑體", contentXml);
+        Assert.Contains("Arial", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextRunFormattingBuilder.Underline"/> 經由段落 Fluent builder 套用後可正確 round-trip。
+    /// </summary>
+    [Fact]
+    public void TextParagraphBuilderAppend_UnderlineFormattingPersists()
+    {
+        using TextDocument document = TextDocument.Builder()
+            .AddParagraph(paragraph => paragraph
+                .Append("一般文字 ")
+                .Append("底線文字", format => format.Underline()))
+            .Build();
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using TextDocument loaded = TextDocument.Load(stream);
+        OdfParagraph loadedPara = loaded.Body.Paragraphs.Single();
+        OdfTextRun underlineRun = loadedPara.Runs.Single(r => r.Text == "底線文字");
+        Assert.True(underlineRun.IsUnderline);
+
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+        Assert.Contains("text-underline-style", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfSubDocumentReference"/> record 衍生方法（相等性、解構、複製）的正確性。
+    /// </summary>
+    [Fact]
+    public void OdfSubDocumentReference_RecordSemanticsAreCorrect()
+    {
+        var reference = new OdfSubDocumentReference("Chapter1", "chapter1.odt");
+        var sameValue = new OdfSubDocumentReference("Chapter1", "chapter1.odt");
+        var differentValue = new OdfSubDocumentReference("Chapter2", "chapter2.odt");
+
+        // Equals 與 GetHashCode：依值相等而非參考相等
+        Assert.Equal(reference, sameValue);
+        Assert.Equal(reference.GetHashCode(), sameValue.GetHashCode());
+        Assert.NotEqual(reference, differentValue);
+
+        // Deconstruct：可解構為個別變數
+        (string sectionName, string href) = reference;
+        Assert.Equal("Chapter1", sectionName);
+        Assert.Equal("chapter1.odt", href);
+
+        // <Clone>$（With 表達式）：產生具有部分新值的複本，且不影響原始執行個體
+        OdfSubDocumentReference clone = reference with { Href = "chapter1-revised.odt" };
+        Assert.Equal("Chapter1", clone.SectionName);
+        Assert.Equal("chapter1-revised.odt", clone.Href);
+        Assert.Equal("chapter1.odt", reference.Href);
+        Assert.NotEqual(reference, clone);
+    }
 }
