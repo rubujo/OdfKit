@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -10,8 +11,14 @@ namespace OdfKit.Compliance;
 public static partial class OdfLocalizer
 {
     private static readonly Dictionary<string, Func<Dictionary<string, string>>> FactoryRegistrations = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly Dictionary<string, Dictionary<string, string>> DictionaryCache = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, Dictionary<string, string>> DictionaryCache = new(StringComparer.OrdinalIgnoreCase);
     private static readonly object SyncRoot = new();
+
+    /// <summary>
+    /// 取得或設定全域預設的文化特性。若設定，將覆蓋執行緒預設語系。
+    /// </summary>
+    public static CultureInfo? DefaultCulture { get; set; }
+
 
     /// <summary>
     /// 取得指定規則識別碼與文化特性的建議修復指引。
@@ -26,7 +33,7 @@ public static partial class OdfLocalizer
             return string.Empty;
         }
 
-        var dict = ResolveDictionary(culture ?? CultureInfo.CurrentUICulture);
+        var dict = ResolveDictionary(culture ?? DefaultCulture ?? CultureInfo.CurrentUICulture);
         if (dict is not null && dict.TryGetValue(ruleId, out var fix))
         {
             return fix;
@@ -44,19 +51,29 @@ public static partial class OdfLocalizer
     }
 
     /// <summary>
+    /// 取得指定鍵值的本地化錯誤/警告訊息（使用環境語系）。
+    /// </summary>
+    /// <param name="messageKey">訊息鍵值</param>
+    /// <returns>對應語系的本地化訊息</returns>
+    public static string GetMessage(string messageKey)
+    {
+        return GetMessage(messageKey, (CultureInfo?)null);
+    }
+
+    /// <summary>
     /// 取得指定鍵值與文化特性的本地化錯誤/警告訊息。
     /// </summary>
     /// <param name="messageKey">訊息鍵值</param>
     /// <param name="culture">指定的文化特性；若為 null 則自動偵測環境語系</param>
     /// <returns>對應語系的本地化訊息</returns>
-    public static string GetMessage(string messageKey, CultureInfo? culture = null)
+    public static string GetMessage(string messageKey, CultureInfo? culture)
     {
         if (string.IsNullOrEmpty(messageKey))
         {
             return string.Empty;
         }
 
-        var dict = ResolveDictionary(culture ?? CultureInfo.CurrentUICulture);
+        var dict = ResolveDictionary(culture ?? DefaultCulture ?? CultureInfo.CurrentUICulture);
         if (dict is not null && dict.TryGetValue(messageKey, out var msg))
         {
             return msg;
@@ -69,6 +86,45 @@ public static partial class OdfLocalizer
         }
 
         return messageKey;
+    }
+
+    /// <summary>
+    /// 取得指定鍵值的本地化錯誤/警告訊息，並使用指定參數進行格式化（使用環境語系）。
+    /// </summary>
+    /// <param name="messageKey">訊息鍵值</param>
+    /// <param name="args">格式化參數</param>
+    /// <returns>格式化後的本地化訊息</returns>
+    public static string GetMessage(string messageKey, params object?[] args)
+    {
+        string format = GetMessage(messageKey, (CultureInfo?)null);
+        try
+        {
+            return string.Format(DefaultCulture ?? CultureInfo.CurrentUICulture, format, args);
+        }
+        catch (FormatException)
+        {
+            return format;
+        }
+    }
+
+    /// <summary>
+    /// 取得指定鍵值與文化特性的本地化錯誤/警告訊息，並使用指定參數進行格式化。
+    /// </summary>
+    /// <param name="messageKey">訊息鍵值</param>
+    /// <param name="culture">指定的文化特性；若為 null 則自動偵測環境語系</param>
+    /// <param name="args">格式化參數</param>
+    /// <returns>格式化後的本地化訊息</returns>
+    public static string GetMessage(string messageKey, CultureInfo? culture, params object?[] args)
+    {
+        string format = GetMessage(messageKey, culture);
+        try
+        {
+            return string.Format(culture ?? DefaultCulture ?? CultureInfo.CurrentUICulture, format, args);
+        }
+        catch (FormatException)
+        {
+            return format;
+        }
     }
 
     private static Dictionary<string, string>? ResolveDictionary(CultureInfo culture)
@@ -84,9 +140,14 @@ public static partial class OdfLocalizer
                 name = "en";
             }
 
+            if (DictionaryCache.TryGetValue(name, out var cached))
+            {
+                return cached;
+            }
+
             lock (SyncRoot)
             {
-                if (DictionaryCache.TryGetValue(name, out var cached))
+                if (DictionaryCache.TryGetValue(name, out cached))
                 {
                     return cached;
                 }
@@ -94,6 +155,13 @@ public static partial class OdfLocalizer
                 if (FactoryRegistrations.TryGetValue(name, out var factory))
                 {
                     var dict = factory();
+                    MergeExceptionDictionary(name, dict);
+                    DictionaryCache[name] = dict;
+                    return dict;
+                }
+                else if (ExceptionDictionaries.TryGetValue(name, out var excDict))
+                {
+                    var dict = new Dictionary<string, string>(excDict, StringComparer.Ordinal);
                     DictionaryCache[name] = dict;
                     return dict;
                 }
@@ -108,21 +176,43 @@ public static partial class OdfLocalizer
         }
 
         // 若完全沒有，回退到 en
+        if (DictionaryCache.TryGetValue("en", out var cachedEn))
+        {
+            return cachedEn;
+        }
         lock (SyncRoot)
         {
-            if (DictionaryCache.TryGetValue("en", out var cachedEn))
+            if (DictionaryCache.TryGetValue("en", out cachedEn))
             {
                 return cachedEn;
             }
             if (FactoryRegistrations.TryGetValue("en", out var factoryEn))
             {
                 var dict = factoryEn();
+                MergeExceptionDictionary("en", dict);
+                DictionaryCache["en"] = dict;
+                return dict;
+            }
+            else if (ExceptionDictionaries.TryGetValue("en", out var excDictEn))
+            {
+                var dict = new Dictionary<string, string>(excDictEn, StringComparer.Ordinal);
                 DictionaryCache["en"] = dict;
                 return dict;
             }
         }
 
         return null;
+    }
+
+    private static void MergeExceptionDictionary(string name, Dictionary<string, string> target)
+    {
+        if (ExceptionDictionaries.TryGetValue(name, out var excDict))
+        {
+            foreach (var kvp in excDict)
+            {
+                target[kvp.Key] = kvp.Value;
+            }
+        }
     }
 
     private static string BuildDefaultSuggestedFix(string ruleId)

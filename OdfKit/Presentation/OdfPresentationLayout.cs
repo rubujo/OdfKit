@@ -4,6 +4,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 /// <summary>
@@ -95,7 +96,7 @@ public partial class PresentationDocument
     public OdfMasterPage AddMasterPage(string name, OdfMasterPageDefinition def)
     {
         if (string.IsNullOrEmpty(name))
-            throw new ArgumentException("母片名稱不可為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPresentationLayout_NameCannotBeEmpty_2"), nameof(name));
         if (def is null)
             throw new ArgumentNullException(nameof(def));
 
@@ -142,11 +143,11 @@ public partial class PresentationDocument
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)
         {
-            throw new ArgumentOutOfRangeException(nameof(slideIndex), "投影片索引超出範圍。");
+            throw new ArgumentOutOfRangeException(nameof(slideIndex), OdfLocalizer.GetMessage("Err_OdfPresentationLayout_SlideIndexOutRange_3"));
         }
         if (string.IsNullOrEmpty(masterPageName))
         {
-            throw new ArgumentException("母片名稱不可為空。", nameof(masterPageName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPresentationLayout_NameCannotBeEmpty_2"), nameof(masterPageName));
         }
         Slides[slideIndex].MasterPageName = masterPageName;
     }
@@ -160,7 +161,7 @@ public partial class PresentationDocument
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)
         {
-            throw new ArgumentOutOfRangeException(nameof(slideIndex), "投影片索引超出範圍。");
+            throw new ArgumentOutOfRangeException(nameof(slideIndex), OdfLocalizer.GetMessage("Err_OdfPresentationLayout_SlideIndexOutRange_3"));
         }
         var slide = Slides[slideIndex];
         string? layoutName = slide.PresentationPageLayoutName;
@@ -183,7 +184,7 @@ public partial class PresentationDocument
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)
         {
-            throw new ArgumentOutOfRangeException(nameof(slideIndex), "投影片索引超出範圍。");
+            throw new ArgumentOutOfRangeException(nameof(slideIndex), OdfLocalizer.GetMessage("Err_OdfPresentationLayout_SlideIndexOutRange_3"));
         }
 
         string layoutName = layout switch

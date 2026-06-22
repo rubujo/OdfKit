@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 
 using OdfKit.Core;
@@ -36,7 +37,7 @@ internal static class FormulaDateTimeFunctionHandlers
         }
 
         string s = val.ToString() ?? "";
-        if (double.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double num))
+        if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out double num))
         {
             try
             {
@@ -60,7 +61,7 @@ internal static class FormulaDateTimeFunctionHandlers
             catch { }
         }
 
-        if (DateTime.TryParse(s, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt))
+        if (DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt))
         {
             return true;
         }
@@ -324,7 +325,7 @@ internal static class FormulaDateTimeFunctionHandlers
         var val = arguments[0].Evaluate(context);
         if (val is not string s)
             return OdfFormulaError.Value;
-        if (DateTime.TryParse(s, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime dt))
+        if (DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt))
         {
             return Math.Floor((dt.Date - Epoch).TotalDays);
         }
@@ -338,7 +339,7 @@ internal static class FormulaDateTimeFunctionHandlers
         var val = arguments[0].Evaluate(context);
         if (val is not string s)
             return OdfFormulaError.Value;
-        if (DateTime.TryParse(s, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime dt))
+        if (DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt))
         {
             return dt.TimeOfDay.TotalDays;
         }

@@ -115,7 +115,7 @@ internal static class OdfDocumentSettingsEngine
     internal static double GetZoomLevel(OdfNode settingsDom)
     {
         var entry = FindSettingsConfigItem(settingsDom, "ZoomValue");
-        if (entry != null && double.TryParse(entry.TextContent, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var val))
+        if (entry != null && double.TryParse(entry.TextContent, NumberStyles.Float, CultureInfo.InvariantCulture, out var val))
             return val;
         return 100.0;
     }

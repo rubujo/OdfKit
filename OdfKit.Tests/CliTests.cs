@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 using OdfKit.Cli;
@@ -1404,7 +1405,7 @@ public class CliTests
             path,
             "@echo off\r\n" +
             "echo baseline-ok %1\r\n" +
-            "exit /b " + exitCode.ToString(System.Globalization.CultureInfo.InvariantCulture) + "\r\n",
+            "exit /b " + exitCode.ToString(CultureInfo.InvariantCulture) + "\r\n",
             Encoding.ASCII);
         return path;
     }

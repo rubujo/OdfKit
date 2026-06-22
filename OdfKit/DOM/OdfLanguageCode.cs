@@ -1,5 +1,6 @@
 ﻿using System;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -16,7 +17,7 @@ public readonly struct OdfLanguageCode : IEquatable<OdfLanguageCode>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("語言代碼必須是 1 到 8 個英文字母。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfLanguageCode_LanguageCode18"), nameof(value));
         }
 
         Value = value;

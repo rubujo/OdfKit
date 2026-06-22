@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.IO.Compression;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -79,7 +80,7 @@ namespace OdfKit.Tests
 
             // Verify it writes empty paragraph and office:value-type="string"
             ms.Position = 0;
-            using (var archive = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Read))
+            using (var archive = new ZipArchive(ms, ZipArchiveMode.Read))
             {
                 var entry = archive.GetEntry("content.xml");
                 Assert.NotNull(entry);

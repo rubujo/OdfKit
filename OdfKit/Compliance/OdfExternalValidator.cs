@@ -57,19 +57,19 @@ public static class OdfExternalValidator
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(filePath))
-            throw new ArgumentException("文件路徑不可空白。", nameof(filePath));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_FileCannotBeEmpty_2"), nameof(filePath));
 
         if (!File.Exists(filePath))
-            throw new FileNotFoundException("找不到要驗證的文件。", filePath);
+            throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_FileVerifiedCannotFound_2"), filePath);
 
         string? resolvedJarPath = string.IsNullOrWhiteSpace(jarPath)
             ? Environment.GetEnvironmentVariable(OdfValidatorJarEnvironmentVariable)
             : jarPath;
         if (string.IsNullOrWhiteSpace(resolvedJarPath))
-            throw new ArgumentException("未提供 ODF Validator JAR 路徑。", nameof(jarPath));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_OdfValidatorJarPath"), nameof(jarPath));
 
         if (!File.Exists(resolvedJarPath))
-            throw new FileNotFoundException("找不到 ODF Validator JAR。", resolvedJarPath);
+            throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_OdfNotFound"), resolvedJarPath);
 
         string resolvedJavaPath = string.IsNullOrWhiteSpace(javaPath) ? "java" : javaPath!;
         return RunProcessAsync(
@@ -113,16 +113,16 @@ public static class OdfExternalValidator
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(commandPath))
-            throw new ArgumentException("外部命令路徑不可空白。", nameof(commandPath));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_ExternalCannotBeEmpty"), nameof(commandPath));
 
         if (string.IsNullOrWhiteSpace(filePath))
-            throw new ArgumentException("文件路徑不可空白。", nameof(filePath));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_FileCannotBeEmpty_2"), nameof(filePath));
 
         if (!File.Exists(commandPath))
-            throw new FileNotFoundException("找不到外部命令。", commandPath);
+            throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_ExternalNotFound"), commandPath);
 
         if (!File.Exists(filePath))
-            throw new FileNotFoundException("找不到要驗證的文件。", filePath);
+            throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_FileVerifiedCannotFound_2"), filePath);
 
         return RunProcessAsync(commandPath, [filePath], timeoutMilliseconds, cancellationToken);
     }
@@ -136,7 +136,7 @@ public static class OdfExternalValidator
         cancellationToken.ThrowIfCancellationRequested();
 
         if (timeoutMilliseconds <= 0)
-            throw new ArgumentOutOfRangeException(nameof(timeoutMilliseconds), "逾時必須大於 0。");
+            throw new ArgumentOutOfRangeException(nameof(timeoutMilliseconds), OdfLocalizer.GetMessage("Err_OdfExternalValidator_TimeoutGreater0"));
 
         using var process = new Process();
         process.StartInfo = new ProcessStartInfo
@@ -157,7 +157,7 @@ public static class OdfExternalValidator
         if (!exited)
         {
             TryKillProcess(process);
-            throw new TimeoutException("外部 ODF 驗證器逾時。");
+            throw new TimeoutException(OdfLocalizer.GetMessage("Err_OdfExternalValidator_ExternalOdfValidatorTimed"));
         }
 
         string standardOutput = await standardOutputTask.ConfigureAwait(false);

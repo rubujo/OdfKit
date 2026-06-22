@@ -180,7 +180,7 @@ public static class OdfDocumentFactory
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
         if (OdfDocumentKindDetector.IsFlatKind(kind))
-            throw new ArgumentException("扁平 ODF 類型必須使用 WriteFlatXml 建立。", nameof(kind));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocumentFactory_FlatOdfTypesCreated_2"), nameof(kind));
 
         var package = OdfPackage.Create(stream, leaveOpen, options);
         InitializeMinimalPackage(package, kind, version);
@@ -204,7 +204,7 @@ public static class OdfDocumentFactory
         if (path is null)
             throw new ArgumentNullException(nameof(path));
         if (OdfDocumentKindDetector.IsFlatKind(kind))
-            throw new ArgumentException("扁平 ODF 類型必須使用 WriteFlatXml 建立。", nameof(kind));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocumentFactory_FlatOdfTypesCreated_2"), nameof(kind));
 
         var package = OdfPackage.Create(path, options);
         InitializeMinimalPackage(package, kind, version);
@@ -230,7 +230,7 @@ public static class OdfDocumentFactory
         OdfDocumentKind flatKind = OdfDocumentKindDetector.ToFlatKind(kind);
         if (!OdfDocumentKindDetector.IsFlatKind(flatKind))
         {
-            throw new ArgumentException("所提供的文件類型不具備扁平 XML ODF 格式。", nameof(kind));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocumentFactory_ProvidedFileTypeFlat"), nameof(kind));
         }
 
         var settings = new XmlWriterSettings
@@ -271,7 +271,7 @@ public static class OdfDocumentFactory
         if (package is null)
             throw new ArgumentNullException(nameof(package));
         if (OdfDocumentKindDetector.IsFlatKind(kind))
-            throw new ArgumentException("扁平 ODF 類型無法儲存為封裝 ODF 類型。", nameof(kind));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocumentFactory_FlatOdfTypesCannot"), nameof(kind));
 
         string mimeType = GetMimeType(kind);
         string versionText = FormatVersion(version);
@@ -345,7 +345,7 @@ public static class OdfDocumentFactory
             OdfDocumentKind.ImageTemplate => "application/vnd.oasis.opendocument.image-template",
             OdfDocumentKind.Database => "application/vnd.oasis.opendocument.base",
             OdfDocumentKind.TextWeb => "application/vnd.oasis.opendocument.text-web",
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, OdfLocalizer.GetMessage("Err_OdfDocumentFactory_UnsupportedOdfFileType_3"))
         };
     }
 
@@ -361,7 +361,7 @@ public static class OdfDocumentFactory
             OdfDocumentKind.Formula or OdfDocumentKind.FormulaTemplate or OdfDocumentKind.FlatFormula => "formula",
             OdfDocumentKind.Image or OdfDocumentKind.ImageTemplate or OdfDocumentKind.FlatImage => "image",
             OdfDocumentKind.Database => "database",
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, OdfLocalizer.GetMessage("Err_OdfDocumentFactory_UnsupportedOdfFileType_3"))
         };
     }
 
@@ -389,7 +389,7 @@ public static class OdfDocumentFactory
             OdfVersion.Odf12 => "1.2",
             OdfVersion.Odf13 => "1.3",
             OdfVersion.Odf14 => "1.4",
-            _ => throw new ArgumentOutOfRangeException(nameof(version), version, "必須指定具體的 ODF 版本。")
+            _ => throw new ArgumentOutOfRangeException(nameof(version), version, OdfLocalizer.GetMessage("Err_OdfDocumentFactory_SpecificOdfVersionSpecified"))
         };
     }
 
@@ -484,7 +484,7 @@ public static class OdfDocumentFactory
             OdfDocumentKind.FlatImage => new FlatImageDocument(package),
             OdfDocumentKind.Database => new OdfDatabaseDocument(package),
             OdfDocumentKind.TextWeb => new TextWebDocument(package),
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "不支援的 ODF 文件類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, OdfLocalizer.GetMessage("Err_OdfDocumentFactory_UnsupportedOdfFileType_3"))
         };
     }
 }

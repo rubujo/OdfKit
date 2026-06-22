@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
 /// <summary>
@@ -184,7 +185,7 @@ public sealed class OdfMathBuilder
     {
         if (rows is null || rows.Length == 0)
         {
-            throw new ArgumentException("矩陣必須包含至少一列。", nameof(rows));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfMathBuilder_MatrixContainLeastOne"), nameof(rows));
         }
 
         var rowTokens = new OdfMathToken[rows.Length];
@@ -206,7 +207,7 @@ public sealed class OdfMathBuilder
     {
         if (_tokens.Count == 0)
         {
-            throw new InvalidOperationException("尚未附加任何 MathML token。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfMathBuilder_NoMathmlTokenAttached"));
         }
 
         return _tokens.Count == 1 ? _tokens[0] : OdfMathToken.Row(_tokens.ToArray());
@@ -235,7 +236,7 @@ public sealed class OdfMathBuilder
         build(builder);
         if (builder._tokens.Count == 0)
         {
-            throw new InvalidOperationException("群組內容不能為空。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfMathBuilder_GroupCannotBeEmpty"));
         }
 
         return OdfMathToken.Row(builder._tokens.ToArray());

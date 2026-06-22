@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -17,7 +18,7 @@ public readonly struct OdfStyleName : IEquatable<OdfStyleName>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("樣式名稱必須是有效的 XML NCName。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfStyleName_StyleNameValidXml"), nameof(value));
         }
 
         Value = value;

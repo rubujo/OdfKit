@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Text;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -2106,7 +2108,7 @@ public class TypedDomParityTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfNodeChildList"/> 透過 <see cref="System.Collections.Generic.IList{T}"/>
+    /// 驗證 <see cref="OdfNodeChildList"/> 透過 <see cref="IList{T}"/>
     /// 介面公開的 <c>Insert(int, OdfNode)</c>／<c>RemoveAt(int)</c>：插入後相鄰節點的雙向鏈結
     /// （<c>PreviousSibling</c>／<c>NextSibling</c>）與 <c>SiblingIndex</c> 快取必須正確重新編號；
     /// 移除後節點不可再透過 <c>Parent</c>／<c>SiblingIndex</c> 殘留懸空參照，且父節點的
@@ -2287,7 +2289,7 @@ public class TypedDomParityTests
             .AppendElement((TextPElement)clone);
         OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
         stream.Position = 0;
-        string xml = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+        string xml = Encoding.UTF8.GetString(stream.ToArray());
 
         Assert.Contains("ext:custom-flag=\"preserved\"", xml, StringComparison.Ordinal);
         Assert.DoesNotContain("ns1:custom-flag", xml, StringComparison.Ordinal);

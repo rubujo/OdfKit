@@ -2,6 +2,7 @@
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -33,7 +34,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfStyleLineBreak.Normal => "normal",
             OdfStyleLineBreak.Strict => "strict",
-            _ => throw new ArgumentOutOfRangeException(nameof(lineBreak), lineBreak, "未知的 ODF 斷行規則。")
+            _ => throw new ArgumentOutOfRangeException(nameof(lineBreak), lineBreak, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfLineBreaking"))
         };
     }
 
@@ -63,7 +64,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfStyleRepeat.NoRepeat => "no-repeat",
             OdfStyleRepeat.Repeat => "repeat",
             OdfStyleRepeat.Stretch => "stretch",
-            _ => throw new ArgumentOutOfRangeException(nameof(repeat), repeat, "未知的 ODF 背景重複。")
+            _ => throw new ArgumentOutOfRangeException(nameof(repeat), repeat, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfBackgroundDuplicate"))
         };
     }
 
@@ -85,7 +86,7 @@ internal static partial class OdfElementSchemaRegistry
         return type switch
         {
             OdfXLinkType.Simple => "simple",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "未知的 ODF XLink 類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfXlinkType"))
         };
     }
 
@@ -119,7 +120,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfXLinkShow.New => "new",
             OdfXLinkShow.None => "none",
             OdfXLinkShow.Replace => "replace",
-            _ => throw new ArgumentOutOfRangeException(nameof(show), show, "未知的 ODF XLink 顯示行為。")
+            _ => throw new ArgumentOutOfRangeException(nameof(show), show, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfXlinkDisplay"))
         };
     }
 
@@ -145,7 +146,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfXLinkActuate.OnLoad => "onLoad",
             OdfXLinkActuate.OnRequest => "onRequest",
-            _ => throw new ArgumentOutOfRangeException(nameof(actuate), actuate, "未知的 ODF XLink 觸發行為。")
+            _ => throw new ArgumentOutOfRangeException(nameof(actuate), actuate, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfXlinkTriggering"))
         };
     }
 
@@ -171,7 +172,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfNumberStyle.Short => "short",
             OdfNumberStyle.Long => "long",
-            _ => throw new ArgumentOutOfRangeException(nameof(style), style, "未知的 ODF 數字樣式長短。")
+            _ => throw new ArgumentOutOfRangeException(nameof(style), style, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfNumberStyle"))
         };
     }
 
@@ -197,7 +198,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfTableOrder.Ascending => "ascending",
             OdfTableOrder.Descending => "descending",
-            _ => throw new ArgumentOutOfRangeException(nameof(order), order, "未知的 ODF 表格排序方向。")
+            _ => throw new ArgumentOutOfRangeException(nameof(order), order, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTableSort"))
         };
     }
 
@@ -263,7 +264,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfTableType.RowPercentage => "row-percentage",
             OdfTableType.RunningTotal => "running-total",
             OdfTableType.TotalPercentage => "total-percentage",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "未知的 ODF 表格類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTableType"))
         };
     }
 

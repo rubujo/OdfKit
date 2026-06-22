@@ -1,6 +1,7 @@
 ﻿using System;
 using OdfKit.Chart;
 
+using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 public partial class SpreadsheetDocument
@@ -37,7 +38,7 @@ public partial class SpreadsheetDocument
     public OdfChartDocument GetEmbeddedChartDocument(string objectPath)
     {
         if (string.IsNullOrWhiteSpace(objectPath))
-            throw new ArgumentException("嵌入圖表路徑不可為空。", nameof(objectPath));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_EmbeddedCannotBeEmpty"), nameof(objectPath));
 
         string normalized = objectPath.Trim();
         if (normalized.EndsWith("/", StringComparison.Ordinal))

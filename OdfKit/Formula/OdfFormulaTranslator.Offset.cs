@@ -2,6 +2,7 @@
 using System.Text;
 using OdfKit.Spreadsheet;
 
+using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
 public static partial class OdfFormulaTranslator
@@ -102,7 +103,7 @@ public static partial class OdfFormulaTranslator
         int newCol = addr.IsColumnAbsolute ? addr.Column : addr.Column + colOffset;
 
         if (newRow < 0 || newCol < 0)
-            throw new ArgumentOutOfRangeException(nameof(addr), "Index offset results in out of bounds coordinate.");
+            throw new ArgumentOutOfRangeException(nameof(addr), OdfLocalizer.GetMessage("Err_OdfFormulaTranslator_IndexOffsetResultsOut"));
 
         return new OdfCellAddress(newRow, newCol, addr.SheetName,
             addr.IsRowAbsolute, addr.IsColumnAbsolute, addr.IsSheetAbsolute);

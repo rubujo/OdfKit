@@ -201,8 +201,8 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     public void SetValue(double val)
     {
         ValueType = "float";
-        RawValue = val.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        DisplayText = val.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        RawValue = val.ToString(CultureInfo.InvariantCulture);
+        DisplayText = val.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>

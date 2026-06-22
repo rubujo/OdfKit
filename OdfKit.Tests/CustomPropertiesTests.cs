@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.IO;
+using System;
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.Text;
@@ -153,7 +154,7 @@ public class CustomPropertiesTests
             bytes = doc.SaveToBytes();
         }
 
-        using var ms2 = new System.IO.MemoryStream(bytes);
+        using var ms2 = new MemoryStream(bytes);
         using var loaded = (TextDocument)OdfDocumentFactory.LoadDocument(ms2);
         Assert.Equal("Bob", loaded.GetCustomProperty("Author") as string);
         Assert.Equal(100.0, Convert.ToDouble(loaded.GetCustomProperty("Pages")));

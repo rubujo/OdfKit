@@ -20,11 +20,11 @@ public class OdfVersionDeclarationTests
 
         string manifestXml;
         using (var s = pkg.GetEntryStream("META-INF/manifest.xml"))
-            manifestXml = new System.IO.StreamReader(s).ReadToEnd();
+            manifestXml = new StreamReader(s).ReadToEnd();
 
         string contentXml;
         using (var s = pkg.GetEntryStream("content.xml"))
-            contentXml = new System.IO.StreamReader(s).ReadToEnd();
+            contentXml = new StreamReader(s).ReadToEnd();
 
         return (manifestXml, contentXml);
     }
@@ -116,7 +116,7 @@ public class OdfVersionDeclarationTests
 
         using var pkg = OdfPackage.Open(ms, leaveOpen: true);
         using var s = pkg.GetEntryStream("content.xml");
-        string contentXml = new System.IO.StreamReader(s).ReadToEnd();
+        string contentXml = new StreamReader(s).ReadToEnd();
 
         Assert.Contains("office:version=\"1.4\"", contentXml);
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -16,7 +17,7 @@ public readonly struct OdfCountryCode : IEquatable<OdfCountryCode>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("國別代碼必須是 1 到 8 個英文字母或數字。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfCountryCode_CountryCode18"), nameof(value));
         }
 
         Value = value;

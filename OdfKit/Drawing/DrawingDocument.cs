@@ -139,7 +139,7 @@ public partial class DrawingDocument : OdfDocument
         }
 
         document.Dispose();
-        throw new InvalidOperationException("指定的 ODF 文件不是 ODG 繪圖。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_DrawingDocument_SpecifiedOdfFileOdg"));
     }
 
     private void ParsePages()
@@ -304,7 +304,7 @@ public partial class DrawingDocument : OdfDocument
     /// <param name="renameMap">樣式名稱變更的對照字典</param>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
-        var srcDraw = sourceDoc as DrawingDocument ?? throw new ArgumentException("Source document must be a DrawingDocument.");
+        var srcDraw = sourceDoc as DrawingDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_DrawingDocument_SourceDocumentDrawingdocument"));
         var destDrawNode = GetDrawingNode();
         var srcDrawNode = srcDraw.GetDrawingNode();
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -60,7 +61,7 @@ public class OdfMediaManager
     {
         if (imageBytes is null || imageBytes.Length == 0)
         {
-            throw new ArgumentException("圖片資料不能為 null 或空。", nameof(imageBytes));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfMediaManager_ImageCannotBeEmpty"), nameof(imageBytes));
         }
 
         // 1. 計算 SHA-256 雜湊以進行重複資料刪除

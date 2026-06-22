@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -125,7 +126,7 @@ internal class OdfDomEvaluationContext : IEvaluationContext
         if (string.IsNullOrEmpty(valType))
         {
             string text = cellNode.TextContent;
-            if (double.TryParse(text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double d))
+            if (double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out double d))
                 return d;
             return text;
         }
@@ -133,7 +134,7 @@ internal class OdfDomEvaluationContext : IEvaluationContext
         if (valType == "float" || valType == "percentage" || valType == "currency")
         {
             string? val = cellNode.GetAttribute("value", OdfNamespaces.Office);
-            if (!string.IsNullOrEmpty(val) && double.TryParse(val, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double d))
+            if (!string.IsNullOrEmpty(val) && double.TryParse(val, NumberStyles.Any, CultureInfo.InvariantCulture, out double d))
                 return d;
             return 0.0;
         }

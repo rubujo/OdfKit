@@ -4,6 +4,7 @@ using OdfKit.DOM;
 using OdfKit.Presentation;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Drawing;
 
 /// <summary>
@@ -87,9 +88,9 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
         OdfConnectorType connectorType = OdfConnectorType.Standard)
     {
         if (string.IsNullOrEmpty(startShapeId))
-            throw new ArgumentException("起點圖形識別碼不可為空。", nameof(startShapeId));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawGroup_StartingCannotBeEmpty"), nameof(startShapeId));
         if (string.IsNullOrEmpty(endShapeId))
-            throw new ArgumentException("終點圖形識別碼不可為空。", nameof(endShapeId));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawGroup_EndCannotBeEmpty"), nameof(endShapeId));
 
         var connectorNode = OdfNodeFactory.CreateElement("connector", OdfNamespaces.Draw, "draw");
         connectorNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");

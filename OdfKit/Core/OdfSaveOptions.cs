@@ -1,5 +1,6 @@
 ﻿#pragma warning restore CS1591
 
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Compression;
 using OdfKit.Compliance;
@@ -79,7 +80,7 @@ public class OdfSaveOptions
     /// 保留供未來啟用「儲存時自動清理未被參照媒體檔案」功能使用；目前儲存管線尚未讀取此選項。
     /// </summary>
     /// <remarks>
-    /// 若需立即清理未被參照的 Pictures 媒體檔案，請改用 <see cref="OdfPackage.PruneUnusedMedia(System.Collections.Generic.IEnumerable{string})"/>
+    /// 若需立即清理未被參照的 Pictures 媒體檔案，請改用 <see cref="OdfPackage.PruneUnusedMedia(IEnumerable{string})"/>
     /// 手動傳入目前文件實際參照的媒體路徑清單。
     /// </remarks>
     public bool PruneUnusedMedia { get; set; } = true;

@@ -1,5 +1,6 @@
 ﻿using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
@@ -101,7 +102,7 @@ public sealed class OdfSheetBuilder
         int columnOffset = startColumn - 1;
         foreach (T item in items)
         {
-            object?[] values = selector(item) ?? throw new InvalidOperationException("資料列選取器不可傳回 null。");
+            object?[] values = selector(item) ?? throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_SpreadsheetDocumentBuilder_ColumnSelectorsCannotReturn"));
             for (int i = 0; i < values.Length; i++)
             {
                 _sheet.Cells[rowIndex, columnOffset + i].CellValue = values[i];
@@ -180,7 +181,7 @@ public sealed class OdfSheetBuilder
     {
         if (value < 1)
         {
-            throw new ArgumentOutOfRangeException(parameterName, "索引必須大於或等於 1。");
+            throw new ArgumentOutOfRangeException(parameterName, OdfLocalizer.GetMessage("Err_SpreadsheetDocumentBuilder_IndexGreaterEqual1"));
         }
     }
 }

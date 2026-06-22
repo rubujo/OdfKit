@@ -1,4 +1,5 @@
-﻿using OdfKit.Chart;
+﻿using System.Text;
+using OdfKit.Chart;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -60,7 +61,7 @@ internal static class OdfTableSheetChartEngine
         frame.AppendChild(objectNode);
         shapesNode.AppendChild(frame);
 
-        byte[] mimeBytes = System.Text.Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.chart");
+        byte[] mimeBytes = Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.chart");
         context.Document.Package.WriteEntry($"{objectDir}mimetype", mimeBytes, string.Empty);
 
         var chartDoc = new OdfChartDocument(context.Document.Package, objectDir);

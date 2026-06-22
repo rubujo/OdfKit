@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using OdfKit.DOM;
 using OdfKit.Formula.AST;
 
@@ -41,7 +42,7 @@ internal class CriteriaMatcher
 
     private static object ParseOperand(string val)
     {
-        if (double.TryParse(val, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double num))
+        if (double.TryParse(val, NumberStyles.Any, CultureInfo.InvariantCulture, out double num))
             return num;
         if (bool.TryParse(val, out bool b))
             return b;
@@ -89,8 +90,8 @@ internal class CriteriaMatcher
         if (val1 is bool b1 && val2 is bool b2)
             return b1.CompareTo(b2);
 
-        if (double.TryParse(val1.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double n1) &&
-            double.TryParse(val2.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double n2))
+        if (double.TryParse(val1.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double n1) &&
+            double.TryParse(val2.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double n2))
         {
             return n1.CompareTo(n2);
         }

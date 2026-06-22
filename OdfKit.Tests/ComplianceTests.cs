@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -4190,30 +4191,30 @@ namespace OdfKit.Tests
         [Fact]
         public void LocalizerResolvesCorrectTranslationsForRegisteredLanguages()
         {
-            var enFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("en"));
+            var enFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("en"));
             Assert.Contains("alternative text", enFix);
 
-            var zhFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("zh-TW"));
+            var zhFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("zh-TW"));
             Assert.Contains("為圖片加入 svg:title/svg:desc", zhFix);
 
-            var deFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("de"));
+            var deFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("de"));
             Assert.Contains("Alternativtext", deFix);
         }
 
         [Fact]
         public void LocalizerCorrectlyFallsBackToParentCulture()
         {
-            var atFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("de-AT"));
+            var atFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("de-AT"));
             Assert.Contains("Alternativtext", atFix);
 
-            var ptBrFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("pt-BR"));
+            var ptBrFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("pt-BR"));
             Assert.Contains("texto alternativo", ptBrFix);
         }
 
         [Fact]
         public void LocalizerCorrectlyFallsBackToDefaultEnglishForUnregisteredCulture()
         {
-            var jaFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new System.Globalization.CultureInfo("ja-JP"));
+            var jaFix = OdfLocalizer.GetSuggestedFix("RequireAccessibilityMetadata", new CultureInfo("ja-JP"));
             Assert.Contains("alternative text", jaFix);
         }
 
@@ -4224,7 +4225,7 @@ namespace OdfKit.Tests
             string content = "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:script=\"urn:oasis:names:tc:opendocument:xmlns:script:1.0\" office:version=\"1.2\">" +
                              "<office:scripts><office:event-listeners><script:event-listener script:event-name=\"dom-click\" script:language=\"ooo:script\" script:macro-name=\"MyMacro\" /></office:event-listeners></office:scripts>" +
                              "<office:body><office:text/></office:body></office:document-content>";
-            using MemoryStream ms = new(System.Text.Encoding.UTF8.GetBytes(content));
+            using MemoryStream ms = new(Encoding.UTF8.GetBytes(content));
 
             OdfValidationReport reportDe = OdfFlatDocumentValidator.Validate(
                 ms,

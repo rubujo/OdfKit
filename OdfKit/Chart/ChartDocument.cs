@@ -123,7 +123,7 @@ public class ChartDocument : OdfChartDocument
         }
 
         document.Dispose();
-        throw new InvalidOperationException("指定的 ODF 文件不是高階 ODC 圖表。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_ChartDocument_SpecifiedOdfFileHigh"));
     }
 
     /// <summary>

@@ -7,6 +7,7 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Parameters;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 public sealed partial class OdfBouncyCastleOpenPgpProvider
@@ -56,7 +57,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
             Array.Copy(der, 2, content, 0, content.Length);
             return content;
         }
-        throw new NotSupportedException("ECDH KDF 需要具名曲線，不支援匿名曲線參數。");
+        throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_EcdhKdfRequiresNamed"));
     }
 
     /// <summary>
@@ -77,13 +78,13 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
     private static byte[] RemoveEcdhPkcs5Padding(byte[] data)
     {
         if (data.Length == 0)
-            throw new CryptographicException("PKCS#5 解填充時資料為空。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_Pkcs5DataEmpty"));
         int padLen = data[data.Length - 1];
         if (padLen < 1 || padLen > 8 || padLen > data.Length)
-            throw new CryptographicException($"PKCS#5 填充長度無效：{padLen}。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_InvalidPkcs5Padding", padLen));
         for (int i = data.Length - padLen; i < data.Length; i++)
             if (data[i] != (byte)padLen)
-                throw new CryptographicException("PKCS#5 填充位元組驗證失敗。");
+                throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_Pkcs5PaddingByte"));
         byte[] result = new byte[data.Length - padLen];
         Array.Copy(data, 0, result, 0, result.Length);
         return result;

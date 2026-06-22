@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -28,7 +29,7 @@ internal static class OdfPackageRdfMetadataEngine
         }
         catch (XmlException ex)
         {
-            throw new InvalidDataException("ODF RDF metadata 不是有效的 RDF/XML。", ex);
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageRdfMetadataEngine_OdfRdfMetadataValid"), ex);
         }
     }
 

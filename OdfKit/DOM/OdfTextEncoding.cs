@@ -1,5 +1,6 @@
 ﻿using System;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -16,7 +17,7 @@ public readonly struct OdfTextEncoding : IEquatable<OdfTextEncoding>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("文字編碼名稱必須以英文字母開頭，後續只能包含英文字母、數字、句點、底線或連字號。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfTextEncoding_TextEncodingNameStart"), nameof(value));
         }
 
         Value = value;

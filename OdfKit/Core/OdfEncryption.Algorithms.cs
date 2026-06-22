@@ -5,6 +5,7 @@ using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Parameters;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 public static partial class OdfEncryption
@@ -44,7 +45,7 @@ public static partial class OdfEncryption
         }
         else
         {
-            throw new NotSupportedException($"不支援的總和檢查碼類型： {checksumType}");
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnsupportedChecksumType", checksumType));
         }
     }
 

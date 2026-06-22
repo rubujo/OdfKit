@@ -221,7 +221,7 @@ public class ChartHighLevelApiTests
         Assert.True(pkg.HasEntry("Object 1/mimetype"));
 
         using var contentStream = pkg.GetEntryStream("Object 1/content.xml");
-        using var reader = new System.IO.StreamReader(contentStream);
+        using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();
 
         // 驗證 cell-range-address 正確寫入 content.xml

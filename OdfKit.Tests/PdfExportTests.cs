@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Text;
+using System;
 using System.IO;
 using OdfKit.Core;
 using OdfKit.Export;
@@ -31,7 +32,7 @@ public class PdfExportTests
         ms.Position = 0;
         byte[] header = new byte[5];
         ms.Read(header, 0, 5);
-        Assert.Equal("%PDF-", System.Text.Encoding.ASCII.GetString(header));
+        Assert.Equal("%PDF-", Encoding.ASCII.GetString(header));
     }
 
     /// <summary>

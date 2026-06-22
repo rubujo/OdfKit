@@ -119,7 +119,7 @@ public class DatabaseSchemaAndFormTests
 
         using var pkg = OdfPackage.Open(stream, leaveOpen: true);
         using var entryStream = pkg.GetEntryStream("content.xml");
-        using var reader = new System.IO.StreamReader(entryStream);
+        using var reader = new StreamReader(entryStream);
         string xml = reader.ReadToEnd();
 
         // 驗證表單控制項 XML 結構
@@ -214,7 +214,7 @@ public class DatabaseSchemaAndFormTests
 
         using var pkg = OdfPackage.Open(stream, leaveOpen: true);
         using var entryStream = pkg.GetEntryStream("content.xml");
-        using var reader = new System.IO.StreamReader(entryStream);
+        using var reader = new StreamReader(entryStream);
         return reader.ReadToEnd();
     }
 }

@@ -5,6 +5,7 @@ using OdfKit.DOM;
 using OdfKit.Forms;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
@@ -24,7 +25,7 @@ internal static class TextDocumentFormControlsEngine
         IReadOnlyList<string>? listItems)
     {
         if (string.IsNullOrEmpty(name))
-            throw new ArgumentException("控制項名稱不可為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFormControlsEngine_ControlCannotBeEmpty"), nameof(name));
 
         OdfNode formsNode = FindOrCreateFormsNode(context.BodyTextRoot);
         OdfNode formNode = TextDocumentDomHelper.FindOrCreateChild(formsNode, "form", OdfNamespaces.Form, "form");

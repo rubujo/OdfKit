@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -53,7 +54,7 @@ internal static class OdfPackageEntryAccessEngine
             return entry.OpenReader();
         }
 
-        throw new FileNotFoundException($"Entry '{name}' not found in ODF package.");
+        throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_OdfPackageEntryAccessEngine_EntryNotFound", name));
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -349,7 +350,7 @@ public sealed class DomWrappersCSharpWriter
                 int counter = 1;
                 while (!usedNames.Add(propertyName))
                 {
-                    propertyName = childClassName + "SchemaChildElements" + counter.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    propertyName = childClassName + "SchemaChildElements" + counter.ToString(CultureInfo.InvariantCulture);
                     counter++;
                 }
             }

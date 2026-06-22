@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Database;
 
 public partial class OdfDatabaseDocument
@@ -38,7 +39,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("報表名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_ReportCannotBeEmpty_3"), nameof(name));
         }
 
         foreach (OdfDatabaseReportInfo report in GetReports())

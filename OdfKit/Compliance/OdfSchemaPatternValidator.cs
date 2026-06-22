@@ -31,7 +31,7 @@ public static partial class OdfSchemaPatternValidator
         if (schema is null)
             throw new ArgumentNullException(nameof(schema));
         if (string.IsNullOrWhiteSpace(patternName))
-            throw new ArgumentException("Pattern name cannot be empty.", nameof(patternName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSchemaPatternValidator_PatternCannotBeEmpty"), nameof(patternName));
 
         OdfSchemaPatternDefinition? pattern = schema.FindPattern(patternName);
         if (pattern is null)

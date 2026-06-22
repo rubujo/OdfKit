@@ -1,5 +1,6 @@
 ﻿using System;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -16,7 +17,7 @@ public readonly struct OdfColor : IEquatable<OdfColor>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("色彩值必須是 #RRGGBB 格式。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfColor_ColorValuesRrggbbFormat"), nameof(value));
         }
 
         Value = value;

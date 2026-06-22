@@ -323,8 +323,8 @@ public static class OdfToDocxConverter
             if (!string.IsNullOrEmpty(fontSize) && fontSize.EndsWith("pt", StringComparison.OrdinalIgnoreCase))
             {
                 string ptStr = fontSize!.Substring(0, fontSize.Length - 2);
-                if (double.TryParse(ptStr, System.Globalization.NumberStyles.Float,
-                    System.Globalization.CultureInfo.InvariantCulture, out double pt))
+                if (double.TryParse(ptStr, NumberStyles.Float,
+                    CultureInfo.InvariantCulture, out double pt))
                     info.FontSizePt = pt;
             }
         }
@@ -369,8 +369,8 @@ public static class OdfToDocxConverter
             if (fontSize is { Length: > 0 } && fontSize.EndsWith("pt", StringComparison.OrdinalIgnoreCase))
             {
                 string ptStr = fontSize.Substring(0, fontSize.Length - 2);
-                if (double.TryParse(ptStr, System.Globalization.NumberStyles.Float,
-                    System.Globalization.CultureInfo.InvariantCulture, out double pt))
+                if (double.TryParse(ptStr, NumberStyles.Float,
+                    CultureInfo.InvariantCulture, out double pt))
                     info.FontSizePt = pt;
             }
         }
@@ -1275,15 +1275,15 @@ public static class OdfToDocxConverter
         if (attrValue!.Length > 2 && string.Equals(attrValue.Substring(attrValue.Length - 2), "cm", StringComparison.OrdinalIgnoreCase))
         {
             string numStr = attrValue.Substring(0, attrValue.Length - 2);
-            if (double.TryParse(numStr, System.Globalization.NumberStyles.Float,
-                System.Globalization.CultureInfo.InvariantCulture, out double cm))
+            if (double.TryParse(numStr, NumberStyles.Float,
+                CultureInfo.InvariantCulture, out double cm))
                 return (long)(cm * 360_000);
         }
         else if (attrValue.Length > 2 && string.Equals(attrValue.Substring(attrValue.Length - 2), "in", StringComparison.OrdinalIgnoreCase))
         {
             string numStr = attrValue.Substring(0, attrValue.Length - 2);
-            if (double.TryParse(numStr, System.Globalization.NumberStyles.Float,
-                System.Globalization.CultureInfo.InvariantCulture, out double inches))
+            if (double.TryParse(numStr, NumberStyles.Float,
+                CultureInfo.InvariantCulture, out double inches))
                 return (long)(inches * 914_400);
         }
 
@@ -1517,7 +1517,7 @@ public static class OdfToDocxConverter
         {
             if (!_revisionIds.TryGetValue(changeId, out string? revisionId))
             {
-                revisionId = _nextRevisionId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                revisionId = _nextRevisionId.ToString(CultureInfo.InvariantCulture);
                 _revisionIds[changeId] = revisionId;
                 _nextRevisionId++;
             }

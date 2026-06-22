@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
+using OdfKit.Compliance;
 using OdfKit.Presentation;
-
 namespace OdfKit.Conversion;
 
 /// <summary>
@@ -31,7 +31,7 @@ public static class OdfPresentationOoxmlExtensions
             throw new ArgumentNullException(nameof(presentation));
 
         if (string.IsNullOrEmpty(path))
-            throw new ArgumentException("路徑不可為空。", nameof(path));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPresentationOoxmlExtensions_PathCannotBeEmpty_2"), nameof(path));
 
         string? directory = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(directory))
@@ -60,7 +60,7 @@ public static class OdfPresentationOoxmlExtensions
     public static PresentationDocument LoadPptxAsOdp(string path)
     {
         if (string.IsNullOrEmpty(path))
-            throw new ArgumentException("路徑不可為空。", nameof(path));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPresentationOoxmlExtensions_PathCannotBeEmpty_2"), nameof(path));
 
         using FileStream fileStream = File.OpenRead(path);
         return PptxToOdpConverter.Convert(fileStream);

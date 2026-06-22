@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.IO;
+using System;
 using System.Text;
 using OdfKit.Core;
 
@@ -84,7 +85,7 @@ public partial class OdfNode
 
                     // 在目的套件中註冊媒體
                     var mediaManager = new OdfMediaManager(destPackage);
-                    string fileName = System.IO.Path.GetFileName(href);
+                    string fileName = Path.GetFileName(href);
                     string newHref = mediaManager.AddImage(mediaBytes, fileName);
 
                     // 更新複製節點中的參考

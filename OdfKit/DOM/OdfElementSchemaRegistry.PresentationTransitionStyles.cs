@@ -2,6 +2,7 @@
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -285,7 +286,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfPresentationTransitionStyle.Open => "open",
             OdfPresentationTransitionStyle.Close => "close",
             OdfPresentationTransitionStyle.Melt => "melt",
-            _ => throw new ArgumentOutOfRangeException(nameof(transitionStyle), transitionStyle, "未知的 ODF 簡報轉場樣式。")
+            _ => throw new ArgumentOutOfRangeException(nameof(transitionStyle), transitionStyle, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfBriefingTransition_2"))
         };
     }
 

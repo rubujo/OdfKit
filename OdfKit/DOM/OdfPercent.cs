@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -17,7 +18,7 @@ public readonly struct OdfPercent : IEquatable<OdfPercent>
     {
         if (!TryParseCore(value, allowNegative: true, out decimal percent))
         {
-            throw new ArgumentException("百分比值必須介於 -100% 到 100% 之間。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPercent_PercentageValueBetween100"), nameof(value));
         }
 
         Value = value;

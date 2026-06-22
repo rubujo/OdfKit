@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Xml;
@@ -95,7 +96,7 @@ public partial class OdsStreamWriter
                 else if (style.height.HasValue)
                 {
                     string heightCm = style.height.Value.ToCentimeters()
-                        .ToString("F4", System.Globalization.CultureInfo.InvariantCulture) + "cm";
+                        .ToString("F4", CultureInfo.InvariantCulture) + "cm";
                     writer.WriteAttributeString("style", "row-height", OdfNamespaces.Style, heightCm);
                 }
                 writer.WriteEndElement(); // table-row-properties

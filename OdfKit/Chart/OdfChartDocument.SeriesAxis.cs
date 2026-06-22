@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Chart;
 
 public partial class OdfChartDocument
@@ -17,7 +18,7 @@ public partial class OdfChartDocument
     {
         if (string.IsNullOrWhiteSpace(cellRangeAddress))
         {
-            throw new ArgumentException("分類標籤範圍位址不能為空。", nameof(cellRangeAddress));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfChartDocument_CategoryCannotBeEmpty"), nameof(cellRangeAddress));
         }
 
         OdfNode axis = FindOrCreateAxis("x");
@@ -80,7 +81,7 @@ public partial class OdfChartDocument
     {
         if (string.IsNullOrWhiteSpace(valuesCellRangeAddress))
         {
-            throw new ArgumentException("資料範圍位址不能為空。", nameof(valuesCellRangeAddress));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfChartDocument_DataCannotBeEmpty"), nameof(valuesCellRangeAddress));
         }
 
         OdfNode plotArea = FindOrCreatePlotArea();
@@ -242,7 +243,7 @@ public partial class OdfChartDocument
     {
         if (string.IsNullOrWhiteSpace(dimension))
         {
-            throw new ArgumentException("座標軸維度不能為空。", nameof(dimension));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfChartDocument_AxisCannotBeEmpty"), nameof(dimension));
         }
     }
 

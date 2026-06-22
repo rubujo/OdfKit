@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 public abstract partial class OdfDocument
@@ -31,7 +32,7 @@ public abstract partial class OdfDocument
     public OdfMasterPage AddMasterPage(string name)
     {
         if (string.IsNullOrEmpty(name))
-            throw new ArgumentException("主控頁面名稱不可為空值。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocument_MainCannotBeEmpty"), nameof(name));
 
         var masterStyles = FindOrCreateChild(StylesDom, "master-styles", OdfNamespaces.Office, "office");
 

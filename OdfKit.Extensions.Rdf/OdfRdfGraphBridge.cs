@@ -1,7 +1,7 @@
-﻿using OdfKit.Core;
+﻿using OdfKit.Compliance;
+using OdfKit.Core;
 using VDS.RDF;
 using VDS.RDF.Query;
-
 namespace OdfKit.Extensions.Rdf;
 
 /// <summary>
@@ -57,7 +57,7 @@ public static class OdfRdfGraphBridge
 
         if (string.IsNullOrWhiteSpace(sparql))
         {
-            throw new ArgumentException("SPARQL 查詢不可為空白。", nameof(sparql));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfRdfGraphBridge_SparqlCannotBeEmpty"), nameof(sparql));
         }
 
         IGraph graph = ToGraph(metadata, baseUri);
@@ -70,7 +70,7 @@ public static class OdfRdfGraphBridge
         return result switch
         {
             SparqlResultSet or bool => result,
-            _ => throw new InvalidOperationException("僅支援 SELECT 與 ASK 查詢結果。")
+            _ => throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfRdfGraphBridge_OnlySelectAskQuery"))
         };
     }
 

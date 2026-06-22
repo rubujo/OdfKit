@@ -2,6 +2,7 @@
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -37,7 +38,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfTextKind.Gap => "gap",
             OdfTextKind.Unit => "unit",
             OdfTextKind.Value => "value",
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "未知的 ODF 文字索引項目種類。")
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTextIndex_2"))
         };
     }
 
@@ -63,7 +64,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfStyleDirection.LeftToRight => "ltr",
             OdfStyleDirection.TopToBottom => "ttb",
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "未知的 ODF 樣式方向。")
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfStyleDirection"))
         };
     }
 
@@ -89,7 +90,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfFormOrientation.Horizontal => "horizontal",
             OdfFormOrientation.Vertical => "vertical",
-            _ => throw new ArgumentOutOfRangeException(nameof(orientation), orientation, "未知的 ODF 表單方向。")
+            _ => throw new ArgumentOutOfRangeException(nameof(orientation), orientation, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfFormOrientation"))
         };
     }
 
@@ -119,7 +120,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfTableDirection.FromAnotherTable => "from-another-table",
             OdfTableDirection.ToAnotherTable => "to-another-table",
             OdfTableDirection.FromSameTable => "from-same-table",
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "未知的 ODF 表格方向。")
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTableOrientation"))
         };
     }
 
@@ -157,7 +158,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfTableOrientation.Data => "data",
             OdfTableOrientation.Hidden => "hidden",
             OdfTableOrientation.Page => "page",
-            _ => throw new ArgumentOutOfRangeException(nameof(orientation), orientation, "未知的 ODF 表格方位。")
+            _ => throw new ArgumentOutOfRangeException(nameof(orientation), orientation, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTableOrientation_2"))
         };
     }
 
@@ -223,7 +224,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfStyleFamily.Presentation => "presentation",
             OdfStyleFamily.DrawingPage => "drawing-page",
             OdfStyleFamily.Chart => "chart",
-            _ => throw new ArgumentOutOfRangeException(nameof(family), family, "未知的 ODF 樣式家族。")
+            _ => throw new ArgumentOutOfRangeException(nameof(family), family, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfStyleFamily"))
         };
     }
 

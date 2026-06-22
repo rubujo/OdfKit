@@ -205,7 +205,7 @@ public partial class OdfElement
     {
         if (value.Percent < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(value), value.Percent, "百分比值不可為負數。");
+            throw new ArgumentOutOfRangeException(nameof(value), value.Percent, OdfLocalizer.GetMessage("Err_OdfElement_PercentageValuesCannotNegative"));
         }
 
         SetAttributeValue(localName, namespaceUri, value.Value, prefix, version);

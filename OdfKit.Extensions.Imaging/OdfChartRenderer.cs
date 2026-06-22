@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using OdfKit.Chart;
 using OdfKit.Core;
@@ -297,7 +298,7 @@ public static class OdfChartRenderer
         if (val is decimal dec)
             return (double)dec;
 
-        if (double.TryParse(val.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsed))
+        if (double.TryParse(val.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double parsed))
         {
             return parsed;
         }
@@ -333,18 +334,18 @@ public static class OdfChartRenderer
         s = s.Trim().ToLowerInvariant();
         if (s.EndsWith("cm"))
         {
-            return double.TryParse(s.Substring(0, s.Length - 2), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out cm);
+            return double.TryParse(s.Substring(0, s.Length - 2), NumberStyles.Float, CultureInfo.InvariantCulture, out cm);
         }
 
         if (s.EndsWith("in"))
         {
-            if (double.TryParse(s.Substring(0, s.Length - 2), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double inches))
+            if (double.TryParse(s.Substring(0, s.Length - 2), NumberStyles.Float, CultureInfo.InvariantCulture, out double inches))
             {
                 cm = inches * 2.54;
                 return true;
             }
         }
 
-        return double.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out cm);
+        return double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out cm);
     }
 }

@@ -5,6 +5,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 public partial class OdfShape
@@ -47,6 +48,6 @@ public partial class OdfShape
     private void EnsureConnectorShape()
     {
         if (Node.LocalName != "connector" || Node.NamespaceUri != OdfNamespaces.Draw)
-            throw new InvalidOperationException("僅連接線圖形可設定路由頂點。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfShape_OnlyConnectionLineGraphics"));
     }
 }

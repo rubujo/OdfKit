@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -155,7 +156,7 @@ public class OdfSchemaGeneratorTests
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateRelaxNgFixture()));
         SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "fixture.rng");
-        using var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+        using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
         new SchemaMetadataJsonWriter().Write(metadata, writer);
 
@@ -184,7 +185,7 @@ public class OdfSchemaGeneratorTests
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateRelaxNgFixture()));
         SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
-        using var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+        using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
         new SchemaMetadataCSharpWriter().Write(metadata, writer, "FixtureSchemaMetadata");
 
@@ -218,7 +219,7 @@ public class OdfSchemaGeneratorTests
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateGrammar(
             "<define name=\"wrapped\"><div><element name=\"text:p\"><empty /></element></div></define>")));
         SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
-        using var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+        using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
         new SchemaMetadataCSharpWriter().Write(metadata, writer, "FixtureSchemaMetadata");
 
@@ -396,7 +397,7 @@ public class OdfSchemaGeneratorTests
             "<element name=\"text:p\" />" +
             "</element></define>")));
         SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
-        using var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+        using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
         new DomWrappersCSharpWriter().Write(metadata, writer);
 
@@ -686,7 +687,7 @@ public class OdfSchemaGeneratorTests
             "<define name=\"wrapper\"><element name=\"office:document-content\"><parentRef name=\"paragraph\" /></element></define>")));
         SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
         SchemaPatternMetadata wrapper = metadata.Patterns.Single(pattern => pattern.Name == "wrapper");
-        using var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+        using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
         new SchemaMetadataCSharpWriter().Write(metadata, writer, "FixtureSchemaMetadata");
 
@@ -710,7 +711,7 @@ public class OdfSchemaGeneratorTests
         SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
         SchemaPatternMetadata combined = metadata.Patterns.Single(pattern => pattern.Name == "combined");
         SchemaPatternMetadata choiceCombined = metadata.Patterns.Single(pattern => pattern.Name == "choice-combined");
-        using var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+        using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
         new SchemaMetadataCSharpWriter().Write(metadata, writer, "FixtureSchemaMetadata");
 
@@ -784,8 +785,8 @@ public class OdfSchemaGeneratorTests
         SchemaPatternNodeMetadata choice = Assert.Single(typed.PatternTree);
         SchemaPatternNodeMetadata data = choice.Children[0];
         SchemaPatternNodeMetadata value = choice.Children[1];
-        using var jsonWriter = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
-        using var csharpWriter = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+        using var jsonWriter = new StringWriter(CultureInfo.InvariantCulture);
+        using var csharpWriter = new StringWriter(CultureInfo.InvariantCulture);
 
         new SchemaMetadataJsonWriter().Write(metadata, jsonWriter);
         new SchemaMetadataCSharpWriter().Write(metadata, csharpWriter, "FixtureSchemaMetadata");
@@ -801,7 +802,7 @@ public class OdfSchemaGeneratorTests
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(CreateRelaxNgFixture()));
         SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().Read(stream, "https://example.invalid/schema.rng");
-        using var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+        using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
         new SchemaMetadataCSharpWriter().WriteProvider(metadata, writer, "FixtureSchemaMetadata");
 
@@ -823,8 +824,8 @@ public class OdfSchemaGeneratorTests
             string schemaPath = Path.Combine(directory, "schema.rng");
             string outputPath = Path.Combine(directory, "Generated", "Odf14Schema.g.cs");
             File.WriteAllText(schemaPath, CreateRelaxNgFixture(), Encoding.UTF8);
-            using var stdout = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
-            using var stderr = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+            using var stdout = new StringWriter(CultureInfo.InvariantCulture);
+            using var stderr = new StringWriter(CultureInfo.InvariantCulture);
 
             int exitCode = OdfSchemaGeneratorCli.Run(
                 new[]
@@ -862,8 +863,8 @@ public class OdfSchemaGeneratorTests
     [Fact]
     public void CliRejectsInvalidClassName()
     {
-        using var stdout = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
-        using var stderr = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+        using var stdout = new StringWriter(CultureInfo.InvariantCulture);
+        using var stderr = new StringWriter(CultureInfo.InvariantCulture);
 
         int exitCode = OdfSchemaGeneratorCli.Run(
             new[] { "--format", "csharp-provider", "--class-name", "not-a-class", "schema.rng" },
@@ -877,8 +878,8 @@ public class OdfSchemaGeneratorTests
     [Fact]
     public void CliRejectsInvalidSourceDate()
     {
-        using var stdout = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
-        using var stderr = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+        using var stdout = new StringWriter(CultureInfo.InvariantCulture);
+        using var stderr = new StringWriter(CultureInfo.InvariantCulture);
 
         int exitCode = OdfSchemaGeneratorCli.Run(
             new[] { "--source-date", "2025/10/06", "schema.rng" },
@@ -1007,7 +1008,7 @@ public class OdfSchemaGeneratorTests
                 Encoding.UTF8);
 
             SchemaMetadata metadata = new RelaxNgSchemaMetadataReader().ReadFile(rootPath);
-            using var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
+            using var writer = new StringWriter(CultureInfo.InvariantCulture);
 
             new SchemaMetadataJsonWriter().Write(metadata, writer);
 

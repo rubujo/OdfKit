@@ -4,12 +4,12 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Drawing;
 using OdfKit.Presentation;
 using OdfKit.Styles;
-
 namespace OdfKit.Export;
 
 /// <summary>
@@ -30,7 +30,7 @@ public static class OdfSvgExporter
 
         options ??= new OdfSvgExportOptions();
         if (options.PageIndex < 0 || options.PageIndex >= document.Pages.Count)
-            throw new ArgumentOutOfRangeException(nameof(options), "指定的繪圖頁面索引超出範圍。");
+            throw new ArgumentOutOfRangeException(nameof(options), OdfLocalizer.GetMessage("Err_OdfSvgExporter_SpecifiedDrawingPageIndex"));
 
         OdfDrawPage page = document.Pages[options.PageIndex];
         CanvasBounds bounds = MeasurePage(page, options);

@@ -19,7 +19,7 @@ public class MultiLevelListTests
         ms.Position = 0;
         using var pkg = OdfPackage.Open(ms, leaveOpen: true);
         using var stream = pkg.GetEntryStream("content.xml");
-        return new System.IO.StreamReader(stream).ReadToEnd();
+        return new StreamReader(stream).ReadToEnd();
     }
 
     private static string GetStylesXml(TextDocument doc)
@@ -29,7 +29,7 @@ public class MultiLevelListTests
         ms.Position = 0;
         using var pkg = OdfPackage.Open(ms, leaveOpen: true);
         using var stream = pkg.GetEntryStream("styles.xml");
-        return new System.IO.StreamReader(stream).ReadToEnd();
+        return new StreamReader(stream).ReadToEnd();
     }
 
     /// <summary>

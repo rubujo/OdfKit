@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using OdfKit.Core;
 using OdfKit.Image;
 using OdfKit.Styles;
@@ -182,7 +183,7 @@ public class ImageHighLevelApiTests
         image.SetImage(CreatePngBytes(), "Primary.png");
         image.FrameName = "PrimaryFrame";
 
-        var filter = new OdfImageFilterInfo("grayscale", new System.Collections.Generic.Dictionary<string, string>
+        var filter = new OdfImageFilterInfo("grayscale", new Dictionary<string, string>
         {
             ["intensity"] = "0.5",
         });

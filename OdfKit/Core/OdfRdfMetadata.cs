@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -316,9 +317,9 @@ public sealed class OdfRdfTriple
         if (subject is null)
             throw new ArgumentNullException(nameof(subject));
         if (string.IsNullOrWhiteSpace(predicate))
-            throw new ArgumentException("RDF 述詞不可為空白。", nameof(predicate));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfRdfMetadata_RdfCannotBeEmpty"), nameof(predicate));
         if (string.IsNullOrWhiteSpace(objectValue))
-            throw new ArgumentException("RDF 受詞不可為空白。", nameof(objectValue));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfRdfMetadata_RdfCannotBeEmpty_2"), nameof(objectValue));
 
         Subject = subject;
         Predicate = predicate;

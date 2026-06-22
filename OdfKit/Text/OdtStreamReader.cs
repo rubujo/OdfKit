@@ -1,10 +1,12 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Xml;
 using OdfKit.Core;
 
+using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
@@ -136,7 +138,7 @@ public sealed class OdtStreamReader : IDisposable
     private void OpenContentReader()
     {
         var entry = _zip.GetEntry("content.xml")
-            ?? throw new InvalidOperationException("ODT 檔案缺少 content.xml 項目。");
+            ?? throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdtStreamReader_OdtNotFound"));
         _contentStream = entry.Open();
         _reader = XmlReader.Create(_contentStream, CreateXmlReaderSettings());
     }
@@ -199,7 +201,7 @@ public sealed class OdtStreamReader : IDisposable
 
     private static int ParsePositiveInt(string? value, int defaultValue)
     {
-        return int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int parsed) && parsed > 0
+        return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed) && parsed > 0
             ? parsed
             : defaultValue;
     }

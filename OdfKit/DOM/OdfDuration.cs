@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -17,7 +18,7 @@ public readonly struct OdfDuration : IEquatable<OdfDuration>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("duration 必須是有效的 XML Schema duration 字串。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDuration_DurationValidXmlSchema"), nameof(value));
         }
 
         Value = value.Trim();

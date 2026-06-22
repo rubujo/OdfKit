@@ -18,7 +18,7 @@ public partial class OdfDatabaseDocument
         }
 
         document.Dispose();
-        throw new InvalidOperationException("指定的 ODF 文件不是 ODB 資料庫。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_SpecifiedOdfFileOdb"));
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public partial class OdfDatabaseDocument
     /// <exception cref="ArgumentException">當來源文件不是 <see cref="OdfDatabaseDocument"/> 時擲出。</exception>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
-        var source = sourceDoc as OdfDatabaseDocument ?? throw new ArgumentException("來源文件必須是 OdfDatabaseDocument。", nameof(sourceDoc));
+        var source = sourceDoc as OdfDatabaseDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_SourceFileOdfdatabasedocument"), nameof(sourceDoc));
         OdfNode sourceBody = source.FindOrCreateChild(source.ContentDom, "body", OdfNamespaces.Office, "office");
         OdfNode sourceDatabase = source.FindOrCreateChild(sourceBody, "database", OdfNamespaces.Office, "office");
         OdfNode body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
@@ -209,7 +209,7 @@ public partial class OdfDatabaseDocument
             OdfDatabaseDataSourceSettingType.Long => "long",
             OdfDatabaseDataSourceSettingType.Short => "short",
             OdfDatabaseDataSourceSettingType.String => "string",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "未知的資料來源設定型別。")
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_UnknownDataSourceSetting"))
         };
     }
 

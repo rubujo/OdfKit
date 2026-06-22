@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -18,7 +19,7 @@ public readonly struct OdfStyleNameList : IEquatable<OdfStyleNameList>
     {
         if (!TryParseItems(value, out OdfStyleName[] styleNames))
         {
-            throw new ArgumentException("樣式名稱參照清單必須符合 ODF styleNameRefs 格式。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfStyleNameList_StyleNameReferenceLists"), nameof(value));
         }
 
         Value = value;

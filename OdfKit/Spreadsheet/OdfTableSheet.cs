@@ -7,6 +7,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
@@ -205,7 +206,7 @@ public partial class OdfTableSheet
     {
         if (!OdfCellAddress.TryParse(address, out var addr))
         {
-            throw new FormatException($"Invalid cell address: '{address}'");
+            throw new FormatException(OdfLocalizer.GetMessage("Err_OdfTableSheet_InvalidCellAddress", address));
         }
         return GetCell(addr.Row, addr.Column);
     }

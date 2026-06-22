@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 
 namespace OdfKit.Compliance;
@@ -24,7 +25,7 @@ public sealed class OdfValidationIssue(
     OdfVersion? requiredVersion = null,
     string? profileId = null,
     IReadOnlyDictionary<string, string?>? details = null,
-    System.Globalization.CultureInfo? culture = null)
+    CultureInfo? culture = null)
 {
     /// <summary>
     /// 取得問題嚴重性。
@@ -64,7 +65,7 @@ public sealed class OdfValidationIssue(
     /// <summary>
     /// 取得與此問題相關的文化特性，用於本地化翻譯。
     /// </summary>
-    public System.Globalization.CultureInfo? Culture { get; set; } = culture;
+    public CultureInfo? Culture { get; set; } = culture;
 
     /// <summary>
     /// 取得可供工具處理的結構化診斷細節。
@@ -100,7 +101,7 @@ public sealed class OdfValidationIssue(
         if (RuleId == "ODF0400" || RuleId == "ODF1002")
         {
             string defaultLoc = "相關 XML 節點";
-            var current = Culture ?? System.Globalization.CultureInfo.CurrentUICulture;
+            var current = Culture ?? CultureInfo.CurrentUICulture;
             if (current != null && !current.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
             {
                 defaultLoc = "relevant XML node";

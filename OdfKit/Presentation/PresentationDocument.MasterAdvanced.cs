@@ -1,6 +1,7 @@
 ﻿using System;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 public partial class PresentationDocument
@@ -14,7 +15,7 @@ public partial class PresentationDocument
     public OdfMasterPage GetMasterPage(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("母片名稱不可為空白。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_PresentationDocument_NameCannotBeEmpty"), nameof(name));
 
         foreach (OdfMasterPage masterPage in GetMasterPages())
         {
@@ -22,6 +23,6 @@ public partial class PresentationDocument
                 return masterPage;
         }
 
-        throw new ArgumentException($"找不到母片「{name}」。", nameof(name));
+        throw new ArgumentException(OdfLocalizer.GetMessage("Err_PresentationDocument_MasterNotFound", name), nameof(name));
     }
 }

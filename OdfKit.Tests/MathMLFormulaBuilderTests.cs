@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Text;
+using System.IO;
+using System;
 using Xunit;
 using OdfKit.Formula;
 
@@ -134,12 +136,12 @@ public class MathMLFormulaBuilderTests
         using var formula = OdfFormulaDocument.Builder()
             .WithMathML("<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mi>x</mi><mo>+</mo><mi>y</mi></math>")
             .Build();
-        using var stream = new System.IO.MemoryStream();
+        using var stream = new MemoryStream();
         formula.SaveToStream(stream);
         stream.Position = 0;
         using var pkg = OdfKit.Core.OdfPackage.Open(stream, leaveOpen: true);
         using var contentStream = pkg.GetEntryStream("content.xml");
-        using var reader = new System.IO.StreamReader(contentStream);
+        using var reader = new StreamReader(contentStream);
         string content = reader.ReadToEnd();
 
         Assert.Contains("xmlns:math=\"http://www.w3.org/1998/Math/MathML\"", content);
@@ -160,11 +162,11 @@ public class MathMLFormulaBuilderTests
     {
         string contentXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mi>x</mi><mo>+</mo><mi>y</mi></math>";
 
-        using var ms = new System.IO.MemoryStream();
+        using var ms = new MemoryStream();
         using (var pkg = OdfKit.Core.OdfPackage.Create(ms, leaveOpen: true))
         {
             pkg.SetMimeType("application/vnd.oasis.opendocument.formula");
-            pkg.WriteEntry("content.xml", System.Text.Encoding.UTF8.GetBytes(contentXml), "text/xml");
+            pkg.WriteEntry("content.xml", Encoding.UTF8.GetBytes(contentXml), "text/xml");
             pkg.Save();
         }
         ms.Position = 0;
@@ -173,12 +175,12 @@ public class MathMLFormulaBuilderTests
         Assert.Equal("x+y", formula.MathText);
 
         // 重新儲存後，仍須維持真機相容的裸 math 根節點形狀（而非退化回包裹結構）。
-        using var resaved = new System.IO.MemoryStream();
+        using var resaved = new MemoryStream();
         formula.SaveToStream(resaved);
         resaved.Position = 0;
         using var resavedPkg = OdfKit.Core.OdfPackage.Open(resaved, leaveOpen: true);
         using var resavedContentStream = resavedPkg.GetEntryStream("content.xml");
-        using var resavedReader = new System.IO.StreamReader(resavedContentStream);
+        using var resavedReader = new StreamReader(resavedContentStream);
         string resavedContent = resavedReader.ReadToEnd();
         Assert.DoesNotContain("office:document-content", resavedContent);
     }

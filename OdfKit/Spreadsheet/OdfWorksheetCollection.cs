@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
@@ -59,7 +60,7 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
             OdfTableSheet? sheet = _document.GetSheet(name);
             if (sheet is null)
             {
-                throw new KeyNotFoundException($"找不到名稱為 '{name}' 的工作表。");
+                throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_OdfWorksheetCollection_SheetNamedCannotFound", name));
             }
 
             return sheet;

@@ -138,7 +138,7 @@ public partial class PresentationDocument : OdfDocument
         }
 
         document.Dispose();
-        throw new InvalidOperationException("指定的 ODF 文件不是 ODP 簡報。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_PresentationDocument_SpecifiedOdfFileOdp"));
     }
 
     private void ParseSlides()

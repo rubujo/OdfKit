@@ -14,6 +14,7 @@ using PdfSharp.Fonts;
 using ArgumentNullException = OdfKit.Export.Shim.ArgumentNullException;
 #endif
 
+using OdfKit.Compliance;
 namespace OdfKit.Export;
 
 /// <summary>
@@ -335,6 +336,6 @@ internal sealed class OdfPdfFontResolver : IFontResolver
             }
         }
 
-        throw new InvalidOperationException($"Unable to resolve font '{faceName}'.");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPdfExporter_UnableResolveFont", faceName));
     }
 }

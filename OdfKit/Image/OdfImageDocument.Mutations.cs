@@ -4,6 +4,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Image;
 
 public partial class OdfImageDocument
@@ -67,7 +68,7 @@ public partial class OdfImageDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("框架名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfImageDocument_FrameCannotBeEmpty_3"), nameof(name));
         }
 
         foreach (OdfImageFrameInfo frame in GetImageFrames())
@@ -103,7 +104,7 @@ public partial class OdfImageDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("框架名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfImageDocument_FrameCannotBeEmpty_3"), nameof(name));
         }
 
         OdfNode? frame = FindFrameByName(name);
@@ -130,7 +131,7 @@ public partial class OdfImageDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("框架名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfImageDocument_FrameCannotBeEmpty_3"), nameof(name));
         }
 
         OdfNode? frame = FindFrameByName(name);

@@ -2,8 +2,8 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using OdfKit.Compliance;
 using OdfKit.Core;
-
 namespace OdfKit.Extensions.Rendering;
 
 /// <summary>
@@ -23,7 +23,7 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
     public LibreOfficeHttpRenderer(ILibreOfficeConversionBackend? backend = null, int maxConcurrentCalls = 4)
     {
         if (maxConcurrentCalls <= 0)
-            throw new ArgumentOutOfRangeException(nameof(maxConcurrentCalls), "最大併發連線數必須大於 0。");
+            throw new ArgumentOutOfRangeException(nameof(maxConcurrentCalls), OdfLocalizer.GetMessage("Err_LibreOfficeHttpRenderer_MaximumNumberConcurrentConnections"));
 
         _backend = backend ?? new UnoserverRestBackend();
         _semaphore = new SemaphoreSlim(maxConcurrentCalls, maxConcurrentCalls);

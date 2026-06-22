@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.IO;
 using System.Security;
 using System.Text;
@@ -301,7 +302,7 @@ namespace OdfKit.Tests
             var originalUICulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
             try
             {
-                var thaiCulture = new System.Globalization.CultureInfo("th-TH");
+                var thaiCulture = new CultureInfo("th-TH");
                 System.Threading.Thread.CurrentThread.CurrentCulture = thaiCulture;
                 System.Threading.Thread.CurrentThread.CurrentUICulture = thaiCulture;
 

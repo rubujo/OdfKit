@@ -1,9 +1,11 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Database;
 
 /// <summary>
@@ -348,7 +350,7 @@ public sealed class OdfDatabaseFormDesigner
         numberNode.SetAttribute("id", FormNamespace, id, "form");
         if (value.HasValue)
         {
-            string text = value.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            string text = value.Value.ToString(CultureInfo.InvariantCulture);
             numberNode.SetAttribute("value", FormNamespace, text, "form");
             numberNode.SetAttribute("current-value", FormNamespace, text, "form");
         }
@@ -385,7 +387,7 @@ public sealed class OdfDatabaseFormDesigner
         dateNode.SetAttribute("id", FormNamespace, id, "form");
         if (value.HasValue)
         {
-            string text = value.Value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            string text = value.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             dateNode.SetAttribute("value", FormNamespace, text, "form");
             dateNode.SetAttribute("current-value", FormNamespace, text, "form");
         }
@@ -422,7 +424,7 @@ public sealed class OdfDatabaseFormDesigner
         timeNode.SetAttribute("id", FormNamespace, id, "form");
         if (value.HasValue)
         {
-            string text = value.Value.ToString("c", System.Globalization.CultureInfo.InvariantCulture);
+            string text = value.Value.ToString("c", CultureInfo.InvariantCulture);
             timeNode.SetAttribute("value", FormNamespace, text, "form");
             timeNode.SetAttribute("current-value", FormNamespace, text, "form");
         }
@@ -451,12 +453,12 @@ public sealed class OdfDatabaseFormDesigner
 
         if (string.IsNullOrWhiteSpace(eventName))
         {
-            throw new ArgumentException("事件名稱不能為空。", nameof(eventName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseFormDesigner_EventCannotBeEmpty"), nameof(eventName));
         }
 
         if (string.IsNullOrWhiteSpace(macroName))
         {
-            throw new ArgumentException("巨集名稱不能為空。", nameof(macroName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseFormDesigner_MacroCannotBeEmpty"), nameof(macroName));
         }
 
         const string OfficeNs = "urn:oasis:names:tc:opendocument:xmlns:office:1.0";
@@ -519,10 +521,10 @@ public sealed class OdfDatabaseFormDesigner
 
         if (maxLength < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(maxLength), "最大字元長度不能為負數。");
+            throw new ArgumentOutOfRangeException(nameof(maxLength), OdfLocalizer.GetMessage("Err_OdfDatabaseFormDesigner_MaximumCharacterLengthCannot"));
         }
 
-        controlNode.SetAttribute("max-length", FormNamespace, maxLength.ToString(System.Globalization.CultureInfo.InvariantCulture), "form");
+        controlNode.SetAttribute("max-length", FormNamespace, maxLength.ToString(CultureInfo.InvariantCulture), "form");
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula;
@@ -195,9 +196,9 @@ public ref struct Tokenizer(ReadOnlySpan<char> formula)
     private static double ParseDouble(ReadOnlySpan<char> span)
     {
 #if NET10_0_OR_GREATER
-        return double.Parse(span, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
+        return double.Parse(span, NumberStyles.Any, CultureInfo.InvariantCulture);
 #else
-        return double.Parse(span.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
+        return double.Parse(span.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
 #endif
     }
 }

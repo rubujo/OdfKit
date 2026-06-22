@@ -4,6 +4,7 @@ using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Chart;
 
 /// <summary>
@@ -35,7 +36,7 @@ public sealed class OdfChartSeries
         set
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("資料值儲存格範圍位址不可為空白。", nameof(value));
+                throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfChartSeries_DataCannotBeEmpty"), nameof(value));
 
             _node.SetAttribute("values-cell-range-address", OdfNamespaces.Chart, value, "chart");
         }
@@ -133,7 +134,7 @@ public sealed class OdfChartSeries
     {
         if (repeated < 1)
         {
-            throw new ArgumentOutOfRangeException(nameof(repeated), "重複次數必須至少為 1。");
+            throw new ArgumentOutOfRangeException(nameof(repeated), OdfLocalizer.GetMessage("Err_OdfChartSeries_NumberRepetitionsLeast1"));
         }
 
         OdfNode dataPoint = OdfNodeFactory.CreateElement("data-point", OdfNamespaces.Chart, "chart");

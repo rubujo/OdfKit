@@ -1,4 +1,5 @@
 ﻿#pragma warning restore CS1591
+using System.Globalization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,7 +26,7 @@ public static class OdfFlatDocumentValidator
         Stream stream,
         string? fileName = null,
         OdfComplianceProfile? profile = null,
-        System.Globalization.CultureInfo? culture = null)
+        CultureInfo? culture = null)
     {
         if (stream is null)
             throw new ArgumentNullException(nameof(stream));
@@ -33,9 +34,9 @@ public static class OdfFlatDocumentValidator
         List<OdfValidationIssue> issues = [];
 
         // 智慧偵測語系
-        System.Globalization.CultureInfo targetCulture = culture
+        CultureInfo targetCulture = culture
             ?? profile?.TargetCulture
-            ?? System.Globalization.CultureInfo.CurrentUICulture;
+            ?? CultureInfo.CurrentUICulture;
 
         string? profileId = profile?.Id;
         OdfDocumentKind extensionKind = OdfDocumentKindDetector.FromFileName(fileName);

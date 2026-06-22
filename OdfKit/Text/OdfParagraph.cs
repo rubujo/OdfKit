@@ -251,12 +251,12 @@ public partial class OdfParagraph
     /// <summary>
     /// 取得此段落的所有文字片段（Runs）。存取時會自動將直屬的文字節點分裂包裝為 span 節點。
     /// </summary>
-    public System.Collections.Generic.IEnumerable<OdfTextRun> Runs
+    public IEnumerable<OdfTextRun> Runs
     {
         get
         {
             // 裂變同步：若存在直屬的 text 節點，則先將其包裝到一個全新的 <text:span> 中
-            var children = new System.Collections.Generic.List<OdfNode>(Node.Children);
+            var children = new List<OdfNode>(Node.Children);
             foreach (var child in children)
             {
                 if (child.NodeType == OdfNodeType.Text && !string.IsNullOrEmpty(child.TextContent))
@@ -285,7 +285,7 @@ public partial class OdfParagraph
     /// </summary>
     public void ClearRuns()
     {
-        var spans = new System.Collections.Generic.List<OdfNode>();
+        var spans = new List<OdfNode>();
         foreach (var child in Node.Children)
         {
             if (child.NodeType == OdfNodeType.Element &&

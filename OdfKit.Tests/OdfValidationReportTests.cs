@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.Json;
 using OdfKit.Compliance;
@@ -11,6 +12,11 @@ namespace OdfKit.Tests;
 /// </summary>
 public class OdfValidationReportTests
 {
+    public OdfValidationReportTests()
+    {
+        OdfLocalizer.DefaultCulture = new CultureInfo("zh-TW");
+    }
+
     /// <summary>
     /// 驗證報告提供穩定的 severity 計數與失敗狀態。
     /// </summary>

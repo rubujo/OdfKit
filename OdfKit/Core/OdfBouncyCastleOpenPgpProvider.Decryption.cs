@@ -9,6 +9,7 @@ using Org.BouncyCastle.Crypto.Encodings;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Parameters;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 public sealed partial class OdfBouncyCastleOpenPgpProvider
@@ -22,11 +23,11 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
         // 原始加密資料直接寫入，不含 MPI bit count header。
         int pos = 0;
         if (bytes.Length < 12)
-            throw new CryptographicException("PKESK 封包位元組太短。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PkeskPacketBytesToo"));
 
         int hdr = bytes[pos++];
         if ((hdr & 0x80) == 0)
-            throw new CryptographicException("非有效的 PGP 封包標頭（bit 7 必須為 1）。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_InvalidPgpPacketHeader"));
 
         bool isNew = (hdr & 0x40) != 0;
         int tag, bodyLen;
@@ -50,7 +51,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
             }
             else
             {
-                throw new CryptographicException("不支援 PGP partial body length 格式。");
+                throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PgpPartialBodyLength"));
             }
         }
         else
@@ -76,7 +77,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
         }
 
         if (tag != 1)
-            throw new CryptographicException($"預期 PKESK 封包（標籤 1），但收到標籤 {tag}。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_ExpectedPkeskPacketLabel", tag));
 
         int bodyStart = pos;
         pos++; // version（跳過）
@@ -90,7 +91,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
         // 剩餘全部位元組即為加密後的 Session Key 資料（RSA 為單一區塊，ElGamal 為 c1+c2）
         int dataLen = bodyStart + bodyLen - pos;
         if (dataLen <= 0)
-            throw new CryptographicException("PKESK 封包內無加密金鑰資料。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_NoEncryptionKeyInformation"));
 
         byte[] encData = new byte[dataLen];
         Array.Copy(bytes, pos, encData, 0, dataLen);
@@ -108,7 +109,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
         }
         catch (Exception ex) when (ex is not InvalidOperationException)
         {
-            throw new InvalidOperationException("無法解析 OpenPGP 私鑰環資料。", ex);
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_UnableParseOpenpgpPrivate"), ex);
         }
 
         PgpSecretKey? key = bundle.GetSecretKey(pkeskKeyId);
@@ -149,7 +150,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
                         // ── X25519 路徑 ──────────────────────────────────────────────────
                         // 格式：0x40 || ephPub(32) || wrappedLen(1) || wrapped
                         if (enc.Length < 35)
-                            throw new CryptographicException("ECDH X25519 封包資料長度不足。");
+                            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_EcdhX25519PacketData"));
                         byte[] ephPubRaw = new byte[32];
                         Array.Copy(enc, 1, ephPubRaw, 0, 32); // 略過首位 0x40
                         var ephPub = new X25519PublicKeyParameters(ephPubRaw, 0);
@@ -170,7 +171,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
                         int coordBytes = (ecPriv.Parameters.Curve.FieldSize + 7) / 8;
                         int pointLen = 1 + 2 * coordBytes; // 0x04 + X + Y
                         if (enc.Length < pointLen + 1)
-                            throw new CryptographicException("ECDH 傳統曲線封包資料長度不足。");
+                            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_EcdhTraditionalCurvePacket"));
 
                         byte[] pointBytes = new byte[pointLen];
                         Array.Copy(enc, 0, pointBytes, 0, pointLen);
@@ -188,7 +189,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
                         Array.Copy(enc, pointLen + 1, wrapped, 0, wrapLen);
                         return RemoveEcdhPkcs5Padding(AesKeyUnwrap128(kek, wrapped));
                     }
-                    throw new NotSupportedException($"不支援的 ECDH 金鑰類型：{key.GetType().Name}。");
+                    throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_UnsupportedEcdhKeyType", key.GetType().Name));
                 }
             default:
                 throw new NotSupportedException(

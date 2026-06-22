@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -17,7 +18,7 @@ public readonly struct OdfNamespacedToken : IEquatable<OdfNamespacedToken>
     {
         if (!TryParseParts(value, out string? prefix, out string? localName))
         {
-            throw new ArgumentException("命名空間 token 必須是 prefix:localName 格式，且兩段都必須是有效 XML NCName。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfNamespacedToken_NamespaceTokenPrefixLocalname"), nameof(value));
         }
 
         Value = value;

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -24,7 +25,7 @@ public readonly struct OdfPointList : IEquatable<OdfPointList>
     {
         if (!TryParseItems(value, out OdfPoint2D[] points))
         {
-            throw new ArgumentException("座標清單必須符合 ODF points 格式。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPointList_CoordinateListConformOdf"), nameof(value));
         }
 
         Value = value;
@@ -41,7 +42,7 @@ public readonly struct OdfPointList : IEquatable<OdfPointList>
         OdfPoint2D[] items = points?.ToArray() ?? [];
         if (items.Length == 0)
         {
-            throw new ArgumentException("座標清單不可為空。", nameof(points));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPointList_CoordinateCannotBeEmpty"), nameof(points));
         }
 
         Value = string.Join(" ", items.Select(item => item.ToString()));

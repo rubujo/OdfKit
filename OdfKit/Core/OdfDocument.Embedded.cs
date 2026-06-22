@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 public abstract partial class OdfDocument
@@ -18,7 +19,7 @@ public abstract partial class OdfDocument
     public T GetEmbeddedDocument<T>(string subPath) where T : OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
-            throw new ArgumentException("Subpath cannot be null or empty.", nameof(subPath));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocument_SubpathCannotBeEmpty_2"), nameof(subPath));
         if (!subPath.EndsWith("/"))
             subPath += "/";
 
@@ -46,7 +47,7 @@ public abstract partial class OdfDocument
     public T CreateEmbeddedDocument<T>(string subPath) where T : OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
-            throw new ArgumentException("Subpath cannot be null or empty.", nameof(subPath));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocument_SubpathCannotBeEmpty_2"), nameof(subPath));
         if (!subPath.EndsWith("/"))
             subPath += "/";
 
@@ -84,7 +85,7 @@ public abstract partial class OdfDocument
             return doc;
         }
 
-        throw new InvalidOperationException($"Type {typeof(T).Name} does not have a compatible constructor.");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfDocument_TypeCompatibleConstructor", typeof(T).Name));
     }
 
     #endregion

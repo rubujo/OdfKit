@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
 /// <summary>
@@ -70,7 +71,7 @@ public sealed class OdfMathToken
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("屬性名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfMathToken_PropertyCannotBeEmpty"), nameof(name));
         }
 
         if (value is null)
@@ -265,12 +266,12 @@ public sealed class OdfMathToken
     {
         if (children is null || children.Length == 0)
         {
-            throw new ArgumentException("子 token 清單不能為空。", paramName);
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfMathToken_SubtokenCannotBeEmpty"), paramName);
         }
 
         if (children.Any(static child => child is null))
         {
-            throw new ArgumentException("子 token 清單不能包含 null 項目。", paramName);
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfMathToken_ChildTokenListsCannot"), paramName);
         }
 
         return children.ToList();

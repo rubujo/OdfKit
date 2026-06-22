@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -22,8 +24,8 @@ public partial class OdsStreamWriter : IDisposable
     private bool _isRowStarted;
     private bool _isSheetStarted;
     private bool _disposed;
-    private readonly System.Collections.Generic.List<(string styleName, OdfLength width)> _columnStyles = [];
-    private readonly System.Collections.Generic.List<(string styleName, OdfLength? height, bool useOptimalHeight)> _rowStyles = [];
+    private readonly List<(string styleName, OdfLength width)> _columnStyles = [];
+    private readonly List<(string styleName, OdfLength? height, bool useOptimalHeight)> _rowStyles = [];
     private int _autoColumnStyleIndex = 0;
     private int _autoRowStyleIndex = 0;
     private OdfVersion _version = OdfVersionInfo.DefaultVersion;
@@ -202,13 +204,13 @@ public partial class OdsStreamWriter : IDisposable
             return;
         _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
         _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "float");
-        _writer.WriteAttributeString("office", "value", OdfNamespaces.Office, value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        _writer.WriteAttributeString("office", "value", OdfNamespaces.Office, value.ToString(CultureInfo.InvariantCulture));
         if (!string.IsNullOrEmpty(styleName))
         {
             _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
         }
         _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        _writer.WriteString(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        _writer.WriteString(value.ToString(CultureInfo.InvariantCulture));
         _writer.WriteEndElement(); // text:p
         _writer.WriteEndElement(); // table:cell
     }
@@ -230,14 +232,14 @@ public partial class OdsStreamWriter : IDisposable
         if (value == DateTime.MinValue || value == DateTime.MaxValue)
         {
             isoDate = timezoneNaive
-                ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
-                : value.ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
+                ? value.ToString("s", CultureInfo.InvariantCulture)
+                : value.ToString("s", CultureInfo.InvariantCulture) + "Z";
         }
         else
         {
             isoDate = timezoneNaive
-                ? value.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
-                : value.ToUniversalTime().ToString("s", System.Globalization.CultureInfo.InvariantCulture) + "Z";
+                ? value.ToString("s", CultureInfo.InvariantCulture)
+                : value.ToUniversalTime().ToString("s", CultureInfo.InvariantCulture) + "Z";
         }
 
         _writer.WriteAttributeString("office", "date-value", OdfNamespaces.Office, isoDate);

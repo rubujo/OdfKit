@@ -151,7 +151,7 @@ public partial class SpreadsheetDocument : OdfDocument
         }
 
         document.Dispose();
-        throw new InvalidOperationException("指定的 ODF 文件不是 ODS 試算表。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SpecifiedOdfFileOds"));
     }
 
     private void InitializeSheetsRoot()

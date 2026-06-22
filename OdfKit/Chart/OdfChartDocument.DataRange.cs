@@ -5,6 +5,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
 
+using OdfKit.Compliance;
 namespace OdfKit.Chart;
 
 public partial class OdfChartDocument
@@ -22,7 +23,7 @@ public partial class OdfChartDocument
         bool firstRowAsHeader = true, bool firstColumnAsLabel = true)
     {
         if (string.IsNullOrEmpty(sheetName))
-            throw new ArgumentException("工作表名稱不可為空。", nameof(sheetName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfChartDocument_WorksheetCannotBeEmpty"), nameof(sheetName));
 
         OdfNode chart = GetChartNode();
 
@@ -166,7 +167,7 @@ public partial class OdfChartDocument
     private static string ColumnIndexToName(int index)
     {
         int n = index + 1;
-        var sb = new System.Text.StringBuilder();
+        var sb = new StringBuilder();
         while (n > 0)
         {
             int rem = (n - 1) % 26;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 using OdfKit.Formula;
 using OdfKit.Spreadsheet;
@@ -22,7 +23,7 @@ public class LiteralNode(object value) : AstNode
         if (value is bool b)
             return b ? "TRUE" : "FALSE";
         if (value is double d)
-            return d.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return d.ToString(CultureInfo.InvariantCulture);
         return value?.ToString() ?? string.Empty;
     }
 }

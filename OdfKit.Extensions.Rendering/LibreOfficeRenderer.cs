@@ -310,7 +310,7 @@ public class LibreOfficeRenderer
                 if (!exited)
                 {
                     TryKillLibreOfficeProcess(process);
-                    throw new TimeoutException("LibreOffice conversion process timed out.");
+                    throw new TimeoutException(OdfLocalizer.GetMessage("Err_LibreOfficeRenderer_LibreofficeConversionProcessTimed"));
                 }
 
                 _ = await stdOutTask.ConfigureAwait(false);
@@ -318,7 +318,7 @@ public class LibreOfficeRenderer
 
                 if (process.ExitCode != 0)
                 {
-                    throw new InvalidOperationException($"LibreOffice exited with code {process.ExitCode}.");
+                    throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_LibreOfficeRenderer_LibreofficeExitedCode", process.ExitCode));
                 }
             }
 
@@ -327,7 +327,7 @@ public class LibreOfficeRenderer
 
             if (!File.Exists(convertedFilePath))
             {
-                throw new FileNotFoundException("LibreOffice failed to generate target converted file.");
+                throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_LibreOfficeRenderer_FailedToLibreofficeGenerateTarget"));
             }
 
             if (File.Exists(outputPath))

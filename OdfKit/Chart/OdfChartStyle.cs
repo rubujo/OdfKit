@@ -3,6 +3,7 @@ using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Chart;
 
 /// <summary>
@@ -24,7 +25,7 @@ public sealed class OdfChartStyle
     /// </summary>
     public string Name =>
         _styleNode.GetAttribute("name", OdfNamespaces.Style)
-        ?? throw new InvalidOperationException("圖表樣式節點缺少 style:name 屬性。");
+        ?? throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfChartStyle_ChartNotFound"));
 
     /// <summary>
     /// 取得或設定填滿色（對應 <c>draw:fill-color</c>）。

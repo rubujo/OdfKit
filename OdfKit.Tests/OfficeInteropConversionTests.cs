@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -535,7 +536,7 @@ public sealed class OfficeInteropConversionTests
         string output = process.StandardOutput.ReadToEnd().Trim();
         string error = process.StandardError.ReadToEnd().Trim();
         Assert.True(process.ExitCode == 0, $"PDF 視覺差異比對失敗：{error}");
-        Assert.True(double.TryParse(output, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double differencePercent),
+        Assert.True(double.TryParse(output, NumberStyles.Float, CultureInfo.InvariantCulture, out double differencePercent),
             "PDF 視覺差異比對輸出不是數值：" + output);
         Assert.True(differencePercent <= thresholdPercent,
             $"PDF 視覺差異 {differencePercent:F2}% 超過 {thresholdPercent:F2}% 門檻。");

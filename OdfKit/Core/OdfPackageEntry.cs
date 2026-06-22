@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 
@@ -115,7 +116,7 @@ internal class OdfPackageEntry : IDisposable
             return new MemoryStream(_bytes, false);
         }
 
-        throw new InvalidOperationException("OdfPackageEntry is in an invalid state.");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackageEntry_InvalidOdfpackageentryState"));
     }
 
     public void Dispose()

@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 public sealed partial class OdfPackage
@@ -16,7 +17,7 @@ public sealed partial class OdfPackage
     public void Save(OdfSaveOptions? options = null)
     {
         if (_mode == OdfPackageMode.Read)
-            throw new InvalidOperationException("Cannot save a read-only ODF package.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackage_CannotSaveReadOnly_2"));
 
         _lock.Wait();
         OdfSaveOptions previousOptions = UseSaveOptions(options);
@@ -52,7 +53,7 @@ public sealed partial class OdfPackage
     public async Task SaveAsync(OdfSaveOptions? options, CancellationToken cancellationToken = default)
     {
         if (_mode == OdfPackageMode.Read)
-            throw new InvalidOperationException("Cannot save a read-only ODF package.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackage_CannotSaveReadOnly_2"));
 
         await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
         OdfSaveOptions previousOptions = UseSaveOptions(options);

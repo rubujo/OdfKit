@@ -18,7 +18,7 @@ public class PivotTableTests
         ms.Position = 0;
         using var pkg = OdfPackage.Open(ms, leaveOpen: true);
         using var stream = pkg.GetEntryStream("content.xml");
-        return new System.IO.StreamReader(stream).ReadToEnd();
+        return new StreamReader(stream).ReadToEnd();
     }
 
     private static OdfNode BuildBasicPivot(OdfTableSheet sheet, string name = "Pivot1")

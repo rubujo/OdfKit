@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
+using OdfKit.Compliance;
 using OdfKit.DOM;
 using OdfKit.Styles;
 using OdfKit.Text;
-
 namespace OdfKit.Extensions.Imaging;
 
 /// <summary>
@@ -26,7 +26,7 @@ public static class OdfParagraphExtensions
         if (maxWidthInCentimeters <= 0)
             throw new ArgumentOutOfRangeException(nameof(maxWidthInCentimeters));
         if (string.IsNullOrEmpty(fontName))
-            throw new ArgumentException("字型名稱不可為空。", nameof(fontName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfParagraphExtensions_FontCannotBeEmpty"), nameof(fontName));
 
         // 1. 強制進行裂變同步以取得 Runs 集合，不污染段落本身的預設樣式
         var runs = paragraph.Runs.ToList();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -21,7 +22,7 @@ public readonly struct OdfCellAddressReference : IEquatable<OdfCellAddressRefere
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("儲存格位址必須符合 ODF cellAddress 格式。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfCellAddressReference_CellAddressConformOdf"), nameof(value));
         }
 
         Value = value;

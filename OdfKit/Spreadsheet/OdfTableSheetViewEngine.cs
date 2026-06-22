@@ -4,6 +4,7 @@ using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
@@ -136,9 +137,9 @@ internal static class OdfTableSheetViewEngine
         string[] allowedValues)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("驗證名稱不可空白。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfTableSheetViewEngine_VerificationCannotBeEmpty"), nameof(name));
         if (allowedValues is null || allowedValues.Length == 0)
-            throw new ArgumentException("驗證清單至少需要一個允許值。", nameof(allowedValues));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfTableSheetViewEngine_ValidationManifestRequiresLeast"), nameof(allowedValues));
 
         // table:content-validations 須為 office:spreadsheet 的直接子節點（所有工作表共用的全域宣告），
         // 不可放在個別 table:table 內部，否則真實 LibreOffice 會視為結構不合法並靜默捨棄整條規則。

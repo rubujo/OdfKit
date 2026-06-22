@@ -15,9 +15,9 @@ public sealed class OdfQualifiedName : IEquatable<OdfQualifiedName>
     public OdfQualifiedName(string namespaceUri, string localName)
     {
         if (string.IsNullOrWhiteSpace(namespaceUri))
-            throw new ArgumentException("Namespace URI cannot be empty.", nameof(namespaceUri));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfQualifiedName_NamespaceCannotBeEmpty"), nameof(namespaceUri));
         if (string.IsNullOrWhiteSpace(localName))
-            throw new ArgumentException("Local name cannot be empty.", nameof(localName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfQualifiedName_LocalCannotBeEmpty"), nameof(localName));
         NamespaceUri = namespaceUri;
         LocalName = localName;
     }

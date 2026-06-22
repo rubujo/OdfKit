@@ -1,5 +1,6 @@
 ﻿#pragma warning restore CS1591
 
+using System.Globalization;
 using System;
 using System.Collections.Generic;
 
@@ -306,7 +307,7 @@ public sealed class OdfPolicyRule(string id, string description, OdfIssueSeverit
     /// <summary>
     /// 取得穩定的規則唯一識別碼。
     /// </summary>
-    public string Id { get; } = !string.IsNullOrWhiteSpace(id) ? id : throw new ArgumentException("規則識別碼不得為空", nameof(id));
+    public string Id { get; } = !string.IsNullOrWhiteSpace(id) ? id : throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfComplianceTypes_RuleCannotBeEmpty"), nameof(id));
 
     /// <summary>
     /// 取得規則的詳細說明。
@@ -346,12 +347,12 @@ public sealed class OdfComplianceProfile(
     IEnumerable<string> allowedExtensions,
     IEnumerable<string> allowedMimeTypes,
     IEnumerable<OdfPolicyRule> rules,
-    System.Globalization.CultureInfo? targetCulture = null)
+    CultureInfo? targetCulture = null)
 {
     /// <summary>
     /// 取得穩定的規範唯一識別碼。
     /// </summary>
-    public string Id { get; } = !string.IsNullOrWhiteSpace(id) ? id : throw new ArgumentException("規範識別碼不得為空", nameof(id));
+    public string Id { get; } = !string.IsNullOrWhiteSpace(id) ? id : throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfComplianceTypes_CanonicalCannotBeEmpty"), nameof(id));
 
     /// <summary>
     /// 取得此規範適用的管轄區域。
@@ -406,5 +407,5 @@ public sealed class OdfComplianceProfile(
     /// <summary>
     /// 取得此規範的目標文化特性，用於自動語系偵測。
     /// </summary>
-    public System.Globalization.CultureInfo? TargetCulture { get; } = targetCulture;
+    public CultureInfo? TargetCulture { get; } = targetCulture;
 }

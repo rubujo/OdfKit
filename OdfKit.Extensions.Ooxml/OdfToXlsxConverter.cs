@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
@@ -16,7 +17,6 @@ using A = DocumentFormat.OpenXml.Drawing;
 using C = DocumentFormat.OpenXml.Drawing.Charts;
 using S = DocumentFormat.OpenXml.Spreadsheet;
 using Xdr = DocumentFormat.OpenXml.Drawing.Spreadsheet;
-
 namespace OdfKit.Conversion;
 
 /// <summary>
@@ -308,11 +308,11 @@ public static class OdfToXlsxConverter
         xlsxStream.Position = 0;
         using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, true);
         WorkbookPart workbookPart = spreadsheet.WorkbookPart
-            ?? throw new InvalidDataException("XLSX 缺少 workbook part。");
+            ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfToXlsxConverter_XlsxNotFound"));
         S.Workbook workbook = workbookPart.Workbook
-            ?? throw new InvalidDataException("XLSX 缺少 workbook。");
+            ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfToXlsxConverter_XlsxNotFound_2"));
         S.Sheets sheets = workbook.Sheets
-            ?? throw new InvalidDataException("XLSX 缺少 sheets。");
+            ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfToXlsxConverter_XlsxNotFound_5"));
 
         var perSheetIndex = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         foreach (ChartSpec spec in chartSpecs)
@@ -339,7 +339,7 @@ public static class OdfToXlsxConverter
     {
         DrawingsPart drawingsPart;
         S.Worksheet worksheet = worksheetPart.Worksheet
-            ?? throw new InvalidDataException("XLSX 缺少 worksheet。");
+            ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfToXlsxConverter_XlsxNotFound_4"));
         S.Drawing? drawing = worksheet.Elements<S.Drawing>().FirstOrDefault();
         if (drawing?.Id?.Value is not null && worksheetPart.GetPartById(drawing.Id.Value) is DrawingsPart existing)
         {
@@ -772,7 +772,7 @@ public static class OdfToXlsxConverter
         XNamespace relNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 
         XElement sheets = workbook.Root?.Element(spreadsheetNs + "sheets")
-            ?? throw new InvalidDataException("XLSX 缺少 sheets。");
+            ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfToXlsxConverter_XlsxNotFound_5"));
         XElement pivotCaches = workbook.Root!.Element(spreadsheetNs + "pivotCaches")
             ?? new XElement(spreadsheetNs + "pivotCaches");
         if (pivotCaches.Parent is null)
@@ -980,7 +980,7 @@ public static class OdfToXlsxConverter
     private static XDocument ReadZipXml(ZipArchive archive, string path)
     {
         ZipArchiveEntry entry = archive.GetEntry(path)
-            ?? throw new FileNotFoundException("XLSX entry not found.", path);
+            ?? throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_OdfToXlsxConverter_XlsxNotFound_6"), path);
         using Stream stream = entry.Open();
         return XDocument.Load(stream);
     }
@@ -1009,7 +1009,7 @@ public static class OdfToXlsxConverter
     private static string AddRelationship(XDocument rels, string type, string target)
     {
         XNamespace relNs = "http://schemas.openxmlformats.org/package/2006/relationships";
-        XElement root = rels.Root ?? throw new InvalidDataException("XLSX rels XML 缺少根節點。");
+        XElement root = rels.Root ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfToXlsxConverter_XlsxNotFound_7"));
         int nextId = root.Elements(relNs + "Relationship")
             .Select(element => (string?)element.Attribute("Id"))
             .Select(id => id is not null && id.StartsWith("rId", StringComparison.OrdinalIgnoreCase) && int.TryParse(id.Substring(3), out int value) ? value : 0)
@@ -1026,7 +1026,7 @@ public static class OdfToXlsxConverter
     private static void AddContentTypeOverride(XDocument contentTypes, string partName, string contentType)
     {
         XNamespace contentTypesNs = "http://schemas.openxmlformats.org/package/2006/content-types";
-        XElement root = contentTypes.Root ?? throw new InvalidDataException("XLSX content types XML 缺少根節點。");
+        XElement root = contentTypes.Root ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfToXlsxConverter_XlsxNotFound_8"));
         bool exists = root.Elements(contentTypesNs + "Override")
             .Any(element => string.Equals((string?)element.Attribute("PartName"), partName, StringComparison.OrdinalIgnoreCase));
         if (!exists)
@@ -1621,7 +1621,7 @@ public static class OdfToXlsxConverter
         switch (valueType)
         {
             case "float":
-                if (double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double number))
+                if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double number))
                     return number;
                 return null;
             case "boolean":

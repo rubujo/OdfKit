@@ -18,7 +18,7 @@ public sealed class OdfSchemaPatternDefinition
     public OdfSchemaPatternDefinition(string name, IEnumerable<OdfSchemaPatternNode> roots)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Pattern name cannot be empty.", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSchemaPatternDefinition_PatternCannotBeEmpty"), nameof(name));
         Name = name;
         _roots = new List<OdfSchemaPatternNode>(roots ?? throw new ArgumentNullException(nameof(roots))).AsReadOnly();
     }

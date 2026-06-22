@@ -175,14 +175,14 @@ public partial class OdfFormulaDocument : OdfDocument
     {
         if (string.IsNullOrWhiteSpace(mathMlXml))
         {
-            throw new ArgumentException("MathML XML 不能為空。", nameof(mathMlXml));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_MathmlCannotBeEmpty"), nameof(mathMlXml));
         }
 
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(mathMlXml));
         OdfNode math = OdfXmlReader.Parse(stream);
         if (math.LocalName != "math" || math.NamespaceUri != MathMlNamespace)
         {
-            throw new ArgumentException("MathML 根節點必須是 math:math。", nameof(mathMlXml));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_MathmlRootNodeMath"), nameof(mathMlXml));
         }
 
         OdfNode formula = GetFormulaNode();
@@ -211,7 +211,7 @@ public partial class OdfFormulaDocument : OdfDocument
 
         if (tokens.Length == 0)
         {
-            throw new ArgumentException("MathML token 不能為空。", nameof(tokens));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_MathmlCannotBeEmpty_2"), nameof(tokens));
         }
 
         OdfNode math = OdfNodeFactory.CreateElement("math", MathMlNamespace, "math");
@@ -220,7 +220,7 @@ public partial class OdfFormulaDocument : OdfDocument
         {
             if (token is null)
             {
-                throw new ArgumentNullException(nameof(tokens), "MathML token 不能為 null。");
+                throw new ArgumentNullException(nameof(tokens), OdfLocalizer.GetMessage("Err_OdfFormulaDocument_MathmlCannotBeEmpty_3"));
             }
 
             row.AppendChild(CreateMathTokenNode(token));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Database;
 
 public partial class OdfDatabaseDocument
@@ -19,7 +20,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("資料表名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_7"), nameof(name));
         }
 
         OdfNode tableRepresentations = FindOrCreateChild(GetDatabaseNode(), "table-representations", DatabaseNamespace, "db");
@@ -52,12 +53,12 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("查詢名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryCannotBeEmpty_4"), nameof(name));
         }
 
         if (string.IsNullOrWhiteSpace(command))
         {
-            throw new ArgumentException("查詢命令不能為空。", nameof(command));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryCannotBeEmpty_3"), nameof(command));
         }
 
         OdfNode queries = FindOrCreateChild(GetDatabaseNode(), "queries", DatabaseNamespace, "db");
@@ -117,7 +118,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("資料來源設定名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_8"), nameof(name));
         }
 
         if (values is null)
@@ -127,12 +128,12 @@ public partial class OdfDatabaseDocument
 
         if (values.Length == 0)
         {
-            throw new ArgumentException("資料來源設定值不能為空。", nameof(values));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_5"), nameof(values));
         }
 
         if (FindConnectionResource() is null)
         {
-            throw new InvalidOperationException("新增資料來源設定前必須先設定資料來源連線。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_BeforeAddingNewData"));
         }
 
         OdfNode settings = FindOrCreateDataSourceSettings();
@@ -145,7 +146,7 @@ public partial class OdfDatabaseDocument
         {
             if (value is null)
             {
-                throw new ArgumentNullException(nameof(values), "資料來源設定值不能為 null。");
+                throw new ArgumentNullException(nameof(values), OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_6"));
             }
 
             OdfNode valueNode = OdfNodeFactory.CreateElement("data-source-setting-value", DatabaseNamespace, "db");
@@ -175,7 +176,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("表單名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FormCannotBeEmpty_3"), nameof(name));
         }
 
         OdfNode forms = FindOrCreateChild(GetDatabaseNode(), "forms", DatabaseNamespace, "db");
@@ -227,7 +228,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("報表名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_ReportCannotBeEmpty_2"), nameof(name));
         }
 
         OdfNode reports = FindOrCreateChild(GetDatabaseNode(), "reports", DatabaseNamespace, "db");
@@ -274,7 +275,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("資料表名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_7"), nameof(name));
         }
 
         OdfNode? tableRepresentations = FindChildElement(GetDatabaseNode(), "table-representations", DatabaseNamespace);
@@ -307,7 +308,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("查詢名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryCannotBeEmpty_4"), nameof(name));
         }
 
         OdfNode? queries = FindChildElement(GetDatabaseNode(), "queries", DatabaseNamespace);
@@ -340,7 +341,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("報表名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_ReportCannotBeEmpty_2"), nameof(name));
         }
 
         OdfNode? reportsNode = FindChildElement(GetDatabaseNode(), "reports", DatabaseNamespace);
@@ -361,7 +362,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("表單名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FormCannotBeEmpty_3"), nameof(name));
         }
 
         OdfNode? formsNode = FindChildElement(GetDatabaseNode(), "forms", DatabaseNamespace);
@@ -382,7 +383,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("資料來源設定名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_8"), nameof(name));
         }
 
         OdfNode? settings = FindDataSourceSettings();

@@ -1,5 +1,6 @@
 ﻿using System;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -16,7 +17,7 @@ public readonly struct OdfTargetFrameName : IEquatable<OdfTargetFrameName>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("目標框架名稱不可空白，且不可包含控制字元。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfTargetFrameName_TargetCannotBeEmpty"), nameof(value));
         }
 
         Value = value;

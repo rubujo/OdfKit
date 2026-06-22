@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Text;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -54,7 +55,7 @@ public class LibreOfficeConversionApiTests
         Assert.Equal("odg", backend.InputExtension);
         Assert.Equal(LibreOfficeConversionFormats.Svg, backend.ConvertTo);
         Assert.True(backend.InputLength > 0);
-        Assert.Equal("converted", System.Text.Encoding.UTF8.GetString(output.ToArray()));
+        Assert.Equal("converted", Encoding.UTF8.GetString(output.ToArray()));
     }
 
     [Fact]
@@ -143,7 +144,7 @@ public class LibreOfficeConversionApiTests
             await input.CopyToAsync(sink, 81920, ct).ConfigureAwait(false);
             InputLength = sink.Length;
 
-            return new MemoryStream(System.Text.Encoding.UTF8.GetBytes("converted"));
+            return new MemoryStream(Encoding.UTF8.GetBytes("converted"));
         }
     }
 

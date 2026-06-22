@@ -2,6 +2,7 @@
 using System.IO;
 using System.Security.Cryptography;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -58,7 +59,7 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
             }
         }
 
-        throw new CryptographicException("OpenPGP 解密失敗：無法以任何已知私鑰解密 Session Key。");
+        throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfOpenPgpCryptographyProvider_OpenpgpDecryptionFailedUnable"));
     }
 
     /// <inheritdoc />

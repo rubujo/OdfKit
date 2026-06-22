@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -30,12 +31,12 @@ public readonly struct OdfTime : IEquatable<OdfTime>
     {
         if (timeOfDay < TimeSpan.Zero || timeOfDay >= OneDay)
         {
-            throw new ArgumentOutOfRangeException(nameof(timeOfDay), timeOfDay, "日內時間必須大於等於 00:00:00 且小於 24:00:00。");
+            throw new ArgumentOutOfRangeException(nameof(timeOfDay), timeOfDay, OdfLocalizer.GetMessage("Err_OdfTime_TimeDayGreaterEqual"));
         }
 
         if (offset is { } value && (value < -MaximumTimezoneOffset || value > MaximumTimezoneOffset))
         {
-            throw new ArgumentOutOfRangeException(nameof(offset), offset, "時區 offset 必須在 -14:00 至 +14:00 之間。");
+            throw new ArgumentOutOfRangeException(nameof(offset), offset, OdfLocalizer.GetMessage("Err_OdfTime_TimeZoneOffsetBetween"));
         }
 
         TimeOfDay = timeOfDay;

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
@@ -142,7 +144,7 @@ public class OdfComment
 
             if (activePath.Contains(frame.Comment))
             {
-                throw new InvalidOperationException("Circular reference detected in OdfComment replies.");
+                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfComment_CircularReferenceDetectedOdfcomment"));
             }
 
             if (!serializedNames.Add(frame.Comment.Name))
@@ -194,7 +196,7 @@ public class OdfComment
     {
         if (node.LocalName != "annotation" || node.NamespaceUri != OdfNamespaces.Office)
         {
-            throw new ArgumentException("Provided node is not a valid ODF office:annotation.");
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfComment_ProvidedNodeValidOdf"));
         }
 
         string author = "Unknown";
@@ -207,7 +209,7 @@ public class OdfComment
             {
                 if (child.LocalName == "creator")
                     author = child.TextContent;
-                else if (child.LocalName == "date" && DateTime.TryParse(child.TextContent, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out var dt))
+                else if (child.LocalName == "date" && DateTime.TryParse(child.TextContent, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt))
                 {
                     if (dt == DateTime.MinValue || dt == DateTime.MaxValue)
                     {
@@ -340,11 +342,11 @@ public class OdfComment
 
         if (node.LocalName == "annotation-list")
         {
-            return rootComment ?? throw new ArgumentException("No valid office:annotation elements found in container.");
+            return rootComment ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfComment_NoValidOfficeAnnotation_2"));
         }
         else
         {
-            return targetComment ?? rootComment ?? throw new ArgumentException("No valid office:annotation elements found in container.");
+            return targetComment ?? rootComment ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfComment_NoValidOfficeAnnotation_2"));
         }
     }
 }

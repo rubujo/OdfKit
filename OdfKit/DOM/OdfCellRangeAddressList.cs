@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -18,7 +19,7 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
     {
         if (!TryParseItems(value, out OdfCellRangeAddress[] ranges))
         {
-            throw new ArgumentException("儲存格範圍位址清單必須符合 ODF cellRangeAddressList 格式。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfCellRangeAddressList_CellRangeAddressList"), nameof(value));
         }
 
         Value = value;
@@ -35,7 +36,7 @@ public readonly struct OdfCellRangeAddressList : IEquatable<OdfCellRangeAddressL
         OdfCellRangeAddress[] items = ranges?.ToArray() ?? [];
         if (items.Length == 0)
         {
-            throw new ArgumentException("儲存格範圍位址清單不可為空。", nameof(ranges));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfCellRangeAddressList_ListCannotBeEmpty"), nameof(ranges));
         }
 
         Value = string.Join(" ", items.Select(item => item.Value));

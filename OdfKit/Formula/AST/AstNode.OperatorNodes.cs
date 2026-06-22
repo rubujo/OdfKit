@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using OdfKit.Formula;
 using OdfKit.Spreadsheet;
 
@@ -22,7 +23,7 @@ public class UnaryNode(char op, AstNode child) : AstNode
         {
             if (val is double d)
                 return d / 100.0;
-            if (val is string s && double.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsed))
+            if (val is string s && double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsed))
                 return parsed / 100.0;
             return OdfFormulaError.Value;
         }
@@ -33,7 +34,7 @@ public class UnaryNode(char op, AstNode child) : AstNode
         if (val is bool b)
             return op == '-' ? -(b ? 1.0 : 0.0) : (b ? 1.0 : 0.0);
 
-        if (val is string str && double.TryParse(str, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedNum))
+        if (val is string str && double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedNum))
             return op == '-' ? -parsedNum : parsedNum;
 
         return OdfFormulaError.Value;
@@ -112,7 +113,7 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
         if (val is bool b)
         { result = b ? 1.0 : 0.0; return true; }
         if (val is string s)
-            return double.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out result);
+            return double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
         result = 0;
         return false;
     }

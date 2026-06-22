@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using Markdig;
 using Markdig.Extensions.EmphasisExtras;
@@ -283,7 +284,7 @@ internal static class OdfMarkdownMarkdigImporter
 
     private static void AppendFootnote(ImportContext context, OdfParagraph paragraph, FootnoteLink link)
     {
-        string id = (link.Footnote.Label ?? link.Index.ToString(System.Globalization.CultureInfo.InvariantCulture)).TrimStart('^');
+        string id = (link.Footnote.Label ?? link.Index.ToString(CultureInfo.InvariantCulture)).TrimStart('^');
         string body = ExtractPlainText(link.Footnote).Trim();
         if (TryReadComment(body, out string? author, out string? commentText))
         {

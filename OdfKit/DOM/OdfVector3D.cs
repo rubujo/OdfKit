@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -22,7 +23,7 @@ public readonly struct OdfVector3D : IEquatable<OdfVector3D>
     {
         if (!TryParseComponents(value, out decimal x, out decimal y, out decimal z))
         {
-            throw new ArgumentException("三維向量必須符合 ODF vector3D 格式。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfVector3D_ThreeDimensionalVectorsConform"), nameof(value));
         }
 
         Value = value;

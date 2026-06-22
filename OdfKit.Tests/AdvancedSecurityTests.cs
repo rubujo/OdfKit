@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.IO.Compression;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -1306,7 +1307,7 @@ namespace OdfKit.Tests
             }
 
             ms.Position = 0;
-            using (var archive = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Update, leaveOpen: true))
+            using (var archive = new ZipArchive(ms, ZipArchiveMode.Update, leaveOpen: true))
             {
                 var entry = archive.GetEntry("content.xml");
                 entry?.Delete();

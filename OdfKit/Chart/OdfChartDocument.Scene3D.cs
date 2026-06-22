@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Chart;
 
 public partial class OdfChartDocument
@@ -44,7 +45,7 @@ public partial class OdfChartDocument
     {
         if (string.IsNullOrWhiteSpace(direction))
         {
-            throw new ArgumentException("光源方向向量不能為空。", nameof(direction));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfChartDocument_LightCannotBeEmpty"), nameof(direction));
         }
 
         OdfNode light = OdfNodeFactory.CreateElement("light", OdfNamespaces.Dr3d, "dr3d");

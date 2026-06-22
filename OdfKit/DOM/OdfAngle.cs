@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -17,7 +18,7 @@ public readonly struct OdfAngle : IEquatable<OdfAngle>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("角度值不可為空白，且不可包含控制字元。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfAngle_AngleCannotBeEmpty"), nameof(value));
         }
 
         Value = value.Trim();

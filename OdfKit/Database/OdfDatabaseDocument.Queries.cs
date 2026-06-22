@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Database;
 
 public partial class OdfDatabaseDocument
@@ -74,7 +75,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(tableName))
         {
-            throw new ArgumentException("目標資料表名稱不能為空。", nameof(tableName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_TargetCannotBeEmpty"), nameof(tableName));
         }
 
         OdfNode query = FindQueryNodeOrThrow(queryName);
@@ -138,7 +139,7 @@ public partial class OdfDatabaseDocument
         List<string> names = new(columnNames);
         if (names.Count == 0)
         {
-            throw new ArgumentException("欄位名稱清單不能為空。", nameof(columnNames));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FieldCannotBeEmpty"), nameof(columnNames));
         }
 
         OdfNode query = FindQueryNodeOrThrow(queryName);
@@ -191,7 +192,7 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(command))
         {
-            throw new ArgumentException("陳述式命令文字不能為空。", nameof(command));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DeclarativeCannotBeEmpty"), nameof(command));
         }
 
         OdfNode query = FindQueryNodeOrThrow(queryName);
@@ -224,14 +225,14 @@ public partial class OdfDatabaseDocument
     {
         if (string.IsNullOrWhiteSpace(queryName))
         {
-            throw new ArgumentException("查詢名稱不能為空。", nameof(queryName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryCannotBeEmpty_5"), nameof(queryName));
         }
 
         OdfNode? queries = FindChildElement(GetDatabaseNode(), "queries", DatabaseNamespace);
         OdfNode? query = queries is null ? null : FindQueryChild(queries, queryName);
         if (query is null)
         {
-            throw new InvalidOperationException($"找不到名稱為 '{queryName}' 的查詢。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryNotFound", queryName));
         }
 
         return query;

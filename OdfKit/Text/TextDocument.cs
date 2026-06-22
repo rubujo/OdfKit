@@ -147,7 +147,7 @@ public partial class TextDocument : OdfDocument
         }
 
         document.Dispose();
-        throw new InvalidOperationException("指定的 ODF 文件不是 ODT 文字文件。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_TextDocument_SpecifiedOdfFileOdt"));
     }
 
     private void InitializeTextRoot()
@@ -297,11 +297,11 @@ public partial class TextDocument : OdfDocument
     public OdfPageSetup GetPageSetup(string masterPageName)
     {
         if (string.IsNullOrWhiteSpace(masterPageName))
-            throw new ArgumentException("主頁面樣式名稱不可為空白。", nameof(masterPageName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocument_MainCannotBeEmpty"), nameof(masterPageName));
 
         string? layoutName = ResolveMasterPageLayoutName(masterPageName);
         if (layoutName is null)
-            throw new ArgumentException($"找不到主頁面樣式「{masterPageName}」。", nameof(masterPageName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocument_MainPageStyleCannot", masterPageName), nameof(masterPageName));
 
         return new OdfPageSetup(this, masterPageName, layoutName);
     }
@@ -403,9 +403,9 @@ public partial class TextDocument : OdfDocument
     public OdfSection AddSubDocumentReference(string name, string subDocumentUri, bool loadOnRequest = false)
     {
         if (string.IsNullOrEmpty(name))
-            throw new ArgumentException("區段名稱不可為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocument_SectionCannotBeEmpty"), nameof(name));
         if (string.IsNullOrEmpty(subDocumentUri))
-            throw new ArgumentException("子文件 URI 不可為空。", nameof(subDocumentUri));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocument_SubfileCannotBeEmpty"), nameof(subDocumentUri));
 
         var sectionNode = new OdfNode(OdfNodeType.Element, "section", OdfNamespaces.Text, "text");
         sectionNode.SetAttribute("name", OdfNamespaces.Text, name, "text");

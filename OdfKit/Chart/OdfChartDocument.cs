@@ -253,7 +253,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
         }
 
         document.Dispose();
-        throw new InvalidOperationException("指定的 ODF 文件不是 ODC 圖表。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfChartDocument_SpecifiedOdfFileOdc"));
     }
 
     private static bool InitMimeType(OdfPackage pkg)
@@ -311,7 +311,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <param name="renameMap">樣式名稱變更的對照字典</param>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
-        var srcChart = sourceDoc as OdfChartDocument ?? throw new ArgumentException("Source document must be a OdfChartDocument.");
+        var srcChart = sourceDoc as OdfChartDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfChartDocument_SourceDocumentOdfchartdocument"));
 
         var body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
         var destChartRoot = FindOrCreateChild(body, "chart", OdfNamespaces.Office, "office");

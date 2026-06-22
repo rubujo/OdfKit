@@ -1,4 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.IO.Compression;
+using System.Globalization;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -49,13 +52,13 @@ public class LibreOfficeInteropTests
             RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt", odtPath);
             string txtPath = Path.Combine(outputDir, "interop-tracked-changes.txt");
             Assert.True(File.Exists(txtPath), "LibreOffice 應輸出追蹤修訂 ODT 的文字轉換結果。");
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             string txt;
             using (var stream = File.OpenRead(txtPath))
             {
                 try
                 {
-                    var utf8Throw = System.Text.Encoding.GetEncoding("utf-8", System.Text.EncoderFallback.ExceptionFallback, System.Text.DecoderFallback.ExceptionFallback);
+                    var utf8Throw = Encoding.GetEncoding("utf-8", System.Text.EncoderFallback.ExceptionFallback, System.Text.DecoderFallback.ExceptionFallback);
                     using (var reader = new StreamReader(stream, utf8Throw, detectEncodingFromByteOrderMarks: true, bufferSize: 1024, leaveOpen: true))
                     {
                         txt = reader.ReadToEnd();
@@ -64,8 +67,8 @@ public class LibreOfficeInteropTests
                 catch (DecoderFallbackException)
                 {
                     stream.Position = 0;
-                    int codePage = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ANSICodePage;
-                    using (var reader = new StreamReader(stream, System.Text.Encoding.GetEncoding(codePage), detectEncodingFromByteOrderMarks: true))
+                    int codePage = CultureInfo.CurrentCulture.TextInfo.ANSICodePage;
+                    using (var reader = new StreamReader(stream, Encoding.GetEncoding(codePage), detectEncodingFromByteOrderMarks: true))
                     {
                         txt = reader.ReadToEnd();
                     }
@@ -1804,13 +1807,13 @@ public class LibreOfficeInteropTests
             string txtPath = Path.Combine(outputDir, "rare-chars.txt");
             Assert.True(File.Exists(txtPath), "LibreOffice 應成功轉換為文字檔案。");
 
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             string txt;
             using (var stream = File.OpenRead(txtPath))
             {
                 try
                 {
-                    var utf8Throw = System.Text.Encoding.GetEncoding("utf-8", System.Text.EncoderFallback.ExceptionFallback, System.Text.DecoderFallback.ExceptionFallback);
+                    var utf8Throw = Encoding.GetEncoding("utf-8", System.Text.EncoderFallback.ExceptionFallback, System.Text.DecoderFallback.ExceptionFallback);
                     using (var reader = new StreamReader(stream, utf8Throw, detectEncodingFromByteOrderMarks: true, bufferSize: 1024, leaveOpen: true))
                     {
                         txt = reader.ReadToEnd();
@@ -1820,7 +1823,7 @@ public class LibreOfficeInteropTests
                 {
                     stream.Position = 0;
                     // 若發生解碼失敗，退回至標準容錯 UTF-8 讀取（無效字元會解碼為 replacement character，但罕見字能被保留）
-                    using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
+                    using (var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
                     {
                         txt = reader.ReadToEnd();
                     }
@@ -2237,7 +2240,7 @@ public class LibreOfficeInteropTests
         }
 
         encryptedStream.Position = 0;
-        using (var rawZip = new System.IO.Compression.ZipArchive(encryptedStream, System.IO.Compression.ZipArchiveMode.Read, leaveOpen: true))
+        using (var rawZip = new ZipArchive(encryptedStream, ZipArchiveMode.Read, leaveOpen: true))
         {
             var manifestEntry = rawZip.GetEntry("META-INF/manifest.xml");
             Assert.NotNull(manifestEntry);
@@ -2335,7 +2338,7 @@ public class LibreOfficeInteropTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfPackage.PruneUnusedMedia(System.Collections.Generic.IEnumerable{string})"/> 能正確移除
+    /// 驗證 <see cref="OdfPackage.PruneUnusedMedia(IEnumerable{string})"/> 能正確移除
     /// 封裝中未被指定參照路徑集合納入的 <c>Pictures/</c> 媒體項目，且保留有參照的項目；移除後另存的 ODT
     /// 文件仍可被真實 LibreOffice 26.x headless 模式開啟並轉出 PDF。
     /// </summary>
@@ -2344,7 +2347,7 @@ public class LibreOfficeInteropTests
     /// <c>OdfSaveOptions.PruneUnusedMedia</c> 旗標目前僅為保留供未來自動清理功能使用的設定欄位，
     /// 儲存管線尚未讀取此選項（詳見 <c>OdfSaveOptions.cs</c> 的 <c>PruneUnusedMedia</c> 屬性說明），
     /// 故呼叫端必須如本測試一般自行收集目前實際參照的媒體路徑並手動呼叫
-    /// <see cref="OdfPackage.PruneUnusedMedia(System.Collections.Generic.IEnumerable{string})"/>。
+    /// <see cref="OdfPackage.PruneUnusedMedia(IEnumerable{string})"/>。
     /// </para>
     /// <para>
     /// 重要：此方法僅單純依路徑清單比對移除 ZIP 媒體項目，不會檢查或同步移除 content.xml 中殘留的

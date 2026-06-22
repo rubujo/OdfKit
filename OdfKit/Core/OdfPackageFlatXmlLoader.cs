@@ -140,7 +140,7 @@ internal static class OdfPackageFlatXmlLoader
 
         XElement? root = doc.Root;
         if (root is null || root.Name.LocalName != "document" || root.Name.NamespaceName != OdfNamespaces.Office)
-            throw new InvalidDataException("Invalid Flat XML: root element must be office:document.");
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageFlatXmlLoader_InvalidFlatXmlRoot"));
 
         XNamespace officeNs = XNamespace.Get(OdfNamespaces.Office);
         XNamespace xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
@@ -148,7 +148,7 @@ internal static class OdfPackageFlatXmlLoader
         XAttribute? mimeAttr = root.Attribute(officeNs + "mimetype") ?? root.Attribute("mimetype");
         ctx.MimeType = mimeAttr?.Value;
         if (string.IsNullOrEmpty(ctx.MimeType) && ctx.LoadOptions.ValidateMimeType)
-            throw new InvalidDataException("Invalid Flat XML: missing office:mimetype.");
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageFlatXmlLoader_InvalidNotFound"));
 
         XAttribute? versionAttr = root.Attribute(officeNs + "version") ?? root.Attribute("version");
         string version = versionAttr?.Value ?? "1.3";
@@ -327,7 +327,7 @@ internal static class OdfPackageFlatXmlLoader
         cancellationToken.ThrowIfCancellationRequested();
 
         if (ctx.UnderlyingStream is null)
-            throw new InvalidOperationException("No input stream available.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackageFlatXmlLoader_NoInputStreamAvailable"));
 
         if (!ctx.UnderlyingStream.CanSeek)
         {

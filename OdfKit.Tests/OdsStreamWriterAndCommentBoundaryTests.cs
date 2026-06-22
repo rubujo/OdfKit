@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.IO.Compression;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -273,7 +274,7 @@ namespace OdfKit.Tests
             }
 
             ms.Position = 0;
-            using var archive = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Read);
+            using var archive = new ZipArchive(ms, ZipArchiveMode.Read);
             Assert.NotNull(archive.GetEntry("content.xml"));
             Assert.NotNull(archive.GetEntry("styles.xml"));
             Assert.NotNull(archive.GetEntry("mimetype"));

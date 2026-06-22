@@ -11,6 +11,7 @@ using System.Xml;
 using System.Xml.Linq;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -146,18 +147,18 @@ internal static class OdfPackageArchiveWriter
         if (ctx.Entries.TryGetValue("content.xml", out OdfPackageEntry? contentEntry))
         {
             using var reader = XmlReader.Create(contentEntry.OpenReader(), xmlSettings);
-            contentRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid content.xml root");
+            contentRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageArchiveWriter_InvalidContentXmlRoot"));
         }
         else
         {
-            throw new InvalidDataException("Missing virtual content.xml");
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageArchiveWriter_VirtualNotFound"));
         }
 
         XElement stylesRoot;
         if (ctx.Entries.TryGetValue("styles.xml", out OdfPackageEntry? stylesEntry))
         {
             using var reader = XmlReader.Create(stylesEntry.OpenReader(), xmlSettings);
-            stylesRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid styles.xml root");
+            stylesRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageArchiveWriter_InvalidStylesXmlRoot"));
         }
         else
         {
@@ -168,7 +169,7 @@ internal static class OdfPackageArchiveWriter
         if (ctx.Entries.TryGetValue("meta.xml", out OdfPackageEntry? metaEntry))
         {
             using var reader = XmlReader.Create(metaEntry.OpenReader(), xmlSettings);
-            metaRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid meta.xml root");
+            metaRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageArchiveWriter_InvalidMetaXmlRoot"));
         }
         else
         {
@@ -179,7 +180,7 @@ internal static class OdfPackageArchiveWriter
         if (ctx.Entries.TryGetValue("settings.xml", out OdfPackageEntry? settingsEntry))
         {
             using var reader = XmlReader.Create(settingsEntry.OpenReader(), xmlSettings);
-            settingsRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException("Invalid settings.xml root");
+            settingsRoot = XDocument.Load(reader).Root ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageArchiveWriter_InvalidSettingsXmlRoot"));
         }
         else
         {
@@ -300,7 +301,7 @@ internal static class OdfPackageArchiveWriter
                     XElement subDocRoot;
                     using (var subReader = XmlReader.Create(subDocEntry.OpenReader(), xmlSettings))
                         subDocRoot = XDocument.Load(subReader).Root
-                            ?? throw new InvalidDataException($"Invalid {subDocContentPath} root");
+                            ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageArchiveWriter_InvalidRoot", subDocContentPath));
 
                     var nestedDoc = new XElement(officeNs + "document");
                     nestedDoc.SetAttributeValue(officeNs + "mimetype", mimeType);

@@ -143,7 +143,7 @@ public class SpreadsheetApiUsabilityTests
         ms.Position = 0;
 
         using SpreadsheetDocument loaded = SpreadsheetDocument.Load(ms);
-        using var zip = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Read);
+        using var zip = new ZipArchive(ms, ZipArchiveMode.Read);
         var entry = zip.GetEntry("settings.xml");
         Assert.NotNull(entry);
         using var reader = new StreamReader(entry!.Open());
@@ -173,7 +173,7 @@ public class SpreadsheetApiUsabilityTests
         ms.Position = 0;
 
         using SpreadsheetDocument loaded = SpreadsheetDocument.Load(ms);
-        using var zip = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Read);
+        using var zip = new ZipArchive(ms, ZipArchiveMode.Read);
         var entry = zip.GetEntry("content.xml");
         Assert.NotNull(entry);
         using var reader = new StreamReader(entry!.Open());

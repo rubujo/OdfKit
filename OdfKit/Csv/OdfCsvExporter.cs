@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -8,6 +9,7 @@ using OdfKit.DOM;
 using OdfKit.Spreadsheet;
 using Sylvan.Data.Csv;
 
+using OdfKit.Compliance;
 namespace OdfKit.Csv;
 
 /// <summary>
@@ -32,7 +34,7 @@ public static class OdfCsvExporter
         options ??= new OdfCsvOptions();
 
         if (options.ExportSheetIndex < 0 || options.ExportSheetIndex >= workbook.Worksheets.Count)
-            throw new ArgumentOutOfRangeException(nameof(options), "ExportSheetIndex 超出工作表範圍。");
+            throw new ArgumentOutOfRangeException(nameof(options), OdfLocalizer.GetMessage("Err_OdfCsvExporter_ExportsheetindexExceedsWorksheetRange"));
 
         var sheet = workbook.Worksheets[options.ExportSheetIndex];
 
@@ -139,7 +141,7 @@ public static class OdfCsvExporter
         switch (valueType)
         {
             case "float":
-                if (double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double number))
+                if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double number))
                 {
                     return number;
                 }

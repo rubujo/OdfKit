@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -22,7 +23,7 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     {
         if (!TryParseComponents(value, out OdfLength x, out OdfLength y, out OdfLength z))
         {
-            throw new ArgumentException("三維點必須符合 ODF point3D 格式。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPoint3D_3dPointsConformOdf"), nameof(value));
         }
 
         Value = value;
@@ -42,7 +43,7 @@ public readonly struct OdfPoint3D : IEquatable<OdfPoint3D>
     {
         if (!IsAllowedUnit(x) || !IsAllowedUnit(y) || !IsAllowedUnit(z))
         {
-            throw new ArgumentException("三維點座標只可使用 cm、mm、in、pt 或 pc 單位。");
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfPoint3D_3dPointCoordinatesOnly"));
         }
 
         X = x;

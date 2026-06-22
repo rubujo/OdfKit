@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Text;
+using System.Globalization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using OdfKit.Core;
@@ -16,7 +18,7 @@ internal static class FormulaStringFunctionHandlers
 
     internal static object EvaluateConcat(List<AstNode> arguments, IEvaluationContext context)
     {
-        var sb = new System.Text.StringBuilder();
+        var sb = new StringBuilder();
         foreach (var arg in arguments)
         {
             var val = arg.Evaluate(context);
@@ -289,11 +291,11 @@ internal static class FormulaStringFunctionHandlers
         {
             try
             {
-                return d.ToString(format, System.Globalization.CultureInfo.InvariantCulture);
+                return d.ToString(format, CultureInfo.InvariantCulture);
             }
             catch
             {
-                return d.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                return d.ToString(CultureInfo.InvariantCulture);
             }
         }
         return val?.ToString() ?? "";
@@ -343,7 +345,7 @@ internal static class FormulaStringFunctionHandlers
             return err;
         string str = val.ToString() ?? "";
         str = str.Trim();
-        var sb = new System.Text.StringBuilder();
+        var sb = new StringBuilder();
         bool lastWasSpace = false;
         foreach (char c in str)
         {

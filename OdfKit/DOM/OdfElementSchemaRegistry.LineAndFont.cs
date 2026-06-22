@@ -2,6 +2,7 @@
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -57,7 +58,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfLineStyle.DotDash => "dot-dash",
             OdfLineStyle.DotDotDash => "dot-dot-dash",
             OdfLineStyle.Wave => "wave",
-            _ => throw new ArgumentOutOfRangeException(nameof(lineStyle), lineStyle, "未知的 ODF 線條樣式。")
+            _ => throw new ArgumentOutOfRangeException(nameof(lineStyle), lineStyle, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfLineStyle"))
         };
     }
 
@@ -87,7 +88,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfLineType.None => "none",
             OdfLineType.Single => "single",
             OdfLineType.Double => "double",
-            _ => throw new ArgumentOutOfRangeException(nameof(lineType), lineType, "未知的 ODF 線條類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(lineType), lineType, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfLineType"))
         };
     }
 
@@ -113,7 +114,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfLineMode.Continuous => "continuous",
             OdfLineMode.SkipWhiteSpace => "skip-white-space",
-            _ => throw new ArgumentOutOfRangeException(nameof(lineMode), lineMode, "未知的 ODF 線條模式。")
+            _ => throw new ArgumentOutOfRangeException(nameof(lineMode), lineMode, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfLineMode"))
         };
     }
 
@@ -143,7 +144,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfFontStyle.Normal => "normal",
             OdfFontStyle.Italic => "italic",
             OdfFontStyle.Oblique => "oblique",
-            _ => throw new ArgumentOutOfRangeException(nameof(fontStyle), fontStyle, "未知的 ODF 字型樣式。")
+            _ => throw new ArgumentOutOfRangeException(nameof(fontStyle), fontStyle, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfFontStyle"))
         };
     }
 
@@ -169,7 +170,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfFontVariant.Normal => "normal",
             OdfFontVariant.SmallCaps => "small-caps",
-            _ => throw new ArgumentOutOfRangeException(nameof(fontVariant), fontVariant, "未知的 ODF 字型變體。")
+            _ => throw new ArgumentOutOfRangeException(nameof(fontVariant), fontVariant, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfFontVariant"))
         };
     }
 
@@ -231,7 +232,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfFontWeight.Weight700 => "700",
             OdfFontWeight.Weight800 => "800",
             OdfFontWeight.Weight900 => "900",
-            _ => throw new ArgumentOutOfRangeException(nameof(fontWeight), fontWeight, "未知的 ODF 字型粗細。")
+            _ => throw new ArgumentOutOfRangeException(nameof(fontWeight), fontWeight, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfFontWeight"))
         };
     }
 
@@ -273,7 +274,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfFontFamilyGeneric.Decorative => "decorative",
             OdfFontFamilyGeneric.Script => "script",
             OdfFontFamilyGeneric.System => "system",
-            _ => throw new ArgumentOutOfRangeException(nameof(family), family, "未知的 ODF 通用字型家族。")
+            _ => throw new ArgumentOutOfRangeException(nameof(family), family, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfUniversalFont"))
         };
     }
 
@@ -299,7 +300,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfFontPitch.Fixed => "fixed",
             OdfFontPitch.Variable => "variable",
-            _ => throw new ArgumentOutOfRangeException(nameof(pitch), pitch, "未知的 ODF 字型間距。")
+            _ => throw new ArgumentOutOfRangeException(nameof(pitch), pitch, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfFontSpacing"))
         };
     }
 
@@ -329,7 +330,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfFontRelief.None => "none",
             OdfFontRelief.Embossed => "embossed",
             OdfFontRelief.Engraved => "engraved",
-            _ => throw new ArgumentOutOfRangeException(nameof(relief), relief, "未知的 ODF 字型浮雕。")
+            _ => throw new ArgumentOutOfRangeException(nameof(relief), relief, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfFontRelief"))
         };
     }
 
@@ -383,7 +384,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfFontStretch.Expanded => "expanded",
             OdfFontStretch.ExtraExpanded => "extra-expanded",
             OdfFontStretch.UltraExpanded => "ultra-expanded",
-            _ => throw new ArgumentOutOfRangeException(nameof(stretch), stretch, "未知的 ODF 字型伸縮。")
+            _ => throw new ArgumentOutOfRangeException(nameof(stretch), stretch, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfFontScaling"))
         };
     }
 

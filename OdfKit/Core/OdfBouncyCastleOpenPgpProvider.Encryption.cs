@@ -10,6 +10,7 @@ using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 public sealed partial class OdfBouncyCastleOpenPgpProvider
@@ -31,7 +32,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
                     return key;
             }
         }
-        throw new InvalidOperationException("在公鑰資料中找不到可用於加密的子金鑰。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_NoSubkeyFoundPublic"));
     }
 
     private static PgpPublicKey? FindEncryptionKey(PgpPublicKeyRing ring)

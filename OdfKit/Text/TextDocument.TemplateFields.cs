@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 public partial class TextDocument
@@ -53,12 +54,12 @@ public partial class TextDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("使用者欄位名稱不可為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocument_UserCannotBeEmpty_3"), nameof(name));
         }
 
         if (string.IsNullOrWhiteSpace(valueType))
         {
-            throw new ArgumentException("使用者欄位值類型不可為空。", nameof(valueType));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocument_UserCannotBeEmpty_2"), nameof(valueType));
         }
 
         OdfNode decls = FindOrCreateUserFieldDecls();
@@ -85,7 +86,7 @@ public partial class TextDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("使用者欄位名稱不可為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocument_UserCannotBeEmpty_3"), nameof(name));
         }
 
         OdfNode? decls = BodyTextRoot.FindChildElement("user-field-decls", OdfNamespaces.Text);

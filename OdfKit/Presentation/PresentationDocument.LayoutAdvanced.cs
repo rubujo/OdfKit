@@ -4,6 +4,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 public partial class PresentationDocument
@@ -33,12 +34,12 @@ public partial class PresentationDocument
     public void ApplyPresentationPageLayout(int slideIndex, string layoutName)
     {
         if (string.IsNullOrWhiteSpace(layoutName))
-            throw new ArgumentException("版面配置名稱不可為空白。", nameof(layoutName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_PresentationDocument_LayoutCannotBeEmpty"), nameof(layoutName));
         if (slideIndex < 0 || slideIndex >= Slides.Count)
-            throw new ArgumentOutOfRangeException(nameof(slideIndex), "投影片索引超出範圍。");
+            throw new ArgumentOutOfRangeException(nameof(slideIndex), OdfLocalizer.GetMessage("Err_PresentationDocument_SlideIndexOutRange"));
 
         OdfPresentationPageLayout? layout = GetPresentationPageLayout(layoutName)
-            ?? throw new ArgumentException($"找不到版面配置「{layoutName}」。", nameof(layoutName));
+            ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_PresentationDocument_LayoutNotFound", layoutName), nameof(layoutName));
 
         OdfSlide slide = Slides[slideIndex];
         slide.PresentationPageLayoutName = layoutName;

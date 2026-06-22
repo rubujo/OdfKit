@@ -2,6 +2,7 @@
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -33,7 +34,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfTableBorderModel.Collapsing => "collapsing",
             OdfTableBorderModel.Separating => "separating",
-            _ => throw new ArgumentOutOfRangeException(nameof(borderModel), borderModel, "未知的 ODF 表格邊框模型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(borderModel), borderModel, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTableBorder"))
         };
     }
 
@@ -63,7 +64,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfTextLabelFollowedBy.ListTab => "listtab",
             OdfTextLabelFollowedBy.Nothing => "nothing",
             OdfTextLabelFollowedBy.Space => "space",
-            _ => throw new ArgumentOutOfRangeException(nameof(labelFollowedBy), labelFollowedBy, "未知的 ODF 文字清單標籤後接設定。")
+            _ => throw new ArgumentOutOfRangeException(nameof(labelFollowedBy), labelFollowedBy, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTextList"))
         };
     }
 
@@ -89,7 +90,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfTextListLevelPositionMode.LabelAlignment => "label-alignment",
             OdfTextListLevelPositionMode.LabelWidthAndPosition => "label-width-and-position",
-            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, "未知的 ODF 文字清單層級定位模式。")
+            _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTextList_2"))
         };
     }
 
@@ -115,7 +116,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfTextIndexScope.Chapter => "chapter",
             OdfTextIndexScope.Document => "document",
-            _ => throw new ArgumentOutOfRangeException(nameof(scope), scope, "未知的 ODF 文字索引範圍。")
+            _ => throw new ArgumentOutOfRangeException(nameof(scope), scope, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTextIndex"))
         };
     }
 
@@ -145,7 +146,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfTextTableType.Command => "command",
             OdfTextTableType.Query => "query",
             OdfTextTableType.Table => "table",
-            _ => throw new ArgumentOutOfRangeException(nameof(tableType), tableType, "未知的 ODF 文字資料表來源類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(tableType), tableType, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTextTable"))
         };
     }
 
@@ -183,7 +184,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfTextAnchorType.Frame => "frame",
             OdfTextAnchorType.Page => "page",
             OdfTextAnchorType.Paragraph => "paragraph",
-            _ => throw new ArgumentOutOfRangeException(nameof(anchorType), anchorType, "未知的 ODF 文字錨定類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(anchorType), anchorType, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTextAnchor"))
         };
     }
 
@@ -209,7 +210,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfTextNoteClass.Endnote => "endnote",
             OdfTextNoteClass.Footnote => "footnote",
-            _ => throw new ArgumentOutOfRangeException(nameof(noteClass), noteClass, "未知的 ODF 文字註解類別。")
+            _ => throw new ArgumentOutOfRangeException(nameof(noteClass), noteClass, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTextAnnotation"))
         };
     }
 
@@ -239,7 +240,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfTextSelectPage.Current => "current",
             OdfTextSelectPage.Next => "next",
             OdfTextSelectPage.Previous => "previous",
-            _ => throw new ArgumentOutOfRangeException(nameof(selectPage), selectPage, "未知的 ODF 文字頁面選取。")
+            _ => throw new ArgumentOutOfRangeException(nameof(selectPage), selectPage, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfTextPage"))
         };
     }
 
@@ -297,7 +298,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfTextReferenceFormat.Page => "page",
             OdfTextReferenceFormat.Text => "text",
             OdfTextReferenceFormat.Value => "value",
-            _ => throw new ArgumentOutOfRangeException(nameof(format), format, "未知的 ODF 文字參照格式。")
+            _ => throw new ArgumentOutOfRangeException(nameof(format), format, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfLiteralReference"))
         };
     }
 

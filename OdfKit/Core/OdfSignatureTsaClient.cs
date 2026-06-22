@@ -9,6 +9,7 @@ using System.Xml;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Tsp;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -61,16 +62,16 @@ internal static class OdfSignatureTsaClient
         }
         catch (Exception ex)
         {
-            throw new CryptographicException("Invalid TSA response structure (expected SEQUENCE).", ex);
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureTsaClient_InvalidTsaResponseStructure"), ex);
         }
 
         int status = response.Status.Status.IntValueExact;
         if (status != 0 && status != 1)
-            throw new CryptographicException($"TSA request was rejected with status: {status}.");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureTsaClient_TsaRequestRejectedStatus", status));
 
         Org.BouncyCastle.Asn1.Cms.ContentInfo? token = response.TimeStampToken;
         if (token is null)
-            throw new CryptographicException("TSA response does not contain a TimeStampToken.");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureTsaClient_TsaResponseContainTimestamptoken"));
 
         return token.GetEncoded();
     }
@@ -92,7 +93,7 @@ internal static class OdfSignatureTsaClient
     private static byte[] CreateTsaRequest(byte[] hash)
     {
         if (hash == null || hash.Length != 32)
-            throw new ArgumentException("Hash must be 32 bytes (SHA-256).", nameof(hash));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSignatureTsaClient_Hash32BytesSha"), nameof(hash));
 
         byte[] request = new byte[59];
         request[0] = 0x30;

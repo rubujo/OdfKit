@@ -18,7 +18,7 @@ public partial class OdfFormulaDocument
         }
 
         document.Dispose();
-        throw new InvalidOperationException("指定的 ODF 文件不是 ODF 公式。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_SpecifiedOdfFileOdf"));
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ public partial class OdfFormulaDocument
     /// <exception cref="ArgumentException">當來源文件不是 <see cref="OdfFormulaDocument"/> 時擲出</exception>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
-        var srcFormula = sourceDoc as OdfFormulaDocument ?? throw new ArgumentException("Source document must be a OdfFormulaDocument.");
+        var srcFormula = sourceDoc as OdfFormulaDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_SourceDocumentOdfformuladocument"));
 
         var body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");
         var destFormulaRoot = FindOrCreateChild(body, "formula", OdfNamespaces.Office, "office");
@@ -157,7 +157,7 @@ public partial class OdfFormulaDocument
     {
         if (token.Base is null)
         {
-            throw new InvalidOperationException("根號 token 必須包含被開方數。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_RadicalTokenContainRadicand"));
         }
 
         string elementName = token.Script is null ? "msqrt" : "mroot";
@@ -175,7 +175,7 @@ public partial class OdfFormulaDocument
     {
         if (token.Children is null || token.Children.Count == 0)
         {
-            throw new InvalidOperationException("群組 token 必須包含至少一個子 token。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_GroupTokenContainLeast"));
         }
 
         OdfNode node = OdfNodeFactory.CreateElement(elementName, MathMlNamespace, "math");
@@ -191,7 +191,7 @@ public partial class OdfFormulaDocument
     {
         if (token.Children is null || token.Children.Count == 0)
         {
-            throw new InvalidOperationException("矩陣 token 必須包含至少一列。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_MatrixTokenContainLeast"));
         }
 
         OdfNode table = OdfNodeFactory.CreateElement("mtable", MathMlNamespace, "math");
@@ -216,7 +216,7 @@ public partial class OdfFormulaDocument
     {
         if (token.Children is null || token.Children.Count != 3)
         {
-            throw new InvalidOperationException("上下方標記 token 必須包含底數、下方與上方共三個子 token。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_UpperLowerMarkTokens"));
         }
 
         OdfNode node = OdfNodeFactory.CreateElement("munderover", MathMlNamespace, "math");
@@ -232,7 +232,7 @@ public partial class OdfFormulaDocument
     {
         if (token.Base is null)
         {
-            throw new InvalidOperationException("括號群組 token 必須包含內容。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_BracketGroupTokenContain"));
         }
 
         string[] delimiters = token.Text.Split('|');
@@ -254,7 +254,7 @@ public partial class OdfFormulaDocument
     {
         if (token.Base is null)
         {
-            throw new InvalidOperationException("樣式群組 token 必須包含內容。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_StyleGroupTokenContain"));
         }
 
         OdfNode node = OdfNodeFactory.CreateElement("mstyle", MathMlNamespace, "math");
@@ -278,7 +278,7 @@ public partial class OdfFormulaDocument
     {
         if (token.Base is null || token.Script is null)
         {
-            throw new InvalidOperationException("上標或下標 token 必須包含底數與指數。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_SuperscriptSubscriptTokensContain"));
         }
 
         OdfNode node = OdfNodeFactory.CreateElement(elementName, MathMlNamespace, "math");
@@ -502,7 +502,7 @@ public partial class OdfFormulaDocument
             OdfMathTokenKind.Number => "mn",
             OdfMathTokenKind.Operator => "mo",
             OdfMathTokenKind.Text => "mtext",
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "未知的 MathML 葉節點 token 類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, OdfLocalizer.GetMessage("Err_OdfFormulaDocument_UnknownMathmlLeafNode"))
         };
     }
 

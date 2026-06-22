@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -17,6 +18,11 @@ namespace OdfKit.Tests
 {
     public class DomTest
     {
+        public DomTest()
+        {
+            OdfLocalizer.DefaultCulture = new CultureInfo("en");
+        }
+
         [Fact]
         public void TestBasicDomParsingAndWriting()
         {

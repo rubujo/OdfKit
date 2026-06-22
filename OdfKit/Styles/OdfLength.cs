@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
+using OdfKit.Compliance;
 namespace OdfKit.Styles;
 
 /// <summary>
@@ -156,7 +157,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
 
         if (!double.TryParse(numPart, NumberStyles.Float, CultureInfo.InvariantCulture, out double val))
         {
-            throw new FormatException($"長度中的數值格式無效：'{text}'");
+            throw new FormatException(OdfLocalizer.GetMessage("Err_OdfLength_InvalidNumericFormatLength", text));
         }
 
         OdfUnit unit = unitPart switch
@@ -170,7 +171,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
             "%" => OdfUnit.Percentage,
             "em" => OdfUnit.Em,
             "" => OdfUnit.Unspecified,
-            _ => throw new FormatException($"長度中包含不受支援的單位 '{unitPart}'：'{text}'")
+            _ => throw new FormatException(OdfLocalizer.GetMessage("Err_OdfLength_LengthContainsUnsupportedUnit", unitPart, text))
         };
 
         return new(val, unit);
@@ -243,7 +244,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
 
         if (Unit is OdfUnit.Percentage or OdfUnit.Em || targetUnit is OdfUnit.Percentage or OdfUnit.Em)
         {
-            throw new InvalidOperationException($"無法直接將相對單位 '{Unit}' 轉換為絕對單位 '{targetUnit}'。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfLength_UnableDirectlyConvertRelative", Unit, targetUnit));
         }
 
         // 將目前單位轉換為點（72 點 = 1 英吋）
@@ -255,7 +256,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
             OdfUnit.Inches => Value * 72.0,
             OdfUnit.Picas => Value * 12.0,
             OdfUnit.Pixels => Value * (72.0 / 96.0), // 假設為標準的 96 DPI
-            _ => throw new NotSupportedException($"不支援自單位 {Unit} 進行轉換。")
+            _ => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfLength_ConversionUnitSupported", Unit))
         };
 
         // 將點轉換為目標單位
@@ -267,7 +268,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
             OdfUnit.Inches => points / 72.0,
             OdfUnit.Picas => points / 12.0,
             OdfUnit.Pixels => points / (72.0 / 96.0),
-            _ => throw new NotSupportedException($"不支援轉換為單位 {targetUnit}。")
+            _ => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfLength_ConversionUnitSupported_2", targetUnit))
         };
     }
 

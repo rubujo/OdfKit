@@ -1,8 +1,10 @@
-﻿using System;
+﻿using System.Text;
+using System;
 using System.Xml.Linq;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
@@ -18,7 +20,7 @@ internal static class TextDocumentFormulaEngine
         if (paragraph is null)
             throw new ArgumentNullException(nameof(paragraph));
         if (string.IsNullOrWhiteSpace(mathMlXmlString))
-            throw new ArgumentException("MathML XML content cannot be empty.", nameof(mathMlXmlString));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFormulaEngine_MathmlCannotBeEmpty"), nameof(mathMlXmlString));
 
         try
         {
@@ -26,7 +28,7 @@ internal static class TextDocumentFormulaEngine
         }
         catch (Exception ex)
         {
-            throw new ArgumentException("Invalid MathML XML: " + ex.Message, nameof(mathMlXmlString), ex);
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFormulaEngine_InvalidMathmlXml") + ex.Message, nameof(mathMlXmlString), ex);
         }
 
         string folder = $"Formula_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
@@ -34,10 +36,10 @@ internal static class TextDocumentFormulaEngine
         string stylesXml = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:styles/><office:automatic-styles/><office:master-styles/></office:document-styles>";
         string metaXml = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:meta/></office:document-meta>";
 
-        ctx.Package.WriteEntry($"{folder}/content.xml", System.Text.Encoding.UTF8.GetBytes(mathDocXml), "text/xml");
-        ctx.Package.WriteEntry($"{folder}/styles.xml", System.Text.Encoding.UTF8.GetBytes(stylesXml), "text/xml");
-        ctx.Package.WriteEntry($"{folder}/meta.xml", System.Text.Encoding.UTF8.GetBytes(metaXml), "text/xml");
-        ctx.Package.WriteEntry($"{folder}/mimetype", System.Text.Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.formula"), string.Empty);
+        ctx.Package.WriteEntry($"{folder}/content.xml", Encoding.UTF8.GetBytes(mathDocXml), "text/xml");
+        ctx.Package.WriteEntry($"{folder}/styles.xml", Encoding.UTF8.GetBytes(stylesXml), "text/xml");
+        ctx.Package.WriteEntry($"{folder}/meta.xml", Encoding.UTF8.GetBytes(metaXml), "text/xml");
+        ctx.Package.WriteEntry($"{folder}/mimetype", Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.formula"), string.Empty);
 
         ctx.Package.SaveManifestToEntries();
 

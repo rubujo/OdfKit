@@ -4,6 +4,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 public partial class PresentationDocument
@@ -209,7 +210,7 @@ public partial class PresentationDocument
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)
         {
-            throw new ArgumentOutOfRangeException(nameof(slideIndex), "投影片索引超出範圍。");
+            throw new ArgumentOutOfRangeException(nameof(slideIndex), OdfLocalizer.GetMessage("Err_PresentationDocument_SlideIndexOutRange_3"));
         }
 
         var slide = Slides[slideIndex];
@@ -248,7 +249,7 @@ public partial class PresentationDocument
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)
         {
-            throw new ArgumentOutOfRangeException(nameof(slideIndex), "投影片索引超出範圍。");
+            throw new ArgumentOutOfRangeException(nameof(slideIndex), OdfLocalizer.GetMessage("Err_PresentationDocument_SlideIndexOutRange_3"));
         }
 
         var slide = Slides[slideIndex];

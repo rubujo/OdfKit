@@ -1,5 +1,6 @@
 ﻿using System;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -16,7 +17,7 @@ public readonly struct OdfMediaType : IEquatable<OdfMediaType>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("MIME 類型必須包含 type/subtype，且不可包含空白或控制字元。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfMediaType_MimeTypeContainType"), nameof(value));
         }
 
         Value = value;

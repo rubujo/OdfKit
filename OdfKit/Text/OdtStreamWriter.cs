@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -95,7 +96,7 @@ public sealed class OdtStreamWriter : IDisposable
         EnsureNotDisposed();
         if (level is < 1 or > 6)
         {
-            throw new ArgumentOutOfRangeException(nameof(level), "標題層級必須介於 1 到 6。");
+            throw new ArgumentOutOfRangeException(nameof(level), OdfLocalizer.GetMessage("Err_OdtStreamWriter_TitleLevelBetween1"));
         }
 
         WriteTextElement("h", text, styleName: null, headingLevel: level);
@@ -111,7 +112,7 @@ public sealed class OdtStreamWriter : IDisposable
         EnsureNotDisposed();
         if (_isListStarted)
         {
-            throw new InvalidOperationException("清單已經開始。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdtStreamWriter_ListStarted"));
         }
 
         _writer.WriteStartElement("text", "list", OdfNamespaces.Text);
@@ -133,7 +134,7 @@ public sealed class OdtStreamWriter : IDisposable
         EnsureNotDisposed();
         if (!_isListStarted)
         {
-            throw new InvalidOperationException("AddListItem() 必須在 BeginList() 與 EndList() 之間呼叫。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdtStreamWriter_AddlistitemCalledBetweenBeginlist"));
         }
 
         _writer.WriteStartElement("text", "list-item", OdfNamespaces.Text);
@@ -312,7 +313,7 @@ public sealed class OdtStreamWriter : IDisposable
 
         if (headingLevel.HasValue)
         {
-            _writer.WriteAttributeString("text", "outline-level", OdfNamespaces.Text, headingLevel.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            _writer.WriteAttributeString("text", "outline-level", OdfNamespaces.Text, headingLevel.Value.ToString(CultureInfo.InvariantCulture));
         }
 
         if (!string.IsNullOrEmpty(text))

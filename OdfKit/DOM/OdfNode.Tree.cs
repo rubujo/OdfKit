@@ -1,5 +1,6 @@
 ﻿using System;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 public partial class OdfNode
@@ -19,7 +20,7 @@ public partial class OdfNode
             throw new ArgumentNullException(nameof(child));
         if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
-            throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_CannotAddChildNodes_3"));
         }
 
         IsModified = true;
@@ -42,12 +43,12 @@ public partial class OdfNode
             throw new ArgumentNullException(nameof(refChild));
         if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
-            throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_CannotAddChildNodes_3"));
         }
 
         if (refChild.Parent != this)
         {
-            throw new InvalidOperationException("Reference node is not a child of this node.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_ReferenceNodeChildNode_2"));
         }
 
         IsModified = true;
@@ -70,12 +71,12 @@ public partial class OdfNode
             throw new ArgumentNullException(nameof(refChild));
         if (NodeType == OdfNodeType.Text || NodeType == OdfNodeType.Comment || NodeType == OdfNodeType.ProcessingInstruction)
         {
-            throw new InvalidOperationException("Cannot add child nodes to a text or comment node.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_CannotAddChildNodes_3"));
         }
 
         if (refChild.Parent != this)
         {
-            throw new InvalidOperationException("Reference node is not a child of this node.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNode_ReferenceNodeChildNode_2"));
         }
 
         IsModified = true;

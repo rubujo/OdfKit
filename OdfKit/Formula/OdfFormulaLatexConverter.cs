@@ -3,6 +3,7 @@ using System.Text;
 using CSharpMath.Atom;
 using CSharpMath.Structures;
 
+using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
 /// <summary>
@@ -29,7 +30,7 @@ public static class OdfFormulaLatexConverter
         var (mathList, error) = LaTeXParser.MathListFromLaTeX(latex);
         if (error != null)
         {
-            throw new ArgumentException($"LaTeX 解析失敗：{error}", nameof(latex));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfFormulaLatexConverter_LatexParsingFailed", error), nameof(latex));
         }
 
         var sb = new StringBuilder();

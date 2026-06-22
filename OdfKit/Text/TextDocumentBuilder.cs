@@ -1,6 +1,8 @@
-﻿using OdfKit.Core;
+﻿using System.Globalization;
+using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
@@ -177,7 +179,7 @@ public sealed class TextDocumentBuilder
 
     private static string ToPointString(double points)
     {
-        return points.ToString(System.Globalization.CultureInfo.InvariantCulture) + "pt";
+        return points.ToString(CultureInfo.InvariantCulture) + "pt";
     }
 }
 
@@ -342,7 +344,7 @@ public sealed class TextRunFormattingBuilder
     {
         if (!OdfColor.TryParse(color, out _))
         {
-            throw new ArgumentException("色彩值必須是 #RRGGBB 格式。", nameof(color));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentBuilder_ColorValuesRrggbbFormat"), nameof(color));
         }
 
         ColorValue = color;

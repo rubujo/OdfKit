@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -41,7 +42,7 @@ public static partial class OdfPackageValidator
         OdfPackage package,
         OdfComplianceProfile? profile = null,
         string? fileName = null,
-        System.Globalization.CultureInfo? culture = null)
+        CultureInfo? culture = null)
     {
         if (package is null)
             throw new ArgumentNullException(nameof(package));
@@ -49,9 +50,9 @@ public static partial class OdfPackageValidator
         List<OdfValidationIssue> issues = [];
 
         // 智慧偵測語系
-        System.Globalization.CultureInfo targetCulture = culture
+        CultureInfo targetCulture = culture
             ?? profile?.TargetCulture
-            ?? System.Globalization.CultureInfo.CurrentUICulture;
+            ?? CultureInfo.CurrentUICulture;
 
         string? profileId = profile?.Id;
         string? mimeType = package.MimeType;

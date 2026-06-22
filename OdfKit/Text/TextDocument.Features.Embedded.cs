@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Text;
+using System;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
@@ -70,11 +71,11 @@ public partial class TextDocument
         paragraph.Node.AppendChild(frameNode);
 
         // 3. 建立子封裝中的檔案
-        byte[] mimeBytes = System.Text.Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.chart");
+        byte[] mimeBytes = Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.chart");
         Package.WriteEntry($"{objectDir}mimetype", mimeBytes, string.Empty);
 
         string stylesXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><office:document-styles xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" office:version=\"1.3\"><office:styles/><office:automatic-styles/><office:master-styles/></office:document-styles>";
-        Package.WriteEntry($"{objectDir}styles.xml", System.Text.Encoding.UTF8.GetBytes(stylesXml), "text/xml");
+        Package.WriteEntry($"{objectDir}styles.xml", Encoding.UTF8.GetBytes(stylesXml), "text/xml");
 
         string chartClass = chart.ChartType switch
         {
@@ -86,7 +87,7 @@ public partial class TextDocument
             _ => "chart:bar"
         };
 
-        var sb = new System.Text.StringBuilder();
+        var sb = new StringBuilder();
         sb.Append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
         sb.Append("<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:chart=\"urn:oasis:names:tc:opendocument:xmlns:chart:1.0\" xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\" xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\" xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.3\">");
         sb.Append("<office:body><office:chart>");
@@ -143,12 +144,12 @@ public partial class TextDocument
 
         sb.Append("</chart:chart></office:chart></office:body></office:document-content>");
 
-        Package.WriteEntry($"{objectDir}content.xml", System.Text.Encoding.UTF8.GetBytes(sb.ToString()), "text/xml");
+        Package.WriteEntry($"{objectDir}content.xml", Encoding.UTF8.GetBytes(sb.ToString()), "text/xml");
 
         return frameNode;
     }
 
-    private static void AppendChartSeriesXml(System.Text.StringBuilder sb, OdfChartDefinition chart, string chartClass)
+    private static void AppendChartSeriesXml(StringBuilder sb, OdfChartDefinition chart, string chartClass)
     {
         OdfCellRange range = chart.DataRange;
         int minRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);

@@ -1,4 +1,4 @@
-#:project ../OdfKit/OdfKit.csproj
+﻿#:project ../OdfKit/OdfKit.csproj
 #:project ../OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj
 #:project ../OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj
 #:project ../OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj
@@ -6,6 +6,7 @@
 #:project ../OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj
 #:project ../OdfKit.Extensions.Imaging/OdfKit.Extensions.Imaging.csproj
 
+using System.Text;
 using System;
 using System.IO;
 using System.Linq;
@@ -508,7 +509,7 @@ static void DemoExtensions(string outputDir)
     // 匯出成 HTML (使用 OdfKit.Extensions.Html 提供的 OdfHtmlExporter)
     string htmlPath = Path.Combine(outputDir, "output_html.html");
     string htmlContent = OdfHtmlExporter.Export(tempDoc);
-    File.WriteAllText(htmlPath, htmlContent, System.Text.Encoding.UTF8);
+    File.WriteAllText(htmlPath, htmlContent, Encoding.UTF8);
     Console.WriteLine($"   已成功將 ODT 匯出至 HTML 網頁： {htmlPath} ");
 
     // 1. 建立臨時試算表以供轉換與影像渲染示範

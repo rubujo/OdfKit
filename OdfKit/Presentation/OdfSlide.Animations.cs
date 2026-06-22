@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 public partial class OdfSlide
@@ -26,7 +27,7 @@ public partial class OdfSlide
         TimeSpan duration = default)
     {
         if (string.IsNullOrEmpty(shapeId))
-            throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSlide_TargetCannotBeEmpty_3"), nameof(shapeId));
 
         var mainSeq = AnimationRoot.Node;
         var stepPar = FindOrCreateStepParNode(mainSeq, trigger);
@@ -108,7 +109,7 @@ public partial class OdfSlide
         TimeSpan duration = default)
     {
         if (string.IsNullOrEmpty(shapeId))
-            throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSlide_TargetCannotBeEmpty_3"), nameof(shapeId));
 
         var mainSeq = AnimationRoot.Node;
         var stepPar = FindOrCreateStepParNode(mainSeq, trigger);
@@ -183,7 +184,7 @@ public partial class OdfSlide
     public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, TimeSpan duration = default)
     {
         if (string.IsNullOrEmpty(shapeId))
-            throw new ArgumentException("目標圖形識別碼不可為空。", nameof(shapeId));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSlide_TargetCannotBeEmpty_3"), nameof(shapeId));
 
         var mainSeq = AnimationRoot.Node;
         // 強調動畫一般為點擊觸發

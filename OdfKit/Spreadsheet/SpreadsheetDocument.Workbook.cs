@@ -5,6 +5,7 @@ using System.Text;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 public partial class SpreadsheetDocument
@@ -82,7 +83,7 @@ public partial class SpreadsheetDocument
         {
             rng.GetBytes(salt);
         }
-        byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password);
+        byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
         byte[] hash = OdfEncryption.Pbkdf2(passwordBytes, salt, 50000, 32, "sha256");
 
         var docSettings = FindOrCreateSettingsNode(SettingsDom, "ooo:document-settings");
@@ -167,7 +168,7 @@ public partial class SpreadsheetDocument
 
         byte[] salt = Convert.FromBase64String(saltStr);
         byte[] expectedHash = Convert.FromBase64String(keyStr);
-        byte[] passwordBytes = System.Text.Encoding.UTF8.GetBytes(password);
+        byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 
         byte[] input = new byte[salt.Length + passwordBytes.Length];
         Buffer.BlockCopy(salt, 0, input, 0, salt.Length);
@@ -222,7 +223,7 @@ public partial class SpreadsheetDocument
     /// <exception cref="ArgumentException">當來源文件類型不正確時擲出</exception>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
-        var srcSpreadsheet = sourceDoc as SpreadsheetDocument ?? throw new ArgumentException("Source document must be a SpreadsheetDocument.");
+        var srcSpreadsheet = sourceDoc as SpreadsheetDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SourceDocumentSpreadsheetdocument"));
 
         foreach (var child in srcSpreadsheet.SheetsRoot.Children)
         {

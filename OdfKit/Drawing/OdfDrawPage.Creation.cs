@@ -8,6 +8,7 @@ using OdfKit.DOM;
 using OdfKit.Presentation;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Drawing;
 
 public partial class OdfDrawPage
@@ -119,7 +120,7 @@ public partial class OdfDrawPage
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
         shapeNode.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
 
-        var pointsStr = string.Join(" ", points.Select(p => $"{p.X.ToString(System.Globalization.CultureInfo.InvariantCulture)},{p.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}"));
+        var pointsStr = string.Join(" ", points.Select(p => $"{p.X.ToString(CultureInfo.InvariantCulture)},{p.Y.ToString(CultureInfo.InvariantCulture)}"));
         shapeNode.SetAttribute("points", OdfNamespaces.Draw, pointsStr, "draw");
 
         Node.AppendChild(shapeNode);
@@ -233,7 +234,7 @@ public partial class OdfDrawPage
                 }
 
                 string token = svgPathData.Substring(start, index - start);
-                if (double.TryParse(token, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double value))
+                if (double.TryParse(token, NumberStyles.Float, CultureInfo.InvariantCulture, out double value))
                 {
                     char upperCommand = char.ToUpperInvariant(command);
                     int groupSize = upperCommand switch
@@ -300,7 +301,7 @@ public partial class OdfDrawPage
             vbHeight = 1000;
 
         return string.Format(
-            System.Globalization.CultureInfo.InvariantCulture,
+            CultureInfo.InvariantCulture,
             "{0} {1} {2} {3}",
             Math.Floor(minX),
             Math.Floor(minY),
@@ -319,7 +320,7 @@ public partial class OdfDrawPage
             throw new ArgumentNullException(nameof(points));
         var ptList = points.ToList();
         if (ptList.Count == 0)
-            throw new ArgumentException("頂點集合不可為空。", nameof(points));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_VertexCannotBeEmpty"), nameof(points));
 
         double minX = double.MaxValue;
         double maxX = double.MinValue;
@@ -370,7 +371,7 @@ public partial class OdfDrawPage
         {
             double rx = widthPoints > 0 ? (p.X.ToPoints() - minX) / widthPoints * vbWidth : 0;
             double ry = heightPoints > 0 ? (p.Y.ToPoints() - minY) / heightPoints * vbHeight : 0;
-            return $"{Math.Round(rx).ToString(System.Globalization.CultureInfo.InvariantCulture)},{Math.Round(ry).ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+            return $"{Math.Round(rx).ToString(CultureInfo.InvariantCulture)},{Math.Round(ry).ToString(CultureInfo.InvariantCulture)}";
         });
 
         string pointsStr = string.Join(" ", relPoints);
@@ -390,9 +391,9 @@ public partial class OdfDrawPage
     public OdfShape AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType = OdfConnectorType.Standard)
     {
         if (string.IsNullOrEmpty(startShapeId))
-            throw new ArgumentException("起點圖形識別碼不可為空。", nameof(startShapeId));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_StartingCannotBeEmpty"), nameof(startShapeId));
         if (string.IsNullOrEmpty(endShapeId))
-            throw new ArgumentException("終點圖形識別碼不可為空。", nameof(endShapeId));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_EndCannotBeEmpty"), nameof(endShapeId));
 
         var connectorNode = OdfNodeFactory.CreateElement("connector", OdfNamespaces.Draw, "draw");
         var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
@@ -426,7 +427,7 @@ public partial class OdfDrawPage
     public OdfShape AddCustomShape(string shapeType, OdfLength x, OdfLength y, OdfLength width, OdfLength height)
     {
         if (string.IsNullOrEmpty(shapeType))
-            throw new ArgumentException("幾何類型不可為空。", nameof(shapeType));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_GeometryTypeNullable"), nameof(shapeType));
 
         var shapeNode = OdfNodeFactory.CreateElement("custom-shape", OdfNamespaces.Draw, "draw");
         var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
@@ -475,7 +476,7 @@ public partial class OdfDrawPage
 
     // 權威來源：以 LibreOffice 26.x 透過 com.sun.star.drawing.CustomShape／CustomShapeGeometry UNO API
     // 親手建立同名 preset 後存成 .odg 並反向比對 content.xml 取得的真實節點資料，非憑記憶或猜測。
-    private static readonly System.Collections.Generic.Dictionary<string, PresetGeometryData> PresetGeometries = new()
+    private static readonly Dictionary<string, PresetGeometryData> PresetGeometries = new()
     {
         ["smiley"] = new PresetGeometryData(
             ViewBox: "0 0 21600 21600",

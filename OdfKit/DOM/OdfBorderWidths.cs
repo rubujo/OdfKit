@@ -1,6 +1,7 @@
 ﻿using System;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -17,7 +18,7 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     {
         if (!TryParseComponents(value, out OdfLength innerLineWidth, out OdfLength spacing, out OdfLength outerLineWidth))
         {
-            throw new ArgumentException("邊框線寬必須是三個以空白分隔的正長度值。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfBorderWidths_BorderLineWidthThree"), nameof(value));
         }
 
         Value = value;
@@ -37,7 +38,7 @@ public readonly struct OdfBorderWidths : IEquatable<OdfBorderWidths>
     {
         if (!IsPositiveLength(innerLineWidth) || !IsPositiveLength(spacing) || !IsPositiveLength(outerLineWidth))
         {
-            throw new ArgumentException("邊框線寬只能使用大於 0 的 cm、mm、in、pt、pc 或 px 長度。");
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfBorderWidths_BorderLineWidthsOnly"));
         }
 
         InnerLineWidth = innerLineWidth;

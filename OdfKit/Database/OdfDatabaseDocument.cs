@@ -127,7 +127,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     {
         if (string.IsNullOrWhiteSpace(href))
         {
-            throw new ArgumentException("連線參照不能為空。", nameof(href));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_WireCannotBeEmpty"), nameof(href));
         }
 
         OdfNode dataSource = FindOrCreateDataSource();
@@ -246,7 +246,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("資料表名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty"), nameof(name));
         }
 
         foreach (OdfDatabaseTableInfo table in GetTables())
@@ -269,7 +269,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("查詢名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryCannotBeEmpty"), nameof(name));
         }
 
         foreach (OdfDatabaseQueryInfo query in GetQueries())
@@ -309,7 +309,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("表單名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FormCannotBeEmpty"), nameof(name));
         }
 
         foreach (OdfDatabaseFormInfo form in GetForms())
@@ -332,7 +332,7 @@ public partial class OdfDatabaseDocument : OdfDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("資料來源設定名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DataCannotBeEmpty_2"), nameof(name));
         }
 
         foreach (OdfDatabaseDataSourceSettingInfo setting in GetDataSourceSettings())

@@ -12,6 +12,7 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -78,7 +79,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         if (recipient is null)
             throw new ArgumentNullException(nameof(recipient));
         if (recipient.PublicKey is not { Length: > 0 })
-            throw new ArgumentException("收件人公鑰不可為空。", nameof(recipient));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_RecipientCannotBeEmpty"), nameof(recipient));
 
         PgpPublicKey encKey = FindEncryptionSubkey(recipient.PublicKey);
         byte[] payload = BuildSessionKeyPayload(sessionKey);
@@ -97,7 +98,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
     public byte[] DecryptSessionKey(byte[] encryptedKeyPacket, string keyId)
     {
         if (_secretKeyRingData is null || _passphraseProvider is null)
-            throw new InvalidOperationException("此提供者實例未提供私鑰資料，無法執行解密操作。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_ProviderInstanceProvidePrivate"));
         if (encryptedKeyPacket is null)
             throw new ArgumentNullException(nameof(encryptedKeyPacket));
 
@@ -115,7 +116,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         }
         catch (Exception ex) when (ex is not CryptographicException)
         {
-            throw new CryptographicException("OpenPGP 私鑰解鎖失敗，請確認密語是否正確。", ex);
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_OpenpgpPrivateKeyUnlocking"), ex);
         }
         finally
         {

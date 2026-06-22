@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.IO.Compression;
+using System;
 using System.IO;
 using System.Linq;
 using A = DocumentFormat.OpenXml.Drawing;
@@ -86,7 +87,7 @@ public class OoxmlConversionTests
         Assert.True(docxStream.Length > 0, "DOCX 資料流不應為空");
 
         // 驗證輸出是有效的 ZIP（DOCX 即 ZIP）
-        using var zip = new System.IO.Compression.ZipArchive(docxStream, System.IO.Compression.ZipArchiveMode.Read);
+        using var zip = new ZipArchive(docxStream, ZipArchiveMode.Read);
         bool hasWordDocument = false;
         foreach (var entry in zip.Entries)
         {
@@ -105,7 +106,7 @@ public class OoxmlConversionTests
         odtDoc2.AddParagraph("段落一：Hello World");
         OdfToDocxConverter.Convert(odtDoc2, docxStream2);
         docxStream2.Position = 0;
-        using var zip2 = new System.IO.Compression.ZipArchive(docxStream2, System.IO.Compression.ZipArchiveMode.Read);
+        using var zip2 = new ZipArchive(docxStream2, ZipArchiveMode.Read);
         var docEntry = zip2.GetEntry("word/document.xml");
         Assert.NotNull(docEntry);
         using var docEntryStream = docEntry!.Open();
@@ -149,7 +150,7 @@ public class OoxmlConversionTests
         OdfToDocxConverter.Convert(odtDoc, docxStream);
         docxStream.Position = 0;
 
-        using var zip = new System.IO.Compression.ZipArchive(docxStream, System.IO.Compression.ZipArchiveMode.Read);
+        using var zip = new ZipArchive(docxStream, ZipArchiveMode.Read);
         var docEntry = zip.GetEntry("word/document.xml");
         Assert.NotNull(docEntry);
         using var docEntryStream = docEntry!.Open();
@@ -1142,7 +1143,7 @@ public class OoxmlConversionTests
         }
         xlsxStream.Position = 0;
 
-        using var zip = new System.IO.Compression.ZipArchive(xlsxStream, System.IO.Compression.ZipArchiveMode.Read);
+        using var zip = new ZipArchive(xlsxStream, ZipArchiveMode.Read);
         var chartEntry = zip.Entries.FirstOrDefault(entry =>
             entry.FullName.Contains("/charts/chart", StringComparison.OrdinalIgnoreCase) &&
             entry.FullName.EndsWith(".xml", StringComparison.OrdinalIgnoreCase));
@@ -1195,7 +1196,7 @@ public class OoxmlConversionTests
         OdfToXlsxConverter.Convert(odsDocument, xlsxStream);
         xlsxStream.Position = 0;
 
-        using var zip = new System.IO.Compression.ZipArchive(xlsxStream, System.IO.Compression.ZipArchiveMode.Read);
+        using var zip = new ZipArchive(xlsxStream, ZipArchiveMode.Read);
         var chartEntry = zip.Entries.First(entry =>
             entry.FullName.Contains("/charts/chart", StringComparison.OrdinalIgnoreCase) &&
             entry.FullName.EndsWith(".xml", StringComparison.OrdinalIgnoreCase));
@@ -1241,7 +1242,7 @@ public class OoxmlConversionTests
         OdfToXlsxConverter.Convert(odsDocument, xlsxStream);
         xlsxStream.Position = 0;
 
-        using var zip = new System.IO.Compression.ZipArchive(xlsxStream, System.IO.Compression.ZipArchiveMode.Read);
+        using var zip = new ZipArchive(xlsxStream, ZipArchiveMode.Read);
         var cacheEntry = zip.GetEntry("xl/pivotCache/pivotCacheDefinition1.xml");
         var pivotEntry = zip.GetEntry("xl/pivotTables/pivotTable1.xml");
         var workbookEntry = zip.GetEntry("xl/workbook.xml");
@@ -1779,7 +1780,7 @@ public class OoxmlConversionTests
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
     }
 
-    private static string ReadZipEntry(System.IO.Compression.ZipArchiveEntry entry)
+    private static string ReadZipEntry(ZipArchiveEntry entry)
     {
         using Stream stream = entry.Open();
         using var reader = new StreamReader(stream);

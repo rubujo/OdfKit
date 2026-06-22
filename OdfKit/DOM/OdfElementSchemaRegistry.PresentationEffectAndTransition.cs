@@ -2,6 +2,7 @@
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -93,7 +94,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfPresentationEffect.Checkerboard => "checkerboard",
             OdfPresentationEffect.Rotate => "rotate",
             OdfPresentationEffect.Stretch => "stretch",
-            _ => throw new ArgumentOutOfRangeException(nameof(effect), effect, "未知的 ODF 簡報效果。")
+            _ => throw new ArgumentOutOfRangeException(nameof(effect), effect, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfBriefingEffect"))
         };
     }
 
@@ -123,7 +124,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfPresentationSpeed.Slow => "slow",
             OdfPresentationSpeed.Medium => "medium",
             OdfPresentationSpeed.Fast => "fast",
-            _ => throw new ArgumentOutOfRangeException(nameof(speed), speed, "未知的 ODF 簡報速度。")
+            _ => throw new ArgumentOutOfRangeException(nameof(speed), speed, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfBriefingSpeed"))
         };
     }
 
@@ -193,7 +194,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfPresentationAction.FadeOut => "fade-out",
             OdfPresentationAction.Sound => "sound",
             OdfPresentationAction.LastVisitedPage => "last-visited-page",
-            _ => throw new ArgumentOutOfRangeException(nameof(action), action, "未知的 ODF 簡報動作。")
+            _ => throw new ArgumentOutOfRangeException(nameof(action), action, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfBriefingAction"))
         };
     }
 
@@ -223,7 +224,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfPresentationTransitionType.Manual => "manual",
             OdfPresentationTransitionType.Automatic => "automatic",
             OdfPresentationTransitionType.SemiAutomatic => "semi-automatic",
-            _ => throw new ArgumentOutOfRangeException(nameof(transitionType), transitionType, "未知的 ODF 簡報轉場類型。")
+            _ => throw new ArgumentOutOfRangeException(nameof(transitionType), transitionType, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfBriefingTransition"))
         };
     }
 

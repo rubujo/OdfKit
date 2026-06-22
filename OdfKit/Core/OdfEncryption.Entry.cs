@@ -7,6 +7,7 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 public static partial class OdfEncryption
@@ -50,17 +51,17 @@ public static partial class OdfEncryption
 
         if (!isArgon2 && string.Equals(derivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase) && iterationCount > 50000)
         {
-            throw new CryptographicException($"PBKDF2 反覆運算次數 {iterationCount} 超過最大限制 50000。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds_2", iterationCount));
         }
 
         if (algorithmUri != Aes256AlgorithmUri && algorithmUri != BlowfishAlgorithmUri && algorithmUri != Aes256GcmAlgorithmUri)
         {
-            throw new NotSupportedException($"不支援的加密演算法： {algorithmUri}。 OdfKit 僅支援標準 AES-256-CBC、Blowfish-CBC 與 AES-256-GCM。");
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnsupportedEncryptionAlgorithmOdfkit", algorithmUri));
         }
 
         if (!isArgon2 && !string.Equals(derivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase))
         {
-            throw new NotSupportedException($"不支援的金鑰衍生函式： {derivationName}。");
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnsupportedKeyDerivationFunction", derivationName));
         }
 
         // 若 startKeyGenName 存在，則衍生密碼位元組

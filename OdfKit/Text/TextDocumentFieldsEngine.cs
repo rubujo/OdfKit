@@ -5,6 +5,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
@@ -149,7 +150,7 @@ internal static class TextDocumentFieldsEngine
         if (paragraph is null)
             throw new ArgumentNullException(nameof(paragraph));
         if (string.IsNullOrEmpty(sequenceName))
-            throw new ArgumentException("序號欄位名稱不可為空。", nameof(sequenceName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFieldsEngine_SerialCannotBeEmpty"), nameof(sequenceName));
         var fNode = OdfNodeFactory.CreateElement("sequence-ref", OdfNamespaces.Text, "text");
         fNode.SetAttribute("ref-name", OdfNamespaces.Text, sequenceName, "text");
         fNode.SetAttribute("reference-format", OdfNamespaces.Text, referenceFormat, "text");
@@ -161,7 +162,7 @@ internal static class TextDocumentFieldsEngine
         if (paragraph is null)
             throw new ArgumentNullException(nameof(paragraph));
         if (string.IsNullOrEmpty(bookmarkName))
-            throw new ArgumentException("書籤名稱不可為空。", nameof(bookmarkName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFieldsEngine_BookmarkCannotBeEmpty"), nameof(bookmarkName));
 
         var fNode = OdfNodeFactory.CreateElement("bookmark-ref", OdfNamespaces.Text, "text");
         fNode.SetAttribute("ref-name", OdfNamespaces.Text, bookmarkName, "text");
@@ -195,9 +196,9 @@ internal static class TextDocumentFieldsEngine
         if (paragraph is null)
             throw new ArgumentNullException(nameof(paragraph));
         if (string.IsNullOrEmpty(tableName))
-            throw new ArgumentException("資料表名稱不可為空。", nameof(tableName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFieldsEngine_DataCannotBeEmpty_2"), nameof(tableName));
         if (string.IsNullOrEmpty(columnName))
-            throw new ArgumentException("欄位名稱不可為空。", nameof(columnName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFieldsEngine_FieldCannotBeEmpty"), nameof(columnName));
 
         var fNode = OdfNodeFactory.CreateElement("database-display", OdfNamespaces.Text, "text");
         fNode.SetAttribute("table-name", OdfNamespaces.Text, tableName, "text");
@@ -219,7 +220,7 @@ internal static class TextDocumentFieldsEngine
         if (paragraph is null)
             throw new ArgumentNullException(nameof(paragraph));
         if (string.IsNullOrEmpty(tableName))
-            throw new ArgumentException("資料表名稱不可為空。", nameof(tableName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentFieldsEngine_DataCannotBeEmpty_2"), nameof(tableName));
 
         var fNode = OdfNodeFactory.CreateElement("database-next", OdfNamespaces.Text, "text");
         fNode.SetAttribute("table-name", OdfNamespaces.Text, tableName, "text");

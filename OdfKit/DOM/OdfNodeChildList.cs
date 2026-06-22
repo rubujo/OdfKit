@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Runtime.CompilerServices;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -37,7 +38,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
             EnsureIndexCache();
             return _indexCache![index];
         }
-        set => throw new NotSupportedException("子節點集合不支援以索引直接指派。");
+        set => throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfNodeChildList_ChildNodeCollectionsSupport"));
     }
 
     /// <summary>
@@ -91,7 +92,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
 
         if (array.Length - arrayIndex < _count)
         {
-            throw new ArgumentException("目標陣列空間不足。");
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfNodeChildList_TargetArrayOutSpace"));
         }
 
         int i = arrayIndex;
@@ -200,7 +201,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         }
         if (refChild.Parent != _owner)
         {
-            throw new InvalidOperationException("參考節點不是此節點的子節點。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNodeChildList_ReferenceNodeChildNode_2"));
         }
 
         newChild.DetachFromParent();
@@ -220,7 +221,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         }
         if (refChild.Parent != _owner)
         {
-            throw new InvalidOperationException("參考節點不是此節點的子節點。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfNodeChildList_ReferenceNodeChildNode_2"));
         }
 
         newChild.DetachFromParent();

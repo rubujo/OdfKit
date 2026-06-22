@@ -19,7 +19,7 @@ public partial class OdfImageDocument
         }
 
         document.Dispose();
-        throw new InvalidOperationException("指定的 ODF 文件不是 ODI 影像。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfImageDocument_SpecifiedOdfFileOdi"));
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public partial class OdfImageDocument
     /// <exception cref="ArgumentException">當來源文件不是 <see cref="OdfImageDocument"/> 時擲出。</exception>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
-        var source = sourceDoc as OdfImageDocument ?? throw new ArgumentException("來源文件必須是 OdfImageDocument。", nameof(sourceDoc));
+        var source = sourceDoc as OdfImageDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfImageDocument_SourceFileOdfimagedocument"), nameof(sourceDoc));
         OdfNode sourceBody = source.FindOrCreateChild(source.ContentDom, "body", OdfNamespaces.Office, "office");
         OdfNode sourceImage = source.FindOrCreateChild(sourceBody, "image", OdfNamespaces.Office, "office");
         OdfNode body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -11,7 +12,6 @@ using OdfKit.Text;
 using A = DocumentFormat.OpenXml.Drawing;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using WP = DocumentFormat.OpenXml.Wordprocessing;
-
 namespace OdfKit.Conversion;
 
 /// <summary>
@@ -35,11 +35,11 @@ public static class DocxToOdtConverter
 
         using var wordDocument = WordprocessingDocument.Open(docxStream, false);
         MainDocumentPart mainPart = wordDocument.MainDocumentPart
-            ?? throw new InvalidDataException("DOCX 文件缺少主要文件部分。");
+            ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_DocxToOdtConverter_DocxNotFound"));
         WP.Document document = mainPart.Document
-            ?? throw new InvalidDataException("DOCX 文件缺少 word/document.xml。");
+            ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_DocxToOdtConverter_DocxNotFound_2"));
         WP.Body body = document.Body
-            ?? throw new InvalidDataException("DOCX 文件缺少 word/document.xml 本文。");
+            ?? throw new InvalidDataException(OdfLocalizer.GetMessage("Err_DocxToOdtConverter_DocxNotFound_3"));
 
         TextDocument odtDocument = TextDocument.Create();
         ConvertHeaderFooter(mainPart, odtDocument);
@@ -764,9 +764,9 @@ public static class DocxToOdtConverter
         }
 
         if (properties.GetFirstChild<WP.FontSize>()?.Val?.Value is { Length: > 0 } halfPoints &&
-            double.TryParse(halfPoints, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double sizeValue))
+            double.TryParse(halfPoints, NumberStyles.Float, CultureInfo.InvariantCulture, out double sizeValue))
         {
-            string fontSize = (sizeValue / 2d).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "pt";
+            string fontSize = (sizeValue / 2d).ToString("0.##", CultureInfo.InvariantCulture) + "pt";
             odtDocument.StyleEngine.SetLocalStyleProperty(
                 targetNode, "text", "text-properties", "font-size", OdfNamespaces.Fo, fontSize, "fo", deferSave: true);
         }

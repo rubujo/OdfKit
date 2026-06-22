@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
 using SkiaSharp;
-
 namespace OdfKit.Export;
 
 /// <summary>
@@ -42,7 +42,7 @@ public static class OdfImageExporter
         if (jpegStream is null)
             throw new ArgumentNullException(nameof(jpegStream));
         if (quality < 1 || quality > 100)
-            throw new ArgumentOutOfRangeException(nameof(quality), "品質值必須介於 1 至 100。");
+            throw new ArgumentOutOfRangeException(nameof(quality), OdfLocalizer.GetMessage("Err_OdfImageExporter_QualityValueBetween1"));
         Export(sheet, jpegStream, SKEncodedImageFormat.Jpeg, quality, options);
     }
 

@@ -108,7 +108,7 @@ public partial class PresentationDocument
     /// <exception cref="ArgumentException">來源文件非簡報文件時拋出</exception>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
-        var srcPres = sourceDoc as PresentationDocument ?? throw new ArgumentException("Source document must be a PresentationDocument.");
+        var srcPres = sourceDoc as PresentationDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_PresentationDocument_SourceDocumentPresentationdocument"));
         var destPresNode = GetPresentationNode();
         var srcPresNode = srcPres.GetPresentationNode();
 
@@ -155,11 +155,11 @@ public partial class PresentationDocument
     {
         if (string.IsNullOrEmpty(name))
         {
-            throw new ArgumentException("Master page name cannot be null or empty.", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_PresentationDocument_MasterCannotBeEmpty"), nameof(name));
         }
         if (string.IsNullOrEmpty(pageLayoutName))
         {
-            throw new ArgumentException("Page layout name cannot be null or empty.", nameof(pageLayoutName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_PresentationDocument_PageCannotBeEmpty"), nameof(pageLayoutName));
         }
 
         var masterStyles = FindChildElement(StylesRoot, "master-styles", OdfNamespaces.Office);

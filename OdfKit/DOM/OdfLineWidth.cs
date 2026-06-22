@@ -2,6 +2,7 @@
 using System.Globalization;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -18,7 +19,7 @@ public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
     {
         if (!TryParseParts(value, out OdfLineWidthKind kind, out int? positiveInteger, out decimal? percent, out OdfLength? length))
         {
-            throw new ArgumentException("線條寬度必須是已知 keyword、正整數、百分比或正長度。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfLineWidth_LineWidthKnownKeyword"), nameof(value));
         }
 
         Value = value;

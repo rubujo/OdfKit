@@ -5,6 +5,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Presentation;
 
+using OdfKit.Compliance;
 namespace OdfKit.Drawing;
 
 public partial class OdfDrawPage
@@ -22,13 +23,13 @@ public partial class OdfDrawPage
 
         List<string> ids = shapeIds.Where(id => !string.IsNullOrEmpty(id)).Distinct().ToList();
         if (ids.Count == 0)
-            throw new ArgumentException("至少需提供一個圖形識別碼。", nameof(shapeIds));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_LeastOneGraphicIdentifier"), nameof(shapeIds));
 
         OdfDrawGroup group = AddGroup(name);
         foreach (string id in ids)
         {
             OdfNode shapeNode = FindShapeNodeById(id)
-                ?? throw new KeyNotFoundException($"找不到識別碼為 '{id}' 的圖形。");
+                ?? throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_OdfDrawPage_NoGraphicFoundIdentifier", id));
 
             shapeNode.Parent?.RemoveChild(shapeNode);
             group.Node.AppendChild(shapeNode);

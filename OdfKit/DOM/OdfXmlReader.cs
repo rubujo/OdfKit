@@ -3,6 +3,7 @@ using System.Xml;
 using CommunityToolkit.HighPerformance.Buffers;
 using OdfKit.Core;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -60,7 +61,7 @@ public static class OdfXmlReader
                             // 堆疊溢位 DoS 防禦保護
                             if (currentDepth > MaxElementDepth)
                             {
-                                throw new SecurityException($"XML element nesting depth limit exceeded ({currentDepth} > {MaxElementDepth}). Potential StackOverflow attack.");
+                                throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfXmlReader_XmlElementNestingDepth", currentDepth, MaxElementDepth));
                             }
 
                             string localName = OdfXmlStringPools.GetOrAdd(reader.LocalName);
@@ -192,7 +193,7 @@ public static class OdfXmlReader
 
         if (rootNode is null)
         {
-            throw new InvalidDataException("Invalid XML structure: Root element not found.");
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfXmlReader_InvalidNotFound"));
         }
 
         return rootNode;

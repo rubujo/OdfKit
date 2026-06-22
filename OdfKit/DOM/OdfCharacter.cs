@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -17,7 +18,7 @@ public readonly struct OdfCharacter : IEquatable<OdfCharacter>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("字元值必須是單一文字元素，且不可包含控制字元。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfCharacter_CharacterValueSingleText"), nameof(value));
         }
 
         Value = value;

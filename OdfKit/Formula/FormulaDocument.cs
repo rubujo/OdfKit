@@ -95,7 +95,7 @@ public class FormulaDocument : OdfFormulaDocument
         }
 
         document.Dispose();
-        throw new InvalidOperationException("指定的 ODF 文件不是高階 ODF 公式。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaDocument_SpecifiedOdfFileHigher"));
     }
 
     /// <summary>

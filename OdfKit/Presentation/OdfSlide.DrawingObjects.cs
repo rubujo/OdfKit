@@ -6,6 +6,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 public partial class OdfSlide
@@ -172,9 +173,9 @@ public partial class OdfSlide
         string mimeType)
     {
         if (string.IsNullOrWhiteSpace(packagePath))
-            throw new ArgumentException("封裝路徑不可為空白。", nameof(packagePath));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSlide_PackageCannotBeEmpty"), nameof(packagePath));
         if (string.IsNullOrWhiteSpace(mimeType))
-            throw new ArgumentException("MIME 類型不可為空白。", nameof(mimeType));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSlide_MimeCannotBeEmpty"), nameof(mimeType));
 
         var frame = CreateDrawingFrame(x, y, width, height);
         var plugin = new OdfNode(OdfNodeType.Element, "plugin", OdfNamespaces.Draw, "draw");
@@ -261,7 +262,7 @@ public partial class OdfSlide
         shapeNode.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
         shapeNode.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
 
-        var pointsStr = string.Join(" ", points.Select(p => $"{p.X.ToString(System.Globalization.CultureInfo.InvariantCulture)},{p.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}"));
+        var pointsStr = string.Join(" ", points.Select(p => $"{p.X.ToString(CultureInfo.InvariantCulture)},{p.Y.ToString(CultureInfo.InvariantCulture)}"));
         shapeNode.SetAttribute("points", OdfNamespaces.Draw, pointsStr, "draw");
 
         AddDrawingObjectNode(shapeNode);

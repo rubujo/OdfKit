@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+using OdfKit.Compliance;
 namespace OdfKit.Extensions.Rendering;
 
 /// <summary>
@@ -49,7 +50,7 @@ public sealed class LocalProcessBackend : ILibreOfficeConversionBackend
 
             if (!File.Exists(outputFilePath))
             {
-                throw new FileNotFoundException("本地 LibreOffice 轉檔未成功產生預期結果。");
+                throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_LocalProcessBackend_NativeLibreofficeConversionSuccessfully"));
             }
 
             // 讀取為獨立的 MemoryStream

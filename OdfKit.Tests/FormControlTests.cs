@@ -38,7 +38,7 @@ public class FormControlTests
 
         using var pkg = OdfPackage.Open(ms, leaveOpen: true);
         using var stream = pkg.GetEntryStream("content.xml");
-        using var reader = new System.IO.StreamReader(stream);
+        using var reader = new StreamReader(stream);
         string xml = reader.ReadToEnd();
 
         Assert.Contains("form:checkbox", xml);
@@ -64,7 +64,7 @@ public class FormControlTests
 
         using var pkg = OdfPackage.Open(ms, leaveOpen: true);
         using var cs = pkg.GetEntryStream("content.xml");
-        string xml = new System.IO.StreamReader(cs).ReadToEnd();
+        string xml = new StreamReader(cs).ReadToEnd();
 
         Assert.Contains("form:text", xml);
         Assert.Contains("form:name=\"txt1\"", xml);
@@ -116,7 +116,7 @@ public class FormControlTests
 
         using var pkg = OdfPackage.Open(ms, leaveOpen: true);
         using var cs = pkg.GetEntryStream("content.xml");
-        string xml = new System.IO.StreamReader(cs).ReadToEnd();
+        string xml = new StreamReader(cs).ReadToEnd();
 
         Assert.Contains("form:listbox", xml);
         Assert.Contains("form:label=\"選項 A\"", xml);

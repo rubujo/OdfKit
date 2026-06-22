@@ -1,5 +1,6 @@
 ﻿using System;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -16,7 +17,7 @@ public readonly struct OdfIriReference : IEquatable<OdfIriReference>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("IRI 參照不可包含控制字元。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfIriReference_IriReferencesCannotContain"), nameof(value));
         }
 
         Value = value;

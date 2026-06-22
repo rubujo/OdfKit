@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -116,7 +117,7 @@ internal static class OdfDocumentMetadataEngine
     internal static void SetCustomProperty(OdfNode metaDom, string name, object value, string type)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Property name cannot be empty.", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocumentMetadataEngine_PropertyCannotBeEmpty"), nameof(name));
 
         if (name.Contains(":"))
         {

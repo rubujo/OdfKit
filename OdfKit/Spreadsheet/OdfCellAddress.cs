@@ -2,6 +2,7 @@
 using System.Text;
 using OdfKit.Core;
 
+using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
@@ -53,9 +54,9 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         bool isRowAbsolute = false, bool isColumnAbsolute = false, bool isSheetAbsolute = false)
     {
         if (row < 0)
-            throw new ArgumentOutOfRangeException(nameof(row), "Row index must be non-negative.");
+            throw new ArgumentOutOfRangeException(nameof(row), OdfLocalizer.GetMessage("Err_OdfCellAddress_RowIndexNonNegative"));
         if (column < 0)
-            throw new ArgumentOutOfRangeException(nameof(column), "Column index must be non-negative.");
+            throw new ArgumentOutOfRangeException(nameof(column), OdfLocalizer.GetMessage("Err_OdfCellAddress_ColumnIndexNonNegative"));
 
         Row = row;
         Column = column;
@@ -176,7 +177,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     {
         span = span.Trim();
         if (span.IsEmpty)
-            throw new FormatException("Address string cannot be empty.");
+            throw new FormatException(OdfLocalizer.GetMessage("Err_OdfCellAddress_AddressCannotBeEmpty"));
 
         string? sheetName = null;
         bool isSheetAbsolute = false;
@@ -272,7 +273,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
             i++;
         }
         if (i == colStart)
-            throw new FormatException("Invalid cell address: missing column letters.");
+            throw new FormatException(OdfLocalizer.GetMessage("Err_OdfCellAddress_InvalidNotFound"));
 
         ReadOnlySpan<char> colLetters = cellSpan.Slice(colStart, i - colStart);
 
@@ -288,7 +289,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
             i++;
         }
         if (i == rowStart || i < cellSpan.Length)
-            throw new FormatException("Invalid cell address: row index must be numeric digits and terminate the string.");
+            throw new FormatException(OdfLocalizer.GetMessage("Err_OdfCellAddress_InvalidCellAddressRow"));
 
         ReadOnlySpan<char> rowDigits = cellSpan.Slice(rowStart, i - rowStart);
 

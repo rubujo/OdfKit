@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -27,7 +28,7 @@ internal static class OdfPackageEntryNameSanitizer
             name.EndsWith("/..") ||
             name.EndsWith(@"\.."))
         {
-            throw new SecurityException($"Forbidden absolute path, drive specifier, UNC format, double slashes, or directory traversal: {name}");
+            throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfPackageEntryNameSanitizer_ForbiddenAbsolutePathDrive", name));
         }
 
         string normalized = name.Replace('\\', '/');
@@ -42,7 +43,7 @@ internal static class OdfPackageEntryNameSanitizer
         {
             if (part == "..")
             {
-                throw new SecurityException($"Directory traversal attempt (Zip Slip) detected in entry name: {name}");
+                throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfPackageEntryNameSanitizer_DirectoryTraversalAttemptZip", name));
             }
         }
 

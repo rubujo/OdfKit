@@ -6,6 +6,7 @@ using System.Text;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Styles;
 
 /// <summary>
@@ -128,7 +129,7 @@ public static class OdfFontResolver
         if (string.IsNullOrEmpty(filePath))
             throw new ArgumentNullException(nameof(filePath));
         if (!File.Exists(filePath))
-            throw new FileNotFoundException("找不到字型檔案。", filePath);
+            throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_OdfFontResolver_FontNotFound"), filePath);
 
         lock (_lock)
         {
@@ -147,7 +148,7 @@ public static class OdfFontResolver
         if (string.IsNullOrEmpty(directoryPath))
             throw new ArgumentNullException(nameof(directoryPath));
         if (!Directory.Exists(directoryPath))
-            throw new DirectoryNotFoundException($"找不到字型目錄：'{directoryPath}'");
+            throw new DirectoryNotFoundException(OdfLocalizer.GetMessage("Err_OdfFontResolver_FontNotFound_2", directoryPath));
 
         lock (_lock)
         {

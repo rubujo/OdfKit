@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading;
@@ -224,7 +225,7 @@ public class OdfExternalValidatorAsyncTests
     {
         string invalidPath = Path.Combine(Path.GetTempPath(), "odfkit_validator_invalid_" + Guid.NewGuid().ToString("N") + ".odt");
 
-        var entries = new System.Collections.Generic.Dictionary<string, byte[]>();
+        var entries = new Dictionary<string, byte[]>();
         using (var sourceArchive = ZipFile.OpenRead(validOdtPath))
         {
             foreach (var entry in sourceArchive.Entries)

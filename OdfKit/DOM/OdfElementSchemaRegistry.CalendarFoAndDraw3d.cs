@@ -1,7 +1,9 @@
-﻿using System;
+﻿using System.Text;
+using System;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -57,7 +59,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfNumberCalendar.Hijri => "hijri",
             OdfNumberCalendar.Jewish => "jewish",
             OdfNumberCalendar.Roc => "ROC",
-            _ => throw new ArgumentOutOfRangeException(nameof(calendar), calendar, "未知的 ODF 數字曆法。")
+            _ => throw new ArgumentOutOfRangeException(nameof(calendar), calendar, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfNumericCalendar"))
         };
     }
 
@@ -93,7 +95,7 @@ internal static partial class OdfElementSchemaRegistry
 
     internal static string ToOdfToken(string name)
     {
-        var builder = new System.Text.StringBuilder(name.Length + 4);
+        var builder = new StringBuilder(name.Length + 4);
         for (int index = 0; index < name.Length; index++)
         {
             char current = name[index];
@@ -130,7 +132,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfFoKeepTogether.Auto => "auto",
             OdfFoKeepTogether.Always => "always",
-            _ => throw new ArgumentOutOfRangeException(nameof(keepTogether), keepTogether, "未知的 ODF FO 分頁保持設定。")
+            _ => throw new ArgumentOutOfRangeException(nameof(keepTogether), keepTogether, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfFoPaging"))
         };
     }
 
@@ -156,7 +158,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfFoWrapOption.Wrap => "wrap",
             OdfFoWrapOption.NoWrap => "no-wrap",
-            _ => throw new ArgumentOutOfRangeException(nameof(wrapOption), wrapOption, "未知的 ODF FO 換行選項。")
+            _ => throw new ArgumentOutOfRangeException(nameof(wrapOption), wrapOption, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfFoNewline"))
         };
     }
 
@@ -182,7 +184,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfDr3dProjection.Parallel => "parallel",
             OdfDr3dProjection.Perspective => "perspective",
-            _ => throw new ArgumentOutOfRangeException(nameof(projection), projection, "未知的 ODF 3D 投影。")
+            _ => throw new ArgumentOutOfRangeException(nameof(projection), projection, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdf3dProjection"))
         };
     }
 
@@ -216,7 +218,7 @@ internal static partial class OdfElementSchemaRegistry
             OdfDr3dShadeMode.Flat => "flat",
             OdfDr3dShadeMode.Gouraud => "gouraud",
             OdfDr3dShadeMode.Phong => "phong",
-            _ => throw new ArgumentOutOfRangeException(nameof(shadeMode), shadeMode, "未知的 ODF 3D 著色模式。")
+            _ => throw new ArgumentOutOfRangeException(nameof(shadeMode), shadeMode, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdf3dShading"))
         };
     }
 
@@ -242,7 +244,7 @@ internal static partial class OdfElementSchemaRegistry
         {
             OdfSvgFillRule.EvenOdd => "evenodd",
             OdfSvgFillRule.Nonzero => "nonzero",
-            _ => throw new ArgumentOutOfRangeException(nameof(fillRule), fillRule, "未知的 ODF SVG 填滿規則。")
+            _ => throw new ArgumentOutOfRangeException(nameof(fillRule), fillRule, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfSvgPadding"))
         };
     }
 

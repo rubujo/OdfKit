@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 internal static partial class OdfSignatureVerifier
@@ -59,7 +60,7 @@ internal static partial class OdfSignatureVerifier
                         if (!OdfSignatureCrlUtilities.VerifyCrlSignature(crlBytes, issuerCert))
                         {
                             singleResult.ErrorCode = "CRL_SIGNATURE_INVALID";
-                            throw new CryptographicException("Embedded CRL signature is invalid.");
+                            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_InvalidEmbeddedCrlSignature"));
                         }
 
                         checkedAnyCrl = true;
@@ -125,7 +126,7 @@ internal static partial class OdfSignatureVerifier
                             if (!OdfSignatureCrlUtilities.VerifyCrlSignature(crlBytes, issuerCert))
                             {
                                 singleResult.ErrorCode = "CRL_SIGNATURE_INVALID";
-                                throw new CryptographicException("Downloaded CRL signature is invalid.");
+                                throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_InvalidDownloadedCrlSignature"));
                             }
 
                             onlineCrlCheckedSuccessfully = true;
@@ -139,7 +140,7 @@ internal static partial class OdfSignatureVerifier
                         }
                         else
                         {
-                            throw new CryptographicException("Failed to parse downloaded CRL.");
+                            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_FailedToParseDownloadedCrl"));
                         }
                     }
                     catch (Exception ex)

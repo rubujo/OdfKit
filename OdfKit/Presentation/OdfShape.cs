@@ -3,6 +3,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
 
+using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 /// <summary>
@@ -176,7 +177,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     {
         if (Slide is null)
         {
-            throw new InvalidOperationException("Animation is only supported for presentation slides.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfShape_AnimationOnlySupportedPresentation"));
         }
         var slideNode = Slide.Node;
         var mainSeq = FindOrCreateAnimationSequence(slideNode);

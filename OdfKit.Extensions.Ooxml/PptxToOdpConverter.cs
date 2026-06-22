@@ -674,7 +674,7 @@ public static class PptxToOdpConverter
         string style = dash?.Equals(A.PresetLineDashValues.Dash) == true
             ? "dashed"
             : dash?.Equals(A.PresetLineDashValues.Dot) == true ? "dotted" : "solid";
-        return widthPoints.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "pt " + style + " #" + color;
+        return widthPoints.ToString("0.##", CultureInfo.InvariantCulture) + "pt " + style + " #" + color;
     }
 
     private static void ConvertPicture(
@@ -1249,7 +1249,7 @@ public static class PptxToOdpConverter
 
         if (style.FontSizeHundredthsOfPoint is > 0)
         {
-            string fontSize = (style.FontSizeHundredthsOfPoint.Value / 100d).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "pt";
+            string fontSize = (style.FontSizeHundredthsOfPoint.Value / 100d).ToString("0.##", CultureInfo.InvariantCulture) + "pt";
             slide.Document.StyleEngine.SetLocalStyleProperty(span, "text", "text-properties", "font-size", OdfNamespaces.Fo, fontSize, "fo");
         }
 

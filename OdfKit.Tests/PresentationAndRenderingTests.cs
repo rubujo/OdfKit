@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
+using OdfKit.Compliance;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -18,6 +20,11 @@ namespace OdfKit.Tests
     [Collection("SequentialRenderingTests")]
     public class PresentationAndRenderingTests
     {
+        public PresentationAndRenderingTests()
+        {
+            OdfLocalizer.DefaultCulture = new CultureInfo("en");
+        }
+
         #region 1. OdfComment Tests
 
         [Fact]

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -47,7 +49,7 @@ public sealed class SchemaMetadataJsonWriter
         writer.WriteLine("}");
     }
 
-    private static void WriteNames(TextWriter writer, System.Collections.Generic.IReadOnlyList<SchemaNameMetadata> names)
+    private static void WriteNames(TextWriter writer, IReadOnlyList<SchemaNameMetadata> names)
     {
         for (int i = 0; i < names.Count; i++)
         {
@@ -66,7 +68,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WritePatterns(TextWriter writer, System.Collections.Generic.IReadOnlyList<SchemaPatternMetadata> patterns)
+    private static void WritePatterns(TextWriter writer, IReadOnlyList<SchemaPatternMetadata> patterns)
     {
         for (int i = 0; i < patterns.Count; i++)
         {
@@ -95,7 +97,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WriteStringsInline(TextWriter writer, System.Collections.Generic.IReadOnlyList<string> values)
+    private static void WriteStringsInline(TextWriter writer, IReadOnlyList<string> values)
     {
         for (int i = 0; i < values.Count; i++)
         {
@@ -108,7 +110,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WriteNameUsesInline(TextWriter writer, System.Collections.Generic.IReadOnlyList<SchemaPatternNameUseMetadata> names)
+    private static void WriteNameUsesInline(TextWriter writer, IReadOnlyList<SchemaPatternNameUseMetadata> names)
     {
         for (int i = 0; i < names.Count; i++)
         {
@@ -128,7 +130,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WriteNameClassesInline(TextWriter writer, System.Collections.Generic.IReadOnlyList<SchemaNameClassMetadata> names)
+    private static void WriteNameClassesInline(TextWriter writer, IReadOnlyList<SchemaNameClassMetadata> names)
     {
         for (int i = 0; i < names.Count; i++)
         {
@@ -150,7 +152,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WritePatternNodesInline(TextWriter writer, System.Collections.Generic.IReadOnlyList<SchemaPatternNodeMetadata> nodes)
+    private static void WritePatternNodesInline(TextWriter writer, IReadOnlyList<SchemaPatternNodeMetadata> nodes)
     {
         for (int i = 0; i < nodes.Count; i++)
         {
@@ -191,7 +193,7 @@ public sealed class SchemaMetadataJsonWriter
         writer.Write("] }");
     }
 
-    private static void WriteDataParametersInline(TextWriter writer, System.Collections.Generic.IReadOnlyList<SchemaDatatypeParameterMetadata> parameters)
+    private static void WriteDataParametersInline(TextWriter writer, IReadOnlyList<SchemaDatatypeParameterMetadata> parameters)
     {
         for (int i = 0; i < parameters.Count; i++)
         {
@@ -209,7 +211,7 @@ public sealed class SchemaMetadataJsonWriter
         }
     }
 
-    private static void WriteStrings(TextWriter writer, System.Collections.Generic.IReadOnlyList<string> values)
+    private static void WriteStrings(TextWriter writer, IReadOnlyList<string> values)
     {
         for (int i = 0; i < values.Count; i++)
         {
@@ -250,7 +252,7 @@ public sealed class SchemaMetadataJsonWriter
                     if (char.IsControl(ch))
                     {
                         writer.Write("\\u");
-                        writer.Write(((int)ch).ToString("x4", System.Globalization.CultureInfo.InvariantCulture));
+                        writer.Write(((int)ch).ToString("x4", CultureInfo.InvariantCulture));
                     }
                     else
                     {

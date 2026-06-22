@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -88,7 +89,7 @@ internal static class FormulaStatisticalFunctionHandlers
 
             foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
-                if (innerVal is double || (innerVal is string s && double.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out _)))
+                if (innerVal is double || (innerVal is string s && double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out _)))
                 {
                     count++;
                 }

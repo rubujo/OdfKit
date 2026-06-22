@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Chart;
 
 public partial class OdfChartDocument
@@ -110,7 +111,7 @@ public partial class OdfChartDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("樣式名稱不可為空白。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfChartDocument_StyleCannotBeEmpty_2"), nameof(name));
         }
 
         OdfNode? existing = FindAutomaticStyleNode(name);
@@ -119,7 +120,7 @@ public partial class OdfChartDocument
             string? family = existing.GetAttribute("family", OdfNamespaces.Style);
             if (!string.Equals(family, "chart", StringComparison.Ordinal))
             {
-                throw new InvalidOperationException($"樣式名稱 '{name}' 已存在且不是圖表樣式。");
+                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfChartDocument_StyleNameAlreadyExists", name));
             }
 
             return new OdfChartStyle(this, existing);
@@ -181,7 +182,7 @@ public partial class OdfChartDocument
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("樣式名稱不可為空白。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfChartDocument_StyleCannotBeEmpty_2"), nameof(name));
         }
 
         OdfNode? styleNode = FindAutomaticStyleNode(name);

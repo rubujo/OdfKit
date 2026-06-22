@@ -1,5 +1,6 @@
 ﻿using System.IO;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 public sealed partial class OdfPackage
@@ -12,7 +13,7 @@ public sealed partial class OdfPackage
         {
             if (_loadOptions.ValidateMimeType)
             {
-                throw new InvalidDataException("Invalid ODF package: 'META-INF/manifest.xml' is missing.");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackage_InvalidNotFound"));
             }
 
             return;

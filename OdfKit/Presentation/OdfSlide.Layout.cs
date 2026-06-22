@@ -1,5 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System;
 
+using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 public partial class OdfSlide
@@ -34,13 +36,13 @@ public partial class OdfSlide
 
     private int RequireSlideIndex()
     {
-        System.Collections.Generic.IReadOnlyList<OdfSlide> slides = Document.GetSlidesSnapshot();
+        IReadOnlyList<OdfSlide> slides = Document.GetSlidesSnapshot();
         for (int index = 0; index < slides.Count; index++)
         {
             if (ReferenceEquals(slides[index], this))
                 return index;
         }
 
-        throw new InvalidOperationException("投影片不屬於目前文件。");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfSlide_SlideshowBelongCurrentFile"));
     }
 }

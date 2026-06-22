@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Chart;
 
 public partial class OdfChartDocument
@@ -75,7 +76,7 @@ public partial class OdfChartDocument
         IReadOnlyList<OdfNode> nodes = GetSeriesNodes();
         if (seriesIndex < 0 || seriesIndex >= nodes.Count)
         {
-            throw new ArgumentOutOfRangeException(nameof(seriesIndex), $"序列索引 {seriesIndex} 超出範圍（共 {nodes.Count} 筆）。");
+            throw new ArgumentOutOfRangeException(nameof(seriesIndex), OdfLocalizer.GetMessage("Err_OdfChartDocument_SequenceIndexOutRange", seriesIndex, nodes.Count));
         }
 
         return nodes[seriesIndex];

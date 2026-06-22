@@ -1,7 +1,9 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 /// <summary>
@@ -59,7 +61,7 @@ public sealed class OdfEmbeddedTable
     {
         OdfNode cell = GetCell(row, column);
         if (cell.LocalName == "covered-table-cell")
-            throw new InvalidOperationException("Cannot set text on a covered table cell.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetTextCovered"));
 
         OdfNode paragraph = cell.Children.First(child => child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text);
         paragraph.TextContent = text;
@@ -92,7 +94,7 @@ public sealed class OdfEmbeddedTable
     {
         OdfNode cell = GetCell(row, column);
         if (cell.LocalName == "covered-table-cell")
-            throw new InvalidOperationException("Cannot set text style on a covered table cell.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetTextStyle"));
 
         OdfNode paragraph = cell.Children.First(child => child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text);
         if (bold is not null)
@@ -150,11 +152,11 @@ public sealed class OdfEmbeddedTable
 
         OdfNode origin = GetCell(row, column);
         if (origin.LocalName == "covered-table-cell")
-            throw new InvalidOperationException("Cannot span from a covered table cell.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSpanCoveredTable"));
 
         if (rowSpan > 1)
         {
-            origin.SetAttribute("number-rows-spanned", OdfNamespaces.Table, rowSpan.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
+            origin.SetAttribute("number-rows-spanned", OdfNamespaces.Table, rowSpan.ToString(CultureInfo.InvariantCulture), "table");
         }
         else
         {
@@ -163,7 +165,7 @@ public sealed class OdfEmbeddedTable
 
         if (columnSpan > 1)
         {
-            origin.SetAttribute("number-columns-spanned", OdfNamespaces.Table, columnSpan.ToString(System.Globalization.CultureInfo.InvariantCulture), "table");
+            origin.SetAttribute("number-columns-spanned", OdfNamespaces.Table, columnSpan.ToString(CultureInfo.InvariantCulture), "table");
         }
         else
         {
@@ -197,7 +199,7 @@ public sealed class OdfEmbeddedTable
     {
         OdfNode cell = GetCell(row, column);
         if (cell.LocalName == "covered-table-cell")
-            throw new InvalidOperationException("Cannot set style on a covered table cell.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetStyleCovered_6"));
 
         _document.StyleEngine.SetLocalStyleProperty(
             cell,
@@ -221,7 +223,7 @@ public sealed class OdfEmbeddedTable
     {
         OdfNode cell = GetCell(row, column);
         if (cell.LocalName == "covered-table-cell")
-            throw new InvalidOperationException("Cannot set style on a covered table cell.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetStyleCovered_6"));
 
         _document.StyleEngine.SetLocalStyleProperty(
             cell,
@@ -245,7 +247,7 @@ public sealed class OdfEmbeddedTable
     {
         OdfNode cell = GetCell(row, column);
         if (cell.LocalName == "covered-table-cell")
-            throw new InvalidOperationException("Cannot set style on a covered table cell.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetStyleCovered_6"));
 
         _document.StyleEngine.SetLocalStyleProperty(
             cell,
@@ -269,7 +271,7 @@ public sealed class OdfEmbeddedTable
     {
         OdfNode cell = GetCell(row, column);
         if (cell.LocalName == "covered-table-cell")
-            throw new InvalidOperationException("Cannot set style on a covered table cell.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetStyleCovered_6"));
 
         _document.StyleEngine.SetLocalStyleProperty(
             cell,
@@ -293,7 +295,7 @@ public sealed class OdfEmbeddedTable
     {
         OdfNode cell = GetCell(row, column);
         if (cell.LocalName == "covered-table-cell")
-            throw new InvalidOperationException("Cannot set style on a covered table cell.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetStyleCovered_6"));
 
         _document.StyleEngine.SetLocalStyleProperty(
             cell,
@@ -317,7 +319,7 @@ public sealed class OdfEmbeddedTable
     {
         OdfNode cell = GetCell(row, column);
         if (cell.LocalName == "covered-table-cell")
-            throw new InvalidOperationException("Cannot set style on a covered table cell.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetStyleCovered_6"));
 
         _document.StyleEngine.SetLocalStyleProperty(
             cell,

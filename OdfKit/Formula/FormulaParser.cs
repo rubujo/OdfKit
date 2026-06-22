@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Formula.AST;
 using OdfKit.Spreadsheet;
 
+using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
 /// <summary>
@@ -38,7 +39,7 @@ public ref struct FormulaParser
         var node = ParseExpression();
         if (_currentToken.Type != FormulaTokenType.EndOfFormula)
         {
-            throw new InvalidOperationException($"Unexpected token at the end of formula: {_currentToken.Span.ToString()}");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_UnexpectedTokenEndFormula", _currentToken.Span.ToString()));
         }
         return node;
     }
@@ -201,7 +202,7 @@ public ref struct FormulaParser
             var node = ParseExpression();
             if (_currentToken.Type != FormulaTokenType.CloseParen)
             {
-                throw new InvalidOperationException("Mismatched parentheses: expected CloseParen.");
+                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_MismatchedParenthesesExpectedCloseparen"));
             }
             Consume();
             return new ParenthesizedNode(node);
@@ -228,7 +229,7 @@ public ref struct FormulaParser
                 }
                 if (_currentToken.Type != FormulaTokenType.CloseParen)
                 {
-                    throw new InvalidOperationException("Mismatched parentheses in function call.");
+                    throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_MismatchedParenthesesFunctionCall"));
                 }
                 Consume(); // 消耗 ')'
                 return new FunctionNode(ident, args);
@@ -241,7 +242,7 @@ public ref struct FormulaParser
                 Consume(); // 消耗 ':'
                 if (_currentToken.Type != FormulaTokenType.Identifier)
                 {
-                    throw new InvalidOperationException("Invalid range reference layout: missing end coordinate.");
+                    throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_InvalidNotFound"));
                 }
                 string endIdent = _currentToken.Span.ToString();
                 Consume();
@@ -251,7 +252,7 @@ public ref struct FormulaParser
                 {
                     return new RangeReferenceNode(range);
                 }
-                throw new InvalidOperationException($"Failed to parse range string '{fullRangeStr}'.");
+                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_FailedToParseRangeString", fullRangeStr));
             }
 
             // 單一儲存格或單一工作表限定之儲存格 A1 或 Sheet1.A1
@@ -267,6 +268,6 @@ public ref struct FormulaParser
             return new NamedRangeNode(ident);
         }
 
-        throw new InvalidOperationException($"Unexpected token type {_currentToken.Type} during parsing.");
+        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_FormulaParser_UnexpectedTokenTypeDuring", _currentToken.Type));
     }
 }

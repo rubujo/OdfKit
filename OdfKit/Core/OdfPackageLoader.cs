@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -19,7 +20,7 @@ internal static class OdfPackageLoader
     {
         OdfPackage.OdfPackageLoadCollaborators ctx = package.LoadCollaborators;
         if (ctx.UnderlyingStream is null)
-            throw new InvalidOperationException("No input stream available.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackageLoader_NoInputStreamAvailable_2"));
 
         byte[] signature = new byte[4];
         int bytesRead = ReadSignaturePrefix(ctx, signature);
@@ -56,7 +57,7 @@ internal static class OdfPackageLoader
 
         OdfPackage.OdfPackageLoadCollaborators ctx = package.LoadCollaborators;
         if (ctx.UnderlyingStream is null)
-            throw new InvalidOperationException("No input stream available.");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackageLoader_NoInputStreamAvailable_2"));
 
         byte[] signature = new byte[4];
         int bytesRead = ReadSignaturePrefix(ctx, signature);
@@ -118,7 +119,7 @@ internal static class OdfPackageLoader
         }
         else if (ctx.LoadOptions.ValidateMimeType)
         {
-            throw new InvalidDataException("Invalid ODF package: 'mimetype' file is missing.");
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageLoader_InvalidNotFound"));
         }
     }
 }

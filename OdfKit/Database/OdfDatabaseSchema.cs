@@ -4,6 +4,7 @@ using System.Linq;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Database;
 
 /// <summary>
@@ -45,7 +46,7 @@ public sealed class OdfDatabaseSchema
 
         if (_tables.Any(t => string.Equals(t.Name, table.Name, StringComparison.OrdinalIgnoreCase)))
         {
-            throw new InvalidOperationException($"名稱為 '{table.Name}' 的資料表已存在。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfDatabaseSchema_DataTableNameAlready", table.Name));
         }
 
         _tables.Add(table);
@@ -62,7 +63,7 @@ public sealed class OdfDatabaseSchema
     {
         if (string.IsNullOrWhiteSpace(tableName))
         {
-            throw new ArgumentException("資料表名稱不能為空。", nameof(tableName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseSchema_DataCannotBeEmpty_2"), nameof(tableName));
         }
 
         var table = _tables.FirstOrDefault(t => string.Equals(t.Name, tableName, StringComparison.OrdinalIgnoreCase));
@@ -465,7 +466,7 @@ public sealed class OdfSchemaTable
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("資料表名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseSchema_DataCannotBeEmpty_2"), nameof(name));
         }
         Name = name;
     }
@@ -513,7 +514,7 @@ public sealed class OdfSchemaColumn
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("欄位名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseSchema_FieldCannotBeEmpty"), nameof(name));
         }
         Name = name;
         TypeName = typeName;
@@ -574,7 +575,7 @@ public sealed class OdfSchemaIndex
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("索引名稱不能為空。", nameof(name));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseSchema_IndexCannotBeEmpty"), nameof(name));
         }
 
         Name = name;
@@ -650,7 +651,7 @@ public sealed class OdfSchemaForeignKey
     {
         if (string.IsNullOrWhiteSpace(referencedTable))
         {
-            throw new ArgumentException("被參照資料表名稱不能為空。", nameof(referencedTable));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseSchema_NameCannotBeEmpty"), nameof(referencedTable));
         }
 
         Name = name;

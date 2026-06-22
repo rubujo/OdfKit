@@ -5,6 +5,7 @@ using System.Security;
 using System.Security.Cryptography;
 using Org.BouncyCastle.Crypto.Generators;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 public static partial class OdfEncryption
@@ -52,7 +53,7 @@ public static partial class OdfEncryption
             else if (entry.EncryptionInfo.OpenPgpEncryptedKeys.Count > 0 ||
                 string.Equals(entry.EncryptionInfo.AlgorithmName, OpenPgpAlgorithmUri, StringComparison.Ordinal))
             {
-                throw new NotSupportedException("OpenPGP 加密項目必須透過 IOdfCryptographyProvider 解密。");
+                throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_OpenpgpEncryptedItemsDecrypted"));
             }
             else
             {
@@ -110,7 +111,7 @@ public static partial class OdfEncryption
                             cumulativeBytes += bytesRead;
                             if (cumulativeBytes > maxEntrySize)
                             {
-                                throw new SecurityException($"解壓縮後的項目大小超過最大限制： {maxEntrySize} 位元組。");
+                                throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnzippedItemSizeExceeds", maxEntrySize));
                             }
                             outMs.Write(buffer, 0, bytesRead);
                         }
@@ -144,7 +145,7 @@ public static partial class OdfEncryption
                         }
                         else
                         {
-                            throw new CryptographicException("解密失敗：總和檢查碼不符或密碼無效。");
+                            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum_2"));
                         }
                     }
                 }
@@ -157,7 +158,7 @@ public static partial class OdfEncryption
                     }
                     else
                     {
-                        throw new CryptographicException("解密失敗：總和檢查碼不符或密碼無效。");
+                        throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum_2"));
                     }
                 }
             }
@@ -177,7 +178,7 @@ public static partial class OdfEncryption
     {
         if (algorithm == OdfEncryptionAlgorithm.OpenPgp && package.SaveOptions.CryptographyProvider is null)
         {
-            throw new NotSupportedException("OpenPGP 加密必須透過 IOdfCryptographyProvider 實作。");
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_OpenpgpEncryptionImplementedThrough"));
         }
 
         foreach (var entry in package.Entries.Values)

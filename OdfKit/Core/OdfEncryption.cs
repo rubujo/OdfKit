@@ -12,6 +12,7 @@ using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Parameters;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -64,15 +65,15 @@ public static partial class OdfEncryption
     {
         if (salt is null)
         {
-            throw new NullReferenceException("Salt 不能為 null。");
+            throw new NullReferenceException(OdfLocalizer.GetMessage("Err_OdfEncryption_SaltCannotBeEmpty"));
         }
         if (iterations > 50000)
         {
-            throw new CryptographicException($"PBKDF2 反覆運算次數 {iterations} 超過最大限制 50000。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds", iterations));
         }
         if (keyLength < 0)
         {
-            throw new OverflowException("金鑰長度不能為負數。");
+            throw new OverflowException(OdfLocalizer.GetMessage("Err_OdfEncryption_KeyLengthCannotNegative"));
         }
 
         int effectiveIterations = iterations <= 0 ? 1 : iterations;
@@ -91,7 +92,7 @@ public static partial class OdfEncryption
         }
         else
         {
-            throw new NotSupportedException($"不支援的雜湊演算法：{hashName}");
+            throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_UnsupportedHashAlgorithm", hashName));
         }
 
         var generator = new Pkcs5S2ParametersGenerator(digest);

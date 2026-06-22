@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Text;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -9,6 +10,7 @@ using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 using BcX509Crl = Org.BouncyCastle.X509.X509Crl;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -23,7 +25,7 @@ internal static class OdfSignatureCrlUtilities
         try
         {
             BcX509Crl crl = new X509CrlParser().ReadCrl(crlBytes)
-                ?? throw new CryptographicException("無法解析 CRL 內容。");
+                ?? throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureCrlUtilities_UnableParseCrlContent_2"));
             ISet<X509CrlEntry>? entries = crl.GetRevokedCertificates();
             if (entries is null)
             {
@@ -86,7 +88,7 @@ internal static class OdfSignatureCrlUtilities
 
     private static void ExtractUrlsFromRawAscii(byte[] rawData, List<string> urls)
     {
-        string ascii = System.Text.Encoding.ASCII.GetString(rawData);
+        string ascii = Encoding.ASCII.GetString(rawData);
         foreach (string scheme in new[] { "http://", "https://" })
         {
             int idx = 0;
@@ -124,7 +126,7 @@ internal static class OdfSignatureCrlUtilities
         try
         {
             BcX509Crl crl = new X509CrlParser().ReadCrl(crlBytes)
-                ?? throw new CryptographicException("無法解析 CRL 內容。");
+                ?? throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureCrlUtilities_UnableParseCrlContent_2"));
             AsymmetricKeyParameter issuerPublicKey =
                 DotNetUtilities.FromX509Certificate(issuerCert).GetPublicKey();
             crl.Verify(issuerPublicKey);

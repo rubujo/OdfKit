@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
@@ -209,7 +210,7 @@ internal static class OdfPackageZipLoader
 
         if (entryLength > int.MaxValue)
         {
-            throw new SecurityException($"Zip entry size {entryLength} exceeds supported in-memory limit.");
+            throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfPackageZipLoader_ZipEntrySizeExceeds_2", entryLength));
         }
 
         return ReadEntryBytesWithPool(
@@ -230,7 +231,7 @@ internal static class OdfPackageZipLoader
 
         if (entryLength > int.MaxValue)
         {
-            throw new SecurityException($"Zip entry size {entryLength} exceeds supported in-memory limit.");
+            throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfPackageZipLoader_ZipEntrySizeExceeds_2", entryLength));
         }
 
         return await ReadEntryBytesWithPoolAsync(

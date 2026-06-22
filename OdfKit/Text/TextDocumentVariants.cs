@@ -157,7 +157,7 @@ public sealed class TextMasterDocument : TextDocument
     {
         if (string.IsNullOrWhiteSpace(sectionName))
         {
-            throw new ArgumentException("區段名稱不可為空。", nameof(sectionName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentVariants_SectionCannotBeEmpty_2"), nameof(sectionName));
         }
 
         OdfNode? section = FindSubDocumentSectionNode(BodyTextRoot, sectionName);
@@ -181,7 +181,7 @@ public sealed class TextMasterDocument : TextDocument
     {
         if (string.IsNullOrWhiteSpace(sectionName))
         {
-            throw new ArgumentException("區段名稱不可為空。", nameof(sectionName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentVariants_SectionCannotBeEmpty_2"), nameof(sectionName));
         }
 
         OdfNode? section = FindSubDocumentSectionNode(BodyTextRoot, sectionName);
@@ -223,7 +223,7 @@ public sealed class TextMasterDocument : TextDocument
             }
             else if (!ReferenceEquals(parent, section.Parent))
             {
-                throw new InvalidOperationException($"區段 '{name}' 與其他子文件參照不在同一個父節點下，無法重新排序。");
+                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_TextDocumentVariants_SectionUnderSameParent", name));
             }
 
             sections.Add(section);

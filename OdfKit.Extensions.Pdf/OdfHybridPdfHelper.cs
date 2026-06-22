@@ -2,11 +2,11 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using OdfKit.Compliance;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.Advanced;
 using PdfSharp.Pdf.IO;
 using Xml = System.Xml;
-
 namespace OdfKit.Core;
 
 /// <summary>
@@ -47,7 +47,7 @@ public static class OdfHybridPdfHelper
         // 加密防禦檢查
         if (document.SecuritySettings.IsEncrypted && string.IsNullOrEmpty(password))
         {
-            throw new CryptographicException("在沒有密碼的情況下，無法處理加密的 PDF 檔案以進行混合 ODF 提取。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfHybridPdfHelper_EncryptedPdfArchivesCannot"));
         }
 
         PdfCatalog catalog = document.Internals.Catalog;
@@ -143,7 +143,7 @@ public static class OdfHybridPdfHelper
         if (outputPdfStream is null)
             throw new ArgumentNullException(nameof(outputPdfStream));
         if (string.IsNullOrWhiteSpace(odfFileName))
-            throw new ArgumentException("必須指定 ODF 檔名。", nameof(odfFileName));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfHybridPdfHelper_OdfFileNameSpecified"), nameof(odfFileName));
 
         // 讀取 ODF 資料
         byte[] odfData;
@@ -161,7 +161,7 @@ public static class OdfHybridPdfHelper
         // 加密防禦檢查
         if (document.SecuritySettings.IsEncrypted && string.IsNullOrEmpty(password))
         {
-            throw new CryptographicException("在沒有密碼的情況下，無法處理加密的 PDF 檔案以注入混合 ODF 。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfHybridPdfHelper_UnableProcessEncryptedPdf"));
         }
 
         // 決定 MIME 類型
@@ -226,7 +226,7 @@ public static class OdfHybridPdfHelper
         namesArray.Elements.Add(new PdfString(OdfRelationName));
         if (filespec.Reference is null)
         {
-            throw new CryptographicException("無法為 ODF 檔案附件產生 PDF 參考。");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfHybridPdfHelper_UnableGeneratePdfReference"));
         }
         namesArray.Elements.Add(filespec.Reference);
 

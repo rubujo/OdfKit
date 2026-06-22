@@ -70,12 +70,12 @@ public partial class OdfCell
 
             return ValueType switch
             {
-                "float" when double.TryParse(RawValue, System.Globalization.NumberStyles.Float,
-                    System.Globalization.CultureInfo.InvariantCulture, out double dbl)
+                "float" when double.TryParse(RawValue, NumberStyles.Float,
+                    CultureInfo.InvariantCulture, out double dbl)
                     => OdfKit.Styles.OdfNumberFormatEngine.Format(dbl, formatNode),
                 "date" when DateTime.TryParse(
                     Node.GetAttribute("date-value", OdfNamespaces.Office),
-                    CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out DateTime dt)
+                    CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime dt)
                     => OdfKit.Styles.OdfNumberFormatEngine.Format(dt, formatNode),
                 "boolean" when bool.TryParse(
                     Node.GetAttribute("boolean-value", OdfNamespaces.Office), out bool flag)

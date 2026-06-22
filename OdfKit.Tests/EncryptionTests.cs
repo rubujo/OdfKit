@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.IO.Compression;
+using System.Globalization;
+using System;
 using System.IO;
 using System.Security;
 using System.Security.Cryptography;
@@ -11,6 +13,11 @@ namespace OdfKit.Tests
 {
     public class EncryptionTests
     {
+        public EncryptionTests()
+        {
+            OdfLocalizer.DefaultCulture = new CultureInfo("zh-TW");
+        }
+
         [Fact]
         public void TestPbkdf2IterationLimit()
         {
@@ -643,9 +650,9 @@ namespace OdfKit.Tests
             using var ms = new MemoryStream();
             doc.SaveToStream(ms, new OdfSaveOptions { Password = "test" });
             ms.Position = 0;
-            using var zip = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Read);
+            using var zip = new ZipArchive(ms, ZipArchiveMode.Read);
             var manifestEntry = zip.GetEntry("META-INF/manifest.xml")!;
-            using var sr = new System.IO.StreamReader(manifestEntry.Open());
+            using var sr = new StreamReader(manifestEntry.Open());
             string manifest = sr.ReadToEnd();
             Assert.Contains("50000", manifest);
         }
@@ -668,7 +675,7 @@ namespace OdfKit.Tests
 
             // 驗證 manifest.xml
             ms.Position = 0;
-            using (var zip = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Read, true))
+            using (var zip = new ZipArchive(ms, ZipArchiveMode.Read, true))
             {
                 var manifestEntry = zip.GetEntry("META-INF/manifest.xml")!;
                 using var sr = new StreamReader(manifestEntry.Open());

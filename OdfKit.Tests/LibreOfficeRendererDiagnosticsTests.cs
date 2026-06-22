@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Globalization;
+using System;
+using OdfKit.Compliance;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -14,6 +16,11 @@ namespace OdfKit.Tests
     [Collection("SequentialRenderingTests")]
     public class LibreOfficeRendererDiagnosticsTests
     {
+        public LibreOfficeRendererDiagnosticsTests()
+        {
+            OdfLocalizer.DefaultCulture = new CultureInfo("en");
+        }
+
         [Fact]
         public async Task TestParallelTimeoutsProcessOrphanCount()
         {

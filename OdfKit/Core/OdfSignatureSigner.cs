@@ -42,13 +42,13 @@ internal static class OdfSignatureSigner
         if (certificate is null)
             throw new ArgumentNullException(nameof(certificate));
         if (!certificate.HasPrivateKey)
-            throw new ArgumentException("Certificate must contain a private key.", nameof(certificate));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_CertificateContainPrivateKey"), nameof(certificate));
         if (options is null)
             throw new ArgumentNullException(nameof(options));
 
         using AsymmetricAlgorithm? privateKey = certificate.GetRSAPrivateKey() ?? (AsymmetricAlgorithm?)certificate.GetECDsaPrivateKey();
         if (privateKey is null)
-            throw new CryptographicException("Certificate does not have a supported RSA or ECDSA private key.");
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_CertificateSupportedRsaEcdsa"));
 
         var doc = new XmlDocument();
         XmlElement root;
@@ -59,7 +59,7 @@ internal static class OdfSignatureSigner
             using Stream stream = package.GetEntryStream(OdfSignerConstants.SignaturePath);
             using var reader = XmlReader.Create(stream, settings);
             doc.Load(reader);
-            root = doc.DocumentElement ?? throw new CryptographicException("Invalid signature file structure.");
+            root = doc.DocumentElement ?? throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_InvalidSignatureFileStructure"));
         }
         else
         {
@@ -182,14 +182,14 @@ internal static class OdfSignatureSigner
         if (requiresTimestamp)
         {
             if (string.IsNullOrEmpty(options.TsaUrl))
-                throw new CryptographicException("TSA URL must be configured for XAdES-T, XAdES-LT, or XAdES-A.");
+                throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_TsaUrlConfiguredXades"));
 
             var nsManager = new XmlNamespaceManager(doc.NameTable);
             nsManager.AddNamespace("ds", OdfNamespaces.Ds);
             nsManager.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
 
             var sigValElem = xmlSignature.SelectSingleNode(".//ds:SignatureValue", nsManager) as XmlElement
-                ?? throw new CryptographicException("ds:SignatureValue element was not found in computed signature.");
+                ?? throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_DsNotFound"));
 
             byte[] sigValueBytes = OdfSignatureTsaClient.CanonicalizeSignatureValue(sigValElem);
 
@@ -204,7 +204,7 @@ internal static class OdfSignatureSigner
             byte[] tsToken = OdfSignatureTsaClient.ExtractTimestampToken(tsaResponse);
 
             var importedQualProps = xmlSignature.SelectSingleNode(".//xades:QualifyingProperties", nsManager) as XmlElement
-                ?? throw new CryptographicException("xades:QualifyingProperties element was not found in computed signature.");
+                ?? throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_XadesNotFound"));
 
             var unsignedProps = doc.CreateElement("xades", "UnsignedProperties", "http://uri.etsi.org/01903/v1.3.2#");
             var unsignedSigProps = doc.CreateElement("xades", "UnsignedSignatureProperties", "http://uri.etsi.org/01903/v1.3.2#");

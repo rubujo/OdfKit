@@ -4,6 +4,7 @@ using System.Text;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
@@ -75,7 +76,7 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
                 // 目錄穿越防禦 (Zip Slip Defense)：在指定資料夾路徑時執行嚴格的路徑驗證
                 if (value.Contains("..") || value.Contains("\\") || value.StartsWith("/"))
                 {
-                    throw new InvalidOperationException("Invalid formula folder path specified (Zip Slip defense).");
+                    throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaObject_InvalidFormulaFolderPath_2"));
                 }
                 ObjectNode.SetAttribute("href", OdfNamespaces.XLink, value, "xlink");
                 ObjectNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
@@ -125,7 +126,7 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
             // 針對目錄穿越 (Zip Slip) 的防禦性檢查
             if (folder.Contains("..") || folder.Contains("\\") || folder.StartsWith("/"))
             {
-                throw new InvalidOperationException("Invalid formula folder path specified (Zip Slip defense).");
+                throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaObject_InvalidFormulaFolderPath_2"));
             }
 
             string mathDocXml = $"<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:math=\"http://www.w3.org/1998/Math/MathML\" office:version=\"{OdfVersionInfo.DefaultVersionString}\"><office:body><office:formula>{value}</office:formula></office:body></office:document-content>";

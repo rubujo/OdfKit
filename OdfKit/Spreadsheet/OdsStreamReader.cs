@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Xml;
 using OdfKit.Core;
 
+using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
@@ -63,7 +64,7 @@ public sealed class OdsStreamReader : IDisposable
     private void ScanSheetNames()
     {
         var entry = _zip.GetEntry("content.xml")
-            ?? throw new InvalidOperationException("ODS 檔案缺少 content.xml 項目。");
+            ?? throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdsStreamReader_OdsNotFound_2"));
 
         using var stream = entry.Open();
         using var reader = XmlReader.Create(stream, CreateXmlSettings());
@@ -87,7 +88,7 @@ public sealed class OdsStreamReader : IDisposable
     public void SelectSheet(int sheetIndex)
     {
         if (_started)
-            throw new InvalidOperationException("SelectSheet() 必須在第一次 Read() 之前呼叫。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdsStreamReader_SelectsheetCalledBeforeFirst"));
         if (sheetIndex < 0 || sheetIndex >= _sheetNames.Count)
             throw new ArgumentOutOfRangeException(nameof(sheetIndex),
                 $"工作表索引 {sheetIndex} 超出範圍（共 {_sheetNames.Count} 個工作表）。");
@@ -116,7 +117,7 @@ public sealed class OdsStreamReader : IDisposable
     private void OpenReaderAtSheet()
     {
         var entry = _zip.GetEntry("content.xml")
-            ?? throw new InvalidOperationException("ODS 檔案缺少 content.xml 項目。");
+            ?? throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdsStreamReader_OdsNotFound_2"));
 
         _contentStream = entry.Open();
         _xmlReader = XmlReader.Create(_contentStream, CreateXmlSettings());

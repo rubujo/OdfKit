@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
+using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
@@ -21,7 +22,7 @@ public readonly struct OdfLanguageTag : IEquatable<OdfLanguageTag>
     {
         if (!IsValid(value))
         {
-            throw new ArgumentException("語言標記必須符合 XML Schema language 格式。", nameof(value));
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfLanguageTag_LanguageTagsConformXml"), nameof(value));
         }
 
         Value = value;

@@ -1,7 +1,7 @@
-﻿using OdfKit.Core;
+﻿using OdfKit.Compliance;
+using OdfKit.Core;
 using VDS.RDF;
 using VDS.RDF.Query;
-
 namespace OdfKit.Extensions.Rdf;
 
 /// <summary>
@@ -40,7 +40,7 @@ public static class OdfRdfMetadataExtensions
         object result = OdfRdfGraphBridge.ExecuteQuery(metadata, sparql, baseUri);
         if (result is not SparqlResultSet resultSet)
         {
-            throw new InvalidOperationException("SPARQL 查詢必須為 SELECT 形式。");
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfRdfMetadataExtensions_SparqlQueriesSelectForm"));
         }
 
         return resultSet;

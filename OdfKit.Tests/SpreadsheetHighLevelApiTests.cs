@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Text;
+using System;
 using System.IO;
 using System.Linq;
 using OdfKit.Chart;
@@ -53,12 +54,12 @@ public class SpreadsheetHighLevelApiTests
 
         // 2. 驗證 Object 1/mimetype 媒體類型
         byte[] mimeBytes = package.ReadEntry("Object 1/mimetype");
-        string mimeText = System.Text.Encoding.UTF8.GetString(mimeBytes).Trim();
+        string mimeText = Encoding.UTF8.GetString(mimeBytes).Trim();
         Assert.Equal("application/vnd.oasis.opendocument.chart", mimeText);
 
         // 3. 驗證 Object 1/content.xml 內容
         byte[] objContentBytes = package.ReadEntry("Object 1/content.xml");
-        string objContentXml = System.Text.Encoding.UTF8.GetString(objContentBytes);
+        string objContentXml = Encoding.UTF8.GetString(objContentBytes);
 
         Assert.Contains("chart:chart", objContentXml);
         Assert.Contains("chart:class=\"chart:line\"", objContentXml);
@@ -617,7 +618,7 @@ public class SpreadsheetHighLevelApiTests
         stream.Position = 0;
         using var pkg = OdfKit.Core.OdfPackage.Open(stream, leaveOpen: true);
         using var contentStream = pkg.GetEntryStream("content.xml");
-        using var reader = new System.IO.StreamReader(contentStream);
+        using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();
         Assert.Contains("xlink:href=\"https://odfkit.dev\"", xml);
         Assert.Contains("xlink:type=\"simple\"", xml);
@@ -663,7 +664,7 @@ public class SpreadsheetHighLevelApiTests
         stream.Position = 0;
         using var pkg = OdfKit.Core.OdfPackage.Open(stream, leaveOpen: true);
         using var contentStream = pkg.GetEntryStream("content.xml");
-        using var reader = new System.IO.StreamReader(contentStream);
+        using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();
         Assert.Contains("office:annotation", xml);
         Assert.Contains("XML 驗證批注", xml);
@@ -714,7 +715,7 @@ public class SpreadsheetHighLevelApiTests
         stream.Position = 0;
         using var pkg = OdfKit.Core.OdfPackage.Open(stream, leaveOpen: true);
         using var contentStream = pkg.GetEntryStream("content.xml");
-        using var reader = new System.IO.StreamReader(contentStream);
+        using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();
         Assert.Contains("text:span", xml);
         Assert.Contains("font-weight=\"bold\"", xml);
@@ -743,7 +744,7 @@ public class SpreadsheetHighLevelApiTests
         ms1.Position = 0;
         using (var pkg1 = OdfKit.Core.OdfPackage.Open(ms1, leaveOpen: true))
         using (var cs1 = pkg1.GetEntryStream("content.xml"))
-        using (var r1 = new System.IO.StreamReader(cs1))
+        using (var r1 = new StreamReader(cs1))
         {
             string xml1 = r1.ReadToEnd();
             Assert.Contains("table:table-row-group", xml1);
@@ -757,7 +758,7 @@ public class SpreadsheetHighLevelApiTests
         ms2.Position = 0;
         using (var pkg2 = OdfKit.Core.OdfPackage.Open(ms2, leaveOpen: true))
         using (var cs2 = pkg2.GetEntryStream("content.xml"))
-        using (var r2 = new System.IO.StreamReader(cs2))
+        using (var r2 = new StreamReader(cs2))
         {
             string xml2 = r2.ReadToEnd();
             Assert.Contains("table:display=\"false\"", xml2);
@@ -771,7 +772,7 @@ public class SpreadsheetHighLevelApiTests
         ms3.Position = 0;
         using (var pkg3 = OdfKit.Core.OdfPackage.Open(ms3, leaveOpen: true))
         using (var cs3 = pkg3.GetEntryStream("content.xml"))
-        using (var r3 = new System.IO.StreamReader(cs3))
+        using (var r3 = new StreamReader(cs3))
         {
             string xml3 = r3.ReadToEnd();
             Assert.DoesNotContain("table:table-row-group", xml3);
@@ -786,7 +787,7 @@ public class SpreadsheetHighLevelApiTests
         ms4.Position = 0;
         using (var pkg4 = OdfKit.Core.OdfPackage.Open(ms4, leaveOpen: true))
         using (var cs4 = pkg4.GetEntryStream("content.xml"))
-        using (var r4 = new System.IO.StreamReader(cs4))
+        using (var r4 = new StreamReader(cs4))
         {
             string xml4 = r4.ReadToEnd();
             Assert.Contains("table:table-column-group", xml4);

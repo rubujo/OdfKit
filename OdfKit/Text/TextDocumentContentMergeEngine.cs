@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
+using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
@@ -18,7 +19,7 @@ internal static class TextDocumentContentMergeEngine
         OdfDocument sourceDoc,
         Dictionary<string, string> renameMap)
     {
-        var srcText = sourceDoc as TextDocument ?? throw new ArgumentException("Source document must be a TextDocument.");
+        var srcText = sourceDoc as TextDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocumentContentMergeEngine_SourceDocumentTextdocument"));
 
         foreach (OdfNode child in srcText.BodyTextRoot.Children)
         {
