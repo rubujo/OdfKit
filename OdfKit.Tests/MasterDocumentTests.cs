@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OdfKit.Text;
@@ -80,5 +81,51 @@ public class MasterDocumentTests
         var persisted = loaded.GetSubDocumentReferences();
         Assert.Equal("onRequest", persisted.Single(r => r.SectionName == "Chapter1").Actuate);
         Assert.Equal("onRequest", persisted.Single(r => r.SectionName == "Chapter2").Actuate);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextMasterDocument.MergeSubDocuments"/> 可依文件順序，
+    /// 將主控文件本身內容與外部子文件內容合併為單一文字文件。
+    /// </summary>
+    [Fact]
+    public void MergeSubDocuments_CombinesOwnContentAndSubDocumentsInOrder()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+        string chapter1Path = Path.Combine(tempDir, "chapter1.odt");
+        string chapter2Path = Path.Combine(tempDir, "chapter2.odt");
+
+        try
+        {
+            using (var chapter1 = TextDocument.Create())
+            {
+                chapter1.AddParagraph("第一章內容");
+                chapter1.Save(chapter1Path);
+            }
+
+            using (var chapter2 = TextDocument.Create())
+            {
+                chapter2.AddParagraph("第二章內容");
+                chapter2.Save(chapter2Path);
+            }
+
+            using var master = TextMasterDocument.Create();
+            master.AddParagraph("封面標題");
+            master.AddSubDocumentReference("Chapter1", "chapter1.odt");
+            master.AddSubDocumentReference("Chapter2", "chapter2.odt");
+
+            using TextDocument merged = master.MergeSubDocuments(tempDir);
+            var paragraphTexts = merged.Body.Paragraphs.Select(p => p.TextContent).ToList();
+
+            Assert.Contains("封面標題", paragraphTexts);
+            Assert.Contains("第一章內容", paragraphTexts);
+            Assert.Contains("第二章內容", paragraphTexts);
+            Assert.True(paragraphTexts.IndexOf("封面標題") < paragraphTexts.IndexOf("第一章內容"));
+            Assert.True(paragraphTexts.IndexOf("第一章內容") < paragraphTexts.IndexOf("第二章內容"));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
     }
 }

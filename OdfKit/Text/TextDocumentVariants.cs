@@ -144,6 +144,46 @@ public sealed class TextMasterDocument : TextDocument
     }
 
     /// <summary>
+    /// 將主控文件本身內容與所有外部子文件依文件順序合併為單一文字文件。
+    /// </summary>
+    /// <param name="baseDirectory">解析子文件參照相對路徑時所使用的基準目錄。</param>
+    /// <param name="options">合併設定選項；若為 <see langword="null"/> 則使用預設選項。</param>
+    /// <returns>合併完成的新 <see cref="TextDocument"/> 執行個體。</returns>
+    /// <exception cref="ArgumentException">當 <paramref name="baseDirectory"/> 為空白時擲出。</exception>
+    public TextDocument MergeSubDocuments(string baseDirectory, OdfMergeOptions? options = null)
+    {
+        if (string.IsNullOrWhiteSpace(baseDirectory))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextMasterDocument_BaseDirectoryCannotBeEmpty"), nameof(baseDirectory));
+        }
+
+        TextDocument merged = TextDocument.Create();
+        foreach (OdfNode child in new List<OdfNode>(BodyTextRoot.Children))
+        {
+            OdfNode? sectionSource = child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "section" &&
+                child.NamespaceUri == OdfNamespaces.Text
+                ? child.FindChildElement("section-source", OdfNamespaces.Text)
+                : null;
+            string? href = sectionSource?.GetAttribute("href", OdfNamespaces.XLink);
+
+            if (!string.IsNullOrEmpty(href))
+            {
+                string fullPath = Path.Combine(baseDirectory, href);
+                using TextDocument subDoc = TextDocument.Load(fullPath);
+                merged.AppendDocument(subDoc, options);
+            }
+            else
+            {
+                OdfNode imported = OdfNode.ImportNode(child, Package, merged.Package);
+                merged.BodyTextRoot.AppendChild(imported);
+            }
+        }
+
+        return merged;
+    }
+
+    /// <summary>
     /// 設定指定名稱外部子文件區段參照的載入時機。
     /// </summary>
     /// <param name="sectionName">區段名稱</param>
