@@ -161,7 +161,15 @@ public sealed class TextMasterDocument : TextDocument
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextMasterDocument_BaseDirectoryCannotBeEmpty"), nameof(baseDirectory));
         }
 
+        OdfMergeOptions effectiveOptions = options ?? OdfMergeOptions.Default;
         TextDocument merged = TextDocument.Create();
+
+        var ownStyleRenameMap = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (effectiveOptions.ImportStyles)
+        {
+            OdfDocumentMergeEngine.MergeStyles(merged.MergeCollaborators, this, effectiveOptions, ownStyleRenameMap);
+        }
+
         foreach (OdfNode child in new List<OdfNode>(BodyTextRoot.Children))
         {
             OdfNode? sectionSource = child.NodeType is OdfNodeType.Element &&
@@ -180,11 +188,16 @@ public sealed class TextMasterDocument : TextDocument
                     subDoc.ShiftHeadingOutlineLevels(subDocumentOutlineOffset);
                 }
 
-                merged.AppendDocument(subDoc, options);
+                merged.AppendDocument(subDoc, effectiveOptions);
             }
             else
             {
                 OdfNode imported = OdfNode.ImportNode(child, Package, merged.Package);
+                if (ownStyleRenameMap.Count > 0)
+                {
+                    OdfDocumentStyleRemapEngine.RemapStylesInNodes(imported, ownStyleRenameMap);
+                }
+
                 merged.BodyTextRoot.AppendChild(imported);
             }
         }

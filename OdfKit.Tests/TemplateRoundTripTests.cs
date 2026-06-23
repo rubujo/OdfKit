@@ -169,6 +169,129 @@ public class TemplateRoundTripTests
     }
 
     /// <summary>
+    /// 驗證從 OTS 試算表範本建立 ODS 文件的完整流程，涵蓋母片頁面、範本中繼資料與
+    /// 工作表內容的儲存／載入 Round-trip。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetTemplateInstantiationAndRoundTrip()
+    {
+        using var template = SpreadsheetTemplateDocument.Create();
+        template.Title = "My Spreadsheet Template";
+
+        var masterPage = template.AddMasterPage("MySpreadsheetMaster");
+        masterPage.HeaderText = "Spreadsheet Header";
+
+        var sheet = template.Worksheets.Add("Sheet1");
+        sheet.Cells["A1"].CellValue = "範本既有資料";
+
+        using var doc = SpreadsheetDocument.CreateFromTemplate(template);
+
+        Assert.Equal("application/vnd.oasis.opendocument.spreadsheet", doc.Package.MimeType);
+
+        var copiedMasterPage = doc.GetMasterPages().FirstOrDefault(m => m.Name == "MySpreadsheetMaster");
+        Assert.NotNull(copiedMasterPage);
+        Assert.Equal("Spreadsheet Header", copiedMasterPage!.HeaderText);
+
+        doc.TemplateMetadata = new OdfTemplateMetadata
+        {
+            Href = "http://templates.example.com/mytemplate.ots",
+            Title = "My Original OTS Template",
+            Date = DateTime.UtcNow
+        };
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+
+        using var loadedDoc = SpreadsheetDocument.Load(ms);
+        Assert.NotNull(loadedDoc.TemplateMetadata);
+        Assert.Equal("http://templates.example.com/mytemplate.ots", loadedDoc.TemplateMetadata.Href);
+
+        var loadedMaster = loadedDoc.GetMasterPages().FirstOrDefault(m => m.Name == "MySpreadsheetMaster");
+        Assert.NotNull(loadedMaster);
+        Assert.Equal("Spreadsheet Header", loadedMaster!.HeaderText);
+
+        var loadedSheet = loadedDoc.Worksheets["Sheet1"];
+        Assert.Equal("範本既有資料", loadedSheet.Cells["A1"].CellValue?.ToString());
+    }
+
+    /// <summary>
+    /// 驗證從 OTP 簡報範本建立 ODP 文件的完整流程，涵蓋母片頁面與範本中繼資料的
+    /// 儲存／載入 Round-trip。
+    /// </summary>
+    [Fact]
+    public void PresentationTemplateInstantiationAndRoundTrip()
+    {
+        using var template = PresentationTemplateDocument.Create();
+        template.Title = "My Presentation Template";
+
+        var masterPage = template.AddMasterPage("MyPresentationMaster");
+
+        using var doc = PresentationDocument.CreateFromTemplate(template);
+
+        Assert.Equal("application/vnd.oasis.opendocument.presentation", doc.Package.MimeType);
+
+        var copiedMasterPage = doc.GetMasterPages().FirstOrDefault(m => m.Name == "MyPresentationMaster");
+        Assert.NotNull(copiedMasterPage);
+
+        doc.TemplateMetadata = new OdfTemplateMetadata
+        {
+            Href = "http://templates.example.com/mytemplate.otp",
+            Title = "My Original OTP Template",
+            Date = DateTime.UtcNow
+        };
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+
+        using var loadedDoc = PresentationDocument.Load(ms);
+        Assert.NotNull(loadedDoc.TemplateMetadata);
+        Assert.Equal("http://templates.example.com/mytemplate.otp", loadedDoc.TemplateMetadata.Href);
+
+        var loadedMaster = loadedDoc.GetMasterPages().FirstOrDefault(m => m.Name == "MyPresentationMaster");
+        Assert.NotNull(loadedMaster);
+    }
+
+    /// <summary>
+    /// 驗證從 OTG 繪圖範本建立 ODG 文件的完整流程，涵蓋母片頁面與範本中繼資料的
+    /// 儲存／載入 Round-trip。
+    /// </summary>
+    [Fact]
+    public void DrawingTemplateInstantiationAndRoundTrip()
+    {
+        using var template = GraphicsTemplateDocument.Create();
+        template.Title = "My Drawing Template";
+
+        var masterPage = template.AddMasterPage("MyDrawingMaster");
+
+        using var doc = DrawingDocument.CreateFromTemplate(template);
+
+        Assert.Equal("application/vnd.oasis.opendocument.graphics", doc.Package.MimeType);
+
+        var copiedMasterPage = doc.GetMasterPages().FirstOrDefault(m => m.Name == "MyDrawingMaster");
+        Assert.NotNull(copiedMasterPage);
+
+        doc.TemplateMetadata = new OdfTemplateMetadata
+        {
+            Href = "http://templates.example.com/mytemplate.otg",
+            Title = "My Original OTG Template",
+            Date = DateTime.UtcNow
+        };
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+
+        using var loadedDoc = DrawingDocument.Load(ms);
+        Assert.NotNull(loadedDoc.TemplateMetadata);
+        Assert.Equal("http://templates.example.com/mytemplate.otg", loadedDoc.TemplateMetadata.Href);
+
+        var loadedMaster = loadedDoc.GetMasterPages().FirstOrDefault(m => m.Name == "MyDrawingMaster");
+        Assert.NotNull(loadedMaster);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="OdfSection.IsProtected"/> 可寫入並於儲存／載入後讀回，
     /// 用於將範本中特定區段標記為唯讀。
     /// </summary>

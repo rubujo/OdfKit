@@ -30,7 +30,11 @@ internal static class OdfDocumentMergeEngine
         dest.MergeContentNodes(sourceDoc, options, styleRenameMap);
     }
 
-    private static void MergeStyles(
+    /// <summary>
+    /// 僅合併樣式（不含內容節點），供需要自行控制內容節點合併順序的呼叫端
+    /// （例如 <see cref="OdfKit.Text.TextMasterDocument.MergeSubDocuments"/>）使用。
+    /// </summary>
+    internal static void MergeStyles(
         OdfDocument.OdfDocumentMergeCollaborators dest,
         OdfDocument sourceDoc,
         OdfMergeOptions options,
@@ -47,6 +51,10 @@ internal static class OdfDocumentMergeEngine
         OdfNode sourceStylesAuto = dest.FindOrCreateChild(sourceDoc.StylesDom, "automatic-styles", OdfNamespaces.Office, "office");
         OdfNode destStylesAuto = dest.FindOrCreateChild(dest.StylesDom, "automatic-styles", OdfNamespaces.Office, "office");
         MergeStyleNodes(dest, sourceStylesAuto, destStylesAuto, options, renameMap);
+
+        // 新增的樣式節點透過原始 DOM 操作寫入，未經過樣式引擎的一般建立路徑，
+        // 必須重建索引快取，否則後續（例如連續合併多份來源文件時）的衝突偵測會讀到過期快取。
+        dest.StyleEngine.RebuildStyleIndex();
     }
 
     private static void MergeStyleNodes(
