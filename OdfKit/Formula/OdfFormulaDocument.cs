@@ -139,9 +139,11 @@ public partial class OdfFormulaDocument : OdfDocument
     public OdfNode MathNode => FindOrCreateChild(GetFormulaNode(), "math", MathMlNamespace, "math");
 
     /// <summary>
-    /// 取得 MathML 內容的純文字摘要。
+    /// 取得 MathML 呈現內容（presentation MathML）的純文字摘要，不含
+    /// <c>math:semantics</c>／<c>math:annotation</c> 標註文字（例如真實 LibreOffice <c>math8</c>
+    /// 匯出時附加的原始 StarMath 來源）。
     /// </summary>
-    public string MathText => MathNode.TextContent;
+    public string MathText => GetPresentationTextContent(MathNode);
 
     /// <summary>
     /// 取得目前 MathML row 中可辨識的 token 摘要。

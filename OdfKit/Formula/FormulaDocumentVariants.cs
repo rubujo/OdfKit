@@ -73,6 +73,17 @@ public sealed class FormulaTemplateDocument : FormulaDocument
     public static new async Task<FormulaTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
+    /// <summary>
+    /// 從現有的 ODF 公式文件建立新的 OTF 公式範本文件，完整保留其 MathML 公式內容。
+    /// </summary>
+    /// <param name="document">作為範本內容來源的公式文件</param>
+    /// <returns>建立完成的 <see cref="FormulaTemplateDocument"/> 執行個體</returns>
+    public static FormulaTemplateDocument CreateFromDocument(FormulaDocument document) =>
+        (FormulaTemplateDocument)CreateTemplateFromDocumentInternal(
+            document,
+            OdfDocumentKind.FormulaTemplate,
+            "application/vnd.oasis.opendocument.formula-template");
+
     private static FormulaTemplateDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<FormulaTemplateDocument>(
             document,
@@ -146,6 +157,14 @@ public sealed class FlatFormulaDocument : FormulaDocument
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatFormulaDocument"/></returns>
     public static new async Task<FlatFormulaDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+
+    /// <summary>
+    /// 從現有的 ODF（ZIP 封裝）公式文件建立等價的 FDF 扁平 XML 公式文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 ODF 公式文件</param>
+    /// <returns>建立完成的 <see cref="FlatFormulaDocument"/> 執行個體</returns>
+    public static FlatFormulaDocument CreateFromDocument(FormulaDocument document) =>
+        (FlatFormulaDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.FlatFormula, targetIsFlatXml: true);
 
     private static FlatFormulaDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<FlatFormulaDocument>(

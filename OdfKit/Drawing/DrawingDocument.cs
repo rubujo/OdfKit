@@ -78,6 +78,14 @@ public partial class DrawingDocument : OdfDocument
         return (DrawingDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Graphics, "application/vnd.oasis.opendocument.graphics", clearUserContent);
     }
 
+    /// <summary>
+    /// 從 FODG 扁平 XML 繪圖文件建立等價的 ODG（ZIP 封裝）繪圖文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 FODG 扁平 XML 繪圖文件</param>
+    /// <returns>建立完成的 <see cref="DrawingDocument"/> 執行個體</returns>
+    public static DrawingDocument CreateFromFlatDocument(FlatGraphicsDocument document) =>
+        (DrawingDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.Graphics, targetIsFlatXml: false);
+
     /// <inheritdoc/>
     protected override void ClearTemplateUserContent()
     {

@@ -75,6 +75,22 @@ public partial class TextDocument : OdfDocument
     }
 
     /// <summary>
+    /// 從 FODT 扁平 XML 文字文件建立等價的 ODT（ZIP 封裝）文字文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 FODT 扁平 XML 文字文件</param>
+    /// <returns>建立完成的 <see cref="TextDocument"/> 執行個體</returns>
+    public static TextDocument CreateFromFlatDocument(FlatTextDocument document) =>
+        (TextDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.Text, targetIsFlatXml: false);
+
+    /// <summary>
+    /// 從 OTH 網頁範本文件建立等價的 ODT 文字文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 OTH 網頁範本文件</param>
+    /// <returns>建立完成的 <see cref="TextDocument"/> 執行個體</returns>
+    public static TextDocument CreateFromWebDocument(TextWebDocument document) =>
+        (TextDocument)CreateFromTemplateInternal(document, OdfDocumentKind.Text, "application/vnd.oasis.opendocument.text", clearUserContent: false);
+
+    /// <summary>
     /// 建立新的 ODT 文字文件 Fluent builder。
     /// </summary>
     /// <returns>新的 <see cref="TextDocumentBuilder"/> 執行個體</returns>

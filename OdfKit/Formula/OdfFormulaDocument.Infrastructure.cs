@@ -91,21 +91,26 @@ public partial class OdfFormulaDocument
     /// </summary>
     /// <remarks>
     /// 真實 LibreOffice 對 ODF 公式文件（<c>application/vnd.oasis.opendocument.formula</c>）
-    /// 的 <c>content.xml</c> 採用裸 <c>math:math</c> 根節點，並不包裹於
+    /// 的 ZIP 封裝 <c>content.xml</c> 採用裸 <c>math:math</c> 根節點，並不包裹於
     /// <c>office:document-content/office:body/office:formula</c> 結構內（與其他文件類型不同的封裝慣例）。
     /// 若以 OdfKit 內部慣用的包裹結構直接寫出，LibreOffice 的 <c>math8</c> 匯入篩選器會回報
-    /// 「source file could not be loaded」並拒絕開啟。此處在序列化邊界轉換為真機相容的裸根節點形狀，
-    /// 內部 <see cref="OdfDocument.ContentDom"/> 仍維持包裹結構，不影響其餘共用基礎結構（統計、版本戳記等）。
+    /// 「source file could not be loaded」並拒絕開啟。此處僅在 ZIP 封裝（非 Flat XML）情境下，
+    /// 於序列化邊界轉換為真機相容的裸根節點形狀；內部 <see cref="OdfDocument.ContentDom"/>
+    /// 仍維持包裹結構，不影響其餘共用基礎結構（統計、版本戳記等）。Flat XML 情境下
+    /// <see cref="OdfPackageArchiveWriter"/> 需要從 <c>content.xml</c> 根節點的
+    /// <c>office:body</c> 子元素取出內容才能組成單一 Flat XML 文件，因此維持基底類別的包裹結構，
+    /// 否則 Flat XML 輸出會遺失公式內容（找不到 <c>office:body</c>）。
     /// </remarks>
     internal override OdfNode GetContentXmlForPersistence()
     {
-        return MathNode.CloneNode(true);
+        return Package.IsFlatXml ? ContentDom : MathNode.CloneNode(true);
     }
 
     private IReadOnlyList<OdfMathToken> ReadMathTokens()
     {
         OdfNode math = MathNode;
-        OdfNode tokenParent = FindChildElement(math, "mrow", MathMlNamespace) ?? math;
+        OdfNode presentationRoot = FindChildElement(math, "semantics", MathMlNamespace) ?? math;
+        OdfNode tokenParent = FindChildElement(presentationRoot, "mrow", MathMlNamespace) ?? presentationRoot;
         List<OdfMathToken> tokens = [];
         foreach (OdfNode child in tokenParent.Children)
         {

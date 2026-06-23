@@ -73,6 +73,17 @@ public sealed class ChartTemplateDocument : ChartDocument
     public static new async Task<ChartTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
+    /// <summary>
+    /// 從現有的 ODC 圖表文件建立新的 OTC 圖表範本文件，完整保留其圖表定義、序列與樣式。
+    /// </summary>
+    /// <param name="document">作為範本內容來源的圖表文件</param>
+    /// <returns>建立完成的 <see cref="ChartTemplateDocument"/> 執行個體</returns>
+    public static ChartTemplateDocument CreateFromDocument(ChartDocument document) =>
+        (ChartTemplateDocument)CreateTemplateFromDocumentInternal(
+            document,
+            OdfDocumentKind.ChartTemplate,
+            "application/vnd.oasis.opendocument.chart-template");
+
     private static ChartTemplateDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<ChartTemplateDocument>(
             document,
@@ -146,6 +157,14 @@ public sealed class FlatChartDocument : ChartDocument
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatChartDocument"/></returns>
     public static new async Task<FlatChartDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+
+    /// <summary>
+    /// 從現有的 ODC（ZIP 封裝）圖表文件建立等價的 FODC 扁平 XML 圖表文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 ODC 圖表文件</param>
+    /// <returns>建立完成的 <see cref="FlatChartDocument"/> 執行個體</returns>
+    public static FlatChartDocument CreateFromDocument(ChartDocument document) =>
+        (FlatChartDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.FlatChart, targetIsFlatXml: true);
 
     private static FlatChartDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<FlatChartDocument>(

@@ -292,6 +292,90 @@ public class TemplateRoundTripTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="TextTemplateDocument.CreateFromDocument(TextDocument)"/> 可將既有文字文件
+    /// 另存為範本，並可再次以 <see cref="TextDocument.CreateFromTemplate(TextTemplateDocument, bool)"/>
+    /// 還原為一般文件，形成雙向往返工作流。
+    /// </summary>
+    [Fact]
+    public void TextDocument_CreateTemplateFromDocument_RoundTripsBackToDocument()
+    {
+        using var original = TextDocument.Create();
+        original.Title = "既有文件標題";
+        original.AddParagraph("既有文件內容");
+
+        using var template = TextTemplateDocument.CreateFromDocument(original);
+
+        Assert.Equal("application/vnd.oasis.opendocument.text-template", template.Package.MimeType);
+        Assert.Equal("既有文件內容", template.BodyTextRoot.Children.Single().TextContent);
+
+        using var restored = TextDocument.CreateFromTemplate(template);
+        Assert.Equal("application/vnd.oasis.opendocument.text", restored.Package.MimeType);
+        Assert.Equal("既有文件內容", restored.BodyTextRoot.Children.Single().TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="SpreadsheetTemplateDocument.CreateFromDocument(SpreadsheetDocument)"/> 可將既有
+    /// 試算表文件另存為範本，且完整保留工作表資料。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetDocument_CreateTemplateFromDocument_PreservesSheetData()
+    {
+        using var original = SpreadsheetDocument.Create();
+        var sheet = original.Worksheets.Add("Sheet1");
+        sheet.Cells["A1"].CellValue = "既有資料";
+
+        using var template = SpreadsheetTemplateDocument.CreateFromDocument(original);
+
+        Assert.Equal("application/vnd.oasis.opendocument.spreadsheet-template", template.Package.MimeType);
+        Assert.Equal("既有資料", template.Worksheets["Sheet1"].Cells["A1"].CellValue?.ToString());
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="PresentationTemplateDocument.CreateFromDocument(PresentationDocument)"/> 可將既有
+    /// 簡報文件另存為範本，且完整保留母片頁面。
+    /// </summary>
+    [Fact]
+    public void PresentationDocument_CreateTemplateFromDocument_PreservesMasterPages()
+    {
+        using var original = PresentationDocument.Create();
+        original.AddMasterPage("OriginalMaster");
+
+        using var template = PresentationTemplateDocument.CreateFromDocument(original);
+
+        Assert.Equal("application/vnd.oasis.opendocument.presentation-template", template.Package.MimeType);
+        Assert.NotNull(template.GetMasterPages().FirstOrDefault(m => m.Name == "OriginalMaster"));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="GraphicsTemplateDocument.CreateFromDocument(DrawingDocument)"/> 可將既有
+    /// 繪圖文件另存為範本，且完整保留母片頁面。
+    /// </summary>
+    [Fact]
+    public void DrawingDocument_CreateTemplateFromDocument_PreservesMasterPages()
+    {
+        using var original = DrawingDocument.Create();
+        original.AddMasterPage("OriginalDrawingMaster");
+
+        using var template = GraphicsTemplateDocument.CreateFromDocument(original);
+
+        Assert.Equal("application/vnd.oasis.opendocument.graphics-template", template.Package.MimeType);
+        Assert.NotNull(template.GetMasterPages().FirstOrDefault(m => m.Name == "OriginalDrawingMaster"));
+    }
+
+    /// <summary>
+    /// 驗證四個 <c>CreateFromDocument</c> 反向範本建立工作流邊界案例：
+    /// 傳入 <see langword="null"/> 來源文件時皆擲出 <see cref="ArgumentNullException"/>。
+    /// </summary>
+    [Fact]
+    public void CreateTemplateFromDocument_NullSource_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => TextTemplateDocument.CreateFromDocument(null!));
+        Assert.Throws<ArgumentNullException>(() => SpreadsheetTemplateDocument.CreateFromDocument(null!));
+        Assert.Throws<ArgumentNullException>(() => PresentationTemplateDocument.CreateFromDocument(null!));
+        Assert.Throws<ArgumentNullException>(() => GraphicsTemplateDocument.CreateFromDocument(null!));
+    }
+
+    /// <summary>
     /// 驗證 <see cref="OdfSection.IsProtected"/> 可寫入並於儲存／載入後讀回，
     /// 用於將範本中特定區段標記為唯讀。
     /// </summary>

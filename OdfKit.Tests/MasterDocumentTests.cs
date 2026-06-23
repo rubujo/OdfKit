@@ -265,6 +265,44 @@ public class MasterDocumentTests
         }
     }
 
+    /// <summary>
+    /// 驗證 <see cref="TextMasterDocument.MergeSubDocuments"/> 在子文件參照的目標檔案不存在時，
+    /// 會擲出檔案系統層級的例外，而非靜默忽略或產生不完整的合併結果。
+    /// </summary>
+    [Fact]
+    public void MergeSubDocuments_MissingSubDocumentFile_ThrowsFileNotFoundException()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-missing-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+
+        try
+        {
+            using var master = TextMasterDocument.Create();
+            master.AddSubDocumentReference("MissingChapter", "does-not-exist.odt");
+
+            Assert.Throws<FileNotFoundException>(() => master.MergeSubDocuments(tempDir));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextMasterDocument.MergeSubDocuments"/> 在 <c>baseDirectory</c> 為空白時，
+    /// 擲出 <see cref="ArgumentException"/>（既有邊界檢查的回歸測試）。
+    /// </summary>
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void MergeSubDocuments_BlankBaseDirectory_ThrowsArgumentException(string baseDirectory)
+    {
+        using var master = TextMasterDocument.Create();
+        master.AddSubDocumentReference("Chapter1", "chapter1.odt");
+
+        Assert.Throws<ArgumentException>(() => master.MergeSubDocuments(baseDirectory));
+    }
+
     private static void AddNamedParagraphStyle(TextDocument doc, string name, string fontSize)
     {
         OdfNode styles = FindOrCreateChild(doc.StylesDom, "styles", OdfNamespaces.Office, "office");

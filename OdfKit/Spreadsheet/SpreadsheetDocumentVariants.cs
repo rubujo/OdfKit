@@ -64,6 +64,17 @@ public sealed class SpreadsheetTemplateDocument : SpreadsheetDocument
     public static new async Task<SpreadsheetTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
+    /// <summary>
+    /// 從現有的 ODS 試算表文件建立新的 OTS 試算表範本文件，完整保留其工作表內容與樣式。
+    /// </summary>
+    /// <param name="document">作為範本內容來源的試算表文件</param>
+    /// <returns>建立完成的 <see cref="SpreadsheetTemplateDocument"/> 執行個體</returns>
+    public static SpreadsheetTemplateDocument CreateFromDocument(SpreadsheetDocument document) =>
+        (SpreadsheetTemplateDocument)CreateTemplateFromDocumentInternal(
+            document,
+            OdfDocumentKind.SpreadsheetTemplate,
+            "application/vnd.oasis.opendocument.spreadsheet-template");
+
     private static SpreadsheetTemplateDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<SpreadsheetTemplateDocument>(
             document,
@@ -128,6 +139,14 @@ public sealed class FlatSpreadsheetDocument : SpreadsheetDocument
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatSpreadsheetDocument"/></returns>
     public static new async Task<FlatSpreadsheetDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+
+    /// <summary>
+    /// 從現有的 ODS（ZIP 封裝）試算表文件建立等價的 FODS 扁平 XML 試算表文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 ODS 試算表文件</param>
+    /// <returns>建立完成的 <see cref="FlatSpreadsheetDocument"/> 執行個體</returns>
+    public static FlatSpreadsheetDocument CreateFromDocument(SpreadsheetDocument document) =>
+        (FlatSpreadsheetDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.FlatSpreadsheet, targetIsFlatXml: true);
 
     private static FlatSpreadsheetDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<FlatSpreadsheetDocument>(

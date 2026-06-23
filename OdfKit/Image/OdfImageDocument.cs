@@ -37,6 +37,22 @@ public partial class OdfImageDocument : OdfDocument
     }
 
     /// <summary>
+    /// 從指定的影像範本文件建立新的 ODI 影像文件。
+    /// </summary>
+    /// <param name="template">影像範本文件</param>
+    /// <returns>建立完成的 <see cref="OdfImageDocument"/> 執行個體</returns>
+    public static OdfImageDocument CreateFromTemplate(ImageTemplateDocument template) =>
+        (OdfImageDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Image, "application/vnd.oasis.opendocument.image");
+
+    /// <summary>
+    /// 從 FODI 扁平 XML 影像文件建立等價的 ODI（ZIP 封裝）影像文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 FODI 扁平 XML 影像文件</param>
+    /// <returns>建立完成的 <see cref="OdfImageDocument"/> 執行個體</returns>
+    public static OdfImageDocument CreateFromFlatDocument(FlatImageDocument document) =>
+        (OdfImageDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.Image, targetIsFlatXml: false);
+
+    /// <summary>
     /// 從指定路徑載入 ODI 影像文件。
     /// </summary>
     /// <param name="path">ODI 文件路徑</param>

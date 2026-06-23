@@ -511,6 +511,69 @@ public class ChartHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證序列誤差棒（<c>chart:error-indicator</c>）、趨勢線（<c>chart:regression-curve</c>）
+    /// 與平均值線（<c>chart:mean-value</c>）可設定、移除並於儲存／載入後保留，且元素順序符合
+    /// OASIS ODF 1.4 schema 規定（domain、mean-value、regression-curve、error-indicator、
+    /// data-point、data-label）。
+    /// </summary>
+    [Fact]
+    public void SeriesErrorIndicatorRegressionCurveAndMeanValue_RoundTripAfterSaveAndLoad()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
+
+        OdfChartSeries series = chartDoc.GetSeriesEditor(0);
+        Assert.Null(series.GetErrorIndicator());
+        Assert.Null(series.GetRegressionCurve());
+        Assert.Null(series.GetMeanValue());
+
+        series.SetMeanValue(new OdfChartMeanValueInfo("MeanStyle1"));
+        series.SetRegressionCurve(new OdfChartRegressionCurveInfo("RegressionStyle1"));
+        series.SetErrorIndicator(new OdfChartErrorIndicatorInfo("y", "ErrorStyle1"));
+        series.AddDataPoint(1, "PointStyleA");
+
+        using var stream = new MemoryStream();
+        chartDoc.SaveToStream(stream);
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+
+        int meanIndex = xml.IndexOf("chart:mean-value", StringComparison.Ordinal);
+        int regressionIndex = xml.IndexOf("chart:regression-curve", StringComparison.Ordinal);
+        int errorIndex = xml.IndexOf("chart:error-indicator", StringComparison.Ordinal);
+        int dataPointIndex = xml.IndexOf("chart:data-point", StringComparison.Ordinal);
+        Assert.True(meanIndex >= 0 && meanIndex < regressionIndex, "chart:mean-value 應位於 chart:regression-curve 之前。");
+        Assert.True(regressionIndex < errorIndex, "chart:regression-curve 應位於 chart:error-indicator 之前。");
+        Assert.True(errorIndex < dataPointIndex, "chart:error-indicator 應位於 chart:data-point 之前。");
+
+        stream.Position = 0;
+        using OdfChartDocument loaded = OdfChartDocument.Load(stream);
+        OdfChartSeries loadedSeries = loaded.GetSeriesEditor(0);
+
+        OdfChartMeanValueInfo? meanValue = loadedSeries.GetMeanValue();
+        Assert.NotNull(meanValue);
+        Assert.Equal("MeanStyle1", meanValue!.StyleName);
+
+        OdfChartRegressionCurveInfo? regressionCurve = loadedSeries.GetRegressionCurve();
+        Assert.NotNull(regressionCurve);
+        Assert.Equal("RegressionStyle1", regressionCurve!.StyleName);
+
+        OdfChartErrorIndicatorInfo? errorIndicator = loadedSeries.GetErrorIndicator();
+        Assert.NotNull(errorIndicator);
+        Assert.Equal("y", errorIndicator!.Dimension);
+        Assert.Equal("ErrorStyle1", errorIndicator.StyleName);
+
+        loadedSeries.SetErrorIndicator(null);
+        loadedSeries.SetRegressionCurve(null);
+        loadedSeries.SetMeanValue(null);
+        Assert.Null(loadedSeries.GetErrorIndicator());
+        Assert.Null(loadedSeries.GetRegressionCurve());
+        Assert.Null(loadedSeries.GetMeanValue());
+    }
+
+    /// <summary>
     /// 驗證資料點樣式覆蓋（C-5）可新增、列舉並往返。
     /// </summary>
     [Fact]

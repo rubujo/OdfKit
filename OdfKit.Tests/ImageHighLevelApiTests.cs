@@ -239,6 +239,91 @@ public class ImageHighLevelApiTests
         Assert.Null(cleared.Crop);
     }
 
+    /// <summary>
+    /// 驗證 <see cref="OdfImageDocument.AddImageFrames"/> 可一次新增多個影像框架，
+    /// 且結果與依序個別呼叫 <see cref="OdfImageDocument.AddImageFrame"/> 等價。
+    /// </summary>
+    [Fact]
+    public void AddImageFrames_AddsMultipleFramesInOneCall()
+    {
+        using var image = OdfImageDocument.Create();
+        byte[] primary = CreatePngBytes();
+        byte[] secondary = CreateAlternatePngBytes();
+
+        IReadOnlyList<string> hrefs = image.AddImageFrames(
+        [
+            new OdfImageFrameRequest(
+                primary,
+                OdfLength.FromCentimeters(0),
+                OdfLength.FromCentimeters(0),
+                OdfLength.FromCentimeters(3),
+                OdfLength.FromCentimeters(3),
+                preferredName: "Batch1.png",
+                name: "BatchFrame1",
+                title: "批次框架一"),
+            new OdfImageFrameRequest(
+                secondary,
+                OdfLength.FromCentimeters(4),
+                OdfLength.FromCentimeters(0),
+                OdfLength.FromCentimeters(3),
+                OdfLength.FromCentimeters(3),
+                preferredName: "Batch2.png",
+                name: "BatchFrame2",
+                title: "批次框架二"),
+        ]);
+
+        Assert.Equal(2, hrefs.Count);
+        Assert.Equal(2, image.GetImageFrames().Count);
+        Assert.Equal("BatchFrame1", image.GetImageFrames()[0].Name);
+        Assert.Equal("批次框架一", image.GetImageFrames()[0].Title);
+        Assert.Equal("BatchFrame2", image.GetImageFrames()[1].Name);
+        Assert.Equal(hrefs[0], image.GetImageFrames()[0].ImageHref);
+        Assert.Equal(hrefs[1], image.GetImageFrames()[1].ImageHref);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfImageDocument.RemoveImageFrames"/> 可一次移除多個影像框架，
+    /// 並正確回報實際移除數量（忽略找不到的名稱，不擲出例外）。
+    /// </summary>
+    [Fact]
+    public void RemoveImageFrames_RemovesMultipleFramesAndIgnoresMissingNames()
+    {
+        using var image = OdfImageDocument.Create();
+        image.SetImage(CreatePngBytes(), "Primary.png");
+        image.AddImageFrames(
+        [
+            new OdfImageFrameRequest(
+                CreateAlternatePngBytes(),
+                OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(1),
+                name: "FrameA"),
+            new OdfImageFrameRequest(
+                CreatePngBytes(),
+                OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(1), OdfLength.FromCentimeters(1),
+                name: "FrameB"),
+        ]);
+
+        Assert.Equal(3, image.GetImageFrames().Count);
+
+        int removedCount = image.RemoveImageFrames(["FrameA", "FrameB", "NotExist"]);
+
+        Assert.Equal(2, removedCount);
+        Assert.Equal(1, image.GetImageFrames().Count);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfImageDocument.AddImageFrames"/> 與
+    /// <see cref="OdfImageDocument.RemoveImageFrames"/> 的邊界案例：
+    /// 傳入 <see langword="null"/> 集合時擲出 <see cref="System.ArgumentNullException"/>。
+    /// </summary>
+    [Fact]
+    public void BatchFrameOperations_NullCollection_ThrowsArgumentNullException()
+    {
+        using var image = OdfImageDocument.Create();
+
+        Assert.Throws<System.ArgumentNullException>(() => image.AddImageFrames(null!));
+        Assert.Throws<System.ArgumentNullException>(() => image.RemoveImageFrames(null!));
+    }
+
     private static byte[] CreatePngBytes() =>
         System.Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");

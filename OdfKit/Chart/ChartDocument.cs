@@ -115,6 +115,22 @@ public class ChartDocument : OdfChartDocument
     public new static async Task<ChartDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         EnsureChart(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
+    /// <summary>
+    /// 從指定的圖表範本文件建立新的高階圖表文件。
+    /// </summary>
+    /// <param name="template">圖表範本文件</param>
+    /// <returns>建立完成的 <see cref="ChartDocument"/> 執行個體</returns>
+    public static ChartDocument CreateFromTemplate(ChartTemplateDocument template) =>
+        (ChartDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Chart, "application/vnd.oasis.opendocument.chart");
+
+    /// <summary>
+    /// 從 FODC 扁平 XML 圖表文件建立等價的 ODC（ZIP 封裝）圖表文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 FODC 扁平 XML 圖表文件</param>
+    /// <returns>建立完成的 <see cref="ChartDocument"/> 執行個體</returns>
+    public static ChartDocument CreateFromFlatDocument(FlatChartDocument document) =>
+        (ChartDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.Chart, targetIsFlatXml: false);
+
     private static ChartDocument EnsureChart(OdfDocument document)
     {
         if (document is ChartDocument chart && document.DocumentKind == OdfDocumentKind.Chart)

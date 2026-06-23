@@ -64,6 +64,17 @@ public sealed class ImageTemplateDocument : OdfImageDocument
     public static new async Task<ImageTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
+    /// <summary>
+    /// 從現有的 ODI 影像文件建立新的 OTI 影像範本文件，完整保留其影像框架內容。
+    /// </summary>
+    /// <param name="document">作為範本內容來源的影像文件</param>
+    /// <returns>建立完成的 <see cref="ImageTemplateDocument"/> 執行個體</returns>
+    public static ImageTemplateDocument CreateFromDocument(OdfImageDocument document) =>
+        (ImageTemplateDocument)CreateTemplateFromDocumentInternal(
+            document,
+            OdfDocumentKind.ImageTemplate,
+            "application/vnd.oasis.opendocument.image-template");
+
     private static ImageTemplateDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<ImageTemplateDocument>(
             document,
@@ -128,6 +139,14 @@ public sealed class FlatImageDocument : OdfImageDocument
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatImageDocument"/></returns>
     public static new async Task<FlatImageDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+
+    /// <summary>
+    /// 從現有的 ODI（ZIP 封裝）影像文件建立等價的 FODI 扁平 XML 影像文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 ODI 影像文件</param>
+    /// <returns>建立完成的 <see cref="FlatImageDocument"/> 執行個體</returns>
+    public static FlatImageDocument CreateFromDocument(OdfImageDocument document) =>
+        (FlatImageDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.FlatImage, targetIsFlatXml: true);
 
     private static FlatImageDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<FlatImageDocument>(

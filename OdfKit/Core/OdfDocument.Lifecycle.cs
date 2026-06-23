@@ -203,6 +203,45 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// 從指定的一般文件建立對應範本文件封裝的基礎實作（與 <see cref="CreateFromTemplateInternal"/> 方向相反）。
+    /// </summary>
+    /// <param name="document">要轉換為範本的來源文件</param>
+    /// <param name="targetTemplateKind">目標範本文件種類</param>
+    /// <param name="targetTemplateMimeType">目標範本 MIME 媒體類型</param>
+    /// <remarks>
+    /// 與 <see cref="CreateFromTemplateInternal"/> 不同，此方法預設完整保留來源文件的內容，
+    /// 因為「將現有文件另存為範本」的常見使用情境是保留既有內容供未來重複使用，而非清空內容。
+    /// </remarks>
+    internal static OdfDocument CreateTemplateFromDocumentInternal(
+        OdfDocument document,
+        OdfDocumentKind targetTemplateKind,
+        string targetTemplateMimeType)
+    {
+        if (document == null)
+            throw new ArgumentNullException(nameof(document));
+
+        byte[] packageBytes = document.SaveToBytes();
+        var ms = new MemoryStream(packageBytes);
+        OdfPackage package = OdfPackage.Open(ms);
+
+        package.SetMimeType(targetTemplateMimeType);
+        package.Version = OdfVersion.Odf14;
+
+        OdfDocument newTemplate = OdfDocumentFactory.CreateDocumentWrapper(package, targetTemplateKind);
+
+        if (newTemplate.ContentDom != null)
+            newTemplate.ContentDom.SetAttribute("version", OdfNamespaces.Office, "1.4", "office");
+        if (newTemplate.StylesDom != null)
+            newTemplate.StylesDom.SetAttribute("version", OdfNamespaces.Office, "1.4", "office");
+        if (newTemplate.MetaDom != null)
+            newTemplate.MetaDom.SetAttribute("version", OdfNamespaces.Office, "1.4", "office");
+        if (newTemplate.SettingsDom != null)
+            newTemplate.SettingsDom.SetAttribute("version", OdfNamespaces.Office, "1.4", "office");
+
+        return newTemplate;
+    }
+
+    /// <summary>
     /// 清除範本實例化後的使用者內容，但保留格式與版面配置。
     /// </summary>
     /// <remarks>
@@ -318,6 +357,31 @@ public abstract partial class OdfDocument
         var doc = OdfDocumentFactory.LoadDocument(stream, options);
         doc.Package.IsFlatXml = true;
         return doc;
+    }
+
+    /// <summary>
+    /// 在記憶體中將文件轉換為指定文件種類，並設定目標的 Flat XML／ZIP 封裝形態，
+    /// 為四主格式 <c>CreateFromFlatDocument</c>／<c>CreateFromDocument</c> 型別化
+    /// Flat↔ZIP 雙向轉換 API 的共用基礎實作。
+    /// </summary>
+    /// <param name="document">來源文件（可為 Flat XML 或 ZIP 封裝形態）</param>
+    /// <param name="targetKind">目標 <see cref="OdfDocumentKind"/></param>
+    /// <param name="targetIsFlatXml">轉換結果是否應為 Flat XML 形態</param>
+    /// <returns>轉換完成的文件，封裝內容與來源完全相同，僅 Flat XML／ZIP 形態與種類標記不同</returns>
+    internal static OdfDocument ConvertFlatVariantInternal(
+        OdfDocument document,
+        OdfDocumentKind targetKind,
+        bool targetIsFlatXml)
+    {
+        if (document == null)
+            throw new ArgumentNullException(nameof(document));
+
+        byte[] packageBytes = document.SaveToBytes();
+        var ms = new MemoryStream(packageBytes);
+        OdfPackage package = OdfPackage.Open(ms);
+        package.IsFlatXml = targetIsFlatXml;
+
+        return OdfDocumentFactory.CreateDocumentWrapper(package, targetKind);
     }
 
     /// <summary>

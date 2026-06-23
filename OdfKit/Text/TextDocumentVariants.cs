@@ -67,6 +67,17 @@ public sealed class TextTemplateDocument : TextDocument
     public static new async Task<TextTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
+    /// <summary>
+    /// 從現有的 ODT 文字文件建立新的 OTT 文字範本文件，完整保留其內容、樣式與母片頁面。
+    /// </summary>
+    /// <param name="document">作為範本內容來源的文字文件</param>
+    /// <returns>建立完成的 <see cref="TextTemplateDocument"/> 執行個體</returns>
+    public static TextTemplateDocument CreateFromDocument(TextDocument document) =>
+        (TextTemplateDocument)CreateTemplateFromDocumentInternal(
+            document,
+            OdfDocumentKind.TextTemplate,
+            "application/vnd.oasis.opendocument.text-template");
+
     private static TextTemplateDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<TextTemplateDocument>(
             document,
@@ -469,6 +480,20 @@ public sealed class TextWebDocument : TextDocument
     public static new async Task<TextWebDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
+    /// <summary>
+    /// 從現有的 ODT 文字文件建立新的 OTH 網頁範本文件，完整保留其內容、樣式與母片頁面。
+    /// 因 OTH 內容模型與 ODT 完全相同（僅 MIME 類型與用途標記不同，常用於後續 HTML 匯出
+    /// 工作流，例如 <c>OdfKit.Extensions.Html</c> 的 <c>OdfHtmlExporter</c>），故重用
+    /// 與 <c>CreateFromTemplateInternal</c> 共用的種類／MIME 置換基礎實作。
+    /// </summary>
+    /// <param name="document">作為網頁範本內容來源的文字文件</param>
+    /// <returns>建立完成的 <see cref="TextWebDocument"/> 執行個體</returns>
+    public static TextWebDocument CreateFromDocument(TextDocument document) =>
+        (TextWebDocument)CreateTemplateFromDocumentInternal(
+            document,
+            OdfDocumentKind.TextWeb,
+            "application/vnd.oasis.opendocument.text-web");
+
     private static TextWebDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<TextWebDocument>(
             document,
@@ -533,6 +558,14 @@ public sealed class FlatTextDocument : TextDocument
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatTextDocument"/></returns>
     public static new async Task<FlatTextDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+
+    /// <summary>
+    /// 從現有的 ODT（ZIP 封裝）文字文件建立等價的 FODT 扁平 XML 文字文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 ODT 文字文件</param>
+    /// <returns>建立完成的 <see cref="FlatTextDocument"/> 執行個體</returns>
+    public static FlatTextDocument CreateFromDocument(TextDocument document) =>
+        (FlatTextDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.FlatText, targetIsFlatXml: true);
 
     private static FlatTextDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<FlatTextDocument>(

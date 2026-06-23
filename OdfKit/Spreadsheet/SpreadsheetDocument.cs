@@ -59,6 +59,14 @@ public partial class SpreadsheetDocument : OdfDocument
         return (SpreadsheetDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Spreadsheet, "application/vnd.oasis.opendocument.spreadsheet", clearUserContent);
     }
 
+    /// <summary>
+    /// 從 FODS 扁平 XML 試算表文件建立等價的 ODS（ZIP 封裝）試算表文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 FODS 扁平 XML 試算表文件</param>
+    /// <returns>建立完成的 <see cref="SpreadsheetDocument"/> 執行個體</returns>
+    public static SpreadsheetDocument CreateFromFlatDocument(FlatSpreadsheetDocument document) =>
+        (SpreadsheetDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.Spreadsheet, targetIsFlatXml: false);
+
     /// <inheritdoc/>
     protected override void ClearTemplateUserContent()
     {

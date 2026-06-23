@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -142,6 +143,31 @@ public partial class OdfImageDocument
 
         frame.Parent.RemoveChild(frame);
         return true;
+    }
+
+    /// <summary>
+    /// 批次移除指定名稱清單的影像框架。
+    /// </summary>
+    /// <param name="names">要移除的框架名稱清單</param>
+    /// <returns>實際成功移除的框架數量（找不到的名稱會被忽略，不會擲出例外）</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="names"/> 為 <see langword="null"/> 時擲出</exception>
+    public int RemoveImageFrames(IEnumerable<string> names)
+    {
+        if (names is null)
+        {
+            throw new ArgumentNullException(nameof(names));
+        }
+
+        int removedCount = 0;
+        foreach (string name in names)
+        {
+            if (RemoveImageFrame(name))
+            {
+                removedCount++;
+            }
+        }
+
+        return removedCount;
     }
 
     private OdfNode? FindFrameByName(string name)

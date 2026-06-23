@@ -64,6 +64,17 @@ public sealed class PresentationTemplateDocument : PresentationDocument
     public static new async Task<PresentationTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
+    /// <summary>
+    /// 從現有的 ODP 簡報文件建立新的 OTP 簡報範本文件，完整保留其投影片內容、母片頁面與樣式。
+    /// </summary>
+    /// <param name="document">作為範本內容來源的簡報文件</param>
+    /// <returns>建立完成的 <see cref="PresentationTemplateDocument"/> 執行個體</returns>
+    public static PresentationTemplateDocument CreateFromDocument(PresentationDocument document) =>
+        (PresentationTemplateDocument)CreateTemplateFromDocumentInternal(
+            document,
+            OdfDocumentKind.PresentationTemplate,
+            "application/vnd.oasis.opendocument.presentation-template");
+
     private static PresentationTemplateDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<PresentationTemplateDocument>(
             document,
@@ -128,6 +139,14 @@ public sealed class FlatPresentationDocument : PresentationDocument
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatPresentationDocument"/></returns>
     public static new async Task<FlatPresentationDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+
+    /// <summary>
+    /// 從現有的 ODP（ZIP 封裝）簡報文件建立等價的 FODP 扁平 XML 簡報文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 ODP 簡報文件</param>
+    /// <returns>建立完成的 <see cref="FlatPresentationDocument"/> 執行個體</returns>
+    public static FlatPresentationDocument CreateFromDocument(PresentationDocument document) =>
+        (FlatPresentationDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.FlatPresentation, targetIsFlatXml: true);
 
     private static FlatPresentationDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<FlatPresentationDocument>(

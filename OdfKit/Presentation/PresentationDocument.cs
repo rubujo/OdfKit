@@ -77,6 +77,14 @@ public partial class PresentationDocument : OdfDocument
         return (PresentationDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Presentation, "application/vnd.oasis.opendocument.presentation", clearUserContent);
     }
 
+    /// <summary>
+    /// 從 FODP 扁平 XML 簡報文件建立等價的 ODP（ZIP 封裝）簡報文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 FODP 扁平 XML 簡報文件</param>
+    /// <returns>建立完成的 <see cref="PresentationDocument"/> 執行個體</returns>
+    public static PresentationDocument CreateFromFlatDocument(FlatPresentationDocument document) =>
+        (PresentationDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.Presentation, targetIsFlatXml: false);
+
     /// <inheritdoc/>
     protected override void ClearTemplateUserContent()
     {

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.Text;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -132,5 +134,37 @@ public class OdfValidatorApiTests
 
         Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
         Assert.Equal(OdfComplianceProfiles.OasisOdf14Strict.Id, OdfValidationOptions.Odf14Strict.Profile?.Id);
+    }
+
+    /// <summary>
+    /// 驗證文件實例可直接呼叫 <see cref="OdfDocument.Validate(OdfComplianceProfile?)"/>，
+    /// 且能反映呼叫前所做但尚未儲存的編輯。
+    /// </summary>
+    [Fact]
+    public void DocumentInstance_Validate_ReflectsUnsavedEdits()
+    {
+        using TextDocument doc = TextDocument.Create();
+        doc.Title = "Validate() 骨架測試";
+        doc.AddParagraph("尚未儲存的段落");
+
+        OdfValidationReport report = doc.Validate();
+
+        Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
+        Assert.Equal(OdfDocumentKind.Text, report.DocumentKind);
+    }
+
+    /// <summary>
+    /// 驗證文件實例可直接呼叫 <see cref="OdfDocument.ValidateAsync(OdfComplianceProfile?, System.Threading.CancellationToken)"/>。
+    /// </summary>
+    [Fact]
+    public async Task DocumentInstance_ValidateAsync_ReturnsStructuredReport()
+    {
+        using TextDocument doc = TextDocument.Create();
+        doc.AddParagraph("非同步驗證測試");
+
+        OdfValidationReport report = await doc.ValidateAsync(OdfComplianceProfiles.OasisOdf14Extended);
+
+        Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
+        Assert.Equal(OdfDocumentKind.Text, report.DocumentKind);
     }
 }

@@ -168,6 +168,168 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// 取得此序列的誤差棒設定（<c>chart:error-indicator</c>）；若未設定則為 <see langword="null"/>。
+    /// </summary>
+    /// <returns>誤差棒設定；若序列中第一個 <c>chart:error-indicator</c> 不存在則為 <see langword="null"/></returns>
+    public OdfChartErrorIndicatorInfo? GetErrorIndicator()
+    {
+        OdfNode? node = FindFirstChild("error-indicator");
+        if (node is null)
+        {
+            return null;
+        }
+
+        return new OdfChartErrorIndicatorInfo(
+            node.GetAttribute("dimension", OdfNamespaces.Chart),
+            node.GetAttribute("style-name", OdfNamespaces.Chart));
+    }
+
+    /// <summary>
+    /// 設定或移除此序列的誤差棒。
+    /// </summary>
+    /// <param name="info">誤差棒設定；傳入 <see langword="null"/> 表示移除既有設定</param>
+    public void SetErrorIndicator(OdfChartErrorIndicatorInfo? info)
+    {
+        RemoveAllChildren("error-indicator");
+        if (info is null)
+        {
+            return;
+        }
+
+        OdfNode node = OdfNodeFactory.CreateElement("error-indicator", OdfNamespaces.Chart, "chart");
+        if (!string.IsNullOrWhiteSpace(info.Dimension))
+        {
+            node.SetAttribute("dimension", OdfNamespaces.Chart, info.Dimension!, "chart");
+        }
+
+        if (!string.IsNullOrWhiteSpace(info.StyleName))
+        {
+            node.SetAttribute("style-name", OdfNamespaces.Chart, info.StyleName!, "chart");
+        }
+
+        InsertChildInSchemaOrder(node, "error-indicator");
+    }
+
+    /// <summary>
+    /// 取得此序列的趨勢線（迴歸曲線）設定（<c>chart:regression-curve</c>）；若未設定則為 <see langword="null"/>。
+    /// </summary>
+    /// <returns>趨勢線設定；若序列中第一個 <c>chart:regression-curve</c> 不存在則為 <see langword="null"/></returns>
+    public OdfChartRegressionCurveInfo? GetRegressionCurve()
+    {
+        OdfNode? node = FindFirstChild("regression-curve");
+        return node is null ? null : new OdfChartRegressionCurveInfo(node.GetAttribute("style-name", OdfNamespaces.Chart));
+    }
+
+    /// <summary>
+    /// 設定或移除此序列的趨勢線（迴歸曲線）。
+    /// </summary>
+    /// <param name="info">趨勢線設定；傳入 <see langword="null"/> 表示移除既有設定</param>
+    public void SetRegressionCurve(OdfChartRegressionCurveInfo? info)
+    {
+        RemoveAllChildren("regression-curve");
+        if (info is null)
+        {
+            return;
+        }
+
+        OdfNode node = OdfNodeFactory.CreateElement("regression-curve", OdfNamespaces.Chart, "chart");
+        if (!string.IsNullOrWhiteSpace(info.StyleName))
+        {
+            node.SetAttribute("style-name", OdfNamespaces.Chart, info.StyleName!, "chart");
+        }
+
+        InsertChildInSchemaOrder(node, "regression-curve");
+    }
+
+    /// <summary>
+    /// 取得此序列的平均值線設定（<c>chart:mean-value</c>）；若未設定則為 <see langword="null"/>。
+    /// </summary>
+    /// <returns>平均值線設定；若序列未定義 <c>chart:mean-value</c> 則為 <see langword="null"/></returns>
+    public OdfChartMeanValueInfo? GetMeanValue()
+    {
+        OdfNode? node = FindFirstChild("mean-value");
+        return node is null ? null : new OdfChartMeanValueInfo(node.GetAttribute("style-name", OdfNamespaces.Chart));
+    }
+
+    /// <summary>
+    /// 設定或移除此序列的平均值線。
+    /// </summary>
+    /// <param name="info">平均值線設定；傳入 <see langword="null"/> 表示移除既有設定</param>
+    public void SetMeanValue(OdfChartMeanValueInfo? info)
+    {
+        RemoveAllChildren("mean-value");
+        if (info is null)
+        {
+            return;
+        }
+
+        OdfNode node = OdfNodeFactory.CreateElement("mean-value", OdfNamespaces.Chart, "chart");
+        if (!string.IsNullOrWhiteSpace(info.StyleName))
+        {
+            node.SetAttribute("style-name", OdfNamespaces.Chart, info.StyleName!, "chart");
+        }
+
+        InsertChildInSchemaOrder(node, "mean-value");
+    }
+
+    /// <summary>
+    /// <c>chart:series</c> 子元素依 OASIS ODF 1.4 schema 規定的順序：
+    /// <c>chart:domain*</c>、<c>chart:mean-value?</c>、<c>chart:regression-curve*</c>、
+    /// <c>chart:error-indicator*</c>、<c>chart:data-point*</c>、<c>chart:data-label?</c>。
+    /// </summary>
+    private static readonly string[] SeriesChildOrder =
+        ["domain", "mean-value", "regression-curve", "error-indicator", "data-point", "data-label"];
+
+    private OdfNode? FindFirstChild(string localName)
+    {
+        foreach (OdfNode child in _node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == OdfNamespaces.Chart)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private void RemoveAllChildren(string localName)
+    {
+        foreach (OdfNode child in new List<OdfNode>(_node.Children))
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == OdfNamespaces.Chart)
+            {
+                _node.RemoveChild(child);
+            }
+        }
+    }
+
+    private void InsertChildInSchemaOrder(OdfNode newChild, string localName)
+    {
+        int rank = Array.IndexOf(SeriesChildOrder, localName);
+        foreach (OdfNode sibling in _node.Children)
+        {
+            if (sibling.NodeType is not OdfNodeType.Element || sibling.NamespaceUri != OdfNamespaces.Chart)
+            {
+                continue;
+            }
+
+            int siblingRank = Array.IndexOf(SeriesChildOrder, sibling.LocalName);
+            if (siblingRank > rank)
+            {
+                _node.InsertBefore(newChild, sibling);
+                return;
+            }
+        }
+
+        _node.AppendChild(newChild);
+    }
+
+    /// <summary>
     /// 取得或設定此資料序列的圖表自動樣式。
     /// </summary>
     public OdfChartStyle Style

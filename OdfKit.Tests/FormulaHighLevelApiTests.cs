@@ -329,4 +329,59 @@ public class FormulaHighLevelApiTests
         Assert.Equal("F=ma", loadedDoc.MathText);
         Assert.Contains("<math:mi>F</math:mi>", loadedDoc.GetMathML());
     }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfFormulaDocument.SetAnnotation"/>／<see cref="OdfFormulaDocument.GetAnnotation"/>
+    /// 可附加、讀取並移除 <c>math:semantics</c>／<c>math:annotation</c> 標註，且不影響既有呈現
+    /// 內容（presentation MathML）的 token 讀取，並於儲存／載入後保留。
+    /// </summary>
+    [Fact]
+    public void SetAndGetAnnotation_RoundTripsAfterSaveAndLoad_WithoutAffectingTokens()
+    {
+        using var formula = OdfFormulaDocument.Builder()
+            .WithTokens(OdfMathToken.Identifier("x"), OdfMathToken.Operator("+"), OdfMathToken.Identifier("y"))
+            .Build();
+
+        Assert.Null(formula.GetAnnotation("application/x-tex"));
+
+        formula.SetAnnotation("application/x-tex", "x + y");
+        formula.SetAnnotation("StarMath 5.0", "x + y");
+        Assert.Equal("x + y", formula.GetAnnotation("application/x-tex"));
+        Assert.Equal("x + y", formula.GetAnnotation("StarMath 5.0"));
+        Assert.Equal(3, formula.GetMathTokens().Count);
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
+        Assert.Equal("x + y", loaded.GetAnnotation("application/x-tex"));
+        Assert.Equal("x + y", loaded.GetAnnotation("StarMath 5.0"));
+        Assert.Equal(3, loaded.GetMathTokens().Count);
+        Assert.Equal("x", loaded.GetMathTokens()[0].Text);
+
+        loaded.SetAnnotation("application/x-tex", null);
+        Assert.Null(loaded.GetAnnotation("application/x-tex"));
+        Assert.Equal("x + y", loaded.GetAnnotation("StarMath 5.0"));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfFormulaDocument.LoadFromLatex"/> 會自動附加原始 LaTeX 來源為
+    /// <c>application/x-tex</c> 標註，使 <see cref="OdfFormulaDocument.ToLatex"/> 可精確還原
+    /// 原始來源字串，而非僅 best-effort 由 MathML 重建。
+    /// </summary>
+    [Fact]
+    public void ToLatex_AfterLoadFromLatex_ReturnsExactOriginalSource()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.FromLatex(@"\frac{a}{b} + \sqrt{c}");
+
+        Assert.Equal(@"\frac{a}{b} + \sqrt{c}", formula.ToLatex());
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
+        Assert.Equal(@"\frac{a}{b} + \sqrt{c}", loaded.ToLatex());
+    }
 }

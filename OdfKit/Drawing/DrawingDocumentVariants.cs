@@ -64,6 +64,17 @@ public sealed class GraphicsTemplateDocument : DrawingDocument
     public static new async Task<GraphicsTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
+    /// <summary>
+    /// 從現有的 ODG 繪圖文件建立新的 OTG 繪圖範本文件，完整保留其頁面內容、形狀與樣式。
+    /// </summary>
+    /// <param name="document">作為範本內容來源的繪圖文件</param>
+    /// <returns>建立完成的 <see cref="GraphicsTemplateDocument"/> 執行個體</returns>
+    public static GraphicsTemplateDocument CreateFromDocument(DrawingDocument document) =>
+        (GraphicsTemplateDocument)CreateTemplateFromDocumentInternal(
+            document,
+            OdfDocumentKind.GraphicsTemplate,
+            "application/vnd.oasis.opendocument.graphics-template");
+
     private static GraphicsTemplateDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<GraphicsTemplateDocument>(
             document,
@@ -128,6 +139,14 @@ public sealed class FlatGraphicsDocument : DrawingDocument
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatGraphicsDocument"/></returns>
     public static new async Task<FlatGraphicsDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+
+    /// <summary>
+    /// 從現有的 ODG（ZIP 封裝）繪圖文件建立等價的 FODG 扁平 XML 繪圖文件，內容完全相同。
+    /// </summary>
+    /// <param name="document">來源 ODG 繪圖文件</param>
+    /// <returns>建立完成的 <see cref="FlatGraphicsDocument"/> 執行個體</returns>
+    public static FlatGraphicsDocument CreateFromDocument(DrawingDocument document) =>
+        (FlatGraphicsDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.FlatGraphics, targetIsFlatXml: true);
 
     private static FlatGraphicsDocument Ensure(OdfDocument document) =>
         OdfDocumentVariantSupport.EnsureKind<FlatGraphicsDocument>(

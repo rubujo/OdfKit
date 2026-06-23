@@ -6,6 +6,12 @@ namespace OdfKit.Formula;
 public partial class OdfFormulaDocument
 {
     /// <summary>
+    /// LaTeX 來源標註使用的 MathML <c>annotation</c> 編碼，與既有的 LaTeX/MathML 工具
+    /// （例如 MathJax、KaTeX）所採用的慣例一致。
+    /// </summary>
+    private const string LatexAnnotationEncoding = "application/x-tex";
+
+    /// <summary>
     /// 取得 MathML 的 XML 字串。
     /// </summary>
     /// <returns>MathML XML 字串</returns>
@@ -45,14 +51,18 @@ public partial class OdfFormulaDocument
         }
         var xml = OdfFormulaLatexConverter.Convert(latex);
         SetMathMl(xml);
+        SetAnnotation(LatexAnnotationEncoding, latex);
     }
 
     /// <summary>
-    /// 將目前 MathML 公式內容反向轉換為 LaTeX 公式字串（best-effort，因 LaTeX 與 MathML
-    /// 並非一對一對應，部分語意可能無法完整保留，與既有 <see cref="LoadFromLatex"/> 對稱）。
+    /// 將目前 MathML 公式內容反向轉換為 LaTeX 公式字串。若公式以
+    /// <see cref="LoadFromLatex"/>／<see cref="FromLatex"/> 建立（或曾以
+    /// <see cref="SetAnnotation"/> 附加 <c>application/x-tex</c> 標註），會優先傳回該原始
+    /// LaTeX 來源以達成精確往返；否則改採 best-effort 由 MathML token 重建（因 LaTeX 與
+    /// MathML 並非一對一對應，部分語意可能無法完整保留）。
     /// </summary>
     /// <returns>LaTeX 公式字串</returns>
-    public string ToLatex() => OdfFormulaLatexConverter.ToLatex(GetMathTokens());
+    public string ToLatex() => GetAnnotation(LatexAnnotationEncoding) ?? OdfFormulaLatexConverter.ToLatex(GetMathTokens());
 
     /// <summary>
     /// 使用 <see cref="OdfMathBuilder"/> 組合委派建立並載入 <see cref="OdfFormulaDocument"/>。

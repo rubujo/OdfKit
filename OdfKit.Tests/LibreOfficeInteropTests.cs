@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using OdfKit.Chart;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Csv;
 using OdfKit.DOM;
@@ -1013,15 +1014,351 @@ public class LibreOfficeInteropTests
     }
 
     /// <summary>
-    /// 驗證 ODI 影像文件的封裝結構（mimetype、manifest、content.xml）符合 ODF 1.4 規格，
-    /// 並可由 OdfKit 自身完整往返讀回。
-    /// 注意：實測確認真實 LibreOffice 26.x 與 Microsoft Office 365 皆未實作 ODI／OTI
+    /// 驗證 OTT、OTS、OTP 與 OTG 四個範本格式可由 LibreOffice 26.x headless 模式載入與轉換，
+    /// 涵蓋 Batch 1 四主格式範本變體的最低互通驗收案例。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeHeadless_LoadsTemplateVariantDocuments()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過範本變體實機互通性測試。");
+        }
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeTemplateInterop_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            string ottPath = Path.Combine(tempRoot, "interop-template.ott");
+            string otsPath = Path.Combine(tempRoot, "interop-template.ots");
+            string otpPath = Path.Combine(tempRoot, "interop-template.otp");
+            string otgPath = Path.Combine(tempRoot, "interop-template.otg");
+
+            CreateTextTemplateDocument(ottPath);
+            CreateSpreadsheetTemplateDocument(otsPath);
+            CreatePresentationTemplateDocument(otpPath);
+            CreateDrawingTemplateDocument(otgPath);
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt", ottPath);
+            string ottTxtPath = Path.Combine(outputDir, "interop-template.txt");
+            Assert.True(File.Exists(ottTxtPath), "LibreOffice 應輸出 OTT 文字轉換結果。");
+            Assert.Contains("OdfKit-LibreOffice-Template-Interop-Marker", File.ReadAllText(ottTxtPath));
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "fods", otsPath);
+            string otsFodsPath = Path.Combine(outputDir, "interop-template.fods");
+            Assert.True(File.Exists(otsFodsPath), "LibreOffice 應輸出 OTS 至 FODS 轉換結果。");
+            Assert.Contains("OdfKit-LibreOffice-Template-Interop-Marker", File.ReadAllText(otsFodsPath));
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "fodp", otpPath);
+            string otpFodpPath = Path.Combine(outputDir, "interop-template.fodp");
+            Assert.True(File.Exists(otpFodpPath), "LibreOffice 應輸出 OTP 至 FODP 轉換結果。");
+            Assert.Contains("OdfKit-LibreOffice-Template-Interop-Marker", File.ReadAllText(otpFodpPath));
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "fodg", otgPath);
+            string otgFodgPath = Path.Combine(outputDir, "interop-template.fodg");
+            Assert.True(File.Exists(otgFodgPath), "LibreOffice 應輸出 OTG 至 FODG 轉換結果。");
+            Assert.Contains("OdfKit-LibreOffice-Template-Interop-Marker", File.ReadAllText(otgFodgPath));
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證由 OdfKit 直接產生（非由 ZIP 轉換而來）的原生 FODT、FODS、FODP 與 FODG 扁平 XML
+    /// 文件，可由 LibreOffice 26.x headless 模式直接開啟並轉換，證明 Flat XML 與 ZIP 封裝的
+    /// 高階工作流對 LibreOffice 而言互通等價。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeHeadless_LoadsNativeFlatXmlDocuments()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過原生 Flat XML 實機互通性測試。");
+        }
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeNativeFlatInterop_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            string fodtPath = Path.Combine(tempRoot, "interop-native-text.fodt");
+            string fodsPath = Path.Combine(tempRoot, "interop-native-sheet.fods");
+            string fodpPath = Path.Combine(tempRoot, "interop-native-slide.fodp");
+            string fodgPath = Path.Combine(tempRoot, "interop-native-draw.fodg");
+
+            CreateNativeFlatTextDocument(fodtPath);
+            CreateNativeFlatSpreadsheetDocument(fodsPath);
+            CreateNativeFlatPresentationDocument(fodpPath);
+            CreateNativeFlatDrawingDocument(fodgPath);
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt", fodtPath);
+            string fodtTxtPath = Path.Combine(outputDir, "interop-native-text.txt");
+            Assert.True(File.Exists(fodtTxtPath), "LibreOffice 應輸出原生 FODT 文字轉換結果。");
+            Assert.Contains("OdfKit-LibreOffice-NativeFlat-Interop-Marker", File.ReadAllText(fodtTxtPath));
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "xlsx", fodsPath);
+            string fodsXlsxPath = Path.Combine(outputDir, "interop-native-sheet.xlsx");
+            Assert.True(File.Exists(fodsXlsxPath), "LibreOffice 應輸出原生 FODS 至 XLSX 轉換結果。");
+            Assert.True(new FileInfo(fodsXlsxPath).Length > 0, "XLSX 轉換結果不應為空。");
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "odp", fodpPath);
+            string fodpOdpPath = Path.Combine(outputDir, "interop-native-slide.odp");
+            Assert.True(File.Exists(fodpOdpPath), "LibreOffice 應輸出原生 FODP 至 ODP（ZIP 封裝）轉換結果。");
+            using (OdfPackage roundTrippedPackage = OdfPackage.Open(fodpOdpPath))
+            using (Stream roundTrippedContent = roundTrippedPackage.GetEntryStream("content.xml"))
+            using (var roundTrippedReader = new StreamReader(roundTrippedContent, Encoding.UTF8))
+            {
+                Assert.Contains("OdfKit-LibreOffice-NativeFlat-Interop-Marker", roundTrippedReader.ReadToEnd());
+            }
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "png", fodgPath);
+            string fodgPngPath = Path.Combine(outputDir, "interop-native-draw.png");
+            Assert.True(File.Exists(fodgPngPath), "LibreOffice 應輸出原生 FODG 至 PNG 轉換結果。");
+            Assert.True(new FileInfo(fodgPngPath).Length > 0, "PNG 轉換結果不應為空。");
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證 ODM 主控文字文件可由 LibreOffice 26.x headless 模式直接識別為「Writer master
+    /// document」並轉換，且往返 ODM 後仍保留段落內容（已實機確認 LibreOffice 使用
+    /// <c>writerglobal8</c> 篩選器，非僅理論相容）。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeHeadless_LoadsMasterDocument()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過 ODM 主控文件實機互通性測試。");
+        }
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeMasterInterop_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            string odmPath = Path.Combine(tempRoot, "interop-master.odm");
+            using (var master = TextMasterDocument.Create())
+            {
+                master.AddParagraph("OdfKit-LibreOffice-Master-Interop-Marker");
+                master.AddSubDocumentReference("Chapter1", "chapter1.odt");
+                master.Save(odmPath);
+            }
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt", odmPath);
+            string txtPath = Path.Combine(outputDir, "interop-master.txt");
+            Assert.True(File.Exists(txtPath), "LibreOffice 應輸出 ODM 文字轉換結果。");
+            Assert.Contains("OdfKit-LibreOffice-Master-Interop-Marker", File.ReadAllText(txtPath));
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "odm", odmPath);
+            string roundTripPath = Path.Combine(outputDir, "interop-master.odm");
+            Assert.True(File.Exists(roundTripPath), "LibreOffice 應輸出 ODM 往返結果。");
+
+            using TextMasterDocument roundTripped = TextMasterDocument.Load(roundTripPath);
+            Assert.Equal(OdfDocumentKind.TextMaster, roundTripped.DocumentKind);
+            var reference = Assert.Single(roundTripped.GetSubDocumentReferences());
+            Assert.Equal("Chapter1", reference.SectionName);
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證 OTH 網頁範本文件可由 LibreOffice 26.x headless 模式直接識別為「Writer/Web
+    /// document」並轉換，且往返 ODT 後仍保留段落內容（已實機確認 LibreOffice 使用
+    /// <c>writerweb8_writer</c> 篩選器，非僅理論相容）。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeHeadless_LoadsWebTemplateDocument()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過 OTH 網頁範本實機互通性測試。");
+        }
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeWebInterop_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            string othPath = Path.Combine(tempRoot, "interop-web.oth");
+            using (var web = TextWebDocument.Create())
+            {
+                web.AddHeading("OdfKit-LibreOffice-Web-Interop-Heading", 1);
+                web.AddParagraph("OdfKit-LibreOffice-Web-Interop-Marker");
+                web.Save(othPath);
+            }
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "txt", othPath);
+            string txtPath = Path.Combine(outputDir, "interop-web.txt");
+            Assert.True(File.Exists(txtPath), "LibreOffice 應輸出 OTH 文字轉換結果。");
+            Assert.Contains("OdfKit-LibreOffice-Web-Interop-Marker", File.ReadAllText(txtPath));
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "odt", othPath);
+            string roundTripPath = Path.Combine(outputDir, "interop-web.odt");
+            Assert.True(File.Exists(roundTripPath), "LibreOffice 應輸出 OTH 至 ODT 轉換結果。");
+
+            using TextDocument roundTripped = TextDocument.Load(roundTripPath);
+            string contentXml = ReadContentXml(roundTripped);
+            Assert.Contains("OdfKit-LibreOffice-Web-Interop-Marker", contentXml);
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證獨立 ODF 公式文件可由 LibreOffice 26.x headless 模式直接識別為「Math document」
+    /// 並使用 <c>math8</c> 篩選器轉換，且往返後 MathML 內容仍保留（與 ODC／ODI 等次要格式不同，
+    /// ODF 公式文件確實有獨立可開啟主文件層級的真機支援，因為 LibreOffice Math 本身即支援
+    /// 將公式作為獨立文件編輯，而非僅作為嵌入物件）。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeHeadless_LoadsFormulaDocument()
+    {
+        string? sofficePath = FindLibreOfficeSoffice();
+        if (string.IsNullOrEmpty(sofficePath))
+        {
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過公式文件實機互通性測試。");
+        }
+
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeFormulaInterop_" + Guid.NewGuid().ToString("N"));
+        string outputDir = Path.Combine(tempRoot, "out");
+        string userInstallationDir = Path.Combine(tempRoot, "profile");
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(userInstallationDir);
+
+        try
+        {
+            string odfPath = Path.Combine(tempRoot, "interop-formula.odf");
+            using (FormulaDocument formula = FormulaDocument.Create(
+                "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow></math>"))
+            {
+                formula.Save(odfPath);
+            }
+
+            RunSoffice(sofficePath!, userInstallationDir, outputDir, "odf", odfPath);
+            string roundTripPath = Path.Combine(outputDir, "interop-formula.odf");
+            Assert.True(File.Exists(roundTripPath), "LibreOffice 應輸出公式文件往返結果。");
+
+            using FormulaDocument roundTripped = FormulaDocument.Load(roundTripPath);
+            Assert.Equal("E=mc2", roundTripped.MathText);
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證 OTF 公式範本與 FDF 扁平 XML 公式文件的封裝結構（mimetype、content.xml）符合 ODF 1.4
+    /// 規格，並可由 OdfKit 自身完整往返讀回。
+    /// 注意：實測確認 LibreOffice 26.2.1 不接受獨立 .otf 為可直接開啟的主文件（回報
+    /// 「source file could not be loaded」）；獨立 .fdf 則更隱晦地被誤判為「Calc document」並以
+    /// <c>calc_png_Export</c> 篩選器產生與公式內容完全無關的輸出，同樣不構成有效互通。與獨立
+    /// <c>.odf</c>（見 <see cref="LibreOfficeHeadless_LoadsFormulaDocument"/>，已確認真機支援）
+    /// 不同，這是上游應用程式對範本／Flat 公式變體的已知限制，並非 OdfKit 的缺陷。因此 OTF／FDF
+    /// 改以封裝結構與 schema 層級的精確驗證取代真機驗證。
+    /// </summary>
+    [Fact]
+    public void OdfFormulaVariantDocument_PackageStructureMatchesOdf14Schema()
+    {
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitFormulaVariantPackageStructure_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempRoot);
+
+        try
+        {
+            string otfPath = Path.Combine(tempRoot, "interop-formula.otf");
+            string fdfPath = Path.Combine(tempRoot, "interop-formula.fdf");
+
+            using (FormulaTemplateDocument otf = FormulaTemplateDocument.Create())
+            {
+                otf.SetIdentifierEquation("x", "y");
+                otf.Save(otfPath);
+            }
+
+            using OdfPackage otfPackage = OdfPackage.Open(otfPath);
+            Assert.Equal("application/vnd.oasis.opendocument.formula-template", otfPackage.MimeType);
+
+            using (FormulaTemplateDocument otfForFlat = FormulaTemplateDocument.Load(otfPath))
+            using (FlatFormulaDocument fdf = FlatFormulaDocument.CreateFromDocument(FormulaDocument.CreateFromTemplate(otfForFlat)))
+            {
+                fdf.Save(fdfPath);
+            }
+
+            string fdfXml = File.ReadAllText(fdfPath);
+            Assert.Contains("<office:document", fdfXml, StringComparison.Ordinal);
+
+            using FlatFormulaDocument reloadedFdf = FlatFormulaDocument.Load(fdfPath);
+            Assert.Equal("x=y", reloadedFdf.MathText);
+
+            using FormulaTemplateDocument reloadedOtf = FormulaTemplateDocument.Load(otfPath);
+            Assert.Equal("x=y", reloadedOtf.MathText);
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證 ODI／OTI／FODI 影像文件的封裝結構（mimetype、manifest、content.xml）符合 ODF 1.4
+    /// 規格，並可由 OdfKit 自身完整往返讀回。
+    /// 注意：實測確認真實 LibreOffice 26.2.1 與 Microsoft Office 365 皆未實作 ODI／OTI
     /// （OpenDocument Image／Image Template）的匯入篩選器——LibreOffice 僅在
     /// <c>draw.xcd</c> 等篩選器登錄檔註冊 ODG／ODP／ODS／ODT／ODC，從未登錄
     /// <c>application/vnd.oasis.opendocument.image</c>；以 <c>soffice --headless
-    /// --convert-to fodi</c> 開啟 OdfKit 產生的 ODI 一律回報「source file could not be
+    /// --convert-to png</c> 開啟 OdfKit 產生的獨立 ODI／OTI 一律回報「source file could not be
     /// loaded」，即使內容完全符合 ODF 規格亦然，這是上游應用程式的已知缺口，並非 OdfKit 的
-    /// 缺陷。Microsoft Office 則完全不支援開啟任何 ODF 影像文件。因此 ODI／OTI／FODI 改以封裝
+    /// 缺陷。獨立 FODI（Flat XML）則更隱晦地被誤判為「Writer document」，以
+    /// <c>writer_png_Export</c> 篩選器產生與影像內容完全無關的輸出（並非真正剖析為影像），
+    /// 同樣不構成有效互通——與 ODC／OTC／FODC（見
+    /// <see cref="OdfChartDocument_PackageStructureMatchesOdf14Schema"/>）及 OTF／FDF（見
+    /// <see cref="OdfFormulaVariantDocument_PackageStructureMatchesOdf14Schema"/>）的誤判模式
+    /// 一致。Microsoft Office 則完全不支援開啟任何 ODF 影像文件。因此 ODI／OTI／FODI 改以封裝
     /// 結構與 schema 層級的精確驗證取代真機驗證。
     /// </summary>
     [Fact]
@@ -1060,6 +1397,116 @@ public class LibreOfficeInteropTests
             Assert.Equal("OdfKit-LibreOffice-Image-Interop-Marker", frame.Title);
             Assert.True(frame.TryGetWidth(out OdfLength width));
             Assert.Equal(OdfLength.Parse("6cm").ToPoints(), width.ToPoints(), 0.001);
+
+            string otiPath = Path.Combine(tempRoot, "interop-image.oti");
+            string fodiPath = Path.Combine(tempRoot, "interop-image.fodi");
+
+            using (OdfImageDocument odiForTemplate = OdfImageDocument.Load(odiPath))
+            using (ImageTemplateDocument oti = ImageTemplateDocument.CreateFromDocument(odiForTemplate))
+            {
+                oti.Save(otiPath);
+            }
+
+            using OdfPackage otiPackage = OdfPackage.Open(otiPath);
+            Assert.Equal("application/vnd.oasis.opendocument.image-template", otiPackage.MimeType);
+
+            using (OdfImageDocument odiForFlat = OdfImageDocument.Load(odiPath))
+            using (FlatImageDocument fodi = FlatImageDocument.CreateFromDocument(odiForFlat))
+            {
+                fodi.Save(fodiPath);
+            }
+
+            string fodiXml = File.ReadAllText(fodiPath);
+            Assert.Contains("<office:document", fodiXml, StringComparison.Ordinal);
+
+            using FlatImageDocument reloadedFodi = FlatImageDocument.Load(fodiPath);
+            Assert.Equal("OdfKit-LibreOffice-Image-Interop-Marker", Assert.Single(reloadedFodi.GetImageFrames()).Title);
+
+            using ImageTemplateDocument reloadedOti = ImageTemplateDocument.Load(otiPath);
+            Assert.Equal("OdfKit-LibreOffice-Image-Interop-Marker", Assert.Single(reloadedOti.GetImageFrames()).Title);
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot))
+            {
+                Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證 ODC／OTC／FODC 圖表文件的封裝結構（mimetype、manifest、content.xml）符合 ODF 1.4
+    /// 規格，並可由 OdfKit 自身完整往返讀回。
+    /// 注意：實測確認真實 LibreOffice 26.2.1 並未將獨立（非嵌入 ODS/ODT/ODP）的 ODF Chart
+    /// 文件視為可直接開啟的主文件——以 <c>soffice --headless --convert-to txt</c> 開啟
+    /// OdfKit 產生的獨立 .odc／.otc 一律回報「source file could not be loaded」，即使內容完全
+    /// 符合 ODF 規格亦然；獨立 .fodc（Flat XML）則更隱晦地被誤判為「Writer document」並原樣
+    /// 回顯來源 XML（並非真正剖析為圖表），同樣不構成有效互通。這與既有
+    /// <c>OdfImageDocument_PackageStructureMatchesOdf14Schema</c> 註解中「LibreOffice 已在
+    /// draw.xcd 註冊 ODC」的舊有假設不符——ODF Chart 在 ODF 生態中設計上即為僅可嵌入
+    /// ODS/ODT/ODP 內的子文件類型，並非獨立可開啟的主文件格式，這是上游應用程式的已知限制，
+    /// 並非 OdfKit 的缺陷。因此 ODC／OTC／FODC 改以封裝結構與 schema 層級的精確驗證，以及
+    /// <see cref="ChartHighLevelApiTests"/>／<see cref="EmbeddedChartIntegrationTests"/> 中
+    /// 「圖表嵌入 ODS/ODT 後由 LibreOffice 開啟」的既有嵌入式互通驗收（見
+    /// <c>LibreOfficeHeadless_LoadsGeneratedDocuments</c> 對含圖表 ODS 的 <c>xlsx</c> 轉換）
+    /// 取代獨立檔案的真機驗證。
+    /// </summary>
+    [Fact]
+    public void OdfChartDocument_PackageStructureMatchesOdf14Schema()
+    {
+        string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitChartPackageStructure_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempRoot);
+
+        try
+        {
+            string odcPath = Path.Combine(tempRoot, "interop-chart.odc");
+            string otcPath = Path.Combine(tempRoot, "interop-chart.otc");
+            string fodcPath = Path.Combine(tempRoot, "interop-chart.fodc");
+
+            var definition = new OdfChartDefinition
+            {
+                ChartType = OdfChartType.Bar,
+                Title = "OdfKit-Chart-PackageStructure-Marker",
+                DataRange = new OdfCellRange(0, 0, 4, 1, "LocalTable"),
+                HasLegend = true
+            };
+
+            using (ChartDocument odc = ChartDocument.Create(definition))
+            {
+                odc.Save(odcPath);
+            }
+
+            using OdfPackage odcPackage = OdfPackage.Open(odcPath);
+            Assert.Equal("application/vnd.oasis.opendocument.chart", odcPackage.MimeType);
+            using (Stream contentStream = odcPackage.GetEntryStream("content.xml"))
+            using (var reader = new StreamReader(contentStream, Encoding.UTF8))
+            {
+                string contentXml = reader.ReadToEnd();
+                Assert.Contains("<office:chart", contentXml, StringComparison.Ordinal);
+                Assert.Contains("OdfKit-Chart-PackageStructure-Marker", contentXml, StringComparison.Ordinal);
+            }
+
+            using (ChartDocument odcForTemplate = ChartDocument.Load(odcPath))
+            using (ChartTemplateDocument otc = ChartTemplateDocument.CreateFromDocument(odcForTemplate))
+            {
+                otc.Save(otcPath);
+            }
+
+            using OdfPackage otcPackage = OdfPackage.Open(otcPath);
+            Assert.Equal("application/vnd.oasis.opendocument.chart-template", otcPackage.MimeType);
+
+            using (ChartDocument odcForFlat = ChartDocument.Load(odcPath))
+            using (FlatChartDocument fodc = FlatChartDocument.CreateFromDocument(odcForFlat))
+            {
+                fodc.Save(fodcPath);
+            }
+
+            string fodcXml = File.ReadAllText(fodcPath);
+            Assert.Contains("<office:document", fodcXml, StringComparison.Ordinal);
+            Assert.Contains("OdfKit-Chart-PackageStructure-Marker", fodcXml, StringComparison.Ordinal);
+
+            using ChartDocument reloaded = ChartDocument.Load(odcPath);
+            Assert.Equal("OdfKit-Chart-PackageStructure-Marker", reloaded.ChartTitle);
         }
         finally
         {
@@ -1489,6 +1936,96 @@ public class LibreOfficeInteropTests
             OdfLength.Parse("8cm"),
             OdfLength.Parse("3cm"),
             "OdfKit-LibreOffice-26-Interop-Marker");
+        document.Save(path);
+    }
+
+    private static void CreateTextTemplateDocument(string path)
+    {
+        using var document = TextTemplateDocument.Create();
+        document.AddMasterPage("InteropTemplateMaster");
+        document.AddParagraph("OdfKit-LibreOffice-Template-Interop-Marker");
+        document.Save(path);
+    }
+
+    private static void CreateSpreadsheetTemplateDocument(string path)
+    {
+        using var document = SpreadsheetTemplateDocument.Create();
+        var sheet = document.Worksheets.Add("Data");
+        sheet.Cells["A1"].CellValue = "OdfKit-LibreOffice-Template-Interop-Marker";
+        document.Save(path);
+    }
+
+    private static void CreatePresentationTemplateDocument(string path)
+    {
+        using var document = PresentationTemplateDocument.Create();
+        var slide = document.AddSlide();
+        slide.AddPlaceholder(
+            OdfPlaceholderType.Title,
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("10cm"),
+            OdfLength.Parse("2cm"));
+        slide.AddTextBox(
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("4cm"),
+            OdfLength.Parse("10cm"),
+            OdfLength.Parse("2cm"),
+            "OdfKit-LibreOffice-Template-Interop-Marker");
+        document.Save(path);
+    }
+
+    private static void CreateDrawingTemplateDocument(string path)
+    {
+        using var document = GraphicsTemplateDocument.Create();
+        OdfDrawPage page = document.AddPage("互通範本頁");
+        page.AddTextBox(
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("8cm"),
+            OdfLength.Parse("3cm"),
+            "OdfKit-LibreOffice-Template-Interop-Marker");
+        document.Save(path);
+    }
+
+    private static void CreateNativeFlatTextDocument(string path)
+    {
+        using var document = FlatTextDocument.Create();
+        document.AddHeading("原生 Flat XML 互通性", 1);
+        document.AddParagraph("OdfKit-LibreOffice-NativeFlat-Interop-Marker");
+        document.Save(path);
+    }
+
+    private static void CreateNativeFlatSpreadsheetDocument(string path)
+    {
+        using var document = FlatSpreadsheetDocument.Create();
+        var sheet = document.Worksheets.Add("Data");
+        sheet.Cells["A1"].CellValue = "OdfKit-LibreOffice-NativeFlat-Interop-Marker";
+        document.Save(path);
+    }
+
+    private static void CreateNativeFlatPresentationDocument(string path)
+    {
+        using var document = FlatPresentationDocument.Create();
+        var slide = document.AddSlide();
+        slide.AddTextBox(
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("1cm"),
+            OdfLength.Parse("10cm"),
+            OdfLength.Parse("2cm"),
+            "OdfKit-LibreOffice-NativeFlat-Interop-Marker");
+        document.Save(path);
+    }
+
+    private static void CreateNativeFlatDrawingDocument(string path)
+    {
+        using var document = FlatGraphicsDocument.Create();
+        OdfDrawPage page = document.AddPage("原生 Flat 互通頁");
+        page.AddTextBox(
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("2cm"),
+            OdfLength.Parse("8cm"),
+            OdfLength.Parse("3cm"),
+            "OdfKit-LibreOffice-NativeFlat-Interop-Marker");
         document.Save(path);
     }
 

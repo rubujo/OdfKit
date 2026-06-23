@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -77,5 +78,41 @@ public partial class OdfImageDocument
         frame.AppendChild(image);
         GetImageNode().AppendChild(frame);
         return href;
+    }
+
+    /// <summary>
+    /// 批次新增多個影像框架（不取代既有框架）。
+    /// </summary>
+    /// <param name="requests">要新增的影像框架請求清單</param>
+    /// <returns>依請求順序排列的影像在 ODF 封裝中的路徑清單</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="requests"/> 或其中任一筆請求為 <see langword="null"/> 時擲出</exception>
+    public IReadOnlyList<string> AddImageFrames(IEnumerable<OdfImageFrameRequest> requests)
+    {
+        if (requests is null)
+        {
+            throw new ArgumentNullException(nameof(requests));
+        }
+
+        List<string> hrefs = [];
+        foreach (OdfImageFrameRequest request in requests)
+        {
+            if (request is null)
+            {
+                throw new ArgumentNullException(nameof(requests));
+            }
+
+            hrefs.Add(AddImageFrame(
+                request.ImageBytes,
+                request.X,
+                request.Y,
+                request.Width,
+                request.Height,
+                request.PreferredName,
+                request.Name,
+                request.Title,
+                request.Description));
+        }
+
+        return hrefs;
     }
 }
