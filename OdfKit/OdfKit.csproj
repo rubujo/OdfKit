@@ -32,6 +32,10 @@
 
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
     <IsTrimmable>true</IsTrimmable>
+    <!-- 裁剪相容性已由 eng/Test-TrimSmoke.ps1 的實機發佈+執行驗證把關；
+         此分析器對 OdfKit/DOM/Generated/GeneratedDomWrappers.g.cs（156 萬行生成碼）
+         做資料流分析會讓 CI 建置耗時失控（VBCSCompiler 衝上 7GB+ 記憶體），故關閉。 -->
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>
