@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("OdfKit.Extensions.Imaging")]
 [assembly: InternalsVisibleTo("OdfKit.Extensions.Ooxml")]
 [assembly: InternalsVisibleTo("OdfKit.Extensions.Html")]
+[assembly: InternalsVisibleTo("OdfKit.TrimSmoke")]
 
 namespace OdfKit.Core;
 

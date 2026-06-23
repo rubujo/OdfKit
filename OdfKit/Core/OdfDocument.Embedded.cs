@@ -16,7 +16,7 @@ public abstract partial class OdfDocument
     /// <typeparam name="T">嵌入式文件 wrapper 類型</typeparam>
     /// <param name="subPath">封裝中的子路徑</param>
     /// <returns>嵌入式文件 wrapper</returns>
-    public T GetEmbeddedDocument<T>(string subPath) where T : OdfDocument
+    public T GetEmbeddedDocument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(string subPath) where T : OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocument_SubpathCannotBeEmpty_2"), nameof(subPath));
@@ -44,7 +44,7 @@ public abstract partial class OdfDocument
     /// （外層文件的 <see cref="Save(OdfSaveOptions?)"/> 僅會持久化外層自身的
     /// <c>content.xml</c> 等專案，不會連動儲存內嵌子文件）。
     /// </remarks>
-    public T CreateEmbeddedDocument<T>(string subPath) where T : OdfDocument
+    public T CreateEmbeddedDocument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(string subPath) where T : OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDocument_SubpathCannotBeEmpty_2"), nameof(subPath));
@@ -65,11 +65,7 @@ public abstract partial class OdfDocument
         return doc;
     }
 
-#if !NETSTANDARD2_0
-    [RequiresUnreferencedCode("未註冊的嵌入式文件類型仍以反射建立；請呼叫 OdfEmbeddedDocumentFactory 註冊。")]
-    [RequiresDynamicCode("未註冊的嵌入式文件類型仍以反射建立；請呼叫 OdfEmbeddedDocumentFactory 註冊。")]
-#endif
-    private static T CreateEmbeddedViaReflection<T>(OdfPackage package, string subPath) where T : OdfDocument
+    private static T CreateEmbeddedViaReflection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(OdfPackage package, string subPath) where T : OdfDocument
     {
         var ctor = typeof(T).GetConstructor(new[] { typeof(OdfPackage), typeof(string) });
         if (ctor is not null)

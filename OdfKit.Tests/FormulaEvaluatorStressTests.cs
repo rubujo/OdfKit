@@ -16,8 +16,11 @@ namespace OdfKit.Tests
     {
         #region Stress Mock IEvaluationContext
 
-        private class StressMockEvaluationContext : IEvaluationContext
+        private class StressMockEvaluationContext : IEvaluationContext, IOdfBlankCheckableContext
         {
+            public bool IsBlank(OdfCellAddress address) =>
+                !CellValues.ContainsKey(address) && !CellFormulas.ContainsKey(address);
+
             public OdfCellAddress CurrentCell { get; set; }
             public Dictionary<OdfCellAddress, object?> CellValues { get; } = new();
             public Dictionary<OdfCellAddress, string> CellFormulas { get; } = new();

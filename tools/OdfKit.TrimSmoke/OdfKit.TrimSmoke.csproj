@@ -29,9 +29,10 @@
     </ProjectReference>
   </ItemGroup>
 
-  <!-- BouncyCastle 密碼學路徑尚未完全 trimming 化；整包保留以避免 IL 連結器誤裁（PERF-5e）。 -->
+  <!-- BouncyCastle 密碼學路徑與 Sylvan.Data.Csv 尚未完全 trimming 化；整包保留以避免 IL 連結器誤裁。 -->
   <ItemGroup>
     <TrimmerRootAssembly Include="BouncyCastle.Cryptography" />
+    <TrimmerRootAssembly Include="Sylvan.Data.Csv" />
   </ItemGroup>
 
 </Project>

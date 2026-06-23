@@ -189,22 +189,9 @@ internal static class FormulaLogicalFunctionHandlers
         if (node is CellAddressNode cellNode)
         {
             var addr = cellNode.Address;
-            if (context is OdfDomEvaluationContext domCtx)
+            if (context is IOdfBlankCheckableContext blankCheckable)
             {
-                return !domCtx.CellValues.ContainsKey(addr) && !domCtx.CellFormulas.ContainsKey(addr);
-            }
-
-            var type = context.GetType();
-            var cellValuesProp = type.GetProperty("CellValues");
-            var cellFormulasProp = type.GetProperty("CellFormulas");
-            if (cellValuesProp != null && cellFormulasProp != null)
-            {
-                var vals = cellValuesProp.GetValue(context) as System.Collections.IDictionary;
-                var forms = cellFormulasProp.GetValue(context) as System.Collections.IDictionary;
-                if (vals != null && forms != null)
-                {
-                    return !vals.Contains(addr) && !forms.Contains(addr);
-                }
+                return blankCheckable.IsBlank(addr);
             }
         }
 

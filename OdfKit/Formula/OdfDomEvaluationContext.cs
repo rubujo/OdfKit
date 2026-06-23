@@ -8,8 +8,11 @@ using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula;
 
-internal class OdfDomEvaluationContext : IEvaluationContext
+internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableContext
 {
+    public bool IsBlank(OdfCellAddress address) =>
+        !_cellValues.ContainsKey(address) && !_cellFormulas.ContainsKey(address);
+
     public OdfCellAddress CurrentCell { get; set; }
     private readonly Dictionary<OdfCellAddress, OdfNode> _cellNodes = new();
     private readonly Dictionary<OdfCellAddress, string> _cellFormulas = new();

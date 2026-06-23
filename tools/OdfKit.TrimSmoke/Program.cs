@@ -189,8 +189,11 @@ static int SmokeEmbeddedDocumentFactory()
 /// <summary>
 /// TrimSmoke 專用之最小公式評估內容，避免依賴測試專案中的 Mock 類型。
 /// </summary>
-file sealed class TrimSmokeEvaluationContext : IEvaluationContext
+file sealed class TrimSmokeEvaluationContext : IEvaluationContext, IOdfBlankCheckableContext
 {
+    public bool IsBlank(OdfCellAddress address) =>
+        !CellValues.ContainsKey(address);
+
     public OdfCellAddress CurrentCell { get; init; } = OdfCellAddress.ParseExcel("A1");
 
     public Dictionary<OdfCellAddress, object> CellValues { get; } = new();

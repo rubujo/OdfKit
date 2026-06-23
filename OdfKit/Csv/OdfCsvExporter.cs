@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -254,6 +255,9 @@ internal sealed class OdfTableSheetDataReader : DbDataReader
     public override DateTime GetDateTime(int ordinal) => Convert.ToDateTime(GetValue(ordinal));
     public override decimal GetDecimal(int ordinal) => Convert.ToDecimal(GetValue(ordinal));
     public override double GetDouble(int ordinal) => Convert.ToDouble(GetValue(ordinal));
+#if !NETSTANDARD2_0
+    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
     public override Type GetFieldType(int ordinal) => typeof(object);
     public override float GetFloat(int ordinal) => Convert.ToSingle(GetValue(ordinal));
     public override Guid GetGuid(int ordinal) => Guid.Parse(GetString(ordinal));
