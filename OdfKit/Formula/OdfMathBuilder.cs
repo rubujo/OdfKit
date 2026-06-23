@@ -163,6 +163,43 @@ public sealed class OdfMathBuilder
     }
 
     /// <summary>
+    /// 附加重音標記（語意上的上方標記，序列化為 <c>mover</c> 並設定 <c>accent="true"</c>，
+    /// 用於向量符號、變音符號等裝飾性記號，與一般 <see cref="Over"/> 的極限記號語意有別）。
+    /// </summary>
+    /// <param name="baseExpr">底數組合委派</param>
+    /// <param name="accentMark">重音標記組合委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfMathBuilder Accent(Action<OdfMathBuilder> baseExpr, Action<OdfMathBuilder> accentMark)
+    {
+        _tokens.Add(OdfMathToken.Over(BuildSingle(baseExpr), BuildSingle(accentMark)).WithAttribute("accent", "true"));
+        return this;
+    }
+
+    /// <summary>
+    /// 附加 Content MathML <c>apply</c> 語意標記（基礎支援）。
+    /// </summary>
+    /// <param name="operatorName">運算子名稱（例如 <c>plus</c>、<c>times</c>、<c>eq</c>）</param>
+    /// <param name="operands">運算元組合委派清單</param>
+    /// <returns>目前 builder 執行個體</returns>
+    /// <exception cref="ArgumentException">當未提供任何運算元時擲出</exception>
+    public OdfMathBuilder Apply(string operatorName, params Action<OdfMathBuilder>[] operands)
+    {
+        if (operands is null || operands.Length == 0)
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfMathToken_SubtokenCannotBeEmpty"), nameof(operands));
+        }
+
+        var operandTokens = new OdfMathToken[operands.Length];
+        for (int i = 0; i < operands.Length; i++)
+        {
+            operandTokens[i] = BuildSingle(operands[i]);
+        }
+
+        _tokens.Add(OdfMathToken.Apply(operatorName, operandTokens));
+        return this;
+    }
+
+    /// <summary>
     /// 附加以括號包圍的群組。
     /// </summary>
     /// <param name="inner">括號內容組合委派</param>

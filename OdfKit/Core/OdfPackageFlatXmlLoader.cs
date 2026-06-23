@@ -38,7 +38,8 @@ internal static class OdfPackageFlatXmlLoader
         if (!ctx.UnderlyingStream!.CanSeek && signatureLength > 0)
             xmlStream = new PeekableStream(ctx.UnderlyingStream, signature, signatureLength, ctx.LeaveOpen);
 
-        var cleanXmlStream = new MemoryStream();
+        long estimatedCleanSize = ctx.UnderlyingStream!.CanSeek ? ctx.UnderlyingStream.Length : 0;
+        using Stream cleanXmlStream = OdfTempStreamFactory.Create(estimatedCleanSize, temporaryDirectory: null);
         var binaryPaths = new Dictionary<int, string>();
         int binaryCounter = 0;
 

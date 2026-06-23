@@ -60,4 +60,27 @@ public class FlatXmlMediaEncodingTests
                 File.Delete(tempFlatXmlPath);
         }
     }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfTempStreamFactory.Create"/> 在預估大小低於門檻時使用記憶體資料流，
+    /// 超過門檻時改用隨關閉自動刪除的暫存檔資料流，避免大型 Flat XML 文件一次性佔用大量記憶體。
+    /// </summary>
+    [Fact]
+    public void TempStreamFactory_SwitchesBetweenMemoryAndTempFileByThreshold()
+    {
+        using Stream smallStream = OdfTempStreamFactory.Create(estimatedSize: 1024, temporaryDirectory: null, thresholdBytes: 1024 * 1024);
+        Assert.IsType<MemoryStream>(smallStream);
+
+        using Stream largeStream = OdfTempStreamFactory.Create(estimatedSize: 2 * 1024 * 1024, temporaryDirectory: null, thresholdBytes: 1024 * 1024);
+        Assert.IsType<FileStream>(largeStream);
+
+        var fileStream = (FileStream)largeStream;
+        string tempPath = fileStream.Name;
+        Assert.True(File.Exists(tempPath));
+
+        largeStream.Write(new byte[] { 1, 2, 3 }, 0, 3);
+        largeStream.Dispose();
+
+        Assert.False(File.Exists(tempPath));
+    }
 }

@@ -124,7 +124,7 @@ internal static class OdfPackageArchiveWriter
         Stream targetStream,
         CancellationToken cancellationToken = default)
     {
-        using var buffer = new MemoryStream();
+        using Stream buffer = OdfPackageSaver.CreateTempStream(ctx, ctx.EstimateArchiveSize(), async: true);
         WriteFlatXmlToStream(ctx, buffer);
         cancellationToken.ThrowIfCancellationRequested();
         buffer.Position = 0;

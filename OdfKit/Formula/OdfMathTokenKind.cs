@@ -81,5 +81,11 @@ public enum OdfMathTokenKind
     /// <summary>
     /// MathML <c>mstyle</c> 樣式群組，<see cref="OdfMathToken.Base"/> 為內容。
     /// </summary>
-    Style
+    Style,
+
+    /// <summary>
+    /// Content MathML <c>apply</c> 語意標記（基礎支援）：<see cref="OdfMathToken.Text"/> 為運算子名稱
+    /// （例如 <c>plus</c>、<c>times</c>、<c>eq</c>），運算元依序存放於 <see cref="OdfMathToken.Children"/>。
+    /// </summary>
+    Apply
 }

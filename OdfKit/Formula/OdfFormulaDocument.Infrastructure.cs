@@ -139,6 +139,7 @@ public partial class OdfFormulaDocument
             OdfMathTokenKind.UnderOver => CreateUnderOverNode(token),
             OdfMathTokenKind.Fenced => CreateFencedNode(token),
             OdfMathTokenKind.Style => CreateStyleNode(token),
+            OdfMathTokenKind.Apply => CreateApplyNode(token),
             _ => CreateLeafMathTokenNode(token),
         };
 
@@ -267,6 +268,24 @@ public partial class OdfFormulaDocument
         return node;
     }
 
+    private static OdfNode CreateApplyNode(OdfMathToken token)
+    {
+        if (token.Children is null || token.Children.Count == 0)
+        {
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfFormulaDocument_ApplyTokenContainLeast"));
+        }
+
+        OdfNode node = OdfNodeFactory.CreateElement("apply", MathMlNamespace, "math");
+        OdfNode operatorNode = OdfNodeFactory.CreateElement(token.Text, MathMlNamespace, "math");
+        node.AppendChild(operatorNode);
+        foreach (OdfMathToken operand in token.Children)
+        {
+            node.AppendChild(CreateMathTokenNode(operand));
+        }
+
+        return node;
+    }
+
     private static OdfNode CreateLeafMathTokenNode(OdfMathToken token)
     {
         OdfNode node = OdfNodeFactory.CreateElement(GetLeafMathTokenElementName(token.Kind), MathMlNamespace, "math");
@@ -291,6 +310,7 @@ public partial class OdfFormulaDocument
     [
         "mathvariant", "mathsize", "mathcolor", "mathbackground",
         "displaystyle", "stretchy", "lspace", "rspace",
+        "accent", "accentunder",
     ];
 
     private static OdfMathToken? CreateTokenOrDefault(OdfNode node)
@@ -312,6 +332,7 @@ public partial class OdfFormulaDocument
             "mtable" => CreateMatrixToken(node),
             "munderover" => CreateUnderOverToken(node),
             "mstyle" => CreateStyleToken(node),
+            "apply" => CreateApplyToken(node),
             _ => null
         };
 
@@ -478,6 +499,28 @@ public partial class OdfFormulaDocument
         };
 
         return OdfMathToken.Style(inner, displayStyle);
+    }
+
+    private static OdfMathToken? CreateApplyToken(OdfNode node)
+    {
+        List<OdfNode> children = CollectElementChildren(node);
+        if (children.Count < 2)
+        {
+            return null;
+        }
+
+        string operatorName = children[0].LocalName;
+        List<OdfMathToken> operands = [];
+        for (int i = 1; i < children.Count; i++)
+        {
+            OdfMathToken? operand = CreateTokenOrDefault(children[i]);
+            if (operand is not null)
+            {
+                operands.Add(operand);
+            }
+        }
+
+        return operands.Count == 0 ? null : OdfMathToken.Apply(operatorName, operands.ToArray());
     }
 
     private static List<OdfNode> CollectElementChildren(OdfNode node)

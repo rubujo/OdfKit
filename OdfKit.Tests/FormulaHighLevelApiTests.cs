@@ -267,6 +267,52 @@ public class FormulaHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfMathBuilder.Accent"/> 可建立帶有 <c>accent="true"</c> 屬性的 <c>mover</c>
+    /// token，並於儲存／載入後保留該屬性（W3C MathML 重音語意，與一般 <c>Over</c> 的極限記號語意有別）。
+    /// </summary>
+    [Fact]
+    public void Accent_SetsAccentAttributeAndRoundTrips()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.FromBuilder(
+            b => b.Accent(inner => inner.Identifier("v"), mark => mark.Operator("→")));
+
+        Assert.Contains("accent=\"true\"", formula.GetMathML());
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
+        OdfMathToken token = Assert.Single(loaded.GetMathTokens());
+        Assert.Equal(OdfMathTokenKind.Over, token.Kind);
+        Assert.Equal("true", token.Attributes?["accent"]);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfMathBuilder.Apply"/> 可建立 Content MathML <c>apply</c> token，
+    /// 並於儲存／載入後保留運算子與運算元；<see cref="OdfFormulaDocument.ToLatex"/> 可將其
+    /// 轉換為對應的 LaTeX 中綴運算式。
+    /// </summary>
+    [Fact]
+    public void Apply_RoundTripsAndConvertsToLatex()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.FromBuilder(
+            b => b.Apply("plus", x => x.Identifier("x"), y => y.Identifier("y")));
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
+        OdfMathToken token = Assert.Single(loaded.GetMathTokens());
+        Assert.Equal(OdfMathTokenKind.Apply, token.Kind);
+        Assert.Equal("plus", token.Text);
+        Assert.Equal(2, token.Children?.Count);
+
+        Assert.Equal("x + y", loaded.ToLatex());
+    }
+
+    /// <summary>
     /// 驗證公式文件的 Round-trip 載入與儲存。
     /// </summary>
     [Fact]

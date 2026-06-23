@@ -153,20 +153,6 @@ internal static class OdfPackageSaver
         }
     }
 
-    private static Stream CreateTempStream(OdfPackage.OdfPackageSaveCollaborators ctx, long estimatedSize, bool async = false)
-    {
-        if (estimatedSize < TempFileThresholdBytes)
-            return new MemoryStream();
-
-        string tempDir = ctx.SaveOptions.TemporaryDirectory ?? Path.GetTempPath();
-        if (!Directory.Exists(tempDir))
-            Directory.CreateDirectory(tempDir);
-
-        string tempFilePath = Path.Combine(tempDir, "odfkit_" + Path.GetRandomFileName());
-        FileOptions options = FileOptions.DeleteOnClose;
-        if (async)
-            options |= FileOptions.Asynchronous;
-
-        return new FileStream(tempFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, options);
-    }
+    internal static Stream CreateTempStream(OdfPackage.OdfPackageSaveCollaborators ctx, long estimatedSize, bool async = false)
+        => OdfTempStreamFactory.Create(estimatedSize, ctx.SaveOptions.TemporaryDirectory, async, TempFileThresholdBytes);
 }

@@ -254,6 +254,23 @@ public sealed class OdfMathToken
         return new OdfMathToken(OdfMathTokenKind.Style, text, inner, null);
     }
 
+    /// <summary>
+    /// 建立 Content MathML <c>apply</c> 語意標記 token（基礎支援）。
+    /// </summary>
+    /// <param name="operatorName">運算子名稱（例如 <c>plus</c>、<c>times</c>、<c>eq</c>），序列化為對應的空元素</param>
+    /// <param name="operands">運算元 token 清單</param>
+    /// <returns>新的 <see cref="OdfMathToken"/></returns>
+    /// <exception cref="ArgumentException">當 <paramref name="operatorName"/> 為空白，或 <paramref name="operands"/> 為空時擲出</exception>
+    public static OdfMathToken Apply(string operatorName, params OdfMathToken[] operands)
+    {
+        if (string.IsNullOrWhiteSpace(operatorName))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfMathToken_PropertyCannotBeEmpty"), nameof(operatorName));
+        }
+
+        return new OdfMathToken(OdfMathTokenKind.Apply, operatorName, null, null, RequireChildren(operands, nameof(operands)));
+    }
+
     private static void RequireNotNull(OdfMathToken? token, string paramName)
     {
         if (token is null)

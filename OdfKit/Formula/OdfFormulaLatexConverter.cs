@@ -428,12 +428,77 @@ public static class OdfFormulaLatexConverter
                 AppendLatexToken(sb, token.Base!);
                 sb.Append('}');
                 break;
+            case OdfMathTokenKind.Apply:
+                AppendLatexApply(sb, token);
+                break;
         }
 
         if (prefix.Length > 0)
         {
             sb.Append('}');
         }
+    }
+
+    private static readonly Dictionary<string, string> ContentMathMlInfixOperators = new(StringComparer.Ordinal)
+    {
+        ["plus"] = " + ",
+        ["minus"] = " - ",
+        ["times"] = " \\cdot ",
+        ["divide"] = " \\div ",
+        ["eq"] = " = ",
+        ["neq"] = " \\neq ",
+        ["lt"] = " < ",
+        ["gt"] = " > ",
+        ["leq"] = " \\leq ",
+        ["geq"] = " \\geq ",
+    };
+
+    private static void AppendLatexApply(StringBuilder sb, OdfMathToken token)
+    {
+        IReadOnlyList<OdfMathToken> operands = token.Children ?? Array.Empty<OdfMathToken>();
+
+        if (token.Text == "power" && operands.Count == 2)
+        {
+            AppendLatexGroup(sb, operands[0]);
+            sb.Append('^');
+            AppendLatexGroup(sb, operands[1]);
+            return;
+        }
+
+        if (token.Text == "root" && operands.Count == 1)
+        {
+            sb.Append("\\sqrt");
+            AppendLatexGroup(sb, operands[0]);
+            return;
+        }
+
+        if (ContentMathMlInfixOperators.TryGetValue(token.Text, out string? infix) && operands.Count > 0)
+        {
+            for (int i = 0; i < operands.Count; i++)
+            {
+                if (i > 0)
+                {
+                    sb.Append(infix);
+                }
+
+                AppendLatexToken(sb, operands[i]);
+            }
+
+            return;
+        }
+
+        sb.Append("\\operatorname{").Append(token.Text).Append("}(");
+        for (int i = 0; i < operands.Count; i++)
+        {
+            if (i > 0)
+            {
+                sb.Append(", ");
+            }
+
+            AppendLatexToken(sb, operands[i]);
+        }
+
+        sb.Append(')');
     }
 
     private static void AppendLatexGroup(StringBuilder sb, OdfMathToken? token)
