@@ -128,4 +128,58 @@ public class MasterDocumentTests
             Directory.Delete(tempDir, recursive: true);
         }
     }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.ShiftHeadingOutlineLevels"/> 可調整文件中所有標題的大綱階層，
+    /// 並將結果限制在最小值 1。
+    /// </summary>
+    [Fact]
+    public void ShiftHeadingOutlineLevels_AdjustsHeadingsAndClampsToMinimumOne()
+    {
+        using var doc = TextDocument.Create();
+        var heading = doc.AddHeading("頂層標題", 1);
+
+        doc.ShiftHeadingOutlineLevels(1);
+        Assert.Equal(2, heading.OutlineLevel);
+
+        doc.ShiftHeadingOutlineLevels(-10);
+        Assert.Equal(1, heading.OutlineLevel);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextMasterDocument.MergeSubDocuments"/> 的 <c>subDocumentOutlineOffset</c>
+    /// 參數可位移子文件標題大綱階層，使其正確巢狀於主控文件本身的標題之下。
+    /// </summary>
+    [Fact]
+    public void MergeSubDocuments_WithOutlineOffset_ShiftsSubDocumentHeadingLevels()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+        string chapter1Path = Path.Combine(tempDir, "chapter1.odt");
+
+        try
+        {
+            using (var chapter1 = TextDocument.Create())
+            {
+                chapter1.AddHeading("第一章", 1);
+                chapter1.Save(chapter1Path);
+            }
+
+            using var master = TextMasterDocument.Create();
+            master.AddHeading("封面標題", 1);
+            master.AddSubDocumentReference("Chapter1", "chapter1.odt");
+
+            using TextDocument merged = master.MergeSubDocuments(tempDir, subDocumentOutlineOffset: 1);
+            var headings = merged.Body.Headings.Items;
+
+            var coverHeading = headings.Single(h => h.TextContent == "封面標題");
+            var chapterHeading = headings.Single(h => h.TextContent == "第一章");
+            Assert.Equal(1, coverHeading.OutlineLevel);
+            Assert.Equal(2, chapterHeading.OutlineLevel);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
 }

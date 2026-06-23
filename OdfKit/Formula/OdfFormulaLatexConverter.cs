@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using CSharpMath.Atom;
 using CSharpMath.Structures;
@@ -285,5 +286,177 @@ public static class OdfFormulaLatexConverter
         if (value == null || value.Length == 0)
             return string.Empty;
         return System.Security.SecurityElement.Escape(value);
+    }
+
+    /// <summary>
+    /// 將一組 <see cref="OdfMathToken"/> token 反向轉換為 LaTeX 公式字串（best-effort，
+    /// 因 LaTeX 與 MathML 並非一對一對應，部分語意可能無法完整保留）。
+    /// </summary>
+    /// <param name="tokens">要轉換的 token 清單。</param>
+    /// <returns>LaTeX 公式字串。</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="tokens"/> 為 <see langword="null"/> 時擲出。</exception>
+    public static string ToLatex(IReadOnlyList<OdfMathToken> tokens)
+    {
+        if (tokens is null)
+        {
+            throw new ArgumentNullException(nameof(tokens));
+        }
+
+        var sb = new StringBuilder();
+        foreach (OdfMathToken token in tokens)
+        {
+            AppendLatexToken(sb, token);
+        }
+
+        return sb.ToString();
+    }
+
+    private static void AppendLatexToken(StringBuilder sb, OdfMathToken token)
+    {
+        string? mathVariant = token.Attributes is not null && token.Attributes.TryGetValue("mathvariant", out string? variant) ? variant : null;
+        string prefix = mathVariant switch
+        {
+            "bold" => "\\mathbf{",
+            "italic" => "\\mathit{",
+            "bold-italic" => "\\boldsymbol{",
+            _ => string.Empty,
+        };
+        if (prefix.Length > 0)
+        {
+            sb.Append(prefix);
+        }
+
+        switch (token.Kind)
+        {
+            case OdfMathTokenKind.Identifier:
+            case OdfMathTokenKind.Number:
+            case OdfMathTokenKind.Operator:
+                sb.Append(token.Text);
+                break;
+            case OdfMathTokenKind.Text:
+                sb.Append("\\text{").Append(token.Text).Append('}');
+                break;
+            case OdfMathTokenKind.Superscript:
+                AppendLatexGroup(sb, token.Base);
+                sb.Append('^');
+                AppendLatexGroup(sb, token.Script);
+                break;
+            case OdfMathTokenKind.Subscript:
+                AppendLatexGroup(sb, token.Base);
+                sb.Append('_');
+                AppendLatexGroup(sb, token.Script);
+                break;
+            case OdfMathTokenKind.Fraction:
+                sb.Append("\\frac");
+                AppendLatexGroup(sb, token.Base);
+                AppendLatexGroup(sb, token.Script);
+                break;
+            case OdfMathTokenKind.Radical:
+                if (token.Script is null)
+                {
+                    sb.Append("\\sqrt");
+                    AppendLatexGroup(sb, token.Base);
+                }
+                else
+                {
+                    sb.Append("\\sqrt[");
+                    AppendLatexToken(sb, token.Script);
+                    sb.Append(']');
+                    AppendLatexGroup(sb, token.Base);
+                }
+                break;
+            case OdfMathTokenKind.Row:
+                AppendLatexChildren(sb, token.Children);
+                break;
+            case OdfMathTokenKind.Matrix:
+                sb.Append("\\begin{matrix}");
+                if (token.Children is not null)
+                {
+                    for (int i = 0; i < token.Children.Count; i++)
+                    {
+                        IReadOnlyList<OdfMathToken> cells = token.Children[i].Children ?? Array.Empty<OdfMathToken>();
+                        for (int j = 0; j < cells.Count; j++)
+                        {
+                            if (j > 0)
+                            {
+                                sb.Append(" & ");
+                            }
+
+                            AppendLatexToken(sb, cells[j]);
+                        }
+
+                        if (i < token.Children.Count - 1)
+                        {
+                            sb.Append(" \\\\ ");
+                        }
+                    }
+                }
+
+                sb.Append("\\end{matrix}");
+                break;
+            case OdfMathTokenKind.Under:
+                sb.Append("\\underset");
+                AppendLatexGroup(sb, token.Script);
+                AppendLatexGroup(sb, token.Base);
+                break;
+            case OdfMathTokenKind.Over:
+                sb.Append("\\overset");
+                AppendLatexGroup(sb, token.Script);
+                AppendLatexGroup(sb, token.Base);
+                break;
+            case OdfMathTokenKind.UnderOver:
+                if (token.Children is { Count: 3 })
+                {
+                    sb.Append("\\overset{");
+                    AppendLatexToken(sb, token.Children[2]);
+                    sb.Append("}{\\underset{");
+                    AppendLatexToken(sb, token.Children[1]);
+                    sb.Append("}{");
+                    AppendLatexToken(sb, token.Children[0]);
+                    sb.Append("}}");
+                }
+
+                break;
+            case OdfMathTokenKind.Fenced:
+                string[] delimiters = token.Text.Split('|');
+                sb.Append("\\left").Append(delimiters.Length > 0 ? delimiters[0] : "(");
+                AppendLatexToken(sb, token.Base!);
+                sb.Append("\\right").Append(delimiters.Length > 1 ? delimiters[1] : ")");
+                break;
+            case OdfMathTokenKind.Style:
+                sb.Append(token.Text == "true" ? "\\displaystyle{" : "\\textstyle{");
+                AppendLatexToken(sb, token.Base!);
+                sb.Append('}');
+                break;
+        }
+
+        if (prefix.Length > 0)
+        {
+            sb.Append('}');
+        }
+    }
+
+    private static void AppendLatexGroup(StringBuilder sb, OdfMathToken? token)
+    {
+        sb.Append('{');
+        if (token is not null)
+        {
+            AppendLatexToken(sb, token);
+        }
+
+        sb.Append('}');
+    }
+
+    private static void AppendLatexChildren(StringBuilder sb, IReadOnlyList<OdfMathToken>? children)
+    {
+        if (children is null)
+        {
+            return;
+        }
+
+        foreach (OdfMathToken child in children)
+        {
+            AppendLatexToken(sb, child);
+        }
     }
 }

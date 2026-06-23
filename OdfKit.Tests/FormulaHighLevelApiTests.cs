@@ -232,6 +232,41 @@ public class FormulaHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdfFormulaDocument.ToLatex"/> 可將分數、根號與上標結構反向轉換為 LaTeX。
+    /// </summary>
+    [Fact]
+    public void ToLatex_ConvertsFractionRadicalAndSuperscript()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+            .WithTokens(
+                OdfMathToken.Fraction(OdfMathToken.Number("1"), OdfMathToken.Number("2")),
+                OdfMathToken.Operator("+"),
+                OdfMathToken.Radical(OdfMathToken.Number("9")),
+                OdfMathToken.Superscript(OdfMathToken.Identifier("x"), OdfMathToken.Number("2")))
+            .Build();
+
+        string latex = formula.ToLatex();
+
+        Assert.Contains("\\frac{1}{2}", latex);
+        Assert.Contains("\\sqrt{9}", latex);
+        Assert.Contains("{x}^{2}", latex);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfFormulaDocument.ToLatex"/> 與 <see cref="OdfFormulaDocument.FromLatex"/>
+    /// 對基本算式具備語意往返一致性（轉為 MathML 再轉回 LaTeX 後，結構保持等價）。
+    /// </summary>
+    [Fact]
+    public void ToLatex_RoundTripsThroughFromLatex()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.FromLatex("\\frac{a}{b}");
+        string latex = formula.ToLatex();
+
+        using OdfFormulaDocument reconverted = OdfFormulaDocument.FromLatex(latex);
+        Assert.Equal(formula.GetMathML(), reconverted.GetMathML());
+    }
+
+    /// <summary>
     /// 驗證公式文件的 Round-trip 載入與儲存。
     /// </summary>
     [Fact]

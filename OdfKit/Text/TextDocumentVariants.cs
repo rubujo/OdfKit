@@ -148,9 +148,13 @@ public sealed class TextMasterDocument : TextDocument
     /// </summary>
     /// <param name="baseDirectory">解析子文件參照相對路徑時所使用的基準目錄。</param>
     /// <param name="options">合併設定選項；若為 <see langword="null"/> 則使用預設選項。</param>
+    /// <param name="subDocumentOutlineOffset">
+    /// 套用至每份子文件標題大綱階層的位移量，套用後再併入（見
+    /// <see cref="TextDocument.ShiftHeadingOutlineLevels"/>）；預設為 <c>0</c>，不調整。
+    /// </param>
     /// <returns>合併完成的新 <see cref="TextDocument"/> 執行個體。</returns>
     /// <exception cref="ArgumentException">當 <paramref name="baseDirectory"/> 為空白時擲出。</exception>
-    public TextDocument MergeSubDocuments(string baseDirectory, OdfMergeOptions? options = null)
+    public TextDocument MergeSubDocuments(string baseDirectory, OdfMergeOptions? options = null, int subDocumentOutlineOffset = 0)
     {
         if (string.IsNullOrWhiteSpace(baseDirectory))
         {
@@ -171,6 +175,11 @@ public sealed class TextMasterDocument : TextDocument
             {
                 string fullPath = Path.Combine(baseDirectory, href);
                 using TextDocument subDoc = TextDocument.Load(fullPath);
+                if (subDocumentOutlineOffset != 0)
+                {
+                    subDoc.ShiftHeadingOutlineLevels(subDocumentOutlineOffset);
+                }
+
                 merged.AppendDocument(subDoc, options);
             }
             else

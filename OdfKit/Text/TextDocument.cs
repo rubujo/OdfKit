@@ -257,6 +257,43 @@ public partial class TextDocument : OdfDocument
     public OdfTableOfContents AddTableOfContents(string title = "Table of Contents", int outlineLevel = 10)
         => TextDocumentTocEngine.AddTableOfContents(this, CoreCollaborators, title, outlineLevel);
 
+    /// <summary>
+    /// 將文件中所有標題（包含區段內巢狀標題）的大綱階層整體位移指定量。
+    /// </summary>
+    /// <param name="offset">位移量；正值表示降階（數字變大），負值表示升階。結果會限制最小為 1。</param>
+    /// <remarks>
+    /// 適用於將子文件併入主控文件前，調整其標題大綱階層以接續主控文件本身的階層結構
+    /// （例如主控文件已有第 1 階層的「上篇」標題，子文件章節標題需位移為第 2 階層才能正確巢狀）。
+    /// </remarks>
+    public void ShiftHeadingOutlineLevels(int offset)
+    {
+        if (offset == 0)
+        {
+            return;
+        }
+
+        ShiftHeadingOutlineLevelsRecursive(BodyTextRoot, offset);
+    }
+
+    private static void ShiftHeadingOutlineLevelsRecursive(OdfNode node, int offset)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "h" &&
+                child.NamespaceUri == OdfNamespaces.Text)
+            {
+                int current = int.TryParse(child.GetAttribute("outline-level", OdfNamespaces.Text), NumberStyles.Integer, CultureInfo.InvariantCulture, out int level)
+                    ? level
+                    : 1;
+                int updated = Math.Max(1, current + offset);
+                child.SetAttribute("outline-level", OdfNamespaces.Text, updated.ToString(CultureInfo.InvariantCulture), "text");
+            }
+
+            ShiftHeadingOutlineLevelsRecursive(child, offset);
+        }
+    }
+
 
     #endregion
 

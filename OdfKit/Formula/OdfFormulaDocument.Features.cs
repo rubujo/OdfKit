@@ -48,6 +48,13 @@ public partial class OdfFormulaDocument
     }
 
     /// <summary>
+    /// 將目前 MathML 公式內容反向轉換為 LaTeX 公式字串（best-effort，因 LaTeX 與 MathML
+    /// 並非一對一對應，部分語意可能無法完整保留，與既有 <see cref="LoadFromLatex"/> 對稱）。
+    /// </summary>
+    /// <returns>LaTeX 公式字串</returns>
+    public string ToLatex() => OdfFormulaLatexConverter.ToLatex(GetMathTokens());
+
+    /// <summary>
     /// 使用 <see cref="OdfMathBuilder"/> 組合委派建立並載入 <see cref="OdfFormulaDocument"/>。
     /// </summary>
     /// <param name="build">用於組合 MathML token 樹狀結構的委派</param>
