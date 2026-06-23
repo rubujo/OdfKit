@@ -13,7 +13,7 @@ repo 內可直接執行的範本 manifest 位於 `tests/fixtures/corpus/manifest
 - fixture 必須是 generated、專案自有、授權清楚，或已去識別化且可再散布。
 - fixture 應保持小型；大型真實世界 corpus 改由 `ODFKIT_PARITY_CORPUS_ROOT`
   指向本機或 CI artifact。
-- 不提交含個資、商業機密、未知授權或不可再散布內容的文件。
+- 不提交含個資、敏感資料、未知授權或不可再散布內容的文件。
 - 每個 fixture 必須有預期驗證結果與 round-trip 策略。
 
 ## 欄位

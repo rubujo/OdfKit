@@ -1,7 +1,7 @@
 # ODF Toolkit Parity
 
 本文件定義 OdfKit 對標 ODF Toolkit、ODFDOM 與 ODF Validator 的完成線。
-此線是 OdfKit 的「官方 parity」基準；商業文件元件能力另列為成熟度路線圖，
+此線是 OdfKit 的「官方 parity」基準；其他文件元件能力另列為成熟度路線圖，
 不作為核心 ODF 規格可信度的必要條件。
 
 ## 對標來源
@@ -130,7 +130,7 @@ corpus 完成線；外部 baseline mismatch 若未列入 documented exception，
 - fixture path
 - OdfKit classification
 - external classification
-- OdfKit issue codes 或外部 output 摘要
+- OdfKit 問題代碼或外部 output 摘要
 - profile
 - 暫時接受差異的原因
 

@@ -1,7 +1,8 @@
 # OdfKit .NET 10.0 單檔 C# Script 範例使用說明
 
-本目錄包含了一個全新設計的 `OdfKit` 全功能使用範例。
-此範例採用 **C# 14** 與 **.NET 10.0** 引入的 **單檔指令碼 (File-based apps)** 特性，您不需要建立傳統的 `.csproj` 專案檔，即可直接執行本範例程式碼。
+本目錄包含一個以 `Sample.cs` 為主的 `OdfKit` 全功能展示範例。
+此範例採用 **C# 14** 與 **.NET 10.0** 引入的 **單檔指令碼 (File-based apps)** 特性，
+不需要建立傳統 `.csproj`，即可直接執行。
 
 ---
 
@@ -13,12 +14,19 @@
   - `#:project <path.csproj>`：可用於直接參考本地 C# 專案。
   - `#:package <package>@<version>`：可用於下載並參考 NuGet 套件。
 
-本範例 `Sample.cs` 即是透過頂部的檔案指令，直接連結專案目錄下的主程式庫與擴充套件：
+本範例 `Sample.cs` 透過頂部檔案指令，直接參考核心程式庫與多個擴充套件：
 ```csharp
 #:project ../OdfKit/OdfKit.csproj
 #:project ../OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj
 #:project ../OdfKit.Extensions.Html/OdfKit.Extensions.Html.csproj
+#:project ../OdfKit.Extensions.Ooxml/OdfKit.Extensions.Ooxml.csproj
+#:project ../OdfKit.Extensions.Collaboration/OdfKit.Extensions.Collaboration.csproj
+#:project ../OdfKit.Extensions.Rdf/OdfKit.Extensions.Rdf.csproj
+#:project ../OdfKit.Extensions.Imaging/OdfKit.Extensions.Imaging.csproj
 ```
+
+因此它是**整合展示範例**，不是最小入門範例。若只需要最短上手流程，請先讀
+[docs/getting-started.md](../docs/getting-started.md)。
 
 ---
 
@@ -40,13 +48,13 @@
    ```bash
    dotnet run samples/Sample.cs
    ```
-4. 執行完成後，範例將在 `samples/output/` 目錄下產生示範檔案。
+4. 執行完成後，範例將在 `samples/output/` 目錄下產生示範檔案與轉換結果。
 
 ---
 
 ## 示範涵蓋功能說明
 
-本範例程式碼完整展示了 `OdfKit` 以下的核心能力：
+本範例程式碼展示了 `OdfKit` 與多個擴充套件的整合能力：
 
 1. **文字文件 (ODT) 建立與編排**：
    - 建立標題與段落，並套用粗體、斜體等字型樣式。
@@ -66,15 +74,21 @@
    - 示範在大數據情境下，以小於 1 MB 記憶體佔用的超高效率模式，流式寫入多達 100 列以上的表格明細，有效杜絕記憶體不足 (OOM) 錯誤。
 5. **中介資料 (Metadata) 讀取與更新**：
    - 展示如何載入既有檔案、讀取文件 Metadata 標題與建立者資訊，並進行修改更新與二次存檔。
-6. **進階轉檔 Extensions (PDF / HTML 導出)**：
+6. **進階轉檔與擴充套件整合**：
    - 使用 `OdfPdfExporter` 將 ODT 轉換並渲染匯出為 PDF 檔案。
    - 使用 `OdfHtmlExporter` 將 ODT 轉換並匯出為 HTML 網頁。
+   - 使用 `OdfToDocxConverter` / `OdfToXlsxConverter` 轉出 OOXML。
+   - 使用 `OdtOperationsExporter` / `OdtOperationsImporter` 展示協作操作匯出與回讀。
+   - 使用 `RdfMetadata` 展示 RDF 三元組寫入與 SPARQL 查詢。
+   - 使用 `OdfImageExporter` 將工作表渲染為 PNG。
+7. **低記憶體串流寫入**：
+   - 示範 `OdsStreamWriter` 與 `OdtStreamWriter` 的串流輸出。
 
 ---
 
 ## 預期產出檔案
 
-執行成功後，您可以在 `samples/output/` 資料夾下找到以下產出：
+執行成功後，您可以在 `samples/output/` 資料夾下找到以下主要產出：
 
 | 檔名 | 格式 | 說明 |
 | :--- | :--- | :--- |
@@ -83,6 +97,26 @@
 | **`output_spreadsheet.ods`** | ODF 試算表 | 包含銷售統計資料與總計 SUM 公式的表格。 |
 | **`output_presentation.odp`** | ODF 簡報 | 包含兩張投影片、轉場效果與形狀的簡報。 |
 | **`output_stream.ods`** | ODF 試算表 | 透過 `OdsStreamWriter` 大量串流寫入的明細表。 |
+| **`output_stream.odt`** | ODF 文字文件 | 透過 `OdtStreamWriter` 串流寫入的文字文件。 |
 | **`output_pdf.pdf`** | PDF 檔案 | 將 ODT 內容完美轉譯後的 PDF 格式文件。 |
 | **`output_html.html`** | HTML 網頁 | 將 ODT 內容轉換後的純 HTML 網頁。 |
+| **`output_csv.csv`** | CSV 檔案 | 由 ODS 匯出之 CSV。 |
+| **`output_docx.docx`** | Word 文件 | 由 ODT 轉出的 DOCX。 |
+| **`output_xlsx.xlsx`** | Excel 文件 | 由 ODS 轉出的 XLSX。 |
+| **`output_collaboration_imported.odt`** | ODF 文字文件 | 由協作操作 JSON 重新匯入產生。 |
+| **`output_sheet_rendering.png`** | PNG 圖片 | 由工作表格線渲染出的影像。 |
 
+若目標檔名已被占用，`Sample.cs` 也可能建立 `output_stream_backup.ods` 或
+`output_stream_backup.odt` 做為備援輸出。
+
+## 此範例目前未明說的限制
+
+- `Sample.cs` 為**大型整合展示腳本**，覆蓋面廣，但不適合作為每個 API 的最小示例。
+- RDF 展示會輸出查詢結果到主控台，但不額外產生獨立 RDF 檔案。
+- 範例假設本 repository 結構完整存在，無法單獨複製 `Sample.cs` 到其他目錄直接執行。
+
+## 相關文件
+
+- [tools/README.md](../tools/README.md)
+- [docs/getting-started.md](../docs/getting-started.md)
+- [docs/cookbook.md](../docs/cookbook.md)
