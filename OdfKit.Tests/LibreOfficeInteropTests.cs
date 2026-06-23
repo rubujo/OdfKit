@@ -1675,6 +1675,8 @@ public class LibreOfficeInteropTests
         };
         startInfo.ArgumentList.Add("run");
         startInfo.ArgumentList.Add("samples/Sample.cs");
+        startInfo.ArgumentList.Add("-p:RunAnalyzersDuringBuild=false");
+        startInfo.ArgumentList.Add("-p:UseSharedCompilation=false");
 
         using (var process = Process.Start(startInfo) ?? throw new InvalidOperationException("無法啟動 dotnet run。"))
         {

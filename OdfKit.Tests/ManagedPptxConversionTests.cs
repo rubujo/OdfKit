@@ -59,7 +59,7 @@ public class ManagedPptxConversionTests
 
         pptxStream.Position = 0;
         using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
-        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
 
         OpenXmlPresentationPart? presentationPart = pptx.PresentationPart;
         Assert.NotNull(presentationPart);
@@ -235,7 +235,7 @@ public class ManagedPptxConversionTests
 
         pptxStream.Position = 0;
         using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
-        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
         OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
         A.Run[] runs = slidePart.Slide!.Descendants<A.Run>()
             .Where(run => run.GetFirstChild<A.Text>()?.Text is "First" or "Second" or "Third" or "Fourth")
@@ -295,7 +295,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             P.Shape textShape = Assert.Single(
                 slidePart.Slide!.Descendants<P.Shape>(),
@@ -348,7 +348,7 @@ public class ManagedPptxConversionTests
 
         pptxStream.Position = 0;
         using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
-        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
         OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
         A.Table table = Assert.Single(slidePart.Slide!.Descendants<A.Table>());
         Assert.Equal(2, table.Elements<A.TableRow>().Count());
@@ -436,7 +436,7 @@ public class ManagedPptxConversionTests
 
         pptxStream.Position = 0;
         using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
-        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
         OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
         A.TableCell[] cells = Assert.Single(slidePart.Slide!.Descendants<A.Table>()).Descendants<A.TableCell>().ToArray();
         Assert.Equal(4, cells.Length);
@@ -558,7 +558,7 @@ public class ManagedPptxConversionTests
 
         pptxStream.Position = 0;
         using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
-        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
         A.ColorScheme colorScheme = Assert.Single(pptx.PresentationPart!.SlideMasterParts)
             .ThemePart!
             .Theme!
@@ -599,7 +599,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
         }
 
         pptxStream.Position = 0;
@@ -675,7 +675,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
         }
 
         pptxStream.Position = 0;
@@ -723,7 +723,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
         }
 
         pptxStream.Position = 0;
@@ -751,7 +751,7 @@ public class ManagedPptxConversionTests
 
         pptxStream.Position = 0;
         using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
-        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
         A.FontScheme fontScheme = Assert.Single(pptx.PresentationPart!.SlideMasterParts)
             .ThemePart!
             .Theme!
@@ -831,7 +831,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             P.Picture pptxPicture = Assert.Single(slidePart.Slide!.Descendants<P.Picture>());
             Assert.Equal("Revenue chart", pptxPicture.NonVisualPictureProperties?.NonVisualDrawingProperties?.Description?.Value);
@@ -870,7 +870,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             A.SourceRectangle sourceRectangle = Assert.Single(slidePart.Slide!.Descendants<A.SourceRectangle>());
             Assert.Equal(20000, sourceRectangle.Left?.Value);
@@ -896,7 +896,7 @@ public class ManagedPptxConversionTests
         OdpToPptxConverter.Convert(converted, clearedPptxStream);
         clearedPptxStream.Position = 0;
         using PackagingPresentationDocument clearedPptx = PackagingPresentationDocument.Open(clearedPptxStream, false);
-        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(clearedPptx));
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(clearedPptx, TestContext.Current.CancellationToken));
         OpenXmlSlidePart clearedSlidePart = Assert.Single(clearedPptx.PresentationPart!.SlideParts);
         Assert.Empty(clearedSlidePart.Slide!.Descendants<A.SourceRectangle>());
     }
@@ -920,7 +920,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             P.Shape convertedShape = Assert.Single(
                 slidePart.Slide!.Descendants<P.Shape>(),
@@ -960,7 +960,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             P.Shape pptxShape = Assert.Single(
                 slidePart.Slide!.Descendants<P.Shape>(),
@@ -997,7 +997,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             P.Shape pptxLine = Assert.Single(
                 slidePart.Slide!.Descendants<P.Shape>(),
@@ -1034,7 +1034,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             A.Transform2D transform = Assert.Single(
                 slidePart.Slide!.Descendants<P.Shape>(),
@@ -1073,7 +1073,7 @@ public class ManagedPptxConversionTests
 
         pptxStream.Position = 0;
         using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
-        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
         OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
         P.Transition transition = Assert.Single(slidePart.Slide!.Elements<P.Transition>());
         Assert.Equal("2500", transition.Duration?.Value);
@@ -1123,7 +1123,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             P.AnimateEffect[] effects = slidePart.Slide!.Descendants<P.AnimateEffect>().ToArray();
             Assert.Equal(2, effects.Length);
@@ -1191,7 +1191,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             P.PlaceholderShape[] placeholders = slidePart.Slide!.Descendants<P.PlaceholderShape>().ToArray();
             Assert.Contains(placeholders, placeholder => placeholder.Type?.Value == P.PlaceholderValues.Title);
@@ -1229,7 +1229,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             Assert.Equal("Executive Summary", slidePart.Slide!.CommonSlideData?.Name?.Value);
         }
@@ -1251,7 +1251,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             P.SlideSize slideSize = pptx.PresentationPart!.Presentation!.SlideSize!;
             Assert.Equal(ToEmus(OdfLength.FromCentimeters(25)), slideSize.Cx?.Value);
             Assert.Equal(ToEmus(OdfLength.FromCentimeters(14)), slideSize.Cy?.Value);
@@ -1276,7 +1276,7 @@ public class ManagedPptxConversionTests
         pptxStream.Position = 0;
         using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
         {
-            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx));
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
             Assert.Equal(P.SlideLayoutValues.TitleOnly, slidePart.SlideLayoutPart?.SlideLayout?.Type?.Value);
         }
@@ -1660,8 +1660,8 @@ public class ManagedPptxConversionTests
         Assert.Equal("#4F81BD", shape.StrokeColor); // Accent1
 
         // 驗證是否套用了 Theme 的 EffectStyle 中的陰影 (draw:shadow="visible", draw:shadow-color="#1F497D")
-        string shadow = shape.Document.StyleEngine.GetStyleProperty(shape.Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "shadow", OdfNamespaces.Draw, "graphic");
-        string shadowColor = shape.Document.StyleEngine.GetStyleProperty(shape.Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "shadow-color", OdfNamespaces.Draw, "graphic");
+        string? shadow = shape.Document.StyleEngine.GetStyleProperty(shape.Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "shadow", OdfNamespaces.Draw, "graphic");
+        string? shadowColor = shape.Document.StyleEngine.GetStyleProperty(shape.Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "shadow-color", OdfNamespaces.Draw, "graphic");
         Assert.Equal("visible", shadow);
         Assert.Equal("#1F497D", shadowColor); // Accent3 maps to effect style index 1, which has shadow using Dark2 (1F497D)
     }
@@ -1723,7 +1723,7 @@ public class ManagedPptxConversionTests
 
         // 驗證 OpenXML 文件結構合法性
         var validator = new OpenXmlValidator(FileFormatVersions.Office2019);
-        var validationErrors = validator.Validate(pptx).ToList();
+        var validationErrors = validator.Validate(pptx, TestContext.Current.CancellationToken).ToList();
         Assert.Empty(validationErrors);
 
         var presentationPart = pptx.PresentationPart;
@@ -1731,12 +1731,28 @@ public class ManagedPptxConversionTests
 
         // 驗證 SlideMaster 與 SlideLayout 背景樣式參考
         var masterPart = Assert.Single(presentationPart.SlideMasterParts);
-        Assert.NotNull(masterPart.SlideMaster.CommonSlideData?.Background?.BackgroundStyleReference);
-        Assert.Equal(1U, masterPart.SlideMaster.CommonSlideData.Background.BackgroundStyleReference.Index.Value);
+        var slideMaster = masterPart.SlideMaster;
+        Assert.NotNull(slideMaster);
+        var commonSlideData = slideMaster.CommonSlideData;
+        Assert.NotNull(commonSlideData);
+        var background = commonSlideData.Background;
+        Assert.NotNull(background);
+        var bgRef = background.BackgroundStyleReference;
+        Assert.NotNull(bgRef);
+        Assert.NotNull(bgRef.Index);
+        Assert.Equal(1U, bgRef.Index.Value);
 
         var layoutPart = Assert.Single(masterPart.SlideLayoutParts);
-        Assert.NotNull(layoutPart.SlideLayout.CommonSlideData?.Background?.BackgroundStyleReference);
-        Assert.Equal(1U, layoutPart.SlideLayout.CommonSlideData.Background.BackgroundStyleReference.Index.Value);
+        var slideLayout = layoutPart.SlideLayout;
+        Assert.NotNull(slideLayout);
+        var layoutData = slideLayout.CommonSlideData;
+        Assert.NotNull(layoutData);
+        var layoutBg = layoutData.Background;
+        Assert.NotNull(layoutBg);
+        var layoutBgRef = layoutBg.BackgroundStyleReference;
+        Assert.NotNull(layoutBgRef);
+        Assert.NotNull(layoutBgRef.Index);
+        Assert.Equal(1U, layoutBgRef.Index.Value);
 
         // 驗證 Slide 內容
         var slidePart = Assert.Single(presentationPart.SlideParts);

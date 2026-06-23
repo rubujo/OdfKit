@@ -173,7 +173,7 @@ public class OdfExternalValidatorAsyncTests
 
         await Assert.ThrowsAsync<FileNotFoundException>(async () =>
         {
-            await OdfExternalValidator.ValidateWithOdfValidatorAsync(nonexistentDocumentPath, jarPath: "dummy.jar");
+            await OdfExternalValidator.ValidateWithOdfValidatorAsync(nonexistentDocumentPath, jarPath: "dummy.jar", cancellationToken: TestContext.Current.CancellationToken);
         });
     }
 

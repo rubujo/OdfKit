@@ -38,7 +38,7 @@
     <ProjectReference Include="..\OdfKit.Extensions.Collaboration\OdfKit.Extensions.Collaboration.csproj" />
     <ProjectReference Include="..\tools\OdfKit.Cli\OdfKit.Cli.csproj" />
     <ProjectReference Include="..\tools\OdfSchemaGenerator\OdfSchemaGenerator.csproj" />
-    <ProjectReference Include="MockSoffice\MockSoffice.csproj" ReferenceOutputAssembly="false" OutputItemType="None" />
+    <ProjectReference Include="MockSoffice\MockSoffice.csproj" ReferenceOutputAssembly="false" OutputItemType="None" Private="false" />
   </ItemGroup>
 
   <Target Name="CopyMockSoffice" AfterTargets="Build">

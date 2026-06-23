@@ -343,7 +343,7 @@ public class FourFormatApiScenarioTests
     {
         const string routePoints = "0cm 0cm 2cm 1cm 4cm 0cm";
         using var stream = new MemoryStream();
-        string groupName;
+        string? groupName;
         using (var document = DrawingDocument.Create())
         {
             OdfDrawPage page = document.AddPage("場景頁");

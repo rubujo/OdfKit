@@ -699,7 +699,7 @@ public class ManagedTextExportTests
 
         Assert.Single(github.BodyTextRoot.Children, node => node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table);
         Assert.Single(gitlab.BodyTextRoot.Children, node => node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table);
-        Assert.Empty(commonMark.BodyTextRoot.Children.Where(node => node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table));
+        Assert.DoesNotContain(commonMark.BodyTextRoot.Children, node => node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table);
     }
 
     [Fact]
@@ -838,7 +838,7 @@ public class ManagedTextExportTests
         using TextDocument importedCommonMark = gitLab.ToOdtTextDocument(OdfMarkdownImportOptions.CommonMark);
 
         Assert.Single(importedGitLab.BodyTextRoot.Children, node => node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table);
-        Assert.Empty(importedCommonMark.BodyTextRoot.Children.Where(node => node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table));
+        Assert.DoesNotContain(importedCommonMark.BodyTextRoot.Children, node => node.LocalName == "table" && node.NamespaceUri == OdfNamespaces.Table);
     }
 
     [Fact]
