@@ -32,6 +32,7 @@ permissions:
 jobs:
   typed-dom-coverage:
     runs-on: windows-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6

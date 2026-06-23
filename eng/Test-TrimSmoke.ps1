@@ -44,6 +44,8 @@ try {
     $modeLabel = if ($PublishAot) { "PublishTrimmed + NativeAOT" } else { "PublishTrimmed" }
     Write-Host "$modeLabel 發佈 TrimSmoke ($Configuration / win-x64)…"
 
+    dotnet restore $project
+
     $publishArgs = @(
         "publish", $project,
         "-c", $Configuration,

@@ -86,12 +86,18 @@ public class OdfExternalValidatorAsyncTests
 
     private static void TryDelete(string path)
     {
+        if (!path.StartsWith(Path.GetTempPath(), StringComparison.Ordinal))
+            return;
+
         try
         {
             if (File.Exists(path))
                 File.Delete(path);
         }
         catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
         {
         }
     }

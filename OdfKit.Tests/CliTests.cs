@@ -315,6 +315,8 @@ public class CliTests
     public void ValidateJsonOutputPreservesReadableUnicodeText()
     {
         string path = CreateTempPath(".odt");
+        CultureInfo originalUiCulture = CultureInfo.CurrentUICulture;
+        CultureInfo.CurrentUICulture = new CultureInfo("zh-TW");
         try
         {
             using (FileStream stream = File.Create(path))
@@ -352,6 +354,7 @@ public class CliTests
         }
         finally
         {
+            CultureInfo.CurrentUICulture = originalUiCulture;
             TryDelete(path);
         }
     }
@@ -1405,14 +1408,30 @@ public class CliTests
 
     private static string CreateBaselineCommand(int exitCode)
     {
-        string path = CreateTempPath(".cmd");
+        if (OperatingSystem.IsWindows())
+        {
+            string path = CreateTempPath(".cmd");
+            File.WriteAllText(
+                path,
+                "@echo off\r\n" +
+                "echo baseline-ok %1\r\n" +
+                "exit /b " + exitCode.ToString(CultureInfo.InvariantCulture) + "\r\n",
+                Encoding.ASCII);
+            return path;
+        }
+
+        string shPath = CreateTempPath(".sh");
         File.WriteAllText(
-            path,
-            "@echo off\r\n" +
-            "echo baseline-ok %1\r\n" +
-            "exit /b " + exitCode.ToString(CultureInfo.InvariantCulture) + "\r\n",
-            Encoding.ASCII);
-        return path;
+            shPath,
+            "#!/bin/sh\n" +
+            "echo baseline-ok \"$1\"\n" +
+            "exit " + exitCode.ToString(CultureInfo.InvariantCulture) + "\n");
+        File.SetUnixFileMode(
+            shPath,
+            UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute
+            | UnixFileMode.GroupRead | UnixFileMode.GroupExecute
+            | UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
+        return shPath;
     }
 
     private static void WriteCorpusManifest(

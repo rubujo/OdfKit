@@ -67,6 +67,9 @@ nunit-agent*
 project.lock.json
 project.assets.json
 
+# CI-local NuGet package cache (see .github/actions/setup-dotnet-odfkit)
+.nuget/
+
 # Tooling
 .tools/
 .cli/

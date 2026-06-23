@@ -55,6 +55,7 @@ if (Test-Path $odfKitObj) {
 }
 
 $sw = [System.Diagnostics.Stopwatch]::StartNew()
+dotnet restore $odfKitProject
 dotnet build $odfKitProject -c $Configuration -f net10.0 --no-restore -v minimal
 if ($LASTEXITCODE -ne 0) {
     throw "OdfKit 建置失敗，結束碼 $LASTEXITCODE"

@@ -198,6 +198,11 @@ namespace OdfKit.Tests
         [Fact]
         public async Task TestSandboxCleanupLeakWithActiveHandleLock()
         {
+            if (!OperatingSystem.IsWindows())
+            {
+                Assert.Skip("獨佔檔案鎖阻擋清理導致沙箱目錄洩漏，屬 Windows 專屬檔案鎖定語意；POSIX 系統可在控制代碼開啟時成功 unlink，略過本測試。");
+            }
+
             string mockSoffice = GetMockSofficePath();
             Assert.False(string.IsNullOrEmpty(mockSoffice), "MockSoffice not found.");
 
