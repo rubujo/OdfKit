@@ -10,6 +10,7 @@
 | 快速評估 OdfKit 是否符合需求 | [README](../README.md) | [套件目錄與選型指南](package-catalog.md)、[ODF 格式支援矩陣](odf-format-support.md) |
 | 決定要安裝哪些套件 | [套件目錄與選型指南](package-catalog.md) | [NuGet 相容矩陣](nuget-compatibility-matrix.md)、[Rendering 後端部署](rendering-backend-deployment.md) |
 | 建立第一個範例或驗證 PoC | [快速開始](getting-started.md) | [Cookbook](cookbook.md)、[samples/README.md](../samples/README.md) |
+| 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[ODF 格式支援矩陣](odf-format-support.md) |
 | 規劃部署、升級與版本交付 | [版本與交付資訊](version-delivery.md) | [GitHub Release 發佈指南](github-release-publishing.md)、[CHANGELOG](../CHANGELOG.md) |
 | 確認功能邊界、互通性與驗證證據 | [ODF 格式支援矩陣](odf-format-support.md) | [ODF 1.4 覆蓋](odf14-coverage.md)、[LibreOffice 互通矩陣](libreoffice-interop-matrix.md)、[OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md) |
 
@@ -23,6 +24,8 @@
 | [套件目錄與選型指南](package-catalog.md) | 依情境挑選核心套件、擴充套件與工具 |
 | [NuGet 相容矩陣](nuget-compatibility-matrix.md) | 套件清單、目標框架、安裝策略 |
 | [ODF 格式支援矩陣](odf-format-support.md) | 功能覆蓋、狀態標記與測試證據 |
+| [ODF Profile 來源](odf-profile-sources.md) | 內建 Profile 的來源、權威層級與驗證狀態 |
+| [i18n 與在地化](i18n-localization.md) | 語系字典、訊息回退與 `OdfLocalizer` 使用方式 |
 | [Managed-first 轉檔策略](managed-first-conversion-strategy.md) | 純 managed 與外部後端的分工原則 |
 | [版本與交付資訊](version-delivery.md) | 交付管道、版本原則與安裝參考 |
 
