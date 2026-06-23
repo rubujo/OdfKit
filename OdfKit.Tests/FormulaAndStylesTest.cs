@@ -1021,7 +1021,7 @@ namespace OdfKit.Tests
             const string realTtcPath = @"C:\Windows\Fonts\Nirmala.ttc";
             if (!File.Exists(realTtcPath))
             {
-                Assert.Skip("找不到系統真實 TTC 字型檔案，略過真機字型格式偵測測試。");
+                Assert.Skip("找不到系統真實 TTC 字型檔案，略過真機字型格式偵測。");
             }
 
             Assert.True(OdfFontResolver.IsTrueTypeCollection(realTtcPath));

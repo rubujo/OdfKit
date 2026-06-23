@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Diagnostics;
@@ -113,6 +113,12 @@ namespace MockSoffice
             if (format != null && format.Contains("delay"))
             {
                 Thread.Sleep(2000);
+            }
+            else if (!string.IsNullOrEmpty(outDir))
+            {
+                // 在非 Windows 平台（如 Linux CI）上，唯讀開啟檔案並不會鎖定檔案以阻止刪除（unlink）。
+                // 我們在此稍作延遲，以確保測試的背景監聽器（watcherTask）有足夠時間在目錄被清理前讀取 arguments.txt。
+                Thread.Sleep(500);
             }
 
             return 0;
