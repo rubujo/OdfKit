@@ -41,7 +41,7 @@
 
 | 區域 | 建議 | 理由 |
 |------|------|------|
-| Markdown import | 採用 Markdig backend | Markdig 為 BSD-2-Clause，NuGet 1.3.1 更新於 2026-06-17，支援 CommonMark/GFM tables/footnotes/task lists/`~~` 等 extension，且有 AST，可減少手刻 parser 邊界錯誤。 |
+| Markdown import | 採用 Markdig backend | Markdig 為 BSD-2-Clause，NuGet 1.3.2，支援 CommonMark/GFM tables/footnotes/task lists/`~~` 等 extension，且有 AST，可減少手刻 parser 邊界錯誤。 |
 | Markdown export | 暫保留 OdfKit exporter | ODF -> Markdown 是語意 mapping，不是 Markdown parser 問題；手寫 StringBuilder 可控且輕量。 |
 | RTF import | 暫不採用 RtfPipe | RtfPipe 授權可接受，但截至 2026 年未呈現近期活躍更新；目前維持 OdfKit 淨室 importer，後續若找不到活躍且授權相容的 RTF library，才在安全與高性能前提下繼續淨室擴充。 |
 | RTF export | 暫保留 OdfKit exporter | ODF -> RTF 子集輸出可控；外部 RTF writer 選擇少，為少量 control word 引入重依賴不划算。 |
@@ -118,7 +118,7 @@ using PresentationDocument fromPath = OdfPresentationOoxmlExtensions.LoadPptxAsO
 | DocumentFormat.OpenXml | MIT | DOCX / PPTX / low-level XLSX |
 | ClosedXML | MIT | XLSX 高階處理 |
 | PDFsharp-MigraDoc | MIT | PDF 建立與簡易排版 |
-| Markdig | BSD-2-Clause | Markdown parser backend；NuGet 1.3.1 更新於 2026-06-17 |
+| Markdig | BSD-2-Clause | Markdown parser backend；NuGet 1.3.2 |
 | RtfPipe | MIT | 暫不採用：截至 2026 年未呈現近期活躍更新 |
 | AngleSharp | MIT | HTML parser / DOM bridge 候選 |
 | Svg.Skia | MIT | SVG render/verification 候選，不取代 ODF -> SVG mapping |

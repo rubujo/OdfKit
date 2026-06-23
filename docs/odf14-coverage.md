@@ -46,4 +46,7 @@ profile rule validation、package / flat XML 驗證、全格式最小 round-trip
 - 擴大更接近真實世界文件的 positive / negative corpus。
 - 依 [odf-official-corpus-sources.md](odf-official-corpus-sources.md) 擴大 ODF Toolkit / ODF Validator parity matrix 的官方與真實 corpus 覆蓋。
 - 擴充更多跨應用加密文件 corpus 與 policy automation。
-- 繼續擴充 ODC 的完整圖表模型、ODF formula 的 MathML 語意 helper、ODI 的多影像 / 樣式 / 進階版面 API 與 ODB 的完整資料庫模型。
+
+（ODC 圖表模型、ODF formula 的 MathML 語意 helper、ODI 多影像 / 樣式 / 進階版面 API、ODB
+完整資料庫模型已於 2026-06-23 推進至 `complete`，詳見 [odf-format-support.md](odf-format-support.md)，
+不再列為待擴充項目。）

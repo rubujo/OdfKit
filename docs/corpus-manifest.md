@@ -58,10 +58,19 @@ repo 內可直接執行的範本 manifest 位於 `tests/fixtures/corpus/manifest
 | repo-generated-minimal-spreadsheet | `tests/fixtures/corpus/generated/minimal-spreadsheet.ods` | generated | n/a | generated-no-copyright | Spreadsheet | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | repo-generated-minimal-presentation | `tests/fixtures/corpus/generated/minimal-presentation.odp` | generated | n/a | generated-no-copyright | Presentation | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | repo-generated-minimal-graphics | `tests/fixtures/corpus/generated/minimal-graphics.odg` | generated | n/a | generated-no-copyright | Graphics | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
-| generated-format-minimal | generated in `OdfFormatRoundTripTests` | generated | n/a | generated-no-copyright | 17 extensions | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| generated-format-minimal | generated in `OdfFormatRoundTripTests` | generated | n/a | generated-no-copyright | 24 extensions | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
 | generated-interop-package | generated in `InteropCorpusTests` | generated | n/a | generated-no-copyright | package formats | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | generated-schema-negative | generated in `CorpusComplianceTests` | generated | n/a | generated-no-copyright | ODT / flat XML | 1.4 | OASIS ODF 1.4 Strict | invalid | semantic-equivalent |
 | generated-security-boundary | generated in `OdfSecurityBoundaryTests` | generated | n/a | generated-no-copyright | package formats | mixed | policy profiles | mixed | preserve-unknown |
+
+> 以上四列為測試執行時動態產生的樣本（未提交為實體檔案），`24 extensions` 對應
+> `OdfDocumentKindDetector.SupportedFormats` 目前登記的全部副檔名數量。
+
+`tests/fixtures/corpus/manifest.json` 實際已提交的 fixture 數量遠多於上表列出的初始集合
+（目前共 220 筆，含 Chart／Database／Image／Formula／各 Template 種類、ODF 1.1／1.2／1.3
+版本樣本，以及 `bulk-*` 前綴的大量規模測試樣本)；上表僅保留最初建立 corpus 機制時的種子
+fixture 作為欄位用法範例，並非完整清單。欲取得目前完整、權威的 fixture 清單，請直接讀取
+`tests/fixtures/corpus/manifest.json`，不要以本文件表格為準。
 
 ## 外部 corpus 路徑
 

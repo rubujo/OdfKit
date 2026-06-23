@@ -9,7 +9,9 @@ OdfKit 專案採用 [CC0-1.0 Universal](https://creativecommons.org/publicdomain
 | [System.Security.Cryptography.Xml](https://github.com/dotnet/runtime) | XML 數位簽章處理 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [System.Security.Cryptography.Pkcs](https://github.com/dotnet/runtime) | PKCS7 / CMS 簽章處理 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [Sylvan.Data.Csv](https://github.com/MarkPelf/Sylvan) | 用於 ODS 檔案的 CSV 匯入與匯出 | [MIT](https://github.com/MarkPelf/Sylvan/blob/main/LICENSE) |
-| [System.Memory 等相容性支援](https://github.com/dotnet/runtime) | netstandard2.0 平台相容性支援 | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
+| [CSharpMath](https://github.com/verybadcat/CSharpMath) | LaTeX ↔ MathML 公式轉換引擎 | [MIT](https://github.com/verybadcat/CSharpMath/blob/master/LICENSE) |
+| [System.Text.Json](https://github.com/dotnet/runtime) | JSON 序列化（核心套件與 OdfKit.Extensions.Collaboration 之 netstandard2.0 目標均使用） | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
+| [System.Memory](https://github.com/dotnet/runtime) / [System.Buffers](https://github.com/dotnet/runtime) / [System.Threading.Tasks.Extensions](https://github.com/dotnet/runtime) / [Microsoft.Bcl.AsyncInterfaces](https://github.com/dotnet/runtime) / [Microsoft.Bcl.HashCode](https://github.com/dotnet/runtime) / [System.Text.Encoding.CodePages](https://github.com/dotnet/runtime) | netstandard2.0 平台相容性支援（補齊 net10.0 才內建的型別與 API） | [MIT](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT) |
 | [Markdig](https://github.com/xoofx/markdig) | Markdown AST 解析 backend（於 OdfKit.Extensions.Html 中使用） | [BSD-2-Clause](https://github.com/xoofx/markdig/blob/master/license.txt) |
 | [SkiaSharp](https://github.com/mono/SkiaSharp) / [HarfBuzzSharp](https://github.com/mono/SkiaSharp) | 跨平台圖像繪製與文字排版支援（於 OdfKit.Extensions.Imaging 中使用） | [MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |
 | [ScottPlot](https://github.com/ScottPlot/ScottPlot) | 記憶體內圖表繪製與 fallback 影像視覺化（於 OdfKit.Extensions.Imaging 中使用） | [MIT](https://github.com/ScottPlot/ScottPlot/blob/main/LICENSE) |

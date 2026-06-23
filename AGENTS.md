@@ -8,10 +8,13 @@
 - **專案名稱**：OdfKit
 - **程式語言**：C# / .NET
 - **目標架構**：`net10.0` 與 `netstandard2.0`（雙平台編譯）
-- **核心第三方相依套件**（詳細版本參見專案檔，如 `OdfKit.csproj`）：
-  - `PDFsharp` (採用 MIT 授權)
+- **核心第三方相依套件**（詳細版本參見專案檔，如 `OdfKit.csproj`；`PDFsharp` 等格式擴充套件相依僅存在於對應的 `OdfKit.Extensions.*` 專案，不屬於核心套件）：
+  - `BouncyCastle.Cryptography` (採用 MIT 授權)
   - `CommunityToolkit.HighPerformance` (採用 MIT 授權)
+  - `CSharpMath` (採用 MIT 授權)
   - `System.Security.Cryptography.Xml` (採用 MIT 授權)
+  - `System.Security.Cryptography.Pkcs` (採用 MIT 授權)
+  - `Sylvan.Data.Csv` (採用 MIT 授權)
 - **授權協議**：**CC0-1.0 Universal** (專案原創程式碼屬公有領域；第三方套件維持其原 MIT 授權)。
 
 ---

@@ -33,12 +33,12 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 
 | 測試 | 來源格式 | OdfKit 建立內容 | LibreOffice 轉換 | 驗收方式 | 狀態 |
 |------|----------|-----------------|------------------|----------|------|
-| `LibreOffice26Headless_LoadsGeneratedDocuments` | ODT | 標題、段落、互通標記 | `txt` | 轉出文字含 `OdfKit-LibreOffice-26-Interop-Marker` | ✅ |
+| `LibreOfficeHeadless_LoadsGeneratedDocuments` | ODT | 標題、段落、互通標記 | `txt` | 轉出文字含 `OdfKit-LibreOffice-26-Interop-Marker` | ✅ |
 | 同上 | ODS | 嵌入圖表（條形圖、標題、圖例） | `xlsx` | 轉出 XLSX 非空 | ✅ |
 | 同上 | ODP | 進場動畫（fade-in） | `fodp` | 轉出 XML 含 `ooo-entrance-fade-in` | ✅ |
 | 同上 | ODG | 文字方塊互通標記 | `fodg` | 轉出 XML 含 `OdfKit-LibreOffice-26-Interop-Marker` | ✅ |
-| `LibreOffice26Headless_LoadsTrackedChangesOdt` | ODT | `text:tracked-changes` 段落與表格 | `txt` / `odt` | 標記保留；可 accept 修訂 | ✅ |
-| `LibreOffice26Headless_LoadsTrackedChangesOds` | ODS | `table:tracked-changes` 公式變更 | `ods` | 標記與修訂節點保留 | ✅ |
+| `LibreOfficeHeadless_LoadsTrackedChangesOdt` | ODT | `text:tracked-changes` 段落與表格 | `txt` / `odt` | 標記保留；可 accept 修訂 | ✅ |
+| `LibreOfficeHeadless_LoadsTrackedChangesOds` | ODS | `table:tracked-changes` 公式變更 | `ods` | 標記與修訂節點保留 | ✅ |
 
 ## 非目標（Wave 3 尚未涵蓋）
 
