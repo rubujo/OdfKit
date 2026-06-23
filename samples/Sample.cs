@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Drawing;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -42,7 +43,8 @@ if (!Directory.Exists(outputDir))
 // 執行各項功能示範
 DemoTextDocument(outputDir);
 DemoSpreadsheetDocument(outputDir);
-DemoPresentationDocument(outputDir);
+string presentationPath = DemoPresentationDocument(outputDir);
+DemoProfilesAndLocalization(presentationPath);
 DemoOdsStreamWriter(outputDir);
 DemoMetadataAndSecurity(outputDir);
 DemoExtensions(outputDir);
@@ -272,7 +274,8 @@ static void DemoSpreadsheetDocument(string outputDir)
 /// 示範採用 OdfKit 專屬的 Fluent Builder 模式建立簡報文件 (ODP)，包含投影片、幾何形狀、轉場特效與 CNS15251 驗證。
 /// </summary>
 /// <param name="outputDir"> 輸出的目標目錄 </param>
-static void DemoPresentationDocument(string outputDir)
+/// <returns> 已產生的簡報檔案路徑 </returns>
+static string DemoPresentationDocument(string outputDir)
 {
     Console.WriteLine(" 3. 正在建立簡報 (ODP) ⋯⋯");
 
@@ -332,13 +335,23 @@ static void DemoPresentationDocument(string outputDir)
     string outputPath = Path.Combine(outputDir, "output_presentation.odp");
     deck.Save(outputPath);
     Console.WriteLine($"   已儲存簡報至： {outputPath} ");
+    return outputPath;
+}
 
-    // 進行 ODF 規格合規性驗證 (CNS15251)
+/// <summary>
+/// 示範使用內建 ODF Profile 進行驗證，並展示在地化訊息查找與語系切換。
+/// </summary>
+/// <param name="presentationPath"> 要驗證的簡報檔案路徑 </param>
+static void DemoProfilesAndLocalization(string presentationPath)
+{
+    Console.WriteLine(" 4. 正在示範 ODF Profile 驗證與 i18n 在地化 ⋯⋯");
+
+    // 使用臺灣 CNS 15251 Profile 驗證剛產生的 ODP。
     try
     {
         var profile = OdfKit.Compliance.OdfComplianceProfiles.RocTaiwanOdfCns15251;
-        var report = OdfKit.Compliance.OdfValidator.Validate(outputPath, profile: profile);
-        Console.WriteLine($"   [驗證結果 - ROC CNS15251] 是否合規： {report.IsValid} ");
+        var report = OdfKit.Compliance.OdfValidator.Validate(presentationPath, profile: profile);
+        Console.WriteLine($"   [驗證結果 - ROC CNS 15251] 是否合規： {report.IsValid} ");
         if (!report.IsValid)
         {
             foreach (var error in report.Issues)
@@ -351,6 +364,19 @@ static void DemoPresentationDocument(string outputDir)
     {
         Console.WriteLine($"   [驗證失敗] 呼叫驗證器時發生錯誤： {ex.Message} ");
     }
+
+    CultureInfo? previousCulture = OdfKit.Compliance.OdfLocalizer.DefaultCulture;
+    try
+    {
+        OdfKit.Compliance.OdfLocalizer.DefaultCulture = new CultureInfo("zh-TW");
+        string localizedMessage = OdfKit.Compliance.OdfLocalizer.GetMessage(
+            "Err_OdfCellAddress_AddressCannotBeEmpty");
+        Console.WriteLine($"   [i18n] zh-TW 訊息範例： {localizedMessage} ");
+    }
+    finally
+    {
+        OdfKit.Compliance.OdfLocalizer.DefaultCulture = previousCulture;
+    }
 }
 
 /// <summary>
@@ -359,7 +385,7 @@ static void DemoPresentationDocument(string outputDir)
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoOdsStreamWriter(string outputDir)
 {
-    Console.WriteLine(" 4. 正在執行低記憶體高流速寫入 (OdsStreamWriter) ⋯⋯");
+    Console.WriteLine(" 5. 正在執行低記憶體高流速寫入 (OdsStreamWriter) ⋯⋯");
 
     string outputPath = Path.Combine(outputDir, "output_stream.ods");
     FileStream fileStream;
@@ -459,7 +485,7 @@ static void DemoOdsStreamWriter(string outputDir)
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoMetadataAndSecurity(string outputDir)
 {
-    Console.WriteLine(" 5. 正在示範中介資料 (Metadata) 讀寫設定 ⋯⋯");
+    Console.WriteLine(" 6. 正在示範中介資料 (Metadata) 讀寫設定 ⋯⋯");
 
     string testOdtPath = Path.Combine(outputDir, "output_text.odt");
     if (!File.Exists(testOdtPath))
@@ -487,7 +513,7 @@ static void DemoMetadataAndSecurity(string outputDir)
 
 static void DemoExtensions(string outputDir)
 {
-    Console.WriteLine(" 6. 正在執行 PDF、HTML、CSV、OOXML、協同編輯、RDF 與影像渲染等轉換匯出展示 ⋯⋯");
+    Console.WriteLine(" 7. 正在執行 PDF、HTML、CSV、OOXML、協同編輯、RDF 與影像渲染等轉換匯出展示 ⋯⋯");
 
     // 建立臨時文字文件做為轉換來源
     using var tempDoc = TextDocument.Create();
@@ -599,7 +625,7 @@ static byte[] CreatePngBytes()
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoOdtStreamWriter(string outputDir)
 {
-    Console.WriteLine(" 7. 正在執行低記憶體高流速寫入 (OdtStreamWriter) ⋯⋯");
+    Console.WriteLine(" 8. 正在執行低記憶體高流速寫入 (OdtStreamWriter) ⋯⋯");
 
     string outputPath = Path.Combine(outputDir, "output_stream.odt");
     FileStream fileStream;
