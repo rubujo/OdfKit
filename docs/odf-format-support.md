@@ -15,49 +15,99 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - `partial`：已有部分高階模型或 round-trip 能力，但仍有明確缺口。
 - `planned`：尚未有足夠程式與測試證據支撐。
 
-### 高階 API 層（Wave 1 分級）
+### 高階 API 層
 
-- `complete`：日常辦公自動化不需下沉 DOM；四主格式（ODT／ODS／ODP／ODG）已達此分級。
-- `usable`：常用建立／編輯 API 可用，仍有明確語意缺口。
+- `complete`：滿足計畫文件第 14 節 5 項 Done Criteria——(1) 公開高階 API 可完成該格式常見
+  workflow、(2) 有專屬測試、(3) 有 round-trip／boundary／interop 證據（含誠實記錄的上游限制）、
+  (4) `Validate()`／`ValidateAsync()` 可用且測試覆蓋正向與負向案例、(5) 文件已同步。
+  截至 2026-06-24，全部 24 個 extension 均已達成此分級（詳見下方「全格式 complete 最低能力
+  矩陣」）。日常辦公自動化不需下沉 DOM。
+- `usable`／`usable-variant`：歷史分級，目前矩陣中已無格式使用；保留定義供未來新格式或
+  迴歸情況參考——`usable` 指常用建立／編輯 API 可用但有明確語意缺口；`usable-variant` 指具
+  專屬 typed 文件類別但語意 API 仍完全繼承基底格式。
 - `package-only`：僅封裝層 round-trip；高階語意模型尚未專屬化或仍共用基底 wrapper。
-- `usable-variant`：具專屬 typed 文件類別與 `Create`/`Load` 入口；語意 API 繼承基底格式（Wave 2 VAR-1）。
+
+**重要說明（避免過度宣稱）**：`complete` 分級僅代表滿足第 14 節的最低字面標準，**不**代表
+已達成計畫第 7 節各格式族列出的完整深度語意模型（例如 Chart 的 Legend 統一可編輯模型與
+fluent builder API、Formula 的「尋找→取得→更新」語意編輯 helper）。這些屬於更大規模、
+獨立追蹤的延伸工作，詳見下方各 Batch 說明段落。
 
 ## 矩陣
 
 | Extension | MIME type | `OdfDocumentKind` | Detect | Create | Load | Save | Validate | Round-trip | High-level API | Test evidence |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | complete | `TextApiUsabilityTests`, `TextHighLevelApiTests`, `FourFormatApiScenarioTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
-| `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `MasterDocumentTests`, `LibreOfficeInteropTests` |
-| `.oth` | `application/vnd.oasis.opendocument.text-web` | `TextWeb` | complete | complete | complete | complete | validated | complete | usable-variant | `ComplianceTests`, `PackageRoundTripTests`, `TextWebDocumentTests`, `HtmlExportTests`, `LibreOfficeInteropTests` |
-| `.fodt` | `application/vnd.oasis.opendocument.text` | `FlatText` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odm` | `application/vnd.oasis.opendocument.text-master` | `TextMaster` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `MasterDocumentTests`, `LibreOfficeInteropTests` |
+| `.oth` | `application/vnd.oasis.opendocument.text-web` | `TextWeb` | complete | complete | complete | complete | validated | complete | complete | `ComplianceTests`, `PackageRoundTripTests`, `TextWebDocumentTests`, `HtmlExportTests`, `LibreOfficeInteropTests` |
+| `.fodt` | `application/vnd.oasis.opendocument.text` | `FlatText` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
 | `.ods` | `application/vnd.oasis.opendocument.spreadsheet` | `Spreadsheet` | complete | complete | complete | complete | validated | complete | complete | `SpreadsheetApiUsabilityTests`, `SpreadsheetHighLevelApiTests`, `ChartHighLevelApiTests`, `FourFormatApiScenarioTests`, `SpreadsheetCommonApiTests`, `OpenFormulaSupportTests`, `InteropCorpusTests` |
-| `.ots` | `application/vnd.oasis.opendocument.spreadsheet-template` | `SpreadsheetTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
-| `.fods` | `application/vnd.oasis.opendocument.spreadsheet` | `FlatSpreadsheet` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.ots` | `application/vnd.oasis.opendocument.spreadsheet-template` | `SpreadsheetTemplate` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fods` | `application/vnd.oasis.opendocument.spreadsheet` | `FlatSpreadsheet` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
 | `.odp` | `application/vnd.oasis.opendocument.presentation` | `Presentation` | complete | complete | complete | complete | validated | complete | complete | `PresentationApiUsabilityTests`, `PresentationHighLevelApiTests`, `FourFormatApiScenarioTests`, `PresentationAndRenderingTests`, `PresentationBoundaryTests`, `InteropCorpusTests` |
-| `.otp` | `application/vnd.oasis.opendocument.presentation-template` | `PresentationTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
-| `.fodp` | `application/vnd.oasis.opendocument.presentation` | `FlatPresentation` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.otp` | `application/vnd.oasis.opendocument.presentation-template` | `PresentationTemplate` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fodp` | `application/vnd.oasis.opendocument.presentation` | `FlatPresentation` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
 | `.odg` | `application/vnd.oasis.opendocument.graphics` | `Graphics` | complete | complete | complete | complete | validated | complete | complete | `DrawingApiUsabilityTests`, `DrawingHighLevelApiTests`, `FourFormatApiScenarioTests`, `ComplianceTests`, `InteropCorpusTests` |
-| `.otg` | `application/vnd.oasis.opendocument.graphics-template` | `GraphicsTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
-| `.fodg` | `application/vnd.oasis.opendocument.graphics` | `FlatGraphics` | complete | complete | complete | complete | validated | complete | usable-variant | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | complete | complete | complete | complete | validated | complete | usable | `ChartHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.otc` | `application/vnd.oasis.opendocument.chart-template` | `ChartTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `ComplianceTests`, `PackageRoundTripTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odf` | `application/vnd.oasis.opendocument.formula` | `Formula` | complete | complete | complete | complete | validated | complete | usable | `FormulaHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `PackageRoundTripTests`, `InteropCorpusTests`, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.otf` | `application/vnd.oasis.opendocument.formula-template` | `FormulaTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `ComplianceTests`, `PackageRoundTripTests`, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odi` | `application/vnd.oasis.opendocument.image` | `Image` | complete | complete | complete | complete | validated | complete | usable | `ImageHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.oti` | `application/vnd.oasis.opendocument.image-template` | `ImageTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `ComplianceTests`, `PackageRoundTripTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.otg` | `application/vnd.oasis.opendocument.graphics-template` | `GraphicsTemplate` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fodg` | `application/vnd.oasis.opendocument.graphics` | `FlatGraphics` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `PackageRoundTripTests`, `FlatVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odc` | `application/vnd.oasis.opendocument.chart` | `Chart` | complete | complete | complete | complete | validated | complete | complete | `ChartHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.otc` | `application/vnd.oasis.opendocument.chart-template` | `ChartTemplate` | complete | complete | complete | complete | validated | complete | complete | `ComplianceTests`, `PackageRoundTripTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odf` | `application/vnd.oasis.opendocument.formula` | `Formula` | complete | complete | complete | complete | validated | complete | complete | `FormulaHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `PackageRoundTripTests`, `InteropCorpusTests`, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.otf` | `application/vnd.oasis.opendocument.formula-template` | `FormulaTemplate` | complete | complete | complete | complete | validated | complete | complete | `ComplianceTests`, `PackageRoundTripTests`, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.odi` | `application/vnd.oasis.opendocument.image` | `Image` | complete | complete | complete | complete | validated | complete | complete | `ImageHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.oti` | `application/vnd.oasis.opendocument.image-template` | `ImageTemplate` | complete | complete | complete | complete | validated | complete | complete | `ComplianceTests`, `PackageRoundTripTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
 | `.odb` | `application/vnd.oasis.opendocument.base` | `Database` | complete | complete | complete | complete | validated | complete | complete | `DatabaseHighLevelApiTests`, `DatabaseSchemaAndFormTests`, `DatabaseBoundaryTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `LibreOfficeInteropTests` |
-| `.fodc` | `application/vnd.oasis.opendocument.chart` | `FlatChart` | complete | complete | complete | complete | validated | complete | usable-variant | `PackageRoundTripTests`, `CorpusComplianceTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.fdf` | `application/vnd.oasis.opendocument.formula` | `FlatFormula` | complete | complete | complete | complete | validated | complete | usable-variant | `PackageRoundTripTests`, corpus manifest, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.fodi` | `application/vnd.oasis.opendocument.image` | `FlatImage` | complete | complete | complete | complete | validated | complete | usable-variant | `PackageRoundTripTests`, `CorpusComplianceTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fodc` | `application/vnd.oasis.opendocument.chart` | `FlatChart` | complete | complete | complete | complete | validated | complete | complete | `PackageRoundTripTests`, `CorpusComplianceTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fdf` | `application/vnd.oasis.opendocument.formula` | `FlatFormula` | complete | complete | complete | complete | validated | complete | complete | `PackageRoundTripTests`, corpus manifest, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
+| `.fodi` | `application/vnd.oasis.opendocument.image` | `FlatImage` | complete | complete | complete | complete | validated | complete | complete | `PackageRoundTripTests`, `CorpusComplianceTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
+
+## 全格式 complete 最低能力矩陣（Workstream A）
+
+依計畫文件第 14 節「明確的 Done Criteria」逐格式列出 5 項條件是否滿足，作為上方矩陣
+`complete` 分級的可稽核依據。圖例：✅ 滿足；✅\* 滿足，但 interop 證據為「已實機驗證並誠實
+記錄上游應用程式限制」而非綠燈通過（依使用者決策，至少一個驗收案例即符合計畫 2.1 節要求，
+不要求每案必須通過）。
+
+| Extension | (1) 高階 API 完成常見 workflow | (2) 專屬測試 | (3) round-trip／boundary／interop 證據 | (4) Validate() 正負向 | (5) 文件同步 |
+|---|---|---|---|---|---|
+| `.odt` | ✅ | ✅ `TextHighLevelApiTests` | ✅ 真機（`LibreOfficeHeadless_LoadsGeneratedDocuments`） | ✅ 通用骨架 | ✅ |
+| `.ott` | ✅ `CreateFromTemplate`／`CreateFromDocument` | ✅ `TemplateRoundTripTests` | ✅ 真機（`LibreOfficeHeadless_LoadsTemplateVariantDocuments`） | ✅ 通用骨架 | ✅ |
+| `.odm` | ✅ 子文件 CRUD／合併／大綱位移 | ✅ `MasterDocumentTests` | ✅ 真機（`LibreOfficeHeadless_LoadsMasterDocument`，`writerglobal8`） | ✅ 通用骨架 | ✅ |
+| `.oth` | ✅ `CreateFromDocument`／`CreateFromWebDocument`＋HTML 匯出整合 | ✅ `TextWebDocumentTests` | ✅ 真機（`LibreOfficeHeadless_LoadsWebTemplateDocument`，`writerweb8_writer`） | ✅ 通用骨架 | ✅ |
+| `.fodt` | ✅ `CreateFromFlatDocument`／`CreateFromDocument` | ✅ `FlatVariantRoundTripTests` | ✅ 真機（`LibreOfficeHeadless_LoadsNativeFlatXmlDocuments`） | ✅ 通用骨架 | ✅ |
+| `.ods` | ✅ | ✅ `SpreadsheetHighLevelApiTests` | ✅ 真機（`LibreOfficeHeadless_LoadsGeneratedDocuments`） | ✅ 通用骨架 | ✅ |
+| `.ots` | ✅ | ✅ `TemplateRoundTripTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
+| `.fods` | ✅ | ✅ `FlatVariantRoundTripTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
+| `.odp` | ✅ | ✅ `PresentationHighLevelApiTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
+| `.otp` | ✅ | ✅ `TemplateRoundTripTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
+| `.fodp` | ✅ | ✅ `FlatVariantRoundTripTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
+| `.odg` | ✅ | ✅ `DrawingHighLevelApiTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
+| `.otg` | ✅ | ✅ `TemplateRoundTripTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
+| `.fodg` | ✅ | ✅ `FlatVariantRoundTripTests` | ✅ 真機 | ✅ 通用骨架 | ✅ |
+| `.odc` | ✅ 軸線／序列／樣式／error-indicator／regression-curve／mean-value | ✅ `ChartHighLevelApiTests` | ✅\* 嵌入 ODS 真機成功；獨立檔案經實機確認上游不支援（已記錄） | ✅ 通用骨架 | ✅ |
+| `.otc` | ✅ `CreateFromDocument`／`CreateFromTemplate` | ✅ `ChartVariantRoundTripTests` | ✅\* 封裝結構驗證＋上游限制已記錄 | ✅ 通用骨架 | ✅ |
+| `.fodc` | ✅ `CreateFromDocument`／`CreateFromFlatDocument` | ✅ `ChartVariantRoundTripTests` | ✅\* 封裝結構驗證＋上游限制已記錄（誤判為 Writer document） | ✅ 通用骨架 | ✅ |
+| `.odf` | ✅ MathML token／builder／LaTeX／annotation | ✅ `FormulaHighLevelApiTests` | ✅ 真機（`LibreOfficeHeadless_LoadsFormulaDocument`，`math8`） | ✅ 通用骨架 | ✅ |
+| `.otf` | ✅ `CreateFromDocument`／`CreateFromTemplate` | ✅ `FormulaVariantRoundTripTests` | ✅\* 封裝結構驗證＋上游限制已記錄 | ✅ 通用骨架 | ✅ |
+| `.fdf` | ✅ `CreateFromDocument`／`CreateFromFlatDocument` | ✅ `FormulaVariantRoundTripTests` | ✅\* 封裝結構驗證＋上游限制已記錄（誤判為 Calc document） | ✅ 通用骨架 | ✅ |
+| `.odi` | ✅ 多框架／版面／旋轉／裁切／濾鏡／批次操作 | ✅ `ImageHighLevelApiTests` | ✅\* 封裝結構驗證＋上游限制已記錄 | ✅ 通用骨架 | ✅ |
+| `.oti` | ✅ `CreateFromDocument`／`CreateFromTemplate` | ✅ `ImageVariantRoundTripTests` | ✅\* 封裝結構驗證＋上游限制已記錄 | ✅ 通用骨架 | ✅ |
+| `.fodi` | ✅ `CreateFromDocument`／`CreateFromFlatDocument` | ✅ `ImageVariantRoundTripTests` | ✅\* 封裝結構驗證＋上游限制已記錄（誤判為 Writer document） | ✅ 通用骨架 | ✅ |
+| `.odb` | ✅ 連線／查詢／表單設計器／報表 href／Schema CRUD | ✅ `DatabaseHighLevelApiTests`、`DatabaseBoundaryTests` | ✅\* mimetype／manifest 驗證＋ LibreOffice UNO API 人工驗證＋ `--convert-to` 行為已誠實記錄 | ✅ 通用骨架 | ✅ |
+
+第 (4) 項「Validate() 正負向」對所有列皆標示「✅ 通用骨架」：因 `OdfDocument.Validate()`／
+`ValidateAsync()` 定義於基底類別，對全部文件種類自動生效，無需逐格式重複實作或測試；正向
+與負向覆蓋見 `OdfValidatorApiTests.DocumentInstance_Validate_AcrossSecondaryFormatKinds_AllSucceed`
+與 `DocumentInstance_Validate_DetectsUnregisteredElementUnderStrictProfile`。
 
 ## 目前缺口
 
 - 統一的 `OdfDocument.Load` / `OdfDocument.Create` 與
   `OdfDocumentFactory.LoadDocument` / `CreateDocument` 高階入口已建立。
 - ODT、ODS、ODP、ODG 高階 API 已升為 `complete`（Wave 2 DEPTH 目標 ✅）：常用讀寫 API 與 `FourFormatApiScenarioTests` 進階寫入場景已背書；仍非全功能辦公套件物件模型（例如 ODS 樞紐表重算見 non-goals、圖表 chart style 物件模型仍屬 DEPTH-2 延伸）。
-- `.ott`、`.ots`、`.otp`、`.otg`、`.odm` 與 Flat 變體標為 `usable-variant`（VAR-1 ✅）：
-  具專屬 typed 文件類別與 `Create`/`Load` 入口；內容編輯語意 API 繼承四主格式基底類別。
+- `.ott`、`.ots`、`.otp`、`.otg`、`.odm` 與 Flat 變體（VAR-1 ✅）：具專屬 typed 文件類別與
+  `Create`/`Load` 入口；內容編輯語意 API 繼承四主格式基底類別。2026-06-24 依計畫第 14 節字面
+  標準重新檢視後已升級為 `complete`，詳見下方各 Batch 說明。
 - `.ott`／`.ots`／`.otp`／`.otg`（Batch 1 第一波，2026-06-23）：新增雙向範本生命週期工作流——
   `TextDocument.CreateFromTemplate`／`SpreadsheetDocument.CreateFromTemplate`／
   `PresentationDocument.CreateFromTemplate`／`DrawingDocument.CreateFromTemplate`（範本→文件，
@@ -65,10 +115,10 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
   `PresentationTemplateDocument.CreateFromDocument`／`GraphicsTemplateDocument.CreateFromDocument`
   （文件→範本，本次新增），並各補上 `TemplateRoundTripTests` 雙向往返測試與
   `LibreOfficeInteropTests.LibreOfficeHeadless_LoadsTemplateVariantDocuments` 實機互通驗收。
-  維持 `usable-variant` 而非升級為 `complete`：範本本身內容編輯仍沿用基底格式語意 API，
-  尚未有範本專屬的深度內容模型；其餘 Batch 1（`.odm`／`.oth`／`.fodt`／`.fods`／`.fodp`／`.fodg`）
-  與 Workstream D（Chart／Formula／Image／Database 深度語意模型，已於 Batch 3-6 完成
-  各自計畫明確列出的缺口）。
+  2026-06-23 完成時依「範本內容編輯仍沿用基底格式語意 API，尚未有範本專屬深度內容模型」為
+  理由維持 `usable-variant`；2026-06-24 依計畫第 14 節字面 5 項 Done Criteria（高階 API、
+  專屬測試、round-trip／boundary／interop 證據、`Validate()` 正負向、文件同步）重新檢視，
+  確認上述條件已全部滿足，**升級為 `complete`**。
 - 文件級 `OdfDocument.Validate(OdfComplianceProfile?)` / `ValidateAsync(...)` 已新增（Workstream E
   ✅，2026-06-23／24）：所有文件種類現皆可直接呼叫實例方法驗證目前（含尚未儲存的編輯）記憶體
   狀態，內部委派既有 `OdfValidator` 靜態進入點與 `OdfValidationReport` 結構化結果。因定義於
@@ -92,8 +142,9 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
   邊界測試，並新增 `LibreOfficeInteropTests.LibreOfficeHeadless_LoadsNativeFlatXmlDocuments`——
   以 OdfKit **直接產生**（非由 ZIP 轉換而來）的原生 FODT／FODS／FODP／FODG 檔案實機驗證
   LibreOffice 26.x 可直接開啟，證明 Flat XML 與 ZIP 封裝的高階工作流對 LibreOffice 而言互通等價。
-  維持 `usable-variant` 而非升級為 `complete`，理由與範本變體相同：內容編輯仍沿用基底格式
-  語意 API，未有 Flat 專屬深度內容模型。
+  2026-06-24 依計畫第 14 節字面標準重新檢視，**升級為 `complete`**（理由與範本變體相同：
+  上述 5 項 Done Criteria 已全部滿足；內容編輯仍沿用基底格式語意 API、未有 Flat 專屬深度
+  內容模型，但這不在第 14 節的最低標準之內）。
 - `.odm`（Batch 2 第一項，2026-06-23）：子文件 CRUD、條件式載入、合併為單一文件、大綱階層
   位移等變體專屬 workflow 在此之前即已完備（`TextMasterDocument.AddSubDocumentReference`／
   `GetSubDocumentReferences`／`RemoveSubDocumentReference`／`ReorderSubDocumentReferences`／
@@ -110,7 +161,8 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
   OTH 文件，不需任何轉接層，滿足「與 HTML／export 行為一致性」要求。新增實機 LibreOffice
   互通驗收——已確認 LibreOffice 將 .oth 識別為「Writer/Web document」並使用
   `writerweb8_writer` 篩選器轉換為 ODT（`LibreOfficeHeadless_LoadsWebTemplateDocument`）。
-  維持 `usable-variant`，理由同上：內容模型本身與 ODT 相同，未有專屬深度內容模型。
+  2026-06-24 依計畫第 14 節字面標準重新檢視，**升級為 `complete`**（內容模型本身與 ODT 相同、
+  未有專屬深度內容模型，但這不在第 14 節的最低標準之內）。
 - `.odc`／`.otc`／`.fodc`（Batch 3，2026-06-23）：現況調查發現既有圖表實作已遠比文件先前
   描述的「摘要層」深入——`OdfChartDocument` 早已具備軸線（對數刻度、範圍、反向、網格）、
   序列、樣式（含 3D 投影、光源）、牆面／地板、股票圖標記等大量可變更高階 API。本次補上計畫
@@ -136,9 +188,11 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
     註解中修正此假設。改以封裝結構驗證取代真機驗證，並以既有
     `LibreOfficeHeadless_LoadsGeneratedDocuments` 中「圖表嵌入 ODS 後由 LibreOffice 開啟」
     的驗收佐證嵌入式圖表（ODF Chart 設計上唯一的真實使用情境）的互通性。
-  - 維持 `usable`／`usable-variant`，未升級為 `complete`：圖表樣式物件模型雖已相當完整，
-    但仍缺 Legend 統一可編輯模型與 fluent builder API（計畫列出的延伸項目），屬於更大規模的
-    後續工作。
+  - 2026-06-23 完成時依「仍缺 Legend 統一可編輯模型與 fluent builder API」為理由維持
+    `usable`／`usable-variant`；2026-06-24 依計畫第 14 節字面 5 項 Done Criteria 重新檢視，
+    確認已全部滿足，**升級為 `complete`**。Legend 物件模型與 fluent builder API 屬於計畫
+    第 7.5 節列出的延伸項目，不在第 14 節最低標準之內，續列為獨立追蹤的後續深度工作（非
+    阻礙 complete 分級的缺口）。
 - `.odf`／`.otf`／`.fdf`（Batch 4，2026-06-23）：現況調查同樣發現既有 MathML token 模型
   （`OdfMathToken`／`OdfMathBuilder`，17 種 token 類型）與 LaTeX↔MathML 雙向轉換早已完整支援
   row／fraction／script／table 等計畫列出的結構；本次補上確認缺失的部分：
@@ -168,9 +222,11 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
     變體仍與 Chart／Image 的變體一樣不受 LibreOffice 支援為獨立主文件（`.otf` 回報
     「source file could not be loaded」；`.fdf` 被誤判為「Calc document」），改以封裝結構驗證
     取代（`OdfFormulaVariantDocument_PackageStructureMatchesOdf14Schema`）。
-  - 維持 `usable`／`usable-variant`，未升級為 `complete`：雖然已具備完整 MathML 結構編輯、
-    annotation 與雙向變體轉換，但仍缺計畫列出的「公式語意編輯 helper」（例如「尋找分數→
-    取得分子→更新分子」這類查詢－修改－更新 API），屬於更大規模的後續工作。
+  - 2026-06-23 完成時依「仍缺計畫列出的公式語意編輯 helper（例如『尋找分數→取得分子→
+    更新分子』這類查詢－修改－更新 API）」為理由維持 `usable`／`usable-variant`；
+    2026-06-24 依計畫第 14 節字面 5 項 Done Criteria 重新檢視，確認已全部滿足，**升級為
+    `complete`**。語意編輯 helper 屬於計畫第 7.6 節列出的延伸項目，不在第 14 節最低標準
+    之內，續列為獨立追蹤的後續深度工作。
 - `.odi`／`.oti`／`.fodi`（Batch 5，2026-06-23）：現況調查發現多影像框架、版面配置、旋轉、
   裁切、濾鏡與描述性 metadata（`svg:title`／`svg:desc`）等計畫列出的能力早已完整實作
   （`GetImageFrames`／`AddImageFrame`／`UpdateImageFrame`／`RemoveImageFrame`／
@@ -191,8 +247,10 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
     `writer_png_Export` 篩選器產生與影像內容完全無關的輸出，與 `.fodc`（誤判為 Writer
     document）、`.fdf`（誤判為 Calc document）的誤判模式一致。已修正文件註解用語，並擴充該
     測試涵蓋 ODI／OTI／FODI 三者的封裝結構驗證（先前僅涵蓋 ODI）。
-  - 維持 `usable`／`usable-variant`，未升級為 `complete`：理由與 Chart／Formula 相同——
-    Template／Flat 變體內容編輯仍沿用基底格式語意 API，未有專屬深度內容模型。
+  - 2026-06-23 完成時依「Template／Flat 變體內容編輯仍沿用基底格式語意 API，未有專屬深度
+    內容模型」為理由維持 `usable`／`usable-variant`；2026-06-24 依計畫第 14 節字面 5 項
+    Done Criteria 重新檢視，確認已全部滿足，**升級為 `complete`**（理由與 Chart／Formula
+    相同：深度內容模型差異不在第 14 節最低標準之內）。
 - `.odb`（Batch 6，2026-06-23）：現況調查確認 Database 已具備計畫文件要求的**全部**能力，
   並無比照 Chart（Legend 物件模型）／Formula（語意編輯 helper）那樣明確列出但仍缺的延伸項目，
   經評估後依使用者先前確認的「ODB complete 標準採真實可用工作流為準」決策，**升級為
@@ -228,9 +286,10 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - ODC／嵌入圖表已補強 `OdfChartDocument.GetChartDefinition`；ODB 已補強 `AddForm`／`GetForms` 表單元件 API（`DatabaseHighLevelApiTests`）。
 - ODF 已補強 `GetMathTokens` 讀取 API；ODI 已補強 `GetImageFrames`／`AddImageFrame`（`FormulaHighLevelApiTests`、`ImageHighLevelApiTests`）。
 - LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；CALCEXT-1 基礎 ✅：工作表層與 `SpreadsheetDocument.GetConditionalFormats`／`GetSparklineGroups` 文件層聚合讀取。
-- `.odc`、`.odf`、`.odi` 標為 `usable`：已有摘要與常用編輯 API，
-  `SecondaryFormatApiScenarioTests` 已背書連線／圖表軸／公式 token／多框架影像等場景；
-  完整語意模型（例如 ODC chart style 物件模型）仍屬 Wave 2 DEPTH-2 延伸。`.odb` 已於
+- `.odc`、`.odf`、`.odi`（曾標為 `usable`，2026-06-24 已升級為 `complete`，詳見下方
+  Batch 3-5 說明）：已有摘要與常用編輯 API，`SecondaryFormatApiScenarioTests` 已背書連線／
+  圖表軸／公式 token／多框架影像等場景；完整深度語意模型（例如 ODC chart style 物件模型）
+  仍屬計畫第 7 節列出、不在第 14 節 complete 最低標準內的延伸工作。`.odb` 已於
   Batch 6（2026-06-23）升級為 `complete`，詳見下方說明。
 - 次要格式與變體高階物件模型補完計畫（原 Batch 1-6 + 測試補強，已於 2026-06-23 全數完成並移除
   追蹤文件）：ODC／ODB／ODI／ODF 公式四項次要格式高階物件模型，以及範本變數系統

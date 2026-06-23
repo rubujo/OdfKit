@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using OdfKit.Cli;
@@ -253,6 +254,56 @@ public class DocsAndCorpusContractTests
             item => item.GetProperty("id").GetString() == "repo-generated-odf14-invalid-decorative-bad-value" &&
                 item.GetProperty("expected").GetString() == "invalid" &&
                 item.GetProperty("passed").GetBoolean());
+    }
+
+    /// <summary>
+    /// 驗證 <c>docs/odf-format-support.md</c> 主矩陣表中，每一列標示為 <c>complete</c> 的
+    /// High-level API 欄位，其 Test evidence 欄位皆非空，避免文件狀態與測試證據脫節
+    /// （Workstream A 文件契約檢查；僅檢查證據欄位存在，不驗證測試實際內容）。
+    /// </summary>
+    [Fact]
+    public void FormatSupportMatrix_CompleteRowsDeclareNonEmptyTestEvidence()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string[] lines = File.ReadAllLines(Path.Combine(repoRoot, "docs", "odf-format-support.md"));
+
+        var rows = new List<(string Extension, string HighLevelApi, string TestEvidence)>();
+        bool inMatrixSection = false;
+        foreach (string line in lines)
+        {
+            if (line.StartsWith("## 矩陣", StringComparison.Ordinal))
+            {
+                inMatrixSection = true;
+                continue;
+            }
+
+            if (inMatrixSection && line.StartsWith("## ", StringComparison.Ordinal))
+            {
+                break;
+            }
+
+            if (!inMatrixSection || !line.TrimStart().StartsWith("| `.", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            string[] cells = line.Split('|');
+            // 欄位順序：(空白) Extension MIME Kind Detect Create Load Save Validate Round-trip HighLevelApi TestEvidence (空白)
+            Assert.True(cells.Length >= 12, $"矩陣資料列欄位數不足，無法解析：{line}");
+            rows.Add((cells[1].Trim(), cells[10].Trim(), cells[11].Trim()));
+        }
+
+        Assert.True(rows.Count >= 24, $"預期矩陣至少含 24 個 extension 資料列，實際解析到 {rows.Count} 列。");
+
+        foreach ((string extension, string highLevelApi, string testEvidence) in rows)
+        {
+            if (string.Equals(highLevelApi, "complete", StringComparison.Ordinal))
+            {
+                Assert.False(
+                    string.IsNullOrWhiteSpace(testEvidence),
+                    $"{extension} 的 High-level API 標示為 complete，但 Test evidence 欄位為空。");
+            }
+        }
     }
 
     private static string FindRepositoryRoot()
