@@ -2511,10 +2511,14 @@ public class LibreOfficeInteropTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// 已知限制：LibreOffice 26.x headless 的 <c>--convert-to</c> 命令列管線本身不支援 ODB 資料庫文件
-    /// （無論來源檔案結構是否正確，<c>private:factory/sdatabase --convert-to odb</c> 一律回報
-    /// 「no export filter」；對既有 .odb 檔案執行 <c>--convert-to</c> 則一律回報
-    /// 「source file could not be loaded」），故無法沿用其他文件類型慣用的 <c>RunSoffice</c> PDF
+    /// 已知限制：LibreOffice 26.2.1 headless 的 <c>--convert-to</c> 命令列管線本身不支援 ODB 資料庫
+    /// 文件的轉換。實機重新驗證（2026-06-23）發現比先前記錄更隱晦的失效模式：以轉換目標
+    /// <c>odb</c> 自身轉換時會明確回報「no export filter」並以非零結束碼失敗；但轉換目標為
+    /// <c>txt</c>／<c>ods</c>／<c>xlsx</c>／<c>csv</c> 時卻回報「convert ... using filter」字樣並以
+    /// 結束碼 0（成功）結束——然而輸出檔案經位元組層級檢查確認，內容是來源 .odb 的逐位元組原樣
+    /// 複製（檔頭仍為 ZIP <c>PK</c> 簽章與 <c>mimetype application/vnd.oasis.opendocument.base</c>），
+    /// 並未真正剖析或轉換，這比清楚的「could not be loaded」錯誤更具誤導性（指令稿可能誤判此為
+    /// 轉換成功）。故無法沿用其他文件類型慣用的 <c>RunSoffice</c> PDF
     /// 轉換真機驗證模式。本測試改以實際透過 LibreOffice UNO API（<c>soffice --accept=socket</c> 搭配
     /// <c>desktop.loadComponentFromURL</c>）人工驗證過：採用正確 mimetype 的 ODB 檔案可成功載入，
     /// 採用舊版錯誤 mimetype（<c>application/vnd.oasis.opendocument.database</c>）的檔案載入會靜默

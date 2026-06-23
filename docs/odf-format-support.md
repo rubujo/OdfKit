@@ -46,7 +46,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 | `.otf` | `application/vnd.oasis.opendocument.formula-template` | `FormulaTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `ComplianceTests`, `PackageRoundTripTests`, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
 | `.odi` | `application/vnd.oasis.opendocument.image` | `Image` | complete | complete | complete | complete | validated | complete | usable | `ImageHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
 | `.oti` | `application/vnd.oasis.opendocument.image-template` | `ImageTemplate` | complete | complete | complete | complete | validated | complete | usable-variant | `ComplianceTests`, `PackageRoundTripTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
-| `.odb` | `application/vnd.oasis.opendocument.base` | `Database` | complete | complete | complete | complete | validated | complete | usable | `DatabaseHighLevelApiTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests` |
+| `.odb` | `application/vnd.oasis.opendocument.base` | `Database` | complete | complete | complete | complete | validated | complete | complete | `DatabaseHighLevelApiTests`, `DatabaseSchemaAndFormTests`, `DatabaseBoundaryTests`, `SecondaryFormatApiScenarioTests`, `DocumentKindApiUsabilityTests`, `ComplianceTests`, `InteropCorpusTests`, `LibreOfficeInteropTests` |
 | `.fodc` | `application/vnd.oasis.opendocument.chart` | `FlatChart` | complete | complete | complete | complete | validated | complete | usable-variant | `PackageRoundTripTests`, `CorpusComplianceTests`, `ChartVariantRoundTripTests`, `LibreOfficeInteropTests` |
 | `.fdf` | `application/vnd.oasis.opendocument.formula` | `FlatFormula` | complete | complete | complete | complete | validated | complete | usable-variant | `PackageRoundTripTests`, corpus manifest, `FormulaVariantRoundTripTests`, `LibreOfficeInteropTests` |
 | `.fodi` | `application/vnd.oasis.opendocument.image` | `FlatImage` | complete | complete | complete | complete | validated | complete | usable-variant | `PackageRoundTripTests`, `CorpusComplianceTests`, `ImageVariantRoundTripTests`, `LibreOfficeInteropTests` |
@@ -187,15 +187,45 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
     測試涵蓋 ODI／OTI／FODI 三者的封裝結構驗證（先前僅涵蓋 ODI）。
   - 維持 `usable`／`usable-variant`，未升級為 `complete`：理由與 Chart／Formula 相同——
     Template／Flat 變體內容編輯仍沿用基底格式語意 API，未有專屬深度內容模型。
+- `.odb`（Batch 6，2026-06-23）：現況調查確認 Database 已具備計畫文件要求的**全部**能力，
+  並無比照 Chart（Legend 物件模型）／Formula（語意編輯 helper）那樣明確列出但仍缺的延伸項目，
+  經評估後依使用者先前確認的「ODB complete 標準採真實可用工作流為準」決策，**升級為
+  `complete`**：
+  - **資料來源**：連線 href、登入（`OdfDatabaseDocument.GetLogin`／`SetLogin`）、驅動程式設定
+    （`GetDriverSettings`／`SetDriverSettings`）。
+  - **查詢**：SQL 命令、`ORDER BY`／`WHERE` 陳述式、可見欄位、更新目標表、escape processing
+    （`OdfDatabaseDocument.Queries.cs`）。
+  - **表單**：完整表單設計器 `OdfDatabaseFormDesigner`，涵蓋文字框、核取方塊、選項按鈕、下拉
+    選單、列表框、按鈕、標籤、群組框、數值／日期／時間欄位，並支援事件繫結與必填／長度驗證。
+  - **報表**：因官方 OASIS ODF schema 並未定義報表內容結構（先前以虛構命名空間
+    `urn:oasis:names:tc:opendocument:xmlns:report:1.0` 推測的設計已查證不可行並移除），改以
+    `AddReport` 的 `href` 參照機制連結至獨立 `TextDocument`（搭配
+    `text:database-display`／`text:database-next` 欄位），這是真實可用且符合規格的作法。
+  - **Schema 導覽與 mutation**：`OdfDatabaseSchema` 提供資料表、欄位、主鍵、外鍵、索引的完整
+    CRUD（計畫文件原規劃中基於推測的「ODB 檢視表定義」已查證不可行並移除）。
+  - **互通驗收**：實機重新驗證（2026-06-23）發現 LibreOffice 26.2.1 headless 的
+    `--convert-to` 對 ODB 的失效模式比先前記錄更隱晦——轉換目標為 `odb` 時明確回報
+    「no export filter」，但轉換目標為 `txt`／`ods`／`xlsx`／`csv` 時卻以結束碼 0 成功，
+    實際上只是逐位元組原樣複製來源檔案、並未真正轉換（已修正
+    `LibreOfficeInteropTests.DatabaseSchemaPackageUsesLibreOfficeCompatibleMimeType` 的文件
+    註解用語）。改以封裝層級 mimetype／manifest 驗證搭配先前已完成的 LibreOffice UNO API
+    （`desktop.loadComponentFromURL`）人工驗證佐證真實載入能力。
+  - **邊界測試**：新增 `DatabaseBoundaryTests`，涵蓋 `AddTable`／`AddQuery` 空白名稱或命令時
+    擲出 `ArgumentException`、`RemoveTable`／`RemoveQuery`／`RemoveDataSourceSetting` 對不存在
+    名稱回傳 `false`、`FindTable`／`FindQuery`／`FindDataSourceSetting` 對不存在名稱回傳
+    `null`。
+  - **Template／Flat 變體**：ODF 規格設計上即未定義 ODB 的 template 或 flat XML 變體（不同於
+    其他七個格式族），故「變體專屬 workflow」此項不適用（N/A），非缺口。
 - ODT `text:tracked-changes` 已支援段落與表格儲存格插入／格式變更記錄；LO 互通測試已備（`TrackedChangesInteropTests`）。
 - ODS `table:tracked-changes` 已支援儲存格內容／公式變更、列／欄插入刪除與儲存格移動；LO 互通測試已新增（需本機 LibreOffice 26.x）。
 - ODG 已補強路徑、多邊形、連接線（含 `draw:points` 路由）、自定義幾何、群組、圖層、文字方塊、圖片與圖層指派讀取 API（`GetPaths`／`GetConnectors`／`GetPolygons`／`GetCustomShapes`／`GetGroups`／`GetLayers`／`GetTextBoxes`／`GetPictures`／`GetShapeLayerAssignments`）；測試見 `DrawingHighLevelApiTests`。
 - ODC／嵌入圖表已補強 `OdfChartDocument.GetChartDefinition`；ODB 已補強 `AddForm`／`GetForms` 表單元件 API（`DatabaseHighLevelApiTests`）。
 - ODF 已補強 `GetMathTokens` 讀取 API；ODI 已補強 `GetImageFrames`／`AddImageFrame`（`FormulaHighLevelApiTests`、`ImageHighLevelApiTests`）。
 - LibreOffice `loext` Argon2id 與 `calcext` 條件格式／sparkline 寫入已實作；CALCEXT-1 基礎 ✅：工作表層與 `SpreadsheetDocument.GetConditionalFormats`／`GetSparklineGroups` 文件層聚合讀取。
-- `.odc`、`.odf`、`.odi`、`.odb` 標為 `usable`：已有摘要與常用編輯 API，
+- `.odc`、`.odf`、`.odi` 標為 `usable`：已有摘要與常用編輯 API，
   `SecondaryFormatApiScenarioTests` 已背書連線／圖表軸／公式 token／多框架影像等場景；
-  完整語意模型（例如 ODC chart style 物件模型）仍屬 Wave 2 DEPTH-2 延伸。
+  完整語意模型（例如 ODC chart style 物件模型）仍屬 Wave 2 DEPTH-2 延伸。`.odb` 已於
+  Batch 6（2026-06-23）升級為 `complete`，詳見下方說明。
 - 次要格式與變體高階物件模型補完計畫（原 Batch 1-6 + 測試補強，已於 2026-06-23 全數完成並移除
   追蹤文件）：ODC／ODB／ODI／ODF 公式四項次要格式高階物件模型，以及範本變數系統
   （`text:user-field-decls`）、範本清除使用者資料、範本區段唯讀標記、ODM 主控文件子文件
