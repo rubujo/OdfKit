@@ -3,8 +3,6 @@
 本文件記錄 OdfKit 與 **LibreOffice 26.x** 的實機 headless 互通驗收範圍。
 矩陣以 `OdfKit.Tests/LibreOfficeInteropTests.cs` 與 `eng/Test-LibreOfficeInterop.ps1` 為準。
 
-完滿化路線圖見 [eng/OdfKit-Completeness-Plan.md](../eng/OdfKit-Completeness-Plan.md)（Wave 3 X-2）。
-
 ## 執行方式
 
 ```powershell

@@ -59,7 +59,6 @@
 去重結論：目前沒有足夠證據刪除超過 5 個 E2E 測試；依 TEST-STRUCT 的保守規則，不為降低數字而刪除互補的 E2E 覆蓋。
 ## 維護入口
 
-- 測試結構整理計畫：`IMPLEMENTATION_PLAN.md` 的 `Phase TEST-STRUCT`。
 - 安全格式化：`pwsh eng/Format-Safe.ps1 -IncludeTests`。
 - 合併衝突標記檢查：`pwsh eng/Test-MergeConflictMarkers.ps1`。
 - 簽署稽核：`pwsh eng/Test-GpgSignatures.ps1`。

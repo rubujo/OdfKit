@@ -1,8 +1,6 @@
 # Changelog
 
 本檔案依 [Keep a Changelog](https://keepachangelog.com/) 慣例，記錄 OdfKit 對外可見的重大里程碑。
-逐任務工程細節（FIND/REPLACE 層級）請見 [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)；
-完滿化路線圖請見 [eng/OdfKit-Completeness-Plan.md](eng/OdfKit-Completeness-Plan.md)。
 
 ## [0.0.1] - 未發行（GitHub Release 資產，非 nuget.org）
 

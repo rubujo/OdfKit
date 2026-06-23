@@ -4,7 +4,6 @@
 測試證據為準，不把路線圖中的目標預先標為完成。
 
 ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-parity.md)。
-完滿化路線圖見 [eng/OdfKit-Completeness-Plan.md](../eng/OdfKit-Completeness-Plan.md)。
 
 ## 狀態標記
 
@@ -68,11 +67,12 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - `.odc`、`.odf`、`.odi`、`.odb` 標為 `usable`：已有摘要與常用編輯 API，
   `SecondaryFormatApiScenarioTests` 已背書連線／圖表軸／公式 token／多框架影像等場景；
   完整語意模型（例如 ODC chart style 物件模型）仍屬 Wave 2 DEPTH-2 延伸。
-- 次要格式與變體高階物件模型補完 Batch 1（P0/P1）已完成：ODC 數據標籤／牆面地板樣式、
-  ODB 欄位約束與索引、ODI 影像濾鏡與旋轉裁切、ODF 公式分數／根號／矩陣型別化 token 與
-  `OdfMathBuilder` fluent API、範本使用者欄位（`text:user-field-decls`）、ODM 主控文件子文件
-  CRUD 完整化、Flat XML ↔ ZIP 就地轉換 API；剩餘 P2 任務見
-  [docs/ODF_SECONDARY_FORMAT_COMPLETION_PLAN.md](ODF_SECONDARY_FORMAT_COMPLETION_PLAN.md)。
+- 次要格式與變體高階物件模型補完計畫（原 Batch 1-6 + 測試補強，已於 2026-06-23 全數完成並移除
+  追蹤文件）：ODC／ODB／ODI／ODF 公式四項次要格式高階物件模型，以及範本變數系統
+  （`text:user-field-decls`）、範本清除使用者資料、範本區段唯讀標記、ODM 主控文件子文件
+  CRUD 完整化／條件式載入／合併為單一文件／大綱階層位移、Flat XML ↔ ZIP 就地轉換 API與
+  大型文件記憶體優化。原規劃中基於推測而非實際 schema 查證的項目（ODB 檢視表定義、
+  報表詳細設計、ODI 中繼資料擴充與分組圖層）已查證為不可行並從規劃中移除。
 - RDF-1 基礎 ✅：`manifest.rdf` 文件層往返、`pkg:` ontology 同步；corpus 含 `repo-generated-manifest-rdf-text`（`RdfMetadataTests`）。
 - LOEXT-1 基礎 ✅：`loext:decorative` 載入映射至 `draw:decorative`（`OdfLoExtInteropEngine`、`LoExtInteropTests`）。
 - repo 內 corpus 已擴充至 200+ fixtures（`tools/OdfCorpusGenerator` + 手工負向／版本特例）；
