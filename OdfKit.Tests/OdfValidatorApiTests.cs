@@ -1,8 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using OdfKit.Chart;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.Database;
+using OdfKit.DOM;
+using OdfKit.Formula;
+using OdfKit.Image;
+using OdfKit.Spreadsheet;
 using OdfKit.Text;
 using Xunit;
 
@@ -166,5 +172,58 @@ public class OdfValidatorApiTests
 
         Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
         Assert.Equal(OdfDocumentKind.Text, report.DocumentKind);
+    }
+
+    /// <summary>
+    /// 驗證文件級 <see cref="OdfDocument.Validate(OdfComplianceProfile?)"/> 並非僅限於 Text，
+    /// 而是因定義於 <see cref="OdfDocument"/> 基底類別而對所有文件種類（包含次要格式）皆可用，
+    /// 完成 Workstream E「統一驗證 API」對全格式的覆蓋。
+    /// </summary>
+    [Fact]
+    public void DocumentInstance_Validate_AcrossSecondaryFormatKinds_AllSucceed()
+    {
+        using ChartDocument chart = ChartDocument.Create(new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Bar,
+            Title = "驗證測試圖表",
+            DataRange = new OdfCellRange(0, 0, 4, 1, "LocalTable"),
+            HasLegend = false
+        });
+        OdfValidationReport chartReport = chart.Validate();
+        Assert.True(chartReport.IsValid, string.Join(Environment.NewLine, chartReport.Issues));
+
+        using OdfFormulaDocument formula = OdfFormulaDocument.Create();
+        formula.SetIdentifierEquation("x", "y");
+        OdfValidationReport formulaReport = formula.Validate();
+        Assert.True(formulaReport.IsValid, string.Join(Environment.NewLine, formulaReport.Issues));
+
+        using OdfImageDocument image = OdfImageDocument.Create();
+        OdfValidationReport imageReport = image.Validate();
+        Assert.True(imageReport.IsValid, string.Join(Environment.NewLine, imageReport.Issues));
+
+        using OdfDatabaseDocument database = OdfDatabaseDocument.Create();
+        OdfValidationReport databaseReport = database.Validate();
+        Assert.True(databaseReport.IsValid, string.Join(Environment.NewLine, databaseReport.Issues));
+    }
+
+    /// <summary>
+    /// 驗證文件級 <see cref="OdfDocument.Validate(OdfComplianceProfile?)"/> 的負向案例：
+    /// 插入未註冊命名空間／元素名稱的節點後，以嚴格相容性設定檔驗證應回報失敗，而非靜默通過。
+    /// </summary>
+    [Fact]
+    public void DocumentInstance_Validate_DetectsUnregisteredElementUnderStrictProfile()
+    {
+        using TextDocument doc = TextDocument.Create();
+        doc.AddParagraph("正常段落");
+
+        // 使用已知命名空間（text:）但 schema 未定義的本地名稱，觸發嚴格 RNG 結構驗證失敗；
+        // 完全陌生的命名空間反而會被視為外部擴充標記而略過，不構成有效的負向測試案例。
+        OdfNode bogus = OdfNodeFactory.CreateElement("totally-bogus-element", OdfNamespaces.Text, "text");
+        doc.BodyTextRoot.AppendChild(bogus);
+
+        OdfValidationReport report = doc.Validate(OdfComplianceProfiles.OasisOdf14Strict);
+
+        Assert.False(report.IsValid, "插入未註冊命名空間的元素應使嚴格相容性設定檔驗證失敗。");
+        Assert.NotEmpty(report.Issues);
     }
 }

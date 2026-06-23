@@ -67,13 +67,19 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
   `LibreOfficeInteropTests.LibreOfficeHeadless_LoadsTemplateVariantDocuments` 實機互通驗收。
   維持 `usable-variant` 而非升級為 `complete`：範本本身內容編輯仍沿用基底格式語意 API，
   尚未有範本專屬的深度內容模型；其餘 Batch 1（`.odm`／`.oth`／`.fodt`／`.fods`／`.fodp`／`.fodg`）
-  與 Workstream D（Chart／Formula／Image／Database 深度語意模型）、Workstream F（剩餘 16
-  種 extension 的 LibreOffice 互通）仍待後續批次。
+  與 Workstream D（Chart／Formula／Image／Database 深度語意模型，已於 Batch 3-6 完成
+  各自計畫明確列出的缺口）。
 - 文件級 `OdfDocument.Validate(OdfComplianceProfile?)` / `ValidateAsync(...)` 已新增（Workstream E
-  骨架 ✅）：所有文件種類現皆可直接呼叫實例方法驗證目前（含尚未儲存的編輯）記憶體狀態，
-  內部委派既有 `OdfValidator` 靜態進入點與 `OdfValidationReport` 結構化結果；
-  測試見 `OdfValidatorApiTests.DocumentInstance_Validate_ReflectsUnsavedEdits` 與
-  `DocumentInstance_ValidateAsync_ReturnsStructuredReport`。
+  ✅，2026-06-23／24）：所有文件種類現皆可直接呼叫實例方法驗證目前（含尚未儲存的編輯）記憶體
+  狀態，內部委派既有 `OdfValidator` 靜態進入點與 `OdfValidationReport` 結構化結果。因定義於
+  `OdfDocument` 基底類別，對全部文件種類（包含 Chart／Formula／Image／Database 等次要格式與其
+  Template／Flat 變體）皆通用，無需逐格式重複實作。測試見
+  `OdfValidatorApiTests.DocumentInstance_Validate_ReflectsUnsavedEdits`、
+  `DocumentInstance_ValidateAsync_ReturnsStructuredReport`（正向，Text）、
+  `DocumentInstance_Validate_AcrossSecondaryFormatKinds_AllSucceed`（正向，跨 Chart／Formula／
+  Image／Database 驗證 API 通用性）、
+  `DocumentInstance_Validate_DetectsUnregisteredElementUnderStrictProfile`（負向，插入未註冊
+  schema 元素於嚴格設定檔下應回報失敗）。
 - `.fodt`／`.fods`／`.fodp`／`.fodg`（Batch 1 第二波，2026-06-23）：新增型別化 Flat XML↔ZIP
   雙向轉換工作流——`FlatTextDocument.CreateFromDocument(TextDocument)`／
   `FlatSpreadsheetDocument.CreateFromDocument(SpreadsheetDocument)`／
