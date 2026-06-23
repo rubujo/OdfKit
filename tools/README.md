@@ -1,7 +1,7 @@
 # OdfKit 工具總覽
 
 本目錄收錄 OdfKit 的命令列工具與開發用產生器。它們**不是**可發佈套件，
-主要用於驗證、轉換、schema 生成、corpus 產生與 trimming 煙霧測試。
+主要用於驗證、轉換、schema 產生、corpus 產生與 trimming 煙霧測試。
 
 ## 工具一覽
 
@@ -14,7 +14,7 @@
 
 ## 1. OdfKit.Cli
 
-### 支援命令
+### 可用命令
 
 | 命令 | 用途 |
 |------|------|
@@ -112,7 +112,7 @@ TrimSmoke OK: 15 API 根通過
 
 ## 5. 與 samples 的分工
 
-- `tools/` 側重 **驗證、轉換、生成與工程煙霧測試**
+- `tools/` 側重 **驗證、轉換、產生與工程煙霧測試**
 - `samples/` 側重 **使用情境展示與輸出成果範例**
 
 若要先看 API 示範，請讀 [samples/README.md](../samples/README.md)。

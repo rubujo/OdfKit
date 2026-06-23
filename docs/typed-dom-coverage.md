@@ -1,19 +1,19 @@
 # Typed DOM Coverage
 
-本文件記錄 OdfKit typed DOM 對標 ODFDOM 的目前完成線。typed DOM 的目標不是取代高階文件 facade，而是提供 schema-aware、prefix-independent、可保真的 ODF-first 操作層。
+本文件記錄 OdfKit typed DOM 對標 ODFDOM 的目前完成線。typed DOM 的目標不是取代高階文件 facade，而是提供可感知 schema、與 prefix 無關且可保真的 ODF-first 操作層。
 
 ## 目前能力
 
 - `OdfNodeFactory.CreateElement(...)` 會先呼叫 generated factory，找不到 typed wrapper 時才回退到通用 `OdfElement`。
 - `OdfElement.cs` 保留常用手寫 wrapper，例如 text paragraph、heading、table cell、draw frame、office document 與 manifest file entry。
 - `GeneratedDomWrappers.g.cs` 由 ODF 1.4 schema metadata 產生，涵蓋大量 schema element wrapper、factory case 與 attribute property，且已重產生為第一批 typed datatype property。
-- `OdfTypedDomCoverage.Build()` 會產生 machine-readable schema-to-wrapper report，列出 schema element、wrapper type、fallback 狀態、schema child element relation、wrapper property 數、schema attribute value type 分布與 wrapper property CLR type 分布。
+- `OdfTypedDomCoverage.Build()` 會產生機器可讀的 schema-to-wrapper 報告，列出 schema element、wrapper type、fallback 狀態、schema child element relation、wrapper property 數、schema attribute value type 分布與 wrapper property CLR type 分布。
 - CLI `typed-dom-coverage --format json` 可輸出同一份 report，供 CI 或 release artifact 保存。
 - `eng/Test-OdfTypedDomCoverage.ps1` 會產生 `artifacts/typed-dom-coverage/odf-typed-dom-coverage.json`，GitHub Actions `Typed DOM coverage` workflow 會上傳同一份 artifact。
 - `OdfElement` 已提供 typed child facade，可用泛型 `ChildElements<TElement>()`、`DescendantElements<TElement>()`、`AppendElement<TElement>()` 與 typed insert helper 操作 generated 與手寫 wrapper，並保留未知節點與原始 DOM child list。
 - `GeneratedDomWrappers.g.cs` 已依 schema child element relation 產生 schema-specific child collection property，例如 `OfficeTextChildElements`、`TableTableRowChildElements` 與 `TextPChildElements`。
 - `TypedDomParityTests` 已用 ODFDOM 風格 user story 覆蓋 text body、spreadsheet table、image frame / SVG alternative text、巢狀清單 / 註腳、presentation draw page / text box / notes，以及 MathML formula object 的 typed 建立、schema-specific child collection traversal 與 XML round-trip。
-- `OdfElement` 已提供 schema-aware typed attribute helpers，涵蓋 `int`、`bool`、`decimal`、ODF 日期時間字串、XML Schema `time` / `duration`、ODF 長度 / 百分比、三段邊框線寬、0 到 100 百分比、角度、FO 分頁保持 / 換行選項 / 文字轉換 / 文字對齊、3D 投影 / 著色模式、SVG 填滿規則 / 線端樣式、表格邊框模型、文字清單標籤 / 清單定位 / 索引範圍 / 資料表來源 / 錨定 / 註解類別 / 頁面選取 / 參照格式 / 起始編號 / 註腳位置 / 標號序列 / 編號位置 / 預留位置 / 動畫 / 動畫方向 / 索引項目種類、線條樣式 / 類型 / 寬度 / 模式、繪圖填滿 / 圖片參照點 / 色彩模式 / 線條接合、通用字型家族 / 字型間距 / 字型浮雕 / 字型伸縮 / 字型樣式 / 變體 / 粗細、樣式斷行 / 背景重複 / 方向 / 書寫方向 / 文字旋轉縮放 / 文字組合 / 文字系統類型 / 文字強調 / 水平與垂直定位 / 垂直對齊 / 文繞圖 / 穿越排列 / 輪廓繞排、表單方向、表格方向 / 方位 / 成員顯示方向 / 版面配置模式、資料庫參照動作規則、XLink 類型 / 顯示 / 觸發行為、數字樣式長短 / 音譯樣式、表格排序 / 類型、簡報效果 / 速度 / 動作 / 轉場類型 / 轉場樣式 / 預設動畫類別、樣式名稱 / 樣式名稱參照清單、色彩、IRI 參照、儲存格位址 / 範圍位址、儲存格範圍位址清單、三維向量 / 三維點、二維整數座標清單、語言 / 國別 / 文字系統 token、命名空間 token、單一字元、文字編碼名稱、目標框架名稱、XML 名稱、`style:family`、`office:version` 與 MIME 類型。
+- `OdfElement` 已提供可感知 schema 的 typed attribute helpers，涵蓋 `int`、`bool`、`decimal`、ODF 日期時間字串、XML Schema `time` / `duration`、ODF 長度 / 百分比、三段邊框線寬、0 到 100 百分比、角度、FO 分頁保持 / 換行選項 / 文字轉換 / 文字對齊、3D 投影 / 著色模式、SVG 填滿規則 / 線端樣式、表格邊框模型、文字清單標籤 / 清單定位 / 索引範圍 / 資料表來源 / 錨定 / 註解類別 / 頁面選取 / 參照格式 / 起始編號 / 註腳位置 / 標號序列 / 編號位置 / 預留位置 / 動畫 / 動畫方向 / 索引項目種類、線條樣式 / 類型 / 寬度 / 模式、繪圖填滿 / 圖片參照點 / 色彩模式 / 線條接合、通用字型家族 / 字型間距 / 字型浮雕 / 字型伸縮 / 字型樣式 / 變體 / 粗細、樣式斷行 / 背景重複 / 方向 / 書寫方向 / 文字旋轉縮放 / 文字組合 / 文字系統類型 / 文字強調 / 水平與垂直定位 / 垂直對齊 / 文繞圖 / 穿越排列 / 輪廓繞排、表單方向、表格方向 / 方位 / 成員顯示方向 / 版面配置模式、資料庫參照動作規則、XLink 類型 / 顯示 / 觸發行為、數字樣式長短 / 音譯樣式、表格排序 / 類型、簡報效果 / 速度 / 動作 / 轉場類型 / 轉場樣式 / 預設動畫類別、樣式名稱 / 樣式名稱參照清單、色彩、IRI 參照、儲存格位址 / 範圍位址、儲存格範圍位址清單、三維向量 / 三維點、二維整數座標清單、語言 / 國別 / 文字系統 token、命名空間 token、單一字元、文字編碼名稱、目標框架名稱、XML 名稱、`style:family`、`office:version` 與 MIME 類型。
 - `OdfElement` 另提供 schema token helpers，涵蓋 `number:calendar`、`table:member-type`、`table:grouped-by`、`table:sort-mode`、`table:condition-source`、`table:function`、`db:is-nullable`、`db:data-source-setting-type`、`anim:color-interpolation`、`anim:color-interpolation-direction` 與 `draw:nohref`。
 - `DomWrappersCSharpWriter` 會從 RELAX NG `data` / `value` 節點與常用 named pattern 推斷 datatype，讓 wrapper 可把 boolean、integer、decimal、date/dateTime、time、duration、length/percent、borderWidths、bounded percent、angle、foKeepTogether/foWrapOption/foTextTransform/foTextAlign、dr3dProjection/dr3dShadeMode、svgFillRule/svgStrokeLineCap、tableBorderModel、textLabelFollowedBy/textListLevelPositionMode/textIndexScope/textTableType/textAnchorType/textNoteClass/textSelectPage/textReferenceFormat/textStartNumberingAt/textFootnotesPosition/textCaptionSequenceFormat/textNumberPosition/textPlaceholderType/textAnimation/textAnimationDirection/textKind、drawFill/drawFillImageRefPoint/drawColorMode/drawStrokeLineJoin、lineStyle/lineType/lineWidth/lineMode、fontFamilyGeneric/fontPitch/fontRelief/fontStretch/fontStyle/fontVariant/fontWeight、styleLineBreak/styleRepeat/styleDirection/styleWritingMode/styleTextRotationScale/styleTextCombine/styleVerticalAlign/styleVerticalPos/styleVerticalRel/styleHorizontalPos/styleHorizontalRel/styleWrap/styleRunThrough/styleWrapContourMode/styleScriptType/styleTextEmphasize、formOrientation、tableDirection/tableOrientation/tableDisplayMemberMode/tableLayoutMode、databaseRule、xLinkType/xLinkShow/xLinkActuate、numberStyle/numberTransliterationStyle、tableOrder/tableType、presentationEffect/presentationSpeed/presentationAction/presentationTransitionType/presentationTransitionStyle/presentationPresetClass、style name/list、color、IRI reference、cell address/range address、cell range address list、vector3D、point3D、points、language/country/script tokens、namespacedToken、character、textEncoding、targetFrameName、XML name、style family、ODF version 與 media type attribute 輸出為可空強型別屬性；未知或衝突型別會保守維持 `string?`。
 - generator 也會把上述 schema token attribute 輸出為對應 enum 屬性；目前 generated `string?` wrapper property 已收斂至 39691 個。
@@ -184,10 +184,9 @@
 
 Typed DOM parity 已經達到 `complete` 狀態。我們已滿足下列所有完成條件：
 
-- 產生 machine-readable coverage report，列出 schema element / attribute 對應 wrapper 與 schema child element relation。（已完成，CI/CD 自動生成並保存於產出物）
+- 產生機器可讀的 coverage 報告，列出 schema element / attribute 對應 wrapper 與 schema child element relation。（已完成，CI/CD 自動產生並保存於產出物）
 - 所有 ODF 1.4 schema element 可由 factory 建立，並能 parse / serialize round-trip。（已完成）
 - typed child facade 可支援 ODFDOM 風格的建立、插入、列舉與 round-trip user story。（已完成）
 - generated wrapper 提供 schema-specific child collection property，並由 coverage guard 防止數量退化。（已完成）
 - 常用 datatype attribute 有強型別存取或明確保留為 string 的理由。（已完成）
 - 與 ODFDOM sample usage 對照的 user story tests，已完成文字、試算表、圖片 frame、巢狀清單、註腳、簡報頁面與 MathML formula object traversal 等測試，並全部整合於 `TypedDomParityTests.cs` 中。（已完成）
-

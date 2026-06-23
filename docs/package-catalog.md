@@ -23,7 +23,7 @@
 | `OdfKit.Cli` | CLI 工具 | 驗證、資訊查詢、sanitize、flat XML / CSV 轉換 |
 | `samples/Sample.cs` | 範例 | 單檔 Script 展示主要功能 |
 | `OdfCorpusGenerator` | 開發工具 | 產生 corpus 與測試資料 |
-| `OdfSchemaGenerator` | 開發工具 | schema 衍生與 DOM wrapper 生成 |
+| `OdfSchemaGenerator` | 開發工具 | schema 衍生與 DOM wrapper 產生 |
 | `OdfKit.TrimSmoke` | 開發工具 | trimming / Native AOT API 根煙霧測試 |
 | `OdfKit.Tests` | 測試套件 | 單元、整合、互通與 packaging 驗證 |
 | `OdfKit.Benchmarks` | 基準測試 | 效能與資源使用量量測 |
