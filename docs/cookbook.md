@@ -299,3 +299,94 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack file.fodt file
 
 `validate` 在 CI 中可用 exit code 判斷結果：`0` 表示通過，`1` 表示驗證錯誤或 `--fail-on warning` 命中，`2` 表示參數或路徑錯誤。
 `sanitize` 會移除巨集、指令碼參照與簽章 artifact，並另存為新的 ODF 檔案；加密文件可用 `--password` 載入，並用 `--output-password` 重新加密輸出。
+
+## Web 應用程式檔案下載
+
+在 Web 應用程式中動態產生 ODF 文件並提供下載時，建議直接將其儲存至記憶體串流 (MemoryStream) 或位元組陣列，避免在伺服器上產生實體暫存檔。
+
+### ODF MIME 類型對照表
+
+在設定 HTTP 回應時，請根據下載的文件格式設定正確的 MIME 類型：
+
+| 擴充副檔名 | 文件類型 | MIME 類型 (Content-Type) |
+| :--- | :--- | :--- |
+| `.odt` | ODF 文字文件 | `application/vnd.oasis.opendocument.text` |
+| `.ods` | ODF 試算表 | `application/vnd.oasis.opendocument.spreadsheet` |
+| `.odp` | ODF 簡報 | `application/vnd.oasis.opendocument.presentation` |
+| `.odg` | ODF 繪圖 | `application/vnd.oasis.opendocument.graphics` |
+
+### ASP.NET Core Razor Pages (非同步)
+
+在 ASP.NET Core 中，應優先使用 `SaveToStreamAsync` 將文件寫入 `MemoryStream`，並回傳 `FileStreamResult`。這可以避免在大量請求時阻塞執行緒。
+
+```csharp
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using OdfKit.Spreadsheet;
+
+public class DownloadModel : PageModel
+{
+    public async Task<IActionResult> OnGetDownloadOdsAsync()
+    {
+        // 1. 建立 ODS 試算表文件
+        using SpreadsheetDocument workbook = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = workbook.Worksheets.Add("Data");
+        sheet.Cells["A1"].CellValue = "Name";
+        sheet.Cells["B1"].CellValue = "Amount";
+        sheet.Cells["A2"].CellValue = "OdfKit User";
+        sheet.Cells["B2"].CellValue = 100;
+
+        // 2. 將文件非同步寫入 MemoryStream 記憶體串流
+        var stream = new MemoryStream();
+        await workbook.SaveToStreamAsync(stream);
+        
+        // 3. 將串流指標移回起點以供讀取
+        stream.Position = 0;
+
+        // 4. 設定 ODF 試算表 MIME 類型與下載檔名
+        string contentType = "application/vnd.oasis.opendocument.spreadsheet";
+        string fileName = "report.ods";
+
+        // 回傳 FileStreamResult，ASP.NET Core 會自動在 HTTP 回應完成後關閉並釋放串流
+        return File(stream, contentType, fileName);
+    }
+}
+```
+
+### ASP.NET WebForms (同步)
+
+在傳統的 ASP.NET WebForms 中，建議使用 `SaveToBytes` 將文件轉為位元組陣列，寫入 `HttpResponse`，並呼叫 `HttpContext.Current.ApplicationInstance.CompleteRequest()`。這可避免 WebForms 繼續執行 Page 生命週期而將額外的 HTML 標記寫入檔案，導致下載的 ODF 檔案損毀。
+
+```csharp
+using System;
+using System.IO;
+using System.Web;
+using OdfKit.Spreadsheet;
+
+protected void btnDownload_Click(object sender, EventArgs e)
+{
+    // 1. 建立 ODS 試算表文件
+    using SpreadsheetDocument workbook = SpreadsheetDocument.Create();
+    OdfTableSheet sheet = workbook.Worksheets.Add("Data");
+    sheet.Cells["A1"].CellValue = "Name";
+    sheet.Cells["B1"].CellValue = "Amount";
+    sheet.Cells["A2"].CellValue = "OdfKit User";
+    sheet.Cells["B2"].CellValue = 100;
+
+    // 2. 將文件寫入位元組陣列
+    byte[] fileBytes = workbook.SaveToBytes();
+
+    // 3. 設定 HTTP 回應標頭與內容
+    HttpResponse response = HttpContext.Current.Response;
+    response.Clear();
+    response.ClearHeaders();
+    response.ContentType = "application/vnd.oasis.opendocument.spreadsheet";
+    response.AddHeader("Content-Disposition", "attachment; filename=\"report.ods\"");
+    response.AddHeader("Content-Length", fileBytes.Length.ToString());
+    response.BinaryWrite(fileBytes);
+    
+    // 4. 結束回應，避免 WebForms 繼續渲染 HTML 頁面內容而導致檔案損毀
+    response.Flush();
+    HttpContext.Current.ApplicationInstance.CompleteRequest();
+}
+```
