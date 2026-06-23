@@ -30,12 +30,12 @@ public class LibreOfficeInteropTests
     /// 驗證含追蹤修訂的 ODT 可由 LibreOffice 26.x headless 模式載入、轉換並由 OdfKit 重新讀取。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_LoadsTrackedChangesOdt()
+    public void LibreOfficeHeadless_LoadsTrackedChangesOdt()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過追蹤修訂實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過追蹤修訂實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeTrackedChanges_" + Guid.NewGuid().ToString("N"));
@@ -107,12 +107,12 @@ public class LibreOfficeInteropTests
     /// 驗證含 <c>table:tracked-changes</c> 的 ODS 可由 LibreOffice 26.x headless 模式載入並往返。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_LoadsTrackedChangesOds()
+    public void LibreOfficeHeadless_LoadsTrackedChangesOds()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過 ODS 追蹤修訂實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過 ODS 追蹤修訂實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeTrackedChangesOds_" + Guid.NewGuid().ToString("N"));
@@ -155,12 +155,12 @@ public class LibreOfficeInteropTests
     /// 仍可由 LibreOffice 26.x headless 模式載入並往返，且儲存格已還原為原始內容。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_RejectAllChangesRoundTripsOds()
+    public void LibreOfficeHeadless_RejectAllChangesRoundTripsOds()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過拒絕全部修訂實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過拒絕全部修訂實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeRejectAllChangesOds_" + Guid.NewGuid().ToString("N"));
@@ -220,12 +220,12 @@ public class LibreOfficeInteropTests
     /// 套用後的嵌入圖表，仍可由 LibreOffice 26.x headless 模式載入並正確往返。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_ChartApplyDefinitionAndClearSeriesRoundTripsOds()
+    public void LibreOfficeHeadless_ChartApplyDefinitionAndClearSeriesRoundTripsOds()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過圖表定義套用與序列清除實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過圖表定義套用與序列清除實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeChartApplyDefinition_" + Guid.NewGuid().ToString("N"));
@@ -319,12 +319,12 @@ public class LibreOfficeInteropTests
     /// 重新匯出為 CSV 檔案，驗證資料往返不失真。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_CsvImportFromFileThenExportToFileRoundTrips()
+    public void LibreOfficeHeadless_CsvImportFromFileThenExportToFileRoundTrips()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過 CSV 檔案路徑 API 實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過 CSV 檔案路徑 API 實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitCsvFileApiInterop_" + Guid.NewGuid().ToString("N"));
@@ -375,12 +375,12 @@ public class LibreOfficeInteropTests
     /// headless 模式正確載入、往返並轉出 PDF，且框線屬性於往返後仍存在於 content.xml 中。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_CellSetBordersRoundTripsOdsAndPdf()
+    public void LibreOfficeHeadless_CellSetBordersRoundTripsOdsAndPdf()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過儲存格框線實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過儲存格框線實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeCellBorders_" + Guid.NewGuid().ToString("N"));
@@ -443,12 +443,12 @@ public class LibreOfficeInteropTests
     /// 解析結果）於往返後仍正確。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_PivotTableRoundTripsOdsAndPdf()
+    public void LibreOfficeHeadless_PivotTableRoundTripsOdsAndPdf()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過樞紐分析表實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過樞紐分析表實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficePivotTable_" + Guid.NewGuid().ToString("N"));
@@ -537,12 +537,12 @@ public class LibreOfficeInteropTests
     /// 屬性，於 LibreOffice 26.x headless 模式往返後語意仍正確。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_SheetLayoutApiRoundTripsOds()
+    public void LibreOfficeHeadless_SheetLayoutApiRoundTripsOds()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過工作表版面配置實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過工作表版面配置實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeSheetLayout_" + Guid.NewGuid().ToString("N"));
@@ -651,12 +651,12 @@ public class LibreOfficeInteropTests
     /// 且清除後對應的 XML 結構與屬性應完全移除。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_SheetPrintSettingsClearApiRoundTripsOdsAndPdf()
+    public void LibreOfficeHeadless_SheetPrintSettingsClearApiRoundTripsOdsAndPdf()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過工作表列印設定實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過工作表列印設定實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficePrintSettingsClear_" + Guid.NewGuid().ToString("N"));
@@ -783,12 +783,12 @@ public class LibreOfficeInteropTests
     /// 於版面配置與列印設定變更後仍可正確列舉已使用儲存格。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_PrintScaleAndPageBreaksWithUsedCellsRoundTripsOds()
+    public void LibreOfficeHeadless_PrintScaleAndPageBreaksWithUsedCellsRoundTripsOds()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過列印縮放與分頁符實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過列印縮放與分頁符實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficePrintScalePageBreaks_" + Guid.NewGuid().ToString("N"));
@@ -874,12 +874,12 @@ public class LibreOfficeInteropTests
     /// 且欄群組節點應完全移除、欄資料與順序應正確還原。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_UngroupColumnsRoundTripsOdsAndPdf()
+    public void LibreOfficeHeadless_UngroupColumnsRoundTripsOdsAndPdf()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過欄群組移除實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過欄群組移除實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeUngroupColumns_" + Guid.NewGuid().ToString("N"));
@@ -955,12 +955,12 @@ public class LibreOfficeInteropTests
     /// 驗證 ODT、ODS、ODP 與 ODG 可由 LibreOffice 26.x headless 模式載入並轉換。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_LoadsGeneratedDocuments()
+    public void LibreOfficeHeadless_LoadsGeneratedDocuments()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeInterop_" + Guid.NewGuid().ToString("N"));
@@ -1112,12 +1112,12 @@ public class LibreOfficeInteropTests
     /// 自訂字型宣告皆能往返保真（巢狀表格改由 OdfKit 自身 round-trip 驗證，原因詳見內文註解）。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_LoadsIndexTemplatesNestedStructuresAndFontFace()
+    public void LibreOfficeHeadless_LoadsIndexTemplatesNestedStructuresAndFontFace()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過索引範本與巢狀結構實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過索引範本與巢狀結構實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeIndexTemplates_" + Guid.NewGuid().ToString("N"));
@@ -1199,12 +1199,12 @@ public class LibreOfficeInteropTests
     /// content.xml 結構驗證。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_LoadsBuilderImageFrameSectionAndFloatingTextBoxDocument()
+    public void LibreOfficeHeadless_LoadsBuilderImageFrameSectionAndFloatingTextBoxDocument()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過 Builder／影像框架／區段／浮動文字框實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過 Builder／影像框架／區段／浮動文字框實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitLibreOfficeBuilderInterop_" + Guid.NewGuid().ToString("N"));
@@ -1492,8 +1492,14 @@ public class LibreOfficeInteropTests
         document.Save(path);
     }
 
-    private static string? FindLibreOffice26Soffice()
+    private static string GetExpectedLibreOfficeVersion()
     {
+        return Environment.GetEnvironmentVariable("ODFKIT_TEST_SOFFICE_VERSION") ?? "26.";
+    }
+
+    private static string? FindLibreOfficeSoffice()
+    {
+        string expectedVersion = GetExpectedLibreOfficeVersion();
         foreach (string candidate in EnumerateSofficeCandidates())
         {
             string? executable = ResolveSofficeExecutable(candidate);
@@ -1503,7 +1509,7 @@ public class LibreOfficeInteropTests
             }
 
             string version = GetVersion(executable);
-            if (version.Contains("LibreOffice 26.", StringComparison.OrdinalIgnoreCase))
+            if (version.Contains($"LibreOffice {expectedVersion}", StringComparison.OrdinalIgnoreCase))
             {
                 return executable;
             }
@@ -1647,12 +1653,12 @@ public class LibreOfficeInteropTests
     /// 驗證官方範例 Sample.cs 可成功編譯執行，且其產生的 ODT、ODS、ODP 檔案可由 LibreOffice 完美載入與相容。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_LoadsSampleGeneratedDocuments()
+    public void LibreOfficeHeadless_LoadsSampleGeneratedDocuments()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過範例文件實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過範例文件實機互通性測試。");
         }
 
         string slnRoot = FindSolutionRoot();
@@ -1720,12 +1726,12 @@ public class LibreOfficeInteropTests
     /// 驗證由 OdtStreamWriter 與 OdsStreamWriter 流式寫入產生的文件可由 LibreOffice 完美載入與相容。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_LoadsStreamWriterGeneratedDocuments()
+    public void LibreOfficeHeadless_LoadsStreamWriterGeneratedDocuments()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過流式寫入文件實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過流式寫入文件實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitStreamWriterInterop_" + Guid.NewGuid().ToString("N"));
@@ -1779,12 +1785,12 @@ public class LibreOfficeInteropTests
     /// 驗證 CJK 增補平面與自造字罕見字寫入文件後，其 LibreOffice 實機開檔與轉檔內容的字元保真度。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_LoadsSupplementaryPlaneFontDocument()
+    public void LibreOfficeHeadless_LoadsSupplementaryPlaneFontDocument()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過罕見字實機字元保真度測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過罕見字實機字元保真度測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitRareCharInterop_" + Guid.NewGuid().ToString("N"));
@@ -1849,12 +1855,12 @@ public class LibreOfficeInteropTests
     /// <c>presentation:placeholder</c> 語意（並非退化為一般文字方塊）。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_SlideBuilderAddTitlePlaceholderRoundTrips()
+    public void LibreOfficeHeadless_SlideBuilderAddTitlePlaceholderRoundTrips()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過投影片 builder 標題預留位置實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過投影片 builder 標題預留位置實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitSlideBuilderTitlePlaceholderInterop_" + Guid.NewGuid().ToString("N"));
@@ -1902,12 +1908,12 @@ public class LibreOfficeInteropTests
     /// 建立的 ODF 公式文件可由 LibreOffice 26.x headless 模式正確開啟並轉出 PDF。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_FormulaBuilderWithMathMLAndIdentifierEquationRoundTrips()
+    public void LibreOfficeHeadless_FormulaBuilderWithMathMLAndIdentifierEquationRoundTrips()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過公式 builder 實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過公式 builder 實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitFormulaBuilderInterop_" + Guid.NewGuid().ToString("N"));
@@ -2037,12 +2043,12 @@ public class LibreOfficeInteropTests
     /// 檔案可由真實 LibreOffice 26.x headless 模式正確開啟與往返，不會因列結構順序錯誤而被拒絕載入。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_AppendHeaderRowsAfterDataRowInsertsBeforeRowsAndRoundTrips()
+    public void LibreOfficeHeadless_AppendHeaderRowsAfterDataRowInsertsBeforeRowsAndRoundTrips()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過表頭列結構順序實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過表頭列結構順序實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitHeaderRowsOrder_" + Guid.NewGuid().ToString("N"));
@@ -2113,12 +2119,12 @@ public class LibreOfficeInteropTests
     /// 自封裝層級擷取內嵌物件內容，確認其與 <c>OdfDocument.GetEmbeddedDocument</c> 高階 API 結果一致。
     /// </summary>
     [Fact]
-    public void LibreOffice26Headless_EmbeddedObjectExtractionRoundTrips()
+    public void LibreOfficeHeadless_EmbeddedObjectExtractionRoundTrips()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過內嵌物件擷取實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過內嵌物件擷取實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitEmbeddedObjectInterop_" + Guid.NewGuid().ToString("N"));
@@ -2271,12 +2277,12 @@ public class LibreOfficeInteropTests
     /// 以獨一字型名稱直接登錄複製後的真實字型路徑，而不依賴目錄掃描的「尚未登錄才寫入」語意。
     /// </remarks>
     [Fact]
-    public void LibreOffice26Headless_EmbedUsedFontsFromRegisteredDirectoryRoundTrips()
+    public void LibreOfficeHeadless_EmbedUsedFontsFromRegisteredDirectoryRoundTrips()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過字型內嵌實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過字型內嵌實機互通性測試。");
         }
 
         const string realFontPath = @"C:\Windows\Fonts\arial.ttf";
@@ -2358,12 +2364,12 @@ public class LibreOfficeInteropTests
     /// </para>
     /// </remarks>
     [Fact]
-    public void LibreOffice26Headless_PruneUnusedMediaRemovesOnlyUnreferencedPicturesAndRoundTrips()
+    public void LibreOfficeHeadless_PruneUnusedMediaRemovesOnlyUnreferencedPicturesAndRoundTrips()
     {
-        string? sofficePath = FindLibreOffice26Soffice();
+        string? sofficePath = FindLibreOfficeSoffice();
         if (string.IsNullOrEmpty(sofficePath))
         {
-            Assert.Skip("找不到真實 LibreOffice 26.x soffice binary，略過清理未參照媒體實機互通性測試。");
+            Assert.Skip($"找不到真實 LibreOffice {GetExpectedLibreOfficeVersion()}x soffice binary，略過清理未參照媒體實機互通性測試。");
         }
 
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitPruneUnusedMediaInterop_" + Guid.NewGuid().ToString("N"));
