@@ -46,7 +46,7 @@
 |------|------|------|
 | TEST-STRUCT-1 | ✅ | 新增本測試策略文件，說明分層、命名與去重規則。 |
 | TEST-STRUCT-2 | ✅ | Phase / Milestone / Challenger / Adversarial 歷史檔名已改為長期領域命名；`DocsAndCorpusContractTests` 保留文件與 corpus 契約驗證但移除 ODF Toolkit parity readiness 歷史命名。**2026-06-20 補充**：先前重命名遺留 12 個逐字元重複的舊檔案未刪除，已 diff 驗證後移除，雙 TFM 測試數由 1688 降為 1483，零覆蓋率損失。 |
-| TEST-STRUCT-3 | ⚠️ 未執行 | 原計畫將四個單宣告稀疏檔併入相鄰領域檔（`OdfFormatRoundTripTests`、`OdfUnknownXmlRoundTripTests` 併入 `PackageRoundTripTests`；`OoxmlVisualGoldenManifestTests` 併入 `OoxmlConversionTests`；`ChartFallbackRenderTests` 併入 `ChartHighLevelApiTests`）。**2026-06-23 查證**：經 `git log --follow` 核對，這四個檔案自建立以來從未被併入對應目標檔，目前仍各自獨立存在（與 [interop-corpus.md](interop-corpus.md) 的測試類別清單一致）。此項目應視為未執行，若仍認為有併入價值，需重新排程為新任務。 |
+| TEST-STRUCT-3 | ✅ | 原計畫將四個單宣告稀疏檔併入相鄰領域檔，先前文件曾誤標為已完成，實際從未執行（2026-06-23 以 `git log --follow` 查證後修正記錄）。**2026-06-23 補充**：已實際執行併入：`OdfFormatRoundTripTests.MinimalSupportedFormatRoundTrips`、`OdfUnknownXmlRoundTripTests.HighLevelSavePreservesUnknownXmlForeignContentAndProcessingInstructions` 併入 `PackageRoundTripTests`；`OoxmlVisualGoldenManifestTests.Manifest_DefinesExpectedScenarios` 併入 `OoxmlConversionTests`；`ChartFallbackRenderTests.RenderChartsToFallbackImages_GeneratesPngAndUpdatesXml` 併入 `ChartHighLevelApiTests`。四個來源檔已刪除，測試方法名與斷言保留，[interop-corpus.md](interop-corpus.md)／[odf-format-support.md](odf-format-support.md)／[foreign-extension-policy.md](foreign-extension-policy.md)／[ooxml-visual-golden-matrix.md](ooxml-visual-golden-matrix.md)／[corpus-manifest.md](corpus-manifest.md) 對應類別引用已同步更新。 |
 | TEST-STRUCT-4 | ✅ | `E2ETests` 與 `OdfFeatureE2ETests` 已完成主題盤點；未發現可安全刪除的大量完全重複測試，保留兩者但明確分層。 |
 
 ## E2E 分層對照

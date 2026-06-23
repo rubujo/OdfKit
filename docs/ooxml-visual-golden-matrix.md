@@ -54,5 +54,4 @@ PDF 像素比對腳本：[`eng/scripts/PdfVisualDiff.py`](../eng/scripts/PdfVisu
 | 類別 | 說明 |
 |------|------|
 | `OfficeInteropConversionTests` | 本矩陣的實機 PDF 視覺比對 |
-| `OoxmlConversionTests` | OOXML 結構與語意 round-trip（非視覺）；含 ODT↔DOCX 圖片／追蹤修訂與 ODS↔XLSX 樞紐表往返 |
-| `OoxmlVisualGoldenManifestTests` | manifest 結構與場景清單完整性 |
+| `OoxmlConversionTests` | OOXML 結構與語意 round-trip（非視覺）；含 ODT↔DOCX 圖片／追蹤修訂與 ODS↔XLSX 樞紐表往返；`Manifest_DefinesExpectedScenarios` 驗證本矩陣 manifest 結構與場景清單完整性 |

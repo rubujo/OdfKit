@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -6,6 +7,8 @@ using System.Text;
 using System.Xml.Linq;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.DOM;
+using OdfKit.Text;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -280,5 +283,145 @@ public class PackageRoundTripTests
         var miElement = nestedDocument.Descendants(XNamespace.Get("http://www.w3.org/1998/Math/MathML") + "mi").FirstOrDefault();
         Assert.NotNull(miElement);
         Assert.Equal("x", miElement.Value);
+    }
+
+    /// <summary>
+    /// 列舉所有格式支援矩陣中的格式。
+    /// </summary>
+    public static IEnumerable<object[]> SupportedFormats()
+    {
+        return OdfDocumentKindDetector.SupportedFormats.Select(format => new object[] { format });
+    }
+
+    /// <summary>
+    /// 驗證每種格式的最小文件可完成 package-level round-trip。
+    /// </summary>
+    /// <param name="format">要驗證的格式資訊</param>
+    [Theory]
+    [MemberData(nameof(SupportedFormats))]
+    public void MinimalSupportedFormatRoundTrips(OdfFormatInfo format)
+    {
+        using MemoryStream first = CreateMinimalDocument(format);
+        using OdfPackage package = OdfPackage.Open(first, leaveOpen: true);
+
+        Assert.Equal(format.IsFlatXml, package.IsFlatXml);
+        Assert.Equal(format.MimeType, package.MimeType);
+
+        using var second = new MemoryStream();
+        package.Save(second);
+        second.Position = 0;
+
+        OdfValidationReport report = ValidateRoundTrippedDocument(second, format);
+
+        Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
+        Assert.Equal(format.Kind, report.DocumentKind);
+        Assert.Equal(OdfVersion.Odf14, report.DetectedVersion);
+    }
+
+    private static MemoryStream CreateMinimalDocument(OdfFormatInfo format)
+    {
+        var stream = new MemoryStream();
+        if (format.IsFlatXml)
+        {
+            OdfDocumentFactory.WriteFlatXml(stream, format.Kind, leaveOpen: true);
+        }
+        else
+        {
+            using OdfPackage package = OdfDocumentFactory.CreatePackage(stream, format.Kind, leaveOpen: true);
+            package.Save();
+        }
+
+        stream.Position = 0;
+        return stream;
+    }
+
+    private static OdfValidationReport ValidateRoundTrippedDocument(Stream stream, OdfFormatInfo format)
+    {
+        if (format.IsFlatXml)
+        {
+            return OdfFlatDocumentValidator.Validate(stream, "document" + format.Extension);
+        }
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        return OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Extended, "document" + format.Extension);
+    }
+
+    private const string UnknownXmlCustomNamespace = "urn:example:custom";
+    private const string UnknownXmlOfficeExtensionNamespace = "urn:example:office-extension";
+
+    /// <summary>
+    /// 驗證 high-level save 保留 unknown XML、foreign namespace、註解與處理指令。
+    /// </summary>
+    [Fact]
+    public void HighLevelSavePreservesUnknownXmlForeignContentAndProcessingInstructions()
+    {
+        using MemoryStream source = CreatePackageWithUnknownXml();
+        using var document = new TextDocument(OdfPackage.Open(source, leaveOpen: true));
+
+        document.AddParagraph("觸發高階保存");
+
+        using var saved = new MemoryStream();
+        document.SaveToStream(saved);
+        saved.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(saved, leaveOpen: true);
+        string contentXml = ReadEntryText(package, "content.xml");
+        XDocument content = XDocument.Parse(contentXml, LoadOptions.PreserveWhitespace);
+        XNamespace text = OdfNamespaces.Text;
+        XNamespace custom = UnknownXmlCustomNamespace;
+        XNamespace officeExtension = UnknownXmlOfficeExtensionNamespace;
+
+        XElement unknownOdf = Assert.Single(content.Descendants(text + "unknown-child"));
+        Assert.Equal("u1", unknownOdf.Attribute(text + "name")?.Value);
+
+        XElement widget = Assert.Single(content.Descendants(custom + "widget"));
+        Assert.Equal("yes", widget.Attribute(custom + "flag")?.Value);
+        Assert.Equal("preserve", widget.Attribute(officeExtension + "flag")?.Value);
+        Assert.Contains("custom:widget", contentXml);
+        Assert.Contains("custom:flag", contentXml);
+        Assert.Contains("officeext:flag", contentXml);
+
+        Assert.Contains(content.DescendantNodes().OfType<XComment>(), comment => comment.Value == "keep-comment");
+        Assert.Contains(
+            content.DescendantNodes().OfType<XProcessingInstruction>(),
+            instruction => instruction.Target == "odfkit" && instruction.Data == "status=\"keep\"");
+    }
+
+    private static MemoryStream CreatePackageWithUnknownXml()
+    {
+        string contentXml =
+            "<office:document-content " +
+            "xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+            "xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\" " +
+            "xmlns:custom=\"" + UnknownXmlCustomNamespace + "\" " +
+            "xmlns:officeext=\"" + UnknownXmlOfficeExtensionNamespace + "\" " +
+            "office:version=\"" + OdfVersionInfo.DefaultVersionString + "\">" +
+            "<office:body><office:text>" +
+            "<text:p>before</text:p>" +
+            "<text:unknown-child text:name=\"u1\">unknown odf child</text:unknown-child>" +
+            "<custom:widget custom:flag=\"yes\" officeext:flag=\"preserve\">" +
+            "<custom:child>foreign child</custom:child>" +
+            "</custom:widget>" +
+            "<!--keep-comment-->" +
+            "<?odfkit status=\"keep\"?>" +
+            "</office:text></office:body>" +
+            "</office:document-content>";
+
+        var stream = new MemoryStream();
+        using (OdfPackage package = OdfDocumentFactory.CreatePackage(stream, OdfDocumentKind.Text, leaveOpen: true))
+        {
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(contentXml), "text/xml");
+            package.Save();
+        }
+
+        stream.Position = 0;
+        return stream;
+    }
+
+    private static string ReadEntryText(OdfPackage package, string entryName)
+    {
+        using Stream stream = package.GetEntryStream(entryName);
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        return reader.ReadToEnd();
     }
 }

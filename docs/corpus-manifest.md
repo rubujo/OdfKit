@@ -58,7 +58,7 @@ repo 內可直接執行的範本 manifest 位於 `tests/fixtures/corpus/manifest
 | repo-generated-minimal-spreadsheet | `tests/fixtures/corpus/generated/minimal-spreadsheet.ods` | generated | n/a | generated-no-copyright | Spreadsheet | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | repo-generated-minimal-presentation | `tests/fixtures/corpus/generated/minimal-presentation.odp` | generated | n/a | generated-no-copyright | Presentation | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | repo-generated-minimal-graphics | `tests/fixtures/corpus/generated/minimal-graphics.odg` | generated | n/a | generated-no-copyright | Graphics | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
-| generated-format-minimal | generated in `OdfFormatRoundTripTests` | generated | n/a | generated-no-copyright | 24 extensions | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| generated-format-minimal | generated in `PackageRoundTripTests.MinimalSupportedFormatRoundTrips` | generated | n/a | generated-no-copyright | 24 extensions | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
 | generated-interop-package | generated in `InteropCorpusTests` | generated | n/a | generated-no-copyright | package formats | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | generated-schema-negative | generated in `CorpusComplianceTests` | generated | n/a | generated-no-copyright | ODT / flat XML | 1.4 | OASIS ODF 1.4 Strict | invalid | semantic-equivalent |
 | generated-security-boundary | generated in `OdfSecurityBoundaryTests` | generated | n/a | generated-no-copyright | package formats | mixed | policy profiles | mixed | preserve-unknown |
