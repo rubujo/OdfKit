@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using OdfKit.DOM;
 using Xunit;
 

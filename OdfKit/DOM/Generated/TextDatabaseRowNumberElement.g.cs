@@ -30,18 +30,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfIriReference? Href
-        {
-            get => GetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("href", "http://www.w3.org/1999/xlink");
-                else
-                    SetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
         public string? NumFormat
         {
             get => GetAttributeValue("num-format", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

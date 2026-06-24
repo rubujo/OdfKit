@@ -18,114 +18,6 @@ namespace OdfKit.DOM
     {
         public TableDataPilotFieldElement(string? prefix = null) : base("data-pilot-field", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
-        public bool? AddEmptyLines
-        {
-            get => GetBooleanAttributeValue("add-empty-lines", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("add-empty-lines", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetBooleanAttributeValue("add-empty-lines", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? DataField
-        {
-            get => GetAttributeValue("data-field", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-field", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("data-field", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? DateEnd
-        {
-            get => GetAttributeValue("date-end", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("date-end", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("date-end", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? DateStart
-        {
-            get => GetAttributeValue("date-start", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("date-start", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("date-start", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public bool? Display
-        {
-            get => GetBooleanAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetBooleanAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableDisplayMemberMode? DisplayMemberMode
-        {
-            get => GetTableDisplayMemberModeAttributeValue("display-member-mode", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("display-member-mode", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableDisplayMemberModeAttributeValue("display-member-mode", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public bool? Enabled
-        {
-            get => GetBooleanAttributeValue("enabled", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("enabled", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetBooleanAttributeValue("enabled", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? End
-        {
-            get => GetAttributeValue("end", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("end", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("end", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? FieldName
-        {
-            get => GetAttributeValue("field-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("field-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("field-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
         public OdfTableFunction? Function
         {
             get => GetTableFunctionAttributeValue("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -138,18 +30,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfTableGroupedBy? GroupedBy
-        {
-            get => GetTableGroupedByAttributeValue("grouped-by", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("grouped-by", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableGroupedByAttributeValue("grouped-by", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public string? IsDataLayoutField
         {
             get => GetAttributeValue("is-data-layout-field", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -159,78 +39,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("is-data-layout-field", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
                 else
                     SetAttributeValue("is-data-layout-field", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableLayoutMode? LayoutMode
-        {
-            get => GetTableLayoutModeAttributeValue("layout-mode", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("layout-mode", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableLayoutModeAttributeValue("layout-mode", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public int? MemberCount
-        {
-            get => GetNullableInt32AttributeValue("member-count", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("member-count", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("member-count", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? MemberName
-        {
-            get => GetAttributeValue("member-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("member-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("member-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableMemberType? MemberType
-        {
-            get => GetTableMemberTypeAttributeValue("member-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("member-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableMemberTypeAttributeValue("member-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableOrder? Order
-        {
-            get => GetTableOrderAttributeValue("order", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("order", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableOrderAttributeValue("order", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
             }
         }
 
@@ -258,42 +66,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public bool? ShowDetails
-        {
-            get => GetBooleanAttributeValue("show-details", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("show-details", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetBooleanAttributeValue("show-details", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public bool? ShowEmpty
-        {
-            get => GetBooleanAttributeValue("show-empty", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("show-empty", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetBooleanAttributeValue("show-empty", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableSortMode? SortMode
-        {
-            get => GetTableSortModeAttributeValue("sort-mode", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("sort-mode", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableSortModeAttributeValue("sort-mode", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public string? SourceFieldName
         {
             get => GetAttributeValue("source-field-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -303,42 +75,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("source-field-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
                 else
                     SetAttributeValue("source-field-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? Start
-        {
-            get => GetAttributeValue("start", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("start", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("start", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public decimal? Step
-        {
-            get => GetDecimalAttributeValue("step", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("step", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetDecimalAttributeValue("step", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableType? Type
-        {
-            get => GetTableTypeAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableTypeAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
             }
         }
 

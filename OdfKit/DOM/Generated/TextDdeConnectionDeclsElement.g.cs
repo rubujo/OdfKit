@@ -18,66 +18,6 @@ namespace OdfKit.DOM
     {
         public TextDdeConnectionDeclsElement(string? prefix = null) : base("dde-connection-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
-        public bool? AutomaticUpdate
-        {
-            get => GetBooleanAttributeValue("automatic-update", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("automatic-update", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetBooleanAttributeValue("automatic-update", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value.Value, "office", GetDocumentVersion());
-            }
-        }
-
-        public string? DdeApplication
-        {
-            get => GetAttributeValue("dde-application", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("dde-application", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetAttributeValue("dde-application", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value, "office", GetDocumentVersion());
-            }
-        }
-
-        public string? DdeItem
-        {
-            get => GetAttributeValue("dde-item", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("dde-item", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetAttributeValue("dde-item", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value, "office", GetDocumentVersion());
-            }
-        }
-
-        public string? DdeTopic
-        {
-            get => GetAttributeValue("dde-topic", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("dde-topic", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetAttributeValue("dde-topic", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value, "office", GetDocumentVersion());
-            }
-        }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value, "office", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TextDdeConnectionDeclElement> TextDdeConnectionDeclChildElements
         {
             get => ChildElements<TextDdeConnectionDeclElement>();

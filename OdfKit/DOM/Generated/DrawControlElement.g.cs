@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public DrawControlElement(string? prefix = null) : base("control", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
-        public string? Align
-        {
-            get => GetAttributeValue("align", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("align", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetAttributeValue("align", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
-            }
-        }
-
         public int? AnchorPageNumber
         {
             get => GetNullableInt32AttributeValue("anchor-page-number", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
@@ -90,15 +78,15 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? DrawId
+        public OdfXmlName? DrawId
         {
-            get => GetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
+            get => GetXmlNameAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
             set
             {
                 if (value == null)
                     RemoveAttribute("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
                 else
-                    SetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
+                    SetXmlNameAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
             }
         }
 
@@ -147,18 +135,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("end-y", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
                 else
                     SetLengthAttributeValue("end-y", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? EscapeDirection
-        {
-            get => GetAttributeValue("escape-direction", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("escape-direction", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetAttributeValue("escape-direction", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
             }
         }
 

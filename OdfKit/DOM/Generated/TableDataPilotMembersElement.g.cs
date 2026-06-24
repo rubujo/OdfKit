@@ -18,42 +18,6 @@ namespace OdfKit.DOM
     {
         public TableDataPilotMembersElement(string? prefix = null) : base("data-pilot-members", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
-        public bool? Display
-        {
-            get => GetBooleanAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetBooleanAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public bool? ShowDetails
-        {
-            get => GetBooleanAttributeValue("show-details", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("show-details", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetBooleanAttributeValue("show-details", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TableDataPilotMemberElement> TableDataPilotMemberChildElements
         {
             get => ChildElements<TableDataPilotMemberElement>();

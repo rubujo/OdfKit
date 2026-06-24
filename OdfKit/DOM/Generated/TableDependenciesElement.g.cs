@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public TableDependenciesElement(string? prefix = null) : base("dependencies", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
-        public string? Id
-        {
-            get => GetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("id", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TableDependencyElement> TableDependencyChildElements
         {
             get => ChildElements<TableDependencyElement>();

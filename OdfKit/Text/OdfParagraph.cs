@@ -444,6 +444,21 @@ public partial class OdfParagraph
     /// <param name="text">顯示文字</param>
     public void AddHyperlink(string url, string text) => Doc.AddHyperlink(this, url, text);
 
+    /// <summary>
+    /// 在段落內追加一個清單建構器。
+    /// </summary>
+    /// <param name="styleName">選用的清單樣式名稱</param>
+    /// <returns>清單建構器</returns>
+    public OdfListBuilder AppendList(string? styleName = null)
+        => new OdfListBuilder(Node, Doc, null, styleName);
+
+    /// <summary>
+    /// 取得段落的行內富文本建構器，支援鏈式樣式設定。
+    /// </summary>
+    /// <returns>行內富文本建構器</returns>
+    public InlineTextBuilder AppendText()
+        => new InlineTextBuilder(Node, Doc);
+
     #endregion
 
 }

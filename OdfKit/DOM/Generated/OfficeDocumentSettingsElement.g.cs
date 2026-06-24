@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public OfficeDocumentSettingsElement(string? prefix = null) : base("document-settings", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:config:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", value, "config", GetDocumentVersion());
-            }
-        }
-
         public OdfIriReference? Transformation
         {
             get => GetIriReferenceAttributeValue("transformation", "http://www.w3.org/2003/g/data-view#", GetDocumentVersion());
@@ -39,18 +27,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("transformation", "http://www.w3.org/2003/g/data-view#");
                 else
                     SetIriReferenceAttributeValue("transformation", "http://www.w3.org/2003/g/data-view#", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Type
-        {
-            get => GetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:config:1.0");
-                else
-                    SetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", value, "config", GetDocumentVersion());
             }
         }
 

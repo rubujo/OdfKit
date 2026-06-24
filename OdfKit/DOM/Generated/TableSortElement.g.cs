@@ -66,18 +66,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? DataType
-        {
-            get => GetAttributeValue("data-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("data-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
         public string? EmbeddedNumberBehavior
         {
             get => GetAttributeValue("embedded-number-behavior", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -90,18 +78,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public int? FieldNumber
-        {
-            get => GetNullableInt32AttributeValue("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public OdfLanguageCode? Language
         {
             get => GetLanguageCodeAttributeValue("language", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -111,18 +87,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("language", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
                 else
                     SetLanguageCodeAttributeValue("language", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableOrder? Order
-        {
-            get => GetTableOrderAttributeValue("order", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("order", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableOrderAttributeValue("order", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
             }
         }
 

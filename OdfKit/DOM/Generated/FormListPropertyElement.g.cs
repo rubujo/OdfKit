@@ -18,42 +18,6 @@ namespace OdfKit.DOM
     {
         public FormListPropertyElement(string? prefix = null) : base("list-property", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
-        public bool? BooleanValue
-        {
-            get => GetBooleanAttributeValue("boolean-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("boolean-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetBooleanAttributeValue("boolean-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value.Value, "office", GetDocumentVersion());
-            }
-        }
-
-        public string? Currency
-        {
-            get => GetAttributeValue("currency", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("currency", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetAttributeValue("currency", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value, "office", GetDocumentVersion());
-            }
-        }
-
-        public DateTime? DateValue
-        {
-            get => GetDateTimeAttributeValue("date-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("date-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetDateTimeAttributeValue("date-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value.Value, "office", GetDocumentVersion());
-            }
-        }
-
         public string? PropertyName
         {
             get => GetAttributeValue("property-name", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", GetDocumentVersion());
@@ -63,42 +27,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("property-name", "urn:oasis:names:tc:opendocument:xmlns:form:1.0");
                 else
                     SetAttributeValue("property-name", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? StringValue
-        {
-            get => GetAttributeValue("string-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("string-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetAttributeValue("string-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value, "office", GetDocumentVersion());
-            }
-        }
-
-        public OdfDuration? TimeValue
-        {
-            get => GetDurationAttributeValue("time-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("time-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetDurationAttributeValue("time-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value.Value, "office", GetDocumentVersion());
-            }
-        }
-
-        public decimal? Value
-        {
-            get => GetDecimalAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetDecimalAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value.Value, "office", GetDocumentVersion());
             }
         }
 

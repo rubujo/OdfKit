@@ -376,6 +376,10 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         set => OdfDocumentSettingsEngine.SetZoomLevel(SettingsDom, value);
     }
 
+    /// <summary>
+    /// 取得書籤管理器，提供安全讀寫與操作書籤的高階介面。
+    /// </summary>
+    public OdfBookmarkManager Bookmarks => new OdfBookmarkManager(this);
 
     #endregion
 

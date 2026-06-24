@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public StyleColumnsElement(string? prefix = null) : base("columns", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
-        public OdfColor? Color
-        {
-            get => GetColorAttributeValue("color", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("color", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetColorAttributeValue("color", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value.Value, "style", GetDocumentVersion());
-            }
-        }
-
         public int? ColumnCount
         {
             get => GetNullableInt32AttributeValue("column-count", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());
@@ -51,114 +39,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("column-gap", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0");
                 else
                     SetLengthAttributeValue("column-gap", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", value.Value, "fo", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? EndIndent
-        {
-            get => GetLengthAttributeValue("end-indent", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("end-indent", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0");
-                else
-                    SetLengthAttributeValue("end-indent", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", value.Value, "fo", GetDocumentVersion());
-            }
-        }
-
-        public OdfPercent? Height
-        {
-            get => GetPercentAttributeValue("height", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("height", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetPercentAttributeValue("height", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value.Value, "style", GetDocumentVersion());
-            }
-        }
-
-        public string? RelWidth
-        {
-            get => GetAttributeValue("rel-width", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("rel-width", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetAttributeValue("rel-width", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value, "style", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? SpaceAfter
-        {
-            get => GetLengthAttributeValue("space-after", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("space-after", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0");
-                else
-                    SetLengthAttributeValue("space-after", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", value.Value, "fo", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? SpaceBefore
-        {
-            get => GetLengthAttributeValue("space-before", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("space-before", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0");
-                else
-                    SetLengthAttributeValue("space-before", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", value.Value, "fo", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? StartIndent
-        {
-            get => GetLengthAttributeValue("start-indent", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("start-indent", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0");
-                else
-                    SetLengthAttributeValue("start-indent", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", value.Value, "fo", GetDocumentVersion());
-            }
-        }
-
-        public string? Style
-        {
-            get => GetAttributeValue("style", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("style", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetAttributeValue("style", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value, "style", GetDocumentVersion());
-            }
-        }
-
-        public OdfStyleVerticalAlign? VerticalAlign
-        {
-            get => GetStyleVerticalAlignAttributeValue("vertical-align", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("vertical-align", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetStyleVerticalAlignAttributeValue("vertical-align", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value.Value, "style", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? Width
-        {
-            get => GetLengthAttributeValue("width", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("width", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetLengthAttributeValue("width", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value.Value, "style", GetDocumentVersion());
             }
         }
 

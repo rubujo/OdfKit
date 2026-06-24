@@ -18,30 +18,6 @@ namespace OdfKit.DOM
     {
         public DatabaseKeyColumnsElement(string? prefix = null) : base("key-columns", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? RelatedColumnName
-        {
-            get => GetAttributeValue("related-column-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("related-column-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("related-column-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<DatabaseKeyColumnElement> DatabaseKeyColumnChildElements
         {
             get => ChildElements<DatabaseKeyColumnElement>();

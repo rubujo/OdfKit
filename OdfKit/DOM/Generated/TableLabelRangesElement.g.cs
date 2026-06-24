@@ -18,42 +18,6 @@ namespace OdfKit.DOM
     {
         public TableLabelRangesElement(string? prefix = null) : base("label-ranges", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
-        public OdfCellRangeAddress? DataCellRangeAddress
-        {
-            get => GetCellRangeAddressAttributeValue("data-cell-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-cell-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetCellRangeAddressAttributeValue("data-cell-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfCellRangeAddress? LabelCellRangeAddress
-        {
-            get => GetCellRangeAddressAttributeValue("label-cell-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("label-cell-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetCellRangeAddressAttributeValue("label-cell-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableOrientation? Orientation
-        {
-            get => GetTableOrientationAttributeValue("orientation", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("orientation", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableOrientationAttributeValue("orientation", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TableLabelRangeElement> TableLabelRangeChildElements
         {
             get => ChildElements<TableLabelRangeElement>();

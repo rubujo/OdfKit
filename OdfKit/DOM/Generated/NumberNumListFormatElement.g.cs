@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public NumberNumListFormatElement(string? prefix = null) : base("num-list-format", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
-        public int? Level
-        {
-            get => GetNullableInt32AttributeValue("level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetInt32AttributeValue("level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
         public OdfStyleName? Name
         {
             get => GetStyleNameAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

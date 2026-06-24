@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using OdfKit.Core;
 using OdfKit.Database;
 using Xunit;

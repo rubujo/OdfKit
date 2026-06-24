@@ -18,66 +18,6 @@ namespace OdfKit.DOM
     {
         public SvgFontFaceSrcElement(string? prefix = null) : base("font-face-src", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
-        public OdfXLinkActuate? Actuate
-        {
-            get => GetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("actuate", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
-        public OdfIriReference? Href
-        {
-            get => GetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("href", "http://www.w3.org/1999/xlink");
-                else
-                    SetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public string? String
-        {
-            get => GetAttributeValue("string", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("string", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetAttributeValue("string", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public OdfXLinkType? Type
-        {
-            get => GetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<SvgFontFaceNameElement> SvgFontFaceNameChildElements
         {
             get => ChildElements<SvgFontFaceNameElement>();

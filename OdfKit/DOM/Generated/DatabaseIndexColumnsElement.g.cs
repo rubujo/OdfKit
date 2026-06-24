@@ -18,30 +18,6 @@ namespace OdfKit.DOM
     {
         public DatabaseIndexColumnsElement(string? prefix = null) : base("index-columns", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
-        public bool? IsAscending
-        {
-            get => GetBooleanAttributeValue("is-ascending", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("is-ascending", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetBooleanAttributeValue("is-ascending", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<DatabaseIndexColumnElement> DatabaseIndexColumnChildElements
         {
             get => ChildElements<DatabaseIndexColumnElement>();

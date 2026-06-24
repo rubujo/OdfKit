@@ -18,30 +18,6 @@ namespace OdfKit.DOM
     {
         public OfficeSettingsElement(string? prefix = null) : base("settings", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:config:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", value, "config", GetDocumentVersion());
-            }
-        }
-
-        public string? Type
-        {
-            get => GetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:config:1.0");
-                else
-                    SetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", value, "config", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<ConfigConfigItemSetElement> ConfigConfigItemSetChildElements
         {
             get => ChildElements<ConfigConfigItemSetElement>();

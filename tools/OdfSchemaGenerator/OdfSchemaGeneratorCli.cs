@@ -65,7 +65,7 @@ public static class OdfSchemaGeneratorCli
 
             string fullOutputDirectory = Path.GetFullPath(parsedOptions.OutputDirectory);
             Directory.CreateDirectory(fullOutputDirectory);
-            new DomWrappersCSharpWriter().WriteToDirectory(metadata, fullOutputDirectory);
+            new DomWrappersCSharpWriter().WriteToDirectory(metadata, fullOutputDirectory, error);
             return 0;
         }
 

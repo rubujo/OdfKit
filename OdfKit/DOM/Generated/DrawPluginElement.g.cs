@@ -66,18 +66,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
-            }
-        }
-
         public OdfXLinkShow? Show
         {
             get => GetXLinkShowAttributeValue("show", "http://www.w3.org/1999/xlink", GetDocumentVersion());
@@ -99,18 +87,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("type", "http://www.w3.org/1999/xlink");
                 else
                     SetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
-        public string? Value
-        {
-            get => GetAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("value", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
             }
         }
 

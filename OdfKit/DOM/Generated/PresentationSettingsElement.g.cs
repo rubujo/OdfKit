@@ -90,30 +90,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value, "presentation", GetDocumentVersion());
-            }
-        }
-
-        public string? Pages
-        {
-            get => GetAttributeValue("pages", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("pages", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetAttributeValue("pages", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value, "presentation", GetDocumentVersion());
-            }
-        }
-
         public OdfDuration? Pause
         {
             get => GetDurationAttributeValue("pause", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());

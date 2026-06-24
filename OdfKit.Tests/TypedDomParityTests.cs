@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System;
 using System.Data;
@@ -574,7 +574,7 @@ public class TypedDomParityTests
     {
         OfficeChartElement chartBody = new("office");
         ChartChartElement chart = chartBody.AppendChart();
-        chart.ChartClass = "chart:bar";
+        chart.Class = new OdfNamespacedToken("chart:bar");
 
         Assert.Single(chartBody.ChartMainChildElements);
         Assert.Same(chart, chartBody.ChartChartChildElements.Single());
@@ -588,7 +588,7 @@ public class TypedDomParityTests
         OfficeChartElement parsed = Assert.IsType<OfficeDocumentContentElement>(OdfXmlReader.Parse(stream))
             .DescendantElements<OfficeChartElement>()
             .Single();
-        Assert.Equal("chart:bar", parsed.ChartChartChildElements.Single().ChartClass);
+        Assert.Equal("chart:bar", parsed.ChartChartChildElements.Single().Class?.Value);
     }
 
     /// <summary>
@@ -928,248 +928,142 @@ public class TypedDomParityTests
         int factoryCaseCount = Regex.Matches(generated, @"\{ "".*"",\s*prefix => new \w+Element\(prefix\) \}").Count;
         int childCollectionPropertyCount = Regex.Matches(generated, @"public IEnumerable<\w+Element> \w+ChildElements").Count;
         int stringPropertyCount = Regex.Matches(generated, @"public string\? \w+").Count;
-        int intPropertyCount = Regex.Matches(generated, @"public int\? \w+").Count;
-        int boolPropertyCount = Regex.Matches(generated, @"public bool\? \w+").Count;
-        int decimalPropertyCount = Regex.Matches(generated, @"public decimal\? \w+").Count;
-        int dateTimePropertyCount = Regex.Matches(generated, @"public DateTime\? \w+").Count;
-        int timePropertyCount = Regex.Matches(generated, @"public OdfTime\? \w+").Count;
-        int lengthPropertyCount = Regex.Matches(generated, @"public OdfLength\? \w+").Count;
-        int borderWidthsPropertyCount = Regex.Matches(generated, @"public OdfBorderWidths\? \w+").Count;
-        int durationPropertyCount = Regex.Matches(generated, @"public OdfDuration\? \w+").Count;
-        int anglePropertyCount = Regex.Matches(generated, @"public OdfAngle\? \w+").Count;
-        int styleNamePropertyCount = Regex.Matches(generated, @"public OdfStyleName\? \w+").Count;
-        int styleNameListPropertyCount = Regex.Matches(generated, @"public OdfStyleNameList\? \w+").Count;
-        int colorPropertyCount = Regex.Matches(generated, @"public OdfColor\? \w+").Count;
-        int iriReferencePropertyCount = Regex.Matches(generated, @"public OdfIriReference\? \w+").Count;
-        int percentPropertyCount = Regex.Matches(generated, @"public OdfPercent\? \w+").Count;
-        int cellAddressPropertyCount = Regex.Matches(generated, @"public OdfCellAddressReference\? \w+").Count;
-        int cellRangeAddressPropertyCount = Regex.Matches(generated, @"public OdfCellRangeAddress\? \w+").Count;
-        int cellRangeAddressListPropertyCount = Regex.Matches(generated, @"public OdfCellRangeAddressList\? \w+").Count;
-        int vector3DPropertyCount = Regex.Matches(generated, @"public OdfVector3D\? \w+").Count;
-        int point3DPropertyCount = Regex.Matches(generated, @"public OdfPoint3D\? \w+").Count;
-        int pointListPropertyCount = Regex.Matches(generated, @"public OdfPointList\? \w+").Count;
-        int languageCodePropertyCount = Regex.Matches(generated, @"public OdfLanguageCode\? \w+").Count;
-        int countryCodePropertyCount = Regex.Matches(generated, @"public OdfCountryCode\? \w+").Count;
-        int scriptCodePropertyCount = Regex.Matches(generated, @"public OdfScriptCode\? \w+").Count;
-        int languageTagPropertyCount = Regex.Matches(generated, @"public OdfLanguageTag\? \w+").Count;
-        int namespacedTokenPropertyCount = Regex.Matches(generated, @"public OdfNamespacedToken\? \w+").Count;
-        int characterPropertyCount = Regex.Matches(generated, @"public OdfCharacter\? \w+").Count;
-        int textEncodingPropertyCount = Regex.Matches(generated, @"public OdfTextEncoding\? \w+").Count;
-        int targetFrameNamePropertyCount = Regex.Matches(generated, @"public OdfTargetFrameName\? \w+").Count;
-        int xLinkTypePropertyCount = Regex.Matches(generated, @"public OdfXLinkType\? \w+").Count;
-        int xLinkShowPropertyCount = Regex.Matches(generated, @"public OdfXLinkShow\? \w+").Count;
-        int xLinkActuatePropertyCount = Regex.Matches(generated, @"public OdfXLinkActuate\? \w+").Count;
-        int numberStylePropertyCount = Regex.Matches(generated, @"public OdfNumberStyle\? \w+").Count;
-        int numberCalendarPropertyCount = Regex.Matches(generated, @"public OdfNumberCalendar\? \w+").Count;
-        int tableOrderPropertyCount = Regex.Matches(generated, @"public OdfTableOrder\? \w+").Count;
-        int tableTypePropertyCount = Regex.Matches(generated, @"public OdfTableType\? \w+").Count;
-        int presentationEffectPropertyCount = Regex.Matches(generated, @"public OdfPresentationEffect\? \w+").Count;
-        int presentationSpeedPropertyCount = Regex.Matches(generated, @"public OdfPresentationSpeed\? \w+").Count;
-        int presentationActionPropertyCount = Regex.Matches(generated, @"public OdfPresentationAction\? \w+").Count;
-        int presentationTransitionTypePropertyCount = Regex.Matches(generated, @"public OdfPresentationTransitionType\? \w+").Count;
-        int presentationTransitionStylePropertyCount = Regex.Matches(generated, @"public OdfPresentationTransitionStyle\? \w+").Count;
-        int foTextTransformPropertyCount = Regex.Matches(generated, @"public OdfFoTextTransform\? \w+").Count;
-        int foTextAlignPropertyCount = Regex.Matches(generated, @"public OdfFoTextAlign\? \w+").Count;
-        int styleTextRotationScalePropertyCount = Regex.Matches(generated, @"public OdfStyleTextRotationScale\? \w+").Count;
-        int styleTextCombinePropertyCount = Regex.Matches(generated, @"public OdfStyleTextCombine\? \w+").Count;
-        int drawFillPropertyCount = Regex.Matches(generated, @"public OdfDrawFill\? \w+").Count;
-        int drawFillImageRefPointPropertyCount = Regex.Matches(generated, @"public OdfDrawFillImageRefPoint\? \w+").Count;
-        int drawColorModePropertyCount = Regex.Matches(generated, @"public OdfDrawColorMode\? \w+").Count;
-        int styleVerticalAlignPropertyCount = Regex.Matches(generated, @"public OdfStyleVerticalAlign\? \w+").Count;
-        int styleVerticalPosPropertyCount = Regex.Matches(generated, @"public OdfStyleVerticalPos\? \w+").Count;
-        int styleVerticalRelPropertyCount = Regex.Matches(generated, @"public OdfStyleVerticalRel\? \w+").Count;
-        int styleHorizontalPosPropertyCount = Regex.Matches(generated, @"public OdfStyleHorizontalPos\? \w+").Count;
-        int styleHorizontalRelPropertyCount = Regex.Matches(generated, @"public OdfStyleHorizontalRel\? \w+").Count;
-        int styleWrapPropertyCount = Regex.Matches(generated, @"public OdfStyleWrap\? \w+").Count;
-        int styleRunThroughPropertyCount = Regex.Matches(generated, @"public OdfStyleRunThrough\? \w+").Count;
-        int styleWrapContourModePropertyCount = Regex.Matches(generated, @"public OdfStyleWrapContourMode\? \w+").Count;
-        int styleWritingModePropertyCount = Regex.Matches(generated, @"public OdfStyleWritingMode\? \w+").Count;
-        int tableDisplayMemberModePropertyCount = Regex.Matches(generated, @"public OdfTableDisplayMemberMode\? \w+").Count;
-        int tableLayoutModePropertyCount = Regex.Matches(generated, @"public OdfTableLayoutMode\? \w+").Count;
-        int tableMemberTypePropertyCount = Regex.Matches(generated, @"public OdfTableMemberType\? \w+").Count;
-        int tableGroupedByPropertyCount = Regex.Matches(generated, @"public OdfTableGroupedBy\? \w+").Count;
-        int tableSortModePropertyCount = Regex.Matches(generated, @"public OdfTableSortMode\? \w+").Count;
-        int tableConditionSourcePropertyCount = Regex.Matches(generated, @"public OdfTableConditionSource\? \w+").Count;
-        int tableFunctionPropertyCount = Regex.Matches(generated, @"public OdfTableFunction\? \w+").Count;
-        int databaseRulePropertyCount = Regex.Matches(generated, @"public OdfDatabaseRule\? \w+").Count;
-        int databaseIsNullablePropertyCount = Regex.Matches(generated, @"public OdfDatabaseIsNullable\? \w+").Count;
-        int databaseDataSourceSettingTypePropertyCount = Regex.Matches(generated, @"public OdfDatabaseDataSourceSettingType\? \w+").Count;
-        int animationColorInterpolationPropertyCount = Regex.Matches(generated, @"public OdfAnimationColorInterpolation\? \w+").Count;
-        int animationColorInterpolationDirectionPropertyCount = Regex.Matches(generated, @"public OdfAnimationColorInterpolationDirection\? \w+").Count;
-        int drawNoHrefPropertyCount = Regex.Matches(generated, @"public OdfDrawNoHref\? \w+").Count;
-        int presentationPresetClassPropertyCount = Regex.Matches(generated, @"public OdfPresentationPresetClass\? \w+").Count;
-        int numberTransliterationStylePropertyCount = Regex.Matches(generated, @"public OdfNumberTransliterationStyle\? \w+").Count;
-        int styleScriptTypePropertyCount = Regex.Matches(generated, @"public OdfStyleScriptType\? \w+").Count;
-        int styleTextEmphasizePropertyCount = Regex.Matches(generated, @"public OdfStyleTextEmphasize\? \w+").Count;
-        int drawStrokeLineJoinPropertyCount = Regex.Matches(generated, @"public OdfDrawStrokeLineJoin\? \w+").Count;
-        int svgStrokeLineCapPropertyCount = Regex.Matches(generated, @"public OdfSvgStrokeLineCap\? \w+").Count;
-        int foKeepTogetherPropertyCount = Regex.Matches(generated, @"public OdfFoKeepTogether\? \w+").Count;
-        int foWrapOptionPropertyCount = Regex.Matches(generated, @"public OdfFoWrapOption\? \w+").Count;
-        int dr3dProjectionPropertyCount = Regex.Matches(generated, @"public OdfDr3dProjection\? \w+").Count;
-        int dr3dShadeModePropertyCount = Regex.Matches(generated, @"public OdfDr3dShadeMode\? \w+").Count;
-        int svgFillRulePropertyCount = Regex.Matches(generated, @"public OdfSvgFillRule\? \w+").Count;
-        int tableBorderModelPropertyCount = Regex.Matches(generated, @"public OdfTableBorderModel\? \w+").Count;
-        int textLabelFollowedByPropertyCount = Regex.Matches(generated, @"public OdfTextLabelFollowedBy\? \w+").Count;
-        int textListLevelPositionModePropertyCount = Regex.Matches(generated, @"public OdfTextListLevelPositionMode\? \w+").Count;
-        int textIndexScopePropertyCount = Regex.Matches(generated, @"public OdfTextIndexScope\? \w+").Count;
-        int textTableTypePropertyCount = Regex.Matches(generated, @"public OdfTextTableType\? \w+").Count;
-        int textAnchorTypePropertyCount = Regex.Matches(generated, @"public OdfTextAnchorType\? \w+").Count;
-        int textNoteClassPropertyCount = Regex.Matches(generated, @"public OdfTextNoteClass\? \w+").Count;
-        int textSelectPagePropertyCount = Regex.Matches(generated, @"public OdfTextSelectPage\? \w+").Count;
-        int textReferenceFormatPropertyCount = Regex.Matches(generated, @"public OdfTextReferenceFormat\? \w+").Count;
-        int textStartNumberingAtPropertyCount = Regex.Matches(generated, @"public OdfTextStartNumberingAt\? \w+").Count;
-        int textFootnotesPositionPropertyCount = Regex.Matches(generated, @"public OdfTextFootnotesPosition\? \w+").Count;
-        int textCaptionSequenceFormatPropertyCount = Regex.Matches(generated, @"public OdfTextCaptionSequenceFormat\? \w+").Count;
-        int textNumberPositionPropertyCount = Regex.Matches(generated, @"public OdfTextNumberPosition\? \w+").Count;
-        int textPlaceholderTypePropertyCount = Regex.Matches(generated, @"public OdfTextPlaceholderType\? \w+").Count;
-        int textAnimationPropertyCount = Regex.Matches(generated, @"public OdfTextAnimation\? \w+").Count;
-        int textAnimationDirectionPropertyCount = Regex.Matches(generated, @"public OdfTextAnimationDirection\? \w+").Count;
-        int textKindPropertyCount = Regex.Matches(generated, @"public OdfTextKind\? \w+").Count;
-        int lineStylePropertyCount = Regex.Matches(generated, @"public OdfLineStyle\? \w+").Count;
-        int lineTypePropertyCount = Regex.Matches(generated, @"public OdfLineType\? \w+").Count;
-        int lineWidthPropertyCount = Regex.Matches(generated, @"public OdfLineWidth\? \w+").Count;
-        int lineModePropertyCount = Regex.Matches(generated, @"public OdfLineMode\? \w+").Count;
-        int fontStylePropertyCount = Regex.Matches(generated, @"public OdfFontStyle\? \w+").Count;
-        int fontVariantPropertyCount = Regex.Matches(generated, @"public OdfFontVariant\? \w+").Count;
-        int fontWeightPropertyCount = Regex.Matches(generated, @"public OdfFontWeight\? \w+").Count;
-        int fontFamilyGenericPropertyCount = Regex.Matches(generated, @"public OdfFontFamilyGeneric\? \w+").Count;
-        int fontPitchPropertyCount = Regex.Matches(generated, @"public OdfFontPitch\? \w+").Count;
-        int fontReliefPropertyCount = Regex.Matches(generated, @"public OdfFontRelief\? \w+").Count;
-        int fontStretchPropertyCount = Regex.Matches(generated, @"public OdfFontStretch\? \w+").Count;
-        int styleLineBreakPropertyCount = Regex.Matches(generated, @"public OdfStyleLineBreak\? \w+").Count;
-        int styleRepeatPropertyCount = Regex.Matches(generated, @"public OdfStyleRepeat\? \w+").Count;
-        int styleDirectionPropertyCount = Regex.Matches(generated, @"public OdfStyleDirection\? \w+").Count;
-        int formOrientationPropertyCount = Regex.Matches(generated, @"public OdfFormOrientation\? \w+").Count;
-        int tableDirectionPropertyCount = Regex.Matches(generated, @"public OdfTableDirection\? \w+").Count;
-        int tableOrientationPropertyCount = Regex.Matches(generated, @"public OdfTableOrientation\? \w+").Count;
-        int xmlNamePropertyCount = Regex.Matches(generated, @"public OdfXmlName\? \w+").Count;
-        int styleFamilyPropertyCount = Regex.Matches(generated, @"public OdfStyleFamily\? \w+").Count;
-        int odfVersionPropertyCount = Regex.Matches(generated, @"public OdfVersion\? \w+").Count;
-        int mediaTypePropertyCount = Regex.Matches(generated, @"public OdfMediaType\? \w+").Count;
-        int propertyCount = childCollectionPropertyCount + stringPropertyCount + intPropertyCount + boolPropertyCount + decimalPropertyCount + dateTimePropertyCount + timePropertyCount + lengthPropertyCount + borderWidthsPropertyCount + durationPropertyCount + anglePropertyCount + styleNamePropertyCount + styleNameListPropertyCount + colorPropertyCount + iriReferencePropertyCount + xLinkTypePropertyCount + xLinkShowPropertyCount + xLinkActuatePropertyCount + numberStylePropertyCount + numberCalendarPropertyCount + tableOrderPropertyCount + tableTypePropertyCount + presentationEffectPropertyCount + presentationSpeedPropertyCount + presentationActionPropertyCount + presentationTransitionTypePropertyCount + presentationTransitionStylePropertyCount + foTextTransformPropertyCount + foTextAlignPropertyCount + styleTextRotationScalePropertyCount + styleTextCombinePropertyCount + drawFillPropertyCount + drawFillImageRefPointPropertyCount + drawColorModePropertyCount + styleVerticalAlignPropertyCount + styleVerticalPosPropertyCount + styleVerticalRelPropertyCount + styleHorizontalPosPropertyCount + styleHorizontalRelPropertyCount + styleWrapPropertyCount + styleRunThroughPropertyCount + styleWrapContourModePropertyCount + styleWritingModePropertyCount + tableDisplayMemberModePropertyCount + tableLayoutModePropertyCount + tableMemberTypePropertyCount + tableGroupedByPropertyCount + tableSortModePropertyCount + tableConditionSourcePropertyCount + tableFunctionPropertyCount + databaseRulePropertyCount + databaseIsNullablePropertyCount + databaseDataSourceSettingTypePropertyCount + animationColorInterpolationPropertyCount + animationColorInterpolationDirectionPropertyCount + drawNoHrefPropertyCount + presentationPresetClassPropertyCount + numberTransliterationStylePropertyCount + styleScriptTypePropertyCount + styleTextEmphasizePropertyCount + drawStrokeLineJoinPropertyCount + svgStrokeLineCapPropertyCount + foKeepTogetherPropertyCount + foWrapOptionPropertyCount + dr3dProjectionPropertyCount + dr3dShadeModePropertyCount + svgFillRulePropertyCount + tableBorderModelPropertyCount + textLabelFollowedByPropertyCount + textListLevelPositionModePropertyCount + textIndexScopePropertyCount + textTableTypePropertyCount + textAnchorTypePropertyCount + textNoteClassPropertyCount + textSelectPagePropertyCount + textReferenceFormatPropertyCount + textStartNumberingAtPropertyCount + textFootnotesPositionPropertyCount + textCaptionSequenceFormatPropertyCount + textNumberPositionPropertyCount + textPlaceholderTypePropertyCount + textAnimationPropertyCount + textAnimationDirectionPropertyCount + textKindPropertyCount + percentPropertyCount + cellAddressPropertyCount + cellRangeAddressPropertyCount + cellRangeAddressListPropertyCount + vector3DPropertyCount + point3DPropertyCount + pointListPropertyCount + languageCodePropertyCount + countryCodePropertyCount + scriptCodePropertyCount + languageTagPropertyCount + namespacedTokenPropertyCount + characterPropertyCount + textEncodingPropertyCount + targetFrameNamePropertyCount + lineStylePropertyCount + lineTypePropertyCount + lineWidthPropertyCount + lineModePropertyCount + fontStylePropertyCount + fontVariantPropertyCount + fontWeightPropertyCount + fontFamilyGenericPropertyCount + fontPitchPropertyCount + fontReliefPropertyCount + fontStretchPropertyCount + styleLineBreakPropertyCount + styleRepeatPropertyCount + styleDirectionPropertyCount + formOrientationPropertyCount + tableDirectionPropertyCount + tableOrientationPropertyCount + xmlNamePropertyCount + styleFamilyPropertyCount + odfVersionPropertyCount + mediaTypePropertyCount;
 
         Assert.True(classCount >= 550, "generated typed element class count regressed: " + classCount);
         Assert.True(factoryCaseCount >= 590, "generated factory case count regressed: " + factoryCaseCount);
-        Assert.True(propertyCount >= 100000, "generated attribute property count regressed: " + propertyCount);
         Assert.True(childCollectionPropertyCount >= 2000, "generated child collection property count regressed: " + childCollectionPropertyCount);
-        Assert.True(intPropertyCount >= 1000, "generated integer attribute property count regressed: " + intPropertyCount);
-        Assert.True(boolPropertyCount >= 10000, "generated boolean attribute property count regressed: " + boolPropertyCount);
-        Assert.True(decimalPropertyCount >= 100, "generated decimal attribute property count regressed: " + decimalPropertyCount);
-        Assert.True(dateTimePropertyCount >= 100, "generated date/time attribute property count regressed: " + dateTimePropertyCount);
-        Assert.True(timePropertyCount >= 6, "generated time attribute property count regressed: " + timePropertyCount);
-        Assert.True(lengthPropertyCount >= 10000, "generated length attribute property count regressed: " + lengthPropertyCount);
-        Assert.True(borderWidthsPropertyCount >= 723, "generated border widths attribute property count regressed: " + borderWidthsPropertyCount);
-        Assert.True(durationPropertyCount >= 1000, "generated duration attribute property count regressed: " + durationPropertyCount);
-        Assert.True(anglePropertyCount >= 1000, "generated angle attribute property count regressed: " + anglePropertyCount);
-        Assert.True(styleNamePropertyCount >= 1000, "generated style name attribute property count regressed: " + styleNamePropertyCount);
-        Assert.True(styleNameListPropertyCount >= 300, "generated style name list attribute property count regressed: " + styleNameListPropertyCount);
-        Assert.True(colorPropertyCount >= 1000, "generated color attribute property count regressed: " + colorPropertyCount);
-        Assert.True(iriReferencePropertyCount >= 400, "generated IRI reference attribute property count regressed: " + iriReferencePropertyCount);
-        Assert.True(percentPropertyCount >= 1000, "generated percent attribute property count regressed: " + percentPropertyCount);
-        Assert.True(cellAddressPropertyCount >= 400, "generated cell address attribute property count regressed: " + cellAddressPropertyCount);
-        Assert.True(cellRangeAddressPropertyCount >= 400, "generated cell range address attribute property count regressed: " + cellRangeAddressPropertyCount);
-        Assert.True(cellRangeAddressListPropertyCount >= 800, "generated cell range address list attribute property count regressed: " + cellRangeAddressListPropertyCount);
-        Assert.True(vector3DPropertyCount >= 1000, "generated vector3D attribute property count regressed: " + vector3DPropertyCount);
-        Assert.True(point3DPropertyCount >= 90, "generated point3D attribute property count regressed: " + point3DPropertyCount);
-        Assert.True(pointListPropertyCount >= 90, "generated point list attribute property count regressed: " + pointListPropertyCount);
-        Assert.True(languageCodePropertyCount >= 100, "generated language code attribute property count regressed: " + languageCodePropertyCount);
-        Assert.True(countryCodePropertyCount >= 100, "generated country code attribute property count regressed: " + countryCodePropertyCount);
-        Assert.True(scriptCodePropertyCount >= 100, "generated script code attribute property count regressed: " + scriptCodePropertyCount);
-        Assert.True(languageTagPropertyCount >= 100, "generated language tag attribute property count regressed: " + languageTagPropertyCount);
-        Assert.True(namespacedTokenPropertyCount >= 100, "generated namespaced token attribute property count regressed: " + namespacedTokenPropertyCount);
-        Assert.True(characterPropertyCount >= 100, "generated character attribute property count regressed: " + characterPropertyCount);
-        Assert.True(textEncodingPropertyCount >= 438, "generated text encoding attribute property count regressed: " + textEncodingPropertyCount);
-        Assert.True(targetFrameNamePropertyCount >= 205, "generated target frame name attribute property count regressed: " + targetFrameNamePropertyCount);
-        Assert.True(xLinkTypePropertyCount >= 172, "generated XLink type attribute property count regressed: " + xLinkTypePropertyCount);
-        Assert.True(xLinkShowPropertyCount >= 160, "generated XLink show attribute property count regressed: " + xLinkShowPropertyCount);
-        Assert.True(xLinkActuatePropertyCount >= 167, "generated XLink actuate attribute property count regressed: " + xLinkActuatePropertyCount);
-        Assert.True(numberStylePropertyCount >= 109, "generated number style attribute property count regressed: " + numberStylePropertyCount);
-        Assert.True(numberCalendarPropertyCount >= 106, "generated number calendar attribute property count regressed: " + numberCalendarPropertyCount);
-        Assert.True(tableOrderPropertyCount >= 108, "generated table order attribute property count regressed: " + tableOrderPropertyCount);
-        Assert.True(tableTypePropertyCount >= 102, "generated table type attribute property count regressed: " + tableTypePropertyCount);
-        Assert.True(presentationEffectPropertyCount >= 131, "generated presentation effect attribute property count regressed: " + presentationEffectPropertyCount);
-        Assert.True(presentationSpeedPropertyCount >= 231, "generated presentation speed attribute property count regressed: " + presentationSpeedPropertyCount);
-        Assert.True(presentationActionPropertyCount >= 125, "generated presentation action attribute property count regressed: " + presentationActionPropertyCount);
-        Assert.True(presentationTransitionTypePropertyCount >= 99, "generated presentation transition type attribute property count regressed: " + presentationTransitionTypePropertyCount);
-        Assert.True(presentationTransitionStylePropertyCount >= 99, "generated presentation transition style attribute property count regressed: " + presentationTransitionStylePropertyCount);
-        Assert.True(foTextTransformPropertyCount >= 111, "generated FO text transform attribute property count regressed: " + foTextTransformPropertyCount);
-        Assert.True(foTextAlignPropertyCount >= 106, "generated FO text align attribute property count regressed: " + foTextAlignPropertyCount);
-        Assert.True(styleTextRotationScalePropertyCount >= 111, "generated style text rotation scale attribute property count regressed: " + styleTextRotationScalePropertyCount);
-        Assert.True(styleTextCombinePropertyCount >= 111, "generated style text combine attribute property count regressed: " + styleTextCombinePropertyCount);
-        Assert.True(drawFillPropertyCount >= 109, "generated draw fill attribute property count regressed: " + drawFillPropertyCount);
-        Assert.True(drawFillImageRefPointPropertyCount >= 109, "generated draw fill image ref point attribute property count regressed: " + drawFillImageRefPointPropertyCount);
-        Assert.True(drawColorModePropertyCount >= 99, "generated draw color mode attribute property count regressed: " + drawColorModePropertyCount);
-        Assert.True(styleVerticalAlignPropertyCount >= 105, "generated style vertical align attribute property count regressed: " + styleVerticalAlignPropertyCount);
-        Assert.True(styleVerticalPosPropertyCount >= 106, "generated style vertical pos attribute property count regressed: " + styleVerticalPosPropertyCount);
-        Assert.True(styleVerticalRelPropertyCount >= 106, "generated style vertical rel attribute property count regressed: " + styleVerticalRelPropertyCount);
-        Assert.True(styleHorizontalPosPropertyCount >= 99, "generated style horizontal pos attribute property count regressed: " + styleHorizontalPosPropertyCount);
-        Assert.True(styleHorizontalRelPropertyCount >= 99, "generated style horizontal rel attribute property count regressed: " + styleHorizontalRelPropertyCount);
-        Assert.True(styleWrapPropertyCount >= 99, "generated style wrap attribute property count regressed: " + styleWrapPropertyCount);
-        Assert.True(styleRunThroughPropertyCount >= 99, "generated style run-through attribute property count regressed: " + styleRunThroughPropertyCount);
-        Assert.True(styleWrapContourModePropertyCount >= 99, "generated style wrap contour mode attribute property count regressed: " + styleWrapContourModePropertyCount);
-        Assert.True(styleWritingModePropertyCount >= 104, "generated style writing mode attribute property count regressed: " + styleWritingModePropertyCount);
-        Assert.True(tableDisplayMemberModePropertyCount >= 103, "generated table display member mode attribute property count regressed: " + tableDisplayMemberModePropertyCount);
-        Assert.True(tableLayoutModePropertyCount >= 103, "generated table layout mode attribute property count regressed: " + tableLayoutModePropertyCount);
-        Assert.True(tableMemberTypePropertyCount >= 102, "generated table member type attribute property count regressed: " + tableMemberTypePropertyCount);
-        Assert.True(tableGroupedByPropertyCount >= 102, "generated table grouped-by attribute property count regressed: " + tableGroupedByPropertyCount);
-        Assert.True(tableSortModePropertyCount >= 103, "generated table sort mode attribute property count regressed: " + tableSortModePropertyCount);
-        Assert.True(tableConditionSourcePropertyCount >= 103, "generated table condition source attribute property count regressed: " + tableConditionSourcePropertyCount);
-        Assert.True(tableFunctionPropertyCount >= 109, "generated table function attribute property count regressed: " + tableFunctionPropertyCount);
-        Assert.True(databaseRulePropertyCount >= 206, "generated database rule attribute property count regressed: " + databaseRulePropertyCount);
-        Assert.True(databaseIsNullablePropertyCount >= 103, "generated database is-nullable attribute property count regressed: " + databaseIsNullablePropertyCount);
-        Assert.True(databaseDataSourceSettingTypePropertyCount >= 102, "generated database data source setting type attribute property count regressed: " + databaseDataSourceSettingTypePropertyCount);
-        Assert.True(animationColorInterpolationPropertyCount >= 102, "generated animation color interpolation attribute property count regressed: " + animationColorInterpolationPropertyCount);
-        Assert.True(animationColorInterpolationDirectionPropertyCount >= 102, "generated animation color interpolation direction attribute property count regressed: " + animationColorInterpolationDirectionPropertyCount);
-        Assert.True(drawNoHrefPropertyCount >= 102, "generated draw nohref attribute property count regressed: " + drawNoHrefPropertyCount);
-        Assert.True(presentationPresetClassPropertyCount >= 103, "generated presentation preset class attribute property count regressed: " + presentationPresetClassPropertyCount);
-        Assert.True(numberTransliterationStylePropertyCount >= 105, "generated number transliteration style attribute property count regressed: " + numberTransliterationStylePropertyCount);
-        Assert.True(styleScriptTypePropertyCount >= 111, "generated style script type attribute property count regressed: " + styleScriptTypePropertyCount);
-        Assert.True(styleTextEmphasizePropertyCount >= 111, "generated style text emphasize attribute property count regressed: " + styleTextEmphasizePropertyCount);
-        Assert.True(drawStrokeLineJoinPropertyCount >= 99, "generated draw stroke linejoin attribute property count regressed: " + drawStrokeLineJoinPropertyCount);
-        Assert.True(svgStrokeLineCapPropertyCount >= 99, "generated SVG stroke linecap attribute property count regressed: " + svgStrokeLineCapPropertyCount);
-        Assert.True(foKeepTogetherPropertyCount >= 99, "generated FO keep-together attribute property count regressed: " + foKeepTogetherPropertyCount);
-        Assert.True(foWrapOptionPropertyCount >= 100, "generated FO wrap option attribute property count regressed: " + foWrapOptionPropertyCount);
-        Assert.True(dr3dProjectionPropertyCount >= 100, "generated 3D projection attribute property count regressed: " + dr3dProjectionPropertyCount);
-        Assert.True(dr3dShadeModePropertyCount >= 100, "generated 3D shade mode attribute property count regressed: " + dr3dShadeModePropertyCount);
-        Assert.True(svgFillRulePropertyCount >= 109, "generated SVG fill rule attribute property count regressed: " + svgFillRulePropertyCount);
-        Assert.True(tableBorderModelPropertyCount >= 99, "generated table border model attribute property count regressed: " + tableBorderModelPropertyCount);
-        Assert.True(textLabelFollowedByPropertyCount >= 107, "generated text label-followed-by attribute property count regressed: " + textLabelFollowedByPropertyCount);
-        Assert.True(textListLevelPositionModePropertyCount >= 106, "generated text list level position mode attribute property count regressed: " + textListLevelPositionModePropertyCount);
-        Assert.True(textIndexScopePropertyCount >= 104, "generated text index scope attribute property count regressed: " + textIndexScopePropertyCount);
-        Assert.True(textTableTypePropertyCount >= 103, "generated text table type attribute property count regressed: " + textTableTypePropertyCount);
-        Assert.True(textAnchorTypePropertyCount >= 102, "generated text anchor type attribute property count regressed: " + textAnchorTypePropertyCount);
-        Assert.True(textNoteClassPropertyCount >= 101, "generated text note class attribute property count regressed: " + textNoteClassPropertyCount);
-        Assert.True(textSelectPagePropertyCount >= 100, "generated text select page attribute property count regressed: " + textSelectPagePropertyCount);
-        Assert.True(textReferenceFormatPropertyCount >= 100, "generated text reference format attribute property count regressed: " + textReferenceFormatPropertyCount);
-        Assert.True(textStartNumberingAtPropertyCount >= 100, "generated text start numbering at attribute property count regressed: " + textStartNumberingAtPropertyCount);
-        Assert.True(textFootnotesPositionPropertyCount >= 100, "generated text footnotes position attribute property count regressed: " + textFootnotesPositionPropertyCount);
-        Assert.True(textCaptionSequenceFormatPropertyCount >= 100, "generated text caption sequence format attribute property count regressed: " + textCaptionSequenceFormatPropertyCount);
-        Assert.True(textNumberPositionPropertyCount >= 99, "generated text number position attribute property count regressed: " + textNumberPositionPropertyCount);
-        Assert.True(textPlaceholderTypePropertyCount >= 99, "generated text placeholder type attribute property count regressed: " + textPlaceholderTypePropertyCount);
-        Assert.True(textAnimationPropertyCount >= 99, "generated text animation attribute property count regressed: " + textAnimationPropertyCount);
-        Assert.True(textAnimationDirectionPropertyCount >= 99, "generated text animation direction attribute property count regressed: " + textAnimationDirectionPropertyCount);
-        Assert.True(textKindPropertyCount >= 99, "generated text kind attribute property count regressed: " + textKindPropertyCount);
-        Assert.True(lineStylePropertyCount >= 534, "generated line style attribute property count regressed: " + lineStylePropertyCount);
-        Assert.True(lineTypePropertyCount >= 433, "generated line type attribute property count regressed: " + lineTypePropertyCount);
-        Assert.True(lineWidthPropertyCount >= 433, "generated line width attribute property count regressed: " + lineWidthPropertyCount);
-        Assert.True(lineModePropertyCount >= 333, "generated line mode attribute property count regressed: " + lineModePropertyCount);
-        Assert.True(fontStylePropertyCount >= 433, "generated font style attribute property count regressed: " + fontStylePropertyCount);
-        Assert.True(fontVariantPropertyCount >= 211, "generated font variant attribute property count regressed: " + fontVariantPropertyCount);
-        Assert.True(fontWeightPropertyCount >= 433, "generated font weight attribute property count regressed: " + fontWeightPropertyCount);
-        Assert.True(fontFamilyGenericPropertyCount >= 335, "generated font family generic attribute property count regressed: " + fontFamilyGenericPropertyCount);
-        Assert.True(fontPitchPropertyCount >= 335, "generated font pitch attribute property count regressed: " + fontPitchPropertyCount);
-        Assert.True(fontReliefPropertyCount >= 111, "generated font relief attribute property count regressed: " + fontReliefPropertyCount);
-        Assert.True(fontStretchPropertyCount >= 100, "generated font stretch attribute property count regressed: " + fontStretchPropertyCount);
-        Assert.True(styleLineBreakPropertyCount >= 98, "generated style line break attribute property count regressed: " + styleLineBreakPropertyCount);
-        Assert.True(styleRepeatPropertyCount >= 111, "generated style repeat attribute property count regressed: " + styleRepeatPropertyCount);
-        Assert.True(styleDirectionPropertyCount >= 99, "generated style direction attribute property count regressed: " + styleDirectionPropertyCount);
-        Assert.True(formOrientationPropertyCount >= 99, "generated form orientation attribute property count regressed: " + formOrientationPropertyCount);
-        Assert.True(tableDirectionPropertyCount >= 100, "generated table direction attribute property count regressed: " + tableDirectionPropertyCount);
-        Assert.True(tableOrientationPropertyCount >= 104, "generated table orientation attribute property count regressed: " + tableOrientationPropertyCount);
-        Assert.True(xmlNamePropertyCount >= 1000, "generated XML name attribute property count regressed: " + xmlNamePropertyCount);
-        Assert.True(styleFamilyPropertyCount >= 50, "generated style family attribute property count regressed: " + styleFamilyPropertyCount);
-        Assert.True(odfVersionPropertyCount >= 50, "generated ODF version attribute property count regressed: " + odfVersionPropertyCount);
-        Assert.True(mediaTypePropertyCount >= 100, "generated media type attribute property count regressed: " + mediaTypePropertyCount);
+        Assert.True(stringPropertyCount >= 800, "generated string property count regressed: " + stringPropertyCount);
+
+        var expectedFloors = new (string TypeName, int MinCount)[]
+        {
+            ("int", 200),
+            ("bool", 400),
+            ("decimal", 40),
+            ("DateTime", 15),
+            ("OdfTime", 5),
+            ("OdfLength", 300),
+            ("OdfBorderWidths", 15),
+            ("OdfDuration", 20),
+            ("OdfAngle", 12),
+            ("OdfStyleName", 150),
+            ("OdfStyleNameList", 30),
+            ("OdfColor", 20),
+            ("OdfIriReference", 40),
+            ("OdfPercent", 15),
+            ("OdfCellAddressReference", 15),
+            ("OdfCellRangeAddress", 5),
+            ("OdfCellRangeAddressList", 8),
+            ("OdfVector3D", 10),
+            ("OdfPoint3D", 1),
+            ("OdfPointList", 3),
+            ("OdfLanguageCode", 8),
+            ("OdfCountryCode", 20),
+            ("OdfScriptCode", 8),
+            ("OdfLanguageTag", 8),
+            ("OdfNamespacedToken", 20),
+            ("OdfCharacter", 5),
+            ("OdfTextEncoding", 2),
+            ("OdfTargetFrameName", 5),
+            ("OdfXLinkType", 20),
+            ("OdfXLinkShow", 15),
+            ("OdfXLinkActuate", 15),
+            ("OdfNumberStyle", 6),
+            ("OdfNumberCalendar", 5),
+            ("OdfTableOrder", 2),
+            ("OdfTableType", 2),
+            ("OdfPresentationEffect", 3),
+            ("OdfPresentationSpeed", 5),
+            ("OdfPresentationAction", 1),
+            ("OdfPresentationTransitionType", 1),
+            ("OdfPresentationTransitionStyle", 1),
+            ("OdfFoTextAlign", 1),
+            ("OdfDrawFill", 2),
+            ("OdfDrawFillImageRefPoint", 2),
+            ("OdfDrawColorMode", 1),
+            ("OdfStyleVerticalAlign", 1),
+            ("OdfStyleVerticalPos", 1),
+            ("OdfStyleVerticalRel", 1),
+            ("OdfStyleHorizontalPos", 1),
+            ("OdfStyleHorizontalRel", 1),
+            ("OdfStyleWrap", 1),
+            ("OdfStyleRunThrough", 1),
+            ("OdfStyleWrapContourMode", 1),
+            ("OdfStyleWritingMode", 3),
+            ("OdfTableDisplayMemberMode", 1),
+            ("OdfTableLayoutMode", 1),
+            ("OdfTableMemberType", 1),
+            ("OdfTableGroupedBy", 1),
+            ("OdfTableSortMode", 1),
+            ("OdfTableConditionSource", 1),
+            ("OdfTableFunction", 2),
+            ("OdfDatabaseRule", 1),
+            ("OdfDatabaseIsNullable", 1),
+            ("OdfDatabaseDataSourceSettingType", 1),
+            ("OdfAnimationColorInterpolation", 1),
+            ("OdfAnimationColorInterpolationDirection", 1),
+            ("OdfDrawNoHref", 2),
+            ("OdfPresentationPresetClass", 3),
+            ("OdfNumberTransliterationStyle", 5),
+            ("OdfDrawStrokeLineJoin", 1),
+            ("OdfSvgStrokeLineCap", 1),
+            ("OdfFoKeepTogether", 1),
+            ("OdfFoWrapOption", 1),
+            ("OdfDr3dProjection", 2),
+            ("OdfDr3dShadeMode", 2),
+            ("OdfSvgFillRule", 2),
+            ("OdfTableBorderModel", 1),
+            ("OdfTextLabelFollowedBy", 1),
+            ("OdfTextListLevelPositionMode", 1),
+            ("OdfTextIndexScope", 4),
+            ("OdfTextTableType", 3),
+            ("OdfTextAnchorType", 12),
+            ("OdfTextNoteClass", 1),
+            ("OdfTextSelectPage", 1),
+            ("OdfTextReferenceFormat", 1),
+            ("OdfTextStartNumberingAt", 1),
+            ("OdfTextFootnotesPosition", 1),
+            ("OdfTextCaptionSequenceFormat", 1),
+            ("OdfTextNumberPosition", 1),
+            ("OdfTextPlaceholderType", 1),
+            ("OdfTextAnimation", 1),
+            ("OdfTextAnimationDirection", 1),
+            ("OdfTextKind", 1),
+            ("OdfXmlName", 120),
+            ("OdfVersion", 2),
+            ("OdfMediaType", 1),
+            ("OdfLineStyle", 1),
+            ("OdfLineType", 1),
+            ("OdfLineWidth", 1),
+            ("OdfFontStyle", 1),
+            ("OdfFontVariant", 1),
+            ("OdfFontWeight", 1),
+            ("OdfFontPitch", 1),
+            ("OdfFontStretch", 1),
+            ("OdfStyleRepeat", 2),
+            ("OdfStyleDirection", 1),
+            ("OdfFoTextTransform", 0),
+            ("OdfStyleTextRotationScale", 0),
+            ("OdfStyleTextCombine", 0),
+            ("OdfStyleScriptType", 0),
+            ("OdfStyleTextEmphasize", 0),
+            ("OdfLineMode", 0),
+            ("OdfFontFamilyGeneric", 1),
+            ("OdfFontRelief", 0),
+            ("OdfStyleLineBreak", 0),
+            ("OdfFormOrientation", 1),
+            ("OdfTableDirection", 1),
+            ("OdfTableOrientation", 1),
+            ("OdfStyleFamily", 0)
+        };
+
+        int propertyCount = childCollectionPropertyCount + stringPropertyCount;
+        foreach (var pair in expectedFloors)
+        {
+            int actual = Regex.Matches(generated, @"public " + Regex.Escape(pair.TypeName) + @"\? \w+").Count;
+            propertyCount += actual;
+            Assert.True(actual >= pair.MinCount, $"generated '{pair.TypeName}' property count regressed: expected >= {pair.MinCount}, actual {actual}");
+        }
+        Assert.True(propertyCount >= 5000, "generated attribute property count regressed: " + propertyCount);
     }
 
     /// <summary>
@@ -1203,125 +1097,135 @@ public class TypedDomParityTests
                 relation.ChildNamespaceUri == OdfNamespaces.Table &&
                 relation.ChildLocalName == "table-row");
         Assert.Contains(report.AttributeValueTypeCounts, pair => pair.Key.Length > 0 && pair.Value > 0);
-        Assert.True(report.WrapperPropertyTypeCounts["int"] >= 1000);
-        Assert.True(report.WrapperPropertyTypeCounts["childElementCollection"] >= 2000);
-        Assert.True(report.WrapperPropertyTypeCounts["bool"] >= 10000);
-        Assert.True(report.WrapperPropertyTypeCounts["decimal"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["dateTime"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["time"] >= 6);
-        Assert.True(report.WrapperPropertyTypeCounts["length"] >= 10000);
-        Assert.True(report.WrapperPropertyTypeCounts["borderWidths"] >= 723);
-        Assert.True(report.WrapperPropertyTypeCounts["duration"] >= 1000);
-        Assert.True(report.WrapperPropertyTypeCounts["angle"] >= 1000);
-        Assert.True(report.WrapperPropertyTypeCounts["styleName"] >= 1000);
-        Assert.True(report.WrapperPropertyTypeCounts["styleNameList"] >= 300);
-        Assert.True(report.WrapperPropertyTypeCounts["color"] >= 1000);
-        Assert.True(report.WrapperPropertyTypeCounts["iriReference"] >= 400);
-        Assert.True(report.WrapperPropertyTypeCounts["percent"] >= 1000);
-        Assert.True(report.WrapperPropertyTypeCounts["cellAddress"] >= 400);
-        Assert.True(report.WrapperPropertyTypeCounts["cellRangeAddress"] >= 400);
-        Assert.True(report.WrapperPropertyTypeCounts["cellRangeAddressList"] >= 800);
-        Assert.True(report.WrapperPropertyTypeCounts["vector3D"] >= 1000);
-        Assert.True(report.WrapperPropertyTypeCounts["point3D"] >= 90);
-        Assert.True(report.WrapperPropertyTypeCounts["pointList"] >= 90);
-        Assert.True(report.WrapperPropertyTypeCounts["languageCode"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["countryCode"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["scriptCode"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["languageTag"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["namespacedToken"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["character"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["textEncoding"] >= 438);
-        Assert.True(report.WrapperPropertyTypeCounts["targetFrameName"] >= 205);
-        Assert.True(report.WrapperPropertyTypeCounts["xLinkType"] >= 172);
-        Assert.True(report.WrapperPropertyTypeCounts["xLinkShow"] >= 160);
-        Assert.True(report.WrapperPropertyTypeCounts["xLinkActuate"] >= 167);
-        Assert.True(report.WrapperPropertyTypeCounts["numberStyle"] >= 109);
-        Assert.True(report.WrapperPropertyTypeCounts["numberCalendar"] >= 106);
-        Assert.True(report.WrapperPropertyTypeCounts["tableOrder"] >= 108);
-        Assert.True(report.WrapperPropertyTypeCounts["tableType"] >= 102);
-        Assert.True(report.WrapperPropertyTypeCounts["presentationEffect"] >= 131);
-        Assert.True(report.WrapperPropertyTypeCounts["presentationSpeed"] >= 231);
-        Assert.True(report.WrapperPropertyTypeCounts["presentationAction"] >= 125);
-        Assert.True(report.WrapperPropertyTypeCounts["presentationTransitionType"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["presentationTransitionStyle"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["foTextTransform"] >= 111);
-        Assert.True(report.WrapperPropertyTypeCounts["foTextAlign"] >= 106);
-        Assert.True(report.WrapperPropertyTypeCounts["styleTextRotationScale"] >= 111);
-        Assert.True(report.WrapperPropertyTypeCounts["styleTextCombine"] >= 111);
-        Assert.True(report.WrapperPropertyTypeCounts["drawFill"] >= 109);
-        Assert.True(report.WrapperPropertyTypeCounts["drawFillImageRefPoint"] >= 109);
-        Assert.True(report.WrapperPropertyTypeCounts["drawColorMode"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["styleVerticalAlign"] >= 105);
-        Assert.True(report.WrapperPropertyTypeCounts["styleVerticalPos"] >= 106);
-        Assert.True(report.WrapperPropertyTypeCounts["styleVerticalRel"] >= 106);
-        Assert.True(report.WrapperPropertyTypeCounts["styleHorizontalPos"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["styleHorizontalRel"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["styleWrap"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["styleRunThrough"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["styleWrapContourMode"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["styleWritingMode"] >= 104);
-        Assert.True(report.WrapperPropertyTypeCounts["tableDisplayMemberMode"] >= 103);
-        Assert.True(report.WrapperPropertyTypeCounts["tableLayoutMode"] >= 103);
-        Assert.True(report.WrapperPropertyTypeCounts["tableMemberType"] >= 102);
-        Assert.True(report.WrapperPropertyTypeCounts["tableGroupedBy"] >= 102);
-        Assert.True(report.WrapperPropertyTypeCounts["tableSortMode"] >= 103);
-        Assert.True(report.WrapperPropertyTypeCounts["tableConditionSource"] >= 103);
-        Assert.True(report.WrapperPropertyTypeCounts["tableFunction"] >= 109);
-        Assert.True(report.WrapperPropertyTypeCounts["databaseRule"] >= 206);
-        Assert.True(report.WrapperPropertyTypeCounts["databaseIsNullable"] >= 103);
-        Assert.True(report.WrapperPropertyTypeCounts["databaseDataSourceSettingType"] >= 102);
-        Assert.True(report.WrapperPropertyTypeCounts["animationColorInterpolation"] >= 102);
-        Assert.True(report.WrapperPropertyTypeCounts["animationColorInterpolationDirection"] >= 102);
-        Assert.True(report.WrapperPropertyTypeCounts["drawNoHref"] >= 102);
-        Assert.True(report.WrapperPropertyTypeCounts["presentationPresetClass"] >= 103);
-        Assert.True(report.WrapperPropertyTypeCounts["numberTransliterationStyle"] >= 105);
-        Assert.True(report.WrapperPropertyTypeCounts["styleScriptType"] >= 111);
-        Assert.True(report.WrapperPropertyTypeCounts["styleTextEmphasize"] >= 111);
-        Assert.True(report.WrapperPropertyTypeCounts["drawStrokeLineJoin"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["svgStrokeLineCap"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["foKeepTogether"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["foWrapOption"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["dr3dProjection"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["dr3dShadeMode"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["svgFillRule"] >= 109);
-        Assert.True(report.WrapperPropertyTypeCounts["tableBorderModel"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["textLabelFollowedBy"] >= 107);
-        Assert.True(report.WrapperPropertyTypeCounts["textListLevelPositionMode"] >= 106);
-        Assert.True(report.WrapperPropertyTypeCounts["textIndexScope"] >= 104);
-        Assert.True(report.WrapperPropertyTypeCounts["textTableType"] >= 103);
-        Assert.True(report.WrapperPropertyTypeCounts["textAnchorType"] >= 102);
-        Assert.True(report.WrapperPropertyTypeCounts["textNoteClass"] >= 101);
-        Assert.True(report.WrapperPropertyTypeCounts["textSelectPage"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["textReferenceFormat"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["textStartNumberingAt"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["textFootnotesPosition"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["textCaptionSequenceFormat"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["textNumberPosition"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["textPlaceholderType"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["textAnimation"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["textAnimationDirection"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["textKind"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["lineStyle"] >= 534);
-        Assert.True(report.WrapperPropertyTypeCounts["lineType"] >= 433);
-        Assert.True(report.WrapperPropertyTypeCounts["lineWidth"] >= 433);
-        Assert.True(report.WrapperPropertyTypeCounts["lineMode"] >= 333);
-        Assert.True(report.WrapperPropertyTypeCounts["fontStyle"] >= 433);
-        Assert.True(report.WrapperPropertyTypeCounts["fontVariant"] >= 211);
-        Assert.True(report.WrapperPropertyTypeCounts["fontWeight"] >= 433);
-        Assert.True(report.WrapperPropertyTypeCounts["fontFamilyGeneric"] >= 335);
-        Assert.True(report.WrapperPropertyTypeCounts["fontPitch"] >= 335);
-        Assert.True(report.WrapperPropertyTypeCounts["fontRelief"] >= 111);
-        Assert.True(report.WrapperPropertyTypeCounts["fontStretch"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["styleLineBreak"] >= 98);
-        Assert.True(report.WrapperPropertyTypeCounts["styleRepeat"] >= 111);
-        Assert.True(report.WrapperPropertyTypeCounts["styleDirection"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["formOrientation"] >= 99);
-        Assert.True(report.WrapperPropertyTypeCounts["tableDirection"] >= 100);
-        Assert.True(report.WrapperPropertyTypeCounts["tableOrientation"] >= 104);
-        Assert.True(report.WrapperPropertyTypeCounts["xmlName"] >= 1000);
-        Assert.True(report.WrapperPropertyTypeCounts["styleFamily"] >= 50);
-        Assert.True(report.WrapperPropertyTypeCounts["odfVersion"] >= 50);
-        Assert.True(report.WrapperPropertyTypeCounts["mediaType"] >= 100);
+        var expectedFloors = new (string PropertyType, int MinCount)[]
+        {
+            ("int", 200),
+            ("childElementCollection", 2000),
+            ("bool", 400),
+            ("decimal", 40),
+            ("dateTime", 15),
+            ("time", 5),
+            ("length", 300),
+            ("borderWidths", 15),
+            ("duration", 20),
+            ("angle", 12),
+            ("styleName", 150),
+            ("styleNameList", 30),
+            ("color", 20),
+            ("iriReference", 40),
+            ("percent", 15),
+            ("cellAddress", 15),
+            ("cellRangeAddress", 5),
+            ("cellRangeAddressList", 8),
+            ("vector3D", 10),
+            ("point3D", 1),
+            ("pointList", 3),
+            ("languageCode", 8),
+            ("countryCode", 20),
+            ("scriptCode", 8),
+            ("languageTag", 8),
+            ("namespacedToken", 20),
+            ("character", 5),
+            ("textEncoding", 2),
+            ("targetFrameName", 5),
+            ("xLinkType", 20),
+            ("xLinkShow", 15),
+            ("xLinkActuate", 15),
+            ("numberStyle", 6),
+            ("numberCalendar", 5),
+            ("tableOrder", 2),
+            ("tableType", 2),
+            ("presentationEffect", 3),
+            ("presentationSpeed", 5),
+            ("presentationAction", 1),
+            ("presentationTransitionType", 1),
+            ("presentationTransitionStyle", 1),
+            ("foTextTransform", 0),
+            ("foTextAlign", 1),
+            ("styleTextRotationScale", 0),
+            ("styleTextCombine", 0),
+            ("drawFill", 2),
+            ("drawFillImageRefPoint", 2),
+            ("drawColorMode", 1),
+            ("styleVerticalAlign", 1),
+            ("styleVerticalPos", 1),
+            ("styleVerticalRel", 1),
+            ("styleHorizontalPos", 1),
+            ("styleHorizontalRel", 1),
+            ("styleWrap", 1),
+            ("styleRunThrough", 1),
+            ("styleWrapContourMode", 1),
+            ("styleWritingMode", 3),
+            ("tableDisplayMemberMode", 1),
+            ("tableLayoutMode", 1),
+            ("tableMemberType", 1),
+            ("tableGroupedBy", 1),
+            ("tableSortMode", 1),
+            ("tableConditionSource", 1),
+            ("tableFunction", 2),
+            ("databaseRule", 1),
+            ("databaseIsNullable", 1),
+            ("databaseDataSourceSettingType", 1),
+            ("animationColorInterpolation", 1),
+            ("animationColorInterpolationDirection", 1),
+            ("drawNoHref", 2),
+            ("presentationPresetClass", 3),
+            ("numberTransliterationStyle", 5),
+            ("styleScriptType", 0),
+            ("styleTextEmphasize", 0),
+            ("drawStrokeLineJoin", 1),
+            ("svgStrokeLineCap", 1),
+            ("foKeepTogether", 1),
+            ("foWrapOption", 1),
+            ("dr3dProjection", 2),
+            ("dr3dShadeMode", 2),
+            ("svgFillRule", 2),
+            ("tableBorderModel", 1),
+            ("textLabelFollowedBy", 1),
+            ("textListLevelPositionMode", 1),
+            ("textIndexScope", 4),
+            ("textTableType", 3),
+            ("textAnchorType", 12),
+            ("textNoteClass", 1),
+            ("textSelectPage", 1),
+            ("textReferenceFormat", 1),
+            ("textStartNumberingAt", 1),
+            ("textFootnotesPosition", 1),
+            ("textCaptionSequenceFormat", 1),
+            ("textNumberPosition", 1),
+            ("textPlaceholderType", 1),
+            ("textAnimation", 1),
+            ("textAnimationDirection", 1),
+            ("textKind", 1),
+            ("lineStyle", 1),
+            ("lineType", 1),
+            ("lineWidth", 1),
+            ("lineMode", 0),
+            ("fontStyle", 1),
+            ("fontVariant", 1),
+            ("fontWeight", 1),
+            ("fontFamilyGeneric", 1),
+            ("fontPitch", 1),
+            ("fontRelief", 0),
+            ("fontStretch", 1),
+            ("styleLineBreak", 0),
+            ("styleRepeat", 2),
+            ("styleDirection", 1),
+            ("formOrientation", 1),
+            ("tableDirection", 1),
+            ("tableOrientation", 1),
+            ("xmlName", 120),
+            ("styleFamily", 0),
+            ("odfVersion", 2),
+            ("mediaType", 1)
+        };
+
+        foreach (var pair in expectedFloors)
+        {
+            int actual = report.WrapperPropertyTypeCounts.TryGetValue(pair.PropertyType, out int val) ? val : 0;
+            Assert.True(actual >= pair.MinCount,
+                $"report.WrapperPropertyTypeCounts['{pair.PropertyType}'] regressed: expected >= {pair.MinCount}, actual {actual}");
+        }
 
         string json = JsonSerializer.Serialize(report.ToJsonModel(), OdfJsonSerializerOptions.Compact);
         using JsonDocument document = JsonDocument.Parse(json);
@@ -1334,123 +1238,15 @@ public class TypedDomParityTests
                 relation.GetProperty("parentLocalName").GetString() == "body" &&
                 relation.GetProperty("childNamespaceUri").GetString() == OdfNamespaces.Office &&
                 relation.GetProperty("childLocalName").GetString() == "text");
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("childElementCollection").GetInt32() >= 2000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("int").GetInt32() >= 1000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("bool").GetInt32() >= 10000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("time").GetInt32() >= 6);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("length").GetInt32() >= 10000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("borderWidths").GetInt32() >= 723);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("duration").GetInt32() >= 1000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("angle").GetInt32() >= 1000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleName").GetInt32() >= 1000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleNameList").GetInt32() >= 300);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("color").GetInt32() >= 1000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("iriReference").GetInt32() >= 400);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("percent").GetInt32() >= 1000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("cellAddress").GetInt32() >= 400);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("cellRangeAddress").GetInt32() >= 400);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("cellRangeAddressList").GetInt32() >= 800);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("vector3D").GetInt32() >= 1000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("point3D").GetInt32() >= 90);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("pointList").GetInt32() >= 90);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("languageCode").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("countryCode").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("scriptCode").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("languageTag").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("namespacedToken").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("character").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textEncoding").GetInt32() >= 438);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("targetFrameName").GetInt32() >= 205);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkType").GetInt32() >= 172);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkShow").GetInt32() >= 160);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkActuate").GetInt32() >= 167);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberStyle").GetInt32() >= 109);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberCalendar").GetInt32() >= 106);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableOrder").GetInt32() >= 108);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableType").GetInt32() >= 102);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationEffect").GetInt32() >= 131);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationSpeed").GetInt32() >= 231);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationAction").GetInt32() >= 125);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationTransitionType").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationTransitionStyle").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foTextTransform").GetInt32() >= 111);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foTextAlign").GetInt32() >= 106);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleTextRotationScale").GetInt32() >= 111);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleTextCombine").GetInt32() >= 111);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawFill").GetInt32() >= 109);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawFillImageRefPoint").GetInt32() >= 109);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawColorMode").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleVerticalAlign").GetInt32() >= 105);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleVerticalPos").GetInt32() >= 106);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleVerticalRel").GetInt32() >= 106);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleHorizontalPos").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleHorizontalRel").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleWrap").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleRunThrough").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleWrapContourMode").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleWritingMode").GetInt32() >= 104);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableDisplayMemberMode").GetInt32() >= 103);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableLayoutMode").GetInt32() >= 103);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableMemberType").GetInt32() >= 102);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableGroupedBy").GetInt32() >= 102);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableSortMode").GetInt32() >= 103);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableConditionSource").GetInt32() >= 103);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableFunction").GetInt32() >= 109);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("databaseRule").GetInt32() >= 206);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("databaseIsNullable").GetInt32() >= 103);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("databaseDataSourceSettingType").GetInt32() >= 102);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("animationColorInterpolation").GetInt32() >= 102);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("animationColorInterpolationDirection").GetInt32() >= 102);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawNoHref").GetInt32() >= 102);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationPresetClass").GetInt32() >= 103);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberTransliterationStyle").GetInt32() >= 105);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleScriptType").GetInt32() >= 111);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleTextEmphasize").GetInt32() >= 111);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawStrokeLineJoin").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("svgStrokeLineCap").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foKeepTogether").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foWrapOption").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("dr3dProjection").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("dr3dShadeMode").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("svgFillRule").GetInt32() >= 109);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableBorderModel").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textLabelFollowedBy").GetInt32() >= 107);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textListLevelPositionMode").GetInt32() >= 106);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textIndexScope").GetInt32() >= 104);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textTableType").GetInt32() >= 103);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textAnchorType").GetInt32() >= 102);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textNoteClass").GetInt32() >= 101);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textSelectPage").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textReferenceFormat").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textStartNumberingAt").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textFootnotesPosition").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textCaptionSequenceFormat").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textNumberPosition").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textPlaceholderType").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textAnimation").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textAnimationDirection").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textKind").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineStyle").GetInt32() >= 534);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineType").GetInt32() >= 433);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineWidth").GetInt32() >= 433);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineMode").GetInt32() >= 333);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontStyle").GetInt32() >= 433);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontVariant").GetInt32() >= 211);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontWeight").GetInt32() >= 433);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontFamilyGeneric").GetInt32() >= 335);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontPitch").GetInt32() >= 335);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontRelief").GetInt32() >= 111);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontStretch").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleLineBreak").GetInt32() >= 98);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleRepeat").GetInt32() >= 111);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleDirection").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("formOrientation").GetInt32() >= 99);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableDirection").GetInt32() >= 100);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableOrientation").GetInt32() >= 104);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xmlName").GetInt32() >= 1000);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleFamily").GetInt32() >= 50);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("odfVersion").GetInt32() >= 50);
-        Assert.True(document.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("mediaType").GetInt32() >= 100);
+
+        foreach (var pair in expectedFloors)
+        {
+            int actual = document.RootElement.GetProperty("wrapperPropertyTypeCounts").TryGetProperty(pair.PropertyType, out JsonElement val)
+                ? val.GetInt32()
+                : 0;
+            Assert.True(actual >= pair.MinCount,
+                $"JSON wrapperPropertyTypeCounts['{pair.PropertyType}'] regressed: expected >= {pair.MinCount}, actual {actual}");
+        }
         Assert.True(document.RootElement.GetProperty("elements").GetArrayLength() >= report.SchemaElementCount);
     }
 

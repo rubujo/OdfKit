@@ -30,18 +30,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfXLinkActuate? Actuate
-        {
-            get => GetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("actuate", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
         public int? Alphabetic
         {
             get => GetNullableInt32AttributeValue("alphabetic", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
@@ -234,18 +222,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfIriReference? Href
-        {
-            get => GetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("href", "http://www.w3.org/1999/xlink");
-                else
-                    SetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
         public int? Ideographic
         {
             get => GetNullableInt32AttributeValue("ideographic", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
@@ -267,6 +243,18 @@ namespace OdfKit.DOM
                     RemoveAttribute("mathematical", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
                 else
                     SetInt32AttributeValue("mathematical", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value.Value, "svg", GetDocumentVersion());
+            }
+        }
+
+        public string? Name
+        {
+            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
+            set
+            {
+                if (value == null)
+                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
+                else
+                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value, "style", GetDocumentVersion());
             }
         }
 
@@ -363,54 +351,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("strikethrough-thickness", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
                 else
                     SetInt32AttributeValue("strikethrough-thickness", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value.Value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public string? String
-        {
-            get => GetAttributeValue("string", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("string", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetAttributeValue("string", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public string? StyleName
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value, "style", GetDocumentVersion());
-            }
-        }
-
-        public string? SvgName
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public OdfXLinkType? Type
-        {
-            get => GetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
             }
         }
 

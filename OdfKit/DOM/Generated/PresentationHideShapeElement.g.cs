@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public PresentationHideShapeElement(string? prefix = null) : base("hide-shape", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
-        public OdfXLinkActuate? Actuate
-        {
-            get => GetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("actuate", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
         public OdfDuration? Delay
         {
             get => GetDurationAttributeValue("delay", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
@@ -66,30 +54,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfIriReference? Href
-        {
-            get => GetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("href", "http://www.w3.org/1999/xlink");
-                else
-                    SetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
-        public OdfXmlName? Id
-        {
-            get => GetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("id", "http://www.w3.org/XML/1998/namespace");
-                else
-                    SetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
         public string? PathId
         {
             get => GetAttributeValue("path-id", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
@@ -102,18 +66,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public bool? PlayFull
-        {
-            get => GetBooleanAttributeValue("play-full", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("play-full", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetBooleanAttributeValue("play-full", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value.Value, "presentation", GetDocumentVersion());
-            }
-        }
-
         public OdfXmlName? ShapeId
         {
             get => GetXmlNameAttributeValue("shape-id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
@@ -123,18 +75,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("shape-id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
                 else
                     SetXmlNameAttributeValue("shape-id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfXLinkShow? Show
-        {
-            get => GetXLinkShowAttributeValue("show", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("show", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkShowAttributeValue("show", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
             }
         }
 
@@ -159,18 +99,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("start-scale", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
                 else
                     SetLengthAttributeValue("start-scale", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value.Value, "presentation", GetDocumentVersion());
-            }
-        }
-
-        public OdfXLinkType? Type
-        {
-            get => GetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
             }
         }
 

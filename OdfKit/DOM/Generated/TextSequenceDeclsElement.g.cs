@@ -18,42 +18,6 @@ namespace OdfKit.DOM
     {
         public TextSequenceDeclsElement(string? prefix = null) : base("sequence-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
-        public int? DisplayOutlineLevel
-        {
-            get => GetNullableInt32AttributeValue("display-outline-level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("display-outline-level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetInt32AttributeValue("display-outline-level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value, "text", GetDocumentVersion());
-            }
-        }
-
-        public OdfCharacter? SeparationCharacter
-        {
-            get => GetCharacterAttributeValue("separation-character", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("separation-character", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetCharacterAttributeValue("separation-character", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TextSequenceDeclElement> TextSequenceDeclChildElements
         {
             get => ChildElements<TextSequenceDeclElement>();

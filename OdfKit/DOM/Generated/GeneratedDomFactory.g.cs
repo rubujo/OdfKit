@@ -8,14 +8,12 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.Compliance;
 using OdfKit.Styles;
-
-namespace OdfKit.DOM
-{
 #if NET8_0_OR_GREATER
 using System.Collections.Frozen;
 #endif
-using System.Collections.Generic;
 
+namespace OdfKit.DOM
+{
     public static partial class OdfNodeFactory
     {
 #if NET8_0_OR_GREATER

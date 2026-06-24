@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public DatabaseDriverSettingsElement(string? prefix = null) : base("driver-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
-        public string? AdditionalColumnStatement
-        {
-            get => GetAttributeValue("additional-column-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("additional-column-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("additional-column-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public string? BaseDn
         {
             get => GetAttributeValue("base-dn", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
@@ -39,42 +27,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("base-dn", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
                 else
                     SetAttributeValue("base-dn", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Decimal
-        {
-            get => GetAttributeValue("decimal", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("decimal", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("decimal", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public OdfTextEncoding? Encoding
-        {
-            get => GetTextEncodingAttributeValue("encoding", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("encoding", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetTextEncodingAttributeValue("encoding", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Field
-        {
-            get => GetAttributeValue("field", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("field", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("field", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
             }
         }
 
@@ -102,18 +54,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? RowRetrievingStatement
-        {
-            get => GetAttributeValue("row-retrieving-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("row-retrieving-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("row-retrieving-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public bool? ShowDeleted
         {
             get => GetBooleanAttributeValue("show-deleted", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
@@ -126,18 +66,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? String
-        {
-            get => GetAttributeValue("string", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("string", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("string", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public string? SystemDriverSettings
         {
             get => GetAttributeValue("system-driver-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
@@ -147,18 +75,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("system-driver-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
                 else
                     SetAttributeValue("system-driver-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Thousand
-        {
-            get => GetAttributeValue("thousand", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("thousand", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("thousand", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
             }
         }
 

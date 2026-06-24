@@ -78,30 +78,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfStyleName? ParagraphStyleName
-        {
-            get => GetStyleNameAttributeValue("paragraph-style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("paragraph-style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetStyleNameAttributeValue("paragraph-style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfStyleName? StyleName
-        {
-            get => GetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TableBackgroundElement> TableBackgroundChildElements
         {
             get => ChildElements<TableBackgroundElement>();

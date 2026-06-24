@@ -18,54 +18,6 @@ namespace OdfKit.DOM
     {
         public TableCutOffsElement(string? prefix = null) : base("cut-offs", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
-        public int? EndPosition
-        {
-            get => GetNullableInt32AttributeValue("end-position", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("end-position", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("end-position", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? Id
-        {
-            get => GetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("id", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public int? Position
-        {
-            get => GetNullableInt32AttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("position", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public int? StartPosition
-        {
-            get => GetNullableInt32AttributeValue("start-position", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("start-position", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("start-position", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TableInsertionCutOffElement> TableInsertionCutOffChildElements
         {
             get => ChildElements<TableInsertionCutOffElement>();

@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public TextPageSequenceElement(string? prefix = null) : base("page-sequence", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
-        public OdfStyleName? MasterPageName
-        {
-            get => GetStyleNameAttributeValue("master-page-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("master-page-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetStyleNameAttributeValue("master-page-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TextPageElement> TextPageChildElements
         {
             get => ChildElements<TextPageElement>();

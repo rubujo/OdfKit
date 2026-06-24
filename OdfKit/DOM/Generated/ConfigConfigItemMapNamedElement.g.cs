@@ -30,18 +30,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Type
-        {
-            get => GetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:config:1.0");
-                else
-                    SetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", value, "config", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<ConfigConfigItemMapEntryElement> ConfigConfigItemMapEntryChildElements
         {
             get => ChildElements<ConfigConfigItemMapEntryElement>();

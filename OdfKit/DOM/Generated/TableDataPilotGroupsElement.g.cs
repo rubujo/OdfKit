@@ -66,18 +66,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
         public string? SourceFieldName
         {
             get => GetAttributeValue("source-field-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

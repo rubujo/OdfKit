@@ -30,30 +30,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Accumulate
-        {
-            get => GetAttributeValue("accumulate", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("accumulate", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("accumulate", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? Additive
-        {
-            get => GetAttributeValue("additive", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("additive", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("additive", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
         public OdfXmlName? AnimationId
         {
             get => GetXmlNameAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
@@ -63,30 +39,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("id", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
                 else
                     SetXmlNameAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? AttributeName
-        {
-            get => GetAttributeValue("attributeName", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("attributeName", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("attributeName", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public decimal? AudioLevel
-        {
-            get => GetDecimalAttributeValue("audio-level", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("audio-level", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetDecimalAttributeValue("audio-level", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value.Value, "ns", GetDocumentVersion());
             }
         }
 
@@ -114,66 +66,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? By
-        {
-            get => GetAttributeValue("by", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("by", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("by", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? CalcMode
-        {
-            get => GetAttributeValue("calcMode", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("calcMode", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("calcMode", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public OdfAnimationColorInterpolation? ColorInterpolation
-        {
-            get => GetAnimationColorInterpolationAttributeValue("color-interpolation", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("color-interpolation", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetAnimationColorInterpolationAttributeValue("color-interpolation", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public OdfAnimationColorInterpolationDirection? ColorInterpolationDirection
-        {
-            get => GetAnimationColorInterpolationDirectionAttributeValue("color-interpolation-direction", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("color-interpolation-direction", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetAnimationColorInterpolationDirectionAttributeValue("color-interpolation-direction", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Command
-        {
-            get => GetAttributeValue("command", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("command", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetAttributeValue("command", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public decimal? Decelerate
         {
             get => GetDecimalAttributeValue("decelerate", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
@@ -183,18 +75,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("decelerate", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
                 else
                     SetDecimalAttributeValue("decelerate", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value.Value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? Direction
-        {
-            get => GetAttributeValue("direction", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("direction", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("direction", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
             }
         }
 
@@ -234,18 +114,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfColor? FadeColor
-        {
-            get => GetColorAttributeValue("fadeColor", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fadeColor", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetColorAttributeValue("fadeColor", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value.Value, "smil", GetDocumentVersion());
-            }
-        }
-
         public OdfSmilFill? Fill
         {
             get => GetSmilFillAttributeValue("fill", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
@@ -270,30 +138,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Formula
-        {
-            get => GetAttributeValue("formula", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("formula", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetAttributeValue("formula", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? From
-        {
-            get => GetAttributeValue("from", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("from", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("from", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
         public string? GroupId
         {
             get => GetAttributeValue("group-id", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
@@ -303,66 +147,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("group-id", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
                 else
                     SetAttributeValue("group-id", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value, "presentation", GetDocumentVersion());
-            }
-        }
-
-        public OdfIriReference? Href
-        {
-            get => GetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("href", "http://www.w3.org/1999/xlink");
-                else
-                    SetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
-        public OdfDuration? IterateInterval
-        {
-            get => GetDurationAttributeValue("iterate-interval", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("iterate-interval", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetDurationAttributeValue("iterate-interval", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? IterateType
-        {
-            get => GetAttributeValue("iterate-type", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("iterate-type", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetAttributeValue("iterate-type", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? KeySplines
-        {
-            get => GetAttributeValue("keySplines", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("keySplines", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("keySplines", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? KeyTimes
-        {
-            get => GetAttributeValue("keyTimes", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("keyTimes", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("keyTimes", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
             }
         }
 
@@ -378,30 +162,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Mode
-        {
-            get => GetAttributeValue("mode", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("mode", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("mode", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public OdfXmlName? NamespaceId
         {
             get => GetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", GetDocumentVersion());
@@ -411,30 +171,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("id", "http://www.w3.org/XML/1998/namespace");
                 else
                     SetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Origin
-        {
-            get => GetAttributeValue("origin", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("origin", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetAttributeValue("origin", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public string? Path
-        {
-            get => GetAttributeValue("path", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("path", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetAttributeValue("path", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
             }
         }
 
@@ -531,102 +267,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("restartDefault", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
                 else
                     SetAttributeValue("restartDefault", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? SmilType
-        {
-            get => GetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? SubItem
-        {
-            get => GetAttributeValue("sub-item", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("sub-item", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetAttributeValue("sub-item", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Subtype
-        {
-            get => GetAttributeValue("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("subtype", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? SvgType
-        {
-            get => GetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public OdfXmlName? TargetElement
-        {
-            get => GetXmlNameAttributeValue("targetElement", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("targetElement", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetXmlNameAttributeValue("targetElement", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value.Value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? To
-        {
-            get => GetAttributeValue("to", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("to", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("to", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? Value
-        {
-            get => GetAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("value", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Values
-        {
-            get => GetAttributeValue("values", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("values", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
-                else
-                    SetAttributeValue("values", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value, "smil", GetDocumentVersion());
             }
         }
 

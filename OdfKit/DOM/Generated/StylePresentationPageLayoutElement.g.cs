@@ -30,18 +30,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfLength? Height
-        {
-            get => GetLengthAttributeValue("height", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("height", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetLengthAttributeValue("height", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value.Value, "svg", GetDocumentVersion());
-            }
-        }
-
         public OdfStyleName? Name
         {
             get => GetStyleNameAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
@@ -51,54 +39,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
                 else
                     SetStyleNameAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value.Value, "style", GetDocumentVersion());
-            }
-        }
-
-        public string? Object
-        {
-            get => GetAttributeValue("object", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("object", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetAttributeValue("object", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value, "presentation", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? Width
-        {
-            get => GetLengthAttributeValue("width", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("width", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetLengthAttributeValue("width", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value.Value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? X
-        {
-            get => GetLengthAttributeValue("x", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("x", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetLengthAttributeValue("x", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value.Value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? Y
-        {
-            get => GetLengthAttributeValue("y", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("y", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetLengthAttributeValue("y", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value.Value, "svg", GetDocumentVersion());
             }
         }
 

@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public TextTableOfContentSourceElement(string? prefix = null) : base("table-of-content-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
-        public string? Display
-        {
-            get => GetAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("display", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value, "text", GetDocumentVersion());
-            }
-        }
-
         public OdfTextIndexScope? IndexScope
         {
             get => GetTextIndexScopeAttributeValue("index-scope", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
@@ -39,18 +27,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("index-scope", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                 else
                     SetTextIndexScopeAttributeValue("index-scope", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
-        public OdfCharacter? LeaderChar
-        {
-            get => GetCharacterAttributeValue("leader-char", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("leader-char", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetCharacterAttributeValue("leader-char", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value.Value, "style", GetDocumentVersion());
             }
         }
 
@@ -66,18 +42,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfLength? Position
-        {
-            get => GetLengthAttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("position", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetLengthAttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value.Value, "style", GetDocumentVersion());
-            }
-        }
-
         public bool? RelativeTabStopPosition
         {
             get => GetBooleanAttributeValue("relative-tab-stop-position", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
@@ -87,30 +51,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("relative-tab-stop-position", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                 else
                     SetBooleanAttributeValue("relative-tab-stop-position", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
-        public OdfStyleName? StyleName
-        {
-            get => GetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
-        public string? Type
-        {
-            get => GetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value, "style", GetDocumentVersion());
             }
         }
 

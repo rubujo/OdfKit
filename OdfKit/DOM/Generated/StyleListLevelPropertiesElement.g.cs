@@ -42,18 +42,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfTextLabelFollowedBy? LabelFollowedBy
-        {
-            get => GetTextLabelFollowedByAttributeValue("label-followed-by", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("label-followed-by", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetTextLabelFollowedByAttributeValue("label-followed-by", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
         public OdfTextListLevelPositionMode? ListLevelPositionAndSpaceMode
         {
             get => GetTextListLevelPositionModeAttributeValue("list-level-position-and-space-mode", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
@@ -63,30 +51,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("list-level-position-and-space-mode", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                 else
                     SetTextListLevelPositionModeAttributeValue("list-level-position-and-space-mode", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? ListTabStopPosition
-        {
-            get => GetLengthAttributeValue("list-tab-stop-position", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("list-tab-stop-position", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetLengthAttributeValue("list-tab-stop-position", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? MarginLeft
-        {
-            get => GetLengthAttributeValue("margin-left", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("margin-left", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0");
-                else
-                    SetLengthAttributeValue("margin-left", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", value.Value, "fo", GetDocumentVersion());
             }
         }
 
@@ -135,18 +99,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("text-align", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0");
                 else
                     SetFoTextAlignAttributeValue("text-align", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", value.Value, "fo", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? TextIndent
-        {
-            get => GetLengthAttributeValue("text-indent", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("text-indent", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0");
-                else
-                    SetLengthAttributeValue("text-indent", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", value.Value, "fo", GetDocumentVersion());
             }
         }
 

@@ -215,6 +215,14 @@ public partial class OdfStyleEngine
 
         // 對應序列化樣式屬性至其去重樣式名稱的字典
         Dictionary<string, string> uniqueStyles = new(StringComparer.Ordinal);
+        foreach (var kvp in _automaticStyles)
+        {
+            string key = SerializeStyleProperties(kvp.Value);
+            if (!string.IsNullOrEmpty(key) && !uniqueStyles.ContainsKey(key))
+            {
+                uniqueStyles[key] = kvp.Key;
+            }
+        }
 
         // 用於產生自動樣式名稱的計數器（例如 P1, P2, T1, T2）
         Dictionary<string, int> familyCounters = new(StringComparer.OrdinalIgnoreCase);

@@ -42,66 +42,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? DataType
-        {
-            get => GetAttributeValue("data-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("data-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public int? FieldNumber
-        {
-            get => GetNullableInt32AttributeValue("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableFunction? Function
-        {
-            get => GetTableFunctionAttributeValue("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableFunctionAttributeValue("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public int? GroupByFieldNumber
-        {
-            get => GetNullableInt32AttributeValue("group-by-field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("group-by-field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("group-by-field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableOrder? Order
-        {
-            get => GetTableOrderAttributeValue("order", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("order", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableOrderAttributeValue("order", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public bool? PageBreaksOnGroupChange
         {
             get => GetBooleanAttributeValue("page-breaks-on-group-change", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

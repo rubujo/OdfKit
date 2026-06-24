@@ -42,30 +42,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public DateTime? DateValue
-        {
-            get => GetDateTimeAttributeValue("date-value", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("date-value", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetDateTimeAttributeValue("date-value", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public decimal? MaximumDifference
-        {
-            get => GetDecimalAttributeValue("maximum-difference", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("maximum-difference", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetDecimalAttributeValue("maximum-difference", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public int? NullYear
         {
             get => GetNullableInt32AttributeValue("null-year", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -102,30 +78,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Status
-        {
-            get => GetAttributeValue("status", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("status", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("status", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
-        public int? Steps
-        {
-            get => GetNullableInt32AttributeValue("steps", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("steps", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("steps", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public bool? UseRegularExpressions
         {
             get => GetBooleanAttributeValue("use-regular-expressions", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -147,18 +99,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("use-wildcards", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
                 else
                     SetBooleanAttributeValue("use-wildcards", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? ValueType
-        {
-            get => GetAttributeValue("value-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("value-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("value-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
             }
         }
 

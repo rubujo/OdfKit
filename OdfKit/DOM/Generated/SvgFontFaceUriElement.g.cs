@@ -42,18 +42,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? String
-        {
-            get => GetAttributeValue("string", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("string", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetAttributeValue("string", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
-            }
-        }
-
         public OdfXLinkType? Type
         {
             get => GetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", GetDocumentVersion());

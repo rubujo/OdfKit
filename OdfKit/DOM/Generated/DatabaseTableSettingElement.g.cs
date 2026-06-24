@@ -18,42 +18,6 @@ namespace OdfKit.DOM
     {
         public DatabaseTableSettingElement(string? prefix = null) : base("table-setting", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
-        public string? Decimal
-        {
-            get => GetAttributeValue("decimal", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("decimal", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("decimal", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public OdfTextEncoding? Encoding
-        {
-            get => GetTextEncodingAttributeValue("encoding", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("encoding", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetTextEncodingAttributeValue("encoding", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Field
-        {
-            get => GetAttributeValue("field", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("field", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("field", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public bool? IsFirstRowHeaderLine
         {
             get => GetBooleanAttributeValue("is-first-row-header-line", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
@@ -75,30 +39,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("show-deleted", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
                 else
                     SetBooleanAttributeValue("show-deleted", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? String
-        {
-            get => GetAttributeValue("string", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("string", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("string", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Thousand
-        {
-            get => GetAttributeValue("thousand", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("thousand", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("thousand", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
             }
         }
 

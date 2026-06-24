@@ -30,18 +30,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfStyleName? StyleName
-        {
-            get => GetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TextIndexSourceStyleElement> TextIndexSourceStyleChildElements
         {
             get => ChildElements<TextIndexSourceStyleElement>();

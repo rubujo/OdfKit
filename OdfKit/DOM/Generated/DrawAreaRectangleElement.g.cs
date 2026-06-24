@@ -18,66 +18,6 @@ namespace OdfKit.DOM
     {
         public DrawAreaRectangleElement(string? prefix = null) : base("area-rectangle", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
-        public OdfPresentationAction? Action
-        {
-            get => GetPresentationActionAttributeValue("action", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("action", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetPresentationActionAttributeValue("action", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value.Value, "presentation", GetDocumentVersion());
-            }
-        }
-
-        public OdfXLinkActuate? Actuate
-        {
-            get => GetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("actuate", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
-        public string? Direction
-        {
-            get => GetAttributeValue("direction", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("direction", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetAttributeValue("direction", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value, "presentation", GetDocumentVersion());
-            }
-        }
-
-        public OdfPresentationEffect? Effect
-        {
-            get => GetPresentationEffectAttributeValue("effect", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("effect", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetPresentationEffectAttributeValue("effect", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value.Value, "presentation", GetDocumentVersion());
-            }
-        }
-
-        public string? EventName
-        {
-            get => GetAttributeValue("event-name", "urn:oasis:names:tc:opendocument:xmlns:script:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("event-name", "urn:oasis:names:tc:opendocument:xmlns:script:1.0");
-                else
-                    SetAttributeValue("event-name", "urn:oasis:names:tc:opendocument:xmlns:script:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public OdfLength? Height
         {
             get => GetLengthAttributeValue("height", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
@@ -99,42 +39,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("href", "http://www.w3.org/1999/xlink");
                 else
                     SetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
-        public OdfXmlName? Id
-        {
-            get => GetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("id", "http://www.w3.org/XML/1998/namespace");
-                else
-                    SetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? Language
-        {
-            get => GetAttributeValue("language", "urn:oasis:names:tc:opendocument:xmlns:script:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("language", "urn:oasis:names:tc:opendocument:xmlns:script:1.0");
-                else
-                    SetAttributeValue("language", "urn:oasis:names:tc:opendocument:xmlns:script:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? MacroName
-        {
-            get => GetAttributeValue("macro-name", "urn:oasis:names:tc:opendocument:xmlns:script:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("macro-name", "urn:oasis:names:tc:opendocument:xmlns:script:1.0");
-                else
-                    SetAttributeValue("macro-name", "urn:oasis:names:tc:opendocument:xmlns:script:1.0", value, "ns", GetDocumentVersion());
             }
         }
 
@@ -162,18 +66,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public bool? PlayFull
-        {
-            get => GetBooleanAttributeValue("play-full", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("play-full", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetBooleanAttributeValue("play-full", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value.Value, "presentation", GetDocumentVersion());
-            }
-        }
-
         public OdfXLinkShow? Show
         {
             get => GetXLinkShowAttributeValue("show", "http://www.w3.org/1999/xlink", GetDocumentVersion());
@@ -183,30 +75,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("show", "http://www.w3.org/1999/xlink");
                 else
                     SetXLinkShowAttributeValue("show", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
-        public OdfPresentationSpeed? Speed
-        {
-            get => GetPresentationSpeedAttributeValue("speed", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("speed", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetPresentationSpeedAttributeValue("speed", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value.Value, "presentation", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? StartScale
-        {
-            get => GetLengthAttributeValue("start-scale", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("start-scale", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetLengthAttributeValue("start-scale", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value.Value, "presentation", GetDocumentVersion());
             }
         }
 
@@ -231,18 +99,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("type", "http://www.w3.org/1999/xlink");
                 else
                     SetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
-        public int? Verb
-        {
-            get => GetNullableInt32AttributeValue("verb", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("verb", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetInt32AttributeValue("verb", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value.Value, "presentation", GetDocumentVersion());
             }
         }
 

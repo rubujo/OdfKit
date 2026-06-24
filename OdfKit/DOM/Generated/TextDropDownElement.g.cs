@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public TextDropDownElement(string? prefix = null) : base("drop-down", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
-        public bool? CurrentSelected
-        {
-            get => GetBooleanAttributeValue("current-selected", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("current-selected", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetBooleanAttributeValue("current-selected", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
         public string? Name
         {
             get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
@@ -39,18 +27,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                 else
                     SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value, "text", GetDocumentVersion());
-            }
-        }
-
-        public string? Value
-        {
-            get => GetAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("value", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value, "text", GetDocumentVersion());
             }
         }
 

@@ -42,42 +42,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public bool? DataSourceSettingIsList
-        {
-            get => GetBooleanAttributeValue("data-source-setting-is-list", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-source-setting-is-list", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetBooleanAttributeValue("data-source-setting-is-list", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? DataSourceSettingName
-        {
-            get => GetAttributeValue("data-source-setting-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-source-setting-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("data-source-setting-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public OdfDatabaseDataSourceSettingType? DataSourceSettingType
-        {
-            get => GetDatabaseDataSourceSettingTypeAttributeValue("data-source-setting-type", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-source-setting-type", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetDatabaseDataSourceSettingTypeAttributeValue("data-source-setting-type", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
         public bool? EnableSql92Check
         {
             get => GetBooleanAttributeValue("enable-sql92-check", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

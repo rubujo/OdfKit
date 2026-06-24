@@ -90,18 +90,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public int? Position
-        {
-            get => GetNullableInt32AttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("position", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0");
-                else
-                    SetInt32AttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", value.Value, "number", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<NumberEmbeddedTextElement> NumberEmbeddedTextChildElements
         {
             get => ChildElements<NumberEmbeddedTextElement>();

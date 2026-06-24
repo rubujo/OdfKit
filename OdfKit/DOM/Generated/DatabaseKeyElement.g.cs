@@ -54,18 +54,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? RelatedColumnName
-        {
-            get => GetAttributeValue("related-column-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("related-column-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("related-column-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public string? Type
         {
             get => GetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

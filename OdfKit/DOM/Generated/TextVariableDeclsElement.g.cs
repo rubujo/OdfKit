@@ -18,30 +18,6 @@ namespace OdfKit.DOM
     {
         public TextVariableDeclsElement(string? prefix = null) : base("variable-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value, "text", GetDocumentVersion());
-            }
-        }
-
-        public string? ValueType
-        {
-            get => GetAttributeValue("value-type", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("value-type", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
-                else
-                    SetAttributeValue("value-type", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", value, "office", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TextVariableDeclElement> TextVariableDeclChildElements
         {
             get => ChildElements<TextVariableDeclElement>();

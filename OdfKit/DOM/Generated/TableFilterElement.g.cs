@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public TableFilterElement(string? prefix = null) : base("filter", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
-        public string? CaseSensitive
-        {
-            get => GetAttributeValue("case-sensitive", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("case-sensitive", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("case-sensitive", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
         public OdfTableConditionSource? ConditionSource
         {
             get => GetTableConditionSourceAttributeValue("condition-source", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -54,18 +42,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? DataType
-        {
-            get => GetAttributeValue("data-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("data-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
         public bool? DisplayDuplicates
         {
             get => GetBooleanAttributeValue("display-duplicates", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -78,30 +54,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public int? FieldNumber
-        {
-            get => GetNullableInt32AttributeValue("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? Operator
-        {
-            get => GetAttributeValue("operator", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("operator", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("operator", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
-            }
-        }
-
         public OdfCellRangeAddress? TargetRangeAddress
         {
             get => GetCellRangeAddressAttributeValue("target-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -111,18 +63,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("target-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
                 else
                     SetCellRangeAddressAttributeValue("target-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? Value
-        {
-            get => GetAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("value", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
             }
         }
 

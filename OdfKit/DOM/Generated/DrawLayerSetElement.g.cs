@@ -18,42 +18,6 @@ namespace OdfKit.DOM
     {
         public DrawLayerSetElement(string? prefix = null) : base("layer-set", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
-        public string? Display
-        {
-            get => GetAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("display", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public bool? Protected
-        {
-            get => GetBooleanAttributeValue("protected", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("protected", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetBooleanAttributeValue("protected", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<DrawLayerElement> DrawLayerChildElements
         {
             get => ChildElements<DrawLayerElement>();

@@ -90,30 +90,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfXmlName? Id
-        {
-            get => GetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("id", "http://www.w3.org/XML/1998/namespace");
-                else
-                    SetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public bool? PlayFull
-        {
-            get => GetBooleanAttributeValue("play-full", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("play-full", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0");
-                else
-                    SetBooleanAttributeValue("play-full", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", value.Value, "presentation", GetDocumentVersion());
-            }
-        }
-
         public OdfXLinkShow? Show
         {
             get => GetXLinkShowAttributeValue("show", "http://www.w3.org/1999/xlink", GetDocumentVersion());

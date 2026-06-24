@@ -18,42 +18,6 @@ namespace OdfKit.DOM
     {
         public DatabaseDataSourceSettingsElement(string? prefix = null) : base("data-source-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
-        public bool? DataSourceSettingIsList
-        {
-            get => GetBooleanAttributeValue("data-source-setting-is-list", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-source-setting-is-list", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetBooleanAttributeValue("data-source-setting-is-list", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? DataSourceSettingName
-        {
-            get => GetAttributeValue("data-source-setting-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-source-setting-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetAttributeValue("data-source-setting-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public OdfDatabaseDataSourceSettingType? DataSourceSettingType
-        {
-            get => GetDatabaseDataSourceSettingTypeAttributeValue("data-source-setting-type", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("data-source-setting-type", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetDatabaseDataSourceSettingTypeAttributeValue("data-source-setting-type", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<DatabaseDataSourceSettingElement> DatabaseDataSourceSettingChildElements
         {
             get => ChildElements<DatabaseDataSourceSettingElement>();

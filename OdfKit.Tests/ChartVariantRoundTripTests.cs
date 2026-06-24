@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using OdfKit.Chart;
 using OdfKit.Compliance;
 using OdfKit.Core;

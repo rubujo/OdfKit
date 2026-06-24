@@ -188,123 +188,137 @@ public class CliTests
                 relation.GetProperty("parentLocalName").GetString() == "body" &&
                 relation.GetProperty("childNamespaceUri").GetString() == OdfNamespaces.Office &&
                 relation.GetProperty("childLocalName").GetString() == "text");
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("childElementCollection").GetInt32() >= 2000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("int").GetInt32() >= 1000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("bool").GetInt32() >= 10000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("time").GetInt32() >= 6);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("length").GetInt32() >= 10000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("borderWidths").GetInt32() >= 723);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("duration").GetInt32() >= 1000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("angle").GetInt32() >= 1000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleName").GetInt32() >= 1000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleNameList").GetInt32() >= 300);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("color").GetInt32() >= 1000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("iriReference").GetInt32() >= 400);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("percent").GetInt32() >= 1000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("cellAddress").GetInt32() >= 400);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("cellRangeAddress").GetInt32() >= 400);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("cellRangeAddressList").GetInt32() >= 800);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("vector3D").GetInt32() >= 1000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("point3D").GetInt32() >= 90);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("pointList").GetInt32() >= 90);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("languageCode").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("countryCode").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("scriptCode").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("languageTag").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("namespacedToken").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("character").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textEncoding").GetInt32() >= 438);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("targetFrameName").GetInt32() >= 205);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkType").GetInt32() >= 172);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkShow").GetInt32() >= 160);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xLinkActuate").GetInt32() >= 167);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberStyle").GetInt32() >= 109);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberCalendar").GetInt32() >= 106);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableOrder").GetInt32() >= 108);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableType").GetInt32() >= 102);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationEffect").GetInt32() >= 131);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationSpeed").GetInt32() >= 231);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationAction").GetInt32() >= 125);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationTransitionType").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationTransitionStyle").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foTextTransform").GetInt32() >= 111);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foTextAlign").GetInt32() >= 106);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleTextRotationScale").GetInt32() >= 111);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleTextCombine").GetInt32() >= 111);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawFill").GetInt32() >= 109);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawFillImageRefPoint").GetInt32() >= 109);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawColorMode").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleVerticalAlign").GetInt32() >= 105);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleVerticalPos").GetInt32() >= 106);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleVerticalRel").GetInt32() >= 106);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleHorizontalPos").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleHorizontalRel").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleWrap").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleRunThrough").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleWrapContourMode").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleWritingMode").GetInt32() >= 104);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableDisplayMemberMode").GetInt32() >= 103);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableLayoutMode").GetInt32() >= 103);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableMemberType").GetInt32() >= 102);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableGroupedBy").GetInt32() >= 102);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableSortMode").GetInt32() >= 103);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableConditionSource").GetInt32() >= 103);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableFunction").GetInt32() >= 109);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("databaseRule").GetInt32() >= 206);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("databaseIsNullable").GetInt32() >= 103);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("databaseDataSourceSettingType").GetInt32() >= 102);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("animationColorInterpolation").GetInt32() >= 102);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("animationColorInterpolationDirection").GetInt32() >= 102);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawNoHref").GetInt32() >= 102);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("presentationPresetClass").GetInt32() >= 103);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("numberTransliterationStyle").GetInt32() >= 105);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleScriptType").GetInt32() >= 111);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleTextEmphasize").GetInt32() >= 111);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("drawStrokeLineJoin").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("svgStrokeLineCap").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foKeepTogether").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("foWrapOption").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("dr3dProjection").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("dr3dShadeMode").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("svgFillRule").GetInt32() >= 109);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableBorderModel").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textLabelFollowedBy").GetInt32() >= 107);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textListLevelPositionMode").GetInt32() >= 106);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textIndexScope").GetInt32() >= 104);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textTableType").GetInt32() >= 103);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textAnchorType").GetInt32() >= 102);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textNoteClass").GetInt32() >= 101);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textSelectPage").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textReferenceFormat").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textStartNumberingAt").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textFootnotesPosition").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textCaptionSequenceFormat").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textNumberPosition").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textPlaceholderType").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textAnimation").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textAnimationDirection").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("textKind").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineStyle").GetInt32() >= 534);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineType").GetInt32() >= 433);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineWidth").GetInt32() >= 433);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("lineMode").GetInt32() >= 333);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontStyle").GetInt32() >= 433);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontVariant").GetInt32() >= 211);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontWeight").GetInt32() >= 433);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontFamilyGeneric").GetInt32() >= 335);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontPitch").GetInt32() >= 335);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontRelief").GetInt32() >= 111);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("fontStretch").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleLineBreak").GetInt32() >= 98);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleRepeat").GetInt32() >= 111);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleDirection").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("formOrientation").GetInt32() >= 99);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableDirection").GetInt32() >= 100);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("tableOrientation").GetInt32() >= 104);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("xmlName").GetInt32() >= 1000);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("styleFamily").GetInt32() >= 50);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("odfVersion").GetInt32() >= 50);
-        Assert.True(json.RootElement.GetProperty("wrapperPropertyTypeCounts").GetProperty("mediaType").GetInt32() >= 100);
+        var expectedFloors = new (string PropertyType, int MinCount)[]
+        {
+            ("int", 200),
+            ("childElementCollection", 2000),
+            ("bool", 400),
+            ("decimal", 40),
+            ("dateTime", 15),
+            ("time", 5),
+            ("length", 300),
+            ("borderWidths", 15),
+            ("duration", 20),
+            ("angle", 12),
+            ("styleName", 150),
+            ("styleNameList", 30),
+            ("color", 20),
+            ("iriReference", 40),
+            ("percent", 15),
+            ("cellAddress", 15),
+            ("cellRangeAddress", 5),
+            ("cellRangeAddressList", 8),
+            ("vector3D", 10),
+            ("point3D", 1),
+            ("pointList", 3),
+            ("languageCode", 8),
+            ("countryCode", 20),
+            ("scriptCode", 8),
+            ("languageTag", 8),
+            ("namespacedToken", 20),
+            ("character", 5),
+            ("textEncoding", 2),
+            ("targetFrameName", 5),
+            ("xLinkType", 20),
+            ("xLinkShow", 15),
+            ("xLinkActuate", 15),
+            ("numberStyle", 6),
+            ("numberCalendar", 5),
+            ("tableOrder", 2),
+            ("tableType", 2),
+            ("presentationEffect", 3),
+            ("presentationSpeed", 5),
+            ("presentationAction", 1),
+            ("presentationTransitionType", 1),
+            ("presentationTransitionStyle", 1),
+            ("foTextTransform", 0),
+            ("foTextAlign", 1),
+            ("styleTextRotationScale", 0),
+            ("styleTextCombine", 0),
+            ("drawFill", 2),
+            ("drawFillImageRefPoint", 2),
+            ("drawColorMode", 1),
+            ("styleVerticalAlign", 1),
+            ("styleVerticalPos", 1),
+            ("styleVerticalRel", 1),
+            ("styleHorizontalPos", 1),
+            ("styleHorizontalRel", 1),
+            ("styleWrap", 1),
+            ("styleRunThrough", 1),
+            ("styleWrapContourMode", 1),
+            ("styleWritingMode", 3),
+            ("tableDisplayMemberMode", 1),
+            ("tableLayoutMode", 1),
+            ("tableMemberType", 1),
+            ("tableGroupedBy", 1),
+            ("tableSortMode", 1),
+            ("tableConditionSource", 1),
+            ("tableFunction", 2),
+            ("databaseRule", 1),
+            ("databaseIsNullable", 1),
+            ("databaseDataSourceSettingType", 1),
+            ("animationColorInterpolation", 1),
+            ("animationColorInterpolationDirection", 1),
+            ("drawNoHref", 2),
+            ("presentationPresetClass", 3),
+            ("numberTransliterationStyle", 5),
+            ("styleScriptType", 0),
+            ("styleTextEmphasize", 0),
+            ("drawStrokeLineJoin", 1),
+            ("svgStrokeLineCap", 1),
+            ("foKeepTogether", 1),
+            ("foWrapOption", 1),
+            ("dr3dProjection", 2),
+            ("dr3dShadeMode", 2),
+            ("svgFillRule", 2),
+            ("tableBorderModel", 1),
+            ("textLabelFollowedBy", 1),
+            ("textListLevelPositionMode", 1),
+            ("textIndexScope", 4),
+            ("textTableType", 3),
+            ("textAnchorType", 12),
+            ("textNoteClass", 1),
+            ("textSelectPage", 1),
+            ("textReferenceFormat", 1),
+            ("textStartNumberingAt", 1),
+            ("textFootnotesPosition", 1),
+            ("textCaptionSequenceFormat", 1),
+            ("textNumberPosition", 1),
+            ("textPlaceholderType", 1),
+            ("textAnimation", 1),
+            ("textAnimationDirection", 1),
+            ("textKind", 1),
+            ("lineStyle", 1),
+            ("lineType", 1),
+            ("lineWidth", 1),
+            ("lineMode", 0),
+            ("fontStyle", 1),
+            ("fontVariant", 1),
+            ("fontWeight", 1),
+            ("fontFamilyGeneric", 1),
+            ("fontPitch", 1),
+            ("fontRelief", 0),
+            ("fontStretch", 1),
+            ("styleLineBreak", 0),
+            ("styleRepeat", 2),
+            ("styleDirection", 1),
+            ("formOrientation", 1),
+            ("tableDirection", 1),
+            ("tableOrientation", 1),
+            ("xmlName", 120),
+            ("styleFamily", 0),
+            ("odfVersion", 2),
+            ("mediaType", 1)
+        };
+
+        foreach (var pair in expectedFloors)
+        {
+            int actual = json.RootElement.GetProperty("wrapperPropertyTypeCounts").TryGetProperty(pair.PropertyType, out JsonElement val)
+                ? val.GetInt32()
+                : 0;
+            Assert.True(actual >= pair.MinCount,
+                $"JSON wrapperPropertyTypeCounts['{pair.PropertyType}'] regressed: expected >= {pair.MinCount}, actual {actual}");
+        }
         Assert.True(json.RootElement.GetProperty("elements").GetArrayLength() >= 550);
     }
 

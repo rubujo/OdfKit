@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public Dr3dSceneElement(string? prefix = null) : base("scene", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
-        public string? Align
-        {
-            get => GetAttributeValue("align", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("align", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetAttributeValue("align", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
-            }
-        }
-
         public OdfColor? AmbientColor
         {
             get => GetColorAttributeValue("ambient-color", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());
@@ -78,54 +66,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfVector3D? Center
-        {
-            get => GetVector3DAttributeValue("center", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("center", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0");
-                else
-                    SetVector3DAttributeValue("center", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public string? D
-        {
-            get => GetAttributeValue("d", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("d", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetAttributeValue("d", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public OdfColor? DiffuseColor
-        {
-            get => GetColorAttributeValue("diffuse-color", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("diffuse-color", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0");
-                else
-                    SetColorAttributeValue("diffuse-color", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public OdfVector3D? Direction
-        {
-            get => GetVector3DAttributeValue("direction", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("direction", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0");
-                else
-                    SetVector3DAttributeValue("direction", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
         public OdfLength? Distance
         {
             get => GetLengthAttributeValue("distance", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());
@@ -150,15 +90,15 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? DrawId
+        public OdfXmlName? DrawId
         {
-            get => GetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
+            get => GetXmlNameAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
             set
             {
                 if (value == null)
                     RemoveAttribute("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
                 else
-                    SetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
+                    SetXmlNameAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
             }
         }
 
@@ -171,18 +111,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("style-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
                 else
                     SetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public bool? Enabled
-        {
-            get => GetBooleanAttributeValue("enabled", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("enabled", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0");
-                else
-                    SetBooleanAttributeValue("enabled", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", value.Value, "ns", GetDocumentVersion());
             }
         }
 
@@ -219,18 +147,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("end-y", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
                 else
                     SetLengthAttributeValue("end-y", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? EscapeDirection
-        {
-            get => GetAttributeValue("escape-direction", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("escape-direction", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetAttributeValue("escape-direction", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
             }
         }
 
@@ -279,30 +195,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("lighting-mode", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0");
                 else
                     SetBooleanAttributeValue("lighting-mode", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public OdfVector3D? MaxEdge
-        {
-            get => GetVector3DAttributeValue("max-edge", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("max-edge", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0");
-                else
-                    SetVector3DAttributeValue("max-edge", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public OdfVector3D? MinEdge
-        {
-            get => GetVector3DAttributeValue("min-edge", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("min-edge", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0");
-                else
-                    SetVector3DAttributeValue("min-edge", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", value.Value, "ns", GetDocumentVersion());
             }
         }
 
@@ -390,30 +282,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfVector3D? Size
-        {
-            get => GetVector3DAttributeValue("size", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("size", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0");
-                else
-                    SetVector3DAttributeValue("size", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public bool? Specular
-        {
-            get => GetBooleanAttributeValue("specular", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("specular", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0");
-                else
-                    SetBooleanAttributeValue("specular", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
         public bool? TableBackground
         {
             get => GetBooleanAttributeValue("table-background", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -435,18 +303,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("transform", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0");
                 else
                     SetAttributeValue("transform", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public int? ViewBox
-        {
-            get => GetNullableInt32AttributeValue("viewBox", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("viewBox", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetInt32AttributeValue("viewBox", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value.Value, "svg", GetDocumentVersion());
             }
         }
 

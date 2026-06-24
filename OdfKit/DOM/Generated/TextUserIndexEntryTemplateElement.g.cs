@@ -18,30 +18,6 @@ namespace OdfKit.DOM
     {
         public TextUserIndexEntryTemplateElement(string? prefix = null) : base("user-index-entry-template", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
-        public string? Display
-        {
-            get => GetAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("display", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value, "text", GetDocumentVersion());
-            }
-        }
-
-        public OdfCharacter? LeaderChar
-        {
-            get => GetCharacterAttributeValue("leader-char", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("leader-char", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetCharacterAttributeValue("leader-char", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value.Value, "style", GetDocumentVersion());
-            }
-        }
-
         public int? OutlineLevel
         {
             get => GetNullableInt32AttributeValue("outline-level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
@@ -54,18 +30,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfLength? Position
-        {
-            get => GetLengthAttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("position", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetLengthAttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value.Value, "style", GetDocumentVersion());
-            }
-        }
-
         public OdfStyleName? StyleName
         {
             get => GetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
@@ -75,18 +39,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                 else
                     SetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
-            }
-        }
-
-        public string? Type
-        {
-            get => GetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetAttributeValue("type", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value, "style", GetDocumentVersion());
             }
         }
 

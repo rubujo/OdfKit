@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public TableDataPilotSubtotalsElement(string? prefix = null) : base("data-pilot-subtotals", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
-        public OdfTableFunction? Function
-        {
-            get => GetTableFunctionAttributeValue("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableFunctionAttributeValue("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public IEnumerable<TableDataPilotSubtotalElement> TableDataPilotSubtotalChildElements
         {
             get => ChildElements<TableDataPilotSubtotalElement>();

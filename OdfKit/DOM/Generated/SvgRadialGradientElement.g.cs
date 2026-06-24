@@ -114,18 +114,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Offset
-        {
-            get => GetAttributeValue("offset", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("offset", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetAttributeValue("offset", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
-            }
-        }
-
         public OdfLength? R
         {
             get => GetLengthAttributeValue("r", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
@@ -147,30 +135,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("spreadMethod", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
                 else
                     SetAttributeValue("spreadMethod", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public OdfColor? StopColor
-        {
-            get => GetColorAttributeValue("stop-color", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("stop-color", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetColorAttributeValue("stop-color", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value.Value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public decimal? StopOpacity
-        {
-            get => GetDecimalAttributeValue("stop-opacity", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("stop-opacity", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetDecimalAttributeValue("stop-opacity", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value.Value, "svg", GetDocumentVersion());
             }
         }
 

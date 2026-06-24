@@ -192,6 +192,13 @@ public partial class TextDocument : OdfDocument
         return new OdfTable(table, rows, cols, this);
     }
 
+    /// <summary>
+    /// 在文字文件本文的結尾，追加一個清單建構器。
+    /// </summary>
+    /// <param name="styleName">選用的清單樣式名稱</param>
+    /// <returns>清單建構器</returns>
+    public OdfListBuilder AppendList(string? styleName = null)
+        => new OdfListBuilder(BodyTextRoot, this, null, styleName);
 
     #endregion
 

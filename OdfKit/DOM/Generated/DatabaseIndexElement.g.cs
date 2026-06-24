@@ -30,18 +30,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public bool? IsAscending
-        {
-            get => GetBooleanAttributeValue("is-ascending", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("is-ascending", "urn:oasis:names:tc:opendocument:xmlns:database:1.0");
-                else
-                    SetBooleanAttributeValue("is-ascending", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
         public bool? IsClustered
         {
             get => GetBooleanAttributeValue("is-clustered", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

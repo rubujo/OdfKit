@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public StyleTablePropertiesElement(string? prefix = null) : base("table-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
-        public OdfXLinkActuate? Actuate
-        {
-            get => GetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("actuate", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
         public string? Align
         {
             get => GetAttributeValue("align", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -99,186 +87,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
                 else
                     SetBooleanAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfDrawFill? Fill
-        {
-            get => GetDrawFillAttributeValue("fill", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetDrawFillAttributeValue("fill", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfColor? FillColor
-        {
-            get => GetColorAttributeValue("fill-color", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-color", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetColorAttributeValue("fill-color", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfStyleName? FillGradientName
-        {
-            get => GetStyleNameAttributeValue("fill-gradient-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-gradient-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetStyleNameAttributeValue("fill-gradient-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfStyleName? FillHatchName
-        {
-            get => GetStyleNameAttributeValue("fill-hatch-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-hatch-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetStyleNameAttributeValue("fill-hatch-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public bool? FillHatchSolid
-        {
-            get => GetBooleanAttributeValue("fill-hatch-solid", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-hatch-solid", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetBooleanAttributeValue("fill-hatch-solid", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? FillImageHeight
-        {
-            get => GetLengthAttributeValue("fill-image-height", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-image-height", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetLengthAttributeValue("fill-image-height", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfStyleName? FillImageName
-        {
-            get => GetStyleNameAttributeValue("fill-image-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-image-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetStyleNameAttributeValue("fill-image-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfDrawFillImageRefPoint? FillImageRefPoint
-        {
-            get => GetDrawFillImageRefPointAttributeValue("fill-image-ref-point", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-image-ref-point", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetDrawFillImageRefPointAttributeValue("fill-image-ref-point", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? FillImageRefPointX
-        {
-            get => GetLengthAttributeValue("fill-image-ref-point-x", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-image-ref-point-x", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetLengthAttributeValue("fill-image-ref-point-x", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? FillImageRefPointY
-        {
-            get => GetLengthAttributeValue("fill-image-ref-point-y", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-image-ref-point-y", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetLengthAttributeValue("fill-image-ref-point-y", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfLength? FillImageWidth
-        {
-            get => GetLengthAttributeValue("fill-image-width", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-image-width", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetLengthAttributeValue("fill-image-width", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfSvgFillRule? FillRule
-        {
-            get => GetSvgFillRuleAttributeValue("fill-rule", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("fill-rule", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0");
-                else
-                    SetSvgFillRuleAttributeValue("fill-rule", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", value.Value, "svg", GetDocumentVersion());
-            }
-        }
-
-        public string? FilterName
-        {
-            get => GetAttributeValue("filter-name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("filter-name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetAttributeValue("filter-name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value, "style", GetDocumentVersion());
-            }
-        }
-
-        public int? GradientStepCount
-        {
-            get => GetNullableInt32AttributeValue("gradient-step-count", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("gradient-step-count", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetInt32AttributeValue("gradient-step-count", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfIriReference? Href
-        {
-            get => GetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("href", "http://www.w3.org/1999/xlink");
-                else
-                    SetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
             }
         }
 
@@ -366,30 +174,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfPercent? Opacity
-        {
-            get => GetPercentAttributeValue("opacity", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("opacity", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetPercentAttributeValue("opacity", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfStyleName? OpacityName
-        {
-            get => GetStyleNameAttributeValue("opacity-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("opacity-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetStyleNameAttributeValue("opacity-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
         public string? PageNumber
         {
             get => GetAttributeValue("page-number", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
@@ -399,18 +183,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("page-number", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
                 else
                     SetAttributeValue("page-number", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value, "style", GetDocumentVersion());
-            }
-        }
-
-        public string? Position
-        {
-            get => GetAttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("position", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetAttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value, "style", GetDocumentVersion());
             }
         }
 
@@ -426,30 +198,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfStyleRepeat? Repeat
-        {
-            get => GetStyleRepeatAttributeValue("repeat", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("repeat", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
-                else
-                    SetStyleRepeatAttributeValue("repeat", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", value.Value, "style", GetDocumentVersion());
-            }
-        }
-
-        public OdfColor? SecondaryFillColor
-        {
-            get => GetColorAttributeValue("secondary-fill-color", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("secondary-fill-color", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetColorAttributeValue("secondary-fill-color", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value.Value, "draw", GetDocumentVersion());
-            }
-        }
-
         public string? Shadow
         {
             get => GetAttributeValue("shadow", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());
@@ -462,18 +210,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public OdfXLinkShow? Show
-        {
-            get => GetXLinkShowAttributeValue("show", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("show", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkShowAttributeValue("show", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
-            }
-        }
-
         public OdfColor? TabColor
         {
             get => GetColorAttributeValue("tab-color", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -483,30 +219,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("tab-color", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
                 else
                     SetColorAttributeValue("tab-color", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? TileRepeatOffset
-        {
-            get => GetAttributeValue("tile-repeat-offset", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("tile-repeat-offset", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0");
-                else
-                    SetAttributeValue("tile-repeat-offset", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", value, "draw", GetDocumentVersion());
-            }
-        }
-
-        public OdfXLinkType? Type
-        {
-            get => GetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("type", "http://www.w3.org/1999/xlink");
-                else
-                    SetXLinkTypeAttributeValue("type", "http://www.w3.org/1999/xlink", value.Value, "xlink", GetDocumentVersion());
             }
         }
 

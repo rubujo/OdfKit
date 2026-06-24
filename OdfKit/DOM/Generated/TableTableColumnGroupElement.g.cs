@@ -18,18 +18,6 @@ namespace OdfKit.DOM
     {
         public TableTableColumnGroupElement(string? prefix = null) : base("table-column-group", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
-        public OdfStyleName? DefaultCellStyleName
-        {
-            get => GetStyleNameAttributeValue("default-cell-style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("default-cell-style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetStyleNameAttributeValue("default-cell-style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public bool? Display
         {
             get => GetBooleanAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
@@ -39,54 +27,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
                 else
                     SetBooleanAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfXmlName? Id
-        {
-            get => GetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("id", "http://www.w3.org/XML/1998/namespace");
-                else
-                    SetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", value.Value, "ns", GetDocumentVersion());
-            }
-        }
-
-        public int? NumberColumnsRepeated
-        {
-            get => GetNullableInt32AttributeValue("number-columns-repeated", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("number-columns-repeated", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("number-columns-repeated", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfStyleName? StyleName
-        {
-            get => GetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public string? Visibility
-        {
-            get => GetAttributeValue("visibility", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("visibility", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetAttributeValue("visibility", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value, "table", GetDocumentVersion());
             }
         }
 

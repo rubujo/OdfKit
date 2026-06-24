@@ -90,18 +90,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Name
-        {
-            get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("name", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value, "ns", GetDocumentVersion());
-            }
-        }
-
         public OdfXmlName? NamespaceId
         {
             get => GetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", GetDocumentVersion());
@@ -183,18 +171,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("targetElement", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0");
                 else
                     SetXmlNameAttributeValue("targetElement", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", value.Value, "smil", GetDocumentVersion());
-            }
-        }
-
-        public string? Value
-        {
-            get => GetAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("value", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0");
-                else
-                    SetAttributeValue("value", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", value, "ns", GetDocumentVersion());
             }
         }
 

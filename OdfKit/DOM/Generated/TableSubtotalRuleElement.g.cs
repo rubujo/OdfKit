@@ -18,30 +18,6 @@ namespace OdfKit.DOM
     {
         public TableSubtotalRuleElement(string? prefix = null) : base("subtotal-rule", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
-        public int? FieldNumber
-        {
-            get => GetNullableInt32AttributeValue("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetInt32AttributeValue("field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
-        public OdfTableFunction? Function
-        {
-            get => GetTableFunctionAttributeValue("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0");
-                else
-                    SetTableFunctionAttributeValue("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", value.Value, "table", GetDocumentVersion());
-            }
-        }
-
         public int? GroupByFieldNumber
         {
             get => GetNullableInt32AttributeValue("group-by-field-number", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

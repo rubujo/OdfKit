@@ -30,18 +30,6 @@ namespace OdfKit.DOM
             }
         }
 
-        public string? Key
-        {
-            get => GetAttributeValue("key", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("key", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetAttributeValue("key", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value, "text", GetDocumentVersion());
-            }
-        }
-
         public OdfLanguageCode? Language
         {
             get => GetLanguageCodeAttributeValue("language", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());
@@ -99,18 +87,6 @@ namespace OdfKit.DOM
                     RemoveAttribute("sort-algorithm", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
                 else
                     SetAttributeValue("sort-algorithm", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value, "text", GetDocumentVersion());
-            }
-        }
-
-        public bool? SortAscending
-        {
-            get => GetBooleanAttributeValue("sort-ascending", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());
-            set
-            {
-                if (value == null)
-                    RemoveAttribute("sort-ascending", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
-                else
-                    SetBooleanAttributeValue("sort-ascending", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", value.Value, "text", GetDocumentVersion());
             }
         }
 
