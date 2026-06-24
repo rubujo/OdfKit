@@ -384,4 +384,53 @@ public class FormulaHighLevelApiTests
         using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
         Assert.Equal(@"\frac{a}{b} + \sqrt{c}", loaded.ToLatex());
     }
+
+    /// <summary>
+    /// 驗證公式 token 的查詢與不可變子節點替換能力。
+    /// </summary>
+    [Fact]
+    public void OdfMathToken_FindAndWithChild_WorksForNestedStructure()
+    {
+        OdfMathToken original = OdfMathToken.Row(
+            OdfMathToken.Identifier("x"),
+            OdfMathToken.Fraction(OdfMathToken.Identifier("a"), OdfMathToken.Identifier("b")));
+
+        OdfMathToken? fraction = original.FindFirst(OdfMathTokenKind.Fraction);
+        Assert.NotNull(fraction);
+        Assert.Single(original.FindAll(OdfMathTokenKind.Fraction));
+
+        OdfMathToken updatedFraction = fraction!.WithChild(0, OdfMathToken.Identifier("y"));
+        Assert.Equal("y", updatedFraction.Base?.Text);
+        Assert.Equal("b", updatedFraction.Script?.Text);
+    }
+
+    /// <summary>
+    /// 驗證語意替換 API 可替換巢狀公式中的第一個目標 token。
+    /// </summary>
+    [Fact]
+    public void ReplaceFirst_ReplacesNestedFraction()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+            .WithTokens(
+                OdfMathToken.Fraction(OdfMathToken.Identifier("a"), OdfMathToken.Identifier("b")),
+                OdfMathToken.Operator("+"),
+                OdfMathToken.Fraction(OdfMathToken.Identifier("c"), OdfMathToken.Identifier("d")))
+            .Build();
+
+        OdfMathToken replacement = OdfMathToken.Fraction(
+            OdfMathToken.Identifier("x"),
+            OdfMathToken.Identifier("z"));
+
+        bool replaced = formula.ReplaceFirst(OdfMathTokenKind.Fraction, replacement);
+
+        Assert.True(replaced);
+        var fractions = formula.GetMathTokens()
+            .Where(token => token.Kind == OdfMathTokenKind.Fraction)
+            .ToList();
+        Assert.Equal(2, fractions.Count);
+        Assert.Equal("x", fractions[0].Base?.Text);
+        Assert.Equal("z", fractions[0].Script?.Text);
+        Assert.Equal("c", fractions[1].Base?.Text);
+        Assert.Equal("d", fractions[1].Script?.Text);
+    }
 }

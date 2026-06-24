@@ -97,10 +97,8 @@ public partial class PresentationDocument : OdfDocument
     /// <param name="path">ODP 文件路徑</param>
     /// <returns>載入完成的 <see cref="PresentationDocument"/> 執行個體</returns>
     /// <exception cref="InvalidOperationException">當指定文件不是 ODP 簡報時擲出</exception>
-    public new static PresentationDocument Load(string path)
-    {
-        return EnsurePresentation(OdfDocumentFactory.LoadDocument(path));
-    }
+    public new static PresentationDocument Load(string path) =>
+        OdfDocumentVariantSupport.Load<PresentationDocument>(path, OdfDocumentKind.Presentation, "Err_PresentationDocument_SpecifiedOdfFileOdp");
 
     /// <summary>
     /// 非同步從指定路徑載入 ODP 簡報文件。
@@ -108,8 +106,8 @@ public partial class PresentationDocument : OdfDocument
     /// <param name="path">ODP 文件路徑</param>
     /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="PresentationDocument"/></returns>
-    public new static async Task<PresentationDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
-        EnsurePresentation(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
+    public new static Task<PresentationDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+        OdfDocumentVariantSupport.LoadAsync<PresentationDocument>(path, OdfDocumentKind.Presentation, "Err_PresentationDocument_SpecifiedOdfFileOdp", cancellationToken);
 
     /// <summary>
     /// 從指定資料流載入 ODP 簡報文件。
@@ -118,10 +116,8 @@ public partial class PresentationDocument : OdfDocument
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
     /// <returns>載入完成的 <see cref="PresentationDocument"/> 執行個體</returns>
     /// <exception cref="InvalidOperationException">當指定文件不是 ODP 簡報時擲出</exception>
-    public new static PresentationDocument Load(Stream stream, string? fileName = null)
-    {
-        return EnsurePresentation(OdfDocumentFactory.LoadDocument(stream, fileName));
-    }
+    public new static PresentationDocument Load(Stream stream, string? fileName = null) =>
+        OdfDocumentVariantSupport.Load<PresentationDocument>(stream, OdfDocumentKind.Presentation, "Err_PresentationDocument_SpecifiedOdfFileOdp", fileName);
 
     /// <summary>
     /// 非同步從指定資料流載入 ODP 簡報文件。
@@ -130,23 +126,12 @@ public partial class PresentationDocument : OdfDocument
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
     /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="PresentationDocument"/></returns>
-    public new static async Task<PresentationDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
-        EnsurePresentation(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+    public new static Task<PresentationDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+        OdfDocumentVariantSupport.LoadAsync<PresentationDocument>(stream, OdfDocumentKind.Presentation, "Err_PresentationDocument_SpecifiedOdfFileOdp", fileName, cancellationToken);
 
     internal IReadOnlyList<OdfSlide> GetSlidesSnapshot()
     {
         return _slides.AsReadOnly();
-    }
-
-    private static PresentationDocument EnsurePresentation(OdfDocument document)
-    {
-        if (document is PresentationDocument presentation && document.DocumentKind == OdfDocumentKind.Presentation)
-        {
-            return presentation;
-        }
-
-        document.Dispose();
-        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_PresentationDocument_SpecifiedOdfFileOdp"));
     }
 
     private void ParseSlides()

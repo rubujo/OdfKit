@@ -1,4 +1,4 @@
-namespace OdfKit.Chart;
+﻿namespace OdfKit.Chart;
 
 /// <summary>
 /// 表示圖表資料序列的趨勢線（迴歸曲線）設定（<c>chart:regression-curve</c>）。

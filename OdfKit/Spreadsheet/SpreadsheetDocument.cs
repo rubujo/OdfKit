@@ -106,10 +106,8 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <param name="path">ODS 文件路徑</param>
     /// <returns>載入完成的 <see cref="SpreadsheetDocument"/> 執行個體</returns>
     /// <exception cref="InvalidOperationException">當指定文件不是 ODS 試算表時擲出</exception>
-    public new static SpreadsheetDocument Load(string path)
-    {
-        return EnsureSpreadsheet(OdfDocumentFactory.LoadDocument(path));
-    }
+    public new static SpreadsheetDocument Load(string path) =>
+        OdfDocumentVariantSupport.Load<SpreadsheetDocument>(path, OdfDocumentKind.Spreadsheet, "Err_SpreadsheetDocument_SpecifiedOdfFileOds");
 
     /// <summary>
     /// 非同步從指定路徑載入 ODS 試算表文件。
@@ -121,8 +119,8 @@ public partial class SpreadsheetDocument : OdfDocument
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
     /// </remarks>
-    public new static async Task<SpreadsheetDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
-        EnsureSpreadsheet(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
+    public new static Task<SpreadsheetDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+        OdfDocumentVariantSupport.LoadAsync<SpreadsheetDocument>(path, OdfDocumentKind.Spreadsheet, "Err_SpreadsheetDocument_SpecifiedOdfFileOds", cancellationToken);
 
     /// <summary>
     /// 從指定資料流載入 ODS 試算表文件。
@@ -131,10 +129,8 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
     /// <returns>載入完成的 <see cref="SpreadsheetDocument"/> 執行個體</returns>
     /// <exception cref="InvalidOperationException">當指定文件不是 ODS 試算表時擲出</exception>
-    public new static SpreadsheetDocument Load(Stream stream, string? fileName = null)
-    {
-        return EnsureSpreadsheet(OdfDocumentFactory.LoadDocument(stream, fileName));
-    }
+    public new static SpreadsheetDocument Load(Stream stream, string? fileName = null) =>
+        OdfDocumentVariantSupport.Load<SpreadsheetDocument>(stream, OdfDocumentKind.Spreadsheet, "Err_SpreadsheetDocument_SpecifiedOdfFileOds", fileName);
 
     /// <summary>
     /// 非同步從指定資料流載入 ODS 試算表文件。
@@ -143,24 +139,13 @@ public partial class SpreadsheetDocument : OdfDocument
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
     /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="SpreadsheetDocument"/></returns>
-    public new static async Task<SpreadsheetDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
-        EnsureSpreadsheet(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+    public new static Task<SpreadsheetDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+        OdfDocumentVariantSupport.LoadAsync<SpreadsheetDocument>(stream, OdfDocumentKind.Spreadsheet, "Err_SpreadsheetDocument_SpecifiedOdfFileOds", fileName, cancellationToken);
 
     /// <summary>
     /// 取得工作表集合。
     /// </summary>
     public OdfWorksheetCollection Worksheets => _worksheets ??= new OdfWorksheetCollection(this);
-
-    private static SpreadsheetDocument EnsureSpreadsheet(OdfDocument document)
-    {
-        if (document is SpreadsheetDocument spreadsheet && document.DocumentKind == OdfDocumentKind.Spreadsheet)
-        {
-            return spreadsheet;
-        }
-
-        document.Dispose();
-        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SpecifiedOdfFileOds"));
-    }
 
     private void InitializeSheetsRoot()
     {

@@ -719,4 +719,62 @@ public class ChartHighLevelApiTests
         Assert.NotNull(imgNode);
         Assert.Equal(fallbackPath, imgNode.GetAttribute("href", OdfNamespaces.XLink));
     }
+
+    /// <summary>
+    /// 驗證統一圖例模型與既有圖例屬性可雙向同步。
+    /// </summary>
+    [Fact]
+    public void LegendModel_SynchronizesWithLegacyLegendProperties()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.Legend.IsVisible = true;
+        chartDoc.Legend.Position = "end";
+        chartDoc.Legend.Alignment = "center";
+        chartDoc.Legend.StyleName = "LegendStyleA";
+
+        Assert.Equal("end", chartDoc.LegendPosition);
+        Assert.Equal("center", chartDoc.LegendAlignment);
+        Assert.Equal("LegendStyleA", chartDoc.Legend.StyleName);
+
+        chartDoc.LegendPosition = null;
+        Assert.False(chartDoc.Legend.IsVisible);
+    }
+
+    /// <summary>
+    /// 驗證圖表 Fluent builder 可鏈式設定圖表、圖例、座標軸與序列設定。
+    /// </summary>
+    [Fact]
+    public void ChartBuilder_ConfiguresChartLegendAxisAndSeries()
+    {
+        using ChartDocument chart = ChartDocument.Builder()
+            .WithType(OdfChartType.Bar)
+            .WithTitle("年度營收")
+            .WithDataRange("Sheet1", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true)
+            .WithLegend(position: "end")
+            .WithAxis("y", axis => axis
+                .WithTitle("營收（萬元）")
+                .WithMinimum(0)
+                .WithLogarithmic(false))
+            .ConfigureSeries(0, series => series
+                .WithStyle(style => style.FillColor = "#4472C4")
+                .WithErrorIndicator(new OdfChartErrorIndicatorInfo("y", "ErrorStyle1")))
+            .Build();
+
+        Assert.Equal("chart:bar", chart.ChartClass);
+        Assert.Equal("年度營收", chart.ChartTitle);
+        Assert.Equal("end", chart.Legend.Position);
+        Assert.Equal("營收（萬元）", chart.GetAxisTitle("y"));
+
+        OdfChartAxisInfo? axisInfo = chart.GetAxisInfo("y");
+        Assert.NotNull(axisInfo);
+        Assert.Equal(0d, axisInfo!.Minimum);
+        Assert.False(axisInfo.Logarithmic);
+
+        OdfChartSeries seriesEditor = chart.GetSeriesEditor(0);
+        Assert.Equal("#4472C4", seriesEditor.Style.FillColor);
+        OdfChartErrorIndicatorInfo? indicator = seriesEditor.GetErrorIndicator();
+        Assert.NotNull(indicator);
+        Assert.Equal("y", indicator!.Dimension);
+        Assert.Equal("ErrorStyle1", indicator.StyleName);
+    }
 }

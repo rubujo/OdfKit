@@ -1,4 +1,4 @@
-namespace OdfKit.Chart;
+﻿namespace OdfKit.Chart;
 
 /// <summary>
 /// 表示圖表資料序列的誤差棒設定（<c>chart:error-indicator</c>）。

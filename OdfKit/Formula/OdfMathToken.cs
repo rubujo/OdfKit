@@ -93,6 +93,82 @@ public sealed class OdfMathToken
     }
 
     /// <summary>
+    /// 遞迴尋找第一個符合指定種類的 token。
+    /// </summary>
+    /// <param name="kind">目標 token 種類</param>
+    /// <returns>找到的第一個 token；若不存在則為 <see langword="null"/></returns>
+    public OdfMathToken? FindFirst(OdfMathTokenKind kind)
+    {
+        if (Kind == kind)
+        {
+            return this;
+        }
+
+        int childCount = GetChildCount();
+        for (int index = 0; index < childCount; index++)
+        {
+            OdfMathToken? found = GetChild(index).FindFirst(kind);
+            if (found is not null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 遞迴列舉所有符合指定種類的 token。
+    /// </summary>
+    /// <param name="kind">目標 token 種類</param>
+    /// <returns>符合條件的 token 序列</returns>
+    public IEnumerable<OdfMathToken> FindAll(OdfMathTokenKind kind)
+    {
+        if (Kind == kind)
+        {
+            yield return this;
+        }
+
+        int childCount = GetChildCount();
+        for (int index = 0; index < childCount; index++)
+        {
+            foreach (OdfMathToken match in GetChild(index).FindAll(kind))
+            {
+                yield return match;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 回傳替換指定子節點後的新 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="index">要替換的子節點索引</param>
+    /// <param name="replacement">替換後的新子節點</param>
+    /// <returns>替換完成的新 <see cref="OdfMathToken"/></returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="index"/> 超出可用子節點範圍時擲出</exception>
+    public OdfMathToken WithChild(int index, OdfMathToken replacement)
+    {
+        if (replacement is null)
+        {
+            throw new ArgumentNullException(nameof(replacement));
+        }
+
+        int childCount = GetChildCount();
+        if (index < 0 || index >= childCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        return Kind switch
+        {
+            OdfMathTokenKind.Row or OdfMathTokenKind.Matrix or OdfMathTokenKind.UnderOver or OdfMathTokenKind.Apply
+                => ReplaceListChild(index, replacement),
+            _ => ReplacePairedChild(index, replacement)
+        };
+    }
+
+    /// <summary>
     /// 建立 MathML <c>mi</c> 識別名稱 token。
     /// </summary>
     /// <param name="text">識別名稱文字</param>
@@ -292,5 +368,62 @@ public sealed class OdfMathToken
         }
 
         return children.ToList();
+    }
+
+    private int GetChildCount() =>
+        Kind switch
+        {
+            OdfMathTokenKind.Row or OdfMathTokenKind.Matrix or OdfMathTokenKind.UnderOver or OdfMathTokenKind.Apply
+                => Children?.Count ?? 0,
+            OdfMathTokenKind.Identifier or OdfMathTokenKind.Number or OdfMathTokenKind.Operator or OdfMathTokenKind.Text
+                => 0,
+            OdfMathTokenKind.Fenced or OdfMathTokenKind.Style
+                => Base is null ? 0 : 1,
+            _ => Base is null
+                ? 0
+                : Script is null ? 1 : 2
+        };
+
+    private OdfMathToken GetChild(int index)
+    {
+        if (Kind is OdfMathTokenKind.Row or OdfMathTokenKind.Matrix or OdfMathTokenKind.UnderOver or OdfMathTokenKind.Apply)
+        {
+            return Children![index];
+        }
+
+        if (index == 0 && Base is not null)
+        {
+            return Base;
+        }
+
+        if (index == 1 && Script is not null)
+        {
+            return Script;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(index));
+    }
+
+    private OdfMathToken ReplaceListChild(int index, OdfMathToken replacement)
+    {
+        var children = new List<OdfMathToken>(Children!);
+        children[index] = replacement;
+        return new OdfMathToken(Kind, Text, Base, Script, children, Attributes);
+    }
+
+    private OdfMathToken ReplacePairedChild(int index, OdfMathToken replacement)
+    {
+        OdfMathToken? baseToken = Base;
+        OdfMathToken? scriptToken = Script;
+        if (index == 0)
+        {
+            baseToken = replacement;
+        }
+        else
+        {
+            scriptToken = replacement;
+        }
+
+        return new OdfMathToken(Kind, Text, baseToken, scriptToken, Children, Attributes);
     }
 }

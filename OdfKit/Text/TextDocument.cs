@@ -105,10 +105,8 @@ public partial class TextDocument : OdfDocument
     /// <param name="path">ODT 文件路徑</param>
     /// <returns>載入完成的 <see cref="TextDocument"/> 執行個體</returns>
     /// <exception cref="InvalidOperationException">當指定文件不是 ODT 文字文件時擲出</exception>
-    public new static TextDocument Load(string path)
-    {
-        return EnsureTextDocument(OdfDocumentFactory.LoadDocument(path));
-    }
+    public new static TextDocument Load(string path) =>
+        OdfDocumentVariantSupport.Load<TextDocument>(path, OdfDocumentKind.Text, "Err_TextDocument_SpecifiedOdfFileOdt");
 
     /// <summary>
     /// 非同步從指定路徑載入 ODT 文字文件。
@@ -120,8 +118,8 @@ public partial class TextDocument : OdfDocument
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
     /// </remarks>
-    public new static async Task<TextDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
-        EnsureTextDocument(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
+    public new static Task<TextDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+        OdfDocumentVariantSupport.LoadAsync<TextDocument>(path, OdfDocumentKind.Text, "Err_TextDocument_SpecifiedOdfFileOdt", cancellationToken);
 
     /// <summary>
     /// 從指定資料流載入 ODT 文字文件。
@@ -130,10 +128,8 @@ public partial class TextDocument : OdfDocument
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
     /// <returns>載入完成的 <see cref="TextDocument"/> 執行個體</returns>
     /// <exception cref="InvalidOperationException">當指定文件不是 ODT 文字文件時擲出</exception>
-    public new static TextDocument Load(Stream stream, string? fileName = null)
-    {
-        return EnsureTextDocument(OdfDocumentFactory.LoadDocument(stream, fileName));
-    }
+    public new static TextDocument Load(Stream stream, string? fileName = null) =>
+        OdfDocumentVariantSupport.Load<TextDocument>(stream, OdfDocumentKind.Text, "Err_TextDocument_SpecifiedOdfFileOdt", fileName);
 
     /// <summary>
     /// 非同步從指定資料流載入 ODT 文字文件。
@@ -142,8 +138,8 @@ public partial class TextDocument : OdfDocument
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
     /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextDocument"/></returns>
-    public new static async Task<TextDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
-        EnsureTextDocument(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+    public new static Task<TextDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+        OdfDocumentVariantSupport.LoadAsync<TextDocument>(stream, OdfDocumentKind.Text, "Err_TextDocument_SpecifiedOdfFileOdt", fileName, cancellationToken);
 
     /// <summary>
     /// 取得文字文件本文的高階操作入口。
@@ -154,17 +150,6 @@ public partial class TextDocument : OdfDocument
     /// 取得文件中繼資料的高階操作入口。
     /// </summary>
     public OdfDocumentMetadata Metadata => _metadata ??= new OdfDocumentMetadata(this);
-
-    private static TextDocument EnsureTextDocument(OdfDocument document)
-    {
-        if (document is TextDocument textDocument && document.DocumentKind == OdfDocumentKind.Text)
-        {
-            return textDocument;
-        }
-
-        document.Dispose();
-        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_TextDocument_SpecifiedOdfFileOdt"));
-    }
 
     private void InitializeTextRoot()
     {

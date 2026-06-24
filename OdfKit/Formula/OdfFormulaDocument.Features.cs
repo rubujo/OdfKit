@@ -85,4 +85,122 @@ public partial class OdfFormulaDocument
         doc.SetMathRow(root);
         return doc;
     }
+
+    /// <summary>
+    /// 將目前公式樹中第一個符合種類的 token 替換為指定 token。
+    /// </summary>
+    /// <param name="kind">目標 token 種類</param>
+    /// <param name="replacement">替換後的新 token</param>
+    /// <returns>若成功替換則為 <see langword="true"/>；找不到目標時為 <see langword="false"/></returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出</exception>
+    public bool ReplaceFirst(OdfMathTokenKind kind, OdfMathToken replacement)
+    {
+        if (replacement is null)
+        {
+            throw new ArgumentNullException(nameof(replacement));
+        }
+
+        IReadOnlyList<OdfMathToken> tokens = ReadMathTokens();
+        if (tokens.Count == 0)
+        {
+            return false;
+        }
+
+        var rewritten = new OdfMathToken[tokens.Count];
+        for (int index = 0; index < tokens.Count; index++)
+        {
+            rewritten[index] = tokens[index];
+        }
+
+        for (int index = 0; index < rewritten.Length; index++)
+        {
+            OdfMathToken root = rewritten[index];
+            OdfMathToken? target = root.FindFirst(kind);
+            if (target is null)
+            {
+                continue;
+            }
+
+            if (ReferenceEquals(root, target))
+            {
+                rewritten[index] = replacement;
+            }
+            else if (TryReplaceToken(root, target, replacement, out OdfMathToken updated))
+            {
+                rewritten[index] = updated;
+            }
+            else
+            {
+                continue;
+            }
+
+            SetMathRow(rewritten);
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool TryReplaceToken(
+        OdfMathToken current,
+        OdfMathToken target,
+        OdfMathToken replacement,
+        out OdfMathToken updated)
+    {
+        if (ReferenceEquals(current, target))
+        {
+            updated = replacement;
+            return true;
+        }
+
+        int childCount = GetChildCount(current);
+        for (int childIndex = 0; childIndex < childCount; childIndex++)
+        {
+            OdfMathToken child = GetChild(current, childIndex);
+            if (!TryReplaceToken(child, target, replacement, out OdfMathToken childUpdated))
+            {
+                continue;
+            }
+
+            updated = current.WithChild(childIndex, childUpdated);
+            return true;
+        }
+
+        updated = current;
+        return false;
+    }
+
+    private static int GetChildCount(OdfMathToken token) =>
+        token.Kind switch
+        {
+            OdfMathTokenKind.Row or OdfMathTokenKind.Matrix or OdfMathTokenKind.UnderOver or OdfMathTokenKind.Apply
+                => token.Children?.Count ?? 0,
+            OdfMathTokenKind.Identifier or OdfMathTokenKind.Number or OdfMathTokenKind.Operator or OdfMathTokenKind.Text
+                => 0,
+            OdfMathTokenKind.Fenced or OdfMathTokenKind.Style
+                => token.Base is null ? 0 : 1,
+            _ => token.Base is null
+                ? 0
+                : token.Script is null ? 1 : 2
+        };
+
+    private static OdfMathToken GetChild(OdfMathToken token, int index)
+    {
+        if (token.Kind is OdfMathTokenKind.Row or OdfMathTokenKind.Matrix or OdfMathTokenKind.UnderOver or OdfMathTokenKind.Apply)
+        {
+            return token.Children![index];
+        }
+
+        if (index == 0 && token.Base is not null)
+        {
+            return token.Base;
+        }
+
+        if (index == 1 && token.Script is not null)
+        {
+            return token.Script;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(index));
+    }
 }

@@ -75,27 +75,17 @@ public partial class OdfChartDocument
     /// </summary>
     public OdfChartStyle LegendStyle
     {
-        get
-        {
-            OdfNode legend = FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
-            string? name = legend.GetAttribute("style-name", OdfNamespaces.Chart);
-            if (string.IsNullOrEmpty(name))
-            {
-                name = "legend-style";
-                legend.SetAttribute("style-name", OdfNamespaces.Chart, name, "chart");
-            }
-            return CreateChartStyle(name!);
-        }
+        get => Legend.Style;
         set
         {
-            OdfNode legend = FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
             if (value is null)
             {
-                legend.RemoveAttribute("style-name", OdfNamespaces.Chart);
+                Legend.EnsureVisible();
+                Legend.StyleName = null;
             }
             else
             {
-                legend.SetAttribute("style-name", OdfNamespaces.Chart, value.Name, "chart");
+                Legend.Style = value;
             }
         }
     }

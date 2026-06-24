@@ -98,10 +98,8 @@ public partial class DrawingDocument : OdfDocument
     /// <param name="path">ODG 文件路徑</param>
     /// <returns>載入完成的 <see cref="DrawingDocument"/> 執行個體</returns>
     /// <exception cref="InvalidOperationException">當指定文件不是 ODG 繪圖時擲出</exception>
-    public new static DrawingDocument Load(string path)
-    {
-        return EnsureDrawing(OdfDocumentFactory.LoadDocument(path));
-    }
+    public new static DrawingDocument Load(string path) =>
+        OdfDocumentVariantSupport.Load<DrawingDocument>(path, OdfDocumentKind.Graphics, "Err_DrawingDocument_SpecifiedOdfFileOdg");
 
     /// <summary>
     /// 非同步從指定路徑載入 ODG 繪圖文件。
@@ -109,8 +107,8 @@ public partial class DrawingDocument : OdfDocument
     /// <param name="path">ODG 文件路徑</param>
     /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="DrawingDocument"/></returns>
-    public new static async Task<DrawingDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
-        EnsureDrawing(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
+    public new static Task<DrawingDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
+        OdfDocumentVariantSupport.LoadAsync<DrawingDocument>(path, OdfDocumentKind.Graphics, "Err_DrawingDocument_SpecifiedOdfFileOdg", cancellationToken);
 
     /// <summary>
     /// 從指定資料流載入 ODG 繪圖文件。
@@ -119,10 +117,8 @@ public partial class DrawingDocument : OdfDocument
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
     /// <returns>載入完成的 <see cref="DrawingDocument"/> 執行個體</returns>
     /// <exception cref="InvalidOperationException">當指定文件不是 ODG 繪圖時擲出</exception>
-    public new static DrawingDocument Load(Stream stream, string? fileName = null)
-    {
-        return EnsureDrawing(OdfDocumentFactory.LoadDocument(stream, fileName));
-    }
+    public new static DrawingDocument Load(Stream stream, string? fileName = null) =>
+        OdfDocumentVariantSupport.Load<DrawingDocument>(stream, OdfDocumentKind.Graphics, "Err_DrawingDocument_SpecifiedOdfFileOdg", fileName);
 
     /// <summary>
     /// 非同步從指定資料流載入 ODG 繪圖文件。
@@ -131,23 +127,12 @@ public partial class DrawingDocument : OdfDocument
     /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
     /// <param name="cancellationToken">取消語彙基元</param>
     /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="DrawingDocument"/></returns>
-    public new static async Task<DrawingDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
-        EnsureDrawing(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
+    public new static Task<DrawingDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
+        OdfDocumentVariantSupport.LoadAsync<DrawingDocument>(stream, OdfDocumentKind.Graphics, "Err_DrawingDocument_SpecifiedOdfFileOdg", fileName, cancellationToken);
 
     internal IReadOnlyList<OdfDrawPage> GetPagesSnapshot()
     {
         return _pages.AsReadOnly();
-    }
-
-    private static DrawingDocument EnsureDrawing(OdfDocument document)
-    {
-        if (document is DrawingDocument drawing && document.DocumentKind == OdfDocumentKind.Graphics)
-        {
-            return drawing;
-        }
-
-        document.Dispose();
-        throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_DrawingDocument_SpecifiedOdfFileOdg"));
     }
 
     private void ParsePages()
@@ -349,4 +334,3 @@ public partial class DrawingDocument : OdfDocument
         return null;
     }
 }
-

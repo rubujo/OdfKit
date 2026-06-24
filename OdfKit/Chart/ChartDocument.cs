@@ -76,6 +76,13 @@ public class ChartDocument : OdfChartDocument
     }
 
     /// <summary>
+    /// 建立高階圖表文件 Fluent builder。
+    /// </summary>
+    /// <returns>新的 <see cref="ChartDocumentBuilder"/> 執行個體</returns>
+    public static ChartDocumentBuilder Builder() =>
+        new((ChartDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Chart));
+
+    /// <summary>
     /// 從指定檔案路徑載入高階圖表文件。
     /// </summary>
     /// <param name="path">ODC 文件檔案路徑</param>

@@ -17,6 +17,8 @@ namespace OdfKit.Chart;
 /// <param name="subPath">子路徑</param>
 public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfDocument(package, subPath)
 {
+    private OdfChartLegend? _legend;
+
     /// <summary>
     /// 初始化 <see cref="OdfChartDocument"/> 類別的新執行個體。
     /// </summary>
@@ -118,28 +120,8 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <remarks>常見值包含 <c>top</c>、<c>bottom</c>、<c>start</c> 與 <c>end</c></remarks>
     public string? LegendPosition
     {
-        get
-        {
-            OdfNode? legend = FindChildElement(GetChartNode(), "legend", OdfNamespaces.Chart);
-            return legend?.GetAttribute("legend-position", OdfNamespaces.Chart);
-        }
-        set
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                OdfNode? existingLegend = FindChildElement(GetChartNode(), "legend", OdfNamespaces.Chart);
-                if (existingLegend is not null)
-                {
-                    GetChartNode().RemoveChild(existingLegend);
-                }
-
-                return;
-            }
-
-            string position = value!;
-            OdfNode legendNode = FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
-            legendNode.SetAttribute("legend-position", OdfNamespaces.Chart, position, "chart");
-        }
+        get => Legend.Position;
+        set => Legend.Position = value;
     }
 
     /// <summary>
@@ -148,24 +130,14 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// <remarks>常見值包含 <c>start</c>、<c>center</c> 與 <c>end</c></remarks>
     public string? LegendAlignment
     {
-        get
-        {
-            OdfNode? legend = FindChildElement(GetChartNode(), "legend", OdfNamespaces.Chart);
-            return legend?.GetAttribute("legend-align", OdfNamespaces.Chart);
-        }
-        set
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                OdfNode? existingLegend = FindChildElement(GetChartNode(), "legend", OdfNamespaces.Chart);
-                existingLegend?.RemoveAttribute("legend-align", OdfNamespaces.Chart);
-                return;
-            }
-
-            OdfNode legendNode = FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
-            legendNode.SetAttribute("legend-align", OdfNamespaces.Chart, value!, "chart");
-        }
+        get => Legend.Alignment;
+        set => Legend.Alignment = value;
     }
+
+    /// <summary>
+    /// 取得圖例的統一可編輯模型。
+    /// </summary>
+    public OdfChartLegend Legend => _legend ??= new OdfChartLegend(this);
 
     /// <summary>
     /// 取得或設定圖表資料來源是否包含標籤。
@@ -245,6 +217,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     {
         LegendPosition = position;
     }
+
     private static OdfChartDocument EnsureChart(OdfDocument document)
     {
         if (document is OdfChartDocument chart && document.DocumentKind == OdfDocumentKind.Chart)
@@ -350,5 +323,18 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
         }
 
         return null;
+    }
+
+    internal OdfNode? FindLegendNode() => FindChildElement(GetChartNode(), "legend", OdfNamespaces.Chart);
+
+    internal OdfNode EnsureLegendNode() => FindOrCreateChild(GetChartNode(), "legend", OdfNamespaces.Chart, "chart");
+
+    internal void RemoveLegendNode()
+    {
+        OdfNode? legendNode = FindLegendNode();
+        if (legendNode is not null)
+        {
+            GetChartNode().RemoveChild(legendNode);
+        }
     }
 }
