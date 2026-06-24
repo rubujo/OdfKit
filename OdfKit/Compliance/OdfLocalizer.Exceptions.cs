@@ -9,6 +9,7 @@ public static partial class OdfLocalizer
     {
         ["en"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "Bookmark '{0}' not found.",
             ["Cli_CommandsHeader"] = "commands:",
             ["Cli_NoOdfFilesFound"] = "no ODF files found: {0}",
             ["Cli_PathNotFound"] = "path not found: {0}",
@@ -459,6 +460,7 @@ public static partial class OdfLocalizer
         },
         ["zh-TW"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "找不到名稱為 '{0}' 的書籤。",
             ["Cli_CommandsHeader"] = "指令：",
             ["Cli_NoOdfFilesFound"] = "找不到任何 ODF 檔案：{0}",
             ["Cli_PathNotFound"] = "找不到路徑：{0}",
@@ -909,6 +911,7 @@ public static partial class OdfLocalizer
         },
         ["de"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "Lesezeichen '{0}' nicht gefunden.",
             ["Cli_CommandsHeader"] = "Befehle:",
             ["Cli_NoOdfFilesFound"] = "keine ODF-Dateien gefunden: {0}",
             ["Cli_PathNotFound"] = "Pfad nicht gefunden: {0}",
@@ -1359,6 +1362,7 @@ public static partial class OdfLocalizer
         },
         ["fr"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "Signet '{0}' non trouvé.",
             ["Cli_CommandsHeader"] = "commandes:",
             ["Cli_NoOdfFilesFound"] = "aucun fichier ODF trouvé: {0}",
             ["Cli_PathNotFound"] = "chemin non trouvé: {0}",
@@ -1809,6 +1813,7 @@ public static partial class OdfLocalizer
         },
         ["nl"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "Bladwijzer '{0}' niet gevonden.",
             ["Cli_CommandsHeader"] = "commando's:",
             ["Cli_NoOdfFilesFound"] = "geen ODF-bestanden gevonden: {0}",
             ["Cli_PathNotFound"] = "pad niet gevonden: {0}",
@@ -2259,6 +2264,7 @@ public static partial class OdfLocalizer
         },
         ["nb"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "Fant ikke bokmerket '{0}'.",
             ["Cli_CommandsHeader"] = "kommandoer:",
             ["Cli_NoOdfFilesFound"] = "ingen ODF-filer funnet: {0}",
             ["Cli_PathNotFound"] = "sti ikke funnet: {0}",
@@ -2709,6 +2715,7 @@ public static partial class OdfLocalizer
         },
         ["pt"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "Indicador '{0}' não encontrado.",
             ["Cli_CommandsHeader"] = "comandos:",
             ["Cli_NoOdfFilesFound"] = "nenhum arquivo ODF encontrado: {0}",
             ["Cli_PathNotFound"] = "caminho não encontrado: {0}",
@@ -3159,6 +3166,7 @@ public static partial class OdfLocalizer
         },
         ["it"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "Segnalibro '{0}' non trovato.",
             ["Cli_CommandsHeader"] = "comandi:",
             ["Cli_NoOdfFilesFound"] = "nessun file ODF trovato: {0}",
             ["Cli_PathNotFound"] = "percorso non trovato: {0}",
@@ -3609,6 +3617,7 @@ public static partial class OdfLocalizer
         },
         ["sk"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "Záložka '{0}' sa nenašla.",
             ["Cli_CommandsHeader"] = "príkazy:",
             ["Cli_NoOdfFilesFound"] = "nenašli sa žiadne súbory ODF: {0}",
             ["Cli_PathNotFound"] = "cesta sa nenašla: {0}",
@@ -4059,6 +4068,7 @@ public static partial class OdfLocalizer
         },
         ["da"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "Bogmærket '{0}' blev ikke fundet.",
             ["Cli_CommandsHeader"] = "kommandoer:",
             ["Cli_NoOdfFilesFound"] = "ingen ODF-filer fundet: {0}",
             ["Cli_PathNotFound"] = "sti ikke fundet: {0}",
@@ -4509,6 +4519,7 @@ public static partial class OdfLocalizer
         },
         ["ms"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "Penanda buku '{0}' tidak ditemui.",
             ["Cli_CommandsHeader"] = "arahan:",
             ["Cli_NoOdfFilesFound"] = "tiada fail ODF ditemui: {0}",
             ["Cli_PathNotFound"] = "laluan tidak ditemui: {0}",
@@ -4959,6 +4970,7 @@ public static partial class OdfLocalizer
         },
         ["ko"] = new(StringComparer.Ordinal)
         {
+            ["Err_Bookmark_NotFound"] = "북마크 '{0}'을(를) 찾을 수 없습니다.",
             ["Cli_CommandsHeader"] = "명령어:",
             ["Cli_NoOdfFilesFound"] = "ODF 파일을 찾을 수 없습니다: {0}",
             ["Cli_PathNotFound"] = "경로를 찾을 수 없습니다: {0}",

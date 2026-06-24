@@ -30,12 +30,68 @@ public sealed class HighLevelApiExtensionTests
         var val = doc.Bookmarks["InlineBookmark"].Value;
         Assert.Equal(string.Empty, val);
 
-        // 設值給 inline 書籤，應在該節點後方追加文字
+        // 設值給 inline 書籤，會將其升級為範圍書籤，並把內容夾在中間
         doc.Bookmarks["InlineBookmark"].Value = "新填入內容";
 
-        // 行內書籤本身依然是 inline，Value 應仍為 empty（因為它是沒有長度的點），但後方已被插入文字
-        Assert.Equal(string.Empty, doc.Bookmarks["InlineBookmark"].Value);
+        // 設值後可正確讀取出寫入的內容
+        Assert.Equal("新填入內容", doc.Bookmarks["InlineBookmark"].Value);
         Assert.Contains("新填入內容", paragraph.TextContent);
+    }
+
+    [Fact]
+    public void TestBookmarkManager_InlineBookmark_DuplicateWrite_ReplacesValue()
+    {
+        using var doc = TextDocument.Create();
+        var paragraph = doc.AddParagraph("段落文字");
+
+        // 新增 inline 書籤
+        paragraph.AddBookmark("InlineBookmark");
+
+        // 第一次設值
+        doc.Bookmarks["InlineBookmark"].Value = "第一次填入內容";
+        Assert.Equal("第一次填入內容", doc.Bookmarks["InlineBookmark"].Value);
+        Assert.Contains("第一次填入內容", paragraph.TextContent);
+        Assert.DoesNotContain("第二次填入內容", paragraph.TextContent);
+
+        // 第二次設值，應取代前值，而不是累積
+        doc.Bookmarks["InlineBookmark"].Value = "第二次填入內容";
+        Assert.Equal("第二次填入內容", doc.Bookmarks["InlineBookmark"].Value);
+        Assert.Contains("第二次填入內容", paragraph.TextContent);
+    }
+
+    [Fact]
+    public void TestBookmarkManager_InlineBookmark_SaveAndReload_DuplicateWrite_ReplacesValue()
+    {
+        using var ms = new System.IO.MemoryStream();
+
+        // 1. 建立文件並寫入第一次設值
+        using (var doc = TextDocument.Create())
+        {
+            var paragraph = doc.AddParagraph("段落文字");
+            paragraph.AddBookmark("SaveReloadBookmark");
+            doc.Bookmarks["SaveReloadBookmark"].Value = "第一次內容";
+            doc.SaveToStream(ms);
+        }
+
+        ms.Position = 0;
+
+        // 2. 重新載入並再次設值，驗證是否為取代而非累積
+        using (var doc2 = TextDocument.Load(ms))
+        {
+            var paragraph = doc2.Body.Paragraphs.FirstOrDefault();
+            Assert.NotNull(paragraph);
+
+            // 驗證重載後，設值已正確轉為範圍書籤，因此可讀取出來
+            Assert.Equal("第一次內容", doc2.Bookmarks["SaveReloadBookmark"].Value);
+
+            // 第二次設值
+            doc2.Bookmarks["SaveReloadBookmark"].Value = "第二次內容";
+
+            // 驗證讀取值與段落內容
+            Assert.Equal("第二次內容", doc2.Bookmarks["SaveReloadBookmark"].Value);
+            Assert.Contains("第二次內容", paragraph!.TextContent);
+            Assert.DoesNotContain("第一次內容", paragraph.TextContent);
+        }
     }
 
     [Fact]
@@ -109,8 +165,14 @@ public sealed class HighLevelApiExtensionTests
     public void TestBookmarkManager_NonExistent_ThrowsException()
     {
         using var doc = TextDocument.Create();
-        Assert.Throws<KeyNotFoundException>(() => doc.Bookmarks["NoSuchBookmark"].Value);
-        Assert.Throws<KeyNotFoundException>(() => doc.Bookmarks["NoSuchBookmark"].Value = "New Value");
+
+        var exRead = Assert.Throws<KeyNotFoundException>(() => doc.Bookmarks["NoSuchBookmark"].Value);
+        Assert.Contains("NoSuchBookmark", exRead.Message);
+        Assert.DoesNotContain("Err_Bookmark_NotFound", exRead.Message);
+
+        var exWrite = Assert.Throws<KeyNotFoundException>(() => doc.Bookmarks["NoSuchBookmark"].Value = "New Value");
+        Assert.Contains("NoSuchBookmark", exWrite.Message);
+        Assert.DoesNotContain("Err_Bookmark_NotFound", exWrite.Message);
     }
 
     [Fact]

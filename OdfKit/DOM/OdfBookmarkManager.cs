@@ -92,7 +92,7 @@ public sealed class OdfBookmark
             var nodes = FindBookmarkNodes();
             if (nodes.Start == null && nodes.Inline == null)
             {
-                throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_Bookmark_NotFound") ?? $"找不到名稱為 '{Name}' 的書籤。");
+                throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_Bookmark_NotFound", Name));
             }
 
             if (nodes.Inline != null)
@@ -128,16 +128,35 @@ public sealed class OdfBookmark
             var nodes = FindBookmarkNodes();
             if (nodes.Start == null && nodes.Inline == null)
             {
-                throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_Bookmark_NotFound") ?? $"找不到名稱為 '{Name}' 的書籤。");
+                throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_Bookmark_NotFound", Name));
             }
 
             var textVal = value ?? string.Empty;
 
             if (nodes.Inline != null)
             {
-                // 行內書籤：直接在該節點後面插入新文字
-                var newText = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = textVal };
-                nodes.Inline.Parent?.InsertAfter(newText, nodes.Inline);
+                if (string.IsNullOrEmpty(textVal))
+                {
+                    return;
+                }
+
+                // 行內書籤寫入非空值時，自動升級為成對的範圍書籤，以便重載後仍能正確識別其內容邊界
+                var parent = nodes.Inline.Parent;
+                if (parent != null)
+                {
+                    var inlineStartNode = new OdfNode(OdfNodeType.Element, "bookmark-start", OdfNamespaces.Text, "text");
+                    inlineStartNode.SetAttribute("name", OdfNamespaces.Text, Name, "text");
+
+                    var inlineEndNode = new OdfNode(OdfNodeType.Element, "bookmark-end", OdfNamespaces.Text, "text");
+                    inlineEndNode.SetAttribute("name", OdfNamespaces.Text, Name, "text");
+
+                    var newText = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = textVal };
+
+                    parent.InsertAfter(inlineStartNode, nodes.Inline);
+                    parent.InsertAfter(newText, inlineStartNode);
+                    parent.InsertAfter(inlineEndNode, newText);
+                    parent.RemoveChild(nodes.Inline);
+                }
                 return;
             }
 
