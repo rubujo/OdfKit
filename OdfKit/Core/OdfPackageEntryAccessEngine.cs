@@ -60,12 +60,13 @@ internal static class OdfPackageEntryAccessEngine
     /// <summary>
     /// 將指定的位元組內容寫入或覆寫封裝中的專案。
     /// </summary>
-    internal static void WriteEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name, byte[] content, string mediaType)
+    internal static void WriteEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name, byte[] content, string? mediaType)
     {
         name = OdfPackage.SanitizeEntryName(name);
+        string resolvedMediaType = OdfPackageMediaTypeResolver.Resolve(name, mediaType);
         OdfPackageEntry entry = new(name, content);
         ctx.Entries[name] = entry;
-        ctx.Manifest[name] = mediaType;
+        ctx.Manifest[name] = resolvedMediaType;
 
         if (name.EndsWith("/mimetype") && name.Length > 9)
         {
@@ -83,12 +84,13 @@ internal static class OdfPackageEntryAccessEngine
     /// <summary>
     /// 將指定的資料流內容寫入或覆寫封裝中的專案。
     /// </summary>
-    internal static void WriteEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name, Stream contentStream, string mediaType)
+    internal static void WriteEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name, Stream contentStream, string? mediaType)
     {
         name = OdfPackage.SanitizeEntryName(name);
+        string resolvedMediaType = OdfPackageMediaTypeResolver.Resolve(name, mediaType);
         OdfPackageEntry entry = new(name, contentStream);
         ctx.Entries[name] = entry;
-        ctx.Manifest[name] = mediaType;
+        ctx.Manifest[name] = resolvedMediaType;
 
         if (name.EndsWith("/mimetype") && name.Length > 9)
         {

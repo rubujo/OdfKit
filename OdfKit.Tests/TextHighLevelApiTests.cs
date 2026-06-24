@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -696,6 +697,56 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 ODT 流式寫入器可透過 <see cref="IAsyncDisposable"/> 釋放並完成封裝輸出。
+    /// </summary>
+    [Fact]
+    public async Task OdtStreamWriterDisposeAsync_WritesValidContent()
+    {
+        await using var stream = new MemoryStream();
+        await using (var writer = new OdtStreamWriter(stream))
+        {
+            writer.AddHeading("非同步標題", 1);
+            writer.AddParagraph("非同步段落");
+        }
+
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string contentXml = reader.ReadToEnd();
+        Assert.Contains("非同步標題", contentXml);
+        Assert.Contains("非同步段落", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 ODT 流式寫入器的 Span/Memory 文字多載可正常輸出。
+    /// </summary>
+    [Fact]
+    public void OdtStreamWriter_SpanAndMemoryOverloads_WriteExpectedContent()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new OdtStreamWriter(stream))
+        {
+            writer.AddHeading("Span 標題".AsSpan(), 1);
+            writer.AddParagraph("Memory 段落".AsMemory());
+            writer.BeginList();
+            writer.AddListItem("Span 清單".AsSpan());
+            writer.AddListItem("Memory 清單".AsMemory());
+            writer.EndList();
+        }
+
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string contentXml = reader.ReadToEnd();
+        Assert.Contains("Span 標題", contentXml);
+        Assert.Contains("Memory 段落", contentXml);
+        Assert.Contains("Span 清單", contentXml);
+        Assert.Contains("Memory 清單", contentXml);
+    }
+
+    /// <summary>
     /// 驗證 ODT 流式讀取器可逐一讀出大型文字文件元素。
     /// </summary>
     [Fact]
@@ -753,6 +804,50 @@ public class TextHighLevelApiTests
         long after = GC.GetTotalMemory(forceFullCollection: true);
         long retainedBytes = Math.Max(0, after - before);
         Assert.True(retainedBytes < 20 * 1024 * 1024, $"保留記憶體過高：{retainedBytes:N0} bytes。");
+    }
+
+    /// <summary>
+    /// 驗證文件層級替換可跨相鄰文字片段命中關鍵字，並保留未命中片段的樣式設定。
+    /// </summary>
+    [Fact]
+    public void ReplaceTextAcrossRuns_PreservesSurroundingStyles()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph(string.Empty);
+        OdfTextRun run1 = paragraph.AddTextRun("Hello ");
+        run1.StyleName = "KeepA";
+        OdfTextRun run2 = paragraph.AddTextRun("[Com");
+        run2.StyleName = "TokenA";
+        OdfTextRun run3 = paragraph.AddTextRun("pany]");
+        run3.StyleName = "TokenB";
+        OdfTextRun run4 = paragraph.AddTextRun("!");
+        run4.StyleName = "KeepB";
+
+        document.ReplaceText("[Company]", "OdfKit");
+
+        Assert.Equal("Hello OdfKit!", paragraph.TextContent);
+        var runs = paragraph.Runs.ToList();
+        Assert.Contains(runs, run => run.StyleName == "KeepA" && run.Text == "Hello ");
+        Assert.Contains(runs, run => run.StyleName == "TokenA" && run.Text == "OdfKit");
+        Assert.Contains(runs, run => run.StyleName == "KeepB" && run.Text == "!");
+    }
+
+    /// <summary>
+    /// 驗證段落層級替換僅影響目前段落，不會修改其他段落內容。
+    /// </summary>
+    [Fact]
+    public void ParagraphReplaceText_OnlyAffectsCurrentParagraph()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph first = document.AddParagraph(string.Empty);
+        first.AddTextRun("A[Target]B");
+        OdfParagraph second = document.AddParagraph(string.Empty);
+        second.AddTextRun("A[Target]B");
+
+        first.ReplaceText("[Target]", "X");
+
+        Assert.Equal("AXB", first.TextContent);
+        Assert.Equal("A[Target]B", second.TextContent);
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -891,6 +891,92 @@ public class OdfSchemaGeneratorTests
     }
 
     [Fact]
+    public void CliWritesDomWrapperArtifactsToOutputDirectory()
+    {
+        string directory = Path.Combine(Path.GetTempPath(), "OdfKitSchemaGeneratorCliTests", Path.GetRandomFileName());
+        Directory.CreateDirectory(directory);
+        try
+        {
+            string schemaPath = Path.Combine(directory, "schema.rng");
+            string outputDirectory = Path.Combine(directory, "Generated");
+            File.WriteAllText(schemaPath, CreateRelaxNgFixture(), Encoding.UTF8);
+            using var stdout = new StringWriter(CultureInfo.InvariantCulture);
+            using var stderr = new StringWriter(CultureInfo.InvariantCulture);
+
+            int exitCode = OdfSchemaGeneratorCli.Run(
+                new[]
+                {
+                    "--format",
+                    "dom-wrappers",
+                    "--output-directory",
+                    outputDirectory,
+                    schemaPath
+                },
+                stdout,
+                stderr);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, stderr.ToString());
+            Assert.Equal(string.Empty, stdout.ToString());
+            Assert.True(File.Exists(Path.Combine(outputDirectory, "GeneratedDomFactory.g.cs")));
+            Assert.NotEmpty(Directory.GetFiles(outputDirectory, "*.g.cs").Where(path => !path.EndsWith("GeneratedDomFactory.g.cs", StringComparison.Ordinal)));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void CliDomWrapperSplitUsesUniqueFilesForUnknownNamespaces()
+    {
+        string directory = Path.Combine(Path.GetTempPath(), "OdfKitSchemaGeneratorCliTests", Path.GetRandomFileName());
+        Directory.CreateDirectory(directory);
+        try
+        {
+            string schemaPath = Path.Combine(directory, "schema.rng");
+            string outputDirectory = Path.Combine(directory, "Generated");
+            string schema = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                "<grammar xmlns=\"http://relaxng.org/ns/structure/1.0\">" +
+                "<start>" +
+                "<choice>" +
+                "<element name=\"a:root\" xmlns:a=\"urn:oasis:names:tc:opendocument:xmlns:alpha:1.0\"/>" +
+                "<element name=\"b:root\" xmlns:b=\"urn:oasis:names:tc:opendocument:xmlns:beta:1.0\"/>" +
+                "</choice>" +
+                "</start>" +
+                "</grammar>";
+            File.WriteAllText(schemaPath, schema, Encoding.UTF8);
+            using var stdout = new StringWriter(CultureInfo.InvariantCulture);
+            using var stderr = new StringWriter(CultureInfo.InvariantCulture);
+
+            int exitCode = OdfSchemaGeneratorCli.Run(
+                new[]
+                {
+                    "--format",
+                    "dom-wrappers",
+                    "--output-directory",
+                    outputDirectory,
+                    schemaPath
+                },
+                stdout,
+                stderr);
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(string.Empty, stderr.ToString());
+            string[] wrapperFiles = Directory.GetFiles(outputDirectory, "*.g.cs")
+                .Where(path => !path.EndsWith("GeneratedDomFactory.g.cs", StringComparison.Ordinal))
+                .ToArray();
+            Assert.Equal(2, wrapperFiles.Length);
+            Assert.Contains(wrapperFiles, path => path.EndsWith("AlphaRootElement.g.cs", StringComparison.Ordinal));
+            Assert.Contains(wrapperFiles, path => path.EndsWith("BetaRootElement.g.cs", StringComparison.Ordinal));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public void OasisOdf14GenerationManifestDefinesProviderArtifact()
     {
         string repoRoot = FindRepositoryRoot();
@@ -930,6 +1016,19 @@ public class OdfSchemaGeneratorTests
         Assert.Contains("--source-date", script);
         Assert.Contains("--class-name", script);
         Assert.Contains("--output", script);
+    }
+
+    [Fact]
+    public void OasisOdf14DomWrappersManifestDefinesOutputDirectory()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string manifestPath = Path.Combine(repoRoot, "tools", "OdfSchemaGenerator", "oasis-odf14-dom-wrappers.json");
+        using JsonDocument document = JsonDocument.Parse(File.ReadAllText(manifestPath, Encoding.UTF8));
+        JsonElement root = document.RootElement;
+
+        Assert.Equal("1.4", root.GetProperty("version").GetString());
+        Assert.Equal("dom-wrappers", root.GetProperty("format").GetString());
+        Assert.Equal("OdfKit/DOM/Generated", root.GetProperty("outputDirectory").GetString());
     }
 
     [Fact]
@@ -1078,4 +1177,3 @@ public class OdfSchemaGeneratorTests
         return path.Replace("\\", "\\\\");
     }
 }
-

@@ -2,6 +2,8 @@
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Spreadsheet;
@@ -117,6 +119,82 @@ public class SpreadsheetApiUsabilityTests
         Assert.Contains("style:name=\"ro_auto_1\"", stylesXml);
         Assert.Contains("style:family=\"table-row\"", stylesXml);
         Assert.Contains("style:row-height=\"0.6526cm\"", stylesXml);
+    }
+
+    /// <summary>
+    /// 驗證 ODS 流式寫入器可透過 <see cref="IAsyncDisposable"/> 釋放並完成封裝輸出。
+    /// </summary>
+    [Fact]
+    public async Task OdsStreamWriter_DisposeAsync_FinalizesPackage()
+    {
+        await using var stream = new MemoryStream();
+        await using (var writer = new OdsStreamWriter(stream))
+        {
+            writer.WriteStartSheet("Async");
+            writer.WriteStartRow();
+            writer.WriteCell("A1");
+            writer.WriteEndRow();
+            writer.WriteEndSheet();
+        }
+
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string contentXml = reader.ReadToEnd();
+        Assert.Contains("table:table", contentXml);
+        Assert.Contains("A1", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 ODS 流式寫入器可直接將 CSV 資料流逐列匯入目前工作表。
+    /// </summary>
+    [Fact]
+    public async Task OdsStreamWriter_WriteCsvStreamAsync_WritesRowsFromCsv()
+    {
+        const string csv = "Name,Qty\nKeyboard,5\nMouse,12\n";
+        await using var stream = new MemoryStream();
+        await using (var writer = new OdsStreamWriter(stream))
+        {
+            writer.WriteStartSheet("CSV");
+            await writer.WriteCsvStreamAsync(
+                new MemoryStream(Encoding.UTF8.GetBytes(csv)),
+                firstRowAsHeader: true,
+                TestContext.Current.CancellationToken);
+            writer.WriteEndSheet();
+        }
+
+        stream.Position = 0;
+        using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        string contentXml = ReadZipEntry(zip, "content.xml");
+        Assert.Contains("Keyboard", contentXml);
+        Assert.Contains("Mouse", contentXml);
+        Assert.Contains(">5<", contentXml);
+        Assert.Contains(">12<", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 ODS 流式寫入器的 Span/Memory 字串多載可正常寫入字串儲存格。
+    /// </summary>
+    [Fact]
+    public void OdsStreamWriter_WriteCell_SpanAndMemoryOverloadsWork()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new OdsStreamWriter(stream))
+        {
+            writer.WriteStartSheet("Span");
+            writer.WriteStartRow();
+            writer.WriteCell("Span 內容".AsSpan());
+            writer.WriteCell("Memory 內容".AsMemory());
+            writer.WriteEndRow();
+            writer.WriteEndSheet();
+        }
+
+        stream.Position = 0;
+        using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        string contentXml = ReadZipEntry(zip, "content.xml");
+        Assert.Contains("Span 內容", contentXml);
+        Assert.Contains("Memory 內容", contentXml);
     }
 
     private static string ReadZipEntry(ZipArchive zip, string entryName)

@@ -335,7 +335,7 @@ public static class XlsxToOdfConverter
         odsSheet.AddDataBarFormat(
             range,
             new OdfColor(positiveColor),
-            negativeColor is null ? null : new OdfColor(negativeColor));
+            negativeColor is null ? (OdfColor?)null : new OdfColor(negativeColor!));
     }
 
     private static void CopyIconSetFromOpenXml(S.ConditionalFormattingRule rule, OdfCellRange range, OdfTableSheet odsSheet)
@@ -1214,7 +1214,7 @@ public static class XlsxToOdfConverter
                 odsSheet.AddDataBarFormat(
                     range,
                     new OdfColor(positiveColor),
-                    negativeColor is null ? null : new OdfColor(negativeColor));
+                    negativeColor is null ? (OdfColor?)null : new OdfColor(negativeColor!));
             }
             else if (conditionalFormat.ConditionalFormatType == XLConditionalFormatType.IconSet)
             {

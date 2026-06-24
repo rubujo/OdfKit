@@ -7,7 +7,7 @@ namespace OdfKit.Tools.OdfSchemaGenerator;
 /// </summary>
 public static class OdfSchemaGeneratorCli
 {
-    private const string Usage = "Usage: OdfSchemaGenerator [--format json|csharp|csharp-provider|dom-wrappers] [--output <file>] [--class-name <name>] [--source-url <uri>] [--source-date <date>] [--version 1.0|1.1|1.2|1.3|1.4] <schema.rng>";
+    private const string Usage = "Usage: OdfSchemaGenerator [--format json|csharp|csharp-provider|dom-wrappers] [--output <file>] [--output-directory <directory>] [--class-name <name>] [--source-url <uri>] [--source-date <date>] [--version 1.0|1.1|1.2|1.3|1.4] <schema.rng>";
 
     private static readonly string[] SupportedVersionStrings = ["1.0", "1.1", "1.2", "1.3", "1.4"];
 
@@ -55,6 +55,20 @@ public static class OdfSchemaGeneratorCli
             metadata.Version = parsedOptions.Version;
         }
 
+        if (!string.IsNullOrWhiteSpace(parsedOptions.OutputDirectory))
+        {
+            if (!string.Equals(parsedOptions.Format, "dom-wrappers", StringComparison.OrdinalIgnoreCase))
+            {
+                error.WriteLine("--output-directory is only supported when --format dom-wrappers is used.");
+                return 2;
+            }
+
+            string fullOutputDirectory = Path.GetFullPath(parsedOptions.OutputDirectory);
+            Directory.CreateDirectory(fullOutputDirectory);
+            new DomWrappersCSharpWriter().WriteToDirectory(metadata, fullOutputDirectory);
+            return 0;
+        }
+
         if (string.IsNullOrWhiteSpace(parsedOptions.OutputPath))
         {
             WriteMetadata(metadata, output, parsedOptions);
@@ -77,6 +91,7 @@ public static class OdfSchemaGeneratorCli
     {
         string format = "json";
         string outputPath = string.Empty;
+        string outputDirectory = string.Empty;
         string className = "GeneratedOdfSchemaMetadata";
         string sourceUrl = string.Empty;
         string sourceDate = string.Empty;
@@ -100,6 +115,17 @@ public static class OdfSchemaGeneratorCli
             if (string.Equals(arg, "--output", StringComparison.Ordinal))
             {
                 if (!TryReadValue(args, ref i, error, "--output", out outputPath))
+                {
+                    options = null;
+                    return false;
+                }
+
+                continue;
+            }
+
+            if (string.Equals(arg, "--output-directory", StringComparison.Ordinal))
+            {
+                if (!TryReadValue(args, ref i, error, "--output-directory", out outputDirectory))
                 {
                     options = null;
                     return false;
@@ -180,7 +206,7 @@ public static class OdfSchemaGeneratorCli
 
         if (!IsSupportedFormat(format))
         {
-            error.WriteLine("Unsupported format. Use json, csharp, or csharp-provider.");
+            error.WriteLine("Unsupported format. Use json, csharp, csharp-provider, or dom-wrappers.");
             options = null;
             return false;
         }
@@ -206,7 +232,14 @@ public static class OdfSchemaGeneratorCli
             return false;
         }
 
-        options = new GeneratorOptions(format, outputPath, className, sourceUrl, sourceDate, version, schemaPath);
+        if (!string.IsNullOrWhiteSpace(outputPath) && !string.IsNullOrWhiteSpace(outputDirectory))
+        {
+            error.WriteLine("Specify either --output or --output-directory, not both.");
+            options = null;
+            return false;
+        }
+
+        options = new GeneratorOptions(format, outputPath, outputDirectory, className, sourceUrl, sourceDate, version, schemaPath);
         return true;
     }
 
@@ -315,6 +348,7 @@ public static class OdfSchemaGeneratorCli
         public GeneratorOptions(
             string format,
             string outputPath,
+            string outputDirectory,
             string className,
             string sourceUrl,
             string sourceDate,
@@ -323,6 +357,7 @@ public static class OdfSchemaGeneratorCli
         {
             Format = format;
             OutputPath = outputPath;
+            OutputDirectory = outputDirectory;
             ClassName = className;
             SourceUrl = sourceUrl;
             SourceDate = sourceDate;
@@ -333,6 +368,8 @@ public static class OdfSchemaGeneratorCli
         public string Format { get; }
 
         public string OutputPath { get; }
+
+        public string OutputDirectory { get; }
 
         public string ClassName { get; }
 

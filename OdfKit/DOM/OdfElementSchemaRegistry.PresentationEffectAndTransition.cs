@@ -219,13 +219,22 @@ internal static partial class OdfElementSchemaRegistry
 
     internal static string FormatPresentationTransitionType(OdfPresentationTransitionType transitionType)
     {
-        return transitionType switch
+        if (transitionType == OdfPresentationTransitionType.Manual)
         {
-            OdfPresentationTransitionType.Manual => "manual",
-            OdfPresentationTransitionType.Automatic => "automatic",
-            OdfPresentationTransitionType.SemiAutomatic => "semi-automatic",
-            _ => throw new ArgumentOutOfRangeException(nameof(transitionType), transitionType, OdfLocalizer.GetMessage("Err_OdfElementSchemaRegistry_UnknownOdfBriefingTransition"))
-        };
+            return "manual";
+        }
+
+        if (transitionType == OdfPresentationTransitionType.Automatic)
+        {
+            return "automatic";
+        }
+
+        if (transitionType == OdfPresentationTransitionType.SemiAutomatic)
+        {
+            return "semi-automatic";
+        }
+
+        return transitionType.Value;
     }
 
     #endregion

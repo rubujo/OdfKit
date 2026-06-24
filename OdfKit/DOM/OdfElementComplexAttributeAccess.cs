@@ -159,7 +159,7 @@ internal static class OdfElementComplexAttributeAccess
     /// <param name="value">原始屬性字串</param>
     /// <returns>解析後的色彩；若格式無效則為 <see langword="null"/></returns>
     internal static OdfColor? GetColor(string? value)
-        => OdfColor.TryParse(value, out OdfColor color) ? color : null;
+        => OdfColor.TryParse(value, out OdfColor color) ? color : (OdfColor?)null;
 
     /// <summary>
     /// 將色彩格式化為 ODF 屬性字串。

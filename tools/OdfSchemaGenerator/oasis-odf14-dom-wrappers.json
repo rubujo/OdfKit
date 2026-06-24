@@ -3,7 +3,7 @@
   "schemaPath": "tools/OdfSchemaGenerator/schemas/OpenDocument-v1.4-schema.rng",
   "sourceUrl": "https://docs.oasis-open.org/office/OpenDocument/v1.4/os/schemas/OpenDocument-v1.4-schema.rng",
   "sourceDate": "2025-10-06",
-  "outputPath": "OdfKit/DOM/Generated/GeneratedDomWrappers.g.cs",
+  "outputDirectory": "OdfKit/DOM/Generated",
   "className": "GeneratedDomWrappers",
   "format": "dom-wrappers"
 }

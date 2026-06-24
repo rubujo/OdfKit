@@ -24,6 +24,148 @@ public sealed class DomWrappersCSharpWriter
 
     public void Write(SchemaMetadata metadata, TextWriter writer)
     {
+        var elementAttributes = ResolveAllElementAttributes(metadata);
+        var elementChildRelations = ResolveAllElementChildRelations(metadata);
+        var sortedElements = metadata.Elements
+            .OrderBy(e => e.NamespaceUri, StringComparer.Ordinal)
+            .ThenBy(e => e.LocalName, StringComparer.Ordinal)
+            .ToList();
+
+        WriteFileHeader(writer);
+        writer.WriteLine("namespace OdfKit.DOM");
+        writer.WriteLine("{");
+        WriteElementWrappers(writer, sortedElements, elementAttributes, elementChildRelations);
+        WriteHandWrittenPartialExtensions(writer, sortedElements, elementChildRelations);
+        WriteFactory(writer, sortedElements);
+        writer.WriteLine("}");
+    }
+
+    public void WriteToDirectory(SchemaMetadata metadata, string outputDirectory)
+    {
+        if (metadata is null)
+        {
+            throw new ArgumentNullException(nameof(metadata));
+        }
+
+        if (string.IsNullOrWhiteSpace(outputDirectory))
+        {
+            throw new ArgumentException("Output directory is required.", nameof(outputDirectory));
+        }
+
+        // 清理舊有的所有產生程式碼，避免重複定義衝突
+        if (Directory.Exists(outputDirectory))
+        {
+            foreach (string file in Directory.GetFiles(outputDirectory, "*.g.cs"))
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (IOException)
+                {
+                    // 忽略暫時的鎖定
+                }
+            }
+        }
+        else
+        {
+            Directory.CreateDirectory(outputDirectory);
+        }
+
+        var elementAttributes = ResolveAllElementAttributes(metadata);
+        var elementChildRelations = ResolveAllElementChildRelations(metadata);
+        var sortedElements = metadata.Elements
+            .OrderBy(e => e.NamespaceUri, StringComparer.Ordinal)
+            .ThenBy(e => e.LocalName, StringComparer.Ordinal)
+            .ToList();
+
+        // 依型別一檔案 (Type-per-file) 產生強型別 Wrappers
+        foreach (var element in sortedElements)
+        {
+            string nsPrefix = GetNamespacePascalName(element.NamespaceUri);
+            string localPascal = ToPascalCase(element.LocalName);
+            string className = nsPrefix + localPascal + "Element";
+
+            bool isHandWritten = HandWrittenClasses.Contains(className);
+            bool hasChildRelations = elementChildRelations.TryGetValue((element.NamespaceUri, element.LocalName), out var childRelations);
+
+            // 若為手寫類別且無子關係，則完全不需產生任何 wrapper 檔
+            if (isHandWritten && !hasChildRelations)
+            {
+                continue;
+            }
+
+            string fileName = className + ".g.cs";
+            string outputPath = Path.Combine(outputDirectory, fileName);
+            using var writer = new StreamWriter(outputPath, append: false, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            WriteFileHeader(writer);
+            writer.WriteLine("namespace OdfKit.DOM");
+            writer.WriteLine("{");
+
+            if (!isHandWritten)
+            {
+                WriteElementWrappers(writer, new[] { element }, elementAttributes, elementChildRelations);
+            }
+            else
+            {
+                WriteHandWrittenPartialExtensions(writer, new[] { element }, elementChildRelations);
+            }
+
+            writer.WriteLine("}");
+        }
+
+        string factoryPath = Path.Combine(outputDirectory, "GeneratedDomFactory.g.cs");
+        using var factoryWriter = new StreamWriter(factoryPath, append: false, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        WriteFileHeader(factoryWriter);
+        factoryWriter.WriteLine("namespace OdfKit.DOM");
+        factoryWriter.WriteLine("{");
+        WriteFactory(factoryWriter, sortedElements);
+        factoryWriter.WriteLine("}");
+    }
+
+    private static Dictionary<string, string> BuildNamespaceFileKeys(IEnumerable<string> namespaceUris)
+    {
+        var namespaceFileKeys = new Dictionary<string, string>(StringComparer.Ordinal);
+        var usedKeys = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (string namespaceUri in namespaceUris.OrderBy(item => item, StringComparer.Ordinal))
+        {
+            string baseKey = NormalizeFileKey(GetNamespacePascalName(namespaceUri));
+            string key = baseKey;
+            int suffix = 2;
+            while (!usedKeys.Add(key))
+            {
+                key = baseKey + suffix.ToString(CultureInfo.InvariantCulture);
+                suffix++;
+            }
+
+            namespaceFileKeys[namespaceUri] = key;
+        }
+
+        return namespaceFileKeys;
+    }
+
+    private static string NormalizeFileKey(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "ns";
+        }
+
+        var chars = new List<char>(value.Length);
+        foreach (char ch in value)
+        {
+            if (char.IsLetterOrDigit(ch))
+            {
+                chars.Add(char.ToLowerInvariant(ch));
+            }
+        }
+
+        return chars.Count > 0 ? new string(chars.ToArray()) : "ns";
+    }
+
+    private static void WriteFileHeader(TextWriter writer)
+    {
         writer.WriteLine("// <auto-generated />");
         writer.WriteLine("// Generated from OASIS Open Document Format (ODF) schemas.");
         writer.WriteLine("// Copyright (c) OASIS Open. All rights reserved.");
@@ -35,44 +177,37 @@ public sealed class DomWrappersCSharpWriter
         writer.WriteLine("using OdfKit.Compliance;");
         writer.WriteLine("using OdfKit.Styles;");
         writer.WriteLine();
-        writer.WriteLine("namespace OdfKit.DOM");
-        writer.WriteLine("{");
+    }
 
-        var elementAttributes = ResolveAllElementAttributes(metadata);
-        var elementChildRelations = ResolveAllElementChildRelations(metadata);
-
-        var sortedElements = metadata.Elements
-            .OrderBy(e => e.NamespaceUri, StringComparer.Ordinal)
-            .ThenBy(e => e.LocalName, StringComparer.Ordinal)
-            .ToList();
-
-        // Write wrapper classes
-        foreach (var element in sortedElements)
+    private static void WriteElementWrappers(
+        TextWriter writer,
+        IEnumerable<SchemaNameMetadata> elements,
+        IReadOnlyDictionary<(string, string), List<AttributePropertyMetadata>> elementAttributes,
+        IReadOnlyDictionary<(string, string), List<ChildElementPropertyMetadata>> elementChildRelations)
+    {
+        foreach (var element in elements)
         {
             string nsPrefix = GetNamespacePascalName(element.NamespaceUri);
             string localPascal = ToPascalCase(element.LocalName);
             string className = nsPrefix + localPascal + "Element";
-
             if (HandWrittenClasses.Contains(className))
             {
-                continue; // Skip generating class as it is hand-written in OdfElement.cs
+                continue;
             }
 
-            writer.WriteLine($"    /// <summary>");
+            writer.WriteLine("    /// <summary>");
             writer.WriteLine($"    /// Typed wrapper for element &lt;{GetPrefix(element.NamespaceUri)}:{element.LocalName}&gt;.");
-            writer.WriteLine($"    /// </summary>");
+            writer.WriteLine("    /// </summary>");
             writer.WriteLine($"    public partial class {className} : OdfElement");
             writer.WriteLine("    {");
             writer.WriteLine($"        public {className}(string? prefix = null) : base(\"{element.LocalName}\", \"{element.NamespaceUri}\", prefix) {{ }}");
 
             var existingPropertyNames = new List<string>();
-
-            // Write version-aware property accessors
             if (elementAttributes.TryGetValue((element.NamespaceUri, element.LocalName), out var attrs))
             {
                 var resolvedNames = ResolvePropertyNames(attrs);
                 existingPropertyNames.AddRange(resolvedNames.Values);
-                foreach (var attr in attrs.OrderBy(a => resolvedNames[a], StringComparer.Ordinal))
+                foreach (var attr in attrs.OrderBy(item => resolvedNames[item], StringComparer.Ordinal))
                 {
                     string propName = resolvedNames[attr];
                     string prefix = GetPrefix(attr.NamespaceUri);
@@ -88,8 +223,14 @@ public sealed class DomWrappersCSharpWriter
             writer.WriteLine("    }");
             writer.WriteLine();
         }
+    }
 
-        foreach (var element in sortedElements)
+    private static void WriteHandWrittenPartialExtensions(
+        TextWriter writer,
+        IEnumerable<SchemaNameMetadata> elements,
+        IReadOnlyDictionary<(string, string), List<ChildElementPropertyMetadata>> elementChildRelations)
+    {
+        foreach (var element in elements)
         {
             string nsPrefix = GetNamespacePascalName(element.NamespaceUri);
             string localPascal = ToPascalCase(element.LocalName);
@@ -107,45 +248,67 @@ public sealed class DomWrappersCSharpWriter
             writer.WriteLine("    }");
             writer.WriteLine();
         }
+    }
 
-        // Write OdfNodeFactory partial class
+    private static void WriteFactory(TextWriter writer, IReadOnlyList<SchemaNameMetadata> sortedElements)
+    {
+        writer.WriteLine("#if NET8_0_OR_GREATER");
+        writer.WriteLine("using System.Collections.Frozen;");
+        writer.WriteLine("#endif");
+        writer.WriteLine("using System.Collections.Generic;");
+        writer.WriteLine();
         writer.WriteLine("    public static partial class OdfNodeFactory");
         writer.WriteLine("    {");
-        writer.WriteLine("        public static OdfNode? CreateGeneratedElement(string localName, string namespaceUri, string? prefix)");
+        writer.WriteLine("#if NET8_0_OR_GREATER");
+        writer.WriteLine("        private static readonly FrozenDictionary<string, FrozenDictionary<string, Func<string?, OdfNode>>> GeneratedFactories;");
+        writer.WriteLine("#else");
+        writer.WriteLine("        private static readonly Dictionary<string, Dictionary<string, Func<string?, OdfNode>>> GeneratedFactories;");
+        writer.WriteLine("#endif");
+        writer.WriteLine();
+        writer.WriteLine("        static OdfNodeFactory()");
         writer.WriteLine("        {");
+        writer.WriteLine("            var temp = new Dictionary<string, Dictionary<string, Func<string?, OdfNode>>>(StringComparer.Ordinal);");
+        writer.WriteLine();
 
-        // Group by namespace URI
-        var groups = sortedElements.GroupBy(e => e.NamespaceUri).ToList();
-        bool firstGroup = true;
+        var groups = sortedElements.GroupBy(element => element.NamespaceUri).ToList();
         foreach (var group in groups)
         {
-            if (firstGroup)
-            {
-                writer.WriteLine($"            if (namespaceUri == \"{group.Key}\")");
-                firstGroup = false;
-            }
-            else
-            {
-                writer.WriteLine($"            else if (namespaceUri == \"{group.Key}\")");
-            }
+            string nsKey = NormalizeFileKey(GetNamespacePascalName(group.Key));
+            writer.WriteLine($"            var nsMap_{nsKey} = new Dictionary<string, Func<string?, OdfNode>>(StringComparer.Ordinal)");
             writer.WriteLine("            {");
-            writer.WriteLine("                switch (localName)");
-            writer.WriteLine("                {");
             foreach (var element in group)
             {
                 string nsPrefix = GetNamespacePascalName(element.NamespaceUri);
                 string localPascal = ToPascalCase(element.LocalName);
                 string className = nsPrefix + localPascal + "Element";
-                writer.WriteLine($"                    case \"{element.LocalName}\": return new {className}(prefix);");
+                writer.WriteLine($"                {{ \"{element.LocalName}\", prefix => new {className}(prefix) }},");
             }
-            writer.WriteLine("                }");
-            writer.WriteLine("            }");
+            writer.WriteLine("            };");
+            writer.WriteLine($"            temp[\"{group.Key}\"] = nsMap_{nsKey};");
+            writer.WriteLine();
         }
 
+        writer.WriteLine("#if NET8_0_OR_GREATER");
+        writer.WriteLine("            GeneratedFactories = temp.ToFrozenDictionary(");
+        writer.WriteLine("                pair => pair.Key,");
+        writer.WriteLine("                pair => pair.Value.ToFrozenDictionary(StringComparer.Ordinal),");
+        writer.WriteLine("                StringComparer.Ordinal");
+        writer.WriteLine("            );");
+        writer.WriteLine("#else");
+        writer.WriteLine("            GeneratedFactories = temp;");
+        writer.WriteLine("#endif");
+        writer.WriteLine("        }");
+        writer.WriteLine();
+        writer.WriteLine("        public static OdfNode? CreateGeneratedElement(string localName, string namespaceUri, string? prefix)");
+        writer.WriteLine("        {");
+        writer.WriteLine("            if (GeneratedFactories.TryGetValue(namespaceUri, out var nsFactories) &&");
+        writer.WriteLine("                nsFactories.TryGetValue(localName, out var factory))");
+        writer.WriteLine("            {");
+        writer.WriteLine("                return factory(prefix);");
+        writer.WriteLine("            }");
         writer.WriteLine("            return null;");
         writer.WriteLine("        }");
         writer.WriteLine("    }");
-        writer.WriteLine("}");
     }
 
     private static Dictionary<(string, string), List<AttributePropertyMetadata>> ResolveAllElementAttributes(SchemaMetadata metadata)

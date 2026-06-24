@@ -4,17 +4,20 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Styles;
+using Sylvan.Data.Csv;
 
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
 /// 提供以資料流方式寫入 ODS 試算表文件的功能，以支援高效能、低記憶體耗用的寫入作業。
 /// </summary>
-public partial class OdsStreamWriter : IDisposable
+public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
 {
     #region Stream Writing
     private readonly Stream _outputStream;
@@ -179,6 +182,16 @@ public partial class OdsStreamWriter : IDisposable
     /// <param name="styleName">樣式名稱</param>
     public void WriteCell(string value, string? styleName = null)
     {
+        WriteCell(value.AsSpan(), styleName);
+    }
+
+    /// <summary>
+    /// 寫入字串型態的儲存格。
+    /// </summary>
+    /// <param name="value">儲存格的值</param>
+    /// <param name="styleName">樣式名稱</param>
+    public void WriteCell(ReadOnlySpan<char> value, string? styleName = null)
+    {
         if (_disposed)
             return;
         _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
@@ -188,10 +201,21 @@ public partial class OdsStreamWriter : IDisposable
             _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
         }
         _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        _writer.WriteString(value);
+        if (!value.IsEmpty)
+        {
+            _writer.WriteString(ToStringValue(value));
+        }
         _writer.WriteEndElement(); // text:p
         _writer.WriteEndElement(); // table:cell
     }
+
+    /// <summary>
+    /// 寫入字串型態的儲存格。
+    /// </summary>
+    /// <param name="value">儲存格的值</param>
+    /// <param name="styleName">樣式名稱</param>
+    public void WriteCell(ReadOnlyMemory<char> value, string? styleName = null) =>
+        WriteCell(value.Span, styleName);
 
     /// <summary>
     /// 寫入數值型態的儲存格。
@@ -275,6 +299,78 @@ public partial class OdsStreamWriter : IDisposable
         _writer.WriteEndElement(); // table:cell
     }
 
+    private static string ToStringValue(ReadOnlySpan<char> value)
+    {
+#if NETSTANDARD2_0
+        return new string(value.ToArray());
+#else
+        return new string(value);
+#endif
+    }
+
+    /// <summary>
+    /// 將 CSV 資料流以低記憶體方式逐列寫入目前工作表。
+    /// </summary>
+    /// <param name="csvStream">CSV 來源資料流</param>
+    /// <param name="firstRowAsHeader">是否將第一列視為欄位標題而略過資料寫入</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步寫入作業的工作</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="csvStream"/> 為 null 時擲出</exception>
+    /// <exception cref="InvalidOperationException">當目前尚未開始任何工作表時擲出</exception>
+    public async Task WriteCsvStreamAsync(
+        Stream csvStream,
+        bool firstRowAsHeader = false,
+        CancellationToken cancellationToken = default)
+    {
+        if (csvStream is null)
+        {
+            throw new ArgumentNullException(nameof(csvStream));
+        }
+
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(OdsStreamWriter));
+        }
+
+        if (!_isSheetStarted)
+        {
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdsStreamWriter_SheetNotStarted"));
+        }
+
+        using var textReader = new StreamReader(
+            csvStream,
+            Encoding.UTF8,
+            detectEncodingFromByteOrderMarks: true,
+            bufferSize: 4096,
+            leaveOpen: true);
+        using CsvDataReader csv = CsvDataReader.Create(
+            textReader,
+            new CsvDataReaderOptions
+            {
+                HasHeaders = false
+            });
+
+        bool skipHeader = firstRowAsHeader;
+        while (await csv.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (skipHeader)
+            {
+                skipHeader = false;
+                continue;
+            }
+
+            WriteStartRow();
+            for (int i = 0; i < csv.FieldCount; i++)
+            {
+                string value = csv.IsDBNull(i) ? string.Empty : csv.GetString(i);
+                WriteCell(value);
+            }
+            WriteEndRow();
+        }
+    }
+
     /// <summary>
     /// 結束目前資料列的寫入。
     /// </summary>
@@ -311,6 +407,16 @@ public partial class OdsStreamWriter : IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// 非同步釋放 <see cref="OdsStreamWriter"/> 類別所使用的資源。
+    /// </summary>
+    /// <returns>代表非同步處置作業的 <see cref="ValueTask"/></returns>
+    public ValueTask DisposeAsync()
+    {
+        Dispose();
+        return default;
     }
 
     /// <summary>

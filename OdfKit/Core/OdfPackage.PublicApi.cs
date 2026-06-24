@@ -70,8 +70,8 @@ public sealed partial class OdfPackage
     /// </summary>
     /// <param name="name">專案的相對路徑名稱</param>
     /// <param name="content">要寫入的位元組內容</param>
-    /// <param name="mediaType">專案的 MIME 媒體類型</param>
-    public void WriteEntry(string name, byte[] content, string mediaType)
+    /// <param name="mediaType">專案的 MIME 媒體類型；未指定時自動依路徑判定</param>
+    public void WriteEntry(string name, byte[] content, string? mediaType = null)
         => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, content, mediaType);
 
     /// <summary>
@@ -79,8 +79,8 @@ public sealed partial class OdfPackage
     /// </summary>
     /// <param name="name">專案的相對路徑名稱</param>
     /// <param name="contentStream">要寫入的內容來源資料流</param>
-    /// <param name="mediaType">專案的 MIME 媒體類型</param>
-    public void WriteEntry(string name, Stream contentStream, string mediaType)
+    /// <param name="mediaType">專案的 MIME 媒體類型；未指定時自動依路徑判定</param>
+    public void WriteEntry(string name, Stream contentStream, string? mediaType = null)
         => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, contentStream, mediaType);
 
     /// <summary>

@@ -61,10 +61,9 @@ internal static class OdfPackageZipLoader
             }
 
             var pkgEntry = new OdfPackageEntry(name, entryBytes);
-            if (entry.CompressedLength == entry.Length && entry.Length > 0)
-                pkgEntry.IsCompressed = false;
-
-            pkgEntry.WasStoredInZip = TryDetectStoredCompression(entry);
+            bool wasStored = TryDetectStoredCompression(entry);
+            pkgEntry.WasStoredInZip = wasStored;
+            pkgEntry.IsCompressed = !wasStored;
             if (ctx.Entries.ContainsKey(name))
                 ctx.DuplicateEntryNames.Add(name);
 
@@ -124,10 +123,9 @@ internal static class OdfPackageZipLoader
             }
 
             var pkgEntry = new OdfPackageEntry(name, entryBytes);
-            if (entry.CompressedLength == entry.Length && entry.Length > 0)
-                pkgEntry.IsCompressed = false;
-
-            pkgEntry.WasStoredInZip = TryDetectStoredCompression(entry);
+            bool wasStored = TryDetectStoredCompression(entry);
+            pkgEntry.WasStoredInZip = wasStored;
+            pkgEntry.IsCompressed = !wasStored;
             if (ctx.Entries.ContainsKey(name))
                 ctx.DuplicateEntryNames.Add(name);
 

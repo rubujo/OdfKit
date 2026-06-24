@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Xml.Linq;
+using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit.DOM;
 
@@ -37,15 +39,19 @@ public partial class OdfNode
     /// <param name="prefix">選用的命名空間前綴</param>
     public void SetAttribute(string localName, string namespaceUri, string value, string? prefix = null)
     {
+#if DEBUG
+        ValidateAttributeWrite(localName, namespaceUri, value);
+#endif
         var key = new OdfAttributeName(localName, namespaceUri);
         string? existingPrefix = GetAttributePrefix(key);
+        string? resolvedPrefix = ResolveAttributePrefix(namespaceUri, prefix);
         if (!Attributes.TryGetValue(key, out string? existing) || existing != value)
         {
             IsModified = true;
             Attributes[key] = value;
         }
 
-        if (!string.IsNullOrEmpty(prefix) && prefix is string attributePrefix)
+        if (!string.IsNullOrEmpty(resolvedPrefix) && resolvedPrefix is string attributePrefix)
         {
             if (!string.Equals(existingPrefix, attributePrefix, StringComparison.Ordinal))
             {
@@ -105,6 +111,46 @@ public partial class OdfNode
     /// <param name="localName">屬性的局部名稱</param>
     /// <param name="namespaceUri">屬性的命名空間</param>
     public void RemoveAttribute(string localName, XNamespace namespaceUri) => RemoveAttribute(localName, namespaceUri.NamespaceName);
+
+    private static string? ResolveAttributePrefix(string namespaceUri, string? requestedPrefix)
+    {
+        if (!string.IsNullOrEmpty(requestedPrefix))
+        {
+            return requestedPrefix;
+        }
+
+        string defaultPrefix = OdfNamespaces.GetPrefix(namespaceUri);
+        return string.IsNullOrEmpty(defaultPrefix) ? null : defaultPrefix;
+    }
+
+#if DEBUG
+    private void ValidateAttributeWrite(string localName, string namespaceUri, string value)
+    {
+        if (string.IsNullOrEmpty(localName))
+        {
+            OdfKitDiagnostics.Warn("OdfNode.SetAttribute 收到空白屬性名稱。");
+            return;
+        }
+
+        if (value is null)
+        {
+            OdfKitDiagnostics.Warn($"OdfNode.SetAttribute 收到 null 屬性值：{localName}。");
+            return;
+        }
+
+        string knownPrefix = OdfNamespaces.GetPrefix(namespaceUri);
+        if (!string.IsNullOrEmpty(knownPrefix))
+        {
+            var definition = OdfSchemaRegistry
+                .GetSchema(GetDocumentVersion())
+                .FindAttribute(namespaceUri, localName);
+            if (definition is null)
+            {
+                OdfKitDiagnostics.Warn($"屬性 '{knownPrefix}:{localName}' 未定義於 ODF schema。");
+            }
+        }
+    }
+#endif
 
 
     #endregion

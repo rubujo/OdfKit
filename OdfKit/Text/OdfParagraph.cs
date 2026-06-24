@@ -39,6 +39,14 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// 在此段落內搜尋指定文字並替換為新文字，同時保留未命中區段的原始樣式結構。
+    /// </summary>
+    /// <param name="search">要搜尋的關鍵字</param>
+    /// <param name="replacement">要替換的新文字</param>
+    public void ReplaceText(string search, string replacement)
+        => TextDocumentSearchReplaceEngine.ReplaceText(this, search, replacement);
+
+    /// <summary>
     /// 取得或設定段落的樣式名稱。
     /// </summary>
     public string? StyleName

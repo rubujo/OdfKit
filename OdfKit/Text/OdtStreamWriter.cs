@@ -12,7 +12,7 @@ namespace OdfKit.Text;
 /// <summary>
 /// 提供以資料流方式逐段落寫入 ODT 文字文件的功能，適用於大型文件生成。
 /// </summary>
-public sealed class OdtStreamWriter : IDisposable
+public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
 {
     private const string MimeType = "application/vnd.oasis.opendocument.text";
     private const string PageBreakStyleName = "OdtStreamPageBreak";
@@ -82,8 +82,27 @@ public sealed class OdtStreamWriter : IDisposable
     public void AddParagraph(string text, string? styleName = null)
     {
         EnsureNotDisposed();
+        WriteTextElement("p", text.AsSpan(), styleName, headingLevel: null);
+    }
+
+    /// <summary>
+    /// 加入一個段落。
+    /// </summary>
+    /// <param name="text">段落文字</param>
+    /// <param name="styleName">段落樣式名稱</param>
+    public void AddParagraph(ReadOnlySpan<char> text, string? styleName = null)
+    {
+        EnsureNotDisposed();
         WriteTextElement("p", text, styleName, headingLevel: null);
     }
+
+    /// <summary>
+    /// 加入一個段落。
+    /// </summary>
+    /// <param name="text">段落文字</param>
+    /// <param name="styleName">段落樣式名稱</param>
+    public void AddParagraph(ReadOnlyMemory<char> text, string? styleName = null) =>
+        AddParagraph(text.Span, styleName);
 
     /// <summary>
     /// 加入標題段落。
@@ -99,8 +118,34 @@ public sealed class OdtStreamWriter : IDisposable
             throw new ArgumentOutOfRangeException(nameof(level), OdfLocalizer.GetMessage("Err_OdtStreamWriter_TitleLevelBetween1"));
         }
 
+        WriteTextElement("h", text.AsSpan(), styleName: null, headingLevel: level);
+    }
+
+    /// <summary>
+    /// 加入標題段落。
+    /// </summary>
+    /// <param name="text">標題文字</param>
+    /// <param name="level">標題層級，範圍為 1 到 6</param>
+    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="level"/> 不在 1 到 6 之間時擲出</exception>
+    public void AddHeading(ReadOnlySpan<char> text, int level = 1)
+    {
+        EnsureNotDisposed();
+        if (level is < 1 or > 6)
+        {
+            throw new ArgumentOutOfRangeException(nameof(level), OdfLocalizer.GetMessage("Err_OdtStreamWriter_TitleLevelBetween1"));
+        }
+
         WriteTextElement("h", text, styleName: null, headingLevel: level);
     }
+
+    /// <summary>
+    /// 加入標題段落。
+    /// </summary>
+    /// <param name="text">標題文字</param>
+    /// <param name="level">標題層級，範圍為 1 到 6</param>
+    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="level"/> 不在 1 到 6 之間時擲出</exception>
+    public void AddHeading(ReadOnlyMemory<char> text, int level = 1) =>
+        AddHeading(text.Span, level);
 
     /// <summary>
     /// 開始清單。
@@ -138,9 +183,34 @@ public sealed class OdtStreamWriter : IDisposable
         }
 
         _writer.WriteStartElement("text", "list-item", OdfNamespaces.Text);
+        WriteTextElement("p", text.AsSpan(), styleName: null, headingLevel: null);
+        _writer.WriteEndElement();
+    }
+
+    /// <summary>
+    /// 加入清單專案。
+    /// </summary>
+    /// <param name="text">清單專案文字</param>
+    /// <exception cref="InvalidOperationException">當尚未呼叫 <see cref="BeginList(string?)"/> 時擲出</exception>
+    public void AddListItem(ReadOnlySpan<char> text)
+    {
+        EnsureNotDisposed();
+        if (!_isListStarted)
+        {
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdtStreamWriter_AddlistitemCalledBetweenBeginlist"));
+        }
+
+        _writer.WriteStartElement("text", "list-item", OdfNamespaces.Text);
         WriteTextElement("p", text, styleName: null, headingLevel: null);
         _writer.WriteEndElement();
     }
+
+    /// <summary>
+    /// 加入清單專案。
+    /// </summary>
+    /// <param name="text">清單專案文字</param>
+    /// <exception cref="InvalidOperationException">當尚未呼叫 <see cref="BeginList(string?)"/> 時擲出</exception>
+    public void AddListItem(ReadOnlyMemory<char> text) => AddListItem(text.Span);
 
     /// <summary>
     /// 結束目前清單。
@@ -191,6 +261,42 @@ public sealed class OdtStreamWriter : IDisposable
         _contentEntryStream.Dispose();
         _zip.Dispose();
         _ownedStream?.Dispose();
+    }
+
+    /// <summary>
+    /// 非同步釋放資源並最終化文件 ZIP 結構。
+    /// </summary>
+    /// <returns>代表非同步處置作業的 <see cref="ValueTask"/></returns>
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        if (_isListStarted)
+        {
+            _writer.WriteEndElement();
+            _isListStarted = false;
+        }
+
+        _writer.WriteEndElement();
+        _writer.WriteEndElement();
+        _writer.WriteEndElement();
+        _writer.WriteEndDocument();
+        _writer.Dispose();
+        _contentEntryStream.Dispose();
+        _zip.Dispose();
+
+        if (_ownedStream is IAsyncDisposable asyncDisposable)
+        {
+            await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+        }
+        else
+        {
+            _ownedStream?.Dispose();
+        }
     }
 
     private static FileStream CreateFileStream(string path)
@@ -303,7 +409,7 @@ public sealed class OdtStreamWriter : IDisposable
         _writer.WriteStartElement("office", "text", OdfNamespaces.Office);
     }
 
-    private void WriteTextElement(string localName, string text, string? styleName, int? headingLevel)
+    private void WriteTextElement(string localName, ReadOnlySpan<char> text, string? styleName, int? headingLevel)
     {
         _writer.WriteStartElement("text", localName, OdfNamespaces.Text);
         if (!string.IsNullOrWhiteSpace(styleName))
@@ -316,12 +422,21 @@ public sealed class OdtStreamWriter : IDisposable
             _writer.WriteAttributeString("text", "outline-level", OdfNamespaces.Text, headingLevel.Value.ToString(CultureInfo.InvariantCulture));
         }
 
-        if (!string.IsNullOrEmpty(text))
+        if (!text.IsEmpty)
         {
-            _writer.WriteString(text);
+            _writer.WriteString(ToStringValue(text));
         }
 
         _writer.WriteEndElement();
+    }
+
+    private static string ToStringValue(ReadOnlySpan<char> value)
+    {
+#if NETSTANDARD2_0
+        return new string(value.ToArray());
+#else
+        return new string(value);
+#endif
     }
 
     private void EnsureNotDisposed()

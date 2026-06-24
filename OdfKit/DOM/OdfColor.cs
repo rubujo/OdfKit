@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 using OdfKit.Compliance;
 namespace OdfKit.DOM;
@@ -54,6 +55,24 @@ public readonly struct OdfColor : IEquatable<OdfColor>
     /// <param name="blue">藍色通道</param>
     /// <returns>對應的色彩值</returns>
     public static OdfColor FromRgb(byte red, byte green, byte blue) => new($"#{red:x2}{green:x2}{blue:x2}");
+
+    /// <summary>
+    /// 將 HTML 色碼字串隱式轉換為 <see cref="OdfColor"/>。
+    /// </summary>
+    /// <param name="value">色彩字串，例如 <c>#ffcc00</c></param>
+    public static implicit operator OdfColor(string value) => new(value);
+
+    /// <summary>
+    /// 將 <see cref="Color"/> 隱式轉換為 <see cref="OdfColor"/>。
+    /// </summary>
+    /// <param name="color">來源色彩值</param>
+    public static implicit operator OdfColor(Color color) => FromRgb(color.R, color.G, color.B);
+
+    /// <summary>
+    /// 將 <see cref="OdfColor"/> 隱式轉換為色彩字串。
+    /// </summary>
+    /// <param name="color">來源色彩值</param>
+    public static implicit operator string(OdfColor color) => color.ToString();
 
     /// <summary>
     /// 傳回原始色彩字串。

@@ -70,6 +70,25 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
     }
 
     /// <summary>
+    /// 取得第一個符合指定 typed DOM 型別的直接子元素。
+    /// </summary>
+    /// <typeparam name="TElement">要尋找的 typed DOM 元素型別</typeparam>
+    /// <returns>第一個符合型別的直接子元素；找不到時為 <see langword="null"/></returns>
+    public TElement? FirstChildElement<TElement>()
+        where TElement : OdfElement
+    {
+        foreach (OdfNode child in Children)
+        {
+            if (child is TElement typedChild)
+            {
+                return typedChild;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// 列舉此元素的所有後代元素，並只傳回指定的 typed DOM 元素型別。
     /// </summary>
     /// <typeparam name="TElement">要篩選的 typed DOM 元素型別</typeparam>
@@ -84,6 +103,25 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
                 yield return typedDescendant;
             }
         }
+    }
+
+    /// <summary>
+    /// 取得第一個符合指定 typed DOM 型別的後代元素。
+    /// </summary>
+    /// <typeparam name="TElement">要尋找的 typed DOM 元素型別</typeparam>
+    /// <returns>第一個符合型別的後代元素；找不到時為 <see langword="null"/></returns>
+    public TElement? FirstDescendantElement<TElement>()
+        where TElement : OdfElement
+    {
+        foreach (OdfNode descendant in Descendants())
+        {
+            if (descendant is TElement typedDescendant)
+            {
+                return typedDescendant;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

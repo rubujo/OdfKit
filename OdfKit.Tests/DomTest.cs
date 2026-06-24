@@ -4,6 +4,7 @@ using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Linq;
 using Xunit;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -124,6 +125,39 @@ namespace OdfKit.Tests
             Assert.Equal("p", imported.LocalName);
             Assert.Equal("Standard", imported.GetAttribute("style-name", OdfNamespaces.Text));
             Assert.Equal("Clone testing", imported.TextContent);
+        }
+
+        [Fact]
+        public void TestDocumentAdoptNodeFromSamePackage()
+        {
+            using var document = TextDocument.Create();
+            OdfParagraph paragraph = document.AddParagraph("採納測試");
+
+            OdfNode adopted = document.AdoptNode(paragraph.Node);
+            document.BodyTextRoot.AppendChild(adopted);
+
+            OdfNode[] paragraphs = document.BodyTextRoot.Descendants()
+                .Where(node => node.NodeType == OdfNodeType.Element && node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text)
+                .ToArray();
+            Assert.Equal(2, paragraphs.Length);
+            Assert.Equal("採納測試", paragraphs.Last().TextContent);
+        }
+
+        [Fact]
+        public void TestDocumentAdoptNodeFromAnotherDocument()
+        {
+            using var source = TextDocument.Create();
+            OdfParagraph sourceParagraph = source.AddParagraph("來源段落");
+
+            using var target = TextDocument.Create();
+            OdfNode adopted = target.AdoptNode(source, sourceParagraph.Node);
+            target.BodyTextRoot.AppendChild(adopted);
+
+            OdfNode[] paragraphs = target.BodyTextRoot.Descendants()
+                .Where(node => node.NodeType == OdfNodeType.Element && node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text)
+                .ToArray();
+            Assert.Single(paragraphs);
+            Assert.Equal("來源段落", paragraphs[0].TextContent);
         }
 
         [Fact]

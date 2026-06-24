@@ -1,4 +1,4 @@
-using OdfKit.Styles;
+﻿using OdfKit.Styles;
 
 namespace OdfKit.Image;
 

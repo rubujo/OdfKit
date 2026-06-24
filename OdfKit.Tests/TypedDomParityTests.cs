@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text;
 using System;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -62,7 +63,9 @@ public class TypedDomParityTests
         animation.Formula = "width * 2";
 
         Assert.Same(body, document.ChildElements<OfficeBodyElement>().Single());
+        Assert.Same(body, document.FirstChildElement<OfficeBodyElement>());
         Assert.Same(paragraph, document.DescendantElements<TextPElement>().Single());
+        Assert.Same(paragraph, document.FirstDescendantElement<TextPElement>());
         Assert.Equal([prefix, emphasis, suffix], paragraph.ChildElements<TextSpanElement>().ToArray());
         Assert.Same(animation, paragraph.ChildElements<AnimationAnimateElement>().Single());
         Assert.Equal("Hello typed DOM!", paragraph.TextContent);
@@ -74,6 +77,7 @@ public class TypedDomParityTests
         OdfNode parsed = OdfXmlReader.Parse(stream);
         OfficeDocumentContentElement parsedDocument = Assert.IsType<OfficeDocumentContentElement>(parsed);
         TextPElement parsedParagraph = parsedDocument.DescendantElements<TextPElement>().Single();
+        Assert.Same(parsedParagraph, parsedDocument.FirstDescendantElement<TextPElement>());
         TextSpanElement parsedEmphasis = parsedParagraph.ChildElements<TextSpanElement>().ElementAt(1);
         AnimationAnimateElement parsedAnimation = parsedParagraph.ChildElements<AnimationAnimateElement>().Single();
 
@@ -335,6 +339,24 @@ public class TypedDomParityTests
         Assert.Equal(OdfPresentationSpeed.Fast, parsedPage.GetPresentationSpeedAttributeValue("transition-speed", OdfNamespaces.Presentation));
         Assert.Equal(OdfLength.FromCentimeters(1), parsedTitleFrame.GetLengthAttributeValue("x", OdfNamespaces.Svg));
         Assert.Equal(OdfLength.FromCentimeters(1), parsedPage.DrawRectChildElements.Single().GetLengthAttributeValue("height", OdfNamespaces.Svg));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfPresentationTransitionType"/> 可保留自訂 token 並完成 round-trip。
+    /// </summary>
+    [Fact]
+    public void PresentationTransitionTypeSupportsCustomTokenRoundTrip()
+    {
+        DrawPageElement page = new("draw");
+        OdfPresentationTransitionType custom = OdfPresentationTransitionType.Custom("vendor-special");
+        page.SetPresentationTransitionTypeAttributeValue(
+            "transition-type",
+            OdfNamespaces.Presentation,
+            custom,
+            "presentation");
+
+        Assert.Equal("vendor-special", page.GetAttribute("transition-type", OdfNamespaces.Presentation));
+        Assert.Equal("vendor-special", custom.Value);
     }
 
     /// <summary>
@@ -802,6 +824,63 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="TableTableElement"/> 的二維與 Excel 位址索引器會自動補齊列與儲存格。
+    /// </summary>
+    [Fact]
+    public void TableTableElementIndexersAutoMaterializeRowsAndCells()
+    {
+        TableTableElement table = new("table");
+
+        TableTableCellElement byIndex = table[2, 3];
+        TableTableCellElement byAddress = table["D3"];
+
+        Assert.Same(byIndex, byAddress);
+        Assert.Equal(3, table.TableTableRowChildElements.Count());
+        Assert.Equal(4, table.TableTableRowChildElements.Last().TableTableCellChildElements.Count());
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TableTableElement.ImportData(DataTable)"/> 會把不同型別資料映射成 ODF 儲存格值。
+    /// </summary>
+    [Fact]
+    public void TableTableElementImportDataFromDataTableMapsTypedValues()
+    {
+        DataTable dataTable = new();
+        dataTable.Columns.Add("Name", typeof(string));
+        dataTable.Columns.Add("Qty", typeof(int));
+        dataTable.Columns.Add("Active", typeof(bool));
+        dataTable.Columns.Add("UpdatedAt", typeof(DateTime));
+        dataTable.Rows.Add("Keyboard", 5, true, new DateTime(2026, 6, 24, 8, 0, 0, DateTimeKind.Utc));
+
+        TableTableElement table = new("table");
+        table.ImportData(dataTable);
+
+        Assert.Equal("Keyboard", table[0, 0].TextContent);
+        Assert.Equal("5", table[0, 1].TextContent);
+        Assert.Equal("TRUE", table[0, 2].TextContent);
+        Assert.Contains("2026-06-24T08:00:00", table[0, 3].TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TableTableElement.ImportData{T}(IEnumerable{T})"/> 可匯入實體集合。
+    /// </summary>
+    [Fact]
+    public void TableTableElementImportDataFromEnumerableWritesRows()
+    {
+        TableTableElement table = new("table");
+        table.ImportData(new[]
+        {
+            new ImportRow("Mouse", 12),
+            new ImportRow("Monitor", 3),
+        });
+
+        Assert.Equal("Mouse", table["A1"].TextContent);
+        Assert.Equal("12", table["B1"].TextContent);
+        Assert.Equal("Monitor", table["A2"].TextContent);
+        Assert.Equal("3", table["B2"].TextContent);
+    }
+
+    /// <summary>
     /// 驗證 <c>office:spreadsheet</c> content model facade 可建立工作表並 round-trip。
     /// </summary>
     [Fact]
@@ -828,6 +907,8 @@ public class TypedDomParityTests
         Assert.Equal("A1", parsed.TableTableChildElements.Single().TableTableRowChildElements.Single().TableTableCellChildElements.Single().TextContent);
     }
 
+    private sealed record ImportRow(string Name, int Qty);
+
     /// <summary>
     /// 驗證 generated DOM wrapper 的 class、factory case 與屬性數量沒有意外退化。
     /// </summary>
@@ -835,11 +916,16 @@ public class TypedDomParityTests
     public void GeneratedDomWrapperCoverageDoesNotRegressBelowParityFloor()
     {
         string repoRoot = FindRepositoryRoot();
-        string generatedPath = Path.Combine(repoRoot, "OdfKit", "DOM", "Generated", "GeneratedDomWrappers.g.cs");
-        string generated = File.ReadAllText(generatedPath);
+        string generatedDirectory = Path.Combine(repoRoot, "OdfKit", "DOM", "Generated");
+        string[] generatedFiles = Directory.GetFiles(generatedDirectory, "*.g.cs")
+            .OrderBy(path => path, StringComparer.Ordinal)
+            .ToArray();
+        string generated = string.Join(
+            Environment.NewLine,
+            generatedFiles.Select(path => File.ReadAllText(path)));
 
         int classCount = Regex.Matches(generated, @"public partial class \w+Element").Count;
-        int factoryCaseCount = Regex.Matches(generated, "case \".*\": return new .*Element\\(prefix\\);").Count;
+        int factoryCaseCount = Regex.Matches(generated, @"\{ "".*"",\s*prefix => new \w+Element\(prefix\) \}").Count;
         int childCollectionPropertyCount = Regex.Matches(generated, @"public IEnumerable<\w+Element> \w+ChildElements").Count;
         int stringPropertyCount = Regex.Matches(generated, @"public string\? \w+").Count;
         int intPropertyCount = Regex.Matches(generated, @"public int\? \w+").Count;
@@ -2298,6 +2384,37 @@ public class TypedDomParityTests
             .DescendantElements<TextPElement>()
             .Single();
         Assert.Equal("preserved", parsedParagraph.GetAttribute("custom-flag", customNamespaceUri));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfNode.SetAttribute(string, string, string, string?)"/> 在未指定前綴時，
+    /// 會自動套用對應命名空間的標準前綴。
+    /// </summary>
+    [Fact]
+    public void OdfNodeSetAttributeWithoutPrefixAutoUsesStandardNamespacePrefix()
+    {
+        TextPElement paragraph = new("text");
+        paragraph.SetAttribute("style-name", OdfNamespaces.Text, "BodyStyle");
+
+        string? prefix = paragraph.GetAttributePrefix(new OdfAttributeName("style-name", OdfNamespaces.Text));
+        Assert.Equal("text", prefix);
+        Assert.Equal("BodyStyle", paragraph.GetAttribute("style-name", OdfNamespaces.Text));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfNode.SetAttribute(string, string, string, string?)"/> 在未知命名空間且未指定前綴時，
+    /// 不會強制寫入前綴。
+    /// </summary>
+    [Fact]
+    public void OdfNodeSetAttributeWithoutPrefixKeepsUnknownNamespacePrefixUnset()
+    {
+        const string customNamespaceUri = "urn:example:custom-namespace";
+        TextPElement paragraph = new("text");
+        paragraph.SetAttribute("custom-flag", customNamespaceUri, "1");
+
+        string? prefix = paragraph.GetAttributePrefix(new OdfAttributeName("custom-flag", customNamespaceUri));
+        Assert.Null(prefix);
+        Assert.Equal("1", paragraph.GetAttribute("custom-flag", customNamespaceUri));
     }
 
     private static string FindRepositoryRoot()

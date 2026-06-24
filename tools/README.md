@@ -58,6 +58,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack input.fodt out
 ```text
 Usage: OdfSchemaGenerator [--format json|csharp|csharp-provider|dom-wrappers]
                           [--output <file>]
+                          [--output-directory <directory>]
                           [--class-name <name>]
                           [--source-url <uri>]
                           [--source-date <date>]
