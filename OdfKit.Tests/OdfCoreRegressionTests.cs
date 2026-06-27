@@ -126,7 +126,7 @@ namespace OdfKit.Tests
             using var ms1 = new MemoryStream();
             using var ms2 = new MemoryStream();
 
-            // 1. Create source doc with some styles
+            // 1. 建立帶有來源樣式的文件
             using (var pkg1 = OdfPackage.Create(ms1, leaveOpen: true))
             {
                 var srcDoc = new TextDocument(pkg1);
@@ -134,6 +134,9 @@ namespace OdfKit.Tests
                 var styleNode = new OdfNode(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
                 styleNode.SetAttribute("name", OdfNamespaces.Style, "Standard");
                 styleNode.SetAttribute("family", OdfNamespaces.Style, "paragraph");
+                var textProperties = new OdfNode(OdfNodeType.Element, "text-properties", OdfNamespaces.Style, "style");
+                textProperties.SetAttribute("color", OdfNamespaces.Fo, "#FF0000", "fo");
+                styleNode.AppendChild(textProperties);
 
                 var stylesStyles = FindOrCreateChild(styles, "styles", OdfNamespaces.Office, "office");
                 stylesStyles.AppendChild(styleNode);
@@ -142,7 +145,7 @@ namespace OdfKit.Tests
 
             ms1.Position = 0;
 
-            // 2. Create dest doc
+            // 2. 建立帶有同名但語意不同樣式的目標文件
             using (var pkg2 = OdfPackage.Create(ms2, leaveOpen: true))
             {
                 var destDoc = new TextDocument(pkg2);
@@ -150,6 +153,9 @@ namespace OdfKit.Tests
                 var styleNode = new OdfNode(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
                 styleNode.SetAttribute("name", OdfNamespaces.Style, "Standard");
                 styleNode.SetAttribute("family", OdfNamespaces.Style, "paragraph");
+                var textProperties = new OdfNode(OdfNodeType.Element, "text-properties", OdfNamespaces.Style, "style");
+                textProperties.SetAttribute("color", OdfNamespaces.Fo, "#0000FF", "fo");
+                styleNode.AppendChild(textProperties);
 
                 var stylesStyles = FindOrCreateChild(styles, "styles", OdfNamespaces.Office, "office");
                 stylesStyles.AppendChild(styleNode);
@@ -166,10 +172,10 @@ namespace OdfKit.Tests
                 StyleConflictResolution = ConflictResolution.KeepSourceFormatting
             };
 
-            // Merge src into dest
+            // 將來源文件合併到目標文件
             dest.AppendDocument(src, options);
 
-            // Verify that conflicting Standard style was renamed to Standard_s1
+            // 驗證同名但語意不同的 Standard 樣式會重新命名為 Standard_s1
             var automaticStyles = FindOrCreateChild(dest.StylesDom, "styles", OdfNamespaces.Office, "office");
             bool foundRenamed = false;
             foreach (var child in automaticStyles.Children)

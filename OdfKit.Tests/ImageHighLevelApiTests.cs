@@ -307,7 +307,7 @@ public class ImageHighLevelApiTests
         int removedCount = image.RemoveImageFrames(["FrameA", "FrameB", "NotExist"]);
 
         Assert.Equal(2, removedCount);
-        Assert.Equal(1, image.GetImageFrames().Count);
+        Assert.Single(image.GetImageFrames());
     }
 
     /// <summary>

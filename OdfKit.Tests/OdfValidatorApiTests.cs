@@ -168,7 +168,9 @@ public class OdfValidatorApiTests
         using TextDocument doc = TextDocument.Create();
         doc.AddParagraph("非同步驗證測試");
 
-        OdfValidationReport report = await doc.ValidateAsync(OdfComplianceProfiles.OasisOdf14Extended);
+        OdfValidationReport report = await doc.ValidateAsync(
+            OdfComplianceProfiles.OasisOdf14Extended,
+            TestContext.Current.CancellationToken);
 
         Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
         Assert.Equal(OdfDocumentKind.Text, report.DocumentKind);

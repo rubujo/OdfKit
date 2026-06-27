@@ -132,7 +132,8 @@ public class SpreadsheetApiUsabilityTests
     {
         using var workbook = SpreadsheetDocument.Create();
         OdfTableSheet sheet = workbook.Worksheets.Add("Data");
-        await using OdfFormulaEvaluationChannel channel = workbook.BeginFormulaEvaluationChannel();
+        await using OdfFormulaEvaluationChannel channel = workbook.BeginFormulaEvaluationChannel(
+            cancellationToken: TestContext.Current.CancellationToken);
 
         sheet.Cells["A1"].CellValue = 10d;
         sheet.Cells["B1"].CellValue = 5d;

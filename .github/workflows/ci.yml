@@ -51,4 +51,30 @@ jobs:
       - name: Build & Run Tests
         shell: pwsh
         run: |
-          dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f ${{ matrix.framework }} --logger "console;verbosity=normal"
+          if ('${{ matrix.framework }}' -eq 'net8.0') {
+            Write-Host "net8.0 CI job 只驗證建置；完整測試由 net10.0 smoke 與專用 workflow 執行。"
+            dotnet build OdfKit.Tests/OdfKit.Tests.csproj -c Release -f ${{ matrix.framework }}
+            return
+          }
+
+          $ciTestClasses = @(
+            'ApiUsabilityTests',
+            'DocumentKindApiUsabilityTests',
+            'DocsAndCorpusContractTests',
+            'DrawingApiUsabilityTests',
+            'OdfBoundaryRegressionTests',
+            'OdfCoreRegressionTests',
+            'OdfPackageAutoMediaTypeTests',
+            'OdfPackageUnknownEntryTests',
+            'OdfSecurityBoundaryTests',
+            'PackageReadinessTests',
+            'PackageRoundTripTests',
+            'PresentationApiUsabilityTests',
+            'SecurityBoundaryTests',
+            'SpreadsheetApiUsabilityTests',
+            'TextApiUsabilityTests',
+            'VerticalSliceRoundTripTests'
+          )
+          $testFilter = ($ciTestClasses | ForEach-Object { "FullyQualifiedName~OdfKit.Tests.$_." }) -join '|'
+          Write-Host "CI 快速回歸測試 filter: $testFilter"
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f ${{ matrix.framework }} --filter $testFilter --logger "console;verbosity=normal"

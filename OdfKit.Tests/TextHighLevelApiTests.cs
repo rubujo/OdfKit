@@ -42,7 +42,8 @@ public class TextHighLevelApiTests
         await OdfStreamingMailMerge.ApplyTemplateAsync(
             template,
             output,
-            new Dictionary<string, object?> { ["Name"] = "Ada & Lin <QA>" });
+            new Dictionary<string, object?> { ["Name"] = "Ada & Lin <QA>" },
+            TestContext.Current.CancellationToken);
 
         string contentXml = ReadZipEntryText(output, "content.xml");
 
@@ -72,7 +73,8 @@ public class TextHighLevelApiTests
         await Assert.ThrowsAsync<XmlException>(() => OdfStreamingMailMerge.ApplyTemplateAsync(
             template,
             output,
-            new Dictionary<string, object?>()));
+            new Dictionary<string, object?>(),
+            TestContext.Current.CancellationToken));
     }
 
     /// <summary>

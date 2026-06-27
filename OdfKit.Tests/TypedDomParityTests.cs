@@ -867,7 +867,7 @@ public class TypedDomParityTests
         Assert.Equal("embed", primaryImage.GetAttribute("show", OdfNamespaces.XLink));
         Assert.Equal("onLoad", primaryImage.GetAttribute("actuate", OdfNamespaces.XLink));
         Assert.True(document.Package.HasEntry(primaryHref));
-        Assert.Single(document.Package.Manifest.Keys.Where(path => path.StartsWith("Pictures/", StringComparison.Ordinal)));
+        Assert.Single(document.Package.Manifest.Keys, path => path.StartsWith("Pictures/", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -1817,7 +1817,7 @@ public class TypedDomParityTests
         table.InsertRows(1, 2);
 
         Dictionary<(int Row, int Column), OdfCellData> insertedViews = ReadCellViews(table);
-        Assert.Empty(table.TableTableRowChildElements.Where(row => row.TableTableCellChildElements.Any()));
+        Assert.DoesNotContain(table.TableTableRowChildElements, row => row.TableTableCellChildElements.Any());
         Assert.Equal("Item 0", insertedViews[(0, 0)].Text);
         Assert.False(insertedViews.ContainsKey((1, 0)));
         Assert.False(insertedViews.ContainsKey((2, 0)));

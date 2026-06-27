@@ -595,7 +595,8 @@ public class SpreadsheetHighLevelApiTests
         sheet.InsertRows(0, 4);
 
         TableTableRowElement row = Assert.IsType<TableTableRowElement>(Assert.Single(
-            sheet.TableNode.Children.Where(child => child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)));
+            sheet.TableNode.Children,
+            child => child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table));
         Assert.Equal(4, row.NumberRowsRepeated);
     }
 
@@ -647,7 +648,7 @@ public class SpreadsheetHighLevelApiTests
         sheet.DeleteRows(1, 1);
 
         Dictionary<(int Row, int Column), OdfCellData> views = ReadCellViews(table);
-        Assert.Empty(table.TableTableRowChildElements.Where(row => row.TableTableCellChildElements.Any()));
+        Assert.DoesNotContain(table.TableTableRowChildElements, row => row.TableTableCellChildElements.Any());
         Assert.Equal("Item 1", views[(1, 0)].Text);
         Assert.Equal("Item 2", views[(2, 0)].Text);
         Assert.Equal("Item 0", views[(3, 0)].Text);

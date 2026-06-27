@@ -53,7 +53,7 @@ public class OptimizedRefactoringTests
     /// 驗證檔案路徑載入會以 MMF 定位核心 XML entries，並將多個獨立 entry 排入平行預讀。
     /// </summary>
     [Fact]
-    public void Test_OdfPackage_MmfPreload_QueuesCoreXmlEntriesForParallelRandomAccess()
+    public async Task Test_OdfPackage_MmfPreload_QueuesCoreXmlEntriesForParallelRandomAccess()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"odfkit_mmf_preload_{Guid.NewGuid():N}.ods");
         byte[] xml = Encoding.UTF8.GetBytes("<root><item>payload</item></root>");
@@ -88,7 +88,7 @@ public class OptimizedRefactoringTests
             Assert.NotNull(package.MmfEntries);
             Assert.NotNull(package.PreloadTask);
 
-            package.PreloadTask!.GetAwaiter().GetResult();
+            await package.PreloadTask!.WaitAsync(TestContext.Current.CancellationToken);
 
             Assert.Equal(4, OdfPackageZipLoader.LastMmfParallelPreloadEntryCountForTests);
             Assert.Equal(4, OdfPackageZipLoader.LastMmfParallelPreloadVisitedEntryCountForTests);
