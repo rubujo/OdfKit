@@ -60,6 +60,22 @@ sheet.Cells["A3"].Formula = "of:=SUM([.A1:.A2])";
 workbook.Save("calc.ods");
 ```
 
+## 搜尋與更新試算表公式
+
+```csharp
+using OdfKit.Spreadsheet;
+
+using SpreadsheetDocument workbook = SpreadsheetDocument.Load("calc.ods");
+foreach (OdfFormulaCellInfo formulaCell in workbook.FindFormulaCells(
+    cell => cell.Formula.Contains("SUM", StringComparison.Ordinal)))
+{
+    Console.WriteLine($"{formulaCell.ExcelAddress}: {formulaCell.Formula}");
+}
+
+workbook.ReplaceFormulaText("SUM", "AVERAGE");
+workbook.Save("calc-updated.ods");
+```
+
 ## 建立 ODP（Fluent Builder）
 
 ```csharp
@@ -266,6 +282,10 @@ document.Save("vendor-file-copy.odt");
 此路徑適合在只需要讀取、保存或做有限修改時使用。未知 XML 與未知 package entries 的保真由 round-trip 測試覆蓋。
 
 ## 串流寫入大型 ODS
+
+以下範例使用嚴格順序寫入模式：每張工作表以 `WriteStartSheet` 開始、
+以 `WriteEndSheet` 結束後再寫下一張，適合低記憶體輸出。若需要在多張工作表之間
+交錯寫入，`SwitchToSheet` 會使用暫存緩衝，便利性較高但不屬於純串流模式。
 
 ```csharp
 using OdfKit.Spreadsheet;

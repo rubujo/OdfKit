@@ -258,7 +258,11 @@ static void DemoSpreadsheetDocument(string outputDir)
     workbook.AutoCalculate = true;
     workbook.LinkUpdateMode = 1;
 
-
+    // 10. 搜尋公式儲存格，示範公式編輯輔助 API 可回報工作表與位址
+    foreach (OdfFormulaCellInfo formulaCell in workbook.GetFormulaCells())
+    {
+        Console.WriteLine($"   公式儲存格： {formulaCell.ExcelAddress} = {formulaCell.Formula} ");
+    }
 
     // 6. 設定第二個工作表示範
     OdfTableSheet metaSheet = workbook.Worksheets.Add("說明頁面");
@@ -380,7 +384,7 @@ static void DemoProfilesAndLocalization(string presentationPath)
 }
 
 /// <summary>
-/// 示範高效能低記憶體的 OdsStreamWriter API，適用於產生大數據報表以避免 OOM 崩潰。
+/// 示範高效能低記憶體的 OdsStreamWriter 順序寫入 API，適用於產生大數據報表以避免 OOM 崩潰。
 /// </summary>
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoOdsStreamWriter(string outputDir)
@@ -401,7 +405,8 @@ static void DemoOdsStreamWriter(string outputDir)
         fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
     }
 
-    // 初始化串流寫入器，此模式記憶體佔用小於 1 MB
+    // 初始化串流寫入器；順序使用 WriteStartSheet/WriteEndSheet 時，此模式記憶體佔用小於 1 MB。
+    // 若改用 SwitchToSheet 交錯寫入多張工作表，會啟用工作表暫存緩衝，不再是純串流模式。
     using (fileStream)
     using (var writer = new OdsStreamWriter(fileStream))
     {

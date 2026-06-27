@@ -19,6 +19,8 @@ namespace OdfKit.Core;
 /// </summary>
 internal static class OdfPackageArchiveWriter
 {
+    private static int _lastFastPathCancellationCheckCount;
+
     /// <summary>
     /// 將封裝專案寫入目標串流（ZIP 或 Flat XML）。
     /// </summary>
@@ -55,16 +57,10 @@ internal static class OdfPackageArchiveWriter
             if (ctx.SaveOptions.Deterministic)
                 zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-            ReadOnlySpan<byte> bytes = mimeEntry.GetBytesSpan();
             using (Stream entryStream = zipEntry.Open())
             {
-#if NETSTANDARD2_0
-                byte[] arr = mimeEntry.GetCachedBytes() ?? Array.Empty<byte>();
+                byte[] arr = GetFallbackEntryBytes(mimeEntry);
                 WriteEntryContentWithCrc32(entryStream, arr);
-#else
-                byte[] arr = bytes.ToArray();
-                WriteEntryContentWithCrc32(entryStream, arr);
-#endif
             }
         }
 
@@ -81,16 +77,10 @@ internal static class OdfPackageArchiveWriter
             if (ctx.SaveOptions.Deterministic)
                 zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-            ReadOnlySpan<byte> bytes = kvp.Value.GetBytesSpan();
             using (Stream entryStream = zipEntry.Open())
             {
-#if NETSTANDARD2_0
-                byte[] arr = kvp.Value.GetCachedBytes() ?? Array.Empty<byte>();
+                byte[] arr = GetFallbackEntryBytes(kvp.Value);
                 WriteEntryContentWithCrc32(entryStream, arr);
-#else
-                byte[] arr = bytes.ToArray();
-                WriteEntryContentWithCrc32(entryStream, arr);
-#endif
             }
         }
     }
@@ -98,6 +88,20 @@ internal static class OdfPackageArchiveWriter
     internal static int LastParallelPreparedEntryCount { get; set; }
 
     internal static bool LastParallelCompressionUsedPooledBuffer { get; set; }
+
+    internal static bool LastRawCopyArchiveUsed { get; set; }
+
+    internal static bool LastAsyncFastPathArchiveUsed { get; set; }
+
+    internal static int LastFallbackCrcWriteCount { get; set; }
+
+    internal static int LastFallbackEntryByteCloneCount { get; set; }
+
+    internal static int LastFastPathCancellationCheckCount
+    {
+        get => _lastFastPathCancellationCheckCount;
+        set => _lastFastPathCancellationCheckCount = value;
+    }
 
     /// <summary>
     /// 將封裝專案非同步寫入目標串流（ZIP 或 Flat XML），支援協作式取消。
@@ -112,6 +116,24 @@ internal static class OdfPackageArchiveWriter
         if (ctx.IsFlatXml)
         {
             await WriteFlatXmlToStreamAsync(ctx, targetStream, cancellationToken).ConfigureAwait(false);
+            return;
+        }
+
+        LastAsyncFastPathArchiveUsed = false;
+        LastFastPathCancellationCheckCount = 0;
+        CheckCancellation(cancellationToken);
+        if (TryWriteRawCopyArchive(ctx, targetStream, cancellationToken))
+        {
+            LastAsyncFastPathArchiveUsed = true;
+            CheckCancellation(cancellationToken);
+            return;
+        }
+
+        CheckCancellation(cancellationToken);
+        if (TryWriteParallelPreparedArchive(ctx, targetStream, cancellationToken))
+        {
+            LastAsyncFastPathArchiveUsed = true;
+            CheckCancellation(cancellationToken);
             return;
         }
 
@@ -132,12 +154,8 @@ internal static class OdfPackageArchiveWriter
             if (ctx.SaveOptions.Deterministic)
                 zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-            byte[]? arr = mimeEntry.GetCachedBytes();
-            if (arr is not null)
-            {
-                using Stream entryStream = zipEntry.Open();
-                await WriteEntryContentWithCrc32Async(entryStream, arr, cancellationToken).ConfigureAwait(false);
-            }
+            using Stream entryStream = zipEntry.Open();
+            await WriteEntryContentWithCrc32Async(entryStream, GetFallbackEntryBytes(mimeEntry), cancellationToken).ConfigureAwait(false);
         }
 
         foreach (KeyValuePair<string, OdfPackageEntry> kvp in ctx.Entries)
@@ -157,45 +175,41 @@ internal static class OdfPackageArchiveWriter
             if (ctx.SaveOptions.Deterministic)
                 zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-            byte[]? arr = kvp.Value.GetCachedBytes();
-            if (arr is not null)
-            {
-                using Stream entryStream = zipEntry.Open();
-                await WriteEntryContentWithCrc32Async(entryStream, arr, cancellationToken).ConfigureAwait(false);
-            }
+            using Stream entryStream = zipEntry.Open();
+            await WriteEntryContentWithCrc32Async(entryStream, GetFallbackEntryBytes(kvp.Value), cancellationToken).ConfigureAwait(false);
         }
     }
 
     private static void WriteEntryContentWithCrc32(Stream entryStream, byte[] data)
     {
+        LastFallbackCrcWriteCount++;
         using var crcStream = new OdfCrc32Stream(entryStream);
         crcStream.Write(data, 0, data.Length);
         crcStream.Flush();
+    }
 
-        uint expectedCrc = OdfCrc32.Compute(data);
-        if (crcStream.Crc32 != expectedCrc)
-        {
-            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackage_CrcMismatch", expectedCrc.ToString("X8"), crcStream.Crc32.ToString("X8")));
-        }
+    internal static uint WriteEntryContentWithCrc32ForTests(Stream entryStream, byte[] data)
+    {
+        WriteEntryContentWithCrc32(entryStream, data);
+        return OdfCrc32.Compute(data);
     }
 
     private static async Task WriteEntryContentWithCrc32Async(Stream entryStream, byte[] data, CancellationToken cancellationToken)
     {
+        LastFallbackCrcWriteCount++;
         using var crcStream = new OdfCrc32Stream(entryStream);
         await crcStream.WriteAsync(data, 0, data.Length, cancellationToken).ConfigureAwait(false);
         await crcStream.FlushAsync(cancellationToken).ConfigureAwait(false);
-
-        uint expectedCrc = OdfCrc32.Compute(data);
-        if (crcStream.Crc32 != expectedCrc)
-        {
-            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackage_CrcMismatch", expectedCrc.ToString("X8"), crcStream.Crc32.ToString("X8")));
-        }
     }
 
-    private static bool TryWriteParallelPreparedArchive(OdfPackage.OdfPackageSaveCollaborators ctx, Stream targetStream)
+    private static bool TryWriteParallelPreparedArchive(
+        OdfPackage.OdfPackageSaveCollaborators ctx,
+        Stream targetStream,
+        CancellationToken cancellationToken = default)
     {
         LastParallelPreparedEntryCount = 0;
         LastParallelCompressionUsedPooledBuffer = false;
+        CheckCancellation(cancellationToken);
         if (ctx.HasActiveEncryption || ctx.Entries.Count <= 1)
             return false;
 
@@ -206,12 +220,14 @@ internal static class OdfPackageArchiveWriter
         {
             foreach (OdfPackageEntry entry in ctx.Entries.Values)
             {
+                CheckCancellation(cancellationToken);
                 entry.Prefetch();
             }
 
             var options = new ParallelOptions
             {
-                MaxDegreeOfParallelism = OdfParallelScheduler.GetEffectiveConcurrency()
+                MaxDegreeOfParallelism = OdfParallelScheduler.GetEffectiveConcurrency(),
+                CancellationToken = cancellationToken
             };
 
             Parallel.For(
@@ -220,9 +236,10 @@ internal static class OdfPackageArchiveWriter
                 options,
                 index =>
                 {
+                    CheckCancellation(cancellationToken);
                     KeyValuePair<string, OdfPackageEntry> kvp = orderedEntries[index];
                     preparedEntries[index] = OdfParallelScheduler.RunWithConfiguredThreadPriority(
-                        () => PrepareZipEntry(kvp.Key, kvp.Value, ctx));
+                        () => PrepareZipEntry(kvp.Key, kvp.Value, ctx, cancellationToken));
                 });
 
             LastParallelPreparedEntryCount = preparedEntries.Length;
@@ -232,6 +249,7 @@ internal static class OdfPackageArchiveWriter
 
             foreach (PreparedZipEntry? prepared in preparedEntries)
             {
+                CheckCancellation(cancellationToken);
                 if (prepared is null)
                     return false;
 
@@ -260,11 +278,14 @@ internal static class OdfPackageArchiveWriter
             }
 
             long centralDirectoryOffset = countingTarget.BytesWritten;
+            CheckCancellation(cancellationToken);
             foreach (RawZipCentralDirectoryEntry entry in centralDirectory)
             {
+                CheckCancellation(cancellationToken);
                 WriteCentralDirectoryEntry(writer, entry);
             }
 
+            CheckCancellation(cancellationToken);
             long centralDirectorySize = countingTarget.BytesWritten - centralDirectoryOffset;
             WriteEndOfCentralDirectory(
                 writer,
@@ -288,10 +309,15 @@ internal static class OdfPackageArchiveWriter
         }
     }
 
-    private static PreparedZipEntry PrepareZipEntry(string name, OdfPackageEntry entry, OdfPackage.OdfPackageSaveCollaborators ctx)
+    private static PreparedZipEntry PrepareZipEntry(
+        string name,
+        OdfPackageEntry entry,
+        OdfPackage.OdfPackageSaveCollaborators ctx,
+        CancellationToken cancellationToken)
     {
-        entry.EnsureBytesLoaded();
-        byte[] data = entry.GetCachedBytes() ?? entry.GetBytesSpan().ToArray();
+        CheckCancellation(cancellationToken);
+        byte[] data = GetEntryBytes(entry);
+        CheckCancellation(cancellationToken);
         byte[] nameBytes = Encoding.UTF8.GetBytes(name);
         uint crc = OdfCrc32.Compute(data);
         ushort method;
@@ -308,6 +334,7 @@ internal static class OdfPackageArchiveWriter
             using var compressed = new PooledZipPayloadStream(Math.Max(256, Math.Min(data.Length, 81920)));
             using (var deflate = new DeflateStream(compressed, ctx.SaveOptions.CompressionLevel, leaveOpen: true))
             {
+                CheckCancellation(cancellationToken);
                 deflate.Write(data, 0, data.Length);
             }
             payload = compressed.ToArray();
@@ -349,8 +376,13 @@ internal static class OdfPackageArchiveWriter
         return orderedEntries;
     }
 
-    private static bool TryWriteRawCopyArchive(OdfPackage.OdfPackageSaveCollaborators ctx, Stream targetStream)
+    private static bool TryWriteRawCopyArchive(
+        OdfPackage.OdfPackageSaveCollaborators ctx,
+        Stream targetStream,
+        CancellationToken cancellationToken = default)
     {
+        LastRawCopyArchiveUsed = false;
+        CheckCancellation(cancellationToken);
         if (ctx.Package.Mmf is null || ctx.Package.MmfEntries is null)
             return false;
 
@@ -360,6 +392,7 @@ internal static class OdfPackageArchiveWriter
         bool hasRawCopyCandidate = false;
         foreach (OdfPackageEntry entry in ctx.Entries.Values)
         {
+            CheckCancellation(cancellationToken);
             if (!entry.IsModified && entry.MmfEntry is not null)
             {
                 if (entry.MmfEntry.CompressionMethod is not 0 and not 8)
@@ -380,6 +413,7 @@ internal static class OdfPackageArchiveWriter
         {
             foreach (KeyValuePair<string, OdfPackageEntry> kvp in GetOdfZipWriteOrder(ctx))
             {
+                CheckCancellation(cancellationToken);
                 string name = kvp.Key;
                 OdfPackageEntry entry = kvp.Value;
                 byte[] nameBytes = Encoding.UTF8.GetBytes(name);
@@ -406,7 +440,7 @@ internal static class OdfPackageArchiveWriter
                         mmfEntry.CompressedDataOffset,
                         mmfEntry.CompressedSize,
                         System.IO.MemoryMappedFiles.MemoryMappedFileAccess.Read);
-                    rawStream.CopyTo(countingTarget);
+                    CopyStreamWithCancellation(rawStream, countingTarget, cancellationToken);
 
                     centralDirectory.Add(new RawZipCentralDirectoryEntry(
                         name,
@@ -421,7 +455,7 @@ internal static class OdfPackageArchiveWriter
                 }
                 else
                 {
-                    byte[] data = entry.GetCachedBytes() ?? Array.Empty<byte>();
+                    byte[] data = GetEntryBytes(entry);
                     uint crc = OdfCrc32.Compute(data);
                     ushort method;
                     byte[] payload;
@@ -455,6 +489,7 @@ internal static class OdfPackageArchiveWriter
                         nameBytes,
                         flags,
                         timeDate);
+                    CheckCancellation(cancellationToken);
                     writer.Write(payload);
 
                     centralDirectory.Add(new RawZipCentralDirectoryEntry(
@@ -471,11 +506,14 @@ internal static class OdfPackageArchiveWriter
             }
 
             long centralDirectoryOffset = countingTarget.BytesWritten;
+            CheckCancellation(cancellationToken);
             foreach (RawZipCentralDirectoryEntry entry in centralDirectory)
             {
+                CheckCancellation(cancellationToken);
                 WriteCentralDirectoryEntry(writer, entry);
             }
 
+            CheckCancellation(cancellationToken);
             long centralDirectorySize = countingTarget.BytesWritten - centralDirectoryOffset;
             WriteEndOfCentralDirectory(
                 writer,
@@ -483,6 +521,7 @@ internal static class OdfPackageArchiveWriter
                 checked((uint)centralDirectorySize),
                 checked((uint)centralDirectoryOffset));
             writer.Flush();
+            LastRawCopyArchiveUsed = true;
             return true;
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or OverflowException)
@@ -495,6 +534,48 @@ internal static class OdfPackageArchiveWriter
             }
             return false;
         }
+    }
+
+    private static byte[] GetEntryBytes(OdfPackageEntry entry)
+    {
+        entry.EnsureBytesLoaded();
+        return entry.GetCachedBytes() ?? entry.GetBytesSpan().ToArray();
+    }
+
+    private static byte[] GetFallbackEntryBytes(OdfPackageEntry entry)
+    {
+        byte[]? cached = entry.GetCachedBytes();
+        if (cached is not null)
+            return cached;
+
+        LastFallbackEntryByteCloneCount++;
+        return entry.GetBytesSpan().ToArray();
+    }
+
+    private static void CopyStreamWithCancellation(Stream source, Stream destination, CancellationToken cancellationToken)
+    {
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(81920);
+        try
+        {
+            int read;
+            while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                CheckCancellation(cancellationToken);
+                destination.Write(buffer, 0, read);
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+    }
+
+    private static void CheckCancellation(CancellationToken cancellationToken)
+    {
+        if (cancellationToken.CanBeCanceled)
+            Interlocked.Increment(ref _lastFastPathCancellationCheckCount);
+
+        cancellationToken.ThrowIfCancellationRequested();
     }
 
     private static void WriteLocalHeader(

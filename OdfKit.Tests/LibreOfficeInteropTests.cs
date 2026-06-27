@@ -2162,6 +2162,12 @@ public class LibreOfficeInteropTests
         return process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
     }
 
+    private static bool IsNuGetRestoreUnavailable(string output)
+    {
+        return output.Contains("NU1301", StringComparison.OrdinalIgnoreCase) ||
+            output.Contains("NU1900", StringComparison.OrdinalIgnoreCase);
+    }
+
     private static void RunSoffice(string sofficePath, string userInstallationDir, string outputDir, string targetFormat, string inputPath)
     {
         var startInfo = new ProcessStartInfo
@@ -2214,11 +2220,22 @@ public class LibreOfficeInteropTests
         startInfo.ArgumentList.Add("samples/Sample.cs");
         startInfo.ArgumentList.Add("-p:RunAnalyzersDuringBuild=false");
         startInfo.ArgumentList.Add("-p:UseSharedCompilation=false");
+        startInfo.Environment["NuGetAudit"] = "false";
+        string? restoreConfigFile = Environment.GetEnvironmentVariable("RestoreConfigFile");
+        if (!string.IsNullOrWhiteSpace(restoreConfigFile))
+        {
+            startInfo.Environment["RestoreConfigFile"] = restoreConfigFile;
+        }
 
         using (var process = Process.Start(startInfo) ?? throw new InvalidOperationException("無法啟動 dotnet run。"))
         {
             Assert.True(process.WaitForExit(90_000), "執行範例程式 Sample.cs 逾時。");
             string runOutput = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
+            if (process.ExitCode != 0 && IsNuGetRestoreUnavailable(runOutput))
+            {
+                Assert.Skip("目前 NuGet restore 環境無法解析範例相依套件，略過範例文件實機互通性測試。");
+            }
+
             Assert.True(process.ExitCode == 0, $"執行範例程式 Sample.cs 失敗，輸出：{runOutput}");
         }
 

@@ -60,7 +60,14 @@ public sealed class OfficeInteropConversionTests
             }
 
             RunSoffice(sofficePath, tempRoot, "pdf", odtPath);
-            ExportWordPdf(wordType, docxPath, wordPdfPath);
+            try
+            {
+                ExportWordPdf(wordType, docxPath, wordPdfPath);
+            }
+            catch (COMException ex) when (IsOfficeSessionUnavailable(ex))
+            {
+                Assert.Skip("目前 Windows 工作階段無法啟動 Microsoft Word COM，略過 Word 實機驗收。");
+            }
 
             AssertPdfExists(libreOfficePdfPath);
             AssertPdfExists(wordPdfPath);
@@ -108,7 +115,14 @@ public sealed class OfficeInteropConversionTests
             }
 
             RunSoffice(sofficePath, tempRoot, "pdf", odsPath);
-            ExportExcelPdf(excelType, xlsxPath, excelPdfPath);
+            try
+            {
+                ExportExcelPdf(excelType, xlsxPath, excelPdfPath);
+            }
+            catch (COMException ex) when (IsOfficeSessionUnavailable(ex))
+            {
+                Assert.Skip("目前 Windows 工作階段無法啟動 Microsoft Excel COM，略過 Excel 實機驗收。");
+            }
 
             AssertPdfExists(libreOfficePdfPath);
             AssertPdfExists(excelPdfPath);
@@ -185,7 +199,17 @@ public sealed class OfficeInteropConversionTests
                 OdpToPptxConverter.Convert(source, pptxStream);
             }
 
-            int mainSequenceCount = ReadMainSequenceCount(powerPointType!, pptxPath);
+            int mainSequenceCount;
+            try
+            {
+                mainSequenceCount = ReadMainSequenceCount(powerPointType!, pptxPath);
+            }
+            catch (COMException ex) when (IsOfficeSessionUnavailable(ex))
+            {
+                Assert.Skip("目前 Windows 工作階段無法啟動 Microsoft PowerPoint COM，略過 PowerPoint 實機驗收。");
+                return;
+            }
+
             Assert.Equal(2, mainSequenceCount);
         }
         finally
@@ -405,6 +429,12 @@ public sealed class OfficeInteropConversionTests
         GC.WaitForPendingFinalizers();
         GC.Collect();
         GC.WaitForPendingFinalizers();
+    }
+
+    private static bool IsOfficeSessionUnavailable(COMException exception)
+    {
+        const int ErrorNoLogonSession = unchecked((int)0x80070520);
+        return exception.HResult == ErrorNoLogonSession;
     }
 
     private static string FindLibreOffice26Soffice()

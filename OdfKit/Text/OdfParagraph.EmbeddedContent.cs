@@ -135,11 +135,11 @@ public partial class OdfParagraph
     /// <param name="pageNumber">新頁碼起始值；null 表示繼續</param>
     public void BreakPageBefore(string? masterPageName = null, int? pageNumber = null)
     {
+        if (!string.IsNullOrEmpty(masterPageName))
+            Doc.StyleEngine.GetOrCreateLocalStyle(Node, "paragraph").SetAttribute("master-page-name", OdfNamespaces.Style, masterPageName!, "style");
         Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "break-before", OdfNamespaces.Fo, "page", "fo");
         if (pageNumber.HasValue)
             Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "page-number", OdfNamespaces.Style, pageNumber.Value.ToString(CultureInfo.InvariantCulture), "style");
-        if (!string.IsNullOrEmpty(masterPageName))
-            Doc.StyleEngine.GetOrCreateLocalStyle(Node, "paragraph").SetAttribute("master-page-name", OdfNamespaces.Style, masterPageName!, "style");
     }
 
     #endregion

@@ -76,7 +76,6 @@ internal static class OdfDocumentMergeEngine
                 bool conflict = existingStyle is not null || dest.StyleEngine.StyleExists(name);
 
                 if (conflict &&
-                    options.StyleConflictResolution != ConflictResolution.KeepSourceFormatting &&
                     existingStyle is not null &&
                     AreSemanticallyEquivalentStyles(srcStyle, existingStyle))
                 {
@@ -143,6 +142,8 @@ internal static class OdfDocumentMergeEngine
         foreach (OdfAttributeName attribute in attributes)
         {
             if (attribute.LocalName == "name" && attribute.NamespaceUri == OdfNamespaces.Style)
+                continue;
+            if (attribute.LocalName == "display-name" && attribute.NamespaceUri == OdfNamespaces.Style)
                 continue;
 
             builder.Append('@')

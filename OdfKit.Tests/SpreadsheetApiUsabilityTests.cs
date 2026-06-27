@@ -75,6 +75,56 @@ public class SpreadsheetApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證公式查詢與批次更新 helper 可定位、篩選並更新公式。
+    /// </summary>
+    [Fact]
+    public void FormulaEditingHelpersFindAndUpdateWorkbookFormulas()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        OdfTableSheet sales = workbook.Worksheets.Add("銷售");
+        OdfTableSheet summary = workbook.Worksheets.Add("摘要");
+
+        sales.Cells["A1"].CellValue = 10d;
+        sales.Cells["B1"].Formula = "of:=[.A1]*2";
+        sales.Cells["C1"].Formula = "of:=SUM([.A1:.B1])";
+        summary.Cells["A1"].Formula = "of:='銷售'.B1";
+
+        OdfFormulaCellInfo[] formulaCells = workbook.GetFormulaCells().ToArray();
+
+        Assert.Equal(3, formulaCells.Length);
+        Assert.Contains(formulaCells, cell => cell.ExcelAddress == "銷售!B1" && cell.Formula == "of:=[.A1]*2");
+        Assert.Contains(formulaCells, cell => cell.SheetName == "摘要" && cell.Address.ToExcelString() == "摘要!A1");
+        Assert.True(sales.TryGetFormula("B1", out string formula));
+        Assert.Equal("of:=[.A1]*2", formula);
+
+        OdfFormulaCellInfo summaryReference = Assert.Single(workbook.FindFormulaCells(
+            cell => cell.Formula.Contains("'銷售'.", StringComparison.Ordinal)));
+        Assert.Equal("摘要!A1", summaryReference.ExcelAddress);
+
+        int replacedCount = workbook.ReplaceFormulaText(".A1", ".A2");
+        int updatedCount = sales.UpdateFormulas(cell =>
+            cell.Address.Column == 2
+                ? cell.Formula.Replace("SUM", "AVERAGE", StringComparison.Ordinal)
+                : null);
+
+        Assert.Equal(2, replacedCount);
+        Assert.Equal(1, updatedCount);
+        Assert.Equal("of:=[.A2]*2", sales.Cells["B1"].Formula);
+        Assert.Equal("of:=AVERAGE([.A2:.B1])", sales.Cells["C1"].Formula);
+        Assert.Equal("of:='銷售'.B1", summary.Cells["A1"].Formula);
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+
+        Assert.Equal("of:=[.A2]*2", loaded.Worksheets["銷售"].Cells["B1"].Formula);
+        Assert.Equal("of:=AVERAGE([.A2:.B1])", loaded.Worksheets["銷售"].Cells["C1"].Formula);
+        Assert.Equal(3, loaded.GetFormulaCells().Count());
+    }
+
+    /// <summary>
     /// 驗證公式重算通道會在儲存格變更後以背景工作更新公式結果。
     /// </summary>
     [Fact]
@@ -293,6 +343,8 @@ public class SpreadsheetApiUsabilityTests
     public void OdsStreamWriter_SwitchToSheet_WritesInterleavedSheets()
     {
         using var stream = new MemoryStream();
+        bool usedBufferedMode;
+        int bufferedSheetCount;
         using (var writer = new OdsStreamWriter(stream))
         {
             writer.SwitchToSheet("第一張");
@@ -306,8 +358,13 @@ public class SpreadsheetApiUsabilityTests
             writer.SwitchToSheet("第一張");
             writer.WriteStartRow();
             writer.WriteCell("A2");
+
+            usedBufferedMode = writer.UsesBufferedSheetModeForTests;
+            bufferedSheetCount = writer.BufferedSheetCountForTests;
         }
 
+        Assert.True(usedBufferedMode);
+        Assert.Equal(2, bufferedSheetCount);
         stream.Position = 0;
         using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
         string contentXml = ReadZipEntry(zip, "content.xml");

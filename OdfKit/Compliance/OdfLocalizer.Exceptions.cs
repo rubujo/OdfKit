@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace OdfKit.Compliance;
 
+// 類產生式成品：此大型在地化字典以同步資源表維護。更新時必須同步所有支援語言，
+// 並在 docs/provenance/README.md 記錄產生或批次重寫流程；不可只手動修改單一文化。
 public static partial class OdfLocalizer
 {
     private static readonly Dictionary<string, Dictionary<string, string>> ExceptionDictionaries = new(StringComparer.OrdinalIgnoreCase)

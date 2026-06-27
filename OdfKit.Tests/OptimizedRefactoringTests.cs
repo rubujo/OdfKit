@@ -950,6 +950,193 @@ public class OptimizedRefactoringTests
     }
 
     [Fact]
+    public async Task Test_OdfPackage_SaveAsync_UsesParallelPreparedZipEntries()
+    {
+        using var source = new MemoryStream();
+        using var destination = new MemoryStream();
+        using var cts = new CancellationTokenSource();
+        using (var package = OdfPackage.Create(source, leaveOpen: true))
+        {
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content>" + new string('a', 4096) + "</content>"), "text/xml");
+            package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes("<styles>" + new string('b', 4096) + "</styles>"), "text/xml");
+            package.WriteEntry(
+                "Pictures/logo.bin",
+                Enumerable.Range(0, 2048).Select(static value => (byte)(value % 251)).ToArray(),
+                "application/octet-stream");
+
+            OdfPackageArchiveWriter.LastAsyncFastPathArchiveUsed = false;
+            OdfPackageArchiveWriter.LastParallelPreparedEntryCount = 0;
+            OdfPackageArchiveWriter.LastFastPathCancellationCheckCount = 0;
+
+            await package.SaveToStreamAsync(destination, cts.Token);
+        }
+
+        Assert.True(OdfPackageArchiveWriter.LastAsyncFastPathArchiveUsed);
+        Assert.True(OdfPackageArchiveWriter.LastParallelPreparedEntryCount >= 3);
+        Assert.True(OdfPackageArchiveWriter.LastFastPathCancellationCheckCount > 0);
+        destination.Position = 0;
+        using var archive = new ZipArchive(destination, ZipArchiveMode.Read, leaveOpen: true);
+        Assert.NotNull(archive.GetEntry("content.xml"));
+        Assert.NotNull(archive.GetEntry("styles.xml"));
+        Assert.NotNull(archive.GetEntry("Pictures/logo.bin"));
+    }
+
+    [Fact]
+    public async Task Test_OdfPackage_SaveAsync_UsesRawCopyForUnmodifiedMmfEntries()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"async_raw_copy_{Guid.NewGuid():N}.odt");
+        using var cts = new CancellationTokenSource();
+        try
+        {
+            using (var document = TextDocument.Create())
+            {
+                document.AddParagraph("Async raw copy");
+                document.Save(tempFile);
+            }
+
+            await using var package = await OdfPackage.OpenAsync(
+                tempFile,
+                new OdfLoadOptions { AllowLazyLoading = true },
+                cancellationToken: TestContext.Current.CancellationToken);
+            using var destination = new MemoryStream();
+
+            OdfPackageArchiveWriter.LastAsyncFastPathArchiveUsed = false;
+            OdfPackageArchiveWriter.LastRawCopyArchiveUsed = false;
+            OdfPackageArchiveWriter.LastFastPathCancellationCheckCount = 0;
+
+            await package.SaveToStreamAsync(destination, cts.Token);
+
+            Assert.True(OdfPackageArchiveWriter.LastAsyncFastPathArchiveUsed);
+            Assert.True(OdfPackageArchiveWriter.LastRawCopyArchiveUsed);
+            Assert.True(OdfPackageArchiveWriter.LastFastPathCancellationCheckCount > 0);
+            destination.Position = 0;
+            using OdfPackage reloaded = OdfPackage.Open(destination, leaveOpen: true);
+            Assert.True(reloaded.HasEntry("content.xml"));
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task Test_OdfPackage_SaveAsync_CanceledBeforeFastPathThrows()
+    {
+        using var source = new MemoryStream();
+        using var destination = new MemoryStream();
+        using var cts = new CancellationTokenSource();
+        using var package = OdfPackage.Create(source, leaveOpen: true);
+        package.SetMimeType("application/vnd.oasis.opendocument.text");
+        package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+        cts.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => package.SaveToStreamAsync(destination, cts.Token));
+    }
+
+    [Fact]
+    public void Test_OdfPackage_Save_FallbackLargeEntryAvoidsExtraByteCloneAndRoundTrips()
+    {
+        byte[] payload = Enumerable.Range(0, 512 * 1024).Select(static value => (byte)(value % 251)).ToArray();
+        using var source = new MemoryStream();
+        using var destination = new MemoryStream();
+        using (var package = OdfPackage.Create(source, leaveOpen: true, new OdfSaveOptions { Password = "force-fallback" }))
+        {
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+            package.WriteEntry("Pictures/large.bin", payload, "application/octet-stream");
+            package.WriteEntry("META-INF/manifest.xml", Encoding.UTF8.GetBytes(CreateMinimalManifestXml("Pictures/large.bin")), "text/xml");
+            OdfPackageArchiveWriter.LastFallbackCrcWriteCount = 0;
+            OdfPackageArchiveWriter.LastFallbackEntryByteCloneCount = 0;
+            OdfPackageArchiveWriter.LastParallelPreparedEntryCount = 0;
+
+            package.SaveCollaborators.WriteToArchive(destination);
+        }
+
+        Assert.Equal(4, OdfPackageArchiveWriter.LastFallbackCrcWriteCount);
+        Assert.Equal(0, OdfPackageArchiveWriter.LastFallbackEntryByteCloneCount);
+        Assert.Equal(0, OdfPackageArchiveWriter.LastParallelPreparedEntryCount);
+
+        destination.Position = 0;
+        using (var archive = new ZipArchive(destination, ZipArchiveMode.Read, leaveOpen: true))
+        {
+            ZipArchiveEntry? entry = archive.GetEntry("Pictures/large.bin");
+            Assert.NotNull(entry);
+            using Stream entryStream = entry!.Open();
+            using var copied = new MemoryStream();
+            entryStream.CopyTo(copied);
+            Assert.Equal(payload, copied.ToArray());
+        }
+
+        destination.Position = 0;
+        using OdfPackage reloaded = OdfPackage.Open(destination, leaveOpen: true);
+        Assert.Equal(payload, reloaded.ReadEntry("Pictures/large.bin"));
+    }
+
+    [Fact]
+    public void Test_OdfPackage_FallbackWriterComputesCrcDuringSingleWritePass()
+    {
+        byte[] payload = Encoding.UTF8.GetBytes(new string('x', 4096));
+        using var output = new MemoryStream();
+        OdfPackageArchiveWriter.LastFallbackCrcWriteCount = 0;
+
+        uint crc = OdfPackageArchiveWriter.WriteEntryContentWithCrc32ForTests(output, payload);
+
+        Assert.Equal(1, OdfPackageArchiveWriter.LastFallbackCrcWriteCount);
+        Assert.Equal(OdfCrc32.Compute(payload), crc);
+        Assert.Equal(payload, output.ToArray());
+    }
+
+    [Fact]
+    public void Test_OdfCrc32Stream_ReadDetectsCrcMismatch()
+    {
+        byte[] payload = Encoding.UTF8.GetBytes("crc mismatch payload");
+        uint wrongCrc = OdfCrc32.Compute(payload) ^ 0xFFFFFFFFu;
+        using var input = new MemoryStream(payload);
+        using var crcStream = new OdfCrc32Stream(input, wrongCrc);
+        byte[] buffer = new byte[8];
+
+        Assert.Throws<InvalidDataException>(() =>
+        {
+            while (crcStream.Read(buffer, 0, buffer.Length) > 0)
+            { }
+        });
+    }
+
+    [Fact]
+    public async Task Test_OdfPackage_LoadEntries_TracksEntryOrderWithDuplicates()
+    {
+        byte[] first = Encoding.UTF8.GetBytes("first");
+        byte[] second = Encoding.UTF8.GetBytes("second");
+        using MemoryStream packageStream = CreateZipPackage(
+            ("mimetype", Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.text")),
+            ("content.xml", first),
+            ("content.xml", second),
+            ("styles.xml", Encoding.UTF8.GetBytes("<styles/>")),
+            ("META-INF/manifest.xml", Encoding.UTF8.GetBytes(CreateMinimalManifestXml())));
+
+        using OdfPackage package = OdfPackage.Open(packageStream, leaveOpen: true);
+
+        Assert.Contains("content.xml", package.DuplicateEntryNames);
+        Assert.Equal(new[] { "mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml" }, package.EntryOrder);
+        Assert.Equal(second, package.ReadEntry("content.xml"));
+
+        packageStream.Position = 0;
+        await using OdfPackage asyncPackage = await OdfPackage.OpenAsync(
+            packageStream,
+            leaveOpen: true,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Contains("content.xml", asyncPackage.DuplicateEntryNames);
+        Assert.Equal(new[] { "mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml" }, asyncPackage.EntryOrder);
+        Assert.Equal(second, asyncPackage.ReadEntry("content.xml"));
+    }
+
+    [Fact]
     public void Test_OdfPackage_RawEntryPatch_RepeatedCacheConsistency()
     {
         using var ms = new MemoryStream();
@@ -1987,6 +2174,24 @@ public class OptimizedRefactoringTests
         }
 
         throw new InvalidDataException("找不到 ZIP 簽章。");
+    }
+
+    private static string CreateMinimalManifestXml(params string[] additionalEntries)
+    {
+        var builder = new StringBuilder();
+        builder.Append("<manifest:manifest xmlns:manifest=\"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0\" manifest:version=\"1.4\">");
+        builder.Append("<manifest:file-entry manifest:full-path=\"/\" manifest:media-type=\"application/vnd.oasis.opendocument.text\" />");
+        builder.Append("<manifest:file-entry manifest:full-path=\"content.xml\" manifest:media-type=\"text/xml\" />");
+        builder.Append("<manifest:file-entry manifest:full-path=\"styles.xml\" manifest:media-type=\"text/xml\" />");
+        foreach (string entry in additionalEntries)
+        {
+            builder.Append("<manifest:file-entry manifest:full-path=\"");
+            builder.Append(entry);
+            builder.Append("\" manifest:media-type=\"application/octet-stream\" />");
+        }
+
+        builder.Append("</manifest:manifest>");
+        return builder.ToString();
     }
 
     private static MemoryStream CreateZipPackage(params (string Name, byte[] Content)[] entries)

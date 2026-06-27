@@ -14,10 +14,28 @@
 
 ## 產生式程式碼（可安全追溯）
 
-以下檔案由 `tools/OdfSchemaGenerator` 與 `eng/Generate-OdfSchemaProvider.ps1` 從 OASIS RNG 產生，**不應手動編輯**：
+以下檔案由 `tools/OdfSchemaGenerator` 與 `eng/Generate-OdfSchemaProvider.ps1` 從 OASIS RNG 產生，**不可手動編輯**：
 
-- `OdfKit/DOM/GeneratedDomWrappers.g.cs`
-- `OdfKit/Compliance/Odf*OfficialSchemaProvider.g.cs`
+- `OdfKit/DOM/Generated/*.g.cs`：typed DOM wrapper、factory case、typed attribute 與 schema child collection。
+- `OdfKit/Compliance/Generated/Odf*OfficialSchemaProvider.g.cs`：ODF 1.1/1.2/1.3/1.4 官方 schema metadata provider。
+
+重產流程：
+
+```powershell
+dotnet run --project tools/OdfSchemaGenerator --framework net10.0
+pwsh eng/Test-OdfTypedDomCoverage.ps1
+```
+
+重產後必須確認 `docs/typed-dom-coverage.md` 的 coverage guard、`OdfSchemaGeneratorTests`
+與 `TypedDomParityTests` 仍通過。若產生器導致 wrapper 或 schema metadata 大幅變動，
+提交訊息需說明對應的 OASIS schema 來源與差異原因。
+
+## 同步維護的大型資源表
+
+`OdfKit/Compliance/OdfLocalizer.Exceptions.cs` 是類產生式成品：它不是由單一
+工具每次完整重產，但必須作為同步資源表維護。新增或修改錯誤訊息時，需同時更新所有支援語言
+（`en`, `zh-TW`, `de`, `fr`, `nl`, `nb`, `pt`, `it`, `sk`, `da`, `ms`, `ko`），並保留
+`OdfLocalizer` 的文化回退測試。不得只修改單一文化或在呼叫端硬編碼例外訊息。
 
 ## 建議 Clean Room 重寫區塊
 

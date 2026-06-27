@@ -40,6 +40,10 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     private int _autoRowStyleIndex = 0;
     private OdfVersion _version = OdfVersionInfo.DefaultVersion;
 
+    internal int BufferedSheetCountForTests => _sheetBuffers.Count;
+
+    internal bool UsesBufferedSheetModeForTests => _sheetBuffers.Count > 0;
+
     /// <summary>
     /// 取得或設定寫入之 ODS 文件的 ODF 版本。
     /// </summary>
@@ -118,6 +122,11 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     /// 開始寫入一個新的工作表。
     /// </summary>
     /// <param name="sheetName">工作表名稱</param>
+    /// <remarks>
+    /// 此方法會直接寫入目前輸出資料流，適合嚴格順序、低記憶體的工作表輸出。
+    /// 若需要在多張工作表之間交錯寫入，請使用 <see cref="SwitchToSheet(string)"/>；
+    /// 該模式會暫存各工作表片段，便利性較高但記憶體用量會隨已緩衝內容增加。
+    /// </remarks>
     public void WriteStartSheet(string sheetName)
     {
         if (_disposed)
@@ -131,9 +140,14 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// 切換至指定工作表，以暫存緩衝支援多工作表交錯流式寫入。
+    /// 切換至指定工作表，以暫存緩衝支援多工作表交錯寫入。
     /// </summary>
     /// <param name="sheetName">要切換或建立的工作表名稱</param>
+    /// <remarks>
+    /// 此方法是緩衝便利路徑：每張曾切換的工作表都會保留一段暫存 XML，
+    /// 並於釋放寫入器時依首次出現順序輸出。若要維持嚴格低記憶體串流語意，請使用
+    /// <see cref="WriteStartSheet(string)"/> 與 <see cref="WriteEndSheet"/> 依序完成每張工作表。
+    /// </remarks>
     /// <exception cref="ArgumentException">當 <paramref name="sheetName"/> 為 null 或空白時擲出</exception>
     public void SwitchToSheet(string sheetName)
     {
