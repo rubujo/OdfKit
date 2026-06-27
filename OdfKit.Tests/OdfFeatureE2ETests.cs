@@ -368,8 +368,11 @@ namespace OdfKit.Tests
             doc.Save();
 
             var reloaded = RoundTrip(doc, p => new TextDocument(p));
-            // MathML inserted formula creates folder structured entry
-            Assert.True(reloaded.Package.HasEntry("Formula_1/content.xml") || reloaded.Package.GetEntries().Any(e => e.Path.EndsWith("/content.xml") && e.Path.StartsWith("Formula_")));
+            // 插入 MathML 公式時會建立資料夾結構的項目。
+            Assert.Contains(
+                reloaded.Package.GetEntries(),
+                entry => entry.Path.StartsWith("Formula_", StringComparison.Ordinal) &&
+                    entry.Path.EndsWith("/content.xml", StringComparison.Ordinal));
         }
 
         [Fact]

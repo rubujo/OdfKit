@@ -919,7 +919,9 @@ public class OdfSchemaGeneratorTests
             Assert.Equal(string.Empty, stderr.ToString());
             Assert.Equal(string.Empty, stdout.ToString());
             Assert.True(File.Exists(Path.Combine(outputDirectory, "GeneratedDomFactory.g.cs")));
-            Assert.NotEmpty(Directory.GetFiles(outputDirectory, "*.g.cs").Where(path => !path.EndsWith("GeneratedDomFactory.g.cs", StringComparison.Ordinal)));
+            Assert.Contains(
+                Directory.GetFiles(outputDirectory, "*.g.cs"),
+                path => !path.EndsWith("GeneratedDomFactory.g.cs", StringComparison.Ordinal));
         }
         finally
         {

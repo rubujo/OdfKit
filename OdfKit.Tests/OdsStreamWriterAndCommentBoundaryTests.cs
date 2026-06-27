@@ -316,15 +316,17 @@ namespace OdfKit.Tests
         public async Task ToAsyncEnumerable_WritesSyncAndAsyncProducerOutput()
         {
             var chunks = new List<byte[]>();
-            await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(writer =>
-            {
-                writer.WriteStartSheet("Sheet1");
-                writer.WriteStartRow();
-                writer.WriteCell("Hello");
-                writer.WriteCell(123.45);
-                writer.WriteEndRow();
-                writer.WriteEndSheet();
-            }))
+            await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(
+                writer =>
+                {
+                    writer.WriteStartSheet("Sheet1");
+                    writer.WriteStartRow();
+                    writer.WriteCell("Hello");
+                    writer.WriteCell(123.45);
+                    writer.WriteEndRow();
+                    writer.WriteEndSheet();
+                },
+                cancellationToken: TestContext.Current.CancellationToken))
             {
                 chunks.Add(chunk.ToArray());
             }
@@ -349,15 +351,17 @@ namespace OdfKit.Tests
             }
 
             var chunksAsync = new List<byte[]>();
-            await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(async writer =>
-            {
-                writer.WriteStartSheet("Sheet1");
-                writer.WriteStartRow();
-                writer.WriteCell("HelloAsync");
-                writer.WriteEndRow();
-                writer.WriteEndSheet();
-                await Task.Yield();
-            }))
+            await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(
+                async writer =>
+                {
+                    writer.WriteStartSheet("Sheet1");
+                    writer.WriteStartRow();
+                    writer.WriteCell("HelloAsync");
+                    writer.WriteEndRow();
+                    writer.WriteEndSheet();
+                    await Task.Yield();
+                },
+                cancellationToken: TestContext.Current.CancellationToken))
             {
                 chunksAsync.Add(chunk.ToArray());
             }
@@ -369,18 +373,20 @@ namespace OdfKit.Tests
         public async Task ToAsyncEnumerable_LargeOutputProducesValidChunks()
         {
             var chunks = new List<byte[]>();
-            await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(writer =>
-            {
-                writer.WriteStartSheet("Rows");
-                for (int row = 0; row < 250; row++)
+            await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(
+                writer =>
                 {
-                    writer.WriteStartRow();
-                    writer.WriteCell($"R{row}");
-                    writer.WriteCell(row);
-                    writer.WriteEndRow();
-                }
-                writer.WriteEndSheet();
-            }))
+                    writer.WriteStartSheet("Rows");
+                    for (int row = 0; row < 250; row++)
+                    {
+                        writer.WriteStartRow();
+                        writer.WriteCell($"R{row}");
+                        writer.WriteCell(row);
+                        writer.WriteEndRow();
+                    }
+                    writer.WriteEndSheet();
+                },
+                cancellationToken: TestContext.Current.CancellationToken))
             {
                 chunks.Add(chunk.ToArray());
             }
@@ -408,10 +414,12 @@ namespace OdfKit.Tests
         {
             InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
-                await foreach (ReadOnlyMemory<byte> _ in OdsStreamWriter.ToAsyncEnumerable(_ =>
-                {
-                    throw new InvalidOperationException("writer failed");
-                }))
+                await foreach (ReadOnlyMemory<byte> _ in OdsStreamWriter.ToAsyncEnumerable(
+                    _ =>
+                    {
+                        throw new InvalidOperationException("writer failed");
+                    },
+                    cancellationToken: TestContext.Current.CancellationToken))
                 {
                 }
             });

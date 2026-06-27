@@ -42,6 +42,10 @@
   - **禁止**在方案根目錄直接執行 `dotnet format`（無專案範圍）：`OdfKit.Tests` 為雙 TFM（`net10.0` + `net8.0`），全方案格式化會觸發 IDE multi-target 合併失敗，將 `<<<<<<< TODO: 取消合併專案 …` 標記寫入 `.cs` 並導致 **CS8300**。
   - 格式化後必須通過 `eng/Test-MergeConflictMarkers.ps1`（已內建於 `Format-Safe.ps1`）。
   - 若僅修改函式庫，使用 `pwsh eng/Format-Safe.ps1`；需連同測試檔排版時，加上 `-IncludeTests`（測試專案僅執行 `whitespace`，不套用 analyzer 程式碼修正）。
+- **測試與 xUnit analyzer 規範**：
+  - 測試中呼叫任何可接受 `CancellationToken` 的非同步 API 時，必須傳入 `TestContext.Current.CancellationToken`，包含 `Task.Delay`、`ReadToEndAsync`、`WaitAsync`、`IAsyncEnumerable` 工廠方法與專案自訂 async API；只有刻意驗證預取消或自訂取消語意時，才可使用測試內建立的 linked token。
+  - 不得用 `Assert.NotEmpty(query.Where(...))`、`Assert.Empty(query.Where(...))`、`Assert.True(query.Any(...))` 或等價 LINQ 形狀檢查集合是否存在符合條件的項目；應改用 `Assert.Contains(collection, predicate)` 或 `Assert.DoesNotContain(collection, predicate)`，避免觸發 xUnit analyzer 警告並讓失敗訊息更精準。
+  - 新增或修改測試後，至少執行對應 TFM 的 `dotnet build OdfKit.Tests/OdfKit.Tests.csproj -c Release --framework net10.0 --no-restore`，必要時再補 `net8.0`，確認 xUnit analyzer 無警告。
 
 ### B. ODF 與 XML 協定規格
 - **命名空間處理**：一律使用與前綴無關的 `NamespaceURI` + `LocalName` 作為 XML 節點與屬性的比對基準。
