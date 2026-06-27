@@ -12,6 +12,7 @@ using OdfKit.Styles;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Stress)]
     public class FormulaEvaluatorStressTests
     {
         #region Stress Mock IEvaluationContext

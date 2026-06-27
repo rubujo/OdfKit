@@ -16,6 +16,7 @@ using OdfKit.Formula;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Smoke)]
     public class OdfBoundaryRegressionTests
     {
         [Fact]

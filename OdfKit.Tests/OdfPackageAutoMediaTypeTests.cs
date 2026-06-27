@@ -8,6 +8,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證封裝專案在未指定 MIME 類型時的自動判定行為。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class OdfPackageAutoMediaTypeTests
 {
     [Fact]

@@ -14,6 +14,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定簡報文件高階 API 的易用入口。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class PresentationApiUsabilityTests
 {
     /// <summary>

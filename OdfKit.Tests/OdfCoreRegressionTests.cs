@@ -11,6 +11,7 @@ using OdfKit.Spreadsheet;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Smoke)]
     public class OdfCoreRegressionTests
     {
         [Fact]

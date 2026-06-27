@@ -19,6 +19,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 使用本機 Office 與 LibreOffice 驗證 OOXML 轉換結果可實機載入與匯出。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Interop)]
 public sealed class OfficeInteropConversionTests
 {
     private const int WordPdfFormat = 17;

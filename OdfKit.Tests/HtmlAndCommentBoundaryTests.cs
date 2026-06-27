@@ -9,6 +9,7 @@ using OdfKit.Text;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Boundary)]
     public class HtmlAndCommentBoundaryTests
     {
         #region 1. OdfComment Cyclic References & Nested Limits

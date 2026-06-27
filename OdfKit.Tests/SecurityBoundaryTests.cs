@@ -15,6 +15,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 針對加密、雜湊比對與列高邊界條件、極端值及無效輸入的實證測試。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class SecurityBoundaryTests
 {
     /// <summary>

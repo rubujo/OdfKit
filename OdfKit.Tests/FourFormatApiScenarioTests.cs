@@ -15,6 +15,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證四主格式（ODT／ODS／ODP／ODG）Wave 2 高階 API 的整合場景。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Scenario)]
 public class FourFormatApiScenarioTests
 {
     private const string DublinCoreTitle = OdfNamespaces.Dc + "title";

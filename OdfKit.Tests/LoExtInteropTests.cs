@@ -11,6 +11,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定 LibreOffice <c>loext</c> 擴充屬性與 ODF 標準屬性之互通行為。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Interop)]
 public class LoExtInteropTests
 {
     /// <summary>

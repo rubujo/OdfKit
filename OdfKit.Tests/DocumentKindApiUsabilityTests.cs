@@ -20,6 +20,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定 Chart、Formula、Image 與 Database 文件的最小高階入口。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class DocumentKindApiUsabilityTests
 {
     /// <summary>

@@ -11,6 +11,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證 ODF Toolkit 對標文件與 corpus manifest 已宣告必要契約。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class DocsAndCorpusContractTests
 {
     /// <summary>
@@ -173,6 +174,28 @@ public class DocsAndCorpusContractTests
         Assert.Contains("manifest.json", initializeScript, StringComparison.Ordinal);
         Assert.Contains("baseline-exceptions.json", initializeScript, StringComparison.Ordinal);
         Assert.Contains("Test-OdfCorpus.ps1", workflow, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證快速 CI 與測試策略文件使用 trait 分類，而不是硬編碼測試類別清單。
+    /// </summary>
+    [Fact]
+    public void CiSmokeTestsUseTraitCategoryFilter()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string workflow = File.ReadAllText(Path.Combine(repoRoot, ".github", "workflows", "ci.yml"));
+        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "testing-strategy.md"));
+        string categories = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "TestCategories.cs"));
+
+        Assert.Contains("Category=Smoke", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("FullyQualifiedName~OdfKit.Tests.", workflow, StringComparison.Ordinal);
+        Assert.Contains("TestCategories", strategy, StringComparison.Ordinal);
+        Assert.Contains("--filter Category=Smoke", strategy, StringComparison.Ordinal);
+        Assert.Contains("public const string Smoke = \"Smoke\";", categories, StringComparison.Ordinal);
+        Assert.Contains("public const string Interop = \"Interop\";", categories, StringComparison.Ordinal);
+        Assert.Contains("public const string Corpus = \"Corpus\";", categories, StringComparison.Ordinal);
+        Assert.Contains("public const string Compliance = \"Compliance\";", categories, StringComparison.Ordinal);
+        Assert.Contains("public const string Scenario = \"Scenario\";", categories, StringComparison.Ordinal);
     }
 
     /// <summary>

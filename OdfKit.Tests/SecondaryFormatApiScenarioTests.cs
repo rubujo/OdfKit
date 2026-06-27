@@ -14,6 +14,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證次要格式（ODC／ODB／ODF／ODI）Wave 2 DEPTH-2 高階 API 的整合場景。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Scenario)]
 public class SecondaryFormatApiScenarioTests
 {
     /// <summary>

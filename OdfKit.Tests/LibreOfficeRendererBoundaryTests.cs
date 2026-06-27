@@ -16,6 +16,8 @@ using OdfKit.Extensions.Rendering;
 namespace OdfKit.Tests
 {
     [Collection("SequentialRenderingTests")]
+    [Trait(TestCategories.Kind, TestCategories.Interop)]
+    [Trait(TestCategories.Kind, TestCategories.Boundary)]
     public class LibreOfficeRendererBoundaryTests
     {
         public LibreOfficeRendererBoundaryTests()

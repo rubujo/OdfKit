@@ -9,6 +9,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證 NuGet 發佈前的必要套件中繼資料。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class PackageReadinessTests
 {
     /// <summary>

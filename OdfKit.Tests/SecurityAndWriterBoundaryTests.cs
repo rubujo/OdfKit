@@ -12,6 +12,7 @@ using System.Linq;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Boundary)]
     public class SecurityAndWriterBoundaryTests
     {
         // ─── ROW HEIGHTS BOUNDARY & STRESS TESTS ───

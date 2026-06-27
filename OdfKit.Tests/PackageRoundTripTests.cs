@@ -16,6 +16,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 測試 OdfPackage 在 Flat XML 與 ZIP 封裝包之間的互轉與 Round-trip 保真度。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class PackageRoundTripTests
 {
     private static readonly XNamespace OfficeNs = OdfNamespaces.Office;

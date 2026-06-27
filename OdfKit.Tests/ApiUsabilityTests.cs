@@ -11,6 +11,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定高階 API 的使用者故事形狀。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class ApiUsabilityTests
 {
     /// <summary>

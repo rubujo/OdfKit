@@ -18,6 +18,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證 typed DOM 與 ODFDOM 對標線的基本覆蓋能力。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Regression)]
 public class TypedDomParityTests
 {
     /// <summary>

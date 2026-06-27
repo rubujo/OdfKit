@@ -25,6 +25,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 使用真實 LibreOffice 26.x binary 驗證 OdfKit 產生文件的互通性。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Interop)]
 public class LibreOfficeInteropTests
 {
     /// <summary>

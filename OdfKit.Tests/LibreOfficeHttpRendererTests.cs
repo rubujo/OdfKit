@@ -12,6 +12,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定 LibreOfficeHttpRenderer 的併發、取消與 Mock 轉檔行為之單元測試。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Interop)]
 public class LibreOfficeHttpRendererTests
 {
     private sealed class MockConversionBackend : ILibreOfficeConversionBackend

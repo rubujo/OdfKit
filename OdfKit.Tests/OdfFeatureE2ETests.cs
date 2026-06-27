@@ -17,6 +17,7 @@ using Xunit;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Scenario)]
     public class OdfFeatureE2ETests
     {
         private static readonly XNamespace OfficeNs = OdfNamespaces.Office;

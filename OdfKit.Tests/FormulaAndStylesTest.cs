@@ -13,6 +13,7 @@ using OdfKit.Styles;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Regression)]
     public class FormulaAndStylesTest
     {
         #region Mock IEvaluationContext

@@ -15,6 +15,7 @@ using OdfKit.Formula;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Boundary)]
     public class PresentationBoundaryTests
     {
         #region 1. Slide Layouts & Placeholders Boundary Tests

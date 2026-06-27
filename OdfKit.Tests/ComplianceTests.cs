@@ -18,6 +18,7 @@ using Xunit;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Compliance)]
     public class ComplianceTests
     {
         [Fact]

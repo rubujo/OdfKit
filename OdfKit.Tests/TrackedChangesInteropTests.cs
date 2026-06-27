@@ -10,6 +10,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證追蹤修訂的封裝往返與 LibreOffice 風格 ODT 互通。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Interop)]
 public class TrackedChangesInteropTests
 {
     /// <summary>

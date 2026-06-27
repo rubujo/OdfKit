@@ -11,6 +11,8 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證 interop corpus 的最小格式覆蓋與保真行為。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Interop)]
+[Trait(TestCategories.Kind, TestCategories.Corpus)]
 public class InteropCorpusTests
 {
     private static readonly byte[] UnknownPayload = Encoding.UTF8.GetBytes("odfkit interop corpus");

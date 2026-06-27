@@ -17,6 +17,8 @@ using Xunit;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Smoke)]
+    [Trait(TestCategories.Kind, TestCategories.Scenario)]
     public class VerticalSliceRoundTripTests
     {
         [Fact]

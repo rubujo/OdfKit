@@ -11,6 +11,7 @@ using OdfKit.Styles;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Stress)]
     public class OdfCoreStressTests
     {
         #region OdsStreamWriter Tests

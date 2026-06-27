@@ -12,6 +12,7 @@ using Xunit;
 
 namespace OdfKit.Tests;
 
+[Trait(TestCategories.Kind, TestCategories.Interop)]
 public class LibreOfficeConversionApiTests
 {
     [Theory]

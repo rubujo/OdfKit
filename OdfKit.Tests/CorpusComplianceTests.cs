@@ -10,6 +10,8 @@ using Xunit;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Corpus)]
+    [Trait(TestCategories.Kind, TestCategories.Compliance)]
     public class CorpusComplianceTests
     {
         private static void LogReport(string testName, OdfValidationReport report)

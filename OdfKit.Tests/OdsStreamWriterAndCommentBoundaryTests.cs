@@ -12,6 +12,7 @@ using OdfKit.Styles;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Boundary)]
     public class OdsStreamWriterAndCommentBoundaryTests
     {
         #region 1. OdsStreamWriter Boundary & Stress Tests

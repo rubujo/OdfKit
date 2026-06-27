@@ -57,24 +57,6 @@ jobs:
             return
           }
 
-          $ciTestClasses = @(
-            'ApiUsabilityTests',
-            'DocumentKindApiUsabilityTests',
-            'DocsAndCorpusContractTests',
-            'DrawingApiUsabilityTests',
-            'OdfBoundaryRegressionTests',
-            'OdfCoreRegressionTests',
-            'OdfPackageAutoMediaTypeTests',
-            'OdfPackageUnknownEntryTests',
-            'OdfSecurityBoundaryTests',
-            'PackageReadinessTests',
-            'PackageRoundTripTests',
-            'PresentationApiUsabilityTests',
-            'SecurityBoundaryTests',
-            'SpreadsheetApiUsabilityTests',
-            'TextApiUsabilityTests',
-            'VerticalSliceRoundTripTests'
-          )
-          $testFilter = ($ciTestClasses | ForEach-Object { "FullyQualifiedName~OdfKit.Tests.$_." }) -join '|'
+          $testFilter = 'Category=Smoke'
           Write-Host "CI 快速回歸測試 filter: $testFilter"
           dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f ${{ matrix.framework }} --filter $testFilter --logger "console;verbosity=normal"

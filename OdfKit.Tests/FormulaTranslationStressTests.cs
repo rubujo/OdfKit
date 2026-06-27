@@ -6,6 +6,7 @@ using OdfKit.Formula;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Stress)]
     public class FormulaTranslationStressTests
     {
         #region 1. Coordinate Parsing and Boundary Stress Tests

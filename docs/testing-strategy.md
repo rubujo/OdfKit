@@ -6,6 +6,16 @@
 
 ## 測試分層
 
+測試分類統一使用 xUnit `Trait` 與 `OdfKit.Tests.TestCategories` 常數，避免
+GitHub Actions 或本機腳本硬編碼測試類別名稱。常用入口如下：
+
+- 快速 PR 回歸：`dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f net10.0 --filter Category=Smoke`。
+- 壓力與效能檢查：`--filter "Category=Stress|Category=Performance"`。
+- 外部互通檢查：`--filter Category=Interop`。
+- Corpus 檢查：`--filter Category=Corpus`。
+- 規範與 schema 檢查：`--filter Category=Compliance`。
+- 跨功能情境檢查：`--filter Category=Scenario`。
+
 | 分層 | 目的 | 代表檔案 |
 |------|------|----------|
 | API usability | 驗證公開 API 的日常使用流程 | `*ApiUsabilityTests.cs`、`*HighLevelApiTests.cs` |
@@ -14,6 +24,7 @@
 | Interop | 驗證 LibreOffice、OOXML 與外部工具互通 | `LibreOfficeInteropTests.cs`、`OfficeInteropConversionTests.cs` |
 | Boundary | 驗證邊界輸入、錯誤復原與歷史回歸 | `*BoundaryTests.cs`、`*RegressionTests.cs` |
 | Stress | 驗證大量資料、深層結構與效能邊界 | `*StressTests.cs` |
+| Scenario | 驗證跨格式或跨功能工作流程 | `*ScenarioTests.cs`、`*E2ETests.cs`、`VerticalSliceRoundTripTests.cs` |
 | Packaging / docs contract | 驗證 NuGet、發佈資產、文件／corpus 契約與消費端煙霧測試 | `NuGetPackagingTests.cs`、`PackageReadinessTests.cs`、`DocsAndCorpusContractTests.cs` |
 
 ## 命名規則
@@ -37,6 +48,15 @@
 - 同一功能分別驗證 API 層、封裝 XML 層與外部互通層。
 - 同一資料格式分別驗證 happy path、boundary、stress 與 regression。
 - 測試方法名稱相近，但斷言不同的失敗模式。
+
+## 目前整合候選
+
+下列檔案保留覆蓋率，但後續整理時優先拆分或併入相鄰領域檔：
+
+- `OptimizedRefactoringTests.cs`：近期重構驗收集合，應逐步搬回 package、DOM、transaction、stream writer 專檔。
+- `FormulaAndStylesTest.cs`：公式、格式、字型、pivot 與 reference model 混合檔，應分散至對應專檔。
+- `OdfFeatureE2ETests.cs`：保留跨功能 Tier 3/4 scenario，單一功能 happy path 可移回 high-level 或 boundary 測試。
+- `EmpiricalStressTests.cs`、`OdfCoreStressTests.cs`：保留作為 `Category=Stress`，不進快速 CI。
 
 ## TEST-STRUCT 完成狀態
 

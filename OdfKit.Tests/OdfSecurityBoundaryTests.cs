@@ -12,6 +12,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證簽章、加密與巨集淨化的保真邊界。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class OdfSecurityBoundaryTests
 {
     private const string Password = "R5BoundaryPassword";

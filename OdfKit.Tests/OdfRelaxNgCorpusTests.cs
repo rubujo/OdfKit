@@ -11,6 +11,8 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 針對 ODF 官方規範中各種核心 XML 結構進行嚴格的 RELAX NG 驗證測試。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Corpus)]
+[Trait(TestCategories.Kind, TestCategories.Compliance)]
 public class OdfRelaxNgCorpusTests
 {
     private static MemoryStream CreatePackage(

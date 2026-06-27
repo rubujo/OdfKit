@@ -27,6 +27,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 針對 OdfKit 底層 API 設計優化與效能重構之所有新增功能進行完整驗證的測試類別。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Regression)]
 public class OptimizedRefactoringTests
 {
     /// <summary>

@@ -7,6 +7,8 @@ using OdfKit.Formula;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Stress)]
+    [Trait(TestCategories.Kind, TestCategories.Boundary)]
     public class StressAndBoundaryTests
     {
         #region 1. Coordinate Parsing Boundaries and Edge Cases

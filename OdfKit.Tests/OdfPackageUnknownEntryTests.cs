@@ -12,6 +12,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證高階文件保存流程不會刪除或改寫未知封裝專案。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Smoke)]
 public class OdfPackageUnknownEntryTests
 {
     private static readonly IReadOnlyDictionary<string, byte[]> UnknownEntries = new Dictionary<string, byte[]>

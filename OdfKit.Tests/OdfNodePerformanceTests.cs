@@ -11,6 +11,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證 DOM 效能相關優化（SiblingIndex、TextContent 快速路徑）的正確性。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Performance)]
 public class OdfNodePerformanceTests
 {
     /// <summary>

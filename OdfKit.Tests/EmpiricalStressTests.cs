@@ -13,6 +13,8 @@ using OdfKit.Formula;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Stress)]
+    [Trait(TestCategories.Kind, TestCategories.Performance)]
     public class EmpiricalStressTests
     {
         [Fact]

@@ -8,6 +8,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定 Database 文件 mutation API 的邊界與負向案例。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Boundary)]
 public class DatabaseBoundaryTests
 {
     /// <summary>

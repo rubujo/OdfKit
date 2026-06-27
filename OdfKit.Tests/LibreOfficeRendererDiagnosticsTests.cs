@@ -14,6 +14,7 @@ using OdfKit.Extensions.Rendering;
 namespace OdfKit.Tests
 {
     [Collection("SequentialRenderingTests")]
+    [Trait(TestCategories.Kind, TestCategories.Interop)]
     public class LibreOfficeRendererDiagnosticsTests
     {
         public LibreOfficeRendererDiagnosticsTests()
