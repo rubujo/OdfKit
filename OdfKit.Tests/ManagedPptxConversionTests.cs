@@ -1166,6 +1166,49 @@ public class ManagedPptxConversionTests
     }
 
     [Fact]
+    public void PptxToOdpConverterCombinesNestedAnimationDelays()
+    {
+        using OdfPresentationDocument source = OdfPresentationDocument.Create();
+        OdfSlide sourceSlide = source.AddSlide("Nested delays");
+        OdfShape shape = sourceSlide.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(4),
+            OdfLength.FromCentimeters(2));
+        sourceSlide.AddEntranceEffect(
+            shape.Id,
+            OdfAnimationEffect.Fade,
+            OdfAnimationTrigger.OnClick,
+            delay: TimeSpan.FromMilliseconds(100),
+            duration: TimeSpan.FromMilliseconds(500));
+
+        using var pptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(source, pptxStream);
+
+        pptxStream.Position = 0;
+        using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, true))
+        {
+            OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+            P.AnimateEffect effect = Assert.Single(slidePart.Slide!.Descendants<P.AnimateEffect>());
+            P.ParallelTimeNode middleLayer = Assert.Single(
+                effect.Ancestors<P.ParallelTimeNode>(),
+                node => node.CommonTimeNode?
+                    .StartConditionList?
+                    .Elements<P.Condition>()
+                    .Any(condition => condition.Delay?.Value == "0") == true);
+            middleLayer.CommonTimeNode!.StartConditionList = new P.StartConditionList(new P.Condition { Delay = "250" });
+            slidePart.Slide.Save();
+        }
+
+        pptxStream.Position = 0;
+        using OdfPresentationDocument converted = PptxToOdpConverter.Convert(pptxStream);
+        OdfAnimationInfo animation = Assert.Single(Assert.Single(converted.Slides).GetAnimations());
+        Assert.True(animation.TryGetDelaySeconds(out double delaySeconds));
+        Assert.True(Math.Abs(delaySeconds - 0.35d) < 0.001d);
+    }
+
+    [Fact]
     public void PptxConvertersPreserveSlidePlaceholders()
     {
         using OdfPresentationDocument source = OdfPresentationDocument.Create();

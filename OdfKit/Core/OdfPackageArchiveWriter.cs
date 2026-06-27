@@ -180,18 +180,18 @@ internal static class OdfPackageArchiveWriter
         }
     }
 
-    private static void WriteEntryContentWithCrc32(Stream entryStream, byte[] data)
+    private static uint WriteEntryContentWithCrc32(Stream entryStream, byte[] data)
     {
         LastFallbackCrcWriteCount++;
         using var crcStream = new OdfCrc32Stream(entryStream);
         crcStream.Write(data, 0, data.Length);
         crcStream.Flush();
+        return crcStream.Crc32;
     }
 
     internal static uint WriteEntryContentWithCrc32ForTests(Stream entryStream, byte[] data)
     {
-        WriteEntryContentWithCrc32(entryStream, data);
-        return OdfCrc32.Compute(data);
+        return WriteEntryContentWithCrc32(entryStream, data);
     }
 
     private static async Task WriteEntryContentWithCrc32Async(Stream entryStream, byte[] data, CancellationToken cancellationToken)

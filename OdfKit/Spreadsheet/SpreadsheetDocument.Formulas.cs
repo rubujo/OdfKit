@@ -43,6 +43,41 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// 取得指定工作表儲存格的公式。
+    /// </summary>
+    /// <param name="sheetName">工作表名稱</param>
+    /// <param name="address">儲存格位址，例如 <c>A1</c></param>
+    /// <returns>指定儲存格的公式；若沒有公式則為空字串</returns>
+    public string GetFormula(string sheetName, string address)
+    {
+        return Worksheets[sheetName].GetFormula(address);
+    }
+
+    /// <summary>
+    /// 嘗試取得指定工作表儲存格的公式。
+    /// </summary>
+    /// <param name="sheetName">工作表名稱</param>
+    /// <param name="address">儲存格位址，例如 <c>A1</c></param>
+    /// <param name="formula">取得成功時傳回公式文字</param>
+    /// <returns>若指定儲存格具有公式則為 <see langword="true"/>，否則為 <see langword="false"/></returns>
+    public bool TryGetFormula(string sheetName, string address, out string formula)
+    {
+        return Worksheets[sheetName].TryGetFormula(address, out formula);
+    }
+
+    /// <summary>
+    /// 設定指定工作表儲存格的公式。
+    /// </summary>
+    /// <param name="sheetName">工作表名稱</param>
+    /// <param name="address">儲存格位址，例如 <c>A1</c></param>
+    /// <param name="formula">要寫入的公式；傳入空字串會清除公式</param>
+    /// <returns>已更新的儲存格 facade</returns>
+    public OdfCell SetFormula(string sheetName, string address, string formula)
+    {
+        return Worksheets[sheetName].SetFormula(address, formula);
+    }
+
+    /// <summary>
     /// 更新活頁簿中的所有公式。
     /// </summary>
     /// <param name="updater">接收目前公式資訊並傳回新公式的委派；傳回 <see langword="null"/> 表示不變更</param>

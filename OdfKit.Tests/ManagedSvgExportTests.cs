@@ -513,6 +513,44 @@ public class ManagedSvgExportTests
     }
 
     [Fact]
+    public void SvgExporterConvertsDrawMarkersToSvgMarkerDefinitions()
+    {
+        using DrawingDocument document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage();
+        page.AddLine(
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(5),
+            OdfLength.FromCentimeters(1));
+        OdfNode lineNode = page.Node.Children.Last(child => child.LocalName == "line");
+        lineNode.SetAttribute("marker-end", OdfNamespaces.Draw, "Arrow", "draw");
+
+        var marker = new OdfNode(OdfNodeType.Element, "marker", OdfNamespaces.Draw, "draw");
+        marker.SetAttribute("name", OdfNamespaces.Draw, "Arrow", "draw");
+        marker.SetAttribute("viewBox", OdfNamespaces.Svg, "0 0 10 10", "svg");
+        marker.SetAttribute("d", OdfNamespaces.Svg, "M 0 0 L 10 5 L 0 10 Z", "svg");
+        document.StylesDom.AppendChild(marker);
+
+        string svg = document.ToSvg();
+        XDocument parsed = XDocument.Parse(svg);
+        XNamespace ns = "http://www.w3.org/2000/svg";
+
+        XElement svgMarker = Assert.Single(parsed.Descendants(ns + "marker"));
+        Assert.Equal("odf-marker-Arrow", (string?)svgMarker.Attribute("id"));
+        Assert.Equal("0 0 10 10", (string?)svgMarker.Attribute("viewBox"));
+        Assert.Equal("10", (string?)svgMarker.Attribute("refX"));
+        Assert.Equal("5", (string?)svgMarker.Attribute("refY"));
+        Assert.Equal("auto", (string?)svgMarker.Attribute("orient"));
+
+        XElement markerPath = Assert.Single(svgMarker.Elements(ns + "path"));
+        Assert.Equal("M 0 0 L 10 5 L 0 10 Z", (string?)markerPath.Attribute("d"));
+        Assert.Equal("context-stroke", (string?)markerPath.Attribute("fill"));
+
+        XElement line = Assert.Single(parsed.Descendants(ns + "line"));
+        Assert.Equal("url(#odf-marker-Arrow)", (string?)line.Attribute("marker-end"));
+    }
+
+    [Fact]
     public void SvgExporterConvertsNamedLinearGradients()
     {
         using DrawingDocument document = DrawingDocument.Create();

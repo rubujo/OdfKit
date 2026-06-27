@@ -86,8 +86,8 @@ public class SpreadsheetApiUsabilityTests
         OdfTableSheet summary = workbook.Worksheets.Add("摘要");
 
         sales.Cells["A1"].CellValue = 10d;
-        sales.Cells["B1"].Formula = "of:=[.A1]*2";
-        sales.Cells["C1"].Formula = "of:=SUM([.A1:.B1])";
+        workbook.SetFormula("銷售", "B1", "of:=[.A1]*2");
+        sales.SetFormula("C1", "of:=SUM([.A1:.B1])");
         summary.Cells["A1"].Formula = "of:='銷售'.B1";
 
         OdfFormulaCellInfo[] formulaCells = workbook.GetFormulaCells().ToArray();
@@ -97,6 +97,9 @@ public class SpreadsheetApiUsabilityTests
         Assert.Contains(formulaCells, cell => cell.SheetName == "摘要" && cell.Address.ToExcelString() == "摘要!A1");
         Assert.True(sales.TryGetFormula("B1", out string formula));
         Assert.Equal("of:=[.A1]*2", formula);
+        Assert.True(workbook.TryGetFormula("銷售", "C1", out string documentFormula));
+        Assert.Equal("of:=SUM([.A1:.B1])", documentFormula);
+        Assert.Equal("of:='銷售'.B1", workbook.GetFormula("摘要", "A1"));
 
         OdfFormulaCellInfo summaryReference = Assert.Single(workbook.FindFormulaCells(
             cell => cell.Formula.Contains("'銷售'.", StringComparison.Ordinal)));
@@ -113,6 +116,8 @@ public class SpreadsheetApiUsabilityTests
         Assert.Equal("of:=[.A2]*2", sales.Cells["B1"].Formula);
         Assert.Equal("of:=AVERAGE([.A2:.B1])", sales.Cells["C1"].Formula);
         Assert.Equal("of:='銷售'.B1", summary.Cells["A1"].Formula);
+        workbook.SetFormula("摘要", "A1", string.Empty);
+        Assert.False(workbook.TryGetFormula("摘要", "A1", out _));
 
         using var stream = new MemoryStream();
         workbook.SaveToStream(stream);
@@ -122,7 +127,7 @@ public class SpreadsheetApiUsabilityTests
 
         Assert.Equal("of:=[.A2]*2", loaded.Worksheets["銷售"].Cells["B1"].Formula);
         Assert.Equal("of:=AVERAGE([.A2:.B1])", loaded.Worksheets["銷售"].Cells["C1"].Formula);
-        Assert.Equal(3, loaded.GetFormulaCells().Count());
+        Assert.Equal(2, loaded.GetFormulaCells().Count());
     }
 
     /// <summary>
@@ -807,6 +812,44 @@ public class SpreadsheetApiUsabilityTests
         OdfEmbeddedChartInfo chart = Assert.Single(loaded.GetEmbeddedCharts());
         Assert.Equal("趨勢", chart.Title);
         Assert.Equal(OdfChartType.Line, chart.ChartType);
+    }
+
+    /// <summary>
+    /// 驗證活頁簿層級計算設定可用高階外觀設定並於儲存後重新載入。
+    /// </summary>
+    [Fact]
+    public void CalculationSettingsFacadeSurvivesRoundTrip()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        workbook.Worksheets.Add("試算");
+        workbook.CalculationSettings.AutomaticFindLabels = true;
+        workbook.CalculationSettings.CaseSensitive = false;
+        workbook.CalculationSettings.NullYear = 1930;
+        workbook.CalculationSettings.PrecisionAsShown = true;
+        workbook.CalculationSettings.SearchCriteriaMustApplyToWholeCell = true;
+        workbook.CalculationSettings.UseRegularExpressions = false;
+        workbook.CalculationSettings.UseWildcards = true;
+        workbook.CalculationSettings.Iteration.Enabled = true;
+        workbook.CalculationSettings.Iteration.MaximumDifference = 0.001m;
+        workbook.CalculationSettings.Iteration.Steps = 100;
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+
+        Assert.True(loaded.CalculationSettings.AutomaticFindLabels);
+        Assert.False(loaded.CalculationSettings.CaseSensitive);
+        Assert.Equal(1930, loaded.CalculationSettings.NullYear);
+        Assert.True(loaded.CalculationSettings.PrecisionAsShown);
+        Assert.True(loaded.CalculationSettings.SearchCriteriaMustApplyToWholeCell);
+        Assert.False(loaded.CalculationSettings.UseRegularExpressions);
+        Assert.True(loaded.CalculationSettings.UseWildcards);
+        Assert.True(loaded.CalculationSettings.HasIteration);
+        Assert.True(loaded.CalculationSettings.Iteration.Enabled);
+        Assert.Equal(0.001m, loaded.CalculationSettings.Iteration.MaximumDifference);
+        Assert.Equal(100, loaded.CalculationSettings.Iteration.Steps);
     }
 
     /// <summary>

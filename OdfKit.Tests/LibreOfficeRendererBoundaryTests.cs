@@ -224,52 +224,59 @@ namespace OdfKit.Tests
             var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
             var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var token = cts.Token;
+            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, TestContext.Current.CancellationToken);
+            CancellationToken token = cts.Token;
             string? detectedDir = null;
             FileStream? fsLock = null;
 
             var watcherTask = Task.Run(async () =>
             {
-                while (!token.IsCancellationRequested && detectedDir == null)
+                try
                 {
-                    try
+                    while (!token.IsCancellationRequested && detectedDir == null)
                     {
-                        var dirs = Directory.GetDirectories(tempPath, searchPattern);
-                        foreach (var dir in dirs)
+                        try
                         {
-                            if (existingDirs.Contains(dir))
-                                continue;
-
-                            string argsFile = Path.Combine(dir, "arguments.txt");
-                            if (File.Exists(argsFile))
+                            var dirs = Directory.GetDirectories(tempPath, searchPattern);
+                            foreach (var dir in dirs)
                             {
-                                try
+                                if (existingDirs.Contains(dir))
+                                    continue;
+
+                                string argsFile = Path.Combine(dir, "arguments.txt");
+                                if (File.Exists(argsFile))
                                 {
-                                    var lines = File.ReadAllLines(argsFile);
-                                    if (System.Linq.Enumerable.Contains(lines, "pdf-leak-delay"))
+                                    try
                                     {
-                                        // Acquire an exclusive file lock on arguments.txt to block cleanup/deletion
-                                        fsLock = new FileStream(argsFile, FileMode.Open, FileAccess.Read, FileShare.None);
-                                        detectedDir = dir;
-                                        break;
+                                        var lines = File.ReadAllLines(argsFile);
+                                        if (System.Linq.Enumerable.Contains(lines, "pdf-leak-delay"))
+                                        {
+                                            // Acquire an exclusive file lock on arguments.txt to block cleanup/deletion
+                                            fsLock = new FileStream(argsFile, FileMode.Open, FileAccess.Read, FileShare.None);
+                                            detectedDir = dir;
+                                            break;
+                                        }
                                     }
-                                }
-                                catch
-                                {
-                                    if (fsLock != null)
+                                    catch
                                     {
-                                        fsLock.Dispose();
-                                        fsLock = null;
+                                        if (fsLock != null)
+                                        {
+                                            fsLock.Dispose();
+                                            fsLock = null;
+                                        }
                                     }
                                 }
                             }
                         }
+                        catch { }
+                        if (detectedDir != null)
+                            break;
+                        await Task.Delay(10, token);
                     }
-                    catch { }
-                    if (detectedDir != null)
-                        break;
-                    await Task.Delay(10);
+                }
+                catch (OperationCanceledException) when (token.IsCancellationRequested)
+                {
                 }
             }, TestContext.Current.CancellationToken);
 
@@ -408,41 +415,49 @@ namespace OdfKit.Tests
             var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
             var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var token = cts.Token;
+            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, TestContext.Current.CancellationToken);
+            CancellationToken token = cts.Token;
             string? detectedDir = null;
 
             var watcherTask = Task.Run(async () =>
             {
-                LogDebug("CaptureSandboxDirAsync watcher started");
-                while (!token.IsCancellationRequested && detectedDir == null)
+                try
                 {
-                    try
+                    LogDebug("CaptureSandboxDirAsync watcher started");
+                    while (!token.IsCancellationRequested && detectedDir == null)
                     {
-                        var dirs = Directory.GetDirectories(tempPath, searchPattern);
-                        foreach (var dir in dirs)
+                        try
                         {
-                            if (existingDirs.Contains(dir))
-                                continue;
-
-                            if (Directory.Exists(Path.Combine(dir, "profile")))
+                            var dirs = Directory.GetDirectories(tempPath, searchPattern);
+                            foreach (var dir in dirs)
                             {
-                                detectedDir = dir;
-                                LogDebug($"CaptureSandboxDirAsync watcher detected: {detectedDir}");
-                                break;
+                                if (existingDirs.Contains(dir))
+                                    continue;
+
+                                if (Directory.Exists(Path.Combine(dir, "profile")))
+                                {
+                                    detectedDir = dir;
+                                    LogDebug($"CaptureSandboxDirAsync watcher detected: {detectedDir}");
+                                    break;
+                                }
                             }
                         }
+                        catch (Exception ex)
+                        {
+                            LogDebug($"CaptureSandboxDirAsync watcher exception: {ex.Message}");
+                        }
+                        if (detectedDir != null)
+                            break;
+                        await Task.Delay(10, token);
                     }
-                    catch (Exception ex)
-                    {
-                        LogDebug($"CaptureSandboxDirAsync watcher exception: {ex.Message}");
-                    }
-                    if (detectedDir != null)
-                        break;
-                    await Task.Delay(10);
+                    LogDebug("CaptureSandboxDirAsync watcher finished");
                 }
-                LogDebug("CaptureSandboxDirAsync watcher finished");
-            });
+                catch (OperationCanceledException) when (token.IsCancellationRequested)
+                {
+                    LogDebug("CaptureSandboxDirAsync watcher canceled");
+                }
+            }, TestContext.Current.CancellationToken);
 
             try
             {
@@ -472,8 +487,9 @@ namespace OdfKit.Tests
             var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
             var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var token = cts.Token;
+            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, TestContext.Current.CancellationToken);
+            CancellationToken token = cts.Token;
 
             List<string>? capturedArgs = null;
             string? detectedDir = null;
@@ -481,69 +497,76 @@ namespace OdfKit.Tests
 
             var watcherTask = Task.Run(async () =>
             {
-                LogDebug("CaptureArgumentsAsync watcher started");
-                while (!token.IsCancellationRequested && capturedArgs == null)
+                try
                 {
-                    try
+                    LogDebug("CaptureArgumentsAsync watcher started");
+                    while (!token.IsCancellationRequested && capturedArgs == null)
                     {
-                        var dirs = Directory.GetDirectories(tempPath, searchPattern);
-                        foreach (var dir in dirs)
+                        try
                         {
-                            if (existingDirs.Contains(dir))
-                                continue;
-
-                            string argsFile = Path.Combine(dir, "arguments.txt");
-                            if (File.Exists(argsFile))
+                            var dirs = Directory.GetDirectories(tempPath, searchPattern);
+                            foreach (var dir in dirs)
                             {
-                                try
+                                if (existingDirs.Contains(dir))
+                                    continue;
+
+                                string argsFile = Path.Combine(dir, "arguments.txt");
+                                if (File.Exists(argsFile))
                                 {
-                                    // Open with FileShare.Read to read the file, but keep a lock to block deletion
-                                    lockStream = new FileStream(argsFile, FileMode.Open, FileAccess.Read, FileShare.Read);
-                                    using (var reader = new StreamReader(lockStream, Encoding.UTF8, true, 1024, leaveOpen: true))
+                                    try
                                     {
-                                        var lines = new List<string>();
-                                        string? line;
-                                        while ((line = await reader.ReadLineAsync()) != null)
+                                        // Open with FileShare.Read to read the file, but keep a lock to block deletion
+                                        lockStream = new FileStream(argsFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                                        using (var reader = new StreamReader(lockStream, Encoding.UTF8, true, 1024, leaveOpen: true))
                                         {
-                                            lines.Add(line);
+                                            var lines = new List<string>();
+                                            string? line;
+                                            while ((line = await reader.ReadLineAsync()) != null)
+                                            {
+                                                lines.Add(line);
+                                            }
+                                            if (validator == null || validator(lines))
+                                            {
+                                                capturedArgs = lines;
+                                                detectedDir = dir;
+                                                LogDebug($"Successfully read {lines.Count} arguments: {string.Join(", ", lines)}");
+                                            }
+                                            else
+                                            {
+                                                lockStream.Dispose();
+                                                lockStream = null;
+                                            }
                                         }
-                                        if (validator == null || validator(lines))
-                                        {
-                                            capturedArgs = lines;
-                                            detectedDir = dir;
-                                            LogDebug($"Successfully read {lines.Count} arguments: {string.Join(", ", lines)}");
-                                        }
-                                        else
+                                        if (capturedArgs != null)
+                                            break;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        LogDebug($"Exception reading file: {ex.Message}");
+                                        if (lockStream != null)
                                         {
                                             lockStream.Dispose();
                                             lockStream = null;
                                         }
                                     }
-                                    if (capturedArgs != null)
-                                        break;
-                                }
-                                catch (Exception ex)
-                                {
-                                    LogDebug($"Exception reading file: {ex.Message}");
-                                    if (lockStream != null)
-                                    {
-                                        lockStream.Dispose();
-                                        lockStream = null;
-                                    }
                                 }
                             }
                         }
+                        catch (Exception ex)
+                        {
+                            LogDebug($"Exception listing directories: {ex.Message}");
+                        }
+                        if (capturedArgs != null)
+                            break;
+                        await Task.Delay(10, token);
                     }
-                    catch (Exception ex)
-                    {
-                        LogDebug($"Exception listing directories: {ex.Message}");
-                    }
-                    if (capturedArgs != null)
-                        break;
-                    await Task.Delay(10);
+                    LogDebug("Watcher task finished");
                 }
-                LogDebug("Watcher task finished");
-            });
+                catch (OperationCanceledException) when (token.IsCancellationRequested)
+                {
+                    LogDebug("Watcher task canceled");
+                }
+            }, TestContext.Current.CancellationToken);
 
             try
             {

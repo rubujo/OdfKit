@@ -2037,6 +2037,11 @@ public class LibreOfficeInteropTests
 
     private static string? FindLibreOfficeSoffice()
     {
+        if (!IsLibreOfficeInteropEnabled())
+        {
+            return null;
+        }
+
         string expectedVersion = GetExpectedLibreOfficeVersion();
         foreach (string candidate in EnumerateSofficeCandidates())
         {
@@ -2054,6 +2059,13 @@ public class LibreOfficeInteropTests
         }
 
         return null;
+    }
+
+    private static bool IsLibreOfficeInteropEnabled()
+    {
+        string? enabled = Environment.GetEnvironmentVariable("ODFKIT_RUN_LIBREOFFICE_INTEROP");
+        return string.Equals(enabled, "1", StringComparison.Ordinal) ||
+            string.Equals(enabled, "true", StringComparison.OrdinalIgnoreCase);
     }
 
     private static string[] EnumerateSofficeCandidates()

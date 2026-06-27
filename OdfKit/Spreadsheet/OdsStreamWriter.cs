@@ -19,7 +19,8 @@ using Sylvan.Data.Csv;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// 提供以資料流方式寫入 ODS 試算表文件的功能，以支援高效能、低記憶體耗用的寫入作業。
+/// 提供以資料流方式寫入 ODS 試算表文件的功能；使用 <see cref="WriteStartSheet(string)"/>
+/// 與 <see cref="WriteEndSheet"/> 的嚴格順序模式時，可支援高效能、低記憶體耗用的寫入作業。
 /// </summary>
 public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
 {

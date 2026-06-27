@@ -952,27 +952,47 @@ public static class PptxToOdpConverter
 
     private static TimeSpan ReadAnimationDelay(OpenXmlElement element)
     {
+        double totalMilliseconds = 0d;
         P.CommonBehavior? behavior = GetCommonBehavior(element);
-        string? start = ReadStartDelay(behavior?.CommonTimeNode);
-        if (string.IsNullOrWhiteSpace(start))
+        totalMilliseconds += ReadStartDelayMilliseconds(behavior?.CommonTimeNode);
+
+        foreach (P.CommonTimeNode? timeNode in element
+            .Ancestors<P.ParallelTimeNode>()
+            .Select(ancestor => ancestor.CommonTimeNode))
         {
-            start = element
-                .Ancestors<P.ParallelTimeNode>()
-                .Select(ancestor => ReadStartDelay(ancestor.CommonTimeNode))
-                .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
+            totalMilliseconds += ReadStartDelayMilliseconds(timeNode);
+            if (timeNode?.NodeType is not null && timeNode.NodeType.Value.Equals(P.TimeNodeValues.AfterEffect))
+            {
+                break;
+            }
         }
 
-        return double.TryParse(start, NumberStyles.Float, CultureInfo.InvariantCulture, out double milliseconds)
-            ? TimeSpan.FromMilliseconds(Math.Max(milliseconds, 0d))
+        return totalMilliseconds > 0d
+            ? TimeSpan.FromMilliseconds(totalMilliseconds)
             : default;
     }
 
-    private static string? ReadStartDelay(P.CommonTimeNode? timeNode)
-        => timeNode?
-            .StartConditionList?
+    private static double ReadStartDelayMilliseconds(P.CommonTimeNode? timeNode)
+    {
+        if (timeNode?.StartConditionList is null)
+        {
+            return 0d;
+        }
+
+        double milliseconds = 0d;
+        foreach (string? delay in timeNode.StartConditionList
             .Elements<P.Condition>()
             .Select(condition => condition.Delay?.Value)
-            .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
+            .Where(value => !string.IsNullOrWhiteSpace(value)))
+        {
+            if (double.TryParse(delay, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed))
+            {
+                milliseconds += Math.Max(parsed, 0d);
+            }
+        }
+
+        return milliseconds;
+    }
 
     private static P.PlaceholderShape? GetPlaceholderShape(P.Shape shape)
     {

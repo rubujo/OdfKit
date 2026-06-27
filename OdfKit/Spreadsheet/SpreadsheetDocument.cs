@@ -147,6 +147,12 @@ public partial class SpreadsheetDocument : OdfDocument
     /// </summary>
     public OdfWorksheetCollection Worksheets => _worksheets ??= new OdfWorksheetCollection(this);
 
+    /// <summary>
+    /// 取得 ODS 活頁簿層級的公式計算與重算設定。
+    /// </summary>
+    public OdfSpreadsheetCalculationSettings CalculationSettings =>
+        new(FindOrCreateChild(SheetsRoot, "calculation-settings", OdfNamespaces.Table, "table"));
+
     private void InitializeSheetsRoot()
     {
         var body = FindOrCreateChild(ContentDom, "body", OdfNamespaces.Office, "office");

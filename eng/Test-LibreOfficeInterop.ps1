@@ -143,26 +143,35 @@ try {
     Write-Host "使用 LibreOffice：$($soffice.Path)"
     Write-Host "版本：$($soffice.Version)"
 
+    $previousSofficePath = $env:ODFKIT_SOFFICE_PATH
+    $previousRunFlag = $env:ODFKIT_RUN_LIBREOFFICE_INTEROP
     $env:ODFKIT_SOFFICE_PATH = $soffice.Path
+    $env:ODFKIT_RUN_LIBREOFFICE_INTEROP = "1"
 
-    if (-not $NoBuild) {
-        dotnet build $testProject -c $Configuration --framework $Framework
+    try {
+        if (-not $NoBuild) {
+            dotnet build $testProject -c $Configuration --framework $Framework
+        }
+
+        $testArgs = @(
+            "test",
+            $testProject,
+            "-c", $Configuration,
+            "--framework", $Framework,
+            "--filter", "FullyQualifiedName~LibreOfficeInteropTests",
+            "--no-restore"
+        )
+
+        if ($NoBuild) {
+            $testArgs += "--no-build"
+        }
+
+        dotnet @testArgs
     }
-
-    $testArgs = @(
-        "test",
-        $testProject,
-        "-c", $Configuration,
-        "--framework", $Framework,
-        "--filter", "FullyQualifiedName~LibreOfficeInteropTests",
-        "--no-restore"
-    )
-
-    if ($NoBuild) {
-        $testArgs += "--no-build"
+    finally {
+        $env:ODFKIT_SOFFICE_PATH = $previousSofficePath
+        $env:ODFKIT_RUN_LIBREOFFICE_INTEROP = $previousRunFlag
     }
-
-    dotnet @testArgs
 }
 finally {
     Pop-Location

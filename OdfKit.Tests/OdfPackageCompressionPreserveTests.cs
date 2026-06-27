@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using Xunit;
@@ -81,6 +83,138 @@ public class OdfPackageCompressionPreserveTests
         }
     }
 
+    [Fact]
+    public void FallbackSave_LargeEntryAvoidsExtraByteCloneAndRoundTrips()
+    {
+        byte[] payload = Enumerable.Range(0, 512 * 1024).Select(static value => (byte)(value % 251)).ToArray();
+        using var source = new MemoryStream();
+        using var destination = new MemoryStream();
+        using (var package = OdfPackage.Create(source, leaveOpen: true, new OdfSaveOptions { Password = "force-fallback" }))
+        {
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+            package.WriteEntry("Pictures/large.bin", payload, "application/octet-stream");
+            package.WriteEntry("META-INF/manifest.xml", Encoding.UTF8.GetBytes(CreateMinimalManifestXml("Pictures/large.bin")), "text/xml");
+            OdfPackageArchiveWriter.LastFallbackCrcWriteCount = 0;
+            OdfPackageArchiveWriter.LastFallbackEntryByteCloneCount = 0;
+            OdfPackageArchiveWriter.LastParallelPreparedEntryCount = 0;
+
+            package.SaveCollaborators.WriteToArchive(destination);
+        }
+
+        Assert.Equal(4, OdfPackageArchiveWriter.LastFallbackCrcWriteCount);
+        Assert.Equal(0, OdfPackageArchiveWriter.LastFallbackEntryByteCloneCount);
+        Assert.Equal(0, OdfPackageArchiveWriter.LastParallelPreparedEntryCount);
+
+        destination.Position = 0;
+        using (var archive = new ZipArchive(destination, ZipArchiveMode.Read, leaveOpen: true))
+        {
+            ZipArchiveEntry? entry = archive.GetEntry("Pictures/large.bin");
+            Assert.NotNull(entry);
+            using Stream entryStream = entry!.Open();
+            using var copied = new MemoryStream();
+            entryStream.CopyTo(copied);
+            Assert.Equal(payload, copied.ToArray());
+        }
+
+        destination.Position = 0;
+        using OdfPackage reloaded = OdfPackage.Open(destination, leaveOpen: true);
+        Assert.Equal(payload, reloaded.ReadEntry("Pictures/large.bin"));
+    }
+
+    [Fact]
+    public void FallbackWriter_ComputesCrcDuringSingleWritePass()
+    {
+        byte[] payload = Encoding.UTF8.GetBytes(new string('x', 4096));
+        using var output = new MemoryStream();
+        OdfPackageArchiveWriter.LastFallbackCrcWriteCount = 0;
+
+        uint crc = OdfPackageArchiveWriter.WriteEntryContentWithCrc32ForTests(output, payload);
+
+        Assert.Equal(1, OdfPackageArchiveWriter.LastFallbackCrcWriteCount);
+        Assert.Equal(OdfCrc32.Compute(payload), crc);
+        Assert.Equal(payload, output.ToArray());
+    }
+
+    [Fact]
+    public void Crc32Stream_ReadDetectsCrcMismatch()
+    {
+        byte[] payload = Encoding.UTF8.GetBytes("crc mismatch payload");
+        uint wrongCrc = OdfCrc32.Compute(payload) ^ 0xFFFFFFFFu;
+        using var input = new MemoryStream(payload);
+        using var crcStream = new OdfCrc32Stream(input, wrongCrc);
+        byte[] buffer = new byte[8];
+
+        Assert.Throws<InvalidDataException>(() =>
+        {
+            while (crcStream.Read(buffer, 0, buffer.Length) > 0)
+            { }
+        });
+    }
+
+    [Fact]
+    public async Task LoadEntries_TracksEntryOrderWithDuplicates()
+    {
+        byte[] first = Encoding.UTF8.GetBytes("first");
+        byte[] second = Encoding.UTF8.GetBytes("second");
+        using MemoryStream packageStream = CreateZipPackage(
+            ("mimetype", Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.text")),
+            ("content.xml", first),
+            ("content.xml", second),
+            ("styles.xml", Encoding.UTF8.GetBytes("<styles/>")),
+            ("META-INF/manifest.xml", Encoding.UTF8.GetBytes(CreateMinimalManifestXml())));
+
+        using OdfPackage package = OdfPackage.Open(packageStream, leaveOpen: true);
+
+        Assert.Contains("content.xml", package.DuplicateEntryNames);
+        Assert.Equal(new[] { "mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml" }, package.EntryOrder);
+        Assert.Equal(second, package.ReadEntry("content.xml"));
+
+        packageStream.Position = 0;
+        await using OdfPackage asyncPackage = await OdfPackage.OpenAsync(
+            packageStream,
+            leaveOpen: true,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Contains("content.xml", asyncPackage.DuplicateEntryNames);
+        Assert.Equal(new[] { "mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml" }, asyncPackage.EntryOrder);
+        Assert.Equal(second, asyncPackage.ReadEntry("content.xml"));
+    }
+
+    [Fact]
+    public void LoadEntriesFromMmf_TracksEntryOrderWithoutLinearContains()
+    {
+        string tempPath = Path.Combine(Path.GetTempPath(), $"odfkit_mmf_entry_order_{Guid.NewGuid():N}.odt");
+        try
+        {
+            using (MemoryStream packageStream = CreateZipPackage(
+                ("mimetype", Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.text")),
+                ("content.xml", Encoding.UTF8.GetBytes("<content/>")),
+                ("styles.xml", Encoding.UTF8.GetBytes("<styles/>")),
+                ("meta.xml", Encoding.UTF8.GetBytes("<meta/>")),
+                ("META-INF/manifest.xml", Encoding.UTF8.GetBytes(CreateMinimalManifestXml()))))
+            {
+                File.WriteAllBytes(tempPath, packageStream.ToArray());
+            }
+
+            using OdfPackage package = OdfPackage.Open(
+                tempPath,
+                new OdfLoadOptions { AllowLazyLoading = true });
+
+            Assert.NotNull(package.MmfEntries);
+            Assert.Equal(
+                new[] { "mimetype", "content.xml", "styles.xml", "meta.xml", "META-INF/manifest.xml" },
+                package.EntryOrder);
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+            {
+                File.Delete(tempPath);
+            }
+        }
+    }
+
     private static MemoryStream CreatePackageWithStoredEntry(string storedEntryName, byte[] storedEntryContent)
     {
         var baseStream = new MemoryStream();
@@ -109,6 +243,41 @@ public class OdfPackageCompressionPreserveTests
 
         rebuilt.Position = 0;
         return rebuilt;
+    }
+
+    private static string CreateMinimalManifestXml(params string[] additionalEntries)
+    {
+        var builder = new StringBuilder();
+        builder.Append("<manifest:manifest xmlns:manifest=\"urn:oasis:names:tc:opendocument:xmlns:manifest:1.0\" manifest:version=\"1.4\">");
+        builder.Append("<manifest:file-entry manifest:full-path=\"/\" manifest:media-type=\"application/vnd.oasis.opendocument.text\" />");
+        builder.Append("<manifest:file-entry manifest:full-path=\"content.xml\" manifest:media-type=\"text/xml\" />");
+        builder.Append("<manifest:file-entry manifest:full-path=\"styles.xml\" manifest:media-type=\"text/xml\" />");
+        foreach (string entry in additionalEntries)
+        {
+            builder.Append("<manifest:file-entry manifest:full-path=\"");
+            builder.Append(entry);
+            builder.Append("\" manifest:media-type=\"application/octet-stream\" />");
+        }
+
+        builder.Append("</manifest:manifest>");
+        return builder.ToString();
+    }
+
+    private static MemoryStream CreateZipPackage(params (string Name, byte[] Content)[] entries)
+    {
+        var stream = new MemoryStream();
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            foreach ((string name, byte[] content) in entries)
+            {
+                ZipArchiveEntry entry = archive.CreateEntry(name, CompressionLevel.NoCompression);
+                using Stream entryStream = entry.Open();
+                entryStream.Write(content, 0, content.Length);
+            }
+        }
+
+        stream.Position = 0;
+        return stream;
     }
 
     private static bool IsStoredEntry(ZipArchiveEntry entry)

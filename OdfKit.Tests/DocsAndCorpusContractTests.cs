@@ -240,6 +240,40 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
+    /// 驗證 ODS 串流文件明確區分嚴格順序模式與交錯緩衝便利路徑。
+    /// </summary>
+    [Fact]
+    public void OdsStreamWriterCookbookDeclaresBufferedSwitchToSheetBoundary()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string cookbook = File.ReadAllText(Path.Combine(repoRoot, "docs", "cookbook.md"));
+
+        Assert.Contains("嚴格順序寫入模式", cookbook, StringComparison.Ordinal);
+        Assert.Contains("WriteStartSheet", cookbook, StringComparison.Ordinal);
+        Assert.Contains("WriteEndSheet", cookbook, StringComparison.Ordinal);
+        Assert.Contains("低記憶體輸出", cookbook, StringComparison.Ordinal);
+        Assert.Contains("SwitchToSheet", cookbook, StringComparison.Ordinal);
+        Assert.Contains("暫存緩衝", cookbook, StringComparison.Ordinal);
+        Assert.Contains("不屬於純串流模式", cookbook, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證真實 LibreOffice 互通測試只由專用入口明確啟用。
+    /// </summary>
+    [Fact]
+    public void LibreOfficeInteropTestsRequireDedicatedRunFlag()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string script = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-LibreOfficeInterop.ps1"));
+        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "testing-strategy.md"));
+        string matrix = File.ReadAllText(Path.Combine(repoRoot, "docs", "libreoffice-interop-matrix.md"));
+
+        Assert.Contains("ODFKIT_RUN_LIBREOFFICE_INTEROP", script, StringComparison.Ordinal);
+        Assert.Contains("ODFKIT_RUN_LIBREOFFICE_INTEROP=1", strategy, StringComparison.Ordinal);
+        Assert.Contains("ODFKIT_RUN_LIBREOFFICE_INTEROP=1", matrix, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// 驗證 repo 內可提交 corpus manifest 可由 CLI 直接執行。
     /// </summary>
     [Fact]

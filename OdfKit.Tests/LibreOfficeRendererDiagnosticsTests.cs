@@ -256,35 +256,42 @@ namespace OdfKit.Tests
             var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
             var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var token = cts.Token;
+            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, TestContext.Current.CancellationToken);
+            CancellationToken token = cts.Token;
             string? detectedDir = null;
 
             var watcherTask = Task.Run(async () =>
             {
-                while (!token.IsCancellationRequested && detectedDir == null)
+                try
                 {
-                    try
+                    while (!token.IsCancellationRequested && detectedDir == null)
                     {
-                        var dirs = Directory.GetDirectories(tempPath, searchPattern);
-                        foreach (var dir in dirs)
+                        try
                         {
-                            if (existingDirs.Contains(dir))
-                                continue;
-
-                            if (Directory.Exists(Path.Combine(dir, "profile")))
+                            var dirs = Directory.GetDirectories(tempPath, searchPattern);
+                            foreach (var dir in dirs)
                             {
-                                detectedDir = dir;
-                                break;
+                                if (existingDirs.Contains(dir))
+                                    continue;
+
+                                if (Directory.Exists(Path.Combine(dir, "profile")))
+                                {
+                                    detectedDir = dir;
+                                    break;
+                                }
                             }
                         }
+                        catch { }
+                        if (detectedDir != null)
+                            break;
+                        await Task.Delay(10, token);
                     }
-                    catch { }
-                    if (detectedDir != null)
-                        break;
-                    await Task.Delay(10);
                 }
-            });
+                catch (OperationCanceledException) when (token.IsCancellationRequested)
+                {
+                }
+            }, TestContext.Current.CancellationToken);
 
             try
             {

@@ -17,6 +17,10 @@ $env:ODFKIT_SOFFICE_PATH = "D:\Tools\LibreOffice\program\soffice.com"
 pwsh eng/Test-LibreOfficeInterop.ps1
 ```
 
+`LibreOfficeInteropTests` 預設不會由一般 `dotnet test` 自動執行真實 LibreOffice；
+專用腳本會在測試程序期間設定 `ODFKIT_RUN_LIBREOFFICE_INTEROP=1`，以免 unfiltered
+回歸在安裝 LibreOffice 的機器上被外部 headless 轉檔拖慢。
+
 環境變數（擇一）：
 
 | 變數 | 用途 |

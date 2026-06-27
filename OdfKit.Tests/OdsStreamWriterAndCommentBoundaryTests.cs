@@ -1,5 +1,7 @@
 ﻿using System.IO.Compression;
 using System;
+using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -133,6 +135,28 @@ namespace OdfKit.Tests
             }
         }
 
+        [Fact]
+        public void SwitchToSheetUsesBufferedConvenienceMode()
+        {
+            using var ms = new MemoryStream();
+            using var writer = new OdsStreamWriter(ms);
+
+            writer.SwitchToSheet("第一張");
+            writer.WriteStartRow();
+            writer.WriteCell("A");
+            writer.WriteEndRow();
+            writer.SwitchToSheet("第二張");
+            writer.WriteStartRow();
+            writer.WriteCell("B");
+            writer.WriteEndRow();
+            writer.SwitchToSheet("第一張");
+            writer.WriteStartRow();
+            writer.WriteCell("C");
+            writer.WriteEndRow();
+
+            Assert.True(writer.UsesBufferedSheetModeForTests);
+            Assert.Equal(2, writer.BufferedSheetCountForTests);
+        }
 
 
         [Fact]
@@ -286,6 +310,153 @@ namespace OdfKit.Tests
             using var contentStream = contentEntry!.Open();
             var contentDoc = OdfXmlReader.Parse(contentStream);
             Assert.NotNull(contentDoc);
+        }
+
+        [Fact]
+        public async Task ToAsyncEnumerable_WritesSyncAndAsyncProducerOutput()
+        {
+            var chunks = new List<byte[]>();
+            await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(writer =>
+            {
+                writer.WriteStartSheet("Sheet1");
+                writer.WriteStartRow();
+                writer.WriteCell("Hello");
+                writer.WriteCell(123.45);
+                writer.WriteEndRow();
+                writer.WriteEndSheet();
+            }))
+            {
+                chunks.Add(chunk.ToArray());
+            }
+
+            Assert.NotEmpty(chunks);
+
+            using var zipStream = new MemoryStream();
+            foreach (byte[] chunk in chunks)
+            {
+                zipStream.Write(chunk, 0, chunk.Length);
+            }
+
+            zipStream.Position = 0;
+            using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+            {
+                ZipArchiveEntry? contentEntry = archive.GetEntry("content.xml");
+                Assert.NotNull(contentEntry);
+                using var reader = new StreamReader(contentEntry.Open());
+                string xmlText = await reader.ReadToEndAsync(TestContext.Current.CancellationToken);
+                Assert.Contains("Hello", xmlText);
+                Assert.Contains("123.45", xmlText);
+            }
+
+            var chunksAsync = new List<byte[]>();
+            await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(async writer =>
+            {
+                writer.WriteStartSheet("Sheet1");
+                writer.WriteStartRow();
+                writer.WriteCell("HelloAsync");
+                writer.WriteEndRow();
+                writer.WriteEndSheet();
+                await Task.Yield();
+            }))
+            {
+                chunksAsync.Add(chunk.ToArray());
+            }
+
+            Assert.NotEmpty(chunksAsync);
+        }
+
+        [Fact]
+        public async Task ToAsyncEnumerable_LargeOutputProducesValidChunks()
+        {
+            var chunks = new List<byte[]>();
+            await foreach (ReadOnlyMemory<byte> chunk in OdsStreamWriter.ToAsyncEnumerable(writer =>
+            {
+                writer.WriteStartSheet("Rows");
+                for (int row = 0; row < 250; row++)
+                {
+                    writer.WriteStartRow();
+                    writer.WriteCell($"R{row}");
+                    writer.WriteCell(row);
+                    writer.WriteEndRow();
+                }
+                writer.WriteEndSheet();
+            }))
+            {
+                chunks.Add(chunk.ToArray());
+            }
+
+            Assert.True(chunks.Count > 1);
+
+            using var zipStream = new MemoryStream();
+            foreach (byte[] chunk in chunks)
+            {
+                zipStream.Write(chunk, 0, chunk.Length);
+            }
+
+            zipStream.Position = 0;
+            using var archive = new ZipArchive(zipStream, ZipArchiveMode.Read);
+            ZipArchiveEntry? contentEntry = archive.GetEntry("content.xml");
+            Assert.NotNull(contentEntry);
+            using var reader = new StreamReader(contentEntry.Open());
+            string xmlText = await reader.ReadToEndAsync(TestContext.Current.CancellationToken);
+            Assert.Contains("R0", xmlText);
+            Assert.Contains("R249", xmlText);
+        }
+
+        [Fact]
+        public async Task ToAsyncEnumerable_PropagatesProducerFailure()
+        {
+            InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                await foreach (ReadOnlyMemory<byte> _ in OdsStreamWriter.ToAsyncEnumerable(_ =>
+                {
+                    throw new InvalidOperationException("writer failed");
+                }))
+                {
+                }
+            });
+
+            Assert.Equal("writer failed", exception.Message);
+        }
+
+        [Fact]
+        public void OdsStreamReader_LoadsRowsThroughDbDataReader()
+        {
+            using var tempStream = new MemoryStream();
+            using (var writer = new OdsStreamWriter(tempStream))
+            {
+                writer.WriteStartSheet("Sheet1");
+                writer.WriteStartRow();
+                writer.WriteCell("Name");
+                writer.WriteCell("Age");
+                writer.WriteEndRow();
+                writer.WriteStartRow();
+                writer.WriteCell("Alice");
+                writer.WriteCell(25.0);
+                writer.WriteEndRow();
+                writer.WriteStartRow();
+                writer.WriteCell("Bob");
+                writer.WriteCell(30.0);
+                writer.WriteEndRow();
+                writer.WriteEndSheet();
+            }
+
+            tempStream.Position = 0;
+            using var reader = new OdsStreamReader(tempStream);
+            reader.SelectSheet(0);
+
+            Assert.True(reader is DbDataReader);
+            Assert.True(reader.HasRows);
+
+            var table = new DataTable();
+            table.Load(reader);
+
+            Assert.Equal(3, table.Rows.Count);
+            Assert.Equal("Name", table.Rows[0][0]);
+            Assert.Equal("Alice", table.Rows[1][0]);
+            Assert.Equal(25.0, Convert.ToDouble(table.Rows[1][1]));
+            Assert.Equal("Bob", table.Rows[2][0]);
+            Assert.Equal(30.0, Convert.ToDouble(table.Rows[2][1]));
         }
 
         #endregion

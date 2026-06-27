@@ -66,6 +66,19 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// 設定指定儲存格的公式。
+    /// </summary>
+    /// <param name="address">儲存格位址，例如 <c>A1</c></param>
+    /// <param name="formula">要寫入的公式；傳入空字串會清除公式</param>
+    /// <returns>已更新的儲存格 facade</returns>
+    public OdfCell SetFormula(string address, string formula)
+    {
+        OdfCell cell = Cells[address];
+        cell.Formula = formula;
+        return cell;
+    }
+
+    /// <summary>
     /// 更新此工作表中的公式。
     /// </summary>
     /// <param name="updater">接收目前公式資訊並傳回新公式的委派；傳回 <see langword="null"/> 表示不變更</param>

@@ -573,6 +573,7 @@ internal static class OdfPackageZipLoader
 
         long totalUncompressedSize = 0;
         List<OdfPackageEntry> entriesToPreload = new();
+        HashSet<string> entryOrderSet = new(ctx.EntryOrder, StringComparer.Ordinal);
 
         foreach (var mmfEntry in mmfEntries.Values)
         {
@@ -616,7 +617,7 @@ internal static class OdfPackageZipLoader
                 ctx.DuplicateEntryNames.Add(name);
 
             ctx.Entries[name] = pkgEntry;
-            if (!ctx.EntryOrder.Contains(name))
+            if (entryOrderSet.Add(name))
                 ctx.EntryOrder.Add(name);
         }
 

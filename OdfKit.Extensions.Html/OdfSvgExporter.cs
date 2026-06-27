@@ -680,6 +680,7 @@ public static class OdfSvgExporter
         AppendAttribute(sb, "stroke", string.Equals(strokeMode, "none", StringComparison.Ordinal) ? "none" : strokeColor ?? "#000000");
         AppendStrokeWidth(node, sb);
         AppendStrokePresentation(node, sb);
+        AppendMarkers(node, sb, context);
         AppendOptionalAttribute(sb, "fill-rule", node.GetAttribute("fill-rule", OdfNamespaces.Svg));
         AppendOpacity(node, sb);
     }
@@ -697,6 +698,7 @@ public static class OdfSvgExporter
         AppendAttribute(sb, "stroke", string.Equals(strokeMode, "none", StringComparison.Ordinal) ? "none" : strokeColor ?? "#000000");
         AppendStrokeWidth(node, sb);
         AppendStrokePresentation(node, sb);
+        AppendMarkers(node, sb, context);
         AppendOpacity(node, sb);
     }
 
@@ -717,6 +719,12 @@ public static class OdfSvgExporter
     {
         AppendOptionalAttribute(sb, "stroke-linecap", node.GetAttribute("stroke-linecap", OdfNamespaces.Svg));
         AppendOptionalAttribute(sb, "stroke-linejoin", node.GetAttribute("stroke-linejoin", OdfNamespaces.Draw));
+    }
+
+    private static void AppendMarkers(OdfNode node, StringBuilder sb, SvgExportContext context)
+    {
+        AppendOptionalAttribute(sb, "marker-start", context.TryGetMarkerUrl(node, "marker-start", out string? markerStart) ? markerStart : null);
+        AppendOptionalAttribute(sb, "marker-end", context.TryGetMarkerUrl(node, "marker-end", out string? markerEnd) ? markerEnd : null);
     }
 
     private static void AppendTransform(OdfNode node, StringBuilder sb)
@@ -1857,6 +1865,8 @@ public static class OdfSvgExporter
     {
         private readonly Dictionary<string, GradientDefinition> _availableGradients = new(StringComparer.Ordinal);
         private readonly Dictionary<string, GradientDefinition> _usedGradients = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, MarkerDefinition> _availableMarkers = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, MarkerDefinition> _usedMarkers = new(StringComparer.Ordinal);
         private int _clipId;
 
         public SvgExportContext(DrawingDocument document, OdfSvgExportOptions options)
@@ -1865,6 +1875,8 @@ public static class OdfSvgExporter
             Options = options;
             LoadGradients(document.ContentDom);
             LoadGradients(document.StylesDom);
+            LoadMarkers(document.ContentDom);
+            LoadMarkers(document.StylesDom);
         }
 
         public DrawingDocument Document { get; }
@@ -1876,6 +1888,8 @@ public static class OdfSvgExporter
             if (node.NodeType == OdfNodeType.Element)
             {
                 _ = TryUseGradient(node);
+                _ = TryUseMarker(node, "marker-start");
+                _ = TryUseMarker(node, "marker-end");
             }
 
             foreach (OdfNode child in node.Children)
@@ -1897,14 +1911,39 @@ public static class OdfSvgExporter
             return "odf-clip-" + _clipId.ToString(CultureInfo.InvariantCulture);
         }
 
+        public bool TryGetMarkerUrl(OdfNode node, string attributeName, out string? value)
+        {
+            MarkerDefinition? marker = TryUseMarker(node, attributeName);
+            value = marker is null ? null : "url(#" + marker.SvgId + ")";
+            return marker is not null;
+        }
+
         public void WriteDefinitions(StringBuilder sb)
         {
-            if (_usedGradients.Count == 0)
+            if (_usedGradients.Count == 0 && _usedMarkers.Count == 0)
             {
                 return;
             }
 
             sb.Append("<defs>");
+            foreach (MarkerDefinition marker in _usedMarkers.Values)
+            {
+                sb.Append("<marker");
+                AppendAttribute(sb, "id", marker.SvgId);
+                AppendAttribute(sb, "viewBox", marker.ViewBox.Raw);
+                AppendAttribute(sb, "markerWidth", FormatPoints(marker.ViewBox.Width));
+                AppendAttribute(sb, "markerHeight", FormatPoints(marker.ViewBox.Height));
+                AppendAttribute(sb, "refX", FormatPoints(marker.ViewBox.MaxX));
+                AppendAttribute(sb, "refY", FormatPoints(marker.ViewBox.CenterY));
+                AppendAttribute(sb, "orient", "auto");
+                AppendAttribute(sb, "markerUnits", "strokeWidth");
+                sb.Append("><path");
+                AppendAttribute(sb, "d", marker.PathData);
+                AppendAttribute(sb, "fill", "context-stroke");
+                AppendAttribute(sb, "stroke", "none");
+                sb.Append(" /></marker>");
+            }
+
             foreach (GradientDefinition gradient in _usedGradients.Values)
             {
                 if (gradient.IsRadial)
@@ -1962,6 +2001,27 @@ public static class OdfSvgExporter
             return gradient;
         }
 
+        private MarkerDefinition? TryUseMarker(OdfNode node, string attributeName)
+        {
+            string? markerName = node.GetAttribute(attributeName, OdfNamespaces.Draw);
+            if (string.IsNullOrWhiteSpace(markerName))
+            {
+                string? styleName = node.GetAttribute("style-name", OdfNamespaces.Draw);
+                markerName = string.IsNullOrWhiteSpace(styleName)
+                    ? null
+                    : Document.StyleEngine.GetStyleProperty(styleName!, attributeName, OdfNamespaces.Draw, "graphic");
+            }
+
+            if (string.IsNullOrWhiteSpace(markerName) ||
+                !_availableMarkers.TryGetValue(markerName!, out MarkerDefinition? marker))
+            {
+                return null;
+            }
+
+            _usedMarkers[marker.Name] = marker;
+            return marker;
+        }
+
         private void LoadGradients(OdfNode? root)
         {
             if (root is null)
@@ -2003,6 +2063,42 @@ public static class OdfSvgExporter
                         ParseGradientAngle(node.GetAttribute("angle", OdfNamespaces.Draw)),
                         centerX,
                         centerY));
+            }
+        }
+
+        private void LoadMarkers(OdfNode? root)
+        {
+            if (root is null)
+            {
+                return;
+            }
+
+            foreach (OdfNode node in Enumerate(root))
+            {
+                if (node.NodeType != OdfNodeType.Element ||
+                    node.NamespaceUri != OdfNamespaces.Draw ||
+                    node.LocalName != "marker")
+                {
+                    continue;
+                }
+
+                string? name = node.GetAttribute("name", OdfNamespaces.Draw);
+                string? pathData = node.GetAttribute("d", OdfNamespaces.Svg);
+                if (string.IsNullOrWhiteSpace(name) ||
+                    string.IsNullOrWhiteSpace(pathData) ||
+                    !IsSvgCompatibleEnhancedPath(pathData!) ||
+                    _availableMarkers.ContainsKey(name!))
+                {
+                    continue;
+                }
+
+                _availableMarkers.Add(
+                    name!,
+                    new MarkerDefinition(
+                        name!,
+                        CreateSvgId("odf-marker-", name!),
+                        pathData!,
+                        MarkerViewBox.Parse(node.GetAttribute("viewBox", OdfNamespaces.Svg))));
             }
         }
 
@@ -2057,9 +2153,11 @@ public static class OdfSvgExporter
             }
         }
 
-        private static string CreateSvgId(string name)
+        private static string CreateSvgId(string name) => CreateSvgId("odf-gradient-", name);
+
+        private static string CreateSvgId(string prefix, string name)
         {
-            var sb = new StringBuilder("odf-gradient-");
+            var sb = new StringBuilder(prefix);
             foreach (char c in name)
             {
                 sb.Append(char.IsLetterOrDigit(c) || c is '-' or '_' ? c : '-');
@@ -2165,6 +2263,74 @@ public static class OdfSvgExporter
             string.Equals(Style, "ellipsoid", StringComparison.Ordinal) ||
             string.Equals(Style, "square", StringComparison.Ordinal) ||
             string.Equals(Style, "rectangular", StringComparison.Ordinal);
+    }
+
+    private sealed class MarkerDefinition
+    {
+        public MarkerDefinition(string name, string svgId, string pathData, MarkerViewBox viewBox)
+        {
+            Name = name;
+            SvgId = svgId;
+            PathData = pathData;
+            ViewBox = viewBox;
+        }
+
+        public string Name { get; }
+
+        public string SvgId { get; }
+
+        public string PathData { get; }
+
+        public MarkerViewBox ViewBox { get; }
+    }
+
+    private sealed class MarkerViewBox
+    {
+        private MarkerViewBox(string raw, double x, double y, double width, double height)
+        {
+            Raw = raw;
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
+        }
+
+        public string Raw { get; }
+
+        public double X { get; }
+
+        public double Y { get; }
+
+        public double Width { get; }
+
+        public double Height { get; }
+
+        public double MaxX => X + Width;
+
+        public double CenterY => Y + (Height / 2);
+
+        public static MarkerViewBox Parse(string? value)
+        {
+            const string fallback = "0 0 10 10";
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return new MarkerViewBox(fallback, 0, 0, 10, 10);
+            }
+
+            string[] parts = value!.Split([' ', ','], StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 4 &&
+                double.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out double x) &&
+                double.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out double y) &&
+                double.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out double width) &&
+                double.TryParse(parts[3], NumberStyles.Float, CultureInfo.InvariantCulture, out double height) &&
+                width > 0 &&
+                height > 0)
+            {
+                return new MarkerViewBox(value!, x, y, width, height);
+            }
+
+            return new MarkerViewBox(fallback, 0, 0, 10, 10);
+        }
     }
 
     private sealed class GradientVector

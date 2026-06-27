@@ -164,8 +164,14 @@ public class OptimizedRefactoringTests
             Assert.Contains(loaded.MetaDom.Descendants(), node => node.LocalName == "meta-marker" && node.NamespaceUri == markerNamespace);
             Assert.Contains(loaded.SettingsDom.Descendants(), node => node.LocalName == "settings-marker" && node.NamespaceUri == markerNamespace);
             Assert.Equal(4, OdfDocument.LastCoreXmlChannelJobCountForTests);
+            int expectedWorkerCount =
+#if NET10_0_OR_GREATER
+                Math.Min(4, OdfParallelScheduler.GetEffectiveConcurrency());
+#else
+                1;
+#endif
             Assert.Equal(
-                Math.Min(4, OdfParallelScheduler.GetEffectiveConcurrency()),
+                expectedWorkerCount,
                 OdfDocument.LastCoreXmlChannelWorkerCountForTests);
         }
         finally
@@ -1040,104 +1046,6 @@ public class OptimizedRefactoringTests
     }
 
     [Fact]
-    public void Test_OdfPackage_Save_FallbackLargeEntryAvoidsExtraByteCloneAndRoundTrips()
-    {
-        byte[] payload = Enumerable.Range(0, 512 * 1024).Select(static value => (byte)(value % 251)).ToArray();
-        using var source = new MemoryStream();
-        using var destination = new MemoryStream();
-        using (var package = OdfPackage.Create(source, leaveOpen: true, new OdfSaveOptions { Password = "force-fallback" }))
-        {
-            package.SetMimeType("application/vnd.oasis.opendocument.text");
-            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-            package.WriteEntry("Pictures/large.bin", payload, "application/octet-stream");
-            package.WriteEntry("META-INF/manifest.xml", Encoding.UTF8.GetBytes(CreateMinimalManifestXml("Pictures/large.bin")), "text/xml");
-            OdfPackageArchiveWriter.LastFallbackCrcWriteCount = 0;
-            OdfPackageArchiveWriter.LastFallbackEntryByteCloneCount = 0;
-            OdfPackageArchiveWriter.LastParallelPreparedEntryCount = 0;
-
-            package.SaveCollaborators.WriteToArchive(destination);
-        }
-
-        Assert.Equal(4, OdfPackageArchiveWriter.LastFallbackCrcWriteCount);
-        Assert.Equal(0, OdfPackageArchiveWriter.LastFallbackEntryByteCloneCount);
-        Assert.Equal(0, OdfPackageArchiveWriter.LastParallelPreparedEntryCount);
-
-        destination.Position = 0;
-        using (var archive = new ZipArchive(destination, ZipArchiveMode.Read, leaveOpen: true))
-        {
-            ZipArchiveEntry? entry = archive.GetEntry("Pictures/large.bin");
-            Assert.NotNull(entry);
-            using Stream entryStream = entry!.Open();
-            using var copied = new MemoryStream();
-            entryStream.CopyTo(copied);
-            Assert.Equal(payload, copied.ToArray());
-        }
-
-        destination.Position = 0;
-        using OdfPackage reloaded = OdfPackage.Open(destination, leaveOpen: true);
-        Assert.Equal(payload, reloaded.ReadEntry("Pictures/large.bin"));
-    }
-
-    [Fact]
-    public void Test_OdfPackage_FallbackWriterComputesCrcDuringSingleWritePass()
-    {
-        byte[] payload = Encoding.UTF8.GetBytes(new string('x', 4096));
-        using var output = new MemoryStream();
-        OdfPackageArchiveWriter.LastFallbackCrcWriteCount = 0;
-
-        uint crc = OdfPackageArchiveWriter.WriteEntryContentWithCrc32ForTests(output, payload);
-
-        Assert.Equal(1, OdfPackageArchiveWriter.LastFallbackCrcWriteCount);
-        Assert.Equal(OdfCrc32.Compute(payload), crc);
-        Assert.Equal(payload, output.ToArray());
-    }
-
-    [Fact]
-    public void Test_OdfCrc32Stream_ReadDetectsCrcMismatch()
-    {
-        byte[] payload = Encoding.UTF8.GetBytes("crc mismatch payload");
-        uint wrongCrc = OdfCrc32.Compute(payload) ^ 0xFFFFFFFFu;
-        using var input = new MemoryStream(payload);
-        using var crcStream = new OdfCrc32Stream(input, wrongCrc);
-        byte[] buffer = new byte[8];
-
-        Assert.Throws<InvalidDataException>(() =>
-        {
-            while (crcStream.Read(buffer, 0, buffer.Length) > 0)
-            { }
-        });
-    }
-
-    [Fact]
-    public async Task Test_OdfPackage_LoadEntries_TracksEntryOrderWithDuplicates()
-    {
-        byte[] first = Encoding.UTF8.GetBytes("first");
-        byte[] second = Encoding.UTF8.GetBytes("second");
-        using MemoryStream packageStream = CreateZipPackage(
-            ("mimetype", Encoding.UTF8.GetBytes("application/vnd.oasis.opendocument.text")),
-            ("content.xml", first),
-            ("content.xml", second),
-            ("styles.xml", Encoding.UTF8.GetBytes("<styles/>")),
-            ("META-INF/manifest.xml", Encoding.UTF8.GetBytes(CreateMinimalManifestXml())));
-
-        using OdfPackage package = OdfPackage.Open(packageStream, leaveOpen: true);
-
-        Assert.Contains("content.xml", package.DuplicateEntryNames);
-        Assert.Equal(new[] { "mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml" }, package.EntryOrder);
-        Assert.Equal(second, package.ReadEntry("content.xml"));
-
-        packageStream.Position = 0;
-        await using OdfPackage asyncPackage = await OdfPackage.OpenAsync(
-            packageStream,
-            leaveOpen: true,
-            cancellationToken: TestContext.Current.CancellationToken);
-
-        Assert.Contains("content.xml", asyncPackage.DuplicateEntryNames);
-        Assert.Equal(new[] { "mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml" }, asyncPackage.EntryOrder);
-        Assert.Equal(second, asyncPackage.ReadEntry("content.xml"));
-    }
-
-    [Fact]
     public void Test_OdfPackage_RawEntryPatch_RepeatedCacheConsistency()
     {
         using var ms = new MemoryStream();
@@ -1401,158 +1309,6 @@ public class OptimizedRefactoringTests
     }
 
     [Fact]
-    public async Task Test_OdsStreamWriter_ToAsyncEnumerable()
-    {
-        // 1. 同步 Action ToAsyncEnumerable
-        var chunks = new List<byte[]>();
-        await foreach (var chunk in OdsStreamWriter.ToAsyncEnumerable(writer =>
-        {
-            writer.WriteStartSheet("Sheet1");
-            writer.WriteStartRow();
-            writer.WriteCell("Hello");
-            writer.WriteCell(123.45);
-            writer.WriteEndRow();
-            writer.WriteEndSheet();
-        }))
-        {
-            chunks.Add(chunk.ToArray());
-        }
-
-        Assert.NotEmpty(chunks);
-
-        // 將 chunks 合併回 Stream 以 ZipArchive 解壓驗證
-        using var zipStream = new MemoryStream();
-        foreach (var c in chunks)
-        {
-            zipStream.Write(c, 0, c.Length);
-        }
-
-        zipStream.Position = 0;
-        using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
-        {
-            var contentEntry = archive.GetEntry("content.xml");
-            Assert.NotNull(contentEntry);
-            using var reader = new StreamReader(contentEntry.Open());
-            var xmlText = await reader.ReadToEndAsync();
-            Assert.Contains("Hello", xmlText);
-            Assert.Contains("123.45", xmlText);
-        }
-
-        // 2. 非同步 Func ToAsyncEnumerable
-        var chunksAsync = new List<byte[]>();
-        await foreach (var chunk in OdsStreamWriter.ToAsyncEnumerable(async writer =>
-        {
-            writer.WriteStartSheet("Sheet1");
-            writer.WriteStartRow();
-            writer.WriteCell("HelloAsync");
-            writer.WriteEndRow();
-            writer.WriteEndSheet();
-            await Task.Yield();
-        }))
-        {
-            chunksAsync.Add(chunk.ToArray());
-        }
-
-        Assert.NotEmpty(chunksAsync);
-    }
-
-    [Fact]
-    public async Task Test_OdsStreamWriter_ToAsyncEnumerable_LargeOutputProducesValidChunks()
-    {
-        var chunks = new List<byte[]>();
-        await foreach (var chunk in OdsStreamWriter.ToAsyncEnumerable(writer =>
-        {
-            writer.WriteStartSheet("Rows");
-            for (int row = 0; row < 250; row++)
-            {
-                writer.WriteStartRow();
-                writer.WriteCell($"R{row}");
-                writer.WriteCell(row);
-                writer.WriteEndRow();
-            }
-            writer.WriteEndSheet();
-        }))
-        {
-            chunks.Add(chunk.ToArray());
-        }
-
-        Assert.True(chunks.Count > 1);
-
-        using var zipStream = new MemoryStream();
-        foreach (byte[] chunk in chunks)
-        {
-            zipStream.Write(chunk, 0, chunk.Length);
-        }
-
-        zipStream.Position = 0;
-        using var archive = new ZipArchive(zipStream, ZipArchiveMode.Read);
-        ZipArchiveEntry? contentEntry = archive.GetEntry("content.xml");
-        Assert.NotNull(contentEntry);
-        using var reader = new StreamReader(contentEntry.Open());
-        string xmlText = await reader.ReadToEndAsync();
-        Assert.Contains("R0", xmlText);
-        Assert.Contains("R249", xmlText);
-    }
-
-    [Fact]
-    public async Task Test_OdsStreamWriter_ToAsyncEnumerable_PropagatesProducerFailure()
-    {
-        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-        {
-            await foreach (ReadOnlyMemory<byte> _ in OdsStreamWriter.ToAsyncEnumerable(_ =>
-            {
-                throw new InvalidOperationException("writer failed");
-            }))
-            {
-            }
-        });
-
-        Assert.Equal("writer failed", exception.Message);
-    }
-
-    [Fact]
-    public void Test_OdsStreamReader_DbDataReader()
-    {
-        using var tempStream = new MemoryStream();
-        using (var writer = new OdsStreamWriter(tempStream))
-        {
-            writer.WriteStartSheet("Sheet1");
-            writer.WriteStartRow();
-            writer.WriteCell("Name");
-            writer.WriteCell("Age");
-            writer.WriteEndRow();
-            writer.WriteStartRow();
-            writer.WriteCell("Alice");
-            writer.WriteCell(25.0);
-            writer.WriteEndRow();
-            writer.WriteStartRow();
-            writer.WriteCell("Bob");
-            writer.WriteCell(30.0);
-            writer.WriteEndRow();
-            writer.WriteEndSheet();
-        }
-
-        tempStream.Position = 0;
-        using var reader = new OdsStreamReader(tempStream);
-        reader.SelectSheet(0);
-
-        // 1. 驗證繼承與屬性
-        Assert.True(reader is System.Data.Common.DbDataReader);
-        Assert.True(reader.HasRows);
-
-        var table = new System.Data.DataTable();
-        table.Load(reader);
-
-        // 2. 驗證讀出資料正確性
-        Assert.Equal(3, table.Rows.Count); // 包括 Header 列，因為 HasHeaders=false
-        Assert.Equal("Name", table.Rows[0][0]);
-        Assert.Equal("Alice", table.Rows[1][0]);
-        Assert.Equal(25.0, Convert.ToDouble(table.Rows[1][1]));
-        Assert.Equal("Bob", table.Rows[2][0]);
-        Assert.Equal(30.0, Convert.ToDouble(table.Rows[2][1]));
-    }
-
-    [Fact]
     public void Test_DOMTree_ComputedStyleInvalidation()
     {
         var doc = TextDocument.Create();
@@ -1786,13 +1542,13 @@ public class OptimizedRefactoringTests
                 .ToArray();
             using (var writer = new OdfDirectIoWritableStream(tempFile))
             {
-                await writer.WriteAsync(payload, 0, payload.Length, CancellationToken.None);
+                await writer.WriteAsync(payload, 0, payload.Length, TestContext.Current.CancellationToken);
             }
 
             using (var reader = new OdfDirectIoReadableStream(tempFile))
             {
                 byte[] buffer = new byte[payload.Length + 16];
-                int read = await reader.ReadAsync(buffer, 0, buffer.Length, CancellationToken.None);
+                int read = await reader.ReadAsync(buffer, 0, buffer.Length, TestContext.Current.CancellationToken);
                 Assert.Equal(payload.Length, read);
                 Assert.Equal(payload, buffer.Take(read).ToArray());
             }
@@ -1822,7 +1578,7 @@ public class OptimizedRefactoringTests
                 while (offset < payload.Length)
                 {
                     int count = Math.Min(7001, payload.Length - offset);
-                    await writer.WriteAsync(payload, offset, count, CancellationToken.None);
+                    await writer.WriteAsync(payload, offset, count, TestContext.Current.CancellationToken);
                     offset += count;
                 }
             }
@@ -1833,7 +1589,11 @@ public class OptimizedRefactoringTests
                 int total = 0;
                 while (total < actual.Length)
                 {
-                    int read = await reader.ReadAsync(actual, total, Math.Min(5003, actual.Length - total), CancellationToken.None);
+                    int read = await reader.ReadAsync(
+                        actual,
+                        total,
+                        Math.Min(5003, actual.Length - total),
+                        TestContext.Current.CancellationToken);
                     if (read == 0)
                         break;
 
