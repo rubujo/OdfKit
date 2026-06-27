@@ -62,12 +62,3 @@
 | [CHANGELOG](../CHANGELOG.md) | 版本變更與破壞性調整紀錄 |
 | [THIRD-PARTY-NOTICES](../THIRD-PARTY-NOTICES.md) | 第三方授權與版權聲明 |
 | [provenance/README.md](provenance/README.md) | 模組來源、授權與依據 |
-
-## 目前補齊的文件缺口
-
-本次重整已補上先前較欠缺的核心入口文件：
-
-1. 文件入口頁：`docs/index.md`
-2. 導入導向入門頁：`docs/getting-started.md`
-3. 套件與情境選型頁：`docs/package-catalog.md`
-4. 版本與交付資訊頁：`docs/version-delivery.md`
