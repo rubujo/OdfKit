@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using System;
 using System.Collections.Generic;
+using System.Security;
+using System.Text;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -99,34 +101,15 @@ public class OdfComment
     /// <returns>包含註解 XML 結構的 <see cref="OdfNode"/> 執行個體</returns>
     public OdfNode ToXmlNode()
     {
-        if (_replies.Count == 0)
+        return SerializeManually();
+    }
+
+    private OdfNode SerializeManually()
+    {
+        var container = new OdfNode(OdfNodeType.Element, "annotation-list", string.Empty)
         {
-            var annotationNode = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
-            annotationNode.SetAttribute("name", OdfNamespaces.Office, Name, "office");
-
-            // 建立者專案
-            var creator = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc");
-            creator.TextContent = Author;
-            annotationNode.AppendChild(creator);
-
-            // 日期專案
-            var dateNode = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc");
-            dateNode.TextContent = Date.ToString("yyyy-MM-ddTHH:mm:ssZ");
-            annotationNode.AppendChild(dateNode);
-
-            // 代表文字的段落
-            var paragraphs = Text.Split(["\r\n", "\n"], StringSplitOptions.None);
-            foreach (var pText in paragraphs)
-            {
-                var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
-                pNode.TextContent = pText;
-                annotationNode.AppendChild(pNode);
-            }
-
-            return annotationNode;
-        }
-
-        var container = new OdfNode(OdfNodeType.Element, "annotation-list", string.Empty);
+            TextContent = string.Empty
+        };
         var activePath = new HashSet<OdfComment>();
         var serializedNames = new HashSet<string>(StringComparer.Ordinal);
         var stack = new Stack<CommentStackFrame>();
@@ -155,33 +138,8 @@ public class OdfComment
             activePath.Add(frame.Comment);
             stack.Push(new CommentStackFrame(frame.Comment, frame.ParentName, true));
 
-            var annotationNode = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
-            annotationNode.SetAttribute("name", OdfNamespaces.Office, frame.Comment.Name, "office");
-            if (frame.ParentName is not null)
-            {
-                annotationNode.SetAttribute("annotation-parent", OdfNamespaces.Office, frame.ParentName, "office");
-            }
-
-            // 建立者專案
-            var creator = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc");
-            creator.TextContent = frame.Comment.Author;
-            annotationNode.AppendChild(creator);
-
-            // 日期專案
-            var dateNode = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc");
-            dateNode.TextContent = frame.Comment.Date.ToString("yyyy-MM-ddTHH:mm:ssZ");
-            annotationNode.AppendChild(dateNode);
-
-            // 代表文字的段落
-            var paragraphs = frame.Comment.Text.Split(["\r\n", "\n"], StringSplitOptions.None);
-            foreach (var pText in paragraphs)
-            {
-                var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
-                pNode.TextContent = pText;
-                annotationNode.AppendChild(pNode);
-            }
-
-            container.AppendChild(annotationNode);
+            var annotationNode = CreateAnnotationNode(frame.Comment, frame.ParentName);
+            container.Children.Append(annotationNode);
 
             for (int i = frame.Comment._replies.Count - 1; i >= 0; i--)
             {
@@ -192,6 +150,61 @@ public class OdfComment
         return container;
     }
 
+    private static OdfNode CreateAnnotationNode(OdfComment comment, string? parentName)
+    {
+        var annotationNode = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
+        annotationNode.SetAttribute("name", OdfNamespaces.Office, comment.Name, "office");
+        if (parentName is not null)
+        {
+            annotationNode.SetAttribute("annotation-parent", OdfNamespaces.Office, parentName, "office");
+        }
+
+        var creatorNode = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc")
+        {
+            TextContent = comment.Author
+        };
+        annotationNode.Children.Append(creatorNode);
+
+        var dateNode = new OdfNode(OdfNodeType.Element, "date", OdfNamespaces.Dc, "dc")
+        {
+            TextContent = comment.Date.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
+        };
+        annotationNode.Children.Append(dateNode);
+
+        var normalizedText = comment.Text ?? string.Empty;
+        var paragraphs = normalizedText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+        foreach (var pText in paragraphs)
+        {
+            var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text")
+            {
+                TextContent = pText
+            };
+            annotationNode.Children.Append(pNode);
+        }
+
+        return annotationNode;
+    }
+
+    private static IEnumerable<OdfNode> EnumerateAnnotationNodes(OdfNode root)
+    {
+        var stack = new Stack<OdfNode>();
+        stack.Push(root);
+
+        while (stack.Count > 0)
+        {
+            var current = stack.Pop();
+            if (current.LocalName == "annotation" && current.NamespaceUri == OdfNamespaces.Office)
+            {
+                yield return current;
+            }
+
+            for (int i = current.Children.Count - 1; i >= 0; i--)
+            {
+                stack.Push(current.Children[i]);
+            }
+        }
+    }
+
     private static OdfComment FromXmlNodeSingle(OdfNode node, string uniqueName)
     {
         if (node.LocalName != "annotation" || node.NamespaceUri != OdfNamespaces.Office)
@@ -199,41 +212,68 @@ public class OdfComment
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfComment_ProvidedNodeValidOdf"));
         }
 
-        string author = "Unknown";
+        string author = node.GetAttribute("creator", OdfNamespaces.Dc) ?? "Unknown";
         DateTime date = DateTime.UtcNow;
-        string text = string.Empty;
+        string text = node.GetAttribute("text", OdfNamespaces.Text) ?? string.Empty;
 
-        foreach (var child in node.Children)
+        if (string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(node.GetAttribute("p", OdfNamespaces.Text)))
         {
-            if (child.NamespaceUri == OdfNamespaces.Dc)
+            text = node.GetAttribute("p", OdfNamespaces.Text)!;
+        }
+
+        string? dateText = node.GetAttribute("date", OdfNamespaces.Dc);
+        if (!string.IsNullOrEmpty(dateText) && DateTime.TryParse(dateText, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var parsedDate))
+        {
+            if (parsedDate == DateTime.MinValue || parsedDate == DateTime.MaxValue)
             {
-                if (child.LocalName == "creator")
-                    author = child.TextContent;
-                else if (child.LocalName == "date" && DateTime.TryParse(child.TextContent, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt))
+                date = parsedDate;
+            }
+            else
+            {
+                try
                 {
-                    if (dt == DateTime.MinValue || dt == DateTime.MaxValue)
+                    date = parsedDate.ToUniversalTime();
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    date = parsedDate;
+                }
+            }
+        }
+        else
+        {
+            foreach (var child in node.Children)
+            {
+                if (child.NamespaceUri == OdfNamespaces.Dc)
+                {
+                    if (child.LocalName == "creator")
+                        author = child.TextContent;
+                    else if (child.LocalName == "date" && DateTime.TryParse(child.TextContent, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt))
                     {
-                        date = dt;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            date = dt.ToUniversalTime();
-                        }
-                        catch (ArgumentOutOfRangeException)
+                        if (dt == DateTime.MinValue || dt == DateTime.MaxValue)
                         {
                             date = dt;
                         }
+                        else
+                        {
+                            try
+                            {
+                                date = dt.ToUniversalTime();
+                            }
+                            catch (ArgumentOutOfRangeException)
+                            {
+                                date = dt;
+                            }
+                        }
                     }
                 }
-            }
-            else if (child.NamespaceUri == OdfNamespaces.Text && child.LocalName == "p")
-            {
-                if (string.IsNullOrEmpty(text))
-                    text = child.TextContent;
-                else
-                    text += "\n" + child.TextContent;
+                else if (child.NamespaceUri == OdfNamespaces.Text && child.LocalName == "p")
+                {
+                    if (string.IsNullOrEmpty(text))
+                        text = child.TextContent;
+                    else
+                        text += "\n" + child.TextContent;
+                }
             }
         }
 
@@ -254,15 +294,15 @@ public class OdfComment
         IEnumerable<OdfNode> xmlNodes;
         if (node.LocalName == "annotation-list")
         {
-            xmlNodes = node.Children;
+            xmlNodes = EnumerateAnnotationNodes(node);
         }
         else if (node.Parent is not null)
         {
-            xmlNodes = node.Parent.Children;
+            xmlNodes = EnumerateAnnotationNodes(node.Parent);
         }
         else
         {
-            xmlNodes = [node];
+            xmlNodes = EnumerateAnnotationNodes(node);
         }
 
         var commentsMap = new Dictionary<string, OdfComment>(StringComparer.Ordinal);

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableFilterAndElement(string? prefix = null) : base("filter-and", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableFilterAndElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TableFilterConditionElement> TableFilterConditionChildElements
         {
             get => ChildElements<TableFilterConditionElement>();

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartLabelSeparatorElement(string? prefix = null) : base("label-separator", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartLabelSeparatorElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TextPElement> TextPChildElements
         {
             get => ChildElements<TextPElement>();

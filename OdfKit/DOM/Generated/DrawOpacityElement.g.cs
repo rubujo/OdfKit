@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawOpacityElement(string? prefix = null) : base("opacity", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawOpacityElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfAngle? Angle
         {
             get => GetAngleAttributeValue("angle", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

@@ -18,6 +18,37 @@ internal static class OdfPackageSaver
     internal static void SaveToUnderlyingStream(OdfPackage package, bool includeRdfMetadata)
     {
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
+        foreach (var entry in ctx.Entries.Values)
+        {
+            entry.EnsureBytesLoaded();
+        }
+
+        if (package.InTransaction && package.Mmf != null && ctx.UnderlyingStream is FileStream ufs && !ctx.IsFlatXml)
+        {
+            PrepareMetadata(ctx, includeRdfMetadata);
+            if (OdfPackage.TryIncrementalZipAppend(package, ctx, ufs, includeRdfMetadata))
+            {
+                foreach (var entry in ctx.Entries.Values)
+                {
+                    entry.ReleaseMmfView();
+                }
+                package.Mmf.Dispose();
+                package.Mmf = null;
+                package.MmfEntries = null;
+                return;
+            }
+        }
+
+        if (package.Mmf != null)
+        {
+            foreach (var entry in ctx.Entries.Values)
+            {
+                entry.ReleaseMmfView();
+            }
+            package.Mmf.Dispose();
+            package.Mmf = null;
+            package.MmfEntries = null;
+        }
         RunEncryptedPipeline(package, () =>
         {
             PrepareMetadata(ctx, includeRdfMetadata);
@@ -43,6 +74,41 @@ internal static class OdfPackageSaver
         CancellationToken cancellationToken = default)
     {
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
+        foreach (var entry in ctx.Entries.Values)
+        {
+            entry.Prefetch();
+        }
+        foreach (var entry in ctx.Entries.Values)
+        {
+            await entry.PrefetchAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        if (package.InTransaction && package.Mmf != null && ctx.UnderlyingStream is FileStream ufs && !ctx.IsFlatXml)
+        {
+            PrepareMetadata(ctx, includeRdfMetadata);
+            if (OdfPackage.TryIncrementalZipAppend(package, ctx, ufs, includeRdfMetadata))
+            {
+                foreach (var entry in ctx.Entries.Values)
+                {
+                    entry.ReleaseMmfView();
+                }
+                package.Mmf.Dispose();
+                package.Mmf = null;
+                package.MmfEntries = null;
+                return;
+            }
+        }
+
+        if (package.Mmf != null)
+        {
+            foreach (var entry in ctx.Entries.Values)
+            {
+                entry.ReleaseMmfView();
+            }
+            package.Mmf.Dispose();
+            package.Mmf = null;
+            package.MmfEntries = null;
+        }
         await RunEncryptedPipelineAsync(package, async () =>
         {
             PrepareMetadata(ctx, includeRdfMetadata);

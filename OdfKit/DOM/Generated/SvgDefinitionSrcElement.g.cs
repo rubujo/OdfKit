@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public SvgDefinitionSrcElement(string? prefix = null) : base("definition-src", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
+        public SvgDefinitionSrcElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXLinkActuate? Actuate
         {
             get => GetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", GetDocumentVersion());

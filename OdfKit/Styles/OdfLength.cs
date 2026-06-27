@@ -106,6 +106,13 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     public static OdfLength FromPoints(double val) => new(val, OdfUnit.Points);
 
     /// <summary>
+    /// 從指定的派卡值建立 <see cref="OdfLength"/> 結構。
+    /// </summary>
+    /// <param name="val">長度數值</param>
+    /// <returns>表示該派卡值的 <see cref="OdfLength"/> 結構</returns>
+    public static OdfLength FromPicas(double val) => new(val, OdfUnit.Picas);
+
+    /// <summary>
     /// 從指定的像素值建立 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="val">長度數值</param>

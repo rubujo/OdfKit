@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawMarkerElement(string? prefix = null) : base("marker", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawMarkerElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? D
         {
             get => GetAttributeValue("d", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());

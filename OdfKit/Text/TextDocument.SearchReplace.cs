@@ -13,8 +13,17 @@ public partial class TextDocument
     /// <param name="search">要搜尋的關鍵字</param>
     /// <param name="replacement">要替換的新文字</param>
     /// <param name="styleAction">套用於替換後文字片段的樣式委派作業</param>
-    public void ReplaceText(string search, string replacement, Action<OdfTextRun>? styleAction = null) =>
-        TextDocumentSearchReplaceEngine.ReplaceText(this, search, replacement, styleAction);
+    public void ReplaceText(string search, string replacement, Action<OdfTextRun>? styleAction = null)
+    {
+        if (styleAction is null)
+        {
+            base.ReplaceText(search, replacement);
+        }
+        else
+        {
+            TextDocumentSearchReplaceEngine.ReplaceText(this, search, replacement, styleAction);
+        }
+    }
 
     /// <summary>
     /// 以規則運算式搜尋文字並替換為新文字。

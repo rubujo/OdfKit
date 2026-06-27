@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextInsertionElement(string? prefix = null) : base("insertion", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextInsertionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<OfficeChangeInfoElement> OfficeChangeInfoChildElements
         {
             get => ChildElements<OfficeChangeInfoElement>();

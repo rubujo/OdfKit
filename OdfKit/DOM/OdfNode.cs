@@ -37,6 +37,25 @@ public partial class OdfNode
     /// </summary>
     public OdfNode? Parent { get; internal set; }
 
+    private OdfDocument? _document;
+
+    /// <summary>
+    /// 取得此節點所屬的 ODF 文件。
+    /// </summary>
+    public OdfDocument? Document
+    {
+        get
+        {
+            if (_document is not null)
+                return _document;
+            return Parent?.Document;
+        }
+        internal set
+        {
+            _document = value;
+        }
+    }
+
     /// <summary>
     /// 取得此節點的子節點集合（雙向鏈結串列；插入／移除為 O(1)）。
     /// </summary>
@@ -200,6 +219,195 @@ public partial class OdfNode
         return OdfVersion.Odf14;
     }
 
+    /// <summary>
+    /// 使此節點的樣式快取失效。基底類別實作不執行任何動作。
+    /// </summary>
+    public virtual void InvalidateStyle()
+    {
+    }
+
+    internal ReadOnlyMemory<byte> _lazyXmlMemory;
+    internal IntPtr _lazyXmlPtr;
+    internal int _lazyXmlLen;
+    internal OdfXmlByteRange? _xmlByteRange;
+    internal bool _isLazy;
+
+    /// <summary>
+    /// 嘗試取得此節點在來源 UTF-8 XML 緩衝區中的位元組範圍。
+    /// </summary>
+    /// <param name="range">若存在來源索引，則為完整元素與內容區段的位元組範圍</param>
+    /// <returns>若此節點帶有來源 XML 位元組索引則為 <see langword="true"/></returns>
+    public bool TryGetXmlByteRange(out OdfXmlByteRange range)
+    {
+        if (_xmlByteRange is OdfXmlByteRange existing)
+        {
+            range = existing;
+            return true;
+        }
+
+        range = default;
+        return false;
+    }
+
+    /// <summary>
+    /// 確保延遲解析的子節點已具現化。
+    /// </summary>
+    public void EnsureMaterialized()
+    {
+        if (_isLazy)
+        {
+            _isLazy = false;
+            if (_lazyXmlPtr != IntPtr.Zero && _lazyXmlLen > 0)
+            {
+                unsafe
+                {
+                    using var manager = new UnmanagedMemoryManager(_lazyXmlPtr, _lazyXmlLen);
+                    MaterializeChildren(manager.Memory);
+                }
+                _lazyXmlPtr = IntPtr.Zero;
+                _lazyXmlLen = 0;
+            }
+            else if (!_lazyXmlMemory.IsEmpty)
+            {
+                var data = _lazyXmlMemory;
+                _lazyXmlMemory = default;
+                MaterializeChildren(data);
+            }
+        }
+    }
+
+    internal bool TryWriteLazyXml(System.Xml.XmlWriter writer)
+    {
+        if (!_isLazy || Children.LoadedCount != 0)
+        {
+            return false;
+        }
+
+        if (_lazyXmlPtr != IntPtr.Zero && _lazyXmlLen > 0)
+        {
+            unsafe
+            {
+                ReadOnlySpan<byte> xml = new((byte*)_lazyXmlPtr, _lazyXmlLen);
+                writer.WriteRaw(Encoding.UTF8.GetString(
+#if NETSTANDARD2_0
+                    xml.ToArray()
+#else
+                    xml
+#endif
+                ));
+            }
+
+            return true;
+        }
+
+        if (!_lazyXmlMemory.IsEmpty)
+        {
+            writer.WriteRaw(Encoding.UTF8.GetString(
+#if NETSTANDARD2_0
+                _lazyXmlMemory.ToArray()
+#else
+                _lazyXmlMemory.Span
+#endif
+            ));
+            return true;
+        }
+
+        return false;
+    }
+
+    private void MaterializeChildren(ReadOnlyMemory<byte> xmlData)
+    {
+        byte[] prefixBytes = Encoding.UTF8.GetBytes("<wrapper" +
+            " xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\"" +
+            " xmlns:text=\"urn:oasis:names:tc:opendocument:xmlns:text:1.0\"" +
+            " xmlns:table=\"urn:oasis:names:tc:opendocument:xmlns:table:1.0\"" +
+            " xmlns:style=\"urn:oasis:names:tc:opendocument:xmlns:style:1.0\"" +
+            " xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\"" +
+            " xmlns:fo=\"urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0\"" +
+            " xmlns:xlink=\"http://www.w3.org/1999/xlink\"" +
+            ">");
+        byte[] suffixBytes = Encoding.UTF8.GetBytes("</wrapper>");
+
+        using var seqStream = new OdfSequenceStream(prefixBytes, xmlData, suffixBytes);
+        OdfNode? tempRoot = OdfXmlReader.Parse(seqStream, new OdfLoadOptions { AllowLazyLoading = false });
+        if (tempRoot is not null)
+        {
+            OdfNode? nextChild = tempRoot.FirstChild;
+            while (nextChild is not null)
+            {
+                OdfNode? sibling = nextChild.NextSibling;
+                tempRoot.Children.Remove(nextChild);
+                this.AppendChild(nextChild);
+                nextChild = sibling;
+            }
+        }
+    }
+
+    private sealed class OdfSequenceStream : System.IO.Stream
+    {
+        private readonly ReadOnlyMemory<byte>[] _buffers;
+        private int _currentBufferIndex;
+        private int _currentBufferPosition;
+        private long _position;
+
+        public OdfSequenceStream(params ReadOnlyMemory<byte>[] buffers)
+        {
+            _buffers = buffers;
+        }
+
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position
+        {
+            get => _position;
+            set => throw new NotSupportedException();
+        }
+
+        public override void Flush() { }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            if (_currentBufferIndex >= _buffers.Length)
+                return 0;
+
+            int totalRead = 0;
+            while (count > 0 && _currentBufferIndex < _buffers.Length)
+            {
+                var current = _buffers[_currentBufferIndex];
+                int remaining = current.Length - _currentBufferPosition;
+                if (remaining <= 0)
+                {
+                    _currentBufferIndex++;
+                    _currentBufferPosition = 0;
+                    continue;
+                }
+
+                int toCopy = Math.Min(remaining, count);
+                current.Span.Slice(_currentBufferPosition, toCopy).CopyTo(buffer.AsSpan(offset, toCopy));
+                _currentBufferPosition += toCopy;
+                offset += toCopy;
+                count -= toCopy;
+                totalRead += toCopy;
+                _position += toCopy;
+            }
+
+            return totalRead;
+        }
+
+        public override long Seek(long offset, System.IO.SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+    }
+
+    /// <summary>
+    /// 嘗試自訂寫出 XML。若傳回 <see langword="true"/>，則略過預設的序列化行為。
+    /// </summary>
+    /// <param name="writer">XML 寫入器</param>
+    /// <param name="nsDict">命名空間宣告字典</param>
+    /// <returns>若已由該節點接管寫出則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
+    public virtual bool TryWriteOverride(System.Xml.XmlWriter writer, Dictionary<string, string> nsDict) => false;
 }
 
 /// <summary>
@@ -248,4 +456,35 @@ public static class OdfNodeExtensions
         }
         return null;
     }
+}
+
+internal sealed unsafe class UnmanagedMemoryManager : System.Buffers.MemoryManager<byte>
+{
+    private readonly byte* _pointer;
+    private readonly int _length;
+
+    public UnmanagedMemoryManager(byte* pointer, int length)
+    {
+        _pointer = pointer;
+        _length = length;
+    }
+
+    public UnmanagedMemoryManager(IntPtr pointer, int length)
+    {
+        _pointer = (byte*)pointer;
+        _length = length;
+    }
+
+    public override Span<byte> GetSpan() => new Span<byte>(_pointer, _length);
+
+    public override System.Buffers.MemoryHandle Pin(int elementIndex = 0)
+    {
+        if (elementIndex < 0 || elementIndex > _length)
+            throw new ArgumentOutOfRangeException(nameof(elementIndex));
+        return new System.Buffers.MemoryHandle(_pointer + elementIndex);
+    }
+
+    public override void Unpin() { }
+
+    protected override void Dispose(bool disposing) { }
 }

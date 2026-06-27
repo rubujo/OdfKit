@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberEraElement(string? prefix = null) : base("era", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberEraElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfNumberCalendar? Calendar
         {
             get => GetNumberCalendarAttributeValue("calendar", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", GetDocumentVersion());

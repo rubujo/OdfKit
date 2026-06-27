@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextLinenumberingSeparatorElement(string? prefix = null) : base("linenumbering-separator", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextLinenumberingSeparatorElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? Increment
         {
             get => GetNullableInt32AttributeValue("increment", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

@@ -188,7 +188,7 @@ internal static class TextDocumentSearchReplaceEngine
         }
     }
 
-    private static void ReplaceTextInParagraph(
+    internal static void ReplaceTextInParagraph(
         OdfNode paragraphNode,
         string search,
         string replacement)

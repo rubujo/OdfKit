@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextUserIndexSourceElement(string? prefix = null) : base("user-index-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextUserIndexSourceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? CopyOutlineLevels
         {
             get => GetBooleanAttributeValue("copy-outline-levels", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

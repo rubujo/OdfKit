@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextSequenceElement(string? prefix = null) : base("sequence", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextSequenceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Formula
         {
             get => GetAttributeValue("formula", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

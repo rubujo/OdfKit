@@ -1,7 +1,9 @@
 ﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using OdfKit.Compliance;
+using OdfKit.DOM;
 
 namespace OdfKit.Core;
 
@@ -20,7 +22,8 @@ public abstract partial class OdfDocument
     {
         using MemoryStream snapshot = new();
         SaveToStream(snapshot);
-        return OdfValidator.Validate(snapshot, ValidationFileNameHint(), profile);
+        OdfValidationReport packageReport = OdfValidator.Validate(snapshot, ValidationFileNameHint(), profile);
+        return MergeTopologyReport(packageReport);
     }
 
     /// <summary>
@@ -33,7 +36,22 @@ public abstract partial class OdfDocument
     {
         using MemoryStream snapshot = new();
         await SaveToStreamAsync(snapshot, cancellationToken: cancellationToken).ConfigureAwait(false);
-        return OdfValidator.Validate(snapshot, ValidationFileNameHint(), profile);
+        OdfValidationReport packageReport = OdfValidator.Validate(snapshot, ValidationFileNameHint(), profile);
+        return MergeTopologyReport(packageReport);
+    }
+
+    private OdfValidationReport MergeTopologyReport(OdfValidationReport packageReport)
+    {
+        OdfValidationReport topologyReport = OdfDocumentValidator.Validate(this);
+        if (topologyReport.Issues.Count == 0)
+        {
+            return packageReport;
+        }
+
+        var issues = new List<OdfValidationIssue>(packageReport.Issues.Count + topologyReport.Issues.Count);
+        issues.AddRange(packageReport.Issues);
+        issues.AddRange(topologyReport.Issues);
+        return new OdfValidationReport(packageReport.DetectedVersion, packageReport.DocumentKind, issues);
     }
 
     private string? ValidationFileNameHint()

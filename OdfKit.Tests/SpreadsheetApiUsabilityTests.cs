@@ -3,12 +3,15 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Spreadsheet;
 using OdfKit.Styles;
 using Xunit;
+using SheetFormula = OdfKit.Spreadsheet.Formula;
 
 namespace OdfKit.Tests;
 
@@ -44,6 +47,57 @@ public class SpreadsheetApiUsabilityTests
         Assert.Equal(42d, loadedSheet.Cells["B1"].CellValue);
         Assert.Equal("of:=[.B1]*2", loadedSheet.Cells["C1"].Formula);
         Assert.Equal("HeadingCell", loadedSheet.Cells["A1"].StyleName);
+    }
+
+    /// <summary>
+    /// 驗證強型別公式建構器可產生可直接寫入儲存格的 OpenFormula 字串。
+    /// </summary>
+    [Fact]
+    public void FormulaBuilderCreatesSpreadsheetFormulaStrings()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = workbook.Worksheets.Add("Data");
+
+        OdfSpreadsheetFormula formula = SheetFormula.Sum("A1:A10").Multiply(SheetFormula.Cell("B1"));
+        sheet.Cells["C1"].Formula = formula;
+
+        Assert.Equal("of:=SUM([.A1:.A10])*[.B1]", formula.ToString());
+        Assert.Equal("of:=SUM([.A1:.A10])*[.B1]", sheet.Cells["C1"].Formula);
+        Assert.Equal("of:=(SUM([.A1:.A10])+[.B1])*2", SheetFormula.Sum("A1:A10").Add(SheetFormula.Cell("B1")).Multiply(2).ToString());
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+
+        Assert.Equal("of:=SUM([.A1:.A10])*[.B1]", loaded.Worksheets["Data"].Cells["C1"].Formula);
+    }
+
+    /// <summary>
+    /// 驗證公式重算通道會在儲存格變更後以背景工作更新公式結果。
+    /// </summary>
+    [Fact]
+    public async Task FormulaEvaluationChannelProcessesCellChangesAsync()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = workbook.Worksheets.Add("Data");
+        await using OdfFormulaEvaluationChannel channel = workbook.BeginFormulaEvaluationChannel();
+
+        sheet.Cells["A1"].CellValue = 10d;
+        sheet.Cells["B1"].CellValue = 5d;
+        sheet.Cells["C1"].Formula = "of:=[.A1]+[.B1]";
+
+        await channel.WaitForIdleAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+
+        Assert.True(channel.SubmittedCount > 0);
+        Assert.Equal(channel.SubmittedCount, channel.CompletedCount);
+        Assert.Equal(15d, sheet.Cells["C1"].CellValue);
+
+        sheet.Cells["B1"].CellValue = 7d;
+        await channel.WaitForIdleAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+
+        Assert.Equal(17d, sheet.Cells["C1"].CellValue);
     }
 
     /// <summary>
@@ -174,6 +228,41 @@ public class SpreadsheetApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證 ODS 流式寫入器可直接逐列寫入 <see cref="System.Data.Common.DbDataReader"/>。
+    /// </summary>
+    [Fact]
+    public async Task OdsStreamWriter_WriteDataAsync_WritesRowsFromDbDataReader()
+    {
+        System.Data.DataTable table = new();
+        table.Columns.Add("Name", typeof(string));
+        table.Columns.Add("Amount", typeof(double));
+        table.Columns.Add("Active", typeof(bool));
+        table.Columns.Add("Created", typeof(DateTime));
+        table.Rows.Add("Alice", 3.5d, true, new DateTime(2026, 6, 26, 8, 30, 0, DateTimeKind.Utc));
+        table.Rows.Add("Bob", 7d, false, new DateTime(2026, 6, 27, 9, 0, 0, DateTimeKind.Utc));
+
+        await using var stream = new MemoryStream();
+        await using (var writer = new OdsStreamWriter(stream))
+        {
+            writer.SwitchToSheet("Reader");
+            using var reader = table.CreateDataReader();
+            await writer.WriteDataAsync(reader, includeColumnNames: true, TestContext.Current.CancellationToken);
+        }
+
+        stream.Position = 0;
+        using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        string contentXml = ReadZipEntry(zip, "content.xml");
+        Assert.Contains("table:name=\"Reader\"", contentXml);
+        Assert.Contains("Name", contentXml);
+        Assert.Contains("Amount", contentXml);
+        Assert.Contains("Alice", contentXml);
+        Assert.Contains("Bob", contentXml);
+        Assert.Contains("office:value=\"3.5\"", contentXml);
+        Assert.Contains("office:boolean-value=\"true\"", contentXml);
+        Assert.Contains("office:date-value=\"2026-06-26T", contentXml);
+    }
+
+    /// <summary>
     /// 驗證 ODS 流式寫入器的 Span/Memory 字串多載可正常寫入字串儲存格。
     /// </summary>
     [Fact]
@@ -197,6 +286,174 @@ public class SpreadsheetApiUsabilityTests
         Assert.Contains("Memory 內容", contentXml);
     }
 
+    /// <summary>
+    /// 驗證 ODS 流式寫入器可交錯切換工作表並於完成時依首次出現順序輸出。
+    /// </summary>
+    [Fact]
+    public void OdsStreamWriter_SwitchToSheet_WritesInterleavedSheets()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new OdsStreamWriter(stream))
+        {
+            writer.SwitchToSheet("第一張");
+            writer.WriteStartRow();
+            writer.WriteCell("A1");
+
+            writer.SwitchToSheet("第二張");
+            writer.WriteStartRow();
+            writer.WriteCell("B1");
+
+            writer.SwitchToSheet("第一張");
+            writer.WriteStartRow();
+            writer.WriteCell("A2");
+        }
+
+        stream.Position = 0;
+        using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        string contentXml = ReadZipEntry(zip, "content.xml");
+        int firstSheetIndex = contentXml.IndexOf("table:name=\"第一張\"", StringComparison.Ordinal);
+        int secondSheetIndex = contentXml.IndexOf("table:name=\"第二張\"", StringComparison.Ordinal);
+
+        Assert.True(firstSheetIndex >= 0);
+        Assert.True(secondSheetIndex > firstSheetIndex);
+        Assert.Contains("A1", contentXml);
+        Assert.Contains("A2", contentXml);
+        Assert.Contains("B1", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證 ODS 流式寫入器可並行產生多工作表片段並依工作清單順序輸出。
+    /// </summary>
+    [Fact]
+    public async Task OdsStreamWriter_WriteSheetsAsync_WritesParallelSheetsInStableOrder()
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new OdsStreamWriter(stream))
+        {
+            await writer.WriteSheetsAsync(
+                [
+                    new OdsSheetWriteJob("第一張", async (sheet, cancellationToken) =>
+                    {
+                        await Task.Delay(30, cancellationToken);
+                        sheet.WriteStartRow();
+                        sheet.WriteCell("A1");
+                        sheet.WriteCell(1d);
+                    }),
+                    new OdsSheetWriteJob("第二張", async (sheet, cancellationToken) =>
+                    {
+                        await Task.Delay(5, cancellationToken);
+                        sheet.WriteStartRow();
+                        sheet.WriteCell("B1");
+                        sheet.WriteCell(true);
+                    }),
+                    new OdsSheetWriteJob("第三張", (sheet, _) =>
+                    {
+                        sheet.WriteStartRow();
+                        sheet.WriteCell("C1");
+                        return Task.CompletedTask;
+                    })
+                ],
+                maxConcurrency: 3,
+                cancellationToken: TestContext.Current.CancellationToken);
+        }
+
+        stream.Position = 0;
+        using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        string contentXml = ReadZipEntry(zip, "content.xml");
+        int firstSheetIndex = contentXml.IndexOf("table:name=\"第一張\"", StringComparison.Ordinal);
+        int secondSheetIndex = contentXml.IndexOf("table:name=\"第二張\"", StringComparison.Ordinal);
+        int thirdSheetIndex = contentXml.IndexOf("table:name=\"第三張\"", StringComparison.Ordinal);
+
+        Assert.True(firstSheetIndex >= 0);
+        Assert.True(secondSheetIndex > firstSheetIndex);
+        Assert.True(thirdSheetIndex > secondSheetIndex);
+        Assert.Contains("A1", contentXml);
+        Assert.Contains("office:value=\"1\"", contentXml);
+        Assert.Contains("B1", contentXml);
+        Assert.Contains("office:boolean-value=\"true\"", contentXml);
+        Assert.Contains("C1", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證自動平行化會套用 CPU 核心預留比例，明確平行度則維持呼叫端設定。
+    /// </summary>
+    [Fact]
+    public async Task OdsStreamWriter_WriteSheetsAsync_UsesReservedCpuConcurrency()
+    {
+        double originalRatio = OdfParallelScheduler.ReservationRatio;
+        OdfParallelScheduler.ReservationRatio = 0.99d;
+        try
+        {
+            Assert.Equal(1, OdfParallelScheduler.GetEffectiveConcurrency());
+            Assert.Equal(3, OdfParallelScheduler.GetEffectiveConcurrency(3));
+
+            int active = 0;
+            int peakActive = 0;
+            OdsSheetWriteJob[] jobs = Enumerable.Range(0, 5)
+                .Select(index => new OdsSheetWriteJob(
+                    $"工作表 {index}",
+                    async (sheet, cancellationToken) =>
+                    {
+                        int current = Interlocked.Increment(ref active);
+                        int observed;
+                        do
+                        {
+                            observed = Volatile.Read(ref peakActive);
+                            if (current <= observed)
+                            {
+                                break;
+                            }
+                        }
+                        while (Interlocked.CompareExchange(ref peakActive, current, observed) != observed);
+
+                        await Task.Delay(15, cancellationToken);
+                        sheet.WriteStartRow();
+                        sheet.WriteCell(index.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                        Interlocked.Decrement(ref active);
+                    }))
+                .ToArray();
+
+            using var stream = new MemoryStream();
+            using (var writer = new OdsStreamWriter(stream))
+            {
+                await writer.WriteSheetsAsync(
+                    jobs,
+                    cancellationToken: TestContext.Current.CancellationToken);
+            }
+
+            Assert.Equal(1, peakActive);
+        }
+        finally
+        {
+            OdfParallelScheduler.ReservationRatio = originalRatio;
+        }
+    }
+
+    /// <summary>
+    /// 驗證 ODS 流式寫入器可直接混合輸出既有 DOM 子樹。
+    /// </summary>
+    [Fact]
+    public void OdsStreamWriter_WriteNode_WritesDomSubtree()
+    {
+        using var stream = new MemoryStream();
+        var row = new TableTableRowElement("table");
+        row.AppendElement(new TableTableCellElement("table"))
+            .AppendElement(new TextPElement("text")).TextContent = "DOM Row";
+
+        using (var writer = new OdsStreamWriter(stream))
+        {
+            writer.WriteStartSheet("DOM");
+            writer.WriteNode(row);
+            writer.WriteEndSheet();
+        }
+
+        stream.Position = 0;
+        using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        string contentXml = ReadZipEntry(zip, "content.xml");
+        Assert.Contains("table:table-row", contentXml);
+        Assert.Contains("DOM Row", contentXml);
+    }
+
     private static string ReadZipEntry(ZipArchive zip, string entryName)
     {
         var entry = zip.GetEntry(entryName);
@@ -207,20 +464,25 @@ public class SpreadsheetApiUsabilityTests
     }
 
     /// <summary>
-    /// 驗證 SplitPanes 寫入 config-item 並可 round-trip。
+    /// 驗證 SplitWindow 寫入 config-item 並可 round-trip。
     /// </summary>
     [Fact]
-    public void SplitPanes_WritesConfigItemsToSettingsXml()
+    public void SplitWindow_WritesConfigItemsToSettingsXml()
     {
         using var workbook = SpreadsheetDocument.Create();
         var sheet = workbook.Worksheets.Add("Sheet1");
-        sheet.SplitPanes(splitRow: 3, splitColumn: 2);
+        sheet.SplitWindow(splitRow: 3, splitColumn: 2);
+        Assert.Equal(new OdfSplitPanes(3, 2), sheet.ViewSplitPanes);
 
         using var ms = new MemoryStream();
         workbook.SaveToStream(ms);
         ms.Position = 0;
 
         using SpreadsheetDocument loaded = SpreadsheetDocument.Load(ms);
+        var splitPanes = Assert.Single(loaded.GetSplitPanes());
+        Assert.Equal("Sheet1", splitPanes.SheetName);
+        Assert.Equal(new OdfSplitPanes(3, 2), splitPanes.SplitPanes);
+
         using var zip = new ZipArchive(ms, ZipArchiveMode.Read);
         var entry = zip.GetEntry("settings.xml");
         Assert.NotNull(entry);
@@ -333,7 +595,17 @@ public class SpreadsheetApiUsabilityTests
         Assert.Equal(OdfLength.FromCentimeters(1), 1.Cm());
         Assert.Equal(OdfLength.FromMillimeters(2), 2.Mm());
         Assert.Equal(OdfLength.FromPoints(12), 12.Pt());
+        Assert.Equal(OdfLength.FromInches(3), 3.In());
+        Assert.Equal(OdfLength.FromPicas(4), 4.Pc());
+        Assert.Equal(OdfLength.FromPixels(96), 96.Px());
+        Assert.Equal(OdfLength.FromPercentage(50), 50.Percent());
+        Assert.Equal(OdfLength.FromEm(2), 2.Em());
         Assert.Equal("1.5cm", 1.5.Cm().ToString());
+        Assert.Equal("0.5in", 0.5.In().ToString());
+        Assert.Equal("1.25pc", 1.25.Pc().ToString());
+        Assert.Equal("1.5px", 1.5.Px().ToString());
+        Assert.Equal("12.5%", 12.5.Percent().ToString());
+        Assert.Equal("1.2em", 1.2.Em().ToString());
     }
 
     /// <summary>

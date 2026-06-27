@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableDataPilotLayoutInfoElement(string? prefix = null) : base("data-pilot-layout-info", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableDataPilotLayoutInfoElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? AddEmptyLines
         {
             get => GetBooleanAttributeValue("add-empty-lines", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

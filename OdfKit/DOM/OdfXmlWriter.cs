@@ -73,7 +73,7 @@ public static class OdfXmlWriter
         }
     }
 
-    private static void WriteNode(
+    internal static void WriteNode(
         OdfNode node,
         XmlWriter writer,
         Dictionary<string, string> nsDict,
@@ -102,6 +102,11 @@ public static class OdfXmlWriter
         if (node.NodeType == OdfNodeType.Text)
         {
             writer.WriteString(node.TextContent);
+            return;
+        }
+
+        if (node.TryWriteOverride(writer, nsDict))
+        {
             return;
         }
 
@@ -143,6 +148,13 @@ public static class OdfXmlWriter
             {
                 writer.WriteAttributeString(attr.Key.LocalName, attr.Value);
             }
+        }
+
+        if (node.TryWriteLazyXml(writer))
+        {
+            writer.WriteEndElement();
+            openElementsCount--;
+            return;
         }
 
         foreach (var child in node.Children)
@@ -231,6 +243,11 @@ public static class OdfXmlWriter
                         nsDict[OdfNamespaces.Oooc] = "oooc";
                     }
                 }
+            }
+
+            if (current._isLazy && current.Children.LoadedCount == 0)
+            {
+                continue;
             }
 
             for (int i = current.Children.Count - 1; i >= 0; i--)

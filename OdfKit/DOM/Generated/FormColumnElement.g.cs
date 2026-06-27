@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public FormColumnElement(string? prefix = null) : base("column", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
+        public FormColumnElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfNamespacedToken? ControlImplementation
         {
             get => GetNamespacedTokenAttributeValue("control-implementation", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", GetDocumentVersion());

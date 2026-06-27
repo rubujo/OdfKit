@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class DatabaseTableTypeElement : OdfElement
     {
         public DatabaseTableTypeElement(string? prefix = null) : base("table-type", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+
+        public DatabaseTableTypeElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

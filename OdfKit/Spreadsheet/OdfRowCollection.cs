@@ -25,4 +25,25 @@ public sealed class OdfRowCollection
     /// <param name="index">以 0 為基準的列索引</param>
     /// <returns>指定列</returns>
     public OdfSheetRow this[int index] => new(_sheet, index);
+
+    /// <summary>
+    /// 將指定列範圍設為可展開/收合的群組。
+    /// </summary>
+    /// <param name="startRow">起始列索引（0 為基準）</param>
+    /// <param name="endRow">結束列索引（包含，0 為基準）</param>
+    /// <param name="collapsed">是否預設為收合狀態</param>
+    public void Group(int startRow, int endRow, bool collapsed = false)
+    {
+        _sheet.GroupRows(startRow, endRow, collapsed);
+    }
+
+    /// <summary>
+    /// 移除包含指定列範圍的群組，將列移回工作表主體。
+    /// </summary>
+    /// <param name="startRow">起始列索引（0 為基準）</param>
+    /// <param name="endRow">結束列索引（包含，0 為基準）</param>
+    public void Ungroup(int startRow, int endRow)
+    {
+        _sheet.UngroupRows(startRow, endRow);
+    }
 }

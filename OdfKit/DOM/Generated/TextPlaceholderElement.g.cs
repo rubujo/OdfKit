@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextPlaceholderElement(string? prefix = null) : base("placeholder", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextPlaceholderElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Description
         {
             get => GetAttributeValue("description", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

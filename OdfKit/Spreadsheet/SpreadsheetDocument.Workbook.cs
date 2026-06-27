@@ -19,10 +19,38 @@ public partial class SpreadsheetDocument
     /// <returns>新增的 <see cref="OdfTableSheet"/> 執行個體</returns>
     public OdfTableSheet AddSheet(string name)
     {
-        var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
+        var table = new TableTableElement("table");
         table.SetAttribute("name", OdfNamespaces.Table, name, "table");
         SheetsRoot.AppendChild(table);
         return new OdfTableSheet(table, this);
+    }
+
+    /// <summary>
+    /// 將另一份文件或同一份文件中的工作表採納到此活頁簿末尾。
+    /// </summary>
+    /// <param name="sheet">要採納的來源工作表</param>
+    /// <param name="newName">採納後選用的新工作表名稱；未指定時保留來源名稱</param>
+    /// <returns>採納完成且屬於此文件的工作表</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="sheet"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <remarks>
+    /// 此方法沿用 <see cref="OdfDocument.AdoptNode(OdfDocument, OdfNode)"/> 的低分配採納路徑，
+    /// 會將來源工作表節點自原本活頁簿移除、遷移媒體參照，並更新節點文件所有權與命名空間前綴。
+    /// </remarks>
+    public OdfTableSheet AdoptSheet(OdfTableSheet sheet, string? newName = null)
+    {
+        if (sheet is null)
+        {
+            throw new ArgumentNullException(nameof(sheet));
+        }
+
+        OdfNode adopted = AdoptNode(sheet.Document, sheet.TableNode);
+        if (newName is { Length: > 0 })
+        {
+            adopted.SetAttribute("name", OdfNamespaces.Table, newName, "table");
+        }
+
+        SheetsRoot.AppendChild(adopted);
+        return new OdfTableSheet(adopted, this);
     }
 
     /// <summary>
@@ -79,7 +107,7 @@ public partial class SpreadsheetDocument
     public void ProtectWorkbook(string password)
     {
         byte[] salt = new byte[16];
-        using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+        using (var rng = RandomNumberGenerator.Create())
         {
             rng.GetBytes(salt);
         }
@@ -184,7 +212,7 @@ public partial class SpreadsheetDocument
                  (algo == "http://www.w3.org/2001/04/xmlenc#sha256" || algo == "http://www.w3.org/2000/09/xmldsig#sha256"))
         {
             // 向下相容：舊格式使用 SHA-256 單次雜湊
-            using (var sha = System.Security.Cryptography.SHA256.Create())
+            using (var sha = SHA256.Create())
             {
                 actualHash = sha.ComputeHash(input);
             }

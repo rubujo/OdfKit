@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableDataPilotFieldReferenceElement(string? prefix = null) : base("data-pilot-field-reference", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableDataPilotFieldReferenceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? FieldName
         {
             get => GetAttributeValue("field-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public FormPropertyElement(string? prefix = null) : base("property", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
+        public FormPropertyElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? BooleanValue
         {
             get => GetBooleanAttributeValue("boolean-value", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());

@@ -7,11 +7,13 @@ namespace OdfKit.Spreadsheet;
 /// </summary>
 /// <param name="name">資料庫範圍名稱</param>
 /// <param name="targetRangeAddress">目標範圍位址字串（<c>table:target-range-address</c>）</param>
+/// <param name="displayFilterButtons">是否顯示自動篩選按鈕</param>
 /// <param name="filterConditions">篩選條件清單</param>
 /// <param name="sortRules">排序規則清單</param>
 public sealed class OdfDatabaseRangeInfo(
     string name,
     string targetRangeAddress,
+    bool displayFilterButtons,
     IReadOnlyList<OdfDatabaseFilterConditionInfo> filterConditions,
     IReadOnlyList<OdfDatabaseSortRuleInfo> sortRules)
 {
@@ -24,6 +26,11 @@ public sealed class OdfDatabaseRangeInfo(
     /// 取得目標範圍位址字串。
     /// </summary>
     public string TargetRangeAddress { get; } = targetRangeAddress ?? string.Empty;
+
+    /// <summary>
+    /// 取得是否顯示自動篩選按鈕。
+    /// </summary>
+    public bool DisplayFilterButtons { get; } = displayFilterButtons;
 
     /// <summary>
     /// 取得篩選條件清單。

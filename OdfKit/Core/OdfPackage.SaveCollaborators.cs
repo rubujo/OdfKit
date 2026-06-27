@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Compliance;
+using OdfKit.Spreadsheet;
 
 namespace OdfKit.Core;
 
@@ -44,6 +45,8 @@ public sealed partial class OdfPackage
         internal OdfPackage Package => _package;
 
         internal OdfRdfMetadata RdfMetadata => _package.RdfMetadata;
+
+        internal OdfExternalLinkManager? FormulaExternalLinksForSave => _package.FormulaExternalLinksForSave;
 
         internal void ProcessSaveHooks() => OdfPackageSaveHooksEngine.Process(this);
 

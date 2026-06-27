@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public SvgFontFaceNameElement(string? prefix = null) : base("font-face-name", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
+        public SvgFontFaceNameElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Name
         {
             get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());

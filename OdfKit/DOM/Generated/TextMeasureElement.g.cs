@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextMeasureElement(string? prefix = null) : base("measure", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextMeasureElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfTextKind? Kind
         {
             get => GetTextKindAttributeValue("kind", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

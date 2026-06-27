@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextAlphabeticalIndexSourceElement(string? prefix = null) : base("alphabetical-index-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextAlphabeticalIndexSourceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? AlphabeticalSeparators
         {
             get => GetBooleanAttributeValue("alphabetical-separators", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberEmbeddedTextElement(string? prefix = null) : base("embedded-text", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberEmbeddedTextElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? Position
         {
             get => GetNullableInt32AttributeValue("position", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", GetDocumentVersion());

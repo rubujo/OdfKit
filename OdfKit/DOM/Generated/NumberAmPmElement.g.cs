@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class NumberAmPmElement : OdfElement
     {
         public NumberAmPmElement(string? prefix = null) : base("am-pm", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+
+        public NumberAmPmElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

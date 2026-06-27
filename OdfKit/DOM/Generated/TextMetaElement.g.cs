@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextMetaElement(string? prefix = null) : base("meta", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextMetaElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? About
         {
             get => GetAttributeValue("about", "http://www.w3.org/1999/xhtml", GetDocumentVersion());

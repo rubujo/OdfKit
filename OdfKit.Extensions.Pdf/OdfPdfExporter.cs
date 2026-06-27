@@ -278,13 +278,10 @@ internal sealed class OdfPdfFontResolver : IFontResolver
 {
     public FontResolverInfo ResolveTypeface(string familyName, bool isBold, bool isItalic)
     {
-        string? fontPath = Styles.OdfFontResolver.ResolveFontPath(familyName);
-        // PDFsharp 不支援 TrueType Collection（.ttc）容器格式，直接餵入會拋出例外；
-        // 許多常見中文系統字型（微軟正黑體、新細明體等）正是以 .ttc 形式安裝，
-        // 須在此提前偵測並視為「找不到」，回退至安全的替代字型。
-        if (fontPath is not null && !Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
+        string? resolved = Styles.OdfFontResolver.ResolveFontFallback(familyName, IsUsablePdfFont);
+        if (resolved is not null)
         {
-            return new FontResolverInfo(familyName, isBold, isItalic);
+            return new FontResolverInfo(resolved, isBold, isItalic);
         }
 
         if (familyName.IndexOf("Courier", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -296,22 +293,25 @@ internal sealed class OdfPdfFontResolver : IFontResolver
 
     public byte[] GetFont(string faceName)
     {
-        string? fontPath = Styles.OdfFontResolver.ResolveFontPath(faceName);
-        if (fontPath is not null && File.Exists(fontPath) && !Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
+        foreach (string candidate in Styles.OdfFontResolver.GetFontFallbackCandidates(faceName))
         {
-            return File.ReadAllBytes(fontPath);
-        }
+            string? fontPath = Styles.OdfFontResolver.ResolveFontPath(candidate);
+            if (fontPath is not null && File.Exists(fontPath) && !Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
+            {
+                return File.ReadAllBytes(fontPath);
+            }
 
-        if (fontPath is not null && Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
-        {
-            OdfKitDiagnostics.Warn(
-                $"字型「{faceName}」對應的檔案為 PDFsharp 不支援的 TrueType Collection（.ttc）格式，已改用替代字型；輸出 PDF 中對應文字的字形可能與原始字型不同。");
+            if (fontPath is not null && Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
+            {
+                OdfKitDiagnostics.Warn(
+                    $"字型「{candidate}」對應的檔案為 PDFsharp 不支援的 TrueType Collection（.ttc）格式，已改用替代字型；輸出 PDF 中對應文字的字形可能與原始字型不同。");
+            }
         }
 
         string[] fallbacks = { "Arial", "Courier New", "Liberation Sans", "DejaVu Sans" };
         foreach (var fb in fallbacks)
         {
-            fontPath = Styles.OdfFontResolver.ResolveFontPath(fb);
+            string? fontPath = Styles.OdfFontResolver.ResolveFontPath(fb);
             if (fontPath is not null && File.Exists(fontPath))
             {
                 return File.ReadAllBytes(fontPath);
@@ -337,5 +337,11 @@ internal sealed class OdfPdfFontResolver : IFontResolver
         }
 
         throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPdfExporter_UnableResolveFont", faceName));
+    }
+
+    private static bool IsUsablePdfFont(string familyName)
+    {
+        string? fontPath = Styles.OdfFontResolver.ResolveFontPath(familyName);
+        return fontPath is not null && !Styles.OdfFontResolver.IsTrueTypeCollection(fontPath);
     }
 }

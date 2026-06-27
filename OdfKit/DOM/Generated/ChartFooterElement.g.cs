@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartFooterElement(string? prefix = null) : base("footer", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartFooterElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCellRangeAddressList? CellRange
         {
             get => GetCellRangeAddressListAttributeValue("cell-range", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

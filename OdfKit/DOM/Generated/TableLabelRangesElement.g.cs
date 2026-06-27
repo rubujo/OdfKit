@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableLabelRangesElement(string? prefix = null) : base("label-ranges", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableLabelRangesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TableLabelRangeElement> TableLabelRangeChildElements
         {
             get => ChildElements<TableLabelRangeElement>();

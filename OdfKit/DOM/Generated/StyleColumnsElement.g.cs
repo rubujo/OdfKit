@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleColumnsElement(string? prefix = null) : base("columns", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleColumnsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? ColumnCount
         {
             get => GetNullableInt32AttributeValue("column-count", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());

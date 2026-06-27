@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextChangeElement(string? prefix = null) : base("change", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextChangeElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXmlName? ChangeId
         {
             get => GetXmlNameAttributeValue("change-id", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

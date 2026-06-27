@@ -23,6 +23,8 @@ public sealed partial class OdfPackage
 
         internal OdfPackageLoadCollaborators(OdfPackage package) => _package = package;
 
+        internal OdfPackage Package => _package;
+
         internal Stream? UnderlyingStream
         {
             get => _package._underlyingStream;

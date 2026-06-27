@@ -42,9 +42,10 @@ public partial class OdfNode
 #if DEBUG
         ValidateAttributeWrite(localName, namespaceUri, value);
 #endif
+        value = OdfAttributeStringPool.InternValue(value);
         var key = new OdfAttributeName(localName, namespaceUri);
         string? existingPrefix = GetAttributePrefix(key);
-        string? resolvedPrefix = ResolveAttributePrefix(namespaceUri, prefix);
+        string? resolvedPrefix = OdfAttributeStringPool.InternName(ResolveAttributePrefix(namespaceUri, prefix) ?? string.Empty);
         if (!Attributes.TryGetValue(key, out string? existing) || existing != value)
         {
             IsModified = true;
@@ -69,6 +70,11 @@ public partial class OdfNode
 
             _attributePrefixes.Remove(key);
         }
+
+        if (IsModified)
+        {
+            InvalidateStyle();
+        }
     }
 
     /// <summary>
@@ -92,6 +98,7 @@ public partial class OdfNode
         {
             _attributePrefixes.Remove(key);
             IsModified = true;
+            InvalidateStyle();
         }
     }
 

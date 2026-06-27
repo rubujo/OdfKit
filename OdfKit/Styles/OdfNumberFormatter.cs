@@ -17,6 +17,7 @@ public partial class OdfNumberFormatter
 
     // 金鑰：樣式之規範 XML 金鑰，值：產生的樣式名稱（例如 N1, D1）
     private readonly Dictionary<string, string> _formatCache = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _formatRequestCache = new(StringComparer.Ordinal);
     private int _styleCounter;
 
     /// <summary>
@@ -42,6 +43,10 @@ public partial class OdfNumberFormatter
     {
         var cult = culture ?? CultureInfo.InvariantCulture;
         string normalized = ResolveStandardFormat(dotNetFormat, cult);
+        if (_formatRequestCache.TryGetValue(normalized, out string? cachedStyleName))
+        {
+            return cachedStyleName;
+        }
 
         // 1. 建立格式資訊
         FormatInfo info = ParsePattern(normalized);
@@ -53,6 +58,7 @@ public partial class OdfNumberFormatter
         // 3. 檢查快取
         if (_formatCache.TryGetValue(canonicalKey, out string? existingStyleName))
         {
+            _formatRequestCache[normalized] = existingStyleName;
             return existingStyleName;
         }
 
@@ -79,6 +85,7 @@ public partial class OdfNumberFormatter
         automaticStyles.AppendChild(tempNode);
 
         _formatCache[canonicalKey] = generatedName;
+        _formatRequestCache[normalized] = generatedName;
         return generatedName;
     }
 

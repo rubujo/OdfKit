@@ -2,15 +2,20 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
+#if NET10_0_OR_GREATER
+using System.Threading.Channels;
+#endif
 using System.Threading.Tasks;
 using System.Xml;
 using OdfKit.Compliance;
 using OdfKit.DOM;
 using OdfKit.Styles;
+using OdfKit.Text;
 
 namespace OdfKit.Core;
 
@@ -20,6 +25,10 @@ namespace OdfKit.Core;
 public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
 {
     private const string DocumentSignaturesPath = "META-INF/documentsignatures.xml";
+
+    internal static int LastCoreXmlChannelJobCountForTests { get; private set; }
+
+    internal static int LastCoreXmlChannelWorkerCountForTests { get; private set; }
 
     /// <summary>
     /// 建立指定種類的 ODF 文件。
@@ -183,6 +192,11 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     internal OdfStyleEngine StyleEngine { get; private protected set; } = null!;
 
     /// <summary>
+    /// 取得文件樣式引擎，可用於樣式屬性查詢、去重與未使用樣式回收。
+    /// </summary>
+    public OdfStyleEngine Styles => StyleEngine;
+
+    /// <summary>
     /// 取得或設定文件的中繼資料 DOM 樹。
     /// </summary>
     internal OdfNode MetaDom { get; private protected set; } = null!;
@@ -249,6 +263,16 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         StylesDom.ResetModifiedState();
 
         StyleEngine = new OdfStyleEngine(ContentDom, StylesDom);
+        Package.OnRollback += ReloadDoms;
+    }
+
+    private void ReloadDoms()
+    {
+        LoadXmlTrees();
+        OdfLoExtInteropEngine.NormalizeLoadedDocument(ContentDom, StylesDom);
+        ContentDom.ResetModifiedState();
+        StylesDom.ResetModifiedState();
+        StyleEngine = new OdfStyleEngine(ContentDom, StylesDom);
     }
 
     /// <summary>
@@ -265,19 +289,105 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
 
     private void LoadXmlTrees()
     {
-        ContentDom = LoadOrInitDom("content.xml", GetDefaultContentXml());
-        StylesDom = LoadOrInitDom("styles.xml", GetDefaultStylesXml());
-        MetaDom = LoadOrInitDom("meta.xml", GetDefaultMetaXml());
-        SettingsDom = LoadOrInitDom("settings.xml", GetDefaultSettingsXml());
+        CoreXmlLoadJob[] jobs =
+        [
+            new(0, "content.xml", GetDefaultContentXml()),
+            new(1, "styles.xml", GetDefaultStylesXml()),
+            new(2, "meta.xml", GetDefaultMetaXml()),
+            new(3, "settings.xml", GetDefaultSettingsXml())
+        ];
+        OdfNode[] results = new OdfNode[jobs.Length];
+#if NET10_0_OR_GREATER
+        var channel = Channel.CreateUnbounded<CoreXmlLoadJob>(new UnboundedChannelOptions
+        {
+            SingleReader = false,
+            SingleWriter = true
+        });
+
+        foreach (CoreXmlLoadJob job in jobs)
+        {
+            channel.Writer.TryWrite(job);
+        }
+        channel.Writer.Complete();
+
+        int workerCount = Math.Min(jobs.Length, OdfParallelScheduler.GetEffectiveConcurrency());
+        LastCoreXmlChannelJobCountForTests = jobs.Length;
+        LastCoreXmlChannelWorkerCountForTests = workerCount;
+
+        Task[] workers = new Task[workerCount];
+        for (int i = 0; i < workers.Length; i++)
+        {
+            workers[i] = Task.Run(async () =>
+            {
+                ChannelReader<CoreXmlLoadJob> reader = channel.Reader;
+                while (await reader.WaitToReadAsync().ConfigureAwait(false))
+                {
+                    while (reader.TryRead(out CoreXmlLoadJob job))
+                    {
+                        results[job.Index] = LoadOrInitDom(job.EntryName, job.DefaultXml);
+                    }
+                }
+            });
+        }
+
+        Task.WhenAll(workers).GetAwaiter().GetResult();
+#else
+        LastCoreXmlChannelJobCountForTests = jobs.Length;
+        LastCoreXmlChannelWorkerCountForTests = 1;
+        foreach (CoreXmlLoadJob job in jobs)
+        {
+            results[job.Index] = LoadOrInitDom(job.EntryName, job.DefaultXml);
+        }
+#endif
+
+        ContentDom = results[0];
+        StylesDom = results[1];
+        MetaDom = results[2];
+        SettingsDom = results[3];
+
+        ContentDom.Document = this;
+        StylesDom.Document = this;
+        MetaDom.Document = this;
+        SettingsDom.Document = this;
+    }
+
+    private readonly struct CoreXmlLoadJob
+    {
+        public CoreXmlLoadJob(int index, string entryName, string defaultXml)
+        {
+            Index = index;
+            EntryName = entryName;
+            DefaultXml = defaultXml;
+        }
+
+        public int Index { get; }
+
+        public string EntryName { get; }
+
+        public string DefaultXml { get; }
     }
 
     private OdfNode LoadOrInitDom(string entryName, string defaultXml)
     {
         string path = string.IsNullOrEmpty(SubPath) ? entryName : SubPath + entryName;
-        if (Package.HasEntry(path))
+        var entry = Package.GetEntry(path);
+        if (entry != null)
         {
-            using var stream = Package.GetEntryStream(path);
-            return OdfXmlReader.Parse(stream, Package.LoadOptions);
+            int len;
+            IntPtr ptr = entry.GetMmfPointer(out len);
+            if (ptr != IntPtr.Zero)
+            {
+                unsafe
+                {
+                    using var manager = new UnmanagedMemoryManager(ptr, len);
+                    return OdfXmlReader.Parse(manager.Memory, ptr, Package.LoadOptions);
+                }
+            }
+            else
+            {
+                using var stream = entry.OpenReader();
+                return OdfXmlReader.Parse(stream, Package.LoadOptions);
+            }
         }
         else
         {
@@ -344,6 +454,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         {
             if (disposing)
             {
+                Package.OnRollback -= ReloadDoms;
                 Package.Dispose();
             }
             _isDisposed = true;
@@ -358,6 +469,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     {
         if (!_isDisposed)
         {
+            Package.OnRollback -= ReloadDoms;
             await Package.DisposeAsync().ConfigureAwait(false);
             _isDisposed = true;
         }
@@ -380,6 +492,56 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     /// 取得書籤管理器，提供安全讀寫與操作書籤的高階介面。
     /// </summary>
     public OdfBookmarkManager Bookmarks => new OdfBookmarkManager(this);
+
+    /// <summary>
+    /// 將目前文件轉換並匯出為 PDF 格式。
+    /// </summary>
+    /// <param name="pdfStream">要寫入 PDF 的目標資料流</param>
+    /// <param name="certificate">用於簽章 PDF 的憑證；若為 null 則不簽章</param>
+    public void ExportToPdf(Stream pdfStream, X509Certificate2? certificate = null)
+    {
+        if (pdfStream is null)
+            throw new ArgumentNullException(nameof(pdfStream));
+
+        var renderer = OdfRendererRegistry.Instance;
+        if (renderer is null)
+        {
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_Renderer_NotRegistered", CultureInfo.InvariantCulture));
+        }
+
+        renderer.ExportToPdf(this, pdfStream, certificate);
+    }
+
+    /// <summary>
+    /// 在整份文件的 DOM 樹中搜尋指定文字並替換為新文字，同時保留文字的格式與樣式結構。
+    /// </summary>
+    /// <param name="search">要搜尋的關鍵字</param>
+    /// <param name="replacement">要替換的新文字</param>
+    public virtual void ReplaceText(string search, string replacement)
+    {
+        if (string.IsNullOrEmpty(search))
+            return;
+
+        var stack = new Stack<OdfNode>();
+        stack.Push(ContentDom);
+        while (stack.Count > 0)
+        {
+            var current = stack.Pop();
+            if (current.NodeType == OdfNodeType.Element &&
+                (current.LocalName == "p" || current.LocalName == "h") &&
+                current.NamespaceUri == OdfNamespaces.Text)
+            {
+                TextDocumentSearchReplaceEngine.ReplaceTextInParagraph(current, search, replacement);
+            }
+            else
+            {
+                for (int i = current.Children.Count - 1; i >= 0; i--)
+                {
+                    stack.Push(current.Children[i]);
+                }
+            }
+        }
+    }
 
     #endregion
 

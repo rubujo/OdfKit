@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseFormsElement(string? prefix = null) : base("forms", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseFormsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DatabaseComponentElement> DatabaseComponentChildElements
         {
             get => ChildElements<DatabaseComponentElement>();

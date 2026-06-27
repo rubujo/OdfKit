@@ -5,11 +5,11 @@ using OdfKit.DOM;
 namespace OdfKit.Styles;
 
 /// <summary>
-/// 表示日期時間格式化語彙基元的類別。
+/// 表示日期時間格式化語彙基元的唯讀值型別。
 /// </summary>
 /// <param name="token">格式化語彙基元字串</param>
 /// <param name="isLiteral">指出該語彙基元是否為字面值</param>
-public class DateTimeToken(string token, bool isLiteral)
+public readonly struct DateTimeToken(string token, bool isLiteral)
 {
     /// <summary>
     /// 取得格式化語彙基元字串。

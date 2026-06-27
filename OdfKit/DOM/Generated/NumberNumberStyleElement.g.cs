@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberNumberStyleElement(string? prefix = null) : base("number-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberNumberStyleElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCountryCode? Country
         {
             get => GetCountryCodeAttributeValue("country", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", GetDocumentVersion());

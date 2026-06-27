@@ -104,6 +104,11 @@ public class OdfSaveOptions
     public bool EvaluateFormulasOnSave { get; set; } = false;
 
     /// <summary>
+    /// 取得或設定一個值，指出是否啟用 Direct I/O 無快取寫入模式以提升存檔效能。預設為 <see langword="false"/> 。
+    /// </summary>
+    public bool EnableDirectIo { get; set; } = false;
+
+    /// <summary>
     /// 取得或設定用於加密 ODF 文件的密碼。
     /// </summary>
     public string? Password { get; set; }

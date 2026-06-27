@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeStylesElement(string? prefix = null) : base("styles", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeStylesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<NumberBooleanStyleElement> NumberBooleanStyleChildElements
         {
             get => ChildElements<NumberBooleanStyleElement>();

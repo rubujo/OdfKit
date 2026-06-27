@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseDriverSettingsElement(string? prefix = null) : base("driver-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseDriverSettingsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? BaseDn
         {
             get => GetAttributeValue("base-dn", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

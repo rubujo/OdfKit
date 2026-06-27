@@ -1,5 +1,6 @@
 ﻿using OdfKit.Compliance;
 using OdfKit.DOM;
+using OdfKit.Spreadsheet;
 using OdfKit.Styles;
 
 namespace OdfKit.Core;
@@ -37,5 +38,15 @@ public abstract partial class OdfDocument
         internal OdfStyleEngine StyleEngine => _document.StyleEngine;
 
         internal OdfVersion? TargetVersion => _document.TargetVersion;
+
+        internal OdfExternalLinkManager? FormulaExternalLinks => _document.GetFormulaExternalLinksForPersistence();
+
+        internal void PrepareForPersistence(OdfSaveOptions options) => _document.PrepareForPersistence(options);
+    }
+
+    internal virtual OdfExternalLinkManager? GetFormulaExternalLinksForPersistence() => null;
+
+    internal virtual void PrepareForPersistence(OdfSaveOptions options)
+    {
     }
 }

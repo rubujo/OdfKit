@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public Dr3dCubeElement(string? prefix = null) : base("cube", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
+        public Dr3dCubeElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleNameList? DrawClassNames
         {
             get => GetStyleNameListAttributeValue("class-names", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

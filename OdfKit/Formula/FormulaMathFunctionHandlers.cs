@@ -671,6 +671,12 @@ internal static class FormulaMathFunctionHandlers
             }
         }
 
+        if (arrays.Count == 2 &&
+            FormulaNumericAggregation.TrySumProduct(arrays[0], arrays[1], out double fastSumProduct))
+        {
+            return fastSumProduct;
+        }
+
         double sum = 0.0;
         for (int r = 0; r < rows; r++)
         {

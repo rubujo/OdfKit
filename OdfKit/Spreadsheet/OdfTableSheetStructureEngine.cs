@@ -24,20 +24,16 @@ internal static class OdfTableSheetStructureEngine
             return;
 
         List<OdfNode> rows = OdfTableSheetDomAccessEngine.GetRowsList(tableNode);
+        OdfNode row = CreateEmptyRow(count);
         if (position >= rows.Count)
         {
-            for (int i = 0; i < count; i++)
-            {
-                tableNode.AppendChild(CreateEmptyRow());
-            }
-
+            tableNode.AppendChild(row);
             return;
         }
 
         OdfNode referenceRow = rows[position];
         OdfNode parent = referenceRow.Parent ?? tableNode;
-        for (int i = 0; i < count; i++)
-            parent.InsertBefore(CreateEmptyRow(), referenceRow);
+        parent.InsertBefore(row, referenceRow);
     }
 
     internal static IReadOnlyList<OdfNode> DeleteRows(OdfNode tableNode, int position, int count)
@@ -79,6 +75,18 @@ internal static class OdfTableSheetStructureEngine
             else
                 parent.AppendChild(row);
         }
+    }
+
+    internal static void CopyRows(OdfNode tableNode, int sourcePosition, int count, int targetPosition)
+    {
+        IReadOnlyList<OdfNode> rowSnapshots = GetRowSnapshots(tableNode, sourcePosition, count);
+        RestoreRows(tableNode, targetPosition, rowSnapshots);
+    }
+
+    internal static void MoveRows(OdfNode tableNode, int sourcePosition, int count, int targetPosition)
+    {
+        IReadOnlyList<OdfNode> rowSnapshots = DeleteRows(tableNode, sourcePosition, count);
+        RestoreRows(tableNode, targetPosition, rowSnapshots);
     }
 
     internal static void InsertColumns(OdfNode tableNode, int position, int count)
@@ -263,14 +271,39 @@ internal static class OdfTableSheetStructureEngine
         return null;
     }
 
-    private static OdfNode CreateEmptyRow() =>
-        new(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
+    internal static IReadOnlyList<OdfNode> GetRowSnapshots(OdfNode tableNode, int position, int count)
+    {
+        if (count <= 0)
+            return [];
+
+        List<OdfNode> rows = OdfTableSheetDomAccessEngine.GetRowsList(tableNode);
+        List<OdfNode> snapshots = [];
+
+        int end = position + count - 1;
+        for (int index = position; index <= end; index++)
+        {
+            if (index < 0 || index >= rows.Count)
+                continue;
+
+            snapshots.Add(rows[index].CloneNode(deep: true));
+        }
+
+        return snapshots.AsReadOnly();
+    }
+
+    private static OdfNode CreateEmptyRow(int repeatedCount = 1)
+    {
+        var row = new TableTableRowElement("table");
+        if (repeatedCount > 1)
+            row.SetAttribute("number-rows-repeated", OdfNamespaces.Table, repeatedCount.ToString(), "table");
+        return row;
+    }
 
     private static OdfNode CreateEmptyColumn() =>
-        new(OdfNodeType.Element, "table-column", OdfNamespaces.Table, "table");
+        new TableTableColumnElement("table");
 
     private static OdfNode CreateEmptyCell() =>
-        new(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table");
+        new TableTableCellElement("table");
 
     private static void CopyCellContent(OdfNode source, OdfNode target)
     {

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleGraphicPropertiesElement(string? prefix = null) : base("graphic-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleGraphicPropertiesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? AllowOverlap
         {
             get => GetBooleanAttributeValue("allow-overlap", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

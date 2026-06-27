@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextListHeaderElement(string? prefix = null) : base("list-header", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextListHeaderElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXmlName? Id
         {
             get => GetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", GetDocumentVersion());

@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class DatabaseTableFilterPatternElement : OdfElement
     {
         public DatabaseTableFilterPatternElement(string? prefix = null) : base("table-filter-pattern", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+
+        public DatabaseTableFilterPatternElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

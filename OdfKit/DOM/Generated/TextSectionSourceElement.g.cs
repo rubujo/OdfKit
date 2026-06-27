@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextSectionSourceElement(string? prefix = null) : base("section-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextSectionSourceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? FilterName
         {
             get => GetAttributeValue("filter-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

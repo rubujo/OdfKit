@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -87,6 +88,24 @@ public sealed partial class OdfPackage
             _saveOptions = previousOptions;
             _lock.Release();
         }
+    }
+
+    /// <summary>
+    /// 將封裝序列化儲存至指定的位元組緩衝區寫入器。
+    /// </summary>
+    /// <param name="destination">目標位元組緩衝區寫入器</param>
+    /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
+    /// <remarks>
+    /// 此入口會將 ZIP 或 Flat XML 輸出直接寫入 <paramref name="destination"/>，適合與 ASP.NET Core、
+    /// pipelines 或自訂零拷貝緩衝區整合，避免呼叫端必須先建立中介 <see cref="MemoryStream"/>。
+    /// </remarks>
+    public void Save(IBufferWriter<byte> destination, OdfSaveOptions? options = null)
+    {
+        if (destination is null)
+            throw new ArgumentNullException(nameof(destination));
+
+        using var stream = new OdfBufferWriterStream(destination);
+        SaveToStream(stream, options);
     }
 
     /// <summary>

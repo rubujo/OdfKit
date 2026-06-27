@@ -3,6 +3,8 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.IO.MemoryMappedFiles;
+using System.Reflection;
 using System.Security;
 using System.Text;
 using System.Threading;
@@ -16,18 +18,59 @@ namespace OdfKit.Core;
 /// </summary>
 internal static class OdfPackageZipLoader
 {
+    internal static int LastMmfParallelPreloadEntryCountForTests;
+
+    internal static int LastMmfParallelPreloadVisitedEntryCountForTests;
+
+    internal static int LastMmfParallelPreloadMaxDegreeForTests;
+
     /// <summary>
     /// 自 ZIP 封存讀取所有專案至載入內容。
     /// </summary>
     internal static void LoadEntries(ZipArchive archive, OdfPackage.OdfPackageLoadCollaborators ctx)
     {
+        OdfPackage package = ctx.Package;
+        if (package.FilePath != null)
+        {
+            try
+            {
+                MemoryMappedFile mmf;
+                if (ctx.UnderlyingStream is FileStream ufs)
+                {
+                    mmf = MemoryMappedFile.CreateFromFile(ufs, null, 0, MemoryMappedFileAccess.Read, HandleInheritability.None, true);
+                }
+                else
+                {
+                    mmf = MemoryMappedFile.CreateFromFile(package.FilePath, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
+                }
+
+                using (var fs = new FileStream(package.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    var mmfEntries = OdfZipDirectoryParser.ParseCentralDirectory(fs);
+                    if (mmfEntries != null)
+                    {
+                        package.Mmf = mmf;
+                        package.MmfEntries = mmfEntries;
+                        LoadEntriesFromMmf(ctx);
+                        return;
+                    }
+                }
+                mmf.Dispose();
+            }
+            catch (Exception ex)
+            {
+                OdfKitDiagnostics.Warn($"[OdfPackage] 無法使用 MMF 唯讀映射，將退回 BCL ZipArchive 讀取模式。原因: {ex.Message}");
+            }
+        }
+
         if (archive.Entries.Count > ctx.LoadOptions.MaxZipEntries)
         {
             throw new SecurityException(
-                $"Zip archive contains too many entries ({archive.Entries.Count} > {ctx.LoadOptions.MaxZipEntries}). Potential Zip DoS attack.");
+                OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntryCountLimitExceeded", archive.Entries.Count, ctx.LoadOptions.MaxZipEntries));
         }
 
         long totalUncompressedSize = 0;
+        List<OdfPackageEntry> entriesToPreload = new();
 
         foreach (ZipArchiveEntry entry in archive.Entries)
         {
@@ -44,23 +87,35 @@ internal static class OdfPackageZipLoader
             if (entry.Length > ctx.LoadOptions.MaxEntrySize)
             {
                 throw new SecurityException(
-                    $"Zip entry '{name}' exceeds size limit ({entry.Length} > {ctx.LoadOptions.MaxEntrySize} bytes).");
+                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", name, entry.Length, ctx.LoadOptions.MaxEntrySize));
             }
 
             totalUncompressedSize += entry.Length;
             if (totalUncompressedSize > ctx.LoadOptions.MaxTotalUncompressedSize)
             {
                 throw new SecurityException(
-                    $"Zip archive total uncompressed size exceeds limit ({totalUncompressedSize} > {ctx.LoadOptions.MaxTotalUncompressedSize} bytes).");
+                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded", totalUncompressedSize, ctx.LoadOptions.MaxTotalUncompressedSize));
             }
 
-            byte[] entryBytes;
-            using (Stream entryStream = entry.Open())
+            OdfPackageEntry pkgEntry;
+            if (ctx.LoadOptions.AllowLazyLoading)
             {
-                entryBytes = ReadEntryBytes(entryStream, entry.Length);
+                pkgEntry = new OdfPackageEntry(name, entry);
+                if (name == "content.xml" || name == "styles.xml" || name == "meta.xml" || name == "settings.xml")
+                {
+                    entriesToPreload.Add(pkgEntry);
+                }
+            }
+            else
+            {
+                byte[] entryBytes;
+                using (Stream entryStream = entry.Open())
+                {
+                    entryBytes = ReadEntryBytes(entryStream, entry.Length);
+                }
+                pkgEntry = new OdfPackageEntry(name, entryBytes);
             }
 
-            var pkgEntry = new OdfPackageEntry(name, entryBytes);
             bool wasStored = TryDetectStoredCompression(entry);
             pkgEntry.WasStoredInZip = wasStored;
             pkgEntry.IsCompressed = !wasStored;
@@ -70,6 +125,27 @@ internal static class OdfPackageZipLoader
             ctx.Entries[name] = pkgEntry;
             if (!ctx.EntryOrder.Contains(name))
                 ctx.EntryOrder.Add(name);
+        }
+
+        if (ctx.LoadOptions.AllowLazyLoading && entriesToPreload.Count > 0)
+        {
+            package.PreloadTask = Task.Run(() =>
+            {
+                lock (archive)
+                {
+                    foreach (OdfPackageEntry entry in entriesToPreload)
+                    {
+                        try
+                        {
+                            using Stream stream = entry.OpenReader();
+                        }
+                        catch
+                        {
+                            // 忽略預讀異常，待主線程存取時處理
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -81,13 +157,50 @@ internal static class OdfPackageZipLoader
         OdfPackage.OdfPackageLoadCollaborators ctx,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        OdfPackage package = ctx.Package;
+        if (package.FilePath != null)
+        {
+            try
+            {
+                MemoryMappedFile mmf;
+                if (ctx.UnderlyingStream is FileStream ufs)
+                {
+                    mmf = MemoryMappedFile.CreateFromFile(ufs, null, 0, MemoryMappedFileAccess.Read, HandleInheritability.None, true);
+                }
+                else
+                {
+                    mmf = MemoryMappedFile.CreateFromFile(package.FilePath, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
+                }
+
+                using (var fs = new FileStream(package.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 4096, true))
+                {
+                    var mmfEntries = OdfZipDirectoryParser.ParseCentralDirectory(fs);
+                    if (mmfEntries != null)
+                    {
+                        package.Mmf = mmf;
+                        package.MmfEntries = mmfEntries;
+                        LoadEntriesFromMmf(ctx);
+                        return;
+                    }
+                }
+                mmf.Dispose();
+            }
+            catch (Exception ex)
+            {
+                OdfKitDiagnostics.Warn($"[OdfPackage] 非同步作業無法使用 MMF 唯讀映射，將退回 BCL ZipArchive 讀取模式。原因: {ex.Message}");
+            }
+        }
+
         if (archive.Entries.Count > ctx.LoadOptions.MaxZipEntries)
         {
             throw new SecurityException(
-                $"Zip archive contains too many entries ({archive.Entries.Count} > {ctx.LoadOptions.MaxZipEntries}). Potential Zip DoS attack.");
+                OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntryCountLimitExceeded", archive.Entries.Count, ctx.LoadOptions.MaxZipEntries));
         }
 
         long totalUncompressedSize = 0;
+        List<OdfPackageEntry> entriesToPreload = new();
 
         foreach (ZipArchiveEntry entry in archive.Entries)
         {
@@ -106,23 +219,35 @@ internal static class OdfPackageZipLoader
             if (entry.Length > ctx.LoadOptions.MaxEntrySize)
             {
                 throw new SecurityException(
-                    $"Zip entry '{name}' exceeds size limit ({entry.Length} > {ctx.LoadOptions.MaxEntrySize} bytes).");
+                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", name, entry.Length, ctx.LoadOptions.MaxEntrySize));
             }
 
             totalUncompressedSize += entry.Length;
             if (totalUncompressedSize > ctx.LoadOptions.MaxTotalUncompressedSize)
             {
                 throw new SecurityException(
-                    $"Zip archive total uncompressed size exceeds limit ({totalUncompressedSize} > {ctx.LoadOptions.MaxTotalUncompressedSize} bytes).");
+                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded", totalUncompressedSize, ctx.LoadOptions.MaxTotalUncompressedSize));
             }
 
-            byte[] entryBytes;
-            using (Stream entryStream = entry.Open())
+            OdfPackageEntry pkgEntry;
+            if (ctx.LoadOptions.AllowLazyLoading)
             {
-                entryBytes = await ReadEntryBytesAsync(entryStream, entry.Length, cancellationToken).ConfigureAwait(false);
+                pkgEntry = new OdfPackageEntry(name, entry);
+                if (name == "content.xml" || name == "styles.xml" || name == "meta.xml" || name == "settings.xml")
+                {
+                    entriesToPreload.Add(pkgEntry);
+                }
+            }
+            else
+            {
+                byte[] entryBytes;
+                using (Stream entryStream = entry.Open())
+                {
+                    entryBytes = await ReadEntryBytesAsync(entryStream, entry.Length, cancellationToken).ConfigureAwait(false);
+                }
+                pkgEntry = new OdfPackageEntry(name, entryBytes);
             }
 
-            var pkgEntry = new OdfPackageEntry(name, entryBytes);
             bool wasStored = TryDetectStoredCompression(entry);
             pkgEntry.WasStoredInZip = wasStored;
             pkgEntry.IsCompressed = !wasStored;
@@ -132,6 +257,26 @@ internal static class OdfPackageZipLoader
             ctx.Entries[name] = pkgEntry;
             if (!ctx.EntryOrder.Contains(name))
                 ctx.EntryOrder.Add(name);
+        }
+
+        if (ctx.LoadOptions.AllowLazyLoading && entriesToPreload.Count > 0)
+        {
+            package.PreloadTask = Task.Run(() =>
+            {
+                lock (archive)
+                {
+                    foreach (OdfPackageEntry entry in entriesToPreload)
+                    {
+                        try
+                        {
+                            using Stream stream = entry.OpenReader();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -391,10 +536,10 @@ internal static class OdfPackageZipLoader
         {
             var fieldInfo = typeof(ZipArchiveEntry).GetField(
                     "_compressionMethod",
-                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    BindingFlags.NonPublic | BindingFlags.Instance)
                 ?? typeof(ZipArchiveEntry).GetField(
                     "m_compressionMethod",
-                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    BindingFlags.NonPublic | BindingFlags.Instance);
 
             if (fieldInfo is null)
             {
@@ -418,4 +563,92 @@ internal static class OdfPackageZipLoader
             return entry.CompressedLength == entry.Length;
         }
     }
+
+    private static void LoadEntriesFromMmf(OdfPackage.OdfPackageLoadCollaborators ctx)
+    {
+        OdfPackage package = ctx.Package;
+        var mmfEntries = package.MmfEntries!;
+
+        long totalUncompressedSize = 0;
+        List<OdfPackageEntry> entriesToPreload = new();
+
+        foreach (var mmfEntry in mmfEntries.Values)
+        {
+            string name = mmfEntry.Name;
+            if (mmfEntry.UncompressedSize > ctx.LoadOptions.MaxEntrySize)
+            {
+                throw new SecurityException(
+                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", name, mmfEntry.UncompressedSize, ctx.LoadOptions.MaxEntrySize));
+            }
+
+            totalUncompressedSize += mmfEntry.UncompressedSize;
+            if (totalUncompressedSize > ctx.LoadOptions.MaxTotalUncompressedSize)
+            {
+                throw new SecurityException(
+                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded", totalUncompressedSize, ctx.LoadOptions.MaxTotalUncompressedSize));
+            }
+
+            OdfPackageEntry pkgEntry;
+            if (ctx.LoadOptions.AllowLazyLoading)
+            {
+                pkgEntry = new OdfPackageEntry(name, mmfEntry, package);
+                if (name == "content.xml" || name == "styles.xml" || name == "meta.xml" || name == "settings.xml")
+                {
+                    entriesToPreload.Add(pkgEntry);
+                }
+            }
+            else
+            {
+                byte[] entryBytes;
+                using (Stream entryStream = mmfEntry.OpenStream(package.Mmf!))
+                {
+                    entryBytes = ReadEntryBytes(entryStream, mmfEntry.UncompressedSize);
+                }
+                pkgEntry = new OdfPackageEntry(name, entryBytes);
+            }
+
+            bool wasStored = mmfEntry.CompressionMethod == 0;
+            pkgEntry.WasStoredInZip = wasStored;
+            pkgEntry.IsCompressed = !wasStored;
+            if (ctx.Entries.ContainsKey(name))
+                ctx.DuplicateEntryNames.Add(name);
+
+            ctx.Entries[name] = pkgEntry;
+            if (!ctx.EntryOrder.Contains(name))
+                ctx.EntryOrder.Add(name);
+        }
+
+        if (ctx.LoadOptions.AllowLazyLoading && entriesToPreload.Count > 0)
+        {
+            LastMmfParallelPreloadEntryCountForTests = entriesToPreload.Count;
+            LastMmfParallelPreloadVisitedEntryCountForTests = 0;
+            ParallelOptions preloadOptions = CreatePreloadParallelOptions();
+            LastMmfParallelPreloadMaxDegreeForTests = preloadOptions.MaxDegreeOfParallelism;
+
+            package.PreloadTask = Task.Run(() =>
+            {
+                Parallel.ForEach(entriesToPreload, preloadOptions, entry =>
+                {
+                    OdfParallelScheduler.RunWithConfiguredThreadPriority(() =>
+                    {
+                        try
+                        {
+                            using Stream stream = entry.OpenReader();
+                            Interlocked.Increment(ref LastMmfParallelPreloadVisitedEntryCountForTests);
+                        }
+                        catch
+                        {
+                            // 忽略預讀異常，待主線程存取時處理
+                        }
+                    });
+                });
+            });
+        }
+    }
+
+    internal static ParallelOptions CreatePreloadParallelOptions()
+        => new()
+        {
+            MaxDegreeOfParallelism = OdfParallelScheduler.GetEffectiveConcurrency()
+        };
 }

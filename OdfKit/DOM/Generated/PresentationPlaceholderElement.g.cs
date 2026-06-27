@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public PresentationPlaceholderElement(string? prefix = null) : base("placeholder", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
+        public PresentationPlaceholderElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfLength? Height
         {
             get => GetLengthAttributeValue("height", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public Dr3dRotateElement(string? prefix = null) : base("rotate", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
+        public Dr3dRotateElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? D
         {
             get => GetAttributeValue("d", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());

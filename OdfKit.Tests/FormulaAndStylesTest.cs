@@ -344,6 +344,27 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void TestFormulaEvaluatorSumProductUsesVectorizedMatrixPath()
+        {
+            var context = new MockEvaluationContext();
+            var evaluator = new DefaultFormulaEvaluator();
+
+            context.CellValues[OdfCellAddress.ParseExcel("A1")] = 1.0;
+            context.CellValues[OdfCellAddress.ParseExcel("A2")] = 2.0;
+            context.CellValues[OdfCellAddress.ParseExcel("A3")] = 3.0;
+            context.CellValues[OdfCellAddress.ParseExcel("A4")] = 4.0;
+            context.CellValues[OdfCellAddress.ParseExcel("B1")] = 10.0;
+            context.CellValues[OdfCellAddress.ParseExcel("B2")] = 20.0;
+            context.CellValues[OdfCellAddress.ParseExcel("B3")] = 30.0;
+            context.CellValues[OdfCellAddress.ParseExcel("B4")] = 40.0;
+
+            var result = evaluator.Evaluate("SUMPRODUCT(A1:A4, B1:B4)", context);
+
+            Assert.Equal(300.0, result);
+            Assert.True(FormulaNumericAggregation.LastSumProductUsedVectorizedPathForTests);
+        }
+
+        [Fact]
         public void TestFormulaEvaluatorVLookup()
         {
             var context = new MockEvaluationContext();
@@ -798,6 +819,9 @@ namespace OdfKit.Tests
         [Fact]
         public void TestParsePatternRecognizesAllFormatTypes()
         {
+            Assert.True(typeof(FormatInfo).IsValueType);
+            Assert.True(typeof(DateTimeToken).IsValueType);
+
             FormatInfo number = OdfNumberFormatter.ParsePattern("#,##0.00");
             Assert.Equal(FormatType.Number, number.Type);
             Assert.True(number.Grouping);
@@ -828,6 +852,38 @@ namespace OdfKit.Tests
             FormatInfo time = OdfNumberFormatter.ParsePattern("HH:mm:ss");
             Assert.Equal(FormatType.Time, time.Type);
             Assert.NotEmpty(time.DateTimeTokens);
+
+            FormatInfo cachedDate = OdfNumberFormatter.ParsePattern("yyyy/MM/dd");
+            Assert.Same(date.DateTimeTokens, cachedDate.DateTimeTokens);
+        }
+
+        /// <summary>
+        /// 驗證重複格式樣式查詢會在規格化格式字串層命中快取，避免再次建立暫時 XML 節點。
+        /// </summary>
+        [Fact]
+        public void TestNumberFormatterRepeatedFormatLookupAvoidsHeapAllocation()
+        {
+            var contentRoot = new OdfNode(OdfNodeType.Element, "document-content", OdfNamespaces.Office, "office");
+            var stylesRoot = new OdfNode(OdfNodeType.Element, "document-styles", OdfNamespaces.Office, "office");
+            var formatter = new OdfNumberFormatter(contentRoot, stylesRoot);
+
+            string firstStyleName = formatter.GetOrCreateNumberStyle("#,##0.00");
+            Assert.Equal(firstStyleName, formatter.GetOrCreateNumberStyle("#,##0.00"));
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            long before = GC.GetAllocatedBytesForCurrentThread();
+            string? lastStyleName = null;
+            for (int i = 0; i < 1_000; i++)
+            {
+                lastStyleName = formatter.GetOrCreateNumberStyle("#,##0.00");
+            }
+
+            long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - before;
+            Assert.Equal(firstStyleName, lastStyleName);
+            Assert.Equal(0, allocatedBytes);
         }
 
         #endregion

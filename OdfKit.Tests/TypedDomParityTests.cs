@@ -10,6 +10,7 @@ using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
+using OdfKit.Text;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -20,7 +21,7 @@ namespace OdfKit.Tests;
 public class TypedDomParityTests
 {
     /// <summary>
-    /// 驗證 factory 會建立 generated 與手寫 typed wrapper，未知元素則回退為通用元素。
+    /// 驗證 factory 會建立 generated 與手寫 typed wrapper，未知元素則回退為未知元素。
     /// </summary>
     [Fact]
     public void NodeFactoryCreatesGeneratedHandWrittenAndFallbackElements()
@@ -34,10 +35,170 @@ public class TypedDomParityTests
 
         Assert.IsType<AnimationAnimateElement>(generated);
         Assert.IsType<TextPElement>(handWritten);
-        Assert.IsType<OdfElement>(fallback);
+        Assert.IsType<OdfUnknownElement>(fallback);
         Assert.Equal("animate", generated.LocalName);
         Assert.Equal("p", handWritten.LocalName);
         Assert.Equal("custom-node", fallback.LocalName);
+    }
+
+    /// <summary>
+    /// 驗證自訂 wrapper 註冊表可讓非標準命名空間元素被解析成指定 typed DOM 型別。
+    /// </summary>
+    [Fact]
+    public void WrapperRegistryCreatesCustomTypedElementDuringParsing()
+    {
+        const string customNamespace = "urn:example:odfkit:custom";
+        OdfWrapperRegistry.Register(
+            "approval-stamp",
+            customNamespace,
+            prefix => new ApprovalStampElement(prefix));
+
+        try
+        {
+            string xml = """
+                <office:document-content
+                    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                    xmlns:custom="urn:example:odfkit:custom">
+                  <office:body>
+                    <custom:approval-stamp custom:status="approved">完成</custom:approval-stamp>
+                  </office:body>
+                </office:document-content>
+                """;
+
+            OfficeDocumentContentElement parsedDocument = Assert.IsType<OfficeDocumentContentElement>(
+                OdfXmlReader.Parse(Encoding.UTF8.GetBytes(xml), new OdfLoadOptions { AllowLazyLoading = true }));
+            ApprovalStampElement stamp = Assert.IsType<ApprovalStampElement>(
+                parsedDocument.FirstDescendantElement<ApprovalStampElement>());
+
+            Assert.Equal("custom", stamp.Prefix);
+            Assert.Equal("approved", stamp.Status);
+            Assert.Equal("完成", stamp.TextContent);
+
+            OfficeDocumentContentElement fallbackDocument = Assert.IsType<OfficeDocumentContentElement>(
+                OdfXmlReader.Parse(Encoding.UTF8.GetBytes(xml), new OdfLoadOptions { AllowLazyLoading = false }));
+            ApprovalStampElement fallbackStamp = Assert.IsType<ApprovalStampElement>(
+                fallbackDocument.FirstDescendantElement<ApprovalStampElement>());
+
+            Assert.Equal("custom", fallbackStamp.Prefix);
+            Assert.Equal("approved", fallbackStamp.Status);
+            Assert.Equal("完成", fallbackStamp.TextContent);
+        }
+        finally
+        {
+            Assert.True(OdfWrapperRegistry.Unregister("approval-stamp", customNamespace));
+        }
+
+        OdfNode fallback = OdfNodeFactory.CreateElement("approval-stamp", customNamespace, "custom");
+        Assert.IsType<OdfUnknownElement>(fallback);
+        Assert.IsNotType<ApprovalStampElement>(fallback);
+    }
+
+    /// <summary>
+    /// 驗證未知元素會以可辨識型別保留，並完整 round-trip 屬性、文字與子樹。
+    /// </summary>
+    [Fact]
+    public void UnknownElementPreservesForeignMarkupRoundTrip()
+    {
+        const string xml = """
+            <office:document-content
+                xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                xmlns:ext="urn:example:extension"
+                office:version="1.4">
+              <office:body>
+                <ext:payload ext:id="p1">
+                  <ext:child>自訂內容</ext:child>
+                </ext:payload>
+              </office:body>
+            </office:document-content>
+            """;
+
+        OfficeDocumentContentElement document = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(Encoding.UTF8.GetBytes(xml), new OdfLoadOptions { AllowLazyLoading = false }));
+        OdfUnknownElement payload = Assert.IsType<OdfUnknownElement>(
+            document.OfficeBodyChildElements.Single().ChildElements<OdfUnknownElement>().Single());
+        OdfUnknownElement child = payload.ChildElements<OdfUnknownElement>().Single();
+
+        Assert.Equal("ext", payload.Prefix);
+        Assert.Equal("payload", payload.LocalName);
+        Assert.Equal("p1", payload.GetAttribute("id", "urn:example:extension"));
+        Assert.Equal("自訂內容", child.TextContent);
+
+        using MemoryStream stream = new();
+        OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
+        string output = Encoding.UTF8.GetString(stream.ToArray());
+
+        Assert.Contains("<ext:payload ext:id=\"p1\">", output, StringComparison.Ordinal);
+        Assert.Contains("<ext:child>自訂內容</ext:child>", output, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證自訂 XML 屬性註冊表會在 UTF-8 Span 階段快速識別屬性 local name，並保留 namespace URI 語意。
+    /// </summary>
+    [Fact]
+    public void CustomAttributeRegistryFastLookupPreservesNamespaceUriSemantics()
+    {
+        const string customNamespace = "urn:example:odfkit:custom-attributes";
+        using IDisposable registration = OdfCustomAttributeRegistry.Register("approval-code", customNamespace);
+
+        Assert.True(OdfCustomAttributeRegistry.TryMatchLocalName("custom:approval-code"u8, out string registeredLocalName));
+        Assert.Equal("approval-code", registeredLocalName);
+        Assert.False(OdfCustomAttributeRegistry.TryMatchLocalName("custom:unrelated"u8, out _));
+
+        const string xml = """
+            <office:document-content
+                xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                xmlns:custom="urn:example:odfkit:custom-attributes"
+                office:version="1.4">
+              <office:body custom:approval-code="A-42" custom:unrelated="ignored">
+                <office:text />
+              </office:body>
+            </office:document-content>
+            """;
+
+        OfficeDocumentContentElement document = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(Encoding.UTF8.GetBytes(xml), new OdfLoadOptions { AllowLazyLoading = true }));
+        OfficeBodyElement body = document.OfficeBodyChildElements.Single();
+
+        Assert.Equal("A-42", body.GetAttribute("approval-code", customNamespace));
+        Assert.Equal("custom", body.GetAttributePrefix(new OdfAttributeName("approval-code", customNamespace)));
+        Assert.Equal("ignored", body.GetAttribute("unrelated", customNamespace));
+    }
+
+    /// <summary>
+    /// 驗證 generated wrapper 的函數式建構子會依序掛載子節點。
+    /// </summary>
+    [Fact]
+    public void GeneratedWrapperFunctionalConstructorAppendsChildren()
+    {
+        ChartTitleElement title = new("chart") { TextContent = "Axis title" };
+        ChartAxisElement axis = new(title);
+
+        Assert.Same(title, axis.Children.Single());
+        Assert.Same(axis, title.Parent);
+        Assert.Equal("Axis title", axis.Children.Single().TextContent);
+
+        OdfNode[] nullChildren = null!;
+        Assert.Throws<ArgumentNullException>(() => new ChartAxisElement(nullChildren));
+    }
+
+    private sealed class ApprovalStampElement(string? prefix = null)
+        : OdfElement("approval-stamp", "urn:example:odfkit:custom", prefix)
+    {
+        public string? Status
+        {
+            get => GetAttribute("status", "urn:example:odfkit:custom");
+            set
+            {
+                if (value is null)
+                {
+                    RemoveAttribute("status", "urn:example:odfkit:custom");
+                }
+                else
+                {
+                    SetAttribute("status", "urn:example:odfkit:custom", value, "custom");
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -85,6 +246,29 @@ public class TypedDomParityTests
         Assert.Equal("Emphasis", parsedEmphasis.StyleName);
         Assert.Equal("width * 2", parsedAnimation.Formula);
         Assert.Equal("Hello typed DOM!", parsedParagraph.TextContent);
+    }
+
+    /// <summary>
+    /// 驗證計畫名的 LINQ 友善尋覽與鏈式 DOM 建立擴充 API。
+    /// </summary>
+    [Fact]
+    public void OdfNodeTraversalExtensionsSupportTypedChildrenDescendantsAndAppend()
+    {
+        TextPElement paragraph = new("text");
+        TextSpanElement first = new("text") { TextContent = "第一段" };
+        TextSpanElement second = new("text") { TextContent = "第二段" };
+        TextAElement link = new("text");
+        TextSpanElement nested = new("text") { TextContent = "連結文字" };
+
+        TextPElement returned = paragraph.Append(first, link.Append(nested), second);
+
+        Assert.Same(paragraph, returned);
+        Assert.Same(paragraph, paragraph.As<TextPElement>());
+        Assert.Null(paragraph.As<TableTableElement>());
+        Assert.Equal([first, second], paragraph.Children<TextSpanElement>().ToArray());
+        Assert.Equal([first, nested, second], paragraph.Descendants<TextSpanElement>().ToArray());
+        Assert.Same(link, nested.Parent);
+        Assert.Same(paragraph, link.Parent);
     }
 
     /// <summary>
@@ -142,6 +326,431 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 UTF-8 快速路徑與 XmlReader fallback 會建立相同的 typed DOM 結構。
+    /// </summary>
+    [Fact]
+    public void FastPathAndFallbackReaderCreateEquivalentTypedDom()
+    {
+        const string xml = """
+            <office:document-content
+                xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                office:version="1.4">
+              <office:body>
+                <office:spreadsheet>
+                  <table:table table:name="Sheet1">
+                    <table:table-row>
+                      <table:table-cell office:value-type="string">
+                        <text:p>Hello &amp; typed fast path</text:p>
+                      </table:table-cell>
+                    </table:table-row>
+                  </table:table>
+                </office:spreadsheet>
+              </office:body>
+            </office:document-content>
+            """;
+
+        byte[] bytes = Encoding.UTF8.GetBytes(xml);
+        OfficeDocumentContentElement fastDocument = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(bytes, new OdfLoadOptions { AllowLazyLoading = true }));
+        OfficeDocumentContentElement fallbackDocument = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(bytes, new OdfLoadOptions { AllowLazyLoading = false }));
+
+        AssertEquivalentSpreadsheet(fastDocument);
+        AssertEquivalentSpreadsheet(fallbackDocument);
+    }
+
+    /// <summary>
+    /// 驗證 UTF-8 快速路徑會依據 namespace URI 而非固定 prefix 建立 typed DOM。
+    /// </summary>
+    [Fact]
+    public void FastPathResolvesNonStandardNamespacePrefixes()
+    {
+        const string xml = """
+            <office:document-content
+                xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                xmlns:calc="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                office:version="1.4">
+              <office:body>
+                <office:spreadsheet>
+                  <calc:table calc:name="Sheet1">
+                    <calc:table-row>
+                      <calc:table-cell office:value-type="string">
+                        <text:p>Hello &amp; typed fast path</text:p>
+                      </calc:table-cell>
+                    </calc:table-row>
+                  </calc:table>
+                </office:spreadsheet>
+              </office:body>
+            </office:document-content>
+            """;
+
+        byte[] bytes = Encoding.UTF8.GetBytes(xml);
+        OfficeDocumentContentElement fastDocument = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(bytes, new OdfLoadOptions { AllowLazyLoading = true }));
+        OfficeDocumentContentElement fallbackDocument = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(bytes, new OdfLoadOptions { AllowLazyLoading = false }));
+
+        AssertEquivalentSpreadsheet(fastDocument);
+        AssertEquivalentSpreadsheet(fallbackDocument);
+    }
+
+    /// <summary>
+    /// 驗證 UTF-8 快速路徑會以 SIMD / Span 分類常見前綴，且前綴被重定義時會退回 namespace scope 查表。
+    /// </summary>
+    [Fact]
+    public void FastPathKnownPrefixClassifierPreservesNamespaceUriSemantics()
+    {
+        Dictionary<string, string> canonicalNamespaces = new(StringComparer.Ordinal)
+        {
+            ["table"] = OdfNamespaces.Table,
+            ["text"] = OdfNamespaces.Text
+        };
+
+        Assert.True(OdfUtf8XmlReader.TryResolveKnownQualifiedName(
+            "table:table-cell"u8,
+            canonicalNamespaces,
+            out string prefix,
+            out string localName,
+            out string namespaceUri));
+        Assert.Equal("table", prefix);
+        Assert.Equal("table-cell", localName);
+        Assert.Equal(OdfNamespaces.Table, namespaceUri);
+        Assert.Equal(6, OdfUtf8XmlReader.GetCommonPrefixLength("table:table-cell"u8));
+        Assert.False(OdfUtf8XmlReader.TryResolveKnownQualifiedName(
+            "tablex:table-cell"u8,
+            canonicalNamespaces,
+            out _,
+            out _,
+            out _));
+        Assert.False(OdfUtf8XmlReader.TryResolveKnownQualifiedName(
+            "Table:table-cell"u8,
+            canonicalNamespaces,
+            out _,
+            out _,
+            out _));
+        Assert.False(OdfUtf8XmlReader.TryResolveKnownQualifiedName(
+            "table"u8,
+            canonicalNamespaces,
+            out _,
+            out _,
+            out _));
+
+        Dictionary<string, string> redefinedNamespaces = new(StringComparer.Ordinal)
+        {
+            ["table"] = "urn:example:not-table"
+        };
+
+        Assert.False(OdfUtf8XmlReader.TryResolveKnownQualifiedName(
+            "table:table"u8,
+            redefinedNamespaces,
+            out _,
+            out _,
+            out _));
+
+        const string xml = """
+            <office:document-content
+                xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                xmlns:table="urn:example:not-table"
+                office:version="1.4">
+              <office:body>
+                <office:spreadsheet>
+                  <table:table table:name="NotAnOdfTable" />
+                </office:spreadsheet>
+              </office:body>
+            </office:document-content>
+            """;
+
+        OfficeDocumentContentElement document = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(Encoding.UTF8.GetBytes(xml), new OdfLoadOptions { AllowLazyLoading = true }));
+        OdfUnknownElement customTable = Assert.IsType<OdfUnknownElement>(
+            document.OfficeBodyChildElements.Single().OfficeSpreadsheetChildElements.Single().Children.Single());
+
+        Assert.Equal("table", customTable.Prefix);
+        Assert.Equal("table", customTable.LocalName);
+        Assert.Equal("urn:example:not-table", customTable.NamespaceUri);
+    }
+
+    /// <summary>
+    /// 驗證 UTF-8 快速路徑會以 hash 直接辨識常見標籤與屬性名稱，且命中後仍做二進位二次比對。
+    /// </summary>
+    [Fact]
+    public void FastPathKnownQualifiedNameHashRecognizesTagsAndAttributesWithBinaryGuard()
+    {
+        Assert.True(OdfUtf8XmlReader.TryGetKnownQualifiedNameKind(
+            "office:document-content"u8,
+            out OdfUtf8KnownQualifiedName documentContentKind));
+        Assert.Equal(OdfUtf8KnownQualifiedName.OfficeDocumentContent, documentContentKind);
+
+        Assert.True(OdfUtf8XmlReader.TryGetKnownQualifiedNameKind(
+            "table:table-cell"u8,
+            out OdfUtf8KnownQualifiedName tableCellKind));
+        Assert.Equal(OdfUtf8KnownQualifiedName.TableTableCell, tableCellKind);
+
+        Assert.True(OdfUtf8XmlReader.TryGetKnownQualifiedNameKind(
+            "text:style-name"u8,
+            out OdfUtf8KnownQualifiedName textStyleNameKind));
+        Assert.Equal(OdfUtf8KnownQualifiedName.TextStyleName, textStyleNameKind);
+
+        Assert.True(OdfUtf8XmlReader.TryGetKnownQualifiedNameKind(
+            "xlink:href"u8,
+            out OdfUtf8KnownQualifiedName hrefKind));
+        Assert.Equal(OdfUtf8KnownQualifiedName.XLinkHref, hrefKind);
+
+        Assert.False(OdfUtf8XmlReader.TryGetKnownQualifiedNameKind(
+            "table:table-celx"u8,
+            out OdfUtf8KnownQualifiedName nearMissKind));
+        Assert.Equal(OdfUtf8KnownQualifiedName.Unknown, nearMissKind);
+
+        Assert.False(OdfUtf8XmlReader.TryGetKnownQualifiedNameKind(
+            "Table:table-cell"u8,
+            out _));
+        Assert.False(OdfUtf8XmlReader.TryGetKnownQualifiedNameKind(
+            "text:style-names"u8,
+            out _));
+    }
+
+    /// <summary>
+    /// 驗證大型表格在 UTF-8 快速路徑中會維持延遲載入，讀取子節點時才具現化。
+    /// </summary>
+    [Fact]
+    public void FastPathKeepsLargeTableLazyUntilChildTraversal()
+    {
+        string rows = string.Concat(Enumerable.Range(0, 260).Select(i =>
+            $"""
+                    <table:table-row>
+                      <table:table-cell office:value-type="string"><text:p>Row {i}</text:p></table:table-cell>
+                    </table:table-row>
+            """));
+        string xml = $$"""
+            <office:document-content
+                xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                office:version="1.4">
+              <office:body>
+                <office:spreadsheet>
+                  <table:table table:name="Sheet1">
+            {{rows}}
+                  </table:table>
+                </office:spreadsheet>
+              </office:body>
+            </office:document-content>
+            """;
+
+        OfficeDocumentContentElement document = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(Encoding.UTF8.GetBytes(xml), new OdfLoadOptions { AllowLazyLoading = true }));
+        TableTableElement table = document.OfficeBodyChildElements
+            .Single()
+            .OfficeSpreadsheetChildElements
+            .Single()
+            .TableTableChildElements
+            .Single();
+
+        Assert.True(table._isLazy);
+        Assert.True(table._lazyXmlMemory.Length > 8192);
+
+        TableTableRowElement[] materializedRows = table.TableTableRowChildElements.ToArray();
+
+        Assert.False(table._isLazy);
+        Assert.Equal(260, materializedRows.Length);
+        Assert.Equal("Row 0", materializedRows[0].TableTableCellChildElements.Single().TextPChildElements.Single().TextContent);
+    }
+
+    /// <summary>
+    /// 驗證未具現化的大型 XML 區段可在寫出時直接沿用原始 inner XML。
+    /// </summary>
+    [Fact]
+    public void FastPathWritesLazyChunkWithoutMaterializingChildren()
+    {
+        string rows = string.Concat(Enumerable.Range(0, 260).Select(i =>
+            $"""
+                    <table:table-row>
+                      <table:table-cell office:value-type="string"><text:p>Row {i}</text:p></table:table-cell>
+                    </table:table-row>
+            """));
+        string xml = $$"""
+            <office:document-content
+                xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                office:version="1.4">
+              <office:body>
+                <office:spreadsheet>
+                  <table:table table:name="Sheet1">
+            {{rows}}
+                  </table:table>
+                </office:spreadsheet>
+              </office:body>
+            </office:document-content>
+            """;
+
+        OfficeDocumentContentElement document = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(Encoding.UTF8.GetBytes(xml), new OdfLoadOptions { AllowLazyLoading = true }));
+        TableTableElement table = document.OfficeBodyChildElements
+            .Single()
+            .OfficeSpreadsheetChildElements
+            .Single()
+            .TableTableChildElements
+            .Single();
+
+        Assert.True(table._isLazy);
+
+        using var firstStream = new MemoryStream();
+        OdfXmlWriter.Write(document, firstStream);
+        string firstXml = Encoding.UTF8.GetString(firstStream.ToArray());
+
+        Assert.True(table._isLazy);
+        Assert.Contains("table:name=\"Sheet1\"", firstXml, StringComparison.Ordinal);
+        Assert.Contains("<text:p>Row 259</text:p>", firstXml, StringComparison.Ordinal);
+
+        table.Name = "Changed";
+        using var secondStream = new MemoryStream();
+        OdfXmlWriter.Write(document, secondStream);
+        string secondXml = Encoding.UTF8.GetString(secondStream.ToArray());
+
+        Assert.True(table._isLazy);
+        Assert.Contains("table:name=\"Changed\"", secondXml, StringComparison.Ordinal);
+        Assert.Contains("<text:p>Row 259</text:p>", secondXml, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證深層複製尚未具現化的大型 XML 區段時，會保留 lazy XML 狀態而非展開子節點。
+    /// </summary>
+    [Fact]
+    public void CloneNodePreservesLazyXmlChunkWithoutMaterializingChildren()
+    {
+        string rows = string.Concat(Enumerable.Range(0, 260).Select(i =>
+            $"""
+                    <table:table-row>
+                      <table:table-cell office:value-type="string"><text:p>Row {i}</text:p></table:table-cell>
+                    </table:table-row>
+            """));
+        string xml = $$"""
+            <office:document-content
+                xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                office:version="1.4">
+              <office:body>
+                <office:spreadsheet>
+                  <table:table table:name="Sheet1">
+            {{rows}}
+                  </table:table>
+                </office:spreadsheet>
+              </office:body>
+            </office:document-content>
+            """;
+
+        OfficeDocumentContentElement document = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(Encoding.UTF8.GetBytes(xml), new OdfLoadOptions { AllowLazyLoading = true }));
+        TableTableElement table = document.OfficeBodyChildElements
+            .Single()
+            .OfficeSpreadsheetChildElements
+            .Single()
+            .TableTableChildElements
+            .Single();
+
+        Assert.True(table._isLazy);
+        Assert.Equal(0, table.Children.LoadedCount);
+
+        OfficeDocumentContentElement clonedDocument = Assert.IsType<OfficeDocumentContentElement>(document.CloneNode(deep: true));
+        TableTableElement clonedTable = clonedDocument.OfficeBodyChildElements
+            .Single()
+            .OfficeSpreadsheetChildElements
+            .Single()
+            .TableTableChildElements
+            .Single();
+
+        Assert.True(table._isLazy);
+        Assert.True(clonedTable._isLazy);
+        Assert.Equal(0, table.Children.LoadedCount);
+        Assert.Equal(0, clonedTable.Children.LoadedCount);
+        Assert.Equal(table._lazyXmlMemory.Length, clonedTable._lazyXmlMemory.Length);
+
+        using var stream = new MemoryStream();
+        OdfXmlWriter.Write(clonedDocument, stream);
+        string cloneXml = Encoding.UTF8.GetString(stream.ToArray());
+
+        Assert.True(clonedTable._isLazy);
+        Assert.Equal(0, clonedTable.Children.LoadedCount);
+        Assert.Contains("table:name=\"Sheet1\"", cloneXml, StringComparison.Ordinal);
+        Assert.Contains("<text:p>Row 259</text:p>", cloneXml, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 lazy XML 節點保留來源位元組 offset 索引，可精準定位完整元素與 inner XML 區段。
+    /// </summary>
+    [Fact]
+    public void LazyXmlNodePreservesSourceByteRangeIndex()
+    {
+        string rows = string.Concat(Enumerable.Range(0, 260).Select(i =>
+            $"""
+                    <table:table-row>
+                      <table:table-cell office:value-type="string"><text:p>Row {i}</text:p></table:table-cell>
+                    </table:table-row>
+            """));
+        string xml = $$"""
+            <office:document-content
+                xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                office:version="1.4">
+              <office:body>
+                <office:spreadsheet>
+                  <table:table table:name="Sheet1">
+            {{rows}}
+                  </table:table>
+                </office:spreadsheet>
+              </office:body>
+            </office:document-content>
+            """;
+        byte[] xmlBytes = Encoding.UTF8.GetBytes(xml);
+
+        OfficeDocumentContentElement document = Assert.IsType<OfficeDocumentContentElement>(
+            OdfXmlReader.Parse(xmlBytes, new OdfLoadOptions { AllowLazyLoading = true }));
+        TableTableElement table = document.OfficeBodyChildElements
+            .Single()
+            .OfficeSpreadsheetChildElements
+            .Single()
+            .TableTableChildElements
+            .Single();
+
+        Assert.True(table._isLazy);
+        Assert.True(table.TryGetXmlByteRange(out OdfXmlByteRange range));
+
+        string elementXml = Encoding.UTF8.GetString(xmlBytes.AsSpan(range.ElementOffset, range.ElementLength));
+        string innerXml = Encoding.UTF8.GetString(xmlBytes.AsSpan(range.InnerOffset, range.InnerLength));
+
+        Assert.StartsWith("<table:table table:name=\"Sheet1\">", elementXml.TrimStart(), StringComparison.Ordinal);
+        Assert.EndsWith("</table:table>", elementXml.TrimEnd(), StringComparison.Ordinal);
+        Assert.DoesNotContain("<table:table table:name=\"Sheet1\">", innerXml, StringComparison.Ordinal);
+        Assert.Contains("<text:p>Row 259</text:p>", innerXml, StringComparison.Ordinal);
+
+        var clonedTable = (TableTableElement)table.CloneNode(deep: true);
+        Assert.True(clonedTable.TryGetXmlByteRange(out OdfXmlByteRange clonedRange));
+        Assert.Equal(range, clonedRange);
+    }
+
+    private static void AssertEquivalentSpreadsheet(OfficeDocumentContentElement document)
+    {
+        OfficeSpreadsheetElement spreadsheet = document.OfficeBodyChildElements
+            .Single()
+            .OfficeSpreadsheetChildElements
+            .Single();
+        TableTableElement table = spreadsheet.TableTableChildElements.Single();
+        TableTableRowElement row = table.TableTableRowChildElements.Single();
+        TableTableCellElement cell = row.TableTableCellChildElements.Single();
+        TextPElement paragraph = cell.TextPChildElements.Single();
+
+        Assert.Equal("Sheet1", table.Name);
+        Assert.Equal("string", cell.ValueType);
+        Assert.Equal("Hello & typed fast path", paragraph.TextContent);
+    }
+
+    /// <summary>
     /// 驗證 typed DOM 可用 ODFDOM 風格走訪圖文混排 frame、image 與 SVG 替代文字。
     /// </summary>
     [Fact]
@@ -166,6 +775,19 @@ public class TypedDomParityTests
         image.SetXLinkTypeAttributeValue("type", OdfNamespaces.XLink, OdfXLinkType.Simple, "xlink");
         image.SetXLinkShowAttributeValue("show", OdfNamespaces.XLink, OdfXLinkShow.Embed, "xlink");
         image.SetXLinkActuateAttributeValue("actuate", OdfNamespaces.XLink, OdfXLinkActuate.OnLoad, "xlink");
+        image.Crop(
+                OdfLength.FromCentimeters(0.1),
+                OdfLength.FromCentimeters(0.3),
+                OdfLength.FromCentimeters(0.4),
+                OdfLength.FromCentimeters(0.2))
+            .SetEffects(e => e
+                .SoftEdge(OdfLength.FromPoints(2))
+                .Shadow(new OdfColor("#336699"), OdfLength.FromPoints(1), OdfLength.FromPoints(2), OdfPercent.FromPercent(60m))
+                .CornerRadius(OdfLength.FromPoints(3))
+                .Opacity(OdfPercent.FromPercent(75m))
+                .Luminance(OdfPercent.FromPercent(10m))
+                .Contrast("15%")
+                .Gamma("1.1"));
         caption.TextContent = "Figure 1";
 
         Assert.Same(frame, paragraph.ChildElements<DrawFrameElement>().Single());
@@ -177,6 +799,18 @@ public class TypedDomParityTests
         Assert.Equal(OdfXLinkType.Simple, image.GetXLinkTypeAttributeValue("type", OdfNamespaces.XLink));
         Assert.Equal(OdfXLinkShow.Embed, image.GetXLinkShowAttributeValue("show", OdfNamespaces.XLink));
         Assert.Equal(OdfXLinkActuate.OnLoad, image.GetXLinkActuateAttributeValue("actuate", OdfNamespaces.XLink));
+        Assert.Equal("rect(0.1cm, 0.2cm, 0.3cm, 0.4cm)", image.CropClip);
+        Assert.Equal("soft-edge(2pt)", image.GetAttribute("filter-name", OdfNamespaces.Draw));
+        Assert.Equal("visible", image.GetAttribute("shadow", OdfNamespaces.Draw));
+        Assert.Equal("#336699", image.GetAttribute("shadow-color", OdfNamespaces.Draw));
+        Assert.Equal("1pt", image.GetAttribute("shadow-offset-x", OdfNamespaces.Draw));
+        Assert.Equal("2pt", image.GetAttribute("shadow-offset-y", OdfNamespaces.Draw));
+        Assert.Equal("60%", image.GetAttribute("shadow-opacity", OdfNamespaces.Draw));
+        Assert.Equal("3pt", image.GetAttribute("corner-radius", OdfNamespaces.Draw));
+        Assert.Equal("75%", image.GetAttribute("image-opacity", OdfNamespaces.Draw));
+        Assert.Equal("10%", image.GetAttribute("luminance", OdfNamespaces.Draw));
+        Assert.Equal("15%", image.GetAttribute("contrast", OdfNamespaces.Draw));
+        Assert.Equal("1.1", image.GetAttribute("gamma", OdfNamespaces.Draw));
 
         using MemoryStream stream = new();
         OdfXmlWriter.Write(document, stream, new OdfSaveOptions { IndentXml = false });
@@ -191,7 +825,208 @@ public class TypedDomParityTests
         Assert.Equal(OdfLength.FromCentimeters(3), parsedFrame.GetLengthAttributeValue("height", OdfNamespaces.Svg));
         Assert.Equal(new OdfIriReference("Pictures/image.png"), parsedImage.GetIriReferenceAttributeValue("href", OdfNamespaces.XLink));
         Assert.Equal(OdfXLinkShow.Embed, parsedImage.GetXLinkShowAttributeValue("show", OdfNamespaces.XLink));
+        Assert.Equal("rect(0.1cm, 0.2cm, 0.3cm, 0.4cm)", parsedImage.CropClip);
+        Assert.Equal("soft-edge(2pt)", parsedImage.GetAttribute("filter-name", OdfNamespaces.Draw));
+        Assert.Equal("visible", parsedImage.GetAttribute("shadow", OdfNamespaces.Draw));
+        Assert.Equal("#336699", parsedImage.GetAttribute("shadow-color", OdfNamespaces.Draw));
+        Assert.Equal("1pt", parsedImage.GetAttribute("shadow-offset-x", OdfNamespaces.Draw));
+        Assert.Equal("2pt", parsedImage.GetAttribute("shadow-offset-y", OdfNamespaces.Draw));
+        Assert.Equal("60%", parsedImage.GetAttribute("shadow-opacity", OdfNamespaces.Draw));
+        Assert.Equal("3pt", parsedImage.GetAttribute("corner-radius", OdfNamespaces.Draw));
+        Assert.Equal("75%", parsedImage.GetAttribute("image-opacity", OdfNamespaces.Draw));
+        Assert.Equal("10%", parsedImage.GetAttribute("luminance", OdfNamespaces.Draw));
+        Assert.Equal("15%", parsedImage.GetAttribute("contrast", OdfNamespaces.Draw));
+        Assert.Equal("1.1", parsedImage.GetAttribute("gamma", OdfNamespaces.Draw));
         Assert.Equal("Figure 1", parsedImage.TextPChildElements.Single().TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 draw:image 可直接繫結圖片二進位資料，並重用既有媒體去重集區。
+    /// </summary>
+    [Fact]
+    public void DrawImageElementSetImageSourceWritesPackageEntryAndReusesMedia()
+    {
+        using TextDocument document = TextDocument.Create();
+        TextPElement paragraph = new("text");
+        document.BodyTextRoot.AppendChild(paragraph);
+        DrawImageElement primaryImage = paragraph
+            .AppendElement(new DrawFrameElement("draw"))
+            .AppendElement(new DrawImageElement("draw"));
+        DrawImageElement reusedImage = paragraph
+            .AppendElement(new DrawFrameElement("draw"))
+            .AppendElement(new DrawImageElement("draw"));
+        byte[] bytes = CreatePngBytes();
+
+        string primaryHref = primaryImage.SetImageSource(bytes, "Logo.png");
+        string reusedHref = reusedImage.SetImageSource((byte[])bytes.Clone(), "DuplicatedLogo.png");
+
+        Assert.Equal(primaryHref, reusedHref);
+        Assert.Equal(primaryHref, primaryImage.Href);
+        Assert.Equal(reusedHref, reusedImage.Href);
+        Assert.Equal("simple", primaryImage.GetAttribute("type", OdfNamespaces.XLink));
+        Assert.Equal("embed", primaryImage.GetAttribute("show", OdfNamespaces.XLink));
+        Assert.Equal("onLoad", primaryImage.GetAttribute("actuate", OdfNamespaces.XLink));
+        Assert.True(document.Package.HasEntry(primaryHref));
+        Assert.Single(document.Package.Manifest.Keys.Where(path => path.StartsWith("Pictures/", StringComparison.Ordinal)));
+    }
+
+    /// <summary>
+    /// 驗證 typed DOM 元素可用 Fluent 樣式混合 API 對接既有樣式去重引擎。
+    /// </summary>
+    [Fact]
+    public void OdfElementApplyStyleUsesStyleEngineAndReturnsOriginalElement()
+    {
+        using TextDocument document = TextDocument.Create();
+        TextPElement paragraph = new("text");
+        document.BodyTextRoot.AppendChild(paragraph);
+
+        TextPElement returned = paragraph.ApplyStyle(style => style
+            .Bold()
+            .FontSize("14pt")
+            .Color("#336699")
+            .TextAlign("center"));
+
+        Assert.Same(paragraph, returned);
+        string styleName = Assert.IsType<string>(paragraph.GetAttribute("style-name", OdfNamespaces.Text));
+        Assert.Equal("bold", document.StyleEngine.GetStyleProperty(styleName, "font-weight", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("14pt", document.StyleEngine.GetStyleProperty(styleName, "font-size", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("#336699", document.StyleEngine.GetStyleProperty(styleName, "color", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("center", document.StyleEngine.GetStyleProperty(styleName, "text-align", OdfNamespaces.Fo, "paragraph"));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfStyleMixinExtensions.ConfigureStyle{TElement}"/> 可作為計畫名入口設定自動樣式。
+    /// </summary>
+    [Fact]
+    public void OdfElementConfigureStyleUsesStyleEngineAndReturnsOriginalElement()
+    {
+        using TextDocument document = TextDocument.Create();
+        TextPElement paragraph = new("text");
+        document.BodyTextRoot.AppendChild(paragraph);
+
+        TextPElement returned = paragraph.ConfigureStyle(style => style
+            .Italic()
+            .Underline()
+            .BackgroundColor("#FFFFCC"));
+
+        Assert.Same(paragraph, returned);
+        string styleName = Assert.IsType<string>(paragraph.GetAttribute("style-name", OdfNamespaces.Text));
+        Assert.Equal("italic", document.StyleEngine.GetStyleProperty(styleName, "font-style", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("solid", document.StyleEngine.GetStyleProperty(styleName, "text-underline-style", OdfNamespaces.Style, "paragraph"));
+        Assert.Equal("#FFFFCC", document.StyleEngine.GetStyleProperty(styleName, "background-color", OdfNamespaces.Fo, "paragraph"));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfStyleMixinExtensions.CopyFormatFrom{TElement}"/> 先共用來源樣式，後續修改目標時會走 COW 自動樣式。
+    /// </summary>
+    [Fact]
+    public void OdfElementCopyFormatFromSharesStyleThenCopyOnWriteWhenConfigured()
+    {
+        using TextDocument document = TextDocument.Create();
+        TextPElement source = new("text");
+        TextPElement target = new("text");
+        document.BodyTextRoot.AppendChild(source);
+        document.BodyTextRoot.AppendChild(target);
+
+        source.ConfigureStyle(style => style
+            .Bold()
+            .Color("#224466"));
+
+        string sourceStyleName = Assert.IsType<string>(source.GetAttribute("style-name", OdfNamespaces.Text));
+        TextPElement returned = target.CopyFormatFrom(source);
+
+        Assert.Same(target, returned);
+        Assert.Equal(sourceStyleName, target.GetAttribute("style-name", OdfNamespaces.Text));
+
+        target.ConfigureStyle(style => style.Italic());
+
+        string targetStyleName = Assert.IsType<string>(target.GetAttribute("style-name", OdfNamespaces.Text));
+        Assert.NotEqual(sourceStyleName, targetStyleName);
+        Assert.Equal(sourceStyleName, source.GetAttribute("style-name", OdfNamespaces.Text));
+        Assert.Equal("bold", document.StyleEngine.GetStyleProperty(sourceStyleName, "font-weight", OdfNamespaces.Fo, "paragraph"));
+        Assert.Null(document.StyleEngine.GetStyleProperty(sourceStyleName, "font-style", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("bold", document.StyleEngine.GetStyleProperty(targetStyleName, "font-weight", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("italic", document.StyleEngine.GetStyleProperty(targetStyleName, "font-style", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("#224466", document.StyleEngine.GetStyleProperty(targetStyleName, "color", OdfNamespaces.Fo, "paragraph"));
+    }
+
+    /// <summary>
+    /// 驗證樣式 COW 會深層複製來源樣式的繼承鏈、class 與既有屬性。
+    /// </summary>
+    [Fact]
+    public void OdfElementCopyFormatFromCowDeepCopiesStyleInheritanceMetadata()
+    {
+        using TextDocument document = TextDocument.Create();
+        TextPElement source = new("text");
+        TextPElement target = new("text");
+        document.BodyTextRoot.AppendChild(source);
+        document.BodyTextRoot.AppendChild(target);
+
+        source.ConfigureStyle(style => style
+            .InheritFrom("Heading_20_1")
+            .StyleClass("text")
+            .Bold()
+            .Color("#224466"));
+
+        string sourceStyleName = Assert.IsType<string>(source.GetAttribute("style-name", OdfNamespaces.Text));
+        target.CopyFormatFrom(source);
+        target.ConfigureStyle(style => style.Italic());
+
+        string targetStyleName = Assert.IsType<string>(target.GetAttribute("style-name", OdfNamespaces.Text));
+        Assert.NotEqual(sourceStyleName, targetStyleName);
+
+        using MemoryStream stream = new();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using StreamReader reader = new(contentStream, Encoding.UTF8);
+        string contentXml = reader.ReadToEnd();
+
+        Match targetStyleMatch = Regex.Match(
+            contentXml,
+            $"<style:style(?=[^>]*style:name=\"{Regex.Escape(targetStyleName)}\")[^>]*>.*?</style:style>",
+            RegexOptions.Singleline);
+
+        Assert.True(targetStyleMatch.Success);
+        string targetStyleXml = targetStyleMatch.Value;
+        Assert.Contains("style:parent-style-name=\"Heading_20_1\"", targetStyleXml, StringComparison.Ordinal);
+        Assert.DoesNotContain($"style:parent-style-name=\"{sourceStyleName}\"", targetStyleXml, StringComparison.Ordinal);
+        Assert.Contains("style:class=\"text\"", targetStyleXml, StringComparison.Ordinal);
+        Assert.Contains("fo:font-weight=\"bold\"", targetStyleXml, StringComparison.Ordinal);
+        Assert.Contains("fo:font-style=\"italic\"", targetStyleXml, StringComparison.Ordinal);
+        Assert.Contains("fo:color=\"#224466\"", targetStyleXml, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 Fluent 樣式混合可保留父樣式與 ODF 樣式 class metadata。
+    /// </summary>
+    [Fact]
+    public void OdfElementApplyStylePreservesInheritedStyleMetadata()
+    {
+        using TextDocument document = TextDocument.Create();
+        TextPElement paragraph = new("text");
+        document.BodyTextRoot.AppendChild(paragraph);
+
+        paragraph.ApplyStyle(style => style
+            .InheritFrom("Heading_20_1")
+            .StyleClass("text")
+            .Bold());
+
+        string styleName = Assert.IsType<string>(paragraph.GetAttribute("style-name", OdfNamespaces.Text));
+        using MemoryStream stream = new();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using StreamReader reader = new(contentStream, Encoding.UTF8);
+        string contentXml = reader.ReadToEnd();
+
+        Assert.Contains($"style:name=\"{styleName}\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("style:parent-style-name=\"Heading_20_1\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("style:class=\"text\"", contentXml, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -881,6 +1716,162 @@ public class TypedDomParityTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="TableTableElement.ImportData{T}(IEnumerable{T})"/> 會重用同一個型別的屬性 accessor 快取。
+    /// </summary>
+    [Fact]
+    public void TableTableElementImportDataFromEnumerableReusesCompiledAccessors()
+    {
+        int buildCount = TableTableElement.GetImportDataAccessorBuildCountForTests<ImportAccessorRow>();
+        Assert.Equal(1, buildCount);
+
+        TableTableElement first = new("table");
+        first.ImportData(new[]
+        {
+            new ImportAccessorRow("Keyboard", 5, true),
+        });
+
+        TableTableElement second = new("table");
+        second.ImportData(new[]
+        {
+            new ImportAccessorRow("Mouse", 12, false),
+        });
+
+        Assert.Equal(buildCount, TableTableElement.GetImportDataAccessorBuildCountForTests<ImportAccessorRow>());
+        Assert.Equal("Keyboard", first["A1"].TextContent);
+        Assert.Equal("5", first["B1"].TextContent);
+        Assert.Equal("TRUE", first["C1"].TextContent);
+        Assert.Equal("Mouse", second["A1"].TextContent);
+        Assert.Equal("12", second["B1"].TextContent);
+        Assert.Equal("FALSE", second["C1"].TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TableTableElement.EnumerateCellViews"/> 可直接讀取稀疏儲存格而不具現化 DOM 列。
+    /// </summary>
+    [Fact]
+    public void TableTableElementEnumerateCellViewsReadsSparseStorageWithoutMaterializingRows()
+    {
+        DataTable dataTable = new();
+        dataTable.Columns.Add("Name", typeof(string));
+        dataTable.Columns.Add("Qty", typeof(int));
+        dataTable.Columns.Add("Active", typeof(bool));
+        dataTable.Rows.Add("Keyboard", 5, true);
+
+        TableTableElement table = new("table");
+        table.ImportData(dataTable);
+
+        var views = new List<OdfCellView>();
+        foreach (OdfCellView view in table.EnumerateCellViews())
+        {
+            views.Add(view);
+        }
+
+        Assert.Empty(table.TableTableRowChildElements);
+        Assert.Collection(
+            views,
+            view =>
+            {
+                Assert.Equal(0, view.RowIndex);
+                Assert.Equal(0, view.ColumnIndex);
+                Assert.Equal(OdfCellDataKind.Text, view.Data.Kind);
+                Assert.Equal("Keyboard", view.Data.Text);
+            },
+            view =>
+            {
+                Assert.Equal(0, view.RowIndex);
+                Assert.Equal(1, view.ColumnIndex);
+                Assert.Equal(OdfCellDataKind.Number, view.Data.Kind);
+                Assert.Equal(5, view.Data.Number);
+            },
+            view =>
+            {
+                Assert.Equal(0, view.RowIndex);
+                Assert.Equal(2, view.ColumnIndex);
+                Assert.Equal(OdfCellDataKind.Boolean, view.Data.Kind);
+                Assert.True(view.Data.Boolean);
+            });
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TableTableElement.InsertRows"/> 與 <see cref="TableTableElement.DeleteRows"/> 會位移跨 page 的稀疏儲存格。
+    /// </summary>
+    [Fact]
+    public void TableTableElementSparseRowsShiftAcrossPagesWithoutMaterializingCells()
+    {
+        DataTable dataTable = new();
+        dataTable.Columns.Add("Name", typeof(string));
+        dataTable.Columns.Add("Qty", typeof(int));
+        for (int row = 0; row < 130; row++)
+        {
+            dataTable.Rows.Add($"Item {row}", row);
+        }
+
+        TableTableElement table = new("table");
+        table.ImportData(dataTable);
+        table.SetSparseCellStyle(129, 1, "tail-style");
+        table.SetSparseCellFormula(129, 1, "of:=[.A130]");
+
+        Dictionary<(int Row, int Column), OdfCellData> originalViews = ReadCellViews(table);
+        Assert.Equal("Item 1", originalViews[(1, 0)].Text);
+
+        table.InsertRows(1, 2);
+
+        Dictionary<(int Row, int Column), OdfCellData> insertedViews = ReadCellViews(table);
+        Assert.Empty(table.TableTableRowChildElements.Where(row => row.TableTableCellChildElements.Any()));
+        Assert.Equal("Item 0", insertedViews[(0, 0)].Text);
+        Assert.False(insertedViews.ContainsKey((1, 0)));
+        Assert.False(insertedViews.ContainsKey((2, 0)));
+        Assert.True(
+            insertedViews.TryGetValue((3, 0), out OdfCellData movedFirstSparseRow),
+            string.Join(", ", insertedViews.Keys.OrderBy(static key => key.Row).ThenBy(static key => key.Column).Take(16)));
+        Assert.Equal("Item 1", movedFirstSparseRow.Text);
+        Assert.Equal(129, insertedViews[(131, 1)].Number);
+        Assert.Equal("tail-style", insertedViews[(131, 1)].StyleName);
+        Assert.Equal("of:=[.A130]", insertedViews[(131, 1)].Formula);
+
+        table.DeleteRows(2, 1);
+
+        Dictionary<(int Row, int Column), OdfCellData> deletedViews = ReadCellViews(table);
+        Assert.Equal("Item 1", deletedViews[(2, 0)].Text);
+        Assert.Equal(129, deletedViews[(130, 1)].Number);
+        Assert.Equal("tail-style", deletedViews[(130, 1)].StyleName);
+        Assert.Equal("of:=[.A130]", deletedViews[(130, 1)].Formula);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TableTableElement.EnumerateCellViews"/> 會展開 DOM 儲存格的重複列與欄。
+    /// </summary>
+    [Fact]
+    public void TableTableElementEnumerateCellViewsExpandsRepeatedDomCells()
+    {
+        TableTableElement table = new("table");
+        TableTableRowElement row = table.AppendRow();
+        row.NumberRowsRepeated = 2;
+        TableTableCellElement cell = row.AppendElement(new TableTableCellElement("table"));
+        cell.NumberColumnsRepeated = 3;
+        cell.ValueType = "string";
+        cell.SetAttribute("string-value", OdfNamespaces.Office, "A", "office");
+        cell.AppendElement(new TextPElement("text")).TextContent = "A";
+
+        var coordinates = new List<(int Row, int Column, string? Text)>();
+        foreach (OdfCellView view in table.EnumerateCellViews())
+        {
+            coordinates.Add((view.RowIndex, view.ColumnIndex, view.Data.Text));
+        }
+
+        Assert.Equal(
+            [
+                (0, 0, "A"),
+                (0, 1, "A"),
+                (0, 2, "A"),
+                (1, 0, "A"),
+                (1, 1, "A"),
+                (1, 2, "A"),
+            ],
+            coordinates);
+    }
+
+    /// <summary>
     /// 驗證 <c>office:spreadsheet</c> content model facade 可建立工作表並 round-trip。
     /// </summary>
     [Fact]
@@ -908,6 +1899,19 @@ public class TypedDomParityTests
     }
 
     private sealed record ImportRow(string Name, int Qty);
+
+    private sealed record ImportAccessorRow(string Name, int Qty, bool Active);
+
+    private static Dictionary<(int Row, int Column), OdfCellData> ReadCellViews(TableTableElement table)
+    {
+        var cells = new Dictionary<(int Row, int Column), OdfCellData>();
+        foreach (OdfCellView view in table.EnumerateCellViews())
+        {
+            cells[(view.RowIndex, view.ColumnIndex)] = view.Data;
+        }
+
+        return cells;
+    }
 
     /// <summary>
     /// 驗證 generated DOM wrapper 的 class、factory case 與屬性數量沒有意外退化。
@@ -1064,6 +2068,35 @@ public class TypedDomParityTests
             Assert.True(actual >= pair.MinCount, $"generated '{pair.TypeName}' property count regressed: expected >= {pair.MinCount}, actual {actual}");
         }
         Assert.True(propertyCount >= 5000, "generated attribute property count regressed: " + propertyCount);
+    }
+
+    /// <summary>
+    /// 抽樣驗證 generated DOM wrapper 同時提供 prefix 與函數式子節點建構子。
+    /// </summary>
+    [Fact]
+    public void GeneratedDomWrappersExposeFunctionalConstructorsForSampledElements()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string generatedDirectory = Path.Combine(repoRoot, "OdfKit", "DOM", "Generated");
+        var samples = Directory.GetFiles(generatedDirectory, "*.g.cs")
+            .OrderBy(path => path, StringComparer.Ordinal)
+            .Select(path => File.ReadAllText(path, Encoding.UTF8))
+            .Select(code => new
+            {
+                Code = code,
+                Match = Regex.Match(code, @"public partial class (?<name>\w+Element) : OdfElement")
+            })
+            .Where(item => item.Match.Success)
+            .Take(20)
+            .ToArray();
+
+        Assert.Equal(20, samples.Length);
+        foreach (var sample in samples)
+        {
+            string className = sample.Match.Groups["name"].Value;
+            Assert.Contains($"public {className}(string? prefix = null)", sample.Code, StringComparison.Ordinal);
+            Assert.Contains($"public {className}(params OdfNode[] children) : this()", sample.Code, StringComparison.Ordinal);
+        }
     }
 
     /// <summary>
@@ -2211,6 +3244,40 @@ public class TypedDomParityTests
         string? prefix = paragraph.GetAttributePrefix(new OdfAttributeName("custom-flag", customNamespaceUri));
         Assert.Null(prefix);
         Assert.Equal("1", paragraph.GetAttribute("custom-flag", customNamespaceUri));
+    }
+
+    /// <summary>
+    /// 驗證 Debug 模式下寫入已知命名空間但未定義於 ODF schema 的屬性時，會發出診斷警告。
+    /// </summary>
+    [Fact]
+    public void OdfNodeSetAttributeWarnsForUnknownSchemaAttributeInDebugBuilds()
+    {
+#if DEBUG
+        List<OdfDiagnosticsEventArgs> diagnostics = [];
+        EventHandler<OdfDiagnosticsEventArgs> handler = (_, args) => diagnostics.Add(args);
+        OdfKitDiagnostics.Log += handler;
+        try
+        {
+            TextPElement paragraph = new("text");
+
+            paragraph.SetAttribute("not-in-schema", OdfNamespaces.Text, "1");
+
+            Assert.Contains(
+                diagnostics,
+                args => args.Level == OdfDiagnosticsLevel.Warning &&
+                    args.Message.Contains("text:not-in-schema", StringComparison.Ordinal));
+        }
+        finally
+        {
+            OdfKitDiagnostics.Log -= handler;
+        }
+#endif
+    }
+
+    private static byte[] CreatePngBytes()
+    {
+        return Convert.FromBase64String(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
     }
 
     private static string FindRepositoryRoot()

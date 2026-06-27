@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextUserIndexMarkEndElement(string? prefix = null) : base("user-index-mark-end", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextUserIndexMarkEndElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Id
         {
             get => GetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

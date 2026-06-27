@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableNamedExpressionsElement(string? prefix = null) : base("named-expressions", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableNamedExpressionsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TableNamedExpressionElement> TableNamedExpressionChildElements
         {
             get => ChildElements<TableNamedExpressionElement>();

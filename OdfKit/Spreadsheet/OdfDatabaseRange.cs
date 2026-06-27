@@ -41,6 +41,15 @@ public class OdfDatabaseRange(OdfNode node, SpreadsheetDocument doc)
     }
 
     /// <summary>
+    /// 取得或設定是否顯示自動篩選按鈕。
+    /// </summary>
+    public bool DisplayFilterButtons
+    {
+        get => Node.GetAttribute("display-filter-buttons", OdfNamespaces.Table) == "true";
+        set => Node.SetAttribute("display-filter-buttons", OdfNamespaces.Table, value ? "true" : "false", "table");
+    }
+
+    /// <summary>
     /// 設定此資料庫範圍的排序規則。
     /// </summary>
     /// <param name="rules">排序規則陣列，包含欄位編號與是否遞增</param>

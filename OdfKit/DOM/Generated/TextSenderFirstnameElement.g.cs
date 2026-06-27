@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextSenderFirstnameElement(string? prefix = null) : base("sender-firstname", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextSenderFirstnameElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? Fixed
         {
             get => GetBooleanAttributeValue("fixed", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

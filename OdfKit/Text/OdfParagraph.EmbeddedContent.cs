@@ -97,6 +97,28 @@ public partial class OdfParagraph
     public void AddHtmlFragment(string html) => Doc.AddHtmlFragment(this, html);
 
     /// <summary>
+    /// 在段落結尾解析並追加 HTML 行內富文字片段。
+    /// </summary>
+    /// <param name="html">要解析的 HTML 行內片段</param>
+    /// <returns>目前段落，方便鏈式呼叫</returns>
+    public OdfParagraph AppendHtml(string html)
+    {
+        Doc.AddHtmlFragment(this, html);
+        return this;
+    }
+
+    /// <summary>
+    /// 在段落結尾解析並追加 Markdown 行內富文字片段。
+    /// </summary>
+    /// <param name="markdown">要解析的 Markdown 行內文字</param>
+    /// <returns>目前段落，方便鏈式呼叫</returns>
+    public OdfParagraph AppendMarkdown(string markdown)
+    {
+        Doc.AddHtmlFragment(this, TextDocumentHtmlFragmentEngine.ConvertMarkdownInlineToHtml(markdown));
+        return this;
+    }
+
+    /// <summary>
     /// 在段落中新增頁碼欄位
     /// </summary>
     public void AddPageNumberField() => Doc.AddPageNumberField(this);

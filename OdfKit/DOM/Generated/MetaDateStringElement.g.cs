@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class MetaDateStringElement : OdfElement
     {
         public MetaDateStringElement(string? prefix = null) : base("date-string", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+
+        public MetaDateStringElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

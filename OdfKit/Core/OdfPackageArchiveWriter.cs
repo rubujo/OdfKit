@@ -30,6 +30,22 @@ internal static class OdfPackageArchiveWriter
             return;
         }
 
+        if (TryWriteRawCopyArchive(ctx, targetStream))
+        {
+            return;
+        }
+
+        if (TryWriteParallelPreparedArchive(ctx, targetStream))
+        {
+            return;
+        }
+
+        // 對所有 entries 啟動背景 DMA 預載
+        foreach (OdfPackageEntry entry in ctx.Entries.Values)
+        {
+            entry.Prefetch();
+        }
+
         using var zip = new ZipArchive(targetStream, ZipArchiveMode.Create, true, Encoding.UTF8);
 
         if (ctx.Entries.TryGetValue("mimetype", out OdfPackageEntry? mimeEntry))
@@ -39,9 +55,17 @@ internal static class OdfPackageArchiveWriter
             if (ctx.SaveOptions.Deterministic)
                 zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
+            ReadOnlySpan<byte> bytes = mimeEntry.GetBytesSpan();
             using (Stream entryStream = zipEntry.Open())
-            using (Stream src = mimeEntry.OpenReader())
-                src.CopyTo(entryStream);
+            {
+#if NETSTANDARD2_0
+                byte[] arr = mimeEntry.GetCachedBytes() ?? Array.Empty<byte>();
+                WriteEntryContentWithCrc32(entryStream, arr);
+#else
+                byte[] arr = bytes.ToArray();
+                WriteEntryContentWithCrc32(entryStream, arr);
+#endif
+            }
         }
 
         foreach (KeyValuePair<string, OdfPackageEntry> kvp in ctx.Entries)
@@ -57,11 +81,23 @@ internal static class OdfPackageArchiveWriter
             if (ctx.SaveOptions.Deterministic)
                 zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
+            ReadOnlySpan<byte> bytes = kvp.Value.GetBytesSpan();
             using (Stream entryStream = zipEntry.Open())
-            using (Stream src = kvp.Value.OpenReader())
-                src.CopyTo(entryStream);
+            {
+#if NETSTANDARD2_0
+                byte[] arr = kvp.Value.GetCachedBytes() ?? Array.Empty<byte>();
+                WriteEntryContentWithCrc32(entryStream, arr);
+#else
+                byte[] arr = bytes.ToArray();
+                WriteEntryContentWithCrc32(entryStream, arr);
+#endif
+            }
         }
     }
+
+    internal static int LastParallelPreparedEntryCount { get; set; }
+
+    internal static bool LastParallelCompressionUsedPooledBuffer { get; set; }
 
     /// <summary>
     /// 將封裝專案非同步寫入目標串流（ZIP 或 Flat XML），支援協作式取消。
@@ -79,18 +115,29 @@ internal static class OdfPackageArchiveWriter
             return;
         }
 
-        using var zip = new ZipArchive(targetStream, ZipArchiveMode.Create, true, Encoding.UTF8);
+        // 對所有 entries 啟動背景 DMA 預載
+        foreach (OdfPackageEntry entry in ctx.Entries.Values)
+        {
+            entry.Prefetch();
+        }
+
+        using var bufferedTarget = new OdfPagedGatherWritableStream(targetStream, leaveOpen: true);
+        using var zip = new ZipArchive(bufferedTarget, ZipArchiveMode.Create, true, Encoding.UTF8);
 
         if (ctx.Entries.TryGetValue("mimetype", out OdfPackageEntry? mimeEntry))
         {
+            await mimeEntry.PrefetchAsync(cancellationToken).ConfigureAwait(false);
             ZipArchiveEntry zipEntry = zip.CreateEntry("mimetype", CompressionLevel.NoCompression);
 
             if (ctx.SaveOptions.Deterministic)
                 zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-            using (Stream entryStream = zipEntry.Open())
-            using (Stream src = mimeEntry.OpenReader())
-                await CopyEntryContentAsync(src, entryStream, cancellationToken).ConfigureAwait(false);
+            byte[]? arr = mimeEntry.GetCachedBytes();
+            if (arr is not null)
+            {
+                using Stream entryStream = zipEntry.Open();
+                await WriteEntryContentWithCrc32Async(entryStream, arr, cancellationToken).ConfigureAwait(false);
+            }
         }
 
         foreach (KeyValuePair<string, OdfPackageEntry> kvp in ctx.Entries)
@@ -100,6 +147,8 @@ internal static class OdfPackageArchiveWriter
             if (kvp.Key == "mimetype")
                 continue;
 
+            await kvp.Value.PrefetchAsync(cancellationToken).ConfigureAwait(false);
+
             CompressionLevel compLevel = kvp.Value.IsCompressed
                 ? ctx.SaveOptions.CompressionLevel
                 : CompressionLevel.NoCompression;
@@ -108,11 +157,613 @@ internal static class OdfPackageArchiveWriter
             if (ctx.SaveOptions.Deterministic)
                 zipEntry.LastWriteTime = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-            using (Stream entryStream = zipEntry.Open())
-            using (Stream src = kvp.Value.OpenReader())
-                await CopyEntryContentAsync(src, entryStream, cancellationToken).ConfigureAwait(false);
+            byte[]? arr = kvp.Value.GetCachedBytes();
+            if (arr is not null)
+            {
+                using Stream entryStream = zipEntry.Open();
+                await WriteEntryContentWithCrc32Async(entryStream, arr, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
+
+    private static void WriteEntryContentWithCrc32(Stream entryStream, byte[] data)
+    {
+        using var crcStream = new OdfCrc32Stream(entryStream);
+        crcStream.Write(data, 0, data.Length);
+        crcStream.Flush();
+
+        uint expectedCrc = OdfCrc32.Compute(data);
+        if (crcStream.Crc32 != expectedCrc)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackage_CrcMismatch", expectedCrc.ToString("X8"), crcStream.Crc32.ToString("X8")));
+        }
+    }
+
+    private static async Task WriteEntryContentWithCrc32Async(Stream entryStream, byte[] data, CancellationToken cancellationToken)
+    {
+        using var crcStream = new OdfCrc32Stream(entryStream);
+        await crcStream.WriteAsync(data, 0, data.Length, cancellationToken).ConfigureAwait(false);
+        await crcStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+
+        uint expectedCrc = OdfCrc32.Compute(data);
+        if (crcStream.Crc32 != expectedCrc)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackage_CrcMismatch", expectedCrc.ToString("X8"), crcStream.Crc32.ToString("X8")));
+        }
+    }
+
+    private static bool TryWriteParallelPreparedArchive(OdfPackage.OdfPackageSaveCollaborators ctx, Stream targetStream)
+    {
+        LastParallelPreparedEntryCount = 0;
+        LastParallelCompressionUsedPooledBuffer = false;
+        if (ctx.HasActiveEncryption || ctx.Entries.Count <= 1)
+            return false;
+
+        KeyValuePair<string, OdfPackageEntry>[] orderedEntries = GetOdfZipWriteOrder(ctx);
+        PreparedZipEntry?[] preparedEntries = new PreparedZipEntry?[orderedEntries.Length];
+
+        try
+        {
+            foreach (OdfPackageEntry entry in ctx.Entries.Values)
+            {
+                entry.Prefetch();
+            }
+
+            var options = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = OdfParallelScheduler.GetEffectiveConcurrency()
+            };
+
+            Parallel.For(
+                0,
+                orderedEntries.Length,
+                options,
+                index =>
+                {
+                    KeyValuePair<string, OdfPackageEntry> kvp = orderedEntries[index];
+                    preparedEntries[index] = OdfParallelScheduler.RunWithConfiguredThreadPriority(
+                        () => PrepareZipEntry(kvp.Key, kvp.Value, ctx));
+                });
+
+            LastParallelPreparedEntryCount = preparedEntries.Length;
+            using CountingWriteStream countingTarget = new(targetStream);
+            using BinaryWriter writer = new(countingTarget, Encoding.UTF8, leaveOpen: true);
+            var centralDirectory = new List<RawZipCentralDirectoryEntry>(preparedEntries.Length);
+
+            foreach (PreparedZipEntry? prepared in preparedEntries)
+            {
+                if (prepared is null)
+                    return false;
+
+                long localHeaderOffset = countingTarget.BytesWritten;
+                WriteLocalHeader(
+                    writer,
+                    prepared.Method,
+                    prepared.Crc32,
+                    checked((uint)prepared.Payload.Length),
+                    checked((uint)prepared.UncompressedSize),
+                    prepared.NameBytes,
+                    prepared.Flags,
+                    prepared.TimeDate);
+                writer.Write(prepared.Payload);
+
+                centralDirectory.Add(new RawZipCentralDirectoryEntry(
+                    prepared.Name,
+                    prepared.Method,
+                    prepared.Crc32,
+                    checked((uint)prepared.Payload.Length),
+                    checked((uint)prepared.UncompressedSize),
+                    checked((uint)localHeaderOffset),
+                    prepared.Flags,
+                    prepared.TimeDate,
+                    prepared.NameBytes));
+            }
+
+            long centralDirectoryOffset = countingTarget.BytesWritten;
+            foreach (RawZipCentralDirectoryEntry entry in centralDirectory)
+            {
+                WriteCentralDirectoryEntry(writer, entry);
+            }
+
+            long centralDirectorySize = countingTarget.BytesWritten - centralDirectoryOffset;
+            WriteEndOfCentralDirectory(
+                writer,
+                checked((ushort)centralDirectory.Count),
+                checked((uint)centralDirectorySize),
+                checked((uint)centralDirectoryOffset));
+            writer.Flush();
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or OverflowException)
+        {
+            OdfKitDiagnostics.Warn($"[OdfPackage] 並行 ZIP 封裝寫入失敗，將降級為 ZipArchive 寫出。原因: {ex.Message}", ex);
+            LastParallelPreparedEntryCount = 0;
+            LastParallelCompressionUsedPooledBuffer = false;
+            if (targetStream.CanSeek)
+            {
+                targetStream.SetLength(0);
+                targetStream.Position = 0;
+            }
+            return false;
+        }
+    }
+
+    private static PreparedZipEntry PrepareZipEntry(string name, OdfPackageEntry entry, OdfPackage.OdfPackageSaveCollaborators ctx)
+    {
+        entry.EnsureBytesLoaded();
+        byte[] data = entry.GetCachedBytes() ?? entry.GetBytesSpan().ToArray();
+        byte[] nameBytes = Encoding.UTF8.GetBytes(name);
+        uint crc = OdfCrc32.Compute(data);
+        ushort method;
+        byte[] payload;
+
+        if (name == "mimetype" || !entry.IsCompressed)
+        {
+            method = 0;
+            payload = data;
+        }
+        else
+        {
+            method = 8;
+            using var compressed = new PooledZipPayloadStream(Math.Max(256, Math.Min(data.Length, 81920)));
+            using (var deflate = new DeflateStream(compressed, ctx.SaveOptions.CompressionLevel, leaveOpen: true))
+            {
+                deflate.Write(data, 0, data.Length);
+            }
+            payload = compressed.ToArray();
+            LastParallelCompressionUsedPooledBuffer = true;
+        }
+
+        uint timeDate = ctx.SaveOptions.Deterministic
+            ? GetDeterministicDosTimeDate()
+            : GetCurrentDosTimeDate();
+
+        return new PreparedZipEntry(
+            name,
+            method,
+            crc,
+            payload,
+            data.Length,
+            0x0800,
+            timeDate,
+            nameBytes);
+    }
+
+    private static KeyValuePair<string, OdfPackageEntry>[] GetOdfZipWriteOrder(
+        OdfPackage.OdfPackageSaveCollaborators ctx)
+    {
+        if (!ctx.Entries.TryGetValue("mimetype", out OdfPackageEntry? mimeEntry))
+            return [.. ctx.Entries];
+
+        var orderedEntries = new KeyValuePair<string, OdfPackageEntry>[ctx.Entries.Count];
+        orderedEntries[0] = new KeyValuePair<string, OdfPackageEntry>("mimetype", mimeEntry);
+        int index = 1;
+        foreach (KeyValuePair<string, OdfPackageEntry> entry in ctx.Entries)
+        {
+            if (entry.Key == "mimetype")
+                continue;
+
+            orderedEntries[index++] = entry;
+        }
+
+        return orderedEntries;
+    }
+
+    private static bool TryWriteRawCopyArchive(OdfPackage.OdfPackageSaveCollaborators ctx, Stream targetStream)
+    {
+        if (ctx.Package.Mmf is null || ctx.Package.MmfEntries is null)
+            return false;
+
+        if (ctx.HasActiveEncryption)
+            return false;
+
+        bool hasRawCopyCandidate = false;
+        foreach (OdfPackageEntry entry in ctx.Entries.Values)
+        {
+            if (!entry.IsModified && entry.MmfEntry is not null)
+            {
+                if (entry.MmfEntry.CompressionMethod is not 0 and not 8)
+                    return false;
+
+                hasRawCopyCandidate = true;
+            }
+        }
+
+        if (!hasRawCopyCandidate)
+            return false;
+
+        using CountingWriteStream countingTarget = new(targetStream);
+        using BinaryWriter writer = new(countingTarget, Encoding.UTF8, leaveOpen: true);
+        var centralDirectory = new List<RawZipCentralDirectoryEntry>();
+
+        try
+        {
+            foreach (KeyValuePair<string, OdfPackageEntry> kvp in GetOdfZipWriteOrder(ctx))
+            {
+                string name = kvp.Key;
+                OdfPackageEntry entry = kvp.Value;
+                byte[] nameBytes = Encoding.UTF8.GetBytes(name);
+                long localHeaderOffset = countingTarget.BytesWritten;
+
+                if (!entry.IsModified && entry.MmfEntry is OdfMmfEntryInfo mmfEntry)
+                {
+                    ushort flags = NormalizeZipFlags(mmfEntry.Flags);
+                    uint timeDate = ctx.SaveOptions.Deterministic
+                        ? GetDeterministicDosTimeDate()
+                        : mmfEntry.TimeDate;
+
+                    WriteLocalHeader(
+                        writer,
+                        mmfEntry.CompressionMethod,
+                        mmfEntry.Crc32,
+                        checked((uint)mmfEntry.CompressedSize),
+                        checked((uint)mmfEntry.UncompressedSize),
+                        nameBytes,
+                        flags,
+                        timeDate);
+
+                    using Stream rawStream = ctx.Package.Mmf!.CreateViewStream(
+                        mmfEntry.CompressedDataOffset,
+                        mmfEntry.CompressedSize,
+                        System.IO.MemoryMappedFiles.MemoryMappedFileAccess.Read);
+                    rawStream.CopyTo(countingTarget);
+
+                    centralDirectory.Add(new RawZipCentralDirectoryEntry(
+                        name,
+                        mmfEntry.CompressionMethod,
+                        mmfEntry.Crc32,
+                        checked((uint)mmfEntry.CompressedSize),
+                        checked((uint)mmfEntry.UncompressedSize),
+                        checked((uint)localHeaderOffset),
+                        flags,
+                        timeDate,
+                        nameBytes));
+                }
+                else
+                {
+                    byte[] data = entry.GetCachedBytes() ?? Array.Empty<byte>();
+                    uint crc = OdfCrc32.Compute(data);
+                    ushort method;
+                    byte[] payload;
+                    if (entry.IsCompressed)
+                    {
+                        method = 8;
+                        using var compressed = new PooledZipPayloadStream(Math.Max(256, Math.Min(data.Length, 81920)));
+                        using (var deflate = new DeflateStream(compressed, ctx.SaveOptions.CompressionLevel, leaveOpen: true))
+                        {
+                            deflate.Write(data, 0, data.Length);
+                        }
+                        payload = compressed.ToArray();
+                    }
+                    else
+                    {
+                        method = 0;
+                        payload = data;
+                    }
+
+                    ushort flags = 0x0800;
+                    uint timeDate = ctx.SaveOptions.Deterministic
+                        ? GetDeterministicDosTimeDate()
+                        : GetCurrentDosTimeDate();
+
+                    WriteLocalHeader(
+                        writer,
+                        method,
+                        crc,
+                        checked((uint)payload.Length),
+                        checked((uint)data.Length),
+                        nameBytes,
+                        flags,
+                        timeDate);
+                    writer.Write(payload);
+
+                    centralDirectory.Add(new RawZipCentralDirectoryEntry(
+                        name,
+                        method,
+                        crc,
+                        checked((uint)payload.Length),
+                        checked((uint)data.Length),
+                        checked((uint)localHeaderOffset),
+                        flags,
+                        timeDate,
+                        nameBytes));
+                }
+            }
+
+            long centralDirectoryOffset = countingTarget.BytesWritten;
+            foreach (RawZipCentralDirectoryEntry entry in centralDirectory)
+            {
+                WriteCentralDirectoryEntry(writer, entry);
+            }
+
+            long centralDirectorySize = countingTarget.BytesWritten - centralDirectoryOffset;
+            WriteEndOfCentralDirectory(
+                writer,
+                checked((ushort)centralDirectory.Count),
+                checked((uint)centralDirectorySize),
+                checked((uint)centralDirectoryOffset));
+            writer.Flush();
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or NotSupportedException or OverflowException)
+        {
+            OdfKitDiagnostics.Warn($"[OdfPackage] Raw ZIP entry 直接輸出失敗，將降級為 ZipArchive 寫出。原因: {ex.Message}", ex);
+            if (targetStream.CanSeek)
+            {
+                targetStream.SetLength(0);
+                targetStream.Position = 0;
+            }
+            return false;
+        }
+    }
+
+    private static void WriteLocalHeader(
+        BinaryWriter writer,
+        ushort method,
+        uint crc,
+        uint compressedSize,
+        uint uncompressedSize,
+        byte[] nameBytes,
+        ushort flags,
+        uint timeDate)
+    {
+        writer.Write(0x04034b50u);
+        writer.Write((ushort)20);
+        writer.Write(flags);
+        writer.Write(method);
+        writer.Write(timeDate);
+        writer.Write(crc);
+        writer.Write(compressedSize);
+        writer.Write(uncompressedSize);
+        writer.Write((ushort)nameBytes.Length);
+        writer.Write((ushort)0);
+        writer.Write(nameBytes);
+    }
+
+    private static void WriteCentralDirectoryEntry(BinaryWriter writer, RawZipCentralDirectoryEntry entry)
+    {
+        writer.Write(0x02014b50u);
+        writer.Write((ushort)20);
+        writer.Write((ushort)20);
+        writer.Write(entry.Flags);
+        writer.Write(entry.Method);
+        writer.Write(entry.TimeDate);
+        writer.Write(entry.Crc32);
+        writer.Write(entry.CompressedSize);
+        writer.Write(entry.UncompressedSize);
+        writer.Write((ushort)entry.NameBytes.Length);
+        writer.Write((ushort)0);
+        writer.Write((ushort)0);
+        writer.Write((ushort)0);
+        writer.Write((ushort)0);
+        writer.Write((uint)0);
+        writer.Write(entry.LocalHeaderOffset);
+        writer.Write(entry.NameBytes);
+    }
+
+    private static void WriteEndOfCentralDirectory(BinaryWriter writer, ushort entryCount, uint centralDirectorySize, uint centralDirectoryOffset)
+    {
+        writer.Write(0x06054b50u);
+        writer.Write((ushort)0);
+        writer.Write((ushort)0);
+        writer.Write(entryCount);
+        writer.Write(entryCount);
+        writer.Write(centralDirectorySize);
+        writer.Write(centralDirectoryOffset);
+        writer.Write((ushort)0);
+    }
+
+    private static ushort NormalizeZipFlags(ushort flags)
+    {
+        const ushort dataDescriptorFlag = 0x0008;
+        const ushort utf8Flag = 0x0800;
+        return (ushort)((flags & ~dataDescriptorFlag) | utf8Flag);
+    }
+
+    private static uint GetDeterministicDosTimeDate()
+        => ToDosTimeDate(new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+
+    private static uint GetCurrentDosTimeDate()
+        => ToDosTimeDate(DateTime.Now);
+
+    private static uint ToDosTimeDate(DateTime value)
+    {
+        if (value.Year < 1980)
+            value = new DateTime(1980, 1, 1, 0, 0, 0, value.Kind);
+
+        uint dosTime =
+            ((uint)value.Hour << 11) |
+            ((uint)value.Minute << 5) |
+            ((uint)value.Second / 2);
+        uint dosDate =
+            ((uint)(value.Year - 1980) << 9) |
+            ((uint)value.Month << 5) |
+            (uint)value.Day;
+        return (dosDate << 16) | dosTime;
+    }
+
+    private sealed class CountingWriteStream(Stream inner) : Stream
+    {
+        public long BytesWritten { get; private set; }
+
+        public override bool CanRead => false;
+
+        public override bool CanSeek => false;
+
+        public override bool CanWrite => inner.CanWrite;
+
+        public override long Length => BytesWritten;
+
+        public override long Position
+        {
+            get => BytesWritten;
+            set => throw new NotSupportedException();
+        }
+
+        public override void Flush() => inner.Flush();
+
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+
+        public override void SetLength(long value) => throw new NotSupportedException();
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            inner.Write(buffer, offset, count);
+            BytesWritten += count;
+        }
+
+#if NETSTANDARD2_0
+        public override void WriteByte(byte value)
+        {
+            inner.WriteByte(value);
+            BytesWritten++;
+        }
+#else
+        public override void Write(ReadOnlySpan<byte> buffer)
+        {
+            inner.Write(buffer);
+            BytesWritten += buffer.Length;
+        }
+
+        public override void WriteByte(byte value)
+        {
+            inner.WriteByte(value);
+            BytesWritten++;
+        }
+#endif
+    }
+
+    private sealed class PooledZipPayloadStream : Stream
+    {
+        private byte[] _buffer;
+        private int _length;
+        private bool _disposed;
+
+        public PooledZipPayloadStream(int initialCapacity)
+        {
+            _buffer = ArrayPool<byte>.Shared.Rent(Math.Max(1, initialCapacity));
+        }
+
+        public override bool CanRead => false;
+
+        public override bool CanSeek => false;
+
+        public override bool CanWrite => !_disposed;
+
+        public override long Length => _length;
+
+        public override long Position
+        {
+            get => _length;
+            set => throw new NotSupportedException();
+        }
+
+        public byte[] ToArray()
+        {
+            ThrowIfDisposed();
+
+            if (_length == 0)
+                return [];
+
+            var result = new byte[_length];
+            Buffer.BlockCopy(_buffer, 0, result, 0, _length);
+            return result;
+        }
+
+        public override void Flush()
+        {
+        }
+
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+
+        public override void SetLength(long value) => throw new NotSupportedException();
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            ThrowIfDisposed();
+            if (buffer is null)
+                throw new ArgumentNullException(nameof(buffer));
+            if (offset < 0 || count < 0 || offset > buffer.Length - count)
+                throw new ArgumentOutOfRangeException(nameof(offset));
+
+            EnsureCapacity(_length + count);
+            Buffer.BlockCopy(buffer, offset, _buffer, _length, count);
+            _length += count;
+        }
+
+#if !NETSTANDARD2_0
+        public override void Write(ReadOnlySpan<byte> buffer)
+        {
+            ThrowIfDisposed();
+            EnsureCapacity(_length + buffer.Length);
+            buffer.CopyTo(_buffer.AsSpan(_length));
+            _length += buffer.Length;
+        }
+#endif
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                ArrayPool<byte>.Shared.Return(_buffer);
+                _buffer = Array.Empty<byte>();
+                _length = 0;
+                _disposed = true;
+            }
+
+            base.Dispose(disposing);
+        }
+
+        private void EnsureCapacity(int required)
+        {
+            if (required <= _buffer.Length)
+                return;
+
+            int newSize = _buffer.Length;
+            while (newSize < required)
+            {
+                newSize = checked(newSize * 2);
+            }
+
+            byte[] next = ArrayPool<byte>.Shared.Rent(newSize);
+            Buffer.BlockCopy(_buffer, 0, next, 0, _length);
+            ArrayPool<byte>.Shared.Return(_buffer);
+            _buffer = next;
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(PooledZipPayloadStream));
+            }
+        }
+    }
+
+    private sealed record RawZipCentralDirectoryEntry(
+        string Name,
+        ushort Method,
+        uint Crc32,
+        uint CompressedSize,
+        uint UncompressedSize,
+        uint LocalHeaderOffset,
+        ushort Flags,
+        uint TimeDate,
+        byte[] NameBytes);
+
+    private sealed record PreparedZipEntry(
+        string Name,
+        ushort Method,
+        uint Crc32,
+        byte[] Payload,
+        int UncompressedSize,
+        ushort Flags,
+        uint TimeDate,
+        byte[] NameBytes);
 
     private static Task CopyEntryContentAsync(Stream source, Stream destination, CancellationToken cancellationToken = default)
     {
@@ -136,6 +787,7 @@ internal static class OdfPackageArchiveWriter
         XNamespace officeNs = XNamespace.Get(OdfNamespaces.Office);
         var xmlSettings = new XmlReaderSettings
         {
+            NameTable = OdfXmlNameTable.Create(),
             DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null,
             MaxCharactersInDocument = ctx.LoadOptions.MaxXmlCharactersInDocument > 0

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public FormFixedTextElement(string? prefix = null) : base("fixed-text", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
+        public FormFixedTextElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Bind
         {
             get => GetAttributeValue("bind", "http://www.w3.org/2002/xforms", GetDocumentVersion());

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Styles;
@@ -16,6 +19,200 @@ namespace OdfKit.Tests;
 /// </summary>
 public class TextHighLevelApiTests
 {
+    /// <summary>
+    /// 驗證流式套印會以預編譯 XML 位元組區段輸出並正確逸出欄位值。
+    /// </summary>
+    [Fact]
+    public async Task StreamingMailMerge_CompilesBinaryXmlSegmentsAndEscapesValues()
+    {
+        using MemoryStream template = CreateStreamingTemplateZip(
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                                     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+              <office:body>
+                <office:text>
+                  <text:p>Hello {{Name}}</text:p>
+                </office:text>
+              </office:body>
+            </office:document-content>
+            """);
+        using MemoryStream output = new();
+
+        await OdfStreamingMailMerge.ApplyTemplateAsync(
+            template,
+            output,
+            new Dictionary<string, object?> { ["Name"] = "Ada & Lin <QA>" });
+
+        string contentXml = ReadZipEntryText(output, "content.xml");
+
+        Assert.Contains("Hello Ada &amp; Lin &lt;QA&gt;", contentXml);
+        Assert.DoesNotContain("{{Name}}", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證流式套印 XML 讀取器會禁止 DTD，避免 XXE 與實體展開風險。
+    /// </summary>
+    [Fact]
+    public async Task StreamingMailMerge_RejectsDtdTemplates()
+    {
+        using MemoryStream template = CreateStreamingTemplateZip(
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <!DOCTYPE office:document-content [
+              <!ENTITY xxe SYSTEM "file:///etc/passwd">
+            ]>
+            <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                                     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+              <office:body><office:text><text:p>&xxe;</text:p></office:text></office:body>
+            </office:document-content>
+            """);
+        using MemoryStream output = new();
+
+        await Assert.ThrowsAsync<XmlException>(() => OdfStreamingMailMerge.ApplyTemplateAsync(
+            template,
+            output,
+            new Dictionary<string, object?>()));
+    }
+
+    /// <summary>
+    /// 驗證 HTML / CSS 樣式表可映射為 ODT 共用樣式並保存至 styles.xml。
+    /// </summary>
+    [Fact]
+    public void ImportHtmlStyles_MapsCssRulesToOdtStyles()
+    {
+        using var document = TextDocument.Create();
+        IReadOnlyDictionary<string, string> styles = document.ImportHtmlStyles(
+            """
+            .official { font-weight: 700; font-size: 16px; color: #123456; text-align: center; margin-left: 2cm; }
+            span.notice { font-style: italic; text-decoration: underline; color: red; }
+            """);
+
+        Assert.True(styles.TryGetValue(".official", out string? paragraphStyle));
+        Assert.True(styles.TryGetValue("span.notice", out string? textStyle));
+        Assert.Equal("bold", document.StyleEngine.GetStyleProperty(paragraphStyle!, "font-weight", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("12pt", document.StyleEngine.GetStyleProperty(paragraphStyle!, "font-size", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("#123456", document.StyleEngine.GetStyleProperty(paragraphStyle!, "color", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("center", document.StyleEngine.GetStyleProperty(paragraphStyle!, "text-align", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("2cm", document.StyleEngine.GetStyleProperty(paragraphStyle!, "margin-left", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("italic", document.StyleEngine.GetStyleProperty(textStyle!, "font-style", OdfNamespaces.Fo, "text"));
+        Assert.Equal("solid", document.StyleEngine.GetStyleProperty(textStyle!, "text-underline-style", OdfNamespaces.Style, "text"));
+        Assert.Equal("#FF0000", document.StyleEngine.GetStyleProperty(textStyle!, "color", OdfNamespaces.Fo, "text"));
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+        using TextDocument reloaded = TextDocument.Load(stream);
+
+        Assert.Equal("bold", reloaded.StyleEngine.GetStyleProperty(paragraphStyle!, "font-weight", OdfNamespaces.Fo, "paragraph"));
+        Assert.Equal("solid", reloaded.StyleEngine.GetStyleProperty(textStyle!, "text-underline-style", OdfNamespaces.Style, "text"));
+    }
+
+    /// <summary>
+    /// 驗證段落可直接追加 HTML / Markdown 行內富文字並映射為 text:span。
+    /// </summary>
+    [Fact]
+    public void ParagraphAppendHtmlAndMarkdownCreatesStyledInlineRuns()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("開頭 ");
+
+        paragraph
+            .AppendHtml("<b>粗體</b><br><span style=\"font-style:italic; text-decoration:underline; font-size:16px; color:red\">提示</span>")
+            .AppendMarkdown(" **標記** *斜體*");
+
+        Assert.Equal("開頭 粗體\n提示 標記 斜體", paragraph.Node.TextContent);
+        Assert.Contains(paragraph.Node.Children, node => node.LocalName == "line-break" && node.NamespaceUri == OdfNamespaces.Text);
+
+        OdfNode bold = Assert.Single(paragraph.Node.Descendants(), node => node.LocalName == "span" && node.TextContent == "粗體");
+        OdfNode notice = Assert.Single(paragraph.Node.Descendants(), node => node.LocalName == "span" && node.TextContent == "提示");
+        OdfNode markdownBold = Assert.Single(paragraph.Node.Descendants(), node => node.LocalName == "span" && node.TextContent == "標記");
+        OdfNode markdownItalic = Assert.Single(paragraph.Node.Descendants(), node => node.LocalName == "span" && node.TextContent == "斜體");
+
+        string boldStyle = bold.GetAttribute("style-name", OdfNamespaces.Text)!;
+        string noticeStyle = notice.GetAttribute("style-name", OdfNamespaces.Text)!;
+        string markdownBoldStyle = markdownBold.GetAttribute("style-name", OdfNamespaces.Text)!;
+        string markdownItalicStyle = markdownItalic.GetAttribute("style-name", OdfNamespaces.Text)!;
+
+        Assert.Equal("bold", document.StyleEngine.GetStyleProperty(boldStyle, "font-weight", OdfNamespaces.Fo, "text"));
+        Assert.Equal("italic", document.StyleEngine.GetStyleProperty(noticeStyle, "font-style", OdfNamespaces.Fo, "text"));
+        Assert.Equal("solid", document.StyleEngine.GetStyleProperty(noticeStyle, "text-underline-style", OdfNamespaces.Style, "text"));
+        Assert.Equal("12pt", document.StyleEngine.GetStyleProperty(noticeStyle, "font-size", OdfNamespaces.Fo, "text"));
+        Assert.Equal("#FF0000", document.StyleEngine.GetStyleProperty(noticeStyle, "color", OdfNamespaces.Fo, "text"));
+        Assert.Equal("bold", document.StyleEngine.GetStyleProperty(markdownBoldStyle, "font-weight", OdfNamespaces.Fo, "text"));
+        Assert.Equal("italic", document.StyleEngine.GetStyleProperty(markdownItalicStyle, "font-style", OdfNamespaces.Fo, "text"));
+    }
+
+    /// <summary>
+    /// 驗證段落可鏈式設定大綱階層與自動編號樣式。
+    /// </summary>
+    [Fact]
+    public void ParagraphSetOutlineLevelAndAutoNumberingWritesHeadingAndOutlineStyle()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("第一章");
+
+        paragraph.SetOutlineLevel(2).EnableAutoNumbering("LegalOutline");
+        paragraph.AddTextRun(" 總則");
+
+        Assert.Equal("h", paragraph.Node.LocalName);
+        Assert.Equal("2", paragraph.Node.GetAttribute("outline-level", OdfNamespaces.Text));
+        Assert.Equal("LegalOutline", paragraph.Node.GetAttribute("list-style-name", OdfNamespaces.Style));
+        Assert.Equal("第一章 總則", paragraph.TextContent);
+
+        string contentXml = SaveAndGetContentXml(document);
+        string stylesXml = SaveAndGetStylesXml(document);
+
+        Assert.Contains("<text:h", contentXml);
+        Assert.Contains("text:outline-level=\"2\"", contentXml);
+        Assert.Contains("style:list-style-name=\"LegalOutline\"", contentXml);
+        Assert.Contains("第一章", contentXml);
+        Assert.Contains("總則", contentXml);
+        Assert.Contains("<text:outline-style", stylesXml);
+        Assert.Contains("style:name=\"LegalOutline\"", stylesXml);
+        Assert.Contains("text:outline-level-style", stylesXml);
+        Assert.Contains("text:level=\"2\"", stylesXml);
+        Assert.Contains("style:num-format=\"1\"", stylesXml);
+        Assert.Contains("text:display-levels=\"2\"", stylesXml);
+    }
+
+    /// <summary>
+    /// 驗證計畫名 Styles.GC 會移除未引用樣式，並保留已使用樣式及其父樣式鏈。
+    /// </summary>
+    [Fact]
+    public void StylesGcRemovesUnusedStylesAndKeepsParentChain()
+    {
+        using var document = TextDocument.Create();
+        OdfNode styles = FindOrCreateChild(document.StylesDom, "styles", OdfNamespaces.Office, "office");
+        styles.AppendChild(CreateParagraphStyle("ParentStyle", fontSize: "18pt"));
+        styles.AppendChild(CreateParagraphStyle("UsedStyle", parentStyleName: "ParentStyle"));
+        styles.AppendChild(CreateParagraphStyle("OrphanStyle", color: "#FF0000"));
+
+        OdfParagraph paragraph = document.AddParagraph("保留樣式");
+        paragraph.StyleName = "UsedStyle";
+        document.Styles.RebuildStyleIndex();
+
+        Assert.True(document.Styles.StyleExists("OrphanStyle"));
+
+        int removed = document.Styles.GC();
+
+        Assert.Equal(1, removed);
+        Assert.True(document.Styles.StyleExists("UsedStyle"));
+        Assert.True(document.Styles.StyleExists("ParentStyle"));
+        Assert.False(document.Styles.StyleExists("OrphanStyle"));
+        Assert.Equal("18pt", document.Styles.GetStyleProperty("UsedStyle", "font-size", OdfNamespaces.Fo, "paragraph"));
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+        using TextDocument reloaded = TextDocument.Load(stream);
+
+        Assert.True(reloaded.Styles.StyleExists("UsedStyle"));
+        Assert.True(reloaded.Styles.StyleExists("ParentStyle"));
+        Assert.False(reloaded.Styles.StyleExists("OrphanStyle"));
+        Assert.Equal("18pt", reloaded.Styles.GetStyleProperty("UsedStyle", "font-size", OdfNamespaces.Fo, "paragraph"));
+    }
+
     /// <summary>
     /// 驗證追蹤修訂 API 的新增、讀取與接受拒絕。
     /// </summary>
@@ -70,6 +267,56 @@ public class TextHighLevelApiTests
         Assert.Contains("新增修訂文字內容", contentXml);
         Assert.DoesNotContain("change-start", contentXml);
         Assert.DoesNotContain("change-end", contentXml);
+    }
+
+    private static OdfNode FindOrCreateChild(OdfNode parent, string localName, string namespaceUri, string prefix)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+        }
+
+        OdfNode node = new(OdfNodeType.Element, localName, namespaceUri, prefix);
+        parent.AppendChild(node);
+        return node;
+    }
+
+    private static OdfNode CreateParagraphStyle(
+        string name,
+        string? parentStyleName = null,
+        string? fontSize = null,
+        string? color = null)
+    {
+        OdfNode style = new(OdfNodeType.Element, "style", OdfNamespaces.Style, "style");
+        style.SetAttribute("name", OdfNamespaces.Style, name, "style");
+        style.SetAttribute("family", OdfNamespaces.Style, "paragraph", "style");
+        if (!string.IsNullOrEmpty(parentStyleName))
+        {
+            style.SetAttribute("parent-style-name", OdfNamespaces.Style, parentStyleName!, "style");
+        }
+
+        if (fontSize is not null || color is not null)
+        {
+            OdfNode properties = new(OdfNodeType.Element, "text-properties", OdfNamespaces.Style, "style");
+            if (fontSize is not null)
+            {
+                properties.SetAttribute("font-size", OdfNamespaces.Fo, fontSize, "fo");
+            }
+
+            if (color is not null)
+            {
+                properties.SetAttribute("color", OdfNamespaces.Fo, color, "fo");
+            }
+
+            style.AppendChild(properties);
+        }
+
+        return style;
     }
 
     /// <summary>
@@ -366,6 +613,29 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="TextDocument.TrackChanges"/> 計畫名屬性可啟用文字插入修訂記錄。
+    /// </summary>
+    [Fact]
+    public void TrackChangesAliasRecordsInsertedTextRuns()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph("原文");
+
+        document.TrackChanges = true;
+        paragraph.AddTextRun("新增");
+
+        OdfTrackedChange change = Assert.Single(document.GetTrackedChanges());
+        Assert.Equal(OdfChangeType.Insertion, change.ChangeType);
+        Assert.Equal("新增", change.Content);
+        Assert.True(document.TrackedChanges);
+
+        string contentXml = SaveAndGetContentXml(document);
+        Assert.Contains("text:tracked-changes", contentXml);
+        Assert.Contains("text:change-start", contentXml);
+        Assert.Contains("text:change-end", contentXml);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="TextDocument.GetTableStructuralChanges"/> 可讀回表格結構修訂。
     /// </summary>
     [Fact]
@@ -444,6 +714,37 @@ public class TextHighLevelApiTests
         Assert.Equal("關鍵字", mark.Term);
         Assert.Equal("K", mark.Key1);
         Assert.Equal("1", mark.Key2);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.InsertTableOfContents"/> 會立即掃描標題並產生可點擊的目錄項目。
+    /// </summary>
+    [Fact]
+    public void InsertTableOfContents_GeneratesHeadingLinksImmediately()
+    {
+        using var document = TextDocument.Create();
+        document.AddHeading("第一章", 1);
+        document.AddHeading("忽略第三層", 3);
+
+        OdfTableOfContents toc = document.InsertTableOfContents("文件目錄", 2);
+
+        OdfNode? body = toc.BodyNode;
+        Assert.NotNull(body);
+        OdfNode entry = Assert.Single(
+            body!.Children,
+            child => child.LocalName == "p" &&
+                child.NamespaceUri == OdfNamespaces.Text &&
+                child.TextContent.Contains("第一章", StringComparison.Ordinal));
+        OdfNode link = Assert.Single(
+            entry.Children,
+            child => child.LocalName == "a" && child.NamespaceUri == OdfNamespaces.Text);
+
+        Assert.StartsWith("#_Toc_", link.GetAttribute("href", OdfNamespaces.XLink), StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            body.Children,
+            child => child.LocalName == "p" &&
+                child.NamespaceUri == OdfNamespaces.Text &&
+                child.TextContent.Contains("忽略第三層", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -747,6 +1048,31 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 ODT 流式寫入器可直接混合輸出既有 DOM 子樹。
+    /// </summary>
+    [Fact]
+    public void OdtStreamWriter_WriteNode_WritesDomSubtree()
+    {
+        using var stream = new MemoryStream();
+        var paragraph = new TextPElement("text") { TextContent = "DOM 段落" };
+
+        using (var writer = new OdtStreamWriter(stream))
+        {
+            writer.AddHeading("標題", 1);
+            writer.WriteNode(paragraph);
+        }
+
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string contentXml = reader.ReadToEnd();
+
+        Assert.Contains("text:h", contentXml);
+        Assert.Contains("DOM 段落", contentXml);
+    }
+
+    /// <summary>
     /// 驗證 ODT 流式讀取器可逐一讀出大型文字文件元素。
     /// </summary>
     [Fact]
@@ -848,6 +1174,52 @@ public class TextHighLevelApiTests
 
         Assert.Equal("AXB", first.TextContent);
         Assert.Equal("A[Target]B", second.TextContent);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.ExtractFields"/> 可跨文字 run 提取標記欄位。
+    /// </summary>
+    [Fact]
+    public void ExtractFieldsReadsDelimitedValuesAcrossTextRuns()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph(string.Empty);
+        paragraph.AddTextRun("[甲");
+        paragraph.AddTextRun("方]星河股份有限公司[/甲");
+        paragraph.AddTextRun("方]");
+
+        IReadOnlyDictionary<string, string> fields = document.ExtractFields();
+        IReadOnlyDictionary<string, OdfExtractedFieldInfo> infos = document.ExtractFieldInfos();
+
+        Assert.Equal("星河股份有限公司", fields["甲方"]);
+        Assert.Equal(OdfExtractedFieldSource.DelimitedText, infos["甲方"].Source);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.ExtractFields"/> 可提取書籤範圍與 ODF 變數欄位。
+    /// </summary>
+    [Fact]
+    public void ExtractFieldsReadsBookmarkRangesAndOdfVariables()
+    {
+        using var document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph(string.Empty);
+        var start = OdfNodeFactory.CreateElement("bookmark-start", OdfNamespaces.Text, "text");
+        start.SetAttribute("name", OdfNamespaces.Text, "乙方", "text");
+        var end = OdfNodeFactory.CreateElement("bookmark-end", OdfNamespaces.Text, "text");
+        end.SetAttribute("name", OdfNamespaces.Text, "乙方", "text");
+
+        paragraph.Node.AppendChild(start);
+        paragraph.AddTextRun("晨曦有限公司");
+        paragraph.Node.AppendChild(end);
+        paragraph.AddVariableSetField("合約編號", "C-2026-001");
+
+        IReadOnlyDictionary<string, string> fields = document.ExtractFields();
+        IReadOnlyDictionary<string, OdfExtractedFieldInfo> infos = document.ExtractFieldInfos();
+
+        Assert.Equal("晨曦有限公司", fields["乙方"]);
+        Assert.Equal("C-2026-001", fields["合約編號"]);
+        Assert.Equal(OdfExtractedFieldSource.Bookmark, infos["乙方"].Source);
+        Assert.Equal(OdfExtractedFieldSource.OdfField, infos["合約編號"].Source);
     }
 
     /// <summary>
@@ -980,5 +1352,43 @@ public class TextHighLevelApiTests
         using Stream stylesStream = package.GetEntryStream("styles.xml");
         using var reader = new StreamReader(stylesStream);
         return reader.ReadToEnd();
+    }
+
+    private static MemoryStream CreateStreamingTemplateZip(string contentXml)
+    {
+        var stream = new MemoryStream();
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            WriteZipEntry(archive, "mimetype", "application/vnd.oasis.opendocument.text");
+            WriteZipEntry(archive, "content.xml", contentXml);
+            WriteZipEntry(
+                archive,
+                "styles.xml",
+                """
+                <?xml version="1.0" encoding="utf-8"?>
+                <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" />
+                """);
+        }
+
+        stream.Position = 0;
+        return stream;
+    }
+
+    private static string ReadZipEntryText(Stream stream, string entryName)
+    {
+        stream.Position = 0;
+        using var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        ZipArchiveEntry entry = archive.GetEntry(entryName) ?? throw new InvalidDataException(entryName);
+        using Stream entryStream = entry.Open();
+        using var reader = new StreamReader(entryStream, Encoding.UTF8);
+        return reader.ReadToEnd();
+    }
+
+    private static void WriteZipEntry(ZipArchive archive, string entryName, string text)
+    {
+        ZipArchiveEntry entry = archive.CreateEntry(entryName, CompressionLevel.NoCompression);
+        using Stream stream = entry.Open();
+        byte[] bytes = Encoding.UTF8.GetBytes(text);
+        stream.Write(bytes, 0, bytes.Length);
     }
 }

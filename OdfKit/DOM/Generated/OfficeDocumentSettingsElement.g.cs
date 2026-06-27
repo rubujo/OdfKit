@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeDocumentSettingsElement(string? prefix = null) : base("document-settings", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeDocumentSettingsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfIriReference? Transformation
         {
             get => GetIriReferenceAttributeValue("transformation", "http://www.w3.org/2003/g/data-view#", GetDocumentVersion());

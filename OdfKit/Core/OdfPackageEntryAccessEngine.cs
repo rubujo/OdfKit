@@ -64,7 +64,12 @@ internal static class OdfPackageEntryAccessEngine
     {
         name = OdfPackage.SanitizeEntryName(name);
         string resolvedMediaType = OdfPackageMediaTypeResolver.Resolve(name, mediaType);
-        OdfPackageEntry entry = new(name, content);
+        bool isCompressed = true;
+        if (ctx.Entries.TryGetValue(name, out var oldEntry))
+        {
+            isCompressed = oldEntry.IsCompressed;
+        }
+        OdfPackageEntry entry = new(name, content) { IsCompressed = isCompressed };
         ctx.Entries[name] = entry;
         ctx.Manifest[name] = resolvedMediaType;
 
@@ -88,7 +93,12 @@ internal static class OdfPackageEntryAccessEngine
     {
         name = OdfPackage.SanitizeEntryName(name);
         string resolvedMediaType = OdfPackageMediaTypeResolver.Resolve(name, mediaType);
-        OdfPackageEntry entry = new(name, contentStream);
+        bool isCompressed = true;
+        if (ctx.Entries.TryGetValue(name, out var oldEntry))
+        {
+            isCompressed = oldEntry.IsCompressed;
+        }
+        OdfPackageEntry entry = new(name, contentStream) { IsCompressed = isCompressed };
         ctx.Entries[name] = entry;
         ctx.Manifest[name] = resolvedMediaType;
 

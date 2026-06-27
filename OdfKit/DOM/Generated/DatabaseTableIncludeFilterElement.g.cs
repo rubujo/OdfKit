@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseTableIncludeFilterElement(string? prefix = null) : base("table-include-filter", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseTableIncludeFilterElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DatabaseTableFilterPatternElement> DatabaseTableFilterPatternChildElements
         {
             get => ChildElements<DatabaseTableFilterPatternElement>();

@@ -285,6 +285,36 @@ public class PackageRoundTripTests
         Assert.Equal("x", miElement.Value);
     }
 
+    [Fact]
+    public void WriteEntryInfersManifestMediaTypesWhenMediaTypeIsOmitted()
+    {
+        using var packageStream = new MemoryStream();
+
+        using (OdfPackage package = OdfPackage.Create(packageStream, leaveOpen: true))
+        {
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"));
+            package.WriteEntry("Pictures/logo.png", Convert.FromBase64String(Base64Image));
+
+            using var rdfStream = new MemoryStream(Encoding.UTF8.GetBytes("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"/>"));
+            package.WriteEntry("META-INF/manifest.rdf", rdfStream);
+
+            Assert.Equal("text/xml", package.Manifest["content.xml"]);
+            Assert.Equal("image/png", package.Manifest["Pictures/logo.png"]);
+            Assert.Equal("application/rdf+xml", package.Manifest["META-INF/manifest.rdf"]);
+
+            package.Save();
+        }
+
+        packageStream.Position = 0;
+
+        using OdfPackage reopened = OdfPackage.Open(packageStream, leaveOpen: true);
+
+        Assert.Equal("text/xml", reopened.Manifest["content.xml"]);
+        Assert.Equal("image/png", reopened.Manifest["Pictures/logo.png"]);
+        Assert.Equal("application/rdf+xml", reopened.Manifest["META-INF/manifest.rdf"]);
+    }
+
     /// <summary>
     /// 列舉所有格式支援矩陣中的格式。
     /// </summary>

@@ -266,6 +266,48 @@ public class MasterDocumentTests
     }
 
     /// <summary>
+    /// 驗證同名且語意等價的樣式在合併時會直接複用目的地樣式，
+    /// 避免產生不必要的重新命名樣式與 XML 增長。
+    /// </summary>
+    [Fact]
+    public void MergeSubDocuments_ReusesSemanticallyEquivalentStyleNames()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+        string chapter1Path = Path.Combine(tempDir, "chapter1.odt");
+
+        try
+        {
+            using (var chapter1 = TextDocument.Create())
+            {
+                AddNamedParagraphStyle(chapter1, "Standard", "12pt");
+                chapter1.AddParagraph("同樣式章節").StyleName = "Standard";
+                chapter1.Save(chapter1Path);
+            }
+
+            using var master = TextMasterDocument.Create();
+            AddNamedParagraphStyle(master, "Standard", "12pt");
+            master.AddSubDocumentReference("Chapter1", "chapter1.odt");
+
+            using TextDocument merged = master.MergeSubDocuments(tempDir);
+
+            OdfNode mergedStyles = FindOrCreateChild(merged.StylesDom, "styles", OdfNamespaces.Office, "office");
+            var paragraphStyleNames = mergedStyles.Children
+                .Where(c => c.NodeType is OdfNodeType.Element && c.LocalName == "style" && c.GetAttribute("family", OdfNamespaces.Style) == "paragraph")
+                .Select(c => c.GetAttribute("name", OdfNamespaces.Style))
+                .ToList();
+
+            Assert.Single(paragraphStyleNames);
+            Assert.Equal("Standard", paragraphStyleNames[0]);
+            Assert.Contains(merged.Body.Paragraphs.Items, paragraph => paragraph.TextContent == "同樣式章節" && paragraph.StyleName == "Standard");
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    /// <summary>
     /// 驗證 <see cref="TextMasterDocument.MergeSubDocuments"/> 在子文件參照的目標檔案不存在時，
     /// 會擲出檔案系統層級的例外，而非靜默忽略或產生不完整的合併結果。
     /// </summary>

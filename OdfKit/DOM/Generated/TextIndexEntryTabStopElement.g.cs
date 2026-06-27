@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextIndexEntryTabStopElement(string? prefix = null) : base("index-entry-tab-stop", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextIndexEntryTabStopElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCharacter? LeaderChar
         {
             get => GetCharacterAttributeValue("leader-char", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class TextSheetNameElement : OdfElement
     {
         public TextSheetNameElement(string? prefix = null) : base("sheet-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+
+        public TextSheetNameElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

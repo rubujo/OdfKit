@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleListLevelLabelAlignmentElement(string? prefix = null) : base("list-level-label-alignment", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleListLevelLabelAlignmentElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfTextLabelFollowedBy? LabelFollowedBy
         {
             get => GetTextLabelFollowedByAttributeValue("label-followed-by", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

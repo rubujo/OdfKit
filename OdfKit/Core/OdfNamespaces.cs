@@ -203,5 +203,49 @@ public static class OdfNamespaces
             _ => string.Empty
         };
     }
+
+    /// <summary>
+    /// 根據命名空間前綴查找標準命名空間 URI。
+    /// </summary>
+    /// <param name="prefix">命名空間前綴</param>
+    /// <returns>標準命名空間 URI；若無對應則傳回空字串</returns>
+    public static string LookupNamespaceUri(string prefix)
+    {
+        return prefix switch
+        {
+            "office" => Office,
+            "style" => Style,
+            "text" => Text,
+            "table" => Table,
+            "draw" => Draw,
+            "fo" => Fo,
+            "xlink" => XLink,
+            "dc" => Dc,
+            "meta" => Meta,
+            "number" => Number,
+            "presentation" => Presentation,
+            "svg" => Svg,
+            "chart" => Chart,
+            "config" => Config,
+            "script" => Script,
+            "anim" => Anim,
+            "smil" => Smil,
+            "manifest" => Manifest,
+            "dsig" => Dsig,
+            "ds" => Ds,
+            "calcext" => CalcExt,
+            "loext" => LoExt,
+            "form" => Form,
+            "pkg" => Pkg,
+            "of" => Of,
+            "oooc" => Oooc,
+            "math" => MathMl,
+            "xml" => Xml,
+            "dr3d" => Dr3d,
+            "db" => Database,
+            "report" => Report,
+            _ => string.Empty
+        };
+    }
 }
 

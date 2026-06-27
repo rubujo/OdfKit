@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableFilterConditionElement(string? prefix = null) : base("filter-condition", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableFilterConditionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? CaseSensitive
         {
             get => GetAttributeValue("case-sensitive", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

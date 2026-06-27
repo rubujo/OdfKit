@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextBibliographySourceElement(string? prefix = null) : base("bibliography-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextBibliographySourceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TextBibliographyEntryTemplateElement> TextBibliographyEntryTemplateChildElements
         {
             get => ChildElements<TextBibliographyEntryTemplateElement>();

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextBibliographyElement(string? prefix = null) : base("bibliography", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextBibliographyElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXmlName? Id
         {
             get => GetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", GetDocumentVersion());

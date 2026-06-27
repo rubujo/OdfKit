@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartGridElement(string? prefix = null) : base("grid", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartGridElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Class
         {
             get => GetAttributeValue("class", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextAlphabeticalIndexMarkElement(string? prefix = null) : base("alphabetical-index-mark", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextAlphabeticalIndexMarkElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Key1
         {
             get => GetAttributeValue("key1", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

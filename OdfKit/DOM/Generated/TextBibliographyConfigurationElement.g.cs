@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextBibliographyConfigurationElement(string? prefix = null) : base("bibliography-configuration", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextBibliographyConfigurationElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCountryCode? Country
         {
             get => GetCountryCodeAttributeValue("country", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());

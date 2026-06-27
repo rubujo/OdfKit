@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeSettingsElement(string? prefix = null) : base("settings", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeSettingsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<ConfigConfigItemSetElement> ConfigConfigItemSetChildElements
         {
             get => ChildElements<ConfigConfigItemSetElement>();

@@ -10,6 +10,42 @@ public partial class OdfStyleEngine
 {
     #region Local Styles & Deduplication
 
+    private int _updateDepth;
+    private bool _hasDeferredStyleSave;
+
+    internal bool IsUpdateActive => _updateDepth > 0;
+
+    internal void BeginUpdate()
+    {
+        _updateDepth++;
+    }
+
+    internal void EndUpdate()
+    {
+        if (_updateDepth == 0)
+            return;
+
+        _updateDepth--;
+        if (_updateDepth == 0 && _hasDeferredStyleSave)
+        {
+            FlushPendingStyles();
+        }
+    }
+
+    internal void FlushPendingStyles()
+    {
+        _hasDeferredStyleSave = false;
+        DeduplicateAndSaveStylesCore();
+    }
+
+    internal void ReleaseLocalStyle(OdfNode elementNode)
+    {
+        if (_localStyles.Remove(elementNode) && _localStyles.Count == 0)
+        {
+            _hasDeferredStyleSave = false;
+        }
+    }
+
     /// <summary>
     /// 取得或建立特定 DOM 節點在記憶體中的局部編輯樣式節點。
     /// </summary>
@@ -43,7 +79,14 @@ public partial class OdfStyleEngine
         string? existingStyleName = elementNode.GetAttribute(styleAttr, styleNs);
         if (!string.IsNullOrEmpty(existingStyleName))
         {
-            styleNode.SetAttribute("parent-style-name", OdfNamespaces.Style, existingStyleName!);
+            if (TryGetIndexedStyle(existingStyleName!, out OdfNode? existingStyleNode))
+            {
+                CopyStyleStateForCow(styleNode, existingStyleNode!);
+            }
+            else
+            {
+                styleNode.SetAttribute("parent-style-name", OdfNamespaces.Style, existingStyleName!);
+            }
         }
 
         _localStyles[elementNode] = styleNode;
@@ -183,7 +226,14 @@ public partial class OdfStyleEngine
         }
 
         elementNode.IsModified = true;
-        if (!deferSave)
+        if (deferSave)
+        {
+            if (IsUpdateActive)
+            {
+                _hasDeferredStyleSave = true;
+            }
+        }
+        else
         {
             DeduplicateAndSaveStyles();
         }
@@ -193,6 +243,17 @@ public partial class OdfStyleEngine
     /// 執行自動樣式去重，將記憶體中的臨時局部樣式合併寫入 XML 並更新 DOM 節點參照。
     /// </summary>
     public void DeduplicateAndSaveStyles()
+    {
+        if (IsUpdateActive)
+        {
+            _hasDeferredStyleSave = true;
+            return;
+        }
+
+        DeduplicateAndSaveStylesCore();
+    }
+
+    private void DeduplicateAndSaveStylesCore()
     {
         if (_localStyles.Count == 0)
             return;
@@ -284,12 +345,51 @@ public partial class OdfStyleEngine
         RebuildStyleIndex();
     }
 
+    private bool TryGetIndexedStyle(string styleName, out OdfNode? styleNode)
+    {
+        if (_automaticStyles.TryGetValue(styleName, out styleNode))
+        {
+            return true;
+        }
+
+        return _commonStyles.TryGetValue(styleName, out styleNode);
+    }
+
+    private static void CopyStyleStateForCow(OdfNode targetStyle, OdfNode sourceStyle)
+    {
+        foreach (var attr in sourceStyle.Attributes)
+        {
+            if (attr.Key.NamespaceUri == OdfNamespaces.Style &&
+                string.Equals(attr.Key.LocalName, "name", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            targetStyle.SetAttribute(
+                attr.Key.LocalName,
+                attr.Key.NamespaceUri,
+                attr.Value,
+                sourceStyle.GetAttributePrefix(attr.Key));
+        }
+
+        foreach (OdfNode child in sourceStyle.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName.EndsWith("-properties", StringComparison.Ordinal) &&
+                child.NamespaceUri == OdfNamespaces.Style)
+            {
+                targetStyle.AppendChild(child.CloneNode(true));
+            }
+        }
+    }
+
     private string SerializeStyleProperties(OdfNode styleNode)
     {
         // 用於進行雜湊之樣式屬性的簡單確定性序列化
         StringBuilder sb = new();
         sb.Append($"family:{styleNode.GetAttribute("family", OdfNamespaces.Style)}|");
         sb.Append($"parent:{styleNode.GetAttribute("parent-style-name", OdfNamespaces.Style)}|");
+        sb.Append($"class:{styleNode.GetAttribute("class", OdfNamespaces.Style)}|");
 
         List<OdfNode> propNodes = [.. styleNode.Children];
         propNodes.Sort((x, y) => string.Compare(x.LocalName, y.LocalName, StringComparison.Ordinal));

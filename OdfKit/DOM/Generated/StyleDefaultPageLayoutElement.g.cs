@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleDefaultPageLayoutElement(string? prefix = null) : base("default-page-layout", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleDefaultPageLayoutElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<StyleFooterStyleElement> StyleFooterStyleChildElements
         {
             get => ChildElements<StyleFooterStyleElement>();

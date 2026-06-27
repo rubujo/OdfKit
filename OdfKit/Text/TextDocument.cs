@@ -266,6 +266,19 @@ public partial class TextDocument : OdfDocument
         => TextDocumentTocEngine.AddTableOfContents(this, CoreCollaborators, title, outlineLevel);
 
     /// <summary>
+    /// 於文件結尾插入目錄，並立即更新以自動生成標題超連結與大綱內容。
+    /// </summary>
+    /// <param name="title">目錄標題</param>
+    /// <param name="outlineLevel">目錄的大綱階層上限</param>
+    /// <returns>已建立且更新完成的目錄物件</returns>
+    public OdfTableOfContents InsertTableOfContents(string title = "Table of Contents", int outlineLevel = 10)
+    {
+        var toc = AddTableOfContents(title, outlineLevel);
+        toc.Update();
+        return toc;
+    }
+
+    /// <summary>
     /// 將文件中所有標題（包含區段內巢狀標題）的大綱階層整體位移指定量。
     /// </summary>
     /// <param name="offset">位移量；正值表示降階（數字變大），負值表示升階。結果會限制最小為 1。</param>
@@ -556,6 +569,80 @@ public partial class TextDocument : OdfDocument
     /// <returns>每筆記錄對應一個已合併的 <see cref="TextDocument"/>；呼叫端負責 Dispose</returns>
     public IReadOnlyList<TextDocument> MailMerge(IEnumerable<IReadOnlyDictionary<string, object?>> records)
         => TextDocumentMailMergeBatchEngine.MailMerge(this, records);
+
+    /// <summary>
+    /// 以流式、低記憶體佔用（小於 1MB）的方式，將目前文字文件作為範本進行郵件合併，並將結果輸出至目標串流。
+    /// </summary>
+    /// <param name="outputStream">輸出目標檔案串流</param>
+    /// <param name="dataSource">套印資料字典，Key 對應範本中的合併欄位名稱</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步合併作業的工作</returns>
+    /// <remarks>
+    /// 此方法會將目前文件儲存，並從其封裝包的底層資料流中以 SAX 流式讀寫重構輸出，不會載入完整 DOM 樹至記憶體中。
+    /// </remarks>
+    public async Task StreamingMailMergeAsync(
+        Stream outputStream,
+        IDictionary<string, object?> dataSource,
+        CancellationToken cancellationToken = default)
+    {
+        if (outputStream is null)
+        {
+            throw new ArgumentNullException(nameof(outputStream));
+        }
+
+        if (dataSource is null)
+        {
+            throw new ArgumentNullException(nameof(dataSource));
+        }
+
+        // 確保目前文件的內容已序列化寫入封裝
+        Save();
+
+        // 建立暫存的記憶體串流以儲存當前範本文件封裝
+        using var tempMemoryStream = new MemoryStream();
+        Package.Save(tempMemoryStream);
+        tempMemoryStream.Position = 0;
+
+        // 呼叫流式郵件合併引擎執行套印
+        await OdfStreamingMailMerge.ApplyTemplateAsync(tempMemoryStream, outputStream, dataSource, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 以流式、低記憶體佔用（小於 1MB）的方式，將目前文字文件作為範本進行郵件合併，並將結果輸出至目標串流。
+    /// </summary>
+    /// <param name="outputStream">輸出目標檔案串流</param>
+    /// <param name="dataSource">套印資料字典，Key 對應範本中的合併欄位名稱</param>
+    public void StreamingMailMerge(Stream outputStream, IDictionary<string, object?> dataSource)
+    {
+        StreamingMailMergeAsync(outputStream, dataSource).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// 以流式、低記憶體佔用（小於 1MB）的方式，載入指定路徑的範本文字文件進行郵件合併，並將結果輸出至目標串流。
+    /// </summary>
+    /// <param name="templatePath">範本文字文件路徑</param>
+    /// <param name="outputStream">輸出目標檔案串流</param>
+    /// <param name="dataSource">套印資料字典，Key 對應範本中的合併欄位名稱</param>
+    public static void StreamingMailMerge(string templatePath, Stream outputStream, IDictionary<string, object?> dataSource)
+    {
+        if (string.IsNullOrEmpty(templatePath))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_TextDocument_TemplatePathCannotBeNullOrEmpty"), nameof(templatePath));
+        }
+
+        if (outputStream is null)
+        {
+            throw new ArgumentNullException(nameof(outputStream));
+        }
+
+        if (dataSource is null)
+        {
+            throw new ArgumentNullException(nameof(dataSource));
+        }
+
+        using var templateStream = File.OpenRead(templatePath);
+        OdfStreamingMailMerge.ApplyTemplateAsync(templateStream, outputStream, dataSource).GetAwaiter().GetResult();
+    }
 
 
     #endregion

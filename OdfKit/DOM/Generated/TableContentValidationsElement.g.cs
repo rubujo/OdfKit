@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableContentValidationsElement(string? prefix = null) : base("content-validations", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableContentValidationsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TableContentValidationElement> TableContentValidationChildElements
         {
             get => ChildElements<TableContentValidationElement>();

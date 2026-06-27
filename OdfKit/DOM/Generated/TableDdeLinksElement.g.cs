@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableDdeLinksElement(string? prefix = null) : base("dde-links", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableDdeLinksElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TableDdeLinkElement> TableDdeLinkChildElements
         {
             get => ChildElements<TableDdeLinkElement>();

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableDataPilotGroupElement(string? prefix = null) : base("data-pilot-group", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableDataPilotGroupElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Name
         {
             get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

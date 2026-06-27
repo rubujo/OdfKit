@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public FormPropertiesElement(string? prefix = null) : base("properties", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
+        public FormPropertiesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<FormListPropertyElement> FormListPropertyChildElements
         {
             get => ChildElements<FormListPropertyElement>();

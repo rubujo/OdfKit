@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartLegendElement(string? prefix = null) : base("legend", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartLegendElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfLength? Height
         {
             get => GetLengthAttributeValue("height", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());

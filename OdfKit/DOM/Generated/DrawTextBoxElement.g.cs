@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawTextBoxElement(string? prefix = null) : base("text-box", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawTextBoxElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? ChainNextName
         {
             get => GetAttributeValue("chain-next-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

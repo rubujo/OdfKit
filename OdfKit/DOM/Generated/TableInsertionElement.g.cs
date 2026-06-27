@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableInsertionElement(string? prefix = null) : base("insertion", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableInsertionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? AcceptanceState
         {
             get => GetAttributeValue("acceptance-state", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextNoteRefElement(string? prefix = null) : base("note-ref", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextNoteRefElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfTextNoteClass? NoteClass
         {
             get => GetTextNoteClassAttributeValue("note-class", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

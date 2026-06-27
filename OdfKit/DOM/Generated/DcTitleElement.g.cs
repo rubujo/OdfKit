@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class DcTitleElement : OdfElement
     {
         public DcTitleElement(string? prefix = null) : base("title", "http://purl.org/dc/elements/1.1/", prefix) { }
+
+        public DcTitleElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

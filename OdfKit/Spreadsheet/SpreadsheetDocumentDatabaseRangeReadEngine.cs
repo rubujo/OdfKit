@@ -32,6 +32,7 @@ internal static class SpreadsheetDocumentDatabaseRangeReadEngine
             ranges.Add(new OdfDatabaseRangeInfo(
                 name!,
                 targetRange,
+                child.GetAttribute("display-filter-buttons", OdfNamespaces.Table) == "true",
                 ParseFilterConditions(child),
                 ParseSortRules(child)));
         }

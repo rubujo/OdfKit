@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Collections.Generic;
 using System.Security;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using Org.BouncyCastle.Crypto.Generators;
 
 using OdfKit.Compliance;
@@ -11,6 +13,10 @@ namespace OdfKit.Core;
 public static partial class OdfEncryption
 {
     #region Package Encryption & Decryption
+
+    internal static int LastParallelEncryptedEntryCountForTests { get; private set; }
+
+    internal static int LastParallelEncryptionMaxDegreeForTests { get; private set; }
 
     /// <summary>
     /// 解密指定 ODF 封裝中的所有加密專案。
@@ -176,9 +182,18 @@ public static partial class OdfEncryption
     /// <param name="algorithm">加密演算法，預設為 AES-256</param>
     public static void Encrypt(OdfPackage package, string password, OdfEncryptionAlgorithm algorithm = OdfEncryptionAlgorithm.Aes256)
     {
+        LastParallelEncryptedEntryCountForTests = 0;
+        LastParallelEncryptionMaxDegreeForTests = 0;
+
         if (algorithm == OdfEncryptionAlgorithm.OpenPgp && package.SaveOptions.CryptographyProvider is null)
         {
             throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfEncryption_OpenpgpEncryptionImplementedThrough"));
+        }
+
+        if (package.SaveOptions.CryptographyProvider is null)
+        {
+            EncryptBuiltInEntries(package, password, algorithm);
+            return;
         }
 
         foreach (var entry in package.Entries.Values)
@@ -200,65 +215,125 @@ public static partial class OdfEncryption
             byte[] ciphertext;
             OdfEncryptionInfo info;
 
-            if (package.SaveOptions.CryptographyProvider is not null)
-            {
-                ciphertext = package.SaveOptions.CryptographyProvider.Encrypt(plaintext, name, package.SaveOptions, out info);
-            }
-            else
-            {
-                byte[] compressedPlaintext;
-                using (var ms = new MemoryStream())
-                {
-                    using (var deflate = new DeflateStream(ms, CompressionMode.Compress, true))
-                    {
-                        deflate.Write(plaintext, 0, plaintext.Length);
-                    }
-                    compressedPlaintext = ms.ToArray();
-                }
-
-                byte[] iv;
-                byte[] salt;
-                ciphertext = EncryptEntry(compressedPlaintext, password, algorithm, out iv, out salt, out _);
-
-                byte[] checksum = ComputeHash(plaintext, "SHA256");
-
-                info = new OdfEncryptionInfo
-                {
-                    ChecksumType = "SHA256",
-                    Checksum = checksum,
-                    AlgorithmName = algorithm == OdfEncryptionAlgorithm.Aes256Gcm
-                        ? Aes256GcmAlgorithmUri
-                        : (algorithm == OdfEncryptionAlgorithm.Aes256 ? Aes256AlgorithmUri : BlowfishAlgorithmUri),
-                    InitialisationVector = iv,
-                    KeyDerivationName = "PBKDF2",
-                    KeySize = (algorithm == OdfEncryptionAlgorithm.Aes256 || algorithm == OdfEncryptionAlgorithm.Aes256Gcm) ? 32 : 16,
-                    IterationCount = 50000,
-                    Salt = salt
-                };
-
-                if (algorithm == OdfEncryptionAlgorithm.Aes256Gcm)
-                {
-                    info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha256";
-                    info.StartKeySize = 32;
-                    info.ExtensionProperties["kdf-name"] = "argon2id";
-                    info.ExtensionProperties["argon2-t"] = "3";
-                    info.ExtensionProperties["argon2-m"] = "65536";
-                    info.ExtensionProperties["argon2-p"] = "4";
-                }
-                else if (algorithm == OdfEncryptionAlgorithm.Aes256)
-                {
-                    info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha256";
-                    info.StartKeySize = 32;
-                }
-                else
-                {
-                    info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha1";
-                    info.StartKeySize = 20;
-                }
-            }
+            ciphertext = package.SaveOptions.CryptographyProvider.Encrypt(plaintext, name, package.SaveOptions, out info);
 
             entry.SetContent(ciphertext);
             entry.EncryptionInfo = info;
+        }
+    }
+
+    private static void EncryptBuiltInEntries(OdfPackage package, string password, OdfEncryptionAlgorithm algorithm)
+    {
+        List<EncryptionWorkItem> workItems = [];
+        foreach (var entry in package.Entries.Values)
+        {
+            string name = entry.Name;
+            if (name == "mimetype" || name.StartsWith("META-INF/"))
+            {
+                continue;
+            }
+
+            byte[] plaintext;
+            using (var stream = entry.OpenReader())
+            using (var ms = new MemoryStream())
+            {
+                stream.CopyTo(ms);
+                plaintext = ms.ToArray();
+            }
+
+            workItems.Add(new EncryptionWorkItem(entry, plaintext));
+        }
+
+        if (workItems.Count == 0)
+        {
+            return;
+        }
+
+        if (workItems.Count == 1)
+        {
+            workItems[0].Encrypt(password, algorithm);
+        }
+        else
+        {
+            int maxDegree = OdfParallelScheduler.GetEffectiveConcurrency();
+            LastParallelEncryptionMaxDegreeForTests = maxDegree;
+            Parallel.For(
+                0,
+                workItems.Count,
+                new ParallelOptions { MaxDegreeOfParallelism = maxDegree },
+                i => OdfParallelScheduler.RunWithConfiguredThreadPriority(
+                    () => workItems[i].Encrypt(password, algorithm)));
+            LastParallelEncryptedEntryCountForTests = workItems.Count;
+        }
+
+        foreach (EncryptionWorkItem item in workItems)
+        {
+            item.Apply();
+        }
+    }
+
+    private sealed class EncryptionWorkItem(OdfPackageEntry entry, byte[] plaintext)
+    {
+        private byte[]? _ciphertext;
+        private OdfEncryptionInfo? _info;
+
+        public void Encrypt(string password, OdfEncryptionAlgorithm algorithm)
+        {
+            byte[] compressedPlaintext;
+            using (var ms = new MemoryStream())
+            {
+                using (var deflate = new DeflateStream(ms, CompressionMode.Compress, true))
+                {
+                    deflate.Write(plaintext, 0, plaintext.Length);
+                }
+                compressedPlaintext = ms.ToArray();
+            }
+
+            byte[] iv;
+            byte[] salt;
+            _ciphertext = EncryptEntry(compressedPlaintext, password, algorithm, out iv, out salt, out _);
+
+            byte[] checksum = ComputeHash(plaintext, "SHA256");
+
+            _info = new OdfEncryptionInfo
+            {
+                ChecksumType = "SHA256",
+                Checksum = checksum,
+                AlgorithmName = algorithm == OdfEncryptionAlgorithm.Aes256Gcm
+                    ? Aes256GcmAlgorithmUri
+                    : (algorithm == OdfEncryptionAlgorithm.Aes256 ? Aes256AlgorithmUri : BlowfishAlgorithmUri),
+                InitialisationVector = iv,
+                KeyDerivationName = "PBKDF2",
+                KeySize = (algorithm == OdfEncryptionAlgorithm.Aes256 || algorithm == OdfEncryptionAlgorithm.Aes256Gcm) ? 32 : 16,
+                IterationCount = 50000,
+                Salt = salt
+            };
+
+            if (algorithm == OdfEncryptionAlgorithm.Aes256Gcm)
+            {
+                _info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha256";
+                _info.StartKeySize = 32;
+                _info.ExtensionProperties["kdf-name"] = "argon2id";
+                _info.ExtensionProperties["argon2-t"] = "3";
+                _info.ExtensionProperties["argon2-m"] = "65536";
+                _info.ExtensionProperties["argon2-p"] = "4";
+            }
+            else if (algorithm == OdfEncryptionAlgorithm.Aes256)
+            {
+                _info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha256";
+                _info.StartKeySize = 32;
+            }
+            else
+            {
+                _info.StartKeyGenerationName = "http://www.w3.org/2000/09/xmldsig#sha1";
+                _info.StartKeySize = 20;
+            }
+        }
+
+        public void Apply()
+        {
+            entry.SetContent(_ciphertext ?? throw new InvalidOperationException());
+            entry.EncryptionInfo = _info ?? throw new InvalidOperationException();
         }
     }
 

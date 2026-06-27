@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawPolygonElement(string? prefix = null) : base("polygon", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawPolygonElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? AnchorPageNumber
         {
             get => GetNullableInt32AttributeValue("anchor-page-number", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

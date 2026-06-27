@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextTextInputElement(string? prefix = null) : base("text-input", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextTextInputElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Description
         {
             get => GetAttributeValue("description", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

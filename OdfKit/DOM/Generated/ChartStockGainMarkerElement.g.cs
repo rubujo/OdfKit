@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartStockGainMarkerElement(string? prefix = null) : base("stock-gain-marker", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartStockGainMarkerElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? StyleName
         {
             get => GetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", GetDocumentVersion());

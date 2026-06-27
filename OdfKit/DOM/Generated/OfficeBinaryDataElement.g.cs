@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class OfficeBinaryDataElement : OdfElement
     {
         public OfficeBinaryDataElement(string? prefix = null) : base("binary-data", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
+
+        public OfficeBinaryDataElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

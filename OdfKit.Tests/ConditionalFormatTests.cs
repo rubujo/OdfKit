@@ -106,6 +106,22 @@ public class ConditionalFormatTests
     }
 
     /// <summary>
+    /// 驗證計畫名 AddDataBar API 會建立可讀回的資料橫條條件格式。
+    /// </summary>
+    [Fact]
+    public void AddDataBar_CreatesReadableDataBarFormat()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Sheet1");
+
+        sheet.AddDataBar(new OdfCellRange(0, 1, 9, 1), new OdfColor("#638EC6"));
+
+        var format = Assert.Single(sheet.ConditionalFormats);
+        Assert.Equal(OdfConditionalFormatKind.DataBar, format.Kind);
+        Assert.Equal("#638EC6", format.PositiveColor?.Value);
+    }
+
+    /// <summary>
     /// 驗證三箭頭圖示集寫入正確的 calcext:icon-set 元素與 icon-set-type。
     /// </summary>
     [Fact]
@@ -145,6 +161,23 @@ public class ConditionalFormatTests
             start++;
         }
         Assert.Equal(5, count);
+    }
+
+    /// <summary>
+    /// 驗證計畫名 AddIconSet API 會建立可讀回的圖示集條件格式。
+    /// </summary>
+    [Fact]
+    public void AddIconSet_CreatesReadableIconSetFormat()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Sheet1");
+
+        sheet.AddIconSet(new OdfCellRange(0, 2, 9, 2), OdfIconSetType.ThreeTrafficLights);
+
+        var format = Assert.Single(sheet.ConditionalFormats);
+        Assert.Equal(OdfConditionalFormatKind.IconSet, format.Kind);
+        Assert.Equal(OdfIconSetType.ThreeTrafficLights, format.IconSetType);
+        Assert.Equal("3TrafficLights1", format.IconSetTypeName);
     }
 
     /// <summary>

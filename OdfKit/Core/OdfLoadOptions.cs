@@ -74,6 +74,16 @@ public class OdfLoadOptions
     private IOdfOpenPgpKeyProvider? _openPgpKeyProvider;
 
     /// <summary>
+    /// 取得或設定一個值，指出是否允許延遲解析 XML 子樹節點。
+    /// </summary>
+    public bool AllowLazyLoading { get; set; } = true;
+
+    /// <summary>
+    /// 取得或設定一個值，指出是否啟用作業系統的 Direct I/O 進行高效檔案讀取。
+    /// </summary>
+    public bool EnableDirectIo { get; set; } = false;
+
+    /// <summary>
     /// 取得預設的載入選項執行個體。
     /// </summary>
     public static OdfLoadOptions Default => new();

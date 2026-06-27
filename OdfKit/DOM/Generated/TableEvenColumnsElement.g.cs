@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableEvenColumnsElement(string? prefix = null) : base("even-columns", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableEvenColumnsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? ParagraphStyleName
         {
             get => GetStyleNameAttributeValue("paragraph-style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

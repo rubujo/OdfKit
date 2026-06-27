@@ -32,6 +32,11 @@ public partial class OdfNode
             clone._attributePrefixes[attrPrefix.Key] = attrPrefix.Value;
         }
 
+        if (deep && TryCopyLazyXmlStateTo(clone))
+        {
+            return clone;
+        }
+
         if (deep)
         {
             foreach (var child in Children)
@@ -41,6 +46,21 @@ public partial class OdfNode
         }
 
         return clone;
+    }
+
+    internal bool TryCopyLazyXmlStateTo(OdfNode clone)
+    {
+        if (!_isLazy || Children.LoadedCount != 0)
+        {
+            return false;
+        }
+
+        clone._isLazy = true;
+        clone._lazyXmlMemory = _lazyXmlMemory;
+        clone._lazyXmlPtr = _lazyXmlPtr;
+        clone._lazyXmlLen = _lazyXmlLen;
+        clone._xmlByteRange = _xmlByteRange;
+        return true;
     }
 
     /// <summary>
@@ -67,7 +87,7 @@ public partial class OdfNode
         return importedNode;
     }
 
-    private static void MigrateMediaReferences(OdfNode node, OdfPackage sourcePackage, OdfPackage destPackage)
+    internal static void MigrateMediaReferences(OdfNode node, OdfPackage sourcePackage, OdfPackage destPackage)
     {
         // 檢查節點中的 xlink:href 屬性
         var hrefKey = new OdfAttributeName("href", OdfNamespaces.XLink);
@@ -83,10 +103,9 @@ public partial class OdfNode
                     stream.CopyTo(ms);
                     byte[] mediaBytes = ms.ToArray();
 
-                    // 在目的套件中註冊媒體
-                    var mediaManager = new OdfMediaManager(destPackage);
+                    // 使用目的套件的共用 MediaManager 快取進行註冊，防止重複實例化與 Pictures 全掃描
                     string fileName = Path.GetFileName(href);
-                    string newHref = mediaManager.AddImage(mediaBytes, fileName);
+                    string newHref = destPackage.MediaManager.AddImage(mediaBytes, fileName);
 
                     // 更新複製節點中的參考
                     node.Attributes[hrefKey] = newHref;

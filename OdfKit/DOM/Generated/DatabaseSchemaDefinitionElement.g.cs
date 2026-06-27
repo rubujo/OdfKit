@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseSchemaDefinitionElement(string? prefix = null) : base("schema-definition", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseSchemaDefinitionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DatabaseTableDefinitionsElement> DatabaseTableDefinitionsChildElements
         {
             get => ChildElements<DatabaseTableDefinitionsElement>();

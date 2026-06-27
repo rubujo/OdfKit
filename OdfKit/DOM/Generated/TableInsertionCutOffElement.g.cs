@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableInsertionCutOffElement(string? prefix = null) : base("insertion-cut-off", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableInsertionCutOffElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Id
         {
             get => GetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

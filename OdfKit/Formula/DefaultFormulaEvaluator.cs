@@ -34,6 +34,13 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
             return OdfFormulaError.Ref;
         }
 
+        var domCtx = context as OdfDomEvaluationContext;
+        var oldCell = domCtx?.CurrentCell;
+        if (domCtx != null)
+        {
+            domCtx.CurrentCell = cellAddress;
+        }
+
         _evaluatingStack.Add(cellAddress);
         try
         {
@@ -63,6 +70,10 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
         finally
         {
             _evaluatingStack.Remove(cellAddress);
+            if (domCtx != null && oldCell.HasValue)
+            {
+                domCtx.CurrentCell = oldCell.Value;
+            }
         }
     }
 
@@ -96,12 +107,25 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
         _evaluatingStack.Clear();
     }
 
+    internal void SetCachedValue(OdfCellAddress cellAddress, object value)
+    {
+        _cache[cellAddress] = value;
+    }
+
     /// <summary>
     /// 評估指定內容根節點下的所有文件公式，並更新其顯示文字與屬性。
     /// </summary>
     /// <param name="contentRoot">文件的內容根節點</param>
     public void EvaluateFormulasInDocument(OdfNode contentRoot)
         => FormulaDocumentEvaluationEngine.EvaluateFormulasInDocument(contentRoot, this);
+
+    /// <summary>
+    /// 評估指定內容根節點下的所有文件公式，並使用外部連結管理器解析跨文件參照。
+    /// </summary>
+    /// <param name="contentRoot">文件的內容根節點</param>
+    /// <param name="externalLinks">外部連結管理器</param>
+    public void EvaluateFormulasInDocument(OdfNode contentRoot, OdfExternalLinkManager? externalLinks)
+        => FormulaDocumentEvaluationEngine.EvaluateFormulasInDocument(contentRoot, this, externalLinks);
 
     /// <summary>
     /// 評估所有支援之公式函式的中央分派方法。

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableMovementElement(string? prefix = null) : base("movement", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableMovementElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? AcceptanceState
         {
             get => GetAttributeValue("acceptance-state", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

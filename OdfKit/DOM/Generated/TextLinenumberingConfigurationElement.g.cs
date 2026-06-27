@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextLinenumberingConfigurationElement(string? prefix = null) : base("linenumbering-configuration", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextLinenumberingConfigurationElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? CountEmptyLines
         {
             get => GetBooleanAttributeValue("count-empty-lines", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

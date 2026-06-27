@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberNumListLabelElement(string? prefix = null) : base("num-list-label", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberNumListLabelElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? Level
         {
             get => GetNullableInt32AttributeValue("level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

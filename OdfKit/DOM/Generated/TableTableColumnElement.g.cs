@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableTableColumnElement(string? prefix = null) : base("table-column", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableTableColumnElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? DefaultCellStyleName
         {
             get => GetStyleNameAttributeValue("default-cell-style-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

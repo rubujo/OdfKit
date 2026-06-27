@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextVariableGetElement(string? prefix = null) : base("variable-get", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextVariableGetElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? DataStyleName
         {
             get => GetStyleNameAttributeValue("data-style-name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

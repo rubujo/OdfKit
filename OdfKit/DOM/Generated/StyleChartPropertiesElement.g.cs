@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleChartPropertiesElement(string? prefix = null) : base("chart-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleChartPropertiesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfAngle? AngleOffset
         {
             get => GetAngleAttributeValue("angle-offset", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", GetDocumentVersion());

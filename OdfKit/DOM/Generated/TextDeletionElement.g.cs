@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextDeletionElement(string? prefix = null) : base("deletion", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextDeletionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<Dr3dSceneElement> Dr3dSceneChildElements
         {
             get => ChildElements<Dr3dSceneElement>();

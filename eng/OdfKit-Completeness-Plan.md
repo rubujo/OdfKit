@@ -1,0 +1,336 @@
+# OdfKit 大計畫完成追蹤
+
+本檔追蹤 `docs/OdfKit-底層API設計優化與效能重構計畫-修訂版.md` 的實作進度。狀態以目前工作區為準，完成與否需以程式碼、測試與建置結果證明；文件願景本身不視為完成。
+
+## 狀態圖例
+
+- `Done`：已有可用實作與測試或既有測試覆蓋。
+- `Partial`：已有部分 API 或雛形，但未覆蓋計畫描述的主要行為。
+- `Todo`：未找到可用實作，或只有文件描述。
+- `Risk`：查證後需重設計或降級為候選方案。
+
+## 模組追蹤
+
+| 模組 | 對應計畫區段 | 狀態 | 目前證據 | 下一步 |
+| --- | --- | --- | --- | --- |
+| 生成碼拆分與建構子優化 | 模組 1、決策 1 | Done | `OdfKit/DOM/Generated/*.g.cs` 已拆分；generated wrapper 已提供 prefix 建構子與 `params OdfNode[]` 函數式建構子，並以 20 個元素抽樣測試防退化 | 持續由 generator 與 coverage guard 維護 |
+| 流式讀寫與混合輸出 | 模組 2、決策 2-5、8、29、64、76、105 | Done | `OdsStreamWriter` / `OdtStreamWriter.WriteNode`、`OdsStreamWriter.SwitchToSheet`、`OdsStreamWriter.WriteSheetsAsync`、`OdsStreamWriter.WriteDataAsync(DbDataReader)`、`OdsStreamReader.DbDataReader`、CSV、`ToAsyncEnumerable`、直接輸出邊界與 writer 端雙緩衝壓力測試已存在 | 持續由 stream writer / reader usability 與 optimized refactoring 測試維護 |
+| 底層型別與智慧列舉 | 模組 3、決策 6 | Done | `OdfColor` 隱式轉換、`OdfPresentationTransitionType` struct、`OdfLength` 常用單位工廠方法與數字 extension 測試已存在 | 持續由型別化屬性與 API usability 測試維護 |
+| DOM 操作與延遲載入 | 模組 4、決策 7、9-13、20、23-31、37-58、62-76、80-82、89-90、94-116 | Done | `ReplaceText`、`ExtractFields`、`PruneAndCollect`、`ReleaseUnusedNodes()`、`InlineTextBuilder`、`OdfBookmarkManager`、`InsertTableOfContents`、`OdfListBuilder`、`OdfChartBuilder`、`ComputedStyle`、`BeginUpdate/EndUpdate`、`OdfWrapperRegistry`、`IFontSubsetter` / `OdfFontResolver.RegisterFontSubsetter`、公式非同步 channel pipeline、`FormatInfo` / `DateTimeToken` readonly struct 與格式解析 flyweight cache、`OdfCell.RichText`、`OdfParagraph.AppendHtml/AppendMarkdown`、`OdfCell.AppendHtml/AppendMarkdown`、`OdfStreamingMailMerge` 位元組區段預編譯套印與 DTD 防護、`OdfTableSheet.AutoFilter/Sort`、`OdfCellRangeSelection.AutoFilter/Sort`、`OdfTableSheet.GroupRows/GroupColumns`、`Rows.Group/Ungroup`、`Columns.Group/Ungroup`、`TextDocument.TrackChanges`、`DrawImageElement.Crop/SetEffects/SetImageSource`、`Formula.Sum/Cell` 強型別 OpenFormula 建構器、`OdfParagraph.SetOutlineLevel/EnableAutoNumbering`、`OdfElement.ApplyStyle/ConfigureStyle/CopyFormatFrom` / `OdfStyleMixinBuilder`、樣式 COW 深層複製繼承鏈與 `style:class`、`OdfDocument.Validate()`、`OdfCell.Style.NumberFormat`、工作表 `AdoptSheet` 跨文件採納、跨文件 `AdoptNode` 圖片 SHA-256 去重、跨文件 `AdoptNode` default style 扁平化、工作表 Auto-fit 欄寬 / 最佳列高、`TableTableElement.EnumerateCellViews()` 與 `OdfCellData` 輕量 cell view、`TextDocument.FormFields`、`OdfCellRangeSelection.Borders`、`TextDocument.OptimizeMedia`、`OdfDocument.Styles.GC()`、工作表 facade cache 公開釋放、剪裁後子節點索引快取深度釋放、段落預綁定批次 writer、語意樣式合併、稀疏表格 hot formula / cold page 分離、圖表本地資料 lazy cache、lazy XML chunk 局部寫出、SVG path UTF-8 parser、`AddDataBar` / `AddIconSet` 條件格式、凍結窗格 / `SplitWindow`、`CreatePivotTable`、`ImportHtmlStyles(cssString)` 等已有部分實作 | 已完成抽樣稽核，持續由 focused tests 防退化 |
+| Package、Namespace 與低階 I/O | 模組 5、決策 14-19、21-22、32-36、39-45、48、51-52、57、60-61、66-67、77-79、83-88、91-93、98-100、106-107、112、114-115 | Done | Direct I/O aligned buffer、Direct I/O 邊界壓力、journal fail-fast、MMF、CRC、transaction、telemetry、memory tracker、`OdfXmlNameTable`、XML UTF-8 fast path typed parity、`OdfUtf8XmlReader.ReadValueChunk(Span<byte>)`、並行 ZIP entry deflate 準備、`ArrayPool<byte>` 壓縮暫存緩衝與單執行緒有序寫出、流式 writer 雙緩衝池化分頁、SIMD / Span 命名空間前綴分類器與 near-miss 二次比對防護、自訂屬性 Span Fast-LUT、`SetAttribute` 未指定 prefix 時自動套用標準 namespace prefix、Debug 模式屬性 schema 診斷、package-level `IBufferWriter<byte>` 儲存入口、`AddEntry` / `WriteEntry` 未指定 MIME 時依路徑自動推導 manifest media type 並 round-trip、未修改 MMF ZIP entry raw compressed payload 直接輸出、stored ZIP entry 載入後另存會保留壓縮方法、唯讀 Central Directory ZIP 快速索引與 VFS offset 證據、試算表 `ExternalLinks` 跨文件公式載入委派與 settings.xml 快取、`SaveEncryptedAsync` / `LoadEncryptedAsync` 文件與封裝非同步加解密入口、raw entry patch 壓力測試、變長 entry 增量追加會讓檔案長度與 Central Directory offset 超過原 MMF / EOCD 邊界並可 round-trip、VFS debug visualizer / debugger proxy、CPU 核心預留與 worker priority scope 調度、稀疏表格 hot formula store SafeHandle 生命週期與同步鎖、AES-GCM 竄改失敗測試、`OdfDocument.SignDocumentAsync` 一鍵文件簽章入口、簽章竄改驗證本地化測試與基本 PDF CMS detached 簽章測試已有實作與測試 | 已完成低階 I/O 與封裝一致性盤點，持續由 focused tests 防退化 |
+
+## 完成狀態覆核
+
+- 模組 4 已以決策 22、111、115 的 focused tests 完成 DOM 延遲載入抽樣稽核，未發現仍需新增實作的缺口，狀態覆核為 `Done`。
+- 模組 5 已完成低階 I/O、Namespace、封裝一致性與加密路徑盤點，並補齊決策 18、61、66 與 Direct I/O 對齊的防退化測試。模組 5 的計畫範圍已有實作與測試證據，狀態覆核為 `Done`。
+- 依目前追蹤文件與 focused 驗證，5 個大模組皆已有可用實作與測試證據；沒有剩餘 Phase 或 Batch。
+
+## 本輪已完成增量
+
+- Direct I/O：`net10.0` 使用 `NativeMemory.AlignedAlloc` 包裝的 `AlignedNativeBuffer`，並以 `File.OpenHandle` / `RandomAccess` 進行對齊 I/O；舊 TFM 與尾端非對齊資料維持 `FileStream` fallback。Focused test 直接 pin 出 native pointer 驗證 64KB 緩衝區符合 4096 bytes 對齊，避免退回 `GC.AllocateArray<byte>(pinned: true)` 但未保證 sector alignment 的錯誤路徑。
+- Journal：交易日誌建立與 recovery 失敗改為 fail-fast，新增 `Err_OdfPackage_JournalCreateFailed` 全語系訊息。
+- XML parser 計畫：將 U8XmlParser 降為研究候選，保留 `XmlReader` 安全 fallback。
+- 決策 95 Struct 格式化享元池：`FormatInfo` 與 `DateTimeToken` 改為 readonly struct，`OdfNumberFormatter.ParsePattern(...)` 透過 `ConcurrentDictionary` 快取已解析格式；`GetOrCreateNumberStyle(...)` 現在於 normalized format 層先命中 request cache，避免重複格式查詢仍建立暫時 XML 樣式節點。Focused test 以 `GC.GetAllocatedBytesForCurrentThread()` 驗證熱路徑 1,000 次查詢零配置。
+- 儲存格取消合併：新增 `OdfTableSheet.UnmergeCells(OdfCellRange)`、`OdfTableSheet.UnmergeCells(string)` 與 `OdfCellRangeSelection.Unmerge()`，補 `SpreadsheetHighLevelApiTests` 覆蓋。
+- 預填充 XML 名稱表：新增 `OdfXmlNameTable`，套用至 DOM、manifest、Flat XML 與 ODS/ODT 串流讀取路徑。
+- 決策 61 ZIP CRC-32/ISO-HDLC 防退化：`OdfCrc32` 的 one-shot 路徑使用 `System.IO.Hashing.Crc32.HashToUInt32`，累積路徑使用 ISO-HDLC reflected polynomial `0xEDB88320` 與 slice-by-8 fallback；測試以標準向量 `123456789` 驗證結果為 `0xCBF43926`，且明確不等於 CRC-32C/Castagnoli 的 `0xE3069283`，避免誤用 `Sse42.Crc32`。
+- 批次更新：新增 `OdfDocument.BeginUpdate()`、`EndUpdate()` 與 `IsUpdateActive`，批次期間延後樣式去重，最外層結束或儲存前統一 flush。
+- 安全範本欄位提取：新增 `TextDocument.ExtractFields()` 與 `ExtractFieldInfos()`，支援跨 `text:span` 的標記欄位、書籤範圍與 ODF 變數欄位。
+- 主動子樹剪裁：新增 `OdfNode.PruneAndCollect()` 與 `OdfTableSheet.PruneAndCollect()`，可斷開大型 DOM 子樹並釋放延遲 XML 參照。
+- 跨文件公式連結：新增 `OdfExternalLinkManager`、`SpreadsheetDocument.ExternalLinks` 與 `EvaluateFormulas()`，支援 resolver 載入外部文件並快取外部儲存格值。
+- 儲存掛鉤外部公式重算：`EvaluateFormulasOnSave` 會透過文件持久化協作者將 `SpreadsheetDocument.ExternalLinks` 傳入 package save hook，避免存檔時回退成無外部連結的公式重算。
+- 外部連結快取持久化：將外部文件 URI、工作表、儲存格座標與快取值保存至 `settings.xml`，重新載入後可在沒有 resolver 的情況下供公式評估使用。
+- 樣式暫存回收：`PruneAndCollect()` 會通知 `OdfStyleEngine` 釋放被剪裁子樹的 deferred local styles，避免已移除節點在批次更新結束或儲存時把孤兒樣式寫入 `automatic-styles`。
+- 工作表 facade pool 回收：`OdfTableSheet.PruneAndCollect()` 會同步釋放 `Cells`、`Rows`、`Columns`、`Ranges` 高階集合快取，避免剪裁後的 sheet wrapper 持續保留已無效的 facade 物件圖。
+- 決策 66 Raw entry patch 壓力驗證：新增反覆 `RawEntryPatch` 快取一致性測試，以及 stored `mimetype` 同長度原位 patch / CRC round-trip 測試，覆蓋免 DOM 二進位直改後的快取與重開讀取路徑；測試會解析 ZIP Local File Header 與 Central Directory，確認兩處 CRC 都等於 patch 後 payload 的 CRC-32/ISO-HDLC。
+- XML 快速路徑 typed parity：新增 `OdfXmlReader.Parse(ReadOnlyMemory<byte>)` UTF-8 快速路徑與 `XmlReader` fallback 的 typed DOM 等價測試，覆蓋 generated wrapper、schema child collection、屬性與 entity-decoded 文字；修正 entity 文字掃描避免停在 `&amp;`，並確保小型可 lazy 節點不會在判斷大小時提前消耗 reader。
+- XML 快速路徑壓力驗證：補上大型 lazy table 延遲具現化測試，以及非標準命名空間前綴仍依 URI 解析為 typed DOM 的測試，符合 prefix-independent XML 比對規則。
+- Generated wrapper 函數式建構子：`DomWrappersCSharpWriter` 現在為非手寫 generated element 產生 `params OdfNode[]` 建構子，重產 `OdfKit/DOM/Generated/*.g.cs`，並新增 public API、generator CLI 產物與 20 個 generated element 抽樣測試。
+- 流式寫入混合輸出：`OdsStreamWriter` 與 `OdtStreamWriter` 新增 `WriteNode(OdfNode)`，可直接混合輸出 DOM 子樹；`OdsStreamWriter.SwitchToSheet(string)` 以分段 sheet buffer 支援多工作表交錯寫入，並修正 Dispose 自動補關 row / sheet 的狀態順序。新增 `Err_OdsStreamWriter_SheetNameRequired` 全語系訊息。
+- `OdfLength` 單位擴充稽核：補 `FromPicas` 工廠方法，並讓數字 extension 涵蓋 `Cm`、`Mm`、`Pt`、`In`、`Pc`、`Px`、`Percent` 與 `Em` 的 `int` / `double` 版本。
+- `DbDataReader` 流式匯出：`OdsStreamWriter.WriteDataAsync(DbDataReader)` 可逐列寫入目前工作表，支援欄名列、字串、數值、布林、日期與 null；同步修正 buffered sheet 關列時應使用目前 writer，而非主 content writer。
+- Writer 端雙緩衝壓力：`OdfDoubleBufferedWritableStream` 補 buffer size 防呆，並新增跨多次 buffer boundary 的 byte-for-byte 保序測試。
+- 直接輸出邊界：`OdsStreamWriter.ToAsyncEnumerable()` 新增大輸出多 chunk ZIP round-trip 與 producer 例外傳遞測試，補齊 HTTP chunked streaming 邊界證據。
+- 多工作表並行寫入：新增 `OdsStreamWriter.WriteSheetsAsync`、`OdsSheetWriteJob` 與 `OdsSheetWriter`，可讓多個工作表先並行產生獨立 XML fragment，再依 job 順序由單一 writer 合併至 `content.xml`，補上決策 105 的並行 sheet 產生與單一 I/O 提交基礎。
+- 並行 ZIP 封裝寫入：同步 ZIP 儲存管線會在 raw-copy 快速路徑後嘗試 parallel-prepared archive，先以 `OdfParallelScheduler` 計算平行度，並行準備各 entry 的 CRC 與 deflate payload，再由主執行緒依原 entry 順序寫 Local Header、payload、Central Directory 與 EOCD；若失敗會回退原 `ZipArchive` 寫出。Focused test 驗證多 entry 封裝會走並行準備路徑且輸出可由 `ZipArchive` 讀回。
+- 並行壓縮暫存緩衝：parallel-prepared archive 的 Deflate 輸出改由 `ArrayPool<byte>` 成長緩衝承接，避免每個壓縮 entry 依賴 `MemoryStream` 自行配置可成長大陣列；focused test 驗證多 entry 儲存會走 pooled buffer 路徑並可讀回。
+- 流式 writer 池化分頁：`OdfDoubleBufferedWritableStream` 的雙緩衝 page 改由 `ArrayPool<byte>` 租用與歸還，保留呼叫端指定的邏輯 buffer boundary；focused tests 驗證跨 buffer 邊界輸出保序、無效大小防呆，以及 dispose 後租用 / 歸還計數成對。
+- 二進位 XML 預編譯套印：`OdfStreamingMailMerge` 會將 XML 轉為靜態 UTF-8 byte segment、placeholder segment 與 foreach segment 後直接輸出；XML reader 安全設定改為 `DtdProcessing.Prohibit`。Focused tests 驗證 ZIP 範本套印會輸出 escaped 值且移除 placeholder，並拒絕含 DTD 的範本。
+- 決策 116 HTML 樣式映射：`TextDocument.ImportHtmlStyles(cssString)` 可將 CSS selector 對應到 ODT 共用樣式名稱，並將常用文字 / 段落屬性寫入 `styles.xml`；新增 round-trip 測試覆蓋 class selector 與 `span` selector。
+- Direct I/O 邊界壓力：新增跨 64KB prefetch、4096 bytes 對齊區段與尾端非對齊資料的讀寫測試；修正 Windows Direct I/O 背景 prefetch 與前景讀取共用 lock 時可能互等的風險。
+- 決策 77 AES-GCM + Argon2id 加密：AES-256-GCM 路徑使用 `Argon2idDerivationUri` 與 BouncyCastle Argon2id 產生金鑰，並以 GCM 驗證標籤保護內容完整性；解密失敗路徑改用 `Err_OdfEncryption_GcmDecryptionFailed` 全語系在地化訊息，移除 hard-coded 中文診斷訊息。Focused tests 驗證 Argon2id round-trip 與竄改密文時必須拋出在地化 `CryptographicException`。
+- 簽章竄改驗證在地化：核心 XMLDSig 密碼學驗證失敗改用 `Err_OdfSignatureVerifier_CryptographicSignatureInvalid` 全語系訊息；簽章值、簽署檔案與 XAdES 憑證摘要被竄改時，測試改為驗證本地化錯誤訊息。
+- PDF 簽章嵌入：`OdfPdfRenderer.ExportToPdf(..., certificate)` 會先由 PDFsharp 產生 PDF，再以 incremental update 追加 signature field、AcroForm、`/ByteRange` 與 `/Contents`，並使用 `SignedCms` 產生 `adbe.pkcs7.detached` CMS detached signature；測試會從輸出 PDF 抽出 `ByteRange` 與 CMS 簽章並驗證簽章有效。
+- 自訂 typed wrapper 註冊表：新增 `OdfWrapperRegistry.Register` / `Unregister`，`OdfNodeFactory.CreateElement` 會優先使用自訂 factory，讓非標準命名空間元素於解析時具現化為使用者註冊的 `OdfElement` 子類別；新增測試覆蓋解析、屬性、文字與 unregister 回退。
+- 未知節點保留：新增 `OdfUnknownElement` 作為 factory fallback 型別，未知或第三方擴充元素會保留 prefix、namespace URI、屬性、文字與子樹並可無損 round-trip；測試同時覆蓋 XmlReader fallback 與 UTF-8 fast path 的未知元素保護。
+- AdoptNode 命名空間重對照：`OdfDocument.AdoptNode(...)` 會在跨文件或同文件採納後遞迴更新 Document 所有權，並將已知 ODF namespace 的元素與屬性 prefix 正規化為目標文件標準前綴；未知 namespace 保留原 prefix，避免破壞第三方擴充可讀性。
+- AdoptNode 媒體去重採納：跨文件採納含 `Pictures/...` 圖片參照的節點時，會透過目的封裝 `OdfMediaManager` 依 SHA-256 重用既有相同圖片 entry，並重寫採納節點的 `xlink:href`，避免重複寫入媒體或留下來源封裝失效參照。
+- AdoptNode default style 扁平化：跨文件採納節點時會匯入其引用的來源樣式；若來源樣式依賴來源文件的 `style:default-style`，匯入時會將 default style 的實質 `style:*properties` 屬性合併進該樣式，避免目標文件 default style 不同造成視覺外觀漂移。
+- 儲存格多行富文字：新增 `OdfCell.RichText` 鏈式建構器，`OdfRichText` 支援鏈式 `AddRun` / `AddLineBreak`，`SetRichText` 會將 `\n`、`\t` 與連續空白輸出為對應 ODF 文字節點；偵測到換行時自動套用 `fo:wrap-option="wrap"` 的儲存格樣式，並以 XML round-trip 測試鎖定 `<text:line-break>` 與 wrap 樣式。
+- 表單欄位安全填充：新增 `TextDocument.FormFields`、`OdfFormFieldCollection` 與 `OdfFormField` facade，可依 key 填入既有 `text:text-input` 與 `form:*` 控制項；文字欄位更新內容或 `form:value`，核取方塊更新 `form:current-state`，missing key 透過 `Exists` / `TrySetValue` 回報而不建立新節點。
+- 範圍框線與對齊管理：新增 `OdfCellRangeSelection.Borders` 與 `OdfRangeBorderProxy`，支援 `SetAll`、`SetOuter`、`SetInner`、`SetGrid`，可依範圍邊界與內部格線套用不同 `fo:border-*`；範圍選取新增 `HorizontalAlignment` 批次套用 `fo:text-align`。
+- 媒體最佳化核心管線：新增 `TextDocument.OptimizeMedia(maxDpi, jpegQuality, optimizer)`、`OdfMediaOptimizationRequest`、`OdfOptimizedMedia` 與 `OdfMediaOptimizer`，可掃描本文圖片、交由可插拔影像後端重採樣 / 轉碼、寫入新 package entry、同步更新 `draw:image/@xlink:href` 並清理舊 Pictures entry；核心庫不綁定 WebP 編碼器，測試以 fake optimizer 驗證 PNG 轉 WebP 參照與 manifest 同步。
+- SIMD 命名空間前綴快速路徑：`OdfUtf8XmlReader` 新增 `Vector128<byte>` / Span 的 known prefix classifier，`OdfXmlReader.Parse(ReadOnlyMemory<byte>)` 在 UTF-8 fast path 中會先解析 `table:`、`text:`、`draw:` 等常見前綴與 local name，減少整串 qualified name 解碼；若前綴被重新宣告為非標準 URI，會退回 namespace scope 查表，維持 `NamespaceURI + LocalName` 語意。
+- Perfect hash / prefix 二次驗證：known prefix classifier 會在 hash / 首字元分派後再以實際 UTF-8 bytes 驗證完整 prefix 與 colon；focused test 覆蓋 `tablex:`、大小寫錯誤與缺 colon 的 near-miss 名稱皆不能解析為標準命名空間，避免未知或擴充標籤被誤判。
+- 常見 XML 標籤 / 屬性 hash 快速映射：`OdfUtf8XmlReader.TryGetKnownQualifiedNameKind(...)` 會直接在 UTF-8 qualified name Span 上計算 hash，映射到常見 ODF 標籤與屬性列舉，命中後仍以實際位元組二次驗證，避免 near-miss 或大小寫錯誤被誤判。
+- 變長 entry 增量追加：`OdfPackageEntry` 區分讀取快取與實際修改，避免 MMF 預載讓所有 entry 被誤判為 dirty；`TryIncrementalZipAppend` 只對修改或新增 entry 追加新 Local Header 與資料，再重寫 Central Directory / EOCD。測試會比對 patch 前後檔案長度與 EOCD Central Directory offset 皆增加，並以 `ZipArchive` 與 `OdfPackage.Open` 重開驗證。
+- CPU 核心預留調度：新增 `OdfParallelScheduler.ReservationRatio` 與 `GetEffectiveConcurrency()`，讓內部並行工作負載在自動模式下可保留指定比例 CPU 核心給宿主系統；`OdsStreamWriter.WriteSheetsAsync` 與 MMF lazy preload 已套用此調度器，明確 `maxConcurrency` 仍優先於全域預留比例。
+- Worker priority scope 調度：新增 `OdfParallelScheduler.WorkerThreadPriority` 與作用域式執行包裝，讓 parallel ZIP deflate 準備與 MMF entry preload 可在工作委派期間暫時套用指定 `ThreadPriority`，完成後還原原優先權，避免污染 ThreadPool 後續工作。
+- SVG path 二進位解析：新增 `OdfSvgPathDataParser.TryGetBounds(ReadOnlySpan<byte>)`，直接在 UTF-8 path data 上掃描 SVG 指令與數值，支援 H / V 單軸指令、C / Q / S 曲線、A 弧線端點、負數與科學記號；`OdfDrawPage.AddPath` 的 `svg:viewBox` 已改用此 parser 計算。
+- 自訂屬性 Span Fast-LUT：新增 `OdfCustomAttributeRegistry.Register(localName, namespaceUri)`，UTF-8 fast path 解析屬性時會先以 Span 比對註冊 local name，命中後才解析 prefix 與 namespace URI；未註冊或 namespace 不符的屬性維持原本通用解析路徑。
+- 稀疏儲存冷熱分離：`TableTableElement` 公式資料改由獨立 unmanaged hot formula store 保存，冷頁壓縮前會抽離既有 page 內公式，讓同頁樣式 / 常值仍可壓縮為 cold page；`OdfSparseStorage` 測試驗證 hot formula store、cold page 壓縮與公式 round-trip。
+- 非受控 hot formula 生命週期：`TableTableElement` 的 hot formula store 改由 `SafeHandle` 包裝 UTF-8 公式指標，set/get/free 路徑以同步鎖保護，`Dispose()` / finalizer 皆會釋放並清空 store；focused test 驗證 cold page 公式抽離後 handle 有效，Dispose 後 handle 關閉。
+- 段落節點預綁定：新增 `TextDocument.BeginParagraphPrebinding(styleName)` 與 `OdfParagraphPrebindingWriter`，批次段落輸出時預先綁定本文根節點並直接追加 `text:p`，避免每段都建立 `OdfParagraph` facade；測試覆蓋樣式套用、計數與 round-trip。
+- 語意樣式合併：`OdfDocumentMergeEngine` 在同名樣式衝突時會先建立忽略 `style:name` 的語意簽章；若屬性與子節點等價，直接複用目的地樣式以避免 XML 增長，只有實質衝突才維持 `_sN` 重新命名。測試同時覆蓋「不同樣式改名」與「等價樣式複用」。
+- 公式非同步通道：新增 `SpreadsheetDocument.BeginFormulaEvaluationChannel()` 與 `OdfFormulaEvaluationChannel`，開啟後儲存格值或公式變更只送出 channel 請求，由背景 worker 呼叫既有 DAG 公式評估並寫回結果；測試驗證變更後背景重算、idle 等待與結果更新。
+- 圖表資料 lazy cache：新增 `OdfChartDocument.GetLocalDataCache()` 與 `OdfChartDataCache`，本地 `table:table` 只有在呼叫 API 時才掃描並快取；`ChartDocument.UpdateData()` 會讓快取失效，測試驗證 on-demand 載入、重複讀取不重掃與資料更新後重建。
+- Dirty XML chunk 局部寫出：`OdfXmlWriter` 會在遇到尚未具現化的 lazy XML 節點時，保留外層節點與屬性正常序列化，並直接寫出原始 inner XML；namespace 收集不再提前展開 lazy chunk。測試驗證大型 `table:table` 存檔不 materialize，且只修改外層屬性時仍保留內部原始列資料。
+- 二進位區塊深拷貝與延遲解析：`CloneNode(true)` 對尚未具現化的 lazy XML 節點會複製 lazy XML 狀態而不展開子節點，寫出 clone 時仍可沿用原始 inner XML；測試驗證原節點與 clone 均保持 lazy。
+- 樣式垃圾回收：新增公開 `OdfDocument.Styles` 入口與 `OdfStyleEngine.CollectGarbage()`，可移除未被 DOM 或已使用樣式父鏈引用的 `style:style`；測試驗證 orphan style 被移除、已使用樣式與父樣式保留，且存檔重載後索引仍正確。
+- Wrapper 深度回收：`OdfTableSheet.ReleaseFacadeCaches()` 可在不剪裁 DOM 的情況下主動釋放 `Cells`、`Rows`、`Columns`、`Ranges` 高階 facade；`OdfNode.ReleaseUnusedNodes()` 可非破壞式釋放已載入子樹的隨機存取索引快取且不具現化 lazy XML；`OdfNode.PruneAndCollect()` 會同步清空 `OdfNodeChildList` 隨機存取索引陣列，避免已剪裁子樹被失效快取保留。
+- VFS 偵錯視圖：`OdfPackage` 掛上 `DebuggerTypeProxy`，`DumpVfsLayout()` 與 debugger proxy 共用結構化 `OdfPackageDebugEntry`，可檢視 entry 路徑、媒體類型、大小、壓縮、加密、Dirty、Local Header offset 與資料 offset；測試以反射驗證 proxy 與結構化 entries。
+- `IBufferWriter<byte>` 儲存入口：新增 `OdfPackage.Save(IBufferWriter<byte>, OdfSaveOptions?)` 與 `OdfBufferWriterStream` adapter，讓封裝輸出可直接寫入呼叫端提供的位元組緩衝區；測試以 `ArrayBufferWriter<byte>` round-trip 驗證輸出可重新開啟。
+- 一鍵式文件簽章入口：新增 `OdfDocument.SignDocumentAsync(X509Certificate2, ...)` 計畫名 API，委派既有文件層 `SignAsync` / `OdfSigner.SignAsync` 管線，簽署前會同步刷新 DOM entries；新增測試驗證 `TextDocument` 呼叫後會寫入 `META-INF/documentsignatures.xml` 並可由文件層 `VerifySignaturesAsync` 通過。
+- 多 Entry 非同步載入解析：`OdfDocument.LoadAsync(...)` 取得封裝後，文件建構流程會以 `Task.WhenAll` 平行解析 `content.xml`、`styles.xml`、`meta.xml` 與 `settings.xml` 四個核心 DOM entry；測試驗證 async 載入後四個 entry 的自訂標記皆已解析保留。
+- 決策 18 非同步加密載入與儲存入口：新增 `OdfPackage.SaveEncryptedAsync(...)`、`OdfPackage.LoadEncryptedAsync(...)`、`OdfDocument.SaveEncryptedAsync(...)` 與 `OdfDocument.LoadEncryptedAsync(...)` 計畫名 API，直接套用既有 `OdfSaveOptions.Password` / `OdfLoadOptions.Password` 加密管線；內建密碼加密路徑會先順序讀取 entry plaintext，再依 `OdfParallelScheduler.GetEffectiveConcurrency()` 並行準備各 entry 的 ciphertext / metadata，最後順序回寫 package，避免多執行緒同時修改封裝狀態。測試以 AES-256-GCM 驗證文件層與封裝層 async 加解密 round-trip，並確認多 entry package 走並行加密準備。
+- 完整測試總閘修復：`netstandard2.0` 不再依賴 `System.Threading.Channels` 10.x，避免 `net8.0` 測試與執行環境載入 OdfKit 時要求不存在的 Channels 10.0.0 組件；`net10.0` 仍保留 channel pipeline，舊 TFM 改走順序載入 fallback。手寫 ZIP raw-copy 與 parallel-prepared 路徑改為共用 ODF entry 寫入順序，強制 `mimetype` 作為第一個 ZIP entry；樣式合併在 `KeepSourceFormatting` 模式下遇到同名衝突會重新命名來源樣式，即使語意相同也不靜默合併。
+- HTML/Markdown 行內富文字解析：新增 `OdfParagraph.AppendHtml/AppendMarkdown` 與 `OdfCell.AppendHtml/AppendMarkdown`，共用核心 HTML 片段解析器，支援 `<b>`、`<i>`、`<u>`、`<span style>`、`<br>` 與基本 Markdown 粗斜體語法；段落可映射字重、斜體、底線、色彩、字級與字型，儲存格可映射既有富文字模型支援的字重、斜體、底線、色彩與字型，並修正 `OdfCell.GetRichText()` 讀回 `text:line-break` 的保真度。
+- LINQ 友善 typed DOM 尋覽：新增 `OdfNode.As<T>()`、`OdfNodeTraversalExtensions.Children<T>()`、`Descendants<T>()` 與 `Append(params OdfNode[])` 計畫名 API，讓呼叫端可用零分配 typed 轉型、typed 子節點 / 後代列舉與鏈式 DOM 建立，同時不破壞既有 `Children` 屬性。
+- 一鍵目錄自動生成：`TextDocument.InsertTableOfContents(...)` 會立即掃描標題、套用 outline level 上限、自動建立 reference mark，並在目錄內容中產生 `text:a` 超連結項目。
+- 自動篩選與排序高階入口：新增 `OdfTableSheet.AutoFilter(string/OdfCellRange)`、`OdfTableSheet.Sort(string/OdfCellRange, ...)` 與 `OdfCellRangeSelection.AutoFilter/Sort`，以資料庫範圍生成 `table:display-filter-buttons`、`table:filter` 與 `table:sort` 結構；`GetDatabaseRanges()` 現可讀回自動篩選按鈕狀態，測試覆蓋工作表與範圍選取入口的 round-trip。
+- 工作表分組與採納：`OdfTableSheet.GroupRows/GroupColumns` 與計畫名 `Rows.Group/Ungroup`、`Columns.Group/Ungroup` 會產生 `table:table-row-group` / `table:table-column-group` 並支援解除群組；新增 `SpreadsheetDocument.AdoptSheet` 與 `Worksheets.Adopt`，可將來源工作表低分配採納到目標活頁簿、保留資料與群組結構並通過儲存重載。
+- 修訂追蹤計畫名入口：新增 `TextDocument.TrackChanges` 作為 `TrackedChanges` 的計畫名別名，`doc.TrackChanges = true` 後新增文字 run 會建立 `text:tracked-changes`、`text:change-start` 與 `text:change-end`，並可由 `GetTrackedChanges()` 讀回插入內容。
+- 影像裁切與效果 DOM 入口：新增 `DrawImageElement.Crop(top, bottom, left, right)`、`ClearCrop()` 與 `SetEffects(...)`，可寫入 `fo:clip`、`draw:filter-name`、不透明度、亮度、對比、gamma、圓角與陰影屬性；typed DOM 圖片 frame round-trip 測試驗證序列化與解析後保真。
+- 圖片來源自動繫結：新增 `DrawImageElement.SetImageSource(byte[] bytes, string fileName)`，可直接寫入封裝媒體 entry、設定 `xlink:href/type/show/actuate`，並重用 `OdfMediaManager` 的 SHA-256 去重集區；新增 `Err_DrawImageElement_DocumentRequiredForImageSource` 全語系訊息與 typed DOM 行為測試。
+- Fluent 樣式混合：新增 `OdfElement.ApplyStyle(...)` 與 `OdfStyleMixinBuilder`，支援粗體、斜體、底線、字級、文字色彩、對齊、背景色、父樣式繼承與 ODF 樣式 class metadata，並委派既有 `OdfStyleEngine` 去重管線；新增 `Err_OdfStyleMixinBuilder_DocumentRequired` 全語系訊息與 typed DOM 行為測試。
+- Fluent 樣式計畫名入口：新增 `OdfElement.ConfigureStyle(...)` 作為 `ApplyStyle(...)` 的計畫名別名，沿用 `OdfStyleMixinBuilder` 與既有樣式去重管線，測試覆蓋斜體、底線與背景色設定。
+- 寫時複製樣式繼承：新增 `OdfElement.CopyFormatFrom(...)`，先讓目標元素共用來源 `style-name`；當目標後續 `ConfigureStyle(...)` 時，現有局部樣式管線以來源樣式為 parent 建立新自動樣式，測試驗證來源樣式不受目標斜體修改影響。
+- 樣式 COW 深層複製防護：`OdfStyleEngine.GetOrCreateLocalStyle(...)` 在 Copy-on-Write 起始時會複製來源樣式的 `parent-style-name`、`style:class`、樣式家族與既有 `style:*properties`，避免新樣式只淺層依賴來源自動樣式造成繼承鏈斷裂或來源樣式被 GC 後外觀漂移。
+- 樣式垃圾回收計畫名入口：新增 `OdfDocument.Styles.GC()` 作為 `CollectGarbage()` 的計畫名別名，沿用既有未引用樣式移除與父樣式鏈保留邏輯。
+- 試算表視窗分割計畫名入口：新增 `OdfTableSheet.SplitWindow(...)` 作為 `SplitPanes(...)` 的計畫名別名，沿用既有 `settings.xml` 分割窗格寫入與讀回管線。
+- 條件格式視覺化計畫名入口：新增 `OdfTableSheet.AddDataBar(...)` 與 `AddIconSet(...)` 作為決策 82 指定 API，沿用既有 LibreOffice `calcext` data bar / icon set 寫入與讀回管線。
+- 強型別樞紐分析表計畫名入口：新增 `OdfTableSheet.CreatePivotTable(...)`，以 lambda 設定既有 `OdfPivotTableBuilder` 後直接建置並可由 `GetPivotTables()` 讀回。
+- 字型子集化擴充點：新增 `IFontSubsetter`、`OdfFontSubsetRequest`、`OdfFontSubset` 與 `OdfFontResolver.RegisterFontSubsetter(...)`；存檔前會掃描 PUA 自造字碼位，呼叫註冊的子集化實作，將回傳字型寫入 `Fonts/Subsets/` 並更新 `style:font-face-uri`，測試以 fake subsetter 驗證 package entry、manifest 與 XML 參照。
+- 強型別 OpenFormula 建構器：新增 `OdfKit.Spreadsheet.Formula` 與 `OdfSpreadsheetFormula`，支援 `Cell`、`Range`、`Sum`、`Average`、`Min`、`Max`、`Count`、`CountA` 與鏈式 `Add` / `Subtract` / `Multiply` / `Divide`，可直接隱式轉成 `table:formula` 字串並寫入 `OdfCell.Formula`。
+- 段落大綱與自動編號：新增 `OdfParagraph.SetOutlineLevel(level).EnableAutoNumbering(styleName)`，可將普通段落轉為 `text:h`、保留原有內容與屬性，寫入 `text:outline-level` / `style:list-style-name`，並在 `styles.xml` 建立 `text:outline-style` 與各層 `text:outline-level-style`。
+- 零 facade 儲存格遍歷：新增 `TableTableElement.EnumerateCellViews()`、`OdfCellView`、`OdfCellData` 與 stack-only 列舉器，可直接讀取稀疏儲存格而不建立 `TableTableCellElement` facade；已具現化 DOM 儲存格會展開 `table:number-rows-repeated` 與 `table:number-columns-repeated`，同時修正冷頁解壓時空字串指標造成空白格被誤判為有效資料的問題。
+- 批次列操作與 RLE 行合併：`OdfTableSheet.InsertRows(position, count)` 對多列空白插入會寫成單一 `table:table-row` 搭配 `table:number-rows-repeated`；新增 `CopyRows(sourcePosition, count, targetPosition)` 與 `MoveRows(sourcePosition, count, targetPosition)`，以 row snapshot 保留來源內容順序並支援批次列重排。
+- 記憶體分配過載與反模式警示：`OdfMemoryTracker` 新增可調診斷門檻，追蹤大型非受控 / POH 分配、累計追蹤記憶體、分配數量，並提供 `ReportLoadProfile(...)` 回報單次載入節點數、LOH / POH 壓力與高頻 boxing 風險，超過門檻時透過 `OdfKitDiagnostics` 發出 warning。
+- Manifest MIME 自動推導：`OdfPackage.AddEntry(...)` 與 `WriteEntry(...)` 未指定 media type 時會依 entry 路徑推導 `content.xml`、`Pictures/*.png`、`Pictures/*.svg`、`META-INF/manifest.rdf` 的 manifest media type，並在儲存後重開仍保留。
+- Namespace prefix 自動匹配：`OdfNode.SetAttribute(...)` 未指定 prefix 時會依已知 namespace URI 自動套用標準 prefix；未知 namespace 不強制補 prefix，保留第三方擴充可讀性。
+- Debug 屬性 schema 診斷：Debug 組態下 `OdfNode.SetAttribute(...)` 寫入已知 ODF namespace 但 schema 未定義的屬性時，會透過 `OdfKitDiagnostics` 發出 warning。
+- Raw ZIP entry 直接輸出：`SaveToStream` 於 MMF 載入且 entry 未修改時會直接複製原始 compressed payload，新增 / 修改 entry 才重新寫入，再統一重建 Central Directory / EOCD；測試直接比對另存前後指定 entry 的壓縮 payload bytes。
+- Stored entry 壓縮方法保留：載入含 stored entry 的 ZIP 後另存，輸出 ZIP 仍以 method 0 儲存該 entry，避免未修改二進位 entry 被無端重壓。
+- 唯讀 Central Directory ZIP 快速索引：檔案路徑載入會走 `OdfZipDirectoryParser.ParseCentralDirectory(...)` 建立 MMF entry offset 索引，新增 VFS offset 測試確認 `content.xml` 具備 Local Header、Data Offset 與 Compressed Size。
+- XML 大型文字分塊讀取：新增 `OdfUtf8XmlReader.ReadValueChunk(Span<byte>)`，可在讀到 text token 後以 UTF-8 位元組分塊讀取目前值，避免呼叫端為大型文字一次配置完整字串。
+- ZIP DoS 防護本地化：`OdfPackageZipLoader` 的 entry 數量、單 entry 大小與總解壓大小限制改用 `OdfLocalizer` 訊息，補齊 12 語系翻譯與三個 focused tests，避免低階封裝安全例外遺留 hard-coded 英文。
+- 跨文件公式連結快取：`SpreadsheetDocument.ExternalLinks` 支援外部文件載入委派、公式重算時解析跨文件參照，並將快取值保存至 `settings.xml` 後 round-trip。
+- 核心 XML channel 載入管線：`OdfDocument.LoadXmlTrees()` 改以 `System.Threading.Channels` 建立 content、styles、meta、settings 四個核心 XML entry 的工作佇列，依 `OdfParallelScheduler.GetEffectiveConcurrency()` 建立 worker 並行解析；focused test 驗證四個 entry 都由 channel pipeline 載入。
+- Central Directory / EOCD 直接寫入：增量 ZIP append 的 Central Directory 與 EOCD 重寫改為 Span 小端序二進位 writer；`net10.0` 以 stackalloc 緩衝直接寫入串流，`netstandard2.0` 以 `ArrayPool<byte>` 暫存避免 `BinaryWriter` 物件路徑。Raw patch 變長 entry 測試同步驗證 direct writer 計數與 EOCD offset 增長。
+- MMF 跨 entry 並行預讀證據：檔案路徑載入會以 Central Directory offset 建立 MMF entry 索引，並將 content、styles、meta、settings 四個獨立 XML entry 排入 `Parallel.ForEach` 預讀；focused test 以真實 ZIP 檔案驗證四個核心 entry 皆完成 MMF 並行預讀，且平行度來自 `OdfParallelScheduler.GetEffectiveConcurrency()`。
+- SIMD SUMPRODUCT 快速路徑：`FormulaNumericAggregation.TrySumProduct(...)` 會將兩個純數值矩陣展平成 pooled `double` 緩衝區；`net10.0` 使用 `TensorPrimitives.Dot`，舊 TFM 使用 `Vector<double>`，`SUMPRODUCT` 評估器會優先走此矩陣快速路徑。Focused test 驗證公式結果與向量化路徑命中。
+- 決策 93 字型 fallback 對照表：`OdfFontResolver.GetFontFallbackCandidates(...)` 內建 Office / 臺灣 CJK 常見字型跨平台候選序列，並提供 `ResolveFontFallback(...)` 讓 PDF 等後端以 availability probe 選出第一個可用候選；PDFsharp resolver 已共用此表避開 `.ttc` 字型。Focused tests 驗證 Calibri / Cambria / 新細明體候選、使用者註冊替代優先序與空白 / null probe 行為。
+- 決策 85 分頁聚合寫入：新增 `OdfPagedGatherWritableStream`，將 writer 輸出拆成固定頁並批次刷寫；`net10.0` 檔案目標使用 `RandomAccess.Write/WriteAsync` 的多緩衝區 overload 聚合提交，非檔案或舊 TFM 則順序 fallback。非同步 ZIP archive writer 已改用此分頁聚合 stream，focused tests 驗證非檔案 fallback、頁面租還、固定頁 batching 與真實檔案 vectored flush。
+- 決策 84 大 XML 常值二進位直寫：`OdfUtf8XmlReader.CopyValueTo(IBufferWriter<byte>, chunkSize)` 可從目前文字值的分塊游標位置直接把 UTF-8 位元組寫入呼叫端提供的 buffer writer，避免將大型 XML 文字或 Base64 常值先轉成完整字串 / 陣列。Focused test 驗證先讀部分 chunk 後可把剩餘值以小 chunk 串流寫入 `ArrayBufferWriter<byte>`。
+- 決策 78 XML 屬性享元字串池：新增內部 `OdfAttributeStringPool`，讓 `OdfAttributeName` 的 local name / namespace URI 以及 `SetAttribute` 常見屬性值回用共享 string 實例；屬性值僅針對高頻 ODF 常值對照，不永久保存任意長使用者內容。Focused test 驗證重複建立的 `value-type` / Office namespace / `float` 會指向同一批共享字串。
+- 決策 73 Span-based 數字 Fast-LUT：新增 `OdfFastNumberParser`，針對常見短數字 UTF-8 / char Span 先走小型 LUT，再以無配置簡單 parser 處理短整數與小數；科學記號與複雜格式回到既有 `double.TryParse` fallback。`FormulaCoercion.TryCoerceDouble` 的字串路徑已先接上 char Span 快速解析，focused tests 驗證 UTF-8 LUT、Span parser、fallback false 與公式 coercion 命中。
+- 決策 65 XML 節點 byte offset 索引：新增 `OdfXmlByteRange` 與 `OdfNode.TryGetXmlByteRange(...)`，UTF-8 fast path 建立大型 lazy 節點時會記錄完整元素與 inner XML 的來源 byte offset / length；lazy clone 會保留索引，prune 會清除失效索引。Focused test 直接用 range 切回原始 XML byte[]，驗證 table 節點完整元素與 inner XML 可精準定位。
+- 決策 42 Matrix3x2 幾何變換：`DrawFrameElement.Transform` / `DrawImageElement.Transform` 以 `System.Numerics.Matrix3x2` 暴露仿射矩陣，底層可格式化 `draw:transform="matrix(...)"`，並可解析 `matrix(...)`、`translate(...)`、`scale(...)`、`rotate(...)` 組合。既有 focused test 驗證矩陣寫入與 translate / scale 組合解析。
+- 決策 68 XML entity 快速解碼：`OdfUtf8XmlReader.GetStringMaybeDecoded(...)` 已先以 `Vector256<byte>` / `Vector128<byte>` 掃描 `&`，命中後改由 UTF-8 byte Span 分段解碼常見 XML entity 與十進位 / 十六進位 numeric entity，避免先建立整段字串再走 `HtmlDecode`。Focused test 驗證 `&amp;`、`&lt;`、`&gt;`、`&quot;`、`&apos;`、numeric entity 與未知 entity 保留行為。
+- 決策 16 `ImportData<T>` compiled accessor cache：`TableTableElement.ImportData<T>` 透過泛型靜態 `ValueAccessorCache<T>` 以每個資料列型別建置一次屬性 accessor；一般 JIT 路徑使用 expression compiled delegate，動態程式碼不可用時改用 getter delegate 包裝，避免每列每欄呼叫 `PropertyInfo.GetValue`。Focused test 驗證同型別兩次匯入只建置一次 accessor，且匯入值維持正確。
+- 決策 15 多核心 XML entry 並行解析：`OdfDocument.LoadXmlTrees()` 會將 `content.xml`、`styles.xml`、`meta.xml` 與 `settings.xml` 排入 `Channel<CoreXmlLoadJob>`，依 `OdfParallelScheduler.GetEffectiveConcurrency()` 啟動多個 worker 並行解析 DOM，最後再回填四棵核心 XML 樹並建立 `OdfStyleEngine` 關聯。既有 focused test 驗證 `LoadAsync` 會解析四個核心 entry，並記錄 job count 與 worker count。
+- 決策 25 並行 DAG 公式重算：`OdfFormulaDependencyGraph.GetTopologicalDirtyLevels()` 會將 dirty formulas 切成拓撲層級；`FormulaDocumentEvaluationEngine` 逐層寫回結果，同層互不相依公式則以 `Parallel.ForEach` 依 `OdfParallelScheduler` 並行計算。每個 worker 使用短生命週期 evaluator/context 並注入已完成層級結果，避免共享 evaluator 狀態競爭。Focused test 驗證兩條獨立公式分枝會形成寬度至少為 2 的並行層，且下游彙總公式結果正確。
+- 決策 17 分頁式稀疏儲存行位移：`TableTableElement.InsertRows/DeleteRows` 會同步位移尚未具現化的 native sparse pages，跨 page row index 仍保持 `OdfCellData`、style 與 formula；現行 page 粒度採 128x128，避免 1024x1024 在 40-byte native cell 佈局下造成單頁約 40MB 的過大熱頁。Focused test 驗證 130 列跨 page 插入 / 刪除不 materialize 儲存格且保留 style / formula，並補強 sparse view 換列時第 0 欄不可被跳過的列舉防退化。
+- 決策 24 高階批次列操作接上稀疏儲存：新建工作表改以 `TableTableElement` 作為底層 table node，`OdfTableSheet.InsertRows/DeleteRows/CopyRows/MoveRows` 會委派 typed table 的 sparse-aware row 操作，保留 tracked changes 的 DOM row snapshot，同時讓 `ImportData(DataTable)` 產生的 native sparse pages 在高階工作表 API 下也能位移 / 複製 / 移動。Focused test 驗證高階列操作不 materialize sparse cells，且跨 page tail cell 的 style / formula 仍保留。
+- 決策 31 零分配 UTF-8 直接寫入器：新增內部 `OdfUtf8SpanWriter`，可直接寫入 `IBufferWriter<byte>`，以 `Utf8Formatter.TryFormat` 將 `long`、`double`、`DateTime` 與 `bool` 格式化為 UTF-8，並以手寫 UTF-8 scalar encoder 輸出 XML text / attribute escaped 內容，避免動態值先轉成 C# 字串再編碼。Focused tests 驗證 XML escaping、臺灣字與 surrogate pair 輸出正確，且重複數值寫入路徑沒有 per-value string allocation。
+- 決策 35 DOM 結構相容性檢查器：文件級 `OdfDocument.Validate()` / `ValidateAsync()` 會將封裝 / schema 驗證結果與記憶體 DOM topology report 合併，讓尚未儲存的手動 DOM 編輯若產生孤立 `table:table-row` 或 `table:table-cell` 可直接得到含 `content.xml` 與 XML path 的錯誤診斷；`Rule_Topology_OrphanRow_Msg` / `Rule_Topology_OrphanCell_Msg` 已補齊所有支援語言。Focused test 驗證 `TextDocument.Validate()` 能回報 `Rule_Topology_OrphanCell`，而非只依賴低階 validator。
+
+## 下一批候選
+
+1. DOM 操作缺口抽樣稽核已完成：決策 22 lazy clone、決策 111 chart local data lazy cache、決策 115 lazy XML chunk 局部寫出與 wrapper 深度回收的 focused tests 皆通過；目前未發現需新增實作的 DOM 延遲載入缺口。
+2. 決策 83 PDF 簽章嵌入已完成原始範圍：`ExportToPdf(..., X509Certificate2)` 會寫入 PDF signature field、AcroForm、`/ByteRange`、`/Contents` 與可驗證的 CMS detached signature。PAdES / LTV 不在決策 83 原文範圍內，後續若需要長期驗證可另列互通性擴充。
+3. Package、Namespace 與低階 I/O 盤點已完成：模組 5 覆核為 `Done`，目前沒有剩餘低階 I/O 與封裝一致性缺口。
+
+## 最近驗證
+
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TestParsePatternRecognizesAllFormatTypes|FullyQualifiedName~TestNumberFormatterRepeatedFormatLookupAvoidsHeapAllocation|FullyQualifiedName~TestNumberFormatterDeduplicationAndFallback"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~CloneNodePreservesLazyXmlChunkWithoutMaterializingChildren|FullyQualifiedName~FastPathWritesLazyChunkWithoutMaterializingChildren|FullyQualifiedName~LocalDataCacheLoadsOnDemandAndInvalidatesAfterUpdate|FullyQualifiedName~ReleaseUnusedNodes_ClearsChildListIndexCacheWithoutPruningDom"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Renderer_ExportToPdfWithCertificate_WritesVerifiableDetachedSignature"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Aes256Gcm_Argon2id_RoundTrip_Succeeds|FullyQualifiedName~Aes256Gcm_TamperedCiphertext_ThrowsLocalizedCryptographicException"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfCrc32UsesZipIsoHdlcPolynomialAndSupportsIncrementalState"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_DirectIoAlignedNativeBuffer_Uses4096ByteAlignedNativeMemory"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~SaveEncryptedAsyncAndLoadEncryptedAsync_PackageRoundTrip"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfPackage_RawEntryPatch_StoredEntry_RoundTripsWithUpdatedCrc"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~SaveEncryptedAsyncAndLoadEncryptedAsync_PackageRoundTrip|FullyQualifiedName~Test_OdfPackage_RawEntryPatch_StoredEntry_RoundTripsWithUpdatedCrc"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfNodeSetAttributeWithoutPrefixAutoUsesStandardNamespacePrefix|FullyQualifiedName~OdfNodeSetAttributeWithoutPrefixKeepsUnknownNamespacePrefixUnset|FullyQualifiedName~OdfNodeSetAttributeWarnsForUnknownSchemaAttributeInDebugBuilds|FullyQualifiedName~Test_OdfPerformanceTelemetry|FullyQualifiedName~Test_OdfPackage_Save_WritesToBufferWriter|FullyQualifiedName~Test_OdfPackage_Save_UsesParallelPreparedZipEntries|FullyQualifiedName~Test_OdfPackage_FileOpen_UsesCentralDirectoryIndexForVfsOffsets|FullyQualifiedName~Test_OdfPackage_DebuggerProxy_Exposes_Structured_Vfs_Entries"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net8.0 --no-build --filter "FullyQualifiedName~FormulaBuilderCreatesSpreadsheetFormulaStrings|FullyQualifiedName~ParagraphSetOutlineLevelAndAutoNumberingWritesHeadingAndOutlineStyle"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~TestFlatXmlAndZipPackageCoreDocumentRoundTrip"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~TestStyleMergingAndRemapping"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~SaveEncryptedAsyncAndLoadEncryptedAsync_PackageRoundTrip|FullyQualifiedName~Test_OdfPackage_RawEntryPatch_StoredEntry_RoundTripsWithUpdatedCrc|FullyQualifiedName~OdfCrc32UsesZipIsoHdlcPolynomialAndSupportsIncrementalState|FullyQualifiedName~Test_DirectIoAlignedNativeBuffer_Uses4096ByteAlignedNativeMemory"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~OdfNodeSetAttributeWithoutPrefixAutoUsesStandardNamespacePrefix|FullyQualifiedName~OdfNodeSetAttributeWithoutPrefixKeepsUnknownNamespacePrefixUnset|FullyQualifiedName~OdfNodeSetAttributeWarnsForUnknownSchemaAttributeInDebugBuilds|FullyQualifiedName~Test_OdfPerformanceTelemetry|FullyQualifiedName~Test_OdfPackage_Save_WritesToBufferWriter|FullyQualifiedName~Test_OdfPackage_Save_UsesParallelPreparedZipEntries|FullyQualifiedName~Test_OdfPackage_FileOpen_UsesCentralDirectoryIndexForVfsOffsets|FullyQualifiedName~Test_OdfPackage_DebuggerProxy_Exposes_Structured_Vfs_Entries"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TestFormulaEvaluatorSumProductUsesVectorizedMatrixPath"`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfPackage_MmfPreload_QueuesCoreXmlEntriesForParallelRandomAccess"`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfPackage_RawEntryPatch_VariableLengthEntry_AppendsNewCentralDirectory"`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TableTableElementSparseRowsShiftAcrossPagesWithoutMaterializingCells"`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~SheetRowOperationsShiftSparseImportDataWithoutMaterializingCells"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfUtf8SpanWriter"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~DocumentInstance_Validate_DetectsInMemoryDomTopologyErrors"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~FastPathKnownQualifiedNameHashRecognizesTagsAndAttributesWithBinaryGuard|FullyQualifiedName~Test_OdfDocument_LoadAsync_ParsesCoreXmlEntries"`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfParallelScheduler"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~ReleaseUnusedNodes"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~StreamingMailMerge"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfDoubleBufferedWritableStream"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfPackage_Save_UsesParallelPreparedZipEntries"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfPackage_Save_UsesParallelPreparedZipEntries"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfPackage_RawEntryPatch_VariableLengthEntry_AppendsNewCentralDirectory"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~FastPathKnownPrefixClassifierPreservesNamespaceUriSemantics"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfSparseStorage_ColdPageCompression_RoundTrip"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TestParsePatternRecognizesAllFormatTypes|FullyQualifiedName~TestNumberFormatterDeduplicationAndFallback"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfElementCopyFormatFromCowDeepCopiesStyleInheritanceMetadata|FullyQualifiedName~OdfElementCopyFormatFromSharesStyleThenCopyOnWriteWhenConfigured"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfPackage_ZipEntryCountLimit_UsesLocalizedException|FullyQualifiedName~Test_OdfPackage_ZipEntrySizeLimit_UsesLocalizedException|FullyQualifiedName~Test_OdfPackage_ZipTotalUncompressedSizeLimit_UsesLocalizedException"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~SplitWindow"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~AddDataBar_CreatesReadableDataBarFormat|FullyQualifiedName~AddIconSet_CreatesReadableIconSetFormat"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~CreatePivotTable_ConfiguresBuilderAndReadsBack"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~StylesGcRemovesUnusedStylesAndKeepsParentChain"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfPackage_FileOpen_UsesCentralDirectoryIndexForVfsOffsets"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfUtf8XmlReader_ReadValueChunk_ReadsTextInUtf8Chunks"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~CloneNodePreservesLazyXmlChunkWithoutMaterializingChildren|FullyQualifiedName~OdfNodeTraversalExtensionsSupportTypedChildrenDescendantsAndAppend"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~InsertRowsUsesRepeatedRowForBatchEmptyRows|FullyQualifiedName~CopyRowsAndMoveRowsPreserveRowContentOrder"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfMemoryTracker_Emits_Large_Allocation_Diagnostics|FullyQualifiedName~Test_OdfMemoryTracker_ReportLoadProfile_Emits_AntiPattern_Diagnostics"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~CloneNodePreservesLazyXmlChunkWithoutMaterializingChildren"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfDocument_LoadAsync_ParsesCoreXmlEntries|FullyQualifiedName~Test_OdfPackage_MmfPreload_UsesReservedCpuConcurrency"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~WriteEntryInfersManifestMediaTypesWhenMediaTypeIsOmitted"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfNodeSetAttributeWithoutPrefixAutoUsesStandardNamespacePrefix|FullyQualifiedName~OdfNodeSetAttributeWithoutPrefixKeepsUnknownNamespacePrefixUnset"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfNodeSetAttributeWarnsForUnknownSchemaAttributeInDebugBuilds"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfPackageCompressionPreserveTests"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~SaveToStream_CopiesUnmodifiedMmfEntryCompressedPayload"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfPackageAutoMediaTypeTests"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~ExternalLinkManagerResolvesFormulaReferences|FullyQualifiedName~EvaluateFormulasOnSaveUsesSpreadsheetExternalLinks|FullyQualifiedName~ExternalLinkCachedValuesRoundTripThroughSettings"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~InsertTableOfContents_GeneratesHeadingLinksImmediately"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~AdoptSheetMovesSheetBetweenWorkbooksAndRoundTrips"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~RowColumnGroupApiWorksCorrectly"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TrackChangesAliasRecordsInsertedTextRuns"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfElementConfigureStyleUsesStyleEngineAndReturnsOriginalElement"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfElementCopyFormatFromSharesStyleThenCopyOnWriteWhenConfigured"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfElementApplyStyle"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~AdoptNode"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TestDocumentAdoptNodeReusesExistingMediaByHash"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TestDocumentAdoptNodeFlattensSourceDefaultStyleProperties|FullyQualifiedName~TestDocumentAdoptNodeReusesExistingMediaByHash"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~UnknownElementPreservesForeignMarkupRoundTrip|FullyQualifiedName~NodeFactoryCreatesGeneratedHandWrittenAndFallbackElements|FullyQualifiedName~FastPathKnownPrefixClassifierPreservesNamespaceUriSemantics"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~FontSubsetterRegistration_EmbedsPrivateUseFontSubsetOnSave"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~DrawImageElementSetImageSourceWritesPackageEntryAndReusesMedia|FullyQualifiedName~OdfElementApplyStyleUsesStyleEngineAndReturnsOriginalElement"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~DrawImageElementSetImageSourceWritesPackageEntryAndReusesMedia"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~SpreadsheetHighLevelApiTests"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OptimizedRefactoringTests"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TextHighLevelApiTests"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~SpreadsheetHighLevelApiTests"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~FastPath"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TypedDomParityTests"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~TypedDomParityTests"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~OdfSchemaGeneratorTests"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~OdsStreamWriter_SwitchToSheet_WritesInterleavedSheets"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~OdsStreamWriter_WriteNode_WritesDomSubtree"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~OdtStreamWriter_WriteNode_WritesDomSubtree"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~SpreadsheetApiUsabilityTests"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TextHighLevelApiTests"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~OdfLengthNumericExtensionsCreateLengths"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~OdsStreamWriter_WriteDataAsync_WritesRowsFromDbDataReader|FullyQualifiedName~OdsStreamWriter_SwitchToSheet_WritesInterleavedSheets"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~OdfDoubleBufferedWritableStream"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~ToAsyncEnumerable"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~ImportHtmlStyles_MapsCssRulesToOdtStyles"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~DirectIoStreams"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~Aes256Gcm"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~TestVerificationRejectsTamperedCertificateDigest|FullyQualifiedName~TestVerificationRejectsTamperedSignatureValue|FullyQualifiedName~TestVerificationRejectsTamperedSignatureFile"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~Renderer_ExportToPdfWithCertificate_ThrowsLocalizedNotSupportedException"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~WrapperRegistryCreatesCustomTypedElementDuringParsing"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~CellRichText"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~FormFields"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~RangeBordersAndAlignment"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~OptimizeMediaRewritesImageEntryAndReference"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~WriteSheetsAsync"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~FastPathKnownPrefixClassifierPreservesNamespaceUriSemantics"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~FastPath"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~RawEntryPatch_VariableLengthEntry"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~RawEntryPatch"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~ReservedCpuConcurrency"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~SvgPathDataParserComputesBoundsForComplexPathData"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~CustomAttributeRegistryFastLookup"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~OdfSparseStorage"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~ParagraphPrebindingWriter"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~MergeSubDocuments_RenamesConflictingStyleNames|FullyQualifiedName~MergeSubDocuments_ReusesSemanticallyEquivalentStyleNames"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~FormulaEvaluationChannelProcessesCellChangesAsync"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~LocalDataCacheLoadsOnDemandAndInvalidatesAfterUpdate"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~FastPathWritesLazyChunkWithoutMaterializingChildren"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet build OdfKit.Extensions.Pdf/OdfKit.Extensions.Pdf.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Renderer_ExportToPdfWithCertificate_WritesVerifiableDetachedSignature"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~StylesCollectGarbageRemovesUnusedStylesAndKeepsParentChain"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~PruneAndCollect_ClearsChildListIndexCache|FullyQualifiedName~SheetReleaseFacadeCachesKeepsWorkbookContent|FullyQualifiedName~SheetPruneAndCollectReleasesFacadeCaches"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfPackage_DebuggerProxy_Exposes_Structured_Vfs_Entries|FullyQualifiedName~Test_OdfPackage_RawEntryPatch_And_DumpVfsLayout"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~Test_OdfPackage_Save_WritesToBufferWriter"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~ParagraphAppendHtmlAndMarkdownCreatesStyledInlineRuns|FullyQualifiedName~CellAppendHtmlAndMarkdownCreatesRichTextRuns"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~AddHtmlFragment|FullyQualifiedName~HtmlParsing"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~SheetAutoFilterAndSortCreateDatabaseRanges"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~TypedDomSupportsOdfDomStyleImageFrameTraversal"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~TypedDomSupportsOdfDomStyleImageFrameTraversal"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~FormulaBuilderCreatesSpreadsheetFormulaStrings"`
+- `dotnet build OdfKit/OdfKit.csproj --no-restore`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~TypedDomSupportsOdfDomStyleImageFrameTraversal|FullyQualifiedName~FormulaBuilderCreatesSpreadsheetFormulaStrings"`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-restore --filter "FullyQualifiedName~ParagraphSetOutlineLevelAndAutoNumberingWritesHeadingAndOutlineStyle"`
+- `pwsh eng/Format-Safe.ps1 -IncludeTests`
+- `pwsh eng/Test-MergeConflictMarkers.ps1`
+- `dotnet test OdfKit.Tests/OdfKit.Tests.csproj --framework net10.0 --no-build --filter "FullyQualifiedName~ParagraphSetOutlineLevelAndAutoNumberingWritesHeadingAndOutlineStyle"`

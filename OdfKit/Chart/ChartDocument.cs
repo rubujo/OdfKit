@@ -262,5 +262,7 @@ public class ChartDocument : OdfChartDocument
                 }
             }
         }
+
+        InvalidateLocalDataCache();
     }
 }

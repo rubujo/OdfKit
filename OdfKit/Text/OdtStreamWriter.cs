@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.DOM;
 
 namespace OdfKit.Text;
 
@@ -234,6 +235,38 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     {
         EnsureNotDisposed();
         AddParagraph(string.Empty, PageBreakStyleName);
+    }
+
+    /// <summary>
+    /// 將既有 DOM 子樹直接寫入目前文字文件位置。
+    /// </summary>
+    /// <param name="node">要寫入的 DOM 節點</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="node"/> 為 null 時擲出</exception>
+    public void WriteNode(OdfNode node)
+    {
+        if (node is null)
+        {
+            throw new ArgumentNullException(nameof(node));
+        }
+
+        EnsureNotDisposed();
+        Dictionary<string, string> namespaces = new(StringComparer.Ordinal)
+        {
+            [OdfNamespaces.Office] = "office",
+            [OdfNamespaces.Text] = "text",
+            [OdfNamespaces.Style] = "style",
+            [OdfNamespaces.Fo] = "fo",
+            [OdfNamespaces.Draw] = "draw",
+            [OdfNamespaces.XLink] = "xlink"
+        };
+
+        if (!string.IsNullOrEmpty(node.NamespaceUri) && !namespaces.ContainsKey(node.NamespaceUri))
+        {
+            namespaces[node.NamespaceUri] = node.Prefix ?? string.Empty;
+        }
+
+        int openElementsCount = 0;
+        OdfXmlWriter.WriteNode(node, _writer, namespaces, ref openElementsCount, isRoot: false, depth: 1);
     }
 
     /// <summary>

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ScriptEventListenerElement(string? prefix = null) : base("event-listener", "urn:oasis:names:tc:opendocument:xmlns:script:1.0", prefix) { }
 
+        public ScriptEventListenerElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXLinkActuate? Actuate
         {
             get => GetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", GetDocumentVersion());

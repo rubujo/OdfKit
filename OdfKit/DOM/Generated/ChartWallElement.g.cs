@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartWallElement(string? prefix = null) : base("wall", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartWallElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? StyleName
         {
             get => GetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", GetDocumentVersion());

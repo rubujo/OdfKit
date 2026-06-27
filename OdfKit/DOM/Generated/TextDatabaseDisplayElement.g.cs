@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextDatabaseDisplayElement(string? prefix = null) : base("database-display", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextDatabaseDisplayElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? ColumnName
         {
             get => GetAttributeValue("column-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

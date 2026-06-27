@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public SvgStopElement(string? prefix = null) : base("stop", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
+        public SvgStopElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Offset
         {
             get => GetAttributeValue("offset", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseDataSourceElement(string? prefix = null) : base("data-source", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseDataSourceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DatabaseApplicationConnectionSettingsElement> DatabaseApplicationConnectionSettingsChildElements
         {
             get => ChildElements<DatabaseApplicationConnectionSettingsElement>();

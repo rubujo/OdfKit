@@ -7,6 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
+using OdfKit.Compliance;
+
 namespace OdfKit.Core;
 
 internal static partial class OdfSignatureVerifier
@@ -103,7 +105,7 @@ internal static partial class OdfSignatureVerifier
         if (!isSignatureValid)
         {
             singleResult.ErrorCode = "CRYPTOGRAPHIC_SIGNATURE_INVALID";
-            singleResult.ErrorMessage = "XML signature verification failed (cryptographically invalid).";
+            singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_CryptographicSignatureInvalid");
             return false;
         }
 

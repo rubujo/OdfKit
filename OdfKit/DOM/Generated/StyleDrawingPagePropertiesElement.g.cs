@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleDrawingPagePropertiesElement(string? prefix = null) : base("drawing-page-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleDrawingPagePropertiesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? BackgroundObjectsVisible
         {
             get => GetBooleanAttributeValue("background-objects-visible", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());

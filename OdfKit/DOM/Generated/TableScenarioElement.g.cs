@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableScenarioElement(string? prefix = null) : base("scenario", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableScenarioElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfColor? BorderColor
         {
             get => GetColorAttributeValue("border-color", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

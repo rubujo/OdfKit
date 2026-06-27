@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableConsolidationElement(string? prefix = null) : base("consolidation", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableConsolidationElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfTableFunction? Function
         {
             get => GetTableFunctionAttributeValue("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class PresentationDateTimeElement : OdfElement
     {
         public PresentationDateTimeElement(string? prefix = null) : base("date-time", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
+
+        public PresentationDateTimeElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

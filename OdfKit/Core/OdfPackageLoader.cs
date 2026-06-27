@@ -18,6 +18,11 @@ internal static class OdfPackageLoader
     /// </summary>
     internal static void Initialize(OdfPackage package)
     {
+        if (package.FilePath != null)
+        {
+            RecoverJournal(package.FilePath);
+        }
+
         OdfPackage.OdfPackageLoadCollaborators ctx = package.LoadCollaborators;
         if (ctx.UnderlyingStream is null)
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfPackageLoader_NoInputStreamAvailable_2"));
@@ -54,6 +59,11 @@ internal static class OdfPackageLoader
     internal static async Task InitializeAsync(OdfPackage package, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        if (package.FilePath != null)
+        {
+            RecoverJournal(package.FilePath);
+        }
 
         OdfPackage.OdfPackageLoadCollaborators ctx = package.LoadCollaborators;
         if (ctx.UnderlyingStream is null)
@@ -120,6 +130,31 @@ internal static class OdfPackageLoader
         else if (ctx.LoadOptions.ValidateMimeType)
         {
             throw new InvalidDataException(OdfLocalizer.GetMessage("Err_OdfPackageLoader_InvalidNotFound"));
+        }
+    }
+
+    private static void RecoverJournal(string filePath)
+    {
+        string journalPath = filePath + ".journal";
+        if (File.Exists(journalPath))
+        {
+            try
+            {
+                OdfKitDiagnostics.Warn($"[OdfPackageLoader] 偵測到未完成交易日誌 '{journalPath}'。正在執行原子 Rollback...");
+
+                File.Copy(journalPath, filePath, true);
+                using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                {
+                    fs.Flush(true);
+                }
+
+                File.Delete(journalPath);
+                OdfKitDiagnostics.Info("[OdfPackageLoader] 原子 Rollback 成功完成，交易日誌已清除。");
+            }
+            catch (Exception ex)
+            {
+                throw new IOException(OdfLocalizer.GetMessage("Err_OdfPackage_JournalCreateFailed"), ex);
+            }
         }
     }
 }

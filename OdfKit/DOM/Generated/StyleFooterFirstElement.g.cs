@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleFooterFirstElement(string? prefix = null) : base("footer-first", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleFooterFirstElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? Display
         {
             get => GetBooleanAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberFractionElement(string? prefix = null) : base("fraction", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberFractionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? DenominatorValue
         {
             get => GetNullableInt32AttributeValue("denominator-value", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public FormItemElement(string? prefix = null) : base("item", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
+        public FormItemElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Label
         {
             get => GetAttributeValue("label", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", GetDocumentVersion());

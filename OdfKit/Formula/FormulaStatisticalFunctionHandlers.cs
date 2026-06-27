@@ -208,6 +208,18 @@ internal static class FormulaStatisticalFunctionHandlers
             var val = arg.Evaluate(context);
             if (val is OdfFormulaError err)
                 return err;
+
+            if (val is object[,] matrix && FormulaNumericAggregation.TryMaxMatrix(matrix, out double matrixMax, out bool matrixHasNumber))
+            {
+                if (matrixHasNumber)
+                {
+                    if (matrixMax > max)
+                        max = matrixMax;
+                    hasNumber = true;
+                }
+                continue;
+            }
+
             foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
                 if (FormulaCoercion.TryCoerceDouble(innerVal, out double d))
@@ -230,6 +242,18 @@ internal static class FormulaStatisticalFunctionHandlers
             var val = arg.Evaluate(context);
             if (val is OdfFormulaError err)
                 return err;
+
+            if (val is object[,] matrix && FormulaNumericAggregation.TryMinMatrix(matrix, out double matrixMin, out bool matrixHasNumber))
+            {
+                if (matrixHasNumber)
+                {
+                    if (matrixMin < min)
+                        min = matrixMin;
+                    hasNumber = true;
+                }
+                continue;
+            }
+
             foreach (var innerVal in FormulaCoercion.FlattenValues(val))
             {
                 if (FormulaCoercion.TryCoerceDouble(innerVal, out double d))

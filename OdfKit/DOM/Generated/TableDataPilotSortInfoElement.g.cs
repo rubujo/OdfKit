@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableDataPilotSortInfoElement(string? prefix = null) : base("data-pilot-sort-info", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableDataPilotSortInfoElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? DataField
         {
             get => GetAttributeValue("data-field", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

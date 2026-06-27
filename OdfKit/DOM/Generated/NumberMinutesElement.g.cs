@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberMinutesElement(string? prefix = null) : base("minutes", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberMinutesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfNumberStyle? Style
         {
             get => GetNumberStyleAttributeValue("style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", GetDocumentVersion());

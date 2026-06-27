@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextAuthorInitialsElement(string? prefix = null) : base("author-initials", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextAuthorInitialsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? Fixed
         {
             get => GetBooleanAttributeValue("fixed", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleHandoutMasterElement(string? prefix = null) : base("handout-master", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleHandoutMasterElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? PageLayoutName
         {
             get => GetStyleNameAttributeValue("page-layout-name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

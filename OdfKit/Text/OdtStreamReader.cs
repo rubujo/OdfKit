@@ -208,6 +208,7 @@ public sealed class OdtStreamReader : IDisposable
 
     private static XmlReaderSettings CreateXmlReaderSettings() => new()
     {
+        NameTable = OdfXmlNameTable.Create(),
         DtdProcessing = DtdProcessing.Prohibit,
         XmlResolver = null
     };

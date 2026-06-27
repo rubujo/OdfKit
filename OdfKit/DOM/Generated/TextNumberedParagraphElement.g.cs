@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextNumberedParagraphElement(string? prefix = null) : base("numbered-paragraph", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextNumberedParagraphElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? ContinueNumbering
         {
             get => GetBooleanAttributeValue("continue-numbering", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

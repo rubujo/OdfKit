@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class MetaKeywordElement : OdfElement
     {
         public MetaKeywordElement(string? prefix = null) : base("keyword", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+
+        public MetaKeywordElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

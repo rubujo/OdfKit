@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class SvgTitleElement : OdfElement
     {
         public SvgTitleElement(string? prefix = null) : base("title", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
+
+        public SvgTitleElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

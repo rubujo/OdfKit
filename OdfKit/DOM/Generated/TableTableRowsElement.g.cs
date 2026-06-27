@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableTableRowsElement(string? prefix = null) : base("table-rows", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableTableRowsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TableTableRowElement> TableTableRowChildElements
         {
             get => ChildElements<TableTableRowElement>();

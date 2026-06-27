@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public MetaHyperlinkBehaviourElement(string? prefix = null) : base("hyperlink-behaviour", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
+        public MetaHyperlinkBehaviourElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXLinkShow? Show
         {
             get => GetXLinkShowAttributeValue("show", "http://www.w3.org/1999/xlink", GetDocumentVersion());

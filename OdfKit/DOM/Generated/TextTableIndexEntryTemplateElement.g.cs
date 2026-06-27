@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextTableIndexEntryTemplateElement(string? prefix = null) : base("table-index-entry-template", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextTableIndexEntryTemplateElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? StyleName
         {
             get => GetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

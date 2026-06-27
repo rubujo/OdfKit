@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleFooterStyleElement(string? prefix = null) : base("footer-style", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleFooterStyleElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<StyleHeaderFooterPropertiesElement> StyleHeaderFooterPropertiesChildElements
         {
             get => ChildElements<StyleHeaderFooterPropertiesElement>();

@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class TableTitleElement : OdfElement
     {
         public TableTitleElement(string? prefix = null) : base("title", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
+
+        public TableTitleElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

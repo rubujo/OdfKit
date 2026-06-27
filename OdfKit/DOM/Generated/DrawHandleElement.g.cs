@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawHandleElement(string? prefix = null) : base("handle", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawHandleElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? HandleMirrorHorizontal
         {
             get => GetBooleanAttributeValue("handle-mirror-horizontal", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

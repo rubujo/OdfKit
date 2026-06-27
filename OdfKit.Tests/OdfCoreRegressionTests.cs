@@ -14,6 +14,21 @@ namespace OdfKit.Tests
     public class OdfCoreRegressionTests
     {
         [Fact]
+        public void OdfCrc32UsesZipIsoHdlcPolynomialAndSupportsIncrementalState()
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes("123456789");
+
+            uint oneShot = OdfCrc32.Compute(bytes);
+            uint state = OdfCrc32.Compute(0xFFFFFFFF, bytes.AsSpan(0, 4));
+            state = OdfCrc32.Compute(state, bytes.AsSpan(4));
+            uint incremental = state ^ 0xFFFFFFFF;
+
+            Assert.Equal(0xCBF43926u, oneShot);
+            Assert.Equal(oneShot, incremental);
+            Assert.NotEqual(0xE3069283u, oneShot);
+        }
+
+        [Fact]
         public void TestDeepNestingCommentRepliesRecursionPrevention()
         {
             var root = new OdfComment("Author", "Root");

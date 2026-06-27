@@ -106,6 +106,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
             }
 
             PublishTrackingSnapshot(previousSnapshot);
+            _doc.NotifyFormulaRecalculationRequested();
         }
     }
 
@@ -134,6 +135,11 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     /// 取得此儲存格的高階樣式設定代理 Facade。
     /// </summary>
     public OdfKit.Styles.OdfCellStyleProxy Style => _styleProxy ??= new OdfKit.Styles.OdfCellStyleProxy(this);
+
+    /// <summary>
+    /// 取得此儲存格的富文字鏈式建構器。
+    /// </summary>
+    public OdfCellRichTextBuilder RichText => new(this);
 
     /// <summary>
     /// 取得或設定儲存格顯示的文字內容（text:p 子節點的純文字）。
@@ -191,6 +197,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
                 Node.SetAttribute("formula", OdfNamespaces.Table, normalized, "table");
 
             PublishTrackingSnapshot(previousSnapshot);
+            _doc.NotifyFormulaRecalculationRequested();
         }
     }
 
@@ -203,6 +210,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         ValueType = "float";
         RawValue = val.ToString(CultureInfo.InvariantCulture);
         DisplayText = val.ToString(CultureInfo.InvariantCulture);
+        _doc.NotifyFormulaRecalculationRequested();
     }
 
     /// <summary>
@@ -214,6 +222,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         ValueType = "boolean";
         Node.SetAttribute("boolean-value", OdfNamespaces.Office, val ? "true" : "false", "office");
         DisplayText = val ? "TRUE" : "FALSE";
+        _doc.NotifyFormulaRecalculationRequested();
     }
 
     /// <summary>
@@ -239,6 +248,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         }
         Node.SetAttribute("date-value", OdfNamespaces.Office, isoDate, "office");
         DisplayText = isoDate;
+        _doc.NotifyFormulaRecalculationRequested();
     }
 
     /// <summary>
@@ -249,6 +259,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     {
         ValueType = "string";
         DisplayText = text;
+        _doc.NotifyFormulaRecalculationRequested();
     }
 
     private OdfNode? CaptureTrackingSnapshot() =>
@@ -276,6 +287,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         Node.RemoveAttribute("boolean-value", OdfNamespaces.Office);
         Node.RemoveAttribute("date-value", OdfNamespaces.Office);
         DisplayText = string.Empty;
+        _doc.NotifyFormulaRecalculationRequested();
     }
 
     private void SetCellTextContent(string text)
@@ -294,18 +306,30 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
         var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
         bool needsWrap = false;
 
+        AppendTextContent(pNode, text, ref needsWrap);
+
+        Node.AppendChild(pNode);
+
+        if (needsWrap)
+        {
+            SetStyleProperty("table-cell-properties", "wrap-option", OdfNamespaces.Fo, "wrap", "fo");
+        }
+    }
+
+    private static void AppendTextContent(OdfNode parentNode, string text, ref bool needsWrap)
+    {
         int i = 0;
         while (i < text.Length)
         {
             if (text[i] == '\n')
             {
-                pNode.AppendChild(new OdfNode(OdfNodeType.Element, "line-break", OdfNamespaces.Text, "text"));
+                parentNode.AppendChild(new OdfNode(OdfNodeType.Element, "line-break", OdfNamespaces.Text, "text"));
                 needsWrap = true;
                 i++;
             }
             else if (text[i] == '\t')
             {
-                pNode.AppendChild(new OdfNode(OdfNodeType.Element, "tab", OdfNamespaces.Text, "text"));
+                parentNode.AppendChild(new OdfNode(OdfNodeType.Element, "tab", OdfNamespaces.Text, "text"));
                 i++;
             }
             else if (text[i] == ' ')
@@ -319,14 +343,14 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
 
                 if (spaceCount == 1)
                 {
-                    pNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = " " });
+                    parentNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = " " });
                 }
                 else
                 {
-                    pNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = " " });
+                    parentNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = " " });
                     var sNode = new OdfNode(OdfNodeType.Element, "s", OdfNamespaces.Text, "text");
                     sNode.SetAttribute("c", OdfNamespaces.Text, (spaceCount - 1).ToString(CultureInfo.InvariantCulture), "text");
-                    pNode.AppendChild(sNode);
+                    parentNode.AppendChild(sNode);
                 }
             }
             else
@@ -336,16 +360,10 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
                 {
                     i++;
                 }
+
                 string segment = text.Substring(start, i - start);
-                pNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = segment });
+                parentNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = segment });
             }
-        }
-
-        Node.AppendChild(pNode);
-
-        if (needsWrap)
-        {
-            SetStyleProperty("table-cell-properties", "wrap-option", OdfNamespaces.Fo, "wrap", "fo");
         }
     }
 

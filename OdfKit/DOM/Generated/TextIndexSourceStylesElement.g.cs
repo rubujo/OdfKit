@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextIndexSourceStylesElement(string? prefix = null) : base("index-source-styles", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextIndexSourceStylesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? OutlineLevel
         {
             get => GetNullableInt32AttributeValue("outline-level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

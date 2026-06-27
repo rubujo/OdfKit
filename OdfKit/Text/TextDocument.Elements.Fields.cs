@@ -16,6 +16,14 @@ public partial class TextDocument
         TextDocumentFieldsEngine.AddParagraph(this, MutationContext, text);
 
     /// <summary>
+    /// 建立預先綁定至文字本文根節點的批次段落寫入器。
+    /// </summary>
+    /// <param name="styleName">選用的段落樣式名稱，會套用至此寫入器新增的所有段落</param>
+    /// <returns>預先綁定的段落寫入器</returns>
+    public OdfParagraphPrebindingWriter BeginParagraphPrebinding(string? styleName = null) =>
+        new(MutationContext, styleName);
+
+    /// <summary>
     /// 新增一個標題至文件本文結尾。
     /// </summary>
     /// <param name="text">標題的文字內容</param>
@@ -40,6 +48,27 @@ public partial class TextDocument
     /// <returns>新建立的清單（已套用樣式名稱）</returns>
     public OdfList AddListWithStyle(string styleName, IReadOnlyList<OdfListLevelStyle> levels) =>
         TextDocumentFieldsEngine.AddListWithStyle(this, MutationContext, styleName, levels);
+
+    /// <summary>
+    /// 從文件中反向提取範本欄位值，支援跨 <c>text:span</c> 斷裂的文字標記、書籤範圍與 ODF 變數欄位。
+    /// </summary>
+    /// <param name="startDelimiter">欄位起始分隔符號，預設為 <c>[</c></param>
+    /// <param name="endDelimiter">欄位結束分隔符號，預設為 <c>]</c></param>
+    /// <returns>依欄位名稱索引的欄位值字典</returns>
+    /// <remarks>
+    /// 文字標記格式為 <c>[Name]value[/Name]</c>。若同名欄位重複出現，會保留文件中第一個值。
+    /// </remarks>
+    public IReadOnlyDictionary<string, string> ExtractFields(string startDelimiter = "[", string endDelimiter = "]") =>
+        TextDocumentFieldExtractionEngine.ExtractFieldValues(this, startDelimiter, endDelimiter);
+
+    /// <summary>
+    /// 從文件中反向提取範本欄位詳細資料，包含欄位來源。
+    /// </summary>
+    /// <param name="startDelimiter">欄位起始分隔符號，預設為 <c>[</c></param>
+    /// <param name="endDelimiter">欄位結束分隔符號，預設為 <c>]</c></param>
+    /// <returns>依欄位名稱索引的欄位詳細資料字典</returns>
+    public IReadOnlyDictionary<string, OdfExtractedFieldInfo> ExtractFieldInfos(string startDelimiter = "[", string endDelimiter = "]") =>
+        TextDocumentFieldExtractionEngine.ExtractFields(this, startDelimiter, endDelimiter);
 
     /// <summary>
     /// 在指定的段落中新增日期欄位。

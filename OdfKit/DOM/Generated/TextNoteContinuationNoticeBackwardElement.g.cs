@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class TextNoteContinuationNoticeBackwardElement : OdfElement
     {
         public TextNoteContinuationNoticeBackwardElement(string? prefix = null) : base("note-continuation-notice-backward", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+
+        public TextNoteContinuationNoticeBackwardElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

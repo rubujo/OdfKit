@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public AnimationCommandElement(string? prefix = null) : base("command", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
+        public AnimationCommandElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXmlName? AnimationId
         {
             get => GetXmlNameAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());

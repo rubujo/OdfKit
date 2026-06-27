@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawHatchElement(string? prefix = null) : base("hatch", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawHatchElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfColor? Color
         {
             get => GetColorAttributeValue("color", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

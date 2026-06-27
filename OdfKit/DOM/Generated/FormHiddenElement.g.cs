@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public FormHiddenElement(string? prefix = null) : base("hidden", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
+        public FormHiddenElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Bind
         {
             get => GetAttributeValue("bind", "http://www.w3.org/2002/xforms", GetDocumentVersion());

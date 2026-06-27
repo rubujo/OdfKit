@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.Collections.Generic;
+using System.Reflection;
 
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -84,5 +85,57 @@ public class OdfNodePerformanceTests
 
         Assert.Equal("Sheet1", attributes[new OdfAttributeName("name", OdfNamespaces.Table)]);
         Assert.Equal("Default", attributes[new OdfAttributeName("style-name", OdfNamespaces.Table)]);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfNode.PruneAndCollect"/> 會清除子節點隨機存取索引陣列，避免已剪裁子樹被快取保留。
+    /// </summary>
+    [Fact]
+    public void PruneAndCollect_ClearsChildListIndexCache()
+    {
+        var root = new OdfNode(OdfNodeType.Element, "root", OdfNamespaces.Office, "office");
+        var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
+        root.AppendChild(table);
+        for (int i = 0; i < 4; i++)
+        {
+            table.AppendChild(new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table"));
+        }
+
+        _ = table.Children[2];
+
+        FieldInfo cacheField = typeof(OdfNodeChildList).GetField("_indexCache", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        Assert.NotNull(cacheField.GetValue(table.Children));
+
+        table.PruneAndCollect();
+
+        Assert.Null(cacheField.GetValue(table.Children));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfNode.ReleaseUnusedNodes"/> 會非破壞式釋放子節點索引快取。
+    /// </summary>
+    [Fact]
+    public void ReleaseUnusedNodes_ClearsChildListIndexCacheWithoutPruningDom()
+    {
+        var root = new OdfNode(OdfNodeType.Element, "root", OdfNamespaces.Office, "office");
+        var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
+        root.AppendChild(table);
+        for (int i = 0; i < 4; i++)
+        {
+            table.AppendChild(new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table"));
+        }
+
+        _ = table.Children[2];
+
+        FieldInfo cacheField = typeof(OdfNodeChildList).GetField("_indexCache", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        Assert.NotNull(cacheField.GetValue(table.Children));
+
+        int releasedCount = root.ReleaseUnusedNodes();
+
+        Assert.Equal(6, releasedCount);
+        Assert.Same(table, root.Children[0]);
+        Assert.Equal(4, table.Children.Count);
+        Assert.Null(cacheField.GetValue(table.Children));
+        Assert.Equal(0, table.Children[0].SiblingIndex);
     }
 }

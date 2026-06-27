@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeImageElement(string? prefix = null) : base("image", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeImageElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DrawFrameElement> DrawFrameChildElements
         {
             get => ChildElements<DrawFrameElement>();

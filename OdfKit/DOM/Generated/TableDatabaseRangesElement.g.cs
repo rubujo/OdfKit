@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableDatabaseRangesElement(string? prefix = null) : base("database-ranges", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableDatabaseRangesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TableDatabaseRangeElement> TableDatabaseRangeChildElements
         {
             get => ChildElements<TableDatabaseRangeElement>();

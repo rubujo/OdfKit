@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextDatabaseRowSelectElement(string? prefix = null) : base("database-row-select", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextDatabaseRowSelectElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Condition
         {
             get => GetAttributeValue("condition", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

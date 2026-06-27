@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableLabelRangeElement(string? prefix = null) : base("label-range", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableLabelRangeElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCellRangeAddress? DataCellRangeAddress
         {
             get => GetCellRangeAddressAttributeValue("data-cell-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

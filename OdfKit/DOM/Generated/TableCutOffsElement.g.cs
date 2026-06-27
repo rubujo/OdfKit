@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableCutOffsElement(string? prefix = null) : base("cut-offs", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableCutOffsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TableInsertionCutOffElement> TableInsertionCutOffChildElements
         {
             get => ChildElements<TableInsertionCutOffElement>();

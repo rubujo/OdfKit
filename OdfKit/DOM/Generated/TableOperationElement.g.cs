@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableOperationElement(string? prefix = null) : base("operation", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableOperationElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? Index
         {
             get => GetNullableInt32AttributeValue("index", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

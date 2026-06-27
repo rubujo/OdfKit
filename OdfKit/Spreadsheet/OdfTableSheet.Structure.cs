@@ -19,7 +19,10 @@ public partial class OdfTableSheet
         if (count < 1)
             throw new ArgumentOutOfRangeException(nameof(count));
 
-        OdfTableSheetStructureEngine.InsertRows(TableNode, position, count);
+        if (TableNode is TableTableElement tableElement)
+            tableElement.InsertRows(position, count);
+        else
+            OdfTableSheetStructureEngine.InsertRows(TableNode, position, count);
 
         if (_doc.TrackedChanges)
         {
@@ -44,7 +47,16 @@ public partial class OdfTableSheet
         if (count < 1)
             throw new ArgumentOutOfRangeException(nameof(count));
 
-        IReadOnlyList<OdfNode> deletedSnapshots = OdfTableSheetStructureEngine.DeleteRows(TableNode, position, count);
+        IReadOnlyList<OdfNode> deletedSnapshots;
+        if (TableNode is TableTableElement tableElement)
+        {
+            deletedSnapshots = OdfTableSheetStructureEngine.GetRowSnapshots(TableNode, position, count);
+            tableElement.DeleteRows(position, count);
+        }
+        else
+        {
+            deletedSnapshots = OdfTableSheetStructureEngine.DeleteRows(TableNode, position, count);
+        }
 
         if (_doc.TrackedChanges && deletedSnapshots.Count > 0)
         {
@@ -54,6 +66,52 @@ public partial class OdfTableSheet
                 position,
                 deletedSnapshots);
         }
+    }
+
+    /// <summary>
+    /// 將指定範圍的列複製到目標位置。
+    /// </summary>
+    /// <param name="sourcePosition">以 0 為基準的來源起始列索引</param>
+    /// <param name="count">要複製的列數</param>
+    /// <param name="targetPosition">以 0 為基準的目標插入列索引</param>
+    public void CopyRows(int sourcePosition, int count, int targetPosition)
+    {
+        if (sourcePosition < 0)
+            throw new ArgumentOutOfRangeException(nameof(sourcePosition));
+
+        if (count < 1)
+            throw new ArgumentOutOfRangeException(nameof(count));
+
+        if (targetPosition < 0)
+            throw new ArgumentOutOfRangeException(nameof(targetPosition));
+
+        if (TableNode is TableTableElement tableElement)
+            tableElement.CopyRows(sourcePosition, count, targetPosition);
+        else
+            OdfTableSheetStructureEngine.CopyRows(TableNode, sourcePosition, count, targetPosition);
+    }
+
+    /// <summary>
+    /// 將指定範圍的列移動到目標位置；目標索引以移除來源列後的表格狀態為準。
+    /// </summary>
+    /// <param name="sourcePosition">以 0 為基準的來源起始列索引</param>
+    /// <param name="count">要移動的列數</param>
+    /// <param name="targetPosition">移除來源列後，以 0 為基準的目標插入列索引</param>
+    public void MoveRows(int sourcePosition, int count, int targetPosition)
+    {
+        if (sourcePosition < 0)
+            throw new ArgumentOutOfRangeException(nameof(sourcePosition));
+
+        if (count < 1)
+            throw new ArgumentOutOfRangeException(nameof(count));
+
+        if (targetPosition < 0)
+            throw new ArgumentOutOfRangeException(nameof(targetPosition));
+
+        if (TableNode is TableTableElement tableElement)
+            tableElement.MoveRows(sourcePosition, count, targetPosition);
+        else
+            OdfTableSheetStructureEngine.MoveRows(TableNode, sourcePosition, count, targetPosition);
     }
 
     /// <summary>

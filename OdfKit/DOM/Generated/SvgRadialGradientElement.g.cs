@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public SvgRadialGradientElement(string? prefix = null) : base("radialGradient", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
+        public SvgRadialGradientElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfLength? Cx
         {
             get => GetLengthAttributeValue("cx", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());

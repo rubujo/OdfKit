@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleFontFaceElement(string? prefix = null) : base("font-face", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleFontFaceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? AccentHeight
         {
             get => GetNullableInt32AttributeValue("accent-height", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());

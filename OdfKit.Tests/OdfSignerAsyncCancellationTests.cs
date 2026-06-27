@@ -68,6 +68,30 @@ public class OdfSignerAsyncCancellationTests
     }
 
     /// <summary>
+    /// 文件層一鍵式 SignDocumentAsync 應寫入簽章專案並可由文件層驗證通過。
+    /// </summary>
+    [Fact]
+    public async Task DocumentSignDocumentAsync_DefaultToken_WritesAndVerifiesSignature()
+    {
+        using var doc = TextDocument.Create();
+        doc.Body.Paragraphs.Add("一鍵式文件簽章測試");
+        using var cert = CreateSelfSignedCertificate();
+
+        await doc.SignDocumentAsync(cert, TestContext.Current.CancellationToken);
+
+        OdfDocumentSignatureSummary summary = doc.GetSignatureSummary();
+        Assert.True(summary.IsSigned);
+        Assert.Equal(1, summary.SignatureCount);
+
+        OdfSignatureValidationResult result = await doc.VerifySignaturesAsync(
+            new OdfSigningOptions { AllowUntrustedRoot = true },
+            TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsValid);
+        Assert.Single(result.Signatures);
+    }
+
+    /// <summary>
     /// 未取消時 SignAsync 與 VerifySignaturesAsync 應成功完成基本簽章往返。
     /// </summary>
     [Fact]

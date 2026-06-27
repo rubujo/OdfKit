@@ -2,15 +2,34 @@
 
 public partial class OdfNode
 {
+    private OdfNode? _firstChild;
+    private OdfNode? _lastChild;
+
     /// <summary>
     /// 取得第一個子節點（雙向鏈結串列頭指標）。
     /// </summary>
-    public OdfNode? FirstChild { get; internal set; }
+    public OdfNode? FirstChild
+    {
+        get
+        {
+            EnsureMaterialized();
+            return _firstChild;
+        }
+        internal set => _firstChild = value;
+    }
 
     /// <summary>
     /// 取得最後一個子節點（雙向鏈結串列尾指標）。
     /// </summary>
-    public OdfNode? LastChild { get; internal set; }
+    public OdfNode? LastChild
+    {
+        get
+        {
+            EnsureMaterialized();
+            return _lastChild;
+        }
+        internal set => _lastChild = value;
+    }
 
     /// <summary>
     /// 取得下一個兄弟節點。

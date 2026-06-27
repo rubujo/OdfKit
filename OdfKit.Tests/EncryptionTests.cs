@@ -5,9 +5,11 @@ using System.IO;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 using OdfKit.Core;
 using OdfKit.Compliance;
+using OdfKit.Text;
 
 namespace OdfKit.Tests
 {
@@ -140,6 +142,66 @@ namespace OdfKit.Tests
                     // Trigger evaluation
                 }
             });
+        }
+
+        [Fact]
+        public async Task SaveEncryptedAsyncAndLoadEncryptedAsync_DocumentRoundTrip()
+        {
+            const string password = "AsyncDocumentSecret";
+            using var ms = new MemoryStream();
+            using (TextDocument document = TextDocument.Create())
+            {
+                document.Body.Paragraphs.Add("非同步加密文件測試");
+
+                await document.SaveEncryptedAsync(
+                    ms,
+                    password,
+                    OdfEncryptionAlgorithm.Aes256Gcm,
+                    TestContext.Current.CancellationToken);
+            }
+
+            ms.Position = 0;
+            using OdfDocument loaded = await OdfDocument.LoadEncryptedAsync(
+                ms,
+                password,
+                "async-encrypted.odt",
+                TestContext.Current.CancellationToken);
+
+            TextDocument textDocument = Assert.IsType<TextDocument>(loaded);
+            Assert.Contains("非同步加密文件測試", textDocument.BodyTextRoot.TextContent);
+        }
+
+        [Fact]
+        public async Task SaveEncryptedAsyncAndLoadEncryptedAsync_PackageRoundTrip()
+        {
+            const string password = "AsyncPackageSecret";
+            using var ms = new MemoryStream();
+            using (OdfPackage package = OdfPackage.Create(ms, leaveOpen: true))
+            {
+                package.SetMimeType("application/vnd.oasis.opendocument.text");
+                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content>secret</content>"), "text/xml");
+                package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes("<styles/>"), "text/xml");
+                package.WriteEntry("meta.xml", Encoding.UTF8.GetBytes("<meta/>"), "text/xml");
+                package.WriteEntry("settings.xml", Encoding.UTF8.GetBytes("<settings/>"), "text/xml");
+
+                await package.SaveEncryptedAsync(
+                    password,
+                    OdfEncryptionAlgorithm.Aes256Gcm,
+                    TestContext.Current.CancellationToken);
+
+                Assert.True(OdfEncryption.LastParallelEncryptedEntryCountForTests >= 4);
+                Assert.True(OdfEncryption.LastParallelEncryptionMaxDegreeForTests >= 1);
+            }
+
+            ms.Position = 0;
+            using OdfPackage loaded = await OdfPackage.LoadEncryptedAsync(
+                ms,
+                password,
+                leaveOpen: true,
+                TestContext.Current.CancellationToken);
+
+            string content = Encoding.UTF8.GetString(loaded.ReadEntry("content.xml"));
+            Assert.Contains("secret", content);
         }
 
         [Fact]
@@ -693,6 +755,38 @@ namespace OdfKit.Tests
             using var loadedDoc = OdfDocument.Load(ms, loadOpts);
             Assert.NotNull(loadedDoc);
             Assert.Equal(OdfDocumentKind.Text, loadedDoc.DocumentKind);
+        }
+
+        /// <summary>
+        /// 測試 AES-256-GCM 密文遭竄改時，應以在地化密碼學例外拒絕解密。
+        /// </summary>
+        [Fact]
+        public void Aes256Gcm_TamperedCiphertext_ThrowsLocalizedCryptographicException()
+        {
+            byte[] plaintext = Encoding.UTF8.GetBytes("AES-GCM authentication must reject tampered content.");
+            byte[] ciphertext = OdfEncryption.EncryptEntry(
+                plaintext,
+                "gcm_password",
+                OdfEncryptionAlgorithm.Aes256Gcm,
+                out byte[] iv,
+                out byte[] salt,
+                out _);
+            ciphertext[ciphertext.Length - 1] ^= 0x7F;
+
+            CryptographicException exception = Assert.Throws<CryptographicException>(() =>
+                OdfEncryption.DecryptEntry(
+                    ciphertext,
+                    "gcm_password",
+                    OdfEncryption.Aes256GcmAlgorithmUri,
+                    OdfEncryption.Argon2idDerivationUri,
+                    32,
+                    0,
+                    salt,
+                    iv,
+                    "http://www.w3.org/2000/09/xmldsig#sha256",
+                    "argon2id"));
+
+            Assert.Equal(OdfLocalizer.GetMessage("Err_OdfEncryption_GcmDecryptionFailed"), exception.Message);
         }
     }
 }

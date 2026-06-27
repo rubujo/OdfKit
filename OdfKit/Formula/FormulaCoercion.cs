@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using OdfKit.DOM;
 using OdfKit.Formula.AST;
 
 namespace OdfKit.Formula;
@@ -69,7 +70,10 @@ internal static class FormulaCoercion
         }
 
         if (val is string s)
-            return double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+        {
+            return OdfFastNumberParser.TryParse(s.AsSpan(), out result) ||
+                double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+        }
 
         result = 0;
         return false;

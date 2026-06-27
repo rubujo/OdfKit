@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseKeyElement(string? prefix = null) : base("key", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseKeyElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfDatabaseRule? DeleteRule
         {
             get => GetDatabaseRuleAttributeValue("delete-rule", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

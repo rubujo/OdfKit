@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartDomainElement(string? prefix = null) : base("domain", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartDomainElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCellRangeAddressList? CellRangeAddress
         {
             get => GetCellRangeAddressListAttributeValue("cell-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

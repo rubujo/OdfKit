@@ -15,7 +15,10 @@ internal static class OdfDocumentPersistenceEngine
     /// </summary>
     internal static void PrepareDomEntriesForSave(OdfDocument.OdfDocumentPersistenceCollaborators ctx, OdfSaveOptions options)
     {
-        ctx.StyleEngine.DeduplicateAndSaveStyles();
+        ctx.PrepareForPersistence(options);
+        ctx.StyleEngine.FlushPendingStyles();
+        ctx.Package.FormulaExternalLinksForSave = ctx.FormulaExternalLinks;
+        OdfFontResolver.EmbedFontSubsets(ctx.Package, ctx.ContentDom, ctx.StylesDom);
         OdfDocumentMetadataEngine.UpdateDocumentStatistics(ctx.MetaDom, ctx.ContentDom);
         ApplySaveVersionOptions(ctx, options);
         WriteAllDomEntries(ctx, options);
@@ -26,6 +29,14 @@ internal static class OdfDocumentPersistenceEngine
     /// </summary>
     internal static void WriteAllDomEntries(OdfDocument.OdfDocumentPersistenceCollaborators ctx, OdfSaveOptions options)
     {
+        foreach (var desc in ctx.ContentXmlForPersistence.Descendants())
+        {
+            if (desc is TableTableElement table)
+            {
+                table.MaterializeSparseCells();
+            }
+        }
+
         WriteDomToEntry(ctx, "content.xml", ctx.ContentXmlForPersistence, options);
         WriteDomToEntry(ctx, "styles.xml", ctx.StylesDom, options);
         WriteDomToEntry(ctx, "meta.xml", ctx.MetaDom, options);

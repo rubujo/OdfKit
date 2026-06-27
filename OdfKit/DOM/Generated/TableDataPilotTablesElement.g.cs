@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableDataPilotTablesElement(string? prefix = null) : base("data-pilot-tables", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableDataPilotTablesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TableDataPilotTableElement> TableDataPilotTableChildElements
         {
             get => ChildElements<TableDataPilotTableElement>();

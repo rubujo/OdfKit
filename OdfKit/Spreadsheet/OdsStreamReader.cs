@@ -13,7 +13,7 @@ namespace OdfKit.Spreadsheet;
 /// 以低記憶體流式方式逐列讀取 ODS 試算表，適用於大型資料集。
 /// 整個讀取過程使用 SAX 風格 XmlReader，記憶體佔用遠低於 DOM 讀取路徑。
 /// </summary>
-public sealed class OdsStreamReader : IDisposable
+public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
 {
     private const int MaxRowRepeat = 1_048_576;
     private const int MaxColRepeat = 16_384;
@@ -21,6 +21,8 @@ public sealed class OdsStreamReader : IDisposable
     private readonly ZipArchive _zip;
     private int _selectedSheetIndex;
     private bool _started;
+    private bool _isFirstRowBuffered;
+    private bool _closed;
     private XmlReader? _xmlReader;
     private Stream? _contentStream;
     private int _rowRepeatRemaining;
@@ -41,7 +43,17 @@ public sealed class OdsStreamReader : IDisposable
     /// <summary>
     /// 取得目前列的欄位數
     /// </summary>
-    public int FieldCount => _currentRowData.Count;
+    public override int FieldCount
+    {
+        get
+        {
+            if (!_started)
+            {
+                InitializeAndBufferFirstRow();
+            }
+            return _currentRowData.Count;
+        }
+    }
 
     /// <summary>
     /// 從資料流初始化 <see cref="OdsStreamReader"/>。
@@ -99,19 +111,24 @@ public sealed class OdsStreamReader : IDisposable
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdsStreamReader_SelectsheetCalledBeforeFirst"));
         if (sheetIndex < 0 || sheetIndex >= _sheetNames.Count)
             throw new ArgumentOutOfRangeException(nameof(sheetIndex),
-                $"工作表索引 {sheetIndex} 超出範圍（共 {_sheetNames.Count} 個工作表）。");
+                OdfLocalizer.GetMessage("Err_OdsStreamReader_SheetIndexOutOfRange", sheetIndex.ToString(CultureInfo.InvariantCulture), _sheetNames.Count.ToString(CultureInfo.InvariantCulture)));
         _selectedSheetIndex = sheetIndex;
     }
 
     /// <summary>
     /// 讀取下一列；回傳 false 代表工作表結束
     /// </summary>
-    public bool Read()
+    public override bool Read()
     {
         if (!_started)
         {
-            _started = true;
-            OpenReaderAtSheet();
+            InitializeAndBufferFirstRow();
+        }
+
+        if (_isFirstRowBuffered)
+        {
+            _isFirstRowBuffered = false;
+            return _currentRowData.Count > 0;
         }
 
         if (_rowRepeatRemaining > 0)
@@ -122,6 +139,16 @@ public sealed class OdsStreamReader : IDisposable
         }
 
         return ReadNextRow();
+    }
+
+    private void InitializeAndBufferFirstRow()
+    {
+        _started = true;
+        OpenReaderAtSheet();
+        if (ReadNextRow())
+        {
+            _isFirstRowBuffered = true;
+        }
     }
 
     private void OpenReaderAtSheet()
@@ -309,11 +336,11 @@ public sealed class OdsStreamReader : IDisposable
     /// 取得目前列指定欄的原始值（float→double、boolean→bool、date→DateTime、其餘→string）
     /// </summary>
     /// <param name="ordinal">欄位索引（0-based）</param>
-    public object? GetValue(int ordinal)
+    public override object GetValue(int ordinal)
     {
         if (ordinal < 0 || ordinal >= _currentRowData.Count)
-            return null;
-        return _currentRowData[ordinal];
+            return null!;
+        return _currentRowData[ordinal]!;
     }
 
     private static int ParseRepeat(string? attr, int max)
@@ -326,15 +353,21 @@ public sealed class OdsStreamReader : IDisposable
 
     private static XmlReaderSettings CreateXmlSettings() => new XmlReaderSettings
     {
+        NameTable = OdfXmlNameTable.Create(),
         DtdProcessing = DtdProcessing.Prohibit,
         XmlResolver = null,
     };
 
     /// <inheritdoc/>
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        _xmlReader?.Dispose();
-        _contentStream?.Dispose();
-        _zip.Dispose();
+        if (disposing)
+        {
+            _closed = true;
+            _xmlReader?.Dispose();
+            _contentStream?.Dispose();
+            _zip.Dispose();
+        }
+        base.Dispose(disposing);
     }
 }

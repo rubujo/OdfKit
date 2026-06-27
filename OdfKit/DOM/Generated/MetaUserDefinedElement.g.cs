@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public MetaUserDefinedElement(string? prefix = null) : base("user-defined", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
+        public MetaUserDefinedElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Name
         {
             get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", GetDocumentVersion());

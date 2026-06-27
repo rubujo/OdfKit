@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public FormConnectionResourceElement(string? prefix = null) : base("connection-resource", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
+        public FormConnectionResourceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfIriReference? Href
         {
             get => GetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", GetDocumentVersion());

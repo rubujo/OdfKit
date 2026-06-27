@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableContentValidationElement(string? prefix = null) : base("content-validation", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableContentValidationElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? AllowEmptyCell
         {
             get => GetBooleanAttributeValue("allow-empty-cell", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextEditingCyclesElement(string? prefix = null) : base("editing-cycles", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextEditingCyclesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? Fixed
         {
             get => GetBooleanAttributeValue("fixed", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

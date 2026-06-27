@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawLayerElement(string? prefix = null) : base("layer", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawLayerElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Display
         {
             get => GetAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

@@ -139,8 +139,8 @@ namespace OdfKit.Tests
             OdfNode[] paragraphs = document.BodyTextRoot.Descendants()
                 .Where(node => node.NodeType == OdfNodeType.Element && node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text)
                 .ToArray();
-            Assert.Equal(2, paragraphs.Length);
-            Assert.Equal("採納測試", paragraphs.Last().TextContent);
+            Assert.Single(paragraphs);
+            Assert.Equal("採納測試", paragraphs[0].TextContent);
         }
 
         [Fact]
@@ -158,6 +158,89 @@ namespace OdfKit.Tests
                 .ToArray();
             Assert.Single(paragraphs);
             Assert.Equal("來源段落", paragraphs[0].TextContent);
+        }
+
+        [Fact]
+        public void TestDocumentAdoptNodeNormalizesKnownNamespacePrefixes()
+        {
+            using var source = TextDocument.Create();
+            TextPElement paragraph = new("t");
+            paragraph.SetAttribute("style-name", OdfNamespaces.Text, "SourceStyle", "t");
+            TextSpanElement span = paragraph.AppendElement(new TextSpanElement("t"));
+            span.TextContent = "命名空間重對照";
+            OdfUnknownElement extension = paragraph.AppendElement(
+                new OdfUnknownElement("payload", "urn:example:extension", "ext"));
+            extension.SetAttribute("id", "urn:example:extension", "p1", "ext");
+            source.BodyTextRoot.AppendChild(paragraph);
+
+            using var target = TextDocument.Create();
+            OdfNode adopted = target.AdoptNode(source, paragraph);
+            target.BodyTextRoot.AppendChild(adopted);
+
+            OdfAttributeName styleName = new("style-name", OdfNamespaces.Text);
+            OdfAttributeName extensionId = new("id", "urn:example:extension");
+            TextPElement adoptedParagraph = Assert.IsType<TextPElement>(adopted);
+            TextSpanElement adoptedSpan = adoptedParagraph.ChildElements<TextSpanElement>().Single();
+
+            Assert.Equal("text", adopted.Prefix);
+            Assert.Equal("text", adopted.GetAttributePrefix(styleName));
+            Assert.Equal("text", adoptedSpan.Prefix);
+            Assert.Equal("ext", extension.Prefix);
+            Assert.Equal("ext", extension.GetAttributePrefix(extensionId));
+            Assert.Same(target, adopted.Document);
+            Assert.Same(target, adoptedSpan.Document);
+        }
+
+        [Fact]
+        public void TestDocumentAdoptNodeReusesExistingMediaByHash()
+        {
+            byte[] imageBytes = CreateTinyPngBytes();
+            using var source = TextDocument.Create();
+            OdfParagraph sourceParagraph = source.AddParagraph("來源圖片");
+            source.AddImageFrame(sourceParagraph, imageBytes, OdfLength.Parse("2cm"), OdfLength.Parse("2cm"), "SourceImage");
+
+            using var target = TextDocument.Create();
+            OdfParagraph targetParagraph = target.AddParagraph("既有圖片");
+            OdfImage targetImage = target.AddImageFrame(targetParagraph, imageBytes, OdfLength.Parse("2cm"), OdfLength.Parse("2cm"), "TargetImage");
+            string? targetHref = targetImage.ImageHref;
+            Assert.NotNull(targetHref);
+
+            OdfNode adopted = target.AdoptNode(source, sourceParagraph.Node);
+            target.BodyTextRoot.AppendChild(adopted);
+
+            OdfNode adoptedImage = adopted.Descendants().Single(node =>
+                node.NodeType == OdfNodeType.Element &&
+                node.LocalName == "image" &&
+                node.NamespaceUri == OdfNamespaces.Draw);
+            string? adoptedHref = adoptedImage.GetAttribute("href", OdfNamespaces.XLink);
+            string[] pictureEntries = target.Package.GetEntries()
+                .Where(entry => entry.Path.StartsWith("Pictures/", StringComparison.Ordinal))
+                .Select(entry => entry.Path)
+                .ToArray();
+
+            Assert.Equal(targetHref, adoptedHref);
+            Assert.Single(pictureEntries);
+            Assert.Equal(targetHref, pictureEntries[0]);
+        }
+
+        [Fact]
+        public void TestDocumentAdoptNodeFlattensSourceDefaultStyleProperties()
+        {
+            using var source = TextDocument.Create();
+            AddDefaultParagraphTextProperties(source, "20pt", "#336699");
+            AddParagraphStyle(source, "SourceParagraph");
+            OdfParagraph sourceParagraph = source.AddParagraph("來源預設樣式");
+            sourceParagraph.Node.SetAttribute("style-name", OdfNamespaces.Text, "SourceParagraph", "text");
+
+            using var target = TextDocument.Create();
+            AddDefaultParagraphTextProperties(target, "8pt", "#111111");
+
+            OdfNode adopted = target.AdoptNode(source, sourceParagraph.Node);
+            target.BodyTextRoot.AppendChild(adopted);
+
+            Assert.Equal("SourceParagraph", adopted.GetAttribute("style-name", OdfNamespaces.Text));
+            Assert.Equal("20pt", target.StyleEngine.GetStyleProperty("SourceParagraph", "font-size", OdfNamespaces.Fo, "paragraph"));
+            Assert.Equal("#336699", target.StyleEngine.GetStyleProperty("SourceParagraph", "color", OdfNamespaces.Fo, "paragraph"));
         }
 
         [Fact]
@@ -672,6 +755,51 @@ namespace OdfKit.Tests
             var eventListeners = new OfficeEventListenersElement();
             Assert.Equal("event-listeners", eventListeners.LocalName);
             Assert.Equal(OdfNamespaces.Office, eventListeners.NamespaceUri);
+        }
+
+        private static byte[] CreateTinyPngBytes()
+        {
+            return Convert.FromBase64String(
+                "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
+        }
+
+        private static void AddDefaultParagraphTextProperties(TextDocument document, string fontSize, string color)
+        {
+            OdfNode styles = FindOrCreateChild(document.StylesDom, "styles", OdfNamespaces.Office, "office");
+            var defaultStyle = OdfNodeFactory.CreateElement("default-style", OdfNamespaces.Style, "style");
+            defaultStyle.SetAttribute("family", OdfNamespaces.Style, "paragraph", "style");
+
+            var textProperties = OdfNodeFactory.CreateElement("text-properties", OdfNamespaces.Style, "style");
+            textProperties.SetAttribute("font-size", OdfNamespaces.Fo, fontSize, "fo");
+            textProperties.SetAttribute("color", OdfNamespaces.Fo, color, "fo");
+            defaultStyle.AppendChild(textProperties);
+            styles.AppendChild(defaultStyle);
+            document.StyleEngine.RebuildStyleIndex();
+        }
+
+        private static void AddParagraphStyle(TextDocument document, string styleName)
+        {
+            OdfNode styles = FindOrCreateChild(document.StylesDom, "styles", OdfNamespaces.Office, "office");
+            var style = OdfNodeFactory.CreateElement("style", OdfNamespaces.Style, "style");
+            style.SetAttribute("name", OdfNamespaces.Style, styleName, "style");
+            style.SetAttribute("family", OdfNamespaces.Style, "paragraph", "style");
+            styles.AppendChild(style);
+            document.StyleEngine.RebuildStyleIndex();
+        }
+
+        private static OdfNode FindOrCreateChild(OdfNode parent, string localName, string namespaceUri, string prefix)
+        {
+            foreach (OdfNode child in parent.Children)
+            {
+                if (child.LocalName == localName && child.NamespaceUri == namespaceUri)
+                {
+                    return child;
+                }
+            }
+
+            var created = OdfNodeFactory.CreateElement(localName, namespaceUri, prefix);
+            parent.AppendChild(created);
+            return created;
         }
     }
 }

@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class NumberBooleanElement : OdfElement
     {
         public NumberBooleanElement(string? prefix = null) : base("boolean", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
+
+        public NumberBooleanElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseLoginElement(string? prefix = null) : base("login", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseLoginElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? IsPasswordRequired
         {
             get => GetBooleanAttributeValue("is-password-required", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

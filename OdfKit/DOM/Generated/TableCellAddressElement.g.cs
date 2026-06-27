@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableCellAddressElement(string? prefix = null) : base("cell-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableCellAddressElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? Column
         {
             get => GetNullableInt32AttributeValue("column", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

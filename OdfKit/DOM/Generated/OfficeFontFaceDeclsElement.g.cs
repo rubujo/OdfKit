@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeFontFaceDeclsElement(string? prefix = null) : base("font-face-decls", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeFontFaceDeclsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<StyleFontFaceElement> StyleFontFaceChildElements
         {
             get => ChildElements<StyleFontFaceElement>();

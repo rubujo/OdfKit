@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextTableIndexSourceElement(string? prefix = null) : base("table-index-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextTableIndexSourceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfTextCaptionSequenceFormat? CaptionSequenceFormat
         {
             get => GetTextCaptionSequenceFormatAttributeValue("caption-sequence-format", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

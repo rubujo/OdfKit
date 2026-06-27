@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public Dr3dLightElement(string? prefix = null) : base("light", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
+        public Dr3dLightElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfColor? DiffuseColor
         {
             get => GetColorAttributeValue("diffuse-color", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());

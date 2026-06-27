@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberMonthElement(string? prefix = null) : base("month", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberMonthElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfNumberCalendar? Calendar
         {
             get => GetNumberCalendarAttributeValue("calendar", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", GetDocumentVersion());

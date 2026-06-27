@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextDatabaseRowNumberElement(string? prefix = null) : base("database-row-number", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextDatabaseRowNumberElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? DatabaseName
         {
             get => GetAttributeValue("database-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

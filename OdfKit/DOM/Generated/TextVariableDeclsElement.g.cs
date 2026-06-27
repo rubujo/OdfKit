@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextVariableDeclsElement(string? prefix = null) : base("variable-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextVariableDeclsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TextVariableDeclElement> TextVariableDeclChildElements
         {
             get => ChildElements<TextVariableDeclElement>();

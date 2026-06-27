@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableChangeDeletionElement(string? prefix = null) : base("change-deletion", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableChangeDeletionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Id
         {
             get => GetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

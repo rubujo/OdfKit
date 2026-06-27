@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseIndexColumnElement(string? prefix = null) : base("index-column", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseIndexColumnElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? IsAscending
         {
             get => GetBooleanAttributeValue("is-ascending", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Compliance;
@@ -37,8 +38,14 @@ public abstract partial class OdfDocument
         options ??= OdfSaveOptions.Default;
         OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
 
-        using FileStream stream = new(path, FileMode.Create, FileAccess.Write, FileShare.None);
-        Package.SaveToStream(stream, options);
+        Stream stream = (options.EnableDirectIo && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            ? new OdfDirectIoWritableStream(path)
+            : new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+
+        using (stream)
+        {
+            Package.SaveToStream(stream, options);
+        }
     }
 
     /// <summary>
@@ -77,8 +84,14 @@ public abstract partial class OdfDocument
         options ??= OdfSaveOptions.Default;
         OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(PersistenceCollaborators, options);
 
-        using FileStream stream = new(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
-        await Package.SaveToStreamAsync(stream, options, cancellationToken).ConfigureAwait(false);
+        Stream stream = (options.EnableDirectIo && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            ? new OdfDirectIoWritableStream(path)
+            : new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous);
+
+        using (stream)
+        {
+            await Package.SaveToStreamAsync(stream, options, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     #endregion

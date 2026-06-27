@@ -19,11 +19,13 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
     private readonly Dictionary<OdfCellAddress, object> _cellValues = new();
     private readonly DefaultFormulaEvaluator _evaluator;
     private readonly OdfNode _contentRoot;
+    private readonly OdfExternalLinkManager? _externalLinks;
 
-    public OdfDomEvaluationContext(OdfNode contentRoot, DefaultFormulaEvaluator evaluator)
+    public OdfDomEvaluationContext(OdfNode contentRoot, DefaultFormulaEvaluator evaluator, OdfExternalLinkManager? externalLinks = null)
     {
         _contentRoot = contentRoot;
         _evaluator = evaluator;
+        _externalLinks = externalLinks;
         TraverseTable(contentRoot);
     }
 
@@ -157,6 +159,11 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
 
     public object GetCellValue(OdfCellAddress address)
     {
+        if (_externalLinks is not null && _externalLinks.TryGetCellValue(address, out object? externalValue))
+        {
+            return externalValue ?? 0.0;
+        }
+
         if (string.IsNullOrEmpty(address.SheetName) && !string.IsNullOrEmpty(CurrentCell.SheetName))
         {
             address = new OdfCellAddress(address.Row, address.Column, CurrentCell.SheetName,
@@ -183,6 +190,11 @@ internal class OdfDomEvaluationContext : IEvaluationContext, IOdfBlankCheckableC
 
     public object[,] GetRangeValues(OdfCellRange range)
     {
+        if (_externalLinks is not null && _externalLinks.TryGetRangeValues(range, out object[,] externalValues))
+        {
+            return externalValues;
+        }
+
         string? sheetName = range.StartAddress.SheetName;
         if (string.IsNullOrEmpty(sheetName))
         {

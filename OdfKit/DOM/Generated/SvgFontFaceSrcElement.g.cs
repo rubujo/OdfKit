@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public SvgFontFaceSrcElement(string? prefix = null) : base("font-face-src", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
+        public SvgFontFaceSrcElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<SvgFontFaceNameElement> SvgFontFaceNameChildElements
         {
             get => ChildElements<SvgFontFaceNameElement>();

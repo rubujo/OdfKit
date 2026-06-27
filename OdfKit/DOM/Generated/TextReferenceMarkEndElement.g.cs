@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextReferenceMarkEndElement(string? prefix = null) : base("reference-mark-end", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextReferenceMarkEndElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Name
         {
             get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

@@ -20,16 +20,26 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <inheritdoc />
-    public int Count => _count;
+    public int Count
+    {
+        get
+        {
+            _owner.EnsureMaterialized();
+            return _count;
+        }
+    }
 
     /// <inheritdoc />
     public bool IsReadOnly => false;
+
+    internal int LoadedCount => _count;
 
     /// <inheritdoc />
     public OdfNode this[int index]
     {
         get
         {
+            _owner.EnsureMaterialized();
             if ((uint)index >= (uint)_count)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -50,6 +60,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         {
             throw new ArgumentNullException(nameof(match));
         }
+        _owner.EnsureMaterialized();
         for (OdfNode? node = _owner.FirstChild; node is not null; node = node.NextSibling)
         {
             if (match(node))
@@ -67,6 +78,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     /// <inheritdoc />
     public void Clear()
     {
+        _owner.EnsureMaterialized();
         for (OdfNode? node = _owner.FirstChild; node is not null;)
         {
             OdfNode? next = node.NextSibling;
@@ -76,7 +88,11 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <inheritdoc />
-    public bool Contains(OdfNode item) => item.Parent == _owner;
+    public bool Contains(OdfNode item)
+    {
+        _owner.EnsureMaterialized();
+        return item.Parent == _owner;
+    }
 
     /// <inheritdoc />
     public void CopyTo(OdfNode[] array, int arrayIndex)
@@ -90,6 +106,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
             throw new ArgumentOutOfRangeException(nameof(arrayIndex));
         }
 
+        _owner.EnsureMaterialized();
         if (array.Length - arrayIndex < _count)
         {
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfNodeChildList_TargetArrayOutSpace"));
@@ -105,6 +122,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     /// <inheritdoc />
     public IEnumerator<OdfNode> GetEnumerator()
     {
+        _owner.EnsureMaterialized();
         for (OdfNode? node = _owner.FirstChild; node is not null; node = node.NextSibling)
         {
             yield return node;
@@ -114,6 +132,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     /// <inheritdoc />
     public int IndexOf(OdfNode item)
     {
+        _owner.EnsureMaterialized();
         if (item.Parent != _owner)
         {
             return -1;
@@ -141,6 +160,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     /// <inheritdoc />
     public void Insert(int index, OdfNode item)
     {
+        _owner.EnsureMaterialized();
         if ((uint)index > (uint)_count)
         {
             throw new ArgumentOutOfRangeException(nameof(index));
@@ -261,6 +281,19 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         _count--;
         InvalidateIndexCache();
         ReindexFromSibling(_owner.FirstChild, 0);
+    }
+
+    internal void ResetAfterPrune()
+    {
+        _count = 0;
+        _indexCache = null;
+        _indexCacheValid = false;
+    }
+
+    internal void ReleaseIndexCache()
+    {
+        _indexCache = null;
+        _indexCacheValid = false;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

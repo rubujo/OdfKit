@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextIndexEntrySpanElement(string? prefix = null) : base("index-entry-span", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextIndexEntrySpanElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? StyleName
         {
             get => GetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

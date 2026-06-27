@@ -19,6 +19,23 @@ public sealed partial class OdfPackage
         {
             if (disposing)
             {
+#if NET10_0_OR_GREATER
+                _prefetchCts.Cancel();
+                try
+                {
+                    _prefetchProcessorTask?.GetAwaiter().GetResult();
+                }
+                catch { }
+                _prefetchCts.Dispose();
+#endif
+
+                try
+                {
+                    PreloadTask?.GetAwaiter().GetResult();
+                }
+                catch
+                {
+                }
                 _lock.Dispose();
                 _archive?.Dispose();
                 if (!_leaveOpen)
@@ -31,6 +48,8 @@ public sealed partial class OdfPackage
                 {
                     entry.Dispose();
                 }
+                Mmf?.Dispose();
+                Mmf = null;
             }
             _isDisposed = true;
         }
@@ -53,6 +72,29 @@ public sealed partial class OdfPackage
     {
         if (!_isDisposed)
         {
+#if NET10_0_OR_GREATER
+            _prefetchCts.Cancel();
+            if (_prefetchProcessorTask != null)
+            {
+                try
+                {
+                    await _prefetchProcessorTask.ConfigureAwait(false);
+                }
+                catch { }
+            }
+            _prefetchCts.Dispose();
+#endif
+
+            if (PreloadTask != null)
+            {
+                try
+                {
+                    await PreloadTask.ConfigureAwait(false);
+                }
+                catch
+                {
+                }
+            }
             _lock.Dispose();
             _archive?.Dispose();
 
@@ -72,6 +114,8 @@ public sealed partial class OdfPackage
             {
                 entry.Dispose();
             }
+            Mmf?.Dispose();
+            Mmf = null;
 
             _isDisposed = true;
         }

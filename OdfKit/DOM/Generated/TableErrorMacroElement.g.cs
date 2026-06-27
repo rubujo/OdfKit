@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableErrorMacroElement(string? prefix = null) : base("error-macro", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableErrorMacroElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? Execute
         {
             get => GetBooleanAttributeValue("execute", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

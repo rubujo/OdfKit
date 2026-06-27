@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextIndexEntryChapterElement(string? prefix = null) : base("index-entry-chapter", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextIndexEntryChapterElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Display
         {
             get => GetAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

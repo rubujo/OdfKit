@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextTocMarkEndElement(string? prefix = null) : base("toc-mark-end", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextTocMarkEndElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Id
         {
             get => GetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

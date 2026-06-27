@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public FormComboboxElement(string? prefix = null) : base("combobox", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", prefix) { }
 
+        public FormComboboxElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? AutoComplete
         {
             get => GetBooleanAttributeValue("auto-complete", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", GetDocumentVersion());

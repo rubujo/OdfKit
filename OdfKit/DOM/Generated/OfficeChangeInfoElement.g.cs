@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeChangeInfoElement(string? prefix = null) : base("change-info", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeChangeInfoElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DcCreatorElement> DcCreatorChildElements
         {
             get => ChildElements<DcCreatorElement>();

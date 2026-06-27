@@ -9,7 +9,7 @@ namespace OdfKit.DOM;
 public static partial class OdfNodeFactory
 {
     /// <summary>
-    /// 建立特定類型的 ODF 元素；如果無對應的特定類型，則建立通用的 <see cref="OdfElement"/>。
+    /// 建立特定類型的 ODF 元素；如果無對應的特定類型，則建立 <see cref="OdfUnknownElement"/>。
     /// </summary>
     /// <param name="localName">元素局部名稱</param>
     /// <param name="namespaceUri">元素命名空間 URI</param>
@@ -17,6 +17,12 @@ public static partial class OdfNodeFactory
     /// <returns>所建立的 ODF 元素節點</returns>
     public static OdfNode CreateElement(string localName, string namespaceUri, string? prefix = null)
     {
+        var customElement = OdfWrapperRegistry.CreateElement(localName, namespaceUri, prefix);
+        if (customElement is not null)
+        {
+            return customElement;
+        }
+
         // 嘗試先使用結構定義驅動所產生的對應關係來產生元素
         var generatedElement = CreateGeneratedElement(localName, namespaceUri, prefix);
         if (generatedElement is not null)
@@ -24,7 +30,7 @@ public static partial class OdfNodeFactory
             return generatedElement;
         }
 
-        // 後備使用通用的 OdfElement
-        return new OdfElement(localName, namespaceUri, prefix);
+        // 後備使用未知元素，保留第三方擴充並提供可辨識型別。
+        return new OdfUnknownElement(localName, namespaceUri, prefix);
     }
 }

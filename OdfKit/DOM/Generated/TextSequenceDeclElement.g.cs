@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextSequenceDeclElement(string? prefix = null) : base("sequence-decl", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextSequenceDeclElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? DisplayOutlineLevel
         {
             get => GetNullableInt32AttributeValue("display-outline-level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

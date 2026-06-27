@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextObjectIndexSourceElement(string? prefix = null) : base("object-index-source", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextObjectIndexSourceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfTextIndexScope? IndexScope
         {
             get => GetTextIndexScopeAttributeValue("index-scope", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

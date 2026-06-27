@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public Dr3dExtrudeElement(string? prefix = null) : base("extrude", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", prefix) { }
 
+        public Dr3dExtrudeElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? D
         {
             get => GetAttributeValue("d", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseTableSettingElement(string? prefix = null) : base("table-setting", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseTableSettingElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? IsFirstRowHeaderLine
         {
             get => GetBooleanAttributeValue("is-first-row-header-line", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

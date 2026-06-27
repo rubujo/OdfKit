@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class DatabaseDataSourceSettingValueElement : OdfElement
     {
         public DatabaseDataSourceSettingValueElement(string? prefix = null) : base("data-source-setting-value", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
+
+        public DatabaseDataSourceSettingValueElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

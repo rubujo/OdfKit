@@ -117,6 +117,10 @@ public partial class OdfCell
                 {
                     richText.AddRun(inner.TextContent);
                 }
+                else if (inner.LocalName == "line-break" && inner.NamespaceUri == OdfNamespaces.Text)
+                {
+                    richText.AddLineBreak();
+                }
             }
         }
         return richText;
@@ -125,8 +129,14 @@ public partial class OdfCell
     /// <summary>
     /// 設定儲存格的富文字內容，取代現有文字。
     /// </summary>
+    /// <param name="richText">要寫入儲存格的富文字內容</param>
     public void SetRichText(OdfRichText richText)
     {
+        if (richText is null)
+        {
+            throw new ArgumentNullException(nameof(richText));
+        }
+
         var toRemove = new List<OdfNode>();
         foreach (var child in Node.Children)
             if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
@@ -135,6 +145,7 @@ public partial class OdfCell
             Node.RemoveChild(child);
 
         var pNode = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+        bool needsWrap = false;
         foreach (var run in richText.Runs)
         {
             bool hasFormatting = run.Bold || run.Italic || run.Underline || run.Color.HasValue || !string.IsNullOrEmpty(run.FontFamily);
@@ -143,16 +154,20 @@ public partial class OdfCell
                 string styleName = _doc.GetOrCreateCharacterStyle(run.Bold, run.Italic, run.Underline, run.Color, run.FontFamily);
                 var span = new OdfNode(OdfNodeType.Element, "span", OdfNamespaces.Text, "text");
                 span.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
-                span.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = run.Text });
+                AppendTextContent(span, run.Text, ref needsWrap);
                 pNode.AppendChild(span);
             }
             else
             {
-                pNode.AppendChild(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = run.Text });
+                AppendTextContent(pNode, run.Text, ref needsWrap);
             }
         }
         Node.AppendChild(pNode);
         ValueType = "string";
+        if (needsWrap)
+        {
+            SetStyleProperty("table-cell-properties", "wrap-option", OdfNamespaces.Fo, "wrap", "fo");
+        }
     }
 
     /// <summary>

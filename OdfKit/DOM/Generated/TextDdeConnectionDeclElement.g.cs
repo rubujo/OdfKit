@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextDdeConnectionDeclElement(string? prefix = null) : base("dde-connection-decl", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextDdeConnectionDeclElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? AutomaticUpdate
         {
             get => GetBooleanAttributeValue("automatic-update", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());

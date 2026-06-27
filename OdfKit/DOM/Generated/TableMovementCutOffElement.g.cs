@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableMovementCutOffElement(string? prefix = null) : base("movement-cut-off", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableMovementCutOffElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? EndPosition
         {
             get => GetNullableInt32AttributeValue("end-position", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

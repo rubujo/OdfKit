@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextIllustrationIndexEntryTemplateElement(string? prefix = null) : base("illustration-index-entry-template", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextIllustrationIndexEntryTemplateElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? StyleName
         {
             get => GetStyleNameAttributeValue("style-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

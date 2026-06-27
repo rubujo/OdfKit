@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextScriptElement(string? prefix = null) : base("script", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextScriptElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfIriReference? Href
         {
             get => GetIriReferenceAttributeValue("href", "http://www.w3.org/1999/xlink", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextDdeConnectionDeclsElement(string? prefix = null) : base("dde-connection-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextDdeConnectionDeclsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TextDdeConnectionDeclElement> TextDdeConnectionDeclChildElements
         {
             get => ChildElements<TextDdeConnectionDeclElement>();

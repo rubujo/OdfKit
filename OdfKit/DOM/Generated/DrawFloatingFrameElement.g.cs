@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawFloatingFrameElement(string? prefix = null) : base("floating-frame", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawFloatingFrameElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXLinkActuate? Actuate
         {
             get => GetXLinkActuateAttributeValue("actuate", "http://www.w3.org/1999/xlink", GetDocumentVersion());

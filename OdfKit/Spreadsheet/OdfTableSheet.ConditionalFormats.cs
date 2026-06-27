@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using OdfKit.Chart;
+using OdfKit.Compliance;
+using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Spreadsheet;
@@ -55,12 +58,29 @@ public partial class OdfTableSheet
             MutationContext, range, positiveColor, negativeColor);
 
     /// <summary>
+    /// 新增資料橫條條件格式。
+    /// </summary>
+    /// <param name="range">套用範圍</param>
+    /// <param name="color">正值橫條色彩</param>
+    /// <param name="negativeColor">負值橫條色彩（可選）</param>
+    public void AddDataBar(OdfCellRange range, OdfColor color, OdfColor? negativeColor = null) =>
+        AddDataBarFormat(range, color, negativeColor);
+
+    /// <summary>
     /// 新增圖示集條件格式。
     /// </summary>
     /// <param name="range">套用範圍</param>
     /// <param name="iconSet">圖示集類型</param>
     public void AddIconSetFormat(OdfCellRange range, OdfIconSetType iconSet) =>
         OdfTableSheetConditionalFormatEngine.AddIconSetFormat(MutationContext, range, iconSet);
+
+    /// <summary>
+    /// 新增圖示集條件格式。
+    /// </summary>
+    /// <param name="range">套用範圍</param>
+    /// <param name="iconSet">圖示集類型</param>
+    public void AddIconSet(OdfCellRange range, OdfIconSetType iconSet) =>
+        AddIconSetFormat(range, iconSet);
 
     /// <summary>
     /// 在工作表中新增 LibreOffice calcext 走勢圖群組。
@@ -86,6 +106,104 @@ public partial class OdfTableSheet
     /// <returns>新增的資料庫範圍</returns>
     public OdfDatabaseRange AddDatabaseRange(string name, OdfCellRange range) =>
         _doc.AddDatabaseRange(name, range);
+
+    /// <summary>
+    /// 為指定範圍啟用自動篩選按鈕。
+    /// </summary>
+    /// <param name="range">要啟用自動篩選的儲存格範圍</param>
+    /// <returns>對應的資料庫範圍，可繼續設定篩選條件</returns>
+    public OdfDatabaseRange AutoFilter(string range)
+    {
+        if (!OdfCellRange.TryParse(range, out OdfCellRange parsedRange))
+            throw new FormatException(OdfLocalizer.GetMessage("Err_OdfTableSheet_InvalidCellRange", range));
+
+        return AutoFilter(parsedRange);
+    }
+
+    /// <summary>
+    /// 為指定範圍啟用自動篩選按鈕。
+    /// </summary>
+    /// <param name="range">要啟用自動篩選的儲存格範圍</param>
+    /// <returns>對應的資料庫範圍，可繼續設定篩選條件</returns>
+    public OdfDatabaseRange AutoFilter(OdfCellRange range)
+    {
+        OdfDatabaseRange databaseRange = AddDatabaseRange(CreateDatabaseRangeName("AutoFilter"), EnsureSheetName(range));
+        databaseRange.DisplayFilterButtons = true;
+        return databaseRange;
+    }
+
+    /// <summary>
+    /// 為指定範圍設定排序規則。
+    /// </summary>
+    /// <param name="range">要排序的儲存格範圍</param>
+    /// <param name="rules">排序規則陣列，包含欄位編號與是否遞增</param>
+    /// <returns>對應的資料庫範圍</returns>
+    public OdfDatabaseRange Sort(string range, params (int fieldNumber, bool ascending)[] rules)
+    {
+        if (!OdfCellRange.TryParse(range, out OdfCellRange parsedRange))
+            throw new FormatException(OdfLocalizer.GetMessage("Err_OdfTableSheet_InvalidCellRange", range));
+
+        return Sort(parsedRange, rules);
+    }
+
+    /// <summary>
+    /// 為指定範圍設定排序規則。
+    /// </summary>
+    /// <param name="range">要排序的儲存格範圍</param>
+    /// <param name="rules">排序規則陣列，包含欄位編號與是否遞增</param>
+    /// <returns>對應的資料庫範圍</returns>
+    public OdfDatabaseRange Sort(OdfCellRange range, params (int fieldNumber, bool ascending)[] rules)
+    {
+        OdfDatabaseRange databaseRange = AddDatabaseRange(CreateDatabaseRangeName("Sort"), EnsureSheetName(range));
+        databaseRange.SetSort(rules);
+        return databaseRange;
+    }
+
+    private OdfCellRange EnsureSheetName(OdfCellRange range)
+    {
+        string? startSheet = range.StartAddress.SheetName ?? Name;
+        string? endSheet = range.EndAddress.SheetName ?? startSheet;
+        return new OdfCellRange(
+            new OdfCellAddress(
+                range.StartAddress.Row,
+                range.StartAddress.Column,
+                startSheet,
+                range.StartAddress.IsRowAbsolute,
+                range.StartAddress.IsColumnAbsolute,
+                range.StartAddress.IsSheetAbsolute),
+            new OdfCellAddress(
+                range.EndAddress.Row,
+                range.EndAddress.Column,
+                endSheet,
+                range.EndAddress.IsRowAbsolute,
+                range.EndAddress.IsColumnAbsolute,
+                range.EndAddress.IsSheetAbsolute));
+    }
+
+    private string CreateDatabaseRangeName(string purpose)
+    {
+        int index = _doc.GetDatabaseRanges().Count + 1;
+        string name;
+        do
+        {
+            name = $"{Name}_{purpose}_{index.ToString(CultureInfo.InvariantCulture)}";
+            index++;
+        }
+        while (DatabaseRangeNameExists(name));
+
+        return name;
+    }
+
+    private bool DatabaseRangeNameExists(string name)
+    {
+        foreach (OdfDatabaseRangeInfo info in _doc.GetDatabaseRanges())
+        {
+            if (string.Equals(info.Name, name, StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
+    }
 
     #endregion
 }

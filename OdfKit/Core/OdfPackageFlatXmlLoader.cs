@@ -26,6 +26,7 @@ internal static class OdfPackageFlatXmlLoader
     {
         var settings = new XmlReaderSettings
         {
+            NameTable = OdfXmlNameTable.Create(),
             DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null,
             CloseInput = !ctx.LeaveOpen,
@@ -134,7 +135,12 @@ internal static class OdfPackageFlatXmlLoader
 
         cleanXmlStream.Position = 0;
         XDocument doc;
-        using (var cleanReader = XmlReader.Create(cleanXmlStream, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit }))
+        using (var cleanReader = XmlReader.Create(cleanXmlStream, new XmlReaderSettings
+        {
+            NameTable = OdfXmlNameTable.Create(),
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null
+        }))
         {
             doc = XDocument.Load(cleanReader);
         }

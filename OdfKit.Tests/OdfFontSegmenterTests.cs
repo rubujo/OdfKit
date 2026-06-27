@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using OdfKit.Core;
 using OdfKit.Styles;
+using OdfKit.Text;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -76,6 +81,34 @@ public class OdfFontSegmenterTests
 
         Assert.Equal("結尾", segments[4].Text);
         Assert.Equal(defaultFont, segments[4].FontName);
+    }
+
+    /// <summary>
+    /// 驗證註冊字型子集化擴充點後，存檔會掃描 PUA 字元、嵌入子集字型並更新 font-face-uri。
+    /// </summary>
+    [Fact]
+    public void FontSubsetterRegistration_EmbedsPrivateUseFontSubsetOnSave()
+    {
+        var subsetter = new FakeFontSubsetter();
+        using IDisposable registration = OdfFontResolver.RegisterFontSubsetter(subsetter);
+        using TextDocument document = TextDocument.Create();
+        string pua = char.ConvertFromUtf32(0xF0000);
+
+        document.AddFontFace("PuaFont", "PuaFont", "system-serif", "variable");
+        document.AddParagraph("自造字" + pua);
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+
+        Assert.Single(subsetter.Requests);
+        OdfFontSubsetRequest request = subsetter.Requests.Single();
+        Assert.Equal("PuaFont", request.FontName);
+        Assert.Contains(0xF0000, request.CodePoints);
+        Assert.True(document.Package.HasEntry("Fonts/Subsets/PuaFont-subset.ttf"));
+        Assert.Equal("font/ttf", document.Package.Manifest["Fonts/Subsets/PuaFont-subset.ttf"]);
+
+        string contentXml = ReadEntry(document.Package, "content.xml");
+        Assert.Contains("xlink:href=\"Fonts/Subsets/PuaFont-subset.ttf\"", contentXml, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -196,5 +229,23 @@ public class OdfFontSegmenterTests
 
         Assert.Equal(baseFont4, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont4, 2));
         Assert.Equal(baseFont4, OdfFontSegmenter.GetSupplementaryPlaneFontName(baseFont4, 15));
+    }
+
+    private static string ReadEntry(OdfPackage package, string path)
+    {
+        using Stream stream = package.GetEntryStream(path);
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+
+    private sealed class FakeFontSubsetter : IFontSubsetter
+    {
+        public List<OdfFontSubsetRequest> Requests { get; } = [];
+
+        public OdfFontSubset? CreateSubset(OdfFontSubsetRequest request)
+        {
+            Requests.Add(request);
+            return new OdfFontSubset([0x00, 0x01, 0x02], ".ttf", "font/ttf");
+        }
     }
 }

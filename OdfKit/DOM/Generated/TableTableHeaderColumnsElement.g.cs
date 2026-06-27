@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableTableHeaderColumnsElement(string? prefix = null) : base("table-header-columns", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableTableHeaderColumnsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TableTableColumnElement> TableTableColumnChildElements
         {
             get => ChildElements<TableTableColumnElement>();

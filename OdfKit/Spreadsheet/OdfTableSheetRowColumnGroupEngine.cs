@@ -14,6 +14,8 @@ internal static class OdfTableSheetRowColumnGroupEngine
     /// </summary>
     internal static void GroupRows(OdfTableSheetMutationContext context, int startRow, int endRow, bool collapsed)
     {
+        ValidateRange(startRow, endRow, nameof(startRow), nameof(endRow));
+
         var rowsToWrap = new List<OdfNode>();
         for (int r = startRow; r <= endRow; r++)
             rowsToWrap.Add(context.GetOrCreateRow(r, forWrite: true));
@@ -37,6 +39,8 @@ internal static class OdfTableSheetRowColumnGroupEngine
     /// </summary>
     internal static void UngroupRows(OdfTableSheetMutationContext context, int startRow, int endRow)
     {
+        ValidateRange(startRow, endRow, nameof(startRow), nameof(endRow));
+
         foreach (var child in new List<OdfNode>(context.TableNode.Children))
         {
             if (child.LocalName != "table-row-group" || child.NamespaceUri != OdfNamespaces.Table)
@@ -59,6 +63,8 @@ internal static class OdfTableSheetRowColumnGroupEngine
     /// </summary>
     internal static void GroupColumns(OdfTableSheetMutationContext context, int startCol, int endCol, bool collapsed)
     {
+        ValidateRange(startCol, endCol, nameof(startCol), nameof(endCol));
+
         var colsToWrap = new List<OdfNode>();
         for (int c = startCol; c <= endCol; c++)
             colsToWrap.Add(context.GetOrCreateColumn(c));
@@ -80,6 +86,8 @@ internal static class OdfTableSheetRowColumnGroupEngine
     /// </summary>
     internal static void UngroupColumns(OdfTableSheetMutationContext context, int startCol, int endCol)
     {
+        ValidateRange(startCol, endCol, nameof(startCol), nameof(endCol));
+
         foreach (var child in new List<OdfNode>(context.TableNode.Children))
         {
             if (child.LocalName != "table-column-group" || child.NamespaceUri != OdfNamespaces.Table)
@@ -94,6 +102,19 @@ internal static class OdfTableSheetRowColumnGroupEngine
                 insertAfter = col;
             }
             context.TableNode.RemoveChild(child);
+        }
+    }
+
+    private static void ValidateRange(int start, int end, string startParameterName, string endParameterName)
+    {
+        if (start < 0)
+        {
+            throw new ArgumentOutOfRangeException(startParameterName);
+        }
+
+        if (end < start)
+        {
+            throw new ArgumentOutOfRangeException(endParameterName);
         }
     }
 }

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartSeriesElement(string? prefix = null) : base("series", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartSeriesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? AttachedAxis
         {
             get => GetAttributeValue("attached-axis", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", GetDocumentVersion());

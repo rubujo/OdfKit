@@ -40,12 +40,12 @@ public struct OdfAttributeName(string localName, string namespaceUri) : IEquatab
     /// <summary>
     /// 取得屬性的局部名稱。
     /// </summary>
-    public string LocalName { get; } = localName;
+    public string LocalName { get; } = OdfAttributeStringPool.InternName(localName);
 
     /// <summary>
     /// 取得屬性的命名空間 URI。
     /// </summary>
-    public string NamespaceUri { get; } = namespaceUri;
+    public string NamespaceUri { get; } = OdfAttributeStringPool.InternName(namespaceUri);
 
     /// <summary>
     /// 指示目前物件是否等於另一個相同類型的物件。
@@ -89,4 +89,103 @@ internal class OdfAttributeNameComparer : IEqualityComparer<OdfAttributeName>
     /// 取得屬性名稱的雜湊碼。
     /// </summary>
     public int GetHashCode(OdfAttributeName obj) => obj.GetHashCode();
+}
+
+internal static class OdfAttributeStringPool
+{
+    private static readonly object Lock = new();
+
+    private static readonly Dictionary<string, string> Names = new(StringComparer.Ordinal)
+    {
+        ["boolean-value"] = "boolean-value",
+        ["class"] = "class",
+        ["date-value"] = "date-value",
+        ["formula"] = "formula",
+        ["href"] = "href",
+        ["name"] = "name",
+        ["number-columns-repeated"] = "number-columns-repeated",
+        ["number-rows-repeated"] = "number-rows-repeated",
+        ["style-name"] = "style-name",
+        ["string-value"] = "string-value",
+        ["table:name"] = "table:name",
+        ["text:style-name"] = "text:style-name",
+        ["value"] = "value",
+        ["value-type"] = "value-type",
+        [OdfNamespaces.Draw] = OdfNamespaces.Draw,
+        [OdfNamespaces.Fo] = OdfNamespaces.Fo,
+        [OdfNamespaces.Office] = OdfNamespaces.Office,
+        [OdfNamespaces.Style] = OdfNamespaces.Style,
+        [OdfNamespaces.Table] = OdfNamespaces.Table,
+        [OdfNamespaces.Text] = OdfNamespaces.Text,
+        [OdfNamespaces.XLink] = OdfNamespaces.XLink
+    };
+
+    private static readonly Dictionary<string, string> Values = new(StringComparer.Ordinal)
+    {
+        ["1.4"] = "1.4",
+        ["auto"] = "auto",
+        ["boolean"] = "boolean",
+        ["center"] = "center",
+        ["currency"] = "currency",
+        ["date"] = "date",
+        ["false"] = "false",
+        ["float"] = "float",
+        ["left"] = "left",
+        ["none"] = "none",
+        ["normal"] = "normal",
+        ["percentage"] = "percentage",
+        ["right"] = "right",
+        ["solid"] = "solid",
+        ["string"] = "string",
+        ["time"] = "time",
+        ["true"] = "true",
+        ["wrap"] = "wrap"
+    };
+
+    internal static int NameHitCountForTests;
+
+    internal static int ValueHitCountForTests;
+
+    internal static string InternName(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return value;
+        }
+
+        lock (Lock)
+        {
+            if (Names.TryGetValue(value, out string? interned))
+            {
+                NameHitCountForTests++;
+                return interned;
+            }
+
+            if (value.Length <= 96)
+            {
+                Names[value] = value;
+            }
+
+            return value;
+        }
+    }
+
+    internal static string InternValue(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return value;
+        }
+
+        lock (Lock)
+        {
+            if (Values.TryGetValue(value, out string? interned))
+            {
+                ValueHitCountForTests++;
+                return interned;
+            }
+        }
+
+        return value;
+    }
 }

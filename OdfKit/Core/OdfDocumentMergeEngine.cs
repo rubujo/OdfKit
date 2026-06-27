@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
@@ -71,7 +72,16 @@ internal static class OdfDocumentMergeEngine
                 string name = srcStyle.GetAttribute("name", OdfNamespaces.Style)!;
                 string family = srcStyle.GetAttribute("family", OdfNamespaces.Style) ?? "paragraph";
 
-                bool conflict = dest.StyleEngine.StyleExists(name);
+                OdfNode? existingStyle = FindStyleByName(destContainer, name);
+                bool conflict = existingStyle is not null || dest.StyleEngine.StyleExists(name);
+
+                if (conflict &&
+                    options.StyleConflictResolution != ConflictResolution.KeepSourceFormatting &&
+                    existingStyle is not null &&
+                    AreSemanticallyEquivalentStyles(srcStyle, existingStyle))
+                {
+                    continue;
+                }
 
                 if (conflict && options.StyleConflictResolution == ConflictResolution.KeepSourceFormatting)
                 {
@@ -88,6 +98,74 @@ internal static class OdfDocumentMergeEngine
                     destContainer.AppendChild(clonedStyle);
                 }
             }
+        }
+    }
+
+    private static OdfNode? FindStyleByName(OdfNode container, string styleName)
+    {
+        foreach (OdfNode child in container.Children)
+        {
+            if (child.NodeType == OdfNodeType.Element &&
+                child.LocalName == "style" &&
+                child.NamespaceUri == OdfNamespaces.Style &&
+                string.Equals(child.GetAttribute("name", OdfNamespaces.Style), styleName, StringComparison.Ordinal))
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool AreSemanticallyEquivalentStyles(OdfNode sourceStyle, OdfNode destinationStyle)
+        => string.Equals(CreateSemanticStyleSignature(sourceStyle), CreateSemanticStyleSignature(destinationStyle), StringComparison.Ordinal);
+
+    private static string CreateSemanticStyleSignature(OdfNode node)
+    {
+        StringBuilder builder = new();
+        AppendSemanticNodeSignature(node, builder);
+        return builder.ToString();
+    }
+
+    private static void AppendSemanticNodeSignature(OdfNode node, StringBuilder builder)
+    {
+        builder.Append(node.NodeType).Append('|');
+        builder.Append(node.NamespaceUri).Append('|');
+        builder.Append(node.LocalName).Append('|');
+
+        List<OdfAttributeName> attributes = [.. node.Attributes.Keys];
+        attributes.Sort((left, right) =>
+        {
+            int namespaceCompare = string.CompareOrdinal(left.NamespaceUri, right.NamespaceUri);
+            return namespaceCompare != 0 ? namespaceCompare : string.CompareOrdinal(left.LocalName, right.LocalName);
+        });
+
+        foreach (OdfAttributeName attribute in attributes)
+        {
+            if (attribute.LocalName == "name" && attribute.NamespaceUri == OdfNamespaces.Style)
+                continue;
+
+            builder.Append('@')
+                .Append(attribute.NamespaceUri)
+                .Append(':')
+                .Append(attribute.LocalName)
+                .Append('=')
+                .Append(node.Attributes[attribute])
+                .Append(';');
+        }
+
+        List<string> childSignatures = [];
+        foreach (OdfNode child in node.Children)
+        {
+            StringBuilder childBuilder = new();
+            AppendSemanticNodeSignature(child, childBuilder);
+            childSignatures.Add(childBuilder.ToString());
+        }
+
+        childSignatures.Sort(StringComparer.Ordinal);
+        foreach (string childSignature in childSignatures)
+        {
+            builder.Append('[').Append(childSignature).Append(']');
         }
     }
 

@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class TextNumberElement : OdfElement
     {
         public TextNumberElement(string? prefix = null) : base("number", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
+
+        public TextNumberElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

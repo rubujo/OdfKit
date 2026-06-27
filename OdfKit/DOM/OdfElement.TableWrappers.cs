@@ -89,6 +89,21 @@ public partial class TableTableCellElement(string? prefix = null) : OdfElement("
                 SetAttributeValue("value-type", OdfNamespaces.Office, value, OdfNamespaces.GetPrefix(OdfNamespaces.Office), GetDocumentVersion());
         }
     }
+
+    /// <summary>
+    /// 取得或設定此表格儲存格的樣式名稱。
+    /// </summary>
+    public string? StyleName
+    {
+        get => GetAttributeValue("style-name", OdfNamespaces.Table, GetDocumentVersion());
+        set
+        {
+            if (value is null)
+                RemoveAttribute("style-name", OdfNamespaces.Table);
+            else
+                SetAttributeValue("style-name", OdfNamespaces.Table, value, OdfNamespaces.GetPrefix(OdfNamespaces.Table), GetDocumentVersion());
+        }
+    }
 }
 
 /// <summary>

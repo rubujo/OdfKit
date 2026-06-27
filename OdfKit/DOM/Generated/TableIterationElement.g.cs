@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableIterationElement(string? prefix = null) : base("iteration", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableIterationElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public decimal? MaximumDifference
         {
             get => GetDecimalAttributeValue("maximum-difference", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

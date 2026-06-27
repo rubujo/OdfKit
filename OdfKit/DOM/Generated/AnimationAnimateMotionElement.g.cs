@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public AnimationAnimateMotionElement(string? prefix = null) : base("animateMotion", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
+        public AnimationAnimateMotionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public decimal? Accelerate
         {
             get => GetDecimalAttributeValue("accelerate", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", GetDocumentVersion());

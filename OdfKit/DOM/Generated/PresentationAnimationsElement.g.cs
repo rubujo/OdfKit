@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public PresentationAnimationsElement(string? prefix = null) : base("animations", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
+        public PresentationAnimationsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<PresentationAnimationGroupElement> PresentationAnimationGroupChildElements
         {
             get => ChildElements<PresentationAnimationGroupElement>();

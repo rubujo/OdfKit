@@ -37,4 +37,18 @@ public class OdfPackageAutoMediaTypeTests
         Assert.Equal("application/vnd.oasis.opendocument.formula", package.Manifest["Object1/"]);
         Assert.Equal("text/xml", package.Manifest["Object1/content.xml"]);
     }
+
+    [Fact]
+    public void AddEntry_WithoutMediaType_AutoResolvesManifestMediaTypes()
+    {
+        using var package = OdfPackage.Create(new MemoryStream());
+        package.SetMimeType("application/vnd.oasis.opendocument.text");
+
+        package.AddEntry("content.xml", Encoding.UTF8.GetBytes("<root/>"));
+        using var svgStream = new MemoryStream(Encoding.UTF8.GetBytes("<svg xmlns=\"http://www.w3.org/2000/svg\"/>"));
+        package.AddEntry("Pictures/logo.svg", svgStream);
+
+        Assert.Equal("text/xml", package.Manifest["content.xml"]);
+        Assert.Equal("image/svg+xml", package.Manifest["Pictures/logo.svg"]);
+    }
 }

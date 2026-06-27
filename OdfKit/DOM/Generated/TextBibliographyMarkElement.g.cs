@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextBibliographyMarkElement(string? prefix = null) : base("bibliography-mark", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextBibliographyMarkElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? BibliographyType
         {
             get => GetAttributeValue("bibliography-type", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

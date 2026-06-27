@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseApplicationConnectionSettingsElement(string? prefix = null) : base("application-connection-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseApplicationConnectionSettingsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? AppendTableAliasName
         {
             get => GetBooleanAttributeValue("append-table-alias-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

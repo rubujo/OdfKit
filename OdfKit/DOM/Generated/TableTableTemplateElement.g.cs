@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableTableTemplateElement(string? prefix = null) : base("table-template", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableTableTemplateElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? FirstRowEndColumn
         {
             get => GetAttributeValue("first-row-end-column", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

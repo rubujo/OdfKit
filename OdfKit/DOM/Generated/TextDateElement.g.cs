@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextDateElement(string? prefix = null) : base("date", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextDateElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? DataStyleName
         {
             get => GetStyleNameAttributeValue("data-style-name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

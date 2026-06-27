@@ -1,14 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System;
+using System.Data.Common;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Styles;
 using Sylvan.Data.Csv;
 
@@ -24,6 +28,9 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     private readonly ZipArchive _zip;
     private readonly Stream _contentEntryStream;
     private readonly XmlWriter _writer;
+    private readonly List<SheetBuffer> _sheetBuffers = [];
+    private readonly Dictionary<string, SheetBuffer> _sheetBuffersByName = new(StringComparer.Ordinal);
+    private SheetBuffer? _activeSheetBuffer;
     private bool _isRowStarted;
     private bool _isSheetStarted;
     private bool _disposed;
@@ -117,8 +124,38 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             return;
         if (_isSheetStarted)
             WriteEndSheet();
+        _activeSheetBuffer = null;
         _writer.WriteStartElement("table", "table", OdfNamespaces.Table);
         _writer.WriteAttributeString("table", "name", OdfNamespaces.Table, sheetName);
+        _isSheetStarted = true;
+    }
+
+    /// <summary>
+    /// 切換至指定工作表，以暫存緩衝支援多工作表交錯流式寫入。
+    /// </summary>
+    /// <param name="sheetName">要切換或建立的工作表名稱</param>
+    /// <exception cref="ArgumentException">當 <paramref name="sheetName"/> 為 null 或空白時擲出</exception>
+    public void SwitchToSheet(string sheetName)
+    {
+        if (_disposed)
+            return;
+        if (string.IsNullOrWhiteSpace(sheetName))
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdsStreamWriter_SheetNameRequired"), nameof(sheetName));
+
+        if (_isRowStarted)
+            WriteEndRow();
+
+        if (_activeSheetBuffer is null && _isSheetStarted)
+            WriteEndSheet();
+
+        if (!_sheetBuffersByName.TryGetValue(sheetName, out SheetBuffer? sheet))
+        {
+            sheet = new SheetBuffer(sheetName);
+            _sheetBuffersByName.Add(sheetName, sheet);
+            _sheetBuffers.Add(sheet);
+        }
+
+        _activeSheetBuffer = sheet;
         _isSheetStarted = true;
     }
 
@@ -135,9 +172,10 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             ? $"co_auto_{++_autoColumnStyleIndex}"
             : styleName!;
 
-        _writer.WriteStartElement("table", "table-column", OdfNamespaces.Table);
-        _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, name);
-        _writer.WriteEndElement();
+        XmlWriter writer = CurrentWriter;
+        writer.WriteStartElement("table", "table-column", OdfNamespaces.Table);
+        writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, name);
+        writer.WriteEndElement();
 
         _columnStyles.Add((name, width));
     }
@@ -168,10 +206,11 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             _rowStyles.Add((resolvedStyleName!, rowHeight, useOptimalHeight));
         }
 
-        _writer.WriteStartElement("table", "table-row", OdfNamespaces.Table);
+        XmlWriter writer = CurrentWriter;
+        writer.WriteStartElement("table", "table-row", OdfNamespaces.Table);
         if (!string.IsNullOrEmpty(resolvedStyleName))
         {
-            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, resolvedStyleName);
+            writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, resolvedStyleName);
         }
     }
 
@@ -194,19 +233,20 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     {
         if (_disposed)
             return;
-        _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-        _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "string");
+        XmlWriter writer = CurrentWriter;
+        writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+        writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "string");
         if (!string.IsNullOrEmpty(styleName))
         {
-            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
         }
-        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+        writer.WriteStartElement("text", "p", OdfNamespaces.Text);
         if (!value.IsEmpty)
         {
-            _writer.WriteString(ToStringValue(value));
+            writer.WriteString(ToStringValue(value));
         }
-        _writer.WriteEndElement(); // text:p
-        _writer.WriteEndElement(); // table:cell
+        writer.WriteEndElement(); // text:p
+        writer.WriteEndElement(); // table:cell
     }
 
     /// <summary>
@@ -226,17 +266,18 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     {
         if (_disposed)
             return;
-        _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-        _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "float");
-        _writer.WriteAttributeString("office", "value", OdfNamespaces.Office, value.ToString(CultureInfo.InvariantCulture));
+        XmlWriter writer = CurrentWriter;
+        writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+        writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "float");
+        writer.WriteAttributeString("office", "value", OdfNamespaces.Office, value.ToString(CultureInfo.InvariantCulture));
         if (!string.IsNullOrEmpty(styleName))
         {
-            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
         }
-        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        _writer.WriteString(value.ToString(CultureInfo.InvariantCulture));
-        _writer.WriteEndElement(); // text:p
-        _writer.WriteEndElement(); // table:cell
+        writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+        writer.WriteString(value.ToString(CultureInfo.InvariantCulture));
+        writer.WriteEndElement(); // text:p
+        writer.WriteEndElement(); // table:cell
     }
 
     /// <summary>
@@ -249,8 +290,9 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     {
         if (_disposed)
             return;
-        _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-        _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "date");
+        XmlWriter writer = CurrentWriter;
+        writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+        writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "date");
 
         string isoDate;
         if (value == DateTime.MinValue || value == DateTime.MaxValue)
@@ -266,15 +308,15 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
                 : value.ToUniversalTime().ToString("s", CultureInfo.InvariantCulture) + "Z";
         }
 
-        _writer.WriteAttributeString("office", "date-value", OdfNamespaces.Office, isoDate);
+        writer.WriteAttributeString("office", "date-value", OdfNamespaces.Office, isoDate);
         if (!string.IsNullOrEmpty(styleName))
         {
-            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
         }
-        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        _writer.WriteString(isoDate);
-        _writer.WriteEndElement(); // text:p
-        _writer.WriteEndElement(); // table:cell
+        writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+        writer.WriteString(isoDate);
+        writer.WriteEndElement(); // text:p
+        writer.WriteEndElement(); // table:cell
     }
 
     /// <summary>
@@ -286,17 +328,35 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     {
         if (_disposed)
             return;
-        _writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
-        _writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "boolean");
-        _writer.WriteAttributeString("office", "boolean-value", OdfNamespaces.Office, value ? "true" : "false");
+        XmlWriter writer = CurrentWriter;
+        writer.WriteStartElement("table", "table-cell", OdfNamespaces.Table);
+        writer.WriteAttributeString("office", "value-type", OdfNamespaces.Office, "boolean");
+        writer.WriteAttributeString("office", "boolean-value", OdfNamespaces.Office, value ? "true" : "false");
         if (!string.IsNullOrEmpty(styleName))
         {
-            _writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
+            writer.WriteAttributeString("table", "style-name", OdfNamespaces.Table, styleName);
         }
-        _writer.WriteStartElement("text", "p", OdfNamespaces.Text);
-        _writer.WriteString(value ? "TRUE" : "FALSE");
-        _writer.WriteEndElement(); // text:p
-        _writer.WriteEndElement(); // table:cell
+        writer.WriteStartElement("text", "p", OdfNamespaces.Text);
+        writer.WriteString(value ? "TRUE" : "FALSE");
+        writer.WriteEndElement(); // text:p
+        writer.WriteEndElement(); // table:cell
+    }
+
+    /// <summary>
+    /// 將既有 DOM 子樹直接寫入目前工作表或資料列位置。
+    /// </summary>
+    /// <param name="node">要寫入的 DOM 節點</param>
+    /// <exception cref="ArgumentNullException">當 <paramref name="node"/> 為 null 時擲出</exception>
+    public void WriteNode(OdfNode node)
+    {
+        if (node is null)
+            throw new ArgumentNullException(nameof(node));
+        if (_disposed)
+            return;
+
+        Dictionary<string, string> namespaces = CreateFragmentNamespaceMap(node);
+        int openElementsCount = 0;
+        OdfXmlWriter.WriteNode(node, CurrentWriter, namespaces, ref openElementsCount, isRoot: false, depth: 1);
     }
 
     private static string ToStringValue(ReadOnlySpan<char> value)
@@ -372,6 +432,85 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// 將 <see cref="DbDataReader"/> 目前結果集以低記憶體方式逐列寫入目前工作表。
+    /// </summary>
+    /// <param name="reader">資料來源讀取器</param>
+    /// <param name="includeColumnNames">是否先寫入資料行名稱列</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步寫入作業的工作</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="reader"/> 為 null 時擲出</exception>
+    /// <exception cref="ObjectDisposedException">當寫入器已釋放時擲出</exception>
+    /// <exception cref="InvalidOperationException">當目前尚未開始任何工作表時擲出</exception>
+    public async Task WriteDataAsync(
+        DbDataReader reader,
+        bool includeColumnNames = false,
+        CancellationToken cancellationToken = default)
+    {
+        if (reader is null)
+        {
+            throw new ArgumentNullException(nameof(reader));
+        }
+
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(OdsStreamWriter));
+        }
+
+        if (!_isSheetStarted)
+        {
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdsStreamWriter_SheetNotStarted"));
+        }
+
+        if (includeColumnNames)
+        {
+            WriteStartRow();
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                WriteCell(reader.GetName(i));
+            }
+            WriteEndRow();
+        }
+
+        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            WriteStartRow();
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                WriteCellValue(reader.IsDBNull(i) ? null : reader.GetValue(i));
+            }
+            WriteEndRow();
+        }
+    }
+
+    private void WriteCellValue(object? value)
+    {
+        switch (value)
+        {
+            case null:
+            case DBNull:
+                WriteCell(string.Empty);
+                break;
+            case string text:
+                WriteCell(text);
+                break;
+            case bool boolean:
+                WriteCell(boolean);
+                break;
+            case DateTime dateTime:
+                WriteCell(dateTime);
+                break;
+            case byte or sbyte or short or ushort or int or uint or long or ulong or float or double or decimal:
+                WriteCell(Convert.ToDouble(value, CultureInfo.InvariantCulture));
+                break;
+            default:
+                WriteCell(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+                break;
+        }
+    }
+
+    /// <summary>
     /// 結束目前資料列的寫入。
     /// </summary>
     public void WriteEndRow()
@@ -380,7 +519,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             return;
         if (_isRowStarted)
         {
-            _writer.WriteEndElement(); // table-row
+            CurrentWriter.WriteEndElement(); // table-row
             _isRowStarted = false;
         }
     }
@@ -396,7 +535,8 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             WriteEndRow();
         if (_isSheetStarted)
         {
-            _writer.WriteEndElement(); // table:table
+            if (_activeSheetBuffer is null)
+                _writer.WriteEndElement(); // table:table
             _isSheetStarted = false;
         }
     }
@@ -427,24 +567,35 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     {
         if (_disposed)
             return;
-        _disposed = true;
 
         if (disposing)
         {
+            bool hasBufferedSheets = _sheetBuffers.Count > 0;
             if (_isSheetStarted)
                 WriteEndSheet();
 
-            // 關閉 spreadsheet、body、document-content 標籤
-            _writer.WriteEndElement(); // office:spreadsheet
-            _writer.WriteEndElement(); // office:body
-            _writer.WriteEndElement(); // office:document-content
-            _writer.WriteEndDocument();
-
-            try
-            { _writer.Dispose(); }
-            catch (Exception ex)
+            if (hasBufferedSheets)
             {
-                OdfKitDiagnostics.Warn($"OdsStreamWriter 釋放 XmlWriter 時發生次要錯誤：{ex.Message}", ex);
+                WriteBufferedSheets();
+                WriteUtf8ToContent("</office:spreadsheet></office:body></office:document-content>");
+            }
+            else
+            {
+                // 關閉 spreadsheet、body、document-content 標籤
+                _writer.WriteEndElement(); // office:spreadsheet
+                _writer.WriteEndElement(); // office:body
+                _writer.WriteEndElement(); // office:document-content
+                _writer.WriteEndDocument();
+            }
+
+            if (!hasBufferedSheets)
+            {
+                try
+                { _writer.Dispose(); }
+                catch (Exception ex)
+                {
+                    OdfKitDiagnostics.Warn($"OdsStreamWriter 釋放 XmlWriter 時發生次要錯誤：{ex.Message}", ex);
+                }
             }
 
             try
@@ -462,7 +613,341 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             }
             _zip.Dispose();
         }
+
+        _disposed = true;
     }
 
     #endregion
+
+    private XmlWriter CurrentWriter => _activeSheetBuffer?.Writer ?? _writer;
+
+    /// <summary>
+    /// 並行產生多個工作表的 XML 片段，並依工作清單順序寫入目前 ODS 封裝。
+    /// </summary>
+    /// <param name="jobs">工作表寫入工作清單</param>
+    /// <param name="maxConcurrency">最大並行度；小於 1 時使用處理器核心數</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步寫入作業的工作</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="jobs"/> 為 null 時擲出</exception>
+    /// <exception cref="ObjectDisposedException">當寫入器已釋放時擲出</exception>
+    public async Task WriteSheetsAsync(
+        IEnumerable<OdsSheetWriteJob> jobs,
+        int maxConcurrency = 0,
+        CancellationToken cancellationToken = default)
+    {
+        if (jobs is null)
+        {
+            throw new ArgumentNullException(nameof(jobs));
+        }
+
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(OdsStreamWriter));
+        }
+
+        if (_isRowStarted)
+        {
+            WriteEndRow();
+        }
+
+        if (_isSheetStarted)
+        {
+            WriteEndSheet();
+        }
+
+        OdsSheetWriteJob[] jobArray = jobs.ToArray();
+        if (jobArray.Length == 0)
+        {
+            return;
+        }
+
+        int concurrency = OdfParallelScheduler.GetEffectiveConcurrency(maxConcurrency);
+        using SemaphoreSlim semaphore = new(concurrency);
+        SheetBuffer[] buffers = new SheetBuffer[jobArray.Length];
+        Task[] tasks = new Task[jobArray.Length];
+        for (int index = 0; index < jobArray.Length; index++)
+        {
+            int jobIndex = index;
+            tasks[jobIndex] = Task.Run(async () =>
+            {
+                await semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    OdsSheetWriteJob job = jobArray[jobIndex];
+                    var buffer = new SheetBuffer(job.SheetName);
+                    var sheetWriter = new OdsSheetWriter(buffer.Writer);
+                    await job.WriteAsync(sheetWriter, cancellationToken).ConfigureAwait(false);
+                    sheetWriter.CloseOpenRow();
+                    buffer.Close();
+                    buffers[jobIndex] = buffer;
+                }
+                catch
+                {
+                    buffers[jobIndex]?.Dispose();
+                    throw;
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            }, cancellationToken);
+        }
+
+        try
+        {
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+            foreach (SheetBuffer buffer in buffers)
+            {
+                _sheetBuffers.Add(buffer);
+            }
+        }
+        catch
+        {
+            foreach (SheetBuffer? buffer in buffers)
+            {
+                buffer?.Dispose();
+            }
+
+            throw;
+        }
+    }
+
+    private void WriteBufferedSheets()
+    {
+        _writer.Flush();
+        foreach (SheetBuffer sheet in _sheetBuffers)
+        {
+            sheet.Close();
+            WriteUtf8ToContent(sheet.GetXml());
+            sheet.Dispose();
+        }
+
+        _sheetBuffers.Clear();
+        _sheetBuffersByName.Clear();
+        _activeSheetBuffer = null;
+    }
+
+    private void WriteUtf8ToContent(string xml)
+    {
+        byte[] bytes = Encoding.UTF8.GetBytes(xml);
+        _contentEntryStream.Write(bytes, 0, bytes.Length);
+    }
+
+    private static Dictionary<string, string> CreateFragmentNamespaceMap(OdfNode node)
+    {
+        Dictionary<string, string> namespaces = new(StringComparer.Ordinal)
+        {
+            [OdfNamespaces.Office] = "office",
+            [OdfNamespaces.Table] = "table",
+            [OdfNamespaces.Text] = "text",
+            [OdfNamespaces.Style] = "style",
+            [OdfNamespaces.Fo] = "fo",
+            [OdfNamespaces.Draw] = "draw",
+            [OdfNamespaces.XLink] = "xlink"
+        };
+
+        if (!string.IsNullOrEmpty(node.NamespaceUri) && !namespaces.ContainsKey(node.NamespaceUri))
+            namespaces[node.NamespaceUri] = node.Prefix ?? string.Empty;
+
+        return namespaces;
+    }
+
+    private sealed class SheetBuffer : IDisposable
+    {
+        private readonly MemoryStream _stream = new();
+        private bool _closed;
+
+        public SheetBuffer(string sheetName)
+        {
+            Writer = XmlWriter.Create(
+                _stream,
+                new XmlWriterSettings
+                {
+                    Encoding = new UTF8Encoding(false),
+                    Indent = false,
+                    ConformanceLevel = ConformanceLevel.Fragment
+                });
+            Writer.WriteStartElement("table", "table", OdfNamespaces.Table);
+            Writer.WriteAttributeString("table", "name", OdfNamespaces.Table, sheetName);
+        }
+
+        public XmlWriter Writer { get; }
+
+        public void Close()
+        {
+            if (_closed)
+                return;
+
+            Writer.WriteEndElement();
+            Writer.Flush();
+            _closed = true;
+        }
+
+        public string GetXml()
+        {
+            Close();
+            return Encoding.UTF8.GetString(_stream.ToArray());
+        }
+
+        public void Dispose()
+        {
+            Writer.Dispose();
+            _stream.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// 將 ODS 文件寫入作業轉換為非同步的唯讀記憶體位元組資料流，可用於 Chunked HTTP 傳輸。
+    /// </summary>
+    /// <param name="writeAction">執行寫入的非同步委派</param>
+    /// <param name="version">要寫入的 ODF 規格版本</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>非同步唯讀記憶體位元組區段的列舉器</returns>
+    public static async IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
+        Func<OdsStreamWriter, Task> writeAction,
+        OdfVersion version = OdfVersion.Odf14,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        if (writeAction is null)
+            throw new ArgumentNullException(nameof(writeAction));
+
+        var stream = new AsyncProducerConsumerStream();
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                using (var writer = new OdsStreamWriter(stream, version))
+                {
+                    await writeAction(writer).ConfigureAwait(false);
+                }
+                stream.Complete();
+            }
+            catch (Exception ex)
+            {
+                stream.Fault(ex);
+            }
+        }, cancellationToken);
+
+        while (true)
+        {
+            var chunk = await stream.ReadChunkAsync(cancellationToken).ConfigureAwait(false);
+            if (chunk is null)
+                break;
+
+            yield return chunk;
+        }
+    }
+
+    /// <summary>
+    /// 將 ODS 文件寫入作業轉換為非同步的唯讀記憶體位元組資料流，可用於 Chunked HTTP 傳輸。
+    /// </summary>
+    /// <param name="writeAction">執行寫入的同步委派</param>
+    /// <param name="version">要寫入的 ODF 規格版本</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>非同步唯讀記憶體位元組區段的列舉器</returns>
+    public static async IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
+        Action<OdsStreamWriter> writeAction,
+        OdfVersion version = OdfVersion.Odf14,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        if (writeAction is null)
+            throw new ArgumentNullException(nameof(writeAction));
+
+        var stream = new AsyncProducerConsumerStream();
+
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                using (var writer = new OdsStreamWriter(stream, version))
+                {
+                    writeAction(writer);
+                }
+                stream.Complete();
+            }
+            catch (Exception ex)
+            {
+                stream.Fault(ex);
+            }
+        }, cancellationToken);
+
+        while (true)
+        {
+            var chunk = await stream.ReadChunkAsync(cancellationToken).ConfigureAwait(false);
+            if (chunk is null)
+                break;
+
+            yield return chunk;
+        }
+    }
+
+    private sealed class AsyncProducerConsumerStream : Stream
+    {
+        private readonly System.Collections.Concurrent.ConcurrentQueue<byte[]> _queue = new();
+        private readonly SemaphoreSlim _semaphore = new(0);
+        private bool _isCompleted;
+        private Exception? _exception;
+
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => true;
+        public override long Length => throw new NotSupportedException();
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+
+        public void Complete()
+        {
+            _isCompleted = true;
+            _semaphore.Release();
+        }
+
+        public void Fault(Exception ex)
+        {
+            _exception = ex;
+            _isCompleted = true;
+            _semaphore.Release();
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            if (count == 0)
+                return;
+            var copy = new byte[count];
+            Buffer.BlockCopy(buffer, offset, copy, 0, count);
+            _queue.Enqueue(copy);
+            _semaphore.Release();
+        }
+
+        public async Task<byte[]?> ReadChunkAsync(CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                if (_queue.TryDequeue(out var chunk))
+                {
+                    return chunk;
+                }
+
+                if (_isCompleted)
+                {
+                    if (_exception is not null)
+                    {
+                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(_exception).Throw();
+                    }
+                    return null;
+                }
+
+                await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        public override void Flush() { }
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+    }
 }

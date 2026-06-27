@@ -1,10 +1,14 @@
 ﻿using System.Text;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using OdfKit.Chart;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Formula;
 using OdfKit.Spreadsheet;
 using OdfKit.Styles;
 using Xunit;
@@ -379,6 +383,57 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證工作表可一鍵建立自動篩選與排序資料庫範圍。
+    /// </summary>
+    [Fact]
+    public void SheetAutoFilterAndSortCreateDatabaseRanges()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Sheet1");
+
+        OdfDatabaseRange filterRange = sheet.AutoFilter("A1:C10");
+        filterRange.SetFilter((1, "=", "Active"));
+        sheet.Sort("A1:C10", (2, false), (0, true));
+        sheet.Ranges["D1:E5"].AutoFilter().Sort((1, true));
+
+        OdfDatabaseRangeInfo[] ranges = document.GetDatabaseRanges().ToArray();
+        Assert.Equal(4, ranges.Length);
+
+        OdfDatabaseRangeInfo autoFilter = Assert.Single(ranges, range => range.Name == "Sheet1_AutoFilter_1");
+        Assert.True(autoFilter.DisplayFilterButtons);
+        Assert.Equal("Sheet1.A1:.C10", autoFilter.TargetRangeAddress);
+        Assert.Single(autoFilter.FilterConditions);
+        Assert.Equal(1, autoFilter.FilterConditions[0].FieldNumber);
+        Assert.Equal("Active", autoFilter.FilterConditions[0].Value);
+
+        OdfDatabaseRangeInfo sort = Assert.Single(ranges, range => range.Name == "Sheet1_Sort_2");
+        Assert.False(sort.DisplayFilterButtons);
+        Assert.Equal(2, sort.SortRules.Count);
+        Assert.Equal(2, sort.SortRules[0].FieldNumber);
+        Assert.False(sort.SortRules[0].Ascending);
+        Assert.Equal(0, sort.SortRules[1].FieldNumber);
+        Assert.True(sort.SortRules[1].Ascending);
+
+        OdfDatabaseRangeInfo selectionFilter = Assert.Single(ranges, range => range.Name == "Sheet1_AutoFilter_3");
+        OdfDatabaseRangeInfo selectionSort = Assert.Single(ranges, range => range.Name == "Sheet1_Sort_4");
+        Assert.Equal("Sheet1.D1:.E5", selectionFilter.TargetRangeAddress);
+        Assert.Equal("Sheet1.D1:.E5", selectionSort.TargetRangeAddress);
+        Assert.True(selectionFilter.DisplayFilterButtons);
+        Assert.Single(selectionSort.SortRules);
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+        using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(stream, fileName: "filter-sort.ods");
+
+        OdfDatabaseRangeInfo reloadedFilter = Assert.Single(
+            reloaded.GetDatabaseRanges(),
+            range => range.Name == "Sheet1_AutoFilter_1");
+        Assert.True(reloadedFilter.DisplayFilterButtons);
+        Assert.Single(reloadedFilter.FilterConditions);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="SpreadsheetDocument.GetPivotTables"/> 可讀回樞紐分析表欄位、排序與篩選設定。
     /// </summary>
     [Fact]
@@ -486,6 +541,345 @@ public class SpreadsheetHighLevelApiTests
         OdfSheetFrozenPanesInfo info = document.GetFrozenPanes()[0];
         Assert.Equal("Report", info.SheetName);
         Assert.Equal(new OdfFrozenPanes(2, 1), info.FrozenPanes);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfTableSheet.UnmergeCells(string)"/> 會移除 span 屬性並還原 covered cell。
+    /// </summary>
+    [Fact]
+    public void UnmergeCellsRestoresCoveredCells()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Report");
+
+        sheet.MergeCells(new OdfCellRange(0, 0, 1, 1));
+        Assert.Equal("2", sheet.Cells["A1"].Node.GetAttribute("number-columns-spanned", OdfNamespaces.Table));
+        Assert.Equal("covered-table-cell", sheet.Cells["B2"].Node.LocalName);
+
+        sheet.UnmergeCells("A1:B2");
+
+        Assert.Null(sheet.Cells["A1"].Node.GetAttribute("number-columns-spanned", OdfNamespaces.Table));
+        Assert.Null(sheet.Cells["A1"].Node.GetAttribute("number-rows-spanned", OdfNamespaces.Table));
+        Assert.Equal("table-cell", sheet.Cells["B1"].Node.LocalName);
+        Assert.Equal("table-cell", sheet.Cells["A2"].Node.LocalName);
+        Assert.Equal("table-cell", sheet.Cells["B2"].Node.LocalName);
+    }
+
+    /// <summary>
+    /// 驗證範圍選取的 <see cref="OdfCellRangeSelection.Unmerge"/> 入口會委派取消合併。
+    /// </summary>
+    [Fact]
+    public void RangeSelectionUnmergeDelegatesToSheet()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Report");
+
+        sheet.Ranges["A1:B1"].Merge();
+        Assert.Equal("covered-table-cell", sheet.Cells["B1"].Node.LocalName);
+
+        sheet.Ranges["A1:B1"].Unmerge();
+
+        Assert.Null(sheet.Cells["A1"].Node.GetAttribute("number-columns-spanned", OdfNamespaces.Table));
+        Assert.Equal("table-cell", sheet.Cells["B1"].Node.LocalName);
+    }
+
+    /// <summary>
+    /// 驗證批次插入空列會以 <c>table:number-rows-repeated</c> 寫成單一列節點。
+    /// </summary>
+    [Fact]
+    public void InsertRowsUsesRepeatedRowForBatchEmptyRows()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Report");
+
+        sheet.InsertRows(0, 4);
+
+        TableTableRowElement row = Assert.IsType<TableTableRowElement>(Assert.Single(
+            sheet.TableNode.Children.Where(child => child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)));
+        Assert.Equal(4, row.NumberRowsRepeated);
+    }
+
+    /// <summary>
+    /// 驗證工作表可批次複製與移動列，並保留來源列內容順序。
+    /// </summary>
+    [Fact]
+    public void CopyRowsAndMoveRowsPreserveRowContentOrder()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Report");
+        sheet.Cells["A1"].CellValue = "A";
+        sheet.Cells["A2"].CellValue = "B";
+        sheet.Cells["A3"].CellValue = "C";
+
+        sheet.CopyRows(sourcePosition: 0, count: 2, targetPosition: 3);
+
+        Assert.Equal(["A", "B", "C", "A", "B"], ReadFirstColumnText(sheet));
+
+        sheet.MoveRows(sourcePosition: 0, count: 2, targetPosition: 3);
+
+        Assert.Equal(["C", "A", "B", "A", "B"], ReadFirstColumnText(sheet));
+    }
+
+    /// <summary>
+    /// 驗證工作表列操作會同步位移尚未具現化的稀疏匯入資料。
+    /// </summary>
+    [Fact]
+    public void SheetRowOperationsShiftSparseImportDataWithoutMaterializingCells()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Report");
+        var table = Assert.IsType<TableTableElement>(sheet.TableNode);
+        DataTable dataTable = new();
+        dataTable.Columns.Add("Name", typeof(string));
+        dataTable.Columns.Add("Qty", typeof(int));
+        for (int row = 0; row < 130; row++)
+        {
+            dataTable.Rows.Add($"Item {row}", row);
+        }
+
+        table.ImportData(dataTable);
+        table.SetSparseCellStyle(129, 1, "tail-style");
+        table.SetSparseCellFormula(129, 1, "of:=[.A130]");
+
+        sheet.InsertRows(1, 2);
+        sheet.CopyRows(sourcePosition: 3, count: 1, targetPosition: 5);
+        sheet.MoveRows(sourcePosition: 0, count: 1, targetPosition: 4);
+        sheet.DeleteRows(1, 1);
+
+        Dictionary<(int Row, int Column), OdfCellData> views = ReadCellViews(table);
+        Assert.Empty(table.TableTableRowChildElements.Where(row => row.TableTableCellChildElements.Any()));
+        Assert.Equal("Item 1", views[(1, 0)].Text);
+        Assert.Equal("Item 2", views[(2, 0)].Text);
+        Assert.Equal("Item 0", views[(3, 0)].Text);
+        Assert.Equal("Item 1", views[(4, 0)].Text);
+        Assert.Equal(129, views[(131, 1)].Number);
+        Assert.Equal("tail-style", views[(131, 1)].StyleName);
+        Assert.Equal("of:=[.A130]", views[(131, 1)].Formula);
+    }
+
+    /// <summary>
+    /// 驗證工作表層級 <see cref="OdfTableSheet.PruneAndCollect"/> 會從試算表 DOM 移除該工作表。
+    /// </summary>
+    [Fact]
+    public void SheetPruneAndCollectRemovesSheetFromWorkbook()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet first = document.AddSheet("Keep");
+        OdfTableSheet second = document.AddSheet("Archive");
+        second.Cells["A1"].CellValue = "待剪裁";
+
+        int prunedCount = second.PruneAndCollect();
+
+        Assert.True(prunedCount >= 3);
+        Assert.Single(document.GetSheets());
+        Assert.NotNull(document.GetSheet("Keep"));
+        Assert.Null(document.GetSheet("Archive"));
+        Assert.Equal("Keep", first.Name);
+    }
+
+    /// <summary>
+    /// 驗證工作表剪裁會同步釋放高階集合 facade 快取。
+    /// </summary>
+    [Fact]
+    public void SheetPruneAndCollectReleasesFacadeCaches()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Archive");
+
+        _ = sheet.Cells;
+        _ = sheet.Rows;
+        _ = sheet.Columns;
+        _ = sheet.Ranges;
+        Assert.Equal(4, sheet.FacadeCacheCount);
+
+        sheet.PruneAndCollect();
+
+        Assert.Equal(0, sheet.FacadeCacheCount);
+        Assert.Empty(document.GetSheets());
+    }
+
+    /// <summary>
+    /// 驗證工作表 facade 快取可在不剪裁 DOM 的情況下主動釋放，後續仍可重新存取資料。
+    /// </summary>
+    [Fact]
+    public void SheetReleaseFacadeCachesKeepsWorkbookContent()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Data");
+        sheet.Cells["A1"].CellValue = "保留資料";
+
+        _ = sheet.Rows;
+        _ = sheet.Columns;
+        _ = sheet.Ranges;
+        Assert.Equal(4, sheet.FacadeCacheCount);
+
+        sheet.ReleaseFacadeCaches();
+
+        Assert.Equal(0, sheet.FacadeCacheCount);
+        Assert.Single(document.GetSheets());
+        Assert.Equal("保留資料", sheet.Cells["A1"].CellValue);
+        Assert.Equal(1, sheet.FacadeCacheCount);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="SpreadsheetDocument.AdoptSheet"/> 會將來源工作表移入目標活頁簿並可往返儲存。
+    /// </summary>
+    [Fact]
+    public void AdoptSheetMovesSheetBetweenWorkbooksAndRoundTrips()
+    {
+        using var source = SpreadsheetDocument.Create();
+        OdfTableSheet sourceSheet = source.AddSheet("Imported");
+        sourceSheet.Cells["A1"].CellValue = "跨文件資料";
+        sourceSheet.GroupRows(0, 0, collapsed: true);
+
+        using var target = SpreadsheetDocument.Create();
+        target.AddSheet("Main");
+
+        OdfTableSheet adopted = target.Worksheets.Adopt(sourceSheet, "Adopted");
+
+        Assert.Null(source.GetSheet("Imported"));
+        Assert.Equal(2, target.Worksheets.Count);
+        Assert.Equal("Adopted", adopted.Name);
+        Assert.Equal("跨文件資料", adopted.Cells["A1"].CellValue);
+
+        using var stream = new MemoryStream();
+        target.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(stream, "adopted.ods");
+        OdfTableSheet reloadedSheet = reloaded.Worksheets["Adopted"];
+
+        Assert.Equal("跨文件資料", reloadedSheet.Cells["A1"].CellValue);
+        string contentXml = ReadZipEntry(stream, "content.xml");
+        Assert.Contains("table:table-row-group", contentXml);
+        Assert.Contains("table:display=\"false\"", contentXml);
+    }
+
+    private static string[] ReadFirstColumnText(OdfTableSheet sheet)
+        => sheet.TableNode.Children
+            .Where(row => row.LocalName == "table-row" && row.NamespaceUri == OdfNamespaces.Table)
+            .Select(row => row.Children.First(cell => cell.LocalName == "table-cell" && cell.NamespaceUri == OdfNamespaces.Table).TextContent ?? string.Empty)
+            .ToArray();
+
+    private static Dictionary<(int Row, int Column), OdfCellData> ReadCellViews(TableTableElement table)
+    {
+        var cells = new Dictionary<(int Row, int Column), OdfCellData>();
+        foreach (OdfCellView view in table.EnumerateCellViews())
+        {
+            cells[(view.RowIndex, view.ColumnIndex)] = view.Data;
+        }
+
+        return cells;
+    }
+
+    private static string ReadZipEntry(Stream stream, string entryName)
+    {
+        stream.Position = 0;
+        using var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        ZipArchiveEntry entry = archive.GetEntry(entryName)!;
+        using Stream entryStream = entry.Open();
+        using var reader = new StreamReader(entryStream, Encoding.UTF8);
+        return reader.ReadToEnd();
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfExternalLinkManager"/> 可透過載入委派解析跨文件公式參照。
+    /// </summary>
+    [Fact]
+    public void ExternalLinkManagerResolvesFormulaReferences()
+    {
+        using var external = SpreadsheetDocument.Create();
+        OdfTableSheet externalSheet = external.AddSheet("Sheet1");
+        externalSheet.Cells["A1"].CellValue = 41d;
+
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Main");
+        sheet.Cells["A1"].Formula = "='file:///external.ods#$Sheet1'!A1+1";
+        document.ExternalLinks.DocumentResolver = documentId =>
+            documentId == "file:///external.ods" ? external : null;
+
+        document.EvaluateFormulas();
+
+        Assert.Equal(42d, sheet.Cells["A1"].CellValue);
+    }
+
+    /// <summary>
+    /// 驗證公式重算會將同一拓撲層的互不相依公式以並行 DAG 批次處理。
+    /// </summary>
+    [Fact]
+    public void EvaluateFormulasUsesParallelDagLevelsForIndependentBranches()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Main");
+        sheet.Cells["A1"].CellValue = 1d;
+        sheet.Cells["B1"].CellValue = 2d;
+        sheet.Cells["A2"].Formula = "=A1+1";
+        sheet.Cells["B2"].Formula = "=B1+1";
+        sheet.Cells["C3"].Formula = "=A2+B2";
+
+        document.EvaluateFormulas();
+
+        Assert.Equal(2d, sheet.Cells["A2"].CellValue);
+        Assert.Equal(3d, sheet.Cells["B2"].CellValue);
+        Assert.Equal(5d, sheet.Cells["C3"].CellValue);
+        Assert.True(FormulaDocumentEvaluationEngine.LastParallelFormulaLevelCountForTests >= 2);
+        Assert.True(FormulaDocumentEvaluationEngine.LastParallelFormulaMaxLevelWidthForTests >= 2);
+        Assert.True(FormulaDocumentEvaluationEngine.LastParallelFormulaWorkerDegreeForTests >= 1);
+    }
+
+    /// <summary>
+    /// 驗證存檔時公式重算會使用試算表文件上的跨文件連結管理器。
+    /// </summary>
+    [Fact]
+    public void EvaluateFormulasOnSaveUsesSpreadsheetExternalLinks()
+    {
+        using var external = SpreadsheetDocument.Create();
+        OdfTableSheet externalSheet = external.AddSheet("Sheet1");
+        externalSheet.Cells["A1"].CellValue = 41d;
+
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Main");
+        sheet.Cells["A1"].Formula = "='file:///external.ods#$Sheet1'!A1+1";
+        document.ExternalLinks.DocumentResolver = documentId =>
+            documentId == "file:///external.ods" ? external : null;
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream, new OdfSaveOptions { EvaluateFormulasOnSave = true });
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        OdfNode root = OdfXmlReader.Parse(contentStream);
+        OdfNode cell = root.Descendants()
+            .First(node => node.LocalName == "table-cell" && node.NamespaceUri == OdfNamespaces.Table);
+
+        Assert.Equal("float", cell.GetAttribute("value-type", OdfNamespaces.Office));
+        Assert.Equal("42", cell.GetAttribute("value", OdfNamespaces.Office));
+        Assert.Equal("42", cell.TextContent);
+    }
+
+    /// <summary>
+    /// 驗證外部連結快取值會保存至 settings.xml，並在重新載入後供公式評估使用。
+    /// </summary>
+    [Fact]
+    public void ExternalLinkCachedValuesRoundTripThroughSettings()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Main");
+        sheet.Cells["A1"].Formula = "='file:///external.ods#$Sheet1'!A1+1";
+        document.ExternalLinks.SetCachedValue(
+            "file:///external.ods",
+            "Sheet1",
+            new OdfCellAddress(0, 0),
+            41d);
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+
+        using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(stream, fileName: "cached.ods");
+        OdfTableSheet reloadedSheet = reloaded.GetSheet("Main")!;
+        reloaded.EvaluateFormulas();
+
+        Assert.Equal(42d, reloadedSheet.Cells["A1"].CellValue);
     }
 
     /// <summary>
@@ -723,7 +1117,82 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證列欄群組 GroupRows / UngroupRows / GroupColumns / UngroupColumns API。
+    /// 驗證儲存格富文字鏈式 API 會將換行輸出為 ODF 節點並啟用自動換行。
+    /// </summary>
+    [Fact]
+    public void CellRichTextFluentApiWritesLineBreakAndWrapStyle()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.AddSheet("Sheet1");
+        var cell = sheet.GetCell(0, 0);
+
+        cell.RichText
+            .Clear()
+            .Append("第一行", bold: true)
+            .LineBreak()
+            .Append("第二行", italic: true, color: new OdfKit.DOM.OdfColor("#336699"));
+
+        Assert.Equal("第一行\n第二行", cell.DisplayText);
+        Assert.Equal("wrap", doc.StyleEngine.GetStyleProperty(cell.StyleName!, "wrap-option", OdfNamespaces.Fo, "table-cell"));
+
+        using var stream = new MemoryStream();
+        doc.SaveToStream(stream);
+        stream.Position = 0;
+        using var pkg = OdfKit.Core.OdfPackage.Open(stream, leaveOpen: true);
+        using var contentStream = pkg.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+
+        Assert.Contains("text:span", xml);
+        Assert.Contains("text:line-break", xml);
+        Assert.Contains("fo:wrap-option=\"wrap\"", xml);
+        Assert.Contains("#336699", xml);
+    }
+
+    /// <summary>
+    /// 驗證儲存格可直接追加 HTML / Markdown 行內富文字。
+    /// </summary>
+    [Fact]
+    public void CellAppendHtmlAndMarkdownCreatesRichTextRuns()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.AddSheet("Sheet1");
+        var cell = sheet.GetCell(0, 0);
+
+        cell.SetValue("開頭 ");
+        cell
+            .AppendHtml("<b>粗體</b><br><span style=\"font-style:italic; text-decoration:underline; color:blue\">提示</span>")
+            .AppendMarkdown(" **標記**");
+
+        OdfRichText richText = Assert.IsType<OdfRichText>(cell.GetRichText());
+        Assert.Equal("開頭 粗體\n提示 標記", cell.DisplayText);
+        Assert.Contains(richText.Runs, run => run.Text == "開頭");
+        OdfRichTextRun boldRun = Assert.Single(richText.Runs, run => run.Text == "粗體");
+        OdfRichTextRun noticeRun = Assert.Single(richText.Runs, run => run.Text == "提示");
+        OdfRichTextRun markdownRun = Assert.Single(richText.Runs, run => run.Text == "標記");
+        Assert.Contains(richText.Runs, run => run.Text == "\n");
+        Assert.True(boldRun.Bold);
+        Assert.True(noticeRun.Italic);
+        Assert.True(noticeRun.Underline);
+        Assert.Equal("#0000FF", noticeRun.Color?.Value);
+        Assert.True(markdownRun.Bold);
+
+        using var stream = new MemoryStream();
+        doc.SaveToStream(stream);
+        stream.Position = 0;
+        using var pkg = OdfPackage.Open(stream, leaveOpen: true);
+        using var contentStream = pkg.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+
+        Assert.Contains("text:span", xml);
+        Assert.Contains("text:line-break", xml);
+        Assert.Contains("font-weight=\"bold\"", xml);
+        Assert.Contains("#0000FF", xml);
+    }
+
+    /// <summary>
+    /// 驗證列欄群組 GroupRows / Rows.Group / GroupColumns / Columns.Group API。
     /// </summary>
     [Fact]
     public void RowColumnGroupApiWorksCorrectly()
@@ -735,8 +1204,8 @@ public class SpreadsheetHighLevelApiTests
         for (int r = 0; r < 5; r++)
             sheet.GetCell(r, 0).SetValue(r + 1.0);
 
-        // 1. GroupRows — 群組第 1~3 列（collapsed = false）
-        sheet.GroupRows(1, 3);
+        // 1. Rows.Group — 群組第 1~3 列（collapsed = false）
+        sheet.Rows.Group(1, 3);
 
         // 2. 群組後儲存並驗證 XML
         using var ms1 = new MemoryStream();
@@ -751,8 +1220,8 @@ public class SpreadsheetHighLevelApiTests
             Assert.Contains("table:display=\"true\"", xml1);
         }
 
-        // 3. GroupRows collapsed
-        sheet.GroupRows(4, 4, collapsed: true);
+        // 3. Rows.Group collapsed
+        sheet.Rows.Group(4, 4, collapsed: true);
         using var ms2 = new MemoryStream();
         doc.SaveToStream(ms2);
         ms2.Position = 0;
@@ -764,9 +1233,9 @@ public class SpreadsheetHighLevelApiTests
             Assert.Contains("table:display=\"false\"", xml2);
         }
 
-        // 4. UngroupRows — 移除群組後 table-row-group 應消失
-        sheet.UngroupRows(1, 3);
-        sheet.UngroupRows(4, 4);
+        // 4. Rows.Ungroup — 移除群組後 table-row-group 應消失
+        sheet.Rows.Ungroup(1, 3);
+        sheet.Rows.Ungroup(4, 4);
         using var ms3 = new MemoryStream();
         doc.SaveToStream(ms3);
         ms3.Position = 0;
@@ -778,10 +1247,10 @@ public class SpreadsheetHighLevelApiTests
             Assert.DoesNotContain("table:table-row-group", xml3);
         }
 
-        // 5. GroupColumns
+        // 5. Columns.Group
         for (int c = 0; c < 4; c++)
             sheet.GetCell(0, c).SetValue(c + 1.0);
-        sheet.GroupColumns(1, 2);
+        sheet.Columns.Group(1, 2);
         using var ms4 = new MemoryStream();
         doc.SaveToStream(ms4);
         ms4.Position = 0;
@@ -792,6 +1261,9 @@ public class SpreadsheetHighLevelApiTests
             string xml4 = r4.ReadToEnd();
             Assert.Contains("table:table-column-group", xml4);
         }
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => sheet.Rows.Group(3, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => sheet.Columns.Group(-1, 0));
     }
 
     /// <summary>
@@ -830,4 +1302,45 @@ public class SpreadsheetHighLevelApiTests
         OdfCell loadedCell = loaded.Worksheets["Sheet1"].Cells["A1"];
         Assert.Equal("邊框測試", loadedCell.CellValue);
     }
+
+    /// <summary>
+    /// 驗證範圍框線與對齊 facade 會依外框、內框與所有儲存格分別套用樣式。
+    /// </summary>
+    [Fact]
+    public void RangeBordersAndAlignmentApplyToBoundaryAndInteriorCells()
+    {
+        using var document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.AddSheet("Sheet1");
+        var outer = new OdfBorder(OdfBorder.BorderStyle.Solid, OdfLength.FromPoints(1), System.Drawing.Color.Black);
+        var inner = new OdfBorder(OdfBorder.BorderStyle.Dotted, OdfLength.FromPoints(0.5), System.Drawing.Color.Blue);
+
+        OdfCellRangeSelection range = sheet.Ranges["A1:C3"];
+        range.Borders.SetGrid(outer, inner);
+        range.HorizontalAlignment = "center";
+
+        Assert.Equal("1pt solid #000000", GetCellStyle(sheet.Cells["A1"], "border-top"));
+        Assert.Equal("1pt solid #000000", GetCellStyle(sheet.Cells["A1"], "border-left"));
+        Assert.Equal("0.5pt dotted #0000FF", GetCellStyle(sheet.Cells["A1"], "border-bottom"));
+        Assert.Equal("0.5pt dotted #0000FF", GetCellStyle(sheet.Cells["A1"], "border-right"));
+        Assert.Equal("0.5pt dotted #0000FF", GetCellStyle(sheet.Cells["B2"], "border-top"));
+        Assert.Equal("0.5pt dotted #0000FF", GetCellStyle(sheet.Cells["B2"], "border-bottom"));
+        Assert.Equal("1pt solid #000000", GetCellStyle(sheet.Cells["C3"], "border-bottom"));
+        Assert.Equal("1pt solid #000000", GetCellStyle(sheet.Cells["C3"], "border-right"));
+        Assert.Equal("center", document.StyleEngine.GetStyleProperty(sheet.Cells["B2"].StyleName!, "text-align", OdfNamespaces.Fo, "table-cell"));
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+
+        Assert.Contains("fo:border-top=\"1pt solid #000000\"", xml);
+        Assert.Contains("fo:border-bottom=\"0.5pt dotted #0000FF\"", xml);
+        Assert.Contains("fo:text-align=\"center\"", xml);
+    }
+
+    private static string? GetCellStyle(OdfCell cell, string propertyName) =>
+        cell.Document.StyleEngine.GetStyleProperty(cell.StyleName!, propertyName, OdfNamespaces.Fo, "table-cell");
 }

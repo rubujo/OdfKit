@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawPageElement(string? prefix = null) : base("page", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawPageElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXmlName? DrawId
         {
             get => GetXmlNameAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

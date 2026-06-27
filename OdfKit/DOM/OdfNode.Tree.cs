@@ -26,6 +26,8 @@ public partial class OdfNode
         IsModified = true;
         child.Parent?.RemoveChild(child);
         Children.Append(child);
+        child.InvalidateStyle();
+        InvalidateStyle();
     }
 
     /// <summary>
@@ -54,6 +56,8 @@ public partial class OdfNode
         IsModified = true;
         newChild.Parent?.RemoveChild(newChild);
         Children.InsertBefore(newChild, refChild);
+        newChild.InvalidateStyle();
+        InvalidateStyle();
     }
 
     /// <summary>
@@ -82,6 +86,8 @@ public partial class OdfNode
         IsModified = true;
         newChild.Parent?.RemoveChild(newChild);
         Children.InsertAfter(newChild, refChild);
+        newChild.InvalidateStyle();
+        InvalidateStyle();
     }
 
     /// <summary>
@@ -101,6 +107,8 @@ public partial class OdfNode
 
         IsModified = true;
         Children.Remove(child);
+        child.InvalidateStyle();
+        InvalidateStyle();
     }
 
     /// <summary>

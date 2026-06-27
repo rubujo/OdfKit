@@ -22,7 +22,7 @@ public partial class OdfParagraph
     /// <summary>
     /// 取得與此段落相關聯的 OdfNode 節點。
     /// </summary>
-    internal OdfNode Node { get; }
+    internal OdfNode Node { get; set; }
 
     /// <summary>
     /// 取得所屬的文字文件。

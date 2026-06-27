@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public SvgLinearGradientElement(string? prefix = null) : base("linearGradient", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
 
+        public SvgLinearGradientElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? DisplayName
         {
             get => GetAttributeValue("display-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

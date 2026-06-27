@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeAnnotationEndElement(string? prefix = null) : base("annotation-end", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeAnnotationEndElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Name
         {
             get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", GetDocumentVersion());

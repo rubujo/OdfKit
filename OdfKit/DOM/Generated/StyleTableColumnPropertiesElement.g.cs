@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleTableColumnPropertiesElement(string? prefix = null) : base("table-column-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleTableColumnPropertiesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? BreakAfter
         {
             get => GetAttributeValue("break-after", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());

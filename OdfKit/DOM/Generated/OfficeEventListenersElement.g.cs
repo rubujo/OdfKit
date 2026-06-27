@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeEventListenersElement(string? prefix = null) : base("event-listeners", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeEventListenersElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<PresentationEventListenerElement> PresentationEventListenerChildElements
         {
             get => ChildElements<PresentationEventListenerElement>();

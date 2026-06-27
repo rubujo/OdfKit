@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeScriptElement(string? prefix = null) : base("script", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeScriptElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Language
         {
             get => GetAttributeValue("language", "urn:oasis:names:tc:opendocument:xmlns:script:1.0", GetDocumentVersion());

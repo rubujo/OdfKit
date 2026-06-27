@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleListLevelPropertiesElement(string? prefix = null) : base("list-level-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleListLevelPropertiesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? FontName
         {
             get => GetAttributeValue("font-name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

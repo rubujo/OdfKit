@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableSortByElement(string? prefix = null) : base("sort-by", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableSortByElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? DataType
         {
             get => GetAttributeValue("data-type", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

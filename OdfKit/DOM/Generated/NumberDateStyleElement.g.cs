@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberDateStyleElement(string? prefix = null) : base("date-style", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberDateStyleElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? AutomaticOrder
         {
             get => GetBooleanAttributeValue("automatic-order", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", GetDocumentVersion());

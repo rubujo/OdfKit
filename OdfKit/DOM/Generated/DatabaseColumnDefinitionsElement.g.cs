@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseColumnDefinitionsElement(string? prefix = null) : base("column-definitions", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseColumnDefinitionsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DatabaseColumnDefinitionElement> DatabaseColumnDefinitionChildElements
         {
             get => ChildElements<DatabaseColumnDefinitionElement>();

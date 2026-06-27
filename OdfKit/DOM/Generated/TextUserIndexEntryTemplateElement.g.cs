@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextUserIndexEntryTemplateElement(string? prefix = null) : base("user-index-entry-template", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextUserIndexEntryTemplateElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? OutlineLevel
         {
             get => GetNullableInt32AttributeValue("outline-level", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

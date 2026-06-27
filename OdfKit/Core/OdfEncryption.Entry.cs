@@ -161,8 +161,7 @@ public static partial class OdfEncryption
             }
             catch (Exception ex)
             {
-                throw new CryptographicException(
-                    $"GCM 解密失敗。診斷資訊：isArgon2={isArgon2}, kdfName='{kdfName}', derivationName='{derivationName}', derivedKeyLen={derivedKey?.Length}, ivLen={iv?.Length}, saltLen={salt?.Length}, ciphertextLen={ciphertext?.Length}. 原始錯誤：{ex.Message}", ex);
+                throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_GcmDecryptionFailed"), ex);
             }
         }
         else if (algorithmUri == Aes256AlgorithmUri)

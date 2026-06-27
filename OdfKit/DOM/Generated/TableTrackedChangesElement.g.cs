@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableTrackedChangesElement(string? prefix = null) : base("tracked-changes", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableTrackedChangesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? TrackChanges
         {
             get => GetBooleanAttributeValue("track-changes", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

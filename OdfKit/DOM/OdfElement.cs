@@ -188,6 +188,11 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
                 clone.SetAttribute(attr.Key.LocalName, attr.Key.NamespaceUri, attr.Value, attrPrefix);
             }
         }
+        if (deep && TryCopyLazyXmlStateTo(clone))
+        {
+            return clone;
+        }
+
         if (deep)
         {
             foreach (var child in Children)
@@ -196,6 +201,44 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
             }
         }
         return clone;
+    }
+
+    #endregion
+
+    #region ComputedStyle Cache
+
+    private OdfKit.Core.ComputedStyle? _computedStyle;
+    private bool _isStyleDirty = true;
+
+    /// <summary>
+    /// 取得此元素經過層疊繼承解析後的實質最終樣式。
+    /// </summary>
+    public OdfKit.Core.ComputedStyle ComputedStyle
+    {
+        get
+        {
+            if (_isStyleDirty || _computedStyle == null)
+            {
+                _computedStyle = OdfKit.Core.ComputedStyle.Resolve(this);
+                _isStyleDirty = false;
+            }
+            return _computedStyle;
+        }
+    }
+
+    /// <summary>
+    /// 使此元素及其所有子元素的層疊樣式快取失效。
+    /// </summary>
+    public override void InvalidateStyle()
+    {
+        if (!_isStyleDirty)
+        {
+            _isStyleDirty = true;
+            foreach (var child in Children)
+            {
+                child.InvalidateStyle();
+            }
+        }
     }
 
     #endregion

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public PresentationHeaderDeclElement(string? prefix = null) : base("header-decl", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
+        public PresentationHeaderDeclElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Name
         {
             get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());

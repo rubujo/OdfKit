@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseOrderStatementElement(string? prefix = null) : base("order-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseOrderStatementElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? ApplyCommand
         {
             get => GetBooleanAttributeValue("apply-command", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

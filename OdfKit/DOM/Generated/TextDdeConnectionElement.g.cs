@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextDdeConnectionElement(string? prefix = null) : base("dde-connection", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextDdeConnectionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? ConnectionName
         {
             get => GetAttributeValue("connection-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

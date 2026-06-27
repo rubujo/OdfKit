@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class SvgDescElement : OdfElement
     {
         public SvgDescElement(string? prefix = null) : base("desc", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", prefix) { }
+
+        public SvgDescElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

@@ -218,6 +218,17 @@ public sealed class DomWrappersCSharpWriter
             writer.WriteLine($"    public partial class {className} : OdfElement");
             writer.WriteLine("    {");
             writer.WriteLine($"        public {className}(string? prefix = null) : base(\"{element.LocalName}\", \"{element.NamespaceUri}\", prefix) {{ }}");
+            writer.WriteLine();
+            writer.WriteLine($"        public {className}(params OdfNode[] children) : this()");
+            writer.WriteLine("        {");
+            writer.WriteLine("            if (children is null)");
+            writer.WriteLine("                throw new ArgumentNullException(nameof(children));");
+            writer.WriteLine();
+            writer.WriteLine("            foreach (OdfNode child in children)");
+            writer.WriteLine("            {");
+            writer.WriteLine("                AppendChild(child);");
+            writer.WriteLine("            }");
+            writer.WriteLine("        }");
 
             var existingPropertyNames = new List<string>();
             if (elementAttributes.TryGetValue((element.NamespaceUri, element.LocalName), out var attrs))

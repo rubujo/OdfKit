@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextListStyleElement(string? prefix = null) : base("list-style", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextListStyleElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? ConsecutiveNumbering
         {
             get => GetBooleanAttributeValue("consecutive-numbering", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

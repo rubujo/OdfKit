@@ -969,6 +969,11 @@ public class OdfSchemaGeneratorTests
             Assert.Equal(2, wrapperFiles.Length);
             Assert.Contains(wrapperFiles, path => path.EndsWith("AlphaRootElement.g.cs", StringComparison.Ordinal));
             Assert.Contains(wrapperFiles, path => path.EndsWith("BetaRootElement.g.cs", StringComparison.Ordinal));
+
+            string alphaCode = File.ReadAllText(Path.Combine(outputDirectory, "AlphaRootElement.g.cs"), Encoding.UTF8);
+            Assert.Contains("public AlphaRootElement(params OdfNode[] children) : this()", alphaCode, StringComparison.Ordinal);
+            Assert.Contains("throw new ArgumentNullException(nameof(children));", alphaCode, StringComparison.Ordinal);
+            Assert.Contains("AppendChild(child);", alphaCode, StringComparison.Ordinal);
         }
         finally
         {

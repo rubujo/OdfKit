@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextPageContinuationElement(string? prefix = null) : base("page-continuation", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextPageContinuationElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfTextSelectPage? SelectPage
         {
             get => GetTextSelectPageAttributeValue("select-page", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

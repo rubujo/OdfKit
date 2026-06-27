@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawLayerSetElement(string? prefix = null) : base("layer-set", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawLayerSetElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DrawLayerElement> DrawLayerChildElements
         {
             get => ChildElements<DrawLayerElement>();

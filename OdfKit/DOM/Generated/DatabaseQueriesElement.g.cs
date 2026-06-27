@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseQueriesElement(string? prefix = null) : base("queries", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseQueriesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DatabaseQueryElement> DatabaseQueryChildElements
         {
             get => ChildElements<DatabaseQueryElement>();

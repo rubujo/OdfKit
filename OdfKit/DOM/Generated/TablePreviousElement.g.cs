@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TablePreviousElement(string? prefix = null) : base("previous", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TablePreviousElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Id
         {
             get => GetAttributeValue("id", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableHighlightedRangeElement(string? prefix = null) : base("highlighted-range", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableHighlightedRangeElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCellRangeAddress? CellRangeAddress
         {
             get => GetCellRangeAddressAttributeValue("cell-range-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeFormsElement(string? prefix = null) : base("forms", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeFormsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? ApplyDesignMode
         {
             get => GetBooleanAttributeValue("apply-design-mode", "urn:oasis:names:tc:opendocument:xmlns:form:1.0", GetDocumentVersion());

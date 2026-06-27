@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleTabStopElement(string? prefix = null) : base("tab-stop", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleTabStopElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCharacter? Char
         {
             get => GetCharacterAttributeValue("char", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

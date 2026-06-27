@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleTablePropertiesElement(string? prefix = null) : base("table-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleTablePropertiesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Align
         {
             get => GetAttributeValue("align", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

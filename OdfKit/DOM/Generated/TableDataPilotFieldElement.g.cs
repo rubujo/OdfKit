@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableDataPilotFieldElement(string? prefix = null) : base("data-pilot-field", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableDataPilotFieldElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfTableFunction? Function
         {
             get => GetTableFunctionAttributeValue("function", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextPageElement(string? prefix = null) : base("page", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextPageElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? MasterPageName
         {
             get => GetStyleNameAttributeValue("master-page-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

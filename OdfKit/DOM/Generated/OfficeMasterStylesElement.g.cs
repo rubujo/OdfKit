@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeMasterStylesElement(string? prefix = null) : base("master-styles", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeMasterStylesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DrawLayerSetElement> DrawLayerSetChildElements
         {
             get => ChildElements<DrawLayerSetElement>();

@@ -226,4 +226,27 @@ public class OdfValidatorApiTests
         Assert.False(report.IsValid, "插入未註冊命名空間的元素應使嚴格相容性設定檔驗證失敗。");
         Assert.NotEmpty(report.Issues);
     }
+
+    /// <summary>
+    /// 驗證文件級 <see cref="OdfDocument.Validate(OdfComplianceProfile?)"/> 會合併記憶體 DOM 拓撲檢查結果。
+    /// </summary>
+    [Fact]
+    public void DocumentInstance_Validate_DetectsInMemoryDomTopologyErrors()
+    {
+        using TextDocument doc = TextDocument.Create();
+        doc.AddParagraph("正常段落");
+        OdfNode orphanCell = OdfNodeFactory.CreateElement("table-cell", OdfNamespaces.Table, "table");
+        doc.ContentDom.AppendChild(orphanCell);
+
+        OdfValidationReport report = doc.Validate();
+
+        Assert.False(report.IsValid);
+        OdfValidationIssue issue = Assert.Single(
+            report.Issues,
+            issue => issue.RuleId == "Rule_Topology_OrphanCell");
+        Assert.Equal(OdfIssueSeverity.Error, issue.Severity);
+        Assert.Equal("content.xml", issue.PackagePath);
+        Assert.Contains("table-cell", issue.Message, StringComparison.Ordinal);
+        Assert.Contains("table-cell", issue.XPath, StringComparison.Ordinal);
+    }
 }

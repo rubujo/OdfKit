@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseServerDatabaseElement(string? prefix = null) : base("server-database", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseServerDatabaseElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? DatabaseName
         {
             get => GetAttributeValue("database-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextPageVariableGetElement(string? prefix = null) : base("page-variable-get", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextPageVariableGetElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? NumFormat
         {
             get => GetAttributeValue("num-format", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

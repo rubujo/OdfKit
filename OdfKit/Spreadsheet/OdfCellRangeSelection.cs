@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -10,6 +11,7 @@ namespace OdfKit.Spreadsheet;
 public sealed class OdfCellRangeSelection
 {
     private readonly OdfTableSheet _sheet;
+    private OdfRangeBorderProxy? _borders;
 
     /// <summary>
     /// 初始化 <see cref="OdfCellRangeSelection"/> 類別的新執行個體。
@@ -26,6 +28,37 @@ public sealed class OdfCellRangeSelection
     /// 取得此選取代表的儲存格範圍。
     /// </summary>
     public OdfCellRange Range { get; }
+
+    /// <summary>
+    /// 取得此範圍的框線設定代理。
+    /// </summary>
+    public OdfRangeBorderProxy Borders => _borders ??= new OdfRangeBorderProxy(_sheet, Range);
+
+    /// <summary>
+    /// 取得或設定此範圍所有儲存格的水平對齊方式。
+    /// </summary>
+    public string? HorizontalAlignment
+    {
+        get
+        {
+            OdfCell startCell = _sheet.GetCell(Range.StartAddress.Row, Range.StartAddress.Column);
+            return startCell.Document.StyleEngine.GetStyleProperty(startCell.StyleName ?? string.Empty, "text-align", OdfNamespaces.Fo, "table-cell");
+        }
+        set
+        {
+            foreach (OdfCell cell in EnumerateCells())
+            {
+                cell.Document.StyleEngine.SetLocalStyleProperty(
+                    cell.Node,
+                    "table-cell",
+                    "paragraph-properties",
+                    "text-align",
+                    OdfNamespaces.Fo,
+                    value,
+                    "fo");
+            }
+        }
+    }
 
     /// <summary>
     /// 取得一個值，指出此範圍是否已啟用保護。
@@ -145,6 +178,14 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// 取消合併此範圍的儲存格。
+    /// </summary>
+    public void Unmerge()
+    {
+        _sheet.UnmergeCells(Range);
+    }
+
+    /// <summary>
     /// 將此範圍加入命名範圍。
     /// </summary>
     /// <param name="name">命名範圍名稱</param>
@@ -161,6 +202,27 @@ public sealed class OdfCellRangeSelection
     public void AddFilter(string name, params (int fieldNumber, string op, string value)[] conditions)
     {
         _sheet.AddDatabaseRange(name, Range).SetFilter(conditions);
+    }
+
+    /// <summary>
+    /// 為此範圍啟用自動篩選按鈕。
+    /// </summary>
+    /// <returns>此範圍選取物件，方便鏈式呼叫</returns>
+    public OdfCellRangeSelection AutoFilter()
+    {
+        _sheet.AutoFilter(Range);
+        return this;
+    }
+
+    /// <summary>
+    /// 為此範圍設定排序規則。
+    /// </summary>
+    /// <param name="rules">排序規則陣列，包含欄位編號與是否遞增</param>
+    /// <returns>此範圍選取物件，方便鏈式呼叫</returns>
+    public OdfCellRangeSelection Sort(params (int fieldNumber, bool ascending)[] rules)
+    {
+        _sheet.Sort(Range, rules);
+        return this;
     }
 
     /// <summary>
@@ -181,6 +243,22 @@ public sealed class OdfCellRangeSelection
     public void AddValidationList(string name, params string[] allowedValues)
     {
         _sheet.AddValidationList(Range, name, allowedValues);
+    }
+
+    internal IEnumerable<OdfCell> EnumerateCells()
+    {
+        int minRow = Math.Min(Range.StartAddress.Row, Range.EndAddress.Row);
+        int maxRow = Math.Max(Range.StartAddress.Row, Range.EndAddress.Row);
+        int minColumn = Math.Min(Range.StartAddress.Column, Range.EndAddress.Column);
+        int maxColumn = Math.Max(Range.StartAddress.Column, Range.EndAddress.Column);
+
+        for (int row = minRow; row <= maxRow; row++)
+        {
+            for (int column = minColumn; column <= maxColumn; column++)
+            {
+                yield return _sheet.GetCell(row, column);
+            }
+        }
     }
 
     private static OdfCellRange EnsureSheetName(OdfCellRange range, string sheetName)

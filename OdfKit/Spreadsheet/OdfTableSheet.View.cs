@@ -25,6 +25,15 @@ public partial class OdfTableSheet
         OdfTableSheetViewEngine.SplitPanes(MutationContext, splitRow, splitColumn);
 
     /// <summary>
+    /// 以分割模式（非凍結）分割工作表視窗。
+    /// </summary>
+    /// <param name="splitRow">水平分割線所在的列索引（0 表示不分割）</param>
+    /// <param name="splitColumn">垂直分割線所在的欄索引（0 表示不分割）</param>
+    /// <exception cref="ArgumentOutOfRangeException">當列索引或欄索引小於 0 時擲出</exception>
+    public void SplitWindow(int splitRow, int splitColumn) =>
+        SplitPanes(splitRow, splitColumn);
+
+    /// <summary>
     /// 取得目前工作表的凍結窗格設定。
     /// </summary>
     public OdfFrozenPanes FrozenPanes =>

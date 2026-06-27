@@ -87,6 +87,43 @@ public class TextApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="TextDocument.OptimizeMedia"/> 可替換圖片封裝項目並同步更新參照。
+    /// </summary>
+    [Fact]
+    public void OptimizeMediaRewritesImageEntryAndReference()
+    {
+        using var document = TextDocument.Create();
+        document.Body.Images.Add(CreatePngBytes(), "2cm", "2cm", "TinyPng");
+        OdfMediaOptimizationRequest? capturedRequest = null;
+
+        int optimized = document.OptimizeMedia(144, 82, request =>
+        {
+            capturedRequest = request;
+            return new OdfOptimizedMedia(CreateWebpBytes(), "image/webp", ".webp");
+        });
+
+        Assert.Equal(1, optimized);
+        Assert.NotNull(capturedRequest);
+        Assert.Equal("Pictures/TinyPng.png", capturedRequest!.PackagePath);
+        Assert.Equal("image/png", capturedRequest.MediaType);
+        Assert.Equal(144, capturedRequest.MaxDpi);
+        Assert.Equal(82, capturedRequest.JpegQuality);
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+
+        Assert.Contains("xlink:href=\"Pictures/TinyPng.optimized.webp\"", contentXml);
+        Assert.True(package.HasEntry("Pictures/TinyPng.optimized.webp"));
+        Assert.False(package.HasEntry("Pictures/TinyPng.png"));
+        Assert.True(package.Manifest.TryGetValue("Pictures/TinyPng.optimized.webp", out string? mediaType));
+        Assert.Equal("image/webp", mediaType);
+    }
+
+    /// <summary>
     /// 驗證非 ODT 文件不會被誤載為文字文件。
     /// </summary>
     [Fact]
@@ -126,6 +163,33 @@ public class TextApiUsabilityTests
         Assert.Equal(["標題"], headingTexts);
         Assert.Single(doc.Body.Lists);
         Assert.Single(doc.Body.Tables);
+    }
+
+    /// <summary>
+    /// 驗證預綁定段落寫入器可批次追加段落並避免逐段建立 facade。
+    /// </summary>
+    [Fact]
+    public void ParagraphPrebindingWriterAppendsBatchParagraphs()
+    {
+        using var doc = TextDocument.Create();
+        OdfParagraphPrebindingWriter writer = doc.BeginParagraphPrebinding("BodyStyle");
+
+        writer
+            .Add("第一段")
+            .Add("第二段")
+            .Add("第三段");
+
+        Assert.Equal(3, writer.Count);
+
+        using var stream = new MemoryStream();
+        doc.SaveToStream(stream);
+        stream.Position = 0;
+
+        using TextDocument loaded = TextDocument.Load(stream);
+        OdfParagraph[] paragraphs = loaded.Body.Paragraphs.Items.ToArray();
+
+        Assert.Equal(["第一段", "第二段", "第三段"], paragraphs.Select(paragraph => paragraph.TextContent).ToArray());
+        Assert.All(paragraphs, paragraph => Assert.Equal("BodyStyle", paragraph.StyleName));
     }
 
     /// <summary>
@@ -231,6 +295,17 @@ public class TextApiUsabilityTests
     {
         return Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
+    }
+
+    private static byte[] CreateWebpBytes()
+    {
+        return
+        [
+            0x52, 0x49, 0x46, 0x46,
+            0x04, 0x00, 0x00, 0x00,
+            0x57, 0x45, 0x42, 0x50,
+            0x56, 0x50, 0x38, 0x20
+        ];
     }
 
     /// <summary>

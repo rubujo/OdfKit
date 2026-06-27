@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseDelimiterElement(string? prefix = null) : base("delimiter", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseDelimiterElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Decimal
         {
             get => GetAttributeValue("decimal", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

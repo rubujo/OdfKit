@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeDatabaseElement(string? prefix = null) : base("database", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeDatabaseElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DatabaseDataSourceElement> DatabaseDataSourceChildElements
         {
             get => ChildElements<DatabaseDataSourceElement>();

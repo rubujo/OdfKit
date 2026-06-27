@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseTableRepresentationElement(string? prefix = null) : base("table-representation", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseTableRepresentationElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? CatalogName
         {
             get => GetAttributeValue("catalog-name", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

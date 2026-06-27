@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public PresentationHideTextElement(string? prefix = null) : base("hide-text", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
+        public PresentationHideTextElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfDuration? Delay
         {
             get => GetDurationAttributeValue("delay", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());

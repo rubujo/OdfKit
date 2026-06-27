@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextChangedRegionElement(string? prefix = null) : base("changed-region", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextChangedRegionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXmlName? NamespaceId
         {
             get => GetXmlNameAttributeValue("id", "http://www.w3.org/XML/1998/namespace", GetDocumentVersion());

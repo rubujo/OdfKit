@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartCoordinateRegionElement(string? prefix = null) : base("coordinate-region", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartCoordinateRegionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfLength? Height
         {
             get => GetLengthAttributeValue("height", "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0", GetDocumentVersion());

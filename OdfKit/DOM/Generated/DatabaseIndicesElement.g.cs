@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseIndicesElement(string? prefix = null) : base("indices", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseIndicesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DatabaseIndexElement> DatabaseIndexChildElements
         {
             get => ChildElements<DatabaseIndexElement>();

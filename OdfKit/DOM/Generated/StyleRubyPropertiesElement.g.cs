@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleRubyPropertiesElement(string? prefix = null) : base("ruby-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleRubyPropertiesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? RubyAlign
         {
             get => GetAttributeValue("ruby-align", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

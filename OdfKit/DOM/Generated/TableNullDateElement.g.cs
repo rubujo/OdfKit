@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableNullDateElement(string? prefix = null) : base("null-date", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableNullDateElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public DateTime? DateValue
         {
             get => GetDateTimeAttributeValue("date-value", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

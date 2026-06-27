@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Drawing;
@@ -69,6 +70,32 @@ public class DrawingHighLevelApiTests
             OdfLength.Parse("5cm"),
             OdfLength.Parse("5cm"));
         Assert.Equal("10 10 10 10", arcShape.Node.GetAttribute("viewBox", OdfNamespaces.Svg));
+    }
+
+    /// <summary>
+    /// 驗證 SVG path data 會透過 UTF-8 Span parser 解析負數、曲線、弧線與科學記號座標。
+    /// </summary>
+    [Fact]
+    public void SvgPathDataParserComputesBoundsForComplexPathData()
+    {
+        string pathData = "M -10 -5 C 1e1 20 30 -40 50 60 H 75 V -15 A 5 5 0 0 1 -25 35 Z";
+        byte[] utf8 = Encoding.UTF8.GetBytes(pathData);
+
+        Assert.True(OdfSvgPathDataParser.TryGetBounds(utf8, out OdfSvgPathBounds bounds));
+        Assert.Equal(-25d, bounds.MinX);
+        Assert.Equal(-40d, bounds.MinY);
+        Assert.Equal(75d, bounds.MaxX);
+        Assert.Equal(60d, bounds.MaxY);
+
+        using var document = DrawingDocument.Create();
+        OdfShape shape = document.AddPath(
+            pathData,
+            OdfLength.Parse("0cm"),
+            OdfLength.Parse("0cm"),
+            OdfLength.Parse("5cm"),
+            OdfLength.Parse("5cm"));
+
+        Assert.Equal("-25 -40 100 100", shape.Node.GetAttribute("viewBox", OdfNamespaces.Svg));
     }
 
     /// <summary>

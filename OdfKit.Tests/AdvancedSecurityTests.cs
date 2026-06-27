@@ -1233,7 +1233,7 @@ namespace OdfKit.Tests
 
                 var sig = result.Signatures[0];
                 Assert.False(sig.IsSignatureValid || result.IsValid);
-                Assert.Contains("verification failed", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+                Assert.Equal(OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_CryptographicSignatureInvalid"), sig.ErrorMessage);
             }
         }
 
@@ -1288,7 +1288,7 @@ namespace OdfKit.Tests
 
                 var sig = result.Signatures[0];
                 Assert.False(sig.IsSignatureValid);
-                Assert.Contains("invalid", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+                Assert.Equal(OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_CryptographicSignatureInvalid"), sig.ErrorMessage);
             }
         }
 
@@ -1324,7 +1324,7 @@ namespace OdfKit.Tests
 
                 var sig = result.Signatures[0];
                 Assert.False(sig.IsSignatureValid);
-                Assert.Contains("verification failed", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+                Assert.Equal(OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_CryptographicSignatureInvalid"), sig.ErrorMessage);
             }
         }
 

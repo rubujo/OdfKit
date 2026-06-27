@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextTabElement(string? prefix = null) : base("tab", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextTabElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? TabRef
         {
             get => GetNullableInt32AttributeValue("tab-ref", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

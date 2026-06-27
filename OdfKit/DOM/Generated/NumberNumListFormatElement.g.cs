@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberNumListFormatElement(string? prefix = null) : base("num-list-format", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberNumListFormatElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? Name
         {
             get => GetStyleNameAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

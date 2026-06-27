@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseAutoIncrementElement(string? prefix = null) : base("auto-increment", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseAutoIncrementElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? AdditionalColumnStatement
         {
             get => GetAttributeValue("additional-column-statement", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", GetDocumentVersion());

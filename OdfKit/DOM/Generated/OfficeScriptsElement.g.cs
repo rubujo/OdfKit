@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public OfficeScriptsElement(string? prefix = null) : base("scripts", "urn:oasis:names:tc:opendocument:xmlns:office:1.0", prefix) { }
 
+        public OfficeScriptsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<OfficeEventListenersElement> OfficeEventListenersChildElements
         {
             get => ChildElements<OfficeEventListenersElement>();

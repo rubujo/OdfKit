@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberNumberElement(string? prefix = null) : base("number", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberNumberElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? DecimalPlaces
         {
             get => GetNullableInt32AttributeValue("decimal-places", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", GetDocumentVersion());

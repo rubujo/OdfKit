@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleMapElement(string? prefix = null) : base("map", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleMapElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfStyleName? ApplyStyleName
         {
             get => GetStyleNameAttributeValue("apply-style-name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

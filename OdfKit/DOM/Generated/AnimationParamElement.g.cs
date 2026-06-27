@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public AnimationParamElement(string? prefix = null) : base("param", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", prefix) { }
 
+        public AnimationParamElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Name
         {
             get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", GetDocumentVersion());

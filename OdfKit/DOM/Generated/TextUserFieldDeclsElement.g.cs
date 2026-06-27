@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextUserFieldDeclsElement(string? prefix = null) : base("user-field-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextUserFieldDeclsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TextUserFieldDeclElement> TextUserFieldDeclChildElements
         {
             get => ChildElements<TextUserFieldDeclElement>();

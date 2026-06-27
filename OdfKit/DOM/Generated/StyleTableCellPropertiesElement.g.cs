@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleTableCellPropertiesElement(string? prefix = null) : base("table-cell-properties", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleTableCellPropertiesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? BackgroundColor
         {
             get => GetAttributeValue("background-color", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());

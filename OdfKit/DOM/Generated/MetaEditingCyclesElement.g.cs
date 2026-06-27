@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class MetaEditingCyclesElement : OdfElement
     {
         public MetaEditingCyclesElement(string? prefix = null) : base("editing-cycles", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+
+        public MetaEditingCyclesElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

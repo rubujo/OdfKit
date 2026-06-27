@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public PresentationPlayElement(string? prefix = null) : base("play", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
+        public PresentationPlayElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfXmlName? ShapeId
         {
             get => GetXmlNameAttributeValue("shape-id", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

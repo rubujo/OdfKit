@@ -22,6 +22,22 @@ internal static class OdfPackageSaveHooksEngine
         if (!evaluateFormulas && !embedFonts)
             return;
 
+        var nonLazyOptions = ctx.LoadOptions != null
+            ? new OdfLoadOptions
+            {
+                StrictXmlParsing = ctx.LoadOptions.StrictXmlParsing,
+                ValidateMimeType = ctx.LoadOptions.ValidateMimeType,
+                MaxZipEntries = ctx.LoadOptions.MaxZipEntries,
+                MaxEntrySize = ctx.LoadOptions.MaxEntrySize,
+                MaxTotalUncompressedSize = ctx.LoadOptions.MaxTotalUncompressedSize,
+                MaxXmlCharactersInDocument = ctx.LoadOptions.MaxXmlCharactersInDocument,
+                Password = ctx.LoadOptions.Password,
+                CryptographyProvider = ctx.LoadOptions.CryptographyProvider,
+                OpenPgpKeyProvider = ctx.LoadOptions.OpenPgpKeyProvider,
+                AllowLazyLoading = false
+            }
+            : new OdfLoadOptions { AllowLazyLoading = false };
+
         OdfNode? contentRoot = null;
         OdfNode? stylesRoot = null;
 
@@ -30,7 +46,7 @@ internal static class OdfPackageSaveHooksEngine
             try
             {
                 using var stream = contentEntry.OpenReader();
-                contentRoot = OdfXmlReader.Parse(stream, ctx.LoadOptions);
+                contentRoot = OdfXmlReader.Parse(stream, nonLazyOptions);
             }
             catch (Exception ex)
             {
@@ -43,7 +59,7 @@ internal static class OdfPackageSaveHooksEngine
             try
             {
                 using var stream = stylesEntry.OpenReader();
-                stylesRoot = OdfXmlReader.Parse(stream, ctx.LoadOptions);
+                stylesRoot = OdfXmlReader.Parse(stream, nonLazyOptions);
             }
             catch (Exception ex)
             {
@@ -59,7 +75,7 @@ internal static class OdfPackageSaveHooksEngine
             try
             {
                 var evaluator = new DefaultFormulaEvaluator();
-                evaluator.EvaluateFormulasInDocument(contentRoot);
+                evaluator.EvaluateFormulasInDocument(contentRoot, ctx.FormulaExternalLinksForSave);
                 contentModified = true;
             }
             catch (Exception ex)

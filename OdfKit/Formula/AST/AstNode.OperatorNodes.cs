@@ -13,6 +13,9 @@ namespace OdfKit.Formula.AST;
 public class UnaryNode(char op, AstNode child) : AstNode
 {
     /// <inheritdoc />
+    public override List<OdfCellRange> GetRanges(IEvaluationContext context) => child.GetRanges(context);
+
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
         var val = child.Evaluate(context);
@@ -57,6 +60,15 @@ public class UnaryNode(char op, AstNode child) : AstNode
 /// <param name="right">右側 AST 節點</param>
 public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
 {
+    /// <inheritdoc />
+    public override List<OdfCellRange> GetRanges(IEvaluationContext context)
+    {
+        var list = new List<OdfCellRange>();
+        list.AddRange(left.GetRanges(context));
+        list.AddRange(right.GetRanges(context));
+        return list;
+    }
+
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {

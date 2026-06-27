@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextSequenceRefElement(string? prefix = null) : base("sequence-ref", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextSequenceRefElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? RefName
         {
             get => GetAttributeValue("ref-name", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

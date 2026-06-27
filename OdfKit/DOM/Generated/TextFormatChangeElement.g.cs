@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextFormatChangeElement(string? prefix = null) : base("format-change", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextFormatChangeElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<OfficeChangeInfoElement> OfficeChangeInfoChildElements
         {
             get => ChildElements<OfficeChangeInfoElement>();

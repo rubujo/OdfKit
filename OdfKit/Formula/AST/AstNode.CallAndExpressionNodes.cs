@@ -23,6 +23,17 @@ public class FunctionNode(string name, List<AstNode> arguments) : AstNode
     public List<AstNode> Arguments { get; } = arguments;
 
     /// <inheritdoc />
+    public override List<OdfCellRange> GetRanges(IEvaluationContext context)
+    {
+        var list = new List<OdfCellRange>();
+        foreach (var arg in Arguments)
+        {
+            list.AddRange(arg.GetRanges(context));
+        }
+        return list;
+    }
+
+    /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
         return DefaultFormulaEvaluator.EvaluateFunction(Name, Arguments, context);

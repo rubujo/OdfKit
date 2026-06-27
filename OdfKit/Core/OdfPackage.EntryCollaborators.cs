@@ -18,11 +18,56 @@ public sealed partial class OdfPackage
 
         internal OdfPackageEntryCollaborators(OdfPackage package) => _package = package;
 
-        internal Dictionary<string, OdfPackageEntry> Entries => _package._entries;
+        internal IDictionary<string, OdfPackageEntry> Entries
+        {
+            get
+            {
+                var pkg = _package;
+                return pkg._inTransaction
+                    ? new UndoableDictionary<string, OdfPackageEntry>(pkg, pkg._entries,
+                        (key, old, existed) =>
+                        {
+                            if (existed && old != null)
+                            {
+                                // 在將舊 entry 放進撤銷日誌前，先將其二進位資料載入記憶體中，以防 MMF 釋放後失效
+                                old.EnsureBytesLoaded();
+                            }
+                            pkg._undoLog.Add(new UndoSetEntry(key, old, existed));
+                        },
+                        (key, old) =>
+                        {
+                            if (old != null)
+                            {
+                                // 在將舊 entry 放進撤銷日誌前，先將其二進位資料載入記憶體中，以防 MMF 釋放後失效
+                                old.EnsureBytesLoaded();
+                            }
+                            pkg._undoLog.Add(new UndoRemoveEntry(key, old!));
+                        })
+                    : pkg._entries;
+            }
+        }
 
-        internal Dictionary<string, string> Manifest => _package._manifest;
+        internal IDictionary<string, string> Manifest
+        {
+            get
+            {
+                var pkg = _package;
+                return pkg._inTransaction
+                    ? new UndoableDictionary<string, string>(pkg, pkg._manifest, (key, old, existed) => pkg._undoLog.Add(new UndoSetManifest(key, old, existed)), (key, old) => pkg._undoLog.Add(new UndoRemoveManifest(key, old)))
+                    : pkg._manifest;
+            }
+        }
 
-        internal List<string> EntryOrder => _package._entryOrder;
+        internal IList<string> EntryOrder
+        {
+            get
+            {
+                var pkg = _package;
+                return pkg._inTransaction
+                    ? new UndoableList<string>(pkg, pkg._entryOrder, (oldList) => pkg._undoLog.Add(new UndoSetEntryOrder(oldList)))
+                    : pkg._entryOrder;
+            }
+        }
 
         internal void SetMimeTypeValue(string mimetype) => _package._mimetype = mimetype;
 

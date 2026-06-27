@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextSequenceDeclsElement(string? prefix = null) : base("sequence-decls", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextSequenceDeclsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TextSequenceDeclElement> TextSequenceDeclChildElements
         {
             get => ChildElements<TextSequenceDeclElement>();

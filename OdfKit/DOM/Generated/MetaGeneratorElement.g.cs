@@ -17,6 +17,17 @@ namespace OdfKit.DOM
     public partial class MetaGeneratorElement : OdfElement
     {
         public MetaGeneratorElement(string? prefix = null) : base("generator", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
+
+        public MetaGeneratorElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
     }
 
 }

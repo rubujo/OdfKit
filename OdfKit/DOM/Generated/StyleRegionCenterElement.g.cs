@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleRegionCenterElement(string? prefix = null) : base("region-center", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleRegionCenterElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TextPElement> TextPChildElements
         {
             get => ChildElements<TextPElement>();

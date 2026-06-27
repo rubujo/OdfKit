@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Forms;
 using OdfKit.Styles;
 using OdfKit.Text;
@@ -153,5 +154,68 @@ public class FormControlTests
         using var doc = TextDocument.Create();
         var controls = doc.GetFormControls();
         Assert.Empty(controls);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.FormFields"/> 可依名稱填入 <c>text:text-input</c> 欄位。
+    /// </summary>
+    [Fact]
+    public void FormFieldsBindTextInputByDescription()
+    {
+        using var doc = TextDocument.Create();
+        var paragraph = doc.AddParagraph(string.Empty);
+        var input = new OdfNode(OdfNodeType.Element, "text-input", OdfNamespaces.Text, "text");
+        input.SetAttribute("description", OdfNamespaces.Text, "ApplicantName", "text");
+        input.TextContent = "ApplicantName";
+        paragraph.Node.AppendChild(input);
+
+        Assert.True(doc.FormFields.Contains("ApplicantName"));
+        doc.FormFields["ApplicantName"].Value = "王小明";
+
+        Assert.True(doc.FormFields["ApplicantName"].Exists);
+        Assert.Equal("王小明", doc.FormFields["ApplicantName"].Value);
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+        using var pkg = OdfPackage.Open(ms, leaveOpen: true);
+        using var stream = pkg.GetEntryStream("content.xml");
+        string xml = new StreamReader(stream).ReadToEnd();
+
+        Assert.Contains("text:text-input", xml);
+        Assert.Contains("text:description=\"ApplicantName\"", xml);
+        Assert.Contains("王小明", xml);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextDocument.FormFields"/> 可填入文字控制項並切換核取方塊狀態。
+    /// </summary>
+    [Fact]
+    public void FormFieldsBindFormControlsByName()
+    {
+        using var doc = TextDocument.Create();
+        doc.AddFormControl(OdfControlType.TextBox, "txt1", Cm1, Cm2, Cm4, Cm08, label: "預設文字");
+        doc.AddFormControl(OdfControlType.CheckBox, "chk1", Cm1, Cm1, Cm4, Cm08, label: "同意條款");
+
+        Assert.True(doc.FormFields.TrySetValue("txt1", "更新文字"));
+        doc.FormFields["chk1"].Value = "true";
+        Assert.False(doc.FormFields.TrySetValue("missing", "不應建立"));
+
+        Assert.Equal("更新文字", doc.FormFields["txt1"].Value);
+        Assert.Equal("true", doc.FormFields["chk1"].Value);
+        Assert.False(doc.FormFields["missing"].Exists);
+
+        using var ms = new MemoryStream();
+        doc.SaveToStream(ms);
+        ms.Position = 0;
+        using var pkg = OdfPackage.Open(ms, leaveOpen: true);
+        using var stream = pkg.GetEntryStream("content.xml");
+        string xml = new StreamReader(stream).ReadToEnd();
+
+        Assert.Contains("form:name=\"txt1\"", xml);
+        Assert.Contains("form:value=\"更新文字\"", xml);
+        Assert.Contains("form:name=\"chk1\"", xml);
+        Assert.Contains("form:current-state=\"checked\"", xml);
+        Assert.DoesNotContain("不應建立", xml);
     }
 }

@@ -63,6 +63,37 @@ public class PivotTableTests
     }
 
     /// <summary>
+    /// 驗證計畫名 CreatePivotTable API 會建立可讀回的強型別樞紐分析表。
+    /// </summary>
+    [Fact]
+    public void CreatePivotTable_ConfiguresBuilderAndReadsBack()
+    {
+        using var doc = SpreadsheetDocument.Create();
+        var sheet = doc.Worksheets.Add("Sheet1");
+        var sourceRange = new OdfCellRange(new OdfCellAddress(0, 0), new OdfCellAddress(9, 3));
+        var targetCell = new OdfCellAddress(12, 0);
+
+        sheet.CreatePivotTable(sourceRange, targetCell, pivot => pivot
+            .AddRowField("Region")
+            .AddColumnField("Year")
+            .AddDataField("Sales", OdfPivotFunction.Sum)
+            .AddFilter("Region", OdfPivotFilterOperator.Equal, "North"));
+
+        var info = Assert.Single(doc.GetPivotTables());
+        Assert.Equal("Sheet1", info.SheetName);
+        Assert.Equal("PivotTable1", info.Name);
+        Assert.Contains("Sheet1.A1:.D10", info.SourceRangeAddress);
+        Assert.Contains("Sheet1.A13:.A13", info.TargetRangeAddress);
+        Assert.Contains(info.Fields, field => field.SourceFieldName == "Region" && field.Orientation == "row");
+        Assert.Contains(info.Fields, field => field.SourceFieldName == "Year" && field.Orientation == "column");
+        Assert.Contains(info.Fields, field => field.SourceFieldName == "Sales" && field.Orientation == "data" && field.Function == "sum");
+        var filter = Assert.Single(info.FilterConditions);
+        Assert.Equal("Region", filter.SourceFieldName);
+        Assert.Equal("=", filter.Operator);
+        Assert.Equal("North", filter.Value);
+    }
+
+    /// <summary>
     /// 驗證所有 OdfPivotFunction 列舉值正確轉換為 ODF function 屬性字串。
     /// </summary>
     [Theory]

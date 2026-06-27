@@ -35,13 +35,47 @@ public abstract partial class OdfDocument
     /// </remarks>
     public async Task SignAsync(X509Certificate2 certificate, CancellationToken cancellationToken = default)
     {
+        await SignDocumentAsync(certificate, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 非同步使用指定的 X.509 憑證對文件進行一鍵式數位簽章。
+    /// </summary>
+    /// <param name="certificate">用於簽章的憑證</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步簽章作業的工作</returns>
+    /// <remarks>
+    /// 此方法是計畫文件中 <c>SignDocumentAsync</c> 入口的文件層別名；行為等同於
+    /// <see cref="SignAsync(X509Certificate2, CancellationToken)"/>。
+    /// </remarks>
+    public Task SignDocumentAsync(X509Certificate2 certificate, CancellationToken cancellationToken = default)
+    {
+        return SignDocumentAsync(certificate, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken);
+    }
+
+    /// <summary>
+    /// 非同步使用指定的 X.509 憑證與簽章選項對文件進行一鍵式數位簽章。
+    /// </summary>
+    /// <param name="certificate">用於簽章的憑證</param>
+    /// <param name="options">簽章選項；若為 <see langword="null"/>，則使用預設簽章層級</param>
+    /// <param name="cancellationToken">取消語彙基元</param>
+    /// <returns>代表非同步簽章作業的工作</returns>
+    /// <remarks>
+    /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
+    /// 否則會在 DOM 寫入、ZIP 寫入與 HTTP（TSA／CRL）期間協作檢查取消語彙。
+    /// </remarks>
+    public async Task SignDocumentAsync(
+        X509Certificate2 certificate,
+        OdfSigningOptions? options,
+        CancellationToken cancellationToken = default)
+    {
         StyleEngine.DeduplicateAndSaveStyles();
         OdfDocumentPersistenceEngine.WriteAllDomEntries(PersistenceCollaborators, OdfSaveOptions.Default);
 
         await OdfSigner.SignAsync(
             Package,
             certificate,
-            new OdfSigningOptions { Level = XadesLevel.None },
+            options ?? new OdfSigningOptions { Level = XadesLevel.None },
             cancellationToken).ConfigureAwait(false);
     }
 

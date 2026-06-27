@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -16,6 +17,7 @@ using System.Xml.Linq;
 using OdfKit.Compliance;
 using OdfKit.DOM;
 using OdfKit.Formula;
+using OdfKit.Spreadsheet;
 using OdfKit.Styles;
 
 namespace OdfKit.Core;
@@ -44,6 +46,7 @@ public enum OdfPackageMode
 /// <summary>
 /// 表示 ODF 文件的實體封裝。
 /// </summary>
+[DebuggerTypeProxy(typeof(OdfPackageDebugView))]
 public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
 {
     private const string RdfMetadataPath = "META-INF/manifest.rdf";
@@ -65,6 +68,19 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     private bool _isDisposed;
     private string? _mimetype;
     private bool _isFlatXml;
+
+    internal string? FilePath { get; set; }
+    internal System.IO.MemoryMappedFiles.MemoryMappedFile? Mmf { get; set; }
+    internal Dictionary<string, OdfMmfEntryInfo>? MmfEntries { get; set; }
+    internal System.Threading.Tasks.Task? PreloadTask { get; set; }
+    internal event System.Action? OnRollback;
+    internal OdfExternalLinkManager? FormulaExternalLinksForSave { get; set; }
+
+#if NET10_0_OR_GREATER
+    internal System.Threading.Channels.Channel<OdfPackageEntry>? _prefetchChannel;
+    private System.Threading.Tasks.Task? _prefetchProcessorTask;
+    private readonly System.Threading.CancellationTokenSource _prefetchCts = new();
+#endif
 
     /// <summary>
     /// 取得目前 ODF 封裝的開啟模式。
@@ -93,6 +109,13 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     public OdfRdfMetadata RdfMetadata { get; private set; } = new();
 
     internal void SetRdfMetadata(OdfRdfMetadata metadata) => RdfMetadata = metadata;
+
+    private OdfMediaManager? _mediaManager;
+
+    /// <summary>
+    /// 取得此封裝套件的媒體管理器實例。
+    /// </summary>
+    public OdfMediaManager MediaManager => _mediaManager ??= new OdfMediaManager(this);
 
     /// <summary>
     /// 取得一個值，指出目前封裝是否為單一 Flat XML 檔案。
@@ -139,7 +162,46 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         _leaveOpen = leaveOpen;
         _loadOptions = loadOptions ?? OdfLoadOptions.Default;
         _saveOptions = saveOptions ?? OdfSaveOptions.Default;
+
+#if NET10_0_OR_GREATER
+        if (_mode == OdfPackageMode.ReadWrite || _mode == OdfPackageMode.Read)
+        {
+            _prefetchChannel = System.Threading.Channels.Channel.CreateUnbounded<OdfPackageEntry>(new System.Threading.Channels.UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = false
+            });
+            _prefetchProcessorTask = Task.Run(ProcessPrefetchQueueAsync);
+        }
+#endif
     }
+
+#if NET10_0_OR_GREATER
+    private async Task ProcessPrefetchQueueAsync()
+    {
+        if (_prefetchChannel == null)
+            return;
+        var reader = _prefetchChannel.Reader;
+        try
+        {
+            while (await reader.WaitToReadAsync(_prefetchCts.Token).ConfigureAwait(false))
+            {
+                while (reader.TryRead(out var entry))
+                {
+                    try
+                    {
+                        entry.EnsureBytesLoaded();
+                    }
+                    catch
+                    {
+                        // 忽略預讀異常，待主線程存取時處理
+                    }
+                }
+            }
+        }
+        catch (OperationCanceledException) { }
+    }
+#endif
 
 
     #region Factory Methods
@@ -153,8 +215,33 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// <returns>開啟的 <see cref="OdfPackage"/> 執行個體</returns>
     public static OdfPackage Open(string path, OdfLoadOptions? options = null)
     {
-        FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        string journalPath = path + ".journal";
+        if (File.Exists(journalPath))
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+                File.Copy(journalPath, path, true);
+                using (var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                {
+                    fs.Flush(true);
+                }
+                File.Delete(journalPath);
+            }
+            catch (Exception ex)
+            {
+                throw new IOException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfPackage_JournalCreateFailed"), ex);
+            }
+        }
+
+        Stream stream = options?.EnableDirectIo == true
+            ? new OdfDirectIoReadableStream(path)
+            : new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
         OdfPackage package = new(OdfPackageMode.ReadWrite, stream, false, options, null);
+        package.FilePath = path;
         try
         {
             package.InitializeLoad();
@@ -177,6 +264,14 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     public static OdfPackage Open(Stream stream, bool leaveOpen = false, OdfLoadOptions? options = null)
     {
         OdfPackage package = new(OdfPackageMode.ReadWrite, stream, leaveOpen, options, null);
+        if (stream is FileStream fs)
+        {
+            package.FilePath = fs.Name;
+        }
+        else if (stream is OdfDirectIoReadableStream ds)
+        {
+            package.FilePath = ds.FilePath;
+        }
         try
         {
             package.InitializeLoad();
@@ -206,8 +301,33 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         OdfLoadOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        string journalPath = path + ".journal";
+        if (File.Exists(journalPath))
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+                File.Copy(journalPath, path, true);
+                using (var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                {
+                    fs.Flush(true);
+                }
+                File.Delete(journalPath);
+            }
+            catch (Exception ex)
+            {
+                throw new IOException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfPackage_JournalCreateFailed"), ex);
+            }
+        }
+
+        Stream stream = options?.EnableDirectIo == true
+            ? new OdfDirectIoReadableStream(path)
+            : new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
         OdfPackage package = new(OdfPackageMode.ReadWrite, stream, false, options, null);
+        package.FilePath = path;
         try
         {
             await package.InitializeLoadAsync(cancellationToken).ConfigureAwait(false);
@@ -239,6 +359,14 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         CancellationToken cancellationToken = default)
     {
         OdfPackage package = new(OdfPackageMode.ReadWrite, stream, leaveOpen, options, null);
+        if (stream is FileStream fs)
+        {
+            package.FilePath = fs.Name;
+        }
+        else if (stream is OdfDirectIoReadableStream ds)
+        {
+            package.FilePath = ds.FilePath;
+        }
         try
         {
             await package.InitializeLoadAsync(cancellationToken).ConfigureAwait(false);

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableNamedExpressionElement(string? prefix = null) : base("named-expression", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableNamedExpressionElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCellAddressReference? BaseCellAddress
         {
             get => GetCellAddressAttributeValue("base-cell-address", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

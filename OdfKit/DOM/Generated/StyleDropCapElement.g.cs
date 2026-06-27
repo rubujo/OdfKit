@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleDropCapElement(string? prefix = null) : base("drop-cap", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleDropCapElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfLength? Distance
         {
             get => GetLengthAttributeValue("distance", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

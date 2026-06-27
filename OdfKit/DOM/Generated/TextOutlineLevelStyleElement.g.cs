@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextOutlineLevelStyleElement(string? prefix = null) : base("outline-level-style", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextOutlineLevelStyleElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? DisplayLevels
         {
             get => GetNullableInt32AttributeValue("display-levels", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

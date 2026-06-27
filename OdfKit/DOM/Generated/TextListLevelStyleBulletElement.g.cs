@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextListLevelStyleBulletElement(string? prefix = null) : base("list-level-style-bullet", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextListLevelStyleBulletElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCharacter? BulletChar
         {
             get => GetCharacterAttributeValue("bullet-char", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

@@ -70,6 +70,39 @@ public partial class OdfTableSheet
     public IEnumerable<OdfCell> UsedCells => GetUsedCells();
 
     /// <summary>
+    /// 將此工作表從試算表 DOM 樹中剪裁，並釋放其子樹與延遲載入 XML 參照。
+    /// </summary>
+    /// <param name="collectGarbage">是否在剪裁後要求執行一次最佳化 GC 收集</param>
+    /// <returns>已剪裁的節點數，包含工作表節點本身</returns>
+    public int PruneAndCollect(bool collectGarbage = false)
+    {
+        ReleaseFacadeCaches();
+        return TableNode.PruneAndCollect(collectGarbage);
+    }
+
+    internal int FacadeCacheCount =>
+        (_cells is null ? 0 : 1) +
+        (_rows is null ? 0 : 1) +
+        (_columns is null ? 0 : 1) +
+        (_ranges is null ? 0 : 1);
+
+    /// <summary>
+    /// 釋放此工作表已建立的高階集合 facade 快取，但保留底層 DOM 與文件內容不變。
+    /// </summary>
+    /// <remarks>
+    /// 適合在處理大型工作表後主動解除 <see cref="Cells"/>、<see cref="Rows"/>、
+    /// <see cref="Columns"/> 與 <see cref="Ranges"/> 的入口物件參照，降低長時間批次流程的
+    /// wrapper 物件保留量。後續再次存取這些屬性時會按需重新建立 facade。
+    /// </remarks>
+    public void ReleaseFacadeCaches()
+    {
+        _cells = null;
+        _rows = null;
+        _columns = null;
+        _ranges = null;
+    }
+
+    /// <summary>
     /// 取得或設定工作表是否顯示。
     /// </summary>
     public bool Visible
@@ -285,5 +318,45 @@ public partial class OdfTableSheet
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 取消合併指定的儲存格範圍。
+    /// </summary>
+    /// <param name="range">要取消合併的儲存格範圍。</param>
+    public void UnmergeCells(OdfCellRange range)
+    {
+        int startRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
+        int endRow = Math.Max(range.StartAddress.Row, range.EndAddress.Row);
+        int startCol = Math.Min(range.StartAddress.Column, range.EndAddress.Column);
+        int endCol = Math.Max(range.StartAddress.Column, range.EndAddress.Column);
+
+        OdfNode mainCell = GetOrCreateCellNode(startRow, startCol);
+        mainCell.RemoveAttribute("number-columns-spanned", OdfNamespaces.Table);
+        mainCell.RemoveAttribute("number-rows-spanned", OdfNamespaces.Table);
+
+        for (int row = startRow; row <= endRow; row++)
+        {
+            for (int column = startCol; column <= endCol; column++)
+            {
+                if (row == startRow && column == startCol)
+                    continue;
+
+                OdfNode cellNode = GetOrCreateCellNode(row, column);
+                if (cellNode.LocalName == "covered-table-cell" && cellNode.NamespaceUri == OdfNamespaces.Table)
+                {
+                    ReplaceCellNode(row, column, new OdfNode(OdfNodeType.Element, "table-cell", OdfNamespaces.Table, "table"));
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 取消合併指定的 Excel 樣式儲存格範圍。
+    /// </summary>
+    /// <param name="rangeAddress">儲存格範圍位址，例如 <c>A1:C3</c>。</param>
+    public void UnmergeCells(string rangeAddress)
+    {
+        UnmergeCells(OdfCellRange.ParseExcel(rangeAddress));
     }
 }

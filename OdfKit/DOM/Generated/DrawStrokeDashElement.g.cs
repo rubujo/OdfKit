@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawStrokeDashElement(string? prefix = null) : base("stroke-dash", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawStrokeDashElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? DisplayName
         {
             get => GetAttributeValue("display-name", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public PresentationSettingsElement(string? prefix = null) : base("settings", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", prefix) { }
 
+        public PresentationSettingsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Animations
         {
             get => GetAttributeValue("animations", "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0", GetDocumentVersion());

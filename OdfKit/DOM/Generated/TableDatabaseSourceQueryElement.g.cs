@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableDatabaseSourceQueryElement(string? prefix = null) : base("database-source-query", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableDatabaseSourceQueryElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? DatabaseName
         {
             get => GetAttributeValue("database-name", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

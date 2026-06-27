@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextPageVariableSetElement(string? prefix = null) : base("page-variable-set", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextPageVariableSetElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? Active
         {
             get => GetBooleanAttributeValue("active", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

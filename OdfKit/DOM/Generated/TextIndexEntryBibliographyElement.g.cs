@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextIndexEntryBibliographyElement(string? prefix = null) : base("index-entry-bibliography", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextIndexEntryBibliographyElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? BibliographyDataField
         {
             get => GetAttributeValue("bibliography-data-field", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

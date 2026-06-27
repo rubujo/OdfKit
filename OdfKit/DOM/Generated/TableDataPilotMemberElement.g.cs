@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TableDataPilotMemberElement(string? prefix = null) : base("data-pilot-member", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", prefix) { }
 
+        public TableDataPilotMemberElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? Display
         {
             get => GetBooleanAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:table:1.0", GetDocumentVersion());

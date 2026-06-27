@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -11,6 +12,7 @@ public partial class OdfNumberFormatter
 {
     #region 內部解析與翻譯邏輯
 
+    private static readonly ConcurrentDictionary<string, FormatInfo> FormatInfoPool = new(StringComparer.Ordinal);
 
     /// <summary>
     /// 解析標準格式。
@@ -81,31 +83,44 @@ public partial class OdfNumberFormatter
     /// <returns>解析後的 <see cref="FormatInfo"/> 執行個體</returns>
     public static FormatInfo ParsePattern(string pattern)
     {
-        FormatInfo info = new();
+        if (pattern is null)
+        {
+            throw new ArgumentNullException(nameof(pattern));
+        }
 
+        return FormatInfoPool.GetOrAdd(pattern, ParsePatternCore);
+    }
+
+    private static FormatInfo ParsePatternCore(string pattern)
+    {
+        FormatType type;
+        string currencySymbol = "$";
+        IReadOnlyList<DateTimeToken>? dateTimeTokens = null;
         if (pattern.Contains("%"))
         {
-            info.Type = FormatType.Percentage;
+            type = FormatType.Percentage;
         }
         else if (ContainsCurrencySymbol(pattern, out string symbol))
         {
-            info.Type = FormatType.Currency;
-            info.CurrencySymbol = symbol;
+            type = FormatType.Currency;
+            currencySymbol = symbol;
         }
         else if (ContainsDateTimeChars(pattern))
         {
-            info.Type = IsTimeOnlyPattern(pattern) ? FormatType.Time : FormatType.Date;
-            info.DateTimeTokens = ParseDateTimeTokens(pattern);
-            return info;
+            type = IsTimeOnlyPattern(pattern) ? FormatType.Time : FormatType.Date;
+            dateTimeTokens = ParseDateTimeTokens(pattern);
+            return new FormatInfo(type, currencySymbol: currencySymbol, dateTimeTokens: dateTimeTokens);
         }
         else
         {
-            info.Type = FormatType.Number;
+            type = FormatType.Number;
         }
 
         string clean = StripLiteralsAndSymbols(pattern);
-        info.Grouping = clean.Contains(",");
+        bool grouping = clean.Contains(",");
 
+        int minIntegerDigits;
+        int decimalPlaces;
         int dotIndex = clean.IndexOf('.');
         if (dotIndex >= 0)
         {
@@ -116,13 +131,13 @@ public partial class OdfNumberFormatter
             foreach (char c in integerPart)
                 if (c == '0')
                     zeros++;
-            info.MinIntegerDigits = Math.Max(1, zeros);
+            minIntegerDigits = Math.Max(1, zeros);
 
             int decCount = 0;
             foreach (char c in decimalPart)
                 if (c == '0' || c == '#')
                     decCount++;
-            info.DecimalPlaces = decCount;
+            decimalPlaces = decCount;
         }
         else
         {
@@ -130,11 +145,11 @@ public partial class OdfNumberFormatter
             foreach (char c in clean)
                 if (c == '0')
                     zeros++;
-            info.MinIntegerDigits = Math.Max(1, zeros);
-            info.DecimalPlaces = 0;
+            minIntegerDigits = Math.Max(1, zeros);
+            decimalPlaces = 0;
         }
 
-        return info;
+        return new FormatInfo(type, decimalPlaces, minIntegerDigits, grouping, currencySymbol, dateTimeTokens);
     }
 
     private static bool ContainsCurrencySymbol(string pattern, out string symbol)

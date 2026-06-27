@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextLabelElement(string? prefix = null) : base("label", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextLabelElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? CurrentSelected
         {
             get => GetBooleanAttributeValue("current-selected", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

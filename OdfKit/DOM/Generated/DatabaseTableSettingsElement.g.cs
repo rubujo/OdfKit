@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DatabaseTableSettingsElement(string? prefix = null) : base("table-settings", "urn:oasis:names:tc:opendocument:xmlns:database:1.0", prefix) { }
 
+        public DatabaseTableSettingsElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<DatabaseTableSettingElement> DatabaseTableSettingChildElements
         {
             get => ChildElements<DatabaseTableSettingElement>();

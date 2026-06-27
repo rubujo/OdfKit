@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartAxisElement(string? prefix = null) : base("axis", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartAxisElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Dimension
         {
             get => GetAttributeValue("dimension", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", GetDocumentVersion());

@@ -14,6 +14,19 @@ public partial class TextDocument
     public bool TrackedChanges { get; set; }
 
     /// <summary>
+    /// 取得或設定一個值，指出是否啟用修訂追蹤。
+    /// </summary>
+    /// <remarks>
+    /// 這是 <see cref="TrackedChanges"/> 的計畫名別名，供呼叫端以 <c>doc.TrackChanges = true</c>
+    /// 啟用修訂追蹤。
+    /// </remarks>
+    public bool TrackChanges
+    {
+        get => TrackedChanges;
+        set => TrackedChanges = value;
+    }
+
+    /// <summary>
     /// 記錄修訂追蹤資訊。
     /// </summary>
     /// <param name="changeType">修訂類型</param>

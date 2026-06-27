@@ -109,6 +109,57 @@ public class ChartHighLevelApiTests
         Assert.Contains("<text:p>2026-06-15T12:00:00Z</text:p>", xml);
     }
 
+    /// <summary>
+    /// 驗證圖表本地資料快取只在需要時掃描 DOM，並會在更新資料後失效。
+    /// </summary>
+    [Fact]
+    public void LocalDataCacheLoadsOnDemandAndInvalidatesAfterUpdate()
+    {
+        using var chartDoc = ChartDocument.Create(new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Bar,
+            Title = "快取驗證",
+            DataRange = new OdfCellRange(0, 0, 1, 1, "LocalTable")
+        });
+
+        chartDoc.UpdateData(new object?[][]
+        {
+            new object?[] { "季度", "銷量" },
+            new object?[] { "Q1", 10d }
+        });
+
+        Assert.Equal(0, chartDoc.LocalDataCacheBuildCount);
+
+        OdfChartDataCache first = chartDoc.GetLocalDataCache();
+
+        Assert.Equal(1, chartDoc.LocalDataCacheBuildCount);
+        Assert.Equal(2, first.Rows.Count);
+        Assert.Equal("季度", first.Rows[0][0]);
+        Assert.Equal("銷量", first.Rows[0][1]);
+        Assert.Equal("Q1", first.Rows[1][0]);
+        Assert.Equal(10d, first.Rows[1][1]);
+
+        OdfChartDataCache second = chartDoc.GetLocalDataCache();
+
+        Assert.Same(first, second);
+        Assert.Equal(1, chartDoc.LocalDataCacheBuildCount);
+
+        chartDoc.UpdateData(new object?[][]
+        {
+            new object?[] { "季度", "銷量" },
+            new object?[] { "Q2", 25d }
+        });
+
+        Assert.Equal(1, chartDoc.LocalDataCacheBuildCount);
+
+        OdfChartDataCache rebuilt = chartDoc.GetLocalDataCache();
+
+        Assert.NotSame(first, rebuilt);
+        Assert.Equal(2, chartDoc.LocalDataCacheBuildCount);
+        Assert.Equal("Q2", rebuilt.Rows[1][0]);
+        Assert.Equal(25d, rebuilt.Rows[1][1]);
+    }
+
     // ── V-1: SetDataRange / GetDataRange / InsertChart ──────────────────────
 
     /// <summary>

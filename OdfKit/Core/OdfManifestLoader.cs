@@ -23,6 +23,7 @@ internal static class OdfManifestLoader
     {
         var settings = new XmlReaderSettings
         {
+            NameTable = OdfXmlNameTable.Create(),
             DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null,
             IgnoreWhitespace = true,

@@ -78,6 +78,18 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
     }
 
     /// <summary>
+    /// 將另一份文件或同一份文件中的工作表採納到集合末尾。
+    /// </summary>
+    /// <param name="sheet">要採納的來源工作表</param>
+    /// <param name="newName">採納後選用的新工作表名稱；未指定時保留來源名稱</param>
+    /// <returns>採納完成且屬於此集合所屬文件的工作表</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="sheet"/> 為 <see langword="null"/> 時擲出</exception>
+    public OdfTableSheet Adopt(OdfTableSheet sheet, string? newName = null)
+    {
+        return _document.AdoptSheet(sheet, newName);
+    }
+
+    /// <summary>
     /// 尋找指定名稱的工作表。
     /// </summary>
     /// <param name="name">工作表名稱</param>

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartChartElement(string? prefix = null) : base("chart", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartChartElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfNamespacedToken? Class
         {
             get => GetNamespacedTokenAttributeValue("class", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", GetDocumentVersion());

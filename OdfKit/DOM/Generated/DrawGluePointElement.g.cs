@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public DrawGluePointElement(string? prefix = null) : base("glue-point", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", prefix) { }
 
+        public DrawGluePointElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Align
         {
             get => GetAttributeValue("align", "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0", GetDocumentVersion());

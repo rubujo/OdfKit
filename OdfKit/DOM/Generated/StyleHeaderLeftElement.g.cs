@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleHeaderLeftElement(string? prefix = null) : base("header-left", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleHeaderLeftElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public bool? Display
         {
             get => GetBooleanAttributeValue("display", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

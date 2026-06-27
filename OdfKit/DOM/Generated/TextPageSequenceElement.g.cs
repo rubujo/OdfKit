@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextPageSequenceElement(string? prefix = null) : base("page-sequence", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextPageSequenceElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public IEnumerable<TextPageElement> TextPageChildElements
         {
             get => ChildElements<TextPageElement>();

@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public NumberCurrencySymbolElement(string? prefix = null) : base("currency-symbol", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", prefix) { }
 
+        public NumberCurrencySymbolElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfCountryCode? Country
         {
             get => GetCountryCodeAttributeValue("country", "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0", GetDocumentVersion());

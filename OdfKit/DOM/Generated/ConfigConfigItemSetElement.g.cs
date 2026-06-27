@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ConfigConfigItemSetElement(string? prefix = null) : base("config-item-set", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", prefix) { }
 
+        public ConfigConfigItemSetElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? Name
         {
             get => GetAttributeValue("name", "urn:oasis:names:tc:opendocument:xmlns:config:1.0", GetDocumentVersion());

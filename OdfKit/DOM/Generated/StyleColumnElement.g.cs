@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StyleColumnElement(string? prefix = null) : base("column", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StyleColumnElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfLength? EndIndent
         {
             get => GetLengthAttributeValue("end-indent", "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0", GetDocumentVersion());

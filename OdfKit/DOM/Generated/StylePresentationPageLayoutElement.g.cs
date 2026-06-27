@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public StylePresentationPageLayoutElement(string? prefix = null) : base("presentation-page-layout", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", prefix) { }
 
+        public StylePresentationPageLayoutElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public string? DisplayName
         {
             get => GetAttributeValue("display-name", "urn:oasis:names:tc:opendocument:xmlns:style:1.0", GetDocumentVersion());

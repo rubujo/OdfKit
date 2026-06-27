@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public TextSElement(string? prefix = null) : base("s", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", prefix) { }
 
+        public TextSElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? C
         {
             get => GetNullableInt32AttributeValue("c", "urn:oasis:names:tc:opendocument:xmlns:text:1.0", GetDocumentVersion());

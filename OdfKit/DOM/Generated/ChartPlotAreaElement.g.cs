@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public ChartPlotAreaElement(string? prefix = null) : base("plot-area", "urn:oasis:names:tc:opendocument:xmlns:chart:1.0", prefix) { }
 
+        public ChartPlotAreaElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public OdfColor? AmbientColor
         {
             get => GetColorAttributeValue("ambient-color", "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0", GetDocumentVersion());

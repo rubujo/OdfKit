@@ -18,6 +18,17 @@ namespace OdfKit.DOM
     {
         public MetaDocumentStatisticElement(string? prefix = null) : base("document-statistic", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", prefix) { }
 
+        public MetaDocumentStatisticElement(params OdfNode[] children) : this()
+        {
+            if (children is null)
+                throw new ArgumentNullException(nameof(children));
+
+            foreach (OdfNode child in children)
+            {
+                AppendChild(child);
+            }
+        }
+
         public int? CellCount
         {
             get => GetNullableInt32AttributeValue("cell-count", "urn:oasis:names:tc:opendocument:xmlns:meta:1.0", GetDocumentVersion());

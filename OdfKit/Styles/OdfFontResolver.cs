@@ -16,10 +16,28 @@ public static class OdfFontResolver
 {
     private static readonly Dictionary<string, string> _fontMap = new(StringComparer.OrdinalIgnoreCase);
     private static readonly Dictionary<string, string> _fallbackMap = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, string[]> _builtInFallbackMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Aptos"] = ["Arial", "Liberation Sans", "DejaVu Sans"],
+        ["Aptos Display"] = ["Arial", "Liberation Sans", "DejaVu Sans"],
+        ["Calibri"] = ["Carlito", "Arial", "Liberation Sans", "DejaVu Sans"],
+        ["Cambria"] = ["Caladea", "Times New Roman", "Liberation Serif", "DejaVu Serif"],
+        ["Consolas"] = ["Cascadia Mono", "Courier New", "Liberation Mono", "DejaVu Sans Mono"],
+        ["Courier New"] = ["Liberation Mono", "DejaVu Sans Mono"],
+        ["Microsoft JhengHei"] = ["Noto Sans CJK TC", "Source Han Sans TC", "Noto Sans TC", "DejaVu Sans"],
+        ["MingLiU"] = ["Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "DejaVu Serif"],
+        ["PMingLiU"] = ["Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "DejaVu Serif"],
+        ["Times New Roman"] = ["Liberation Serif", "DejaVu Serif"],
+        ["微軟正黑體"] = ["Noto Sans CJK TC", "Source Han Sans TC", "Noto Sans TC", "DejaVu Sans"],
+        ["細明體"] = ["Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "DejaVu Serif"],
+        ["新細明體"] = ["Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "DejaVu Serif"]
+    };
+
     private static readonly List<string> _customDirectories = [];
     private static readonly HashSet<string> _warnedMissingFonts = new(StringComparer.OrdinalIgnoreCase);
     private static bool _isScanned;
     private static readonly object _lock = new();
+    private static IFontSubsetter? _fontSubsetter;
 
     /// <summary>
     /// 檢查指定字型名稱是否能成功解析出實際字型檔案；若找不到則發出一次性警告（同一名稱不重複記錄），
@@ -116,6 +134,74 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// 取得指定字型的解析候選序列，依序包含原始名稱、使用者註冊替代字型與內建跨平台替代字型。
+    /// </summary>
+    /// <param name="fontName">字型名稱</param>
+    /// <returns>依優先順序排列且已去除重複項目的字型候選序列</returns>
+    public static IReadOnlyList<string> GetFontFallbackCandidates(string fontName)
+    {
+        if (string.IsNullOrWhiteSpace(fontName))
+        {
+            return [];
+        }
+
+        var candidates = new List<string>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        AddCandidate(fontName);
+
+        lock (_lock)
+        {
+            if (_fallbackMap.TryGetValue(fontName, out string? replacement))
+            {
+                AddCandidate(replacement);
+            }
+
+            if (_builtInFallbackMap.TryGetValue(fontName, out string[]? builtInCandidates))
+            {
+                foreach (string candidate in builtInCandidates)
+                {
+                    AddCandidate(candidate);
+                }
+            }
+        }
+
+        return candidates;
+
+        void AddCandidate(string candidate)
+        {
+            if (!string.IsNullOrWhiteSpace(candidate) && seen.Add(candidate))
+            {
+                candidates.Add(candidate);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 依指定可用性探針解析第一個可使用的字型候選名稱。
+    /// </summary>
+    /// <param name="fontName">字型名稱</param>
+    /// <param name="isAvailable">用來判斷字型候選是否可使用的探針</param>
+    /// <returns>第一個可使用的候選字型名稱，若沒有候選符合則為 null</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="isAvailable"/> 為 <see langword="null"/> 時擲出</exception>
+    public static string? ResolveFontFallback(string fontName, Func<string, bool> isAvailable)
+    {
+        if (isAvailable is null)
+        {
+            throw new ArgumentNullException(nameof(isAvailable));
+        }
+
+        foreach (string candidate in GetFontFallbackCandidates(fontName))
+        {
+            if (isAvailable(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// 顯式註冊字型對應。
     /// </summary>
     /// <param name="fontName">字型名稱</param>
@@ -154,6 +240,27 @@ public static class OdfFontResolver
         {
             _customDirectories.Add(directoryPath);
             _isScanned = false; // 觸發下一次查尋時的重新掃描
+        }
+    }
+
+    /// <summary>
+    /// 註冊字型子集化擴充實作。
+    /// </summary>
+    /// <param name="subsetter">字型子集化實作</param>
+    /// <returns>可用於還原先前註冊狀態的資源控制代碼</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="subsetter"/> 為 <see langword="null"/> 時擲出</exception>
+    public static IDisposable RegisterFontSubsetter(IFontSubsetter subsetter)
+    {
+        if (subsetter is null)
+        {
+            throw new ArgumentNullException(nameof(subsetter));
+        }
+
+        lock (_lock)
+        {
+            IFontSubsetter? previous = _fontSubsetter;
+            _fontSubsetter = subsetter;
+            return new FontSubsetterRegistration(previous);
         }
     }
 
@@ -258,6 +365,85 @@ public static class OdfFontResolver
         }
     }
 
+    /// <summary>
+    /// 若已註冊字型子集化實作，掃描文件中的 PUA 自造字並將對應子集字型嵌入封裝。
+    /// </summary>
+    /// <param name="package">ODF 套件</param>
+    /// <param name="contentRoot">內容 XML 的根節點</param>
+    /// <param name="stylesRoot">樣式 XML 的根節點</param>
+    public static void EmbedFontSubsets(OdfPackage package, OdfNode contentRoot, OdfNode stylesRoot)
+    {
+        if (package is null)
+        {
+            throw new ArgumentNullException(nameof(package));
+        }
+
+        if (contentRoot is null)
+        {
+            throw new ArgumentNullException(nameof(contentRoot));
+        }
+
+        if (stylesRoot is null)
+        {
+            throw new ArgumentNullException(nameof(stylesRoot));
+        }
+
+        IFontSubsetter? subsetter;
+        lock (_lock)
+        {
+            subsetter = _fontSubsetter;
+        }
+
+        if (subsetter is null)
+        {
+            return;
+        }
+
+        SortedSet<int> codePoints = [];
+        GatherPrivateUseCodePoints(contentRoot, codePoints);
+        if (codePoints.Count == 0)
+        {
+            return;
+        }
+
+        List<OdfNode> fontFaces = [];
+        GatherFontFaces(contentRoot, fontFaces);
+        GatherFontFaces(stylesRoot, fontFaces);
+        var processedFonts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (OdfNode fontFace in fontFaces)
+        {
+            string? fontName = fontFace.GetAttribute("name", OdfNamespaces.Style);
+            if (string.IsNullOrEmpty(fontName) || !processedFonts.Add(fontName!))
+            {
+                continue;
+            }
+
+            string? fontPath = ResolveFontPath(fontName!);
+            var request = new OdfFontSubsetRequest(fontName!, fontPath, codePoints);
+            OdfFontSubset? subset;
+            try
+            {
+                subset = subsetter.CreateSubset(request);
+            }
+            catch (Exception ex)
+            {
+                OdfKitDiagnostics.Warn($"字型 '{fontName}' 子集化失敗：{ex.Message}");
+                continue;
+            }
+
+            if (subset is null || subset.Bytes.Length == 0)
+            {
+                continue;
+            }
+
+            string path = $"Fonts/Subsets/{SanitizePackagePathSegment(fontName!)}-subset{subset.Extension}";
+            package.WriteEntry(path, subset.Bytes, subset.MediaType);
+            LinkFontSubset(contentRoot, fontName!, path);
+            LinkFontSubset(stylesRoot, fontName!, path);
+        }
+    }
+
     private static void GatherFontFaces(OdfNode node, List<OdfNode> fontFaces)
     {
         if (node.NodeType == OdfNodeType.Element && node.LocalName == "font-face" && node.NamespaceUri == OdfNamespaces.Style)
@@ -267,6 +453,101 @@ public static class OdfFontResolver
         foreach (var child in node.Children)
         {
             GatherFontFaces(child, fontFaces);
+        }
+    }
+
+    private static void GatherPrivateUseCodePoints(OdfNode node, SortedSet<int> codePoints)
+    {
+        if (node.NodeType == OdfNodeType.Text)
+        {
+            string text = node.TextContent;
+            for (int i = 0; i < text.Length; i++)
+            {
+                int codePoint = char.ConvertToUtf32(text, i);
+                if (char.IsHighSurrogate(text[i]))
+                {
+                    i++;
+                }
+
+                if (IsPrivateUseCodePoint(codePoint))
+                {
+                    codePoints.Add(codePoint);
+                }
+            }
+        }
+
+        foreach (OdfNode child in node.Children)
+        {
+            GatherPrivateUseCodePoints(child, codePoints);
+        }
+    }
+
+    private static bool IsPrivateUseCodePoint(int codePoint)
+        => codePoint is >= 0xE000 and <= 0xF8FF
+            or >= 0xF0000 and <= 0xFFFFD
+            or >= 0x100000 and <= 0x10FFFD;
+
+    private static void LinkFontSubset(OdfNode root, string fontName, string packagePath)
+    {
+        List<OdfNode> fontFaces = [];
+        GatherFontFaces(root, fontFaces);
+        foreach (OdfNode fontFace in fontFaces)
+        {
+            if (fontFace.GetAttribute("name", OdfNamespaces.Style) == fontName)
+            {
+                OdfNode uriNode = FindOrCreateFontFaceUri(fontFace);
+                uriNode.SetAttribute("href", OdfNamespaces.XLink, packagePath, "xlink");
+                uriNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+            }
+        }
+    }
+
+    private static OdfNode FindOrCreateFontFaceUri(OdfNode fontFace)
+    {
+        foreach (OdfNode child in fontFace.Children)
+        {
+            if (child.LocalName == "font-face-uri" && child.NamespaceUri == OdfNamespaces.Style)
+            {
+                return child;
+            }
+        }
+
+        OdfNode uriNode = new(OdfNodeType.Element, "font-face-uri", OdfNamespaces.Style, "style");
+        fontFace.AppendChild(uriNode);
+        return uriNode;
+    }
+
+    private static string SanitizePackagePathSegment(string value)
+    {
+        var builder = new StringBuilder(value.Length);
+        foreach (char ch in value)
+        {
+            builder.Append(IsSafePackagePathCharacter(ch) ? ch : '_');
+        }
+
+        return builder.Length == 0 ? "font" : builder.ToString();
+    }
+
+    private static bool IsSafePackagePathCharacter(char ch)
+        => char.IsLetterOrDigit(ch) || ch is '-' or '_' or '.';
+
+    private sealed class FontSubsetterRegistration(IFontSubsetter? previous) : IDisposable
+    {
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            lock (_lock)
+            {
+                _fontSubsetter = previous;
+            }
+
+            _disposed = true;
         }
     }
 
