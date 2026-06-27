@@ -6,6 +6,7 @@
 *.csproj text eol=crlf
 *.sln text eol=crlf
 *.slnx text eol=crlf
+*.ps1 text eol=crlf
 *.config text eol=crlf
 *.xml text eol=crlf
 *.json text eol=crlf
