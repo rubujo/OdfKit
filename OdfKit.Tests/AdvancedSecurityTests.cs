@@ -17,6 +17,7 @@ using Xunit;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Boundary)]
     public class AdvancedSecurityTests
     {
 #if NET9_0_OR_GREATER

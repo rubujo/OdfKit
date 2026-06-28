@@ -19,7 +19,7 @@ namespace OdfKit.Tests;
 /// 驗證 typed DOM 與 ODFDOM 對標線的基本覆蓋能力。
 /// </summary>
 [Trait(TestCategories.Kind, TestCategories.Regression)]
-public class TypedDomParityTests
+public partial class TypedDomParityTests
 {
     /// <summary>
     /// 驗證 factory 會建立 generated 與手寫 typed wrapper，未知元素則回退為未知元素。
@@ -2131,6 +2131,30 @@ public class TypedDomParityTests
                 relation.ChildNamespaceUri == OdfNamespaces.Table &&
                 relation.ChildLocalName == "table-row");
         Assert.Contains(report.AttributeValueTypeCounts, pair => pair.Key.Length > 0 && pair.Value > 0);
+        Assert.Contains(
+            report.AttributeDatatypeCoverage,
+            coverage => coverage.SchemaValueType == "positive-integer" &&
+                coverage.WrapperPropertyType == "int" &&
+                coverage.HasTypedHelper &&
+                coverage.Status == "typed-helper-present");
+        Assert.Contains(
+            report.AttributeDatatypeCoverage,
+            coverage => coverage.SchemaValueType == "date" &&
+                coverage.WrapperPropertyType == "dateTime" &&
+                coverage.HasTypedHelper &&
+                coverage.Status == "typed-helper-present");
+        Assert.Contains(
+            report.AttributeDatatypeCoverage,
+            coverage => coverage.SchemaValueType == "time" &&
+                coverage.WrapperPropertyType == "time" &&
+                coverage.HasTypedHelper &&
+                coverage.Status == "typed-helper-present");
+        Assert.Contains(
+            report.AttributeDatatypeCoverage,
+            coverage => coverage.SchemaValueType == "string" &&
+                coverage.WrapperPropertyType == "string" &&
+                !coverage.HasTypedHelper &&
+                coverage.Status == "string-preserve");
         var expectedFloors = new (string PropertyType, int MinCount)[]
         {
             ("int", 200),
@@ -2266,6 +2290,18 @@ public class TypedDomParityTests
         Assert.Equal(report.SchemaElementCount, document.RootElement.GetProperty("summary").GetProperty("schemaElementCount").GetInt32());
         Assert.Equal(report.SchemaChildElementRelationCount, document.RootElement.GetProperty("summary").GetProperty("schemaChildElementRelationCount").GetInt32());
         Assert.True(document.RootElement.GetProperty("childElementRelations").GetArrayLength() >= 2000);
+        Assert.Contains(
+            document.RootElement.GetProperty("attributeDatatypeCoverage").EnumerateArray(),
+            coverage => coverage.GetProperty("schemaValueType").GetString() == "positive-integer" &&
+                coverage.GetProperty("wrapperPropertyType").GetString() == "int" &&
+                coverage.GetProperty("hasTypedHelper").GetBoolean() &&
+                coverage.GetProperty("status").GetString() == "typed-helper-present");
+        Assert.Contains(
+            document.RootElement.GetProperty("attributeDatatypeCoverage").EnumerateArray(),
+            coverage => coverage.GetProperty("schemaValueType").GetString() == "time" &&
+                coverage.GetProperty("wrapperPropertyType").GetString() == "time" &&
+                coverage.GetProperty("hasTypedHelper").GetBoolean() &&
+                coverage.GetProperty("status").GetString() == "typed-helper-present");
         Assert.Contains(
             document.RootElement.GetProperty("childElementRelations").EnumerateArray(),
             relation => relation.GetProperty("parentNamespaceUri").GetString() == OdfNamespaces.Office &&
@@ -2935,20 +2971,21 @@ public class TypedDomParityTests
     }
 
     /// <summary>
-    /// 驗證 typed DOM coverage 文件列出 ODFDOM 對標缺口與 coverage guard。
+    /// 驗證 typed DOM 對標文件與 coverage guard 入口仍存在。
     /// </summary>
     [Fact]
     public void TypedDomCoverageDocumentDeclaresParityGaps()
     {
         string repoRoot = FindRepositoryRoot();
-        string document = File.ReadAllText(Path.Combine(repoRoot, "docs", "typed-dom-coverage.md"));
+        string parity = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf-toolkit-parity.md"));
+        string script = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-OdfTypedDomCoverage.ps1"));
 
-        Assert.Contains("ODFDOM", document, StringComparison.Ordinal);
-        Assert.Contains("Coverage guard", document, StringComparison.Ordinal);
-        Assert.Contains("Generated typed element classes", document, StringComparison.Ordinal);
-        Assert.Contains("schema-to-wrapper coverage report", document, StringComparison.Ordinal);
-        Assert.Contains("schema-specific child collection", document, StringComparison.Ordinal);
-        Assert.Contains("ODFDOM 風格 sample usage parity tests", document, StringComparison.Ordinal);
+        Assert.Contains("ODFDOM", parity, StringComparison.Ordinal);
+        Assert.Contains("typed-dom-coverage", parity, StringComparison.Ordinal);
+        Assert.Contains("schema-specific child collection", parity, StringComparison.Ordinal);
+        Assert.Contains("ODFDOM-style sample traversal", parity, StringComparison.Ordinal);
+        Assert.Contains("schemaElementCount", script, StringComparison.Ordinal);
+        Assert.Contains("odf-typed-dom-coverage.json", script, StringComparison.Ordinal);
     }
 
     /// <summary>

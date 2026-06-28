@@ -12,7 +12,7 @@
 | 建立第一個範例或驗證 PoC | [快速開始](getting-started.md) | [Cookbook](cookbook.md)、[samples/README.md](../samples/README.md) |
 | 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[ODF 格式支援矩陣](odf-format-support.md) |
 | 規劃部署、升級與版本交付 | [版本與交付資訊](version-delivery.md) | [GitHub Release 發佈指南](github-release-publishing.md)、[CHANGELOG](../CHANGELOG.md) |
-| 確認功能邊界、互通性與驗證證據 | [ODF 格式支援矩陣](odf-format-support.md) | [ODF 1.4 覆蓋](odf14-coverage.md)、[LibreOffice 互通矩陣](libreoffice-interop-matrix.md)、[OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md) |
+| 確認功能邊界、互通性與驗證證據 | [ODF 格式支援矩陣](odf-format-support.md) | [LibreOffice 互通矩陣](libreoffice-interop-matrix.md)、[OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md)、[ODF Toolkit 對標線](odf-toolkit-parity.md) |
 
 ## 依生命週期分類
 
@@ -26,7 +26,6 @@
 | [ODF 格式支援矩陣](odf-format-support.md) | 功能覆蓋、狀態標記與測試證據 |
 | [ODF Profile 來源](odf-profile-sources.md) | 內建 Profile 的來源、權威層級與驗證狀態 |
 | [i18n 與在地化](i18n-localization.md) | 語系字典、訊息回退與 `OdfLocalizer` 使用方式 |
-| [Managed-first 轉檔策略](managed-first-conversion-strategy.md) | 純 managed 與外部後端的分工原則 |
 | [版本與交付資訊](version-delivery.md) | 交付管道、版本原則與安裝參考 |
 
 ### 2. 導入與開發
@@ -39,21 +38,18 @@
 | [samples/README.md](../samples/README.md) | 單檔 Script 範例與輸出說明 |
 | [Rendering 後端部署](rendering-backend-deployment.md) | LibreOffice 渲染擴充的部署要求 |
 | [Foreign 擴充政策](foreign-extension-policy.md) | 非標準命名空間與相容策略 |
-| [typed DOM 覆蓋](typed-dom-coverage.md) | DOM wrapper 覆蓋範圍 |
 
 ### 3. 驗證、互通與營運
 
 | 文件 | 用途 |
 |------|------|
-| [ODF 1.4 覆蓋](odf14-coverage.md) | 規格對照與完成度 |
-| [ODF Toolkit 對標線](odf-toolkit-parity.md) | 與外部工具能力對照 |
+| [ODF Toolkit 對標線](odf-toolkit-parity.md) | ODF Toolkit / ODF Validator / ODFDOM 對標狀態 |
 | [LibreOffice 互通矩陣](libreoffice-interop-matrix.md) | 與 LibreOffice 的行為驗證 |
 | [OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md) | OOXML 視覺與 golden 驗收 |
 | [Interop Corpus 總覽](interop-corpus.md) | corpus 來源與使用方式 |
 | [官方 Corpus 來源](odf-official-corpus-sources.md) | 官方 ODF corpus 來源說明 |
 | [Corpus Manifest 規則](corpus-manifest.md) | corpus manifest 契約 |
 | [GitHub Release 發佈指南](github-release-publishing.md) | 封裝、驗證與發佈步驟 |
-| [測試策略](testing-strategy.md) | 測試分層、命名與整理規則 |
 
 ## 其他治理文件
 

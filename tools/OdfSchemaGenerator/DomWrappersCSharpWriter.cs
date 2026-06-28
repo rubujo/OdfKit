@@ -1445,7 +1445,8 @@ public sealed class DomWrappersCSharpWriter
             "time" => AttributeValueKind.Time,
             "duration" => AttributeValueKind.Duration,
             "ncname" or "id" or "idref" => AttributeValueKind.XmlName,
-            "string" or "normalizedstring" or "token" or "language" or "name" or "anyuri" => AttributeValueKind.String,
+            "anyuri" => AttributeValueKind.IriReference,
+            "string" or "normalizedstring" or "token" or "language" or "name" => AttributeValueKind.String,
             _ => AttributeValueKind.String
         };
     }

@@ -646,7 +646,7 @@ public static class OdfMarkdownImporter
 
         if (commentBody.StartsWith("annotation-start:", StringComparison.Ordinal))
         {
-            string name = ReadAttributeValue(commentBody, "name") ?? string.Empty;
+            string name = ResolveAnnotationName(paragraph, ReadAttributeValue(commentBody, "name"));
             string creator = ReadAttributeValue(commentBody, "creator") ?? string.Empty;
             string date = ReadAttributeValue(commentBody, "date") ?? string.Empty;
             string commentText = ReadAttributeValue(commentBody, "text") ?? string.Empty;
@@ -679,7 +679,7 @@ public static class OdfMarkdownImporter
         }
         else if (commentBody.StartsWith("annotation-end:", StringComparison.Ordinal))
         {
-            string name = ReadAttributeValue(commentBody, "name") ?? string.Empty;
+            string name = ResolveAnnotationEndName(paragraph, ReadAttributeValue(commentBody, "name"));
 
             var endNode = new OdfNode(OdfNodeType.Element, "annotation-end", OdfNamespaces.Office, "office");
             endNode.SetAttribute("name", OdfNamespaces.Office, name, "office");
@@ -689,7 +689,7 @@ public static class OdfMarkdownImporter
         }
         else if (commentBody.StartsWith("annotation:", StringComparison.Ordinal))
         {
-            string name = ReadAttributeValue(commentBody, "name") ?? string.Empty;
+            string name = ResolveAnnotationName(paragraph, ReadAttributeValue(commentBody, "name"));
             string creator = ReadAttributeValue(commentBody, "creator") ?? string.Empty;
             string date = ReadAttributeValue(commentBody, "date") ?? string.Empty;
             string commentText = ReadAttributeValue(commentBody, "text") ?? string.Empty;
@@ -718,6 +718,87 @@ public static class OdfMarkdownImporter
         }
 
         return false;
+    }
+
+    private static string ResolveAnnotationName(OdfParagraph paragraph, string? name)
+    {
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            return name;
+        }
+
+        OdfNode root = paragraph.Node;
+        while (root.Parent is not null)
+        {
+            root = root.Parent;
+        }
+
+        var usedNames = new HashSet<string>(StringComparer.Ordinal);
+        foreach (OdfNode node in root.Descendants())
+        {
+            if (node.NamespaceUri != OdfNamespaces.Office ||
+                (node.LocalName != "annotation" &&
+                    node.LocalName != "annotation-start" &&
+                    node.LocalName != "annotation-end"))
+            {
+                continue;
+            }
+
+            string? existing = node.GetAttribute("name", OdfNamespaces.Office);
+            if (!string.IsNullOrWhiteSpace(existing))
+            {
+                usedNames.Add(existing!);
+            }
+        }
+
+        for (int i = 1; ; i++)
+        {
+            string generated = "comment-" + i.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (!usedNames.Contains(generated))
+            {
+                return generated;
+            }
+        }
+    }
+
+    private static string ResolveAnnotationEndName(OdfParagraph paragraph, string? name)
+    {
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            return name;
+        }
+
+        OdfNode root = paragraph.Node;
+        while (root.Parent is not null)
+        {
+            root = root.Parent;
+        }
+
+        var openNames = new List<string>();
+        foreach (OdfNode node in root.Descendants())
+        {
+            if (node.NamespaceUri != OdfNamespaces.Office)
+            {
+                continue;
+            }
+
+            string? existing = node.GetAttribute("name", OdfNamespaces.Office);
+            if (string.IsNullOrWhiteSpace(existing))
+            {
+                continue;
+            }
+
+            if (node.LocalName == "annotation-start")
+            {
+                openNames.Add(existing!);
+            }
+            else if (node.LocalName == "annotation-end")
+            {
+                openNames.Remove(existing!);
+            }
+        }
+
+        return openNames.Count == 0 ? ResolveAnnotationName(paragraph, name) : openNames[openNames.Count - 1];
     }
 
     private static bool TryReadComment(string body, out string? author, out string? commentText)

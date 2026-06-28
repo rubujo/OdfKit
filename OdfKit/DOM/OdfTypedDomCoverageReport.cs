@@ -13,6 +13,7 @@ public sealed class OdfTypedDomCoverageReport
 {
     private readonly IReadOnlyList<OdfTypedDomElementCoverage> elements;
     private readonly IReadOnlyList<OdfTypedDomChildElementRelationCoverage> childElementRelations;
+    private readonly IReadOnlyList<OdfTypedDomAttributeDatatypeCoverage> attributeDatatypeCoverage;
     private readonly IReadOnlyDictionary<string, int> attributeValueTypeCounts;
     private readonly IReadOnlyDictionary<string, int> wrapperPropertyTypeCounts;
 
@@ -24,6 +25,7 @@ public sealed class OdfTypedDomCoverageReport
     /// <param name="schemaSourceDate">schema 來源日期</param>
     /// <param name="elements">元素覆蓋清單</param>
     /// <param name="childElementRelations">schema 直接子元素關係清單</param>
+    /// <param name="attributeDatatypeCoverage">schema 屬性值類型與 typed helper 對照清單</param>
     /// <param name="schemaAttributeCount">schema 屬性總數</param>
     /// <param name="attributeValueTypeCounts">schema 屬性值類型分布</param>
     /// <param name="wrapperPropertyTypeCounts">wrapper 屬性 CLR 類型分布</param>
@@ -33,6 +35,7 @@ public sealed class OdfTypedDomCoverageReport
         string schemaSourceDate,
         IReadOnlyList<OdfTypedDomElementCoverage> elements,
         IReadOnlyList<OdfTypedDomChildElementRelationCoverage> childElementRelations,
+        IReadOnlyList<OdfTypedDomAttributeDatatypeCoverage> attributeDatatypeCoverage,
         int schemaAttributeCount,
         IReadOnlyDictionary<string, int> attributeValueTypeCounts,
         IReadOnlyDictionary<string, int> wrapperPropertyTypeCounts)
@@ -42,6 +45,7 @@ public sealed class OdfTypedDomCoverageReport
         SchemaSourceDate = schemaSourceDate ?? throw new ArgumentNullException(nameof(schemaSourceDate));
         this.elements = elements ?? throw new ArgumentNullException(nameof(elements));
         this.childElementRelations = childElementRelations ?? throw new ArgumentNullException(nameof(childElementRelations));
+        this.attributeDatatypeCoverage = attributeDatatypeCoverage ?? throw new ArgumentNullException(nameof(attributeDatatypeCoverage));
         SchemaAttributeCount = schemaAttributeCount;
         this.attributeValueTypeCounts = attributeValueTypeCounts ?? throw new ArgumentNullException(nameof(attributeValueTypeCounts));
         this.wrapperPropertyTypeCounts = wrapperPropertyTypeCounts ?? throw new ArgumentNullException(nameof(wrapperPropertyTypeCounts));
@@ -110,6 +114,11 @@ public sealed class OdfTypedDomCoverageReport
     public IReadOnlyList<OdfTypedDomChildElementRelationCoverage> ChildElementRelations => childElementRelations;
 
     /// <summary>
+    /// 取得 schema 屬性值類型與 typed helper 對照清單。
+    /// </summary>
+    public IReadOnlyList<OdfTypedDomAttributeDatatypeCoverage> AttributeDatatypeCoverage => attributeDatatypeCoverage;
+
+    /// <summary>
     /// 取得 schema 屬性值類型分布。
     /// </summary>
     public IReadOnlyDictionary<string, int> AttributeValueTypeCounts => attributeValueTypeCounts;
@@ -142,6 +151,15 @@ public sealed class OdfTypedDomCoverageReport
             },
             attributeValueTypeCounts = AttributeValueTypeCounts,
             wrapperPropertyTypeCounts = WrapperPropertyTypeCounts,
+            attributeDatatypeCoverage = AttributeDatatypeCoverage.Select(coverage => new
+            {
+                schemaValueType = coverage.SchemaValueType,
+                schemaAttributeCount = coverage.SchemaAttributeCount,
+                wrapperPropertyType = coverage.WrapperPropertyType,
+                wrapperPropertyCount = coverage.WrapperPropertyCount,
+                hasTypedHelper = coverage.HasTypedHelper,
+                status = coverage.Status
+            }).ToArray(),
             elements = Elements.Select(element => new
             {
                 namespaceUri = element.NamespaceUri,

@@ -12,6 +12,7 @@ using Xunit;
 
 namespace OdfKit.Tests;
 
+[Trait(TestCategories.Kind, TestCategories.Regression)]
 public class ManagedTextExportTests
 {
     [Fact]
@@ -878,6 +879,25 @@ public class ManagedTextExportTests
     }
 
     [Fact]
+    public void RtfImporterMapsReferenceNumberSwitchesToNumberReference()
+    {
+        const string rtf = @"{\rtf1\ansi Section {\field{\*\fldinst REF ""HeadingAnchor"" \n}{\fldrslt 2.1}} / {\field{\*\fldinst REF ""HeadingAnchor"" \w}{\fldrslt 2.1.4}}}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        OdfNode[] referenceRefs = paragraph.Children
+            .Where(node => node.LocalName == "reference-ref" && node.NamespaceUri == OdfNamespaces.Text)
+            .ToArray();
+
+        Assert.Equal(2, referenceRefs.Length);
+        Assert.All(referenceRefs, node => Assert.Equal("HeadingAnchor", node.GetAttribute("ref-name", OdfNamespaces.Text)));
+        Assert.All(referenceRefs, node => Assert.Equal("number", node.GetAttribute("reference-format", OdfNamespaces.Text)));
+        Assert.Equal("2.1", referenceRefs[0].TextContent);
+        Assert.Equal("2.1.4", referenceRefs[1].TextContent);
+    }
+
+    [Fact]
     public void RtfImporterRoundTripsImageReferencesAndComments()
     {
         using TextDocument source = TextDocument.Create();
@@ -1322,6 +1342,44 @@ public class ManagedTextExportTests
         var descNodes = roundTripDoc.BodyTextRoot.Descendants();
         Assert.Contains(descNodes, n => n.LocalName == "annotation-start" && n.GetAttribute("name", OdfNamespaces.Office) == "comment-台湾-1");
         Assert.Contains(descNodes, n => n.LocalName == "annotation-end" && n.GetAttribute("name", OdfNamespaces.Office) == "comment-台湾-1");
+    }
+
+    [Fact]
+    public void MarkdownImporterGeneratesNameForAnnotationWithoutMetadata()
+    {
+        const string markdown =
+            "Alpha <!-- annotation: text=\"缺少 metadata 仍保留\" --> omega\n";
+
+        using TextDocument document = markdown.ToOdtTextDocument(OdfMarkdownImportOptions.Basic);
+
+        OdfCommentInfo comment = Assert.Single(document.GetCommentInfos());
+        Assert.Equal("comment-1", comment.Name);
+        Assert.Equal("Unknown", comment.Author);
+        Assert.Equal("缺少 metadata 仍保留", comment.Text);
+        Assert.Contains(document.BodyTextRoot.Descendants(), node =>
+            node.LocalName == "annotation" &&
+            node.NamespaceUri == OdfNamespaces.Office &&
+            node.GetAttribute("name", OdfNamespaces.Office) == "comment-1");
+    }
+
+    [Fact]
+    public void MarkdownImporterPairsUnnamedAnnotationRangeMarkers()
+    {
+        const string markdown =
+            "Alpha <!-- annotation-start: text=\"範圍註解\" -->scoped<!-- annotation-end: --> omega\n";
+
+        using TextDocument document = markdown.ToOdtTextDocument(OdfMarkdownImportOptions.Basic);
+
+        OdfCommentInfo comment = Assert.Single(document.GetCommentInfos());
+        Assert.Equal("comment-1", comment.Name);
+        Assert.Equal("範圍註解", comment.Text);
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Contains(paragraph.Descendants(), node =>
+            node.LocalName == "annotation-start" &&
+            node.GetAttribute("name", OdfNamespaces.Office) == "comment-1");
+        Assert.Contains(paragraph.Descendants(), node =>
+            node.LocalName == "annotation-end" &&
+            node.GetAttribute("name", OdfNamespaces.Office) == "comment-1");
     }
 
     /// <summary>

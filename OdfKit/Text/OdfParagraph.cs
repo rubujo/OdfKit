@@ -208,6 +208,33 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// 依 Unicode 平面將文字拆成適合 CNS 11643 全字庫情境的多個文字片段，並自動套用對應字型。
+    /// </summary>
+    /// <param name="text">要新增的文字內容</param>
+    /// <param name="baseFont">Plane 0 文字使用的基礎字型名稱</param>
+    /// <returns>新增的文字片段集合</returns>
+    public IReadOnlyList<OdfTextRun> AddCns11643Text(string text, string baseFont = "TW-Kai")
+    {
+        if (text is null)
+            throw new ArgumentNullException(nameof(text));
+        if (baseFont is null)
+            throw new ArgumentNullException(nameof(baseFont));
+
+        Doc.ApplyCjkFontFallback();
+
+        List<(string Text, string FontName)> segments = OdfFontSegmenter.SegmentText(text, baseFont);
+        var runs = new List<OdfTextRun>(segments.Count);
+        foreach ((string segmentText, string fontName) in segments)
+        {
+            OdfTextRun run = AddTextRun(segmentText);
+            run.SetFont(fontName, fontName, fontName);
+            runs.Add(run);
+        }
+
+        return runs;
+    }
+
+    /// <summary>
     /// 在段落中新增軟分頁符號。
     /// </summary>
     public void AddSoftPageBreak()

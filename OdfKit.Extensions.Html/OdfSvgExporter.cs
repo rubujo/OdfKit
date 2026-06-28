@@ -1013,6 +1013,9 @@ public static class OdfSvgExporter
         double subpathX = 0;
         double subpathY = 0;
         bool hasCurrentPoint = false;
+        bool hasLastCubicControlPoint = false;
+        double lastCubicControlX = 0;
+        double lastCubicControlY = 0;
 
         while (index < tokens.Count)
         {
@@ -1043,6 +1046,7 @@ public static class OdfSvgExporter
                     subpathX = currentX;
                     subpathY = currentY;
                     hasCurrentPoint = true;
+                    hasLastCubicControlPoint = false;
                     command = 'L';
                     break;
                 case 'L':
@@ -1056,6 +1060,7 @@ public static class OdfSvgExporter
                     currentY = commandIsRelative ? currentY + lineY : lineY;
                     AppendSvgCommand(sb, "L", currentX, currentY);
                     hasCurrentPoint = true;
+                    hasLastCubicControlPoint = false;
                     break;
                 case 'H':
                     if (!hasCurrentPoint ||
@@ -1066,6 +1071,7 @@ public static class OdfSvgExporter
 
                     currentX = commandIsRelative ? currentX + horizontalX : horizontalX;
                     AppendSvgCommand(sb, "H", currentX);
+                    hasLastCubicControlPoint = false;
                     break;
                 case 'C':
                     if (!TryReadNumbers(tokens, ref index, 6, out double[] cubic))
@@ -1079,9 +1085,46 @@ public static class OdfSvgExporter
                     }
 
                     AppendSvgCommand(sb, "C", cubic);
+                    lastCubicControlX = cubic[2];
+                    lastCubicControlY = cubic[3];
                     currentX = cubic[4];
                     currentY = cubic[5];
                     hasCurrentPoint = true;
+                    hasLastCubicControlPoint = true;
+                    break;
+                case 'S':
+                    if (!hasCurrentPoint ||
+                        !TryReadNumbers(tokens, ref index, 4, out double[] smoothCubic))
+                    {
+                        return false;
+                    }
+
+                    if (commandIsRelative)
+                    {
+                        OffsetCoordinatePairs(smoothCubic, currentX, currentY);
+                    }
+
+                    double reflectedControlX = hasLastCubicControlPoint
+                        ? (2 * currentX) - lastCubicControlX
+                        : currentX;
+                    double reflectedControlY = hasLastCubicControlPoint
+                        ? (2 * currentY) - lastCubicControlY
+                        : currentY;
+                    AppendSvgCommand(
+                        sb,
+                        "C",
+                        reflectedControlX,
+                        reflectedControlY,
+                        smoothCubic[0],
+                        smoothCubic[1],
+                        smoothCubic[2],
+                        smoothCubic[3]);
+                    lastCubicControlX = smoothCubic[0];
+                    lastCubicControlY = smoothCubic[1];
+                    currentX = smoothCubic[2];
+                    currentY = smoothCubic[3];
+                    hasCurrentPoint = true;
+                    hasLastCubicControlPoint = true;
                     break;
                 case 'Q':
                     if (!TryReadNumbers(tokens, ref index, 4, out double[] quadratic))
@@ -1098,12 +1141,14 @@ public static class OdfSvgExporter
                     currentX = quadratic[2];
                     currentY = quadratic[3];
                     hasCurrentPoint = true;
+                    hasLastCubicControlPoint = false;
                     break;
                 case 'Z':
                     AppendSvgCommand(sb, "Z");
                     currentX = subpathX;
                     currentY = subpathY;
                     hasCurrentPoint = true;
+                    hasLastCubicControlPoint = false;
                     command = '\0';
                     break;
                 case 'A':
@@ -1120,6 +1165,7 @@ public static class OdfSvgExporter
 
                         currentY = commandIsRelative ? currentY + verticalY : verticalY;
                         AppendSvgCommand(sb, "V", currentY);
+                        hasLastCubicControlPoint = false;
                         break;
                     }
 
@@ -1141,6 +1187,7 @@ public static class OdfSvgExporter
                         subpathY = currentY;
                     }
 
+                    hasLastCubicControlPoint = false;
                     break;
                 case 'G':
                     if (!hasCurrentPoint ||
@@ -1154,6 +1201,7 @@ public static class OdfSvgExporter
                         return false;
                     }
 
+                    hasLastCubicControlPoint = false;
                     break;
                 case 'T':
                 case 'U':
@@ -1180,6 +1228,7 @@ public static class OdfSvgExporter
                         subpathY = currentY;
                     }
 
+                    hasLastCubicControlPoint = false;
                     break;
                 case 'X':
                 case 'Y':
@@ -1192,11 +1241,12 @@ public static class OdfSvgExporter
                     AppendQuadrantArc(sb, command, currentX, currentY, quadrant[0], quadrant[1]);
                     currentX = quadrant[0];
                     currentY = quadrant[1];
+                    hasLastCubicControlPoint = false;
                     break;
                 case 'F':
                 case 'N':
-                case 'S':
                     command = '\0';
+                    hasLastCubicControlPoint = false;
                     break;
                 default:
                     return false;

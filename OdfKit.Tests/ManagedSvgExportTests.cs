@@ -12,6 +12,7 @@ using Xunit;
 
 namespace OdfKit.Tests;
 
+[Trait(TestCategories.Kind, TestCategories.Regression)]
 public class ManagedSvgExportTests
 {
     [Fact]
@@ -157,6 +158,34 @@ public class ManagedSvgExportTests
 
         XElement path = Assert.Single(parsed.Descendants(ns + "path"));
         Assert.Equal("M 100 10 L 120 40 H 160 V 90 Q 170 100 180 90 C 185 95 190 100 195 105 Z", (string?)path.Attribute("d"));
+        Assert.Empty(parsed.Descendants(ns + "rect"));
+    }
+
+    [Fact]
+    public void SvgExporterTranslatesSmoothCubicEnhancedPathCommandsAfterSubstitution()
+    {
+        using DrawingDocument document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("Page 1");
+        OdfShape shape = page.AddCustomShape(
+            "custom",
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(3),
+            OdfLength.FromCentimeters(2));
+        OdfNode geometry = Assert.Single(
+            shape.Node.Children,
+            child => child.LocalName == "enhanced-geometry" && child.NamespaceUri == OdfNamespaces.Draw);
+        geometry.SetAttribute("enhanced-path", OdfNamespaces.Draw, "M 0 0 C 10 0 20 0 $0 0 S ?x2 20 70 20", "draw");
+        geometry.SetAttribute("modifiers", OdfNamespaces.Draw, "30", "draw");
+        geometry.SetAttribute("viewBox", OdfNamespaces.Svg, "0 0 100 100", "svg");
+        AddEquation(geometry, "x2", "$0 + 20");
+
+        string svg = document.ToSvg();
+        XDocument parsed = XDocument.Parse(svg);
+        XNamespace ns = "http://www.w3.org/2000/svg";
+
+        XElement path = Assert.Single(parsed.Descendants(ns + "path"));
+        Assert.Equal("M 0 0 C 10 0 20 0 30 0 C 40 0 50 20 70 20", (string?)path.Attribute("d"));
         Assert.Empty(parsed.Descendants(ns + "rect"));
     }
 

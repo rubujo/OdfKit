@@ -10,6 +10,7 @@ using OdfKit.Text;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Policy)]
     public class SecurityComplianceTests
     {
         [Theory]

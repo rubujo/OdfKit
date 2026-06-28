@@ -18,6 +18,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定試算表高階 API 的整合測試。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Scenario)]
 public class SpreadsheetHighLevelApiTests
 {
     /// <summary>

@@ -549,6 +549,7 @@ public static class OdpToPptxConverter
         P.CommonSlideData layoutCommonSlideData = CreateCommonSlideData();
         layoutCommonSlideData.Background = new P.Background(
             new P.BackgroundStyleReference(new A.SchemeColor { Val = A.SchemeColorValues.Background2 }) { Index = 1U });
+        AppendStandardLayoutPlaceholders(layoutCommonSlideData.ShapeTree!, layoutType);
 
         layoutPart.SlideLayout = new P.SlideLayout(
             layoutCommonSlideData,
@@ -588,6 +589,95 @@ public static class OdpToPptxConverter
         P.Presentation presentation = presentationPart.Presentation!;
         presentation.SlideMasterIdList!.Append(new P.SlideMasterId { Id = 2147483648U, RelationshipId = masterRelationshipId });
         return layoutPart;
+    }
+
+    /// <summary>
+    /// 依標準版面配置在 SlideLayoutPart 內建立對應的預留位置圖形。
+    /// </summary>
+    private static void AppendStandardLayoutPlaceholders(P.ShapeTree shapeTree, P.SlideLayoutValues layoutType)
+    {
+        uint placeholderId = 2U;
+        if (layoutType == P.SlideLayoutValues.TitleOnly)
+        {
+            shapeTree.Append(CreateLayoutPlaceholderShape(
+                ref placeholderId,
+                P.PlaceholderValues.Title,
+                "Title Placeholder",
+                685800L,
+                457200L,
+                7772400L,
+                914400L));
+
+            return;
+        }
+
+        if (layoutType == P.SlideLayoutValues.Title)
+        {
+            shapeTree.Append(CreateLayoutPlaceholderShape(
+                ref placeholderId,
+                P.PlaceholderValues.Title,
+                "Title Placeholder",
+                685800L,
+                457200L,
+                7772400L,
+                914400L));
+            shapeTree.Append(CreateLayoutPlaceholderShape(
+                ref placeholderId,
+                P.PlaceholderValues.SubTitle,
+                "Subtitle Placeholder",
+                1371600L,
+                1828800L,
+                6400800L,
+                1371600L));
+
+            return;
+        }
+
+        if (layoutType == P.SlideLayoutValues.Text)
+        {
+            shapeTree.Append(CreateLayoutPlaceholderShape(
+                ref placeholderId,
+                P.PlaceholderValues.Title,
+                "Title Placeholder",
+                685800L,
+                457200L,
+                7772400L,
+                914400L));
+            shapeTree.Append(CreateLayoutPlaceholderShape(
+                ref placeholderId,
+                P.PlaceholderValues.Body,
+                "Body Placeholder",
+                914400L,
+                1600200L,
+                7315200L,
+                4572000L));
+        }
+    }
+
+    /// <summary>
+    /// 建立 SlideLayoutPart 使用的預留位置圖形。
+    /// </summary>
+    private static P.Shape CreateLayoutPlaceholderShape(
+        ref uint placeholderId,
+        P.PlaceholderValues placeholderType,
+        string name,
+        long x,
+        long y,
+        long width,
+        long height)
+    {
+        return new P.Shape(
+            new P.NonVisualShapeProperties(
+                new P.NonVisualDrawingProperties { Id = placeholderId++, Name = name },
+                new P.NonVisualShapeDrawingProperties(new A.ShapeLocks { NoGrouping = true }),
+                CreateApplicationNonVisualDrawingProperties(placeholderType)),
+            new P.ShapeProperties(
+                new A.Transform2D(
+                    new A.Offset { X = x, Y = y },
+                    new A.Extents { Cx = width, Cy = height }),
+                new A.PresetGeometry(new A.AdjustValueList()) { Preset = A.ShapeTypeValues.Rectangle }),
+            CreateDefaultShapeStyle(),
+            new P.TextBody(new A.BodyProperties(), new A.ListStyle(), new A.Paragraph()));
     }
 
     /// <summary>

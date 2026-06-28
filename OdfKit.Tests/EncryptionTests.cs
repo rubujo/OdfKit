@@ -13,6 +13,7 @@ using OdfKit.Text;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Boundary)]
     public class EncryptionTests
     {
         public EncryptionTests()

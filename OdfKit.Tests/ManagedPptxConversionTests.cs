@@ -19,6 +19,7 @@ using PackagingPresentationDocument = DocumentFormat.OpenXml.Packaging.Presentat
 
 namespace OdfKit.Tests;
 
+[Trait(TestCategories.Kind, TestCategories.Regression)]
 public class ManagedPptxConversionTests
 {
     [Fact]
@@ -1570,6 +1571,35 @@ public class ManagedPptxConversionTests
             roundTrippedPlaceholders,
             placeholder => placeholder.PlaceholderType == OdfPlaceholderType.Outline && placeholder.Node.TextContent == "Revenue is ahead");
     }
+
+    [Fact]
+    public void OdpToPptxConverterWritesStandardLayoutPlaceholders()
+    {
+        using OdfPresentationDocument source = OdfPresentationDocument.Create();
+        OdfSlide sourceSlide = source.AddSlide("Layout Placeholders");
+        sourceSlide.PresentationPageLayoutName = "layout_TitleAndBody";
+        sourceSlide.AddTextBox(
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(6),
+            OdfLength.FromCentimeters(2),
+            "Layout body");
+
+        using var pptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(source, pptxStream);
+
+        pptxStream.Position = 0;
+        using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
+        OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+        DocumentFormat.OpenXml.Packaging.SlideLayoutPart layoutPart = slidePart.SlideLayoutPart!;
+        Assert.Equal(P.SlideLayoutValues.Text, layoutPart.SlideLayout!.Type?.Value);
+
+        P.PlaceholderShape[] layoutPlaceholders = layoutPart.SlideLayout.Descendants<P.PlaceholderShape>().ToArray();
+        Assert.Contains(layoutPlaceholders, placeholder => placeholder.Type?.Value == P.PlaceholderValues.Title);
+        Assert.Contains(layoutPlaceholders, placeholder => placeholder.Type?.Value == P.PlaceholderValues.Body);
+    }
+
     [Fact]
     public void PptxConvertersPreserveSlideNames()
     {

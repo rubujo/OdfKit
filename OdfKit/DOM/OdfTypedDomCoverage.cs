@@ -61,6 +61,11 @@ public static class OdfTypedDomCoverage
             .GroupBy(attribute => string.IsNullOrWhiteSpace(attribute.ValueType) ? "string" : attribute.ValueType, StringComparer.Ordinal)
             .OrderBy(group => group.Key, StringComparer.Ordinal)
             .ToDictionary(group => group.Key, group => group.Count(), StringComparer.Ordinal);
+        Dictionary<string, int> orderedWrapperPropertyTypeCounts = wrapperPropertyTypeCounts
+            .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+            .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
+        IReadOnlyList<OdfTypedDomAttributeDatatypeCoverage> attributeDatatypeCoverage =
+            BuildAttributeDatatypeCoverage(attributeValueTypeCounts, orderedWrapperPropertyTypeCounts);
 
         return new OdfTypedDomCoverageReport(
             FormatVersion(resolvedSchema.Version),
@@ -68,11 +73,64 @@ public static class OdfTypedDomCoverage
             resolvedSchema.SourceDate,
             elements,
             childElementRelations,
+            attributeDatatypeCoverage,
             resolvedSchema.Attributes.Count,
             attributeValueTypeCounts,
-            wrapperPropertyTypeCounts
-                .OrderBy(pair => pair.Key, StringComparer.Ordinal)
-                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal));
+            orderedWrapperPropertyTypeCounts);
+    }
+
+    private static IReadOnlyList<OdfTypedDomAttributeDatatypeCoverage> BuildAttributeDatatypeCoverage(
+        IReadOnlyDictionary<string, int> attributeValueTypeCounts,
+        IReadOnlyDictionary<string, int> wrapperPropertyTypeCounts)
+    {
+        return attributeValueTypeCounts
+            .Select(pair =>
+            {
+                string wrapperPropertyType = MapSchemaValueTypeToWrapperPropertyType(pair.Key);
+                int wrapperPropertyCount = wrapperPropertyTypeCounts.TryGetValue(wrapperPropertyType, out int count)
+                    ? count
+                    : 0;
+                bool hasTypedHelper = wrapperPropertyType != "string" && wrapperPropertyCount > 0;
+                string status = GetAttributeDatatypeCoverageStatus(wrapperPropertyType, wrapperPropertyCount);
+                return new OdfTypedDomAttributeDatatypeCoverage(
+                    pair.Key,
+                    pair.Value,
+                    wrapperPropertyType,
+                    wrapperPropertyCount,
+                    hasTypedHelper,
+                    status);
+            })
+            .OrderBy(coverage => coverage.SchemaValueType, StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static string GetAttributeDatatypeCoverageStatus(string wrapperPropertyType, int wrapperPropertyCount)
+    {
+        if (wrapperPropertyType == "string")
+        {
+            return "string-preserve";
+        }
+
+        return wrapperPropertyCount > 0
+            ? "typed-helper-present"
+            : "candidate-for-typed-helper";
+    }
+
+    private static string MapSchemaValueTypeToWrapperPropertyType(string schemaValueType)
+    {
+        string normalized = schemaValueType.Replace("-", string.Empty).ToLowerInvariant();
+        return normalized switch
+        {
+            "boolean" => "bool",
+            "byte" or "short" or "int" or "integer" or "long" or "nonnegativeinteger" or "positiveinteger" or "nonpositiveinteger" or "negativeinteger" => "int",
+            "decimal" or "double" or "float" => "decimal",
+            "date" or "datetime" => "dateTime",
+            "time" => "time",
+            "duration" => "duration",
+            "ncname" or "id" or "idref" => "xmlName",
+            "anyuri" => "iriReference",
+            _ => "string"
+        };
     }
 
     private static IReadOnlyList<OdfTypedDomChildElementRelationCoverage> BuildChildElementRelations(OdfSchemaSet schema)

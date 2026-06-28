@@ -18,6 +18,7 @@ using OdfKit.Extensions.Rendering;
 namespace OdfKit.Tests
 {
     [Collection("SequentialRenderingTests")]
+    [Trait(TestCategories.Kind, TestCategories.Scenario)]
     public class PresentationAndRenderingTests
     {
         public PresentationAndRenderingTests()

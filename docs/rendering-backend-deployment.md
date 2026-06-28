@@ -75,8 +75,8 @@ await document.ConvertToPdfAsync("out.pdf", cancellationToken);
 ```
 
 `LibreOfficeConversionFormats` 提供常用 fallback 格式常數。跨格式輸出預設應優先使用
-[`managed-first-conversion-strategy.md`](managed-first-conversion-strategy.md) 中列出的 managed
-路徑；本套件保留 LibreOffice 作為高 fidelity 或未 managed 化格式的 fallback。
+核心套件已提供的 managed 路徑；本套件保留 LibreOffice 作為高 fidelity 或未 managed 化格式的
+fallback。
 
 ### 串流後端範例
 

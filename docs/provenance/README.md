@@ -26,7 +26,7 @@ dotnet run --project tools/OdfSchemaGenerator --framework net10.0
 pwsh eng/Test-OdfTypedDomCoverage.ps1
 ```
 
-重產後必須確認 `docs/typed-dom-coverage.md` 的 coverage guard、`OdfSchemaGeneratorTests`
+重產後必須確認 `eng/Test-OdfTypedDomCoverage.ps1` 的 coverage guard、`OdfSchemaGeneratorTests`
 與 `TypedDomParityTests` 仍通過。若產生器導致 wrapper 或 schema metadata 大幅變動，
 提交訊息需說明對應的 OASIS schema 來源與差異原因。
 

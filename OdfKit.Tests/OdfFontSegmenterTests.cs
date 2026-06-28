@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OdfKit.Core;
+using OdfKit.DOM;
 using OdfKit.Styles;
 using OdfKit.Text;
 using Xunit;
@@ -109,6 +110,55 @@ public class OdfFontSegmenterTests
 
         string contentXml = ReadEntry(document.Package, "content.xml");
         Assert.Contains("xlink:href=\"Fonts/Subsets/PuaFont-subset.ttf\"", contentXml, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證預設 CJK 字型遞補宣告包含全字庫楷體與宋體家族。
+    /// </summary>
+    [Fact]
+    public void ApplyCjkFontFallback_DeclaresTaiwanFullFontSetFamilies()
+    {
+        using TextDocument document = TextDocument.Create();
+
+        document.ApplyCjkFontFallback();
+
+        AssertFontFace(document.ContentDom, "TW-Kai-98_1");
+        AssertFontFace(document.ContentDom, "TW-Kai-Ext-B-98_1");
+        AssertFontFace(document.ContentDom, "TW-Kai-Plus-98_1");
+        AssertFontFace(document.ContentDom, "TW-Song-98_1");
+        AssertFontFace(document.ContentDom, "TW-Song-Ext-B-98_1");
+        AssertFontFace(document.ContentDom, "TW-Song-Plus-98_1");
+        AssertFontFace(document.ContentDom, "PMingLiU");
+        AssertFontFace(document.ContentDom, "Microsoft JhengHei");
+        AssertFontFace(document.StylesDom, "TW-Kai-Ext-B-98_1");
+        AssertFontFace(document.StylesDom, "TW-Song-Ext-B-98_1");
+    }
+
+    /// <summary>
+    /// 驗證段落高階 API 可自動依 CNS 11643 全字庫情境分段並套用字型。
+    /// </summary>
+    [Fact]
+    public void AddCns11643Text_SegmentsTextRunsAndDeclaresFallbackFonts()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph();
+        string plane2Char = char.ConvertFromUtf32(0x20BB7);
+        string plane15Char = char.ConvertFromUtf32(0xF0000);
+
+        IReadOnlyList<OdfTextRun> runs = paragraph.AddCns11643Text("甲" + plane2Char + "乙" + plane15Char, "TW-Kai");
+
+        Assert.Equal(4, runs.Count);
+        Assert.Equal("甲", runs[0].Text);
+        Assert.Equal("TW-Kai", runs[0].FontName);
+        Assert.Equal(plane2Char, runs[1].Text);
+        Assert.Equal("TW-Kai-Ext-B-98_1", runs[1].FontName);
+        Assert.Equal("乙", runs[2].Text);
+        Assert.Equal("TW-Kai", runs[2].FontName);
+        Assert.Equal(plane15Char, runs[3].Text);
+        Assert.Equal("TW-Kai-Plus-98_1", runs[3].FontName);
+        Assert.All(runs, run => Assert.Equal(run.FontName, run.FontNameAsian));
+        AssertFontFace(document.ContentDom, "TW-Kai-Ext-B-98_1");
+        AssertFontFace(document.ContentDom, "TW-Kai-Plus-98_1");
     }
 
     /// <summary>
@@ -236,6 +286,18 @@ public class OdfFontSegmenterTests
         using Stream stream = package.GetEntryStream(path);
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
+    }
+
+    private static void AssertFontFace(OdfNode domRoot, string name)
+    {
+        OdfNode? fontFace = domRoot.Descendants().FirstOrDefault(
+            node => node.LocalName == "font-face" &&
+                    node.NamespaceUri == OdfNamespaces.Style &&
+                    node.GetAttribute("name", OdfNamespaces.Style) == name);
+
+        Assert.NotNull(fontFace);
+        Assert.Equal(name, fontFace.GetAttribute("font-family", OdfNamespaces.Svg));
+        Assert.Equal("variable", fontFace.GetAttribute("font-pitch", OdfNamespaces.Style));
     }
 
     private sealed class FakeFontSubsetter : IFontSubsetter

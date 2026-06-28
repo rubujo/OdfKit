@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  office:mimetype="application/vnd.oasis.opendocument.text"
+  office:version="1.4">
+  <office:body>
+    <office:text>
+      <text:h text:outline-level="1">月報審閱備忘錄</text:h>
+      <text:p>本 fixture 模擬常見辦公文件：標題、段落、清單、表格與註解。</text:p>
+      <text:p>確認收入數字與來源系統一致，並補上跨部門審閱意見。</text:p>
+      <text:p>
+        <office:annotation office:name="comment-1">
+          <dc:creator>Ada</dc:creator>
+          <dc:date>2026-06-28T00:00:00Z</dc:date>
+          <text:p>請確認此表格是否需要附上匯率註記。</text:p>
+        </office:annotation>
+        審閱意見之後仍保留段落文字。
+      </text:p>
+    </office:text>
+  </office:body>
+</office:document>

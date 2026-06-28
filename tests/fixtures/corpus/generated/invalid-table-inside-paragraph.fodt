@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document
+  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  office:mimetype="application/vnd.oasis.opendocument.text"
+  office:version="1.4">
+  <office:body>
+    <office:text>
+      <text:p>
+        這個負向 fixture 模擬轉檔工具把區塊表格錯誤塞進段落的情境。
+        <table:table table:name="InvalidNestedTable">
+          <table:table-row>
+            <table:table-cell office:value-type="string">
+              <text:p>不應出現在 text:p 內的表格。</text:p>
+            </table:table-cell>
+          </table:table-row>
+        </table:table>
+      </text:p>
+    </office:text>
+  </office:body>
+</office:document>

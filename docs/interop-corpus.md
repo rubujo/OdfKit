@@ -15,11 +15,15 @@
 
 - `CorpusComplianceTests` 以 OASIS ODF 1.4 schema provider 與最小文件樣本驗證主要 body kind。
 - Positive corpus 目前重點是格式偵測、body kind、manifest 與 schema pattern 可執行性。
+- `tests/fixtures/corpus/generated/realistic-review-memo.fodt` 提供小型 repo-local 近實務文件樣本，
+  覆蓋標題、段落、清單、表格與註解的組合。
 
 ## Negative corpus
 
 - `CorpusComplianceTests` 與 `ComplianceTests` 覆蓋錯誤 root、錯誤 MIME / extension、Zip Slip、manifest 不一致與 profile rule 違規。
 - 驗證器應回報結構化 issue，而不是在一般錯誤文件上崩潰。
+- `tests/fixtures/corpus/generated/invalid-table-inside-paragraph.fodt` 模擬轉檔工具把區塊表格塞進
+  `text:p` 的錯誤結構，作為更接近轉檔失誤的 negative fixture。
 
 ## Unknown content corpus
 
@@ -32,6 +36,8 @@
 ## Security boundary corpus
 
 - `OdfSecurityBoundaryTests` 覆蓋簽章保存 / 失效、macro sanitize、加密文件 sanitize 後重新保存。
+- `eng/Test-OdfPolicy.ps1` 與 GitHub Actions `ODF policy` workflow 會執行 `Category=Policy`
+  測試，固定檢查 macro / script artifact、外部資源 policy 與加密重新保存邊界。
 - XML reader 與 package loader 另有 XXE、DoS 與 Zip Slip 防禦測試。
 
 ## Rendering / LibreOffice corpus
@@ -61,6 +67,11 @@
 - `docs/examples/external-corpus/` 提供外部 corpus manifest 與 baseline exception 範本。
 - repo 內建 `tests/fixtures/corpus/manifest.json` 作為可提交 manifest 的最小範本，覆蓋
   ODT、ODS、ODP、ODG，以及 `.fodt`、`.fods`、`.fodp`、`.fodg` 四種 flat ODF 格式。
+- `repo-generated-odf14-decorative-image`、`repo-generated-odf14-table-in-shape` 與
+  `repo-generated-odf14-zero-based-list` 是小型 repo-local baseline-difference fixture，
+  用來固定 ODF 1.4 schema 與仍以 ODF 1.2 為基準之 ODF Toolkit / ODF Validator 的分類邊界。
+- 大型 ODFDOM 官方 sample parity 仍走 `docs/examples/odfdom-sample-corpus/manifest.json`
+  與 `ODFKIT_PARITY_CORPUS_ROOT`，不提交第三方 corpus 實體。
 
 ## Real-world sanitized corpus
 

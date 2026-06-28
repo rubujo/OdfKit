@@ -46,7 +46,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack input.fodt out
 
 - [docs/corpus-manifest.md](../docs/corpus-manifest.md)
 - [docs/odf-toolkit-parity.md](../docs/odf-toolkit-parity.md)
-- [docs/typed-dom-coverage.md](../docs/typed-dom-coverage.md)
+- [docs/interop-corpus.md](../docs/interop-corpus.md)
 
 ## 2. OdfSchemaGenerator
 
@@ -77,7 +77,7 @@ dotnet run --project tools/OdfSchemaGenerator -- `
 ```
 
 相關背景請見 [docs/odf-official-corpus-sources.md](../docs/odf-official-corpus-sources.md)
-與 [docs/typed-dom-coverage.md](../docs/typed-dom-coverage.md)。
+與 [docs/odf-toolkit-parity.md](../docs/odf-toolkit-parity.md)。
 
 ## 3. OdfCorpusGenerator
 

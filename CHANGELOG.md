@@ -24,4 +24,4 @@
 
 - 採用協作者抽取模式拆分上帝類別。
 - 所有公開 `*Async` 方法統一帶 `CancellationToken cancellationToken = default`。
-- 測試套件依分層命名規則整理，移除歷史開發階段命名與重複測試檔（`docs/testing-strategy.md`）。
+- 測試套件依分層命名規則整理，移除歷史開發階段命名與重複測試檔。

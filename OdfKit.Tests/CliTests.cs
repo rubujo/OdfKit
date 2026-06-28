@@ -16,6 +16,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證 OdfKit CLI 的主要命令流程。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Regression)]
 public class CliTests
 {
     public CliTests()

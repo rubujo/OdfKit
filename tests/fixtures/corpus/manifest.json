@@ -13,6 +13,30 @@
       "notes": "Small repo-local fixture for validating the corpus manifest contract."
     },
     {
+      "id": "repo-generated-realistic-review-memo-flat-text",
+      "path": "generated/realistic-review-memo.fodt",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatText",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local positive fixture that combines heading, review paragraphs and annotation content in one realistic review memo."
+    },
+    {
+      "id": "repo-generated-invalid-table-inside-paragraph-flat-text",
+      "path": "generated/invalid-table-inside-paragraph.fodt",
+      "source": "generated",
+      "license": "generated-no-copyright",
+      "kind": "FlatText",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "invalid",
+      "roundTrip": "semantic-equivalent",
+      "notes": "Small repo-local negative fixture that simulates a converter placing a block table inside text:p."
+    },
+    {
       "id": "repo-generated-minimal-flat-spreadsheet",
       "path": "generated/minimal-spreadsheet.fods",
       "source": "generated",
@@ -94,7 +118,7 @@
       "profile": "OASIS_ODF_1_4_Extended",
       "expected": "valid",
       "roundTrip": "semantic-equivalent",
-      "notes": "ODF 1.4 fixture covering draw:decorative accessibility attribute on style:graphic-properties, unknown to ODF 1.2 schemas."
+      "notes": "ODF 1.4 / ODF Toolkit Validator parity fixture covering draw:decorative accessibility attribute on style:graphic-properties, unknown to ODF 1.2 schemas."
     },
     {
       "id": "repo-generated-odf14-table-in-shape",
@@ -106,7 +130,7 @@
       "profile": "OASIS_ODF_1_4_Extended",
       "expected": "valid",
       "roundTrip": "semantic-equivalent",
-      "notes": "ODF 1.4 fixture covering table:table embedded inside a draw:frame shape, not allowed by ODF 1.2 schemas."
+      "notes": "ODF 1.4 / ODF Toolkit Validator parity fixture covering table:table embedded inside a draw:frame shape, not allowed by ODF 1.2 schemas."
     },
     {
       "id": "repo-generated-odf14-zero-based-list",
@@ -118,7 +142,7 @@
       "profile": "OASIS_ODF_1_4_Extended",
       "expected": "valid",
       "roundTrip": "semantic-equivalent",
-      "notes": "ODF 1.4 fixture covering text:start-value=\u00220\u0022 on text:list-level-style-number, valid because ODF 1.4 widened the datatype from positiveInteger to nonNegativeInteger."
+      "notes": "ODF 1.4 / ODF Toolkit Validator parity fixture covering text:start-value=\u00220\u0022 on text:list-level-style-number, valid because ODF 1.4 widened the datatype from positiveInteger to nonNegativeInteger."
     },
     {
       "id": "repo-generated-odf14-invalid-decorative-bad-value",

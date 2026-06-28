@@ -1064,12 +1064,12 @@ public static class OdfRtfImporter
                 "PAGEREF" => AppendReferenceTextField(
                     "bookmark-ref",
                     ReadFirstFieldArgument(tokens),
-                    HasFieldSwitch(tokens, "\\p") ? "direction" : "page",
+                    ResolveReferenceFormat(tokens, "page"),
                     result),
                 "REF" => AppendReferenceTextField(
                     "reference-ref",
                     ReadFirstFieldArgument(tokens),
-                    HasFieldSwitch(tokens, "\\p") ? "direction" : "text",
+                    ResolveReferenceFormat(tokens, "text"),
                     result),
                 _ => false,
             };
@@ -1178,6 +1178,23 @@ public static class OdfRtfImporter
             }
 
             return false;
+        }
+
+        private static string ResolveReferenceFormat(IReadOnlyList<string> tokens, string defaultFormat)
+        {
+            if (HasFieldSwitch(tokens, "\\p"))
+            {
+                return "direction";
+            }
+
+            if (HasFieldSwitch(tokens, "\\n") ||
+                HasFieldSwitch(tokens, "\\r") ||
+                HasFieldSwitch(tokens, "\\w"))
+            {
+                return "number";
+            }
+
+            return defaultFormat;
         }
 
         private static List<string> ReadFieldInstructionTokens(string? instruction)

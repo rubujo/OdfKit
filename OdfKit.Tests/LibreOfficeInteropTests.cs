@@ -26,7 +26,7 @@ namespace OdfKit.Tests;
 /// 使用真實 LibreOffice 26.x binary 驗證 OdfKit 產生文件的互通性。
 /// </summary>
 [Trait(TestCategories.Kind, TestCategories.Interop)]
-public class LibreOfficeInteropTests
+public partial class LibreOfficeInteropTests
 {
     /// <summary>
     /// 驗證含追蹤修訂的 ODT 可由 LibreOffice 26.x headless 模式載入、轉換並由 OdfKit 重新讀取。
@@ -2371,7 +2371,7 @@ public class LibreOfficeInteropTests
         {
             using var doc = TextDocument.Create();
             var p = doc.Body.Paragraphs.Add();
-            p.AddTextRun("罕見字字型對照保真度測試：吉、𠮷、𠜎、𿿽。");
+            p.AddCns11643Text("罕見字字型對照保真度測試：吉、𠮷、𠜎、𿿽。");
 
             string odtPath = Path.Combine(tempRoot, "rare-chars.odt");
             doc.Save(odtPath);

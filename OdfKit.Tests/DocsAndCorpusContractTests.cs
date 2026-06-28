@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -97,81 +98,6 @@ public class DocsAndCorpusContractTests
         Assert.Contains("docs/examples/external-corpus/manifest.json", manifest, StringComparison.Ordinal);
         Assert.Contains("repo-generated-minimal-flat-text", manifest, StringComparison.Ordinal);
         Assert.Contains("generated-format-minimal", manifest, StringComparison.Ordinal);
-    }
-
-    /// <summary>
-    /// 驗證 managed-first 轉檔策略不再把已完成的 Markdown／RTF 註解範圍往返列為缺口。
-    /// </summary>
-    [Fact]
-    public void ManagedFirstConversionStrategyDeclaresAnnotationRangeRoundTripComplete()
-    {
-        string repoRoot = FindRepositoryRoot();
-        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "managed-first-conversion-strategy.md"));
-
-        Assert.Contains("annotation-start", strategy, StringComparison.Ordinal);
-        Assert.Contains("annotation-end", strategy, StringComparison.Ordinal);
-        Assert.Contains("annotation range round-trip", strategy, StringComparison.Ordinal);
-        Assert.Contains("缺少 `atnid` 時沿用 range id", strategy, StringComparison.Ordinal);
-        Assert.DoesNotContain("下一步補更深控制字與更高保真註解範圍語意", strategy, StringComparison.Ordinal);
-    }
-
-    /// <summary>
-    /// 驗證 managed-first 轉檔策略已將 PPTX 逐段落動畫 range 往返列為完成基礎。
-    /// </summary>
-    [Fact]
-    public void ManagedFirstConversionStrategyDeclaresPptxParagraphAnimationRangeRoundTripComplete()
-    {
-        string repoRoot = FindRepositoryRoot();
-        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "managed-first-conversion-strategy.md"));
-
-        Assert.Contains("paragraph range round-trip", strategy, StringComparison.Ordinal);
-        Assert.Contains("emphasis animation trigger/delay round-trip", strategy, StringComparison.Ordinal);
-        Assert.Contains("shape shadow effect export", strategy, StringComparison.Ordinal);
-        Assert.Contains("theme effect style matrix export", strategy, StringComparison.Ordinal);
-        Assert.Contains("theme effect style shadow color/offset/opacity import", strategy, StringComparison.Ordinal);
-        Assert.Contains("layout/master placeholder text style inheritance", strategy, StringComparison.Ordinal);
-        Assert.Contains("direct shape shadow import", strategy, StringComparison.Ordinal);
-        Assert.Contains("root timing restart metadata", strategy, StringComparison.Ordinal);
-        Assert.Contains("main sequence previous/next action metadata", strategy, StringComparison.Ordinal);
-        Assert.Contains("low-level animation tree `transitionFilter` export", strategy, StringComparison.Ordinal);
-        Assert.Contains("BuildParagraph-only paragraph build import fallback", strategy, StringComparison.Ordinal);
-        Assert.DoesNotContain("群組與逐段落動畫", strategy, StringComparison.Ordinal);
-    }
-
-    /// <summary>
-    /// 驗證 managed-first 轉檔策略已將 SVG 水平／垂直線段 substitution 列為完成基礎。
-    /// </summary>
-    [Fact]
-    public void ManagedFirstConversionStrategyDeclaresSvgHorizontalVerticalSubstitutionComplete()
-    {
-        string repoRoot = FindRepositoryRoot();
-        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "managed-first-conversion-strategy.md"));
-
-        Assert.Contains("substitution 後 SVG `H`/`V` 水平／垂直線段", strategy, StringComparison.Ordinal);
-        Assert.Contains("full ellipse arcs split", strategy, StringComparison.Ordinal);
-    }
-
-    /// <summary>
-    /// 驗證 managed-first 轉檔策略已將 RTF field result 保留列為完成基礎。
-    /// </summary>
-    [Fact]
-    public void ManagedFirstConversionStrategyDeclaresRtfFieldResultImportComplete()
-    {
-        string repoRoot = FindRepositoryRoot();
-        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "managed-first-conversion-strategy.md"));
-
-        Assert.Contains("巢狀 `fldrslt` field result 與非 hyperlink field result 保留", strategy, StringComparison.Ordinal);
-        Assert.Contains("`DATE`／`TIME`", strategy, StringComparison.Ordinal);
-        Assert.Contains("`AUTHOR`／`TITLE`／`SUBJECT`／`DOCPROPERTY` metadata 白名單語意映射", strategy, StringComparison.Ordinal);
-        Assert.Contains("`MERGEFIELD` ODF placeholder 語意映射", strategy, StringComparison.Ordinal);
-        Assert.Contains("`SEQ` ODF sequence 語意映射", strategy, StringComparison.Ordinal);
-        Assert.Contains("`REF`（含 `\\\\p` 方向 switch）欄位 instruction 語意映射", strategy, StringComparison.Ordinal);
-        Assert.Contains("`\\\\sect`/`\\\\column` soft-page-break fallback", strategy, StringComparison.Ordinal);
-        Assert.Contains("`\\\\softline`/`\\\\softpage` fallback", strategy, StringComparison.Ordinal);
-        Assert.Contains("`\\\\line`/`\\\\tab` 節點化匯入", strategy, StringComparison.Ordinal);
-        Assert.Contains("zero-width break controls `\\\\zwbo`/`\\\\zwnbo`", strategy, StringComparison.Ordinal);
-        Assert.Contains("`\\\\chftn` current footnote marker", strategy, StringComparison.Ordinal);
-        Assert.DoesNotContain("巢狀欄位與更高保真註解邊界案例", strategy, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -300,25 +226,39 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
-    /// 驗證快速 CI 與測試策略文件使用 trait 分類，而不是硬編碼測試類別清單。
+    /// 驗證快速 CI 使用 trait 分類，而不是硬編碼測試類別清單。
     /// </summary>
     [Fact]
     public void CiSmokeTestsUseTraitCategoryFilter()
     {
         string repoRoot = FindRepositoryRoot();
         string workflow = File.ReadAllText(Path.Combine(repoRoot, ".github", "workflows", "ci.yml"));
-        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "testing-strategy.md"));
         string categories = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "TestCategories.cs"));
 
         Assert.Contains("Category=Smoke", workflow, StringComparison.Ordinal);
         Assert.DoesNotContain("FullyQualifiedName~OdfKit.Tests.", workflow, StringComparison.Ordinal);
-        Assert.Contains("TestCategories", strategy, StringComparison.Ordinal);
-        Assert.Contains("--filter Category=Smoke", strategy, StringComparison.Ordinal);
         Assert.Contains("public const string Smoke = \"Smoke\";", categories, StringComparison.Ordinal);
         Assert.Contains("public const string Interop = \"Interop\";", categories, StringComparison.Ordinal);
         Assert.Contains("public const string Corpus = \"Corpus\";", categories, StringComparison.Ordinal);
         Assert.Contains("public const string Compliance = \"Compliance\";", categories, StringComparison.Ordinal);
         Assert.Contains("public const string Scenario = \"Scenario\";", categories, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證高負載壓力測試保留在 Stress 分層，不會被快速 Smoke CI 撈入。
+    /// </summary>
+    [Fact]
+    public void StressTestsRemainOutsideSmokeTier()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string empiricalStress = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "EmpiricalStressTests.cs"));
+        string coreStress = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "OdfCoreStressTests.cs"));
+
+        Assert.Contains("TestCategories.Stress", empiricalStress, StringComparison.Ordinal);
+        Assert.Contains("TestCategories.Performance", empiricalStress, StringComparison.Ordinal);
+        Assert.Contains("TestCategories.Stress", coreStress, StringComparison.Ordinal);
+        Assert.DoesNotContain("TestCategories.Smoke", empiricalStress, StringComparison.Ordinal);
+        Assert.DoesNotContain("TestCategories.Smoke", coreStress, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -342,7 +282,7 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
-    /// 驗證 trimming 煙霧測試已文件化，且 CI 入口會監看工具本身與核心程式碼。
+    /// 驗證 trimming 煙霧測試入口已文件化，且 CI 入口會監看工具本身與核心程式碼。
     /// </summary>
     [Fact]
     public void TrimSmokeEntryPointsAreDocumentedAndPathScoped()
@@ -350,7 +290,6 @@ public class DocsAndCorpusContractTests
         string repoRoot = FindRepositoryRoot();
         string script = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-TrimSmoke.ps1"));
         string workflow = File.ReadAllText(Path.Combine(repoRoot, ".github", "workflows", "trim-smoke.yml"));
-        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "testing-strategy.md"));
         string toolsReadme = File.ReadAllText(Path.Combine(repoRoot, "tools", "README.md"));
         string trimProject = File.ReadAllText(Path.Combine(repoRoot, "tools", "OdfKit.TrimSmoke", "OdfKit.TrimSmoke.csproj"));
         string openPgpProvider = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Core", "OdfBouncyCastleOpenPgpProvider.cs"));
@@ -360,12 +299,38 @@ public class DocsAndCorpusContractTests
         Assert.Contains("tools/OdfKit.TrimSmoke/**", workflow, StringComparison.Ordinal);
         Assert.Contains("eng/Test-TrimSmoke.ps1", workflow, StringComparison.Ordinal);
         Assert.Contains("workflow_dispatch", workflow, StringComparison.Ordinal);
-        Assert.Contains("Test-TrimSmoke.ps1 -Configuration Release", strategy, StringComparison.Ordinal);
         Assert.Contains("Test-TrimSmoke.ps1 -Configuration Release", toolsReadme, StringComparison.Ordinal);
         Assert.Contains("<TrimmerRootAssembly Include=\"BouncyCastle.Cryptography\" />", trimProject, StringComparison.Ordinal);
         Assert.Contains("<NuGetAudit>false</NuGetAudit>", trimProject, StringComparison.Ordinal);
         Assert.Contains("<NoWarn>$(NoWarn);IL2104</NoWarn>", trimProject, StringComparison.Ordinal);
         Assert.Contains("RequiresUnreferencedCode", openPgpProvider, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 ODF policy automation 入口已文件化，且 CI 入口以 Policy trait 分層。
+    /// </summary>
+    [Fact]
+    public void PolicyAutomationEntryPointsAreDocumentedAndPathScoped()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string script = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-OdfPolicy.ps1"));
+        string workflow = File.ReadAllText(Path.Combine(repoRoot, ".github", "workflows", "odf-policy.yml"));
+        string engReadme = File.ReadAllText(Path.Combine(repoRoot, "eng", "README.md"));
+        string interopCorpus = File.ReadAllText(Path.Combine(repoRoot, "docs", "interop-corpus.md"));
+        string categories = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "TestCategories.cs"));
+        string securityBoundaryTests = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "OdfSecurityBoundaryTests.cs"));
+        string securityComplianceTests = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "SecurityComplianceTests.cs"));
+
+        Assert.Contains("Category=Policy", script, StringComparison.Ordinal);
+        Assert.Contains("Test-OdfPolicy.ps1", workflow, StringComparison.Ordinal);
+        Assert.Contains("OdfKit.Tests/**", workflow, StringComparison.Ordinal);
+        Assert.Contains("workflow_dispatch", workflow, StringComparison.Ordinal);
+        Assert.Contains("Test-OdfPolicy.ps1", engReadme, StringComparison.Ordinal);
+        Assert.Contains("Category=Policy", engReadme, StringComparison.Ordinal);
+        Assert.Contains("ODF policy", interopCorpus, StringComparison.Ordinal);
+        Assert.Contains("public const string Policy = \"Policy\";", categories, StringComparison.Ordinal);
+        Assert.Contains("TestCategories.Policy", securityBoundaryTests, StringComparison.Ordinal);
+        Assert.Contains("TestCategories.Policy", securityComplianceTests, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -643,11 +608,9 @@ public class DocsAndCorpusContractTests
     {
         string repoRoot = FindRepositoryRoot();
         string script = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-LibreOfficeInterop.ps1"));
-        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "testing-strategy.md"));
         string matrix = File.ReadAllText(Path.Combine(repoRoot, "docs", "libreoffice-interop-matrix.md"));
 
         Assert.Contains("ODFKIT_RUN_LIBREOFFICE_INTEROP", script, StringComparison.Ordinal);
-        Assert.Contains("ODFKIT_RUN_LIBREOFFICE_INTEROP=1", strategy, StringComparison.Ordinal);
         Assert.Contains("ODFKIT_RUN_LIBREOFFICE_INTEROP=1", matrix, StringComparison.Ordinal);
     }
 
@@ -672,13 +635,23 @@ public class DocsAndCorpusContractTests
         int fixtureCount = summary.GetProperty("fixtureCount").GetInt32();
         Assert.True(fixtureCount >= 200, $"corpus fixtureCount 應 ≥ 200，實際為 {fixtureCount}。");
         Assert.Equal(fixtureCount, summary.GetProperty("passedCount").GetInt32());
-        Assert.Equal(fixtureCount - 6, summary.GetProperty("validCount").GetInt32());
-        Assert.Equal(6, summary.GetProperty("invalidCount").GetInt32());
+        Assert.Equal(fixtureCount - 7, summary.GetProperty("validCount").GetInt32());
+        Assert.Equal(7, summary.GetProperty("invalidCount").GetInt32());
         Assert.True(summary.GetProperty("sha256CheckedCount").GetInt32() >= 4);
         Assert.Equal(0, summary.GetProperty("sha256MismatchCount").GetInt32());
         Assert.Equal("repo-generated-minimal-flat-text", fixture.GetProperty("id").GetString());
         Assert.True(fixture.GetProperty("kindMatches").GetBoolean());
         Assert.True(fixture.GetProperty("versionMatches").GetBoolean());
+        Assert.Contains(
+            json.RootElement.GetProperty("fixtures").EnumerateArray(),
+            item => item.GetProperty("id").GetString() == "repo-generated-realistic-review-memo-flat-text" &&
+                item.GetProperty("expected").GetString() == "valid" &&
+                item.GetProperty("passed").GetBoolean());
+        Assert.Contains(
+            json.RootElement.GetProperty("fixtures").EnumerateArray(),
+            item => item.GetProperty("id").GetString() == "repo-generated-invalid-table-inside-paragraph-flat-text" &&
+                item.GetProperty("expected").GetString() == "invalid" &&
+                item.GetProperty("passed").GetBoolean());
         Assert.Contains(
             json.RootElement.GetProperty("fixtures").EnumerateArray(),
             item => item.GetProperty("id").GetString() == "repo-generated-page-layout-interleave-flat-text" &&
@@ -821,6 +794,103 @@ public class DocsAndCorpusContractTests
                     $"{extension} 的 High-level API 標示為 complete，但 Test evidence 欄位為空。");
             }
         }
+    }
+
+    /// <summary>
+    /// 驗證格式支援文件不再把 Formula 最小語意編輯 helper 誤列為後續追蹤項目。
+    /// </summary>
+    [Fact]
+    public void FormatSupportDocs_FormulaSemanticEditingHelpersAreMarkedComplete()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string support = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf-format-support.md"));
+        string tests = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "FormulaHighLevelApiTests.cs"));
+
+        Assert.Contains("Formula 已具備 `FindFirst`／`FindAll`／`WithChild`／`ReplaceFirst`", support, StringComparison.Ordinal);
+        Assert.Contains("最小「尋找→取得→更新」語意編輯 helper", support, StringComparison.Ordinal);
+        Assert.DoesNotContain("續列為獨立追蹤的後續深度工作", support, StringComparison.Ordinal);
+        Assert.Contains("OdfMathToken_FindAndWithChild_WorksForNestedStructure", tests, StringComparison.Ordinal);
+        Assert.Contains("FormulaTokenSemanticEditing_FindReplaceAndSetMathRow_Persists", tests, StringComparison.Ordinal);
+        Assert.Contains("ReplaceFirst_ReplacesNestedFraction", tests, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證格式支援文件明確區分 CNS 11643 全字庫骨架支援與官方語意相容聲明。
+    /// </summary>
+    [Fact]
+    public void FormatSupportDocs_Cns11643FontSupportBoundaryIsConservative()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string support = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf-format-support.md"));
+
+        Assert.Contains("Unicode 平面分段", support, StringComparison.Ordinal);
+        Assert.Contains("`TextDocument.ApplyCjkFontFallback()`", support, StringComparison.Ordinal);
+        Assert.Contains("`OdfParagraph.AddCns11643Text(...)`", support, StringComparison.Ordinal);
+        Assert.Contains("`TW-Kai-Ext-B-98_1`", support, StringComparison.Ordinal);
+        Assert.Contains("`TW-Song-Ext-B-98_1`", support, StringComparison.Ordinal);
+        Assert.Contains("OdfKit 不內建政府字型", support, StringComparison.Ordinal);
+        Assert.Contains("不應宣稱完整", support, StringComparison.Ordinal);
+        Assert.Contains("CNS 11643 官方語意相容或認證", support, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證大型測試檔必須具備分類，避免測試套件膨脹後失去分層治理。
+    /// </summary>
+    [Fact]
+    public void LargeTestFilesDeclareCategoryTrait()
+    {
+        const int largeTestFileLineThreshold = 700;
+        string repoRoot = FindRepositoryRoot();
+        string testRoot = Path.Combine(repoRoot, "OdfKit.Tests");
+        string[] violations = Directory.EnumerateFiles(testRoot, "*.cs", SearchOption.AllDirectories)
+            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal) &&
+                !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal) &&
+                !path.Contains($"{Path.DirectorySeparatorChar}MockSoffice{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .Select(path => new
+            {
+                RelativePath = Path.GetRelativePath(repoRoot, path),
+                Text = File.ReadAllText(path),
+                LineCount = File.ReadLines(path).Count()
+            })
+            .Where(file => file.LineCount >= largeTestFileLineThreshold &&
+                (file.Text.Contains("[Fact", StringComparison.Ordinal) ||
+                    file.Text.Contains("[Theory", StringComparison.Ordinal)) &&
+                !file.Text.Contains("[Trait(TestCategories.Kind", StringComparison.Ordinal))
+            .Select(file => $"{file.RelativePath} ({file.LineCount} 行)")
+            .OrderBy(path => path, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Empty(violations);
+    }
+
+    /// <summary>
+    /// 驗證超大型測試檔至少已採用 partial 類別拆分，避免單一檔案持續吸收無關情境。
+    /// </summary>
+    [Fact]
+    public void ExtraLargeTestFilesUsePartialClasses()
+    {
+        const int extraLargeTestFileLineThreshold = 3000;
+        string repoRoot = FindRepositoryRoot();
+        string testRoot = Path.Combine(repoRoot, "OdfKit.Tests");
+        string[] violations = Directory.EnumerateFiles(testRoot, "*.cs", SearchOption.AllDirectories)
+            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal) &&
+                !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal) &&
+                !path.Contains($"{Path.DirectorySeparatorChar}MockSoffice{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+            .Select(path => new
+            {
+                RelativePath = Path.GetRelativePath(repoRoot, path),
+                Text = File.ReadAllText(path),
+                LineCount = File.ReadLines(path).Count()
+            })
+            .Where(file => file.LineCount >= extraLargeTestFileLineThreshold &&
+                (file.Text.Contains("[Fact", StringComparison.Ordinal) ||
+                    file.Text.Contains("[Theory", StringComparison.Ordinal)) &&
+                !file.Text.Contains("partial class", StringComparison.Ordinal))
+            .Select(file => $"{file.RelativePath} ({file.LineCount} 行)")
+            .OrderBy(path => path, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Empty(violations);
     }
 
     private static string FindRepositoryRoot()

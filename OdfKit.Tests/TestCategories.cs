@@ -10,6 +10,7 @@ internal static class TestCategories
     public const string Interop = "Interop";
     public const string Corpus = "Corpus";
     public const string Compliance = "Compliance";
+    public const string Policy = "Policy";
     public const string Scenario = "Scenario";
     public const string Performance = "Performance";
 }

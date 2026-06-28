@@ -25,6 +25,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定 ODS 與 XLSX 雙向轉換 API。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Regression)]
 public class OoxmlConversionTests
 {
     /// <summary>

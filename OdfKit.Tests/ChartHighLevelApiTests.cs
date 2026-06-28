@@ -13,6 +13,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 鎖定圖表文件高階 API 的整合測試。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Scenario)]
 public class ChartHighLevelApiTests
 {
     /// <summary>

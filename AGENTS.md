@@ -95,7 +95,8 @@
   ```powershell
   pwsh eng/Test-GpgSignatures.ps1
   ```
-- **測試套件分層與整理準則**：見 [`docs/testing-strategy.md`](docs/testing-strategy.md)。
+- **測試套件分層與整理準則**：以 `TestCategories` trait、CI workflow 與對應測試檔為準。
+- **臨時計畫檔邊界**：任何 `*plan*.md` 或名稱含「計畫」的整理檔都只能作為短期工作暫存，不得被 `AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md` 或其它 Agent 規範引用為長期規則來源；完成後應移除。
 
 ---
 

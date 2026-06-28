@@ -17,6 +17,7 @@ using OdfKit.Presentation;
 
 namespace OdfKit.Tests
 {
+    [Trait(TestCategories.Kind, TestCategories.Regression)]
     public class DomTest
     {
         public DomTest()

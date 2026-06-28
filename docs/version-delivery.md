@@ -36,4 +36,4 @@
 | 功能是否支援 | [ODF 格式支援矩陣](odf-format-support.md) |
 | 渲染 / LibreOffice 後端 | [Rendering 後端部署](rendering-backend-deployment.md) |
 | 封裝 / Release | [GitHub Release 發佈指南](github-release-publishing.md) |
-| 測試 / corpus | [測試策略](testing-strategy.md)、[Interop Corpus 總覽](interop-corpus.md) |
+| 測試 / corpus | [Interop Corpus 總覽](interop-corpus.md)、[Corpus Manifest 規則](corpus-manifest.md) |

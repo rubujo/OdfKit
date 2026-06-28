@@ -8,6 +8,7 @@ using Xunit;
 
 namespace OdfKit.Tests;
 
+[Trait(TestCategories.Kind, TestCategories.Regression)]
 public class OdfSchemaGeneratorTests
 {
     [Fact]
@@ -1168,7 +1169,7 @@ public class OdfSchemaGeneratorTests
         string? directory = AppContext.BaseDirectory;
         while (!string.IsNullOrWhiteSpace(directory))
         {
-            if (File.Exists(Path.Combine(directory, "implementation_plan.md")) || File.Exists(Path.Combine(directory, "AGENTS.md")))
+            if (File.Exists(Path.Combine(directory, "OdfKit.slnx")) || File.Exists(Path.Combine(directory, "AGENTS.md")))
             {
                 return directory;
             }

@@ -1,0 +1,44 @@
+name: ODF policy
+
+on:
+  pull_request:
+    paths:
+      - 'OdfKit/**'
+      - 'OdfKit.Tests/**'
+      - 'eng/Test-OdfPolicy.ps1'
+      - '.github/actions/setup-dotnet-odfkit/**'
+      - '.github/workflows/odf-policy.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'OdfKit/**'
+      - 'OdfKit.Tests/**'
+      - 'eng/Test-OdfPolicy.ps1'
+      - '.github/actions/setup-dotnet-odfkit/**'
+      - '.github/workflows/odf-policy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: odf-policy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: ./.github/actions/setup-dotnet-odfkit
+        with:
+          cache-key-suffix: '-odf-policy'
+
+      - name: Run ODF policy tests
+        shell: pwsh
+        run: ./eng/Test-OdfPolicy.ps1
