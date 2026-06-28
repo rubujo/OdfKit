@@ -724,7 +724,7 @@ public static class OdfMarkdownImporter
     {
         if (!string.IsNullOrWhiteSpace(name))
         {
-            return name;
+            return name!;
         }
 
         OdfNode root = paragraph.Node;
@@ -765,7 +765,7 @@ public static class OdfMarkdownImporter
     {
         if (!string.IsNullOrWhiteSpace(name))
         {
-            return name;
+            return name!;
         }
 
         OdfNode root = paragraph.Node;

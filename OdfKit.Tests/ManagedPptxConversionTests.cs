@@ -2079,14 +2079,14 @@ public class ManagedPptxConversionTests
         // 驗證 Placeholder 繼承與 Theme 矩陣套用
         var shape = Assert.Single(slide.Placeholders);
         Assert.Equal("Master Title Text", shape.Node.TextContent);
-        OdfNode inheritedSpan = Assert.Single(shape.Node.Descendants().Where(node => node.LocalName == "span" && node.NamespaceUri == OdfNamespaces.Text));
+        OdfNode inheritedSpan = Assert.Single(shape.Node.Descendants(), node => node.LocalName == "span" && node.NamespaceUri == OdfNamespaces.Text);
         string? inheritedTextStyleName = inheritedSpan.GetAttribute("style-name", OdfNamespaces.Text);
         Assert.NotNull(inheritedTextStyleName);
         Assert.Equal("bold", shape.Document.StyleEngine.GetStyleProperty(inheritedTextStyleName, "font-weight", OdfNamespaces.Fo, "text"));
         Assert.Equal("24pt", shape.Document.StyleEngine.GetStyleProperty(inheritedTextStyleName, "font-size", OdfNamespaces.Fo, "text"));
         Assert.Equal("#9BBB59", shape.Document.StyleEngine.GetStyleProperty(inheritedTextStyleName, "color", OdfNamespaces.Fo, "text"));
         Assert.Equal("Calibri", shape.Document.StyleEngine.GetStyleProperty(inheritedTextStyleName, "font-family", OdfNamespaces.Fo, "text"));
-        OdfNode inheritedParagraph = Assert.Single(shape.Node.Descendants().Where(node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text));
+        OdfNode inheritedParagraph = Assert.Single(shape.Node.Descendants(), node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
         string? inheritedParagraphStyleName = inheritedParagraph.GetAttribute("style-name", OdfNamespaces.Text);
         Assert.NotNull(inheritedParagraphStyleName);
         Assert.Equal("center", shape.Document.StyleEngine.GetStyleProperty(inheritedParagraphStyleName, "text-align", OdfNamespaces.Fo, "paragraph"));

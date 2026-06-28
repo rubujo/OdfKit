@@ -265,8 +265,8 @@ public sealed class CollaborationOperationsTests
 
         OdfParagraph paragraph = Assert.Single(merged.Body.Paragraphs);
         Assert.Equal("AlphaBeta", paragraph.TextContent);
-        OdfTextRun alpha = Assert.Single(paragraph.Runs.Where(run => run.Text == "Alpha"));
-        OdfTextRun beta = Assert.Single(paragraph.Runs.Where(run => run.Text == "Beta"));
+        OdfTextRun alpha = Assert.Single(paragraph.Runs, run => run.Text == "Alpha");
+        OdfTextRun beta = Assert.Single(paragraph.Runs, run => run.Text == "Beta");
         Assert.False(alpha.IsBold);
         Assert.True(beta.IsBold);
         Assert.Equal("#0066CC", beta.Color);
@@ -404,7 +404,7 @@ public sealed class CollaborationOperationsTests
         OdfParagraph firstParagraph = merged.Body.Paragraphs.First();
         Assert.Equal("協作草稿段落\n", firstParagraph.TextContent);
         Assert.Equal("Heading_20_1", firstParagraph.StyleName);
-        OdfTextRun formattedRun = Assert.Single(firstParagraph.Runs.Where(run => run.Text == "段落"));
+        OdfTextRun formattedRun = Assert.Single(firstParagraph.Runs, run => run.Text == "段落");
         Assert.True(formattedRun.IsBold);
         Assert.Equal("#0066CC", formattedRun.Color);
         Assert.Equal("#FFF2CC", formattedRun.BackgroundColor);
