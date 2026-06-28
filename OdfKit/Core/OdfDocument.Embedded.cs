@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
@@ -8,6 +9,9 @@ namespace OdfKit.Core;
 
 public abstract partial class OdfDocument
 {
+    private readonly List<OdfDocument> _trackedEmbeddedDocuments = [];
+    private bool _isFlushingTrackedEmbeddedDocuments;
+
     #region Embedded Documents
 
     /// <summary>
@@ -25,10 +29,13 @@ public abstract partial class OdfDocument
 
         if (OdfEmbeddedDocumentFactory.TryCreate(Package, subPath, out T document))
         {
+            TrackEmbeddedDocument(document);
             return document;
         }
 
-        return CreateEmbeddedViaReflection<T>(Package, subPath);
+        T reflected = CreateEmbeddedViaReflection<T>(Package, subPath);
+        TrackEmbeddedDocument(reflected);
+        return reflected;
     }
 
     /// <summary>
@@ -39,10 +46,9 @@ public abstract partial class OdfDocument
     /// <returns>建立完成的嵌入式文件 wrapper</returns>
     /// <remarks>
     /// 此方法會在建立時立即呼叫一次傳回文件的 <c>Save()</c> 以寫入最小骨架內容；
-    /// 若呼叫端在取得傳回值後繼續修改其內容（例如設定公式或新增資料），
-    /// 必須自行再次呼叫該嵌入式文件的 <c>Save()</c>，否則後續修改不會寫回封裝
-    /// （外層文件的 <see cref="Save(OdfSaveOptions?)"/> 僅會持久化外層自身的
-    /// <c>content.xml</c> 等專案，不會連動儲存內嵌子文件）。
+    /// 後續透過傳回 wrapper 所做的修改會由父文件 <see cref="Save(OdfSaveOptions?)"/>、
+    /// <see cref="SaveToStream(System.IO.Stream, OdfSaveOptions?)"/> 與非同步儲存流程自動 flush 至封裝。
+    /// 呼叫端仍可手動呼叫嵌入式文件的 <c>Save()</c> 以提早寫回。
     /// </remarks>
     public T CreateEmbeddedDocument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(string subPath) where T : OdfDocument
     {
@@ -62,7 +68,41 @@ public abstract partial class OdfDocument
         }
 
         doc.Save();
+        TrackEmbeddedDocument(doc);
         return doc;
+    }
+
+    private void TrackEmbeddedDocument(OdfDocument document)
+    {
+        if (ReferenceEquals(document, this) || _trackedEmbeddedDocuments.Contains(document))
+        {
+            return;
+        }
+
+        _trackedEmbeddedDocuments.Add(document);
+    }
+
+    internal void TrackEmbeddedDocumentForPersistence(OdfDocument document) => TrackEmbeddedDocument(document);
+
+    private void FlushTrackedEmbeddedDocumentsCore(OdfSaveOptions options)
+    {
+        if (_isFlushingTrackedEmbeddedDocuments || _trackedEmbeddedDocuments.Count == 0)
+        {
+            return;
+        }
+
+        _isFlushingTrackedEmbeddedDocuments = true;
+        try
+        {
+            foreach (OdfDocument document in _trackedEmbeddedDocuments)
+            {
+                OdfDocumentPersistenceEngine.PrepareDomEntriesForSave(document.PersistenceCollaborators, options);
+            }
+        }
+        finally
+        {
+            _isFlushingTrackedEmbeddedDocuments = false;
+        }
     }
 
     private static T CreateEmbeddedViaReflection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(OdfPackage package, string subPath) where T : OdfDocument

@@ -1,6 +1,10 @@
-﻿using OdfKit.Styles;
+﻿using System.Globalization;
+using OdfKit.Styles;
 
+using OdfKit.Chart;
 using OdfKit.Compliance;
+using OdfKit.DOM;
+using OdfKit.Text;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
@@ -9,10 +13,62 @@ namespace OdfKit.Spreadsheet;
 public sealed class SpreadsheetDocumentBuilder
 {
     private readonly SpreadsheetDocument _document;
+    private OdfStyleSet? _styles;
 
     internal SpreadsheetDocumentBuilder(SpreadsheetDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
+
+    /// <summary>
+    /// 設定文件中繼資料。
+    /// </summary>
+    /// <param name="configure">中繼資料設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public SpreadsheetDocumentBuilder WithMetadata(Action<TextDocumentMetadataBuilder> configure)
+    {
+        if (configure is null)
+            throw new ArgumentNullException(nameof(configure));
+
+        configure(new TextDocumentMetadataBuilder(new OdfDocumentMetadata(_document)));
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此 builder 後續建立內容會套用的樣式集合。
+    /// </summary>
+    /// <param name="styles">樣式集合</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public SpreadsheetDocumentBuilder WithStyles(OdfStyleSet styles)
+    {
+        _styles = styles ?? throw new ArgumentNullException(nameof(styles));
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此 builder 後續建立內容會套用的樣式集合。
+    /// </summary>
+    /// <param name="configure">樣式集合設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public SpreadsheetDocumentBuilder WithStyles(Action<OdfStyleSet> configure)
+    {
+        if (configure is null)
+            throw new ArgumentNullException(nameof(configure));
+
+        var styles = new OdfStyleSet();
+        configure(styles);
+        return WithStyles(styles);
+    }
+
+    /// <summary>
+    /// 設定此 builder 後續建立內容會套用的設計主題。
+    /// </summary>
+    /// <param name="theme">設計主題</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public SpreadsheetDocumentBuilder WithTheme(OdfDesignTheme theme)
+    {
+        _styles = OdfStyleSet.FromTheme(theme);
+        return this;
     }
 
     /// <summary>
@@ -26,7 +82,7 @@ public sealed class SpreadsheetDocumentBuilder
         if (configure is null)
             throw new ArgumentNullException(nameof(configure));
         OdfTableSheet sheet = _document.Worksheets.Add(name);
-        configure(new OdfSheetBuilder(sheet));
+        configure(new OdfSheetBuilder(_document, sheet, _styles));
         return this;
     }
 
@@ -45,11 +101,15 @@ public sealed class SpreadsheetDocumentBuilder
 /// </summary>
 public sealed class OdfSheetBuilder
 {
+    private readonly SpreadsheetDocument _document;
     private readonly OdfTableSheet _sheet;
+    private readonly OdfStyleSet? _styles;
 
-    internal OdfSheetBuilder(OdfTableSheet sheet)
+    internal OdfSheetBuilder(SpreadsheetDocument document, OdfTableSheet sheet, OdfStyleSet? styles)
     {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+        _styles = styles;
     }
 
     /// <summary>
@@ -60,7 +120,9 @@ public sealed class OdfSheetBuilder
     /// <returns>目前 builder 執行個體</returns>
     public OdfSheetBuilder SetCell(string address, object? value)
     {
-        _sheet.Cells[address].CellValue = value;
+        OdfCell cell = _sheet.Cells[address];
+        cell.CellValue = value;
+        ApplyBodyStyle(cell);
         return this;
     }
 
@@ -72,8 +134,83 @@ public sealed class OdfSheetBuilder
     /// <returns>目前 builder 執行個體</returns>
     public OdfSheetBuilder SetFormula(string address, string formula)
     {
-        _sheet.Cells[address].Formula = formula;
+        OdfCell cell = _sheet.Cells[address];
+        cell.Formula = formula;
+        ApplyBodyStyle(cell);
         return this;
+    }
+
+    /// <summary>
+    /// 對指定儲存格範圍逐格設定公式。
+    /// </summary>
+    /// <param name="range">要設定公式的儲存格範圍</param>
+    /// <param name="formulaFactory">依 1-based 列號與欄號產生 ODF 公式文字的委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder SetFormulaRange(OdfCellRange range, Func<int, int, string> formulaFactory)
+    {
+        if (formulaFactory is null)
+            throw new ArgumentNullException(nameof(formulaFactory));
+
+        OdfCellRange normalizedRange = EnsureSheetName(range);
+        int startRow = Math.Min(normalizedRange.StartAddress.Row, normalizedRange.EndAddress.Row);
+        int endRow = Math.Max(normalizedRange.StartAddress.Row, normalizedRange.EndAddress.Row);
+        int startColumn = Math.Min(normalizedRange.StartAddress.Column, normalizedRange.EndAddress.Column);
+        int endColumn = Math.Max(normalizedRange.StartAddress.Column, normalizedRange.EndAddress.Column);
+
+        for (int row = startRow; row <= endRow; row++)
+        {
+            for (int column = startColumn; column <= endColumn; column++)
+            {
+                OdfCell cell = _sheet.Cells[row, column];
+                cell.Formula = formulaFactory(row + 1, column + 1);
+                ApplyBodyStyle(cell);
+            }
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// 對指定儲存格範圍逐格設定公式。
+    /// </summary>
+    /// <param name="range">儲存格範圍字串，例如 <c>D2:D20</c></param>
+    /// <param name="formulaFactory">依 1-based 列號與欄號產生 ODF 公式文字的委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder SetFormulaRange(string range, Func<int, int, string> formulaFactory)
+        => SetFormulaRange(ParseRange(range), formulaFactory);
+
+    /// <summary>
+    /// 新增公式欄，包含標題儲存格與指定資料列的公式。
+    /// </summary>
+    /// <param name="columnName">欄位名稱，例如 <c>D</c></param>
+    /// <param name="header">標題列文字</param>
+    /// <param name="firstDataRow">第一筆資料列，採 1 為基準</param>
+    /// <param name="lastDataRow">最後一筆資料列，採 1 為基準</param>
+    /// <param name="formulaFactory">依 1-based 列號產生 ODF 公式文字的委派</param>
+    /// <param name="headerRow">標題列，採 1 為基準</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddFormulaColumn(
+        string columnName,
+        string header,
+        int firstDataRow,
+        int lastDataRow,
+        Func<int, string> formulaFactory,
+        int headerRow = 1)
+    {
+        if (string.IsNullOrWhiteSpace(columnName))
+            throw new ArgumentNullException(nameof(columnName));
+        if (formulaFactory is null)
+            throw new ArgumentNullException(nameof(formulaFactory));
+        EnsureOneBasedIndex(headerRow, nameof(headerRow));
+        EnsureOneBasedIndex(firstDataRow, nameof(firstDataRow));
+        EnsureOneBasedIndex(lastDataRow, nameof(lastDataRow));
+
+        int columnIndex = OdfCellAddress.ParseExcel(columnName.Trim() + headerRow.ToString(CultureInfo.InvariantCulture)).Column;
+        OdfCell headerCell = _sheet.Cells[headerRow - 1, columnIndex];
+        headerCell.CellValue = header;
+        ApplyHeaderStyle(headerCell);
+        var range = new OdfCellRange(firstDataRow - 1, columnIndex, lastDataRow - 1, columnIndex, _sheet.Name);
+        return SetFormulaRange(range, (row, _) => formulaFactory(row));
     }
 
     /// <summary>
@@ -105,7 +242,9 @@ public sealed class OdfSheetBuilder
             object?[] values = selector(item) ?? throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_SpreadsheetDocumentBuilder_ColumnSelectorsCannotReturn"));
             for (int i = 0; i < values.Length; i++)
             {
-                _sheet.Cells[rowIndex, columnOffset + i].CellValue = values[i];
+                OdfCell cell = _sheet.Cells[rowIndex, columnOffset + i];
+                cell.CellValue = values[i];
+                ApplyBodyStyle(cell);
             }
 
             rowIndex++;
@@ -139,11 +278,47 @@ public sealed class OdfSheetBuilder
         int columnIndex = startColumn - 1;
         foreach (string header in headers)
         {
-            _sheet.Cells[startRow - 1, columnIndex].CellValue = header;
+            OdfCell cell = _sheet.Cells[startRow - 1, columnIndex];
+            cell.CellValue = header;
+            ApplyHeaderStyle(cell);
             columnIndex++;
         }
 
         return ImportRows(items, rowSelector, startRow + 1, startColumn);
+    }
+
+    private void ApplyHeaderStyle(OdfCell cell)
+    {
+        if (_styles is null)
+            return;
+
+        if (_styles.TableHeaderBackgroundColor is not null)
+        {
+            cell.Style.Fill.Color = _styles.TableHeaderBackgroundColor;
+        }
+
+        if (_styles.TableHeaderColor is not null)
+        {
+            cell.Style.Font.Color = _styles.TableHeaderColor;
+        }
+
+        cell.Style.Font.IsBold = _styles.TableHeaderBold;
+    }
+
+    private void ApplyBodyStyle(OdfCell cell)
+    {
+        if (_styles is null)
+            return;
+
+        if (_styles.BodyColor is not null)
+        {
+            cell.Style.Font.Color = _styles.BodyColor;
+        }
+
+        if (_styles.BodyFontSizePoints.HasValue)
+        {
+            cell.Style.Font.Size = ToPointString(_styles.BodyFontSizePoints.Value);
+        }
     }
 
     /// <summary>
@@ -177,11 +352,330 @@ public sealed class OdfSheetBuilder
         return this;
     }
 
+    /// <summary>
+    /// 新增工作表層命名範圍。
+    /// </summary>
+    /// <param name="name">命名範圍名稱</param>
+    /// <param name="range">儲存格範圍</param>
+    /// <param name="baseCell">基準儲存格位址</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddNamedRange(string name, OdfCellRange range, OdfCellAddress? baseCell = null)
+    {
+        _sheet.AddNamedRange(name, EnsureSheetName(range), baseCell);
+        return this;
+    }
+
+    /// <summary>
+    /// 新增工作表層命名範圍。
+    /// </summary>
+    /// <param name="name">命名範圍名稱</param>
+    /// <param name="range">儲存格範圍字串，例如 <c>A1:D10</c></param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddNamedRange(string name, string range)
+        => AddNamedRange(name, ParseRange(range));
+
+    /// <summary>
+    /// 新增工作表層具名運算式。
+    /// </summary>
+    /// <param name="name">具名運算式名稱</param>
+    /// <param name="expression">公式運算式字串</param>
+    /// <param name="baseCell">基準儲存格位址</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddNamedExpression(string name, string expression, OdfCellAddress? baseCell = null)
+    {
+        _sheet.AddNamedExpression(name, expression, baseCell);
+        return this;
+    }
+
+    /// <summary>
+    /// 在目前工作表新增嵌入圖表。
+    /// </summary>
+    /// <param name="anchor">圖表左上角錨定儲存格</param>
+    /// <param name="chart">圖表定義</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddChart(OdfCellAddress anchor, OdfChartDefinition chart)
+    {
+        _document.AddChart(_sheet.Name, EnsureSheetName(anchor), chart);
+        return this;
+    }
+
+    /// <summary>
+    /// 在目前工作表新增嵌入圖表。
+    /// </summary>
+    /// <param name="anchor">圖表左上角錨定儲存格，例如 <c>F1</c></param>
+    /// <param name="chart">圖表定義</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddChart(string anchor, OdfChartDefinition chart)
+        => AddChart(ParseAddress(anchor), chart);
+
+    /// <summary>
+    /// 在目前工作表插入可立即設定的嵌入圖表。
+    /// </summary>
+    /// <param name="dataRange">圖表資料來源範圍</param>
+    /// <param name="chartType">圖表類型</param>
+    /// <param name="configure">圖表設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder InsertChart(
+        OdfCellRange dataRange,
+        OdfChartType chartType,
+        Action<OdfChartDocument>? configure = null)
+    {
+        OdfChartDocument chart = _sheet.InsertChart(EnsureSheetName(dataRange), chartType);
+        configure?.Invoke(chart);
+        return this;
+    }
+
+    /// <summary>
+    /// 在目前工作表插入可立即設定的嵌入圖表。
+    /// </summary>
+    /// <param name="dataRange">圖表資料來源範圍字串，例如 <c>A1:D10</c></param>
+    /// <param name="chartType">圖表類型</param>
+    /// <param name="configure">圖表設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder InsertChart(
+        string dataRange,
+        OdfChartType chartType,
+        Action<OdfChartDocument>? configure = null)
+        => InsertChart(ParseRange(dataRange), chartType, configure);
+
+    /// <summary>
+    /// 新增資料驗證規則。
+    /// </summary>
+    /// <param name="validation">資料驗證設定</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddDataValidation(OdfDataValidation validation)
+    {
+        _document.AddDataValidation(_sheet.Name, validation);
+        return this;
+    }
+
+    /// <summary>
+    /// 新增十進位數值範圍資料驗證規則。
+    /// </summary>
+    /// <param name="range">套用驗證的儲存格範圍</param>
+    /// <param name="minimum">允許的最小值</param>
+    /// <param name="maximum">允許的最大值</param>
+    /// <param name="errorTitle">輸入錯誤時顯示的標題</param>
+    /// <param name="errorMessage">輸入錯誤時顯示的訊息內容</param>
+    /// <param name="alertStyle">輸入錯誤時的警告樣式等級</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddDecimalValidation(
+        OdfCellRange range,
+        double minimum,
+        double maximum,
+        string? errorTitle = null,
+        string? errorMessage = null,
+        OdfValidationAlertStyle alertStyle = OdfValidationAlertStyle.Stop)
+    {
+        _document.AddDataValidation(_sheet.Name, new OdfDataValidation
+        {
+            ApplyTo = EnsureSheetName(range),
+            Condition = OdfValidationCondition.DecimalBetween,
+            Formula1 = minimum.ToString(CultureInfo.InvariantCulture),
+            Formula2 = maximum.ToString(CultureInfo.InvariantCulture),
+            ErrorTitle = errorTitle ?? string.Empty,
+            ErrorMessage = errorMessage ?? string.Empty,
+            AlertStyle = alertStyle,
+        });
+        return this;
+    }
+
+    /// <summary>
+    /// 新增十進位數值範圍資料驗證規則。
+    /// </summary>
+    /// <param name="range">套用驗證的儲存格範圍字串，例如 <c>B2:C20</c></param>
+    /// <param name="minimum">允許的最小值</param>
+    /// <param name="maximum">允許的最大值</param>
+    /// <param name="errorTitle">輸入錯誤時顯示的標題</param>
+    /// <param name="errorMessage">輸入錯誤時顯示的訊息內容</param>
+    /// <param name="alertStyle">輸入錯誤時的警告樣式等級</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddDecimalValidation(
+        string range,
+        double minimum,
+        double maximum,
+        string? errorTitle = null,
+        string? errorMessage = null,
+        OdfValidationAlertStyle alertStyle = OdfValidationAlertStyle.Stop)
+        => AddDecimalValidation(ParseRange(range), minimum, maximum, errorTitle, errorMessage, alertStyle);
+
+    /// <summary>
+    /// 新增條件格式規則。
+    /// </summary>
+    /// <param name="range">儲存格範圍</param>
+    /// <param name="conditionValue">條件運算式</param>
+    /// <param name="styleName">要套用的格式樣式名稱</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddConditionalFormat(OdfCellRange range, string conditionValue, string styleName)
+    {
+        _sheet.AddConditionalFormat(EnsureSheetName(range), conditionValue, styleName);
+        return this;
+    }
+
+    /// <summary>
+    /// 新增條件格式規則。
+    /// </summary>
+    /// <param name="range">儲存格範圍字串，例如 <c>D2:D20</c></param>
+    /// <param name="conditionValue">條件運算式</param>
+    /// <param name="styleName">要套用的格式樣式名稱</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddConditionalFormat(string range, string conditionValue, string styleName)
+        => AddConditionalFormat(ParseRange(range), conditionValue, styleName);
+
+    /// <summary>
+    /// 新增資料橫條條件格式。
+    /// </summary>
+    /// <param name="range">儲存格範圍</param>
+    /// <param name="positiveColor">正值橫條色彩</param>
+    /// <param name="negativeColor">負值橫條色彩</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddDataBarFormat(OdfCellRange range, OdfColor positiveColor, OdfColor? negativeColor = null)
+    {
+        _sheet.AddDataBarFormat(EnsureSheetName(range), positiveColor, negativeColor);
+        return this;
+    }
+
+    /// <summary>
+    /// 新增色階條件格式。
+    /// </summary>
+    /// <param name="range">儲存格範圍</param>
+    /// <param name="minColor">最小值對應色彩</param>
+    /// <param name="maxColor">最大值對應色彩</param>
+    /// <param name="midColor">中間值對應色彩</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddColorScaleFormat(
+        OdfCellRange range,
+        OdfColor minColor,
+        OdfColor maxColor,
+        OdfColor? midColor = null)
+    {
+        _sheet.AddColorScaleFormat(EnsureSheetName(range), minColor, maxColor, midColor);
+        return this;
+    }
+
+    /// <summary>
+    /// 新增圖示集條件格式。
+    /// </summary>
+    /// <param name="range">儲存格範圍</param>
+    /// <param name="iconSet">圖示集類型</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddIconSetFormat(OdfCellRange range, OdfIconSetType iconSet)
+    {
+        _sheet.AddIconSetFormat(EnsureSheetName(range), iconSet);
+        return this;
+    }
+
+    /// <summary>
+    /// 新增樞紐分析表。
+    /// </summary>
+    /// <param name="sourceRange">來源資料範圍</param>
+    /// <param name="targetCell">輸出起點儲存格</param>
+    /// <param name="configure">樞紐分析表設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddPivotTable(
+        OdfCellRange sourceRange,
+        OdfCellAddress targetCell,
+        Action<OdfPivotTableBuilder> configure)
+    {
+        _sheet.CreatePivotTable(EnsureSheetName(sourceRange), EnsureSheetName(targetCell), configure);
+        return this;
+    }
+
+    /// <summary>
+    /// 新增樞紐分析表。
+    /// </summary>
+    /// <param name="name">樞紐分析表名稱</param>
+    /// <param name="sourceRange">來源資料範圍</param>
+    /// <param name="targetCell">輸出起點儲存格</param>
+    /// <param name="configure">樞紐分析表設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddPivotTable(
+        string name,
+        OdfCellRange sourceRange,
+        OdfCellAddress targetCell,
+        Action<OdfPivotTableBuilder> configure)
+    {
+        _sheet.CreatePivotTable(name, EnsureSheetName(sourceRange), EnsureSheetName(targetCell), configure);
+        return this;
+    }
+
+    /// <summary>
+    /// 新增樞紐分析表。
+    /// </summary>
+    /// <param name="name">樞紐分析表名稱</param>
+    /// <param name="sourceRange">來源資料範圍字串，例如 <c>A1:D20</c></param>
+    /// <param name="targetCell">輸出起點儲存格，例如 <c>G1</c></param>
+    /// <param name="configure">樞紐分析表設定委派</param>
+    /// <returns>目前 builder 執行個體</returns>
+    public OdfSheetBuilder AddPivotTable(
+        string name,
+        string sourceRange,
+        string targetCell,
+        Action<OdfPivotTableBuilder> configure)
+        => AddPivotTable(name, ParseRange(sourceRange), ParseAddress(targetCell), configure);
+
     private static void EnsureOneBasedIndex(int value, string parameterName)
     {
         if (value < 1)
         {
             throw new ArgumentOutOfRangeException(parameterName, OdfLocalizer.GetMessage("Err_SpreadsheetDocumentBuilder_IndexGreaterEqual1"));
         }
+    }
+
+    private OdfCellRange EnsureSheetName(OdfCellRange range)
+    {
+        string? startSheet = range.StartAddress.SheetName ?? _sheet.Name;
+        string? endSheet = range.EndAddress.SheetName ?? startSheet;
+        return new OdfCellRange(
+            new OdfCellAddress(
+                range.StartAddress.Row,
+                range.StartAddress.Column,
+                startSheet,
+                range.StartAddress.IsRowAbsolute,
+                range.StartAddress.IsColumnAbsolute,
+                range.StartAddress.IsSheetAbsolute),
+            new OdfCellAddress(
+                range.EndAddress.Row,
+                range.EndAddress.Column,
+                endSheet,
+                range.EndAddress.IsRowAbsolute,
+                range.EndAddress.IsColumnAbsolute,
+                range.EndAddress.IsSheetAbsolute));
+    }
+
+    private OdfCellAddress EnsureSheetName(OdfCellAddress address) =>
+        address.SheetName is not null
+            ? address
+            : new OdfCellAddress(
+                address.Row,
+                address.Column,
+                _sheet.Name,
+                address.IsRowAbsolute,
+                address.IsColumnAbsolute,
+                address.IsSheetAbsolute);
+
+    private static OdfCellRange ParseRange(string range)
+    {
+        if (!OdfCellRange.TryParse(range, out OdfCellRange parsedRange))
+        {
+            throw new FormatException(OdfLocalizer.GetMessage("Err_OdfTableSheet_InvalidCellRange", range));
+        }
+
+        return parsedRange;
+    }
+
+    private static OdfCellAddress ParseAddress(string address)
+    {
+        if (!OdfCellAddress.TryParse(address, out OdfCellAddress parsedAddress))
+        {
+            throw new FormatException(OdfLocalizer.GetMessage("Err_OdfCellAddress_InvalidAddress", address));
+        }
+
+        return parsedAddress;
+    }
+
+    private static string ToPointString(double points)
+    {
+        return points.ToString(CultureInfo.InvariantCulture) + "pt";
     }
 }

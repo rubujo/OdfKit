@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -58,22 +59,22 @@ public static class OdfHtmlExporter
             }
 
             sb.Append("</head><body>");
-            ConvertBodyNodes(document.BodyTextRoot, sb);
+            ConvertBodyNodes(document, document.BodyTextRoot, sb);
             sb.Append("</body></html>");
             return sb.ToString();
         }
 
-        ConvertBodyNodes(document.BodyTextRoot, sb);
+        ConvertBodyNodes(document, document.BodyTextRoot, sb);
         return sb.ToString();
     }
 
-    private static void ConvertBodyNodes(OdfNode odfNode, StringBuilder sb)
+    private static void ConvertBodyNodes(TextDocument document, OdfNode odfNode, StringBuilder sb)
     {
         foreach (var child in odfNode.Children)
         {
             if (child.NamespaceUri != OdfNamespaces.Text)
             {
-                ConvertBodyNodes(child, sb);
+                ConvertBodyNodes(document, child, sb);
                 continue;
             }
 
@@ -84,14 +85,14 @@ public static class OdfHtmlExporter
                         int level = int.TryParse(child.GetAttribute("outline-level", OdfNamespaces.Text), out int l) ? l : 1;
                         level = level < 1 ? 1 : (level > 6 ? 6 : level);
                         sb.Append('<').Append('h').Append(level).Append('>');
-                        AppendEncodedText(sb, child.TextContent);
+                        ConvertParagraphContent(document, child, sb);
                         sb.Append("</h").Append(level).Append('>');
                         break;
                     }
                 case "p":
                     {
                         sb.Append("<p>");
-                        ConvertParagraphContent(child, sb);
+                        ConvertParagraphContent(document, child, sb);
                         sb.Append("</p>");
                         break;
                     }
@@ -103,7 +104,7 @@ public static class OdfHtmlExporter
                             if (item.LocalName == "list-item" && item.NamespaceUri == OdfNamespaces.Text)
                             {
                                 sb.Append("<li>");
-                                AppendEncodedText(sb, item.TextContent);
+                                ConvertParagraphContent(document, item, sb);
                                 sb.Append("</li>");
                             }
                         }
@@ -112,13 +113,13 @@ public static class OdfHtmlExporter
                         break;
                     }
                 default:
-                    ConvertBodyNodes(child, sb);
+                    ConvertBodyNodes(document, child, sb);
                     break;
             }
         }
     }
 
-    private static void ConvertParagraphContent(OdfNode para, StringBuilder sb)
+    private static void ConvertParagraphContent(TextDocument document, OdfNode para, StringBuilder sb)
     {
         bool wroteContent = false;
         foreach (var child in para.Children)
@@ -130,8 +131,10 @@ public static class OdfHtmlExporter
             }
             else if (child.LocalName == "span" && child.NamespaceUri == OdfNamespaces.Text)
             {
-                sb.Append("<span>");
-                ConvertParagraphContent(child, sb);
+                sb.Append("<span");
+                AppendInlineStyleAttribute(document, child, sb);
+                sb.Append('>');
+                ConvertParagraphContent(document, child, sb);
                 sb.Append("</span>");
                 wroteContent = true;
             }
@@ -160,6 +163,74 @@ public static class OdfHtmlExporter
         if (!wroteContent)
         {
             AppendEncodedText(sb, para.TextContent);
+        }
+    }
+
+    private static void AppendInlineStyleAttribute(TextDocument document, OdfNode span, StringBuilder sb)
+    {
+        string? styleName = span.GetAttribute("style-name", OdfNamespaces.Text);
+        if (string.IsNullOrWhiteSpace(styleName))
+        {
+            return;
+        }
+
+        var declarations = new List<string>();
+        string? fontWeight = document.StyleEngine.GetStyleProperty(styleName!, "font-weight", OdfNamespaces.Fo, "text");
+        if (string.Equals(fontWeight, "bold", StringComparison.OrdinalIgnoreCase))
+        {
+            declarations.Add("font-weight:bold");
+        }
+
+        string? fontStyle = document.StyleEngine.GetStyleProperty(styleName!, "font-style", OdfNamespaces.Fo, "text");
+        if (string.Equals(fontStyle, "italic", StringComparison.OrdinalIgnoreCase))
+        {
+            declarations.Add("font-style:italic");
+        }
+
+        string? underline = document.StyleEngine.GetStyleProperty(styleName!, "text-underline-style", OdfNamespaces.Style, "text");
+        string? lineThrough = document.StyleEngine.GetStyleProperty(styleName!, "text-line-through-style", OdfNamespaces.Style, "text");
+        string? decoration = BuildTextDecoration(underline, lineThrough);
+        if (!string.IsNullOrWhiteSpace(decoration))
+        {
+            declarations.Add("text-decoration:" + decoration);
+        }
+
+        AddCssDeclaration(document, styleName!, "font-size", OdfNamespaces.Fo, "text", declarations);
+        AddCssDeclaration(document, styleName!, "color", OdfNamespaces.Fo, "text", declarations);
+        AddCssDeclaration(document, styleName!, "background-color", OdfNamespaces.Fo, "text", declarations);
+        AddCssDeclaration(document, styleName!, "text-transform", OdfNamespaces.Fo, "text", declarations);
+        AddCssDeclaration(document, styleName!, "font-variant", OdfNamespaces.Fo, "text", declarations);
+
+        if (declarations.Count == 0)
+        {
+            return;
+        }
+
+        sb.Append(" style=\"");
+        sb.Append(WebUtility.HtmlEncode(string.Join("; ", declarations)));
+        sb.Append('"');
+    }
+
+    private static string? BuildTextDecoration(string? underline, string? lineThrough)
+    {
+        bool hasUnderline = !string.IsNullOrWhiteSpace(underline) &&
+            !string.Equals(underline, "none", StringComparison.OrdinalIgnoreCase);
+        bool hasLineThrough = !string.IsNullOrWhiteSpace(lineThrough) &&
+            !string.Equals(lineThrough, "none", StringComparison.OrdinalIgnoreCase);
+        if (hasUnderline && hasLineThrough)
+        {
+            return "underline line-through";
+        }
+
+        return hasUnderline ? "underline" : hasLineThrough ? "line-through" : null;
+    }
+
+    private static void AddCssDeclaration(TextDocument document, string styleName, string propertyName, string namespaceUri, string family, List<string> declarations)
+    {
+        string? value = document.StyleEngine.GetStyleProperty(styleName, propertyName, namespaceUri, family);
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            declarations.Add(propertyName + ":" + value);
         }
     }
 

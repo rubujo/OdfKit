@@ -844,6 +844,7 @@ namespace OdfKit.Tests
 
                 var formulaDoc = doc.CreateEmbeddedDocument<OdfKit.Formula.OdfFormulaDocument>("Object 2");
                 Assert.NotNull(formulaDoc);
+                formulaDoc.SetIdentifierEquation("x", "y");
 
                 var slide = doc.AddSlide("Slide 1");
                 slide.AddEmbeddedObject("Object 1", OdfLength.Parse("1cm"), OdfLength.Parse("1cm"), OdfLength.Parse("8cm"), OdfLength.Parse("6cm"));
@@ -864,6 +865,7 @@ namespace OdfKit.Tests
                 var formulaDoc = doc.GetEmbeddedDocument<OdfKit.Formula.OdfFormulaDocument>("Object 2");
                 Assert.NotNull(formulaDoc);
                 Assert.Equal("application/vnd.oasis.opendocument.formula", formulaDoc.Package.Manifest["Object 2/"]);
+                Assert.Equal("x=y", formulaDoc.MathText);
 
                 // Verify the directory full-paths exist in manifest
                 Assert.True(package.Manifest.ContainsKey("Object 1/"));

@@ -41,6 +41,9 @@ public abstract partial class OdfDocument
 
         internal OdfExternalLinkManager? FormulaExternalLinks => _document.GetFormulaExternalLinksForPersistence();
 
+        internal void FlushTrackedEmbeddedDocuments(OdfSaveOptions options) =>
+            _document.FlushTrackedEmbeddedDocuments(options);
+
         internal void PrepareForPersistence(OdfSaveOptions options) => _document.PrepareForPersistence(options);
     }
 
@@ -49,4 +52,6 @@ public abstract partial class OdfDocument
     internal virtual void PrepareForPersistence(OdfSaveOptions options)
     {
     }
+
+    internal void FlushTrackedEmbeddedDocuments(OdfSaveOptions options) => FlushTrackedEmbeddedDocumentsCore(options);
 }

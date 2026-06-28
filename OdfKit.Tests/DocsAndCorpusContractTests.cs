@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using OdfKit.Cli;
 using OdfKit.Compliance;
 using Xunit;
@@ -98,6 +100,81 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
+    /// 驗證 managed-first 轉檔策略不再把已完成的 Markdown／RTF 註解範圍往返列為缺口。
+    /// </summary>
+    [Fact]
+    public void ManagedFirstConversionStrategyDeclaresAnnotationRangeRoundTripComplete()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "managed-first-conversion-strategy.md"));
+
+        Assert.Contains("annotation-start", strategy, StringComparison.Ordinal);
+        Assert.Contains("annotation-end", strategy, StringComparison.Ordinal);
+        Assert.Contains("annotation range round-trip", strategy, StringComparison.Ordinal);
+        Assert.Contains("缺少 `atnid` 時沿用 range id", strategy, StringComparison.Ordinal);
+        Assert.DoesNotContain("下一步補更深控制字與更高保真註解範圍語意", strategy, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 managed-first 轉檔策略已將 PPTX 逐段落動畫 range 往返列為完成基礎。
+    /// </summary>
+    [Fact]
+    public void ManagedFirstConversionStrategyDeclaresPptxParagraphAnimationRangeRoundTripComplete()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "managed-first-conversion-strategy.md"));
+
+        Assert.Contains("paragraph range round-trip", strategy, StringComparison.Ordinal);
+        Assert.Contains("emphasis animation trigger/delay round-trip", strategy, StringComparison.Ordinal);
+        Assert.Contains("shape shadow effect export", strategy, StringComparison.Ordinal);
+        Assert.Contains("theme effect style matrix export", strategy, StringComparison.Ordinal);
+        Assert.Contains("theme effect style shadow color/offset/opacity import", strategy, StringComparison.Ordinal);
+        Assert.Contains("layout/master placeholder text style inheritance", strategy, StringComparison.Ordinal);
+        Assert.Contains("direct shape shadow import", strategy, StringComparison.Ordinal);
+        Assert.Contains("root timing restart metadata", strategy, StringComparison.Ordinal);
+        Assert.Contains("main sequence previous/next action metadata", strategy, StringComparison.Ordinal);
+        Assert.Contains("low-level animation tree `transitionFilter` export", strategy, StringComparison.Ordinal);
+        Assert.Contains("BuildParagraph-only paragraph build import fallback", strategy, StringComparison.Ordinal);
+        Assert.DoesNotContain("群組與逐段落動畫", strategy, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 managed-first 轉檔策略已將 SVG 水平／垂直線段 substitution 列為完成基礎。
+    /// </summary>
+    [Fact]
+    public void ManagedFirstConversionStrategyDeclaresSvgHorizontalVerticalSubstitutionComplete()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "managed-first-conversion-strategy.md"));
+
+        Assert.Contains("substitution 後 SVG `H`/`V` 水平／垂直線段", strategy, StringComparison.Ordinal);
+        Assert.Contains("full ellipse arcs split", strategy, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 managed-first 轉檔策略已將 RTF field result 保留列為完成基礎。
+    /// </summary>
+    [Fact]
+    public void ManagedFirstConversionStrategyDeclaresRtfFieldResultImportComplete()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "managed-first-conversion-strategy.md"));
+
+        Assert.Contains("巢狀 `fldrslt` field result 與非 hyperlink field result 保留", strategy, StringComparison.Ordinal);
+        Assert.Contains("`DATE`／`TIME`", strategy, StringComparison.Ordinal);
+        Assert.Contains("`AUTHOR`／`TITLE`／`SUBJECT`／`DOCPROPERTY` metadata 白名單語意映射", strategy, StringComparison.Ordinal);
+        Assert.Contains("`MERGEFIELD` ODF placeholder 語意映射", strategy, StringComparison.Ordinal);
+        Assert.Contains("`SEQ` ODF sequence 語意映射", strategy, StringComparison.Ordinal);
+        Assert.Contains("`REF`（含 `\\\\p` 方向 switch）欄位 instruction 語意映射", strategy, StringComparison.Ordinal);
+        Assert.Contains("`\\\\sect`/`\\\\column` soft-page-break fallback", strategy, StringComparison.Ordinal);
+        Assert.Contains("`\\\\softline`/`\\\\softpage` fallback", strategy, StringComparison.Ordinal);
+        Assert.Contains("`\\\\line`/`\\\\tab` 節點化匯入", strategy, StringComparison.Ordinal);
+        Assert.Contains("zero-width break controls `\\\\zwbo`/`\\\\zwnbo`", strategy, StringComparison.Ordinal);
+        Assert.Contains("`\\\\chftn` current footnote marker", strategy, StringComparison.Ordinal);
+        Assert.DoesNotContain("巢狀欄位與更高保真註解邊界案例", strategy, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// 驗證外部 corpus 範本宣告必要欄位與 baseline exception 格式。
     /// </summary>
     [Fact]
@@ -154,6 +231,50 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
+    /// 驗證 ODFDOM 官方 sample parity 外部 corpus 範本具備來源、授權、雜湊欄位並可通過 metadata gate。
+    /// </summary>
+    [Fact]
+    public void ExternalOdfDomSampleCorpusTemplateCanBeMetadataValidatedByCli()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string manifestPath = Path.Combine(repoRoot, "docs", "examples", "odfdom-sample-corpus", "manifest.json");
+        string exceptionsPath = Path.Combine(repoRoot, "docs", "examples", "odfdom-sample-corpus", "baseline-exceptions.json");
+        using StringWriter output = new();
+        using StringWriter error = new();
+
+        int exitCode = OdfKitCli.Run(
+            [
+                "validate-corpus",
+                manifestPath,
+                "--metadata-only",
+                "--format",
+                "json",
+                "--baseline-exceptions",
+                exceptionsPath
+            ],
+            output,
+            error);
+
+        Assert.Equal(0, exitCode);
+        Assert.Equal(string.Empty, error.ToString());
+        using JsonDocument json = JsonDocument.Parse(output.ToString());
+        JsonElement summary = json.RootElement.GetProperty("summary");
+        Assert.True(summary.GetProperty("metadataOnly").GetBoolean());
+        Assert.Equal(2, summary.GetProperty("fixtureCount").GetInt32());
+        Assert.Equal(0, summary.GetProperty("baselineExceptionCount").GetInt32());
+
+        using JsonDocument manifest = JsonDocument.Parse(File.ReadAllText(manifestPath));
+        foreach (JsonElement fixture in manifest.RootElement.GetProperty("fixtures").EnumerateArray())
+        {
+            Assert.Equal("ODF Toolkit ODFDOM sample", fixture.GetProperty("source").GetString());
+            Assert.Equal("external-review-required", fixture.GetProperty("license").GetString());
+            Assert.Contains("github.com/tdf/odftoolkit", fixture.GetProperty("sourceUri").GetString(), StringComparison.Ordinal);
+            Assert.Matches("^[0-9a-f]{64}$", fixture.GetProperty("sha256").GetString());
+            Assert.Contains("Replace", fixture.GetProperty("notes").GetString(), StringComparison.Ordinal);
+        }
+    }
+
+    /// <summary>
     /// 驗證 corpus CI 腳本與 GitHub Actions 入口存在。
     /// </summary>
     [Fact]
@@ -171,6 +292,8 @@ public class DocsAndCorpusContractTests
         Assert.Contains("ODFKIT_PARITY_CORPUS_ROOT", script, StringComparison.Ordinal);
         Assert.Contains("ODFKIT_ODFVALIDATOR_JAR", script, StringComparison.Ordinal);
         Assert.Contains("--metadata-only", script, StringComparison.Ordinal);
+        Assert.Contains("odfdom-sample-corpus", initializeScript, StringComparison.Ordinal);
+        Assert.Contains("ValidateSet", initializeScript, StringComparison.Ordinal);
         Assert.Contains("manifest.json", initializeScript, StringComparison.Ordinal);
         Assert.Contains("baseline-exceptions.json", initializeScript, StringComparison.Ordinal);
         Assert.Contains("Test-OdfCorpus.ps1", workflow, StringComparison.Ordinal);
@@ -219,6 +342,33 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
+    /// 驗證 trimming 煙霧測試已文件化，且 CI 入口會監看工具本身與核心程式碼。
+    /// </summary>
+    [Fact]
+    public void TrimSmokeEntryPointsAreDocumentedAndPathScoped()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string script = File.ReadAllText(Path.Combine(repoRoot, "eng", "Test-TrimSmoke.ps1"));
+        string workflow = File.ReadAllText(Path.Combine(repoRoot, ".github", "workflows", "trim-smoke.yml"));
+        string strategy = File.ReadAllText(Path.Combine(repoRoot, "docs", "testing-strategy.md"));
+        string toolsReadme = File.ReadAllText(Path.Combine(repoRoot, "tools", "README.md"));
+        string trimProject = File.ReadAllText(Path.Combine(repoRoot, "tools", "OdfKit.TrimSmoke", "OdfKit.TrimSmoke.csproj"));
+        string openPgpProvider = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Core", "OdfBouncyCastleOpenPgpProvider.cs"));
+
+        Assert.Contains("PublishTrimmed", script, StringComparison.Ordinal);
+        Assert.Contains("OdfKit.TrimSmoke.exe", script, StringComparison.Ordinal);
+        Assert.Contains("tools/OdfKit.TrimSmoke/**", workflow, StringComparison.Ordinal);
+        Assert.Contains("eng/Test-TrimSmoke.ps1", workflow, StringComparison.Ordinal);
+        Assert.Contains("workflow_dispatch", workflow, StringComparison.Ordinal);
+        Assert.Contains("Test-TrimSmoke.ps1 -Configuration Release", strategy, StringComparison.Ordinal);
+        Assert.Contains("Test-TrimSmoke.ps1 -Configuration Release", toolsReadme, StringComparison.Ordinal);
+        Assert.Contains("<TrimmerRootAssembly Include=\"BouncyCastle.Cryptography\" />", trimProject, StringComparison.Ordinal);
+        Assert.Contains("<NuGetAudit>false</NuGetAudit>", trimProject, StringComparison.Ordinal);
+        Assert.Contains("<NoWarn>$(NoWarn);IL2104</NoWarn>", trimProject, StringComparison.Ordinal);
+        Assert.Contains("RequiresUnreferencedCode", openPgpProvider, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// 驗證大型產生式成品與同步資源表已記錄來源與維護規則。
     /// </summary>
     [Fact]
@@ -240,6 +390,130 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
+    /// 驗證 validate-corpus CLI 訊息已覆蓋全部支援語言，且非英文文化不是英文佔位。
+    /// </summary>
+    [Fact]
+    public void CliCorpusDiagnosticsAreLocalizedForAllSupportedCultures()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string localizer = File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Compliance", "OdfLocalizer.Exceptions.cs"));
+        string[] keys =
+        [
+            "Cli_InvalidJsonFile",
+            "Cli_UnhandledError",
+            "Cli_BaselineExceptionBaselineInvalid",
+            "Cli_BaselineExceptionDoesNotMatchFixture",
+            "Cli_BaselineExceptionDuplicate",
+            "Cli_BaselineExceptionEntriesMustBeObjects",
+            "Cli_BaselineExceptionRequiresBooleanProperty",
+            "Cli_BaselineExceptionRequiresProperty",
+            "Cli_BaselineExceptionsRequiresExceptionsArray",
+            "Cli_CorpusFixtureDuplicateId",
+            "Cli_CorpusFixtureDuplicatePath",
+            "Cli_CorpusFixtureEntriesMustBeObjects",
+            "Cli_CorpusFixtureExpectedInvalid",
+            "Cli_CorpusFixtureNotFound",
+            "Cli_CorpusFixturePathEscapesRoot",
+            "Cli_CorpusFixturePathMustBeRelative",
+            "Cli_CorpusFixtureRequiresProperty",
+            "Cli_CorpusFixtureRoundTripInvalid",
+            "Cli_CorpusFixtureSha256Invalid",
+            "Cli_CorpusFixtureUnknownProfile",
+            "Cli_CorpusManifestRequiresAtLeastOneFixture",
+            "Cli_CorpusManifestRequiresFixturesArray",
+            "Cli_ExternalCorpusFixtureRequiresAbsoluteSourceUri",
+        ];
+
+        foreach (string key in keys)
+        {
+            Assert.Equal(12, Regex.Matches(localizer, "\\[\"" + Regex.Escape(key) + "\"\\]").Count);
+        }
+
+        Assert.Contains("Die baseline exception baseline", localizer, StringComparison.Ordinal);
+        Assert.Contains("La baseline d'une exception", localizer, StringComparison.Ordinal);
+        Assert.Contains("baseline exception의 baseline", localizer, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證新增的公式與 OpenPGP 診斷訊息可由全部支援語言查出，而不是回退為 key 名稱。
+    /// </summary>
+    [Fact]
+    public void FormulaAndOpenPgpDiagnosticsAreLocalizedForAllSupportedCultures()
+    {
+        string[] cultures = ["en", "zh-TW", "de", "fr", "nl", "nb", "pt", "it", "sk", "da", "ms", "ko"];
+        string[] keys =
+        [
+            "Diag_OdfFormulaSupport_ParseFailed",
+            "Diag_OdfFormulaSupport_UnsupportedFunction",
+            "Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm",
+        ];
+
+        foreach (string cultureName in cultures)
+        {
+            var culture = new System.Globalization.CultureInfo(cultureName);
+            foreach (string key in keys)
+            {
+                string message = OdfLocalizer.GetMessage(key, culture, "XLOOKUP");
+
+                Assert.NotEqual(key, message);
+                Assert.Contains("XLOOKUP", message, StringComparison.Ordinal);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證公式評估、schema pattern validator 與 JSON Collaboration 的 clean-room 來源索引已宣告證據與不可複製來源。
+    /// </summary>
+    [Fact]
+    public void CleanRoomSourceIndexDeclaresFormulaAndSchemaPatternEvidence()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string sourceIndex = File.ReadAllText(Path.Combine(repoRoot, "docs", "provenance", "clean-room-source-index.md"));
+        string provenance = File.ReadAllText(Path.Combine(repoRoot, "docs", "provenance", "README.md"));
+        string docsIndex = File.ReadAllText(Path.Combine(repoRoot, "docs", "index.md"));
+        string formulaTests = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "OpenFormulaSupportTests.cs"));
+        string complianceTests = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "ComplianceTests.cs"));
+
+        Assert.Contains("DefaultFormulaEvaluator.*", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("OdfSchemaPatternValidator.*", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("OdfKit.Extensions.Collaboration", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("OASIS OpenDocument v1.4 Part 4 OpenFormula", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("RELAX NG Specification", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("W3C XML Schema Part 2 Datatypes", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("TDF ODF Toolkit 公開文件", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("reference JSON", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("Managed conversion fidelity 來源", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("OdfSvgExporter.cs", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("OdfRtfImporter.cs", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("OdpToPptxConverter.cs", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("PptxToOdpConverter.cs", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("OpenFormulaSupportTests", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("FormulaEvaluatorStressTests", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("FormulaTranslationStressTests", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("ComplianceTests.SchemaPatternValidator*", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("CollaborationOperationsTests", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("tests/fixtures/collaboration/manifest.json", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("ManagedSvgExportTests.SvgExporterSplitsFullEnhancedPathEllipseArcs", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("ManagedTextExportTests.RtfImporterConvertsSectionAndColumnBreaksToSoftPageBreaks", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("ManagedPptxConversionTests.PptxConvertersPreserveBasicObjectAnimations", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("CorpusComplianceTests", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("eng/Test-OdfCorpus.ps1", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("不複製 LibreOffice", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("Java ODF Toolkit", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("OT", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("CRDT", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("golden / regression", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("clean-room-source-index.md", provenance, StringComparison.Ordinal);
+        Assert.Contains("clean-room-source-index.md", docsIndex, StringComparison.Ordinal);
+        Assert.Contains("managed conversion fidelity", docsIndex, StringComparison.Ordinal);
+        Assert.Contains("SpreadsheetFormulaRoundTripPreservesUnsupportedFormula", formulaTests, StringComparison.Ordinal);
+        Assert.Contains("LibreOfficeEasterSundayEvaluatesToDateSerial", formulaTests, StringComparison.Ordinal);
+        Assert.Contains("LibreOfficeIsOmittedEvaluatesByArgumentCount", formulaTests, StringComparison.Ordinal);
+        Assert.Contains("SchemaPatternValidatorHandlesInterleaveChildrenOutOfOrder", complianceTests, StringComparison.Ordinal);
+        Assert.Contains("SchemaPatternValidatorHandlesTextDataAndValueNodes", complianceTests, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// 驗證 ODS 串流文件明確區分嚴格順序模式與交錯緩衝便利路徑。
     /// </summary>
     [Fact]
@@ -255,6 +529,110 @@ public class DocsAndCorpusContractTests
         Assert.Contains("SwitchToSheet", cookbook, StringComparison.Ordinal);
         Assert.Contains("暫存緩衝", cookbook, StringComparison.Ordinal);
         Assert.Contains("不屬於純串流模式", cookbook, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 cookbook 宣告四個高階複雜文件場景與 JSON Collaboration 相容入口。
+    /// </summary>
+    [Fact]
+    public void CookbookDeclaresComplexDocumentAndCollaborationScenarios()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string cookbook = File.ReadAllText(Path.Combine(repoRoot, "docs", "cookbook.md"));
+
+        Assert.Contains("年度報告（ODT）", cookbook, StringComparison.Ordinal);
+        Assert.Contains("財務模型（ODS）", cookbook, StringComparison.Ordinal);
+        Assert.Contains("商業簡報（ODP）", cookbook, StringComparison.Ordinal);
+        Assert.Contains("流程圖／架構圖（ODG）", cookbook, StringComparison.Ordinal);
+        Assert.Contains("SpreadsheetDocument.Builder()", cookbook, StringComparison.Ordinal);
+        Assert.Contains(".WithMetadata(metadata => metadata.Title(\"財務模型\").Author(\"OdfKit\"))", cookbook, StringComparison.Ordinal);
+        Assert.Contains("OdtOperationCompatibilityOptions", cookbook, StringComparison.Ordinal);
+        Assert.Contains("CreateTdfCompatibility", cookbook, StringComparison.Ordinal);
+        Assert.Contains("OdtOperationImportReport", cookbook, StringComparison.Ordinal);
+        Assert.Contains("TextDocument.Builder()", cookbook, StringComparison.Ordinal);
+        Assert.Contains("WithStyles", cookbook, StringComparison.Ordinal);
+        Assert.Contains("OdfStyleSet.BusinessReport", cookbook, StringComparison.Ordinal);
+        Assert.Contains("public static OdfStyleSet FromTheme", File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Styles", "OdfStyleSet.cs")), StringComparison.Ordinal);
+        Assert.Contains("OdfLayoutPreset", cookbook, StringComparison.Ordinal);
+        Assert.Contains("WithLayoutPreset", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddCoverPage", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddTableOfContents", cookbook, StringComparison.Ordinal);
+        Assert.Contains("WithPageSetup", cookbook, StringComparison.Ordinal);
+        Assert.Contains("BackgroundColor", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddSection", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddImage", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddNamedRange", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddFormulaColumn", cookbook, StringComparison.Ordinal);
+        Assert.Contains("SetFormulaRange", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddDecimalValidation", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddDataBarFormat", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddPivotTable", cookbook, StringComparison.Ordinal);
+        Assert.Contains("WithMasterPage", cookbook, StringComparison.Ordinal);
+        Assert.Contains("OdfDesignTheme.Flowchart", cookbook, StringComparison.Ordinal);
+        Assert.Contains("WithTheme", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddTitleSlide", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddTwoColumnSlide", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddChartSlide", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddLayer", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddConnector", cookbook, StringComparison.Ordinal);
+        Assert.Contains("AddGroup", cookbook, StringComparison.Ordinal);
+        Assert.Contains("SaveAsSvg", cookbook, StringComparison.Ordinal);
+        Assert.Contains("OdfChartDataLabelPreset", cookbook, StringComparison.Ordinal);
+        Assert.Contains("WithDataLabels", cookbook, StringComparison.Ordinal);
+        Assert.Contains("WithChartPaletteColors", File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Styles", "OdfStyleSet.cs")), StringComparison.Ordinal);
+        Assert.Contains("OdfLayoutPreset", File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Styles", "OdfLayoutPreset.cs")), StringComparison.Ordinal);
+        Assert.Contains("FindFirst", cookbook, StringComparison.Ordinal);
+        Assert.Contains("FindAll", cookbook, StringComparison.Ordinal);
+        Assert.Contains("WithChild", cookbook, StringComparison.Ordinal);
+        Assert.Contains("ReplaceFirst", cookbook, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 GitHub Release nupkg 文件提供可重現 restore 的 local feed 範本。
+    /// </summary>
+    [Fact]
+    public void GitHubReleasePublishingDocumentDeclaresLocalFeedRestoreContract()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string release = File.ReadAllText(Path.Combine(repoRoot, "docs", "github-release-publishing.md"));
+
+        Assert.Contains("nuget.config", release, StringComparison.Ordinal);
+        Assert.Contains("odfkit-github-release", release, StringComparison.Ordinal);
+        Assert.Contains("dotnet restore --configfile nuget.config", release, StringComparison.Ordinal);
+        Assert.Contains("RestoreAdditionalProjectSources", release, StringComparison.Ordinal);
+        Assert.Contains("nuget.org", release, StringComparison.Ordinal);
+        Assert.Contains("非目前目標", release, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 JSON Collaboration 文件邊界與 clean-room 策略沒有再被列為純 non-goal。
+    /// </summary>
+    [Fact]
+    public void JsonCollaborationScopeIsExtensionScopedCompatibilitySubset()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string nonGoals = File.ReadAllText(Path.Combine(repoRoot, "docs", "udx-non-goals.md"));
+
+        Assert.Contains("extension-scoped compatibility subset", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("OdfKit.Extensions.Collaboration", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("{ \"changes\": [...] }", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("addLineBreak", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("format", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("format` range", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("前景色、背景色", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("small-caps", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("上標／下標", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("addStyle", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("delete", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("splitParagraph", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("mergeParagraph", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("addListStyle", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("addTable", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("addRows", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("addCells", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("OT", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("CRDT", nonGoals, StringComparison.Ordinal);
+        Assert.Contains("clean-room", nonGoals, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -294,8 +672,10 @@ public class DocsAndCorpusContractTests
         int fixtureCount = summary.GetProperty("fixtureCount").GetInt32();
         Assert.True(fixtureCount >= 200, $"corpus fixtureCount 應 ≥ 200，實際為 {fixtureCount}。");
         Assert.Equal(fixtureCount, summary.GetProperty("passedCount").GetInt32());
-        Assert.Equal(fixtureCount - 3, summary.GetProperty("validCount").GetInt32());
-        Assert.Equal(3, summary.GetProperty("invalidCount").GetInt32());
+        Assert.Equal(fixtureCount - 6, summary.GetProperty("validCount").GetInt32());
+        Assert.Equal(6, summary.GetProperty("invalidCount").GetInt32());
+        Assert.True(summary.GetProperty("sha256CheckedCount").GetInt32() >= 4);
+        Assert.Equal(0, summary.GetProperty("sha256MismatchCount").GetInt32());
         Assert.Equal("repo-generated-minimal-flat-text", fixture.GetProperty("id").GetString());
         Assert.True(fixture.GetProperty("kindMatches").GetBoolean());
         Assert.True(fixture.GetProperty("versionMatches").GetBoolean());
@@ -332,6 +712,65 @@ public class DocsAndCorpusContractTests
             item => item.GetProperty("id").GetString() == "repo-generated-odf14-invalid-decorative-bad-value" &&
                 item.GetProperty("expected").GetString() == "invalid" &&
                 item.GetProperty("passed").GetBoolean());
+        Assert.Contains(
+            json.RootElement.GetProperty("fixtures").EnumerateArray(),
+            item => item.GetProperty("id").GetString() == "repo-generated-complex-annual-report" &&
+                item.GetProperty("expected").GetString() == "invalid" &&
+                item.GetProperty("sha256Matches").GetBoolean() &&
+                item.GetProperty("passed").GetBoolean());
+        Assert.Contains(
+            json.RootElement.GetProperty("fixtures").EnumerateArray(),
+            item => item.GetProperty("id").GetString() == "repo-generated-complex-financial-model" &&
+                item.GetProperty("expected").GetString() == "invalid" &&
+                item.GetProperty("sha256Matches").GetBoolean() &&
+                item.GetProperty("passed").GetBoolean());
+        Assert.Contains(
+            json.RootElement.GetProperty("fixtures").EnumerateArray(),
+            item => item.GetProperty("id").GetString() == "repo-generated-complex-business-deck" &&
+                item.GetProperty("expected").GetString() == "valid" &&
+                item.GetProperty("sha256Matches").GetBoolean() &&
+                item.GetProperty("passed").GetBoolean());
+        Assert.Contains(
+            json.RootElement.GetProperty("fixtures").EnumerateArray(),
+            item => item.GetProperty("id").GetString() == "repo-generated-complex-flow-diagram" &&
+                item.GetProperty("expected").GetString() == "invalid" &&
+                item.GetProperty("sha256Matches").GetBoolean() &&
+                item.GetProperty("passed").GetBoolean());
+    }
+
+    /// <summary>
+    /// 驗證 JSON Collaboration fixture manifest 具備 clean-room 來源、授權與 SHA-256。
+    /// </summary>
+    [Fact]
+    public void CollaborationFixtureManifestDeclaresSourceLicenseAndHash()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string manifestPath = Path.Combine(repoRoot, "tests", "fixtures", "collaboration", "manifest.json");
+        using JsonDocument manifest = JsonDocument.Parse(File.ReadAllText(manifestPath));
+        JsonElement fixture = manifest.RootElement.GetProperty("fixtures")[0];
+        string path = fixture.GetProperty("path").GetString() ?? string.Empty;
+        string expectedHash = fixture.GetProperty("sha256").GetString() ?? string.Empty;
+        string fullPath = Path.Combine(Path.GetDirectoryName(manifestPath)!, path);
+
+        Assert.Equal("repo-generated-tdf-subset-envelope", fixture.GetProperty("id").GetString());
+        Assert.Equal("generated-no-copyright", fixture.GetProperty("license").GetString());
+        Assert.Equal("tdf-changes-envelope", fixture.GetProperty("wireShape").GetString());
+        Assert.StartsWith("https://github.com/tdf/odftoolkit/", fixture.GetProperty("sourceUri").GetString(), StringComparison.Ordinal);
+        Assert.Equal(expectedHash, ComputeSha256(fullPath));
+
+        string json = File.ReadAllText(fullPath);
+        Assert.Contains("\"changes\"", json, StringComparison.Ordinal);
+        Assert.Contains("addParagraph", json, StringComparison.Ordinal);
+        Assert.Contains("addText", json, StringComparison.Ordinal);
+        Assert.Contains("delete", json, StringComparison.Ordinal);
+        Assert.Contains("splitParagraph", json, StringComparison.Ordinal);
+        Assert.Contains("mergeParagraph", json, StringComparison.Ordinal);
+        Assert.Contains("addLineBreak", json, StringComparison.Ordinal);
+        Assert.Contains("format", json, StringComparison.Ordinal);
+        Assert.Contains("addListStyle", json, StringComparison.Ordinal);
+        Assert.Contains("addTable", json, StringComparison.Ordinal);
+        Assert.Contains("addRows", json, StringComparison.Ordinal);
+        Assert.Contains("addCells", json, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -398,5 +837,12 @@ public class DocsAndCorpusContractTests
         }
 
         throw new InvalidOperationException("找不到 repository root。");
+    }
+
+    private static string ComputeSha256(string path)
+    {
+        using FileStream stream = File.OpenRead(path);
+        byte[] hash = SHA256.HashData(stream);
+        return Convert.ToHexString(hash).ToLowerInvariant();
     }
 }

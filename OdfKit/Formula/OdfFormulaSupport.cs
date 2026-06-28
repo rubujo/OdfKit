@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OdfKit.Compliance;
 using OdfKit.Formula.AST;
 
 namespace OdfKit.Formula;
@@ -234,7 +235,7 @@ public static class OdfFormulaSupport
         {
             diagnostics.Add(new OdfFormulaDiagnostic(
                 "OF0001",
-                $"公式無法剖析：{ex.Message}",
+                OdfLocalizer.GetMessage("Diag_OdfFormulaSupport_ParseFailed", ex.Message),
                 OdfFormulaDiagnosticSeverity.Error));
         }
 
@@ -244,7 +245,7 @@ public static class OdfFormulaSupport
             {
                 diagnostics.Add(new OdfFormulaDiagnostic(
                     UnsupportedFunctionCode,
-                    $"預設評估器尚未支援函式 {functionName}，保存時應保留原公式。",
+                    OdfLocalizer.GetMessage("Diag_OdfFormulaSupport_UnsupportedFunction", functionName),
                     OdfFormulaDiagnosticSeverity.Warning));
             }
         }

@@ -14,6 +14,8 @@ namespace OdfKit.Presentation;
 /// <param name="duration">持續時間原文（<c>smil:dur</c>）</param>
 /// <param name="begin">開始時間原文（<c>smil:begin</c>）</param>
 /// <param name="sequenceIndex">在投影片動畫序列中的順序索引（以 0 為基準）</param>
+/// <param name="paragraphStartIndex">PPTX 逐段落動畫的起始段落索引（以 0 為基準）</param>
+/// <param name="paragraphEndIndex">PPTX 逐段落動畫的結束段落索引（以 0 為基準）</param>
 public sealed class OdfAnimationInfo(
     OdfAnimationKind kind,
     string targetElementId,
@@ -22,7 +24,9 @@ public sealed class OdfAnimationInfo(
     string? presetId,
     string? duration = null,
     string? begin = null,
-    int sequenceIndex = 0)
+    int sequenceIndex = 0,
+    int? paragraphStartIndex = null,
+    int? paragraphEndIndex = null)
 {
     /// <summary>
     /// 取得動畫種類。
@@ -63,6 +67,16 @@ public sealed class OdfAnimationInfo(
     /// 取得在投影片動畫序列中的順序索引。
     /// </summary>
     public int SequenceIndex { get; } = sequenceIndex;
+
+    /// <summary>
+    /// 取得 PPTX 逐段落動畫的起始段落索引（以 0 為基準）。
+    /// </summary>
+    public int? ParagraphStartIndex { get; } = paragraphStartIndex;
+
+    /// <summary>
+    /// 取得 PPTX 逐段落動畫的結束段落索引（以 0 為基準）。
+    /// </summary>
+    public int? ParagraphEndIndex { get; } = paragraphEndIndex;
 
     /// <summary>
     /// 嘗試將 <see cref="Duration"/> 解析為秒數。

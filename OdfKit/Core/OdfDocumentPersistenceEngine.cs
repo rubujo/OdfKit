@@ -15,6 +15,7 @@ internal static class OdfDocumentPersistenceEngine
     /// </summary>
     internal static void PrepareDomEntriesForSave(OdfDocument.OdfDocumentPersistenceCollaborators ctx, OdfSaveOptions options)
     {
+        ctx.FlushTrackedEmbeddedDocuments(options);
         ctx.PrepareForPersistence(options);
         ctx.StyleEngine.FlushPendingStyles();
         ctx.Package.FormulaExternalLinksForSave = ctx.FormulaExternalLinks;
@@ -22,6 +23,7 @@ internal static class OdfDocumentPersistenceEngine
         OdfDocumentMetadataEngine.UpdateDocumentStatistics(ctx.MetaDom, ctx.ContentDom);
         ApplySaveVersionOptions(ctx, options);
         WriteAllDomEntries(ctx, options);
+        PruneUnusedMedia(ctx, options);
     }
 
     /// <summary>
@@ -80,5 +82,89 @@ internal static class OdfDocumentPersistenceEngine
         {
             node.SetAttribute("version", OdfNamespaces.Office, version, "office");
         }
+    }
+
+    private static void PruneUnusedMedia(OdfDocument.OdfDocumentPersistenceCollaborators ctx, OdfSaveOptions options)
+    {
+        if (!options.PruneUnusedMedia || !string.IsNullOrEmpty(ctx.SubPath))
+        {
+            return;
+        }
+
+        ctx.Package.PruneUnusedMedia(CollectReferencedPackageMediaPaths(ctx));
+    }
+
+    private static System.Collections.Generic.IEnumerable<string> CollectReferencedPackageMediaPaths(
+        OdfDocument.OdfDocumentPersistenceCollaborators ctx)
+    {
+        foreach (string path in CollectReferencedPackageMediaPaths(ctx.ContentXmlForPersistence))
+        {
+            yield return path;
+        }
+
+        foreach (string path in CollectReferencedPackageMediaPaths(ctx.StylesDom))
+        {
+            yield return path;
+        }
+
+        foreach (string path in CollectReferencedPackageMediaPaths(ctx.MetaDom))
+        {
+            yield return path;
+        }
+
+        foreach (string path in CollectReferencedPackageMediaPaths(ctx.SettingsDom))
+        {
+            yield return path;
+        }
+    }
+
+    private static System.Collections.Generic.IEnumerable<string> CollectReferencedPackageMediaPaths(OdfNode root)
+    {
+        foreach (OdfNode node in EnumerateSelfAndDescendants(root))
+        {
+            foreach (System.Collections.Generic.KeyValuePair<OdfAttributeName, string> attribute in node.Attributes)
+            {
+                string? normalizedPath = NormalizePackageMediaReference(attribute.Value);
+                if (normalizedPath is not null)
+                {
+                    yield return normalizedPath;
+                }
+            }
+        }
+    }
+
+    private static System.Collections.Generic.IEnumerable<OdfNode> EnumerateSelfAndDescendants(OdfNode root)
+    {
+        yield return root;
+        foreach (OdfNode descendant in root.Descendants())
+        {
+            yield return descendant;
+        }
+    }
+
+    private static string? NormalizePackageMediaReference(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        int fragmentIndex = value.IndexOf("#", System.StringComparison.Ordinal);
+        if (fragmentIndex >= 0)
+        {
+            value = value.Substring(0, fragmentIndex);
+        }
+
+        while (value.StartsWith("./", System.StringComparison.Ordinal))
+        {
+            value = value.Substring(2);
+        }
+
+        if (!value.StartsWith("Pictures/", System.StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return OdfPackage.SanitizeEntryName(value);
     }
 }

@@ -47,6 +47,68 @@ public class PresentationApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證簡報 Fluent builder 可建立商業簡報常見的版面、圖片、圖表預留位置與動畫。
+    /// </summary>
+    [Fact]
+    public void PresentationDocumentBuilderCreatesComplexBusinessDeck()
+    {
+        using PresentationDocument deck = PresentationDocument.Builder()
+            .WithMetadata(metadata => metadata.Title("董事會簡報"))
+            .WithTheme(OdfDesignTheme.Flowchart)
+            .WithStyles(OdfStyleSet.BusinessReport)
+            .WithLayoutPreset(new OdfLayoutPreset
+            {
+                TitleBounds = new OdfLayoutBounds(2, 1, 14, 1.5),
+                ChartBounds = new OdfLayoutBounds(3, 4, 12, 6),
+            })
+            .WithMasterPage("BoardTheme", "#F6F8FB")
+            .AddTitleSlide("封面", "年度重點", "營收成長與產品化路線")
+            .AddTwoColumnSlide(
+                "Roadmap",
+                "下一季路線圖",
+                ["Complex DSL", "JSON Collaboration subset"],
+                ["Managed fidelity", "Corpus parity"],
+                slide => slide
+                    .AddImage(CreatePngBytes(), 16, 1, 1.5, 1.5)
+                    .AddShape(OdfShapeType.Rectangle, 1, 11, 3, 1, shape => shape
+                        .WithId("roadmap_highlight"))
+                    .AddEntranceEffect("roadmap_highlight", OdfAnimationEffect.Fade)
+                    .AddExitEffect("roadmap_highlight", OdfAnimationEffect.Zoom))
+            .AddChartSlide("Metrics", "營運指標", slide => slide
+                .WithSpeakerNotes("圖表頁先說趨勢，再補風險。")
+                .WithTransition(OdfTransitionType.Fade))
+            .Build();
+
+        using var stream = new MemoryStream();
+        deck.SaveToStream(stream);
+        stream.Position = 0;
+
+        using PresentationDocument loaded = PresentationDocument.Load(stream);
+
+        Assert.Equal("董事會簡報", loaded.Title);
+        Assert.Equal(3, loaded.Slides.Count);
+        Assert.All(loaded.Slides, slide => Assert.Equal("BoardTheme", slide.MasterPageName));
+        Assert.Equal(OdfPresentationLayout.TitleAndSubtitle, loaded.Slides[0].GetLayout());
+        Assert.Equal(OdfPresentationLayout.TitleAndBody, loaded.Slides[1].GetLayout());
+        Assert.Contains(loaded.Slides[1].Pictures, picture => picture.ImageHref is { } href && href.EndsWith(".png", StringComparison.Ordinal));
+        Assert.Contains(loaded.Slides[1].Shapes, shape => shape.Id == "roadmap_highlight");
+        Assert.Equal("#D9EAF7", loaded.Slides[1].Shapes.Single(shape => shape.Id == "roadmap_highlight").FillColor);
+        Assert.Equal("#1F4E79", loaded.Slides[1].Shapes.Single(shape => shape.Id == "roadmap_highlight").StrokeColor);
+        Assert.Contains(loaded.Slides[2].Placeholders, placeholder => placeholder.PlaceholderType == OdfPlaceholderType.Chart);
+        Assert.Equal("圖表頁先說趨勢，再補風險。", loaded.Slides[2].SpeakerNotes);
+        Assert.Contains(loaded.Slides[1].GetAnimations(), animation => animation.TargetElementId == "roadmap_highlight");
+
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        string stylesXml = ReadEntry(package, "styles.xml");
+        Assert.Contains("style:name=\"BoardTheme\"", stylesXml, StringComparison.Ordinal);
+        Assert.Contains("draw:fill-color=\"#F6F8FB\"", stylesXml, StringComparison.Ordinal);
+        string contentXml = ReadEntry(package, "content.xml");
+        Assert.Contains("svg:x=\"3cm\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("svg:width=\"12cm\"", contentXml, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// 驗證可用 slides collection 建立常見 ODP 內容並 round-trip。
     /// </summary>
     [Fact]
@@ -195,5 +257,12 @@ public class PresentationApiUsabilityTests
     {
         return Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
+    }
+
+    private static string ReadEntry(OdfPackage package, string path)
+    {
+        using Stream stream = package.GetEntryStream(path);
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
     }
 }

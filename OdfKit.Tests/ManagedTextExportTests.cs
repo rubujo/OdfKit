@@ -98,17 +98,25 @@ public class ManagedTextExportTests
         OdfParagraph paragraph = document.AddParagraph();
         paragraph.AddTextRun("Bold").WithBold();
         paragraph.AddTextRun(" ");
-        OdfTextRun styled = paragraph.AddTextRun("Style & Color").WithItalic().WithFontSize("14pt").WithColor("#0066CC");
+        OdfTextRun styled = paragraph.AddTextRun("Style & Color")
+            .WithItalic()
+            .WithFontSize("14pt")
+            .WithColor("#0066CC")
+            .WithBackgroundColor("#FFF2CC")
+            .WithTextTransform("uppercase")
+            .WithFontVariant("small-caps");
         styled.IsUnderline = true;
 
         string markdown = document.ToMarkdown();
         string rtf = document.ToRtf();
+        string html = document.ToHtml(new OdfHtmlExportOptions { FullPage = false });
 
         Assert.Contains("**Bold**", markdown);
-        Assert.Contains("<span style=\"font-style:italic; text-decoration:underline; font-size:14pt; color:#0066CC\">Style &amp; Color</span>", markdown);
-        Assert.Contains(@"{\colortbl;\red0\green102\blue204;}", rtf);
+        Assert.Contains("<span style=\"font-style:italic; text-decoration:underline; font-size:14pt; color:#0066CC; background-color:#FFF2CC; text-transform:uppercase; font-variant:small-caps\">Style &amp; Color</span>", markdown);
+        Assert.Contains(@"{\colortbl;\red0\green102\blue204;\red255\green242\blue204;}", rtf);
         Assert.Contains(@"{\b Bold}", rtf);
-        Assert.Contains(@"{\i \ul \fs28 \cf1 Style & Color}", rtf);
+        Assert.Contains(@"{\i \ul \fs28 \cf1 \highlight2 \caps \scaps Style & Color}", rtf);
+        Assert.Contains("<span style=\"font-style:italic; text-decoration:underline; font-size:14pt; color:#0066CC; background-color:#FFF2CC; text-transform:uppercase; font-variant:small-caps\">Style &amp; Color</span>", html);
     }
 
     [Fact]
@@ -384,6 +392,44 @@ public class ManagedTextExportTests
     }
 
     [Fact]
+    public void RtfImporterConvertsSectionAndColumnBreaksToSoftPageBreaks()
+    {
+        const string rtf = @"{\rtf1\ansi First\sect Second\column Third}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal(2, paragraph.Children.Count(node => node.LocalName == "soft-page-break" && node.NamespaceUri == OdfNamespaces.Text));
+        Assert.Equal("FirstSecondThird", paragraph.TextContent);
+    }
+
+    [Fact]
+    public void RtfImporterConvertsSoftLineAndSoftPageControls()
+    {
+        const string rtf = @"{\rtf1\ansi First\softline Second\softpage Third}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Single(paragraph.Children, node => node.LocalName == "line-break" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Single(paragraph.Children, node => node.LocalName == "soft-page-break" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("First\nSecondThird", paragraph.TextContent);
+    }
+
+    [Fact]
+    public void RtfImporterConvertsLineAndTabControlsToOdfNodes()
+    {
+        const string rtf = @"{\rtf1\ansi Before\line Middle\tab After}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Contains(paragraph.Children, node => node.LocalName == "line-break" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Contains(paragraph.Children, node => node.LocalName == "tab" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("Before\nMiddle\tAfter", paragraph.TextContent);
+    }
+
+    [Fact]
     public void RtfExporterConvertsTypographicSymbols()
     {
         using TextDocument document = TextDocument.Create();
@@ -475,6 +521,28 @@ public class ManagedTextExportTests
     }
 
     [Fact]
+    public void RtfExporterConvertsZeroWidthBreakControls()
+    {
+        using TextDocument document = TextDocument.Create();
+        document.AddParagraph("Zero\u200Bbreak zero\uFEFFnonbreak");
+
+        string rtf = document.ToRtf();
+
+        Assert.Contains(@"Zero\zwbo break zero\zwnbo nonbreak", rtf);
+    }
+
+    [Fact]
+    public void RtfImporterConvertsZeroWidthBreakControls()
+    {
+        const string rtf = @"{\rtf1\ansi Zero\zwbo break zero\zwnbo nonbreak}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("Zero\u200Bbreak zero\uFEFFnonbreak", paragraph.TextContent);
+    }
+
+    [Fact]
     public void RtfImporterPlainResetsInlineStyle()
     {
         const string rtf = @"{\rtf1\ansi {\b\i\ul Styled} \plain Plain}";
@@ -491,6 +559,63 @@ public class ManagedTextExportTests
 
         OdfNode plainRun = Assert.Single(paragraph.Children, node => node.LocalName == "span" && node.TextContent == "Plain");
         Assert.True(string.IsNullOrEmpty(plainRun.GetAttribute("style-name", OdfNamespaces.Text)));
+    }
+
+    [Fact]
+    public void RtfImporterConvertsHighlightColorToTextBackground()
+    {
+        const string rtf = @"{\rtf1\ansi{\colortbl;\red0\green0\blue255;\red255\green255\blue0;}Normal {\highlight2 Marked} {\highlight0 Plain}}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        OdfNode markedRun = Assert.Single(paragraph.Children, node => node.LocalName == "span" && node.TextContent == "Marked");
+        string? markedStyleName = markedRun.GetAttribute("style-name", OdfNamespaces.Text);
+        Assert.NotNull(markedStyleName);
+        Assert.Equal("#FFFF00", document.StyleEngine.GetStyleProperty(markedStyleName, "background-color", OdfNamespaces.Fo, "text"));
+
+        OdfNode plainRun = Assert.Single(paragraph.Children, node => node.LocalName == "span" && node.TextContent == "Plain");
+        string? plainStyleName = plainRun.GetAttribute("style-name", OdfNamespaces.Text);
+        Assert.True(string.IsNullOrEmpty(plainStyleName) ||
+            string.IsNullOrEmpty(document.StyleEngine.GetStyleProperty(plainStyleName!, "background-color", OdfNamespaces.Fo, "text")));
+    }
+
+    [Fact]
+    public void RtfRoundTripPreservesTextBackgroundColor()
+    {
+        using TextDocument source = TextDocument.Create();
+        source.AddParagraph().AddTextRun("Marked").WithBackgroundColor("#FFFF00");
+
+        string rtf = source.ToRtf();
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        Assert.Contains(@"\highlight1 Marked", rtf, StringComparison.Ordinal);
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        OdfNode markedRun = Assert.Single(paragraph.Children, node => node.LocalName == "span" && node.TextContent == "Marked");
+        string? markedStyleName = markedRun.GetAttribute("style-name", OdfNamespaces.Text);
+        Assert.NotNull(markedStyleName);
+        Assert.Equal("#FFFF00", document.StyleEngine.GetStyleProperty(markedStyleName, "background-color", OdfNamespaces.Fo, "text"));
+    }
+
+    [Fact]
+    public void RtfRoundTripPreservesCapsAndSmallCaps()
+    {
+        const string rtf = @"{\rtf1\ansi Normal {\caps Upper} {\scaps Small}}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+        string exported = document.ToRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        OdfNode upperRun = Assert.Single(paragraph.Children, node => node.LocalName == "span" && node.TextContent == "Upper");
+        OdfNode smallRun = Assert.Single(paragraph.Children, node => node.LocalName == "span" && node.TextContent == "Small");
+        string? upperStyle = upperRun.GetAttribute("style-name", OdfNamespaces.Text);
+        string? smallStyle = smallRun.GetAttribute("style-name", OdfNamespaces.Text);
+        Assert.NotNull(upperStyle);
+        Assert.NotNull(smallStyle);
+        Assert.Equal("uppercase", document.StyleEngine.GetStyleProperty(upperStyle, "text-transform", OdfNamespaces.Fo, "text"));
+        Assert.Equal("small-caps", document.StyleEngine.GetStyleProperty(smallStyle, "font-variant", OdfNamespaces.Fo, "text"));
+        Assert.Contains(@"\caps Upper", exported, StringComparison.Ordinal);
+        Assert.Contains(@"\scaps Small", exported, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -584,6 +709,175 @@ public class ManagedTextExportTests
     }
 
     [Fact]
+    public void RtfImporterConvertsCurrentFootnoteMarkers()
+    {
+        const string rtf = @"{\rtf1\ansi Alpha\chftn{\footnote \chftn Footnote body.} Omega}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Contains(paragraph.Children, node => node.LocalName == "span" && node.TextContent == "Alpha");
+        Assert.Contains(paragraph.Children, node => node.LocalName == "span" && node.TextContent == " Omega");
+        Assert.DoesNotContain(paragraph.Children, node => node.LocalName == "span" && node.TextContent == "Alpha1");
+        OdfFootnoteInfo footnote = Assert.Single(document.GetFootnotes());
+        Assert.Equal("1", footnote.Citation);
+        Assert.Equal("Footnote body.", footnote.BodyText);
+    }
+
+    [Fact]
+    public void RtfImporterPreservesNestedFieldResultForHyperlink()
+    {
+        const string rtf = @"{\rtf1\ansi See {\field{\*\fldinst HYPERLINK ""https://example.invalid/deep""}{\fldrslt{\b Deep} link}} now}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        OdfNode link = Assert.Single(paragraph.Children, node => node.LocalName == "a" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("https://example.invalid/deep", link.GetAttribute("href", OdfNamespaces.XLink));
+        Assert.Equal("Deep link", link.TextContent);
+        Assert.Equal("See Deep link now", paragraph.TextContent);
+    }
+
+    [Fact]
+    public void RtfImporterPreservesNonHyperlinkFieldResult()
+    {
+        const string rtf = @"{\rtf1\ansi Before {\field{\*\fldinst PAGE}{\fldrslt{\b 42}}} after}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("Before 42 after", paragraph.TextContent);
+        OdfNode pageNumber = Assert.Single(paragraph.Children, node => node.LocalName == "page-number" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("42", pageNumber.TextContent);
+        Assert.DoesNotContain(paragraph.Children, node => node.LocalName == "a" && node.NamespaceUri == OdfNamespaces.Text);
+    }
+
+    [Fact]
+    public void RtfImporterMapsDateAndTimeFieldsToOdfFields()
+    {
+        const string rtf = @"{\rtf1\ansi Printed {\field{\*\fldinst DATE \@ ""yyyy-MM-dd""}{\fldrslt 2026-06-28}} at {\field{\*\fldinst TIME}{\fldrslt 09:30}}}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("Printed 2026-06-28 at 09:30", paragraph.TextContent);
+        OdfNode date = Assert.Single(paragraph.Children, node => node.LocalName == "date" && node.NamespaceUri == OdfNamespaces.Text);
+        OdfNode time = Assert.Single(paragraph.Children, node => node.LocalName == "time" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("2026-06-28", date.TextContent);
+        Assert.Equal("09:30", time.TextContent);
+    }
+
+    [Fact]
+    public void RtfImporterMapsMergeFieldToOdfPlaceholder()
+    {
+        const string rtf = @"{\rtf1\ansi Dear {\field{\*\fldinst MERGEFIELD ""CustomerName"" \* MERGEFORMAT}{\fldrslt Contoso}}}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("Dear Contoso", paragraph.TextContent);
+        OdfNode placeholder = Assert.Single(paragraph.Children, node => node.LocalName == "placeholder" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("CustomerName", placeholder.GetAttribute("description", OdfNamespaces.Text));
+        Assert.Equal("text", placeholder.GetAttribute("placeholder-type", OdfNamespaces.Text));
+        Assert.Equal("Contoso", placeholder.TextContent);
+    }
+
+    [Fact]
+    public void RtfImporterMapsMetadataFieldsToOdfTextFields()
+    {
+        const string rtf = @"{\rtf1\ansi By {\field{\*\fldinst AUTHOR}{\fldrslt Ada}}: {\field{\*\fldinst TITLE}{\fldrslt Annual Plan}} / {\field{\*\fldinst DOCPROPERTY ""Subject""}{\fldrslt Revenue}}}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("By Ada: Annual Plan / Revenue", paragraph.TextContent);
+        OdfNode author = Assert.Single(paragraph.Children, node => node.LocalName == "author-name" && node.NamespaceUri == OdfNamespaces.Text);
+        OdfNode title = Assert.Single(paragraph.Children, node => node.LocalName == "title" && node.NamespaceUri == OdfNamespaces.Text);
+        OdfNode subject = Assert.Single(paragraph.Children, node => node.LocalName == "subject" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("Ada", author.TextContent);
+        Assert.Equal("Annual Plan", title.TextContent);
+        Assert.Equal("Revenue", subject.TextContent);
+    }
+
+    [Fact]
+    public void RtfImporterMapsSequenceFieldToOdfSequence()
+    {
+        const string rtf = @"{\rtf1\ansi Figure {\field{\*\fldinst SEQ ""Figure"" \* ARABIC}{\fldrslt 3}}}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("Figure 3", paragraph.TextContent);
+        OdfNode sequence = Assert.Single(paragraph.Children, node => node.LocalName == "sequence" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("Figure", sequence.GetAttribute("name", OdfNamespaces.Text));
+        Assert.Equal("1", sequence.GetAttribute("num-format", OdfNamespaces.Style));
+        Assert.Equal("3", sequence.TextContent);
+    }
+
+    [Fact]
+    public void RtfImporterMapsReferenceFieldInstructionsToOdfFields()
+    {
+        const string rtf = @"{\rtf1\ansi Page {\field{\*\fldinst PAGEREF ""TargetBookmark"" \h}{\fldrslt 7}} and ref {\field{\*\fldinst REF ""FigureAnchor""}{\fldrslt Figure 1}} of {\field{\*\fldinst NUMPAGES}{\fldrslt 12}}}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("Page 7 and ref Figure 1 of 12", paragraph.TextContent);
+        OdfNode bookmarkRef = Assert.Single(paragraph.Children, node => node.LocalName == "bookmark-ref" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("TargetBookmark", bookmarkRef.GetAttribute("ref-name", OdfNamespaces.Text));
+        Assert.Equal("page", bookmarkRef.GetAttribute("reference-format", OdfNamespaces.Text));
+        Assert.Equal("7", bookmarkRef.TextContent);
+
+        OdfNode referenceRef = Assert.Single(paragraph.Children, node => node.LocalName == "reference-ref" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("FigureAnchor", referenceRef.GetAttribute("ref-name", OdfNamespaces.Text));
+        Assert.Equal("text", referenceRef.GetAttribute("reference-format", OdfNamespaces.Text));
+        Assert.Equal("Figure 1", referenceRef.TextContent);
+
+        OdfNode pageCount = Assert.Single(paragraph.Children, node => node.LocalName == "page-count" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Equal("12", pageCount.TextContent);
+    }
+
+    [Fact]
+    public void RtfImporterMapsPageRefPositionSwitchToDirectionReference()
+    {
+        const string rtf = @"{\rtf1\ansi See {\field{\*\fldinst PAGEREF ""TargetBookmark"" \p}{\fldrslt above}} or page {\field{\*\fldinst PAGEREF ""TargetBookmark"" \h}{\fldrslt 7}}}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        OdfNode[] bookmarkRefs = paragraph.Children
+            .Where(node => node.LocalName == "bookmark-ref" && node.NamespaceUri == OdfNamespaces.Text)
+            .ToArray();
+
+        Assert.Equal(2, bookmarkRefs.Length);
+        Assert.Equal("TargetBookmark", bookmarkRefs[0].GetAttribute("ref-name", OdfNamespaces.Text));
+        Assert.Equal("direction", bookmarkRefs[0].GetAttribute("reference-format", OdfNamespaces.Text));
+        Assert.Equal("above", bookmarkRefs[0].TextContent);
+        Assert.Equal("page", bookmarkRefs[1].GetAttribute("reference-format", OdfNamespaces.Text));
+        Assert.Equal("7", bookmarkRefs[1].TextContent);
+    }
+
+    [Fact]
+    public void RtfImporterMapsReferencePositionSwitchToDirectionReference()
+    {
+        const string rtf = @"{\rtf1\ansi See {\field{\*\fldinst REF ""FigureAnchor"" \p}{\fldrslt below}} or text {\field{\*\fldinst REF ""FigureAnchor""}{\fldrslt Figure 1}}}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        OdfNode[] referenceRefs = paragraph.Children
+            .Where(node => node.LocalName == "reference-ref" && node.NamespaceUri == OdfNamespaces.Text)
+            .ToArray();
+
+        Assert.Equal(2, referenceRefs.Length);
+        Assert.Equal("FigureAnchor", referenceRefs[0].GetAttribute("ref-name", OdfNamespaces.Text));
+        Assert.Equal("direction", referenceRefs[0].GetAttribute("reference-format", OdfNamespaces.Text));
+        Assert.Equal("below", referenceRefs[0].TextContent);
+        Assert.Equal("text", referenceRefs[1].GetAttribute("reference-format", OdfNamespaces.Text));
+        Assert.Equal("Figure 1", referenceRefs[1].TextContent);
+    }
+
+    [Fact]
     public void RtfImporterRoundTripsImageReferencesAndComments()
     {
         using TextDocument source = TextDocument.Create();
@@ -618,6 +912,22 @@ public class ManagedTextExportTests
         Assert.Equal("c1", comment.Name);
         Assert.Equal("Ada", comment.Author);
         Assert.Equal("Review this link.\nNeeds follow-up with Café.", comment.Text);
+    }
+
+    [Fact]
+    public void RtfImporterUsesAnnotationRangeIdWhenAnnotationMetadataOmitsId()
+    {
+        const string rtf = @"{\rtf1\ansi Intro \atnstart2 scoped text {\*\atnauthor Ada}{\*\annotation Range comment.}\atnend2 outro}";
+
+        using TextDocument document = rtf.ToOdtTextDocumentFromRtf();
+
+        OdfCommentInfo comment = Assert.Single(document.GetCommentInfos());
+        Assert.Equal("comment-2", comment.Name);
+        Assert.Equal("Ada", comment.Author);
+        Assert.Equal("Range comment.", comment.Text);
+        OdfNode paragraph = Assert.Single(document.BodyTextRoot.Children, node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text);
+        Assert.Contains(paragraph.Descendants(), node => node.LocalName == "annotation-start" && node.GetAttribute("name", OdfNamespaces.Office) == "comment-2");
+        Assert.Contains(paragraph.Descendants(), node => node.LocalName == "annotation-end" && node.GetAttribute("name", OdfNamespaces.Office) == "comment-2");
     }
 
     [Fact]
@@ -706,7 +1016,7 @@ public class ManagedTextExportTests
     public void MarkdownImporterConvertsItalicBoldItalicAndHtmlSpanStyles()
     {
         const string markdown =
-            "*Italic* ***Both*** <span style=\"font-style:italic; text-decoration:underline; font-size:14pt; color:#0066CC\">Style &amp; Color</span>";
+            "*Italic* ***Both*** <span style=\"font-style:italic; text-decoration:underline; font-size:14pt; color:#0066CC; background-color:#FFF2CC; text-transform:uppercase; font-variant:small-caps\">Style &amp; Color</span>";
 
         using TextDocument document = markdown.ToOdtTextDocument();
 
@@ -728,6 +1038,9 @@ public class ManagedTextExportTests
         Assert.Equal("solid", document.StyleEngine.GetStyleProperty(styledStyle, "text-underline-style", OdfNamespaces.Style, "text"));
         Assert.Equal("14pt", document.StyleEngine.GetStyleProperty(styledStyle, "font-size", OdfNamespaces.Fo, "text"));
         Assert.Equal("#0066CC", document.StyleEngine.GetStyleProperty(styledStyle, "color", OdfNamespaces.Fo, "text"));
+        Assert.Equal("#FFF2CC", document.StyleEngine.GetStyleProperty(styledStyle, "background-color", OdfNamespaces.Fo, "text"));
+        Assert.Equal("uppercase", document.StyleEngine.GetStyleProperty(styledStyle, "text-transform", OdfNamespaces.Fo, "text"));
+        Assert.Equal("small-caps", document.StyleEngine.GetStyleProperty(styledStyle, "font-variant", OdfNamespaces.Fo, "text"));
     }
 
     [Fact]

@@ -486,6 +486,43 @@ public class ChartHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證資料標籤 preset 與 Fluent builder 可產生正確的 <c>chart:data-label</c>。
+    /// </summary>
+    [Fact]
+    public void ChartBuilder_DataLabelPreset_RoundTripsAndCanBeRemoved()
+    {
+        using ChartDocument chart = ChartDocument.Builder()
+            .WithType(OdfChartType.Bar)
+            .WithTitle("年度營收")
+            .WithDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true)
+            .ConfigureSeries(0, series => series.WithDataLabels(OdfChartDataLabelPreset.Full))
+            .Build();
+
+        OdfChartDataLabelInfo? labels = chart.GetSeriesEditor(0).GetDataLabels();
+        Assert.NotNull(labels);
+        Assert.True(labels!.ShowValue);
+        Assert.True(labels.ShowPercentage);
+        Assert.True(labels.ShowCategoryName);
+        Assert.True(labels.ShowLegendKey);
+
+        using var stream = new MemoryStream();
+        chart.SaveToStream(stream);
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        using Stream contentStream = package.GetEntryStream("content.xml");
+        using var reader = new StreamReader(contentStream);
+        string xml = reader.ReadToEnd();
+
+        Assert.Contains("chart:data-label", xml);
+        Assert.Contains("chart:data-label-number=\"value-and-percentage\"", xml);
+        Assert.Contains("chart:data-label-text=\"true\"", xml);
+        Assert.Contains("chart:data-label-symbol=\"true\"", xml);
+
+        chart.SetSeriesDataLabelPreset(0, OdfChartDataLabelPreset.None);
+        Assert.Null(chart.GetSeriesDataLabels(0));
+    }
+
+    /// <summary>
     /// 驗證 <see cref="OdfChartDocument.SetWallStyleName"/> 與 <see cref="OdfChartDocument.SetFloorStyleName"/> 的往返一致性。
     /// </summary>
     [Fact]
@@ -800,6 +837,7 @@ public class ChartHighLevelApiTests
         using ChartDocument chart = ChartDocument.Builder()
             .WithType(OdfChartType.Bar)
             .WithTitle("年度營收")
+            .WithStyles(styles => styles.WithChartPaletteColors("#AA0000", "#00AA00"))
             .WithDataRange("Sheet1", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true)
             .WithLegend(position: "end")
             .WithAxis("y", axis => axis
@@ -808,6 +846,7 @@ public class ChartHighLevelApiTests
                 .WithLogarithmic(false))
             .ConfigureSeries(0, series => series
                 .WithStyle(style => style.FillColor = "#4472C4")
+                .WithDataLabels(OdfChartDataLabelPreset.ValueAndCategoryName)
                 .WithErrorIndicator(new OdfChartErrorIndicatorInfo("y", "ErrorStyle1")))
             .Build();
 
@@ -823,6 +862,12 @@ public class ChartHighLevelApiTests
 
         OdfChartSeries seriesEditor = chart.GetSeriesEditor(0);
         Assert.Equal("#4472C4", seriesEditor.Style.FillColor);
+        Assert.Equal("#00AA00", chart.GetSeriesEditor(1).Style.FillColor);
+        OdfChartDataLabelInfo? labels = seriesEditor.GetDataLabels();
+        Assert.NotNull(labels);
+        Assert.True(labels!.ShowValue);
+        Assert.False(labels.ShowPercentage);
+        Assert.True(labels.ShowCategoryName);
         OdfChartErrorIndicatorInfo? indicator = seriesEditor.GetErrorIndicator();
         Assert.NotNull(indicator);
         Assert.Equal("y", indicator!.Dimension);

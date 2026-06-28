@@ -206,10 +206,10 @@ public class SpreadsheetHighLevelApiTests
 
     /// <summary>
     /// 驗證 <see cref="OdfChartDocument.ClearSeries"/> 與 <see cref="OdfChartDocument.ApplyDefinition"/>
-    /// 對嵌入圖表所做的修改，呼叫 <see cref="OdfChartDocument.Save"/> 後可正確持久化並於重新載入後讀回。
+    /// 對嵌入圖表所做的修改，只呼叫父文件儲存也可正確持久化並於重新載入後讀回。
     /// </summary>
     [Fact]
-    public void EmbeddedChartDocument_ClearSeriesAndApplyDefinition_PersistsAfterSaveAndReload()
+    public void EmbeddedChartDocument_ClearSeriesAndApplyDefinition_PersistsWhenParentSaves()
     {
         using var document = SpreadsheetDocument.Create();
         OdfTableSheet sheet = document.AddSheet("Sheet1");
@@ -238,9 +238,6 @@ public class SpreadsheetHighLevelApiTests
             DataRange = new OdfCellRange(0, 0, 1, 1, "Sheet1"),
             HasLegend = true,
         });
-
-        // 必須明確呼叫嵌入圖表文件自身的 Save，變更才會寫回共用封裝。
-        chartDoc.Save();
 
         using var stream = new MemoryStream();
         document.SaveToStream(stream);

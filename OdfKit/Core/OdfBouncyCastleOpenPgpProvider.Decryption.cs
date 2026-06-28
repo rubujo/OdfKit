@@ -192,8 +192,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
                     throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_UnsupportedEcdhKeyType", key.GetType().Name));
                 }
             default:
-                throw new NotSupportedException(
-                    $"不支援的 OpenPGP 公鑰演算法：{algorithm}。目前支援 RSA、ElGamal 及 ECDH。");
+                throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm", algorithm));
         }
     }
 

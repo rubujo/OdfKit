@@ -402,6 +402,48 @@ public class FormulaHighLevelApiTests
         OdfMathToken updatedFraction = fraction!.WithChild(0, OdfMathToken.Identifier("y"));
         Assert.Equal("y", updatedFraction.Base?.Text);
         Assert.Equal("b", updatedFraction.Script?.Text);
+
+        OdfMathToken updated = original.ReplaceFirst(
+            token => token.Kind == OdfMathTokenKind.Identifier && token.Text == "b",
+            _ => OdfMathToken.Identifier("z"));
+
+        OdfMathToken? replacedFraction = updated.FindFirst(OdfMathTokenKind.Fraction);
+        Assert.Equal("a", replacedFraction?.Base?.Text);
+        Assert.Equal("z", replacedFraction?.Script?.Text);
+        Assert.Equal("b", fraction.Script?.Text);
+    }
+
+    /// <summary>
+    /// 驗證可用「搜尋、取得、更新、寫回」流程編輯公式 token tree，並於儲存後保留。
+    /// </summary>
+    [Fact]
+    public void FormulaTokenSemanticEditing_FindReplaceAndSetMathRow_Persists()
+    {
+        using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+            .WithTokens(
+                OdfMathToken.Superscript(
+                    OdfMathToken.Identifier("x"),
+                    OdfMathToken.Number("2")),
+                OdfMathToken.Operator("+"),
+                OdfMathToken.Identifier("y"))
+            .Build();
+
+        OdfMathToken root = OdfMathToken.Row(formula.GetMathTokens().ToArray());
+        OdfMathToken? superscript = root.FindFirst(OdfMathTokenKind.Superscript);
+        Assert.Equal("2", superscript?.Script?.Text);
+
+        OdfMathToken updatedRoot = root.ReplaceFirst(OdfMathTokenKind.Number, OdfMathToken.Number("3"));
+        formula.SetMathRow(updatedRoot);
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
+        OdfMathToken loadedRoot = Assert.Single(loaded.GetMathTokens());
+        OdfMathToken? loadedSuperscript = loadedRoot.FindFirst(OdfMathTokenKind.Superscript);
+        Assert.Equal("x", loadedSuperscript?.Base?.Text);
+        Assert.Equal("3", loadedSuperscript?.Script?.Text);
     }
 
     /// <summary>

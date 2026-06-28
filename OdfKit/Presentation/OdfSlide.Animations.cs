@@ -180,22 +180,35 @@ public partial class OdfSlide
     /// <param name="shapeId">目標圖形識別碼</param>
     /// <param name="effect">動畫效果類型</param>
     /// <param name="duration">動畫持續時間；預設為 0.5 秒</param>
+    /// <param name="trigger">動畫觸發方式</param>
+    /// <param name="delay">動畫延遲啟動時間</param>
     /// <returns>新增的動畫物件執行個體</returns>
-    public OdfAnimation AddEmphasisEffect(string shapeId, OdfAnimationEffect effect, TimeSpan duration = default)
+    public OdfAnimation AddEmphasisEffect(
+        string shapeId,
+        OdfAnimationEffect effect,
+        TimeSpan duration = default,
+        OdfAnimationTrigger trigger = OdfAnimationTrigger.OnClick,
+        TimeSpan delay = default)
     {
         if (string.IsNullOrEmpty(shapeId))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfSlide_TargetCannotBeEmpty_3"), nameof(shapeId));
 
         var mainSeq = AnimationRoot.Node;
-        // 強調動畫一般為點擊觸發
-        var stepPar = FindOrCreateStepParNode(mainSeq, OdfAnimationTrigger.OnClick);
+        // 強調動畫預設為點擊觸發，但匯入 PPTX 時需保留接續上一個效果的時序。
+        var stepPar = FindOrCreateStepParNode(mainSeq, trigger);
 
         TimeSpan effectiveDuration = duration == default ? TimeSpan.FromSeconds(0.5) : duration;
+        string delayStr = OdfSmilTime.FormatDelay(delay);
         string durStr = OdfSmilTime.FormatDuration(effectiveDuration);
 
         // 建立動畫效果包裝節點
         OdfNode effectPar = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
-        effectPar.SetAttribute("begin", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "0s", "smil");
+        string beginVal = trigger switch
+        {
+            OdfAnimationTrigger.AfterPrevious => "prev.end" + (delay > TimeSpan.Zero ? $"+{delayStr}" : ""),
+            _ => delay > TimeSpan.Zero ? delayStr : "0s",
+        };
+        effectPar.SetAttribute("begin", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", beginVal, "smil");
         effectPar.SetAttribute("dur", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", durStr, "smil");
         effectPar.SetAttribute("preset-class", OdfKit.Core.OdfNamespaces.Presentation, "emphasis", "presentation");
         effectPar.SetAttribute("preset-id", OdfKit.Core.OdfNamespaces.Presentation, "ooo-emphasis-fade", "presentation");
@@ -210,7 +223,7 @@ public partial class OdfSlide
         filter.SetAttribute("mode", "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0", "in", "smil");
         effectPar.AppendChild(filter);
 
-        return new OdfAnimation(effectPar, shapeId, effect, OdfAnimationTrigger.OnClick);
+        return new OdfAnimation(effectPar, shapeId, effect, trigger);
     }
 
     private static OdfNode FindOrCreateStepParNode(OdfNode mainSeq, OdfAnimationTrigger trigger)

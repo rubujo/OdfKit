@@ -17,5 +17,7 @@
 * **決策**：OdfKit 不予支援 SmartArt 佈局器封裝，以避免跨平台開檔時的版面混亂。
 
 ## 4. ODF Toolkit 風格 JSON Collaboration operations merge
-* **說明**：ODF Toolkit 0.10+ 的 Collaboration API 將 ODT 語意變更序列化為 JSON operations（`addParagraph`、`delete`、`format` 等），供 web office 場景做變更交換與 merge。這與 OdfKit 核心已支援的 `META-INF/manifest.rdf` 封裝 RDF metadata 屬不同層次；後者由核心 `OdfRdfMetadata` 負責，前者需另行設計 Position 模型與 merge 語意。
-* **決策**：Wave 1–3 不納入 JSON Collaboration operations merge。ODT 規格內建的 `text:tracked-changes` 讀寫與接受／拒絕屬 Wave 2 `DEPTH-1-TC` 正常深化範圍。若未來需要 ODF Toolkit JSON 相容，列為 Wave 4 選用延伸套件 `OdfKit.Extensions.Collaboration`，不放入核心 `OdfKit`。
+* **說明**：TDF ODF Toolkit 的 Collaboration API 將 ODT 語意變更序列化為 JSON operations（`addParagraph`、`delete`、`format` 等），供 web office 場景做變更交換與 merge。這與 OdfKit 核心已支援的 `META-INF/manifest.rdf` 封裝 RDF metadata 屬不同層次；後者由核心 `OdfRdfMetadata` 負責，前者需另行設計 position 模型與 merge 語意。
+* **目前範圍**：JSON Collaboration 不再是純 non-goal。OdfKit 將其限定為 extension-scoped compatibility subset，由選用套件 `OdfKit.Extensions.Collaboration` 對標 TDF ODF Toolkit 的公開 operation 名稱、wire shape 與 reference JSON；核心 `OdfKit` 不新增依賴。
+* **已納入子集合**：匯入端接受裸陣列與 TDF 相容的 `{ "changes": [...] }` 封包；匯出端預設維持裸陣列，並可用 `OdtOperationCompatibilityOptions` 選擇 TDF changes 封包。第一波支援 `addParagraph`、`addText`、`addTab`、`addLineBreak` 與基本 `format` range 字元屬性（含前景色、背景色、大小寫轉換、small-caps 與上標／下標），並容忍 `documentLayout`、`addFontDecl`、`addStyle` 等 metadata-only operation。第二波支援單段落範圍 `delete`、最上層段落 `splitParagraph`／`mergeParagraph`、metadata-only `addListStyle`、基本清單段落，以及固定尺寸文字表格的 `addTable`／`addRows`／`addCells` 依序填值。
+* **仍屬非目標**：完整多人協同演算法、任意衝突合併、undo stack、OT、CRDT、跨段落刪除／移動、drawing operation、動態表格擴張，以及 header/footer/note selection 的完整語意，仍不納入核心與本輪承諾。授權策略採 clean-room：只使用 TDF 公開文件、operation 名稱、wire shape 與 reference JSON 作行為對標，不複製 Java 原始碼。

@@ -2,6 +2,189 @@
 
 本文件提供可直接改寫的常見 ODF 操作範例。範例只描述目前已有測試支撐的能力。
 
+## 複雜文件場景總覽
+
+OdfKit 的高階 API 目標是讓 C# / .NET 開發者用少量程式碼建立中高複雜度 ODF 文件；
+目前建議以既有 facade 與 builder 混用，而不是直接操作 ZIP 或 XML：
+
+- **年度報告（ODT）**：使用 `TextDocument.Builder()`、標題階層、目錄、段落富文字、表格、註腳、
+  註解、區段、頁首／頁尾與嵌入圖表，最後可接 Markdown/RTF 延伸套件。
+- **財務模型（ODS）**：使用 `SpreadsheetDocument.Create()`、多工作表、公式 helper、
+  命名範圍、條件格式、資料驗證與嵌入圖表；大量資料輸出仍使用 `OdsStreamWriter`
+  的嚴格順序低記憶體模式。
+- **商業簡報（ODP）**：使用 `PresentationDocument.Builder()` 建立標題、內容、雙欄、
+  圖表投影片、講者備註與轉場。
+- **流程圖／架構圖（ODG）**：使用 `DrawingDocument.Builder()` 與頁面 facade 建立形狀、
+  連接線、文字框、圖片與 SVG 匯出。
+
+## 年度報告（ODT）
+
+```csharp
+using OdfKit.Chart;
+using OdfKit.Spreadsheet;
+using OdfKit.Styles;
+using OdfKit.Text;
+
+using TextDocument report = TextDocument.Builder()
+    .WithMetadata(metadata => metadata.Title("年度報告").Author("OdfKit"))
+    .WithTheme(OdfDesignTheme.Flowchart)
+    .WithStyles(OdfStyleSet.BusinessReport)
+    .WithPageSetup(page => page.Header("年度報告").FooterPageNumbers())
+    .AddCoverPage("年度報告", "2026 年營運成果", "OdfKit", "2026 年")
+    .AddTableOfContents("目錄", 2)
+    .AddHeading("營運摘要", 2)
+    .AddParagraph(paragraph => paragraph
+        .Append("營收年增 ")
+        .Append("18%", format => format.Bold().Color("#0066CC").BackgroundColor("#FFF2CC"))
+        .Append("。")
+        .AddFootnote("1", "示範資料，非實際財務數字。")
+        .AddComment("reviewer", "請財務團隊確認最終數字。"))
+    .AddTable(3, 2, table => table
+        .WithSummary("季度營收摘要")
+        .SetCell(1, 1, "季度")
+        .SetCell(1, 2, "營收")
+        .SetCell(2, 1, "Q1")
+        .SetCell(2, 2, "120")
+        .SetCell(3, 1, "Q2")
+        .SetCell(3, 2, "148"))
+    .AddSection("ExecutiveSection", 2, OdfLength.FromCentimeters(0.5), section => section
+        .AddParagraph("本區段使用雙欄版面呈現重點。")
+        .Protected())
+    .AddParagraph(paragraph => paragraph
+        .Append("圖表摘要")
+        .AddChart(new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Bar,
+            Title = "季度營收",
+            DataRange = new OdfCellRange(0, 0, 2, 1, "Data"),
+            HasLegend = true,
+        }, OdfLength.FromCentimeters(8), OdfLength.FromCentimeters(5)))
+    .AddParagraph(paragraph => paragraph
+        .Append("品牌視覺 ")
+        .AddImage(File.ReadAllBytes("logo.png"), OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(2), "AnnualLogo"))
+    .Build();
+report.Save("annual-report.odt");
+```
+
+## 財務模型（ODS）
+
+```csharp
+using OdfKit.Chart;
+using OdfKit.DOM;
+using OdfKit.Spreadsheet;
+using OdfKit.Styles;
+
+using SpreadsheetDocument workbook = SpreadsheetDocument.Builder()
+    .WithMetadata(metadata => metadata.Title("財務模型").Author("OdfKit"))
+    .WithTheme(OdfDesignTheme.Flowchart)
+    .WithStyles(OdfStyleSet.BusinessReport)
+    .AddSheet("銷售", sheet => sheet
+        .ImportTable(
+            new[]
+            {
+                new { Month = "一月", Revenue = 120d, Cost = 72d },
+                new { Month = "二月", Revenue = 148d, Cost = 83d },
+            },
+            row => [row.Month, row.Revenue, row.Cost],
+            ["月份", "營收", "成本"])
+        .AddFormulaColumn("D", "毛利", 2, 3, row => $"of:=[.B{row}]-[.C{row}]")
+        .AddNamedRange("SalesModel", "A1:D3")
+        .AddConditionalFormat("D2:D3", "cell-content()>50", "ProfitStyle")
+        .AddDataBarFormat(new OdfCellRange(1, 3, 2, 3, "銷售"), new OdfColor("#638ec6"))
+        .AddDecimalValidation("B2:C3", 0, 1000, "輸入範圍", "請輸入 0 到 1000 之間的數值。")
+        .InsertChart("A1:D3", OdfChartType.Line, chart => chart.ChartTitle = "毛利趨勢")
+        .AddPivotTable("SalesPivot", "A1:D3", "G1", pivot => pivot
+            .AddRowField("月份")
+            .AddDataField("營收", OdfPivotFunction.Sum)))
+    .AddSheet("摘要", sheet => sheet.SetFormula("A1", "of:='銷售'.D2"))
+    .Build();
+workbook.Save("financial-model.ods");
+```
+
+若公式不是單一欄模型，可改用 `SetFormulaRange("D2:F20", (row, column) => ...)`
+依儲存格位置批次產生公式。
+
+## 商業簡報（ODP）
+
+```csharp
+using OdfKit.Presentation;
+using OdfKit.Styles;
+
+using PresentationDocument deck = PresentationDocument.Builder()
+    .WithMetadata(metadata => metadata.Title("董事會簡報"))
+    .WithTheme(OdfDesignTheme.Flowchart)
+    .WithStyles(OdfStyleSet.BusinessReport)
+    .WithLayoutPreset(OdfLayoutPreset.BusinessDeck)
+    .WithMasterPage("BoardTheme", "#F6F8FB")
+    .AddTitleSlide("Executive Summary", "年度重點", "營收成長與產品化路線")
+    .AddTwoColumnSlide(
+        "Roadmap",
+        "下一季路線圖",
+        ["Complex DSL", "JSON Collaboration subset"],
+        ["Managed fidelity", "Corpus parity"],
+        slide => slide
+            .AddShape(OdfShapeType.Rectangle, 1, 11, 3, 1, shape => shape.WithId("roadmap_highlight"))
+            .AddEntranceEffect("roadmap_highlight", OdfAnimationEffect.Fade))
+    .AddChartSlide("Metrics", "營運指標", slide => slide
+        .WithSpeakerNotes("先說結論，再切入財務模型。")
+        .WithTransition(OdfTransitionType.Fade))
+    .Build();
+deck.Save("business-deck.odp");
+```
+
+## 流程圖／架構圖（ODG）
+
+```csharp
+using OdfKit.Drawing;
+using OdfKit.Export;
+using OdfKit.Styles;
+
+using DrawingDocument drawing = DrawingDocument.Builder()
+    .WithMetadata(metadata => metadata.Title("匯入流程"))
+    .WithTheme(OdfDesignTheme.Flowchart)
+    .WithStyles(OdfStyleSet.BusinessReport)
+    .WithLayoutPreset(OdfLayoutPreset.FlowDiagram)
+    .AddPage("主流程", page => page
+        .AddLayer("流程")
+        .AddFlowStep("load", "載入 ODF", 0, configure: shape => shape.OnLayer("流程"))
+        .AddFlowStep("validate", "驗證封裝", 1, OdfShapeType.Ellipse, shape => shape.OnLayer("流程"))
+        .AddFlowStep("export", "輸出報告", 2, configure: shape => shape.OnLayer("流程"))
+        .AddConnector("load", "validate", OdfConnectorType.Straight)
+        .AddConnector("validate", "export", OdfConnectorType.Straight)
+        .AddGroup("圖例", group => group
+            .AddRectangle(13, 4, 1, 1)
+            .AddTextBox("完成節點", 14.2, 4, 3, 1)))
+    .Build();
+drawing.Save("flow.odg");
+drawing.SaveAsSvg("flow.svg");
+```
+
+## TDF JSON Collaboration 相容子集合
+
+```csharp
+using OdfKit.Collaboration;
+using OdfKit.Text;
+
+using TextDocument document = TextDocument.Create();
+document.Body.Paragraphs.Add("協作段落");
+
+string tdfJson = OdtOperationsExporter.ExportToJson(
+    document,
+    OdtOperationCompatibilityOptions.CreateTdfCompatibility());
+
+using TextDocument merged = OdtOperationsImporter.Merge(
+    tdfJson,
+    OdtOperationCompatibilityOptions.CreateTdfCompatibility(),
+    out OdtOperationImportReport report);
+
+Console.WriteLine(report.ReplayedCount);
+```
+
+匯入端目前支援 TDF changes 封包、段落與文字新增、Tab、換行、基本 range 字元格式（含前景色、背景色、大小寫轉換、small-caps 與上標／下標）、
+單段落刪除、最上層段落分割／合併、基本清單段落，以及固定尺寸文字表格填值。
+完整 OT／CRDT、任意衝突合併、跨段落刪除、move、drawing 與 header/footer/note selection
+仍屬非目標。
+
 ## 建立 ODT
 
 ```csharp
@@ -193,20 +376,25 @@ Console.WriteLine(loadedImage.FrameWidth);
 
 ```csharp
 using OdfKit.Chart;
+using OdfKit.Spreadsheet;
+using OdfKit.Styles;
 
-using OdfChartDocument chart = OdfChartDocument.Create();
-chart.ChartClass = "bar";
-chart.ChartTitle = "營收";
-chart.SetLegend("top");
-chart.SetCategories("Sheet1.A1:C1");
-chart.XAxisTitle = "月份";
-chart.YAxisTitle = "金額";
-chart.AddSeries("Sheet1.A1:A3", "Sheet1.A1");
+using ChartDocument chart = ChartDocument.Builder()
+    .WithType(OdfChartType.Bar)
+    .WithTitle("年度營收")
+    .WithStyles(OdfStyleSet.BusinessReport)
+    .WithDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true)
+    .WithLegend(position: "end")
+    .WithAxis("y", axis => axis.WithTitle("營收（萬元）").WithMinimum(0))
+    .ConfigureSeries(0, series => series
+        .WithStyle(style => style.FillColor = "#4472C4")
+        .WithDataLabels(OdfChartDataLabelPreset.ValueAndCategoryName))
+    .Build();
 chart.Save("revenue.odc");
 
-using OdfChartDocument loadedChart = OdfChartDocument.Load("revenue.odc");
-Console.WriteLine(loadedChart.XAxisTitle);
-Console.WriteLine(loadedChart.Series[0].ValuesCellRangeAddress);
+using ChartDocument loadedChart = ChartDocument.Load("revenue.odc");
+Console.WriteLine(loadedChart.ChartTitle);
+Console.WriteLine(loadedChart.GetSeriesDataLabels(0)?.ShowCategoryName);
 ```
 
 ## 建立 ODF 公式（Fluent Builder）
@@ -218,6 +406,37 @@ using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
     .WithIdentifierEquation("F", "ma")
     .Build();
 formula.Save("equation.odf");
+```
+
+## 編輯 ODF 公式 token tree
+
+```csharp
+using OdfKit.Formula;
+
+using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+    .WithTokens(
+        OdfMathToken.Superscript(
+            OdfMathToken.Identifier("x"),
+            OdfMathToken.Number("2")),
+        OdfMathToken.Operator("+"),
+        OdfMathToken.Identifier("y"))
+    .Build();
+
+OdfMathToken root = OdfMathToken.Row(formula.GetMathTokens().ToArray());
+OdfMathToken? exponent = root.FindFirst(OdfMathTokenKind.Number);
+IEnumerable<OdfMathToken> identifiers = root.FindAll(OdfMathTokenKind.Identifier);
+
+OdfMathToken updatedRoot = root.ReplaceFirst(
+    token => token.Kind == OdfMathTokenKind.Number && token.Text == "2",
+    token => OdfMathToken.Number("3"));
+
+OdfMathToken denominator = OdfMathToken.Fraction(
+    OdfMathToken.Identifier("a"),
+    OdfMathToken.Identifier("b"))
+    .WithChild(1, OdfMathToken.Identifier("c"));
+
+formula.SetMathRow(updatedRoot, OdfMathToken.Operator("/"), denominator);
+formula.Save("edited-equation.odf");
 ```
 
 ## 建立 ODF 公式
@@ -318,7 +537,9 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack file.fodt file
 ```
 
 `validate` 在 CI 中可用 exit code 判斷結果：`0` 表示通過，`1` 表示驗證錯誤或 `--fail-on warning` 命中，`2` 表示參數或路徑錯誤。
-`sanitize` 會移除巨集、指令碼參照與簽章 artifact，並另存為新的 ODF 檔案；加密文件可用 `--password` 載入，並用 `--output-password` 重新加密輸出。
+`sanitize` 會移除巨集、指令碼參照與簽章 artifact，並另存為新的 ODF 檔案；輸出會包含
+`removed-artifacts`，方便 CI 稽核實際移除數量。加密文件可用 `--password` 載入，並用
+`--output-password` 重新加密輸出；密碼錯誤時會以 exit code `2` 回報，不會產生輸出檔。
 
 ## Web 應用程式檔案下載
 

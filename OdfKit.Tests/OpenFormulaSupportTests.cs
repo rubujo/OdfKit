@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.Formula;
 using OdfKit.Spreadsheet;
@@ -41,7 +42,10 @@ public class OpenFormulaSupportTests
 
         Assert.Contains("XLOOKUP", analysis.Functions);
         Assert.True(analysis.HasUnsupportedFunctions);
-        Assert.Contains(analysis.Diagnostics, d => d.Code == "OF0002");
+        Assert.Contains(
+            analysis.Diagnostics,
+            d => d.Code == "OF0002" &&
+                d.Message == OdfLocalizer.GetMessage("Diag_OdfFormulaSupport_UnsupportedFunction", "XLOOKUP"));
         Assert.Equal(formula, OdfFormulaSupport.SerializePreservingUnsupported(formula));
     }
 
@@ -56,7 +60,12 @@ public class OpenFormulaSupportTests
         OdfFormulaAnalysis analysis = OdfFormulaSupport.Analyze(formula);
 
         Assert.False(analysis.CanParse);
-        Assert.Contains(analysis.Diagnostics, d => d.Code == "OF0001");
+        Assert.Contains(
+            analysis.Diagnostics,
+            d => d.Code == "OF0001" &&
+                d.Message.StartsWith(
+                    OdfLocalizer.GetMessage("Diag_OdfFormulaSupport_ParseFailed", string.Empty),
+                    StringComparison.Ordinal));
         Assert.Equal(formula, OdfFormulaSupport.SerializePreservingUnsupported(formula));
     }
 

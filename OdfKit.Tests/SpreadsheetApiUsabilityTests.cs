@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using OdfKit.Chart;
 using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
@@ -733,6 +734,103 @@ public class SpreadsheetApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證試算表 Fluent builder 可用少量程式碼建立含公式、命名範圍、條件格式、資料驗證、
+    /// 嵌入圖表與樞紐分析表的財務模型。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetDocumentBuilderCreatesComplexFinancialModel()
+    {
+        var rows = new[]
+        {
+            new FinancialRow("一月", 120d, 72d),
+            new FinancialRow("二月", 148d, 83d),
+            new FinancialRow("三月", 161d, 91d),
+        };
+
+        using SpreadsheetDocument workbook = SpreadsheetDocument.Builder()
+            .WithMetadata(metadata => metadata
+                .Title("財務模型")
+                .Author("OdfKit"))
+            .WithStyles(OdfStyleSet.BusinessReport)
+            .AddSheet("模型", sheet => sheet
+                .ImportTable(rows, row => [row.Month, row.Revenue, row.Cost], ["月份", "營收", "成本"])
+                .AddFormulaColumn("D", "毛利", 2, 4, row => $"of:=[.B{row}]-[.C{row}]")
+                .AddNamedRange("RevenueModel", "A1:D4")
+                .AddConditionalFormat("D2:D4", "cell-content()>50", "ProfitStyle")
+                .AddDataBarFormat(new OdfCellRange(1, 3, 3, 3, "模型"), new OdfColor("#638ec6"))
+                .AddDecimalValidation("B2:C4", 0, 1000, "輸入範圍", "請輸入 0 到 1000 之間的數值。")
+                .InsertChart("A1:D4", OdfChartType.Line, chart => chart.ChartTitle = "毛利趨勢")
+                .AddPivotTable("RevenuePivot", "A1:D4", "G1", pivot => pivot
+                    .AddRowField("月份")
+                    .AddDataField("營收", OdfPivotFunction.Sum)))
+            .Build();
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+        OdfTableSheet sheet = loaded.Worksheets["模型"];
+
+        Assert.Equal("財務模型", loaded.Title);
+        Assert.Equal("OdfKit", loaded.Creator);
+        Assert.Equal("of:=[.B2]-[.C2]", sheet.Cells["D2"].Formula);
+        Assert.Equal("of:=[.B4]-[.C4]", sheet.Cells["D4"].Formula);
+        Assert.Contains(loaded.GetNamedRanges(), range => range.Name == "RevenueModel");
+        Assert.Contains(loaded.GetConditionalFormats(), format => format.Kind == OdfConditionalFormatKind.Condition);
+        Assert.Contains(loaded.GetConditionalFormats(), format => format.Kind == OdfConditionalFormatKind.DataBar);
+        OdfDataValidationInfo validation = Assert.Single(loaded.GetDataValidations());
+        Assert.True(validation.TryGetCondition(out OdfValidationCondition condition));
+        Assert.Equal(OdfValidationCondition.DecimalBetween, condition);
+        Assert.Contains("0", validation.ConditionExpression, StringComparison.Ordinal);
+        Assert.Contains("1000", validation.ConditionExpression, StringComparison.Ordinal);
+        OdfEmbeddedChartInfo embeddedChart = Assert.Single(loaded.GetEmbeddedCharts());
+        Assert.Equal("毛利趨勢", loaded.GetEmbeddedChartDocument(embeddedChart).ChartTitle);
+        Assert.Contains(loaded.GetPivotTables(), pivot => pivot.Name == "RevenuePivot");
+
+        stream.Position = 0;
+        using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        string contentXml = ReadZipEntry(zip, "content.xml");
+
+        Assert.Contains("#D9EAF7", contentXml);
+        Assert.Contains("#111111", contentXml);
+        Assert.Contains("#222222", contentXml);
+        Assert.Contains("fo:font-weight=\"bold\"", contentXml);
+        Assert.Contains("fo:font-size=\"11pt\"", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證試算表 builder 可直接套用設計主題並映射到表頭樣式。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetDocumentBuilderWithThemeMapsThemeToStyles()
+    {
+        var rows = new[] { new ProductRow("鍵盤", 1200d, 5) };
+        var theme = new OdfDesignTheme
+        {
+            StrokeColor = "#123456",
+            ConnectorColor = "#654321",
+        }.WithAccentFillColors("#ABCDEF");
+
+        using SpreadsheetDocument workbook = SpreadsheetDocument.Builder()
+            .WithTheme(theme)
+            .AddSheet("產品", sheet => sheet
+                .ImportTable(rows, row => [row.Name, row.Price, row.Stock], ["名稱", "價格", "庫存"]))
+            .Build();
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+        string contentXml = ReadZipEntry(zip, "content.xml");
+
+        Assert.Contains("#ABCDEF", contentXml);
+        Assert.Contains("#654321", contentXml);
+        Assert.Contains("fo:font-weight=\"bold\"", contentXml);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="OdfSheetBuilder.SetCell"/> 與 <see cref="OdfSheetBuilder.ImportRows"/>
     /// 可直接呼叫（不透過 ImportTable），且儲存後可由真實 LibreOffice 慣例驗證的方式重新讀回。
     /// </summary>
@@ -877,4 +975,6 @@ public class SpreadsheetApiUsabilityTests
     }
 
     private sealed record ProductRow(string Name, double Price, int Stock);
+
+    private sealed record FinancialRow(string Month, double Revenue, double Cost);
 }

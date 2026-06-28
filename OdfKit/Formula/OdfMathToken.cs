@@ -169,6 +169,62 @@ public sealed class OdfMathToken
     }
 
     /// <summary>
+    /// 遞迴尋找第一個符合條件的 token，並以指定 factory 建立的新 token 取代。
+    /// </summary>
+    /// <param name="predicate">判斷 token 是否為替換目標的委派</param>
+    /// <param name="replacementFactory">根據命中的 token 建立替換 token 的委派</param>
+    /// <returns>替換後的新 token；若未命中任何 token，則回傳目前 token</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="predicate"/> 或 <paramref name="replacementFactory"/> 為 <see langword="null"/> 時擲出</exception>
+    public OdfMathToken ReplaceFirst(Func<OdfMathToken, bool> predicate, Func<OdfMathToken, OdfMathToken> replacementFactory)
+    {
+        if (predicate is null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+
+        if (replacementFactory is null)
+        {
+            throw new ArgumentNullException(nameof(replacementFactory));
+        }
+
+        if (predicate(this))
+        {
+            OdfMathToken replacement = replacementFactory(this);
+            return replacement ?? throw new ArgumentNullException(nameof(replacementFactory));
+        }
+
+        int childCount = GetChildCount();
+        for (int index = 0; index < childCount; index++)
+        {
+            OdfMathToken child = GetChild(index);
+            OdfMathToken replaced = child.ReplaceFirst(predicate, replacementFactory);
+            if (!ReferenceEquals(child, replaced))
+            {
+                return WithChild(index, replaced);
+            }
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// 遞迴尋找第一個指定種類的 token，並以指定 token 取代。
+    /// </summary>
+    /// <param name="kind">目標 token 種類</param>
+    /// <param name="replacement">替換後的新 token</param>
+    /// <returns>替換後的新 token；若未命中任何 token，則回傳目前 token</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出</exception>
+    public OdfMathToken ReplaceFirst(OdfMathTokenKind kind, OdfMathToken replacement)
+    {
+        if (replacement is null)
+        {
+            throw new ArgumentNullException(nameof(replacement));
+        }
+
+        return ReplaceFirst(token => token.Kind == kind, _ => replacement);
+    }
+
+    /// <summary>
     /// 建立 MathML <c>mi</c> 識別名稱 token。
     /// </summary>
     /// <param name="text">識別名稱文字</param>

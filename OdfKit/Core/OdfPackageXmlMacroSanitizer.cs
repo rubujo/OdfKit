@@ -27,6 +27,7 @@ internal static class OdfPackageXmlMacroSanitizer
             if (child.NodeType == OdfNodeType.Element)
             {
                 bool shouldRemove =
+                    (child.LocalName == "scripts" && child.NamespaceUri == OdfNamespaces.Office) ||
                     (child.LocalName == "event-listeners" && (child.NamespaceUri == OdfNamespaces.Office || child.NamespaceUri == OdfNamespaces.Presentation)) ||
                     (child.LocalName == "event-listener" && (child.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:script:1.0" || child.NamespaceUri == OdfNamespaces.Presentation)) ||
                     (child.LocalName == "script" && child.NamespaceUri == "urn:oasis:names:tc:opendocument:xmlns:script:1.0") ||

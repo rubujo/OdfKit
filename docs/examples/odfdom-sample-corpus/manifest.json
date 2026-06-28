@@ -1,0 +1,32 @@
+{
+  "fixtures": [
+    {
+      "id": "odfdom-sample-text-document",
+      "path": "odfdom/samples/text/odfdom-sample-text-document.odt",
+      "source": "ODF Toolkit ODFDOM sample",
+      "sourceUri": "https://github.com/tdf/odftoolkit",
+      "license": "external-review-required",
+      "kind": "Text",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "notes": "Template entry for external ODFDOM sample parity. Replace sourceUri with the exact upstream sample URL, license with the reviewed license, and sha256 with the downloaded fixture hash before executing beyond metadata-only."
+    },
+    {
+      "id": "odfdom-sample-spreadsheet-document",
+      "path": "odfdom/samples/spreadsheet/odfdom-sample-spreadsheet-document.ods",
+      "source": "ODF Toolkit ODFDOM sample",
+      "sourceUri": "https://github.com/tdf/odftoolkit",
+      "license": "external-review-required",
+      "kind": "Spreadsheet",
+      "version": "1.4",
+      "profile": "OASIS_ODF_1_4_Extended",
+      "expected": "valid",
+      "roundTrip": "semantic-equivalent",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "notes": "Template entry for external ODFDOM sample parity. Replace sourceUri with the exact upstream sample URL, license with the reviewed license, and sha256 with the downloaded fixture hash before executing beyond metadata-only."
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using OdfKit.Core;
 
 namespace OdfKit.Compliance;
@@ -149,7 +150,7 @@ public static class OdfExternalValidator
             CreateNoWindow = true
         };
 
-        process.Start();
+        StartProcess(process);
         Task<string> standardOutputTask = process.StandardOutput.ReadToEndAsync();
         Task<string> standardErrorTask = process.StandardError.ReadToEndAsync();
 
@@ -166,6 +167,15 @@ public static class OdfExternalValidator
             process.ExitCode,
             standardOutput,
             standardError);
+    }
+
+    private static void StartProcess(Process process)
+    {
+        lock (OdfNativeProcessErrorMode.ProcessStartLock)
+        {
+            using OdfNativeProcessErrorMode.Scope scope = OdfNativeProcessErrorMode.SuppressCrashDialogForChildProcess();
+            process.Start();
+        }
     }
 
     private static async Task<bool> WaitForProcessExitAsync(
@@ -228,6 +238,53 @@ public static class OdfExternalValidator
 
         return "\"" + argument.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
     }
+}
+
+internal static class OdfNativeProcessErrorMode
+{
+    internal static readonly object ProcessStartLock = new();
+
+    private const uint SemNoGpFaultErrorBox = 0x0002;
+
+    internal static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+    internal static Scope SuppressCrashDialogForChildProcess()
+    {
+        if (!IsWindows)
+        {
+            return default;
+        }
+
+        uint previousMode = GetErrorMode();
+        SetErrorMode(previousMode | SemNoGpFaultErrorBox);
+        return new Scope(previousMode);
+    }
+
+    internal readonly struct Scope : IDisposable
+    {
+        private readonly uint previousMode;
+        private readonly bool restore;
+
+        internal Scope(uint previousMode)
+        {
+            this.previousMode = previousMode;
+            restore = true;
+        }
+
+        public void Dispose()
+        {
+            if (restore)
+            {
+                SetErrorMode(previousMode);
+            }
+        }
+    }
+
+    [DllImport("kernel32.dll")]
+    private static extern uint GetErrorMode();
+
+    [DllImport("kernel32.dll")]
+    private static extern uint SetErrorMode(uint uMode);
 }
 
 /// <summary>

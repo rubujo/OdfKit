@@ -102,8 +102,13 @@ dotnet run --project tools/OdfCorpusGenerator -- D:\Dev\Project\Application\OdfK
 trimming / Native AOT 情境下的基本可用性。
 
 ```powershell
+pwsh eng/Test-TrimSmoke.ps1 -Configuration Release
 dotnet run --project tools/OdfKit.TrimSmoke
 ```
+
+標準驗證使用 `eng/Test-TrimSmoke.ps1`，它會以 `PublishTrimmed` 發佈並執行裁剪後的
+`OdfKit.TrimSmoke.exe`。`-PublishAot` 僅作為 Native AOT 研究入口；BouncyCastle OpenPGP
+路徑目前仍透過 trimming guard 保留必要組件，不宣稱完整 Native AOT 支援。
 
 成功時會輸出類似：
 

@@ -286,7 +286,6 @@ public class FourFormatApiScenarioTests
         chartDoc.SetAxisGrid("y", OdfChartGridKind.Major, true);
         if (chartDoc.SeriesCount > 0)
             chartDoc.GetSeriesEditor(0).SeriesClass = "chart:bar";
-        chartDoc.Save();
 
         using var stream = new MemoryStream();
         workbook.SaveToStream(stream);

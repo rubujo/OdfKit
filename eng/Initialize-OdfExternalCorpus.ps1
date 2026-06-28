@@ -3,13 +3,16 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$OutputRoot,
 
+    [ValidateSet("external-corpus", "odfdom-sample-corpus")]
+    [string]$Template = "external-corpus",
+
     [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$templateRoot = Join-Path $repoRoot "docs/examples/external-corpus"
+$templateRoot = Join-Path $repoRoot "docs/examples/$Template"
 if (-not (Test-Path -LiteralPath $templateRoot)) {
     throw "External corpus template root not found: $templateRoot"
 }

@@ -106,6 +106,61 @@ public class ManagedSvgExportTests
     }
 
     [Fact]
+    public void SvgExporterTranslatesEnhancedPathHorizontalAndVerticalLinesAfterSubstitution()
+    {
+        using DrawingDocument document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("Page 1");
+        OdfShape shape = page.AddCustomShape(
+            "custom",
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(3),
+            OdfLength.FromCentimeters(2));
+        OdfNode geometry = Assert.Single(
+            shape.Node.Children,
+            child => child.LocalName == "enhanced-geometry" && child.NamespaceUri == OdfNamespaces.Draw);
+        geometry.SetAttribute("enhanced-path", OdfNamespaces.Draw, "M 0 0 H $0 V ?bottom H 0 Z", "draw");
+        geometry.SetAttribute("modifiers", OdfNamespaces.Draw, "1000", "draw");
+        geometry.SetAttribute("viewBox", OdfNamespaces.Svg, "0 0 1000 1000", "svg");
+        AddEquation(geometry, "bottom", "$0");
+
+        string svg = document.ToSvg();
+        XDocument parsed = XDocument.Parse(svg);
+        XNamespace ns = "http://www.w3.org/2000/svg";
+
+        XElement path = Assert.Single(parsed.Descendants(ns + "path"));
+        Assert.Equal("M 0 0 H 1000 V 1000 H 0 Z", (string?)path.Attribute("d"));
+        Assert.Empty(parsed.Descendants(ns + "rect"));
+    }
+
+    [Fact]
+    public void SvgExporterTranslatesRelativeEnhancedPathCommandsAfterSubstitution()
+    {
+        using DrawingDocument document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("Page 1");
+        OdfShape shape = page.AddCustomShape(
+            "custom",
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(3),
+            OdfLength.FromCentimeters(2));
+        OdfNode geometry = Assert.Single(
+            shape.Node.Children,
+            child => child.LocalName == "enhanced-geometry" && child.NamespaceUri == OdfNamespaces.Draw);
+        geometry.SetAttribute("enhanced-path", OdfNamespaces.Draw, "m $0 10 l 20 30 h 40 v 50 q 10 10 20 0 c 5 5 10 10 15 15 z", "draw");
+        geometry.SetAttribute("modifiers", OdfNamespaces.Draw, "100", "draw");
+        geometry.SetAttribute("viewBox", OdfNamespaces.Svg, "0 0 300 300", "svg");
+
+        string svg = document.ToSvg();
+        XDocument parsed = XDocument.Parse(svg);
+        XNamespace ns = "http://www.w3.org/2000/svg";
+
+        XElement path = Assert.Single(parsed.Descendants(ns + "path"));
+        Assert.Equal("M 100 10 L 120 40 H 160 V 90 Q 170 100 180 90 C 185 95 190 100 195 105 Z", (string?)path.Attribute("d"));
+        Assert.Empty(parsed.Descendants(ns + "rect"));
+    }
+
+    [Fact]
     public void SvgExporterSupportsCommonEnhancedPathFormulaFunctions()
     {
         using DrawingDocument document = DrawingDocument.Create();
@@ -185,6 +240,32 @@ public class ManagedSvgExportTests
 
         XElement path = Assert.Single(parsed.Descendants(ns + "path"));
         Assert.Equal("M 1000 500 A 500 250 0 0 1 0 500 L 0 500 A 500 250 0 0 1 1000 500 Z", (string?)path.Attribute("d"));
+        Assert.Empty(parsed.Descendants(ns + "rect"));
+    }
+
+    [Fact]
+    public void SvgExporterSplitsFullEnhancedPathEllipseArcs()
+    {
+        using DrawingDocument document = DrawingDocument.Create();
+        OdfDrawPage page = document.AddPage("Page 1");
+        OdfShape shape = page.AddCustomShape(
+            "custom",
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(3),
+            OdfLength.FromCentimeters(2));
+        OdfNode geometry = Assert.Single(
+            shape.Node.Children,
+            child => child.LocalName == "enhanced-geometry" && child.NamespaceUri == OdfNamespaces.Draw);
+        geometry.SetAttribute("enhanced-path", OdfNamespaces.Draw, "U 500 500 500 250 0 360 Z", "draw");
+        geometry.SetAttribute("viewBox", OdfNamespaces.Svg, "0 0 1000 1000", "svg");
+
+        string svg = document.ToSvg();
+        XDocument parsed = XDocument.Parse(svg);
+        XNamespace ns = "http://www.w3.org/2000/svg";
+
+        XElement path = Assert.Single(parsed.Descendants(ns + "path"));
+        Assert.Equal("M 1000 500 A 500 250 0 0 1 0 500 A 500 250 0 0 1 1000 500 Z", (string?)path.Attribute("d"));
         Assert.Empty(parsed.Descendants(ns + "rect"));
     }
 

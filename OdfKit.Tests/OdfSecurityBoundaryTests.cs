@@ -16,7 +16,9 @@ namespace OdfKit.Tests;
 public class OdfSecurityBoundaryTests
 {
     private const string Password = "R5BoundaryPassword";
+    private static readonly XNamespace OfficeNs = OdfNamespaces.Office;
     private static readonly XNamespace ScriptNs = "urn:oasis:names:tc:opendocument:xmlns:script:1.0";
+    private static readonly XNamespace TextNs = OdfNamespaces.Text;
     private static readonly XNamespace XLinkNs = OdfNamespaces.XLink;
     private static readonly XNamespace CustomNs = "urn:odfkit:test:foreign";
 
@@ -162,6 +164,7 @@ public class OdfSecurityBoundaryTests
         Assert.False(package.HasEntry("META-INF/documentsignatures.xml"));
 
         XDocument content = ReadXml(package, "content.xml");
+        Assert.Empty(content.Descendants(OfficeNs + "scripts"));
         Assert.Empty(content.Descendants(ScriptNs + "event-listener"));
         Assert.Empty(content.Descendants(ScriptNs + "script"));
         Assert.Contains(content.Descendants(CustomNs + "payload"), element => element.Value == "安全外來內容");
@@ -206,16 +209,57 @@ public class OdfSecurityBoundaryTests
         Assert.False(reopened.HasEntry("META-INF/documentsignatures.xml"));
 
         XDocument content = ReadXml(reopened, "content.xml");
+        Assert.Empty(content.Descendants(OfficeNs + "scripts"));
         Assert.Empty(content.Descendants(ScriptNs + "event-listener"));
         Assert.Contains(content.Descendants(CustomNs + "payload"), element => element.Value == "安全外來內容");
     }
 
-    private static MemoryStream CreateTextPackage(bool includeMacroContent = false)
+    /// <summary>
+    /// 驗證加密文件淨化後重新加密時，巨集被移除，但外部資源仍由 profile policy 回報。
+    /// </summary>
+    [Fact]
+    public void EncryptedSanitizeKeepsExternalResourcePolicyVisibleAfterReencryption()
+    {
+        using MemoryStream encrypted = CreateEncryptedTextPackage(includeExternalResource: true);
+        using var document = new TextDocument(OdfPackage.Open(
+            encrypted,
+            leaveOpen: true,
+            new OdfLoadOptions { Password = Password }));
+
+        AddMacroAndSignatureEntries(document.Package);
+        document.SanitizeMacros();
+
+        using var saved = new MemoryStream();
+        document.SaveToStream(saved, new OdfSaveOptions
+        {
+            Password = Password,
+            EncryptionAlgorithm = OdfEncryptionAlgorithm.Aes256
+        });
+
+        saved.Position = 0;
+        using OdfPackage reopened = OdfPackage.Open(saved, leaveOpen: true, new OdfLoadOptions { Password = Password });
+        Assert.False(reopened.HasEntry("Basic/script.xlb"));
+        Assert.False(reopened.HasEntry("Scripts/python/hello.py"));
+        Assert.False(reopened.HasEntry("META-INF/macrosignatures.xml"));
+
+        XDocument content = ReadXml(reopened, "content.xml");
+        Assert.Empty(content.Descendants(OfficeNs + "scripts"));
+        Assert.Empty(content.Descendants(ScriptNs + "event-listener"));
+        Assert.Contains(
+            content.Descendants(TextNs + "a"),
+            element => element.Attribute(XLinkNs + "href")?.Value == "https://example.invalid/pixel.png");
+
+        OdfValidationReport report = OdfPackageValidator.Validate(reopened, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools);
+        Assert.Contains(report.Issues, issue => issue.RuleId == "RequireSafeExternalResourcePolicy");
+        Assert.DoesNotContain(report.Issues, issue => issue.RuleId == "DisallowMacroByDefault");
+    }
+
+    private static MemoryStream CreateTextPackage(bool includeMacroContent = false, bool includeExternalResource = false)
     {
         var stream = new MemoryStream();
         using (OdfPackage package = OdfDocumentFactory.CreatePackage(stream, OdfDocumentKind.Text, leaveOpen: true))
         {
-            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(CreateContentXml(includeMacroContent ? "巨集邊界" : "一般內容", includeMacroContent)), "text/xml");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes(CreateContentXml(includeMacroContent ? "巨集邊界" : "一般內容", includeMacroContent, includeExternalResource)), "text/xml");
             package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes(CreateStylesXml()), "text/xml");
             package.WriteEntry("meta.xml", Encoding.UTF8.GetBytes(CreateMetaXml()), "text/xml");
             package.WriteEntry("settings.xml", Encoding.UTF8.GetBytes(CreateSettingsXml()), "text/xml");
@@ -227,9 +271,9 @@ public class OdfSecurityBoundaryTests
         return stream;
     }
 
-    private static MemoryStream CreateEncryptedTextPackage()
+    private static MemoryStream CreateEncryptedTextPackage(bool includeExternalResource = false)
     {
-        MemoryStream stream = CreateTextPackage(includeMacroContent: true);
+        MemoryStream stream = CreateTextPackage(includeMacroContent: true, includeExternalResource);
         var encrypted = new MemoryStream();
         using (OdfPackage package = OdfPackage.Open(stream, leaveOpen: false))
         {
@@ -266,10 +310,13 @@ public class OdfSecurityBoundaryTests
         return XDocument.Load(stream);
     }
 
-    private static string CreateContentXml(string paragraphText, bool includeMacroContent = false)
+    private static string CreateContentXml(string paragraphText, bool includeMacroContent = false, bool includeExternalResource = false)
     {
         string macroXml = includeMacroContent
             ? "<office:scripts><office:event-listeners><script:event-listener script:event-name=\"dom-click\" script:language=\"ooo:script\" script:macro-name=\"MyMacro\" /></office:event-listeners><script:script script:language=\"StarBasic\">Sub Main\nEnd Sub</script:script></office:scripts>"
+            : string.Empty;
+        string externalResourceXml = includeExternalResource
+            ? "<text:p><text:a xlink:type=\"simple\" xlink:href=\"https://example.invalid/pixel.png\">外部資源</text:a></text:p>"
             : string.Empty;
 
         return $"""
@@ -285,6 +332,7 @@ public class OdfSecurityBoundaryTests
               <office:body>
                 <office:text>
                   <text:p>{paragraphText}</text:p>
+                  {externalResourceXml}
                   <custom:payload custom:flag="keep">安全外來內容</custom:payload>
                   <custom:resource xlink:type="simple" xlink:href="Pictures/foreign-safe.bin" />
                 </office:text>

@@ -416,6 +416,9 @@ public static class OdfMarkdownImporter
         bool strikethrough = false;
         string? fontSize = null;
         string? color = null;
+        string? backgroundColor = null;
+        string? textTransform = null;
+        string? fontVariant = null;
 
         string[] declarations = styleValue!.Split(';');
         foreach (string declaration in declarations)
@@ -451,9 +454,21 @@ public static class OdfMarkdownImporter
             {
                 color = value;
             }
+            else if (string.Equals(name, "background-color", StringComparison.OrdinalIgnoreCase))
+            {
+                backgroundColor = value;
+            }
+            else if (string.Equals(name, "text-transform", StringComparison.OrdinalIgnoreCase))
+            {
+                textTransform = value;
+            }
+            else if (string.Equals(name, "font-variant", StringComparison.OrdinalIgnoreCase))
+            {
+                fontVariant = value;
+            }
         }
 
-        return new InlineImportStyle(bold, italic, underline, strikethrough, fontSize, color);
+        return new InlineImportStyle(bold, italic, underline, strikethrough, fontSize, color, backgroundColor, textTransform, fontVariant);
     }
 
     private static string? ReadAttributeValue(string tag, string attributeName)
@@ -500,6 +515,21 @@ public static class OdfMarkdownImporter
         if (!string.IsNullOrWhiteSpace(style.Color))
         {
             run.Color = style.Color;
+        }
+
+        if (!string.IsNullOrWhiteSpace(style.BackgroundColor))
+        {
+            run.BackgroundColor = style.BackgroundColor;
+        }
+
+        if (!string.IsNullOrWhiteSpace(style.TextTransform))
+        {
+            run.TextTransform = style.TextTransform;
+        }
+
+        if (!string.IsNullOrWhiteSpace(style.FontVariant))
+        {
+            run.FontVariant = style.FontVariant;
         }
     }
 
@@ -904,7 +934,10 @@ public static class OdfMarkdownImporter
             bool Underline = false,
             bool Strikethrough = false,
             string? FontSize = null,
-            string? Color = null)
+            string? Color = null,
+            string? BackgroundColor = null,
+            string? TextTransform = null,
+            string? FontVariant = null)
         {
             this.Bold = Bold;
             this.Italic = Italic;
@@ -912,6 +945,9 @@ public static class OdfMarkdownImporter
             this.Strikethrough = Strikethrough;
             this.FontSize = FontSize;
             this.Color = Color;
+            this.BackgroundColor = BackgroundColor;
+            this.TextTransform = TextTransform;
+            this.FontVariant = FontVariant;
         }
 
         public static InlineImportStyle Empty { get; } = new();
@@ -927,5 +963,11 @@ public static class OdfMarkdownImporter
         public string? FontSize { get; }
 
         public string? Color { get; }
+
+        public string? BackgroundColor { get; }
+
+        public string? TextTransform { get; }
+
+        public string? FontVariant { get; }
     }
 }

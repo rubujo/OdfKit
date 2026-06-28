@@ -187,5 +187,7 @@ internal sealed class CorpusFixtureEntry
 
     public string RoundTrip { get; set; } = string.Empty;
 
+    public string? Sha256 { get; set; }
+
     public string? Notes { get; set; }
 }

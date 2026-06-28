@@ -37,9 +37,12 @@ pwsh eng/Test-OdfTypedDomCoverage.ps1
 （`en`, `zh-TW`, `de`, `fr`, `nl`, `nb`, `pt`, `it`, `sk`, `da`, `ms`, `ko`），並保留
 `OdfLocalizer` 的文化回退測試。不得只修改單一文化或在呼叫端硬編碼例外訊息。
 
-## 建議 Clean Room 重寫區塊
+## Clean-room 來源索引
 
-以下區塊邏輯密集且與外部試算表引擎語意相近，建議以 **規格驅動（OpenFormula / ODF 1.3）** 方式逐步重寫並補強測試：
+公式評估與 schema pattern validator 的規格來源、可接受參考、不可接受來源與
+golden / regression 測試契約集中記錄於 [Clean-room 來源索引](clean-room-source-index.md)。
+這些區塊邏輯密集且與外部試算表引擎或驗證器語意相近，後續變更必須以規格、
+自有 corpus 與可再散布 fixture 驅動，不得複製外部原始碼。
 
 | 模組 | 檔案 | 說明 |
 |------|------|------|
@@ -57,5 +60,5 @@ pwsh eng/Test-OdfTypedDomCoverage.ps1
 ## 維護建議
 
 1. 新增第三方參考實作時，記錄於本目錄並標註授權
-2. 財務函式變更需附 OpenFormula 規格連結與對照測試
+2. 財務函式與 schema pattern 變更需附規格來源、來源範圍與對照測試
 3. 勿將產生式 `.g.cs` 納入 partial 拆分範圍

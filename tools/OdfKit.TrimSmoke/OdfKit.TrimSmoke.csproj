@@ -9,6 +9,8 @@
     <TrimMode>partial</TrimMode>
     <IsPackable>false</IsPackable>
     <SelfContained>true</SelfContained>
+    <NuGetAudit>false</NuGetAudit>
+    <NoWarn>$(NoWarn);IL2104</NoWarn>
   </PropertyGroup>
 
   <!-- PublishTrimmed 需要 RID；僅 publish 管線套用，避免 dotnet build 連帶要求 OdfKit 產出 win-x64 參考組件。 -->
@@ -29,7 +31,8 @@
     </ProjectReference>
   </ItemGroup>
 
-  <!-- BouncyCastle 密碼學路徑與 Sylvan.Data.Csv 尚未完全 trimming 化；整包保留以避免 IL 連結器誤裁。 -->
+  <!-- BouncyCastle 密碼學路徑與 Sylvan.Data.Csv 尚未完全 trimming 化；整包保留以避免 IL 連結器誤裁。
+       IL2104 由 Sylvan.Data.Csv 發出，已在此 smoke 專案文件化為第三方整包保留策略。 -->
   <ItemGroup>
     <TrimmerRootAssembly Include="BouncyCastle.Cryptography" />
     <TrimmerRootAssembly Include="Sylvan.Data.Csv" />

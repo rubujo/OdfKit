@@ -190,9 +190,10 @@ fluent builder API、Formula 的「尋找→取得→更新」語意編輯 helpe
     的驗收佐證嵌入式圖表（ODF Chart 設計上唯一的真實使用情境）的互通性。
   - 2026-06-23 完成時依「仍缺 Legend 統一可編輯模型與 fluent builder API」為理由維持
     `usable`／`usable-variant`；2026-06-24 依計畫第 14 節字面 5 項 Done Criteria 重新檢視，
-    確認已全部滿足，**升級為 `complete`**。Legend 物件模型與 fluent builder API 屬於計畫
-    第 7.5 節列出的延伸項目，不在第 14 節最低標準之內，續列為獨立追蹤的後續深度工作（非
-    阻礙 complete 分級的缺口）。
+    確認已全部滿足，**升級為 `complete`**。後續深度工作已補齊 Legend 物件模型、
+    `ChartDocument.Builder()`、序列樣式 builder 與資料標籤 preset（`OdfChartDataLabelPreset`／
+    `WithDataLabels`），目前剩餘 Chart 追蹤重點轉為更完整的跨格式 fidelity 與高階樣式
+    preset，而不是基礎 builder 缺口。
 - `.odf`／`.otf`／`.fdf`（Batch 4，2026-06-23）：現況調查同樣發現既有 MathML token 模型
   （`OdfMathToken`／`OdfMathBuilder`，17 種 token 類型）與 LaTeX↔MathML 雙向轉換早已完整支援
   row／fraction／script／table 等計畫列出的結構；本次補上確認缺失的部分：
@@ -252,7 +253,7 @@ fluent builder API、Formula 的「尋找→取得→更新」語意編輯 helpe
     Done Criteria 重新檢視，確認已全部滿足，**升級為 `complete`**（理由與 Chart／Formula
     相同：深度內容模型差異不在第 14 節最低標準之內）。
 - `.odb`（Batch 6，2026-06-23）：現況調查確認 Database 已具備計畫文件要求的**全部**能力，
-  並無比照 Chart（Legend 物件模型）／Formula（語意編輯 helper）那樣明確列出但仍缺的延伸項目，
+  並無比照 Chart（Legend 物件模型與資料標籤 preset）／Formula（語意編輯 helper）那樣明確追蹤的延伸項目，
   經評估後依使用者先前確認的「ODB complete 標準採真實可用工作流為準」決策，**升級為
   `complete`**：
   - **資料來源**：連線 href、登入（`OdfDatabaseDocument.GetLogin`／`SetLogin`）、驅動程式設定

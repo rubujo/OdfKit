@@ -65,6 +65,17 @@ public class OdfExternalValidatorAsyncTests
         }
     }
 
+    /// <summary>
+    /// 驗證外部程序錯誤視窗抑制 scope 可安全進出，避免 corpus baseline 工具崩潰時卡住桌面工作階段。
+    /// </summary>
+    [Fact]
+    public void NativeProcessErrorModeScope_CanBeEnteredAndDisposed()
+    {
+        Assert.Equal(OperatingSystem.IsWindows(), OdfNativeProcessErrorMode.IsWindows);
+
+        using OdfNativeProcessErrorMode.Scope scope = OdfNativeProcessErrorMode.SuppressCrashDialogForChildProcess();
+    }
+
     private static string CreateTempOdfFile()
     {
         string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".odt");

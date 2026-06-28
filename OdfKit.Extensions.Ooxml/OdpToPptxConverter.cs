@@ -631,9 +631,9 @@ public static class OdpToPptxConverter
                         CreateThemeOutline(25400),
                         CreateThemeOutline(38100)),
                     new A.EffectStyleList(
-                        new A.EffectStyle(new A.EffectList()),
-                        new A.EffectStyle(new A.EffectList()),
-                        new A.EffectStyle(new A.EffectList())),
+                        CreateThemeEffectStyle(A.SchemeColorValues.Dark2, 38100L, 5400000, 72000),
+                        CreateThemeEffectStyle(A.SchemeColorValues.Dark2, 50800L, 5400000, 55000),
+                        CreateThemeEffectStyle(A.SchemeColorValues.Accent1, 63500L, 5400000, 45000)),
                     new A.BackgroundFillStyleList(
                         new A.SolidFill(new A.SchemeColor { Val = A.SchemeColorValues.PhColor }),
                         CreateGradientFill(),
@@ -669,6 +669,26 @@ public static class OdpToPptxConverter
             CompoundLineType = A.CompoundLineValues.Single,
             Alignment = A.PenAlignmentValues.Center,
         };
+    }
+
+    /// <summary>
+    /// 建立佈景主題效果矩陣使用的陰影效果。
+    /// </summary>
+    private static A.EffectStyle CreateThemeEffectStyle(
+        A.SchemeColorValues color,
+        long distance,
+        int direction,
+        int alpha)
+    {
+        return new A.EffectStyle(
+            new A.EffectList(
+                new A.OuterShadow(
+                    new A.SchemeColor(new A.Alpha { Val = alpha }) { Val = color })
+                {
+                    Distance = distance,
+                    Direction = direction,
+                    Alignment = A.RectangleAlignmentValues.BottomLeft,
+                }));
     }
 
     /// <summary>
@@ -760,6 +780,8 @@ public static class OdpToPptxConverter
                 pCount = Math.Max(GetParagraphCount(targetNode), 1);
             }
 
+            (int Start, int End)? paragraphRange = GetParagraphRange(animation, pCount);
+
             // 判斷是否需要建立新的動畫群組。OnClick 或 AfterPrevious 動畫，或是第一個動畫時，開啟新群組。
             bool startNewGroup = currentGroupChildren is null ||
                                  animation.Trigger == OdfKit.Presentation.OdfAnimationTrigger.OnClick ||
@@ -788,16 +810,36 @@ public static class OdpToPptxConverter
             }
 
             // 逐段落動畫展開，或者單一圖形動畫
-            if (pCount > 1)
+            if (paragraphRange.HasValue)
+            {
+                currentGroupChildren!.Append(CreateAnimationEffectNode(
+                    animation,
+                    targetShapeId,
+                    ReadAnimationNodeType(animation.Trigger),
+                    ref timeNodeId,
+                    paragraphRange.Value.Start,
+                    paragraphRange.Value.End));
+            }
+            else if (pCount > 1)
             {
                 for (int i = 0; i < pCount; i++)
                 {
-                    currentGroupChildren!.Append(CreateAnimationEffectNode(animation, targetShapeId, currentGroupNodeType, ref timeNodeId, i));
+                    currentGroupChildren!.Append(CreateAnimationEffectNode(
+                        animation,
+                        targetShapeId,
+                        ReadAnimationNodeType(animation.Trigger),
+                        ref timeNodeId,
+                        i,
+                        i));
                 }
             }
             else
             {
-                currentGroupChildren!.Append(CreateAnimationEffectNode(animation, targetShapeId, currentGroupNodeType, ref timeNodeId));
+                currentGroupChildren!.Append(CreateAnimationEffectNode(
+                    animation,
+                    targetShapeId,
+                    ReadAnimationNodeType(animation.Trigger),
+                    ref timeNodeId));
             }
         }
 
@@ -824,6 +866,7 @@ public static class OdpToPptxConverter
                 new P.Condition { Event = P.TriggerEventValues.OnNext, Delay = "0", TargetElement = new P.TargetElement(new P.SlideTarget()) }))
         {
             Concurrent = true,
+            PreviousAction = P.PreviousActionValues.SkipTimed,
             NextAction = P.NextActionValues.Seek,
         };
 
@@ -833,6 +876,7 @@ public static class OdpToPptxConverter
             {
                 Id = timeNodeId++,
                 Duration = IndefiniteDuration,
+                Restart = P.TimeNodeRestartValues.Always,
                 NodeType = P.TimeNodeValues.TmingRoot,
                 ChildTimeNodeList = rootChildren,
             });
@@ -918,7 +962,7 @@ public static class OdpToPptxConverter
                 continue;
             }
 
-            bool isByParagraph = false;
+            bool isByParagraph = GetParagraphRange(animation, int.MaxValue).HasValue;
             if (animationNodes.TryGetValue(animation.TargetElementId, out OdfNode? targetNode))
             {
                 if (GetParagraphCount(targetNode) > 1)
@@ -940,15 +984,35 @@ public static class OdpToPptxConverter
         return buildList;
     }
 
+    private static (int Start, int End)? GetParagraphRange(OdfKit.Presentation.OdfAnimationInfo animation, int paragraphCount)
+    {
+        if (!animation.ParagraphStartIndex.HasValue)
+        {
+            return null;
+        }
+
+        int start = Math.Max(animation.ParagraphStartIndex.Value, 0);
+        int end = Math.Max(animation.ParagraphEndIndex ?? start, start);
+        if (paragraphCount != int.MaxValue)
+        {
+            int maxIndex = Math.Max(paragraphCount - 1, 0);
+            start = Math.Min(start, maxIndex);
+            end = Math.Min(end, maxIndex);
+        }
+
+        return (start, end);
+    }
+
     /// <summary>
-    /// 建立動畫效果節點，並支援特定段落 index（逐段落動畫）。
+    /// 建立動畫效果節點，並支援特定段落 range（逐段落動畫）。
     /// </summary>
     private static P.ParallelTimeNode CreateAnimationEffectNode(
         OdfKit.Presentation.OdfAnimationInfo animation,
         uint targetShapeId,
         P.TimeNodeValues groupNodeType,
         ref uint timeNodeId,
-        int? paragraphIndex = null)
+        int? paragraphStartIndex = null,
+        int? paragraphEndIndex = null)
     {
         string duration = FormatAnimationDuration(animation);
         string? delay = FormatAnimationDelay(animation);
@@ -963,12 +1027,12 @@ public static class OdpToPptxConverter
         P.ShapeTarget CreateShapeTarget()
         {
             var shapeTarget = new P.ShapeTarget { ShapeId = shapeIdText };
-            if (paragraphIndex.HasValue)
+            if (paragraphStartIndex.HasValue)
             {
                 var txEl = new OpenXmlUnknownElement("p", "txEl", "http://schemas.openxmlformats.org/presentationml/2006/main");
                 var pRg = new OpenXmlUnknownElement("p", "pRg", "http://schemas.openxmlformats.org/presentationml/2006/main");
-                pRg.SetAttribute(new OpenXmlAttribute("st", "", paragraphIndex.Value.ToString(CultureInfo.InvariantCulture)));
-                pRg.SetAttribute(new OpenXmlAttribute("end", "", paragraphIndex.Value.ToString(CultureInfo.InvariantCulture)));
+                pRg.SetAttribute(new OpenXmlAttribute("st", "", paragraphStartIndex.Value.ToString(CultureInfo.InvariantCulture)));
+                pRg.SetAttribute(new OpenXmlAttribute("end", "", (paragraphEndIndex ?? paragraphStartIndex.Value).ToString(CultureInfo.InvariantCulture)));
                 txEl.Append(pRg);
                 shapeTarget.Append(txEl);
             }
@@ -2167,6 +2231,71 @@ public static class OdpToPptxConverter
 
             properties.Append(outline);
         }
+
+        AppendShapeShadow(properties, styleName, document);
+    }
+
+    private static void AppendShapeShadow(P.ShapeProperties properties, string styleName, OdfPresentationDocument document)
+    {
+        string? shadow = document.StyleEngine.GetStyleProperty(styleName, "shadow", OdfNamespaces.Draw, "graphic");
+        if (!string.Equals(shadow, "visible", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        string? shadowColor = NormalizeColor(document.StyleEngine.GetStyleProperty(styleName, "shadow-color", OdfNamespaces.Draw, "graphic"));
+        long offsetX = ToEmus(document.StyleEngine.GetStyleProperty(styleName, "shadow-offset-x", OdfNamespaces.Draw, "graphic"));
+        long offsetY = ToEmus(document.StyleEngine.GetStyleProperty(styleName, "shadow-offset-y", OdfNamespaces.Draw, "graphic"));
+        long distance = (long)Math.Round(Math.Sqrt(((double)offsetX * offsetX) + ((double)offsetY * offsetY)), MidpointRounding.AwayFromZero);
+        int direction = ToDrawingMlDirection(offsetX, offsetY);
+        var color = new A.RgbColorModelHex { Val = shadowColor ?? "808080" };
+        int? alpha = ToDrawingMlAlpha(document.StyleEngine.GetStyleProperty(styleName, "shadow-opacity", OdfNamespaces.Draw, "graphic"));
+        if (alpha.HasValue)
+        {
+            color.Append(new A.Alpha { Val = alpha.Value });
+        }
+
+        properties.Append(new A.EffectList(
+            new A.OuterShadow(color)
+            {
+                Distance = Math.Max(distance, 0L),
+                Direction = direction,
+                Alignment = A.RectangleAlignmentValues.BottomRight,
+            }));
+    }
+
+    private static int ToDrawingMlDirection(long offsetX, long offsetY)
+    {
+        if (offsetX == 0L && offsetY == 0L)
+        {
+            return 0;
+        }
+
+        double degrees = Math.Atan2(offsetY, offsetX) * 180d / Math.PI;
+        if (degrees < 0d)
+        {
+            degrees += 360d;
+        }
+
+        return (int)Math.Round(degrees * 60000d, MidpointRounding.AwayFromZero);
+    }
+
+    private static int? ToDrawingMlAlpha(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        string trimmed = value!.Trim();
+        if (trimmed.EndsWith("%", StringComparison.Ordinal))
+        {
+            trimmed = trimmed.Substring(0, trimmed.Length - 1);
+        }
+
+        return double.TryParse(trimmed, NumberStyles.Float, CultureInfo.InvariantCulture, out double percent)
+            ? Math.Min(Math.Max((int)Math.Round(percent * 1000d, MidpointRounding.AwayFromZero), 0), 100000)
+            : null;
     }
 
     private static IEnumerable<OdfNode> GetSlides(OdfPresentationDocument document)

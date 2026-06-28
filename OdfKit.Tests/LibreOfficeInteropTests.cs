@@ -282,8 +282,7 @@ public class LibreOfficeInteropTests
                 Assert.Equal("套用後折線圖標題", chartDoc.ChartTitle);
                 Assert.Equal("top", chartDoc.LegendPosition);
 
-                // 嵌入圖表文件需明確 Save，變更才會寫回母文件共用的封裝。
-                chartDoc.Save();
+                // 父文件保存時會自動 flush 已追蹤的嵌入圖表文件。
                 document.Save(odsPath);
             }
 
@@ -2716,9 +2715,7 @@ public class LibreOfficeInteropTests
 
                 OdfFormulaDocument formulaDoc = doc.CreateEmbeddedDocument<OdfFormulaDocument>("Object 1");
                 formulaDoc.SetIdentifierEquation("x", "y");
-                // CreateEmbeddedDocument 僅在建立當下寫入一次最小骨架內容；後續修改內嵌文件
-                // 必須再次呼叫該內嵌文件自身的 Save，外層 PresentationDocument.Save 不會連動寫入。
-                formulaDoc.Save();
+                // 父文件保存時會自動 flush 已追蹤的嵌入式公式文件；呼叫端仍可手動 Save 以提早寫回。
 
                 OdfSlide slide = doc.AddSlide("投影片 1");
                 slide.AddEmbeddedObject("Object 1", OdfLength.Parse("1cm"), OdfLength.Parse("1cm"), OdfLength.Parse("8cm"), OdfLength.Parse("6cm"));
@@ -2923,10 +2920,10 @@ public class LibreOfficeInteropTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>OdfSaveOptions.PruneUnusedMedia</c> 旗標目前僅為保留供未來自動清理功能使用的設定欄位，
-    /// 儲存管線尚未讀取此選項（詳見 <c>OdfSaveOptions.cs</c> 的 <c>PruneUnusedMedia</c> 屬性說明），
-    /// 故呼叫端必須如本測試一般自行收集目前實際參照的媒體路徑並手動呼叫
-    /// <see cref="OdfPackage.PruneUnusedMedia(IEnumerable{string})"/>。
+    /// 高階 <see cref="OdfDocument"/> 儲存管線會依 <c>OdfSaveOptions.PruneUnusedMedia</c> 自動清理
+    /// 目前 DOM 未再參照的 <c>Pictures/</c> 媒體。此測試仍直接覆蓋
+    /// <see cref="OdfPackage.PruneUnusedMedia(IEnumerable{string})"/> 的低階行為，以驗證呼叫端自行傳入參照清單時
+    /// 只會依該清單移除封裝項目。
     /// </para>
     /// <para>
     /// 重要：此方法僅單純依路徑清單比對移除 ZIP 媒體專案，不會檢查或同步移除 content.xml 中殘留的

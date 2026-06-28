@@ -14,6 +14,23 @@ public sealed class OdfChartDataLabelInfo(
     bool showLegendKey = false)
 {
     /// <summary>
+    /// 依常用預設組合建立資料標籤設定。
+    /// </summary>
+    /// <param name="preset">資料標籤預設組合</param>
+    /// <returns>對應的資料標籤設定</returns>
+    public static OdfChartDataLabelInfo FromPreset(OdfChartDataLabelPreset preset) =>
+        preset switch
+        {
+            OdfChartDataLabelPreset.Value => new(showValue: true),
+            OdfChartDataLabelPreset.Percentage => new(showPercentage: true),
+            OdfChartDataLabelPreset.ValueAndPercentage => new(showValue: true, showPercentage: true),
+            OdfChartDataLabelPreset.ValueAndCategoryName => new(showValue: true, showCategoryName: true),
+            OdfChartDataLabelPreset.PercentageAndCategoryName => new(showPercentage: true, showCategoryName: true),
+            OdfChartDataLabelPreset.Full => new(showValue: true, showPercentage: true, showCategoryName: true, showLegendKey: true),
+            _ => new(),
+        };
+
+    /// <summary>
     /// 取得是否顯示資料數值。
     /// </summary>
     public bool ShowValue { get; } = showValue;

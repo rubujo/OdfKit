@@ -57,7 +57,10 @@ public static partial class OdfLocalizer
         ["ODF2006"] = "Correct the office:body content type to match the MIME type and extension.",
         ["ODF3002"] = "Correct the office:body content type to match the MIME type and extension.",
         ["ODF1000"] = "Verify that the document version matches the selected compliance profile.",
-        ["ODF1001"] = "Verify that the document version matches the selected compliance profile."
+        ["ODF1001"] = "Verify that the document version matches the selected compliance profile.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "The formula could not be parsed: {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "The default evaluator does not support function {0}; preserve the original formula when saving.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Unsupported OpenPGP public key algorithm: {0}. Currently supported: RSA, ElGamal, and ECDH."
     };
 
     private static Dictionary<string, string> CreateZhTwDictionary() => new(StringComparer.Ordinal)
@@ -95,7 +98,10 @@ public static partial class OdfLocalizer
         ["ODF2006"] = "修正 office:body 內的文件種類，使其與 MIME 類型和副檔名一致。",
         ["ODF3002"] = "修正 office:body 內的文件種類，使其與 MIME 類型和副檔名一致。",
         ["ODF1000"] = "確認文件版本與選取的相容性設定檔一致。",
-        ["ODF1001"] = "確認文件版本與選取的相容性設定檔一致。"
+        ["ODF1001"] = "確認文件版本與選取的相容性設定檔一致。",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "公式無法剖析：{0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "預設評估器尚未支援函式 {0}，保存時應保留原公式。",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "不支援的 OpenPGP 公鑰演算法：{0}。目前支援 RSA、ElGamal 與 ECDH。"
     };
 
     private static Dictionary<string, string> CreateDeDictionary() => new(StringComparer.Ordinal)
@@ -107,7 +113,10 @@ public static partial class OdfLocalizer
         ["DisallowMacroByDefault"] = "Entfernen Sie Makros, Skripte und Ereignis-Listener oder verwenden Sie eine andere Richtlinie.",
         ["RequireSafeExternalResourcePolicy"] = "Verwenden Sie eingebettete Ressourcen oder überprüfen Sie externe Links.",
         ["ODF0001"] = "Fügen Sie einen gültigen Mimetype-Eintrag hinzu.",
-        ["ODF0100"] = "Fügen Sie META-INF/manifest.xml hinzu und beschreiben Sie den Paketinhalt."
+        ["ODF0100"] = "Fügen Sie META-INF/manifest.xml hinzu und beschreiben Sie den Paketinhalt.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "Die Formel konnte nicht analysiert werden: {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "Der Standardauswerter unterstützt Funktion {0} nicht; beim Speichern die ursprüngliche Formel beibehalten.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Nicht unterstützter OpenPGP-Algorithmus für öffentliche Schlüssel: {0}. Derzeit unterstützt: RSA, ElGamal und ECDH."
     };
 
     private static Dictionary<string, string> CreateFrDictionary() => new(StringComparer.Ordinal)
@@ -118,7 +127,10 @@ public static partial class OdfLocalizer
         ["DisallowMacroByDefault"] = "Supprimez les macros, scripts et écouteurs d'événements, ou modifiez la politique de sécurité.",
         ["RequireSafeExternalResourcePolicy"] = "Utilisez des ressources intégrées ou validez les références externes.",
         ["ODF0001"] = "Ajoutez une entrée mimetype valide.",
-        ["ODF0100"] = "Ajoutez META-INF/manifest.xml et décrivez le contenu du paquet."
+        ["ODF0100"] = "Ajoutez META-INF/manifest.xml et décrivez le contenu du paquet.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "La formule n'a pas pu être analysée : {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "L'évaluateur par défaut ne prend pas en charge la fonction {0}; conservez la formule d'origine lors de l'enregistrement.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Algorithme de clé publique OpenPGP non pris en charge : {0}. Actuellement pris en charge : RSA, ElGamal et ECDH."
     };
 
     private static Dictionary<string, string> CreateNlDictionary() => new(StringComparer.Ordinal)
@@ -128,7 +140,10 @@ public static partial class OdfLocalizer
         ["RequireOpenStandardDocumentFormat"] = "Zorg ervoor dat bewerkbare documenten gebaseerd blijven op open standaarden.",
         ["DisallowMacroByDefault"] = "Verwijder macro's, scripts en gebeurtenis-listeners, of pas het beleid aan.",
         ["ODF0001"] = "Voeg een geldige mimetype-vermelding toe.",
-        ["ODF0100"] = "Voeg META-INF/manifest.xml toe en beschrijf de pakketinhoud."
+        ["ODF0100"] = "Voeg META-INF/manifest.xml toe en beschrijf de pakketinhoud.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "De formule kon niet worden geparseerd: {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "De standaardevaluator ondersteunt functie {0} niet; behoud de oorspronkelijke formule bij opslaan.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Niet-ondersteund OpenPGP-algoritme voor openbare sleutels: {0}. Momenteel ondersteund: RSA, ElGamal en ECDH."
     };
 
     private static Dictionary<string, string> CreateNbDictionary() => new(StringComparer.Ordinal)
@@ -138,7 +153,10 @@ public static partial class OdfLocalizer
         ["DisallowMacroByDefault"] = "Fjern makroer, skripter og hendelseslyttere, eller endre sikkerhetspolicyen.",
         ["RequireSafeExternalResourcePolicy"] = "Bruk innebygde ressurser eller verifiser eksterne referanser.",
         ["ODF0001"] = "Legg til en gyldig mimetype-oppføring.",
-        ["ODF0100"] = "Legg til META-INF/manifest.xml og beskriv pakkeinnholdet."
+        ["ODF0100"] = "Legg til META-INF/manifest.xml og beskriv pakkeinnholdet.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "Formelen kunne ikke analyseres: {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "Standard-evaluatoren støtter ikke funksjonen {0}; behold den opprinnelige formelen ved lagring.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Ustøttet OpenPGP-algoritme for offentlig nøkkel: {0}. Støttes nå: RSA, ElGamal og ECDH."
     };
 
     private static Dictionary<string, string> CreatePtDictionary() => new(StringComparer.Ordinal)
@@ -148,7 +166,10 @@ public static partial class OdfLocalizer
         ["RequireForeignExtensionIsolation"] = "Coloque as extensões em namespaces não-ODF e garanta que sejam removíveis.",
         ["DisallowMacroByDefault"] = "Remova macros, scripts e ouvintes de eventos, ou altere a política de segurança.",
         ["ODF0001"] = "Adicione uma entrada mimetype válida.",
-        ["ODF0100"] = "Adicione META-INF/manifest.xml e descreva o conteúdo do pacote."
+        ["ODF0100"] = "Adicione META-INF/manifest.xml e descreva o conteúdo do pacote.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "A fórmula não pôde ser analisada: {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "O avaliador padrão não oferece suporte à função {0}; preserve a fórmula original ao salvar.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Algoritmo de chave pública OpenPGP não suportado: {0}. Atualmente suportado: RSA, ElGamal e ECDH."
     };
 
     private static Dictionary<string, string> CreateItDictionary() => new(StringComparer.Ordinal)
@@ -157,7 +178,10 @@ public static partial class OdfLocalizer
         ["RequireAccessibilityMetadata"] = "Aggiungi testo alternativo (svg:title o svg:desc) per le immagini, o intestazioni per le tabelle.",
         ["DisallowMacroByDefault"] = "Rimuovi macro, script e listener di eventi, o modifica la politica di sicurezza.",
         ["ODF0001"] = "Aggiungi una voce mimetype valida.",
-        ["ODF0100"] = "Aggiungi META-INF/manifest.xml e descrivi il contenuto del pacchetto."
+        ["ODF0100"] = "Aggiungi META-INF/manifest.xml e descrivi il contenuto del pacchetto.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "Impossibile analizzare la formula: {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "Il valutatore predefinito non supporta la funzione {0}; mantenere la formula originale durante il salvataggio.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Algoritmo di chiave pubblica OpenPGP non supportato: {0}. Attualmente supportati: RSA, ElGamal ed ECDH."
     };
 
     private static Dictionary<string, string> CreateSkDictionary() => new(StringComparer.Ordinal)
@@ -166,7 +190,10 @@ public static partial class OdfLocalizer
         ["RequireAccessibilityMetadata"] = "Pridajte alternatívny text (svg:title alebo svg:desc) pre obrázky, alebo hlavičky pre tabuľky.",
         ["DisallowMacroByDefault"] = "Odstráňte makrá, skripty a poslucháče udalostí, alebo zmeňte bezpečnostnú politiku.",
         ["ODF0001"] = "Pridajte platný záznam mimetype.",
-        ["ODF0100"] = "Pridajte META-INF/manifest.xml a popíšte obsah balíka."
+        ["ODF0100"] = "Pridajte META-INF/manifest.xml a popíšte obsah balíka.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "Vzorec sa nepodarilo analyzovať: {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "Predvolený vyhodnocovač nepodporuje funkciu {0}; pri ukladaní zachovajte pôvodný vzorec.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Nepodporovaný algoritmus verejného kľúča OpenPGP: {0}. Aktuálne podporované: RSA, ElGamal a ECDH."
     };
 
     private static Dictionary<string, string> CreateDaDictionary() => new(StringComparer.Ordinal)
@@ -175,7 +202,10 @@ public static partial class OdfLocalizer
         ["RequireAccessibilityMetadata"] = "Tilføj alternativ tekst (svg:title eller svg:desc) for billeder, eller tabeloverskrifter for tabeller.",
         ["DisallowMacroByDefault"] = "Fjern makroer, scripts og hændelseslyttere, eller skift sikkerhedspolitik.",
         ["ODF0001"] = "Tilføj en gyldig mimetype-indgang.",
-        ["ODF0100"] = "Tilføj META-INF/manifest.xml og beskriv pakkeindholdet."
+        ["ODF0100"] = "Tilføj META-INF/manifest.xml og beskriv pakkeindholdet.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "Formlen kunne ikke parses: {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "Standard-evaluatoren understøtter ikke funktionen {0}; bevar den oprindelige formel ved lagring.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Ikke-understøttet OpenPGP-algoritme for offentlig nøgle: {0}. Understøttes aktuelt: RSA, ElGamal og ECDH."
     };
 
     private static Dictionary<string, string> CreateMsDictionary() => new(StringComparer.Ordinal)
@@ -184,7 +214,10 @@ public static partial class OdfLocalizer
         ["RequireAccessibilityMetadata"] = "Tambah teks alternatif (svg:title atau svg:desc) untuk imej, atau baris pengepala untuk jadual.",
         ["DisallowMacroByDefault"] = "Buang makro, skrip dan pendengar peristiwa, atau tukar dasar keselamatan.",
         ["ODF0001"] = "Tambah entri mimetype yang sah.",
-        ["ODF0100"] = "Tambah META-INF/manifest.xml dan terangkan kandungan pakej."
+        ["ODF0100"] = "Tambah META-INF/manifest.xml dan terangkan kandungan pakej.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "Formula tidak dapat dihuraikan: {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "Penilai lalai tidak menyokong fungsi {0}; kekalkan formula asal semasa menyimpan.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "Algoritma kunci awam OpenPGP tidak disokong: {0}. Disokong sekarang: RSA, ElGamal dan ECDH."
     };
 
     private static Dictionary<string, string> CreateKoDictionary() => new(StringComparer.Ordinal)
@@ -193,6 +226,9 @@ public static partial class OdfLocalizer
         ["RequireAccessibilityMetadata"] = "이미지에 대체 텍스트(svg:title 또는 svg:desc)를 추가하거나 테이블에 헤더 행을 추가하십시오.",
         ["DisallowMacroByDefault"] = "매크로, 스크립트 및 이벤트 리스너를 제거하거나 매크로를 허용하는 정책으로 변경하십시오.",
         ["ODF0001"] = "올바른 mimetype 엔트리를 추가하십시오.",
-        ["ODF0100"] = "META-INF/manifest.xml을 추가하고 패키지 콘텐츠를 설명하십시오."
+        ["ODF0100"] = "META-INF/manifest.xml을 추가하고 패키지 콘텐츠를 설명하십시오.",
+        ["Diag_OdfFormulaSupport_ParseFailed"] = "수식을 구문 분석할 수 없습니다: {0}",
+        ["Diag_OdfFormulaSupport_UnsupportedFunction"] = "기본 평가기는 {0} 함수를 지원하지 않습니다. 저장할 때 원래 수식을 유지하세요.",
+        ["Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm"] = "지원되지 않는 OpenPGP 공개 키 알고리즘: {0}. 현재 지원: RSA, ElGamal 및 ECDH."
     };
 }

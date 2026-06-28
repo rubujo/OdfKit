@@ -48,9 +48,39 @@ pwsh eng/Pack-NuGet.ps1 -Configuration Release
 
 ## 5. 消費端：自 Release 安裝套件
 
+下載 Release 資產後，先將 `.nupkg` 與 `.snupkg` 放在固定資料夾，例如
+`C:\packages\odfkit`。本機開發可以用具名 package source：
+
 ```powershell
-dotnet nuget add source C:\path\to\downloaded-packages --name odfkit-github-release
+dotnet nuget add source C:\packages\odfkit --name odfkit-github-release
 dotnet add package OdfKit --version 0.0.1 --source odfkit-github-release
+```
+
+若團隊希望 repo 內可重現 restore，建議提交 `nuget.config` 範本並以相對路徑指向
+CI 下載或快取的 Release 套件資料夾：
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="odfkit-github-release" value="./.nuget/odfkit" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+  </packageSources>
+</configuration>
+```
+
+CI 可先下載 GitHub Release 資產到 `.nuget/odfkit`，再執行 restore：
+
+```powershell
+dotnet restore --configfile nuget.config
+dotnet build --no-restore
+```
+
+若不想提交 `nuget.config`，也可以在 CI 以 MSBuild 屬性臨時加入來源：
+
+```powershell
+dotnet restore -p:RestoreAdditionalProjectSources="$PWD/.nuget/odfkit"
 ```
 
 多數情境仍建議直接以原始碼 `ProjectReference` 整合。

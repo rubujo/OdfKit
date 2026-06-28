@@ -1,0 +1,29 @@
+{
+  "fixtures": [
+    {
+      "id": "repo-generated-tdf-subset-envelope",
+      "path": "tdf-subset-envelope.json",
+      "source": "generated",
+      "sourceUri": "https://github.com/tdf/odftoolkit/blob/master/src/site/site/content/odftoolkit_website/odfdom/operations/operations.mdtext",
+      "license": "generated-no-copyright",
+      "wireShape": "tdf-changes-envelope",
+      "expectedOperations": [
+        "documentLayout",
+        "addStyle",
+        "addParagraph",
+        "addText",
+        "delete",
+        "splitParagraph",
+        "mergeParagraph",
+        "addLineBreak",
+        "format",
+        "addListStyle",
+        "addTable",
+        "addRows",
+        "addCells"
+      ],
+      "sha256": "74610cc5bef5e9803aea1db7f38eed0da596935cacaf8450f1936636007aa25e",
+      "notes": "Small clean-room JSON Collaboration fixture covering the TDF changes envelope, metadata-only operations, range inline formatting with foreground/background color and text casing, line breaks, single-paragraph delete/split/merge, list paragraphs, and simple tables."
+    }
+  ]
+}

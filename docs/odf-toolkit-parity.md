@@ -92,6 +92,9 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate sample.odt
   指向本機資料夾。
 - 外部 corpus 可從 `docs/examples/external-corpus/manifest.json` 複製範本開始，
   並以 `docs/examples/external-corpus/baseline-exceptions.json` 記錄暫時分類差異。
+- ODFDOM 官方 sample parity 可從 `docs/examples/odfdom-sample-corpus/manifest.json`
+  複製範本開始；此範本要求 `sourceUri`、授權審核狀態、expected classification、
+  round-trip 策略與 `sha256` 欄位格式先通過 metadata gate。
 - 每個 fixture 都要記錄來源、授權、預期 valid / invalid、ODF 版本、
   profile 與 round-trip 預期。
 - Corpus manifest 會拒絕重複 `id` / `path`、未知 `roundTrip` 策略與逃出 corpus root 的路徑。
@@ -105,6 +108,9 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus tes
 .\eng\Test-OdfCorpus.ps1
 
 .\eng\Initialize-OdfExternalCorpus.ps1 -OutputRoot D:\Corpus\OdfKit
+
+.\eng\Initialize-OdfExternalCorpus.ps1 -OutputRoot D:\Corpus\OdfKitOdfDom `
+  -Template odfdom-sample-corpus
 
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus manifest.json `
   --root $env:ODFKIT_PARITY_CORPUS_ROOT `

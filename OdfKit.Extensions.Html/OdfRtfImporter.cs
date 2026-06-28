@@ -67,8 +67,10 @@ public static class OdfRtfImporter
         private OdfTextRun? _lastRun;
         private List<CellInfo>? _currentTableRow;
         private StringBuilder? _tableCellBuffer;
+        private string? _pendingFootnoteCitation;
         private string? _pendingAnnotationAuthor;
         private string? _pendingAnnotationId;
+        private readonly List<string> _activeAnnotationRangeNames = [];
         private string? _paragraphTextAlign;
         private string? _paragraphMarginLeft;
         private string? _paragraphMarginRight;
@@ -77,6 +79,7 @@ public static class OdfRtfImporter
         private string? _paragraphTextIndent;
         private string? _paragraphLineHeight;
         private bool _inTableCell;
+        private int _footnoteCounter;
         private int _unicodeFallbackLength = 1;
         private InlineStyle _style;
 
@@ -116,7 +119,7 @@ public static class OdfRtfImporter
                     if (StartsGroup(i, "field"))
                     {
                         FlushText();
-                        ReadHyperlinkGroup(i);
+                        ReadFieldGroup(i);
                         i = FindGroupEnd(i) + 1;
                         continue;
                     }
@@ -322,8 +325,14 @@ public static class OdfRtfImporter
                     _unicodeFallbackLength = Math.Max(0, number ?? 1);
                     break;
                 case "page":
-                    EnsureParagraph().AddSoftPageBreak();
-                    _lastRun = null;
+                    AppendSoftPageBreak();
+                    break;
+                case "softpage":
+                    AppendSoftPageBreak();
+                    break;
+                case "sect":
+                case "column":
+                    AppendSoftPageBreak();
                     break;
                 case "trowd":
                     StartTableRow();
@@ -346,26 +355,36 @@ public static class OdfRtfImporter
                 case "atnstart":
                     if (number.HasValue)
                     {
+                        string rangeName = "comment-" + number.Value;
                         var startNode = new OdfNode(OdfNodeType.Element, "annotation-start", OdfNamespaces.Office, "office");
-                        startNode.SetAttribute("name", OdfNamespaces.Office, "comment-" + number.Value, "office");
+                        startNode.SetAttribute("name", OdfNamespaces.Office, rangeName, "office");
                         EnsureParagraph().Node.AppendChild(startNode);
+                        _activeAnnotationRangeNames.Add(rangeName);
                     }
                     break;
                 case "atnend":
                     if (number.HasValue)
                     {
+                        string rangeName = "comment-" + number.Value;
                         var endNode = new OdfNode(OdfNodeType.Element, "annotation-end", OdfNamespaces.Office, "office");
-                        endNode.SetAttribute("name", OdfNamespaces.Office, "comment-" + number.Value, "office");
+                        endNode.SetAttribute("name", OdfNamespaces.Office, rangeName, "office");
                         EnsureParagraph().Node.AppendChild(endNode);
+                        RemoveActiveAnnotationRangeName(rangeName);
                     }
                     break;
                 case "trautofit":
                     break;
                 case "line":
-                    _textBuffer.Append('\n');
+                    AppendLineBreak();
+                    break;
+                case "softline":
+                    AppendLineBreak();
                     break;
                 case "tab":
-                    _textBuffer.Append('\t');
+                    AppendTab();
+                    break;
+                case "chftn":
+                    AppendCurrentFootnoteCitation();
                     break;
                 case "bullet":
                     _textBuffer.Append("•");
@@ -396,6 +415,12 @@ public static class OdfRtfImporter
                     break;
                 case "rdblquote":
                     _textBuffer.Append('\u201D');
+                    break;
+                case "zwbo":
+                    _textBuffer.Append('\u200B');
+                    break;
+                case "zwnbo":
+                    _textBuffer.Append('\uFEFF');
                     break;
                 case "plain":
                     _style = InlineStyle.Empty;
@@ -430,6 +455,15 @@ public static class OdfRtfImporter
                 case "cf":
                     _style = _style with { Color = ReadColor(number) };
                     break;
+                case "highlight":
+                    _style = _style with { BackgroundColor = ReadColor(number) };
+                    break;
+                case "caps":
+                    _style = _style with { TextTransform = number == 0 ? null : "uppercase" };
+                    break;
+                case "scaps":
+                    _style = _style with { FontVariant = number == 0 ? null : "small-caps" };
+                    break;
             }
         }
 
@@ -458,6 +492,42 @@ public static class OdfRtfImporter
 
             AppendParagraphText(_textBuffer.ToString(), _style);
             _textBuffer.Clear();
+        }
+
+        private void AppendLineBreak()
+        {
+            if (_inTableCell || _tableCellBuffer is not null)
+            {
+                _textBuffer.Append('\n');
+                return;
+            }
+
+            EnsureParagraph().AddLineBreak();
+            _lastRun = null;
+        }
+
+        private void AppendSoftPageBreak()
+        {
+            if (_inTableCell || _tableCellBuffer is not null)
+            {
+                _textBuffer.Append('\n');
+                return;
+            }
+
+            EnsureParagraph().AddSoftPageBreak();
+            _lastRun = null;
+        }
+
+        private void AppendTab()
+        {
+            if (_inTableCell || _tableCellBuffer is not null)
+            {
+                _textBuffer.Append('\t');
+                return;
+            }
+
+            EnsureParagraph().AddTab();
+            _lastRun = null;
         }
 
         private void AppendParagraphText(string text, InlineStyle style)
@@ -864,6 +934,21 @@ public static class OdfRtfImporter
             {
                 run.Color = style.Color;
             }
+
+            if (!string.IsNullOrWhiteSpace(style.BackgroundColor))
+            {
+                run.BackgroundColor = style.BackgroundColor;
+            }
+
+            if (!string.IsNullOrWhiteSpace(style.TextTransform))
+            {
+                run.TextTransform = style.TextTransform;
+            }
+
+            if (!string.IsNullOrWhiteSpace(style.FontVariant))
+            {
+                run.FontVariant = style.FontVariant;
+            }
         }
 
         private void ReadFootnoteGroup(int groupStart)
@@ -874,12 +959,47 @@ public static class OdfRtfImporter
                 return;
             }
 
+            bool usesCurrentMarker = FootnoteGroupStartsWithCurrentMarker(groupStart);
             int split = text.IndexOf(' ');
-            string citation = split > 0 ? text.Substring(0, split) : text;
-            string body = split > 0 ? text.Substring(split + 1) : string.Empty;
+            string citation = _pendingFootnoteCitation ??
+                (usesCurrentMarker ? GetNextFootnoteCitation() : split > 0 ? text.Substring(0, split) : text);
+            string body = _pendingFootnoteCitation is not null || usesCurrentMarker
+                ? text
+                : split > 0 ? text.Substring(split + 1) : string.Empty;
             RemoveCitationSuffix(citation);
             EnsureParagraph().AddFootnote(citation, body);
+            _pendingFootnoteCitation = null;
             _lastRun = null;
+        }
+
+        private void AppendCurrentFootnoteCitation()
+        {
+            string citation = GetNextFootnoteCitation();
+            _textBuffer.Append(citation);
+            _pendingFootnoteCitation = citation;
+        }
+
+        private string GetNextFootnoteCitation()
+        {
+            _footnoteCounter++;
+            return _footnoteCounter.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private bool FootnoteGroupStartsWithCurrentMarker(int groupStart)
+        {
+            int groupEnd = FindGroupEnd(groupStart);
+            int start = groupStart + 1;
+            if (start < groupEnd && _rtf[start] == '\\')
+            {
+                start = ReadSkippedControl(start);
+            }
+
+            while (start < groupEnd && char.IsWhiteSpace(_rtf[start]))
+            {
+                start++;
+            }
+
+            return start < groupEnd && StartsWith(start, "\\chftn");
         }
 
         private void RemoveCitationSuffix(string citation)
@@ -894,16 +1014,214 @@ public static class OdfRtfImporter
             _lastRun.Text = _lastRun.Text.Substring(0, _lastRun.Text.Length - citation.Length);
         }
 
-        private void ReadHyperlinkGroup(int groupStart)
+        private void ReadFieldGroup(int groupStart)
         {
             int groupEnd = FindGroupEnd(groupStart);
             string group = _rtf.Substring(groupStart, groupEnd - groupStart + 1);
-            string? url = ReadHyperlinkUrl(group);
-            string? result = ReadFieldResult(group);
+            string? instruction = ReadFieldDestination(group, "fldinst");
+            string? result = ReadFieldDestination(group, "fldrslt");
+            string? url = ReadHyperlinkUrl(instruction);
             if (!string.IsNullOrWhiteSpace(url) && !string.IsNullOrEmpty(result))
             {
                 EnsureParagraph().AddHyperlink(url!, result!);
+                _lastRun = null;
+                return;
             }
+
+            if (!string.IsNullOrEmpty(result) && TryAppendSemanticField(instruction, result!))
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                _textBuffer.Append(result);
+                FlushText();
+            }
+        }
+
+        private bool TryAppendSemanticField(string? instruction, string result)
+        {
+            List<string> tokens = ReadFieldInstructionTokens(instruction);
+            if (tokens.Count == 0)
+            {
+                return false;
+            }
+
+            string fieldName = tokens[0].ToUpperInvariant();
+            return fieldName switch
+            {
+                "PAGE" => AppendSimpleTextField("page-number", result),
+                "NUMPAGES" => AppendSimpleTextField("page-count", result),
+                "DATE" => AppendSimpleTextField("date", result),
+                "TIME" => AppendSimpleTextField("time", result),
+                "AUTHOR" => AppendSimpleTextField("author-name", result),
+                "TITLE" => AppendSimpleTextField("title", result),
+                "SUBJECT" => AppendSimpleTextField("subject", result),
+                "DOCPROPERTY" => AppendDocumentPropertyField(ReadFirstFieldArgument(tokens), result),
+                "MERGEFIELD" => AppendPlaceholderField(ReadFirstFieldArgument(tokens), result),
+                "SEQ" => AppendSequenceField(ReadFirstFieldArgument(tokens), result),
+                "PAGEREF" => AppendReferenceTextField(
+                    "bookmark-ref",
+                    ReadFirstFieldArgument(tokens),
+                    HasFieldSwitch(tokens, "\\p") ? "direction" : "page",
+                    result),
+                "REF" => AppendReferenceTextField(
+                    "reference-ref",
+                    ReadFirstFieldArgument(tokens),
+                    HasFieldSwitch(tokens, "\\p") ? "direction" : "text",
+                    result),
+                _ => false,
+            };
+        }
+
+        private bool AppendSimpleTextField(string localName, string result)
+        {
+            OdfNode field = OdfNodeFactory.CreateElement(localName, OdfNamespaces.Text, "text");
+            field.TextContent = result;
+            EnsureParagraph().Node.AppendChild(field);
+            _lastRun = null;
+            return true;
+        }
+
+        private bool AppendDocumentPropertyField(string? propertyName, string result)
+        {
+            string? localName = ResolveDocumentPropertyFieldLocalName(propertyName);
+            return localName is not null && AppendSimpleTextField(localName, result);
+        }
+
+        private bool AppendSequenceField(string? sequenceName, string result)
+        {
+            if (string.IsNullOrWhiteSpace(sequenceName))
+            {
+                return false;
+            }
+
+            OdfNode field = OdfNodeFactory.CreateElement("sequence", OdfNamespaces.Text, "text");
+            field.SetAttribute("name", OdfNamespaces.Text, sequenceName!, "text");
+            field.SetAttribute("num-format", OdfNamespaces.Style, "1", "style");
+            field.TextContent = result;
+            EnsureParagraph().Node.AppendChild(field);
+            _lastRun = null;
+            return true;
+        }
+
+        private static string? ResolveDocumentPropertyFieldLocalName(string? propertyName)
+        {
+            if (string.IsNullOrWhiteSpace(propertyName))
+            {
+                return null;
+            }
+
+            return propertyName!.ToUpperInvariant() switch
+            {
+                "AUTHOR" or "CREATOR" => "author-name",
+                "TITLE" => "title",
+                "SUBJECT" => "subject",
+                _ => null,
+            };
+        }
+
+        private bool AppendPlaceholderField(string? placeholderName, string result)
+        {
+            if (string.IsNullOrWhiteSpace(placeholderName))
+            {
+                return false;
+            }
+
+            OdfNode field = OdfNodeFactory.CreateElement("placeholder", OdfNamespaces.Text, "text");
+            field.SetAttribute("description", OdfNamespaces.Text, placeholderName!, "text");
+            field.SetAttribute("placeholder-type", OdfNamespaces.Text, "text", "text");
+            field.TextContent = result;
+            EnsureParagraph().Node.AppendChild(field);
+            _lastRun = null;
+            return true;
+        }
+
+        private bool AppendReferenceTextField(string localName, string? referenceName, string referenceFormat, string result)
+        {
+            if (string.IsNullOrWhiteSpace(referenceName))
+            {
+                return false;
+            }
+
+            OdfNode field = OdfNodeFactory.CreateElement(localName, OdfNamespaces.Text, "text");
+            field.SetAttribute("ref-name", OdfNamespaces.Text, referenceName!, "text");
+            field.SetAttribute("reference-format", OdfNamespaces.Text, referenceFormat, "text");
+            field.TextContent = result;
+            EnsureParagraph().Node.AppendChild(field);
+            _lastRun = null;
+            return true;
+        }
+
+        private static string? ReadFirstFieldArgument(IReadOnlyList<string> tokens)
+        {
+            for (int i = 1; i < tokens.Count; i++)
+            {
+                if (!tokens[i].StartsWith("\\", StringComparison.Ordinal))
+                {
+                    return tokens[i];
+                }
+            }
+
+            return null;
+        }
+
+        private static bool HasFieldSwitch(IReadOnlyList<string> tokens, string fieldSwitch)
+        {
+            for (int i = 1; i < tokens.Count; i++)
+            {
+                if (string.Equals(tokens[i], fieldSwitch, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static List<string> ReadFieldInstructionTokens(string? instruction)
+        {
+            var tokens = new List<string>();
+            if (string.IsNullOrWhiteSpace(instruction))
+            {
+                return tokens;
+            }
+
+            var current = new StringBuilder();
+            string text = instruction!;
+            bool inQuote = false;
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (c == '"')
+                {
+                    inQuote = !inQuote;
+                    continue;
+                }
+
+                if (!inQuote && char.IsWhiteSpace(c))
+                {
+                    AddCurrentFieldInstructionToken(tokens, current);
+                    continue;
+                }
+
+                current.Append(c);
+            }
+
+            AddCurrentFieldInstructionToken(tokens, current);
+            return tokens;
+        }
+
+        private static void AddCurrentFieldInstructionToken(List<string> tokens, StringBuilder current)
+        {
+            if (current.Length == 0)
+            {
+                return;
+            }
+
+            tokens.Add(current.ToString());
+            current.Clear();
         }
 
         private void ReadAnnotationMetadataGroup(int groupStart, string controlWord)
@@ -932,7 +1250,7 @@ public static class OdfRtfImporter
                 return;
             }
 
-            string name = _pendingAnnotationId ?? "comment-1";
+            string name = _pendingAnnotationId ?? GetCurrentAnnotationRangeName() ?? "comment-1";
             if (!name.StartsWith("comment-", StringComparison.Ordinal) && int.TryParse(name, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
             {
                 name = "comment-" + name;
@@ -956,6 +1274,25 @@ public static class OdfRtfImporter
             _pendingAnnotationAuthor = null;
             _pendingAnnotationId = null;
             _lastRun = null;
+        }
+
+        private string? GetCurrentAnnotationRangeName()
+        {
+            return _activeAnnotationRangeNames.Count == 0
+                ? null
+                : _activeAnnotationRangeNames[_activeAnnotationRangeNames.Count - 1];
+        }
+
+        private void RemoveActiveAnnotationRangeName(string name)
+        {
+            for (int i = _activeAnnotationRangeNames.Count - 1; i >= 0; i--)
+            {
+                if (string.Equals(_activeAnnotationRangeNames[i], name, StringComparison.Ordinal))
+                {
+                    _activeAnnotationRangeNames.RemoveAt(i);
+                    return;
+                }
+            }
         }
 
         private static OdfNode? FindChild(OdfNode parent, Func<OdfNode, bool> predicate)
@@ -1224,32 +1561,95 @@ public static class OdfRtfImporter
         private static int HexValue(char c) =>
             c <= '9' ? c - '0' : (c <= 'F' ? c - 'A' : c - 'a') + 10;
 
-        private string? ReadHyperlinkUrl(string group)
+        private string? ReadHyperlinkUrl(string? instruction)
         {
+            if (string.IsNullOrWhiteSpace(instruction))
+            {
+                return null;
+            }
+
+            string fieldInstruction = instruction!;
             const string marker = "HYPERLINK \"";
-            int start = group.IndexOf(marker, StringComparison.Ordinal);
+            int start = fieldInstruction.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
             if (start < 0)
             {
                 return null;
             }
 
             start += marker.Length;
-            int end = group.IndexOf('"', start);
-            return end < 0 ? null : DecodeRtfText(group.Substring(start, end - start));
+            int end = fieldInstruction.IndexOf('"', start);
+            return end < 0 ? null : fieldInstruction.Substring(start, end - start);
         }
 
-        private string? ReadFieldResult(string group)
+        private string? ReadFieldDestination(string group, string controlWord)
         {
-            const string marker = @"{\fldrslt ";
-            int start = group.IndexOf(marker, StringComparison.Ordinal);
-            if (start < 0)
+            for (int i = 0; i < group.Length; i++)
             {
-                return null;
+                if (group[i] != '{')
+                {
+                    continue;
+                }
+
+                int contentStart = ReadFieldDestinationContentStart(group, i, controlWord);
+                if (contentStart < 0)
+                {
+                    continue;
+                }
+
+                int end = FindLocalGroupEnd(group, i);
+                if (end <= contentStart)
+                {
+                    return string.Empty;
+                }
+
+                string content = group.Substring(contentStart, end - contentStart);
+                return string.Equals(controlWord, "fldinst", StringComparison.Ordinal)
+                    ? DecodeRtfText(content, preserveUnknownControls: true)
+                    : DecodeRtfText(content);
             }
 
-            start += marker.Length;
-            int end = FindLocalGroupEnd(group, start - marker.Length);
-            return end <= start ? null : DecodeRtfText(group.Substring(start, end - start));
+            return null;
+        }
+
+        private static int ReadFieldDestinationContentStart(string group, int groupStart, string controlWord)
+        {
+            int pos = groupStart + 1;
+            if (pos < group.Length && group[pos] == '\\')
+            {
+                pos++;
+                if (pos < group.Length && group[pos] == '*')
+                {
+                    pos++;
+                    if (pos < group.Length && group[pos] == '\\')
+                    {
+                        pos++;
+                    }
+                    else
+                    {
+                        return -1;
+                    }
+                }
+
+                if (!StartsWith(group, pos, controlWord))
+                {
+                    return -1;
+                }
+
+                pos += controlWord.Length;
+                while (pos < group.Length && (char.IsDigit(group[pos]) || group[pos] == '-'))
+                {
+                    pos++;
+                }
+
+                if (pos < group.Length && group[pos] == ' ')
+                {
+                    pos++;
+                }
+
+                return pos;
+            }
+
+            return -1;
         }
 
         private static int FindLocalGroupEnd(string value, int groupStart)
@@ -1382,7 +1782,7 @@ public static class OdfRtfImporter
             return DecodeRtfText(_rtf.Substring(start, Math.Max(0, groupEnd - start)));
         }
 
-        private string DecodeRtfText(string value)
+        private string DecodeRtfText(string value, bool preserveUnknownControls = false)
         {
             var sb = new StringBuilder(value.Length);
             int unicodeFallbackLength = 1;
@@ -1427,6 +1827,12 @@ public static class OdfRtfImporter
                     {
                         i = ReadUnicodeEscape(value, i, sb, unicodeFallbackLength);
                     }
+                    else if (preserveUnknownControls)
+                    {
+                        int next = ReadUnknownControlEnd(value, i);
+                        sb.Append(value, i, next - i);
+                        i = next;
+                    }
                     else
                     {
                         i = SkipControl(value, i);
@@ -1444,6 +1850,32 @@ public static class OdfRtfImporter
             }
 
             return sb.ToString();
+        }
+
+        private static int ReadUnknownControlEnd(string value, int index)
+        {
+            int pos = index + 1;
+            while (pos < value.Length && char.IsLetter(value[pos]))
+            {
+                pos++;
+            }
+
+            if (pos < value.Length && value[pos] == '-')
+            {
+                pos++;
+            }
+
+            while (pos < value.Length && char.IsDigit(value[pos]))
+            {
+                pos++;
+            }
+
+            if (pos < value.Length && value[pos] == ' ')
+            {
+                pos++;
+            }
+
+            return pos;
         }
 
         private static bool TryAppendSimpleTextControl(string value, int index, StringBuilder sb, out int nextIndex)
@@ -1474,6 +1906,8 @@ public static class OdfRtfImporter
             ("\\rquote", '\u2019'),
             ("\\ldblquote", '\u201C'),
             ("\\rdblquote", '\u201D'),
+            ("\\zwbo", '\u200B'),
+            ("\\zwnbo", '\uFEFF'),
         ];
 
         private static int ReadUnicodeEscape(string value, int index, StringBuilder sb, int fallbackLength)
@@ -1785,7 +2219,10 @@ public static class OdfRtfImporter
         bool Strikethrough = false,
         string? TextPosition = null,
         string? FontSize = null,
-        string? Color = null)
+        string? Color = null,
+        string? BackgroundColor = null,
+        string? TextTransform = null,
+        string? FontVariant = null)
     {
         public static InlineStyle Empty { get; } = new();
     }

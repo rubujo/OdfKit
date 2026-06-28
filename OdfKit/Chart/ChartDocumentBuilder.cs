@@ -1,5 +1,6 @@
 ﻿using System;
 using OdfKit.Spreadsheet;
+using OdfKit.Styles;
 
 namespace OdfKit.Chart;
 
@@ -9,6 +10,7 @@ namespace OdfKit.Chart;
 public sealed class ChartDocumentBuilder
 {
     private readonly ChartDocument _document;
+    private OdfStyleSet? _styles;
 
     internal ChartDocumentBuilder(ChartDocument document)
     {
@@ -47,6 +49,35 @@ public sealed class ChartDocumentBuilder
     }
 
     /// <summary>
+    /// 設定此 builder 後續建立圖表序列會套用的樣式集合。
+    /// </summary>
+    /// <param name="styles">樣式集合</param>
+    /// <returns>目前 builder</returns>
+    public ChartDocumentBuilder WithStyles(OdfStyleSet styles)
+    {
+        _styles = styles ?? throw new ArgumentNullException(nameof(styles));
+        ApplyStyleSetToAllSeries();
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此 builder 後續建立圖表序列會套用的樣式集合。
+    /// </summary>
+    /// <param name="configure">樣式集合設定委派</param>
+    /// <returns>目前 builder</returns>
+    public ChartDocumentBuilder WithStyles(Action<OdfStyleSet> configure)
+    {
+        if (configure is null)
+        {
+            throw new ArgumentNullException(nameof(configure));
+        }
+
+        var styles = new OdfStyleSet();
+        configure(styles);
+        return WithStyles(styles);
+    }
+
+    /// <summary>
     /// 設定圖表資料範圍。
     /// </summary>
     /// <param name="sheetName">工作表名稱</param>
@@ -61,6 +92,7 @@ public sealed class ChartDocumentBuilder
         bool firstColumnAsLabel = true)
     {
         _document.SetDataRange(sheetName, range, firstRowAsHeader, firstColumnAsLabel);
+        ApplyStyleSetToAllSeries();
         return this;
     }
 
@@ -107,7 +139,9 @@ public sealed class ChartDocumentBuilder
             throw new ArgumentNullException(nameof(configure));
         }
 
-        configure(new ChartSeriesBuilder(_document.GetSeriesEditor(index)));
+        OdfChartSeries series = _document.GetSeriesEditor(index);
+        ApplyStyleSetToSeries(series, index);
+        configure(new ChartSeriesBuilder(series));
         return this;
     }
 
@@ -116,6 +150,29 @@ public sealed class ChartDocumentBuilder
     /// </summary>
     /// <returns>建構完成的 <see cref="ChartDocument"/></returns>
     public ChartDocument Build() => _document;
+
+    private void ApplyStyleSetToAllSeries()
+    {
+        if (_styles is null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < _document.SeriesCount; i++)
+        {
+            ApplyStyleSetToSeries(_document.GetSeriesEditor(i), i);
+        }
+    }
+
+    private void ApplyStyleSetToSeries(OdfChartSeries series, int index)
+    {
+        if (_styles is null)
+        {
+            return;
+        }
+
+        series.Style.FillColor = _styles.GetChartPaletteColor(index);
+    }
 }
 
 /// <summary>
@@ -202,6 +259,28 @@ public sealed class ChartSeriesBuilder
         }
 
         configure(_series.Style);
+        return this;
+    }
+
+    /// <summary>
+    /// 依常用預設組合設定序列資料標籤。
+    /// </summary>
+    /// <param name="preset">資料標籤預設組合；<see cref="OdfChartDataLabelPreset.None"/> 表示移除既有設定</param>
+    /// <returns>目前 builder</returns>
+    public ChartSeriesBuilder WithDataLabels(OdfChartDataLabelPreset preset)
+    {
+        _series.SetDataLabelPreset(preset);
+        return this;
+    }
+
+    /// <summary>
+    /// 設定序列資料標籤。
+    /// </summary>
+    /// <param name="info">資料標籤設定；傳入 <see langword="null"/> 表示移除既有設定</param>
+    /// <returns>目前 builder</returns>
+    public ChartSeriesBuilder WithDataLabels(OdfChartDataLabelInfo? info)
+    {
+        _series.SetDataLabels(info);
         return this;
     }
 

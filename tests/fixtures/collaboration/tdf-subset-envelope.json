@@ -1,0 +1,32 @@
+{
+  "changes": [
+    { "name": "documentLayout", "start": [0], "attrs": { "view": "text" } },
+    { "name": "addStyle", "attrs": { "styleId": "Heading_20_1", "family": "paragraph" } },
+    { "name": "addParagraph", "start": [0], "attrs": { "styleId": "Heading_20_1" } },
+    { "name": "addText", "start": [0, 0], "text": "\u5354\u4F5C\u8349\u7A3F" },
+    { "name": "delete", "start": [0, 2], "end": [0, 4] },
+    { "name": "splitParagraph", "start": [0, 1] },
+    { "name": "mergeParagraph", "start": [0, 1] },
+    { "name": "addText", "start": [0, 2], "text": "\u8349\u7A3F\u6BB5\u843D" },
+    {
+      "name": "format",
+      "start": [0, 4],
+      "end": [0, 6],
+      "attrs": {
+        "bold": true,
+        "color": "#0066CC",
+        "backgroundColor": "#FFF2CC",
+        "textTransform": "uppercase",
+        "fontVariant": "small-caps"
+      }
+    },
+    { "name": "addLineBreak", "start": [0, 6] },
+    { "name": "addListStyle", "attrs": { "styleId": "BulletList" } },
+    { "name": "addParagraph", "start": [1], "attrs": { "listStyleName": "BulletList", "listLevel": 1 } },
+    { "name": "addText", "start": [1, 0], "text": "\u6E05\u55AE" },
+    { "name": "addTable", "attrs": { "tableName": "Metrics", "rows": 2, "columns": 2 } },
+    { "name": "addCells", "attrs": { "values": [ "Name", "Value" ] } },
+    { "name": "addRows", "attrs": { "row": 1 } },
+    { "name": "addCells", "attrs": { "values": [ "Revenue", "42" ] } }
+  ]
+}

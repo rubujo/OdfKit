@@ -27,13 +27,23 @@ public static class OdtOperationsExporter
     /// <param name="document">來源文字文件</param>
     /// <returns>JSON operations 陣列</returns>
     /// <exception cref="ArgumentNullException">當 <paramref name="document"/> 為 null 時擲出</exception>
-    public static string ExportToJson(TextDocument document)
+    public static string ExportToJson(TextDocument document) => ExportToJson(document, null);
+
+    /// <summary>
+    /// 將文字文件本文匯出為 JSON operations 字串。
+    /// </summary>
+    /// <param name="document">來源文字文件</param>
+    /// <param name="options">ODF Toolkit 相容選項；若為 <see langword="null"/>，則使用裸陣列輸出</param>
+    /// <returns>JSON operations 或 TDF changes 封包</returns>
+    /// <exception cref="ArgumentNullException">當 <paramref name="document"/> 為 null 時擲出</exception>
+    public static string ExportToJson(TextDocument document, OdtOperationCompatibilityOptions? options)
     {
         if (document is null)
         {
             throw new ArgumentNullException(nameof(document));
         }
 
+        options ??= new OdtOperationCompatibilityOptions();
         List<OdtOperation> operations = [];
         int bodyIndex = 0;
 
@@ -57,6 +67,11 @@ public static class OdtOperationsExporter
                 AppendTextOperations(child, bodyIndex, ref characterIndex, operations);
                 bodyIndex++;
             }
+        }
+
+        if (options.EnvelopeMode == OdtOperationEnvelopeMode.TdfChangesObject)
+        {
+            return JsonSerializer.Serialize(new OdtOperationEnvelope(operations), SerializerOptions);
         }
 
         return JsonSerializer.Serialize(operations, SerializerOptions);
@@ -114,6 +129,15 @@ public static class OdtOperationsExporter
                 });
                 characterIndex++;
             }
+            else if (child.LocalName == "line-break")
+            {
+                operations.Add(new OdtOperation
+                {
+                    Name = "addLineBreak",
+                    Start = [bodyIndex, characterIndex],
+                });
+                characterIndex++;
+            }
             else if (!string.IsNullOrEmpty(child.TextContent))
             {
                 AppendAddTextOperation(bodyIndex, ref characterIndex, child.TextContent ?? string.Empty, operations);
@@ -155,5 +179,10 @@ public static class OdtOperationsExporter
         public string? Text { get; set; }
 
         public Dictionary<string, object>? Attrs { get; set; }
+    }
+
+    private sealed class OdtOperationEnvelope(List<OdtOperation> changes)
+    {
+        public List<OdtOperation> Changes { get; } = changes;
     }
 }

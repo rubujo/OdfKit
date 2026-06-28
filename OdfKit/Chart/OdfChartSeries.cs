@@ -168,6 +168,61 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// 取得此序列的資料標籤設定（<c>chart:data-label</c>）；若未設定則為 <see langword="null"/>。
+    /// </summary>
+    /// <returns>資料標籤設定；若序列中第一個 <c>chart:data-label</c> 不存在則為 <see langword="null"/></returns>
+    public OdfChartDataLabelInfo? GetDataLabels()
+    {
+        OdfNode? dataLabel = FindFirstChild("data-label");
+        if (dataLabel is null)
+        {
+            return null;
+        }
+
+        string? numberKind = dataLabel.GetAttribute("data-label-number", OdfNamespaces.Chart);
+        bool showValue = numberKind is "value" or "value-and-percentage";
+        bool showPercentage = numberKind is "percentage" or "value-and-percentage";
+        bool showCategoryName = string.Equals(dataLabel.GetAttribute("data-label-text", OdfNamespaces.Chart), "true", StringComparison.Ordinal);
+        bool showLegendKey = string.Equals(dataLabel.GetAttribute("data-label-symbol", OdfNamespaces.Chart), "true", StringComparison.Ordinal);
+
+        return new OdfChartDataLabelInfo(showValue, showPercentage, showCategoryName, showLegendKey);
+    }
+
+    /// <summary>
+    /// 設定或移除此序列的資料標籤。
+    /// </summary>
+    /// <param name="info">資料標籤設定；傳入 <see langword="null"/> 表示移除既有設定</param>
+    public void SetDataLabels(OdfChartDataLabelInfo? info)
+    {
+        RemoveAllChildren("data-label");
+        if (info is null)
+        {
+            return;
+        }
+
+        OdfNode dataLabel = OdfNodeFactory.CreateElement("data-label", OdfNamespaces.Chart, "chart");
+        string numberKind = (info.ShowValue, info.ShowPercentage) switch
+        {
+            (true, true) => "value-and-percentage",
+            (true, false) => "value",
+            (false, true) => "percentage",
+            _ => "none",
+        };
+        dataLabel.SetAttribute("data-label-number", OdfNamespaces.Chart, numberKind, "chart");
+        dataLabel.SetAttribute("data-label-text", OdfNamespaces.Chart, info.ShowCategoryName ? "true" : "false", "chart");
+        dataLabel.SetAttribute("data-label-symbol", OdfNamespaces.Chart, info.ShowLegendKey ? "true" : "false", "chart");
+
+        InsertChildInSchemaOrder(dataLabel, "data-label");
+    }
+
+    /// <summary>
+    /// 依常用預設組合設定或移除此序列的資料標籤。
+    /// </summary>
+    /// <param name="preset">資料標籤預設組合；<see cref="OdfChartDataLabelPreset.None"/> 表示移除既有設定</param>
+    public void SetDataLabelPreset(OdfChartDataLabelPreset preset) =>
+        SetDataLabels(preset == OdfChartDataLabelPreset.None ? null : OdfChartDataLabelInfo.FromPreset(preset));
+
+    /// <summary>
     /// 取得此序列的誤差棒設定（<c>chart:error-indicator</c>）；若未設定則為 <see langword="null"/>。
     /// </summary>
     /// <returns>誤差棒設定；若序列中第一個 <c>chart:error-indicator</c> 不存在則為 <see langword="null"/></returns>

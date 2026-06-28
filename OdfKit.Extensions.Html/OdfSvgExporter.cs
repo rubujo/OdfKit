@@ -1007,6 +1007,7 @@ public static class OdfSvgExporter
         var sb = new StringBuilder(pathData.Length + 32);
         int index = 0;
         char command = '\0';
+        bool commandIsRelative = false;
         double currentX = 0;
         double currentY = 0;
         double subpathX = 0;
@@ -1017,7 +1018,9 @@ public static class OdfSvgExporter
         {
             if (tokens[index].IsCommand)
             {
-                command = char.ToUpperInvariant(tokens[index].Command);
+                char rawCommand = tokens[index].Command;
+                command = char.ToUpperInvariant(rawCommand);
+                commandIsRelative = char.IsLower(rawCommand);
                 index++;
             }
             else if (command == '\0')
@@ -1028,12 +1031,14 @@ public static class OdfSvgExporter
             switch (command)
             {
                 case 'M':
-                    if (!TryReadNumber(tokens, ref index, out currentX) ||
-                        !TryReadNumber(tokens, ref index, out currentY))
+                    if (!TryReadNumber(tokens, ref index, out double moveX) ||
+                        !TryReadNumber(tokens, ref index, out double moveY))
                     {
                         return false;
                     }
 
+                    currentX = commandIsRelative && hasCurrentPoint ? currentX + moveX : moveX;
+                    currentY = commandIsRelative && hasCurrentPoint ? currentY + moveY : moveY;
                     AppendSvgCommand(sb, "M", currentX, currentY);
                     subpathX = currentX;
                     subpathY = currentY;
@@ -1041,19 +1046,36 @@ public static class OdfSvgExporter
                     command = 'L';
                     break;
                 case 'L':
-                    if (!TryReadNumber(tokens, ref index, out currentX) ||
-                        !TryReadNumber(tokens, ref index, out currentY))
+                    if (!TryReadNumber(tokens, ref index, out double lineX) ||
+                        !TryReadNumber(tokens, ref index, out double lineY))
                     {
                         return false;
                     }
 
+                    currentX = commandIsRelative ? currentX + lineX : lineX;
+                    currentY = commandIsRelative ? currentY + lineY : lineY;
                     AppendSvgCommand(sb, "L", currentX, currentY);
                     hasCurrentPoint = true;
+                    break;
+                case 'H':
+                    if (!hasCurrentPoint ||
+                        !TryReadNumber(tokens, ref index, out double horizontalX))
+                    {
+                        return false;
+                    }
+
+                    currentX = commandIsRelative ? currentX + horizontalX : horizontalX;
+                    AppendSvgCommand(sb, "H", currentX);
                     break;
                 case 'C':
                     if (!TryReadNumbers(tokens, ref index, 6, out double[] cubic))
                     {
                         return false;
+                    }
+
+                    if (commandIsRelative)
+                    {
+                        OffsetCoordinatePairs(cubic, currentX, currentY);
                     }
 
                     AppendSvgCommand(sb, "C", cubic);
@@ -1065,6 +1087,11 @@ public static class OdfSvgExporter
                     if (!TryReadNumbers(tokens, ref index, 4, out double[] quadratic))
                     {
                         return false;
+                    }
+
+                    if (commandIsRelative)
+                    {
+                        OffsetCoordinatePairs(quadratic, currentX, currentY);
                     }
 
                     AppendSvgCommand(sb, "Q", quadratic);
@@ -1083,6 +1110,19 @@ public static class OdfSvgExporter
                 case 'B':
                 case 'V':
                 case 'W':
+                    if (command == 'V' && CountAvailableNumbers(tokens, index) == 1)
+                    {
+                        if (!hasCurrentPoint ||
+                            !TryReadNumber(tokens, ref index, out double verticalY))
+                        {
+                            return false;
+                        }
+
+                        currentY = commandIsRelative ? currentY + verticalY : verticalY;
+                        AppendSvgCommand(sb, "V", currentY);
+                        break;
+                    }
+
                     if (!TryReadNumbers(tokens, ref index, 8, out double[] arcBox))
                     {
                         return false;
@@ -1276,6 +1316,26 @@ public static class OdfSvgExporter
         return true;
     }
 
+    private static void OffsetCoordinatePairs(double[] values, double offsetX, double offsetY)
+    {
+        for (int i = 0; i + 1 < values.Length; i += 2)
+        {
+            values[i] += offsetX;
+            values[i + 1] += offsetY;
+        }
+    }
+
+    private static int CountAvailableNumbers(IReadOnlyList<EnhancedPathToken> tokens, int index)
+    {
+        int count = 0;
+        for (int i = index; i < tokens.Count && !tokens[i].IsCommand; i++)
+        {
+            count++;
+        }
+
+        return count;
+    }
+
     private static bool AppendBoundingBoxArc(
         StringBuilder sb,
         IReadOnlyList<double> values,
@@ -1380,10 +1440,40 @@ public static class OdfSvgExporter
             AppendSvgCommand(sb, "L", startX, startY);
         }
 
+        double rawDelta = endAngle - startAngle;
+        if (IsFullEllipseArc(rawDelta))
+        {
+            bool clockwise = rawDelta >= 0;
+            AppendFullEllipseArc(sb, centerX, centerY, radiusX, radiusY, startAngle, clockwise);
+            currentX = startX;
+            currentY = startY;
+            return true;
+        }
+
         AppendSvgArc(sb, radiusX, radiusY, clockwise: true, ArcDelta(startAngle, endAngle, clockwise: true), endX, endY);
         currentX = endX;
         currentY = endY;
         return true;
+    }
+
+    private static bool IsFullEllipseArc(double rawDelta)
+        => Math.Abs(rawDelta) >= 360d &&
+            Math.Abs(NormalizeDegrees(rawDelta)) < 0.000001d;
+
+    private static void AppendFullEllipseArc(
+        StringBuilder sb,
+        double centerX,
+        double centerY,
+        double radiusX,
+        double radiusY,
+        double startAngle,
+        bool clockwise)
+    {
+        double midAngle = startAngle + (clockwise ? 180d : -180d);
+        (double midX, double midY) = PointOnEllipse(centerX, centerY, radiusX, radiusY, midAngle);
+        (double endX, double endY) = PointOnEllipse(centerX, centerY, radiusX, radiusY, startAngle);
+        AppendSvgArc(sb, radiusX, radiusY, clockwise, 180d, midX, midY);
+        AppendSvgArc(sb, radiusX, radiusY, clockwise, 180d, endX, endY);
     }
 
     private static void AppendQuadrantArc(

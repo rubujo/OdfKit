@@ -11,11 +11,26 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function Invoke-NativeCommand {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FilePath,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$ArgumentList
+    )
+
+    & $FilePath @ArgumentList
+    if ($LASTEXITCODE -ne 0) {
+        throw "命令失敗（exit code $LASTEXITCODE）：$FilePath $($ArgumentList -join ' ')"
+    }
+}
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
 try {
-    dotnet restore
-    dotnet build -c $Configuration --no-restore
+    Invoke-NativeCommand "dotnet" @("restore")
+    Invoke-NativeCommand "dotnet" @("build", "-c", $Configuration, "--no-restore")
 
     $commonArgs = @(
         "run",
@@ -30,7 +45,7 @@ try {
         "validate-corpus"
     )
 
-    dotnet @commonArgs $InternalManifest --format json
+    Invoke-NativeCommand "dotnet" ($commonArgs + @($InternalManifest, "--format", "json"))
 
     if (-not [string]::IsNullOrWhiteSpace($ExternalRoot)) {
         $manifestPath = if ([string]::IsNullOrWhiteSpace($ExternalManifest)) {
@@ -49,7 +64,7 @@ try {
             $metadataArgs += @("--baseline-exceptions", $BaselineExceptions)
         }
 
-        dotnet @commonArgs @metadataArgs
+        Invoke-NativeCommand "dotnet" ($commonArgs + $metadataArgs)
 
         $externalArgs = @($manifestPath, "--root", $ExternalRoot, "--format", "json")
         if (-not [string]::IsNullOrWhiteSpace($BaselineJar)) {
@@ -60,7 +75,7 @@ try {
             $externalArgs += @("--baseline-exceptions", $BaselineExceptions)
         }
 
-        dotnet @commonArgs @externalArgs
+        Invoke-NativeCommand "dotnet" ($commonArgs + $externalArgs)
     }
     else {
         Write-Host "ODFKIT_PARITY_CORPUS_ROOT is not set; skipping external corpus validation."

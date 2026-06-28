@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -12,6 +13,7 @@ internal static class OdfSlideAnimationReadEngine
 {
     private const string AnimNs = "urn:oasis:names:tc:opendocument:xmlns:animation:1.0";
     private const string SmilNs = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0";
+    private const string OoxmlCompatNs = "urn:odfkit:ooxml:compatibility";
 
     internal static IReadOnlyList<OdfAnimationInfo> GetAnimations(OdfSlide slide)
     {
@@ -28,7 +30,9 @@ internal static class OdfSlideAnimationReadEngine
                 current.PresetId,
                 current.Duration,
                 current.Begin,
-                index);
+                index,
+                current.ParagraphStartIndex,
+                current.ParagraphEndIndex);
         }
 
         return animations.AsReadOnly();
@@ -38,12 +42,18 @@ internal static class OdfSlideAnimationReadEngine
     {
         foreach (OdfNode child in node.Children)
         {
-            if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != AnimNs || child.LocalName != "par")
+            if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != AnimNs)
+            {
                 continue;
+            }
 
-            if (child.GetAttribute("preset-class", OdfNamespaces.Presentation) is not null)
+            if (child.LocalName == "par" && child.GetAttribute("preset-class", OdfNamespaces.Presentation) is not null)
             {
                 TryAddAnimation(child, animations);
+            }
+            else if (child.LocalName == "transitionFilter")
+            {
+                TryAddTransitionFilterAnimation(child, animations);
             }
             else
             {
@@ -77,7 +87,35 @@ internal static class OdfSlideAnimationReadEngine
             ResolveEffectTrigger(effectPar),
             presetId,
             effectPar.GetAttribute("dur", SmilNs),
-            effectPar.GetAttribute("begin", SmilNs)));
+            effectPar.GetAttribute("begin", SmilNs),
+            paragraphStartIndex: ReadNullableNonNegativeInt(effectPar, "pptx-paragraph-start"),
+            paragraphEndIndex: ReadNullableNonNegativeInt(effectPar, "pptx-paragraph-end")));
+    }
+
+    private static void TryAddTransitionFilterAnimation(OdfNode filter, List<OdfAnimationInfo> animations)
+    {
+        string? targetElementId = filter.GetAttribute("targetElement", SmilNs);
+        if (string.IsNullOrEmpty(targetElementId))
+            return;
+
+        OdfAnimationKind kind = filter.GetAttribute("mode", SmilNs) == "out"
+            ? OdfAnimationKind.Exit
+            : OdfAnimationKind.Entrance;
+
+        animations.Add(new OdfAnimationInfo(
+            kind,
+            targetElementId!,
+            ParseFilterEffect(filter.GetAttribute("type", SmilNs)),
+            ResolveEffectTrigger(filter),
+            filter.GetAttribute("type", SmilNs),
+            filter.GetAttribute("dur", SmilNs),
+            filter.GetAttribute("begin", SmilNs)));
+    }
+
+    private static int? ReadNullableNonNegativeInt(OdfNode node, string localName)
+    {
+        string? value = node.GetAttribute(localName, OoxmlCompatNs);
+        return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed) && parsed >= 0 ? parsed : null;
     }
 
     private static string? FindTargetElementId(OdfNode effectPar)
@@ -101,11 +139,11 @@ internal static class OdfSlideAnimationReadEngine
         if (begin?.StartsWith("prev.end", StringComparison.Ordinal) == true)
             return OdfAnimationTrigger.AfterPrevious;
 
-        OdfNode? clickStep = FindAncestorClickStep(effectPar);
+        OdfNode? clickStep = FindAncestorClickStep(effectPar) ?? FindAncestorClickSequence(effectPar);
         if (clickStep is null)
             return OdfAnimationTrigger.AfterPrevious;
 
-        return IsFirstEffectInClickStep(effectPar, clickStep)
+        return IsFirstAnimationInClickStep(effectPar, clickStep)
             ? OdfAnimationTrigger.OnClick
             : OdfAnimationTrigger.WithPrevious;
     }
@@ -126,22 +164,52 @@ internal static class OdfSlideAnimationReadEngine
         return null;
     }
 
-    private static bool IsFirstEffectInClickStep(OdfNode effectPar, OdfNode clickStep)
+    private static OdfNode? FindAncestorClickSequence(OdfNode node)
     {
-        foreach (OdfNode sibling in clickStep.Children)
+        for (OdfNode? current = node.Parent; current is not null; current = current.Parent)
         {
-            if (sibling.NodeType is not OdfNodeType.Element ||
-                sibling.NamespaceUri != AnimNs ||
-                sibling.LocalName != "par")
+            if (current.NodeType is not OdfNodeType.Element ||
+                current.NamespaceUri != AnimNs ||
+                current.LocalName is not ("seq" or "par"))
                 continue;
 
-            if (sibling.GetAttribute("preset-class", OdfNamespaces.Presentation) is null)
-                continue;
+            string? begin = current.GetAttribute("begin", SmilNs);
+            if (string.Equals(begin, "click", StringComparison.OrdinalIgnoreCase))
+                return current;
+        }
 
-            return ReferenceEquals(sibling, effectPar);
+        return null;
+    }
+
+    private static bool IsFirstAnimationInClickStep(OdfNode effectNode, OdfNode clickStep)
+    {
+        foreach (OdfNode child in EnumerateAnimationNodes(clickStep))
+        {
+            return ReferenceEquals(child, effectNode);
         }
 
         return false;
+    }
+
+    private static IEnumerable<OdfNode> EnumerateAnimationNodes(OdfNode node)
+    {
+        foreach (OdfNode child in node.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != AnimNs)
+                continue;
+
+            if ((child.LocalName == "par" && child.GetAttribute("preset-class", OdfNamespaces.Presentation) is not null) ||
+                child.LocalName == "transitionFilter")
+            {
+                yield return child;
+                continue;
+            }
+
+            foreach (OdfNode descendant in EnumerateAnimationNodes(child))
+            {
+                yield return descendant;
+            }
+        }
     }
 
     private static OdfAnimationEffect ParseEffect(string? presetId, OdfAnimationKind kind)
@@ -157,5 +225,20 @@ internal static class OdfSlideAnimationReadEngine
             return OdfAnimationEffect.FlyIn;
 
         return kind == OdfAnimationKind.Emphasis ? OdfAnimationEffect.Appear : OdfAnimationEffect.Appear;
+    }
+
+    private static OdfAnimationEffect ParseFilterEffect(string? type)
+    {
+        if (string.IsNullOrEmpty(type))
+            return OdfAnimationEffect.Appear;
+
+        if (type.Contains("fade", StringComparison.OrdinalIgnoreCase))
+            return OdfAnimationEffect.Fade;
+        if (type.Contains("zoom", StringComparison.OrdinalIgnoreCase))
+            return OdfAnimationEffect.Zoom;
+        if (type.Contains("fly", StringComparison.OrdinalIgnoreCase))
+            return OdfAnimationEffect.FlyIn;
+
+        return OdfAnimationEffect.Appear;
     }
 }

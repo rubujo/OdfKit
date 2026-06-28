@@ -20,7 +20,8 @@ public partial class OdfTableSheet
     /// <param name="firstColumnAsLabel">資料首欄作為 X 軸分類標籤，預設 true</param>
     /// <returns>
     /// 可進一步設定的 <see cref="OdfChartDocument"/>。
-    /// 呼叫端修改後須呼叫 <c>Save()</c> 並在父文件儲存前保持物件存活；
+    /// 呼叫端修改後可直接儲存父文件，父文件會自動 flush 已追蹤的嵌入圖表；
+    /// 也可手動呼叫 <c>Save()</c> 以提早寫回封裝。
     /// 請勿對此物件呼叫 <c>Dispose()</c>（生命週期由父文件管理）。
     /// </returns>
     public OdfChartDocument InsertChart(

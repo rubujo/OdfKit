@@ -1,8 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using OdfKit.Chart;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.Spreadsheet;
+using OdfKit.Styles;
 using OdfKit.Text;
 using Xunit;
 
@@ -85,6 +88,54 @@ public class TextApiUsabilityTests
         Assert.Contains("draw:name=\"TinyPng\"", contentXml);
         Assert.Contains("xlink:href=\"Pictures/TinyPng.png\"", contentXml);
         Assert.True(package.HasEntry("Pictures/TinyPng.png"));
+    }
+
+    /// <summary>
+    /// 驗證高階儲存預設會清理已從 DOM 移除、但仍殘留在封裝中的圖片媒體。
+    /// </summary>
+    [Fact]
+    public void SavePrunesUnreferencedPictureEntriesByDefault()
+    {
+        using var document = TextDocument.Create();
+        OdfImage kept = document.Body.Images.Add(CreatePngBytes(), "2cm", "2cm", "Kept");
+        const string orphanedPath = "Pictures/Orphaned.png";
+        document.Package.WriteEntry(orphanedPath, CreatePngBytes(), "image/png");
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+
+        Assert.True(package.HasEntry(kept.ImageHref!));
+        Assert.False(package.HasEntry(orphanedPath));
+        Assert.Contains($"xlink:href=\"{kept.ImageHref}\"", contentXml);
+        Assert.DoesNotContain(orphanedPath, contentXml);
+    }
+
+    /// <summary>
+    /// 驗證關閉 <see cref="OdfSaveOptions.PruneUnusedMedia"/> 時，高階儲存會保留孤立圖片媒體項目。
+    /// </summary>
+    [Fact]
+    public void SaveCanPreserveUnreferencedPictureEntriesWhenPruningIsDisabled()
+    {
+        using var document = TextDocument.Create();
+        OdfImage kept = document.Body.Images.Add(CreatePngBytes(), "2cm", "2cm", "Kept");
+        const string orphanedPath = "Pictures/Orphaned.png";
+        document.Package.WriteEntry(orphanedPath, CreatePngBytes(), "image/png");
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream, new OdfSaveOptions { PruneUnusedMedia = false });
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+
+        Assert.True(package.HasEntry(kept.ImageHref!));
+        Assert.True(package.HasEntry(orphanedPath));
+        Assert.Contains($"xlink:href=\"{kept.ImageHref}\"", contentXml);
+        Assert.DoesNotContain(orphanedPath, contentXml);
     }
 
     /// <summary>
@@ -283,6 +334,119 @@ public class TextApiUsabilityTests
 
         Assert.Contains("#C00000", contentXml);
         Assert.Contains("11pt", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證文字文件 Fluent builder 可建立年度報告常見結構：目錄、表格、註腳、註解、區段、頁首頁尾與嵌入圖表。
+    /// </summary>
+    [Fact]
+    public void TextDocumentBuilderCreatesComplexAnnualReport()
+    {
+        using TextDocument document = TextDocument.Builder()
+            .WithMetadata(metadata => metadata
+                .Title("年度報告")
+                .Author("OdfKit")
+                .Subject("年度營運成果"))
+            .WithStyles(OdfStyleSet.BusinessReport)
+            .WithPageSetup(page => page
+                .Header("年度報告")
+                .FooterPageNumbers()
+                .FirstPageHeader("首頁摘要"))
+            .AddCoverPage("年度報告", "2026 年營運成果", "OdfKit", "2026 年")
+            .AddTableOfContents("目錄", 2)
+            .AddHeading("營運摘要", 2)
+            .AddParagraph(paragraph => paragraph
+                .Append("營收年增 ")
+                .Append("18%", format => format.Bold().Color("#0066CC").BackgroundColor("#FFF2CC"))
+                .Append("。")
+                .AddFootnote("1", "示範資料，非實際財務數字。")
+                .AddComment("reviewer", "請財務團隊確認最終數字。"))
+            .AddTable(3, 2, table => table
+                .WithSummary("季度營收摘要")
+                .SetCell(1, 1, "季度")
+                .SetCell(1, 2, "營收")
+                .SetCell(2, 1, "Q1")
+                .SetCell(2, 2, "120")
+                .SetCell(3, 1, "Q2")
+                .SetCell(3, 2, "148"))
+            .AddSection("ExecutiveSection", 2, OdfLength.FromCentimeters(0.5), section => section
+                .AddParagraph("本區段使用雙欄版面呈現重點。")
+                .Protected())
+            .AddParagraph(paragraph => paragraph
+                .Append("圖表摘要")
+                .AddChart(new OdfChartDefinition
+                {
+                    ChartType = OdfChartType.Bar,
+                    Title = "季度營收",
+                    DataRange = new OdfCellRange(0, 0, 2, 1, "Data"),
+                    HasLegend = true,
+                }, OdfLength.FromCentimeters(8), OdfLength.FromCentimeters(5)))
+            .AddParagraph(paragraph => paragraph
+                .Append("品牌視覺 ")
+                .AddImage(CreatePngBytes(), OdfLength.FromCentimeters(2), OdfLength.FromCentimeters(2), "AnnualLogo"))
+            .Build();
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using TextDocument loaded = TextDocument.Load(stream);
+
+        Assert.Equal("年度報告", loaded.Metadata.Title);
+        Assert.Contains(loaded.Body.Headings, heading => heading.TextContent == "營運摘要");
+        Assert.Contains(loaded.Body.Tables.Items, table => table.RowCount == 3 && table.ColumnCount == 2);
+        Assert.Contains(loaded.Body.Sections, section => section.IsProtected);
+        Assert.Single(loaded.GetCommentInfos());
+        Assert.Contains(loaded.GetPageSetups(), setup => setup.HeaderText == "年度報告");
+
+        stream.Position = 0;
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+
+        Assert.Contains("季度營收", contentXml);
+        Assert.Contains("季度營收摘要", contentXml);
+        Assert.Contains("2026 年營運成果", contentXml);
+        Assert.Contains("fo:break-after=\"page\"", contentXml);
+        Assert.Contains("#1F4E79", contentXml);
+        Assert.Contains("#D9EAF7", contentXml);
+        Assert.Contains("fo:font-weight=\"bold\"", contentXml);
+        Assert.Contains("#FFF2CC", contentXml);
+        Assert.Contains("text:note", contentXml);
+        Assert.Contains("draw:object", contentXml);
+        Assert.Contains("xlink:href=\"Pictures/AnnualLogo.png\"", contentXml);
+        Assert.True(package.HasEntry("Pictures/AnnualLogo.png"));
+    }
+
+    /// <summary>
+    /// 驗證文字文件 builder 可直接套用設計主題並映射到標題與表格首列樣式。
+    /// </summary>
+    [Fact]
+    public void TextDocumentBuilderWithThemeMapsThemeToStyles()
+    {
+        var theme = new OdfDesignTheme
+        {
+            StrokeColor = "#123456",
+            ConnectorColor = "#654321",
+        }.WithAccentFillColors("#ABCDEF");
+
+        using TextDocument document = TextDocument.Builder()
+            .WithTheme(theme)
+            .AddHeading("主題標題", 1)
+            .AddTable(1, 2, table => table
+                .SetCell(1, 1, "欄一")
+                .SetCell(1, 2, "欄二"))
+            .Build();
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
+        string contentXml = ReadEntry(package, "content.xml");
+
+        Assert.Contains("#123456", contentXml);
+        Assert.Contains("#ABCDEF", contentXml);
+        Assert.Contains("#654321", contentXml);
     }
 
     private static string ReadEntry(OdfPackage package, string path)

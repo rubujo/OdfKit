@@ -77,6 +77,7 @@ internal static class OdfTableSheetChartEngine
         };
         chartDoc.SetDataRange(context.SheetName, dataRange, firstRowAsHeader, firstColumnAsLabel);
         chartDoc.Save();
+        context.Document.TrackEmbeddedDocumentForPersistence(chartDoc);
 
         return chartDoc;
     }

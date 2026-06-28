@@ -941,6 +941,52 @@ public class ManagedPptxConversionTests
     }
 
     [Fact]
+    public void OdpToPptxConverterWritesShapeShadowEffects()
+    {
+        using OdfPresentationDocument source = OdfPresentationDocument.Create();
+        OdfSlide sourceSlide = source.AddSlide("Shape Shadow");
+        OdfShape shape = sourceSlide.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(4),
+            OdfLength.FromCentimeters(2));
+        shape.FillColor = "#66AA33";
+        source.StyleEngine.SetLocalStyleProperty(shape.Node, "graphic", "graphic-properties", "shadow", OdfNamespaces.Draw, "visible", "draw");
+        source.StyleEngine.SetLocalStyleProperty(shape.Node, "graphic", "graphic-properties", "shadow-color", OdfNamespaces.Draw, "#336699", "draw");
+        source.StyleEngine.SetLocalStyleProperty(shape.Node, "graphic", "graphic-properties", "shadow-offset-x", OdfNamespaces.Draw, "3pt", "draw");
+        source.StyleEngine.SetLocalStyleProperty(shape.Node, "graphic", "graphic-properties", "shadow-offset-y", OdfNamespaces.Draw, "4pt", "draw");
+        source.StyleEngine.SetLocalStyleProperty(shape.Node, "graphic", "graphic-properties", "shadow-opacity", OdfNamespaces.Draw, "65%", "draw");
+
+        using var pptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(source, pptxStream);
+
+        pptxStream.Position = 0;
+        using PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false);
+        Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
+        OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+        P.Shape convertedShape = Assert.Single(
+            slidePart.Slide!.Descendants<P.Shape>(),
+            candidate => candidate.ShapeProperties?.GetFirstChild<A.PresetGeometry>()?.Preset?.Value == A.ShapeTypeValues.Rectangle);
+        A.OuterShadow shadow = Assert.Single(convertedShape.ShapeProperties!.Descendants<A.OuterShadow>());
+        A.RgbColorModelHex color = Assert.IsType<A.RgbColorModelHex>(Assert.Single(shadow.ChildElements, child => child is A.RgbColorModelHex));
+        Assert.Equal("336699", color.Val?.Value);
+        Assert.Equal(65000, Assert.Single(color.Elements<A.Alpha>()).Val?.Value);
+        Assert.Equal(63500L, shadow.Distance?.Value);
+        Assert.InRange(shadow.Direction?.Value ?? 0L, 3187000L, 3189000L);
+
+        pptxStream.Position = 0;
+        using OdfPresentationDocument converted = PptxToOdpConverter.Convert(pptxStream);
+        OdfShape roundTrippedShape = Assert.Single(Assert.Single(converted.Slides).Shapes, candidate => candidate.LocalName == "rect");
+        string styleName = roundTrippedShape.Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty;
+        Assert.Equal("visible", converted.StyleEngine.GetStyleProperty(styleName, "shadow", OdfNamespaces.Draw, "graphic"));
+        Assert.Equal("#336699", converted.StyleEngine.GetStyleProperty(styleName, "shadow-color", OdfNamespaces.Draw, "graphic"));
+        AssertLengthEquals(OdfLength.FromPoints(3), converted.StyleEngine.GetStyleProperty(styleName, "shadow-offset-x", OdfNamespaces.Draw, "graphic"));
+        AssertLengthEquals(OdfLength.FromPoints(4), converted.StyleEngine.GetStyleProperty(styleName, "shadow-offset-y", OdfNamespaces.Draw, "graphic"));
+        Assert.Equal("65%", converted.StyleEngine.GetStyleProperty(styleName, "shadow-opacity", OdfNamespaces.Draw, "graphic"));
+    }
+
+    [Fact]
     public void PptxConvertersPreserveTextOnShapes()
     {
         using OdfPresentationDocument source = OdfPresentationDocument.Create();
@@ -1125,6 +1171,14 @@ public class ManagedPptxConversionTests
         {
             Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
             OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+            P.ParallelTimeNode timingRoot = Assert.Single(
+                slidePart.Slide!.Timing!.Descendants<P.ParallelTimeNode>(),
+                node => node.CommonTimeNode?.NodeType?.Value == P.TimeNodeValues.TmingRoot);
+            Assert.Equal(P.TimeNodeRestartValues.Always, timingRoot.CommonTimeNode?.Restart?.Value);
+            P.SequenceTimeNode mainSequence = Assert.Single(slidePart.Slide!.Timing!.Descendants<P.SequenceTimeNode>());
+            Assert.True(mainSequence.Concurrent?.Value);
+            Assert.Equal(P.PreviousActionValues.SkipTimed, mainSequence.PreviousAction?.Value);
+            Assert.Equal(P.NextActionValues.Seek, mainSequence.NextAction?.Value);
             P.AnimateEffect[] effects = slidePart.Slide!.Descendants<P.AnimateEffect>().ToArray();
             Assert.Equal(2, effects.Length);
             Assert.Contains(effects, effect =>
@@ -1163,6 +1217,166 @@ public class ManagedPptxConversionTests
                 animation.Trigger == OdfAnimationTrigger.AfterPrevious &&
                 animation.TryGetDelaySeconds(out double delaySeconds) &&
                 Math.Abs(delaySeconds - 0.4d) < 0.001d);
+    }
+
+    [Fact]
+    public void OdpToPptxConverterExportsLowLevelAnimationTreeEffects()
+    {
+        using OdfPresentationDocument source = OdfPresentationDocument.Create();
+        OdfSlide sourceSlide = source.AddSlide("Low-level animation tree");
+        OdfShape shape = sourceSlide.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(4),
+            OdfLength.FromCentimeters(2));
+        sourceSlide.AnimationRoot
+            .AddSequence("click")
+            .AddParallel("0s")
+            .AddEffect(
+                OdfAnimationType.FadeIn,
+                shape.Id,
+                OdfLength.FromPoints(72),
+                OdfLength.FromPoints(18));
+
+        OdfAnimationInfo sourceAnimation = Assert.Single(sourceSlide.GetAnimations());
+        Assert.Equal(OdfAnimationEffect.Fade, sourceAnimation.Effect);
+        Assert.Equal(OdfAnimationTrigger.OnClick, sourceAnimation.Trigger);
+        Assert.True(sourceAnimation.TryGetDurationSeconds(out double sourceDurationSeconds));
+        Assert.True(Math.Abs(sourceDurationSeconds - 1d) < 0.001d);
+        Assert.True(sourceAnimation.TryGetDelaySeconds(out double sourceDelaySeconds));
+        Assert.True(Math.Abs(sourceDelaySeconds - 0.25d) < 0.001d);
+
+        using var pptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(source, pptxStream);
+
+        pptxStream.Position = 0;
+        using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
+        {
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
+            OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+            P.AnimateEffect effect = Assert.Single(slidePart.Slide!.Descendants<P.AnimateEffect>());
+            Assert.Equal(P.AnimateEffectTransitionValues.In, effect.Transition?.Value);
+            Assert.Equal("fade", effect.Filter?.Value);
+            Assert.Equal("1000", effect.CommonBehavior?.CommonTimeNode?.Duration?.Value);
+            Assert.Equal("250", GetAnimationDelay(effect));
+        }
+
+        pptxStream.Position = 0;
+        using OdfPresentationDocument converted = PptxToOdpConverter.Convert(pptxStream);
+        OdfAnimationInfo convertedAnimation = Assert.Single(Assert.Single(converted.Slides).GetAnimations());
+        Assert.Equal(OdfAnimationEffect.Fade, convertedAnimation.Effect);
+        Assert.Equal(OdfAnimationTrigger.OnClick, convertedAnimation.Trigger);
+        Assert.True(convertedAnimation.TryGetDurationSeconds(out double convertedDurationSeconds));
+        Assert.True(Math.Abs(convertedDurationSeconds - 1d) < 0.001d);
+        Assert.True(convertedAnimation.TryGetDelaySeconds(out double convertedDelaySeconds));
+        Assert.True(Math.Abs(convertedDelaySeconds - 0.25d) < 0.001d);
+    }
+
+    [Fact]
+    public void PptxConvertersPreserveWithPreviousAnimationNodeType()
+    {
+        using OdfPresentationDocument source = OdfPresentationDocument.Create();
+        OdfSlide sourceSlide = source.AddSlide("With previous");
+        OdfShape shape = sourceSlide.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(4),
+            OdfLength.FromCentimeters(2));
+        sourceSlide.AddEntranceEffect(
+            shape.Id,
+            OdfAnimationEffect.Fade,
+            OdfAnimationTrigger.OnClick,
+            duration: TimeSpan.FromMilliseconds(300));
+        sourceSlide.AddEntranceEffect(
+            shape.Id,
+            OdfAnimationEffect.FlyIn,
+            OdfAnimationTrigger.WithPrevious,
+            delay: TimeSpan.FromMilliseconds(250),
+            duration: TimeSpan.FromMilliseconds(700));
+
+        using var pptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(source, pptxStream);
+
+        pptxStream.Position = 0;
+        using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
+        {
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
+            OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+            P.AnimateEffect flyIn = Assert.Single(
+                slidePart.Slide!.Descendants<P.AnimateEffect>(),
+                effect => effect.Filter?.Value == "fly");
+            P.ParallelTimeNode flyInTimeNode = Assert.Single(
+                flyIn.Ancestors<P.ParallelTimeNode>(),
+                node => node.CommonTimeNode?.PresetClass?.Value == P.TimeNodePresetClassValues.Entrance);
+            Assert.Equal(P.TimeNodeValues.WithEffect, flyInTimeNode.CommonTimeNode?.NodeType?.Value);
+            Assert.Equal("250", GetAnimationDelay(flyIn));
+        }
+
+        pptxStream.Position = 0;
+        using OdfPresentationDocument converted = PptxToOdpConverter.Convert(pptxStream);
+        OdfAnimationInfo flyInAnimation = Assert.Single(
+            Assert.Single(converted.Slides).GetAnimations(),
+            animation => animation.Effect == OdfAnimationEffect.FlyIn);
+        Assert.Equal(OdfAnimationTrigger.WithPrevious, flyInAnimation.Trigger);
+        Assert.True(flyInAnimation.TryGetDelaySeconds(out double delaySeconds));
+        Assert.True(Math.Abs(delaySeconds - 0.25d) < 0.001d);
+    }
+
+    [Fact]
+    public void PptxConvertersPreserveEmphasisAnimationTiming()
+    {
+        using OdfPresentationDocument source = OdfPresentationDocument.Create();
+        OdfSlide sourceSlide = source.AddSlide("Emphasis timing");
+        OdfShape shape = sourceSlide.AddShape(
+            OdfShapeType.Rectangle,
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(4),
+            OdfLength.FromCentimeters(2));
+        sourceSlide.AddEntranceEffect(
+            shape.Id,
+            OdfAnimationEffect.Fade,
+            OdfAnimationTrigger.OnClick,
+            duration: TimeSpan.FromMilliseconds(300));
+        sourceSlide.AddEmphasisEffect(
+            shape.Id,
+            OdfAnimationEffect.Fade,
+            TimeSpan.FromMilliseconds(900),
+            OdfAnimationTrigger.AfterPrevious,
+            TimeSpan.FromMilliseconds(250));
+
+        using var pptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(source, pptxStream);
+
+        pptxStream.Position = 0;
+        using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
+        {
+            Assert.Empty(new OpenXmlValidator(FileFormatVersions.Office2019).Validate(pptx, TestContext.Current.CancellationToken));
+            OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+            P.AnimateEffect emphasis = Assert.Single(
+                slidePart.Slide!.Descendants<P.AnimateEffect>(),
+                effect => effect.Transition?.Value == P.AnimateEffectTransitionValues.None);
+            P.ParallelTimeNode emphasisTimeNode = Assert.Single(
+                emphasis.Ancestors<P.ParallelTimeNode>(),
+                node => node.CommonTimeNode?.PresetClass?.Value == P.TimeNodePresetClassValues.Emphasis);
+            Assert.Equal(P.TimeNodePresetClassValues.Emphasis, emphasisTimeNode.CommonTimeNode?.PresetClass?.Value);
+            Assert.Equal(P.TimeNodeValues.AfterEffect, emphasisTimeNode.CommonTimeNode?.NodeType?.Value);
+            Assert.Equal("900", emphasis.CommonBehavior?.CommonTimeNode?.Duration?.Value);
+            Assert.Equal("250", GetAnimationDelay(emphasis));
+        }
+
+        pptxStream.Position = 0;
+        using OdfPresentationDocument converted = PptxToOdpConverter.Convert(pptxStream);
+        OdfAnimationInfo emphasisAnimation = Assert.Single(
+            Assert.Single(converted.Slides).GetAnimations(),
+            animation => animation.Kind == OdfAnimationKind.Emphasis);
+        Assert.Equal(OdfAnimationTrigger.AfterPrevious, emphasisAnimation.Trigger);
+        Assert.True(emphasisAnimation.TryGetDelaySeconds(out double delaySeconds));
+        Assert.True(Math.Abs(delaySeconds - 0.25d) < 0.001d);
+        Assert.True(emphasisAnimation.TryGetDurationSeconds(out double durationSeconds));
+        Assert.True(Math.Abs(durationSeconds - 0.9d) < 0.001d);
     }
 
     [Fact]
@@ -1206,6 +1420,107 @@ public class ManagedPptxConversionTests
         OdfAnimationInfo animation = Assert.Single(Assert.Single(converted.Slides).GetAnimations());
         Assert.True(animation.TryGetDelaySeconds(out double delaySeconds));
         Assert.True(Math.Abs(delaySeconds - 0.35d) < 0.001d);
+    }
+
+    [Fact]
+    public void PptxConvertersPreserveParagraphAnimationRanges()
+    {
+        using OdfPresentationDocument source = OdfPresentationDocument.Create();
+        OdfSlide sourceSlide = source.AddSlide("Paragraph ranges");
+        OdfTextBox textBox = sourceSlide.AddTextBox(
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(8),
+            OdfLength.FromCentimeters(3),
+            ["第一段", "第二段"]);
+        sourceSlide.AddEntranceEffect(
+            textBox.Id,
+            OdfAnimationEffect.Fade,
+            OdfAnimationTrigger.OnClick,
+            duration: TimeSpan.FromMilliseconds(600));
+
+        using var pptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(source, pptxStream);
+
+        pptxStream.Position = 0;
+        using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, false))
+        {
+            OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+            Assert.Equal([(0, 0), (1, 1)], GetParagraphAnimationRanges(slidePart));
+        }
+
+        pptxStream.Position = 0;
+        using OdfPresentationDocument converted = PptxToOdpConverter.Convert(pptxStream);
+        OdfAnimationInfo[] animations = Assert.Single(converted.Slides).GetAnimations().ToArray();
+        Assert.Equal(2, animations.Length);
+        Assert.Contains(animations, animation => animation.ParagraphStartIndex == 0 && animation.ParagraphEndIndex == 0);
+        Assert.Contains(animations, animation => animation.ParagraphStartIndex == 1 && animation.ParagraphEndIndex == 1);
+
+        using var roundTripPptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(converted, roundTripPptxStream);
+
+        roundTripPptxStream.Position = 0;
+        using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(roundTripPptxStream, false))
+        {
+            OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+            Assert.Equal([(0, 0), (1, 1)], GetParagraphAnimationRanges(slidePart));
+        }
+    }
+
+    [Fact]
+    public void PptxToOdpConverterExpandsBuildParagraphWhenEffectOmitsParagraphRange()
+    {
+        using OdfPresentationDocument source = OdfPresentationDocument.Create();
+        OdfSlide sourceSlide = source.AddSlide("Build paragraph");
+        OdfTextBox textBox = sourceSlide.AddTextBox(
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(8),
+            OdfLength.FromCentimeters(3),
+            ["第一段", "第二段"]);
+        sourceSlide.AddEntranceEffect(
+            textBox.Id,
+            OdfAnimationEffect.Fade,
+            OdfAnimationTrigger.OnClick,
+            duration: TimeSpan.FromMilliseconds(600));
+
+        using var pptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(source, pptxStream);
+
+        pptxStream.Position = 0;
+        using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, true))
+        {
+            OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+            foreach (OpenXmlElement paragraphRange in slidePart.Slide!.Descendants().Where(IsParagraphRangeElement).ToArray())
+            {
+                paragraphRange.Remove();
+            }
+
+            P.AnimateEffect[] effects = slidePart.Slide!.Descendants<P.AnimateEffect>().ToArray();
+            Assert.NotEmpty(effects);
+            P.AnimateEffect firstEffect = effects[0];
+            foreach (P.AnimateEffect extraEffect in effects.Skip(1))
+            {
+                P.ParallelTimeNode? removableTimeNode = extraEffect
+                    .Ancestors<P.ParallelTimeNode>()
+                    .FirstOrDefault(timeNode => !timeNode.Descendants<P.AnimateEffect>().Contains(firstEffect));
+                (removableTimeNode as OpenXmlElement ?? extraEffect).Remove();
+            }
+
+            Assert.Single(slidePart.Slide!.Descendants<P.AnimateEffect>());
+            Assert.Empty(GetParagraphAnimationRanges(slidePart));
+            P.BuildParagraph buildParagraph = Assert.Single(slidePart.Slide!.Timing!.BuildList!.Elements<P.BuildParagraph>());
+            Assert.Equal(P.ParagraphBuildValues.Paragraph, buildParagraph.Build?.Value);
+            slidePart.Slide.Save();
+        }
+
+        pptxStream.Position = 0;
+        using OdfPresentationDocument converted = PptxToOdpConverter.Convert(pptxStream);
+
+        OdfAnimationInfo[] animations = Assert.Single(converted.Slides).GetAnimations().ToArray();
+        Assert.Equal(2, animations.Length);
+        Assert.Contains(animations, animation => animation.ParagraphStartIndex == 0 && animation.ParagraphEndIndex == 0);
+        Assert.Contains(animations, animation => animation.ParagraphStartIndex == 1 && animation.ParagraphEndIndex == 1);
     }
 
     [Fact]
@@ -1442,6 +1757,29 @@ public class ManagedPptxConversionTests
             .Select(condition => condition.Delay?.Value)
             .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
 
+    private static (int Start, int End)[] GetParagraphAnimationRanges(OpenXmlSlidePart slidePart)
+        => slidePart.Slide!
+            .Descendants<P.AnimateEffect>()
+            .Select(effect => effect.CommonBehavior?.TargetElement?.ShapeTarget)
+            .Where(target => target is not null)
+            .SelectMany(target => target!.Descendants())
+            .Where(IsParagraphRangeElement)
+            .Select(element => (
+                ReadRequiredIntAttribute(element, "st"),
+                ReadRequiredIntAttribute(element, "end")))
+            .ToArray();
+
+    private static bool IsParagraphRangeElement(OpenXmlElement element)
+        => element.LocalName == "pRg" &&
+            element.NamespaceUri == "http://schemas.openxmlformats.org/presentationml/2006/main";
+
+    private static int ReadRequiredIntAttribute(OpenXmlElement element, string localName)
+    {
+        string? value = element.GetAttribute(localName, string.Empty).Value;
+        Assert.False(string.IsNullOrWhiteSpace(value));
+        return int.Parse(value!, System.Globalization.CultureInfo.InvariantCulture);
+    }
+
     private static void ApplyStyledTextBox(
         OdfPresentationDocument source,
         string text,
@@ -1587,7 +1925,7 @@ public class ManagedPptxConversionTests
                             new A.Outline(new A.SolidFill(new A.SchemeColor { Val = A.SchemeColorValues.Accent3 })) { Width = 28575 }
                         ),
                         new A.EffectStyleList(
-                            new A.EffectStyle(new A.EffectList(new A.OuterShadow(new A.SchemeColor { Val = A.SchemeColorValues.Dark2 }) { Distance = 38100L, Direction = 5400000, Alignment = A.RectangleAlignmentValues.BottomLeft })),
+                            new A.EffectStyle(new A.EffectList(new A.OuterShadow(new A.SchemeColor(new A.Alpha { Val = 72000 }) { Val = A.SchemeColorValues.Dark2 }) { Distance = 38100L, Direction = 5400000, Alignment = A.RectangleAlignmentValues.BottomLeft })),
                             new A.EffectStyle(new A.EffectList()),
                             new A.EffectStyle(new A.EffectList())
                         ),
@@ -1614,7 +1952,21 @@ public class ManagedPptxConversionTests
                                 new P.NonVisualShapeDrawingProperties(new A.ShapeLocks { NoGrouping = true }),
                                 new P.ApplicationNonVisualDrawingProperties(new P.PlaceholderShape { Type = P.PlaceholderValues.Title })),
                             new P.ShapeProperties(),
-                            new P.TextBody(new A.BodyProperties(), new A.ListStyle(), new A.Paragraph()))
+                            new P.TextBody(
+                                new A.BodyProperties(),
+                                new A.ListStyle(),
+                                new A.Paragraph(
+                                    new A.ParagraphProperties(
+                                        new A.DefaultRunProperties(
+                                            new A.SolidFill(new A.SchemeColor { Val = A.SchemeColorValues.Accent3 }),
+                                            new A.LatinFont { Typeface = "+mj-lt" })
+                                        {
+                                            Bold = true,
+                                            FontSize = 2400,
+                                        })
+                                    {
+                                        Alignment = A.TextAlignmentTypeValues.Center,
+                                    })))
                     )
                 )
             )
@@ -1697,16 +2049,31 @@ public class ManagedPptxConversionTests
         // 驗證 Placeholder 繼承與 Theme 矩陣套用
         var shape = Assert.Single(slide.Placeholders);
         Assert.Equal("Master Title Text", shape.Node.TextContent);
+        OdfNode inheritedSpan = Assert.Single(shape.Node.Descendants().Where(node => node.LocalName == "span" && node.NamespaceUri == OdfNamespaces.Text));
+        string? inheritedTextStyleName = inheritedSpan.GetAttribute("style-name", OdfNamespaces.Text);
+        Assert.NotNull(inheritedTextStyleName);
+        Assert.Equal("bold", shape.Document.StyleEngine.GetStyleProperty(inheritedTextStyleName, "font-weight", OdfNamespaces.Fo, "text"));
+        Assert.Equal("24pt", shape.Document.StyleEngine.GetStyleProperty(inheritedTextStyleName, "font-size", OdfNamespaces.Fo, "text"));
+        Assert.Equal("#9BBB59", shape.Document.StyleEngine.GetStyleProperty(inheritedTextStyleName, "color", OdfNamespaces.Fo, "text"));
+        Assert.Equal("Calibri", shape.Document.StyleEngine.GetStyleProperty(inheritedTextStyleName, "font-family", OdfNamespaces.Fo, "text"));
+        OdfNode inheritedParagraph = Assert.Single(shape.Node.Descendants().Where(node => node.LocalName == "p" && node.NamespaceUri == OdfNamespaces.Text));
+        string? inheritedParagraphStyleName = inheritedParagraph.GetAttribute("style-name", OdfNamespaces.Text);
+        Assert.NotNull(inheritedParagraphStyleName);
+        Assert.Equal("center", shape.Document.StyleEngine.GetStyleProperty(inheritedParagraphStyleName, "text-align", OdfNamespaces.Fo, "paragraph"));
 
         // 驗證 FillColor 與 StrokeColor 來自 Style Reference 和 Theme Color
         Assert.Equal("#C0504D", shape.FillColor); // Accent2
         Assert.Equal("#4F81BD", shape.StrokeColor); // Accent1
 
-        // 驗證是否套用了 Theme 的 EffectStyle 中的陰影 (draw:shadow="visible", draw:shadow-color="#1F497D")
-        string? shadow = shape.Document.StyleEngine.GetStyleProperty(shape.Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "shadow", OdfNamespaces.Draw, "graphic");
-        string? shadowColor = shape.Document.StyleEngine.GetStyleProperty(shape.Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty, "shadow-color", OdfNamespaces.Draw, "graphic");
+        // 驗證是否套用了 Theme 的 EffectStyle 中的陰影。
+        string styleName = shape.Node.GetAttribute("style-name", OdfNamespaces.Draw) ?? string.Empty;
+        string? shadow = shape.Document.StyleEngine.GetStyleProperty(styleName, "shadow", OdfNamespaces.Draw, "graphic");
+        string? shadowColor = shape.Document.StyleEngine.GetStyleProperty(styleName, "shadow-color", OdfNamespaces.Draw, "graphic");
         Assert.Equal("visible", shadow);
         Assert.Equal("#1F497D", shadowColor); // Accent3 maps to effect style index 1, which has shadow using Dark2 (1F497D)
+        AssertLengthEquals(OdfLength.FromPoints(0), shape.Document.StyleEngine.GetStyleProperty(styleName, "shadow-offset-x", OdfNamespaces.Draw, "graphic"));
+        AssertLengthEquals(OdfLength.FromPoints(3), shape.Document.StyleEngine.GetStyleProperty(styleName, "shadow-offset-y", OdfNamespaces.Draw, "graphic"));
+        Assert.Equal("72%", shape.Document.StyleEngine.GetStyleProperty(styleName, "shadow-opacity", OdfNamespaces.Draw, "graphic"));
     }
 
     /// <summary>
@@ -1809,6 +2176,21 @@ public class ManagedPptxConversionTests
         Assert.NotNull(shapeStyle.FillReference);
         Assert.NotNull(shapeStyle.EffectReference);
         Assert.NotNull(shapeStyle.FontReference);
+
+        var effectStyles = masterPart.ThemePart!.Theme!.ThemeElements!.FormatScheme!.EffectStyleList!
+            .Elements<A.EffectStyle>()
+            .ToArray();
+        Assert.Equal(3, effectStyles.Length);
+        A.OuterShadow[] themeShadows = effectStyles
+            .Select(style => style.GetFirstChild<A.EffectList>()?.GetFirstChild<A.OuterShadow>())
+            .Where(shadow => shadow is not null)
+            .Cast<A.OuterShadow>()
+            .ToArray();
+        Assert.Equal(3, themeShadows.Length);
+        A.SchemeColor firstShadowColor = Assert.IsType<A.SchemeColor>(Assert.Single(themeShadows[0].ChildElements, child => child is A.SchemeColor));
+        Assert.Equal(A.SchemeColorValues.Dark2, firstShadowColor.Val?.Value);
+        Assert.Equal(72000, Assert.Single(firstShadowColor.Elements<A.Alpha>()).Val?.Value);
+        Assert.Equal(38100L, themeShadows[0].Distance?.Value);
 
         // 驗證 Table 四向邊框與背景填滿
         var cell = parsedSlide.Descendants<A.TableCell>().FirstOrDefault();

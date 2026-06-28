@@ -588,7 +588,10 @@ public static class OdfMarkdownExporter
             document.StyleEngine.GetStyleProperty(styleName!, "text-underline-style", OdfNamespaces.Style, "text"),
             document.StyleEngine.GetStyleProperty(styleName!, "text-line-through-style", OdfNamespaces.Style, "text"),
             document.StyleEngine.GetStyleProperty(styleName!, "font-size", OdfNamespaces.Fo, "text"),
-            document.StyleEngine.GetStyleProperty(styleName!, "color", OdfNamespaces.Fo, "text"));
+            document.StyleEngine.GetStyleProperty(styleName!, "color", OdfNamespaces.Fo, "text"),
+            document.StyleEngine.GetStyleProperty(styleName!, "background-color", OdfNamespaces.Fo, "text"),
+            document.StyleEngine.GetStyleProperty(styleName!, "text-transform", OdfNamespaces.Fo, "text"),
+            document.StyleEngine.GetStyleProperty(styleName!, "font-variant", OdfNamespaces.Fo, "text"));
     }
 
     private static void AppendStyledMarkdown(StringBuilder sb, string? text, InlineStyle style, OdfMarkdownExportOptions options)
@@ -640,6 +643,9 @@ public static class OdfMarkdownExporter
         AppendCssDeclaration(sb, "text-decoration", style.TextDecorationCss, ref needsSeparator);
         AppendCssDeclaration(sb, "font-size", style.FontSize, ref needsSeparator);
         AppendCssDeclaration(sb, "color", NormalizeCssColor(style.Color), ref needsSeparator);
+        AppendCssDeclaration(sb, "background-color", NormalizeCssColor(style.BackgroundColor), ref needsSeparator);
+        AppendCssDeclaration(sb, "text-transform", style.TextTransform, ref needsSeparator);
+        AppendCssDeclaration(sb, "font-variant", style.FontVariant, ref needsSeparator);
     }
 
     private static void AppendCssDeclaration(StringBuilder sb, string name, string? value, ref bool needsSeparator)
@@ -792,9 +798,9 @@ public static class OdfMarkdownExporter
 
     private sealed class InlineStyle
     {
-        public static readonly InlineStyle Empty = new(null, null, null, null, null, null);
+        public static readonly InlineStyle Empty = new(null, null, null, null, null, null, null, null, null);
 
-        public InlineStyle(string? fontWeight, string? fontStyle, string? underlineStyle, string? lineThroughStyle, string? fontSize, string? color)
+        public InlineStyle(string? fontWeight, string? fontStyle, string? underlineStyle, string? lineThroughStyle, string? fontSize, string? color, string? backgroundColor, string? textTransform, string? fontVariant)
         {
             Bold = string.Equals(fontWeight, "bold", StringComparison.OrdinalIgnoreCase);
             Italic = string.Equals(fontStyle, "italic", StringComparison.OrdinalIgnoreCase);
@@ -804,9 +810,12 @@ public static class OdfMarkdownExporter
                 !string.Equals(lineThroughStyle, "none", StringComparison.OrdinalIgnoreCase);
             FontSize = string.IsNullOrWhiteSpace(fontSize) ? null : fontSize!.Trim();
             Color = string.IsNullOrWhiteSpace(color) ? null : color!.Trim();
+            BackgroundColor = string.IsNullOrWhiteSpace(backgroundColor) ? null : backgroundColor!.Trim();
+            TextTransform = string.IsNullOrWhiteSpace(textTransform) ? null : textTransform!.Trim();
+            FontVariant = string.IsNullOrWhiteSpace(fontVariant) ? null : fontVariant!.Trim();
         }
 
-        private InlineStyle(bool bold, bool italic, bool underline, bool strikethrough, string? fontSize, string? color)
+        private InlineStyle(bool bold, bool italic, bool underline, bool strikethrough, string? fontSize, string? color, string? backgroundColor, string? textTransform, string? fontVariant)
         {
             Bold = bold;
             Italic = italic;
@@ -814,6 +823,9 @@ public static class OdfMarkdownExporter
             Strikethrough = strikethrough;
             FontSize = fontSize;
             Color = color;
+            BackgroundColor = backgroundColor;
+            TextTransform = textTransform;
+            FontVariant = fontVariant;
         }
 
         public bool Bold { get; }
@@ -827,6 +839,12 @@ public static class OdfMarkdownExporter
         public string? FontSize { get; }
 
         public string? Color { get; }
+
+        public string? BackgroundColor { get; }
+
+        public string? TextTransform { get; }
+
+        public string? FontVariant { get; }
 
         public string? TextDecorationCss
         {
@@ -845,6 +863,9 @@ public static class OdfMarkdownExporter
             Underline ||
             !string.IsNullOrWhiteSpace(FontSize) ||
             !string.IsNullOrWhiteSpace(Color) ||
+            !string.IsNullOrWhiteSpace(BackgroundColor) ||
+            !string.IsNullOrWhiteSpace(TextTransform) ||
+            !string.IsNullOrWhiteSpace(FontVariant) ||
             (Strikethrough && !options.UseTildeStrikethrough);
 
         public InlineStyle Merge(InlineStyle other) =>
@@ -854,6 +875,9 @@ public static class OdfMarkdownExporter
                 Underline || other.Underline,
                 Strikethrough || other.Strikethrough,
                 other.FontSize ?? FontSize,
-                other.Color ?? Color);
+                other.Color ?? Color,
+                other.BackgroundColor ?? BackgroundColor,
+                other.TextTransform ?? TextTransform,
+                other.FontVariant ?? FontVariant);
     }
 }

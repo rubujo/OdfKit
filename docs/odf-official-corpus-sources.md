@@ -23,6 +23,9 @@
 2. 將官方或授權允許的樣本放在外部 root 內，不直接提交到 repo。
 3. 依 `docs/examples/external-corpus/manifest.json` 填入每個 fixture 的 `id`、`path`、
    `source`、`sourceUri`、`license`、`kind`、`version`、`profile`、`expected` 與 `roundTrip`。
+   若採集 ODFDOM 官方 sample parity，從
+   `docs/examples/odfdom-sample-corpus/manifest.json` 開始，並在下載實體樣本後將
+   `sourceUri` 改為精確上游樣本 URL、將 `sha256` 佔位值改為實際小寫十六進位雜湊。
 4. 若 ODF Toolkit Validator 與 OdfKit classification 不一致，先確認是否為 OdfKit bug。
    只有確認為暫時接受的 baseline 差異時，才記錄到 `baseline-exceptions.json`。
 5. 在樣本尚未下載或授權仍待審核時，可先用 `validate-corpus --metadata-only`

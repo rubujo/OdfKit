@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using OdfKit.Compliance;
@@ -55,7 +56,12 @@ public static class OdfKitCli
                 _ => UnknownCommand(args[0], error)
             };
         }
-        catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or ArgumentException or TimeoutException)
+        catch (JsonException ex)
+        {
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_InvalidJsonFile", ex.Path ?? "$"));
+            return 2;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or InvalidOperationException or ArgumentException or TimeoutException or CryptographicException)
         {
             error.WriteLine(ex.Message);
             return 2;
@@ -69,7 +75,7 @@ public static class OdfKitCli
             return 2;
         }
 
-        ValidateOptions parsedOptions = options ?? throw new InvalidOperationException("validate options were not parsed.");
+        ValidateOptions parsedOptions = options!;
         IReadOnlyList<string> files = ResolveValidateFiles(parsedOptions.Path, parsedOptions.Recursive);
         if (files.Count == 0)
         {
@@ -119,7 +125,7 @@ public static class OdfKitCli
             return 2;
         }
 
-        ValidateCorpusOptions parsedOptions = options ?? throw new InvalidOperationException("validate-corpus options were not parsed.");
+        ValidateCorpusOptions parsedOptions = options!;
         ValidateCorpusManifest manifest = ValidateCorpusManifest.Load(parsedOptions.ManifestPath);
         ValidateBaselineExceptionSet baselineExceptions = ValidateBaselineExceptionSet.Load(parsedOptions.BaselineExceptionsPath);
         baselineExceptions.EnsureAppliesTo(manifest);
@@ -135,9 +141,10 @@ public static class OdfKitCli
             string path = ResolveCorpusFixturePath(parsedOptions.RootPath, fixture.Path);
             if (!File.Exists(path))
             {
-                throw new InvalidDataException("corpus fixture not found: " + fixture.Path);
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixtureNotFound", fixture.Path));
             }
 
+            string? actualSha256 = fixture.Sha256 is null ? null : ComputeSha256(path);
             OdfValidationReport report = OdfValidator.Validate(
                 path,
                 new OdfValidationOptions
@@ -153,7 +160,7 @@ public static class OdfKitCli
                 report.IsValid,
                 baseline?.IsValid,
                 fixture.Profile.Id);
-            results.Add(new ValidateCorpusFixtureResult(fixture, path, report, baseline, documentedException));
+            results.Add(new ValidateCorpusFixtureResult(fixture, path, actualSha256, report, baseline, documentedException));
         }
 
         ValidateCorpusSummary summary = ValidateCorpusSummary.Create(results);
@@ -240,26 +247,37 @@ public static class OdfKitCli
             return 2;
         }
 
-        SanitizeOptions parsedOptions = options ?? throw new InvalidOperationException("sanitize options were not parsed.");
+        SanitizeOptions parsedOptions = options!;
         if (!File.Exists(parsedOptions.InputPath))
         {
             error.WriteLine(OdfLocalizer.GetMessage("Cli_PathNotFound", parsedOptions.InputPath));
             return 2;
         }
 
-        using OdfDocument document = OdfDocument.Load(
-            parsedOptions.InputPath,
-            new OdfLoadOptions { Password = parsedOptions.InputPassword });
-        int artifactCountBefore = CountSanitizableArtifacts(document.Package);
-        document.SanitizeMacros();
-        int artifactCountAfter = CountSanitizableArtifacts(document.Package);
-        document.Save(
-            parsedOptions.OutputPath,
-            new OdfSaveOptions
-            {
-                Password = parsedOptions.OutputPassword,
-                EncryptionAlgorithm = parsedOptions.EncryptionAlgorithm
-            });
+        int artifactCountBefore;
+        int artifactCountAfter;
+        try
+        {
+            using OdfDocument document = OdfDocument.Load(
+                parsedOptions.InputPath,
+                new OdfLoadOptions { Password = parsedOptions.InputPassword });
+            artifactCountBefore = CountSanitizableArtifacts(document.Package);
+            document.SanitizeMacros();
+            artifactCountAfter = CountSanitizableArtifacts(document.Package);
+            document.Save(
+                parsedOptions.OutputPath,
+                new OdfSaveOptions
+                {
+                    Password = parsedOptions.OutputPassword,
+                    EncryptionAlgorithm = parsedOptions.EncryptionAlgorithm
+                });
+        }
+        catch (CryptographicException)
+        {
+            error.WriteLine(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum"));
+            return 2;
+        }
+
         output.WriteLine("wrote: " + parsedOptions.OutputPath);
         output.WriteLine("removed-artifacts: " + Math.Max(0, artifactCountBefore - artifactCountAfter).ToString(CultureInfo.InvariantCulture));
         if (parsedOptions.OutputPassword is not null)
@@ -292,7 +310,7 @@ public static class OdfKitCli
             return 2;
         }
 
-        ConvertCsvOptions parsedOptions = options ?? throw new InvalidOperationException("convert-csv options were not parsed.");
+        ConvertCsvOptions parsedOptions = options!;
         if (!File.Exists(parsedOptions.InputPath))
         {
             error.WriteLine(OdfLocalizer.GetMessage("Cli_PathNotFound", parsedOptions.InputPath));
@@ -340,7 +358,7 @@ public static class OdfKitCli
             OdfDocumentKind.Spreadsheet => SpreadsheetDocument.Load(path),
             OdfDocumentKind.FlatSpreadsheet => FlatSpreadsheetDocument.Load(path),
             OdfDocumentKind.SpreadsheetTemplate => SpreadsheetTemplateDocument.Load(path),
-            _ => throw new InvalidOperationException("輸入檔案不是可匯出的 ODS 試算表。")
+            _ => throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SpecifiedOdfFileOds"))
         };
     }
 
@@ -382,7 +400,7 @@ public static class OdfKitCli
     {
         if (Path.IsPathRooted(fixturePath))
         {
-            throw new InvalidDataException("corpus fixture path must be relative: " + fixturePath);
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixturePathMustBeRelative", fixturePath));
         }
 
         string root = Path.GetFullPath(rootPath);
@@ -390,10 +408,17 @@ public static class OdfKitCli
         string rootWithSeparator = EnsureTrailingDirectorySeparator(root);
         if (!candidate.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidDataException("corpus fixture path escapes the corpus root: " + fixturePath);
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixturePathEscapesRoot", fixturePath));
         }
 
         return candidate;
+    }
+
+    private static string ComputeSha256(string path)
+    {
+        using FileStream stream = File.OpenRead(path);
+        byte[] hash = SHA256.HashData(stream);
+        return Convert.ToHexString(hash).ToLowerInvariant();
     }
 
     private static string EnsureTrailingDirectorySeparator(string path)
@@ -533,13 +558,13 @@ public static class OdfKitCli
 
         if (!File.Exists(path) && !Directory.Exists(path))
         {
-            error.WriteLine("path not found: " + path);
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_PathNotFound", path));
             return false;
         }
 
         if (!string.IsNullOrWhiteSpace(baselineExceptionsPath) && !File.Exists(baselineExceptionsPath))
         {
-            error.WriteLine("baseline exceptions file not found: " + baselineExceptionsPath);
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_PathNotFound", baselineExceptionsPath));
             return false;
         }
 
@@ -632,7 +657,7 @@ public static class OdfKitCli
 
                     if (manifestPath is not null)
                     {
-                        error.WriteLine("usage: odfkit validate-corpus manifest.json [options]");
+                        error.WriteLine(OdfLocalizer.GetMessage("Cli_UsageWithCmd", "validate-corpus manifest.json [options]"));
                         return false;
                     }
 
@@ -643,25 +668,25 @@ public static class OdfKitCli
 
         if (string.IsNullOrWhiteSpace(manifestPath))
         {
-            error.WriteLine("usage: odfkit validate-corpus manifest.json [options]");
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_UsageWithCmd", "validate-corpus manifest.json [options]"));
             return false;
         }
 
         if (!File.Exists(manifestPath))
         {
-            error.WriteLine("manifest not found: " + manifestPath);
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_PathNotFound", manifestPath));
             return false;
         }
 
         if (!string.IsNullOrWhiteSpace(rootPath) && !Directory.Exists(rootPath))
         {
-            error.WriteLine("root not found: " + rootPath);
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_PathNotFound", rootPath));
             return false;
         }
 
         if (!string.IsNullOrWhiteSpace(baselineExceptionsPath) && !File.Exists(baselineExceptionsPath))
         {
-            error.WriteLine("baseline exceptions file not found: " + baselineExceptionsPath);
+            error.WriteLine(OdfLocalizer.GetMessage("Cli_PathNotFound", baselineExceptionsPath));
             return false;
         }
 
@@ -996,9 +1021,9 @@ public static class OdfKitCli
         {
             ValidateBaselineKind.OdfValidator => OdfExternalValidator.ValidateWithOdfValidator(file, options.BaselineJarPath),
             ValidateBaselineKind.Command => OdfExternalValidator.ValidateWithCommand(
-                options.BaselineCommandPath ?? throw new ArgumentException("未提供 baseline command 路徑。"),
+                options.BaselineCommandPath ?? throw new ArgumentException(OdfLocalizer.GetMessage("Cli_UsageWithCmd", "--baseline-command path")),
                 file),
-            _ => throw new ArgumentOutOfRangeException(nameof(options), "不支援的 baseline。")
+            _ => throw new ArgumentOutOfRangeException(nameof(options), OdfLocalizer.GetMessage("Cli_SupportedBaselines"))
         };
 
         return new ValidateBaselineResult(
@@ -1034,6 +1059,8 @@ public static class OdfKitCli
         string normalized = path.Replace('\\', '/');
         return normalized.StartsWith("Basic/", StringComparison.OrdinalIgnoreCase) ||
             normalized.StartsWith("Scripts/", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(normalized, "macrosignatures.xml", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(normalized, "META-INF/macrosignatures.xml", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(normalized, "META-INF/documentsignatures.xml", StringComparison.OrdinalIgnoreCase);
     }
 
@@ -1176,6 +1203,8 @@ public static class OdfKitCli
             " failed=" + summary.FailedCount.ToString(CultureInfo.InvariantCulture) +
             " kind-mismatches=" + summary.KindMismatchCount.ToString(CultureInfo.InvariantCulture) +
             " version-mismatches=" + summary.VersionMismatchCount.ToString(CultureInfo.InvariantCulture) +
+            " sha256-checked=" + summary.Sha256CheckedCount.ToString(CultureInfo.InvariantCulture) +
+            " sha256-mismatches=" + summary.Sha256MismatchCount.ToString(CultureInfo.InvariantCulture) +
             " baseline-mismatches=" + summary.BaselineMismatchCount.ToString(CultureInfo.InvariantCulture) +
             " baseline-documented-exceptions=" + summary.BaselineDocumentedExceptionCount.ToString(CultureInfo.InvariantCulture));
     }
@@ -1198,12 +1227,17 @@ public static class OdfKitCli
                 versionMismatchCount = summary.VersionMismatchCount,
                 baselineFileCount = summary.BaselineFileCount,
                 baselineMismatchCount = summary.BaselineMismatchCount,
-                baselineDocumentedExceptionCount = summary.BaselineDocumentedExceptionCount
+                baselineDocumentedExceptionCount = summary.BaselineDocumentedExceptionCount,
+                sha256CheckedCount = summary.Sha256CheckedCount,
+                sha256MismatchCount = summary.Sha256MismatchCount
             },
             fixtures = results.Select(result => new
             {
                 id = result.Fixture.Id,
                 path = result.Path,
+                expectedSha256 = result.Fixture.Sha256,
+                actualSha256 = result.ActualSha256,
+                sha256Matches = result.Sha256Matches,
                 expected = FormatExpected(result.Fixture.Expected),
                 passed = result.Passed,
                 expectedKind = result.Fixture.Kind,
@@ -1272,6 +1306,7 @@ public static class OdfKitCli
                     source = fixture.Source,
                     sourceUri = fixture.SourceUri,
                     license = fixture.License,
+                    sha256 = fixture.Sha256,
                     kind = fixture.Kind,
                     version = fixture.Version,
                     profileId = fixture.Profile.Id,
@@ -1457,6 +1492,7 @@ public static class OdfKitCli
     private sealed record ValidateCorpusFixtureResult(
         ValidateCorpusFixture Fixture,
         string Path,
+        string? ActualSha256,
         OdfValidationReport Report,
         ValidateBaselineResult? Baseline,
         bool BaselineExceptionDocumented)
@@ -1472,7 +1508,10 @@ public static class OdfKitCli
             FormatVersion(Report.DetectedVersion),
             StringComparison.OrdinalIgnoreCase);
 
-        public bool Passed => ClassificationMatches && KindMatches && VersionMatches && BaselineMatches;
+        public bool Sha256Matches => Fixture.Sha256 is null ||
+            string.Equals(Fixture.Sha256, ActualSha256, StringComparison.OrdinalIgnoreCase);
+
+        public bool Passed => ClassificationMatches && KindMatches && VersionMatches && Sha256Matches && BaselineMatches;
 
         public bool RawBaselineMatches => Baseline is null || Baseline.IsValid == Report.IsValid;
 
@@ -1520,6 +1559,10 @@ public static class OdfKitCli
 
         public int BaselineDocumentedExceptionCount { get; private init; }
 
+        public int Sha256CheckedCount { get; private init; }
+
+        public int Sha256MismatchCount { get; private init; }
+
         public static ValidateCorpusSummary Create(IReadOnlyList<ValidateCorpusFixtureResult> results)
         {
             return new ValidateCorpusSummary
@@ -1533,7 +1576,9 @@ public static class OdfKitCli
                 VersionMismatchCount = results.Count(result => !result.VersionMatches),
                 BaselineFileCount = results.Count(result => result.Baseline is not null),
                 BaselineMismatchCount = results.Count(result => !result.BaselineMatches),
-                BaselineDocumentedExceptionCount = results.Count(result => result.BaselineExceptionDocumented)
+                BaselineDocumentedExceptionCount = results.Count(result => result.BaselineExceptionDocumented),
+                Sha256CheckedCount = results.Count(result => result.Fixture.Sha256 is not null),
+                Sha256MismatchCount = results.Count(result => !result.Sha256Matches)
             };
         }
     }
@@ -1556,7 +1601,7 @@ public static class OdfKitCli
                 !root.TryGetProperty("fixtures", out JsonElement fixtures) ||
                 fixtures.ValueKind != JsonValueKind.Array)
             {
-                throw new InvalidDataException("corpus manifest must contain a fixtures array.");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusManifestRequiresFixturesArray"));
             }
 
             List<ValidateCorpusFixture> parsed = [];
@@ -1567,13 +1612,13 @@ public static class OdfKitCli
                 ValidateCorpusFixture fixture = ValidateCorpusFixture.Parse(item);
                 if (!ids.Add(fixture.Id))
                 {
-                    throw new InvalidDataException("duplicate corpus fixture id: " + fixture.Id);
+                    throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixtureDuplicateId", fixture.Id));
                 }
 
                 string normalizedPath = fixture.Path.Replace('\\', '/').Trim();
                 if (!paths.Add(normalizedPath))
                 {
-                    throw new InvalidDataException("duplicate corpus fixture path: " + fixture.Path);
+                    throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixtureDuplicatePath", fixture.Path));
                 }
 
                 parsed.Add(fixture);
@@ -1581,7 +1626,7 @@ public static class OdfKitCli
 
             if (parsed.Count == 0)
             {
-                throw new InvalidDataException("corpus manifest must contain at least one fixture.");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusManifestRequiresAtLeastOneFixture"));
             }
 
             return new ValidateCorpusManifest(parsed);
@@ -1598,13 +1643,14 @@ public static class OdfKitCli
         string Version,
         OdfComplianceProfile Profile,
         ValidateCorpusExpected Expected,
-        string RoundTrip)
+        string RoundTrip,
+        string? Sha256)
     {
         public static ValidateCorpusFixture Parse(JsonElement item)
         {
             if (item.ValueKind != JsonValueKind.Object)
             {
-                throw new InvalidDataException("corpus fixture entries must be objects.");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixtureEntriesMustBeObjects"));
             }
 
             string id = ReadRequiredString(item, "id");
@@ -1617,12 +1663,14 @@ public static class OdfKitCli
             string profileId = ReadRequiredString(item, "profile");
             string expectedValue = ReadRequiredString(item, "expected");
             string roundTrip = ReadRequiredString(item, "roundTrip");
+            string? sha256 = ReadOptionalString(item, "sha256");
             OdfComplianceProfile profile = OdfComplianceProfiles.Find(profileId) ??
-                throw new InvalidDataException("unknown corpus fixture profile: " + profileId);
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixtureUnknownProfile", profileId));
             ValidateCorpusExpected expected = ParseExpected(expectedValue);
             ValidateRoundTrip(roundTrip);
+            ValidateSha256(sha256);
             ValidateSourceTraceability(source, sourceUri, license);
-            return new ValidateCorpusFixture(id, path, source, sourceUri, license, kind, version, profile, expected, roundTrip);
+            return new ValidateCorpusFixture(id, path, source, sourceUri, license, kind, version, profile, expected, roundTrip, sha256);
         }
 
         private static void ValidateSourceTraceability(string source, string? sourceUri, string license)
@@ -1636,7 +1684,7 @@ public static class OdfKitCli
                 !Uri.TryCreate(sourceUri, UriKind.Absolute, out Uri? uri) ||
                 uri.Scheme is not ("https" or "http"))
             {
-                throw new InvalidDataException("external corpus fixture requires absolute http(s) sourceUri.");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_ExternalCorpusFixtureRequiresAbsoluteSourceUri"));
             }
         }
 
@@ -1660,7 +1708,7 @@ public static class OdfKitCli
                 return ValidateCorpusExpected.Invalid;
             }
 
-            throw new InvalidDataException("corpus fixture expected must be valid or invalid.");
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixtureExpectedInvalid"));
         }
 
         private static void ValidateRoundTrip(string value)
@@ -1672,7 +1720,20 @@ public static class OdfKitCli
                 return;
             }
 
-            throw new InvalidDataException("corpus fixture roundTrip must be preserve-unknown, semantic-equivalent, or byte-identical.");
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixtureRoundTripInvalid"));
+        }
+
+        private static void ValidateSha256(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            if (value.Length != 64 || value.Any(ch => !Uri.IsHexDigit(ch)))
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixtureSha256Invalid"));
+            }
         }
 
         private static string ReadRequiredString(JsonElement item, string propertyName)
@@ -1680,7 +1741,7 @@ public static class OdfKitCli
             string? value = ReadOptionalString(item, propertyName);
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new InvalidDataException("corpus fixture requires " + propertyName + ".");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_CorpusFixtureRequiresProperty", propertyName));
             }
 
             return value;
@@ -1726,7 +1787,7 @@ public static class OdfKitCli
                 !root.TryGetProperty("exceptions", out JsonElement exceptions) ||
                 exceptions.ValueKind != JsonValueKind.Array)
             {
-                throw new InvalidDataException("baseline exceptions must contain an exceptions array.");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_BaselineExceptionsRequiresExceptionsArray"));
             }
 
             List<ValidateBaselineExceptionEntry> parsed = [];
@@ -1736,7 +1797,7 @@ public static class OdfKitCli
                 ValidateBaselineExceptionEntry entry = ValidateBaselineExceptionEntry.Parse(item);
                 if (!keys.Add(entry.Key))
                 {
-                    throw new InvalidDataException("duplicate baseline exception: " + entry.Path);
+                    throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_BaselineExceptionDuplicate", entry.Path));
                 }
 
                 parsed.Add(entry);
@@ -1751,7 +1812,7 @@ public static class OdfKitCli
             {
                 if (!manifest.Fixtures.Any(fixture => entry.MatchesFixturePath(fixture.Path)))
                 {
-                    throw new InvalidDataException("baseline exception does not match any corpus fixture: " + entry.Path);
+                    throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_BaselineExceptionDoesNotMatchFixture", entry.Path));
                 }
             }
         }
@@ -1798,14 +1859,14 @@ public static class OdfKitCli
         {
             if (item.ValueKind != JsonValueKind.Object)
             {
-                throw new InvalidDataException("baseline exception entries must be objects.");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_BaselineExceptionEntriesMustBeObjects"));
             }
 
             string path = ReadRequiredString(item, "path");
             string baselineValue = ReadRequiredString(item, "baseline");
             if (!TryParseBaseline(baselineValue, out ValidateBaselineKind baseline) || baseline == ValidateBaselineKind.None)
             {
-                throw new InvalidDataException("baseline exception baseline must be odf-validator or command.");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_BaselineExceptionBaselineInvalid"));
             }
 
             bool odfKitIsValid = ReadRequiredBoolean(item, "odfKitIsValid");
@@ -1857,7 +1918,7 @@ public static class OdfKitCli
             string? value = ReadOptionalString(item, propertyName);
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new InvalidDataException("baseline exception requires " + propertyName + ".");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_BaselineExceptionRequiresProperty", propertyName));
             }
 
             return value;
@@ -1875,7 +1936,7 @@ public static class OdfKitCli
             if (!item.TryGetProperty(propertyName, out JsonElement value) ||
                 value.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
             {
-                throw new InvalidDataException("baseline exception requires boolean " + propertyName + ".");
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Cli_BaselineExceptionRequiresBooleanProperty", propertyName));
             }
 
             return value.GetBoolean();

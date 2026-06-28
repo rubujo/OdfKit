@@ -165,6 +165,33 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// 取得或設定文字片段的背景色。
+    /// </summary>
+    public string? BackgroundColor
+    {
+        get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "background-color", OdfNamespaces.Fo, "text");
+        set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "background-color", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+    }
+
+    /// <summary>
+    /// 取得或設定文字大小寫轉換，例如 <c>uppercase</c>。
+    /// </summary>
+    public string? TextTransform
+    {
+        get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "text-transform", OdfNamespaces.Fo, "text");
+        set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "text-transform", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+    }
+
+    /// <summary>
+    /// 取得或設定字型變體，例如 <c>small-caps</c>。
+    /// </summary>
+    public string? FontVariant
+    {
+        get => _doc.StyleEngine.GetStyleProperty(GetStyleName(), "font-variant", OdfNamespaces.Fo, "text");
+        set => _doc.StyleEngine.SetLocalStyleProperty(Node, "text", "text-properties", "font-variant", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+    }
+
+    /// <summary>
     /// 取得或設定文字片段的東亞（中日韓）字型名稱。
     /// </summary>
     public string? FontNameAsian
@@ -297,6 +324,39 @@ public class OdfTextRun
     public OdfTextRun WithColor(string hexColor)
     {
         Color = hexColor;
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此文字片段的背景色。
+    /// </summary>
+    /// <param name="hexColor">十六進位顏色字串，例如 <c>#FFFF00</c></param>
+    /// <returns>文字片段本身</returns>
+    public OdfTextRun WithBackgroundColor(string hexColor)
+    {
+        BackgroundColor = hexColor;
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此文字片段的大小寫轉換。
+    /// </summary>
+    /// <param name="transform">大小寫轉換值，例如 <c>uppercase</c></param>
+    /// <returns>文字片段本身</returns>
+    public OdfTextRun WithTextTransform(string transform)
+    {
+        TextTransform = transform;
+        return this;
+    }
+
+    /// <summary>
+    /// 設定此文字片段的字型變體。
+    /// </summary>
+    /// <param name="variant">字型變體值，例如 <c>small-caps</c></param>
+    /// <returns>文字片段本身</returns>
+    public OdfTextRun WithFontVariant(string variant)
+    {
+        FontVariant = variant;
         return this;
     }
 }

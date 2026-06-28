@@ -5,6 +5,7 @@ using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Drawing;
+using OdfKit.Export;
 using OdfKit.Presentation;
 using OdfKit.Styles;
 using Xunit;
@@ -42,6 +43,76 @@ public class DrawingApiUsabilityTests
         Assert.Single(loaded.Pages[0].Shapes, shape => shape.LocalName == "rect");
         Assert.Equal("開始", loaded.Pages[0].TextBoxes[0].Text);
         Assert.Contains(loaded.GetPaths(), path => path.SvgPathData == "M 0 0 L 2 2 Z");
+    }
+
+    /// <summary>
+    /// 驗證繪圖 Fluent builder 可建立流程圖常見的圖層、連接線、群組與圖片。
+    /// </summary>
+    [Fact]
+    public void DrawingDocumentBuilderCreatesComplexFlowDiagram()
+    {
+        using DrawingDocument drawing = DrawingDocument.Builder()
+            .WithMetadata(metadata => metadata.Title("匯入流程"))
+            .WithTheme(OdfDesignTheme.Flowchart)
+            .WithStyles(OdfStyleSet.BusinessReport)
+            .WithLayoutPreset(OdfLayoutPreset.FlowDiagram)
+            .AddPage("主流程", page => page
+                .AddLayer("背景", isProtected: true)
+                .AddLayer("流程")
+                .AddFlowStep("load", "載入 ODF", 0, configure: shape => shape
+                    .WithId("load")
+                    .OnLayer("流程"))
+                .AddFlowStep("validate", "驗證封裝", 1, OdfShapeType.Ellipse, shape => shape
+                    .WithId("validate")
+                    .OnLayer("流程"))
+                .AddFlowStep("export", "輸出報告", 2, configure: shape => shape
+                    .WithId("export")
+                    .OnLayer("流程"))
+                .AddConnector("load", "validate", OdfConnectorType.Straight)
+                .AddConnector("validate", "export", OdfConnectorType.Straight)
+                .AddImage(CreatePngBytes(), 1, 4, 1, 1)
+                .AddGroup("圖例", group => group
+                    .AddRectangle(13, 4, 1, 1, shape => shape.Fill("#d9ead3"))
+                    .AddTextBox("完成節點", 14.2, 4, 3, 1)))
+            .Build();
+
+        using var stream = new MemoryStream();
+        drawing.SaveToStream(stream);
+        stream.Position = 0;
+
+        using DrawingDocument loaded = DrawingDocument.Load(stream, "flow.odg");
+
+        Assert.Equal("匯入流程", loaded.Title);
+        Assert.Equal("主流程", loaded.Pages[0].Name);
+        Assert.Contains(loaded.GetLayers(), layer => layer.Name == "背景" && layer.IsProtected);
+        Assert.Contains(loaded.GetShapeLayerAssignments(), assignment => assignment.Id == "load" && assignment.LayerName == "流程");
+        Assert.Equal("#D9EAF7", loaded.Pages[0].Shapes.Single(shape => shape.Id == "load").FillColor);
+        Assert.Equal("#FFF2CC", loaded.Pages[0].Shapes.Single(shape => shape.Id == "validate").FillColor);
+        Assert.Equal("#D9EAD3", loaded.Pages[0].Shapes.Single(shape => shape.Id == "export").FillColor);
+        Assert.Equal("#1F4E79", loaded.Pages[0].Shapes.Single(shape => shape.Id == "load").StrokeColor);
+        Assert.Equal("#1F4E79", loaded.Pages[0].Shapes.First(shape => shape.LocalName == "connector").StrokeColor);
+        Assert.Contains(loaded.GetConnectors(), connector => connector.StartShapeId == "load" && connector.EndShapeId == "validate");
+        Assert.Contains(loaded.Pages[0].Pictures, picture => picture.ImageHref is { } href && href.EndsWith(".png", StringComparison.Ordinal));
+        Assert.Contains(loaded.Pages[0].Shapes, shape => shape.LocalName == "g");
+        Assert.Contains(loaded.Pages[0].TextBoxes, textBox => textBox.Text == "輸出報告");
+
+        string svg = loaded.ToSvg();
+        Assert.Contains("<svg", svg, StringComparison.Ordinal);
+        Assert.Contains("載入 ODF", svg, StringComparison.Ordinal);
+        Assert.Contains("image", svg, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證內建設計主題每次都回傳獨立執行個體，避免客製化污染後續 builder。
+    /// </summary>
+    [Fact]
+    public void BuiltInDesignThemeInstancesAreIsolated()
+    {
+        OdfDesignTheme.Flowchart.WithAccentFillColors("#000000");
+
+        OdfDesignTheme freshTheme = OdfDesignTheme.Flowchart;
+
+        Assert.Equal("#CFE2F3", freshTheme.GetAccentFillColor(0));
     }
 
     /// <summary>

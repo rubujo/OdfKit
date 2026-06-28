@@ -98,6 +98,9 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     /// </summary>
     /// <param name="ordinal">以零起始的資料行索引</param>
     /// <returns>該資料行的 Type</returns>
+    [return: System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(
+        System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields |
+        System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]
     public override Type GetFieldType(int ordinal)
     {
         var val = GetValue(ordinal);

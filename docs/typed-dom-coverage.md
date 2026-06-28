@@ -169,7 +169,7 @@
 | `office:spreadsheet` 工作表 facade | complete | `OfficeSpreadsheetContentModelFacadeSupportsTableAppendAndEnumeration` |
 | `office:presentation` 投影片頁面 facade | complete | `OfficePresentationContentModelFacadeSupportsPageAppendAndEnumeration` |
 | `office:drawing` 繪圖頁面 facade | complete | `OfficeDrawingContentModelFacadeSupportsPageAppendAndEnumeration` |
-| 外部 ODFDOM 官方 sample corpus 逐項 API | planned | 待 Wave 2 外部 corpus 對照 |
+| 外部 ODFDOM 官方 sample corpus metadata gate | validated | `docs/examples/odfdom-sample-corpus/manifest.json`、`ExternalOdfDomSampleCorpusTemplateCanBeMetadataValidatedByCli` |
 
 ## ODFDOM parity gaps
 
@@ -177,7 +177,7 @@
 - Attribute property 目前已有基底 typed helper，且 generated artifact 已包含 integer、boolean、decimal、date/dateTime、time、duration、length/percent、borderWidths、bounded percent、angle、foKeepTogether/foWrapOption/foTextTransform/foTextAlign、dr3dProjection/dr3dShadeMode、svgFillRule/svgStrokeLineCap、tableBorderModel、textLabelFollowedBy/textListLevelPositionMode/textIndexScope/textTableType/textAnchorType/textNoteClass/textSelectPage/textReferenceFormat/textStartNumberingAt/textFootnotesPosition/textCaptionSequenceFormat/textNumberPosition/textPlaceholderType/textAnimation/textAnimationDirection/textKind、drawFill/drawFillImageRefPoint/drawColorMode/drawStrokeLineJoin、lineStyle/lineType/lineWidth/lineMode、fontFamilyGeneric/fontPitch/fontRelief/fontStretch/fontStyle/fontVariant/fontWeight、styleLineBreak/styleRepeat/styleDirection/styleWritingMode/styleTextRotationScale/styleTextCombine/styleVerticalAlign/styleVerticalPos/styleVerticalRel/styleHorizontalPos/styleHorizontalRel/styleWrap/styleRunThrough/styleWrapContourMode/styleScriptType/styleTextEmphasize、formOrientation、tableDirection/tableOrientation/tableDisplayMemberMode/tableLayoutMode、databaseRule、xLinkType/xLinkShow/xLinkActuate、numberStyle/numberTransliterationStyle、tableOrder/tableType、presentationEffect/presentationSpeed/presentationAction/presentationTransitionType/presentationTransitionStyle/presentationPresetClass、style name/list、color、IRI reference、cell address/range address、cell range address list、vector3D、point3D、points、language/country/script tokens、namespacedToken、character、textEncoding、targetFrameName、XML name、style family、ODF version 與 media type 強型別 property；其他 ODF datatype 仍需補齊。
 - Schema token attribute 目前已補 `number:calendar`、表格成員 / 群組 / 排序 / 條件來源 / 函式、資料庫 nullable / datasource setting、動畫色彩插值與 `draw:nohref`；開放字串或複合 grammar 的屬性仍保守維持 `string?`。
 - schema-to-wrapper coverage report 已可由 API / CLI 產生，並包含 schema child relation coverage；release pipeline 會固定保存 artifact。
-- 已有 repo 內 ODFDOM 風格 sample usage parity tests，涵蓋 text、spreadsheet、draw image frame、巢狀清單、註腳、presentation draw page 與 MathML formula object traversal；尚未對外部 ODF Toolkit / ODFDOM 官方 sample corpus 做逐項 API parity。
+- 已有 repo 內 ODFDOM 風格 sample usage parity tests，涵蓋 text、spreadsheet、draw image frame、巢狀清單、註腳、presentation draw page 與 MathML formula object traversal；外部 ODF Toolkit / ODFDOM 官方 sample corpus 已提供 `docs/examples/odfdom-sample-corpus/` metadata gate 與 `sha256` 欄位格式檢查，實體樣本仍維持在 `ODFKIT_PARITY_CORPUS_ROOT` 外部路徑，不提交第三方檔案。
 - High-level facade 仍由 Text / Spreadsheet / Presentation / Drawing 等文件模型承接，不直接從 generated DOM 推導。
 
 ## 完成狀態

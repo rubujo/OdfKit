@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -90,15 +91,25 @@ public class CliTests
             Assert.Equal(0, exitCode);
             Assert.Equal(string.Empty, error.ToString());
             Assert.Contains("wrote: " + outputPath, output.ToString());
-            Assert.Contains("removed-artifacts: 1", output.ToString());
+            Assert.Contains("removed-artifacts: 4", output.ToString());
             using (OdfPackage source = OdfPackage.Open(sourcePath))
             {
                 Assert.True(source.HasEntry("Basic/script.xlb"));
+                Assert.True(source.HasEntry("Scripts/python/hello.py"));
             }
 
             using OdfPackage sanitized = OdfPackage.Open(outputPath);
             Assert.False(sanitized.HasEntry("Basic/script.xlb"));
+            Assert.False(sanitized.HasEntry("Scripts/python/hello.py"));
+            Assert.False(sanitized.HasEntry("META-INF/macrosignatures.xml"));
+            Assert.False(sanitized.HasEntry("META-INF/documentsignatures.xml"));
             Assert.True(sanitized.HasEntry("content.xml"));
+
+            string contentXml = ReadEntryText(sanitized, "content.xml");
+            Assert.DoesNotContain("vnd.sun.star.script", contentXml, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("event-listener", contentXml, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("https://example.invalid/remote-image.png", contentXml, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("Pictures/foreign-safe.bin", contentXml, StringComparison.OrdinalIgnoreCase);
         }
         finally
         {
@@ -141,6 +152,7 @@ public class CliTests
 
             Assert.Equal(0, exitCode);
             Assert.Equal(string.Empty, error.ToString());
+            Assert.Contains("removed-artifacts: 4", output.ToString());
             Assert.Contains("encrypted-output: true", output.ToString());
             Assert.Contains("encryption-algorithm: aes256", output.ToString());
 
@@ -153,7 +165,43 @@ public class CliTests
                 outputPath,
                 new OdfLoadOptions { Password = outputPassword });
             Assert.False(sanitized.HasEntry("Basic/script.xlb"));
+            Assert.False(sanitized.HasEntry("Scripts/python/hello.py"));
+            Assert.False(sanitized.HasEntry("META-INF/macrosignatures.xml"));
+            Assert.False(sanitized.HasEntry("META-INF/documentsignatures.xml"));
             Assert.True(sanitized.HasEntry("content.xml"));
+        }
+        finally
+        {
+            TryDelete(sourcePath);
+            TryDelete(outputPath);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 sanitize 遇到錯誤密碼時會回報使用錯誤，且不會產生輸出檔。
+    /// </summary>
+    [Fact]
+    public void SanitizeEncryptedPackageWithWrongPasswordReturnsUsageError()
+    {
+        const string inputPassword = "CliInputSecret";
+        string sourcePath = CreateTempPath(".odt");
+        string outputPath = CreateTempPath(".odt");
+        try
+        {
+            CreateMacroPackage(sourcePath, inputPassword);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(
+                ["sanitize", sourcePath, outputPath, "--password", "WrongSecret"],
+                output,
+                error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains("password is invalid", error.ToString(), StringComparison.OrdinalIgnoreCase);
+            Assert.False(File.Exists(outputPath));
         }
         finally
         {
@@ -649,7 +697,7 @@ public class CliTests
 
             Assert.Equal(2, exitCode);
             Assert.Equal(string.Empty, output.ToString());
-            Assert.Contains("baseline exceptions file not found", error.ToString());
+            Assert.Contains(OdfLocalizer.GetMessage("Cli_PathNotFound", exceptions), error.ToString());
         }
         finally
         {
@@ -688,6 +736,80 @@ public class CliTests
             Assert.Equal("generated-valid", result.GetProperty("id").GetString());
             Assert.True(result.GetProperty("kindMatches").GetBoolean());
             Assert.True(result.GetProperty("versionMatches").GetBoolean());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 validate-corpus 遇到格式錯誤的 JSON manifest 時會回傳可診斷錯誤，而不是讓主程序崩潰。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusMalformedJsonReturnsDiagnosticFailure()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string manifest = Path.Combine(root, "manifest.json");
+            File.WriteAllText(manifest, "{ bad json", Encoding.UTF8);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest, "--format", "json"], output, error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains(OdfLocalizer.GetMessage("Cli_InvalidJsonFile", "$"), error.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 CLI 執行檔遇到格式錯誤的 corpus manifest 時不會冒泡成未處理例外。
+    /// </summary>
+    [Fact]
+    public async Task ValidateCorpusMalformedJsonExecutableReturnsDiagnosticFailure()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string manifest = Path.Combine(root, "manifest.json");
+            File.WriteAllText(manifest, "{ bad json", Encoding.UTF8);
+            string executablePath = GetCliExecutablePath();
+
+            using Process process = new()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = executablePath,
+                    ArgumentList =
+                    {
+                        "validate-corpus",
+                        manifest,
+                        "--format",
+                        "json"
+                    },
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false
+                }
+            };
+
+            Assert.True(process.Start());
+            string output = await process.StandardOutput.ReadToEndAsync(TestContext.Current.CancellationToken);
+            string error = await process.StandardError.ReadToEndAsync(TestContext.Current.CancellationToken);
+            await process.WaitForExitAsync(TestContext.Current.CancellationToken);
+
+            Assert.Equal(2, process.ExitCode);
+            Assert.Equal(string.Empty, output);
+            Assert.Contains("JSON", error, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("$", error, StringComparison.Ordinal);
         }
         finally
         {
@@ -1004,6 +1126,48 @@ public class CliTests
     }
 
     /// <summary>
+    /// 驗證外部 corpus fixture 缺少絕對 HTTP(S) sourceUri 時會回傳在地化診斷。
+    /// </summary>
+    [Fact]
+    public void ValidateCorpusExternalFixtureRequiresHttpSourceUri()
+    {
+        string root = CreateTempDirectory();
+        try
+        {
+            string manifest = Path.Combine(root, "manifest.json");
+            WriteCorpusManifest(
+                manifest,
+                [
+                    new CorpusFixtureTemplate(
+                        "external-without-source",
+                        "external/sample.odt",
+                        "ODF Validator sample",
+                        "relative/source",
+                        "external-review-required",
+                        "valid",
+                        "Text",
+                        "1.4",
+                        "semantic-equivalent")
+                ]);
+
+            using StringWriter output = new();
+            using StringWriter error = new();
+
+            int exitCode = OdfKitCli.Run(["validate-corpus", manifest, "--metadata-only"], output, error);
+
+            Assert.Equal(2, exitCode);
+            Assert.Equal(string.Empty, output.ToString());
+            Assert.Contains(
+                OdfLocalizer.GetMessage("Cli_ExternalCorpusFixtureRequiresAbsoluteSourceUri"),
+                error.ToString());
+        }
+        finally
+        {
+            TryDeleteDirectory(root);
+        }
+    }
+
+    /// <summary>
     /// 驗證 baseline exception manifest 不能包含重複例外。
     /// </summary>
     [Fact]
@@ -1049,7 +1213,9 @@ public class CliTests
 
             Assert.Equal(2, exitCode);
             Assert.Equal(string.Empty, output.ToString());
-            Assert.Contains("duplicate baseline exception", error.ToString());
+            Assert.Contains(
+                OdfLocalizer.GetMessage("Cli_BaselineExceptionDuplicate", "fixture.odt"),
+                error.ToString());
         }
         finally
         {
@@ -1095,7 +1261,9 @@ public class CliTests
 
             Assert.Equal(2, exitCode);
             Assert.Equal(string.Empty, output.ToString());
-            Assert.Contains("does not match any corpus fixture", error.ToString());
+            Assert.Contains(
+                OdfLocalizer.GetMessage("Cli_BaselineExceptionDoesNotMatchFixture", "missing.odt"),
+                error.ToString());
         }
         finally
         {
@@ -1393,6 +1561,20 @@ public class CliTests
         return path;
     }
 
+    private static string GetCliExecutablePath()
+    {
+        string executableName = OperatingSystem.IsWindows()
+            ? "OdfKit.Cli.exe"
+            : "OdfKit.Cli";
+        string path = Path.Combine(AppContext.BaseDirectory, executableName);
+        if (File.Exists(path))
+        {
+            return path;
+        }
+
+        throw new FileNotFoundException(OdfLocalizer.GetMessage("Cli_PathNotFound", executableName), path);
+    }
+
     private static void CreateTextDocument(string path, string text)
     {
         using TextDocument document = TextDocument.Create();
@@ -1414,10 +1596,33 @@ public class CliTests
         package.SetMimeType("application/vnd.oasis.opendocument.text");
         package.WriteEntry(
             "content.xml",
-            Encoding.UTF8.GetBytes("<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text /></office:body></office:document-content>"),
+            Encoding.UTF8.GetBytes(
+                "<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" " +
+                "xmlns:draw=\"urn:oasis:names:tc:opendocument:xmlns:drawing:1.0\" " +
+                "xmlns:script=\"urn:oasis:names:tc:opendocument:xmlns:script:1.0\" " +
+                "xmlns:xlink=\"http://www.w3.org/1999/xlink\" office:version=\"1.4\">" +
+                "<office:scripts><office:event-listeners>" +
+                "<script:event-listener script:event-name=\"dom-click\" script:language=\"ooo:script\" script:macro-name=\"Standard.Module1.Main\" />" +
+                "</office:event-listeners></office:scripts>" +
+                "<office:body><office:text>" +
+                "<draw:frame xlink:type=\"simple\" xlink:href=\"vnd.sun.star.script:Standard.Module1.Main\" />" +
+                "<draw:frame xlink:type=\"simple\" xlink:href=\"https://example.invalid/remote-image.png\" />" +
+                "<draw:frame xlink:type=\"simple\" xlink:href=\"Pictures/foreign-safe.bin\" />" +
+                "</office:text></office:body></office:document-content>"),
             "text/xml");
         package.WriteEntry("Basic/script.xlb", Encoding.UTF8.GetBytes("macro"), "application/octet-stream");
+        package.WriteEntry("Scripts/python/hello.py", Encoding.UTF8.GetBytes("print('macro')"), "text/x-python");
+        package.WriteEntry("META-INF/macrosignatures.xml", Encoding.UTF8.GetBytes("<macro-signatures/>"), "text/xml");
+        package.WriteEntry("Pictures/foreign-safe.bin", [1, 2, 3, 4], "application/octet-stream");
+        package.WriteEntry("META-INF/documentsignatures.xml", Encoding.UTF8.GetBytes("<document-signatures/>"), "text/xml");
         package.Save();
+    }
+
+    private static string ReadEntryText(OdfPackage package, string entryName)
+    {
+        using Stream stream = package.GetEntryStream(entryName);
+        using StreamReader reader = new(stream, Encoding.UTF8);
+        return reader.ReadToEnd();
     }
 
     private static string CreateBaselineCommand(int exitCode)

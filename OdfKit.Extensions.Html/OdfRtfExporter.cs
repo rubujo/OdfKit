@@ -493,7 +493,10 @@ public static class OdfRtfExporter
             document.StyleEngine.GetStyleProperty(styleName!, "text-line-through-style", OdfNamespaces.Style, "text"),
             document.StyleEngine.GetStyleProperty(styleName!, "text-position", OdfNamespaces.Style, "text"),
             document.StyleEngine.GetStyleProperty(styleName!, "font-size", OdfNamespaces.Fo, "text"),
-            document.StyleEngine.GetStyleProperty(styleName!, "color", OdfNamespaces.Fo, "text"));
+            document.StyleEngine.GetStyleProperty(styleName!, "color", OdfNamespaces.Fo, "text"),
+            document.StyleEngine.GetStyleProperty(styleName!, "background-color", OdfNamespaces.Fo, "text"),
+            document.StyleEngine.GetStyleProperty(styleName!, "text-transform", OdfNamespaces.Fo, "text"),
+            document.StyleEngine.GetStyleProperty(styleName!, "font-variant", OdfNamespaces.Fo, "text"));
     }
 
     private static void AppendStyledRtfText(StringBuilder sb, string? text, InlineStyle style, RtfExportContext context)
@@ -546,6 +549,22 @@ public static class OdfRtfExporter
             if (colorIndex > 0)
             {
                 sb.Append(@"\cf").Append(colorIndex).Append(' ');
+            }
+
+            int backgroundColorIndex = context.GetColorIndex(style.BackgroundColor);
+            if (backgroundColorIndex > 0)
+            {
+                sb.Append(@"\highlight").Append(backgroundColorIndex).Append(' ');
+            }
+
+            if (style.Uppercase)
+            {
+                sb.Append(@"\caps ");
+            }
+
+            if (style.SmallCaps)
+            {
+                sb.Append(@"\scaps ");
             }
         }
 
@@ -624,6 +643,12 @@ public static class OdfRtfExporter
                     break;
                 case '\u2011':
                     sb.Append(@"\_");
+                    break;
+                case '\u200B':
+                    sb.Append(@"\zwbo ");
+                    break;
+                case '\uFEFF':
+                    sb.Append(@"\zwnbo ");
                     break;
                 case '\u2002':
                     sb.Append(@"\enspace ");
@@ -760,7 +785,9 @@ public static class OdfRtfExporter
                 node.NamespaceUri == OdfNamespaces.Text &&
                 node.LocalName == "span")
             {
-                AddColor(ReadInlineStyle(document, node).Color);
+                InlineStyle style = ReadInlineStyle(document, node);
+                AddColor(style.Color);
+                AddColor(style.BackgroundColor);
             }
 
             foreach (OdfNode child in node.Children)
@@ -781,9 +808,9 @@ public static class OdfRtfExporter
 
     private sealed class InlineStyle
     {
-        public static readonly InlineStyle Empty = new(null, null, null, null, null, null, null);
+        public static readonly InlineStyle Empty = new(null, null, null, null, null, null, null, null, null, null);
 
-        public InlineStyle(string? fontWeight, string? fontStyle, string? underlineStyle, string? lineThroughStyle, string? textPosition, string? fontSize, string? color)
+        public InlineStyle(string? fontWeight, string? fontStyle, string? underlineStyle, string? lineThroughStyle, string? textPosition, string? fontSize, string? color, string? backgroundColor, string? textTransform, string? fontVariant)
         {
             Bold = string.Equals(fontWeight, "bold", StringComparison.OrdinalIgnoreCase);
             Italic = string.Equals(fontStyle, "italic", StringComparison.OrdinalIgnoreCase);
@@ -795,9 +822,12 @@ public static class OdfRtfExporter
             Subscript = string.Equals(textPosition, "sub", StringComparison.OrdinalIgnoreCase);
             FontSize = string.IsNullOrWhiteSpace(fontSize) ? null : fontSize!.Trim();
             Color = string.IsNullOrWhiteSpace(color) ? null : color!.Trim();
+            BackgroundColor = string.IsNullOrWhiteSpace(backgroundColor) ? null : backgroundColor!.Trim();
+            Uppercase = string.Equals(textTransform, "uppercase", StringComparison.OrdinalIgnoreCase);
+            SmallCaps = string.Equals(fontVariant, "small-caps", StringComparison.OrdinalIgnoreCase);
         }
 
-        private InlineStyle(bool bold, bool italic, bool underline, bool strikethrough, bool superscript, bool subscript, string? fontSize, string? color)
+        private InlineStyle(bool bold, bool italic, bool underline, bool strikethrough, bool superscript, bool subscript, string? fontSize, string? color, string? backgroundColor, bool uppercase, bool smallCaps)
         {
             Bold = bold;
             Italic = italic;
@@ -807,6 +837,9 @@ public static class OdfRtfExporter
             Subscript = subscript;
             FontSize = fontSize;
             Color = color;
+            BackgroundColor = backgroundColor;
+            Uppercase = uppercase;
+            SmallCaps = smallCaps;
         }
 
         public bool Bold { get; }
@@ -825,7 +858,13 @@ public static class OdfRtfExporter
 
         public string? Color { get; }
 
-        public bool IsEmpty => !Bold && !Italic && !Underline && !Strikethrough && !Superscript && !Subscript && string.IsNullOrWhiteSpace(FontSize) && string.IsNullOrWhiteSpace(Color);
+        public string? BackgroundColor { get; }
+
+        public bool Uppercase { get; }
+
+        public bool SmallCaps { get; }
+
+        public bool IsEmpty => !Bold && !Italic && !Underline && !Strikethrough && !Superscript && !Subscript && !Uppercase && !SmallCaps && string.IsNullOrWhiteSpace(FontSize) && string.IsNullOrWhiteSpace(Color) && string.IsNullOrWhiteSpace(BackgroundColor);
 
         public InlineStyle Merge(InlineStyle other) =>
             new(
@@ -836,6 +875,9 @@ public static class OdfRtfExporter
                 other.Superscript || (!other.Subscript && Superscript),
                 other.Subscript || (!other.Superscript && Subscript),
                 other.FontSize ?? FontSize,
-                other.Color ?? Color);
+                other.Color ?? Color,
+                other.BackgroundColor ?? BackgroundColor,
+                Uppercase || other.Uppercase,
+                SmallCaps || other.SmallCaps);
     }
 }

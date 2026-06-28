@@ -62,3 +62,4 @@
 | [CHANGELOG](../CHANGELOG.md) | 版本變更與破壞性調整紀錄 |
 | [THIRD-PARTY-NOTICES](../THIRD-PARTY-NOTICES.md) | 第三方授權與版權聲明 |
 | [provenance/README.md](provenance/README.md) | 模組來源、授權與依據 |
+| [Clean-room 來源索引](provenance/clean-room-source-index.md) | 公式評估、schema pattern、JSON Collaboration 與 managed conversion fidelity 的規格來源、不可複製來源與 golden 測試契約 |

@@ -21,6 +21,8 @@ namespace OdfKit.Conversion;
 /// </summary>
 public static class PptxToOdpConverter
 {
+    private const string OoxmlCompatNamespace = "urn:odfkit:ooxml:compatibility";
+    private const string PresentationMlNamespace = "http://schemas.openxmlformats.org/presentationml/2006/main";
     private const double EmusPerPoint = 12700d;
     private static readonly OdfLength DefaultX = OdfLength.FromCentimeters(1);
     private static readonly OdfLength DefaultY = OdfLength.FromCentimeters(1);
@@ -173,9 +175,10 @@ public static class PptxToOdpConverter
         }
 
         var animationTargets = new Dictionary<uint, string>();
+        var animationTargetParagraphCounts = new Dictionary<uint, int>();
         foreach (P.Shape shape in shapeTree.Elements<P.Shape>())
         {
-            ConvertShape(slidePart, shape, slide, animationTargets, themeColors);
+            ConvertShape(slidePart, shape, slide, animationTargets, animationTargetParagraphCounts, themeColors);
         }
 
         foreach (P.Picture picture in shapeTree.Elements<P.Picture>())
@@ -188,7 +191,7 @@ public static class PptxToOdpConverter
             ConvertGraphicFrame(graphicFrame, slide, animationTargets, themeColors);
         }
 
-        ApplySlideAnimations(slidePart, slide, animationTargets);
+        ApplySlideAnimations(slidePart, slide, animationTargets, animationTargetParagraphCounts);
 
         IReadOnlyList<string> speakerNotes = GetSpeakerNotes(slidePart);
         if (speakerNotes.Count > 0 && speakerNotes.Any(note => !string.IsNullOrWhiteSpace(note)))
@@ -298,16 +301,16 @@ public static class PptxToOdpConverter
         P.Shape shape,
         OdfKit.Presentation.OdfSlide slide,
         Dictionary<uint, string> animationTargets,
+        Dictionary<uint, int> animationTargetParagraphCounts,
         ThemeColorMap themeColors)
     {
+        P.PlaceholderShape? ph = GetPlaceholderShape(shape);
+        P.Shape? matchingPlaceholder = ph is not null ? FindMatchingPlaceholder(slidePart, ph) : null;
         Bounds bounds = GetBounds(shape.ShapeProperties);
-        IReadOnlyList<TextParagraph> paragraphs = GetTextParagraphs(shape, themeColors);
+        IReadOnlyList<TextParagraph> paragraphs = GetTextParagraphs(shape, themeColors, matchingPlaceholder);
         IReadOnlyList<TextRun> runs = FlattenTextRuns(paragraphs);
         uint? sourceShapeId = ReadShapeId(shape.NonVisualShapeProperties?.NonVisualDrawingProperties);
         OdfKit.Presentation.OdfPlaceholderType? placeholderType = ReadPlaceholderType(shape);
-
-        P.PlaceholderShape? ph = GetPlaceholderShape(shape);
-        P.Shape? matchingPlaceholder = ph is not null ? FindMatchingPlaceholder(slidePart, ph) : null;
 
         if (placeholderType.HasValue)
         {
@@ -318,7 +321,7 @@ public static class PptxToOdpConverter
             }
 
             ApplyShapeStyle(shape.ShapeProperties, shape.ShapeStyle, placeholder, themeColors, matchingPlaceholder);
-            RegisterAnimationTarget(sourceShapeId, placeholder, animationTargets);
+            RegisterAnimationTarget(sourceShapeId, placeholder, animationTargets, animationTargetParagraphCounts, paragraphs.Count);
             return;
         }
 
@@ -353,20 +356,20 @@ public static class PptxToOdpConverter
             }
 
             ApplyShapeStyle(shape.ShapeProperties, shape.ShapeStyle, addedShape, themeColors, matchingPlaceholder);
-            RegisterAnimationTarget(sourceShapeId, addedShape, animationTargets);
+            RegisterAnimationTarget(sourceShapeId, addedShape, animationTargets, animationTargetParagraphCounts, paragraphs.Count);
             return;
         }
         if (preset.HasValue && preset.Value.Equals(A.ShapeTypeValues.Rectangle))
         {
             OdfKit.Presentation.OdfShape addedShape = slide.AddShape(OdfShapeType.Rectangle, bounds.X, bounds.Y, bounds.Width, bounds.Height);
             ApplyShapeStyle(shape.ShapeProperties, shape.ShapeStyle, addedShape, themeColors, matchingPlaceholder);
-            RegisterAnimationTarget(sourceShapeId, addedShape, animationTargets);
+            RegisterAnimationTarget(sourceShapeId, addedShape, animationTargets, animationTargetParagraphCounts, 0);
         }
         else if (preset.HasValue && preset.Value.Equals(A.ShapeTypeValues.Ellipse))
         {
             OdfKit.Presentation.OdfShape addedShape = slide.AddShape(OdfShapeType.Ellipse, bounds.X, bounds.Y, bounds.Width, bounds.Height);
             ApplyShapeStyle(shape.ShapeProperties, shape.ShapeStyle, addedShape, themeColors, matchingPlaceholder);
-            RegisterAnimationTarget(sourceShapeId, addedShape, animationTargets);
+            RegisterAnimationTarget(sourceShapeId, addedShape, animationTargets, animationTargetParagraphCounts, 0);
         }
         else if (preset.HasValue && preset.Value.Equals(A.ShapeTypeValues.Line))
         {
@@ -376,7 +379,7 @@ public static class PptxToOdpConverter
                 bounds.HorizontalFlip ? bounds.X : AddLengths(bounds.X, bounds.Width),
                 bounds.VerticalFlip ? bounds.Y : AddLengths(bounds.Y, bounds.Height));
             ApplyShapeStyle(shape.ShapeProperties, shape.ShapeStyle, addedShape, themeColors, matchingPlaceholder);
-            RegisterAnimationTarget(sourceShapeId, addedShape, animationTargets);
+            RegisterAnimationTarget(sourceShapeId, addedShape, animationTargets, animationTargetParagraphCounts, 0);
         }
     }
 
@@ -490,32 +493,132 @@ public static class PptxToOdpConverter
             shape.StrokeStyle = strokeStyle;
         }
 
+        bool hasDirectShadow = ApplyDirectShapeShadow(properties ?? matchingPlaceholder?.ShapeProperties, shape, themeColors);
         A.EffectReference? effectRef = style?.EffectReference ?? matchingPlaceholder?.ShapeStyle?.EffectReference;
-        if (effectRef is not null)
+        if (!hasDirectShadow && effectRef is not null)
         {
             // EffectStyleList 範本內若已是具名 scheme color（非 phClr 佔位），陰影色彩須以範本本身
             // 定義的顏色為準，不可被呼叫端 EffectReference 自身的色彩取代。
-            string? shadowColor = themeColors.ResolveEffectStyleColor(effectRef.Index?.Value);
-            if (!string.IsNullOrWhiteSpace(shadowColor))
+            ThemeEffectShadow? themeShadow = themeColors.ResolveEffectStyleShadow(effectRef.Index?.Value);
+            if (themeShadow is not null)
             {
-                shape.Document.StyleEngine.SetLocalStyleProperty(
-                    shape.Node,
-                    "graphic",
-                    "graphic-properties",
-                    "shadow",
-                    OdfNamespaces.Draw,
-                    "visible",
-                    "draw");
-                shape.Document.StyleEngine.SetLocalStyleProperty(
-                    shape.Node,
-                    "graphic",
-                    "graphic-properties",
-                    "shadow-color",
-                    OdfNamespaces.Draw,
-                    "#" + shadowColor,
-                    "draw");
+                ApplyShadowProperties(shape, themeShadow);
             }
         }
+    }
+
+    private static bool ApplyDirectShapeShadow(
+        P.ShapeProperties? properties,
+        OdfKit.Presentation.OdfShape shape,
+        ThemeColorMap themeColors)
+    {
+        A.OuterShadow? outerShadow = properties?.GetFirstChild<A.EffectList>()?.GetFirstChild<A.OuterShadow>();
+        if (outerShadow is null)
+        {
+            return false;
+        }
+
+        string? shadowColor = ReadShadowColor(outerShadow, themeColors);
+        ThemeEffectShadow shadow = ReadThemeEffectShadow(outerShadow, shadowColor);
+        ApplyShadowProperties(shape, shadow);
+
+        return true;
+    }
+
+    private static ThemeEffectShadow ReadThemeEffectShadow(A.OuterShadow outerShadow, string? color)
+    {
+        string? offsetX = null;
+        string? offsetY = null;
+        if (outerShadow.Distance?.Value is long distance && distance > 0L)
+        {
+            double degrees = (outerShadow.Direction?.Value ?? 0) / 60000d;
+            double radians = degrees * Math.PI / 180d;
+            double distancePoints = distance / EmusPerPoint;
+            offsetX = OdfLength.FromPoints(distancePoints * Math.Cos(radians)).ToString();
+            offsetY = OdfLength.FromPoints(distancePoints * Math.Sin(radians)).ToString();
+        }
+
+        string? opacity = null;
+        int? alpha = outerShadow.GetFirstChild<A.RgbColorModelHex>()?.GetFirstChild<A.Alpha>()?.Val?.Value ??
+            outerShadow.GetFirstChild<A.SchemeColor>()?.GetFirstChild<A.Alpha>()?.Val?.Value;
+        if (alpha.HasValue)
+        {
+            opacity = (alpha.Value / 1000d).ToString("0.##", CultureInfo.InvariantCulture) + "%";
+        }
+
+        return new ThemeEffectShadow(color, offsetX, offsetY, opacity);
+    }
+
+    private static void ApplyShadowProperties(OdfKit.Presentation.OdfShape shape, ThemeEffectShadow shadow)
+    {
+        shape.Document.StyleEngine.SetLocalStyleProperty(
+            shape.Node,
+            "graphic",
+            "graphic-properties",
+            "shadow",
+            OdfNamespaces.Draw,
+            "visible",
+            "draw");
+
+        if (!string.IsNullOrWhiteSpace(shadow.Color))
+        {
+            shape.Document.StyleEngine.SetLocalStyleProperty(
+                shape.Node,
+                "graphic",
+                "graphic-properties",
+                "shadow-color",
+                OdfNamespaces.Draw,
+                "#" + shadow.Color,
+                "draw");
+        }
+
+        if (!string.IsNullOrWhiteSpace(shadow.OffsetX))
+        {
+            shape.Document.StyleEngine.SetLocalStyleProperty(
+                shape.Node,
+                "graphic",
+                "graphic-properties",
+                "shadow-offset-x",
+                OdfNamespaces.Draw,
+                shadow.OffsetX,
+                "draw");
+        }
+
+        if (!string.IsNullOrWhiteSpace(shadow.OffsetY))
+        {
+            shape.Document.StyleEngine.SetLocalStyleProperty(
+                shape.Node,
+                "graphic",
+                "graphic-properties",
+                "shadow-offset-y",
+                OdfNamespaces.Draw,
+                shadow.OffsetY,
+                "draw");
+        }
+
+        if (!string.IsNullOrWhiteSpace(shadow.Opacity))
+        {
+            shape.Document.StyleEngine.SetLocalStyleProperty(
+                shape.Node,
+                "graphic",
+                "graphic-properties",
+                "shadow-opacity",
+                OdfNamespaces.Draw,
+                shadow.Opacity,
+                "draw");
+        }
+    }
+
+    private static string? ReadShadowColor(A.OuterShadow outerShadow, ThemeColorMap themeColors)
+    {
+        string? rgb = outerShadow.GetFirstChild<A.RgbColorModelHex>()?.Val?.Value;
+        if (!string.IsNullOrWhiteSpace(rgb))
+        {
+            return NormalizeColor(rgb);
+        }
+
+        A.SchemeColorValues? scheme = outerShadow.GetFirstChild<A.SchemeColor>()?.Val?.Value;
+        return scheme.HasValue ? themeColors.Resolve(scheme.Value) : null;
     }
 
     private static string? ReadStyleReferenceColor(OpenXmlCompositeElement? reference, ThemeColorMap themeColors)
@@ -755,7 +858,8 @@ public static class PptxToOdpConverter
     private static void ApplySlideAnimations(
         SlidePart slidePart,
         OdfKit.Presentation.OdfSlide slide,
-        IReadOnlyDictionary<uint, string> animationTargets)
+        IReadOnlyDictionary<uint, string> animationTargets,
+        IReadOnlyDictionary<uint, int> animationTargetParagraphCounts)
     {
         P.Timing? timing = slidePart.Slide?.Timing;
         if (timing is null || animationTargets.Count == 0)
@@ -763,9 +867,10 @@ public static class PptxToOdpConverter
             return;
         }
 
+        IReadOnlyDictionary<uint, bool> paragraphBuildTargets = ReadParagraphBuildTargets(timing);
         var animationNodes = timing.Descendants<OpenXmlCompositeElement>()
             .Where(e => e is P.AnimateEffect || e is P.Animate || e is P.AnimateColor || e is P.AnimateMotion || e is P.AnimateRotation || e is P.AnimateScale ||
-                (e is P.SetBehavior setBehavior && setBehavior.Parent?.Elements<P.AnimateEffect>().Any() != true));
+                (e is P.SetBehavior setBehavior && !IsSupplementalSetBehavior(setBehavior)));
 
         foreach (OpenXmlCompositeElement effect in animationNodes)
         {
@@ -782,24 +887,110 @@ public static class PptxToOdpConverter
                 continue;
             }
 
-            OdfKit.Presentation.OdfAnimationEffect animationEffect = ReadAnimationEffect(effect);
-            TimeSpan duration = ReadAnimationDuration(effect);
-            TimeSpan delay = ReadAnimationDelay(effect);
-            OdfKit.Presentation.OdfAnimationKind kind = ReadAnimationKind(effect);
-            OdfKit.Presentation.OdfAnimationTrigger trigger = ReadAnimationTrigger(effect);
-            switch (kind)
+            if (TryReadParagraphRange(shapeTarget, out int start, out int end))
             {
-                case OdfKit.Presentation.OdfAnimationKind.Exit:
-                    slide.AddExitEffect(targetId, animationEffect, trigger, delay, duration);
-                    break;
-                case OdfKit.Presentation.OdfAnimationKind.Emphasis:
-                    slide.AddEmphasisEffect(targetId, animationEffect, duration);
-                    break;
-                default:
-                    slide.AddEntranceEffect(targetId, animationEffect, trigger, delay, duration);
-                    break;
+                OdfKit.Presentation.OdfAnimation rangedAnimation = AddOdfAnimation(slide, targetId, effect);
+                ApplyParagraphRange(rangedAnimation.Node, start, end);
+                continue;
             }
+
+            if (paragraphBuildTargets.TryGetValue(sourceShapeId, out bool isParagraphBuild) &&
+                isParagraphBuild &&
+                animationTargetParagraphCounts.TryGetValue(sourceShapeId, out int paragraphCount) &&
+                paragraphCount > 1)
+            {
+                for (int index = 0; index < paragraphCount; index++)
+                {
+                    OdfKit.Presentation.OdfAnimation paragraphAnimation = AddOdfAnimation(slide, targetId, effect);
+                    ApplyParagraphRange(paragraphAnimation.Node, index, index);
+                }
+
+                continue;
+            }
+
+            AddOdfAnimation(slide, targetId, effect);
         }
+    }
+
+    private static OdfKit.Presentation.OdfAnimation AddOdfAnimation(
+        OdfKit.Presentation.OdfSlide slide,
+        string targetId,
+        OpenXmlCompositeElement effect)
+    {
+        OdfKit.Presentation.OdfAnimationEffect animationEffect = ReadAnimationEffect(effect);
+        TimeSpan duration = ReadAnimationDuration(effect);
+        TimeSpan delay = ReadAnimationDelay(effect);
+        OdfKit.Presentation.OdfAnimationKind kind = ReadAnimationKind(effect);
+        OdfKit.Presentation.OdfAnimationTrigger trigger = ReadAnimationTrigger(effect);
+        return kind switch
+        {
+            OdfKit.Presentation.OdfAnimationKind.Exit => slide.AddExitEffect(targetId, animationEffect, trigger, delay, duration),
+            OdfKit.Presentation.OdfAnimationKind.Emphasis => slide.AddEmphasisEffect(targetId, animationEffect, duration, trigger, delay),
+            _ => slide.AddEntranceEffect(targetId, animationEffect, trigger, delay, duration),
+        };
+    }
+
+    private static IReadOnlyDictionary<uint, bool> ReadParagraphBuildTargets(P.Timing timing)
+    {
+        var targets = new Dictionary<uint, bool>();
+        foreach (P.BuildParagraph buildParagraph in timing.BuildList?.Elements<P.BuildParagraph>() ?? [])
+        {
+            if (!uint.TryParse(buildParagraph.ShapeId?.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out uint shapeId))
+            {
+                continue;
+            }
+
+            targets[shapeId] = buildParagraph.Build?.Value == P.ParagraphBuildValues.Paragraph;
+        }
+
+        return targets;
+    }
+
+    private static bool IsSupplementalSetBehavior(P.SetBehavior setBehavior)
+    {
+        P.ParallelTimeNode? timeNode = setBehavior.Ancestors<P.ParallelTimeNode>().FirstOrDefault();
+        return timeNode?.Descendants<P.AnimateEffect>().Any() == true;
+    }
+
+    private static void ApplyParagraphRange(OdfNode animationNode, int start, int end)
+    {
+        animationNode.SetAttribute("pptx-paragraph-start", OoxmlCompatNamespace, start.ToString(CultureInfo.InvariantCulture), "odfkit-ooxml");
+        animationNode.SetAttribute("pptx-paragraph-end", OoxmlCompatNamespace, end.ToString(CultureInfo.InvariantCulture), "odfkit-ooxml");
+    }
+
+    private static bool TryReadParagraphRange(P.ShapeTarget shapeTarget, out int start, out int end)
+    {
+        OpenXmlElement? paragraphRange = shapeTarget
+            .Descendants()
+            .FirstOrDefault(element =>
+                element.LocalName == "pRg" &&
+                element.NamespaceUri == PresentationMlNamespace);
+        if (paragraphRange is null)
+        {
+            start = 0;
+            end = 0;
+            return false;
+        }
+
+        bool hasStart = TryReadNonNegativeInt(paragraphRange.GetAttribute("st", string.Empty).Value, out start);
+        bool hasEnd = TryReadNonNegativeInt(paragraphRange.GetAttribute("end", string.Empty).Value, out end);
+        if (!hasStart && !hasEnd)
+        {
+            start = 0;
+            end = 0;
+            return false;
+        }
+
+        if (!hasEnd)
+            end = start;
+        if (!hasStart)
+            start = end;
+        return true;
+    }
+
+    private static bool TryReadNonNegativeInt(string? value, out int result)
+    {
+        return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out result) && result >= 0;
     }
 
     private static int? ReadPresetId(OpenXmlElement element)
@@ -1079,11 +1270,17 @@ public static class PptxToOdpConverter
     private static void RegisterAnimationTarget(
         uint? sourceShapeId,
         OdfKit.Presentation.OdfShape addedShape,
-        Dictionary<uint, string> animationTargets)
+        Dictionary<uint, string> animationTargets,
+        Dictionary<uint, int>? paragraphCounts = null,
+        int paragraphCount = 0)
     {
         if (sourceShapeId.HasValue && !string.IsNullOrWhiteSpace(addedShape.Id))
         {
             animationTargets[sourceShapeId.Value] = addedShape.Id;
+            if (paragraphCounts is not null)
+            {
+                paragraphCounts[sourceShapeId.Value] = Math.Max(paragraphCount, 0);
+            }
         }
     }
 
@@ -1102,7 +1299,10 @@ public static class PptxToOdpConverter
                 .Where(text => text.Length > 0));
     }
 
-    private static IReadOnlyList<TextParagraph> GetTextParagraphs(P.Shape shape, ThemeColorMap themeColors)
+    private static IReadOnlyList<TextParagraph> GetTextParagraphs(
+        P.Shape shape,
+        ThemeColorMap themeColors,
+        P.Shape? matchingPlaceholder = null)
     {
         P.TextBody? textBody = shape.TextBody;
         if (textBody is null)
@@ -1111,22 +1311,42 @@ public static class PptxToOdpConverter
         }
 
         var paragraphs = new List<TextParagraph>();
+        A.Paragraph[] inheritedParagraphs = matchingPlaceholder?.TextBody?.Elements<A.Paragraph>().ToArray() ?? [];
+        int paragraphIndex = 0;
         foreach (A.Paragraph paragraph in textBody.Elements<A.Paragraph>())
         {
+            A.Paragraph? inheritedParagraph = GetInheritedParagraph(inheritedParagraphs, paragraphIndex);
+            A.ParagraphProperties? paragraphProperties = paragraph.ParagraphProperties;
+            A.ParagraphProperties? inheritedProperties = inheritedParagraph?.ParagraphProperties;
+            A.TextCharacterPropertiesType? defaultProperties =
+                (A.TextCharacterPropertiesType?)paragraphProperties?.GetFirstChild<A.DefaultRunProperties>() ??
+                (A.TextCharacterPropertiesType?)inheritedProperties?.GetFirstChild<A.DefaultRunProperties>() ??
+                inheritedParagraph?.Descendants<A.RunProperties>().FirstOrDefault();
             var runs = new List<TextRun>();
             foreach (A.Run run in paragraph.Elements<A.Run>())
             {
                 string text = string.Concat(run.Elements<A.Text>().Select(value => value.Text));
                 if (text.Length > 0)
                 {
-                    runs.Add(new TextRun(text, GetTextStyle(run.RunProperties, themeColors)));
+                    runs.Add(new TextRun(text, GetTextStyle(run.RunProperties, themeColors, defaultProperties)));
                 }
             }
 
-            paragraphs.Add(new TextParagraph(runs, ReadTextAlignment(paragraph.ParagraphProperties?.Alignment?.Value)));
+            paragraphs.Add(new TextParagraph(runs, ReadTextAlignment(paragraphProperties?.Alignment?.Value) ?? ReadTextAlignment(inheritedProperties?.Alignment?.Value)));
+            paragraphIndex++;
         }
 
         return paragraphs;
+    }
+
+    private static A.Paragraph? GetInheritedParagraph(IReadOnlyList<A.Paragraph> paragraphs, int index)
+    {
+        if (paragraphs.Count == 0)
+        {
+            return null;
+        }
+
+        return index < paragraphs.Count ? paragraphs[index] : paragraphs[0];
     }
 
     private static IReadOnlyList<TextRun> FlattenTextRuns(IReadOnlyList<TextParagraph> paragraphs)
@@ -1179,24 +1399,29 @@ public static class PptxToOdpConverter
         return GetTextStyle(runProperties, ThemeColorMap.Empty);
     }
 
-    private static TextStyle GetTextStyle(A.RunProperties? runProperties, ThemeColorMap themeColors)
+    private static TextStyle GetTextStyle(
+        A.TextCharacterPropertiesType? runProperties,
+        ThemeColorMap themeColors,
+        A.TextCharacterPropertiesType? inheritedProperties = null)
     {
-        if (runProperties is null)
+        if (runProperties is null && inheritedProperties is null)
         {
             return TextStyle.Empty;
         }
 
-        string? color = ReadSolidFillColor(runProperties.GetFirstChild<A.SolidFill>(), themeColors);
-        string? fontFamily = ReadRunFontFamily(runProperties, themeColors);
+        string? color = ReadSolidFillColor(runProperties?.GetFirstChild<A.SolidFill>(), themeColors) ??
+            ReadSolidFillColor(inheritedProperties?.GetFirstChild<A.SolidFill>(), themeColors);
+        string? fontFamily = ReadRunFontFamily(runProperties, themeColors) ??
+            ReadRunFontFamily(inheritedProperties, themeColors);
         return new TextStyle(
-            runProperties.Bold?.Value == true,
-            runProperties.Italic?.Value == true,
-            runProperties.FontSize?.Value,
+            runProperties?.Bold?.Value == true || inheritedProperties?.Bold?.Value == true,
+            runProperties?.Italic?.Value == true || inheritedProperties?.Italic?.Value == true,
+            runProperties?.FontSize?.Value ?? inheritedProperties?.FontSize?.Value,
             fontFamily,
             color,
-            IsUnderlineEnabled(runProperties.Underline?.Value),
-            IsStrikethroughEnabled(runProperties.Strike?.Value),
-            GetTextPosition(runProperties.Baseline?.Value));
+            IsUnderlineEnabled(runProperties?.Underline?.Value) || IsUnderlineEnabled(inheritedProperties?.Underline?.Value),
+            IsStrikethroughEnabled(runProperties?.Strike?.Value) || IsStrikethroughEnabled(inheritedProperties?.Strike?.Value),
+            GetTextPosition(runProperties?.Baseline?.Value ?? inheritedProperties?.Baseline?.Value));
     }
 
     private static OdfKit.Presentation.OdfShape AddStyledTextBox(
@@ -1401,8 +1626,13 @@ public static class PptxToOdpConverter
         return scheme.HasValue ? themeColors.Resolve(scheme.Value) : null;
     }
 
-    private static string? ReadRunFontFamily(A.RunProperties runProperties, ThemeColorMap themeColors)
+    private static string? ReadRunFontFamily(A.TextCharacterPropertiesType? runProperties, ThemeColorMap themeColors)
     {
+        if (runProperties is null)
+        {
+            return null;
+        }
+
         string? latin = ResolveTypeface(runProperties.GetFirstChild<A.LatinFont>()?.Typeface?.Value, themeColors);
         if (!string.IsNullOrWhiteSpace(latin))
         {
@@ -1475,6 +1705,17 @@ public static class PptxToOdpConverter
         public bool VerticalFlip { get; }
     }
 
+    private sealed class ThemeEffectShadow(string? color, string? offsetX, string? offsetY, string? opacity)
+    {
+        public string? Color { get; } = color;
+
+        public string? OffsetX { get; } = offsetX;
+
+        public string? OffsetY { get; } = offsetY;
+
+        public string? Opacity { get; } = opacity;
+    }
+
     private sealed class ThemeColorMap
     {
         public static readonly ThemeColorMap Empty = new(
@@ -1484,6 +1725,7 @@ public static class PptxToOdpConverter
             new Dictionary<uint, string>(),
             new Dictionary<uint, string>(),
             new Dictionary<uint, string>(),
+            new Dictionary<uint, ThemeEffectShadow>(),
             new Dictionary<uint, string>());
 
         private readonly IReadOnlyDictionary<A.SchemeColorValues, string> _colors;
@@ -1492,6 +1734,7 @@ public static class PptxToOdpConverter
         private readonly IReadOnlyDictionary<uint, string> _fillStyleColors;
         private readonly IReadOnlyDictionary<uint, string> _lineStyleColors;
         private readonly IReadOnlyDictionary<uint, string> _effectStyleColors;
+        private readonly IReadOnlyDictionary<uint, ThemeEffectShadow> _effectStyleShadows;
         private readonly IReadOnlyDictionary<uint, string> _backgroundFillColors;
 
         private ThemeColorMap(
@@ -1501,6 +1744,7 @@ public static class PptxToOdpConverter
             IReadOnlyDictionary<uint, string> fillStyleColors,
             IReadOnlyDictionary<uint, string> lineStyleColors,
             IReadOnlyDictionary<uint, string> effectStyleColors,
+            IReadOnlyDictionary<uint, ThemeEffectShadow> effectStyleShadows,
             IReadOnlyDictionary<uint, string> backgroundFillColors)
         {
             _colors = colors;
@@ -1509,6 +1753,7 @@ public static class PptxToOdpConverter
             _fillStyleColors = fillStyleColors;
             _lineStyleColors = lineStyleColors;
             _effectStyleColors = effectStyleColors;
+            _effectStyleShadows = effectStyleShadows;
             _backgroundFillColors = backgroundFillColors;
         }
 
@@ -1542,6 +1787,7 @@ public static class PptxToOdpConverter
                         new Dictionary<uint, string>(),
                         new Dictionary<uint, string>(),
                         new Dictionary<uint, string>(),
+                        new Dictionary<uint, ThemeEffectShadow>(),
                         new Dictionary<uint, string>());
             }
 
@@ -1569,13 +1815,14 @@ public static class PptxToOdpConverter
             var lineStyleColors = new Dictionary<uint, string>();
             AddThemeLineStyleColors(lineStyleColors, formatScheme?.LineStyleList, colors);
             var effectStyleColors = new Dictionary<uint, string>();
-            AddThemeEffectStyleColors(effectStyleColors, formatScheme?.EffectStyleList, colors);
+            var effectStyleShadows = new Dictionary<uint, ThemeEffectShadow>();
+            AddThemeEffectStyles(effectStyleColors, effectStyleShadows, formatScheme?.EffectStyleList, colors);
             var backgroundFillColors = new Dictionary<uint, string>();
             AddThemeBackgroundFillColors(backgroundFillColors, formatScheme?.BackgroundFillStyleList, colors);
             return colors.Count == 0 && fonts.Count == 0 && lineWidths.Count == 0 && fillStyleColors.Count == 0 &&
-                lineStyleColors.Count == 0 && effectStyleColors.Count == 0 && backgroundFillColors.Count == 0
+                lineStyleColors.Count == 0 && effectStyleColors.Count == 0 && effectStyleShadows.Count == 0 && backgroundFillColors.Count == 0
                 ? Empty
-                : new ThemeColorMap(colors, fonts, lineWidths, fillStyleColors, lineStyleColors, effectStyleColors, backgroundFillColors);
+                : new ThemeColorMap(colors, fonts, lineWidths, fillStyleColors, lineStyleColors, effectStyleColors, effectStyleShadows, backgroundFillColors);
         }
 
         public string? Resolve(A.SchemeColorValues value)
@@ -1626,6 +1873,18 @@ public static class PptxToOdpConverter
             }
 
             return _effectStyleColors.TryGetValue(index.Value, out string? color) ? color : null;
+        }
+
+        public ThemeEffectShadow? ResolveEffectStyleShadow(uint? index)
+        {
+            if (!index.HasValue || index.Value == 0U)
+            {
+                return null;
+            }
+
+            return _effectStyleShadows.TryGetValue(index.Value, out ThemeEffectShadow? shadow)
+                ? shadow
+                : (_effectStyleColors.TryGetValue(index.Value, out string? color) ? new ThemeEffectShadow(color, null, null, null) : null);
         }
 
         public string? ResolveBackgroundFillColor(uint? index)
@@ -1724,8 +1983,9 @@ public static class PptxToOdpConverter
             }
         }
 
-        private static void AddThemeEffectStyleColors(
+        private static void AddThemeEffectStyles(
             Dictionary<uint, string> effectStyleColors,
+            Dictionary<uint, ThemeEffectShadow> effectStyleShadows,
             A.EffectStyleList? effectStyleList,
             IReadOnlyDictionary<A.SchemeColorValues, string> colors)
         {
@@ -1754,7 +2014,13 @@ public static class PptxToOdpConverter
 
                 if (!string.IsNullOrWhiteSpace(color))
                 {
-                    effectStyleColors[index] = NormalizeColor(color)!;
+                    string normalized = NormalizeColor(color)!;
+                    effectStyleColors[index] = normalized;
+                    A.OuterShadow? outerShadow = effectStyle.GetFirstChild<A.EffectList>()?.GetFirstChild<A.OuterShadow>();
+                    if (outerShadow is not null)
+                    {
+                        effectStyleShadows[index] = ReadThemeEffectShadow(outerShadow, normalized);
+                    }
                 }
 
                 index++;

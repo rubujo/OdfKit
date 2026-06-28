@@ -127,12 +127,10 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
                         Array.Copy(wrapped2, 0, result2, point.Length + 1, wrapped2.Length);
                         return new byte[][] { result2 };
                     }
-                    throw new NotSupportedException(
-                        $"不支援的 ECDH 金鑰類型：{rawKey.GetType().Name}。目前支援 X25519 及傳統 EC 曲線。");
+                    throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_UnsupportedEcdhKeyType", rawKey.GetType().Name));
                 }
             default:
-                throw new NotSupportedException(
-                    $"不支援的 OpenPGP 公鑰演算法：{encKey.Algorithm}。目前支援 RSA、ElGamal 及 ECDH。");
+                throw new NotSupportedException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_UnsupportedPublicKeyAlgorithm", encKey.Algorithm));
         }
     }
 

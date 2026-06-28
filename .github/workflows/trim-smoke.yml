@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'OdfKit/**'
+      - 'tools/OdfKit.TrimSmoke/**'
       - 'eng/Test-TrimSmoke.ps1'
       - '.github/workflows/trim-smoke.yml'
   push:
@@ -11,6 +12,7 @@ on:
       - main
     paths:
       - 'OdfKit/**'
+      - 'tools/OdfKit.TrimSmoke/**'
       - 'eng/Test-TrimSmoke.ps1'
       - '.github/workflows/trim-smoke.yml'
   workflow_dispatch:
