@@ -13,13 +13,13 @@ using OdfKit.Styles;
 namespace OdfKit.Export;
 
 /// <summary>
-/// Applies odf svg exporter.
+/// Exports ODF drawing pages to SVG.
 /// 將 DrawingDocument 匯出為 SVG 的淨室轉換器。
 /// </summary>
 public static class OdfSvgExporter
 {
     /// <summary>
-    /// Applies export.
+    /// Exports the specified drawing page as SVG markup.
     /// 將指定繪圖文件匯出為 SVG 字串。
     /// </summary>
     /// <param name="document">The source or target object. / 來源繪圖文件</param>
@@ -62,7 +62,7 @@ public static class OdfSvgExporter
     }
 
     /// <summary>
-    /// Applies save.
+    /// Saves the specified drawing page as an SVG file.
     /// 將指定繪圖文件匯出為 SVG 檔案。
     /// </summary>
     public static void Save(DrawingDocument document, string path, OdfSvgExportOptions? options = null)

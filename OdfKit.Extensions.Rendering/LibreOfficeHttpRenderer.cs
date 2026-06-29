@@ -7,7 +7,7 @@ using OdfKit.Core;
 namespace OdfKit.Extensions.Rendering;
 
 /// <summary>
-/// Provides libre office http renderer.
+/// Converts documents through a LibreOffice-compatible HTTP service.
 /// 使用 Docker 轉檔 API 進行雲原生文件轉譯的渲染器，內建池化管理與併發閘道控制。
 /// </summary>
 public sealed class LibreOfficeHttpRenderer : IDisposable
@@ -17,7 +17,7 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
     private bool _isDisposed;
 
     /// <summary>
-    /// Provides libre office http renderer.
+    /// Converts documents through a LibreOffice-compatible HTTP service.
     /// 初始化 <see cref="LibreOfficeHttpRenderer"/> 類別的新執行個體。
     /// </summary>
     /// <param name="backend">The numeric value. / 轉換後端實作；若為 null 則預設使用 <see cref="UnoserverRestBackend"/></param>
@@ -32,7 +32,7 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
     }
 
     /// <summary>
-    /// Applies convert async.
+    /// Converts a document through the LibreOffice HTTP backend asynchronously.
     /// 將指定文件非同步轉檔為目標格式並寫入輸出資料流。
     /// </summary>
     /// <param name="document">The source or target object. / 來源文件</param>
@@ -70,7 +70,7 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
     }
 
     /// <summary>
-    /// Provides dispose.
+    /// Releases resources used by the renderer.
     /// 釋放此渲染器所使用的資源。
     /// </summary>
     public void Dispose()

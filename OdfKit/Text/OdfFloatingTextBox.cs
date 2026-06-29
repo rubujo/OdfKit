@@ -5,7 +5,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf floating text box.
+/// Represents a floating text box in an ODT document.
 /// 表示 ODT 文件中的浮動文字框。
 /// </summary>
 public sealed class OdfFloatingTextBox
@@ -20,11 +20,11 @@ public sealed class OdfFloatingTextBox
     }
 
     /// <summary>
-    /// Adds add paragraph.
+    /// Adds a paragraph to the text box.
     /// 新增文字框段落。
     /// </summary>
-    /// <param name="text">The text or value. / 段落文字</param>
-    /// <returns>The result. / 新建立的段落</returns>
+    /// <param name="text">The paragraph text. / 段落文字。</param>
+    /// <returns>The newly created paragraph. / 新建立的段落。</returns>
     public OdfParagraph AddParagraph(string text = "")
     {
         var paragraphNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");

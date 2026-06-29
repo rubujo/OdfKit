@@ -6,7 +6,7 @@ using OdfKit.Core;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Provides a writer API for a single ODS worksheet XML fragment.
+/// Writes a single ODS worksheet XML fragment.
 /// 提供單一 ODS 工作表 XML 片段的寫入 API。
 /// </summary>
 public sealed class OdsSheetWriter

@@ -5,7 +5,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides a fluent API for composing MathML token trees with nested delegates.
+/// Composes MathML token trees with nested delegates.
 /// 提供以巢狀委派組合 MathML token 樹狀結構的 Fluent API。
 /// </summary>
 public sealed class OdfMathBuilder

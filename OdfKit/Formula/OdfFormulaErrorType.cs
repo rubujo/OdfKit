@@ -3,7 +3,7 @@
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Represents ODF formula error types.
+/// Defines the categories of errors that can occur while processing ODF formulas.
 /// 代表 ODF 公式錯誤的型別。
 /// </summary>
 public enum OdfFormulaErrorType

@@ -1,7 +1,7 @@
 ﻿namespace OdfKit.Export;
 
 /// <summary>
-/// Provides odf image export options.
+/// Configures raster image export behavior for ODF content.
 /// 試算表影像匯出的選項設定。
 /// </summary>
 public sealed class OdfImageExportOptions

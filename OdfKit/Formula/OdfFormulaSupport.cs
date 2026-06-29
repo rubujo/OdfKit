@@ -6,7 +6,7 @@ using OdfKit.Formula.AST;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides OpenFormula support coverage, preservation-safe serialization, and diagnostic helpers.
+/// Analyzes OpenFormula support coverage, preservation-safe serialization, and diagnostics.
 /// 提供 OpenFormula 支援範圍、保真序列化與診斷工具。
 /// </summary>
 public static class OdfFormulaSupport

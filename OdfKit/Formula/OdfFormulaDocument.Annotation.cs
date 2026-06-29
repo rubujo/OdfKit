@@ -6,7 +6,7 @@ using OdfKit.DOM;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides MathML annotation helpers for <see cref="OdfFormulaDocument"/>.
+/// Adds MathML annotation helpers to formula documents.
 /// 提供 <see cref="OdfFormulaDocument"/> 的 MathML 標註協助方法。
 /// </summary>
 public partial class OdfFormulaDocument

@@ -5,20 +5,20 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf bibliography mark.
+/// Represents a bibliography mark in an ODF document.
 /// 表示 ODF 文件中的文獻標記。
 /// </summary>
-/// <param name="node">The value to use. / 文獻標記 the OdfNode 節點</param>
+/// <param name="node">The OdfNode of the bibliography mark. / 文獻標記的 OdfNode 節點。</param>
 public class OdfBibliographyMark(OdfNode node)
 {
     /// <summary>
-    /// Gets argument null exception.
+    /// Gets the OdfNode associated with this mark.
     /// 取得與此標記相關聯的 OdfNode 節點。
     /// </summary>
     public OdfNode Node { get; } = node ?? throw new ArgumentNullException(nameof(node));
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the identifier of this bibliography mark.
     /// 取得或設定此文獻標記的識別碼。
     /// </summary>
     public string Identifier
@@ -28,7 +28,7 @@ public class OdfBibliographyMark(OdfNode node)
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the type of this bibliography mark.
     /// 取得或設定此文獻標記的類型。
     /// </summary>
     public string BibliographyType
@@ -38,7 +38,7 @@ public class OdfBibliographyMark(OdfNode node)
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the author of this bibliography mark.
     /// 取得或設定此文獻標記的作者。
     /// </summary>
     public string? Author
@@ -48,7 +48,7 @@ public class OdfBibliographyMark(OdfNode node)
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the title of this bibliography mark.
     /// 取得或設定此文獻標記的標題。
     /// </summary>
     public string? Title
@@ -58,7 +58,7 @@ public class OdfBibliographyMark(OdfNode node)
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the year of this bibliography mark.
     /// 取得或設定此文獻標記的年份。
     /// </summary>
     public string? Year

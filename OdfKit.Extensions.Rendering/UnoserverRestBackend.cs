@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace OdfKit.Extensions.Rendering;
 
 /// <summary>
-/// Provides unoserver rest backend.
+/// Runs LibreOffice conversions through an unoserver REST backend.
 /// 實作基於 <c>unoserver-rest-api</c> 的雲端 LibreOffice 轉檔後端。
 /// </summary>
 public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
@@ -19,7 +19,7 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
     private static readonly HttpClient SharedHttpClient = CreateSharedHttpClient();
 
     /// <summary>
-    /// Provides unoserver rest backend.
+    /// Runs LibreOffice conversions through an unoserver REST backend.
     /// 初始化 <see cref="UnoserverRestBackend"/> 類別的新執行個體。
     /// </summary>
     /// <param name="endpoint">The numeric value. / unoserver-rest-api 轉換服務端點（例如 <c>http://localhost:2004/request</c>）</param>

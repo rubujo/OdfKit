@@ -4,14 +4,14 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Provides odf page style.
+/// Represents a named page style (master-page) in a text document.
 /// 代表文字文件中的一個具名頁面樣式（master-page）。
 /// </summary>
 public sealed class OdfPageStyle
 {
     /// <summary>
-    /// Gets name.
-    /// 取得主頁面樣式名稱
+    /// Gets the master page style name.
+    /// 取得主頁面樣式名稱。
     /// </summary>
     public string Name { get; }
 

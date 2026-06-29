@@ -5,7 +5,7 @@ using OdfKit.Spreadsheet;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides conversion helpers for ODF and Excel formula formats.
+/// Converts formulas between ODF and Excel formats.
 /// 提供 ODF 與 Excel 公式格式之間的轉換工具。
 /// </summary>
 public static partial class OdfFormulaTranslator

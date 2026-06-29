@@ -21,13 +21,13 @@ public sealed class OdfMarkdownImportOptions
     public static OdfMarkdownImportOptions CommonMark { get; } = new() { Flavor = OdfMarkdownFlavor.CommonMark };
 
     /// <summary>
-    /// Provides basic.
+    /// Creates a basic Markdown import option set.
     /// 基礎 Markdown 匯入 preset。
     /// </summary>
     public static OdfMarkdownImportOptions Basic { get; } = new() { Flavor = OdfMarkdownFlavor.Basic };
 
     /// <summary>
-    /// Gets or sets flavor.
+    /// Gets or sets the Markdown dialect used during conversion.
     /// 取得或設定輸入 Markdown 的方言，預設為 GitHub Flavored Markdown。
     /// </summary>
     public OdfMarkdownFlavor Flavor { get; init; } = OdfMarkdownFlavor.GitHubFlavored;

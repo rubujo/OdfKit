@@ -10,15 +10,15 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     /// <summary>
-    /// Provides add image frame.
+    /// Adds an image frame in the specified paragraph.
     /// 在指定的段落中新增影像框架。
     /// </summary>
-    /// <param name="paragraph">The value to use. / 目標段落</param>
-    /// <param name="imageBytes">The value to use. / 影像的二進位位元組</param>
-    /// <param name="width">The name or identifier. / 影像寬度</param>
-    /// <param name="height">The numeric value. / 影像高度</param>
-    /// <param name="name">The name or identifier. / 影像名稱</param>
-    /// <returns>The result. / 代表新建影像的 OdfImage 物件</returns>
+    /// <param name="paragraph">The target paragraph. / 目標段落。</param>
+    /// <param name="imageBytes">The image's binary bytes. / 影像的二進位位元組。</param>
+    /// <param name="width">The image width. / 影像寬度。</param>
+    /// <param name="height">The image height. / 影像高度。</param>
+    /// <param name="name">The image name. / 影像名稱。</param>
+    /// <returns>The OdfImage object representing the newly created image. / 代表新建影像的 OdfImage 物件。</returns>
     public OdfImage AddImageFrame(OdfParagraph paragraph, byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
     {
         if (paragraph is null)
@@ -33,14 +33,14 @@ public partial class TextDocument
     }
 
     /// <summary>
-    /// Provides add chart.
+    /// Inserts an embedded chart in the specified paragraph.
     /// 在指定段落中插入嵌入式圖表。
     /// </summary>
-    /// <param name="paragraph">The value to use. / 目標段落</param>
-    /// <param name="chart">The value to use. / 圖表設定定義</param>
-    /// <param name="width">The name or identifier. / 圖表顯示寬度</param>
-    /// <param name="height">The numeric value. / 圖表顯示高度</param>
-    /// <returns>The result. / 代表圖表物件的 OdfNode 節點</returns>
+    /// <param name="paragraph">The target paragraph. / 目標段落。</param>
+    /// <param name="chart">The chart configuration definition. / 圖表設定定義。</param>
+    /// <param name="width">The chart display width. / 圖表顯示寬度。</param>
+    /// <param name="height">The chart display height. / 圖表顯示高度。</param>
+    /// <returns>The OdfNode representing the chart object. / 代表圖表物件的 OdfNode 節點。</returns>
     public OdfNode AddChart(OdfParagraph paragraph, OdfChartDefinition chart, OdfLength width, OdfLength height)
     {
         if (paragraph is null)

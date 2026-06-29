@@ -10,13 +10,13 @@ using SkiaSharp;
 namespace OdfKit.Extensions.Imaging;
 
 /// <summary>
-/// Provides APIs for odf text measurer.
+/// Measures text using the configured font and rendering options.
 /// 提供整合 HarfBuzzSharp 與 SkiaSharp 的跨平台文字物理寬度精確量測工具。
 /// </summary>
 public static class OdfTextMeasurer
 {
     /// <summary>
-    /// Provides measure width.
+    /// Measures the rendered width of text.
     /// 精確量測指定字型、大小與書寫模式下文字的物理寬度（回傳 <see cref="OdfLength"/> 封裝）。
     /// </summary>
     /// <param name="text">The text or value. / 要量測的文字內容</param>

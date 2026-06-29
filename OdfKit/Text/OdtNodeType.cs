@@ -1,7 +1,7 @@
 ﻿namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odt node type.
+/// Defines high-level node categories emitted by the streaming ODT reader.
 /// 表示 ODT 流式讀取器目前讀取到的文字元素類型。
 /// </summary>
 public enum OdtNodeType

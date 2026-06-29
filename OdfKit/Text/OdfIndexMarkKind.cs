@@ -1,18 +1,20 @@
 ﻿namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf index mark kind.
+/// Represents the high-level kind of an index mark.
 /// 表示索引標記的高階類型。
 /// </summary>
 public enum OdfIndexMarkKind
 {
     /// <summary>
-    /// 字母索引標記
+    /// An alphabetical index mark.
+    /// 字母索引標記。
     /// </summary>
     Alphabetical,
 
     /// <summary>
-    /// 文獻標記
+    /// A bibliography mark.
+    /// 文獻標記。
     /// </summary>
     Bibliography,
 }

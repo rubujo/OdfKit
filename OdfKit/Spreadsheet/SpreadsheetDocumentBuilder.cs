@@ -8,7 +8,7 @@ using OdfKit.Text;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Provides a fluent creation API for <see cref="SpreadsheetDocument"/>.
+/// Builds spreadsheet documents with a fluent API.
 /// 提供 <see cref="SpreadsheetDocument"/> 的 Fluent 建立 API。
 /// </summary>
 public sealed class SpreadsheetDocumentBuilder
@@ -104,7 +104,7 @@ public sealed class SpreadsheetDocumentBuilder
 }
 
 /// <summary>
-/// Provides a fluent creation API for worksheet content.
+/// Builds worksheet content with a fluent API.
 /// 提供工作表內容的 Fluent 建立 API。
 /// </summary>
 public sealed class OdfSheetBuilder

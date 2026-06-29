@@ -21,7 +21,7 @@ public partial class SpreadsheetDocument
     /// Gets summaries for all tracked changes in the document.
     /// 取得文件中所有追蹤修訂摘要。
     /// </summary>
-    /// <returns>The result. / 追蹤修訂清單</returns>
+    /// <returns>The list of tracked changes. / 追蹤修訂清單。</returns>
     public IReadOnlyList<OdfSpreadsheetTrackedChangeInfo> GetTrackedChanges() =>
         SpreadsheetDocumentTrackedChangesEngine.GetTrackedChanges(this);
 
@@ -29,7 +29,7 @@ public partial class SpreadsheetDocument
     /// Accepts the specified tracked change.
     /// 接受指定的追蹤修訂。
     /// </summary>
-    /// <param name="changeId">The name or identifier. / 修訂識別碼</param>
+    /// <param name="changeId">The change identifier. / 修訂識別碼。</param>
     public void AcceptChange(string changeId) =>
         SpreadsheetDocumentTrackedChangesEngine.AcceptChange(this, changeId);
 
@@ -37,7 +37,7 @@ public partial class SpreadsheetDocument
     /// Rejects the specified tracked change.
     /// 拒絕指定的追蹤修訂。
     /// </summary>
-    /// <param name="changeId">The name or identifier. / 修訂識別碼</param>
+    /// <param name="changeId">The change identifier. / 修訂識別碼。</param>
     public void RejectChange(string changeId) =>
         SpreadsheetDocumentTrackedChangesEngine.RejectChange(this, changeId);
 

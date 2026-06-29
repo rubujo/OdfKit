@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Provides workbook-level formula query and batch update APIs.
+/// Queries and batch-updates formulas across a workbook.
 /// 提供活頁簿層級的公式查詢與批次更新 API。
 /// </summary>
 public partial class SpreadsheetDocument

@@ -6,7 +6,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides formula reference offset helpers.
+/// Offsets formula references while preserving formula syntax.
 /// 提供公式參照偏移工具。
 /// </summary>
 public static partial class OdfFormulaTranslator

@@ -5,28 +5,28 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf index mark info.
+/// Represents summary information for an index mark.
 /// 表示索引標記的資訊。
 /// </summary>
-/// <param name="term">The value to use. / 索引詞彙</param>
-/// <param name="key1">The name or identifier. / 主要鍵值</param>
-/// <param name="key2">The name or identifier. / 次要鍵值</param>
+/// <param name="term">The index term. / 索引詞彙。</param>
+/// <param name="key1">The primary key. / 主要鍵值。</param>
+/// <param name="key2">The secondary key. / 次要鍵值。</param>
 public class OdfIndexMarkInfo(string term, string? key1, string? key2)
 {
     /// <summary>
-    /// Gets term.
+    /// Gets the index term.
     /// 取得索引詞彙。
     /// </summary>
     public string Term { get; } = term;
 
     /// <summary>
-    /// Gets key1.
+    /// Gets the primary key.
     /// 取得主要鍵值。
     /// </summary>
     public string? Key1 { get; } = key1;
 
     /// <summary>
-    /// Gets key2.
+    /// Gets the secondary key.
     /// 取得次要鍵值。
     /// </summary>
     public string? Key2 { get; } = key2;

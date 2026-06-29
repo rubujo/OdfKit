@@ -8,7 +8,7 @@ using OdfKit.Styles;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Provides APIs for odf text image collection.
+/// Adds images to text documents.
 /// 提供圖片新增入口。
 /// </summary>
 public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
@@ -16,24 +16,24 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
     private readonly TextDocument _document;
 
     /// <summary>
-    /// Provides odf text image collection.
+    /// Initializes a new instance of the <see cref="OdfTextImageCollection"/> class.
     /// 初始化 <see cref="OdfTextImageCollection"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">The value to use. / 所屬文字文件</param>
+    /// <param name="document">The owning text document. / 所屬文字文件。</param>
     public OdfTextImageCollection(TextDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
     }
 
     /// <summary>
-    /// Adds add.
+    /// Adds an image to a new paragraph.
     /// 新增圖片至新的段落。
     /// </summary>
-    /// <param name="imageBytes">The value to use. / 圖片二進位內容</param>
-    /// <param name="width">The name or identifier. / 圖片寬度</param>
-    /// <param name="height">The numeric value. / 圖片高度</param>
-    /// <param name="name">The name or identifier. / 選用的圖片名稱</param>
-    /// <returns>The result. / 新增完成的圖片</returns>
+    /// <param name="imageBytes">The binary image content. / 圖片二進位內容。</param>
+    /// <param name="width">The image width. / 圖片寬度。</param>
+    /// <param name="height">The image height. / 圖片高度。</param>
+    /// <param name="name">The optional image name. / 選用的圖片名稱。</param>
+    /// <returns>The newly added image. / 新增完成的圖片。</returns>
     public OdfImage Add(byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
     {
         var media = new OdfMediaManager(_document.Package);
@@ -43,7 +43,7 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
     }
 
     /// <summary>
-    /// Gets this member.
+    /// Gets the list of images in the document body.
     /// 取得文件本文中的圖片清單。
     /// </summary>
     public IReadOnlyList<OdfImage> Items
@@ -57,10 +57,10 @@ public sealed class OdfTextImageCollection : IEnumerable<OdfImage>
     }
 
     /// <summary>
-    /// Gets get enumerator.
+    /// Gets an enumerator over the images, for use with LINQ queries.
     /// 取得圖片列舉器，供 LINQ 查詢使用。
     /// </summary>
-    /// <returns>The result. / 圖片列舉器</returns>
+    /// <returns>The image enumerator. / 圖片列舉器。</returns>
     public IEnumerator<OdfImage> GetEnumerator()
     {
         return Items.GetEnumerator();

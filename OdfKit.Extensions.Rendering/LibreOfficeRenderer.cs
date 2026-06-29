@@ -11,7 +11,7 @@ using OdfKit.Core;
 namespace OdfKit.Extensions.Rendering;
 
 /// <summary>
-/// Provides APIs for libre office conversion formats.
+/// Defines common LibreOffice <c>--convert-to</c> output format names.
 /// 提供 LibreOffice <c>--convert-to</c> 常用輸出格式常數。
 /// </summary>
 public static class LibreOfficeConversionFormats
@@ -52,7 +52,7 @@ public static class LibreOfficeConversionFormats
     public const string Pptx = "pptx";
 
     /// <summary>
-    /// Provides csv.
+    /// Creates a renderer configured for CSV conversion.
     /// 逗號分隔值文字檔
     /// </summary>
     public const string Csv = "csv";
@@ -74,13 +74,13 @@ public static class LibreOfficeConversionFormats
 }
 
 /// <summary>
-/// Provides APIs for libre office renderer extensions.
+/// Adds convenience methods for converting ODF documents through LibreOffice.
 /// 提供將 ODF 文件轉檔與轉譯為其他格式的擴充方法。
 /// </summary>
 public static class LibreOfficeRendererExtensions
 {
     /// <summary>
-    /// Applies convert to pdf.
+    /// Converts the document to a PDF file.
     /// 將指定文件轉換為 PDF 格式。
     /// </summary>
     /// <param name="document">The source or target object. / 要轉換的 OdfDocument 來源文件</param>
@@ -91,7 +91,7 @@ public static class LibreOfficeRendererExtensions
     }
 
     /// <summary>
-    /// Provides convert to pdf.
+    /// Converts the document to PDF with the specified renderer.
     /// 使用指定的 LibreOffice renderer 將文件轉換為 PDF 格式。
     /// </summary>
     /// <param name="document">The source or target object. / 要轉換的 OdfDocument 來源文件</param>
@@ -103,7 +103,7 @@ public static class LibreOfficeRendererExtensions
     }
 
     /// <summary>
-    /// Provides convert to pdf async.
+    /// Converts the document to PDF asynchronously.
     /// 非同步將指定文件轉換為 PDF 格式。
     /// </summary>
     /// <param name="document">The source or target object. / 要轉換的 OdfDocument 來源文件</param>
@@ -122,7 +122,7 @@ public static class LibreOfficeRendererExtensions
     }
 
     /// <summary>
-    /// Applies convert to image.
+    /// Converts the document to an image file.
     /// 將指定文件轉換為指定的圖片格式。
     /// </summary>
     /// <param name="document">The source or target object. / 要轉換的 OdfDocument 來源文件</param>
@@ -134,7 +134,7 @@ public static class LibreOfficeRendererExtensions
     }
 
     /// <summary>
-    /// Provides convert to libre office format.
+    /// Converts the document to any LibreOffice-supported output format.
     /// 使用 LibreOffice 將指定文件轉換為任意 <c>--convert-to</c> 目標格式。
     /// </summary>
     /// <param name="document">The source or target object. / 要轉換的 OdfDocument 來源文件</param>
@@ -151,7 +151,7 @@ public static class LibreOfficeRendererExtensions
     }
 
     /// <summary>
-    /// Provides convert to libre office format async.
+    /// Converts the document to any LibreOffice-supported output format asynchronously.
     /// 非同步使用 LibreOffice 將指定文件轉換為任意 <c>--convert-to</c> 目標格式。
     /// </summary>
     /// <param name="document">The source or target object. / 要轉換的 OdfDocument 來源文件</param>
@@ -172,25 +172,25 @@ public static class LibreOfficeRendererExtensions
 }
 
 /// <summary>
-/// Provides libre office renderer.
+/// Converts ODF documents by invoking a local LibreOffice executable.
 /// 使用系統安裝的 LibreOffice 執行檔進行背景文件格式轉換的渲染器。
 /// </summary>
 public class LibreOfficeRenderer
 {
     /// <summary>
-    /// Gets or sets default libre office path.
+    /// Gets or sets the LibreOffice executable path.
     /// 取得或設定 LibreOffice 的執行檔路徑。
     /// </summary>
     public string LibreOfficePath { get; set; } = DefaultLibreOfficePath();
 
     /// <summary>
-    /// Gets or sets from seconds.
+    /// Gets or sets the timeout for LibreOffice conversion operations.
     /// 取得或設定轉檔作業的超時時間限制。預設為 60 秒。
     /// </summary>
     public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(60);
 
     /// <summary>
-    /// Provides convert.
+    /// Converts a document to the requested output format.
     /// 使用 LibreOffice 將 ODF 文件轉換為指定的目標格式並輸出。
     /// </summary>
     /// <param name="document">The source or target object. / 要轉檔的 OdfDocument 來源文件</param>
@@ -206,7 +206,7 @@ public class LibreOfficeRenderer
     }
 
     /// <summary>
-    /// Provides convert async.
+    /// Converts a document to the requested output format asynchronously.
     /// 使用 LibreOffice 將 ODF 文件非同步轉換為指定的目標格式並輸出。
     /// </summary>
     /// <param name="document">The source or target object. / 要轉檔的 OdfDocument 來源文件</param>
@@ -244,7 +244,7 @@ public class LibreOfficeRenderer
     }
 
     /// <summary>
-    /// Provides convert file.
+    /// Converts a file to the requested output format.
     /// 使用系統安裝的 LibreOffice 將指定的實體檔案轉換為目標格式並輸出。
     /// </summary>
     /// <param name="inputFilePath">The path or URI. / 輸入檔案的實體絕對路徑</param>
@@ -256,7 +256,7 @@ public class LibreOfficeRenderer
     }
 
     /// <summary>
-    /// Provides convert file async.
+    /// Converts an input file through LibreOffice asynchronously.
     /// 使用系統安裝的 LibreOffice 將指定的實體檔案非同步轉換為目標格式並輸出。
     /// </summary>
     /// <param name="inputFilePath">The path or URI. / 輸入檔案的實體絕對路徑</param>

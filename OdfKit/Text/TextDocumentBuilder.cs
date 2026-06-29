@@ -9,7 +9,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Provides APIs for text document builder.
+/// Builds text documents with a fluent API.
 /// 提供 <see cref="TextDocument"/> 的 Fluent 建立 API。
 /// </summary>
 public sealed class TextDocumentBuilder
@@ -23,11 +23,11 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Sets with metadata.
+    /// Configures the document metadata.
     /// 設定文件中繼資料。
     /// </summary>
-    /// <param name="configure">The delegate to invoke. / 中繼資料設定委派</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="configure">The metadata configuration delegate. / 中繼資料設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder WithMetadata(Action<TextDocumentMetadataBuilder> configure)
     {
         if (configure is null)
@@ -37,11 +37,11 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Sets with styles.
+    /// Sets the style set this builder applies to subsequently created content.
     /// 設定此 builder 後續建立內容會套用的樣式集合。
     /// </summary>
-    /// <param name="styles">The value to use. / 樣式集合</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="styles">The style set. / 樣式集合。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder WithStyles(OdfStyleSet styles)
     {
         _styles = styles ?? throw new ArgumentNullException(nameof(styles));
@@ -49,11 +49,11 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Sets with styles.
+    /// Sets the style set this builder applies to subsequently created content.
     /// 設定此 builder 後續建立內容會套用的樣式集合。
     /// </summary>
-    /// <param name="configure">The delegate to invoke. / 樣式集合設定委派</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="configure">The style set configuration delegate. / 樣式集合設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder WithStyles(Action<OdfStyleSet> configure)
     {
         if (configure is null)
@@ -65,11 +65,11 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Sets with theme.
+    /// Sets the design theme this builder applies to subsequently created content.
     /// 設定此 builder 後續建立內容會套用的設計主題。
     /// </summary>
-    /// <param name="theme">The value to use. / 設計主題</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="theme">The design theme. / 設計主題。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder WithTheme(OdfDesignTheme theme)
     {
         _styles = OdfStyleSet.FromTheme(theme);
@@ -77,12 +77,12 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Adds add heading.
+    /// Adds a heading paragraph at the specified outline level.
     /// 新增標題。
     /// </summary>
-    /// <param name="text">The text or value. / 標題文字</param>
-    /// <param name="level">The numeric value. / 大綱階層</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="text">The heading text. / 標題文字。</param>
+    /// <param name="level">The outline level. / 大綱階層。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddHeading(string text, int level = 1)
     {
         OdfParagraph heading = _document.Body.Headings.Add(text, level);
@@ -91,12 +91,12 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Adds add paragraph.
+    /// Adds a body paragraph to the document.
     /// 新增段落。
     /// </summary>
-    /// <param name="text">The text or value. / 段落文字</param>
-    /// <param name="configure">The delegate to invoke. / 段落樣式設定委派</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="text">The paragraph text. / 段落文字。</param>
+    /// <param name="configure">The paragraph style configuration delegate. / 段落樣式設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddParagraph(string text, Action<TextRunFormattingBuilder>? configure = null)
     {
         OdfParagraph paragraph = _document.Body.Paragraphs.Add(text);
@@ -112,11 +112,11 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Adds add paragraph.
+    /// Adds a paragraph composed of multiple text runs.
     /// 新增由多個文字片段組成的段落。
     /// </summary>
-    /// <param name="configure">The delegate to invoke. / 段落內容設定委派</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="configure">The paragraph content configuration delegate. / 段落內容設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddParagraph(Action<TextParagraphBuilder> configure)
     {
         if (configure is null)
@@ -128,14 +128,14 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Adds add cover page.
+    /// Adds a cover page with a title, optional subtitle, author, and date text, inserting a page break after the cover.
     /// 新增封面頁，包含標題、可選副標題、作者與日期文字，並在封面後插入分頁。
     /// </summary>
-    /// <param name="title">The name or identifier. / 封面標題</param>
-    /// <param name="subtitle">The name or identifier. / 封面副標題</param>
-    /// <param name="author">The name or identifier. / 作者或組織名稱</param>
-    /// <param name="dateText">The text or value. / 日期或期間文字</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="title">The cover title. / 封面標題。</param>
+    /// <param name="subtitle">The cover subtitle. / 封面副標題。</param>
+    /// <param name="author">The author or organization name. / 作者或組織名稱。</param>
+    /// <param name="dateText">The date or period text. / 日期或期間文字。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddCoverPage(
         string title,
         string? subtitle = null,
@@ -178,11 +178,11 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Adds add list.
+    /// Adds a list and configures its list items.
     /// 新增專案清單。
     /// </summary>
-    /// <param name="configure">The delegate to invoke. / 清單內容設定委派</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="configure">The list content configuration delegate. / 清單內容設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddList(Action<TextListBuilder> configure)
     {
         if (configure is null)
@@ -193,12 +193,12 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Adds add table of contents.
+    /// Adds a table of contents and immediately updates its content.
     /// 新增目錄並立即更新目錄內容。
     /// </summary>
-    /// <param name="title">The name or identifier. / 目錄標題</param>
-    /// <param name="outlineLevel">The numeric value. / 目錄大綱階層上限</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="title">The table of contents title. / 目錄標題。</param>
+    /// <param name="outlineLevel">The maximum outline level included in the table of contents. / 目錄大綱階層上限。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddTableOfContents(string title = "目錄", int outlineLevel = 10)
     {
         _document.InsertTableOfContents(title, outlineLevel);
@@ -206,13 +206,13 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Adds add table.
+    /// Adds a text table.
     /// 新增文字表格。
     /// </summary>
-    /// <param name="rows">The numeric value. / 列數</param>
-    /// <param name="columns">The numeric value. / 欄數</param>
-    /// <param name="configure">The delegate to invoke. / 表格設定委派</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="rows">The row count. / 列數。</param>
+    /// <param name="columns">The column count. / 欄數。</param>
+    /// <param name="configure">The table configuration delegate. / 表格設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddTable(int rows, int columns, Action<TextTableBuilder>? configure = null)
     {
         OdfTable table = _document.AddTable(rows, columns);
@@ -222,14 +222,14 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Adds add section.
+    /// Adds a multi-column section.
     /// 新增多欄區段。
     /// </summary>
-    /// <param name="name">The name or identifier. / 區段名稱</param>
-    /// <param name="columnCount">The numeric value. / 欄數</param>
-    /// <param name="gap">The value to use. / 欄間距</param>
-    /// <param name="configure">The delegate to invoke. / 區段內容設定委派</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="name">The section name. / 區段名稱。</param>
+    /// <param name="columnCount">The column count. / 欄數。</param>
+    /// <param name="gap">The column gap. / 欄間距。</param>
+    /// <param name="configure">The section content configuration delegate. / 區段內容設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder AddSection(
         string name,
         int columnCount,
@@ -242,11 +242,11 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Sets with page setup.
+    /// Configures the header and footer of the default page style.
     /// 設定預設頁面樣式的頁首與頁尾。
     /// </summary>
-    /// <param name="configure">The delegate to invoke. / 頁面設定委派</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="configure">The page setup configuration delegate. / 頁面設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentBuilder WithPageSetup(Action<TextPageSetupBuilder> configure)
     {
         if (configure is null)
@@ -257,10 +257,10 @@ public sealed class TextDocumentBuilder
     }
 
     /// <summary>
-    /// Creates build.
+    /// Builds and returns the text document.
     /// 建立並傳回文字文件。
     /// </summary>
-    /// <returns>The result. / 建立完成的文字文件</returns>
+    /// <returns>The built text document. / 建立完成的文字文件。</returns>
     public TextDocument Build()
     {
         return _document;
@@ -488,7 +488,7 @@ public sealed class TextDocumentBuilder
 }
 
 /// <summary>
-/// Provides APIs for text document metadata builder.
+/// Configures text document metadata with a fluent API.
 /// 提供文字文件中繼資料的 Fluent 設定 API。
 /// </summary>
 public sealed class TextDocumentMetadataBuilder
@@ -501,11 +501,11 @@ public sealed class TextDocumentMetadataBuilder
     }
 
     /// <summary>
-    /// Sets title.
+    /// Sets the document title metadata.
     /// 設定標題。
     /// </summary>
-    /// <param name="value">The text or value. / 標題</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="value">The title. / 標題。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentMetadataBuilder Title(string value)
     {
         _metadata.Title = value;
@@ -513,11 +513,11 @@ public sealed class TextDocumentMetadataBuilder
     }
 
     /// <summary>
-    /// Sets author.
+    /// Sets the document author metadata.
     /// 設定作者。
     /// </summary>
-    /// <param name="value">The text or value. / 作者</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="value">The author. / 作者。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentMetadataBuilder Author(string value)
     {
         _metadata.Creator = value;
@@ -525,11 +525,11 @@ public sealed class TextDocumentMetadataBuilder
     }
 
     /// <summary>
-    /// Sets subject.
+    /// Sets the document subject metadata.
     /// 設定主旨。
     /// </summary>
-    /// <param name="value">The text or value. / 主旨</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="value">The subject. / 主旨。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentMetadataBuilder Subject(string value)
     {
         _metadata.Subject = value;
@@ -537,11 +537,11 @@ public sealed class TextDocumentMetadataBuilder
     }
 
     /// <summary>
-    /// Sets description.
+    /// Sets the document description metadata.
     /// 設定描述。
     /// </summary>
-    /// <param name="value">The text or value. / 描述</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="value">The description. / 描述。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextDocumentMetadataBuilder Description(string value)
     {
         _metadata.Description = value;
@@ -550,7 +550,7 @@ public sealed class TextDocumentMetadataBuilder
 }
 
 /// <summary>
-/// Provides APIs for text paragraph builder.
+/// Builds paragraph text runs with a fluent API.
 /// 提供段落文字片段的 Fluent 建立 API。
 /// </summary>
 public sealed class TextParagraphBuilder
@@ -565,11 +565,11 @@ public sealed class TextParagraphBuilder
     }
 
     /// <summary>
-    /// Adds append.
+    /// Appends a plain text run.
     /// 新增純文字片段。
     /// </summary>
-    /// <param name="text">The text or value. / 文字內容</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="text">The text content. / 文字內容。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextParagraphBuilder Append(string text)
     {
         _paragraph.AddTextRun(text);
@@ -577,12 +577,12 @@ public sealed class TextParagraphBuilder
     }
 
     /// <summary>
-    /// Adds append.
+    /// Appends a formatted text run.
     /// 新增帶格式的文字片段。
     /// </summary>
-    /// <param name="text">The text or value. / 文字內容</param>
-    /// <param name="configure">The delegate to invoke. / 格式設定委派</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="text">The text content. / 文字內容。</param>
+    /// <param name="configure">The format configuration delegate. / 格式設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextParagraphBuilder Append(string text, Action<TextRunFormattingBuilder> configure)
     {
         if (configure is null)
@@ -595,12 +595,12 @@ public sealed class TextParagraphBuilder
     }
 
     /// <summary>
-    /// Adds add footnote.
+    /// Adds a footnote to the document.
     /// 新增腳註。
     /// </summary>
-    /// <param name="citation">The value to use. / 腳註引用標記</param>
-    /// <param name="bodyText">The text or value. / 腳註本文</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="citation">The footnote citation marker. / 腳註引用標記。</param>
+    /// <param name="bodyText">The footnote body text. / 腳註本文。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextParagraphBuilder AddFootnote(string citation, string bodyText)
     {
         _paragraph.AddFootnote(citation, bodyText);
@@ -608,12 +608,12 @@ public sealed class TextParagraphBuilder
     }
 
     /// <summary>
-    /// Adds add comment.
+    /// Adds a document comment.
     /// 新增註解。
     /// </summary>
-    /// <param name="author">The name or identifier. / 作者名稱</param>
-    /// <param name="text">The text or value. / 註解內容</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="author">The author name. / 作者名稱。</param>
+    /// <param name="text">The comment content. / 註解內容。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextParagraphBuilder AddComment(string author, string text)
     {
         _paragraph.AddComment(new OdfComment(author, text));
@@ -621,14 +621,14 @@ public sealed class TextParagraphBuilder
     }
 
     /// <summary>
-    /// Adds add image.
+    /// Adds an image frame.
     /// 新增圖片框架。
     /// </summary>
-    /// <param name="imageBytes">The value to use. / 圖片位元組</param>
-    /// <param name="width">The name or identifier. / 圖片寬度</param>
-    /// <param name="height">The numeric value. / 圖片高度</param>
-    /// <param name="name">The name or identifier. / 圖片名稱</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="imageBytes">The image bytes. / 圖片位元組。</param>
+    /// <param name="width">The image width. / 圖片寬度。</param>
+    /// <param name="height">The image height. / 圖片高度。</param>
+    /// <param name="name">The image name. / 圖片名稱。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextParagraphBuilder AddImage(byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
     {
         _document.AddImageFrame(_paragraph, imageBytes, width, height, name);
@@ -636,13 +636,13 @@ public sealed class TextParagraphBuilder
     }
 
     /// <summary>
-    /// Adds add chart.
+    /// Adds an embedded chart.
     /// 新增嵌入圖表。
     /// </summary>
-    /// <param name="chart">The value to use. / 圖表定義</param>
-    /// <param name="width">The name or identifier. / 圖表寬度</param>
-    /// <param name="height">The numeric value. / 圖表高度</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="chart">The chart definition. / 圖表定義。</param>
+    /// <param name="width">The chart width. / 圖表寬度。</param>
+    /// <param name="height">The chart height. / 圖表高度。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextParagraphBuilder AddChart(OdfChartDefinition chart, OdfLength width, OdfLength height)
     {
         _document.AddChart(_paragraph, chart, width, height);
@@ -651,7 +651,7 @@ public sealed class TextParagraphBuilder
 }
 
 /// <summary>
-/// Provides APIs for text table builder.
+/// Builds text tables with a fluent API.
 /// 提供文字表格的 Fluent 建立 API。
 /// </summary>
 public sealed class TextTableBuilder
@@ -664,11 +664,11 @@ public sealed class TextTableBuilder
     }
 
     /// <summary>
-    /// Sets with summary.
+    /// Sets the table summary.
     /// 設定表格摘要。
     /// </summary>
-    /// <param name="summary">The value to use. / 摘要文字</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="summary">The summary text. / 摘要文字。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextTableBuilder WithSummary(string summary)
     {
         _table.Summary = summary;
@@ -676,13 +676,13 @@ public sealed class TextTableBuilder
     }
 
     /// <summary>
-    /// Sets set cell.
+    /// Sets the cell text.
     /// 設定儲存格文字。
     /// </summary>
-    /// <param name="row">The numeric value. / 列索引，採 1 為基準</param>
-    /// <param name="column">The numeric value. / 欄索引，採 1 為基準</param>
-    /// <param name="text">The text or value. / 儲存格文字</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="row">The one-based row index. / 列索引，採 1 為基準。</param>
+    /// <param name="column">The one-based column index. / 欄索引，採 1 為基準。</param>
+    /// <param name="text">The cell text. / 儲存格文字。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextTableBuilder SetCell(int row, int column, string text)
     {
         EnsureOneBasedIndex(row, nameof(row));
@@ -693,14 +693,14 @@ public sealed class TextTableBuilder
     }
 
     /// <summary>
-    /// Provides merge cells.
+    /// Merges cells.
     /// 合併儲存格。
     /// </summary>
-    /// <param name="startRow">The numeric value. / 起始列，採 1 為基準</param>
-    /// <param name="startColumn">The numeric value. / 起始欄，採 1 為基準</param>
-    /// <param name="rowSpan">The numeric value. / 跨列數</param>
-    /// <param name="columnSpan">The numeric value. / 跨欄數</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="startRow">The one-based start row. / 起始列，採 1 為基準。</param>
+    /// <param name="startColumn">The one-based start column. / 起始欄，採 1 為基準。</param>
+    /// <param name="rowSpan">The number of rows spanned. / 跨列數。</param>
+    /// <param name="columnSpan">The number of columns spanned. / 跨欄數。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextTableBuilder MergeCells(int startRow, int startColumn, int rowSpan, int columnSpan)
     {
         EnsureOneBasedIndex(startRow, nameof(startRow));
@@ -719,7 +719,7 @@ public sealed class TextTableBuilder
 }
 
 /// <summary>
-/// Provides APIs for text section builder.
+/// Builds text sections with a fluent API.
 /// 提供文字區段的 Fluent 建立 API。
 /// </summary>
 public sealed class TextSectionBuilder
@@ -734,11 +734,11 @@ public sealed class TextSectionBuilder
     }
 
     /// <summary>
-    /// Adds add paragraph.
+    /// Adds a paragraph within the section.
     /// 新增區段內段落。
     /// </summary>
-    /// <param name="text">The text or value. / 段落文字</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="text">The paragraph text. / 段落文字。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextSectionBuilder AddParagraph(string text)
     {
         var paragraphNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
@@ -748,11 +748,11 @@ public sealed class TextSectionBuilder
     }
 
     /// <summary>
-    /// Adds add paragraph.
+    /// Adds a paragraph within the section, composed of multiple text runs.
     /// 新增由多個文字片段組成的區段內段落。
     /// </summary>
-    /// <param name="configure">The delegate to invoke. / 段落內容設定委派</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="configure">The paragraph content configuration delegate. / 段落內容設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextSectionBuilder AddParagraph(Action<TextParagraphBuilder> configure)
     {
         if (configure is null)
@@ -765,11 +765,11 @@ public sealed class TextSectionBuilder
     }
 
     /// <summary>
-    /// Sets protected.
+    /// Sets whether the section is read-only.
     /// 設定區段是否唯讀。
     /// </summary>
-    /// <param name="isProtected">The value to use. / 是否唯讀</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="isProtected">Whether it is read-only. / 是否唯讀。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextSectionBuilder Protected(bool isProtected = true)
     {
         _section.IsProtected = isProtected;
@@ -778,7 +778,7 @@ public sealed class TextSectionBuilder
 }
 
 /// <summary>
-/// Provides APIs for text page setup builder.
+/// Configures page setup with a fluent API.
 /// 提供頁面設定的 Fluent 建立 API。
 /// </summary>
 public sealed class TextPageSetupBuilder
@@ -791,11 +791,11 @@ public sealed class TextPageSetupBuilder
     }
 
     /// <summary>
-    /// Sets header.
+    /// Sets the header text.
     /// 設定頁首文字。
     /// </summary>
-    /// <param name="text">The text or value. / 頁首文字</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="text">The header text. / 頁首文字。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextPageSetupBuilder Header(string text)
     {
         _setup.Header.Text = text;
@@ -803,11 +803,11 @@ public sealed class TextPageSetupBuilder
     }
 
     /// <summary>
-    /// Sets footer.
+    /// Sets the footer text.
     /// 設定頁尾文字。
     /// </summary>
-    /// <param name="text">The text or value. / 頁尾文字</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="text">The footer text. / 頁尾文字。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextPageSetupBuilder Footer(string text)
     {
         _setup.Footer.Text = text;
@@ -815,11 +815,11 @@ public sealed class TextPageSetupBuilder
     }
 
     /// <summary>
-    /// Sets first page header.
+    /// Sets the first-page-only header text.
     /// 設定首頁專用頁首文字。
     /// </summary>
-    /// <param name="text">The text or value. / 首頁頁首文字</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="text">The first-page header text. / 首頁頁首文字。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextPageSetupBuilder FirstPageHeader(string text)
     {
         _setup.HeaderFirst.Text = text;
@@ -827,11 +827,11 @@ public sealed class TextPageSetupBuilder
     }
 
     /// <summary>
-    /// Sets first page footer.
+    /// Sets the first-page-only footer text.
     /// 設定首頁專用頁尾文字。
     /// </summary>
-    /// <param name="text">The text or value. / 首頁頁尾文字</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="text">The first-page footer text. / 首頁頁尾文字。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextPageSetupBuilder FirstPageFooter(string text)
     {
         _setup.FooterFirst.Text = text;
@@ -839,10 +839,10 @@ public sealed class TextPageSetupBuilder
     }
 
     /// <summary>
-    /// Provides footer page numbers.
+    /// Adds page number and page count fields to the footer.
     /// 在頁尾新增頁碼與總頁數欄位。
     /// </summary>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextPageSetupBuilder FooterPageNumbers()
     {
         OdfParagraph paragraph = _setup.Footer.GetOrCreateParagraph();
@@ -856,7 +856,7 @@ public sealed class TextPageSetupBuilder
 }
 
 /// <summary>
-/// Provides APIs for text run formatting builder.
+/// Configures text run formatting with a fluent API.
 /// 提供文字片段格式的 Fluent 設定 API。
 /// </summary>
 public sealed class TextRunFormattingBuilder
@@ -869,10 +869,10 @@ public sealed class TextRunFormattingBuilder
     internal string? BackgroundColorValue { get; private set; }
 
     /// <summary>
-    /// Sets bold.
+    /// Sets the text to bold.
     /// 設定文字為粗體。
     /// </summary>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextRunFormattingBuilder Bold()
     {
         BoldValue = true;
@@ -880,10 +880,10 @@ public sealed class TextRunFormattingBuilder
     }
 
     /// <summary>
-    /// Sets italic.
+    /// Sets the text to italic.
     /// 設定文字為斜體。
     /// </summary>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextRunFormattingBuilder Italic()
     {
         ItalicValue = true;
@@ -891,10 +891,10 @@ public sealed class TextRunFormattingBuilder
     }
 
     /// <summary>
-    /// Sets underline.
+    /// Sets the text to underline.
     /// 設定文字底線。
     /// </summary>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextRunFormattingBuilder Underline()
     {
         UnderlineValue = true;
@@ -902,11 +902,11 @@ public sealed class TextRunFormattingBuilder
     }
 
     /// <summary>
-    /// Sets font size.
+    /// Sets the text size.
     /// 設定文字大小。
     /// </summary>
-    /// <param name="points">The value to use. / 點數大小</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="points">The size in points. / 點數大小。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextRunFormattingBuilder FontSize(double points)
     {
         FontSizeValue = points;
@@ -914,11 +914,11 @@ public sealed class TextRunFormattingBuilder
     }
 
     /// <summary>
-    /// Sets color.
+    /// Sets the text color.
     /// 設定文字色彩。
     /// </summary>
-    /// <param name="color">The value to use. / 色彩值，格式為 <c>#RRGGBB</c></param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="color">The color value, formatted as <c>#RRGGBB</c>. / 色彩值，格式為 <c>#RRGGBB</c>。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextRunFormattingBuilder Color(string color)
     {
         if (!OdfColor.TryParse(color, out _))
@@ -931,11 +931,11 @@ public sealed class TextRunFormattingBuilder
     }
 
     /// <summary>
-    /// Sets background color.
+    /// Sets the text background color.
     /// 設定文字背景色。
     /// </summary>
-    /// <param name="color">The value to use. / 色彩值，格式為 <c>#RRGGBB</c></param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="color">The color value, formatted as <c>#RRGGBB</c>. / 色彩值，格式為 <c>#RRGGBB</c>。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextRunFormattingBuilder BackgroundColor(string color)
     {
         if (!OdfColor.TryParse(color, out _))
@@ -949,7 +949,7 @@ public sealed class TextRunFormattingBuilder
 }
 
 /// <summary>
-/// Provides APIs for text list builder.
+/// Builds text lists with a fluent API.
 /// 提供文字清單的 Fluent 建立 API。
 /// </summary>
 public sealed class TextListBuilder
@@ -962,11 +962,11 @@ public sealed class TextListBuilder
     }
 
     /// <summary>
-    /// Adds item.
+    /// Adds a list item.
     /// 新增清單專案。
     /// </summary>
-    /// <param name="text">The text or value. / 專案文字</param>
-    /// <returns>The result. / 目前 builder 執行個體</returns>
+    /// <param name="text">The item text. / 專案文字。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public TextListBuilder Item(string text)
     {
         _list.AddItem(text);

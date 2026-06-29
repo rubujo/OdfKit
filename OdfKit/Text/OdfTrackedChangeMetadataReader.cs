@@ -13,8 +13,8 @@ internal static class OdfTrackedChangeMetadataReader
     /// <summary>
     /// 讀取修訂作者與時間，支援 <c>office:change-info</c> 與 LibreOffice 慣用之內嵌屬性。
     /// </summary>
-    /// <param name="specNode">The value to use. / insertion／deletion／format-change 節點</param>
-    /// <returns>The result. / 作者與 UTC 時間</returns>
+    /// <param name="specNode">insertion／deletion／format-change 節點</param>
+    /// <returns>作者與 UTC 時間</returns>
     internal static (string Author, DateTime ChangedAt) Read(OdfNode? specNode)
     {
         if (specNode is null)
@@ -50,8 +50,8 @@ internal static class OdfTrackedChangeMetadataReader
     /// <summary>
     /// 將修訂時間格式化為 ODF 日期字串。
     /// </summary>
-    /// <param name="date">The value to use. / 修訂時間</param>
-    /// <returns>The result. / ODF 日期字串</returns>
+    /// <param name="date">修訂時間</param>
+    /// <returns>ODF 日期字串</returns>
     internal static string FormatChangeDate(DateTime date)
     {
         if (date == DateTime.MinValue)
@@ -70,8 +70,8 @@ internal static class OdfTrackedChangeMetadataReader
     /// <summary>
     /// 解析 ODF 修訂日期字串。
     /// </summary>
-    /// <param name="textContent">The text or value. / 日期文字</param>
-    /// <returns>The result. / UTC 時間；無法解析時回傳 <see cref="DateTime.MinValue"/></returns>
+    /// <param name="textContent">日期文字</param>
+    /// <returns>UTC 時間；無法解析時回傳 <see cref="DateTime.MinValue"/></returns>
     internal static DateTime ParseChangeDate(string? textContent)
     {
         if (string.IsNullOrEmpty(textContent))
@@ -98,9 +98,9 @@ internal static class OdfTrackedChangeMetadataReader
     /// <summary>
     /// 將作者與時間寫入修訂規格節點（內嵌屬性 + <c>office:change-info</c>）。
     /// </summary>
-    /// <param name="typeNode">The value to use. / insertion／deletion／format-change 節點</param>
-    /// <param name="creator">The value to use. / 作者</param>
-    /// <param name="date">The value to use. / 修訂時間</param>
+    /// <param name="typeNode">insertion／deletion／format-change 節點</param>
+    /// <param name="creator">作者</param>
+    /// <param name="date">修訂時間</param>
     internal static void Write(OdfNode typeNode, string creator, DateTime date)
     {
         string dateText = FormatChangeDate(date);

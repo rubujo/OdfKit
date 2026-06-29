@@ -17,7 +17,7 @@ using S = DocumentFormat.OpenXml.Spreadsheet;
 namespace OdfKit.Conversion;
 
 /// <summary>
-/// Applies xlsx to odf converter.
+/// Converts XLSX workbooks to ODF spreadsheet documents.
 /// 將 XLSX 格式轉換為 SpreadsheetDocument 的轉換器。
 /// </summary>
 public static class XlsxToOdfConverter
@@ -37,7 +37,7 @@ public static class XlsxToOdfConverter
     }
 
     /// <summary>
-    /// Provides convert.
+    /// Converts an XLSX workbook to an ODF spreadsheet.
     /// 從 XLSX 資料流讀取並建立對應的 SpreadsheetDocument。
     /// </summary>
     /// <param name="xlsxStream">The source or target object. / XLSX 來源資料流</param>
@@ -1266,7 +1266,7 @@ public static class XlsxToOdfConverter
     }
 
     /// <summary>
-    /// Applies translate formula to odf.
+    /// Translates an XLSX formula into ODF formula syntax.
     /// 將 Excel A1 格式公式翻譯為 OpenFormula 格式。
     /// </summary>
     /// <param name="excelFormula">The value to use. / Excel A1 格式公式</param>

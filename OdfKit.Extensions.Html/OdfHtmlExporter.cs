@@ -8,7 +8,7 @@ using OdfKit.Text;
 namespace OdfKit.Export;
 
 /// <summary>
-/// Applies odf html exporter.
+/// Exports ODF text documents to HTML.
 /// 將 TextDocument 匯出為 HTML 的工具類別。
 /// </summary>
 /// <remarks>
@@ -25,7 +25,7 @@ public static class OdfHtmlExporter
         "th{background:#f0f0f0;}";
 
     /// <summary>
-    /// Applies export.
+    /// Exports the specified text document as HTML.
     /// 將 TextDocument 匯出為 HTML 字串。
     /// </summary>
     /// <param name="document">The source or target object. / 來源文字文件</param>

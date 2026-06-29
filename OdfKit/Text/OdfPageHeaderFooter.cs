@@ -4,7 +4,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf page header footer.
+/// Represents a header or footer region in a master page style, supporting mixed plain text and field content.
 /// 表示主頁面樣式中的一個頁首或頁尾區域，支援純文字與欄位混排。
 /// </summary>
 public sealed class OdfPageHeaderFooter
@@ -21,7 +21,7 @@ public sealed class OdfPageHeaderFooter
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the plain text content of this region; setting it replaces existing child nodes.
     /// 取得或設定此區域的純文字內容；設定時會取代既有子節點。
     /// </summary>
     public string? Text
@@ -31,33 +31,33 @@ public sealed class OdfPageHeaderFooter
     }
 
     /// <summary>
-    /// Gets get or create paragraph.
+    /// Gets or creates the paragraph node of this region, for advanced mixed-content editing.
     /// 取得或建立此區域的段落節點，供進階混排編輯。
     /// </summary>
-    /// <returns>The result. / 可追加欄位或文字的段落物件</returns>
+    /// <returns>The paragraph object to which fields or text can be appended. / 可追加欄位或文字的段落物件。</returns>
     public OdfParagraph GetOrCreateParagraph() =>
         _setup.GetOrCreateHeaderFooterParagraph(_localName);
 
     /// <summary>
-    /// Removes clear.
+    /// Clears all content of this region.
     /// 清除此區域的所有內容。
     /// </summary>
     public void Clear() => _setup.SetHeaderFooterRegionText(_localName, null);
 
     /// <summary>
-    /// Provides add page number field.
+    /// Adds a page number field at the end of the paragraph.
     /// 在段落尾端新增頁碼欄位。
     /// </summary>
     public void AddPageNumberField() => _doc.AddPageNumberField(GetOrCreateParagraph());
 
     /// <summary>
-    /// Provides add page count field.
+    /// Adds a page count field at the end of the paragraph.
     /// 在段落尾端新增總頁數欄位。
     /// </summary>
     public void AddPageCountField() => _doc.AddPageCountField(GetOrCreateParagraph());
 
     /// <summary>
-    /// Provides add date field.
+    /// Adds a date field at the end of the paragraph.
     /// 在段落尾端新增日期欄位。
     /// </summary>
     public void AddDateField() => _doc.AddDateField(GetOrCreateParagraph());

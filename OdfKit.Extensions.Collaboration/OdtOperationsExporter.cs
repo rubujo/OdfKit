@@ -9,7 +9,7 @@ using OdfKit.Text;
 namespace OdfKit.Collaboration;
 
 /// <summary>
-/// Applies odt operations exporter.
+/// Exports ODT tracked changes as portable operation logs.
 /// 將 <see cref="TextDocument"/> 匯出為 ODF Toolkit 相容的 JSON operations 序列。
 /// </summary>
 public static class OdtOperationsExporter
@@ -23,7 +23,7 @@ public static class OdtOperationsExporter
     };
 
     /// <summary>
-    /// Applies export to json.
+    /// Exports the document body as a JSON operation log.
     /// 將文字文件本文匯出為 JSON operations 陣列字串。
     /// </summary>
     /// <param name="document">The source or target object. / 來源文字文件</param>
@@ -32,7 +32,7 @@ public static class OdtOperationsExporter
     public static string ExportToJson(TextDocument document) => ExportToJson(document, null);
 
     /// <summary>
-    /// Applies export to json.
+    /// Exports the document body as a JSON operation log.
     /// 將文字文件本文匯出為 JSON operations 字串。
     /// </summary>
     /// <param name="document">The source or target object. / 來源文字文件</param>

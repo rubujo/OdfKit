@@ -7,17 +7,17 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf table of contents.
+/// Represents a table of contents in an ODF document.
 /// 表示 ODF 文件中的目錄。
 /// </summary>
 public class OdfTableOfContents : OdfIndex
 {
     /// <summary>
-    /// Provides odf table of contents.
+    /// Initializes a new instance of the <see cref="OdfTableOfContents"/> class.
     /// 初始化 <see cref="OdfTableOfContents"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="node">The value to use. / 目錄的 OdfNode 節點</param>
-    /// <param name="doc">The value to use. / 所屬的文字文件</param>
+    /// <param name="node">The OdfNode of the table of contents. / 目錄的 OdfNode 節點。</param>
+    /// <param name="doc">The owning text document. / 所屬的文字文件。</param>
     public OdfTableOfContents(OdfNode node, TextDocument doc) : base(node, doc)
     {
         FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
@@ -25,14 +25,14 @@ public class OdfTableOfContents : OdfIndex
     }
 
     /// <summary>
-    /// Gets get source local name.
+    /// Gets the XML local name of the table of contents source node.
     /// 取得目錄來源節點的 XML 本地名稱。
     /// </summary>
-    /// <returns>The result. / XML 本地名稱</returns>
+    /// <returns>The XML local name. / XML 本地名稱。</returns>
     protected override string GetSourceLocalName() => "table-of-content-source";
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the outline level of the table of contents.
     /// 取得或設定目錄的大綱階層。
     /// </summary>
     public int OutlineLevel
@@ -42,7 +42,7 @@ public class OdfTableOfContents : OdfIndex
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets a value indicating whether the outline level is used to generate the table of contents.
     /// 取得或設定一個值，指出是否使用大綱階層來產生目錄。
     /// </summary>
     public bool UseOutlineLevel
@@ -52,7 +52,7 @@ public class OdfTableOfContents : OdfIndex
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets a value indicating whether index marks are used to generate the table of contents.
     /// 取得或設定一個值，指出是否使用索引標記來產生目錄。
     /// </summary>
     public bool UseIndexMarks
@@ -62,12 +62,12 @@ public class OdfTableOfContents : OdfIndex
     }
 
     /// <summary>
-    /// Adds add entry template.
+    /// Adds an entry template for the table of contents.
     /// 新增目錄專案範本。
     /// </summary>
-    /// <param name="outlineLevel">The numeric value. / 大綱階層</param>
-    /// <param name="styleName">The name or identifier. / 樣式名稱</param>
-    /// <returns>The result. / 用於建構範本的 <see cref="OdfIndexTemplateBuilder"/> 執行個體</returns>
+    /// <param name="outlineLevel">The outline level. / 大綱階層。</param>
+    /// <param name="styleName">The style name. / 樣式名稱。</param>
+    /// <returns>An <see cref="OdfIndexTemplateBuilder"/> instance for constructing the template. / 用於建構範本的 <see cref="OdfIndexTemplateBuilder"/> 執行個體。</returns>
     public OdfIndexTemplateBuilder AddEntryTemplate(int outlineLevel, string styleName)
     {
         var src = FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
@@ -79,7 +79,7 @@ public class OdfTableOfContents : OdfIndex
     }
 
     /// <summary>
-    /// Provides update.
+    /// Updates the content of the table of contents.
     /// 更新目錄的內容。
     /// </summary>
     public override void Update()

@@ -7,7 +7,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Provides indexing and enumeration entry points for workbook worksheets.
+/// Indexes and enumerates workbook worksheets.
 /// 提供活頁簿工作表的索引與列舉入口。
 /// </summary>
 public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
@@ -73,7 +73,7 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
     }
 
     /// <summary>
-    /// Adds a worksheet.
+    /// Adds a worksheet to the collection.
     /// 新增工作表。
     /// </summary>
     /// <param name="name">The worksheet name. / 工作表名稱。</param>

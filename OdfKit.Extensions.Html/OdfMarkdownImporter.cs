@@ -11,13 +11,13 @@ using OdfKit.Text;
 namespace OdfKit.Export;
 
 /// <summary>
-/// Applies odf markdown importer.
+/// Imports Markdown content into ODF text documents.
 /// 將 Markdown 匯入為 <see cref="TextDocument"/> 的 managed 淨室轉換器。
 /// </summary>
 public static class OdfMarkdownImporter
 {
     /// <summary>
-    /// Provides import.
+    /// Imports Markdown text into a new text document.
     /// 從 Markdown 字串建立文字文件。
     /// </summary>
     /// <param name="markdown">The text or value. / 來源 Markdown 內容</param>
@@ -174,7 +174,7 @@ public static class OdfMarkdownImporter
     }
 
     /// <summary>
-    /// Provides import.
+    /// Imports Markdown from a stream into a new text document.
     /// 從 Markdown reader 建立文字文件。
     /// </summary>
     public static TextDocument Import(TextReader reader, OdfMarkdownImportOptions? options = null)
@@ -186,7 +186,7 @@ public static class OdfMarkdownImporter
     }
 
     /// <summary>
-    /// Provides load.
+    /// Loads Markdown from a file and imports it into a new text document.
     /// 從 Markdown 檔案建立文字文件。
     /// </summary>
     public static TextDocument Load(string path, OdfMarkdownImportOptions? options = null)

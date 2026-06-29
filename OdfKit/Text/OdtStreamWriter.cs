@@ -11,7 +11,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Provides APIs for odt stream writer.
+/// Writes ODT text documents paragraph by paragraph with a forward-only streaming API.
 /// 提供以資料流方式逐段落寫入 ODT 文字文件的功能，適用於大型文件生成。
 /// </summary>
 public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
@@ -28,12 +28,12 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     private bool _disposed;
 
     /// <summary>
-    /// Provides odt stream writer.
+    /// Initializes a new instance of the <see cref="OdtStreamWriter"/> class.
     /// 初始化 <see cref="OdtStreamWriter"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="outputStream">The stream or target object. / 用來輸出 ODT 文件的目標資料流</param>
-    /// <param name="version">The value to use. / 要寫入的 ODF 規格版本</param>
-    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="outputStream"/> 為 null 時擲出</exception>
+    /// <param name="outputStream">The target stream to which the ODT document is written. / 用來輸出 ODT 文件的目標資料流。</param>
+    /// <param name="version">The ODF specification version to write. / 要寫入的 ODF 規格版本。</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="outputStream"/> is null. / 當 <paramref name="outputStream"/> 為 null 時擲出。</exception>
     public OdtStreamWriter(Stream outputStream, OdfVersion version = OdfVersion.Odf14)
         : this(outputStream, version, ownsStream: false)
     {
@@ -67,23 +67,23 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Provides odt stream writer.
+    /// Initializes a new instance of the <see cref="OdtStreamWriter"/> class from a file path.
     /// 從檔案路徑初始化 <see cref="OdtStreamWriter"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="path">The path or URI. / 要建立或覆寫的 ODT 檔案路徑</param>
-    /// <param name="version">The value to use. / 要寫入的 ODF 規格版本</param>
-    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="path"/> 為 null 時擲出</exception>
+    /// <param name="path">The ODT file path to create or overwrite. / 要建立或覆寫的 ODT 檔案路徑。</param>
+    /// <param name="version">The ODF specification version to write. / 要寫入的 ODF 規格版本。</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="path"/> is null. / 當 <paramref name="path"/> 為 null 時擲出。</exception>
     public OdtStreamWriter(string path, OdfVersion version = OdfVersion.Odf14)
         : this(CreateFileStream(path), version, ownsStream: true)
     {
     }
 
     /// <summary>
-    /// Adds add paragraph.
+    /// Adds a paragraph with the specified text content.
     /// 加入一個段落。
     /// </summary>
-    /// <param name="text">The text or value. / 段落文字</param>
-    /// <param name="styleName">The name or identifier. / 段落樣式名稱</param>
+    /// <param name="text">The paragraph text. / 段落文字。</param>
+    /// <param name="styleName">The paragraph style name. / 段落樣式名稱。</param>
     public void AddParagraph(string text, string? styleName = null)
     {
         EnsureNotDisposed();
@@ -91,11 +91,11 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Adds add paragraph.
+    /// Adds a paragraph with the specified rich text runs.
     /// 加入一個段落。
     /// </summary>
-    /// <param name="text">The text or value. / 段落文字</param>
-    /// <param name="styleName">The name or identifier. / 段落樣式名稱</param>
+    /// <param name="text">The paragraph text. / 段落文字。</param>
+    /// <param name="styleName">The paragraph style name. / 段落樣式名稱。</param>
     public void AddParagraph(ReadOnlySpan<char> text, string? styleName = null)
     {
         EnsureNotDisposed();
@@ -103,21 +103,21 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Adds add paragraph.
+    /// Adds a paragraph from a prebound writer callback.
     /// 加入一個段落。
     /// </summary>
-    /// <param name="text">The text or value. / 段落文字</param>
-    /// <param name="styleName">The name or identifier. / 段落樣式名稱</param>
+    /// <param name="text">The paragraph text. / 段落文字。</param>
+    /// <param name="styleName">The paragraph style name. / 段落樣式名稱。</param>
     public void AddParagraph(ReadOnlyMemory<char> text, string? styleName = null) =>
         AddParagraph(text.Span, styleName);
 
     /// <summary>
-    /// Adds add heading.
+    /// Adds a heading paragraph.
     /// 加入標題段落。
     /// </summary>
-    /// <param name="text">The text or value. / 標題文字</param>
-    /// <param name="level">The numeric value. / 標題層級，範圍為 1 到 6</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when the documented condition occurs. / 當 <paramref name="level"/> 不在 1 到 6 之間時擲出</exception>
+    /// <param name="text">The heading text. / 標題文字。</param>
+    /// <param name="level">The heading level, ranging from 1 to 6. / 標題層級，範圍為 1 到 6。</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="level"/> is not between 1 and 6. / 當 <paramref name="level"/> 不在 1 到 6 之間時擲出。</exception>
     public void AddHeading(string text, int level = 1)
     {
         EnsureNotDisposed();
@@ -130,12 +130,12 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Adds add heading.
+    /// Adds a heading paragraph.
     /// 加入標題段落。
     /// </summary>
-    /// <param name="text">The text or value. / 標題文字</param>
-    /// <param name="level">The numeric value. / 標題層級，範圍為 1 到 6</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when the documented condition occurs. / 當 <paramref name="level"/> 不在 1 到 6 之間時擲出</exception>
+    /// <param name="text">The heading text. / 標題文字。</param>
+    /// <param name="level">The heading level, ranging from 1 to 6. / 標題層級，範圍為 1 到 6。</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="level"/> is not between 1 and 6. / 當 <paramref name="level"/> 不在 1 到 6 之間時擲出。</exception>
     public void AddHeading(ReadOnlySpan<char> text, int level = 1)
     {
         EnsureNotDisposed();
@@ -148,21 +148,21 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Adds add heading.
+    /// Adds a heading paragraph.
     /// 加入標題段落。
     /// </summary>
-    /// <param name="text">The text or value. / 標題文字</param>
-    /// <param name="level">The numeric value. / 標題層級，範圍為 1 到 6</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when the documented condition occurs. / 當 <paramref name="level"/> 不在 1 到 6 之間時擲出</exception>
+    /// <param name="text">The heading text. / 標題文字。</param>
+    /// <param name="level">The heading level, ranging from 1 to 6. / 標題層級，範圍為 1 到 6。</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="level"/> is not between 1 and 6. / 當 <paramref name="level"/> 不在 1 到 6 之間時擲出。</exception>
     public void AddHeading(ReadOnlyMemory<char> text, int level = 1) =>
         AddHeading(text.Span, level);
 
     /// <summary>
-    /// Provides begin list.
+    /// Begins a list.
     /// 開始清單。
     /// </summary>
-    /// <param name="styleName">The name or identifier. / 清單樣式名稱</param>
-    /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當清單已經開始時擲出</exception>
+    /// <param name="styleName">The list style name. / 清單樣式名稱。</param>
+    /// <exception cref="InvalidOperationException">Thrown when a list has already begun. / 當清單已經開始時擲出。</exception>
     public void BeginList(string? styleName = null)
     {
         EnsureNotDisposed();
@@ -181,11 +181,11 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Adds add list item.
+    /// Adds a list item.
     /// 加入清單專案。
     /// </summary>
-    /// <param name="text">The text or value. / 清單專案文字</param>
-    /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當尚未呼叫 <see cref="BeginList(string?)"/> 時擲出</exception>
+    /// <param name="text">The list item text. / 清單專案文字。</param>
+    /// <exception cref="InvalidOperationException">Thrown when <see cref="BeginList(string?)"/> has not been called. / 當尚未呼叫 <see cref="BeginList(string?)"/> 時擲出。</exception>
     public void AddListItem(string text)
     {
         EnsureNotDisposed();
@@ -200,11 +200,11 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Adds add list item.
+    /// Adds a list item.
     /// 加入清單專案。
     /// </summary>
-    /// <param name="text">The text or value. / 清單專案文字</param>
-    /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當尚未呼叫 <see cref="BeginList(string?)"/> 時擲出</exception>
+    /// <param name="text">The list item text. / 清單專案文字。</param>
+    /// <exception cref="InvalidOperationException">Thrown when <see cref="BeginList(string?)"/> has not been called. / 當尚未呼叫 <see cref="BeginList(string?)"/> 時擲出。</exception>
     public void AddListItem(ReadOnlySpan<char> text)
     {
         EnsureNotDisposed();
@@ -219,15 +219,15 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Adds add list item.
+    /// Adds a list item.
     /// 加入清單專案。
     /// </summary>
-    /// <param name="text">The text or value. / 清單專案文字</param>
-    /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當尚未呼叫 <see cref="BeginList(string?)"/> 時擲出</exception>
+    /// <param name="text">The list item text. / 清單專案文字。</param>
+    /// <exception cref="InvalidOperationException">Thrown when <see cref="BeginList(string?)"/> has not been called. / 當尚未呼叫 <see cref="BeginList(string?)"/> 時擲出。</exception>
     public void AddListItem(ReadOnlyMemory<char> text) => AddListItem(text.Span);
 
     /// <summary>
-    /// Provides end list.
+    /// Ends the current list.
     /// 結束目前清單。
     /// </summary>
     public void EndList()
@@ -243,7 +243,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Adds add page break.
+    /// Adds a forced page break.
     /// 加入強制分頁。
     /// </summary>
     public void AddPageBreak()
@@ -253,11 +253,11 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Applies write node.
+    /// Writes an existing DOM subtree directly at the current position in the text document.
     /// 將既有 DOM 子樹直接寫入目前文字文件位置。
     /// </summary>
-    /// <param name="node">The value to use. / 要寫入的 DOM 節點</param>
-    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="node"/> 為 null 時擲出</exception>
+    /// <param name="node">The DOM node to write. / 要寫入的 DOM 節點。</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="node"/> is null. / 當 <paramref name="node"/> 為 null 時擲出。</exception>
     public void WriteNode(OdfNode node)
     {
         if (node is null)
@@ -286,7 +286,7 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Provides dispose.
+    /// Releases resources and finalizes the document ZIP structure.
     /// 釋放資源並最終化文件 ZIP 結構。
     /// </summary>
     public void Dispose()
@@ -314,10 +314,10 @@ public sealed class OdtStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Provides dispose async.
+    /// Asynchronously releases resources and finalizes the document ZIP structure.
     /// 非同步釋放資源並最終化文件 ZIP 結構。
     /// </summary>
-    /// <returns>The result. / 代表非同步處置作業的 <see cref="ValueTask"/></returns>
+    /// <returns>A <see cref="ValueTask"/> representing the asynchronous dispose operation. / 代表非同步處置作業的 <see cref="ValueTask"/>。</returns>
     public async ValueTask DisposeAsync()
     {
         if (_disposed)

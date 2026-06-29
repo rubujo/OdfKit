@@ -8,13 +8,13 @@ using SkiaSharp;
 namespace OdfKit.Export;
 
 /// <summary>
-/// Applies odf image exporter.
+/// Exports ODF visual content to raster images.
 /// 將 SpreadsheetDocument 的工作表格線渲染為點陣圖影像的工具類別。
 /// </summary>
 public static class OdfImageExporter
 {
     /// <summary>
-    /// Applies export to png.
+    /// Exports the specified ODF content to PNG.
     /// 將工作表格線渲染並寫入 PNG 資料流。
     /// </summary>
     /// <param name="sheet">The value to use. / 來源工作表</param>
@@ -31,7 +31,7 @@ public static class OdfImageExporter
     }
 
     /// <summary>
-    /// Applies export to jpeg.
+    /// Exports the specified ODF content to JPEG.
     /// 將工作表格線渲染並寫入 JPEG 資料流。
     /// </summary>
     /// <param name="sheet">The value to use. / 來源工作表</param>

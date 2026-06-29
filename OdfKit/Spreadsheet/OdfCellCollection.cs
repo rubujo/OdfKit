@@ -4,7 +4,7 @@ using OdfKit.DOM;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Provides indexing entry points for worksheet cells.
+/// Indexes worksheet cells by row, column, or address.
 /// 提供工作表儲存格的索引入口。
 /// </summary>
 public sealed class OdfCellCollection

@@ -11,13 +11,13 @@ using ScottPlot;
 namespace OdfKit.Extensions.Imaging;
 
 /// <summary>
-/// Provides APIs for odf chart renderer.
+/// Renders spreadsheet chart objects into static fallback images.
 /// 提供試算表圖表靜態影像渲染（ScottPlot 5.1.58）與 ODF 封裝 fallback 回寫的工具類別。
 /// </summary>
 public static class OdfChartRenderer
 {
     /// <summary>
-    /// Provides render charts to fallback images.
+    /// Renders embedded spreadsheet charts and writes PNG fallback images into the package.
     /// 自動將試算表文件內的 Chart 物件繪製為 PNG fallback 影像並回寫至 OdfPackage 封裝中，提升跨平台開檔相容性。
     /// </summary>
     /// <param name="document">The source or target object. / 目標試算表文件</param>

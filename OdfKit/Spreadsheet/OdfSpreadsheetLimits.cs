@@ -1,7 +1,7 @@
 ﻿namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Provides defensive upper-bound constants for repeated spreadsheet rows and columns.
+/// Defines defensive upper bounds for repeated spreadsheet rows and columns.
 /// 試算表重複列與欄的防禦性上限常數。
 /// </summary>
 public static class OdfSpreadsheetLimits

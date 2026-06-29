@@ -8,13 +8,13 @@ using OdfKit.Text;
 namespace OdfKit.Export;
 
 /// <summary>
-/// Applies odf markdown exporter.
+/// Exports ODF text documents to Markdown.
 /// 將 TextDocument 匯出為 Markdown 的淨室轉換器。
 /// </summary>
 public static class OdfMarkdownExporter
 {
     /// <summary>
-    /// Applies export.
+    /// Exports the specified text document as Markdown.
     /// 將 TextDocument 匯出為 Markdown 字串。
     /// </summary>
     /// <param name="document">The source or target object. / 來源文字文件</param>

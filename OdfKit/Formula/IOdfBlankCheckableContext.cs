@@ -3,7 +3,7 @@
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides a cell blank-state check interface without reflection during formula evaluation.
+/// Checks cell blank states without reflection during formula evaluation.
 /// 提供儲存格空白狀態檢查介面，避免在公式評估時使用反射。
 /// </summary>
 internal interface IOdfBlankCheckableContext

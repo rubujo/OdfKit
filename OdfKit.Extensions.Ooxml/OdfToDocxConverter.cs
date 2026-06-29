@@ -19,14 +19,14 @@ using WP = DocumentFormat.OpenXml.Wordprocessing;
 namespace OdfKit.Conversion;
 
 /// <summary>
-/// Applies odf to docx converter.
+/// Converts ODF text documents to DOCX.
 /// 將 <see cref="TextDocument"/> (ODT) 轉換為 DOCX 格式的轉換器。
 /// 支援段落樣式、字元格式、標題、表格、圖片與追蹤修訂。
 /// </summary>
 public static class OdfToDocxConverter
 {
     /// <summary>
-    /// Applies convert.
+    /// Converts an ODF text document to DOCX.
     /// 將 ODT 文字文件轉換並寫入 DOCX 資料流。
     /// </summary>
     /// <param name="odtDocument">The source or target object. / 來源 ODT 文字文件</param>

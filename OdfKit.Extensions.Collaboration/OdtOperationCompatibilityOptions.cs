@@ -1,7 +1,7 @@
 ﻿namespace OdfKit.Collaboration;
 
 /// <summary>
-/// Provides odt operation envelope mode.
+/// Defines how operation logs are wrapped when exported.
 /// 指定 ODT JSON operations 的外層封包格式。
 /// </summary>
 public enum OdtOperationEnvelopeMode
@@ -18,7 +18,7 @@ public enum OdtOperationEnvelopeMode
 }
 
 /// <summary>
-/// Provides odt unsupported operation policy.
+/// Defines how unsupported operations are handled during import.
 /// 指定遇到目前 compatibility subset 未支援的 operation 時要採取的策略。
 /// </summary>
 public enum OdtUnsupportedOperationPolicy
@@ -40,7 +40,7 @@ public enum OdtUnsupportedOperationPolicy
 }
 
 /// <summary>
-/// Provides odt operation compatibility options.
+/// Configures compatibility behavior for ODT operation import and export.
 /// 控制 ODT JSON operations 與 TDF ODF Toolkit 相容子集合互通時的行為。
 /// </summary>
 public sealed class OdtOperationCompatibilityOptions

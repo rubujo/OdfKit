@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace OdfKit.Extensions.Rendering;
 
 /// <summary>
-/// Provides ilibre office conversion backend.
+/// Defines the contract implemented by LibreOffice conversion backends.
 /// 定義 LibreOffice 文件格式轉換的後端介面。
 /// </summary>
 public interface ILibreOfficeConversionBackend

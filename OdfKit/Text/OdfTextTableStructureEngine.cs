@@ -226,8 +226,8 @@ internal static class OdfTextTableStructureEngine
 /// <summary>
 /// 欄結構刪除快照（欄定義與各列儲存格）。
 /// </summary>
-/// <param name="ColumnSnapshots">The numeric value. / 已刪除的欄定義節點快照</param>
-/// <param name="RowCellSnapshots">The numeric value. / 各列已刪除儲存格快照（含列索引）</param>
+/// <param name="ColumnSnapshots">已刪除的欄定義節點快照</param>
+/// <param name="RowCellSnapshots">各列已刪除儲存格快照（含列索引）</param>
 internal readonly record struct ColumnDeletionSnapshots(
     IReadOnlyList<OdfNode> ColumnSnapshots,
     IReadOnlyList<(int RowIndex, OdfNode CellSnapshot)> RowCellSnapshots);

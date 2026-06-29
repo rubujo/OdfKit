@@ -10,7 +10,6 @@ namespace OdfKit.Text;
 internal static class OdfTrackedChangeDom
 {
     /// <summary>
-    /// Provides find direct child.
     /// 在父節點的直接子節點中，依本地名稱與命名空間 URI 尋找第一個符合的節點。
     /// </summary>
     public static OdfNode? FindDirectChild(OdfNode parent, string localName, string ns)
@@ -25,7 +24,6 @@ internal static class OdfTrackedChangeDom
     }
 
     /// <summary>
-    /// Provides restore deleted content.
     /// 還原已刪除內容至變更起始標記之前。
     /// </summary>
     public static void RestoreDeletedContent(
@@ -69,7 +67,6 @@ internal static class OdfTrackedChangeDom
     }
 
     /// <summary>
-    /// Provides find change node.
     /// 在子樹中尋找指定變更 ID 的變更標記節點。
     /// </summary>
     public static OdfNode? FindChangeNode(OdfNode root, string localName, string changeId)
@@ -114,7 +111,6 @@ internal static class OdfTrackedChangeDom
     }
 
     /// <summary>
-    /// Provides extract tracked changes meta.
     /// 從 <c>text:tracked-changes</c> 節點擷取修訂中繼資料。
     /// </summary>
     public static void ExtractTrackedChangesMeta(OdfNode tcNode, Dictionary<string, string> changes)

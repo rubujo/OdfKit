@@ -7,7 +7,7 @@ using OdfKit.Styles;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf page setup.
+/// Represents the page setup of a text document.
 /// 表示文字文件的頁面設定。
 /// </summary>
 public partial class OdfPageSetup
@@ -17,8 +17,8 @@ public partial class OdfPageSetup
     private readonly string _pageLayoutName;
 
     /// <summary>
-    /// Provides odf page setup.
-    /// 使用預設主頁面（Standard / Mpm1）初始化
+    /// Initializes a new instance of the <see cref="OdfPageSetup"/> class using the default master page (Standard / Mpm1).
+    /// 使用預設主頁面（Standard / Mpm1）初始化。
     /// </summary>
     public OdfPageSetup(TextDocument doc) : this(doc, "Standard", "Mpm1") { }
 
@@ -39,7 +39,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the page width (in centimeters).
     /// 取得或設定頁面寬度（公分）。
     /// </summary>
     public double PageWidth
@@ -55,7 +55,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the page height (in centimeters).
     /// 取得或設定頁面高度（公分）。
     /// </summary>
     public double PageHeight
@@ -85,7 +85,7 @@ public partial class OdfPageSetup
     private static string FormatCentimeterLength(double value) => value.ToString(CultureInfo.InvariantCulture) + "cm";
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the page usage.
     /// 取得或設定頁面使用方式。
     /// </summary>
     public OdfPageUsage PageUsage
@@ -116,7 +116,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the page's text writing mode.
     /// 取得或設定頁面的文字書寫模式。
     /// </summary>
     public OdfWritingMode WritingMode
@@ -153,7 +153,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the mode of the page layout grid.
     /// 取得或設定頁面版面配置網格的模式。
     /// </summary>
     public OdfLayoutGridMode LayoutGridMode
@@ -180,7 +180,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the base height of the layout grid.
     /// 取得或設定版面配置網格的基礎高度。
     /// </summary>
     public string? LayoutGridBaseHeight
@@ -190,7 +190,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the base width of the layout grid.
     /// 取得或設定版面配置網格的基礎寬度。
     /// </summary>
     public string? LayoutGridBaseWidth
@@ -200,7 +200,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the ruby (phonetic annotation) height of the layout grid.
     /// 取得或設定版面配置網格的旁註標記（注音）高度。
     /// </summary>
     public string? LayoutGridRubyHeight
@@ -210,7 +210,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the number of lines in the layout grid.
     /// 取得或設定版面配置網格的行數。
     /// </summary>
     public int? LayoutGridLines
@@ -220,7 +220,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the number of characters in the layout grid.
     /// 取得或設定版面配置網格的字數。
     /// </summary>
     public int? LayoutGridCharacters
@@ -230,7 +230,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets a value indicating whether the layout grid is displayed.
     /// 取得或設定一個值，指出是否顯示版面配置網格。
     /// </summary>
     public bool? LayoutGridDisplay
@@ -240,7 +240,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets a value indicating whether the layout grid is printed.
     /// 取得或設定一個值，指出是否列印版面配置網格。
     /// </summary>
     public bool? LayoutGridPrint
@@ -250,7 +250,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the header's text content.
     /// 取得或設定頁首的文字內容。
     /// </summary>
     public string? HeaderText
@@ -260,7 +260,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the left-page header's text content.
     /// 取得或設定左頁首的文字內容。
     /// </summary>
     public string? HeaderLeftText
@@ -270,7 +270,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the footer's text content.
     /// 取得或設定頁尾的文字內容。
     /// </summary>
     public string? FooterText
@@ -280,7 +280,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the left-page footer's text content.
     /// 取得或設定左頁尾的文字內容。
     /// </summary>
     public string? FooterLeftText

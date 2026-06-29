@@ -19,7 +19,7 @@ using Sylvan.Data.Csv;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Provides streaming ODS spreadsheet writing; when used with strict sequential <see cref="WriteStartSheet(string)"/> and <see cref="WriteEndSheet"/> calls, it supports high-performance, low-memory writes.
+/// Writes ODS spreadsheets with strict sequential sheet calls for high-performance, low-memory output.
 /// 提供以資料流方式寫入 ODS 試算表文件的功能；使用 <see cref="WriteStartSheet(string)"/>
 /// 與 <see cref="WriteEndSheet"/> 的嚴格順序模式時，可支援高效能、低記憶體耗用的寫入作業。
 /// </summary>

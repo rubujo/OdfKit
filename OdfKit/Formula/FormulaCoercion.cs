@@ -8,7 +8,7 @@ using OdfKit.Formula.AST;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides type coercion and value comparison helpers for spreadsheet formula evaluation.
+/// Coerces values and compares spreadsheet formula evaluation results.
 /// 試算表公式求值時的型別轉換與值比較工具。
 /// </summary>
 internal static class FormulaCoercion

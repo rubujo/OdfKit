@@ -8,7 +8,7 @@ using OdfKit.Text;
 namespace OdfKit.Export;
 
 /// <summary>
-/// Provides odf pdf renderer.
+/// Renders ODF documents through the PDF export pipeline.
 /// 實作 IOdfRenderer 介面，以提供 OdfDocument 的 PDF 匯出功能。
 /// </summary>
 public sealed class OdfPdfRenderer : IOdfRenderer
@@ -26,7 +26,7 @@ public sealed class OdfPdfRenderer : IOdfRenderer
     }
 
     /// <summary>
-    /// Provides odf pdf renderer.
+    /// Initializes a new instance of the <see cref="OdfPdfRenderer"/> class.
     /// 初始化 OdfPdfRenderer 類別的新執行個體。
     /// </summary>
     public OdfPdfRenderer()
@@ -34,7 +34,7 @@ public sealed class OdfPdfRenderer : IOdfRenderer
     }
 
     /// <summary>
-    /// Applies export to pdf.
+    /// Exports the document to PDF.
     /// 將指定的 OdfDocument 轉換並寫入 PDF 輸出資料流。
     /// </summary>
     /// <param name="document">The source or target object. / 要進行轉換的 ODF 文件</param>

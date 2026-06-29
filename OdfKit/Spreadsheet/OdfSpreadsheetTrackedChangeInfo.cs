@@ -49,7 +49,7 @@ public sealed class OdfSpreadsheetTrackedChangeInfo(
     public OdfSpreadsheetChangeKind Kind { get; } = kind;
 
     /// <summary>
-    /// Gets the author.
+    /// Gets the author who made the tracked change.
     /// 取得作者。
     /// </summary>
     public string Author { get; } = author ?? string.Empty;

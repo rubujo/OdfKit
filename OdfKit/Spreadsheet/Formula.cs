@@ -5,7 +5,7 @@ using System.Linq;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Provides strongly typed construction entry points for spreadsheet OpenFormula formulas.
+/// Creates spreadsheet OpenFormula formulas through strongly typed factory methods.
 /// 提供試算表 OpenFormula 公式的強型別建構入口。
 /// </summary>
 public static class Formula

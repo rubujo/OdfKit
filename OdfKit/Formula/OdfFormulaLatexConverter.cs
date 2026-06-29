@@ -8,7 +8,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides converters between LaTeX formula strings and MathML XML structures.
+/// Converts between LaTeX formula strings and MathML XML structures.
 /// 提供 LaTeX 公式字串與 MathML XML 結構之間的轉換器。
 /// </summary>
 public static class OdfFormulaLatexConverter

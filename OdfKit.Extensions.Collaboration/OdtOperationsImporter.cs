@@ -6,7 +6,7 @@ using OdfKit.Text;
 namespace OdfKit.Collaboration;
 
 /// <summary>
-/// Applies odt operations importer.
+/// Imports portable operation logs into ODT documents.
 /// 將 ODF Toolkit 相容的 JSON operations 序列單向 merge 至 <see cref="TextDocument"/>。
 /// </summary>
 /// <remarks>
@@ -17,7 +17,7 @@ namespace OdfKit.Collaboration;
 public static class OdtOperationsImporter
 {
     /// <summary>
-    /// Applies merge.
+    /// Merges operation log content into the target document.
     /// 將 JSON operations 陣列字串重播至新建立的文字文件。
     /// </summary>
     /// <param name="operationsJson">The value to use. / JSON operations 陣列字串</param>
@@ -31,7 +31,7 @@ public static class OdtOperationsImporter
     }
 
     /// <summary>
-    /// Applies merge.
+    /// Merges operation log content into the target document.
     /// 將 JSON operations 字串重播至新建立的文字文件，並回傳匯入診斷。
     /// </summary>
     /// <param name="operationsJson">The value to use. / JSON operations 陣列或 TDF changes 封包字串</param>
@@ -50,7 +50,7 @@ public static class OdtOperationsImporter
     }
 
     /// <summary>
-    /// Applies merge.
+    /// Merges operation log content into the target document.
     /// 將 JSON operations 陣列字串重播至既有的文字文件結尾。
     /// </summary>
     /// <param name="document">The source or target object. / 目標文字文件</param>
@@ -60,7 +60,7 @@ public static class OdtOperationsImporter
         => Merge(document, operationsJson, null);
 
     /// <summary>
-    /// Applies merge.
+    /// Merges operation log content into the target document.
     /// 將 JSON operations 字串重播至既有的文字文件結尾，並回傳匯入診斷。
     /// </summary>
     /// <param name="document">The source or target object. / 目標文字文件</param>

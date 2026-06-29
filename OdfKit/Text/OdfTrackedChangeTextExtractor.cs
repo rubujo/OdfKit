@@ -11,7 +11,6 @@ namespace OdfKit.Text;
 internal static class OdfTrackedChangeTextExtractor
 {
     /// <summary>
-    /// Provides extract text content ignoring change info.
     /// 擷取節點文字內容，略過 <c>office:change-info</c> 子節點。
     /// </summary>
     public static void ExtractTextContentIgnoringChangeInfo(OdfNode node, StringBuilder sb)
@@ -27,7 +26,6 @@ internal static class OdfTrackedChangeTextExtractor
     }
 
     /// <summary>
-    /// Provides extract text between markers.
     /// 擷取變更起始與結束標記之間的文字內容。
     /// </summary>
     public static string ExtractTextBetweenMarkers(OdfNode root, string changeId)
@@ -39,7 +37,6 @@ internal static class OdfTrackedChangeTextExtractor
     }
 
     /// <summary>
-    /// Provides find affected nodes for format change.
     /// 尋找格式變更修訂所影響的 DOM 節點。
     /// </summary>
     public static List<OdfNode> FindAffectedNodesForFormatChange(

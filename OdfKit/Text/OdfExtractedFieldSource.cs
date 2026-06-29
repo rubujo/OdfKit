@@ -1,7 +1,7 @@
 ﻿namespace OdfKit.Text;
 
 /// <summary>
-/// Determines odf extracted field source.
+/// Identifies where an extracted ODF text field was found.
 /// 指出反向提取出的範本欄位來源。
 /// </summary>
 public enum OdfExtractedFieldSource

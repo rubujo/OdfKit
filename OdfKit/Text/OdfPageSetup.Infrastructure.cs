@@ -258,13 +258,13 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
-    /// Provides add font face.
+    /// Adds a font declaration entry to the page setup.
     /// 在頁面設定中新增字型宣告專案。
     /// </summary>
-    /// <param name="name">The name or identifier. / 字型代碼或別名</param>
-    /// <param name="fontFamily">The value to use. / 實際的字型名稱</param>
-    /// <param name="genericFamily">The value to use. / 泛用字型系列</param>
-    /// <param name="pitch">The value to use. / 字距模式</param>
+    /// <param name="name">The font code or alias. / 字型代碼或別名。</param>
+    /// <param name="fontFamily">The actual font name. / 實際的字型名稱。</param>
+    /// <param name="genericFamily">The generic font family. / 泛用字型系列。</param>
+    /// <param name="pitch">The font pitch mode. / 字距模式。</param>
     public void AddFontFace(string name, string fontFamily, string? genericFamily = null, string? pitch = null)
     {
         void AddToDom(OdfNode domRoot)

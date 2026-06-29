@@ -5,7 +5,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Provides APIs for odf paragraph prebinding writer.
+/// Writes batches of paragraphs into a pre-bound text body root node.
 /// 提供預先綁定至文字本文根節點的批次段落寫入器。
 /// </summary>
 /// <remarks>
@@ -24,17 +24,17 @@ public sealed class OdfParagraphPrebindingWriter
     }
 
     /// <summary>
-    /// Gets count.
+    /// Gets the number of paragraphs appended through this writer.
     /// 取得已透過此寫入器追加的段落數量。
     /// </summary>
     public int Count { get; private set; }
 
     /// <summary>
-    /// Provides add.
+    /// Appends a paragraph and returns the current writer, for chained calls.
     /// 追加一個段落並傳回目前寫入器，以便鏈式呼叫。
     /// </summary>
-    /// <param name="text">The text or value. / 段落文字內容</param>
-    /// <returns>The result. / 目前寫入器</returns>
+    /// <param name="text">The paragraph text content. / 段落文字內容。</param>
+    /// <returns>The current writer. / 目前寫入器。</returns>
     public OdfParagraphPrebindingWriter Add(string text)
     {
         var paragraphNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");

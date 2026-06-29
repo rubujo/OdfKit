@@ -32,9 +32,9 @@ public partial class SpreadsheetDocument
     /// Opens an asynchronous formula recalculation channel that queues subsequent cell value or formula changes for background recalculation.
     /// 開啟非同步公式重算通道，將後續儲存格值或公式變更排入背景重算。
     /// </summary>
-    /// <param name="capacity">The numeric value. / 通道容量</param>
-    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元</param>
-    /// <returns>The result. / 已啟動的公式重算通道</returns>
+    /// <param name="capacity">The channel capacity. / 通道容量。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>The started formula recalculation channel. / 已啟動的公式重算通道。</returns>
     public OdfFormulaEvaluationChannel BeginFormulaEvaluationChannel(int capacity = 64, CancellationToken cancellationToken = default)
     {
         _formulaEvaluationChannel?.Dispose();

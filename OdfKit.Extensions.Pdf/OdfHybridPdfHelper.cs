@@ -10,7 +10,7 @@ using Xml = System.Xml;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Provides APIs for odf hybrid pdf helper.
+/// Embeds ODF packages in hybrid PDFs and extracts them back out.
 /// 提供混合 PDF （Hybrid PDF）的公用程式方法，支援在 PDF 中內嵌與提取 ODF 檔案。
 /// </summary>
 public static class OdfHybridPdfHelper
@@ -18,7 +18,7 @@ public static class OdfHybridPdfHelper
     private const string OdfRelationName = "OdfKitHybridOdf";
 
     /// <summary>
-    /// Provides extract odf from pdf.
+    /// Extracts an embedded ODF package from a hybrid PDF.
     /// 從混合 PDF 檔案中提取並讀取隱藏的 ODF 檔案。
     /// </summary>
     /// <param name="pdfPath">The path or URI. / PDF 檔案路徑</param>
@@ -31,7 +31,7 @@ public static class OdfHybridPdfHelper
     }
 
     /// <summary>
-    /// Provides extract odf from pdf.
+    /// Extracts an embedded ODF package from a hybrid PDF.
     /// 從混合 PDF 檔案流中提取並讀取隱藏的 ODF 檔案。
     /// </summary>
     /// <param name="pdfStream">The source or target object. / PDF 檔案的資料流</param>
@@ -114,7 +114,7 @@ public static class OdfHybridPdfHelper
     }
 
     /// <summary>
-    /// Applies inject odf to pdf.
+    /// Embeds an ODF package into a PDF as a hybrid PDF attachment.
     /// 將 ODF 檔案作為附件注入 PDF 中，生成混合 PDF （Hybrid PDF）。
     /// </summary>
     /// <param name="pdfPath">The path or URI. / 來源 PDF 檔案路徑</param>
@@ -131,7 +131,7 @@ public static class OdfHybridPdfHelper
     }
 
     /// <summary>
-    /// Applies inject odf to pdf.
+    /// Embeds an ODF package into a PDF as a hybrid PDF attachment.
     /// 將 ODF 檔案流作為附件注入 PDF 檔案流中，生成混合 PDF 。
     /// </summary>
     /// <param name="pdfStream">The source or target object. / 來源 PDF 檔案的資料流</param>

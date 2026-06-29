@@ -1,7 +1,7 @@
 ﻿namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides a fluent builder API for <see cref="OdfFormulaDocument"/>.
+/// Builds <see cref="OdfFormulaDocument"/> content with a fluent API.
 /// 提供 <see cref="OdfFormulaDocument"/> 的 Fluent 建立 API。
 /// </summary>
 public sealed class OdfFormulaBuilder

@@ -15,7 +15,7 @@ internal readonly record struct ColumnDeletionSnapshots(
     IReadOnlyList<(int RowIndex, OdfNode CellSnapshot)> RowCellSnapshots);
 
 /// <summary>
-/// Provides worksheet row and column structure change helpers for internal collaborators.
+/// Modifies worksheet row and column structure for internal collaborators.
 /// 工作表列／欄結構變更引擎（內部協作者）。
 /// </summary>
 internal static class OdfTableSheetStructureEngine

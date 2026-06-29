@@ -8,7 +8,7 @@ using OdfKit.Spreadsheet;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides the default ODF formula evaluator implementation.
+/// Evaluates parsed ODF formulas with the default spreadsheet function set.
 /// 提供預設的 ODF 公式評估器實作。
 /// </summary>
 public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator

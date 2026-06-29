@@ -5,13 +5,13 @@ using VDS.RDF.Query;
 namespace OdfKit.Extensions.Rdf;
 
 /// <summary>
-/// Provides APIs for odf rdf metadata extensions.
+/// Adds RDF graph query and import helpers to ODF packages.
 /// 提供 <see cref="OdfRdfMetadata"/> 的 RDF 擴充方法。
 /// </summary>
 public static class OdfRdfMetadataExtensions
 {
     /// <summary>
-    /// Applies to graph.
+    /// Converts package RDF metadata to an in-memory RDF graph.
     /// 將此 metadata 轉換為 dotNetRDF 圖形。
     /// </summary>
     /// <param name="metadata">The value to use. / 來源 RDF metadata</param>
@@ -21,7 +21,7 @@ public static class OdfRdfMetadataExtensions
         OdfRdfGraphBridge.ToGraph(metadata, baseUri);
 
     /// <summary>
-    /// Provides execute sparql query.
+    /// Executes a SPARQL query against package RDF metadata.
     /// 對此 metadata 執行 SPARQL 查詢。
     /// </summary>
     /// <param name="metadata">The value to use. / 來源 RDF metadata</param>
@@ -32,7 +32,7 @@ public static class OdfRdfMetadataExtensions
         OdfRdfGraphBridge.ExecuteQuery(metadata, sparql, baseUri);
 
     /// <summary>
-    /// Provides select sparql.
+    /// Executes a SPARQL SELECT query against package RDF metadata.
     /// 對此 metadata 執行 SPARQL SELECT 查詢。
     /// </summary>
     /// <param name="metadata">The value to use. / 來源 RDF metadata</param>

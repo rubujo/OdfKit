@@ -18,7 +18,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Export;
 
 /// <summary>
-/// Applies odf pdf exporter.
+/// Exports ODF documents to PDF.
 /// 將 TextDocument 匯出為 PDF 的工具類別。
 /// </summary>
 public static class OdfPdfExporter
@@ -39,7 +39,7 @@ public static class OdfPdfExporter
     }
 
     /// <summary>
-    /// Applies export.
+    /// Exports the specified ODF document to PDF.
     /// 將 ODT 文字文件轉換並寫入 PDF 資料流。
     /// </summary>
     /// <param name="document">The source or target object. / 來源文字文件</param>

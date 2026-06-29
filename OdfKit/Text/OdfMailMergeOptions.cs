@@ -1,7 +1,7 @@
 ﻿namespace OdfKit.Text;
 
 /// <summary>
-/// Provides APIs for odf mail merge options.
+/// Configures ODF mail merge behavior.
 /// 提供郵件合併（Mail Merge）作業的進階設定選項。
 /// </summary>
 public sealed class OdfMailMergeOptions

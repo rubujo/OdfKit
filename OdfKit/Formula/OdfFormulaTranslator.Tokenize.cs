@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// Provides conversion, tokenization, and offset helpers for ODF and Excel formula formats.
+/// Tokenizes, converts, and offsets ODF and Excel formula formats.
 /// 提供 ODF 與 Excel 公式格式之間的轉換、語彙分析與偏移工具。
 /// </summary>
 public static partial class OdfFormulaTranslator

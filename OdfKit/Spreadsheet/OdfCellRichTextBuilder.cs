@@ -4,7 +4,7 @@ using OdfKit.DOM;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Provides a fluent builder API for cell rich text.
+/// Builds rich text runs for spreadsheet cells with a fluent API.
 /// 提供儲存格富文字的鏈式建構 API。
 /// </summary>
 public sealed class OdfCellRichTextBuilder

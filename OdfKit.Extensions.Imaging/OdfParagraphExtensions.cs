@@ -7,13 +7,13 @@ using OdfKit.Text;
 namespace OdfKit.Extensions.Imaging;
 
 /// <summary>
-/// Provides APIs for odf paragraph extensions.
+/// Adds paragraph layout helpers for image-aware rendering.
 /// 提供針對 <see cref="OdfParagraph"/> 的進階版面度量與排版 Facade 擴充方法。
 /// </summary>
 public static class OdfParagraphExtensions
 {
     /// <summary>
-    /// Provides auto shrink to fit.
+    /// Reduces paragraph text size until it fits the target bounds.
     /// 當段落文字長度超出指定的物理限制時，自動縮小字型大小（Auto-Shrink），確保單行文字不溢出物理範圍。
     /// </summary>
     /// <param name="paragraph">The source or target object. / 目標段落</param>

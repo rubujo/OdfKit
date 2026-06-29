@@ -10,31 +10,31 @@ using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf comment.
+/// Represents a comment in an ODF document.
 /// 表示 ODF 文件中的註解。
 /// </summary>
 public class OdfComment
 {
     /// <summary>
-    /// Gets or sets author.
+    /// Gets or sets the comment's author.
     /// 取得或設定註解的作者。
     /// </summary>
     public string Author { get; set; }
 
     /// <summary>
-    /// Gets or sets date.
+    /// Gets or sets the comment's date and time.
     /// 取得或設定註解的日期與時間。
     /// </summary>
     public DateTime Date { get; set; }
 
     /// <summary>
-    /// Gets or sets text.
+    /// Gets or sets the comment's body text.
     /// 取得或設定註解的內文。
     /// </summary>
     public string Text { get; set; }
 
     /// <summary>
-    /// Gets name.
+    /// Gets the unique identifier. This identifier is used in ODF 1.3 to reference a parent comment.
     /// 取得唯一識別碼。此識別碼在 ODF 1.3 中用於參考上層註解。
     /// </summary>
     public string Name { get; }
@@ -42,30 +42,30 @@ public class OdfComment
     private readonly List<OdfComment> _replies = [];
 
     /// <summary>
-    /// Gets replies.
+    /// Gets the list of replies to this comment.
     /// 取得此註解的回覆列表。
     /// </summary>
     public IReadOnlyList<OdfComment> Replies => _replies;
 
     /// <summary>
-    /// Provides odf comment.
+    /// Initializes a new instance of the <see cref="OdfComment"/> class.
     /// 初始化 <see cref="OdfComment"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="author">The name or identifier. / 註解的作者</param>
-    /// <param name="text">The text or value. / 註解的內文</param>
+    /// <param name="author">The comment's author. / 註解的作者。</param>
+    /// <param name="text">The comment's body text. / 註解的內文。</param>
     public OdfComment(string author, string text)
         : this(author, text, DateTime.UtcNow, Guid.NewGuid().ToString("N"))
     {
     }
 
     /// <summary>
-    /// Provides odf comment.
+    /// Initializes a new instance of the <see cref="OdfComment"/> class.
     /// 初始化 <see cref="OdfComment"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="author">The name or identifier. / 註解的作者</param>
-    /// <param name="text">The text or value. / 註解的內文</param>
-    /// <param name="date">The value to use. / 註解的日期</param>
-    /// <param name="name">The name or identifier. / 註解的唯一名稱</param>
+    /// <param name="author">The comment's author. / 註解的作者。</param>
+    /// <param name="text">The comment's body text. / 註解的內文。</param>
+    /// <param name="date">The comment's date. / 註解的日期。</param>
+    /// <param name="name">The comment's unique name. / 註解的唯一名稱。</param>
     public OdfComment(string author, string text, DateTime date, string name)
     {
         Author = author ?? throw new ArgumentNullException(nameof(author));
@@ -75,11 +75,11 @@ public class OdfComment
     }
 
     /// <summary>
-    /// Adds add reply.
+    /// Adds a reply to this comment.
     /// 新增回覆至此註解。
     /// </summary>
-    /// <param name="author">The name or identifier. / 回覆的作者</param>
-    /// <param name="text">The text or value. / 回覆的內文</param>
+    /// <param name="author">The reply's author. / 回覆的作者。</param>
+    /// <param name="text">The reply's body text. / 回覆的內文。</param>
     public void AddReply(string author, string text)
     {
         var reply = new OdfComment(author, text, DateTime.UtcNow, Guid.NewGuid().ToString("N"));
@@ -87,10 +87,10 @@ public class OdfComment
     }
 
     /// <summary>
-    /// Adds add reply.
+    /// Adds a reply to this comment.
     /// 新增回覆至此註解。
     /// </summary>
-    /// <param name="reply">The value to use. / 要新增的回覆註解執行個體</param>
+    /// <param name="reply">The reply comment instance to add. / 要新增的回覆註解執行個體。</param>
     public void AddReply(OdfComment reply)
     {
         if (reply is null)
@@ -106,10 +106,10 @@ public class OdfComment
     }
 
     /// <summary>
-    /// Applies to xml node.
+    /// Recursively renders this comment and its replies as standard ODF 1.3 XML flat sibling office annotation nodes.
     /// 將此註解及其回覆遞迴呈現為標準的 ODF 1.3 XML 扁平同級辦公室註解節點。
     /// </summary>
-    /// <returns>The result. / 包含註解 XML 結構的 <see cref="OdfNode"/> 執行個體</returns>
+    /// <returns>An <see cref="OdfNode"/> instance containing the comment XML structure. / 包含註解 XML 結構的 <see cref="OdfNode"/> 執行個體。</returns>
     public OdfNode ToXmlNode()
     {
         return SerializeManually();
@@ -292,11 +292,11 @@ public class OdfComment
     }
 
     /// <summary>
-    /// Applies from xml node.
+    /// A helper method that parses standard ODF 1.3 XML flat sibling entries back into an <see cref="OdfComment"/> object tree.
     /// 將標準的 ODF 1.3 XML 扁平同級專案還原解析為 <see cref="OdfComment"/> 物件樹的輔助方法。
     /// </summary>
-    /// <param name="node">The value to use. / 要解析的 <see cref="OdfNode"/> 節點</param>
-    /// <returns>The result. / 解析後的 <see cref="OdfComment"/> 根註解物件</returns>
+    /// <param name="node">The <see cref="OdfNode"/> node to parse. / 要解析的 <see cref="OdfNode"/> 節點。</param>
+    /// <returns>The parsed root <see cref="OdfComment"/> object. / 解析後的 <see cref="OdfComment"/> 根註解物件。</returns>
     public static OdfComment FromXmlNode(OdfNode node)
     {
         if (node is null)

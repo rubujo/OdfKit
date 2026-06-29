@@ -8,7 +8,7 @@ using OdfKit.Styles;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf table.
+/// Represents a table in a text document.
 /// 表示文字文件中的表格。
 /// </summary>
 public partial class OdfTable
@@ -23,13 +23,13 @@ public partial class OdfTable
     private readonly int _cols;
 
     /// <summary>
-    /// Provides odf table.
+    /// Initializes a new instance of the <see cref="OdfTable"/> class.
     /// 初始化 <see cref="OdfTable"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="node">The value to use. / 表格的 OdfNode 節點</param>
-    /// <param name="rows">The numeric value. / 表格列數</param>
-    /// <param name="cols">The value to use. / 表格欄數</param>
-    /// <param name="doc">The value to use. / 所屬的文字文件</param>
+    /// <param name="node">The OdfNode of the table. / 表格的 OdfNode 節點。</param>
+    /// <param name="rows">The table row count. / 表格列數。</param>
+    /// <param name="cols">The table column count. / 表格欄數。</param>
+    /// <param name="doc">The owning text document. / 所屬的文字文件。</param>
     public OdfTable(OdfNode node, int rows, int cols, TextDocument doc)
     {
         Node = node;
@@ -54,7 +54,7 @@ public partial class OdfTable
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the table's accessible summary description (maps to the ODF <c>table:summary</c> attribute).
     /// 取得或設定表格的無障礙摘要說明（對應 ODF <c>table:summary</c> 屬性）。
     /// </summary>
     public string? Summary
@@ -70,13 +70,13 @@ public partial class OdfTable
     }
 
     /// <summary>
-    /// Provides merge cells.
+    /// Merges cells in the table.
     /// 合併表格中的儲存格。
     /// </summary>
-    /// <param name="startRow">The numeric value. / 起始列索引</param>
-    /// <param name="startCol">The numeric value. / 起始欄索引</param>
-    /// <param name="rowSpan">The numeric value. / 橫跨的列數</param>
-    /// <param name="colSpan">The value to use. / 橫跨的欄數</param>
+    /// <param name="startRow">The start row index. / 起始列索引。</param>
+    /// <param name="startCol">The start column index. / 起始欄索引。</param>
+    /// <param name="rowSpan">The number of rows spanned. / 橫跨的列數。</param>
+    /// <param name="colSpan">The number of columns spanned. / 橫跨的欄數。</param>
     public void MergeCells(int startRow, int startCol, int rowSpan, int colSpan)
     {
         List<OdfNode> rows = [];
@@ -127,14 +127,14 @@ public partial class OdfTable
     }
 
     /// <summary>
-    /// Provides add nested table.
+    /// Adds a nested table within the specified cell.
     /// 在指定儲存格中新增巢狀表格。
     /// </summary>
-    /// <param name="row">The numeric value. / 儲存格列索引</param>
-    /// <param name="col">The value to use. / 儲存格欄索引</param>
-    /// <param name="nestedRows">The numeric value. / 巢狀表格列數</param>
-    /// <param name="nestedCols">The value to use. / 巢狀表格欄數</param>
-    /// <returns>The result. / 建立的巢狀表格物件</returns>
+    /// <param name="row">The cell row index. / 儲存格列索引。</param>
+    /// <param name="col">The cell column index. / 儲存格欄索引。</param>
+    /// <param name="nestedRows">The nested table row count. / 巢狀表格列數。</param>
+    /// <param name="nestedCols">The nested table column count. / 巢狀表格欄數。</param>
+    /// <returns>The created nested table object. / 建立的巢狀表格物件。</returns>
     public OdfTable AddNestedTable(int row, int col, int nestedRows, int nestedCols)
     {
         var cellNode = GetCellNode(row, col);
@@ -144,12 +144,12 @@ public partial class OdfTable
     }
 
     /// <summary>
-    /// Sets set cell style.
+    /// Sets the style name of the specified cell.
     /// 設定指定儲存格的樣式名稱。
     /// </summary>
-    /// <param name="row">The numeric value. / 儲存格列索引</param>
-    /// <param name="col">The value to use. / 儲存格欄索引</param>
-    /// <param name="styleName">The name or identifier. / 樣式名稱</param>
+    /// <param name="row">The cell row index. / 儲存格列索引。</param>
+    /// <param name="col">The cell column index. / 儲存格欄索引。</param>
+    /// <param name="styleName">The style name. / 樣式名稱。</param>
     public void SetCellStyle(int row, int col, string styleName)
     {
         OdfNode cellNode = GetCellNode(row, col);
@@ -160,11 +160,11 @@ public partial class OdfTable
     }
 
     /// <summary>
-    /// Sets set row repeat.
+    /// Sets the repeat count of the specified row.
     /// 設定指定列的重複次數。
     /// </summary>
-    /// <param name="row">The numeric value. / 列索引</param>
-    /// <param name="repeatCount">The numeric value. / 重複次數</param>
+    /// <param name="row">The row index. / 列索引。</param>
+    /// <param name="repeatCount">The repeat count. / 重複次數。</param>
     public void SetRowRepeat(int row, int repeatCount)
     {
         List<OdfNode> rows = [];
@@ -196,12 +196,12 @@ public partial class OdfTable
     }
 
     /// <summary>
-    /// Gets get cell.
+    /// Gets the specified cell object.
     /// 取得指定的儲存格物件。
     /// </summary>
-    /// <param name="row">The numeric value. / 列索引</param>
-    /// <param name="col">The value to use. / 欄索引</param>
-    /// <returns>The result. / 對應的儲存格執行個體</returns>
+    /// <param name="row">The row index. / 列索引。</param>
+    /// <param name="col">The column index. / 欄索引。</param>
+    /// <returns>The corresponding cell instance. / 對應的儲存格執行個體。</returns>
     public OdfTableCell GetCell(int row, int col)
     {
         var cellNode = GetCellNode(row, col);
@@ -209,11 +209,11 @@ public partial class OdfTable
     }
 
     /// <summary>
-    /// Sets set column width.
+    /// Sets the width of the specified column.
     /// 設定指定欄的欄寬。
     /// </summary>
-    /// <param name="col">The value to use. / 欄位索引</param>
-    /// <param name="width">The name or identifier. / 欄寬值</param>
+    /// <param name="col">The column index. / 欄位索引。</param>
+    /// <param name="width">The column width value. / 欄寬值。</param>
     public void SetColumnWidth(int col, OdfLength width)
     {
         var colNode = GetOrCreateColumnNode(col);

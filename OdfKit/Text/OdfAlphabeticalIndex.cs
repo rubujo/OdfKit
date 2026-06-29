@@ -7,17 +7,17 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf alphabetical index.
+/// Represents an alphabetical index in an ODF document.
 /// 表示 ODF 文件中的字母索引。
 /// </summary>
 public class OdfAlphabeticalIndex : OdfIndex
 {
     /// <summary>
-    /// Provides odf alphabetical index.
+    /// Initializes a new instance of the <see cref="OdfAlphabeticalIndex"/> class.
     /// 初始化 <see cref="OdfAlphabeticalIndex"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="node">The value to use. / 字母索引的 OdfNode 節點</param>
-    /// <param name="doc">The value to use. / 所屬的文字文件</param>
+    /// <param name="node">The OdfNode of the alphabetical index. / 字母索引的 OdfNode 節點。</param>
+    /// <param name="doc">The owning text document. / 所屬的文字文件。</param>
     public OdfAlphabeticalIndex(OdfNode node, TextDocument doc) : base(node, doc)
     {
         FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
@@ -25,14 +25,14 @@ public class OdfAlphabeticalIndex : OdfIndex
     }
 
     /// <summary>
-    /// Gets get source local name.
+    /// Gets the XML local name of the alphabetical index source node.
     /// 取得字母索引來源節點的 XML 本地名稱。
     /// </summary>
-    /// <returns>The result. / XML 本地名稱</returns>
+    /// <returns>The XML local name. / XML 本地名稱。</returns>
     protected override string GetSourceLocalName() => "alphabetical-index-source";
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets a value indicating whether alphabetical separators are used.
     /// 取得或設定一個值，指出是否使用字母分隔符號。
     /// </summary>
     public bool AlphabeticalSeparators
@@ -42,7 +42,7 @@ public class OdfAlphabeticalIndex : OdfIndex
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets a value indicating whether identical index entries are combined.
     /// 取得或設定一個值，指出是否合併相同的索引專案。
     /// </summary>
     public bool CombineEntries
@@ -52,7 +52,7 @@ public class OdfAlphabeticalIndex : OdfIndex
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets a value indicating whether case is ignored when sorting the index.
     /// 取得或設定一個值，指出索引排序時是否忽略大小寫。
     /// </summary>
     public bool IgnoreCase
@@ -62,11 +62,11 @@ public class OdfAlphabeticalIndex : OdfIndex
     }
 
     /// <summary>
-    /// Sets configure source.
+    /// Configures the properties of the alphabetical index source.
     /// 設定字母索引來源的屬性。
     /// </summary>
-    /// <param name="commaSeparated">The value to use. / 是否使用逗號分隔</param>
-    /// <param name="ignoreCase">The value to use. / 是否忽略大小寫</param>
+    /// <param name="commaSeparated">Whether to use comma separation. / 是否使用逗號分隔。</param>
+    /// <param name="ignoreCase">Whether to ignore case. / 是否忽略大小寫。</param>
     public void ConfigureSource(bool commaSeparated = false, bool ignoreCase = false)
     {
         var src = FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
@@ -75,12 +75,12 @@ public class OdfAlphabeticalIndex : OdfIndex
     }
 
     /// <summary>
-    /// Adds add entry template.
+    /// Adds an entry template for the alphabetical index.
     /// 新增字母索引專案範本。
     /// </summary>
-    /// <param name="outlineLevel">The numeric value. / 大綱階層</param>
-    /// <param name="styleName">The name or identifier. / 樣式名稱</param>
-    /// <returns>The result. / 用於建構範本的 <see cref="OdfIndexTemplateBuilder"/> 執行個體</returns>
+    /// <param name="outlineLevel">The outline level. / 大綱階層。</param>
+    /// <param name="styleName">The style name. / 樣式名稱。</param>
+    /// <returns>An <see cref="OdfIndexTemplateBuilder"/> instance for constructing the template. / 用於建構範本的 <see cref="OdfIndexTemplateBuilder"/> 執行個體。</returns>
     public OdfIndexTemplateBuilder AddEntryTemplate(string outlineLevel, string styleName)
     {
         var src = FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
@@ -92,7 +92,7 @@ public class OdfAlphabeticalIndex : OdfIndex
     }
 
     /// <summary>
-    /// Provides update.
+    /// Updates the content of the alphabetical index.
     /// 更新字母索引的內容。
     /// </summary>
     public override void Update()

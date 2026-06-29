@@ -6,7 +6,7 @@ using OdfKit.Styles;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Provides a fluent border configuration API for spreadsheet cell ranges.
+/// Configures spreadsheet cell range borders with a fluent API.
 /// 提供試算表儲存格範圍的框線鏈式設定 API。
 /// </summary>
 public sealed class OdfRangeBorderProxy
@@ -21,7 +21,7 @@ public sealed class OdfRangeBorderProxy
     }
 
     /// <summary>
-    /// Applies borders to all four sides of every cell in the range.
+    /// Sets borders on every side of every cell in the range.
     /// 對範圍內每個儲存格套用四面框線。
     /// </summary>
     /// <param name="border">The border to apply. / 要套用的框線。</param>
@@ -37,7 +37,7 @@ public sealed class OdfRangeBorderProxy
     }
 
     /// <summary>
-    /// Applies borders only to the outer edges of the range.
+    /// Sets borders only on the outside edges of the range.
     /// 只對範圍外側邊界套用框線。
     /// </summary>
     /// <param name="border">The border to apply. / 要套用的框線。</param>
@@ -58,7 +58,7 @@ public sealed class OdfRangeBorderProxy
     }
 
     /// <summary>
-    /// Applies borders only to the internal grid lines of the range.
+    /// Sets borders only on the internal grid lines of the range.
     /// 只對範圍內部格線套用框線。
     /// </summary>
     /// <param name="border">The border to apply. / 要套用的框線。</param>
@@ -79,7 +79,7 @@ public sealed class OdfRangeBorderProxy
     }
 
     /// <summary>
-    /// Applies borders to the outer edges and internal grid lines of the range.
+    /// Sets borders on both the outside edges and internal grid lines of the range.
     /// 對範圍外側與內部格線套用框線。
     /// </summary>
     /// <param name="outer">The outer edge border. / 外側邊界框線。</param>

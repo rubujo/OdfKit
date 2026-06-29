@@ -5,7 +5,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Provides APIs for odf document metadata.
+/// Exposes high-level accessors for document metadata.
 /// 提供文件中繼資料的高階操作入口。
 /// </summary>
 public sealed class OdfDocumentMetadata
@@ -13,17 +13,17 @@ public sealed class OdfDocumentMetadata
     private readonly OdfDocument _document;
 
     /// <summary>
-    /// Provides odf document metadata.
+    /// Initializes a new instance of the <see cref="OdfDocumentMetadata"/> class.
     /// 初始化 <see cref="OdfDocumentMetadata"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">The value to use. / 所屬文件</param>
+    /// <param name="document">The owning document. / 所屬文件。</param>
     public OdfDocumentMetadata(OdfDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the title.
     /// 取得或設定標題。
     /// </summary>
     public string? Title
@@ -33,7 +33,7 @@ public sealed class OdfDocumentMetadata
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the author.
     /// 取得或設定作者。
     /// </summary>
     public string? Creator
@@ -43,7 +43,7 @@ public sealed class OdfDocumentMetadata
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the subject.
     /// 取得或設定主旨。
     /// </summary>
     public string? Subject
@@ -53,7 +53,7 @@ public sealed class OdfDocumentMetadata
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the description.
     /// 取得或設定描述。
     /// </summary>
     public string? Description
@@ -63,7 +63,8 @@ public sealed class OdfDocumentMetadata
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the document language (a BCP-47 language tag, e.g. "zh-TW", "en-US").
+    /// Maps to the ODF <c>dc:language</c> element.
     /// 取得或設定文件語言（BCP-47 語言標籤，例如 "zh-TW"、"en-US"）。
     /// 對應 ODF 的 <c>dc:language</c> 元素。
     /// </summary>
@@ -74,7 +75,7 @@ public sealed class OdfDocumentMetadata
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the document's source template metadata.
     /// 取得或設定文件來源範本中繼資料。
     /// </summary>
     public OdfTemplateMetadata? TemplateMetadata

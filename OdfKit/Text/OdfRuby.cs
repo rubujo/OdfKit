@@ -5,15 +5,15 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Represents odf ruby.
+/// Represents a ruby layout entry used for East Asian phonetic annotations (furigana-style markup).
 /// 表示用於東亞注音（旁註標記）的 ruby 版面配置專案。
 /// </summary>
-/// <param name="node">The value to use. / 基礎的 OdfNode 節點</param>
-/// <param name="doc">The value to use. / 所屬的文字文件</param>
+/// <param name="node">The underlying OdfNode. / 基礎的 OdfNode 節點。</param>
+/// <param name="doc">The owning text document. / 所屬的文字文件。</param>
 public class OdfRuby(OdfNode node, TextDocument doc)
 {
     /// <summary>
-    /// Gets argument null exception.
+    /// Gets the underlying ODF node representing the ruby entry.
     /// 取得表示 ruby 專案的基礎 ODF 節點。
     /// </summary>
     public OdfNode Node { get; } = node ?? throw new ArgumentNullException(nameof(node));
@@ -21,7 +21,7 @@ public class OdfRuby(OdfNode node, TextDocument doc)
     private readonly TextDocument _doc = doc ?? throw new ArgumentNullException(nameof(doc));
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the style name associated with the ruby entry.
     /// 取得或設定與 ruby 專案關聯的樣式名稱。
     /// </summary>
     public string? StyleName
@@ -31,7 +31,7 @@ public class OdfRuby(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
-    /// Gets this member.
+    /// Gets the ruby base node.
     /// 取得 ruby 的基底節點。
     /// </summary>
     public OdfNode? RubyBaseNode
@@ -50,7 +50,7 @@ public class OdfRuby(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
-    /// Gets this member.
+    /// Gets the ruby text node.
     /// 取得 ruby 的文字節點。
     /// </summary>
     public OdfNode? RubyTextNode
@@ -69,7 +69,7 @@ public class OdfRuby(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the style name associated with the ruby base entry.
     /// 取得或設定與 ruby 基底專案關聯的樣式名稱。
     /// </summary>
     public string? RubyBaseStyleName
@@ -79,7 +79,7 @@ public class OdfRuby(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the style name associated with the ruby text entry.
     /// 取得或設定與 ruby 文字專案關聯的樣式名稱。
     /// </summary>
     public string? RubyTextStyleName
@@ -89,7 +89,7 @@ public class OdfRuby(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the ruby position (e.g. "above" or "below").
     /// 取得或設定 ruby 的位置（例如 "above" 或 "below"）。
     /// </summary>
     public string? RubyPosition
@@ -99,7 +99,7 @@ public class OdfRuby(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
-    /// Gets or sets this member.
+    /// Gets or sets the ruby alignment (e.g. "left", "center", "right", "distribute-letter", "distribute-space").
     /// 取得或設定 ruby 的對齊方式（例如 "left"、"center"、"right"、"distribute-letter"、"distribute-space"）。
     /// </summary>
     public string? RubyAlign

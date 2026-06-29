@@ -15,13 +15,13 @@ using WP = DocumentFormat.OpenXml.Wordprocessing;
 namespace OdfKit.Conversion;
 
 /// <summary>
-/// Applies docx to odt converter.
+/// Converts DOCX documents into ODT text documents.
 /// 將 DOCX 格式轉換為 <see cref="TextDocument"/> 的轉換器。
 /// </summary>
 public static class DocxToOdtConverter
 {
     /// <summary>
-    /// Provides convert.
+    /// Converts a DOCX document to ODT.
     /// 從 DOCX 資料流讀取並建立對應的 ODT 文字文件。
     /// </summary>
     /// <param name="docxStream">The source or target object. / DOCX 來源資料流</param>

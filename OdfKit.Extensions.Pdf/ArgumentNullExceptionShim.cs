@@ -7,7 +7,7 @@ namespace OdfKit.Export.Shim;
 internal static class ArgumentNullException
 {
     /// <summary>
-    /// Provides throw if null.
+    /// Throws an <see cref="ArgumentNullException"/> when the value is <see langword="null"/>.
     /// 若引數為 null 則拋出 ArgumentNullException。
     /// </summary>
     public static void ThrowIfNull(object? argument, string? paramName = null)

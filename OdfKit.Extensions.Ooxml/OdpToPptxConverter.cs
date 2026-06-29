@@ -15,7 +15,7 @@ using P = DocumentFormat.OpenXml.Presentation;
 namespace OdfKit.Conversion;
 
 /// <summary>
-/// Applies odp to pptx converter.
+/// Converts ODP presentations to PPTX files.
 /// 將 <see cref="OdfPresentationDocument"/> (ODP) 轉換為 PPTX 格式的 managed 淨室轉換器。
 /// </summary>
 public static class OdpToPptxConverter
@@ -27,7 +27,7 @@ public static class OdpToPptxConverter
     private const string IndefiniteDuration = "indefinite";
 
     /// <summary>
-    /// Applies convert.
+    /// Converts an ODP presentation to PPTX.
     /// 將 ODP 簡報文件轉換並寫入 PPTX 資料流。
     /// </summary>
     /// <param name="odpDocument">The source or target object. / 來源 ODP 簡報文件</param>

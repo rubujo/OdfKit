@@ -19,7 +19,7 @@ public interface IOdfFormulaEvaluator
 }
 
 /// <summary>
-/// Provides spreadsheet data access required for formula evaluation.
+/// Supplies spreadsheet data required by formula evaluation.
 /// 提供公式評估所需的試算表資料存取介面。
 /// </summary>
 public interface IEvaluationContext
