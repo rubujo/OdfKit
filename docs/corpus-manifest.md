@@ -66,7 +66,7 @@ ODFDOM 官方 sample parity 的外部範本位於
 | repo-generated-complex-financial-model | `tests/fixtures/corpus/generated/complex/complex-financial-model.ods` | generated | n/a | generated-no-copyright | Spreadsheet | 1.4 | OASIS ODF 1.4 Extended | invalid | preserve-unknown |
 | repo-generated-complex-business-deck | `tests/fixtures/corpus/generated/complex/complex-business-deck.odp` | generated | n/a | generated-no-copyright | Presentation | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | repo-generated-complex-flow-diagram | `tests/fixtures/corpus/generated/complex/complex-flow-diagram.odg` | generated | n/a | generated-no-copyright | Graphics | 1.4 | OASIS ODF 1.4 Extended | invalid | preserve-unknown |
-| generated-format-minimal | generated in `PackageRoundTripTests.MinimalSupportedFormatRoundTrips` | generated | n/a | generated-no-copyright | 24 extensions | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
+| generated-format-minimal | generated in `PackageRoundTripMatrixTests.MinimalSupportedFormatRoundTrips` | generated | n/a | generated-no-copyright | 24 extensions | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
 | generated-interop-package | generated in `InteropCorpusTests` | generated | n/a | generated-no-copyright | package formats | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | generated-schema-negative | generated in `CorpusComplianceTests` | generated | n/a | generated-no-copyright | ODT / flat XML | 1.4 | OASIS ODF 1.4 Strict | invalid | semantic-equivalent |
 | generated-security-boundary | generated in `OdfSecurityBoundaryTests` | generated | n/a | generated-no-copyright | package formats | mixed | policy profiles | mixed | preserve-unknown |

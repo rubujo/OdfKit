@@ -39,7 +39,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         framework: [net8.0, net10.0]
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       TEST_RESULTS_DIR: artifacts/test-results/${{ matrix.os }}-${{ matrix.framework }}
     steps:
@@ -56,13 +56,13 @@ jobs:
 
       - name: Build test project
         shell: pwsh
-        timeout-minutes: 6
+        timeout-minutes: 8
         run: |
           dotnet build OdfKit.Tests/OdfKit.Tests.csproj -c Release -f ${{ matrix.framework }}
 
       - name: Run smoke tests (docs)
         shell: pwsh
-        timeout-minutes: 4
+        timeout-minutes: 8
         run: |
           $testFilter = 'Category=Smoke&FullyQualifiedName~DocsAndCorpusContractTests'
           $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'docs'
@@ -76,13 +76,13 @@ jobs:
             --results-directory $resultsDir `
             --logger "console;verbosity=normal" `
             --blame-hang `
-            --blame-hang-timeout 3m `
+            --blame-hang-timeout 5m `
             --blame-hang-dump-type none `
             --logger "trx;LogFileName=smoke-docs-${{ matrix.os }}-${{ matrix.framework }}.trx"
 
       - name: Run smoke tests (api)
         shell: pwsh
-        timeout-minutes: 5
+        timeout-minutes: 8
         run: |
           $testFilter = 'Category=Smoke&(FullyQualifiedName~ApiUsabilityTests|FullyQualifiedName~DocumentKindApiUsabilityTests|FullyQualifiedName~TextApiUsabilityTests|FullyQualifiedName~SpreadsheetApiUsabilityTests|FullyQualifiedName~PresentationApiUsabilityTests|FullyQualifiedName~DrawingApiUsabilityTests)'
           $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'api'
@@ -96,13 +96,13 @@ jobs:
             --results-directory $resultsDir `
             --logger "console;verbosity=normal" `
             --blame-hang `
-            --blame-hang-timeout 3m `
+            --blame-hang-timeout 5m `
             --blame-hang-dump-type none `
             --logger "trx;LogFileName=smoke-api-${{ matrix.os }}-${{ matrix.framework }}.trx"
 
       - name: Run smoke tests (package-entries)
         shell: pwsh
-        timeout-minutes: 4
+        timeout-minutes: 8
         run: |
           $testFilter = 'Category=Smoke&(FullyQualifiedName~OdfPackage|FullyQualifiedName~PackageReadinessTests)'
           $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'package-entries'
@@ -116,16 +116,16 @@ jobs:
             --results-directory $resultsDir `
             --logger "console;verbosity=normal" `
             --blame-hang `
-            --blame-hang-timeout 3m `
+            --blame-hang-timeout 5m `
             --blame-hang-dump-type none `
             --logger "trx;LogFileName=smoke-package-entries-${{ matrix.os }}-${{ matrix.framework }}.trx"
 
-      - name: Run smoke tests (package-roundtrip)
+      - name: Run smoke tests (package-roundtrip-core)
         shell: pwsh
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
-          $testFilter = 'Category=Smoke&FullyQualifiedName~PackageRoundTripTests'
-          $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'package-roundtrip'
+          $testFilter = 'Category=Smoke&FullyQualifiedName~TestFlatXmlAndZipPackageCoreDocumentRoundTrip'
+          $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'package-roundtrip-core'
           New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
           Write-Host "CI 快速回歸測試 filter: $testFilter"
           dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
@@ -136,13 +136,53 @@ jobs:
             --results-directory $resultsDir `
             --logger "console;verbosity=normal" `
             --blame-hang `
-            --blame-hang-timeout 3m `
+            --blame-hang-timeout 8m `
             --blame-hang-dump-type none `
-            --logger "trx;LogFileName=smoke-package-roundtrip-${{ matrix.os }}-${{ matrix.framework }}.trx"
+            --logger "trx;LogFileName=smoke-package-roundtrip-core-${{ matrix.os }}-${{ matrix.framework }}.trx"
+
+      - name: Run smoke tests (package-roundtrip-embedded)
+        shell: pwsh
+        timeout-minutes: 10
+        run: |
+          $testFilter = 'Category=Smoke&(FullyQualifiedName~TestFlatXmlAndZipPackageImageRoundTrip|FullyQualifiedName~TestFlatXmlAndZipPackageFormulaRoundTrip)'
+          $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'package-roundtrip-embedded'
+          New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
+          Write-Host "CI 快速回歸測試 filter: $testFilter"
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
+            -c Release `
+            -f ${{ matrix.framework }} `
+            --no-build `
+            --filter $testFilter `
+            --results-directory $resultsDir `
+            --logger "console;verbosity=normal" `
+            --blame-hang `
+            --blame-hang-timeout 8m `
+            --blame-hang-dump-type none `
+            --logger "trx;LogFileName=smoke-package-roundtrip-embedded-${{ matrix.os }}-${{ matrix.framework }}.trx"
+
+      - name: Run smoke tests (package-roundtrip-preservation)
+        shell: pwsh
+        timeout-minutes: 10
+        run: |
+          $testFilter = 'Category=Smoke&(FullyQualifiedName~WriteEntryInfersManifestMediaTypesWhenMediaTypeIsOmitted|FullyQualifiedName~HighLevelSavePreservesUnknownXmlForeignContentAndProcessingInstructions)'
+          $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'package-roundtrip-preservation'
+          New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
+          Write-Host "CI 快速回歸測試 filter: $testFilter"
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
+            -c Release `
+            -f ${{ matrix.framework }} `
+            --no-build `
+            --filter $testFilter `
+            --results-directory $resultsDir `
+            --logger "console;verbosity=normal" `
+            --blame-hang `
+            --blame-hang-timeout 8m `
+            --blame-hang-dump-type none `
+            --logger "trx;LogFileName=smoke-package-roundtrip-preservation-${{ matrix.os }}-${{ matrix.framework }}.trx"
 
       - name: Run smoke tests (vertical-slice)
         shell: pwsh
-        timeout-minutes: 4
+        timeout-minutes: 8
         run: |
           $testFilter = 'Category=Smoke&FullyQualifiedName~VerticalSliceRoundTripTests'
           $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'vertical-slice'
@@ -156,13 +196,13 @@ jobs:
             --results-directory $resultsDir `
             --logger "console;verbosity=normal" `
             --blame-hang `
-            --blame-hang-timeout 3m `
+            --blame-hang-timeout 5m `
             --blame-hang-dump-type none `
             --logger "trx;LogFileName=smoke-vertical-slice-${{ matrix.os }}-${{ matrix.framework }}.trx"
 
       - name: Run smoke tests (core-security)
         shell: pwsh
-        timeout-minutes: 5
+        timeout-minutes: 8
         run: |
           $testFilter = 'Category=Smoke&(FullyQualifiedName~OdfCoreRegressionTests|FullyQualifiedName~OdfBoundaryRegressionTests|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityBoundaryTests)'
           $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'core-security'
@@ -176,7 +216,7 @@ jobs:
             --results-directory $resultsDir `
             --logger "console;verbosity=normal" `
             --blame-hang `
-            --blame-hang-timeout 3m `
+            --blame-hang-timeout 5m `
             --blame-hang-dump-type none `
             --logger "trx;LogFileName=smoke-core-security-${{ matrix.os }}-${{ matrix.framework }}.trx"
 

@@ -234,6 +234,7 @@ public class DocsAndCorpusContractTests
         string repoRoot = FindRepositoryRoot();
         string workflow = File.ReadAllText(Path.Combine(repoRoot, ".github", "workflows", "ci.yml"));
         string categories = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "TestCategories.cs"));
+        string roundTripMatrix = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "PackageRoundTripMatrixTests.cs"));
 
         Assert.Contains("Category=Smoke", workflow, StringComparison.Ordinal);
         Assert.DoesNotContain("FullyQualifiedName~OdfKit.Tests.", workflow, StringComparison.Ordinal);
@@ -241,7 +242,13 @@ public class DocsAndCorpusContractTests
         Assert.Contains("Run smoke tests (docs)", workflow, StringComparison.Ordinal);
         Assert.Contains("Run smoke tests (api)", workflow, StringComparison.Ordinal);
         Assert.Contains("Run smoke tests (package-entries)", workflow, StringComparison.Ordinal);
-        Assert.Contains("Run smoke tests (package-roundtrip)", workflow, StringComparison.Ordinal);
+        Assert.Contains("Run smoke tests (package-roundtrip-core)", workflow, StringComparison.Ordinal);
+        Assert.Contains("Run smoke tests (package-roundtrip-embedded)", workflow, StringComparison.Ordinal);
+        Assert.Contains("Run smoke tests (package-roundtrip-preservation)", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("$testFilter = 'Category=Smoke&FullyQualifiedName~PackageRoundTripTests'", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("Run smoke tests (package-roundtrip-minimal)", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("MinimalSupportedFormatRoundTrips", workflow, StringComparison.Ordinal);
+        Assert.Contains("[Fact(Explicit = true)]", roundTripMatrix, StringComparison.Ordinal);
         Assert.Contains("Run smoke tests (vertical-slice)", workflow, StringComparison.Ordinal);
         Assert.Contains("Run smoke tests (core-security)", workflow, StringComparison.Ordinal);
         Assert.Contains("public const string Smoke = \"Smoke\";", categories, StringComparison.Ordinal);

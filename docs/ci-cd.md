@@ -11,14 +11,19 @@
 - `net8.0` 與 `net10.0` 都必須先建置 `OdfKit.Tests`。
 - `net8.0` 與 `net10.0` 都必須執行 `Category=Smoke`，避免只有較新 TFM 有測試證據。
 - 建置與測試分成不同 step；Smoke 測試再依 docs、api、package-entries、
-  package-roundtrip、vertical-slice、core-security
+  package-roundtrip-core、package-roundtrip-embedded、package-roundtrip-preservation、
+  vertical-slice、core-security
   分成不同 step，避免單一 testhost 長時間承載整批測試時難以定位 hang。
 - 測試 step 有較短 timeout，避免整個 job 黑箱卡到總 timeout。
 - 測試輸出 TRX 與 blame 診斷檔，並以 artifact 上傳。
 
-Windows `net10.0` 曾在單一 `Category=Smoke` 批次中留下 `OdfKit.Tests.exe` 測試子行程，
-即使個別測試單跑可通過也可能讓 VSTest/testhost 無法結束。Smoke shard 是針對這個
-testhost 收尾風險的必要設計，不得合回單一全量 Smoke step。
+Windows 與 `net10.0` 曾在單一 `Category=Smoke` 批次或單一
+`PackageRoundTripTests` 批次中留下 `OdfKit.Tests.exe` 測試子行程，即使個別測試單跑可通過，
+也可能讓 VSTest/testhost 無法結束。Smoke shard 是針對這個 testhost 收尾風險的必要設計，
+不得合回單一全量 Smoke step，也不得把所有 package round-trip 測試合回單一 step。
+完整格式矩陣 round-trip（`PackageRoundTripMatrixTests`）保留在 `Regression` / `Compliance`
+分層並標示為 explicit，不放入主 CI Smoke，避免 VSTest filter 與大量矩陣案例組合造成
+testhost 收尾不穩。
 
 Smoke 測試只放「快速、無外部 Office/LibreOffice 依賴、可在 GitHub-hosted runner 穩定完成」
 的回歸案例。需要外部應用程式、真實大型 corpus、視覺比對或效能統計的工作不得塞入主 CI。
@@ -44,6 +49,8 @@ CI 必須優先產生可診斷失敗，而不是只延長 timeout。
 
 - job 保留整體 timeout，防止 runner 無限占用。
 - 主要 build/test step 也要設定 timeout，讓卡住的位置能被定位。
+- 一般 Smoke step 使用較短 hang timeout；round-trip 與 ZIP/Flat XML 互轉測試可使用稍長
+  hang timeout，但仍須拆成小 shard，不得只靠單一長 timeout 掩蓋 testhost hang。
 - `dotnet test` 必須輸出 TRX。
 - Smoke 測試啟用 blame hang；日常 CI 使用 `--blame-hang-dump-type none` 避免 artifact 爆量。
 - Crash dump 與 hang dump type `mini` / `full` 僅用於手動診斷重跑，避免日常 CI 在 Windows
