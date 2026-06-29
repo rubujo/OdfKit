@@ -37,6 +37,10 @@ pwsh eng/Test-OdfTypedDomCoverage.ps1
 （`en`, `zh-TW`, `de`, `fr`, `nl`, `nb`, `pt`, `it`, `sk`, `da`, `ms`, `ko`），並保留
 `OdfLocalizer` 的文化回退測試。不得只修改單一文化或在呼叫端硬編碼例外訊息。
 
+`OdfKit/Compliance/OdfLocalizer.ComplianceSuggestions.cs` 維護非例外的合規建議補充
+翻譯；新增內建 compliance rule 或 suggested-fix key 時，也必須讓 12 個支援語言
+合併後的鍵值集合與英文一致。
+
 ## Clean-room 來源索引
 
 公式評估與 schema pattern validator 的規格來源、可接受參考、不可接受來源與

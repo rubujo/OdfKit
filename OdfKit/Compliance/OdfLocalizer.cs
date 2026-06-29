@@ -243,6 +243,8 @@ public static partial class OdfLocalizer
                 target[kvp.Key] = kvp.Value;
             }
         }
+
+        MergeSupplementalComplianceDictionary(name, target);
     }
 
     /// <summary>

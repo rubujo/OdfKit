@@ -88,6 +88,32 @@ public partial class ComplianceTests
     }
 
     [Fact]
+    public void BuiltInComplianceSuggestedFixesResolveForAllSupportedCultures()
+    {
+        string[] cultures = ["en", "zh-TW", "de", "fr", "nl", "nb", "pt", "it", "sk", "da", "ms", "ko"];
+        var ruleIds = new System.Collections.Generic.SortedSet<string>(StringComparer.Ordinal);
+        foreach (OdfComplianceProfile profile in OdfComplianceProfiles.BuiltIn)
+        {
+            foreach (var rule in profile.Rules)
+            {
+                ruleIds.Add(rule.Id);
+            }
+        }
+
+        foreach (string cultureName in cultures)
+        {
+            var culture = new CultureInfo(cultureName);
+            foreach (string ruleId in ruleIds)
+            {
+                string fix = OdfLocalizer.GetSuggestedFix(ruleId, culture);
+
+                Assert.NotEmpty(fix);
+                Assert.NotEqual(ruleId, fix);
+            }
+        }
+    }
+
+    [Fact]
     public void ValidatorAutoDetectsLanguageBasedOnProfileTargetCulture()
     {
         // 使用含有事件監聽器（巨集）的內容，以觸發 DisallowMacroByDefault 規則。
