@@ -10,7 +10,8 @@
 - `ubuntu-latest` 與 `windows-latest` 都必須執行。
 - `net8.0` 與 `net10.0` 都必須先建置 `OdfKit.Tests`。
 - `net8.0` 與 `net10.0` 都必須執行 `Category=Smoke`，避免只有較新 TFM 有測試證據。
-- 建置與測試分成不同 step；Smoke 測試再依 docs、api、package、core-security
+- 建置與測試分成不同 step；Smoke 測試再依 docs、api、package-entries、
+  package-roundtrip、vertical-slice、core-security
   分成不同 step，避免單一 testhost 長時間承載整批測試時難以定位 hang。
 - 測試 step 有較短 timeout，避免整個 job 黑箱卡到總 timeout。
 - 測試輸出 TRX 與 blame 診斷檔，並以 artifact 上傳。

@@ -240,7 +240,9 @@ public class DocsAndCorpusContractTests
         Assert.DoesNotContain("- name: Run smoke tests\r\n", workflow, StringComparison.Ordinal);
         Assert.Contains("Run smoke tests (docs)", workflow, StringComparison.Ordinal);
         Assert.Contains("Run smoke tests (api)", workflow, StringComparison.Ordinal);
-        Assert.Contains("Run smoke tests (package)", workflow, StringComparison.Ordinal);
+        Assert.Contains("Run smoke tests (package-entries)", workflow, StringComparison.Ordinal);
+        Assert.Contains("Run smoke tests (package-roundtrip)", workflow, StringComparison.Ordinal);
+        Assert.Contains("Run smoke tests (vertical-slice)", workflow, StringComparison.Ordinal);
         Assert.Contains("Run smoke tests (core-security)", workflow, StringComparison.Ordinal);
         Assert.Contains("public const string Smoke = \"Smoke\";", categories, StringComparison.Ordinal);
         Assert.Contains("public const string Interop = \"Interop\";", categories, StringComparison.Ordinal);
