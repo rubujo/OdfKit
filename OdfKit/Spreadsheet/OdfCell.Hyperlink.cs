@@ -63,8 +63,10 @@ public partial class OdfCell
     /// Removes the hyperlink of the cell while preserving display text.
     /// 移除儲存格的超連結，保留顯示文字。
     /// </summary>
-    public void RemoveHyperlink()
+    /// <returns><see langword="true"/> if a hyperlink was removed; otherwise, <see langword="false"/>. / 若已移除超連結則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveHyperlink()
     {
+        bool removed = false;
         foreach (var child in Node.Children)
         {
             if (child.LocalName != "p" || child.NamespaceUri != OdfNamespaces.Text)
@@ -78,9 +80,12 @@ public partial class OdfCell
                 string linkText = aNode.TextContent;
                 child.InsertBefore(new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = linkText }, aNode);
                 child.RemoveChild(aNode);
+                removed = true;
             }
             break;
         }
+
+        return removed;
     }
 
     /// <summary>
@@ -176,10 +181,10 @@ public partial class OdfCell
     }
 
     /// <summary>
-    /// Gets the cell annotation, or <see langword="null"/> when no annotation exists.
-    /// 取得儲存格的批注；若無批注則回傳 null。
+    /// Finds the cell annotation, or <see langword="null"/> when no annotation exists.
+    /// 尋找儲存格的批注；若無批注則回傳 null。
     /// </summary>
-    public OdfCellAnnotation? GetAnnotation()
+    public OdfCellAnnotation? FindAnnotation()
     {
         foreach (var child in Node.Children)
         {
@@ -243,7 +248,8 @@ public partial class OdfCell
     /// Removes the cell annotation.
     /// 移除儲存格的批注。
     /// </summary>
-    public void RemoveAnnotation()
+    /// <returns><see langword="true"/> if at least one annotation was removed; otherwise, <see langword="false"/>. / 若已移除至少一個批注則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveAnnotation()
     {
         var toRemove = new List<OdfNode>();
         foreach (var child in Node.Children)
@@ -251,6 +257,8 @@ public partial class OdfCell
                 toRemove.Add(child);
         foreach (var child in toRemove)
             Node.RemoveChild(child);
+
+        return toRemove.Count > 0;
     }
 
     #endregion

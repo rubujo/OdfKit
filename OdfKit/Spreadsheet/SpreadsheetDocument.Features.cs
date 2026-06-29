@@ -163,7 +163,7 @@ public partial class SpreadsheetDocument
         if (chart is null)
             throw new ArgumentNullException(nameof(chart));
 
-        var sheet = GetSheet(sheetName);
+        var sheet = FindSheet(sheetName);
         if (sheet is null)
             throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SheetNamedCannotFound_2", sheetName));
 
@@ -348,7 +348,7 @@ public partial class SpreadsheetDocument
         if (validation is null)
             throw new ArgumentNullException(nameof(validation));
 
-        var sheet = GetSheet(sheetName);
+        var sheet = FindSheet(sheetName);
         if (sheet is null)
             throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SheetNamedCannotFound_2", sheetName));
 

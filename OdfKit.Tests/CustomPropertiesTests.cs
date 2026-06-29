@@ -13,14 +13,14 @@ namespace OdfKit.Tests;
 public class CustomPropertiesTests
 {
     /// <summary>
-    /// 驗證 SetCustomProperty(string, string) 能寫入並以 GetCustomProperty 讀回。
+    /// 驗證 SetCustomProperty(string, string) 能寫入並以 FindCustomProperty 讀回。
     /// </summary>
     [Fact]
     public void SetCustomProperty_String_CanBeReadBack()
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Author", "Alice");
-        Assert.Equal("Alice", doc.GetCustomProperty("Author") as string);
+        Assert.Equal("Alice", doc.FindCustomProperty("Author") as string);
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ public class CustomPropertiesTests
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Version", 42);
-        var val = doc.GetCustomProperty("Version");
+        var val = doc.FindCustomProperty("Version");
         Assert.NotNull(val);
         Assert.Equal(42.0, Convert.ToDouble(val));
     }
@@ -44,7 +44,7 @@ public class CustomPropertiesTests
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Score", 3.14);
-        var val = doc.GetCustomProperty("Score");
+        var val = doc.FindCustomProperty("Score");
         Assert.NotNull(val);
         double d = Convert.ToDouble(val);
         Assert.InRange(d, 3.13, 3.15);
@@ -58,7 +58,7 @@ public class CustomPropertiesTests
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("IsActive", true);
-        var val = doc.GetCustomProperty("IsActive");
+        var val = doc.FindCustomProperty("IsActive");
         Assert.Equal(true, val);
     }
 
@@ -71,7 +71,7 @@ public class CustomPropertiesTests
         using var doc = TextDocument.Create();
         var dt = new DateTime(2026, 6, 16, 12, 0, 0, DateTimeKind.Utc);
         doc.SetCustomProperty("CreatedAt", dt);
-        var val = doc.GetCustomProperty("CreatedAt");
+        var val = doc.FindCustomProperty("CreatedAt");
         Assert.NotNull(val);
         var result = Convert.ToDateTime(val);
         Assert.Equal(2026, result.Year);
@@ -80,25 +80,25 @@ public class CustomPropertiesTests
     }
 
     /// <summary>
-    /// 驗證 GetCustomProperty&lt;T&gt; 泛型版本能正確轉型字串屬性。
+    /// 驗證 FindCustomProperty&lt;T&gt; 泛型版本能正確轉型字串屬性。
     /// </summary>
     [Fact]
     public void GetCustomProperty_Generic_ReturnsTypedValue()
     {
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Department", "工程部");
-        string? val = doc.GetCustomProperty<string>("Department");
+        string? val = doc.FindCustomProperty<string>("Department");
         Assert.Equal("工程部", val);
     }
 
     /// <summary>
-    /// 驗證 GetCustomProperty&lt;T&gt; 對不存在的屬性回傳預設值。
+    /// 驗證 FindCustomProperty&lt;T&gt; 對不存在的屬性回傳預設值。
     /// </summary>
     [Fact]
     public void GetCustomProperty_Generic_NonExistent_ReturnsDefault()
     {
         using var doc = TextDocument.Create();
-        string? val = doc.GetCustomProperty<string>("NonExistent");
+        string? val = doc.FindCustomProperty<string>("NonExistent");
         Assert.Null(val);
     }
 
@@ -130,7 +130,7 @@ public class CustomPropertiesTests
         using var doc = TextDocument.Create();
         doc.SetCustomProperty("Title", "舊標題");
         doc.SetCustomProperty("Title", "新標題");
-        Assert.Equal("新標題", doc.GetCustomProperty("Title") as string);
+        Assert.Equal("新標題", doc.FindCustomProperty("Title") as string);
 
         var all = doc.GetAllCustomProperties();
         int count = 0;
@@ -156,7 +156,7 @@ public class CustomPropertiesTests
 
         using var ms2 = new MemoryStream(bytes);
         using var loaded = (TextDocument)OdfDocumentFactory.LoadDocument(ms2);
-        Assert.Equal("Bob", loaded.GetCustomProperty("Author") as string);
-        Assert.Equal(100.0, Convert.ToDouble(loaded.GetCustomProperty("Pages")));
+        Assert.Equal("Bob", loaded.FindCustomProperty("Author") as string);
+        Assert.Equal(100.0, Convert.ToDouble(loaded.FindCustomProperty("Pages")));
     }
 }

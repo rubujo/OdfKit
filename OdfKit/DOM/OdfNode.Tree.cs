@@ -91,24 +91,27 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Removes the specified child node from this node.
     /// 從此節點的子節點清單中移除指定的子節點。
     /// </summary>
-    /// <param name="child">要移除的子節點</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="child"/> 為 <see langword="null"/> 時擲出</exception>
-    public void RemoveChild(OdfNode child)
+    /// <param name="child">The child node to remove. / 要移除的子節點。</param>
+    /// <returns><see langword="true"/> if the child node was removed; otherwise, <see langword="false"/>. / 若已移除子節點則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="child"/> is <see langword="null"/>. / 當 <paramref name="child"/> 為 <see langword="null"/> 時擲出。</exception>
+    public bool RemoveChild(OdfNode child)
     {
         if (child is null)
             throw new ArgumentNullException(nameof(child));
 
         if (child.Parent != this)
         {
-            return;
+            return false;
         }
 
         IsModified = true;
         Children.Remove(child);
         child.InvalidateStyle();
         InvalidateStyle();
+        return true;
     }
 
     /// <summary>

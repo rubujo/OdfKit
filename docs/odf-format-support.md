@@ -1,4 +1,4 @@
-# ODF 格式支援矩陣
+﻿# ODF 格式支援矩陣
 
 本文件記錄 OdfKit 對主要 ODF 格式的實作狀態。狀態以目前程式碼與
 測試證據為準，不把路線圖中的目標預先標為完成。
@@ -188,8 +188,8 @@ CNS 11643 官方語意相容或認證。
   描述的「摘要層」深入——`OdfChartDocument` 早已具備軸線（對數刻度、範圍、反向、網格）、
   序列、樣式（含 3D 投影、光源）、牆面／地板、股票圖標記等大量可變更高階 API。本次補上先前
   明確列出但確認缺失的部分：
-  - 新增 `OdfChartSeries.GetErrorIndicator`／`SetErrorIndicator`、`GetRegressionCurve`／
-    `SetRegressionCurve`、`GetMeanValue`／`SetMeanValue`（對應 `chart:error-indicator`／
+  - 新增 `OdfChartSeries.FindErrorIndicator`／`SetErrorIndicator`、`FindRegressionCurve`／
+    `SetRegressionCurve`、`FindMeanValue`／`SetMeanValue`（對應 `chart:error-indicator`／
     `chart:regression-curve`／`chart:mean-value`），新增時依 OASIS ODF 1.4 schema 規定的
     子元素順序（domain、mean-value、regression-curve、error-indicator、data-point、
     data-label）正確插入，避免產生不合規文件。
@@ -218,7 +218,7 @@ CNS 11643 官方語意相容或認證。
 - `.odf`／`.otf`／`.fdf`（Batch 4，2026-06-23）：現況調查同樣發現既有 MathML token 模型
   （`OdfMathToken`／`OdfMathBuilder`，17 種 token 類型）與 LaTeX↔MathML 雙向轉換早已完整支援
   row／fraction／script／table 等必要結構；本次補上確認缺失的部分：
-  - 新增 `OdfFormulaDocument.GetAnnotation`／`SetAnnotation`，支援 `math:semantics`／
+  - 新增 `OdfFormulaDocument.FindAnnotation`／`SetAnnotation`，支援 `math:semantics`／
     `math:annotation`（先前確認缺失的 annotation 結構）；`LoadFromLatex` 現會自動將
     原始 LaTeX 來源附加為 `application/x-tex` 標註，`ToLatex` 優先回傳該標註以達成**精確**
     往返，而非僅 best-effort 由 MathML 重建。

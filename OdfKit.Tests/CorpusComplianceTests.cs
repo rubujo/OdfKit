@@ -59,7 +59,7 @@ namespace OdfKit.Tests
                 using (Stream stream = content.Open())
                 using (var writer = new StreamWriter(stream, Encoding.UTF8))
                 {
-                    writer.Write("<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.4\"><office:body><office:text/></office:body></office:document-content>");
+                    writer.Write("<office:document-content xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" office:version=\"1.2\"><office:body><office:text/></office:body></office:document-content>");
                 }
 
                 ZipArchiveEntry custom = zip.CreateEntry(entryName, CompressionLevel.Fastest);
@@ -193,7 +193,7 @@ namespace OdfKit.Tests
             using OdfPackage package = OdfPackage.Open(ms);
             OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.EuInteroperableEurope);
             LogReport("EuInteroperableEurope_Negative_AltText", report);
-            Assert.True(report.IsValid); // Warning only
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.RuleId + ": " + i.Message))); // Warning only
             Assert.Contains(report.Issues, issue => issue.RuleId == "RequireAccessibilityMetadata" && issue.XPath == "/office:document-content[1]/office:body[1]/office:text[1]/draw:frame[1]/draw:image[1]");
         }
 
@@ -207,7 +207,7 @@ namespace OdfKit.Tests
             using OdfPackage package = OdfPackage.Open(ms);
             OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.EuInteroperableEurope);
             LogReport("EuInteroperableEurope_Negative_TableHeaders", report);
-            Assert.True(report.IsValid); // Warning only
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.RuleId + ": " + i.Message))); // Warning only
             Assert.Contains(report.Issues, issue => issue.RuleId == "RequireAccessibilityMetadata" && issue.XPath == "/office:document-content[1]/office:body[1]/office:text[1]/table:table[1]");
         }
 
@@ -287,7 +287,7 @@ namespace OdfKit.Tests
             using OdfPackage package = OdfPackage.Open(ms);
             OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.RocTaiwanOdfCns15251);
             LogReport("RocTaiwanOdfCns15251_Negative_MacroEntry", report);
-            Assert.True(report.IsValid); // Warning only
+            Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(i => i.RuleId + ": " + i.Message))); // Warning only
             Assert.Contains(report.Issues, issue => issue.RuleId == "DisallowMacroByDefault" && issue.PackagePath == "Basic/script.xlb");
         }
 

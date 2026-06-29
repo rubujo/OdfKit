@@ -70,8 +70,9 @@ public partial class OdfTableSheet
     /// Removes the manual page break for the specified row.
     /// 移除指定列的手動分頁符。
     /// </summary>
-    /// <param name="afterRow">The numeric value. / 分頁符位於此列之後（0 為基準）</param>
-    public void RemoveRowPageBreak(int afterRow) =>
+    /// <param name="afterRow">The zero-based row index after which the page break is located. / 分頁符位於此列之後（0 為基準）。</param>
+    /// <returns><see langword="true"/> if the page break was removed; otherwise, <see langword="false"/>. / 若已移除分頁符則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveRowPageBreak(int afterRow) =>
         OdfTableSheetPrintSettingsEngine.RemoveRowPageBreak(MutationContext, afterRow);
 
     /// <summary>
@@ -86,8 +87,9 @@ public partial class OdfTableSheet
     /// Removes the manual page break for the specified column.
     /// 移除指定欄的手動分頁符。
     /// </summary>
-    /// <param name="afterCol">The numeric value. / 分頁符位於此欄之後（0 為基準）</param>
-    public void RemoveColumnPageBreak(int afterCol) =>
+    /// <param name="afterCol">The zero-based column index after which the page break is located. / 分頁符位於此欄之後（0 為基準）。</param>
+    /// <returns><see langword="true"/> if the page break was removed; otherwise, <see langword="false"/>. / 若已移除分頁符則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveColumnPageBreak(int afterCol) =>
         OdfTableSheetPrintSettingsEngine.RemoveColumnPageBreak(MutationContext, afterCol);
 
     /// <summary>

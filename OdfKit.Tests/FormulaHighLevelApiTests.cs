@@ -331,7 +331,7 @@ public class FormulaHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfFormulaDocument.SetAnnotation"/>／<see cref="OdfFormulaDocument.GetAnnotation"/>
+    /// 驗證 <see cref="OdfFormulaDocument.SetAnnotation"/>／<see cref="OdfFormulaDocument.FindAnnotation"/>
     /// 可附加、讀取並移除 <c>math:semantics</c>／<c>math:annotation</c> 標註，且不影響既有呈現
     /// 內容（presentation MathML）的 token 讀取，並於儲存／載入後保留。
     /// </summary>
@@ -342,12 +342,12 @@ public class FormulaHighLevelApiTests
             .WithTokens(OdfMathToken.Identifier("x"), OdfMathToken.Operator("+"), OdfMathToken.Identifier("y"))
             .Build();
 
-        Assert.Null(formula.GetAnnotation("application/x-tex"));
+        Assert.Null(formula.FindAnnotation("application/x-tex"));
 
         formula.SetAnnotation("application/x-tex", "x + y");
         formula.SetAnnotation("StarMath 5.0", "x + y");
-        Assert.Equal("x + y", formula.GetAnnotation("application/x-tex"));
-        Assert.Equal("x + y", formula.GetAnnotation("StarMath 5.0"));
+        Assert.Equal("x + y", formula.FindAnnotation("application/x-tex"));
+        Assert.Equal("x + y", formula.FindAnnotation("StarMath 5.0"));
         Assert.Equal(3, formula.GetMathTokens().Count);
 
         using var stream = new MemoryStream();
@@ -355,14 +355,14 @@ public class FormulaHighLevelApiTests
         stream.Position = 0;
 
         using OdfFormulaDocument loaded = OdfFormulaDocument.Load(stream, "equation.odf");
-        Assert.Equal("x + y", loaded.GetAnnotation("application/x-tex"));
-        Assert.Equal("x + y", loaded.GetAnnotation("StarMath 5.0"));
+        Assert.Equal("x + y", loaded.FindAnnotation("application/x-tex"));
+        Assert.Equal("x + y", loaded.FindAnnotation("StarMath 5.0"));
         Assert.Equal(3, loaded.GetMathTokens().Count);
         Assert.Equal("x", loaded.GetMathTokens()[0].Text);
 
         loaded.SetAnnotation("application/x-tex", null);
-        Assert.Null(loaded.GetAnnotation("application/x-tex"));
-        Assert.Equal("x + y", loaded.GetAnnotation("StarMath 5.0"));
+        Assert.Null(loaded.FindAnnotation("application/x-tex"));
+        Assert.Equal("x + y", loaded.FindAnnotation("StarMath 5.0"));
     }
 
     /// <summary>
@@ -397,7 +397,7 @@ public class FormulaHighLevelApiTests
 
         OdfMathToken? fraction = original.FindFirst(OdfMathTokenKind.Fraction);
         Assert.NotNull(fraction);
-        Assert.Single(original.FindAll(OdfMathTokenKind.Fraction));
+        Assert.Single(original.GetAll(OdfMathTokenKind.Fraction));
 
         OdfMathToken updatedFraction = fraction!.WithChild(0, OdfMathToken.Identifier("y"));
         Assert.Equal("y", updatedFraction.Base?.Text);

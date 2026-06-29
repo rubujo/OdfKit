@@ -27,12 +27,12 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
-    /// Finds formula cells in this worksheet that match the specified predicate.
-    /// 尋找此工作表中符合指定條件的公式儲存格。
+    /// Gets formula cells in this worksheet that match the specified predicate.
+    /// 取得此工作表中符合指定條件的公式儲存格。
     /// </summary>
     /// <param name="predicate">The delegate to invoke. / 用來篩選公式儲存格的條件委派</param>
     /// <returns>The result. / 符合條件的公式儲存格資訊列舉</returns>
-    public IEnumerable<OdfFormulaCellInfo> FindFormulaCells(Func<OdfFormulaCellInfo, bool> predicate)
+    public IEnumerable<OdfFormulaCellInfo> GetFormulaCells(Func<OdfFormulaCellInfo, bool> predicate)
     {
         if (predicate is null)
             throw new ArgumentNullException(nameof(predicate));

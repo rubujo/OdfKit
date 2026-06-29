@@ -102,7 +102,7 @@ public class SpreadsheetApiUsabilityTests
         Assert.Equal("of:=SUM([.A1:.B1])", documentFormula);
         Assert.Equal("of:='銷售'.B1", workbook.GetFormula("摘要", "A1"));
 
-        OdfFormulaCellInfo summaryReference = Assert.Single(workbook.FindFormulaCells(
+        OdfFormulaCellInfo summaryReference = Assert.Single(workbook.GetFormulaCells(
             cell => cell.Formula.Contains("'銷售'.", StringComparison.Ordinal)));
         Assert.Equal("摘要!A1", summaryReference.ExcelAddress);
 

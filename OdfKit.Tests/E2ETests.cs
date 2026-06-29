@@ -969,7 +969,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(outputStream, leaveOpen: true))
             {
                 var doc = new SpreadsheetDocument(package);
-                var sheet = doc.GetSheet("Template Grid");
+                var sheet = doc.FindSheet("Template Grid");
                 Assert.NotNull(sheet);
                 sheet.GetCell(1, 0).RawValue = "1";
                 sheet.GetCell(1, 1).RawValue = "100.25";
@@ -980,7 +980,7 @@ namespace OdfKit.Tests
             using (var packageRead = OdfPackage.Open(outputStream))
             {
                 var doc = new SpreadsheetDocument(packageRead);
-                var sheet = doc.GetSheet("Template Grid");
+                var sheet = doc.FindSheet("Template Grid");
                 Assert.NotNull(sheet);
                 Assert.Equal("1", sheet.GetCell(1, 0).RawValue);
                 Assert.Equal("100.25", sheet.GetCell(1, 1).RawValue);

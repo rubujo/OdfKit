@@ -293,7 +293,7 @@ public class FourFormatApiScenarioTests
 
         using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
         OdfChartDocument reloadedChart = loaded.GetEmbeddedChartDocument(Assert.Single(loaded.GetEmbeddedCharts()));
-        OdfChartAxisInfo? axisInfo = reloadedChart.GetAxisInfo("y");
+        OdfChartAxisInfo? axisInfo = reloadedChart.FindAxisInfo("y");
         Assert.NotNull(axisInfo);
         Assert.Equal(500, axisInfo!.Maximum);
         Assert.True(axisInfo.HasMajorGrid);

@@ -241,7 +241,7 @@ public static class OdfChartRenderer
             return false;
         }
 
-        sheet = doc.GetSheet(sheetName!);
+        sheet = doc.FindSheet(sheetName!);
         if (sheet is null)
         {
             return false;
@@ -280,7 +280,7 @@ public static class OdfChartRenderer
 
             if (!string.IsNullOrEmpty(sheetName))
             {
-                var sheet = doc.GetSheet(sheetName!);
+                var sheet = doc.FindSheet(sheetName!);
                 return sheet?.GetCell(address.Row, address.Column)?.CellValue?.ToString();
             }
         }

@@ -64,7 +64,7 @@ public sealed class OdfExternalLinkManager
         }
 
         SpreadsheetDocument? document = DocumentResolver?.Invoke(documentId);
-        OdfTableSheet? sheet = document?.GetSheet(sheetName);
+        OdfTableSheet? sheet = document?.FindSheet(sheetName);
         if (sheet is null)
         {
             return false;

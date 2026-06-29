@@ -78,6 +78,9 @@ OdfLocalizer.DefaultCulture = new CultureInfo("zh-TW");
 - 可在地化的例外訊息與警告訊息
 - 部分建議修復文字
 
+公開與受保護 API 的 XML 文件已採英文＋正體中文雙語格式；英文摘要提供
+.NET IntelliSense 的主要說明，正體中文摘要保留臺灣地區用語。
+
 ## 6. 相關原始碼
 
 | 檔案 | 用途 |

@@ -67,7 +67,7 @@ public partial class OdfFormulaDocument
     /// MathML 並非一對一對應，部分語意可能無法完整保留）。
     /// </summary>
     /// <returns>The LaTeX formula string. / LaTeX 公式字串。</returns>
-    public string ToLatex() => GetAnnotation(LatexAnnotationEncoding) ?? OdfFormulaLatexConverter.ToLatex(GetMathTokens());
+    public string ToLatex() => FindAnnotation(LatexAnnotationEncoding) ?? OdfFormulaLatexConverter.ToLatex(GetMathTokens());
 
     /// <summary>
     /// Creates and loads an <see cref="OdfFormulaDocument"/> by using an <see cref="OdfMathBuilder"/> composition delegate.

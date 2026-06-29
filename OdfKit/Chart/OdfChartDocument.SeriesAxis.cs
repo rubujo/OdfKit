@@ -28,12 +28,12 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
-    /// Gets the title of the axis for the specified dimension.
-    /// 取得指定維度座標軸的標題。
+    /// Finds the title of the axis for the specified dimension.
+    /// 尋找指定維度座標軸的標題。
     /// </summary>
     /// <param name="dimension">The axis dimension, e.g. x, y, or z. / 座標軸維度，例如 x、y 或 z。</param>
     /// <returns>The axis title; <see langword="null"/> if not set. / 座標軸標題；若未設定則為 <see langword="null"/>。</returns>
-    public string? GetAxisTitle(string dimension)
+    public string? FindAxisTitle(string dimension)
     {
         ValidateAxisDimension(dimension);
 

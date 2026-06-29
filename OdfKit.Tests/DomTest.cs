@@ -637,7 +637,8 @@ namespace OdfKit.Tests
             docContent.SetAttribute("version", OdfNamespaces.Office, "1.3");
             Assert.Equal(OdfVersion.Odf13, p.GetDocumentVersion());
 
-            docContent.RemoveAttribute("version", OdfNamespaces.Office);
+            Assert.True(docContent.RemoveAttribute("version", OdfNamespaces.Office));
+            Assert.False(docContent.RemoveAttribute("version", OdfNamespaces.Office));
             Assert.Equal(OdfVersion.Odf14, p.GetDocumentVersion());
 
             // 2. Nullable property cleanup deletes attribute

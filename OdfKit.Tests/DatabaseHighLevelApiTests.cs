@@ -254,17 +254,17 @@ public class DatabaseHighLevelApiTests
         stream.Position = 0;
 
         using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
-        OdfDatabaseQueryStatementInfo? order = loaded.GetQueryOrderStatement("CustomerQuery");
+        OdfDatabaseQueryStatementInfo? order = loaded.FindQueryOrderStatement("CustomerQuery");
         Assert.NotNull(order);
         Assert.Equal("Name ASC", order!.Command);
         Assert.True(order.ApplyCommand);
 
-        OdfDatabaseQueryStatementInfo? filter = loaded.GetQueryFilterStatement("CustomerQuery");
+        OdfDatabaseQueryStatementInfo? filter = loaded.FindQueryFilterStatement("CustomerQuery");
         Assert.NotNull(filter);
         Assert.Equal("Age > 18", filter!.Command);
 
         Assert.Equal(new[] { "Name", "Age" }, loaded.GetQueryColumns("CustomerQuery"));
-        Assert.Equal("Customers", loaded.GetQueryUpdateTable("CustomerQuery"));
+        Assert.Equal("Customers", loaded.FindQueryUpdateTable("CustomerQuery"));
     }
 
     /// <summary>

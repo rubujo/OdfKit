@@ -5,14 +5,14 @@ namespace OdfKit.Chart;
 public partial class OdfChartDocument
 {
     /// <summary>
-    /// Gets the data label setting for the specified data series.
-    /// 取得指定資料序列的數據標籤設定。
+    /// Finds the data label setting for the specified data series.
+    /// 尋找指定資料序列的數據標籤設定。
     /// </summary>
     /// <param name="seriesIndex">The zero-based series index. / 序列索引（從 0 起算）。</param>
     /// <returns>The data label setting; <see langword="null"/> if the series does not define one. / 數據標籤設定；若序列未定義數據標籤則為 <see langword="null"/>。</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="seriesIndex"/> is out of range. / 當 <paramref name="seriesIndex"/> 超出範圍時擲出。</exception>
-    public OdfChartDataLabelInfo? GetSeriesDataLabels(int seriesIndex) =>
-        GetSeriesEditor(seriesIndex).GetDataLabels();
+    public OdfChartDataLabelInfo? FindSeriesDataLabels(int seriesIndex) =>
+        GetSeriesEditor(seriesIndex).FindDataLabels();
 
     /// <summary>
     /// Sets the data label for the specified data series.

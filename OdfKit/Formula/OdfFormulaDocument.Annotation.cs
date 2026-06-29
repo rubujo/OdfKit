@@ -12,13 +12,13 @@ namespace OdfKit.Formula;
 public partial class OdfFormulaDocument
 {
     /// <summary>
-    /// Gets MathML annotation content for the specified encoding (<c>math:semantics</c>/<c>math:annotation</c>).
-    /// 取得指定編碼的 MathML 標註內容（<c>math:semantics</c>／<c>math:annotation</c>）。
+    /// Finds MathML annotation content for the specified encoding (<c>math:semantics</c>/<c>math:annotation</c>).
+    /// 尋找指定編碼的 MathML 標註內容（<c>math:semantics</c>／<c>math:annotation</c>）。
     /// </summary>
     /// <param name="encoding">The annotation encoding, such as <c>application/x-tex</c> or <c>StarMath 5.0</c>. / 標註編碼，例如 <c>application/x-tex</c> 或 <c>StarMath 5.0</c>。</param>
     /// <returns>The annotation content, or <see langword="null"/> when the formula is not wrapped in <c>math:semantics</c> or no matching annotation exists. / 標註內容；若公式未以 <c>math:semantics</c> 包裹或不存在對應編碼的標註則為 <see langword="null"/>。</returns>
     /// <exception cref="ArgumentException">When <paramref name="encoding"/> is blank. / 當 <paramref name="encoding"/> 為空白時擲出。</exception>
-    public string? GetAnnotation(string encoding)
+    public string? FindAnnotation(string encoding)
     {
         if (string.IsNullOrWhiteSpace(encoding))
         {

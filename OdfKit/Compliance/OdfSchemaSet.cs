@@ -216,12 +216,13 @@ public sealed class OdfSchemaSet
     }
 
     /// <summary>
-    /// 尋找與限定名稱相符的所有保留 RELAX NG 名稱類別。
+    /// Gets all preserved RELAX NG name classes that match the qualified name.
+    /// 取得與限定名稱相符的所有保留 RELAX NG 名稱類別。
     /// </summary>
-    /// <param name="namespaceUri">命名空間 URI</param>
-    /// <param name="localName">區域名稱</param>
-    /// <returns>符合的名稱類別清單</returns>
-    public IReadOnlyList<OdfSchemaNameClass> FindMatchingNameClasses(string namespaceUri, string localName)
+    /// <param name="namespaceUri">The namespace URI. / 命名空間 URI。</param>
+    /// <param name="localName">The local name. / 區域名稱。</param>
+    /// <returns>The matching name classes. / 符合的名稱類別清單。</returns>
+    public IReadOnlyList<OdfSchemaNameClass> GetMatchingNameClasses(string namespaceUri, string localName)
     {
         var matches = new List<OdfSchemaNameClass>();
         foreach (OdfSchemaNameClass nameClass in _nameClasses)

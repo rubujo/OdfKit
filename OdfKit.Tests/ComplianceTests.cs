@@ -277,13 +277,13 @@ namespace OdfKit.Tests
             Assert.True(schema.NameClasses[2].Matches(OdfNamespaces.Text, "span"));
             Assert.False(schema.NameClasses[2].Matches(OdfNamespaces.Text, "p"));
 
-            Assert.Single(schema.FindMatchingNameClasses(OdfNamespaces.Text, "p"));
+            Assert.Single(schema.GetMatchingNameClasses(OdfNamespaces.Text, "p"));
             Assert.Collection(
-                schema.FindMatchingNameClasses(OdfNamespaces.Draw, "frame"),
+                schema.GetMatchingNameClasses(OdfNamespaces.Draw, "frame"),
                 item => Assert.Equal(OdfSchemaNameClassKind.AnyName, item.Kind),
                 item => Assert.Equal(OdfSchemaNameClassKind.NamespaceName, item.Kind));
             Assert.Collection(
-                schema.FindMatchingNameClasses(OdfNamespaces.Text, "span"),
+                schema.GetMatchingNameClasses(OdfNamespaces.Text, "span"),
                 item => Assert.Equal(OdfSchemaNameClassKind.AnyName, item.Kind),
                 item => Assert.Equal(OdfSchemaNameClassKind.Name, item.Kind));
             Assert.True(schema.IsNameAllowedByNameClasses(OdfNamespaces.Text, "p"));

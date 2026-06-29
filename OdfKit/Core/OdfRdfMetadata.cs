@@ -46,12 +46,13 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// Gets RDF triples filtered by subject and predicate.
     /// 依主詞與述詞篩選 RDF triples。
     /// </summary>
-    /// <param name="subject">主詞 IRI；為 <see langword="null"/> 時不篩選主詞</param>
-    /// <param name="predicate">述詞 IRI；為 <see langword="null"/> 時不篩選述詞</param>
-    /// <returns>符合條件的 triple 清單</returns>
-    public IReadOnlyList<OdfRdfTriple> FindTriples(string? subject = null, string? predicate = null)
+    /// <param name="subject">The subject IRI, or <see langword="null"/> to include all subjects. / 主詞 IRI；為 <see langword="null"/> 時不篩選主詞。</param>
+    /// <param name="predicate">The predicate IRI, or <see langword="null"/> to include all predicates. / 述詞 IRI；為 <see langword="null"/> 時不篩選述詞。</param>
+    /// <returns>The matching triples. / 符合條件的 triple 清單。</returns>
+    public IReadOnlyList<OdfRdfTriple> GetTriples(string? subject = null, string? predicate = null)
     {
         IEnumerable<OdfRdfTriple> query = _triples;
         if (subject is not null)
@@ -175,7 +176,7 @@ public sealed class OdfRdfMetadata
     /// <returns>已正規化之組件路徑集合</returns>
     public IReadOnlyList<string> GetLinkedPartPaths(string documentSubject)
     {
-        return FindTriples(documentSubject, OdfPkgRdfPredicates.HasPart)
+        return GetTriples(documentSubject, OdfPkgRdfPredicates.HasPart)
             .Where(triple => !triple.IsLiteral)
             .Select(triple => NormalizePartPath(triple.ObjectValue))
             .Distinct(StringComparer.Ordinal)

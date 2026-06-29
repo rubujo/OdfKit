@@ -101,7 +101,7 @@ public class RdfMetadataTests
         stream.Position = 0;
         using var reopened = OdfPackage.Open(stream, leaveOpen: true);
 
-        Assert.Single(reopened.RdfMetadata.FindTriples(string.Empty, OdfPkgRdfPredicates.HasPart));
+        Assert.Single(reopened.RdfMetadata.GetTriples(string.Empty, OdfPkgRdfPredicates.HasPart));
         Assert.True(reopened.RdfMetadata.TryGetLiteral("content.xml", OdfPkgRdfPredicates.MimeType, out string mimeType));
         Assert.Equal("text/xml", mimeType);
 
@@ -156,7 +156,8 @@ public class RdfMetadataTests
             package.SyncRdfMetadataWithEntries();
             Assert.Contains("meta.xml", package.RdfMetadata.GetLinkedPartPaths(string.Empty));
 
-            package.RemoveEntry("meta.xml");
+            Assert.True(package.RemoveEntry("meta.xml"));
+            Assert.False(package.RemoveEntry("meta.xml"));
             package.SyncRdfMetadataWithEntries();
             Assert.DoesNotContain("meta.xml", package.RdfMetadata.GetLinkedPartPaths(string.Empty));
             Assert.False(package.RdfMetadata.TryGetLiteral("meta.xml", OdfPkgRdfPredicates.MimeType, out _));

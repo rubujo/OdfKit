@@ -161,13 +161,13 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
         => OdfPackageEntryAccessEngine.IsEntryEncrypted(EntryCollaborators, name);
 
     /// <summary>
-    /// Gets the encryption details of the specified entry.
-    /// 取得指定專案的加密詳細資訊。
+    /// Finds the encryption details of the specified entry.
+    /// 尋找指定專案的加密詳細資訊。
     /// </summary>
     /// <param name="name">The relative path name of the entry. / 專案的相對路徑名稱。</param>
     /// <returns>The entry's encryption information, or <see langword="null"/> if not encrypted. / 專案的加密資訊；若未加密則為 <see langword="null"/>。</returns>
-    public OdfEncryptionInfo? GetEntryEncryptionInfo(string name)
-        => OdfPackageEntryAccessEngine.GetEntryEncryptionInfo(EntryCollaborators, name);
+    public OdfEncryptionInfo? FindEntryEncryptionInfo(string name)
+        => OdfPackageEntryAccessEngine.FindEntryEncryptionInfo(EntryCollaborators, name);
 
     private OdfPackage(OdfPackageMode mode, Stream? underlyingStream, bool leaveOpen, OdfLoadOptions? loadOptions, OdfSaveOptions? saveOptions)
     {

@@ -143,7 +143,7 @@ internal static class OdfDocumentMetadataEngine
     /// <summary>
     /// 取得自訂中繼資料屬性。
     /// </summary>
-    internal static object? GetCustomProperty(OdfNode metaDom, string name)
+    internal static object? FindCustomProperty(OdfNode metaDom, string name)
     {
         var metaRoot = FindOrCreateMetaRoot(metaDom);
         var propNode = FindCustomPropertyNode(metaRoot, name);

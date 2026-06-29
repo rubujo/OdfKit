@@ -75,7 +75,8 @@ public class OdfPresentationPageLayout(OdfNode node)
     /// 移除指定型態的預留位置範本。
     /// </summary>
     /// <param name="type">The placeholder type to remove. / 要移除的預留位置型態。</param>
-    public void RemovePlaceholder(OdfPlaceholderType type)
+    /// <returns><see langword="true"/> if at least one placeholder was removed; otherwise, <see langword="false"/>. / 若已移除至少一個預留位置則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemovePlaceholder(OdfPlaceholderType type)
     {
         string clsVal = OdfPlaceholderTemplate.TypeToKebab(type);
         List<OdfNode> toRemove = [];
@@ -93,5 +94,7 @@ public class OdfPresentationPageLayout(OdfNode node)
         {
             Node.RemoveChild(child);
         }
+
+        return toRemove.Count > 0;
     }
 }

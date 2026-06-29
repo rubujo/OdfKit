@@ -112,10 +112,12 @@ public sealed partial class OdfPackage
         => WriteEntry(name, contentStream, mediaType);
 
     /// <summary>
+    /// Removes the specified entry from the package.
     /// 從封裝中移除指定的專案。
     /// </summary>
-    /// <param name="name">要移除的專案相對路徑名稱</param>
-    public void RemoveEntry(string name)
+    /// <param name="name">The relative package entry path to remove. / 要移除的專案相對路徑名稱。</param>
+    /// <returns><see langword="true"/> if an entry, manifest item, or entry-order item was removed; otherwise, <see langword="false"/>. / 若已移除 entry、manifest 項目或 entry order 項目則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveEntry(string name)
         => OdfPackageEntryAccessEngine.RemoveEntry(EntryCollaborators, name);
 
     /// <summary>

@@ -207,7 +207,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// </summary>
     public string? XAxisTitle
     {
-        get => GetAxisTitle("x");
+        get => FindAxisTitle("x");
         set => SetAxisTitle("x", value);
     }
 
@@ -217,7 +217,7 @@ public partial class OdfChartDocument(OdfPackage package, string subPath) : OdfD
     /// </summary>
     public string? YAxisTitle
     {
-        get => GetAxisTitle("y");
+        get => FindAxisTitle("y");
         set => SetAxisTitle("y", value);
     }
 

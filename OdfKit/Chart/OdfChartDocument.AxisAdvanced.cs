@@ -8,12 +8,12 @@ namespace OdfKit.Chart;
 public partial class OdfChartDocument
 {
     /// <summary>
-    /// Gets summary information for the axis of the specified dimension.
-    /// 取得指定維度座標軸的摘要資訊。
+    /// Finds summary information for the axis of the specified dimension.
+    /// 尋找指定維度座標軸的摘要資訊。
     /// </summary>
     /// <param name="dimension">The axis dimension, e.g. <c>x</c>, <c>y</c>, or <c>z</c>. / 座標軸維度，例如 <c>x</c>、<c>y</c> 或 <c>z</c>。</param>
     /// <returns>The axis summary; <see langword="null"/> if it does not exist. / 座標軸摘要；若不存在則為 <see langword="null"/>。</returns>
-    public OdfChartAxisInfo? GetAxisInfo(string dimension)
+    public OdfChartAxisInfo? FindAxisInfo(string dimension)
     {
         ValidateAxisDimension(dimension);
         OdfNode? axis = FindAxis(dimension);
@@ -22,7 +22,7 @@ public partial class OdfChartDocument
 
         return new OdfChartAxisInfo(
             dimension,
-            GetAxisTitle(dimension),
+            FindAxisTitle(dimension),
             GetChartBool(axis, "logarithmic"),
             GetChartBool(axis, "reverse-direction"),
             GetChartDouble(axis, "minimum"),

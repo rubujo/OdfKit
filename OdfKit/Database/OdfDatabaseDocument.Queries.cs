@@ -9,12 +9,12 @@ namespace OdfKit.Database;
 public partial class OdfDatabaseDocument
 {
     /// <summary>
-    /// Gets the order statement of the specified query (<c>db:order-statement</c>).
-    /// 取得指定查詢的排序陳述式（<c>db:order-statement</c>）。
+    /// Finds the order statement of the specified query (<c>db:order-statement</c>).
+    /// 尋找指定查詢的排序陳述式（<c>db:order-statement</c>）。
     /// </summary>
     /// <param name="queryName">The query name. / 查詢名稱。</param>
     /// <returns>The order statement summary, or <see langword="null"/> if not set. / 排序陳述式摘要；若未設定則為 <see langword="null"/>。</returns>
-    public OdfDatabaseQueryStatementInfo? GetQueryOrderStatement(string queryName) =>
+    public OdfDatabaseQueryStatementInfo? FindQueryOrderStatement(string queryName) =>
         ReadQueryStatement(queryName, "order-statement");
 
     /// <summary>
@@ -34,12 +34,12 @@ public partial class OdfDatabaseDocument
             ("filter-statement", DatabaseNamespace), ("columns", DatabaseNamespace), ("update-table", DatabaseNamespace));
 
     /// <summary>
-    /// Gets the filter statement of the specified query (<c>db:filter-statement</c>).
-    /// 取得指定查詢的篩選陳述式（<c>db:filter-statement</c>）。
+    /// Finds the filter statement of the specified query (<c>db:filter-statement</c>).
+    /// 尋找指定查詢的篩選陳述式（<c>db:filter-statement</c>）。
     /// </summary>
     /// <param name="queryName">The query name. / 查詢名稱。</param>
     /// <returns>The filter statement summary, or <see langword="null"/> if not set. / 篩選陳述式摘要；若未設定則為 <see langword="null"/>。</returns>
-    public OdfDatabaseQueryStatementInfo? GetQueryFilterStatement(string queryName) =>
+    public OdfDatabaseQueryStatementInfo? FindQueryFilterStatement(string queryName) =>
         ReadQueryStatement(queryName, "filter-statement");
 
     /// <summary>
@@ -59,12 +59,12 @@ public partial class OdfDatabaseDocument
             ("columns", DatabaseNamespace), ("update-table", DatabaseNamespace));
 
     /// <summary>
-    /// Gets the updatable target table name of the specified query (<c>db:update-table</c>).
-    /// 取得指定查詢的可更新目標資料表名稱（<c>db:update-table</c>）。
+    /// Finds the updatable target table name of the specified query (<c>db:update-table</c>).
+    /// 尋找指定查詢的可更新目標資料表名稱（<c>db:update-table</c>）。
     /// </summary>
     /// <param name="queryName">The query name. / 查詢名稱。</param>
     /// <returns>The target table name, or <see langword="null"/> if not set. / 目標資料表名稱；若未設定則為 <see langword="null"/>。</returns>
-    public string? GetQueryUpdateTable(string queryName)
+    public string? FindQueryUpdateTable(string queryName)
     {
         OdfNode query = FindQueryNodeOrThrow(queryName);
         return FindChildElement(query, "update-table", DatabaseNamespace)?.GetAttribute("name", DatabaseNamespace);

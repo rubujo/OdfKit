@@ -40,7 +40,7 @@ public partial class PresentationDocument
         if (slideIndex < 0 || slideIndex >= Slides.Count)
             throw new ArgumentOutOfRangeException(nameof(slideIndex), OdfLocalizer.GetMessage("Err_PresentationDocument_SlideIndexOutRange"));
 
-        OdfPresentationPageLayout? layout = GetPresentationPageLayout(layoutName)
+        OdfPresentationPageLayout? layout = FindPresentationPageLayout(layoutName)
             ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_PresentationDocument_LayoutNotFound", layoutName), nameof(layoutName));
 
         OdfSlide slide = Slides[slideIndex];
@@ -51,7 +51,7 @@ public partial class PresentationDocument
 
     internal void EnsureStandardPresentationPageLayout(string layoutName, OdfPresentationLayout layout)
     {
-        if (GetPresentationPageLayout(layoutName) is not null)
+        if (FindPresentationPageLayout(layoutName) is not null)
             return;
 
         OdfPresentationPageLayout pageLayout = CreatePresentationPageLayout(layoutName);

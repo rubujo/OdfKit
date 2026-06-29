@@ -87,11 +87,13 @@ public partial class OdfNode
     public void SetAttribute(string localName, XNamespace namespaceUri, string value, string? prefix = null) => SetAttribute(localName, namespaceUri.NamespaceName, value, prefix);
 
     /// <summary>
+    /// Removes the attribute with the specified local name and namespace.
     /// 移除指定屬性名稱與命名空間的屬性。
     /// </summary>
-    /// <param name="localName">屬性的局部名稱</param>
-    /// <param name="namespaceUri">屬性的命名空間 URI</param>
-    public void RemoveAttribute(string localName, string namespaceUri)
+    /// <param name="localName">The attribute local name. / 屬性的局部名稱。</param>
+    /// <param name="namespaceUri">The attribute namespace URI. / 屬性的命名空間 URI。</param>
+    /// <returns><see langword="true"/> if the attribute was removed; otherwise, <see langword="false"/>. / 若已移除屬性則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveAttribute(string localName, string namespaceUri)
     {
         var key = new OdfAttributeName(localName, namespaceUri);
         if (Attributes.Remove(key))
@@ -99,7 +101,10 @@ public partial class OdfNode
             _attributePrefixes.Remove(key);
             IsModified = true;
             InvalidateStyle();
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -113,11 +118,13 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Removes the attribute with the specified local name and namespace.
     /// 移除指定屬性名稱與命名空間的屬性。
     /// </summary>
-    /// <param name="localName">屬性的局部名稱</param>
-    /// <param name="namespaceUri">屬性的命名空間</param>
-    public void RemoveAttribute(string localName, XNamespace namespaceUri) => RemoveAttribute(localName, namespaceUri.NamespaceName);
+    /// <param name="localName">The attribute local name. / 屬性的局部名稱。</param>
+    /// <param name="namespaceUri">The attribute namespace. / 屬性的命名空間。</param>
+    /// <returns><see langword="true"/> if the attribute was removed; otherwise, <see langword="false"/>. / 若已移除屬性則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool RemoveAttribute(string localName, XNamespace namespaceUri) => RemoveAttribute(localName, namespaceUri.NamespaceName);
 
     private static string? ResolveAttributePrefix(string namespaceUri, string? requestedPrefix)
     {

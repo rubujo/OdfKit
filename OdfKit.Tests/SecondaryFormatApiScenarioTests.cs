@@ -49,7 +49,7 @@ public class SecondaryFormatApiScenarioTests
         stream.Position = 0;
 
         using OdfChartDocument loaded = OdfChartDocument.Load(stream, "chart.odc");
-        OdfChartAxisInfo? axisInfo = loaded.GetAxisInfo("y");
+        OdfChartAxisInfo? axisInfo = loaded.FindAxisInfo("y");
         Assert.NotNull(axisInfo);
         Assert.Equal("銷售額", axisInfo!.Title);
         Assert.Equal(500, axisInfo.Maximum);

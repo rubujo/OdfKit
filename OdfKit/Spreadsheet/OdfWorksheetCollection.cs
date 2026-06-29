@@ -62,7 +62,7 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
     {
         get
         {
-            OdfTableSheet? sheet = _document.GetSheet(name);
+            OdfTableSheet? sheet = _document.FindSheet(name);
             if (sheet is null)
             {
                 throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_OdfWorksheetCollection_SheetNamedCannotFound", name));
@@ -104,7 +104,7 @@ public sealed class OdfWorksheetCollection : IEnumerable<OdfTableSheet>
     /// <returns>The found worksheet, or <see langword="null"/> if no worksheet is found. / 找到的工作表；找不到時為 <see langword="null"/>。</returns>
     public OdfTableSheet? Find(string name)
     {
-        return _document.GetSheet(name);
+        return _document.FindSheet(name);
     }
 
     /// <summary>

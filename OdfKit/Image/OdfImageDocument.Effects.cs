@@ -7,12 +7,12 @@ namespace OdfKit.Image;
 public partial class OdfImageDocument
 {
     /// <summary>
-    /// Gets the filter setting of the image frame with the specified name.
-    /// 取得指定名稱影像框架的濾鏡設定。
+    /// Finds the filter setting of the image frame with the specified name.
+    /// 尋找指定名稱影像框架的濾鏡設定。
     /// </summary>
     /// <param name="name">The frame name. / 框架名稱。</param>
     /// <returns>The filter setting, or <see langword="null"/> if the frame does not exist or has no filter set. / 濾鏡設定；若框架不存在或未設定濾鏡則為 <see langword="null"/>。</returns>
-    public OdfImageFilterInfo? GetImageFilter(string name)
+    public OdfImageFilterInfo? FindImageFilter(string name)
     {
         OdfNode? frame = FindFrameByName(name);
         OdfNode? image = frame is null ? null : FindChild(frame, "image", OdfNamespaces.Draw);

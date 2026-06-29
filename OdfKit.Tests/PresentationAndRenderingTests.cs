@@ -356,7 +356,7 @@ namespace OdfKit.Tests
                 var keyItem = FindConfigItemNode(entry, "WorkbookProtectionKey");
                 Assert.NotNull(keyItem?.TextContent);
 
-                var sheet = doc.GetSheet("ProtectedSheet");
+                var sheet = doc.FindSheet("ProtectedSheet");
                 Assert.NotNull(sheet);
                 Assert.True(sheet.IsProtected);
                 Assert.Equal("true", sheet.TableNode.GetAttribute("protected", OdfNamespaces.Table));
@@ -384,7 +384,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms))
             {
                 var doc = new SpreadsheetDocument(package);
-                var sheet = doc.GetSheet("Sheet1");
+                var sheet = doc.FindSheet("Sheet1");
                 Assert.NotNull(sheet);
 
                 var a1 = sheet.GetCell(0, 0);
@@ -430,7 +430,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms))
             {
                 var doc = new SpreadsheetDocument(package);
-                var sheet = doc.GetSheet("Sheet1");
+                var sheet = doc.FindSheet("Sheet1");
                 Assert.NotNull(sheet);
 
                 var formatsNode = FindNodeByLocalName(sheet.TableNode, "conditional-formats");
@@ -479,7 +479,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms))
             {
                 var doc = new SpreadsheetDocument(package);
-                var sheet = doc.GetSheet("StreamingSheet");
+                var sheet = doc.FindSheet("StreamingSheet");
                 Assert.NotNull(sheet);
 
                 // Row 0 Col 0
@@ -733,7 +733,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms))
             {
                 var doc = new PresentationDocument(package);
-                var layout = doc.GetPresentationPageLayout("CustomLayout");
+                var layout = doc.FindPresentationPageLayout("CustomLayout");
                 Assert.NotNull(layout);
                 Assert.Single(layout.Placeholders);
                 Assert.Equal(OdfPlaceholderType.Title, layout.Placeholders[0].PlaceholderType);

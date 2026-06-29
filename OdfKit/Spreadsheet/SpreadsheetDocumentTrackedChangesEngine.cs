@@ -315,7 +315,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
         if (address?.SheetName is null)
             return;
 
-        OdfTableSheet? sheet = document.GetSheet(address.Value.SheetName);
+        OdfTableSheet? sheet = document.FindSheet(address.Value.SheetName);
         if (sheet is null)
             return;
 
@@ -655,7 +655,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
         if (!string.Equals(source.Value.SheetName, target.Value.SheetName, StringComparison.Ordinal))
             return;
 
-        OdfTableSheet? sheet = document.GetSheet(source.Value.SheetName);
+        OdfTableSheet? sheet = document.FindSheet(source.Value.SheetName);
         if (sheet is null)
             return;
 
@@ -673,7 +673,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
         if (sheetName is null || position is null || count is null || count < 1)
             return;
 
-        OdfTableSheet? sheet = document.GetSheet(sheetName);
+        OdfTableSheet? sheet = document.FindSheet(sheetName);
         if (sheet is null)
             return;
 
@@ -694,7 +694,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
         if (sheetName is null || position is null)
             return;
 
-        OdfTableSheet? sheet = document.GetSheet(sheetName);
+        OdfTableSheet? sheet = document.FindSheet(sheetName);
         if (sheet is null)
             return;
 

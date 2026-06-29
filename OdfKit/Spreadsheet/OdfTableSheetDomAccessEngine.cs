@@ -304,6 +304,31 @@ internal static class OdfTableSheetDomAccessEngine
     }
 
     /// <summary>
+    /// 唯讀查找已存在的欄節點，不會像 <see cref="GetOrCreateColumnNode"/> 一樣在索引超出範圍時建立新欄。
+    /// </summary>
+    internal static OdfNode? TryFindColumnNode(OdfNode tableNode, int col)
+    {
+        int currentColIndex = 0;
+
+        foreach (var child in tableNode.Children)
+        {
+            if (child.LocalName == "table-column" && child.NamespaceUri == OdfNamespaces.Table)
+            {
+                int repeatedCount = OdfTableSheetRepeatSplitEngine.GetRepeatCount(child, "number-columns-repeated");
+
+                if (col >= currentColIndex && col < currentColIndex + repeatedCount)
+                {
+                    return child;
+                }
+
+                currentColIndex += repeatedCount;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// 列舉工作表中所有既有的儲存格節點及其座標。
     /// </summary>
     internal static IEnumerable<(OdfNode Node, int Row, int Column)> EnumerateExistingCells(OdfNode tableNode)

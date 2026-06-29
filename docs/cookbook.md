@@ -1,4 +1,4 @@
-# OdfKit Cookbook
+﻿# OdfKit Cookbook
 
 本文件提供可直接改寫的常見 ODF 操作範例。範例只描述目前已有測試支撐的能力。
 
@@ -249,7 +249,7 @@ workbook.Save("calc.ods");
 using OdfKit.Spreadsheet;
 
 using SpreadsheetDocument workbook = SpreadsheetDocument.Load("calc.ods");
-foreach (OdfFormulaCellInfo formulaCell in workbook.FindFormulaCells(
+foreach (OdfFormulaCellInfo formulaCell in workbook.GetFormulaCells(
     cell => cell.Formula.Contains("SUM", StringComparison.Ordinal)))
 {
     Console.WriteLine($"{formulaCell.ExcelAddress}: {formulaCell.Formula}");
@@ -394,7 +394,7 @@ chart.Save("revenue.odc");
 
 using ChartDocument loadedChart = ChartDocument.Load("revenue.odc");
 Console.WriteLine(loadedChart.ChartTitle);
-Console.WriteLine(loadedChart.GetSeriesDataLabels(0)?.ShowCategoryName);
+Console.WriteLine(loadedChart.FindSeriesDataLabels(0)?.ShowCategoryName);
 ```
 
 ## 建立 ODF 公式（Fluent Builder）
@@ -424,7 +424,7 @@ using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
 
 OdfMathToken root = OdfMathToken.Row(formula.GetMathTokens().ToArray());
 OdfMathToken? exponent = root.FindFirst(OdfMathTokenKind.Number);
-IEnumerable<OdfMathToken> identifiers = root.FindAll(OdfMathTokenKind.Identifier);
+IEnumerable<OdfMathToken> identifiers = root.GetAll(OdfMathTokenKind.Identifier);
 
 OdfMathToken updatedRoot = root.ReplaceFirst(
     token => token.Kind == OdfMathTokenKind.Number && token.Text == "2",

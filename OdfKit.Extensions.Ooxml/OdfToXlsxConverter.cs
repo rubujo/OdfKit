@@ -55,7 +55,7 @@ public static class OdfToXlsxConverter
         // 在文件層級一次讀取全部樞紐分析表，而非逐工作表於 table:table 節點內尋找。
         foreach (OdfPivotTableInfo pivotInfo in odsWorkbook.GetPivotTables())
         {
-            OdfTableSheet? pivotSheet = odsWorkbook.GetSheet(pivotInfo.SheetName);
+            OdfTableSheet? pivotSheet = odsWorkbook.FindSheet(pivotInfo.SheetName);
             if (pivotSheet is null || !pivotInfo.TryGetSourceRange(out OdfCellRange sourceRange))
             {
                 continue;

@@ -149,7 +149,7 @@ public sealed class OdfMathToken
     /// </summary>
     /// <param name="kind">The target token kind. / 目標 token 種類。</param>
     /// <returns>The matching token sequence. / 符合條件的 token 序列。</returns>
-    public IEnumerable<OdfMathToken> FindAll(OdfMathTokenKind kind)
+    public IEnumerable<OdfMathToken> GetAll(OdfMathTokenKind kind)
     {
         if (Kind == kind)
         {
@@ -159,7 +159,7 @@ public sealed class OdfMathToken
         int childCount = GetChildCount();
         for (int index = 0; index < childCount; index++)
         {
-            foreach (OdfMathToken match in GetChild(index).FindAll(kind))
+            foreach (OdfMathToken match in GetChild(index).GetAll(kind))
             {
                 yield return match;
             }

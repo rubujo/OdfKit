@@ -134,10 +134,10 @@ internal static class OdfTableSheetPrintSettingsEngine
         rowNode.SetAttribute("break-before", OdfNamespaces.Fo, "page", "fo");
     }
 
-    internal static void RemoveRowPageBreak(OdfTableSheetMutationContext context, int afterRow)
+    internal static bool RemoveRowPageBreak(OdfTableSheetMutationContext context, int afterRow)
     {
-        var rowNode = context.GetOrCreateRow(afterRow + 1, forWrite: false);
-        rowNode.RemoveAttribute("break-before", OdfNamespaces.Fo);
+        var rowNode = OdfTableSheetDomAccessEngine.TryFindRowNode(context.TableNode, afterRow + 1);
+        return rowNode is not null && rowNode.RemoveAttribute("break-before", OdfNamespaces.Fo);
     }
 
     internal static void InsertColumnPageBreak(OdfTableSheetMutationContext context, int afterCol)
@@ -146,10 +146,10 @@ internal static class OdfTableSheetPrintSettingsEngine
         colNode.SetAttribute("break-before", OdfNamespaces.Fo, "page", "fo");
     }
 
-    internal static void RemoveColumnPageBreak(OdfTableSheetMutationContext context, int afterCol)
+    internal static bool RemoveColumnPageBreak(OdfTableSheetMutationContext context, int afterCol)
     {
-        var colNode = context.GetOrCreateColumn(afterCol + 1);
-        colNode.RemoveAttribute("break-before", OdfNamespaces.Fo);
+        var colNode = OdfTableSheetDomAccessEngine.TryFindColumnNode(context.TableNode, afterCol + 1);
+        return colNode is not null && colNode.RemoveAttribute("break-before", OdfNamespaces.Fo);
     }
 
     internal static void SetPrintScale(OdfTableSheetMutationContext context, int percent)

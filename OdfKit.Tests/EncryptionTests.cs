@@ -227,7 +227,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms, true))
             {
-                var info = package.GetEntryEncryptionInfo("content.xml");
+                var info = package.FindEntryEncryptionInfo("content.xml");
                 Assert.NotNull(info);
                 Assert.Equal(OdfEncryption.BlowfishAlgorithmUri, info.AlgorithmName);
             }
@@ -267,7 +267,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms, true))
             {
-                var info = package.GetEntryEncryptionInfo("content.xml");
+                var info = package.FindEntryEncryptionInfo("content.xml");
                 Assert.NotNull(info);
                 Assert.Equal("custom-rot13", info.AlgorithmName);
             }
@@ -312,7 +312,7 @@ namespace OdfKit.Tests
             ms.Position = 0;
             using (var package = OdfPackage.Open(ms, true))
             {
-                var info = package.GetEntryEncryptionInfo("content.xml");
+                var info = package.FindEntryEncryptionInfo("content.xml");
                 Assert.NotNull(info);
                 Assert.Equal(OdfEncryption.OpenPgpAlgorithmUri, info.AlgorithmName);
                 var encryptedKey = Assert.Single(info.OpenPgpEncryptedKeys);

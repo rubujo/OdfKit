@@ -63,7 +63,7 @@ namespace OdfKit.Tests
             using (var package = OdfPackage.Open(ms))
             {
                 var doc = new PresentationDocument(package);
-                var layout = doc.GetPresentationPageLayout("BoundaryLayout");
+                var layout = doc.FindPresentationPageLayout("BoundaryLayout");
                 Assert.NotNull(layout);
                 Assert.Single(layout.Placeholders);
 
@@ -100,11 +100,11 @@ namespace OdfKit.Tests
                 Assert.Equal(2, layout.Placeholders.Count);
 
                 // Remove non-existent placeholder type (should be a no-op)
-                layout.RemovePlaceholder(OdfPlaceholderType.Footer);
+                Assert.False(layout.RemovePlaceholder(OdfPlaceholderType.Footer));
                 Assert.Equal(2, layout.Placeholders.Count);
 
                 // Remove the duplicate placeholder type (should remove both)
-                layout.RemovePlaceholder(OdfPlaceholderType.Header);
+                Assert.True(layout.RemovePlaceholder(OdfPlaceholderType.Header));
                 Assert.Empty(layout.Placeholders);
 
                 doc.Save();

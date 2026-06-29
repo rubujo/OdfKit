@@ -159,7 +159,7 @@ public class CliTests
 
             using (OdfPackage metadataPackage = OdfPackage.Open(outputPath))
             {
-                Assert.NotNull(metadataPackage.GetEntryEncryptionInfo("content.xml"));
+                Assert.NotNull(metadataPackage.FindEntryEncryptionInfo("content.xml"));
             }
 
             using OdfPackage sanitized = OdfPackage.Open(

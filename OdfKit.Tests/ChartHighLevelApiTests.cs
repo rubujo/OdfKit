@@ -477,7 +477,7 @@ public class ChartHighLevelApiTests
         Assert.Contains("chart:style-name=\"SeriesStyle1\"", xml);
         Assert.Contains("chart:attached-axis=\"primary-y\"", xml);
 
-        OdfChartAxisInfo? axisInfo = chartDoc.GetAxisInfo("y");
+        OdfChartAxisInfo? axisInfo = chartDoc.FindAxisInfo("y");
         Assert.NotNull(axisInfo);
         Assert.Equal("銷售額", axisInfo!.Title);
         Assert.True(axisInfo.Logarithmic);
@@ -564,7 +564,7 @@ public class ChartHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfChartDocument.SetSeriesDataLabels"/> 與 <see cref="OdfChartDocument.GetSeriesDataLabels"/> 的往返一致性。
+    /// 驗證 <see cref="OdfChartDocument.SetSeriesDataLabels"/> 與 <see cref="OdfChartDocument.FindSeriesDataLabels"/> 的往返一致性。
     /// </summary>
     [Fact]
     public void SeriesDataLabels_RoundTripsAfterSetAndSave()
@@ -575,14 +575,14 @@ public class ChartHighLevelApiTests
         var labels = new OdfChartDataLabelInfo(showValue: true, showPercentage: true, showCategoryName: true, showLegendKey: false);
         chartDoc.SetSeriesDataLabels(0, labels);
 
-        Assert.Null(chartDoc.GetSeriesDataLabels(1));
+        Assert.Null(chartDoc.FindSeriesDataLabels(1));
 
         using var stream = new MemoryStream();
         chartDoc.SaveToStream(stream);
         stream.Position = 0;
 
         using OdfChartDocument loaded = OdfChartDocument.Load(stream);
-        OdfChartDataLabelInfo? readLabels = loaded.GetSeriesDataLabels(0);
+        OdfChartDataLabelInfo? readLabels = loaded.FindSeriesDataLabels(0);
         Assert.NotNull(readLabels);
         Assert.True(readLabels!.ShowValue);
         Assert.True(readLabels.ShowPercentage);
@@ -591,7 +591,7 @@ public class ChartHighLevelApiTests
 
         Assert.True(chartDoc.SeriesCount > 1);
         chartDoc.SetSeriesDataLabels(0, null);
-        Assert.Null(chartDoc.GetSeriesDataLabels(0));
+        Assert.Null(chartDoc.FindSeriesDataLabels(0));
     }
 
     /// <summary>
@@ -607,7 +607,7 @@ public class ChartHighLevelApiTests
             .ConfigureSeries(0, series => series.WithDataLabels(OdfChartDataLabelPreset.Full))
             .Build();
 
-        OdfChartDataLabelInfo? labels = chart.GetSeriesEditor(0).GetDataLabels();
+        OdfChartDataLabelInfo? labels = chart.GetSeriesEditor(0).FindDataLabels();
         Assert.NotNull(labels);
         Assert.True(labels!.ShowValue);
         Assert.True(labels.ShowPercentage);
@@ -628,7 +628,7 @@ public class ChartHighLevelApiTests
         Assert.Contains("chart:data-label-symbol=\"true\"", xml);
 
         chart.SetSeriesDataLabelPreset(0, OdfChartDataLabelPreset.None);
-        Assert.Null(chart.GetSeriesDataLabels(0));
+        Assert.Null(chart.FindSeriesDataLabels(0));
     }
 
     /// <summary>
@@ -720,9 +720,9 @@ public class ChartHighLevelApiTests
         chartDoc.SetDataRange("Sales", new OdfCellRange(0, 0, 4, 2), firstRowAsHeader: true, firstColumnAsLabel: true);
 
         OdfChartSeries series = chartDoc.GetSeriesEditor(0);
-        Assert.Null(series.GetErrorIndicator());
-        Assert.Null(series.GetRegressionCurve());
-        Assert.Null(series.GetMeanValue());
+        Assert.Null(series.FindErrorIndicator());
+        Assert.Null(series.FindRegressionCurve());
+        Assert.Null(series.FindMeanValue());
 
         series.SetMeanValue(new OdfChartMeanValueInfo("MeanStyle1"));
         series.SetRegressionCurve(new OdfChartRegressionCurveInfo("RegressionStyle1"));
@@ -749,15 +749,15 @@ public class ChartHighLevelApiTests
         using OdfChartDocument loaded = OdfChartDocument.Load(stream);
         OdfChartSeries loadedSeries = loaded.GetSeriesEditor(0);
 
-        OdfChartMeanValueInfo? meanValue = loadedSeries.GetMeanValue();
+        OdfChartMeanValueInfo? meanValue = loadedSeries.FindMeanValue();
         Assert.NotNull(meanValue);
         Assert.Equal("MeanStyle1", meanValue!.StyleName);
 
-        OdfChartRegressionCurveInfo? regressionCurve = loadedSeries.GetRegressionCurve();
+        OdfChartRegressionCurveInfo? regressionCurve = loadedSeries.FindRegressionCurve();
         Assert.NotNull(regressionCurve);
         Assert.Equal("RegressionStyle1", regressionCurve!.StyleName);
 
-        OdfChartErrorIndicatorInfo? errorIndicator = loadedSeries.GetErrorIndicator();
+        OdfChartErrorIndicatorInfo? errorIndicator = loadedSeries.FindErrorIndicator();
         Assert.NotNull(errorIndicator);
         Assert.Equal("y", errorIndicator!.Dimension);
         Assert.Equal("ErrorStyle1", errorIndicator.StyleName);
@@ -765,9 +765,9 @@ public class ChartHighLevelApiTests
         loadedSeries.SetErrorIndicator(null);
         loadedSeries.SetRegressionCurve(null);
         loadedSeries.SetMeanValue(null);
-        Assert.Null(loadedSeries.GetErrorIndicator());
-        Assert.Null(loadedSeries.GetRegressionCurve());
-        Assert.Null(loadedSeries.GetMeanValue());
+        Assert.Null(loadedSeries.FindErrorIndicator());
+        Assert.Null(loadedSeries.FindRegressionCurve());
+        Assert.Null(loadedSeries.FindMeanValue());
     }
 
     /// <summary>
@@ -962,9 +962,9 @@ public class ChartHighLevelApiTests
         Assert.Equal("chart:bar", chart.ChartClass);
         Assert.Equal("年度營收", chart.ChartTitle);
         Assert.Equal("end", chart.Legend.Position);
-        Assert.Equal("營收（萬元）", chart.GetAxisTitle("y"));
+        Assert.Equal("營收（萬元）", chart.FindAxisTitle("y"));
 
-        OdfChartAxisInfo? axisInfo = chart.GetAxisInfo("y");
+        OdfChartAxisInfo? axisInfo = chart.FindAxisInfo("y");
         Assert.NotNull(axisInfo);
         Assert.Equal(0d, axisInfo!.Minimum);
         Assert.False(axisInfo.Logarithmic);
@@ -972,12 +972,12 @@ public class ChartHighLevelApiTests
         OdfChartSeries seriesEditor = chart.GetSeriesEditor(0);
         Assert.Equal("#4472C4", seriesEditor.Style.FillColor);
         Assert.Equal("#00AA00", chart.GetSeriesEditor(1).Style.FillColor);
-        OdfChartDataLabelInfo? labels = seriesEditor.GetDataLabels();
+        OdfChartDataLabelInfo? labels = seriesEditor.FindDataLabels();
         Assert.NotNull(labels);
         Assert.True(labels!.ShowValue);
         Assert.False(labels.ShowPercentage);
         Assert.True(labels.ShowCategoryName);
-        OdfChartErrorIndicatorInfo? indicator = seriesEditor.GetErrorIndicator();
+        OdfChartErrorIndicatorInfo? indicator = seriesEditor.FindErrorIndicator();
         Assert.NotNull(indicator);
         Assert.Equal("y", indicator!.Dimension);
         Assert.Equal("ErrorStyle1", indicator.StyleName);

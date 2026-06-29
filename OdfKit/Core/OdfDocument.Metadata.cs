@@ -115,22 +115,24 @@ public abstract partial class OdfDocument
     public void SetCustomProperty(string name, DateTime value) => SetCustomProperty(name, (object)value, "date");
 
     /// <summary>
-    /// 取得自訂中繼資料屬性。
+    /// Finds the custom metadata property.
+    /// 尋找自訂中繼資料屬性。
     /// </summary>
     /// <param name="name">屬性名稱</param>
     /// <returns>屬性值；若不存在則為 <see langword="null"/></returns>
-    public object? GetCustomProperty(string name)
-        => OdfDocumentMetadataEngine.GetCustomProperty(MetaDom, name);
+    public object? FindCustomProperty(string name)
+        => OdfDocumentMetadataEngine.FindCustomProperty(MetaDom, name);
 
     /// <summary>
-    /// 以強型別讀取自訂中繼資料屬性，並轉換成指定型別。
+    /// Finds and converts the custom metadata property to the specified type.
+    /// 尋找自訂中繼資料屬性，並轉換成指定型別。
     /// </summary>
     /// <typeparam name="T">目標型別（string、int、double、bool、DateTime）</typeparam>
     /// <param name="name">屬性名稱</param>
     /// <returns>轉換後的屬性值；若不存在或轉換失敗則為預設值</returns>
-    public T? GetCustomProperty<T>(string name)
+    public T? FindCustomProperty<T>(string name)
     {
-        object? val = GetCustomProperty(name);
+        object? val = FindCustomProperty(name);
         if (val is null)
             return default;
         try

@@ -199,7 +199,7 @@ public class OdfSecurityBoundaryTests
         saved.Position = 0;
         using (OdfPackage metadataPackage = OdfPackage.Open(saved, leaveOpen: true))
         {
-            Assert.NotNull(metadataPackage.GetEntryEncryptionInfo("content.xml"));
+            Assert.NotNull(metadataPackage.FindEntryEncryptionInfo("content.xml"));
         }
 
         saved.Position = 0;

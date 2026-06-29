@@ -318,7 +318,7 @@ namespace OdfKit.Tests
                         Assert.Equal(testDate, doc.CreationDate);
 
                         doc.SetCustomProperty("MyDate", testDate, "date");
-                        var retrieved = doc.GetCustomProperty("MyDate");
+                        var retrieved = doc.FindCustomProperty("MyDate");
                         Assert.Equal(testDate, retrieved);
 
                         doc.Save();

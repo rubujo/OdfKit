@@ -125,16 +125,20 @@ internal static class OdfPackageEntryAccessEngine
     /// <summary>
     /// 從封裝中移除指定的專案。
     /// </summary>
-    internal static void RemoveEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name)
+    internal static bool RemoveEntry(OdfPackage.OdfPackageEntryCollaborators ctx, string name)
     {
         name = OdfPackage.SanitizeEntryName(name);
-        ctx.Entries.Remove(name);
-        ctx.Manifest.Remove(name);
+        bool removed = ctx.Entries.Remove(name);
+        bool manifestRemoved = ctx.Manifest.Remove(name);
+        bool orderRemoved = ctx.EntryOrder.Remove(name);
 
-        if (name != DocumentSignaturesPath && name != ManifestPath)
+        if ((removed || manifestRemoved || orderRemoved) &&
+            name != DocumentSignaturesPath && name != ManifestPath)
         {
             ctx.RemoveOutdatedSignatures();
         }
+
+        return removed || manifestRemoved || orderRemoved;
     }
 
     /// <summary>
@@ -229,7 +233,7 @@ internal static class OdfPackageEntryAccessEngine
     /// <summary>
     /// 取得指定專案的加密詳細資訊。
     /// </summary>
-    internal static OdfEncryptionInfo? GetEntryEncryptionInfo(OdfPackage.OdfPackageEntryCollaborators ctx, string name)
+    internal static OdfEncryptionInfo? FindEntryEncryptionInfo(OdfPackage.OdfPackageEntryCollaborators ctx, string name)
     {
         name = OdfPackage.SanitizeEntryName(name);
         return ctx.Entries.TryGetValue(name, out var entry) ? entry.EncryptionInfo : null;

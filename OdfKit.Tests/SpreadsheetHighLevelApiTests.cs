@@ -199,7 +199,7 @@ public class SpreadsheetHighLevelApiTests
             chartDoc.GetSeriesEditor(0).SeriesClass = "chart:bar";
         }
 
-        OdfChartAxisInfo? axisInfo = chartDoc.GetAxisInfo("y");
+        OdfChartAxisInfo? axisInfo = chartDoc.FindAxisInfo("y");
         Assert.NotNull(axisInfo);
         Assert.True(axisInfo!.HasMajorGrid);
         Assert.Equal(500, axisInfo.Maximum);
@@ -671,8 +671,8 @@ public class SpreadsheetHighLevelApiTests
 
         Assert.True(prunedCount >= 3);
         Assert.Single(document.GetSheets());
-        Assert.NotNull(document.GetSheet("Keep"));
-        Assert.Null(document.GetSheet("Archive"));
+        Assert.NotNull(document.FindSheet("Keep"));
+        Assert.Null(document.FindSheet("Archive"));
         Assert.Equal("Keep", first.Name);
     }
 
@@ -736,7 +736,7 @@ public class SpreadsheetHighLevelApiTests
 
         OdfTableSheet adopted = target.Worksheets.Adopt(sourceSheet, "Adopted");
 
-        Assert.Null(source.GetSheet("Imported"));
+        Assert.Null(source.FindSheet("Imported"));
         Assert.Equal(2, target.Worksheets.Count);
         Assert.Equal("Adopted", adopted.Name);
         Assert.Equal("跨文件資料", adopted.Cells["A1"].CellValue);
@@ -875,7 +875,7 @@ public class SpreadsheetHighLevelApiTests
         document.SaveToStream(stream);
 
         using SpreadsheetDocument reloaded = SpreadsheetDocument.Load(stream, fileName: "cached.ods");
-        OdfTableSheet reloadedSheet = reloaded.GetSheet("Main")!;
+        OdfTableSheet reloadedSheet = reloaded.FindSheet("Main")!;
         reloaded.EvaluateFormulas();
 
         Assert.Equal(42d, reloadedSheet.Cells["A1"].CellValue);
@@ -919,6 +919,12 @@ public class SpreadsheetHighLevelApiTests
         sheet.SetPrintArea(new OdfCellRange(0, 0, 9, 2));
         sheet.SetPrintTitleRows(0, 0);
         sheet.SetPrintTitleColumns(0, 0);
+        sheet.InsertRowPageBreak(afterRow: 1);
+        sheet.InsertColumnPageBreak(afterCol: 1);
+        Assert.True(sheet.RemoveRowPageBreak(afterRow: 1));
+        Assert.False(sheet.RemoveRowPageBreak(afterRow: 1));
+        Assert.True(sheet.RemoveColumnPageBreak(afterCol: 1));
+        Assert.False(sheet.RemoveColumnPageBreak(afterCol: 1));
         sheet.InsertRowPageBreak(afterRow: 1);
         sheet.InsertColumnPageBreak(afterCol: 1);
         sheet.SetFitToPage(maxPagesWide: 1, maxPagesTall: 0);
@@ -996,7 +1002,8 @@ public class SpreadsheetHighLevelApiTests
         Assert.Equal("範例網站", cell.DisplayText);
 
         // 4. RemoveHyperlink — 保留顯示文字，移除 text:a
-        cell.RemoveHyperlink();
+        Assert.True(cell.RemoveHyperlink());
+        Assert.False(cell.RemoveHyperlink());
         Assert.Null(cell.GetHyperlinkUrl());
         Assert.Equal("範例網站", cell.DisplayText);
 
@@ -1019,7 +1026,7 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證儲存格批注 SetAnnotation / GetAnnotation / RemoveAnnotation API。
+    /// 驗證儲存格批注 SetAnnotation / FindAnnotation / RemoveAnnotation API。
     /// </summary>
     [Fact]
     public void CellAnnotationApiWorksCorrectly()
@@ -1030,7 +1037,7 @@ public class SpreadsheetHighLevelApiTests
         // 1. SetAnnotation 帶作者
         var cell = sheet.GetCell(0, 0);
         cell.SetAnnotation("這是批注", "Alice");
-        var ann = cell.GetAnnotation();
+        var ann = cell.FindAnnotation();
         Assert.NotNull(ann);
         Assert.Equal("這是批注", ann.Text);
         Assert.Equal("Alice", ann.Author);
@@ -1038,17 +1045,18 @@ public class SpreadsheetHighLevelApiTests
 
         // 2. 覆蓋批注
         cell.SetAnnotation("新批注", visible: true);
-        ann = cell.GetAnnotation();
+        ann = cell.FindAnnotation();
         Assert.Equal("新批注", ann!.Text);
         Assert.True(ann.Visible);
 
         // 3. RemoveAnnotation
-        cell.RemoveAnnotation();
-        Assert.Null(cell.GetAnnotation());
+        Assert.True(cell.RemoveAnnotation());
+        Assert.False(cell.RemoveAnnotation());
+        Assert.Null(cell.FindAnnotation());
 
         // 4. 無批注的儲存格回傳 null
         var cell2 = sheet.GetCell(0, 1);
-        Assert.Null(cell2.GetAnnotation());
+        Assert.Null(cell2.FindAnnotation());
 
         // 5. XML 結構驗證
         cell.SetAnnotation("XML 驗證批注", "Bob");

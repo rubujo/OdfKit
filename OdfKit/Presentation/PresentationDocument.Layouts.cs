@@ -202,12 +202,12 @@ public partial class PresentationDocument
     }
 
     /// <summary>
-    /// Gets the specified presentation page layout.
-    /// 取得指定的投影片版面配置。
+    /// Finds the specified presentation page layout.
+    /// 尋找指定的投影片版面配置。
     /// </summary>
     /// <param name="name">The layout name. / 版面配置名稱。</param>
     /// <returns>The presentation page layout instance, or <see langword="null"/> if it does not exist. / 投影片版面配置執行個體，若不存在則為 <see langword="null"/>。</returns>
-    public OdfPresentationPageLayout? GetPresentationPageLayout(string name)
+    public OdfPresentationPageLayout? FindPresentationPageLayout(string name)
     {
         // 優先搜尋 ContentDom
         var autoStyles = FindChildElement(ContentRoot, "automatic-styles", OdfNamespaces.Office);

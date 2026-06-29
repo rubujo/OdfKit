@@ -145,7 +145,7 @@ internal static class OdfTrackedChangesEngine
             }
         }
 
-        List<OdfNode> affected = OdfTrackedChangeTextExtractor.FindAffectedNodesForFormatChange(bodyTextRoot, changeId, tcNode);
+        List<OdfNode> affected = OdfTrackedChangeTextExtractor.GetAffectedNodesForFormatChange(bodyTextRoot, changeId, tcNode);
         foreach (OdfNode node in affected)
         {
             string styleAttr = "style-name";

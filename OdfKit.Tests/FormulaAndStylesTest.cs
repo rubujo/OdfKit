@@ -1241,7 +1241,7 @@ namespace OdfKit.Tests
                 using (var package = OdfPackage.Open(ms, leaveOpen: true))
                 {
                     var doc = new SpreadsheetDocument(package);
-                    var sheet = doc.GetSheet("VisibilitySheet");
+                    var sheet = doc.FindSheet("VisibilitySheet");
                     Assert.NotNull(sheet);
 
                     // Let's check row visibility

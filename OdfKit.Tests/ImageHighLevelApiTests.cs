@@ -174,7 +174,7 @@ public class ImageHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfImageDocument.SetImageFilter"/> 與 <see cref="OdfImageDocument.GetImageFilter"/> 的往返一致性。
+    /// 驗證 <see cref="OdfImageDocument.SetImageFilter"/> 與 <see cref="OdfImageDocument.FindImageFilter"/> 的往返一致性。
     /// </summary>
     [Fact]
     public void ImageFilter_RoundTripsAfterSetAndSave()
@@ -194,13 +194,13 @@ public class ImageHighLevelApiTests
         stream.Position = 0;
 
         using var loaded = OdfImageDocument.Load(stream, "gallery.odi");
-        OdfImageFilterInfo? readFilter = loaded.GetImageFilter("PrimaryFrame");
+        OdfImageFilterInfo? readFilter = loaded.FindImageFilter("PrimaryFrame");
         Assert.NotNull(readFilter);
         Assert.Equal("grayscale", readFilter!.FilterName);
         Assert.Equal("0.5", readFilter.Parameters["intensity"]);
 
         Assert.True(loaded.SetImageFilter("PrimaryFrame", null));
-        Assert.Null(loaded.GetImageFilter("PrimaryFrame"));
+        Assert.Null(loaded.FindImageFilter("PrimaryFrame"));
     }
 
     /// <summary>

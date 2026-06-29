@@ -56,12 +56,12 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
-    /// Gets the worksheet with the specified name.
-    /// 取得指定名稱的工作表。
+    /// Finds the worksheet with the specified name.
+    /// 尋找指定名稱的工作表。
     /// </summary>
     /// <param name="name">The name or identifier. / 工作表名稱</param>
     /// <returns>The result. / 找不到則傳回 null</returns>
-    public OdfTableSheet? GetSheet(string name)
+    public OdfTableSheet? FindSheet(string name)
     {
         foreach (var child in SheetsRoot.Children)
         {

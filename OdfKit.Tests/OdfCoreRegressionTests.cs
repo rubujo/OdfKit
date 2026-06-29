@@ -236,7 +236,7 @@ namespace OdfKit.Tests
             doc.SetCustomProperty("MinProp", DateTime.MinValue, "date");
             doc.SetCustomProperty("MaxProp", safeMaxPropDate, "date");
 
-            var minPropVal = (DateTime)doc.GetCustomProperty("MinProp")!;
+            var minPropVal = (DateTime)doc.FindCustomProperty("MinProp")!;
             if (minPropVal != DateTime.MinValue)
             {
                 Assert.Equal(DateTime.MinValue, minPropVal.ToUniversalTime());
@@ -245,7 +245,7 @@ namespace OdfKit.Tests
             {
                 Assert.Equal(DateTime.MinValue, minPropVal);
             }
-            var maxPropVal = (DateTime)doc.GetCustomProperty("MaxProp")!;
+            var maxPropVal = (DateTime)doc.FindCustomProperty("MaxProp")!;
             Assert.Equal(safeMaxPropDate, maxPropVal.ToUniversalTime());
         }
 

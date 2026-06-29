@@ -178,11 +178,11 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
-    /// Gets the data label setting (<c>chart:data-label</c>) for this series; <see langword="null"/> if not set.
-    /// 取得此序列的資料標籤設定（<c>chart:data-label</c>）；若未設定則為 <see langword="null"/>。
+    /// Finds the data label setting (<c>chart:data-label</c>) for this series; <see langword="null"/> if not set.
+    /// 尋找此序列的資料標籤設定（<c>chart:data-label</c>）；若未設定則為 <see langword="null"/>。
     /// </summary>
     /// <returns>The data label setting; <see langword="null"/> if no <c>chart:data-label</c> exists in this series. / 資料標籤設定；若序列中第一個 <c>chart:data-label</c> 不存在則為 <see langword="null"/>。</returns>
-    public OdfChartDataLabelInfo? GetDataLabels()
+    public OdfChartDataLabelInfo? FindDataLabels()
     {
         OdfNode? dataLabel = FindFirstChild("data-label");
         if (dataLabel is null)
@@ -236,11 +236,11 @@ public sealed class OdfChartSeries
         SetDataLabels(preset == OdfChartDataLabelPreset.None ? null : OdfChartDataLabelInfo.FromPreset(preset));
 
     /// <summary>
-    /// Gets the error bar setting (<c>chart:error-indicator</c>) for this series; <see langword="null"/> if not set.
-    /// 取得此序列的誤差棒設定（<c>chart:error-indicator</c>）；若未設定則為 <see langword="null"/>。
+    /// Finds the error bar setting (<c>chart:error-indicator</c>) for this series; <see langword="null"/> if not set.
+    /// 尋找此序列的誤差棒設定（<c>chart:error-indicator</c>）；若未設定則為 <see langword="null"/>。
     /// </summary>
     /// <returns>The error bar setting; <see langword="null"/> if no <c>chart:error-indicator</c> exists in this series. / 誤差棒設定；若序列中第一個 <c>chart:error-indicator</c> 不存在則為 <see langword="null"/>。</returns>
-    public OdfChartErrorIndicatorInfo? GetErrorIndicator()
+    public OdfChartErrorIndicatorInfo? FindErrorIndicator()
     {
         OdfNode? node = FindFirstChild("error-indicator");
         if (node is null)
@@ -281,11 +281,11 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
-    /// Gets the trend line (regression curve) setting (<c>chart:regression-curve</c>) for this series; <see langword="null"/> if not set.
-    /// 取得此序列的趨勢線（迴歸曲線）設定（<c>chart:regression-curve</c>）；若未設定則為 <see langword="null"/>。
+    /// Finds the trend line (regression curve) setting (<c>chart:regression-curve</c>) for this series; <see langword="null"/> if not set.
+    /// 尋找此序列的趨勢線（迴歸曲線）設定（<c>chart:regression-curve</c>）；若未設定則為 <see langword="null"/>。
     /// </summary>
     /// <returns>The trend line setting; <see langword="null"/> if no <c>chart:regression-curve</c> exists in this series. / 趨勢線設定；若序列中第一個 <c>chart:regression-curve</c> 不存在則為 <see langword="null"/>。</returns>
-    public OdfChartRegressionCurveInfo? GetRegressionCurve()
+    public OdfChartRegressionCurveInfo? FindRegressionCurve()
     {
         OdfNode? node = FindFirstChild("regression-curve");
         return node is null ? null : new OdfChartRegressionCurveInfo(node.GetAttribute("style-name", OdfNamespaces.Chart));
@@ -314,11 +314,11 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
-    /// Gets the mean value line setting (<c>chart:mean-value</c>) for this series; <see langword="null"/> if not set.
-    /// 取得此序列的平均值線設定（<c>chart:mean-value</c>）；若未設定則為 <see langword="null"/>。
+    /// Finds the mean value line setting (<c>chart:mean-value</c>) for this series; <see langword="null"/> if not set.
+    /// 尋找此序列的平均值線設定（<c>chart:mean-value</c>）；若未設定則為 <see langword="null"/>。
     /// </summary>
     /// <returns>The mean value line setting; <see langword="null"/> if this series does not define <c>chart:mean-value</c>. / 平均值線設定；若序列未定義 <c>chart:mean-value</c> 則為 <see langword="null"/>。</returns>
-    public OdfChartMeanValueInfo? GetMeanValue()
+    public OdfChartMeanValueInfo? FindMeanValue()
     {
         OdfNode? node = FindFirstChild("mean-value");
         return node is null ? null : new OdfChartMeanValueInfo(node.GetAttribute("style-name", OdfNamespaces.Chart));

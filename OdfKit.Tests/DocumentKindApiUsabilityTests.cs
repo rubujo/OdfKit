@@ -160,8 +160,8 @@ public class DocumentKindApiUsabilityTests
         Assert.Equal("Sheet1.A1:C1", loaded.CategoriesCellRangeAddress);
         Assert.Equal("月份", loaded.XAxisTitle);
         Assert.Equal("金額", loaded.YAxisTitle);
-        Assert.Equal("月份", loaded.GetAxisTitle("x"));
-        Assert.Equal("金額", loaded.GetAxisTitle("y"));
+        Assert.Equal("月份", loaded.FindAxisTitle("x"));
+        Assert.Equal("金額", loaded.FindAxisTitle("y"));
         Assert.Single(loaded.Series);
         Assert.Equal("Sheet1.A1:A3", loaded.Series[0].ValuesCellRangeAddress);
         Assert.Equal("Sheet1.A1", loaded.Series[0].LabelCellAddress);

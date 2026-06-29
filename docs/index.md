@@ -1,4 +1,4 @@
-# OdfKit 文件中心
+﻿# OdfKit 文件中心
 
 本文件將 OdfKit 的現有文件整理為常用技術文件的閱讀結構，方便依照
 「評估、導入、營運」三個階段快速找到需要的資訊。
@@ -35,6 +35,8 @@
 |------|------|
 | [快速開始](getting-started.md) | 第一個專案、第一個文件、CLI 驗證 |
 | [Cookbook](cookbook.md) | 常見操作片段與實作範例 |
+| [API Surface Consistency](api-surface-consistency.md) | 公開 API 分層、命名契約與非目標邊界 |
+| [API Surface Inventory](api-surface-inventory.md) | 高階 facade 命名分布、breaking rename 批次與文件掃描基線 |
 | [tools/README.md](../tools/README.md) | CLI、schema generator、corpus generator 與 trim smoke 工具總覽 |
 | [samples/README.md](../samples/README.md) | 單檔 Script 範例與輸出說明 |
 | [Rendering 後端部署](rendering-backend-deployment.md) | LibreOffice 渲染擴充的部署要求 |

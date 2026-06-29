@@ -37,9 +37,9 @@ internal static class OdfTrackedChangeTextExtractor
     }
 
     /// <summary>
-    /// 尋找格式變更修訂所影響的 DOM 節點。
+    /// 取得格式變更修訂所影響的 DOM 節點。
     /// </summary>
-    public static List<OdfNode> FindAffectedNodesForFormatChange(
+    public static List<OdfNode> GetAffectedNodesForFormatChange(
         OdfNode bodyTextRoot,
         string changeId,
         OdfNode? trackedChangesNode)
