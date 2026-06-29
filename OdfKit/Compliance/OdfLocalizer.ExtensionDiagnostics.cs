@@ -234,7 +234,10 @@ public static partial class OdfLocalizer
 
         foreach (var kvp in translations)
         {
-            target.TryAdd(kvp.Key, kvp.Value);
+            if (!target.ContainsKey(kvp.Key))
+            {
+                target.Add(kvp.Key, kvp.Value);
+            }
         }
     }
 }
