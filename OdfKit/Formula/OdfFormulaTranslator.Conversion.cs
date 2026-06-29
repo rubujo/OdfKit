@@ -4,15 +4,20 @@ using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula;
 
+/// <summary>
+/// Provides conversion helpers for ODF and Excel formula formats.
+/// 提供 ODF 與 Excel 公式格式之間的轉換工具。
+/// </summary>
 public static partial class OdfFormulaTranslator
 {
     #region Formula Conversion
 
     /// <summary>
+    /// Converts an Excel-style formula to an ODF-style formula.
     /// 將 Excel 樣式的公式轉換為 ODF 樣式的公式。
     /// </summary>
-    /// <param name="excelFormula">Excel 樣式的公式字串</param>
-    /// <returns>ODF 樣式的公式字串</returns>
+    /// <param name="excelFormula">The Excel-style formula string. / Excel 樣式的公式字串。</param>
+    /// <returns>The ODF-style formula string. / ODF 樣式的公式字串。</returns>
     public static string ExcelToOdfFormula(string excelFormula)
     {
         if (string.IsNullOrEmpty(excelFormula))
@@ -72,10 +77,11 @@ public static partial class OdfFormulaTranslator
     }
 
     /// <summary>
+    /// Converts an ODF-style formula to an Excel-style formula.
     /// 將 ODF 樣式的公式轉換為 Excel 樣式的公式。
     /// </summary>
-    /// <param name="odfFormula">ODF 樣式的公式字串</param>
-    /// <returns>Excel 樣式的公式字串</returns>
+    /// <param name="odfFormula">The ODF-style formula string. / ODF 樣式的公式字串。</param>
+    /// <returns>The Excel-style formula string. / Excel 樣式的公式字串。</returns>
     public static string OdfToExcelFormula(string odfFormula)
     {
         if (string.IsNullOrEmpty(odfFormula))

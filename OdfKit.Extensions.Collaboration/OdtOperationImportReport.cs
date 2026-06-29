@@ -5,6 +5,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Collaboration;
 
 /// <summary>
+/// Provides odt operation import report.
 /// 描述 ODT JSON operations 匯入時的重播與相容性診斷結果。
 /// </summary>
 public sealed class OdtOperationImportReport
@@ -12,21 +13,25 @@ public sealed class OdtOperationImportReport
     private readonly List<string> _diagnostics = [];
 
     /// <summary>
+    /// Gets replayed count.
     /// 取得已實際重播的 operation 數量。
     /// </summary>
     public int ReplayedCount { get; private set; }
 
     /// <summary>
+    /// Gets ignored count.
     /// 取得因為相容性邊界或 metadata-only 語意而被略過的 operation 數量。
     /// </summary>
     public int IgnoredCount { get; private set; }
 
     /// <summary>
+    /// Gets unsupported count.
     /// 取得目前 compatibility subset 尚未支援的 operation 數量。
     /// </summary>
     public int UnsupportedCount { get; private set; }
 
     /// <summary>
+    /// Gets diagnostics.
     /// 取得匯入過程產生的診斷訊息。
     /// </summary>
     public IReadOnlyList<string> Diagnostics => _diagnostics;

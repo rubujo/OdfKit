@@ -6,6 +6,7 @@ using OdfKit.Styles;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf section.
 /// 表示文字文件中的多欄版面配置區段。
 /// </summary>
 public class OdfSection
@@ -24,6 +25,7 @@ public class OdfSection
     private readonly TextDocument _doc;
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定此區段的書寫模式。
     /// </summary>
     public string? WritingMode
@@ -33,6 +35,7 @@ public class OdfSection
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定此區段是否受保護（對應 <c>text:protected</c>）。
     /// </summary>
     /// <remarks>
@@ -46,15 +49,17 @@ public class OdfSection
     }
 
     /// <summary>
+    /// Provides protect.
     /// 以指定密碼保護此區段。
     /// </summary>
-    /// <param name="password">密碼明文</param>
+    /// <param name="password">The value to use. / 密碼明文</param>
     public void Protect(string password)
     {
         OdfKit.Core.OdfProtectionHelper.ProtectNode(Node, password, "text", OdfNamespaces.Text);
     }
 
     /// <summary>
+    /// Provides unprotect.
     /// 解除此區段的密碼保護。
     /// </summary>
     public void Unprotect()
@@ -63,10 +68,11 @@ public class OdfSection
     }
 
     /// <summary>
+    /// Attempts to process try unprotect.
     /// 嘗試以指定密碼解除此區段的保護。
     /// </summary>
-    /// <param name="password">密碼明文</param>
-    /// <returns>若解除成功則為 true，否則為 false</returns>
+    /// <param name="password">The value to use. / 密碼明文</param>
+    /// <returns>The result. / 若解除成功則為 true，否則為 false</returns>
     public bool TryUnprotect(string password)
     {
         if (!IsProtected)
@@ -80,10 +86,11 @@ public class OdfSection
     }
 
     /// <summary>
+    /// Provides verify password.
     /// 驗證指定密碼是否能成功解鎖此區段。
     /// </summary>
-    /// <param name="password">密碼明文</param>
-    /// <returns>若密碼正確或區段未受保護則為 true，否則為 false</returns>
+    /// <param name="password">The value to use. / 密碼明文</param>
+    /// <returns>The result. / 若密碼正確或區段未受保護則為 true，否則為 false</returns>
     public bool VerifyPassword(string password)
     {
         if (!IsProtected)

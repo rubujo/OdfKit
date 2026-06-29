@@ -8,17 +8,19 @@ using OdfKit.Text;
 namespace OdfKit.Export;
 
 /// <summary>
+/// Applies odf rtf exporter.
 /// 將 TextDocument 匯出為 RTF 的淨室轉換器。
 /// </summary>
 public static class OdfRtfExporter
 {
     /// <summary>
+    /// Applies export.
     /// 將 TextDocument 匯出為 RTF 字串。
     /// </summary>
-    /// <param name="document">來源文字文件</param>
-    /// <param name="options">RTF 匯出選項；若為 null 則使用預設值</param>
-    /// <returns>RTF 內容字串</returns>
-    /// <exception cref="ArgumentNullException">當 document 為 null 時引發</exception>
+    /// <param name="document">The source or target object. / 來源文字文件</param>
+    /// <param name="options">The value to use. / RTF 匯出選項；若為 null 則使用預設值</param>
+    /// <returns>The result. / RTF 內容字串</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 document 為 null 時引發</exception>
     public static string Export(TextDocument document, OdfRtfExportOptions? options = null)
     {
         if (document is null)

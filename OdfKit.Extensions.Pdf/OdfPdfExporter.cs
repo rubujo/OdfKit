@@ -18,6 +18,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Export;
 
 /// <summary>
+/// Applies odf pdf exporter.
 /// 將 TextDocument 匯出為 PDF 的工具類別。
 /// </summary>
 public static class OdfPdfExporter
@@ -38,11 +39,12 @@ public static class OdfPdfExporter
     }
 
     /// <summary>
+    /// Applies export.
     /// 將 ODT 文字文件轉換並寫入 PDF 資料流。
     /// </summary>
-    /// <param name="document">來源文字文件</param>
-    /// <param name="pdfStream">要寫入 PDF 的目標資料流</param>
-    /// <exception cref="ArgumentNullException">當任一必要參數為 null 時拋出</exception>
+    /// <param name="document">The source or target object. / 來源文字文件</param>
+    /// <param name="pdfStream">The source or target object. / 要寫入 PDF 的目標資料流</param>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當任一必要參數為 null 時拋出</exception>
     public static void Export(TextDocument document, Stream pdfStream)
     {
         ArgumentNullException.ThrowIfNull(document);

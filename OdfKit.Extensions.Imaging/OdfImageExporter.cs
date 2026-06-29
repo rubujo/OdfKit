@@ -8,17 +8,19 @@ using SkiaSharp;
 namespace OdfKit.Export;
 
 /// <summary>
+/// Applies odf image exporter.
 /// 將 SpreadsheetDocument 的工作表格線渲染為點陣圖影像的工具類別。
 /// </summary>
 public static class OdfImageExporter
 {
     /// <summary>
+    /// Applies export to png.
     /// 將工作表格線渲染並寫入 PNG 資料流。
     /// </summary>
-    /// <param name="sheet">來源工作表</param>
-    /// <param name="pngStream">目標 PNG 資料流</param>
-    /// <param name="options">影像匯出選項；若為 null 則使用預設值</param>
-    /// <exception cref="ArgumentNullException">當任一必要參數為 null 時拋出</exception>
+    /// <param name="sheet">The value to use. / 來源工作表</param>
+    /// <param name="pngStream">The source or target object. / 目標 PNG 資料流</param>
+    /// <param name="options">The value to use. / 影像匯出選項；若為 null 則使用預設值</param>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當任一必要參數為 null 時拋出</exception>
     public static void ExportToPng(OdfTableSheet sheet, Stream pngStream, OdfImageExportOptions? options = null)
     {
         if (sheet is null)
@@ -29,12 +31,13 @@ public static class OdfImageExporter
     }
 
     /// <summary>
+    /// Applies export to jpeg.
     /// 將工作表格線渲染並寫入 JPEG 資料流。
     /// </summary>
-    /// <param name="sheet">來源工作表</param>
-    /// <param name="jpegStream">目標 JPEG 資料流</param>
-    /// <param name="quality">JPEG 壓縮品質，範圍為 1 至 100，預設為 90</param>
-    /// <param name="options">影像匯出選項；若為 null 則使用預設值</param>
+    /// <param name="sheet">The value to use. / 來源工作表</param>
+    /// <param name="jpegStream">The source or target object. / 目標 JPEG 資料流</param>
+    /// <param name="quality">The numeric value. / JPEG 壓縮品質，範圍為 1 至 100，預設為 90</param>
+    /// <param name="options">The value to use. / 影像匯出選項；若為 null 則使用預設值</param>
     public static void ExportToJpeg(OdfTableSheet sheet, Stream jpegStream, int quality = 90, OdfImageExportOptions? options = null)
     {
         if (sheet is null)

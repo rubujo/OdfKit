@@ -6,6 +6,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf list.
 /// 表示文字文件中的清單。
 /// </summary>
 public class OdfList
@@ -24,6 +25,7 @@ public class OdfList
     private readonly TextDocument _doc;
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定此清單的樣式名稱。
     /// </summary>
     public string? StyleName
@@ -33,6 +35,7 @@ public class OdfList
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定一個值，指出清單編號是否延續上一清單。
     /// </summary>
     public bool? ContinueNumbering
@@ -48,10 +51,11 @@ public class OdfList
     }
 
     /// <summary>
+    /// Provides add list item.
     /// 在清單中新增清單專案。
     /// </summary>
-    /// <param name="text">專案預設段落文字內容</param>
-    /// <returns>新建立的清單專案執行個體</returns>
+    /// <param name="text">The text or value. / 專案預設段落文字內容</param>
+    /// <returns>The result. / 新建立的清單專案執行個體</returns>
     public OdfListItem AddListItem(string text = "")
     {
         var itemNode = OdfNodeFactory.CreateElement("list-item", OdfNamespaces.Text, "text");
@@ -65,12 +69,13 @@ public class OdfList
     }
 
     /// <summary>
+    /// Provides add item.
     /// 在指定層級新增清單專案（1-based）。層級 1 直接加入此清單；
     /// 層級 2 以上則自動建立/沿用巢狀清單結構。
     /// </summary>
-    /// <param name="text">專案文字內容</param>
-    /// <param name="level">目標層級，從 1 開始，最大值為 10</param>
-    /// <returns>新建立的清單專案</returns>
+    /// <param name="text">The text or value. / 專案文字內容</param>
+    /// <param name="level">The numeric value. / 目標層級，從 1 開始，最大值為 10</param>
+    /// <returns>The result. / 新建立的清單專案</returns>
     public OdfListItem AddItem(string text, int level = 1)
     {
         if (level < 1)
@@ -130,9 +135,10 @@ public class OdfList
     }
 
     /// <summary>
+    /// Provides restart numbering.
     /// 重新開始清單的編號。
     /// </summary>
-    /// <param name="startValue">開始數值</param>
+    /// <param name="startValue">The text or value. / 開始數值</param>
     public void RestartNumbering(int startValue = 1)
     {
         ContinueNumbering = false;
@@ -145,10 +151,11 @@ public class OdfList
     }
 
     /// <summary>
+    /// Sets start from.
     /// 設定清單的起始編號。
     /// </summary>
-    /// <param name="value">起始編號；ODF 1.4 允許從 0 開始</param>
-    /// <returns>目前清單執行個體</returns>
+    /// <param name="value">The text or value. / 起始編號；ODF 1.4 允許從 0 開始</param>
+    /// <returns>The result. / 目前清單執行個體</returns>
     public OdfList StartFrom(int value)
     {
         RestartNumbering(value);
@@ -156,6 +163,7 @@ public class OdfList
     }
 
     /// <summary>
+    /// Gets this member.
     /// 取得清單專案清單。
     /// </summary>
     public IReadOnlyList<OdfListItem> Items

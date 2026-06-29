@@ -5,17 +5,22 @@ using OdfKit.Spreadsheet;
 using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
+/// <summary>
+/// Provides formula reference offset helpers.
+/// 提供公式參照偏移工具。
+/// </summary>
 public static partial class OdfFormulaTranslator
 {
     #region Formula Offset
 
     /// <summary>
+    /// Offsets relative cell references in a formula.
     /// 偏移公式中的相對儲存格參照。
     /// </summary>
-    /// <param name="formula">要偏移的公式字串</param>
-    /// <param name="rowOffset">列偏移量</param>
-    /// <param name="colOffset">欄偏移量</param>
-    /// <returns>偏移後的公式字串</returns>
+    /// <param name="formula">The formula string to offset. / 要偏移的公式字串。</param>
+    /// <param name="rowOffset">The row offset. / 列偏移量。</param>
+    /// <param name="colOffset">The column offset. / 欄偏移量。</param>
+    /// <returns>The offset formula string. / 偏移後的公式字串。</returns>
     public static string TranslateFormulaOffset(string formula, int rowOffset, int colOffset)
     {
         if (string.IsNullOrEmpty(formula) || (rowOffset == 0 && colOffset == 0))

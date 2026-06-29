@@ -10,14 +10,15 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     /// <summary>
+    /// Provides add image frame.
     /// 在指定的段落中新增影像框架。
     /// </summary>
-    /// <param name="paragraph">目標段落</param>
-    /// <param name="imageBytes">影像的二進位位元組</param>
-    /// <param name="width">影像寬度</param>
-    /// <param name="height">影像高度</param>
-    /// <param name="name">影像名稱</param>
-    /// <returns>代表新建影像的 OdfImage 物件</returns>
+    /// <param name="paragraph">The value to use. / 目標段落</param>
+    /// <param name="imageBytes">The value to use. / 影像的二進位位元組</param>
+    /// <param name="width">The name or identifier. / 影像寬度</param>
+    /// <param name="height">The numeric value. / 影像高度</param>
+    /// <param name="name">The name or identifier. / 影像名稱</param>
+    /// <returns>The result. / 代表新建影像的 OdfImage 物件</returns>
     public OdfImage AddImageFrame(OdfParagraph paragraph, byte[] imageBytes, OdfLength width, OdfLength height, string? name = null)
     {
         if (paragraph is null)
@@ -32,13 +33,14 @@ public partial class TextDocument
     }
 
     /// <summary>
+    /// Provides add chart.
     /// 在指定段落中插入嵌入式圖表。
     /// </summary>
-    /// <param name="paragraph">目標段落</param>
-    /// <param name="chart">圖表設定定義</param>
-    /// <param name="width">圖表顯示寬度</param>
-    /// <param name="height">圖表顯示高度</param>
-    /// <returns>代表圖表物件的 OdfNode 節點</returns>
+    /// <param name="paragraph">The value to use. / 目標段落</param>
+    /// <param name="chart">The value to use. / 圖表設定定義</param>
+    /// <param name="width">The name or identifier. / 圖表顯示寬度</param>
+    /// <param name="height">The numeric value. / 圖表顯示高度</param>
+    /// <returns>The result. / 代表圖表物件的 OdfNode 節點</returns>
     public OdfNode AddChart(OdfParagraph paragraph, OdfChartDefinition chart, OdfLength width, OdfLength height)
     {
         if (paragraph is null)

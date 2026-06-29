@@ -6,10 +6,11 @@ using OdfKit.Spreadsheet;
 namespace OdfKit.Formula.AST;
 
 /// <summary>
+/// Represents an AST node for a unary operator.
 /// 代表單元運算子 (Unary Operator) 的 AST 節點。
 /// </summary>
-/// <param name="op">單元運算子字元</param>
-/// <param name="child">子 AST 節點</param>
+/// <param name="op">The unary operator character. / 單元運算子字元。</param>
+/// <param name="child">The child AST node. / 子 AST 節點。</param>
 public class UnaryNode(char op, AstNode child) : AstNode
 {
     /// <inheritdoc />
@@ -53,11 +54,12 @@ public class UnaryNode(char op, AstNode child) : AstNode
 }
 
 /// <summary>
+/// Represents an AST node for a binary operator.
 /// 代表二元運算子 (Binary Operator) 的 AST 節點。
 /// </summary>
-/// <param name="op">二元運算子字串</param>
-/// <param name="left">左側 AST 節點</param>
-/// <param name="right">右側 AST 節點</param>
+/// <param name="op">The binary operator string. / 二元運算子字串。</param>
+/// <param name="left">The left AST node. / 左側 AST 節點。</param>
+/// <param name="right">The right AST node. / 右側 AST 節點。</param>
 public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
 {
     /// <inheritdoc />

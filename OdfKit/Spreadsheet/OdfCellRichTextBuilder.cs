@@ -4,6 +4,7 @@ using OdfKit.DOM;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Provides a fluent builder API for cell rich text.
 /// 提供儲存格富文字的鏈式建構 API。
 /// </summary>
 public sealed class OdfCellRichTextBuilder
@@ -18,9 +19,10 @@ public sealed class OdfCellRichTextBuilder
     }
 
     /// <summary>
+    /// Clears the current rich text content of the cell.
     /// 清除目前儲存格富文字內容。
     /// </summary>
-    /// <returns>目前建構器，方便鏈式呼叫</returns>
+    /// <returns>The current builder for chaining. / 目前建構器，方便鏈式呼叫。</returns>
     public OdfCellRichTextBuilder Clear()
     {
         _richText.Clear();
@@ -29,15 +31,16 @@ public sealed class OdfCellRichTextBuilder
     }
 
     /// <summary>
+    /// Appends a text run.
     /// 追加一段文字。
     /// </summary>
-    /// <param name="text">要追加的文字</param>
-    /// <param name="bold">是否套用粗體</param>
-    /// <param name="italic">是否套用斜體</param>
-    /// <param name="color">文字色彩；null 表示繼承預設色彩</param>
-    /// <param name="fontFamily">字型名稱；null 表示繼承</param>
-    /// <param name="underline">是否套用底線</param>
-    /// <returns>目前建構器，方便鏈式呼叫</returns>
+    /// <param name="text">The text to append. / 要追加的文字。</param>
+    /// <param name="bold">Whether to apply bold styling. / 是否套用粗體。</param>
+    /// <param name="italic">Whether to apply italic styling. / 是否套用斜體。</param>
+    /// <param name="color">The text color; <see langword="null"/> inherits the default color. / 文字色彩；<see langword="null"/> 表示繼承預設色彩。</param>
+    /// <param name="fontFamily">The font family name; <see langword="null"/> indicates inheritance. / 字型名稱；<see langword="null"/> 表示繼承。</param>
+    /// <param name="underline">Whether to apply underline styling. / 是否套用底線。</param>
+    /// <returns>The current builder for chaining. / 目前建構器，方便鏈式呼叫。</returns>
     public OdfCellRichTextBuilder Append(
         string text,
         bool bold = false,
@@ -57,9 +60,10 @@ public sealed class OdfCellRichTextBuilder
     }
 
     /// <summary>
+    /// Appends a line break.
     /// 追加一個換行。
     /// </summary>
-    /// <returns>目前建構器，方便鏈式呼叫</returns>
+    /// <returns>The current builder for chaining. / 目前建構器，方便鏈式呼叫。</returns>
     public OdfCellRichTextBuilder LineBreak()
     {
         _richText.AddLineBreak();
@@ -68,10 +72,11 @@ public sealed class OdfCellRichTextBuilder
     }
 
     /// <summary>
+    /// Replaces the current cell text with the specified rich text content.
     /// 以指定富文字內容取代目前儲存格文字。
     /// </summary>
-    /// <param name="richText">新的富文字內容</param>
-    /// <returns>目前建構器，方便鏈式呼叫</returns>
+    /// <param name="richText">The new rich text content. / 新的富文字內容。</param>
+    /// <returns>The current builder for chaining. / 目前建構器，方便鏈式呼叫。</returns>
     public OdfCellRichTextBuilder Set(OdfRichText richText)
     {
         if (richText is null)

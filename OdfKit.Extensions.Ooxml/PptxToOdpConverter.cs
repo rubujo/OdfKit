@@ -17,6 +17,7 @@ using PackagingPresentationDocument = DocumentFormat.OpenXml.Packaging.Presentat
 namespace OdfKit.Conversion;
 
 /// <summary>
+/// Applies pptx to odp converter.
 /// 將 PPTX 轉換為 <see cref="OdfPresentationDocument"/> (ODP) 的 managed 淨室轉換器。
 /// </summary>
 public static class PptxToOdpConverter
@@ -30,11 +31,12 @@ public static class PptxToOdpConverter
     private static readonly OdfLength DefaultHeight = OdfLength.FromCentimeters(2);
 
     /// <summary>
+    /// Provides convert.
     /// 從 PPTX 資料流建立 ODP 簡報文件。
     /// </summary>
-    /// <param name="pptxStream">來源 PPTX 資料流</param>
-    /// <returns>轉換後的 ODP 簡報文件</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="pptxStream"/> 為 null 時引發</exception>
+    /// <param name="pptxStream">The source or target object. / 來源 PPTX 資料流</param>
+    /// <returns>The result. / 轉換後的 ODP 簡報文件</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / <paramref name="pptxStream"/> 為 null 時引發</exception>
     public static OdfPresentationDocument Convert(Stream pptxStream)
     {
         if (pptxStream is null)

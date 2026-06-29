@@ -10,6 +10,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Provides odt stream reader.
 /// 以低記憶體流式方式逐段落讀取 ODT 文字文件，適用於大型文件文字擷取。
 /// </summary>
 public sealed class OdtStreamReader : IDisposable
@@ -20,10 +21,11 @@ public sealed class OdtStreamReader : IDisposable
     private bool _started;
 
     /// <summary>
+    /// Provides odt stream reader.
     /// 從資料流初始化 <see cref="OdtStreamReader"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="stream">ODT 檔案資料流</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="stream"/> 為 null 時擲出</exception>
+    /// <param name="stream">The stream or target object. / ODT 檔案資料流</param>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="stream"/> 為 null 時擲出</exception>
     public OdtStreamReader(Stream stream)
     {
         if (stream is null)
@@ -35,10 +37,11 @@ public sealed class OdtStreamReader : IDisposable
     }
 
     /// <summary>
+    /// Provides odt stream reader.
     /// 從檔案路徑初始化 <see cref="OdtStreamReader"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="path">ODT 檔案路徑</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="path"/> 為 null 時擲出</exception>
+    /// <param name="path">The path or URI. / ODT 檔案路徑</param>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="path"/> 為 null 時擲出</exception>
     public OdtStreamReader(string path)
     {
         if (path is null)
@@ -50,29 +53,34 @@ public sealed class OdtStreamReader : IDisposable
     }
 
     /// <summary>
+    /// Gets node type.
     /// 取得目前元素的類型。
     /// </summary>
     public OdtNodeType NodeType { get; private set; } = OdtNodeType.Other;
 
     /// <summary>
+    /// Gets text.
     /// 取得目前元素的純文字內容，包含內嵌 <c>text:span</c> 文字。
     /// </summary>
     public string Text { get; private set; } = string.Empty;
 
     /// <summary>
+    /// Gets style name.
     /// 取得目前元素的段落樣式名稱。
     /// </summary>
     public string? StyleName { get; private set; }
 
     /// <summary>
+    /// Gets heading level.
     /// 取得標題層級，僅在 <see cref="NodeType"/> 為 <see cref="OdtNodeType.Heading"/> 時有效。
     /// </summary>
     public int HeadingLevel { get; private set; }
 
     /// <summary>
+    /// Provides read.
     /// 讀取下一個文字元素；回傳 false 代表文件結束。
     /// </summary>
-    /// <returns>若成功讀取元素則為 true，否則為 false</returns>
+    /// <returns>The result. / 若成功讀取元素則為 true，否則為 false</returns>
     public bool Read()
     {
         if (!_started)
@@ -126,6 +134,7 @@ public sealed class OdtStreamReader : IDisposable
     }
 
     /// <summary>
+    /// Provides dispose.
     /// 釋放讀取器與底層 ZIP 資源。
     /// </summary>
     public void Dispose()

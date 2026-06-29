@@ -12,9 +12,10 @@ public partial class PresentationDocument
     #region Presentation Slides
 
     /// <summary>
+    /// Gets the presentation root node.
     /// 取得簡報的核心節點。
     /// </summary>
-    /// <returns>簡報的 <see cref="OdfNode"/> 節點</returns>
+    /// <returns>The presentation <see cref="OdfNode"/> node. / 簡報的 <see cref="OdfNode"/> 節點。</returns>
     public OdfNode GetPresentationNode()
     {
         var body = FindChildElement(ContentRoot, "body", OdfNamespaces.Office);
@@ -35,10 +36,11 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Adds a slide.
     /// 新增一張投影片。
     /// </summary>
-    /// <param name="name">投影片的名稱</param>
-    /// <returns>新增的投影片執行個體</returns>
+    /// <param name="name">The slide name. / 投影片的名稱。</param>
+    /// <returns>The added slide instance. / 新增的投影片執行個體。</returns>
     public OdfSlide AddSlide(string? name = null)
     {
         var presentationNode = GetPresentationNode();
@@ -55,11 +57,12 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Clones the specified slide.
     /// 複製指定的投影片。
     /// </summary>
-    /// <param name="sourceSlideIndex">來源投影片的索引位置</param>
-    /// <returns>複製後的新投影片執行個體</returns>
-    /// <exception cref="ArgumentOutOfRangeException">索引超出範圍時拋出</exception>
+    /// <param name="sourceSlideIndex">The source slide index. / 來源投影片的索引位置。</param>
+    /// <returns>The cloned slide instance. / 複製後的新投影片執行個體。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the index is out of range. / 索引超出範圍時拋出。</exception>
     public OdfSlide CloneSlide(int sourceSlideIndex)
     {
         if (sourceSlideIndex < 0 || sourceSlideIndex >= _slides.Count)
@@ -87,10 +90,11 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Deletes the specified slide.
     /// 刪除指定的投影片。
     /// </summary>
-    /// <param name="slideIndex">投影片的索引位置</param>
-    /// <exception cref="ArgumentOutOfRangeException">索引超出範圍時拋出</exception>
+    /// <param name="slideIndex">The slide index. / 投影片的索引位置。</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the index is out of range. / 索引超出範圍時拋出。</exception>
     public void DeleteSlide(int slideIndex)
     {
         if (slideIndex < 0 || slideIndex >= _slides.Count)
@@ -105,11 +109,12 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Moves a slide to a different position.
     /// 移動投影片的順序位置。
     /// </summary>
-    /// <param name="fromIndex">來源投影片的索引位置</param>
-    /// <param name="toIndex">目標投影片的索引位置</param>
-    /// <exception cref="ArgumentOutOfRangeException">索引超出範圍時拋出</exception>
+    /// <param name="fromIndex">The source slide index. / 來源投影片的索引位置。</param>
+    /// <param name="toIndex">The destination slide index. / 目標投影片的索引位置。</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when an index is out of range. / 索引超出範圍時拋出。</exception>
     public void MoveSlide(int fromIndex, int toIndex)
     {
         if (fromIndex < 0 || fromIndex >= _slides.Count || toIndex < 0 || toIndex >= _slides.Count)
@@ -140,10 +145,11 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Sets the slide size.
     /// 設定投影片的尺寸。
     /// </summary>
-    /// <param name="width">寬度</param>
-    /// <param name="height">高度</param>
+    /// <param name="width">The width. / 寬度。</param>
+    /// <param name="height">The height. / 高度。</param>
     public void SetSlideSize(OdfLength width, OdfLength height)
     {
         var pageLayoutProps = GetDefaultPageLayoutProperties();
@@ -152,9 +158,10 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Gets the slide size.
     /// 取得投影片尺寸。
     /// </summary>
-    /// <returns>投影片寬度與高度</returns>
+    /// <returns>The slide width and height. / 投影片寬度與高度。</returns>
     public (OdfLength Width, OdfLength Height) GetSlideSize()
     {
         var pageLayoutProps = GetDefaultPageLayoutProperties();
@@ -165,9 +172,10 @@ public partial class PresentationDocument
             string.IsNullOrWhiteSpace(height) ? OdfLength.FromCentimeters(21) : OdfLength.Parse(height));
     }
     /// <summary>
+    /// Sets the slide orientation.
     /// 設定投影片的方向。
     /// </summary>
-    /// <param name="orientation">投影片方向列舉值</param>
+    /// <param name="orientation">The slide orientation value. / 投影片方向列舉值。</param>
     public void SetSlideOrientation(OdfPageOrientation orientation)
     {
         var pageLayoutProps = GetDefaultPageLayoutProperties();
@@ -202,10 +210,11 @@ public partial class PresentationDocument
     private const string SmilNamespace = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0";
 
     /// <summary>
+    /// Gets the transition effect of the slide at the specified index.
     /// 取得指定索引投影片的切換效果。
     /// </summary>
-    /// <param name="slideIndex">投影片索引位置</param>
-    /// <returns>投影片切換效果類型；未設定時為 <see cref="OdfSlideTransition.None"/></returns>
+    /// <param name="slideIndex">The slide index. / 投影片索引位置。</param>
+    /// <returns>The slide transition type, or <see cref="OdfSlideTransition.None"/> when unset. / 投影片切換效果類型；未設定時為 <see cref="OdfSlideTransition.None"/>。</returns>
     public OdfSlideTransition GetSlideTransition(int slideIndex)
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)
@@ -241,10 +250,11 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Sets the transition effect of the slide at the specified index.
     /// 設定指定索引投影片的切換效果。
     /// </summary>
-    /// <param name="slideIndex">投影片索引位置</param>
-    /// <param name="transition">投影片切換效果類型</param>
+    /// <param name="slideIndex">The slide index. / 投影片索引位置。</param>
+    /// <param name="transition">The slide transition type. / 投影片切換效果類型。</param>
     public void SetSlideTransition(int slideIndex, OdfSlideTransition transition)
     {
         if (slideIndex < 0 || slideIndex >= Slides.Count)
@@ -284,30 +294,35 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Gets summaries of animation effects across all slides in the presentation.
     /// 取得簡報中所有投影片的動畫效果摘要清單。
     /// </summary>
     public IReadOnlyList<OdfSlideAnimationInfo> GetAnimations() =>
         PresentationDocumentAnimationReadEngine.GetAnimations(this);
 
     /// <summary>
+    /// Gets summaries of placeholders across all slides in the presentation.
     /// 取得簡報中所有投影片的預留位置摘要清單。
     /// </summary>
     public IReadOnlyList<OdfSlidePlaceholderInfo> GetPlaceholderInfos() =>
         PresentationDocumentPlaceholderReadEngine.GetPlaceholders(this);
 
     /// <summary>
+    /// Gets summaries of speaker notes with content across all slides in the presentation.
     /// 取得簡報中所有含內容的主講人備忘錄摘要清單。
     /// </summary>
     public IReadOnlyList<OdfSlideSpeakerNotesInfo> GetSpeakerNotes() =>
         PresentationDocumentSpeakerNotesReadEngine.GetSpeakerNotes(this);
 
     /// <summary>
+    /// Gets summaries of layouts across all slides in the presentation.
     /// 取得簡報中所有投影片的版面配置摘要清單。
     /// </summary>
     public IReadOnlyList<OdfSlideLayoutInfo> GetLayouts() =>
         PresentationDocumentLayoutReadEngine.GetLayouts(this);
 
     /// <summary>
+    /// Gets summaries of slides with configured transition effects in the presentation.
     /// 取得簡報中所有已設定切換效果的投影片摘要清單。
     /// </summary>
     public IReadOnlyList<OdfSlideTransitionInfo> GetSlideTransitions() =>

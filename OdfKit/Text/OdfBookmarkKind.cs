@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf bookmark kind.
 /// 表示 ODF 書籤節點種類。
 /// </summary>
 public enum OdfBookmarkKind

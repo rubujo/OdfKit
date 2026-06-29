@@ -13,10 +13,11 @@ public partial class OdfCell
     #region Hyperlink, Rich Text & Annotation
 
     /// <summary>
+    /// Sets the hyperlink of the cell.
     /// 設定儲存格的超連結。
     /// </summary>
-    /// <param name="url">超連結 URL</param>
-    /// <param name="displayText">連結顯示文字；為 null 時使用現有文字內容或 URL 本身</param>
+    /// <param name="url">The hyperlink URL. / 超連結 URL。</param>
+    /// <param name="displayText">The link display text; when <see langword="null"/>, the existing text content or URL itself is used. / 連結顯示文字；為 <see langword="null"/> 時使用現有文字內容或 URL 本身。</param>
     public void SetHyperlink(string url, string? displayText = null)
     {
         string text = displayText ?? (string.IsNullOrEmpty(DisplayText) ? url : DisplayText);
@@ -40,6 +41,7 @@ public partial class OdfCell
     }
 
     /// <summary>
+    /// Gets the hyperlink URL of the cell, or <see langword="null"/> when no hyperlink exists.
     /// 取得儲存格的超連結 URL；若無超連結則回傳 null。
     /// </summary>
     public string? GetHyperlinkUrl()
@@ -58,6 +60,7 @@ public partial class OdfCell
     }
 
     /// <summary>
+    /// Removes the hyperlink of the cell while preserving display text.
     /// 移除儲存格的超連結，保留顯示文字。
     /// </summary>
     public void RemoveHyperlink()
@@ -81,6 +84,7 @@ public partial class OdfCell
     }
 
     /// <summary>
+    /// Gets the rich text content of the cell, or <see langword="null"/> when it is plain text or empty.
     /// 取得儲存格的富文字內容；若為純文字或空白則回傳 null。
     /// </summary>
     public OdfRichText? GetRichText()
@@ -127,9 +131,10 @@ public partial class OdfCell
     }
 
     /// <summary>
+    /// Sets the rich text content of the cell and replaces existing text.
     /// 設定儲存格的富文字內容，取代現有文字。
     /// </summary>
-    /// <param name="richText">要寫入儲存格的富文字內容</param>
+    /// <param name="richText">The rich text content to write to the cell. / 要寫入儲存格的富文字內容。</param>
     public void SetRichText(OdfRichText richText)
     {
         if (richText is null)
@@ -171,6 +176,7 @@ public partial class OdfCell
     }
 
     /// <summary>
+    /// Gets the cell annotation, or <see langword="null"/> when no annotation exists.
     /// 取得儲存格的批注；若無批注則回傳 null。
     /// </summary>
     public OdfCellAnnotation? GetAnnotation()
@@ -202,11 +208,12 @@ public partial class OdfCell
     }
 
     /// <summary>
+    /// Sets the cell annotation and overwrites any existing annotation.
     /// 設定儲存格的批注。若已有批注則覆蓋。
     /// </summary>
-    /// <param name="text">批注內容</param>
-    /// <param name="author">作者名稱</param>
-    /// <param name="visible">是否顯示（預設為 false）</param>
+    /// <param name="text">The annotation content. / 批注內容。</param>
+    /// <param name="author">The author name. / 作者名稱。</param>
+    /// <param name="visible">Whether to display the annotation; the default is <see langword="false"/>. / 是否顯示；預設為 <see langword="false"/>。</param>
     public void SetAnnotation(string text, string? author = null, bool visible = false)
     {
         RemoveAnnotation();
@@ -233,6 +240,7 @@ public partial class OdfCell
     }
 
     /// <summary>
+    /// Removes the cell annotation.
     /// 移除儲存格的批注。
     /// </summary>
     public void RemoveAnnotation()

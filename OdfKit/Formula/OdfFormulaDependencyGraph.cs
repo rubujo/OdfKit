@@ -5,7 +5,8 @@ using OdfKit.Spreadsheet;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// 實作公式單元格相依圖，管理單元格之間的計算相依性與骯髒 (Dirty) 狀態傳播。
+/// Implements a formula cell dependency graph that manages calculation dependencies and dirty-state propagation.
+/// 實作公式儲存格相依圖，管理儲存格之間的計算相依性與 Dirty 狀態傳播。
 /// </summary>
 public sealed class OdfFormulaDependencyGraph
 {
@@ -15,21 +16,24 @@ public sealed class OdfFormulaDependencyGraph
     private readonly HashSet<OdfCellAddress> _circularCells = new();
 
     /// <summary>
-    /// 取得所有當前 Dirty 的單元格。
+    /// Gets all currently dirty cells.
+    /// 取得所有目前 Dirty 的儲存格。
     /// </summary>
     public IReadOnlyCollection<OdfCellAddress> DirtyCells => _dirtyCells;
 
     /// <summary>
-    /// 取得被偵測到具有循環參照的單元格。
+    /// Gets cells detected as having circular references.
+    /// 取得被偵測到具有循環參照的儲存格。
     /// </summary>
     public IReadOnlyCollection<OdfCellAddress> CircularCells => _circularCells;
 
     /// <summary>
-    /// 新增或更新單元格的公式相依關係。
+    /// Adds or updates formula dependencies for a cell.
+    /// 新增或更新儲存格的公式相依關係。
     /// </summary>
-    /// <param name="cell">單元格位址</param>
-    /// <param name="formula">公式字串</param>
-    /// <param name="context">評估內容</param>
+    /// <param name="cell">The cell address. / 儲存格位址。</param>
+    /// <param name="formula">The formula string. / 公式字串。</param>
+    /// <param name="context">The evaluation context. / 評估內容。</param>
     public void UpdateFormulaDependencies(OdfCellAddress cell, string formula, IEvaluationContext context)
     {
         // 1. 清除舊相依關係
@@ -111,9 +115,10 @@ public sealed class OdfFormulaDependencyGraph
     }
 
     /// <summary>
-    /// 將指定單元格及其所有受影響的下游單元格遞迴標記為 Dirty。
+    /// Recursively marks the specified cell and all affected downstream cells as dirty.
+    /// 將指定儲存格及其所有受影響的下游儲存格遞迴標記為 Dirty。
     /// </summary>
-    /// <param name="cell">被修改或受影響的單元格位址</param>
+    /// <param name="cell">The modified or affected cell address. / 被修改或受影響的儲存格位址。</param>
     public void MarkDirty(OdfCellAddress cell)
     {
         if (_dirtyCells.Add(cell))
@@ -133,20 +138,25 @@ public sealed class OdfFormulaDependencyGraph
     }
 
     /// <summary>
-    /// 清除指定單元格的 Dirty 標記。
+    /// Clears the dirty marker for the specified cell.
+    /// 清除指定儲存格的 Dirty 標記。
     /// </summary>
-    /// <param name="cell">單元格位址</param>
+    /// <param name="cell">The cell address. / 儲存格位址。</param>
     public void ClearDirty(OdfCellAddress cell)
     {
         _dirtyCells.Remove(cell);
     }
 
     /// <summary>
-    /// 判斷指定單元格是否為 Dirty 狀態。
+    /// Determines whether the specified cell is dirty.
+    /// 判斷指定儲存格是否為 Dirty 狀態。
     /// </summary>
+    /// <param name="cell">The cell address. / 儲存格位址。</param>
+    /// <returns>True when the cell is dirty; otherwise, false. / 若儲存格為 Dirty 狀態則為 true，否則為 false。</returns>
     public bool IsDirty(OdfCellAddress cell) => _dirtyCells.Contains(cell);
 
     /// <summary>
+    /// Clears all structures in the dependency graph.
     /// 清除整個相依圖的所有結構。
     /// </summary>
     public void Clear()
@@ -158,10 +168,14 @@ public sealed class OdfFormulaDependencyGraph
     }
 
     /// <summary>
-    /// 對所有目前處於 Dirty 狀態的單元格進行拓撲排序，並返回其計算順序。
-    /// 若檢測到循環相依，會將相關單元格加入 CircularCells。
+    /// Topologically sorts all currently dirty cells and returns their calculation order.
+    /// 對所有目前處於 Dirty 狀態的儲存格進行拓撲排序，並傳回其計算順序。
     /// </summary>
-    /// <returns>已排序的單元格計算順序清單</returns>
+    /// <remarks>
+    /// When circular dependencies are detected, the related cells are added to <see cref="CircularCells"/>.
+    /// 若偵測到循環相依，會將相關儲存格加入 <see cref="CircularCells"/>。
+    /// </remarks>
+    /// <returns>The sorted cell calculation order. / 已排序的儲存格計算順序清單。</returns>
     public List<OdfCellAddress> GetTopologicallySortedDirtyCells()
     {
         var visited = new HashSet<OdfCellAddress>();

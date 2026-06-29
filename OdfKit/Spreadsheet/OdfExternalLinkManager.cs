@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Manages the external document loading delegate and local cache for cross-document spreadsheet formula references.
 /// 管理試算表跨文件公式引用的外部文件載入委派與本地快取。
 /// </summary>
 public sealed class OdfExternalLinkManager
@@ -11,22 +12,25 @@ public sealed class OdfExternalLinkManager
     private readonly Dictionary<ExternalCellKey, object?> _cellCache = new();
 
     /// <summary>
+    /// Gets or sets the external document loading delegate. The parameter is the document identifier from the formula reference, such as <c>file:///other.ods</c>.
     /// 取得或設定外部文件載入委派。參數為公式參照中的文件識別碼，例如 <c>file:///other.ods</c>。
     /// </summary>
     public Func<string, SpreadsheetDocument?>? DocumentResolver { get; set; }
 
     /// <summary>
+    /// Clears all external cell caches.
     /// 清除所有外部儲存格快取。
     /// </summary>
     public void ClearCache() => _cellCache.Clear();
 
     /// <summary>
+    /// Sets a cached external cell value.
     /// 設定外部儲存格快取值。
     /// </summary>
-    /// <param name="documentId">外部文件識別碼</param>
-    /// <param name="sheetName">外部工作表名稱</param>
-    /// <param name="address">外部儲存格位址</param>
-    /// <param name="value">快取值</param>
+    /// <param name="documentId">The external document identifier. / 外部文件識別碼。</param>
+    /// <param name="sheetName">The external sheet name. / 外部工作表名稱。</param>
+    /// <param name="address">The external cell address. / 外部儲存格位址。</param>
+    /// <param name="value">The cached value. / 快取值。</param>
     public void SetCachedValue(string documentId, string sheetName, OdfCellAddress address, object? value)
     {
         _cellCache[new ExternalCellKey(documentId, sheetName, address.Row, address.Column)] = value;

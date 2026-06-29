@@ -17,6 +17,7 @@ using S = DocumentFormat.OpenXml.Spreadsheet;
 namespace OdfKit.Conversion;
 
 /// <summary>
+/// Applies xlsx to odf converter.
 /// 將 XLSX 格式轉換為 SpreadsheetDocument 的轉換器。
 /// </summary>
 public static class XlsxToOdfConverter
@@ -36,11 +37,12 @@ public static class XlsxToOdfConverter
     }
 
     /// <summary>
+    /// Provides convert.
     /// 從 XLSX 資料流讀取並建立對應的 SpreadsheetDocument。
     /// </summary>
-    /// <param name="xlsxStream">XLSX 來源資料流</param>
-    /// <returns>轉換後的 SpreadsheetDocument 執行個體</returns>
-    /// <exception cref="ArgumentNullException">當 xlsxStream 為 null 時引發</exception>
+    /// <param name="xlsxStream">The source or target object. / XLSX 來源資料流</param>
+    /// <returns>The result. / 轉換後的 SpreadsheetDocument 執行個體</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 xlsxStream 為 null 時引發</exception>
     public static OdfKit.Spreadsheet.SpreadsheetDocument Convert(Stream xlsxStream)
     {
         if (xlsxStream is null)
@@ -1264,10 +1266,11 @@ public static class XlsxToOdfConverter
     }
 
     /// <summary>
+    /// Applies translate formula to odf.
     /// 將 Excel A1 格式公式翻譯為 OpenFormula 格式。
     /// </summary>
-    /// <param name="excelFormula">Excel A1 格式公式</param>
-    /// <returns>含 <c>of:</c> 前綴的 OpenFormula 公式</returns>
+    /// <param name="excelFormula">The value to use. / Excel A1 格式公式</param>
+    /// <returns>The result. / 含 <c>of:</c> 前綴的 OpenFormula 公式</returns>
     public static string TranslateFormulaToOdf(string excelFormula)
     {
         if (string.IsNullOrWhiteSpace(excelFormula))

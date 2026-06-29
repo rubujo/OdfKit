@@ -8,10 +8,11 @@ using OdfKit.Styles;
 namespace OdfKit.Presentation;
 
 /// <summary>
+/// Represents a presentation slide.
 /// 表示簡報投影片（Slide）的類別。
 /// </summary>
-/// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
-/// <param name="doc">所屬的簡報文件執行個體</param>
+/// <param name="node">The underlying <see cref="OdfNode"/> instance. / 底層的 <see cref="OdfNode"/> 執行個體。</param>
+/// <param name="doc">The owning presentation document instance. / 所屬的簡報文件執行個體。</param>
 public partial class OdfSlide(OdfNode node, PresentationDocument doc)
 {
     /// <summary>
@@ -20,11 +21,13 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     internal OdfNode Node { get; } = node;
 
     /// <summary>
+    /// Gets the owning presentation document.
     /// 取得所屬的簡報文件。
     /// </summary>
     public PresentationDocument Document { get; } = doc;
 
     /// <summary>
+    /// Gets or sets the slide name.
     /// 取得或設定投影片名稱。
     /// </summary>
     public string Name
@@ -34,6 +37,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets or sets the master page name used by the slide.
     /// 取得或設定投影片使用的母片名稱。
     /// </summary>
     public string MasterPageName
@@ -43,6 +47,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets or sets the page layout name used by the slide.
     /// 取得或設定投影片使用的版面配置名稱。
     /// </summary>
     public string? PresentationPageLayoutName
@@ -62,6 +67,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets or sets the slide background color, such as <c>#FFFFFF</c>.
     /// 取得或設定投影片背景色（例如 <c>#FFFFFF</c>）。
     /// </summary>
     public string? BackgroundColor
@@ -88,6 +94,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets or sets the style name used by the slide header.
     /// 取得或設定投影片頁首使用的樣式名稱。
     /// </summary>
     public string? UseHeaderName
@@ -107,6 +114,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets or sets the style name used by the slide footer.
     /// 取得或設定投影片頁尾使用的樣式名稱。
     /// </summary>
     public string? UseFooterName
@@ -126,6 +134,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets or sets the style name used by the slide date and time field.
     /// 取得或設定投影片日期與時間使用的樣式名稱。
     /// </summary>
     public string? UseDateTimeName
@@ -145,6 +154,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets the slide notes page.
     /// 取得投影片的備忘錄頁面（Notes Page）。
     /// </summary>
     public OdfNotesPage SpeakerNotesPage
@@ -162,6 +172,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets or sets the slide speaker notes text.
     /// 取得或設定投影片備忘錄文字。
     /// </summary>
     public string SpeakerNotes
@@ -171,15 +182,17 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets the paragraph text of the slide speaker notes.
     /// 取得投影片備忘錄的段落文字。
     /// </summary>
     public IReadOnlyList<string> SpeakerNoteParagraphs => SpeakerNotesPage.SpeakerNoteParagraphs;
 
     /// <summary>
+    /// Sets slide speaker notes as multiple paragraphs.
     /// 以多段落形式設定投影片備忘錄文字。
     /// </summary>
-    /// <param name="paragraphs">段落文字集合</param>
-    /// <returns>目前投影片</returns>
+    /// <param name="paragraphs">The paragraph text collection. / 段落文字集合。</param>
+    /// <returns>The current slide. / 目前投影片。</returns>
     public OdfSlide SetSpeakerNotes(IEnumerable<string> paragraphs)
     {
         SpeakerNotesPage.SetSpeakerNotes(paragraphs);
@@ -187,6 +200,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets the animation root node.
     /// 取得動畫根節點。
     /// </summary>
     public OdfAnimationNode AnimationRoot
@@ -236,12 +250,14 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets the summary list of all placeholders in the slide.
     /// 取得投影片中所有預留位置的摘要清單。
     /// </summary>
     public IReadOnlyList<OdfPlaceholderInfo> GetPlaceholderInfos() =>
         OdfSlidePlaceholderReadEngine.GetPlaceholders(this);
 
     /// <summary>
+    /// Gets the read-only list of all placeholders in the slide.
     /// 取得投影片中所有預留位置的唯讀清單。
     /// </summary>
     public IReadOnlyList<OdfPlaceholder> Placeholders
@@ -265,6 +281,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets the text boxes on the slide.
     /// 取得投影片上的文字方塊清單。
     /// </summary>
     public IReadOnlyList<OdfTextBox> TextBoxes => FindDrawingObjects(
@@ -273,6 +290,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
         node => new OdfTextBox(node, this));
 
     /// <summary>
+    /// Gets the pictures on the slide.
     /// 取得投影片上的圖片清單。
     /// </summary>
     public IReadOnlyList<OdfPicture> Pictures => FindDrawingObjects(
@@ -281,6 +299,7 @@ public partial class OdfSlide(OdfNode node, PresentationDocument doc)
         node => new OdfPicture(node, this));
 
     /// <summary>
+    /// Gets the general shapes on the slide.
     /// 取得投影片上的一般圖形清單。
     /// </summary>
     public IReadOnlyList<OdfShape> Shapes => FindDrawingObjects(

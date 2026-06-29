@@ -15,17 +15,19 @@ using WP = DocumentFormat.OpenXml.Wordprocessing;
 namespace OdfKit.Conversion;
 
 /// <summary>
+/// Applies docx to odt converter.
 /// 將 DOCX 格式轉換為 <see cref="TextDocument"/> 的轉換器。
 /// </summary>
 public static class DocxToOdtConverter
 {
     /// <summary>
+    /// Provides convert.
     /// 從 DOCX 資料流讀取並建立對應的 ODT 文字文件。
     /// </summary>
-    /// <param name="docxStream">DOCX 來源資料流</param>
-    /// <returns>轉換後的 <see cref="TextDocument"/> 執行個體</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="docxStream"/> 為 null 時擲出</exception>
-    /// <exception cref="InvalidDataException">當 DOCX 缺少主要文件本文時擲出</exception>
+    /// <param name="docxStream">The source or target object. / DOCX 來源資料流</param>
+    /// <returns>The result. / 轉換後的 <see cref="TextDocument"/> 執行個體</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="docxStream"/> 為 null 時擲出</exception>
+    /// <exception cref="InvalidDataException">Thrown when the documented condition occurs. / 當 DOCX 缺少主要文件本文時擲出</exception>
     public static TextDocument Convert(Stream docxStream)
     {
         if (docxStream is null)

@@ -12,24 +12,27 @@ public partial class OdfFormulaDocument
     private const string LatexAnnotationEncoding = "application/x-tex";
 
     /// <summary>
+    /// Gets the MathML XML string.
     /// 取得 MathML 的 XML 字串。
     /// </summary>
-    /// <returns>MathML XML 字串</returns>
+    /// <returns>The MathML XML string. / MathML XML 字串。</returns>
     public string GetMathML() => MathMlXml;
 
     /// <summary>
+    /// Gets the recognizable token summary list in the current MathML row.
     /// 取得目前 MathML row 中可辨識的 token 摘要清單。
     /// </summary>
-    /// <returns>MathML token 清單</returns>
+    /// <returns>The MathML token list. / MathML token 清單。</returns>
     public IReadOnlyList<OdfMathToken> GetMathTokens() => ReadMathTokens();
 
     /// <summary>
+    /// Creates and loads an <see cref="OdfFormulaDocument"/> from the specified LaTeX formula string.
     /// 從指定的 LaTeX 公式字串建立並載入 <see cref="OdfFormulaDocument"/>。
     /// </summary>
-    /// <param name="latex">LaTeX 公式字串</param>
-    /// <returns>已載入 LaTeX 公式的 <see cref="OdfFormulaDocument"/> 執行個體</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="latex"/> 為 <see langword="null"/> 時擲出</exception>
-    /// <exception cref="ArgumentException">當 LaTeX 公式語法錯誤時擲出</exception>
+    /// <param name="latex">The LaTeX formula string. / LaTeX 公式字串。</param>
+    /// <returns>The <see cref="OdfFormulaDocument"/> instance loaded with the LaTeX formula. / 已載入 LaTeX 公式的 <see cref="OdfFormulaDocument"/> 執行個體。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="latex"/> is <see langword="null"/>. / 當 <paramref name="latex"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When the LaTeX formula syntax is invalid. / 當 LaTeX 公式語法錯誤時擲出。</exception>
     public static OdfFormulaDocument FromLatex(string latex)
     {
         var doc = Create();
@@ -38,11 +41,12 @@ public partial class OdfFormulaDocument
     }
 
     /// <summary>
+    /// Compiles the specified LaTeX formula string to MathML and loads it into the current formula document.
     /// 將指定的 LaTeX 公式字串編譯為 MathML 並載入到目前的公式文件中。
     /// </summary>
-    /// <param name="latex">LaTeX 公式字串</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="latex"/> 為 <see langword="null"/> 時擲出</exception>
-    /// <exception cref="ArgumentException">當 LaTeX 公式語法錯誤時擲出</exception>
+    /// <param name="latex">The LaTeX formula string. / LaTeX 公式字串。</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="latex"/> is <see langword="null"/>. / 當 <paramref name="latex"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When the LaTeX formula syntax is invalid. / 當 LaTeX 公式語法錯誤時擲出。</exception>
     public void LoadFromLatex(string latex)
     {
         if (latex == null)
@@ -55,21 +59,23 @@ public partial class OdfFormulaDocument
     }
 
     /// <summary>
+    /// Converts the current MathML formula content back to a LaTeX formula string.
     /// 將目前 MathML 公式內容反向轉換為 LaTeX 公式字串。若公式以
     /// <see cref="LoadFromLatex"/>／<see cref="FromLatex"/> 建立（或曾以
     /// <see cref="SetAnnotation"/> 附加 <c>application/x-tex</c> 標註），會優先傳回該原始
     /// LaTeX 來源以達成精確往返；否則改採 best-effort 由 MathML token 重建（因 LaTeX 與
     /// MathML 並非一對一對應，部分語意可能無法完整保留）。
     /// </summary>
-    /// <returns>LaTeX 公式字串</returns>
+    /// <returns>The LaTeX formula string. / LaTeX 公式字串。</returns>
     public string ToLatex() => GetAnnotation(LatexAnnotationEncoding) ?? OdfFormulaLatexConverter.ToLatex(GetMathTokens());
 
     /// <summary>
+    /// Creates and loads an <see cref="OdfFormulaDocument"/> by using an <see cref="OdfMathBuilder"/> composition delegate.
     /// 使用 <see cref="OdfMathBuilder"/> 組合委派建立並載入 <see cref="OdfFormulaDocument"/>。
     /// </summary>
-    /// <param name="build">用於組合 MathML token 樹狀結構的委派</param>
-    /// <returns>已載入組合結果的 <see cref="OdfFormulaDocument"/> 執行個體</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="build"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <param name="build">The delegate used to compose the MathML token tree. / 用於組合 MathML token 樹狀結構的委派。</param>
+    /// <returns>The <see cref="OdfFormulaDocument"/> instance loaded with the composed result. / 已載入組合結果的 <see cref="OdfFormulaDocument"/> 執行個體。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="build"/> is <see langword="null"/>. / 當 <paramref name="build"/> 為 <see langword="null"/> 時擲出。</exception>
     public static OdfFormulaDocument FromBuilder(Action<OdfMathBuilder> build)
     {
         if (build is null)
@@ -87,12 +93,13 @@ public partial class OdfFormulaDocument
     }
 
     /// <summary>
+    /// Replaces the first token of the specified kind in the current formula tree.
     /// 將目前公式樹中第一個符合種類的 token 替換為指定 token。
     /// </summary>
-    /// <param name="kind">目標 token 種類</param>
-    /// <param name="replacement">替換後的新 token</param>
-    /// <returns>若成功替換則為 <see langword="true"/>；找不到目標時為 <see langword="false"/></returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <param name="kind">The target token kind. / 目標 token 種類。</param>
+    /// <param name="replacement">The replacement token. / 替換後的新 token。</param>
+    /// <returns><see langword="true"/> if a token was replaced; <see langword="false"/> when no target token was found. / 若成功替換則為 <see langword="true"/>；找不到目標時為 <see langword="false"/>。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="replacement"/> is <see langword="null"/>. / 當 <paramref name="replacement"/> 為 <see langword="null"/> 時擲出。</exception>
     public bool ReplaceFirst(OdfMathTokenKind kind, OdfMathToken replacement)
     {
         if (replacement is null)

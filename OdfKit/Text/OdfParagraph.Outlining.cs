@@ -9,10 +9,11 @@ namespace OdfKit.Text;
 public partial class OdfParagraph
 {
     /// <summary>
+    /// Applies set outline level.
     /// 將此段落設定為指定的大綱階層。
     /// </summary>
-    /// <param name="outlineLevel">大綱階層，最小值為 1</param>
-    /// <returns>目前段落，供鏈式呼叫使用</returns>
+    /// <param name="outlineLevel">The numeric value. / 大綱階層，最小值為 1</param>
+    /// <returns>The result. / 目前段落，供鏈式呼叫使用</returns>
     public OdfParagraph SetOutlineLevel(int outlineLevel)
     {
         int normalizedLevel = Math.Max(1, outlineLevel);
@@ -22,10 +23,11 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Provides enable auto numbering.
     /// 啟用此大綱段落的自動編號樣式。
     /// </summary>
-    /// <param name="styleName">要使用或建立的清單樣式名稱</param>
-    /// <returns>目前段落，供鏈式呼叫使用</returns>
+    /// <param name="styleName">The name or identifier. / 要使用或建立的清單樣式名稱</param>
+    /// <returns>The result. / 目前段落，供鏈式呼叫使用</returns>
     public OdfParagraph EnableAutoNumbering(string styleName)
     {
         if (string.IsNullOrWhiteSpace(styleName))

@@ -11,6 +11,7 @@ namespace OdfKit.Text;
 internal static class OdfTrackedChangesEngine
 {
     /// <summary>
+    /// Accepts accept all.
     /// 接受文件中所有的追蹤修訂。
     /// </summary>
     public static void AcceptAll(OdfNode bodyTextRoot)
@@ -36,6 +37,7 @@ internal static class OdfTrackedChangesEngine
     }
 
     /// <summary>
+    /// Rejects reject all.
     /// 拒絕文件中所有的追蹤修訂。
     /// </summary>
     public static void RejectAll(OdfNode bodyTextRoot, OdfPackage package)
@@ -57,6 +59,7 @@ internal static class OdfTrackedChangesEngine
     }
 
     /// <summary>
+    /// Accepts accept change.
     /// 接受指定的追蹤修訂。
     /// </summary>
     public static void AcceptChange(OdfNode bodyTextRoot, string changeId)
@@ -82,6 +85,7 @@ internal static class OdfTrackedChangesEngine
     }
 
     /// <summary>
+    /// Rejects reject change.
     /// 拒絕指定的追蹤修訂。
     /// </summary>
     public static void RejectChange(OdfNode bodyTextRoot, string changeId, OdfPackage package)

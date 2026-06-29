@@ -6,77 +6,103 @@ using OdfKit.DOM;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Specifies pivot table value aggregate functions.
 /// 樞紐分析表值彙總函式。
 /// </summary>
 public enum OdfPivotFunction
 {
     /// <summary>
-    /// 加總
+    /// Sum.
+    /// 加總。
     /// </summary>
     Sum,
+
     /// <summary>
-    /// 計數
+    /// Count.
+    /// 計數。
     /// </summary>
     Count,
+
     /// <summary>
-    /// 平均值
+    /// Average.
+    /// 平均值。
     /// </summary>
     Average,
+
     /// <summary>
-    /// 最大值
+    /// Maximum.
+    /// 最大值。
     /// </summary>
     Max,
+
     /// <summary>
-    /// 最小值
+    /// Minimum.
+    /// 最小值。
     /// </summary>
     Min,
+
     /// <summary>
-    /// 計算公式（搭配 AddCalculatedField 使用）
+    /// Calculated formula, used with <see cref="OdfPivotTableBuilder.AddCalculatedField"/>.
+    /// 計算公式，搭配 <see cref="OdfPivotTableBuilder.AddCalculatedField"/> 使用。
     /// </summary>
     Formula,
 }
 
 /// <summary>
+/// Specifies pivot table filter condition operators.
 /// 樞紐分析表篩選條件運算子。
 /// </summary>
 public enum OdfPivotFilterOperator
 {
     /// <summary>
-    /// 等於
+    /// Equal to.
+    /// 等於。
     /// </summary>
     Equal,
+
     /// <summary>
-    /// 不等於
+    /// Not equal to.
+    /// 不等於。
     /// </summary>
     NotEqual,
+
     /// <summary>
-    /// 大於
+    /// Greater than.
+    /// 大於。
     /// </summary>
     GreaterThan,
+
     /// <summary>
-    /// 大於或等於
+    /// Greater than or equal to.
+    /// 大於或等於。
     /// </summary>
     GreaterThanOrEqual,
+
     /// <summary>
-    /// 小於
+    /// Less than.
+    /// 小於。
     /// </summary>
     LessThan,
+
     /// <summary>
-    /// 小於或等於
+    /// Less than or equal to.
+    /// 小於或等於。
     /// </summary>
     LessThanOrEqual,
 }
 
 /// <summary>
+/// Builds ODF pivot tables, also known as data pilot tables.
 /// 用於建構 ODF 樞紐分析表（Data Pilot Table）的產生器。
 /// </summary>
 /// <remarks>
+/// Initializes a new instance of the <see cref="OdfPivotTableBuilder"/> class.
 /// 初始化 <see cref="OdfPivotTableBuilder"/> 類別的新執行個體。
 /// </remarks>
-/// <param name="name">樞紐分析表的名稱</param>
-/// <param name="sourceRange">來源資料範圍</param>
-/// <param name="targetStart">目標位置起點</param>
-/// <param name="sheet">所屬的工作表</param>
+/// <param name="name">The pivot table name. / 樞紐分析表的名稱。</param>
+/// <param name="sourceRange">The source data range. / 來源資料範圍。</param>
+/// <param name="targetStart">The target position start. / 目標位置起點。</param>
+/// <param name="sheet">The owning worksheet. / 所屬的工作表。</param>
 public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCellAddress targetStart, OdfTableSheet sheet)
 {
     private readonly string _name = name;
@@ -90,6 +116,7 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     private bool _hasRowHeaders = true;
 
     /// <summary>
+    /// Sets whether the source data contains a column header row. The default is <see langword="true"/>.
     /// 設定來源資料是否包含欄標題列（預設為 <see langword="true"/>）。
     /// </summary>
     public OdfPivotTableBuilder WithColumnHeaders(bool hasHeaders = true)
@@ -99,6 +126,7 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
+    /// Sets whether the source data contains a row header column. The default is <see langword="true"/>.
     /// 設定來源資料是否包含列標題欄（預設為 <see langword="true"/>）。
     /// </summary>
     public OdfPivotTableBuilder WithRowHeaders(bool hasHeaders = true)
@@ -108,10 +136,11 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
+    /// Adds a row field to the pivot table.
     /// 新增資料列欄位至樞紐分析表。
     /// </summary>
-    /// <param name="fieldName">欄位名稱</param>
-    /// <returns>目前執行個體，以支援鏈結呼叫</returns>
+    /// <param name="fieldName">The field name. / 欄位名稱。</param>
+    /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
     public OdfPivotTableBuilder AddRowField(string fieldName)
     {
         _fields.Add((fieldName, "row", null, null));
@@ -119,10 +148,11 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
+    /// Adds a column field to the pivot table.
     /// 新增資料欄欄位至樞紐分析表。
     /// </summary>
-    /// <param name="fieldName">欄位名稱</param>
-    /// <returns>目前執行個體，以支援鏈結呼叫</returns>
+    /// <param name="fieldName">The field name. / 欄位名稱。</param>
+    /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
     public OdfPivotTableBuilder AddColumnField(string fieldName)
     {
         _fields.Add((fieldName, "column", null, null));
@@ -130,11 +160,12 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
+    /// Adds a data value field and its calculation function to the pivot table.
     /// 新增資料值欄位與對應的計算函式至樞紐分析表。
     /// </summary>
-    /// <param name="fieldName">欄位名稱</param>
-    /// <param name="function">使用的計算函式（預設為 <see cref="OdfPivotFunction.Sum"/>）</param>
-    /// <returns>目前執行個體，以支援鏈結呼叫</returns>
+    /// <param name="fieldName">The field name. / 欄位名稱。</param>
+    /// <param name="function">The calculation function to use; the default is <see cref="OdfPivotFunction.Sum"/>. / 使用的計算函式，預設為 <see cref="OdfPivotFunction.Sum"/>。</param>
+    /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
     public OdfPivotTableBuilder AddDataField(string fieldName, OdfPivotFunction function = OdfPivotFunction.Sum)
     {
         _fields.Add((fieldName, "data", FunctionToString(function), null));
@@ -142,11 +173,12 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
+    /// Adds a data value field using a raw function name string for legacy API compatibility.
     /// 新增資料值欄位，使用原始函式名稱字串（相容舊版 API）。
     /// </summary>
-    /// <param name="fieldName">欄位名稱</param>
-    /// <param name="function">ODF 函式名稱字串（例如 "sum"、"count"）</param>
-    /// <returns>目前執行個體，以支援鏈結呼叫</returns>
+    /// <param name="fieldName">The field name. / 欄位名稱。</param>
+    /// <param name="function">The ODF function name string, such as <c>sum</c> or <c>count</c>. / ODF 函式名稱字串，例如 <c>sum</c>、<c>count</c>。</param>
+    /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
     public OdfPivotTableBuilder AddDataField(string fieldName, string function)
     {
         _fields.Add((fieldName, "data", function, null));
@@ -154,10 +186,11 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
+    /// Adds a page or filter field to the pivot table.
     /// 新增頁面/篩選欄位至樞紐分析表。
     /// </summary>
-    /// <param name="fieldName">欄位名稱</param>
-    /// <returns>目前執行個體，以支援鏈結呼叫</returns>
+    /// <param name="fieldName">The field name. / 欄位名稱。</param>
+    /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
     public OdfPivotTableBuilder AddPageField(string fieldName)
     {
         _fields.Add((fieldName, "page", null, null));
@@ -165,11 +198,12 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
+    /// Adds a calculated field using a formula to the pivot table.
     /// 新增計算欄位（使用公式）至樞紐分析表。
     /// </summary>
-    /// <param name="fieldName">計算欄位名稱</param>
-    /// <param name="formula">ODF 公式（例如 "of:[.Sales]/[.Count]"）</param>
-    /// <returns>目前執行個體，以支援鏈結呼叫</returns>
+    /// <param name="fieldName">The calculated field name. / 計算欄位名稱。</param>
+    /// <param name="formula">The ODF formula, such as <c>of:[.Sales]/[.Count]</c>. / ODF 公式，例如 <c>of:[.Sales]/[.Count]</c>。</param>
+    /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
     public OdfPivotTableBuilder AddCalculatedField(string fieldName, string formula)
     {
         _fields.Add((fieldName, "data", "formula", formula));
@@ -177,11 +211,12 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
+    /// Sets the sort direction for the specified field.
     /// 為指定欄位設定排序方向。
     /// </summary>
-    /// <param name="fieldName">排序欄位名稱</param>
-    /// <param name="ascending">是否升冪排序（預設為 <see langword="true"/>）</param>
-    /// <returns>目前執行個體，以支援鏈結呼叫</returns>
+    /// <param name="fieldName">The sort field name. / 排序欄位名稱。</param>
+    /// <param name="ascending">Whether sorting is ascending; the default is <see langword="true"/>. / 是否升冪排序，預設為 <see langword="true"/>。</param>
+    /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
     public OdfPivotTableBuilder AddSortInfo(string fieldName, bool ascending = true)
     {
         _sortInfos.Add((fieldName, ascending));
@@ -189,12 +224,13 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
+    /// Adds a field filter condition to the pivot table.
     /// 新增欄位篩選條件至樞紐分析表。
     /// </summary>
-    /// <param name="fieldName">篩選欄位名稱</param>
-    /// <param name="op">比較運算子</param>
-    /// <param name="value">篩選值字串</param>
-    /// <returns>目前執行個體，以支援鏈結呼叫</returns>
+    /// <param name="fieldName">The filter field name. / 篩選欄位名稱。</param>
+    /// <param name="op">The comparison operator. / 比較運算子。</param>
+    /// <param name="value">The filter value string. / 篩選值字串。</param>
+    /// <returns>The current instance for chaining. / 目前執行個體，以支援鏈結呼叫。</returns>
     public OdfPivotTableBuilder AddFilter(string fieldName, OdfPivotFilterOperator op, string value)
     {
         _filters.Add((fieldName, op, value));
@@ -202,9 +238,10 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     }
 
     /// <summary>
+    /// Builds and applies the pivot table to the worksheet.
     /// 建置並將樞紐分析表套用至工作表中。
     /// </summary>
-    /// <returns>代表建置後之樞紐分析表的 XML 節點</returns>
+    /// <returns>The XML node that represents the built pivot table. / 代表建置後之樞紐分析表的 XML 節點。</returns>
     public OdfNode Build()
     {
         // 依 ODF 1.4 schema（table-functions／office-spreadsheet-content-epilogue），

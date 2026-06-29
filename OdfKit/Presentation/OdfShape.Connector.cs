@@ -11,11 +11,12 @@ namespace OdfKit.Presentation;
 public partial class OdfShape
 {
     /// <summary>
+    /// Sets custom route vertices for a connector line (<c>draw:points</c>).
     /// 設定連接線的自訂路由頂點（<c>draw:points</c>）。
     /// </summary>
-    /// <param name="points">以空白分隔的座標對字串（例如 <c>0cm 0cm 1cm 1cm</c>）</param>
-    /// <returns>目前圖形執行個體</returns>
-    /// <exception cref="InvalidOperationException">當圖形不是連接線時擲回</exception>
+    /// <param name="points">The whitespace-separated coordinate-pair string, such as <c>0cm 0cm 1cm 1cm</c>. / 以空白分隔的座標對字串，例如 <c>0cm 0cm 1cm 1cm</c>。</param>
+    /// <returns>The current shape instance. / 目前圖形執行個體。</returns>
+    /// <exception cref="InvalidOperationException">When the shape is not a connector line. / 當圖形不是連接線時擲出。</exception>
     public OdfShape SetConnectorRoutePoints(string points)
     {
         EnsureConnectorShape();
@@ -29,11 +30,12 @@ public partial class OdfShape
     }
 
     /// <summary>
+    /// Sets custom route vertices for a connector line from a coordinate collection.
     /// 以座標集合設定連接線的自訂路由頂點。
     /// </summary>
-    /// <param name="points">路由頂點座標集合</param>
-    /// <returns>目前圖形執行個體</returns>
-    /// <exception cref="InvalidOperationException">當圖形不是連接線時擲回</exception>
+    /// <param name="points">The route vertex coordinate collection. / 路由頂點座標集合。</param>
+    /// <returns>The current shape instance. / 目前圖形執行個體。</returns>
+    /// <exception cref="InvalidOperationException">When the shape is not a connector line. / 當圖形不是連接線時擲出。</exception>
     public OdfShape SetConnectorRoutePoints(IEnumerable<(OdfLength X, OdfLength Y)> points)
     {
         if (points is null)

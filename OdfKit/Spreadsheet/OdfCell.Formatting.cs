@@ -11,12 +11,13 @@ public partial class OdfCell
     #region Borders, Conditional Format & Display
 
     /// <summary>
+    /// Sets the border style for all four sides of this cell.
     /// 設定此儲存格的四面框線樣式。
     /// </summary>
-    /// <param name="top">上框線</param>
-    /// <param name="bottom">下框線</param>
-    /// <param name="left">左框線</param>
-    /// <param name="right">右框線</param>
+    /// <param name="top">The top border. / 上框線。</param>
+    /// <param name="bottom">The bottom border. / 下框線。</param>
+    /// <param name="left">The left border. / 左框線。</param>
+    /// <param name="right">The right border. / 右框線。</param>
     public void SetBorders(OdfBorder? top, OdfBorder? bottom, OdfBorder? left, OdfBorder? right)
     {
         if (top.HasValue)
@@ -30,11 +31,12 @@ public partial class OdfCell
     }
 
     /// <summary>
+    /// Adds a conditional formatting map rule.
     /// 新增條件格式對應規則。
     /// </summary>
-    /// <param name="condition">條件值（例如 "cell-content()=1"）</param>
-    /// <param name="applyStyleName">要套用的格式樣式名稱</param>
-    /// <param name="baseCell">基準儲存格位址</param>
+    /// <param name="condition">The condition value, such as <c>cell-content()=1</c>. / 條件值，例如 <c>cell-content()=1</c>。</param>
+    /// <param name="applyStyleName">The formatting style name to apply. / 要套用的格式樣式名稱。</param>
+    /// <param name="baseCell">The base cell address. / 基準儲存格位址。</param>
     public void AddConditionalFormatMap(string condition, string applyStyleName, OdfCellAddress? baseCell = null)
     {
         var styleNode = _doc.StyleEngine.GetOrCreateLocalStyle(Node, "table-cell");
@@ -49,6 +51,7 @@ public partial class OdfCell
     }
 
     /// <summary>
+    /// Gets the display value formatted by the applied number format style, or <see cref="DisplayText"/> when no style definition exists.
     /// 取得依套用數字格式樣式格式化後的顯示值；若無樣式定義則回傳 <see cref="DisplayText"/>。
     /// </summary>
     public string FormattedValue

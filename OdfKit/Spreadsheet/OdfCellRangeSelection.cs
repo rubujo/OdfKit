@@ -6,6 +6,7 @@ using OdfKit.DOM;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Represents a range selection in a worksheet.
 /// 表示工作表中的一個範圍選取。
 /// </summary>
 public sealed class OdfCellRangeSelection
@@ -14,10 +15,11 @@ public sealed class OdfCellRangeSelection
     private OdfRangeBorderProxy? _borders;
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfCellRangeSelection"/> class.
     /// 初始化 <see cref="OdfCellRangeSelection"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="sheet">所屬工作表</param>
-    /// <param name="range">儲存格範圍</param>
+    /// <param name="sheet">The owning worksheet. / 所屬工作表。</param>
+    /// <param name="range">The cell range. / 儲存格範圍。</param>
     internal OdfCellRangeSelection(OdfTableSheet sheet, OdfCellRange range)
     {
         _sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
@@ -25,16 +27,19 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Gets the cell range represented by this selection.
     /// 取得此選取代表的儲存格範圍。
     /// </summary>
     public OdfCellRange Range { get; }
 
     /// <summary>
+    /// Gets the border configuration proxy for this range.
     /// 取得此範圍的框線設定代理。
     /// </summary>
     public OdfRangeBorderProxy Borders => _borders ??= new OdfRangeBorderProxy(_sheet, Range);
 
     /// <summary>
+    /// Gets or sets the horizontal alignment for all cells in this range.
     /// 取得或設定此範圍所有儲存格的水平對齊方式。
     /// </summary>
     public string? HorizontalAlignment
@@ -61,6 +66,7 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Gets a value indicating whether this range is protected.
     /// 取得一個值，指出此範圍是否已啟用保護。
     /// </summary>
     public bool IsProtected
@@ -75,9 +81,10 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Protects this range with the specified password and writes it to the protected range map of the worksheet.
     /// 以指定密碼保護此範圍，將其寫入工作表的受保護範圍對照表中。
     /// </summary>
-    /// <param name="password">密碼明文</param>
+    /// <param name="password">The plain text password. / 密碼明文。</param>
     public void Protect(string password)
     {
         var rangesNode = _sheet.TableNode.Children.Find(c =>
@@ -105,6 +112,7 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Removes protection from this range.
     /// 解除此範圍的保護。
     /// </summary>
     public void Unprotect()
@@ -122,10 +130,11 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Verifies whether the given password can unlock this range.
     /// 驗證給定密碼是否能解除此範圍的保護。
     /// </summary>
-    /// <param name="password">要驗證的密碼</param>
-    /// <returns>若驗證成功則為 true，否則為 false</returns>
+    /// <param name="password">The password to verify. / 要驗證的密碼。</param>
+    /// <returns><see langword="true"/> if verification succeeds; otherwise, <see langword="false"/>. / 若驗證成功則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool VerifyPassword(string password)
     {
         var node = FindProtectedRangeNode();
@@ -135,10 +144,11 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Attempts to remove protection from this range with the specified password.
     /// 嘗試以指定密碼解除此範圍的保護。
     /// </summary>
-    /// <param name="password">密碼明文</param>
-    /// <returns>若解除成功則為 true，否則為 false</returns>
+    /// <param name="password">The plain text password. / 密碼明文。</param>
+    /// <returns><see langword="true"/> if protection is removed successfully; otherwise, <see langword="false"/>. / 若解除成功則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool TryUnprotect(string password)
     {
         if (!IsProtected)
@@ -170,6 +180,7 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Merges the cells in this range.
     /// 合併此範圍的儲存格。
     /// </summary>
     public void Merge()
@@ -178,6 +189,7 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Unmerges the cells in this range.
     /// 取消合併此範圍的儲存格。
     /// </summary>
     public void Unmerge()
@@ -186,28 +198,31 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Adds this range as a named range.
     /// 將此範圍加入命名範圍。
     /// </summary>
-    /// <param name="name">命名範圍名稱</param>
+    /// <param name="name">The named range name. / 命名範圍名稱。</param>
     public void NameAs(string name)
     {
         _sheet.AddNamedRange(name, Range);
     }
 
     /// <summary>
+    /// Adds a filter to this range.
     /// 為此範圍新增篩選。
     /// </summary>
-    /// <param name="name">資料庫範圍名稱</param>
-    /// <param name="conditions">篩選條件</param>
+    /// <param name="name">The database range name. / 資料庫範圍名稱。</param>
+    /// <param name="conditions">The filter conditions. / 篩選條件。</param>
     public void AddFilter(string name, params (int fieldNumber, string op, string value)[] conditions)
     {
         _sheet.AddDatabaseRange(name, Range).SetFilter(conditions);
     }
 
     /// <summary>
+    /// Enables auto-filter buttons for this range.
     /// 為此範圍啟用自動篩選按鈕。
     /// </summary>
-    /// <returns>此範圍選取物件，方便鏈式呼叫</returns>
+    /// <returns>This range selection object for chaining. / 此範圍選取物件，方便鏈式呼叫。</returns>
     public OdfCellRangeSelection AutoFilter()
     {
         _sheet.AutoFilter(Range);
@@ -215,10 +230,11 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Sets sort rules for this range.
     /// 為此範圍設定排序規則。
     /// </summary>
-    /// <param name="rules">排序規則陣列，包含欄位編號與是否遞增</param>
-    /// <returns>此範圍選取物件，方便鏈式呼叫</returns>
+    /// <param name="rules">The sort rule array, containing field numbers and whether each field is ascending. / 排序規則陣列，包含欄位編號與是否遞增。</param>
+    /// <returns>This range selection object for chaining. / 此範圍選取物件，方便鏈式呼叫。</returns>
     public OdfCellRangeSelection Sort(params (int fieldNumber, bool ascending)[] rules)
     {
         _sheet.Sort(Range, rules);
@@ -226,20 +242,22 @@ public sealed class OdfCellRangeSelection
     }
 
     /// <summary>
+    /// Adds conditional formatting to this range.
     /// 為此範圍新增條件格式。
     /// </summary>
-    /// <param name="condition">條件運算式</param>
-    /// <param name="styleName">套用的樣式名稱</param>
+    /// <param name="condition">The condition expression. / 條件運算式。</param>
+    /// <param name="styleName">The style name to apply. / 套用的樣式名稱。</param>
     public void AddConditionalFormat(string condition, string styleName)
     {
         _sheet.AddConditionalFormat(Range, condition, styleName);
     }
 
     /// <summary>
+    /// Adds list-based data validation to this range.
     /// 為此範圍新增清單型資料驗證。
     /// </summary>
-    /// <param name="name">驗證規則名稱</param>
-    /// <param name="allowedValues">允許的值</param>
+    /// <param name="name">The validation rule name. / 驗證規則名稱。</param>
+    /// <param name="allowedValues">The allowed values. / 允許的值。</param>
     public void AddValidationList(string name, params string[] allowedValues)
     {
         _sheet.AddValidationList(Range, name, allowedValues);

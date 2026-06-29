@@ -48,9 +48,10 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Gets the default content XML string.
     /// 取得預設的內容 XML 字串。
     /// </summary>
-    /// <returns>預設的內容 XML 字串</returns>
+    /// <returns>The default content XML string. / 預設的內容 XML 字串。</returns>
     protected override string GetDefaultContentXml()
     {
         return "<office:document-content " +
@@ -73,9 +74,10 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Gets the default styles XML string.
     /// 取得預設的樣式 XML 字串。
     /// </summary>
-    /// <returns>預設的樣式 XML 字串</returns>
+    /// <returns>The default styles XML string. / 預設的樣式 XML 字串。</returns>
     protected override string GetDefaultStylesXml()
     {
         return "<office:document-styles " +
@@ -100,12 +102,13 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Merges content nodes from the source document into this document.
     /// 合併來源文件的內容節點至本文件中。
     /// </summary>
-    /// <param name="sourceDoc">來源 ODF 文件</param>
-    /// <param name="options">合併設定選項</param>
-    /// <param name="renameMap">樣式名稱變更的對照字典</param>
-    /// <exception cref="ArgumentException">來源文件非簡報文件時拋出</exception>
+    /// <param name="sourceDoc">The source ODF document. / 來源 ODF 文件。</param>
+    /// <param name="options">The merge options. / 合併設定選項。</param>
+    /// <param name="renameMap">The style rename map. / 樣式名稱變更的對照字典。</param>
+    /// <exception cref="ArgumentException">Thrown when the source document is not a presentation document. / 來源文件非簡報文件時拋出。</exception>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
         var srcPres = sourceDoc as PresentationDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_PresentationDocument_SourceDocumentPresentationdocument"));
@@ -125,12 +128,13 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Finds a specified child element node.
     /// 尋找指定的子元素節點。
     /// </summary>
-    /// <param name="parent">要尋找的父節點</param>
-    /// <param name="localName">區域名稱</param>
-    /// <param name="nsUri">命名空間 URI</param>
-    /// <returns>尋找到的子節點，若未找到則為 <c>null</c></returns>
+    /// <param name="parent">The parent node to search. / 要尋找的父節點。</param>
+    /// <param name="localName">The local name. / 區域名稱。</param>
+    /// <param name="nsUri">The namespace URI. / 命名空間 URI。</param>
+    /// <returns>The found child node, or <see langword="null"/> if none is found. / 尋找到的子節點，若未找到則為 <see langword="null"/>。</returns>
     public OdfNode? FindChildElement(OdfNode parent, string localName, string nsUri)
     {
         foreach (var child in parent.Children)
@@ -146,11 +150,12 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Adds a master page.
     /// 新增母片（Master Page）。
     /// </summary>
-    /// <param name="name">母片名稱</param>
-    /// <param name="pageLayoutName">頁面版面配置名稱</param>
-    /// <exception cref="ArgumentException">引數為 null 或空字串時拋出</exception>
+    /// <param name="name">The master page name. / 母片名稱。</param>
+    /// <param name="pageLayoutName">The page layout name. / 頁面版面配置名稱。</param>
+    /// <exception cref="ArgumentException">Thrown when an argument is <see langword="null"/> or an empty string. / 引數為 <see langword="null"/> 或空字串時拋出。</exception>
     public void AddMasterPage(string name, string pageLayoutName)
     {
         if (string.IsNullOrEmpty(name))
@@ -177,10 +182,11 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Creates a presentation page layout.
     /// 建立新的投影片版面配置（Presentation Page Layout）。
     /// </summary>
-    /// <param name="name">版面配置名稱</param>
-    /// <returns>新增的投影片版面配置執行個體</returns>
+    /// <param name="name">The layout name. / 版面配置名稱。</param>
+    /// <returns>The added presentation page layout instance. / 新增的投影片版面配置執行個體。</returns>
     public OdfPresentationPageLayout CreatePresentationPageLayout(string name)
     {
         var autoStyles = FindChildElement(StylesRoot, "automatic-styles", OdfNamespaces.Office);
@@ -196,10 +202,11 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Gets the specified presentation page layout.
     /// 取得指定的投影片版面配置。
     /// </summary>
-    /// <param name="name">版面配置名稱</param>
-    /// <returns>投影片版面配置執行個體，若不存在則為 <c>null</c></returns>
+    /// <param name="name">The layout name. / 版面配置名稱。</param>
+    /// <returns>The presentation page layout instance, or <see langword="null"/> if it does not exist. / 投影片版面配置執行個體，若不存在則為 <see langword="null"/>。</returns>
     public OdfPresentationPageLayout? GetPresentationPageLayout(string name)
     {
         // 優先搜尋 ContentDom
@@ -234,6 +241,7 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Gets the presentation handout page.
     /// 取得簡報的講義頁面（Handout Page）。
     /// </summary>
     public OdfHandoutPage HandoutPage

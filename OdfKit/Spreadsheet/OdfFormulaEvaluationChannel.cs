@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Decouples spreadsheet cell writes from formula recalculation through an asynchronous channel.
 /// 以非同步通道解耦試算表儲存格寫入與公式重算。
 /// </summary>
 public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
@@ -47,19 +48,22 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Gets the number of recalculation requests submitted to the channel.
     /// 取得已送入通道的重算請求數。
     /// </summary>
     public int SubmittedCount => Volatile.Read(ref _submittedCount);
 
     /// <summary>
+    /// Gets the number of recalculation requests that have completed processing.
     /// 取得已完成處理的重算請求數。
     /// </summary>
     public int CompletedCount => Volatile.Read(ref _completedCount);
 
     /// <summary>
+    /// Attempts to submit a formula recalculation request without blocking.
     /// 嘗試以非阻塞方式送出公式重算請求。
     /// </summary>
-    /// <returns>若請求已送入通道則為 <see langword="true"/></returns>
+    /// <returns><see langword="true"/> if the request was submitted to the channel. / 若請求已送入通道則為 <see langword="true"/>。</returns>
     public bool TryEnqueue()
     {
         ThrowIfDisposed();
@@ -76,10 +80,11 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Asynchronously submits a formula recalculation request.
     /// 以非同步方式送出公式重算請求。
     /// </summary>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表送出作業的 <see cref="ValueTask"/></returns>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>A <see cref="ValueTask"/> that represents the submit operation. / 代表送出作業的 <see cref="ValueTask"/>。</returns>
     public async ValueTask EnqueueAsync(CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
@@ -95,11 +100,12 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Waits until currently submitted recalculation requests are completed.
     /// 等待目前已送出的重算請求完成。
     /// </summary>
-    /// <param name="timeout">最長等待時間</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表等待作業的工作</returns>
+    /// <param name="timeout">The maximum wait time. / 最長等待時間。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>A task that represents the wait operation. / 代表等待作業的工作。</returns>
     public async Task WaitForIdleAsync(TimeSpan timeout, CancellationToken cancellationToken = default)
     {
         DateTimeOffset deadline = DateTimeOffset.UtcNow + timeout;

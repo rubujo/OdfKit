@@ -8,10 +8,11 @@ namespace OdfKit.Spreadsheet;
 public partial class OdfCell
 {
     /// <summary>
+    /// Parses and appends an HTML inline rich text fragment to the end of the cell text.
     /// 在儲存格文字結尾解析並追加 HTML 行內富文字片段。
     /// </summary>
-    /// <param name="html">要解析的 HTML 行內片段</param>
-    /// <returns>目前儲存格，方便鏈式呼叫</returns>
+    /// <param name="html">The HTML inline fragment to parse. / 要解析的 HTML 行內片段。</param>
+    /// <returns>The current cell for chaining. / 目前儲存格，方便鏈式呼叫。</returns>
     public OdfCell AppendHtml(string html)
     {
         AppendInlineHtml(html);
@@ -19,10 +20,11 @@ public partial class OdfCell
     }
 
     /// <summary>
+    /// Parses and appends a Markdown inline rich text fragment to the end of the cell text.
     /// 在儲存格文字結尾解析並追加 Markdown 行內富文字片段。
     /// </summary>
-    /// <param name="markdown">要解析的 Markdown 行內文字</param>
-    /// <returns>目前儲存格，方便鏈式呼叫</returns>
+    /// <param name="markdown">The Markdown inline text to parse. / 要解析的 Markdown 行內文字。</param>
+    /// <returns>The current cell for chaining. / 目前儲存格，方便鏈式呼叫。</returns>
     public OdfCell AppendMarkdown(string markdown)
     {
         AppendInlineHtml(TextDocumentHtmlFragmentEngine.ConvertMarkdownInlineToHtml(markdown));

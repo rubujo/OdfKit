@@ -13,10 +13,11 @@ public partial class SpreadsheetDocument
     #region Workbook & Sheet Management
 
     /// <summary>
+    /// Adds a worksheet with the specified name.
     /// 新增指定名稱的工作表。
     /// </summary>
-    /// <param name="name">工作表名稱</param>
-    /// <returns>新增的 <see cref="OdfTableSheet"/> 執行個體</returns>
+    /// <param name="name">The name or identifier. / 工作表名稱</param>
+    /// <returns>The result. / 新增的 <see cref="OdfTableSheet"/> 執行個體</returns>
     public OdfTableSheet AddSheet(string name)
     {
         var table = new TableTableElement("table");
@@ -26,12 +27,13 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Adopts a worksheet from another document or the same document at the end of this workbook.
     /// 將另一份文件或同一份文件中的工作表採納到此活頁簿末尾。
     /// </summary>
-    /// <param name="sheet">要採納的來源工作表</param>
-    /// <param name="newName">採納後選用的新工作表名稱；未指定時保留來源名稱</param>
-    /// <returns>採納完成且屬於此文件的工作表</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="sheet"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <param name="sheet">The value to use. / 要採納的來源工作表</param>
+    /// <param name="newName">The name or identifier. / 採納後選用的新工作表名稱；未指定時保留來源名稱</param>
+    /// <returns>The result. / 採納完成且屬於此文件的工作表</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="sheet"/> 為 <see langword="null"/> 時擲出</exception>
     /// <remarks>
     /// 此方法沿用 <see cref="OdfDocument.AdoptNode(OdfDocument, OdfNode)"/> 的低分配採納路徑，
     /// 會將來源工作表節點自原本活頁簿移除、遷移媒體參照，並更新節點文件所有權與命名空間前綴。
@@ -54,10 +56,11 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Gets the worksheet with the specified name.
     /// 取得指定名稱的工作表。
     /// </summary>
-    /// <param name="name">工作表名稱</param>
-    /// <returns>找不到則傳回 null</returns>
+    /// <param name="name">The name or identifier. / 工作表名稱</param>
+    /// <returns>The result. / 找不到則傳回 null</returns>
     public OdfTableSheet? GetSheet(string name)
     {
         foreach (var child in SheetsRoot.Children)
@@ -72,9 +75,10 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Gets all worksheets in the current workbook.
     /// 取得目前活頁簿中所有的工作表。
     /// </summary>
-    /// <returns>工作表唯讀清單</returns>
+    /// <returns>The result. / 工作表唯讀清單</returns>
     public IReadOnlyList<OdfTableSheet> GetSheets()
     {
         var list = new List<OdfTableSheet>();
@@ -89,6 +93,7 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Gets a value indicating whether the workbook structure is protected.
     /// 取得一個值，指出活頁簿結構是否受到保護。
     /// </summary>
     public bool WorkbookStructureProtected
@@ -101,9 +106,10 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Enables workbook protection and stores the hashed protection password.
     /// 啟用活頁簿保護，並設定雜湊後的保護密碼。
     /// </summary>
-    /// <param name="password">密碼明文</param>
+    /// <param name="password">The password text. / 密碼明文</param>
     public void ProtectWorkbook(string password)
     {
         byte[] salt = new byte[16];
@@ -160,10 +166,11 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Verifies whether the specified workbook password is valid.
     /// 驗證指定的活頁簿密碼是否正確。
     /// </summary>
-    /// <param name="password">要驗證的密碼</param>
-    /// <returns>若驗證成功則為 true，否則為 false</returns>
+    /// <param name="password">The password text. / 要驗證的密碼</param>
+    /// <returns>The result. / 若驗證成功則為 true，否則為 false</returns>
     public bool VerifyWorkbookPassword(string password)
     {
         if (!WorkbookStructureProtected)
@@ -243,12 +250,13 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Merges content nodes from the source document.
     /// 合併來源文件的內容節點。
     /// </summary>
-    /// <param name="sourceDoc">來源文件</param>
-    /// <param name="options">合併選項</param>
-    /// <param name="renameMap">重命名對照表</param>
-    /// <exception cref="ArgumentException">當來源文件類型不正確時擲出</exception>
+    /// <param name="sourceDoc">The value to use. / 來源文件</param>
+    /// <param name="options">The value to use. / 合併選項</param>
+    /// <param name="renameMap">The name or identifier. / 重命名對照表</param>
+    /// <exception cref="ArgumentException">Thrown when the documented condition occurs. / 當來源文件類型不正確時擲出</exception>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
         var srcSpreadsheet = sourceDoc as SpreadsheetDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SourceDocumentSpreadsheetdocument"));

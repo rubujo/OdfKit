@@ -16,77 +16,89 @@ public partial class SpreadsheetDocument
     #region Named Ranges, Charts & Validation
 
     /// <summary>
+    /// Gets summaries for all data validation rules in the spreadsheet.
     /// 取得試算表中所有資料驗證規則的摘要清單。
     /// </summary>
     public IReadOnlyList<OdfDataValidationInfo> GetDataValidations() =>
         SpreadsheetDocumentDataValidationReadEngine.GetDataValidations(this);
 
     /// <summary>
+    /// Gets summaries for all embedded charts in the spreadsheet.
     /// 取得試算表中所有嵌入圖表的摘要清單。
     /// </summary>
     public IReadOnlyList<OdfEmbeddedChartInfo> GetEmbeddedCharts() =>
         SpreadsheetDocumentEmbeddedChartReadEngine.GetEmbeddedCharts(this);
 
     /// <summary>
+    /// Gets summaries for LibreOffice calcext conditional formatting rules across all worksheets in the spreadsheet.
     /// 取得試算表中所有工作表的 LibreOffice calcext 條件格式規則摘要清單。
     /// </summary>
     public IReadOnlyList<OdfConditionalFormatInfo> GetConditionalFormats() =>
         SpreadsheetDocumentConditionalFormatReadEngine.GetConditionalFormats(this);
 
     /// <summary>
+    /// Gets summaries for LibreOffice calcext sparkline groups across all worksheets in the spreadsheet.
     /// 取得試算表中所有工作表的 LibreOffice calcext 走勢圖群組摘要清單。
     /// </summary>
     public IReadOnlyList<OdfSparklineGroupInfo> GetSparklineGroups() =>
         SpreadsheetDocumentConditionalFormatReadEngine.GetSparklineGroups(this);
 
     /// <summary>
+    /// Gets summaries for all named ranges in the spreadsheet, including document-level and worksheet-level ranges.
     /// 取得試算表中所有命名範圍的摘要清單（含文件層與各工作表層）。
     /// </summary>
     public IReadOnlyList<OdfNamedRangeInfo> GetNamedRanges() =>
         SpreadsheetDocumentNamedRangeReadEngine.GetNamedRanges(this);
 
     /// <summary>
+    /// Gets summaries for all named expressions in the spreadsheet, including document-level and worksheet-level expressions.
     /// 取得試算表中所有具名運算式的摘要清單（含文件層與各工作表層）。
     /// </summary>
     public IReadOnlyList<OdfNamedExpressionInfo> GetNamedExpressions() =>
         SpreadsheetDocumentNamedRangeReadEngine.GetNamedExpressions(this);
 
     /// <summary>
+    /// Gets summaries for all database ranges in the spreadsheet.
     /// 取得試算表中所有資料庫範圍的摘要清單。
     /// </summary>
     public IReadOnlyList<OdfDatabaseRangeInfo> GetDatabaseRanges() =>
         SpreadsheetDocumentDatabaseRangeReadEngine.GetDatabaseRanges(this);
 
     /// <summary>
+    /// Gets summaries for all worksheets in the spreadsheet that define print areas.
     /// 取得試算表中所有已設定列印範圍的工作表摘要清單。
     /// </summary>
     public IReadOnlyList<OdfSheetPrintAreaInfo> GetPrintAreas() =>
         SpreadsheetDocumentPrintAreaReadEngine.GetPrintAreas(this);
 
     /// <summary>
+    /// Gets summaries for pivot tables across all worksheets in the spreadsheet.
     /// 取得試算表中所有工作表的樞紐分析表摘要清單。
     /// </summary>
     public IReadOnlyList<OdfPivotTableInfo> GetPivotTables() =>
         SpreadsheetDocumentPivotTableReadEngine.GetPivotTables(this);
 
     /// <summary>
+    /// Gets summaries for all worksheets in the spreadsheet that define frozen panes.
     /// 取得試算表中所有已設定凍結窗格的工作表摘要清單。
     /// </summary>
     public IReadOnlyList<OdfSheetFrozenPanesInfo> GetFrozenPanes() =>
         SpreadsheetDocumentFrozenPanesReadEngine.GetFrozenPanes(this);
 
     /// <summary>
+    /// Gets summaries for all worksheets in the spreadsheet that define split panes.
     /// 取得試算表中所有已設定分割窗格的工作表摘要清單。
     /// </summary>
     public IReadOnlyList<OdfSheetSplitPanesInfo> GetSplitPanes() =>
         SpreadsheetDocumentSplitPanesReadEngine.GetSplitPanes(this);
 
     /// <summary>
+    /// Adds a named range.
     /// 新增命名範圍。
     /// </summary>
-    /// <param name="name">命名範圍的名稱</param>
-    /// <param name="range">儲存格範圍</param>
-    /// <param name="baseCell">基準儲存格位址</param>
+    /// <param name="name">The name or identifier. / 命名範圍的名稱</param>
+    /// <param name="range">The cell range. / 儲存格範圍</param>
+    /// <param name="baseCell">The cell address. / 基準儲存格位址</param>
     public void AddNamedRange(string name, OdfCellRange range, OdfCellAddress? baseCell = null)
     {
         var namedExpressions = FindOrCreateChild(SheetsRoot, "named-expressions", OdfNamespaces.Table, "table");
@@ -101,11 +113,12 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Adds a named expression.
     /// 新增具名運算式。
     /// </summary>
-    /// <param name="name">具名運算式的名稱</param>
-    /// <param name="expression">公式運算式字串</param>
-    /// <param name="baseCell">基準儲存格位址</param>
+    /// <param name="name">The name or identifier. / 具名運算式的名稱</param>
+    /// <param name="expression">The value to use. / 公式運算式字串</param>
+    /// <param name="baseCell">The cell address. / 基準儲存格位址</param>
     public void AddNamedExpression(string name, string expression, OdfCellAddress? baseCell = null)
     {
         var namedExpressions = FindOrCreateChild(SheetsRoot, "named-expressions", OdfNamespaces.Table, "table");
@@ -120,11 +133,12 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Adds a database range.
     /// 新增資料庫範圍。
     /// </summary>
-    /// <param name="name">資料庫範圍名稱</param>
-    /// <param name="range">目標儲存格範圍</param>
-    /// <returns>新增的 <see cref="OdfDatabaseRange"/> 執行個體</returns>
+    /// <param name="name">The name or identifier. / 資料庫範圍名稱</param>
+    /// <param name="range">The cell range. / 目標儲存格範圍</param>
+    /// <returns>The result. / 新增的 <see cref="OdfDatabaseRange"/> 執行個體</returns>
     public OdfDatabaseRange AddDatabaseRange(string name, OdfCellRange range)
     {
         var databaseRanges = FindOrCreateChild(SheetsRoot, "database-ranges", OdfNamespaces.Table, "table");
@@ -136,11 +150,12 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Inserts a chart at the specified cell position in a worksheet.
     /// 在指定工作表的儲存格位置插入圖表。
     /// </summary>
-    /// <param name="sheetName">工作表名稱</param>
-    /// <param name="anchor">圖表左上角錨定的儲存格位置</param>
-    /// <param name="chart">圖表設定物件</param>
+    /// <param name="sheetName">The name or identifier. / 工作表名稱</param>
+    /// <param name="anchor">The cell address. / 圖表左上角錨定的儲存格位置</param>
+    /// <param name="chart">The value to use. / 圖表設定物件</param>
     public void AddChart(string sheetName, OdfCellAddress anchor, OdfChartDefinition chart)
     {
         if (string.IsNullOrEmpty(sheetName))
@@ -321,10 +336,11 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Adds a data validation rule to the specified worksheet.
     /// 在指定的工作表中新增資料驗證規則。
     /// </summary>
-    /// <param name="sheetName">工作表名稱</param>
-    /// <param name="validation">資料驗證設定物件</param>
+    /// <param name="sheetName">The name or identifier. / 工作表名稱</param>
+    /// <param name="validation">The value to use. / 資料驗證設定物件</param>
     public void AddDataValidation(string sheetName, OdfDataValidation validation)
     {
         if (string.IsNullOrEmpty(sheetName))

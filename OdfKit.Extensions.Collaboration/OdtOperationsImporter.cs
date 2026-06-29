@@ -6,6 +6,7 @@ using OdfKit.Text;
 namespace OdfKit.Collaboration;
 
 /// <summary>
+/// Applies odt operations importer.
 /// 將 ODF Toolkit 相容的 JSON operations 序列單向 merge 至 <see cref="TextDocument"/>。
 /// </summary>
 /// <remarks>
@@ -16,11 +17,12 @@ namespace OdfKit.Collaboration;
 public static class OdtOperationsImporter
 {
     /// <summary>
+    /// Applies merge.
     /// 將 JSON operations 陣列字串重播至新建立的文字文件。
     /// </summary>
-    /// <param name="operationsJson">JSON operations 陣列字串</param>
-    /// <returns>套用 operations 後的文字文件</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="operationsJson"/> 為 null 時擲出</exception>
+    /// <param name="operationsJson">The value to use. / JSON operations 陣列字串</param>
+    /// <returns>The result. / 套用 operations 後的文字文件</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="operationsJson"/> 為 null 時擲出</exception>
     public static TextDocument Merge(string operationsJson)
     {
         TextDocument document = TextDocument.Create();
@@ -29,13 +31,14 @@ public static class OdtOperationsImporter
     }
 
     /// <summary>
+    /// Applies merge.
     /// 將 JSON operations 字串重播至新建立的文字文件，並回傳匯入診斷。
     /// </summary>
-    /// <param name="operationsJson">JSON operations 陣列或 TDF changes 封包字串</param>
-    /// <param name="options">ODF Toolkit 相容選項；若為 <see langword="null"/>，則使用預設診斷策略</param>
-    /// <param name="report">匯入重播與相容性診斷結果</param>
-    /// <returns>套用 operations 後的文字文件</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="operationsJson"/> 為 null 時擲出</exception>
+    /// <param name="operationsJson">The value to use. / JSON operations 陣列或 TDF changes 封包字串</param>
+    /// <param name="options">The value to use. / ODF Toolkit 相容選項；若為 <see langword="null"/>，則使用預設診斷策略</param>
+    /// <param name="report">The value to use. / 匯入重播與相容性診斷結果</param>
+    /// <returns>The result. / 套用 operations 後的文字文件</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="operationsJson"/> 為 null 時擲出</exception>
     public static TextDocument Merge(
         string operationsJson,
         OdtOperationCompatibilityOptions? options,
@@ -47,22 +50,24 @@ public static class OdtOperationsImporter
     }
 
     /// <summary>
+    /// Applies merge.
     /// 將 JSON operations 陣列字串重播至既有的文字文件結尾。
     /// </summary>
-    /// <param name="document">目標文字文件</param>
-    /// <param name="operationsJson">JSON operations 陣列字串</param>
-    /// <exception cref="ArgumentNullException">當任一參數為 null 時擲出</exception>
+    /// <param name="document">The source or target object. / 目標文字文件</param>
+    /// <param name="operationsJson">The value to use. / JSON operations 陣列字串</param>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當任一參數為 null 時擲出</exception>
     public static void Merge(TextDocument document, string operationsJson)
         => Merge(document, operationsJson, null);
 
     /// <summary>
+    /// Applies merge.
     /// 將 JSON operations 字串重播至既有的文字文件結尾，並回傳匯入診斷。
     /// </summary>
-    /// <param name="document">目標文字文件</param>
-    /// <param name="operationsJson">JSON operations 陣列或 TDF changes 封包字串</param>
-    /// <param name="options">ODF Toolkit 相容選項；若為 <see langword="null"/>，則使用預設診斷策略</param>
-    /// <returns>匯入重播與相容性診斷結果</returns>
-    /// <exception cref="ArgumentNullException">當任一必要參數為 null 時擲出</exception>
+    /// <param name="document">The source or target object. / 目標文字文件</param>
+    /// <param name="operationsJson">The value to use. / JSON operations 陣列或 TDF changes 封包字串</param>
+    /// <param name="options">The value to use. / ODF Toolkit 相容選項；若為 <see langword="null"/>，則使用預設診斷策略</param>
+    /// <returns>The result. / 匯入重播與相容性診斷結果</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當任一必要參數為 null 時擲出</exception>
     public static OdtOperationImportReport Merge(
         TextDocument document,
         string operationsJson,

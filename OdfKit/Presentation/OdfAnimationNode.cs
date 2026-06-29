@@ -6,17 +6,20 @@ using OdfKit.Styles;
 namespace OdfKit.Presentation;
 
 /// <summary>
+/// Represents an ODF animation node.
 /// 表示 ODF 動畫節點的類別。
 /// </summary>
-/// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
+/// <param name="node">The underlying <see cref="OdfNode"/> instance. / 底層的 <see cref="OdfNode"/> 執行個體。</param>
 public class OdfAnimationNode(OdfNode node)
 {
     /// <summary>
+    /// Gets the underlying ODF node.
     /// 取得底層的 ODF 節點。
     /// </summary>
     public OdfNode Node { get; } = node;
 
     /// <summary>
+    /// Gets the animation node type.
     /// 取得動畫節點的型態。
     /// </summary>
     public OdfAnimationNodeType Type
@@ -34,6 +37,7 @@ public class OdfAnimationNode(OdfNode node)
     }
 
     /// <summary>
+    /// Gets or sets the animation start time or trigger condition.
     /// 取得或設定動畫的開始時間或觸發條件。
     /// </summary>
     public string? Begin
@@ -53,6 +57,7 @@ public class OdfAnimationNode(OdfNode node)
     }
 
     /// <summary>
+    /// Gets or sets the animation duration.
     /// 取得或設定動畫的持續時間。
     /// </summary>
     public string? Dur
@@ -72,6 +77,7 @@ public class OdfAnimationNode(OdfNode node)
     }
 
     /// <summary>
+    /// Gets or sets the animation target element identifier.
     /// 取得或設定動畫的目標元素識別碼。
     /// </summary>
     public string? TargetElement
@@ -91,6 +97,7 @@ public class OdfAnimationNode(OdfNode node)
     }
 
     /// <summary>
+    /// Gets the read-only list of child animation nodes.
     /// 取得子動畫節點的唯讀清單。
     /// </summary>
     public IReadOnlyList<OdfAnimationNode> Children
@@ -110,10 +117,11 @@ public class OdfAnimationNode(OdfNode node)
     }
 
     /// <summary>
+    /// Adds a sequential animation sequence.
     /// 新增一個順序動畫序列。
     /// </summary>
-    /// <param name="begin">開始時間的屬性值</param>
-    /// <returns>新增的順序動畫序列節點</returns>
+    /// <param name="begin">The start-time attribute value. / 開始時間的屬性值。</param>
+    /// <returns>The added sequential animation sequence node. / 新增的順序動畫序列節點。</returns>
     public OdfAnimationNode AddSequence(string? begin = null)
     {
         OdfNode seq = new(OdfNodeType.Element, "seq", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
@@ -126,10 +134,11 @@ public class OdfAnimationNode(OdfNode node)
     }
 
     /// <summary>
+    /// Adds a parallel animation sequence.
     /// 新增一個並行動畫序列。
     /// </summary>
-    /// <param name="begin">開始時間的屬性值</param>
-    /// <returns>新增的並行動畫序列節點</returns>
+    /// <param name="begin">The start-time attribute value. / 開始時間的屬性值。</param>
+    /// <returns>The added parallel animation sequence node. / 新增的並行動畫序列節點。</returns>
     public OdfAnimationNode AddParallel(string? begin = null)
     {
         OdfNode par = new(OdfNodeType.Element, "par", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");
@@ -142,13 +151,14 @@ public class OdfAnimationNode(OdfNode node)
     }
 
     /// <summary>
+    /// Adds an animation effect.
     /// 新增一個動畫效果。
     /// </summary>
-    /// <param name="effectType">動畫效果類型</param>
-    /// <param name="targetElementId">目標元素識別碼</param>
-    /// <param name="duration">持續時間</param>
-    /// <param name="delay">延遲時間</param>
-    /// <returns>新增的動畫效果節點</returns>
+    /// <param name="effectType">The animation effect type. / 動畫效果類型。</param>
+    /// <param name="targetElementId">The target element identifier. / 目標元素識別碼。</param>
+    /// <param name="duration">The duration. / 持續時間。</param>
+    /// <param name="delay">The delay. / 延遲時間。</param>
+    /// <returns>The added animation effect node. / 新增的動畫效果節點。</returns>
     public OdfAnimationNode AddEffect(OdfAnimationType effectType, string targetElementId, OdfLength duration, OdfLength delay)
     {
         OdfNode filter = new(OdfNodeType.Element, "transitionFilter", "urn:oasis:names:tc:opendocument:xmlns:animation:1.0", "anim");

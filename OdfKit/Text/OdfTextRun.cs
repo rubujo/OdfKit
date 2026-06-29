@@ -6,6 +6,7 @@ using OdfKit.Styles;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf text run.
 /// 表示段落中的文字片段（Span）。
 /// </summary>
 public class OdfTextRun
@@ -24,6 +25,7 @@ public class OdfTextRun
     private readonly TextDocument _doc;
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的內文。
     /// </summary>
     public string Text
@@ -33,6 +35,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的樣式名稱。
     /// </summary>
     public string? StyleName
@@ -49,6 +52,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的西文字型名稱。
     /// </summary>
     public string? FontName
@@ -58,6 +62,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的西文字型大小。
     /// </summary>
     public string? FontSize
@@ -67,11 +72,12 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets set font.
     /// 設定文字片段的字型名稱。
     /// </summary>
-    /// <param name="westernFont">西文字型名稱</param>
-    /// <param name="asianFont">東亞（中日韓）字型名稱</param>
-    /// <param name="complexFont">複雜文字字型名稱</param>
+    /// <param name="westernFont">The value to use. / 西文字型名稱</param>
+    /// <param name="asianFont">The value to use. / 東亞（中日韓）字型名稱</param>
+    /// <param name="complexFont">The value to use. / 複雜文字字型名稱</param>
     public void SetFont(string westernFont, string? asianFont = null, string? complexFont = null)
     {
         FontName = westernFont;
@@ -80,11 +86,12 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets set font size.
     /// 設定文字片段的字型大小。
     /// </summary>
-    /// <param name="westernSize">西文字型大小</param>
-    /// <param name="asianSize">東亞字型大小</param>
-    /// <param name="complexSize">複雜文字字型大小</param>
+    /// <param name="westernSize">The numeric value. / 西文字型大小</param>
+    /// <param name="asianSize">The numeric value. / 東亞字型大小</param>
+    /// <param name="complexSize">The numeric value. / 複雜文字字型大小</param>
     public void SetFontSize(string westernSize, string? asianSize = null, string? complexSize = null)
     {
         FontSize = westernSize;
@@ -93,6 +100,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定一個值，指出文字片段是否為粗體。
     /// </summary>
     public bool IsBold
@@ -102,6 +110,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定一個值，指出文字片段是否為斜體。
     /// </summary>
     public bool IsItalic
@@ -111,6 +120,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定一個值，指出文字片段是否加上底線。
     /// </summary>
     public bool IsUnderline
@@ -120,6 +130,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定一個值，指出文字片段是否加上刪除線。
     /// </summary>
     public bool IsStrikethrough
@@ -129,6 +140,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的位置，例如 <c>baseline</c>、<c>super</c> 或 <c>sub</c>。
     /// </summary>
     public string? TextPosition
@@ -138,6 +150,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定一個值，指出文字片段是否為上標。
     /// </summary>
     public bool IsSuperscript
@@ -147,6 +160,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定一個值，指出文字片段是否為下標。
     /// </summary>
     public bool IsSubscript
@@ -156,6 +170,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的字色。
     /// </summary>
     public string? Color
@@ -165,6 +180,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的背景色。
     /// </summary>
     public string? BackgroundColor
@@ -174,6 +190,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字大小寫轉換，例如 <c>uppercase</c>。
     /// </summary>
     public string? TextTransform
@@ -183,6 +200,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定字型變體，例如 <c>small-caps</c>。
     /// </summary>
     public string? FontVariant
@@ -192,6 +210,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的東亞（中日韓）字型名稱。
     /// </summary>
     public string? FontNameAsian
@@ -201,6 +220,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的複雜文字字型名稱。
     /// </summary>
     public string? FontNameComplex
@@ -210,6 +230,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的東亞（中日韓）字型大小。
     /// </summary>
     public string? FontSizeAsian
@@ -219,6 +240,7 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文字片段的複雜文字字型大小。
     /// </summary>
     public string? FontSizeComplex
@@ -230,6 +252,7 @@ public class OdfTextRun
     private string GetStyleName() => Node.GetAttribute("style-name", OdfNamespaces.Text) ?? string.Empty;
 
     /// <summary>
+    /// Removes delete.
     /// 刪除此文字片段。
     /// </summary>
     public void Delete()
@@ -238,10 +261,11 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with bold.
     /// 設定此文字片段是否為粗體。
     /// </summary>
-    /// <param name="bold">是否粗體</param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="bold">The value to use. / 是否粗體</param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithBold(bool bold = true)
     {
         IsBold = bold;
@@ -249,10 +273,11 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with italic.
     /// 設定此文字片段是否為斜體。
     /// </summary>
-    /// <param name="italic">是否斜體</param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="italic">The value to use. / 是否斜體</param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithItalic(bool italic = true)
     {
         IsItalic = italic;
@@ -260,10 +285,11 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with strikethrough.
     /// 設定此文字片段是否加上刪除線。
     /// </summary>
-    /// <param name="strikethrough">是否加上刪除線</param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="strikethrough">The value to use. / 是否加上刪除線</param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithStrikethrough(bool strikethrough = true)
     {
         IsStrikethrough = strikethrough;
@@ -271,10 +297,11 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with superscript.
     /// 設定此文字片段是否為上標。
     /// </summary>
-    /// <param name="superscript">是否為上標</param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="superscript">The value to use. / 是否為上標</param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithSuperscript(bool superscript = true)
     {
         IsSuperscript = superscript;
@@ -282,10 +309,11 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with subscript.
     /// 設定此文字片段是否為下標。
     /// </summary>
-    /// <param name="subscript">是否為下標</param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="subscript">The value to use. / 是否為下標</param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithSubscript(bool subscript = true)
     {
         IsSubscript = subscript;
@@ -293,10 +321,11 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with font size.
     /// 設定此文字片段的西文、東亞及複雜字型大小。
     /// </summary>
-    /// <param name="size">字型大小，例如 <c>12pt</c></param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="size">The numeric value. / 字型大小，例如 <c>12pt</c></param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithFontSize(string size)
     {
         SetFontSize(size);
@@ -304,12 +333,13 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with font name.
     /// 設定此文字片段的字型名稱。
     /// </summary>
-    /// <param name="westernFont">西文字型名稱</param>
-    /// <param name="asianFont">東亞（中日韓）字型名稱；未指定時沿用 <paramref name="westernFont"/></param>
-    /// <param name="complexFont">複雜文字字型名稱；未指定時沿用 <paramref name="westernFont"/></param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="westernFont">The value to use. / 西文字型名稱</param>
+    /// <param name="asianFont">The value to use. / 東亞（中日韓）字型名稱；未指定時沿用 <paramref name="westernFont"/></param>
+    /// <param name="complexFont">The value to use. / 複雜文字字型名稱；未指定時沿用 <paramref name="westernFont"/></param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithFontName(string westernFont, string? asianFont = null, string? complexFont = null)
     {
         SetFont(westernFont, asianFont, complexFont);
@@ -317,10 +347,11 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with color.
     /// 設定此文字片段的字色。
     /// </summary>
-    /// <param name="hexColor">十六進位顏色字串，例如 <c>#FF0000</c></param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="hexColor">The value to use. / 十六進位顏色字串，例如 <c>#FF0000</c></param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithColor(string hexColor)
     {
         Color = hexColor;
@@ -328,10 +359,11 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with background color.
     /// 設定此文字片段的背景色。
     /// </summary>
-    /// <param name="hexColor">十六進位顏色字串，例如 <c>#FFFF00</c></param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="hexColor">The value to use. / 十六進位顏色字串，例如 <c>#FFFF00</c></param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithBackgroundColor(string hexColor)
     {
         BackgroundColor = hexColor;
@@ -339,10 +371,11 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with text transform.
     /// 設定此文字片段的大小寫轉換。
     /// </summary>
-    /// <param name="transform">大小寫轉換值，例如 <c>uppercase</c></param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="transform">The delegate to invoke. / 大小寫轉換值，例如 <c>uppercase</c></param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithTextTransform(string transform)
     {
         TextTransform = transform;
@@ -350,10 +383,11 @@ public class OdfTextRun
     }
 
     /// <summary>
+    /// Sets with font variant.
     /// 設定此文字片段的字型變體。
     /// </summary>
-    /// <param name="variant">字型變體值，例如 <c>small-caps</c></param>
-    /// <returns>文字片段本身</returns>
+    /// <param name="variant">The value to use. / 字型變體值，例如 <c>small-caps</c></param>
+    /// <returns>The result. / 文字片段本身</returns>
     public OdfTextRun WithFontVariant(string variant)
     {
         FontVariant = variant;

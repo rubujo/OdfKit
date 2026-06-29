@@ -6,6 +6,7 @@ using OdfKit.Core;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Provides a writer API for a single ODS worksheet XML fragment.
 /// 提供單一 ODS 工作表 XML 片段的寫入 API。
 /// </summary>
 public sealed class OdsSheetWriter
@@ -16,6 +17,7 @@ public sealed class OdsSheetWriter
     internal OdsSheetWriter(XmlWriter writer) => _writer = writer ?? throw new ArgumentNullException(nameof(writer));
 
     /// <summary>
+    /// Starts writing a new data row.
     /// 開始寫入一個新的資料列。
     /// </summary>
     public void WriteStartRow()
@@ -30,6 +32,7 @@ public sealed class OdsSheetWriter
     }
 
     /// <summary>
+    /// Ends writing the current data row.
     /// 結束目前資料列的寫入。
     /// </summary>
     public void WriteEndRow()
@@ -44,9 +47,10 @@ public sealed class OdsSheetWriter
     }
 
     /// <summary>
+    /// Writes a string cell.
     /// 寫入字串型態的儲存格。
     /// </summary>
-    /// <param name="value">儲存格文字</param>
+    /// <param name="value">The cell text. / 儲存格文字。</param>
     public void WriteCell(string value)
     {
         WriteCellStart("string");
@@ -61,9 +65,10 @@ public sealed class OdsSheetWriter
     }
 
     /// <summary>
+    /// Writes a numeric cell.
     /// 寫入數值型態的儲存格。
     /// </summary>
-    /// <param name="value">儲存格數值</param>
+    /// <param name="value">The cell numeric value. / 儲存格數值。</param>
     public void WriteCell(double value)
     {
         string text = value.ToString(CultureInfo.InvariantCulture);
@@ -76,9 +81,10 @@ public sealed class OdsSheetWriter
     }
 
     /// <summary>
+    /// Writes a Boolean cell.
     /// 寫入布林型態的儲存格。
     /// </summary>
-    /// <param name="value">儲存格布林值</param>
+    /// <param name="value">The cell Boolean value. / 儲存格布林值。</param>
     public void WriteCell(bool value)
     {
         WriteCellStart("boolean");

@@ -6,6 +6,7 @@ using OdfKit.Formula.AST;
 namespace OdfKit.Formula;
 
 /// <summary>
+/// Provides OpenFormula support coverage, preservation-safe serialization, and diagnostic helpers.
 /// 提供 OpenFormula 支援範圍、保真序列化與診斷工具。
 /// </summary>
 public static class OdfFormulaSupport
@@ -191,15 +192,17 @@ public static class OdfFormulaSupport
     private static readonly HashSet<string> SupportedFunctionNames = CreateSupportedFunctionSet();
 
     /// <summary>
+    /// Gets the table of functions supported by the default formula evaluator.
     /// 取得預設公式評估器支援的函式表。
     /// </summary>
     public static IReadOnlyList<OdfFormulaFunctionInfo> SupportedFunctions => FunctionTable;
 
     /// <summary>
+    /// Determines whether the default evaluator supports the specified function.
     /// 判斷預設評估器是否支援指定函式。
     /// </summary>
-    /// <param name="name">函式名稱</param>
-    /// <returns>若支援則為 true，否則為 false</returns>
+    /// <param name="name">The function name. / 函式名稱。</param>
+    /// <returns>True when the function is supported; otherwise, false. / 若支援則為 true，否則為 false。</returns>
     public static bool IsFunctionSupported(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -211,10 +214,11 @@ public static class OdfFormulaSupport
     }
 
     /// <summary>
+    /// Analyzes whether a formula can be parsed and whether it contains functions unsupported by the default evaluator.
     /// 分析公式是否可剖析，以及是否包含預設評估器不支援的函式。
     /// </summary>
-    /// <param name="formula">要分析的公式</param>
-    /// <returns>公式分析結果</returns>
+    /// <param name="formula">The formula to analyze. / 要分析的公式。</param>
+    /// <returns>The formula analysis result. / 公式分析結果。</returns>
     public static OdfFormulaAnalysis Analyze(string formula)
     {
         if (formula is null)
@@ -254,10 +258,11 @@ public static class OdfFormulaSupport
     }
 
     /// <summary>
+    /// Returns the reserialized form for supported formulas, while preserving unsupported or unparsable formulas.
     /// 支援的公式會回傳重新序列化結果；不支援或無法剖析時保留原公式。
     /// </summary>
-    /// <param name="formula">要序列化的公式</param>
-    /// <returns>安全的公式字串</returns>
+    /// <param name="formula">The formula to serialize. / 要序列化的公式。</param>
+    /// <returns>A preservation-safe formula string. / 安全的公式字串。</returns>
     public static string SerializePreservingUnsupported(string formula)
     {
         OdfFormulaAnalysis analysis = Analyze(formula);
@@ -320,7 +325,7 @@ public static class OdfFormulaSupport
             {
                 diagnostics.Add(new OdfFormulaDiagnostic(
                     "OF0003",
-                    $"公式包含無法識別的字元 '{token.Value}'。",
+                    OdfLocalizer.GetMessage("Diag_OdfFormulaSupport_UnknownCharacter", token.Value),
                     OdfFormulaDiagnosticSeverity.Error,
                     token.StartIndex));
             }

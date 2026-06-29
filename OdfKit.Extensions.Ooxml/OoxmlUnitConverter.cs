@@ -15,8 +15,8 @@ internal static class OoxmlUnitConverter
     /// <summary>
     /// 將 ODF 長度字串轉為 OOXML twip 整數。
     /// </summary>
-    /// <param name="value">ODF 長度（例如 <c>1.5cm</c>、<c>12pt</c>）</param>
-    /// <returns>換算後的 twip；無法解析時為 <see langword="null"/></returns>
+    /// <param name="value">The text or value. / ODF 長度（例如 <c>1.5cm</c>、<c>12pt</c>）</param>
+    /// <returns>The result. / 換算後的 twip；無法解析時為 <see langword="null"/></returns>
     internal static int? TryParseOdfLengthToTwips(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -57,8 +57,8 @@ internal static class OoxmlUnitConverter
     /// <summary>
     /// 將 OOXML twip 整數轉為 ODF 公分長度字串。
     /// </summary>
-    /// <param name="twips">twip 數值</param>
-    /// <returns>ODF 長度字串；無法換算時為 <see langword="null"/></returns>
+    /// <param name="twips">The value to use. / twip 數值</param>
+    /// <returns>The result. / ODF 長度字串；無法換算時為 <see langword="null"/></returns>
     internal static string? TryFormatTwipsAsOdfCentimeters(int? twips)
     {
         if (twips is null or < 0)
@@ -73,8 +73,8 @@ internal static class OoxmlUnitConverter
     /// <summary>
     /// 將 ODF 行高（點或百分比）轉為 OOXML 行距設定。
     /// </summary>
-    /// <param name="value">ODF <c>fo:line-height</c> 值</param>
-    /// <returns>twip 與是否為自動行距規則</returns>
+    /// <param name="value">The text or value. / ODF <c>fo:line-height</c> 值</param>
+    /// <returns>The result. / twip 與是否為自動行距規則</returns>
     internal static (int? Twips, bool IsAutoRule) TryParseOdfLineHeight(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -101,9 +101,9 @@ internal static class OoxmlUnitConverter
     /// <summary>
     /// 將 OOXML 行距 twip 轉為 ODF 行高點數字串。
     /// </summary>
-    /// <param name="twips">行距 twip</param>
-    /// <param name="isAutoRule">是否為自動行距規則</param>
-    /// <returns>ODF 行高；無法換算時為 <see langword="null"/></returns>
+    /// <param name="twips">The value to use. / 行距 twip</param>
+    /// <param name="isAutoRule">The value to use. / 是否為自動行距規則</param>
+    /// <returns>The result. / ODF 行高；無法換算時為 <see langword="null"/></returns>
     internal static string? TryFormatLineHeightFromTwips(int? twips, bool isAutoRule)
     {
         if (twips is null or < 0)

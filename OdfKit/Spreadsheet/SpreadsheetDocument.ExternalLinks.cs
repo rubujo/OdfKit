@@ -12,12 +12,14 @@ public partial class SpreadsheetDocument
     private OdfFormulaEvaluationChannel? _formulaEvaluationChannel;
 
     /// <summary>
+    /// Gets the external link manager for cross-document formula references.
     /// 取得跨文件公式引用的外部連結管理器。
     /// </summary>
     public OdfExternalLinkManager ExternalLinks =>
         _externalLinks ??= OdfExternalLinkPersistenceEngine.Load(SettingsDom);
 
     /// <summary>
+    /// Evaluates formulas in the current spreadsheet document and resolves cross-document references with <see cref="ExternalLinks"/>.
     /// 評估目前試算表文件中的公式，並使用 <see cref="ExternalLinks"/> 解析跨文件參照。
     /// </summary>
     public void EvaluateFormulas()
@@ -27,11 +29,12 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Opens an asynchronous formula recalculation channel that queues subsequent cell value or formula changes for background recalculation.
     /// 開啟非同步公式重算通道，將後續儲存格值或公式變更排入背景重算。
     /// </summary>
-    /// <param name="capacity">通道容量</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>已啟動的公式重算通道</returns>
+    /// <param name="capacity">The numeric value. / 通道容量</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元</param>
+    /// <returns>The result. / 已啟動的公式重算通道</returns>
     public OdfFormulaEvaluationChannel BeginFormulaEvaluationChannel(int capacity = 64, CancellationToken cancellationToken = default)
     {
         _formulaEvaluationChannel?.Dispose();

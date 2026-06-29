@@ -7,6 +7,7 @@ using OdfKit.Core;
 namespace OdfKit.Extensions.Rendering;
 
 /// <summary>
+/// Provides libre office http renderer.
 /// 使用 Docker 轉檔 API 進行雲原生文件轉譯的渲染器，內建池化管理與併發閘道控制。
 /// </summary>
 public sealed class LibreOfficeHttpRenderer : IDisposable
@@ -16,10 +17,11 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
     private bool _isDisposed;
 
     /// <summary>
+    /// Provides libre office http renderer.
     /// 初始化 <see cref="LibreOfficeHttpRenderer"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="backend">轉換後端實作；若為 null 則預設使用 <see cref="UnoserverRestBackend"/></param>
-    /// <param name="maxConcurrentCalls">最大允許並行轉檔的併發上限，預設為 4</param>
+    /// <param name="backend">The numeric value. / 轉換後端實作；若為 null 則預設使用 <see cref="UnoserverRestBackend"/></param>
+    /// <param name="maxConcurrentCalls">The value to use. / 最大允許並行轉檔的併發上限，預設為 4</param>
     public LibreOfficeHttpRenderer(ILibreOfficeConversionBackend? backend = null, int maxConcurrentCalls = 4)
     {
         if (maxConcurrentCalls <= 0)
@@ -30,12 +32,13 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
     }
 
     /// <summary>
+    /// Applies convert async.
     /// 將指定文件非同步轉檔為目標格式並寫入輸出資料流。
     /// </summary>
-    /// <param name="document">來源文件</param>
-    /// <param name="outputStream">用以寫入轉檔結果的輸出資料流</param>
-    /// <param name="targetFormat">目標副檔名格式（例如 <c>pdf</c>）</param>
-    /// <param name="ct">用於取消作業的取消語彙</param>
+    /// <param name="document">The source or target object. / 來源文件</param>
+    /// <param name="outputStream">The source or target object. / 用以寫入轉檔結果的輸出資料流</param>
+    /// <param name="targetFormat">The name or identifier. / 目標副檔名格式（例如 <c>pdf</c>）</param>
+    /// <param name="ct">The value to use. / 用於取消作業的取消語彙</param>
     public async Task ConvertAsync(OdfDocument document, Stream outputStream, string targetFormat, CancellationToken ct = default)
     {
         if (_isDisposed)
@@ -67,6 +70,7 @@ public sealed class LibreOfficeHttpRenderer : IDisposable
     }
 
     /// <summary>
+    /// Provides dispose.
     /// 釋放此渲染器所使用的資源。
     /// </summary>
     public void Dispose()

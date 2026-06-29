@@ -8,11 +8,13 @@ using OdfKit.Formula.AST;
 namespace OdfKit.Formula;
 
 /// <summary>
+/// Provides type coercion and value comparison helpers for spreadsheet formula evaluation.
 /// 試算表公式求值時的型別轉換與值比較工具。
 /// </summary>
 internal static class FormulaCoercion
 {
     /// <summary>
+    /// Flattens a cell value, array, or reference list into a single value sequence.
     /// 將儲存格值、陣列或參照清單展平為單一值序列。
     /// </summary>
     /// <remarks>
@@ -52,6 +54,7 @@ internal static class FormulaCoercion
     }
 
     /// <summary>
+    /// Attempts to coerce a value to <see cref="double"/>.
     /// 嘗試將值轉換為 <see cref="double"/>。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -80,6 +83,7 @@ internal static class FormulaCoercion
     }
 
     /// <summary>
+    /// Coerces a value to a Boolean value, returning <see langword="false"/> for unsupported inputs.
     /// 將值強制轉換為布林值（非布林／數值／TRUE/FALSE 字串時回傳 false）。
     /// </summary>
     public static bool CoerceToBool(object val)
@@ -100,6 +104,7 @@ internal static class FormulaCoercion
     }
 
     /// <summary>
+    /// Attempts to coerce a value to a Boolean value.
     /// 嘗試將值轉換為布林值。
     /// </summary>
     public static bool TryCoerceToBool(object val, out bool result)
@@ -136,6 +141,7 @@ internal static class FormulaCoercion
     }
 
     /// <summary>
+    /// Compares two formula values as numbers, Booleans, or strings.
     /// 比較兩個公式值（數值、布林或字串）。
     /// </summary>
     public static int CompareValues(object val1, object val2)

@@ -47,16 +47,19 @@ public sealed class OdfMarkdownExportOptions
     public static OdfMarkdownExportOptions CommonMark { get; } = new() { Flavor = OdfMarkdownFlavor.CommonMark };
 
     /// <summary>
+    /// Provides basic.
     /// 基礎 Markdown 匯出 preset。
     /// </summary>
     public static OdfMarkdownExportOptions Basic { get; } = new() { Flavor = OdfMarkdownFlavor.Basic };
 
     /// <summary>
+    /// Gets or sets flavor.
     /// 取得或設定輸出的 Markdown 方言，預設為 GitHub Flavored Markdown。
     /// </summary>
     public OdfMarkdownFlavor Flavor { get; init; } = OdfMarkdownFlavor.GitHubFlavored;
 
     /// <summary>
+    /// Gets or sets blank line between blocks.
     /// 取得或設定是否在段落與區塊之間使用空白行，預設為 true。
     /// </summary>
     public bool BlankLineBetweenBlocks { get; init; } = true;

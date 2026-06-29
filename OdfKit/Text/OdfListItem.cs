@@ -7,10 +7,11 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf list item.
 /// 表示清單中的清單專案。
 /// </summary>
-/// <param name="node">與此清單專案相關聯的 OdfNode 節點</param>
-/// <param name="doc">所屬的文字文件</param>
+/// <param name="node">The value to use. / 與此清單專案相關聯的 OdfNode 節點</param>
+/// <param name="doc">The value to use. / 所屬的文字文件</param>
 public class OdfListItem(OdfNode node, TextDocument doc)
 {
     /// <summary>
@@ -21,6 +22,7 @@ public class OdfListItem(OdfNode node, TextDocument doc)
     private readonly TextDocument _doc = doc;
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定此清單專案的起始數值。
     /// </summary>
     public int? StartValue
@@ -36,10 +38,11 @@ public class OdfListItem(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
+    /// Provides add paragraph.
     /// 在清單專案中新增段落。
     /// </summary>
-    /// <param name="text">段落的預設內文</param>
-    /// <returns>建立的段落物件</returns>
+    /// <param name="text">The text or value. / 段落的預設內文</param>
+    /// <returns>The result. / 建立的段落物件</returns>
     public OdfParagraph AddParagraph(string text = "")
     {
         var pNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
@@ -49,10 +52,11 @@ public class OdfListItem(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
+    /// Provides add nested list.
     /// 在清單專案中新增巢狀清單。
     /// </summary>
-    /// <param name="styleName">專案清單樣式名稱</param>
-    /// <returns>新建立的巢狀清單執行個體</returns>
+    /// <param name="styleName">The name or identifier. / 專案清單樣式名稱</param>
+    /// <returns>The result. / 新建立的巢狀清單執行個體</returns>
     public OdfList AddNestedList(string? styleName = null)
     {
         var listNode = OdfNodeFactory.CreateElement("list", OdfNamespaces.Text, "text");
@@ -65,6 +69,7 @@ public class OdfListItem(OdfNode node, TextDocument doc)
     }
 
     /// <summary>
+    /// Gets this member.
     /// 取得清單專案中的段落清單。
     /// </summary>
     public IReadOnlyList<OdfParagraph> Paragraphs

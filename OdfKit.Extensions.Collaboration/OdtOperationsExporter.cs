@@ -9,6 +9,7 @@ using OdfKit.Text;
 namespace OdfKit.Collaboration;
 
 /// <summary>
+/// Applies odt operations exporter.
 /// 將 <see cref="TextDocument"/> 匯出為 ODF Toolkit 相容的 JSON operations 序列。
 /// </summary>
 public static class OdtOperationsExporter
@@ -22,20 +23,22 @@ public static class OdtOperationsExporter
     };
 
     /// <summary>
+    /// Applies export to json.
     /// 將文字文件本文匯出為 JSON operations 陣列字串。
     /// </summary>
-    /// <param name="document">來源文字文件</param>
-    /// <returns>JSON operations 陣列</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="document"/> 為 null 時擲出</exception>
+    /// <param name="document">The source or target object. / 來源文字文件</param>
+    /// <returns>The result. / JSON operations 陣列</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="document"/> 為 null 時擲出</exception>
     public static string ExportToJson(TextDocument document) => ExportToJson(document, null);
 
     /// <summary>
+    /// Applies export to json.
     /// 將文字文件本文匯出為 JSON operations 字串。
     /// </summary>
-    /// <param name="document">來源文字文件</param>
-    /// <param name="options">ODF Toolkit 相容選項；若為 <see langword="null"/>，則使用裸陣列輸出</param>
-    /// <returns>JSON operations 或 TDF changes 封包</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="document"/> 為 null 時擲出</exception>
+    /// <param name="document">The source or target object. / 來源文字文件</param>
+    /// <param name="options">The value to use. / ODF Toolkit 相容選項；若為 <see langword="null"/>，則使用裸陣列輸出</param>
+    /// <returns>The result. / JSON operations 或 TDF changes 封包</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="document"/> 為 null 時擲出</exception>
     public static string ExportToJson(TextDocument document, OdtOperationCompatibilityOptions? options)
     {
         if (document is null)

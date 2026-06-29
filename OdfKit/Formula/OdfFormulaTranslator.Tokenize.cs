@@ -4,17 +4,19 @@ using System.Collections.Generic;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// 提供 ODF 與 Excel 公式格式之間的轉換與偏移工具。
+/// Provides conversion, tokenization, and offset helpers for ODF and Excel formula formats.
+/// 提供 ODF 與 Excel 公式格式之間的轉換、語彙分析與偏移工具。
 /// </summary>
 public static partial class OdfFormulaTranslator
 {
     #region Tokenization
 
     /// <summary>
+    /// Splits a formula string into a list of tokens.
     /// 將公式字串分割為語彙基元清單。
     /// </summary>
-    /// <param name="formula">公式字串</param>
-    /// <returns>語彙基元清單</returns>
+    /// <param name="formula">The formula string. / 公式字串。</param>
+    /// <returns>The token list. / 語彙基元清單。</returns>
     public static List<FormulaToken> Tokenize(string formula)
     {
         List<FormulaToken> tokens = [];

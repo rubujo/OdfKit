@@ -11,6 +11,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Represents a worksheet in an ODF spreadsheet.
 /// 表示 ODF 試算表中的工作表。
 /// </summary>
 public partial class OdfTableSheet
@@ -36,6 +37,7 @@ public partial class OdfTableSheet
     internal SpreadsheetDocument Document => _doc;
 
     /// <summary>
+    /// Gets or sets the worksheet name.
     /// 取得或設定工作表的名稱。
     /// </summary>
     public string Name
@@ -45,35 +47,41 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Gets the cell collection for this worksheet.
     /// 取得此工作表的儲存格集合。
     /// </summary>
     public OdfCellCollection Cells => _cells ??= new OdfCellCollection(this);
 
     /// <summary>
+    /// Gets the row collection for this worksheet.
     /// 取得此工作表的列集合。
     /// </summary>
     public OdfRowCollection Rows => _rows ??= new OdfRowCollection(this);
 
     /// <summary>
+    /// Gets the column collection for this worksheet.
     /// 取得此工作表的欄集合。
     /// </summary>
     public OdfColumnCollection Columns => _columns ??= new OdfColumnCollection(this);
 
     /// <summary>
+    /// Gets the cell range collection for this worksheet.
     /// 取得此工作表的儲存格範圍集合。
     /// </summary>
     public OdfRangeCollection Ranges => _ranges ??= new OdfRangeCollection(this);
 
     /// <summary>
+    /// Gets the used cells in this worksheet.
     /// 取得此工作表中已使用的儲存格列舉。
     /// </summary>
     public IEnumerable<OdfCell> UsedCells => GetUsedCells();
 
     /// <summary>
+    /// Prunes this worksheet from the spreadsheet DOM tree and releases its subtree references.
     /// 將此工作表從試算表 DOM 樹中剪裁，並釋放其子樹與延遲載入 XML 參照。
     /// </summary>
-    /// <param name="collectGarbage">是否在剪裁後要求執行一次最佳化 GC 收集</param>
-    /// <returns>已剪裁的節點數，包含工作表節點本身</returns>
+    /// <param name="collectGarbage">The numeric value. / 是否在剪裁後要求執行一次最佳化 GC 收集</param>
+    /// <returns>The result. / 已剪裁的節點數，包含工作表節點本身</returns>
     public int PruneAndCollect(bool collectGarbage = false)
     {
         ReleaseFacadeCaches();
@@ -87,6 +95,7 @@ public partial class OdfTableSheet
         (_ranges is null ? 0 : 1);
 
     /// <summary>
+    /// Releases cached high-level collection facades while preserving the underlying DOM and document content.
     /// 釋放此工作表已建立的高階集合 facade 快取，但保留底層 DOM 與文件內容不變。
     /// </summary>
     /// <remarks>
@@ -103,6 +112,7 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Gets or sets whether the worksheet is visible.
     /// 取得或設定工作表是否顯示。
     /// </summary>
     public bool Visible
@@ -112,6 +122,7 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Gets or sets the accessibility summary for the worksheet, mapped to the ODF <c>table:summary</c> attribute.
     /// 取得或設定工作表的無障礙摘要說明（對應 ODF <c>table:summary</c> 屬性）。
     /// </summary>
     public string? Summary
@@ -127,6 +138,7 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Gets or sets the worksheet writing mode.
     /// 取得或設定工作表的書寫方向。
     /// </summary>
     public OdfWritingMode WritingMode
@@ -161,6 +173,7 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Gets a value indicating whether worksheet protection is enabled.
     /// 取得一個值，指出此工作表是否啟用保護。
     /// </summary>
     public bool IsProtected
@@ -169,25 +182,28 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Enables worksheet protection and stores the hashed password.
     /// 啟用工作表保護，並設定雜湊後的密碼。
     /// </summary>
-    /// <param name="password">密碼明文</param>
+    /// <param name="password">The password text. / 密碼明文</param>
     public void Protect(string password)
     {
         OdfProtectionHelper.ProtectNode(TableNode, password, "table", OdfNamespaces.Table);
     }
 
     /// <summary>
+    /// Verifies whether the worksheet protection password is valid.
     /// 驗證工作表保護密碼是否正確。
     /// </summary>
-    /// <param name="password">要驗證的密碼</param>
-    /// <returns>若驗證成功則為 true，否則為 false</returns>
+    /// <param name="password">The password text. / 要驗證的密碼</param>
+    /// <returns>The result. / 若驗證成功則為 true，否則為 false</returns>
     public bool VerifyPassword(string password)
     {
         return OdfProtectionHelper.VerifyPassword(TableNode, password, OdfNamespaces.Table);
     }
 
     /// <summary>
+    /// Disables worksheet protection.
     /// 解除工作表保護。
     /// </summary>
     public void Unprotect()
@@ -196,10 +212,11 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Attempts to disable worksheet protection with the specified password.
     /// 嘗試以指定密碼解除工作表保護。
     /// </summary>
-    /// <param name="password">密碼明文</param>
-    /// <returns>若解除成功則為 true，否則為 false</returns>
+    /// <param name="password">The password text. / 密碼明文</param>
+    /// <returns>The result. / 若解除成功則為 true，否則為 false</returns>
     public bool TryUnprotect(string password)
     {
         if (!IsProtected)
@@ -218,11 +235,12 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Gets the cell at the specified row and column indexes.
     /// 取得指定列與欄索引的儲存格。
     /// </summary>
-    /// <param name="row">以 0 為基準的列索引</param>
-    /// <param name="col">以 0 為基準的欄索引</param>
-    /// <returns>儲存格物件</returns>
+    /// <param name="row">The numeric value. / 以 0 為基準的列索引</param>
+    /// <param name="col">The numeric value. / 以 0 為基準的欄索引</param>
+    /// <returns>The result. / 儲存格物件</returns>
     public OdfCell GetCell(int row, int col)
     {
         var cellNode = GetOrCreateCellNode(row, col);
@@ -230,11 +248,12 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Gets the cell at the specified address.
     /// 取得指定位址的儲存格。
     /// </summary>
-    /// <param name="address">儲存格位址字串（例如 "A1" 或 "Sheet1.A1"）</param>
-    /// <returns>儲存格物件</returns>
-    /// <exception cref="FormatException">當儲存格格式無效時擲出</exception>
+    /// <param name="address">The cell address. / 儲存格位址字串（例如 "A1" 或 "Sheet1.A1"）</param>
+    /// <returns>The result. / 儲存格物件</returns>
+    /// <exception cref="FormatException">Thrown when the documented condition occurs. / 當儲存格格式無效時擲出</exception>
     public OdfCell GetCell(string address)
     {
         if (!OdfCellAddress.TryParse(address, out var addr))
@@ -245,10 +264,11 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Gets the cells in the specified range.
     /// 取得指定範圍中的儲存格列舉。
     /// </summary>
-    /// <param name="range">要列舉的儲存格範圍</param>
-    /// <returns>範圍內的儲存格列舉</returns>
+    /// <param name="range">The cell range. / 要列舉的儲存格範圍</param>
+    /// <returns>The result. / 範圍內的儲存格列舉</returns>
     public IEnumerable<OdfCell> GetRange(OdfCellRange range)
     {
         int startRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
@@ -266,9 +286,10 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Gets the used cells in this worksheet.
     /// 取得此工作表中已使用的儲存格列舉。
     /// </summary>
-    /// <returns>已使用儲存格列舉</returns>
+    /// <returns>The result. / 已使用儲存格列舉</returns>
     public IEnumerable<OdfCell> GetUsedCells()
     {
         foreach ((OdfNode node, int row, int column) in OdfTableSheetDomAccessEngine.EnumerateExistingCells(TableNode))
@@ -281,10 +302,11 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Merges the specified cell range and optionally applies an outer border.
     /// 合併指定的儲存格範圍，並可選擇性套用外框線。
     /// </summary>
-    /// <param name="range">儲存格範圍</param>
-    /// <param name="outerBorder">套用於合併範圍外部的外框線格式</param>
+    /// <param name="range">The cell range. / 儲存格範圍</param>
+    /// <param name="outerBorder">The value to use. / 套用於合併範圍外部的外框線格式</param>
     public void MergeCells(OdfCellRange range, OdfBorder? outerBorder = null)
     {
         int startRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
@@ -321,9 +343,10 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Unmerges the specified cell range.
     /// 取消合併指定的儲存格範圍。
     /// </summary>
-    /// <param name="range">要取消合併的儲存格範圍。</param>
+    /// <param name="range">The cell range. / 要取消合併的儲存格範圍。</param>
     public void UnmergeCells(OdfCellRange range)
     {
         int startRow = Math.Min(range.StartAddress.Row, range.EndAddress.Row);
@@ -352,9 +375,10 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Unmerges the specified Excel-style cell range.
     /// 取消合併指定的 Excel 樣式儲存格範圍。
     /// </summary>
-    /// <param name="rangeAddress">儲存格範圍位址，例如 <c>A1:C3</c>。</param>
+    /// <param name="rangeAddress">The cell range. / 儲存格範圍位址，例如 <c>A1:C3</c>。</param>
     public void UnmergeCells(string rangeAddress)
     {
         UnmergeCells(OdfCellRange.ParseExcel(rangeAddress));

@@ -5,17 +5,19 @@ using VDS.RDF.Query;
 namespace OdfKit.Extensions.Rdf;
 
 /// <summary>
+/// Provides APIs for odf rdf graph bridge.
 /// 提供 <see cref="OdfRdfMetadata"/> 與 dotNetRDF <see cref="IGraph"/> 之間的橋接與 SPARQL 查詢。
 /// </summary>
 public static class OdfRdfGraphBridge
 {
     /// <summary>
+    /// Applies to graph.
     /// 將 OdfKit RDF metadata 轉換為 dotNetRDF 圖形。
     /// </summary>
-    /// <param name="metadata">來源 RDF metadata</param>
-    /// <param name="baseUri">選用的封裝基底 URI；空白主詞會對應至此 URI</param>
-    /// <returns>包含全部 triples 的圖形</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="metadata"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <param name="metadata">The value to use. / 來源 RDF metadata</param>
+    /// <param name="baseUri">The path or URI. / 選用的封裝基底 URI；空白主詞會對應至此 URI</param>
+    /// <returns>The result. / 包含全部 triples 的圖形</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="metadata"/> 為 <see langword="null"/> 時擲出</exception>
     public static IGraph ToGraph(OdfRdfMetadata metadata, Uri? baseUri = null)
     {
         if (metadata is null)
@@ -39,15 +41,16 @@ public static class OdfRdfGraphBridge
     }
 
     /// <summary>
+    /// Provides execute query.
     /// 對 OdfKit RDF metadata 執行 SPARQL 查詢。
     /// </summary>
-    /// <param name="metadata">來源 RDF metadata</param>
-    /// <param name="sparql">SPARQL 查詢字串（支援 SELECT 與 ASK）</param>
-    /// <param name="baseUri">選用的封裝基底 URI</param>
-    /// <returns>查詢結果；SELECT 為 <see cref="SparqlResultSet"/>，ASK 為 <see cref="bool"/></returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="metadata"/> 為 <see langword="null"/> 時擲出</exception>
-    /// <exception cref="ArgumentException">當 <paramref name="sparql"/> 為空白時擲出</exception>
-    /// <exception cref="InvalidOperationException">當查詢類型不受支援時擲出</exception>
+    /// <param name="metadata">The value to use. / 來源 RDF metadata</param>
+    /// <param name="sparql">The value to use. / SPARQL 查詢字串（支援 SELECT 與 ASK）</param>
+    /// <param name="baseUri">The path or URI. / 選用的封裝基底 URI</param>
+    /// <returns>The result. / 查詢結果；SELECT 為 <see cref="SparqlResultSet"/>，ASK 為 <see cref="bool"/></returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="metadata"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <exception cref="ArgumentException">Thrown when the documented condition occurs. / 當 <paramref name="sparql"/> 為空白時擲出</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當查詢類型不受支援時擲出</exception>
     public static object ExecuteQuery(OdfRdfMetadata metadata, string sparql, Uri? baseUri = null)
     {
         if (metadata is null)
@@ -75,13 +78,14 @@ public static class OdfRdfGraphBridge
     }
 
     /// <summary>
+    /// Applies import graph.
     /// 將 dotNetRDF 圖形中的 triples 匯入至 OdfKit metadata（追加模式）。
     /// </summary>
-    /// <param name="metadata">目標 RDF metadata</param>
-    /// <param name="graph">來源圖形</param>
-    /// <param name="baseUri">選用的封裝基底 URI</param>
-    /// <returns>新增的 triple 數量</returns>
-    /// <exception cref="ArgumentNullException">當必要參數為 <see langword="null"/> 時擲出</exception>
+    /// <param name="metadata">The value to use. / 目標 RDF metadata</param>
+    /// <param name="graph">The source or target object. / 來源圖形</param>
+    /// <param name="baseUri">The path or URI. / 選用的封裝基底 URI</param>
+    /// <returns>The result. / 新增的 triple 數量</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當必要參數為 <see langword="null"/> 時擲出</exception>
     public static int ImportGraph(OdfRdfMetadata metadata, IGraph graph, Uri? baseUri = null)
     {
         if (metadata is null)

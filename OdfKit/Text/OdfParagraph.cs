@@ -9,6 +9,7 @@ using OdfKit.Styles;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf paragraph.
 /// 表示文字文件中的段落。
 /// </summary>
 public partial class OdfParagraph
@@ -25,11 +26,13 @@ public partial class OdfParagraph
     internal OdfNode Node { get; set; }
 
     /// <summary>
+    /// Gets doc.
     /// 取得所屬的文字文件。
     /// </summary>
     protected readonly TextDocument Doc;
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落的文字內容。
     /// </summary>
     public string TextContent
@@ -39,14 +42,16 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Provides replace text.
     /// 在此段落內搜尋指定文字並替換為新文字，同時保留未命中區段的原始樣式結構。
     /// </summary>
-    /// <param name="search">要搜尋的關鍵字</param>
-    /// <param name="replacement">要替換的新文字</param>
+    /// <param name="search">The value to use. / 要搜尋的關鍵字</param>
+    /// <param name="replacement">The text or value. / 要替換的新文字</param>
     public void ReplaceText(string search, string replacement)
         => TextDocumentSearchReplaceEngine.ReplaceText(this, search, replacement);
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落的樣式名稱。
     /// </summary>
     public string? StyleName
@@ -68,11 +73,13 @@ public partial class OdfParagraph
     private OdfKit.Styles.OdfParagraphStyleProxy? _styleProxy;
 
     /// <summary>
+    /// Gets odf paragraph style proxy.
     /// 取得此段落的高階樣式設定代理 Facade。
     /// </summary>
     public OdfKit.Styles.OdfParagraphStyleProxy Style => _styleProxy ??= new OdfKit.Styles.OdfParagraphStyleProxy(this);
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落的水平對齊方式。
     /// </summary>
     public string? HorizontalAlignment
@@ -82,6 +89,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落首行縮排（對應 <c>fo:text-indent</c> 屬性）。
     /// </summary>
     public string? TextIndent
@@ -91,6 +99,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落的書寫模式。
     /// </summary>
     public OdfWritingMode WritingMode
@@ -100,6 +109,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落的西文字型名稱。
     /// </summary>
     public string? FontName
@@ -109,6 +119,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落的東亞（中日韓）字型名稱。
     /// </summary>
     public string? FontNameAsian
@@ -118,6 +129,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落的複雜文字字型名稱。
     /// </summary>
     public string? FontNameComplex
@@ -127,6 +139,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落的西文字型大小。
     /// </summary>
     public string? FontSize
@@ -136,6 +149,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落的東亞（中日韓）字型大小。
     /// </summary>
     public string? FontSizeAsian
@@ -145,6 +159,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定段落的複雜文字字型大小。
     /// </summary>
     public string? FontSizeComplex
@@ -154,11 +169,12 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Sets set font.
     /// 設定段落的字型名稱。
     /// </summary>
-    /// <param name="westernFont">西文字型名稱</param>
-    /// <param name="asianFont">東亞（中日韓）字型名稱</param>
-    /// <param name="complexFont">複雜文字字型名稱</param>
+    /// <param name="westernFont">The value to use. / 西文字型名稱</param>
+    /// <param name="asianFont">The value to use. / 東亞（中日韓）字型名稱</param>
+    /// <param name="complexFont">The value to use. / 複雜文字字型名稱</param>
     public void SetFont(string westernFont, string? asianFont = null, string? complexFont = null)
     {
         FontName = westernFont;
@@ -167,11 +183,12 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Sets set font size.
     /// 設定段落的字型大小。
     /// </summary>
-    /// <param name="westernSize">西文字型大小</param>
-    /// <param name="asianSize">東亞字型大小</param>
-    /// <param name="complexSize">複雜文字字型大小</param>
+    /// <param name="westernSize">The numeric value. / 西文字型大小</param>
+    /// <param name="asianSize">The numeric value. / 東亞字型大小</param>
+    /// <param name="complexSize">The numeric value. / 複雜文字字型大小</param>
     public void SetFontSize(string westernSize, string? asianSize = null, string? complexSize = null)
     {
         FontSize = westernSize;
@@ -180,10 +197,11 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Provides add text run.
     /// 在段落結尾新增一個文字片段。
     /// </summary>
-    /// <param name="text">要新增的文字內容</param>
-    /// <returns>建立的文字片段物件</returns>
+    /// <param name="text">The text or value. / 要新增的文字內容</param>
+    /// <returns>The result. / 建立的文字片段物件</returns>
     public OdfTextRun AddTextRun(string text)
     {
         var spanNode = OdfNodeFactory.CreateElement("span", OdfNamespaces.Text, "text");
@@ -208,11 +226,12 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Provides add cns11643 text.
     /// 依 Unicode 平面將文字拆成適合 CNS 11643 全字庫情境的多個文字片段，並自動套用對應字型。
     /// </summary>
-    /// <param name="text">要新增的文字內容</param>
-    /// <param name="baseFont">Plane 0 文字使用的基礎字型名稱</param>
-    /// <returns>新增的文字片段集合</returns>
+    /// <param name="text">The text or value. / 要新增的文字內容</param>
+    /// <param name="baseFont">The value to use. / Plane 0 文字使用的基礎字型名稱</param>
+    /// <returns>The result. / 新增的文字片段集合</returns>
     public IReadOnlyList<OdfTextRun> AddCns11643Text(string text, string baseFont = "TW-Kai")
     {
         if (text is null)
@@ -235,6 +254,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Provides add soft page break.
     /// 在段落中新增軟分頁符號。
     /// </summary>
     public void AddSoftPageBreak()
@@ -244,6 +264,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Provides add tab.
     /// 在段落中新增定位點（Tab）字元。
     /// </summary>
     public void AddTab()
@@ -253,6 +274,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Provides add line break.
     /// 在段落中新增換行符號。
     /// </summary>
     public void AddLineBreak()
@@ -262,9 +284,10 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Provides add space.
     /// 在段落中新增指定數量的空格專案。
     /// </summary>
-    /// <param name="count">空格數量</param>
+    /// <param name="count">The numeric value. / 空格數量</param>
     public void AddSpace(int count = 1)
     {
         var node = OdfNodeFactory.CreateElement("s", OdfNamespaces.Text, "text");
@@ -276,6 +299,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Removes delete.
     /// 刪除此段落。
     /// </summary>
     public void Delete()
@@ -284,6 +308,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Gets this member.
     /// 取得此段落的所有文字片段（Runs）。存取時會自動將直屬的文字節點分裂包裝為 span 節點。
     /// </summary>
     public IEnumerable<OdfTextRun> Runs
@@ -316,6 +341,7 @@ public partial class OdfParagraph
     }
 
     /// <summary>
+    /// Removes clear runs.
     /// 清除此段落內的所有文字片段（移除所有的 span 節點）。
     /// </summary>
     public void ClearRuns()
@@ -338,151 +364,172 @@ public partial class OdfParagraph
     #region Fields & References
 
     /// <summary>
+    /// Provides add date field.
     /// 在段落中新增日期欄位
     /// </summary>
     public void AddDateField() => Doc.AddDateField(this);
 
     /// <summary>
+    /// Provides add time field.
     /// 在段落中新增時間欄位
     /// </summary>
     public void AddTimeField() => Doc.AddTimeField(this);
 
     /// <summary>
+    /// Provides add author field.
     /// 在段落中新增作者名稱欄位
     /// </summary>
     public void AddAuthorField() => Doc.AddAuthorField(this);
 
     /// <summary>
+    /// Provides add chapter field.
     /// 在段落中新增章節欄位
     /// </summary>
     public void AddChapterField() => Doc.AddChapterField(this);
 
     /// <summary>
+    /// Provides add sequence field.
     /// 在段落中新增序號欄位
     /// </summary>
-    /// <param name="name">序號欄位名稱</param>
-    /// <param name="numFormat">編號格式</param>
+    /// <param name="name">The name or identifier. / 序號欄位名稱</param>
+    /// <param name="numFormat">The value to use. / 編號格式</param>
     public void AddSequenceField(string name, string numFormat = "1") => Doc.AddSequenceField(this, name, numFormat);
 
     /// <summary>
+    /// Provides add reference field.
     /// 在段落中新增參考專案欄位
     /// </summary>
-    /// <param name="refName">參考專案名稱</param>
+    /// <param name="refName">The name or identifier. / 參考專案名稱</param>
     public void AddReferenceField(string refName) => Doc.AddReferenceField(this, refName);
 
     /// <summary>
+    /// Provides add sequence ref field.
     /// 在段落中新增序號交互參照欄位
     /// </summary>
-    /// <param name="sequenceName">序號欄位名稱</param>
-    /// <param name="referenceFormat">參照格式，預設為 "value"</param>
+    /// <param name="sequenceName">The name or identifier. / 序號欄位名稱</param>
+    /// <param name="referenceFormat">The value to use. / 參照格式，預設為 "value"</param>
     public void AddSequenceRefField(string sequenceName, string referenceFormat = "value")
         => Doc.AddSequenceRefField(this, sequenceName, referenceFormat);
 
     /// <summary>
+    /// Provides add bookmark reference field.
     /// 在段落中新增書籤參照欄位
     /// </summary>
-    /// <param name="bookmarkName">書籤名稱</param>
-    /// <param name="referenceFormat">參照格式，預設為 "text"</param>
+    /// <param name="bookmarkName">The name or identifier. / 書籤名稱</param>
+    /// <param name="referenceFormat">The value to use. / 參照格式，預設為 "text"</param>
     public void AddBookmarkReferenceField(string bookmarkName, string referenceFormat = "text") => Doc.AddBookmarkReferenceField(this, bookmarkName, referenceFormat);
 
     /// <summary>
+    /// Provides add variable set field.
     /// 在段落中設定變數欄位值
     /// </summary>
-    /// <param name="name">變數名稱</param>
-    /// <param name="value">變數值</param>
+    /// <param name="name">The name or identifier. / 變數名稱</param>
+    /// <param name="value">The text or value. / 變數值</param>
     public void AddVariableSetField(string name, string value) => Doc.AddVariableSetField(this, name, value);
 
     /// <summary>
+    /// Provides add variable get field.
     /// 在段落中取得變數欄位值
     /// </summary>
-    /// <param name="name">變數名稱</param>
+    /// <param name="name">The name or identifier. / 變數名稱</param>
     public void AddVariableGetField(string name) => Doc.AddVariableGetField(this, name);
 
     /// <summary>
+    /// Provides add database display field.
     /// 在段落中新增資料庫欄位顯示欄位（<c>text:database-display</c>），用於合併列印或報表內容綁定資料表欄位
     /// </summary>
-    /// <param name="tableName">資料表、查詢或指令名稱</param>
-    /// <param name="columnName">要顯示的欄位名稱</param>
-    /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"</param>
-    /// <param name="databaseName">資料庫連線名稱</param>
+    /// <param name="tableName">The name or identifier. / 資料表、查詢或指令名稱</param>
+    /// <param name="columnName">The name or identifier. / 要顯示的欄位名稱</param>
+    /// <param name="tableType">The value to use. / 資料來源類型，可為 "table"、"query" 或 "command"</param>
+    /// <param name="databaseName">The name or identifier. / 資料庫連線名稱</param>
     public void AddDatabaseDisplayField(string tableName, string columnName, string? tableType = null, string? databaseName = null) =>
         Doc.AddDatabaseDisplayField(this, tableName, columnName, tableType, databaseName);
 
     /// <summary>
+    /// Provides add database next field.
     /// 在段落中新增資料庫下一筆記錄欄位（<c>text:database-next</c>），用於合併列印或報表的逐筆換行
     /// </summary>
-    /// <param name="tableName">資料表、查詢或指令名稱</param>
-    /// <param name="tableType">資料來源類型，可為 "table"、"query" 或 "command"</param>
-    /// <param name="databaseName">資料庫連線名稱</param>
-    /// <param name="condition">換行前的判斷條件式</param>
+    /// <param name="tableName">The name or identifier. / 資料表、查詢或指令名稱</param>
+    /// <param name="tableType">The value to use. / 資料來源類型，可為 "table"、"query" 或 "command"</param>
+    /// <param name="databaseName">The name or identifier. / 資料庫連線名稱</param>
+    /// <param name="condition">The value to use. / 換行前的判斷條件式</param>
     public void AddDatabaseNextField(string tableName, string? tableType = null, string? databaseName = null, string? condition = null) =>
         Doc.AddDatabaseNextField(this, tableName, tableType, databaseName, condition);
 
     /// <summary>
+    /// Provides add footnote.
     /// 在段落中插入腳注
     /// </summary>
-    /// <param name="citation">腳注引用標記</param>
-    /// <param name="bodyText">腳注本文內容</param>
+    /// <param name="citation">The value to use. / 腳注引用標記</param>
+    /// <param name="bodyText">The text or value. / 腳注本文內容</param>
     public void AddFootnote(string citation, string bodyText) => Doc.AddFootnote(this, citation, bodyText);
 
     /// <summary>
+    /// Provides add endnote.
     /// 在段落中插入尾注
     /// </summary>
-    /// <param name="citation">尾注引用標記</param>
-    /// <param name="bodyText">尾注本文內容</param>
+    /// <param name="citation">The value to use. / 尾注引用標記</param>
+    /// <param name="bodyText">The text or value. / 尾注本文內容</param>
     public void AddEndnote(string citation, string bodyText) => Doc.AddEndnote(this, citation, bodyText);
 
     /// <summary>
+    /// Provides add alphabetical index mark.
     /// 在段落中新增字母索引標記
     /// </summary>
-    /// <param name="stringValue">索引字串值</param>
-    /// <param name="key1">主要鍵值</param>
-    /// <param name="key2">次要鍵值</param>
+    /// <param name="stringValue">The text or value. / 索引字串值</param>
+    /// <param name="key1">The name or identifier. / 主要鍵值</param>
+    /// <param name="key2">The name or identifier. / 次要鍵值</param>
     public OdfAlphabeticalIndexMark AddAlphabeticalIndexMark(string stringValue, string? key1 = null, string? key2 = null)
         => Doc.AddAlphabeticalIndexMark(this, stringValue, key1, key2);
 
     /// <summary>
+    /// Provides add bibliography mark.
     /// 在段落中新增文獻標記
     /// </summary>
-    /// <param name="identifier">文獻標記識別碼</param>
-    /// <param name="bibliographyType">文獻類型</param>
-    /// <param name="author">文獻作者</param>
-    /// <param name="title">文獻標題</param>
-    /// <param name="year">出版年份</param>
+    /// <param name="identifier">The name or identifier. / 文獻標記識別碼</param>
+    /// <param name="bibliographyType">The value to use. / 文獻類型</param>
+    /// <param name="author">The name or identifier. / 文獻作者</param>
+    /// <param name="title">The name or identifier. / 文獻標題</param>
+    /// <param name="year">The value to use. / 出版年份</param>
     public OdfBibliographyMark AddBibliographyMark(string identifier, string bibliographyType, string author, string title, string year)
         => Doc.AddBibliographyMark(this, identifier, bibliographyType, author, title, year);
 
     /// <summary>
+    /// Provides add bookmark.
     /// 在段落中新增書籤
     /// </summary>
-    /// <param name="name">書籤名稱</param>
+    /// <param name="name">The name or identifier. / 書籤名稱</param>
     public void AddBookmark(string name) => Doc.AddBookmark(this, name);
 
     /// <summary>
+    /// Provides add reference mark.
     /// 在段落中新增參考標記
     /// </summary>
-    /// <param name="name">參考標記名稱</param>
+    /// <param name="name">The name or identifier. / 參考標記名稱</param>
     public void AddReferenceMark(string name) => Doc.AddReferenceMark(this, name);
 
     /// <summary>
+    /// Provides add hyperlink.
     /// 在段落中新增超連結
     /// </summary>
-    /// <param name="url">目標 URL</param>
-    /// <param name="text">顯示文字</param>
+    /// <param name="url">The path or URI. / 目標 URL</param>
+    /// <param name="text">The text or value. / 顯示文字</param>
     public void AddHyperlink(string url, string text) => Doc.AddHyperlink(this, url, text);
 
     /// <summary>
+    /// Provides append list.
     /// 在段落內追加一個清單建構器。
     /// </summary>
-    /// <param name="styleName">選用的清單樣式名稱</param>
-    /// <returns>清單建構器</returns>
+    /// <param name="styleName">The name or identifier. / 選用的清單樣式名稱</param>
+    /// <returns>The result. / 清單建構器</returns>
     public OdfListBuilder AppendList(string? styleName = null)
         => new OdfListBuilder(Node, Doc, null, styleName);
 
     /// <summary>
+    /// Gets append text.
     /// 取得段落的行內富文本建構器，支援鏈式樣式設定。
     /// </summary>
-    /// <returns>行內富文本建構器</returns>
+    /// <returns>The result. / 行內富文本建構器</returns>
     public InlineTextBuilder AppendText()
         => new InlineTextBuilder(Node, Doc);
 

@@ -5,6 +5,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf text table info.
 /// 表示文字文件中的表格摘要。
 /// </summary>
 public sealed class OdfTextTableInfo
@@ -17,16 +18,19 @@ public sealed class OdfTextTableInfo
     }
 
     /// <summary>
+    /// Gets name.
     /// 取得表格名稱。
     /// </summary>
     public string? Name { get; }
 
     /// <summary>
+    /// Gets row count.
     /// 取得表格列數。
     /// </summary>
     public int RowCount { get; }
 
     /// <summary>
+    /// Gets column count.
     /// 取得表格最大欄數。
     /// </summary>
     public int ColumnCount { get; }

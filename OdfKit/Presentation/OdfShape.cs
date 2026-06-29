@@ -7,11 +7,12 @@ using OdfKit.Compliance;
 namespace OdfKit.Presentation;
 
 /// <summary>
+/// Represents the base class for shapes within a slide.
 /// 表示投影片內圖形的基底類別。
 /// </summary>
-/// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
-/// <param name="doc">所屬的文件執行個體</param>
-/// <param name="slide">所屬的投影片執行個體，若不屬於簡報投影片則為 <c>null</c></param>
+/// <param name="node">The underlying <see cref="OdfNode"/> instance. / 底層的 <see cref="OdfNode"/> 執行個體。</param>
+/// <param name="doc">The owning document instance. / 所屬的文件執行個體。</param>
+/// <param name="slide">The owning slide instance, or <c>null</c> when the shape does not belong to a presentation slide. / 所屬的投影片執行個體，若不屬於簡報投影片則為 <c>null</c>。</param>
 public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
 {
     /// <summary>
@@ -20,30 +21,35 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     internal OdfNode Node { get; } = node;
 
     /// <summary>
+    /// Gets the owning slide instance.
     /// 取得所屬的投影片執行個體。
     /// </summary>
     public OdfSlide? Slide { get; } = slide;
 
     /// <summary>
+    /// Gets the owning ODF document.
     /// 取得所屬的 ODF 文件。
     /// </summary>
     public OdfDocument Document { get; } = doc;
 
     /// <summary>
+    /// Gets the local name of the shape node.
     /// 取得圖形節點的區域名稱。
     /// </summary>
     public string LocalName => Node.LocalName;
 
     /// <summary>
+    /// Gets whether this shape is marked as decorative, including LibreOffice <c>loext:decorative</c> compatibility reads.
     /// 取得此圖形是否標記為裝飾性（含 LibreOffice <c>loext:decorative</c> 相容讀取）。
     /// </summary>
     public bool IsDecorative => OdfLoExtInteropEngine.IsDecorative(Node);
 
     /// <summary>
+    /// Marks this shape as decorative so assistive technologies should skip it.
     /// 將此圖形標記為裝飾性，輔助技術應略過此物件。
     /// </summary>
-    /// <param name="decorative">是否標記為裝飾性</param>
-    /// <returns>目前圖形執行個體</returns>
+    /// <param name="decorative">Whether to mark the shape as decorative. / 是否標記為裝飾性。</param>
+    /// <returns>The current shape instance. / 目前圖形執行個體。</returns>
     public OdfShape MarkAsDecorative(bool decorative = true)
     {
         if (decorative)
@@ -60,11 +66,12 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     }
 
     /// <summary>
+    /// Creates an embedded table inside this shape frame.
     /// 在此圖形框架內建立嵌入表格。
     /// </summary>
-    /// <param name="rows">列數</param>
-    /// <param name="columns">欄數</param>
-    /// <returns>新建立的嵌入表格</returns>
+    /// <param name="rows">The row count. / 列數。</param>
+    /// <param name="columns">The column count. / 欄數。</param>
+    /// <returns>The newly created embedded table. / 新建立的嵌入表格。</returns>
     public OdfEmbeddedTable AddEmbeddedTable(int rows, int columns)
     {
         if (rows < 1)
@@ -92,6 +99,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     }
 
     /// <summary>
+    /// Gets or sets the shape identifier.
     /// 取得或設定圖形的識別碼。
     /// </summary>
     public string Id
@@ -105,6 +113,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     }
 
     /// <summary>
+    /// Gets or sets the shape fill color.
     /// 取得或設定圖形的填滿色彩。
     /// </summary>
     public string? FillColor
@@ -118,6 +127,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     }
 
     /// <summary>
+    /// Gets or sets the shape stroke color.
     /// 取得或設定圖形的邊框色彩。
     /// </summary>
     public string? StrokeColor
@@ -131,6 +141,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     }
 
     /// <summary>
+    /// Gets or sets the shape stroke width, such as <c>1.5pt</c>.
     /// 取得或設定圖形的邊框寬度，例如 <c>1.5pt</c>。
     /// </summary>
     public string? StrokeWidth
@@ -140,6 +151,7 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     }
 
     /// <summary>
+    /// Gets or sets the shape stroke style, such as <c>solid</c>, <c>dash</c>, or <c>none</c>.
     /// 取得或設定圖形的邊框線條樣式，例如 <c>solid</c>、<c>dash</c> 或 <c>none</c>。
     /// </summary>
     public string? StrokeStyle
@@ -149,30 +161,33 @@ public partial class OdfShape(OdfNode node, OdfDocument doc, OdfSlide? slide)
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfShape"/> class.
     /// 初始化 <see cref="OdfShape"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
-    /// <param name="slide">所屬的投影片執行個體</param>
+    /// <param name="node">The underlying <see cref="OdfNode"/> instance. / 底層的 <see cref="OdfNode"/> 執行個體。</param>
+    /// <param name="slide">The owning slide instance. / 所屬的投影片執行個體。</param>
     public OdfShape(OdfNode node, OdfSlide slide) : this(node, slide?.Document!, slide)
     {
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfShape"/> class.
     /// 初始化 <see cref="OdfShape"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
-    /// <param name="doc">所屬的 ODF 文件執行個體</param>
+    /// <param name="node">The underlying <see cref="OdfNode"/> instance. / 底層的 <see cref="OdfNode"/> 執行個體。</param>
+    /// <param name="doc">The owning ODF document instance. / 所屬的 ODF 文件執行個體。</param>
     public OdfShape(OdfNode node, OdfDocument doc) : this(node, doc, null)
     {
     }
 
     /// <summary>
+    /// Adds an animation effect to the shape.
     /// 為圖形新增動畫效果。
     /// </summary>
-    /// <param name="type">動畫類型</param>
-    /// <param name="duration">動畫持續時間</param>
-    /// <param name="delay">動畫延遲啟動時間</param>
-    /// <exception cref="InvalidOperationException">若圖形不屬於投影片則拋出</exception>
+    /// <param name="type">The animation type. / 動畫類型。</param>
+    /// <param name="duration">The animation duration. / 動畫持續時間。</param>
+    /// <param name="delay">The animation startup delay. / 動畫延遲啟動時間。</param>
+    /// <exception cref="InvalidOperationException">When the shape does not belong to a slide. / 若圖形不屬於投影片則擲出。</exception>
     public void Animate(OdfAnimationType type, OdfLength duration, OdfLength delay)
     {
         if (Slide is null)

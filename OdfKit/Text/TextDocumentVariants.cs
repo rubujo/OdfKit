@@ -10,68 +10,76 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents text template document.
 /// 表示 ODF 文字範本文件（OTT）。
 /// </summary>
 public sealed class TextTemplateDocument : TextDocument
 {
     /// <summary>
+    /// Provides text template document.
     /// 初始化 <see cref="TextTemplateDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝</param>
+    /// <param name="package">The value to use. / ODF 封裝</param>
     public TextTemplateDocument(OdfPackage package) : base(package)
     {
     }
 
     /// <summary>
+    /// Creates create.
     /// 建立新的 OTT 文字範本文件。
     /// </summary>
-    /// <returns>新的 <see cref="TextTemplateDocument"/> 執行個體</returns>
+    /// <returns>The result. / 新的 <see cref="TextTemplateDocument"/> 執行個體</returns>
     public static new TextTemplateDocument Create()
     {
         return (TextTemplateDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.TextTemplate);
     }
 
     /// <summary>
+    /// Provides load.
     /// 從指定路徑載入 OTT 文字範本文件。
     /// </summary>
-    /// <param name="path">OTT 文件路徑</param>
-    /// <returns>載入完成的 <see cref="TextTemplateDocument"/> 執行個體</returns>
+    /// <param name="path">The path or URI. / OTT 文件路徑</param>
+    /// <returns>The result. / 載入完成的 <see cref="TextTemplateDocument"/> 執行個體</returns>
     public static new TextTemplateDocument Load(string path) =>
         Ensure(OdfDocumentFactory.LoadDocument(path));
 
     /// <summary>
+    /// Provides load async.
     /// 非同步從指定路徑載入 OTT 文字範本文件。
     /// </summary>
-    /// <param name="path">OTT 文件路徑</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextTemplateDocument"/></returns>
+    /// <param name="path">The path or URI. / OTT 文件路徑</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元</param>
+    /// <returns>The result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextTemplateDocument"/></returns>
     public static new async Task<TextTemplateDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
+    /// Provides load.
     /// 從指定資料流載入 OTT 文字範本文件。
     /// </summary>
-    /// <param name="stream">包含 OTT 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <returns>載入完成的 <see cref="TextTemplateDocument"/> 執行個體</returns>
+    /// <param name="stream">The stream or target object. / 包含 OTT 文件內容的資料流</param>
+    /// <param name="fileName">The path or URI. / 選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>The result. / 載入完成的 <see cref="TextTemplateDocument"/> 執行個體</returns>
     public static new TextTemplateDocument Load(Stream stream, string? fileName = null) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
+    /// Provides load async.
     /// 非同步從指定資料流載入 OTT 文字範本文件。
     /// </summary>
-    /// <param name="stream">包含 OTT 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextTemplateDocument"/></returns>
+    /// <param name="stream">The stream or target object. / 包含 OTT 文件內容的資料流</param>
+    /// <param name="fileName">The path or URI. / 選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元</param>
+    /// <returns>The result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextTemplateDocument"/></returns>
     public static new async Task<TextTemplateDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
+    /// Provides create from document.
     /// 從現有的 ODT 文字文件建立新的 OTT 文字範本文件，完整保留其內容、樣式與母片頁面。
     /// </summary>
-    /// <param name="document">作為範本內容來源的文字文件</param>
-    /// <returns>建立完成的 <see cref="TextTemplateDocument"/> 執行個體</returns>
+    /// <param name="document">The value to use. / 作為範本內容來源的文字文件</param>
+    /// <returns>The result. / 建立完成的 <see cref="TextTemplateDocument"/> 執行個體</returns>
     public static TextTemplateDocument CreateFromDocument(TextDocument document) =>
         (TextTemplateDocument)CreateTemplateFromDocumentInternal(
             document,
@@ -82,71 +90,79 @@ public sealed class TextTemplateDocument : TextDocument
         OdfDocumentVariantSupport.EnsureKind<TextTemplateDocument>(
             document,
             OdfDocumentKind.TextTemplate,
-            "指定的 ODF 文件不是 OTT 文字範本。");
+            OdfLocalizer.GetMessage("Err_TextTemplateDocument_SpecifiedOdfFileOtt"));
 }
 
 /// <summary>
+/// Represents text master document.
 /// 表示 ODF 主控文字文件（ODM）。
 /// </summary>
 public sealed class TextMasterDocument : TextDocument
 {
     /// <summary>
+    /// Provides text master document.
     /// 初始化 <see cref="TextMasterDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝</param>
+    /// <param name="package">The value to use. / ODF 封裝</param>
     public TextMasterDocument(OdfPackage package) : base(package)
     {
     }
 
     /// <summary>
+    /// Creates create.
     /// 建立新的 ODM 主控文字文件。
     /// </summary>
-    /// <returns>新的 <see cref="TextMasterDocument"/> 執行個體</returns>
+    /// <returns>The result. / 新的 <see cref="TextMasterDocument"/> 執行個體</returns>
     public static new TextMasterDocument Create()
     {
         return (TextMasterDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.TextMaster);
     }
 
     /// <summary>
+    /// Provides load.
     /// 從指定路徑載入 ODM 主控文字文件。
     /// </summary>
-    /// <param name="path">ODM 文件路徑</param>
-    /// <returns>載入完成的 <see cref="TextMasterDocument"/> 執行個體</returns>
+    /// <param name="path">The path or URI. / ODM 文件路徑</param>
+    /// <returns>The result. / 載入完成的 <see cref="TextMasterDocument"/> 執行個體</returns>
     public static new TextMasterDocument Load(string path) =>
         Ensure(OdfDocumentFactory.LoadDocument(path));
 
     /// <summary>
+    /// Provides load async.
     /// 非同步從指定路徑載入 ODM 主控文字文件。
     /// </summary>
-    /// <param name="path">ODM 文件路徑</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextMasterDocument"/></returns>
+    /// <param name="path">The path or URI. / ODM 文件路徑</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元</param>
+    /// <returns>The result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextMasterDocument"/></returns>
     public static new async Task<TextMasterDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
+    /// Provides load.
     /// 從指定資料流載入 ODM 主控文字文件。
     /// </summary>
-    /// <param name="stream">包含 ODM 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <returns>載入完成的 <see cref="TextMasterDocument"/> 執行個體</returns>
+    /// <param name="stream">The stream or target object. / 包含 ODM 文件內容的資料流</param>
+    /// <param name="fileName">The path or URI. / 選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>The result. / 載入完成的 <see cref="TextMasterDocument"/> 執行個體</returns>
     public static new TextMasterDocument Load(Stream stream, string? fileName = null) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
+    /// Provides load async.
     /// 非同步從指定資料流載入 ODM 主控文字文件。
     /// </summary>
-    /// <param name="stream">包含 ODM 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextMasterDocument"/></returns>
+    /// <param name="stream">The stream or target object. / 包含 ODM 文件內容的資料流</param>
+    /// <param name="fileName">The path or URI. / 選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元</param>
+    /// <returns>The result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextMasterDocument"/></returns>
     public static new async Task<TextMasterDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
+    /// Gets get sub document references.
     /// 取得文件中所有指向外部子文件的區段參照。
     /// </summary>
-    /// <returns>子文件參照清單</returns>
+    /// <returns>The result. / 子文件參照清單</returns>
     public IReadOnlyList<OdfSubDocumentReference> GetSubDocumentReferences()
     {
         var results = new List<OdfSubDocumentReference>();
@@ -155,16 +171,17 @@ public sealed class TextMasterDocument : TextDocument
     }
 
     /// <summary>
+    /// Applies merge sub documents.
     /// 將主控文件本身內容與所有外部子文件依文件順序合併為單一文字文件。
     /// </summary>
-    /// <param name="baseDirectory">解析子文件參照相對路徑時所使用的基準目錄。</param>
-    /// <param name="options">合併設定選項；若為 <see langword="null"/> 則使用預設選項。</param>
+    /// <param name="baseDirectory">The value to use. / 解析子文件參照相對路徑時所使用的基準目錄。</param>
+    /// <param name="options">The value to use. / 合併設定選項；若為 <see langword="null"/> 則使用預設選項。</param>
     /// <param name="subDocumentOutlineOffset">
     /// 套用至每份子文件標題大綱階層的位移量，套用後再併入（見
     /// <see cref="TextDocument.ShiftHeadingOutlineLevels"/>）；預設為 <c>0</c>，不調整。
     /// </param>
-    /// <returns>合併完成的新 <see cref="TextDocument"/> 執行個體。</returns>
-    /// <exception cref="ArgumentException">當 <paramref name="baseDirectory"/> 為空白時擲出。</exception>
+    /// <returns>The result. / 合併完成的新 <see cref="TextDocument"/> 執行個體。</returns>
+    /// <exception cref="ArgumentException">Thrown when the documented condition occurs. / 當 <paramref name="baseDirectory"/> 為空白時擲出。</exception>
     public TextDocument MergeSubDocuments(string baseDirectory, OdfMergeOptions? options = null, int subDocumentOutlineOffset = 0)
     {
         if (string.IsNullOrWhiteSpace(baseDirectory))
@@ -217,15 +234,16 @@ public sealed class TextMasterDocument : TextDocument
     }
 
     /// <summary>
+    /// Sets set sub document load on request.
     /// 設定指定名稱外部子文件區段參照的載入時機。
     /// </summary>
-    /// <param name="sectionName">區段名稱</param>
+    /// <param name="sectionName">The name or identifier. / 區段名稱</param>
     /// <param name="loadOnRequest">
     /// <see langword="true"/> 表示延遲載入（<c>xlink:actuate="onRequest"</c>）；
     /// <see langword="false"/> 表示開啟主控文件時立即載入（<c>xlink:actuate="onLoad"</c>）。
     /// </param>
-    /// <returns>若成功設定則為 <see langword="true"/>；找不到對應名稱的子文件參照時為 <see langword="false"/></returns>
-    /// <exception cref="ArgumentException">當 <paramref name="sectionName"/> 為空白時擲出</exception>
+    /// <returns>The result. / 若成功設定則為 <see langword="true"/>；找不到對應名稱的子文件參照時為 <see langword="false"/></returns>
+    /// <exception cref="ArgumentException">Thrown when the documented condition occurs. / 當 <paramref name="sectionName"/> 為空白時擲出</exception>
     public bool SetSubDocumentLoadOnRequest(string sectionName, bool loadOnRequest)
     {
         if (string.IsNullOrWhiteSpace(sectionName))
@@ -245,11 +263,12 @@ public sealed class TextMasterDocument : TextDocument
     }
 
     /// <summary>
+    /// Removes remove sub document reference.
     /// 移除指定名稱的外部子文件區段參照。
     /// </summary>
-    /// <param name="sectionName">區段名稱</param>
-    /// <returns>若成功移除則為 <see langword="true"/>；找不到對應名稱的子文件參照時為 <see langword="false"/></returns>
-    /// <exception cref="ArgumentException">當 <paramref name="sectionName"/> 為空白時擲出</exception>
+    /// <param name="sectionName">The name or identifier. / 區段名稱</param>
+    /// <returns>The result. / 若成功移除則為 <see langword="true"/>；找不到對應名稱的子文件參照時為 <see langword="false"/></returns>
+    /// <exception cref="ArgumentException">Thrown when the documented condition occurs. / 當 <paramref name="sectionName"/> 為空白時擲出</exception>
     public bool RemoveSubDocumentReference(string sectionName)
     {
         if (string.IsNullOrWhiteSpace(sectionName))
@@ -268,11 +287,12 @@ public sealed class TextMasterDocument : TextDocument
     }
 
     /// <summary>
+    /// Provides reorder sub document references.
     /// 依指定名稱順序重新排列外部子文件區段參照。
     /// </summary>
-    /// <param name="orderedSectionNames">期望的區段名稱排列順序。找不到的名稱會被忽略</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="orderedSectionNames"/> 為 <see langword="null"/> 時擲出</exception>
-    /// <exception cref="InvalidOperationException">當指定的子文件參照分散於不同父節點下，無法重新排序時擲出</exception>
+    /// <param name="orderedSectionNames">The name or identifier. / 期望的區段名稱排列順序。找不到的名稱會被忽略</param>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="orderedSectionNames"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the documented condition occurs. / 當指定的子文件參照分散於不同父節點下，無法重新排序時擲出</exception>
     public void ReorderSubDocumentReferences(IReadOnlyList<string> orderedSectionNames)
     {
         if (orderedSectionNames is null)
@@ -419,75 +439,83 @@ public sealed class TextMasterDocument : TextDocument
         OdfDocumentVariantSupport.EnsureKind<TextMasterDocument>(
             document,
             OdfDocumentKind.TextMaster,
-            "指定的 ODF 文件不是 ODM 主控文字文件。");
+            OdfLocalizer.GetMessage("Err_TextMasterDocument_SpecifiedOdfFileOdm"));
 }
 
 /// <summary>
+/// Represents text web document.
 /// 表示 ODF 網頁範本文件（OTH）。
 /// </summary>
 public sealed class TextWebDocument : TextDocument
 {
     /// <summary>
+    /// Provides text web document.
     /// 初始化 <see cref="TextWebDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝</param>
+    /// <param name="package">The value to use. / ODF 封裝</param>
     public TextWebDocument(OdfPackage package) : base(package)
     {
     }
 
     /// <summary>
+    /// Creates create.
     /// 建立新的 OTH 網頁範本文件。
     /// </summary>
-    /// <returns>新的 <see cref="TextWebDocument"/> 執行個體</returns>
+    /// <returns>The result. / 新的 <see cref="TextWebDocument"/> 執行個體</returns>
     public static new TextWebDocument Create()
     {
         return (TextWebDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.TextWeb);
     }
 
     /// <summary>
+    /// Provides load.
     /// 從指定路徑載入 OTH 網頁範本文件。
     /// </summary>
-    /// <param name="path">OTH 文件路徑</param>
-    /// <returns>載入完成的 <see cref="TextWebDocument"/> 執行個體</returns>
+    /// <param name="path">The path or URI. / OTH 文件路徑</param>
+    /// <returns>The result. / 載入完成的 <see cref="TextWebDocument"/> 執行個體</returns>
     public static new TextWebDocument Load(string path) =>
         Ensure(OdfDocumentFactory.LoadDocument(path));
 
     /// <summary>
+    /// Provides load async.
     /// 非同步從指定路徑載入 OTH 網頁範本文件。
     /// </summary>
-    /// <param name="path">OTH 文件路徑</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextWebDocument"/></returns>
+    /// <param name="path">The path or URI. / OTH 文件路徑</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元</param>
+    /// <returns>The result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextWebDocument"/></returns>
     public static new async Task<TextWebDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
+    /// Provides load.
     /// 從指定資料流載入 OTH 網頁範本文件。
     /// </summary>
-    /// <param name="stream">包含 OTH 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <returns>載入完成的 <see cref="TextWebDocument"/> 執行個體</returns>
+    /// <param name="stream">The stream or target object. / 包含 OTH 文件內容的資料流</param>
+    /// <param name="fileName">The path or URI. / 選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>The result. / 載入完成的 <see cref="TextWebDocument"/> 執行個體</returns>
     public static new TextWebDocument Load(Stream stream, string? fileName = null) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
+    /// Provides load async.
     /// 非同步從指定資料流載入 OTH 網頁範本文件。
     /// </summary>
-    /// <param name="stream">包含 OTH 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextWebDocument"/></returns>
+    /// <param name="stream">The stream or target object. / 包含 OTH 文件內容的資料流</param>
+    /// <param name="fileName">The path or URI. / 選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元</param>
+    /// <returns>The result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="TextWebDocument"/></returns>
     public static new async Task<TextWebDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
+    /// Provides create from document.
     /// 從現有的 ODT 文字文件建立新的 OTH 網頁範本文件，完整保留其內容、樣式與母片頁面。
     /// 因 OTH 內容模型與 ODT 完全相同（僅 MIME 類型與用途標記不同，常用於後續 HTML 匯出
     /// 工作流，例如 <c>OdfKit.Extensions.Html</c> 的 <c>OdfHtmlExporter</c>），故重用
     /// 與 <c>CreateFromTemplateInternal</c> 共用的種類／MIME 置換基礎實作。
     /// </summary>
-    /// <param name="document">作為網頁範本內容來源的文字文件</param>
-    /// <returns>建立完成的 <see cref="TextWebDocument"/> 執行個體</returns>
+    /// <param name="document">The value to use. / 作為網頁範本內容來源的文字文件</param>
+    /// <returns>The result. / 建立完成的 <see cref="TextWebDocument"/> 執行個體</returns>
     public static TextWebDocument CreateFromDocument(TextDocument document) =>
         (TextWebDocument)CreateTemplateFromDocumentInternal(
             document,
@@ -498,72 +526,80 @@ public sealed class TextWebDocument : TextDocument
         OdfDocumentVariantSupport.EnsureKind<TextWebDocument>(
             document,
             OdfDocumentKind.TextWeb,
-            "指定的 ODF 文件不是 OTH 網頁範本。");
+            OdfLocalizer.GetMessage("Err_TextWebDocument_SpecifiedOdfFileOth"));
 }
 
 /// <summary>
+/// Represents flat text document.
 /// 表示 ODF 扁平 XML 文字文件（FODT）。
 /// </summary>
 public sealed class FlatTextDocument : TextDocument
 {
     /// <summary>
+    /// Provides flat text document.
     /// 初始化 <see cref="FlatTextDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝或扁平 XML 容器</param>
+    /// <param name="package">The value to use. / ODF 封裝或扁平 XML 容器</param>
     public FlatTextDocument(OdfPackage package) : base(package)
     {
     }
 
     /// <summary>
+    /// Creates create.
     /// 建立新的 FODT 扁平 XML 文字文件。
     /// </summary>
-    /// <returns>新的 <see cref="FlatTextDocument"/> 執行個體</returns>
+    /// <returns>The result. / 新的 <see cref="FlatTextDocument"/> 執行個體</returns>
     public static new FlatTextDocument Create()
     {
         return (FlatTextDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.FlatText);
     }
 
     /// <summary>
+    /// Provides load.
     /// 從指定路徑載入 FODT 扁平 XML 文字文件。
     /// </summary>
-    /// <param name="path">FODT 文件路徑</param>
-    /// <returns>載入完成的 <see cref="FlatTextDocument"/> 執行個體</returns>
+    /// <param name="path">The path or URI. / FODT 文件路徑</param>
+    /// <returns>The result. / 載入完成的 <see cref="FlatTextDocument"/> 執行個體</returns>
     public static new FlatTextDocument Load(string path) =>
         Ensure(OdfDocumentFactory.LoadDocument(path));
 
     /// <summary>
+    /// Provides load async.
     /// 非同步從指定路徑載入 FODT 扁平 XML 文字文件。
     /// </summary>
-    /// <param name="path">FODT 文件路徑</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatTextDocument"/></returns>
+    /// <param name="path">The path or URI. / FODT 文件路徑</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元</param>
+    /// <returns>The result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatTextDocument"/></returns>
     public static new async Task<FlatTextDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
+    /// Provides load.
     /// 從指定資料流載入 FODT 扁平 XML 文字文件。
     /// </summary>
-    /// <param name="stream">包含 FODT 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <returns>載入完成的 <see cref="FlatTextDocument"/> 執行個體</returns>
+    /// <param name="stream">The stream or target object. / 包含 FODT 文件內容的資料流</param>
+    /// <param name="fileName">The path or URI. / 選用的檔案名稱，用於輔助格式偵測</param>
+    /// <returns>The result. / 載入完成的 <see cref="FlatTextDocument"/> 執行個體</returns>
     public static new FlatTextDocument Load(Stream stream, string? fileName = null) =>
         Ensure(OdfDocumentFactory.LoadDocument(stream, fileName));
 
     /// <summary>
+    /// Provides load async.
     /// 非同步從指定資料流載入 FODT 扁平 XML 文字文件。
     /// </summary>
-    /// <param name="stream">包含 FODT 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatTextDocument"/></returns>
+    /// <param name="stream">The stream or target object. / 包含 FODT 文件內容的資料流</param>
+    /// <param name="fileName">The path or URI. / 選用的檔案名稱，用於輔助格式偵測</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元</param>
+    /// <returns>The result. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="FlatTextDocument"/></returns>
     public static new async Task<FlatTextDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
+    /// Provides create from document.
     /// 從現有的 ODT（ZIP 封裝）文字文件建立等價的 FODT 扁平 XML 文字文件，內容完全相同。
     /// </summary>
-    /// <param name="document">來源 ODT 文字文件</param>
-    /// <returns>建立完成的 <see cref="FlatTextDocument"/> 執行個體</returns>
+    /// <param name="document">The value to use. / 來源 ODT 文字文件</param>
+    /// <returns>The result. / 建立完成的 <see cref="FlatTextDocument"/> 執行個體</returns>
     public static FlatTextDocument CreateFromDocument(TextDocument document) =>
         (FlatTextDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.FlatText, targetIsFlatXml: true);
 
@@ -571,5 +607,5 @@ public sealed class FlatTextDocument : TextDocument
         OdfDocumentVariantSupport.EnsureKind<FlatTextDocument>(
             document,
             OdfDocumentKind.FlatText,
-            "指定的 ODF 文件不是 FODT 扁平 XML 文字文件。");
+            OdfLocalizer.GetMessage("Err_FlatTextDocument_SpecifiedOdfFileFodt"));
 }

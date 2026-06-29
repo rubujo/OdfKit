@@ -6,6 +6,7 @@ using OdfKit.Styles;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Provides a fluent border configuration API for spreadsheet cell ranges.
 /// 提供試算表儲存格範圍的框線鏈式設定 API。
 /// </summary>
 public sealed class OdfRangeBorderProxy
@@ -20,10 +21,11 @@ public sealed class OdfRangeBorderProxy
     }
 
     /// <summary>
+    /// Applies borders to all four sides of every cell in the range.
     /// 對範圍內每個儲存格套用四面框線。
     /// </summary>
-    /// <param name="border">要套用的框線</param>
-    /// <returns>目前框線代理，方便鏈式呼叫</returns>
+    /// <param name="border">The border to apply. / 要套用的框線。</param>
+    /// <returns>The current border proxy for chaining. / 目前框線代理，方便鏈式呼叫。</returns>
     public OdfRangeBorderProxy SetAll(OdfBorder border)
     {
         foreach (OdfCell cell in EnumerateCells())
@@ -35,10 +37,11 @@ public sealed class OdfRangeBorderProxy
     }
 
     /// <summary>
+    /// Applies borders only to the outer edges of the range.
     /// 只對範圍外側邊界套用框線。
     /// </summary>
-    /// <param name="border">要套用的框線</param>
-    /// <returns>目前框線代理，方便鏈式呼叫</returns>
+    /// <param name="border">The border to apply. / 要套用的框線。</param>
+    /// <returns>The current border proxy for chaining. / 目前框線代理，方便鏈式呼叫。</returns>
     public OdfRangeBorderProxy SetOuter(OdfBorder border)
     {
         GetBounds(out int minRow, out int maxRow, out int minColumn, out int maxColumn);
@@ -55,10 +58,11 @@ public sealed class OdfRangeBorderProxy
     }
 
     /// <summary>
+    /// Applies borders only to the internal grid lines of the range.
     /// 只對範圍內部格線套用框線。
     /// </summary>
-    /// <param name="border">要套用的框線</param>
-    /// <returns>目前框線代理，方便鏈式呼叫</returns>
+    /// <param name="border">The border to apply. / 要套用的框線。</param>
+    /// <returns>The current border proxy for chaining. / 目前框線代理，方便鏈式呼叫。</returns>
     public OdfRangeBorderProxy SetInner(OdfBorder border)
     {
         GetBounds(out int minRow, out int maxRow, out int minColumn, out int maxColumn);
@@ -75,11 +79,12 @@ public sealed class OdfRangeBorderProxy
     }
 
     /// <summary>
+    /// Applies borders to the outer edges and internal grid lines of the range.
     /// 對範圍外側與內部格線套用框線。
     /// </summary>
-    /// <param name="outer">外側邊界框線</param>
-    /// <param name="inner">內部格線框線</param>
-    /// <returns>目前框線代理，方便鏈式呼叫</returns>
+    /// <param name="outer">The outer edge border. / 外側邊界框線。</param>
+    /// <param name="inner">The internal grid line border. / 內部格線框線。</param>
+    /// <returns>The current border proxy for chaining. / 目前框線代理，方便鏈式呼叫。</returns>
     public OdfRangeBorderProxy SetGrid(OdfBorder outer, OdfBorder inner)
     {
         SetOuter(outer);

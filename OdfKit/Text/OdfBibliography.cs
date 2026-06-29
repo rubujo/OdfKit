@@ -7,15 +7,17 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf bibliography.
 /// 表示 ODF 文件中的文獻目錄。
 /// </summary>
 public class OdfBibliography : OdfIndex
 {
     /// <summary>
+    /// Provides odf bibliography.
     /// 初始化 <see cref="OdfBibliography"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="node">文獻目錄的 OdfNode 節點</param>
-    /// <param name="doc">所屬的文字文件</param>
+    /// <param name="node">The value to use. / 文獻目錄的 OdfNode 節點</param>
+    /// <param name="doc">The value to use. / 所屬的文字文件</param>
     public OdfBibliography(OdfNode node, TextDocument doc) : base(node, doc)
     {
         FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
@@ -23,17 +25,19 @@ public class OdfBibliography : OdfIndex
     }
 
     /// <summary>
+    /// Gets get source local name.
     /// 取得文獻目錄來源節點的 XML 本地名稱。
     /// </summary>
-    /// <returns>XML 本地名稱</returns>
+    /// <returns>The result. / XML 本地名稱</returns>
     protected override string GetSourceLocalName() => "bibliography-source";
 
     /// <summary>
+    /// Adds add entry template.
     /// 新增文獻目錄專案範本。
     /// </summary>
-    /// <param name="bibType">文獻類型</param>
-    /// <param name="styleName">樣式名稱</param>
-    /// <returns>用於建構文獻範本的 <see cref="OdfBibliographyTemplateBuilder"/> 執行個體</returns>
+    /// <param name="bibType">The value to use. / 文獻類型</param>
+    /// <param name="styleName">The name or identifier. / 樣式名稱</param>
+    /// <returns>The result. / 用於建構文獻範本的 <see cref="OdfBibliographyTemplateBuilder"/> 執行個體</returns>
     public OdfBibliographyTemplateBuilder AddEntryTemplate(string bibType, string styleName)
     {
         var src = FindOrCreateChild(Node, GetSourceLocalName(), OdfNamespaces.Text, "text");
@@ -45,6 +49,7 @@ public class OdfBibliography : OdfIndex
     }
 
     /// <summary>
+    /// Provides update.
     /// 更新文獻目錄的內容。
     /// </summary>
     public override void Update()

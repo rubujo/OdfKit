@@ -241,14 +241,14 @@ public partial class TextDocument : OdfDocument
     /// <summary>
     /// 在指定的段落中新增頁碼欄位。
     /// </summary>
-    /// <param name="paragraph">目標段落</param>
+    /// <param name="paragraph">The value to use. / 目標段落</param>
     internal void AddPageNumberField(OdfParagraph paragraph)
         => TextDocumentPageFieldsEngine.AddPageNumberField(paragraph);
 
     /// <summary>
     /// 在指定的段落中新增總頁數欄位。
     /// </summary>
-    /// <param name="paragraph">目標段落</param>
+    /// <param name="paragraph">The value to use. / 目標段落</param>
     internal void AddPageCountField(OdfParagraph paragraph)
         => TextDocumentPageFieldsEngine.AddPageCountField(paragraph);
 
@@ -348,8 +348,8 @@ public partial class TextDocument : OdfDocument
     /// <summary>
     /// 在指定的段落中新增數學公式。
     /// </summary>
-    /// <param name="paragraph">要插入公式的段落</param>
-    /// <param name="mathMlXmlString">MathML 結構的 XML 字串內容</param>
+    /// <param name="paragraph">The value to use. / 要插入公式的段落</param>
+    /// <param name="mathMlXmlString">The value to use. / MathML 結構的 XML 字串內容</param>
     internal void AddFormula(OdfParagraph paragraph, string mathMlXmlString)
         => TextDocumentFormulaEngine.AddFormula(CoreCollaborators, paragraph, mathMlXmlString);
 
@@ -521,8 +521,8 @@ public partial class TextDocument : OdfDocument
     /// <summary>
     /// 在指定的段落中新增註解。
     /// </summary>
-    /// <param name="paragraph">要新增註解的段落</param>
-    /// <param name="comment">註解物件執行個體</param>
+    /// <param name="paragraph">The value to use. / 要新增註解的段落</param>
+    /// <param name="comment">The value to use. / 註解物件執行個體</param>
     internal void AddComment(OdfParagraph paragraph, OdfComment comment)
         => TextDocumentCommentsEngine.AddComment(paragraph, comment);
 

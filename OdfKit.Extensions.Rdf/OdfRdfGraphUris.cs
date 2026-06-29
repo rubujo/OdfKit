@@ -1,21 +1,24 @@
 ﻿namespace OdfKit.Extensions.Rdf;
 
 /// <summary>
+/// Provides APIs for odf rdf graph uris.
 /// 提供 OdfKit RDF 圖形橋接使用的 URI 慣例。
 /// </summary>
 public static class OdfRdfGraphUris
 {
     /// <summary>
+    /// Provides default package base uri.
     /// 預設封裝基底 URI；空白文件主詞會對應至此 URI。
     /// </summary>
     public static Uri DefaultPackageBaseUri { get; } = new("urn:odfkit:odf-package:/");
 
     /// <summary>
+    /// Applies resolve subject uri.
     /// 將 OdfKit 主詞字串解析為絕對 URI。
     /// </summary>
-    /// <param name="subject">OdfKit 主詞 IRI 或相對路徑</param>
-    /// <param name="baseUri">選用的封裝基底 URI</param>
-    /// <returns>可用於 dotNetRDF 的絕對 URI</returns>
+    /// <param name="subject">The value to use. / OdfKit 主詞 IRI 或相對路徑</param>
+    /// <param name="baseUri">The path or URI. / 選用的封裝基底 URI</param>
+    /// <returns>The result. / 可用於 dotNetRDF 的絕對 URI</returns>
     public static Uri ResolveSubjectUri(string subject, Uri? baseUri = null)
     {
         Uri graphBase = baseUri ?? DefaultPackageBaseUri;
@@ -33,11 +36,12 @@ public static class OdfRdfGraphUris
     }
 
     /// <summary>
+    /// Applies to subject string.
     /// 將 dotNetRDF 節點 URI 還原為 OdfKit 主詞字串。
     /// </summary>
-    /// <param name="uri">節點 URI</param>
-    /// <param name="baseUri">封裝基底 URI</param>
-    /// <returns>OdfKit 主詞字串</returns>
+    /// <param name="uri">The path or URI. / 節點 URI</param>
+    /// <param name="baseUri">The path or URI. / 封裝基底 URI</param>
+    /// <returns>The result. / OdfKit 主詞字串</returns>
     public static string ToSubjectString(Uri uri, Uri? baseUri = null)
     {
         Uri graphBase = baseUri ?? DefaultPackageBaseUri;

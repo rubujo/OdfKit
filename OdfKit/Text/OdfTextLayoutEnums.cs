@@ -4,6 +4,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf text wrap.
 /// 表示浮動文字框的文字環繞方式。
 /// </summary>
 public enum OdfTextWrap
@@ -35,6 +36,7 @@ public enum OdfTextWrap
 }
 
 /// <summary>
+/// Represents odf anchor type.
 /// 表示浮動物件的錨定類型。
 /// </summary>
 public enum OdfAnchorType

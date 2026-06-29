@@ -6,9 +6,10 @@ using OdfKit.Styles;
 namespace OdfKit.Presentation;
 
 /// <summary>
+/// Represents a placeholder template.
 /// 表示預留位置範本的類別。
 /// </summary>
-/// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
+/// <param name="node">The underlying <see cref="OdfNode"/> instance. / 底層的 <see cref="OdfNode"/> 執行個體。</param>
 public class OdfPlaceholderTemplate(OdfNode node)
 {
     /// <summary>
@@ -17,6 +18,7 @@ public class OdfPlaceholderTemplate(OdfNode node)
     internal OdfNode Node { get; } = node;
 
     /// <summary>
+    /// Gets or sets the placeholder type.
     /// 取得或設定預留位置的型態。
     /// </summary>
     public OdfPlaceholderType PlaceholderType
@@ -26,6 +28,7 @@ public class OdfPlaceholderTemplate(OdfNode node)
     }
 
     /// <summary>
+    /// Gets or sets the X-axis coordinate of the placeholder.
     /// 取得或設定預留位置的 X 軸座標位置。
     /// </summary>
     public OdfLength? X
@@ -43,6 +46,7 @@ public class OdfPlaceholderTemplate(OdfNode node)
     }
 
     /// <summary>
+    /// Gets or sets the Y-axis coordinate of the placeholder.
     /// 取得或設定預留位置的 Y 軸座標位置。
     /// </summary>
     public OdfLength? Y
@@ -60,6 +64,7 @@ public class OdfPlaceholderTemplate(OdfNode node)
     }
 
     /// <summary>
+    /// Gets or sets the placeholder width.
     /// 取得或設定預留位置的寬度。
     /// </summary>
     public OdfLength? Width
@@ -77,6 +82,7 @@ public class OdfPlaceholderTemplate(OdfNode node)
     }
 
     /// <summary>
+    /// Gets or sets the placeholder height.
     /// 取得或設定預留位置的高度。
     /// </summary>
     public OdfLength? Height

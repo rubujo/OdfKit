@@ -11,16 +11,18 @@ using OdfKit.Text;
 namespace OdfKit.Export;
 
 /// <summary>
+/// Applies odf rtf importer.
 /// 將 RTF 匯入為 <see cref="TextDocument"/> 的 managed 淨室轉換器。
 /// </summary>
 public static class OdfRtfImporter
 {
     /// <summary>
+    /// Provides import.
     /// 從 RTF 字串建立文字文件。
     /// </summary>
-    /// <param name="rtf">來源 RTF 內容</param>
-    /// <returns>轉換後的文字文件</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="rtf"/> 為 null 時引發</exception>
+    /// <param name="rtf">The text or value. / 來源 RTF 內容</param>
+    /// <returns>The result. / 轉換後的文字文件</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / <paramref name="rtf"/> 為 null 時引發</exception>
     public static TextDocument Import(string rtf)
     {
         if (rtf is null)
@@ -31,6 +33,7 @@ public static class OdfRtfImporter
     }
 
     /// <summary>
+    /// Provides import.
     /// 從 RTF reader 建立文字文件。
     /// </summary>
     public static TextDocument Import(TextReader reader)
@@ -42,6 +45,7 @@ public static class OdfRtfImporter
     }
 
     /// <summary>
+    /// Provides load.
     /// 從 RTF 檔案建立文字文件。
     /// </summary>
     public static TextDocument Load(string path)

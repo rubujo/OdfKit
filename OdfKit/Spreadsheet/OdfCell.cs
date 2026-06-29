@@ -9,16 +9,18 @@ using OdfKit.Styles;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Represents a cell in an ODF spreadsheet.
 /// 表示 ODF 工作表中的一個儲存格。
 /// </summary>
 /// <remarks>
+/// Initializes a new instance of the <see cref="OdfCell"/> class.
 /// 初始化 <see cref="OdfCell"/> 類別的新執行個體。
 /// </remarks>
-/// <param name="node">儲存格 XML 節點</param>
-/// <param name="row">以 0 為基準的列索引</param>
-/// <param name="col">以 0 為基準的欄索引</param>
-/// <param name="doc">試算表文件</param>
-/// <param name="sheetName">所在工作表名稱</param>
+/// <param name="node">The cell XML node. / 儲存格 XML 節點。</param>
+/// <param name="row">The zero-based row index. / 採 0 為基準的列索引。</param>
+/// <param name="col">The zero-based column index. / 採 0 為基準的欄索引。</param>
+/// <param name="doc">The spreadsheet document. / 試算表文件。</param>
+/// <param name="sheetName">The containing sheet name. / 所在工作表名稱。</param>
 public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument doc, string sheetName = "")
 {
     /// <summary>
@@ -27,11 +29,13 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     internal OdfNode Node { get; } = node;
 
     /// <summary>
+    /// Gets the zero-based row index.
     /// 取得以 0 為基準的列索引。
     /// </summary>
     public int Row { get; } = row;
 
     /// <summary>
+    /// Gets the zero-based column index.
     /// 取得以 0 為基準的欄索引。
     /// </summary>
     public int Column { get; } = col;
@@ -42,6 +46,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     internal SpreadsheetDocument Document => _doc;
 
     /// <summary>
+    /// Gets or sets the type of the cell data value.
     /// 取得或設定儲存格資料值的型態。
     /// </summary>
     public string ValueType
@@ -51,6 +56,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     }
 
     /// <summary>
+    /// Gets or sets the raw numeric cell value as the <c>office:value</c> attribute string.
     /// 取得或設定儲存格的原始數值（office:value 屬性，字串格式）。
     /// </summary>
     public string RawValue
@@ -60,6 +66,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     }
 
     /// <summary>
+    /// Gets or sets the commonly typed cell value.
     /// 取得或設定儲存格的常用型別值。
     /// </summary>
     public object? CellValue
@@ -111,6 +118,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     }
 
     /// <summary>
+    /// Gets or sets the table style name applied to the cell.
     /// 取得或設定儲存格套用的表格樣式名稱。
     /// </summary>
     public string? StyleName
@@ -132,16 +140,19 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     private OdfKit.Styles.OdfCellStyleProxy? _styleProxy;
 
     /// <summary>
+    /// Gets the high-level style configuration facade for this cell.
     /// 取得此儲存格的高階樣式設定代理 Facade。
     /// </summary>
     public OdfKit.Styles.OdfCellStyleProxy Style => _styleProxy ??= new OdfKit.Styles.OdfCellStyleProxy(this);
 
     /// <summary>
+    /// Gets the fluent rich text builder for this cell.
     /// 取得此儲存格的富文字鏈式建構器。
     /// </summary>
     public OdfCellRichTextBuilder RichText => new(this);
 
     /// <summary>
+    /// Gets or sets the displayed text content of the cell as plain text from <c>text:p</c> child nodes.
     /// 取得或設定儲存格顯示的文字內容（text:p 子節點的純文字）。
     /// </summary>
     public string DisplayText
@@ -164,8 +175,11 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     }
 
     /// <summary>
+    /// Gets the cell value as the specified type <typeparamref name="T"/>, returning the default value when conversion fails.
     /// 以指定型別 <typeparamref name="T"/> 取得儲存格值；轉換失敗時回傳預設值。
     /// </summary>
+    /// <typeparam name="T">The target value type. / 目標值型別。</typeparam>
+    /// <returns>The converted cell value, or the default value when conversion fails. / 轉換後的儲存格值；轉換失敗時為預設值。</returns>
     public T? GetValue<T>()
     {
         object? val = CellValue;
@@ -179,6 +193,7 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     }
 
     /// <summary>
+    /// Gets or sets the cell formula.
     /// 取得或設定儲存格的公式。
     /// </summary>
     public string Formula
@@ -202,9 +217,10 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     }
 
     /// <summary>
+    /// Sets the numeric value of the cell.
     /// 設定儲存格的數值。
     /// </summary>
-    /// <param name="val">數值</param>
+    /// <param name="val">The numeric value. / 數值。</param>
     public void SetValue(double val)
     {
         ValueType = "float";
@@ -214,9 +230,10 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     }
 
     /// <summary>
+    /// Sets the Boolean value of the cell.
     /// 設定儲存格的布林值。
     /// </summary>
-    /// <param name="val">布林值</param>
+    /// <param name="val">The Boolean value. / 布林值。</param>
     public void SetValue(bool val)
     {
         ValueType = "boolean";
@@ -226,10 +243,11 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     }
 
     /// <summary>
+    /// Sets the date and time value of the cell.
     /// 設定儲存格的日期時間值。
     /// </summary>
-    /// <param name="date">日期時間</param>
-    /// <param name="useTimezoneNaive">是否忽略時區轉換，使用本地時間格式</param>
+    /// <param name="date">The date and time value. / 日期時間。</param>
+    /// <param name="useTimezoneNaive">Whether to ignore time zone conversion and use local time formatting. / 是否忽略時區轉換，使用本地時間格式。</param>
     public void SetValue(DateTime date, bool useTimezoneNaive = false)
     {
         ValueType = "date";
@@ -252,9 +270,10 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
     }
 
     /// <summary>
+    /// Sets the text content of the cell.
     /// 設定儲存格的文字內容。
     /// </summary>
-    /// <param name="text">文字字串</param>
+    /// <param name="text">The text string. / 文字字串。</param>
     public void SetValue(string text)
     {
         ValueType = "string";

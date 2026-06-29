@@ -8,19 +8,22 @@ using OdfKit.Compliance;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf formula object.
 /// 表示 ODF 文件中的公式物件。
 /// </summary>
-/// <param name="frameNode">公式的外框節點</param>
-/// <param name="objectNode">公式的物件節點</param>
-/// <param name="doc">所屬的文字文件</param>
+/// <param name="frameNode">The value to use. / 公式的外框節點</param>
+/// <param name="objectNode">The value to use. / 公式的物件節點</param>
+/// <param name="doc">The value to use. / 所屬的文字文件</param>
 public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocument doc)
 {
     /// <summary>
+    /// Gets argument null exception.
     /// 取得公式的外框節點。
     /// </summary>
     public OdfNode FrameNode { get; } = frameNode ?? throw new ArgumentNullException(nameof(frameNode));
 
     /// <summary>
+    /// Gets argument null exception.
     /// 取得公式的物件節點。
     /// </summary>
     public OdfNode ObjectNode { get; } = objectNode ?? throw new ArgumentNullException(nameof(objectNode));
@@ -28,6 +31,7 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
     private readonly TextDocument _doc = doc ?? throw new ArgumentNullException(nameof(doc));
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定公式物件的名稱。
     /// </summary>
     public string? Name
@@ -37,6 +41,7 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定公式物件的錨定類型。
     /// </summary>
     public string? AnchorType
@@ -46,6 +51,7 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定公式物件的寬度。
     /// </summary>
     public string? Width
@@ -55,6 +61,7 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定公式物件的高度。
     /// </summary>
     public string? Height
@@ -64,6 +71,7 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定公式在 ODF 封裝容器內的儲存資料夾路徑。
     /// </summary>
     public string? FormulaFolder
@@ -94,6 +102,7 @@ public class OdfFormulaObject(OdfNode frameNode, OdfNode objectNode, TextDocumen
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定 MathML 的 XML 字串內容。
     /// </summary>
     public string MathMlXmlString

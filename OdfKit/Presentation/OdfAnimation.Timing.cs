@@ -8,10 +8,11 @@ public partial class OdfAnimation
     private const string SmilNs = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0";
 
     /// <summary>
+    /// Sets the animation duration and synchronizes child node <c>smil:dur</c> values.
     /// 設定動畫效果的持續時間，並同步更新子節點的 <c>smil:dur</c>。
     /// </summary>
-    /// <param name="duration">持續時間</param>
-    /// <returns>目前動畫執行個體</returns>
+    /// <param name="duration">The duration. / 持續時間。</param>
+    /// <returns>The current animation instance. / 目前動畫執行個體。</returns>
     public OdfAnimation SetDuration(TimeSpan duration)
     {
         if (duration < TimeSpan.Zero)
@@ -24,10 +25,11 @@ public partial class OdfAnimation
     }
 
     /// <summary>
+    /// Sets the animation startup delay and updates <c>smil:begin</c> according to the trigger mode.
     /// 設定動畫效果的延遲啟動時間，並依觸發方式更新 <c>smil:begin</c>。
     /// </summary>
-    /// <param name="delay">延遲時間</param>
-    /// <returns>目前動畫執行個體</returns>
+    /// <param name="delay">The delay. / 延遲時間。</param>
+    /// <returns>The current animation instance. / 目前動畫執行個體。</returns>
     public OdfAnimation SetDelay(TimeSpan delay)
     {
         if (delay < TimeSpan.Zero)

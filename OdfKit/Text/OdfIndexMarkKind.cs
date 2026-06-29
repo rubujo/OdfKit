@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf index mark kind.
 /// 表示索引標記的高階類型。
 /// </summary>
 public enum OdfIndexMarkKind

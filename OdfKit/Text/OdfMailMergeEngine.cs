@@ -9,31 +9,34 @@ using OdfKit.Formula;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf mail merge engine.
 /// 表示 ODF 文件的郵件合併引擎。
 /// </summary>
-/// <param name="doc">目標文字文件</param>
+/// <param name="doc">The value to use. / 目標文字文件</param>
 public partial class OdfMailMergeEngine(TextDocument doc)
 {
     private readonly TextDocument _doc = doc ?? throw new ArgumentNullException(nameof(doc));
     private readonly Dictionary<(Type, string), PropertyInfo?> _propertyCache = [];
 
     /// <summary>
+    /// Provides execute.
     /// 執行郵件合併作業。
     /// </summary>
-    /// <param name="root">郵件合併的根節點</param>
-    /// <param name="dataSource">用來合併的資料來源物件</param>
+    /// <param name="root">The value to use. / 郵件合併的根節點</param>
+    /// <param name="dataSource">The stream or target object. / 用來合併的資料來源物件</param>
     public void Execute(OdfNode root, object dataSource)
     {
         Execute(root, dataSource, null);
     }
 
     /// <summary>
+    /// Provides execute.
     /// 執行郵件合併作業並傳回報告，支援 options 設定。
     /// </summary>
-    /// <param name="root">郵件合併的根節點</param>
-    /// <param name="dataSource">用來合併的資料來源物件</param>
-    /// <param name="options">郵件合併選項，若為 null 則使用預設值</param>
-    /// <returns>郵件合併執行報告</returns>
+    /// <param name="root">The value to use. / 郵件合併的根節點</param>
+    /// <param name="dataSource">The stream or target object. / 用來合併的資料來源物件</param>
+    /// <param name="options">The value to use. / 郵件合併選項，若為 null 則使用預設值</param>
+    /// <returns>The result. / 郵件合併執行報告</returns>
     public OdfMailMergeReport Execute(OdfNode root, object dataSource, OdfMailMergeOptions? options)
     {
         if (root is null)

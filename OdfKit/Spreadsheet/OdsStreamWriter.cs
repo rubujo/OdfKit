@@ -19,6 +19,7 @@ using Sylvan.Data.Csv;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Provides streaming ODS spreadsheet writing; when used with strict sequential <see cref="WriteStartSheet(string)"/> and <see cref="WriteEndSheet"/> calls, it supports high-performance, low-memory writes.
 /// 提供以資料流方式寫入 ODS 試算表文件的功能；使用 <see cref="WriteStartSheet(string)"/>
 /// 與 <see cref="WriteEndSheet"/> 的嚴格順序模式時，可支援高效能、低記憶體耗用的寫入作業。
 /// </summary>
@@ -46,6 +47,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     internal bool UsesBufferedSheetModeForTests => _sheetBuffers.Count > 0;
 
     /// <summary>
+    /// Gets or sets the ODF version of the ODS document to write.
     /// 取得或設定寫入之 ODS 文件的 ODF 版本。
     /// </summary>
     public OdfVersion Version
@@ -68,11 +70,12 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdsStreamWriter"/> class.
     /// 初始化 <see cref="OdsStreamWriter"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="outputStream">用來輸出 ODS 文件的目標資料流</param>
-    /// <param name="version">要寫入的 ODF 規格版本</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="outputStream"/> 為 null 時擲出</exception>
+    /// <param name="outputStream">The target stream used to output the ODS document. / 用來輸出 ODS 文件的目標資料流。</param>
+    /// <param name="version">The ODF specification version to write. / 要寫入的 ODF 規格版本。</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="outputStream"/> is <see langword="null"/>. / 當 <paramref name="outputStream"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdsStreamWriter(Stream outputStream, OdfVersion version = OdfVersion.Odf14)
     {
         _outputStream = outputStream ?? throw new ArgumentNullException(nameof(outputStream));
@@ -120,10 +123,12 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Starts writing a new worksheet.
     /// 開始寫入一個新的工作表。
     /// </summary>
-    /// <param name="sheetName">工作表名稱</param>
+    /// <param name="sheetName">The sheet name. / 工作表名稱。</param>
     /// <remarks>
+    /// This method writes directly to the current output stream and is suitable for strictly sequential, low-memory sheet output. For interleaved writes across multiple sheets, use <see cref="SwitchToSheet(string)"/>; that mode buffers each sheet fragment for convenience, but memory use grows with buffered content.
     /// 此方法會直接寫入目前輸出資料流，適合嚴格順序、低記憶體的工作表輸出。
     /// 若需要在多張工作表之間交錯寫入，請使用 <see cref="SwitchToSheet(string)"/>；
     /// 該模式會暫存各工作表片段，便利性較高但記憶體用量會隨已緩衝內容增加。
@@ -141,15 +146,17 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Switches to the specified worksheet and uses temporary buffering to support interleaved multi-sheet writes.
     /// 切換至指定工作表，以暫存緩衝支援多工作表交錯寫入。
     /// </summary>
-    /// <param name="sheetName">要切換或建立的工作表名稱</param>
+    /// <param name="sheetName">The worksheet name to switch to or create. / 要切換或建立的工作表名稱。</param>
     /// <remarks>
+    /// This method is the buffered convenience path: every switched sheet keeps a temporary XML fragment and is emitted in first-seen order when the writer is disposed. To preserve strict low-memory streaming semantics, use <see cref="WriteStartSheet(string)"/> and <see cref="WriteEndSheet"/> to complete each sheet sequentially.
     /// 此方法是緩衝便利路徑：每張曾切換的工作表都會保留一段暫存 XML，
     /// 並於釋放寫入器時依首次出現順序輸出。若要維持嚴格低記憶體串流語意，請使用
     /// <see cref="WriteStartSheet(string)"/> 與 <see cref="WriteEndSheet"/> 依序完成每張工作表。
     /// </remarks>
-    /// <exception cref="ArgumentException">當 <paramref name="sheetName"/> 為 null 或空白時擲出</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="sheetName"/> is <see langword="null"/> or whitespace. / 當 <paramref name="sheetName"/> 為 <see langword="null"/> 或空白時擲出。</exception>
     public void SwitchToSheet(string sheetName)
     {
         if (_disposed)
@@ -175,10 +182,11 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Writes a column definition.
     /// 寫入資料欄定義。
     /// </summary>
-    /// <param name="width">資料欄寬度</param>
-    /// <param name="styleName">樣式名稱，如果為 null 則自動產生</param>
+    /// <param name="width">The column width. / 資料欄寬度。</param>
+    /// <param name="styleName">The style name; if <see langword="null"/>, one is generated automatically. / 樣式名稱，如果為 <see langword="null"/> 則自動產生。</param>
     public void WriteColumn(OdfLength width, string? styleName = null)
     {
         if (_disposed)
@@ -196,11 +204,12 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Starts writing a new data row.
     /// 開始寫入一個新的資料列。
     /// </summary>
-    /// <param name="height">資料列高度</param>
-    /// <param name="styleName">樣式名稱</param>
-    /// <param name="useOptimalHeight">是否使用最佳高度</param>
+    /// <param name="height">The row height. / 資料列高度。</param>
+    /// <param name="styleName">The style name. / 樣式名稱。</param>
+    /// <param name="useOptimalHeight">Whether to use optimal height. / 是否使用最佳高度。</param>
     public void WriteStartRow(double? height = null, string? styleName = null, bool useOptimalHeight = false)
     {
         if (_disposed)
@@ -230,20 +239,22 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Writes a string cell.
     /// 寫入字串型態的儲存格。
     /// </summary>
-    /// <param name="value">儲存格的值</param>
-    /// <param name="styleName">樣式名稱</param>
+    /// <param name="value">The cell value. / 儲存格的值。</param>
+    /// <param name="styleName">The style name. / 樣式名稱。</param>
     public void WriteCell(string value, string? styleName = null)
     {
         WriteCell(value.AsSpan(), styleName);
     }
 
     /// <summary>
+    /// Writes a string cell.
     /// 寫入字串型態的儲存格。
     /// </summary>
-    /// <param name="value">儲存格的值</param>
-    /// <param name="styleName">樣式名稱</param>
+    /// <param name="value">The cell value. / 儲存格的值。</param>
+    /// <param name="styleName">The style name. / 樣式名稱。</param>
     public void WriteCell(ReadOnlySpan<char> value, string? styleName = null)
     {
         if (_disposed)
@@ -265,18 +276,20 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Writes a string cell.
     /// 寫入字串型態的儲存格。
     /// </summary>
-    /// <param name="value">儲存格的值</param>
-    /// <param name="styleName">樣式名稱</param>
+    /// <param name="value">The cell value. / 儲存格的值。</param>
+    /// <param name="styleName">The style name. / 樣式名稱。</param>
     public void WriteCell(ReadOnlyMemory<char> value, string? styleName = null) =>
         WriteCell(value.Span, styleName);
 
     /// <summary>
+    /// Writes a numeric cell.
     /// 寫入數值型態的儲存格。
     /// </summary>
-    /// <param name="value">儲存格的數值</param>
-    /// <param name="styleName">樣式名稱</param>
+    /// <param name="value">The cell numeric value. / 儲存格的數值。</param>
+    /// <param name="styleName">The style name. / 樣式名稱。</param>
     public void WriteCell(double value, string? styleName = null)
     {
         if (_disposed)
@@ -296,11 +309,12 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Writes a date and time cell.
     /// 寫入日期時間型態的儲存格。
     /// </summary>
-    /// <param name="value">儲存格的日期時間值</param>
-    /// <param name="styleName">樣式名稱</param>
-    /// <param name="timezoneNaive">是否忽略時區轉換</param>
+    /// <param name="value">The cell date and time value. / 儲存格的日期時間值。</param>
+    /// <param name="styleName">The style name. / 樣式名稱。</param>
+    /// <param name="timezoneNaive">Whether to ignore time zone conversion. / 是否忽略時區轉換。</param>
     public void WriteCell(DateTime value, string? styleName = null, bool timezoneNaive = false)
     {
         if (_disposed)
@@ -335,10 +349,11 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Writes a Boolean cell.
     /// 寫入布林值型態的儲存格。
     /// </summary>
-    /// <param name="value">儲存格的布林值</param>
-    /// <param name="styleName">樣式名稱</param>
+    /// <param name="value">The cell Boolean value. / 儲存格的布林值。</param>
+    /// <param name="styleName">The style name. / 樣式名稱。</param>
     public void WriteCell(bool value, string? styleName = null)
     {
         if (_disposed)
@@ -358,10 +373,11 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Writes an existing DOM subtree directly to the current worksheet or row position.
     /// 將既有 DOM 子樹直接寫入目前工作表或資料列位置。
     /// </summary>
-    /// <param name="node">要寫入的 DOM 節點</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="node"/> 為 null 時擲出</exception>
+    /// <param name="node">The DOM node to write. / 要寫入的 DOM 節點。</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="node"/> is <see langword="null"/>. / 當 <paramref name="node"/> 為 <see langword="null"/> 時擲出。</exception>
     public void WriteNode(OdfNode node)
     {
         if (node is null)
@@ -384,14 +400,15 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Writes a CSV stream to the current worksheet row by row with low memory usage.
     /// 將 CSV 資料流以低記憶體方式逐列寫入目前工作表。
     /// </summary>
-    /// <param name="csvStream">CSV 來源資料流</param>
-    /// <param name="firstRowAsHeader">是否將第一列視為欄位標題而略過資料寫入</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步寫入作業的工作</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="csvStream"/> 為 null 時擲出</exception>
-    /// <exception cref="InvalidOperationException">當目前尚未開始任何工作表時擲出</exception>
+    /// <param name="csvStream">The source CSV stream. / CSV 來源資料流。</param>
+    /// <param name="firstRowAsHeader">Whether to treat the first row as column headers and skip writing it as data. / 是否將第一列視為欄位標題而略過資料寫入。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>A task that represents the asynchronous write operation. / 代表非同步寫入作業的工作。</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="csvStream"/> is <see langword="null"/>. / 當 <paramref name="csvStream"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="InvalidOperationException">Thrown when no worksheet has been started. / 當目前尚未開始任何工作表時擲出。</exception>
     public async Task WriteCsvStreamAsync(
         Stream csvStream,
         bool firstRowAsHeader = false,
@@ -447,15 +464,16 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Writes the current result set from a <see cref="DbDataReader"/> to the current worksheet row by row with low memory usage.
     /// 將 <see cref="DbDataReader"/> 目前結果集以低記憶體方式逐列寫入目前工作表。
     /// </summary>
-    /// <param name="reader">資料來源讀取器</param>
-    /// <param name="includeColumnNames">是否先寫入資料行名稱列</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步寫入作業的工作</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="reader"/> 為 null 時擲出</exception>
-    /// <exception cref="ObjectDisposedException">當寫入器已釋放時擲出</exception>
-    /// <exception cref="InvalidOperationException">當目前尚未開始任何工作表時擲出</exception>
+    /// <param name="reader">The source data reader. / 資料來源讀取器。</param>
+    /// <param name="includeColumnNames">Whether to write a row of column names first. / 是否先寫入資料行名稱列。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>A task that represents the asynchronous write operation. / 代表非同步寫入作業的工作。</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="reader"/> is <see langword="null"/>. / 當 <paramref name="reader"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ObjectDisposedException">Thrown when the writer has been disposed. / 當寫入器已釋放時擲出。</exception>
+    /// <exception cref="InvalidOperationException">Thrown when no worksheet has been started. / 當目前尚未開始任何工作表時擲出。</exception>
     public async Task WriteDataAsync(
         DbDataReader reader,
         bool includeColumnNames = false,
@@ -526,6 +544,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Ends writing the current data row.
     /// 結束目前資料列的寫入。
     /// </summary>
     public void WriteEndRow()
@@ -540,6 +559,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Ends writing the current worksheet.
     /// 結束目前工作表的寫入。
     /// </summary>
     public void WriteEndSheet()
@@ -556,6 +576,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         }
     }
     /// <summary>
+    /// Closes all underlying streams and releases resources used by <see cref="OdsStreamWriter"/>.
     /// 關閉所有底層資料流並釋放 <see cref="OdsStreamWriter"/> 使用的資源。
     /// </summary>
     public void Dispose()
@@ -565,9 +586,10 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Asynchronously releases resources used by the <see cref="OdsStreamWriter"/> class.
     /// 非同步釋放 <see cref="OdsStreamWriter"/> 類別所使用的資源。
     /// </summary>
-    /// <returns>代表非同步處置作業的 <see cref="ValueTask"/></returns>
+    /// <returns>A <see cref="ValueTask"/> that represents the asynchronous dispose operation. / 代表非同步處置作業的 <see cref="ValueTask"/>。</returns>
     public ValueTask DisposeAsync()
     {
         Dispose();
@@ -575,9 +597,10 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Releases unmanaged resources used by the <see cref="OdsStreamWriter"/> class and optionally releases managed resources.
     /// 釋放 <see cref="OdsStreamWriter"/> 類別所使用的非受控資源，並選擇性釋放受控資源。
     /// </summary>
-    /// <param name="disposing">為 true 則釋放受控與非受控資源；為 false 則僅釋放非受控資源</param>
+    /// <param name="disposing"><see langword="true"/> to release managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources. / 為 <see langword="true"/> 則釋放受控與非受控資源；為 <see langword="false"/> 則僅釋放非受控資源。</param>
     protected virtual void Dispose(bool disposing)
     {
         if (_disposed)
@@ -637,14 +660,15 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     private XmlWriter CurrentWriter => _activeSheetBuffer?.Writer ?? _writer;
 
     /// <summary>
+    /// Generates XML fragments for multiple worksheets in parallel and writes them to the current ODS package in job list order.
     /// 並行產生多個工作表的 XML 片段，並依工作清單順序寫入目前 ODS 封裝。
     /// </summary>
-    /// <param name="jobs">工作表寫入工作清單</param>
-    /// <param name="maxConcurrency">最大並行度；小於 1 時使用處理器核心數</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步寫入作業的工作</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="jobs"/> 為 null 時擲出</exception>
-    /// <exception cref="ObjectDisposedException">當寫入器已釋放時擲出</exception>
+    /// <param name="jobs">The worksheet write job list. / 工作表寫入工作清單。</param>
+    /// <param name="maxConcurrency">The maximum concurrency; values less than 1 use the processor count. / 最大並行度；小於 1 時使用處理器核心數。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>A task that represents the asynchronous write operation. / 代表非同步寫入作業的工作。</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="jobs"/> is <see langword="null"/>. / 當 <paramref name="jobs"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ObjectDisposedException">Thrown when the writer has been disposed. / 當寫入器已釋放時擲出。</exception>
     public async Task WriteSheetsAsync(
         IEnumerable<OdsSheetWriteJob> jobs,
         int maxConcurrency = 0,
@@ -813,12 +837,13 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Converts an ODS write operation to an asynchronous stream of read-only memory byte chunks for chunked HTTP transfer.
     /// 將 ODS 文件寫入作業轉換為非同步的唯讀記憶體位元組資料流，可用於 Chunked HTTP 傳輸。
     /// </summary>
-    /// <param name="writeAction">執行寫入的非同步委派</param>
-    /// <param name="version">要寫入的 ODF 規格版本</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>非同步唯讀記憶體位元組區段的列舉器</returns>
+    /// <param name="writeAction">The asynchronous delegate that performs writing. / 執行寫入的非同步委派。</param>
+    /// <param name="version">The ODF specification version to write. / 要寫入的 ODF 規格版本。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>An asynchronous enumerator of read-only memory byte chunks. / 非同步唯讀記憶體位元組區段的列舉器。</returns>
     public static async IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
         Func<OdsStreamWriter, Task> writeAction,
         OdfVersion version = OdfVersion.Odf14,
@@ -856,12 +881,13 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Converts an ODS write operation to an asynchronous stream of read-only memory byte chunks for chunked HTTP transfer.
     /// 將 ODS 文件寫入作業轉換為非同步的唯讀記憶體位元組資料流，可用於 Chunked HTTP 傳輸。
     /// </summary>
-    /// <param name="writeAction">執行寫入的同步委派</param>
-    /// <param name="version">要寫入的 ODF 規格版本</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>非同步唯讀記憶體位元組區段的列舉器</returns>
+    /// <param name="writeAction">The synchronous delegate that performs writing. / 執行寫入的同步委派。</param>
+    /// <param name="version">The ODF specification version to write. / 要寫入的 ODF 規格版本。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消權杖。</param>
+    /// <returns>An asynchronous enumerator of read-only memory byte chunks. / 非同步唯讀記憶體位元組區段的列舉器。</returns>
     public static async IAsyncEnumerable<ReadOnlyMemory<byte>> ToAsyncEnumerable(
         Action<OdsStreamWriter> writeAction,
         OdfVersion version = OdfVersion.Odf14,

@@ -7,10 +7,11 @@ namespace OdfKit.Text;
 public partial class OdfTable
 {
     /// <summary>
+    /// Provides insert rows.
     /// 於指定位置插入列；若啟用追蹤修訂則記錄 <c>table:insertion</c>。
     /// </summary>
-    /// <param name="position">以 0 為基準的插入列索引</param>
-    /// <param name="count">要插入的列數</param>
+    /// <param name="position">The numeric value. / 以 0 為基準的插入列索引</param>
+    /// <param name="count">The numeric value. / 要插入的列數</param>
     public void InsertRows(int position, int count = 1)
     {
         if (position < 0)
@@ -33,10 +34,11 @@ public partial class OdfTable
     }
 
     /// <summary>
+    /// Removes delete rows.
     /// 刪除指定位置的列；若啟用追蹤修訂則記錄 <c>table:deletion</c>。
     /// </summary>
-    /// <param name="position">以 0 為基準的起始列索引</param>
-    /// <param name="count">要刪除的列數</param>
+    /// <param name="position">The numeric value. / 以 0 為基準的起始列索引</param>
+    /// <param name="count">The numeric value. / 要刪除的列數</param>
     public void DeleteRows(int position, int count = 1)
     {
         if (position < 0)
@@ -59,10 +61,11 @@ public partial class OdfTable
     }
 
     /// <summary>
+    /// Provides insert columns.
     /// 於指定位置插入欄；若啟用追蹤修訂則記錄 <c>table:insertion</c>。
     /// </summary>
-    /// <param name="position">以 0 為基準的插入欄索引</param>
-    /// <param name="count">要插入的欄數</param>
+    /// <param name="position">The numeric value. / 以 0 為基準的插入欄索引</param>
+    /// <param name="count">The numeric value. / 要插入的欄數</param>
     public void InsertColumns(int position, int count = 1)
     {
         if (position < 0)
@@ -85,10 +88,11 @@ public partial class OdfTable
     }
 
     /// <summary>
+    /// Removes delete columns.
     /// 刪除指定位置的欄；若啟用追蹤修訂則記錄 <c>table:deletion</c>。
     /// </summary>
-    /// <param name="position">以 0 為基準的起始欄索引</param>
-    /// <param name="count">要刪除的欄數</param>
+    /// <param name="position">The numeric value. / 以 0 為基準的起始欄索引</param>
+    /// <param name="count">The numeric value. / 要刪除的欄數</param>
     public void DeleteColumns(int position, int count = 1)
     {
         if (position < 0)

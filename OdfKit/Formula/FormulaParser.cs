@@ -7,6 +7,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
 /// <summary>
+/// Parses formula strings into abstract syntax tree (AST) nodes.
 /// 公式剖析器，用於將公式字串剖析為抽象語法樹 (AST)。
 /// </summary>
 public ref struct FormulaParser
@@ -15,9 +16,10 @@ public ref struct FormulaParser
     private FormulaParserToken _currentToken;
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="FormulaParser"/> struct with the specified formula string.
     /// 使用指定的公式字串初始化 <see cref="FormulaParser"/> 結構的新執行個體。
     /// </summary>
-    /// <param name="formula">公式字串</param>
+    /// <param name="formula">The formula string. / 公式字串。</param>
     public FormulaParser(string formula)
     {
         _tokenizer = new Tokenizer(formula.AsSpan());
@@ -30,10 +32,11 @@ public ref struct FormulaParser
     }
 
     /// <summary>
+    /// Starts parsing the formula.
     /// 開始剖析公式。
     /// </summary>
-    /// <returns>剖析後的 AST 根節點</returns>
-    /// <exception cref="InvalidOperationException">當公式結尾有未預期的語彙基元時擲出</exception>
+    /// <returns>The parsed AST root node. / 剖析後的 AST 根節點。</returns>
+    /// <exception cref="InvalidOperationException">When an unexpected token remains at the end of the formula. / 當公式結尾有未預期的語彙基元時擲出。</exception>
     public AstNode Parse()
     {
         var node = ParseExpression();

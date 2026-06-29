@@ -3,41 +3,49 @@
 public partial class OdfPageSetup
 {
     /// <summary>
+    /// Gets master page name.
     /// 取得此頁面設定對應的主頁面樣式名稱。
     /// </summary>
     public string MasterPageName => _masterPageName;
 
     /// <summary>
+    /// Gets header.
     /// 取得預設頁首區域。
     /// </summary>
     public OdfPageHeaderFooter Header => new(_doc, this, "header");
 
     /// <summary>
+    /// Gets header left.
     /// 取得左頁首區域（鏡像版面）。
     /// </summary>
     public OdfPageHeaderFooter HeaderLeft => new(_doc, this, "header-left");
 
     /// <summary>
+    /// Gets header first.
     /// 取得首頁專用頁首區域。
     /// </summary>
     public OdfPageHeaderFooter HeaderFirst => new(_doc, this, "header-first");
 
     /// <summary>
+    /// Gets footer.
     /// 取得預設頁尾區域。
     /// </summary>
     public OdfPageHeaderFooter Footer => new(_doc, this, "footer");
 
     /// <summary>
+    /// Gets footer left.
     /// 取得左頁尾區域（鏡像版面）。
     /// </summary>
     public OdfPageHeaderFooter FooterLeft => new(_doc, this, "footer-left");
 
     /// <summary>
+    /// Gets footer first.
     /// 取得首頁專用頁尾區域。
     /// </summary>
     public OdfPageHeaderFooter FooterFirst => new(_doc, this, "footer-first");
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定頁首區域最小高度（例如 <c>1.5cm</c>）。
     /// </summary>
     public string? HeaderMinHeight
@@ -47,6 +55,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定頁尾區域最小高度（例如 <c>1cm</c>）。
     /// </summary>
     public string? FooterMinHeight
@@ -56,6 +65,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定頁首是否採用動態間距。
     /// </summary>
     public bool? HeaderDynamicSpacing
@@ -65,6 +75,7 @@ public partial class OdfPageSetup
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定頁尾是否採用動態間距。
     /// </summary>
     public bool? FooterDynamicSpacing

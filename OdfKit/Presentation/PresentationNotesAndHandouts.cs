@@ -8,23 +8,27 @@ using OdfNamespaces = OdfKit.Core.OdfNamespaces;
 namespace OdfKit.Presentation;
 
 /// <summary>
+/// Represents a speaker notes page for a slide.
 /// 表示投影片備忘錄頁面（Speaker Notes Page）的類別。
 /// </summary>
-/// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
-/// <param name="slide">所屬的投影片執行個體</param>
+/// <param name="node">The underlying <see cref="OdfNode"/> instance. / 底層的 <see cref="OdfNode"/> 執行個體。</param>
+/// <param name="slide">The owning slide instance. / 所屬的投影片執行個體。</param>
 public class OdfNotesPage(OdfNode node, OdfSlide slide)
 {
     /// <summary>
+    /// Gets the underlying ODF node.
     /// 取得底層的 ODF 節點。
     /// </summary>
     public OdfNode Node { get; } = node;
 
     /// <summary>
+    /// Gets the owning slide.
     /// 取得所屬的投影片。
     /// </summary>
     public OdfSlide Slide { get; } = slide;
 
     /// <summary>
+    /// Gets or sets the text content of the speaker notes.
     /// 取得或設定主講人備忘錄的文字內容。
     /// </summary>
     public string SpeakerNotesText
@@ -34,6 +38,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     }
 
     /// <summary>
+    /// Gets the paragraph text of the speaker notes.
     /// 取得主講人備忘錄的段落文字。
     /// </summary>
     public IReadOnlyList<string> SpeakerNoteParagraphs
@@ -58,10 +63,11 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     }
 
     /// <summary>
+    /// Sets speaker notes text as multiple paragraphs.
     /// 以多段落形式設定主講人備忘錄文字。
     /// </summary>
-    /// <param name="paragraphs">段落文字集合</param>
-    /// <returns>目前備忘錄頁面</returns>
+    /// <param name="paragraphs">The paragraph text collection. / 段落文字集合。</param>
+    /// <returns>The current notes page. / 目前備忘錄頁面。</returns>
     public OdfNotesPage SetSpeakerNotes(IEnumerable<string> paragraphs)
     {
         if (paragraphs is null)
@@ -124,6 +130,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     }
 
     /// <summary>
+    /// Gets or sets the master page name used by the notes page.
     /// 取得或設定備忘錄頁面所使用的母片名稱。
     /// </summary>
     public string? MasterPageName
@@ -143,6 +150,7 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     }
 
     /// <summary>
+    /// Gets a read-only list of all shapes on the notes page, excluding thumbnails.
     /// 取得備忘錄頁面上所有圖形（不含縮圖）的唯讀清單。
     /// </summary>
     public IReadOnlyList<OdfShape> Shapes
@@ -173,14 +181,15 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     }
 
     /// <summary>
+    /// Adds a text box to the notes page.
     /// 在備忘錄頁面上新增文字方塊。
     /// </summary>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="w">寬度</param>
-    /// <param name="h">高度</param>
-    /// <param name="text">文字內容</param>
-    /// <returns>新增的文字方塊圖形執行個體</returns>
+    /// <param name="x">The X-axis coordinate. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis coordinate. / Y 軸座標位置。</param>
+    /// <param name="w">The width. / 寬度。</param>
+    /// <param name="h">The height. / 高度。</param>
+    /// <param name="text">The text content. / 文字內容。</param>
+    /// <returns>The added text box shape instance. / 新增的文字方塊圖形執行個體。</returns>
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, string text)
     {
         OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
@@ -203,12 +212,13 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     }
 
     /// <summary>
+    /// Adds a slide thumbnail to the notes page.
     /// 在備忘錄頁面上新增投影片縮圖。
     /// </summary>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="w">寬度</param>
-    /// <param name="h">高度</param>
+    /// <param name="x">The X-axis coordinate. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis coordinate. / Y 軸座標位置。</param>
+    /// <param name="w">The width. / 寬度。</param>
+    /// <param name="h">The height. / 高度。</param>
     public void AddSlideThumbnail(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode thumbnail = new(OdfNodeType.Element, "page-thumbnail", OdfNamespaces.Draw, "draw");
@@ -222,14 +232,15 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     }
 
     /// <summary>
+    /// Adds a basic shape to the notes page.
     /// 在備忘錄頁面上新增基本圖形。
     /// </summary>
-    /// <param name="shapeType">圖形類型</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="w">寬度</param>
-    /// <param name="h">高度</param>
-    /// <returns>新增的圖形執行個體</returns>
+    /// <param name="shapeType">The shape type. / 圖形類型。</param>
+    /// <param name="x">The X-axis coordinate. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis coordinate. / Y 軸座標位置。</param>
+    /// <param name="w">The width. / 寬度。</param>
+    /// <param name="h">The height. / 高度。</param>
+    /// <returns>The added shape instance. / 新增的圖形執行個體。</returns>
     public OdfShape AddShape(OdfShapeType shapeType, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         string localName = shapeType switch
@@ -251,15 +262,16 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
     }
 
     /// <summary>
+    /// Adds an image to the notes page.
     /// 在備忘錄頁面上新增圖片。
     /// </summary>
-    /// <param name="imageBytes">圖片的位元組陣列</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="w">寬度</param>
-    /// <param name="h">高度</param>
-    /// <param name="altText">選用的圖片替代文字</param>
-    /// <returns>新增的圖片圖形執行個體</returns>
+    /// <param name="imageBytes">The image byte array. / 圖片的位元組陣列。</param>
+    /// <param name="x">The X-axis coordinate. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis coordinate. / Y 軸座標位置。</param>
+    /// <param name="w">The width. / 寬度。</param>
+    /// <param name="h">The height. / 高度。</param>
+    /// <param name="altText">The optional image alternative text. / 選用的圖片替代文字。</param>
+    /// <returns>The added picture shape instance. / 新增的圖片圖形執行個體。</returns>
     public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h, string? altText = null)
     {
         OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
@@ -310,23 +322,27 @@ public class OdfNotesPage(OdfNode node, OdfSlide slide)
 }
 
 /// <summary>
+/// Represents a presentation handout page.
 /// 表示投影片講義頁面（Handout Page）的類別。
 /// </summary>
-/// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
-/// <param name="doc">所屬的簡報文件執行個體</param>
+/// <param name="node">The underlying <see cref="OdfNode"/> instance. / 底層的 <see cref="OdfNode"/> 執行個體。</param>
+/// <param name="doc">The owning presentation document instance. / 所屬的簡報文件執行個體。</param>
 public class OdfHandoutPage(OdfNode node, PresentationDocument doc)
 {
     /// <summary>
+    /// Gets the underlying ODF node.
     /// 取得底層的 ODF 節點。
     /// </summary>
     public OdfNode Node { get; } = node;
 
     /// <summary>
+    /// Gets the owning presentation document.
     /// 取得所屬的簡報文件。
     /// </summary>
     public PresentationDocument Document { get; } = doc;
 
     /// <summary>
+    /// Gets or sets the handout page name.
     /// 取得或設定講義頁面的名稱。
     /// </summary>
     public string? Name
@@ -346,6 +362,7 @@ public class OdfHandoutPage(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets or sets the master page name used by the handout page.
     /// 取得或設定講義頁面所使用的母片名稱。
     /// </summary>
     public string? MasterPageName
@@ -365,6 +382,7 @@ public class OdfHandoutPage(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Gets a read-only list of all shapes on the handout page, excluding thumbnail placeholders.
     /// 取得講義頁面上所有圖形（不含縮圖預留位置）的唯讀清單。
     /// </summary>
     public IReadOnlyList<OdfShape> Shapes
@@ -395,14 +413,15 @@ public class OdfHandoutPage(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Adds a text box to the handout page.
     /// 在講義頁面上新增文字方塊。
     /// </summary>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="w">寬度</param>
-    /// <param name="h">高度</param>
-    /// <param name="text">文字內容</param>
-    /// <returns>新增的文字方塊圖形執行個體</returns>
+    /// <param name="x">The X-axis coordinate. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis coordinate. / Y 軸座標位置。</param>
+    /// <param name="w">The width. / 寬度。</param>
+    /// <param name="h">The height. / 高度。</param>
+    /// <param name="text">The text content. / 文字內容。</param>
+    /// <returns>The added text box shape instance. / 新增的文字方塊圖形執行個體。</returns>
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, string text)
     {
         OdfNode frame = new(OdfNodeType.Element, "frame", OdfNamespaces.Draw, "draw");
@@ -425,12 +444,13 @@ public class OdfHandoutPage(OdfNode node, PresentationDocument doc)
     }
 
     /// <summary>
+    /// Adds a slide thumbnail placeholder to the handout page.
     /// 在講義頁面上新增投影片縮圖預留位置。
     /// </summary>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="w">寬度</param>
-    /// <param name="h">高度</param>
+    /// <param name="x">The X-axis coordinate. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis coordinate. / Y 軸座標位置。</param>
+    /// <param name="w">The width. / 寬度。</param>
+    /// <param name="h">The height. / 高度。</param>
     public void AddSlideThumbnailPlaceholder(OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         OdfNode thumbnail = new(OdfNodeType.Element, "page-thumbnail", OdfNamespaces.Draw, "draw");

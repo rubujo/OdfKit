@@ -8,19 +8,21 @@ using OdfKit.Compliance;
 namespace OdfKit.Formula;
 
 /// <summary>
-/// 提供將 LaTeX 公式字串轉譯為 MathML XML 結構的轉換器。
+/// Provides converters between LaTeX formula strings and MathML XML structures.
+/// 提供 LaTeX 公式字串與 MathML XML 結構之間的轉換器。
 /// </summary>
 public static class OdfFormulaLatexConverter
 {
     private const string MathMlNamespace = "http://www.w3.org/1998/Math/MathML";
 
     /// <summary>
+    /// Converts a LaTeX formula string to a standard MathML XML string.
     /// 將 LaTeX 公式字串轉換為標準 MathML XML 字串。
     /// </summary>
-    /// <param name="latex">LaTeX 公式字串</param>
-    /// <returns>標準 MathML XML 字串</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="latex"/> 為 <see langword="null"/> 時擲出</exception>
-    /// <exception cref="ArgumentException">當 LaTeX 公式語法錯誤時擲出</exception>
+    /// <param name="latex">The LaTeX formula string. / LaTeX 公式字串。</param>
+    /// <returns>The standard MathML XML string. / 標準 MathML XML 字串。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="latex"/> is <see langword="null"/>. / 當 <paramref name="latex"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When the LaTeX formula syntax is invalid. / 當 LaTeX 公式語法錯誤時擲出。</exception>
     public static string Convert(string latex)
     {
         if (latex == null)
@@ -289,12 +291,16 @@ public static class OdfFormulaLatexConverter
     }
 
     /// <summary>
-    /// 將一組 <see cref="OdfMathToken"/> token 反向轉換為 LaTeX 公式字串（best-effort，
-    /// 因 LaTeX 與 MathML 並非一對一對應，部分語意可能無法完整保留）。
+    /// Converts a set of <see cref="OdfMathToken"/> tokens back to a LaTeX formula string on a best-effort basis.
+    /// 將一組 <see cref="OdfMathToken"/> token 反向轉換為 LaTeX 公式字串（best-effort）。
     /// </summary>
-    /// <param name="tokens">要轉換的 token 清單。</param>
-    /// <returns>LaTeX 公式字串。</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="tokens"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <remarks>
+    /// Because LaTeX and MathML are not a one-to-one mapping, some semantics may not be fully preserved.
+    /// 因 LaTeX 與 MathML 並非一對一對應，部分語意可能無法完整保留。
+    /// </remarks>
+    /// <param name="tokens">The token list to convert. / 要轉換的 token 清單。</param>
+    /// <returns>The LaTeX formula string. / LaTeX 公式字串。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="tokens"/> is <see langword="null"/>. / 當 <paramref name="tokens"/> 為 <see langword="null"/> 時擲出。</exception>
     public static string ToLatex(IReadOnlyList<OdfMathToken> tokens)
     {
         if (tokens is null)

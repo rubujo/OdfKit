@@ -10,6 +10,8 @@ using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Reads an ODS spreadsheet row by row with low-memory streaming for large data sets.
+/// The read process uses a SAX-style <see cref="XmlReader"/>, keeping memory usage far below the DOM path.
 /// 以低記憶體流式方式逐列讀取 ODS 試算表，適用於大型資料集。
 /// 整個讀取過程使用 SAX 風格 XmlReader，記憶體佔用遠低於 DOM 讀取路徑。
 /// </summary>
@@ -31,16 +33,19 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     private readonly List<string> _sheetNames = new List<string>();
 
     /// <summary>
+    /// Gets the sheet name list scanned from the top level of <c>content.xml</c>.
     /// 工作表名稱清單（從 content.xml 頂層掃描取得）
     /// </summary>
     public IReadOnlyList<string> SheetNames => _sheetNames;
 
     /// <summary>
+    /// Gets the current zero-based row number.
     /// 取得目前列號（0-based）
     /// </summary>
     public int RowIndex => _rowIndex;
 
     /// <summary>
+    /// Gets the number of fields in the current row.
     /// 取得目前列的欄位數
     /// </summary>
     public override int FieldCount
@@ -56,9 +61,10 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     }
 
     /// <summary>
+    /// Initializes an <see cref="OdsStreamReader"/> from a stream.
     /// 從資料流初始化 <see cref="OdsStreamReader"/>。
     /// </summary>
-    /// <param name="stream">ODS 檔案資料流（需為 ZIP 相容格式）</param>
+    /// <param name="stream">The ODS file stream, which must be ZIP-compatible. / ODS 檔案資料流，需為 ZIP 相容格式。</param>
     public OdsStreamReader(Stream stream)
     {
         if (stream is null)
@@ -68,9 +74,10 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     }
 
     /// <summary>
+    /// Initializes an <see cref="OdsStreamReader"/> from a path.
     /// 從路徑初始化 <see cref="OdsStreamReader"/>。
     /// </summary>
-    /// <param name="path">ODS 檔案路徑</param>
+    /// <param name="path">The ODS file path. / ODS 檔案路徑。</param>
     public OdsStreamReader(string path)
     {
         if (path is null)
@@ -102,9 +109,10 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     }
 
     /// <summary>
+    /// Switches to the worksheet with the specified index. This must be called before the first <see cref="Read"/>.
     /// 切換至指定索引的工作表（必須在第一次 Read() 前呼叫）
     /// </summary>
-    /// <param name="sheetIndex">工作表索引（0-based）</param>
+    /// <param name="sheetIndex">The zero-based worksheet index. / 採 0 為基準的工作表索引。</param>
     public void SelectSheet(int sheetIndex)
     {
         if (_started)
@@ -116,6 +124,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     }
 
     /// <summary>
+    /// Reads the next row; returns <see langword="false"/> when the worksheet has ended.
     /// 讀取下一列；回傳 false 代表工作表結束
     /// </summary>
     public override bool Read()
@@ -333,9 +342,10 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
     }
 
     /// <summary>
+    /// Gets the raw value of the specified column in the current row. Float values become <see cref="double"/>, Boolean values become <see cref="bool"/>, date values become <see cref="DateTime"/>, and other values become strings.
     /// 取得目前列指定欄的原始值（float→double、boolean→bool、date→DateTime、其餘→string）
     /// </summary>
-    /// <param name="ordinal">欄位索引（0-based）</param>
+    /// <param name="ordinal">The zero-based field index. / 採 0 為基準的欄位索引。</param>
     public override object GetValue(int ordinal)
     {
         if (ordinal < 0 || ordinal >= _currentRowData.Count)

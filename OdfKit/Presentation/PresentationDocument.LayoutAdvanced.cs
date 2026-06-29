@@ -10,6 +10,7 @@ namespace OdfKit.Presentation;
 public partial class PresentationDocument
 {
     /// <summary>
+    /// Gets summaries for all presentation page layouts in the presentation.
     /// 取得簡報中所有投影片版面配置摘要清單。
     /// </summary>
     public IReadOnlyList<OdfPresentationPageLayoutInfo> GetPresentationPageLayouts()
@@ -26,11 +27,12 @@ public partial class PresentationDocument
     }
 
     /// <summary>
+    /// Applies the named presentation page layout to a slide and instantiates placeholders from its template.
     /// 將指定名稱的投影片版面配置套用至投影片，並依範本實例化預留位置。
     /// </summary>
-    /// <param name="slideIndex">投影片索引位置</param>
-    /// <param name="layoutName">版面配置名稱（<c>presentation:page-layout-name</c>）</param>
-    /// <exception cref="ArgumentException">找不到指定版面配置時擲出</exception>
+    /// <param name="slideIndex">The slide index. / 投影片索引位置。</param>
+    /// <param name="layoutName">The layout name from <c>presentation:page-layout-name</c>. / <c>presentation:page-layout-name</c> 的版面配置名稱。</param>
+    /// <exception cref="ArgumentException">Thrown when the specified layout cannot be found. / 找不到指定版面配置時擲出。</exception>
     public void ApplyPresentationPageLayout(int slideIndex, string layoutName)
     {
         if (string.IsNullOrWhiteSpace(layoutName))

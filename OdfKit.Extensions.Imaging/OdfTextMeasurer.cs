@@ -10,20 +10,22 @@ using SkiaSharp;
 namespace OdfKit.Extensions.Imaging;
 
 /// <summary>
+/// Provides APIs for odf text measurer.
 /// 提供整合 HarfBuzzSharp 與 SkiaSharp 的跨平台文字物理寬度精確量測工具。
 /// </summary>
 public static class OdfTextMeasurer
 {
     /// <summary>
+    /// Provides measure width.
     /// 精確量測指定字型、大小與書寫模式下文字的物理寬度（回傳 <see cref="OdfLength"/> 封裝）。
     /// </summary>
-    /// <param name="text">要量測的文字內容</param>
-    /// <param name="fontName">字型名稱</param>
-    /// <param name="fontSizePoints">字型大小（以點 Pt 為單位）</param>
-    /// <param name="isBold">是否為粗體</param>
-    /// <param name="isItalic">是否為斜體</param>
-    /// <param name="writingMode">書寫模式（橫書或直書）</param>
-    /// <returns>量測後的物理長度 <see cref="OdfLength"/></returns>
+    /// <param name="text">The text or value. / 要量測的文字內容</param>
+    /// <param name="fontName">The name or identifier. / 字型名稱</param>
+    /// <param name="fontSizePoints">The numeric value. / 字型大小（以點 Pt 為單位）</param>
+    /// <param name="isBold">The value to use. / 是否為粗體</param>
+    /// <param name="isItalic">The value to use. / 是否為斜體</param>
+    /// <param name="writingMode">The value to use. / 書寫模式（橫書或直書）</param>
+    /// <returns>The result. / 量測後的物理長度 <see cref="OdfLength"/></returns>
     public static OdfLength MeasureWidth(string text, string fontName, double fontSizePoints, bool isBold = false, bool isItalic = false, OdfWritingMode writingMode = OdfWritingMode.LrTb)
     {
         if (string.IsNullOrEmpty(text))

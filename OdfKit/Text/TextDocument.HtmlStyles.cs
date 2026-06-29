@@ -10,10 +10,11 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     /// <summary>
+    /// Provides import html styles.
     /// 匯入 HTML / CSS 樣式表，並將可對應的規則寫入 ODT 的 <c>styles.xml</c>。
     /// </summary>
-    /// <param name="cssString">要匯入的 CSS 樣式表內容</param>
-    /// <returns>CSS selector 與產生的 ODF 樣式名稱對照表</returns>
+    /// <param name="cssString">The value to use. / 要匯入的 CSS 樣式表內容</param>
+    /// <returns>The result. / CSS selector 與產生的 ODF 樣式名稱對照表</returns>
     public IReadOnlyDictionary<string, string> ImportHtmlStyles(string cssString)
     {
         if (cssString is null)

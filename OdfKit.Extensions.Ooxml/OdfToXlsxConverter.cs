@@ -20,16 +20,18 @@ using Xdr = DocumentFormat.OpenXml.Drawing.Spreadsheet;
 namespace OdfKit.Conversion;
 
 /// <summary>
+/// Applies odf to xlsx converter.
 /// 將 SpreadsheetDocument 轉換為 XLSX 格式的轉換器。
 /// </summary>
 public static class OdfToXlsxConverter
 {
     /// <summary>
+    /// Applies convert.
     /// 將 ODS 工作簿轉換並寫入 XLSX 資料流。
     /// </summary>
-    /// <param name="odsWorkbook">來源 ODS 工作簿</param>
-    /// <param name="xlsxStream">要寫入 XLSX 的目標資料流</param>
-    /// <exception cref="ArgumentNullException">當任一必要參數為 null 時引發</exception>
+    /// <param name="odsWorkbook">The value to use. / 來源 ODS 工作簿</param>
+    /// <param name="xlsxStream">The source or target object. / 要寫入 XLSX 的目標資料流</param>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當任一必要參數為 null 時引發</exception>
     public static void Convert(OdfKit.Spreadsheet.SpreadsheetDocument odsWorkbook, Stream xlsxStream)
     {
         if (odsWorkbook is null)
@@ -1644,6 +1646,7 @@ public static class OdfToXlsxConverter
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     /// <summary>
+    /// Applies translate formula.
     /// 將 OpenFormula 格式公式（of:= 或 oooc:= 前綴）翻譯為 Excel A1 格式公式。
     /// </summary>
     public static string TranslateFormula(string odtFormula)

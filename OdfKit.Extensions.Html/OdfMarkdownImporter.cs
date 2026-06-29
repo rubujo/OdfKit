@@ -11,17 +11,19 @@ using OdfKit.Text;
 namespace OdfKit.Export;
 
 /// <summary>
+/// Applies odf markdown importer.
 /// 將 Markdown 匯入為 <see cref="TextDocument"/> 的 managed 淨室轉換器。
 /// </summary>
 public static class OdfMarkdownImporter
 {
     /// <summary>
+    /// Provides import.
     /// 從 Markdown 字串建立文字文件。
     /// </summary>
-    /// <param name="markdown">來源 Markdown 內容</param>
-    /// <param name="options">Markdown 匯入選項；若為 null 則使用預設值</param>
-    /// <returns>轉換後的文字文件</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="markdown"/> 為 null 時引發</exception>
+    /// <param name="markdown">The text or value. / 來源 Markdown 內容</param>
+    /// <param name="options">The value to use. / Markdown 匯入選項；若為 null 則使用預設值</param>
+    /// <returns>The result. / 轉換後的文字文件</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / <paramref name="markdown"/> 為 null 時引發</exception>
     public static TextDocument Import(string markdown, OdfMarkdownImportOptions? options = null)
     {
         if (markdown is null)
@@ -172,6 +174,7 @@ public static class OdfMarkdownImporter
     }
 
     /// <summary>
+    /// Provides import.
     /// 從 Markdown reader 建立文字文件。
     /// </summary>
     public static TextDocument Import(TextReader reader, OdfMarkdownImportOptions? options = null)
@@ -183,6 +186,7 @@ public static class OdfMarkdownImporter
     }
 
     /// <summary>
+    /// Provides load.
     /// 從 Markdown 檔案建立文字文件。
     /// </summary>
     public static TextDocument Load(string path, OdfMarkdownImportOptions? options = null)

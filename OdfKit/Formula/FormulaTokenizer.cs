@@ -5,18 +5,20 @@ using OdfKit.Spreadsheet;
 namespace OdfKit.Formula;
 
 /// <summary>
+/// Tokenizes formula strings.
 /// 公式字串的分詞器。
 /// </summary>
-/// <param name="formula">要分詞的公式字元範圍</param>
+/// <param name="formula">The formula character span to tokenize. / 要分詞的公式字元範圍。</param>
 public ref struct Tokenizer(ReadOnlySpan<char> formula)
 {
     private readonly ReadOnlySpan<char> _formula = formula;
     private int _index = 0;
 
     /// <summary>
+    /// Gets the next token.
     /// 取得下一個語彙基元。
     /// </summary>
-    /// <returns>下一個語彙基元</returns>
+    /// <returns>The next token. / 下一個語彙基元。</returns>
     public FormulaParserToken NextToken()
     {
         SkipWhitespace();

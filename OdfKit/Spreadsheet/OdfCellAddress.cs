@@ -6,50 +6,58 @@ using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Represents a cell address in an ODF spreadsheet.
 /// 表示 ODF 試算表中的儲存格位址。
 /// </summary>
 public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
 {
     /// <summary>
+    /// Gets the zero-based row index.
     /// 取得以 0 為基準的列索引。
     /// </summary>
     public int Row { get; }
 
     /// <summary>
+    /// Gets the zero-based column index.
     /// 取得以 0 為基準的欄索引。
     /// </summary>
     public int Column { get; }
 
     /// <summary>
+    /// Gets the sheet name.
     /// 取得工作表名稱。
     /// </summary>
     public string? SheetName { get; }
 
     /// <summary>
+    /// Gets a value indicating whether the row index is an absolute reference.
     /// 取得一個值，指出列索引是否為絕對參照。
     /// </summary>
     public bool IsRowAbsolute { get; }
 
     /// <summary>
+    /// Gets a value indicating whether the column index is an absolute reference.
     /// 取得一個值，指出欄索引是否為絕對參照。
     /// </summary>
     public bool IsColumnAbsolute { get; }
 
     /// <summary>
+    /// Gets a value indicating whether the sheet name is an absolute reference.
     /// 取得一個值，指出工作表名稱是否為絕對參照。
     /// </summary>
     public bool IsSheetAbsolute { get; }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfCellAddress"/> struct.
     /// 初始化 <see cref="OdfCellAddress"/> 結構的新執行個體。
     /// </summary>
-    /// <param name="row">以 0 為基準的列索引</param>
-    /// <param name="column">以 0 為基準的欄索引</param>
-    /// <param name="sheetName">工作表名稱</param>
-    /// <param name="isRowAbsolute">列索引是否為絕對參照</param>
-    /// <param name="isColumnAbsolute">欄索引是否為絕對參照</param>
-    /// <param name="isSheetAbsolute">工作表名稱是否為絕對參照</param>
-    /// <exception cref="ArgumentOutOfRangeException">當列索引或欄索引小於 0 時擲出</exception>
+    /// <param name="row">The zero-based row index. / 採 0 為基準的列索引。</param>
+    /// <param name="column">The zero-based column index. / 採 0 為基準的欄索引。</param>
+    /// <param name="sheetName">The sheet name. / 工作表名稱。</param>
+    /// <param name="isRowAbsolute">Whether the row index is an absolute reference. / 列索引是否為絕對參照。</param>
+    /// <param name="isColumnAbsolute">Whether the column index is an absolute reference. / 欄索引是否為絕對參照。</param>
+    /// <param name="isSheetAbsolute">Whether the sheet name is an absolute reference. / 工作表名稱是否為絕對參照。</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the row or column index is less than 0. / 當列索引或欄索引小於 0 時擲出。</exception>
     public OdfCellAddress(int row, int column, string? sheetName = null,
         bool isRowAbsolute = false, bool isColumnAbsolute = false, bool isSheetAbsolute = false)
     {
@@ -67,10 +75,11 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     }
 
     /// <summary>
+    /// Indicates whether the current instance is equal to another instance of the same type.
     /// 指出目前執行個體是否等於另一個相同類型的執行個體。
     /// </summary>
-    /// <param name="other">要比較的另一個執行個體</param>
-    /// <returns>如果兩個執行個體相等則為 true，否則為 false</returns>
+    /// <param name="other">The other instance to compare. / 要比較的另一個執行個體。</param>
+    /// <returns><see langword="true"/> if the two instances are equal; otherwise, <see langword="false"/>. / 如果兩個執行個體相等則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public bool Equals(OdfCellAddress other)
     {
         return Row == other.Row &&
@@ -82,16 +91,18 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     }
 
     /// <summary>
+    /// Indicates whether this instance and the specified object are equal.
     /// 指出此執行個體與指定的物件是否相等。
     /// </summary>
-    /// <param name="obj">要比較的物件</param>
-    /// <returns>如果指定的物件與目前執行個體相等則為 true，否則為 false</returns>
+    /// <param name="obj">The object to compare. / 要比較的物件。</param>
+    /// <returns><see langword="true"/> if the specified object equals the current instance; otherwise, <see langword="false"/>. / 如果指定的物件與目前執行個體相等則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public override bool Equals(object? obj) => obj is OdfCellAddress other && Equals(other);
 
     /// <summary>
+    /// Returns the hash code for this instance.
     /// 傳回此執行個體的雜湊碼。
     /// </summary>
-    /// <returns>32 位元有號整數雜湊碼</returns>
+    /// <returns>A 32-bit signed integer hash code. / 32 位元有號整數雜湊碼。</returns>
     public override int GetHashCode()
     {
         unchecked
@@ -108,42 +119,47 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     }
 
     /// <summary>
+    /// Compares two <see cref="OdfCellAddress"/> instances for equality.
     /// 比較兩個 <see cref="OdfCellAddress"/> 執行個體是否相等。
     /// </summary>
-    /// <param name="left">左方的執行個體</param>
-    /// <param name="right">右方的執行個體</param>
-    /// <returns>如果相等則為 true，否則為 false</returns>
+    /// <param name="left">The left instance. / 左方的執行個體。</param>
+    /// <param name="right">The right instance. / 右方的執行個體。</param>
+    /// <returns><see langword="true"/> if the instances are equal; otherwise, <see langword="false"/>. / 如果相等則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public static bool operator ==(OdfCellAddress left, OdfCellAddress right) => left.Equals(right);
 
     /// <summary>
+    /// Compares two <see cref="OdfCellAddress"/> instances for inequality.
     /// 比較兩個 <see cref="OdfCellAddress"/> 執行個體是否不相等。
     /// </summary>
-    /// <param name="left">左方的執行個體</param>
-    /// <param name="right">右方的執行個體</param>
-    /// <returns>如果不相等則為 true，否則為 false</returns>
+    /// <param name="left">The left instance. / 左方的執行個體。</param>
+    /// <param name="right">The right instance. / 右方的執行個體。</param>
+    /// <returns><see langword="true"/> if the instances are not equal; otherwise, <see langword="false"/>. / 如果不相等則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public static bool operator !=(OdfCellAddress left, OdfCellAddress right) => !left.Equals(right);
     #region Address Parsing
 
     /// <summary>
+    /// Parses an Excel-style cell address string.
     /// 解析 Excel 格式的儲存格位址字串。
     /// </summary>
-    /// <param name="address">Excel 格式的位址字串</param>
-    /// <returns>解析後的 <see cref="OdfCellAddress"/> 執行個體</returns>
+    /// <param name="address">The Excel-style address string. / Excel 格式的位址字串。</param>
+    /// <returns>The parsed <see cref="OdfCellAddress"/> instance. / 解析後的 <see cref="OdfCellAddress"/> 執行個體。</returns>
     public static OdfCellAddress ParseExcel(string address) => Parse(address.AsSpan(), false);
 
     /// <summary>
+    /// Parses an ODF-style cell address string.
     /// 解析 ODF 格式的儲存格位址字串。
     /// </summary>
-    /// <param name="address">ODF 格式的位址字串</param>
-    /// <returns>解析後的 <see cref="OdfCellAddress"/> 執行個體</returns>
+    /// <param name="address">The ODF-style address string. / ODF 格式的位址字串。</param>
+    /// <returns>The parsed <see cref="OdfCellAddress"/> instance. / 解析後的 <see cref="OdfCellAddress"/> 執行個體。</returns>
     public static OdfCellAddress ParseOdf(string address) => Parse(address.AsSpan(), true);
 
     /// <summary>
+    /// Attempts to parse a cell address string.
     /// 嘗試解析儲存格位址字串。
     /// </summary>
-    /// <param name="value">要解析的位址字串</param>
-    /// <param name="address">解析成功時傳回的儲存格位址</param>
-    /// <returns>如果解析成功則為 true，否則為 false</returns>
+    /// <param name="value">The address string to parse. / 要解析的位址字串。</param>
+    /// <param name="address">The cell address returned when parsing succeeds. / 解析成功時傳回的儲存格位址。</param>
+    /// <returns><see langword="true"/> if parsing succeeds; otherwise, <see langword="false"/>. / 如果解析成功則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public static bool TryParse(string value, out OdfCellAddress address)
     {
         try
@@ -167,12 +183,13 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     }
 
     /// <summary>
+    /// Parses a cell address from a character span.
     /// 從字元範圍解析儲存格位址。
     /// </summary>
-    /// <param name="span">包含儲存格位址的唯讀字元範圍</param>
-    /// <param name="isOdfStyle">是否使用 ODF 格式樣式</param>
-    /// <returns>解析後的 <see cref="OdfCellAddress"/> 結構</returns>
-    /// <exception cref="FormatException">當字串格式無效時擲出</exception>
+    /// <param name="span">The read-only character span containing the cell address. / 包含儲存格位址的唯讀字元範圍。</param>
+    /// <param name="isOdfStyle">Whether to use ODF-style formatting. / 是否使用 ODF 格式樣式。</param>
+    /// <returns>The parsed <see cref="OdfCellAddress"/> struct. / 解析後的 <see cref="OdfCellAddress"/> 結構。</returns>
+    /// <exception cref="FormatException">Thrown when the string format is invalid. / 當字串格式無效時擲出。</exception>
     public static OdfCellAddress Parse(ReadOnlySpan<char> span, bool isOdfStyle)
     {
         span = span.Trim();
@@ -318,9 +335,10 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     #region Address Formatting & Structural Shift
 
     /// <summary>
+    /// Converts this cell address to an Excel-style string.
     /// 將此儲存格位址轉換為 Excel 格式的字串。
     /// </summary>
-    /// <returns>Excel 格式的位址字串</returns>
+    /// <returns>The Excel-style address string. / Excel 格式的位址字串。</returns>
     public string ToExcelString()
     {
         var sb = new StringBuilder();
@@ -342,10 +360,11 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     }
 
     /// <summary>
+    /// Converts this cell address to an ODF-style string.
     /// 將此儲存格位址轉換為 ODF 格式的字串。
     /// </summary>
-    /// <param name="includeBrackets">是否包含中括號</param>
-    /// <returns>ODF 格式的位址字串</returns>
+    /// <param name="includeBrackets">Whether to include brackets. / 是否包含中括號。</param>
+    /// <returns>The ODF-style address string. / ODF 格式的位址字串。</returns>
     public string ToOdfString(bool includeBrackets = false)
     {
         var sb = new StringBuilder();
@@ -394,13 +413,14 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     }
 
     /// <summary>
+    /// Adjusts the cell address according to row or column insertion and deletion.
     /// 根據列或欄的插入或刪除，調整儲存格位址。
     /// </summary>
-    /// <param name="insertRowIndex">插入列的索引位置</param>
-    /// <param name="rowCount">插入的列數（負數表示刪除）</param>
-    /// <param name="insertColIndex">插入欄的索引位置</param>
-    /// <param name="colCount">插入的欄數（負數表示刪除）</param>
-    /// <returns>調整後的新 <see cref="OdfCellAddress"/> 執行個體</returns>
+    /// <param name="insertRowIndex">The row insertion index. / 插入列的索引位置。</param>
+    /// <param name="rowCount">The number of inserted rows; a negative value indicates deletion. / 插入的列數；負數表示刪除。</param>
+    /// <param name="insertColIndex">The column insertion index. / 插入欄的索引位置。</param>
+    /// <param name="colCount">The number of inserted columns; a negative value indicates deletion. / 插入的欄數；負數表示刪除。</param>
+    /// <returns>The adjusted new <see cref="OdfCellAddress"/> instance. / 調整後的新 <see cref="OdfCellAddress"/> 執行個體。</returns>
     public OdfCellAddress ShiftStructural(int insertRowIndex, int rowCount, int insertColIndex, int colCount)
     {
         int newRow = Row;
@@ -446,9 +466,10 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
     }
 
     /// <summary>
+    /// Returns a string that represents the current object.
     /// 傳回代表目前物件的字串。
     /// </summary>
-    /// <returns>代表目前物件的字串</returns>
+    /// <returns>A string that represents the current object. / 代表目前物件的字串。</returns>
     public override string ToString() => ToExcelString();
 
     #endregion

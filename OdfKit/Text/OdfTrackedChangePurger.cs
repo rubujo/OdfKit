@@ -13,9 +13,10 @@ internal sealed class OdfTrackedChangePurger(string targetId)
     private bool _foundEnd;
 
     /// <summary>
+    /// Provides purge.
     /// 遞迴清除目標修訂 ID 的變更標記與區間內容。
     /// </summary>
-    /// <param name="node">起始節點</param>
+    /// <param name="node">The value to use. / 起始節點</param>
     public void Purge(OdfNode node)
     {
         for (int i = node.Children.Count - 1; i >= 0; i--)

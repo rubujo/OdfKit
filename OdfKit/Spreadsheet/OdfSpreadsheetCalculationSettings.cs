@@ -6,6 +6,7 @@ using OdfKit.DOM;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Represents a high-level facade for ODS workbook-level calculation settings.
 /// 表示 ODS 活頁簿層級的計算設定高階外觀。
 /// </summary>
 public sealed class OdfSpreadsheetCalculationSettings
@@ -18,6 +19,7 @@ public sealed class OdfSpreadsheetCalculationSettings
     }
 
     /// <summary>
+    /// Gets or sets whether labels are found automatically.
     /// 取得或設定是否自動尋找標籤。
     /// </summary>
     public bool? AutomaticFindLabels
@@ -27,6 +29,7 @@ public sealed class OdfSpreadsheetCalculationSettings
     }
 
     /// <summary>
+    /// Gets or sets whether searches and comparisons are case-sensitive.
     /// 取得或設定搜尋與比較是否區分大小寫。
     /// </summary>
     public bool? CaseSensitive
@@ -36,6 +39,7 @@ public sealed class OdfSpreadsheetCalculationSettings
     }
 
     /// <summary>
+    /// Gets or sets the base year used for the null date.
     /// 取得或設定 null 日期所使用的基準年份。
     /// </summary>
     public int? NullYear
@@ -45,6 +49,7 @@ public sealed class OdfSpreadsheetCalculationSettings
     }
 
     /// <summary>
+    /// Gets or sets whether calculations use the displayed precision.
     /// 取得或設定是否依顯示精度計算。
     /// </summary>
     public bool? PrecisionAsShown
@@ -54,6 +59,7 @@ public sealed class OdfSpreadsheetCalculationSettings
     }
 
     /// <summary>
+    /// Gets or sets whether search criteria must match the entire cell.
     /// 取得或設定搜尋條件是否必須符合整個儲存格。
     /// </summary>
     public bool? SearchCriteriaMustApplyToWholeCell
@@ -63,6 +69,7 @@ public sealed class OdfSpreadsheetCalculationSettings
     }
 
     /// <summary>
+    /// Gets or sets whether formula searches use regular expressions.
     /// 取得或設定公式搜尋是否使用正規表示式。
     /// </summary>
     public bool? UseRegularExpressions
@@ -72,6 +79,7 @@ public sealed class OdfSpreadsheetCalculationSettings
     }
 
     /// <summary>
+    /// Gets or sets whether formula searches use wildcards.
     /// 取得或設定公式搜尋是否使用萬用字元。
     /// </summary>
     public bool? UseWildcards
@@ -81,17 +89,20 @@ public sealed class OdfSpreadsheetCalculationSettings
     }
 
     /// <summary>
+    /// Gets whether iteration settings already exist.
     /// 取得是否已存在反覆運算設定。
     /// </summary>
     public bool HasIteration => FindIterationNode() is not null;
 
     /// <summary>
+    /// Gets or creates iteration settings.
     /// 取得或建立反覆運算設定。
     /// </summary>
     public OdfSpreadsheetIterationSettings Iteration =>
         new(FindOrCreateChild(_node, "iteration", OdfNamespaces.Table, "table"));
 
     /// <summary>
+    /// Clears iteration settings.
     /// 清除反覆運算設定。
     /// </summary>
     public void ClearIteration()
@@ -166,6 +177,7 @@ public sealed class OdfSpreadsheetCalculationSettings
 }
 
 /// <summary>
+/// Represents formula iteration settings at the ODS workbook level.
 /// 表示 ODS 活頁簿層級的公式反覆運算設定。
 /// </summary>
 public sealed class OdfSpreadsheetIterationSettings
@@ -178,6 +190,7 @@ public sealed class OdfSpreadsheetIterationSettings
     }
 
     /// <summary>
+    /// Gets or sets whether iteration is enabled.
     /// 取得或設定反覆運算是否啟用。
     /// </summary>
     public bool? Enabled
@@ -187,6 +200,7 @@ public sealed class OdfSpreadsheetIterationSettings
     }
 
     /// <summary>
+    /// Gets or sets the maximum difference.
     /// 取得或設定最大誤差。
     /// </summary>
     public decimal? MaximumDifference
@@ -196,6 +210,7 @@ public sealed class OdfSpreadsheetIterationSettings
     }
 
     /// <summary>
+    /// Gets or sets the maximum number of iteration steps.
     /// 取得或設定最大反覆運算步數。
     /// </summary>
     public int? Steps

@@ -5,6 +5,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Provides odf image layout.
 /// 封裝影像版面配置設定，例如外框線、影像間距、環繞模式、裁剪及透明度等。
 /// </summary>
 public sealed class OdfImageLayout
@@ -19,6 +20,7 @@ public sealed class OdfImageLayout
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定外框線（對應 <c>fo:border</c>，例如 <c>"0.06pt solid #000000"</c>）。
     /// </summary>
     public string? Border
@@ -28,6 +30,7 @@ public sealed class OdfImageLayout
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定影像的四邊間距（對應 <c>fo:margin</c>，例如 <c>"0.5cm"</c>）。
     /// </summary>
     public string? Margin
@@ -37,6 +40,7 @@ public sealed class OdfImageLayout
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定影像的上方間距（對應 <c>fo:margin-top</c>）。
     /// </summary>
     public string? MarginTop
@@ -46,6 +50,7 @@ public sealed class OdfImageLayout
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定影像的下方間距（對應 <c>fo:margin-bottom</c>）。
     /// </summary>
     public string? MarginBottom
@@ -55,6 +60,7 @@ public sealed class OdfImageLayout
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定影像的左方間距（對應 <c>fo:margin-left</c>）。
     /// </summary>
     public string? MarginLeft
@@ -64,6 +70,7 @@ public sealed class OdfImageLayout
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定影像的右方間距（對應 <c>fo:margin-right</c>）。
     /// </summary>
     public string? MarginRight
@@ -73,6 +80,7 @@ public sealed class OdfImageLayout
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定文繞圖的環繞模式（對應 <c>style:wrap</c>，常見值為 <c>none</c>, <c>left</c>, <c>right</c>, <c>parallel</c>, <c>run-through</c>）。
     /// </summary>
     public string? Wrap
@@ -90,6 +98,7 @@ public sealed class OdfImageLayout
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定影像的裁剪區域設定（對應 <c>fo:clip</c>，格式如 <c>"rect(0cm, 0cm, 0cm, 0cm)"</c>）。
     /// </summary>
     public string? Crop
@@ -105,6 +114,7 @@ public sealed class OdfImageLayout
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定影像透明度（例如 <c>"50%"</c> 或對應百分比，寫入 <c>draw:image-opacity</c> 或 <c>draw:opacity</c>）。
     /// </summary>
     public string? Opacity

@@ -10,6 +10,7 @@ using Xml = System.Xml;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides APIs for odf hybrid pdf helper.
 /// 提供混合 PDF （Hybrid PDF）的公用程式方法，支援在 PDF 中內嵌與提取 ODF 檔案。
 /// </summary>
 public static class OdfHybridPdfHelper
@@ -17,11 +18,12 @@ public static class OdfHybridPdfHelper
     private const string OdfRelationName = "OdfKitHybridOdf";
 
     /// <summary>
+    /// Provides extract odf from pdf.
     /// 從混合 PDF 檔案中提取並讀取隱藏的 ODF 檔案。
     /// </summary>
-    /// <param name="pdfPath">PDF 檔案路徑</param>
-    /// <param name="password">PDF 檔案密碼，若無則為 <see langword="null"/></param>
-    /// <returns>傳回提取出的 ODF 檔案位元組陣列；若未找到則為 <see langword="null"/></returns>
+    /// <param name="pdfPath">The path or URI. / PDF 檔案路徑</param>
+    /// <param name="password">The value to use. / PDF 檔案密碼，若無則為 <see langword="null"/></param>
+    /// <returns>The result. / 傳回提取出的 ODF 檔案位元組陣列；若未找到則為 <see langword="null"/></returns>
     public static byte[]? ExtractOdfFromPdf(string pdfPath, string? password = null)
     {
         using var fs = new FileStream(pdfPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -29,11 +31,12 @@ public static class OdfHybridPdfHelper
     }
 
     /// <summary>
+    /// Provides extract odf from pdf.
     /// 從混合 PDF 檔案流中提取並讀取隱藏的 ODF 檔案。
     /// </summary>
-    /// <param name="pdfStream">PDF 檔案的資料流</param>
-    /// <param name="password">PDF 檔案密碼，若無則為 <see langword="null"/></param>
-    /// <returns>傳回提取出的 ODF 檔案位元組陣列；若未找到則為 <see langword="null"/></returns>
+    /// <param name="pdfStream">The source or target object. / PDF 檔案的資料流</param>
+    /// <param name="password">The value to use. / PDF 檔案密碼，若無則為 <see langword="null"/></param>
+    /// <returns>The result. / 傳回提取出的 ODF 檔案位元組陣列；若未找到則為 <see langword="null"/></returns>
     public static byte[]? ExtractOdfFromPdf(Stream pdfStream, string? password = null)
     {
         if (pdfStream is null)
@@ -111,12 +114,13 @@ public static class OdfHybridPdfHelper
     }
 
     /// <summary>
+    /// Applies inject odf to pdf.
     /// 將 ODF 檔案作為附件注入 PDF 中，生成混合 PDF （Hybrid PDF）。
     /// </summary>
-    /// <param name="pdfPath">來源 PDF 檔案路徑</param>
-    /// <param name="odfPath">要注入的 ODF 檔案路徑</param>
-    /// <param name="outputPdfPath">輸出的混合 PDF 檔案路徑</param>
-    /// <param name="password">PDF 密碼，若無則為 <see langword="null"/></param>
+    /// <param name="pdfPath">The path or URI. / 來源 PDF 檔案路徑</param>
+    /// <param name="odfPath">The path or URI. / 要注入的 ODF 檔案路徑</param>
+    /// <param name="outputPdfPath">The path or URI. / 輸出的混合 PDF 檔案路徑</param>
+    /// <param name="password">The value to use. / PDF 密碼，若無則為 <see langword="null"/></param>
     public static void InjectOdfToPdf(string pdfPath, string odfPath, string outputPdfPath, string? password = null)
     {
         using var pdfSrc = new FileStream(pdfPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -127,13 +131,14 @@ public static class OdfHybridPdfHelper
     }
 
     /// <summary>
+    /// Applies inject odf to pdf.
     /// 將 ODF 檔案流作為附件注入 PDF 檔案流中，生成混合 PDF 。
     /// </summary>
-    /// <param name="pdfStream">來源 PDF 檔案的資料流</param>
-    /// <param name="odfStream">要注入的 ODF 檔案的資料流</param>
-    /// <param name="outputPdfStream">接收輸出的混合 PDF 檔案資料流</param>
-    /// <param name="odfFileName">注入的 ODF 專案檔名</param>
-    /// <param name="password">PDF 密碼，若無則為 <see langword="null"/></param>
+    /// <param name="pdfStream">The source or target object. / 來源 PDF 檔案的資料流</param>
+    /// <param name="odfStream">The source or target object. / 要注入的 ODF 檔案的資料流</param>
+    /// <param name="outputPdfStream">The source or target object. / 接收輸出的混合 PDF 檔案資料流</param>
+    /// <param name="odfFileName">The path or URI. / 注入的 ODF 專案檔名</param>
+    /// <param name="password">The value to use. / PDF 密碼，若無則為 <see langword="null"/></param>
     public static void InjectOdfToPdf(Stream pdfStream, Stream odfStream, Stream outputPdfStream, string odfFileName, string? password = null)
     {
         if (pdfStream is null)

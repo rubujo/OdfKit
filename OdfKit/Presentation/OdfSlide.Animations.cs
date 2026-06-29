@@ -11,14 +11,15 @@ public partial class OdfSlide
     #region Slide Animations
 
     /// <summary>
+    /// Adds an entrance animation to the specified shape.
     /// 為指定的圖形新增物件進場動畫。
     /// </summary>
-    /// <param name="shapeId">目標圖形識別碼</param>
-    /// <param name="effect">動畫效果類型</param>
-    /// <param name="trigger">動畫觸發方式</param>
-    /// <param name="delay">動畫延遲啟動時間</param>
-    /// <param name="duration">動畫持續時間；預設為 0.5 秒</param>
-    /// <returns>新增的動畫物件執行個體</returns>
+    /// <param name="shapeId">The target shape identifier. / 目標圖形識別碼。</param>
+    /// <param name="effect">The animation effect type. / 動畫效果類型。</param>
+    /// <param name="trigger">The animation trigger mode. / 動畫觸發方式。</param>
+    /// <param name="delay">The animation startup delay. / 動畫延遲啟動時間。</param>
+    /// <param name="duration">The animation duration; defaults to 0.5 seconds. / 動畫持續時間；預設為 0.5 秒。</param>
+    /// <returns>The added animation object instance. / 新增的動畫物件執行個體。</returns>
     public OdfAnimation AddEntranceEffect(
         string shapeId,
         OdfAnimationEffect effect,
@@ -93,14 +94,15 @@ public partial class OdfSlide
     }
 
     /// <summary>
+    /// Adds an exit animation to the specified shape.
     /// 為指定的圖形新增物件退場動畫。
     /// </summary>
-    /// <param name="shapeId">目標圖形識別碼</param>
-    /// <param name="effect">動畫效果類型</param>
-    /// <param name="trigger">動畫觸發方式</param>
-    /// <param name="delay">動畫延遲啟動時間</param>
-    /// <param name="duration">動畫持續時間；預設為 0.5 秒</param>
-    /// <returns>新增的動畫物件執行個體</returns>
+    /// <param name="shapeId">The target shape identifier. / 目標圖形識別碼。</param>
+    /// <param name="effect">The animation effect type. / 動畫效果類型。</param>
+    /// <param name="trigger">The animation trigger mode. / 動畫觸發方式。</param>
+    /// <param name="delay">The animation startup delay. / 動畫延遲啟動時間。</param>
+    /// <param name="duration">The animation duration; defaults to 0.5 seconds. / 動畫持續時間；預設為 0.5 秒。</param>
+    /// <returns>The added animation object instance. / 新增的動畫物件執行個體。</returns>
     public OdfAnimation AddExitEffect(
         string shapeId,
         OdfAnimationEffect effect,
@@ -175,14 +177,15 @@ public partial class OdfSlide
     }
 
     /// <summary>
+    /// Adds an emphasis animation to the specified shape.
     /// 為指定的圖形新增物件強調動畫。
     /// </summary>
-    /// <param name="shapeId">目標圖形識別碼</param>
-    /// <param name="effect">動畫效果類型</param>
-    /// <param name="duration">動畫持續時間；預設為 0.5 秒</param>
-    /// <param name="trigger">動畫觸發方式</param>
-    /// <param name="delay">動畫延遲啟動時間</param>
-    /// <returns>新增的動畫物件執行個體</returns>
+    /// <param name="shapeId">The target shape identifier. / 目標圖形識別碼。</param>
+    /// <param name="effect">The animation effect type. / 動畫效果類型。</param>
+    /// <param name="duration">The animation duration; defaults to 0.5 seconds. / 動畫持續時間；預設為 0.5 秒。</param>
+    /// <param name="trigger">The animation trigger mode. / 動畫觸發方式。</param>
+    /// <param name="delay">The animation startup delay. / 動畫延遲啟動時間。</param>
+    /// <returns>The added animation object instance. / 新增的動畫物件執行個體。</returns>
     public OdfAnimation AddEmphasisEffect(
         string shapeId,
         OdfAnimationEffect effect,
@@ -285,6 +288,7 @@ public partial class OdfSlide
     }
 
     /// <summary>
+    /// Gets the summary list of all animation effects on this slide.
     /// 取得此投影片上所有動畫效果的摘要清單。
     /// </summary>
     public IReadOnlyList<OdfAnimationInfo> GetAnimations() =>

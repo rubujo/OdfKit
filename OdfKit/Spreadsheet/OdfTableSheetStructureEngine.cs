@@ -5,15 +5,17 @@ using OdfKit.DOM;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Captures deleted column structure snapshots, including column definitions and row cells.
 /// 欄結構刪除快照（欄定義與各列儲存格）。
 /// </summary>
-/// <param name="ColumnSnapshots">已刪除的欄定義節點快照</param>
-/// <param name="RowCellSnapshots">各列已刪除儲存格快照（含列索引）</param>
+/// <param name="ColumnSnapshots">Deleted column definition node snapshots. / 已刪除的欄定義節點快照。</param>
+/// <param name="RowCellSnapshots">Deleted row cell snapshots with row indexes. / 各列已刪除儲存格快照（含列索引）。</param>
 internal readonly record struct ColumnDeletionSnapshots(
     IReadOnlyList<OdfNode> ColumnSnapshots,
     IReadOnlyList<(int RowIndex, OdfNode CellSnapshot)> RowCellSnapshots);
 
 /// <summary>
+/// Provides worksheet row and column structure change helpers for internal collaborators.
 /// 工作表列／欄結構變更引擎（內部協作者）。
 /// </summary>
 internal static class OdfTableSheetStructureEngine

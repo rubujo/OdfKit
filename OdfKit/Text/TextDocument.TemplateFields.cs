@@ -9,9 +9,10 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     /// <summary>
+    /// Gets get user field declarations.
     /// 取得文件中所有使用者欄位（範本變數）宣告的摘要清單。
     /// </summary>
-    /// <returns>使用者欄位宣告摘要清單</returns>
+    /// <returns>The result. / 使用者欄位宣告摘要清單</returns>
     public IReadOnlyList<OdfUserFieldDeclarationInfo> GetUserFieldDeclarations()
     {
         List<OdfUserFieldDeclarationInfo> results = [];
@@ -44,12 +45,13 @@ public partial class TextDocument
     }
 
     /// <summary>
+    /// Adds add user field declaration.
     /// 新增或更新一個使用者欄位（範本變數）宣告。
     /// </summary>
-    /// <param name="name">欄位名稱</param>
-    /// <param name="valueType">值類型（例如 <c>string</c>、<c>float</c>、<c>boolean</c>、<c>date</c>、<c>time</c>）</param>
-    /// <param name="value">欄位的值原文</param>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 或 <paramref name="valueType"/> 為空白時擲出</exception>
+    /// <param name="name">The name or identifier. / 欄位名稱</param>
+    /// <param name="valueType">The text or value. / 值類型（例如 <c>string</c>、<c>float</c>、<c>boolean</c>、<c>date</c>、<c>time</c>）</param>
+    /// <param name="value">The text or value. / 欄位的值原文</param>
+    /// <exception cref="ArgumentException">Thrown when the documented condition occurs. / 當 <paramref name="name"/> 或 <paramref name="valueType"/> 為空白時擲出</exception>
     public void AddUserFieldDeclaration(string name, string valueType, string value)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -76,12 +78,13 @@ public partial class TextDocument
     }
 
     /// <summary>
+    /// Sets set user field value.
     /// 設定既有使用者欄位（範本變數）宣告的值。
     /// </summary>
-    /// <param name="name">欄位名稱</param>
-    /// <param name="value">要設定的值原文</param>
-    /// <returns>若成功設定則為 <see langword="true"/>；找不到對應名稱的欄位宣告時為 <see langword="false"/></returns>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空白時擲出</exception>
+    /// <param name="name">The name or identifier. / 欄位名稱</param>
+    /// <param name="value">The text or value. / 要設定的值原文</param>
+    /// <returns>The result. / 若成功設定則為 <see langword="true"/>；找不到對應名稱的欄位宣告時為 <see langword="false"/></returns>
+    /// <exception cref="ArgumentException">Thrown when the documented condition occurs. / 當 <paramref name="name"/> 為空白時擲出</exception>
     public bool SetUserFieldValue(string name, string value)
     {
         if (string.IsNullOrWhiteSpace(name))

@@ -5,6 +5,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Represents odf image.
 /// 表示文字文件中的圖片。
 /// </summary>
 public class OdfImage
@@ -13,21 +14,25 @@ public class OdfImage
     private OdfImageLayout? _layout;
 
     /// <summary>
+    /// Gets frame node.
     /// 取得圖片的外框節點。
     /// </summary>
     public OdfNode FrameNode { get; }
 
     /// <summary>
+    /// Gets image node.
     /// 取得圖片的影像節點。
     /// </summary>
     public OdfNode ImageNode { get; }
 
     /// <summary>
+    /// Gets odf image layout.
     /// 取得影像的版面配置設定（如框線、邊距、環繞、裁剪與透明度）。
     /// </summary>
     public OdfImageLayout Layout => _layout ??= new OdfImageLayout(this, _document);
 
     /// <summary>
+    /// Provides odf image.
     /// 初始化 <see cref="OdfImage"/> 類別的新執行個體。
     /// </summary>
     public OdfImage(OdfNode frameNode, OdfNode imageNode) : this(frameNode, imageNode, null)
@@ -35,6 +40,7 @@ public class OdfImage
     }
 
     /// <summary>
+    /// Provides odf image.
     /// 使用指定的節點與文件初始化 <see cref="OdfImage"/> 類別的新執行個體。
     /// </summary>
     public OdfImage(OdfNode frameNode, OdfNode imageNode, OdfDocument? document)
@@ -45,15 +51,17 @@ public class OdfImage
     }
 
     /// <summary>
+    /// Gets is decorative.
     /// 取得此圖片是否標記為裝飾性（含 LibreOffice <c>loext:decorative</c> 相容讀取）。
     /// </summary>
     public bool IsDecorative => OdfLoExtInteropEngine.IsDecorative(FrameNode);
 
     /// <summary>
+    /// Applies mark as decorative.
     /// 將此圖片標記為裝飾性，輔助技術應略過此物件。
     /// </summary>
-    /// <param name="decorative">是否標記為裝飾性</param>
-    /// <returns>目前圖片執行個體</returns>
+    /// <param name="decorative">The value to use. / 是否標記為裝飾性</param>
+    /// <returns>The result. / 目前圖片執行個體</returns>
     public OdfImage MarkAsDecorative(bool decorative = true)
     {
         if (decorative)
@@ -70,6 +78,7 @@ public class OdfImage
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定圖片的名稱。
     /// </summary>
     public string? Name
@@ -79,11 +88,13 @@ public class OdfImage
     }
 
     /// <summary>
+    /// Gets get attribute.
     /// 取得圖片在 ODF 封裝中的參照路徑。
     /// </summary>
     public string? ImageHref => ImageNode.GetAttribute("href", OdfNamespaces.XLink);
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定圖片的錨定類型。
     /// </summary>
     public string? AnchorType
@@ -93,6 +104,7 @@ public class OdfImage
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定圖片的寬度。
     /// </summary>
     public string? Width
@@ -102,6 +114,7 @@ public class OdfImage
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定圖片的高度。
     /// </summary>
     public string? Height
@@ -111,6 +124,7 @@ public class OdfImage
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定圖片的文繞圖樣式。
     /// </summary>
     public string? WrapStyle
@@ -120,6 +134,7 @@ public class OdfImage
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定圖片的裁剪邊界。
     /// </summary>
     public string? CropTop
@@ -129,6 +144,7 @@ public class OdfImage
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定圖片的無障礙替代文字（對應 <c>&lt;svg:desc&gt;</c>）。
     /// </summary>
     public string? AltText
@@ -138,6 +154,7 @@ public class OdfImage
     }
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定圖片的無障礙標題（對應 <c>&lt;svg:title&gt;</c>）。
     /// </summary>
     public string? AccessibilityTitle

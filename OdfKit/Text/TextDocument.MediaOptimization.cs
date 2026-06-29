@@ -9,13 +9,14 @@ namespace OdfKit.Text;
 public partial class TextDocument
 {
     /// <summary>
+    /// Provides optimize media.
     /// 最佳化文件中的圖片媒體，並同步更新封裝路徑與 <c>draw:image</c> 參照。
     /// </summary>
-    /// <param name="maxDpi">目標最大 DPI；會傳入 <paramref name="optimizer"/> 供影像後端判斷是否需要重採樣</param>
-    /// <param name="jpegQuality">JPEG 輸出品質，範圍為 1 至 100</param>
-    /// <param name="optimizer">實際執行影像重採樣或轉碼的委派；回傳 <see langword="null"/> 時保留原圖</param>
-    /// <returns>已更新的媒體項目數量</returns>
-    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="jpegQuality"/> 不在 1 到 100 之間時擲出</exception>
+    /// <param name="maxDpi">The value to use. / 目標最大 DPI；會傳入 <paramref name="optimizer"/> 供影像後端判斷是否需要重採樣</param>
+    /// <param name="jpegQuality">The value to use. / JPEG 輸出品質，範圍為 1 至 100</param>
+    /// <param name="optimizer">The value to use. / 實際執行影像重採樣或轉碼的委派；回傳 <see langword="null"/> 時保留原圖</param>
+    /// <returns>The result. / 已更新的媒體項目數量</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the documented condition occurs. / 當 <paramref name="jpegQuality"/> 不在 1 到 100 之間時擲出</exception>
     public int OptimizeMedia(double maxDpi, int jpegQuality, OdfMediaOptimizer? optimizer = null)
     {
         if (jpegQuality is < 1 or > 100)

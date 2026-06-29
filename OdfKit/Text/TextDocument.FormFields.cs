@@ -10,12 +10,14 @@ public partial class TextDocument
     private OdfFormFieldCollection? _formFields;
 
     /// <summary>
+    /// Gets odf form field collection.
     /// 取得文件中可依名稱填入的文字與表單欄位集合。
     /// </summary>
     public OdfFormFieldCollection FormFields => _formFields ??= new OdfFormFieldCollection(this);
 }
 
 /// <summary>
+/// Provides APIs for odf form field collection.
 /// 提供文字文件表單欄位的名稱索引與安全填值 API。
 /// </summary>
 public sealed class OdfFormFieldCollection
@@ -25,30 +27,34 @@ public sealed class OdfFormFieldCollection
     internal OdfFormFieldCollection(TextDocument document) => _document = document;
 
     /// <summary>
+    /// Provides this member.
     /// 以欄位名稱取得表單欄位 facade。
     /// </summary>
-    /// <param name="key">欄位名稱</param>
-    /// <returns>指定名稱的欄位 facade；可透過 <see cref="OdfFormField.Exists"/> 判斷目前文件是否包含該欄位</returns>
+    /// <param name="key">The name or identifier. / 欄位名稱</param>
+    /// <returns>The result. / 指定名稱的欄位 facade；可透過 <see cref="OdfFormField.Exists"/> 判斷目前文件是否包含該欄位</returns>
     public OdfFormField this[string key] => new(_document, key);
 
     /// <summary>
+    /// Determines contains.
     /// 判斷文件中是否存在指定名稱的欄位。
     /// </summary>
-    /// <param name="key">欄位名稱</param>
-    /// <returns>若文件中存在該欄位則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
+    /// <param name="key">The name or identifier. / 欄位名稱</param>
+    /// <returns>The result. / 若文件中存在該欄位則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool Contains(string key) => TextDocumentFormFieldBinder.Contains(_document.BodyTextRoot, key);
 
     /// <summary>
+    /// Attempts to process try set value.
     /// 嘗試將指定值寫入欄位。
     /// </summary>
-    /// <param name="key">欄位名稱</param>
-    /// <param name="value">要寫入的值</param>
-    /// <returns>若找到並更新至少一個欄位則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
+    /// <param name="key">The name or identifier. / 欄位名稱</param>
+    /// <param name="value">The text or value. / 要寫入的值</param>
+    /// <returns>The result. / 若找到並更新至少一個欄位則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool TrySetValue(string key, string? value) =>
         TextDocumentFormFieldBinder.TrySetValue(_document.BodyTextRoot, key, value);
 }
 
 /// <summary>
+/// Represents odf form field.
 /// 表示文字文件中可填入的單一欄位 facade。
 /// </summary>
 public sealed class OdfFormField
@@ -62,16 +68,19 @@ public sealed class OdfFormField
     }
 
     /// <summary>
+    /// Gets key.
     /// 取得欄位名稱。
     /// </summary>
     public string Key { get; }
 
     /// <summary>
+    /// Gets contains.
     /// 取得目前文件是否包含此欄位。
     /// </summary>
     public bool Exists => TextDocumentFormFieldBinder.Contains(_document.BodyTextRoot, Key);
 
     /// <summary>
+    /// Gets or sets this member.
     /// 取得或設定欄位值；若欄位不存在，設定時不會建立新欄位。
     /// </summary>
     public string? Value
@@ -81,10 +90,11 @@ public sealed class OdfFormField
     }
 
     /// <summary>
+    /// Attempts to process try set value.
     /// 嘗試設定欄位值。
     /// </summary>
-    /// <param name="value">要寫入的值</param>
-    /// <returns>若找到並更新至少一個欄位則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
+    /// <param name="value">The text or value. / 要寫入的值</param>
+    /// <returns>The result. / 若找到並更新至少一個欄位則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
     public bool TrySetValue(string? value) => TextDocumentFormFieldBinder.TrySetValue(_document.BodyTextRoot, Key, value);
 }
 

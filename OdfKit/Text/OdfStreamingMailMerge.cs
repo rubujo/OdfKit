@@ -17,18 +17,20 @@ using System.Buffers;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Provides APIs for odf streaming mail merge.
 /// 提供超低記憶體佔用（小於 1MB）的 SAX 流式郵件合併與範本套印引擎。
 /// 使用 Byte-level 範本編譯與 Expression Trees 零反射技術，性能極致。
 /// </summary>
 public static class OdfStreamingMailMerge
 {
     /// <summary>
+    /// Provides apply template async.
     /// 非同步套用範本資料合併，並將結果輸出至目標串流。
     /// </summary>
-    /// <param name="templateStream">來源範本 ODF (ODT/ODS) 檔案串流</param>
-    /// <param name="outputStream">輸出目標檔案串流</param>
-    /// <param name="data">套印資料字典</param>
-    /// <param name="cancellationToken">取消語彙</param>
+    /// <param name="templateStream">The stream or target object. / 來源範本 ODF (ODT/ODS) 檔案串流</param>
+    /// <param name="outputStream">The stream or target object. / 輸出目標檔案串流</param>
+    /// <param name="data">The value to use. / 套印資料字典</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙</param>
     public static async Task ApplyTemplateAsync(
         Stream templateStream,
         Stream outputStream,
@@ -72,13 +74,14 @@ public static class OdfStreamingMailMerge
     }
 
     /// <summary>
+    /// Provides apply batch template async.
     /// 非同步套用批次範本資料合併，並將結果輸出至目標串流。
     /// 每筆資料合併後，在輸出文件中會以分頁符分隔。
     /// </summary>
-    /// <param name="templateStream">來源範本 ODF (ODT/ODS) 檔案串流</param>
-    /// <param name="outputStream">輸出目標檔案串流</param>
-    /// <param name="dataSequence">大批量的資料序列，每筆資料為一個欄位值字典</param>
-    /// <param name="cancellationToken">取消語彙</param>
+    /// <param name="templateStream">The stream or target object. / 來源範本 ODF (ODT/ODS) 檔案串流</param>
+    /// <param name="outputStream">The stream or target object. / 輸出目標檔案串流</param>
+    /// <param name="dataSequence">The value to use. / 大批量的資料序列，每筆資料為一個欄位值字典</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙</param>
     public static async Task ApplyBatchTemplateAsync(
         Stream templateStream,
         Stream outputStream,
@@ -137,13 +140,14 @@ public static class OdfStreamingMailMerge
     }
 
     /// <summary>
+    /// Provides apply batch template async.
     /// 非同步套用批次範本資料合併，支援 DbDataReader，並將結果輸出至目標串流。
     /// 每筆資料合併後，在輸出文件中會以分頁符分隔。
     /// </summary>
-    /// <param name="templateStream">來源範本 ODF (ODT/ODS) 檔案串流</param>
-    /// <param name="outputStream">輸出目標檔案串流</param>
-    /// <param name="reader">包含多筆資料的 DbDataReader</param>
-    /// <param name="cancellationToken">取消語彙</param>
+    /// <param name="templateStream">The stream or target object. / 來源範本 ODF (ODT/ODS) 檔案串流</param>
+    /// <param name="outputStream">The stream or target object. / 輸出目標檔案串流</param>
+    /// <param name="reader">The stream or target object. / 包含多筆資料的 DbDataReader</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙</param>
     public static Task ApplyBatchTemplateAsync(
         Stream templateStream,
         Stream outputStream,

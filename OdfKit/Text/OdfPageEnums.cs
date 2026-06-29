@@ -4,6 +4,7 @@ using OdfKit.DOM;
 namespace OdfKit.Text;
 
 /// <summary>
+/// Provides odf page usage.
 /// 指定頁面的使用方式。
 /// </summary>
 public enum OdfPageUsage
@@ -27,6 +28,7 @@ public enum OdfPageUsage
 }
 
 /// <summary>
+/// Provides odf layout grid mode.
 /// 指定版面配置網格的模式。
 /// </summary>
 public enum OdfLayoutGridMode
