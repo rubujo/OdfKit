@@ -81,6 +81,27 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
+    /// 驗證 profile 來源文件逐列對應目前內建 metadata。
+    /// </summary>
+    [Fact]
+    public void ProfileSourcesDocumentRowsMatchBuiltInProfileMetadata()
+    {
+        string repoRoot = FindRepositoryRoot();
+        string document = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf-profile-sources.md"));
+        Dictionary<string, string[]> rows = ParseProfileSourceRows(document);
+
+        foreach (OdfComplianceProfile profile in OdfComplianceProfiles.BuiltIn)
+        {
+            Assert.True(rows.TryGetValue(profile.Id, out string[]? columns), $"缺少 profile 來源列：{profile.Id}");
+            Assert.Equal(profile.SourceUrl?.ToString() ?? "null", columns[0]);
+            Assert.Equal(profile.SourceDate ?? "null", columns[1]);
+            Assert.Equal(profile.AuthorityLevel.ToString(), columns[2]);
+            Assert.Equal(profile.VerificationStatus.ToString(), columns[3]);
+            Assert.Equal(FormatVersionRange(profile.SupportedVersions), columns[4]);
+        }
+    }
+
+    /// <summary>
     /// 驗證 corpus manifest 宣告小型可提交 corpus 與外部 corpus 路徑規則。
     /// </summary>
     [Fact]
@@ -981,6 +1002,52 @@ public class DocsAndCorpusContractTests
         }
 
         throw new InvalidOperationException("找不到 repository root。");
+    }
+
+    private static Dictionary<string, string[]> ParseProfileSourceRows(string document)
+    {
+        Dictionary<string, string[]> rows = [];
+        foreach (string line in document.Split(["\r\n", "\n"], StringSplitOptions.None))
+        {
+            Match match = Regex.Match(line, @"^\| `(?<id>[^`]+)` \| (?<rest>.+) \|$");
+            if (!match.Success)
+            {
+                continue;
+            }
+
+            string[] columns = match.Groups["rest"].Value
+                .Split(" | ")
+                .Select(column => column.Trim().Trim('`'))
+                .ToArray();
+
+            rows.Add(match.Groups["id"].Value, columns);
+        }
+
+        return rows;
+    }
+
+    private static string FormatVersionRange(OdfVersionRange range)
+    {
+        if (range.Minimum == OdfVersion.Odf10 && range.Maximum == OdfVersion.Odf14)
+        {
+            return "all-known";
+        }
+
+        if (range.Minimum == range.Maximum)
+        {
+            return range.Minimum switch
+            {
+                OdfVersion.Odf10 => "1.0",
+                OdfVersion.Odf11 => "1.1",
+                OdfVersion.Odf12 => "1.2",
+                OdfVersion.Odf13 => "1.3",
+                OdfVersion.Odf14 => "1.4",
+                _ => range.Minimum.ToString()
+            };
+        }
+
+        return FormatVersionRange(OdfVersionRange.Exact(range.Minimum)) + "-" +
+            FormatVersionRange(OdfVersionRange.Exact(range.Maximum));
     }
 
     private static string ComputeSha256(string path)

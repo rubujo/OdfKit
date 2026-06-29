@@ -52,10 +52,18 @@ namespace OdfKit.Tests
             Assert.Contains(
                 OdfComplianceProfiles.EuOfficeDocumentExchange.Rules,
                 rule => rule.Id == "AllowPolicyScopedOdfPreference");
+            Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.EuInteroperableEurope.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.OfficialButIndirect, OdfComplianceProfiles.EuInteroperableEurope.VerificationStatus);
 
             Assert.Equal(OdfPolicyAuthorityLevel.Normative, OdfComplianceProfiles.RocTaiwanOdfCns15251.AuthorityLevel);
             Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.RocTaiwanOdfCns15251.VerificationStatus);
+            Assert.True(OdfComplianceProfiles.RocTaiwanOdfCns15251.SupportedVersions.Contains(OdfVersion.Odf12));
+            Assert.False(OdfComplianceProfiles.RocTaiwanOdfCns15251.SupportedVersions.Contains(OdfVersion.Odf14));
             Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.AuthorityLevel);
+            Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.UsNaraOdf.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.OfficialButIndirect, OdfComplianceProfiles.UsNaraOdf.VerificationStatus);
+            Assert.True(OdfComplianceProfiles.NlGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf12));
+            Assert.False(OdfComplianceProfiles.NlGovernmentOdf.SupportedVersions.Contains(OdfVersion.Odf14));
         }
 
         [Fact]
@@ -90,8 +98,10 @@ namespace OdfKit.Tests
         {
             OdfComplianceProfile[] policyProfiles =
             [
+                OdfComplianceProfiles.EuInteroperableEurope,
                 OdfComplianceProfiles.EuOfficeDocumentExchange,
-                OdfComplianceProfiles.RocTaiwanGovernmentOdfTools
+                OdfComplianceProfiles.RocTaiwanGovernmentOdfTools,
+                OdfComplianceProfiles.UsNaraOdf
             ];
 
             foreach (OdfComplianceProfile profile in policyProfiles)
@@ -105,10 +115,16 @@ namespace OdfKit.Tests
 
             Assert.Equal(OdfPolicyAuthorityLevel.Normative, OdfComplianceProfiles.RocTaiwanOdfCns15251.AuthorityLevel);
             Assert.Equal(OdfProfileVerificationStatus.VerifiedOfficial, OdfComplianceProfiles.RocTaiwanOdfCns15251.VerificationStatus);
+            Assert.True(OdfComplianceProfiles.RocTaiwanOdfCns15251.SupportedVersions.Contains(OdfVersion.Odf12));
+            Assert.False(OdfComplianceProfiles.RocTaiwanOdfCns15251.SupportedVersions.Contains(OdfVersion.Odf14));
             Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.AuthorityLevel);
             Assert.Equal(OdfProfileVerificationStatus.CompatibilityOnly, OdfComplianceProfiles.RocTaiwanGovernmentOdfTools.VerificationStatus);
             Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.EuOfficeDocumentExchange.AuthorityLevel);
             Assert.Equal(OdfProfileVerificationStatus.OfficialButIndirect, OdfComplianceProfiles.EuOfficeDocumentExchange.VerificationStatus);
+            Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.EuInteroperableEurope.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.OfficialButIndirect, OdfComplianceProfiles.EuInteroperableEurope.VerificationStatus);
+            Assert.Equal(OdfPolicyAuthorityLevel.Compatibility, OdfComplianceProfiles.UsNaraOdf.AuthorityLevel);
+            Assert.Equal(OdfProfileVerificationStatus.OfficialButIndirect, OdfComplianceProfiles.UsNaraOdf.VerificationStatus);
         }
 
         [Fact]
