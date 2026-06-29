@@ -445,7 +445,7 @@ public class LibreOfficeRenderer
         }
         catch (Exception ex)
         {
-            OdfKitDiagnostics.Warn($"LibreOffice 逾時後終止程序失敗：{ex.Message}", ex);
+            OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_LibreOfficeRenderer_KillAfterTimeoutFailed", ex.Message), ex);
         }
     }
 
@@ -692,7 +692,7 @@ public class LibreOfficeRenderer
             {
                 if (i == attempts)
                 {
-                    OdfKitDiagnostics.Warn($"Failed to safely delete sandbox directory '{dirPath}' after {attempts} attempts: {ex.Message}");
+                    OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_LibreOfficeRenderer_SandboxDeleteFailed", dirPath, attempts, ex.Message));
                 }
                 else
                 {

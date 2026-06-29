@@ -9,6 +9,7 @@ using ClosedXML.Excel;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using OdfKit.Chart;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
@@ -670,7 +671,7 @@ public static class XlsxToOdfConverter
         catch (Exception ex)
         {
             // 保留工作表資料轉換；圖表解析失敗時不應中斷整份 XLSX 匯入。
-            OdfKit.Core.OdfKitDiagnostics.Warn($"XLSX 圖表解析失敗，已略過圖表匯入：{ex.Message}", ex);
+            OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_XlsxToOdfConverter_ChartImportSkipped", ex.Message), ex);
         }
     }
 
@@ -794,7 +795,7 @@ public static class XlsxToOdfConverter
         }
         catch (Exception ex)
         {
-            OdfKitDiagnostics.Warn($"XLSX 樞紐分析表解析失敗，已略過樞紐表匯入：{ex.Message}", ex);
+            OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_XlsxToOdfConverter_PivotTableImportSkipped", ex.Message), ex);
         }
     }
 

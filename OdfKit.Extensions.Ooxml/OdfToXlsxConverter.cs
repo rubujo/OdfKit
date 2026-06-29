@@ -216,7 +216,7 @@ public static class OdfToXlsxConverter
         }
         catch (Exception ex)
         {
-            OdfKit.Core.OdfKitDiagnostics.Warn($"ODS 圖表規格解析失敗，已略過該圖表：{ex.Message}", ex);
+            OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_OdfToXlsxConverter_ChartExportSkipped", ex.Message), ex);
             return null;
         }
     }

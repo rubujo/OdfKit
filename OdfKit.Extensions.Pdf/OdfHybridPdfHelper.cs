@@ -57,14 +57,14 @@ public static class OdfHybridPdfHelper
         var names = catalog.Elements.GetDictionary("/Names");
         if (names is null)
         {
-            OdfKitDiagnostics.Info("在 PDF Catalog 中未找到 '/Names' 字典。");
+            OdfKitDiagnostics.Info(OdfLocalizer.GetMessage("Diag_OdfHybridPdfHelper_PdfCatalogNamesMissing"));
             return null;
         }
 
         var embeddedFiles = names.Elements.GetDictionary("/EmbeddedFiles");
         if (embeddedFiles is null)
         {
-            OdfKitDiagnostics.Info("在 PDF Names 中未找到 '/EmbeddedFiles' 字典。");
+            OdfKitDiagnostics.Info(OdfLocalizer.GetMessage("Diag_OdfHybridPdfHelper_PdfEmbeddedFilesMissing"));
             return null;
         }
 
@@ -103,13 +103,13 @@ public static class OdfHybridPdfHelper
             {
                 if (streamDict.Stream is not null)
                 {
-                    OdfKitDiagnostics.Info($"成功從 PDF 提取內嵌的 ODF 檔案 '{fileName}'。");
+                    OdfKitDiagnostics.Info(OdfLocalizer.GetMessage("Diag_OdfHybridPdfHelper_EmbeddedOdfExtracted", fileName));
                     return streamDict.Stream.Value;
                 }
             }
         }
 
-        OdfKitDiagnostics.Info("在 PDF 中未找到內嵌的 ODF 附件。");
+        OdfKitDiagnostics.Info(OdfLocalizer.GetMessage("Diag_OdfHybridPdfHelper_EmbeddedOdfNotFound"));
         return null;
     }
 
@@ -240,7 +240,7 @@ public static class OdfHybridPdfHelper
 
         // 儲存修改後的文件
         document.Save(outputPdfStream);
-        OdfKitDiagnostics.Info($"成功將 ODF '{odfFileName}' 作為 PDF/A-3 附件注入至輸出 PDF 中。");
+        OdfKitDiagnostics.Info(OdfLocalizer.GetMessage("Diag_OdfHybridPdfHelper_OdfAttachmentInjected", odfFileName));
     }
 
     private static void InjectPdfAXmpMetadata(PdfDocument document, string odfFileName, string mimeType)
@@ -251,7 +251,7 @@ public static class OdfHybridPdfHelper
 
         if (metadataDict is null || metadataDict.Stream is null)
         {
-            OdfKitDiagnostics.Info("PDF 目錄中沒有現置的 /Metadata 串流。已略過 PDF/A XMP 中繼資料注入。");
+            OdfKitDiagnostics.Info(OdfLocalizer.GetMessage("Diag_OdfHybridPdfHelper_PdfCatalogMetadataMissing"));
             return;
         }
 
@@ -321,12 +321,12 @@ public static class OdfHybridPdfHelper
                     xmlDoc.Save(writer);
                 }
                 metadataDict.CreateStream(ms.ToArray());
-                OdfKitDiagnostics.Info("成功將 PDF/A-3 結構描述宣告注入至 XMP 中繼資料中。");
+                OdfKitDiagnostics.Info(OdfLocalizer.GetMessage("Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"));
             }
         }
         catch (Exception ex)
         {
-            OdfKitDiagnostics.Warn($"更新 PDF/A XMP 中繼資料資料流失敗： {ex.Message}");
+            OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed", ex.Message));
         }
     }
 }

@@ -245,6 +245,7 @@ public static partial class OdfLocalizer
         }
 
         MergeSupplementalComplianceDictionary(name, target);
+        MergeSupplementalDiagnosticsDictionary(name, target);
     }
 
     /// <summary>

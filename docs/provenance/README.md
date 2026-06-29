@@ -41,6 +41,10 @@ pwsh eng/Test-OdfTypedDomCoverage.ps1
 翻譯；新增內建 compliance rule 或 suggested-fix key 時，也必須讓 12 個支援語言
 合併後的鍵值集合與英文一致。
 
+`OdfKit/Compliance/OdfLocalizer.ExtensionDiagnostics.cs` 維護 Extensions 套件的診斷
+訊息翻譯。新增 `OdfKitDiagnostics.Warn`、`Info` 或 `Error` 訊息時，呼叫端不得傳入硬編碼
+文字，必須透過 `OdfLocalizer.GetMessage` 取得 12 語系同步資源。
+
 ## Clean-room 來源索引
 
 公式評估與 schema pattern validator 的規格來源、可接受參考、不可接受來源與

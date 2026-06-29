@@ -306,7 +306,7 @@ internal sealed class OdfPdfFontResolver : IFontResolver
             if (fontPath is not null && Styles.OdfFontResolver.IsTrueTypeCollection(fontPath))
             {
                 OdfKitDiagnostics.Warn(
-                    $"字型「{candidate}」對應的檔案為 PDFsharp 不支援的 TrueType Collection（.ttc）格式，已改用替代字型；輸出 PDF 中對應文字的字形可能與原始字型不同。");
+                    OdfLocalizer.GetMessage("Diag_OdfPdfExporter_TrueTypeCollectionFontFallback", candidate));
             }
         }
 
