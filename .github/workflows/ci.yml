@@ -9,6 +9,8 @@ on:
       - 'OdfKit.Extensions.*/**'
       - 'OdfKit.Tests/**'
       - 'eng/**'
+      - 'docs/ci-cd.md'
+      - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/ci.yml'
   pull_request:
     paths:
@@ -16,6 +18,8 @@ on:
       - 'OdfKit.Extensions.*/**'
       - 'OdfKit.Tests/**'
       - 'eng/**'
+      - 'docs/ci-cd.md'
+      - '.github/actions/setup-dotnet-odfkit/**'
       - '.github/workflows/ci.yml'
   workflow_dispatch:
 
@@ -36,6 +40,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         framework: [net8.0, net10.0]
     timeout-minutes: 15
+    env:
+      TEST_RESULTS_DIR: artifacts/test-results/${{ matrix.os }}-${{ matrix.framework }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -48,15 +54,97 @@ jobs:
             8.0.x
           cache-key-suffix: '-ci-test'
 
-      - name: Build & Run Tests
+      - name: Build test project
         shell: pwsh
+        timeout-minutes: 6
         run: |
-          if ('${{ matrix.framework }}' -eq 'net8.0') {
-            Write-Host "net8.0 CI job 只驗證建置；完整測試由 net10.0 smoke 與專用 workflow 執行。"
-            dotnet build OdfKit.Tests/OdfKit.Tests.csproj -c Release -f ${{ matrix.framework }}
-            return
-          }
+          dotnet build OdfKit.Tests/OdfKit.Tests.csproj -c Release -f ${{ matrix.framework }}
 
-          $testFilter = 'Category=Smoke'
+      - name: Run smoke tests (docs)
+        shell: pwsh
+        timeout-minutes: 4
+        run: |
+          $testFilter = 'Category=Smoke&FullyQualifiedName~DocsAndCorpusContractTests'
+          $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'docs'
+          New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
           Write-Host "CI 快速回歸測試 filter: $testFilter"
-          dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release -f ${{ matrix.framework }} --filter $testFilter --logger "console;verbosity=normal"
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
+            -c Release `
+            -f ${{ matrix.framework }} `
+            --no-build `
+            --filter $testFilter `
+            --results-directory $resultsDir `
+            --logger "console;verbosity=normal" `
+            --blame-hang `
+            --blame-hang-timeout 3m `
+            --blame-hang-dump-type none `
+            --logger "trx;LogFileName=smoke-docs-${{ matrix.os }}-${{ matrix.framework }}.trx"
+
+      - name: Run smoke tests (api)
+        shell: pwsh
+        timeout-minutes: 5
+        run: |
+          $testFilter = 'Category=Smoke&(FullyQualifiedName~ApiUsabilityTests|FullyQualifiedName~DocumentKindApiUsabilityTests|FullyQualifiedName~TextApiUsabilityTests|FullyQualifiedName~SpreadsheetApiUsabilityTests|FullyQualifiedName~PresentationApiUsabilityTests|FullyQualifiedName~DrawingApiUsabilityTests)'
+          $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'api'
+          New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
+          Write-Host "CI 快速回歸測試 filter: $testFilter"
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
+            -c Release `
+            -f ${{ matrix.framework }} `
+            --no-build `
+            --filter $testFilter `
+            --results-directory $resultsDir `
+            --logger "console;verbosity=normal" `
+            --blame-hang `
+            --blame-hang-timeout 3m `
+            --blame-hang-dump-type none `
+            --logger "trx;LogFileName=smoke-api-${{ matrix.os }}-${{ matrix.framework }}.trx"
+
+      - name: Run smoke tests (package)
+        shell: pwsh
+        timeout-minutes: 5
+        run: |
+          $testFilter = 'Category=Smoke&(FullyQualifiedName~OdfPackage|FullyQualifiedName~PackageRoundTripTests|FullyQualifiedName~PackageReadinessTests|FullyQualifiedName~VerticalSliceRoundTripTests)'
+          $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'package'
+          New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
+          Write-Host "CI 快速回歸測試 filter: $testFilter"
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
+            -c Release `
+            -f ${{ matrix.framework }} `
+            --no-build `
+            --filter $testFilter `
+            --results-directory $resultsDir `
+            --logger "console;verbosity=normal" `
+            --blame-hang `
+            --blame-hang-timeout 3m `
+            --blame-hang-dump-type none `
+            --logger "trx;LogFileName=smoke-package-${{ matrix.os }}-${{ matrix.framework }}.trx"
+
+      - name: Run smoke tests (core-security)
+        shell: pwsh
+        timeout-minutes: 5
+        run: |
+          $testFilter = 'Category=Smoke&(FullyQualifiedName~OdfCoreRegressionTests|FullyQualifiedName~OdfBoundaryRegressionTests|FullyQualifiedName~OdfSecurityBoundaryTests|FullyQualifiedName~SecurityBoundaryTests)'
+          $resultsDir = Join-Path $env:TEST_RESULTS_DIR 'core-security'
+          New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
+          Write-Host "CI 快速回歸測試 filter: $testFilter"
+          dotnet test OdfKit.Tests/OdfKit.Tests.csproj `
+            -c Release `
+            -f ${{ matrix.framework }} `
+            --no-build `
+            --filter $testFilter `
+            --results-directory $resultsDir `
+            --logger "console;verbosity=normal" `
+            --blame-hang `
+            --blame-hang-timeout 3m `
+            --blame-hang-dump-type none `
+            --logger "trx;LogFileName=smoke-core-security-${{ matrix.os }}-${{ matrix.framework }}.trx"
+
+      - name: Upload test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.framework }}
+          path: artifacts/test-results/${{ matrix.os }}-${{ matrix.framework }}/
+          if-no-files-found: ignore
+          retention-days: 7

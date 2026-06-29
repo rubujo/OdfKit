@@ -226,7 +226,7 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
-    /// 驗證快速 CI 使用 trait 分類，而不是硬編碼測試類別清單。
+    /// 驗證快速 CI 使用 trait 分類並保留 Smoke shard，避免單一測試主機承載整批測試。
     /// </summary>
     [Fact]
     public void CiSmokeTestsUseTraitCategoryFilter()
@@ -237,6 +237,11 @@ public class DocsAndCorpusContractTests
 
         Assert.Contains("Category=Smoke", workflow, StringComparison.Ordinal);
         Assert.DoesNotContain("FullyQualifiedName~OdfKit.Tests.", workflow, StringComparison.Ordinal);
+        Assert.DoesNotContain("- name: Run smoke tests\r\n", workflow, StringComparison.Ordinal);
+        Assert.Contains("Run smoke tests (docs)", workflow, StringComparison.Ordinal);
+        Assert.Contains("Run smoke tests (api)", workflow, StringComparison.Ordinal);
+        Assert.Contains("Run smoke tests (package)", workflow, StringComparison.Ordinal);
+        Assert.Contains("Run smoke tests (core-security)", workflow, StringComparison.Ordinal);
         Assert.Contains("public const string Smoke = \"Smoke\";", categories, StringComparison.Ordinal);
         Assert.Contains("public const string Interop = \"Interop\";", categories, StringComparison.Ordinal);
         Assert.Contains("public const string Corpus = \"Corpus\";", categories, StringComparison.Ordinal);

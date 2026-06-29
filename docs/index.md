@@ -13,6 +13,7 @@
 | 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[ODF 格式支援矩陣](odf-format-support.md) |
 | 規劃部署、升級與版本交付 | [版本與交付資訊](version-delivery.md) | [GitHub Release 發佈指南](github-release-publishing.md)、[CHANGELOG](../CHANGELOG.md) |
 | 確認功能邊界、互通性與驗證證據 | [ODF 格式支援矩陣](odf-format-support.md) | [LibreOffice 互通矩陣](libreoffice-interop-matrix.md)、[OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md)、[ODF Toolkit 對標線](odf-toolkit-parity.md) |
+| 維護 CI/CD 與驗證分層 | [CI/CD 驗證設計](ci-cd.md) | [GitHub Release 發佈指南](github-release-publishing.md)、[Corpus Manifest 規則](corpus-manifest.md) |
 
 ## 依生命週期分類
 
@@ -49,6 +50,7 @@
 | [Interop Corpus 總覽](interop-corpus.md) | corpus 來源與使用方式 |
 | [官方 Corpus 來源](odf-official-corpus-sources.md) | 官方 ODF corpus 來源說明 |
 | [Corpus Manifest 規則](corpus-manifest.md) | corpus manifest 契約 |
+| [CI/CD 驗證設計](ci-cd.md) | GitHub Actions 分層、timeout、Smoke 測試與診斷 artifact 規則 |
 | [GitHub Release 發佈指南](github-release-publishing.md) | 封裝、驗證與發佈步驟 |
 
 ## 其他治理文件
