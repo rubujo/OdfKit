@@ -6,6 +6,7 @@ using System.Globalization;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides multi-language localization translation and culture fallback lookup for the entire OdfKit library.
 /// 提供 OdfKit 整個函式庫的多語系本地化翻譯與語系 Fallback 查找機制。
 /// </summary>
 public static partial class OdfLocalizer
@@ -15,17 +16,19 @@ public static partial class OdfLocalizer
     private static readonly object SyncRoot = new();
 
     /// <summary>
+    /// Gets or sets the global default culture. When set, it overrides the thread's default culture.
     /// 取得或設定全域預設的文化特性。若設定，將覆蓋執行緒預設語系。
     /// </summary>
     public static CultureInfo? DefaultCulture { get; set; }
 
 
     /// <summary>
+    /// Gets the suggested fix guidance for the specified rule identifier and culture.
     /// 取得指定規則識別碼與文化特性的建議修復指引。
     /// </summary>
-    /// <param name="ruleId">合規性規則的唯一識別碼</param>
-    /// <param name="culture">指定的文化特性；若為 null 則自動偵測環境語系</param>
-    /// <returns>對應語系的建議修復指引字串</returns>
+    /// <param name="ruleId">The unique identifier of the compliance rule. / 合規性規則的唯一識別碼。</param>
+    /// <param name="culture">The specified culture; if null, the environment culture is auto-detected. / 指定的文化特性；若為 null 則自動偵測環境語系。</param>
+    /// <returns>The suggested fix guidance string for the corresponding culture. / 對應語系的建議修復指引字串。</returns>
     public static string GetSuggestedFix(string ruleId, CultureInfo? culture = null)
     {
         if (string.IsNullOrEmpty(ruleId))
@@ -64,21 +67,23 @@ public static partial class OdfLocalizer
     }
 
     /// <summary>
+    /// Gets the localized error/warning message for the specified key (using the environment culture).
     /// 取得指定鍵值的本地化錯誤/警告訊息（使用環境語系）。
     /// </summary>
-    /// <param name="messageKey">訊息鍵值</param>
-    /// <returns>對應語系的本地化訊息</returns>
+    /// <param name="messageKey">The message key. / 訊息鍵值。</param>
+    /// <returns>The localized message for the corresponding culture. / 對應語系的本地化訊息。</returns>
     public static string GetMessage(string messageKey)
     {
         return GetMessage(messageKey, (CultureInfo?)null);
     }
 
     /// <summary>
+    /// Gets the localized error/warning message for the specified key and culture.
     /// 取得指定鍵值與文化特性的本地化錯誤/警告訊息。
     /// </summary>
-    /// <param name="messageKey">訊息鍵值</param>
-    /// <param name="culture">指定的文化特性；若為 null 則自動偵測環境語系</param>
-    /// <returns>對應語系的本地化訊息</returns>
+    /// <param name="messageKey">The message key. / 訊息鍵值。</param>
+    /// <param name="culture">The specified culture; if null, the environment culture is auto-detected. / 指定的文化特性；若為 null 則自動偵測環境語系。</param>
+    /// <returns>The localized message for the corresponding culture. / 對應語系的本地化訊息。</returns>
     public static string GetMessage(string messageKey, CultureInfo? culture)
     {
         if (string.IsNullOrEmpty(messageKey))
@@ -102,11 +107,12 @@ public static partial class OdfLocalizer
     }
 
     /// <summary>
+    /// Gets the localized error/warning message for the specified key, formatted with the specified arguments (using the environment culture).
     /// 取得指定鍵值的本地化錯誤/警告訊息，並使用指定參數進行格式化（使用環境語系）。
     /// </summary>
-    /// <param name="messageKey">訊息鍵值</param>
-    /// <param name="args">格式化參數</param>
-    /// <returns>格式化後的本地化訊息</returns>
+    /// <param name="messageKey">The message key. / 訊息鍵值。</param>
+    /// <param name="args">The format arguments. / 格式化參數。</param>
+    /// <returns>The formatted localized message. / 格式化後的本地化訊息。</returns>
     public static string GetMessage(string messageKey, params object?[] args)
     {
         string format = GetMessage(messageKey, (CultureInfo?)null);
@@ -121,12 +127,13 @@ public static partial class OdfLocalizer
     }
 
     /// <summary>
+    /// Gets the localized error/warning message for the specified key and culture, formatted with the specified arguments.
     /// 取得指定鍵值與文化特性的本地化錯誤/警告訊息，並使用指定參數進行格式化。
     /// </summary>
-    /// <param name="messageKey">訊息鍵值</param>
-    /// <param name="culture">指定的文化特性；若為 null 則自動偵測環境語系</param>
-    /// <param name="args">格式化參數</param>
-    /// <returns>格式化後的本地化訊息</returns>
+    /// <param name="messageKey">The message key. / 訊息鍵值。</param>
+    /// <param name="culture">The specified culture; if null, the environment culture is auto-detected. / 指定的文化特性；若為 null 則自動偵測環境語系。</param>
+    /// <param name="args">The format arguments. / 格式化參數。</param>
+    /// <returns>The formatted localized message. / 格式化後的本地化訊息。</returns>
     public static string GetMessage(string messageKey, CultureInfo? culture, params object?[] args)
     {
         string format = GetMessage(messageKey, culture);

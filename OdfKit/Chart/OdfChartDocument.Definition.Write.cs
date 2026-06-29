@@ -9,23 +9,28 @@ namespace OdfKit.Chart;
 public partial class OdfChartDocument
 {
     /// <summary>
+    /// Sets the chart type.
     /// 設定圖表類型。
     /// </summary>
-    /// <param name="chartType">圖表類型</param>
+    /// <param name="chartType">The chart type. / 圖表類型。</param>
     public void SetChartType(OdfChartType chartType)
     {
         ChartClass = chartType switch
         {
             OdfChartType.Line => "chart:line",
-            OdfChartType.Pie => "chart:pie",
+            OdfChartType.Pie => "chart:circle",
             OdfChartType.Area => "chart:area",
             OdfChartType.Scatter => "chart:scatter",
             OdfChartType.Bubble => "chart:bubble",
+            OdfChartType.Ring => "chart:ring",
+            OdfChartType.Radar => "chart:radar",
+            OdfChartType.Stock => "chart:stock",
             _ => "chart:bar",
         };
     }
 
     /// <summary>
+    /// Removes all data series nodes from the chart.
     /// 清除圖表中所有資料序列節點。
     /// </summary>
     public void ClearSeries()
@@ -48,9 +53,10 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Applies an <see cref="OdfChartDefinition"/> to the current chart.
     /// 將 <see cref="OdfChartDefinition"/> 套用至目前圖表。
     /// </summary>
-    /// <param name="definition">圖表定義</param>
+    /// <param name="definition">The chart definition. / 圖表定義。</param>
     public void ApplyDefinition(OdfChartDefinition definition)
     {
         if (definition is null)

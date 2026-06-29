@@ -6,6 +6,7 @@ using System.Linq;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides built-in ODF compliance profiles for package validation.
 /// 提供用於封裝驗證的內建 ODF 合規性規範。
 /// </summary>
 public static class OdfComplianceProfiles
@@ -51,6 +52,7 @@ public static class OdfComplianceProfiles
     ];
 
     /// <summary>
+    /// Gets the OASIS OpenDocument v1.0 compliance profile.
     /// 取得 OASIS OpenDocument v1.0 一致性規範。
     /// </summary>
     public static OdfComplianceProfile OasisOdf10 { get; } = new(
@@ -68,6 +70,7 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
+    /// Gets the OASIS OpenDocument v1.1 compliance profile.
     /// 取得 OASIS OpenDocument v1.1 一致性規範。
     /// </summary>
     public static OdfComplianceProfile OasisOdf11 { get; } = new(
@@ -85,6 +88,7 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
+    /// Gets the OASIS OpenDocument v1.2 compliance profile.
     /// 取得 OASIS OpenDocument v1.2 一致性規範。
     /// </summary>
     public static OdfComplianceProfile OasisOdf12 { get; } = new(
@@ -102,6 +106,7 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
+    /// Gets the OASIS OpenDocument v1.3 compliance profile.
     /// 取得 OASIS OpenDocument v1.3 一致性規範。
     /// </summary>
     public static OdfComplianceProfile OasisOdf13 { get; } = new(
@@ -119,6 +124,7 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
+    /// Gets the OASIS OpenDocument v1.4 Strict compliance profile.
     /// 取得 OASIS OpenDocument v1.4 嚴格 (Strict) 一致性規範。
     /// </summary>
     public static OdfComplianceProfile OasisOdf14Strict { get; } = new(
@@ -136,6 +142,7 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
+    /// Gets the OASIS OpenDocument v1.4 Extended compliance profile.
     /// 取得 OASIS OpenDocument v1.4 擴充 (Extended) 一致性規範。
     /// </summary>
     public static OdfComplianceProfile OasisOdf14Extended { get; } = new(
@@ -153,6 +160,7 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
+    /// Gets the ISO/IEC 26300:2006 compliance profile (corresponding to ODF 1.0).
     /// 取得 ISO/IEC 26300:2006 一致性規範（對應於 ODF 1.0）。
     /// </summary>
     public static OdfComplianceProfile IsoIec26300_2006 { get; } = new(
@@ -170,6 +178,7 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
+    /// Gets the ISO/IEC 26300:2015 compliance profile (corresponding to the ODF 1.2 baseline).
     /// 取得 ISO/IEC 26300:2015 一致性規範（對應於 ODF 1.2 基準）。
     /// </summary>
     public static OdfComplianceProfile IsoIec26300_2015 { get; } = new(
@@ -187,6 +196,7 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
+    /// Gets the ISO/IEC 26300:2025 compliance profile (corresponding to the ODF 1.3 baseline).
     /// 取得 ISO/IEC 26300:2025 一致性規範（對應於 ODF 1.3 基準）。
     /// </summary>
     public static OdfComplianceProfile IsoIec26300_2025 { get; } = new(
@@ -204,6 +214,7 @@ public static class OdfComplianceProfiles
         null);
 
     /// <summary>
+    /// Gets the European Union public-sector interoperability profile.
     /// 取得歐盟公共部門互通性規範。
     /// </summary>
     public static OdfComplianceProfile EuInteroperableEurope { get; } = new(
@@ -228,6 +239,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("en"));
 
     /// <summary>
+    /// Gets the European Union editable office document exchange compatibility profile.
     /// 取得歐盟可編輯辦公室文件交換相容性規範。
     /// </summary>
     public static OdfComplianceProfile EuOfficeDocumentExchange { get; } = new(
@@ -251,6 +263,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("en"));
 
     /// <summary>
+    /// Gets the Republic of China (Taiwan) ODF CNS15251 policy profile.
     /// 取得中華民國（臺灣）ODF CNS15251 政策規範。
     /// </summary>
     public static OdfComplianceProfile RocTaiwanOdfCns15251 { get; } = new(
@@ -278,6 +291,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("zh-TW"));
 
     /// <summary>
+    /// Gets the Republic of China (Taiwan) government ODF application tool compatibility profile.
     /// 取得中華民國（臺灣）政府 ODF 文件應用工具相容性規範。
     /// </summary>
     public static OdfComplianceProfile RocTaiwanGovernmentOdfTools { get; } = new(
@@ -302,6 +316,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("zh-TW"));
 
     /// <summary>
+    /// Gets the German federal government ODF document compatibility profile.
     /// 取得德國聯邦政府 ODF 文件相容性規範。
     /// </summary>
     public static OdfComplianceProfile DeGovernmentOdf { get; } = new(
@@ -325,6 +340,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("de"));
 
     /// <summary>
+    /// Gets the French government ODF document compatibility profile.
     /// 取得法國政府 ODF 文件相容性規範。
     /// </summary>
     public static OdfComplianceProfile FrGovernmentOdf { get; } = new(
@@ -347,6 +363,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("fr"));
 
     /// <summary>
+    /// Gets the Norwegian government ODF document compatibility profile.
     /// 取得挪威政府 ODF 文件相容性規範。
     /// </summary>
     public static OdfComplianceProfile NoGovernmentOdf { get; } = new(
@@ -370,6 +387,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("nb"));
 
     /// <summary>
+    /// Gets the Brazilian government ODF document compatibility profile.
     /// 取得巴西政府 ODF 文件相容性規範。
     /// </summary>
     public static OdfComplianceProfile BrGovernmentOdf { get; } = new(
@@ -391,6 +409,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("pt"));
 
     /// <summary>
+    /// Gets the US NARA electronic records transfer guidance compatibility profile.
     /// 取得美國 NARA 電子檔案轉移指引相容性規範。
     /// </summary>
     public static OdfComplianceProfile UsNaraOdf { get; } = new(
@@ -413,6 +432,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("en"));
 
     /// <summary>
+    /// Gets the NATO ODF document compatibility profile.
     /// 取得北約 (NATO) ODF 文件相容性規範。
     /// </summary>
     public static OdfComplianceProfile NatoOdf { get; } = new(
@@ -435,6 +455,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("en"));
 
     /// <summary>
+    /// Gets the Portuguese government ODF document compatibility profile.
     /// 取得葡萄牙政府 ODF 文件相容性規範。
     /// </summary>
     public static OdfComplianceProfile PtGovernmentOdf { get; } = new(
@@ -457,6 +478,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("pt"));
 
     /// <summary>
+    /// Gets the Belgian government ODF document compatibility profile.
     /// 取得比利時政府 ODF 文件相容性規範。
     /// </summary>
     public static OdfComplianceProfile BeGovernmentOdf { get; } = new(
@@ -478,6 +500,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("nl"));
 
     /// <summary>
+    /// Gets the Italian government ODF document compatibility profile.
     /// 取得義大利政府 ODF 文件相容性規範。
     /// </summary>
     public static OdfComplianceProfile ItGovernmentOdf { get; } = new(
@@ -500,6 +523,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("it"));
 
     /// <summary>
+    /// Gets the UK government ODF 1.2 compatibility profile.
     /// 取得英國政府 ODF 1.2 相容性規範。
     /// </summary>
     public static OdfComplianceProfile UkGovernmentOdf12 { get; } = new(
@@ -522,6 +546,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("en"));
 
     /// <summary>
+    /// Gets the Dutch government ODF compatibility profile.
     /// 取得荷蘭政府 ODF 相容性規範。
     /// </summary>
     public static OdfComplianceProfile NlGovernmentOdf { get; } = new(
@@ -544,6 +569,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("nl"));
 
     /// <summary>
+    /// Gets the Slovak government ODF compatibility profile.
     /// 取得斯洛伐克政府 ODF 相容性規範。
     /// </summary>
     public static OdfComplianceProfile SkGovernmentOdf { get; } = new(
@@ -565,6 +591,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("sk"));
 
     /// <summary>
+    /// Gets the Danish government ODF compatibility profile.
     /// 取得丹麥政府 ODF 相容性規範。
     /// </summary>
     public static OdfComplianceProfile DkGovernmentOdf { get; } = new(
@@ -586,6 +613,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("da"));
 
     /// <summary>
+    /// Gets the Malaysian government ODF compatibility profile.
     /// 取得馬來西亞政府 ODF 相容性規範。
     /// </summary>
     public static OdfComplianceProfile MyGovernmentOdf { get; } = new(
@@ -607,6 +635,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("ms"));
 
     /// <summary>
+    /// Gets the South Korean government ODF compatibility profile.
     /// 取得南韓政府 ODF 相容性規範。
     /// </summary>
     public static OdfComplianceProfile KrGovernmentOdf { get; } = new(
@@ -628,6 +657,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("ko"));
 
     /// <summary>
+    /// Gets the South African government ODF compatibility profile.
     /// 取得南非政府 ODF 相容性規範。
     /// </summary>
     public static OdfComplianceProfile ZaGovernmentOdf { get; } = new(
@@ -649,6 +679,7 @@ public static class OdfComplianceProfiles
         new CultureInfo("en"));
 
     /// <summary>
+    /// Gets the list of all built-in compliance profiles.
     /// 取得所有內建的合規性規範清單。
     /// </summary>
     public static IReadOnlyList<OdfComplianceProfile> BuiltIn { get; } = [
@@ -684,10 +715,11 @@ public static class OdfComplianceProfiles
     ];
 
     /// <summary>
+    /// Finds a specific built-in compliance profile by identifier.
     /// 根據識別碼尋找特定的內建合規性規範。
     /// </summary>
-    /// <param name="id">規範的唯一識別碼</param>
-    /// <returns>若找到對應的規範則傳回該執行個體；否則傳回 null</returns>
+    /// <param name="id">The unique identifier of the profile. / 規範的唯一識別碼。</param>
+    /// <returns>The matching profile instance, or null if not found. / 若找到對應的規範則傳回該執行個體；否則傳回 null。</returns>
     public static OdfComplianceProfile? Find(string id)
     {
         if (string.IsNullOrWhiteSpace(id))

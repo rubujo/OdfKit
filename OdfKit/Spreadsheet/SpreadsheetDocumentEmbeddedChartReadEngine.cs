@@ -138,10 +138,13 @@ internal static class SpreadsheetDocumentEmbeddedChartReadEngine
     private static OdfChartType ParseChartType(string? chartClass) => chartClass switch
     {
         "chart:line" => OdfChartType.Line,
-        "chart:pie" => OdfChartType.Pie,
+        "chart:circle" or "chart:pie" => OdfChartType.Pie,
         "chart:area" => OdfChartType.Area,
         "chart:scatter" => OdfChartType.Scatter,
         "chart:bubble" => OdfChartType.Bubble,
+        "chart:ring" => OdfChartType.Ring,
+        "chart:radar" => OdfChartType.Radar,
+        "chart:stock" => OdfChartType.Stock,
         _ => OdfChartType.Bar,
     };
 }

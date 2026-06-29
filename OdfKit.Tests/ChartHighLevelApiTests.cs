@@ -6,6 +6,7 @@ using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Extensions.Imaging;
 using OdfKit.Spreadsheet;
+using OdfKit.Styles;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -51,6 +52,113 @@ public class ChartHighLevelApiTests
         Assert.Equal(0, readDef.DataRange.StartAddress.Column);
         Assert.Equal(4, readDef.DataRange.EndAddress.Row);
         Assert.Equal(1, readDef.DataRange.EndAddress.Column);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfChartType.Pie"/> 寫入的 ODF 正式 chart:class 為 <c>chart:circle</c>
+    /// （而非舊版誤用的 <c>chart:pie</c>），且讀取真實應用程式（如 LibreOffice）以
+    /// <c>chart:circle</c> 匯出的圓餅圖時，<see cref="OdfChartDefinition.ChartType"/>
+    /// 仍能正確解析為 <see cref="OdfChartType.Pie"/>。
+    /// </summary>
+    [Fact]
+    public void PieChartType_WritesOasisCircleClass_AndParsesCircleOrLegacyPieClass()
+    {
+        var definition = new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Pie,
+            Title = "占比圖",
+            DataRange = new OdfCellRange(0, 0, 4, 1, "LocalTable"),
+        };
+
+        using var chartDoc = ChartDocument.Create(definition);
+
+        Assert.Equal("chart:circle", chartDoc.ChartClass);
+        Assert.Equal(OdfChartType.Pie, chartDoc.GetChartDefinition().ChartType);
+
+        chartDoc.ChartClass = "chart:circle";
+        Assert.Equal(OdfChartType.Pie, chartDoc.GetChartDefinition().ChartType);
+
+        chartDoc.ChartClass = "chart:pie";
+        Assert.Equal(OdfChartType.Pie, chartDoc.GetChartDefinition().ChartType);
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfChartType.Ring"/>／<see cref="OdfChartType.Radar"/>／
+    /// <see cref="OdfChartType.Stock"/> 三種先前缺漏的圖表類型，可正確寫入 ODF
+    /// 正式 chart:class（<c>chart:ring</c>／<c>chart:radar</c>／<c>chart:stock</c>）
+    /// 並於讀回後解析為相同列舉值。
+    /// </summary>
+    [Theory]
+    [InlineData(OdfChartType.Ring, "chart:ring")]
+    [InlineData(OdfChartType.Radar, "chart:radar")]
+    [InlineData(OdfChartType.Stock, "chart:stock")]
+    public void RingRadarAndStockChartTypes_RoundTripCorrectChartClass(OdfChartType chartType, string expectedClass)
+    {
+        var definition = new OdfChartDefinition
+        {
+            ChartType = chartType,
+            Title = "圖表",
+            DataRange = new OdfCellRange(0, 0, 4, 1, "LocalTable"),
+        };
+
+        using var chartDoc = ChartDocument.Create(definition);
+
+        Assert.Equal(expectedClass, chartDoc.ChartClass);
+        Assert.Equal(chartType, chartDoc.GetChartDefinition().ChartType);
+    }
+
+    /// <summary>
+    /// 驗證設定圖例位置等高階操作，在嵌入 ODS、獨立 ODC、OTC 範本、FODC 扁平 XML
+    /// 四種容器下儲存並重新載入後語意一致——四者皆共用同一個
+    /// <see cref="OdfChartDocument"/> 基底實作，不應因容器型別不同而有行為差異。
+    /// </summary>
+    [Fact]
+    public void LegendPosition_PersistsIdenticallyAcrossEmbeddedStandaloneTemplateAndFlatContainers()
+    {
+        var definition = new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Bar,
+            Title = "一致性測試",
+            DataRange = new OdfCellRange(0, 0, 3, 2, "Sheet1"),
+        };
+
+        using SpreadsheetDocument sheet = SpreadsheetDocument.Create();
+        sheet.AddSheet("Sheet1");
+        var anchor = new OdfCellAddress(1, 1, "Sheet1");
+        sheet.AddChart("Sheet1", anchor, definition, OdfLength.Parse("10cm"), OdfLength.Parse("6cm"));
+        sheet.GetEmbeddedChartDocument("Object 1/").LegendPosition = "start";
+
+        using var sheetStream = new MemoryStream();
+        sheet.SaveToStream(sheetStream);
+        sheetStream.Position = 0;
+        using SpreadsheetDocument reloadedSheet = SpreadsheetDocument.Load(sheetStream, "sheet.ods");
+        string? embeddedLegend = reloadedSheet.GetEmbeddedChartDocument("Object 1/").LegendPosition;
+
+        using ChartDocument standalone = ChartDocument.Create(definition);
+        standalone.LegendPosition = "start";
+
+        using ChartTemplateDocument template = ChartTemplateDocument.CreateFromDocument(standalone);
+        using FlatChartDocument flat = FlatChartDocument.CreateFromDocument(standalone);
+
+        using var standaloneStream = new MemoryStream();
+        standalone.SaveToStream(standaloneStream);
+        standaloneStream.Position = 0;
+        using ChartDocument reloadedStandalone = ChartDocument.Load(standaloneStream, "chart.odc");
+
+        using var templateStream = new MemoryStream();
+        template.SaveToStream(templateStream);
+        templateStream.Position = 0;
+        using ChartTemplateDocument reloadedTemplate = ChartTemplateDocument.Load(templateStream, "chart.otc");
+
+        using var flatStream = new MemoryStream();
+        flat.SaveToStream(flatStream);
+        flatStream.Position = 0;
+        using FlatChartDocument reloadedFlat = FlatChartDocument.Load(flatStream, "chart.fodc");
+
+        Assert.Equal("start", embeddedLegend);
+        Assert.Equal("start", reloadedStandalone.LegendPosition);
+        Assert.Equal("start", reloadedTemplate.LegendPosition);
+        Assert.Equal("start", reloadedFlat.LegendPosition);
     }
 
     /// <summary>

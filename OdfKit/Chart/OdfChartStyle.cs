@@ -7,6 +7,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Chart;
 
 /// <summary>
+/// Represents an editable chart automatic style (<c>style:family="chart"</c>).
 /// 表示可編輯的圖表自動樣式（<c>style:family="chart"</c>）。
 /// </summary>
 public sealed class OdfChartStyle
@@ -21,6 +22,7 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets the style name.
     /// 取得樣式名稱。
     /// </summary>
     public string Name =>
@@ -28,6 +30,7 @@ public sealed class OdfChartStyle
         ?? throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfChartStyle_ChartNotFound"));
 
     /// <summary>
+    /// Gets or sets the fill color (maps to <c>draw:fill-color</c>).
     /// 取得或設定填滿色（對應 <c>draw:fill-color</c>）。
     /// </summary>
     public string? FillColor
@@ -37,6 +40,7 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets the stroke color (maps to <c>svg:stroke-color</c>).
     /// 取得或設定筆觸色（對應 <c>svg:stroke-color</c>）。
     /// </summary>
     public string? StrokeColor
@@ -46,6 +50,7 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets the stroke width (maps to <c>svg:stroke-width</c>).
     /// 取得或設定筆觸寬度（對應 <c>svg:stroke-width</c>）。
     /// </summary>
     public string? StrokeWidth
@@ -55,6 +60,7 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets the fill style (maps to <c>draw:fill</c>).
     /// 取得或設定填滿樣式（對應 <c>draw:fill</c>）。
     /// </summary>
     public string? Fill
@@ -64,6 +70,7 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets the stroke style (maps to <c>draw:stroke</c>).
     /// 取得或設定筆觸樣式（對應 <c>draw:stroke</c>）。
     /// </summary>
     public string? Stroke
@@ -73,6 +80,7 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets whether the chart is displayed in 3D (maps to <c>chart:three-dimensional</c>).
     /// 取得或設定圖表是否為 3D 顯示（對應 <c>chart:three-dimensional</c>）。
     /// </summary>
     public bool? ThreeDimensional
@@ -88,6 +96,7 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets the 3D projection rotation angle offset (maps to <c>chart:angle-offset</c>).
     /// 取得或設定 3D 投影的旋轉角度偏置（對應 <c>chart:angle-offset</c>）。
     /// </summary>
     public int? AngleOffset
@@ -103,9 +112,10 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets the position of axis scale labels (maps to <c>chart:label-position</c>).
     /// 取得或設定座標軸刻度標籤的位置（對應 <c>chart:label-position</c>）。
     /// </summary>
-    /// <remarks>常見值包含 <c>near-axis</c>、<c>near-axis-other-side</c>、<c>outside-start</c> 與 <c>outside-end</c></remarks>
+    /// <remarks>Common values include <c>near-axis</c>, <c>near-axis-other-side</c>, <c>outside-start</c>, and <c>outside-end</c>. / 常見值包含 <c>near-axis</c>、<c>near-axis-other-side</c>、<c>outside-start</c> 與 <c>outside-end</c>。</remarks>
     public string? LabelPosition
     {
         get => _document.StyleEngine.GetStyleProperty(Name, "label-position", OdfNamespaces.Chart, "chart");
@@ -113,6 +123,7 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets the position of negative axis scale labels (maps to <c>chart:label-position-negative</c>).
     /// 取得或設定座標軸負值刻度標籤的位置（對應 <c>chart:label-position-negative</c>）。
     /// </summary>
     public string? LabelPositionNegative
@@ -122,9 +133,10 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets the alignment position of axis labels relative to the axis (maps to <c>chart:axis-label-position</c>).
     /// 取得或設定座標軸標籤相對於座標軸的對齊位置（對應 <c>chart:axis-label-position</c>）。
     /// </summary>
-    /// <remarks>常見值包含 <c>near-axis</c>、<c>near-axis-other-side</c>、<c>outside-start</c> 與 <c>outside-end</c></remarks>
+    /// <remarks>Common values include <c>near-axis</c>, <c>near-axis-other-side</c>, <c>outside-start</c>, and <c>outside-end</c>. / 常見值包含 <c>near-axis</c>、<c>near-axis-other-side</c>、<c>outside-start</c> 與 <c>outside-end</c>。</remarks>
     public string? AxisLabelPosition
     {
         get => _document.StyleEngine.GetStyleProperty(Name, "axis-label-position", OdfNamespaces.Chart, "chart");
@@ -132,6 +144,7 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets the 3D projection mode (maps to <c>dr3d:projection</c>).
     /// 取得或設定 3D 投影模式（對應 <c>dr3d:projection</c>）。
     /// </summary>
     public OdfDr3dProjection? Projection
@@ -159,6 +172,7 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets whether double-sided lighting mode is enabled (maps to <c>dr3d:lighting-mode</c>).
     /// 取得或設定是否啟用雙面光照模式（對應 <c>dr3d:lighting-mode</c>）。
     /// </summary>
     public bool? LightingMode
@@ -172,9 +186,10 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Creates a high-level summary of this style.
     /// 建立此樣式的高階摘要。
     /// </summary>
-    /// <returns>圖表樣式摘要</returns>
+    /// <returns>The chart style summary. / 圖表樣式摘要。</returns>
     public OdfChartStyleInfo ToInfo() =>
         new(Name, FillColor, StrokeColor, StrokeWidth, Fill, Stroke, ThreeDimensional, AngleOffset);
 

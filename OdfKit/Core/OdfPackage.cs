@@ -23,27 +23,32 @@ using OdfKit.Styles;
 namespace OdfKit.Core;
 
 /// <summary>
+/// The open mode of an ODF package.
 /// 表示 ODF 封裝的開啟模式。
 /// </summary>
 public enum OdfPackageMode
 {
     /// <summary>
+    /// Read-only mode.
     /// 唯讀模式。
     /// </summary>
     Read,
 
     /// <summary>
+    /// Read-write mode.
     /// 讀寫模式。
     /// </summary>
     ReadWrite,
 
     /// <summary>
+    /// Create mode.
     /// 建立模式。
     /// </summary>
     Create
 }
 
 /// <summary>
+/// Represents the physical package of an ODF document.
 /// 表示 ODF 文件的實體封裝。
 /// </summary>
 [DebuggerTypeProxy(typeof(OdfPackageDebugView))]
@@ -83,11 +88,13 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
 #endif
 
     /// <summary>
+    /// Gets the open mode of the current ODF package.
     /// 取得目前 ODF 封裝的開啟模式。
     /// </summary>
     public OdfPackageMode Mode => _mode;
 
     /// <summary>
+    /// Gets or sets the MIME media type of the ODF package.
     /// 取得或設定 ODF 封裝的 MIME 媒體類型。
     /// </summary>
     public string? MimeType => _mimetype;
@@ -95,6 +102,7 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     private OdfVersion _version = OdfVersionInfo.DefaultVersion;
 
     /// <summary>
+    /// Gets or sets the ODF specification version of the packaged document.
     /// 取得或設定封裝文件的 ODF 規格版本。
     /// </summary>
     public OdfVersion Version
@@ -104,6 +112,7 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Gets the package's RDF metadata collection, corresponding to <c>META-INF/manifest.rdf</c>.
     /// 取得封裝的 RDF metadata 集合，對應 <c>META-INF/manifest.rdf</c>。
     /// </summary>
     public OdfRdfMetadata RdfMetadata { get; private set; } = new();
@@ -113,11 +122,13 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     private OdfMediaManager? _mediaManager;
 
     /// <summary>
+    /// Gets the media manager instance for this package.
     /// 取得此封裝套件的媒體管理器實例。
     /// </summary>
     public OdfMediaManager MediaManager => _mediaManager ??= new OdfMediaManager(this);
 
     /// <summary>
+    /// Gets a value indicating whether the current package is a single flat XML file.
     /// 取得一個值，指出目前封裝是否為單一 Flat XML 檔案。
     /// </summary>
     public bool IsFlatXml
@@ -127,6 +138,7 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Gets the media type information list for all entries in the package.
     /// 取得封裝內部所有專案的媒體類型資訊清單。
     /// </summary>
     public IReadOnlyDictionary<string, string> Manifest => _manifest;
@@ -140,18 +152,20 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     internal OdfSaveOptions SaveOptions => _saveOptions;
 
     /// <summary>
+    /// Determines whether the entry at the specified path is encrypted.
     /// 判斷指定路徑的專案是否已加密。
     /// </summary>
-    /// <param name="name">專案的相對路徑名稱</param>
-    /// <returns>若該專案已加密，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
+    /// <param name="name">The relative path name of the entry. / 專案的相對路徑名稱。</param>
+    /// <returns><see langword="true"/> if the entry is encrypted; otherwise <see langword="false"/>. / 若該專案已加密，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public bool IsEntryEncrypted(string name)
         => OdfPackageEntryAccessEngine.IsEntryEncrypted(EntryCollaborators, name);
 
     /// <summary>
+    /// Gets the encryption details of the specified entry.
     /// 取得指定專案的加密詳細資訊。
     /// </summary>
-    /// <param name="name">專案的相對路徑名稱</param>
-    /// <returns>專案的加密資訊；若未加密則為 <see langword="null"/></returns>
+    /// <param name="name">The relative path name of the entry. / 專案的相對路徑名稱。</param>
+    /// <returns>The entry's encryption information, or <see langword="null"/> if not encrypted. / 專案的加密資訊；若未加密則為 <see langword="null"/>。</returns>
     public OdfEncryptionInfo? GetEntryEncryptionInfo(string name)
         => OdfPackageEntryAccessEngine.GetEntryEncryptionInfo(EntryCollaborators, name);
 
@@ -208,11 +222,12 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
 
 
     /// <summary>
+    /// Opens an existing ODF package from the specified file path.
     /// 從指定的檔案路徑開啟既有的 ODF 封裝。
     /// </summary>
-    /// <param name="path">ODF 檔案的路徑</param>
-    /// <param name="options">載入選項</param>
-    /// <returns>開啟的 <see cref="OdfPackage"/> 執行個體</returns>
+    /// <param name="path">The path of the ODF file. / ODF 檔案的路徑。</param>
+    /// <param name="options">The load options. / 載入選項。</param>
+    /// <returns>The opened <see cref="OdfPackage"/> instance. / 開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
     public static OdfPackage Open(string path, OdfLoadOptions? options = null)
     {
         string journalPath = path + ".journal";
@@ -255,12 +270,13 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Opens an existing ODF package from the specified stream.
     /// 從指定的資料流開啟既有的 ODF 封裝。
     /// </summary>
-    /// <param name="stream">包含 ODF 封裝資料的資料流</param>
-    /// <param name="leaveOpen">若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/></param>
-    /// <param name="options">載入選項</param>
-    /// <returns>開啟的 <see cref="OdfPackage"/> 執行個體</returns>
+    /// <param name="stream">The stream containing the ODF package data. / 包含 ODF 封裝資料的資料流。</param>
+    /// <param name="leaveOpen"><see langword="true"/> to keep the stream open after the package is disposed; otherwise <see langword="false"/>. / 若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/>。</param>
+    /// <param name="options">The load options. / 載入選項。</param>
+    /// <returns>The opened <see cref="OdfPackage"/> instance. / 開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
     public static OdfPackage Open(Stream stream, bool leaveOpen = false, OdfLoadOptions? options = null)
     {
         OdfPackage package = new(OdfPackageMode.ReadWrite, stream, leaveOpen, options, null);
@@ -286,12 +302,13 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Asynchronously opens an existing ODF package from the specified file path.
     /// 非同步從指定的檔案路徑開啟既有的 ODF 封裝。
     /// </summary>
-    /// <param name="path">ODF 檔案的路徑</param>
-    /// <param name="options">載入選項</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體</returns>
+    /// <param name="path">The path of the ODF file. / ODF 檔案的路徑。</param>
+    /// <param name="options">The load options. / 載入選項。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous open operation, whose result is the opened <see cref="OdfPackage"/> instance. / 代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與 manifest 載入期間協作檢查取消語彙。
@@ -341,13 +358,14 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Asynchronously opens an existing ODF package from the specified stream.
     /// 非同步從指定的資料流開啟既有的 ODF 封裝。
     /// </summary>
-    /// <param name="stream">包含 ODF 封裝資料的資料流</param>
-    /// <param name="leaveOpen">若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/></param>
-    /// <param name="options">載入選項</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體</returns>
+    /// <param name="stream">The stream containing the ODF package data. / 包含 ODF 封裝資料的資料流。</param>
+    /// <param name="leaveOpen"><see langword="true"/> to keep the stream open after the package is disposed; otherwise <see langword="false"/>. / 若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/>。</param>
+    /// <param name="options">The load options. / 載入選項。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous open operation, whose result is the opened <see cref="OdfPackage"/> instance. / 代表非同步開啟作業的工作，其結果為開啟的 <see cref="OdfPackage"/> 執行個體。</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與 manifest 載入期間協作檢查取消語彙。
@@ -387,11 +405,12 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Creates a new ODF package at the specified file path.
     /// 在指定的檔案路徑建立一個新的 ODF 封裝。
     /// </summary>
-    /// <param name="path">要建立的檔案路徑</param>
-    /// <param name="options">儲存與加密選項</param>
-    /// <returns>建立的 <see cref="OdfPackage"/> 執行個體</returns>
+    /// <param name="path">The file path at which to create the package. / 要建立的檔案路徑。</param>
+    /// <param name="options">The save and encryption options. / 儲存與加密選項。</param>
+    /// <returns>The created <see cref="OdfPackage"/> instance. / 建立的 <see cref="OdfPackage"/> 執行個體。</returns>
     public static OdfPackage Create(string path, OdfSaveOptions? options = null)
     {
         FileStream stream = new(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
@@ -399,12 +418,13 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Creates a new ODF package in the specified stream.
     /// 在指定的資料流建立一個新的 ODF 封裝。
     /// </summary>
-    /// <param name="stream">要寫入 ODF 封裝的資料流</param>
-    /// <param name="leaveOpen">若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/></param>
-    /// <param name="options">儲存與加密選項</param>
-    /// <returns>建立的 <see cref="OdfPackage"/> 執行個體</returns>
+    /// <param name="stream">The stream to which the ODF package is written. / 要寫入 ODF 封裝的資料流。</param>
+    /// <param name="leaveOpen"><see langword="true"/> to keep the stream open after the package is disposed; otherwise <see langword="false"/>. / 若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/>。</param>
+    /// <param name="options">The save and encryption options. / 儲存與加密選項。</param>
+    /// <returns>The created <see cref="OdfPackage"/> instance. / 建立的 <see cref="OdfPackage"/> 執行個體。</returns>
     public static OdfPackage Create(Stream stream, bool leaveOpen = false, OdfSaveOptions? options = null)
     {
         return new OdfPackage(OdfPackageMode.Create, stream, leaveOpen, null, options);

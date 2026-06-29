@@ -7,10 +7,11 @@ namespace OdfKit.Image;
 public partial class OdfImageDocument
 {
     /// <summary>
+    /// Gets the filter setting of the image frame with the specified name.
     /// 取得指定名稱影像框架的濾鏡設定。
     /// </summary>
-    /// <param name="name">框架名稱</param>
-    /// <returns>濾鏡設定；若框架不存在或未設定濾鏡則為 <see langword="null"/></returns>
+    /// <param name="name">The frame name. / 框架名稱。</param>
+    /// <returns>The filter setting, or <see langword="null"/> if the frame does not exist or has no filter set. / 濾鏡設定；若框架不存在或未設定濾鏡則為 <see langword="null"/>。</returns>
     public OdfImageFilterInfo? GetImageFilter(string name)
     {
         OdfNode? frame = FindFrameByName(name);
@@ -26,11 +27,12 @@ public partial class OdfImageDocument
     }
 
     /// <summary>
+    /// Sets the filter of the image frame with the specified name.
     /// 設定指定名稱影像框架的濾鏡。
     /// </summary>
-    /// <param name="name">框架名稱</param>
-    /// <param name="filter">濾鏡設定；傳入 <see langword="null"/> 表示移除既有濾鏡</param>
-    /// <returns>若成功設定則為 <see langword="true"/>；找不到框架時為 <see langword="false"/></returns>
+    /// <param name="name">The frame name. / 框架名稱。</param>
+    /// <param name="filter">The filter setting; pass <see langword="null"/> to remove the existing filter. / 濾鏡設定；傳入 <see langword="null"/> 表示移除既有濾鏡。</param>
+    /// <returns><see langword="true"/> if set successfully; <see langword="false"/> if the frame is not found. / 若成功設定則為 <see langword="true"/>；找不到框架時為 <see langword="false"/>。</returns>
     public bool SetImageFilter(string name, OdfImageFilterInfo? filter)
     {
         OdfNode? frame = FindFrameByName(name);

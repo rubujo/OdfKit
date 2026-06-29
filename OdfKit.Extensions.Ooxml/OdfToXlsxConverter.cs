@@ -586,7 +586,8 @@ public static class OdfToXlsxConverter
                 new C.AxisId { Val = 48650112U },
                 new C.AxisId { Val = 48672768U }),
             // 圓餅圖天生即依資料點（類別）區分色彩，符合 ODF 與 Excel 預設慣例
-            "pie" => new C.PieChart(
+            // ODF 正式 chart:class 為 chart:circle；chart:pie 為舊版 OdfKit 誤用值，仍相容辨識
+            "circle" or "pie" => new C.PieChart(
                 new C.VaryColors { Val = true },
                 BuildPieSeries(spec)),
             // 長條圖每個資料系列維持單一色彩，否則會與圖例的單一色塊不一致

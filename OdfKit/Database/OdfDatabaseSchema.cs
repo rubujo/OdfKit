@@ -8,6 +8,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Database;
 
 /// <summary>
+/// Represents the schema definition accessor for an ODB database, used to model table structures, primary keys, and foreign key relationships.
 /// 表示 ODB 資料庫的 Schema 定義存取器，用於建模資料表結構、主鍵與外鍵關聯。
 /// </summary>
 public sealed class OdfDatabaseSchema
@@ -27,16 +28,18 @@ public sealed class OdfDatabaseSchema
     }
 
     /// <summary>
+    /// Gets all currently defined table structures in the schema.
     /// 取得目前 Schema 中所有已定義的資料表結構。
     /// </summary>
     public IReadOnlyList<OdfSchemaTable> Tables => _tables.AsReadOnly();
 
     /// <summary>
+    /// Adds a table structure to the schema.
     /// 新增一個資料表結構至 Schema 中。
     /// </summary>
-    /// <param name="table">要新增的資料表結構</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="table"/> 為 <see langword="null"/> 時擲出</exception>
-    /// <exception cref="InvalidOperationException">當資料表名稱已存在於 Schema 中時擲出</exception>
+    /// <param name="table">The table structure to add. / 要新增的資料表結構。</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="table"/> is <see langword="null"/>. / 當 <paramref name="table"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="InvalidOperationException">When a table with the same name already exists in the schema. / 當資料表名稱已存在於 Schema 中時擲出。</exception>
     public void AddTable(OdfSchemaTable table)
     {
         if (table is null)
@@ -54,11 +57,12 @@ public sealed class OdfDatabaseSchema
     }
 
     /// <summary>
+    /// Removes the table structure with the specified name from the schema.
     /// 從 Schema 中移除指定名稱的資料表結構。
     /// </summary>
-    /// <param name="tableName">要移除的資料表名稱</param>
-    /// <returns>如果成功移除，則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
-    /// <exception cref="ArgumentException">當 <paramref name="tableName"/> 為空時擲出</exception>
+    /// <param name="tableName">The name of the table to remove. / 要移除的資料表名稱。</param>
+    /// <returns><see langword="true"/> if removed successfully; otherwise <see langword="false"/>. / 如果成功移除，則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    /// <exception cref="ArgumentException">When <paramref name="tableName"/> is empty. / 當 <paramref name="tableName"/> 為空時擲出。</exception>
     public bool RemoveTable(string tableName)
     {
         if (string.IsNullOrWhiteSpace(tableName))
@@ -78,6 +82,7 @@ public sealed class OdfDatabaseSchema
     }
 
     /// <summary>
+    /// Synchronizes the current schema state back to the database document.
     /// 將目前的 Schema 狀態同步保存回資料庫文件中。
     /// </summary>
     public void Save()
@@ -453,15 +458,17 @@ public sealed class OdfDatabaseSchema
 }
 
 /// <summary>
+/// Represents a table schema structure model.
 /// 表示資料表 Schema 結構模型。
 /// </summary>
 public sealed class OdfSchemaTable
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfSchemaTable"/> class.
     /// 初始化 <see cref="OdfSchemaTable"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="name">資料表名稱</param>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空時擲出</exception>
+    /// <param name="name">The table name. / 資料表名稱。</param>
+    /// <exception cref="ArgumentException">When <paramref name="name"/> is empty. / 當 <paramref name="name"/> 為空時擲出。</exception>
     public OdfSchemaTable(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -472,44 +479,51 @@ public sealed class OdfSchemaTable
     }
 
     /// <summary>
+    /// Gets the table name.
     /// 取得資料表名稱。
     /// </summary>
     public string Name { get; }
 
     /// <summary>
+    /// Gets the list of table columns.
     /// 取得資料表欄位清單。
     /// </summary>
     public List<OdfSchemaColumn> Columns { get; } = [];
 
     /// <summary>
+    /// Gets or sets the primary key definition of the table.
     /// 取得或設定資料表的主鍵定義。
     /// </summary>
     public OdfSchemaPrimaryKey? PrimaryKey { get; set; }
 
     /// <summary>
+    /// Gets the list of foreign key relationship definitions of the table.
     /// 取得資料表的外鍵關聯定義清單。
     /// </summary>
     public List<OdfSchemaForeignKey> ForeignKeys { get; } = [];
 
     /// <summary>
+    /// Gets the list of index definitions of the table.
     /// 取得資料表的索引定義清單。
     /// </summary>
     public List<OdfSchemaIndex> Indexes { get; } = [];
 }
 
 /// <summary>
+/// Represents a table column definition.
 /// 表示資料表欄位定義。
 /// </summary>
 public sealed class OdfSchemaColumn
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfSchemaColumn"/> class.
     /// 初始化 <see cref="OdfSchemaColumn"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="name">欄位名稱</param>
-    /// <param name="typeName">資料型別名稱</param>
-    /// <param name="isNullable">是否允許為 null</param>
-    /// <param name="isAutoIncrement">是否為自動遞增欄位</param>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空時擲出</exception>
+    /// <param name="name">The column name. / 欄位名稱。</param>
+    /// <param name="typeName">The data type name. / 資料型別名稱。</param>
+    /// <param name="isNullable">Whether null is allowed. / 是否允許為 null。</param>
+    /// <param name="isAutoIncrement">Whether this is an auto-increment column. / 是否為自動遞增欄位。</param>
+    /// <exception cref="ArgumentException">When <paramref name="name"/> is empty. / 當 <paramref name="name"/> 為空時擲出。</exception>
     public OdfSchemaColumn(string name, string typeName = "VARCHAR", bool isNullable = true, bool isAutoIncrement = false)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -523,54 +537,63 @@ public sealed class OdfSchemaColumn
     }
 
     /// <summary>
+    /// Gets the column name.
     /// 取得欄位名稱。
     /// </summary>
     public string Name { get; }
 
     /// <summary>
+    /// Gets or sets the data type name.
     /// 取得或設定資料型別名稱。
     /// </summary>
     public string TypeName { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether this column allows null.
     /// 取得或設定一個值，指示該欄位是否允許為 null。
     /// </summary>
     public bool IsNullable { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether this column is auto-incrementing.
     /// 取得或設定一個值，指示該欄位是否為自動遞增欄位。
     /// </summary>
     public bool IsAutoIncrement { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether this column has a unique constraint.
     /// 取得或設定一個值，指示該欄位是否具有唯一值約束。
     /// </summary>
     public bool IsUnique { get; set; }
 
     /// <summary>
+    /// Gets or sets the default value expression of the column.
     /// 取得或設定欄位的預設值表達式。
     /// </summary>
     public string? DefaultValue { get; set; }
 
     /// <summary>
+    /// Gets or sets the check constraint expression of the column.
     /// 取得或設定欄位的檢查約束表達式。
     /// </summary>
     public string? CheckConstraint { get; set; }
 }
 
 /// <summary>
+/// Represents a table index definition model.
 /// 表示資料表索引定義模型。
 /// </summary>
 public sealed class OdfSchemaIndex
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfSchemaIndex"/> class.
     /// 初始化 <see cref="OdfSchemaIndex"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="name">索引名稱</param>
-    /// <param name="isUnique">是否為唯一索引</param>
-    /// <param name="columns">索引所包含的欄位名稱清單</param>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空時擲出</exception>
-    /// <exception cref="ArgumentNullException">當 <paramref name="columns"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <param name="name">The index name. / 索引名稱。</param>
+    /// <param name="isUnique">Whether this is a unique index. / 是否為唯一索引。</param>
+    /// <param name="columns">The list of column names included in the index. / 索引所包含的欄位名稱清單。</param>
+    /// <exception cref="ArgumentException">When <paramref name="name"/> is empty. / 當 <paramref name="name"/> 為空時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When <paramref name="columns"/> is <see langword="null"/>. / 當 <paramref name="columns"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdfSchemaIndex(string name, bool isUnique, IEnumerable<string> columns)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -584,32 +607,37 @@ public sealed class OdfSchemaIndex
     }
 
     /// <summary>
+    /// Gets the index name.
     /// 取得索引名稱。
     /// </summary>
     public string Name { get; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether this index is unique.
     /// 取得或設定一個值，指示該索引是否為唯一索引。
     /// </summary>
     public bool IsUnique { get; set; }
 
     /// <summary>
+    /// Gets the list of column names included in the index.
     /// 取得索引所包含的欄位名稱清單。
     /// </summary>
     public List<string> Columns { get; }
 }
 
 /// <summary>
+/// Represents a primary key definition model.
 /// 表示主鍵定義模型。
 /// </summary>
 public sealed class OdfSchemaPrimaryKey
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfSchemaPrimaryKey"/> class.
     /// 初始化 <see cref="OdfSchemaPrimaryKey"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="name">主鍵約束名稱</param>
-    /// <param name="columns">包含在主鍵中的欄位名稱清單</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="columns"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <param name="name">The primary key constraint name. / 主鍵約束名稱。</param>
+    /// <param name="columns">The list of column names included in the primary key. / 包含在主鍵中的欄位名稱清單。</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="columns"/> is <see langword="null"/>. / 當 <paramref name="columns"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdfSchemaPrimaryKey(string? name, IEnumerable<string> columns)
     {
         Name = name;
@@ -617,31 +645,35 @@ public sealed class OdfSchemaPrimaryKey
     }
 
     /// <summary>
+    /// Gets the primary key constraint name.
     /// 取得主鍵約束名稱。
     /// </summary>
     public string? Name { get; }
 
     /// <summary>
+    /// Gets the list of column names included in the primary key.
     /// 取得主鍵所包含的欄位名稱清單。
     /// </summary>
     public List<string> Columns { get; }
 }
 
 /// <summary>
+/// Represents a foreign key relationship definition model.
 /// 表示外鍵關聯定義模型。
 /// </summary>
 public sealed class OdfSchemaForeignKey
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfSchemaForeignKey"/> class.
     /// 初始化 <see cref="OdfSchemaForeignKey"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="name">外鍵約束名稱</param>
-    /// <param name="referencedTable">被參照的目標資料表名稱</param>
-    /// <param name="keyColumns">外鍵與主鍵欄位對應清單</param>
-    /// <param name="updateRule">更新規則</param>
-    /// <param name="deleteRule">刪除規則</param>
-    /// <exception cref="ArgumentException">當 <paramref name="referencedTable"/> 為空時擲出</exception>
-    /// <exception cref="ArgumentNullException">當 <paramref name="keyColumns"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <param name="name">The foreign key constraint name. / 外鍵約束名稱。</param>
+    /// <param name="referencedTable">The name of the referenced target table. / 被參照的目標資料表名稱。</param>
+    /// <param name="keyColumns">The list of foreign-key-to-primary-key column mappings. / 外鍵與主鍵欄位對應清單。</param>
+    /// <param name="updateRule">The update rule. / 更新規則。</param>
+    /// <param name="deleteRule">The delete rule. / 刪除規則。</param>
+    /// <exception cref="ArgumentException">When <paramref name="referencedTable"/> is empty. / 當 <paramref name="referencedTable"/> 為空時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When <paramref name="keyColumns"/> is <see langword="null"/>. / 當 <paramref name="keyColumns"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdfSchemaForeignKey(
         string? name,
         string referencedTable,
@@ -662,41 +694,48 @@ public sealed class OdfSchemaForeignKey
     }
 
     /// <summary>
+    /// Gets the foreign key constraint name.
     /// 取得外鍵約束名稱。
     /// </summary>
     public string? Name { get; }
 
     /// <summary>
+    /// Gets the name of the referenced target table.
     /// 取得被參照的目標資料表名稱。
     /// </summary>
     public string ReferencedTable { get; }
 
     /// <summary>
+    /// Gets the list of foreign-key-to-primary-key column mappings.
     /// 取得外鍵與主鍵欄位的對應清單。
     /// </summary>
     public List<OdfSchemaKeyMapping> KeyColumns { get; }
 
     /// <summary>
+    /// Gets the update rule.
     /// 取得更新規則。
     /// </summary>
     public string? UpdateRule { get; }
 
     /// <summary>
+    /// Gets the delete rule.
     /// 取得刪除規則。
     /// </summary>
     public string? DeleteRule { get; }
 }
 
 /// <summary>
+/// Represents a mapping between primary key and foreign key columns.
 /// 表示主外鍵欄位的對應對照。
 /// </summary>
 public sealed class OdfSchemaKeyMapping
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfSchemaKeyMapping"/> class.
     /// 初始化 <see cref="OdfSchemaKeyMapping"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="column">目前資料表欄位名稱</param>
-    /// <param name="relatedColumn">參照資料表欄位名稱</param>
+    /// <param name="column">The column name in the current table. / 目前資料表欄位名稱。</param>
+    /// <param name="relatedColumn">The column name in the referenced table. / 參照資料表欄位名稱。</param>
     public OdfSchemaKeyMapping(string column, string relatedColumn)
     {
         Column = column ?? string.Empty;
@@ -704,11 +743,13 @@ public sealed class OdfSchemaKeyMapping
     }
 
     /// <summary>
+    /// Gets the column name in the current table.
     /// 取得目前資料表欄位名稱。
     /// </summary>
     public string Column { get; }
 
     /// <summary>
+    /// Gets the column name in the referenced table.
     /// 取得參照資料表欄位名稱。
     /// </summary>
     public string RelatedColumn { get; }

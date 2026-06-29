@@ -92,9 +92,14 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate sample.odt
   指向本機資料夾。
 - 外部 corpus 可從 `docs/examples/external-corpus/manifest.json` 複製範本開始，
   並以 `docs/examples/external-corpus/baseline-exceptions.json` 記錄暫時分類差異。
-- ODFDOM 官方 sample parity 可從 `docs/examples/odfdom-sample-corpus/manifest.json`
-  複製範本開始；此範本要求 `sourceUri`、授權審核狀態、expected classification、
-  round-trip 策略與 `sha256` 欄位格式先通過 metadata gate。
+- ODFDOM 官方 sample parity 已釘選於 `docs/examples/odfdom-sample-corpus/manifest.json`：
+  鎖定 `tdf/odftoolkit v0.13.0`（commit `b926a6134a2fee782076500dfc02c47c2d651cff`）四個
+  官方 sample（Text／Spreadsheet／Presentation／Graphics，皆 ODF 1.2），已完成 Apache-2.0
+  授權審核並填入實際 `sha256`；若要擴充更多 fixture 或改版到更新的上游 release，依同一份
+  manifest 的欄位格式（`sourceUri`、授權審核狀態、expected classification、round-trip 策略、
+  `sha256`）新增或更新項目，並同步調整
+  `OdfKit.Tests/DocsAndCorpusContractTests.cs.ExternalOdfDomSampleCorpusTemplateCanBeMetadataValidatedByCli`
+  的釘選 commit／雜湊斷言。
 - 每個 fixture 都要記錄來源、授權、預期 valid / invalid、ODF 版本、
   profile 與 round-trip 預期。
 - Corpus manifest 會拒絕重複 `id` / `path`、未知 `roundTrip` 策略與逃出 corpus root 的路徑。

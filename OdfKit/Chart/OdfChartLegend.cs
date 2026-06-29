@@ -4,6 +4,7 @@ using OdfKit.DOM;
 namespace OdfKit.Chart;
 
 /// <summary>
+/// Represents a unified editable model for the chart legend.
 /// 表示圖表圖例的統一可編輯模型。
 /// </summary>
 public sealed class OdfChartLegend
@@ -16,6 +17,7 @@ public sealed class OdfChartLegend
     }
 
     /// <summary>
+    /// Gets or sets whether the legend is visible.
     /// 取得或設定圖例是否顯示。
     /// </summary>
     public bool IsVisible
@@ -35,6 +37,7 @@ public sealed class OdfChartLegend
     }
 
     /// <summary>
+    /// Gets or sets the legend position (maps to <c>chart:legend-position</c>).
     /// 取得或設定圖例位置（對應 <c>chart:legend-position</c>）。
     /// </summary>
     public string? Position
@@ -54,6 +57,7 @@ public sealed class OdfChartLegend
     }
 
     /// <summary>
+    /// Gets or sets the legend alignment (maps to <c>chart:legend-align</c>).
     /// 取得或設定圖例對齊方式（對應 <c>chart:legend-align</c>）。
     /// </summary>
     public string? Alignment
@@ -73,6 +77,7 @@ public sealed class OdfChartLegend
     }
 
     /// <summary>
+    /// Gets or sets the legend style name (maps to <c>chart:style-name</c>).
     /// 取得或設定圖例樣式名稱（對應 <c>chart:style-name</c>）。
     /// </summary>
     public string? StyleName
@@ -92,6 +97,7 @@ public sealed class OdfChartLegend
     }
 
     /// <summary>
+    /// Gets or sets the chart style of the legend.
     /// 取得或設定圖例的圖表樣式。
     /// </summary>
     public OdfChartStyle Style

@@ -23,9 +23,10 @@ public partial class OdfImageDocument
     }
 
     /// <summary>
+    /// Gets the default content XML string.
     /// 取得預設的內容 XML 字串。
     /// </summary>
-    /// <returns>預設的內容 XML 字串</returns>
+    /// <returns>The default content XML string. / 預設的內容 XML 字串。</returns>
     protected override string GetDefaultContentXml()
     {
         return "<office:document-content " +
@@ -39,9 +40,10 @@ public partial class OdfImageDocument
     }
 
     /// <summary>
+    /// Gets the default styles XML string.
     /// 取得預設的樣式 XML 字串。
     /// </summary>
-    /// <returns>預設的樣式 XML 字串</returns>
+    /// <returns>The default styles XML string. / 預設的樣式 XML 字串。</returns>
     protected override string GetDefaultStylesXml()
     {
         return "<office:document-styles " +
@@ -52,12 +54,13 @@ public partial class OdfImageDocument
     }
 
     /// <summary>
+    /// Merges the content nodes of a source image document into this document.
     /// 合併來源影像文件的內容節點至此文件。
     /// </summary>
-    /// <param name="sourceDoc">來源文件</param>
-    /// <param name="options">合併選項</param>
-    /// <param name="renameMap">樣式重新命名對照表</param>
-    /// <exception cref="ArgumentException">當來源文件不是 <see cref="OdfImageDocument"/> 時擲出</exception>
+    /// <param name="sourceDoc">The source document. / 來源文件。</param>
+    /// <param name="options">The merge options. / 合併選項。</param>
+    /// <param name="renameMap">The dictionary mapping renamed style names. / 樣式重新命名對照表。</param>
+    /// <exception cref="ArgumentException">When the source document is not an <see cref="OdfImageDocument"/>. / 當來源文件不是 <see cref="OdfImageDocument"/> 時擲出。</exception>
     protected override void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap)
     {
         var source = sourceDoc as OdfImageDocument ?? throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfImageDocument_SourceFileOdfimagedocument"), nameof(sourceDoc));

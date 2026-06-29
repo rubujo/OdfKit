@@ -20,6 +20,7 @@ using OdfKit.Text;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Abstract base class representing an ODF document package container.
 /// 代表一個 ODF 文件封裝容器的抽象基底類別。
 /// </summary>
 public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
@@ -31,26 +32,29 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     internal static int LastCoreXmlChannelWorkerCountForTests { get; private set; }
 
     /// <summary>
+    /// Creates an ODF document of the specified kind.
     /// 建立指定種類的 ODF 文件。
     /// </summary>
-    /// <param name="kind">要建立的 ODF 文件種類</param>
-    /// <returns>建立完成的 ODF 文件</returns>
+    /// <param name="kind">The ODF document kind to create. / 要建立的 ODF 文件種類。</param>
+    /// <returns>The created ODF document. / 建立完成的 ODF 文件。</returns>
     public static OdfDocument Create(OdfDocumentKind kind) => OdfDocumentFactory.CreateDocument(kind);
 
     /// <summary>
+    /// Loads an ODF document from the specified path.
     /// 從指定路徑載入 ODF 文件。
     /// </summary>
-    /// <param name="path">ODF 文件路徑</param>
-    /// <returns>載入完成的 ODF 文件</returns>
+    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     /// <remarks>在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="LoadAsync(string, CancellationToken)"/> 以避免阻塞執行緒</remarks>
     public static OdfDocument Load(string path) => OdfDocumentFactory.LoadDocument(path);
 
     /// <summary>
+    /// Asynchronously loads an ODF document from the specified path.
     /// 非同步從指定路徑載入 ODF 文件。
     /// </summary>
-    /// <param name="path">ODF 文件路徑</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
+    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
@@ -59,20 +63,22 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken);
 
     /// <summary>
+    /// Loads an ODF document from the specified path and load options.
     /// 從指定路徑與載入選項載入 ODF 文件。
     /// </summary>
-    /// <param name="path">ODF 文件路徑</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
-    /// <returns>載入完成的 ODF 文件</returns>
+    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
+    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument Load(string path, OdfLoadOptions? options) => OdfDocumentFactory.LoadDocument(path, options);
 
     /// <summary>
+    /// Asynchronously loads an ODF document from the specified path and load options.
     /// 非同步從指定路徑與載入選項載入 ODF 文件。
     /// </summary>
-    /// <param name="path">ODF 文件路徑</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
+    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
+    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
@@ -81,20 +87,22 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         OdfDocumentFactory.LoadDocumentAsync(path, options, cancellationToken);
 
     /// <summary>
+    /// Loads an ODF document from the specified stream.
     /// 從指定資料流載入 ODF 文件。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <returns>載入完成的 ODF 文件</returns>
+    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
+    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument Load(Stream stream, string? fileName = null) => OdfDocumentFactory.LoadDocument(stream, fileName);
 
     /// <summary>
+    /// Asynchronously loads an ODF document from the specified stream.
     /// 非同步從指定資料流載入 ODF 文件。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
+    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
+    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 解壓與封裝初始化期間協作檢查取消語彙。
@@ -103,32 +111,36 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken);
 
     /// <summary>
+    /// Loads an ODF document from the specified stream and load options.
     /// 從指定資料流與載入選項載入 ODF 文件。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <returns>載入完成的 ODF 文件</returns>
+    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
+    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
+    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument Load(Stream stream, OdfLoadOptions? options, string? fileName = null) =>
         OdfDocumentFactory.LoadDocument(stream, options, fileName);
 
     /// <summary>
+    /// Asynchronously loads an ODF document from the specified stream and load options.
     /// 非同步從指定資料流與載入選項載入 ODF 文件。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
+    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
+    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
+    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     public static Task<OdfDocument> LoadAsync(Stream stream, OdfLoadOptions? options, string? fileName = null, CancellationToken cancellationToken = default) =>
         OdfDocumentFactory.LoadDocumentAsync(stream, options, fileName, cancellationToken);
 
     /// <summary>
+    /// Gets the ODF package container associated with this document.
     /// 取得與此文件相關聯的 ODF 封裝容器。
     /// </summary>
     public OdfPackage Package { get; }
 
     /// <summary>
+    /// Gets the ODF document kind declared by the current package's MIME type.
     /// 取得目前封裝 MIME 類型所宣告的 ODF 文件種類。
     /// </summary>
     public OdfDocumentKind DocumentKind
@@ -143,6 +155,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Gets the format description corresponding to the current document kind; <see langword="null"/> if the MIME type is not recognized.
     /// 取得目前文件種類對應的格式描述；若 MIME 類型無法辨識則為 <see langword="null"/>。
     /// </summary>
     public OdfFormatInfo? Format => OdfDocumentKindDetector.TryGetFormatByKind(DocumentKind, out OdfFormatInfo? format)
@@ -150,26 +163,33 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         : null;
 
     /// <summary>
+    /// Gets the content kind used by the current document under <c>office:body</c>.
     /// 取得目前文件在 <c>office:body</c> 下使用的內容種類。
     /// </summary>
     public OdfDocumentKind ContentKind => OdfDocumentKindDetector.ToContentKind(DocumentKind);
 
     /// <summary>
+    /// Gets a value indicating whether the current document is an ODF template format.
     /// 取得一個值，指出目前文件是否為 ODF 範本格式。
     /// </summary>
     public bool IsTemplate => OdfDocumentKindDetector.IsTemplateKind(DocumentKind);
 
     /// <summary>
+    /// Gets a value indicating whether the current document is an ODF master document format.
     /// 取得一個值，指出目前文件是否為 ODF 主控文件格式。
     /// </summary>
     public bool IsMasterDocument => OdfDocumentKindDetector.IsMasterKind(DocumentKind);
 
     /// <summary>
+    /// Gets a value indicating whether the current document is a single-file (Flat XML) ODF format.
     /// 取得一個值，指出目前文件是否為單一 XML (Flat XML) ODF 格式。
     /// </summary>
     public bool IsFlatXml => Package.IsFlatXml;
 
     /// <summary>
+    /// Gets or sets the target ODF version to use when the document is saved.
+    /// If <see langword="null"/> (the default), the existing version declaration in the DOM is retained.
+    /// When set, saving overwrites the <c>office:version</c> and the version string in the manifest.
     /// 取得或設定文件儲存時的目標 ODF 版本。
     /// 若為 <see langword="null"/>（預設），則沿用現有 DOM 中的版本宣告。
     /// 設定後，存檔時會覆寫 <c>office:version</c> 及 manifest 中的版本字串。
@@ -192,6 +212,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     internal OdfStyleEngine StyleEngine { get; private protected set; } = null!;
 
     /// <summary>
+    /// Gets the document's style engine, usable for style property lookup, deduplication, and unused style reclamation.
     /// 取得文件樣式引擎，可用於樣式屬性查詢、去重與未使用樣式回收。
     /// </summary>
     public OdfStyleEngine Styles => StyleEngine;
@@ -229,23 +250,26 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     private bool _isDisposed;
 
     /// <summary>
+    /// Gets or sets the path of an embedded document within the package container. Empty for a root document.
     /// 取得或設定嵌入式文件在封裝容器內的路徑。若為根文件則為空字串。
     /// </summary>
     public string SubPath { get; set; } = string.Empty;
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfDocument"/> class.
     /// 初始化 <see cref="OdfDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">OdfPackage 封裝容器</param>
+    /// <param name="package">The OdfPackage container. / OdfPackage 封裝容器。</param>
     protected OdfDocument(OdfPackage package) : this(package, string.Empty)
     {
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfDocument"/> class with the specified sub-path.
     /// 初始化指定子路徑的 <see cref="OdfDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">OdfPackage 封裝容器</param>
-    /// <param name="subPath">嵌入式文件在封裝中的子路徑</param>
+    /// <param name="package">The OdfPackage container. / OdfPackage 封裝容器。</param>
+    /// <param name="subPath">The sub-path of the embedded document within the package. / 嵌入式文件在封裝中的子路徑。</param>
     protected OdfDocument(OdfPackage package, string subPath)
     {
         Package = package ?? throw new ArgumentNullException(nameof(package));
@@ -276,6 +300,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Sanitizes the document, removing all VBA and StarBasic macro scripts, digital signatures, and script references.
     /// 清理文件，移除所有 VBA 與 StarBasic 巨集指令碼、數位簽章及指令碼參照。
     /// </summary>
     public void SanitizeMacros()
@@ -397,9 +422,10 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Gets the default content.xml for this document kind.
     /// 取得此文件類型的預設 content.xml。
     /// </summary>
-    /// <returns>預設 content.xml 字串</returns>
+    /// <returns>The default content.xml string. / 預設 content.xml 字串。</returns>
     protected abstract string GetDefaultContentXml();
 
     /// <summary>
@@ -411,24 +437,27 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     internal virtual OdfNode GetContentXmlForPersistence() => ContentDom;
 
     /// <summary>
+    /// Gets the default styles.xml for this document kind.
     /// 取得此文件類型的預設 styles.xml。
     /// </summary>
-    /// <returns>預設 styles.xml 字串</returns>
+    /// <returns>The default styles.xml string. / 預設 styles.xml 字串。</returns>
     protected abstract string GetDefaultStylesXml();
 
     /// <summary>
+    /// Gets the default meta.xml for this document kind.
     /// 取得此文件類型的預設 meta.xml。
     /// </summary>
-    /// <returns>預設 meta.xml 字串</returns>
+    /// <returns>The default meta.xml string. / 預設 meta.xml 字串。</returns>
     protected virtual string GetDefaultMetaXml()
     {
         return "<office:document-meta xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:meta=\"urn:oasis:names:tc:opendocument:xmlns:meta:1.0\" office:version=\"" + OdfVersionInfo.DefaultVersionString + "\"><office:meta></office:meta></office:document-meta>";
     }
 
     /// <summary>
+    /// Gets the default settings.xml for this document kind.
     /// 取得此文件類型的預設 settings.xml。
     /// </summary>
-    /// <returns>預設 settings.xml 字串</returns>
+    /// <returns>The default settings.xml string. / 預設 settings.xml 字串。</returns>
     protected virtual string GetDefaultSettingsXml()
     {
         return "<office:document-settings xmlns:office=\"urn:oasis:names:tc:opendocument:xmlns:office:1.0\" xmlns:config=\"urn:oasis:names:tc:opendocument:xmlns:config:1.0\" office:version=\"" + OdfVersionInfo.DefaultVersionString + "\"><office:settings><config:config-item-set config:name=\"ooo:view-settings\"><config:config-item config:name=\"VisibleAreaTop\" config:type=\"int\">0</config:config-item></config:config-item-set></office:settings></office:document-settings>";
@@ -436,6 +465,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
 
 
     /// <summary>
+    /// Releases the document and underlying package resources.
     /// 釋放文件與底層封裝資源。
     /// </summary>
     public void Dispose()
@@ -445,9 +475,10 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Releases the resources held by the document.
     /// 釋放文件持有的資源。
     /// </summary>
-    /// <param name="disposing">若為 <see langword="true"/>，則釋放受控資源</param>
+    /// <param name="disposing">If <see langword="true"/>, managed resources are released. / 若為 <see langword="true"/>，則釋放受控資源。</param>
     protected virtual void Dispose(bool disposing)
     {
         if (!_isDisposed)
@@ -462,9 +493,10 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Asynchronously releases the document and underlying package resources.
     /// 非同步釋放文件與底層封裝資源。
     /// </summary>
-    /// <returns>代表非同步釋放作業的值工作</returns>
+    /// <returns>A value task representing the asynchronous release operation. / 代表非同步釋放作業的值工作。</returns>
     public async ValueTask DisposeAsync()
     {
         if (!_isDisposed)
@@ -480,6 +512,7 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
 
 
     /// <summary>
+    /// Gets or sets the document view zoom percentage.
     /// 取得或設定文件檢視縮放百分比。
     /// </summary>
     public double ZoomLevel
@@ -489,15 +522,17 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Gets the bookmark manager, providing a high-level interface for safely reading, writing, and manipulating bookmarks.
     /// 取得書籤管理器，提供安全讀寫與操作書籤的高階介面。
     /// </summary>
     public OdfBookmarkManager Bookmarks => new OdfBookmarkManager(this);
 
     /// <summary>
+    /// Converts and exports the current document to PDF format.
     /// 將目前文件轉換並匯出為 PDF 格式。
     /// </summary>
-    /// <param name="pdfStream">要寫入 PDF 的目標資料流</param>
-    /// <param name="certificate">用於簽章 PDF 的憑證；若為 null 則不簽章</param>
+    /// <param name="pdfStream">The target stream to which the PDF is written. / 要寫入 PDF 的目標資料流。</param>
+    /// <param name="certificate">The certificate used to sign the PDF; if null, the PDF is not signed. / 用於簽章 PDF 的憑證；若為 null 則不簽章。</param>
     public void ExportToPdf(Stream pdfStream, X509Certificate2? certificate = null)
     {
         if (pdfStream is null)
@@ -513,10 +548,11 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Searches the entire document's DOM tree for the specified text and replaces it with new text, preserving the text's formatting and style structure.
     /// 在整份文件的 DOM 樹中搜尋指定文字並替換為新文字，同時保留文字的格式與樣式結構。
     /// </summary>
-    /// <param name="search">要搜尋的關鍵字</param>
-    /// <param name="replacement">要替換的新文字</param>
+    /// <param name="search">The keyword to search for. / 要搜尋的關鍵字。</param>
+    /// <param name="replacement">The new text to replace it with. / 要替換的新文字。</param>
     public virtual void ReplaceText(string search, string replacement)
     {
         if (string.IsNullOrEmpty(search))

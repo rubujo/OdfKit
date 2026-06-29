@@ -9,24 +9,26 @@ namespace OdfKit.Image;
 public partial class OdfImageDocument
 {
     /// <summary>
+    /// Gets a summary list of all image frames in the document.
     /// 取得文件中所有影像框架的摘要清單。
     /// </summary>
     public IReadOnlyList<OdfImageFrameInfo> GetImageFrames() =>
         OdfImageDocumentReadEngine.GetImageFrames(this);
 
     /// <summary>
+    /// Adds an image frame (without replacing existing frames).
     /// 新增一個影像框架（不取代既有框架）。
     /// </summary>
-    /// <param name="imageBytes">圖片位元組陣列</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">框架寬度</param>
-    /// <param name="height">框架高度</param>
-    /// <param name="preferredName">選用的偏好檔名</param>
-    /// <param name="name">選用的框架名稱</param>
-    /// <param name="title">選用的框架標題</param>
-    /// <param name="description">選用的框架描述</param>
-    /// <returns>影像在 ODF 封裝中的路徑</returns>
+    /// <param name="imageBytes">The image byte array. / 圖片位元組陣列。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The frame width. / 框架寬度。</param>
+    /// <param name="height">The frame height. / 框架高度。</param>
+    /// <param name="preferredName">The optional preferred file name. / 選用的偏好檔名。</param>
+    /// <param name="name">The optional frame name. / 選用的框架名稱。</param>
+    /// <param name="title">The optional frame title. / 選用的框架標題。</param>
+    /// <param name="description">The optional frame description. / 選用的框架描述。</param>
+    /// <returns>The path of the image within the ODF package. / 影像在 ODF 封裝中的路徑。</returns>
     public string AddImageFrame(
         byte[] imageBytes,
         OdfLength x,
@@ -81,11 +83,12 @@ public partial class OdfImageDocument
     }
 
     /// <summary>
+    /// Batch-adds multiple image frames (without replacing existing frames).
     /// 批次新增多個影像框架（不取代既有框架）。
     /// </summary>
-    /// <param name="requests">要新增的影像框架請求清單</param>
-    /// <returns>依請求順序排列的影像在 ODF 封裝中的路徑清單</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="requests"/> 或其中任一筆請求為 <see langword="null"/> 時擲出</exception>
+    /// <param name="requests">The list of image frame requests to add. / 要新增的影像框架請求清單。</param>
+    /// <returns>The list of image paths within the ODF package, in request order. / 依請求順序排列的影像在 ODF 封裝中的路徑清單。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="requests"/> or any request within it is <see langword="null"/>. / 當 <paramref name="requests"/> 或其中任一筆請求為 <see langword="null"/> 時擲出。</exception>
     public IReadOnlyList<string> AddImageFrames(IEnumerable<OdfImageFrameRequest> requests)
     {
         if (requests is null)

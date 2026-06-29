@@ -13,9 +13,10 @@ public partial class OdfChartDocument
     internal int LocalDataCacheBuildCount { get; private set; }
 
     /// <summary>
+    /// Gets a lazily loaded snapshot of the chart's embedded local data table.
     /// 取得圖表內嵌本地資料表的延遲載入快照。
     /// </summary>
-    /// <returns>本地資料表快照；若圖表沒有內嵌資料表，則回傳空快照</returns>
+    /// <returns>The local data table snapshot; an empty snapshot if the chart has no embedded data table. / 本地資料表快照；若圖表沒有內嵌資料表，則回傳空快照。</returns>
     public OdfChartDataCache GetLocalDataCache()
     {
         if (_localDataCache is not null)
@@ -29,6 +30,7 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Clears the chart's local data snapshot so the next read rescans the current DOM.
     /// 清除圖表本地資料快照，讓下一次讀取重新掃描目前 DOM。
     /// </summary>
     protected void InvalidateLocalDataCache()

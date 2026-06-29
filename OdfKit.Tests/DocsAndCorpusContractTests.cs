@@ -157,7 +157,7 @@ public class DocsAndCorpusContractTests
     }
 
     /// <summary>
-    /// 驗證 ODFDOM 官方 sample parity 外部 corpus 範本具備來源、授權、雜湊欄位並可通過 metadata gate。
+    /// 驗證 ODFDOM 官方 sample parity 外部 corpus 已釘選至具體上游版本，具備已審核授權與雜湊欄位，並可通過 metadata gate。
     /// </summary>
     [Fact]
     public void ExternalOdfDomSampleCorpusTemplateCanBeMetadataValidatedByCli()
@@ -186,17 +186,20 @@ public class DocsAndCorpusContractTests
         using JsonDocument json = JsonDocument.Parse(output.ToString());
         JsonElement summary = json.RootElement.GetProperty("summary");
         Assert.True(summary.GetProperty("metadataOnly").GetBoolean());
-        Assert.Equal(2, summary.GetProperty("fixtureCount").GetInt32());
+        Assert.Equal(4, summary.GetProperty("fixtureCount").GetInt32());
         Assert.Equal(0, summary.GetProperty("baselineExceptionCount").GetInt32());
 
         using JsonDocument manifest = JsonDocument.Parse(File.ReadAllText(manifestPath));
         foreach (JsonElement fixture in manifest.RootElement.GetProperty("fixtures").EnumerateArray())
         {
             Assert.Equal("ODF Toolkit ODFDOM sample", fixture.GetProperty("source").GetString());
-            Assert.Equal("external-review-required", fixture.GetProperty("license").GetString());
-            Assert.Contains("github.com/tdf/odftoolkit", fixture.GetProperty("sourceUri").GetString(), StringComparison.Ordinal);
+            Assert.Equal("Apache-2.0", fixture.GetProperty("license").GetString());
+            Assert.Contains(
+                "github.com/tdf/odftoolkit/blob/b926a6134a2fee782076500dfc02c47c2d651cff",
+                fixture.GetProperty("sourceUri").GetString(),
+                StringComparison.Ordinal);
             Assert.Matches("^[0-9a-f]{64}$", fixture.GetProperty("sha256").GetString());
-            Assert.Contains("Replace", fixture.GetProperty("notes").GetString(), StringComparison.Ordinal);
+            Assert.Contains("Pinned baseline: tdf/odftoolkit release v0.13.0", fixture.GetProperty("notes").GetString(), StringComparison.Ordinal);
         }
     }
 

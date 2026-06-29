@@ -9,6 +9,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Database;
 
 /// <summary>
+/// Represents the form designer for an ODB database, used to model form properties and common controls.
 /// 表示 ODB 資料庫的表單設計器，用於建模表單屬性與常用控制項。
 /// <para>
 /// 報表內容（LibreOffice Base「使用嚮導建立報表」產生的型式）應改用 <see cref="OdfKit.Text.TextDocument"/>
@@ -32,10 +33,11 @@ public sealed class OdfDatabaseFormDesigner
     private int _controlCounter = 1;
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfDatabaseFormDesigner"/> class.
     /// 初始化 <see cref="OdfDatabaseFormDesigner"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="document">要進行表單設計的 ODF 子文件</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="document"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <param name="document">The ODF sub-document on which to design the form. / 要進行表單設計的 ODF 子文件。</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="document"/> is <see langword="null"/>. / 當 <paramref name="document"/> 為 <see langword="null"/> 時擲出。</exception>
     public OdfDatabaseFormDesigner(OdfDocument document)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
@@ -50,16 +52,17 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds a text box control (form:text).
     /// 新增文字框控制項（form:text）。
     /// </summary>
-    /// <param name="name">控制項名稱</param>
-    /// <param name="label">標籤文字</param>
-    /// <param name="defaultValue">預設文字內容</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的文字框 OdfNode 節點</returns>
+    /// <param name="name">The control name. / 控制項名稱。</param>
+    /// <param name="label">The label text. / 標籤文字。</param>
+    /// <param name="defaultValue">The default text content. / 預設文字內容。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added text box. / 代表新增的文字框 OdfNode 節點。</returns>
     public OdfNode AddTextBox(
         string name,
         string label,
@@ -104,16 +107,17 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds a checkbox control (form:checkbox).
     /// 新增核取方塊控制項（form:checkbox）。
     /// </summary>
-    /// <param name="name">控制項名稱</param>
-    /// <param name="label">顯示的標籤文字</param>
-    /// <param name="isChecked">預設勾選狀態</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的核取方塊 OdfNode 節點</returns>
+    /// <param name="name">The control name. / 控制項名稱。</param>
+    /// <param name="label">The displayed label text. / 顯示的標籤文字。</param>
+    /// <param name="isChecked">The default checked state. / 預設勾選狀態。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added checkbox. / 代表新增的核取方塊 OdfNode 節點。</returns>
     public OdfNode AddCheckBox(
         string name,
         string label,
@@ -136,16 +140,17 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds a list box control (form:listbox).
     /// 新增下拉式清單控制項（form:listbox）。
     /// </summary>
-    /// <param name="name">控制項名稱</param>
-    /// <param name="label">標籤文字</param>
-    /// <param name="items">下拉選單的選項清單</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的下拉選單 OdfNode 節點</returns>
+    /// <param name="name">The control name. / 控制項名稱。</param>
+    /// <param name="label">The label text. / 標籤文字。</param>
+    /// <param name="items">The list of options for the list box. / 下拉選單的選項清單。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added list box. / 代表新增的下拉選單 OdfNode 節點。</returns>
     public OdfNode AddListBox(
         string name,
         string label,
@@ -188,16 +193,17 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds a button control (form:button).
     /// 新增按鈕控制項（form:button）。
     /// </summary>
-    /// <param name="name">控制項名稱</param>
-    /// <param name="label">按鈕上顯示的文字</param>
-    /// <param name="value">按鈕的值或動作命令</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的按鈕 OdfNode 節點</returns>
+    /// <param name="name">The control name. / 控制項名稱。</param>
+    /// <param name="label">The text displayed on the button. / 按鈕上顯示的文字。</param>
+    /// <param name="value">The button value or action command. / 按鈕的值或動作命令。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added button. / 代表新增的按鈕 OdfNode 節點。</returns>
     public OdfNode AddButton(
         string name,
         string label,
@@ -223,15 +229,16 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds a fixed text label control (form:fixed-text).
     /// 新增文字標籤控制項（form:fixed-text）。
     /// </summary>
-    /// <param name="name">控制項名稱</param>
-    /// <param name="label">標籤顯示的文字</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的標籤 OdfNode 節點</returns>
+    /// <param name="name">The control name. / 控制項名稱。</param>
+    /// <param name="label">The text displayed by the label. / 標籤顯示的文字。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added label. / 代表新增的標籤 OdfNode 節點。</returns>
     public OdfNode AddLabel(
         string name,
         string label,
@@ -252,16 +259,17 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds a radio button control (form:radio).
     /// 新增單選按鈕控制項（form:radio）。
     /// </summary>
-    /// <param name="name">控制項名稱；同一群組內的單選按鈕應使用相同名稱</param>
-    /// <param name="label">顯示的標籤文字</param>
-    /// <param name="isSelected">預設選取狀態</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的單選按鈕 OdfNode 節點</returns>
+    /// <param name="name">The control name; radio buttons in the same group should share the same name. / 控制項名稱；同一群組內的單選按鈕應使用相同名稱。</param>
+    /// <param name="label">The displayed label text. / 顯示的標籤文字。</param>
+    /// <param name="isSelected">The default selected state. / 預設選取狀態。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added radio button. / 代表新增的單選按鈕 OdfNode 節點。</returns>
     public OdfNode AddRadioButton(
         string name,
         string label,
@@ -284,16 +292,17 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds an editable combo box control (form:combobox).
     /// 新增可編輯下拉組合方塊控制項（form:combobox）。
     /// </summary>
-    /// <param name="name">控制項名稱</param>
-    /// <param name="label">標籤文字</param>
-    /// <param name="items">下拉選單的選項清單</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的組合方塊 OdfNode 節點</returns>
+    /// <param name="name">The control name. / 控制項名稱。</param>
+    /// <param name="label">The label text. / 標籤文字。</param>
+    /// <param name="items">The list of options for the combo box. / 下拉選單的選項清單。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added combo box. / 代表新增的組合方塊 OdfNode 節點。</returns>
     public OdfNode AddComboBox(
         string name,
         string label,
@@ -325,16 +334,17 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds a numeric input control (form:number).
     /// 新增數值輸入控制項（form:number）。
     /// </summary>
-    /// <param name="name">控制項名稱</param>
-    /// <param name="label">標籤文字</param>
-    /// <param name="value">預設數值</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的數值輸入 OdfNode 節點</returns>
+    /// <param name="name">The control name. / 控制項名稱。</param>
+    /// <param name="label">The label text. / 標籤文字。</param>
+    /// <param name="value">The default numeric value. / 預設數值。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added numeric input. / 代表新增的數值輸入 OdfNode 節點。</returns>
     public OdfNode AddNumericField(
         string name,
         string label,
@@ -362,16 +372,17 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds a date input control (form:date).
     /// 新增日期輸入控制項（form:date）。
     /// </summary>
-    /// <param name="name">控制項名稱</param>
-    /// <param name="label">標籤文字</param>
-    /// <param name="value">預設日期</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的日期輸入 OdfNode 節點</returns>
+    /// <param name="name">The control name. / 控制項名稱。</param>
+    /// <param name="label">The label text. / 標籤文字。</param>
+    /// <param name="value">The default date. / 預設日期。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added date input. / 代表新增的日期輸入 OdfNode 節點。</returns>
     public OdfNode AddDateField(
         string name,
         string label,
@@ -399,16 +410,17 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds a time input control (form:time).
     /// 新增時間輸入控制項（form:time）。
     /// </summary>
-    /// <param name="name">控制項名稱</param>
-    /// <param name="label">標籤文字</param>
-    /// <param name="value">預設時間</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的時間輸入 OdfNode 節點</returns>
+    /// <param name="name">The control name. / 控制項名稱。</param>
+    /// <param name="label">The label text. / 標籤文字。</param>
+    /// <param name="value">The default time. / 預設時間。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added time input. / 代表新增的時間輸入 OdfNode 節點。</returns>
     public OdfNode AddTimeField(
         string name,
         string label,
@@ -436,14 +448,15 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Binds an event listener to a control (<c>office:event-listeners</c>／<c>script:event-listener</c>).
     /// 為控制項繫結一個事件監聽器（<c>office:event-listeners</c>／<c>script:event-listener</c>）。
     /// </summary>
-    /// <param name="controlNode">要繫結事件的控制項節點</param>
-    /// <param name="eventName">事件名稱（例如 <c>form:approveaction</c>）</param>
-    /// <param name="macroName">巨集名稱或位置</param>
-    /// <param name="language">巨集語言，預設為 <c>ooo:script</c></param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出</exception>
-    /// <exception cref="ArgumentException">當 <paramref name="eventName"/> 或 <paramref name="macroName"/> 為空白時擲出</exception>
+    /// <param name="controlNode">The control node to bind the event to. / 要繫結事件的控制項節點。</param>
+    /// <param name="eventName">The event name (e.g. <c>form:approveaction</c>). / 事件名稱（例如 <c>form:approveaction</c>）。</param>
+    /// <param name="macroName">The macro name or location. / 巨集名稱或位置。</param>
+    /// <param name="language">The macro language, defaulting to <c>ooo:script</c>. / 巨集語言，預設為 <c>ooo:script</c>。</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="controlNode"/> is <see langword="null"/>. / 當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When <paramref name="eventName"/> or <paramref name="macroName"/> is blank. / 當 <paramref name="eventName"/> 或 <paramref name="macroName"/> 為空白時擲出。</exception>
     public void SetControlEvent(OdfNode controlNode, string eventName, string macroName, string language = "ooo:script")
     {
         if (controlNode is null)
@@ -490,11 +503,12 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Sets whether a control is required (corresponding to <c>form:input-required</c>).
     /// 設定控制項是否為必填（對應 <c>form:input-required</c>）。
     /// </summary>
-    /// <param name="controlNode">控制項節點</param>
-    /// <param name="required">是否必填</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出</exception>
+    /// <param name="controlNode">The control node. / 控制項節點。</param>
+    /// <param name="required">Whether the control is required. / 是否必填。</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="controlNode"/> is <see langword="null"/>. / 當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出。</exception>
     public void SetControlRequired(OdfNode controlNode, bool required)
     {
         if (controlNode is null)
@@ -506,12 +520,13 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Sets the maximum character length allowed for input in a control (corresponding to <c>form:max-length</c>).
     /// 設定控制項允許輸入的最大字元長度（對應 <c>form:max-length</c>）。
     /// </summary>
-    /// <param name="controlNode">控制項節點</param>
-    /// <param name="maxLength">最大字元長度；<c>0</c> 表示不限制</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出</exception>
-    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="maxLength"/> 為負數時擲出</exception>
+    /// <param name="controlNode">The control node. / 控制項節點。</param>
+    /// <param name="maxLength">The maximum character length; <c>0</c> means unlimited. / 最大字元長度；<c>0</c> 表示不限制。</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="controlNode"/> is <see langword="null"/>. / 當 <paramref name="controlNode"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="maxLength"/> is negative. / 當 <paramref name="maxLength"/> 為負數時擲出。</exception>
     public void SetControlMaxLength(OdfNode controlNode, int maxLength)
     {
         if (controlNode is null)
@@ -528,15 +543,16 @@ public sealed class OdfDatabaseFormDesigner
     }
 
     /// <summary>
+    /// Adds a group box control (form:frame), used to group related controls under a title.
     /// 新增群組框控制項（form:frame），用於以標題群組相關控制項。
     /// </summary>
-    /// <param name="name">控制項名稱</param>
-    /// <param name="label">群組框標題文字</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">控制項寬度</param>
-    /// <param name="height">控制項高度</param>
-    /// <returns>代表新增的群組框 OdfNode 節點</returns>
+    /// <param name="name">The control name. / 控制項名稱。</param>
+    /// <param name="label">The group box title text. / 群組框標題文字。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The control width. / 控制項寬度。</param>
+    /// <param name="height">The control height. / 控制項高度。</param>
+    /// <returns>The OdfNode node representing the added group box. / 代表新增的群組框 OdfNode 節點。</returns>
     public OdfNode AddGroupBox(
         string name,
         string label,

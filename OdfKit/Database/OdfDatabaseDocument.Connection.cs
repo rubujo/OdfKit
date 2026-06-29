@@ -7,9 +7,10 @@ namespace OdfKit.Database;
 public partial class OdfDatabaseDocument
 {
     /// <summary>
+    /// Gets the login settings of the current data source connection.
     /// 取得目前資料來源連線的登入設定。
     /// </summary>
-    /// <returns>登入設定摘要；若未設定則為 <see langword="null"/></returns>
+    /// <returns>The login settings summary, or <see langword="null"/> if not set. / 登入設定摘要；若未設定則為 <see langword="null"/>。</returns>
     public OdfDatabaseLoginInfo? GetLogin()
     {
         OdfNode? dataSource = FindChildElement(GetDatabaseNode(), "data-source", DatabaseNamespace);
@@ -28,13 +29,14 @@ public partial class OdfDatabaseDocument
     }
 
     /// <summary>
+    /// Sets the login settings of the data source connection.
     /// 設定資料來源連線的登入設定。
     /// </summary>
-    /// <param name="userName">選用的使用者名稱</param>
-    /// <param name="useSystemUser">選用的系統使用者帳號設定</param>
-    /// <param name="isPasswordRequired">選用的密碼必填設定</param>
-    /// <param name="loginTimeout">選用的登入逾時秒數</param>
-    /// <returns>新增或更新後的登入設定節點</returns>
+    /// <param name="userName">The optional user name. / 選用的使用者名稱。</param>
+    /// <param name="useSystemUser">The optional system user account setting. / 選用的系統使用者帳號設定。</param>
+    /// <param name="isPasswordRequired">The optional password-required setting. / 選用的密碼必填設定。</param>
+    /// <param name="loginTimeout">The optional login timeout in seconds. / 選用的登入逾時秒數。</param>
+    /// <returns>The added or updated login settings node. / 新增或更新後的登入設定節點。</returns>
     public OdfNode SetLogin(
         string? userName = null,
         bool? useSystemUser = null,
@@ -69,9 +71,10 @@ public partial class OdfDatabaseDocument
     }
 
     /// <summary>
+    /// Gets the driver settings of the current data source connection.
     /// 取得目前資料來源連線的驅動程式設定。
     /// </summary>
-    /// <returns>驅動程式設定摘要；若未設定則為 <see langword="null"/></returns>
+    /// <returns>The driver settings summary, or <see langword="null"/> if not set. / 驅動程式設定摘要；若未設定則為 <see langword="null"/>。</returns>
     public OdfDatabaseDriverSettingsInfo? GetDriverSettings()
     {
         OdfNode? dataSource = FindChildElement(GetDatabaseNode(), "data-source", DatabaseNamespace);
@@ -95,14 +98,15 @@ public partial class OdfDatabaseDocument
     }
 
     /// <summary>
+    /// Sets the driver settings of the data source connection.
     /// 設定資料來源連線的驅動程式設定。
     /// </summary>
-    /// <param name="showDeleted">選用的顯示已刪除資料列設定</param>
-    /// <param name="isFirstRowHeaderLine">選用的第一列視為標頭列設定</param>
-    /// <param name="parameterNameSubstitution">選用的具名參數替代設定</param>
-    /// <param name="systemDriverSettings">選用的系統驅動程式設定字串</param>
-    /// <param name="baseDn">選用的 LDAP base DN 設定</param>
-    /// <returns>新增或更新後的驅動程式設定節點</returns>
+    /// <param name="showDeleted">The optional show-deleted-rows setting. / 選用的顯示已刪除資料列設定。</param>
+    /// <param name="isFirstRowHeaderLine">The optional first-row-as-header setting. / 選用的第一列視為標頭列設定。</param>
+    /// <param name="parameterNameSubstitution">The optional named parameter substitution setting. / 選用的具名參數替代設定。</param>
+    /// <param name="systemDriverSettings">The optional system driver settings string. / 選用的系統驅動程式設定字串。</param>
+    /// <param name="baseDn">The optional LDAP base DN setting. / 選用的 LDAP base DN 設定。</param>
+    /// <returns>The added or updated driver settings node. / 新增或更新後的驅動程式設定節點。</returns>
     public OdfNode SetDriverSettings(
         bool? showDeleted = null,
         bool? isFirstRowHeaderLine = null,

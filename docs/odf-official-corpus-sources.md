@@ -16,6 +16,7 @@
 | OASIS ODF 1.2 RNG schema | `https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-schema.rng` | OASIS Standard（2011-09-29）官方獨立 RELAX NG schema，供 `ISO_IEC_26300` profile 使用真實 ODF 1.2 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-v1.2-os-schema.rng`） |
 | OASIS ODF 1.3 RNG schema | `https://docs.oasis-open.org/office/OpenDocument/v1.3/os/schemas/OpenDocument-v1.3-schema.rng` | OASIS Standard（2021-04-27）官方獨立 RELAX NG schema，`OdfComplianceProfiles.OasisOdf13` 用以產生真實 ODF 1.3 schema。 | yes（已下載至 `tools/OdfSchemaGenerator/schemas/OpenDocument-v1.3-schema.rng`） |
 | OASIS ODF 1.0 規格文件 | `https://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf` | 已查證：OASIS 官方目錄（`docs.oasis-open.org/office/v1.0/`）僅提供規格 PDF，從未發布獨立 RNG schema 檔案。因此 ODF 1.0 沒有真實 schema 可用，`OdfSchemaRegistry` 維持以 ODF 1.4 schema 進行 best-effort 近似驗證，屬於已知限制。 | no（無 RNG 可下載） |
+| ODFDOM 官方 sample（釘選版本） | `https://github.com/tdf/odftoolkit/blob/b926a6134a2fee782076500dfc02c47c2d651cff/odfdom/src/main/resources/` | 已審核：釘選 `tdf/odftoolkit` 釋出版本 `v0.13.0`（commit `b926a6134a2fee782076500dfc02c47c2d651cff`），`odfdom` 子模組與 repo 根目錄同採 Apache-2.0 授權（已逐一核對 `LICENSE` 與 `odfdom/LICENSE.txt` 內容一致）。涵蓋 `OdfTextDocument.odt`／`OdfSpreadsheetDocument.ods`／`OdfPresentationDocument.odp`／`OdfGraphicsDocument.odg` 四個官方 sample，皆為 ODF 1.2（`office:version="1.2"`）。詳見 [docs/examples/odfdom-sample-corpus/manifest.json](examples/odfdom-sample-corpus/manifest.json)。 | no（不提交實體檔案，僅引用 sourceUri／sha256；需放置於 `ODFKIT_PARITY_CORPUS_ROOT`） |
 
 ## 採集流程
 
@@ -23,9 +24,11 @@
 2. 將官方或授權允許的樣本放在外部 root 內，不直接提交到 repo。
 3. 依 `docs/examples/external-corpus/manifest.json` 填入每個 fixture 的 `id`、`path`、
    `source`、`sourceUri`、`license`、`kind`、`version`、`profile`、`expected` 與 `roundTrip`。
-   若採集 ODFDOM 官方 sample parity，從
-   `docs/examples/odfdom-sample-corpus/manifest.json` 開始，並在下載實體樣本後將
-   `sourceUri` 改為精確上游樣本 URL、將 `sha256` 佔位值改為實際小寫十六進位雜湊。
+   ODFDOM 官方 sample parity 已釘選至 `docs/examples/odfdom-sample-corpus/manifest.json`
+   所記載的 `tdf/odftoolkit v0.13.0`（commit `b926a6134a2fee782076500dfc02c47c2d651cff`）；
+   若日後要更新到更新的上游版本，須重新審核該版本 `odfdom/LICENSE.txt` 是否仍為
+   Apache-2.0、重新下載四個官方 sample 並計算 `sha256`，再同步更新此處與
+   `OdfKit.Tests/DocsAndCorpusContractTests.cs` 的釘選 commit／雜湊斷言。
 4. 若 ODF Toolkit Validator 與 OdfKit classification 不一致，先確認是否為 OdfKit bug。
    只有確認為暫時接受的 baseline 差異時，才記錄到 `baseline-exceptions.json`。
 5. 在樣本尚未下載或授權仍待審核時，可先用 `validate-corpus --metadata-only`

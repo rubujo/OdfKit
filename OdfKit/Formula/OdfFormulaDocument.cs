@@ -11,6 +11,7 @@ using OdfKit.DOM;
 namespace OdfKit.Formula;
 
 /// <summary>
+/// Represents an ODF formula document.
 /// 代表 ODF 公式文件。
 /// </summary>
 public partial class OdfFormulaDocument : OdfDocument
@@ -18,18 +19,20 @@ public partial class OdfFormulaDocument : OdfDocument
     private const string MathMlNamespace = "http://www.w3.org/1998/Math/MathML";
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfFormulaDocument"/> class with the specified ODF package.
     /// 使用指定的 ODF 封裝初始化 <see cref="OdfFormulaDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝</param>
+    /// <param name="package">The ODF package. / ODF 封裝。</param>
     public OdfFormulaDocument(OdfPackage package) : this(package, string.Empty)
     {
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfFormulaDocument"/> class with the specified ODF package and sub-path.
     /// 使用指定的 ODF 封裝與子路徑初始化 <see cref="OdfFormulaDocument"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="package">ODF 封裝</param>
-    /// <param name="subPath">封裝內的子路徑</param>
+    /// <param name="package">The ODF package. / ODF 封裝。</param>
+    /// <param name="subPath">The sub-path within the package. / 封裝內的子路徑。</param>
     public OdfFormulaDocument(OdfPackage package, string subPath) : base(package, subPath)
     {
         if (string.IsNullOrEmpty(package.MimeType))
@@ -69,76 +72,87 @@ public partial class OdfFormulaDocument : OdfDocument
     }
 
     /// <summary>
+    /// Creates a new ODF formula document fluent builder.
     /// 建立新的 ODF 公式文件 Fluent builder。
     /// </summary>
-    /// <returns>新的 <see cref="OdfFormulaBuilder"/> 執行個體</returns>
+    /// <returns>A new <see cref="OdfFormulaBuilder"/> instance. / 新的 <see cref="OdfFormulaBuilder"/> 執行個體。</returns>
     public static OdfFormulaBuilder Builder()
     {
         return new OdfFormulaBuilder(Create());
     }
 
     /// <summary>
+    /// Creates a new ODF formula document.
     /// 建立新的 ODF 公式文件。
     /// </summary>
-    /// <returns>新的 <see cref="OdfFormulaDocument"/> 執行個體</returns>
+    /// <returns>A new <see cref="OdfFormulaDocument"/> instance. / 新的 <see cref="OdfFormulaDocument"/> 執行個體。</returns>
     public static OdfFormulaDocument Create()
     {
         return (OdfFormulaDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Formula);
     }
 
     /// <summary>
+    /// Loads an ODF formula document from the specified path.
     /// 從指定路徑載入 ODF 公式文件。
     /// </summary>
-    /// <param name="path">ODF 公式文件路徑</param>
-    /// <returns>載入完成的 <see cref="OdfFormulaDocument"/> 執行個體</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODF 公式時擲出</exception>
+    /// <param name="path">The ODF formula document path. / ODF 公式文件路徑。</param>
+    /// <returns>The loaded <see cref="OdfFormulaDocument"/> instance. / 載入完成的 <see cref="OdfFormulaDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">When the specified document is not an ODF formula. / 當指定文件不是 ODF 公式時擲出。</exception>
     public new static OdfFormulaDocument Load(string path)
     {
         return EnsureFormula(OdfDocumentFactory.LoadDocument(path));
     }
 
     /// <summary>
+    /// Asynchronously loads an ODF formula document from the specified path.
     /// 非同步從指定路徑載入 ODF 公式文件。
     /// </summary>
-    /// <param name="path">ODF 公式文件路徑</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfFormulaDocument"/></returns>
+    /// <param name="path">The ODF formula document path. / ODF 公式文件路徑。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="OdfFormulaDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfFormulaDocument"/>。</returns>
     public new static async Task<OdfFormulaDocument> LoadAsync(string path, CancellationToken cancellationToken = default) =>
         EnsureFormula(await OdfDocumentFactory.LoadDocumentAsync(path, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
+    /// Loads an ODF formula document from the specified stream.
     /// 從指定資料流載入 ODF 公式文件。
     /// </summary>
-    /// <param name="stream">包含 ODF 公式文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <returns>載入完成的 <see cref="OdfFormulaDocument"/> 執行個體</returns>
-    /// <exception cref="InvalidOperationException">當指定文件不是 ODF 公式時擲出</exception>
+    /// <param name="stream">The stream containing the ODF formula document content. / 包含 ODF 公式文件內容的資料流。</param>
+    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>The loaded <see cref="OdfFormulaDocument"/> instance. / 載入完成的 <see cref="OdfFormulaDocument"/> 執行個體。</returns>
+    /// <exception cref="InvalidOperationException">When the specified document is not an ODF formula. / 當指定文件不是 ODF 公式時擲出。</exception>
     public new static OdfFormulaDocument Load(Stream stream, string? fileName = null)
     {
         return EnsureFormula(OdfDocumentFactory.LoadDocument(stream, fileName));
     }
 
     /// <summary>
+    /// Asynchronously loads an ODF formula document from the specified stream.
     /// 非同步從指定資料流載入 ODF 公式文件。
     /// </summary>
-    /// <param name="stream">包含 ODF 公式文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfFormulaDocument"/></returns>
+    /// <param name="stream">The stream containing the ODF formula document content. / 包含 ODF 公式文件內容的資料流。</param>
+    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous load operation, whose result is the loaded <see cref="OdfFormulaDocument"/>. / 代表非同步載入作業的工作，其結果為載入完成的 <see cref="OdfFormulaDocument"/>。</returns>
     public new static async Task<OdfFormulaDocument> LoadAsync(Stream stream, string? fileName = null, CancellationToken cancellationToken = default) =>
         EnsureFormula(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
+    /// Gets the main formula node.
     /// 取得主要公式節點。
     /// </summary>
     public OdfNode FormulaNode => GetFormulaNode();
 
     /// <summary>
+    /// Gets the current MathML root node.
     /// 取得目前的 MathML 根節點。
     /// </summary>
     public OdfNode MathNode => FindOrCreateChild(GetFormulaNode(), "math", MathMlNamespace, "math");
 
     /// <summary>
+    /// Gets a plain-text summary of the presentation MathML content, excluding
+    /// <c>math:semantics</c>／<c>math:annotation</c> annotation text (such as the raw StarMath
+    /// source appended by a real LibreOffice <c>math8</c> export).
     /// 取得 MathML 呈現內容（presentation MathML）的純文字摘要，不含
     /// <c>math:semantics</c>／<c>math:annotation</c> 標註文字（例如真實 LibreOffice <c>math8</c>
     /// 匯出時附加的原始 StarMath 來源）。
@@ -146,11 +160,13 @@ public partial class OdfFormulaDocument : OdfDocument
     public string MathText => GetPresentationTextContent(MathNode);
 
     /// <summary>
+    /// Gets a summary of the recognizable tokens in the current MathML row.
     /// 取得目前 MathML row 中可辨識的 token 摘要。
     /// </summary>
     public IReadOnlyList<OdfMathToken> MathTokens => ReadMathTokens();
 
     /// <summary>
+    /// Gets or sets the full MathML XML string.
     /// 取得或設定完整 MathML XML 字串。
     /// </summary>
     /// <remarks>
@@ -168,11 +184,12 @@ public partial class OdfFormulaDocument : OdfDocument
     }
 
     /// <summary>
+    /// Replaces the formula content with the specified MathML XML.
     /// 以指定 MathML XML 取代公式內容。
     /// </summary>
-    /// <param name="mathMlXml">格式正確的 MathML XML</param>
-    /// <returns>匯入後的 MathML 根節點</returns>
-    /// <exception cref="ArgumentException">當 MathML XML 為空或根節點不是 MathML math 時擲出</exception>
+    /// <param name="mathMlXml">The well-formed MathML XML. / 格式正確的 MathML XML。</param>
+    /// <returns>The imported MathML root node. / 匯入後的 MathML 根節點。</returns>
+    /// <exception cref="ArgumentException">When the MathML XML is empty or its root node is not a MathML math element. / 當 MathML XML 為空或根節點不是 MathML math 時擲出。</exception>
     public OdfNode SetMathMl(string mathMlXml)
     {
         if (string.IsNullOrWhiteSpace(mathMlXml))
@@ -198,12 +215,13 @@ public partial class OdfFormulaDocument : OdfDocument
     }
 
     /// <summary>
+    /// Builds a MathML row from a set of semantic tokens.
     /// 以一組語意 token 建立 MathML row。
     /// </summary>
-    /// <param name="tokens">要寫入 row 的 MathML token</param>
-    /// <returns>匯入後的 MathML 根節點</returns>
-    /// <exception cref="ArgumentException">當 <paramref name="tokens"/> 為空時擲出</exception>
-    /// <exception cref="ArgumentNullException">當任一 token 為 <see langword="null"/> 時擲出</exception>
+    /// <param name="tokens">The MathML tokens to write into the row. / 要寫入 row 的 MathML token。</param>
+    /// <returns>The imported MathML root node. / 匯入後的 MathML 根節點。</returns>
+    /// <exception cref="ArgumentException">When <paramref name="tokens"/> is empty. / 當 <paramref name="tokens"/> 為空時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When any token is <see langword="null"/>. / 當任一 token 為 <see langword="null"/> 時擲出。</exception>
     public OdfNode SetMathRow(params OdfMathToken[] tokens)
     {
         if (tokens is null)
@@ -241,11 +259,12 @@ public partial class OdfFormulaDocument : OdfDocument
     }
 
     /// <summary>
+    /// Builds a simple MathML equation stating that one identifier equals another.
     /// 建立以識別名稱等於另一個識別名稱的簡單 MathML 等式。
     /// </summary>
-    /// <param name="leftIdentifier">等號左側識別名稱</param>
-    /// <param name="rightIdentifier">等號右側識別名稱</param>
-    /// <returns>匯入後的 MathML 根節點</returns>
+    /// <param name="leftIdentifier">The identifier on the left side of the equals sign. / 等號左側識別名稱。</param>
+    /// <param name="rightIdentifier">The identifier on the right side of the equals sign. / 等號右側識別名稱。</param>
+    /// <returns>The imported MathML root node. / 匯入後的 MathML 根節點。</returns>
     public OdfNode SetIdentifierEquation(string leftIdentifier, string rightIdentifier)
     {
         return SetMathRow(

@@ -249,7 +249,10 @@ CNS 11643 官方語意相容或認證。
     2026-06-24 依 5 項完成標準重新檢視，確認已全部滿足，**升級為
     `complete`**。2026-06-28 已補齊 `OdfMathToken.FindFirst`／`FindAll`／`WithChild`／
     `ReplaceFirst` 與 `OdfFormulaDocument.ReplaceFirst`，最小「尋找→取得→更新」語意編輯 helper
-    有程式與 `FormulaHighLevelApiTests` 證據；後續延伸工作限縮為更完整的符號級編輯模型。
+    有程式與 `FormulaHighLevelApiTests` 證據；2026-06-29 已補齊分數／根號／上下標／矩陣的具名
+    符號級存取與替換 API（`Numerator`／`Denominator`／`Radicand`／`RootIndex`／`Exponent`／
+    `SubscriptIndex`／`RowCount`／`GetRow`／`GetCell`／`WithRow`／`WithCell`／`AddRow`／
+    `RemoveRow`），符號級編輯模型延伸工作已完成。
 - `.odi`／`.oti`／`.fodi`（Batch 5，2026-06-23）：現況調查發現多影像框架、版面配置、旋轉、
   裁切、濾鏡與描述性 metadata（`svg:title`／`svg:desc`）等必要能力早已完整實作
   （`GetImageFrames`／`AddImageFrame`／`UpdateImageFrame`／`RemoveImageFrame`／

@@ -5,16 +5,18 @@ using System.Text;
 namespace OdfKit.Drawing;
 
 /// <summary>
+/// Provides fast UTF-8 span-based parsing of SVG path data.
 /// 提供 SVG path data 的 UTF-8 Span 快速解析工具。
 /// </summary>
 public static class OdfSvgPathDataParser
 {
     /// <summary>
+    /// Attempts to parse the coordinate bounds from SVG path data.
     /// 嘗試從 SVG path data 解析座標邊界。
     /// </summary>
-    /// <param name="utf8PathData">UTF-8 編碼的 SVG path data</param>
-    /// <param name="bounds">解析出的座標邊界</param>
-    /// <returns>若成功解析到至少一個座標則為 <see langword="true"/>，否則為 <see langword="false"/></returns>
+    /// <param name="utf8PathData">The UTF-8 encoded SVG path data. / UTF-8 編碼的 SVG path data。</param>
+    /// <param name="bounds">The parsed coordinate bounds. / 解析出的座標邊界。</param>
+    /// <returns><see langword="true"/> if at least one coordinate was parsed successfully; otherwise <see langword="false"/>. / 若成功解析到至少一個座標則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
     public static bool TryGetBounds(ReadOnlySpan<byte> utf8PathData, out OdfSvgPathBounds bounds)
     {
         double minX = double.MaxValue;
@@ -140,17 +142,19 @@ public static class OdfSvgPathDataParser
 }
 
 /// <summary>
+/// Represents the coordinate bounds of SVG path data.
 /// 表示 SVG path data 的座標邊界。
 /// </summary>
 public readonly struct OdfSvgPathBounds
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfSvgPathBounds"/> struct.
     /// 初始化 <see cref="OdfSvgPathBounds"/> 結構的新執行個體。
     /// </summary>
-    /// <param name="minX">最小 X 座標</param>
-    /// <param name="minY">最小 Y 座標</param>
-    /// <param name="maxX">最大 X 座標</param>
-    /// <param name="maxY">最大 Y 座標</param>
+    /// <param name="minX">The minimum X coordinate. / 最小 X 座標。</param>
+    /// <param name="minY">The minimum Y coordinate. / 最小 Y 座標。</param>
+    /// <param name="maxX">The maximum X coordinate. / 最大 X 座標。</param>
+    /// <param name="maxY">The maximum Y coordinate. / 最大 Y 座標。</param>
     public OdfSvgPathBounds(double minX, double minY, double maxX, double maxY)
     {
         MinX = minX;
@@ -160,31 +164,37 @@ public readonly struct OdfSvgPathBounds
     }
 
     /// <summary>
+    /// Gets the minimum X coordinate.
     /// 取得最小 X 座標。
     /// </summary>
     public double MinX { get; }
 
     /// <summary>
+    /// Gets the minimum Y coordinate.
     /// 取得最小 Y 座標。
     /// </summary>
     public double MinY { get; }
 
     /// <summary>
+    /// Gets the maximum X coordinate.
     /// 取得最大 X 座標。
     /// </summary>
     public double MaxX { get; }
 
     /// <summary>
+    /// Gets the maximum Y coordinate.
     /// 取得最大 Y 座標。
     /// </summary>
     public double MaxY { get; }
 
     /// <summary>
+    /// Gets the width of the bounds.
     /// 取得邊界寬度。
     /// </summary>
     public double Width => MaxX - MinX;
 
     /// <summary>
+    /// Gets the height of the bounds.
     /// 取得邊界高度。
     /// </summary>
     public double Height => MaxY - MinY;

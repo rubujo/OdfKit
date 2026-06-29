@@ -475,4 +475,64 @@ public class FormulaHighLevelApiTests
         Assert.Equal("c", fractions[1].Base?.Text);
         Assert.Equal("d", fractions[1].Script?.Text);
     }
+
+    /// <summary>
+    /// 驗證分數、根號、上標、下標與矩陣的具名符號級存取與替換 API，
+    /// 以及種類不符時擲出 <see cref="InvalidOperationException"/>。
+    /// </summary>
+    [Fact]
+    public void OdfMathToken_SymbolLevelAccessors_WorkForFractionRadicalScriptsAndMatrix()
+    {
+        OdfMathToken fraction = OdfMathToken.Fraction(OdfMathToken.Number("1"), OdfMathToken.Number("2"));
+        Assert.Equal("1", fraction.Numerator.Text);
+        Assert.Equal("2", fraction.Denominator.Text);
+
+        OdfMathToken updatedFraction = fraction.WithNumerator(OdfMathToken.Number("3")).WithDenominator(OdfMathToken.Number("4"));
+        Assert.Equal("3", updatedFraction.Numerator.Text);
+        Assert.Equal("4", updatedFraction.Denominator.Text);
+        Assert.Equal("1", fraction.Numerator.Text);
+
+        OdfMathToken squareRoot = OdfMathToken.Radical(OdfMathToken.Number("9"));
+        Assert.Equal("9", squareRoot.Radicand.Text);
+        Assert.Null(squareRoot.RootIndex);
+
+        OdfMathToken cubeRoot = squareRoot.WithRootIndex(OdfMathToken.Number("3")).WithRadicand(OdfMathToken.Number("27"));
+        Assert.Equal("27", cubeRoot.Radicand.Text);
+        Assert.Equal("3", cubeRoot.RootIndex?.Text);
+
+        OdfMathToken superscript = OdfMathToken.Superscript(OdfMathToken.Identifier("x"), OdfMathToken.Number("2"));
+        Assert.Equal("2", superscript.Exponent.Text);
+        Assert.Equal("3", superscript.WithExponent(OdfMathToken.Number("3")).Exponent.Text);
+
+        OdfMathToken subscript = OdfMathToken.Subscript(OdfMathToken.Identifier("a"), OdfMathToken.Number("1"));
+        Assert.Equal("1", subscript.SubscriptIndex.Text);
+        Assert.Equal("2", subscript.WithSubscriptIndex(OdfMathToken.Number("2")).SubscriptIndex.Text);
+
+        OdfMathToken matrix = OdfMathToken.Matrix(
+            OdfMathToken.Row(OdfMathToken.Number("1"), OdfMathToken.Number("2")),
+            OdfMathToken.Row(OdfMathToken.Number("3"), OdfMathToken.Number("4")));
+
+        Assert.Equal(2, matrix.RowCount);
+        Assert.Equal("3", matrix.GetCell(1, 0).Text);
+
+        OdfMathToken matrixWithUpdatedCell = matrix.WithCell(1, 0, OdfMathToken.Number("9"));
+        Assert.Equal("9", matrixWithUpdatedCell.GetCell(1, 0).Text);
+        Assert.Equal("3", matrix.GetCell(1, 0).Text);
+
+        OdfMathToken matrixWithExtraRow = matrix.AddRow(OdfMathToken.Row(OdfMathToken.Number("5"), OdfMathToken.Number("6")));
+        Assert.Equal(3, matrixWithExtraRow.RowCount);
+        Assert.Equal("5", matrixWithExtraRow.GetCell(2, 0).Text);
+
+        OdfMathToken matrixWithRowRemoved = matrixWithExtraRow.RemoveRow(0);
+        Assert.Equal(2, matrixWithRowRemoved.RowCount);
+        Assert.Equal("3", matrixWithRowRemoved.GetRow(0).Children![0].Text);
+
+        Assert.Throws<InvalidOperationException>(() => { _ = fraction.Radicand; });
+        Assert.Throws<InvalidOperationException>(() => { _ = superscript.Numerator; });
+        Assert.Throws<ArgumentOutOfRangeException>(() => { _ = matrix.GetCell(5, 0); });
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = OdfMathToken.Matrix(OdfMathToken.Row(OdfMathToken.Number("1"))).RemoveRow(0);
+        });
+    }
 }

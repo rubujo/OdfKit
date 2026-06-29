@@ -20,15 +20,17 @@ using OdfKit.Text;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Creates minimal low-level ODF packages and flat XML documents.
 /// 建立最小的低階 ODF 封裝與扁平 XML 文件。
 /// </summary>
 public static class OdfDocumentFactory
 {
     /// <summary>
+    /// Creates a high-level ODF document wrapper of the specified kind.
     /// 建立指定種類的高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="kind">要建立的 ODF 文件種類</param>
-    /// <returns>建立完成的 ODF 文件</returns>
+    /// <param name="kind">The ODF document kind to create. / 要建立的 ODF 文件種類。</param>
+    /// <returns>The created ODF document. / 建立完成的 ODF 文件。</returns>
     public static OdfDocument CreateDocument(OdfDocumentKind kind)
     {
         OdfDocumentKind packageKind = OdfDocumentKindDetector.IsFlatKind(kind)
@@ -43,21 +45,23 @@ public static class OdfDocumentFactory
     }
 
     /// <summary>
+    /// Loads a high-level ODF document wrapper from the specified path.
     /// 從指定路徑載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="path">ODF 文件路徑</param>
-    /// <returns>載入完成的 ODF 文件</returns>
+    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument LoadDocument(string path)
     {
         return LoadDocument(path, options: null);
     }
 
     /// <summary>
+    /// Loads a high-level ODF document wrapper from the specified path and load options.
     /// 從指定路徑與載入選項載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="path">ODF 文件路徑</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
-    /// <returns>載入完成的 ODF 文件</returns>
+    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
+    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument LoadDocument(string path, OdfLoadOptions? options)
     {
         if (path is null)
@@ -68,23 +72,25 @@ public static class OdfDocumentFactory
     }
 
     /// <summary>
+    /// Asynchronously loads a high-level ODF document wrapper from the specified path.
     /// 非同步從指定路徑載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="path">ODF 文件路徑</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
+    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     public static Task<OdfDocument> LoadDocumentAsync(string path, CancellationToken cancellationToken = default)
     {
         return LoadDocumentAsync(path, options: null, cancellationToken);
     }
 
     /// <summary>
+    /// Asynchronously loads a high-level ODF document wrapper from the specified path and load options.
     /// 非同步從指定路徑與載入選項載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="path">ODF 文件路徑</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
+    /// <param name="path">The ODF document path. / ODF 文件路徑。</param>
+    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     public static async Task<OdfDocument> LoadDocumentAsync(
         string path,
         OdfLoadOptions? options,
@@ -98,23 +104,25 @@ public static class OdfDocumentFactory
     }
 
     /// <summary>
+    /// Loads a high-level ODF document wrapper from the specified stream.
     /// 從指定資料流載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <returns>載入完成的 ODF 文件</returns>
+    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
+    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument LoadDocument(Stream stream, string? fileName = null)
     {
         return LoadDocument(stream, options: null, fileName);
     }
 
     /// <summary>
+    /// Loads a high-level ODF document wrapper from the specified stream and load options.
     /// 從指定資料流與載入選項載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <returns>載入完成的 ODF 文件</returns>
+    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
+    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
+    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <returns>The loaded ODF document. / 載入完成的 ODF 文件。</returns>
     public static OdfDocument LoadDocument(Stream stream, OdfLoadOptions? options, string? fileName = null)
     {
         if (stream is null)
@@ -125,12 +133,13 @@ public static class OdfDocumentFactory
     }
 
     /// <summary>
+    /// Asynchronously loads a high-level ODF document wrapper from the specified stream.
     /// 非同步從指定資料流載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
+    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
+    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     public static Task<OdfDocument> LoadDocumentAsync(
         Stream stream,
         string? fileName = null,
@@ -140,13 +149,14 @@ public static class OdfDocumentFactory
     }
 
     /// <summary>
+    /// Asynchronously loads a high-level ODF document wrapper from the specified stream and load options.
     /// 非同步從指定資料流與載入選項載入高階 ODF 文件 wrapper。
     /// </summary>
-    /// <param name="stream">包含 ODF 文件內容的資料流</param>
-    /// <param name="options">載入選項，例如加密文件密碼與安全限制</param>
-    /// <param name="fileName">選用的檔案名稱，用於輔助格式偵測</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步載入作業的工作，其結果為載入完成的 ODF 文件</returns>
+    /// <param name="stream">The stream containing the ODF document content. / 包含 ODF 文件內容的資料流。</param>
+    /// <param name="options">The load options, such as a password for encrypted documents and security limits. / 載入選項，例如加密文件密碼與安全限制。</param>
+    /// <param name="fileName">The optional file name, used to assist format detection. / 選用的檔案名稱，用於輔助格式偵測。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous load operation, whose result is the loaded ODF document. / 代表非同步載入作業的工作，其結果為載入完成的 ODF 文件。</returns>
     public static async Task<OdfDocument> LoadDocumentAsync(
         Stream stream,
         OdfLoadOptions? options,
@@ -162,14 +172,15 @@ public static class OdfDocumentFactory
     }
 
     /// <summary>
+    /// Creates a minimally packaged ODF document in the provided stream.
     /// 在提供的資料流中建立一個最小封裝的 ODF 文件。
     /// </summary>
-    /// <param name="stream">接收封裝 ODF 文件的資料流</param>
-    /// <param name="kind">ODF 文件的類型</param>
-    /// <param name="version">ODF 規格版本</param>
-    /// <param name="leaveOpen">若為 <see langword="true"/> ，則在釋放封裝後保持資料流開啟；否則為 <see langword="false"/></param>
-    /// <param name="options">儲存文件的選項</param>
-    /// <returns>傳回建立的 <see cref="OdfPackage"/> 執行個體</returns>
+    /// <param name="stream">The stream that receives the packaged ODF document. / 接收封裝 ODF 文件的資料流。</param>
+    /// <param name="kind">The ODF document kind. / ODF 文件的類型。</param>
+    /// <param name="version">The ODF specification version. / ODF 規格版本。</param>
+    /// <param name="leaveOpen">If <see langword="true"/>, keeps the stream open after the package is disposed; otherwise <see langword="false"/>. / 若為 <see langword="true"/> ，則在釋放封裝後保持資料流開啟；否則為 <see langword="false"/>。</param>
+    /// <param name="options">The options for saving the document. / 儲存文件的選項。</param>
+    /// <returns>The created <see cref="OdfPackage"/> instance. / 傳回建立的 <see cref="OdfPackage"/> 執行個體。</returns>
     public static OdfPackage CreatePackage(
         Stream stream,
         OdfDocumentKind kind,
@@ -188,13 +199,14 @@ public static class OdfDocumentFactory
     }
 
     /// <summary>
+    /// Creates a minimally packaged ODF document at the provided path.
     /// 在提供的路徑上建立一個最小封裝的 ODF 文件。
     /// </summary>
-    /// <param name="path">建立封裝 ODF 文件的檔案路徑</param>
-    /// <param name="kind">ODF 文件的類型</param>
-    /// <param name="version">ODF 規格版本</param>
-    /// <param name="options">儲存文件的選項</param>
-    /// <returns>傳回建立的 <see cref="OdfPackage"/> 執行個體</returns>
+    /// <param name="path">The file path at which to create the packaged ODF document. / 建立封裝 ODF 文件的檔案路徑。</param>
+    /// <param name="kind">The ODF document kind. / ODF 文件的類型。</param>
+    /// <param name="version">The ODF specification version. / ODF 規格版本。</param>
+    /// <param name="options">The options for saving the document. / 儲存文件的選項。</param>
+    /// <returns>The created <see cref="OdfPackage"/> instance. / 傳回建立的 <see cref="OdfPackage"/> 執行個體。</returns>
     public static OdfPackage CreatePackage(
         string path,
         OdfDocumentKind kind,
@@ -212,12 +224,13 @@ public static class OdfDocumentFactory
     }
 
     /// <summary>
+    /// Writes a minimal flat XML ODF document to the provided stream.
     /// 將最小的扁平 XML ODF 文件寫入至提供的資料流中。
     /// </summary>
-    /// <param name="stream">寫入扁平 XML ODF 文件的資料流</param>
-    /// <param name="kind">ODF 文件的類型</param>
-    /// <param name="version">ODF 規格版本</param>
-    /// <param name="leaveOpen">若為 <see langword="true"/> ，則保持資料流開啟；否則為 <see langword="false"/></param>
+    /// <param name="stream">The stream to which the flat XML ODF document is written. / 寫入扁平 XML ODF 文件的資料流。</param>
+    /// <param name="kind">The ODF document kind. / ODF 文件的類型。</param>
+    /// <param name="version">The ODF specification version. / ODF 規格版本。</param>
+    /// <param name="leaveOpen">If <see langword="true"/>, keeps the stream open; otherwise <see langword="false"/>. / 若為 <see langword="true"/> ，則保持資料流開啟；否則為 <see langword="false"/>。</param>
     public static void WriteFlatXml(
         Stream stream,
         OdfDocumentKind kind,
@@ -258,11 +271,12 @@ public static class OdfDocumentFactory
     }
 
     /// <summary>
+    /// Populates the package with a minimal ODF entity of the specified document kind.
     /// 以指定的文件類型在封裝中填入最小的 ODF 實體。
     /// </summary>
-    /// <param name="package">要初始化的 OdfPackage 執行個體</param>
-    /// <param name="kind">ODF 文件的類型</param>
-    /// <param name="version">ODF 規格版本</param>
+    /// <param name="package">The OdfPackage instance to initialize. / 要初始化的 OdfPackage 執行個體。</param>
+    /// <param name="kind">The ODF document kind. / ODF 文件的類型。</param>
+    /// <param name="version">The ODF specification version. / ODF 規格版本。</param>
     public static void InitializeMinimalPackage(
         OdfPackage package,
         OdfDocumentKind kind,

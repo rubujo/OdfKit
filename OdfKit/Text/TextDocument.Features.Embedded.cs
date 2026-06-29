@@ -80,10 +80,13 @@ public partial class TextDocument
         string chartClass = chart.ChartType switch
         {
             OdfChartType.Line => "chart:line",
-            OdfChartType.Pie => "chart:pie",
+            OdfChartType.Pie => "chart:circle",
             OdfChartType.Area => "chart:area",
             OdfChartType.Scatter => "chart:scatter",
             OdfChartType.Bubble => "chart:bubble",
+            OdfChartType.Ring => "chart:ring",
+            OdfChartType.Radar => "chart:radar",
+            OdfChartType.Stock => "chart:stock",
             _ => "chart:bar"
         };
 

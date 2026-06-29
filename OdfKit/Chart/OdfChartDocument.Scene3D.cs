@@ -9,9 +9,10 @@ namespace OdfKit.Chart;
 public partial class OdfChartDocument
 {
     /// <summary>
+    /// Gets a summary list of all light sources (<c>dr3d:light</c>) in the 3D chart plot area.
     /// 取得 3D 圖表繪圖區中所有光源（<c>dr3d:light</c>）的摘要清單。
     /// </summary>
-    /// <returns>光源摘要清單，依文件中出現順序排列</returns>
+    /// <returns>The light source summary list, in document order. / 光源摘要清單，依文件中出現順序排列。</returns>
     public IReadOnlyList<OdfChartLightInfo> GetLights()
     {
         List<OdfChartLightInfo> lights = [];
@@ -34,13 +35,14 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Adds a 3D chart light source (<c>dr3d:light</c>).
     /// 新增一個 3D 圖表光源（<c>dr3d:light</c>）。
     /// </summary>
-    /// <param name="direction">光源方向向量，格式為 <c>(x y z)</c></param>
-    /// <param name="diffuseColor">選用的漫射色</param>
-    /// <param name="enabled">選用的啟用狀態</param>
-    /// <param name="specular">選用的反射光啟用狀態</param>
-    /// <exception cref="ArgumentException">當 <paramref name="direction"/> 為空白時擲出</exception>
+    /// <param name="direction">The light direction vector, formatted as <c>(x y z)</c>. / 光源方向向量，格式為 <c>(x y z)</c>。</param>
+    /// <param name="diffuseColor">The optional diffuse color. / 選用的漫射色。</param>
+    /// <param name="enabled">The optional enabled state. / 選用的啟用狀態。</param>
+    /// <param name="specular">The optional specular reflection enabled state. / 選用的反射光啟用狀態。</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="direction"/> is blank. / 當 <paramref name="direction"/> 為空白時擲出。</exception>
     public void AddLight(string direction, string? diffuseColor = null, bool? enabled = null, bool? specular = null)
     {
         if (string.IsNullOrWhiteSpace(direction))
@@ -69,6 +71,7 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Removes all 3D chart light sources from the plot area.
     /// 移除繪圖區中所有 3D 圖表光源。
     /// </summary>
     public void ClearLights()

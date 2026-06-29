@@ -69,10 +69,13 @@ internal static class OdfTableSheetChartEngine
         chartDoc.ChartClass = chartType switch
         {
             OdfChartType.Line => "chart:line",
-            OdfChartType.Pie => "chart:pie",
+            OdfChartType.Pie => "chart:circle",
             OdfChartType.Area => "chart:area",
             OdfChartType.Scatter => "chart:scatter",
             OdfChartType.Bubble => "chart:bubble",
+            OdfChartType.Ring => "chart:ring",
+            OdfChartType.Radar => "chart:radar",
+            OdfChartType.Stock => "chart:stock",
             _ => "chart:bar"
         };
         chartDoc.SetDataRange(context.SheetName, dataRange, firstRowAsHeader, firstColumnAsLabel);

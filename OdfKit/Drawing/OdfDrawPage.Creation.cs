@@ -17,14 +17,15 @@ public partial class OdfDrawPage
     #region Drawing Object Creation
 
     /// <summary>
+    /// Adds a text box on the drawing page.
     /// 在繪圖頁面上新增文字方塊。
     /// </summary>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="w">寬度</param>
-    /// <param name="h">高度</param>
-    /// <param name="text">文字內容</param>
-    /// <returns>新增的文字方塊執行個體</returns>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="w">The width. / 寬度。</param>
+    /// <param name="h">The height. / 高度。</param>
+    /// <param name="text">The text content. / 文字內容。</param>
+    /// <returns>The newly added text box instance. / 新增的文字方塊執行個體。</returns>
     public OdfTextBox AddTextBox(OdfLength x, OdfLength y, OdfLength w, OdfLength h, string text)
     {
         var frame = CreateDrawingFrame(x, y, w, h);
@@ -40,14 +41,15 @@ public partial class OdfDrawPage
     }
 
     /// <summary>
+    /// Adds a shape on the drawing page.
     /// 在繪圖頁面上新增圖形。
     /// </summary>
-    /// <param name="shapeType">圖形類型</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="w">寬度</param>
-    /// <param name="h">高度</param>
-    /// <returns>新增的圖形執行個體</returns>
+    /// <param name="shapeType">The shape type. / 圖形類型。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="w">The width. / 寬度。</param>
+    /// <param name="h">The height. / 高度。</param>
+    /// <returns>The newly added shape instance. / 新增的圖形執行個體。</returns>
     public OdfShape AddShape(OdfShapeType shapeType, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         string localName = shapeType switch
@@ -71,13 +73,14 @@ public partial class OdfDrawPage
     }
 
     /// <summary>
+    /// Adds a line segment on the drawing page.
     /// 在繪圖頁面上新增線段。
     /// </summary>
-    /// <param name="x1">起點 X 軸座標位置</param>
-    /// <param name="y1">起點 Y 軸座標位置</param>
-    /// <param name="x2">終點 X 軸座標位置</param>
-    /// <param name="y2">終點 Y 軸座標位置</param>
-    /// <returns>新增的線段圖形執行個體</returns>
+    /// <param name="x1">The start X-axis position. / 起點 X 軸座標位置。</param>
+    /// <param name="y1">The start Y-axis position. / 起點 Y 軸座標位置。</param>
+    /// <param name="x2">The end X-axis position. / 終點 X 軸座標位置。</param>
+    /// <param name="y2">The end Y-axis position. / 終點 Y 軸座標位置。</param>
+    /// <returns>The newly added line shape instance. / 新增的線段圖形執行個體。</returns>
     public OdfShape AddLine(OdfLength x1, OdfLength y1, OdfLength x2, OdfLength y2)
     {
         var lineNode = CreateLineLikeNode("line", x1, y1, x2, y2);
@@ -86,13 +89,14 @@ public partial class OdfDrawPage
     }
 
     /// <summary>
+    /// Adds a connector on the drawing page.
     /// 在繪圖頁面上新增連接線。
     /// </summary>
-    /// <param name="x1">起點 X 軸座標位置</param>
-    /// <param name="y1">起點 Y 軸座標位置</param>
-    /// <param name="x2">終點 X 軸座標位置</param>
-    /// <param name="y2">終點 Y 軸座標位置</param>
-    /// <returns>新增的連接線圖形執行個體</returns>
+    /// <param name="x1">The start X-axis position. / 起點 X 軸座標位置。</param>
+    /// <param name="y1">The start Y-axis position. / 起點 Y 軸座標位置。</param>
+    /// <param name="x2">The end X-axis position. / 終點 X 軸座標位置。</param>
+    /// <param name="y2">The end Y-axis position. / 終點 Y 軸座標位置。</param>
+    /// <returns>The newly added connector shape instance. / 新增的連接線圖形執行個體。</returns>
     public OdfShape AddConnector(OdfLength x1, OdfLength y1, OdfLength x2, OdfLength y2)
     {
         var connectorNode = CreateLineLikeNode("connector", x1, y1, x2, y2);
@@ -102,14 +106,15 @@ public partial class OdfDrawPage
     }
 
     /// <summary>
+    /// Adds a polyline shape on the drawing page.
     /// 在繪圖頁面上新增折線圖形。
     /// </summary>
-    /// <param name="points">點座標集合</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="w">寬度</param>
-    /// <param name="h">高度</param>
-    /// <returns>新增的折線圖形執行個體</returns>
+    /// <param name="points">The collection of point coordinates. / 點座標集合。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="w">The width. / 寬度。</param>
+    /// <param name="h">The height. / 高度。</param>
+    /// <returns>The newly added polyline shape instance. / 新增的折線圖形執行個體。</returns>
     public OdfShape AddPolyline(IEnumerable<System.Drawing.PointF> points, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         var shapeNode = OdfNodeFactory.CreateElement("polyline", OdfNamespaces.Draw, "draw");
@@ -129,14 +134,15 @@ public partial class OdfDrawPage
     }
 
     /// <summary>
+    /// Adds a picture on the drawing page.
     /// 在繪圖頁面上新增圖片。
     /// </summary>
-    /// <param name="imageBytes">圖片的位元組陣列</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="w">寬度</param>
-    /// <param name="h">高度</param>
-    /// <returns>新增的圖片圖形執行個體</returns>
+    /// <param name="imageBytes">The image byte array. / 圖片的位元組陣列。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="w">The width. / 寬度。</param>
+    /// <param name="h">The height. / 高度。</param>
+    /// <returns>The newly added picture shape instance. / 新增的圖片圖形執行個體。</returns>
     public OdfPicture AddPicture(byte[] imageBytes, OdfLength x, OdfLength y, OdfLength w, OdfLength h)
     {
         var frame = CreateDrawingFrame(x, y, w, h);
@@ -156,14 +162,15 @@ public partial class OdfDrawPage
     }
 
     /// <summary>
+    /// Adds a path shape on the drawing page.
     /// 在繪圖頁面上新增路徑圖形。
     /// </summary>
-    /// <param name="svgPathData">SVG path data 路徑描述字串</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">寬度</param>
-    /// <param name="height">高度</param>
-    /// <returns>新增的路徑圖形執行個體</returns>
+    /// <param name="svgPathData">The SVG path data description string. / SVG path data 路徑描述字串。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The width. / 寬度。</param>
+    /// <param name="height">The height. / 高度。</param>
+    /// <returns>The newly added path shape instance. / 新增的路徑圖形執行個體。</returns>
     public OdfShape AddPath(string svgPathData, OdfLength x, OdfLength y, OdfLength width, OdfLength height)
     {
         if (svgPathData is null)
@@ -220,10 +227,11 @@ public partial class OdfDrawPage
     }
 
     /// <summary>
+    /// Adds a polygon shape on the drawing page.
     /// 在繪圖頁面上新增多邊形圖形。
     /// </summary>
-    /// <param name="points">多邊形頂點的長度座標集合</param>
-    /// <returns>新增的多邊形圖形執行個體</returns>
+    /// <param name="points">The length-based coordinate collection of polygon vertices. / 多邊形頂點的長度座標集合。</param>
+    /// <returns>The newly added polygon shape instance. / 新增的多邊形圖形執行個體。</returns>
     public OdfShape AddPolygon(IEnumerable<(OdfLength X, OdfLength Y)> points)
     {
         if (points is null)
@@ -292,12 +300,13 @@ public partial class OdfDrawPage
     }
 
     /// <summary>
+    /// Creates a connector linking a start shape and an end shape on the drawing page.
     /// 在繪圖頁面上建立起點與終點相連的連接線。
     /// </summary>
-    /// <param name="startShapeId">起點圖形識別碼</param>
-    /// <param name="endShapeId">終點圖形識別碼</param>
-    /// <param name="connectorType">連接線幾何類型</param>
-    /// <returns>新增的連接線圖形執行個體</returns>
+    /// <param name="startShapeId">The start shape identifier. / 起點圖形識別碼。</param>
+    /// <param name="endShapeId">The end shape identifier. / 終點圖形識別碼。</param>
+    /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
+    /// <returns>The newly added connector shape instance. / 新增的連接線圖形執行個體。</returns>
     public OdfShape AddConnector(string startShapeId, string endShapeId, OdfConnectorType connectorType = OdfConnectorType.Standard)
     {
         if (string.IsNullOrEmpty(startShapeId))
@@ -326,14 +335,15 @@ public partial class OdfDrawPage
     }
 
     /// <summary>
+    /// Adds a custom shape on the drawing page.
     /// 在繪圖頁面上新增自定義幾何圖形。
     /// </summary>
-    /// <param name="shapeType">自定義幾何圖形的幾何類型</param>
-    /// <param name="x">X 軸座標位置</param>
-    /// <param name="y">Y 軸座標位置</param>
-    /// <param name="width">寬度</param>
-    /// <param name="height">高度</param>
-    /// <returns>新增的自定義幾何圖形執行個體</returns>
+    /// <param name="shapeType">The geometry type of the custom shape. / 自定義幾何圖形的幾何類型。</param>
+    /// <param name="x">The X-axis position. / X 軸座標位置。</param>
+    /// <param name="y">The Y-axis position. / Y 軸座標位置。</param>
+    /// <param name="width">The width. / 寬度。</param>
+    /// <param name="height">The height. / 高度。</param>
+    /// <returns>The newly added custom shape instance. / 新增的自定義幾何圖形執行個體。</returns>
     public OdfShape AddCustomShape(string shapeType, OdfLength x, OdfLength y, OdfLength width, OdfLength height)
     {
         if (string.IsNullOrEmpty(shapeType))
@@ -403,10 +413,11 @@ public partial class OdfDrawPage
     };
 
     /// <summary>
+    /// Adds a group on the drawing page.
     /// 在繪圖頁面上新增群組。
     /// </summary>
-    /// <param name="name">選用的群組名稱</param>
-    /// <returns>新增的繪圖群組執行個體</returns>
+    /// <param name="name">The optional group name. / 選用的群組名稱。</param>
+    /// <returns>The newly added drawing group instance. / 新增的繪圖群組執行個體。</returns>
     public OdfDrawGroup AddGroup(string? name = null)
     {
         var groupNode = OdfNodeFactory.CreateElement("g", OdfNamespaces.Draw, "draw");

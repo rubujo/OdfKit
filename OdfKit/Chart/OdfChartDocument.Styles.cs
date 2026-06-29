@@ -9,6 +9,7 @@ namespace OdfKit.Chart;
 public partial class OdfChartDocument
 {
     /// <summary>
+    /// Gets or sets the chart automatic style of the plot area.
     /// 取得或設定繪圖區的圖表自動樣式。
     /// </summary>
     public OdfChartStyle PlotAreaStyle
@@ -39,6 +40,7 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Gets or sets the chart automatic style of the primary Y-axis grid lines.
     /// 取得或設定主要 Y 軸格線的圖表自動樣式。
     /// </summary>
     public OdfChartStyle GridStyle
@@ -71,6 +73,7 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Gets or sets the chart automatic style of the legend (background color, border, etc.).
     /// 取得或設定圖例的圖表自動樣式（背景色、邊框等）。
     /// </summary>
     public OdfChartStyle LegendStyle
@@ -91,12 +94,13 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Creates or gets the chart automatic style with the specified name.
     /// 建立或取得指定名稱的圖表自動樣式。
     /// </summary>
-    /// <param name="name">樣式名稱</param>
-    /// <returns>可編輯的圖表樣式物件</returns>
-    /// <exception cref="ArgumentException">當 <paramref name="name"/> 為空白時擲出</exception>
-    /// <exception cref="InvalidOperationException">當名稱已被非圖表樣式使用時擲出</exception>
+    /// <param name="name">The style name. / 樣式名稱。</param>
+    /// <returns>The editable chart style object. / 可編輯的圖表樣式物件。</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is blank. / 當 <paramref name="name"/> 為空白時擲出。</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the name is already used by a non-chart style. / 當名稱已被非圖表樣式使用時擲出。</exception>
     public OdfChartStyle CreateChartStyle(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -126,10 +130,11 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Attempts to get the chart style summary with the specified name.
     /// 嘗試取得指定名稱的圖表樣式摘要。
     /// </summary>
-    /// <param name="name">樣式名稱</param>
-    /// <returns>圖表樣式摘要；若不存在或不是圖表樣式則為 <see langword="null"/></returns>
+    /// <param name="name">The style name. / 樣式名稱。</param>
+    /// <returns>The chart style summary; <see langword="null"/> if it does not exist or is not a chart style. / 圖表樣式摘要；若不存在或不是圖表樣式則為 <see langword="null"/>。</returns>
     public OdfChartStyleInfo? TryGetChartStyle(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -164,10 +169,11 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Removes the chart automatic style with the specified name.
     /// 移除指定名稱的圖表自動樣式。
     /// </summary>
-    /// <param name="name">樣式名稱</param>
-    /// <returns>若成功移除則為 <see langword="true"/>；找不到或非圖表樣式時為 <see langword="false"/></returns>
+    /// <param name="name">The style name. / 樣式名稱。</param>
+    /// <returns><see langword="true"/> if removed successfully; <see langword="false"/> if not found or not a chart style. / 若成功移除則為 <see langword="true"/>；找不到或非圖表樣式時為 <see langword="false"/>。</returns>
     public bool RemoveChartStyle(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -188,9 +194,10 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Gets a summary list of all chart automatic styles in the document.
     /// 取得文件中所有圖表自動樣式的摘要清單。
     /// </summary>
-    /// <returns>圖表樣式摘要清單</returns>
+    /// <returns>The chart style summary list. / 圖表樣式摘要清單。</returns>
     public IReadOnlyList<OdfChartStyleInfo> GetChartStyles()
     {
         var styles = new List<OdfChartStyleInfo>();

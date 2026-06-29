@@ -9,20 +9,22 @@ namespace OdfKit.Database;
 public partial class OdfDatabaseDocument
 {
     /// <summary>
+    /// Gets the order statement of the specified query (<c>db:order-statement</c>).
     /// 取得指定查詢的排序陳述式（<c>db:order-statement</c>）。
     /// </summary>
-    /// <param name="queryName">查詢名稱</param>
-    /// <returns>排序陳述式摘要；若未設定則為 <see langword="null"/></returns>
+    /// <param name="queryName">The query name. / 查詢名稱。</param>
+    /// <returns>The order statement summary, or <see langword="null"/> if not set. / 排序陳述式摘要；若未設定則為 <see langword="null"/>。</returns>
     public OdfDatabaseQueryStatementInfo? GetQueryOrderStatement(string queryName) =>
         ReadQueryStatement(queryName, "order-statement");
 
     /// <summary>
+    /// Sets the order statement of the specified query (<c>db:order-statement</c>).
     /// 設定指定查詢的排序陳述式（<c>db:order-statement</c>）。
     /// </summary>
-    /// <param name="queryName">查詢名稱</param>
-    /// <param name="command">排序命令文字（例如 <c>ORDER BY</c> 子句內容）</param>
-    /// <param name="applyCommand">選用的套用設定</param>
-    /// <returns>新增或更新後的排序陳述式節點</returns>
+    /// <param name="queryName">The query name. / 查詢名稱。</param>
+    /// <param name="command">The order command text (e.g. the content of an <c>ORDER BY</c> clause). / 排序命令文字（例如 <c>ORDER BY</c> 子句內容）。</param>
+    /// <param name="applyCommand">The optional apply setting. / 選用的套用設定。</param>
+    /// <returns>The added or updated order statement node. / 新增或更新後的排序陳述式節點。</returns>
     public OdfNode SetQueryOrderStatement(string queryName, string command, bool? applyCommand = null) =>
         WriteQueryStatement(
             queryName,
@@ -32,20 +34,22 @@ public partial class OdfDatabaseDocument
             ("filter-statement", DatabaseNamespace), ("columns", DatabaseNamespace), ("update-table", DatabaseNamespace));
 
     /// <summary>
+    /// Gets the filter statement of the specified query (<c>db:filter-statement</c>).
     /// 取得指定查詢的篩選陳述式（<c>db:filter-statement</c>）。
     /// </summary>
-    /// <param name="queryName">查詢名稱</param>
-    /// <returns>篩選陳述式摘要；若未設定則為 <see langword="null"/></returns>
+    /// <param name="queryName">The query name. / 查詢名稱。</param>
+    /// <returns>The filter statement summary, or <see langword="null"/> if not set. / 篩選陳述式摘要；若未設定則為 <see langword="null"/>。</returns>
     public OdfDatabaseQueryStatementInfo? GetQueryFilterStatement(string queryName) =>
         ReadQueryStatement(queryName, "filter-statement");
 
     /// <summary>
+    /// Sets the filter statement of the specified query (<c>db:filter-statement</c>).
     /// 設定指定查詢的篩選陳述式（<c>db:filter-statement</c>）。
     /// </summary>
-    /// <param name="queryName">查詢名稱</param>
-    /// <param name="command">篩選命令文字（例如 <c>WHERE</c> 子句內容）</param>
-    /// <param name="applyCommand">選用的套用設定</param>
-    /// <returns>新增或更新後的篩選陳述式節點</returns>
+    /// <param name="queryName">The query name. / 查詢名稱。</param>
+    /// <param name="command">The filter command text (e.g. the content of a <c>WHERE</c> clause). / 篩選命令文字（例如 <c>WHERE</c> 子句內容）。</param>
+    /// <param name="applyCommand">The optional apply setting. / 選用的套用設定。</param>
+    /// <returns>The added or updated filter statement node. / 新增或更新後的篩選陳述式節點。</returns>
     public OdfNode SetQueryFilterStatement(string queryName, string command, bool? applyCommand = null) =>
         WriteQueryStatement(
             queryName,
@@ -55,10 +59,11 @@ public partial class OdfDatabaseDocument
             ("columns", DatabaseNamespace), ("update-table", DatabaseNamespace));
 
     /// <summary>
+    /// Gets the updatable target table name of the specified query (<c>db:update-table</c>).
     /// 取得指定查詢的可更新目標資料表名稱（<c>db:update-table</c>）。
     /// </summary>
-    /// <param name="queryName">查詢名稱</param>
-    /// <returns>目標資料表名稱；若未設定則為 <see langword="null"/></returns>
+    /// <param name="queryName">The query name. / 查詢名稱。</param>
+    /// <returns>The target table name, or <see langword="null"/> if not set. / 目標資料表名稱；若未設定則為 <see langword="null"/>。</returns>
     public string? GetQueryUpdateTable(string queryName)
     {
         OdfNode query = FindQueryNodeOrThrow(queryName);
@@ -66,11 +71,12 @@ public partial class OdfDatabaseDocument
     }
 
     /// <summary>
+    /// Sets the updatable target table name of the specified query (<c>db:update-table</c>).
     /// 設定指定查詢的可更新目標資料表名稱（<c>db:update-table</c>）。
     /// </summary>
-    /// <param name="queryName">查詢名稱</param>
-    /// <param name="tableName">目標資料表名稱</param>
-    /// <returns>新增或更新後的目標資料表節點</returns>
+    /// <param name="queryName">The query name. / 查詢名稱。</param>
+    /// <param name="tableName">The target table name. / 目標資料表名稱。</param>
+    /// <returns>The added or updated target table node. / 新增或更新後的目標資料表節點。</returns>
     public OdfNode SetQueryUpdateTable(string queryName, string tableName)
     {
         if (string.IsNullOrWhiteSpace(tableName))
@@ -91,10 +97,11 @@ public partial class OdfDatabaseDocument
     }
 
     /// <summary>
+    /// Gets the list of visible column names in the specified query (<c>db:columns</c>).
     /// 取得指定查詢中可見欄位的名稱清單（<c>db:columns</c>）。
     /// </summary>
-    /// <param name="queryName">查詢名稱</param>
-    /// <returns>可見欄位名稱清單</returns>
+    /// <param name="queryName">The query name. / 查詢名稱。</param>
+    /// <returns>The list of visible column names. / 可見欄位名稱清單。</returns>
     public IReadOnlyList<string> GetQueryColumns(string queryName)
     {
         OdfNode query = FindQueryNodeOrThrow(queryName);
@@ -123,12 +130,13 @@ public partial class OdfDatabaseDocument
     }
 
     /// <summary>
+    /// Sets the list of visible columns of the specified query (<c>db:columns</c>).
     /// 設定指定查詢的可見欄位清單（<c>db:columns</c>）。
     /// </summary>
-    /// <param name="queryName">查詢名稱</param>
-    /// <param name="columnNames">欄位名稱清單</param>
-    /// <returns>新增或更新後的欄位清單節點</returns>
-    /// <exception cref="ArgumentException">當 <paramref name="columnNames"/> 為空時擲出</exception>
+    /// <param name="queryName">The query name. / 查詢名稱。</param>
+    /// <param name="columnNames">The list of column names. / 欄位名稱清單。</param>
+    /// <returns>The added or updated columns node. / 新增或更新後的欄位清單節點。</returns>
+    /// <exception cref="ArgumentException">When <paramref name="columnNames"/> is empty. / 當 <paramref name="columnNames"/> 為空時擲出。</exception>
     public OdfNode SetQueryColumns(string queryName, IEnumerable<string> columnNames)
     {
         if (columnNames is null)

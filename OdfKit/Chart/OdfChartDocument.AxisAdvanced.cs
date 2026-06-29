@@ -8,10 +8,11 @@ namespace OdfKit.Chart;
 public partial class OdfChartDocument
 {
     /// <summary>
+    /// Gets summary information for the axis of the specified dimension.
     /// 取得指定維度座標軸的摘要資訊。
     /// </summary>
-    /// <param name="dimension">座標軸維度，例如 <c>x</c>、<c>y</c> 或 <c>z</c></param>
-    /// <returns>座標軸摘要；若不存在則為 <see langword="null"/></returns>
+    /// <param name="dimension">The axis dimension, e.g. <c>x</c>, <c>y</c>, or <c>z</c>. / 座標軸維度，例如 <c>x</c>、<c>y</c> 或 <c>z</c>。</param>
+    /// <returns>The axis summary; <see langword="null"/> if it does not exist. / 座標軸摘要；若不存在則為 <see langword="null"/>。</returns>
     public OdfChartAxisInfo? GetAxisInfo(string dimension)
     {
         ValidateAxisDimension(dimension);
@@ -33,50 +34,56 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Sets whether the axis of the specified dimension uses a logarithmic scale.
     /// 設定指定維度座標軸是否採用對數刻度。
     /// </summary>
-    /// <param name="dimension">座標軸維度</param>
-    /// <param name="logarithmic">對數刻度設定；<see langword="null"/> 表示移除屬性</param>
+    /// <param name="dimension">The axis dimension. / 座標軸維度。</param>
+    /// <param name="logarithmic">The logarithmic scale setting; <see langword="null"/> removes the attribute. / 對數刻度設定；<see langword="null"/> 表示移除屬性。</param>
     public void SetAxisLogarithmic(string dimension, bool? logarithmic) =>
         SetAxisChartBool(dimension, "logarithmic", logarithmic);
 
     /// <summary>
+    /// Sets whether the axis of the specified dimension is displayed in reverse direction.
     /// 設定指定維度座標軸是否反向顯示。
     /// </summary>
-    /// <param name="dimension">座標軸維度</param>
-    /// <param name="reverseDirection">反向顯示設定；<see langword="null"/> 表示移除屬性</param>
+    /// <param name="dimension">The axis dimension. / 座標軸維度。</param>
+    /// <param name="reverseDirection">The reverse direction setting; <see langword="null"/> removes the attribute. / 反向顯示設定；<see langword="null"/> 表示移除屬性。</param>
     public void SetAxisReverseDirection(string dimension, bool? reverseDirection) =>
         SetAxisChartBool(dimension, "reverse-direction", reverseDirection);
 
     /// <summary>
+    /// Sets whether the axis of the specified dimension displays scale labels.
     /// 設定指定維度座標軸是否顯示刻度標籤。
     /// </summary>
-    /// <param name="dimension">座標軸維度</param>
-    /// <param name="displayLabels">顯示標籤設定；<see langword="null"/> 表示移除屬性</param>
+    /// <param name="dimension">The axis dimension. / 座標軸維度。</param>
+    /// <param name="displayLabels">The display labels setting; <see langword="null"/> removes the attribute. / 顯示標籤設定；<see langword="null"/> 表示移除屬性。</param>
     public void SetAxisDisplayLabels(string dimension, bool? displayLabels) =>
         SetAxisChartBool(dimension, "display-label", displayLabels);
 
     /// <summary>
+    /// Sets the minimum scale value of the axis for the specified dimension.
     /// 設定指定維度座標軸的刻度最小值。
     /// </summary>
-    /// <param name="dimension">座標軸維度</param>
-    /// <param name="minimum">最小值；<see langword="null"/> 表示移除屬性</param>
+    /// <param name="dimension">The axis dimension. / 座標軸維度。</param>
+    /// <param name="minimum">The minimum value; <see langword="null"/> removes the attribute. / 最小值；<see langword="null"/> 表示移除屬性。</param>
     public void SetAxisMinimum(string dimension, double? minimum) =>
         SetAxisChartDouble(dimension, "minimum", minimum);
 
     /// <summary>
+    /// Sets the maximum scale value of the axis for the specified dimension.
     /// 設定指定維度座標軸的刻度最大值。
     /// </summary>
-    /// <param name="dimension">座標軸維度</param>
-    /// <param name="maximum">最大值；<see langword="null"/> 表示移除屬性</param>
+    /// <param name="dimension">The axis dimension. / 座標軸維度。</param>
+    /// <param name="maximum">The maximum value; <see langword="null"/> removes the attribute. / 最大值；<see langword="null"/> 表示移除屬性。</param>
     public void SetAxisMaximum(string dimension, double? maximum) =>
         SetAxisChartDouble(dimension, "maximum", maximum);
 
     /// <summary>
+    /// Sets the style name of the axis for the specified dimension.
     /// 設定指定維度座標軸的樣式名稱。
     /// </summary>
-    /// <param name="dimension">座標軸維度</param>
-    /// <param name="styleName">樣式名稱；空白值會移除屬性</param>
+    /// <param name="dimension">The axis dimension. / 座標軸維度。</param>
+    /// <param name="styleName">The style name; a blank value removes the attribute. / 樣式名稱；空白值會移除屬性。</param>
     public void SetAxisStyleName(string dimension, string? styleName)
     {
         ValidateAxisDimension(dimension);
@@ -88,11 +95,12 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Sets the grid line visibility of the axis for the specified dimension.
     /// 設定指定維度座標軸的網格線可見性。
     /// </summary>
-    /// <param name="dimension">座標軸維度</param>
-    /// <param name="gridKind">網格線類型</param>
-    /// <param name="visible">是否顯示</param>
+    /// <param name="dimension">The axis dimension. / 座標軸維度。</param>
+    /// <param name="gridKind">The grid line kind. / 網格線類型。</param>
+    /// <param name="visible">Whether the grid line is displayed. / 是否顯示。</param>
     public void SetAxisGrid(string dimension, OdfChartGridKind gridKind, bool visible)
     {
         ValidateAxisDimension(dimension);

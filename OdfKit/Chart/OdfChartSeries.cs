@@ -8,6 +8,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Chart;
 
 /// <summary>
+/// Represents an editable chart data series.
 /// 表示可編輯的圖表資料序列。
 /// </summary>
 public sealed class OdfChartSeries
@@ -23,11 +24,13 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Gets the zero-based index of this series within the chart.
     /// 取得此序列在圖表中的索引（從 0 起算）。
     /// </summary>
     public int Index { get; }
 
     /// <summary>
+    /// Gets or sets the data value cell range address.
     /// 取得或設定資料值儲存格範圍位址。
     /// </summary>
     public string ValuesCellRangeAddress
@@ -43,6 +46,7 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Gets or sets the label cell address.
     /// 取得或設定標籤儲存格位址。
     /// </summary>
     public string? LabelCellAddress
@@ -58,6 +62,7 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Gets or sets the series class (e.g. <c>chart:line</c>, <c>chart:bar</c>).
     /// 取得或設定序列類型（例如 <c>chart:line</c>、<c>chart:bar</c>）。
     /// </summary>
     public string? SeriesClass
@@ -73,6 +78,7 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Gets or sets the series style name.
     /// 取得或設定序列樣式名稱。
     /// </summary>
     public string? StyleName
@@ -88,6 +94,7 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Gets or sets the name of the attached axis (e.g. <c>primary-y</c>).
     /// 取得或設定附著的座標軸名稱（例如 <c>primary-y</c>）。
     /// </summary>
     public string? AttachedAxis
@@ -103,9 +110,10 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Gets all data point style override entries (<c>chart:data-point</c>) in this series.
     /// 取得此序列中所有資料點樣式覆蓋設定（<c>chart:data-point</c>）。
     /// </summary>
-    /// <returns>資料點樣式覆蓋設定清單，依文件中出現順序排列</returns>
+    /// <returns>The list of data point style override entries, in document order. / 資料點樣式覆蓋設定清單，依文件中出現順序排列。</returns>
     public IReadOnlyList<OdfChartDataPointInfo> GetDataPoints()
     {
         List<OdfChartDataPointInfo> points = [];
@@ -125,11 +133,12 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Adds a data point style override entry (<c>chart:data-point</c>).
     /// 新增一筆資料點樣式覆蓋設定（<c>chart:data-point</c>）。
     /// </summary>
-    /// <param name="repeated">此筆設定套用的連續資料點數量，預設為 1</param>
-    /// <param name="styleName">套用的樣式名稱；為 <see langword="null"/> 時不寫入樣式</param>
-    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="repeated"/> 小於 1 時擲出</exception>
+    /// <param name="repeated">The number of consecutive data points this entry applies to; defaults to 1. / 此筆設定套用的連續資料點數量，預設為 1。</param>
+    /// <param name="styleName">The applied style name; no style is written when <see langword="null"/>. / 套用的樣式名稱；為 <see langword="null"/> 時不寫入樣式。</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="repeated"/> is less than 1. / 當 <paramref name="repeated"/> 小於 1 時擲出。</exception>
     public void AddDataPoint(int repeated = 1, string? styleName = null)
     {
         if (repeated < 1)
@@ -152,6 +161,7 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Removes all data point style override entries from this series.
     /// 移除此序列中所有資料點樣式覆蓋設定。
     /// </summary>
     public void ClearDataPoints()
@@ -168,9 +178,10 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Gets the data label setting (<c>chart:data-label</c>) for this series; <see langword="null"/> if not set.
     /// 取得此序列的資料標籤設定（<c>chart:data-label</c>）；若未設定則為 <see langword="null"/>。
     /// </summary>
-    /// <returns>資料標籤設定；若序列中第一個 <c>chart:data-label</c> 不存在則為 <see langword="null"/></returns>
+    /// <returns>The data label setting; <see langword="null"/> if no <c>chart:data-label</c> exists in this series. / 資料標籤設定；若序列中第一個 <c>chart:data-label</c> 不存在則為 <see langword="null"/>。</returns>
     public OdfChartDataLabelInfo? GetDataLabels()
     {
         OdfNode? dataLabel = FindFirstChild("data-label");
@@ -189,9 +200,10 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Sets or removes the data label for this series.
     /// 設定或移除此序列的資料標籤。
     /// </summary>
-    /// <param name="info">資料標籤設定；傳入 <see langword="null"/> 表示移除既有設定</param>
+    /// <param name="info">The data label setting; pass <see langword="null"/> to remove the existing setting. / 資料標籤設定；傳入 <see langword="null"/> 表示移除既有設定。</param>
     public void SetDataLabels(OdfChartDataLabelInfo? info)
     {
         RemoveAllChildren("data-label");
@@ -216,16 +228,18 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Sets or removes the data label for this series according to a common preset combination.
     /// 依常用預設組合設定或移除此序列的資料標籤。
     /// </summary>
-    /// <param name="preset">資料標籤預設組合；<see cref="OdfChartDataLabelPreset.None"/> 表示移除既有設定</param>
+    /// <param name="preset">The data label preset combination; <see cref="OdfChartDataLabelPreset.None"/> removes the existing setting. / 資料標籤預設組合；<see cref="OdfChartDataLabelPreset.None"/> 表示移除既有設定。</param>
     public void SetDataLabelPreset(OdfChartDataLabelPreset preset) =>
         SetDataLabels(preset == OdfChartDataLabelPreset.None ? null : OdfChartDataLabelInfo.FromPreset(preset));
 
     /// <summary>
+    /// Gets the error bar setting (<c>chart:error-indicator</c>) for this series; <see langword="null"/> if not set.
     /// 取得此序列的誤差棒設定（<c>chart:error-indicator</c>）；若未設定則為 <see langword="null"/>。
     /// </summary>
-    /// <returns>誤差棒設定；若序列中第一個 <c>chart:error-indicator</c> 不存在則為 <see langword="null"/></returns>
+    /// <returns>The error bar setting; <see langword="null"/> if no <c>chart:error-indicator</c> exists in this series. / 誤差棒設定；若序列中第一個 <c>chart:error-indicator</c> 不存在則為 <see langword="null"/>。</returns>
     public OdfChartErrorIndicatorInfo? GetErrorIndicator()
     {
         OdfNode? node = FindFirstChild("error-indicator");
@@ -240,9 +254,10 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Sets or removes the error bar for this series.
     /// 設定或移除此序列的誤差棒。
     /// </summary>
-    /// <param name="info">誤差棒設定；傳入 <see langword="null"/> 表示移除既有設定</param>
+    /// <param name="info">The error bar setting; pass <see langword="null"/> to remove the existing setting. / 誤差棒設定；傳入 <see langword="null"/> 表示移除既有設定。</param>
     public void SetErrorIndicator(OdfChartErrorIndicatorInfo? info)
     {
         RemoveAllChildren("error-indicator");
@@ -266,9 +281,10 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Gets the trend line (regression curve) setting (<c>chart:regression-curve</c>) for this series; <see langword="null"/> if not set.
     /// 取得此序列的趨勢線（迴歸曲線）設定（<c>chart:regression-curve</c>）；若未設定則為 <see langword="null"/>。
     /// </summary>
-    /// <returns>趨勢線設定；若序列中第一個 <c>chart:regression-curve</c> 不存在則為 <see langword="null"/></returns>
+    /// <returns>The trend line setting; <see langword="null"/> if no <c>chart:regression-curve</c> exists in this series. / 趨勢線設定；若序列中第一個 <c>chart:regression-curve</c> 不存在則為 <see langword="null"/>。</returns>
     public OdfChartRegressionCurveInfo? GetRegressionCurve()
     {
         OdfNode? node = FindFirstChild("regression-curve");
@@ -276,9 +292,10 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Sets or removes the trend line (regression curve) for this series.
     /// 設定或移除此序列的趨勢線（迴歸曲線）。
     /// </summary>
-    /// <param name="info">趨勢線設定；傳入 <see langword="null"/> 表示移除既有設定</param>
+    /// <param name="info">The trend line setting; pass <see langword="null"/> to remove the existing setting. / 趨勢線設定；傳入 <see langword="null"/> 表示移除既有設定。</param>
     public void SetRegressionCurve(OdfChartRegressionCurveInfo? info)
     {
         RemoveAllChildren("regression-curve");
@@ -297,9 +314,10 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Gets the mean value line setting (<c>chart:mean-value</c>) for this series; <see langword="null"/> if not set.
     /// 取得此序列的平均值線設定（<c>chart:mean-value</c>）；若未設定則為 <see langword="null"/>。
     /// </summary>
-    /// <returns>平均值線設定；若序列未定義 <c>chart:mean-value</c> 則為 <see langword="null"/></returns>
+    /// <returns>The mean value line setting; <see langword="null"/> if this series does not define <c>chart:mean-value</c>. / 平均值線設定；若序列未定義 <c>chart:mean-value</c> 則為 <see langword="null"/>。</returns>
     public OdfChartMeanValueInfo? GetMeanValue()
     {
         OdfNode? node = FindFirstChild("mean-value");
@@ -307,9 +325,10 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Sets or removes the mean value line for this series.
     /// 設定或移除此序列的平均值線。
     /// </summary>
-    /// <param name="info">平均值線設定；傳入 <see langword="null"/> 表示移除既有設定</param>
+    /// <param name="info">The mean value line setting; pass <see langword="null"/> to remove the existing setting. / 平均值線設定；傳入 <see langword="null"/> 表示移除既有設定。</param>
     public void SetMeanValue(OdfChartMeanValueInfo? info)
     {
         RemoveAllChildren("mean-value");
@@ -328,6 +347,9 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// The required child element order of <c>chart:series</c> per the OASIS ODF 1.4 schema:
+    /// <c>chart:domain*</c>, <c>chart:mean-value?</c>, <c>chart:regression-curve*</c>,
+    /// <c>chart:error-indicator*</c>, <c>chart:data-point*</c>, <c>chart:data-label?</c>.
     /// <c>chart:series</c> 子元素依 OASIS ODF 1.4 schema 規定的順序：
     /// <c>chart:domain*</c>、<c>chart:mean-value?</c>、<c>chart:regression-curve*</c>、
     /// <c>chart:error-indicator*</c>、<c>chart:data-point*</c>、<c>chart:data-label?</c>。
@@ -385,6 +407,7 @@ public sealed class OdfChartSeries
     }
 
     /// <summary>
+    /// Gets or sets the chart automatic style of this data series.
     /// 取得或設定此資料序列的圖表自動樣式。
     /// </summary>
     public OdfChartStyle Style

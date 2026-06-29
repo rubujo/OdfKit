@@ -11,9 +11,10 @@ public partial class OdfChartDocument
     #region Series & Axis
 
     /// <summary>
+    /// Sets the cell range address of the X-axis category labels.
     /// 設定 X 軸分類標籤的儲存格範圍位址。
     /// </summary>
-    /// <param name="cellRangeAddress">分類標籤的儲存格範圍位址</param>
+    /// <param name="cellRangeAddress">The cell range address of the category labels. / 分類標籤的儲存格範圍位址。</param>
     public void SetCategories(string cellRangeAddress)
     {
         if (string.IsNullOrWhiteSpace(cellRangeAddress))
@@ -27,10 +28,11 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Gets the title of the axis for the specified dimension.
     /// 取得指定維度座標軸的標題。
     /// </summary>
-    /// <param name="dimension">座標軸維度，例如 x、y 或 z</param>
-    /// <returns>座標軸標題；若未設定則為 <see langword="null"/></returns>
+    /// <param name="dimension">The axis dimension, e.g. x, y, or z. / 座標軸維度，例如 x、y 或 z。</param>
+    /// <returns>The axis title; <see langword="null"/> if not set. / 座標軸標題；若未設定則為 <see langword="null"/>。</returns>
     public string? GetAxisTitle(string dimension)
     {
         ValidateAxisDimension(dimension);
@@ -43,10 +45,11 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Sets the title of the axis for the specified dimension.
     /// 設定指定維度座標軸的標題。
     /// </summary>
-    /// <param name="dimension">座標軸維度，例如 x、y 或 z</param>
-    /// <param name="title">座標軸標題；空白值會移除既有標題</param>
+    /// <param name="dimension">The axis dimension, e.g. x, y, or z. / 座標軸維度，例如 x、y 或 z。</param>
+    /// <param name="title">The axis title; a blank value removes the existing title. / 座標軸標題；空白值會移除既有標題。</param>
     public void SetAxisTitle(string dimension, string? title)
     {
         ValidateAxisDimension(dimension);
@@ -72,11 +75,12 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Adds a placeholder data series node.
     /// 新增資料序列佔位節點。
     /// </summary>
-    /// <param name="valuesCellRangeAddress">資料值儲存格範圍位址</param>
-    /// <param name="labelCellAddress">選用的標籤儲存格位址</param>
-    /// <returns>新增的序列節點</returns>
+    /// <param name="valuesCellRangeAddress">The data value cell range address. / 資料值儲存格範圍位址。</param>
+    /// <param name="labelCellAddress">The optional label cell address. / 選用的標籤儲存格位址。</param>
+    /// <returns>The newly added series node. / 新增的序列節點。</returns>
     public OdfNode AddSeries(string valuesCellRangeAddress, string? labelCellAddress = null)
     {
         if (string.IsNullOrWhiteSpace(valuesCellRangeAddress))

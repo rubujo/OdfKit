@@ -403,6 +403,306 @@ public sealed class OdfMathToken
         return new OdfMathToken(OdfMathTokenKind.Apply, operatorName, null, null, RequireChildren(operands, nameof(operands)));
     }
 
+    /// <summary>
+    /// Gets the numerator of a <see cref="OdfMathTokenKind.Fraction"/> token (the <c>mfrac</c> first child).
+    /// 取得分數（<see cref="OdfMathTokenKind.Fraction"/>，對應 <c>mfrac</c>）token 的分子。
+    /// </summary>
+    /// <exception cref="InvalidOperationException">When this token is not a Fraction. / 當此 token 不是分數時擲出。</exception>
+    public OdfMathToken Numerator
+    {
+        get
+        {
+            RequireKind(OdfMathTokenKind.Fraction);
+            return Base!;
+        }
+    }
+
+    /// <summary>
+    /// Gets the denominator of a <see cref="OdfMathTokenKind.Fraction"/> token (the <c>mfrac</c> second child).
+    /// 取得分數（<see cref="OdfMathTokenKind.Fraction"/>，對應 <c>mfrac</c>）token 的分母。
+    /// </summary>
+    /// <exception cref="InvalidOperationException">When this token is not a Fraction. / 當此 token 不是分數時擲出。</exception>
+    public OdfMathToken Denominator
+    {
+        get
+        {
+            RequireKind(OdfMathTokenKind.Fraction);
+            return Script!;
+        }
+    }
+
+    /// <summary>
+    /// Returns a new Fraction token with the numerator replaced (the original token is not modified).
+    /// 回傳替換分子後的新分數 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="numerator">The new numerator token. / 新的分子 token。</param>
+    /// <returns>The new <see cref="OdfMathToken"/> with the replaced numerator. / 替換分子後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Fraction. / 當此 token 不是分數時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When <paramref name="numerator"/> is null. / 當 <paramref name="numerator"/> 為 null 時擲出。</exception>
+    public OdfMathToken WithNumerator(OdfMathToken numerator)
+    {
+        RequireKind(OdfMathTokenKind.Fraction);
+        RequireNotNull(numerator, nameof(numerator));
+        return Fraction(numerator, Denominator);
+    }
+
+    /// <summary>
+    /// Returns a new Fraction token with the denominator replaced (the original token is not modified).
+    /// 回傳替換分母後的新分數 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="denominator">The new denominator token. / 新的分母 token。</param>
+    /// <returns>The new <see cref="OdfMathToken"/> with the replaced denominator. / 替換分母後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Fraction. / 當此 token 不是分數時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When <paramref name="denominator"/> is null. / 當 <paramref name="denominator"/> 為 null 時擲出。</exception>
+    public OdfMathToken WithDenominator(OdfMathToken denominator)
+    {
+        RequireKind(OdfMathTokenKind.Fraction);
+        RequireNotNull(denominator, nameof(denominator));
+        return Fraction(Numerator, denominator);
+    }
+
+    /// <summary>
+    /// Gets the radicand of a <see cref="OdfMathTokenKind.Radical"/> token (the value under the root).
+    /// 取得根號（<see cref="OdfMathTokenKind.Radical"/>）token 的被開方數。
+    /// </summary>
+    /// <exception cref="InvalidOperationException">When this token is not a Radical. / 當此 token 不是根號時擲出。</exception>
+    public OdfMathToken Radicand
+    {
+        get
+        {
+            RequireKind(OdfMathTokenKind.Radical);
+            return Base!;
+        }
+    }
+
+    /// <summary>
+    /// Gets the root index of a <see cref="OdfMathTokenKind.Radical"/> token; null for a plain square root.
+    /// 取得根號（<see cref="OdfMathTokenKind.Radical"/>）token 的根指數；平方根時為 null。
+    /// </summary>
+    /// <exception cref="InvalidOperationException">When this token is not a Radical. / 當此 token 不是根號時擲出。</exception>
+    public OdfMathToken? RootIndex
+    {
+        get
+        {
+            RequireKind(OdfMathTokenKind.Radical);
+            return Script;
+        }
+    }
+
+    /// <summary>
+    /// Returns a new Radical token with the radicand replaced (the original token is not modified).
+    /// 回傳替換被開方數後的新根號 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="radicand">The new radicand token. / 新的被開方數 token。</param>
+    /// <returns>The new <see cref="OdfMathToken"/> with the replaced radicand. / 替換被開方數後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Radical. / 當此 token 不是根號時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When <paramref name="radicand"/> is null. / 當 <paramref name="radicand"/> 為 null 時擲出。</exception>
+    public OdfMathToken WithRadicand(OdfMathToken radicand)
+    {
+        RequireKind(OdfMathTokenKind.Radical);
+        RequireNotNull(radicand, nameof(radicand));
+        return Radical(radicand, RootIndex);
+    }
+
+    /// <summary>
+    /// Returns a new Radical token with the root index replaced; pass null to turn it back into a plain square root.
+    /// 回傳替換根指數後的新根號 token；傳入 null 可還原為平方根（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="rootIndex">The new root index token, or null for a square root. / 新的根指數 token，或 null 表示平方根。</param>
+    /// <returns>The new <see cref="OdfMathToken"/> with the replaced root index. / 替換根指數後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Radical. / 當此 token 不是根號時擲出。</exception>
+    public OdfMathToken WithRootIndex(OdfMathToken? rootIndex)
+    {
+        RequireKind(OdfMathTokenKind.Radical);
+        return Radical(Radicand, rootIndex);
+    }
+
+    /// <summary>
+    /// Gets the exponent of a <see cref="OdfMathTokenKind.Superscript"/> token (the <c>msup</c> second child).
+    /// 取得上標（<see cref="OdfMathTokenKind.Superscript"/>，對應 <c>msup</c>）token 的指數。
+    /// </summary>
+    /// <exception cref="InvalidOperationException">When this token is not a Superscript. / 當此 token 不是上標時擲出。</exception>
+    public OdfMathToken Exponent
+    {
+        get
+        {
+            RequireKind(OdfMathTokenKind.Superscript);
+            return Script!;
+        }
+    }
+
+    /// <summary>
+    /// Returns a new Superscript token with the exponent replaced (the original token is not modified).
+    /// 回傳替換指數後的新上標 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="exponent">The new exponent token. / 新的指數 token。</param>
+    /// <returns>The new <see cref="OdfMathToken"/> with the replaced exponent. / 替換指數後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Superscript. / 當此 token 不是上標時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When <paramref name="exponent"/> is null. / 當 <paramref name="exponent"/> 為 null 時擲出。</exception>
+    public OdfMathToken WithExponent(OdfMathToken exponent)
+    {
+        RequireKind(OdfMathTokenKind.Superscript);
+        RequireNotNull(exponent, nameof(exponent));
+        return Superscript(Base!, exponent);
+    }
+
+    /// <summary>
+    /// Gets the subscript index of a <see cref="OdfMathTokenKind.Subscript"/> token (the <c>msub</c> second child).
+    /// 取得下標（<see cref="OdfMathTokenKind.Subscript"/>，對應 <c>msub</c>）token 的下標索引。
+    /// </summary>
+    /// <exception cref="InvalidOperationException">When this token is not a Subscript. / 當此 token 不是下標時擲出。</exception>
+    public OdfMathToken SubscriptIndex
+    {
+        get
+        {
+            RequireKind(OdfMathTokenKind.Subscript);
+            return Script!;
+        }
+    }
+
+    /// <summary>
+    /// Returns a new Subscript token with the subscript index replaced (the original token is not modified).
+    /// 回傳替換下標索引後的新下標 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="subscriptIndex">The new subscript index token. / 新的下標索引 token。</param>
+    /// <returns>The new <see cref="OdfMathToken"/> with the replaced subscript index. / 替換下標索引後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Subscript. / 當此 token 不是下標時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When <paramref name="subscriptIndex"/> is null. / 當 <paramref name="subscriptIndex"/> 為 null 時擲出。</exception>
+    public OdfMathToken WithSubscriptIndex(OdfMathToken subscriptIndex)
+    {
+        RequireKind(OdfMathTokenKind.Subscript);
+        RequireNotNull(subscriptIndex, nameof(subscriptIndex));
+        return Subscript(Base!, subscriptIndex);
+    }
+
+    /// <summary>
+    /// Gets the number of rows of a <see cref="OdfMathTokenKind.Matrix"/> token (the <c>mtable</c> row count).
+    /// 取得矩陣（<see cref="OdfMathTokenKind.Matrix"/>，對應 <c>mtable</c>）token 的列數。
+    /// </summary>
+    /// <exception cref="InvalidOperationException">When this token is not a Matrix. / 當此 token 不是矩陣時擲出。</exception>
+    public int RowCount
+    {
+        get
+        {
+            RequireKind(OdfMathTokenKind.Matrix);
+            return Children?.Count ?? 0;
+        }
+    }
+
+    /// <summary>
+    /// Gets the row at the specified index of a Matrix token (a <see cref="OdfMathTokenKind.Row"/> token).
+    /// 取得矩陣 token 指定索引的一列（一個 <see cref="OdfMathTokenKind.Row"/> token）。
+    /// </summary>
+    /// <param name="rowIndex">The zero-based row index. / 以零起始的列索引。</param>
+    /// <returns>The row token at the specified index. / 指定索引的列 token。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Matrix. / 當此 token 不是矩陣時擲出。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="rowIndex"/> is out of range. / 當 <paramref name="rowIndex"/> 超出範圍時擲出。</exception>
+    public OdfMathToken GetRow(int rowIndex)
+    {
+        RequireKind(OdfMathTokenKind.Matrix);
+        return GetChild(rowIndex);
+    }
+
+    /// <summary>
+    /// Gets the cell at the specified row and column of a Matrix token.
+    /// 取得矩陣 token 指定列、欄位置的儲存格 token。
+    /// </summary>
+    /// <param name="rowIndex">The zero-based row index. / 以零起始的列索引。</param>
+    /// <param name="columnIndex">The zero-based column index. / 以零起始的欄索引。</param>
+    /// <returns>The cell token at the specified position. / 指定位置的儲存格 token。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Matrix. / 當此 token 不是矩陣時擲出。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="rowIndex"/> or <paramref name="columnIndex"/> is out of range. / 當 <paramref name="rowIndex"/> 或 <paramref name="columnIndex"/> 超出範圍時擲出。</exception>
+    public OdfMathToken GetCell(int rowIndex, int columnIndex)
+    {
+        OdfMathToken row = GetRow(rowIndex);
+        return row.GetChild(columnIndex);
+    }
+
+    /// <summary>
+    /// Returns a new Matrix token with the row at the specified index replaced (the original token is not modified).
+    /// 回傳替換指定列後的新矩陣 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="rowIndex">The zero-based row index to replace. / 要替換的以零起始列索引。</param>
+    /// <param name="row">The new row token. / 新的列 token。</param>
+    /// <returns>The new <see cref="OdfMathToken"/> with the replaced row. / 替換指定列後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Matrix. / 當此 token 不是矩陣時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When <paramref name="row"/> is null. / 當 <paramref name="row"/> 為 null 時擲出。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="rowIndex"/> is out of range. / 當 <paramref name="rowIndex"/> 超出範圍時擲出。</exception>
+    public OdfMathToken WithRow(int rowIndex, OdfMathToken row)
+    {
+        RequireKind(OdfMathTokenKind.Matrix);
+        return WithChild(rowIndex, row);
+    }
+
+    /// <summary>
+    /// Returns a new Matrix token with the cell at the specified row and column replaced (the original token is not modified).
+    /// 回傳替換指定列、欄儲存格後的新矩陣 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="rowIndex">The zero-based row index. / 以零起始的列索引。</param>
+    /// <param name="columnIndex">The zero-based column index. / 以零起始的欄索引。</param>
+    /// <param name="cell">The new cell token. / 新的儲存格 token。</param>
+    /// <returns>The new <see cref="OdfMathToken"/> with the replaced cell. / 替換指定儲存格後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Matrix. / 當此 token 不是矩陣時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When <paramref name="cell"/> is null. / 當 <paramref name="cell"/> 為 null 時擲出。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="rowIndex"/> or <paramref name="columnIndex"/> is out of range. / 當 <paramref name="rowIndex"/> 或 <paramref name="columnIndex"/> 超出範圍時擲出。</exception>
+    public OdfMathToken WithCell(int rowIndex, int columnIndex, OdfMathToken cell)
+    {
+        OdfMathToken row = GetRow(rowIndex);
+        OdfMathToken updatedRow = row.WithChild(columnIndex, cell);
+        return WithRow(rowIndex, updatedRow);
+    }
+
+    /// <summary>
+    /// Returns a new Matrix token with the specified row appended at the end (the original token is not modified).
+    /// 回傳在尾端新增一列後的新矩陣 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="row">The row token to append, built with <see cref="Row(OdfMathToken[])"/>. / 要新增的列 token，須以 <see cref="Row(OdfMathToken[])"/> 建立。</param>
+    /// <returns>The new <see cref="OdfMathToken"/> with the appended row. / 新增列後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Matrix. / 當此 token 不是矩陣時擲出。</exception>
+    /// <exception cref="ArgumentNullException">When <paramref name="row"/> is null. / 當 <paramref name="row"/> 為 null 時擲出。</exception>
+    public OdfMathToken AddRow(OdfMathToken row)
+    {
+        RequireKind(OdfMathTokenKind.Matrix);
+        RequireNotNull(row, nameof(row));
+        var rows = new List<OdfMathToken>(Children!) { row };
+        return new OdfMathToken(Kind, Text, Base, Script, rows, Attributes);
+    }
+
+    /// <summary>
+    /// Returns a new Matrix token with the row at the specified index removed (the original token is not modified).
+    /// 回傳移除指定列後的新矩陣 token（原 token 不會被修改）。
+    /// </summary>
+    /// <param name="rowIndex">The zero-based row index to remove. / 要移除的以零起始列索引。</param>
+    /// <returns>The new <see cref="OdfMathToken"/> with the row removed. / 移除指定列後的新 <see cref="OdfMathToken"/>。</returns>
+    /// <exception cref="InvalidOperationException">When this token is not a Matrix, or when removing would leave the matrix without any row. / 當此 token 不是矩陣，或移除後矩陣將不剩任何列時擲出。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">When <paramref name="rowIndex"/> is out of range. / 當 <paramref name="rowIndex"/> 超出範圍時擲出。</exception>
+    public OdfMathToken RemoveRow(int rowIndex)
+    {
+        RequireKind(OdfMathTokenKind.Matrix);
+        int childCount = Children?.Count ?? 0;
+        if (rowIndex < 0 || rowIndex >= childCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(rowIndex));
+        }
+
+        if (childCount <= 1)
+        {
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfMathToken_SubtokenCannotBeEmpty"));
+        }
+
+        var rows = new List<OdfMathToken>(Children!);
+        rows.RemoveAt(rowIndex);
+        return new OdfMathToken(Kind, Text, Base, Script, rows, Attributes);
+    }
+
+    private void RequireKind(OdfMathTokenKind expected)
+    {
+        if (Kind != expected)
+        {
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfMathToken_UnexpectedKind", expected, Kind));
+        }
+    }
+
     private static void RequireNotNull(OdfMathToken? token, string paramName)
     {
         if (token is null)

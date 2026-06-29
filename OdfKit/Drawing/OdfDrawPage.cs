@@ -8,23 +8,27 @@ using OdfKit.Styles;
 namespace OdfKit.Drawing;
 
 /// <summary>
+/// Represents an ODF drawing page.
 /// 表示 ODF 繪圖頁面（Drawing Page）的類別。
 /// </summary>
-/// <param name="node">底層的 <see cref="OdfNode"/> 執行個體</param>
-/// <param name="doc">所屬的繪圖文件執行個體</param>
+/// <param name="node">The underlying <see cref="OdfNode"/> instance. / 底層的 <see cref="OdfNode"/> 執行個體。</param>
+/// <param name="doc">The owning drawing document instance. / 所屬的繪圖文件執行個體。</param>
 public partial class OdfDrawPage(OdfNode node, DrawingDocument doc)
 {
     /// <summary>
+    /// Gets the underlying ODF node.
     /// 取得底層的 ODF 節點。
     /// </summary>
     public OdfNode Node { get; } = node;
 
     /// <summary>
+    /// Gets the owning drawing document.
     /// 取得所屬的繪圖文件。
     /// </summary>
     public DrawingDocument Document { get; } = doc;
 
     /// <summary>
+    /// Gets or sets the name of the drawing page.
     /// 取得或設定繪圖頁面的名稱。
     /// </summary>
     public string Name
@@ -34,6 +38,7 @@ public partial class OdfDrawPage(OdfNode node, DrawingDocument doc)
     }
 
     /// <summary>
+    /// Gets or sets the master page name used by the drawing page.
     /// 取得或設定繪圖頁面所使用的母片名稱。
     /// </summary>
     public string? MasterPageName
@@ -43,6 +48,7 @@ public partial class OdfDrawPage(OdfNode node, DrawingDocument doc)
     }
 
     /// <summary>
+    /// Gets the list of text boxes on the drawing page.
     /// 取得繪圖頁面上的文字方塊清單。
     /// </summary>
     public IReadOnlyList<OdfTextBox> TextBoxes => FindDrawingObjects(
@@ -50,6 +56,7 @@ public partial class OdfDrawPage(OdfNode node, DrawingDocument doc)
         node => new OdfTextBox(node, Document));
 
     /// <summary>
+    /// Gets the list of pictures on the drawing page.
     /// 取得繪圖頁面上的圖片清單。
     /// </summary>
     public IReadOnlyList<OdfPicture> Pictures => FindDrawingObjects(
@@ -57,6 +64,7 @@ public partial class OdfDrawPage(OdfNode node, DrawingDocument doc)
         node => new OdfPicture(node, Document));
 
     /// <summary>
+    /// Gets the list of generic shapes on the drawing page.
     /// 取得繪圖頁面上的一般圖形清單。
     /// </summary>
     public IReadOnlyList<OdfShape> Shapes => FindDrawingObjects(

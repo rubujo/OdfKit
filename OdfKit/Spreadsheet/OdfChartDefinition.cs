@@ -33,7 +33,24 @@ public enum OdfChartType
     /// <summary>
     /// 泡泡圖。
     /// </summary>
-    Bubble
+    Bubble,
+
+    /// <summary>
+    /// 環圈圖。
+    /// </summary>
+    Ring,
+
+    /// <summary>
+    /// 雷達圖（蜘蛛圖／網圖）。
+    /// </summary>
+    Radar,
+
+    /// <summary>
+    /// 股票圖；建立後可搭配 <see cref="OdfKit.Chart.OdfChartDocument"/> 的
+    /// <c>SetStockGainMarkerStyleName</c>／<c>SetStockLossMarkerStyleName</c>／
+    /// <c>SetStockRangeLineStyleName</c> 設定股票圖專屬標記樣式。
+    /// </summary>
+    Stock
 }
 
 /// <summary>

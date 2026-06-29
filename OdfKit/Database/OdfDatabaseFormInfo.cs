@@ -1,13 +1,14 @@
 ﻿namespace OdfKit.Database;
 
 /// <summary>
+/// Represents summary information for an ODB database form component.
 /// 表示 ODB 資料庫表單元件的摘要資訊。
 /// </summary>
-/// <param name="name">表單名稱（<c>db:name</c>）</param>
-/// <param name="href">表單資源參照路徑（<c>xlink:href</c>）</param>
-/// <param name="title">顯示標題</param>
-/// <param name="description">描述文字</param>
-/// <param name="asTemplate">是否作為範本（<c>db:as-template</c>）</param>
+/// <param name="name">The form name (<c>db:name</c>). / 表單名稱（<c>db:name</c>）。</param>
+/// <param name="href">The form resource reference path (<c>xlink:href</c>). / 表單資源參照路徑（<c>xlink:href</c>）。</param>
+/// <param name="title">The display title. / 顯示標題。</param>
+/// <param name="description">The description text. / 描述文字。</param>
+/// <param name="asTemplate">Whether it is used as a template (<c>db:as-template</c>). / 是否作為範本（<c>db:as-template</c>）。</param>
 public sealed class OdfDatabaseFormInfo(
     string name,
     string? href,
@@ -16,26 +17,31 @@ public sealed class OdfDatabaseFormInfo(
     bool? asTemplate)
 {
     /// <summary>
+    /// Gets the form name.
     /// 取得表單名稱。
     /// </summary>
     public string Name { get; } = name ?? string.Empty;
 
     /// <summary>
+    /// Gets the form resource reference path.
     /// 取得表單資源參照路徑。
     /// </summary>
     public string? Href { get; } = href;
 
     /// <summary>
+    /// Gets the display title.
     /// 取得顯示標題。
     /// </summary>
     public string? Title { get; } = title;
 
     /// <summary>
+    /// Gets the description text.
     /// 取得描述文字。
     /// </summary>
     public string? Description { get; } = description;
 
     /// <summary>
+    /// Gets whether it is used as a template.
     /// 取得是否作為範本。
     /// </summary>
     public bool? AsTemplate { get; } = asTemplate;

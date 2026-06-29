@@ -6,26 +6,31 @@ using OdfKit.Core;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Base class for nodes in the ODF Document Object Model (DOM).
 /// 表示 ODF 文件物件模型 (DOM) 中的節點基底類別。
 /// </summary>
 public partial class OdfNode
 {
     /// <summary>
+    /// Gets the type of the node.
     /// 取得節點的類型。
     /// </summary>
     public OdfNodeType NodeType { get; }
 
     /// <summary>
+    /// Gets the local name of the node.
     /// 取得節點的局部名稱。
     /// </summary>
     public string LocalName { get; }
 
     /// <summary>
+    /// Gets the namespace URI of the node.
     /// 取得節點的命名空間 URI。
     /// </summary>
     public string NamespaceUri { get; }
 
     /// <summary>
+    /// Gets or sets the namespace prefix of the node.
     /// 取得或設定節點的命名空間前綴。
     /// </summary>
     public string? Prefix { get; set; }
@@ -33,6 +38,7 @@ public partial class OdfNode
     private string? _value; // 用於文字節點
 
     /// <summary>
+    /// Gets the parent node of this node.
     /// 取得此節點的父節點。
     /// </summary>
     public OdfNode? Parent { get; internal set; }
@@ -40,6 +46,7 @@ public partial class OdfNode
     private OdfDocument? _document;
 
     /// <summary>
+    /// Gets the ODF document this node belongs to.
     /// 取得此節點所屬的 ODF 文件。
     /// </summary>
     public OdfDocument? Document
@@ -57,11 +64,13 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Gets the child node collection of this node (a doubly linked list with O(1) insert/remove).
     /// 取得此節點的子節點集合（雙向鏈結串列；插入／移除為 O(1)）。
     /// </summary>
     public OdfNodeChildList Children { get; }
 
     /// <summary>
+    /// Gets the attribute dictionary of this node.
     /// 取得此節點的屬性字典。
     /// </summary>
     public Dictionary<OdfAttributeName, string> Attributes { get; } = new(OdfAttributeNameComparer.Instance);
@@ -69,6 +78,7 @@ public partial class OdfNode
     private readonly Dictionary<OdfAttributeName, string> _attributePrefixes = new(OdfAttributeNameComparer.Instance);
 
     /// <summary>
+    /// Gets or sets a dirty flag indicating whether this node has been added or modified, used for automatic style deduplication.
     /// 取得或設定標記此節點是否被新增或修改 (Dirty Flag)，用於自動樣式去重。
     /// </summary>
     public bool IsModified { get; set; }
@@ -79,12 +89,13 @@ public partial class OdfNode
     internal int SiblingIndex { get; set; } = -1;
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfNode"/> class.
     /// 初始化 <see cref="OdfNode"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="nodeType">節點類型</param>
-    /// <param name="localName">局部名稱</param>
-    /// <param name="namespaceUri">命名空間 URI</param>
-    /// <param name="prefix">命名空間前綴</param>
+    /// <param name="nodeType">The node type. / 節點類型。</param>
+    /// <param name="localName">The local name. / 局部名稱。</param>
+    /// <param name="namespaceUri">The namespace URI. / 命名空間 URI。</param>
+    /// <param name="prefix">The namespace prefix. / 命名空間前綴。</param>
     public OdfNode(OdfNodeType nodeType, string localName, string namespaceUri, string? prefix = null)
     {
         NodeType = nodeType;
@@ -95,18 +106,20 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="OdfNode"/> class.
     /// 初始化 <see cref="OdfNode"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="nodeType">節點類型</param>
-    /// <param name="localName">局部名稱</param>
-    /// <param name="namespaceUri">命名空間</param>
-    /// <param name="prefix">命名空間前綴</param>
+    /// <param name="nodeType">The node type. / 節點類型。</param>
+    /// <param name="localName">The local name. / 局部名稱。</param>
+    /// <param name="namespaceUri">The namespace. / 命名空間。</param>
+    /// <param name="prefix">The namespace prefix. / 命名空間前綴。</param>
     public OdfNode(OdfNodeType nodeType, string localName, XNamespace namespaceUri, string? prefix = null)
         : this(nodeType, localName, namespaceUri.NamespaceName, prefix)
     {
     }
 
     /// <summary>
+    /// Recursively resets the modified flag of this node and all of its child nodes to <see langword="false"/>.
     /// 遞迴重設此節點及其所有子節點的修改標記為 <see langword="false"/>。
     /// </summary>
     public void ResetModifiedState()
@@ -119,6 +132,7 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Gets or sets the text content contained by the node.
     /// 取得或設定節點內含的文字內容。
     /// </summary>
     /// <remarks>
@@ -171,9 +185,10 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Walks up to the root node to get the ODF version of the document this node belongs to.
     /// 向上追溯至根節點，取得此節點所屬文件的 ODF 版本。
     /// </summary>
-    /// <returns>所屬文件的 ODF 版本</returns>
+    /// <returns>The ODF version of the owning document. / 所屬文件的 ODF 版本。</returns>
     public OdfVersion GetDocumentVersion()
     {
         OdfNode current = this;
@@ -220,6 +235,7 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Invalidates the style cache of this node. The base class implementation does nothing.
     /// 使此節點的樣式快取失效。基底類別實作不執行任何動作。
     /// </summary>
     public virtual void InvalidateStyle()
@@ -233,10 +249,11 @@ public partial class OdfNode
     internal bool _isLazy;
 
     /// <summary>
+    /// Attempts to get the byte range of this node within the source UTF-8 XML buffer.
     /// 嘗試取得此節點在來源 UTF-8 XML 緩衝區中的位元組範圍。
     /// </summary>
-    /// <param name="range">若存在來源索引，則為完整元素與內容區段的位元組範圍</param>
-    /// <returns>若此節點帶有來源 XML 位元組索引則為 <see langword="true"/></returns>
+    /// <param name="range">The byte range of the full element and content segment, if a source index exists. / 若存在來源索引，則為完整元素與內容區段的位元組範圍。</param>
+    /// <returns><see langword="true"/> if this node carries a source XML byte index. / 若此節點帶有來源 XML 位元組索引則為 <see langword="true"/>。</returns>
     public bool TryGetXmlByteRange(out OdfXmlByteRange range)
     {
         if (_xmlByteRange is OdfXmlByteRange existing)
@@ -250,6 +267,7 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Ensures that lazily parsed child nodes have been materialized.
     /// 確保延遲解析的子節點已具現化。
     /// </summary>
     public void EnsureMaterialized()
@@ -402,24 +420,27 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Attempts to write this node's XML using a custom override. If it returns <see langword="true"/>, default serialization is skipped.
     /// 嘗試自訂寫出 XML。若傳回 <see langword="true"/>，則略過預設的序列化行為。
     /// </summary>
-    /// <param name="writer">XML 寫入器</param>
-    /// <param name="nsDict">命名空間宣告字典</param>
-    /// <returns>若已由該節點接管寫出則為 <see langword="true"/>；否則為 <see langword="false"/></returns>
+    /// <param name="writer">The XML writer. / XML 寫入器。</param>
+    /// <param name="nsDict">The namespace declaration dictionary. / 命名空間宣告字典。</param>
+    /// <returns><see langword="true"/> if this node has taken over writing; otherwise <see langword="false"/>. / 若已由該節點接管寫出則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
     public virtual bool TryWriteOverride(System.Xml.XmlWriter writer, Dictionary<string, string> nsDict) => false;
 }
 
 /// <summary>
+/// Static class providing extension methods for <see cref="OdfNode"/>.
 /// 提供 <see cref="OdfNode"/> 擴充方法的靜態類別。
 /// </summary>
 public static class OdfNodeExtensions
 {
     /// <summary>
+    /// Gets all descendant nodes of this node.
     /// 取得此節點的所有後代節點。
     /// </summary>
-    /// <param name="node">目前節點</param>
-    /// <returns>後代節點的列舉</returns>
+    /// <param name="node">The current node. / 目前節點。</param>
+    /// <returns>An enumeration of descendant nodes. / 後代節點的列舉。</returns>
     public static IEnumerable<OdfNode> Descendants(this OdfNode node)
     {
         if (node is null)
@@ -435,12 +456,13 @@ public static class OdfNodeExtensions
     }
 
     /// <summary>
+    /// Finds the first child element with the specified local name and namespace URI.
     /// 尋找具有指定局部名稱與命名空間 URI 的第一個子元素。
     /// </summary>
-    /// <param name="node">目前節點</param>
-    /// <param name="localName">要尋找的局部名稱</param>
-    /// <param name="nsUri">要尋找的命名空間 URI</param>
-    /// <returns>符合的第一個子元素；如果找不到，則為 <see langword="null"/></returns>
+    /// <param name="node">The current node. / 目前節點。</param>
+    /// <param name="localName">The local name to find. / 要尋找的局部名稱。</param>
+    /// <param name="nsUri">The namespace URI to find. / 要尋找的命名空間 URI。</param>
+    /// <returns>The first matching child element, or <see langword="null"/> if not found. / 符合的第一個子元素；如果找不到，則為 <see langword="null"/>。</returns>
     public static OdfNode? FindChildElement(this OdfNode node, string localName, string nsUri)
     {
         if (node is null)

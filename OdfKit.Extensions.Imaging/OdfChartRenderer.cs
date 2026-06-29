@@ -60,7 +60,8 @@ public static class OdfChartRenderer
                     plot.Title(title!);
                 }
 
-                if (chartClass.Contains("pie", StringComparison.OrdinalIgnoreCase))
+                if (chartClass.Contains("circle", StringComparison.OrdinalIgnoreCase) ||
+                    chartClass.Contains("pie", StringComparison.OrdinalIgnoreCase))
                 {
                     if (seriesList.Count > 0)
                     {

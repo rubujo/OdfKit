@@ -7,9 +7,10 @@ namespace OdfKit.Chart;
 public partial class OdfChartDocument
 {
     /// <summary>
+    /// Gets the configuration definition information for the current chart.
     /// 取得目前圖表的設定定義資訊。
     /// </summary>
-    /// <returns>包含圖表屬性的 <see cref="OdfChartDefinition"/> 執行個體</returns>
+    /// <returns>An <see cref="OdfChartDefinition"/> instance containing the chart properties. / 包含圖表屬性的 <see cref="OdfChartDefinition"/> 執行個體。</returns>
     public OdfChartDefinition GetChartDefinition()
     {
         OdfChartType chartType = ParseChartType(ChartClass);
@@ -57,10 +58,13 @@ public partial class OdfChartDocument
     private static OdfChartType ParseChartType(string? chartClass) => chartClass switch
     {
         "chart:line" or "line" => OdfChartType.Line,
-        "chart:pie" or "pie" => OdfChartType.Pie,
+        "chart:circle" or "circle" or "chart:pie" or "pie" => OdfChartType.Pie,
         "chart:area" or "area" => OdfChartType.Area,
         "chart:scatter" or "scatter" => OdfChartType.Scatter,
         "chart:bubble" or "bubble" => OdfChartType.Bubble,
+        "chart:ring" or "ring" => OdfChartType.Ring,
+        "chart:radar" or "radar" => OdfChartType.Radar,
+        "chart:stock" or "stock" => OdfChartType.Stock,
         _ => OdfChartType.Bar,
     };
 }

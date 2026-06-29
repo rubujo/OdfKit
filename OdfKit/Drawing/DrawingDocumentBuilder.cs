@@ -7,6 +7,7 @@ using OdfKit.Text;
 namespace OdfKit.Drawing;
 
 /// <summary>
+/// Provides a fluent creation API for <see cref="DrawingDocument"/>.
 /// 提供 <see cref="DrawingDocument"/> 的 Fluent 建立 API。
 /// </summary>
 public sealed class DrawingDocumentBuilder
@@ -22,10 +23,11 @@ public sealed class DrawingDocumentBuilder
     }
 
     /// <summary>
+    /// Configures the document metadata.
     /// 設定文件中繼資料。
     /// </summary>
-    /// <param name="configure">中繼資料設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="configure">The metadata configuration delegate. / 中繼資料設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder WithMetadata(Action<TextDocumentMetadataBuilder> configure)
     {
         if (configure is null)
@@ -35,10 +37,11 @@ public sealed class DrawingDocumentBuilder
     }
 
     /// <summary>
+    /// Sets the design theme used by subsequent drawing pages and shapes.
     /// 設定後續繪圖頁面與圖形使用的設計主題。
     /// </summary>
-    /// <param name="theme">設計主題</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="theme">The design theme. / 設計主題。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder WithTheme(OdfDesignTheme theme)
     {
         _theme = theme ?? throw new ArgumentNullException(nameof(theme));
@@ -46,10 +49,11 @@ public sealed class DrawingDocumentBuilder
     }
 
     /// <summary>
+    /// Sets the style set used by subsequent drawing pages and shapes.
     /// 設定後續繪圖頁面與圖形使用的樣式集合。
     /// </summary>
-    /// <param name="styles">樣式集合</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="styles">The style set. / 樣式集合。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder WithStyles(OdfStyleSet styles)
     {
         ApplyStyleSetToTheme(styles ?? throw new ArgumentNullException(nameof(styles)));
@@ -57,10 +61,11 @@ public sealed class DrawingDocumentBuilder
     }
 
     /// <summary>
+    /// Sets the style set used by subsequent drawing pages and shapes.
     /// 設定後續繪圖頁面與圖形使用的樣式集合。
     /// </summary>
-    /// <param name="configure">樣式集合設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="configure">The style set configuration delegate. / 樣式集合設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder WithStyles(Action<OdfStyleSet> configure)
     {
         if (configure is null)
@@ -72,10 +77,11 @@ public sealed class DrawingDocumentBuilder
     }
 
     /// <summary>
+    /// Sets the layout preset used by subsequent drawing helpers.
     /// 設定後續繪圖 helper 使用的版面 preset。
     /// </summary>
-    /// <param name="preset">版面 preset</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="preset">The layout preset. / 版面 preset。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder WithLayoutPreset(OdfLayoutPreset preset)
     {
         _layoutPreset = preset ?? throw new ArgumentNullException(nameof(preset));
@@ -83,11 +89,12 @@ public sealed class DrawingDocumentBuilder
     }
 
     /// <summary>
+    /// Adds a drawing page and configures its content.
     /// 新增繪圖頁面並設定其內容。
     /// </summary>
-    /// <param name="name">頁面名稱</param>
-    /// <param name="configure">頁面設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="name">The page name. / 頁面名稱。</param>
+    /// <param name="configure">The page configuration delegate. / 頁面設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder AddPage(string name, Action<OdfDrawPageBuilder> configure)
     {
         if (configure is null)
@@ -99,19 +106,21 @@ public sealed class DrawingDocumentBuilder
     }
 
     /// <summary>
+    /// Adds a drawing page and configures its content.
     /// 新增繪圖頁面並設定其內容。
     /// </summary>
-    /// <param name="configure">頁面設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="configure">The page configuration delegate. / 頁面設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder AddPage(Action<OdfDrawPageBuilder> configure)
     {
         return AddPage($"Page {_pageCount + 1}", configure);
     }
 
     /// <summary>
+    /// Builds and returns the drawing document.
     /// 建立並傳回繪圖文件。
     /// </summary>
-    /// <returns>建立完成的繪圖文件</returns>
+    /// <returns>The built drawing document. / 建立完成的繪圖文件。</returns>
     public DrawingDocument Build()
     {
         return _document;
@@ -134,6 +143,7 @@ public sealed class DrawingDocumentBuilder
 }
 
 /// <summary>
+/// Provides a fluent creation API for drawing page content.
 /// 提供繪圖頁面內容的 Fluent 建立 API。
 /// </summary>
 public sealed class OdfDrawPageBuilder
@@ -151,14 +161,15 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds a rectangle shape.
     /// 新增矩形圖形。
     /// </summary>
-    /// <param name="xCm">左側位置（公分）</param>
-    /// <param name="yCm">上方位置（公分）</param>
-    /// <param name="widthCm">寬度（公分）</param>
-    /// <param name="heightCm">高度（公分）</param>
-    /// <param name="configure">圖形設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="xCm">The left position in centimeters. / 左側位置（公分）。</param>
+    /// <param name="yCm">The top position in centimeters. / 上方位置（公分）。</param>
+    /// <param name="widthCm">The width in centimeters. / 寬度（公分）。</param>
+    /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
+    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddRectangle(
         double xCm,
         double yCm,
@@ -178,14 +189,15 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds an ellipse shape.
     /// 新增橢圓圖形。
     /// </summary>
-    /// <param name="xCm">左側位置（公分）</param>
-    /// <param name="yCm">上方位置（公分）</param>
-    /// <param name="widthCm">寬度（公分）</param>
-    /// <param name="heightCm">高度（公分）</param>
-    /// <param name="configure">圖形設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="xCm">The left position in centimeters. / 左側位置（公分）。</param>
+    /// <param name="yCm">The top position in centimeters. / 上方位置（公分）。</param>
+    /// <param name="widthCm">The width in centimeters. / 寬度（公分）。</param>
+    /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
+    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddEllipse(
         double xCm,
         double yCm,
@@ -205,14 +217,15 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds a flow-diagram node and its text according to the layout preset.
     /// 依版面 preset 新增流程圖節點與文字。
     /// </summary>
-    /// <param name="id">圖形識別碼</param>
-    /// <param name="text">節點文字</param>
-    /// <param name="index">節點序號</param>
-    /// <param name="shapeType">節點圖形類型</param>
-    /// <param name="configure">圖形設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="id">The shape identifier. / 圖形識別碼。</param>
+    /// <param name="text">The node text. / 節點文字。</param>
+    /// <param name="index">The node sequence number. / 節點序號。</param>
+    /// <param name="shapeType">The node shape type. / 節點圖形類型。</param>
+    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddFlowStep(
         string id,
         string text,
@@ -242,14 +255,15 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds a text box.
     /// 新增文字方塊。
     /// </summary>
-    /// <param name="text">文字內容</param>
-    /// <param name="xCm">左側位置（公分）</param>
-    /// <param name="yCm">上方位置（公分）</param>
-    /// <param name="widthCm">寬度（公分）</param>
-    /// <param name="heightCm">高度（公分）</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="text">The text content. / 文字內容。</param>
+    /// <param name="xCm">The left position in centimeters. / 左側位置（公分）。</param>
+    /// <param name="yCm">The top position in centimeters. / 上方位置（公分）。</param>
+    /// <param name="widthCm">The width in centimeters. / 寬度（公分）。</param>
+    /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddTextBox(
         string text,
         double xCm,
@@ -267,15 +281,16 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds an SVG path shape.
     /// 新增 SVG 路徑圖形。
     /// </summary>
-    /// <param name="svgPathData">SVG path 資料</param>
-    /// <param name="xCm">左側位置（公分）</param>
-    /// <param name="yCm">上方位置（公分）</param>
-    /// <param name="widthCm">寬度（公分）</param>
-    /// <param name="heightCm">高度（公分）</param>
-    /// <param name="configure">圖形設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="svgPathData">The SVG path data. / SVG path 資料。</param>
+    /// <param name="xCm">The left position in centimeters. / 左側位置（公分）。</param>
+    /// <param name="yCm">The top position in centimeters. / 上方位置（公分）。</param>
+    /// <param name="widthCm">The width in centimeters. / 寬度（公分）。</param>
+    /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
+    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddPath(
         string svgPathData,
         double xCm,
@@ -296,14 +311,15 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds a line segment.
     /// 新增線段。
     /// </summary>
-    /// <param name="x1Cm">起點 X 位置（公分）</param>
-    /// <param name="y1Cm">起點 Y 位置（公分）</param>
-    /// <param name="x2Cm">終點 X 位置（公分）</param>
-    /// <param name="y2Cm">終點 Y 位置（公分）</param>
-    /// <param name="configure">圖形設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="x1Cm">The start X position in centimeters. / 起點 X 位置（公分）。</param>
+    /// <param name="y1Cm">The start Y position in centimeters. / 起點 Y 位置（公分）。</param>
+    /// <param name="x2Cm">The end X position in centimeters. / 終點 X 位置（公分）。</param>
+    /// <param name="y2Cm">The end Y position in centimeters. / 終點 Y 位置（公分）。</param>
+    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddLine(
         double x1Cm,
         double y1Cm,
@@ -322,15 +338,16 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds a coordinate-based connector.
     /// 新增座標式連接線。
     /// </summary>
-    /// <param name="x1Cm">起點 X 位置（公分）</param>
-    /// <param name="y1Cm">起點 Y 位置（公分）</param>
-    /// <param name="x2Cm">終點 X 位置（公分）</param>
-    /// <param name="y2Cm">終點 Y 位置（公分）</param>
-    /// <param name="connectorType">連接線幾何類型</param>
-    /// <param name="configure">圖形設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="x1Cm">The start X position in centimeters. / 起點 X 位置（公分）。</param>
+    /// <param name="y1Cm">The start Y position in centimeters. / 起點 Y 位置（公分）。</param>
+    /// <param name="x2Cm">The end X position in centimeters. / 終點 X 位置（公分）。</param>
+    /// <param name="y2Cm">The end Y position in centimeters. / 終點 Y 位置（公分）。</param>
+    /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
+    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddConnector(
         double x1Cm,
         double y1Cm,
@@ -351,13 +368,14 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds a connector linking two shapes.
     /// 新增連接兩個圖形的連接線。
     /// </summary>
-    /// <param name="startShapeId">起點圖形識別碼</param>
-    /// <param name="endShapeId">終點圖形識別碼</param>
-    /// <param name="connectorType">連接線幾何類型</param>
-    /// <param name="configure">圖形設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="startShapeId">The start shape identifier. / 起點圖形識別碼。</param>
+    /// <param name="endShapeId">The end shape identifier. / 終點圖形識別碼。</param>
+    /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
+    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddConnector(
         string startShapeId,
         string endShapeId,
@@ -371,15 +389,16 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds an image.
     /// 新增圖片。
     /// </summary>
-    /// <param name="imageBytes">圖片位元組</param>
-    /// <param name="xCm">左側位置（公分）</param>
-    /// <param name="yCm">上方位置（公分）</param>
-    /// <param name="widthCm">寬度（公分）</param>
-    /// <param name="heightCm">高度（公分）</param>
-    /// <param name="configure">圖形設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="imageBytes">The image byte array. / 圖片位元組。</param>
+    /// <param name="xCm">The left position in centimeters. / 左側位置（公分）。</param>
+    /// <param name="yCm">The top position in centimeters. / 上方位置（公分）。</param>
+    /// <param name="widthCm">The width in centimeters. / 寬度（公分）。</param>
+    /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
+    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddImage(
         byte[] imageBytes,
         double xCm,
@@ -399,11 +418,12 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds a shape group.
     /// 新增圖形群組。
     /// </summary>
-    /// <param name="name">群組名稱</param>
-    /// <param name="configure">群組內容設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="name">The group name. / 群組名稱。</param>
+    /// <param name="configure">The group content configuration delegate. / 群組內容設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddGroup(string name, Action<OdfDrawGroupBuilder> configure)
     {
         if (configure is null)
@@ -427,12 +447,13 @@ public sealed class OdfDrawPageBuilder
     }
 
     /// <summary>
+    /// Adds a page layer definition.
     /// 新增頁面圖層定義。
     /// </summary>
-    /// <param name="name">圖層名稱</param>
-    /// <param name="isProtected">圖層是否唯讀</param>
-    /// <param name="display">顯示模式</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="name">The layer name. / 圖層名稱。</param>
+    /// <param name="isProtected">Whether the layer is read-only. / 圖層是否唯讀。</param>
+    /// <param name="display">The display mode. / 顯示模式。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawPageBuilder AddLayer(string name, bool isProtected = false, string? display = "screen")
     {
         OdfNode layerSet = GetOrCreateLayerSet();
@@ -479,6 +500,7 @@ public sealed class OdfDrawPageBuilder
 }
 
 /// <summary>
+/// Provides a fluent configuration API for drawing shapes.
 /// 提供繪圖圖形的 Fluent 設定 API。
 /// </summary>
 public sealed class OdfDrawShapeBuilder
@@ -491,10 +513,11 @@ public sealed class OdfDrawShapeBuilder
     }
 
     /// <summary>
+    /// Sets the shape identifier.
     /// 設定圖形識別碼。
     /// </summary>
-    /// <param name="id">圖形識別碼</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="id">The shape identifier. / 圖形識別碼。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawShapeBuilder WithId(string id)
     {
         _shape.Id = id;
@@ -502,10 +525,11 @@ public sealed class OdfDrawShapeBuilder
     }
 
     /// <summary>
+    /// Sets the fill color.
     /// 設定填滿色彩。
     /// </summary>
-    /// <param name="color">色彩值</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="color">The color value. / 色彩值。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawShapeBuilder Fill(string color)
     {
         _shape.FillColor = color;
@@ -513,10 +537,11 @@ public sealed class OdfDrawShapeBuilder
     }
 
     /// <summary>
+    /// Sets the stroke color.
     /// 設定線條色彩。
     /// </summary>
-    /// <param name="color">色彩值</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="color">The color value. / 色彩值。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawShapeBuilder Stroke(string color)
     {
         _shape.StrokeColor = color;
@@ -524,10 +549,11 @@ public sealed class OdfDrawShapeBuilder
     }
 
     /// <summary>
+    /// Assigns the layer the shape belongs to.
     /// 指派圖形所屬圖層。
     /// </summary>
-    /// <param name="layerName">圖層名稱</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="layerName">The layer name. / 圖層名稱。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawShapeBuilder OnLayer(string layerName)
     {
         _shape.Node.SetAttribute("layer", OdfNamespaces.Draw, layerName, "draw");
@@ -536,6 +562,7 @@ public sealed class OdfDrawShapeBuilder
 }
 
 /// <summary>
+/// Provides a fluent creation API for drawing groups.
 /// 提供繪圖群組的 Fluent 建立 API。
 /// </summary>
 public sealed class OdfDrawGroupBuilder
@@ -551,14 +578,15 @@ public sealed class OdfDrawGroupBuilder
     }
 
     /// <summary>
+    /// Adds a rectangle within the group.
     /// 新增群組內矩形。
     /// </summary>
-    /// <param name="xCm">左側位置（公分）</param>
-    /// <param name="yCm">上方位置（公分）</param>
-    /// <param name="widthCm">寬度（公分）</param>
-    /// <param name="heightCm">高度（公分）</param>
-    /// <param name="configure">圖形設定委派</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="xCm">The left position in centimeters. / 左側位置（公分）。</param>
+    /// <param name="yCm">The top position in centimeters. / 上方位置（公分）。</param>
+    /// <param name="widthCm">The width in centimeters. / 寬度（公分）。</param>
+    /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
+    /// <param name="configure">The shape configuration delegate. / 圖形設定委派。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawGroupBuilder AddRectangle(
         double xCm,
         double yCm,
@@ -578,14 +606,15 @@ public sealed class OdfDrawGroupBuilder
     }
 
     /// <summary>
+    /// Adds a text box within the group.
     /// 新增群組內文字方塊。
     /// </summary>
-    /// <param name="text">文字內容</param>
-    /// <param name="xCm">左側位置（公分）</param>
-    /// <param name="yCm">上方位置（公分）</param>
-    /// <param name="widthCm">寬度（公分）</param>
-    /// <param name="heightCm">高度（公分）</param>
-    /// <returns>目前 builder 執行個體</returns>
+    /// <param name="text">The text content. / 文字內容。</param>
+    /// <param name="xCm">The left position in centimeters. / 左側位置（公分）。</param>
+    /// <param name="yCm">The top position in centimeters. / 上方位置（公分）。</param>
+    /// <param name="widthCm">The width in centimeters. / 寬度（公分）。</param>
+    /// <param name="heightCm">The height in centimeters. / 高度（公分）。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public OdfDrawGroupBuilder AddTextBox(
         string text,
         double xCm,
