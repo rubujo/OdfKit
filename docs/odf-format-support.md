@@ -30,7 +30,7 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 **重要說明（避免過度宣稱）**：`complete` 分級僅代表滿足本文件定義的最低完成標準，**不**代表
 已達成各格式族可能延伸出的完整深度語意模型（例如 Chart 的 Legend 統一可編輯模型與
 fluent builder API、Formula 的完整符號級編輯模型）。這些屬於更大規模、獨立追蹤的延伸工作；
-Formula 已具備 `FindFirst`／`FindAll`／`WithChild`／`ReplaceFirst` 等最小「尋找→取得→更新」
+Formula 已具備 `FindFirst`／`GetAll`／`WithChild`／`ReplaceFirst` 等最小「尋找→取得→更新」
 語意編輯 helper。
 
 ### CNS 11643／全字庫字型支援邊界
@@ -247,7 +247,7 @@ CNS 11643 官方語意相容或認證。
   - 2026-06-23 完成時依「仍缺公式語意編輯 helper（例如『尋找分數→取得分子→
     更新分子』這類查詢－修改－更新 API）」為理由維持 `usable`／`usable-variant`；
     2026-06-24 依 5 項完成標準重新檢視，確認已全部滿足，**升級為
-    `complete`**。2026-06-28 已補齊 `OdfMathToken.FindFirst`／`FindAll`／`WithChild`／
+    `complete`**。2026-06-28 已補齊 `OdfMathToken.FindFirst`／`GetAll`／`WithChild`／
     `ReplaceFirst` 與 `OdfFormulaDocument.ReplaceFirst`，最小「尋找→取得→更新」語意編輯 helper
     有程式與 `FormulaHighLevelApiTests` 證據；2026-06-29 已補齊分數／根號／上下標／矩陣的具名
     符號級存取與替換 API（`Numerator`／`Denominator`／`Radicand`／`RootIndex`／`Exponent`／

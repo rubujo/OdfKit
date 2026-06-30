@@ -642,7 +642,7 @@ public class DocsAndCorpusContractTests
         Assert.Contains("WithChartPaletteColors", File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Styles", "OdfStyleSet.cs")), StringComparison.Ordinal);
         Assert.Contains("OdfLayoutPreset", File.ReadAllText(Path.Combine(repoRoot, "OdfKit", "Styles", "OdfLayoutPreset.cs")), StringComparison.Ordinal);
         Assert.Contains("FindFirst", cookbook, StringComparison.Ordinal);
-        Assert.Contains("FindAll", cookbook, StringComparison.Ordinal);
+        Assert.Contains("GetAll", cookbook, StringComparison.Ordinal);
         Assert.Contains("WithChild", cookbook, StringComparison.Ordinal);
         Assert.Contains("ReplaceFirst", cookbook, StringComparison.Ordinal);
     }
@@ -901,7 +901,7 @@ public class DocsAndCorpusContractTests
         string support = File.ReadAllText(Path.Combine(repoRoot, "docs", "odf-format-support.md"));
         string tests = File.ReadAllText(Path.Combine(repoRoot, "OdfKit.Tests", "FormulaHighLevelApiTests.cs"));
 
-        Assert.Contains("Formula 已具備 `FindFirst`／`FindAll`／`WithChild`／`ReplaceFirst`", support, StringComparison.Ordinal);
+        Assert.Contains("Formula 已具備 `FindFirst`／`GetAll`／`WithChild`／`ReplaceFirst`", support, StringComparison.Ordinal);
         Assert.Contains("最小「尋找→取得→更新」語意編輯 helper", support, StringComparison.Ordinal);
         Assert.DoesNotContain("續列為獨立追蹤的後續深度工作", support, StringComparison.Ordinal);
         Assert.Contains("OdfMathToken_FindAndWithChild_WorksForNestedStructure", tests, StringComparison.Ordinal);
