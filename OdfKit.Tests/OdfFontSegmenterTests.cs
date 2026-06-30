@@ -135,17 +135,46 @@ public class OdfFontSegmenterTests
     }
 
     /// <summary>
+    /// 驗證 CNS 11643 字型遞補設定會正規化無效的基礎字型名稱。
+    /// </summary>
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Cns11643Options_WithMissingBaseFont_UsesDefaultKaiFont(string? baseFont)
+    {
+        OdfTextFontFallbackOptions options = OdfTextFontFallbackOptions.Cns11643(baseFont);
+
+        Assert.Equal("TW-Kai", options.BaseFont);
+        Assert.True(options.DeclareDefaultCjkFallbackFonts);
+    }
+
+    /// <summary>
+    /// 驗證直接建立字型遞補設定時仍會保證基礎字型名稱有效。
+    /// </summary>
+    [Fact]
+    public void TextFontFallbackOptions_WithMissingBaseFont_UsesDefaultKaiFont()
+    {
+        var options = new OdfTextFontFallbackOptions(null, declareDefaultCjkFallbackFonts: false);
+
+        Assert.Equal("TW-Kai", options.BaseFont);
+        Assert.False(options.DeclareDefaultCjkFallbackFonts);
+    }
+
+    /// <summary>
     /// 驗證段落高階 API 可自動依 CNS 11643 全字庫情境分段並套用字型。
     /// </summary>
     [Fact]
-    public void AddCns11643Text_SegmentsTextRunsAndDeclaresFallbackFonts()
+    public void ParagraphAddText_WithFallbackOptions_SegmentsTextRunsAndDeclaresFallbackFonts()
     {
         using TextDocument document = TextDocument.Create();
         OdfParagraph paragraph = document.AddParagraph();
         string plane2Char = char.ConvertFromUtf32(0x20BB7);
         string plane15Char = char.ConvertFromUtf32(0xF0000);
 
-        IReadOnlyList<OdfTextRun> runs = paragraph.AddCns11643Text("甲" + plane2Char + "乙" + plane15Char, "TW-Kai");
+        IReadOnlyList<OdfTextRun> runs = paragraph.AddText(
+            "甲" + plane2Char + "乙" + plane15Char,
+            OdfTextFontFallbackOptions.Cns11643("TW-Kai"));
 
         Assert.Equal(4, runs.Count);
         Assert.Equal("甲", runs[0].Text);

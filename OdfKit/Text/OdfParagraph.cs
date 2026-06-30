@@ -226,22 +226,30 @@ public partial class OdfParagraph
     }
 
     /// <summary>
-    /// Splits text into multiple text runs by Unicode plane suitable for CNS 11643 contexts, automatically applying the corresponding fonts.
-    /// 依 Unicode 平面將文字拆成適合 CNS 11643 全字庫情境的多個文字片段，並自動套用對應字型。
+    /// Adds text using the specified font fallback options.
+    /// 使用指定的字型遞補選項新增文字。
     /// </summary>
     /// <param name="text">The text content to add. / 要新增的文字內容。</param>
-    /// <param name="baseFont">The base font name used for Plane 0 text. / Plane 0 文字使用的基礎字型名稱。</param>
+    /// <param name="options">The font fallback options. / 字型遞補選項。</param>
     /// <returns>The collection of added text runs. / 新增的文字片段集合。</returns>
-    public IReadOnlyList<OdfTextRun> AddCns11643Text(string text, string baseFont = "TW-Kai")
+    public IReadOnlyList<OdfTextRun> AddText(string text, OdfTextFontFallbackOptions options)
     {
         if (text is null)
+        {
             throw new ArgumentNullException(nameof(text));
-        if (baseFont is null)
-            throw new ArgumentNullException(nameof(baseFont));
+        }
 
-        Doc.ApplyCjkFontFallback();
+        if (options is null)
+        {
+            throw new ArgumentNullException(nameof(options));
+        }
 
-        List<(string Text, string FontName)> segments = OdfFontSegmenter.SegmentText(text, baseFont);
+        if (options.DeclareDefaultCjkFallbackFonts)
+        {
+            Doc.ApplyCjkFontFallback();
+        }
+
+        List<(string Text, string FontName)> segments = OdfFontSegmenter.SegmentText(text, options.BaseFont);
         var runs = new List<OdfTextRun>(segments.Count);
         foreach ((string segmentText, string fontName) in segments)
         {

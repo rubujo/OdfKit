@@ -1,5 +1,4 @@
-﻿using OdfKit.Core;
-using OdfKit.DOM;
+﻿using OdfKit.Styles;
 
 namespace OdfKit.Text;
 
@@ -18,40 +17,10 @@ internal static class TextDocumentFontFaceEngine
         string? genericFamily = null,
         string? pitch = null)
     {
-        AddToDom(ctx, ctx.ContentDom, name, fontFamily, genericFamily, pitch);
+        OdfFontFaceDeclarationEngine.AddToDom(ctx.ContentDom, name, fontFamily, genericFamily, pitch);
         if (ctx.StylesDom is not null)
-            AddToDom(ctx, ctx.StylesDom, name, fontFamily, genericFamily, pitch);
-    }
-
-    private static void AddToDom(
-        TextDocument.TextDocumentCoreCollaborators ctx,
-        OdfNode domRoot,
-        string name,
-        string fontFamily,
-        string? genericFamily,
-        string? pitch)
-    {
-        OdfNode fontDecls = ctx.FindOrCreateChild(domRoot, "font-face-decls", OdfNamespaces.Office, "office");
-        foreach (OdfNode child in fontDecls.Children)
         {
-            if (child.LocalName == "font-face" && child.NamespaceUri == OdfNamespaces.Style && child.GetAttribute("name", OdfNamespaces.Style) == name)
-            {
-                child.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
-                if (genericFamily is not null)
-                    child.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
-                if (pitch is not null)
-                    child.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
-                return;
-            }
+            OdfFontFaceDeclarationEngine.AddToDom(ctx.StylesDom, name, fontFamily, genericFamily, pitch);
         }
-
-        var fontFace = new OdfNode(OdfNodeType.Element, "font-face", OdfNamespaces.Style, "style");
-        fontFace.SetAttribute("name", OdfNamespaces.Style, name, "style");
-        fontFace.SetAttribute("font-family", OdfNamespaces.Svg, fontFamily, "svg");
-        if (genericFamily is not null)
-            fontFace.SetAttribute("font-family-generic", OdfNamespaces.Style, genericFamily, "style");
-        if (pitch is not null)
-            fontFace.SetAttribute("font-pitch", OdfNamespaces.Style, pitch, "style");
-        fontDecls.AppendChild(fontFace);
     }
 }

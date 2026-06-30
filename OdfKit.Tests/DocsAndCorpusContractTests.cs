@@ -956,7 +956,7 @@ public class DocsAndCorpusContractTests
 
         Assert.Contains("Unicode 平面分段", support, StringComparison.Ordinal);
         Assert.Contains("`TextDocument.ApplyCjkFontFallback()`", support, StringComparison.Ordinal);
-        Assert.Contains("`OdfParagraph.AddCns11643Text(...)`", support, StringComparison.Ordinal);
+        Assert.Contains("`OdfParagraph.AddText(..., OdfTextFontFallbackOptions.Cns11643())`", support, StringComparison.Ordinal);
         Assert.Contains("`TW-Kai-Ext-B-98_1`", support, StringComparison.Ordinal);
         Assert.Contains("`TW-Song-Ext-B-98_1`", support, StringComparison.Ordinal);
         Assert.Contains("OdfKit 不內建政府字型", support, StringComparison.Ordinal);

@@ -44,8 +44,12 @@ OdfKit 的文字內容仍以 Unicode 儲存；一般 ODT 文字層不寫入 CNS 
 - `TextDocument.ApplyCjkFontFallback()` 會宣告常見 CJK fallback 與 `TW-Kai-98_1`、
   `TW-Kai-Ext-B-98_1`、`TW-Kai-Plus-98_1`、`TW-Song-98_1`、`TW-Song-Ext-B-98_1`、
   `TW-Song-Plus-98_1` 等全字庫字型名稱。
-- `OdfParagraph.AddCns11643Text(...)` 可自動呼叫分段邏輯，將同一段文字拆成多個 run 並套用對應
-  font-face。
+- `OdfParagraph.AddText(..., OdfTextFontFallbackOptions.Cns11643())` 可自動呼叫分段邏輯，將同一段
+  文字拆成多個 run 並套用對應 font-face。
+- ODS／ODP／ODG 文字入口已共用同一套分段與 font-face 宣告基礎：`OdfCell.SetText(...,
+  OdfTextFontFallbackOptions.Cns11643())` 會將儲存格文字寫成富文字 run；`OdfSlide.AddTextBox(...)`
+  與 `OdfDrawPage.AddTextBox(...)` 的 fallback options overload 會在文字方塊內寫入帶文字樣式的
+  `text:span`。
 - `OdfFontResolver.RegisterFontDirectory`、`RegisterFont` 與 `RegisterFontSubsetter` 提供外部字型
   註冊與子集化擴充點；OdfKit 不內建政府字型，也不替第三方字型授權背書。
 

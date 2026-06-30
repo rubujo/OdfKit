@@ -2430,7 +2430,7 @@ public partial class LibreOfficeInteropTests
         {
             using var doc = TextDocument.Create();
             var p = doc.Body.Paragraphs.Add();
-            p.AddCns11643Text("罕見字字型對照保真度測試：吉、𠮷、𠜎、𿿽。");
+            p.AddText("罕見字字型對照保真度測試：吉、𠮷、𠜎、𿿽。", OdfTextFontFallbackOptions.Cns11643());
 
             string odtPath = Path.Combine(tempRoot, "rare-chars.odt");
             doc.Save(odtPath);
