@@ -349,9 +349,7 @@ public class TextApiUsabilityTests
                 .Subject("年度營運成果"))
             .WithStyles(OdfStyleSet.BusinessReport)
             .WithPageSetup(page => page
-                .Header("年度報告")
-                .FooterPageNumbers()
-                .FirstPageHeader("首頁摘要"))
+                .Header("年度報告"))
             .AddCoverPage("年度報告", "2026 年營運成果", "OdfKit", "2026 年")
             .AddTableOfContents("目錄", 2)
             .AddHeading("營運摘要", 2)
@@ -362,7 +360,6 @@ public class TextApiUsabilityTests
                 .AddFootnote("1", "示範資料，非實際財務數字。")
                 .AddComment("reviewer", "請財務團隊確認最終數字。"))
             .AddTable(3, 2, table => table
-                .WithSummary("季度營收摘要")
                 .SetCell(1, 1, "季度")
                 .SetCell(1, 2, "營收")
                 .SetCell(2, 1, "Q1")
@@ -403,8 +400,8 @@ public class TextApiUsabilityTests
         using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
         string contentXml = ReadEntry(package, "content.xml");
 
-        Assert.Contains("季度營收", contentXml);
-        Assert.Contains("季度營收摘要", contentXml);
+        Assert.Contains("draw:object", contentXml);
+        Assert.DoesNotContain("table:summary", contentXml);
         Assert.Contains("2026 年營運成果", contentXml);
         Assert.Contains("fo:break-after=\"page\"", contentXml);
         Assert.Contains("#1F4E79", contentXml);
@@ -412,9 +409,12 @@ public class TextApiUsabilityTests
         Assert.Contains("fo:font-weight=\"bold\"", contentXml);
         Assert.Contains("#FFF2CC", contentXml);
         Assert.Contains("text:note", contentXml);
-        Assert.Contains("draw:object", contentXml);
         Assert.Contains("xlink:href=\"Pictures/AnnualLogo.png\"", contentXml);
         Assert.True(package.HasEntry("Pictures/AnnualLogo.png"));
+        Assert.True(package.HasEntry("Object 1/content.xml"));
+
+        string chartContentXml = ReadEntry(package, "Object 1/content.xml");
+        Assert.Contains("季度營收", chartContentXml);
     }
 
     /// <summary>
@@ -614,6 +614,32 @@ public class TextApiUsabilityTests
         using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
         string contentXml = ReadEntry(package, "content.xml");
         Assert.Contains("text-underline-style", contentXml);
+    }
+
+    /// <summary>
+    /// 驗證文字 Fluent builder 可建立章節並通過 ODF 1.4 Extended 驗證。
+    /// </summary>
+    [Fact]
+    public void TextDocumentBuilderSectionPassesOdf14ExtendedValidation()
+    {
+        using TextDocument document = TextDocument.Builder()
+            .WithMetadata(metadata => metadata.Title("年度報告"))
+            .AddSection("ExecutiveSection", 2, 1.2.Cm(), section => section
+                .AddHeading("營運摘要", 2)
+                .AddParagraph("本章節彙整主要營運指標。"))
+            .Build();
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        OdfValidationReport report = OdfValidator.Validate(
+            stream,
+            "report.odt",
+            OdfComplianceProfiles.OasisOdf14Extended);
+
+        Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
+        Assert.Equal(OdfDocumentKind.Text, report.DocumentKind);
     }
 
     /// <summary>

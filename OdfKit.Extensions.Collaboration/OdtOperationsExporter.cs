@@ -32,6 +32,21 @@ public static class OdtOperationsExporter
     public static string ExportToJson(TextDocument document) => ExportToJson(document, null);
 
     /// <summary>
+    /// Exports the document body as a typed operation log.
+    /// 將文字文件本文匯出為 typed operation log。
+    /// </summary>
+    /// <param name="document">The source or target object. / 來源文字文件</param>
+    /// <param name="options">The value to use. / ODF Toolkit 相容選項；若為 <see langword="null"/>，則使用裸陣列輸出</param>
+    /// <returns>The result. / typed operation log</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當 <paramref name="document"/> 為 null 時擲出</exception>
+    public static OdtOperationLog Export(TextDocument document, OdtOperationCompatibilityOptions? options = null)
+    {
+        options ??= new OdtOperationCompatibilityOptions();
+        string json = ExportToJson(document, options);
+        return OdtOperationLog.Parse(json, options);
+    }
+
+    /// <summary>
     /// Exports the document body as a JSON operation log.
     /// 將文字文件本文匯出為 JSON operations 字串。
     /// </summary>

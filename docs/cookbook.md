@@ -29,7 +29,7 @@ using TextDocument report = TextDocument.Builder()
     .WithMetadata(metadata => metadata.Title("年度報告").Author("OdfKit"))
     .WithTheme(OdfDesignTheme.Flowchart)
     .WithStyles(OdfStyleSet.BusinessReport)
-    .WithPageSetup(page => page.Header("年度報告").FooterPageNumbers())
+    .WithPageSetup(page => page.Header("年度報告"))
     .AddCoverPage("年度報告", "2026 年營運成果", "OdfKit", "2026 年")
     .AddTableOfContents("目錄", 2)
     .AddHeading("營運摘要", 2)
@@ -40,7 +40,6 @@ using TextDocument report = TextDocument.Builder()
         .AddFootnote("1", "示範資料，非實際財務數字。")
         .AddComment("reviewer", "請財務團隊確認最終數字。"))
     .AddTable(3, 2, table => table
-        .WithSummary("季度營收摘要")
         .SetCell(1, 1, "季度")
         .SetCell(1, 2, "營收")
         .SetCell(2, 1, "Q1")
@@ -180,10 +179,10 @@ using TextDocument merged = OdtOperationsImporter.Merge(
 Console.WriteLine(report.ReplayedCount);
 ```
 
-匯入端目前支援 TDF changes 封包、段落與文字新增、Tab、換行、基本 range 字元格式（含前景色、背景色、大小寫轉換、small-caps 與上標／下標）、
-單段落刪除、最上層段落分割／合併、基本清單段落，以及固定尺寸文字表格填值。
-完整 OT／CRDT、任意衝突合併、跨段落刪除、move、drawing 與 header/footer/note selection
-仍屬非目標。
+匯入端目前支援 TDF changes 封包、typed operation log、未知欄位 round-trip、段落與文字新增、Tab、換行、基本 range 字元格式（含前景色、背景色、大小寫轉換、small-caps 與上標／下標）、
+單段落刪除／移動、最上層段落分割／合併、基本清單段落、固定尺寸文字表格填值、欄位、comment、header/footer、font declaration 與安全 drawing placeholder。
+完整 OT／CRDT、任意衝突合併、跨段落刪除／移動、完整 drawing DOM 與 header/footer/note selection
+仍屬非目標；不明或無法安全套用的 operation 會進入 import report 診斷。
 
 ## 建立 ODT
 

@@ -163,7 +163,11 @@ public partial class SpreadsheetDocument : OdfDocument
     /// 取得 ODS 活頁簿層級的公式計算與重算設定。
     /// </summary>
     public OdfSpreadsheetCalculationSettings CalculationSettings =>
-        new(FindOrCreateChild(SheetsRoot, "calculation-settings", OdfNamespaces.Table, "table"));
+        new(OdfTableSheetDomHelper.FindOrCreateSpreadsheetPreludeChild(
+            SheetsRoot,
+            "calculation-settings",
+            OdfNamespaces.Table,
+            "table"));
 
     private void InitializeSheetsRoot()
     {

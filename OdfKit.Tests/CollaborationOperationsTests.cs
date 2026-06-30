@@ -1,6 +1,9 @@
 ﻿using System.Text.Json;
 using System.IO;
+using System.Globalization;
+using System.Text;
 using OdfKit.Collaboration;
+using OdfKit.Compliance;
 using OdfKit.Text;
 using Xunit;
 
@@ -9,6 +12,7 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證 ODT → JSON operations 匯出（COLLAB-1）。
 /// </summary>
+[Trait(TestCategories.Kind, TestCategories.Regression)]
 public sealed class CollaborationOperationsTests
 {
     /// <summary>
@@ -483,6 +487,336 @@ public sealed class CollaborationOperationsTests
         Assert.Equal("新增段落", paragraphs[1].TextContent);
     }
 
+    /// <summary>
+    /// 驗證 typed operation log 可保留未知欄位並以 TDF changes 封包輸出。
+    /// </summary>
+    [Fact]
+    public void OperationLog_ParseSerialize_PreservesUnknownWireFields()
+    {
+        const string json = """
+            {
+                "changes": [
+                    { "name": "addParagraph", "start": [0], "tdfFuture": { "flag": true } }
+                ]
+            }
+            """;
+
+        OdtOperationLog log = OdtOperationLog.Parse(json, OdtOperationCompatibilityOptions.CreateTdfCompatibility());
+        string serialized = log.Serialize(OdtOperationCompatibilityOptions.CreateTdfCompatibility());
+
+        using JsonDocument parsed = JsonDocument.Parse(serialized);
+        JsonElement operation = parsed.RootElement.GetProperty("changes").EnumerateArray().Single();
+        Assert.True(operation.GetProperty("tdfFuture").GetProperty("flag").GetBoolean());
+    }
+
+    /// <summary>
+    /// 驗證 parser 保留看似外部連結或 script 的 attrs，安全副作用由 replay 階段處理。
+    /// </summary>
+    [Fact]
+    public void OperationLog_ParseSerialize_PreservesUnsafeLookingAttributesForAudit()
+    {
+        const string json = """
+            {
+                "changes": [
+                    {
+                        "name": "addDrawing",
+                        "start": [0],
+                        "attrs": {
+                            "name": "RemoteDrawing",
+                            "href": "https://example.invalid/image.png",
+                            "onclick": "alert(1)"
+                        }
+                    }
+                ]
+            }
+            """;
+
+        OdtOperationLog log = OdtOperationLog.Parse(json, OdtOperationCompatibilityOptions.CreateTdfCompatibility());
+        string serialized = log.Serialize(OdtOperationCompatibilityOptions.CreateTdfCompatibility());
+
+        using JsonDocument parsed = JsonDocument.Parse(serialized);
+        JsonElement attrs = parsed.RootElement
+            .GetProperty("changes")
+            .EnumerateArray()
+            .Single()
+            .GetProperty("attrs");
+        Assert.Equal("https://example.invalid/image.png", attrs.GetProperty("href").GetString());
+        Assert.Equal("alert(1)", attrs.GetProperty("onclick").GetString());
+    }
+
+    /// <summary>
+    /// 驗證 replay 階段會略過含外部連結或 script attr 的 operation，且不產生副作用。
+    /// </summary>
+    [Fact]
+    public void Merge_UnsafeReplayAttributes_AreDiagnosticOnlyAndDoNotMutateDocument()
+    {
+        const string json = """
+            {
+                "changes": [
+                    { "name": "addParagraph", "start": [0] },
+                    {
+                        "name": "addDrawing",
+                        "start": [0],
+                        "attrs": {
+                            "name": "RemoteDrawing",
+                            "href": "https://example.invalid/image.png",
+                            "onclick": "alert(1)"
+                        }
+                    }
+                ]
+            }
+            """;
+
+        using TextDocument merged = OdtOperationsImporter.Merge(
+            json,
+            OdtOperationCompatibilityOptions.CreateTdfCompatibility(),
+            out OdtOperationImportReport report);
+
+        Assert.Equal(1, report.ReplayedCount);
+        Assert.Equal(1, report.UnsupportedCount);
+        Assert.DoesNotContain("RemoteDrawing", merged.BodyTextRoot.TextContent, StringComparison.Ordinal);
+        Assert.Contains(report.Diagnostics, message => message.Contains("unsafeAttribute", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// 驗證 strict mode 會在 replay 階段中止 unsafe attrs。
+    /// </summary>
+    [Fact]
+    public void Merge_UnsafeReplayAttributes_ThrowInStrictMode()
+    {
+        var options = OdtOperationCompatibilityOptions.CreateTdfCompatibility();
+        options.UnsupportedOperationPolicy = OdtUnsupportedOperationPolicy.Throw;
+
+        const string json = """
+            {
+                "changes": [
+                    {
+                        "name": "addDrawing",
+                        "start": [0],
+                        "attrs": {
+                            "name": "RemoteDrawing",
+                            "href": "https://example.invalid/image.png"
+                        }
+                    }
+                ]
+            }
+            """;
+
+        using TextDocument document = TextDocument.Create();
+
+        Assert.Throws<NotSupportedException>(() => OdtOperationsImporter.Merge(document, json, options));
+    }
+
+    /// <summary>
+    /// 驗證安全限制會拒絕過多 operation。
+    /// </summary>
+    [Fact]
+    public void OperationLog_Parse_RejectsOperationCountOverSafetyLimit()
+    {
+        var options = new OdtOperationCompatibilityOptions
+        {
+            Safety = new OdtOperationSafetyOptions
+            {
+                MaxOperationCount = 1,
+            },
+        };
+
+        const string json = """
+            [
+                { "name": "addParagraph", "start": [0] },
+                { "name": "addParagraph", "start": [1] }
+            ]
+            """;
+
+        JsonException exception = Assert.Throws<JsonException>(() => OdtOperationLog.Parse(json, options));
+        Assert.Contains("operationCount", exception.Message, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證新增的 TDF operation 子集合可安全重播至 ODT DOM。
+    /// </summary>
+    [Fact]
+    public void Merge_ReplaysExtendedTdfTextOperationSubset()
+    {
+        const string json = """
+            {
+                "changes": [
+                    { "name": "addFontDecl", "attrs": { "name": "Inter", "fontFamily": "Inter" } },
+                    { "name": "addStyle", "attrs": { "styleId": "BodyText", "family": "paragraph" } },
+                    { "name": "addParagraph", "start": [0], "attrs": { "styleId": "BodyText" } },
+                    { "name": "addText", "start": [0, 0], "text": "ABCDE" },
+                    { "name": "move", "start": [0, 1], "end": [0, 3], "to": [0, 3] },
+                    { "name": "addField", "start": [0, 5], "attrs": { "fieldType": "date" } },
+                    { "name": "addNote", "start": [0, 5], "id": "c1", "author": "測試者", "text": "註解內容" },
+                    { "name": "addHeaderFooter", "attrs": { "type": "header_default", "text": "頁首" } },
+                    { "name": "addDrawing", "start": [0, 5], "attrs": { "name": "Diagram" } },
+                    { "name": "addTable", "attrs": { "rows": 1, "columns": 1 } },
+                    { "name": "addColumn", "attrs": { "startGrid": 1, "endGrid": 1 } },
+                    { "name": "addCells", "attrs": { "row": 0, "column": 1, "values": [ "X" ] } }
+                ]
+            }
+            """;
+
+        using TextDocument merged = OdtOperationsImporter.Merge(
+            json,
+            OdtOperationCompatibilityOptions.CreateTdfCompatibility(),
+            out OdtOperationImportReport report);
+
+        Assert.Equal(11, report.ReplayedCount);
+        Assert.Equal(1, report.IgnoredCount);
+        Assert.Equal(0, report.UnsupportedCount);
+        // start=[0,1], end=[0,3] 移除 "BC"；to=[0,3] 是「移除前」座標中緊接在 C 之後的位置，
+        // 對應移除後字串中緊接在 A 之後（索引 1）的相同位置，因此 "BC" 會被插回原位，結果與原字串相同。
+        Assert.Contains("ABCDE", merged.Body.Paragraphs.First().TextContent, StringComparison.Ordinal);
+        Assert.Contains("Diagram", merged.BodyTextRoot.TextContent, StringComparison.Ordinal);
+        OdfCommentInfo comment = Assert.Single(merged.GetCommentInfos());
+        Assert.Equal("測試者", comment.Author);
+        Assert.Equal("註解內容", comment.Text);
+        Assert.Equal("頁首", merged.GetDefaultPageSetup().Header.Text);
+        Assert.Contains("X", merged.BodyTextRoot.TextContent, StringComparison.Ordinal);
+        Assert.Contains(report.Entries, entry => entry.OperationName == "addColumn" && entry.Status == OdtOperationReplayStatus.Replayed);
+    }
+
+    /// <summary>
+    /// 驗證 importer 明確宣告 TDF 公開文件列出的 operation 名稱。
+    /// </summary>
+    [Fact]
+    public void CollaborationImporter_DeclaresDocumentedTdfOperationCases()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string source = File.ReadAllText(
+            Path.Combine(repositoryRoot, "OdfKit.Extensions.Collaboration", "OdtOperationsImporter.cs"));
+        string[] documentedOperations =
+        [
+            "delete",
+            "move",
+            "addParagraph",
+            "splitParagraph",
+            "mergeParagraph",
+            "addText",
+            "addTab",
+            "addLineBreak",
+            "addField",
+            "updateField",
+            "addTable",
+            "addRows",
+            "addCells",
+            "addColumn",
+            "deleteColumns",
+            "addListStyle",
+            "addHeaderFooter",
+            "deleteHeaderFooterContent",
+            "addNote",
+            "documentLayout",
+            "addFontDecl",
+            "format",
+            "addStyle",
+            "changeStyle",
+            "deleteStyle",
+            "addDrawing",
+        ];
+
+        foreach (string operation in documentedOperations)
+        {
+            Assert.Contains($"case \"{operation}\":", source, StringComparison.Ordinal);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 collaboration parser 新增的 i18n key 具備全部支援語言翻譯。
+    /// </summary>
+    [Fact]
+    public void CollaborationOperationLogLocalizerKeysResolveForSupportedCultures()
+    {
+        string[] cultures = ["en", "zh-TW", "de", "fr", "nl", "nb", "pt", "it", "sk", "da", "ms", "ko"];
+        string[] keys =
+        [
+            "Err_OdtOperationLog_InvalidEnvelope",
+            "Err_OdtOperationLog_OperationMustBeObject",
+            "Err_OdtOperationLog_InvalidPosition",
+            "Err_OdtOperationLog_SafetyLimitExceeded",
+        ];
+
+        foreach (string cultureName in cultures)
+        {
+            CultureInfo culture = CultureInfo.GetCultureInfo(cultureName);
+            foreach (string key in keys)
+            {
+                string message = OdfLocalizer.GetMessage(key, culture, "x", 2, 1);
+                Assert.NotEqual(key, message);
+                Assert.False(string.IsNullOrWhiteSpace(message));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證 10k collaboration operations 可完成剖析、序列化與重播。
+    /// </summary>
+    [Fact]
+    public void OperationLog_PerformanceSmoke_ParsesSerializesAndReplays10kOperations()
+    {
+        string json = CreateTextOperationLog(paragraphCount: 5_000);
+        OdtOperationCompatibilityOptions options = OdtOperationCompatibilityOptions.CreateTdfCompatibility();
+
+        OdtOperationLog log = OdtOperationLog.Parse(json, options);
+        string serialized = log.Serialize(options);
+        OdtOperationLog reparsed = OdtOperationLog.Parse(serialized, options);
+        using TextDocument document = TextDocument.Create();
+        OdtOperationImportReport report = reparsed.Apply(document, options);
+
+        Assert.Equal(10_000, log.Operations.Count);
+        Assert.Equal(10_000, reparsed.Operations.Count);
+        Assert.Equal(10_000, report.ReplayedCount);
+        Assert.Equal(0, report.UnsupportedCount);
+        Assert.Equal(5_000, document.Body.Paragraphs.Count());
+    }
+
+    /// <summary>
+    /// 驗證長段落 range formatting 可完成重播並只分裂必要文字片段。
+    /// </summary>
+    [Fact]
+    public void Merge_PerformanceSmoke_ReplaysLongParagraphRangeFormatting()
+    {
+        string text = new('A', 64_000);
+        string json = "{\"changes\":[{\"name\":\"addParagraph\",\"start\":[0]},{\"name\":\"addText\",\"start\":[0,0],\"text\":\"" +
+            text +
+            "\"},{\"name\":\"format\",\"start\":[0,1024],\"end\":[0,63000],\"attrs\":{\"bold\":true,\"color\":\"#0066CC\"}}]}";
+
+        using TextDocument merged = OdtOperationsImporter.Merge(
+            json,
+            OdtOperationCompatibilityOptions.CreateTdfCompatibility(),
+            out OdtOperationImportReport report);
+
+        OdfParagraph paragraph = Assert.Single(merged.Body.Paragraphs);
+        Assert.Equal(3, report.ReplayedCount);
+        Assert.Equal(64_000, paragraph.TextContent.Length);
+        Assert.Contains(paragraph.Runs, run => run.IsBold && run.Color == "#0066CC");
+    }
+
+    /// <summary>
+    /// 驗證安全限制內的大型固定表格可完成建立。
+    /// </summary>
+    [Fact]
+    public void Merge_PerformanceSmoke_ReplaysLargeTableWithinSafetyLimit()
+    {
+        const string json = """
+            {
+                "changes": [
+                    { "name": "addTable", "attrs": { "rows": 1000, "columns": 20, "tableName": "LargeTableSmoke" } }
+                ]
+            }
+            """;
+
+        using TextDocument merged = OdtOperationsImporter.Merge(
+            json,
+            OdtOperationCompatibilityOptions.CreateTdfCompatibility(),
+            out OdtOperationImportReport report);
+
+        Assert.Single(merged.Body.Tables);
+        Assert.Equal(1, report.ReplayedCount);
+        Assert.Equal(0, report.UnsupportedCount);
+    }
+
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);
@@ -497,5 +831,30 @@ public sealed class CollaborationOperationsTests
         }
 
         throw new DirectoryNotFoundException("找不到 OdfKit repo root。");
+    }
+
+    private static string CreateTextOperationLog(int paragraphCount)
+    {
+        var builder = new StringBuilder();
+        builder.Append("{\"changes\":[");
+        for (int i = 0; i < paragraphCount; i++)
+        {
+            if (i > 0)
+            {
+                builder.Append(',');
+            }
+
+            builder.Append("{\"name\":\"addParagraph\",\"start\":[");
+            builder.Append(i);
+            builder.Append("]},");
+            builder.Append("{\"name\":\"addText\",\"start\":[");
+            builder.Append(i);
+            builder.Append(",0],\"text\":\"Value ");
+            builder.Append(i);
+            builder.Append("\"}");
+        }
+
+        builder.Append("]}");
+        return builder.ToString();
     }
 }

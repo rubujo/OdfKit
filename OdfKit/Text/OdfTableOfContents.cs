@@ -124,11 +124,11 @@ public class OdfTableOfContents : OdfIndex
         }
     }
 
-    private class OdfHeadingInfo(string text, int level, string anchor)
+    private class OdfHeadingInfo(string text, int level, string? anchor)
     {
         public string Text { get; } = text;
         public int Level { get; } = level;
-        public string Anchor { get; } = anchor;
+        public string? Anchor { get; } = anchor;
     }
 
     private void ScanHeadings(OdfNode node, List<OdfHeadingInfo> headings)
@@ -149,16 +149,13 @@ public class OdfTableOfContents : OdfIndex
 
             if (string.IsNullOrEmpty(anchor))
             {
-                anchor = $"_Toc_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
-                var newRef = OdfNodeFactory.CreateElement("reference-mark", OdfNamespaces.Text, "text");
-                newRef.SetAttribute("name", OdfNamespaces.Text, anchor, "text");
-                if (node.Children.Count > 0)
-                    node.InsertBefore(newRef, node.Children[0]);
-                else
-                    node.AppendChild(newRef);
+                anchor = "_Toc_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+                refMark = OdfNodeFactory.CreateElement("reference-mark", OdfNamespaces.Text, "text");
+                refMark.SetAttribute("name", OdfNamespaces.Text, anchor, "text");
+                node.AppendChild(refMark);
             }
 
-            headings.Add(new OdfHeadingInfo(node.TextContent, level, anchor!));
+            headings.Add(new OdfHeadingInfo(node.TextContent, level, anchor));
         }
 
         foreach (var child in node.Children)
@@ -175,10 +172,15 @@ public class OdfTableOfContents : OdfIndex
         string styleName = template?.GetAttribute("style-name", OdfNamespaces.Text) ?? $"Contents_{heading.Level}";
         p.SetAttribute("style-name", OdfNamespaces.Text, styleName, "text");
 
-        var link = OdfNodeFactory.CreateElement("a", OdfNamespaces.Text, "text");
-        link.SetAttribute("href", OdfNamespaces.XLink, $"#{heading.Anchor}", "xlink");
-        link.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
-        p.AppendChild(link);
+        OdfNode textContainer = p;
+        if (!string.IsNullOrEmpty(heading.Anchor))
+        {
+            var link = OdfNodeFactory.CreateElement("a", OdfNamespaces.Text, "text");
+            link.SetAttribute("href", OdfNamespaces.XLink, $"#{heading.Anchor}", "xlink");
+            link.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
+            p.AppendChild(link);
+            textContainer = link;
+        }
 
         if (template is not null && template.Children.Count > 0)
         {
@@ -187,36 +189,36 @@ public class OdfTableOfContents : OdfIndex
                 if (child.LocalName == "index-entry-text")
                 {
                     var textNode = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = heading.Text };
-                    link.AppendChild(textNode);
+                    textContainer.AppendChild(textNode);
                 }
                 else if (child.LocalName == "index-entry-tab-stop")
                 {
                     var tab = OdfNodeFactory.CreateElement("tab", OdfNamespaces.Text, "text");
-                    link.AppendChild(tab);
+                    textContainer.AppendChild(tab);
                 }
                 else if (child.LocalName == "index-entry-page-number")
                 {
                     var pageNumText = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = "1" };
-                    link.AppendChild(pageNumText);
+                    textContainer.AppendChild(pageNumText);
                 }
                 else if (child.LocalName == "index-entry-span")
                 {
                     var span = OdfNodeFactory.CreateElement("span", OdfNamespaces.Text, "text");
                     span.TextContent = child.TextContent;
-                    link.AppendChild(span);
+                    textContainer.AppendChild(span);
                 }
             }
         }
         else
         {
             var textNode = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = heading.Text };
-            link.AppendChild(textNode);
+            textContainer.AppendChild(textNode);
 
             var tab = OdfNodeFactory.CreateElement("tab", OdfNamespaces.Text, "text");
-            link.AppendChild(tab);
+            textContainer.AppendChild(tab);
 
             var pageNumText = new OdfNode(OdfNodeType.Text, string.Empty, string.Empty) { TextContent = "1" };
-            link.AppendChild(pageNumText);
+            textContainer.AppendChild(pageNumText);
         }
 
         return p;

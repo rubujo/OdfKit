@@ -205,8 +205,23 @@ public partial class TextDocument : OdfDocument
     public OdfTable AddTable(int rows, int cols)
     {
         var table = new OdfNode(OdfNodeType.Element, "table", OdfNamespaces.Table, "table");
+        table.SetAttribute("name", OdfNamespaces.Table, CreateTableName(), "table");
         BodyTextRoot.AppendChild(table);
         return new OdfTable(table, rows, cols, this);
+    }
+
+    private string CreateTableName()
+    {
+        int tableCount = 0;
+        foreach (OdfNode child in BodyTextRoot.Children)
+        {
+            if (child.LocalName == "table" && child.NamespaceUri == OdfNamespaces.Table)
+            {
+                tableCount++;
+            }
+        }
+
+        return $"Table{(tableCount + 1).ToString(CultureInfo.InvariantCulture)}";
     }
 
     /// <summary>
@@ -469,9 +484,19 @@ public partial class TextDocument : OdfDocument
         var section = new OdfNode(OdfNodeType.Element, "section", OdfNamespaces.Text, "text");
         section.SetAttribute("name", OdfNamespaces.Text, name, "text");
 
-        string styleName = StyleEngine.GetOrCreateLocalStyle(section, "section").GetAttribute("name", OdfNamespaces.Style) ?? "S1";
-        StyleEngine.SetLocalStyleProperty(section, "section", "section-properties", "column-count", OdfNamespaces.Fo, columnCount.ToString(CultureInfo.InvariantCulture), "fo");
-        StyleEngine.SetLocalStyleProperty(section, "section", "section-properties", "column-gap", OdfNamespaces.Fo, gap.ToString(), "fo");
+        OdfNode styleNode = StyleEngine.GetOrCreateLocalStyle(section, "section");
+        OdfNode sectionProperties = TextDocumentDomHelper.FindOrCreateChild(
+            styleNode,
+            "section-properties",
+            OdfNamespaces.Style,
+            "style");
+        OdfNode columns = TextDocumentDomHelper.FindOrCreateChild(
+            sectionProperties,
+            "columns",
+            OdfNamespaces.Style,
+            "style");
+        columns.SetAttribute("column-count", OdfNamespaces.Fo, columnCount.ToString(CultureInfo.InvariantCulture), "fo");
+        columns.SetAttribute("column-gap", OdfNamespaces.Fo, gap.ToString(), "fo");
 
         BodyTextRoot.AppendChild(section);
         return new OdfSection(section, this);

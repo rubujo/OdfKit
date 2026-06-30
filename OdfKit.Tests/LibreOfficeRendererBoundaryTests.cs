@@ -20,6 +20,8 @@ namespace OdfKit.Tests
     [Trait(TestCategories.Kind, TestCategories.Boundary)]
     public class LibreOfficeRendererBoundaryTests
     {
+        private const string MockSofficeArgumentsCapturePathVariable = "ODFKIT_MOCK_SOFFICE_ARGS_PATH";
+
         public LibreOfficeRendererBoundaryTests()
         {
             OdfLocalizer.DefaultCulture = new CultureInfo("en");
@@ -487,6 +489,8 @@ namespace OdfKit.Tests
             var currentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
             var searchPattern = $"OdfKit_Render_{currentPid}_*";
             var existingDirs = new HashSet<string>(Directory.GetDirectories(tempPath, searchPattern), StringComparer.OrdinalIgnoreCase);
+            string capturePath = Path.Combine(tempPath, "OdfKit_MockSoffice_Args_" + Guid.NewGuid().ToString("N") + ".txt");
+            string? previousCapturePath = Environment.GetEnvironmentVariable(MockSofficeArgumentsCapturePathVariable);
             using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, TestContext.Current.CancellationToken);
             CancellationToken token = cts.Token;
@@ -504,6 +508,17 @@ namespace OdfKit.Tests
                     {
                         try
                         {
+                            if (File.Exists(capturePath))
+                            {
+                                var lines = File.ReadAllLines(capturePath).ToList();
+                                if (validator == null || validator(lines))
+                                {
+                                    capturedArgs = lines;
+                                    LogDebug($"Successfully read {lines.Count} arguments from capture file: {string.Join(", ", lines)}");
+                                    break;
+                                }
+                            }
+
                             var dirs = Directory.GetDirectories(tempPath, searchPattern);
                             foreach (var dir in dirs)
                             {
@@ -571,6 +586,7 @@ namespace OdfKit.Tests
             try
             {
                 LogDebug("Running action...");
+                Environment.SetEnvironmentVariable(MockSofficeArgumentsCapturePathVariable, capturePath);
                 runAction();
                 LogDebug("Action finished successfully");
             }
@@ -580,10 +596,11 @@ namespace OdfKit.Tests
             }
             finally
             {
-                cts.Cancel();
+                Environment.SetEnvironmentVariable(MockSofficeArgumentsCapturePathVariable, previousCapturePath);
             }
 
             await watcherTask;
+            cts.Cancel();
 
             if (lockStream != null)
             {
@@ -596,6 +613,13 @@ namespace OdfKit.Tests
                 { Directory.Delete(detectedDir, true); }
                 catch { }
             }
+
+            try
+            {
+                if (File.Exists(capturePath))
+                    File.Delete(capturePath);
+            }
+            catch { }
 
             LogDebug($"CaptureArgumentsAsync finished, returning {(capturedArgs != null ? capturedArgs.Count.ToString() : "null")} arguments");
             return capturedArgs ?? new List<string>();

@@ -1567,7 +1567,7 @@ public static class OdfToXlsxConverter
                 continue;
             }
 
-            rule.ErrorMessage = child.GetAttribute("message", OdfNamespaces.Table) ?? string.Empty;
+            rule.ErrorMessage = child.GetAttribute("message", OdfNamespaces.Table) ?? ReadElementText(child);
             rule.ErrorTitle = child.GetAttribute("title", OdfNamespaces.Table) ?? string.Empty;
             rule.ErrorStyle = (child.GetAttribute("message-type", OdfNamespaces.Table) ?? string.Empty) switch
             {
@@ -1577,6 +1577,21 @@ public static class OdfToXlsxConverter
             };
             return;
         }
+    }
+
+    private static string ReadElementText(OdfNode node)
+    {
+        if (!string.IsNullOrEmpty(node.TextContent))
+            return node.TextContent;
+
+        foreach (OdfNode child in node.Children)
+        {
+            string text = ReadElementText(child);
+            if (!string.IsNullOrEmpty(text))
+                return text;
+        }
+
+        return string.Empty;
     }
 
     private static void ApplyValidation(IXLCell cell, ValidationRule rule)

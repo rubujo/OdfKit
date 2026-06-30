@@ -1,6 +1,13 @@
 ﻿using System.Text.Json;
+using OdfKit.Chart;
 using OdfKit.Compliance;
 using OdfKit.Core;
+using OdfKit.DOM;
+using OdfKit.Drawing;
+using OdfKit.Presentation;
+using OdfKit.Spreadsheet;
+using OdfKit.Styles;
+using OdfKit.Text;
 
 namespace OdfCorpusGenerator;
 
@@ -29,12 +36,19 @@ internal static class Program
         string corpusRoot = Path.Combine(repoRoot, "tests", "fixtures", "corpus");
         string manifestPath = Path.Combine(corpusRoot, "manifest.json");
         string bulkRoot = Path.Combine(corpusRoot, "generated", "bulk");
+        string complexRoot = Path.Combine(corpusRoot, "generated", "complex");
 
         Directory.CreateDirectory(bulkRoot);
+        Directory.CreateDirectory(complexRoot);
 
         CorpusManifestDocument manifest = CorpusManifestDocument.Load(manifestPath);
+        CorpusFixtureEntry[] complexFixtures = GenerateComplexFixtures(complexRoot);
+        HashSet<string> generatedComplexIds = complexFixtures
+            .Select(static fixture => fixture.Id)
+            .ToHashSet(StringComparer.Ordinal);
         List<CorpusFixtureEntry> preserved = manifest.Fixtures
             .Where(fixture => !fixture.Id.StartsWith("bulk-", StringComparison.Ordinal))
+            .Where(fixture => !generatedComplexIds.Contains(fixture.Id))
             .ToList();
 
         List<CorpusFixtureEntry> bulkFixtures = [];
@@ -46,10 +60,15 @@ internal static class Program
             }
         }
 
-        manifest.Fixtures = [.. preserved, .. bulkFixtures.OrderBy(fixture => fixture.Id, StringComparer.Ordinal)];
+        manifest.Fixtures =
+        [
+            .. preserved,
+            .. complexFixtures,
+            .. bulkFixtures.OrderBy(fixture => fixture.Id, StringComparer.Ordinal)
+        ];
         manifest.Save(manifestPath);
 
-        Console.WriteLine($"Wrote {bulkFixtures.Count} bulk fixtures and {manifest.Fixtures.Count} total manifest entries.");
+        Console.WriteLine($"Wrote {complexFixtures.Length} complex fixtures, {bulkFixtures.Count} bulk fixtures and {manifest.Fixtures.Count} total manifest entries.");
         return 0;
     }
 
@@ -78,6 +97,162 @@ internal static class Program
         };
     }
 
+    private static CorpusFixtureEntry[] GenerateComplexFixtures(string complexRoot)
+    {
+        string annualPath = Path.Combine(complexRoot, "complex-annual-report.odt");
+        string financialPath = Path.Combine(complexRoot, "complex-financial-model.ods");
+        string flowPath = Path.Combine(complexRoot, "complex-flow-diagram.odg");
+
+        WriteComplexAnnualReport(annualPath);
+        WriteComplexFinancialModel(financialPath);
+        WriteComplexFlowDiagram(flowPath);
+
+        return
+        [
+            CreateComplexFixture(
+                "repo-generated-complex-annual-report",
+                "generated/complex/complex-annual-report.odt",
+                "Text",
+                annualPath,
+                "Schema-clean complex builder corpus fixture generated from the annual report cookbook scenario."),
+            CreateComplexFixture(
+                "repo-generated-complex-financial-model",
+                "generated/complex/complex-financial-model.ods",
+                "Spreadsheet",
+                financialPath,
+                "Schema-clean complex builder corpus fixture generated from the financial model cookbook scenario."),
+            CreateComplexFixture(
+                "repo-generated-complex-flow-diagram",
+                "generated/complex/complex-flow-diagram.odg",
+                "Graphics",
+                flowPath,
+                "Schema-clean complex builder corpus fixture generated from the flow diagram cookbook scenario.")
+        ];
+    }
+
+    private static CorpusFixtureEntry CreateComplexFixture(
+        string id,
+        string path,
+        string kind,
+        string fullPath,
+        string notes)
+    {
+        return new CorpusFixtureEntry
+        {
+            Id = id,
+            Path = path,
+            Source = "generated",
+            License = "generated-no-copyright",
+            Kind = kind,
+            Version = "1.4",
+            Profile = "OASIS_ODF_1_4_Extended",
+            Expected = "valid",
+            RoundTrip = "preserve-unknown",
+            Sha256 = ComputeSha256(fullPath),
+            Notes = notes
+        };
+    }
+
+    private static void WriteComplexAnnualReport(string outputPath)
+    {
+        using TextDocument report = TextDocument.Builder()
+            .WithMetadata(metadata => metadata.Title("年度報告").Author("OdfKit"))
+            .WithTheme(OdfDesignTheme.Flowchart)
+            .WithStyles(OdfStyleSet.BusinessReport)
+            .WithPageSetup(page => page.Header("年度報告"))
+            .AddCoverPage("年度報告", "2026 年營運成果", "OdfKit", "2026 年")
+            .AddTableOfContents("目錄", 2)
+            .AddHeading("營運摘要", 2)
+            .AddParagraph(paragraph => paragraph
+                .Append("營收年增 ")
+                .Append("18%", format => format.Bold().Color("#0066CC").BackgroundColor("#FFF2CC"))
+                .Append("。")
+                .AddFootnote("1", "示範資料，非實際財務數字。")
+                .AddComment("reviewer", "請財務團隊確認最終數字。"))
+            .AddSection("ExecutiveSection", 2, OdfLength.FromCentimeters(0.5), section => section
+                .AddHeading("區段摘要", 3)
+                .AddParagraph("此區段使用多欄版面，驗證 text:section 與 style:columns 產物。")
+                .AddParagraph("第二欄內容保留一般段落與文字片段，避免下沉 DOM 操作。"))
+            .AddTable(3, 2, table => table
+                .SetCell(1, 1, "季度")
+                .SetCell(1, 2, "營收")
+                .SetCell(2, 1, "Q1")
+                .SetCell(2, 2, "120")
+                .SetCell(3, 1, "Q2")
+                .SetCell(3, 2, "148"))
+            .AddParagraph("本段落示範報告本文與表格後續說明。")
+            .AddParagraph(paragraph => paragraph
+                .Append("圖表摘要")
+                .AddChart(new OdfChartDefinition
+                {
+                    ChartType = OdfChartType.Bar,
+                    Title = "季度營收",
+                    DataRange = new OdfCellRange(0, 0, 2, 1, "Data"),
+                    HasLegend = true,
+                }, OdfLength.FromCentimeters(8), OdfLength.FromCentimeters(5)))
+            .Build();
+
+        report.Save(outputPath);
+    }
+
+    private static void WriteComplexFinancialModel(string outputPath)
+    {
+        using SpreadsheetDocument workbook = SpreadsheetDocument.Builder()
+            .WithMetadata(metadata => metadata.Title("財務模型").Author("OdfKit"))
+            .WithTheme(OdfDesignTheme.Flowchart)
+            .WithStyles(OdfStyleSet.BusinessReport)
+            .AddSheet("銷售", sheet => sheet
+                .SetColumnWidth(1, 2.8)
+                .SetColumnWidth(2, 2.2)
+                .SetColumnWidth(3, 2.2)
+                .SetColumnWidth(4, 2.2)
+                .ImportTable(
+                    new[]
+                    {
+                        new { Month = "一月", Revenue = 120d, Cost = 72d },
+                        new { Month = "二月", Revenue = 148d, Cost = 83d },
+                    },
+                    row => [row.Month, row.Revenue, row.Cost],
+                    ["月份", "營收", "成本"])
+                .AddFormulaColumn(
+                    "D",
+                    "毛利",
+                    2,
+                    3,
+                    row => $"of:=[.B{row}]-[.C{row}]",
+                    row => row == 2 ? 48d : 65d)
+                .AddNamedRange("SalesModel", "A1:D3")
+                .AddDecimalValidation("B2:C3", 0, 1000, "輸入範圍", "請輸入 0 到 1000 之間的數值。")
+                .AddPivotTable("SalesPivot", "A1:D3", "G1", pivot => pivot
+                    .AddRowField("月份")
+                    .AddDataField("毛利", OdfPivotFunction.Sum))
+                .InsertChart("A1:D3", OdfChartType.Line, chart => chart.ChartTitle = "毛利趨勢"))
+            .AddSheet("摘要", sheet => sheet
+                .SetFormula("A1", "of:='銷售'.D2", 48d))
+            .Build();
+
+        workbook.Save(outputPath);
+    }
+
+    private static void WriteComplexFlowDiagram(string outputPath)
+    {
+        using DrawingDocument drawing = DrawingDocument.Builder()
+            .WithMetadata(metadata => metadata.Title("匯入流程"))
+            .WithTheme(OdfDesignTheme.Flowchart)
+            .WithStyles(OdfStyleSet.BusinessReport)
+            .WithLayoutPreset(OdfLayoutPreset.FlowDiagram)
+            .AddPage("主流程", page => page
+                .AddFlowStep("load", "載入 ODF", 0)
+                .AddFlowStep("validate", "驗證封裝", 1, OdfShapeType.Ellipse)
+                .AddFlowStep("export", "輸出報告", 2)
+                .AddConnector("load", "validate", OdfConnectorType.Straight)
+                .AddConnector("validate", "export", OdfConnectorType.Straight)
+                .AddTextBox("完成節點", 13, 4, 4, 1))
+            .Build();
+
+        drawing.Save(outputPath);
+    }
+
     private static (OdfVersion Version, string ProfileId, string RoundTrip) ResolveScenarioMetadata(
         OdfFormatInfo format,
         string scenario)
@@ -90,7 +265,7 @@ internal static class Program
             "roundtrip-rich" when format.Kind == OdfDocumentKind.FlatText =>
                 (OdfVersion.Odf13, "OASIS_ODF_1_3", roundTrip),
             "multi-element" when format.Kind == OdfDocumentKind.FlatText =>
-                (OdfVersion.Odf12, "ISO_IEC_26300", roundTrip),
+                (OdfVersion.Odf12, "ISO_IEC_26300_2015", roundTrip),
             "metadata" when format.Kind == OdfDocumentKind.FlatText =>
                 (OdfVersion.Odf11, "OASIS_ODF_1_1", roundTrip),
             _ => (OdfVersion.Odf14, "OASIS_ODF_1_4_Extended", roundTrip)
@@ -129,6 +304,13 @@ internal static class Program
         OdfVersion.Odf13 => "1.3",
         _ => "1.4"
     };
+
+    private static string ComputeSha256(string path)
+    {
+        using FileStream stream = File.OpenRead(path);
+        byte[] hash = System.Security.Cryptography.SHA256.HashData(stream);
+        return Convert.ToHexString(hash).ToLowerInvariant();
+    }
 
     private static string FindRepositoryRoot(string startDirectory)
     {

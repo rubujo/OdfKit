@@ -103,7 +103,7 @@ Database 與 Image 目前不強制補 `Builder()` 入口。Database 的主要 L2
 - 完整物理分頁排版器、像素級高保真渲染與所有 LibreOffice 版本的像素一致性。
 - 試算表完整公式重算、樞紐表重算、volatile function、多使用者計算狀態與任意外部連結資料來源。
 - SmartArt 智慧圖形、複雜形狀布局器與 Office 專屬 layout 相容層。
-- 完整多人協同演算法、任意衝突合併、undo stack、OT、CRDT、drawing operation、動態表格擴張與 header/footer/note selection 完整語意。
+- 完整多人協同演算法、任意衝突合併、undo stack、OT、CRDT、完整 drawing DOM、動態表格擴張與 header/footer/note selection 完整語意。
 - 通用 RELAX NG validator；核心 validator 只服務內建 ODF profile gate。
 - 外部 Office / LibreOffice / PDF pixel diff / large corpus 驗收進入主 CI Smoke。
 - 不可再散布 corpus、商業 SDK 輸出或外部專案原始碼作為 golden。

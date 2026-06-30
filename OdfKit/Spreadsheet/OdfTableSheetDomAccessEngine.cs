@@ -30,6 +30,64 @@ internal static class OdfTableSheetDomAccessEngine
     }
 
     /// <summary>
+    /// 依「邏輯欄索引」（已展開 <c>number-columns-repeated</c>）尋找對應的欄定義節點；
+    /// 若索引落在某個重複欄節點範圍內，會先將該節點拆分為單一節點再回傳。索引超出既有欄位定義範圍時回傳 <see langword="null"/>。
+    /// </summary>
+    internal static OdfNode? TryGetColumnNodeAtLogicalIndex(OdfNode tableNode, int position)
+    {
+        if (position < 0)
+            return null;
+
+        int currentColumnIndex = 0;
+        foreach (OdfNode child in tableNode.Children)
+        {
+            if (child.LocalName != "table-column" || child.NamespaceUri != OdfNamespaces.Table)
+                break;
+
+            int repeatedCount = OdfTableSheetRepeatSplitEngine.GetRepeatCount(child, "number-columns-repeated");
+            if (position >= currentColumnIndex && position < currentColumnIndex + repeatedCount)
+            {
+                return repeatedCount > 1
+                    ? OdfTableSheetRepeatSplitEngine.SplitRepeatedColumn(tableNode, child, position, currentColumnIndex, repeatedCount)
+                    : child;
+            }
+
+            currentColumnIndex += repeatedCount;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 依「邏輯欄索引」（已展開 <c>number-columns-repeated</c>）尋找列節點中對應的儲存格節點；
+    /// 若索引落在某個重複儲存格節點範圍內，會先將該節點拆分為單一節點再回傳。索引超出既有儲存格範圍時回傳 <see langword="null"/>。
+    /// </summary>
+    internal static OdfNode? TryGetCellNodeAtLogicalIndex(OdfNode rowNode, int col)
+    {
+        if (col < 0)
+            return null;
+
+        int currentColIndex = 0;
+        foreach (OdfNode child in rowNode.Children)
+        {
+            if ((child.LocalName != "table-cell" && child.LocalName != "covered-table-cell") || child.NamespaceUri != OdfNamespaces.Table)
+                continue;
+
+            int repeatedCount = OdfTableSheetRepeatSplitEngine.GetRepeatCount(child, "number-columns-repeated");
+            if (col >= currentColIndex && col < currentColIndex + repeatedCount)
+            {
+                return repeatedCount > 1
+                    ? OdfTableSheetRepeatSplitEngine.SplitRepeatedCell(child, col, currentColIndex, repeatedCount, rowNode)
+                    : child;
+            }
+
+            currentColIndex += repeatedCount;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// 取得工作表中所有列節點的清單（展開列容器）。
     /// </summary>
     internal static List<OdfNode> GetRowsList(OdfNode tableNode)
@@ -179,8 +237,95 @@ internal static class OdfTableSheetDomAccessEngine
     /// </summary>
     internal static OdfNode GetOrCreateCellNode(OdfNode tableNode, int row, int col)
     {
+        EnsureColumnDefinitions(tableNode, col);
         var rowNode = GetOrCreateRowNode(tableNode, row, forWrite: true);
         return GetOrCreateCellNode(rowNode, col, forWrite: true);
+    }
+
+    private static void EnsureColumnDefinitions(OdfNode tableNode, int col)
+    {
+        int currentColumnIndex = 0;
+        OdfNode? lastColumn = null;
+        foreach (OdfNode child in tableNode.Children)
+        {
+            if (child.LocalName == "table-column" && child.NamespaceUri == OdfNamespaces.Table)
+            {
+                int repeatedCount = OdfTableSheetRepeatSplitEngine.GetRepeatCount(child, "number-columns-repeated");
+                currentColumnIndex += repeatedCount;
+                lastColumn = child;
+                continue;
+            }
+
+            if (child.NamespaceUri == OdfNamespaces.Table &&
+                child.LocalName is "table-columns" or "table-column-group")
+            {
+                currentColumnIndex += CountColumnsInGroup(child);
+                lastColumn = child;
+                continue;
+            }
+
+            if (child.NamespaceUri == OdfNamespaces.Table &&
+                child.LocalName is "table-row" or "table-rows" or "table-row-group" or "named-expressions")
+            {
+                break;
+            }
+        }
+
+        while (currentColumnIndex <= col)
+        {
+            var columnNode = new OdfNode(OdfNodeType.Element, "table-column", OdfNamespaces.Table, "table");
+            InsertColumnDefinition(tableNode, columnNode, lastColumn);
+            lastColumn = columnNode;
+            currentColumnIndex++;
+        }
+    }
+
+    private static int CountColumnsInGroup(OdfNode groupNode)
+    {
+        int count = 0;
+        foreach (OdfNode child in groupNode.Children)
+        {
+            if (child.NamespaceUri != OdfNamespaces.Table)
+                continue;
+
+            if (child.LocalName == "table-column")
+            {
+                count += OdfTableSheetRepeatSplitEngine.GetRepeatCount(child, "number-columns-repeated");
+            }
+            else if (child.LocalName is "table-columns" or "table-column-group")
+            {
+                count += CountColumnsInGroup(child);
+            }
+        }
+        return count;
+    }
+
+    private static void InsertColumnDefinition(OdfNode tableNode, OdfNode columnNode, OdfNode? lastColumn)
+    {
+        if (lastColumn is not null)
+        {
+            int lastIndex = tableNode.Children.IndexOf(lastColumn);
+            if (lastIndex >= 0 && lastIndex + 1 < tableNode.Children.Count)
+            {
+                tableNode.InsertBefore(columnNode, tableNode.Children[lastIndex + 1]);
+                return;
+            }
+
+            tableNode.AppendChild(columnNode);
+            return;
+        }
+
+        foreach (OdfNode child in tableNode.Children)
+        {
+            if (child.NamespaceUri == OdfNamespaces.Table &&
+                child.LocalName is "table-row" or "table-rows" or "table-row-group" or "named-expressions")
+            {
+                tableNode.InsertBefore(columnNode, child);
+                return;
+            }
+        }
+
+        tableNode.AppendChild(columnNode);
     }
 
     /// <summary>
@@ -280,7 +425,9 @@ internal static class OdfTableSheetDomAccessEngine
                 }
                 currentColIndex += repeatedCount;
             }
-            else if (cols.Count > 0 && insertBeforeNode is null)
+            else if (insertBeforeNode is null &&
+                child.NamespaceUri == OdfNamespaces.Table &&
+                child.LocalName is "table-row" or "table-rows" or "table-row-group" or "named-expressions")
             {
                 insertBeforeNode = child;
             }

@@ -85,6 +85,21 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Sets the formula and cached value for the specified cell.
+    /// 設定指定儲存格的公式與快取值。
+    /// </summary>
+    /// <param name="address">The cell address. / 儲存格位址，例如 <c>A1</c>。</param>
+    /// <param name="formula">The ODF formula text; an empty value clears the formula. / ODF 公式文字；空值會清除公式。</param>
+    /// <param name="cachedValue">The cached value stored with the formula. / 隨公式儲存的快取值。</param>
+    /// <returns>The updated cell facade. / 已更新的儲存格 facade。</returns>
+    public OdfCell SetFormula(string address, string formula, object? cachedValue)
+    {
+        OdfCell cell = Cells[address];
+        cell.SetFormula(formula, cachedValue);
+        return cell;
+    }
+
+    /// <summary>
     /// Updates formulas in this worksheet.
     /// 更新此工作表中的公式。
     /// </summary>

@@ -23,7 +23,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "The PDF/A-3 schema declaration was injected into XMP metadata.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "Failed to update the PDF/A XMP metadata stream: {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "Failed to terminate LibreOffice after timeout: {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Failed to safely delete sandbox directory '{0}' after {1} attempts: {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Failed to safely delete sandbox directory '{0}' after {1} attempts: {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "ODT JSON operations must be an array or an object with a changes array.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "ODT JSON operation at index {0} must be an object.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "ODT JSON operation position '{0}' must be an array of non-negative integers.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "ODT JSON operation safety limit exceeded for {0}: {1} > {2}."
         },
         ["zh-TW"] = new(StringComparer.Ordinal)
         {
@@ -41,7 +45,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "成功將 PDF/A-3 結構描述宣告注入至 XMP 中繼資料中。",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "更新 PDF/A XMP 中繼資料資料流失敗：{0}。",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "LibreOffice 逾時後終止程序失敗：{0}。",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "安全刪除沙箱目錄「{0}」失敗，已嘗試 {1} 次：{2}。"
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "安全刪除沙箱目錄「{0}」失敗，已嘗試 {1} 次：{2}。",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "ODT JSON operations 必須是陣列，或是包含 changes 陣列的物件。",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "索引 {0} 的 ODT JSON operation 必須是物件。",
+            ["Err_OdtOperationLog_InvalidPosition"] = "ODT JSON operation 的位置「{0}」必須是非負整數陣列。",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "ODT JSON operation 超出 {0} 安全限制：{1} > {2}。"
         },
         ["de"] = new(StringComparer.Ordinal)
         {
@@ -59,7 +67,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "Die PDF/A-3-Schemadeklaration wurde in die XMP-Metadaten eingefügt.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "Aktualisierung des PDF/A-XMP-Metadatenstroms fehlgeschlagen: {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "LibreOffice konnte nach dem Timeout nicht beendet werden: {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Sandbox-Verzeichnis '{0}' konnte nach {1} Versuchen nicht sicher gelöscht werden: {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Sandbox-Verzeichnis '{0}' konnte nach {1} Versuchen nicht sicher gelöscht werden: {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "ODT-JSON-Operationen müssen ein Array oder ein Objekt mit einem changes-Array sein.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "ODT-JSON-Operation bei Index {0} muss ein Objekt sein.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "ODT-JSON-Operationsposition '{0}' muss ein Array nicht negativer Ganzzahlen sein.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "Sicherheitslimit für ODT-JSON-Operation überschritten für {0}: {1} > {2}."
         },
         ["fr"] = new(StringComparer.Ordinal)
         {
@@ -77,7 +89,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "La déclaration de schéma PDF/A-3 a été injectée dans les métadonnées XMP.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "Échec de la mise à jour du flux de métadonnées XMP PDF/A : {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "Échec de l'arrêt de LibreOffice après expiration du délai : {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Échec de la suppression sécurisée du répertoire bac à sable '{0}' après {1} tentatives : {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Échec de la suppression sécurisée du répertoire bac à sable '{0}' après {1} tentatives : {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "Les opérations JSON ODT doivent être un tableau ou un objet avec un tableau changes.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "L'opération JSON ODT à l'index {0} doit être un objet.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "La position d'opération JSON ODT '{0}' doit être un tableau d'entiers non négatifs.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "Limite de sécurité des opérations JSON ODT dépassée pour {0} : {1} > {2}."
         },
         ["nl"] = new(StringComparer.Ordinal)
         {
@@ -95,7 +111,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "De PDF/A-3-schemaverklaring is in XMP-metadata geïnjecteerd.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "Bijwerken van de PDF/A XMP-metadatastream is mislukt: {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "LibreOffice beëindigen na time-out is mislukt: {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Sandboxmap '{0}' kon na {1} pogingen niet veilig worden verwijderd: {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Sandboxmap '{0}' kon na {1} pogingen niet veilig worden verwijderd: {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "ODT JSON-bewerkingen moeten een array zijn of een object met een changes-array.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "ODT JSON-bewerking op index {0} moet een object zijn.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "ODT JSON-bewerkingspositie '{0}' moet een array met niet-negatieve gehele getallen zijn.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "Veiligheidslimiet voor ODT JSON-bewerkingen overschreden voor {0}: {1} > {2}."
         },
         ["nb"] = new(StringComparer.Ordinal)
         {
@@ -113,7 +133,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "PDF/A-3-skjemaerklæringen ble injisert i XMP-metadata.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "Kunne ikke oppdatere PDF/A XMP-metadatastrømmen: {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "Kunne ikke avslutte LibreOffice etter tidsavbrudd: {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Kunne ikke slette sandkassekatalogen '{0}' trygt etter {1} forsøk: {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Kunne ikke slette sandkassekatalogen '{0}' trygt etter {1} forsøk: {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "ODT JSON-operasjoner må være en matrise eller et objekt med en changes-matrise.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "ODT JSON-operasjon ved indeks {0} må være et objekt.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "ODT JSON-operasjonsposisjon '{0}' må være en matrise med ikke-negative heltall.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "Sikkerhetsgrense for ODT JSON-operasjon overskredet for {0}: {1} > {2}."
         },
         ["pt"] = new(StringComparer.Ordinal)
         {
@@ -131,7 +155,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "A declaração de esquema PDF/A-3 foi injetada nos metadados XMP.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "Falha ao atualizar o fluxo de metadados XMP PDF/A: {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "Falha ao encerrar o LibreOffice após o tempo limite: {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Falha ao excluir com segurança o diretório de sandbox '{0}' após {1} tentativas: {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Falha ao excluir com segurança o diretório de sandbox '{0}' após {1} tentativas: {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "As operações JSON ODT devem ser uma matriz ou um objeto com uma matriz changes.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "A operação JSON ODT no índice {0} deve ser um objeto.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "A posição da operação JSON ODT '{0}' deve ser uma matriz de inteiros não negativos.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "Limite de segurança de operação JSON ODT excedido para {0}: {1} > {2}."
         },
         ["it"] = new(StringComparer.Ordinal)
         {
@@ -149,7 +177,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "La dichiarazione dello schema PDF/A-3 è stata inserita nei metadati XMP.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "Aggiornamento del flusso di metadati XMP PDF/A non riuscito: {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "Impossibile terminare LibreOffice dopo il timeout: {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Impossibile eliminare in sicurezza la directory sandbox '{0}' dopo {1} tentativi: {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Impossibile eliminare in sicurezza la directory sandbox '{0}' dopo {1} tentativi: {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "Le operazioni JSON ODT devono essere un array o un oggetto con un array changes.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "L'operazione JSON ODT all'indice {0} deve essere un oggetto.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "La posizione dell'operazione JSON ODT '{0}' deve essere un array di interi non negativi.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "Limite di sicurezza dell'operazione JSON ODT superato per {0}: {1} > {2}."
         },
         ["sk"] = new(StringComparer.Ordinal)
         {
@@ -167,7 +199,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "Deklarácia schémy PDF/A-3 bola vložená do metadát XMP.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "Aktualizácia toku metadát XMP PDF/A zlyhala: {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "Ukončenie LibreOffice po časovom limite zlyhalo: {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Bezpečné odstránenie adresára sandboxu '{0}' po {1} pokusoch zlyhalo: {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Bezpečné odstránenie adresára sandboxu '{0}' po {1} pokusoch zlyhalo: {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "Operácie ODT JSON musia byť pole alebo objekt s poľom changes.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "Operácia ODT JSON na indexe {0} musí byť objekt.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "Pozícia operácie ODT JSON '{0}' musí byť pole nezáporných celých čísel.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "Bezpečnostný limit operácie ODT JSON bol prekročený pre {0}: {1} > {2}."
         },
         ["da"] = new(StringComparer.Ordinal)
         {
@@ -185,7 +221,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "PDF/A-3-skemaerklæringen blev indsat i XMP-metadata.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "Opdatering af PDF/A XMP-metadatastrømmen mislykkedes: {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "Kunne ikke afslutte LibreOffice efter timeout: {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Kunne ikke slette sandbox-mappen '{0}' sikkert efter {1} forsøg: {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Kunne ikke slette sandbox-mappen '{0}' sikkert efter {1} forsøg: {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "ODT JSON-operationer skal være en matrix eller et objekt med en changes-matrix.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "ODT JSON-operation ved indeks {0} skal være et objekt.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "ODT JSON-operationsposition '{0}' skal være en matrix af ikke-negative heltal.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "Sikkerhedsgrænse for ODT JSON-operation overskredet for {0}: {1} > {2}."
         },
         ["ms"] = new(StringComparer.Ordinal)
         {
@@ -203,7 +243,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "Pengisytiharan skema PDF/A-3 telah disuntik ke dalam metadata XMP.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "Gagal mengemas kini strim metadata XMP PDF/A: {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "Gagal menamatkan LibreOffice selepas tamat masa: {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Gagal memadam direktori sandbox '{0}' dengan selamat selepas {1} percubaan: {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "Gagal memadam direktori sandbox '{0}' dengan selamat selepas {1} percubaan: {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "Operasi JSON ODT mesti berupa tatasusunan atau objek dengan tatasusunan changes.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "Operasi JSON ODT pada indeks {0} mesti berupa objek.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "Kedudukan operasi JSON ODT '{0}' mesti berupa tatasusunan integer bukan negatif.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "Had keselamatan operasi JSON ODT dilampaui untuk {0}: {1} > {2}."
         },
         ["ko"] = new(StringComparer.Ordinal)
         {
@@ -221,7 +265,11 @@ public static partial class OdfLocalizer
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataInjected"] = "PDF/A-3 스키마 선언이 XMP 메타데이터에 삽입되었습니다.",
             ["Diag_OdfHybridPdfHelper_PdfaXmpMetadataUpdateFailed"] = "PDF/A XMP 메타데이터 스트림을 업데이트하지 못했습니다: {0}.",
             ["Diag_LibreOfficeRenderer_KillAfterTimeoutFailed"] = "시간 초과 후 LibreOffice 종료에 실패했습니다: {0}.",
-            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "샌드박스 디렉터리 '{0}'을(를) {1}번 시도 후에도 안전하게 삭제하지 못했습니다: {2}."
+            ["Diag_LibreOfficeRenderer_SandboxDeleteFailed"] = "샌드박스 디렉터리 '{0}'을(를) {1}번 시도 후에도 안전하게 삭제하지 못했습니다: {2}.",
+            ["Err_OdtOperationLog_InvalidEnvelope"] = "ODT JSON 작업은 배열이거나 changes 배열을 포함하는 객체여야 합니다.",
+            ["Err_OdtOperationLog_OperationMustBeObject"] = "인덱스 {0}의 ODT JSON 작업은 객체여야 합니다.",
+            ["Err_OdtOperationLog_InvalidPosition"] = "ODT JSON 작업 위치 '{0}'은 음수가 아닌 정수 배열이어야 합니다.",
+            ["Err_OdtOperationLog_SafetyLimitExceeded"] = "ODT JSON 작업 안전 제한을 초과했습니다({0}: {1} > {2})."
         }
     };
 

@@ -229,10 +229,10 @@ public class PivotTableTests
     }
 
     /// <summary>
-    /// 驗證 WithColumnHeaders(false) 寫入 has-column-headers="false"。
+    /// 驗證 WithColumnHeaders(false) 不輸出非標準 has-column-headers 屬性。
     /// </summary>
     [Fact]
-    public void WithColumnHeaders_False_WritesCorrectAttribute()
+    public void WithColumnHeaders_False_DoesNotWriteNonstandardAttribute()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -244,29 +244,29 @@ public class PivotTableTests
             .Build();
 
         string xml = GetContentXml(doc);
-        Assert.Contains("table:has-column-headers=\"false\"", xml);
+        Assert.DoesNotContain("table:has-column-headers", xml);
     }
 
     /// <summary>
-    /// 驗證預設情況下 has-column-headers="true" 與 has-row-headers="true"。
+    /// 驗證預設情況下不輸出非標準 header 屬性。
     /// </summary>
     [Fact]
-    public void Build_DefaultHeaders_WritesTrue()
+    public void Build_DefaultHeaders_DoesNotWriteNonstandardAttributes()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
         BuildBasicPivot(sheet);
 
         string xml = GetContentXml(doc);
-        Assert.Contains("table:has-column-headers=\"true\"", xml);
-        Assert.Contains("table:has-row-headers=\"true\"", xml);
+        Assert.DoesNotContain("table:has-column-headers", xml);
+        Assert.DoesNotContain("table:has-row-headers", xml);
     }
 
     /// <summary>
-    /// 驗證 WithRowHeaders(false) 寫入 has-row-headers="false"。
+    /// 驗證 WithRowHeaders(false) 不輸出非標準 has-row-headers 屬性。
     /// </summary>
     [Fact]
-    public void WithRowHeaders_False_WritesCorrectAttribute()
+    public void WithRowHeaders_False_DoesNotWriteNonstandardAttribute()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -278,16 +278,15 @@ public class PivotTableTests
             .Build();
 
         string xml = GetContentXml(doc);
-        Assert.Contains("table:has-row-headers=\"false\"", xml);
-        // WithRowHeaders(false) 不應影響 has-column-headers，應維持預設 true。
-        Assert.Contains("table:has-column-headers=\"true\"", xml);
+        Assert.DoesNotContain("table:has-row-headers", xml);
+        Assert.DoesNotContain("table:has-column-headers", xml);
     }
 
     /// <summary>
-    /// 驗證 WithRowHeaders 與 WithColumnHeaders 可同時設為 false，且彼此互不干擾。
+    /// 驗證 WithRowHeaders 與 WithColumnHeaders 可同時呼叫且不輸出非標準屬性。
     /// </summary>
     [Fact]
-    public void WithRowHeadersAndWithColumnHeaders_BothFalse_WritesBothAttributes()
+    public void WithRowHeadersAndWithColumnHeaders_BothFalse_DoesNotWriteNonstandardAttributes()
     {
         using var doc = SpreadsheetDocument.Create();
         var sheet = doc.Worksheets.Add("Sheet1");
@@ -300,8 +299,8 @@ public class PivotTableTests
             .Build();
 
         string xml = GetContentXml(doc);
-        Assert.Contains("table:has-row-headers=\"false\"", xml);
-        Assert.Contains("table:has-column-headers=\"false\"", xml);
+        Assert.DoesNotContain("table:has-row-headers", xml);
+        Assert.DoesNotContain("table:has-column-headers", xml);
     }
 
     /// <summary>

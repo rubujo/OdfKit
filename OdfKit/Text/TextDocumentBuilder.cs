@@ -664,18 +664,6 @@ public sealed class TextTableBuilder
     }
 
     /// <summary>
-    /// Sets the table summary.
-    /// 設定表格摘要。
-    /// </summary>
-    /// <param name="summary">The summary text. / 摘要文字。</param>
-    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
-    public TextTableBuilder WithSummary(string summary)
-    {
-        _table.Summary = summary;
-        return this;
-    }
-
-    /// <summary>
     /// Sets the cell text.
     /// 設定儲存格文字。
     /// </summary>
@@ -761,6 +749,22 @@ public sealed class TextSectionBuilder
         var paragraphNode = OdfNodeFactory.CreateElement("p", OdfNamespaces.Text, "text");
         _section.Node.AppendChild(paragraphNode);
         configure(new TextParagraphBuilder(_document, new OdfParagraph(paragraphNode, _document)));
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a heading within the section.
+    /// 新增區段內標題。
+    /// </summary>
+    /// <param name="text">The heading text. / 標題文字。</param>
+    /// <param name="level">The outline level. / 大綱階層。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
+    public TextSectionBuilder AddHeading(string text, int level = 1)
+    {
+        var headingNode = OdfNodeFactory.CreateElement("h", OdfNamespaces.Text, "text");
+        headingNode.SetAttribute("outline-level", OdfNamespaces.Text, Math.Max(1, level).ToString(CultureInfo.InvariantCulture), "text");
+        headingNode.TextContent = text;
+        _section.Node.AppendChild(headingNode);
         return this;
     }
 

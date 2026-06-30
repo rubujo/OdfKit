@@ -44,15 +44,6 @@ internal static class OdfTableSheetChartEngine
         frame.SetAttribute("x", OdfNamespaces.Svg, xStr, "svg");
         frame.SetAttribute("y", OdfNamespaces.Svg, yStr, "svg");
 
-        string anchorAddr = new OdfCellAddress(
-            dataRange.StartAddress.Row, dataRange.StartAddress.Column).ToOdfString(false);
-        frame.SetAttribute("start-cell-address", OdfNamespaces.Table, anchorAddr, "table");
-        frame.SetAttribute("end-cell-address", OdfNamespaces.Table, anchorAddr, "table");
-        frame.SetAttribute("start-x", OdfNamespaces.Table, xStr, "table");
-        frame.SetAttribute("start-y", OdfNamespaces.Table, yStr, "table");
-        frame.SetAttribute("end-x", OdfNamespaces.Table, wStr, "table");
-        frame.SetAttribute("end-y", OdfNamespaces.Table, hStr, "table");
-
         var objectNode = new OdfNode(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
         objectNode.SetAttribute("href", OdfNamespaces.XLink, $"./{objectName}", "xlink");
         objectNode.SetAttribute("type", OdfNamespaces.XLink, "simple", "xlink");
@@ -92,8 +83,6 @@ internal static class OdfTableSheetChartEngine
             if (child.LocalName == "shapes" && child.NamespaceUri == OdfNamespaces.Table)
                 return child;
         }
-        var shapesNode = new OdfNode(OdfNodeType.Element, "shapes", OdfNamespaces.Table, "table");
-        tableNode.AppendChild(shapesNode);
-        return shapesNode;
+        return OdfTableSheetDomHelper.FindOrCreateTableShapes(tableNode);
     }
 }

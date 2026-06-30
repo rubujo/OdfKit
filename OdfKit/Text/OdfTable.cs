@@ -41,6 +41,12 @@ public partial class OdfTable
 
     private void BuildGrid()
     {
+        for (int c = 0; c < _cols; c++)
+        {
+            var colNode = new OdfNode(OdfNodeType.Element, "table-column", OdfNamespaces.Table, "table");
+            Node.AppendChild(colNode);
+        }
+
         for (int r = 0; r < _rows; r++)
         {
             var rNode = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
@@ -50,22 +56,6 @@ public partial class OdfTable
                 rNode.AppendChild(cNode);
             }
             Node.AppendChild(rNode);
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the table's accessible summary description (maps to the ODF <c>table:summary</c> attribute).
-    /// 取得或設定表格的無障礙摘要說明（對應 ODF <c>table:summary</c> 屬性）。
-    /// </summary>
-    public string? Summary
-    {
-        get => Node.GetAttribute("summary", OdfNamespaces.Table);
-        set
-        {
-            if (string.IsNullOrEmpty(value))
-                Node.RemoveAttribute("summary", OdfNamespaces.Table);
-            else
-                Node.SetAttribute("summary", OdfNamespaces.Table, value!, "table");
         }
     }
 
@@ -139,6 +129,11 @@ public partial class OdfTable
     {
         var cellNode = GetCellNode(row, col);
         var nestedTableNode = OdfNodeFactory.CreateElement("table", OdfNamespaces.Table, "table");
+        nestedTableNode.SetAttribute(
+            "name",
+            OdfNamespaces.Table,
+            $"NestedTable{row.ToString(CultureInfo.InvariantCulture)}_{col.ToString(CultureInfo.InvariantCulture)}",
+            "table");
         cellNode.AppendChild(nestedTableNode);
         return new OdfTable(nestedTableNode, nestedRows, nestedCols, _doc);
     }

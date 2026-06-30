@@ -9,6 +9,24 @@ namespace MockSoffice
     {
         static int Main(string[] args)
         {
+            string? capturePath = Environment.GetEnvironmentVariable("ODFKIT_MOCK_SOFFICE_ARGS_PATH");
+            if (!string.IsNullOrWhiteSpace(capturePath))
+            {
+                try
+                {
+                    string? captureDir = Path.GetDirectoryName(capturePath);
+                    if (!string.IsNullOrEmpty(captureDir))
+                    {
+                        Directory.CreateDirectory(captureDir);
+                    }
+
+                    File.WriteAllLines(capturePath, args);
+                }
+                catch
+                {
+                }
+            }
+
             string? outDir = null;
             string format = "pdf";
             bool simulateTimeout = false;

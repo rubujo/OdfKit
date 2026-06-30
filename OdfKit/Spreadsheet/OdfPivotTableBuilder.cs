@@ -112,26 +112,22 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
     private readonly List<(string name, string orientation, string? function, string? formula)> _fields = [];
     private readonly List<(string fieldName, bool ascending)> _sortInfos = [];
     private readonly List<(string fieldName, OdfPivotFilterOperator op, string value)> _filters = [];
-    private bool _hasColumnHeaders = true;
-    private bool _hasRowHeaders = true;
 
     /// <summary>
-    /// Sets whether the source data contains a column header row. The default is <see langword="true"/>.
-    /// 設定來源資料是否包含欄標題列（預設為 <see langword="true"/>）。
+    /// Keeps source column header intent for fluent API compatibility without emitting nonstandard attributes.
+    /// 保留來源欄標題意圖以相容 Fluent API，但不輸出非標準屬性。
     /// </summary>
     public OdfPivotTableBuilder WithColumnHeaders(bool hasHeaders = true)
     {
-        _hasColumnHeaders = hasHeaders;
         return this;
     }
 
     /// <summary>
-    /// Sets whether the source data contains a row header column. The default is <see langword="true"/>.
-    /// 設定來源資料是否包含列標題欄（預設為 <see langword="true"/>）。
+    /// Keeps source row header intent for fluent API compatibility without emitting nonstandard attributes.
+    /// 保留來源列標題意圖以相容 Fluent API，但不輸出非標準屬性。
     /// </summary>
     public OdfPivotTableBuilder WithRowHeaders(bool hasHeaders = true)
     {
-        _hasRowHeaders = hasHeaders;
         return this;
     }
 
@@ -274,8 +270,6 @@ public class OdfPivotTableBuilder(string name, OdfCellRange sourceRange, OdfCell
         tableNode.SetAttribute("name", OdfNamespaces.Table, _name, "table");
         tableNode.SetAttribute("target-range-address", OdfNamespaces.Table, targetRange.ToOdfString(false), "table");
         tableNode.SetAttribute("buttons", OdfNamespaces.Table, targetRange.ToOdfString(false), "table");
-        tableNode.SetAttribute("has-column-headers", OdfNamespaces.Table, _hasColumnHeaders ? "true" : "false", "table");
-        tableNode.SetAttribute("has-row-headers", OdfNamespaces.Table, _hasRowHeaders ? "true" : "false", "table");
 
         var sourceRangeNode = new OdfNode(OdfNodeType.Element, "source-cell-range", OdfNamespaces.Table, "table");
         sourceRangeNode.SetAttribute("cell-range-address", OdfNamespaces.Table, _sourceRange.ToOdfString(false), "table");

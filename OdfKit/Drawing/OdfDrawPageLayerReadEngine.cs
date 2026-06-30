@@ -16,7 +16,20 @@ internal static class OdfDrawPageLayerReadEngine
     {
         List<OdfLayerInfo> layers = [];
 
-        foreach (OdfNode child in pageNode.Children)
+        OdfNode? parent = pageNode.Parent;
+        if (parent is not null)
+        {
+            CollectLayerSetChildren(parent, pageName, layers);
+        }
+
+        CollectLayerSetChildren(pageNode, pageName, layers);
+
+        return layers;
+    }
+
+    private static void CollectLayerSetChildren(OdfNode containerNode, string pageName, List<OdfLayerInfo> layers)
+    {
+        foreach (OdfNode child in containerNode.Children)
         {
             if (child.NodeType is not OdfNodeType.Element ||
                 child.LocalName is not "layer-set" ||
@@ -42,7 +55,5 @@ internal static class OdfDrawPageLayerReadEngine
                     layerNode.GetAttribute("display", OdfNamespaces.Draw)));
             }
         }
-
-        return layers;
     }
 }

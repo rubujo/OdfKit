@@ -89,31 +89,41 @@ public static partial class OdfSchemaPatternValidator
 
         if (!context.EnterReference(referenceName))
         {
-            return false;
+            OdfSchemaPatternMatchContext? recursiveContext = context.CreateRecursiveContext();
+            return recursiveContext is not null &&
+                MatchesReferenceWithoutActiveGuard(referenceName, element, recursiveContext);
         }
 
         try
         {
-            OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
-            if (pattern == null)
-            {
-                return false;
-            }
-
-            foreach (OdfSchemaPatternNode root in pattern.Roots)
-            {
-                if (MatchesRootNode(root, element, context))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return MatchesReferenceWithoutActiveGuard(referenceName, element, context);
         }
         finally
         {
             context.LeaveReference(referenceName);
         }
+    }
+
+    private static bool MatchesReferenceWithoutActiveGuard(
+        string referenceName,
+        XElement element,
+        OdfSchemaPatternMatchContext context)
+    {
+        OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
+        if (pattern == null)
+        {
+            return false;
+        }
+
+        foreach (OdfSchemaPatternNode root in pattern.Roots)
+        {
+            if (MatchesRootNode(root, element, context))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool MatchesElementName(OdfSchemaPatternNode node, XElement element)

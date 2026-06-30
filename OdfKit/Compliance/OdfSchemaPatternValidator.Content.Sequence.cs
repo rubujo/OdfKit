@@ -120,33 +120,52 @@ internal static partial class OdfSchemaPatternContentMatcher
         int index,
         OdfSchemaPatternMatchContext context)
     {
-        if (string.IsNullOrWhiteSpace(referenceName) || !context.EnterReference(referenceName))
+        if (string.IsNullOrWhiteSpace(referenceName))
         {
             return new HashSet<int>();
         }
 
+        bool entered = context.EnterReference(referenceName);
+        if (!entered)
+        {
+            OdfSchemaPatternMatchContext? recursiveContext = context.CreateRecursiveContext();
+            return recursiveContext is null
+                ? new HashSet<int>()
+                : MatchContentReferenceWithoutActiveGuard(referenceName, parent, childElements, index, recursiveContext);
+        }
+
         try
         {
-            OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
-            if (pattern == null)
-            {
-                return new HashSet<int>();
-            }
-
-            var matches = new HashSet<int>();
-            foreach (OdfSchemaPatternNode root in pattern.Roots)
-            {
-                foreach (int matched in MatchContentNode(root, parent, childElements, index, context))
-                {
-                    matches.Add(matched);
-                }
-            }
-            return matches;
+            return MatchContentReferenceWithoutActiveGuard(referenceName, parent, childElements, index, context);
         }
         finally
         {
             context.LeaveReference(referenceName);
         }
+    }
+
+    private static HashSet<int> MatchContentReferenceWithoutActiveGuard(
+        string referenceName,
+        XElement parent,
+        IReadOnlyList<XElement> childElements,
+        int index,
+        OdfSchemaPatternMatchContext context)
+    {
+        OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
+        if (pattern == null)
+        {
+            return new HashSet<int>();
+        }
+
+        var matches = new HashSet<int>();
+        foreach (OdfSchemaPatternNode root in pattern.Roots)
+        {
+            foreach (int matched in MatchContentNode(root, parent, childElements, index, context))
+            {
+                matches.Add(matched);
+            }
+        }
+        return matches;
     }
 
     private static HashSet<int> MatchChoice(

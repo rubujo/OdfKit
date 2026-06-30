@@ -475,7 +475,8 @@ public sealed class OdfDrawPageBuilder
 
     private OdfNode GetOrCreateLayerSet()
     {
-        foreach (OdfNode child in _page.Node.Children)
+        OdfNode drawingRoot = _page.Document.GetDrawingNode();
+        foreach (OdfNode child in drawingRoot.Children)
         {
             if (child.NodeType is OdfNodeType.Element &&
                 child.LocalName == "layer-set" &&
@@ -486,14 +487,14 @@ public sealed class OdfDrawPageBuilder
         }
 
         OdfNode layerSet = OdfNodeFactory.CreateElement("layer-set", OdfNamespaces.Draw, "draw");
-        _page.Node.AppendChild(layerSet);
+        drawingRoot.InsertBefore(layerSet, _page.Node);
         return layerSet;
     }
 
     private static string ToConnectorTypeValue(OdfConnectorType connectorType) => connectorType switch
     {
         OdfConnectorType.Lines => "lines",
-        OdfConnectorType.Straight => "straight",
+        OdfConnectorType.Straight => "line",
         OdfConnectorType.Curve => "curve",
         _ => "standard"
     };

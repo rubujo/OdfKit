@@ -23,8 +23,8 @@ internal static class TextDocumentPageFieldsEngine
     /// </summary>
     internal static void AddPageCountField(OdfParagraph paragraph)
     {
-        var fNode = new OdfNode(OdfNodeType.Element, "page-count", OdfNamespaces.Text, "text");
-        fNode.SetAttribute("num-format", OdfNamespaces.Style, "1", "style");
+        var fNode = new OdfNode(OdfNodeType.Element, "page-number", OdfNamespaces.Text, "text");
+        fNode.SetAttribute("select-page", OdfNamespaces.Text, "last", "text");
         paragraph.Node.AppendChild(fNode);
     }
 }

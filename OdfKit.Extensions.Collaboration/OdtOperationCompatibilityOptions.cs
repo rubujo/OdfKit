@@ -45,6 +45,8 @@ public enum OdtUnsupportedOperationPolicy
 /// </summary>
 public sealed class OdtOperationCompatibilityOptions
 {
+    private OdtOperationSafetyOptions? _safety;
+
     /// <summary>
     /// Gets or sets envelope mode.
     /// 取得或設定匯出時使用的封包格式；匯入時會同時接受裸陣列與 TDF changes 封包。
@@ -65,6 +67,22 @@ public sealed class OdtOperationCompatibilityOptions
     public bool EmitDiagnostics { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets whether unknown JSON properties are preserved when serializing typed operation logs.
+    /// 取得或設定序列化 typed operation log 時是否保留未知 JSON 欄位。
+    /// </summary>
+    public bool PreserveUnknownProperties { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets safety limits for parsing and replay.
+    /// 取得或設定剖析與重播使用的安全限制。
+    /// </summary>
+    public OdtOperationSafetyOptions Safety
+    {
+        get => _safety ??= new OdtOperationSafetyOptions();
+        set => _safety = value ?? throw new ArgumentNullException(nameof(value));
+    }
+
+    /// <summary>
     /// Creates create tdf compatibility.
     /// 建立以 TDF changes 封包輸出，並對未知 operation 產生診斷的預設相容設定。
     /// </summary>
@@ -74,5 +92,6 @@ public sealed class OdtOperationCompatibilityOptions
         EnvelopeMode = OdtOperationEnvelopeMode.TdfChangesObject,
         UnsupportedOperationPolicy = OdtUnsupportedOperationPolicy.RecordDiagnostic,
         EmitDiagnostics = true,
+        PreserveUnknownProperties = true,
     };
 }

@@ -129,8 +129,8 @@ internal static class OdfTableSheetStructureEngine
         if (columnSnapshots.Count == 0)
             return;
 
-        List<OdfNode> columns = OdfTableSheetDomAccessEngine.GetColumnsList(tableNode);
-        OdfNode? insertBefore = position < columns.Count ? columns[position] : FindFirstNonColumnChild(tableNode);
+        OdfNode? insertBefore = OdfTableSheetDomAccessEngine.TryGetColumnNodeAtLogicalIndex(tableNode, position)
+            ?? FindFirstNonColumnChild(tableNode);
         OdfNode parent = insertBefore?.Parent ?? tableNode;
 
         foreach (OdfNode snapshot in columnSnapshots)
@@ -179,40 +179,33 @@ internal static class OdfTableSheetStructureEngine
 
     private static void InsertColumnDefinitions(OdfNode tableNode, int position, int count)
     {
-        List<OdfNode> columns = OdfTableSheetDomAccessEngine.GetColumnsList(tableNode);
-        if (position >= columns.Count)
-        {
-            OdfNode? insertBefore = FindFirstNonColumnChild(tableNode);
-            for (int i = 0; i < count; i++)
-            {
-                OdfNode column = CreateEmptyColumn();
-                if (insertBefore is not null)
-                    tableNode.InsertBefore(column, insertBefore);
-                else
-                    tableNode.AppendChild(column);
-            }
+        // 以「邏輯欄索引」（已展開 number-columns-repeated）尋找插入錨點，而非依 DOM 節點數索引，
+        // 否則表格含重複欄定義時，插入位置會被誤判。
+        OdfNode? insertBefore = OdfTableSheetDomAccessEngine.TryGetColumnNodeAtLogicalIndex(tableNode, position)
+            ?? FindFirstNonColumnChild(tableNode);
 
-            return;
-        }
-
-        OdfNode referenceColumn = columns[position];
-        OdfNode parent = referenceColumn.Parent ?? tableNode;
         for (int i = 0; i < count; i++)
-            parent.InsertBefore(CreateEmptyColumn(), referenceColumn);
+        {
+            OdfNode column = CreateEmptyColumn();
+            if (insertBefore is not null)
+                tableNode.InsertBefore(column, insertBefore);
+            else
+                tableNode.AppendChild(column);
+        }
     }
 
     private static IReadOnlyList<OdfNode> DeleteColumnDefinitions(OdfNode tableNode, int position, int count)
     {
-        List<OdfNode> columns = OdfTableSheetDomAccessEngine.GetColumnsList(tableNode);
         List<OdfNode> deletedSnapshots = [];
 
+        // 同樣以邏輯欄索引逐一查找並刪除，必要時會先拆分重複欄節點，避免索引超出 DOM 節點數時靜默變成 no-op。
         int end = position + count - 1;
         for (int index = end; index >= position; index--)
         {
-            if (index < 0 || index >= columns.Count)
+            OdfNode? column = OdfTableSheetDomAccessEngine.TryGetColumnNodeAtLogicalIndex(tableNode, index);
+            if (column is null)
                 continue;
 
-            OdfNode column = columns[index];
             deletedSnapshots.Insert(0, column.CloneNode(deep: true));
             column.Parent?.RemoveChild(column);
         }
@@ -222,27 +215,24 @@ internal static class OdfTableSheetStructureEngine
 
     private static void InsertCellsInRow(OdfNode rowNode, int position, int count)
     {
-        List<OdfNode> cells = OdfTableSheetDomAccessEngine.GetCellsInRow(rowNode);
-        if (position >= cells.Count)
-        {
-            for (int i = 0; i < count; i++)
-                rowNode.AppendChild(CreateEmptyCell());
+        OdfNode? insertBefore = OdfTableSheetDomAccessEngine.TryGetCellNodeAtLogicalIndex(rowNode, position);
 
-            return;
-        }
-
-        OdfNode referenceCell = cells[position];
         for (int i = 0; i < count; i++)
-            rowNode.InsertBefore(CreateEmptyCell(), referenceCell);
+        {
+            OdfNode cell = CreateEmptyCell();
+            if (insertBefore is not null)
+                rowNode.InsertBefore(cell, insertBefore);
+            else
+                rowNode.AppendChild(cell);
+        }
     }
 
     private static OdfNode? DeleteCellInRow(OdfNode rowNode, int position)
     {
-        List<OdfNode> cells = OdfTableSheetDomAccessEngine.GetCellsInRow(rowNode);
-        if (position < 0 || position >= cells.Count)
+        OdfNode? cell = OdfTableSheetDomAccessEngine.TryGetCellNodeAtLogicalIndex(rowNode, position);
+        if (cell is null)
             return null;
 
-        OdfNode cell = cells[position];
         OdfNode snapshot = cell.CloneNode(deep: true);
         cell.Parent?.RemoveChild(cell);
         return snapshot;
@@ -250,12 +240,12 @@ internal static class OdfTableSheetStructureEngine
 
     private static void RestoreCellInRow(OdfNode rowNode, int position, OdfNode cellSnapshot)
     {
-        List<OdfNode> cells = OdfTableSheetDomAccessEngine.GetCellsInRow(rowNode);
         OdfNode restoredCell = cellSnapshot.CloneNode(deep: true);
+        OdfNode? insertBefore = OdfTableSheetDomAccessEngine.TryGetCellNodeAtLogicalIndex(rowNode, position);
 
-        if (position < cells.Count)
+        if (insertBefore is not null)
         {
-            rowNode.InsertBefore(restoredCell, cells[position]);
+            rowNode.InsertBefore(restoredCell, insertBefore);
             return;
         }
 

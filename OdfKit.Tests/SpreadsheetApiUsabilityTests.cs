@@ -132,6 +132,54 @@ public class SpreadsheetApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證 Fluent builder 可建立含快取公式與樞紐彙總的 ODS，並通過 ODF 1.4 Extended 驗證。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetDocumentBuilderFormulaCachedValuesAndPivotPassOdf14ExtendedValidation()
+    {
+        FinancialRow[] rows =
+        [
+            new("一月", 120d, 72d),
+            new("二月", 150d, 85d),
+        ];
+
+        using SpreadsheetDocument workbook = SpreadsheetDocument.Builder()
+            .AddSheet("銷售", sheet => sheet
+                .ImportTable(rows, row => [row.Month, row.Revenue, row.Cost], ["月份", "營收", "成本"])
+                .AddFormulaColumn(
+                    "D",
+                    "毛利",
+                    2,
+                    rows.Length + 1,
+                    row => $"of:=[.B{row}]-[.C{row}]",
+                    row => row == 2 ? 48d : 65d)
+                .AddPivotTable("SalesPivot", "A1:D3", "G1", pivot => pivot
+                    .AddRowField("月份")
+                    .AddDataField("毛利", OdfPivotFunction.Sum)))
+            .AddSheet("摘要", sheet => sheet
+                .SetFormula("A1", "of:='銷售'.D2", 48d))
+            .Build();
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        OdfValidationReport report = OdfValidator.Validate(
+            stream,
+            "model.ods",
+            OdfComplianceProfiles.OasisOdf14Extended);
+
+        Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
+
+        stream.Position = 0;
+        using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
+        Assert.Equal(48d, loaded.Worksheets["銷售"].Cells["D2"].CellValue);
+        Assert.Equal("of:=[.B2]-[.C2]", loaded.Worksheets["銷售"].Cells["D2"].Formula);
+        Assert.Equal(48d, loaded.Worksheets["摘要"].Cells["A1"].CellValue);
+        Assert.Equal("of:='銷售'.D2", loaded.Worksheets["摘要"].Cells["A1"].Formula);
+    }
+
+    /// <summary>
     /// 驗證公式重算通道會在儲存格變更後以背景工作更新公式結果。
     /// </summary>
     [Fact]

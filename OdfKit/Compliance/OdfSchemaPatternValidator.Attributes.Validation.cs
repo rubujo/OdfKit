@@ -248,6 +248,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         switch (node.Kind)
         {
             case OdfSchemaPatternNodeKind.Attribute:
+            case OdfSchemaPatternNodeKind.Empty:
                 return true;
             case OdfSchemaPatternNodeKind.Ref:
                 return IsAttributeReference(node, context);

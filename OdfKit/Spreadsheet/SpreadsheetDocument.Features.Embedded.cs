@@ -34,20 +34,7 @@ public partial class SpreadsheetDocument
             throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SheetNamedCannotFound_4", sheetName));
 
         // 1. 尋找或建立 table:shapes
-        OdfNode? shapesNode = null;
-        foreach (var child in sheet.TableNode.Children)
-        {
-            if (child.LocalName == "shapes" && child.NamespaceUri == OdfNamespaces.Table)
-            {
-                shapesNode = child;
-                break;
-            }
-        }
-        if (shapesNode is null)
-        {
-            shapesNode = new OdfNode(OdfNodeType.Element, "shapes", OdfNamespaces.Table, "table");
-            sheet.TableNode.AppendChild(shapesNode);
-        }
+        OdfNode shapesNode = OdfTableSheetDomHelper.FindOrCreateTableShapes(sheet.TableNode);
 
         // 2. 新增影像到 Package 中
         var media = new OdfMediaManager(Package);
@@ -61,13 +48,6 @@ public partial class SpreadsheetDocument
         frameNode.SetAttribute("x", OdfNamespaces.Svg, "1cm", "svg");
         frameNode.SetAttribute("y", OdfNamespaces.Svg, "1cm", "svg");
 
-        string anchorOdf = anchor.ToOdfString(false);
-        frameNode.SetAttribute("start-cell-address", OdfNamespaces.Table, anchorOdf, "table");
-        frameNode.SetAttribute("end-cell-address", OdfNamespaces.Table, anchorOdf, "table");
-        frameNode.SetAttribute("start-x", OdfNamespaces.Table, "0cm", "table");
-        frameNode.SetAttribute("start-y", OdfNamespaces.Table, "0cm", "table");
-        frameNode.SetAttribute("end-x", OdfNamespaces.Table, width.ToString(), "table");
-        frameNode.SetAttribute("end-y", OdfNamespaces.Table, height.ToString(), "table");
         if (name is not null)
         {
             frameNode.SetAttribute("name", OdfNamespaces.Draw, name, "draw");
@@ -107,20 +87,7 @@ public partial class SpreadsheetDocument
             throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SheetNamedCannotFound_4", sheetName));
 
         // 1. 尋找或建立 table:shapes
-        OdfNode? shapesNode = null;
-        foreach (var child in sheet.TableNode.Children)
-        {
-            if (child.LocalName == "shapes" && child.NamespaceUri == OdfNamespaces.Table)
-            {
-                shapesNode = child;
-                break;
-            }
-        }
-        if (shapesNode is null)
-        {
-            shapesNode = new OdfNode(OdfNodeType.Element, "shapes", OdfNamespaces.Table, "table");
-            sheet.TableNode.AppendChild(shapesNode);
-        }
+        OdfNode shapesNode = OdfTableSheetDomHelper.FindOrCreateTableShapes(sheet.TableNode);
 
         // 2. 計算唯一的 Object 名稱
         int objectIndex = 1;
@@ -138,14 +105,6 @@ public partial class SpreadsheetDocument
         frameNode.SetAttribute("height", OdfNamespaces.Svg, height.ToString(), "svg");
         frameNode.SetAttribute("x", OdfNamespaces.Svg, "1cm", "svg");
         frameNode.SetAttribute("y", OdfNamespaces.Svg, "1cm", "svg");
-
-        string anchorOdf = anchor.ToOdfString(false);
-        frameNode.SetAttribute("start-cell-address", OdfNamespaces.Table, anchorOdf, "table");
-        frameNode.SetAttribute("end-cell-address", OdfNamespaces.Table, anchorOdf, "table");
-        frameNode.SetAttribute("start-x", OdfNamespaces.Table, "0cm", "table");
-        frameNode.SetAttribute("start-y", OdfNamespaces.Table, "0cm", "table");
-        frameNode.SetAttribute("end-x", OdfNamespaces.Table, width.ToString(), "table");
-        frameNode.SetAttribute("end-y", OdfNamespaces.Table, height.ToString(), "table");
 
         var objectNode = new OdfNode(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
         objectNode.SetAttribute("href", OdfNamespaces.XLink, $"./{objectName}", "xlink");

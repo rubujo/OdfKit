@@ -259,11 +259,10 @@ public class DrawingHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證圖形連結模式（無座標屬性）連接線的 <see cref="OdfConnectorInfo.TryGetStartPoint"/>
-    /// 與 <see cref="OdfConnectorInfo.TryGetEndPoint"/> 會因座標缺失而傳回 <see langword="false"/>。
+    /// 驗證圖形連結模式連接線仍可讀回由圖形中心解析出的座標。
     /// </summary>
     [Fact]
-    public void GetConnectors_ShapeLinkedMode_TryGetStartAndEndPointFail()
+    public void GetConnectors_ShapeLinkedMode_TryGetStartAndEndPointSucceed()
     {
         using var document = DrawingDocument.Create();
         OdfDrawPage page = document.AddPage();
@@ -282,8 +281,14 @@ public class DrawingHighLevelApiTests
         document.AddConnector(startShape.Id, endShape.Id, OdfConnectorType.Standard);
 
         OdfConnectorInfo connector = Assert.Single(page.GetConnectors());
-        Assert.False(connector.TryGetStartPoint(out _, out _));
-        Assert.False(connector.TryGetEndPoint(out _, out _));
+        Assert.True(connector.IsShapeLinked);
+        Assert.True(connector.TryGetStartPoint(out OdfLength startX, out OdfLength startY));
+        Assert.Equal(OdfLength.Parse("2.5cm").ToPoints(), startX.ToPoints(), 0.001);
+        Assert.Equal(OdfLength.Parse("2cm").ToPoints(), startY.ToPoints(), 0.001);
+
+        Assert.True(connector.TryGetEndPoint(out OdfLength endX, out OdfLength endY));
+        Assert.Equal(OdfLength.Parse("11.5cm").ToPoints(), endX.ToPoints(), 0.001);
+        Assert.Equal(OdfLength.Parse("2cm").ToPoints(), endY.ToPoints(), 0.001);
     }
 
     /// <summary>

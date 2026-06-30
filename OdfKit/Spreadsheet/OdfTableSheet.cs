@@ -122,22 +122,6 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
-    /// Gets or sets the accessibility summary for the worksheet, mapped to the ODF <c>table:summary</c> attribute.
-    /// 取得或設定工作表的無障礙摘要說明（對應 ODF <c>table:summary</c> 屬性）。
-    /// </summary>
-    public string? Summary
-    {
-        get => TableNode.GetAttribute("summary", OdfNamespaces.Table);
-        set
-        {
-            if (string.IsNullOrEmpty(value))
-                TableNode.RemoveAttribute("summary", OdfNamespaces.Table);
-            else
-                TableNode.SetAttribute("summary", OdfNamespaces.Table, value!, "table");
-        }
-    }
-
-    /// <summary>
     /// Gets or sets the worksheet writing mode.
     /// 取得或設定工作表的書寫方向。
     /// </summary>

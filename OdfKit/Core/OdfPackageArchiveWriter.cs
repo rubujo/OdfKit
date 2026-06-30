@@ -210,6 +210,7 @@ internal static class OdfPackageArchiveWriter
         LastParallelPreparedEntryCount = 0;
         LastParallelCompressionUsedPooledBuffer = false;
         CheckCancellation(cancellationToken);
+
         if (ctx.HasActiveEncryption || ctx.Entries.Count <= 1)
             return false;
 

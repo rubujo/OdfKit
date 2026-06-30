@@ -62,10 +62,10 @@ ODFDOM 官方 sample parity 的外部範本位於
 | repo-generated-minimal-spreadsheet | `tests/fixtures/corpus/generated/minimal-spreadsheet.ods` | generated | n/a | generated-no-copyright | Spreadsheet | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | repo-generated-minimal-presentation | `tests/fixtures/corpus/generated/minimal-presentation.odp` | generated | n/a | generated-no-copyright | Presentation | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | repo-generated-minimal-graphics | `tests/fixtures/corpus/generated/minimal-graphics.odg` | generated | n/a | generated-no-copyright | Graphics | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
-| repo-generated-complex-annual-report | `tests/fixtures/corpus/generated/complex/complex-annual-report.odt` | generated | n/a | generated-no-copyright | Text | 1.4 | OASIS ODF 1.4 Extended | invalid | preserve-unknown |
-| repo-generated-complex-financial-model | `tests/fixtures/corpus/generated/complex/complex-financial-model.ods` | generated | n/a | generated-no-copyright | Spreadsheet | 1.4 | OASIS ODF 1.4 Extended | invalid | preserve-unknown |
+| repo-generated-complex-annual-report | `tests/fixtures/corpus/generated/complex/complex-annual-report.odt` | generated | n/a | generated-no-copyright | Text | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
+| repo-generated-complex-financial-model | `tests/fixtures/corpus/generated/complex/complex-financial-model.ods` | generated | n/a | generated-no-copyright | Spreadsheet | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | repo-generated-complex-business-deck | `tests/fixtures/corpus/generated/complex/complex-business-deck.odp` | generated | n/a | generated-no-copyright | Presentation | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
-| repo-generated-complex-flow-diagram | `tests/fixtures/corpus/generated/complex/complex-flow-diagram.odg` | generated | n/a | generated-no-copyright | Graphics | 1.4 | OASIS ODF 1.4 Extended | invalid | preserve-unknown |
+| repo-generated-complex-flow-diagram | `tests/fixtures/corpus/generated/complex/complex-flow-diagram.odg` | generated | n/a | generated-no-copyright | Graphics | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | generated-format-minimal | generated in `PackageRoundTripMatrixTests.MinimalSupportedFormatRoundTrips` | generated | n/a | generated-no-copyright | 24 extensions | 1.4 | OASIS ODF 1.4 Extended | valid | semantic-equivalent |
 | generated-interop-package | generated in `InteropCorpusTests` | generated | n/a | generated-no-copyright | package formats | 1.4 | OASIS ODF 1.4 Extended | valid | preserve-unknown |
 | generated-schema-negative | generated in `CorpusComplianceTests` | generated | n/a | generated-no-copyright | ODT / flat XML | 1.4 | OASIS ODF 1.4 Strict | invalid | semantic-equivalent |
@@ -80,10 +80,9 @@ ODFDOM 官方 sample parity 的外部範本位於
 fixture 作為欄位用法範例，並非完整清單。欲取得目前完整、權威的 fixture 清單，請直接讀取
 `tests/fixtures/corpus/manifest.json`，不要以本文件表格為準。
 
-complex builder corpus 同時包含正向與負向樣本：`complex-business-deck.odp` 是目前 schema-clean
-的高階 builder 正向 fixture；`complex-annual-report.odt`、`complex-financial-model.ods` 與
-`complex-flow-diagram.odg` 是負向 fixture，用來追蹤高階 builder round-trip 產物距離完整
-ODF schema-clean 尚待收斂的技術債。
+complex builder corpus 目前包含四個 schema-clean 正向樣本：`complex-annual-report.odt`、
+`complex-financial-model.ods`、`complex-business-deck.odp` 與 `complex-flow-diagram.odg`。
+這些檔案是本 repo 原創生成資料，授權使用 `generated-no-copyright`。
 
 ## 外部 corpus 路徑
 
@@ -142,10 +141,12 @@ corpus 在下載樣本前的來源、授權與 baseline 例外格式檢查。
 ## JSON Collaboration fixture
 
 JSON Collaboration fixture 不屬於 ODF package corpus，因此不放入 `validate-corpus` 的 ODF manifest。
-repo 內小型 JSON wire-shape fixture 位於 `tests/fixtures/collaboration/`，並由
+repo 內 JSON wire-shape fixture 位於 `tests/fixtures/collaboration/`，並由
 `tests/fixtures/collaboration/manifest.json` 記錄來源、授權、TDF changes envelope 形狀、operation
-子集合與 SHA-256。此 manifest 採 clean-room 對標：可使用 TDF 公開文件與 JSON wire shape 作為來源，
-不可複製 Java 實作。
+覆蓋、語意狀態、預期 replay report 與 SHA-256。此 manifest 採 clean-room 對標：可使用 TDF
+公開文件與 JSON wire shape 作為來源，不可複製 Java 實作。`tdf-public-docs/` 必須讓 TDF 公開 ODF
+Text operation 名稱各至少有一個最小 fixture；`repo-generated/` 可放 unknown-field round-trip、
+safety limit 與 strict diagnostic fixture。
 
 ## Baseline exception manifest
 

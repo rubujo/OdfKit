@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OdfKit.Extensions.Collaboration\OdfKit.Extensions.Collaboration.csproj" />
     <ProjectReference Include="..\OdfKit\OdfKit.csproj" />
   </ItemGroup>
 

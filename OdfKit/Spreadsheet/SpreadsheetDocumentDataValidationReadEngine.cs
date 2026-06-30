@@ -42,7 +42,7 @@ internal static class SpreadsheetDocumentDataValidationReadEngine
                     child.NamespaceUri != OdfNamespaces.Table)
                     continue;
 
-                errorMessage = child.GetAttribute("message", OdfNamespaces.Table);
+                errorMessage = child.GetAttribute("message", OdfNamespaces.Table) ?? ReadElementText(child);
                 errorTitle = child.GetAttribute("title", OdfNamespaces.Table);
                 alertStyle = child.GetAttribute("message-type", OdfNamespaces.Table);
             }
@@ -84,5 +84,20 @@ internal static class SpreadsheetDocumentDataValidationReadEngine
         }
 
         return rangesByName;
+    }
+
+    private static string ReadElementText(OdfNode node)
+    {
+        if (!string.IsNullOrEmpty(node.TextContent))
+            return node.TextContent;
+
+        foreach (OdfNode child in node.Children)
+        {
+            string text = ReadElementText(child);
+            if (!string.IsNullOrEmpty(text))
+                return text;
+        }
+
+        return string.Empty;
     }
 }

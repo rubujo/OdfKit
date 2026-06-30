@@ -209,10 +209,31 @@ public partial class OdfCell(OdfNode node, int row, int col, SpreadsheetDocument
             if (string.IsNullOrEmpty(normalized))
                 Node.RemoveAttribute("formula", OdfNamespaces.Table);
             else
+            {
                 Node.SetAttribute("formula", OdfNamespaces.Table, normalized, "table");
+                if (string.IsNullOrEmpty(ValueType))
+                {
+                    ValueType = "float";
+                }
+            }
 
             PublishTrackingSnapshot(previousSnapshot);
             _doc.NotifyFormulaRecalculationRequested();
+        }
+    }
+
+    /// <summary>
+    /// Sets this cell's formula and cached display value.
+    /// 設定此儲存格的公式與快取顯示值。
+    /// </summary>
+    /// <param name="formula">The ODF formula text; an empty value clears the formula. / ODF 公式文字；空值會清除公式。</param>
+    /// <param name="cachedValue">The cached value stored with the formula. / 隨公式儲存的快取值。</param>
+    public void SetFormula(string formula, object? cachedValue)
+    {
+        Formula = formula;
+        if (cachedValue is not null)
+        {
+            CellValue = cachedValue;
         }
     }
 

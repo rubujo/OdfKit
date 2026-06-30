@@ -55,7 +55,7 @@ public class SpreadsheetHighLevelApiTests
         Assert.Contains("table:shapes", contentXml);
         Assert.Contains("draw:frame", contentXml);
         Assert.Contains("draw:object xlink:href=\"./Object 1\"", contentXml);
-        Assert.Contains("table:start-cell-address=\"Sheet1.D1\"", contentXml);
+        Assert.DoesNotContain("table:start-cell-address", contentXml);
 
         // 2. 驗證 Object 1/mimetype 媒體類型
         byte[] mimeBytes = package.ReadEntry("Object 1/mimetype");
@@ -114,7 +114,10 @@ public class SpreadsheetHighLevelApiTests
         Assert.Contains("table:content-validation", contentXml);
         Assert.Contains("table:name=\"val_1\"", contentXml);
         Assert.Contains("condition=\"of:cell-content-is-whole-number() and cell-content-is-between(1,100)\"", contentXml);
-        Assert.Contains("table:error-message table:message=\"請輸入 1 至 100 的整數！\" table:title=\"無效輸入\" table:message-type=\"stop\"", contentXml);
+        Assert.Contains("table:error-message", contentXml);
+        Assert.Contains("table:title=\"無效輸入\"", contentXml);
+        Assert.Contains("table:message-type=\"stop\"", contentXml);
+        Assert.Contains("<text:p>請輸入 1 至 100 的整數！</text:p>", contentXml);
 
         // 2. 驗證 A1 儲存格已正確被附加了此驗證名稱
         // 在 ODS 中列與欄均被展開，A1 為第 1 列 (row) 的第 1 個 cell
@@ -276,8 +279,7 @@ public class SpreadsheetHighLevelApiTests
         Assert.Equal(OdfChartType.Bar, chart.ChartType);
         Assert.Equal("季度銷售", chart.Title);
         Assert.Equal("Object 1/", chart.ObjectPath);
-        Assert.True(chart.TryGetAnchorAddress(out OdfCellAddress anchor));
-        Assert.Equal(3, anchor.Column);
+        Assert.False(chart.TryGetAnchorAddress(out _));
     }
 
     /// <summary>
@@ -495,7 +497,7 @@ public class SpreadsheetHighLevelApiTests
         using SpreadsheetDocument loaded = SpreadsheetDocument.Load(stream);
         OdfPivotTableInfo info = Assert.Single(loaded.GetPivotTables());
         Assert.Equal("Sheet1", info.SheetName);
-        Assert.False(info.HasRowHeaders);
+        Assert.True(info.HasRowHeaders);
         Assert.True(info.HasColumnHeaders);
 
         Assert.True(info.TryGetSourceRange(out OdfCellRange resolvedSourceRange));

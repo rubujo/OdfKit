@@ -11,6 +11,7 @@ namespace OdfKit.Collaboration;
 public sealed class OdtOperationImportReport
 {
     private readonly List<string> _diagnostics = [];
+    private readonly List<OdtOperationReportEntry> _entries = [];
 
     /// <summary>
     /// Gets the number of operations replayed successfully.
@@ -36,18 +37,57 @@ public sealed class OdtOperationImportReport
     /// </summary>
     public IReadOnlyList<string> Diagnostics => _diagnostics;
 
-    internal void RecordReplayed() => ReplayedCount++;
+    /// <summary>
+    /// Gets per-operation replay entries.
+    /// 取得逐筆 operation 重播項目。
+    /// </summary>
+    public IReadOnlyList<OdtOperationReportEntry> Entries => _entries;
 
-    internal void RecordIgnored(string? operationName, OdtOperationCompatibilityOptions options)
+    /// <summary>
+    /// Gets the number of skipped operations.
+    /// 取得被略過的 operation 數量。
+    /// </summary>
+    public int SkippedCount => IgnoredCount;
+
+    /// <summary>
+    /// Gets the last safety limit hit reason, if any.
+    /// 取得最後一次觸發安全限制的原因；若無則為 null。
+    /// </summary>
+    public string? SafetyLimitHitReason { get; private set; }
+
+    internal void RecordReplayed(OdtOperation? operation = null)
     {
-        IgnoredCount++;
-        if (options.EmitDiagnostics && options.UnsupportedOperationPolicy == OdtUnsupportedOperationPolicy.RecordDiagnostic)
-        {
-            _diagnostics.Add(OdfLocalizer.GetMessage("Diag_OdtOperationImportReport_MetadataOnlyIgnored", operationName ?? string.Empty));
-        }
+        ReplayedCount++;
+        _entries.Add(new OdtOperationReportEntry(
+            operation?.SourceIndex ?? -1,
+            operation?.Name,
+            OdtOperationReplayStatus.Replayed,
+            null,
+            null,
+            null));
     }
 
-    internal void RecordUnsupported(string? operationName, OdtOperationCompatibilityOptions options)
+    internal void RecordIgnored(string? operationName, OdtOperationCompatibilityOptions options, OdtOperation? operation = null)
+    {
+        IgnoredCount++;
+        const string key = "Diag_OdtOperationImportReport_MetadataOnlyIgnored";
+        string? message = null;
+        if (options.EmitDiagnostics && options.UnsupportedOperationPolicy == OdtUnsupportedOperationPolicy.RecordDiagnostic)
+        {
+            message = OdfLocalizer.GetMessage(key, operationName ?? string.Empty);
+            _diagnostics.Add(message);
+        }
+
+        _entries.Add(new OdtOperationReportEntry(
+            operation?.SourceIndex ?? -1,
+            operationName,
+            OdtOperationReplayStatus.Ignored,
+            key,
+            message,
+            null));
+    }
+
+    internal void RecordUnsupported(string? operationName, OdtOperationCompatibilityOptions options, OdtOperation? operation = null, string? reason = null)
     {
         UnsupportedCount++;
 
@@ -57,9 +97,27 @@ public sealed class OdtOperationImportReport
         }
 
         IgnoredCount++;
+        const string key = "Diag_OdtOperationImportReport_UnsupportedOperation";
+        string? message = null;
         if (options.EmitDiagnostics && options.UnsupportedOperationPolicy == OdtUnsupportedOperationPolicy.RecordDiagnostic)
         {
-            _diagnostics.Add(OdfLocalizer.GetMessage("Diag_OdtOperationImportReport_UnsupportedOperation", operationName ?? string.Empty));
+            message = string.IsNullOrEmpty(reason)
+                ? OdfLocalizer.GetMessage(key, operationName ?? string.Empty)
+                : OdfLocalizer.GetMessage(key, operationName ?? string.Empty) + " " + reason;
+            _diagnostics.Add(message);
         }
+
+        _entries.Add(new OdtOperationReportEntry(
+            operation?.SourceIndex ?? -1,
+            operationName,
+            OdtOperationReplayStatus.Unsupported,
+            key,
+            message,
+            reason));
+    }
+
+    internal void RecordSafetyLimit(string reason)
+    {
+        SafetyLimitHitReason = reason;
     }
 }

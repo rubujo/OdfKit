@@ -103,6 +103,31 @@ public class DrawingApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證繪圖 Fluent builder 產生的流程連接線可通過 ODF 1.4 Extended 驗證。
+    /// </summary>
+    [Fact]
+    public void DrawingDocumentBuilderConnectorsPassOdf14ExtendedValidation()
+    {
+        using DrawingDocument drawing = DrawingDocument.Builder()
+            .AddPage("主流程", page => page
+                .AddFlowStep("load", "載入", 0)
+                .AddFlowStep("validate", "驗證", 1)
+                .AddConnector("load", "validate", OdfConnectorType.Straight))
+            .Build();
+
+        using var stream = new MemoryStream();
+        drawing.SaveToStream(stream);
+        stream.Position = 0;
+
+        OdfValidationReport report = OdfValidator.Validate(
+            stream,
+            "flow.odg",
+            OdfComplianceProfiles.OasisOdf14Extended);
+
+        Assert.True(report.IsValid, string.Join(Environment.NewLine, report.Issues));
+    }
+
+    /// <summary>
     /// 驗證內建設計主題每次都回傳獨立執行個體，避免客製化污染後續 builder。
     /// </summary>
     [Fact]

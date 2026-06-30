@@ -99,13 +99,14 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
 
         var connectorNode = OdfNodeFactory.CreateElement("connector", OdfNamespaces.Draw, "draw");
         connectorNode.SetAttribute("id", OdfNamespaces.Draw, "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8), "draw");
+        connectorNode.SetAttribute("viewBox", OdfNamespaces.Svg, "0 0 1000 1000", "svg");
         connectorNode.SetAttribute("start-shape", OdfNamespaces.Draw, startShapeId, "draw");
         connectorNode.SetAttribute("end-shape", OdfNamespaces.Draw, endShapeId, "draw");
 
         string typeVal = connectorType switch
         {
             OdfConnectorType.Lines => "lines",
-            OdfConnectorType.Straight => "straight",
+            OdfConnectorType.Straight => "line",
             OdfConnectorType.Curve => "curve",
             _ => "standard",
         };
@@ -123,7 +124,6 @@ public sealed class OdfDrawGroup(OdfNode node, OdfDocument doc) : OdfShape(node,
         frame.SetAttribute("y", OdfNamespaces.Svg, y.ToString(), "svg");
         frame.SetAttribute("width", OdfNamespaces.Svg, w.ToString(), "svg");
         frame.SetAttribute("height", OdfNamespaces.Svg, h.ToString(), "svg");
-        frame.SetAttribute("anchor-type", OdfNamespaces.Draw, "page", "draw");
         return frame;
     }
 }

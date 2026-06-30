@@ -132,18 +132,15 @@ internal static class OdfPackageZipLoader
         {
             package.PreloadTask = Task.Run(() =>
             {
-                lock (archive)
+                foreach (OdfPackageEntry entry in entriesToPreload)
                 {
-                    foreach (OdfPackageEntry entry in entriesToPreload)
+                    try
                     {
-                        try
-                        {
-                            using Stream stream = entry.OpenReader();
-                        }
-                        catch
-                        {
-                            // 忽略預讀異常，待主線程存取時處理
-                        }
+                        using Stream stream = entry.OpenReader();
+                    }
+                    catch
+                    {
+                        // 忽略預讀異常，待主線程存取時處理
                     }
                 }
             });
@@ -265,17 +262,14 @@ internal static class OdfPackageZipLoader
         {
             package.PreloadTask = Task.Run(() =>
             {
-                lock (archive)
+                foreach (OdfPackageEntry entry in entriesToPreload)
                 {
-                    foreach (OdfPackageEntry entry in entriesToPreload)
+                    try
                     {
-                        try
-                        {
-                            using Stream stream = entry.OpenReader();
-                        }
-                        catch
-                        {
-                        }
+                        using Stream stream = entry.OpenReader();
+                    }
+                    catch
+                    {
                     }
                 }
             });

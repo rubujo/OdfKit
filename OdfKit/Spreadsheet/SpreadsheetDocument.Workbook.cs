@@ -22,7 +22,7 @@ public partial class SpreadsheetDocument
     {
         var table = new TableTableElement("table");
         table.SetAttribute("name", OdfNamespaces.Table, name, "table");
-        SheetsRoot.AppendChild(table);
+        OdfTableSheetDomHelper.InsertSpreadsheetTable(SheetsRoot, table);
         return new OdfTableSheet(table, this);
     }
 
@@ -51,7 +51,7 @@ public partial class SpreadsheetDocument
             adopted.SetAttribute("name", OdfNamespaces.Table, newName, "table");
         }
 
-        SheetsRoot.AppendChild(adopted);
+        OdfTableSheetDomHelper.InsertSpreadsheetTable(SheetsRoot, adopted);
         return new OdfTableSheet(adopted, this);
     }
 

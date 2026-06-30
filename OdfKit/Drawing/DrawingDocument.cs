@@ -197,6 +197,8 @@ public partial class DrawingDocument : OdfDocument
 
         string pageName = name ?? $"Page {_pages.Count + 1}";
         pageNode.SetAttribute("name", OdfNamespaces.Draw, pageName, "draw");
+        pageNode.SetAttribute("master-page-name", OdfNamespaces.Draw, "Default", "draw");
+        pageNode.SetAttribute("style-name", OdfNamespaces.Draw, "dp1", "draw");
 
         drawingNode.AppendChild(pageNode);
         var page = new OdfDrawPage(pageNode, this);

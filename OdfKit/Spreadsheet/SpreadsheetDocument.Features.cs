@@ -167,21 +167,8 @@ public partial class SpreadsheetDocument
         if (sheet is null)
             throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SheetNamedCannotFound_2", sheetName));
 
-        // 1. 尋找或建立 table:shapes
-        OdfNode? shapesNode = null;
-        foreach (var child in sheet.TableNode.Children)
-        {
-            if (child.LocalName == "shapes" && child.NamespaceUri == OdfNamespaces.Table)
-            {
-                shapesNode = child;
-                break;
-            }
-        }
-        if (shapesNode is null)
-        {
-            shapesNode = new OdfNode(OdfNodeType.Element, "shapes", OdfNamespaces.Table, "table");
-            sheet.TableNode.AppendChild(shapesNode);
-        }
+        // 1. 尋找或建立 table:shapes，並維持 table:table 的合法子節點順序。
+        OdfNode shapesNode = OdfTableSheetDomHelper.FindOrCreateTableShapes(sheet.TableNode);
 
         // 2. 計算唯一的 Object 名稱
         int objectIndex = 1;
@@ -200,14 +187,6 @@ public partial class SpreadsheetDocument
         frameNode.SetAttribute("height", OdfNamespaces.Svg, "7cm", "svg");
         frameNode.SetAttribute("x", OdfNamespaces.Svg, anchorXCm.ToString("0.###", CultureInfo.InvariantCulture) + "cm", "svg");
         frameNode.SetAttribute("y", OdfNamespaces.Svg, anchorYCm.ToString("0.###", CultureInfo.InvariantCulture) + "cm", "svg");
-
-        string anchorOdf = anchor.ToOdfString(false);
-        frameNode.SetAttribute("start-cell-address", OdfNamespaces.Table, anchorOdf, "table");
-        frameNode.SetAttribute("end-cell-address", OdfNamespaces.Table, anchorOdf, "table");
-        frameNode.SetAttribute("start-x", OdfNamespaces.Table, "0cm", "table");
-        frameNode.SetAttribute("start-y", OdfNamespaces.Table, "0cm", "table");
-        frameNode.SetAttribute("end-x", OdfNamespaces.Table, "12cm", "table");
-        frameNode.SetAttribute("end-y", OdfNamespaces.Table, "7cm", "table");
 
         var objectNode = new OdfNode(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
         objectNode.SetAttribute("href", OdfNamespaces.XLink, $"./{objectName}", "xlink");
@@ -411,7 +390,6 @@ public partial class SpreadsheetDocument
         if (!string.IsNullOrEmpty(validation.ErrorMessage))
         {
             var errorNode = new OdfNode(OdfNodeType.Element, "error-message", OdfNamespaces.Table, "table");
-            errorNode.SetAttribute("message", OdfNamespaces.Table, validation.ErrorMessage, "table");
             if (!string.IsNullOrEmpty(validation.ErrorTitle))
             {
                 errorNode.SetAttribute("title", OdfNamespaces.Table, validation.ErrorTitle, "table");
@@ -423,6 +401,11 @@ public partial class SpreadsheetDocument
                 _ => "stop"
             };
             errorNode.SetAttribute("message-type", OdfNamespaces.Table, alertStyleStr, "table");
+            var messageParagraph = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text")
+            {
+                TextContent = validation.ErrorMessage,
+            };
+            errorNode.AppendChild(messageParagraph);
             validationNode.AppendChild(errorNode);
         }
 

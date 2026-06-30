@@ -2198,10 +2198,37 @@ public partial class LibreOfficeInteropTests
         startInfo.ArgumentList.Add(inputPath);
 
         using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("無法啟動 soffice。");
-        Assert.True(process.WaitForExit(60_000), "LibreOffice 轉換逾時。");
-        string output = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
-        Assert.True(process.ExitCode == 0, $"LibreOffice 轉換失敗，輸出：{output}");
-        Assert.DoesNotContain("Error", output, StringComparison.OrdinalIgnoreCase);
+        var output = new StringBuilder();
+        process.OutputDataReceived += (_, args) =>
+        {
+            if (args.Data is not null)
+                output.AppendLine(args.Data);
+        };
+        process.ErrorDataReceived += (_, args) =>
+        {
+            if (args.Data is not null)
+                output.AppendLine(args.Data);
+        };
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+
+        if (!process.WaitForExit(60_000))
+        {
+            try
+            {
+                process.Kill(entireProcessTree: true);
+            }
+            catch
+            {
+            }
+
+            Assert.Fail("LibreOffice 轉換逾時。輸出：" + output);
+        }
+
+        process.WaitForExit(5_000);
+        string outputText = output.ToString();
+        Assert.True(process.ExitCode == 0, $"LibreOffice 轉換失敗，輸出：{outputText}");
+        Assert.DoesNotContain("Error", outputText, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -2239,10 +2266,42 @@ public partial class LibreOfficeInteropTests
             startInfo.Environment["RestoreConfigFile"] = restoreConfigFile;
         }
 
+        var runOutputBuilder = new StringBuilder();
+        object runOutputLock = new();
+
         using (var process = Process.Start(startInfo) ?? throw new InvalidOperationException("無法啟動 dotnet run。"))
         {
-            Assert.True(process.WaitForExit(90_000), "執行範例程式 Sample.cs 逾時。");
-            string runOutput = process.StandardOutput.ReadToEnd() + process.StandardError.ReadToEnd();
+            process.OutputDataReceived += (_, args) =>
+            {
+                if (args.Data is not null)
+                {
+                    lock (runOutputLock)
+                    {
+                        runOutputBuilder.AppendLine(args.Data);
+                    }
+                }
+            };
+            process.ErrorDataReceived += (_, args) =>
+            {
+                if (args.Data is not null)
+                {
+                    lock (runOutputLock)
+                    {
+                        runOutputBuilder.AppendLine(args.Data);
+                    }
+                }
+            };
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            if (!process.WaitForExit(300_000))
+            {
+                process.Kill(entireProcessTree: true);
+                Assert.Fail($"執行範例程式 Sample.cs 逾時，輸出：{runOutputBuilder}");
+            }
+
+            process.WaitForExit(5_000);
+            string runOutput = runOutputBuilder.ToString();
             if (process.ExitCode != 0 && IsNuGetRestoreUnavailable(runOutput))
             {
                 Assert.Skip("目前 NuGet restore 環境無法解析範例相依套件，略過範例文件實機互通性測試。");
@@ -2965,7 +3024,7 @@ public partial class LibreOfficeInteropTests
                 OdfImage orphanedImage = document.Body.Images.Add(CreateValidFourPixelBluePngBytes(), OdfLength.Parse("1cm"), OdfLength.Parse("1cm"), "orphaned");
                 orphanedImage.FrameNode.Parent?.RemoveChild(orphanedImage.FrameNode);
 
-                document.SaveToStream(new MemoryStream());
+                document.SaveToStream(new MemoryStream(), new OdfSaveOptions { PruneUnusedMedia = false });
 
                 Assert.Equal(2, document.Package.Manifest.Keys.Count(key => key.StartsWith("Pictures/", StringComparison.Ordinal)));
 

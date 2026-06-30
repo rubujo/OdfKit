@@ -115,7 +115,7 @@ public partial class OdfParagraph
     public string? FontName
     {
         get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-name", OdfNamespaces.Style, "paragraph");
-        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-name", OdfNamespaces.Style, value ?? string.Empty, "style");
+        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "text-properties", "font-name", OdfNamespaces.Style, value ?? string.Empty, "style");
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public partial class OdfParagraph
     public string? FontNameAsian
     {
         get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-name-asian", OdfNamespaces.Style, "paragraph");
-        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-name-asian", OdfNamespaces.Style, value ?? string.Empty, "style");
+        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "text-properties", "font-name-asian", OdfNamespaces.Style, value ?? string.Empty, "style");
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public partial class OdfParagraph
     public string? FontNameComplex
     {
         get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-name-complex", OdfNamespaces.Style, "paragraph");
-        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-name-complex", OdfNamespaces.Style, value ?? string.Empty, "style");
+        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "text-properties", "font-name-complex", OdfNamespaces.Style, value ?? string.Empty, "style");
     }
 
     /// <summary>
@@ -145,7 +145,7 @@ public partial class OdfParagraph
     public string? FontSize
     {
         get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-size", OdfNamespaces.Fo, "paragraph");
-        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-size", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "text-properties", "font-size", OdfNamespaces.Fo, value ?? string.Empty, "fo");
     }
 
     /// <summary>
@@ -154,8 +154,8 @@ public partial class OdfParagraph
     /// </summary>
     public string? FontSizeAsian
     {
-        get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-size-asian", OdfNamespaces.Fo, "paragraph");
-        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-size-asian", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-size-asian", OdfNamespaces.Style, "paragraph");
+        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "text-properties", "font-size-asian", OdfNamespaces.Style, value ?? string.Empty, "style");
     }
 
     /// <summary>
@@ -164,8 +164,8 @@ public partial class OdfParagraph
     /// </summary>
     public string? FontSizeComplex
     {
-        get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-size-complex", OdfNamespaces.Fo, "paragraph");
-        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "paragraph-properties", "font-size-complex", OdfNamespaces.Fo, value ?? string.Empty, "fo");
+        get => Doc.StyleEngine.GetStyleProperty(StyleName ?? string.Empty, "font-size-complex", OdfNamespaces.Style, "paragraph");
+        set => Doc.StyleEngine.SetLocalStyleProperty(Node, "paragraph", "text-properties", "font-size-complex", OdfNamespaces.Style, value ?? string.Empty, "style");
     }
 
     /// <summary>

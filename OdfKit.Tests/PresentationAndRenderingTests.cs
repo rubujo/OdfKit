@@ -107,12 +107,14 @@ namespace OdfKit.Tests
                 Assert.NotNull(configItem);
                 Assert.Equal("true", configItem.TextContent);
 
-                // Verify page number/count elements in paragraph
+                // Verify page number elements in paragraph
                 var pNode = doc.BodyTextRoot.Children[0];
-                var pageNum = FindNodeByLocalName(pNode, "page-number");
-                var pageCount = FindNodeByLocalName(pNode, "page-count");
-                Assert.NotNull(pageNum);
-                Assert.NotNull(pageCount);
+                var pageNumbers = pNode.Children
+                    .Where(node => node.LocalName == "page-number" && node.NamespaceUri == OdfNamespaces.Text)
+                    .ToArray();
+                Assert.Equal(2, pageNumbers.Length);
+                Assert.Contains(pageNumbers, node => node.GetAttribute("select-page", OdfNamespaces.Text) == "current");
+                Assert.Contains(pageNumbers, node => node.GetAttribute("select-page", OdfNamespaces.Text) == "last");
             }
         }
 

@@ -728,10 +728,14 @@ public class DocsAndCorpusContractTests
         JsonElement summary = json.RootElement.GetProperty("summary");
         JsonElement fixture = json.RootElement.GetProperty("fixtures")[0];
         int fixtureCount = summary.GetProperty("fixtureCount").GetInt32();
+        using JsonDocument manifest = JsonDocument.Parse(File.ReadAllText(manifestPath));
+        int expectedInvalidCount = manifest.RootElement.GetProperty("fixtures").EnumerateArray()
+            .Count(item => string.Equals(item.GetProperty("expected").GetString(), "invalid", StringComparison.Ordinal));
+        int expectedValidCount = fixtureCount - expectedInvalidCount;
         Assert.True(fixtureCount >= 200, $"corpus fixtureCount 應 ≥ 200，實際為 {fixtureCount}。");
         Assert.Equal(fixtureCount, summary.GetProperty("passedCount").GetInt32());
-        Assert.Equal(fixtureCount - 7, summary.GetProperty("validCount").GetInt32());
-        Assert.Equal(7, summary.GetProperty("invalidCount").GetInt32());
+        Assert.Equal(expectedValidCount, summary.GetProperty("validCount").GetInt32());
+        Assert.Equal(expectedInvalidCount, summary.GetProperty("invalidCount").GetInt32());
         Assert.True(summary.GetProperty("sha256CheckedCount").GetInt32() >= 4);
         Assert.Equal(0, summary.GetProperty("sha256MismatchCount").GetInt32());
         Assert.Equal("repo-generated-minimal-flat-text", fixture.GetProperty("id").GetString());
@@ -783,13 +787,13 @@ public class DocsAndCorpusContractTests
         Assert.Contains(
             json.RootElement.GetProperty("fixtures").EnumerateArray(),
             item => item.GetProperty("id").GetString() == "repo-generated-complex-annual-report" &&
-                item.GetProperty("expected").GetString() == "invalid" &&
+                item.GetProperty("expected").GetString() == "valid" &&
                 item.GetProperty("sha256Matches").GetBoolean() &&
                 item.GetProperty("passed").GetBoolean());
         Assert.Contains(
             json.RootElement.GetProperty("fixtures").EnumerateArray(),
             item => item.GetProperty("id").GetString() == "repo-generated-complex-financial-model" &&
-                item.GetProperty("expected").GetString() == "invalid" &&
+                item.GetProperty("expected").GetString() == "valid" &&
                 item.GetProperty("sha256Matches").GetBoolean() &&
                 item.GetProperty("passed").GetBoolean());
         Assert.Contains(
@@ -801,13 +805,13 @@ public class DocsAndCorpusContractTests
         Assert.Contains(
             json.RootElement.GetProperty("fixtures").EnumerateArray(),
             item => item.GetProperty("id").GetString() == "repo-generated-complex-flow-diagram" &&
-                item.GetProperty("expected").GetString() == "invalid" &&
+                item.GetProperty("expected").GetString() == "valid" &&
                 item.GetProperty("sha256Matches").GetBoolean() &&
                 item.GetProperty("passed").GetBoolean());
     }
 
     /// <summary>
-    /// 驗證 JSON Collaboration fixture manifest 具備 clean-room 來源、授權與 SHA-256。
+    /// 驗證 JSON Collaboration fixture manifest 具備 clean-room 來源、授權、SHA-256 與完整 operation 覆蓋。
     /// </summary>
     [Fact]
     public void CollaborationFixtureManifestDeclaresSourceLicenseAndHash()
@@ -815,30 +819,62 @@ public class DocsAndCorpusContractTests
         string repoRoot = FindRepositoryRoot();
         string manifestPath = Path.Combine(repoRoot, "tests", "fixtures", "collaboration", "manifest.json");
         using JsonDocument manifest = JsonDocument.Parse(File.ReadAllText(manifestPath));
+        JsonElement root = manifest.RootElement;
+        JsonElement fixtures = root.GetProperty("fixtures");
         JsonElement fixture = manifest.RootElement.GetProperty("fixtures")[0];
         string path = fixture.GetProperty("path").GetString() ?? string.Empty;
         string expectedHash = fixture.GetProperty("sha256").GetString() ?? string.Empty;
         string fullPath = Path.Combine(Path.GetDirectoryName(manifestPath)!, path);
 
+        Assert.Equal(1, root.GetProperty("schemaVersion").GetInt32());
+        Assert.Contains("do not copy TDF Java source", root.GetProperty("cleanRoomPolicy").GetString(), StringComparison.Ordinal);
         Assert.Equal("repo-generated-tdf-subset-envelope", fixture.GetProperty("id").GetString());
-        Assert.Equal("generated-no-copyright", fixture.GetProperty("license").GetString());
-        Assert.Equal("tdf-changes-envelope", fixture.GetProperty("wireShape").GetString());
-        Assert.StartsWith("https://github.com/tdf/odftoolkit/", fixture.GetProperty("sourceUri").GetString(), StringComparison.Ordinal);
+        Assert.Equal("repo-generated", fixture.GetProperty("sourceType").GetString());
+        Assert.Equal("TDF changes envelope with a representative implemented subset.", fixture.GetProperty("wireShape").GetString());
+        Assert.Equal("https://tdf.github.io/odftoolkit/odfdom/operations/operations.html", fixture.GetProperty("sourceUrl").GetString());
         Assert.Equal(expectedHash, ComputeSha256(fullPath));
+        Assert.Contains(fixtures.EnumerateArray(), item => item.GetProperty("path").GetString() == "repo-generated/unknown-fields-roundtrip.json");
+        Assert.Contains(fixtures.EnumerateArray(), item => item.GetProperty("semanticStatus").GetString() == "parse-safety");
+        Assert.Contains(fixtures.EnumerateArray(), item => item.GetProperty("semanticStatus").GetString() == "strict-unsupported");
 
         string json = File.ReadAllText(fullPath);
         Assert.Contains("\"changes\"", json, StringComparison.Ordinal);
-        Assert.Contains("addParagraph", json, StringComparison.Ordinal);
-        Assert.Contains("addText", json, StringComparison.Ordinal);
-        Assert.Contains("delete", json, StringComparison.Ordinal);
-        Assert.Contains("splitParagraph", json, StringComparison.Ordinal);
-        Assert.Contains("mergeParagraph", json, StringComparison.Ordinal);
-        Assert.Contains("addLineBreak", json, StringComparison.Ordinal);
-        Assert.Contains("format", json, StringComparison.Ordinal);
-        Assert.Contains("addListStyle", json, StringComparison.Ordinal);
-        Assert.Contains("addTable", json, StringComparison.Ordinal);
-        Assert.Contains("addRows", json, StringComparison.Ordinal);
-        Assert.Contains("addCells", json, StringComparison.Ordinal);
+        string[] documentedOperations =
+        [
+            "delete",
+            "move",
+            "addParagraph",
+            "splitParagraph",
+            "mergeParagraph",
+            "addText",
+            "addTab",
+            "addLineBreak",
+            "addField",
+            "updateField",
+            "addTable",
+            "addRows",
+            "addCells",
+            "addColumn",
+            "deleteColumns",
+            "addListStyle",
+            "addHeaderFooter",
+            "deleteHeaderFooterContent",
+            "addNote",
+            "documentLayout",
+            "addFontDecl",
+            "format",
+            "addStyle",
+            "changeStyle",
+            "deleteStyle",
+            "addDrawing",
+        ];
+        foreach (string operation in documentedOperations)
+        {
+            Assert.Contains(
+                fixtures.EnumerateArray(),
+                item => item.GetProperty("sourceType").GetString() == "tdf-public-docs" &&
+                    item.GetProperty("primaryOperation").GetString() == operation);
+        }
     }
 
     /// <summary>

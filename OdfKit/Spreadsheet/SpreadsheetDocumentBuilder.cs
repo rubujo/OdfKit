@@ -151,6 +151,22 @@ public sealed class OdfSheetBuilder
     }
 
     /// <summary>
+    /// Sets the formula and cached value for the specified cell.
+    /// 設定指定儲存格的公式與快取值。
+    /// </summary>
+    /// <param name="address">The cell address. / 儲存格位址，例如 <c>A1</c>。</param>
+    /// <param name="formula">The ODF formula text. / ODF 公式文字。</param>
+    /// <param name="cachedValue">The cached value stored with the formula. / 隨公式儲存的快取值。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
+    public OdfSheetBuilder SetFormula(string address, string formula, object? cachedValue)
+    {
+        OdfCell cell = _sheet.Cells[address];
+        cell.SetFormula(formula, cachedValue);
+        ApplyBodyStyle(cell);
+        return this;
+    }
+
+    /// <summary>
     /// Sets formulas cell by cell across the specified cell range.
     /// 對指定儲存格範圍逐格設定公式。
     /// </summary>
@@ -224,6 +240,52 @@ public sealed class OdfSheetBuilder
         ApplyHeaderStyle(headerCell);
         var range = new OdfCellRange(firstDataRow - 1, columnIndex, lastDataRow - 1, columnIndex, _sheet.Name);
         return SetFormulaRange(range, (row, _) => formulaFactory(row));
+    }
+
+    /// <summary>
+    /// Adds a formula column with cached values for the specified data rows.
+    /// 新增公式欄，並為指定資料列寫入快取值。
+    /// </summary>
+    /// <param name="columnName">The column name, such as <c>D</c>. / 欄位名稱，例如 <c>D</c>。</param>
+    /// <param name="header">The header text. / 標題列文字。</param>
+    /// <param name="firstDataRow">The first one-based data row. / 第一筆資料列，採 1 為基準。</param>
+    /// <param name="lastDataRow">The last one-based data row. / 最後一筆資料列，採 1 為基準。</param>
+    /// <param name="formulaFactory">The formula factory using one-based row numbers. / 依 1 為基準列號產生 ODF 公式文字的委派。</param>
+    /// <param name="cachedValueFactory">The cached value factory using one-based row numbers. / 依 1 為基準列號產生快取值的委派。</param>
+    /// <param name="headerRow">The one-based header row. / 標題列，採 1 為基準。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
+    public OdfSheetBuilder AddFormulaColumn(
+        string columnName,
+        string header,
+        int firstDataRow,
+        int lastDataRow,
+        Func<int, string> formulaFactory,
+        Func<int, object?> cachedValueFactory,
+        int headerRow = 1)
+    {
+        if (string.IsNullOrWhiteSpace(columnName))
+            throw new ArgumentNullException(nameof(columnName));
+        if (formulaFactory is null)
+            throw new ArgumentNullException(nameof(formulaFactory));
+        if (cachedValueFactory is null)
+            throw new ArgumentNullException(nameof(cachedValueFactory));
+        EnsureOneBasedIndex(headerRow, nameof(headerRow));
+        EnsureOneBasedIndex(firstDataRow, nameof(firstDataRow));
+        EnsureOneBasedIndex(lastDataRow, nameof(lastDataRow));
+
+        int columnIndex = OdfCellAddress.ParseExcel(columnName.Trim() + headerRow.ToString(CultureInfo.InvariantCulture)).Column;
+        OdfCell headerCell = _sheet.Cells[headerRow - 1, columnIndex];
+        headerCell.CellValue = header;
+        ApplyHeaderStyle(headerCell);
+
+        for (int row = firstDataRow; row <= lastDataRow; row++)
+        {
+            OdfCell cell = _sheet.Cells[row - 1, columnIndex];
+            cell.SetFormula(formulaFactory(row), cachedValueFactory(row));
+            ApplyBodyStyle(cell);
+        }
+
+        return this;
     }
 
     /// <summary>

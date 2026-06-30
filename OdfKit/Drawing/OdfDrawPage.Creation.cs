@@ -100,6 +100,7 @@ public partial class OdfDrawPage
     public OdfShape AddConnector(OdfLength x1, OdfLength y1, OdfLength x2, OdfLength y2)
     {
         var connectorNode = CreateLineLikeNode("connector", x1, y1, x2, y2);
+        connectorNode.SetAttribute("viewBox", OdfNamespaces.Svg, "0 0 1000 1000", "svg");
         connectorNode.SetAttribute("type", OdfNamespaces.Draw, "standard", "draw");
         Node.AppendChild(connectorNode);
         return new OdfShape(connectorNode, Document);
@@ -314,17 +315,18 @@ public partial class OdfDrawPage
         if (string.IsNullOrEmpty(endShapeId))
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDrawPage_EndCannotBeEmpty"), nameof(endShapeId));
 
-        var connectorNode = OdfNodeFactory.CreateElement("connector", OdfNamespaces.Draw, "draw");
-        var id = "shp_" + Guid.NewGuid().ToString("N").Substring(0, 8);
-        connectorNode.SetAttribute("id", OdfNamespaces.Draw, id, "draw");
-        connectorNode.SetAttribute("id", OdfNamespaces.Xml, id, "xml");
+        (OdfLength startX, OdfLength startY) = ResolveShapeCenter(startShapeId);
+        (OdfLength endX, OdfLength endY) = ResolveShapeCenter(endShapeId);
+
+        var connectorNode = CreateLineLikeNode("connector", startX, startY, endX, endY);
+        connectorNode.SetAttribute("viewBox", OdfNamespaces.Svg, "0 0 1000 1000", "svg");
         connectorNode.SetAttribute("start-shape", OdfNamespaces.Draw, startShapeId, "draw");
         connectorNode.SetAttribute("end-shape", OdfNamespaces.Draw, endShapeId, "draw");
 
         string typeVal = connectorType switch
         {
             OdfConnectorType.Lines => "lines",
-            OdfConnectorType.Straight => "straight",
+            OdfConnectorType.Straight => "line",
             OdfConnectorType.Curve => "curve",
             _ => "standard"
         };
@@ -332,6 +334,41 @@ public partial class OdfDrawPage
 
         Node.AppendChild(connectorNode);
         return new OdfShape(connectorNode, Document);
+    }
+
+    private (OdfLength X, OdfLength Y) ResolveShapeCenter(string shapeId)
+    {
+        foreach (OdfNode child in Node.Children)
+        {
+            if (child.NodeType is not OdfNodeType.Element ||
+                child.GetAttribute("id", OdfNamespaces.Draw) != shapeId &&
+                child.GetAttribute("id", OdfNamespaces.Xml) != shapeId)
+            {
+                continue;
+            }
+
+            if (!OdfLength.TryParse(child.GetAttribute("x", OdfNamespaces.Svg), out OdfLength x) ||
+                !OdfLength.TryParse(child.GetAttribute("y", OdfNamespaces.Svg), out OdfLength y))
+            {
+                return (OdfLength.FromCentimeters(0), OdfLength.FromCentimeters(0));
+            }
+
+            double centerXPoints = x.ToPoints();
+            double centerYPoints = y.ToPoints();
+            if (OdfLength.TryParse(child.GetAttribute("width", OdfNamespaces.Svg), out OdfLength width))
+            {
+                centerXPoints += width.ToPoints() / 2;
+            }
+
+            if (OdfLength.TryParse(child.GetAttribute("height", OdfNamespaces.Svg), out OdfLength height))
+            {
+                centerYPoints += height.ToPoints() / 2;
+            }
+
+            return (OdfLength.FromPoints(centerXPoints), OdfLength.FromPoints(centerYPoints));
+        }
+
+        return (OdfLength.FromCentimeters(0), OdfLength.FromCentimeters(0));
     }
 
     /// <summary>

@@ -33,15 +33,10 @@ public partial class OdfChartDocument
                                                range.EndAddress.Row, range.EndAddress.Column);
         chart.SetAttribute("cell-range-address", OdfNamespaces.Table, fullRange, "table");
 
-        // 2. 建立 <chart:data-source>
-        OdfNode dataSource = FindOrCreateDataSource(chart);
-        dataSource.SetAttribute("has-row-headers", OdfNamespaces.Chart,
-            firstRowAsHeader ? "true" : "false", "chart");
-        dataSource.SetAttribute("has-column-headers", OdfNamespaces.Chart,
-            firstColumnAsLabel ? "true" : "false", "chart");
-
-        // 3. 清除現有 <chart:series>
+        // 2. 清除現有 <chart:series>
         OdfNode plotArea = FindOrCreatePlotArea();
+        plotArea.SetAttribute("data-source-has-labels", OdfNamespaces.Chart,
+            GetDataSourceLabelToken(firstRowAsHeader, firstColumnAsLabel), "chart");
         var toRemove = new List<OdfNode>();
         foreach (var child in plotArea.Children)
         {
@@ -56,7 +51,7 @@ public partial class OdfChartDocument
         int dataRowStart = firstRowAsHeader ? range.StartAddress.Row + 1 : range.StartAddress.Row;
         int dataColStart = firstColumnAsLabel ? range.StartAddress.Column + 1 : range.StartAddress.Column;
 
-        // 4. 設定 X 軸分類範圍
+        // 3. 設定 X 軸分類範圍
         if (firstColumnAsLabel && dataRowStart <= range.EndAddress.Row)
         {
             OdfNode xAxis = FindOrCreateAxis("x");
@@ -72,7 +67,7 @@ public partial class OdfChartDocument
             xAxis.AppendChild(categories);
         }
 
-        // 5. 為每個資料欄新增 <chart:series>
+        // 4. 為每個資料欄新增 <chart:series>
         for (int col = dataColStart; col <= range.EndAddress.Column; col++)
         {
             if (dataRowStart > range.EndAddress.Row)
@@ -130,18 +125,15 @@ public partial class OdfChartDocument
 
     // ── 私有輔助方法 ──────────────────────────────────────────────────────────
 
-    private OdfNode FindOrCreateDataSource(OdfNode chart)
+    private static string GetDataSourceLabelToken(bool firstRowAsHeader, bool firstColumnAsLabel)
     {
-        OdfNode? ds = FindChildElement(chart, "data-source", OdfNamespaces.Chart);
-        if (ds is not null)
-            return ds;
-        ds = OdfNodeFactory.CreateElement("data-source", OdfNamespaces.Chart, "chart");
-        OdfNode? plotArea = FindChildElement(chart, "plot-area", OdfNamespaces.Chart);
-        if (plotArea is not null)
-            chart.InsertBefore(ds, plotArea);
-        else
-            chart.AppendChild(ds);
-        return ds;
+        if (firstRowAsHeader && firstColumnAsLabel)
+            return "both";
+        if (firstRowAsHeader)
+            return "row";
+        if (firstColumnAsLabel)
+            return "column";
+        return "none";
     }
 
     private static string BuildAbsoluteCell(string sheetName, int row, int col)
