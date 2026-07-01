@@ -226,7 +226,7 @@ Console.WriteLine(loadedSheet.FrozenPanes.Rows);
 using OdfKit.Spreadsheet;
 
 using SpreadsheetDocument workbook = SpreadsheetDocument.Load("data.ods");
-string text = workbook.Worksheets[0].Cells["A2"].Value;
+string text = workbook.Worksheets[0].Cells["A2"].DisplayText;
 ```
 
 ## 設定公式
@@ -530,12 +530,6 @@ writer.WriteEndSheet();
 ```csharp
 using OdfKit.Spreadsheet;
 
-public sealed class SalesRow
-{
-    public string? Region { get; set; }
-    public double Amount { get; set; }
-}
-
 SalesRow[] rows =
 [
     new SalesRow { Region = "North", Amount = 120.5 },
@@ -547,6 +541,14 @@ await using OdsStreamWriter writer = new(output);
 writer.WriteStartSheet("Sales");
 await writer.WriteDataAsync(rows, includeColumnNames: true);
 writer.WriteEndSheet();
+
+// 若貼入單一頂層陳述式檔案（top-level statements），型別宣告必須放在
+// 所有執行陳述式之後；若貼入既有類別/方法內，則可放在任何位置。
+public sealed class SalesRow
+{
+    public string? Region { get; set; }
+    public double Amount { get; set; }
+}
 ```
 
 若資料來源是 Entity Framework Core 查詢，建議先 `AsNoTracking()` 並用
