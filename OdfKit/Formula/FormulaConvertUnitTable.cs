@@ -262,28 +262,30 @@ internal static class FormulaConvertUnitTable
             return true;
         }
 
-        foreach ((string prefix, double prefixValue) in DecimalPrefixes)
+        foreach (KeyValuePair<string, double> prefixEntry in DecimalPrefixes)
         {
+            string prefix = prefixEntry.Key;
             if (unit.Length > prefix.Length && unit.StartsWith(prefix, StringComparison.Ordinal))
             {
                 string baseName = unit.Substring(prefix.Length);
                 if (Units.TryGetValue(baseName, out UnitInfo info) && info.AllowsDecimalPrefix)
                 {
-                    factor = info.ToBase * prefixValue;
+                    factor = info.ToBase * prefixEntry.Value;
                     group = info.Group;
                     return true;
                 }
             }
         }
 
-        foreach ((string prefix, double prefixValue) in BinaryPrefixes)
+        foreach (KeyValuePair<string, double> prefixEntry in BinaryPrefixes)
         {
+            string prefix = prefixEntry.Key;
             if (unit.Length > prefix.Length && unit.StartsWith(prefix, StringComparison.Ordinal))
             {
                 string baseName = unit.Substring(prefix.Length);
                 if (Units.TryGetValue(baseName, out UnitInfo info) && info.AllowsBinaryPrefix)
                 {
-                    factor = info.ToBase * prefixValue;
+                    factor = info.ToBase * prefixEntry.Value;
                     group = info.Group;
                     return true;
                 }
