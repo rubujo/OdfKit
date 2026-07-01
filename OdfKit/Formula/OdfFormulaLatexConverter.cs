@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using CSharpMath.Atom;
-using CSharpMath.Structures;
 
 using OdfKit.Compliance;
 namespace OdfKit.Formula;

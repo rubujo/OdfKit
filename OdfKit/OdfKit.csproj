@@ -48,7 +48,7 @@
   <ItemGroup>
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />
     <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.4.2" />
-    <PackageReference Include="CSharpMath" Version="0.5.1" />
+    <PackageReference Include="CSharpMath" Version="1.0.0-pre.1" />
     <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.9" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.9" />
     <PackageReference Include="Sylvan.Data.Csv" Version="1.4.4" />
