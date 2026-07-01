@@ -11,7 +11,7 @@
 
     <!-- CC0 1.0 通用授權條款設定 -->
     <PackageId>OdfKit</PackageId>
-    <Version>0.0.1-pre.1</Version>
+    <Version>0.0.1</Version>
     <Authors>OdfKit Contributors</Authors>
     <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
     <Description>A managed, high-performance ODF (OpenDocument Format) processing library for .NET.</Description>
@@ -28,6 +28,8 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <RootNamespace>OdfKit</RootNamespace>
     <AssemblyName>OdfKit</AssemblyName>
+    <!-- CSharpMath 1.0.0-pre.1 由 eng/Test-NuGetPack.ps1 明確允許。 -->
+    <NoWarn>$(NoWarn);NU5104</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">

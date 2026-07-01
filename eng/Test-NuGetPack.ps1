@@ -32,6 +32,10 @@ $expectedPackages = @(
     @{ Id = "OdfKit.Extensions.Collaboration"; Assembly = "OdfKit.Extensions.Collaboration.dll"; RequireSnupkg = $false }
 )
 
+$allowedPrereleaseDependencies = @(
+    "CSharpMath"
+)
+
 Push-Location $repoRoot
 try {
     if (-not $SkipPack) {
@@ -52,6 +56,38 @@ try {
                 $entry = $zip.Entries | Where-Object { $_.FullName -eq $entryPath }
                 if (-not $entry) {
                     throw "套件 $($pkg.Id) 缺少 $entryPath"
+                }
+            }
+
+            $nuspec = $zip.Entries | Where-Object { $_.FullName -like "*.nuspec" } | Select-Object -First 1
+            if (-not $nuspec) {
+                throw "套件 $($pkg.Id) 缺少 nuspec"
+            }
+
+            $stream = $nuspec.Open()
+            try {
+                $reader = [System.IO.StreamReader]::new($stream)
+                try {
+                    [xml]$nuspecXml = $reader.ReadToEnd()
+                }
+                finally {
+                    $reader.Dispose()
+                }
+            }
+            finally {
+                $stream.Dispose()
+            }
+
+            $dependencies = $nuspecXml.package.metadata.dependencies.group.dependency + $nuspecXml.package.metadata.dependencies.dependency
+            foreach ($dependency in $dependencies) {
+                if ($null -eq $dependency) {
+                    continue
+                }
+
+                $dependencyId = [string]$dependency.id
+                $dependencyVersion = [string]$dependency.version
+                if ($dependencyVersion -match '-' -and $allowedPrereleaseDependencies -notcontains $dependencyId) {
+                    throw "套件 $($pkg.Id) 含未允許的 prerelease 相依：$dependencyId $dependencyVersion"
                 }
             }
         }
