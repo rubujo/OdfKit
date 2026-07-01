@@ -191,6 +191,57 @@ public class OdfFontSegmenterTests
     }
 
     /// <summary>
+    /// 驗證花園明朝 profile 會分段並宣告 HanaMin font-face。
+    /// </summary>
+    [Fact]
+    public void ParagraphAddText_WithHanaMinOptions_SegmentsAndDeclaresFontFaces()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph();
+        string plane2Char = char.ConvertFromUtf32(0x20BB7);
+        string plane15Char = char.ConvertFromUtf32(0xF0000);
+
+        IReadOnlyList<OdfTextRun> runs = paragraph.AddText(
+            "甲" + plane2Char + plane15Char,
+            OdfTextFontFallbackOptions.HanaMin());
+
+        Assert.Equal(2, runs.Count);
+        Assert.Equal("HanaMinA", runs[0].FontName);
+        Assert.Equal("HanaMinB", runs[1].FontName);
+        AssertFontFace(document.ContentDom, "HanaMinA");
+        AssertFontFace(document.ContentDom, "HanaMinB");
+        AssertFontFace(document.StylesDom, "HanaMinA");
+        AssertFontFace(document.StylesDom, "HanaMinB");
+    }
+
+    /// <summary>
+    /// 驗證字雲 profile 會分段並宣告 Jigmo font-face。
+    /// </summary>
+    [Fact]
+    public void ParagraphAddText_WithJigmoOptions_SegmentsAndDeclaresFontFaces()
+    {
+        using TextDocument document = TextDocument.Create();
+        OdfParagraph paragraph = document.AddParagraph();
+        string plane2Char = char.ConvertFromUtf32(0x20BB7);
+        string plane3Char = char.ConvertFromUtf32(0x30000);
+
+        IReadOnlyList<OdfTextRun> runs = paragraph.AddText(
+            "甲" + plane2Char + plane3Char,
+            OdfTextFontFallbackOptions.Jigmo());
+
+        Assert.Equal(3, runs.Count);
+        Assert.Equal("Jigmo", runs[0].FontName);
+        Assert.Equal("Jigmo2", runs[1].FontName);
+        Assert.Equal("Jigmo3", runs[2].FontName);
+        AssertFontFace(document.ContentDom, "Jigmo");
+        AssertFontFace(document.ContentDom, "Jigmo2");
+        AssertFontFace(document.ContentDom, "Jigmo3");
+        AssertFontFace(document.StylesDom, "Jigmo");
+        AssertFontFace(document.StylesDom, "Jigmo2");
+        AssertFontFace(document.StylesDom, "Jigmo3");
+    }
+
+    /// <summary>
     /// 驗證 GetSupplementaryPlaneFontName 是否依據基礎字型名稱與平面正確指派全字庫宋體字型。
     /// </summary>
     [Fact]

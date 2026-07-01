@@ -21,7 +21,7 @@ internal static class OdfCjkTextSpanBuilder
     {
         if (options.DeclareDefaultCjkFallbackFonts)
         {
-            OdfCjkFontFallbackEngine.ApplyFontFallback(document);
+            OdfCjkFontFallbackEngine.ApplyFontFallback(document, options);
         }
 
         foreach ((string segmentText, string fontName) in OdfFontSegmenter.SegmentText(text, options.BaseFont))

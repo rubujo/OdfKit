@@ -25,7 +25,7 @@ public partial class OdfCell
 
         if (options.DeclareDefaultCjkFallbackFonts)
         {
-            OdfCjkFontFallbackEngine.ApplyFontFallback(_doc);
+            OdfCjkFontFallbackEngine.ApplyFontFallback(_doc, options);
         }
 
         var richText = new OdfRichText();

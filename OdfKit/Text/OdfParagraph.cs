@@ -246,7 +246,7 @@ public partial class OdfParagraph
 
         if (options.DeclareDefaultCjkFallbackFonts)
         {
-            Doc.ApplyCjkFontFallback();
+            OdfCjkFontFallbackEngine.ApplyFontFallback(Doc, options);
         }
 
         List<(string Text, string FontName)> segments = OdfFontSegmenter.SegmentText(text, options.BaseFont);

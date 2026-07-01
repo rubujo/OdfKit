@@ -170,6 +170,64 @@ public class Cns11643InteropTests
         Assert.Contains("TW-Song-Ext-B-98_1", stylesXml, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// 驗證 ODS 儲存格會依花園明朝 profile 宣告 HanaMin font-face。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetCell_SetTextWithHanaMinOptions_DeclaresProfileFontFaces()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("HanaMin");
+        OdfCell cell = sheet.Cells[0, 0];
+        string plane2 = char.ConvertFromUtf32(0x20BB7);
+
+        cell.SetText("花" + plane2, OdfTextFontFallbackOptions.HanaMin());
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        string contentXml = ReadEntry(document.Package, "content.xml");
+        string stylesXml = ReadEntry(document.Package, "styles.xml");
+
+        Assert.Contains("style:font-name=\"HanaMinB\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("style:name=\"HanaMinA\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("style:name=\"HanaMinB\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("style:name=\"HanaMinA\"", stylesXml, StringComparison.Ordinal);
+        Assert.Contains("style:name=\"HanaMinB\"", stylesXml, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 驗證 ODP 文字方塊會依字雲 profile 宣告 Jigmo font-face。
+    /// </summary>
+    [Fact]
+    public void PresentationSlide_AddTextBoxWithJigmoOptions_DeclaresProfileFontFaces()
+    {
+        using PresentationDocument document = PresentationDocument.Create();
+        OdfSlide slide = document.Slides.Add("Jigmo");
+        string plane3 = char.ConvertFromUtf32(0x30000);
+
+        slide.AddTextBox(
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(1),
+            OdfLength.FromCentimeters(6),
+            OdfLength.FromCentimeters(2),
+            "雲" + plane3,
+            OdfTextFontFallbackOptions.Jigmo());
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        string contentXml = ReadEntry(document.Package, "content.xml");
+        string stylesXml = ReadEntry(document.Package, "styles.xml");
+
+        Assert.Contains("style:font-name=\"Jigmo3\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("style:font-name-asian=\"Jigmo3\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("style:name=\"Jigmo\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("style:name=\"Jigmo2\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("style:name=\"Jigmo3\"", contentXml, StringComparison.Ordinal);
+        Assert.Contains("style:name=\"Jigmo\"", stylesXml, StringComparison.Ordinal);
+        Assert.Contains("style:name=\"Jigmo2\"", stylesXml, StringComparison.Ordinal);
+        Assert.Contains("style:name=\"Jigmo3\"", stylesXml, StringComparison.Ordinal);
+    }
+
     private static string ReadEntry(OdfPackage package, string path)
     {
         using Stream stream = package.GetEntryStream(path);

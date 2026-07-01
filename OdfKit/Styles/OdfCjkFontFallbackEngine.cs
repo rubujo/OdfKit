@@ -10,21 +10,21 @@ namespace OdfKit.Styles;
 /// </summary>
 internal static class OdfCjkFontFallbackEngine
 {
-    private static readonly (string Name, string Family, string GenericFamily, string Pitch)[] DefaultFallbackFonts =
+    internal static readonly OdfFontFaceInfo[] DefaultFallbackFonts =
     [
-        ("TW-Kai-98_1", "TW-Kai-98_1", "system-serif", "variable"),
-        ("TW-Kai-Ext-B-98_1", "TW-Kai-Ext-B-98_1", "system-serif", "variable"),
-        ("TW-Kai-Plus-98_1", "TW-Kai-Plus-98_1", "system-serif", "variable"),
-        ("TW-Song-98_1", "TW-Song-98_1", "system-serif", "variable"),
-        ("TW-Song-Ext-B-98_1", "TW-Song-Ext-B-98_1", "system-serif", "variable"),
-        ("TW-Song-Plus-98_1", "TW-Song-Plus-98_1", "system-serif", "variable"),
-        ("PMingLiU", "PMingLiU", "system-serif", "variable"),
-        ("Microsoft JhengHei", "Microsoft JhengHei", "system-sans-serif", "variable"),
-        ("MS Mincho", "MS Mincho", "system-serif", "variable"),
-        ("MS Gothic", "MS Gothic", "system-sans-serif", "variable"),
-        ("SimSun", "SimSun", "system-serif", "variable"),
-        ("Microsoft YaHei", "Microsoft YaHei", "system-sans-serif", "variable"),
-        ("Malgun Gothic", "Malgun Gothic", "system-sans-serif", "variable")
+        new("TW-Kai-98_1", "TW-Kai-98_1", "system-serif", "variable"),
+        new("TW-Kai-Ext-B-98_1", "TW-Kai-Ext-B-98_1", "system-serif", "variable"),
+        new("TW-Kai-Plus-98_1", "TW-Kai-Plus-98_1", "system-serif", "variable"),
+        new("TW-Song-98_1", "TW-Song-98_1", "system-serif", "variable"),
+        new("TW-Song-Ext-B-98_1", "TW-Song-Ext-B-98_1", "system-serif", "variable"),
+        new("TW-Song-Plus-98_1", "TW-Song-Plus-98_1", "system-serif", "variable"),
+        new("PMingLiU", "PMingLiU", "system-serif", "variable"),
+        new("Microsoft JhengHei", "Microsoft JhengHei", "system-sans-serif", "variable"),
+        new("MS Mincho", "MS Mincho", "system-serif", "variable"),
+        new("MS Gothic", "MS Gothic", "system-sans-serif", "variable"),
+        new("SimSun", "SimSun", "system-serif", "variable"),
+        new("Microsoft YaHei", "Microsoft YaHei", "system-sans-serif", "variable"),
+        new("Malgun Gothic", "Malgun Gothic", "system-sans-serif", "variable")
     ];
 
     /// <summary>
@@ -39,10 +39,28 @@ internal static class OdfCjkFontFallbackEngine
             throw new ArgumentNullException(nameof(document));
         }
 
-        foreach ((string name, string family, string genericFamily, string pitch) in DefaultFallbackFonts)
+        ApplyFontFaces(document, DefaultFallbackFonts);
+    }
+
+    /// <summary>
+    /// Applies the font-face declarations specified by fallback options.
+    /// 套用字型遞補設定指定的 font-face 宣告。
+    /// </summary>
+    /// <param name="document">The target ODF document. / 目標 ODF 文件。</param>
+    /// <param name="options">The font fallback options. / 字型遞補選項。</param>
+    internal static void ApplyFontFallback(OdfDocument document, OdfTextFontFallbackOptions options)
+    {
+        if (document is null)
         {
-            OdfFontFaceDeclarationEngine.AddFontFace(document, name, family, genericFamily, pitch);
+            throw new ArgumentNullException(nameof(document));
         }
+
+        if (options is null)
+        {
+            throw new ArgumentNullException(nameof(options));
+        }
+
+        ApplyFontFaces(document, options.FontFaces);
     }
 
     /// <summary>
@@ -53,12 +71,40 @@ internal static class OdfCjkFontFallbackEngine
     /// <param name="stylesDom">The styles DOM root. / styles DOM 根節點。</param>
     internal static void ApplyFontFallback(OdfNode contentDom, OdfNode? stylesDom)
     {
-        foreach ((string name, string family, string genericFamily, string pitch) in DefaultFallbackFonts)
+        ApplyFontFaces(contentDom, stylesDom, DefaultFallbackFonts);
+    }
+
+    private static void ApplyFontFaces(OdfDocument document, IReadOnlyList<OdfFontFaceInfo> fontFaces)
+    {
+        foreach (OdfFontFaceInfo fontFace in fontFaces)
         {
-            OdfFontFaceDeclarationEngine.AddToDom(contentDom, name, family, genericFamily, pitch);
+            OdfFontFaceDeclarationEngine.AddFontFace(
+                document,
+                fontFace.Name,
+                fontFace.Family,
+                fontFace.GenericFamily,
+                fontFace.Pitch);
+        }
+    }
+
+    private static void ApplyFontFaces(OdfNode contentDom, OdfNode? stylesDom, IReadOnlyList<OdfFontFaceInfo> fontFaces)
+    {
+        foreach (OdfFontFaceInfo fontFace in fontFaces)
+        {
+            OdfFontFaceDeclarationEngine.AddToDom(
+                contentDom,
+                fontFace.Name,
+                fontFace.Family,
+                fontFace.GenericFamily,
+                fontFace.Pitch);
             if (stylesDom is not null)
             {
-                OdfFontFaceDeclarationEngine.AddToDom(stylesDom, name, family, genericFamily, pitch);
+                OdfFontFaceDeclarationEngine.AddToDom(
+                    stylesDom,
+                    fontFace.Name,
+                    fontFace.Family,
+                    fontFace.GenericFamily,
+                    fontFace.Pitch);
             }
         }
     }

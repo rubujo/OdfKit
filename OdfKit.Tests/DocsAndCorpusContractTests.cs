@@ -959,6 +959,10 @@ public class DocsAndCorpusContractTests
         Assert.Contains("`OdfParagraph.AddText(..., OdfTextFontFallbackOptions.Cns11643())`", support, StringComparison.Ordinal);
         Assert.Contains("`TW-Kai-Ext-B-98_1`", support, StringComparison.Ordinal);
         Assert.Contains("`TW-Song-Ext-B-98_1`", support, StringComparison.Ordinal);
+        Assert.Contains("`OdfTextFontFallbackOptions.HanaMin()`", support, StringComparison.Ordinal);
+        Assert.Contains("`OdfTextFontFallbackOptions.Jigmo()`", support, StringComparison.Ordinal);
+        Assert.Contains("`HanaMinB`", support, StringComparison.Ordinal);
+        Assert.Contains("`Jigmo3`", support, StringComparison.Ordinal);
         Assert.Contains("OdfKit 不內建政府字型", support, StringComparison.Ordinal);
         Assert.Contains("不應宣稱完整", support, StringComparison.Ordinal);
         Assert.Contains("CNS 11643 官方語意相容或認證", support, StringComparison.Ordinal);

@@ -46,8 +46,11 @@ OdfKit 的文字內容仍以 Unicode 儲存；一般 ODT 文字層不寫入 CNS 
   `TW-Song-Plus-98_1` 等全字庫字型名稱。
 - `OdfParagraph.AddText(..., OdfTextFontFallbackOptions.Cns11643())` 可自動呼叫分段邏輯，將同一段
   文字拆成多個 run 並套用對應 font-face。
+- `OdfTextFontFallbackOptions.HanaMin()` 會宣告 `HanaMinA`／`HanaMinB`，並將 Plane 2 與
+  Plane 15/16 文字切換至 `HanaMinB`；`OdfTextFontFallbackOptions.Jigmo()` 會宣告 `Jigmo`、
+  `Jigmo2`、`Jigmo3`，並將 Plane 2 與 Plane 3 文字分別切換至 `Jigmo2` 與 `Jigmo3`。
 - ODS／ODP／ODG 文字入口已共用同一套分段與 font-face 宣告基礎：`OdfCell.SetText(...,
-  OdfTextFontFallbackOptions.Cns11643())` 會將儲存格文字寫成富文字 run；`OdfSlide.AddTextBox(...)`
+  OdfTextFontFallbackOptions.Cns11643())`、`HanaMin()` 或 `Jigmo()` 會將儲存格文字寫成富文字 run；`OdfSlide.AddTextBox(...)`
   與 `OdfDrawPage.AddTextBox(...)` 的 fallback options overload 會在文字方塊內寫入帶文字樣式的
   `text:span`。
 - `OdfFontResolver.RegisterFontDirectory`、`RegisterFont` 與 `RegisterFontSubsetter` 提供外部字型
