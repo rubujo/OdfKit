@@ -95,7 +95,7 @@ public static class OdfImageExporter
                     string? text = TryGetCellDisplayText(cellNode);
                     if (!string.IsNullOrEmpty(text))
                     {
-                        canvas.DrawText(text, x + 3, y + rowHeight - 4, font, textPaint);
+                        canvas.DrawText(text, x + 3, y + rowHeight - 4, SKTextAlign.Left, font, textPaint);
                     }
                 }
             }

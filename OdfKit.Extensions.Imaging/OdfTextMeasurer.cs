@@ -165,15 +165,13 @@ public static class OdfTextMeasurer
         }
 
         // 3. Fallback 回退：使用 SkiaSharp 量測
-#pragma warning disable CS0618
         using var paint = new SKPaint();
         var styleWeight = isBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal;
         var styleSlant = isItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright;
-        paint.Typeface = SKTypeface.FromFamilyName(mappedFont, new SKFontStyle((int)styleWeight, (int)SKFontStyleWidth.Normal, styleSlant));
-        paint.TextSize = (float)fontSizePoints * 1.3333f; // Points to Pixels (96 DPI)
+        using var fallbackTypeface = SKTypeface.FromFamilyName(mappedFont, new SKFontStyle((int)styleWeight, (int)SKFontStyleWidth.Normal, styleSlant));
+        using var fallbackFont = new SKFont(fallbackTypeface ?? SKTypeface.Default, (float)fontSizePoints * 1.3333f); // Points to Pixels (96 DPI)
 
-        float widthInPx = paint.MeasureText(text);
-#pragma warning restore CS0618
+        float widthInPx = fallbackFont.MeasureText(text, paint);
         double fallbackCm = widthInPx / 96.0 * 2.54; // Pixels to Centimeters
         return OdfLength.FromCentimeters(fallbackCm);
     }
