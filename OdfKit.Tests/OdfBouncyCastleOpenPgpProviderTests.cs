@@ -232,6 +232,53 @@ public class OdfBouncyCastleOpenPgpProviderTests
             () => provider.DecryptSessionKey(packet, "test"));
     }
 
+    /// <summary>
+    /// 以固定種子對大量隨機（含強制保留合法 PGP 封包標頭位元以觸發長度前綴解析分支的變異）
+    /// 位元組陣列呼叫 DecryptSessionKey，驗證 DecodePkeskPacket 對任意輸入皆只會擲出
+    /// CryptographicException 或 InvalidOperationException（金鑰環中找不到對應 Key ID，
+    /// 屬既有且與封包格式無關的正常路徑），不會洩漏 IndexOutOfRangeException 等未宣告的例外型別。
+    /// 屬輕量級的內建隨機化邊界測試，取代需要外部原生 libFuzzer 工具鏈的完整模糊測試方案。
+    /// </summary>
+    [Fact]
+    public void DecryptSessionKey_RandomizedMalformedPackets_NeverThrowsUndocumentedExceptionType()
+    {
+        var (_, secKeyRingBytes) = GenerateRsaKeyRing();
+        var provider = new OdfBouncyCastleOpenPgpProvider(
+            secKeyRingBytes,
+            _ => Array.Empty<char>());
+
+        var random = new Random(20260702);
+        for (int trial = 0; trial < 5000; trial++)
+        {
+            int length = random.Next(0, 64);
+            byte[] packet = new byte[length];
+            random.NextBytes(packet);
+
+            if (length > 0 && trial % 2 == 0)
+            {
+                // 半數嘗試強制保留合法標頭起始位元，讓解析器實際進入長度前綴解析分支，
+                // 而非總是在最外層的標頭位元檢查就被拒絕。
+                packet[0] |= 0x80;
+            }
+
+            try
+            {
+                provider.DecryptSessionKey(packet, "test");
+            }
+            catch (CryptographicException)
+            {
+            }
+            catch (InvalidOperationException)
+            {
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(
+                    $"Trial {trial}（長度 {length}）擲出未宣告的例外型別 {ex.GetType().Name}：{ex.Message}");
+            }
+        }
+    }
+
     [Fact]
     public void DecryptSessionKey_NullPacket_Throws_ArgumentNullException()
     {
