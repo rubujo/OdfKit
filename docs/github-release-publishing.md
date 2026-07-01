@@ -87,7 +87,7 @@ dotnet restore -p:RestoreAdditionalProjectSources="$PWD/.nuget/odfkit"
 
 ## 5. CI 驗證
 
-`/.github/workflows/nuget-pack.yml` 使用 `actions/checkout@v6`、`actions/setup-dotnet@v5`，於 PR 與 `main` 執行 `Test-NuGetPack.ps1`。
+`/.github/workflows/nuget-pack.yml` 使用 `actions/checkout@v7`，並透過共用複合 action `./.github/actions/setup-dotnet-odfkit`（內部使用 `actions/setup-dotnet@v5` 與 `actions/cache@v6`）安裝 .NET SDK，於 PR 與 `main` 執行 `Test-NuGetPack.ps1`。
 
 ## 版本策略
 
