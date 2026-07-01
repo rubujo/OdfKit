@@ -188,6 +188,51 @@ public class OdfBouncyCastleOpenPgpProviderTests
     }
 
     [Fact]
+    public void DecryptSessionKey_TruncatedFiveByteLengthHeader_Throws_CryptographicException()
+    {
+        var (_, secKeyRingBytes) = GenerateRsaKeyRing();
+        var provider = new OdfBouncyCastleOpenPgpProvider(
+            secKeyRingBytes,
+            _ => Array.Empty<char>());
+
+        // 新格式封包標頭（0xC1 = tag 1，PKESK），以 b1=255 觸發 5 位元組長度前綴分支，
+        // 宣告 bodyLen=5，但陣列僅 12 位元組——扣除 6 位元組表頭後，剩餘 6 位元組不足以容納
+        // version(1) + keyId(8) + algorithm(1) 共 10 位元組的固定尾端結構。
+        byte[] packet = new byte[12];
+        packet[0] = 0xC1;
+        packet[1] = 255;
+        packet[2] = 0x00;
+        packet[3] = 0x00;
+        packet[4] = 0x00;
+        packet[5] = 0x05;
+
+        Assert.Throws<CryptographicException>(
+            () => provider.DecryptSessionKey(packet, "test"));
+    }
+
+    [Fact]
+    public void DecryptSessionKey_HighBitBodyLength_Throws_CryptographicException()
+    {
+        var (_, secKeyRingBytes) = GenerateRsaKeyRing();
+        var provider = new OdfBouncyCastleOpenPgpProvider(
+            secKeyRingBytes,
+            _ => Array.Empty<char>());
+
+        // 5 位元組長度前綴的第一個位元組設定最高位元（0x80...），若以有號 int 直接左移會使
+        // bodyLen 變成負數；驗證修正後改以 uint 運算並正確拒絕此封包，而非讓負值繞過邊界檢查。
+        byte[] packet = new byte[16];
+        packet[0] = 0xC1;
+        packet[1] = 255;
+        packet[2] = 0x80;
+        packet[3] = 0x00;
+        packet[4] = 0x00;
+        packet[5] = 0x00;
+
+        Assert.Throws<CryptographicException>(
+            () => provider.DecryptSessionKey(packet, "test"));
+    }
+
+    [Fact]
     public void DecryptSessionKey_NullPacket_Throws_ArgumentNullException()
     {
         var (_, secKeyRingBytes) = GenerateRsaKeyRing();

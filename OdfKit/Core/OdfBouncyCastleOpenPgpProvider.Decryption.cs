@@ -18,6 +18,21 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
 
     private static (long KeyId, PublicKeyAlgorithmTag Algorithm, byte[][] EncData) DecodePkeskPacket(byte[] bytes)
     {
+        try
+        {
+            return DecodePkeskPacketCore(bytes);
+        }
+        catch (Exception ex) when (ex is IndexOutOfRangeException or ArgumentOutOfRangeException or ArgumentException)
+        {
+            // 任何攔截失誤的越界存取（例如標頭宣告的長度前綴超出封包實際位元組數）一律轉換為
+            // CryptographicException，維持本方法「格式有誤時擲出 CryptographicException」的例外契約，
+            // 不讓未經驗證的輸入以非預期例外型別外洩。
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PkeskPacketBytesToo"), ex);
+        }
+    }
+
+    private static (long KeyId, PublicKeyAlgorithmTag Algorithm, byte[][] EncData) DecodePkeskPacketCore(byte[] bytes)
+    {
         // BC 2.6.x 的 PublicKeyEncSessionPacket.GetEncoded() 輸出格式：
         // [封包標頭][版本 (1)][金鑰識別碼 (8)][演算法 (1)][原始加密位元組]
         // 原始加密資料直接寫入，不含 MPI bit count header。
@@ -30,7 +45,8 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_InvalidPgpPacketHeader"));
 
         bool isNew = (hdr & 0x40) != 0;
-        int tag, bodyLen;
+        int tag;
+        long bodyLen;
 
         if (isNew)
         {
@@ -46,7 +62,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
             }
             else if (b1 == 255)
             {
-                bodyLen = (bytes[pos] << 24) | (bytes[pos + 1] << 16) | (bytes[pos + 2] << 8) | bytes[pos + 3];
+                bodyLen = ((uint)bytes[pos] << 24) | ((uint)bytes[pos + 1] << 16) | ((uint)bytes[pos + 2] << 8) | bytes[pos + 3];
                 pos += 4;
             }
             else
@@ -67,7 +83,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
                     bodyLen = (bytes[pos++] << 8) | bytes[pos++];
                     break;
                 case 2:
-                    bodyLen = (bytes[pos] << 24) | (bytes[pos + 1] << 16) | (bytes[pos + 2] << 8) | bytes[pos + 3];
+                    bodyLen = ((uint)bytes[pos] << 24) | ((uint)bytes[pos + 1] << 16) | ((uint)bytes[pos + 2] << 8) | bytes[pos + 3];
                     pos += 4;
                     break;
                 default:
@@ -80,6 +96,13 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_ExpectedPkeskPacketLabel", tag));
 
         int bodyStart = pos;
+
+        // 表頭宣告的內文長度必須完整落在實際位元組陣列範圍內，且至少容納
+        // version(1) + keyId(8) + algorithm(1) 共 10 位元組的固定尾端結構；
+        // 以 long 運算避免 bodyStart + bodyLen 以 int 相加時發生溢位。
+        if (bodyLen < 10 || (long)bodyStart + bodyLen > bytes.Length)
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_PkeskPacketBytesToo"));
+
         pos++; // version（跳過）
 
         long keyId = 0;
@@ -89,7 +112,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
         var algorithm = (PublicKeyAlgorithmTag)bytes[pos++];
 
         // 剩餘全部位元組即為加密後的 Session Key 資料（RSA 為單一區塊，ElGamal 為 c1+c2）
-        int dataLen = bodyStart + bodyLen - pos;
+        int dataLen = (int)(bodyStart + bodyLen - pos);
         if (dataLen <= 0)
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_NoEncryptionKeyInformation"));
 
