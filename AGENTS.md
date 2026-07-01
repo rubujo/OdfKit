@@ -105,4 +105,4 @@
 ---
 
 ## 4. 規範擴充與維護
-若要針對特定工具（如 Claude Code 的 `CLAUDE.md` 或 GitHub Copilot 的 `.github/copilot-instructions.md`）配置專屬規則，必須採用**墊片指向 (Shim)** 的方式，直接連結至本 [`AGENTS.md`](file:///d:/Dev/Project/Application/OdfKit/AGENTS.md) 檔案，嚴禁複製與同步重複的文本內容。
+若要針對特定工具（如 Claude Code 的 `CLAUDE.md` 或 GitHub Copilot 的 `.github/copilot-instructions.md`）配置專屬規則，必須採用**墊片指向 (Shim)** 的方式，直接連結至本 [`AGENTS.md`](AGENTS.md) 檔案，嚴禁複製與同步重複的文本內容。
