@@ -12,7 +12,8 @@
 | 建立第一個範例或驗證 PoC | [快速開始](getting-started.md) | [Cookbook](cookbook.md)、[samples/README.md](../samples/README.md) |
 | 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[ODF 格式支援矩陣](odf-format-support.md) |
 | 規劃部署、升級與版本交付 | [版本與交付資訊](version-delivery.md) | [GitHub Release 發佈指南](github-release-publishing.md)、[CHANGELOG](../CHANGELOG.md) |
-| 確認功能邊界、互通性與驗證證據 | [ODF 格式支援矩陣](odf-format-support.md) | [LibreOffice 互通矩陣](libreoffice-interop-matrix.md)、[OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md)、[ODF Toolkit 對標線](odf-toolkit-parity.md) |
+| 確認功能邊界、互通性與驗證證據 | [ODF 格式支援矩陣](odf-format-support.md) | [LibreOffice 互通矩陣](libreoffice-interop-matrix.md)、[OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md)、[ODF Toolkit 對標線](odf-toolkit-parity.md)、[ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md) |
+| 與其他 ODF 函式庫／SDK 比較 | [競品對照](competitor-comparison.md) | [ODF 格式支援矩陣](odf-format-support.md)、[ODF Toolkit 對標線](odf-toolkit-parity.md) |
 | 維護 CI/CD 與驗證分層 | [CI/CD 驗證設計](ci-cd.md) | [GitHub Release 發佈指南](github-release-publishing.md)、[Corpus Manifest 規則](corpus-manifest.md) |
 
 ## 依生命週期分類
@@ -54,6 +55,8 @@
 | [Corpus Manifest 規則](corpus-manifest.md) | corpus manifest 契約 |
 | [CI/CD 驗證設計](ci-cd.md) | GitHub Actions 分層、timeout、Smoke 測試與診斷 artifact 規則 |
 | [GitHub Release 發佈指南](github-release-publishing.md) | 封裝、驗證與發佈步驟 |
+| [ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md) | 對照 ODF 1.4 四份正式規格文本逐章比對 schema／驗證層／公式引擎缺口 |
+| [競品對照](competitor-comparison.md) | 與 ODF Toolkit、Apache POI、LibreOffice SDK 及 .NET 商業套件的功能與授權對照 |
 
 ## 其他治理文件
 

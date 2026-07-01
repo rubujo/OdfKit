@@ -12,6 +12,9 @@
 - OASIS ODF TC tooling：ODF schema 與規格資料來源。
 
 官方 corpus 來源與 baseline 命名規則請見 [odf-official-corpus-sources.md](odf-official-corpus-sources.md)。
+ODF 1.4（2025-12 OASIS Standard）四份正式規格文本逐章稽核結論見
+[ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md)；與其他 ODF 函式庫的功能對照見
+[競品對照](competitor-comparison.md)。
 
 ## Parity 等級
 
