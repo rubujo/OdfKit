@@ -83,8 +83,23 @@ public class PresentationApiUsabilityTests
         deck.SaveToStream(stream);
         stream.Position = 0;
 
-        using PresentationDocument loaded = PresentationDocument.Load(stream);
+        // 先以 OdfPackage.Open(leaveOpen: true) 讀取原始 XML，並在完整釋放（含等待
+        // 背景預讀工作完成）後才重用 stream 供 PresentationDocument.Load 讀取；
+        // PresentationDocument.Load 本身不支援 leaveOpen，其底層 OdfPackage 會在
+        // loaded 釋放時一併關閉 stream，因此必須排在最後才讀取，避免兩個仍存活的
+        // 讀取端競爭同一個串流游標。
+        using (OdfPackage package = OdfPackage.Open(stream, leaveOpen: true))
+        {
+            string stylesXml = ReadEntry(package, "styles.xml");
+            Assert.Contains("style:name=\"BoardTheme\"", stylesXml, StringComparison.Ordinal);
+            Assert.Contains("draw:fill-color=\"#F6F8FB\"", stylesXml, StringComparison.Ordinal);
+            string contentXml = ReadEntry(package, "content.xml");
+            Assert.Contains("svg:x=\"3cm\"", contentXml, StringComparison.Ordinal);
+            Assert.Contains("svg:width=\"12cm\"", contentXml, StringComparison.Ordinal);
+        }
 
+        stream.Position = 0;
+        using PresentationDocument loaded = PresentationDocument.Load(stream);
         Assert.Equal("董事會簡報", loaded.Title);
         Assert.Equal(3, loaded.Slides.Count);
         Assert.All(loaded.Slides, slide => Assert.Equal("BoardTheme", slide.MasterPageName));
@@ -97,15 +112,6 @@ public class PresentationApiUsabilityTests
         Assert.Contains(loaded.Slides[2].Placeholders, placeholder => placeholder.PlaceholderType == OdfPlaceholderType.Chart);
         Assert.Equal("圖表頁先說趨勢，再補風險。", loaded.Slides[2].SpeakerNotes);
         Assert.Contains(loaded.Slides[1].GetAnimations(), animation => animation.TargetElementId == "roadmap_highlight");
-
-        stream.Position = 0;
-        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
-        string stylesXml = ReadEntry(package, "styles.xml");
-        Assert.Contains("style:name=\"BoardTheme\"", stylesXml, StringComparison.Ordinal);
-        Assert.Contains("draw:fill-color=\"#F6F8FB\"", stylesXml, StringComparison.Ordinal);
-        string contentXml = ReadEntry(package, "content.xml");
-        Assert.Contains("svg:x=\"3cm\"", contentXml, StringComparison.Ordinal);
-        Assert.Contains("svg:width=\"12cm\"", contentXml, StringComparison.Ordinal);
     }
 
     /// <summary>

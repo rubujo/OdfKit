@@ -273,6 +273,10 @@ public sealed partial class OdfPackage : IDisposable, IAsyncDisposable
     /// Opens an existing ODF package from the specified stream.
     /// 從指定的資料流開啟既有的 ODF 封裝。
     /// </summary>
+    /// <remarks>
+    /// When lazy loading is enabled, this method starts a background task that reads well-known entries (e.g. content.xml, styles.xml, meta.xml, settings.xml) from <paramref name="stream"/>; <see cref="Dispose()"/> and <see cref="DisposeAsync"/> both wait for this task to finish. Callers that pass <see langword="true"/> for <paramref name="leaveOpen"/> must fully dispose the returned <see cref="OdfPackage"/> (e.g. by scoping it in an explicit <c>using</c> block) before repositioning or reopening the same <paramref name="stream"/>; otherwise the background read and a subsequent foreground read race on the stream's cursor and can corrupt the read.
+    /// 啟用延遲載入時，此方法會啟動一個背景工作，從 <paramref name="stream"/> 讀取已知專案（例如 content.xml、styles.xml、meta.xml、settings.xml）；<see cref="Dispose()"/> 與 <see cref="DisposeAsync"/> 都會等待此工作完成。呼叫端若對 <paramref name="leaveOpen"/> 傳入 <see langword="true"/>，必須在重新定位或重新開啟同一個 <paramref name="stream"/> 之前完整釋放傳回的 <see cref="OdfPackage"/>（例如以明確的 <c>using</c> 區塊限定其存活範圍），否則背景讀取與後續的前景讀取會競爭該資料流的游標，可能導致讀取內容毀損。
+    /// </remarks>
     /// <param name="stream">The stream containing the ODF package data. / 包含 ODF 封裝資料的資料流。</param>
     /// <param name="leaveOpen"><see langword="true"/> to keep the stream open after the package is disposed; otherwise <see langword="false"/>. / 若在處置封裝後保持資料流開啟，則為 <see langword="true"/>；否則為 <see langword="false"/>。</param>
     /// <param name="options">The load options. / 載入選項。</param>

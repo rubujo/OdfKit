@@ -319,21 +319,25 @@ public class TextApiUsabilityTests
         document.SaveToStream(stream);
         stream.Position = 0;
 
-        using TextDocument loaded = TextDocument.Load(stream);
+        // 先以 OdfPackage.Open(leaveOpen: true) 讀取原始 XML，並在完整釋放（含等待
+        // 背景預讀工作完成）後才重用 stream 供 TextDocument.Load 讀取；TextDocument.Load
+        // 本身不支援 leaveOpen，其底層 OdfPackage 會在 loaded 釋放時一併關閉 stream，
+        // 因此必須排在最後才讀取，避免兩個仍存活的讀取端競爭同一個串流游標。
+        using (OdfPackage package = OdfPackage.Open(stream, leaveOpen: true))
+        {
+            string contentXml = ReadEntry(package, "content.xml");
+            Assert.Contains("#C00000", contentXml);
+            Assert.Contains("11pt", contentXml);
+        }
 
+        stream.Position = 0;
+        using TextDocument loaded = TextDocument.Load(stream);
         Assert.Equal("季報", loaded.Metadata.Title);
         Assert.Equal("OdfKit", loaded.Metadata.Creator);
         Assert.Equal("營運摘要", loaded.Metadata.Subject);
         Assert.Equal("第一季財務摘要", loaded.Body.Headings.Single().TextContent);
         Assert.Contains(loaded.Body.Paragraphs, paragraph => paragraph.TextContent.Contains("NT$ 1,200,000", StringComparison.Ordinal));
         Assert.Equal("硬體銷售：NT$ 800,000", loaded.Body.Lists.Single().Items[0].Paragraphs[0].TextContent);
-
-        stream.Position = 0;
-        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
-        string contentXml = ReadEntry(package, "content.xml");
-
-        Assert.Contains("#C00000", contentXml);
-        Assert.Contains("11pt", contentXml);
     }
 
     /// <summary>
@@ -387,34 +391,39 @@ public class TextApiUsabilityTests
         document.SaveToStream(stream);
         stream.Position = 0;
 
-        using TextDocument loaded = TextDocument.Load(stream);
+        // 先以 OdfPackage.Open(leaveOpen: true) 讀取原始 XML，並在完整釋放（含等待
+        // 背景預讀工作完成）後才重用 stream 供 TextDocument.Load 讀取；TextDocument.Load
+        // 本身不支援 leaveOpen，其底層 OdfPackage 會在 loaded 釋放時一併關閉 stream，
+        // 因此必須排在最後才讀取，避免兩個仍存活的讀取端競爭同一個串流游標。
+        using (OdfPackage package = OdfPackage.Open(stream, leaveOpen: true))
+        {
+            string contentXml = ReadEntry(package, "content.xml");
 
+            Assert.Contains("draw:object", contentXml);
+            Assert.DoesNotContain("table:summary", contentXml);
+            Assert.Contains("2026 年營運成果", contentXml);
+            Assert.Contains("fo:break-after=\"page\"", contentXml);
+            Assert.Contains("#1F4E79", contentXml);
+            Assert.Contains("#D9EAF7", contentXml);
+            Assert.Contains("fo:font-weight=\"bold\"", contentXml);
+            Assert.Contains("#FFF2CC", contentXml);
+            Assert.Contains("text:note", contentXml);
+            Assert.Contains("xlink:href=\"Pictures/AnnualLogo.png\"", contentXml);
+            Assert.True(package.HasEntry("Pictures/AnnualLogo.png"));
+            Assert.True(package.HasEntry("Object 1/content.xml"));
+
+            string chartContentXml = ReadEntry(package, "Object 1/content.xml");
+            Assert.Contains("季度營收", chartContentXml);
+        }
+
+        stream.Position = 0;
+        using TextDocument loaded = TextDocument.Load(stream);
         Assert.Equal("年度報告", loaded.Metadata.Title);
         Assert.Contains(loaded.Body.Headings, heading => heading.TextContent == "營運摘要");
         Assert.Contains(loaded.Body.Tables.Items, table => table.RowCount == 3 && table.ColumnCount == 2);
         Assert.Contains(loaded.Body.Sections, section => section.IsProtected);
         Assert.Single(loaded.GetCommentInfos());
         Assert.Contains(loaded.GetPageSetups(), setup => setup.HeaderText == "年度報告");
-
-        stream.Position = 0;
-        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
-        string contentXml = ReadEntry(package, "content.xml");
-
-        Assert.Contains("draw:object", contentXml);
-        Assert.DoesNotContain("table:summary", contentXml);
-        Assert.Contains("2026 年營運成果", contentXml);
-        Assert.Contains("fo:break-after=\"page\"", contentXml);
-        Assert.Contains("#1F4E79", contentXml);
-        Assert.Contains("#D9EAF7", contentXml);
-        Assert.Contains("fo:font-weight=\"bold\"", contentXml);
-        Assert.Contains("#FFF2CC", contentXml);
-        Assert.Contains("text:note", contentXml);
-        Assert.Contains("xlink:href=\"Pictures/AnnualLogo.png\"", contentXml);
-        Assert.True(package.HasEntry("Pictures/AnnualLogo.png"));
-        Assert.True(package.HasEntry("Object 1/content.xml"));
-
-        string chartContentXml = ReadEntry(package, "Object 1/content.xml");
-        Assert.Contains("季度營收", chartContentXml);
     }
 
     /// <summary>
@@ -612,15 +621,21 @@ public class TextApiUsabilityTests
         document.SaveToStream(stream);
         stream.Position = 0;
 
+        // 先以 OdfPackage.Open(leaveOpen: true) 讀取原始 XML，並在完整釋放（含等待
+        // 背景預讀工作完成）後才重用 stream 供 TextDocument.Load 讀取；TextDocument.Load
+        // 本身不支援 leaveOpen，其底層 OdfPackage 會在 loaded 釋放時一併關閉 stream，
+        // 因此必須排在最後才讀取，避免兩個仍存活的讀取端競爭同一個串流游標。
+        using (OdfPackage package = OdfPackage.Open(stream, leaveOpen: true))
+        {
+            string contentXml = ReadEntry(package, "content.xml");
+            Assert.Contains("text-underline-style", contentXml);
+        }
+
+        stream.Position = 0;
         using TextDocument loaded = TextDocument.Load(stream);
         OdfParagraph loadedPara = loaded.Body.Paragraphs.Single();
         OdfTextRun underlineRun = loadedPara.Runs.Single(r => r.Text == "底線文字");
         Assert.True(underlineRun.IsUnderline);
-
-        stream.Position = 0;
-        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
-        string contentXml = ReadEntry(package, "content.xml");
-        Assert.Contains("text-underline-style", contentXml);
     }
 
     /// <summary>
