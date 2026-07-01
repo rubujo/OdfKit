@@ -21,6 +21,8 @@ public partial class OdfTable
     private readonly TextDocument _doc;
     private readonly int _rows;
     private readonly int _cols;
+    private List<OdfNode>? _rowNodeCache;
+    private readonly Dictionary<OdfNode, List<OdfNode>> _cellNodeCacheByRow = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OdfTable"/> class.
@@ -69,24 +71,10 @@ public partial class OdfTable
     /// <param name="colSpan">The number of columns spanned. / 橫跨的欄數。</param>
     public void MergeCells(int startRow, int startCol, int rowSpan, int colSpan)
     {
-        List<OdfNode> rows = [];
-        foreach (var child in Node.Children)
-        {
-            if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
-            {
-                rows.Add(child);
-            }
-        }
+        List<OdfNode> rows = GetRowNodes();
 
         var targetRowNode = rows[startRow];
-        List<OdfNode> cellsInTargetRow = [];
-        foreach (var child in targetRowNode.Children)
-        {
-            if ((child.LocalName == "table-cell" || child.LocalName == "covered-table-cell") && child.NamespaceUri == OdfNamespaces.Table)
-            {
-                cellsInTargetRow.Add(child);
-            }
-        }
+        List<OdfNode> cellsInTargetRow = GetCellNodesForRow(targetRowNode);
         var targetCell = cellsInTargetRow[startCol];
         targetCell.SetAttribute("number-rows-spanned", OdfNamespaces.Table, rowSpan.ToString(CultureInfo.InvariantCulture), "table");
         targetCell.SetAttribute("number-columns-spanned", OdfNamespaces.Table, colSpan.ToString(CultureInfo.InvariantCulture), "table");
@@ -94,14 +82,7 @@ public partial class OdfTable
         for (int r = startRow; r < startRow + rowSpan; r++)
         {
             var rowNode = rows[r];
-            List<OdfNode> cellsInRow = [];
-            foreach (var child in rowNode.Children)
-            {
-                if ((child.LocalName == "table-cell" || child.LocalName == "covered-table-cell") && child.NamespaceUri == OdfNamespaces.Table)
-                {
-                    cellsInRow.Add(child);
-                }
-            }
+            List<OdfNode> cellsInRow = GetCellNodesForRow(rowNode);
 
             for (int c = startCol; c < startCol + colSpan; c++)
             {
@@ -114,6 +95,8 @@ public partial class OdfTable
                 rowNode.RemoveChild(cellToRemove);
             }
         }
+
+        InvalidateStructureCache();
     }
 
     /// <summary>
@@ -162,32 +145,71 @@ public partial class OdfTable
     /// <param name="repeatCount">The repeat count. / 重複次數。</param>
     public void SetRowRepeat(int row, int repeatCount)
     {
-        List<OdfNode> rows = [];
-        foreach (var child in Node.Children)
-        {
-            if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
-                rows.Add(child);
-        }
-        var rowNode = rows[row];
+        var rowNode = GetRowNodes()[row];
         rowNode.SetAttribute("number-rows-repeated", OdfNamespaces.Table, repeatCount.ToString(CultureInfo.InvariantCulture), "table");
     }
 
     private OdfNode GetCellNode(int row, int col)
     {
+        var rowNode = GetRowNodes()[row];
+        return GetCellNodesForRow(rowNode)[col];
+    }
+
+    /// <summary>
+    /// Returns the table's <c>table:table-row</c> child nodes, building and caching the list on first
+    /// access so repeated cell lookups avoid rescanning all children. Call <see cref="InvalidateStructureCache"/>
+    /// after any structural change to rows, columns, or cells.
+    /// 傳回表格的 <c>table:table-row</c> 子節點清單，首次存取時建立並快取，避免重複儲存格查詢時
+    /// 反覆重新掃描全部子節點。任何列、欄或儲存格結構變更後，須呼叫 <see cref="InvalidateStructureCache"/>。
+    /// </summary>
+    private List<OdfNode> GetRowNodes()
+    {
+        if (_rowNodeCache is not null)
+            return _rowNodeCache;
+
         List<OdfNode> rows = [];
         foreach (var child in Node.Children)
         {
             if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
                 rows.Add(child);
         }
-        var rowNode = rows[row];
+
+        _rowNodeCache = rows;
+        return rows;
+    }
+
+    /// <summary>
+    /// Returns the given row's <c>table:table-cell</c>／<c>table:covered-table-cell</c> child nodes,
+    /// building and caching the list per row node on first access.
+    /// 傳回指定列的 <c>table:table-cell</c>／<c>table:covered-table-cell</c> 子節點清單，
+    /// 首次存取時依列節點建立並快取。
+    /// </summary>
+    private List<OdfNode> GetCellNodesForRow(OdfNode rowNode)
+    {
+        if (_cellNodeCacheByRow.TryGetValue(rowNode, out List<OdfNode>? cached))
+            return cached;
+
         List<OdfNode> cells = [];
         foreach (var child in rowNode.Children)
         {
             if ((child.LocalName == "table-cell" || child.LocalName == "covered-table-cell") && child.NamespaceUri == OdfNamespaces.Table)
                 cells.Add(child);
         }
-        return cells[col];
+
+        _cellNodeCacheByRow[rowNode] = cells;
+        return cells;
+    }
+
+    /// <summary>
+    /// Clears the cached row and cell node lists; must be called after any operation that adds, removes,
+    /// or replaces <c>table:table-row</c> or cell nodes.
+    /// 清除快取的列與儲存格節點清單；任何新增、移除或取代 <c>table:table-row</c> 或儲存格節點的
+    /// 操作之後皆須呼叫此方法。
+    /// </summary>
+    private void InvalidateStructureCache()
+    {
+        _rowNodeCache = null;
+        _cellNodeCacheByRow.Clear();
     }
 
     /// <summary>

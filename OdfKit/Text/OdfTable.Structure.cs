@@ -21,6 +21,7 @@ public partial class OdfTable
             throw new ArgumentOutOfRangeException(nameof(count));
 
         OdfTextTableStructureEngine.InsertRows(Node, position, count);
+        InvalidateStructureCache();
 
         if (_doc.TrackedChanges)
         {
@@ -48,6 +49,7 @@ public partial class OdfTable
             throw new ArgumentOutOfRangeException(nameof(count));
 
         IReadOnlyList<OdfNode> deletedSnapshots = OdfTextTableStructureEngine.DeleteRows(Node, position, count);
+        InvalidateStructureCache();
 
         if (_doc.TrackedChanges && deletedSnapshots.Count > 0)
         {
@@ -75,6 +77,7 @@ public partial class OdfTable
             throw new ArgumentOutOfRangeException(nameof(count));
 
         OdfTextTableStructureEngine.InsertColumns(Node, position, count);
+        InvalidateStructureCache();
 
         if (_doc.TrackedChanges)
         {
@@ -102,6 +105,7 @@ public partial class OdfTable
             throw new ArgumentOutOfRangeException(nameof(count));
 
         ColumnDeletionSnapshots deletedSnapshots = OdfTextTableStructureEngine.DeleteColumns(Node, position, count);
+        InvalidateStructureCache();
 
         if (_doc.TrackedChanges &&
             (deletedSnapshots.ColumnSnapshots.Count > 0 || deletedSnapshots.RowCellSnapshots.Count > 0))
