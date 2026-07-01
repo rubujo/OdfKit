@@ -11,6 +11,8 @@ public static partial class OdfLocalizer
     {
         ["en"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "Type {0} has no readable public properties to map to data reader columns.",
+            ["Err_ObjectDataReader_Disposed"] = "Cannot access a disposed ObjectDataReader.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "An error occurred during Direct I/O background Write-Behind operation.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "Cannot advance past the buffered length.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "GetBytes is not supported for this data type.",
@@ -529,6 +531,8 @@ public static partial class OdfLocalizer
         },
         ["zh-TW"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "型別 {0} 沒有可對應至資料讀取器欄位的可讀公開屬性。",
+            ["Err_ObjectDataReader_Disposed"] = "無法存取已釋放的 ObjectDataReader。",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Direct I/O 背景 Write-Behind 寫入發生錯誤。",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "無法前進超出緩衝區的長度。",
             ["Err_DbDataReader_GetBytesNotSupported"] = "此資料類型不支援 GetBytes。",
@@ -1047,6 +1051,8 @@ public static partial class OdfLocalizer
         },
         ["de"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "Der Typ {0} verfügt über keine lesbaren öffentlichen Eigenschaften, die sich auf Datenlesegerät-Spalten abbilden lassen.",
+            ["Err_ObjectDataReader_Disposed"] = "Auf ein verworfenes ObjectDataReader kann nicht zugegriffen werden.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Bei Direct-I/O-Hintergrund-Write-Behind-Vorgängen ist ein Fehler aufgetreten.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "Es kann nicht über die gepufferte Länge hinaus vorgegangen werden.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "GetBytes wird für diesen Datentyp nicht unterstützt.",
@@ -1565,6 +1571,8 @@ public static partial class OdfLocalizer
         },
         ["fr"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "Le type {0} ne possède aucune propriété publique lisible pouvant être mappée aux colonnes du lecteur de données.",
+            ["Err_ObjectDataReader_Disposed"] = "Impossible d'accéder à un ObjectDataReader supprimé.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Une erreur s'est produite lors de l'opération Direct I/O Write-Behind en arrière-plan.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "Impossible d'avancer au-delà de la longueur mise en mémoire tampon.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "GetBytes n'est pas pris en charge pour ce type de données.",
@@ -2083,6 +2091,8 @@ public static partial class OdfLocalizer
         },
         ["nl"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "Type {0} heeft geen leesbare openbare eigenschappen om aan datalezerkolommen toe te wijzen.",
+            ["Err_ObjectDataReader_Disposed"] = "Kan geen toegang krijgen tot een verwijderde ObjectDataReader.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Er is een fout opgetreden tijdens Direct I/O Write-Behind-bewerkingen op de achtergrond.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "Kan niet verder gaan dan de gebufferde lengte.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "GetBytes wordt niet ondersteund voor dit gegevenstype.",
@@ -2601,6 +2611,8 @@ public static partial class OdfLocalizer
         },
         ["nb"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "Typen {0} har ingen lesbare offentlige egenskaper som kan tilordnes til datalesekolonner.",
+            ["Err_ObjectDataReader_Disposed"] = "Kan ikke få tilgang til en avhendet ObjectDataReader.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Det oppsto en feil under Direct I/O-bakgrunns-Write-Behind-operasjonen.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "Kan ikke gå forbi den bufrede lengden.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "GetBytes støttes ikke for denne datatypen.",
@@ -3119,6 +3131,8 @@ public static partial class OdfLocalizer
         },
         ["pt"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "O tipo {0} não possui propriedades públicas legíveis para mapear para colunas do leitor de dados.",
+            ["Err_ObjectDataReader_Disposed"] = "Não é possível acessar um ObjectDataReader descartado.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Ocorreu um erro durante as operações do Direct I/O Write-Behind em segundo plano.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "Não é possível avançar além do comprimento do buffer.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "GetBytes não é suportado para este tipo de dados.",
@@ -3637,6 +3651,8 @@ public static partial class OdfLocalizer
         },
         ["it"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "Il tipo {0} non dispone di proprietà pubbliche leggibili da mappare alle colonne del data reader.",
+            ["Err_ObjectDataReader_Disposed"] = "Impossibile accedere a un ObjectDataReader eliminato.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Si è verificato un errore durante l'operazione Direct I/O Write-Behind in background.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "Impossibile avanzare oltre la lunghezza del buffer.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "GetBytes non è supportato per questo tipo di dati.",
@@ -4155,6 +4171,8 @@ public static partial class OdfLocalizer
         },
         ["sk"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "Typ {0} nemá žiadne čitateľné verejné vlastnosti, ktoré by bolo možné namapovať na stĺpce dátového čítača.",
+            ["Err_ObjectDataReader_Disposed"] = "Nie je možné pristupovať k uvoľnenému objektu ObjectDataReader.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Počas operácie Direct I/O Write-Behind na pozadí sa vyskytla chyba.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "Nemožno postupovať za vyrovnávaciu pamäť.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "GetBytes nie je podporované pre tento dátový typ.",
@@ -4673,6 +4691,8 @@ public static partial class OdfLocalizer
         },
         ["da"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "Typen {0} har ingen læsbare offentlige egenskaber, der kan tilknyttes datalæserkolonner.",
+            ["Err_ObjectDataReader_Disposed"] = "Kan ikke tilgå en bortskaffet ObjectDataReader.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Der opstod en fejl under Direct I/O Write-Behind-baggrundsoperationen.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "Kan ikke rykke forbi den buffererede længde.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "GetBytes understøttes ikke for denne datatype.",
@@ -5191,6 +5211,8 @@ public static partial class OdfLocalizer
         },
         ["ms"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "Jenis {0} tiada sifat awam boleh baca untuk dipetakan kepada lajur pembaca data.",
+            ["Err_ObjectDataReader_Disposed"] = "Tidak dapat mengakses ObjectDataReader yang telah dilupuskan.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Ralat berlaku semasa operasi Direct I/O Write-Behind latar belakang.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "Tidak dapat maju melepasi panjang buffer.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "GetBytes tidak disokong untuk jenis data ini.",
@@ -5709,6 +5731,8 @@ public static partial class OdfLocalizer
         },
         ["ko"] = new(StringComparer.Ordinal)
         {
+            ["Err_ObjectDataReader_NoReadableProperties"] = "형식 {0}에는 데이터 판독기 열에 매핑할 수 있는 읽기 가능한 공개 속성이 없습니다.",
+            ["Err_ObjectDataReader_Disposed"] = "삭제된 ObjectDataReader에 액세스할 수 없습니다.",
             ["Err_OdfDirectIoWritableStream_BackgroundWriteError"] = "Direct I/O 백그라운드 Write-Behind 작업 중 오류가 발생했습니다.",
             ["Err_OdfPackage_CannotAdvancePastBufferedLength"] = "버퍼링된 길이를 초과하여 진행할 수 없습니다.",
             ["Err_DbDataReader_GetBytesNotSupported"] = "이 데이터 형식에는 GetBytes가 지원되지 않습니다.",

@@ -40,6 +40,7 @@
 | 要保留或查詢 RDF 中介資料 | `OdfKit` + `OdfKit.Extensions.Rdf` |
 | 協作編輯或操作序列輸出 | `OdfKit` + `OdfKit.Extensions.Collaboration` |
 | 在 CI / 批次流程中做驗證或轉檔 | `OdfKit.Cli` |
+| 將資料庫查詢（含 Entity Framework Core）或任意物件序列匯出成 ODS，或反向以 `DbDataReader` 邊界串流灌入 `SqlBulkCopy` 等 bulk copy API | `OdfKit`（核心即可，透過 `ObjectDataReader<T>` 與 `OdsStreamWriter.WriteDataAsync<T>`，無需額外擴充套件） |
 
 ## 4. 選型原則
 
