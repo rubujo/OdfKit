@@ -38,8 +38,6 @@ jobs:
 
       - name: Setup .NET
         uses: ./.github/actions/setup-dotnet-odfkit
-        with:
-          cache-key-suffix: '-odf-corpus'
 
       - name: Validate ODF corpus
         shell: pwsh

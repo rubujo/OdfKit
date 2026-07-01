@@ -52,7 +52,6 @@ jobs:
           dotnet-versions: |
             10.0.x
             8.0.x
-          cache-key-suffix: '-ci-test'
 
       - name: Build test project
         shell: pwsh

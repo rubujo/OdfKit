@@ -5,10 +5,6 @@ inputs:
     description: setup-dotnet 的 dotnet-version（支援多行）
     required: false
     default: 10.0.x
-  cache-key-suffix:
-    description: 快取鍵額外後綴（區分不同 job）
-    required: false
-    default: ''
 runs:
   using: composite
   steps:
@@ -24,7 +20,12 @@ runs:
       uses: actions/cache@v6
       with:
         path: ${{ github.workspace }}/.nuget/packages
-        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/eng/OdfKit.Package.props', '**/Directory.Packages.props') }}${{ inputs.cache-key-suffix }}
+        # 快取鍵刻意不含各呼叫端 workflow 的區分後綴：所有 workflow 都還原同一份
+        # solution 的 NuGet 相依套件，各自加後綴會讓每個 workflow／OS 組合各自
+        # 保留一份幾乎相同的完整快取（曾多達 8 組），很快就超過 repo 層級的
+        # 10 GB Actions 快取總量上限，導致舊快取被提前逐出、還原命中率下降。
+        # 統一鍵值後所有 workflow 共用同一份快取，總量大幅降低。
+        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/eng/OdfKit.Package.props', '**/Directory.Packages.props') }}
         restore-keys: |
           nuget-${{ runner.os }}-
 

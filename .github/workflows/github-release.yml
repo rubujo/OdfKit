@@ -26,7 +26,6 @@ jobs:
           dotnet-versions: |
             10.0.x
             8.0.x
-          cache-key-suffix: '-release'
 
       - name: Verify Tag matches Props Version
         shell: pwsh

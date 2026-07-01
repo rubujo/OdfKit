@@ -39,8 +39,6 @@ jobs:
 
       - name: Setup .NET
         uses: ./.github/actions/setup-dotnet-odfkit
-        with:
-          cache-key-suffix: '-typed-dom'
 
       - name: Generate typed DOM coverage
         shell: pwsh

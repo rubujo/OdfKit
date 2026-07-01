@@ -46,7 +46,6 @@ jobs:
           dotnet-versions: |
             10.0.x
             8.0.x
-          cache-key-suffix: '-nuget-pack'
 
       - name: Validate NuGet pack structure and consumer smoke
         shell: pwsh

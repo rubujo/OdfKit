@@ -40,7 +40,6 @@ jobs:
         with:
           dotnet-versions: |
             10.0.x
-          cache-key-suffix: '-trim-smoke'
 
       - name: Run trim smoke (blocking)
         shell: pwsh
