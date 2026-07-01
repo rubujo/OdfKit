@@ -58,6 +58,8 @@ internal static class FormulaBuiltinFunctionRegistry
             ["SWITCH"] = FormulaLogicalFunctionHandlers.EvaluateSwitch,
             ["ISNUMBER"] = static (args, ctx) => args.Count == 1 ? args[0].Evaluate(ctx) is double : OdfFormulaError.Value,
             ["ISTEXT"] = static (args, ctx) => args.Count == 1 ? args[0].Evaluate(ctx) is string : OdfFormulaError.Value,
+            ["ISNONTEXT"] = FormulaLogicalFunctionHandlers.EvaluateIsNonText,
+            ["ISFORMULA"] = FormulaLogicalFunctionHandlers.EvaluateIsFormula,
             ["ISBLANK"] = FormulaLogicalFunctionHandlers.EvaluateIsBlank,
             ["ISERROR"] = static (args, ctx) => args.Count == 1 ? args[0].Evaluate(ctx) is OdfFormulaError : OdfFormulaError.Value,
             ["ISNA"] = static (args, ctx) => args.Count == 1
@@ -167,6 +169,7 @@ internal static class FormulaBuiltinFunctionRegistry
             ["COS"] = FormulaMathFunctionHandlers.EvaluateCos,
             ["TAN"] = FormulaMathFunctionHandlers.EvaluateTan,
             ["TRUNC"] = FormulaMathFunctionHandlers.EvaluateTrunc,
+            ["CONVERT"] = FormulaMathFunctionHandlers.EvaluateConvert,
 
             // 日期／時間
             ["DATE"] = FormulaDateTimeFunctionHandlers.EvaluateDate,
@@ -188,6 +191,7 @@ internal static class FormulaBuiltinFunctionRegistry
             ["NETWORKDAYS"] = FormulaDateTimeFunctionHandlers.EvaluateNetWorkDays,
             ["EDATE"] = FormulaDateTimeFunctionHandlers.EvaluateEDate,
             ["EOMONTH"] = FormulaDateTimeFunctionHandlers.EvaluateEOMonth,
+            ["EASTERSUNDAY"] = FormulaDateTimeFunctionHandlers.EvaluateOpenOfficeEasterSunday,
             ["ORG.OPENOFFICE.EASTERSUNDAY"] = FormulaDateTimeFunctionHandlers.EvaluateOpenOfficeEasterSunday,
             ["ORG.OPENOFFICE.ISOMITTED"] = static (args, _) => FormulaDateTimeFunctionHandlers.EvaluateOpenOfficeIsOmitted(args),
 

@@ -36,6 +36,8 @@ public static class OdfFormulaSupport
         // 資訊函數
         new("ISNUMBER", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISTEXT", "Information", OdfFormulaSupportLevel.Evaluated),
+        new("ISNONTEXT", "Information", OdfFormulaSupportLevel.Evaluated),
+        new("ISFORMULA", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISBLANK", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISERROR", "Information", OdfFormulaSupportLevel.Evaluated),
         new("ISNA", "Information", OdfFormulaSupportLevel.Evaluated),
@@ -139,6 +141,7 @@ public static class OdfFormulaSupport
         new("ATAN2", "Math", OdfFormulaSupportLevel.Evaluated),
         new("LOG10", "Math", OdfFormulaSupportLevel.Evaluated),
         new("SUMPRODUCT", "Math", OdfFormulaSupportLevel.Evaluated),
+        new("CONVERT", "Math", OdfFormulaSupportLevel.Evaluated),
 
         // 日期／時間函數
         new("DATE", "DateTime", OdfFormulaSupportLevel.Evaluated),
@@ -160,8 +163,9 @@ public static class OdfFormulaSupport
         new("NETWORKDAYS", "DateTime", OdfFormulaSupportLevel.Evaluated),
         new("EDATE", "DateTime", OdfFormulaSupportLevel.Evaluated),
         new("EOMONTH", "DateTime", OdfFormulaSupportLevel.Evaluated),
+        new("EASTERSUNDAY", "DateTime", OdfFormulaSupportLevel.Evaluated),
 
-        // LibreOffice 擴充函數
+        // LibreOffice 擴充函數（ORG.OPENOFFICE.EASTERSUNDAY 為 ODF 1.4 標準化 EASTERSUNDAY 前的舊版供應商前綴名稱，保留以維持回溯相容）
         new("ORG.OPENOFFICE.EASTERSUNDAY", "LibreOffice", OdfFormulaSupportLevel.Evaluated),
         new("ORG.OPENOFFICE.ISOMITTED", "LibreOffice", OdfFormulaSupportLevel.Evaluated),
 

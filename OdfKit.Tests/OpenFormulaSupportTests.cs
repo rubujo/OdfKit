@@ -117,6 +117,22 @@ public class OpenFormulaSupportTests
     }
 
     /// <summary>
+    /// 驗證 ODF 1.4 標準化後的 EASTERSUNDAY（無供應商前綴）與舊版 LibreOffice 擴充名稱回傳相同結果。
+    /// </summary>
+    [Fact]
+    public void StandardEasterSundayMatchesLegacyLibreOfficeExtensionName()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new FormulaAndStylesTest.MockEvaluationContext();
+        double expected = (new DateTime(2026, 4, 5) - new DateTime(1899, 12, 30)).TotalDays;
+
+        object result = evaluator.Evaluate("EASTERSUNDAY(2026)", context);
+
+        Assert.Equal(expected, Assert.IsType<double>(result));
+        Assert.True(OdfFormulaSupport.IsFunctionSupported("EASTERSUNDAY"));
+    }
+
+    /// <summary>
     /// 驗證 LibreOffice ISOMITTED 擴充函式依引數數量回傳結果。
     /// </summary>
     [Fact]

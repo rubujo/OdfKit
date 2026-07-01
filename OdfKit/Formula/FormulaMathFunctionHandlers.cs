@@ -11,7 +11,32 @@ namespace OdfKit.Formula;
 /// </summary>
 internal static class FormulaMathFunctionHandlers
 {
+    internal static object EvaluateConvert(List<AstNode> arguments, IEvaluationContext context)
+    {
+        if (arguments.Count != 3)
+            return OdfFormulaError.Value;
 
+        var numberVal = arguments[0].Evaluate(context);
+        if (numberVal is OdfFormulaError numErr)
+            return numErr;
+        if (!FormulaCoercion.TryCoerceDouble(numberVal, out double number))
+            return OdfFormulaError.Value;
+
+        var fromVal = arguments[1].Evaluate(context);
+        if (fromVal is OdfFormulaError fromErr)
+            return fromErr;
+        var toVal = arguments[2].Evaluate(context);
+        if (toVal is OdfFormulaError toErr)
+            return toErr;
+
+        string fromUnit = fromVal?.ToString() ?? "";
+        string toUnit = toVal?.ToString() ?? "";
+
+        if (!FormulaConvertUnitTable.TryConvert(number, fromUnit, toUnit, out double result))
+            return OdfFormulaError.NA;
+
+        return result;
+    }
 
     internal static object EvaluateAbs(List<AstNode> arguments, IEvaluationContext context)
     {

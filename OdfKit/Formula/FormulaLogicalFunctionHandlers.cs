@@ -199,6 +199,28 @@ internal static class FormulaLogicalFunctionHandlers
         return val == null;
     }
 
+    internal static object EvaluateIsFormula(List<AstNode> arguments, IEvaluationContext context)
+    {
+        if (arguments.Count != 1)
+            return OdfFormulaError.Value;
+
+        var node = arguments[0];
+        if (node is CellAddressNode cellNode)
+        {
+            string? formula = context.GetCellFormula(cellNode.Address);
+            return !string.IsNullOrEmpty(formula);
+        }
+
+        return OdfFormulaError.Value;
+    }
+
+    internal static object EvaluateIsNonText(List<AstNode> arguments, IEvaluationContext context)
+    {
+        if (arguments.Count != 1)
+            return OdfFormulaError.Value;
+        return arguments[0].Evaluate(context) is not string;
+    }
+
     internal static object EvaluateIsError(List<AstNode> arguments, IEvaluationContext context)
     {
         if (arguments.Count != 1)

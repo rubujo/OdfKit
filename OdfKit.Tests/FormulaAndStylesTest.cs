@@ -631,6 +631,15 @@ namespace OdfKit.Tests
             Assert.Equal(false, evaluator.Evaluate("ISODD(4)", context));
             Assert.Equal(true, evaluator.Evaluate("ISEVEN(4)", context));
             Assert.Equal(false, evaluator.Evaluate("ISEVEN(3)", context));
+            Assert.Equal(false, evaluator.Evaluate("ISNONTEXT(\"test\")", context));
+            Assert.Equal(true, evaluator.Evaluate("ISNONTEXT(123)", context));
+
+            var cellFormulaAddr = OdfCellAddress.ParseExcel("J1");
+            var cellPlainValueAddr = OdfCellAddress.ParseExcel("J2");
+            context.CellFormulas[cellFormulaAddr] = "1+1";
+            context.CellValues[cellPlainValueAddr] = 5.0;
+            Assert.Equal(true, evaluator.Evaluate("ISFORMULA(J1)", context));
+            Assert.Equal(false, evaluator.Evaluate("ISFORMULA(J2)", context));
 
             // 3. String Functions
             Assert.Equal("ABC", evaluator.Evaluate("CONCATENATE(\"A\", \"B\", \"C\")", context));
@@ -661,6 +670,10 @@ namespace OdfKit.Tests
             Assert.Equal(Math.PI / 4.0, evaluator.Evaluate("ATAN(1)", context));
             Assert.Equal(Math.PI / 4.0, evaluator.Evaluate("ATAN2(1, 1)", context));
             Assert.Equal(2.0, evaluator.Evaluate("LOG10(100)", context));
+            Assert.Equal(1.0 / 0.3048, (double)evaluator.Evaluate("CONVERT(1, \"m\", \"ft\")", context), 10);
+            Assert.Equal(0.0, evaluator.Evaluate("CONVERT(32, \"F\", \"C\")", context));
+            Assert.Equal(1000.0, evaluator.Evaluate("CONVERT(1, \"kg\", \"g\")", context));
+            Assert.Equal(OdfFormulaError.NA, evaluator.Evaluate("CONVERT(1, \"m\", \"g\")", context));
 
             // 5. Statistical Functions
             var cellC1 = OdfCellAddress.ParseExcel("C1");
@@ -727,6 +740,8 @@ namespace OdfKit.Tests
             Assert.Equal(261.0, evaluator.Evaluate("NETWORKDAYS(H1, H2)", context));
             Assert.Equal((new DateTime(2026, 2, 1) - new DateTime(1899, 12, 30)).TotalDays, evaluator.Evaluate("EDATE(H1, 1)", context));
             Assert.Equal((new DateTime(2026, 1, 31) - new DateTime(1899, 12, 30)).TotalDays, evaluator.Evaluate("EOMONTH(H1, 0)", context));
+            Assert.Equal((new DateTime(2026, 4, 5) - new DateTime(1899, 12, 30)).TotalDays, evaluator.Evaluate("EASTERSUNDAY(2026)", context));
+            Assert.Equal(evaluator.Evaluate("EASTERSUNDAY(2026)", context), evaluator.Evaluate("ORG.OPENOFFICE.EASTERSUNDAY(2026)", context));
 
             // 8. Financial Functions
             Assert.Equal(10.0, evaluator.Evaluate("SLN(100, 50, 5)", context));
