@@ -15,7 +15,7 @@
       "semanticStatus": "implemented",
       "expectedReplay": "Replays text, formatting, list, and table subset operations.",
       "expectedReport": { "replayed": 14, "ignored": 3, "unsupported": 0 },
-      "sha256": "74610cc5bef5e9803aea1db7f38eed0da596935cacaf8450f1936636007aa25e"
+      "sha256": "89240393a65dcbcb805bab3bab2ff980ac742c5272b7eb15dfbca53a11304510"
     },
     {
       "id": "tdf.addParagraph.min",

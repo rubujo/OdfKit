@@ -1,4 +1,4 @@
-using OdfKit.Core;
+﻿using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Spreadsheet;
 using Xunit;

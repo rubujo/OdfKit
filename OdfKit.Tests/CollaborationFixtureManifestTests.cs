@@ -198,8 +198,26 @@ public sealed class CollaborationFixtureManifestTests
     private static string ComputeSha256(string path)
     {
         using SHA256 sha256 = SHA256.Create();
-        byte[] hash = sha256.ComputeHash(File.ReadAllBytes(path));
+        byte[] hash = sha256.ComputeHash(NormalizeLineEndings(File.ReadAllBytes(path)));
         return Convert.ToHexString(hash).ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// Strips CR bytes immediately preceding LF so the hash is independent of the checkout's
+    /// <c>.gitattributes</c> <c>eol</c> normalization (repo declares <c>*.json text eol=crlf</c>).
+    /// 移除緊接在 LF 前的 CR 位元組，使雜湊值不受 checkout 時 <c>.gitattributes</c> 的
+    /// <c>eol</c> 正規化影響（repo 對 <c>*.json</c> 宣告 <c>eol=crlf</c>）。
+    /// </summary>
+    private static byte[] NormalizeLineEndings(byte[] raw)
+    {
+        using var output = new MemoryStream(raw.Length);
+        for (int i = 0; i < raw.Length; i++)
+        {
+            if (raw[i] == (byte)'\r' && i + 1 < raw.Length && raw[i + 1] == (byte)'\n')
+                continue;
+            output.WriteByte(raw[i]);
+        }
+        return output.ToArray();
     }
 
     private static OdtOperationCompatibilityOptions CreateSafetyProbeOptions(string relativePath)
