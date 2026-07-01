@@ -378,17 +378,37 @@ public sealed class OdfDirectIoReadableStream : Stream
 
         if (disposing)
         {
+            // 先標記 _isDisposed 並取出可能仍在執行的背景預讀工作參考，
+            // 再於鎖外等待其完成，才能釋放 _fileHandle／原生緩衝區；
+            // 否則背景執行緒可能仍在對已釋放的原生控制代碼呼叫
+            // RandomAccess.Read，屬未定義行為的資源生命週期競爭。
+            Task<(long start, int length)>? pendingPrefetch;
             lock (_lock)
             {
+                _isDisposed = true;
+                pendingPrefetch = _prefetchTask;
                 _prefetchTask = null;
-#if NET10_0_OR_GREATER
-                _fileHandle?.Dispose();
-                ((IDisposable)_bufferA).Dispose();
-                ((IDisposable)_bufferB).Dispose();
-#endif
-                _fileStream?.Dispose();
-                _fileStream = null;
             }
+
+            if (pendingPrefetch is not null)
+            {
+                try
+                {
+                    pendingPrefetch.GetAwaiter().GetResult();
+                }
+                catch
+                {
+                    // 忽略釋放前尚未完成之背景預讀工作的例外，不影響 Dispose 流程。
+                }
+            }
+
+#if NET10_0_OR_GREATER
+            _fileHandle?.Dispose();
+            ((IDisposable)_bufferA).Dispose();
+            ((IDisposable)_bufferB).Dispose();
+#endif
+            _fileStream?.Dispose();
+            _fileStream = null;
         }
 
         _isDisposed = true;

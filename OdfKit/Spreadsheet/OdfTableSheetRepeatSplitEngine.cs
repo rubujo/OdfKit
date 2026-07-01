@@ -8,13 +8,23 @@ namespace OdfKit.Spreadsheet;
 /// </summary>
 internal static class OdfTableSheetRepeatSplitEngine
 {
+    // 與 OdsStreamReader 的 MaxRowRepeat／MaxColRepeat 上限一致，避免惡意或
+    // 損毀文件宣告超大重複計數時，被呼叫端（例如逐列／逐欄走訪 API）當成
+    // 迴圈上限而放大成記憶體或運算量耗盡的阻斷服務風險。
+    private const int MaxRowRepeat = 1_048_576;
+    private const int MaxColRepeat = 16_384;
+
     /// <summary>
     /// 解析節點的重複計數屬性。
     /// </summary>
     internal static int GetRepeatCount(OdfNode node, string attributeName)
     {
         string? repeatValue = node.GetAttribute(attributeName, OdfNamespaces.Table);
-        return int.TryParse(repeatValue, out int count) && count > 0 ? count : 1;
+        if (!int.TryParse(repeatValue, out int count) || count <= 0)
+            return 1;
+
+        int max = attributeName == "number-rows-repeated" ? MaxRowRepeat : MaxColRepeat;
+        return Math.Min(count, max);
     }
 
     /// <summary>

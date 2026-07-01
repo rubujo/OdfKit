@@ -1520,6 +1520,67 @@ public partial class OptimizedRefactoringTests
         }
     }
 
+    /// <summary>
+    /// 驗證在背景預讀工作可能仍在執行時立即 Dispose 不會擲出例外或洩漏——
+    /// Dispose 必須等待背景 Task.Run 完成後才釋放原生檔案控制代碼／緩衝區，
+    /// 否則背景執行緒會與已釋放的資源競爭。
+    /// </summary>
+    [Fact]
+    public void Test_DirectIoReadableStream_DisposeWhilePrefetchInFlight_DoesNotThrow()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"OdfKitDirectIoDispose_{Guid.NewGuid():N}.bin");
+        try
+        {
+            byte[] payload = Enumerable.Range(0, 64 * 1024 * 4)
+                .Select(i => (byte)((i * 31) % 251))
+                .ToArray();
+
+            using (var writer = new OdfDirectIoWritableStream(tempFile))
+            {
+                writer.Write(payload, 0, payload.Length);
+            }
+
+            for (int attempt = 0; attempt < 20; attempt++)
+            {
+                var reader = new OdfDirectIoReadableStream(tempFile);
+                byte[] buffer = new byte[1024];
+                // 讀取觸發第一次 FillPrefetchBuffer／TriggerNextPrefetch，
+                // 讓背景預讀工作在 Dispose 呼叫當下仍有機會尚未完成。
+                reader.Read(buffer, 0, buffer.Length);
+                reader.Dispose();
+            }
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證 <c>number-rows-repeated</c>／<c>number-columns-repeated</c> 屬性宣告
+    /// 超大重複計數時，會被截斷至與 <c>OdsStreamReader</c> 一致的上限，避免惡意
+    /// 或損毀文件的巨大重複計數被呼叫端（例如逐列／逐欄走訪 API）當成迴圈上限，
+    /// 放大為記憶體或運算量耗盡的阻斷服務風險。
+    /// </summary>
+    [Theory]
+    [InlineData("number-rows-repeated", 2_000_000_000, 1_048_576)]
+    [InlineData("number-columns-repeated", 2_000_000_000, 16_384)]
+    public void Test_GetRepeatCount_ClampsExcessiveRepeatedCountToStreamingReaderLimit(
+        string attributeName,
+        int declaredCount,
+        int expectedMax)
+    {
+        var node = new OdfNode(OdfNodeType.Element, "table-row", OdfNamespaces.Table, "table");
+        node.SetAttribute(attributeName, OdfNamespaces.Table, declaredCount.ToString(), "table");
+
+        int count = OdfTableSheetRepeatSplitEngine.GetRepeatCount(node, attributeName);
+
+        Assert.Equal(expectedMax, count);
+    }
+
     [Fact]
     public void Test_OdfTransaction_JournalCreateFailure_FailsFast()
     {
