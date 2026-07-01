@@ -46,7 +46,7 @@ pwsh eng/Pack-NuGet.ps1 -Configuration Release
    - 在雲端自動進行 NuGet 打包。
    - 自動在 GitHub 上建立 Release，並利用 `GITHUB_TOKEN` 將 `.nupkg`、`.snupkg` 以及打包好的 ZIP 資產上傳至該 Release 中。
 
-## 5. 消費端：自 Release 安裝套件
+## 4. 消費端：自 Release 安裝套件
 
 下載 Release 資產後，先將 `.nupkg` 與 `.snupkg` 放在固定資料夾，例如
 `C:\packages\odfkit`。本機開發可以用具名 package source：
@@ -85,7 +85,7 @@ dotnet restore -p:RestoreAdditionalProjectSources="$PWD/.nuget/odfkit"
 
 多數情境仍建議直接以原始碼 `ProjectReference` 整合。
 
-## 6. CI 驗證
+## 5. CI 驗證
 
 `/.github/workflows/nuget-pack.yml` 使用 `actions/checkout@v6`、`actions/setup-dotnet@v5`，於 PR 與 `main` 執行 `Test-NuGetPack.ps1`。
 

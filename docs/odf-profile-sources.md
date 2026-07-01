@@ -16,8 +16,8 @@
 | `OASIS_ODF_1_1` | `https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng` | `2007-02-01` | `Normative` | `VerifiedOfficial` | `1.1` | 官方 OASIS ODF 1.1 標準。 |
 | `OASIS_ODF_1_2` | `https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part1.html` | `2011-09-29` | `Normative` | `VerifiedOfficial` | `1.2` | 官方 OASIS ODF 1.2 標準。 |
 | `OASIS_ODF_1_3` | `https://docs.oasis-open.org/office/OpenDocument/v1.3/os/schemas/OpenDocument-v1.3-schema.rng` | `2021-04-27` | `Normative` | `VerifiedOfficial` | `1.3` | 官方 OASIS ODF 1.3 標準。 |
-| `OASIS_ODF_1_4_Strict` | `https://docs.oasis-open.org/office/OpenDocument/v1.4/os/` | `2025-10-06` | `Normative` | `VerifiedOfficial` | `1.4` | 官方 OASIS ODF 1.4 嚴格標準。 |
-| `OASIS_ODF_1_4_Extended` | `https://docs.oasis-open.org/office/OpenDocument/v1.4/os/` | `2025-10-06` | `Normative` | `VerifiedOfficial` | `1.4` | 官方 OASIS ODF 1.4 擴充標準。 |
+| `OASIS_ODF_1_4_Strict` | `https://docs.oasis-open.org/office/OpenDocument/v1.4/os/` | `2025-10-06` | `Normative` | `VerifiedOfficial` | `1.4` | 官方 OASIS ODF 1.4 嚴格標準。註：`2025-10-06` 為本 profile 條目建立／驗證日，ODF 1.4 已於 2025-12-03 正式核定為 OASIS Standard，見 [odf14-gap-audit.md](odf14-gap-audit.md)。 |
+| `OASIS_ODF_1_4_Extended` | `https://docs.oasis-open.org/office/OpenDocument/v1.4/os/` | `2025-10-06` | `Normative` | `VerifiedOfficial` | `1.4` | 官方 OASIS ODF 1.4 擴充標準。註：`2025-10-06` 為本 profile 條目建立／驗證日，ODF 1.4 已於 2025-12-03 正式核定為 OASIS Standard，見 [odf14-gap-audit.md](odf14-gap-audit.md)。 |
 | `ISO_IEC_26300_2006` | `https://www.iso.org/standard/43485.html` | `2006-11-30` | `Normative` | `VerifiedOfficial` | `1.0` | ISO/IEC 26300:2006 標準（對應 ODF 1.0）。 |
 | `ISO_IEC_26300_2015` | `https://www.iso.org/standard/66363.html` | `2015` | `Normative` | `VerifiedOfficial` | `1.2` | ISO/IEC 26300:2015 標準（對應 ODF 1.2 基準）。 |
 | `ISO_IEC_26300_2025` | `https://www.iso.org/standard/81404.html` | `2025` | `Normative` | `VerifiedOfficial` | `1.3` | ISO/IEC 26300:2025 標準（對應 ODF 1.3 基準）。 |

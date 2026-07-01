@@ -47,15 +47,16 @@ pwsh eng/Test-OdfTypedDomCoverage.ps1
 
 ## Clean-room 來源索引
 
-公式評估與 schema pattern validator 的規格來源、可接受參考、不可接受來源與
+公式評估、schema pattern validator 與 OpenPGP 加密的規格來源、可接受參考、不可接受來源與
 golden / regression 測試契約集中記錄於 [Clean-room 來源索引](clean-room-source-index.md)。
-這些區塊邏輯密集且與外部試算表引擎或驗證器語意相近，後續變更必須以規格、
+這些區塊邏輯密集且與外部試算表引擎、驗證器或密碼學實作語意相近，後續變更必須以規格、
 自有 corpus 與可再散布 fixture 驅動，不得複製外部原始碼。
 
 | 模組 | 檔案 | 說明 |
 |------|------|------|
 | 公式評估 | `DefaultFormulaEvaluator.*.cs` | 財務與統計函式語意 |
 | 結構驗證 | `OdfSchemaPatternValidator.cs` | 複雜 pattern 比對邏輯 |
+| OpenPGP 加密 | `OdfBouncyCastleOpenPgpProvider*.cs` | PKESK 封包解析、ECDH／RFC 6637 KDF |
 
 ## 已確認無直接抄襲
 

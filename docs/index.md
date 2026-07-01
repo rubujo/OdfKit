@@ -42,6 +42,7 @@
 | [samples/README.md](../samples/README.md) | 單檔 Script 範例與輸出說明 |
 | [Rendering 後端部署](rendering-backend-deployment.md) | LibreOffice 渲染擴充的部署要求 |
 | [Foreign 擴充政策](foreign-extension-policy.md) | 非標準命名空間與相容策略 |
+| [UDX 非功能性目標](udx-non-goals.md) | 明確排除於實作範圍外的功能模組與非目標 |
 
 ### 3. 驗證、互通與營運
 

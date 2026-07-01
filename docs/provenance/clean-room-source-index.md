@@ -1,8 +1,8 @@
 # Clean-room 來源索引
 
 本文件集中記錄 `DefaultFormulaEvaluator.*`、`OdfSchemaPatternValidator.*`、
-`OdfKit.Extensions.Collaboration` 與 managed conversion fidelity 的規格來源、測試證據與非目標，
-避免日後維護者把外部參考實作或辦公套件原始碼當成可複製來源。
+`OdfKit.Extensions.Collaboration`、OpenPGP 加密與 managed conversion fidelity 的規格來源、
+測試證據與非目標，避免日後維護者把外部參考實作或辦公套件原始碼當成可複製來源。
 
 ## 原則
 
@@ -23,6 +23,19 @@
 
 公式評估不是完整試算表引擎：不承諾重算所有 host-defined 行為、volatile function、
 多使用者計算狀態或任意外部連結資料來源。未支援函式應診斷並保留原公式，而不是破壞 round-trip。
+
+## OpenPGP 加密來源
+
+| 範圍 | 權威來源 | OdfKit 實作入口 | Golden / regression 證據 |
+|---|---|---|---|
+| ODF 1.3 OpenPGP session key 加解密封包（PKESK）二進位結構 | OpenPGP Message Format（RFC 4880） | `OdfBouncyCastleOpenPgpProvider.cs`、`OdfBouncyCastleOpenPgpProvider.Decryption.cs`（`DecodePkeskPacket`） | `OdfBouncyCastleOpenPgpProviderTests` |
+| ECDH（X25519 與傳統曲線）Key Derivation Function | Elliptic Curve Cryptography (ECC) in OpenPGP（RFC 6637 §8） | `OdfBouncyCastleOpenPgpProvider.Ecdh.cs`（`ComputeEcdhKdf`、`ApplyEcdhPkcs5Padding`、`AesKeyWrap128`/`AesKeyUnwrap128`） | `OdfBouncyCastleOpenPgpProviderTests` |
+
+上述實作直接對照 RFC 4880 與 RFC 6637 規格文本手動解析二進位封包與計算 KDF，未複製
+BouncyCastle 或其他 OpenPGP 實作（例如 GnuPG、RNP）的原始碼；僅使用 BouncyCastle 提供的
+底層基礎密碼學元件（RSA/ElGamal 加解密、AES 引擎、`Rfc3394WrapEngine`）。`DecodePkeskPacket`
+對任意輸入的例外契約由 `OdfBouncyCastleOpenPgpProviderTests` 中的隨機化邊界測試
+（`DecryptSessionKey_RandomizedMalformedPackets_NeverThrowsUndocumentedExceptionType`）鎖定。
 
 ## Schema pattern 來源
 

@@ -75,7 +75,7 @@ ODFDOM 官方 sample parity 的外部範本位於
 > `OdfDocumentKindDetector.SupportedFormats` 目前登記的全部副檔名數量。
 
 `tests/fixtures/corpus/manifest.json` 實際已提交的 fixture 數量遠多於上表列出的初始集合
-（目前共 224 筆，含 Chart／Database／Image／Formula／各 Template 種類、ODF 1.1／1.2／1.3
+（目前共 266 筆，含 Chart／Database／Image／Formula／各 Template 種類、ODF 1.1／1.2／1.3
 版本樣本，以及 `bulk-*` 前綴的大量規模測試樣本)；上表僅保留最初建立 corpus 機制時的種子
 fixture 作為欄位用法範例，並非完整清單。欲取得目前完整、權威的 fixture 清單，請直接讀取
 `tests/fixtures/corpus/manifest.json`，不要以本文件表格為準。
