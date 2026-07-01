@@ -521,6 +521,68 @@ for (int row = 0; row < 1000; row++)
 writer.WriteEndSheet();
 ```
 
+## 匯出任意物件序列或 EF Core 查詢結果
+
+`OdsStreamWriter.WriteDataAsync<T>` 透過 `ObjectDataReader<T>` 將任意
+`IEnumerable<T>`／`IAsyncEnumerable<T>` 轉接為 `DbDataReader`，把 `T` 的每個
+可讀公開屬性對應成一個資料行，寫入時低記憶體串流，不需要整個序列先載入記憶體。
+
+```csharp
+using OdfKit.Spreadsheet;
+
+public sealed class SalesRow
+{
+    public string? Region { get; set; }
+    public double Amount { get; set; }
+}
+
+SalesRow[] rows =
+[
+    new SalesRow { Region = "North", Amount = 120.5 },
+    new SalesRow { Region = "South", Amount = 98.2 },
+];
+
+await using FileStream output = File.Create("sales.ods");
+await using OdsStreamWriter writer = new(output);
+writer.WriteStartSheet("Sales");
+await writer.WriteDataAsync(rows, includeColumnNames: true);
+writer.WriteEndSheet();
+```
+
+若資料來源是 Entity Framework Core 查詢，建議先 `AsNoTracking()` 並用
+`.Select(...)` 投影成 DTO，再以 `AsAsyncEnumerable()` 交給
+`WriteDataAsync<T>`，資料會逐列從資料庫串流到 ODS，不需一次載入整個結果集：
+
+```csharp
+using Microsoft.EntityFrameworkCore;
+using OdfKit.Spreadsheet;
+
+IAsyncEnumerable<SalesRow> query = dbContext.Sales
+    .AsNoTracking()
+    .Select(sale => new SalesRow { Region = sale.Region, Amount = sale.Amount })
+    .AsAsyncEnumerable();
+
+await using FileStream output = File.Create("sales.ods");
+await using OdsStreamWriter writer = new(output);
+writer.WriteStartSheet("Sales");
+await writer.WriteDataAsync(query, includeColumnNames: true);
+writer.WriteEndSheet();
+```
+
+若要反向把 ODS 內容批次灌入 SQL Server，`OdsStreamReader` 本身就是
+`DbDataReader`，可直接交給 `SqlBulkCopy`，不需要額外的轉接層：
+
+```csharp
+using Microsoft.Data.SqlClient;
+using OdfKit.Spreadsheet;
+
+using OdsStreamReader reader = new(File.OpenRead("sales.ods"));
+await using SqlConnection connection = new(connectionString);
+await connection.OpenAsync();
+using SqlBulkCopy bulkCopy = new(connection) { DestinationTableName = "Sales", EnableStreaming = true };
+await bulkCopy.WriteToServerAsync(reader);
+```
+
 ## CLI 驗證與轉換
 
 ```powershell
