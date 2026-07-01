@@ -558,9 +558,16 @@ public class TextApiUsabilityTests
         doc.SaveToStream(ms);
         ms.Position = 0;
 
-        using OdfPackage package = OdfPackage.Open(ms, leaveOpen: true);
-        string contentXml = ReadEntry(package, "content.xml");
-        Assert.Contains("<text:tab", contentXml);
+        // package 必須在重新使用 ms 前釋放：OdfPackage.Open 對啟用延遲載入的
+        // 串流會啟動背景預讀工作(PreloadTask)讀取 ms；Dispose() 會同步等待該工作
+        // 完成後才回傳，若不先釋放就重設 ms.Position 供第二個 OdfPackage/TextDocument
+        // 讀取，兩者會競爭同一個 MemoryStream 的游標，導致間歇性
+        // "A local file header is corrupt" 例外。
+        using (OdfPackage package = OdfPackage.Open(ms, leaveOpen: true))
+        {
+            string contentXml = ReadEntry(package, "content.xml");
+            Assert.Contains("<text:tab", contentXml);
+        }
 
         ms.Position = 0;
         using TextDocument loaded = TextDocument.Load(ms);
