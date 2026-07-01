@@ -242,7 +242,10 @@ internal static class OdfTableSheetDomAccessEngine
         return GetOrCreateCellNode(rowNode, col, forWrite: true);
     }
 
-    private static void EnsureColumnDefinitions(OdfNode tableNode, int col)
+    /// <summary>
+    /// 確保表格至少宣告到指定索引的欄定義節點（<c>table:table-column</c>）。
+    /// </summary>
+    internal static void EnsureColumnDefinitions(OdfNode tableNode, int col)
     {
         int currentColumnIndex = 0;
         OdfNode? lastColumn = null;

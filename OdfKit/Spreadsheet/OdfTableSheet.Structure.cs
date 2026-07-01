@@ -25,6 +25,8 @@ public partial class OdfTableSheet
         else
             OdfTableSheetStructureEngine.InsertRows(TableNode, position, count);
 
+        InvalidateAccessCache();
+
         if (_doc.TrackedChanges)
         {
             SpreadsheetDocumentTrackedChangesEngine.RecordRowInsertion(
@@ -60,6 +62,8 @@ public partial class OdfTableSheet
             deletedSnapshots = OdfTableSheetStructureEngine.DeleteRows(TableNode, position, count);
         }
 
+        InvalidateAccessCache();
+
         if (_doc.TrackedChanges && deletedSnapshots.Count > 0)
         {
             SpreadsheetDocumentTrackedChangesEngine.RecordRowDeletion(
@@ -92,6 +96,8 @@ public partial class OdfTableSheet
             tableElement.CopyRows(sourcePosition, count, targetPosition);
         else
             OdfTableSheetStructureEngine.CopyRows(TableNode, sourcePosition, count, targetPosition);
+
+        InvalidateAccessCache();
     }
 
     /// <summary>
@@ -116,6 +122,8 @@ public partial class OdfTableSheet
             tableElement.MoveRows(sourcePosition, count, targetPosition);
         else
             OdfTableSheetStructureEngine.MoveRows(TableNode, sourcePosition, count, targetPosition);
+
+        InvalidateAccessCache();
     }
 
     /// <summary>
@@ -133,6 +141,7 @@ public partial class OdfTableSheet
             throw new ArgumentOutOfRangeException(nameof(count));
 
         OdfTableSheetStructureEngine.InsertColumns(TableNode, position, count);
+        InvalidateAccessCache();
 
         if (_doc.TrackedChanges)
         {
@@ -159,6 +168,7 @@ public partial class OdfTableSheet
             throw new ArgumentOutOfRangeException(nameof(count));
 
         ColumnDeletionSnapshots deletedSnapshots = OdfTableSheetStructureEngine.DeleteColumns(TableNode, position, count);
+        InvalidateAccessCache();
 
         if (_doc.TrackedChanges &&
             (deletedSnapshots.ColumnSnapshots.Count > 0 || deletedSnapshots.RowCellSnapshots.Count > 0))
@@ -194,6 +204,7 @@ public partial class OdfTableSheet
             throw new ArgumentOutOfRangeException(nameof(targetColumn));
 
         OdfTableSheetStructureEngine.MoveCell(TableNode, sourceRow, sourceColumn, targetRow, targetColumn);
+        InvalidateAccessCache();
 
         if (_doc.TrackedChanges)
         {

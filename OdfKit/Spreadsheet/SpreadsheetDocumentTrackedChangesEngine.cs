@@ -665,6 +665,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
             target.Value.Column,
             source.Value.Row,
             source.Value.Column);
+        sheet.InvalidateAccessCache();
     }
 
     private static void RejectInsertion(SpreadsheetDocument document, OdfNode changeNode)
@@ -686,6 +687,8 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
                 OdfTableSheetStructureEngine.DeleteColumns(sheet.TableNode, position.Value, count.Value);
                 break;
         }
+
+        sheet.InvalidateAccessCache();
     }
 
     private static void RejectDeletion(SpreadsheetDocument document, OdfNode changeNode)
@@ -719,6 +722,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
         }
 
         OdfTableSheetStructureEngine.RestoreRows(sheet.TableNode, position, snapshots);
+        sheet.InvalidateAccessCache();
     }
 
     private static void RejectColumnDeletion(OdfTableSheet sheet, OdfNode changeNode, int position)
@@ -746,6 +750,7 @@ internal static class SpreadsheetDocumentTrackedChangesEngine
 
         OdfTableSheetStructureEngine.RestoreColumns(sheet.TableNode, position, columnSnapshots);
         OdfTableSheetStructureEngine.RestoreColumnCells(sheet.TableNode, position, rowCellSnapshots);
+        sheet.InvalidateAccessCache();
     }
 
     private static void WriteOfficeChangeInfo(OdfNode changeNode, string author, DateTime date)
