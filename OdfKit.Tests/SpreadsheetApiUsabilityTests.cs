@@ -369,6 +369,31 @@ public class SpreadsheetApiUsabilityTests
     }
 
     /// <summary>
+    /// 驗證 <see cref="OdsStreamWriter.SwitchToSheet(string)"/> 緩衝寫入路徑產生的 content.xml
+    /// 是結構合法的 XML，可被 <see cref="OdsStreamReader"/> 嚴格剖析回讀，而不是只用子字串比對。
+    /// </summary>
+    [Fact]
+    public async Task OdsStreamWriter_SwitchToSheet_ProducesWellFormedContentXmlReadableByOdsStreamReader()
+    {
+        await using var stream = new MemoryStream();
+        await using (var writer = new OdsStreamWriter(stream))
+        {
+            writer.SwitchToSheet("Widgets");
+            writer.WriteStartRow();
+            writer.WriteCell("Alice");
+            writer.WriteCell(3.5d);
+            writer.WriteEndRow();
+        }
+
+        stream.Position = 0;
+        using var reader = new OdsStreamReader(stream);
+        Assert.True(reader.Read());
+        Assert.Equal("Alice", reader.GetValue(0));
+        Assert.Equal(3.5d, reader.GetValue(1));
+        Assert.False(reader.Read());
+    }
+
+    /// <summary>
     /// 驗證 ODS 流式寫入器的 Span/Memory 字串多載可正常寫入字串儲存格。
     /// </summary>
     [Fact]

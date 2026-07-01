@@ -26,3 +26,7 @@
 - 採用協作者抽取模式拆分上帝類別。
 - 所有公開 `*Async` 方法統一帶 `CancellationToken cancellationToken = default`。
 - 測試套件依分層命名規則整理，移除歷史開發階段命名與重複測試檔。
+
+### 修正
+
+- 修正 `OdsStreamWriter.SwitchToSheet` 緩衝寫入路徑產生結構錯誤 `content.xml` 的問題（`<office:spreadsheet` 起始標籤未透過同一個 `XmlWriter` 正確關閉即被後續原始位元組覆蓋，導致無法被嚴格 XML 剖析器讀回）；改為統一透過 `XmlWriter.WriteRaw` 寫入緩衝工作表片段，並補上以 `OdsStreamReader` 嚴格剖析回讀的迴歸測試。

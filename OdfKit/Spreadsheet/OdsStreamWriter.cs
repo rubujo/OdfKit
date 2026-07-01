@@ -608,32 +608,26 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
 
         if (disposing)
         {
-            bool hasBufferedSheets = _sheetBuffers.Count > 0;
             if (_isSheetStarted)
                 WriteEndSheet();
 
-            if (hasBufferedSheets)
-            {
-                WriteBufferedSheets();
-                WriteUtf8ToContent("</office:spreadsheet></office:body></office:document-content>");
-            }
-            else
-            {
-                // 關閉 spreadsheet、body、document-content 標籤
-                _writer.WriteEndElement(); // office:spreadsheet
-                _writer.WriteEndElement(); // office:body
-                _writer.WriteEndElement(); // office:document-content
-                _writer.WriteEndDocument();
-            }
+            // 緩衝工作表片段一律透過 _writer.WriteRaw 寫入（而非直接寫原始位元組到
+            // _contentEntryStream），讓 _writer 自己知道先前延後關閉的 <office:spreadsheet>
+            // 起始標籤已被後續寫入操作結束，才能正確補上 '>'；否則會產生
+            // <office:spreadsheet<table:table ...> 這種缺少 '>' 分隔的畸形 XML。
+            WriteBufferedSheets();
 
-            if (!hasBufferedSheets)
+            // 關閉 spreadsheet、body、document-content 標籤
+            _writer.WriteEndElement(); // office:spreadsheet
+            _writer.WriteEndElement(); // office:body
+            _writer.WriteEndElement(); // office:document-content
+            _writer.WriteEndDocument();
+
+            try
+            { _writer.Dispose(); }
+            catch (Exception ex)
             {
-                try
-                { _writer.Dispose(); }
-                catch (Exception ex)
-                {
-                    OdfKitDiagnostics.Warn($"OdsStreamWriter 釋放 XmlWriter 時發生次要錯誤：{ex.Message}", ex);
-                }
+                OdfKitDiagnostics.Warn($"OdsStreamWriter 釋放 XmlWriter 時發生次要錯誤：{ex.Message}", ex);
             }
 
             try
@@ -754,23 +748,16 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
 
     private void WriteBufferedSheets()
     {
-        _writer.Flush();
         foreach (SheetBuffer sheet in _sheetBuffers)
         {
             sheet.Close();
-            WriteUtf8ToContent(sheet.GetXml());
+            _writer.WriteRaw(sheet.GetXml());
             sheet.Dispose();
         }
 
         _sheetBuffers.Clear();
         _sheetBuffersByName.Clear();
         _activeSheetBuffer = null;
-    }
-
-    private void WriteUtf8ToContent(string xml)
-    {
-        byte[] bytes = Encoding.UTF8.GetBytes(xml);
-        _contentEntryStream.Write(bytes, 0, bytes.Length);
     }
 
     private static Dictionary<string, string> CreateFragmentNamespaceMap(OdfNode node)
