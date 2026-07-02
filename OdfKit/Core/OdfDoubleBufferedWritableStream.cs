@@ -99,9 +99,33 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
     public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Uses a fully synchronous path: buffered bytes are flushed with a direct synchronous write instead of blocking on the asynchronous pipeline.
+    /// 採用純同步路徑：緩衝區滿時直接以同步寫入刷寫，不以阻塞等待非同步管線的方式偽裝同步。
+    /// </remarks>
     public override void Write(byte[] buffer, int offset, int count)
     {
-        WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(OdfDoubleBufferedWritableStream));
+
+        int bytesWritten = 0;
+        while (bytesWritten < count)
+        {
+            int space = _bufferSize - _activeCount;
+            int toCopy = Math.Min(space, count - bytesWritten);
+            Buffer.BlockCopy(buffer, offset + bytesWritten, _activeBuffer, _activeCount, toCopy);
+            _activeCount += toCopy;
+            bytesWritten += toCopy;
+
+            if (_activeCount == _bufferSize)
+            {
+                // 先等待仍在執行的背景寫入完成，再直接同步刷寫目前緩衝區；
+                // 同步呼叫端不需要雙緩衝流水線，也避免 sync-over-async 的執行緒阻塞成本。
+                _writeTask.GetAwaiter().GetResult();
+                _underlyingStream.Write(_activeBuffer, 0, _activeCount);
+                _activeCount = 0;
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -131,6 +155,9 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
                 int lengthToWrite = _activeCount;
                 _activeCount = 0;
 
+                // 不將 cancellationToken 傳給 Task.Run：若權杖在背景工作排程前即被取消，
+                // 工作主體（含 finally 的 Release）將永不執行，semaphore 會被永久持有，
+                // 造成後續 WriteAsync 死結。取消語意仍由主體內的 WriteAsync 履行。
                 _writeTask = Task.Run(async () =>
                 {
                     try
@@ -141,7 +168,7 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
                     {
                         _semaphore.Release();
                     }
-                }, cancellationToken);
+                });
             }
         }
     }
@@ -167,8 +194,9 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
                     _underlyingStream.Dispose();
                 }
 
-                ArrayPool<byte>.Shared.Return(_bufferA);
-                ArrayPool<byte>.Shared.Return(_bufferB);
+                // 歸還前抹除緩衝區內容，避免文件明文殘留於共用集區被其他租用者讀到。
+                ArrayPool<byte>.Shared.Return(_bufferA, clearArray: true);
+                ArrayPool<byte>.Shared.Return(_bufferB, clearArray: true);
                 Interlocked.Add(ref ReturnedBufferCountForTests, 2);
             }
             _isDisposed = true;

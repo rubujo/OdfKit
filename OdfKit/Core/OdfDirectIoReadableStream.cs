@@ -147,7 +147,9 @@ public sealed class OdfDirectIoReadableStream : Stream
             if (_currentPosition != target)
             {
                 _currentPosition = target;
-                _prefetchTask = null;
+                // 只作廢預讀結果，不清除 _prefetchTask 參考：背景工作可能仍在寫入
+                // _backBuffer，必須保留參考讓後續 FillPrefetchBuffer／Dispose 能等待其完成，
+                // 否則孤兒工作會與下一個排程至同一緩衝區的預讀形成資料競爭。
                 _nextPrefetchStart = -1;
             }
         }
@@ -163,7 +165,8 @@ public sealed class OdfDirectIoReadableStream : Stream
     {
         if (buffer is null)
             throw new ArgumentNullException(nameof(buffer));
-        if (offset < 0 || count < 0 || offset + count > buffer.Length)
+        // 以減法形式檢查範圍，避免 offset + count 整數溢位繞過驗證
+        if (offset < 0 || count < 0 || buffer.Length - offset < count)
             throw new ArgumentOutOfRangeException(nameof(count));
         if (_isDisposed)
             throw new ObjectDisposedException(nameof(OdfDirectIoReadableStream));
@@ -182,8 +185,16 @@ public sealed class OdfDirectIoReadableStream : Stream
             }
         }
 
+        return ReadFromPrefetchLoop(buffer.AsSpan(offset, count));
+    }
+
+    /// <summary>
+    /// 以預讀緩衝區為來源循序填滿目標範圍，緩衝區耗盡時同步補讀下一段資料。
+    /// </summary>
+    private int ReadFromPrefetchLoop(Span<byte> destination)
+    {
         int totalBytesRead = 0;
-        int remaining = (int)Math.Min(count, _totalLength - _currentPosition);
+        int remaining = (int)Math.Min(destination.Length, _totalLength - _currentPosition);
 
         while (remaining > 0)
         {
@@ -198,7 +209,7 @@ public sealed class OdfDirectIoReadableStream : Stream
                 break;
 
             int toCopy = Math.Min(remaining, available);
-            ActiveSpan.Slice(bufferOffset, toCopy).CopyTo(buffer.AsSpan(offset + totalBytesRead, toCopy));
+            ActiveSpan.Slice(bufferOffset, toCopy).CopyTo(destination.Slice(totalBytesRead, toCopy));
 
             _currentPosition += toCopy;
             totalBytesRead += toCopy;
@@ -206,6 +217,41 @@ public sealed class OdfDirectIoReadableStream : Stream
         }
 
         return totalBytesRead;
+    }
+
+    /// <summary>
+    /// 嘗試僅以預讀緩衝區內既有的資料完成讀取，不觸發任何磁碟 I/O。
+    /// 命中時允許部分讀取（partial read），符合 Stream 讀取合約；
+    /// 未命中（緩衝區無可用資料或處於後備模式）時傳回 false，由呼叫端改走執行緒集區路徑。
+    /// </summary>
+    private bool TryReadFromPrefetchedBuffer(Span<byte> destination, out int bytesRead)
+    {
+        bytesRead = 0;
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(OdfDirectIoReadableStream));
+
+        if (_currentPosition >= _totalLength || destination.IsEmpty)
+            return true;
+
+        if (_isFallback)
+            return false;
+
+        lock (_lock)
+        {
+            if (_bufferStart == -1 || _currentPosition < _bufferStart || _currentPosition >= _bufferStart + _bufferLength)
+                return false;
+
+            int bufferOffset = (int)(_currentPosition - _bufferStart);
+            int available = _bufferLength - bufferOffset;
+            if (available <= 0)
+                return false;
+
+            int toCopy = Math.Min(destination.Length, available);
+            ActiveSpan.Slice(bufferOffset, toCopy).CopyTo(destination);
+            _currentPosition += toCopy;
+            bytesRead = toCopy;
+            return true;
+        }
     }
 
     private Span<byte> ActiveSpan
@@ -229,27 +275,36 @@ public sealed class OdfDirectIoReadableStream : Stream
                 try
                 {
                     var (start, length) = _prefetchTask.GetAwaiter().GetResult();
-                    _bufferStart = start;
-                    _bufferLength = length;
 
-                    var temp = _activeBuffer;
-                    _activeBuffer = _backBuffer;
-                    _backBuffer = temp;
+                    // 只接受實際讀到資料的預讀結果；背景工作失敗時會吞下例外並回傳 0，
+                    // 若照單全收會形成「有效的空緩衝」，令 Read 回傳 0 造成提前 EOF 的
+                    // 靜默資料截斷。空結果一律落回下方同步補讀，讓真正的 I/O 錯誤以例外浮現。
+                    if (length > 0)
+                    {
+                        _bufferStart = start;
+                        _bufferLength = length;
 
-                    _prefetchTask = null;
-                    _nextPrefetchStart = -1;
-                    TriggerNextPrefetch();
-                    return;
+                        var temp = _activeBuffer;
+                        _activeBuffer = _backBuffer;
+                        _backBuffer = temp;
+
+                        _prefetchTask = null;
+                        _nextPrefetchStart = -1;
+                        TriggerNextPrefetch();
+                        return;
+                    }
                 }
                 catch
                 {
-                    _prefetchTask = null;
-                    _nextPrefetchStart = -1;
+                    // 背景工作異常同樣落回同步補讀路徑；參考清理由下方 Drain 統一處理。
                 }
             }
 
-            _prefetchTask = null;
-            _nextPrefetchStart = -1;
+            // 丟棄不適用的預讀結果前必須先等待背景工作完成：
+            // 孤兒工作（如 Seek 之後遺留者）仍可能在寫入 _backBuffer，
+            // 若直接排程新預讀至同一緩衝區，將形成兩個背景寫入者的資料競爭；
+            // 尾段分支的 EnsureFallbackStream 也會在其仍使用檔案控制代碼時將其釋放。
+            DrainPendingPrefetchLocked();
 
             if (_currentPosition < _alignedLimit)
             {
@@ -281,6 +336,28 @@ public sealed class OdfDirectIoReadableStream : Stream
 
             TriggerNextPrefetch();
         }
+    }
+
+    /// <summary>
+    /// 等待仍在執行的背景預讀完成後捨棄其結果與參考。
+    /// 必須在持有 <see cref="_lock"/> 時呼叫。
+    /// </summary>
+    private void DrainPendingPrefetchLocked()
+    {
+        if (_prefetchTask is not null)
+        {
+            try
+            {
+                _prefetchTask.GetAwaiter().GetResult();
+            }
+            catch
+            {
+                // 只需確保背景工作結束，孤兒預讀的失敗結果一律丟棄。
+            }
+        }
+
+        _prefetchTask = null;
+        _nextPrefetchStart = -1;
     }
 
     private void EnsureFallbackStream()
@@ -353,8 +430,17 @@ public sealed class OdfDirectIoReadableStream : Stream
     public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Completes synchronously when the requested data is already prefetched; otherwise the blocking read is dispatched to the thread pool so the caller thread is never blocked.
+    /// 當要求的資料已在預讀緩衝區內時同步完成；否則將阻塞式讀取排入執行緒集區執行，避免以同步讀取偽裝非同步而阻塞呼叫端執行緒。
+    /// </remarks>
     public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
+        if (buffer is null)
+            throw new ArgumentNullException(nameof(buffer));
+        // 以減法形式檢查範圍，避免 offset + count 整數溢位繞過驗證
+        if (offset < 0 || count < 0 || buffer.Length - offset < count)
+            throw new ArgumentOutOfRangeException(nameof(count));
         if (cancellationToken.IsCancellationRequested)
         {
             return Task.FromCanceled<int>(cancellationToken);
@@ -362,13 +448,70 @@ public sealed class OdfDirectIoReadableStream : Stream
 
         try
         {
-            return Task.FromResult(Read(buffer, offset, count));
+            if (TryReadFromPrefetchedBuffer(buffer.AsSpan(offset, count), out int bytesRead))
+            {
+                return Task.FromResult(bytesRead);
+            }
         }
         catch (Exception ex)
         {
             return Task.FromException<int>(ex);
         }
+
+        return Task.Run(() => Read(buffer, offset, count), cancellationToken);
     }
+
+#if NET10_0_OR_GREATER
+    /// <inheritdoc />
+    public override int Read(Span<byte> buffer)
+    {
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(OdfDirectIoReadableStream));
+
+        if (_currentPosition >= _totalLength || buffer.IsEmpty)
+            return 0;
+
+        if (_isFallback)
+        {
+            lock (_lock)
+            {
+                _fileStream!.Seek(_currentPosition, SeekOrigin.Begin);
+                int read = _fileStream.Read(buffer);
+                _currentPosition += read;
+                return read;
+            }
+        }
+
+        return ReadFromPrefetchLoop(buffer);
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// Completes synchronously when the requested data is already prefetched; otherwise the blocking read is dispatched to the thread pool so the caller thread is never blocked.
+    /// 當要求的資料已在預讀緩衝區內時同步完成；否則將阻塞式讀取排入執行緒集區執行，避免以同步讀取偽裝非同步而阻塞呼叫端執行緒。
+    /// </remarks>
+    public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return ValueTask.FromCanceled<int>(cancellationToken);
+        }
+
+        try
+        {
+            if (TryReadFromPrefetchedBuffer(buffer.Span, out int bytesRead))
+            {
+                return new ValueTask<int>(bytesRead);
+            }
+        }
+        catch (Exception ex)
+        {
+            return ValueTask.FromException<int>(ex);
+        }
+
+        return new ValueTask<int>(Task.Run(() => Read(buffer.Span), cancellationToken));
+    }
+#endif
 
     /// <inheritdoc />
     protected override void Dispose(bool disposing)
