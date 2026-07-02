@@ -82,17 +82,36 @@ public ref struct OdfUtf8XmlReader
             }
             else if (_position < _xml.Length && _xml[_position] == (byte)'!')
             {
-                // 註解或 DTD
+                // 註解、CDATA 或 DTD
                 _position++;
-                int depth = 1;
-                while (_position < _xml.Length && depth > 0)
+
+                if (StartsWith("--"u8))
                 {
-                    if (_xml[_position] == (byte)'<')
-                        depth++;
-                    else if (_xml[_position] == (byte)'>')
-                        depth--;
-                    _position++;
+                    // 註解必須掃描至字面 "-->"；以 < > 深度計數會被註解內的裸 <
+                    // 誤導（如 <!-- 1 < 2 -->），把後續正常標記整段吞掉。
+                    _position += 2;
+                    ScanToSequence("-->"u8);
                 }
+                else if (StartsWith("[CDATA["u8))
+                {
+                    // CDATA 掃描至字面 "]]>"
+                    _position += 7;
+                    ScanToSequence("]]>"u8);
+                }
+                else
+                {
+                    // DTD／其他宣告：以 < > 深度計數處理內部子集（如 <!DOCTYPE x [ ... ]>）
+                    int depth = 1;
+                    while (_position < _xml.Length && depth > 0)
+                    {
+                        if (_xml[_position] == (byte)'<')
+                            depth++;
+                        else if (_xml[_position] == (byte)'>')
+                            depth--;
+                        _position++;
+                    }
+                }
+
                 token = new OdfUtf8XmlToken(OdfUtf8XmlTokenKind.Comment, _xml.Slice(start, _position - start), offset: start, length: _position - start);
                 return true;
             }
@@ -235,6 +254,30 @@ public ref struct OdfUtf8XmlReader
     private static bool IsWhitespace(byte b)
     {
         return b == (byte)' ' || b == (byte)'\t' || b == (byte)'\r' || b == (byte)'\n';
+    }
+
+    /// <summary>
+    /// 判斷目前位置起是否為指定的位元組序列（不移動位置）。
+    /// </summary>
+    private bool StartsWith(ReadOnlySpan<byte> sequence)
+        => _xml.Length - _position >= sequence.Length
+            && _xml.Slice(_position, sequence.Length).SequenceEqual(sequence);
+
+    /// <summary>
+    /// 掃描至指定位元組序列之後（含該序列）；找不到時停在結尾。
+    /// </summary>
+    private void ScanToSequence(ReadOnlySpan<byte> sequence)
+    {
+        while (_position < _xml.Length)
+        {
+            if (_xml[_position] == sequence[0] && StartsWith(sequence))
+            {
+                _position += sequence.Length;
+                return;
+            }
+
+            _position++;
+        }
     }
 
     /// <summary>
