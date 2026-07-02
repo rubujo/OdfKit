@@ -1,6 +1,7 @@
 ﻿using System;
 using OdfKit.Core;
 using OdfKit.Database;
+using OdfKit.DOM;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -36,6 +37,26 @@ public class DatabaseBoundaryTests
     }
 
     /// <summary>
+    /// 驗證以相同名稱重複新增資料表／查詢時擲出 <see cref="InvalidOperationException"/>，
+    /// 避免產生重複鍵導致 ODB 載入失敗。
+    /// </summary>
+    [Fact]
+    public void AddTableOrQuery_DuplicateName_ThrowsInvalidOperationException()
+    {
+        using var database = OdfDatabaseDocument.Create();
+
+        database.AddTable("Customers");
+        Assert.Throws<InvalidOperationException>(() => database.AddTable("Customers"));
+
+        database.AddQuery("Q1", "SELECT 1");
+        Assert.Throws<InvalidOperationException>(() => database.AddQuery("Q1", "SELECT 2"));
+
+        // 移除後應可再次新增同名項目
+        Assert.True(database.RemoveTable("Customers"));
+        database.AddTable("Customers");
+    }
+
+    /// <summary>
     /// 驗證 <see cref="OdfDatabaseDocument.RemoveTable"/>／<see cref="OdfDatabaseDocument.RemoveQuery"/>／
     /// <see cref="OdfDatabaseDocument.RemoveDataSourceSetting"/> 在目標不存在時回傳
     /// <see langword="false"/>，而非擲出例外或靜默忽略。
@@ -52,6 +73,49 @@ public class DatabaseBoundaryTests
         database.AddTable("Customers");
         Assert.False(database.RemoveTable("OtherTable"));
         Assert.True(database.RemoveTable("Customers"));
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="OdfDatabaseDocument.GetForms"/> 面對極深層巢狀 db:component-collection 時，
+    /// 以 <see cref="System.IO.InvalidDataException"/> 中止，而非引發 StackOverflowException 使進程崩潰。
+    /// </summary>
+    [Fact]
+    public void GetForms_DeeplyNestedComponentCollection_ThrowsInsteadOfStackOverflow()
+    {
+        const string dbNs = "urn:oasis:names:tc:opendocument:xmlns:database:1.0";
+
+        using var database = OdfDatabaseDocument.Create();
+
+        // 先透過公開 API 建立 db:forms 節點，再於其下堆疊遠超深度上限的巢狀 collection
+        database.AddForm("Root");
+        OdfNode body = FindChild(database.ContentDom, "body", OdfNamespaces.Office);
+        OdfNode databaseNode = FindChild(body, "database", OdfNamespaces.Office);
+        OdfNode forms = FindChild(databaseNode, "forms", dbNs);
+
+        OdfNode cursor = forms;
+        for (int i = 0; i < 5000; i++)
+        {
+            var collection = new OdfNode(OdfNodeType.Element, "component-collection", dbNs, "db");
+            cursor.AppendChild(collection);
+            cursor = collection;
+        }
+
+        Assert.Throws<System.IO.InvalidDataException>(() => database.GetForms());
+    }
+
+    private static OdfNode FindChild(OdfNode parent, string localName, string namespaceUri)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == namespaceUri)
+            {
+                return child;
+            }
+        }
+
+        throw new InvalidOperationException($"找不到子節點 {localName}。");
     }
 
     /// <summary>

@@ -1296,10 +1296,15 @@ public class SpreadsheetHighLevelApiTests
         document.SaveToStream(stream);
         stream.Position = 0;
 
-        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
-        using Stream contentStream = package.GetEntryStream("content.xml");
-        using var reader = new StreamReader(contentStream);
-        string xml = reader.ReadToEnd();
+        // package 必須在重新使用 stream 前完整釋放，
+        // 避免背景預讀與後續 Load 競爭同一串流的游標
+        string xml;
+        using (OdfPackage package = OdfPackage.Open(stream, leaveOpen: true))
+        {
+            using Stream contentStream = package.GetEntryStream("content.xml");
+            using var reader = new StreamReader(contentStream);
+            xml = reader.ReadToEnd();
+        }
 
         Assert.Contains("fo:border-top=\"1pt solid #000000\"", xml);
         Assert.Contains("fo:border-bottom=\"2pt double #FF0000\"", xml);

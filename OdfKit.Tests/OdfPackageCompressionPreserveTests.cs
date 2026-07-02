@@ -164,11 +164,14 @@ public class OdfPackageCompressionPreserveTests
             ("styles.xml", Encoding.UTF8.GetBytes("<styles/>")),
             ("META-INF/manifest.xml", Encoding.UTF8.GetBytes(CreateMinimalManifestXml())));
 
-        using OdfPackage package = OdfPackage.Open(packageStream, leaveOpen: true);
-
-        Assert.Contains("content.xml", package.DuplicateEntryNames);
-        Assert.Equal(new[] { "mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml" }, package.EntryOrder);
-        Assert.Equal(second, package.ReadEntry("content.xml"));
+        // package 必須在重新使用 packageStream 前完整釋放，
+        // 避免背景預讀與後續的重新開啟競爭同一串流的游標
+        using (OdfPackage package = OdfPackage.Open(packageStream, leaveOpen: true))
+        {
+            Assert.Contains("content.xml", package.DuplicateEntryNames);
+            Assert.Equal(new[] { "mimetype", "content.xml", "styles.xml", "META-INF/manifest.xml" }, package.EntryOrder);
+            Assert.Equal(second, package.ReadEntry("content.xml"));
+        }
 
         packageStream.Position = 0;
         await using OdfPackage asyncPackage = await OdfPackage.OpenAsync(

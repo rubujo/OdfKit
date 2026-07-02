@@ -732,10 +732,18 @@ public class ChartHighLevelApiTests
         using var stream = new MemoryStream();
         chartDoc.SaveToStream(stream);
         stream.Position = 0;
-        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
-        using Stream contentStream = package.GetEntryStream("content.xml");
-        using var reader = new StreamReader(contentStream);
-        string xml = reader.ReadToEnd();
+
+        // package 必須在重新使用 stream 之前完整釋放：延遲載入的封裝會啟動背景預讀
+        // 工作讀取 stream，Dispose() 會同步等待該工作結束。若不先釋放就重設
+        // stream.Position 供後續 Load 使用，背景預讀與新的 ZipArchive 會競爭同一
+        // 串流的游標，造成偶發的中央目錄解析損毀（EOCD 條目數不符）。
+        string xml;
+        using (OdfPackage package = OdfPackage.Open(stream, leaveOpen: true))
+        {
+            using Stream contentStream = package.GetEntryStream("content.xml");
+            using var reader = new StreamReader(contentStream);
+            xml = reader.ReadToEnd();
+        }
 
         int meanIndex = xml.IndexOf("chart:mean-value", StringComparison.Ordinal);
         int regressionIndex = xml.IndexOf("chart:regression-curve", StringComparison.Ordinal);

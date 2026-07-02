@@ -134,6 +134,29 @@ public class OoxmlConversionTests
     }
 
     /// <summary>
+    /// 驗證雙向公式翻譯不會改寫字串常數內的點與驚嘆號。
+    /// </summary>
+    [Fact]
+    public void FormulaTranslation_PreservesStringLiterals()
+    {
+        // ODF → XLSX：字串常數內形似工作表參照的「Sheet.A1」不得被改寫為驚嘆號
+        Assert.Equal("=\"File.Name\"&Sheet2!B1", OdfToXlsxConverter.TranslateFormula("of:=\"File.Name\"&Sheet2.B1"));
+        Assert.Equal(
+            "=CONCATENATE(\"Sheet1.A1\",Sheet1!A1)",
+            OdfToXlsxConverter.TranslateFormula("of:=CONCATENATE(\"Sheet1.A1\",Sheet1.A1)"));
+        // "" 逸出的雙引號仍屬同一個字串常數
+        Assert.Equal(
+            "=\"He said \"\"Sheet1.A1\"\"\"",
+            OdfToXlsxConverter.TranslateFormula("of:=\"He said \"\"Sheet1.A1\"\"\""));
+
+        // XLSX → ODF：字串常數內的驚嘆號不得被改寫為點
+        Assert.Equal(
+            "of:=IF(A1>0,\"Error!\",Sheet1.B2)",
+            XlsxToOdfConverter.TranslateFormulaToOdf("=IF(A1>0,\"Error!\",Sheet1!B2)"));
+        Assert.Equal("of:=\"Hello!\"&A1", XlsxToOdfConverter.TranslateFormulaToOdf("=\"Hello!\"&A1"));
+    }
+
+    /// <summary>
     /// 驗證 ODT → DOCX 轉換可正確轉換表格結構（行列數一致）。
     /// </summary>
     [Fact]

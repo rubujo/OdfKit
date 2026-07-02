@@ -450,6 +450,24 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
+    public void Test_OdfUtf8XmlReader_CommentContainingLessThan_DoesNotSwallowFollowingMarkup()
+    {
+        // 註解內含裸 < ；舊的 < > 深度計數會被誤導而吞掉註解後的 <p> 標記。
+        var xml = "<root><!-- 1 < 2 --><p>Kept</p></root>"u8;
+        var reader = new OdfUtf8XmlReader(xml);
+
+        var tokenList = new System.Collections.Generic.List<string>();
+        while (reader.Read(out var token))
+        {
+            tokenList.Add($"{token.Kind}:{token.GetNameString()}");
+        }
+
+        Assert.Contains("StartElement:p", tokenList);
+        Assert.Contains("Text:Kept", tokenList);
+        Assert.Contains("EndElement:root", tokenList);
+    }
+
+    [Fact]
     public void Test_OdfUtf8XmlReader_ReadValueChunk_ReadsTextInUtf8Chunks()
     {
         var xml = "<root><p>Chunked UTF-8 value 1234567890</p></root>"u8;
@@ -1135,6 +1153,44 @@ public partial class OptimizedRefactoringTests
         Assert.Equal(returnedBefore + 2, OdfDoubleBufferedWritableStream.ReturnedBufferCountForTests);
     }
 
+    /// <summary>
+    /// 驗證同步 Write 路徑（不經非同步管線的直接刷寫）在跨越緩衝區邊界時位元組完整無誤，
+    /// 且與非同步寫入交錯使用時輸出順序正確。
+    /// </summary>
+    [Fact]
+    public async Task Test_OdfDoubleBufferedWritableStream_SyncWritePreservesBytesAndInterleavesWithAsync()
+    {
+        byte[] expected = Enumerable.Range(0, 4097)
+            .Select(static value => (byte)(value % 251))
+            .ToArray();
+
+        using var target = new MemoryStream();
+        using (var stream = new OdfDoubleBufferedWritableStream(target, bufferSize: 127, leaveOpen: true))
+        {
+            int offset = 0;
+            bool useSync = true;
+            while (offset < expected.Length)
+            {
+                int count = Math.Min(53, expected.Length - offset);
+                if (useSync)
+                {
+                    stream.Write(expected, offset, count);
+                }
+                else
+                {
+                    await stream.WriteAsync(expected, offset, count, TestContext.Current.CancellationToken);
+                }
+
+                useSync = !useSync;
+                offset += count;
+            }
+
+            stream.Flush();
+        }
+
+        Assert.Equal(expected, target.ToArray());
+    }
+
     [Fact]
     public void Test_OdfDoubleBufferedWritableStream_RejectsInvalidBufferSize()
     {
@@ -1548,6 +1604,67 @@ public partial class OptimizedRefactoringTests
                 // 讓背景預讀工作在 Dispose 呼叫當下仍有機會尚未完成。
                 reader.Read(buffer, 0, buffer.Length);
                 reader.Dispose();
+            }
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證讀取與 Seek 交錯（模擬 ZipArchive 開檔的跳讀模式）時資料不會損毀——
+    /// Seek 遺留的背景預讀孤兒工作必須在緩衝區重用前被等待完成，
+    /// 否則會與新排程的預讀共寫同一緩衝區而讀到交錯的錯誤位元組。
+    /// </summary>
+    [Fact]
+    public void Test_DirectIoReadableStream_InterleavedReadAndSeek_ReturnsCorrectBytes()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"OdfKitDirectIoSeek_{Guid.NewGuid():N}.bin");
+        try
+        {
+            byte[] payload = Enumerable.Range(0, (64 * 1024 * 4) + 517)
+                .Select(i => (byte)((i * 13) % 251))
+                .ToArray();
+
+            using (var writer = new OdfDirectIoWritableStream(tempFile))
+            {
+                writer.Write(payload, 0, payload.Length);
+            }
+
+            using var reader = new OdfDirectIoReadableStream(tempFile);
+            byte[] buffer = new byte[1500];
+            // 往返跳讀位置，讓每次讀取都在背景預讀仍可能進行時觸發 Seek
+            long[] positions =
+            [
+                0, 64 * 1024 * 3, 100, (64 * 1024 * 2) + 77, 4096, 64 * 1024 * 4,
+                512, (64 * 1024 * 4) + 200, (64 * 1024) - 1, 1
+            ];
+
+            for (int round = 0; round < 10; round++)
+            {
+                foreach (long position in positions)
+                {
+                    reader.Position = position;
+                    int expectedCount = (int)Math.Min(buffer.Length, payload.Length - position);
+                    int total = 0;
+                    while (total < expectedCount)
+                    {
+                        int read = reader.Read(buffer, total, expectedCount - total);
+                        if (read == 0)
+                            break;
+
+                        total += read;
+                    }
+
+                    Assert.Equal(expectedCount, total);
+                    Assert.Equal(
+                        payload.Skip((int)position).Take(expectedCount).ToArray(),
+                        buffer.Take(total).ToArray());
+                }
             }
         }
         finally

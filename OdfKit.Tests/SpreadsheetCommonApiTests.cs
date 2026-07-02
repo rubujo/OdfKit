@@ -41,9 +41,15 @@ public class SpreadsheetCommonApiTests
         workbook.SaveToStream(stream);
         stream.Position = 0;
 
-        using OdfPackage package = OdfPackage.Open(stream, leaveOpen: true);
-        string contentXml = ReadEntry(package, "content.xml");
-        string settingsXml = ReadEntry(package, "settings.xml");
+        // package 必須在重新使用 stream 前完整釋放，
+        // 避免背景預讀與後續 Load 競爭同一串流的游標
+        string contentXml;
+        string settingsXml;
+        using (OdfPackage package = OdfPackage.Open(stream, leaveOpen: true))
+        {
+            contentXml = ReadEntry(package, "content.xml");
+            settingsXml = ReadEntry(package, "settings.xml");
+        }
 
         Assert.Contains("table:name=\"StatusRange\"", contentXml);
         Assert.Contains("table:name=\"StatusFilter\"", contentXml);

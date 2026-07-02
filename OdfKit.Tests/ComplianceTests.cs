@@ -1702,6 +1702,57 @@ namespace OdfKit.Tests
             Assert.Contains(report.Issues, issue => issue.RuleId == "ODF2005");
         }
 
+        /// <summary>
+        /// 驗證不可尋覽串流會回報 ODF0304 警告，而非靜默跳過設定檔規則掃描。
+        /// </summary>
+        [Fact]
+        public void FlatValidatorReportsSkippedProfileRulesOnNonSeekableStream()
+        {
+            using MemoryStream ms = CreateFlatDocument(
+                "application/vnd.oasis.opendocument.text",
+                "1.4",
+                "text");
+            using var nonSeekable = new NonSeekableReadStream(ms);
+
+            OdfValidationReport report = OdfFlatDocumentValidator.Validate(
+                nonSeekable,
+                "document.fodt",
+                OdfComplianceProfiles.OasisOdf14Extended);
+
+            Assert.Contains(report.Issues, issue =>
+                issue.RuleId == "ODF0304" &&
+                issue.ProfileId == OdfComplianceProfiles.OasisOdf14Extended.Id);
+        }
+
+        private sealed class NonSeekableReadStream(Stream inner) : Stream
+        {
+            public override bool CanRead => inner.CanRead;
+
+            public override bool CanSeek => false;
+
+            public override bool CanWrite => false;
+
+            public override long Length => throw new NotSupportedException();
+
+            public override long Position
+            {
+                get => throw new NotSupportedException();
+                set => throw new NotSupportedException();
+            }
+
+            public override void Flush()
+            {
+            }
+
+            public override int Read(byte[] buffer, int offset, int count) => inner.Read(buffer, offset, count);
+
+            public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+
+            public override void SetLength(long value) => throw new NotSupportedException();
+
+            public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        }
+
         [Fact]
         public void FlatValidatorReportsProfileDisallowedExtension()
         {

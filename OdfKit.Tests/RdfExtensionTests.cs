@@ -29,6 +29,24 @@ public class RdfExtensionTests
     }
 
     /// <summary>
+    /// 驗證含相對路徑 predicate 的 triple 會相對於 base URI 解析，而非擲出 UriFormatException。
+    /// </summary>
+    [Fact]
+    public void ToGraph_RelativePredicate_ResolvesAgainstBaseInsteadOfThrowing()
+    {
+        var metadata = new OdfRdfMetadata();
+        metadata.AddTriple(string.Empty, "creator", "Ada");
+
+        IGraph graph = metadata.ToGraph();
+
+        Assert.Equal(1, graph.Triples.Count);
+        Triple triple = Assert.Single(graph.Triples);
+        var predicate = Assert.IsAssignableFrom<IUriNode>(triple.Predicate);
+        Assert.True(predicate.Uri.IsAbsoluteUri);
+        Assert.EndsWith("creator", predicate.Uri.AbsoluteUri, System.StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// 驗證 SPARQL SELECT 可讀回 Dublin Core 標題。
     /// </summary>
     [Fact]

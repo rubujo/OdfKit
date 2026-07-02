@@ -78,6 +78,95 @@ public class TextHighLevelApiTests
             TestContext.Current.CancellationToken));
     }
 
+    private const string BatchTemplateContentXml =
+        """
+        <?xml version="1.0" encoding="utf-8"?>
+        <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                                 xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+          <office:body>
+            <office:text>
+              <text:p>Hello {{Name}}</text:p>
+            </office:text>
+          </office:body>
+        </office:document-content>
+        """;
+
+    /// <summary>
+    /// 驗證批次套印會輸出每一筆資料，且記錄之間插入分頁符樣式。
+    /// </summary>
+    [Fact]
+    public async Task StreamingMailMerge_BatchMergesEveryRecordWithPageBreaks()
+    {
+        using MemoryStream template = CreateStreamingTemplateZip(BatchTemplateContentXml);
+        using MemoryStream output = new();
+
+        var records = new List<IDictionary<string, object?>>
+        {
+            new Dictionary<string, object?> { ["Name"] = "First" },
+            new Dictionary<string, object?> { ["Name"] = "Second" },
+            new Dictionary<string, object?> { ["Name"] = "Third" }
+        };
+
+        await OdfStreamingMailMerge.ApplyBatchTemplateAsync(
+            template,
+            output,
+            records,
+            TestContext.Current.CancellationToken);
+
+        string contentXml = ReadZipEntryText(output, "content.xml");
+
+        Assert.Contains("Hello First", contentXml);
+        Assert.Contains("Hello Second", contentXml);
+        Assert.Contains("Hello Third", contentXml);
+        Assert.Contains("OdfKitPageBreak", contentXml);
+        // 插入分頁符樣式與段落後，輸出必須仍為可解析的 well-formed XML
+        AssertWellFormedXml(contentXml);
+    }
+
+    /// <summary>
+    /// 驗證批次套印面對只能列舉一次的非同步資料源（如 DbDataReader）時，
+    /// 首筆資料不會被 styles.xml 的套印預取消耗而自批次結果中遺失。
+    /// </summary>
+    [Fact]
+    public async Task StreamingMailMerge_BatchWithSinglePassAsyncSource_KeepsFirstRecord()
+    {
+        // styles.xml 排在 content.xml 之前，重現單向資料源被雙重列舉時遺失首筆的情境
+        using MemoryStream template = CreateStreamingTemplateZipWithStylesFirst(BatchTemplateContentXml);
+        using MemoryStream output = new();
+
+        var queue = new Queue<IDictionary<string, object?>>();
+        queue.Enqueue(new Dictionary<string, object?> { ["Name"] = "First" });
+        queue.Enqueue(new Dictionary<string, object?> { ["Name"] = "Second" });
+
+        await OdfStreamingMailMerge.ApplyBatchTemplateAsync(
+            template,
+            output,
+            DrainSinglePassAsync(queue),
+            TestContext.Current.CancellationToken);
+
+        string contentXml = ReadZipEntryText(output, "content.xml");
+
+        Assert.Contains("Hello First", contentXml);
+        Assert.Contains("Hello Second", contentXml);
+        AssertWellFormedXml(contentXml);
+    }
+
+    private static void AssertWellFormedXml(string xml)
+    {
+        var document = new XmlDocument { XmlResolver = null };
+        document.LoadXml(xml);
+    }
+
+    private static async IAsyncEnumerable<IDictionary<string, object?>> DrainSinglePassAsync(
+        Queue<IDictionary<string, object?>> queue)
+    {
+        while (queue.Count > 0)
+        {
+            await Task.Yield();
+            yield return queue.Dequeue();
+        }
+    }
+
     /// <summary>
     /// 驗證 HTML / CSS 樣式表可映射為 ODT 共用樣式並保存至 styles.xml。
     /// </summary>
@@ -1373,6 +1462,26 @@ public class TextHighLevelApiTests
                 <?xml version="1.0" encoding="utf-8"?>
                 <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" />
                 """);
+        }
+
+        stream.Position = 0;
+        return stream;
+    }
+
+    private static MemoryStream CreateStreamingTemplateZipWithStylesFirst(string contentXml)
+    {
+        var stream = new MemoryStream();
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            WriteZipEntry(archive, "mimetype", "application/vnd.oasis.opendocument.text");
+            WriteZipEntry(
+                archive,
+                "styles.xml",
+                """
+                <?xml version="1.0" encoding="utf-8"?>
+                <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" />
+                """);
+            WriteZipEntry(archive, "content.xml", contentXml);
         }
 
         stream.Position = 0;
