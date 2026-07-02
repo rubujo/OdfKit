@@ -156,6 +156,26 @@ public partial class OdfDatabaseDocument
         return null;
     }
 
+    /// <summary>
+    /// 判斷父節點下是否已存在同名（db:name 屬性）的指定 db 命名空間子元素，
+    /// 供新增資料表／查詢時的唯一性檢查使用。
+    /// </summary>
+    private static bool HasChildWithName(OdfNode parent, string localName, string name)
+    {
+        foreach (OdfNode child in parent.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == localName &&
+                child.NamespaceUri == DatabaseNamespace &&
+                string.Equals(child.GetAttribute("name", DatabaseNamespace), name, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static OdfNode? FindFirstChildElement(OdfNode parent, params (string LocalName, string NamespaceUri)[] names)
     {
         foreach (OdfNode child in parent.Children)

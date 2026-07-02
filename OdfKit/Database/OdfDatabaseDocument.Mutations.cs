@@ -25,6 +25,11 @@ public partial class OdfDatabaseDocument
         }
 
         OdfNode tableRepresentations = FindOrCreateChild(GetDatabaseNode(), "table-representations", DatabaseNamespace, "db");
+        if (HasChildWithName(tableRepresentations, "table-representation", name))
+        {
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DuplicateName", name));
+        }
+
         OdfNode table = OdfNodeFactory.CreateElement("table-representation", DatabaseNamespace, "db");
         table.SetAttribute("name", DatabaseNamespace, name, "db");
         if (!string.IsNullOrWhiteSpace(command))
@@ -64,6 +69,11 @@ public partial class OdfDatabaseDocument
         }
 
         OdfNode queries = FindOrCreateChild(GetDatabaseNode(), "queries", DatabaseNamespace, "db");
+        if (HasChildWithName(queries, "query", name))
+        {
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DuplicateName", name));
+        }
+
         OdfNode query = OdfNodeFactory.CreateElement("query", DatabaseNamespace, "db");
         query.SetAttribute("name", DatabaseNamespace, name, "db");
         query.SetAttribute("command", DatabaseNamespace, command, "db");

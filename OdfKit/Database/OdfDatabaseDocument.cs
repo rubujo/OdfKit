@@ -316,7 +316,7 @@ public partial class OdfDatabaseDocument : OdfDocument
         }
 
         List<OdfDatabaseFormInfo> forms = [];
-        CollectFormComponents(formsNode, forms);
+        CollectFormComponents(formsNode, forms, depth: 0);
         return forms.AsReadOnly();
     }
 
@@ -368,8 +368,18 @@ public partial class OdfDatabaseDocument : OdfDocument
         return null;
     }
 
-    private static void CollectFormComponents(OdfNode parent, List<OdfDatabaseFormInfo> forms)
+    // component-collection 巢狀深度上限：防止惡意或損毀的 ODB 以極深層巢狀
+    // 引發無界遞迴的 StackOverflowException 使進程崩潰。
+    private const int MaxFormComponentDepth = 64;
+
+    private static void CollectFormComponents(OdfNode parent, List<OdfDatabaseFormInfo> forms, int depth)
     {
+        if (depth > MaxFormComponentDepth)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FormComponentNestingTooDeep", MaxFormComponentDepth));
+        }
+
         foreach (OdfNode child in parent.Children)
         {
             if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != DatabaseNamespace)
@@ -388,7 +398,7 @@ public partial class OdfDatabaseDocument : OdfDocument
             }
             else if (child.LocalName == "component-collection")
             {
-                CollectFormComponents(child, forms);
+                CollectFormComponents(child, forms, depth + 1);
             }
         }
     }
