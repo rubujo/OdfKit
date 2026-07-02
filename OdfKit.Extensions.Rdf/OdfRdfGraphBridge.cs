@@ -30,7 +30,9 @@ public static class OdfRdfGraphBridge
         foreach (OdfRdfTriple triple in metadata.Triples)
         {
             INode subject = CreateUriNode(graph, triple.Subject, graphBase);
-            INode predicate = graph.CreateUriNode(new Uri(triple.Predicate));
+            // predicate 同樣需相對於 graphBase 解析：subject／object 已支援相對 IRI，
+            // 若此處以 new Uri 直接建立，相對路徑 predicate 會擲 UriFormatException。
+            INode predicate = CreateUriNode(graph, triple.Predicate, graphBase);
             INode obj = triple.IsLiteral
                 ? graph.CreateLiteralNode(triple.ObjectValue)
                 : CreateUriNode(graph, triple.ObjectValue, graphBase);
