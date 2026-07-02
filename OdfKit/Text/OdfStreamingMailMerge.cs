@@ -84,7 +84,7 @@ public static class OdfStreamingMailMerge
     /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
     /// <param name="dataSequence">The large data sequence, where each record is a field value dictionary. / 大批量的資料序列，每筆資料為一個欄位值字典。</param>
     /// <param name="cancellationToken">The cancellation token. / 取消語彙。</param>
-    public static async Task ApplyBatchTemplateAsync(
+    public static Task ApplyBatchTemplateAsync(
         Stream templateStream,
         Stream outputStream,
         IEnumerable<IDictionary<string, object?>> dataSequence,
@@ -97,48 +97,143 @@ public static class OdfStreamingMailMerge
         if (dataSequence is null)
             throw new ArgumentNullException(nameof(dataSequence));
 
+        return ApplyBatchTemplateCoreAsync(
+            templateStream,
+            outputStream,
+            WrapAsAsyncEnumerable(dataSequence),
+            cancellationToken);
+    }
+
+    /// <summary>
+    /// Asynchronously applies batch template data merging from an asynchronous data sequence and writes the result to the target stream.
+    /// Each merged record is separated by a page break in the output document.
+    /// 非同步套用批次範本資料合併，資料序列以非同步方式列舉，並將結果輸出至目標串流。
+    /// 每筆資料合併後，在輸出文件中會以分頁符分隔。
+    /// </summary>
+    /// <param name="templateStream">The source template ODF (ODT/ODS) file stream. / 來源範本 ODF (ODT/ODS) 檔案串流。</param>
+    /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
+    /// <param name="dataSequence">The asynchronous data sequence, where each record is a field value dictionary. / 非同步資料序列，每筆資料為一個欄位值字典。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙。</param>
+    public static Task ApplyBatchTemplateAsync(
+        Stream templateStream,
+        Stream outputStream,
+        IAsyncEnumerable<IDictionary<string, object?>> dataSequence,
+        CancellationToken cancellationToken = default)
+    {
+        if (templateStream is null)
+            throw new ArgumentNullException(nameof(templateStream));
+        if (outputStream is null)
+            throw new ArgumentNullException(nameof(outputStream));
+        if (dataSequence is null)
+            throw new ArgumentNullException(nameof(dataSequence));
+
+        return ApplyBatchTemplateCoreAsync(templateStream, outputStream, dataSequence, cancellationToken);
+    }
+
+    private static async Task ApplyBatchTemplateCoreAsync(
+        Stream templateStream,
+        Stream outputStream,
+        IAsyncEnumerable<IDictionary<string, object?>> dataSequence,
+        CancellationToken cancellationToken)
+    {
         cancellationToken.ThrowIfCancellationRequested();
 
-        using var sourceZip = new ZipArchive(templateStream, ZipArchiveMode.Read, leaveOpen: true);
-        using var destZip = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: true);
-
-        foreach (ZipArchiveEntry entry in sourceZip.Entries)
+        // 單向資料源（如 DbDataReader）只能列舉一次：
+        // 先預取首筆供 styles.xml 套印使用，content.xml 批次合併時改以可重播首筆的序列走訪，
+        // 避免同一序列被列舉兩次而遺失第一筆記錄。
+        IAsyncEnumerator<IDictionary<string, object?>> enumerator = dataSequence.GetAsyncEnumerator(cancellationToken);
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            bool hasFirst = await enumerator.MoveNextAsync().ConfigureAwait(false);
+            IDictionary<string, object?> firstData = hasFirst
+                ? enumerator.Current
+                : new Dictionary<string, object?>();
 
-            if (entry.FullName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase) ||
-                entry.FullName.EndsWith("styles.xml", StringComparison.OrdinalIgnoreCase))
+            using var sourceZip = new ZipArchive(templateStream, ZipArchiveMode.Read, leaveOpen: true);
+            using var destZip = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: true);
+
+            bool replaySequenceUsed = false;
+            foreach (ZipArchiveEntry entry in sourceZip.Entries)
             {
-                ZipArchiveEntry newEntry = destZip.CreateEntry(entry.FullName, CompressionLevel.Optimal);
-                using Stream srcStream = entry.Open();
-                using Stream destStream = newEntry.Open();
+                cancellationToken.ThrowIfCancellationRequested();
 
-                if (entry.FullName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase))
+                if (entry.FullName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase) ||
+                    entry.FullName.EndsWith("styles.xml", StringComparison.OrdinalIgnoreCase))
                 {
-                    await ProcessXmlTemplateBatchAsync(srcStream, destStream, dataSequence, cancellationToken).ConfigureAwait(false);
+                    ZipArchiveEntry newEntry = destZip.CreateEntry(entry.FullName, CompressionLevel.Optimal);
+                    using Stream srcStream = entry.Open();
+                    using Stream destStream = newEntry.Open();
+
+                    if (entry.FullName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // 重播序列只能走訪一次；範本含多個 content.xml（如內嵌物件的
+                        // Object 1/content.xml）時，後續項目改以來源序列重新列舉——
+                        // 可重複列舉的來源（清單、陣列）可完整重播，單向來源則盡力而為。
+                        IAsyncEnumerable<IDictionary<string, object?>> rows;
+                        if (!replaySequenceUsed)
+                        {
+                            rows = ReplayFirstThenRest(firstData, hasFirst, enumerator);
+                            replaySequenceUsed = true;
+                        }
+                        else
+                        {
+                            rows = dataSequence;
+                        }
+
+                        await ProcessXmlTemplateBatchAsync(
+                            srcStream,
+                            destStream,
+                            rows,
+                            cancellationToken).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await ProcessXmlTemplateAsync(srcStream, destStream, firstData, cancellationToken).ConfigureAwait(false);
+                    }
                 }
                 else
                 {
-                    IDictionary<string, object?> firstData = new Dictionary<string, object?>();
-                    using (var enumerator = dataSequence.GetEnumerator())
-                    {
-                        if (enumerator.MoveNext())
-                        {
-                            firstData = enumerator.Current;
-                        }
-                    }
-                    await ProcessXmlTemplateAsync(srcStream, destStream, firstData, cancellationToken).ConfigureAwait(false);
+                    ZipArchiveEntry newEntry = destZip.CreateEntry(entry.FullName, CompressionLevel.NoCompression);
+                    using Stream srcStream = entry.Open();
+                    using Stream destStream = newEntry.Open();
+
+                    await srcStream.CopyToAsync(destStream, 81920, cancellationToken).ConfigureAwait(false);
                 }
             }
-            else
-            {
-                ZipArchiveEntry newEntry = destZip.CreateEntry(entry.FullName, CompressionLevel.NoCompression);
-                using Stream srcStream = entry.Open();
-                using Stream destStream = newEntry.Open();
-
-                await srcStream.CopyToAsync(destStream, 81920, cancellationToken).ConfigureAwait(false);
-            }
         }
+        finally
+        {
+            await enumerator.DisposeAsync().ConfigureAwait(false);
+        }
+    }
+
+    private static async IAsyncEnumerable<IDictionary<string, object?>> ReplayFirstThenRest(
+        IDictionary<string, object?> firstData,
+        bool hasFirst,
+        IAsyncEnumerator<IDictionary<string, object?>> enumerator)
+    {
+        if (!hasFirst)
+        {
+            yield break;
+        }
+
+        yield return firstData;
+        while (await enumerator.MoveNextAsync().ConfigureAwait(false))
+        {
+            yield return enumerator.Current;
+        }
+    }
+
+    private static async IAsyncEnumerable<IDictionary<string, object?>> WrapAsAsyncEnumerable(
+        IEnumerable<IDictionary<string, object?>> source)
+    {
+        foreach (IDictionary<string, object?> row in source)
+        {
+            yield return row;
+        }
+
+        // 滿足 async 迭代器的編譯需求（同步來源沒有實際的非同步等待點）
+        await Task.CompletedTask.ConfigureAwait(false);
     }
 
     /// <summary>
@@ -160,13 +255,17 @@ public static class OdfStreamingMailMerge
         if (reader is null)
             throw new ArgumentNullException(nameof(reader));
 
-        var sequence = AsEnumerable(reader);
+        var sequence = AsAsyncEnumerable(reader);
         return ApplyBatchTemplateAsync(templateStream, outputStream, sequence, cancellationToken);
     }
 
-    private static IEnumerable<IDictionary<string, object?>> AsEnumerable(DbDataReader reader)
+    private static async IAsyncEnumerable<IDictionary<string, object?>> AsAsyncEnumerable(
+        DbDataReader reader,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        while (reader.Read())
+        // 以 ReadAsync 取代同步 Read：資料庫往返不再阻塞執行緒，
+        // 非同步批次套印的吞吐量不受同步 I/O 等待拖累。
+        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
             var row = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
             for (int i = 0; i < reader.FieldCount; i++)
@@ -755,7 +854,7 @@ public static class OdfStreamingMailMerge
     private static async Task ProcessXmlTemplateBatchAsync(
         Stream sourceXml,
         Stream destXml,
-        IEnumerable<IDictionary<string, object?>> dataSequence,
+        IAsyncEnumerable<IDictionary<string, object?>> dataSequence,
         CancellationToken cancellationToken)
     {
         var settings = new XmlReaderSettings
@@ -836,7 +935,7 @@ public static class OdfStreamingMailMerge
             SerializeNodeToStream(pageBreakParagraphNode, pbMs);
             byte[] pageBreakBytes = pbMs.ToArray();
 
-            foreach (var row in dataSequence)
+            await foreach (var row in dataSequence.WithCancellation(cancellationToken).ConfigureAwait(false))
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
