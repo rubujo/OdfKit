@@ -198,10 +198,29 @@ public static class OdfMarkdownImporter
         return Import(reader, options);
     }
 
-    private static string[] SplitLines(string markdown) =>
-        markdown.Replace("\r\n", "\n")
-            .Replace('\r', '\n')
-            .Split('\n');
+    // 單趟掃描切行（支援 \r\n、\r、\n），避免兩次整份文件的 Replace 中介字串配置。
+    private static string[] SplitLines(string markdown)
+    {
+        var lines = new List<string>();
+        int start = 0;
+        for (int i = 0; i < markdown.Length; i++)
+        {
+            char c = markdown[i];
+            if (c is '\n' or '\r')
+            {
+                lines.Add(markdown.Substring(start, i - start));
+                if (c == '\r' && i + 1 < markdown.Length && markdown[i + 1] == '\n')
+                {
+                    i++;
+                }
+
+                start = i + 1;
+            }
+        }
+
+        lines.Add(markdown.Substring(start));
+        return [.. lines];
+    }
 
     private static Dictionary<string, string> ReadNoteDefinitions(string[] lines)
     {
