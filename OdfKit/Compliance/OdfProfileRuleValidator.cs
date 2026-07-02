@@ -72,8 +72,21 @@ internal static partial class OdfProfileRuleValidator
         OdfSchemaSet schema,
         List<OdfValidationIssue> issues)
     {
-        if (profile is null || !stream.CanSeek)
+        if (profile is null)
         {
+            return;
+        }
+
+        if (!stream.CanSeek)
+        {
+            // 不可尋覽串流無法回捲執行規則掃描：明確回報而非靜默跳過，
+            // 避免呼叫端誤以為文件已通過完整的規範檢測。
+            issues.Add(new OdfValidationIssue(
+                OdfIssueSeverity.Warning,
+                "ODF0304",
+                "Profile rule validation was skipped because the stream is not seekable; buffer the stream into a seekable source to run the full rule checks.",
+                fileName,
+                profileId: profile.Id));
             return;
         }
 

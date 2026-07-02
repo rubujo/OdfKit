@@ -33,44 +33,58 @@ public static class OdfFlatDocumentValidator
 
         List<OdfValidationIssue> issues = [];
 
-        // 智慧偵測語系
-        CultureInfo targetCulture = culture
-            ?? profile?.TargetCulture
-            ?? CultureInfo.CurrentUICulture;
+        // 記錄進入時的串流位置：驗證流程會多次推進與回捲串流，
+        // 結束時必須還原到進入位置，避免呼叫端後續讀到殘缺的半路資料。
+        long entryPosition = stream.CanSeek ? stream.Position : -1;
 
-        string? profileId = profile?.Id;
-        OdfDocumentKind extensionKind = OdfDocumentKindDetector.FromFileName(fileName);
-        FlatRootInfo? rootInfo = ReadRootInfo(stream, fileName, profileId, issues);
-
-        OdfDocumentKind documentKind = DetectDocumentKind(rootInfo?.MimeType, extensionKind, rootInfo?.BodyKind ?? OdfDocumentKind.Unknown);
-        OdfVersion detectedVersion = rootInfo?.Version is not null
-            ? ParseVersion(rootInfo.Version)
-            : OdfVersion.Unknown;
-        OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(detectedVersion);
-        if (!OdfSchemaRegistry.HasNativeSchema(detectedVersion) && detectedVersion != OdfVersion.Unknown)
+        try
         {
-            issues.Add(new OdfValidationIssue(
-                OdfIssueSeverity.Warning,
-                "ODF1005",
-                $"The validator is using ODF 1.4 schema to perform best-effort validation on ODF {OdfVersionInfo.ToVersionString(detectedVersion)} document.",
-                fileName,
-                profileId: profileId));
+            // 智慧偵測語系
+            CultureInfo targetCulture = culture
+                ?? profile?.TargetCulture
+                ?? CultureInfo.CurrentUICulture;
+
+            string? profileId = profile?.Id;
+            OdfDocumentKind extensionKind = OdfDocumentKindDetector.FromFileName(fileName);
+            FlatRootInfo? rootInfo = ReadRootInfo(stream, fileName, profileId, issues);
+
+            OdfDocumentKind documentKind = DetectDocumentKind(rootInfo?.MimeType, extensionKind, rootInfo?.BodyKind ?? OdfDocumentKind.Unknown);
+            OdfVersion detectedVersion = rootInfo?.Version is not null
+                ? ParseVersion(rootInfo.Version)
+                : OdfVersion.Unknown;
+            OdfSchemaSet schema = OdfSchemaRegistry.GetSchema(detectedVersion);
+            if (!OdfSchemaRegistry.HasNativeSchema(detectedVersion) && detectedVersion != OdfVersion.Unknown)
+            {
+                issues.Add(new OdfValidationIssue(
+                    OdfIssueSeverity.Warning,
+                    "ODF1005",
+                    $"The validator is using ODF 1.4 schema to perform best-effort validation on ODF {OdfVersionInfo.ToVersionString(detectedVersion)} document.",
+                    fileName,
+                    profileId: profileId));
+            }
+
+            ValidateRoot(rootInfo, schema, fileName, profileId, issues);
+            ValidateMimeType(rootInfo?.MimeType, documentKind, profile, fileName, profileId, issues);
+            ValidateBodyKind(documentKind, rootInfo?.BodyKind ?? OdfDocumentKind.Unknown, fileName, profileId, issues);
+            ValidateExtensionKind(extensionKind, documentKind, fileName, profileId, issues);
+            ValidateProfileExtension(fileName, profile, profileId, issues);
+            ValidateVersion(detectedVersion, profile, fileName, profileId, issues);
+            OdfProfileRuleValidator.ValidateFlatXml(stream, fileName, profile, schema, issues);
+
+            foreach (var issue in issues)
+            {
+                issue.Culture ??= targetCulture;
+            }
+
+            return new OdfValidationReport(detectedVersion, documentKind, issues);
         }
-
-        ValidateRoot(rootInfo, schema, fileName, profileId, issues);
-        ValidateMimeType(rootInfo?.MimeType, documentKind, profile, fileName, profileId, issues);
-        ValidateBodyKind(documentKind, rootInfo?.BodyKind ?? OdfDocumentKind.Unknown, fileName, profileId, issues);
-        ValidateExtensionKind(extensionKind, documentKind, fileName, profileId, issues);
-        ValidateProfileExtension(fileName, profile, profileId, issues);
-        ValidateVersion(detectedVersion, profile, fileName, profileId, issues);
-        OdfProfileRuleValidator.ValidateFlatXml(stream, fileName, profile, schema, issues);
-
-        foreach (var issue in issues)
+        finally
         {
-            issue.Culture ??= targetCulture;
+            if (entryPosition >= 0)
+            {
+                stream.Position = entryPosition;
+            }
         }
-
-        return new OdfValidationReport(detectedVersion, documentKind, issues);
     }
 
     private static FlatRootInfo? ReadRootInfo(Stream stream, string? fileName, string? profileId, List<OdfValidationIssue> issues)
