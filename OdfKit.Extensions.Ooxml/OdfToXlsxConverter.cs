@@ -1658,7 +1658,8 @@ public static class OdfToXlsxConverter
 
     private static readonly Regex SheetRefRegex = new Regex(
         @"([A-Za-z_一-龥][A-Za-z0-9_ 一-龥]*)\.(\$?[A-Z]+\$?[0-9]+(:\$?[A-Z]+\$?[0-9]+)?)",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        TimeSpan.FromSeconds(1));
 
     /// <summary>
     /// Translates an ODF spreadsheet formula to an XLSX formula.
@@ -1680,8 +1681,11 @@ public static class OdfToXlsxConverter
         if (!f.StartsWith("=", StringComparison.Ordinal))
             f = "=" + f;
 
-        // 轉換工作表參照：Sheet.A1 → Sheet!A1
-        f = SheetRefRegex.Replace(f, "$1!$2");
+        // 轉換工作表參照：Sheet.A1 → Sheet!A1；
+        // 僅在字串常數以外的片段套用，避免 ="File.Name" 內的點被誤改寫。
+        f = FormulaTranslationHelper.ReplaceOutsideStringLiterals(
+            f,
+            segment => SheetRefRegex.Replace(segment, "$1!$2"));
 
         return f;
     }

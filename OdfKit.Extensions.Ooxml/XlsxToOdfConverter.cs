@@ -1285,7 +1285,10 @@ public static class XlsxToOdfConverter
             formula = "=" + formula;
         }
 
-        formula = formula.Replace("!", ".");
+        // 只改寫字串常數以外的工作表分隔驚嘆號，避免 ="Error!" 之類的字串內容被誤毀損。
+        formula = FormulaTranslationHelper.ReplaceOutsideStringLiterals(
+            formula,
+            segment => segment.Replace("!", "."));
         return "of:" + formula;
     }
 }
