@@ -86,11 +86,19 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider
         int padLen = data[data.Length - 1];
         if (padLen < 1 || padLen > 8 || padLen > data.Length)
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_InvalidPkcs5Padding", padLen));
+
+        // 以累積差異取代逐位元組早期退出，避免比對時間洩漏首個錯誤填充位元組的位置。
+        // 此檢查位於 AES Key Wrap 完整性驗證之後，時間側道實務上已被前置閘門阻擋，此處為深度防禦。
+        int diff = 0;
         for (int i = data.Length - padLen; i < data.Length; i++)
-            if (data[i] != (byte)padLen)
-                throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_Pkcs5PaddingByte"));
+            diff |= data[i] ^ padLen;
+        if (diff != 0)
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_Pkcs5PaddingByte"));
+
         byte[] result = new byte[data.Length - padLen];
         Array.Copy(data, 0, result, 0, result.Length);
+        // 輸入陣列為 AES Key Unwrap 的輸出，內含 Session Key 承載明文，複製後即抹除。
+        Array.Clear(data, 0, data.Length);
         return result;
     }
 

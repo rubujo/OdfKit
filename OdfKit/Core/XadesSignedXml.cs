@@ -92,17 +92,27 @@ internal sealed class XadesSignedXml : SignedXml
     {
         if (node == null)
             return null;
-        if (node is XmlElement element)
-        {
-            if (element.GetAttribute("Id") == idValue || element.GetAttribute("id") == idValue)
-                return element;
-        }
 
-        foreach (XmlNode child in node.ChildNodes)
+        // 以顯式堆疊取代遞迴：惡意構造的極深層嵌套簽章 XML 不會再引發
+        // 無法攔截的 StackOverflowException 使整個進程崩潰。
+        var stack = new Stack<XmlNode>();
+        stack.Push(node);
+
+        while (stack.Count > 0)
         {
-            var result = FindElementById(child, idValue);
-            if (result != null)
-                return result;
+            XmlNode current = stack.Pop();
+            if (current is XmlElement element &&
+                (element.GetAttribute("Id") == idValue || element.GetAttribute("id") == idValue))
+            {
+                return element;
+            }
+
+            // 反向壓入子節點，維持與原遞迴相同的文件順序深度優先走訪
+            XmlNodeList children = current.ChildNodes;
+            for (int i = children.Count - 1; i >= 0; i--)
+            {
+                stack.Push(children[i]!);
+            }
         }
 
         return null;

@@ -131,26 +131,38 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
 
     private static byte[] ExtractAndVerifySessionKey(byte[] payload)
     {
-        // 承載資料 = [1 位元組演算法][N 位元組金鑰][2 位元組總和檢查碼]
-        if (payload.Length < 4)
-            throw new CryptographicException(
-                $"解密後的 Session Key Payload 長度不足（{payload.Length} 位元組）。");
+        try
+        {
+            // 承載資料 = [1 位元組演算法][N 位元組金鑰][2 位元組總和檢查碼]
+            if (payload.Length < 4)
+                throw new CryptographicException(
+                    $"解密後的 Session Key Payload 長度不足（{payload.Length} 位元組）。");
 
-        int keyLen = payload.Length - 3;
-        byte[] sessionKey = new byte[keyLen];
-        Array.Copy(payload, 1, sessionKey, 0, keyLen);
+            int keyLen = payload.Length - 3;
+            byte[] sessionKey = new byte[keyLen];
+            Array.Copy(payload, 1, sessionKey, 0, keyLen);
 
-        int expected = 0;
-        foreach (byte b in sessionKey)
-            expected += b;
-        expected &= 0xFFFF;
+            int expected = 0;
+            foreach (byte b in sessionKey)
+                expected += b;
+            expected &= 0xFFFF;
 
-        int actual = (payload[payload.Length - 2] << 8) | payload[payload.Length - 1];
-        if (expected != actual)
-            throw new CryptographicException(
-                $"Session Key 總和檢查碼驗證失敗（預期 0x{expected:X4}，實際 0x{actual:X4}）。");
+            int actual = (payload[payload.Length - 2] << 8) | payload[payload.Length - 1];
+            if (expected != actual)
+            {
+                // 驗證失敗時先抹除已複製的金鑰位元組；
+                // 錯誤訊息不得包含預期／實際總和檢查碼值，避免洩漏金鑰位元組總和資訊。
+                Array.Clear(sessionKey, 0, sessionKey.Length);
+                throw new CryptographicException("Session Key 總和檢查碼驗證失敗。");
+            }
 
-        return sessionKey;
+            return sessionKey;
+        }
+        finally
+        {
+            // 承載資料含明文 Session Key 副本，離開前一律抹除。
+            Array.Clear(payload, 0, payload.Length);
+        }
     }
 
     #endregion
