@@ -57,6 +57,22 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         if (string.IsNullOrEmpty(convertTo))
             throw new ArgumentNullException(nameof(convertTo));
 
+        // 先將輸入完整緩衝為位元組陣列：重試需要可重複讀取的來源，
+        // 且不可依賴呼叫端傳入的串流是否可尋覽。每次嘗試以此緩衝建立新的
+        // 內容，避免 MultipartFormDataContent 釋放時連帶關閉呼叫端的串流，
+        // 導致下一次重試擲出 ObjectDisposedException。
+        byte[] inputBytes;
+        using (var buffer = new MemoryStream())
+        {
+            if (input.CanSeek)
+            {
+                input.Position = 0;
+            }
+
+            await input.CopyToAsync(buffer, 81920, ct).ConfigureAwait(false);
+            inputBytes = buffer.ToArray();
+        }
+
         int maxRetries = 3;
         int delayMs = 1000;
 
@@ -64,7 +80,7 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         {
             try
             {
-                return await SendRequestAsync(input, inputExtension, convertTo, ct).ConfigureAwait(false);
+                return await SendRequestAsync(inputBytes, inputExtension, convertTo, ct).ConfigureAwait(false);
             }
             catch (Exception ex) when (attempt < maxRetries && (ex is HttpRequestException || ex is TaskCanceledException))
             {
@@ -74,21 +90,16 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         }
 
         // 最後一次重試直接拋出例外
-        return await SendRequestAsync(input, inputExtension, convertTo, ct).ConfigureAwait(false);
+        return await SendRequestAsync(inputBytes, inputExtension, convertTo, ct).ConfigureAwait(false);
     }
 
-    private async Task<Stream> SendRequestAsync(Stream input, string inputExtension, string convertTo, CancellationToken ct)
+    private async Task<Stream> SendRequestAsync(byte[] inputBytes, string inputExtension, string convertTo, CancellationToken ct)
     {
-        // 每次發送請求都需要確保資料流的 Position 處於起點，
-        // 且 multipart content 的 StreamContent 不會因為重複讀取而失敗。
-        if (input.CanSeek)
-        {
-            input.Position = 0;
-        }
-
         using var requestContent = new MultipartFormDataContent();
 
-        var fileContent = new StreamContent(input);
+        // 每次嘗試都以緩衝位元組建立全新的 ByteArrayContent，
+        // 使重試彼此獨立，且不觸及呼叫端原始串流的生命週期。
+        var fileContent = new ByteArrayContent(inputBytes);
         fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
 
         // unoserver-rest-api 要求 file 欄位名稱必須是 "file"，並包含副檔名 filename

@@ -316,7 +316,7 @@ public class LibreOfficeRenderer
                 RedirectStandardError = true
             };
 
-#if NET10_0
+#if !NETSTANDARD2_0
             startInfo.ArgumentList.Add("--headless");
             startInfo.ArgumentList.Add($"-env:UserInstallation={profileUri}");
             startInfo.ArgumentList.Add("--convert-to");
@@ -457,7 +457,7 @@ public class LibreOfficeRenderer
             return configured!;
         }
 
-#if NET10_0
+#if !NETSTANDARD2_0
         if (OperatingSystem.IsWindows())
         {
             string[] paths = [
