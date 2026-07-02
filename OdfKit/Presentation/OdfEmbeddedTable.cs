@@ -67,7 +67,7 @@ public sealed class OdfEmbeddedTable
         if (cell.LocalName == "covered-table-cell")
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetTextCovered"));
 
-        OdfNode paragraph = cell.Children.First(child => child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text);
+        OdfNode paragraph = GetOrCreateCellParagraph(cell);
         paragraph.TextContent = text;
         return this;
     }
@@ -101,7 +101,7 @@ public sealed class OdfEmbeddedTable
         if (cell.LocalName == "covered-table-cell")
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfEmbeddedTable_CannotSetTextStyle"));
 
-        OdfNode paragraph = cell.Children.First(child => child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text);
+        OdfNode paragraph = GetOrCreateCellParagraph(cell);
         if (bold is not null)
         {
             _document.StyleEngine.SetLocalStyleProperty(paragraph, "paragraph", "text-properties", "font-weight", OdfNamespaces.Fo, bold.Value ? "bold" : "normal", "fo");
@@ -342,6 +342,23 @@ public sealed class OdfEmbeddedTable
             border ?? string.Empty,
             "fo");
         return this;
+    }
+
+    // 取得儲存格內第一個 text:p；若儲存格尚未含段落（例如載入的外部文件其空儲存格），
+    // 則建立一個並附加，避免對空序列呼叫 First 擲出 InvalidOperationException。
+    private static OdfNode GetOrCreateCellParagraph(OdfNode cell)
+    {
+        foreach (OdfNode child in cell.Children)
+        {
+            if (child.LocalName == "p" && child.NamespaceUri == OdfNamespaces.Text)
+            {
+                return child;
+            }
+        }
+
+        var paragraph = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text");
+        cell.AppendChild(paragraph);
+        return paragraph;
     }
 
     private OdfNode GetCell(int row, int column)
