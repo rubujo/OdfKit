@@ -10,14 +10,19 @@ namespace OdfKit.Core;
 /// </summary>
 public static class OdfCrc32
 {
-    private static readonly uint[][] Tables;
+    // 延遲初始化的 Slice-by-8 查表：僅在實際走軟體路徑時才建置，
+    // 避免 ARM64 硬體加速或 net10 單次計算路徑仍付出 8KB 冷啟動配置。
+    // 競爭時最多重複建置一次後被取代，結果相同，無需鎖定。
+    private static uint[][]? _tables;
 
-    static OdfCrc32()
+    private static uint[][] Tables => _tables ??= CreateTables();
+
+    private static uint[][] CreateTables()
     {
-        Tables = new uint[8][];
+        var tables = new uint[8][];
         for (int i = 0; i < 8; i++)
         {
-            Tables[i] = new uint[256];
+            tables[i] = new uint[256];
         }
 
         const uint polynomial = 0xEDB88320;
@@ -32,19 +37,21 @@ public static class OdfCrc32
                 else
                     entry >>= 1;
             }
-            Tables[0][i] = entry;
+            tables[0][i] = entry;
         }
 
         // 建立 Slice-by-8 查表 (Table 1 至 7)
         for (int i = 0; i < 256; i++)
         {
-            uint entry = Tables[0][i];
+            uint entry = tables[0][i];
             for (int step = 1; step < 8; step++)
             {
-                entry = (entry >> 8) ^ Tables[0][entry & 0xFF];
-                Tables[step][i] = entry;
+                entry = (entry >> 8) ^ tables[0][entry & 0xFF];
+                tables[step][i] = entry;
             }
         }
+
+        return tables;
     }
 
     /// <summary>
@@ -93,21 +100,22 @@ public static class OdfCrc32
         }
 #endif
 
-        // Slice-by-8 軟體高效查表
+        // Slice-by-8 軟體高效查表（將查表提升為區域變數，避免熱迴圈內重複的延遲初始化檢查）
+        uint[][] tables = Tables;
         while (i + 8 <= bytes.Length)
         {
             uint one = ReadUInt32LittleEndian(bytes.Slice(i, 4));
             uint two = ReadUInt32LittleEndian(bytes.Slice(i + 4, 4));
 
             uint c = crc ^ one;
-            crc = Tables[7][c & 0xFF]
-                ^ Tables[6][(c >> 8) & 0xFF]
-                ^ Tables[5][(c >> 16) & 0xFF]
-                ^ Tables[4][(c >> 24) & 0xFF]
-                ^ Tables[3][two & 0xFF]
-                ^ Tables[2][(two >> 8) & 0xFF]
-                ^ Tables[1][(two >> 16) & 0xFF]
-                ^ Tables[0][(two >> 24) & 0xFF];
+            crc = tables[7][c & 0xFF]
+                ^ tables[6][(c >> 8) & 0xFF]
+                ^ tables[5][(c >> 16) & 0xFF]
+                ^ tables[4][(c >> 24) & 0xFF]
+                ^ tables[3][two & 0xFF]
+                ^ tables[2][(two >> 8) & 0xFF]
+                ^ tables[1][(two >> 16) & 0xFF]
+                ^ tables[0][(two >> 24) & 0xFF];
 
             i += 8;
         }
@@ -116,7 +124,7 @@ public static class OdfCrc32
         while (i < bytes.Length)
         {
             byte index = (byte)((crc ^ bytes[i]) & 0xFF);
-            crc = (crc >> 8) ^ Tables[0][index];
+            crc = (crc >> 8) ^ tables[0][index];
             i++;
         }
 

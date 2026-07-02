@@ -526,17 +526,29 @@ internal static class OdfPackageZipLoader
         return owned;
     }
 
+    // 靜態快取 BCL 私有欄位的反射結果：只在型別初始化時探測一次，
+    // 之後每個 entry 直接讀取；欄位在未來 .NET 版本消失或反射受限（如 AOT）時
+    // 整體回退至長度比對啟發式，且不得讓探測例外升級為 TypeInitializationException。
+    private static readonly FieldInfo? CompressionMethodField = ProbeCompressionMethodField();
+
+    private static FieldInfo? ProbeCompressionMethodField()
+    {
+        try
+        {
+            return typeof(ZipArchiveEntry).GetField("_compressionMethod", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?? typeof(ZipArchiveEntry).GetField("m_compressionMethod", BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     private static bool TryDetectStoredCompression(ZipArchiveEntry entry)
     {
         try
         {
-            var fieldInfo = typeof(ZipArchiveEntry).GetField(
-                    "_compressionMethod",
-                    BindingFlags.NonPublic | BindingFlags.Instance)
-                ?? typeof(ZipArchiveEntry).GetField(
-                    "m_compressionMethod",
-                    BindingFlags.NonPublic | BindingFlags.Instance);
-
+            FieldInfo? fieldInfo = CompressionMethodField;
             if (fieldInfo is null)
             {
                 OdfKitDiagnostics.Warn(
