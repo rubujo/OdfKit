@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Buffers;
+using System.Collections.Generic;
 using System.Globalization;
 using System;
 using System.Data.Common;
@@ -708,12 +709,13 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     OdsSheetWriteJob job = jobArray[jobIndex];
+                    // 建構後立即指派，確保寫入工作中途失敗時 catch 能處置到此緩衝
                     var buffer = new SheetBuffer(job.SheetName);
+                    buffers[jobIndex] = buffer;
                     var sheetWriter = new OdsSheetWriter(buffer.Writer);
                     await job.WriteAsync(sheetWriter, cancellationToken).ConfigureAwait(false);
                     sheetWriter.CloseOpenRow();
                     buffer.Close();
-                    buffers[jobIndex] = buffer;
                 }
                 catch
                 {
@@ -751,7 +753,7 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
         foreach (SheetBuffer sheet in _sheetBuffers)
         {
             sheet.Close();
-            _writer.WriteRaw(sheet.GetXml());
+            sheet.WriteTo(_writer);
             sheet.Dispose();
         }
 
@@ -810,10 +812,45 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             _closed = true;
         }
 
-        public string GetXml()
+        /// <summary>
+        /// 以分塊解碼方式將緩衝的工作表 XML 直接寫入目標寫入器，
+        /// 避免 ToArray 位元組複本與整份 XML 大字串的雙重 Heap 配置。
+        /// </summary>
+        public void WriteTo(XmlWriter target)
         {
             Close();
-            return Encoding.UTF8.GetString(_stream.ToArray());
+
+            if (!_stream.TryGetBuffer(out ArraySegment<byte> buffer))
+            {
+                target.WriteRaw(Encoding.UTF8.GetString(_stream.ToArray()));
+                return;
+            }
+
+            const int ByteChunkSize = 4096;
+            var decoder = Encoding.UTF8.GetDecoder();
+            char[] chars = ArrayPool<char>.Shared.Rent(ByteChunkSize + 4);
+            try
+            {
+                int byteIndex = buffer.Offset;
+                int remaining = buffer.Count;
+                while (remaining > 0)
+                {
+                    int byteChunk = Math.Min(remaining, ByteChunkSize);
+                    bool isLast = byteChunk == remaining;
+                    int charCount = decoder.GetChars(buffer.Array!, byteIndex, byteChunk, chars, 0, flush: isLast);
+                    if (charCount > 0)
+                    {
+                        target.WriteRaw(chars, 0, charCount);
+                    }
+
+                    byteIndex += byteChunk;
+                    remaining -= byteChunk;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(chars);
+            }
         }
 
         public void Dispose()
