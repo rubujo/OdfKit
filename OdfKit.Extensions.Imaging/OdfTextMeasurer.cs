@@ -77,16 +77,29 @@ public static class OdfTextMeasurer
         string? fontPath = OdfFontResolver.ResolveFontPath(mappedFont);
 
         SKTypeface? typeface = null;
+        // 只釋放本方法建立的 typeface；SKTypeface.Default 為共用單例，不可 Dispose。
+        bool ownsTypeface = false;
         if (fontPath is not null && File.Exists(fontPath))
         {
             typeface = SKTypeface.FromFile(fontPath);
+            ownsTypeface = typeface is not null;
         }
 
         if (typeface is null)
         {
             var weight = isBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal;
             var slant = isItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright;
-            typeface = SKTypeface.FromFamilyName(mappedFont, new SKFontStyle((int)weight, (int)SKFontStyleWidth.Normal, slant)) ?? SKTypeface.Default;
+            SKTypeface? created = SKTypeface.FromFamilyName(mappedFont, new SKFontStyle((int)weight, (int)SKFontStyleWidth.Normal, slant));
+            if (created is not null)
+            {
+                typeface = created;
+                ownsTypeface = true;
+            }
+            else
+            {
+                typeface = SKTypeface.Default;
+                ownsTypeface = false;
+            }
         }
 
         // 2. 嘗試使用 HarfBuzzSharp 進行 Shaping 量測
@@ -162,6 +175,13 @@ public static class OdfTextMeasurer
         {
             // 發生任何例外時回退至 SkiaSharp 量測
             OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage("Diag_OdfTextMeasurer_GdiFontMeasurementFallback", ex.Message), ex);
+        }
+        finally
+        {
+            if (ownsTypeface)
+            {
+                typeface.Dispose();
+            }
         }
 
         // 3. Fallback 回退：使用 SkiaSharp 量測
