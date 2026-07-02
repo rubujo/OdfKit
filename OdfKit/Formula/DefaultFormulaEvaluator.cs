@@ -16,6 +16,12 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
     private readonly Dictionary<OdfCellAddress, object> _cache = new();
     private readonly HashSet<OdfCellAddress> _evaluatingStack = new();
 
+    // 以公式字串為鍵的剖析樹快取；AST 節點於剖析後不可變，可安全跨次評估重用。
+    private readonly Dictionary<string, AstNode> _astCache = new(StringComparer.Ordinal);
+
+    // 剖析樹快取的筆數上限；達到上限時整批清除，避免長時間執行時無上限累積。
+    private const int AstCacheCapacity = 4096;
+
     /// <summary>
     /// Evaluates the formula for a specific cell with circular-reference checks and caching.
     /// 評估特定儲存格的公式，並使用循環參照檢查與快取機制。
@@ -37,9 +43,10 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
         }
 
         var domCtx = context as OdfDomEvaluationContext;
-        var oldCell = domCtx?.CurrentCell;
-        if (domCtx != null)
+        OdfCellAddress oldCell = default;
+        if (domCtx is not null)
         {
+            oldCell = domCtx.CurrentCell;
             domCtx.CurrentCell = cellAddress;
         }
 
@@ -72,9 +79,9 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
         finally
         {
             _evaluatingStack.Remove(cellAddress);
-            if (domCtx != null && oldCell.HasValue)
+            if (domCtx is not null)
             {
-                domCtx.CurrentCell = oldCell.Value;
+                domCtx.CurrentCell = oldCell;
             }
         }
     }
@@ -83,6 +90,10 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
     /// Evaluates a formula string and returns the result.
     /// 評估公式字串並傳回結果。
     /// </summary>
+    /// <remarks>
+    /// Parsed syntax trees are cached by formula text, so repeated evaluation of the same formula skips tokenizing and parsing.
+    /// 剖析後的語法樹會以公式字串為鍵快取，重複評估相同公式時可略過語彙分析與剖析階段。
+    /// </remarks>
     /// <param name="formula">The formula string. / 公式字串。</param>
     /// <param name="context">The evaluation context. / 評估內容模型。</param>
     /// <returns>The formula calculation result. / 公式計算後的結果。</returns>
@@ -90,8 +101,17 @@ public partial class DefaultFormulaEvaluator : IOdfFormulaEvaluator
     {
         try
         {
-            var parser = new FormulaParser(formula);
-            var ast = parser.Parse();
+            if (!_astCache.TryGetValue(formula, out var ast))
+            {
+                var parser = new FormulaParser(formula);
+                ast = parser.Parse();
+                if (_astCache.Count >= AstCacheCapacity)
+                {
+                    _astCache.Clear();
+                }
+                _astCache[formula] = ast;
+            }
+
             return ast.Evaluate(context);
         }
         catch (Exception ex)
