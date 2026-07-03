@@ -25,7 +25,10 @@ internal static partial class OdfSignatureVerifier
         var signedCms = new SignedCms();
         try
         {
-            byte[] tsBytes = Convert.FromBase64String(timestampNode.InnerText.Trim());
+            byte[] tsBytes = DecodeBase64WithLimit(
+                timestampNode.InnerText,
+                MaxEmbeddedTimestampBytes,
+                "Err_OdfSignatureVerifier_EmbeddedTimestampSizeLimitExceeded");
             signedCms.Decode(tsBytes);
 
             try

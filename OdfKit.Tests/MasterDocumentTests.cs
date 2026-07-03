@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Text;
@@ -323,6 +324,30 @@ public class MasterDocumentTests
             master.AddSubDocumentReference("MissingChapter", "does-not-exist.odt");
 
             Assert.Throws<FileNotFoundException>(() => master.MergeSubDocuments(tempDir));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// 驗證 <see cref="TextMasterDocument.MergeSubDocuments"/> 會拒絕逃出基準目錄的子文件路徑。
+    /// </summary>
+    [Theory]
+    [InlineData("../outside.odt")]
+    [InlineData("chapters/../../outside.odt")]
+    public void MergeSubDocuments_PathTraversalHref_ThrowsSecurityException(string href)
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), $"odfkit-master-traversal-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+
+        try
+        {
+            using var master = TextMasterDocument.Create();
+            master.AddSubDocumentReference("EscapingChapter", href);
+
+            Assert.Throws<SecurityException>(() => master.MergeSubDocuments(tempDir));
         }
         finally
         {

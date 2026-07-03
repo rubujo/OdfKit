@@ -219,6 +219,7 @@ public sealed class OdtStreamReader : IDisposable
     {
         NameTable = OdfXmlNameTable.Create(),
         DtdProcessing = DtdProcessing.Prohibit,
-        XmlResolver = null
+        XmlResolver = null,
+        MaxCharactersInDocument = OdfLoadOptions.Default.MaxXmlCharactersInDocument
     };
 }

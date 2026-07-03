@@ -366,6 +366,7 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
         NameTable = OdfXmlNameTable.Create(),
         DtdProcessing = DtdProcessing.Prohibit,
         XmlResolver = null,
+        MaxCharactersInDocument = OdfLoadOptions.Default.MaxXmlCharactersInDocument,
     };
 
     /// <inheritdoc/>

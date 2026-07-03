@@ -46,11 +46,18 @@ internal static class OdfPackageZipLoader
 
                 using (var fs = new FileStream(package.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    var mmfEntries = OdfZipDirectoryParser.ParseCentralDirectory(fs);
-                    if (mmfEntries != null)
+                    var mmfDirectory = OdfZipDirectoryParser.ParseCentralDirectory(fs);
+                    if (mmfDirectory != null)
                     {
+                        if (mmfDirectory.EntryCount > ctx.LoadOptions.MaxZipEntries)
+                        {
+                            throw new SecurityException(
+                                OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntryCountLimitExceeded", mmfDirectory.EntryCount, ctx.LoadOptions.MaxZipEntries));
+                        }
+
                         package.Mmf = mmf;
-                        package.MmfEntries = mmfEntries;
+                        package.MmfEntries = mmfDirectory.Entries;
+                        ctx.DuplicateEntryNames.AddRange(mmfDirectory.DuplicateEntryNames);
                         LoadEntriesFromMmf(ctx);
                         return;
                     }
@@ -75,15 +82,7 @@ internal static class OdfPackageZipLoader
 
         foreach (ZipArchiveEntry entry in archive.Entries)
         {
-            string name;
-            try
-            {
-                name = OdfPackage.SanitizeEntryName(entry.FullName);
-            }
-            catch (SecurityException)
-            {
-                name = entry.FullName;
-            }
+            string name = OdfPackage.SanitizeEntryName(entry.FullName);
 
             if (entry.Length > ctx.LoadOptions.MaxEntrySize)
             {
@@ -174,11 +173,18 @@ internal static class OdfPackageZipLoader
 
                 using (var fs = new FileStream(package.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 4096, true))
                 {
-                    var mmfEntries = OdfZipDirectoryParser.ParseCentralDirectory(fs);
-                    if (mmfEntries != null)
+                    var mmfDirectory = OdfZipDirectoryParser.ParseCentralDirectory(fs);
+                    if (mmfDirectory != null)
                     {
+                        if (mmfDirectory.EntryCount > ctx.LoadOptions.MaxZipEntries)
+                        {
+                            throw new SecurityException(
+                                OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntryCountLimitExceeded", mmfDirectory.EntryCount, ctx.LoadOptions.MaxZipEntries));
+                        }
+
                         package.Mmf = mmf;
-                        package.MmfEntries = mmfEntries;
+                        package.MmfEntries = mmfDirectory.Entries;
+                        ctx.DuplicateEntryNames.AddRange(mmfDirectory.DuplicateEntryNames);
                         LoadEntriesFromMmf(ctx);
                         return;
                     }
@@ -205,15 +211,7 @@ internal static class OdfPackageZipLoader
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            string name;
-            try
-            {
-                name = OdfPackage.SanitizeEntryName(entry.FullName);
-            }
-            catch (SecurityException)
-            {
-                name = entry.FullName;
-            }
+            string name = OdfPackage.SanitizeEntryName(entry.FullName);
 
             if (entry.Length > ctx.LoadOptions.MaxEntrySize)
             {
@@ -290,7 +288,12 @@ internal static class OdfPackageZipLoader
 
         var ms = new MemoryStream();
         ms.Write(signature, 0, bytesRead);
-        underlying.CopyTo(ms);
+        OdfBoundedStreamReader.CopyTo(
+            underlying,
+            ms,
+            ctx.LoadOptions.MaxPackageSize,
+            "Err_OdfPackage_InputStreamSizeLimitExceeded",
+            bytesRead);
         ms.Position = 0;
         if (!ctx.LeaveOpen)
             underlying.Dispose();
@@ -313,7 +316,13 @@ internal static class OdfPackageZipLoader
 
         var ms = new MemoryStream();
         ms.Write(signature, 0, bytesRead);
-        await underlying.CopyToAsync(ms, 81920, cancellationToken).ConfigureAwait(false);
+        await OdfBoundedStreamReader.CopyToAsync(
+            underlying,
+            ms,
+            ctx.LoadOptions.MaxPackageSize,
+            "Err_OdfPackage_InputStreamSizeLimitExceeded",
+            cancellationToken,
+            bytesRead).ConfigureAwait(false);
         ms.Position = 0;
         if (!ctx.LeaveOpen)
             underlying.Dispose();

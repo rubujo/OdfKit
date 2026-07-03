@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security;
 using System.Text;
 using OdfKit.Compliance;
 using OdfKit.Core;
@@ -268,15 +269,12 @@ namespace OdfKit.Tests
         {
             byte[] dummyData = Encoding.UTF8.GetBytes("<root/>");
             using MemoryStream ms = CreateZipWithCustomEntry("../illegal.xml", dummyData);
-            using OdfPackage package = OdfPackage.Open(ms);
-            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.RocTaiwanOdfCns15251);
-            LogReport("RocTaiwanOdfCns15251_Negative_ZipSlip", report);
 
-            Assert.False(report.IsValid);
-            Assert.Contains(report.Issues, issue =>
-                issue.RuleId == "ODF0200" &&
-                issue.PackagePath == "../illegal.xml" &&
-                issue.Severity == OdfIssueSeverity.Fatal);
+            SecurityException ex = Assert.Throws<SecurityException>(() => OdfPackage.Open(ms));
+
+            Assert.Equal(
+                OdfLocalizer.GetMessage("Err_OdfPackageEntryNameSanitizer_ForbiddenAbsolutePathDrive", "../illegal.xml"),
+                ex.Message);
         }
 
         [Fact]

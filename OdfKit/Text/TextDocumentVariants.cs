@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 using OdfKit.Compliance;
@@ -211,7 +212,7 @@ public sealed class TextMasterDocument : TextDocument
 
             if (!string.IsNullOrEmpty(href))
             {
-                string fullPath = Path.Combine(baseDirectory, href);
+                string fullPath = ResolveSubDocumentPath(baseDirectory, href!);
                 using TextDocument subDoc = TextDocument.Load(fullPath);
                 if (subDocumentOutlineOffset != 0)
                 {
@@ -233,6 +234,28 @@ public sealed class TextMasterDocument : TextDocument
         }
 
         return merged;
+    }
+
+    private static string ResolveSubDocumentPath(string baseDirectory, string href)
+    {
+        if (Uri.TryCreate(href, UriKind.Absolute, out _) || Path.IsPathRooted(href))
+        {
+            throw new SecurityException(OdfLocalizer.GetMessage("Err_TextMasterDocument_SubDocumentPathEscapesBaseDirectory", href));
+        }
+
+        string root = Path.GetFullPath(baseDirectory);
+        string rootedPrefix = root.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) ||
+            root.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+            ? root
+            : root + Path.DirectorySeparatorChar;
+
+        string fullPath = Path.GetFullPath(Path.Combine(root, href));
+        if (!fullPath.StartsWith(rootedPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new SecurityException(OdfLocalizer.GetMessage("Err_TextMasterDocument_SubDocumentPathEscapesBaseDirectory", href));
+        }
+
+        return fullPath;
     }
 
     /// <summary>

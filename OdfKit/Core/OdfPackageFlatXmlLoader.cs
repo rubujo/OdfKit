@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,6 +44,23 @@ internal static class OdfPackageFlatXmlLoader
         using Stream cleanXmlStream = OdfTempStreamFactory.Create(estimatedCleanSize, temporaryDirectory: null);
         var binaryPaths = new Dictionary<int, string>();
         int binaryCounter = 0;
+        long totalVirtualEntrySize = 0;
+
+        void TrackVirtualEntry(string path, long length)
+        {
+            if (ctx.LoadOptions.MaxEntrySize > 0 && length > ctx.LoadOptions.MaxEntrySize)
+            {
+                throw new SecurityException(
+                    OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", path, length, ctx.LoadOptions.MaxEntrySize));
+            }
+
+            totalVirtualEntrySize += length;
+            if (ctx.LoadOptions.MaxTotalUncompressedSize > 0 && totalVirtualEntrySize > ctx.LoadOptions.MaxTotalUncompressedSize)
+            {
+                throw new SecurityException(
+                    OdfLocalizer.GetMessage("Err_OdfPackage_FlatXmlTotalVirtualEntrySizeLimitExceeded", totalVirtualEntrySize, ctx.LoadOptions.MaxTotalUncompressedSize));
+            }
+        }
 
         using (var reader = XmlReader.Create(xmlStream, settings))
         using (var writer = XmlWriter.Create(cleanXmlStream, new XmlWriterSettings { Encoding = new UTF8Encoding(false), CloseOutput = false, Indent = false }))
@@ -59,11 +77,22 @@ internal static class OdfPackageFlatXmlLoader
                             byte[] buffer = ArrayPool<byte>.Shared.Rent(65536);
                             using (var binMs = new MemoryStream())
                             {
+                                long binarySize = 0;
                                 try
                                 {
                                     int bytesRead;
                                     while ((bytesRead = reader.ReadElementContentAsBase64(buffer, 0, buffer.Length)) > 0)
                                     {
+                                        binarySize += bytesRead;
+                                        if (ctx.LoadOptions.MaxEntrySize > 0 && binarySize > ctx.LoadOptions.MaxEntrySize)
+                                        {
+                                            throw new SecurityException(
+                                                OdfLocalizer.GetMessage(
+                                                    "Err_OdfPackageFlatXmlLoader_BinaryDataSizeLimitExceeded",
+                                                    binarySize,
+                                                    ctx.LoadOptions.MaxEntrySize));
+                                        }
+
                                         binMs.Write(buffer, 0, bytesRead);
                                     }
                                 }
@@ -76,6 +105,7 @@ internal static class OdfPackageFlatXmlLoader
                                 OdfMediaManager.DetectImageFormat(bytes, out string mediaType, out string ext);
                                 string finalPath = $"Pictures/image_{binaryCounter}{ext}";
                                 binaryPaths[binaryCounter] = finalPath;
+                                TrackVirtualEntry(finalPath, bytes.Length);
 
                                 ctx.Entries[finalPath] = new OdfPackageEntry(finalPath, bytes);
                                 ctx.Manifest[finalPath] = mediaType;
@@ -210,11 +240,13 @@ internal static class OdfPackageFlatXmlLoader
             string contentPath = $"{folderPath}/content.xml";
             string mimePath = $"{folderPath}/mimetype";
 
+            TrackVirtualEntry(contentPath, contentBytes.Length);
             ctx.Entries[contentPath] = new OdfPackageEntry(contentPath, contentBytes);
             ctx.Manifest[contentPath] = "text/xml";
             ctx.EntryOrder.Add(contentPath);
 
             byte[] mimeBytes = Encoding.UTF8.GetBytes(mimeType);
+            TrackVirtualEntry(mimePath, mimeBytes.Length);
             ctx.Entries[mimePath] = new OdfPackageEntry(mimePath, mimeBytes);
             ctx.Manifest[mimePath] = mimeType;
             ctx.EntryOrder.Add(mimePath);
@@ -314,12 +346,18 @@ internal static class OdfPackageFlatXmlLoader
             return ms.ToArray();
         }
 
-        ctx.WriteVirtualEntry("content.xml", ToUtf8Bytes(contentRoot), "text/xml");
-        ctx.WriteVirtualEntry("styles.xml", ToUtf8Bytes(stylesRoot), "text/xml");
-        ctx.WriteVirtualEntry("meta.xml", ToUtf8Bytes(metaRoot), "text/xml");
-        ctx.WriteVirtualEntry("settings.xml", ToUtf8Bytes(settingsRoot), "text/xml");
+        WriteTrackedVirtualEntry("content.xml", ToUtf8Bytes(contentRoot), "text/xml");
+        WriteTrackedVirtualEntry("styles.xml", ToUtf8Bytes(stylesRoot), "text/xml");
+        WriteTrackedVirtualEntry("meta.xml", ToUtf8Bytes(metaRoot), "text/xml");
+        WriteTrackedVirtualEntry("settings.xml", ToUtf8Bytes(settingsRoot), "text/xml");
         if (!string.IsNullOrEmpty(ctx.MimeType))
-            ctx.WriteVirtualEntry("mimetype", Encoding.UTF8.GetBytes(ctx.MimeType), string.Empty);
+            WriteTrackedVirtualEntry("mimetype", Encoding.UTF8.GetBytes(ctx.MimeType), string.Empty);
+
+        void WriteTrackedVirtualEntry(string path, byte[] content, string mediaType)
+        {
+            TrackVirtualEntry(path, content.Length);
+            ctx.WriteVirtualEntry(path, content, mediaType);
+        }
     }
 
     /// <summary>
@@ -342,7 +380,13 @@ internal static class OdfPackageFlatXmlLoader
             if (signatureLength > 0)
                 ms.Write(signature, 0, signatureLength);
 
-            await ctx.UnderlyingStream.CopyToAsync(ms, 81920, cancellationToken).ConfigureAwait(false);
+            await OdfBoundedStreamReader.CopyToAsync(
+                ctx.UnderlyingStream,
+                ms,
+                ctx.LoadOptions.MaxPackageSize,
+                "Err_OdfPackage_InputStreamSizeLimitExceeded",
+                cancellationToken,
+                signatureLength).ConfigureAwait(false);
             ms.Position = 0;
             if (!ctx.LeaveOpen)
                 ctx.UnderlyingStream.Dispose();

@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ using System.Xml;
 using System.Data.Common;
 using System.Buffers;
 
+using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit.Text;
 
@@ -49,15 +52,19 @@ public static class OdfStreamingMailMerge
 
         using var sourceZip = new ZipArchive(templateStream, ZipArchiveMode.Read, leaveOpen: true);
         using var destZip = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: true);
+        OdfLoadOptions loadOptions = OdfLoadOptions.Default;
+        ValidateEntryCount(sourceZip, loadOptions);
+        long totalUncompressedSize = 0;
 
         foreach (ZipArchiveEntry entry in sourceZip.Entries)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            string entryName = ValidateSourceEntry(entry, loadOptions, ref totalUncompressedSize);
 
-            if (entry.FullName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase) ||
-                entry.FullName.EndsWith("styles.xml", StringComparison.OrdinalIgnoreCase))
+            if (entryName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase) ||
+                entryName.EndsWith("styles.xml", StringComparison.OrdinalIgnoreCase))
             {
-                ZipArchiveEntry newEntry = destZip.CreateEntry(entry.FullName, CompressionLevel.Optimal);
+                ZipArchiveEntry newEntry = destZip.CreateEntry(entryName, CompressionLevel.Optimal);
                 using Stream srcStream = entry.Open();
                 using Stream destStream = newEntry.Open();
 
@@ -65,11 +72,16 @@ public static class OdfStreamingMailMerge
             }
             else
             {
-                ZipArchiveEntry newEntry = destZip.CreateEntry(entry.FullName, CompressionLevel.NoCompression);
+                ZipArchiveEntry newEntry = destZip.CreateEntry(entryName, CompressionLevel.NoCompression);
                 using Stream srcStream = entry.Open();
                 using Stream destStream = newEntry.Open();
 
-                await srcStream.CopyToAsync(destStream, 81920, cancellationToken).ConfigureAwait(false);
+                await OdfBoundedStreamReader.CopyToAsync(
+                    srcStream,
+                    destStream,
+                    loadOptions.MaxEntrySize,
+                    "Err_OdfPackage_InputStreamSizeLimitExceeded",
+                    cancellationToken).ConfigureAwait(false);
             }
         }
     }
@@ -151,20 +163,24 @@ public static class OdfStreamingMailMerge
 
             using var sourceZip = new ZipArchive(templateStream, ZipArchiveMode.Read, leaveOpen: true);
             using var destZip = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: true);
+            OdfLoadOptions loadOptions = OdfLoadOptions.Default;
+            ValidateEntryCount(sourceZip, loadOptions);
+            long totalUncompressedSize = 0;
 
             bool replaySequenceUsed = false;
             foreach (ZipArchiveEntry entry in sourceZip.Entries)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                string entryName = ValidateSourceEntry(entry, loadOptions, ref totalUncompressedSize);
 
-                if (entry.FullName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase) ||
-                    entry.FullName.EndsWith("styles.xml", StringComparison.OrdinalIgnoreCase))
+                if (entryName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase) ||
+                    entryName.EndsWith("styles.xml", StringComparison.OrdinalIgnoreCase))
                 {
-                    ZipArchiveEntry newEntry = destZip.CreateEntry(entry.FullName, CompressionLevel.Optimal);
+                    ZipArchiveEntry newEntry = destZip.CreateEntry(entryName, CompressionLevel.Optimal);
                     using Stream srcStream = entry.Open();
                     using Stream destStream = newEntry.Open();
 
-                    if (entry.FullName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase))
+                    if (entryName.EndsWith("content.xml", StringComparison.OrdinalIgnoreCase))
                     {
                         // 重播序列只能走訪一次；範本含多個 content.xml（如內嵌物件的
                         // Object 1/content.xml）時，後續項目改以來源序列重新列舉——
@@ -193,11 +209,16 @@ public static class OdfStreamingMailMerge
                 }
                 else
                 {
-                    ZipArchiveEntry newEntry = destZip.CreateEntry(entry.FullName, CompressionLevel.NoCompression);
+                    ZipArchiveEntry newEntry = destZip.CreateEntry(entryName, CompressionLevel.NoCompression);
                     using Stream srcStream = entry.Open();
                     using Stream destStream = newEntry.Open();
 
-                    await srcStream.CopyToAsync(destStream, 81920, cancellationToken).ConfigureAwait(false);
+                    await OdfBoundedStreamReader.CopyToAsync(
+                        srcStream,
+                        destStream,
+                        loadOptions.MaxEntrySize,
+                        "Err_OdfPackage_InputStreamSizeLimitExceeded",
+                        cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -205,6 +226,37 @@ public static class OdfStreamingMailMerge
         {
             await enumerator.DisposeAsync().ConfigureAwait(false);
         }
+    }
+
+    private static void ValidateEntryCount(ZipArchive sourceZip, OdfLoadOptions loadOptions)
+    {
+        if (sourceZip.Entries.Count > loadOptions.MaxZipEntries)
+        {
+            throw new SecurityException(
+                OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntryCountLimitExceeded", sourceZip.Entries.Count, loadOptions.MaxZipEntries));
+        }
+    }
+
+    private static string ValidateSourceEntry(
+        ZipArchiveEntry entry,
+        OdfLoadOptions loadOptions,
+        ref long totalUncompressedSize)
+    {
+        string entryName = OdfPackage.SanitizeEntryName(entry.FullName);
+        if (entry.Length > loadOptions.MaxEntrySize)
+        {
+            throw new SecurityException(
+                OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", entryName, entry.Length, loadOptions.MaxEntrySize));
+        }
+
+        totalUncompressedSize += entry.Length;
+        if (totalUncompressedSize > loadOptions.MaxTotalUncompressedSize)
+        {
+            throw new SecurityException(
+                OdfLocalizer.GetMessage("Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded", totalUncompressedSize, loadOptions.MaxTotalUncompressedSize));
+        }
+
+        return entryName;
     }
 
     private static async IAsyncEnumerable<IDictionary<string, object?>> ReplayFirstThenRest(

@@ -23,6 +23,9 @@ namespace OdfKit.Conversion;
 /// </summary>
 public static class XlsxToOdfConverter
 {
+    private const long MaxConverterPackageBytes = 1024L * 1024 * 1024;
+    private const long MaxConverterXmlCharactersInDocument = 64L * 1024 * 1024;
+
     /// <summary>
     /// 以禁用外部 DTD／實體解析的安全設定載入 XML 子部件，防禦 XXE。
     /// </summary>
@@ -32,6 +35,7 @@ public static class XlsxToOdfConverter
         {
             DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null,
+            MaxCharactersInDocument = MaxConverterXmlCharactersInDocument,
         };
         using XmlReader reader = XmlReader.Create(stream, settings);
         return XDocument.Load(reader);
@@ -51,7 +55,7 @@ public static class XlsxToOdfConverter
 
         var odsWorkbook = OdfKit.Spreadsheet.SpreadsheetDocument.Create();
         using var workbookStream = new MemoryStream();
-        xlsxStream.CopyTo(workbookStream);
+        CopyToBounded(xlsxStream, workbookStream, MaxConverterPackageBytes);
         workbookStream.Position = 0;
 
         if (HasPivotTables(workbookStream))
@@ -97,6 +101,23 @@ public static class XlsxToOdfConverter
         CopyPivotTables(workbookStream, odsWorkbook);
 
         return odsWorkbook;
+    }
+
+    private static void CopyToBounded(Stream source, Stream destination, long maxBytes)
+    {
+        byte[] buffer = new byte[81920];
+        long totalBytes = 0;
+        int bytesRead;
+        while ((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            totalBytes += bytesRead;
+            if (totalBytes > maxBytes)
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded", totalBytes, maxBytes));
+            }
+
+            destination.Write(buffer, 0, bytesRead);
+        }
     }
 
     private static bool HasPivotTables(Stream xlsxStream)

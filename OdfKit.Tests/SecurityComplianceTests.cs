@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Security;
 using System.Text;
 using Xunit;
@@ -37,6 +38,39 @@ namespace OdfKit.Tests
         {
             var result = OdfPackage.SanitizeEntryName(validPath);
             Assert.Equal(validPath.Replace('\\', '/'), result);
+        }
+
+        [Fact]
+        public void TestZipSlipDefense_RejectsInvalidZipEntryDuringLoad()
+        {
+            using var packageStream = new MemoryStream();
+            using (var archive = new ZipArchive(packageStream, ZipArchiveMode.Create, leaveOpen: true))
+            {
+                ZipArchiveEntry entry = archive.CreateEntry("../content.xml");
+                using Stream entryStream = entry.Open();
+                byte[] payload = Encoding.UTF8.GetBytes("<root/>");
+                entryStream.Write(payload, 0, payload.Length);
+            }
+
+            packageStream.Position = 0;
+
+            Assert.Throws<SecurityException>(() => OdfPackage.Open(packageStream, leaveOpen: true));
+        }
+
+        [Fact]
+        public void TestFlatXmlEmbeddedBinaryDataHonorsEntrySizeLimit()
+        {
+            string flatXml =
+                "<office:document xmlns:office=\"" + OdfNamespaces.Office + "\" " +
+                "xmlns:draw=\"" + OdfNamespaces.Draw + "\" " +
+                "office:mimetype=\"application/vnd.oasis.opendocument.text\">" +
+                "<office:body><office:text><draw:frame><draw:image>" +
+                "<office:binary-data>" + Convert.ToBase64String(new byte[8]) + "</office:binary-data>" +
+                "</draw:image></draw:frame></office:text></office:body></office:document>";
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(flatXml));
+            var options = new OdfLoadOptions { MaxEntrySize = 4 };
+
+            Assert.Throws<SecurityException>(() => OdfDocument.LoadFromFlatXml(stream, options));
         }
 
         [Fact]

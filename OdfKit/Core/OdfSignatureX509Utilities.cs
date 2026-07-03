@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
+using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
@@ -27,12 +28,19 @@ internal static class OdfSignatureX509Utilities
         {
             try
             {
-                byte[] rawData = Convert.FromBase64String(certificateNode.InnerText.Trim());
+                byte[] rawData = OdfSignatureVerifier.DecodeBase64WithLimit(
+                    certificateNode.InnerText,
+                    OdfSignatureVerifier.MaxEmbeddedCertificateBytes,
+                    "Err_OdfSignatureX509Utilities_EmbeddedCertificateSizeLimitExceeded");
 #if NET9_0_OR_GREATER
                 certificates.Add(X509CertificateLoader.LoadCertificate(rawData));
 #else
                 certificates.Add(new X509Certificate2(rawData));
 #endif
+            }
+            catch (SecurityException)
+            {
+                throw;
             }
             catch
             {

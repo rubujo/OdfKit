@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml;
@@ -25,6 +26,23 @@ namespace OdfKit.Conversion;
 /// </summary>
 public static class OdfToXlsxConverter
 {
+    private const long MaxConverterXmlCharactersInDocument = 64L * 1024 * 1024;
+
+    /// <summary>
+    /// 以禁用 DTD 與外部實體解析的安全設定載入 XML 子部件。
+    /// </summary>
+    private static XDocument LoadXDocumentSafely(Stream stream, long maxXmlCharactersInDocument)
+    {
+        var settings = new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null,
+            MaxCharactersInDocument = maxXmlCharactersInDocument > 0 ? maxXmlCharactersInDocument : 0
+        };
+        using XmlReader reader = XmlReader.Create(stream, settings);
+        return XDocument.Load(reader);
+    }
+
     /// <summary>
     /// Converts an ODF spreadsheet to XLSX.
     /// 將 ODS 工作簿轉換並寫入 XLSX 資料流。
@@ -33,6 +51,19 @@ public static class OdfToXlsxConverter
     /// <param name="xlsxStream">The source or target object. / 要寫入 XLSX 的目標資料流</param>
     /// <exception cref="ArgumentNullException">Thrown when the documented condition occurs. / 當任一必要參數為 null 時引發</exception>
     public static void Convert(OdfKit.Spreadsheet.SpreadsheetDocument odsWorkbook, Stream xlsxStream)
+    {
+        Convert(odsWorkbook, xlsxStream, MaxConverterXmlCharactersInDocument);
+    }
+
+    /// <summary>
+    /// Converts an ODF spreadsheet to XLSX with the specified XML character limit.
+    /// 使用指定的 XML 字元上限將 ODS 工作簿轉換並寫入 XLSX 資料流。
+    /// </summary>
+    /// <param name="odsWorkbook">The source ODS workbook. / 來源 ODS 工作簿。</param>
+    /// <param name="xlsxStream">The target XLSX stream. / 要寫入 XLSX 的目標資料流。</param>
+    /// <param name="maxXmlCharactersInDocument">The maximum XML characters per document; use 0 or a negative value to disable the limit. / 單一 XML 文件的最大字元數；設為 0 或負值時停用限制。</param>
+    /// <exception cref="ArgumentNullException">Thrown when a required argument is null. / 當必要參數為 null 時擲出。</exception>
+    public static void Convert(OdfKit.Spreadsheet.SpreadsheetDocument odsWorkbook, Stream xlsxStream, long maxXmlCharactersInDocument)
     {
         if (odsWorkbook is null)
             throw new ArgumentNullException(nameof(odsWorkbook));
@@ -47,7 +78,7 @@ public static class OdfToXlsxConverter
         {
             var xlSheet = xlWorkbook.Worksheets.Add(odsSheet.Name);
             CopySheetData(odsSheet, xlSheet);
-            chartSpecs.AddRange(ReadChartSpecs(odsWorkbook, odsSheet));
+            chartSpecs.AddRange(ReadChartSpecs(odsWorkbook, odsSheet, maxXmlCharactersInDocument));
         }
 
         // 依 ODF 1.4 schema，table:data-pilot-tables 是 office:spreadsheet 的直接子節點
@@ -87,13 +118,13 @@ public static class OdfToXlsxConverter
         xlWorkbook.SaveAs(workbookStream);
         if (chartSpecs.Count > 0)
         {
-            InjectCharts(workbookStream, chartSpecs);
-            NormalizeChartPartLocations(workbookStream);
+            InjectCharts(workbookStream, chartSpecs, maxXmlCharactersInDocument);
+            NormalizeChartPartLocations(workbookStream, maxXmlCharactersInDocument);
         }
 
         if (pivotSpecs.Count > 0)
         {
-            InjectPivotTables(workbookStream, pivotSpecs);
+            InjectPivotTables(workbookStream, pivotSpecs, maxXmlCharactersInDocument);
         }
 
         workbookStream.Position = 0;
@@ -118,7 +149,10 @@ public static class OdfToXlsxConverter
         CopyConditionalFormats(odsSheet, xlSheet);
     }
 
-    private static IEnumerable<ChartSpec> ReadChartSpecs(OdfKit.Spreadsheet.SpreadsheetDocument document, OdfTableSheet sheet)
+    private static IEnumerable<ChartSpec> ReadChartSpecs(
+        OdfKit.Spreadsheet.SpreadsheetDocument document,
+        OdfTableSheet sheet,
+        long maxXmlCharactersInDocument)
     {
         var visitedPaths = new HashSet<string>(StringComparer.Ordinal);
         foreach (var node in sheet.TableNode.Descendants())
@@ -141,7 +175,7 @@ public static class OdfToXlsxConverter
                 continue;
             }
 
-            ChartSpec? spec = ReadChartSpec(document.Package, contentPath, sheet.Name, node.Parent);
+            ChartSpec? spec = ReadChartSpec(document.Package, contentPath, sheet.Name, node.Parent, maxXmlCharactersInDocument);
             if (spec is not null)
             {
                 yield return spec;
@@ -157,7 +191,7 @@ public static class OdfToXlsxConverter
                 continue;
             }
 
-            ChartSpec? spec = ReadChartSpec(document.Package, entry.Path, sheet.Name, null);
+            ChartSpec? spec = ReadChartSpec(document.Package, entry.Path, sheet.Name, null, maxXmlCharactersInDocument);
             if (spec is not null)
             {
                 yield return spec;
@@ -165,12 +199,17 @@ public static class OdfToXlsxConverter
         }
     }
 
-    private static ChartSpec? ReadChartSpec(OdfPackage package, string contentPath, string sheetName, OdfNode? frameNode)
+    private static ChartSpec? ReadChartSpec(
+        OdfPackage package,
+        string contentPath,
+        string sheetName,
+        OdfNode? frameNode,
+        long maxXmlCharactersInDocument)
     {
         try
         {
             using Stream stream = package.GetEntryStream(contentPath);
-            var xml = XDocument.Load(stream);
+            var xml = LoadXDocumentSafely(stream, maxXmlCharactersInDocument);
             XNamespace chartNs = OdfNamespaces.Chart;
             XNamespace tableNs = OdfNamespaces.Table;
             XNamespace textNs = OdfNamespaces.Text;
@@ -305,7 +344,7 @@ public static class OdfToXlsxConverter
         return false;
     }
 
-    private static void InjectCharts(Stream xlsxStream, IReadOnlyList<ChartSpec> chartSpecs)
+    private static void InjectCharts(Stream xlsxStream, IReadOnlyList<ChartSpec> chartSpecs, long maxXmlCharactersInDocument)
     {
         xlsxStream.Position = 0;
         using var spreadsheet = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Open(xlsxStream, true);
@@ -412,7 +451,7 @@ public static class OdfToXlsxConverter
         }
     }
 
-    private static void NormalizeChartPartLocations(Stream xlsxStream)
+    private static void NormalizeChartPartLocations(Stream xlsxStream, long maxXmlCharactersInDocument)
     {
         xlsxStream.Position = 0;
         using var archive = new ZipArchive(xlsxStream, ZipArchiveMode.Update, leaveOpen: true);
@@ -450,11 +489,14 @@ public static class OdfToXlsxConverter
             entry.Delete();
         }
 
-        RewriteChartRelationships(archive, mappings);
-        RewriteChartContentTypes(archive, mappings);
+        RewriteChartRelationships(archive, mappings, maxXmlCharactersInDocument);
+        RewriteChartContentTypes(archive, mappings, maxXmlCharactersInDocument);
     }
 
-    private static void RewriteChartRelationships(ZipArchive archive, IReadOnlyDictionary<string, string> mappings)
+    private static void RewriteChartRelationships(
+        ZipArchive archive,
+        IReadOnlyDictionary<string, string> mappings,
+        long maxXmlCharactersInDocument)
     {
         XNamespace relNs = "http://schemas.openxmlformats.org/package/2006/relationships";
         foreach (ZipArchiveEntry relEntry in archive.Entries
@@ -465,7 +507,7 @@ public static class OdfToXlsxConverter
             XDocument rels;
             using (Stream stream = relEntry.Open())
             {
-                rels = XDocument.Load(stream);
+                rels = LoadXDocumentSafely(stream, maxXmlCharactersInDocument);
             }
 
             bool changed = false;
@@ -497,9 +539,12 @@ public static class OdfToXlsxConverter
         }
     }
 
-    private static void RewriteChartContentTypes(ZipArchive archive, IReadOnlyDictionary<string, string> mappings)
+    private static void RewriteChartContentTypes(
+        ZipArchive archive,
+        IReadOnlyDictionary<string, string> mappings,
+        long maxXmlCharactersInDocument)
     {
-        XDocument contentTypes = ReadZipXml(archive, "[Content_Types].xml");
+        XDocument contentTypes = ReadZipXml(archive, "[Content_Types].xml", maxXmlCharactersInDocument);
         XNamespace contentTypeNs = "http://schemas.openxmlformats.org/package/2006/content-types";
         foreach (XElement element in contentTypes.Root!.Elements(contentTypeNs + "Override"))
         {
@@ -764,13 +809,13 @@ public static class OdfToXlsxConverter
             : targetAddress.Replace('.', '!');
     }
 
-    private static void InjectPivotTables(Stream xlsxStream, IReadOnlyList<PivotSpec> pivotSpecs)
+    private static void InjectPivotTables(Stream xlsxStream, IReadOnlyList<PivotSpec> pivotSpecs, long maxXmlCharactersInDocument)
     {
         xlsxStream.Position = 0;
         using var archive = new ZipArchive(xlsxStream, ZipArchiveMode.Update, leaveOpen: true);
-        XDocument workbook = ReadZipXml(archive, "xl/workbook.xml");
-        XDocument workbookRels = ReadZipXml(archive, "xl/_rels/workbook.xml.rels");
-        XDocument contentTypes = ReadZipXml(archive, "[Content_Types].xml");
+        XDocument workbook = ReadZipXml(archive, "xl/workbook.xml", maxXmlCharactersInDocument);
+        XDocument workbookRels = ReadZipXml(archive, "xl/_rels/workbook.xml.rels", maxXmlCharactersInDocument);
+        XDocument contentTypes = ReadZipXml(archive, "[Content_Types].xml", maxXmlCharactersInDocument);
         XNamespace spreadsheetNs = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
         XNamespace relNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 
@@ -808,15 +853,15 @@ public static class OdfToXlsxConverter
                 new XAttribute("cacheId", cacheIndex),
                 new XAttribute(relNs + "id", cacheRelId)));
 
-            XDocument worksheet = ReadZipXml(archive, worksheetPath);
-            XDocument worksheetRels = ReadOrCreateRelsXml(archive, worksheetRelPath);
+            XDocument worksheet = ReadZipXml(archive, worksheetPath, maxXmlCharactersInDocument);
+            XDocument worksheetRels = ReadOrCreateRelsXml(archive, worksheetRelPath, maxXmlCharactersInDocument);
             string pivotRelId = AddRelationship(
                 worksheetRels,
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotTable",
                 "../pivotTables/pivotTable" + cacheIndex.ToString(CultureInfo.InvariantCulture) + ".xml");
             worksheet.Root!.Add(new XElement(spreadsheetNs + "pivotTableDefinition", new XAttribute(relNs + "id", pivotRelId)));
 
-            XDocument pivotRels = ReadOrCreateRelsXml(archive, pivotRelPath);
+            XDocument pivotRels = ReadOrCreateRelsXml(archive, pivotRelPath, maxXmlCharactersInDocument);
             AddRelationship(
                 pivotRels,
                 "http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheDefinition",
@@ -980,15 +1025,15 @@ public static class OdfToXlsxConverter
         };
     }
 
-    private static XDocument ReadZipXml(ZipArchive archive, string path)
+    private static XDocument ReadZipXml(ZipArchive archive, string path, long maxXmlCharactersInDocument)
     {
         ZipArchiveEntry entry = archive.GetEntry(path)
             ?? throw new FileNotFoundException(OdfLocalizer.GetMessage("Err_OdfToXlsxConverter_XlsxNotFound_6"), path);
         using Stream stream = entry.Open();
-        return XDocument.Load(stream);
+        return LoadXDocumentSafely(stream, maxXmlCharactersInDocument);
     }
 
-    private static XDocument ReadOrCreateRelsXml(ZipArchive archive, string path)
+    private static XDocument ReadOrCreateRelsXml(ZipArchive archive, string path, long maxXmlCharactersInDocument)
     {
         ZipArchiveEntry? entry = archive.GetEntry(path);
         if (entry is null)
@@ -998,7 +1043,7 @@ public static class OdfToXlsxConverter
         }
 
         using Stream stream = entry.Open();
-        return XDocument.Load(stream);
+        return LoadXDocumentSafely(stream, maxXmlCharactersInDocument);
     }
 
     private static void WriteZipXml(ZipArchive archive, string path, XDocument xml)

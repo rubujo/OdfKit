@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
+using OdfKit.Compliance;
+
 namespace OdfKit.Core;
 
 /// <summary>
@@ -10,6 +12,10 @@ namespace OdfKit.Core;
 /// </summary>
 internal static partial class OdfSignatureVerifier
 {
+    internal const long MaxEmbeddedCertificateBytes = 1024 * 1024;
+    internal const long MaxEmbeddedTimestampBytes = 1024 * 1024;
+    internal const long MaxEmbeddedCrlBytes = 10 * 1024 * 1024;
+
     /// <summary>
     /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果（非同步）。
     /// </summary>
@@ -38,10 +44,17 @@ internal static partial class OdfSignatureVerifier
 
         try
         {
-            var doc = new XmlDocument();
+            var doc = new XmlDocument { XmlResolver = null };
             using (var stream = package.GetEntryStream(OdfSignerConstants.SignaturePath))
             {
-                var readerSettings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null };
+                var readerSettings = new XmlReaderSettings
+                {
+                    DtdProcessing = DtdProcessing.Prohibit,
+                    XmlResolver = null,
+                    MaxCharactersInDocument = package.LoadOptions.MaxXmlCharactersInDocument > 0
+                        ? package.LoadOptions.MaxXmlCharactersInDocument
+                        : 0
+                };
                 using var reader = XmlReader.Create(stream, readerSettings);
                 doc.Load(reader);
             }
@@ -89,5 +102,25 @@ internal static partial class OdfSignatureVerifier
             result.IsValid = false;
             return result;
         }
+    }
+
+    internal static byte[] DecodeBase64WithLimit(string value, long maxDecodedBytes, string errorMessageKey)
+    {
+        string trimmed = value.Trim();
+        long maxBase64Length = ((maxDecodedBytes + 2) / 3) * 4;
+        if (maxDecodedBytes > 0 && trimmed.Length > maxBase64Length)
+        {
+            throw new System.Security.SecurityException(
+                OdfLocalizer.GetMessage(errorMessageKey, trimmed.Length, maxBase64Length));
+        }
+
+        byte[] decoded = Convert.FromBase64String(trimmed);
+        if (maxDecodedBytes > 0 && decoded.LongLength > maxDecodedBytes)
+        {
+            throw new System.Security.SecurityException(
+                OdfLocalizer.GetMessage(errorMessageKey, decoded.LongLength, maxDecodedBytes));
+        }
+
+        return decoded;
     }
 }

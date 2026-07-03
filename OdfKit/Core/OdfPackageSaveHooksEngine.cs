@@ -30,6 +30,7 @@ internal static class OdfPackageSaveHooksEngine
                 MaxZipEntries = ctx.LoadOptions.MaxZipEntries,
                 MaxEntrySize = ctx.LoadOptions.MaxEntrySize,
                 MaxTotalUncompressedSize = ctx.LoadOptions.MaxTotalUncompressedSize,
+                MaxPackageSize = ctx.LoadOptions.MaxPackageSize,
                 MaxXmlCharactersInDocument = ctx.LoadOptions.MaxXmlCharactersInDocument,
                 Password = ctx.LoadOptions.Password,
                 CryptographyProvider = ctx.LoadOptions.CryptographyProvider,

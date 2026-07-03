@@ -65,6 +65,7 @@ internal static class OdfPackageEntryAccessEngine
         name = OdfPackage.SanitizeEntryName(name);
         string resolvedMediaType = OdfPackageMediaTypeResolver.Resolve(name, mediaType);
         bool isCompressed = true;
+        bool existed = ctx.Entries.ContainsKey(name);
         if (ctx.Entries.TryGetValue(name, out var oldEntry))
         {
             isCompressed = oldEntry.IsCompressed;
@@ -72,6 +73,8 @@ internal static class OdfPackageEntryAccessEngine
         OdfPackageEntry entry = new(name, content) { IsCompressed = isCompressed };
         ctx.Entries[name] = entry;
         ctx.Manifest[name] = resolvedMediaType;
+        if (!existed && !ctx.EntryOrder.Contains(name))
+            ctx.EntryOrder.Add(name);
 
         if (name.EndsWith("/mimetype") && name.Length > 9)
         {
@@ -94,24 +97,32 @@ internal static class OdfPackageEntryAccessEngine
         name = OdfPackage.SanitizeEntryName(name);
         string resolvedMediaType = OdfPackageMediaTypeResolver.Resolve(name, mediaType);
         bool isCompressed = true;
+        bool existed = ctx.Entries.ContainsKey(name);
         if (ctx.Entries.TryGetValue(name, out var oldEntry))
         {
             isCompressed = oldEntry.IsCompressed;
         }
-        OdfPackageEntry entry = new(name, contentStream) { IsCompressed = isCompressed };
+        byte[] bytes;
+        if (contentStream.CanSeek)
+        {
+            contentStream.Position = 0;
+        }
+
+        using (MemoryStream ms = new())
+        {
+            contentStream.CopyTo(ms);
+            bytes = ms.ToArray();
+        }
+
+        OdfPackageEntry entry = new(name, bytes) { IsCompressed = isCompressed };
         ctx.Entries[name] = entry;
         ctx.Manifest[name] = resolvedMediaType;
+        if (!existed && !ctx.EntryOrder.Contains(name))
+            ctx.EntryOrder.Add(name);
 
         if (name.EndsWith("/mimetype") && name.Length > 9)
         {
             string folder = name.Substring(0, name.Length - 8);
-            byte[] bytes;
-            using (MemoryStream ms = new())
-            {
-                contentStream.CopyTo(ms);
-                bytes = ms.ToArray();
-            }
-            entry.SetContent(bytes);
             string mimeText = Encoding.UTF8.GetString(bytes).Trim();
             ctx.Manifest[folder] = mimeText;
         }

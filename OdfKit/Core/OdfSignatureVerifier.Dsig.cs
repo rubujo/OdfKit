@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Threading;
@@ -28,13 +29,24 @@ internal static partial class OdfSignatureVerifier
         {
             try
             {
-                embeddedCrls.Add(Convert.FromBase64String(crlNode.InnerText.Trim()));
+                embeddedCrls.Add(DecodeBase64WithLimit(
+                    crlNode.InnerText,
+                    MaxEmbeddedCrlBytes,
+                    "Err_OdfSignatureVerifier_EmbeddedCrlSizeLimitExceeded"));
             }
             catch (FormatException ex)
             {
                 singleResult.IsRevocationValid = false;
                 singleResult.ErrorCode = "CRL_INVALID_FORMAT";
                 singleResult.ErrorMessage = $"Embedded CRL is not valid Base64: {ex.Message}";
+                singleResult.Warnings.Add(singleResult.ErrorMessage);
+                return false;
+            }
+            catch (SecurityException ex)
+            {
+                singleResult.IsRevocationValid = false;
+                singleResult.ErrorCode = "CRL_SIZE_LIMIT_EXCEEDED";
+                singleResult.ErrorMessage = ex.Message;
                 singleResult.Warnings.Add(singleResult.ErrorMessage);
                 return false;
             }

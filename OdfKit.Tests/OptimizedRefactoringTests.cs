@@ -994,6 +994,48 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
+    public void Test_OdfPackage_WriteEntry_NewEntryRoundTripsAfterSave()
+    {
+        using var ms = new MemoryStream();
+        using (var package = OdfPackage.Create(ms, leaveOpen: true))
+        {
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+            package.WriteEntry("meta/custom.txt", Encoding.UTF8.GetBytes("custom"), "text/plain");
+            package.Save();
+        }
+
+        ms.Position = 0;
+        using var reloaded = OdfPackage.Open(ms, leaveOpen: true);
+        Assert.Equal(Encoding.UTF8.GetBytes("custom"), reloaded.ReadEntry("meta/custom.txt"));
+    }
+
+    [Fact]
+    public void Test_OdfPackage_WriteEntry_StreamContentIsPackageOwned()
+    {
+        using var ms = new MemoryStream();
+        using (var package = OdfPackage.Create(ms, leaveOpen: true))
+        {
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            using var source = new MemoryStream(Encoding.UTF8.GetBytes("stream-owned"));
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+            package.WriteEntry("meta/stream.txt", source, "text/plain");
+            using (Stream readStream = package.GetEntryStream("meta/stream.txt"))
+            {
+                using var reader = new StreamReader(readStream, Encoding.UTF8);
+                Assert.Equal("stream-owned", reader.ReadToEnd());
+            }
+
+            Assert.True(source.CanRead);
+            package.Save();
+        }
+
+        ms.Position = 0;
+        using var reloaded = OdfPackage.Open(ms, leaveOpen: true);
+        Assert.Equal(Encoding.UTF8.GetBytes("stream-owned"), reloaded.ReadEntry("meta/stream.txt"));
+    }
+
+    [Fact]
     public void Test_OdfPackage_RawEntryPatch_StoredEntry_RoundTripsWithUpdatedCrc()
     {
         string tempFile = Path.Combine(Path.GetTempPath(), $"raw_patch_{Guid.NewGuid():N}.ods");
@@ -1742,6 +1784,35 @@ public partial class OptimizedRefactoringTests
         var ex = Assert.Throws<SecurityException>(() => OdfPackage.Open(packageStream, leaveOpen: true, options));
 
         Assert.Equal(OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntryCountLimitExceeded", 2, 1), ex.Message);
+    }
+
+    [Fact]
+    public void Test_OdfPackage_FilePathZipEntryCountLimit_UsesLocalizedException()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"entry_count_{Guid.NewGuid():N}.odt");
+        try
+        {
+            using (MemoryStream packageStream = CreateZipPackage(
+                ("content.xml", Encoding.UTF8.GetBytes("<root/>")),
+                ("styles.xml", Encoding.UTF8.GetBytes("<root/>"))))
+            using (FileStream fileStream = File.Create(tempFile))
+            {
+                packageStream.CopyTo(fileStream);
+            }
+
+            var options = new OdfLoadOptions { MaxZipEntries = 1 };
+
+            var ex = Assert.Throws<SecurityException>(() => OdfPackage.Open(tempFile, options));
+
+            Assert.Equal(OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntryCountLimitExceeded", 2, 1), ex.Message);
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
     }
 
     [Fact]

@@ -92,6 +92,18 @@ internal sealed class OdfMmfEntryInfo
     }
 }
 
+internal sealed class OdfMmfZipDirectoryInfo(
+    Dictionary<string, OdfMmfEntryInfo> entries,
+    int entryCount,
+    List<string> duplicateEntryNames)
+{
+    public Dictionary<string, OdfMmfEntryInfo> Entries { get; } = entries;
+
+    public int EntryCount { get; } = entryCount;
+
+    public List<string> DuplicateEntryNames { get; } = duplicateEntryNames;
+}
+
 /// <summary>
 /// 用於解析 ZIP 檔案中央目錄（Central Directory）以取得各專案偏移量與大小的快速二進位解析器。
 /// </summary>
@@ -100,7 +112,7 @@ internal static class OdfZipDirectoryParser
     /// <summary>
     /// 解析指定資料流中的中央目錄，並傳回各專案的映射資訊。
     /// </summary>
-    public static Dictionary<string, OdfMmfEntryInfo>? ParseCentralDirectory(Stream stream)
+    public static OdfMmfZipDirectoryInfo? ParseCentralDirectory(Stream stream)
     {
         try
         {
@@ -109,6 +121,7 @@ internal static class OdfZipDirectoryParser
                 return null;
 
             var entries = new Dictionary<string, OdfMmfEntryInfo>(StringComparer.Ordinal);
+            var duplicateEntryNames = new List<string>();
             using (var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true))
             {
                 stream.Position = eocdOffset + 10;
@@ -162,13 +175,19 @@ internal static class OdfZipDirectoryParser
                             long dataOffset = localHeaderOffset + 30 + lfhNameLen + lfhExtraLen;
 
                             string sanitized = OdfPackage.SanitizeEntryName(fileName);
+                            if (entries.ContainsKey(sanitized))
+                            {
+                                duplicateEntryNames.Add(sanitized);
+                            }
+
                             entries[sanitized] = new OdfMmfEntryInfo(sanitized, dataOffset, compressedSize, uncompressedSize, compressionMethod, crc32, localHeaderOffset, flags, timeDate);
                         }
                     }
                     stream.Position = savedPos;
                 }
+
+                return new OdfMmfZipDirectoryInfo(entries, totalRecords, duplicateEntryNames);
             }
-            return entries;
         }
         catch
         {

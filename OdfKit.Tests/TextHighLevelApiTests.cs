@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -75,6 +76,39 @@ public class TextHighLevelApiTests
             template,
             output,
             new Dictionary<string, object?>(),
+            TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>
+    /// 驗證流式套印會拒絕可能逃出 ODF 封裝的 ZIP 項目路徑。
+    /// </summary>
+    [Fact]
+    public async Task StreamingMailMerge_RejectsUnsafeZipEntryNames()
+    {
+        using var template = new MemoryStream();
+        using (var archive = new ZipArchive(template, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            WriteZipEntry(archive, "mimetype", "application/vnd.oasis.opendocument.text");
+            WriteZipEntry(
+                archive,
+                "content.xml",
+                """
+                <?xml version="1.0" encoding="utf-8"?>
+                <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                                         xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+                  <office:body><office:text><text:p>{{Name}}</text:p></office:text></office:body>
+                </office:document-content>
+                """);
+            WriteZipEntry(archive, "../payload.bin", "escape");
+        }
+
+        template.Position = 0;
+        using MemoryStream output = new();
+
+        await Assert.ThrowsAsync<SecurityException>(() => OdfStreamingMailMerge.ApplyTemplateAsync(
+            template,
+            output,
+            new Dictionary<string, object?> { ["Name"] = "Ada" },
             TestContext.Current.CancellationToken));
     }
 

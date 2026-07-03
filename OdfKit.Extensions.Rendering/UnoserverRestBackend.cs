@@ -5,6 +5,8 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
+using OdfKit.Compliance;
+
 namespace OdfKit.Extensions.Rendering;
 
 /// <summary>
@@ -13,6 +15,9 @@ namespace OdfKit.Extensions.Rendering;
 /// </summary>
 public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
 {
+    private const long MaxRequestBytes = 1024L * 1024 * 1024;
+    private const long MaxResponseBytes = 1024L * 1024 * 1024;
+
     private readonly HttpClient _httpClient;
     private readonly string _endpoint;
 
@@ -69,7 +74,8 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
                 input.Position = 0;
             }
 
-            await input.CopyToAsync(buffer, 81920, ct).ConfigureAwait(false);
+            await CopyToBoundedAsync(input, buffer, MaxRequestBytes, "Err_UnoserverRestBackend_RequestSizeLimitExceeded", ct)
+                .ConfigureAwait(false);
             inputBytes = buffer.ToArray();
         }
 
@@ -108,16 +114,54 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         var convertToContent = new StringContent(convertTo);
         requestContent.Add(convertToContent, "convert-to");
 
-        var response = await _httpClient.PostAsync(_endpoint, requestContent, ct).ConfigureAwait(false);
+        using var request = new HttpRequestMessage(HttpMethod.Post, _endpoint)
+        {
+            Content = requestContent
+        };
+
+        using HttpResponseMessage response = await _httpClient
+            .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct)
+            .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
         // 讀取為 MemoryStream，防止與原網路連線生命週期強綁定，導致呼叫端讀取時連線已關閉。
-        var ms = new MemoryStream();
+        long? responseLength = response.Content.Headers.ContentLength;
+        if (responseLength.HasValue && responseLength.Value > MaxResponseBytes)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage("Err_UnoserverRestBackend_ResponseSizeLimitExceeded", responseLength.Value, MaxResponseBytes));
+        }
+
+        var ms = new MemoryStream(responseLength.HasValue && responseLength.Value <= int.MaxValue
+            ? (int)responseLength.Value
+            : 0);
         using (var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
         {
-            await responseStream.CopyToAsync(ms, 81920, ct).ConfigureAwait(false);
+            await CopyToBoundedAsync(responseStream, ms, MaxResponseBytes, "Err_UnoserverRestBackend_ResponseSizeLimitExceeded", ct)
+                .ConfigureAwait(false);
         }
         ms.Position = 0;
         return ms;
+    }
+
+    private static async Task CopyToBoundedAsync(
+        Stream source,
+        Stream destination,
+        long maxBytes,
+        string errorMessageKey,
+        CancellationToken cancellationToken)
+    {
+        byte[] buffer = new byte[81920];
+        long totalBytes = 0;
+        int bytesRead;
+        while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
+        {
+            totalBytes += bytesRead;
+            if (totalBytes > maxBytes)
+            {
+                throw new InvalidDataException(OdfLocalizer.GetMessage(errorMessageKey, totalBytes, maxBytes));
+            }
+
+            await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+        }
     }
 }

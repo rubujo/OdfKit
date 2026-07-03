@@ -17,6 +17,9 @@ namespace OdfKit.Core;
 /// </summary>
 internal static class OdfSignatureTsaClient
 {
+    private const long MaxCrlResponseBytes = 10 * 1024 * 1024;
+    private const long MaxTsaResponseBytes = 1024 * 1024;
+
     private static readonly HttpClient s_httpClient = new();
 
     internal static async Task<byte[]> DownloadCrlAsync(
@@ -27,9 +30,15 @@ internal static class OdfSignatureTsaClient
         cancellationToken.ThrowIfCancellationRequested();
 
         var client = httpClient ?? s_httpClient;
-        using HttpResponseMessage response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
+        using HttpResponseMessage response = await client
+            .GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+        return await OdfBoundedStreamReader.ReadHttpContentAsync(
+            response.Content,
+            MaxCrlResponseBytes,
+            "Err_OdfSignatureTsaClient_ResponseSizeLimitExceeded",
+            cancellationToken).ConfigureAwait(false);
     }
 
     internal static async Task<byte[]> QueryTsaAsync(
@@ -47,10 +56,16 @@ internal static class OdfSignatureTsaClient
         request.Content = new ByteArrayContent(requestBytes);
         request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/timestamp-query");
 
-        using HttpResponseMessage response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        using HttpResponseMessage response = await client
+            .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+        return await OdfBoundedStreamReader.ReadHttpContentAsync(
+            response.Content,
+            MaxTsaResponseBytes,
+            "Err_OdfSignatureTsaClient_ResponseSizeLimitExceeded",
+            cancellationToken).ConfigureAwait(false);
     }
 
     internal static byte[] ExtractTimestampToken(byte[] responseBytes)

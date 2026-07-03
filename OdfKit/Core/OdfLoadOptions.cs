@@ -36,6 +36,16 @@ public class OdfLoadOptions
     public long MaxTotalUncompressedSize { get; set; } = 1024 * 1024 * 1024;
 
     /// <summary>
+    /// Gets or sets the maximum raw package byte count for non-seekable input streams.
+    /// 取得或設定不可搜尋輸入串流的原始封裝位元組數上限。
+    /// </summary>
+    /// <remarks>
+    /// This limit applies before ZIP entry expansion and is separate from <see cref="MaxTotalUncompressedSize"/>.
+    /// 此限制套用於 ZIP 項目展開之前，且與 <see cref="MaxTotalUncompressedSize"/> 分開計算。
+    /// </remarks>
+    public long MaxPackageSize { get; set; } = 1024 * 1024 * 1024;
+
+    /// <summary>
     /// 取得或設定單一 XML 文件可讀取的最大字元數限制（預設 64 MB，防禦 XML DoS）。
     /// </summary>
     /// <remarks>
