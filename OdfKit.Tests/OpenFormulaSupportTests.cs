@@ -147,6 +147,23 @@ public class OpenFormulaSupportTests
     }
 
     /// <summary>
+    /// Verifies that exponentiation binds tighter than unary minus, per the OpenFormula grammar.
+    /// 驗證冪次運算的優先順序高於一元負號，符合 OpenFormula 語法規範。
+    /// </summary>
+    [Fact]
+    public void ExponentiationBindsTighterThanUnaryMinus()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new FormulaAndStylesTest.MockEvaluationContext();
+
+        double negatedSquare = Assert.IsType<double>(evaluator.Evaluate("-2^2", context));
+        double negativeExponent = Assert.IsType<double>(evaluator.Evaluate("2^-2", context));
+
+        Assert.Equal(-4d, negatedSquare);
+        Assert.Equal(0.25d, negativeExponent);
+    }
+
+    /// <summary>
     /// 驗證 LibreOffice ISOMITTED 擴充函式依引數數量回傳結果。
     /// </summary>
     [Fact]

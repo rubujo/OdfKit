@@ -53,7 +53,10 @@ public static class OdfPdfExporter
         var migraDoc = BuildMigraDoc(document);
         var renderer = new PdfDocumentRenderer { Document = migraDoc };
         renderer.RenderDocument();
-        renderer.PdfDocument.Save(pdfStream);
+        using (renderer.PdfDocument)
+        {
+            renderer.PdfDocument.Save(pdfStream);
+        }
     }
 
     private static Document BuildMigraDoc(TextDocument odfDoc)

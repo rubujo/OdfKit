@@ -57,12 +57,12 @@ public partial class OdfSlide
         var frame = CreateDrawingFrame(x, y, w, h);
         OdfNode objNode = new(OdfNodeType.Element, "object", OdfNamespaces.Draw, "draw");
 
-        string href = subPath;
+        string href = subPath.Replace('\\', '/');
         if (!href.StartsWith("./"))
         {
             href = "./" + href;
         }
-        if (href.EndsWith("/"))
+        if (href.Length > 2 && href.EndsWith("/"))
         {
             href = href.Substring(0, href.Length - 1);
         }

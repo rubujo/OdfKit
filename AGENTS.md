@@ -7,7 +7,7 @@
 ## 1. 專案背景與技術棧
 - **專案名稱**：OdfKit
 - **程式語言**：C# / .NET
-- **目標架構**：`net10.0` 與 `netstandard2.0`（雙平台編譯）
+- **目標架構**：核心 `OdfKit` 及全部 `OdfKit.Extensions.*` 擴充套件為 `net10.0` 與 `netstandard2.0`（雙平台編譯）；`OdfKit.Tests` 與 `tools/OdfKit.Cli` 為 `net10.0` 與 `net8.0`（雙 TFM，非 netstandard2.0）；`tools/OdfSchemaGenerator` 與 `OdfKit.Tests/MockSoffice` 僅為 `net8.0`；`OdfKit.Benchmarks`、`tools/OdfCorpusGenerator`、`tools/OdfKit.TrimSmoke` 僅為 `net10.0`。詳細版本請以各專案之 `.csproj` 為準。
 - **核心第三方相依套件**（詳細版本參見專案檔，如 `OdfKit.csproj`；`PDFsharp` 等格式擴充套件相依僅存在於對應的 `OdfKit.Extensions.*` 專案，不屬於核心套件）：
   - `BouncyCastle.Cryptography` (採用 MIT 授權)
   - `CommunityToolkit.HighPerformance` (採用 MIT 授權)

@@ -31,4 +31,11 @@ public sealed class OdfCsvOptions
     /// 取得或設定匯出時的工作表索引（從 0 開始），預設為 0。
     /// </summary>
     public int ExportSheetIndex { get; init; } = 0;
+
+    /// <summary>
+    /// Gets or sets whether text values starting with formula-trigger characters (<c>=</c>, <c>+</c>, <c>-</c>, <c>@</c>, tab, or carriage return)
+    /// are prefixed with a single quote before being written to CSV, mitigating CSV formula injection when the file is opened in spreadsheet applications. Defaults to <see langword="true"/>.
+    /// 取得或設定是否在匯出時，將以公式觸發字元（<c>=</c>、<c>+</c>、<c>-</c>、<c>@</c>、跳格字元或歸位字元）開頭的文字值前面加上一個單引號，以防範 CSV 於試算表應用程式開啟時遭到公式注入攻擊，預設為 <see langword="true"/>。
+    /// </summary>
+    public bool SanitizeFormulas { get; init; } = true;
 }

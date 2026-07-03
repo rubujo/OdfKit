@@ -102,32 +102,23 @@ public ref struct FormulaParser
     // 優先權 4：因數運算 (*, /)
     private AstNode ParseFactor()
     {
-        var node = ParsePower();
+        var node = ParseUnary();
         while (_currentToken.Type == FormulaTokenType.Operator &&
               (_currentToken.Span.Equals("*", StringComparison.Ordinal) || _currentToken.Span.Equals("/", StringComparison.Ordinal)))
         {
             string op = _currentToken.Span.ToString();
             Consume();
-            var right = ParsePower();
+            var right = ParseUnary();
             node = new BinaryNode(op, node, right);
         }
         return node;
     }
 
-    // 優先權 5：乘方運算 (^)（右結合）
-    private AstNode ParsePower()
-    {
-        var node = ParseUnary();
-        if (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("^", StringComparison.Ordinal))
-        {
-            Consume();
-            var right = ParsePower();
-            node = new BinaryNode("^", node, right);
-        }
-        return node;
-    }
-
-    // 優先權 6：單元運算 (+, -, %)
+    // 優先權 5：單元運算 (+, -)
+    // 依 OpenFormula 規範，乘方運算的結合優先權高於單元負號，
+    // 例如 -2^2 應等於 -(2^2) = -4，而非 (-2)^2 = 4。
+    // Per the OpenFormula spec, exponentiation binds tighter than unary minus,
+    // e.g. -2^2 should equal -(2^2) = -4, not (-2)^2 = 4.
     private AstNode ParseUnary()
     {
         if (_currentToken.Type == FormulaTokenType.Operator &&
@@ -139,6 +130,25 @@ public ref struct FormulaParser
             return new UnaryNode(op, child);
         }
 
+        return ParsePower();
+    }
+
+    // 優先權 6：乘方運算 (^)（右結合，指數本身允許帶單元負號，如 2^-2）
+    private AstNode ParsePower()
+    {
+        var node = ParsePercent();
+        if (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("^", StringComparison.Ordinal))
+        {
+            Consume();
+            var right = ParseUnary();
+            node = new BinaryNode("^", node, right);
+        }
+        return node;
+    }
+
+    // 優先權 7：百分比後綴運算 (%)
+    private AstNode ParsePercent()
+    {
         var node = ParseReferenceExpression();
 
         while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("%", StringComparison.Ordinal))

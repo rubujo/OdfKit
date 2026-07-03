@@ -155,6 +155,52 @@ public class CsvImportExportTests
     }
 
     /// <summary>
+    /// Verifies that ExportToStream prefixes dangerous leading characters with an apostrophe by default, per OWASP CSV injection guidance.
+    /// 驗證 ExportToStream 預設會為具危險起始字元的儲存格加上單引號前綴，符合 OWASP CSV 注入防護建議。
+    /// </summary>
+    [Fact]
+    public void ExportToStream_SanitizesFormulaInjectionCharactersByDefault()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        var sheet = workbook.Worksheets.Add("Test");
+        sheet.Cells[0, 0].CellValue = "=1+1";
+        sheet.Cells[0, 1].CellValue = "+SUM(A1)";
+        sheet.Cells[0, 2].CellValue = "-2";
+        sheet.Cells[0, 3].CellValue = "@cmd";
+        sheet.Cells[1, 0].CellValue = "安全文字";
+
+        using var ms = new MemoryStream();
+        OdfCsvExporter.ExportToStream(workbook, ms);
+        string csv = Encoding.UTF8.GetString(ms.ToArray());
+
+        Assert.Contains("'=1+1", csv);
+        Assert.Contains("'+SUM(A1)", csv);
+        Assert.Contains("'-2", csv);
+        Assert.Contains("'@cmd", csv);
+        Assert.Contains("安全文字", csv);
+        Assert.DoesNotContain("'安全文字", csv);
+    }
+
+    /// <summary>
+    /// Verifies that setting SanitizeFormulas to false preserves the original leading characters unmodified.
+    /// 驗證將 SanitizeFormulas 設為 false 時，會保留原始起始字元而不做修改。
+    /// </summary>
+    [Fact]
+    public void ExportToStream_SanitizeFormulasDisabled_PreservesOriginalValue()
+    {
+        using var workbook = SpreadsheetDocument.Create();
+        var sheet = workbook.Worksheets.Add("Test");
+        sheet.Cells[0, 0].CellValue = "=1+1";
+
+        using var ms = new MemoryStream();
+        OdfCsvExporter.ExportToStream(workbook, ms, new OdfCsvOptions { SanitizeFormulas = false });
+        string csv = Encoding.UTF8.GetString(ms.ToArray());
+
+        Assert.Contains("=1+1", csv);
+        Assert.DoesNotContain("'=1+1", csv);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="OdfCsvImporter.ImportFromFile"/> 可正確從實體檔案路徑讀取並建立試算表文件。
     /// </summary>
     [Fact]

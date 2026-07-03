@@ -1,5 +1,4 @@
-﻿using System;
-using OdfKit.Core;
+﻿using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Chart;
@@ -8,23 +7,23 @@ namespace OdfKit.Chart;
 /// Represents high-level summary information for a chart data series.
 /// 表示圖表資料序列的高階摘要。
 /// </summary>
-/// <param name="valuesCellRangeAddress">The data value cell range address. / 資料值儲存格範圍位址。</param>
+/// <param name="valuesCellRangeAddress">The data value cell range address, or <see langword="null"/> when the series uses embedded chart data instead of a linked cell range. / 資料值儲存格範圍位址，若序列使用內嵌圖表資料而非連結儲存格範圍時為 <see langword="null"/>。</param>
 /// <param name="labelCellAddress">The optional label cell address. / 選用的標籤儲存格位址。</param>
 /// <param name="seriesClass">The series class (e.g. <c>chart:line</c>). / 序列類型（例如 <c>chart:line</c>）。</param>
 /// <param name="styleName">The series style name. / 序列樣式名稱。</param>
 /// <param name="attachedAxis">The name of the attached axis. / 附著的座標軸名稱。</param>
 public sealed class OdfChartSeriesInfo(
-    string valuesCellRangeAddress,
+    string? valuesCellRangeAddress,
     string? labelCellAddress,
     string? seriesClass,
     string? styleName,
     string? attachedAxis)
 {
     /// <summary>
-    /// Gets the data value cell range address.
-    /// 取得資料值儲存格範圍位址。
+    /// Gets the data value cell range address, or <see langword="null"/> when the series uses embedded chart data.
+    /// 取得資料值儲存格範圍位址，若序列使用內嵌圖表資料則為 <see langword="null"/>。
     /// </summary>
-    public string ValuesCellRangeAddress { get; } = valuesCellRangeAddress ?? throw new ArgumentNullException(nameof(valuesCellRangeAddress));
+    public string? ValuesCellRangeAddress { get; } = valuesCellRangeAddress;
 
     /// <summary>
     /// Gets the optional label cell address.

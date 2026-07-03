@@ -338,6 +338,30 @@ public class ChartHighLevelApiTests
     }
 
     /// <summary>
+    /// Verifies that a series backed by embedded chart data (no chart:values-cell-range-address attribute) is still surfaced by Series instead of being silently dropped.
+    /// 驗證使用內嵌圖表資料（無 chart:values-cell-range-address 屬性）的序列仍會由 Series 回傳，而非被靜默捨棄。
+    /// </summary>
+    [Fact]
+    public void Series_IncludesSeriesWithoutLinkedCellRange()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+        chartDoc.AddSeries("Sheet1.$B$2:.$B$5");
+
+        OdfNode plotArea = chartDoc.ChartNode.Children.Single(
+            c => c.NodeType == OdfNodeType.Element && c.LocalName == "plot-area" && c.NamespaceUri == OdfNamespaces.Chart);
+        OdfNode embeddedSeries = OdfNodeFactory.CreateElement("series", OdfNamespaces.Chart, "chart");
+        embeddedSeries.SetAttribute("class", OdfNamespaces.Chart, "bar", "chart");
+        plotArea.AppendChild(embeddedSeries);
+
+        var series = chartDoc.Series;
+
+        Assert.Equal(2, series.Count);
+        Assert.Equal("Sheet1.$B$2:.$B$5", series[0].ValuesCellRangeAddress);
+        Assert.Null(series[1].ValuesCellRangeAddress);
+        Assert.Equal("bar", series[1].SeriesClass);
+    }
+
+    /// <summary>
     /// 驗證 OdfTableSheet.InsertChart() 在 ODS 套件中建立嵌入圖表物件，
     /// 並可透過 GetDataRange() 驗證資料繫結已正確持久化。
     /// </summary>

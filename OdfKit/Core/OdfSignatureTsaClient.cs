@@ -20,7 +20,10 @@ internal static class OdfSignatureTsaClient
     private const long MaxCrlResponseBytes = 10 * 1024 * 1024;
     private const long MaxTsaResponseBytes = 1024 * 1024;
 
-    private static readonly HttpClient s_httpClient = new();
+    // 預設逾時 30 秒，避免呼叫端未提供自訂 HttpClient 時，TSA／CRL 連線因網路異常而無限期掛起。
+    // Default timeout of 30 seconds, to avoid indefinitely hanging TSA/CRL connections
+    // when the caller does not supply a custom HttpClient.
+    private static readonly HttpClient s_httpClient = new() { Timeout = TimeSpan.FromSeconds(30) };
 
     internal static async Task<byte[]> DownloadCrlAsync(
         string url,

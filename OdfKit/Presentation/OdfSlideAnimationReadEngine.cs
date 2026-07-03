@@ -83,7 +83,7 @@ internal static class OdfSlideAnimationReadEngine
         animations.Add(new OdfAnimationInfo(
             kind,
             targetElementId!,
-            ParseEffect(presetId, kind),
+            ParseEffect(presetId),
             ResolveEffectTrigger(effectPar),
             presetId,
             effectPar.GetAttribute("dur", SmilNs),
@@ -212,7 +212,7 @@ internal static class OdfSlideAnimationReadEngine
         }
     }
 
-    private static OdfAnimationEffect ParseEffect(string? presetId, OdfAnimationKind kind)
+    private static OdfAnimationEffect ParseEffect(string? presetId)
     {
         if (string.IsNullOrEmpty(presetId))
             return OdfAnimationEffect.Appear;
@@ -224,7 +224,12 @@ internal static class OdfSlideAnimationReadEngine
         if (presetId.Contains("fly", StringComparison.OrdinalIgnoreCase))
             return OdfAnimationEffect.FlyIn;
 
-        return kind == OdfAnimationKind.Emphasis ? OdfAnimationEffect.Appear : OdfAnimationEffect.Appear;
+        // 目前尚無法從 preset-id 推斷更精確的效果，一律回退為 Appear；
+        // 先前版本以 kind 判斷但兩個分支結果相同，屬於無意義的死碼，已一併移除。
+        // No more specific effect can currently be inferred from the preset-id, so it
+        // always falls back to Appear; the previous branch on `kind` returned the same
+        // value either way and was dead code, so it has been removed along with the parameter.
+        return OdfAnimationEffect.Appear;
     }
 
     private static OdfAnimationEffect ParseFilterEffect(string? type)

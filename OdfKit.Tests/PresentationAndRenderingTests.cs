@@ -895,6 +895,24 @@ namespace OdfKit.Tests
             }
         }
 
+        /// <summary>
+        /// Verifies that AddEmbeddedObject normalizes backslash separators in subPath to forward slashes, as required by the ODF package href convention.
+        /// 驗證 AddEmbeddedObject 會將 subPath 中的反斜線分隔符號正規化為正斜線，符合 ODF 套件 href 慣例的要求。
+        /// </summary>
+        [Fact]
+        public void AddEmbeddedObject_NormalizesBackslashesInHref()
+        {
+            using var package = OdfPackage.Create(new MemoryStream(), leaveOpen: true);
+            var doc = new PresentationDocument(package);
+            var slide = doc.AddSlide("Slide 1");
+
+            OdfShape shape = slide.AddEmbeddedObject("Sub\\Folder\\Object 1", OdfLength.Parse("1cm"), OdfLength.Parse("1cm"), OdfLength.Parse("8cm"), OdfLength.Parse("6cm"));
+
+            OdfNode? objNode = FindNodeByLocalName(shape.Node, "object");
+            Assert.NotNull(objNode);
+            Assert.Equal("./Sub/Folder/Object 1", objNode.GetAttribute("href", OdfNamespaces.XLink));
+        }
+
         #endregion
 
         #region Helpers

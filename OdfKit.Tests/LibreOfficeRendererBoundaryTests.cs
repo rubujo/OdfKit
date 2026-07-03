@@ -282,14 +282,12 @@ namespace OdfKit.Tests
                 }
             }, TestContext.Current.CancellationToken);
 
-            try
-            {
-                renderer.Convert(doc, outPath, "pdf-leak-delay");
-            }
-            catch (Exception)
-            {
-                // ignore any exception from Convert
-            }
+            // SafeCleanDirectory 內部已具備重試與失敗容忍機制，鎖定情境下 Convert 預期會正常完成，
+            // 因此此處刻意不使用萬用例外攔截，讓非預期例外可以正常曝露、避免掩蓋真實錯誤。
+            // SafeCleanDirectory already retries and tolerates deletion failures internally, so Convert
+            // is expected to complete normally even while the file lock is active; intentionally NOT
+            // catching a broad Exception here so any unexpected failure surfaces instead of being hidden.
+            renderer.Convert(doc, outPath, "pdf-leak-delay");
 
             cts.Cancel();
             await watcherTask;

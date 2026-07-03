@@ -225,15 +225,14 @@ public partial class OdfChartDocument
                 continue;
             }
 
+            // 序列可能使用內嵌圖表資料而非連結儲存格範圍，此時不應略過該序列，
+            // 否則會造成內嵌資料圖表的序列資訊全部遺失。
+            // A series may use embedded chart data instead of a linked cell range;
+            // it must not be skipped in that case, otherwise series information is
+            // silently lost for charts backed by embedded data.
             string? valuesCellRangeAddress = child.GetAttribute("values-cell-range-address", OdfNamespaces.Chart);
-            if (string.IsNullOrWhiteSpace(valuesCellRangeAddress))
-            {
-                continue;
-            }
-
-            string rangeAddress = valuesCellRangeAddress!;
             series.Add(new OdfChartSeriesInfo(
-                rangeAddress,
+                string.IsNullOrWhiteSpace(valuesCellRangeAddress) ? null : valuesCellRangeAddress,
                 child.GetAttribute("label-cell-address", OdfNamespaces.Chart),
                 child.GetAttribute("class", OdfNamespaces.Chart),
                 child.GetAttribute("style-name", OdfNamespaces.Chart),

@@ -40,7 +40,7 @@ public static class OdfCsvExporter
         var sheet = workbook.Worksheets[options.ExportSheetIndex];
 
         // 掃描已使用的維度
-        var cellValues = ScanCellValues(sheet);
+        var cellValues = ScanCellValues(sheet, options.SanitizeFormulas);
         int maxRow = 0, maxCol = 0;
         foreach (var pair in cellValues)
         {
@@ -76,7 +76,7 @@ public static class OdfCsvExporter
         ExportToStream(workbook, stream, options);
     }
 
-    private static Dictionary<(int Row, int Col), object> ScanCellValues(OdfTableSheet sheet)
+    private static Dictionary<(int Row, int Col), object> ScanCellValues(OdfTableSheet sheet, bool sanitizeFormulas)
     {
         var values = new Dictionary<(int Row, int Col), object>();
         int currentRowIndex = 0;
@@ -104,7 +104,7 @@ public static class OdfCsvExporter
                             colRepeatedCount = Math.Min(crc, OdfSpreadsheetLimits.CsvMaxRepeat);
                         }
 
-                        object? cellValue = GetCellValueFromNode(cellChild);
+                        object? cellValue = GetCellValueFromNode(cellChild, sanitizeFormulas);
                         if (cellValue is not null)
                         {
                             for (int i = 0; i < colRepeatedCount; i++)
@@ -132,7 +132,7 @@ public static class OdfCsvExporter
         return values;
     }
 
-    private static object? GetCellValueFromNode(OdfNode node)
+    private static object? GetCellValueFromNode(OdfNode node, bool sanitizeFormulas)
     {
         string valueType = node.GetAttribute("value-type", OdfNamespaces.Office) ?? string.Empty;
         string value = node.GetAttribute("value", OdfNamespaces.Office) ?? string.Empty;
@@ -157,10 +157,31 @@ public static class OdfCsvExporter
             case "date":
                 return node.GetAttribute("date-value", OdfNamespaces.Office);
             case "string":
-                return textContent;
+                return sanitizeFormulas ? SanitizeCsvFormulaValue(textContent) : textContent;
             default:
-                return string.IsNullOrEmpty(textContent) ? null : textContent;
+                if (string.IsNullOrEmpty(textContent))
+                {
+                    return null;
+                }
+                return sanitizeFormulas ? SanitizeCsvFormulaValue(textContent) : textContent;
         }
+    }
+
+    /// <summary>
+    /// Prefixes text starting with a formula-trigger character with a single quote to mitigate CSV formula injection (OWASP CSV Injection Prevention).
+    /// 若文字以公式觸發字元開頭，前面加上單引號以防範 CSV 公式注入攻擊（依據 OWASP CSV Injection Prevention 建議）。
+    /// </summary>
+    /// <param name="text">The text value to sanitize. / 要淨化的文字值。</param>
+    /// <returns>The sanitized text value. / 淨化後的文字值。</returns>
+    private static string SanitizeCsvFormulaValue(string text)
+    {
+        if (text.Length == 0)
+        {
+            return text;
+        }
+
+        char first = text[0];
+        return first is '=' or '+' or '-' or '@' or '\t' or '\r' ? "'" + text : text;
     }
 
     private static string GetTextContent(OdfNode node)
