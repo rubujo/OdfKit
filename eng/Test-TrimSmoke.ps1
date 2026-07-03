@@ -70,11 +70,6 @@ try {
     Write-Host "發佈耗時：$([math]::Round($sw.Elapsed.TotalSeconds, 1)) 秒"
 
     if ($LASTEXITCODE -ne 0) {
-        if ($PublishAot) {
-            Write-Warning "Native AOT 發佈失敗（已知限制：BouncyCastle／反射後備路徑）。"
-            return
-        }
-
         throw "TrimSmoke 建置失敗，結束碼 $LASTEXITCODE"
     }
 

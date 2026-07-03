@@ -176,6 +176,30 @@ public partial class OdfDatabaseDocument
         return false;
     }
 
+    private OdfNode FindOrCreateOrderedChild(
+        OdfNode parent, string localName, string namespaceUri, string prefix,
+        params (string LocalName, string NamespaceUri)[] followingElementNames)
+    {
+        OdfNode? child = FindChildElement(parent, localName, namespaceUri);
+        if (child is not null)
+        {
+            return child;
+        }
+
+        child = OdfNodeFactory.CreateElement(localName, namespaceUri, prefix);
+        OdfNode? anchor = FindFirstChildElement(parent, followingElementNames);
+        if (anchor is null)
+        {
+            parent.AppendChild(child);
+        }
+        else
+        {
+            parent.InsertBefore(child, anchor);
+        }
+
+        return child;
+    }
+
     private static OdfNode? FindFirstChildElement(OdfNode parent, params (string LocalName, string NamespaceUri)[] names)
     {
         foreach (OdfNode child in parent.Children)

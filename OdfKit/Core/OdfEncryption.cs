@@ -67,7 +67,7 @@ public static partial class OdfEncryption
         {
             throw new NullReferenceException(OdfLocalizer.GetMessage("Err_OdfEncryption_SaltCannotBeEmpty"));
         }
-        if (iterations > 50000)
+        if (iterations < 1 || iterations > 50000)
         {
             throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds", iterations));
         }
@@ -75,8 +75,6 @@ public static partial class OdfEncryption
         {
             throw new OverflowException(OdfLocalizer.GetMessage("Err_OdfEncryption_KeyLengthCannotNegative"));
         }
-
-        int effectiveIterations = iterations <= 0 ? 1 : iterations;
 
         string normalizedHashName = hashName.Trim().ToLowerInvariant();
         Org.BouncyCastle.Crypto.IDigest digest;
@@ -96,7 +94,7 @@ public static partial class OdfEncryption
         }
 
         var generator = new Pkcs5S2ParametersGenerator(digest);
-        generator.Init(password, salt, effectiveIterations);
+        generator.Init(password, salt, iterations);
         var keyParam = (KeyParameter)generator.GenerateDerivedMacParameters(keyLength * 8);
         return keyParam.GetKey();
     }

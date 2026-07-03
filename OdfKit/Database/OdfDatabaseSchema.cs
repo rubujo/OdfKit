@@ -260,7 +260,13 @@ public sealed class OdfDatabaseSchema
         var database = FindOrCreateChild(body, "database", OdfNamespaces.Office, "office");
 
         // 1. 同步寫入 schema-definition（實體結構層）
-        var schemaDef = FindOrCreateChild(database, "schema-definition", DatabaseNamespace, "db");
+        var schemaDef = FindChildElement(database, "schema-definition", DatabaseNamespace)
+            ?? OdfNodeFactory.CreateElement("schema-definition", DatabaseNamespace, "db");
+        if (schemaDef.Parent == database)
+        {
+            database.RemoveChild(schemaDef);
+        }
+
         // 清空現有的 table-definitions
         var tableDefs = FindChildElement(schemaDef, "table-definitions", DatabaseNamespace);
         if (tableDefs is not null)
@@ -278,16 +284,8 @@ public sealed class OdfDatabaseSchema
         }
         tableReps = OdfNodeFactory.CreateElement("table-representations", DatabaseNamespace, "db");
 
-        // 插入到適當的順序位置
-        var queriesNode = FindChildElement(database, "queries", DatabaseNamespace);
-        if (queriesNode is not null)
-        {
-            database.InsertBefore(tableReps, queriesNode);
-        }
-        else
-        {
-            database.AppendChild(tableReps);
-        }
+        // 在 schema-definition 之前插入 table-representations，保持 canonical 順序。
+        database.AppendChild(tableReps);
 
         foreach (var table in _tables)
         {
@@ -427,6 +425,8 @@ public sealed class OdfDatabaseSchema
                 columnsRepNode.AppendChild(colRep);
             }
         }
+
+        database.AppendChild(schemaDef);
     }
 
     private OdfNode FindOrCreateChild(OdfNode parent, string localName, string namespaceUri, string prefix)

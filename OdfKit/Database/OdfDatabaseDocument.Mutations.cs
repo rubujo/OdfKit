@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -68,7 +69,9 @@ public partial class OdfDatabaseDocument
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_QueryCannotBeEmpty_3"), nameof(command));
         }
 
-        OdfNode queries = FindOrCreateChild(GetDatabaseNode(), "queries", DatabaseNamespace, "db");
+        OdfNode queries = FindOrCreateOrderedChild(
+            GetDatabaseNode(), "queries", DatabaseNamespace, "db",
+            ("table-representations", DatabaseNamespace), ("schema-definition", DatabaseNamespace));
         if (HasChildWithName(queries, "query", name))
         {
             throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DuplicateName", name));
@@ -194,7 +197,10 @@ public partial class OdfDatabaseDocument
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FormCannotBeEmpty_3"), nameof(name));
         }
 
-        OdfNode forms = FindOrCreateChild(GetDatabaseNode(), "forms", DatabaseNamespace, "db");
+        OdfNode forms = FindOrCreateOrderedChild(
+            GetDatabaseNode(), "forms", DatabaseNamespace, "db",
+            ("reports", DatabaseNamespace), ("queries", DatabaseNamespace),
+            ("table-representations", DatabaseNamespace), ("schema-definition", DatabaseNamespace));
         OdfNode component = OdfNodeFactory.CreateElement("component", DatabaseNamespace, "db");
         component.SetAttribute("name", DatabaseNamespace, name, "db");
 
@@ -247,7 +253,10 @@ public partial class OdfDatabaseDocument
             throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_ReportCannotBeEmpty_2"), nameof(name));
         }
 
-        OdfNode reports = FindOrCreateChild(GetDatabaseNode(), "reports", DatabaseNamespace, "db");
+        OdfNode reports = FindOrCreateOrderedChild(
+            GetDatabaseNode(), "reports", DatabaseNamespace, "db",
+            ("queries", DatabaseNamespace), ("table-representations", DatabaseNamespace),
+            ("schema-definition", DatabaseNamespace));
         OdfNode component = OdfNodeFactory.CreateElement("component", DatabaseNamespace, "db");
         component.SetAttribute("name", DatabaseNamespace, name, "db");
 
@@ -369,7 +378,7 @@ public partial class OdfDatabaseDocument
             return false;
         }
 
-        return RemoveNamedComponent(reportsNode, name);
+        return RemoveNamedComponent(reportsNode, name, depth: 0);
     }
 
     /// <summary>
@@ -391,7 +400,7 @@ public partial class OdfDatabaseDocument
             return false;
         }
 
-        return RemoveNamedComponent(formsNode, name);
+        return RemoveNamedComponent(formsNode, name, depth: 0);
     }
 
     /// <summary>
@@ -428,8 +437,14 @@ public partial class OdfDatabaseDocument
         return false;
     }
 
-    private static bool RemoveNamedComponent(OdfNode parent, string name)
+    private static bool RemoveNamedComponent(OdfNode parent, string name, int depth)
     {
+        if (depth > MaxFormComponentDepth)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FormComponentNestingTooDeep", MaxFormComponentDepth));
+        }
+
         foreach (OdfNode child in new List<OdfNode>(parent.Children))
         {
             if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != DatabaseNamespace)
@@ -444,7 +459,7 @@ public partial class OdfDatabaseDocument
                 return true;
             }
 
-            if (child.LocalName == "component-collection" && RemoveNamedComponent(child, name))
+            if (child.LocalName == "component-collection" && RemoveNamedComponent(child, name, depth + 1))
             {
                 return true;
             }

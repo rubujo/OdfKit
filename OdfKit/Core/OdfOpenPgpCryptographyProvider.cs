@@ -53,6 +53,10 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
             {
                 return DecryptAes256Cbc(ciphertext, sessionKey, info.InitialisationVector);
             }
+            catch (CryptographicException)
+            {
+                continue;
+            }
             finally
             {
                 Array.Clear(sessionKey, 0, sessionKey.Length);
@@ -65,6 +69,9 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
     /// <inheritdoc />
     public byte[] Encrypt(byte[] plaintext, string entryPath, OdfSaveOptions saveOptions, out OdfEncryptionInfo info)
     {
+        if (saveOptions.OpenPgpRecipients.Count == 0)
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_RecipientCannotBeEmpty"));
+
         byte[] sessionKey = new byte[32];
         byte[] iv = new byte[16];
         using (var rng = RandomNumberGenerator.Create())

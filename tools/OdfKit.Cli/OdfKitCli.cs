@@ -131,6 +131,7 @@ public static class OdfKitCli
         baselineExceptions.EnsureAppliesTo(manifest);
         if (parsedOptions.MetadataOnly)
         {
+            ValidateCorpusFixturePaths(parsedOptions, manifest);
             WriteValidateCorpusMetadataOnly(output, parsedOptions, manifest, baselineExceptions);
             return 0;
         }
@@ -202,10 +203,10 @@ public static class OdfKitCli
         }
 
         using OdfDocument document = OdfDocument.Load(args[1]);
-        output.WriteLine("title: " + (document.Title ?? string.Empty));
-        output.WriteLine("creator: " + (document.Creator ?? string.Empty));
-        output.WriteLine("subject: " + (document.Subject ?? string.Empty));
-        output.WriteLine("description: " + (document.Description ?? string.Empty));
+        output.WriteLine("title: " + EscapeControlCharactersForLineOutput(document.Title));
+        output.WriteLine("creator: " + EscapeControlCharactersForLineOutput(document.Creator));
+        output.WriteLine("subject: " + EscapeControlCharactersForLineOutput(document.Subject));
+        output.WriteLine("description: " + EscapeControlCharactersForLineOutput(document.Description));
         return 0;
     }
 
@@ -412,6 +413,38 @@ public static class OdfKitCli
         }
 
         return candidate;
+    }
+
+    private static void ValidateCorpusFixturePaths(ValidateCorpusOptions options, ValidateCorpusManifest manifest)
+    {
+        foreach (ValidateCorpusFixture fixture in manifest.Fixtures)
+            _ = ResolveCorpusFixturePath(options.RootPath, fixture.Path);
+    }
+
+    private static string EscapeControlCharactersForLineOutput(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return string.Empty;
+
+        StringBuilder sb = new(value.Length);
+        foreach (char ch in value)
+        {
+            if (!char.IsControl(ch))
+            {
+                sb.Append(ch);
+                continue;
+            }
+
+            sb.Append(ch switch
+            {
+                '\r' => "\\r",
+                '\n' => "\\n",
+                '\t' => "\\t",
+                _ => "\\u" + ((int)ch).ToString("X4", CultureInfo.InvariantCulture)
+            });
+        }
+
+        return sb.ToString();
     }
 
     private static string ComputeSha256(string path)
@@ -1508,8 +1541,8 @@ public static class OdfKitCli
             FormatVersion(Report.DetectedVersion),
             StringComparison.OrdinalIgnoreCase);
 
-        public bool Sha256Matches => Fixture.Sha256 is null ||
-            string.Equals(Fixture.Sha256, ActualSha256, StringComparison.OrdinalIgnoreCase);
+        public bool Sha256Matches => (Fixture.Sha256 is null && !Fixture.RequiresSha256) ||
+            (Fixture.Sha256 is not null && string.Equals(Fixture.Sha256, ActualSha256, StringComparison.OrdinalIgnoreCase));
 
         public bool Passed => ClassificationMatches && KindMatches && VersionMatches && Sha256Matches && BaselineMatches;
 
@@ -1646,6 +1679,8 @@ public static class OdfKitCli
         string RoundTrip,
         string? Sha256)
     {
+        public bool RequiresSha256 => !IsRepoOwnedSource(Source, License);
+
         public static ValidateCorpusFixture Parse(JsonElement item)
         {
             if (item.ValueKind != JsonValueKind.Object)

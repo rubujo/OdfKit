@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -185,18 +186,52 @@ internal static class OdfPackageSaver
     {
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
         ctx.ProcessSaveHooks();
-
-        if (ctx.HasActiveEncryption)
-            OdfEncryption.Encrypt(package, ctx.SaveOptions.Password ?? string.Empty, ctx.SaveOptions.EncryptionAlgorithm);
+        Dictionary<OdfPackageEntry, EntrySnapshot>? snapshots = null;
+        bool encrypted = false;
 
         try
         {
+            if (ctx.HasActiveEncryption)
+            {
+                snapshots = CaptureEntrySnapshots(ctx);
+                OdfEncryption.Encrypt(package, ctx.SaveOptions.Password ?? string.Empty, ctx.SaveOptions.EncryptionAlgorithm);
+                encrypted = true;
+            }
+
             body();
+        }
+        catch
+        {
+            if (snapshots is not null)
+            {
+                RestoreEntrySnapshots(snapshots);
+                encrypted = false;
+            }
+
+            throw;
         }
         finally
         {
-            if (ctx.HasActiveEncryption)
-                OdfEncryption.Decrypt(package, ctx.SaveOptions.Password ?? string.Empty);
+            try
+            {
+                if (ctx.HasActiveEncryption && encrypted)
+                {
+                    try
+                    {
+                        OdfEncryption.Decrypt(package, ctx.SaveOptions.Password ?? string.Empty);
+                    }
+                    catch
+                    {
+                        if (snapshots is not null)
+                            RestoreEntrySnapshots(snapshots);
+                        throw;
+                    }
+                }
+            }
+            finally
+            {
+                DisposeEntrySnapshots(snapshots);
+            }
         }
     }
 
@@ -204,19 +239,164 @@ internal static class OdfPackageSaver
     {
         OdfPackage.OdfPackageSaveCollaborators ctx = package.SaveCollaborators;
         ctx.ProcessSaveHooks();
-
-        if (ctx.HasActiveEncryption)
-            OdfEncryption.Encrypt(package, ctx.SaveOptions.Password ?? string.Empty, ctx.SaveOptions.EncryptionAlgorithm);
+        Dictionary<OdfPackageEntry, EntrySnapshot>? snapshots = null;
+        bool encrypted = false;
 
         try
         {
+            if (ctx.HasActiveEncryption)
+            {
+                snapshots = CaptureEntrySnapshots(ctx);
+                OdfEncryption.Encrypt(package, ctx.SaveOptions.Password ?? string.Empty, ctx.SaveOptions.EncryptionAlgorithm);
+                encrypted = true;
+            }
+
             await body().ConfigureAwait(false);
+        }
+        catch
+        {
+            if (snapshots is not null)
+            {
+                RestoreEntrySnapshots(snapshots);
+                encrypted = false;
+            }
+
+            throw;
         }
         finally
         {
-            if (ctx.HasActiveEncryption)
-                OdfEncryption.Decrypt(package, ctx.SaveOptions.Password ?? string.Empty);
+            try
+            {
+                if (ctx.HasActiveEncryption && encrypted)
+                {
+                    try
+                    {
+                        OdfEncryption.Decrypt(package, ctx.SaveOptions.Password ?? string.Empty);
+                    }
+                    catch
+                    {
+                        if (snapshots is not null)
+                            RestoreEntrySnapshots(snapshots);
+                        throw;
+                    }
+                }
+            }
+            finally
+            {
+                DisposeEntrySnapshots(snapshots);
+            }
         }
+    }
+
+    private static Dictionary<OdfPackageEntry, EntrySnapshot> CaptureEntrySnapshots(
+        OdfPackage.OdfPackageSaveCollaborators ctx)
+    {
+        Dictionary<string, OdfPackageEntry> entries = ctx.Entries;
+        Dictionary<OdfPackageEntry, EntrySnapshot> snapshots = new(entries.Count);
+        try
+        {
+            foreach (OdfPackageEntry entry in entries.Values)
+            {
+                if (entry.Name == "mimetype" || entry.Name.StartsWith("META-INF/", StringComparison.Ordinal))
+                    continue;
+
+                using Stream stream = entry.OpenReader();
+                Stream snapshotStream = CreateTempStream(ctx, entry.GetEstimatedSize());
+                try
+                {
+                    stream.CopyTo(snapshotStream);
+                    snapshotStream.Position = 0;
+                    snapshots[entry] = new EntrySnapshot(snapshotStream, CloneEncryptionInfo(entry.EncryptionInfo));
+                }
+                catch
+                {
+                    snapshotStream.Dispose();
+                    throw;
+                }
+            }
+        }
+        catch
+        {
+            DisposeEntrySnapshots(snapshots);
+            throw;
+        }
+
+        return snapshots;
+    }
+
+    private static void RestoreEntrySnapshots(Dictionary<OdfPackageEntry, EntrySnapshot> snapshots)
+    {
+        foreach (KeyValuePair<OdfPackageEntry, EntrySnapshot> kvp in snapshots)
+        {
+            kvp.Value.Content.Position = 0;
+            using MemoryStream ms = new();
+            kvp.Value.Content.CopyTo(ms);
+            kvp.Key.SetContent(ms.ToArray());
+            kvp.Key.EncryptionInfo = CloneEncryptionInfo(kvp.Value.EncryptionInfo);
+        }
+    }
+
+    private static void DisposeEntrySnapshots(Dictionary<OdfPackageEntry, EntrySnapshot>? snapshots)
+    {
+        if (snapshots is null)
+            return;
+
+        foreach (EntrySnapshot snapshot in snapshots.Values)
+            snapshot.Dispose();
+    }
+
+    private static OdfEncryptionInfo? CloneEncryptionInfo(OdfEncryptionInfo? source)
+    {
+        if (source is null)
+            return null;
+
+        OdfEncryptionInfo clone = new()
+        {
+            ChecksumType = source.ChecksumType,
+            Checksum = [.. source.Checksum],
+            AlgorithmName = source.AlgorithmName,
+            InitialisationVector = [.. source.InitialisationVector],
+            KeyDerivationName = source.KeyDerivationName,
+            KeySize = source.KeySize,
+            IterationCount = source.IterationCount,
+            Salt = [.. source.Salt],
+            StartKeyGenerationName = source.StartKeyGenerationName,
+            StartKeySize = source.StartKeySize,
+            HasChecksumType = source.HasChecksumType,
+            HasChecksum = source.HasChecksum,
+            HasAlgorithmName = source.HasAlgorithmName,
+            HasInitialisationVector = source.HasInitialisationVector,
+            HasKeyDerivationName = source.HasKeyDerivationName,
+            HasIterationCount = source.HasIterationCount,
+            HasSalt = source.HasSalt
+        };
+
+        foreach (KeyValuePair<string, string> prop in source.ExtensionProperties)
+            clone.ExtensionProperties[prop.Key] = prop.Value;
+
+        foreach (OdfOpenPgpEncryptedKeyInfo encryptedKey in source.OpenPgpEncryptedKeys)
+        {
+            OdfOpenPgpEncryptedKeyInfo keyClone = new()
+            {
+                KeyId = encryptedKey.KeyId,
+                Recipient = encryptedKey.Recipient,
+                AlgorithmName = encryptedKey.AlgorithmName,
+                KeyPacket = [.. encryptedKey.KeyPacket]
+            };
+            foreach (KeyValuePair<string, string> prop in encryptedKey.ExtensionProperties)
+                keyClone.ExtensionProperties[prop.Key] = prop.Value;
+            clone.OpenPgpEncryptedKeys.Add(keyClone);
+        }
+
+        return clone;
+    }
+
+    private sealed class EntrySnapshot(Stream content, OdfEncryptionInfo? encryptionInfo) : IDisposable
+    {
+        public Stream Content { get; } = content;
+        public OdfEncryptionInfo? EncryptionInfo { get; } = encryptionInfo;
+
+        public void Dispose() => Content.Dispose();
     }
 
     internal static Stream CreateTempStream(OdfPackage.OdfPackageSaveCollaborators ctx, long estimatedSize, bool async = false)

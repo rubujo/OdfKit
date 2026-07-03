@@ -18,6 +18,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+if ($Configuration -notmatch '^[A-Za-z0-9._-]+$') {
+    throw "Configuration 僅允許英數、點、底線與連字號。"
+}
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $odfKitProject = Join-Path $repoRoot "OdfKit/OdfKit.csproj"
 $odfKitDll = Join-Path $repoRoot "OdfKit/bin/$Configuration/net10.0/OdfKit.dll"

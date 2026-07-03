@@ -90,6 +90,44 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public async Task VerifySignaturesAsync_UnsignedAppendedEntry_ReturnsInvalidCoverage()
+        {
+            using var cert = GenerateSelfSignedCertificate("XmlDsigCoverageSigner", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
+            using var signed = new MemoryStream();
+
+            using (var package = OdfPackage.Create(signed, leaveOpen: true))
+            {
+                package.SetMimeType("application/vnd.oasis.opendocument.text");
+                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+                package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes("<styles/>"), "text/xml");
+                package.WriteEntry("meta.xml", Encoding.UTF8.GetBytes("<meta/>"), "text/xml");
+                package.WriteEntry("settings.xml", Encoding.UTF8.GetBytes("<settings/>"), "text/xml");
+
+                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
+                package.Save();
+            }
+
+            signed.Position = 0;
+            using (var zip = new ZipArchive(signed, ZipArchiveMode.Update, leaveOpen: true))
+            {
+                var injected = zip.CreateEntry("Injected/evil.txt", CompressionLevel.NoCompression);
+                using var writer = new StreamWriter(injected.Open(), Encoding.UTF8, 1024, leaveOpen: false);
+                writer.Write("unsigned");
+            }
+
+            signed.Position = 0;
+            using var tampered = OdfPackage.Open(signed);
+            OdfSignatureValidationResult result = await OdfSigner.VerifySignaturesAsync(
+                tampered,
+                new OdfSigningOptions { AllowUntrustedRoot = true },
+                cancellationToken: TestContext.Current.CancellationToken);
+
+            Assert.False(result.IsValid);
+            OdfSingleSignatureValidationResult single = Assert.Single(result.Signatures);
+            Assert.Equal("UNSIGNED_PACKAGE_ENTRY", single.ErrorCode);
+        }
+
+        [Fact]
         public async Task TestXadesBesSigningAndVerification()
         {
             using var cert = GenerateSelfSignedCertificate("XadesBesTestSigner", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));

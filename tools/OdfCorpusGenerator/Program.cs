@@ -38,6 +38,16 @@ internal static class Program
         string bulkRoot = Path.Combine(corpusRoot, "generated", "bulk");
         string complexRoot = Path.Combine(corpusRoot, "generated", "complex");
 
+        if (!Directory.Exists(repoRoot))
+        {
+            throw new DirectoryNotFoundException($"Repository root 不存在：{repoRoot}");
+        }
+
+        if (!File.Exists(manifestPath))
+        {
+            throw new FileNotFoundException($"找不到 corpus manifest：{manifestPath}", manifestPath);
+        }
+
         Directory.CreateDirectory(bulkRoot);
         Directory.CreateDirectory(complexRoot);
 
@@ -344,8 +354,30 @@ internal sealed class CorpusManifestDocument
 
     public void Save(string path)
     {
-        using FileStream stream = File.Create(path);
-        JsonSerializer.Serialize(stream, this, JsonOptions);
+        string directory = Path.GetDirectoryName(path) ?? Directory.GetCurrentDirectory();
+        Directory.CreateDirectory(directory);
+
+        string tempPath = Path.Combine(
+            directory,
+            $"{Path.GetFileName(path)}.{Guid.NewGuid():N}.tmp");
+
+        try
+        {
+            using (FileStream stream = new(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            {
+                JsonSerializer.Serialize(stream, this, JsonOptions);
+                stream.Flush(flushToDisk: true);
+            }
+
+            File.Move(tempPath, path, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+            {
+                File.Delete(tempPath);
+            }
+        }
     }
 }
 

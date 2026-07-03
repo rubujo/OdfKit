@@ -38,6 +38,17 @@ namespace OdfKit.Tests
         }
 
         [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void TestPbkdf2IterationCountLessThanOneThrows(int iterationCount)
+        {
+            Assert.Throws<CryptographicException>(() =>
+            {
+                OdfEncryption.Pbkdf2(new byte[16], new byte[8], iterationCount, 16, "sha256");
+            });
+        }
+
+        [Theory]
         [InlineData("sha256", "sha-256")]
         [InlineData("sha256", "http://www.w3.org/2000/09/xmldsig#sha256")]
         [InlineData("sha256", "http://www.w3.org/2001/04/xmlenc#sha256")]
@@ -640,6 +651,52 @@ namespace OdfKit.Tests
         }
 
         /// <summary>
+        /// 測試在未提供任何 OpenPGP 收件者時，<see cref="OdfOpenPgpCryptographyProvider.Encrypt"/> 會拒絕輸出不可解密密文。
+        /// </summary>
+        [Fact]
+        public void OdfOpenPgpCryptographyProvider_Encrypt_WithoutRecipients_ThrowsInvalidOperationException()
+        {
+            var pgpProvider = new OdfOpenPgpCryptographyProvider(new FakeOpenPgpKeyProvider());
+            var saveOptions = new OdfSaveOptions
+            {
+                EncryptionAlgorithm = OdfEncryptionAlgorithm.OpenPgp
+            };
+
+            Assert.Throws<InvalidOperationException>(() =>
+                pgpProvider.Encrypt([0x01], "entry.xml", saveOptions, out _));
+        }
+
+        /// <summary>
+        /// 測試當儲存後還原階段解密失敗時，封裝內容仍會回復到儲存前的明文狀態。
+        /// </summary>
+        [Fact]
+        public void SaveToStream_OpenPgpEncryptOnlyProvider_DecryptFailureRestoresPlaintextState()
+        {
+            using var package = OdfPackage.Create(new MemoryStream(), leaveOpen: true);
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            byte[] original = Encoding.UTF8.GetBytes("<content>still-plain</content>");
+            package.WriteEntry("content.xml", original, "text/xml");
+            package.WriteEntry("styles.xml", Encoding.UTF8.GetBytes("<styles/>"), "text/xml");
+            package.WriteEntry("meta.xml", Encoding.UTF8.GetBytes("<meta/>"), "text/xml");
+            package.WriteEntry("settings.xml", Encoding.UTF8.GetBytes("<settings/>"), "text/xml");
+
+            package.SaveOptions.EncryptionAlgorithm = OdfEncryptionAlgorithm.OpenPgp;
+            package.SaveOptions.CryptographyProvider = new EncryptOnlyOpenPgpProvider();
+            package.SaveOptions.OpenPgpRecipients.Add(new OdfOpenPgpRecipient
+            {
+                KeyId = "KEY001",
+                Recipient = "test@example.com",
+                PublicKey = [0x01, 0x02]
+            });
+
+            Assert.Throws<CryptographicException>(() => package.SaveToStream(new MemoryStream()));
+
+            byte[] roundtrip = package.ReadEntry("content.xml");
+            Assert.Equal(original, roundtrip);
+            Assert.Null(package.FindEntryEncryptionInfo("content.xml"));
+        }
+
+        /// <summary>
         /// 測試在解密時若無任何可用的私鑰能成功解密金鑰封包，是否正確擲出 <see cref="CryptographicException"/> 。
         /// </summary>
         [Fact]
@@ -662,6 +719,27 @@ namespace OdfKit.Tests
         }
 
         /// <summary>
+        /// 測試多收件者 OpenPGP 解密在第一把金鑰失敗時，仍會嘗試後續收件者並成功解密。
+        /// </summary>
+        [Fact]
+        public void OdfOpenPgpCryptographyProvider_Decrypt_FirstRecipientFails_ContinuesToNextRecipient()
+        {
+            var provider = new OdfOpenPgpCryptographyProvider(new FirstRecipientCorruptingKeyProvider());
+            var saveOptions = new OdfSaveOptions
+            {
+                EncryptionAlgorithm = OdfEncryptionAlgorithm.OpenPgp
+            };
+            saveOptions.OpenPgpRecipients.Add(new OdfOpenPgpRecipient { KeyId = "BADKEY", Recipient = "bad@example.com" });
+            saveOptions.OpenPgpRecipients.Add(new OdfOpenPgpRecipient { KeyId = "GOODKEY", Recipient = "good@example.com" });
+
+            byte[] plaintext = Encoding.UTF8.GetBytes("fallback recipient decrypt");
+            byte[] ciphertext = provider.Encrypt(plaintext, "content.xml", saveOptions, out OdfEncryptionInfo info);
+
+            byte[] decrypted = provider.Decrypt(ciphertext, info, new OdfLoadOptions());
+            Assert.Equal(plaintext, decrypted);
+        }
+
+        /// <summary>
         /// 模擬一個在任何操作下皆會擲出例外的金鑰提供者。
         /// </summary>
         private sealed class ThrowingKeyProvider : IOdfOpenPgpKeyProvider
@@ -673,6 +751,62 @@ namespace OdfKit.Tests
             /// <inheritdoc />
             public byte[] DecryptSessionKey(byte[] encryptedKeyPacket, string keyId)
                 => throw new InvalidOperationException("no private key available");
+        }
+
+        private sealed class FirstRecipientCorruptingKeyProvider : IOdfOpenPgpKeyProvider
+        {
+            public byte[] EncryptSessionKey(byte[] sessionKey, OdfOpenPgpRecipient recipient)
+                => sessionKey;
+
+            public byte[] DecryptSessionKey(byte[] encryptedKeyPacket, string keyId)
+            {
+                if (string.Equals(keyId, "BADKEY", StringComparison.Ordinal))
+                    return new byte[encryptedKeyPacket.Length];
+
+                return encryptedKeyPacket;
+            }
+        }
+
+        private sealed class EncryptOnlyOpenPgpProvider : IOdfCryptographyProvider
+        {
+            public bool CanHandle(OdfEncryptionInfo info)
+            {
+                return string.Equals(info.AlgorithmName, OdfEncryption.OpenPgpAlgorithmUri, StringComparison.Ordinal) ||
+                    info.OpenPgpEncryptedKeys.Count > 0;
+            }
+
+            public byte[] Decrypt(byte[] ciphertext, OdfEncryptionInfo info, OdfLoadOptions loadOptions)
+            {
+                throw new CryptographicException("decrypt-disabled");
+            }
+
+            public byte[] Encrypt(byte[] plaintext, string entryPath, OdfSaveOptions saveOptions, out OdfEncryptionInfo info)
+            {
+                byte[] ciphertext = new byte[plaintext.Length];
+                for (int i = 0; i < plaintext.Length; i++)
+                    ciphertext[i] = (byte)(plaintext[i] ^ 0x2F);
+
+                OdfOpenPgpRecipient recipient = saveOptions.OpenPgpRecipients.Single();
+                info = new OdfEncryptionInfo
+                {
+                    AlgorithmName = OdfEncryption.OpenPgpAlgorithmUri,
+                    ChecksumType = "SHA256",
+                    Checksum = OdfEncryption.ComputeHash(plaintext, "SHA256"),
+                    InitialisationVector = [.. new byte[16]],
+                    KeyDerivationName = "OpenPGP",
+                    KeySize = 32,
+                    IterationCount = 1,
+                    Salt = [.. new byte[8]]
+                };
+                info.OpenPgpEncryptedKeys.Add(new OdfOpenPgpEncryptedKeyInfo
+                {
+                    KeyId = recipient.KeyId,
+                    Recipient = recipient.Recipient,
+                    AlgorithmName = OdfEncryption.OpenPgpAlgorithmUri,
+                    KeyPacket = recipient.PublicKey
+                });
+                return ciphertext;
+            }
         }
 
         /// <summary>

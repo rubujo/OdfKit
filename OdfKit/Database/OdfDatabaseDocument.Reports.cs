@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -28,7 +29,7 @@ public partial class OdfDatabaseDocument
         }
 
         List<OdfDatabaseReportInfo> reports = [];
-        CollectReportComponents(reportsNode, reports);
+        CollectReportComponents(reportsNode, reports, depth: 0);
         return reports.AsReadOnly();
     }
 
@@ -56,8 +57,14 @@ public partial class OdfDatabaseDocument
         return null;
     }
 
-    private static void CollectReportComponents(OdfNode parent, List<OdfDatabaseReportInfo> reports)
+    private static void CollectReportComponents(OdfNode parent, List<OdfDatabaseReportInfo> reports, int depth)
     {
+        if (depth > MaxFormComponentDepth)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_FormComponentNestingTooDeep", MaxFormComponentDepth));
+        }
+
         foreach (OdfNode child in parent.Children)
         {
             if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != DatabaseNamespace)
@@ -76,7 +83,7 @@ public partial class OdfDatabaseDocument
             }
             else if (child.LocalName == "component-collection")
             {
-                CollectReportComponents(child, reports);
+                CollectReportComponents(child, reports, depth + 1);
             }
         }
     }

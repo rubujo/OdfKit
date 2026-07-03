@@ -55,6 +55,7 @@ public static partial class OdfEncryption
             if (cryptoProvider is not null)
             {
                 decryptedPlaintext = cryptoProvider.Decrypt(ciphertext, entry.EncryptionInfo, package.LoadOptions);
+                ValidateChecksumForProviderDecryption(entry.EncryptionInfo, decryptedPlaintext);
             }
             else if (entry.EncryptionInfo.OpenPgpEncryptedKeys.Count > 0 ||
                 string.Equals(entry.EncryptionInfo.AlgorithmName, OpenPgpAlgorithmUri, StringComparison.Ordinal))
@@ -172,6 +173,16 @@ public static partial class OdfEncryption
             entry.SetContent(decryptedPlaintext);
             entry.EncryptionInfo = null;
         }
+    }
+
+    private static void ValidateChecksumForProviderDecryption(OdfEncryptionInfo info, byte[] plaintext)
+    {
+        if (info.Checksum.Length == 0 || string.IsNullOrWhiteSpace(info.ChecksumType))
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum_2"));
+
+        byte[] calculatedChecksum = ComputeHash(plaintext, info.ChecksumType);
+        if (!ByteArrayEquals(calculatedChecksum, info.Checksum))
+            throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_InvalidDecryptionFailedSum_2"));
     }
 
     /// <summary>

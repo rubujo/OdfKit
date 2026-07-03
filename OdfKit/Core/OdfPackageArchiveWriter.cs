@@ -211,7 +211,7 @@ internal static class OdfPackageArchiveWriter
         LastParallelCompressionUsedPooledBuffer = false;
         CheckCancellation(cancellationToken);
 
-        if (ctx.HasActiveEncryption || ctx.Entries.Count <= 1)
+        if (!targetStream.CanSeek || ctx.HasActiveEncryption || ctx.Entries.Count <= 1)
             return false;
 
         KeyValuePair<string, OdfPackageEntry>[] orderedEntries = GetOdfZipWriteOrder(ctx);
@@ -384,7 +384,7 @@ internal static class OdfPackageArchiveWriter
     {
         LastRawCopyArchiveUsed = false;
         CheckCancellation(cancellationToken);
-        if (ctx.Package.Mmf is null || ctx.Package.MmfEntries is null)
+        if (!targetStream.CanSeek || ctx.Package.Mmf is null || ctx.Package.MmfEntries is null)
             return false;
 
         if (ctx.HasActiveEncryption)

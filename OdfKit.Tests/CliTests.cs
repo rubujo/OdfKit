@@ -1039,7 +1039,7 @@ public class CliTests
     }
 
     /// <summary>
-    /// 驗證外部 corpus fixture 有來源 URI 時仍可由 CLI 執行。
+    /// 驗證外部 corpus fixture 缺少 sha256 時，CLI 會回報雜湊比對失敗。
     /// </summary>
     [Fact]
     public void ValidateCorpusAcceptsExternalFixtureWithSourceUri()
@@ -1070,10 +1070,11 @@ public class CliTests
 
             int exitCode = OdfKitCli.Run(["validate-corpus", manifest, "--format", "json"], output, error);
 
-            Assert.Equal(0, exitCode);
+            Assert.Equal(1, exitCode);
             Assert.Equal(string.Empty, error.ToString());
             using JsonDocument json = JsonDocument.Parse(output.ToString());
-            Assert.Equal(1, json.RootElement.GetProperty("summary").GetProperty("passedCount").GetInt32());
+            Assert.Equal(0, json.RootElement.GetProperty("summary").GetProperty("passedCount").GetInt32());
+            Assert.Equal(1, json.RootElement.GetProperty("summary").GetProperty("sha256MismatchCount").GetInt32());
         }
         finally
         {

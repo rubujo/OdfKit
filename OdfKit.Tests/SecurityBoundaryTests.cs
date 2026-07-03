@@ -35,14 +35,12 @@ public class SecurityBoundaryTests
         byte[] key50000 = OdfEncryption.Pbkdf2(pwd, salt, 50000, 16, "sha256");
         Assert.Equal(16, key50000.Length);
 
-        // 3. 測試 iterations 為 0 或負數時的行為
-        // 當 iterations <= 0 時，Pbkdf2Hmac 迴圈不會執行，但仍會計算一次初始 HMAC 值並回傳 key。
-        // 這不符合標準的 PBKDF2 行為（通常 iterations 應至少為 1），但此處驗證其不崩潰。
-        byte[] key0 = OdfEncryption.Pbkdf2(pwd, salt, 0, 16, "sha256");
-        Assert.Equal(16, key0.Length);
+        // 3. 測試 iterations 為 0 或負數時應擲出 CryptographicException（反覆運算次數必須至少為 1）
+        Assert.Throws<CryptographicException>(() =>
+            OdfEncryption.Pbkdf2(pwd, salt, 0, 16, "sha256"));
 
-        byte[] keyNeg = OdfEncryption.Pbkdf2(pwd, salt, -5, 16, "sha256");
-        Assert.Equal(16, keyNeg.Length);
+        Assert.Throws<CryptographicException>(() =>
+            OdfEncryption.Pbkdf2(pwd, salt, -5, 16, "sha256"));
 
         // 4. 測試不支援或空的雜湊演算法名稱應擲出 NotSupportedException
         Assert.Throws<NotSupportedException>(() =>

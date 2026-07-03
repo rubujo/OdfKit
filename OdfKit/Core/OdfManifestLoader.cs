@@ -121,9 +121,15 @@ internal static class OdfManifestLoader
             string? checksumStr = reader.GetAttribute("checksum", OdfNamespaces.Manifest) ?? reader.GetAttribute("checksum");
 
             if (!string.IsNullOrEmpty(checksumType))
+            {
                 currentEncryptionInfo.ChecksumType = checksumType;
+                currentEncryptionInfo.HasChecksumType = true;
+            }
             if (!string.IsNullOrEmpty(checksumStr))
+            {
                 currentEncryptionInfo.Checksum = Convert.FromBase64String(checksumStr);
+                currentEncryptionInfo.HasChecksum = true;
+            }
 
             currentEntry.EncryptionInfo = currentEncryptionInfo;
 
@@ -147,9 +153,15 @@ internal static class OdfManifestLoader
             string? ivStr = reader.GetAttribute("initialisation-vector", OdfNamespaces.Manifest) ?? reader.GetAttribute("initialisation-vector");
 
             if (!string.IsNullOrEmpty(algorithmName))
+            {
                 currentEncryptionInfo.AlgorithmName = algorithmName;
+                currentEncryptionInfo.HasAlgorithmName = true;
+            }
             if (!string.IsNullOrEmpty(ivStr))
+            {
                 currentEncryptionInfo.InitialisationVector = Convert.FromBase64String(ivStr);
+                currentEncryptionInfo.HasInitialisationVector = true;
+            }
             return;
         }
 
@@ -161,22 +173,29 @@ internal static class OdfManifestLoader
             string? saltStr = reader.GetAttribute("salt", OdfNamespaces.Manifest) ?? reader.GetAttribute("salt");
 
             if (!string.IsNullOrEmpty(derivationName))
+            {
                 currentEncryptionInfo.KeyDerivationName = derivationName;
+                currentEncryptionInfo.HasKeyDerivationName = true;
+            }
             if (int.TryParse(keySizeStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int keySize))
                 currentEncryptionInfo.KeySize = keySize;
             if (int.TryParse(iterationCountStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int iterationCount))
             {
-                if (iterationCount > 50000)
+                bool isPbkdf2 = string.Equals(currentEncryptionInfo.KeyDerivationName, "PBKDF2", StringComparison.OrdinalIgnoreCase);
+                if (iterationCount > 50000 || (isPbkdf2 && iterationCount < 1))
                 {
-                    throw new CryptographicException(
-                        $"PBKDF2 iteration count {iterationCount} exceeds the maximum limit of 50000.");
+                    throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfEncryption_NumberPbkdf2IterationsExceeds_2", iterationCount));
                 }
 
                 currentEncryptionInfo.IterationCount = iterationCount;
+                currentEncryptionInfo.HasIterationCount = true;
             }
 
             if (!string.IsNullOrEmpty(saltStr))
+            {
                 currentEncryptionInfo.Salt = Convert.FromBase64String(saltStr);
+                currentEncryptionInfo.HasSalt = true;
+            }
 
             for (int i = 0; i < reader.AttributeCount; i++)
             {
@@ -271,7 +290,8 @@ internal static class OdfManifestLoader
         if (hasIssue)
             context.FileEntryIssues.Add(issue);
 
-        if (path is not null)
+        bool pathIsAcceptable = path is "/" || (path is not null && IsSafeManifestPath(path));
+        if (pathIsAcceptable && path is not null)
         {
             string normPath = NormalizeManifestPath(path);
 

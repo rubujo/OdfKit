@@ -150,7 +150,13 @@ internal static class OdfSignatureSigner
             signedXml.AddReference(refProperties);
         }
 
-        string[] filesToSign = { "content.xml", "styles.xml", "meta.xml", "settings.xml", "META-INF/manifest.xml" };
+        List<string> filesToSign = [];
+        foreach (string entryName in package.Entries.Keys)
+        {
+            if (ShouldSignPackageEntry(entryName))
+                filesToSign.Add(entryName.Replace('\\', '/'));
+        }
+        filesToSign.Sort(StringComparer.Ordinal);
         var openStreams = new List<Stream>();
         try
         {
@@ -312,4 +318,10 @@ internal static class OdfSignatureSigner
             OdfVersion.Odf13 or OdfVersion.Odf14 => OdfVersionInfo.ToVersionString(OdfVersion.Odf13),
             _ => OdfVersionInfo.ToVersionString(OdfVersion.Odf10)
         };
+
+    private static bool ShouldSignPackageEntry(string entryName)
+    {
+        string normalized = entryName.Replace('\\', '/').TrimStart('/');
+        return OdfSignerConstants.IsCoverableEntry(normalized);
+    }
 }

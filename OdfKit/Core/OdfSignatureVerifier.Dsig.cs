@@ -252,6 +252,8 @@ internal static partial class OdfSignatureVerifier
                 return false;
 
             CollectCheckedReferences(signedXml, singleResult);
+            if (!VerifyPackageEntryCoverage(package, singleResult))
+                return false;
             return true;
         }
         catch (Exception ex)
@@ -277,5 +279,33 @@ internal static partial class OdfSignatureVerifier
                 singleResult.CheckedReferences.Add(entryName);
             }
         }
+    }
+
+    private static bool VerifyPackageEntryCoverage(
+        OdfPackage package,
+        OdfSingleSignatureValidationResult singleResult)
+    {
+        HashSet<string> covered = new(singleResult.CheckedReferences, StringComparer.Ordinal);
+        foreach (string entryName in package.Entries.Keys)
+        {
+            string normalized = entryName.Replace('\\', '/').TrimStart('/');
+            if (!ShouldRequireSignatureCoverage(normalized))
+                continue;
+
+            if (covered.Contains(normalized))
+                continue;
+
+            singleResult.ErrorCode = "UNSIGNED_PACKAGE_ENTRY";
+            singleResult.ErrorMessage = $"Signature does not cover package entry '{normalized}'.";
+            singleResult.IsSignatureValid = false;
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool ShouldRequireSignatureCoverage(string entryName)
+    {
+        return OdfSignerConstants.IsCoverableEntry(entryName);
     }
 }
