@@ -133,6 +133,20 @@ public class OpenFormulaSupportTests
     }
 
     /// <summary>
+    /// 驗證冪次運算採右結合。
+    /// </summary>
+    [Fact]
+    public void ExponentiationUsesRightAssociativity()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new FormulaAndStylesTest.MockEvaluationContext();
+
+        double chainedPower = Assert.IsType<double>(evaluator.Evaluate("2^3^2", context));
+
+        Assert.Equal(512d, chainedPower);
+    }
+
+    /// <summary>
     /// 驗證 LibreOffice ISOMITTED 擴充函式依引數數量回傳結果。
     /// </summary>
     [Fact]

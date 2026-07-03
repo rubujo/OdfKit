@@ -202,13 +202,13 @@ namespace OdfKit.Tests
 
             string? sandboxDir = await CaptureSandboxDirAsync(() =>
             {
-                Assert.ThrowsAny<Exception>(() => renderer.Convert(doc, invalidOutPath, "pdf"));
+                Assert.Throws<IOException>(() => renderer.Convert(doc, invalidOutPath, "pdf"));
             });
 
             Assert.NotNull(sandboxDir);
 
             // Wait a brief moment for OS release
-            Thread.Sleep(200);
+            await Task.Delay(200, TestContext.Current.CancellationToken);
 
             // Verify that the sandbox directory was cleaned up and not leaked
             bool isLeaked = Directory.Exists(sandboxDir);
@@ -282,7 +282,10 @@ namespace OdfKit.Tests
                                 }
                             }
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine($"CaptureSandboxDirAsync watcher exception: {ex.Message}");
+                        }
                         if (detectedDir != null)
                             break;
                         await Task.Delay(10, token);
@@ -293,14 +296,7 @@ namespace OdfKit.Tests
                 }
             }, TestContext.Current.CancellationToken);
 
-            try
-            {
-                runAction();
-            }
-            catch
-            {
-                // We expect exceptions in some tests
-            }
+            runAction();
 
             cts.Cancel();
             await watcherTask;

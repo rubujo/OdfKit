@@ -342,11 +342,7 @@ namespace OdfKit.Tests
 
             var arguments = await CaptureArgumentsAsync(() =>
             {
-                try
-                {
-                    renderer.Convert(doc, outPath, formatWithInjection);
-                }
-                catch { }
+                Assert.Throws<InvalidOperationException>(() => renderer.Convert(doc, outPath, formatWithInjection));
             }, args => args.Any(arg => arg.Contains("InjectedDir")));
 
             Assert.NotEmpty(arguments);
@@ -382,11 +378,7 @@ namespace OdfKit.Tests
 
             var arguments = await CaptureArgumentsAsync(() =>
             {
-                try
-                {
-                    renderer.Convert(doc, outPath, formatWithInjection);
-                }
-                catch { }
+                Assert.Throws<InvalidOperationException>(() => renderer.Convert(doc, outPath, formatWithInjection));
             }, args => args.Any(arg => arg.Contains("InjectedDir")));
 
             Assert.NotEmpty(arguments);
@@ -475,6 +467,7 @@ namespace OdfKit.Tests
             catch (Exception ex)
             {
                 LogDebug($"CaptureSandboxDirAsync action threw: {ex}");
+                throw;
             }
 
             await watcherTask;
@@ -886,11 +879,7 @@ namespace OdfKit.Tests
 
             var arguments = await CaptureArgumentsAsync(() =>
             {
-                try
-                {
-                    renderer.Convert(doc, outPath, formatWithMetachars);
-                }
-                catch { }
+                Assert.Throws<InvalidOperationException>(() => renderer.Convert(doc, outPath, formatWithMetachars));
             }, args => args.Any(arg => arg.Contains("whoami") || arg.Contains("&dir") || arg.Contains("--foo")));
 
             Assert.NotEmpty(arguments);

@@ -156,7 +156,8 @@ public sealed class OdtStreamReader : IDisposable
     {
         NodeType = nodeType;
         HeadingLevel = headingLevel;
-        StyleName = _reader!.GetAttribute("style-name", OdfNamespaces.Text);
+        string styleNamespace = nodeType == OdtNodeType.TableCell ? OdfNamespaces.Table : OdfNamespaces.Text;
+        StyleName = _reader!.GetAttribute("style-name", styleNamespace);
         Text = ReadCurrentElementText(_reader);
     }
 

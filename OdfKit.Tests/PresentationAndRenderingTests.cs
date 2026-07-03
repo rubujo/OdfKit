@@ -873,6 +873,12 @@ namespace OdfKit.Tests
                 // Verify the directory full-paths exist in manifest
                 Assert.True(package.Manifest.ContainsKey("Object 1/"));
                 Assert.True(package.Manifest.ContainsKey("Object 2/"));
+                var embeddedObjects = package.GetEmbeddedObjects().ToList();
+                Assert.Contains("Object 1/", embeddedObjects);
+                using Stream embeddedObjectStream = package.ExtractObjectStream(embeddedObjects[0]);
+                using var embeddedObjectReader = new StreamReader(embeddedObjectStream, Encoding.UTF8);
+                string embeddedObjectContent = embeddedObjectReader.ReadToEnd();
+                Assert.Contains("<office:document-content", embeddedObjectContent);
 
                 var slide = doc.Slides[0];
                 var frames = new List<OdfNode>();

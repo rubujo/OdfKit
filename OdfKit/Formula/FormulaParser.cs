@@ -114,14 +114,14 @@ public ref struct FormulaParser
         return node;
     }
 
-    // 優先權 5：乘方運算 (^)
+    // 優先權 5：乘方運算 (^)（右結合）
     private AstNode ParsePower()
     {
         var node = ParseUnary();
-        while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("^", StringComparison.Ordinal))
+        if (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("^", StringComparison.Ordinal))
         {
             Consume();
-            var right = ParseUnary();
+            var right = ParsePower();
             node = new BinaryNode("^", node, right);
         }
         return node;

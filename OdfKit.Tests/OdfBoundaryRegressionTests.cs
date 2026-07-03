@@ -135,6 +135,31 @@ namespace OdfKit.Tests
             Assert.Equal(2, count);
         }
 
+        [Fact]
+        public void TestOdfCommentParsesCreatorAndParagraphWhenDateAttributeExists()
+        {
+            var annotation = new OdfNode(OdfNodeType.Element, "annotation", OdfNamespaces.Office, "office");
+            annotation.SetAttribute("name", OdfNamespaces.Office, "c1", "office");
+            annotation.SetAttribute("date", OdfNamespaces.Dc, "2026-07-03T09:30:00Z", "dc");
+
+            var creator = new OdfNode(OdfNodeType.Element, "creator", OdfNamespaces.Dc, "dc")
+            {
+                TextContent = "Reviewer A"
+            };
+            var text = new OdfNode(OdfNodeType.Element, "p", OdfNamespaces.Text, "text")
+            {
+                TextContent = "Comment body"
+            };
+            annotation.AppendChild(creator);
+            annotation.AppendChild(text);
+
+            OdfComment parsed = OdfComment.FromXmlNode(annotation);
+
+            Assert.Equal("Reviewer A", parsed.Author);
+            Assert.Equal("Comment body", parsed.Text);
+            Assert.Equal(new DateTime(2026, 7, 3, 9, 30, 0, DateTimeKind.Utc), parsed.Date);
+        }
+
         private static int CountNodesWithText(OdfNode node, string text)
         {
             int count = 0;
@@ -459,4 +484,3 @@ namespace OdfKit.Tests
         }
     }
 }
-

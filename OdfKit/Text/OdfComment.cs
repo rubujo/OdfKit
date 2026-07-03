@@ -225,65 +225,52 @@ public class OdfComment
 
         string author = node.GetAttribute("creator", OdfNamespaces.Dc) ?? "Unknown";
         DateTime date = DateTime.UtcNow;
-        string text = node.GetAttribute("text", OdfNamespaces.Text) ?? string.Empty;
+        string text = string.Empty;
 
-        if (string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(node.GetAttribute("p", OdfNamespaces.Text)))
+        static DateTime NormalizeDateTime(DateTime value)
         {
-            text = node.GetAttribute("p", OdfNamespaces.Text)!;
+            if (value == DateTime.MinValue || value == DateTime.MaxValue)
+                return value;
+
+            try
+            {
+                return value.ToUniversalTime();
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return value;
+            }
         }
 
         string? dateText = node.GetAttribute("date", OdfNamespaces.Dc);
-        if (!string.IsNullOrEmpty(dateText) && DateTime.TryParse(dateText, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var parsedDate))
+        DateTime parsedDate = default;
+        bool hasDateFromAttribute = !string.IsNullOrEmpty(dateText) &&
+            DateTime.TryParse(dateText, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out parsedDate);
+        if (hasDateFromAttribute)
         {
-            if (parsedDate == DateTime.MinValue || parsedDate == DateTime.MaxValue)
-            {
-                date = parsedDate;
-            }
-            else
-            {
-                try
-                {
-                    date = parsedDate.ToUniversalTime();
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    date = parsedDate;
-                }
-            }
+            date = NormalizeDateTime(parsedDate);
         }
-        else
+
+        foreach (var child in node.Children)
         {
-            foreach (var child in node.Children)
+            if (child.NamespaceUri == OdfNamespaces.Dc)
             {
-                if (child.NamespaceUri == OdfNamespaces.Dc)
+                if (child.LocalName == "creator")
+                    author = child.TextContent;
+                else if (!hasDateFromAttribute &&
+                    child.LocalName == "date" &&
+                    DateTime.TryParse(child.TextContent, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt))
                 {
-                    if (child.LocalName == "creator")
-                        author = child.TextContent;
-                    else if (child.LocalName == "date" && DateTime.TryParse(child.TextContent, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt))
-                    {
-                        if (dt == DateTime.MinValue || dt == DateTime.MaxValue)
-                        {
-                            date = dt;
-                        }
-                        else
-                        {
-                            try
-                            {
-                                date = dt.ToUniversalTime();
-                            }
-                            catch (ArgumentOutOfRangeException)
-                            {
-                                date = dt;
-                            }
-                        }
-                    }
+                    date = NormalizeDateTime(dt);
                 }
-                else if (child.NamespaceUri == OdfNamespaces.Text && child.LocalName == "p")
+            }
+            else if (child.NamespaceUri == OdfNamespaces.Text && child.LocalName == "p")
+            {
+                if (string.IsNullOrEmpty(text))
+                    text = child.TextContent;
+                else
                 {
-                    if (string.IsNullOrEmpty(text))
-                        text = child.TextContent;
-                    else
-                        text += "\n" + child.TextContent;
+                    text += "\n" + child.TextContent;
                 }
             }
         }

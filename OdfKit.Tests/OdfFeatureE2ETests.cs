@@ -1400,7 +1400,7 @@ namespace OdfKit.Tests
             var doc = new TextDocument(package);
             var p = doc.AddParagraph();
             // XML parse error or invalid string structure
-            Assert.ThrowsAny<Exception>(() => p.AddFormula("<math><mi>x</mi>"));
+            Assert.Throws<ArgumentException>(() => p.AddFormula("<math><mi>x</mi>"));
         }
 
         [Fact]

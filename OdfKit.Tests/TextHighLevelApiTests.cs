@@ -1237,6 +1237,50 @@ public class TextHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 ODT 流式讀取器讀取 table:table-cell 時會使用 table:style-name。
+    /// </summary>
+    [Fact]
+    public void OdtStreamReaderReadsTableCellStyleFromTableNamespace()
+    {
+        using var stream = new MemoryStream();
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            var entry = archive.CreateEntry("content.xml");
+            using var entryStream = entry.Open();
+            using var writer = new StreamWriter(entryStream, Encoding.UTF8, 1024, leaveOpen: true);
+            writer.Write(
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <office:document-content
+                    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                    xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
+                  <office:body>
+                    <office:text>
+                      <table:table>
+                        <table:table-row>
+                          <table:table-cell table:style-name="CellStyle">
+                            <text:p>Cell text</text:p>
+                          </table:table-cell>
+                        </table:table-row>
+                      </table:table>
+                    </office:text>
+                  </office:body>
+                </office:document-content>
+                """);
+        }
+
+        stream.Position = 0;
+        using var odtReader = new OdtStreamReader(stream);
+
+        Assert.True(odtReader.Read());
+        Assert.Equal(OdtNodeType.TableCell, odtReader.NodeType);
+        Assert.Equal("CellStyle", odtReader.StyleName);
+        Assert.Equal("Cell text", odtReader.Text);
+        Assert.False(odtReader.Read());
+    }
+
+    /// <summary>
     /// 驗證 ODT 流式寫入大量段落時不會累積完整 DOM。
     /// </summary>
     [Fact]

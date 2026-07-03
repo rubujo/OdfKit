@@ -216,8 +216,8 @@ internal static class OdfPackageEntryAccessEngine
     /// </summary>
     internal static Stream ExtractObjectStream(OdfPackage.OdfPackageEntryCollaborators ctx, string objectName)
     {
-        string path = OdfPackage.SanitizeEntryName(objectName);
-        return GetEntryStream(ctx, path + "/content.xml");
+        string path = OdfPackage.SanitizeEntryName(objectName).TrimEnd('/');
+        return GetEntryStream(ctx, $"{path}/content.xml");
     }
 
     /// <summary>
