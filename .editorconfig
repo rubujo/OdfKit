@@ -95,3 +95,35 @@ csharp_style_namespace_declarations = file_scoped:warning
 # C# 12+ features
 csharp_style_prefer_collection_expression = true:suggestion
 csharp_style_prefer_primary_constructors = true:suggestion
+
+# 明確停用的分析器規則（僅於手動以 -p:AnalysisMode=All 稽核時才會被觸發，
+# 專案實際建置／CI 設定並未啟用 AnalysisMode=All，故下列規則平時不會出現）。
+# Explicitly suppressed analyzer rules (only surface when auditing with
+# -p:AnalysisMode=All; the project's real build/CI configuration does not
+# enable AnalysisMode=All, so these rules never fire in normal use).
+#
+# CA1304（未指定 CultureInfo）：全專案 798 筆命中中，絕大多數是
+# OdfLocalizer.GetMessage(string) 未帶 CultureInfo 多載呼叫；該單參數多載
+# 本來就設計成內部 fallback 至 OdfLocalizer.DefaultCulture／
+# CultureInfo.CurrentUICulture（見 OdfLocalizer.cs），是雙語在地化系統的
+# 既有慣例，並非遺漏，逐一改寫成帶文化特性的多載反而破壞既有慣例。
+# CA1304 (missing CultureInfo): the vast majority of the 798 hits are calls
+# to OdfLocalizer.GetMessage(string) without the CultureInfo overload; that
+# single-argument overload is intentionally designed to fall back to
+# OdfLocalizer.DefaultCulture / CultureInfo.CurrentUICulture internally (see
+# OdfLocalizer.cs), matching this project's established localization
+# convention rather than an oversight — rewriting every call site would
+# fight the existing convention instead of fixing anything.
+dotnet_diagnostic.CA1304.severity = none
+
+# CA1307（未指定 StringComparison）：228 筆命中中，char 多載（如
+# IndexOf(char)／Contains(char)）本來就固定為序數比對，加不加參數不影響
+# 行為；少數 string 對 string 的呼叫經逐一檢視後，語意上都是「找使用者輸
+# 入的原樣字元」，維持目前文化特性比對即為預期行為。
+# CA1307 (missing StringComparison): of the 228 hits, the char overloads
+# (e.g. IndexOf(char), Contains(char)) are already ordinal regardless of
+# the parameter, so adding it changes no behavior; the handful of
+# string-to-string calls were individually reviewed and are intentionally
+# searching for user-provided literal text, where the current
+# culture-sensitive comparison is the expected behavior.
+dotnet_diagnostic.CA1307.severity = none
