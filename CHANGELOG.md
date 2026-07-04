@@ -32,7 +32,9 @@
 - 修正 `OdsStreamWriter.SwitchToSheet` 緩衝寫入路徑產生結構錯誤 `content.xml` 的問題（`<office:spreadsheet` 起始標籤未透過同一個 `XmlWriter` 正確關閉即被後續原始位元組覆蓋，導致無法被嚴格 XML 剖析器讀回）；改為統一透過 `XmlWriter.WriteRaw` 寫入緩衝工作表片段，並補上以 `OdsStreamReader` 嚴格剖析回讀的迴歸測試。
 - 修正 `OdfDirectIoReadableStream.Dispose` 未等待背景預讀工作（`_prefetchTask`）完成即釋放原生檔案控制代碼／對齊緩衝區的資源生命週期競爭，改為先取出並等待該工作，再釋放底層資源。
 - 修正 `OdfTableSheetRepeatSplitEngine.GetRepeatCount` 未對 `number-rows-repeated`／`number-columns-repeated` 設上限的問題，改為與 `OdsStreamReader` 一致地截斷至 1,048,576／16,384，避免文件宣告超大重複計數被呼叫端當成迴圈上限而放大為阻斷服務風險。
-- 修正 `FormulaParser.ParsePower` 對 `^` 運算子採左結合的問題，改為右結合以符合 OpenFormula 規範（如 `2^3^2` 應等於 `512`）；並修正單元負號與乘方的優先權順序，使 `-2^2` 正確等於 `-4` 而非 `4`。
+- 修正 `FormulaParser.ParsePower` 對 `^` 運算子左結合與優先序的處理，讓其符合 OpenFormula 規範（`2^3^2` 應為 `64`，且 `-2^2` 應視為 `(-2)^2 = 4`）；並修正連續前置一元運算子（如 `--2`）因遞迴解析誤改而無法剖析的問題。
+- 修正 `OdfPackageEntry.SetContent(byte[])` 未釋放先前指派之 `Stream` 內容的資源洩漏問題，改為與 `SetContent(Stream)` 一致，於覆蓋內容前先行釋放。
+- 修正 `OdfPackageFlatXmlLoader`／`OdfStreamingMailMerge` 於修正整數溢位風險時，意外將 `MaxTotalUncompressedSize = 0` 的語意由「拒絕任何非空內容」改為「不限制」，與 `OdfPackageZipLoader` 及既有慣例不一致的問題。
 - 修正 `OdfComment.FromXmlNodeSingle` 在節點具有 `dc:date` 屬性時，會跳過解析 `dc:creator`／`text:p` 子節點導致註解作者與內容遺失的問題。
 - 修正 `OdtStreamReader.CaptureCurrentElement` 一律以 Text 命名空間讀取 `style-name` 屬性，導致表格儲存格（`table:table-cell`）樣式名稱讀取失敗的問題，改為依節點型別選用 Table 或 Text 命名空間。
 - 修正 `OdfPackageEntryAccessEngine.ExtractObjectStream` 於內嵌物件名稱含結尾斜線時，串接出雙斜線路徑（如 `Object 1//content.xml`）導致無法讀取內嵌物件內容的問題。

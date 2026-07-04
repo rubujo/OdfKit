@@ -54,12 +54,16 @@ internal static class OdfPackageFlatXmlLoader
                     OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", path, length, ctx.LoadOptions.MaxEntrySize));
             }
 
-            totalVirtualEntrySize += length;
-            if (ctx.LoadOptions.MaxTotalUncompressedSize > 0 && totalVirtualEntrySize > ctx.LoadOptions.MaxTotalUncompressedSize)
+            if (length > ctx.LoadOptions.MaxTotalUncompressedSize - totalVirtualEntrySize)
             {
+                long projectedSize = totalVirtualEntrySize > long.MaxValue - length
+                    ? long.MaxValue
+                    : totalVirtualEntrySize + length;
                 throw new SecurityException(
-                    OdfLocalizer.GetMessage("Err_OdfPackage_FlatXmlTotalVirtualEntrySizeLimitExceeded", totalVirtualEntrySize, ctx.LoadOptions.MaxTotalUncompressedSize));
+                    OdfLocalizer.GetMessage("Err_OdfPackage_FlatXmlTotalVirtualEntrySizeLimitExceeded", projectedSize, ctx.LoadOptions.MaxTotalUncompressedSize));
             }
+
+            totalVirtualEntrySize += length;
         }
 
         using (var reader = XmlReader.Create(xmlStream, settings))
@@ -83,15 +87,19 @@ internal static class OdfPackageFlatXmlLoader
                                     int bytesRead;
                                     while ((bytesRead = reader.ReadElementContentAsBase64(buffer, 0, buffer.Length)) > 0)
                                     {
-                                        binarySize += bytesRead;
-                                        if (ctx.LoadOptions.MaxEntrySize > 0 && binarySize > ctx.LoadOptions.MaxEntrySize)
+                                        if (ctx.LoadOptions.MaxEntrySize > 0 && bytesRead > ctx.LoadOptions.MaxEntrySize - binarySize)
                                         {
+                                            long projectedBinarySize = binarySize > long.MaxValue - bytesRead
+                                                ? long.MaxValue
+                                                : binarySize + bytesRead;
                                             throw new SecurityException(
                                                 OdfLocalizer.GetMessage(
                                                     "Err_OdfPackageFlatXmlLoader_BinaryDataSizeLimitExceeded",
-                                                    binarySize,
+                                                    projectedBinarySize,
                                                     ctx.LoadOptions.MaxEntrySize));
                                         }
+
+                                        binarySize += bytesRead;
 
                                         binMs.Write(buffer, 0, bytesRead);
                                     }

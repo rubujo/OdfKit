@@ -69,8 +69,22 @@ internal class OdfPackageEntry : IDisposable
 
     public void SetContent(byte[] bytes)
     {
+        _stream?.Dispose();
         _bytes = bytes;
         _stream = null;
+        _isModified = true;
+    }
+
+    internal void SetContent(Stream stream)
+    {
+        if (stream is null)
+            throw new ArgumentNullException(nameof(stream));
+
+        if (_stream != null && !ReferenceEquals(_stream, stream))
+            _stream.Dispose();
+
+        _stream = stream;
+        _bytes = null;
         _isModified = true;
     }
 

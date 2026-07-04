@@ -102,7 +102,7 @@ public ref struct FormulaParser
     // 優先權 4：因數運算 (*, /)
     private AstNode ParseFactor()
     {
-        var node = ParseUnary();
+        var node = ParsePower();
         while (_currentToken.Type == FormulaTokenType.Operator &&
               (_currentToken.Span.Equals("*", StringComparison.Ordinal) || _currentToken.Span.Equals("/", StringComparison.Ordinal)))
         {
@@ -115,10 +115,10 @@ public ref struct FormulaParser
     }
 
     // 優先權 5：單元運算 (+, -)
-    // 依 OpenFormula 規範，乘方運算的結合優先權高於單元負號，
-    // 例如 -2^2 應等於 -(2^2) = -4，而非 (-2)^2 = 4。
-    // Per the OpenFormula spec, exponentiation binds tighter than unary minus,
-    // e.g. -2^2 should equal -(2^2) = -4, not (-2)^2 = 4.
+    // OpenFormula Note 1：前置一元運算子的優先權高於乘方（^）。
+    // 例如 -2^2 應為 (-2)^2 = 4。
+    // OpenFormula Note 1: Prefix unary operators have higher precedence than ^.
+    // For example, -2^2 should be parsed as (-2)^2 = 4.
     private AstNode ParseUnary()
     {
         if (_currentToken.Type == FormulaTokenType.Operator &&
@@ -130,14 +130,14 @@ public ref struct FormulaParser
             return new UnaryNode(op, child);
         }
 
-        return ParsePower();
+        return ParsePercent();
     }
 
-    // 優先權 6：乘方運算 (^)（右結合，指數本身允許帶單元負號，如 2^-2）
+    // 優先權 6：乘方運算 (^)（左結合）
     private AstNode ParsePower()
     {
-        var node = ParsePercent();
-        if (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("^", StringComparison.Ordinal))
+        var node = ParseUnary();
+        while (_currentToken.Type == FormulaTokenType.Operator && _currentToken.Span.Equals("^", StringComparison.Ordinal))
         {
             Consume();
             var right = ParseUnary();

@@ -38,16 +38,16 @@ internal static partial class OdfSignatureVerifier
             {
                 singleResult.IsRevocationValid = false;
                 singleResult.ErrorCode = "CRL_INVALID_FORMAT";
-                singleResult.ErrorMessage = $"Embedded CRL is not valid Base64: {ex.Message}";
-                singleResult.Warnings.Add(singleResult.ErrorMessage);
+                singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_EmbeddedCrlNotBase64");
+                singleResult.Warnings.Add(ex.Message);
                 return false;
             }
             catch (SecurityException ex)
             {
                 singleResult.IsRevocationValid = false;
                 singleResult.ErrorCode = "CRL_SIZE_LIMIT_EXCEEDED";
-                singleResult.ErrorMessage = ex.Message;
-                singleResult.Warnings.Add(singleResult.ErrorMessage);
+                singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_EmbeddedCrlSizeLimitExceededNoLimit");
+                singleResult.Warnings.Add(ex.Message);
                 return false;
             }
         }
@@ -134,7 +134,7 @@ internal static partial class OdfSignatureVerifier
         if (!singleResult.IsCertificateValid)
         {
             singleResult.ErrorCode = "CERTIFICATE_EXPIRED";
-            singleResult.ErrorMessage = "Signing certificate is expired or not yet valid.";
+            singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_CertificateNotYetValid");
             return false;
         }
 
@@ -187,7 +187,7 @@ internal static partial class OdfSignatureVerifier
         if (!isChainValid)
         {
             singleResult.ErrorCode = "CERTIFICATE_CHAIN_INVALID";
-            singleResult.ErrorMessage = "Certificate chain validation failed.";
+            singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_CertificateChainInvalid");
             return false;
         }
 
@@ -221,7 +221,7 @@ internal static partial class OdfSignatureVerifier
             if (cert == null)
             {
                 singleResult.ErrorCode = "CERTIFICATE_MISSING";
-                singleResult.ErrorMessage = "Signature key info does not contain a valid X509 certificate.";
+                singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_SigningCertificateMissing");
                 return false;
             }
 
@@ -258,7 +258,8 @@ internal static partial class OdfSignatureVerifier
         }
         catch (Exception ex)
         {
-            singleResult.ErrorMessage = $"Verification error: {ex.Message}";
+            singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_VerificationError");
+            singleResult.Warnings.Add(ex.Message);
             if (string.IsNullOrEmpty(singleResult.ErrorCode))
                 singleResult.ErrorCode = "VERIFICATION_ERROR";
             return false;
@@ -296,7 +297,9 @@ internal static partial class OdfSignatureVerifier
                 continue;
 
             singleResult.ErrorCode = "UNSIGNED_PACKAGE_ENTRY";
-            singleResult.ErrorMessage = $"Signature does not cover package entry '{normalized}'.";
+            singleResult.ErrorMessage = OdfLocalizer.GetMessage(
+                "Err_OdfSignatureVerifier_UnsignedPackageEntry",
+                normalized);
             singleResult.IsSignatureValid = false;
             return false;
         }

@@ -4,6 +4,9 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.Xml;
 using System.Xml;
+
+using OdfKit.Compliance;
+
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Tsp;
 
@@ -47,7 +50,8 @@ internal static partial class OdfSignatureVerifier
         {
             singleResult.IsTimestampValid = false;
             singleResult.ErrorCode = "TIMESTAMP_SIGNATURE_INVALID";
-            singleResult.ErrorMessage = $"Timestamp signature verification failed: {ex.Message}";
+            singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_TimestampSignatureVerificationFailed");
+            singleResult.Warnings.Add(ex.Message);
             return false;
         }
 
@@ -56,7 +60,7 @@ internal static partial class OdfSignatureVerifier
         {
             singleResult.IsTimestampValid = false;
             singleResult.ErrorCode = "TIMESTAMP_IMPRINT_MISMATCH";
-            singleResult.ErrorMessage = "Missing SignatureValue for timestamp verification.";
+            singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_MissingSignatureValueForTimestamp");
             return false;
         }
 
@@ -80,7 +84,7 @@ internal static partial class OdfSignatureVerifier
         {
             singleResult.IsTimestampValid = false;
             singleResult.ErrorCode = "TIMESTAMP_IMPRINT_MISMATCH";
-            singleResult.ErrorMessage = "Timestamp message imprint does not match the signature value.";
+            singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_TimestampMessageImprintMismatch");
             return false;
         }
 

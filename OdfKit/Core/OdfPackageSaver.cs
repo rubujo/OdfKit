@@ -328,10 +328,9 @@ internal static class OdfPackageSaver
     {
         foreach (KeyValuePair<OdfPackageEntry, EntrySnapshot> kvp in snapshots)
         {
-            kvp.Value.Content.Position = 0;
-            using MemoryStream ms = new();
-            kvp.Value.Content.CopyTo(ms);
-            kvp.Key.SetContent(ms.ToArray());
+            if (kvp.Value.Content.CanSeek)
+                kvp.Value.Content.Position = 0;
+            kvp.Key.SetContent(kvp.Value.TakeContent());
             kvp.Key.EncryptionInfo = CloneEncryptionInfo(kvp.Value.EncryptionInfo);
         }
     }
@@ -395,8 +394,19 @@ internal static class OdfPackageSaver
     {
         public Stream Content { get; } = content;
         public OdfEncryptionInfo? EncryptionInfo { get; } = encryptionInfo;
+        private bool _disposeContent = true;
 
-        public void Dispose() => Content.Dispose();
+        public Stream TakeContent()
+        {
+            _disposeContent = false;
+            return Content;
+        }
+
+        public void Dispose()
+        {
+            if (_disposeContent)
+                Content.Dispose();
+        }
     }
 
     internal static Stream CreateTempStream(OdfPackage.OdfPackageSaveCollaborators ctx, long estimatedSize, bool async = false)

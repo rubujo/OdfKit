@@ -40,7 +40,9 @@ internal static partial class OdfSignatureVerifier
                 {
                     singleResult.IsRevocationValid = false;
                     singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
-                    singleResult.ErrorMessage = $"Issuer certificate for {chainCert.Subject} not found in chain.";
+                    singleResult.ErrorMessage = OdfLocalizer.GetMessage(
+                        "Err_OdfSignatureVerifier_IssuerCertificateNotFound",
+                        chainCert.Subject);
                     return false;
                 }
 
@@ -80,7 +82,8 @@ internal static partial class OdfSignatureVerifier
                         singleResult.IsRevocationValid = false;
                         if (string.IsNullOrEmpty(singleResult.ErrorCode))
                             singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
-                        singleResult.ErrorMessage = $"Embedded CRL validation failed: {ex.Message}";
+                        singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_EmbeddedCrlValidationFailed");
+                        singleResult.Warnings.Add(ex.Message);
                         return false;
                     }
                 }
@@ -92,7 +95,9 @@ internal static partial class OdfSignatureVerifier
             if (isRevoked)
             {
                 singleResult.IsRevocationValid = false;
-                singleResult.ErrorMessage = $"Certificate {chainCert.Subject} has been revoked.";
+                singleResult.ErrorMessage = OdfLocalizer.GetMessage(
+                    "Err_OdfSignatureVerifier_CertificateRevoked",
+                    chainCert.Subject);
                 return false;
             }
 
@@ -103,7 +108,9 @@ internal static partial class OdfSignatureVerifier
                 {
                     singleResult.IsRevocationValid = false;
                     singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
-                    singleResult.ErrorMessage = $"No CRL distribution points found for certificate {chainCert.Subject}.";
+                    singleResult.ErrorMessage = OdfLocalizer.GetMessage(
+                        "Err_OdfSignatureVerifier_NoCrlDistributionPoints",
+                        chainCert.Subject);
                     return false;
                 }
 
@@ -154,15 +161,23 @@ internal static partial class OdfSignatureVerifier
                     singleResult.IsRevocationValid = false;
                     if (string.IsNullOrEmpty(singleResult.ErrorCode))
                         singleResult.ErrorCode = "CERTIFICATE_REVOKED";
-                    singleResult.ErrorMessage = $"Certificate {chainCert.Subject} has been revoked online.";
+                    singleResult.ErrorMessage = OdfLocalizer.GetMessage(
+                        "Err_OdfSignatureVerifier_CertificateRevokedOnline",
+                        chainCert.Subject);
                     return false;
                 }
 
                 if (!onlineCrlCheckedSuccessfully && !checkedAnyCrl)
                 {
+                    string? lastCrlErrorMessage = lastCrlException?.Message;
                     singleResult.IsRevocationValid = false;
                     singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
-                    singleResult.ErrorMessage = $"CRL retrieval or validation failed for certificate {chainCert.Subject}. Last error: {lastCrlException?.Message}";
+                    singleResult.ErrorMessage = OdfLocalizer.GetMessage(
+                        "Err_OdfSignatureVerifier_CrlCheckFailed",
+                        chainCert.Subject,
+                        lastCrlErrorMessage);
+                    if (lastCrlErrorMessage != null && lastCrlErrorMessage.Length > 0)
+                        singleResult.Warnings.Add(lastCrlErrorMessage);
                     return false;
                 }
             }

@@ -133,22 +133,21 @@ public class OpenFormulaSupportTests
     }
 
     /// <summary>
-    /// 驗證冪次運算採右結合。
+    /// 驗證冪次運算採左結合。
     /// </summary>
     [Fact]
-    public void ExponentiationUsesRightAssociativity()
+    public void ExponentiationUsesLeftAssociativity()
     {
         var evaluator = new DefaultFormulaEvaluator();
         var context = new FormulaAndStylesTest.MockEvaluationContext();
 
         double chainedPower = Assert.IsType<double>(evaluator.Evaluate("2^3^2", context));
 
-        Assert.Equal(512d, chainedPower);
+        Assert.Equal(64d, chainedPower);
     }
 
     /// <summary>
-    /// Verifies that exponentiation binds tighter than unary minus, per the OpenFormula grammar.
-    /// 驗證冪次運算的優先順序高於一元負號，符合 OpenFormula 語法規範。
+    /// 驗證一元負號的優先順序高於乘方，符合 OpenFormula 語法規範。
     /// </summary>
     [Fact]
     public void ExponentiationBindsTighterThanUnaryMinus()
@@ -159,8 +158,24 @@ public class OpenFormulaSupportTests
         double negatedSquare = Assert.IsType<double>(evaluator.Evaluate("-2^2", context));
         double negativeExponent = Assert.IsType<double>(evaluator.Evaluate("2^-2", context));
 
-        Assert.Equal(-4d, negatedSquare);
+        Assert.Equal(4d, negatedSquare);
         Assert.Equal(0.25d, negativeExponent);
+    }
+
+    /// <summary>
+    /// 驗證連續前置一元運算子（如 --2）可正確解析為巢狀一元節點。
+    /// </summary>
+    [Fact]
+    public void ChainedUnaryOperatorsAreParsedCorrectly()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new FormulaAndStylesTest.MockEvaluationContext();
+
+        double doubleNegation = Assert.IsType<double>(evaluator.Evaluate("--2", context));
+        double negatedPositive = Assert.IsType<double>(evaluator.Evaluate("-+3", context));
+
+        Assert.Equal(2d, doubleNegation);
+        Assert.Equal(-3d, negatedPositive);
     }
 
     /// <summary>

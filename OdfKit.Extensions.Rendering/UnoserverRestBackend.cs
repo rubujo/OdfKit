@@ -155,12 +155,15 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         int bytesRead;
         while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
         {
-            totalBytes += bytesRead;
-            if (totalBytes > maxBytes)
+            if (maxBytes > 0 && bytesRead > maxBytes - totalBytes)
             {
-                throw new InvalidDataException(OdfLocalizer.GetMessage(errorMessageKey, totalBytes, maxBytes));
+                long exceededBytes = totalBytes > long.MaxValue - bytesRead
+                    ? long.MaxValue
+                    : totalBytes + bytesRead;
+                throw new InvalidDataException(OdfLocalizer.GetMessage(errorMessageKey, exceededBytes, maxBytes));
             }
 
+            totalBytes += bytesRead;
             await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
         }
     }

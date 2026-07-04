@@ -25,18 +25,11 @@ internal static class OdfBoundedStreamReader
     {
         byte[] buffer = new byte[DefaultBufferSize];
         long totalBytes = initialBytes;
+        EnsureInitialBytes(totalBytes, maxBytes, errorMessageKey);
         int bytesRead;
         while ((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0)
         {
-            checked
-            {
-                totalBytes += bytesRead;
-            }
-
-            if (maxBytes > 0 && totalBytes > maxBytes)
-            {
-                throw new SecurityException(OdfLocalizer.GetMessage(errorMessageKey, totalBytes, maxBytes));
-            }
+            totalBytes = AddBytes(totalBytes, bytesRead, maxBytes, errorMessageKey);
 
             destination.Write(buffer, 0, bytesRead);
         }
@@ -52,18 +45,11 @@ internal static class OdfBoundedStreamReader
     {
         byte[] buffer = new byte[DefaultBufferSize];
         long totalBytes = initialBytes;
+        EnsureInitialBytes(totalBytes, maxBytes, errorMessageKey);
         int bytesRead;
         while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
         {
-            checked
-            {
-                totalBytes += bytesRead;
-            }
-
-            if (maxBytes > 0 && totalBytes > maxBytes)
-            {
-                throw new SecurityException(OdfLocalizer.GetMessage(errorMessageKey, totalBytes, maxBytes));
-            }
+            totalBytes = AddBytes(totalBytes, bytesRead, maxBytes, errorMessageKey);
 
             await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
         }
@@ -87,5 +73,24 @@ internal static class OdfBoundedStreamReader
             : 0);
         await CopyToAsync(stream, ms, maxBytes, errorMessageKey, cancellationToken).ConfigureAwait(false);
         return ms.ToArray();
+    }
+
+    private static void EnsureInitialBytes(long totalBytes, long maxBytes, string errorMessageKey)
+    {
+        if (maxBytes > 0 && totalBytes > maxBytes)
+        {
+            throw new SecurityException(OdfLocalizer.GetMessage(errorMessageKey, totalBytes, maxBytes));
+        }
+    }
+
+    private static long AddBytes(long totalBytes, int bytesRead, long maxBytes, string errorMessageKey)
+    {
+        if (maxBytes > 0 && bytesRead > maxBytes - totalBytes)
+        {
+            long exceededBytes = totalBytes > long.MaxValue - bytesRead ? long.MaxValue : totalBytes + bytesRead;
+            throw new SecurityException(OdfLocalizer.GetMessage(errorMessageKey, exceededBytes, maxBytes));
+        }
+
+        return totalBytes + bytesRead;
     }
 }

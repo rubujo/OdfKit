@@ -110,12 +110,15 @@ public static class XlsxToOdfConverter
         int bytesRead;
         while ((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0)
         {
-            totalBytes += bytesRead;
-            if (totalBytes > maxBytes)
+            if (maxBytes > 0 && bytesRead > maxBytes - totalBytes)
             {
-                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded", totalBytes, maxBytes));
+                long exceededBytes = totalBytes > long.MaxValue - bytesRead
+                    ? long.MaxValue
+                    : totalBytes + bytesRead;
+                throw new InvalidDataException(OdfLocalizer.GetMessage("Err_XlsxToOdfConverter_XlsxInputSizeLimitExceeded", exceededBytes, maxBytes));
             }
 
+            totalBytes += bytesRead;
             destination.Write(buffer, 0, bytesRead);
         }
     }
