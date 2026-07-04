@@ -1644,7 +1644,8 @@ public partial class OptimizedRefactoringTests
                 byte[] buffer = new byte[1024];
                 // 讀取觸發第一次 FillPrefetchBuffer／TriggerNextPrefetch，
                 // 讓背景預讀工作在 Dispose 呼叫當下仍有機會尚未完成。
-                reader.Read(buffer, 0, buffer.Length);
+                int bytesRead = reader.Read(buffer, 0, buffer.Length);
+                Assert.True(bytesRead >= 0);
                 reader.Dispose();
             }
         }

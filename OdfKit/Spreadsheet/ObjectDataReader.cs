@@ -225,6 +225,9 @@ public sealed class ObjectDataReader<
     /// </summary>
     /// <param name="ordinal">The zero-based column index. / 採零起始的資料行索引。</param>
     /// <returns>The <see cref="Type"/> of the column. / 該資料行的 <see cref="Type"/>。</returns>
+    [return: System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(
+        System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields |
+        System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]
     public override Type GetFieldType(int ordinal) => Columns[ordinal].PropertyType;
 
     /// <summary>

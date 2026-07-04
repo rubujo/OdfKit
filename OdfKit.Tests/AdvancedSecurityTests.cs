@@ -275,8 +275,8 @@ namespace OdfKit.Tests
             OdfLocalizer.DefaultCulture = CultureInfo.GetCultureInfo("en-US");
             try
             {
-            // Build CDP DER bytes for the test URL "http://mockcrl.com/revocation.crl"
-            var cdpBytes = new byte[] {
+                // Build CDP DER bytes for the test URL "http://mockcrl.com/revocation.crl"
+                var cdpBytes = new byte[] {
                 0x30, 0x29, 0x30, 0x27, 0xa0, 0x25, 0xa0, 0x23, 0x86, 0x21,
                 (byte)'h', (byte)'t', (byte)'t', (byte)'p', (byte)':', (byte)'/', (byte)'/',
                 (byte)'m', (byte)'o', (byte)'c', (byte)'k', (byte)'c', (byte)'r', (byte)'l', (byte)'.', (byte)'c', (byte)'o', (byte)'m',
@@ -284,104 +284,54 @@ namespace OdfKit.Tests
                 (byte)'.', (byte)'c', (byte)'r', (byte)'l'
             };
 
-            var (rootCert, leafCert) = GenerateCertificateChain("XadesARootCA", "XadesATestSigner", cdpBytes);
-            using var signerCA = rootCert;
-            using var signerCert = leafCert;
-            using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
+                var (rootCert, leafCert) = GenerateCertificateChain("XadesARootCA", "XadesATestSigner", cdpBytes);
+                using var signerCA = rootCert;
+                using var signerCert = leafCert;
+                using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
 
-            // Generate mock CRL containing no revoked serials first, issued by CA (signerCA)
-            byte[] cleanCrlBytes = CreateMockCrlBytes(signerCA, new List<string>());
+                // Generate mock CRL containing no revoked serials first, issued by CA (signerCA)
+                byte[] cleanCrlBytes = CreateMockCrlBytes(signerCA, new List<string>());
 
-            // Generate mock CRL containing the leafCert's serial to mock a revoked certificate, issued by CA (signerCA)
-            byte[] revokedCrlBytes = CreateMockCrlBytes(signerCA, new List<string> { signerCert.SerialNumber });
+                // Generate mock CRL containing the leafCert's serial to mock a revoked certificate, issued by CA (signerCA)
+                byte[] revokedCrlBytes = CreateMockCrlBytes(signerCA, new List<string> { signerCert.SerialNumber });
 
-            bool triggerRevocation = false;
+                bool triggerRevocation = false;
 
-            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
-            {
-                string url = request.RequestUri?.AbsoluteUri ?? "";
-                if (url == "http://mocktsa.com/tsa")
+                var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
                 {
-                    byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
-                    var root = ParseDer(reqBytes);
-                    byte[] hash = root.Children[1].Children[1].Value;
-                    byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
+                    string url = request.RequestUri?.AbsoluteUri ?? "";
+                    if (url == "http://mocktsa.com/tsa")
+                    {
+                        byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
+                        var root = ParseDer(reqBytes);
+                        byte[] hash = root.Children[1].Children[1].Value;
+                        byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
 
-                    var contentInfo = new ContentInfo(new Oid("1.2.840.113549.1.9.16.1.4"), tstInfoBytes);
-                    var signedCms = new SignedCms(contentInfo, false);
-                    signedCms.ComputeSignature(new CmsSigner(tsaCert));
+                        var contentInfo = new ContentInfo(new Oid("1.2.840.113549.1.9.16.1.4"), tstInfoBytes);
+                        var signedCms = new SignedCms(contentInfo, false);
+                        signedCms.ComputeSignature(new CmsSigner(tsaCert));
 
-                    byte[] tsaResponse = CreateTsaResponse(signedCms.Encode());
-                    return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new ByteArrayContent(tsaResponse) };
-                }
-                else if (url == "http://mockcrl.com/revocation.crl")
+                        byte[] tsaResponse = CreateTsaResponse(signedCms.Encode());
+                        return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new ByteArrayContent(tsaResponse) };
+                    }
+                    else if (url == "http://mockcrl.com/revocation.crl")
+                    {
+                        byte[] crl = triggerRevocation ? revokedCrlBytes : cleanCrlBytes;
+                        return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new ByteArrayContent(crl) };
+                    }
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+                });
+
+                using var httpClient = new HttpClient(mockHandler);
+                using var ms = new MemoryStream();
+
+                // 1. Sign package as XAdES-LT, which downloads and embeds the CRL.
+                using (var package = OdfPackage.Create(ms, leaveOpen: true))
                 {
-                    byte[] crl = triggerRevocation ? revokedCrlBytes : cleanCrlBytes;
-                    return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new ByteArrayContent(crl) };
-                }
-                return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
-            });
+                    package.SetMimeType("application/vnd.oasis.opendocument.text");
+                    package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
 
-            using var httpClient = new HttpClient(mockHandler);
-            using var ms = new MemoryStream();
-
-            // 1. Sign package as XAdES-LT, which downloads and embeds the CRL.
-            using (var package = OdfPackage.Create(ms, leaveOpen: true))
-            {
-                package.SetMimeType("application/vnd.oasis.opendocument.text");
-                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-
-                var options = new OdfSigningOptions
-                {
-                    Level = XadesLevel.LT,
-                    TsaUrl = "http://mocktsa.com/tsa",
-                    HttpClient = httpClient,
-                    CheckRevocation = true,
-                    AllowUntrustedRoot = true
-                };
-                options.ExtraCertificates.Add(signerCA);
-
-                await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
-                package.Save();
-            }
-
-            // 2. Open package and verify validation
-            ms.Position = 0;
-            using (var package = OdfPackage.Open(ms))
-            {
-                // Verify XML contains EncapsulatedCertificate and EncapsulatedCRLValue
-                using (var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml"))
-                {
-                    var doc = new XmlDocument();
-                    doc.Load(sigStream);
-
-                    var ns = new XmlNamespaceManager(doc.NameTable);
-                    ns.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
-
-                    var certValues = doc.SelectSingleNode("//xades:CertificateValues/xades:EncapsulatedCertificate", ns);
-                    Assert.NotNull(certValues);
-
-                    var revValues = doc.SelectSingleNode("//xades:RevocationValues/xades:CRLValues/xades:EncapsulatedCRLValue", ns);
-                    Assert.NotNull(revValues);
-                }
-
-                // Verify package validation passes when certificate is clean
-                var options = new OdfSigningOptions { HttpClient = httpClient, CheckRevocation = true, AllowUntrustedRoot = true, AllowUntrustedTimestamp = true };
-                options.ExtraCertificates.Add(signerCA);
-                var result = await OdfSigner.VerifySignaturesAsync(package, options, cancellationToken: TestContext.Current.CancellationToken);
-                Assert.True(result.IsValid, result.Signatures.FirstOrDefault()?.ErrorMessage);
-                Assert.True(result.Signatures[0].IsRevocationValid);
-
-                // 3. Verify revocation check fails offline when the embedded CRL lists the cert as revoked
-                // We recreate package with the revoked CRL embedded
-                using var msRevoked = new MemoryStream();
-                triggerRevocation = true;
-                using (var packageRevoked = OdfPackage.Create(msRevoked, leaveOpen: true))
-                {
-                    packageRevoked.SetMimeType("application/vnd.oasis.opendocument.text");
-                    packageRevoked.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-
-                    var optionsRevoked = new OdfSigningOptions
+                    var options = new OdfSigningOptions
                     {
                         Level = XadesLevel.LT,
                         TsaUrl = "http://mocktsa.com/tsa",
@@ -389,20 +339,70 @@ namespace OdfKit.Tests
                         CheckRevocation = true,
                         AllowUntrustedRoot = true
                     };
-                    optionsRevoked.ExtraCertificates.Add(signerCA);
-                    await OdfSigner.SignAsync(packageRevoked, signerCert, optionsRevoked, cancellationToken: TestContext.Current.CancellationToken);
-                    packageRevoked.Save();
+                    options.ExtraCertificates.Add(signerCA);
+
+                    await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
+                    package.Save();
                 }
 
-                msRevoked.Position = 0;
-                using (var packageRevoked = OdfPackage.Open(msRevoked))
+                // 2. Open package and verify validation
+                ms.Position = 0;
+                using (var package = OdfPackage.Open(ms))
                 {
-                    var resultRevoked = await OdfSigner.VerifySignaturesAsync(packageRevoked, options, cancellationToken: TestContext.Current.CancellationToken);
-                    Assert.False(resultRevoked.IsValid);
-                    Assert.False(resultRevoked.Signatures[0].IsRevocationValid);
-                    Assert.Contains("revoked", resultRevoked.Signatures[0].ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+                    // Verify XML contains EncapsulatedCertificate and EncapsulatedCRLValue
+                    using (var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml"))
+                    {
+                        var doc = new XmlDocument();
+                        doc.Load(sigStream);
+
+                        var ns = new XmlNamespaceManager(doc.NameTable);
+                        ns.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
+
+                        var certValues = doc.SelectSingleNode("//xades:CertificateValues/xades:EncapsulatedCertificate", ns);
+                        Assert.NotNull(certValues);
+
+                        var revValues = doc.SelectSingleNode("//xades:RevocationValues/xades:CRLValues/xades:EncapsulatedCRLValue", ns);
+                        Assert.NotNull(revValues);
+                    }
+
+                    // Verify package validation passes when certificate is clean
+                    var options = new OdfSigningOptions { HttpClient = httpClient, CheckRevocation = true, AllowUntrustedRoot = true, AllowUntrustedTimestamp = true };
+                    options.ExtraCertificates.Add(signerCA);
+                    var result = await OdfSigner.VerifySignaturesAsync(package, options, cancellationToken: TestContext.Current.CancellationToken);
+                    Assert.True(result.IsValid, result.Signatures.FirstOrDefault()?.ErrorMessage);
+                    Assert.True(result.Signatures[0].IsRevocationValid);
+
+                    // 3. Verify revocation check fails offline when the embedded CRL lists the cert as revoked
+                    // We recreate package with the revoked CRL embedded
+                    using var msRevoked = new MemoryStream();
+                    triggerRevocation = true;
+                    using (var packageRevoked = OdfPackage.Create(msRevoked, leaveOpen: true))
+                    {
+                        packageRevoked.SetMimeType("application/vnd.oasis.opendocument.text");
+                        packageRevoked.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+
+                        var optionsRevoked = new OdfSigningOptions
+                        {
+                            Level = XadesLevel.LT,
+                            TsaUrl = "http://mocktsa.com/tsa",
+                            HttpClient = httpClient,
+                            CheckRevocation = true,
+                            AllowUntrustedRoot = true
+                        };
+                        optionsRevoked.ExtraCertificates.Add(signerCA);
+                        await OdfSigner.SignAsync(packageRevoked, signerCert, optionsRevoked, cancellationToken: TestContext.Current.CancellationToken);
+                        packageRevoked.Save();
+                    }
+
+                    msRevoked.Position = 0;
+                    using (var packageRevoked = OdfPackage.Open(msRevoked))
+                    {
+                        var resultRevoked = await OdfSigner.VerifySignaturesAsync(packageRevoked, options, cancellationToken: TestContext.Current.CancellationToken);
+                        Assert.False(resultRevoked.IsValid);
+                        Assert.False(resultRevoked.Signatures[0].IsRevocationValid);
+                        Assert.Contains("revoked", resultRevoked.Signatures[0].ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+                    }
                 }
-            }
             }
             finally
             {
@@ -664,26 +664,26 @@ namespace OdfKit.Tests
             OdfLocalizer.DefaultCulture = CultureInfo.GetCultureInfo("en-US");
             try
             {
-            using var expiredCert = GenerateSelfSignedCertificate("ExpiredSigner", DateTimeOffset.UtcNow.AddDays(-10), DateTimeOffset.UtcNow.AddDays(-1));
-            using var ms = new MemoryStream();
+                using var expiredCert = GenerateSelfSignedCertificate("ExpiredSigner", DateTimeOffset.UtcNow.AddDays(-10), DateTimeOffset.UtcNow.AddDays(-1));
+                using var ms = new MemoryStream();
 
-            using (var package = OdfPackage.Create(ms, leaveOpen: true))
-            {
-                package.SetMimeType("application/vnd.oasis.opendocument.text");
-                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+                using (var package = OdfPackage.Create(ms, leaveOpen: true))
+                {
+                    package.SetMimeType("application/vnd.oasis.opendocument.text");
+                    package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
 
-                await OdfSigner.SignAsync(package, expiredCert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
-                package.Save();
-            }
+                    await OdfSigner.SignAsync(package, expiredCert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
+                    package.Save();
+                }
 
-            ms.Position = 0;
-            using (var package = OdfPackage.Open(ms))
-            {
-                var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
-                Assert.False(result.IsValid, "Verification should fail for expired certificate");
-                Assert.False(result.Signatures[0].IsCertificateValid);
-                Assert.Contains("expired", result.Signatures[0].ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
-            }
+                ms.Position = 0;
+                using (var package = OdfPackage.Open(ms))
+                {
+                    var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
+                    Assert.False(result.IsValid, "Verification should fail for expired certificate");
+                    Assert.False(result.Signatures[0].IsCertificateValid);
+                    Assert.Contains("expired", result.Signatures[0].ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+                }
             }
             finally
             {
@@ -1208,29 +1208,29 @@ namespace OdfKit.Tests
             OdfLocalizer.DefaultCulture = CultureInfo.GetCultureInfo("en-US");
             try
             {
-            using var cert = GenerateSelfSignedCertificate("ExpiredSigner", DateTimeOffset.UtcNow.AddDays(-5), DateTimeOffset.UtcNow.AddDays(-1));
-            using var ms = new MemoryStream();
+                using var cert = GenerateSelfSignedCertificate("ExpiredSigner", DateTimeOffset.UtcNow.AddDays(-5), DateTimeOffset.UtcNow.AddDays(-1));
+                using var ms = new MemoryStream();
 
-            using (var package = OdfPackage.Create(ms, leaveOpen: true))
-            {
-                package.SetMimeType("application/vnd.oasis.opendocument.text");
-                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
-                package.Save();
-            }
+                using (var package = OdfPackage.Create(ms, leaveOpen: true))
+                {
+                    package.SetMimeType("application/vnd.oasis.opendocument.text");
+                    package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+                    await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
+                    package.Save();
+                }
 
-            ms.Position = 0;
-            using (var package = OdfPackage.Open(ms))
-            {
-                var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
-                Assert.False(result.IsValid);
-                Assert.Single(result.Signatures);
+                ms.Position = 0;
+                using (var package = OdfPackage.Open(ms))
+                {
+                    var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
+                    Assert.False(result.IsValid);
+                    Assert.Single(result.Signatures);
 
-                var sig = result.Signatures[0];
-                Assert.True(sig.IsSignatureValid);
-                Assert.False(sig.IsCertificateValid);
-                Assert.Contains("expired", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
-            }
+                    var sig = result.Signatures[0];
+                    Assert.True(sig.IsSignatureValid);
+                    Assert.False(sig.IsCertificateValid);
+                    Assert.Contains("expired", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+                }
             }
             finally
             {
@@ -1251,29 +1251,29 @@ namespace OdfKit.Tests
             OdfLocalizer.DefaultCulture = CultureInfo.GetCultureInfo("en-US");
             try
             {
-            using var cert = GenerateSelfSignedCertificate("FutureSigner", DateTimeOffset.UtcNow.AddDays(1), DateTimeOffset.UtcNow.AddDays(5));
-            using var ms = new MemoryStream();
+                using var cert = GenerateSelfSignedCertificate("FutureSigner", DateTimeOffset.UtcNow.AddDays(1), DateTimeOffset.UtcNow.AddDays(5));
+                using var ms = new MemoryStream();
 
-            using (var package = OdfPackage.Create(ms, leaveOpen: true))
-            {
-                package.SetMimeType("application/vnd.oasis.opendocument.text");
-                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-                await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
-                package.Save();
-            }
+                using (var package = OdfPackage.Create(ms, leaveOpen: true))
+                {
+                    package.SetMimeType("application/vnd.oasis.opendocument.text");
+                    package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+                    await OdfSigner.SignAsync(package, cert, new OdfSigningOptions { Level = XadesLevel.None }, cancellationToken: TestContext.Current.CancellationToken);
+                    package.Save();
+                }
 
-            ms.Position = 0;
-            using (var package = OdfPackage.Open(ms))
-            {
-                var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
-                Assert.False(result.IsValid);
-                Assert.Single(result.Signatures);
+                ms.Position = 0;
+                using (var package = OdfPackage.Open(ms))
+                {
+                    var result = await OdfSigner.VerifySignaturesAsync(package, cancellationToken: TestContext.Current.CancellationToken);
+                    Assert.False(result.IsValid);
+                    Assert.Single(result.Signatures);
 
-                var sig = result.Signatures[0];
-                Assert.True(sig.IsSignatureValid);
-                Assert.False(sig.IsCertificateValid);
-                Assert.Contains("not yet valid", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
-            }
+                    var sig = result.Signatures[0];
+                    Assert.True(sig.IsSignatureValid);
+                    Assert.False(sig.IsCertificateValid);
+                    Assert.Contains("not yet valid", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+                }
             }
             finally
             {
@@ -1439,90 +1439,90 @@ namespace OdfKit.Tests
             OdfLocalizer.DefaultCulture = CultureInfo.GetCultureInfo("en-US");
             try
             {
-            using var signerCert = GenerateSelfSignedCertificate("SignerCert", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
-            using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
+                using var signerCert = GenerateSelfSignedCertificate("SignerCert", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
+                using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
 
-            var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
-            {
-                if (request.RequestUri?.AbsoluteUri == "http://mocktsa.com/tsa")
+                var mockHandler = new MockHttpMessageHandler(async (request, ct) =>
                 {
-                    byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
-                    var root = ParseDer(reqBytes);
-                    byte[] hash = root.Children[1].Children[1].Value;
-                    byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
+                    if (request.RequestUri?.AbsoluteUri == "http://mocktsa.com/tsa")
+                    {
+                        byte[] reqBytes = await request.Content!.ReadAsByteArrayAsync(ct);
+                        var root = ParseDer(reqBytes);
+                        byte[] hash = root.Children[1].Children[1].Value;
+                        byte[] tstInfoBytes = CreateMockTstInfoBytes(hash);
 
-                    var contentInfo = new ContentInfo(new Oid("1.2.840.113549.1.9.16.1.4"), tstInfoBytes);
-                    var signedCms = new SignedCms(contentInfo, false);
-                    var signer = new CmsSigner(tsaCert);
-                    signedCms.ComputeSignature(signer);
+                        var contentInfo = new ContentInfo(new Oid("1.2.840.113549.1.9.16.1.4"), tstInfoBytes);
+                        var signedCms = new SignedCms(contentInfo, false);
+                        var signer = new CmsSigner(tsaCert);
+                        signedCms.ComputeSignature(signer);
 
-                    byte[] tokenBytes = signedCms.Encode();
-                    byte[] tsaResponse = CreateTsaResponse(tokenBytes);
+                        byte[] tokenBytes = signedCms.Encode();
+                        byte[] tsaResponse = CreateTsaResponse(tokenBytes);
 
-                    return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new ByteArrayContent(tsaResponse) };
+                        return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new ByteArrayContent(tsaResponse) };
+                    }
+                    return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
+                });
+
+                using var httpClient = new HttpClient(mockHandler);
+                using var ms = new MemoryStream();
+
+                using (var package = OdfPackage.Create(ms, leaveOpen: true))
+                {
+                    package.SetMimeType("application/vnd.oasis.opendocument.text");
+                    package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+
+                    var options = new OdfSigningOptions
+                    {
+                        Level = XadesLevel.T,
+                        TsaUrl = "http://mocktsa.com/tsa",
+                        HttpClient = httpClient
+                    };
+
+                    await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
+                    package.Save();
                 }
-                return new HttpResponseMessage(System.Net.HttpStatusCode.NotFound);
-            });
 
-            using var httpClient = new HttpClient(mockHandler);
-            using var ms = new MemoryStream();
-
-            using (var package = OdfPackage.Create(ms, leaveOpen: true))
-            {
-                package.SetMimeType("application/vnd.oasis.opendocument.text");
-                package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
-
-                var options = new OdfSigningOptions
+                ms.Position = 0;
+                byte[] tamperedXmlBytes;
+                using (var package = OdfPackage.Open(ms, leaveOpen: true))
                 {
-                    Level = XadesLevel.T,
-                    TsaUrl = "http://mocktsa.com/tsa",
-                    HttpClient = httpClient
-                };
+                    using var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml");
+                    var doc = new XmlDocument();
+                    doc.Load(sigStream);
 
-                await OdfSigner.SignAsync(package, signerCert, options, cancellationToken: TestContext.Current.CancellationToken);
-                package.Save();
-            }
+                    var ns = new XmlNamespaceManager(doc.NameTable);
+                    ns.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
 
-            ms.Position = 0;
-            byte[] tamperedXmlBytes;
-            using (var package = OdfPackage.Open(ms, leaveOpen: true))
-            {
-                using var sigStream = package.GetEntryStream("META-INF/documentsignatures.xml");
-                var doc = new XmlDocument();
-                doc.Load(sigStream);
+                    var encap = doc.SelectSingleNode("//xades:SignatureTimeStamp/xades:EncapsulatedTimeStamp", ns);
+                    Assert.NotNull(encap);
 
-                var ns = new XmlNamespaceManager(doc.NameTable);
-                ns.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
+                    string origB64 = encap.InnerText.Trim();
+                    char modifiedChar = origB64[0] == 'A' ? 'B' : 'A';
+                    encap.InnerText = modifiedChar + origB64.Substring(1);
 
-                var encap = doc.SelectSingleNode("//xades:SignatureTimeStamp/xades:EncapsulatedTimeStamp", ns);
-                Assert.NotNull(encap);
+                    using var outMs = new MemoryStream();
+                    doc.Save(outMs);
+                    tamperedXmlBytes = outMs.ToArray();
+                }
 
-                string origB64 = encap.InnerText.Trim();
-                char modifiedChar = origB64[0] == 'A' ? 'B' : 'A';
-                encap.InnerText = modifiedChar + origB64.Substring(1);
+                using (var package = OdfPackage.Open(ms, leaveOpen: true))
+                {
+                    package.WriteEntry("META-INF/documentsignatures.xml", tamperedXmlBytes, "text/xml");
+                    package.Save();
+                }
 
-                using var outMs = new MemoryStream();
-                doc.Save(outMs);
-                tamperedXmlBytes = outMs.ToArray();
-            }
+                ms.Position = 0;
+                using (var package = OdfPackage.Open(ms))
+                {
+                    var options = new OdfSigningOptions { HttpClient = httpClient, AllowUntrustedRoot = true, AllowUntrustedTimestamp = true };
+                    var result = await OdfSigner.VerifySignaturesAsync(package, options, cancellationToken: TestContext.Current.CancellationToken);
+                    Assert.False(result.IsValid);
 
-            using (var package = OdfPackage.Open(ms, leaveOpen: true))
-            {
-                package.WriteEntry("META-INF/documentsignatures.xml", tamperedXmlBytes, "text/xml");
-                package.Save();
-            }
-
-            ms.Position = 0;
-            using (var package = OdfPackage.Open(ms))
-            {
-                var options = new OdfSigningOptions { HttpClient = httpClient, AllowUntrustedRoot = true, AllowUntrustedTimestamp = true };
-                var result = await OdfSigner.VerifySignaturesAsync(package, options, cancellationToken: TestContext.Current.CancellationToken);
-                Assert.False(result.IsValid);
-
-                var sig = result.Signatures[0];
-                Assert.False(sig.IsTimestampValid);
-                Assert.Contains("Timestamp", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
-            }
+                    var sig = result.Signatures[0];
+                    Assert.False(sig.IsTimestampValid);
+                    Assert.Contains("Timestamp", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+                }
             }
             finally
             {
