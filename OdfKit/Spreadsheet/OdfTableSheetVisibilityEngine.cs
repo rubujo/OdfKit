@@ -27,10 +27,7 @@ internal static class OdfTableSheetVisibilityEngine
         {
             if (child.LocalName == "table-row" && child.NamespaceUri == OdfNamespaces.Table)
             {
-                int repeatedCount = 1;
-                string? repStr = child.GetAttribute("number-rows-repeated", OdfNamespaces.Table);
-                if (!string.IsNullOrEmpty(repStr) && int.TryParse(repStr, out int rc))
-                    repeatedCount = rc;
+                int repeatedCount = OdfTableSheetRepeatSplitEngine.GetRepeatCount(child, "number-rows-repeated");
 
                 if (row >= currentRowIndex && row < currentRowIndex + repeatedCount)
                     return child.GetAttribute("visibility", OdfNamespaces.Table) != "collapse";
@@ -47,10 +44,7 @@ internal static class OdfTableSheetVisibilityEngine
         {
             if (child.LocalName == "table-column" && child.NamespaceUri == OdfNamespaces.Table)
             {
-                int repeatedCount = 1;
-                string? repStr = child.GetAttribute("number-columns-repeated", OdfNamespaces.Table);
-                if (!string.IsNullOrEmpty(repStr) && int.TryParse(repStr, out int rc))
-                    repeatedCount = rc;
+                int repeatedCount = OdfTableSheetRepeatSplitEngine.GetRepeatCount(child, "number-columns-repeated");
 
                 if (col >= currentColIndex && col < currentColIndex + repeatedCount)
                     return child.GetAttribute("visibility", OdfNamespaces.Table) != "collapse";

@@ -35,6 +35,12 @@
 - 修正 `FormulaParser.ParsePower` 對 `^` 運算子左結合與優先序的處理，讓其符合 OpenFormula 規範（`2^3^2` 應為 `64`，且 `-2^2` 應視為 `(-2)^2 = 4`）；並修正連續前置一元運算子（如 `--2`）因遞迴解析誤改而無法剖析的問題。
 - 修正 `OdfPackageEntry.SetContent(byte[])` 未釋放先前指派之 `Stream` 內容的資源洩漏問題，改為與 `SetContent(Stream)` 一致，於覆蓋內容前先行釋放。
 - 修正 `OdfPackageFlatXmlLoader`／`OdfStreamingMailMerge` 於修正整數溢位風險時，意外將 `MaxTotalUncompressedSize = 0` 的語意由「拒絕任何非空內容」改為「不限制」，與 `OdfPackageZipLoader` 及既有慣例不一致的問題。
+- 修正 `FormulaParser.ParseFactor` 解析 `*`／`/` 右運算元時未延伸至乘方層級，導致 `^` 出現在因數運算右側時剖析失敗（如 `2*3^2`）的問題。
+- 修正 `FormulaStringFunctionHandlers.EvaluateSubstitute` 於搜尋文字為空字串時，未帶出現次數引數會擲出未處理的 `System.ArgumentException`、帶出現次數引數則計數邏輯失真的問題，改為直接回傳 `#VALUE!` 診斷。
+- 修正 `OdfTableSheetVisibilityEngine.IsRowVisible`／`IsColumnVisible` 未透過 `OdfTableSheetRepeatSplitEngine.GetRepeatCount` 截斷重複計數上限的問題，避免惡意宣告超大重複計數導致索引整數溢位。
+- 修正 `OdfPackageEntry.OpenReader()` 對以 `Stream` 支援內容的專案直接回傳內部共用資料流本體，導致該資料流於呼叫端 `using` 區塊結束後即被釋放、往後任何存取皆擲出 `ObjectDisposedException` 的問題，改為回傳不會連動釋放底層資料流的包裝資料流。
+- 統一簽章描述檔路徑 `META-INF/documentsignatures.xml` 參照至既有的 `OdfSignerConstants.SignaturePath` 常數，避免多處獨立硬編碼字面值於日後路徑調整時各自失步。
+- 修正 `OdfBouncyCastleOpenPgpProvider` 兩處硬編碼中文例外訊息未透過 `OdfLocalizer.GetMessage` 在地化的問題。
 - 修正 `OdfComment.FromXmlNodeSingle` 在節點具有 `dc:date` 屬性時，會跳過解析 `dc:creator`／`text:p` 子節點導致註解作者與內容遺失的問題。
 - 修正 `OdtStreamReader.CaptureCurrentElement` 一律以 Text 命名空間讀取 `style-name` 屬性，導致表格儲存格（`table:table-cell`）樣式名稱讀取失敗的問題，改為依節點型別選用 Table 或 Text 命名空間。
 - 修正 `OdfPackageEntryAccessEngine.ExtractObjectStream` 於內嵌物件名稱含結尾斜線時，串接出雙斜線路徑（如 `Object 1//content.xml`）導致無法讀取內嵌物件內容的問題。

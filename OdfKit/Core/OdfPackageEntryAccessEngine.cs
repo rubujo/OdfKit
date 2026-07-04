@@ -12,7 +12,6 @@ namespace OdfKit.Core;
 /// </summary>
 internal static class OdfPackageEntryAccessEngine
 {
-    private const string DocumentSignaturesPath = "META-INF/documentsignatures.xml";
     private const string ManifestPath = "META-INF/manifest.xml";
 
     /// <summary>
@@ -83,7 +82,7 @@ internal static class OdfPackageEntryAccessEngine
             ctx.Manifest[folder] = mimeText;
         }
 
-        if (name != DocumentSignaturesPath && name != ManifestPath)
+        if (name != OdfSignerConstants.SignaturePath && name != ManifestPath)
         {
             ctx.RemoveOutdatedSignatures();
         }
@@ -127,7 +126,7 @@ internal static class OdfPackageEntryAccessEngine
             ctx.Manifest[folder] = mimeText;
         }
 
-        if (name != DocumentSignaturesPath && name != ManifestPath)
+        if (name != OdfSignerConstants.SignaturePath && name != ManifestPath)
         {
             ctx.RemoveOutdatedSignatures();
         }
@@ -144,7 +143,7 @@ internal static class OdfPackageEntryAccessEngine
         bool orderRemoved = ctx.EntryOrder.Remove(name);
 
         if ((removed || manifestRemoved || orderRemoved) &&
-            name != DocumentSignaturesPath && name != ManifestPath)
+            name != OdfSignerConstants.SignaturePath && name != ManifestPath)
         {
             ctx.RemoveOutdatedSignatures();
         }

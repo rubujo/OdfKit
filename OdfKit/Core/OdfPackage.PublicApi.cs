@@ -254,7 +254,7 @@ public sealed partial class OdfPackage
                 _manifest[entryName] = resolvedMediaType;
             }
 
-            if (entryName != "META-INF/documentsignatures.xml" && entryName != "META-INF/manifest.xml")
+            if (entryName != OdfSignerConstants.SignaturePath && entryName != "META-INF/manifest.xml")
             {
                 RemoveOutdatedSignatures();
             }

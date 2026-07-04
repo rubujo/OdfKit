@@ -289,7 +289,7 @@ internal class OdfPackageEntry : IDisposable
             {
                 _stream.Position = 0;
             }
-            return _stream;
+            return new NonDisposingStreamWrapper(_stream);
         }
 
         if (_mmfEntry != null && _package != null && _package.Mmf != null)

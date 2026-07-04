@@ -28,7 +28,7 @@ public static partial class OdfPackageValidator
         ["styles.xml"] = "text/xml",
         ["meta.xml"] = "text/xml",
         ["settings.xml"] = "text/xml",
-        ["META-INF/documentsignatures.xml"] = "text/xml"
+        [OdfSignerConstants.SignaturePath] = "text/xml"
     };
     /// <summary>
     /// 驗證 ODF 套件是否符合套件層級規則與選用的設定檔。

@@ -108,7 +108,7 @@ public ref struct FormulaParser
         {
             string op = _currentToken.Span.ToString();
             Consume();
-            var right = ParseUnary();
+            var right = ParsePower();
             node = new BinaryNode(op, node, right);
         }
         return node;

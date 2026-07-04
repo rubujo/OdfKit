@@ -136,7 +136,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
             // 承載資料 = [1 位元組演算法][N 位元組金鑰][2 位元組總和檢查碼]
             if (payload.Length < 4)
                 throw new CryptographicException(
-                    $"解密後的 Session Key Payload 長度不足（{payload.Length} 位元組）。");
+                    OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_SessionKeyPayloadTooShort", payload.Length));
 
             int keyLen = payload.Length - 3;
             byte[] sessionKey = new byte[keyLen];
@@ -153,7 +153,7 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
                 // 驗證失敗時先抹除已複製的金鑰位元組；
                 // 錯誤訊息不得包含預期／實際總和檢查碼值，避免洩漏金鑰位元組總和資訊。
                 Array.Clear(sessionKey, 0, sessionKey.Length);
-                throw new CryptographicException("Session Key 總和檢查碼驗證失敗。");
+                throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfBouncyCastleOpenPgpProvider_SessionKeyChecksumMismatch"));
             }
 
             return sessionKey;

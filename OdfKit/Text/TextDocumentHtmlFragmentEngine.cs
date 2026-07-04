@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -12,6 +13,11 @@ namespace OdfKit.Text;
 /// </summary>
 internal static class TextDocumentHtmlFragmentEngine
 {
+    private static readonly Regex TagNameRegex = new(@"^<\s*(/?)\s*([a-zA-Z0-9]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex HrefAttributeRegex = new(@"href\s*=\s*['""]?([^'""\s>]+)['""]?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex StyleAttributeRegex = new(@"style\s*=\s*(?:""([^""]*)""|'([^']*)')", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly ConcurrentDictionary<string, Regex> CssValueRegexCache = new(StringComparer.OrdinalIgnoreCase);
+
     private sealed class SpanState
     {
         public bool? Bold { get; set; }
@@ -61,7 +67,7 @@ internal static class TextDocumentHtmlFragmentEngine
 
             if (token.StartsWith("<", StringComparison.Ordinal) && !token.StartsWith("<!--", StringComparison.Ordinal))
             {
-                var tagMatch = Regex.Match(token, @"^<\s*(/?)\s*([a-zA-Z0-9]+)", RegexOptions.IgnoreCase);
+                var tagMatch = TagNameRegex.Match(token);
                 if (tagMatch.Success)
                 {
                     isTag = true;
@@ -100,7 +106,7 @@ internal static class TextDocumentHtmlFragmentEngine
                         currentHref = null;
                     else
                     {
-                        var hrefMatch = Regex.Match(token, @"href\s*=\s*['""]?([^'""\s>]+)['""]?", RegexOptions.IgnoreCase);
+                        var hrefMatch = HrefAttributeRegex.Match(token);
                         if (hrefMatch.Success)
                             currentHref = hrefMatch.Groups[1].Value;
                     }
@@ -186,7 +192,7 @@ internal static class TextDocumentHtmlFragmentEngine
     private static SpanState ParseSpanState(string token)
     {
         var state = new SpanState();
-        var styleMatch = Regex.Match(token, @"style\s*=\s*(?:""([^""]*)""|'([^']*)')", RegexOptions.IgnoreCase);
+        var styleMatch = StyleAttributeRegex.Match(token);
         if (!styleMatch.Success)
             return state;
 
@@ -328,7 +334,10 @@ internal static class TextDocumentHtmlFragmentEngine
 
     private static string? MatchCssValue(string style, string name)
     {
-        Match match = Regex.Match(style, Regex.Escape(name) + @"\s*:\s*([^;]+)", RegexOptions.IgnoreCase);
+        Regex regex = CssValueRegexCache.GetOrAdd(
+            name,
+            static n => new Regex(Regex.Escape(n) + @"\s*:\s*([^;]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled));
+        Match match = regex.Match(style);
         return match.Success ? match.Groups[1].Value.Trim() : null;
     }
 

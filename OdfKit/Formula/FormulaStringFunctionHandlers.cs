@@ -125,6 +125,9 @@ internal static class FormulaStringFunctionHandlers
         string oldText = oldVal?.ToString() ?? "";
         string newText = newVal?.ToString() ?? "";
 
+        if (oldText.Length == 0)
+            return OdfFormulaError.Value;
+
         if (arguments.Count == 4)
         {
             var instVal = arguments[3].Evaluate(context);

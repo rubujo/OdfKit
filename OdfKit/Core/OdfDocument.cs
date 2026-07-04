@@ -25,8 +25,6 @@ namespace OdfKit.Core;
 /// </summary>
 public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
 {
-    private const string DocumentSignaturesPath = "META-INF/documentsignatures.xml";
-
     internal static int LastCoreXmlChannelJobCountForTests { get; private set; }
 
     internal static int LastCoreXmlChannelWorkerCountForTests { get; private set; }

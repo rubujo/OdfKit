@@ -85,21 +85,21 @@ public abstract partial class OdfDocument
     /// <returns>描述簽章專案存在狀態、可讀性與簽章數量的摘要</returns>
     public OdfDocumentSignatureSummary GetSignatureSummary()
     {
-        if (!Package.HasEntry(DocumentSignaturesPath))
+        if (!Package.HasEntry(OdfSignerConstants.SignaturePath))
         {
-            return OdfDocumentSignatureSummary.Unsigned(DocumentSignaturesPath);
+            return OdfDocumentSignatureSummary.Unsigned(OdfSignerConstants.SignaturePath);
         }
 
         try
         {
-            using Stream stream = Package.GetEntryStream(DocumentSignaturesPath);
+            using Stream stream = Package.GetEntryStream(OdfSignerConstants.SignaturePath);
             int signatureCount = CountSignatureElements(stream, Package.LoadOptions.MaxXmlCharactersInDocument);
-            return OdfDocumentSignatureSummary.Readable(DocumentSignaturesPath, signatureCount);
+            return OdfDocumentSignatureSummary.Readable(OdfSignerConstants.SignaturePath, signatureCount);
         }
         // 簽章摘要為最佳努力查詢：無法讀取時回傳 Unreadable，不向上拋出。
         catch (Exception ex) when (ex is IOException || ex is InvalidDataException || ex is XmlException)
         {
-            return OdfDocumentSignatureSummary.Unreadable(DocumentSignaturesPath, ex.Message);
+            return OdfDocumentSignatureSummary.Unreadable(OdfSignerConstants.SignaturePath, ex.Message);
         }
     }
 

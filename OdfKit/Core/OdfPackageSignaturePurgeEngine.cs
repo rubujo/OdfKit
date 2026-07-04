@@ -7,8 +7,6 @@ namespace OdfKit.Core;
 /// </summary>
 internal static class OdfPackageSignaturePurgeEngine
 {
-    internal const string DocumentSignaturesPath = "META-INF/documentsignatures.xml";
-
     /// <summary>
     /// 封裝內容變更後移除已失效的 documentsignatures.xml。
     /// </summary>
@@ -16,11 +14,11 @@ internal static class OdfPackageSignaturePurgeEngine
         Dictionary<string, OdfPackageEntry> entries,
         Dictionary<string, string> manifest)
     {
-        if (!entries.ContainsKey(DocumentSignaturesPath))
+        if (!entries.ContainsKey(OdfSignerConstants.SignaturePath))
             return;
 
-        entries.Remove(DocumentSignaturesPath);
-        manifest.Remove(DocumentSignaturesPath);
+        entries.Remove(OdfSignerConstants.SignaturePath);
+        manifest.Remove(OdfSignerConstants.SignaturePath);
         OdfKitDiagnostics.Info("Outdated digital signatures removed due to package edit.");
     }
 }

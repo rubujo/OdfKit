@@ -250,17 +250,17 @@ public static partial class OdfPackageValidator
 
         ValidateEncryptionMetadata(package, profileId, issues);
 
-        if (package.HasEntry("META-INF/documentsignatures.xml") &&
-            !package.Manifest.ContainsKey("META-INF/documentsignatures.xml"))
+        if (package.HasEntry(OdfSignerConstants.SignaturePath) &&
+            !package.Manifest.ContainsKey(OdfSignerConstants.SignaturePath))
         {
             issues.Add(new OdfValidationIssue(
                 OdfIssueSeverity.Error,
                 "ODF0110",
                 "Digital signature entry must be listed in META-INF/manifest.xml.",
-                "META-INF/documentsignatures.xml",
+                OdfSignerConstants.SignaturePath,
                 profileId: profileId,
                 details: ManifestDetails(
-                    entryPath: "META-INF/documentsignatures.xml",
+                    entryPath: OdfSignerConstants.SignaturePath,
                     expectedManifestEntry: "present",
                     actualManifestEntry: "missing")));
         }

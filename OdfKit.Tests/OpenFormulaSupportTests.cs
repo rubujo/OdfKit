@@ -147,6 +147,24 @@ public class OpenFormulaSupportTests
     }
 
     /// <summary>
+    /// 驗證乘方運算子出現在因數運算（*、/）右運算元時仍能正確剖析並套用其優先權。
+    /// </summary>
+    [Fact]
+    public void ExponentiationBindsTighterThanMultiplicationOnRightOperand()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new FormulaAndStylesTest.MockEvaluationContext();
+
+        double powerAfterMultiply = Assert.IsType<double>(evaluator.Evaluate("2*3^2", context));
+        double powerBeforeMultiply = Assert.IsType<double>(evaluator.Evaluate("2^2*3", context));
+        double powerBeforeMultiplyReversed = Assert.IsType<double>(evaluator.Evaluate("3^2*2", context));
+
+        Assert.Equal(18d, powerAfterMultiply);
+        Assert.Equal(12d, powerBeforeMultiply);
+        Assert.Equal(18d, powerBeforeMultiplyReversed);
+    }
+
+    /// <summary>
     /// 驗證一元負號的優先順序高於乘方，符合 OpenFormula 語法規範。
     /// </summary>
     [Fact]
@@ -176,6 +194,22 @@ public class OpenFormulaSupportTests
 
         Assert.Equal(2d, doubleNegation);
         Assert.Equal(-3d, negatedPositive);
+    }
+
+    /// <summary>
+    /// 驗證 SUBSTITUTE 於搜尋文字為空字串時回傳 #VALUE! 診斷，而非擲出未處理的框架例外。
+    /// </summary>
+    [Fact]
+    public void SubstituteWithEmptySearchTextReturnsValueError()
+    {
+        var evaluator = new DefaultFormulaEvaluator();
+        var context = new FormulaAndStylesTest.MockEvaluationContext();
+
+        object withoutOccurrence = evaluator.Evaluate("SUBSTITUTE(\"abc\", \"\", \"X\")", context);
+        object withOccurrence = evaluator.Evaluate("SUBSTITUTE(\"abc\", \"\", \"X\", 2)", context);
+
+        Assert.IsType<OdfFormulaError>(withoutOccurrence);
+        Assert.IsType<OdfFormulaError>(withOccurrence);
     }
 
     /// <summary>
