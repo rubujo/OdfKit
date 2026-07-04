@@ -15,11 +15,19 @@ namespace OdfKit.Tests
 {
     [Collection("SequentialRenderingTests")]
     [Trait(TestCategories.Kind, TestCategories.Interop)]
-    public class LibreOfficeRendererDiagnosticsTests
+    public class LibreOfficeRendererDiagnosticsTests : IDisposable
     {
+        private readonly CultureInfo? _originalDefaultCulture;
+
         public LibreOfficeRendererDiagnosticsTests()
         {
+            _originalDefaultCulture = OdfLocalizer.DefaultCulture;
             OdfLocalizer.DefaultCulture = new CultureInfo("en");
+        }
+
+        public void Dispose()
+        {
+            OdfLocalizer.DefaultCulture = _originalDefaultCulture;
         }
 
         [Fact]

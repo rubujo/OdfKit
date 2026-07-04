@@ -78,70 +78,53 @@ public static class OdfFormulaLatexConverter
                 useLimits = !isIntegral && !largeOp.ForceNoLimits;
             }
 
+            void AppendWrapped(string tag, bool includeSub, bool includeSup)
+            {
+                sb.Append('<').Append(tag).Append('>');
+                AppendBaseAtom(sb, atom);
+                if (includeSub)
+                {
+                    sb.Append("<mrow>");
+                    AppendMathList(sb, atom.Subscript);
+                    sb.Append("</mrow>");
+                }
+                if (includeSup)
+                {
+                    sb.Append("<mrow>");
+                    AppendMathList(sb, atom.Superscript);
+                    sb.Append("</mrow>");
+                }
+                sb.Append("</").Append(tag).Append('>');
+            }
+
             if (useLimits)
             {
                 if (hasSub && hasSup)
                 {
-                    sb.Append("<munderover>");
-                    AppendBaseAtom(sb, atom);
-                    sb.Append("<mrow>");
-                    AppendMathList(sb, atom.Subscript);
-                    sb.Append("</mrow>");
-                    sb.Append("<mrow>");
-                    AppendMathList(sb, atom.Superscript);
-                    sb.Append("</mrow>");
-                    sb.Append("</munderover>");
+                    AppendWrapped("munderover", true, true);
                 }
                 else if (hasSub)
                 {
-                    sb.Append("<munder>");
-                    AppendBaseAtom(sb, atom);
-                    sb.Append("<mrow>");
-                    AppendMathList(sb, atom.Subscript);
-                    sb.Append("</mrow>");
-                    sb.Append("</munder>");
+                    AppendWrapped("munder", true, false);
                 }
                 else
                 {
-                    sb.Append("<mover>");
-                    AppendBaseAtom(sb, atom);
-                    sb.Append("<mrow>");
-                    AppendMathList(sb, atom.Superscript);
-                    sb.Append("</mrow>");
-                    sb.Append("</mover>");
+                    AppendWrapped("mover", false, true);
                 }
             }
             else
             {
                 if (hasSub && hasSup)
                 {
-                    sb.Append("<msubsup>");
-                    AppendBaseAtom(sb, atom);
-                    sb.Append("<mrow>");
-                    AppendMathList(sb, atom.Subscript);
-                    sb.Append("</mrow>");
-                    sb.Append("<mrow>");
-                    AppendMathList(sb, atom.Superscript);
-                    sb.Append("</mrow>");
-                    sb.Append("</msubsup>");
+                    AppendWrapped("msubsup", true, true);
                 }
                 else if (hasSub)
                 {
-                    sb.Append("<msub>");
-                    AppendBaseAtom(sb, atom);
-                    sb.Append("<mrow>");
-                    AppendMathList(sb, atom.Subscript);
-                    sb.Append("</mrow>");
-                    sb.Append("</msub>");
+                    AppendWrapped("msub", true, false);
                 }
                 else
                 {
-                    sb.Append("<msup>");
-                    AppendBaseAtom(sb, atom);
-                    sb.Append("<mrow>");
-                    AppendMathList(sb, atom.Superscript);
-                    sb.Append("</mrow>");
-                    sb.Append("</msup>");
+                    AppendWrapped("msup", false, true);
                 }
             }
         }

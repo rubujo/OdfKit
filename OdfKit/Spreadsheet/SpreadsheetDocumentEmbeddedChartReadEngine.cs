@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using OdfKit.Chart;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -97,12 +98,19 @@ internal static class SpreadsheetDocumentEmbeddedChartReadEngine
         try
         {
             using Stream stream = package.GetEntryStream(contentPath);
-            string xml = new StreamReader(stream, Encoding.UTF8).ReadToEnd();
+            using var boundedStream = new MemoryStream();
+            OdfBoundedStreamReader.CopyTo(
+                stream,
+                boundedStream,
+                package.LoadOptions.MaxEntrySize,
+                "Err_SpreadsheetDocumentEmbeddedChartReadEngine_ChartXmlSizeLimitExceeded");
+            string xml = Encoding.UTF8.GetString(boundedStream.GetBuffer(), 0, (int)boundedStream.Length);
 
             using var reader = XmlReader.Create(new StringReader(xml), new XmlReaderSettings
             {
                 DtdProcessing = DtdProcessing.Prohibit,
                 XmlResolver = null,
+                MaxCharactersInDocument = package.LoadOptions.MaxEntrySize,
             });
 
             while (reader.Read())

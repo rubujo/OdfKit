@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -266,6 +267,14 @@ namespace OdfKit.Tests
         [Fact]
         public async Task TestXadesLtSigningAndVerificationWithRevocation()
         {
+            var originalCulture = Thread.CurrentThread.CurrentCulture;
+            var originalUICulture = Thread.CurrentThread.CurrentUICulture;
+            var originalDefaultCulture = OdfLocalizer.DefaultCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            OdfLocalizer.DefaultCulture = CultureInfo.GetCultureInfo("en-US");
+            try
+            {
             // Build CDP DER bytes for the test URL "http://mockcrl.com/revocation.crl"
             var cdpBytes = new byte[] {
                 0x30, 0x29, 0x30, 0x27, 0xa0, 0x25, 0xa0, 0x23, 0x86, 0x21,
@@ -393,6 +402,13 @@ namespace OdfKit.Tests
                     Assert.False(resultRevoked.Signatures[0].IsRevocationValid);
                     Assert.Contains("revoked", resultRevoked.Signatures[0].ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
                 }
+            }
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = originalCulture;
+                Thread.CurrentThread.CurrentUICulture = originalUICulture;
+                OdfLocalizer.DefaultCulture = originalDefaultCulture;
             }
         }
 
@@ -640,6 +656,14 @@ namespace OdfKit.Tests
         [Fact]
         public async Task TestExpiredCertificateRejection()
         {
+            var originalCulture = Thread.CurrentThread.CurrentCulture;
+            var originalUICulture = Thread.CurrentThread.CurrentUICulture;
+            var originalDefaultCulture = OdfLocalizer.DefaultCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            OdfLocalizer.DefaultCulture = CultureInfo.GetCultureInfo("en-US");
+            try
+            {
             using var expiredCert = GenerateSelfSignedCertificate("ExpiredSigner", DateTimeOffset.UtcNow.AddDays(-10), DateTimeOffset.UtcNow.AddDays(-1));
             using var ms = new MemoryStream();
 
@@ -659,6 +683,13 @@ namespace OdfKit.Tests
                 Assert.False(result.IsValid, "Verification should fail for expired certificate");
                 Assert.False(result.Signatures[0].IsCertificateValid);
                 Assert.Contains("expired", result.Signatures[0].ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+            }
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = originalCulture;
+                Thread.CurrentThread.CurrentUICulture = originalUICulture;
+                OdfLocalizer.DefaultCulture = originalDefaultCulture;
             }
         }
 
@@ -1169,6 +1200,14 @@ namespace OdfKit.Tests
         [Fact]
         public async Task TestVerificationRejectsExpiredCertificate()
         {
+            var originalCulture = Thread.CurrentThread.CurrentCulture;
+            var originalUICulture = Thread.CurrentThread.CurrentUICulture;
+            var originalDefaultCulture = OdfLocalizer.DefaultCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            OdfLocalizer.DefaultCulture = CultureInfo.GetCultureInfo("en-US");
+            try
+            {
             using var cert = GenerateSelfSignedCertificate("ExpiredSigner", DateTimeOffset.UtcNow.AddDays(-5), DateTimeOffset.UtcNow.AddDays(-1));
             using var ms = new MemoryStream();
 
@@ -1192,11 +1231,26 @@ namespace OdfKit.Tests
                 Assert.False(sig.IsCertificateValid);
                 Assert.Contains("expired", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
             }
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = originalCulture;
+                Thread.CurrentThread.CurrentUICulture = originalUICulture;
+                OdfLocalizer.DefaultCulture = originalDefaultCulture;
+            }
         }
 
         [Fact]
         public async Task TestVerificationRejectsNotYetValidCertificate()
         {
+            var originalCulture = Thread.CurrentThread.CurrentCulture;
+            var originalUICulture = Thread.CurrentThread.CurrentUICulture;
+            var originalDefaultCulture = OdfLocalizer.DefaultCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            OdfLocalizer.DefaultCulture = CultureInfo.GetCultureInfo("en-US");
+            try
+            {
             using var cert = GenerateSelfSignedCertificate("FutureSigner", DateTimeOffset.UtcNow.AddDays(1), DateTimeOffset.UtcNow.AddDays(5));
             using var ms = new MemoryStream();
 
@@ -1219,6 +1273,13 @@ namespace OdfKit.Tests
                 Assert.True(sig.IsSignatureValid);
                 Assert.False(sig.IsCertificateValid);
                 Assert.Contains("not yet valid", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+            }
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = originalCulture;
+                Thread.CurrentThread.CurrentUICulture = originalUICulture;
+                OdfLocalizer.DefaultCulture = originalDefaultCulture;
             }
         }
 
@@ -1370,6 +1431,14 @@ namespace OdfKit.Tests
         [Fact]
         public async Task TestVerificationRejectsTamperedTimestampToken()
         {
+            var originalCulture = Thread.CurrentThread.CurrentCulture;
+            var originalUICulture = Thread.CurrentThread.CurrentUICulture;
+            var originalDefaultCulture = OdfLocalizer.DefaultCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            OdfLocalizer.DefaultCulture = CultureInfo.GetCultureInfo("en-US");
+            try
+            {
             using var signerCert = GenerateSelfSignedCertificate("SignerCert", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
             using var tsaCert = GenerateSelfSignedCertificate("MockTSA", DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(5));
 
@@ -1453,6 +1522,13 @@ namespace OdfKit.Tests
                 var sig = result.Signatures[0];
                 Assert.False(sig.IsTimestampValid);
                 Assert.Contains("Timestamp", sig.ErrorMessage ?? "", StringComparison.OrdinalIgnoreCase);
+            }
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = originalCulture;
+                Thread.CurrentThread.CurrentUICulture = originalUICulture;
+                OdfLocalizer.DefaultCulture = originalDefaultCulture;
             }
         }
 

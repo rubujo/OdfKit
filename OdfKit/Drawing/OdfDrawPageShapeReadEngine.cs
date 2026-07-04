@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using OdfKit.Compliance;
 using OdfKit.Core;
 using OdfKit.DOM;
 
@@ -9,6 +11,10 @@ namespace OdfKit.Drawing;
 /// </summary>
 internal static class OdfDrawPageShapeReadEngine
 {
+    // 群組巢狀深度上限：防止惡意或損毀的 ODF 以極深層巢狀 <draw:g>
+    // 引發無界遞迴的 StackOverflowException 使進程崩潰。
+    private const int MaxGroupNestingDepth = 64;
+
     internal static IReadOnlyList<OdfPathInfo> GetPaths(OdfDrawPage page) =>
         CollectPaths(page.Node, page.Name);
 
@@ -135,12 +141,18 @@ internal static class OdfDrawPageShapeReadEngine
     private static List<OdfGroupInfo> CollectGroups(OdfNode parent, string pageName)
     {
         List<OdfGroupInfo> groups = [];
-        CollectGroupsRecursive(parent, pageName, groups);
+        CollectGroupsRecursive(parent, pageName, groups, 0);
         return groups;
     }
 
-    private static void CollectGroupsRecursive(OdfNode parent, string pageName, List<OdfGroupInfo> groups)
+    private static void CollectGroupsRecursive(OdfNode parent, string pageName, List<OdfGroupInfo> groups, int depth)
     {
+        if (depth > MaxGroupNestingDepth)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfDrawPageShapeReadEngine_GroupNestingTooDeep", MaxGroupNestingDepth));
+        }
+
         foreach (OdfNode child in parent.Children)
         {
             if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != OdfNamespaces.Draw)
@@ -154,7 +166,7 @@ internal static class OdfDrawPageShapeReadEngine
                 child.GetAttribute("id", OdfNamespaces.Draw) ?? string.Empty,
                 child.GetAttribute("name", OdfNamespaces.Draw)));
 
-            CollectGroupsRecursive(child, pageName, groups);
+            CollectGroupsRecursive(child, pageName, groups, depth + 1);
         }
     }
 

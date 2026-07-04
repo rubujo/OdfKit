@@ -93,8 +93,8 @@ public partial class OdfNode
         var hrefKey = new OdfAttributeName("href", OdfNamespaces.XLink);
         if (node.Attributes.TryGetValue(hrefKey, out string? href) && href is not null)
         {
-            // 媒體參考通常位於 zip 套件內的 "Pictures/" 目錄下
-            if (href.StartsWith("Pictures/", StringComparison.OrdinalIgnoreCase))
+            // 媒體參考通常位於 zip 套件內的 OdfMediaManager.PicturesEntryPrefix 目錄下
+            if (href.StartsWith(OdfMediaManager.PicturesEntryPrefix, StringComparison.Ordinal))
             {
                 try
                 {

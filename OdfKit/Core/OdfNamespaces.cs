@@ -111,6 +111,11 @@ public static class OdfNamespaces
     public const string Ds = "http://www.w3.org/2000/09/xmldsig#";
 
     /// <summary>
+    /// XAdES（ETSI TS 101 903 v1.3.2）命名空間 URI
+    /// </summary>
+    public const string Xades = "http://uri.etsi.org/01903/v1.3.2#";
+
+    /// <summary>
     /// Form 命名空間 URI
     /// </summary>
     public const string Form = "urn:oasis:names:tc:opendocument:xmlns:form:1.0";

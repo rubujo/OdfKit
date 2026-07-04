@@ -88,6 +88,7 @@ internal static class OoxmlUnitConverter
             string percentText = text.Substring(0, text.Length - 1);
             if (double.TryParse(percentText, NumberStyles.Float, CultureInfo.InvariantCulture, out double percent))
             {
+                // 2.4 = 240 twips / 100%（每 100% 行高對應 240 twips）
                 int scaled = (int)Math.Round(percent * 2.4d, MidpointRounding.AwayFromZero);
                 return (scaled, true);
             }
@@ -113,6 +114,7 @@ internal static class OoxmlUnitConverter
 
         if (isAutoRule)
         {
+            // 2.4 = 240 twips / 100%（每 100% 行高對應 240 twips）
             double percent = twips.Value / 2.4d;
             return percent.ToString("0.##", CultureInfo.InvariantCulture) + "%";
         }

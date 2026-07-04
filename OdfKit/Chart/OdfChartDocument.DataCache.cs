@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Spreadsheet;
 
 namespace OdfKit.Chart;
 
@@ -143,7 +144,7 @@ public partial class OdfChartDocument
     {
         string? value = node.GetAttribute(attributeName, OdfNamespaces.Table);
         return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int count) && count > 0
-            ? count
+            ? Math.Min(count, OdfSpreadsheetLimits.ChartMaxRepeat)
             : 1;
     }
 }

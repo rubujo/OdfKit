@@ -194,4 +194,25 @@ public class EmbeddedChartIntegrationTests
         // 驗證 subpackage 檔案建立
         Assert.True(doc.Package.HasEntry("Object 1/content.xml"));
     }
+
+    /// <summary>
+    /// 驗證圖表本地資料快取對惡意宣告的巨大重複計數會截斷至 OdfSpreadsheetLimits.ChartMaxRepeat，而非嘗試配置巨量清單。
+    /// </summary>
+    [Fact]
+    public void LocalDataCacheClampsExcessiveRowRepeatCount()
+    {
+        using var chartDoc = OdfChartDocument.Create();
+
+        var table = OdfNodeFactory.CreateElement("table", OdfNamespaces.Table, "table");
+        var row = OdfNodeFactory.CreateElement("table-row", OdfNamespaces.Table, "table");
+        row.SetAttribute("number-rows-repeated", OdfNamespaces.Table, "50000", "table");
+        var cell = OdfNodeFactory.CreateElement("table-cell", OdfNamespaces.Table, "table");
+        row.AppendChild(cell);
+        table.AppendChild(row);
+        chartDoc.ContentDom.AppendChild(table);
+
+        OdfChartDataCache cache = chartDoc.GetLocalDataCache();
+
+        Assert.Equal(OdfSpreadsheetLimits.ChartMaxRepeat, cache.Rows.Count);
+    }
 }

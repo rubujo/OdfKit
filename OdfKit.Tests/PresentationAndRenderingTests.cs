@@ -19,11 +19,19 @@ namespace OdfKit.Tests
 {
     [Collection("SequentialRenderingTests")]
     [Trait(TestCategories.Kind, TestCategories.Scenario)]
-    public class PresentationAndRenderingTests
+    public class PresentationAndRenderingTests : IDisposable
     {
+        private readonly CultureInfo? _originalDefaultCulture;
+
         public PresentationAndRenderingTests()
         {
+            _originalDefaultCulture = OdfLocalizer.DefaultCulture;
             OdfLocalizer.DefaultCulture = new CultureInfo("en");
+        }
+
+        public void Dispose()
+        {
+            OdfLocalizer.DefaultCulture = _originalDefaultCulture;
         }
 
         #region 1. OdfComment Tests

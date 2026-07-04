@@ -133,6 +133,18 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     /// <returns>表示該 Em 值的 <see cref="OdfLength"/> 結構</returns>
     public static OdfLength FromEm(double val) => new(val, OdfUnit.Em);
 
+    /// <summary>
+    /// 每英吋的 EMU（English Metric Units）數，OOXML 度量單位的標準換算基準。
+    /// </summary>
+    internal const double EmusPerInch = 914_400d;
+
+    /// <summary>
+    /// 從指定的 EMU（OOXML 度量單位）值建立 <see cref="OdfLength"/> 結構。
+    /// </summary>
+    /// <param name="emu">EMU 數值</param>
+    /// <returns>表示該 EMU 值的 <see cref="OdfLength"/> 結構</returns>
+    public static OdfLength FromEmu(long emu) => FromInches(emu / EmusPerInch);
+
     #endregion
 
     #region 轉換與解析
@@ -232,6 +244,12 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     /// </summary>
     /// <returns>轉換為公釐的數值</returns>
     public double ToMillimeters() => ConvertTo(OdfUnit.Millimeters);
+
+    /// <summary>
+    /// 將長度轉換為 EMU（OOXML 度量單位）。
+    /// </summary>
+    /// <returns>轉換為 EMU 的數值（四捨五入至最接近的整數，遠離零捨入）</returns>
+    public long ToEmu() => (long)Math.Round(ToInches() * EmusPerInch, MidpointRounding.AwayFromZero);
 
     /// <summary>
     /// 將長度轉換為指定的目標單位。

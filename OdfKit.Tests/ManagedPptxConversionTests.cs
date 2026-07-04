@@ -462,6 +462,54 @@ public class ManagedPptxConversionTests
             converted.ContentDom.Descendants().Count(node => node.LocalName == "covered-table-cell" && node.NamespaceUri == OdfNamespaces.Table));
     }
 
+    /// <summary>
+    /// 驗證當 PPTX 表格儲存格宣告的 RowSpan/GridSpan 與實際表格列/欄數不一致（超出邊界）時，
+    /// PptxToOdpConverter 會將合併範圍夾限在表格實際邊界內，而非擲出 ArgumentOutOfRangeException 中止轉換。
+    /// </summary>
+    [Fact]
+    public void PptxToOdpConverterClampsCellSpanExceedingTableBounds()
+    {
+        using OdfPresentationDocument source = OdfPresentationDocument.Create();
+        OdfSlide sourceSlide = source.AddSlide("Merged Table");
+        sourceSlide
+            .AddShape(
+                OdfShapeType.Rectangle,
+                OdfLength.FromCentimeters(1),
+                OdfLength.FromCentimeters(1),
+                OdfLength.FromCentimeters(8),
+                OdfLength.FromCentimeters(3))
+            .AddEmbeddedTable(1, 1)
+            .SetCellText(0, 0, "Header");
+
+        using var pptxStream = new MemoryStream();
+        OdpToPptxConverter.Convert(source, pptxStream);
+
+        pptxStream.Position = 0;
+        using (PackagingPresentationDocument pptx = PackagingPresentationDocument.Open(pptxStream, true))
+        {
+            OpenXmlSlidePart slidePart = Assert.Single(pptx.PresentationPart!.SlideParts);
+            A.TableCell firstCell = Assert.Single(
+                Assert.Single(slidePart.Slide!.Descendants<A.Table>()).Descendants<A.TableCell>(),
+                cell => cell.Descendants<A.Text>().Any(text => text.Text == "Header"));
+
+            // 手動注入與實際 1x1 表格不一致的巨大合併範圍。
+            firstCell.RowSpan = new Int32Value(5);
+            firstCell.GridSpan = new Int32Value(5);
+            slidePart.Slide!.Save();
+        }
+
+        pptxStream.Position = 0;
+        using OdfPresentationDocument converted = PptxToOdpConverter.Convert(pptxStream);
+
+        OdfNode tableCell = Assert.Single(
+            converted.ContentDom.Descendants(),
+            node => node.LocalName == "table-cell" &&
+                node.NamespaceUri == OdfNamespaces.Table &&
+                node.TextContent == "Header");
+        Assert.Null(tableCell.GetAttribute("number-columns-spanned", OdfNamespaces.Table));
+        Assert.Null(tableCell.GetAttribute("number-rows-spanned", OdfNamespaces.Table));
+    }
+
     [Fact]
     public void PptxToOdpConverterResolvesThemeSchemeColors()
     {

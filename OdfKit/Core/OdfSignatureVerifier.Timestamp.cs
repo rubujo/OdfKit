@@ -48,20 +48,22 @@ internal static partial class OdfSignatureVerifier
         }
         catch (Exception ex)
         {
-            singleResult.IsTimestampValid = false;
-            singleResult.ErrorCode = "TIMESTAMP_SIGNATURE_INVALID";
-            singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_TimestampSignatureVerificationFailed");
-            singleResult.Warnings.Add(ex.Message);
-            return false;
+            return FailWithWarning(
+                () => singleResult.IsTimestampValid = false,
+                singleResult,
+                "TIMESTAMP_SIGNATURE_INVALID",
+                "Err_OdfSignatureVerifier_TimestampSignatureVerificationFailed",
+                ex.Message);
         }
 
         var signatureValueElem = signatureNode.SelectSingleNode("ds:SignatureValue", nsManager) as XmlElement;
         if (signatureValueElem == null)
         {
-            singleResult.IsTimestampValid = false;
-            singleResult.ErrorCode = "TIMESTAMP_IMPRINT_MISMATCH";
-            singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_MissingSignatureValueForTimestamp");
-            return false;
+            return Fail(
+                () => singleResult.IsTimestampValid = false,
+                singleResult,
+                "TIMESTAMP_IMPRINT_MISMATCH",
+                "Err_OdfSignatureVerifier_MissingSignatureValueForTimestamp");
         }
 
         byte[] sigBytes = OdfSignatureTsaClient.CanonicalizeSignatureValue(signatureValueElem);
@@ -82,10 +84,11 @@ internal static partial class OdfSignatureVerifier
 
         if (embeddedHash == null || !OdfEncryption.ByteArrayEquals(calculatedHash, embeddedHash))
         {
-            singleResult.IsTimestampValid = false;
-            singleResult.ErrorCode = "TIMESTAMP_IMPRINT_MISMATCH";
-            singleResult.ErrorMessage = OdfLocalizer.GetMessage("Err_OdfSignatureVerifier_TimestampMessageImprintMismatch");
-            return false;
+            return Fail(
+                () => singleResult.IsTimestampValid = false,
+                singleResult,
+                "TIMESTAMP_IMPRINT_MISMATCH",
+                "Err_OdfSignatureVerifier_TimestampMessageImprintMismatch");
         }
 
         return true;

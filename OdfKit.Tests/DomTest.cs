@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Security;
 using System.Security.Cryptography;
@@ -18,11 +19,19 @@ using OdfKit.Presentation;
 namespace OdfKit.Tests
 {
     [Trait(TestCategories.Kind, TestCategories.Regression)]
-    public class DomTest
+    public class DomTest : IDisposable
     {
+        private readonly CultureInfo? _originalDefaultCulture;
+
         public DomTest()
         {
+            _originalDefaultCulture = OdfLocalizer.DefaultCulture;
             OdfLocalizer.DefaultCulture = new CultureInfo("en");
+        }
+
+        public void Dispose()
+        {
+            OdfLocalizer.DefaultCulture = _originalDefaultCulture;
         }
 
         [Fact]

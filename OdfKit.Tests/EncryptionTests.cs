@@ -14,11 +14,19 @@ using OdfKit.Text;
 namespace OdfKit.Tests
 {
     [Trait(TestCategories.Kind, TestCategories.Boundary)]
-    public class EncryptionTests
+    public class EncryptionTests : IDisposable
     {
+        private readonly CultureInfo? _originalDefaultCulture;
+
         public EncryptionTests()
         {
+            _originalDefaultCulture = OdfLocalizer.DefaultCulture;
             OdfLocalizer.DefaultCulture = new CultureInfo("zh-TW");
+        }
+
+        public void Dispose()
+        {
+            OdfLocalizer.DefaultCulture = _originalDefaultCulture;
         }
 
         [Fact]

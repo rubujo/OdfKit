@@ -38,12 +38,12 @@ internal static partial class OdfSignatureVerifier
             {
                 if (options.CheckRevocation)
                 {
-                    singleResult.IsRevocationValid = false;
-                    singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
-                    singleResult.ErrorMessage = OdfLocalizer.GetMessage(
+                    return Fail(
+                        () => singleResult.IsRevocationValid = false,
+                        singleResult,
+                        "REVOCATION_CHECK_FAILED",
                         "Err_OdfSignatureVerifier_IssuerCertificateNotFound",
                         chainCert.Subject);
-                    return false;
                 }
 
                 continue;
@@ -94,11 +94,12 @@ internal static partial class OdfSignatureVerifier
 
             if (isRevoked)
             {
-                singleResult.IsRevocationValid = false;
-                singleResult.ErrorMessage = OdfLocalizer.GetMessage(
+                return Fail(
+                    () => singleResult.IsRevocationValid = false,
+                    singleResult,
+                    "CERTIFICATE_REVOKED",
                     "Err_OdfSignatureVerifier_CertificateRevoked",
                     chainCert.Subject);
-                return false;
             }
 
             if (options.CheckRevocation)
@@ -106,12 +107,12 @@ internal static partial class OdfSignatureVerifier
                 var urls = OdfSignatureCrlUtilities.GetCrlUrls(chainCert);
                 if (urls.Count == 0 && !checkedAnyCrl)
                 {
-                    singleResult.IsRevocationValid = false;
-                    singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
-                    singleResult.ErrorMessage = OdfLocalizer.GetMessage(
+                    return Fail(
+                        () => singleResult.IsRevocationValid = false,
+                        singleResult,
+                        "REVOCATION_CHECK_FAILED",
                         "Err_OdfSignatureVerifier_NoCrlDistributionPoints",
                         chainCert.Subject);
-                    return false;
                 }
 
                 bool onlineCrlCheckedSuccessfully = false;

@@ -160,7 +160,7 @@ internal static class OdfDocumentPersistenceEngine
             value = value.Substring(2);
         }
 
-        if (!value.StartsWith("Pictures/", System.StringComparison.OrdinalIgnoreCase))
+        if (!value.StartsWith(OdfMediaManager.PicturesEntryPrefix, System.StringComparison.Ordinal))
         {
             return null;
         }

@@ -283,6 +283,43 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證嵌入圖表的 content.xml 超過 <see cref="OdfLoadOptions.MaxEntrySize"/> 時，
+    /// GetEmbeddedCharts() 會優雅地略過該圖表，而非未被攔截地擲出例外或耗用超額記憶體。
+    /// 直接以 WriteEntry 在已載入的封裝中置換該項目內容，模擬「宣告大小與實際位元組數不符」的情境，
+    /// 而不受載入階段既有的 ZIP 項目大小檢查影響。
+    /// </summary>
+    [Fact]
+    public void GetEmbeddedCharts_SkipsChartExceedingMaxEntrySize()
+    {
+        using var document = SpreadsheetDocument.Create();
+        document.AddSheet("Sheet1");
+        document.AddChart("Sheet1", new OdfCellAddress(0, 3, "Sheet1"), new OdfChartDefinition
+        {
+            ChartType = OdfChartType.Bar,
+            Title = "季度銷售",
+            DataRange = new OdfCellRange(0, 0, 5, 1, "Sheet1"),
+            HasLegend = true,
+        });
+
+        using var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+
+        var options = new OdfLoadOptions { MaxEntrySize = 2_000 };
+        using var loaded = (SpreadsheetDocument)OdfDocument.Load(stream, options);
+
+        string oversizedChartXml =
+            "<office:document-content xmlns:office=\"" + OdfNamespaces.Office + "\" " +
+            "xmlns:chart=\"" + OdfNamespaces.Chart + "\">" +
+            "<office:body><office:chart><chart:chart chart:class=\"chart:bar\">" +
+            "<!--" + new string('A', 5_000) + "-->" +
+            "</chart:chart></office:chart></office:body></office:document-content>";
+        loaded.Package.WriteEntry("Object 1/content.xml", Encoding.UTF8.GetBytes(oversizedChartXml));
+
+        Assert.Empty(loaded.GetEmbeddedCharts());
+    }
+
+    /// <summary>
     /// 驗證 <see cref="SpreadsheetDocument.GetConditionalFormats"/> 可聚合所有工作表的條件格式規則。
     /// </summary>
     [Fact]

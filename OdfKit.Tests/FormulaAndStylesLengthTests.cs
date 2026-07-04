@@ -96,6 +96,25 @@ namespace OdfKit.Tests
             Assert.Equal(OdfBorder.None.GetHashCode(), OdfBorder.None.GetHashCode());
         }
 
+        /// <summary>
+        /// 驗證 <see cref="OdfBorder.Parse"/> 對合法 <c>#RRGGBB</c> 色彩正確解析，
+        /// 對格式不正確的色彩片段（如長度不足或含非十六進位字元）不拋出未攔截例外，且不影響其餘欄位解析。
+        /// </summary>
+        [Fact]
+        public void TestOdfBorderParseHandlesInvalidColorGracefully()
+        {
+            OdfBorder validColor = OdfBorder.Parse("1pt solid #336699");
+            Assert.Equal(System.Drawing.Color.FromArgb(0x33, 0x66, 0x99), validColor.Color);
+
+            OdfBorder tooShort = OdfBorder.Parse("1pt solid #12");
+            Assert.Equal(OdfBorder.BorderStyle.Solid, tooShort.Style);
+            Assert.Equal(System.Drawing.Color.Black, tooShort.Color);
+
+            OdfBorder nonHex = OdfBorder.Parse("1pt solid #zzzzzz");
+            Assert.Equal(OdfBorder.BorderStyle.Solid, nonHex.Style);
+            Assert.Equal(System.Drawing.Color.Black, nonHex.Color);
+        }
+
         #endregion
     }
 }

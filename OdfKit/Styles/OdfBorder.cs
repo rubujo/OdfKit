@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using OdfKit.Core;
+using OdfKit.DOM;
 
 namespace OdfKit.Styles;
 
@@ -84,19 +86,16 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
         {
             if (part.StartsWith("#"))
             {
-                try
+                if (OdfColor.TryParse(part, out _))
                 {
-                    if (part.Length == 7)
-                    {
-                        int r = Convert.ToInt32(part.Substring(1, 2), 16);
-                        int g = Convert.ToInt32(part.Substring(3, 2), 16);
-                        int b = Convert.ToInt32(part.Substring(5, 2), 16);
-                        color = Color.FromArgb(r, g, b);
-                    }
+                    int r = Convert.ToInt32(part.Substring(1, 2), 16);
+                    int g = Convert.ToInt32(part.Substring(3, 2), 16);
+                    int b = Convert.ToInt32(part.Substring(5, 2), 16);
+                    color = Color.FromArgb(r, g, b);
                 }
-                catch
+                else
                 {
-                    color = Color.Black;
+                    OdfKitDiagnostics.Warn($"框線色彩片段格式無效，已略過：'{part}'");
                 }
             }
             else if (Enum.TryParse<BorderStyle>(part, true, out var parsedStyle))

@@ -54,16 +54,11 @@ internal static class OdfPackageFlatXmlLoader
                     OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", path, length, ctx.LoadOptions.MaxEntrySize));
             }
 
-            if (length > ctx.LoadOptions.MaxTotalUncompressedSize - totalVirtualEntrySize)
-            {
-                long projectedSize = totalVirtualEntrySize > long.MaxValue - length
-                    ? long.MaxValue
-                    : totalVirtualEntrySize + length;
-                throw new SecurityException(
-                    OdfLocalizer.GetMessage("Err_OdfPackage_FlatXmlTotalVirtualEntrySizeLimitExceeded", projectedSize, ctx.LoadOptions.MaxTotalUncompressedSize));
-            }
-
-            totalVirtualEntrySize += length;
+            totalVirtualEntrySize = OdfBoundedStreamReader.AddBytes(
+                totalVirtualEntrySize,
+                length,
+                ctx.LoadOptions.MaxTotalUncompressedSize,
+                "Err_OdfPackage_FlatXmlTotalVirtualEntrySizeLimitExceeded");
         }
 
         using (var reader = XmlReader.Create(xmlStream, settings))
@@ -87,19 +82,11 @@ internal static class OdfPackageFlatXmlLoader
                                     int bytesRead;
                                     while ((bytesRead = reader.ReadElementContentAsBase64(buffer, 0, buffer.Length)) > 0)
                                     {
-                                        if (ctx.LoadOptions.MaxEntrySize > 0 && bytesRead > ctx.LoadOptions.MaxEntrySize - binarySize)
-                                        {
-                                            long projectedBinarySize = binarySize > long.MaxValue - bytesRead
-                                                ? long.MaxValue
-                                                : binarySize + bytesRead;
-                                            throw new SecurityException(
-                                                OdfLocalizer.GetMessage(
-                                                    "Err_OdfPackageFlatXmlLoader_BinaryDataSizeLimitExceeded",
-                                                    projectedBinarySize,
-                                                    ctx.LoadOptions.MaxEntrySize));
-                                        }
-
-                                        binarySize += bytesRead;
+                                        binarySize = OdfBoundedStreamReader.AddBytes(
+                                            binarySize,
+                                            bytesRead,
+                                            ctx.LoadOptions.MaxEntrySize,
+                                            "Err_OdfPackageFlatXmlLoader_BinaryDataSizeLimitExceeded");
 
                                         binMs.Write(buffer, 0, bytesRead);
                                     }
@@ -111,7 +98,7 @@ internal static class OdfPackageFlatXmlLoader
 
                                 byte[] bytes = binMs.ToArray();
                                 OdfMediaManager.DetectImageFormat(bytes, out string mediaType, out string ext);
-                                string finalPath = $"Pictures/image_{binaryCounter}{ext}";
+                                string finalPath = $"{OdfMediaManager.PicturesEntryPrefix}image_{binaryCounter}{ext}";
                                 binaryPaths[binaryCounter] = finalPath;
                                 TrackVirtualEntry(finalPath, bytes.Length);
 
@@ -207,6 +194,68 @@ internal static class OdfPackageFlatXmlLoader
             _ => OdfVersion.Odf14
         };
 
+        ExtractNestedDocuments(ctx, doc, officeNs, TrackVirtualEntry);
+
+        List<XElement> binaryDataElements = doc.Descendants(officeNs + "binary-data").ToList();
+        foreach (XElement binData in binaryDataElements)
+        {
+            XAttribute? indexAttr = binData.Attribute(officeNs + "binary-index") ?? binData.Attribute("binary-index");
+            if (indexAttr != null && int.TryParse(indexAttr.Value, out int idx) && binaryPaths.TryGetValue(idx, out string? imagePath))
+            {
+                XElement? binParent = binData.Parent;
+                if (binParent is not null)
+                {
+                    binData.Remove();
+
+                    xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
+
+                    binParent.SetAttributeValue(xlinkNs + "href", imagePath);
+                    binParent.SetAttributeValue(xlinkNs + "type", "simple");
+                    binParent.SetAttributeValue(xlinkNs + "show", "embed");
+                    binParent.SetAttributeValue(xlinkNs + "actuate", "onLoad");
+                }
+            }
+        }
+
+        (XElement contentRoot, XElement stylesRoot, XElement metaRoot, XElement settingsRoot) =
+            SplitDocumentSections(root, officeNs, version);
+
+        byte[] ToUtf8Bytes(XElement element)
+        {
+            using var ms = new MemoryStream();
+            var writerSettings = new XmlWriterSettings
+            {
+                Encoding = new UTF8Encoding(false),
+                Indent = ctx.SaveOptions.IndentXml
+            };
+            using (var writer = XmlWriter.Create(ms, writerSettings))
+                element.Save(writer);
+            return ms.ToArray();
+        }
+
+        WriteTrackedVirtualEntry("content.xml", ToUtf8Bytes(contentRoot), "text/xml");
+        WriteTrackedVirtualEntry("styles.xml", ToUtf8Bytes(stylesRoot), "text/xml");
+        WriteTrackedVirtualEntry("meta.xml", ToUtf8Bytes(metaRoot), "text/xml");
+        WriteTrackedVirtualEntry("settings.xml", ToUtf8Bytes(settingsRoot), "text/xml");
+        if (!string.IsNullOrEmpty(ctx.MimeType))
+            WriteTrackedVirtualEntry("mimetype", Encoding.UTF8.GetBytes(ctx.MimeType), string.Empty);
+
+        void WriteTrackedVirtualEntry(string path, byte[] content, string mediaType)
+        {
+            TrackVirtualEntry(path, content.Length);
+            ctx.WriteVirtualEntry(path, content, mediaType);
+        }
+    }
+
+    /// <summary>
+    /// 將巢狀內嵌文件（office:document）抽取為獨立的虛擬子文件項目，並改寫其父物件參照為 xlink 連結。
+    /// </summary>
+    private static void ExtractNestedDocuments(
+        OdfPackage.OdfPackageLoadCollaborators ctx,
+        XDocument doc,
+        XNamespace officeNs,
+        Action<string, long> trackVirtualEntry)
+    {
         List<XElement> nestedDocs = doc.Descendants(officeNs + "document")
             .Where(d => d != doc.Root)
             .ToList();
@@ -248,13 +297,13 @@ internal static class OdfPackageFlatXmlLoader
             string contentPath = $"{folderPath}/content.xml";
             string mimePath = $"{folderPath}/mimetype";
 
-            TrackVirtualEntry(contentPath, contentBytes.Length);
+            trackVirtualEntry(contentPath, contentBytes.Length);
             ctx.Entries[contentPath] = new OdfPackageEntry(contentPath, contentBytes);
             ctx.Manifest[contentPath] = "text/xml";
             ctx.EntryOrder.Add(contentPath);
 
             byte[] mimeBytes = Encoding.UTF8.GetBytes(mimeType);
-            TrackVirtualEntry(mimePath, mimeBytes.Length);
+            trackVirtualEntry(mimePath, mimeBytes.Length);
             ctx.Entries[mimePath] = new OdfPackageEntry(mimePath, mimeBytes);
             ctx.Manifest[mimePath] = mimeType;
             ctx.EntryOrder.Add(mimePath);
@@ -269,7 +318,16 @@ internal static class OdfPackageFlatXmlLoader
             parent.SetAttributeValue(xlinkNsFormula + "show", "embed");
             parent.SetAttributeValue(xlinkNsFormula + "actuate", "onLoad");
         }
+    }
 
+    /// <summary>
+    /// 將 Flat XML 的單一文件樹切分為 content／styles／meta／settings 四棵獨立的 <see cref="XElement"/> 樹。
+    /// </summary>
+    private static (XElement ContentRoot, XElement StylesRoot, XElement MetaRoot, XElement SettingsRoot) SplitDocumentSections(
+        XElement root,
+        XNamespace officeNs,
+        string version)
+    {
         XElement? metaElement = root.Element(officeNs + "meta");
         XElement? settingsElement = root.Element(officeNs + "settings");
         XElement? stylesElement = root.Element(officeNs + "styles");
@@ -277,27 +335,6 @@ internal static class OdfPackageFlatXmlLoader
         XElement? masterStylesElement = root.Element(officeNs + "master-styles");
         XElement? fontDeclsElement = root.Element(officeNs + "font-face-decls");
         XElement? bodyElement = root.Element(officeNs + "body");
-
-        List<XElement> binaryDataElements = doc.Descendants(officeNs + "binary-data").ToList();
-        foreach (XElement binData in binaryDataElements)
-        {
-            XAttribute? indexAttr = binData.Attribute(officeNs + "binary-index") ?? binData.Attribute("binary-index");
-            if (indexAttr != null && int.TryParse(indexAttr.Value, out int idx) && binaryPaths.TryGetValue(idx, out string? imagePath))
-            {
-                XElement? binParent = binData.Parent;
-                if (binParent is not null)
-                {
-                    binData.Remove();
-
-                    xlinkNs = XNamespace.Get(OdfNamespaces.XLink);
-
-                    binParent.SetAttributeValue(xlinkNs + "href", imagePath);
-                    binParent.SetAttributeValue(xlinkNs + "type", "simple");
-                    binParent.SetAttributeValue(xlinkNs + "show", "embed");
-                    binParent.SetAttributeValue(xlinkNs + "actuate", "onLoad");
-                }
-            }
-        }
 
         var contentRoot = new XElement(officeNs + "document-content",
             new XAttribute(officeNs + "version", version));
@@ -341,31 +378,7 @@ internal static class OdfPackageFlatXmlLoader
         else
             settingsRoot.Add(new XElement(officeNs + "settings"));
 
-        byte[] ToUtf8Bytes(XElement element)
-        {
-            using var ms = new MemoryStream();
-            var writerSettings = new XmlWriterSettings
-            {
-                Encoding = new UTF8Encoding(false),
-                Indent = ctx.SaveOptions.IndentXml
-            };
-            using (var writer = XmlWriter.Create(ms, writerSettings))
-                element.Save(writer);
-            return ms.ToArray();
-        }
-
-        WriteTrackedVirtualEntry("content.xml", ToUtf8Bytes(contentRoot), "text/xml");
-        WriteTrackedVirtualEntry("styles.xml", ToUtf8Bytes(stylesRoot), "text/xml");
-        WriteTrackedVirtualEntry("meta.xml", ToUtf8Bytes(metaRoot), "text/xml");
-        WriteTrackedVirtualEntry("settings.xml", ToUtf8Bytes(settingsRoot), "text/xml");
-        if (!string.IsNullOrEmpty(ctx.MimeType))
-            WriteTrackedVirtualEntry("mimetype", Encoding.UTF8.GetBytes(ctx.MimeType), string.Empty);
-
-        void WriteTrackedVirtualEntry(string path, byte[] content, string mediaType)
-        {
-            TrackVirtualEntry(path, content.Length);
-            ctx.WriteVirtualEntry(path, content, mediaType);
-        }
+        return (contentRoot, stylesRoot, metaRoot, settingsRoot);
     }
 
     /// <summary>

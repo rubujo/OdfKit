@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -10,11 +11,19 @@ namespace OdfKit.Tests;
 /// <summary>
 /// 驗證 ODF 驗證報告可供使用者與 CI 消費。
 /// </summary>
-public class OdfValidationReportTests
+public class OdfValidationReportTests : IDisposable
 {
+    private readonly CultureInfo? _originalDefaultCulture;
+
     public OdfValidationReportTests()
     {
+        _originalDefaultCulture = OdfLocalizer.DefaultCulture;
         OdfLocalizer.DefaultCulture = new CultureInfo("zh-TW");
+    }
+
+    public void Dispose()
+    {
+        OdfLocalizer.DefaultCulture = _originalDefaultCulture;
     }
 
     /// <summary>

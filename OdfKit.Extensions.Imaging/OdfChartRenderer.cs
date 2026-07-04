@@ -125,7 +125,7 @@ public static class OdfChartRenderer
                 (int wPx, int hPx) = ParseDimensions(frame);
                 byte[] pngBytes = plot.GetImageBytes(wPx, hPx, ScottPlot.ImageFormat.Png);
 
-                string fallbackImagePath = $"Pictures/chart-fallback-{objectName}.png";
+                string fallbackImagePath = $"{OdfMediaManager.PicturesEntryPrefix}chart-fallback-{objectName}.png";
                 document.Package.WriteEntry(fallbackImagePath, pngBytes, "image/png");
 
                 var imgNode = frame.Children.Find(c =>

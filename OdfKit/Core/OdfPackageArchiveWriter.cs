@@ -996,7 +996,7 @@ internal static class OdfPackageArchiveWriter
         {
             XAttribute hrefAttr = elem.Attribute(xlinkNs + "href")!;
             string href = hrefAttr.Value;
-            if (href.StartsWith("Pictures/", StringComparison.Ordinal))
+            if (href.StartsWith(OdfMediaManager.PicturesEntryPrefix, StringComparison.Ordinal))
             {
                 if (ctx.Entries.TryGetValue(href, out OdfPackageEntry? entry))
                 {

@@ -24,7 +24,7 @@ public static class PptxToOdpConverter
 {
     private const string OoxmlCompatNamespace = "urn:odfkit:ooxml:compatibility";
     private const string PresentationMlNamespace = "http://schemas.openxmlformats.org/presentationml/2006/main";
-    private const double EmusPerPoint = 12700d;
+    private const double EmusPerPoint = OdfLength.EmusPerInch / 72d;
     private static readonly OdfLength DefaultX = OdfLength.FromCentimeters(1);
     private static readonly OdfLength DefaultY = OdfLength.FromCentimeters(1);
     private static readonly OdfLength DefaultWidth = OdfLength.FromCentimeters(4);
@@ -681,13 +681,11 @@ public static class PptxToOdpConverter
                     continue;
                 }
 
+                int rowSpan = Math.Min(ReadPositiveSpan(cell.RowSpan?.Value), rowCount - rowIndex);
+                int columnSpan = Math.Min(ReadPositiveSpan(cell.GridSpan?.Value), columnCount - columnIndex);
                 embeddedTable
                     .SetCellText(rowIndex, columnIndex, ReadCellText(cell))
-                    .SetCellSpan(
-                        rowIndex,
-                        columnIndex,
-                        ReadPositiveSpan(cell.RowSpan?.Value),
-                        ReadPositiveSpan(cell.GridSpan?.Value));
+                    .SetCellSpan(rowIndex, columnIndex, rowSpan, columnSpan);
                 ApplyTableCellTextStyle(embeddedTable, rowIndex, columnIndex, GetCellTextStyle(cell, themeColors));
                 string? backgroundColor = ReadCellBackgroundColor(cell, themeColors);
                 if (!string.IsNullOrWhiteSpace(backgroundColor))

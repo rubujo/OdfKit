@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -17,11 +18,19 @@ namespace OdfKit.Tests;
 /// 驗證 OdfKit CLI 的主要命令流程。
 /// </summary>
 [Trait(TestCategories.Kind, TestCategories.Regression)]
-public class CliTests
+public class CliTests : IDisposable
 {
+    private readonly CultureInfo? _originalDefaultCulture;
+
     public CliTests()
     {
+        _originalDefaultCulture = OdfLocalizer.DefaultCulture;
         OdfLocalizer.DefaultCulture = new CultureInfo("en");
+    }
+
+    public void Dispose()
+    {
+        OdfLocalizer.DefaultCulture = _originalDefaultCulture;
     }
 
     /// <summary>

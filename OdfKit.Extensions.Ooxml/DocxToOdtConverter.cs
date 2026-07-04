@@ -490,7 +490,8 @@ public static class DocxToOdtConverter
 
     private static OdfLength EmuToCentimeters(long emu)
     {
-        return OdfLength.FromCentimeters(emu / 360000d);
+        // 直接以 EMU/公分換算，避免經由 OdfLength.ConvertTo 的英吋→點→公分中介換算引入額外的浮點誤差。
+        return OdfLength.FromCentimeters(emu / (OdfLength.EmusPerInch / 2.54d));
     }
 
     private static string ExtractRunText(WP.Run run)

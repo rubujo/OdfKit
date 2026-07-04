@@ -22,12 +22,6 @@ namespace OdfKit.Database;
 /// </summary>
 public sealed class OdfDatabaseFormDesigner
 {
-    private const string FormNamespace = "urn:oasis:names:tc:opendocument:xmlns:form:1.0";
-    private const string OfficeNamespace = "urn:oasis:names:tc:opendocument:xmlns:office:1.0";
-    private const string TextNamespace = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
-    private const string DrawNamespace = "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0";
-    private const string SvgNamespace = "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0";
-
     private readonly OdfDocument _document;
     private readonly OdfNode _formNode;
     private int _controlCounter = 1;
@@ -42,12 +36,12 @@ public sealed class OdfDatabaseFormDesigner
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
 
-        var body = FindOrCreateChild(_document.ContentDom, "body", OfficeNamespace, "office");
-        var text = FindOrCreateChild(body, "text", OfficeNamespace, "office");
-        _formNode = FindOrCreateChild(text, "form", FormNamespace, "form");
-        if (string.IsNullOrEmpty(_formNode.GetAttribute("name", FormNamespace)))
+        var body = FindOrCreateChild(_document.ContentDom, "body", OdfNamespaces.Office, "office");
+        var text = FindOrCreateChild(body, "text", OdfNamespaces.Office, "office");
+        _formNode = FindOrCreateChild(text, "form", OdfNamespaces.Form, "form");
+        if (string.IsNullOrEmpty(_formNode.GetAttribute("name", OdfNamespaces.Form)))
         {
-            _formNode.SetAttribute("name", FormNamespace, "Standard", "form");
+            _formNode.SetAttribute("name", OdfNamespaces.Form, "Standard", "form");
         }
     }
 
@@ -73,30 +67,30 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var textNode = OdfNodeFactory.CreateElement("text", FormNamespace, "form");
-        textNode.SetAttribute("name", FormNamespace, name, "form");
-        textNode.SetAttribute("id", FormNamespace, id, "form");
+        var textNode = OdfNodeFactory.CreateElement("text", OdfNamespaces.Form, "form");
+        textNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        textNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
 
         if (!string.IsNullOrEmpty(defaultValue) || !string.IsNullOrEmpty(label))
         {
-            var props = OdfNodeFactory.CreateElement("properties", FormNamespace, "form");
+            var props = OdfNodeFactory.CreateElement("properties", OdfNamespaces.Form, "form");
             textNode.AppendChild(props);
 
             if (!string.IsNullOrEmpty(defaultValue))
             {
-                var prop = OdfNodeFactory.CreateElement("property", FormNamespace, "form");
-                prop.SetAttribute("property-name", FormNamespace, "DefaultVal", "form");
-                prop.SetAttribute("value-type", OfficeNamespace, "string", "office");
-                prop.SetAttribute("string-value", FormNamespace, defaultValue!, "form");
+                var prop = OdfNodeFactory.CreateElement("property", OdfNamespaces.Form, "form");
+                prop.SetAttribute("property-name", OdfNamespaces.Form, "DefaultVal", "form");
+                prop.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
+                prop.SetAttribute("string-value", OdfNamespaces.Form, defaultValue!, "form");
                 props.AppendChild(prop);
             }
 
             if (!string.IsNullOrEmpty(label))
             {
-                var prop = OdfNodeFactory.CreateElement("property", FormNamespace, "form");
-                prop.SetAttribute("property-name", FormNamespace, "Label", "form");
-                prop.SetAttribute("value-type", OfficeNamespace, "string", "office");
-                prop.SetAttribute("string-value", FormNamespace, label, "form");
+                var prop = OdfNodeFactory.CreateElement("property", OdfNamespaces.Form, "form");
+                prop.SetAttribute("property-name", OdfNamespaces.Form, "Label", "form");
+                prop.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
+                prop.SetAttribute("string-value", OdfNamespaces.Form, label, "form");
                 props.AppendChild(prop);
             }
         }
@@ -128,11 +122,11 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var checkNode = OdfNodeFactory.CreateElement("checkbox", FormNamespace, "form");
-        checkNode.SetAttribute("name", FormNamespace, name, "form");
-        checkNode.SetAttribute("id", FormNamespace, id, "form");
-        checkNode.SetAttribute("label", FormNamespace, label, "form");
-        checkNode.SetAttribute("current-state", FormNamespace, isChecked ? "checked" : "unchecked", "form");
+        var checkNode = OdfNodeFactory.CreateElement("checkbox", OdfNamespaces.Form, "form");
+        checkNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        checkNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        checkNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
+        checkNode.SetAttribute("current-state", OdfNamespaces.Form, isChecked ? "checked" : "unchecked", "form");
 
         _formNode.AppendChild(checkNode);
         AddDrawControl(id, x, y, width, height);
@@ -161,19 +155,19 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var listNode = OdfNodeFactory.CreateElement("listbox", FormNamespace, "form");
-        listNode.SetAttribute("name", FormNamespace, name, "form");
-        listNode.SetAttribute("id", FormNamespace, id, "form");
+        var listNode = OdfNodeFactory.CreateElement("listbox", OdfNamespaces.Form, "form");
+        listNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        listNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
 
         if (!string.IsNullOrEmpty(label))
         {
-            var props = OdfNodeFactory.CreateElement("properties", FormNamespace, "form");
+            var props = OdfNodeFactory.CreateElement("properties", OdfNamespaces.Form, "form");
             listNode.AppendChild(props);
 
-            var prop = OdfNodeFactory.CreateElement("property", FormNamespace, "form");
-            prop.SetAttribute("property-name", FormNamespace, "Label", "form");
-            prop.SetAttribute("value-type", OfficeNamespace, "string", "office");
-            prop.SetAttribute("string-value", FormNamespace, label, "form");
+            var prop = OdfNodeFactory.CreateElement("property", OdfNamespaces.Form, "form");
+            prop.SetAttribute("property-name", OdfNamespaces.Form, "Label", "form");
+            prop.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
+            prop.SetAttribute("string-value", OdfNamespaces.Form, label, "form");
             props.AppendChild(prop);
         }
 
@@ -181,8 +175,8 @@ public sealed class OdfDatabaseFormDesigner
         {
             foreach (var item in items)
             {
-                var option = OdfNodeFactory.CreateElement("option", FormNamespace, "form");
-                option.SetAttribute("value", FormNamespace, item, "form");
+                var option = OdfNodeFactory.CreateElement("option", OdfNamespaces.Form, "form");
+                option.SetAttribute("value", OdfNamespaces.Form, item, "form");
                 listNode.AppendChild(option);
             }
         }
@@ -214,13 +208,13 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var buttonNode = OdfNodeFactory.CreateElement("button", FormNamespace, "form");
-        buttonNode.SetAttribute("name", FormNamespace, name, "form");
-        buttonNode.SetAttribute("id", FormNamespace, id, "form");
-        buttonNode.SetAttribute("label", FormNamespace, label, "form");
+        var buttonNode = OdfNodeFactory.CreateElement("button", OdfNamespaces.Form, "form");
+        buttonNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        buttonNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        buttonNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
         if (!string.IsNullOrEmpty(value))
         {
-            buttonNode.SetAttribute("value", FormNamespace, value!, "form");
+            buttonNode.SetAttribute("value", OdfNamespaces.Form, value!, "form");
         }
 
         _formNode.AppendChild(buttonNode);
@@ -248,10 +242,10 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var labelNode = OdfNodeFactory.CreateElement("fixed-text", FormNamespace, "form");
-        labelNode.SetAttribute("name", FormNamespace, name, "form");
-        labelNode.SetAttribute("id", FormNamespace, id, "form");
-        labelNode.SetAttribute("label", FormNamespace, label, "form");
+        var labelNode = OdfNodeFactory.CreateElement("fixed-text", OdfNamespaces.Form, "form");
+        labelNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        labelNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        labelNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
 
         _formNode.AppendChild(labelNode);
         AddDrawControl(id, x, y, width, height);
@@ -280,11 +274,11 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var radioNode = OdfNodeFactory.CreateElement("radio", FormNamespace, "form");
-        radioNode.SetAttribute("name", FormNamespace, name, "form");
-        radioNode.SetAttribute("id", FormNamespace, id, "form");
-        radioNode.SetAttribute("label", FormNamespace, label, "form");
-        radioNode.SetAttribute("current-selected", FormNamespace, isSelected ? "true" : "false", "form");
+        var radioNode = OdfNodeFactory.CreateElement("radio", OdfNamespaces.Form, "form");
+        radioNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        radioNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
+        radioNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
+        radioNode.SetAttribute("current-selected", OdfNamespaces.Form, isSelected ? "true" : "false", "form");
 
         _formNode.AppendChild(radioNode);
         AddDrawControl(id, x, y, width, height);
@@ -313,16 +307,16 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var comboNode = OdfNodeFactory.CreateElement("combobox", FormNamespace, "form");
-        comboNode.SetAttribute("name", FormNamespace, name, "form");
-        comboNode.SetAttribute("id", FormNamespace, id, "form");
+        var comboNode = OdfNodeFactory.CreateElement("combobox", OdfNamespaces.Form, "form");
+        comboNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        comboNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
         AddLabelProperty(comboNode, label);
 
         if (items is not null)
         {
             foreach (var item in items)
             {
-                var option = OdfNodeFactory.CreateElement("item", FormNamespace, "form");
+                var option = OdfNodeFactory.CreateElement("item", OdfNamespaces.Form, "form");
                 option.TextContent = item;
                 comboNode.AppendChild(option);
             }
@@ -355,14 +349,14 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var numberNode = OdfNodeFactory.CreateElement("number", FormNamespace, "form");
-        numberNode.SetAttribute("name", FormNamespace, name, "form");
-        numberNode.SetAttribute("id", FormNamespace, id, "form");
+        var numberNode = OdfNodeFactory.CreateElement("number", OdfNamespaces.Form, "form");
+        numberNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        numberNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
         if (value.HasValue)
         {
             string text = value.Value.ToString(CultureInfo.InvariantCulture);
-            numberNode.SetAttribute("value", FormNamespace, text, "form");
-            numberNode.SetAttribute("current-value", FormNamespace, text, "form");
+            numberNode.SetAttribute("value", OdfNamespaces.Form, text, "form");
+            numberNode.SetAttribute("current-value", OdfNamespaces.Form, text, "form");
         }
 
         AddLabelProperty(numberNode, label);
@@ -393,14 +387,14 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var dateNode = OdfNodeFactory.CreateElement("date", FormNamespace, "form");
-        dateNode.SetAttribute("name", FormNamespace, name, "form");
-        dateNode.SetAttribute("id", FormNamespace, id, "form");
+        var dateNode = OdfNodeFactory.CreateElement("date", OdfNamespaces.Form, "form");
+        dateNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        dateNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
         if (value.HasValue)
         {
             string text = value.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-            dateNode.SetAttribute("value", FormNamespace, text, "form");
-            dateNode.SetAttribute("current-value", FormNamespace, text, "form");
+            dateNode.SetAttribute("value", OdfNamespaces.Form, text, "form");
+            dateNode.SetAttribute("current-value", OdfNamespaces.Form, text, "form");
         }
 
         AddLabelProperty(dateNode, label);
@@ -431,14 +425,14 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var timeNode = OdfNodeFactory.CreateElement("time", FormNamespace, "form");
-        timeNode.SetAttribute("name", FormNamespace, name, "form");
-        timeNode.SetAttribute("id", FormNamespace, id, "form");
+        var timeNode = OdfNodeFactory.CreateElement("time", OdfNamespaces.Form, "form");
+        timeNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        timeNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
         if (value.HasValue)
         {
             string text = value.Value.ToString("c", CultureInfo.InvariantCulture);
-            timeNode.SetAttribute("value", FormNamespace, text, "form");
-            timeNode.SetAttribute("current-value", FormNamespace, text, "form");
+            timeNode.SetAttribute("value", OdfNamespaces.Form, text, "form");
+            timeNode.SetAttribute("current-value", OdfNamespaces.Form, text, "form");
         }
 
         AddLabelProperty(timeNode, label);
@@ -516,7 +510,7 @@ public sealed class OdfDatabaseFormDesigner
             throw new ArgumentNullException(nameof(controlNode));
         }
 
-        controlNode.SetAttribute("input-required", FormNamespace, required ? "true" : "false", "form");
+        controlNode.SetAttribute("input-required", OdfNamespaces.Form, required ? "true" : "false", "form");
     }
 
     /// <summary>
@@ -539,7 +533,7 @@ public sealed class OdfDatabaseFormDesigner
             throw new ArgumentOutOfRangeException(nameof(maxLength), OdfLocalizer.GetMessage("Err_OdfDatabaseFormDesigner_MaximumCharacterLengthCannot"));
         }
 
-        controlNode.SetAttribute("max-length", FormNamespace, maxLength.ToString(CultureInfo.InvariantCulture), "form");
+        controlNode.SetAttribute("max-length", OdfNamespaces.Form, maxLength.ToString(CultureInfo.InvariantCulture), "form");
     }
 
     /// <summary>
@@ -562,12 +556,12 @@ public sealed class OdfDatabaseFormDesigner
         OdfLength? height = null)
     {
         var id = $"control{_controlCounter++}";
-        var frameNode = OdfNodeFactory.CreateElement("frame", FormNamespace, "form");
-        frameNode.SetAttribute("name", FormNamespace, name, "form");
-        frameNode.SetAttribute("id", FormNamespace, id, "form");
+        var frameNode = OdfNodeFactory.CreateElement("frame", OdfNamespaces.Form, "form");
+        frameNode.SetAttribute("name", OdfNamespaces.Form, name, "form");
+        frameNode.SetAttribute("id", OdfNamespaces.Form, id, "form");
         if (!string.IsNullOrWhiteSpace(label))
         {
-            frameNode.SetAttribute("label", FormNamespace, label, "form");
+            frameNode.SetAttribute("label", OdfNamespaces.Form, label, "form");
         }
 
         _formNode.AppendChild(frameNode);
@@ -582,42 +576,42 @@ public sealed class OdfDatabaseFormDesigner
             return;
         }
 
-        var props = OdfNodeFactory.CreateElement("properties", FormNamespace, "form");
+        var props = OdfNodeFactory.CreateElement("properties", OdfNamespaces.Form, "form");
         controlNode.AppendChild(props);
 
-        var prop = OdfNodeFactory.CreateElement("property", FormNamespace, "form");
-        prop.SetAttribute("property-name", FormNamespace, "Label", "form");
-        prop.SetAttribute("value-type", OfficeNamespace, "string", "office");
-        prop.SetAttribute("string-value", FormNamespace, label!, "form");
+        var prop = OdfNodeFactory.CreateElement("property", OdfNamespaces.Form, "form");
+        prop.SetAttribute("property-name", OdfNamespaces.Form, "Label", "form");
+        prop.SetAttribute("value-type", OdfNamespaces.Office, "string", "office");
+        prop.SetAttribute("string-value", OdfNamespaces.Form, label!, "form");
         props.AppendChild(prop);
     }
 
     private void AddDrawControl(string controlId, OdfLength? x, OdfLength? y, OdfLength? width, OdfLength? height)
     {
-        var body = FindOrCreateChild(_document.ContentDom, "body", OfficeNamespace, "office");
-        var text = FindOrCreateChild(body, "text", OfficeNamespace, "office");
+        var body = FindOrCreateChild(_document.ContentDom, "body", OdfNamespaces.Office, "office");
+        var text = FindOrCreateChild(body, "text", OdfNamespaces.Office, "office");
 
         // 建立或尋找一個存放 draw 的段落
-        var p = FindOrCreateChild(text, "p", TextNamespace, "text");
+        var p = FindOrCreateChild(text, "p", OdfNamespaces.Text, "text");
 
-        var drawControl = OdfNodeFactory.CreateElement("control", DrawNamespace, "draw");
-        drawControl.SetAttribute("control", DrawNamespace, controlId, "draw");
+        var drawControl = OdfNodeFactory.CreateElement("control", OdfNamespaces.Draw, "draw");
+        drawControl.SetAttribute("control", OdfNamespaces.Draw, controlId, "draw");
 
         if (x.HasValue)
         {
-            drawControl.SetAttribute("x", SvgNamespace, x.Value.ToString()!, "svg");
+            drawControl.SetAttribute("x", OdfNamespaces.Svg, x.Value.ToString()!, "svg");
         }
         if (y.HasValue)
         {
-            drawControl.SetAttribute("y", SvgNamespace, y.Value.ToString()!, "svg");
+            drawControl.SetAttribute("y", OdfNamespaces.Svg, y.Value.ToString()!, "svg");
         }
         if (width.HasValue)
         {
-            drawControl.SetAttribute("width", SvgNamespace, width.Value.ToString()!, "svg");
+            drawControl.SetAttribute("width", OdfNamespaces.Svg, width.Value.ToString()!, "svg");
         }
         if (height.HasValue)
         {
-            drawControl.SetAttribute("height", SvgNamespace, height.Value.ToString()!, "svg");
+            drawControl.SetAttribute("height", OdfNamespaces.Svg, height.Value.ToString()!, "svg");
         }
 
         p.AppendChild(drawControl);

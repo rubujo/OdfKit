@@ -249,16 +249,11 @@ public static class OdfStreamingMailMerge
                 OdfLocalizer.GetMessage("Err_OdfPackage_ZipEntrySizeLimitExceeded", entryName, entry.Length, loadOptions.MaxEntrySize));
         }
 
-        if (entry.Length > loadOptions.MaxTotalUncompressedSize - totalUncompressedSize)
-        {
-            long projectedSize = totalUncompressedSize > long.MaxValue - entry.Length
-                ? long.MaxValue
-                : totalUncompressedSize + entry.Length;
-            throw new SecurityException(
-                OdfLocalizer.GetMessage("Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded", projectedSize, loadOptions.MaxTotalUncompressedSize));
-        }
-
-        totalUncompressedSize += entry.Length;
+        totalUncompressedSize = OdfBoundedStreamReader.AddBytes(
+            totalUncompressedSize,
+            entry.Length,
+            loadOptions.MaxTotalUncompressedSize,
+            "Err_OdfPackage_ZipTotalUncompressedSizeLimitExceeded");
 
         return entryName;
     }

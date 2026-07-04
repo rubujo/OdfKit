@@ -61,7 +61,7 @@ internal static partial class OdfSignatureVerifier
 
             var nsManager = new XmlNamespaceManager(doc.NameTable);
             nsManager.AddNamespace("ds", OdfNamespaces.Ds);
-            nsManager.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
+            nsManager.AddNamespace("xades", OdfNamespaces.Xades);
 
             var signatureNodes = doc.SelectNodes("//ds:Signature", nsManager);
             if (signatureNodes == null || signatureNodes.Count == 0)

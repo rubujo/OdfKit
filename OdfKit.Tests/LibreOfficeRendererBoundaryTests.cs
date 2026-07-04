@@ -18,13 +18,21 @@ namespace OdfKit.Tests
     [Collection("SequentialRenderingTests")]
     [Trait(TestCategories.Kind, TestCategories.Interop)]
     [Trait(TestCategories.Kind, TestCategories.Boundary)]
-    public class LibreOfficeRendererBoundaryTests
+    public class LibreOfficeRendererBoundaryTests : IDisposable
     {
         private const string MockSofficeArgumentsCapturePathVariable = "ODFKIT_MOCK_SOFFICE_ARGS_PATH";
 
+        private readonly CultureInfo? _originalDefaultCulture;
+
         public LibreOfficeRendererBoundaryTests()
         {
+            _originalDefaultCulture = OdfLocalizer.DefaultCulture;
             OdfLocalizer.DefaultCulture = new CultureInfo("en");
+        }
+
+        public void Dispose()
+        {
+            OdfLocalizer.DefaultCulture = _originalDefaultCulture;
         }
 
         [Fact]

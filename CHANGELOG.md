@@ -41,6 +41,12 @@
 - 修正 `OdfPackageEntry.OpenReader()` 對以 `Stream` 支援內容的專案直接回傳內部共用資料流本體，導致該資料流於呼叫端 `using` 區塊結束後即被釋放、往後任何存取皆擲出 `ObjectDisposedException` 的問題，改為回傳不會連動釋放底層資料流的包裝資料流。
 - 統一簽章描述檔路徑 `META-INF/documentsignatures.xml` 參照至既有的 `OdfSignerConstants.SignaturePath` 常數，避免多處獨立硬編碼字面值於日後路徑調整時各自失步。
 - 修正 `OdfBouncyCastleOpenPgpProvider` 兩處硬編碼中文例外訊息未透過 `OdfLocalizer.GetMessage` 在地化的問題。
+- 修正 `OdfChartDocument.GetPositiveRepeatCount` 未截斷嵌入圖表本地資料表重複計數上限的問題，改為與 `OdfSpreadsheetLimits.CsvMaxRepeat`／`FormulaMaxRepeat` 一致地截斷至 10,000。
+- 修正 `OdfDrawPageShapeReadEngine.CollectGroupsRecursive` 遞迴走訪 `draw:g` 群組無深度上限的問題，比照 `OdfDatabaseDocument` 既有的巢狀深度防護慣例，於超過 64 層時擲出可攔截的例外，避免惡意或損毀文件觸發 `StackOverflowException`。
+- 修正 `SpreadsheetDocumentEmbeddedChartReadEngine.TryReadChartMetadata` 於任何大小限制生效前即以 `ReadToEnd()` 無界讀入嵌入圖表 `content.xml` 的問題，改為透過 `OdfBoundedStreamReader` 以 `OdfLoadOptions.MaxEntrySize` 為上限邊界複製。
+- 修正 `PptxToOdpConverter.ConvertGraphicFrame` 未檢查 PPTX 表格儲存格自帶的 `RowSpan`／`GridSpan` 是否與實際表格列欄數一致，格式不一致時會擲出 `ArgumentOutOfRangeException` 中止整個轉換的問題，改為依實際表格邊界夾限合併範圍。
+- 統一媒體項目路徑前綴 `"Pictures/"` 參照至既有的 `OdfMediaManager.PicturesEntryPrefix` 常數，並修正多處大小寫比對不一致（`StringComparison.OrdinalIgnoreCase` 與 `Ordinal` 混用）的問題。
+- 修正 `OdfToDocxConverter.LoadStylesEntry` 未設定 `MaxCharactersInDocument` 的問題，與同專案內 `OdfToXlsxConverter` 保持一致。
 - 修正 `OdfComment.FromXmlNodeSingle` 在節點具有 `dc:date` 屬性時，會跳過解析 `dc:creator`／`text:p` 子節點導致註解作者與內容遺失的問題。
 - 修正 `OdtStreamReader.CaptureCurrentElement` 一律以 Text 命名空間讀取 `style-name` 屬性，導致表格儲存格（`table:table-cell`）樣式名稱讀取失敗的問題，改為依節點型別選用 Table 或 Text 命名空間。
 - 修正 `OdfPackageEntryAccessEngine.ExtractObjectStream` 於內嵌物件名稱含結尾斜線時，串接出雙斜線路徑（如 `Object 1//content.xml`）導致無法讀取內嵌物件內容的問題。
@@ -54,4 +60,15 @@
 - 修正 `OdfPdfExporter` 未釋放 `PdfDocumentRenderer.PdfDocument` 造成資源洩漏的問題。
 - 修正 `OdfSlide.AddEmbeddedObject` 未將反斜線正規化為正斜線，導致內嵌物件 `href` 不符合 ODF 封裝路徑規範的問題。
 - 修正 `OdfChartDocument` 讀取圖表序列（series）時，若缺少 `values-cell-range-address` 屬性即整筆略過，導致採用內嵌圖表資料的序列完全遺失的問題（`OdfChartSeriesInfo.ValuesCellRangeAddress` 隨之改為可為 `null`）。
+- 修正 `AdvancedSecurityTests` 中 5 個測試方法直接對 `ErrorMessage` 斷言英文子字串、未強制文化特性，導致系統語系為 zh-TW 等非英文環境時測試失敗的問題，比照既有 `SecurityComplianceTests` 慣例暫時切換至 `en-US` 文化特性；另發現並修正僅切換 `Thread.CurrentThread.CurrentCulture`／`CurrentUICulture` 於完整測試套件中仍不穩定的問題——`OdfLocalizer.GetMessage` 實際優先採用靜態的 `OdfLocalizer.DefaultCulture`（會被 `EncryptionTests`／`OdfValidationReportTests` 等其他測試類別設定後即不再還原），因此改為同時暫存並還原 `OdfLocalizer.DefaultCulture`，確保不受其他測試執行順序影響。
+- 修正 `CliTests`／`DomTest`／`EncryptionTests`／`LibreOfficeRendererBoundaryTests`／`LibreOfficeRendererDiagnosticsTests`／`OdfValidationReportTests`／`PresentationAndRenderingTests` 共 7 個測試類別於建構子設定全域靜態的 `OdfLocalizer.DefaultCulture` 後從未還原、污染同一測試行程後續測試的問題，改為實作 `IDisposable`，暫存原始值並於 `Dispose()` 還原。
+- 統一 XAdES 命名空間 URI `http://uri.etsi.org/01903/v1.3.2#`（原於 `OdfSignatureSigner`／`OdfSignatureX509Utilities`／`OdfSignatureVerifier` 共 23 處硬編碼字面值）至 `OdfNamespaces.Xades` 常數。
+- 合併 `OdfPackageFlatXmlLoader`／`OdfStreamingMailMerge`／`XlsxToOdfConverter`／`UnoserverRestBackend` 各自獨立實作的溢位安全大小檢查邏輯，統一改為呼叫 `OdfBoundedStreamReader.AddBytes`／`EnsureInitialBytes` 的既有多載或新增的 `exceptionFactory` 多載。
+- 移除 `OdfDatabaseFormDesigner` 與 `OdfNamespaces` 重複宣告的 5 個命名空間常數，改為直接參照 `OdfNamespaces` 既有常數。
+- 修正 `OdfBorder.Parse` 遇到格式不正確的 `#RRGGBB` 色彩片段時靜默退回黑色、掩蓋損毀樣式資料的問題，改用 `OdfColor.TryParse` 驗證格式，格式不正確時記錄診斷警告並略過該色彩片段。
+- 重構 `OdfMediaManager.DetectImageFormat` 由循序 if-else 鏈改為資料驅動的 magic bytes 比對表格，行為不變。
+- 合併 `OdfSignatureVerifier`（`.Dsig.cs`／`.Revocation.cs`／`.Timestamp.cs`）中重複的「設定 ErrorCode／ErrorMessage／Warnings 並回傳 false」錯誤處理樣式為共用私有輔助方法，並保留控制流程互異（`throw`、迴圈 `break`、條件式覆寫）的呼叫點不變。
+- 於 `OdfLength` 新增 `FromEmu`／`ToEmu` 與 `EmusPerInch` 常數，集中 OOXML EMU 單位換算的推導來源；`DocxToOdtConverter`／`PptxToOdpConverter`／`OdpToPptxConverter`／`OdfToDocxConverter` 中原各自獨立推導、數學上等價的 EMU 換算常數與運算，統一改為參照此單一來源。
+- 抽取 `OdfFormulaLatexConverter.AppendAtom` 中 `munderover`／`munder`／`mover`／`msubsup`／`msub`／`msup` 六個分支重複的「將子節點包入 `<mrow>` 並輸出標籤對」邏輯為區域函式，判斷樹與 MathML 輸出語意不變。
+- 拆分 `OdfPackageFlatXmlLoader.Initialize`：將巢狀內嵌文件抽取邏輯抽出為 `ExtractNestedDocuments`，將 content／styles／meta／settings 四棵 `XElement` 樹的切分邏輯抽出為 `SplitDocumentSections`，核心 XML 串流剖析迴圈維持不變。
 

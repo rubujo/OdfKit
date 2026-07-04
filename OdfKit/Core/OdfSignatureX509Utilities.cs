@@ -56,7 +56,7 @@ internal static class OdfSignatureX509Utilities
         errorMessage = null;
         var nsManager = new XmlNamespaceManager(signatureElement.OwnerDocument.NameTable);
         nsManager.AddNamespace("ds", OdfNamespaces.Ds);
-        nsManager.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
+        nsManager.AddNamespace("xades", OdfNamespaces.Xades);
 
         var certNode = signatureElement.SelectSingleNode(".//xades:SigningCertificate/xades:Cert", nsManager);
         if (certNode == null)

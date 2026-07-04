@@ -10,6 +10,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Styles;
 using OdfKit.Text;
 using A = DocumentFormat.OpenXml.Drawing;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
@@ -25,6 +26,8 @@ namespace OdfKit.Conversion;
 /// </summary>
 public static class OdfToDocxConverter
 {
+    private const long MaxConverterXmlCharactersInDocument = 64L * 1024 * 1024;
+
     /// <summary>
     /// Converts an ODF text document to DOCX.
     /// 將 ODT 文字文件轉換並寫入 DOCX 資料流。
@@ -266,6 +269,7 @@ public static class OdfToDocxConverter
                     XmlResolver = null,
                     IgnoreComments = true,
                     IgnoreWhitespace = false,
+                    MaxCharactersInDocument = MaxConverterXmlCharactersInDocument,
                 };
                 using var reader = XmlReader.Create(stream, settings);
                 var doc = new XPathDocument(reader);
@@ -1279,14 +1283,14 @@ public static class OdfToDocxConverter
             string numStr = attrValue.Substring(0, attrValue.Length - 2);
             if (double.TryParse(numStr, NumberStyles.Float,
                 CultureInfo.InvariantCulture, out double cm))
-                return (long)(cm * 360_000);
+                return OdfLength.FromCentimeters(cm).ToEmu();
         }
         else if (attrValue.Length > 2 && string.Equals(attrValue.Substring(attrValue.Length - 2), "in", StringComparison.OrdinalIgnoreCase))
         {
             string numStr = attrValue.Substring(0, attrValue.Length - 2);
             if (double.TryParse(numStr, NumberStyles.Float,
                 CultureInfo.InvariantCulture, out double inches))
-                return (long)(inches * 914_400);
+                return OdfLength.FromInches(inches).ToEmu();
         }
 
         return fallback;

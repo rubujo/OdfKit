@@ -96,22 +96,22 @@ internal static class OdfSignatureSigner
         {
             var dataObject = new DataObject();
 
-            XmlElement qualifyingProperties = doc.CreateElement("xades", "QualifyingProperties", "http://uri.etsi.org/01903/v1.3.2#");
+            XmlElement qualifyingProperties = doc.CreateElement("xades", "QualifyingProperties", OdfNamespaces.Xades);
             qualifyingProperties.SetAttribute("Target", "#" + signatureId);
 
-            var signedProperties = doc.CreateElement("xades", "SignedProperties", "http://uri.etsi.org/01903/v1.3.2#");
+            var signedProperties = doc.CreateElement("xades", "SignedProperties", OdfNamespaces.Xades);
             signedProperties.SetAttribute("Id", signedPropertiesId);
 
-            var signedSignatureProperties = doc.CreateElement("xades", "SignedSignatureProperties", "http://uri.etsi.org/01903/v1.3.2#");
+            var signedSignatureProperties = doc.CreateElement("xades", "SignedSignatureProperties", OdfNamespaces.Xades);
 
-            var signingTime = doc.CreateElement("xades", "SigningTime", "http://uri.etsi.org/01903/v1.3.2#");
+            var signingTime = doc.CreateElement("xades", "SigningTime", OdfNamespaces.Xades);
             signingTime.InnerText = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
             signedSignatureProperties.AppendChild(signingTime);
 
-            var signingCertificate = doc.CreateElement("xades", "SigningCertificate", "http://uri.etsi.org/01903/v1.3.2#");
-            var cert = doc.CreateElement("xades", "Cert", "http://uri.etsi.org/01903/v1.3.2#");
+            var signingCertificate = doc.CreateElement("xades", "SigningCertificate", OdfNamespaces.Xades);
+            var cert = doc.CreateElement("xades", "Cert", OdfNamespaces.Xades);
 
-            var certDigest = doc.CreateElement("xades", "CertDigest", "http://uri.etsi.org/01903/v1.3.2#");
+            var certDigest = doc.CreateElement("xades", "CertDigest", OdfNamespaces.Xades);
             var digestMethod = doc.CreateElement("ds", "DigestMethod", OdfNamespaces.Ds);
             digestMethod.SetAttribute("Algorithm", SignedXml.XmlDsigSHA256Url);
             certDigest.AppendChild(digestMethod);
@@ -122,7 +122,7 @@ internal static class OdfSignatureSigner
             certDigest.AppendChild(digestValue);
             cert.AppendChild(certDigest);
 
-            var issuerSerial = doc.CreateElement("xades", "IssuerSerial", "http://uri.etsi.org/01903/v1.3.2#");
+            var issuerSerial = doc.CreateElement("xades", "IssuerSerial", OdfNamespaces.Xades);
             var issuerName = doc.CreateElement("ds", "X509IssuerName", OdfNamespaces.Ds);
             issuerName.InnerText = certificate.IssuerName.Name;
             issuerSerial.AppendChild(issuerName);
@@ -143,7 +143,7 @@ internal static class OdfSignatureSigner
 
             var refProperties = new Reference("#" + signedPropertiesId)
             {
-                Type = "http://uri.etsi.org/01903/v1.3.2#SignedProperties",
+                Type = OdfNamespaces.Xades + "SignedProperties",
                 DigestMethod = SignedXml.XmlDsigSHA256Url
             };
             refProperties.AddTransform(new XmlDsigExcC14NTransform());
@@ -192,7 +192,7 @@ internal static class OdfSignatureSigner
 
             var nsManager = new XmlNamespaceManager(doc.NameTable);
             nsManager.AddNamespace("ds", OdfNamespaces.Ds);
-            nsManager.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
+            nsManager.AddNamespace("xades", OdfNamespaces.Xades);
 
             var sigValElem = xmlSignature.SelectSingleNode(".//ds:SignatureValue", nsManager) as XmlElement
                 ?? throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_DsNotFound"));
@@ -212,17 +212,17 @@ internal static class OdfSignatureSigner
             var importedQualProps = xmlSignature.SelectSingleNode(".//xades:QualifyingProperties", nsManager) as XmlElement
                 ?? throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfSignatureSigner_XadesNotFound"));
 
-            var unsignedProps = doc.CreateElement("xades", "UnsignedProperties", "http://uri.etsi.org/01903/v1.3.2#");
-            var unsignedSigProps = doc.CreateElement("xades", "UnsignedSignatureProperties", "http://uri.etsi.org/01903/v1.3.2#");
+            var unsignedProps = doc.CreateElement("xades", "UnsignedProperties", OdfNamespaces.Xades);
+            var unsignedSigProps = doc.CreateElement("xades", "UnsignedSignatureProperties", OdfNamespaces.Xades);
 
-            var sigTimestamp = doc.CreateElement("xades", "SignatureTimeStamp", "http://uri.etsi.org/01903/v1.3.2#");
+            var sigTimestamp = doc.CreateElement("xades", "SignatureTimeStamp", OdfNamespaces.Xades);
             sigTimestamp.SetAttribute("Id", "timestamp-" + Guid.NewGuid());
 
             var canonMethod = doc.CreateElement("ds", "CanonicalizationMethod", OdfNamespaces.Ds);
             canonMethod.SetAttribute("Algorithm", "http://www.w3.org/2001/10/xml-exc-c14n#");
             sigTimestamp.AppendChild(canonMethod);
 
-            var encapTS = doc.CreateElement("xades", "EncapsulatedTimeStamp", "http://uri.etsi.org/01903/v1.3.2#");
+            var encapTS = doc.CreateElement("xades", "EncapsulatedTimeStamp", OdfNamespaces.Xades);
             encapTS.InnerText = Convert.ToBase64String(tsToken);
             sigTimestamp.AppendChild(encapTS);
 
@@ -243,17 +243,17 @@ internal static class OdfSignatureSigner
                 foreach (X509ChainElement element in chain.ChainElements)
                     chainCerts.Add(element.Certificate);
 
-                var certValues = doc.CreateElement("xades", "CertificateValues", "http://uri.etsi.org/01903/v1.3.2#");
+                var certValues = doc.CreateElement("xades", "CertificateValues", OdfNamespaces.Xades);
                 foreach (X509Certificate2 chainCert in chainCerts)
                 {
-                    var encapCert = doc.CreateElement("xades", "EncapsulatedCertificate", "http://uri.etsi.org/01903/v1.3.2#");
+                    var encapCert = doc.CreateElement("xades", "EncapsulatedCertificate", OdfNamespaces.Xades);
                     encapCert.InnerText = Convert.ToBase64String(chainCert.RawData);
                     certValues.AppendChild(encapCert);
                 }
                 unsignedSigProps.AppendChild(certValues);
 
-                var revValues = doc.CreateElement("xades", "RevocationValues", "http://uri.etsi.org/01903/v1.3.2#");
-                var crlValues = doc.CreateElement("xades", "CRLValues", "http://uri.etsi.org/01903/v1.3.2#");
+                var revValues = doc.CreateElement("xades", "RevocationValues", OdfNamespaces.Xades);
+                var crlValues = doc.CreateElement("xades", "CRLValues", OdfNamespaces.Xades);
 
                 var downloadedCrls = new HashSet<string>();
                 foreach (X509Certificate2 chainCert in chainCerts)
@@ -275,7 +275,7 @@ internal static class OdfSignatureSigner
                                 cancellationToken).ConfigureAwait(false);
                             if (crlBytes is { Length: > 0 })
                             {
-                                var encapCrl = doc.CreateElement("xades", "EncapsulatedCRLValue", "http://uri.etsi.org/01903/v1.3.2#");
+                                var encapCrl = doc.CreateElement("xades", "EncapsulatedCRLValue", OdfNamespaces.Xades);
                                 encapCrl.InnerText = Convert.ToBase64String(crlBytes);
                                 crlValues.AppendChild(encapCrl);
                             }

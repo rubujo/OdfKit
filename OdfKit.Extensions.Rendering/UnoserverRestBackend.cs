@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using OdfKit.Compliance;
+using OdfKit.Core;
 
 namespace OdfKit.Extensions.Rendering;
 
@@ -155,15 +156,12 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         int bytesRead;
         while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
         {
-            if (maxBytes > 0 && bytesRead > maxBytes - totalBytes)
-            {
-                long exceededBytes = totalBytes > long.MaxValue - bytesRead
-                    ? long.MaxValue
-                    : totalBytes + bytesRead;
-                throw new InvalidDataException(OdfLocalizer.GetMessage(errorMessageKey, exceededBytes, maxBytes));
-            }
+            totalBytes = OdfBoundedStreamReader.AddBytes(
+                totalBytes,
+                bytesRead,
+                maxBytes,
+                (exceeded, max) => new InvalidDataException(OdfLocalizer.GetMessage(errorMessageKey, exceeded, max)));
 
-            totalBytes += bytesRead;
             await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
         }
     }

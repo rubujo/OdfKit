@@ -165,7 +165,7 @@ internal static class OdfPackageEntryAccessEngine
         List<string> keysToRemove = [];
         foreach (var key in ctx.Entries.Keys)
         {
-            if (key.StartsWith("Pictures/", StringComparison.OrdinalIgnoreCase))
+            if (key.StartsWith(OdfMediaManager.PicturesEntryPrefix, StringComparison.Ordinal))
             {
                 if (!referencedSet.Contains(key))
                 {

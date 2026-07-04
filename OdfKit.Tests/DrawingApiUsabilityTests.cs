@@ -329,4 +329,46 @@ public class DrawingApiUsabilityTests
         return Convert.FromBase64String(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=");
     }
+
+    /// <summary>
+    /// 驗證 GetGroups() 在遇到超過上限的巢狀 draw:g 深度時，會擲出可攔截的例外而非導致堆疊溢位。
+    /// </summary>
+    [Fact]
+    public void GetGroupsThrowsOnExcessiveNestingDepthInsteadOfStackOverflow()
+    {
+        using var doc = DrawingDocument.Create();
+        OdfDrawPage page = doc.AddPage();
+
+        OdfNode current = page.Node;
+        for (int i = 0; i < 100; i++)
+        {
+            var group = OdfNodeFactory.CreateElement("g", OdfNamespaces.Draw, "draw");
+            current.AppendChild(group);
+            current = group;
+        }
+
+        Assert.Throws<InvalidDataException>(() => page.GetGroups());
+    }
+
+    /// <summary>
+    /// 驗證正常（淺層）巢狀群組仍可正確回傳。
+    /// </summary>
+    [Fact]
+    public void GetGroupsReturnsShallowNestedGroups()
+    {
+        using var doc = DrawingDocument.Create();
+        OdfDrawPage page = doc.AddPage();
+
+        var outerGroup = OdfNodeFactory.CreateElement("g", OdfNamespaces.Draw, "draw");
+        outerGroup.SetAttribute("id", OdfNamespaces.Draw, "outer", "draw");
+        page.Node.AppendChild(outerGroup);
+
+        var innerGroup = OdfNodeFactory.CreateElement("g", OdfNamespaces.Draw, "draw");
+        innerGroup.SetAttribute("id", OdfNamespaces.Draw, "inner", "draw");
+        outerGroup.AppendChild(innerGroup);
+
+        var groups = page.GetGroups();
+
+        Assert.Equal(2, groups.Count);
+    }
 }

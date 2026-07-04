@@ -20,7 +20,7 @@ namespace OdfKit.Conversion;
 /// </summary>
 public static class OdpToPptxConverter
 {
-    private const long EmusPerPoint = 12700L;
+    private const long EmusPerPoint = (long)(OdfLength.EmusPerInch / 72d);
     private const int DefaultSlideWidth = 9144000;
     private const int DefaultSlideHeight = 6858000;
     private const string SmilNamespace = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0";

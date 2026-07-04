@@ -75,20 +75,38 @@ internal static class OdfBoundedStreamReader
         return ms.ToArray();
     }
 
-    private static void EnsureInitialBytes(long totalBytes, long maxBytes, string errorMessageKey)
+    /// <summary>
+    /// 檢查初始位元組數是否已超過上限，超過時以 <paramref name="errorMessageKey"/> 對應的在地化訊息擲出 <see cref="SecurityException"/>。
+    /// </summary>
+    internal static void EnsureInitialBytes(long totalBytes, long maxBytes, string errorMessageKey) =>
+        EnsureInitialBytes(totalBytes, maxBytes, (exceeded, max) => new SecurityException(OdfLocalizer.GetMessage(errorMessageKey, exceeded, max)));
+
+    /// <summary>
+    /// 以溢位安全的方式累加已讀取位元組數，超過上限時以 <paramref name="errorMessageKey"/> 對應的在地化訊息擲出 <see cref="SecurityException"/>。
+    /// </summary>
+    internal static long AddBytes(long totalBytes, long bytesRead, long maxBytes, string errorMessageKey) =>
+        AddBytes(totalBytes, bytesRead, maxBytes, (exceeded, max) => new SecurityException(OdfLocalizer.GetMessage(errorMessageKey, exceeded, max)));
+
+    /// <summary>
+    /// 檢查初始位元組數是否已超過上限，超過時以 <paramref name="exceptionFactory"/> 建構的例外擲出。
+    /// </summary>
+    internal static void EnsureInitialBytes(long totalBytes, long maxBytes, Func<long, long, Exception> exceptionFactory)
     {
         if (maxBytes > 0 && totalBytes > maxBytes)
         {
-            throw new SecurityException(OdfLocalizer.GetMessage(errorMessageKey, totalBytes, maxBytes));
+            throw exceptionFactory(totalBytes, maxBytes);
         }
     }
 
-    private static long AddBytes(long totalBytes, int bytesRead, long maxBytes, string errorMessageKey)
+    /// <summary>
+    /// 以溢位安全的方式累加已讀取位元組數，超過上限時以 <paramref name="exceptionFactory"/> 建構的例外擲出。
+    /// </summary>
+    internal static long AddBytes(long totalBytes, long bytesRead, long maxBytes, Func<long, long, Exception> exceptionFactory)
     {
         if (maxBytes > 0 && bytesRead > maxBytes - totalBytes)
         {
             long exceededBytes = totalBytes > long.MaxValue - bytesRead ? long.MaxValue : totalBytes + bytesRead;
-            throw new SecurityException(OdfLocalizer.GetMessage(errorMessageKey, exceededBytes, maxBytes));
+            throw exceptionFactory(exceededBytes, maxBytes);
         }
 
         return totalBytes + bytesRead;

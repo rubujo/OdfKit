@@ -12,6 +12,12 @@ namespace OdfKit.Core;
 /// </summary>
 public class OdfMediaManager
 {
+    /// <summary>
+    /// The canonical package entry path prefix used for embedded media (e.g. images).
+    /// 內嵌媒體（如圖片）於封裝中使用的規範項目路徑前綴。
+    /// </summary>
+    public const string PicturesEntryPrefix = "Pictures/";
+
     private readonly OdfPackage _package;
     // 將 SHA-256 圖片雜湊對應至其 ZIP 專案路徑（例如 "Pictures/image_hash.png" ）的字典
     private readonly Dictionary<string, string> _imageHashRegistry = new(StringComparer.Ordinal);
@@ -32,7 +38,7 @@ public class OdfMediaManager
         // 掃描資訊清單以尋找 Pictures/ 中現有的媒體
         foreach (var kvp in _package.Manifest)
         {
-            if (kvp.Key.StartsWith("Pictures/", StringComparison.Ordinal))
+            if (kvp.Key.StartsWith(PicturesEntryPrefix, StringComparison.Ordinal))
             {
                 try
                 {
@@ -84,13 +90,13 @@ public class OdfMediaManager
             {
                 sanitizedName += extension;
             }
-            entryPath = OdfPackage.SanitizeEntryName($"Pictures/{sanitizedName}");
+            entryPath = OdfPackage.SanitizeEntryName($"{PicturesEntryPrefix}{sanitizedName}");
         }
         else
         {
             // 預設後備路徑
             _fallbackImageCounter++;
-            entryPath = OdfPackage.SanitizeEntryName($"Pictures/image_{_fallbackImageCounter}_{hash.Substring(0, 8)}{extension}");
+            entryPath = OdfPackage.SanitizeEntryName($"{PicturesEntryPrefix}image_{_fallbackImageCounter}_{hash.Substring(0, 8)}{extension}");
         }
 
         // 解析名稱衝突
@@ -113,6 +119,49 @@ public class OdfMediaManager
     }
 
     /// <summary>
+    /// 依序比對的圖片格式簽章表，每一列以判斷式描述辨識條件，對應其 MIME 類型與副檔名。
+    /// </summary>
+    private static readonly (Func<byte[], bool> Matches, string MediaType, string Extension)[] ImageFormatSignatures =
+    [
+        (b => b.Length >= 8 &&
+              b[0] == 0x89 && b[1] == 0x50 && b[2] == 0x4E && b[3] == 0x47 &&
+              b[4] == 0x0D && b[5] == 0x0A && b[6] == 0x1A && b[7] == 0x0A,
+            "image/png", ".png"),
+        (b => b.Length >= 3 && b[0] == 0xFF && b[1] == 0xD8 && b[2] == 0xFF,
+            "image/jpeg", ".jpg"),
+        (b => b.Length >= 4 && b[0] == 0x47 && b[1] == 0x49 && b[2] == 0x46 && b[3] == 0x38,
+            "image/gif", ".gif"),
+        // WebP 格式 (RIFF....WEBP)
+        (b => b.Length >= 12 &&
+              b[0] == 0x52 && b[1] == 0x49 && b[2] == 0x46 && b[3] == 0x46 && // RIFF
+              b[8] == 0x57 && b[9] == 0x45 && b[10] == 0x42 && b[11] == 0x50, // WEBP
+            "image/webp", ".webp"),
+        // BMP 格式 (BM)
+        (b => b.Length >= 2 && b[0] == 0x42 && b[1] == 0x4D,
+            "image/bmp", ".bmp"),
+        // TIFF 格式 (II* / MM*)
+        (b => b.Length >= 4 &&
+              ((b[0] == 0x49 && b[1] == 0x49 && b[2] == 0x2A && b[3] == 0x00) || // Little Endian
+               (b[0] == 0x4D && b[1] == 0x4D && b[2] == 0x00 && b[3] == 0x2A)),  // Big Endian
+            "image/tiff", ".tiff"),
+        // EMF 格式（開頭 0x01 0x00 0x00 0x00，且偏移 40 處為 " EMF"）
+        (b => b.Length >= 44 &&
+              b[0] == 0x01 && b[1] == 0x00 && b[2] == 0x00 && b[3] == 0x00 &&
+              b[40] == 0x20 && b[41] == 0x45 && b[42] == 0x4D && b[43] == 0x46,
+            "image/x-emf", ".emf"),
+        // WMF 格式（傳統簽章）
+        (b => b.Length >= 4 && b[0] == 0xD7 && b[1] == 0xCD && b[2] == 0xC6 && b[3] == 0x9A,
+            "image/x-wmf", ".wmf"),
+        // WMF 格式（替代表頭變體）
+        (b => b.Length >= 10 &&
+              ((b[0] == 0x01 && b[1] == 0x00) || (b[0] == 0x09 && b[1] == 0x00)) &&
+              b[2] == 0x00 && b[3] == 0x00,
+            "image/x-wmf", ".wmf"),
+        // SVG 簡單檢查（文字內容，非固定位移 magic bytes）
+        (IsSvg, "image/svg+xml", ".svg"),
+    ];
+
+    /// <summary>
     /// 根據檔案的幻數（Magic Bytes）偵測圖片格式。
     /// </summary>
     /// <param name="bytes">圖片的二進位內容</param>
@@ -120,90 +169,14 @@ public class OdfMediaManager
     /// <param name="extension">輸出的副檔名，包含前導句點</param>
     public static void DetectImageFormat(byte[] bytes, out string mimeType, out string extension)
     {
-        if (bytes.Length >= 8 &&
-            bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47 &&
-            bytes[4] == 0x0D && bytes[5] == 0x0A && bytes[6] == 0x1A && bytes[7] == 0x0A)
+        foreach (var signature in ImageFormatSignatures)
         {
-            mimeType = "image/png";
-            extension = ".png";
-            return;
-        }
-
-        if (bytes.Length >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
-        {
-            mimeType = "image/jpeg";
-            extension = ".jpg";
-            return;
-        }
-
-        if (bytes.Length >= 4 && bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x38)
-        {
-            mimeType = "image/gif";
-            extension = ".gif";
-            return;
-        }
-
-        // WebP 格式 (RIFF....WEBP)
-        if (bytes.Length >= 12 &&
-            bytes[0] == 0x52 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x46 && // RIFF
-            bytes[8] == 0x57 && bytes[9] == 0x45 && bytes[10] == 0x42 && bytes[11] == 0x50) // WEBP
-        {
-            mimeType = "image/webp";
-            extension = ".webp";
-            return;
-        }
-
-        // BMP 格式 (BM)
-        if (bytes.Length >= 2 && bytes[0] == 0x42 && bytes[1] == 0x4D)
-        {
-            mimeType = "image/bmp";
-            extension = ".bmp";
-            return;
-        }
-
-        // TIFF 格式 (II* / MM*)
-        if (bytes.Length >= 4 &&
-            ((bytes[0] == 0x49 && bytes[1] == 0x49 && bytes[2] == 0x2A && bytes[3] == 0x00) || // Little Endian
-             (bytes[0] == 0x4D && bytes[1] == 0x4D && bytes[2] == 0x00 && bytes[3] == 0x2A)))  // Big Endian
-        {
-            mimeType = "image/tiff";
-            extension = ".tiff";
-            return;
-        }
-
-        // EMF 格式（開頭 0x01 0x00 0x00 0x00，且偏移 40 處為 " EMF"）
-        if (bytes.Length >= 44 &&
-            bytes[0] == 0x01 && bytes[1] == 0x00 && bytes[2] == 0x00 && bytes[3] == 0x00 &&
-            bytes[40] == 0x20 && bytes[41] == 0x45 && bytes[42] == 0x4D && bytes[43] == 0x46)
-        {
-            mimeType = "image/x-emf";
-            extension = ".emf";
-            return;
-        }
-
-        // WMF 格式
-        if (bytes.Length >= 4 &&
-            bytes[0] == 0xD7 && bytes[1] == 0xCD && bytes[2] == 0xC6 && bytes[3] == 0x9A)
-        {
-            mimeType = "image/x-wmf";
-            extension = ".wmf";
-            return;
-        }
-        if (bytes.Length >= 10 &&
-            ((bytes[0] == 0x01 && bytes[1] == 0x00) || (bytes[0] == 0x09 && bytes[1] == 0x00)) &&
-            bytes[2] == 0x00 && bytes[3] == 0x00)
-        {
-            mimeType = "image/x-wmf";
-            extension = ".wmf";
-            return;
-        }
-
-        // SVG 簡單檢查
-        if (IsSvg(bytes))
-        {
-            mimeType = "image/svg+xml";
-            extension = ".svg";
-            return;
+            if (signature.Matches(bytes))
+            {
+                mimeType = signature.MediaType;
+                extension = signature.Extension;
+                return;
+            }
         }
 
         // 預設後備
