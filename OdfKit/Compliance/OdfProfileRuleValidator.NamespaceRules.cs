@@ -197,11 +197,14 @@ internal static partial class OdfProfileRuleValidator
             reader.MoveToAttribute(i);
 
             string attrQName = string.IsNullOrEmpty(reader.Prefix) ? reader.LocalName : $"{reader.Prefix}:{reader.LocalName}";
+            // 「vnd.sun.star.script:」巨集 URI 只可能出現在連結類屬性（如 xlink:href）中，
+            // 限縮子字串掃描範圍至此類屬性，避免對文件中每個元素的每個屬性值都做全字串掃描。
+            bool isHrefLikeAttr = string.Equals(reader.LocalName, "href", StringComparison.Ordinal);
             bool isScriptAttr = reader.NamespaceURI == "urn:oasis:names:tc:opendocument:xmlns:script:1.0" ||
                                 string.Equals(reader.Prefix, "script", StringComparison.Ordinal) ||
                                 string.Equals(attrQName, "script:event-name", StringComparison.Ordinal) ||
                                 (string.Equals(reader.LocalName, "event-name", StringComparison.Ordinal) && reader.NamespaceURI == "urn:oasis:names:tc:opendocument:xmlns:script:1.0") ||
-                                reader.Value.Contains("vnd.sun.star.script:");
+                                (isHrefLikeAttr && reader.Value.Contains("vnd.sun.star.script:"));
 
             if (isScriptAttr)
             {

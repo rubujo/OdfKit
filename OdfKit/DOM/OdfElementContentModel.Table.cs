@@ -367,12 +367,12 @@ public partial class TableTableElement
 
     private TableTableCellElement GetOrCreateCell(int rowIndex, int columnIndex)
     {
-        if (rowIndex < 0)
+        if (rowIndex < 0 || rowIndex > OdfSpreadsheetLimits.MaxRowIndex)
         {
             throw new ArgumentOutOfRangeException(nameof(rowIndex));
         }
 
-        if (columnIndex < 0)
+        if (columnIndex < 0 || columnIndex > OdfSpreadsheetLimits.MaxColumnIndex)
         {
             throw new ArgumentOutOfRangeException(nameof(columnIndex));
         }
@@ -1013,6 +1013,16 @@ public partial class TableTableElement
 
     private void EnsurePageAllocated(int rowIndex, int columnIndex)
     {
+        if (rowIndex > OdfSpreadsheetLimits.MaxRowIndex)
+        {
+            throw new ArgumentOutOfRangeException(nameof(rowIndex));
+        }
+
+        if (columnIndex > OdfSpreadsheetLimits.MaxColumnIndex)
+        {
+            throw new ArgumentOutOfRangeException(nameof(columnIndex));
+        }
+
         if (_nativePages is null)
         {
             _nativePages = new IntPtr[256][];
@@ -1173,8 +1183,11 @@ public partial class TableTableElement
             if (value is null)
             {
                 cell->Type = 0;
+                FreePtr(ref cell->StyleNamePtr);
+                FreePtr(ref cell->FormulaPtr);
                 FreePtr(ref cell->StringValuePtr);
                 cell->StringValuePtr = StringToUtf8Ptr(string.Empty);
+                RemoveHotFormula(rowIndex, columnIndex);
                 return;
             }
 
@@ -1336,6 +1349,7 @@ public partial class TableTableElement
         }
 
         int maxRow = -1;
+        int maxColOverall = -1;
         if (_nativePages is not null)
         {
             for (int pr = 0; pr < _nativePages.Length; pr++)
@@ -1363,6 +1377,9 @@ public partial class TableTableElement
                                 int r = pr * PageSize + (i / PageSize);
                                 if (r > maxRow)
                                     maxRow = r;
+                                int c = pc * PageSize + (i % PageSize);
+                                if (c > maxColOverall)
+                                    maxColOverall = c;
                             }
                         }
                     }
@@ -1378,6 +1395,12 @@ public partial class TableTableElement
                 if (row > maxRow)
                 {
                     maxRow = row;
+                }
+
+                int column = GetColumnFromSparseCellKey(key);
+                if (column > maxColOverall)
+                {
+                    maxColOverall = column;
                 }
             }
         }
@@ -1400,7 +1423,7 @@ public partial class TableTableElement
             writer.WriteStartElement(tablePrefix, "table-row", OdfNamespaces.Table);
 
             int maxCol = -1;
-            for (int c = 0; c < 16384; c++)
+            for (int c = 0; c <= maxColOverall; c++)
             {
                 if (TryGetSparseCellData(r, c, out _, out _, out _, out _, out _, out _, out _))
                 {
@@ -1618,11 +1641,7 @@ public partial class TableTableElement
 #else
         int byteSize = PageSize * PageSize * 40;
         IntPtr ptr = Marshal.AllocHGlobal(byteSize);
-        byte* p = (byte*)ptr;
-        for (int i = 0; i < byteSize; i++)
-        {
-            p[i] = 0;
-        }
+        new Span<byte>((void*)ptr, byteSize).Clear();
 #endif
         return ptr;
     }

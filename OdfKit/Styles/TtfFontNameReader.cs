@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using OdfKit.Core;
+
 namespace OdfKit.Styles;
 
 internal static class TtfFontNameReader
@@ -32,8 +34,18 @@ internal static class TtfFontNameReader
                     }
                     foreach (var offset in offsets)
                     {
-                        fs.Position = offset;
-                        names.AddRange(ReadSingleTtfNames(reader));
+                        try
+                        {
+                            if (offset >= fs.Length)
+                                continue;
+                            fs.Position = offset;
+                            names.AddRange(ReadSingleTtfNames(reader));
+                        }
+                        catch (Exception ex)
+                        {
+                            // 單一子字型損毀不應中斷其餘子字型的名稱擷取
+                            OdfKitDiagnostics.Warn($"Failed to read TTC sub-font names at offset {offset}: {ex.Message}");
+                        }
                     }
                 }
                 return names;
@@ -42,9 +54,9 @@ internal static class TtfFontNameReader
             fs.Position = 0;
             names.AddRange(ReadSingleTtfNames(reader));
         }
-        catch
+        catch (Exception ex)
         {
-            // 壓制損毀檔案的錯誤
+            OdfKitDiagnostics.Warn($"Failed to read TTF/OTF font names from '{filePath}': {ex.Message}");
         }
         return names;
     }

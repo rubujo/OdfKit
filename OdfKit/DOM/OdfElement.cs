@@ -206,9 +206,23 @@ public partial class OdfElement(string localName, string namespaceUri, string? p
 
         if (deep)
         {
-            foreach (var child in Children)
+            if (++CloneRecursionDepth > OdfXmlReader.MaxElementDepth)
             {
-                clone.AppendChild(child.CloneNode(true));
+                CloneRecursionDepth--;
+                throw new System.Security.SecurityException(
+                    OdfLocalizer.GetMessage("Err_OdfXmlReader_XmlElementNestingDepth", CloneRecursionDepth, OdfXmlReader.MaxElementDepth));
+            }
+
+            try
+            {
+                foreach (var child in Children)
+                {
+                    clone.AppendChild(child.CloneNode(true));
+                }
+            }
+            finally
+            {
+                CloneRecursionDepth--;
             }
         }
         return clone;

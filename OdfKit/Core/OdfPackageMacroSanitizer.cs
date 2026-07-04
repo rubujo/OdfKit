@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using OdfKit.Compliance;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
@@ -44,6 +45,7 @@ internal static class OdfPackageMacroSanitizer
             }
         }
 
+        var failedEntries = new List<string>();
         foreach (OdfPackageEntry entry in xmlEntries)
         {
             try
@@ -65,9 +67,16 @@ internal static class OdfPackageMacroSanitizer
             catch (Exception ex)
             {
                 OdfKitDiagnostics.Warn($"Failed to sanitize XML entry '{entry.Name}': {ex.Message}");
+                failedEntries.Add(entry.Name);
             }
         }
 
         ctx.RemoveOutdatedSignatures();
+
+        if (failedEntries.Count > 0)
+        {
+            throw new InvalidDataException(OdfLocalizer.GetMessage(
+                "Err_OdfPackageMacroSanitizer_SanitizeFailed", failedEntries.Count, string.Join(", ", failedEntries)));
+        }
     }
 }

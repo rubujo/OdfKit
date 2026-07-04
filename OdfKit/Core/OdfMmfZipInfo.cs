@@ -174,13 +174,16 @@ internal static class OdfZipDirectoryParser
                             ushort lfhExtraLen = reader.ReadUInt16();
                             long dataOffset = localHeaderOffset + 30 + lfhNameLen + lfhExtraLen;
 
-                            string sanitized = OdfPackage.SanitizeEntryName(fileName);
-                            if (entries.ContainsKey(sanitized))
+                            if (dataOffset >= 0 && dataOffset + compressedSize <= stream.Length)
                             {
-                                duplicateEntryNames.Add(sanitized);
-                            }
+                                string sanitized = OdfPackage.SanitizeEntryName(fileName);
+                                if (entries.ContainsKey(sanitized))
+                                {
+                                    duplicateEntryNames.Add(sanitized);
+                                }
 
-                            entries[sanitized] = new OdfMmfEntryInfo(sanitized, dataOffset, compressedSize, uncompressedSize, compressionMethod, crc32, localHeaderOffset, flags, timeDate);
+                                entries[sanitized] = new OdfMmfEntryInfo(sanitized, dataOffset, compressedSize, uncompressedSize, compressionMethod, crc32, localHeaderOffset, flags, timeDate);
+                            }
                         }
                     }
                     stream.Position = savedPos;

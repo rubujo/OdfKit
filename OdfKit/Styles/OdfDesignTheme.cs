@@ -58,7 +58,7 @@ public sealed class OdfDesignTheme
     /// <returns>對應的填滿色彩</returns>
     public string GetAccentFillColor(int index)
     {
-        int normalized = Math.Abs(index) % _accentFillColors.Length;
+        int normalized = ((index % _accentFillColors.Length) + _accentFillColors.Length) % _accentFillColors.Length;
         return _accentFillColors[normalized];
     }
 

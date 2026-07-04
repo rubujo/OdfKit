@@ -41,7 +41,7 @@ internal static class OdfPackageEntryNameSanitizer
         string[] parts = normalized.Split('/');
         foreach (string part in parts)
         {
-            if (part == "..")
+            if (part.TrimEnd('.', ' ') == "..")
             {
                 throw new SecurityException(OdfLocalizer.GetMessage("Err_OdfPackageEntryNameSanitizer_DirectoryTraversalAttemptZip", name));
             }

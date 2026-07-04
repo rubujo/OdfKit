@@ -9,6 +9,13 @@ namespace OdfKit.Styles;
 /// <summary>
 /// ODF 樣式引擎，負責樣式繼承、解析與去重管理。
 /// </summary>
+/// <remarks>
+/// 本類別非執行緒安全：內部快取（<c>_automaticStyles</c>／<c>_commonStyles</c>／<c>_defaultStyles</c>／
+/// <c>_localStyles</c>／<c>_directStyleProperties</c>）皆為一般 <see cref="Dictionary{TKey, TValue}"/>，
+/// 若同一個 <see cref="OdfStyleEngine"/> 執行個體（或其所屬文件）被多執行緒並行讀寫（例如 <see cref="RebuildStyleIndex"/>
+/// 與其他讀取方法同時呼叫），可能因集合並行存取而擲出例外或讀到不一致資料。若需並行處理多份文件，
+/// 請為每份文件建立獨立的執行個體，而非跨執行緒共用同一個 <see cref="OdfStyleEngine"/>。
+/// </remarks>
 public partial class OdfStyleEngine
 {
     private readonly OdfNode _contentRoot;

@@ -123,7 +123,7 @@ public ref struct OdfUtf8XmlReader
                 {
                     _position++;
                 }
-                _position += 2; // consume '?>'
+                _position = Math.Min(_position + 2, _xml.Length); // consume '?>'（若未找到終止符則夾限至緩衝區尾端）
                 token = new OdfUtf8XmlToken(OdfUtf8XmlTokenKind.ProcessingInstruction, _xml.Slice(start, _position - start), offset: start, length: _position - start);
                 return true;
             }

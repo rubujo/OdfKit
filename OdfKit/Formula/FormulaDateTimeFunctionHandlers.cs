@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Formula.AST;
+using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula;
 
@@ -399,7 +400,12 @@ internal static class FormulaDateTimeFunctionHandlers
         int d = (dt - jan1).Days;
 
         int w;
-        if (type == 1)
+        if (type == 21)
+        {
+            // ISO 8601 週數：週一為週首，第一週須包含該年第一個星期四
+            return (double)GetIso8601WeekOfYear(dt);
+        }
+        else if (type == 1)
         {
             w = (int)jan1.DayOfWeek;
             return (double)((d + w) / 7 + 1);
@@ -417,6 +423,19 @@ internal static class FormulaDateTimeFunctionHandlers
         }
     }
 
+    // ISO 8601 週數計算：週一為週首，若當週落在週一至週三則歸屬於下一週的週四所在該年，
+    // 以此確保第一週恰為包含該年第一個星期四的那一週。netstandard2.0 無 System.Globalization.ISOWeek，故手動實作。
+    private static int GetIso8601WeekOfYear(DateTime date)
+    {
+        DayOfWeek day = CultureInfo.InvariantCulture.Calendar.GetDayOfWeek(date);
+        if (day is >= DayOfWeek.Monday and <= DayOfWeek.Wednesday)
+        {
+            date = date.AddDays(3);
+        }
+
+        return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+    }
+
     internal static object EvaluateWorkday(List<AstNode> arguments, IEvaluationContext context)
     {
         if (arguments.Count < 2 || arguments.Count > 3)
@@ -425,6 +444,9 @@ internal static class FormulaDateTimeFunctionHandlers
         var daysVal = arguments[1].Evaluate(context);
 
         if (!TryCoerceDateTime(startVal, out DateTime current) || !FormulaCoercion.TryCoerceDouble(daysVal, out double daysD))
+            return OdfFormulaError.Value;
+
+        if (Math.Abs(daysD) > OdfSpreadsheetLimits.FormulaMaxDateSpanDays)
             return OdfFormulaError.Value;
 
         int days = (int)daysD;
@@ -488,6 +510,9 @@ internal static class FormulaDateTimeFunctionHandlers
             end = tmp;
             swap = true;
         }
+
+        if ((end.Date - start.Date).TotalDays > OdfSpreadsheetLimits.FormulaMaxDateSpanDays)
+            return OdfFormulaError.Value;
 
         int workdays = 0;
         DateTime curr = start.Date;

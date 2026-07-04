@@ -956,9 +956,21 @@ internal static class OdfPackageArchiveWriter
             root.Add(new XElement(stylesElement));
 
         var combinedAutoStyles = new XElement(officeNs + "automatic-styles");
+        var addedAutoStyleNames = new HashSet<string>(StringComparer.Ordinal);
         XElement? contentAuto = contentRoot.Element(officeNs + "automatic-styles");
         if (contentAuto is not null)
-            combinedAutoStyles.Add(contentAuto.Elements());
+        {
+            foreach (XElement element in contentAuto.Elements())
+            {
+                XAttribute? nameAttr = element.Attribute(XName.Get("name", OdfNamespaces.Style));
+                if (nameAttr is not null)
+                {
+                    addedAutoStyleNames.Add(nameAttr.Value);
+                }
+
+                combinedAutoStyles.Add(new XElement(element));
+            }
+        }
 
         XElement? stylesAuto = stylesRoot.Element(officeNs + "automatic-styles");
         if (stylesAuto is not null)
@@ -966,12 +978,9 @@ internal static class OdfPackageArchiveWriter
             foreach (XElement element in stylesAuto.Elements())
             {
                 XAttribute? nameAttr = element.Attribute(XName.Get("name", OdfNamespaces.Style));
-                if (nameAttr is not null)
+                if (nameAttr is not null && !addedAutoStyleNames.Add(nameAttr.Value))
                 {
-                    XElement? existing = combinedAutoStyles.Elements()
-                        .FirstOrDefault(e => e.Attribute(XName.Get("name", OdfNamespaces.Style))?.Value == nameAttr.Value);
-                    if (existing is not null)
-                        continue;
+                    continue;
                 }
 
                 combinedAutoStyles.Add(new XElement(element));

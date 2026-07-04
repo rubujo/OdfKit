@@ -128,8 +128,20 @@ public static partial class OdfSchemaPatternValidator
             case OdfSchemaPatternNodeKind.OneOrMore:
                 return node.Children.Count > 0 && node.Children.Any(child => MatchAttributeValueNode(child, value, context));
             case OdfSchemaPatternNodeKind.Ref:
-                OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(node.ReferenceName);
-                return pattern != null && pattern.Roots.Any(root => MatchAttributeValueNode(root, value, context));
+                if (string.IsNullOrWhiteSpace(node.ReferenceName) || !context.EnterReference(node.ReferenceName))
+                {
+                    return false;
+                }
+
+                try
+                {
+                    OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(node.ReferenceName);
+                    return pattern != null && pattern.Roots.Any(root => MatchAttributeValueNode(root, value, context));
+                }
+                finally
+                {
+                    context.LeaveReference(node.ReferenceName);
+                }
             default:
                 return false;
         }
@@ -264,39 +276,10 @@ public static partial class OdfSchemaPatternValidator
         OdfSchemaPatternMatchContext context,
         bool requireOne)
     {
-        var matches = new HashSet<int>();
-        var frontier = new HashSet<int> { index };
-        bool consumedAny = false;
-
-        if (!requireOne)
-        {
-            matches.Add(index);
-        }
-
-        while (frontier.Count > 0)
-        {
-            var nextFrontier = new HashSet<int>();
-            foreach (int current in frontier)
-            {
-                foreach (int matched in MatchListSequence(node.Children, tokens, current, context))
-                {
-                    if (matched == current)
-                    {
-                        continue;
-                    }
-
-                    consumedAny = true;
-                    if (matches.Add(matched))
-                    {
-                        nextFrontier.Add(matched);
-                    }
-                }
-            }
-
-            frontier = nextFrontier;
-        }
-
-        return requireOne && !consumedAny ? new HashSet<int>() : matches;
+        return OdfSchemaPatternFrontierMatcher.ExpandRepeated(
+            index,
+            requireOne,
+            current => MatchListSequence(node.Children, tokens, current, context));
     }
 
     private static HashSet<int> MatchListReference(
@@ -305,34 +288,53 @@ public static partial class OdfSchemaPatternValidator
         int index,
         OdfSchemaPatternMatchContext context)
     {
-        if (string.IsNullOrWhiteSpace(referenceName) || !context.EnterReference(referenceName))
+        if (string.IsNullOrWhiteSpace(referenceName))
         {
             return new HashSet<int>();
         }
 
+        if (!context.EnterReference(referenceName))
+        {
+            // 同名參照仍在作用中堆疊上，不必然代表真正的無窮遞迴，改建立新的巢狀內容
+            // 並限制其遞迴深度，而非直接視為循環而拒絕比對（比照 Content.Sequence 慣例）。
+            OdfSchemaPatternMatchContext? recursiveContext = context.CreateRecursiveContext();
+            return recursiveContext is null
+                ? new HashSet<int>()
+                : MatchListReferenceCore(referenceName, tokens, index, recursiveContext);
+        }
+
         try
         {
-            OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
-            if (pattern == null)
-            {
-                return new HashSet<int>();
-            }
-
-            var matches = new HashSet<int>();
-            foreach (OdfSchemaPatternNode root in pattern.Roots)
-            {
-                foreach (int matched in MatchListNode(root, tokens, index, context))
-                {
-                    matches.Add(matched);
-                }
-            }
-
-            return matches;
+            return MatchListReferenceCore(referenceName, tokens, index, context);
         }
         finally
         {
             context.LeaveReference(referenceName);
         }
+    }
+
+    private static HashSet<int> MatchListReferenceCore(
+        string referenceName,
+        IReadOnlyList<string> tokens,
+        int index,
+        OdfSchemaPatternMatchContext context)
+    {
+        OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
+        if (pattern == null)
+        {
+            return new HashSet<int>();
+        }
+
+        var matches = new HashSet<int>();
+        foreach (OdfSchemaPatternNode root in pattern.Roots)
+        {
+            foreach (int matched in MatchListNode(root, tokens, index, context))
+            {
+                matches.Add(matched);
+            }
+        }
+
+        return matches;
     }
 
 

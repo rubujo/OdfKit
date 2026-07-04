@@ -179,39 +179,10 @@ internal static partial class OdfSchemaPatternContentMatcher
         OdfSchemaPatternMatchContext context,
         bool requireOne)
     {
-        var matches = new HashSet<int>();
-        var frontier = new HashSet<int> { index };
-        bool consumedAny = false;
-
-        if (!requireOne)
-        {
-            matches.Add(index);
-        }
-
-        while (frontier.Count > 0)
-        {
-            var nextFrontier = new HashSet<int>();
-            foreach (int current in frontier)
-            {
-                foreach (int matched in MatchSequence(node.Children, parent, childElements, current, context))
-                {
-                    if (matched == current)
-                    {
-                        continue;
-                    }
-
-                    consumedAny = true;
-                    if (matches.Add(matched))
-                    {
-                        nextFrontier.Add(matched);
-                    }
-                }
-            }
-
-            frontier = nextFrontier;
-        }
-
-        return requireOne && !consumedAny ? new HashSet<int>() : matches;
+        return OdfSchemaPatternFrontierMatcher.ExpandRepeated(
+            index,
+            requireOne,
+            current => MatchSequence(node.Children, parent, childElements, current, context));
     }
 
 

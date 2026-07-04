@@ -44,7 +44,7 @@ public class OdfMediaManager
                 {
                     using var stream = _package.GetEntryStream(kvp.Key);
                     using var ms = new MemoryStream();
-                    stream.CopyTo(ms);
+                    OdfBoundedStreamReader.CopyTo(stream, ms, _package.LoadOptions.MaxEntrySize, "Err_OdfMediaManager_ExistingMediaEntryTooLarge");
                     byte[] bytes = ms.ToArray();
                     string hash = ComputeSha256(bytes);
                     _imageHashRegistry[hash] = kvp.Key;

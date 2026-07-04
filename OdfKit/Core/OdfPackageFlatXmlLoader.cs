@@ -275,7 +275,7 @@ internal static class OdfPackageFlatXmlLoader
             if (string.IsNullOrEmpty(objectId))
                 objectId = $"Object_{objectCounter++}";
             else
-                objectId = objectId!.TrimStart('.', '/').TrimEnd('/');
+                objectId = OdfPackage.SanitizeEntryName(objectId!.TrimStart('.', '/')).TrimEnd('/');
 
             string subDocVersion = nestedDoc.Attribute(officeNs + "version")?.Value ?? "1.3";
 

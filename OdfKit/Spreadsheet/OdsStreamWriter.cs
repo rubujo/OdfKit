@@ -639,12 +639,15 @@ public partial class OdsStreamWriter : IDisposable, IAsyncDisposable
             }
 
             try
-            { WriteStyles(); }
-            catch (Exception ex)
             {
-                OdfKitDiagnostics.Warn($"OdsStreamWriter 於 Dispose 寫入 styles.xml 失敗：{ex.Message}", ex);
+                // 與上方 XmlWriter／content 串流的次要清理錯誤不同，styles.xml 寫入失敗代表輸出封裝
+                // 實際缺少 manifest 已宣告的內容、屬於不完整／損毀的封裝，因此不吞例外，讓呼叫端可感知。
+                WriteStyles();
             }
-            _zip.Dispose();
+            finally
+            {
+                _zip.Dispose();
+            }
         }
 
         _disposed = true;

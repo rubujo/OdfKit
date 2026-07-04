@@ -235,8 +235,14 @@ internal static class OdfDrawPageShapeReadEngine
         return assignments;
     }
 
-    private static string? FindImageHref(OdfNode container)
+    private static string? FindImageHref(OdfNode container, int depth = 0)
     {
+        if (depth > MaxGroupNestingDepth)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfDrawPageShapeReadEngine_GroupNestingTooDeep", MaxGroupNestingDepth));
+        }
+
         foreach (OdfNode child in container.Children)
         {
             if (child.NodeType is OdfNodeType.Element &&
@@ -250,7 +256,7 @@ internal static class OdfDrawPageShapeReadEngine
 
             if (child.NodeType is OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Draw)
             {
-                string? nested = FindImageHref(child);
+                string? nested = FindImageHref(child, depth + 1);
                 if (!string.IsNullOrEmpty(nested))
                     return nested;
             }
@@ -259,8 +265,14 @@ internal static class OdfDrawPageShapeReadEngine
         return null;
     }
 
-    private static string ExtractTextBoxContent(OdfNode container)
+    private static string ExtractTextBoxContent(OdfNode container, int depth = 0)
     {
+        if (depth > MaxGroupNestingDepth)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfDrawPageShapeReadEngine_GroupNestingTooDeep", MaxGroupNestingDepth));
+        }
+
         foreach (OdfNode child in container.Children)
         {
             if (child.NodeType is OdfNodeType.Element &&
@@ -278,7 +290,7 @@ internal static class OdfDrawPageShapeReadEngine
 
             if (child.NodeType is OdfNodeType.Element && child.NamespaceUri == OdfNamespaces.Draw)
             {
-                string nested = ExtractTextBoxContent(child);
+                string nested = ExtractTextBoxContent(child, depth + 1);
                 if (!string.IsNullOrEmpty(nested))
                     return nested;
             }
@@ -287,8 +299,14 @@ internal static class OdfDrawPageShapeReadEngine
         return string.Empty;
     }
 
-    private static bool ContainsDescendant(OdfNode node, string localName, string namespaceUri)
+    private static bool ContainsDescendant(OdfNode node, string localName, string namespaceUri, int depth = 0)
     {
+        if (depth > MaxGroupNestingDepth)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfDrawPageShapeReadEngine_GroupNestingTooDeep", MaxGroupNestingDepth));
+        }
+
         foreach (OdfNode child in node.Children)
         {
             if (child.NodeType is OdfNodeType.Element &&
@@ -298,15 +316,21 @@ internal static class OdfDrawPageShapeReadEngine
 
             if (child.NodeType is OdfNodeType.Element &&
                 child.NamespaceUri == OdfNamespaces.Draw &&
-                ContainsDescendant(child, localName, namespaceUri))
+                ContainsDescendant(child, localName, namespaceUri, depth + 1))
                 return true;
         }
 
         return false;
     }
 
-    private static void WalkDrawingNodes(OdfNode parent, System.Action<OdfNode> visit)
+    private static void WalkDrawingNodes(OdfNode parent, System.Action<OdfNode> visit, int depth = 0)
     {
+        if (depth > MaxGroupNestingDepth)
+        {
+            throw new InvalidDataException(
+                OdfLocalizer.GetMessage("Err_OdfDrawPageShapeReadEngine_GroupNestingTooDeep", MaxGroupNestingDepth));
+        }
+
         foreach (OdfNode child in parent.Children)
         {
             if (child.NodeType is not OdfNodeType.Element || child.NamespaceUri != OdfNamespaces.Draw)
@@ -314,7 +338,7 @@ internal static class OdfDrawPageShapeReadEngine
 
             if (child.LocalName == "g")
             {
-                WalkDrawingNodes(child, visit);
+                WalkDrawingNodes(child, visit, depth + 1);
                 continue;
             }
 

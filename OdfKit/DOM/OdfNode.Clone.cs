@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System;
+using System.Collections.Generic;
 using System.Text;
+using OdfKit.Compliance;
 using OdfKit.Core;
 
 namespace OdfKit.DOM;
@@ -9,6 +11,12 @@ public partial class OdfNode
 {
     #region Clone & Import Node
 
+
+    // 複製遞迴深度計數器（執行緒個別）：防止透過公開 DOM API 疊出的極深巢狀樹
+    // 在 CloneNode/ImportNode 遞迴時引發 StackOverflowException，與 OdfXmlReader.MaxElementDepth
+    // 對剖析路徑的深度防護保持一致。OdfElement.CloneNode 覆寫亦共用此計數器。
+    [ThreadStatic]
+    private protected static int CloneRecursionDepth;
 
     /// <summary>
     /// 複製當前節點。
@@ -39,9 +47,23 @@ public partial class OdfNode
 
         if (deep)
         {
-            foreach (var child in Children)
+            if (++CloneRecursionDepth > OdfXmlReader.MaxElementDepth)
             {
-                clone.AppendChild(child.CloneNode(true));
+                CloneRecursionDepth--;
+                throw new System.Security.SecurityException(
+                    OdfLocalizer.GetMessage("Err_OdfXmlReader_XmlElementNestingDepth", CloneRecursionDepth, OdfXmlReader.MaxElementDepth));
+            }
+
+            try
+            {
+                foreach (var child in Children)
+                {
+                    clone.AppendChild(child.CloneNode(true));
+                }
+            }
+            finally
+            {
+                CloneRecursionDepth--;
             }
         }
 
@@ -126,7 +148,11 @@ public partial class OdfNode
                 if (entriesToCopy.Count > 0)
                 {
                     string originalPrefix = normHref.StartsWith("Object", StringComparison.OrdinalIgnoreCase) ? "Object" : "Formula";
-                    string newHref = $"{originalPrefix}_{Guid.NewGuid().ToString("N").Substring(0, 8)}";
+                    // 使用完整 32 位元十六進位 GUID（而非截斷至 8 碼），避免高併發匯入下的檔名碰撞風險。
+                    string newHref = $"{originalPrefix}_{Guid.NewGuid():N}";
+
+                    var writtenPaths = new List<string>();
+                    var failedPaths = new List<string>();
 
                     foreach (var entryInfo in entriesToCopy)
                     {
@@ -143,15 +169,31 @@ public partial class OdfNode
                                 mediaType = Encoding.UTF8.GetString(bytes).Trim();
                             }
                             destPackage.WriteEntry(destPath, bytes, mediaType);
+                            writtenPaths.Add(destPath);
                         }
                         catch (Exception ex)
                         {
                             OdfKitDiagnostics.Warn($"Failed to migrate embedded entry '{srcPath}' during node import: {ex.Message}");
+                            failedPaths.Add(srcPath);
                         }
                     }
 
-                    node.Attributes[hrefKey] = newHref;
-                    destPackage.SaveManifestToEntries();
+                    if (failedPaths.Count > 0)
+                    {
+                        // 部分項目搬移失敗：移除已寫入的殘缺項目，並保留原始 href，避免產生
+                        // 引用不完整內嵌物件資料夾的損毀參照。
+                        foreach (string writtenPath in writtenPaths)
+                        {
+                            destPackage.RemoveEntry(writtenPath);
+                        }
+
+                        OdfKitDiagnostics.Warn($"Embedded object migration for '{href}' aborted due to {failedPaths.Count} failed entr(y/ies); original reference was left unchanged.");
+                    }
+                    else
+                    {
+                        node.Attributes[hrefKey] = newHref;
+                        destPackage.SaveManifestToEntries();
+                    }
                 }
             }
         }

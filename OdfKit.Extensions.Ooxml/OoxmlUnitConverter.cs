@@ -46,7 +46,7 @@ internal static class OoxmlUnitConverter
             _ => double.NaN,
         };
 
-        if (double.IsNaN(twips) || twips < 0)
+        if (double.IsNaN(twips) || twips < 0 || twips > int.MaxValue)
         {
             return null;
         }

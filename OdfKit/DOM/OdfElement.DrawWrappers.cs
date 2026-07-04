@@ -85,6 +85,11 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     /// <summary>
     /// 設定此影像的裁切矩形。
     /// </summary>
+    /// <remarks>
+    /// 本方法引數順序為 (<paramref name="top"/>, <paramref name="bottom"/>, <paramref name="left"/>, <paramref name="right"/>)；
+    /// 產生的 <c>fo:clip</c> 屬性值則依 CSS <c>rect()</c> 語法規範，以順時針 (top, right, bottom, left) 順序輸出，
+    /// 兩者順序不同屬預期行為，並非錯誤——呼叫端應以本方法之具名引數為準，不需自行比對輸出字串順序。
+    /// </remarks>
     /// <param name="top">上方裁切距離</param>
     /// <param name="bottom">下方裁切距離</param>
     /// <param name="left">左方裁切距離</param>
@@ -363,7 +368,7 @@ internal static class OdfTransformHelper
             return System.Numerics.Matrix3x2.Identity;
 
         var match = MatrixRegex.Match(transformStr);
-        if (match.Success)
+        if (match.Success && match.Value.Trim() == transformStr!.Trim())
         {
             var parts = match.Groups[1].Value.Split(new[] { ' ', ',', ';', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length >= 6 &&

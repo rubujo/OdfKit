@@ -53,9 +53,13 @@ public static partial class OdfSchemaPatternValidator
             case "pattern":
                 try
                 {
-                    return Regex.IsMatch(value, parameterValue);
+                    return Regex.IsMatch(value, parameterValue, RegexOptions.None, TimeSpan.FromSeconds(2));
                 }
                 catch (ArgumentException)
+                {
+                    return false;
+                }
+                catch (RegexMatchTimeoutException)
                 {
                     return false;
                 }

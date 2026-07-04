@@ -33,6 +33,9 @@ public static class OdfFontResolver
         ["新細明體"] = ["Noto Serif CJK TC", "Source Han Serif TC", "Noto Serif TC", "DejaVu Serif"]
     };
 
+    // 「已警告過的缺失字型名稱」快取上限：避免長駐轉換服務處理大量不重複字型名稱時，
+    // 此僅供診斷用途的快取無上限成長而緩慢洩漏記憶體；超過上限時清空重來（可接受偶爾重複警告）。
+    private const int MaxWarnedMissingFontsCacheSize = 2_000;
     private static readonly List<string> _customDirectories = [];
     private static readonly HashSet<string> _warnedMissingFonts = new(StringComparer.OrdinalIgnoreCase);
     private static bool _isScanned;
@@ -56,6 +59,11 @@ public static class OdfFontResolver
 
         lock (_lock)
         {
+            if (_warnedMissingFonts.Count >= MaxWarnedMissingFontsCacheSize)
+            {
+                _warnedMissingFonts.Clear();
+            }
+
             if (!_warnedMissingFonts.Add(fontName))
                 return false;
         }

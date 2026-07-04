@@ -158,7 +158,7 @@ public sealed class OdfStyleSet
     /// <returns>對應的圖表色彩</returns>
     public string GetChartPaletteColor(int index)
     {
-        int normalized = Math.Abs(index) % _chartPaletteColors.Length;
+        int normalized = ((index % _chartPaletteColors.Length) + _chartPaletteColors.Length) % _chartPaletteColors.Length;
         return _chartPaletteColors[normalized];
     }
 

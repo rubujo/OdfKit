@@ -12,6 +12,9 @@ public partial class OdfNumberFormatter
 {
     #region 內部解析與翻譯邏輯
 
+    // 已解析格式模式快取上限：避免長駐轉換服務處理大量不重複（如動態產生的）格式字串時無上限成長
+    // 而緩慢洩漏記憶體；超過上限時清空重來（僅損失快取命中率，不影響正確性）。
+    private const int MaxFormatInfoPoolSize = 10_000;
     private static readonly ConcurrentDictionary<string, FormatInfo> FormatInfoPool = new(StringComparer.Ordinal);
 
     /// <summary>
@@ -86,6 +89,11 @@ public partial class OdfNumberFormatter
         if (pattern is null)
         {
             throw new ArgumentNullException(nameof(pattern));
+        }
+
+        if (FormatInfoPool.Count >= MaxFormatInfoPoolSize)
+        {
+            FormatInfoPool.Clear();
         }
 
         return FormatInfoPool.GetOrAdd(pattern, ParsePatternCore);

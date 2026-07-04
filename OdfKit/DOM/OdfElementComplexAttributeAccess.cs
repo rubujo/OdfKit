@@ -9,6 +9,13 @@ namespace OdfKit.DOM;
 /// </summary>
 internal static class OdfElementComplexAttributeAccess
 {
+    // xsd:dateTime 基底格式（不含時區資訊），依序嘗試不含與含次秒精度（最多 7 位）兩種寫法。
+    private static readonly string[] DateTimeBaseFormats =
+    [
+        "yyyy-MM-ddTHH:mm:ss",
+        "yyyy-MM-ddTHH:mm:ss.FFFFFFF",
+    ];
+
     /// <summary>
     /// 解析日期時間屬性字串。
     /// </summary>
@@ -22,14 +29,51 @@ internal static class OdfElementComplexAttributeAccess
         }
 
         string text = value!;
-        string format = text.EndsWith("Z", StringComparison.Ordinal) ? "yyyy-MM-ddTHH:mm:ssZ" : "yyyy-MM-ddTHH:mm:ss";
-        DateTimeStyles styles = text.EndsWith("Z", StringComparison.Ordinal)
-            ? DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal
-            : DateTimeStyles.None;
-        return DateTime.TryParseExact(text, format, CultureInfo.InvariantCulture, styles, out DateTime parsed)
-            ? parsed
-            : null;
+
+        if (text.EndsWith("Z", StringComparison.Ordinal))
+        {
+            foreach (string baseFormat in DateTimeBaseFormats)
+            {
+                if (DateTime.TryParseExact(text, baseFormat + "Z", CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out DateTime parsedUtc))
+                {
+                    return parsedUtc;
+                }
+            }
+
+            return null;
+        }
+
+        if (HasNumericTimeZoneOffset(text))
+        {
+            foreach (string baseFormat in DateTimeBaseFormats)
+            {
+                if (DateTime.TryParseExact(text, baseFormat + "zzz", CultureInfo.InvariantCulture,
+                    DateTimeStyles.AdjustToUniversal, out DateTime parsedOffset))
+                {
+                    return parsedOffset;
+                }
+            }
+
+            return null;
+        }
+
+        foreach (string baseFormat in DateTimeBaseFormats)
+        {
+            if (DateTime.TryParseExact(text, baseFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsed))
+            {
+                return parsed;
+            }
+        }
+
+        return null;
     }
+
+    // 判斷字串結尾是否為 xsd:dateTime 允許的數值時區偏移（如 "+08:00"／"-05:30"）。
+    private static bool HasNumericTimeZoneOffset(string text) =>
+        text.Length >= 6 &&
+        (text[text.Length - 6] == '+' || text[text.Length - 6] == '-') &&
+        text[text.Length - 3] == ':';
 
     /// <summary>
     /// 將日期時間格式化為 ODF 屬性字串。

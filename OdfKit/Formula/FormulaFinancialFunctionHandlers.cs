@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using OdfKit.Core;
 using OdfKit.DOM;
 using OdfKit.Formula.AST;
+using OdfKit.Spreadsheet;
 
 namespace OdfKit.Formula;
 
@@ -382,7 +383,7 @@ internal static class FormulaFinancialFunctionHandlers
                 return OdfFormulaError.Value;
         }
 
-        if (per < 1 || per > nper)
+        if (per < 1 || per > nper || per > OdfSpreadsheetLimits.FormulaMaxRepeat)
             return OdfFormulaError.Value;
 
         // 計算標準每期付款額 (PMT)

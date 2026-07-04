@@ -183,6 +183,11 @@ internal static class FormulaLookupFunctionHandlers
                 colNum = rowNum;
                 rowNum = 1;
             }
+            else if (tableRows > 1 && tableCols > 1)
+            {
+                // 範圍為真正的二維矩陣時，單一索引引數具有歧義，依規範應回傳 #REF!
+                return OdfFormulaError.Ref;
+            }
         }
 
         if (rowNum < 0 || rowNum > tableRows || colNum < 0 || colNum > tableCols)
@@ -323,7 +328,7 @@ internal static class FormulaLookupFunctionHandlers
         if (arguments.Count >= 4)
         {
             var hVal = arguments[3].Evaluate(context);
-            if (!FormulaCoercion.TryCoerceDouble(hVal, out double hD) || hD <= 0)
+            if (!FormulaCoercion.TryCoerceDouble(hVal, out double hD) || hD <= 0 || hD > OdfSpreadsheetLimits.FormulaMaxRepeat)
                 return OdfFormulaError.Value;
             height = (int)hD;
         }
@@ -332,7 +337,7 @@ internal static class FormulaLookupFunctionHandlers
         if (arguments.Count == 5)
         {
             var wVal = arguments[4].Evaluate(context);
-            if (!FormulaCoercion.TryCoerceDouble(wVal, out double wD) || wD <= 0)
+            if (!FormulaCoercion.TryCoerceDouble(wVal, out double wD) || wD <= 0 || wD > OdfSpreadsheetLimits.FormulaMaxRepeat)
                 return OdfFormulaError.Value;
             width = (int)wD;
         }

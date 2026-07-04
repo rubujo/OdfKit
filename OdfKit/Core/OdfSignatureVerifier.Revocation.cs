@@ -89,9 +89,6 @@ internal static partial class OdfSignatureVerifier
                 }
             }
 
-            if (options.CheckRevocation && !singleResult.IsRevocationValid)
-                return false;
-
             if (isRevoked)
             {
                 return Fail(
@@ -116,7 +113,7 @@ internal static partial class OdfSignatureVerifier
                 }
 
                 bool onlineCrlCheckedSuccessfully = false;
-                Exception? lastCrlException = null;
+                var crlFailureMessages = new List<string>();
 
                 foreach (var url in urls)
                 {
@@ -153,7 +150,7 @@ internal static partial class OdfSignatureVerifier
                     }
                     catch (Exception ex)
                     {
-                        lastCrlException = ex;
+                        crlFailureMessages.Add($"{url}: {ex.Message}");
                     }
                 }
 
@@ -170,15 +167,15 @@ internal static partial class OdfSignatureVerifier
 
                 if (!onlineCrlCheckedSuccessfully && !checkedAnyCrl)
                 {
-                    string? lastCrlErrorMessage = lastCrlException?.Message;
+                    string combinedCrlErrorMessage = string.Join("; ", crlFailureMessages);
                     singleResult.IsRevocationValid = false;
                     singleResult.ErrorCode = "REVOCATION_CHECK_FAILED";
                     singleResult.ErrorMessage = OdfLocalizer.GetMessage(
                         "Err_OdfSignatureVerifier_CrlCheckFailed",
                         chainCert.Subject,
-                        lastCrlErrorMessage);
-                    if (lastCrlErrorMessage != null && lastCrlErrorMessage.Length > 0)
-                        singleResult.Warnings.Add(lastCrlErrorMessage);
+                        combinedCrlErrorMessage);
+                    foreach (string failureMessage in crlFailureMessages)
+                        singleResult.Warnings.Add(failureMessage);
                     return false;
                 }
             }

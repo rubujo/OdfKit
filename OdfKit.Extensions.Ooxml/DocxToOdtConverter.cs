@@ -456,7 +456,7 @@ public static class DocxToOdtConverter
         using (Stream stream = imagePart.GetStream(FileMode.Open, FileAccess.Read))
         using (var memory = new MemoryStream())
         {
-            stream.CopyTo(memory);
+            OdfBoundedStreamReader.CopyTo(stream, memory, odtDocument.Package.LoadOptions.MaxEntrySize, "Err_OdfPackage_InputStreamSizeLimitExceeded");
             imageBytes = memory.ToArray();
         }
 

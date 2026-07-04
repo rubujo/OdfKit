@@ -251,6 +251,14 @@ public static class OdfChartRenderer
         maxRow = Math.Max(cellRange.StartAddress.Row, cellRange.EndAddress.Row);
         minCol = Math.Min(cellRange.StartAddress.Column, cellRange.EndAddress.Column);
         maxCol = Math.Max(cellRange.StartAddress.Column, cellRange.EndAddress.Column);
+
+        long totalCells = (long)(maxRow - minRow + 1) * (maxCol - minCol + 1);
+        if (totalCells > OdfSpreadsheetLimits.ChartRenderMaxCells)
+        {
+            sheet = null;
+            return false;
+        }
+
         return true;
     }
 

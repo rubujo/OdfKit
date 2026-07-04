@@ -256,18 +256,21 @@ public sealed class OdfNodeChildList : IList<OdfNode>
 
     internal void Unlink(OdfNode child)
     {
+        OdfNode? next = child.NextSibling;
+        int oldIndex = child.SiblingIndex;
+
         if (child.PreviousSibling is not null)
         {
-            child.PreviousSibling.NextSibling = child.NextSibling;
+            child.PreviousSibling.NextSibling = next;
         }
         else
         {
-            _owner.FirstChild = child.NextSibling;
+            _owner.FirstChild = next;
         }
 
-        if (child.NextSibling is not null)
+        if (next is not null)
         {
-            child.NextSibling.PreviousSibling = child.PreviousSibling;
+            next.PreviousSibling = child.PreviousSibling;
         }
         else
         {
@@ -280,7 +283,15 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         child.SiblingIndex = -1;
         _count--;
         InvalidateIndexCache();
-        ReindexFromSibling(_owner.FirstChild, 0);
+
+        if (oldIndex >= 0)
+        {
+            ReindexFromSibling(next, oldIndex);
+        }
+        else
+        {
+            ReindexFromSibling(_owner.FirstChild, 0);
+        }
     }
 
     internal void ResetAfterPrune()

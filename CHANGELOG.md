@@ -71,4 +71,42 @@
 - 於 `OdfLength` 新增 `FromEmu`／`ToEmu` 與 `EmusPerInch` 常數，集中 OOXML EMU 單位換算的推導來源；`DocxToOdtConverter`／`PptxToOdpConverter`／`OdpToPptxConverter`／`OdfToDocxConverter` 中原各自獨立推導、數學上等價的 EMU 換算常數與運算，統一改為參照此單一來源。
 - 抽取 `OdfFormulaLatexConverter.AppendAtom` 中 `munderover`／`munder`／`mover`／`msubsup`／`msub`／`msup` 六個分支重複的「將子節點包入 `<mrow>` 並輸出標籤對」邏輯為區域函式，判斷樹與 MathML 輸出語意不變。
 - 拆分 `OdfPackageFlatXmlLoader.Initialize`：將巢狀內嵌文件抽取邏輯抽出為 `ExtractNestedDocuments`，將 content／styles／meta／settings 四棵 `XElement` 樹的切分邏輯抽出為 `SplitDocumentSections`，核心 XML 串流剖析迴圈維持不變。
+- 修正 `OdfPackageFlatXmlLoader.ExtractNestedDocuments` 巢狀內嵌文件 `objectId` 僅做 `TrimStart`／`TrimEnd` 而未呼叫既有的 `OdfPackage.SanitizeEntryName`，導致惡意 `xlink:href` 中的 `..` 片段未被清除、可能覆寫封裝內任意項目的 Zip Slip 變體問題。
+- 修正 `OdfPackageEntryNameSanitizer.Sanitize` 逐段比對 `".."` 時，未考慮 Windows 會靜默去除路徑片段尾端句點與空白，導致 `".. "` 等片段可繞過 Zip Slip 防禦的問題，改為比對前先 `TrimEnd('.', ' ')`。
+- 修正 `OdfPackageMacroSanitizer.Sanitize` 於 XML 項目淨化失敗時僅記錄警告、原始未淨化內容原樣寫回封裝的問題，改為收集失敗項目並於處理完畢後擲出 `InvalidDataException`，讓呼叫端可感知淨化未完整成功。
+- 修正 `OdfMmfZipInfo` 記憶體映射快速路徑解析 ZIP 中央目錄時，未驗證壓縮資料偏移量與大小是否超出實體檔案長度，導致損毀或惡意 ZIP 延後至 `OpenStream` 建立記憶體對應檢視時才擲出未經處理例外的問題，改為於解析階段即驗證並略過越界項目。
+- 修正 `OdfUtf8XmlReader` 解析未閉合的 Processing Instruction（截斷於 `<?xml ...` 無 `?>`）時，掃描迴圈已觸及緩衝區尾端仍無條件前進兩個位元組，導致切片越界擲出 `ArgumentOutOfRangeException` 的問題，改為切片前以 `Math.Min` 夾限至緩衝區長度。
+- 修正 `OdfNodeChildList.Unlink` 每次移除子節點皆從串列頭重新索引全部節點、違反其宣稱之 O(1) 移除複雜度（實為 O(N²)）的問題，改為僅從被移除節點的原位置往後重新索引。
+- 修正 `OdfNode.CloneNode`／`OdfElement.CloneNode`（及間接使用其結果的 `OdfNode.ImportNode`）遞迴複製子節點無深度上限，與 `OdfXmlReader.MaxElementDepth` 剖析路徑防護不一致，透過純 DOM API 疊出的極深巢狀樹可能觸發 `StackOverflowException` 的問題，改為以執行緒個別遞迴深度計數器比照剖析器上限攔截。
+- 修正 `OdfElementContentModel.Table.SetSparseCellValue` 將儲存格值設為 `null` 時，未清除該儲存格既有的 `FormulaPtr`／`StyleNamePtr`，導致透過 `ImportData` 覆寫為 `null` 的儲存格仍會殘留並輸出舊公式／樣式的問題。
+- 修正 `OdfDrawPageShapeReadEngine` 中 `WalkDrawingNodes`／`FindImageHref`／`ExtractTextBoxContent`／`ContainsDescendant` 遞迴走訪缺少與 `CollectGroupsRecursive` 一致的巢狀深度上限的問題，避免深巢狀 `draw:g` 觸發 `StackOverflowException`。
+- 修正 `OdfChartRenderer` 具體化圖表資料範圍為陣列（`GetRangeStrings`／`GetRangeDoubles`）前未限制範圍總儲存格數的問題，惡意圖表範圍（如指向整欄）可能嘗試配置巨量陣列造成記憶體耗盡，改為新增 `OdfSpreadsheetLimits.ChartRenderMaxCells` 上限並於超出時視為無效範圍。
+- 為公式引擎多個函式的無界迭代加上與 `OdfSpreadsheetLimits` 一致的上限：`OFFSET` 之 `height`／`width`、`IPMT` 之期數、`WORKDAY`／`NETWORKDAYS` 之日期跨距（新增 `OdfSpreadsheetLimits.FormulaMaxDateSpanDays`），避免惡意公式引數觸發近乎無限迴圈的阻斷服務風險。
+- 修正 `OdfSignatureVerifier.Revocation` 中一段永遠無法觸發的死碼判斷（先前的例外處理路徑必定已提前 `return`），並修正線上 CRL 多個下載位址逐一嘗試失敗時僅保留「最後一個」例外訊息、其餘失敗原因遺失不利除錯稽核的問題，改為保留並回報所有失敗訊息。
+- 修正 `OdfSchemaPatternValidator.MatchAttributeValueNode` 之 `Ref` 分支為唯一跳過循環參照防護（`EnterReference`／`LeaveReference`）的參照解析路徑，自我遞迴的屬性值 pattern 可能觸發 `StackOverflowException` 的問題，比照其餘解析路徑補上防護。
+- 修正 `OdfSchemaPatternValidator` 之 `pattern` facet 使用 `Regex.IsMatch` 未設定逾時的問題，由於 `OdfSchemaRegistry.RegisterSchema` 為公開 API，不受信任來源的 pattern facet 存在 ReDoS 風險，改為附加 2 秒逾時並攔截 `RegexMatchTimeoutException`。
+- 修正 `OdfDesignTheme.GetAccentFillColor`／`OdfStyleSet.GetChartPaletteColor` 以 `Math.Abs(index) % length` 正規化索引，當 `index` 為 `int.MinValue` 時會擲出 `OverflowException` 的問題，改為使用不依賴 `Math.Abs` 的正規化運算。
+- 修正 `OdfXmlStringPools` 之 `ThreadLocal<PoolHolder>` 誤用 `trackAllValues: true`（實際未使用該追蹤功能），導致伺服器情境下執行緒集區churn 時舊執行緒的字串池於程序生命週期內持續被強引用而緩慢洩漏記憶體的問題。
+- 修正 `FormulaLookupFunctionHandlers.EvaluateIndex` 於範圍為真正二維矩陣（多列且多欄）卻僅提供單一索引引數時，未依規範回傳 `#REF!`、而是靜默將索引當作列號並預設欄號為 1 的問題。
+- 修正 `OoxmlUnitConverter.TryParseOdfLengthToTwips` 將換算後的 twip 值轉為 `int` 前未檢查是否超出 `int` 可表示範圍的問題，異常巨大的 ODF 長度字串換算後可能產生無意義的極端值。
+- 修正 `TtfFontNameReader` 於 TrueType Collection（TTC）中單一子字型名稱表損毀時，因僅有單一外層 `catch` 包覆整個方法而中止其餘子字型名稱擷取的問題，改為逐一子字型獨立捕捉例外並記錄診斷警告；並將原本完全靜默的頂層例外壓制改為透過 `OdfKitDiagnostics.Warn` 留下可追蹤紀錄。
+- 修正 `OdfMediaManager.ScanExistingMedia` 建構時整檔載入既有 `Pictures/` 媒體項目計算 SHA-256 卻未套用大小上限的問題，改為透過 `OdfBoundedStreamReader` 以 `OdfLoadOptions.MaxEntrySize` 為界複製，超出上限的項目會記錄警告並略過。
+- 修正 `FormulaDateTimeFunctionHandlers.EvaluateWeekNum` 未實作 ISO 8601 週數規則（`type=21`）、原本一律套用美式簡化公式的問題，改為改用符合 ISO 8601「第一週須包含該年第一個星期四」規則的手動計算（netstandard2.0 無 `System.Globalization.ISOWeek` 可用）。
+- 修正 `XlsxToOdfConverter.ReadOpenXmlCellValue` 於 SharedString 索引越界時靜默回傳 `null`、與同檔案 `CopyCharts`／`CopyPivotTables` 皆會記錄診斷警告的慣例不一致的問題，改為透過 `OdfKitDiagnostics.Warn` 留下可追蹤紀錄。
+- 修正 `DocxToOdtConverter.AppendDrawing` 讀取 DOCX 內嵌 `ImagePart` 前未套用大小上限的問題，改為透過 `OdfBoundedStreamReader` 以 `OdfLoadOptions.MaxEntrySize` 為界複製，避免超大內嵌圖片造成記憶體放大風險。
+- 修正 `TableTableElement` 稀疏儲存格頁面配置（`EnsurePageAllocated`／`GetOrCreateCell`）未對列／欄索引設定上限的問題，改為與 ODF 試算表格線規格（1,048,576 列／16,384 欄）一致地拒絕越界索引，避免透過 `ImportData` 匯入異常寬/高的資料來源時觸發無界原生記憶體配置。
+- 修正 `TryWriteOverride` 儲存每一列時固定掃描至 ODF 規範上限 16,384 欄以尋找該列已用欄位範圍的問題，改為改用序列化前一次性掃描得出的整表最大已用欄位索引，稀疏且列數龐大的表格可大幅減少不必要的掃描次數。
+- 修正 `OdfPackageArchiveWriter` 合併 `content.xml`／`styles.xml` 自動樣式時，以 `Elements().FirstOrDefault(...)` 線性掃描既有樣式名稱去重、隨樣式數量呈 O(n²) 成長的問題，改用 `HashSet<string>` 追蹤已加入的樣式名稱。
+- 修正 `OdfSchemaPatternValidator` 之 `MatchAttributePatternReference`／`MatchListReference` 於偵測到同名參照已在作用中堆疊時直接判定為循環並拒絕比對、未比照 `Content.Sequence`／`ElementMatching` 既有慣例改用 `CreateRecursiveContext` 建立巢狀內容繼續比對的問題，導致合法的巢狀或跨分支共用具名 pattern 參照可能被誤判為循環而驗證失敗。
+- 修正 `OdfTransformHelper.ParseTransform` 只要字串中任何位置出現 `matrix(...)`，即直接以該矩陣做為結果並略過其餘變換函式（如 `"rotate(0.5) matrix(...)"` 會遺失 `rotate` 部分）的問題，改為僅當整個（去除頭尾空白後的）字串恰為單一 `matrix(...)` 呼叫時才套用此快速路徑。
+- 修正 `OdfElementContentModel.Table.AllocatePageMemory` 於 netstandard2.0 分支逐位元組迴圈歸零新配置頁面（約 655,360 bytes）的問題，改用 `Span<byte>.Clear()` 批次歸零。
+- 修正 `OdfElementComplexAttributeAccess.GetDateTime` 僅接受精確的 `yyyy-MM-ddTHH:mm:ss`（或附加字面 `Z`）格式，導致含次秒精度或數值時區偏移（如 `+08:00`）等合法 xsd:dateTime 寫法解析失敗、中繼資料時間戳記靜默遺失的問題，改為依序嘗試含次秒精度與數值時區偏移的格式組合。
+- 修正 `OdfNode.MigrateMediaReferences` 搬移內嵌物件（非 `Pictures/` 媒體）子項目時，若部分項目搬移失敗仍會繼續將 `href` 改指向該不完整資料夾並儲存 manifest 的問題，改為失敗時移除已寫入的殘缺項目、保留原始參照不變；並將內嵌物件資料夾隨機後綴由 `Guid.NewGuid().ToString("N").Substring(0,8)`（32 位元碰撞空間）改為完整 32 位元十六進位 GUID，降低高併發匯入下的檔名碰撞風險。
+- 修正 `OdsStreamWriter.Dispose` 對 `WriteStyles()` 失敗僅記錄警告後吞掉例外的問題，導致輸出封裝可能實際缺少 manifest 已宣告的 `styles.xml` 卻不被呼叫端察覺，改為讓例外傳播（並以 `finally` 確保 `_zip` 資源仍會釋放）。
+- 修正 `OdfFontResolver._warnedMissingFonts`／`OdfNumberFormatter.Parsing.FormatInfoPool` 兩處僅供效能／診斷用途的靜態快取無上限成長的問題，長時間執行的轉換服務處理大量不重複字型名稱或格式字串時會緩慢洩漏記憶體，改為加上大小上限，超過時清空重來。
+- 修正 `OdfProfileRuleValidator.ValidateMacroOrScriptAttributes` 對文件中每個元素的每個屬性值都做 `Contains("vnd.sun.star.script:")` 全字串掃描的問題，改為限縮至 `href` 屬性，該巨集 URI 僅可能出現於連結類屬性中。
+- 為 `DrawImageElement.Crop` 補充 `<remarks>` 說明：方法簽章引數順序 (top, bottom, left, right) 與依 CSS `rect()` 語法規範輸出的 `fo:clip` 屬性值順序 (top, right, bottom, left) 不同屬預期行為，避免呼叫端誤解為缺陷。
+- 統一 `OdfSchemaPatternValidator` 三處各自獨立實作、行為曾經分歧過的 RELAX NG `zeroOrMore`／`oneOrMore` 重複比對「frontier（前緣）狀態展開」演算法（內容模型依子元素索引、清單語彙依 token 索引、屬性模式依已消耗屬性位元遮罩）至共用泛型輔助方法 `OdfSchemaPatternFrontierMatcher.ExpandRepeated`。
+- 將 `OdfSchemaPatternValidator` 屬性模式比對（`Attributes.Matching`）的「已消耗屬性」狀態，由逗號分隔字串（每次比對節點皆需 `Split`／`int.TryParse`／排序／重新組字串）改為 `BigInteger` 位元遮罩，避免屬性數量較多時的字串配置開銷；`BigInteger` 不像 `ulong` 受 64 位元限制，任意屬性數量皆可正確表示。
+- 為 `OdfStyleEngine` 補充 `<remarks>`，明確標示其內部快取（一般 `Dictionary`）非執行緒安全，若需並行處理應為每份文件建立獨立執行個體。
 

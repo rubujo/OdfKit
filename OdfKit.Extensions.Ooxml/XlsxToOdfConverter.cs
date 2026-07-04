@@ -608,6 +608,13 @@ public static class XlsxToOdfConverter
             int.TryParse(rawValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out int sharedIndex))
         {
             S.SharedStringItem? item = sharedStrings.Elements<S.SharedStringItem>().ElementAtOrDefault(sharedIndex);
+            if (item is null)
+            {
+                int tableSize = sharedStrings.Elements<S.SharedStringItem>().Count();
+                OdfKitDiagnostics.Warn(OdfLocalizer.GetMessage(
+                    "Diag_XlsxToOdfConverter_SharedStringIndexOutOfRange", sharedIndex, tableSize));
+            }
+
             return item?.InnerText;
         }
 

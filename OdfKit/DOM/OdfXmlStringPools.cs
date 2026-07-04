@@ -9,7 +9,7 @@ internal static class OdfXmlStringPools
 {
     private const int MaxGetOrAddBeforeReset = 4096;
 
-    private static readonly ThreadLocal<PoolHolder> ThreadPools = new(() => new PoolHolder(), trackAllValues: true);
+    private static readonly ThreadLocal<PoolHolder> ThreadPools = new(() => new PoolHolder(), trackAllValues: false);
 
     /// <summary>
     /// 取得目前執行緒的字串池並將指定字串加入或取出共用執行個體。

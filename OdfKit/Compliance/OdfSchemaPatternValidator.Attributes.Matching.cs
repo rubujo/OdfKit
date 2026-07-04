@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Numerics;
 using System.Xml.Linq;
 
 namespace OdfKit.Compliance;
@@ -8,6 +8,10 @@ namespace OdfKit.Compliance;
 internal static partial class OdfSchemaPatternAttributeMatcher
 {
     #region Attribute Patterns - Matching
+
+    // 屬性消耗狀態以 BigInteger 位元遮罩表示（第 i 位為 1 代表索引 i 之屬性已被消耗），
+    // 取代先前以逗號分隔字串表示、每次比對節點都需重新 Split／int.TryParse／排序並重新
+    // 組字串的做法。BigInteger 不像 ulong 受限於 64 位元，屬性數量不論多少皆可正確表示。
 
     internal static bool MatchesAttributePatterns(
         IReadOnlyList<OdfSchemaPatternNode> attributeNodes,
@@ -23,28 +27,29 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             return attributes.Count == 0;
         }
 
-        HashSet<string> matches = MatchAttributePatternSequence(
+        HashSet<BigInteger> matches = MatchAttributePatternSequence(
             attributeNodes,
             attributes,
-            string.Empty,
+            BigInteger.Zero,
             context);
 
-        return matches.Any(state => AllAttributesConsumed(state, attributes.Count));
+        BigInteger allConsumedMask = (BigInteger.One << attributes.Count) - BigInteger.One;
+        return matches.Contains(allConsumedMask);
     }
 
-    private static HashSet<string> MatchAttributePatternSequence(
+    private static HashSet<BigInteger> MatchAttributePatternSequence(
         IReadOnlyList<OdfSchemaPatternNode> nodes,
         IReadOnlyList<XAttribute> attributes,
-        string state,
+        BigInteger state,
         OdfSchemaPatternMatchContext context)
     {
-        var states = new HashSet<string>(StringComparer.Ordinal) { state };
+        var states = new HashSet<BigInteger> { state };
         foreach (OdfSchemaPatternNode node in nodes)
         {
-            var next = new HashSet<string>(StringComparer.Ordinal);
-            foreach (string current in states)
+            var next = new HashSet<BigInteger>();
+            foreach (BigInteger current in states)
             {
-                foreach (string matched in MatchAttributePatternNode(node, attributes, current, context))
+                foreach (BigInteger matched in MatchAttributePatternNode(node, attributes, current, context))
                 {
                     next.Add(matched);
                 }
@@ -61,10 +66,10 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         return states;
     }
 
-    private static HashSet<string> MatchAttributePatternNode(
+    private static HashSet<BigInteger> MatchAttributePatternNode(
         OdfSchemaPatternNode node,
         IReadOnlyList<XAttribute> attributes,
-        string state,
+        BigInteger state,
         OdfSchemaPatternMatchContext context)
     {
         switch (node.Kind)
@@ -72,7 +77,7 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             case OdfSchemaPatternNodeKind.Attribute:
                 return MatchSingleAttributePattern(node, attributes, state, context);
             case OdfSchemaPatternNodeKind.NotAllowed:
-                return new HashSet<string>(StringComparer.Ordinal);
+                return new HashSet<BigInteger>();
             case OdfSchemaPatternNodeKind.Ref:
                 return MatchAttributePatternReference(node.ReferenceName, attributes, state, context);
             case OdfSchemaPatternNodeKind.Group:
@@ -89,22 +94,23 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             case OdfSchemaPatternNodeKind.OneOrMore:
                 return MatchRepeatedAttributePattern(node, attributes, state, context, requireOne: true);
             case OdfSchemaPatternNodeKind.Empty:
-                return new HashSet<string>(StringComparer.Ordinal) { state };
+                return new HashSet<BigInteger> { state };
             default:
-                return new HashSet<string>(StringComparer.Ordinal);
+                return new HashSet<BigInteger>();
         }
     }
 
-    private static HashSet<string> MatchSingleAttributePattern(
+    private static HashSet<BigInteger> MatchSingleAttributePattern(
         OdfSchemaPatternNode node,
         IReadOnlyList<XAttribute> attributes,
-        string state,
+        BigInteger state,
         OdfSchemaPatternMatchContext context)
     {
-        var matches = new HashSet<string>(StringComparer.Ordinal);
+        var matches = new HashSet<BigInteger>();
         for (int i = 0; i < attributes.Count; i++)
         {
-            if (IsAttributeConsumed(state, i))
+            BigInteger bit = BigInteger.One << i;
+            if ((state & bit) != BigInteger.Zero)
             {
                 continue;
             }
@@ -118,33 +124,38 @@ internal static partial class OdfSchemaPatternAttributeMatcher
             List<OdfSchemaPatternNode> valueNodes = GetAttributeValueNodes(node.Children);
             if (valueNodes.Count == 0 || OdfSchemaPatternValidator.MatchAttributeValueNodes(valueNodes, attribute.Value, context))
             {
-                matches.Add(ConsumeAttribute(state, i));
+                matches.Add(state | bit);
             }
         }
 
         return matches;
     }
 
-    private static HashSet<string> MatchAttributePatternReference(
+    private static HashSet<BigInteger> MatchAttributePatternReference(
         string referenceName,
         IReadOnlyList<XAttribute> attributes,
-        string state,
+        BigInteger state,
         OdfSchemaPatternMatchContext context)
     {
-        if (string.IsNullOrWhiteSpace(referenceName) || !context.EnterReference(referenceName))
+        if (string.IsNullOrWhiteSpace(referenceName))
         {
-            return new HashSet<string>(StringComparer.Ordinal);
+            return new HashSet<BigInteger>();
+        }
+
+        if (!context.EnterReference(referenceName))
+        {
+            // 同名參照仍在作用中堆疊上，不必然代表真正的無窮遞迴（例如合法共用屬性群組
+            // 被兩個不同分支各自參照一次），改建立新的巢狀內容並限制其遞迴深度，
+            // 而非直接視為循環而拒絕比對。
+            OdfSchemaPatternMatchContext? recursiveContext = context.CreateRecursiveContext();
+            return recursiveContext is null
+                ? new HashSet<BigInteger>()
+                : MatchAttributePatternReferenceCore(referenceName, attributes, state, recursiveContext);
         }
 
         try
         {
-            OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
-            if (pattern == null)
-            {
-                return new HashSet<string>(StringComparer.Ordinal);
-            }
-
-            return MatchAttributePatternSequence(pattern.Roots, attributes, state, context);
+            return MatchAttributePatternReferenceCore(referenceName, attributes, state, context);
         }
         finally
         {
@@ -152,16 +163,31 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         }
     }
 
-    private static HashSet<string> MatchAttributePatternChoice(
-        OdfSchemaPatternNode node,
+    private static HashSet<BigInteger> MatchAttributePatternReferenceCore(
+        string referenceName,
         IReadOnlyList<XAttribute> attributes,
-        string state,
+        BigInteger state,
         OdfSchemaPatternMatchContext context)
     {
-        var matches = new HashSet<string>(StringComparer.Ordinal);
+        OdfSchemaPatternDefinition? pattern = context.Schema.FindPattern(referenceName);
+        if (pattern == null)
+        {
+            return new HashSet<BigInteger>();
+        }
+
+        return MatchAttributePatternSequence(pattern.Roots, attributes, state, context);
+    }
+
+    private static HashSet<BigInteger> MatchAttributePatternChoice(
+        OdfSchemaPatternNode node,
+        IReadOnlyList<XAttribute> attributes,
+        BigInteger state,
+        OdfSchemaPatternMatchContext context)
+    {
+        var matches = new HashSet<BigInteger>();
         foreach (OdfSchemaPatternNode child in node.Children)
         {
-            foreach (string matched in MatchAttributePatternNode(child, attributes, state, context))
+            foreach (BigInteger matched in MatchAttributePatternNode(child, attributes, state, context))
             {
                 matches.Add(matched);
             }
@@ -170,14 +196,14 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         return matches;
     }
 
-    private static HashSet<string> MatchOptionalAttributePattern(
+    private static HashSet<BigInteger> MatchOptionalAttributePattern(
         OdfSchemaPatternNode node,
         IReadOnlyList<XAttribute> attributes,
-        string state,
+        BigInteger state,
         OdfSchemaPatternMatchContext context)
     {
-        var matches = new HashSet<string>(StringComparer.Ordinal) { state };
-        foreach (string matched in MatchAttributePatternSequence(node.Children, attributes, state, context))
+        var matches = new HashSet<BigInteger> { state };
+        foreach (BigInteger matched in MatchAttributePatternSequence(node.Children, attributes, state, context))
         {
             matches.Add(matched);
         }
@@ -185,79 +211,17 @@ internal static partial class OdfSchemaPatternAttributeMatcher
         return matches;
     }
 
-    private static HashSet<string> MatchRepeatedAttributePattern(
+    private static HashSet<BigInteger> MatchRepeatedAttributePattern(
         OdfSchemaPatternNode node,
         IReadOnlyList<XAttribute> attributes,
-        string state,
+        BigInteger state,
         OdfSchemaPatternMatchContext context,
         bool requireOne)
     {
-        var matches = new HashSet<string>(StringComparer.Ordinal);
-        var frontier = new HashSet<string>(StringComparer.Ordinal) { state };
-        if (!requireOne)
-        {
-            matches.Add(state);
-        }
-
-        while (frontier.Count > 0)
-        {
-            var next = new HashSet<string>(StringComparer.Ordinal);
-            foreach (string current in frontier)
-            {
-                foreach (string matched in MatchAttributePatternSequence(node.Children, attributes, current, context))
-                {
-                    if (string.Equals(matched, current, StringComparison.Ordinal))
-                    {
-                        continue;
-                    }
-
-                    if (matches.Add(matched))
-                    {
-                        next.Add(matched);
-                    }
-                }
-            }
-
-            frontier = next;
-        }
-
-        return matches;
-    }
-
-    private static bool AllAttributesConsumed(string state, int attributeCount)
-    {
-        return ParseAttributeState(state).Count == attributeCount;
-    }
-
-    private static bool IsAttributeConsumed(string state, int index)
-    {
-        return ParseAttributeState(state).Contains(index);
-    }
-
-    private static string ConsumeAttribute(string state, int index)
-    {
-        HashSet<int> consumed = ParseAttributeState(state);
-        consumed.Add(index);
-        return string.Join(",", consumed.OrderBy(item => item).Select(item => item.ToString(CultureInfo.InvariantCulture)));
-    }
-
-    private static HashSet<int> ParseAttributeState(string state)
-    {
-        var consumed = new HashSet<int>();
-        if (string.IsNullOrEmpty(state))
-        {
-            return consumed;
-        }
-
-        foreach (string item in state.Split(','))
-        {
-            if (int.TryParse(item, NumberStyles.None, CultureInfo.InvariantCulture, out int index))
-            {
-                consumed.Add(index);
-            }
-        }
-
-        return consumed;
+        return OdfSchemaPatternFrontierMatcher.ExpandRepeated(
+            state,
+            requireOne,
+            current => MatchAttributePatternSequence(node.Children, attributes, current, context));
     }
 
     internal static bool MatchesAttributeNode(
