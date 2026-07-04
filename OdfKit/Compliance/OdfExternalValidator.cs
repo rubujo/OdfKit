@@ -280,9 +280,11 @@ internal static class OdfNativeProcessErrorMode
         }
     }
 
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll")]
     private static extern uint GetErrorMode();
 
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll")]
     private static extern uint SetErrorMode(uint uMode);
 }
