@@ -1512,6 +1512,61 @@ public partial class OptimizedRefactoringTests
     }
 
     [Fact]
+    public void Test_OdfSparseStorage_MaxHotPages_IsConfigurablePerTable()
+    {
+        using (var doc = SpreadsheetDocument.Create())
+        {
+            var table = new TableTableElement("table") { Name = "Sheet1" };
+            doc.ContentDom.AppendChild(table);
+
+            // 預設值應為 16（與既有 LRU 分層測試一致）。
+            Assert.Equal(16, table.MaxHotPages);
+
+            // 調低熱頁上限，驗證 EvictHotPagesIfNeeded 會依新上限淘汰，而非固定常數 16。
+            table.MaxHotPages = 4;
+
+            for (int i = 0; i < 20; i++)
+            {
+                table.SetSparseCellStyle(i * 128, 0, $"Style{i}");
+            }
+
+            int hotCount = 0;
+            int coldCount = 0;
+            var pageStates = table._pageStates;
+            Assert.NotNull(pageStates);
+
+            for (int i = 0; i < pageStates.Length; i++)
+            {
+                if (pageStates[i] == null)
+                    continue;
+                for (int j = 0; j < pageStates[i].Length; j++)
+                {
+                    if (pageStates[i][j].IsHot)
+                        hotCount++;
+                    else if (pageStates[i][j].CompressedBytes != null)
+                        coldCount++;
+                }
+            }
+
+            Assert.Equal(4, hotCount);
+            Assert.Equal(16, coldCount);
+        }
+    }
+
+    [Fact]
+    public void Test_OdfSparseStorage_MaxHotPages_RejectsNonPositiveValue()
+    {
+        using (var doc = SpreadsheetDocument.Create())
+        {
+            var table = new TableTableElement("table") { Name = "Sheet1" };
+            doc.ContentDom.AppendChild(table);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => table.MaxHotPages = 0);
+            Assert.Throws<ArgumentOutOfRangeException>(() => table.MaxHotPages = -1);
+        }
+    }
+
+    [Fact]
     public unsafe void Test_DirectIoAlignedNativeBuffer_Uses4096ByteAlignedNativeMemory()
     {
 #if NET10_0_OR_GREATER

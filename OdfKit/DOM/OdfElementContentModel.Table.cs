@@ -473,7 +473,31 @@ public partial class TableTableElement
     }
 
     private long _accessCounter;
-    private const int MaxHotPages = 16;
+    private const int DefaultMaxHotPages = 16;
+    private int _maxHotPages = DefaultMaxHotPages;
+
+    /// <summary>
+    /// Gets or sets the maximum number of "hot" (uncompressed) native cell pages kept resident in memory for this table before the least-recently-used page is evicted to compressed cold storage; each page is 128×128 cells (~655 KB uncompressed), so the default of 16 caps hot memory at roughly 10.5 MB regardless of total sheet size.
+    /// 取得或設定此表格保留在記憶體中的「熱」（未壓縮）原生儲存格頁面數量上限，超過時最久未存取的頁面會被淘汰至壓縮冷儲存；每頁為 128×128 個儲存格（未壓縮約 655 KB），因此預設值 16 會將熱記憶體鎖定在約 10.5 MB，與工作表總大小無關。
+    /// </summary>
+    /// <remarks>
+    /// Raising this value trades memory for fewer decompress/recompress cycles when editing large sparse sheets with a wide, scattered access pattern; lowering it further bounds memory usage at the cost of more frequent (de)compression.
+    /// 調高此值可用記憶體換取較少的解壓/重新壓縮次數，適合存取範圍分散的大型稀疏表格；調低則可進一步限制記憶體用量，但會增加（解）壓縮次數。
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value less than 1. / 當設定值小於 1 時擲出。</exception>
+    public int MaxHotPages
+    {
+        get => _maxHotPages;
+        set
+        {
+            if (value < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value));
+            }
+
+            _maxHotPages = value;
+        }
+    }
 
     private bool _isDisposed;
 
@@ -1091,7 +1115,7 @@ public partial class TableTableElement
             }
         }
 
-        while (hotCount > MaxHotPages)
+        while (hotCount > _maxHotPages)
         {
             int bestRow = -1;
             int bestCol = -1;

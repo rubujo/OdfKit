@@ -47,6 +47,17 @@ public partial class OdfTableSheet
     }
 
     /// <summary>
+    /// Gets or sets the maximum number of "hot" (uncompressed) native cell pages kept resident in memory for this worksheet before the least-recently-used page is evicted to compressed cold storage. See <see cref="TableTableElement.MaxHotPages"/> for details.
+    /// 取得或設定此工作表保留在記憶體中的「熱」（未壓縮）原生儲存格頁面數量上限，超過時最久未存取的頁面會被淘汰至壓縮冷儲存。詳見 <see cref="TableTableElement.MaxHotPages"/>。
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when set to a value less than 1. / 當設定值小於 1 時擲出。</exception>
+    public int MaxHotPages
+    {
+        get => ((TableTableElement)TableNode).MaxHotPages;
+        set => ((TableTableElement)TableNode).MaxHotPages = value;
+    }
+
+    /// <summary>
     /// Gets the cell collection for this worksheet.
     /// 取得此工作表的儲存格集合。
     /// </summary>

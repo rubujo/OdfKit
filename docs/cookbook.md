@@ -585,6 +585,70 @@ using SqlBulkCopy bulkCopy = new(connection) { DestinationTableName = "Sales", E
 await bulkCopy.WriteToServerAsync(reader);
 ```
 
+## 讀取／編輯大型 ODS 的記憶體模型
+
+當要處理的檔案可能達到數百 MB 時，應依「只需唯讀匯出」或「需要讀取後修改再寫回」
+選擇不同路徑，兩者的記憶體特性差異很大：
+
+| 場景 | 建議路徑 | 記憶體特性 |
+| --- | --- | --- |
+| 只需要把 ODS 內容匯出成 CSV、灌入資料庫、或做逐列彙總，不需要修改原始檔案 | `OdsStreamReader`（實作 `DbDataReader`，SAX 風格逐列讀取） | 恆定，不隨檔案大小成長；不建立 DOM |
+| 需要開啟既有 ODS、修改儲存格/樣式/公式後存回 | `SpreadsheetDocument.Open(...)` / `OdfDocument.Load(...)` DOM 路徑 | 見下方說明 |
+
+`OdsStreamReader` 的用法見前面〈匯出任意物件序列或 EF Core 查詢結果〉一節的
+`SqlBulkCopy` 範例；它完全不建立 DOM，一次只解析目前列，適合單向匯出。
+
+### DOM 編輯路徑的兩層記憶體最佳化
+
+透過 `SpreadsheetDocument.Open`／`OdfDocument.Load` 開啟既有文件時，DOM 樹**並非**
+一次性完整攤平載入，而是有兩層彼此獨立的最佳化：
+
+1. **文件層級延遲載入（lazy loading）**：`content.xml` 中超過 8192 bytes 的
+   `table:table`（以及巢狀的 `office:meta`／`office:settings`／`text:list` 等）
+   元素，載入時只保留原始 UTF-8 位元組，不會立即展開成 `OdfNode`／`OdfElement` 樹；
+   直到第一次真正存取該表格內容（例如讀取某個儲存格）時，才會透過內部的
+   `EnsureMaterialized()` 一次性展開該表格的行/儲存格 DOM。這代表：只要程式沒有
+   走訪到某張工作表，那張工作表就不會佔用 DOM 記憶體。
+2. **表格儲存格採稀疏原生分頁儲存，而非 `OdfElement` 樹**：一旦表格被存取，其
+   儲存格資料是以固定 40 bytes 的原生結構（`NativeCell`），依 128×128 分頁
+   （每頁約 655 KB）配置在非受控記憶體中，**不是**以一般的 `OdfElement`/`XElement`
+   物件樹表示。系統會維護一組「熱頁」（未壓縮、可直接讀寫）與「冷頁」（以
+   `DeflateStream` 壓縮，通常可壓縮至原始 1/10 大小）：存取超出熱頁上限時，最久
+   未存取的頁面會被自動壓縮轉為冷頁；之後若再次存取，該頁會自動解壓還原為熱頁，
+   同時視需要淘汰其他熱頁以維持上限。
+
+因此，即使某張工作表有數百萬個儲存格，只要熱頁上限固定，「熱」記憶體佔用也會被
+鎖在一個常數量級（詳見下一節），不會隨儲存格總數線性無界成長；真正會隨檔案大小
+成長的是壓縮後的冷頁位元組陣列（通常遠小於原始資料）。
+
+### 調整熱頁上限（`TableTableElement.MaxHotPages`）
+
+熱頁上限預設為 16 頁（約 16 × 655 KB ≈ 10.5 MB），可依需求逐表調整：
+
+```csharp
+using OdfKit.Spreadsheet;
+
+using var doc = SpreadsheetDocument.Open("huge-report.ods");
+var sheet = doc.Worksheets[0];
+
+// 若存取範圍分散在整張工作表（如逐欄彙總），調高熱頁上限可減少反覆壓縮/解壓縮，
+// 用記憶體換取更少的 CPU 週期。
+sheet.MaxHotPages = 64; // 約 64 × 655 KB ≈ 41 MB 熱記憶體上限
+
+// 若記憶體極度受限（如容器環境），可調低上限，用更多壓縮/解壓縮換取更低的記憶體佔用。
+sheet.MaxHotPages = 4; // 約 4 × 655 KB ≈ 2.6 MB 熱記憶體上限
+```
+
+此設定隨時可調整，新上限會於下一次寫入觸發淘汰檢查時立即套用；調低上限不會立刻
+壓縮既有的熱頁，而是等到下一次有新頁面被配置、觸發淘汰檢查時才會生效。
+
+### 目前的限制
+
+DOM 編輯路徑目前沒有「逐列串流讀取＋修改＋寫回」的中間方案：一旦存取某張工作表，
+該工作表的行結構（`table:table-row` 這層）仍會一次性具現化。若編輯場景是「只改
+少數幾列、其餘原封不動地保留」，建議評估是否能改用 `OdsStreamReader` 讀出所需資料、
+另以 `OdsStreamWriter` 重新輸出整份檔案，而非開啟既有檔案做原地編輯。
+
 ## CLI 驗證與轉換
 
 ```powershell
