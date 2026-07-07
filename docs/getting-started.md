@@ -50,7 +50,7 @@ dotnet add package OdfKit --version 0.0.1 --source odfkit-github-release
 | 匯出影像或圖表渲染 | `OdfKit.Extensions.Imaging` |
 | 與 DOCX / XLSX 互通 | `OdfKit.Extensions.Ooxml` |
 | 需要 LibreOffice 後端渲染 | `OdfKit.Extensions.Rendering` |
-| RDF / SPARQL 中介資料橋接 | `OdfKit.Extensions.Rdf` |
+| RDF / SPARQL 中繼資料橋接 | `OdfKit.Extensions.Rdf` |
 | 協作操作匯出 | `OdfKit.Extensions.Collaboration` |
 
 更完整的選型說明請見 [套件目錄與選型指南](package-catalog.md)。

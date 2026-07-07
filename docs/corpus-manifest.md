@@ -1,9 +1,9 @@
-# Corpus Manifest
+# Corpus Manifest 規則
 
-本文件記錄可提交 corpus 的最小 metadata 規則。新增 fixture 時，必須在同一
+本文件記錄可提交 corpus 的最小中繼資料規則。新增 fixture 時，必須在同一
 pull request 更新本文件或等價 manifest，避免測試樣本來源變成黑盒。
 
-repo 內可直接執行的範本 manifest 位於 `tests/fixtures/corpus/manifest.json`。
+儲存庫內可直接執行的範本 manifest 位於 `tests/fixtures/corpus/manifest.json`。
 外部 corpus 的範本位於 `docs/examples/external-corpus/manifest.json`，baseline 例外範本位於
 `docs/examples/external-corpus/baseline-exceptions.json`。
 ODFDOM 官方 sample parity 的外部範本位於
@@ -13,22 +13,22 @@ ODFDOM 官方 sample parity 的外部範本位於
 
 ## 可提交條件
 
-- fixture 必須是 generated、專案自有、授權清楚，或已去識別化且可再散布。
+- fixture 必須是產生資料、專案自有資料、授權清楚，或已去識別化且可再散布。
 - fixture 應保持小型；大型真實世界 corpus 改由 `ODFKIT_PARITY_CORPUS_ROOT`
-  指向本機或 CI artifact。
+  指向本機或 CI 產物。
 - 不提交含個資、敏感資料、未知授權或不可再散布內容的文件。
 - 每個 fixture 必須有預期驗證結果與 round-trip 策略。
 
 ## 欄位
 
-| Field | Required | Description |
+| 欄位 | 必填 | 說明 |
 |---|---|---|
 | `id` | yes | 穩定 fixture id。 |
-| `path` | yes | repo 內路徑或外部 corpus 相對路徑。 |
+| `path` | yes | 儲存庫內路徑或外部 corpus 相對路徑。 |
 | `source` | yes | generated、OdfKit、ODF Toolkit sample、LibreOffice export、real-world sanitized 等。 |
 | `sourceUri` | external | 外部或官方 corpus 的可追溯來源 URL；generated 或 OdfKit 自有樣本可省略。 |
 | `license` | yes | CC0、Apache-2.0、MPL-2.0、generated-no-copyright 等。 |
-| `kind` | yes | `OdfDocumentKind` 或 extension。 |
+| `kind` | yes | `OdfDocumentKind` 或副檔名。 |
 | `version` | yes | 預期 ODF 版本。 |
 | `profile` | yes | 預期驗證 profile。 |
 | `expected` | yes | `valid` 或 `invalid`。 |
@@ -82,11 +82,11 @@ fixture 作為欄位用法範例，並非完整清單。欲取得目前完整、
 
 complex builder corpus 目前包含四個 schema-clean 正向樣本：`complex-annual-report.odt`、
 `complex-financial-model.ods`、`complex-business-deck.odp` 與 `complex-flow-diagram.odg`。
-這些檔案是本 repo 原創生成資料，授權使用 `generated-no-copyright`。
+這些檔案是本儲存庫原創生成資料，授權使用 `generated-no-copyright`。
 
 ## 外部 corpus 路徑
 
-外部 corpus 不提交到 repo。測試或工具若支援外部 corpus，應讀取：
+外部 corpus 不提交到儲存庫。測試或工具若支援外部 corpus，應讀取：
 
 ```powershell
 $env:ODFKIT_PARITY_CORPUS_ROOT = "D:\Corpus\OdfKit"
@@ -109,7 +109,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate-corpus man
   --format json
 ```
 
-repo 也提供 CI 與本機共用腳本：
+儲存庫也提供 CI 與本機共用腳本：
 
 ```powershell
 .\eng\Initialize-OdfExternalCorpus.ps1 -OutputRoot D:\Corpus\OdfKit
@@ -124,7 +124,7 @@ repo 也提供 CI 與本機共用腳本：
 預設複製 ODF Validator 外部 corpus 範本；若要建立 ODFDOM 官方 sample parity
 根目錄，請指定 `-Template odfdom-sample-corpus`。
 `Test-OdfCorpus.ps1` 必定執行內建 corpus；若設定 `ODFKIT_PARITY_CORPUS_ROOT`，則會同時執行外部 corpus。
-外部 corpus 會先以 `validate-corpus --metadata-only` 檢查 manifest 與 baseline exception metadata，
+外部 corpus 會先以 `validate-corpus --metadata-only` 檢查 manifest 與 baseline exception 中繼資料，
 再執行實體 fixture 驗證。
 若再設定 `ODFKIT_ODFVALIDATOR_JAR`，外部 corpus 會加上 ODF Validator baseline。
 若外部 corpus 有已驗證的暫時分類差異，可用 `-BaselineExceptions` 指向
@@ -134,14 +134,14 @@ repo 也提供 CI 與本機共用腳本：
 classification、`kind` 文件種類與 `version` ODF 版本。任一 fixture 與 manifest 宣告不一致，
 或未文件化的外部 baseline mismatch，都會讓 exit code 為 `1`。
 
-`--metadata-only` 只檢查 manifest 與 baseline exception manifest 的結構與 metadata
+`--metadata-only` 只檢查 manifest 與 baseline exception manifest 的結構與中繼資料
 規則，不要求 fixture 檔案存在，也不執行 OdfKit 或外部 validator。這可用於官方或授權待確認
 corpus 在下載樣本前的來源、授權與 baseline 例外格式檢查。
 
 ## JSON Collaboration fixture
 
 JSON Collaboration fixture 不屬於 ODF package corpus，因此不放入 `validate-corpus` 的 ODF manifest。
-repo 內 JSON wire-shape fixture 位於 `tests/fixtures/collaboration/`，並由
+儲存庫內 JSON wire-shape fixture 位於 `tests/fixtures/collaboration/`，並由
 `tests/fixtures/collaboration/manifest.json` 記錄來源、授權、TDF changes envelope 形狀、operation
 覆蓋、語意狀態、預期 replay report 與 SHA-256。此 manifest 採 clean-room 對標：可使用 TDF
 公開文件與 JSON wire shape 作為來源，不可複製 Java 實作。`tdf-public-docs/` 必須讓 TDF 公開 ODF

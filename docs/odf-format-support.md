@@ -12,20 +12,20 @@ ODF Toolkit / ODF Validator 對標線另見 [odf-toolkit-parity.md](odf-toolkit-
 - `complete`：已有直接 API 與測試覆蓋，可作為目前支援能力使用。
 - `validated`：已有驗證或偵測測試證據，但高階 API 仍可能有限。
 - `package-level`：可建立、載入、保存與驗證最小封裝，但高階語意 API 尚未完整。
-- `partial`：已有部分高階模型或 round-trip 能力，但仍有明確缺口。
+- `partial`：已有部分高階模型或來回讀寫能力，但仍有明確缺口。
 - `planned`：尚未有足夠程式與測試證據支撐。
 
 ### 高階 API 層
 
 - `complete`：滿足本文件採用的 5 項完成標準——(1) 公開高階 API 可完成該格式常見
-  workflow、(2) 有專屬測試、(3) 有 round-trip／boundary／interop 證據（含誠實記錄的上游限制）、
+  工作流程、(2) 有專屬測試、(3) 有來回讀寫／邊界／互通證據（含誠實記錄的上游限制）、
   (4) `Validate()`／`ValidateAsync()` 可用且測試覆蓋正向與負向案例、(5) 文件已同步。
   截至 2026-06-24，全部 24 個 extension 均已達成此分級（詳見下方「全格式 complete 最低能力
   矩陣」）。日常辦公自動化不需下沉 DOM。
 - `usable`／`usable-variant`：歷史分級，目前矩陣中已無格式使用；保留定義供未來新格式或
   迴歸情況參考——`usable` 指常用建立／編輯 API 可用但有明確語意缺口；`usable-variant` 指具
   專屬 typed 文件類別但語意 API 仍完全繼承基底格式。
-- `package-only`：僅封裝層 round-trip；高階語意模型尚未專屬化或仍共用基底 wrapper。
+- `package-only`：僅封裝層來回讀寫；高階語意模型尚未專屬化或仍共用基底 wrapper。
 
 **重要說明（避免過度宣稱）**：`complete` 分級僅代表滿足本文件定義的最低完成標準，**不**代表
 已達成各格式族可能延伸出的完整深度語意模型（例如 Chart 的 Legend 統一可編輯模型與
@@ -67,7 +67,7 @@ CNS 11643 官方語意相容或認證。
 
 ## 矩陣
 
-| Extension | MIME type | `OdfDocumentKind` | Detect | Create | Load | Save | Validate | Round-trip | High-level API | Test evidence |
+| 副檔名 | MIME 類型 | `OdfDocumentKind` | 偵測 | 建立 | 載入 | 保存 | 驗證 | 來回讀寫 | 高階 API | 測試證據 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `.odt` | `application/vnd.oasis.opendocument.text` | `Text` | complete | complete | complete | complete | validated | complete | complete | `TextApiUsabilityTests`, `TextHighLevelApiTests`, `FourFormatApiScenarioTests`, `TextAdvancedFidelityTests`, `ComplianceTests`, `InteropCorpusTests` |
 | `.ott` | `application/vnd.oasis.opendocument.text-template` | `TextTemplate` | complete | complete | complete | complete | validated | complete | complete | `DocumentKindApiUsabilityTests`, `ComplianceTests`, `E2ETests`, `InteropCorpusTests`, `TemplateRoundTripTests`, `LibreOfficeInteropTests` |
@@ -97,11 +97,11 @@ CNS 11643 官方語意相容或認證。
 ## 全格式 complete 最低能力矩陣（Workstream A）
 
 依本文件定義的 5 項完成標準逐格式列出條件是否滿足，作為上方矩陣
-`complete` 分級的可稽核依據。圖例：✅ 滿足；✅\* 滿足，但 interop 證據為「已實機驗證並誠實
+`complete` 分級的可稽核依據。圖例：✅ 滿足；✅\* 滿足，但互通證據為「已實機驗證並誠實
 記錄上游應用程式限制」而非綠燈通過（依使用者決策，至少一個驗收案例即符合本矩陣互通欄位要求，
 不要求每案必須通過）。
 
-| Extension | (1) 高階 API 完成常見 workflow | (2) 專屬測試 | (3) round-trip／boundary／interop 證據 | (4) Validate() 正負向 | (5) 文件同步 |
+| 副檔名 | (1) 高階 API 完成常見工作流程 | (2) 專屬測試 | (3) 來回讀寫／邊界／互通證據 | (4) Validate() 正負向 | (5) 文件同步 |
 |---|---|---|---|---|---|
 | `.odt` | ✅ | ✅ `TextHighLevelApiTests` | ✅ 真機（`LibreOfficeHeadless_LoadsGeneratedDocuments`） | ✅ 通用骨架 | ✅ |
 | `.ott` | ✅ `CreateFromTemplate`／`CreateFromDocument` | ✅ `TemplateRoundTripTests` | ✅ 真機（`LibreOfficeHeadless_LoadsTemplateVariantDocuments`） | ✅ 通用骨架 | ✅ |

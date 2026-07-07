@@ -1,45 +1,45 @@
-# API Surface Layers
+# API 表面分層
 
 本文件描述 OdfKit 公開 API 的分層。它不是逐項 API 清單，而是協助使用者與維護者判斷「應該從哪一層開始」以及「新增 API 時應放在哪一層」。
 
 ## 分層總覽
 
-| Layer | 主要命名空間 / 型別 | 使用者 | 穩定性期待 |
+| 層級 | 主要命名空間 / 型別 | 使用者 | 穩定性期待 |
 |-------|----------------------|--------|------------|
-| L1 Document facade | `TextDocument`、`SpreadsheetDocument`、`PresentationDocument`、`DrawingDocument`、`OdfDocument` | 一般應用程式與 SDK 使用者 | 最重視可讀性、範例與相容性 |
-| L2 Domain builders | `*.Builder()`、domain-specific builder / facade | 建立中高複雜度文件的使用者 | 保持 fluent workflow 清楚，避免暴露封裝細節 |
-| L3 Streaming and data | `OdsStreamWriter`、`OdsStreamReader`、`ObjectDataReader<T>` | 批次匯出、資料管線、低記憶體場景 | 重視效能、配置量、取消與資源釋放 |
-| L4 Package and DOM | `OdfPackage`、`OdfPackageEntry`、`OdfNode`、`OdfElement` | 需要保留未知內容或做低階互通的進階使用者 | 保留 round-trip 行為與 XML/ZIP 安全邊界 |
-| L5 Compliance and diagnostics | `OdfValidator`、`OdfValidationReport`、`OdfLocalizer`、diagnostics types | 驗證、CI、匯入閘門 | 診斷資料應穩定且可機器讀取 |
-| L6 Security and signatures | `OdfLoadOptions`、`OdfSaveOptions`、`OdfSigner`、crypto providers | 加密、簽章、安全敏感工作流 | 預設安全，錯誤訊息在地化，取消語意明確 |
-| L7 Extensions | `OdfKit.Extensions.*` | 需要 HTML、PDF、OOXML、Rendering、RDF、Collaboration 的使用者 | 與核心解耦，避免把 runtime-heavy 相依帶入核心 |
-| L8 Tools and engineering | `tools/OdfKit.Cli`、`eng/*.ps1`、benchmarks | 維護者、CI、發佈流程 | 可重跑、可稽核，避免本機狀態污染 repo |
+| L1 文件外觀層 | `TextDocument`、`SpreadsheetDocument`、`PresentationDocument`、`DrawingDocument`、`OdfDocument` | 一般應用程式與 SDK 使用者 | 最重視可讀性、範例與相容性 |
+| L2 領域建構器 | `*.Builder()`、領域專屬建構器 / 外觀層 | 建立中高複雜度文件的使用者 | 保持 fluent 工作流程清楚，避免暴露封裝細節 |
+| L3 串流與資料 | `OdsStreamWriter`、`OdsStreamReader`、`ObjectDataReader<T>` | 批次匯出、資料管線、低記憶體場景 | 重視效能、配置量、取消與資源釋放 |
+| L4 封裝與 DOM | `OdfPackage`、`OdfPackageEntry`、`OdfNode`、`OdfElement` | 需要保留未知內容或做低階互通的進階使用者 | 保留來回讀寫行為與 XML / ZIP 安全邊界 |
+| L5 合規與診斷 | `OdfValidator`、`OdfValidationReport`、`OdfLocalizer`、診斷型別 | 驗證、CI、匯入閘門 | 診斷資料應穩定且可供機器讀取 |
+| L6 安全性與簽章 | `OdfLoadOptions`、`OdfSaveOptions`、`OdfSigner`、密碼學提供者 | 加密、簽章、安全敏感工作流程 | 預設安全，錯誤訊息在地化，取消語意明確 |
+| L7 擴充套件 | `OdfKit.Extensions.*` | 需要 HTML、PDF、OOXML、Rendering、RDF、Collaboration 的使用者 | 與核心解耦，避免把執行階段較重的相依帶入核心 |
+| L8 工具與工程 | `tools/OdfKit.Cli`、`eng/*.ps1`、基準測試 | 維護者、CI、發佈流程 | 可重跑、可稽核，避免本機狀態污染儲存庫 |
 
 ## 建議使用路徑
 
-新使用者應從 L1 開始：`TextDocument.Create()`、`SpreadsheetDocument.Create()` 或 `OdfDocument.Load()`。只有在需要大量資料匯出時，才直接使用 L3 streaming API；只有在需要保留或修改未知 ZIP/XML 內容時，才進入 L4。
+新使用者應從 L1 開始：`TextDocument.Create()`、`SpreadsheetDocument.Create()` 或 `OdfDocument.Load()`。只有在需要大量資料匯出時，才直接使用 L3 串流 API；只有在需要保留或修改未知 ZIP / XML 內容時，才進入 L4。
 
 ## 新 API 放置準則
 
 | 情境 | 應放層級 | 命名提示 |
 |------|----------|----------|
-| 常見文件操作，一般使用者應該看得懂 | L1 / L2 | 使用 domain vocabulary，例如 `AddHeading`、`FindSheet` |
-| 大量資料匯入/匯出或不建 DOM 的流程 | L3 | 明確標示 streaming、buffering、ordering 限制 |
-| ZIP entry、manifest、raw XML 或 unknown content | L4 | 保留 ODF/ZIP 語意，不把低階行為包裝成高階承諾 |
-| 驗證、report、policy 或 corpus 診斷 | L5 | 優先結構化資料，避免只回傳字串 |
+| 常見文件操作，一般使用者應該看得懂 | L1 / L2 | 使用領域詞彙，例如 `AddHeading`、`FindSheet` |
+| 大量資料匯入 / 匯出或不建 DOM 的流程 | L3 | 明確標示串流、緩衝、寫入順序限制 |
+| ZIP 專案、manifest、原始 XML 或未知內容 | L4 | 保留 ODF / ZIP 語意，不把低階行為包裝成高階承諾 |
+| 驗證、報告、policy 或 corpus 診斷 | L5 | 優先結構化資料，避免只回傳字串 |
 | 加密、簽章、外部資源或不可信輸入 | L6 | 預設防禦式設定，例外訊息使用 `OdfLocalizer` |
 | 需要 LibreOffice、PDF、OOXML 或大型第三方相依 | L7 | 放在 extension，不進核心套件 |
 
 ## 命名契約摘要
 
-- `Find*`：單一 nullable lookup。
-- `Get*`：非 nullable 讀取、集合 snapshot、或狀態查詢。
+- `Find*`：單一可空查找。
+- `Get*`：非可空讀取、集合快照或狀態查詢。
 - `Add*`：新增項目並通常回傳新建物件或 fluent context。
 - `Remove*`：移除指定項目；指定項目移除 API 優先回傳 `bool`。
 - `Clear*`：清空一組狀態，通常 no-op 安全。
-- `Load*` / `Save*`：封裝或文件生命週期操作；async overload 必須支援 `CancellationToken`。
+- `Load*` / `Save*`：封裝或文件生命週期操作；非同步 overload 必須支援 `CancellationToken`。
 
-詳細盤點請見 [API Surface Inventory](api-surface-inventory.md) 與 [API Surface Consistency](api-surface-consistency.md)。
+詳細盤點請見 [API 表面盤點](api-surface-inventory.md) 與 [API 表面一致性](api-surface-consistency.md)。
 
 ## 文件品質要求
 

@@ -1,8 +1,8 @@
-# OdfKit Benchmarks
+# OdfKit 基準測試
 
 本專案使用 BenchmarkDotNet 量測 OdfKit 的效能與記憶體行為。
 
-## Collaboration benchmarks
+## 協作操作基準測試
 
 `CollaborationOperationBenchmarks` 覆蓋：
 
@@ -18,11 +18,11 @@
 dotnet run -c Release --project OdfKit.Benchmarks -- --filter *CollaborationOperationBenchmarks*
 ```
 
-## ODT round-trip benchmarks
+## ODT 來回讀寫基準測試
 
 `OdtRoundTripBenchmarks` 覆蓋大型 ODT 建立、儲存與載入。
 
-## Table sheet cell access benchmarks
+## 試算表儲存格存取基準測試
 
 `OdfTableSheetCellAccessBenchmarks` 覆蓋 `OdfTableSheet.GetCell` 逐格填值情境（例如以巢狀
 迴圈依列／欄索引逐一建立儲存格），用於驗證 `OdfTableSheetDomAccessEngine` 的列／儲存格節點
@@ -42,31 +42,31 @@ dotnet run -c Release --project OdfKit.Benchmarks -- --filter *OdfTableSheetCell
 - `OdfPackageLoadBenchmarks`：ODF 封裝載入效能。
 - `OdsStreamWriterBenchmarks`：`OdsStreamWriter` 大量列寫入效能，見類別內建 XML 文件說明。
 
-## Stable local profile
+## 穩定本機量測設定檔
 
-正式比較效能變更時，優先使用較長、以時間為導向的 profile：
+正式比較效能變更時，優先使用較長、以時間為導向的量測設定檔：
 
 ```powershell
 pwsh eng/Benchmark-Stable.ps1 -Filter "*OdsStreamWriter*"
 ```
 
-此 profile 預設使用 BenchmarkDotNet `Medium` job、`250 ms` iteration time、`9` 到 `15`
-次量測迭代，並開啟 memory 與 exception 欄位。它比 smoke 指令更慢，但較能避免極短迭代
+此量測設定檔預設使用 BenchmarkDotNet `Medium` job、`250 ms` iteration time、`9` 到 `15`
+次量測迭代，並開啟記憶體與例外欄位。它比煙霧測試指令更慢，但較能避免極短迭代
 造成的量測雜訊。
 
-## Baseline report
+## 基準線報告
 
-需要產生可附在 PR 或 release note 的 Markdown 摘要時，使用：
+需要產生可附在 pull request 或發行說明的 Markdown 摘要時，使用：
 
 ```powershell
 pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*"
 ```
 
-報告會包含 stable profile 指令、目前 regression gate 基準線，以及 BenchmarkDotNet
-GitHub summary。長期基準政策請見 [docs/performance-baselines.md](../docs/performance-baselines.md)。
+報告會包含穩定量測設定檔指令、目前回歸關卡基準線，以及 BenchmarkDotNet
+GitHub 摘要。長期基準政策請見 [效能基準線](../docs/performance-baselines.md)。
 
-## Result policy
+## 結果政策
 
 Benchmark 結果受 CPU、記憶體、磁碟、OS、電源設定與 JIT 狀態影響，不提交本機輸出作為固定
-SLA。CI 只應執行 smoke tests，驗證大型 collaboration operations 可完成且報告狀態正確，不應以
+SLA。CI 只應執行煙霧測試，驗證大型協作操作可完成且報告狀態正確，不應以
 固定毫秒或記憶體門檻作為單元測試條件。

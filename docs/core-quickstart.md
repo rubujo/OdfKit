@@ -1,6 +1,6 @@
-# Core SDK Quickstart
+# 核心 SDK 快速開始
 
-本文件提供 OdfKit 核心 SDK 的最短實作路徑，聚焦於純 managed 的 ODF 建立、載入、驗證與低記憶體匯出。需要格式轉換或 LibreOffice 渲染時，再接續閱讀對應 extension 文件。
+本文件提供 OdfKit 核心 SDK 的最短實作路徑，聚焦於純受控程式碼的 ODF 建立、載入、驗證與低記憶體匯出。需要格式轉換或 LibreOffice 渲染時，再接續閱讀對應擴充套件文件。
 
 ## 安裝定位
 
@@ -10,7 +10,7 @@
 dotnet add package OdfKit --version 0.0.1 --source odfkit-github-release
 ```
 
-若以原始碼方式整合，請先在 repo 根目錄執行：
+若以原始碼方式整合，請先在儲存庫根目錄執行：
 
 ```powershell
 dotnet build
@@ -24,10 +24,10 @@ using OdfKit.Compliance;
 using OdfKit.Text;
 
 using TextDocument document = TextDocument.Create();
-document.Title = "Quarterly report";
+document.Title = "季度報告";
 document.Creator = "OdfKit";
-document.Body.Headings.Add("Quarterly report", 1);
-document.Body.Paragraphs.Add("This document was generated without an office runtime.");
+document.Body.Headings.Add("季度報告", 1);
+document.Body.Paragraphs.Add("這份文件是在不啟動辦公室軟體執行階段的情況下產生。");
 document.Save("quarterly-report.odt");
 
 OdfValidationReport report = OdfValidator.Validate("quarterly-report.odt");
@@ -59,17 +59,17 @@ using OdfKit.Spreadsheet;
 await using FileStream output = File.Create("export.ods");
 using var writer = new OdsStreamWriter(output);
 
-writer.WriteStartSheet("Rows");
+writer.WriteStartSheet("資料列");
 writer.WriteStartRow();
-writer.WriteCell("Id");
-writer.WriteCell("Name");
+writer.WriteCell("識別碼");
+writer.WriteCell("名稱");
 writer.WriteEndRow();
 
 for (int i = 1; i <= 100_000; i++)
 {
     writer.WriteStartRow();
     writer.WriteCell(i);
-    writer.WriteCell("Row " + i.ToString(System.Globalization.CultureInfo.InvariantCulture));
+    writer.WriteCell("資料列 " + i.ToString(System.Globalization.CultureInfo.InvariantCulture));
     writer.WriteEndRow();
 }
 
@@ -105,7 +105,7 @@ using OdfKit.Core;
 using OdfKit.Text;
 
 using TextDocument document = TextDocument.Create();
-document.Body.Paragraphs.Add("Repeatable package output.");
+document.Body.Paragraphs.Add("可重複產生的封裝輸出。");
 document.Save("repeatable.odt", new OdfSaveOptions
 {
     Deterministic = true,
@@ -117,8 +117,8 @@ document.Save("repeatable.odt", new OdfSaveOptions
 
 | 需求 | 文件 |
 |------|------|
-| 更多情境範例 | [Cookbook](cookbook.md) |
-| API 分層與命名契約 | [API Surface Layers](api-surface-layers.md) |
+| 更多情境範例 | [實作食譜](cookbook.md) |
+| API 分層與命名契約 | [API 表面分層](api-surface-layers.md) |
 | 格式支援深度 | [ODF 格式支援矩陣](odf-format-support.md) |
 | LibreOffice 互通 | [LibreOffice 互通矩陣](libreoffice-interop-matrix.md) |
-| 效能量測 | [Performance Baselines](performance-baselines.md) |
+| 效能量測 | [效能基準線](performance-baselines.md) |

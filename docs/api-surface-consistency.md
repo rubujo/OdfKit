@@ -1,6 +1,6 @@
-# API Surface Consistency
+# API 表面一致性
 
-本文件定義 OdfKit 公開 API 的長期命名與分層規則。它是實作與 review
+本文件定義 OdfKit 公開 API 的長期命名與分層規則。它是實作與審查
 時判斷「是否需要一級 C# 物件模型」的依據，並同步排除專案既有文件已確認
 不是核心目標的項目。
 
@@ -8,12 +8,12 @@
 
 ## 1. API 分層
 
-| Level | 名稱 | 完成線 | 主要入口 |
+| 層級 | 名稱 | 完成線 | 主要入口 |
 |------|------|--------|----------|
-| L0 | Package API | 所有 ODF package entry、manifest、media、RDF 與 unknown entry 可存取、保存與 round-trip。 | `OdfPackage`、`OdfDocument` |
-| L1 | Typed DOM API | 所有 ODF 1.4 schema element / attribute 可透過 generated wrapper、typed attribute helper 或 schema-aware DOM 存取。 | `OdfNode`、`OdfElement`、generated DOM wrappers、`OdfTypedDomCoverage` |
-| L2 | Semantic Facade API | 常見文件工作流程具備高階 C# facade，不需要呼叫端理解 XML 細節。 | `TextDocument`、`SpreadsheetDocument`、`PresentationDocument`、`DrawingDocument`、Chart / Formula / Image / Database facade |
-| L3 | External Engine Boundary | 需要辦公軟體行為、外部環境或不可穩定 managed 化的能力，只能作為 extension 或 optional validation。 | `OdfKit.Extensions.Rendering`、LibreOffice / Office interop scripts |
+| L0 | 封裝 API | 所有 ODF package entry、manifest、media、RDF 與 unknown entry 可存取、保存與來回讀寫。 | `OdfPackage`、`OdfDocument` |
+| L1 | 型別化 DOM API | 所有 ODF 1.4 schema element / attribute 可透過產生的 wrapper、型別化屬性 helper 或 schema-aware DOM 存取。 | `OdfNode`、`OdfElement`、generated DOM wrappers、`OdfTypedDomCoverage` |
+| L2 | 語意外觀層 API | 常見文件工作流程具備高階 C# 外觀層，不需要呼叫端理解 XML 細節。 | `TextDocument`、`SpreadsheetDocument`、`PresentationDocument`、`DrawingDocument`、Chart / Formula / Image / Database facade |
+| L3 | 外部引擎邊界 | 需要辦公軟體行為、外部環境或不可穩定受控化的能力，只能作為 extension 或 optional validation。 | `OdfKit.Extensions.Rendering`、LibreOffice / Office interop scripts |
 
 「所有 ODF 功能可用 C# 存取」表示 L0 + L1 必須完整；「所有常見工作流程有
 一級 C# 物件模型」表示 L2 必須覆蓋高價值使用情境。L3 不屬於核心 API
@@ -21,38 +21,38 @@
 
 ## 2. 命名契約
 
-新增或 breaking rename 公開 API 時，請使用以下規則；本專案尚未正式發佈
-package，因此允許一次性 refactor repo 內所有使用點，不保留舊名稱 shim。
+新增或破壞性重新命名公開 API 時，請使用以下規則；本專案尚未正式發佈
+套件，因此允許一次性重構儲存庫內所有使用點，不保留舊名稱 shim。
 
-| Pattern | 用途 | 回傳語意 |
+| 形狀 | 用途 | 回傳語意 |
 |---------|------|----------|
 | `Create` / `Load` / `Save` / `Validate` | 文件生命週期。 | 依既有文件 API 慣例。 |
 | `Builder()` | Fluent 建立入口。 | 回傳 builder；builder 使用 `With*` 設定狀態、`Add*` 新增內容。 |
 | `Add*` | 新增節點、實體或 relation。 | 回傳新增項目或 `void`，不得表示查找。 |
-| `Get*` | 讀取 snapshot、summary、集合或不可變資訊。 | 集合讀取統一使用 `Get*` 或屬性。 |
-| `Set*` | 設定或覆寫單一狀態。 | 回傳更新後 facade 或 `void`。 |
-| `Update*` | 依 callback、request 或批次規則修改既有內容。 | 回傳變更數量或更新結果。 |
+| `Get*` | 讀取快照、摘要、集合或不可變資訊。 | 集合讀取統一使用 `Get*` 或屬性。 |
+| `Set*` | 設定或覆寫單一狀態。 | 回傳更新後外觀層或 `void`。 |
+| `Update*` | 依回呼、request 或批次規則修改既有內容。 | 回傳變更數量或更新結果。 |
 | `Remove*` | 移除指定內容。 | 不存在時優先回傳 `false`；輸入無效才拋例外。 |
 | `Find*` | 查找單一可選項。 | 找不到回傳 `null`。不得用於集合。 |
 | `Try*` | 嘗試取得或執行可能失敗的操作。 | 回傳 `bool`，搭配 `out` 或明確結果。 |
 
 `List*` 不作為新的公開 API 命名。若需要列出集合，使用 `Get*` 或唯讀集合屬性。
 
-低階 DOM / typed attribute accessor 可保留 `Get*`，即使回傳 nullable；這些 API
-描述的是「讀取目前節點或屬性的值」，不是依 domain key 查找 semantic object。
-例如 `OdfNode.GetAttribute`、`OdfElement.Get*AttributeValue` 與 generated wrapper
-屬性 setter 內部使用的 remove helper，不適用 L2 facade 的 `Find*` 規則。
+低階 DOM / 型別化屬性 accessor 可保留 `Get*`，即使回傳 nullable；這些 API
+描述的是「讀取目前節點或屬性的值」，不是依領域 key 查找語意物件。
+例如 `OdfNode.GetAttribute`、`OdfElement.Get*AttributeValue` 與產生的 wrapper
+屬性 setter 內部使用的 remove helper，不適用 L2 外觀層的 `Find*` 規則。
 
 `Clear*` 表示清空一段可重建狀態或重設目前設定，可維持 no-op 命令語意與
 `void` 回傳；若 API 需要表達「移除某個指定項目是否成功」，應提供或改用
 `Remove*`，並遵守 `bool` 成功/失敗語意。
 
-Database 與 Image 目前不強制補 `Builder()` 入口。Database 的主要 L2 workflow
-是 table / query / form / report CRUD 與 schema 設定；Image 的主要 L2 workflow
+Database 與 Image 目前不強制補 `Builder()` 入口。Database 的主要 L2 工作流程
+是 table / query / form / report CRUD 與 schema 設定；Image 的主要 L2 工作流程
 是載入、框架、濾鏡與圖片 bytes 變更。這兩者沒有足以降低複雜度的常見 fluent
 建立流程時，可保留 `Create` / `Load` / `Set*` / `Add*` / `Find*` 組合。
 
-### 已套用的 breaking rename
+### 已套用的破壞性重新命名
 
 第一批已將集合型 `Find*` 改為 `Get*`，以符合「`Find*` 只回傳單一可選項」：
 

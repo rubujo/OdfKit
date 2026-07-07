@@ -1,4 +1,4 @@
-# 渲染 Backend 部署指南
+# 渲染後端部署指南
 
 本文件說明 `OdfKit.Extensions.Rendering` 的三種 LibreOffice 轉檔後端部署方式，
 供開發、單機與容器化環境選型（Wave 3 REN-1）。
@@ -20,7 +20,7 @@ flowchart LR
 
 | 元件 | 用途 |
 |------|------|
-| `ILibreOfficeConversionBackend` | 轉檔後端抽象（串流 in → 串流 out） |
+| `ILibreOfficeConversionBackend` | 轉檔後端抽象（輸入串流 → 輸出串流） |
 | `LocalProcessBackend` | 本機 `soffice --headless` 子程序 |
 | `UnoserverRestBackend` | HTTP 呼叫 `unoserver-rest-api` |
 | `LibreOfficeHttpRenderer` | 文件層 API + 併發節流（預設接 Unoserver） |
@@ -49,7 +49,7 @@ flowchart LR
 - Windows：`C:\Program Files\LibreOffice\program\soffice.exe`
 - macOS：`/Applications/LibreOffice.app/Contents/MacOS/soffice`
 - Linux：`/usr/bin/soffice`、`/usr/bin/libreoffice`
-- 找不到時 fallback 為 `soffice`（依 PATH）
+- 找不到時回退為 `soffice`（依 PATH）
 
 可透過屬性覆寫：
 
@@ -69,14 +69,14 @@ using OdfKit.Extensions.Rendering;
 using OdfKit.Text;
 
 using TextDocument document = TextDocument.Create();
-document.AddParagraph("高 fidelity fallback 轉為 PDF");
+document.AddParagraph("高保真回退轉為 PDF");
 
 await document.ConvertToPdfAsync("out.pdf", cancellationToken);
 ```
 
-`LibreOfficeConversionFormats` 提供常用 fallback 格式常數。跨格式輸出預設應優先使用
-核心套件已提供的 managed 路徑；本套件保留 LibreOffice 作為高 fidelity 或未 managed 化格式的
-fallback。
+`LibreOfficeConversionFormats` 提供常用回退格式常數。跨格式輸出預設應優先使用
+核心套件已提供的受控路徑；本套件保留 LibreOffice 作為高保真或未受控化格式的
+回退。
 
 ### 串流後端範例
 
@@ -171,10 +171,10 @@ pwsh eng/Test-LibreOfficeInterop.ps1
 
 ## 限制與非目標
 
-- 本套件不代表 OdfKit 的主要轉檔策略；已 managed 化的 HTML / Markdown / RTF / PDF /
+- 本套件不代表 OdfKit 的主要轉檔策略；已受控化的 HTML / Markdown / RTF / PDF /
   OOXML / CSV 路徑應優先使用對應 extension
-- 不提供完整物理分頁或像素級版面渲染；ODG -> SVG 的 managed 向量匯出基礎由
-  `OdfKit.Extensions.Html` 提供，高保真頁面渲染仍可 fallback 到 LibreOffice
+- 不提供完整物理分頁或像素級版面渲染；ODG -> SVG 的受控向量匯出基礎由
+  `OdfKit.Extensions.Html` 提供，高保真頁面渲染仍可回退到 LibreOffice
 - `OdfKit.Extensions.Imaging` 的 SkiaSharp 文字量測與本套件無直接相依
 - 不保證與所有 LibreOffice 版本像素級一致；互通驗收以 26.x 為準
 

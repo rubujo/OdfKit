@@ -8,8 +8,8 @@
 | 如果您要… | 建議先讀 | 再延伸閱讀 |
 |-----------|----------|------------|
 | 快速評估 OdfKit 是否符合需求 | [README](../README.md) | [套件目錄與選型指南](package-catalog.md)、[ODF 格式支援矩陣](odf-format-support.md) |
-| 決定要安裝哪些套件 | [套件目錄與選型指南](package-catalog.md) | [NuGet 相容矩陣](nuget-compatibility-matrix.md)、[Rendering 後端部署](rendering-backend-deployment.md) |
-| 建立第一個範例或驗證 PoC | [快速開始](getting-started.md)、[Core SDK Quickstart](core-quickstart.md) | [Cookbook](cookbook.md)、[samples/README.md](../samples/README.md) |
+| 決定要安裝哪些套件 | [套件目錄與選型指南](package-catalog.md) | [NuGet 相容矩陣](nuget-compatibility-matrix.md)、[渲染後端部署](rendering-backend-deployment.md) |
+| 建立第一個範例或驗證 PoC | [快速開始](getting-started.md)、[核心 SDK 快速開始](core-quickstart.md) | [實作食譜](cookbook.md)、[samples/README.md](../samples/README.md) |
 | 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[ODF 格式支援矩陣](odf-format-support.md) |
 | 規劃部署、升級與版本交付 | [版本與交付資訊](version-delivery.md) | [GitHub Release 發佈指南](github-release-publishing.md)、[CHANGELOG](../CHANGELOG.md) |
 | 確認功能邊界、互通性與驗證證據 | [ODF 格式支援矩陣](odf-format-support.md) | [LibreOffice 互通矩陣](libreoffice-interop-matrix.md)、[OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md)、[ODF Toolkit 對標線](odf-toolkit-parity.md)、[ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md) |
@@ -34,14 +34,14 @@
 | 文件 | 用途 |
 |------|------|
 | [快速開始](getting-started.md) | 第一個專案、第一個文件、CLI 驗證 |
-| [Core SDK Quickstart](core-quickstart.md) | 核心 SDK 的純 managed 建立、載入、驗證與低記憶體匯出路徑 |
-| [Cookbook](cookbook.md) | 常見操作片段與實作範例 |
-| [API Surface Layers](api-surface-layers.md) | API 分層、使用路徑與新增 API 放置準則 |
-| [API Surface Consistency](api-surface-consistency.md) | 公開 API 分層、命名契約與非目標邊界 |
-| [API Surface Inventory](api-surface-inventory.md) | 高階 facade 命名分布、breaking rename 批次與文件掃描基線 |
+| [核心 SDK 快速開始](core-quickstart.md) | 核心 SDK 的純受控建立、載入、驗證與低記憶體匯出路徑 |
+| [實作食譜](cookbook.md) | 常見操作片段與實作範例 |
+| [API 表面分層](api-surface-layers.md) | API 分層、使用路徑與新增 API 放置準則 |
+| [API 表面一致性](api-surface-consistency.md) | 公開 API 分層、命名契約與非目標邊界 |
+| [API 表面盤點](api-surface-inventory.md) | 高階外觀層命名分布、破壞性重新命名批次與文件掃描基線 |
 | [tools/README.md](../tools/README.md) | CLI、schema generator、corpus generator 與 trim smoke 工具總覽 |
 | [samples/README.md](../samples/README.md) | 單檔 Script 範例與輸出說明 |
-| [Rendering 後端部署](rendering-backend-deployment.md) | LibreOffice 渲染擴充的部署要求 |
+| [渲染後端部署](rendering-backend-deployment.md) | LibreOffice 渲染擴充的部署要求 |
 | [Foreign 擴充政策](foreign-extension-policy.md) | 非標準命名空間與相容策略 |
 | [UDX 非功能性目標](udx-non-goals.md) | 明確排除於實作範圍外的功能模組與非目標 |
 
@@ -52,11 +52,11 @@
 | [ODF Toolkit 對標線](odf-toolkit-parity.md) | ODF Toolkit / ODF Validator / ODFDOM 對標狀態 |
 | [LibreOffice 互通矩陣](libreoffice-interop-matrix.md) | 與 LibreOffice 的行為驗證 |
 | [OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md) | OOXML 視覺與 golden 驗收 |
-| [Interop Corpus 總覽](interop-corpus.md) | corpus 來源與使用方式 |
+| [互通語料庫總覽](interop-corpus.md) | corpus 來源與使用方式 |
 | [官方 Corpus 來源](odf-official-corpus-sources.md) | 官方 ODF corpus 來源說明 |
 | [Corpus Manifest 規則](corpus-manifest.md) | corpus manifest 契約 |
-| [CI/CD 驗證設計](ci-cd.md) | GitHub Actions 分層、timeout、Smoke 測試與診斷 artifact 規則 |
-| [Performance Baselines](performance-baselines.md) | Benchmark regression gate、stable profile 與 baseline report 產生方式 |
+| [CI/CD 驗證設計](ci-cd.md) | GitHub Actions 分層、逾時、煙霧測試與診斷產物規則 |
+| [效能基準線](performance-baselines.md) | 基準測試回歸關卡、穩定量測設定檔與基準線報告產生方式 |
 | [GitHub Release 發佈指南](github-release-publishing.md) | 封裝、驗證與發佈步驟 |
 | [ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md) | 對照 ODF 1.4 四份正式規格文本逐章比對 schema／驗證層／公式引擎缺口 |
 
@@ -67,4 +67,4 @@
 | [CHANGELOG](../CHANGELOG.md) | 版本變更與破壞性調整紀錄 |
 | [THIRD-PARTY-NOTICES](../THIRD-PARTY-NOTICES.md) | 第三方授權與版權聲明 |
 | [provenance/README.md](provenance/README.md) | 模組來源、授權與依據 |
-| [Clean-room 來源索引](provenance/clean-room-source-index.md) | 公式評估、schema pattern、JSON Collaboration 與 managed conversion fidelity 的規格來源、不可複製來源與 golden 測試契約 |
+| [Clean-room 來源索引](provenance/clean-room-source-index.md) | 公式評估、schema pattern、JSON Collaboration 與受控轉換保真度的規格來源、不可複製來源與 golden 測試契約 |

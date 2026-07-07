@@ -7,9 +7,9 @@
 
 | 工具 | 主要用途 | 執行方式 |
 |------|----------|----------|
-| `OdfKit.Cli` | 驗證、資訊查詢、sanitize、flat XML / CSV 轉換 | `dotnet run --project tools/OdfKit.Cli --framework net10.0 -- ...` |
+| `OdfKit.Cli` | 驗證、資訊查詢、淨化、Flat XML / CSV 轉換 | `dotnet run --project tools/OdfKit.Cli --framework net10.0 -- ...` |
 | `OdfSchemaGenerator` | 從 OASIS RNG 產生 schema metadata、provider 與 DOM wrapper 輔助輸出 | `dotnet run --project tools/OdfSchemaGenerator -- ...` |
-| `OdfCorpusGenerator` | 依支援格式批次產生 corpus fixtures 並更新 manifest | `dotnet run --project tools/OdfCorpusGenerator -- [repo-root]` |
+| `OdfCorpusGenerator` | 依支援格式批次產生 corpus fixture 並更新 manifest | `dotnet run --project tools/OdfCorpusGenerator -- [repo-root]` |
 | `OdfKit.TrimSmoke` | Native AOT / trimming API 根煙霧測試 | `dotnet run --project tools/OdfKit.TrimSmoke` |
 
 ## 1. OdfKit.Cli
@@ -21,7 +21,7 @@
 | `validate` | 驗證單一檔案或資料夾中的 ODF 文件 |
 | `validate-corpus` | 依 manifest 驗證 corpus |
 | `info` | 顯示 package / MIME / 版本 / entry 摘要 |
-| `metadata` | 顯示文件中介資料 |
+| `metadata` | 顯示文件中繼資料 |
 | `sanitize` | 重新輸出並清理文件，可搭配密碼與加密選項 |
 | `typed-dom-coverage` | 輸出 typed DOM 覆蓋報告 |
 | `convert-flat` | ZIP ODF 與 Flat XML 之間轉換 |
@@ -82,7 +82,7 @@ dotnet run --project tools/OdfSchemaGenerator -- `
 ## 3. OdfCorpusGenerator
 
 `OdfCorpusGenerator` 會依 `OdfDocumentKindDetector.SupportedFormats` 與既定
-scenario 批次產生 corpus fixtures，並更新 `tests/fixtures/corpus/manifest.json`。
+scenario 批次產生 corpus fixture，並更新 `tests/fixtures/corpus/manifest.json`。
 
 ```powershell
 dotnet run --project tools/OdfCorpusGenerator
@@ -98,7 +98,7 @@ dotnet run --project tools/OdfCorpusGenerator -- D:\Dev\Project\Application\OdfK
 
 ## 4. OdfKit.TrimSmoke
 
-`OdfKit.TrimSmoke` 是開發期 smoke test，會直接觸及主要公開 API 根，驗證
+`OdfKit.TrimSmoke` 是開發期煙霧測試，會直接觸及主要公開 API 根，驗證
 trimming / Native AOT 情境下的基本可用性。
 
 ```powershell

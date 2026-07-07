@@ -1,16 +1,16 @@
-# ODF Profile Sources
+# ODF Profile 來源
 
-本文件記錄 OdfKit 內建 profile 的來源、權威層級與驗證狀態。這份文件描述程式碼目前採用的 profile metadata，不代表外部政策來源的即時狀態。
+本文件記錄 OdfKit 內建 Profile 的來源、權威層級與驗證狀態。這份文件描述程式碼目前採用的 Profile 中繼資料，不代表外部政策來源的即時狀態。
 
 ## 狀態欄位
 
 - `AuthorityLevel`：規則的權威層級。`Normative` 表示可直接追溯到規格或法規；`Compatibility` 表示用於互通或工具相容性；`Draft` 表示仍等待有效官方來源確認。
 - `VerificationStatus`：來源確認程度。`VerifiedOfficial` 表示來源明確且直接；`OfficialButIndirect` 表示有官方來源但此 profile 是 OdfKit 的相容性映射；`CompatibilityOnly` 表示僅作工具相容性檢查；`NeedsActiveSource` 表示需要重新確認有效來源。
-- `SupportedVersions`：profile 接受的 ODF 版本範圍。
+- `SupportedVersions`：Profile 接受的 ODF 版本範圍。
 
 ## 內建 Profile
 
-| Profile | Source | Source date | AuthorityLevel | VerificationStatus | SupportedVersions | Notes |
+| Profile | 來源 | 來源日期 | AuthorityLevel | VerificationStatus | SupportedVersions | 備註 |
 |---|---|---:|---|---|---|---|
 | `OASIS_ODF_1_0` | `https://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf` | `2005-05-01` | `Normative` | `VerifiedOfficial` | `1.0` | 官方 OASIS ODF 1.0 標準。 |
 | `OASIS_ODF_1_1` | `https://docs.oasis-open.org/office/v1.1/OS/OpenDocument-schema-v1.1.rng` | `2007-02-01` | `Normative` | `VerifiedOfficial` | `1.1` | 官方 OASIS ODF 1.1 標準。 |
@@ -44,7 +44,7 @@
 
 ## 維護規則
 
-- 若 profile 的 `SourceUri`、`SourceDate`、`AuthorityLevel`、`VerificationStatus` 或 `SupportedVersions` 變更，必須同步更新本文件與相關測試。
-- `NeedsActiveSource` 的 profile 不得在文件中標示為 official、verified 或 normative。
-- `CompatibilityOnly` 的 profile 不得用於宣稱法規合規，只能描述為工具或流程相容性檢查。
+- 若 Profile 的 `SourceUri`、`SourceDate`、`AuthorityLevel`、`VerificationStatus` 或 `SupportedVersions` 變更，必須同步更新本文件與相關測試。
+- `NeedsActiveSource` 的 Profile 不得在文件中標示為 official、verified 或 normative。
+- `CompatibilityOnly` 的 Profile 不得用於宣稱法規合規，只能描述為工具或流程相容性檢查。
 - `all-known` 表示目前程式碼接受所有已建模的 ODF 版本，不代表外部來源明確批准所有版本。

@@ -1,7 +1,7 @@
 # Clean-room 來源索引
 
 本文件集中記錄 `DefaultFormulaEvaluator.*`、`OdfSchemaPatternValidator.*`、
-`OdfKit.Extensions.Collaboration`、OpenPGP 加密與 managed conversion fidelity 的規格來源、
+`OdfKit.Extensions.Collaboration`、OpenPGP 加密與受控轉換保真度的規格來源、
 測試證據與非目標，避免日後維護者把外部參考實作或辦公套件原始碼當成可複製來源。
 
 ## 原則
@@ -17,12 +17,12 @@
 | 範圍 | 權威來源 | OdfKit 實作入口 | Golden / regression 證據 |
 |---|---|---|---|
 | OpenFormula 表達式、型別、函式與 evaluator conformance | OASIS OpenDocument v1.4 Part 4 OpenFormula | `DefaultFormulaEvaluator.*`、`FormulaParser`、`FormulaTokenizer`、`OdfFormulaSupport` | `OpenFormulaSupportTests`、`FormulaHighLevelApiTests`、`FormulaEvaluatorStressTests`、`FormulaTranslationStressTests` |
-| ODS 儲存格公式 round-trip 與 unsupported formula 保真 | OASIS OpenDocument v1.4 Part 3 schema 與 Part 4 OpenFormula | `SpreadsheetDocument.Formulas.cs`、`OdfTableSheet.Formulas.cs`、`FormulaPrefixNormalizer` | `OpenFormulaSupportTests.SpreadsheetFormulaRoundTripPreservesUnsupportedFormula`、`SpreadsheetApiUsabilityTests` |
+| ODS 儲存格公式來回讀寫與 unsupported formula 保真 | OASIS OpenDocument v1.4 Part 3 schema 與 Part 4 OpenFormula | `SpreadsheetDocument.Formulas.cs`、`OdfTableSheet.Formulas.cs`、`FormulaPrefixNormalizer` | `OpenFormulaSupportTests.SpreadsheetFormulaRoundTripPreservesUnsupportedFormula`、`SpreadsheetApiUsabilityTests` |
 | ODF / OOXML 公式語法轉換 | OASIS OpenFormula 與 ISO / ECMA OOXML 公開格式語法 | `OdfFormulaTranslator.*` | `OoxmlConversionTests`、`FormulaTranslationStressTests` |
 | LibreOffice 相容擴充函式 | LibreOffice 公開文件與自有互通測試輸出 | `OdfFormulaSupport`、`DefaultFormulaEvaluator` | `OpenFormulaSupportTests.LibreOfficeEasterSundayEvaluatesToDateSerial`、`OpenFormulaSupportTests.LibreOfficeIsOmittedEvaluatesByArgumentCount` |
 
 公式評估不是完整試算表引擎：不承諾重算所有 host-defined 行為、volatile function、
-多使用者計算狀態或任意外部連結資料來源。未支援函式應診斷並保留原公式，而不是破壞 round-trip。
+多使用者計算狀態或任意外部連結資料來源。未支援函式應診斷並保留原公式，而不是破壞來回讀寫。
 
 ## OpenPGP 加密來源
 
@@ -44,7 +44,7 @@ BouncyCastle 或其他 OpenPGP 實作（例如 GnuPG、RNP）的原始碼；僅�
 | ODF 1.1 / 1.2 / 1.3 / 1.4 RELAX NG schema | OASIS OpenDocument schema artifacts | `OdfSchemaGenerator`、`Odf*OfficialSchemaProvider.g.cs`、`OdfSchemaPatternValidator.*` | `OdfSchemaGeneratorTests`、`TypedDomParityTests`、`DocsAndCorpusContractTests` |
 | RELAX NG pattern 語意 | RELAX NG Specification | `OdfSchemaPatternValidator.Content.*`、`OdfSchemaPatternValidator.NameClasses.cs`、`OdfSchemaPatternValidator.Attributes.*` | `ComplianceTests.SchemaPatternValidator*` |
 | XML Schema datatypes 與 facets | W3C XML Schema Part 2 Datatypes | `OdfSchemaPatternValidator.DataTypes.*` | `ComplianceTests.SchemaPatternValidatorHandlesTextDataAndValueNodes`、`ComplianceTests.SchemaPatternValidatorHandlesAttributeDataTypeNodes` |
-| ODF package / flat XML corpus gate | OASIS ODF package 與 schema 規範、自有 generated corpus | `OdfProfileRuleValidator.SchemaPatterns.cs`、CLI `validate-corpus` | `CorpusComplianceTests`、`tests/fixtures/corpus/manifest.json`、`eng/Test-OdfCorpus.ps1` |
+| ODF package / Flat XML corpus gate | OASIS ODF package 與 schema 規範、自有 generated corpus | `OdfProfileRuleValidator.SchemaPatterns.cs`、CLI `validate-corpus` | `CorpusComplianceTests`、`tests/fixtures/corpus/manifest.json`、`eng/Test-OdfCorpus.ps1` |
 
 Schema pattern validator 目標是支援 OdfKit 內建 profile 的可驗證 ODF XML 結構，而不是通用
 RELAX NG validator。若需要對外部 schema 做完整 RELAX NG 驗證，應新增獨立 validator 或接外部工具，
@@ -63,15 +63,15 @@ JSON Collaboration 是選用 extension-scoped compatibility subset，不是核�
 Java ODF Toolkit 原始碼。完整多人協同演算法、OT、CRDT、undo stack、任意衝突合併、完整 drawing
 DOM、動態表格擴張與 header/footer/note selection 完整語意仍屬非目標。
 
-## Managed conversion fidelity 來源
+## 受控轉換保真度來源
 
 | 範圍 | 權威來源 | OdfKit 實作入口 | Golden / regression 證據 |
 |---|---|---|---|
 | ODG enhanced-path 與 SVG path mapping | OASIS OpenDocument drawing schema、SVG path 公開規格與 LibreOffice 匯出行為觀察 | `OdfKit.Extensions.Html/OdfSvgExporter.cs` | `ManagedSvgExportTests.SvgExporterTranslatesEnhancedPathAngleEllipseArcs`、`ManagedSvgExportTests.SvgExporterSplitsFullEnhancedPathEllipseArcs`、`ManagedSvgExportTests.SvgExporterCoversLibreOfficeStyleCustomShapeCorpus` |
-| ODT / RTF 控制字、註解、欄位與圖片 marker round-trip | RTF 1.9.1 Specification、ODF text schema 與自有 importer/exporter regression | `OdfKit.Extensions.Html/OdfRtfImporter.cs`、`OdfRtfExporter.cs` | `ManagedTextExportTests.RtfImporterConvertsSectionAndColumnBreaksToSoftPageBreaks`、`ManagedTextExportTests.RtfImporterConvertsSoftLineAndSoftPageControls`、`ManagedTextExportTests.RtfImporterPreservesStandardAnnotationGroups` |
+| ODT / RTF 控制字、註解、欄位與圖片 marker 來回讀寫 | RTF 1.9.1 Specification、ODF text schema 與自有 importer/exporter regression | `OdfKit.Extensions.Html/OdfRtfImporter.cs`、`OdfRtfExporter.cs` | `ManagedTextExportTests.RtfImporterConvertsSectionAndColumnBreaksToSoftPageBreaks`、`ManagedTextExportTests.RtfImporterConvertsSoftLineAndSoftPageControls`、`ManagedTextExportTests.RtfImporterPreservesStandardAnnotationGroups` |
 | ODP / PPTX timing、theme 與 master-style mapping | PresentationML / Open XML SDK 文件、ODF presentation schema 與 PowerPoint / LibreOffice 互通觀察 | `OdfKit.Extensions.Ooxml/OdpToPptxConverter.cs`、`PptxToOdpConverter.cs` | `ManagedPptxConversionTests.PptxConvertersPreserveBasicObjectAnimations`、`PptxToOdpConverterExpandsBuildParagraphWhenEffectOmitsParagraphRange`、`PptxToOdpConverterParsesMasterInheritanceAndTimeline` |
 
-Managed conversion fidelity 允許觀察 LibreOffice、PowerPoint 或其他辦公套件的輸出檔案與行為，
+受控轉換保真度允許觀察 LibreOffice、PowerPoint 或其他辦公套件的輸出檔案與行為，
 但觀察結果必須寫成相容性 regression，不得宣稱為規格要求。新增轉檔 fidelity 行為時，應以
 最小 ODF / OOXML / RTF / SVG fixture 鎖定輸入與輸出，不以外部原始碼或不可再散布 golden
 作為依據。
@@ -84,7 +84,7 @@ Managed conversion fidelity 允許觀察 LibreOffice、PowerPoint 或其他辦�
 
 ## 更新流程
 
-1. 先確認變更屬於公式評估、schema pattern、JSON Collaboration 或 managed conversion fidelity。
+1. 先確認變更屬於公式評估、schema pattern、JSON Collaboration 或受控轉換保真度。
 2. 在 PR 說明或測試名稱中標明來源：OASIS / RELAX NG / XML Schema / LibreOffice 觀察 / PowerPoint 觀察 / TDF 公開 JSON wire shape / 自有 corpus。
 3. 新增最小 golden 或 regression 測試，覆蓋正向與至少一個失敗模式。
 4. 執行相關入口：

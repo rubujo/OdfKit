@@ -1,11 +1,11 @@
-﻿# OdfKit Cookbook
+# OdfKit 實作食譜
 
 本文件提供可直接改寫的常見 ODF 操作範例。範例只描述目前已有測試支撐的能力。
 
 ## 複雜文件場景總覽
 
 OdfKit 的高階 API 目標是讓 C# / .NET 開發者用少量程式碼建立中高複雜度 ODF 文件；
-目前建議以既有 facade 與 builder 混用，而不是直接操作 ZIP 或 XML：
+目前建議以既有外觀層與 builder 混用，而不是直接操作 ZIP 或 XML：
 
 - **年度報告（ODT）**：使用 `TextDocument.Builder()`、標題階層、目錄、段落富文字、表格、註腳、
   註解、區段、頁首／頁尾與嵌入圖表，最後可接 Markdown/RTF 延伸套件。
@@ -14,7 +14,7 @@ OdfKit 的高階 API 目標是讓 C# / .NET 開發者用少量程式碼建立中
   的嚴格順序低記憶體模式。
 - **商業簡報（ODP）**：使用 `PresentationDocument.Builder()` 建立標題、內容、雙欄、
   圖表投影片、講者備註與轉場。
-- **流程圖／架構圖（ODG）**：使用 `DrawingDocument.Builder()` 與頁面 facade 建立形狀、
+- **流程圖／架構圖（ODG）**：使用 `DrawingDocument.Builder()` 與頁面外觀層建立形狀、
   連接線、文字框、圖片與 SVG 匯出。
 
 ## 年度報告（ODT）
@@ -179,7 +179,7 @@ using TextDocument merged = OdtOperationsImporter.Merge(
 Console.WriteLine(report.ReplayedCount);
 ```
 
-匯入端目前支援 TDF changes 封包、typed operation log、未知欄位 round-trip、段落與文字新增、Tab、換行、基本 range 字元格式（含前景色、背景色、大小寫轉換、small-caps 與上標／下標）、
+匯入端目前支援 TDF changes 封包、typed operation log、未知欄位來回讀寫、段落與文字新增、Tab、換行、基本 range 字元格式（含前景色、背景色、大小寫轉換、small-caps 與上標／下標）、
 單段落刪除／移動、最上層段落分割／合併、基本清單段落、固定尺寸文字表格填值、欄位、comment、header/footer、font declaration 與安全 drawing placeholder。
 完整 OT／CRDT、任意衝突合併、跨段落刪除／移動、完整 drawing DOM 與 header/footer/note selection
 仍屬非目標；不明或無法安全套用的 operation 會進入 import report 診斷。
@@ -497,7 +497,7 @@ using OdfDocument document = OdfDocument.Load("vendor-file.odt");
 document.Save("vendor-file-copy.odt");
 ```
 
-此路徑適合在只需要讀取、保存或做有限修改時使用。未知 XML 與未知 package entries 的保真由 round-trip 測試覆蓋。
+此路徑適合在只需要讀取、保存或做有限修改時使用。未知 XML 與未知 package entries 的保真由來回讀寫測試覆蓋。
 
 ## 串流寫入大型 ODS
 
@@ -664,7 +664,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack file.fodt file
 ```
 
 `validate` 在 CI 中可用 exit code 判斷結果：`0` 表示通過，`1` 表示驗證錯誤或 `--fail-on warning` 命中，`2` 表示參數或路徑錯誤。
-`sanitize` 會移除巨集、指令碼參照與簽章 artifact，並另存為新的 ODF 檔案；輸出會包含
+`sanitize` 會移除巨集、指令碼參照與簽章產物，並另存為新的 ODF 檔案；輸出會包含
 `removed-artifacts`，方便 CI 稽核實際移除數量。加密文件可用 `--password` 載入，並用
 `--output-password` 重新加密輸出；密碼錯誤時會以 exit code `2` 回報，不會產生輸出檔。
 

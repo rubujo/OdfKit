@@ -22,7 +22,7 @@ Strict profile 不允許以 ODF namespace 偽裝擴充；若元素或屬性位�
 但不存在於選定 schema metadata，驗證器會回報 `DisallowInvalidOdfNamespaceExtensions`
 或 `RequireOdfNamespaceValidity`。
 
-## Round-Trip 策略
+## 來回讀寫策略
 
 OdfKit 的 DOM reader / writer 以 `NamespaceURI` 與 `LocalName` 為判斷基準，並保留
 prefix、unknown ODF element、foreign element、foreign attribute、comment 與 processing

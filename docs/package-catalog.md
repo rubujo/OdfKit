@@ -13,7 +13,7 @@
 | `OdfKit.Extensions.Ooxml` | 互通擴充 | `net10.0;netstandard2.0` | DOCX / XLSX 轉換與互通 | 依賴 ClosedXML 與 Open XML SDK |
 | `OdfKit.Extensions.Pdf` | 匯出擴充 | `net10.0;netstandard2.0` | PDF 匯出 | 依賴 PDFsharp-MigraDoc |
 | `OdfKit.Extensions.Rendering` | 後端渲染擴充 | `net10.0;netstandard2.0` | 以 LibreOffice 後端產生視覺輸出 | 需外部 LibreOffice 或相容程序 |
-| `OdfKit.Extensions.Rdf` | 中介資料擴充 | `net10.0;netstandard2.0` | `manifest.rdf`、RDF 圖形與 SPARQL 查詢橋接 | 依賴 dotNetRdf |
+| `OdfKit.Extensions.Rdf` | 中繼資料擴充 | `net10.0;netstandard2.0` | `manifest.rdf`、RDF 圖形與 SPARQL 查詢橋接 | 依賴 dotNetRdf |
 | `OdfKit.Extensions.Collaboration` | 協作擴充 | `net10.0;netstandard2.0` | ODF Toolkit 相容 JSON operations 匯出 | 適合協作編輯流程整合 |
 
 ## 2. 非封裝工具與工程元件
@@ -37,7 +37,7 @@
 | 產生圖片預覽或圖表 fallback | `OdfKit` + `OdfKit.Extensions.Imaging` |
 | 與 Office 生態互通 | `OdfKit` + `OdfKit.Extensions.Ooxml` |
 | 必須依賴 LibreOffice 視覺後端 | `OdfKit` + `OdfKit.Extensions.Rendering` |
-| 要保留或查詢 RDF 中介資料 | `OdfKit` + `OdfKit.Extensions.Rdf` |
+| 要保留或查詢 RDF 中繼資料 | `OdfKit` + `OdfKit.Extensions.Rdf` |
 | 協作編輯或操作序列輸出 | `OdfKit` + `OdfKit.Extensions.Collaboration` |
 | 在 CI / 批次流程中做驗證或轉檔 | `OdfKit.Cli` |
 | 將資料庫查詢（含 Entity Framework Core）或任意物件序列匯出成 ODS，或反向以 `DbDataReader` 邊界串流灌入 `SqlBulkCopy` 等 bulk copy API | `OdfKit`（核心即可，透過 `ObjectDataReader<T>` 與 `OdsStreamWriter.WriteDataAsync<T>`，無需額外擴充套件） |
