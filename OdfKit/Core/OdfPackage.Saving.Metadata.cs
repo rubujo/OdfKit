@@ -1,7 +1,7 @@
 ﻿namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfPackage API.
-/// 提供 OdfPackage API。
+/// Adds metadata writing helpers used by package save operations.
+/// 提供封裝儲存作業使用的中繼資料寫入輔助方法。
 /// </summary>
 
 public sealed partial class OdfPackage

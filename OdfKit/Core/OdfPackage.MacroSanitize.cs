@@ -2,8 +2,8 @@
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfPackage API.
-/// 提供 OdfPackage API。
+/// Adds macro sanitization helpers for ODF packages.
+/// 提供 ODF 封裝的巨集淨化輔助方法。
 /// </summary>
 
 public sealed partial class OdfPackage

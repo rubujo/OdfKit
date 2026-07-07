@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfSigner API.
-/// 提供 OdfSigner API。
+/// Implements XMLDSig and XAdES signing for ODF packages.
+/// 實作 ODF 封裝的 XMLDSig 與 XAdES 簽署流程。
 /// </summary>
 
 public static partial class OdfSigner

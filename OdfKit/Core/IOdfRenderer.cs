@@ -21,8 +21,8 @@ public interface IOdfRenderer
 }
 
 /// <summary>
-/// Provides the OdfRendererRegistry API.
-/// 提供 IOdfRenderer 實作之全域註冊與取得機制。
+/// Provides global registration and discovery for <see cref="IOdfRenderer"/> implementations.
+/// 提供 <see cref="IOdfRenderer"/> 實作的全域註冊與探索機制。
 /// </summary>
 public static class OdfRendererRegistry
 {
@@ -30,18 +30,18 @@ public static class OdfRendererRegistry
     private static bool _attemptedAutoRegister;
 
     /// <summary>
-    /// Executes the Register operation.
-    /// 註冊預設的 ODF 渲染器。
+    /// Registers the renderer used by document export helpers.
+    /// 註冊文件匯出輔助方法使用的渲染器。
     /// </summary>
-    /// <param name="renderer">要註冊的渲染器實例</param>
+    /// <param name="renderer">The renderer instance to register. / 要註冊的渲染器執行個體。</param>
     public static void Register(IOdfRenderer renderer)
     {
         _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
     }
 
     /// <summary>
-    /// Provides the member member.
-    /// 取得目前已註冊的渲染器實例，若未註冊則嘗試動態自動載入已引用的 PDF 擴充套件。
+    /// Gets the registered renderer, or tries to discover the PDF extension renderer on first access.
+    /// 取得已註冊的渲染器；若尚未註冊，第一次存取時會嘗試探索 PDF 擴充套件渲染器。
     /// </summary>
     public static IOdfRenderer? Instance
     {

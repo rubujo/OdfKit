@@ -6,8 +6,8 @@ using OdfKit.Styles;
 using OdfKit.Compliance;
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfDocument API.
-/// 提供 OdfDocument API。
+/// Adds master-page style accessors for ODF documents.
+/// 提供 ODF 文件的主版頁面樣式存取 API。
 /// </summary>
 
 public abstract partial class OdfDocument

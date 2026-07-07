@@ -4,8 +4,8 @@ using OdfKit.Styles;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfDocument API.
-/// 提供 OdfDocument API。
+/// Wires collaborators used by document merge operations.
+/// 串接文件合併作業使用的協作者。
 /// </summary>
 
 public abstract partial class OdfDocument

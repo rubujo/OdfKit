@@ -4,8 +4,8 @@ using OdfKit.DOM;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfPackage API.
-/// 提供 OdfPackage API。
+/// Adds disposal and asynchronous cleanup behavior for ODF packages.
+/// 提供 ODF 封裝的處置與非同步清理行為。
 /// </summary>
 
 public sealed partial class OdfPackage

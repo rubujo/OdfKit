@@ -7,8 +7,8 @@ using OdfKit.DOM;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfDocument API.
-/// 提供 OdfDocument API。
+/// Adds validation helpers for ODF documents.
+/// 提供 ODF 文件驗證輔助方法。
 /// </summary>
 
 public abstract partial class OdfDocument

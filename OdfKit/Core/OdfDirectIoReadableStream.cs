@@ -10,8 +10,8 @@ using Microsoft.Win32.SafeHandles;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Provides the OdfDirectIoReadableStream API.
-/// 實作作業系統 Direct I/O 的高效唯讀資料流。
+/// Provides a read-only stream optimized for Direct I/O file access when the platform supports it.
+/// 提供在平台支援時使用 Direct I/O 檔案存取最佳化的唯讀資料流。
 /// </summary>
 public sealed class OdfDirectIoReadableStream : Stream
 {
@@ -48,10 +48,10 @@ public sealed class OdfDirectIoReadableStream : Stream
     private readonly object _lock = new();
 
     /// <summary>
-    /// Executes the OdfDirectIoReadableStream operation.
+    /// Initializes a new instance of the <see cref="OdfDirectIoReadableStream"/> class.
     /// 初始化 <see cref="OdfDirectIoReadableStream"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="filePath">檔案路徑。</param>
+    /// <param name="filePath">The path of the file to read. / 要讀取的檔案路徑。</param>
     public OdfDirectIoReadableStream(string filePath)
     {
         _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
@@ -132,8 +132,8 @@ public sealed class OdfDirectIoReadableStream : Stream
     public override long Length => _totalLength;
 
     /// <summary>
-    /// Provides the member member.
-    /// 提供 member 成員。
+    /// Gets or sets the current stream position.
+    /// 取得或設定目前資料流位置。
     /// </summary>
     /// <inheritdoc />
     public override long Position

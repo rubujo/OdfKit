@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Provides the OdfDoubleBufferedWritableStream API.
-/// 唯寫的雙緩衝非同步資料流，在非同步寫入緩衝區 A 的同時，允許主執行緒繼續寫入緩衝區 B，實現 CPU 與磁碟 I/O 的流水線重疊。
+/// Provides a write-only double-buffered stream that overlaps caller writes with asynchronous flushing.
+/// 提供唯寫雙緩衝資料流，讓呼叫端寫入與非同步刷寫彼此重疊。
 /// </summary>
 public sealed class OdfDoubleBufferedWritableStream : Stream
 {
@@ -30,7 +30,7 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
     internal static int ReturnedBufferCountForTests;
 
     /// <summary>
-    /// Executes the OdfDoubleBufferedWritableStream operation.
+    /// Initializes a new instance of the <see cref="OdfDoubleBufferedWritableStream"/> class.
     /// 初始化 <see cref="OdfDoubleBufferedWritableStream"/> 類別的新執行個體。
     /// </summary>
     public OdfDoubleBufferedWritableStream(Stream underlyingStream, int bufferSize = 64 * 1024, bool leaveOpen = false)
@@ -77,8 +77,8 @@ public sealed class OdfDoubleBufferedWritableStream : Stream
     public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Provides the member member.
-    /// 提供 member 成員。
+    /// Gets or sets the stream position.
+    /// 取得或設定資料流位置。
     /// </summary>
     /// <inheritdoc />
     public override long Position

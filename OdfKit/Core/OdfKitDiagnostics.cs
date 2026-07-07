@@ -74,8 +74,8 @@ public class OdfDiagnosticsEventArgs(OdfDiagnosticsLevel level, string message, 
 public static class OdfKitDiagnostics
 {
     /// <summary>
-    /// Provides the member member.
-    /// 全域靜態診斷日誌事件。開發者可訂閱此事件以將診斷資訊導向自訂的日誌系統。
+    /// Occurs when OdfKit emits a diagnostic log event.
+    /// 當 OdfKit 發出診斷日誌事件時觸發。
     /// </summary>
     public static event EventHandler<OdfDiagnosticsEventArgs>? Log;
 

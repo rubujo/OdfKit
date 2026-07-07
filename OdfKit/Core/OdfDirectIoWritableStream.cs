@@ -10,8 +10,8 @@ using Microsoft.Win32.SafeHandles;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Provides the OdfDirectIoWritableStream API.
-/// 實作作業系統 Direct I/O 的高效寫入資料流。
+/// Provides a write-only stream optimized for Direct I/O file access when the platform supports it.
+/// 提供在平台支援時使用 Direct I/O 檔案存取最佳化的唯寫資料流。
 /// </summary>
 public sealed class OdfDirectIoWritableStream : Stream
 {
@@ -32,10 +32,10 @@ public sealed class OdfDirectIoWritableStream : Stream
     private bool _isDisposed;
 
     /// <summary>
-    /// Executes the OdfDirectIoWritableStream operation.
+    /// Initializes a new instance of the <see cref="OdfDirectIoWritableStream"/> class.
     /// 初始化 <see cref="OdfDirectIoWritableStream"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="filePath">檔案路徑。</param>
+    /// <param name="filePath">The path of the file to write. / 要寫入的檔案路徑。</param>
     public OdfDirectIoWritableStream(string filePath)
     {
         _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
@@ -104,8 +104,8 @@ public sealed class OdfDirectIoWritableStream : Stream
     public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Provides the member member.
-    /// 提供 member 成員。
+    /// Gets the number of bytes accepted by the stream.
+    /// 取得資料流已接受的位元組數。
     /// </summary>
     /// <inheritdoc />
     public override long Position

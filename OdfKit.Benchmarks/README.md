@@ -42,6 +42,18 @@ dotnet run -c Release --project OdfKit.Benchmarks -- --filter *OdfTableSheetCell
 - `OdfPackageLoadBenchmarks`：ODF 封裝載入效能。
 - `OdsStreamWriterBenchmarks`：`OdsStreamWriter` 大量列寫入效能，見類別內建 XML 文件說明。
 
+## Stable local profile
+
+正式比較效能變更時，優先使用較長、以時間為導向的 profile：
+
+```powershell
+pwsh eng/Benchmark-Stable.ps1 -Filter "*OdsStreamWriter*"
+```
+
+此 profile 預設使用 BenchmarkDotNet `Medium` job、`250 ms` iteration time、`9` 到 `15`
+次量測迭代，並開啟 memory 與 exception 欄位。它比 smoke 指令更慢，但較能避免極短迭代
+造成的量測雜訊。
+
 ## Result policy
 
 Benchmark 結果受 CPU、記憶體、磁碟、OS、電源設定與 JIT 狀態影響，不提交本機輸出作為固定

@@ -5,8 +5,8 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Provides the OdfCrc32Stream API.
-/// 裝飾者串流，在讀取或寫入資料時以 <see cref="OdfCrc32"/> 實時計算累積的 CRC-32 校驗碼。
+/// Wraps a stream and computes a running CRC-32 checksum while bytes are read or written.
+/// 包裝資料流，並在讀取或寫入位元組時即時計算累積的 CRC-32 校驗碼。
 /// </summary>
 public sealed class OdfCrc32Stream : Stream
 {
@@ -21,11 +21,11 @@ public sealed class OdfCrc32Stream : Stream
 #endif
 
     /// <summary>
-    /// Executes the OdfCrc32Stream operation.
+    /// Initializes a new instance of the <see cref="OdfCrc32Stream"/> class.
     /// 初始化 <see cref="OdfCrc32Stream"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="underlyingStream">底層被包裝的實體資料流</param>
-    /// <param name="expectedCrc">選用的預期 CRC-32 值；若提供，會在讀取至尾端時自動進行校驗</param>
+    /// <param name="underlyingStream">The stream to wrap. / 要包裝的資料流。</param>
+    /// <param name="expectedCrc">The optional expected CRC-32 value to verify at end of stream. / 選用的預期 CRC-32 值，會在讀取至結尾時驗證。</param>
     public OdfCrc32Stream(Stream underlyingStream, uint? expectedCrc = null)
     {
         _underlyingStream = underlyingStream ?? throw new ArgumentNullException(nameof(underlyingStream));
@@ -75,8 +75,8 @@ public sealed class OdfCrc32Stream : Stream
     public override long Length => _underlyingStream.Length;
 
     /// <summary>
-    /// Provides the member member.
-    /// 提供 member 成員。
+    /// Gets or sets the current position of the underlying stream.
+    /// 取得或設定底層資料流的目前位置。
     /// </summary>
     /// <inheritdoc />
     public override long Position

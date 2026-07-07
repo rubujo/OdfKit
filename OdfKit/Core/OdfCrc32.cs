@@ -4,8 +4,8 @@ using System.Runtime.CompilerServices;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Provides the OdfCrc32 API.
-/// 提供高效且零分配的 CRC-32 (ISO-HDLC) 校驗碼計算。
+/// Computes CRC-32 (ISO-HDLC) checksums with hardware acceleration when available.
+/// 在可用時使用硬體加速計算 CRC-32 (ISO-HDLC) 校驗碼。
 /// </summary>
 public static class OdfCrc32
 {
@@ -54,11 +54,11 @@ public static class OdfCrc32
     }
 
     /// <summary>
-    /// Executes the Compute operation.
-    /// 計算指定位元組 Span 的 CRC-32 值。
+    /// Computes the CRC-32 checksum for the specified bytes.
+    /// 計算指定位元組的 CRC-32 校驗碼。
     /// </summary>
-    /// <param name="bytes">要計算的唯讀位元組 Span</param>
-    /// <returns>CRC-32 校驗碼</returns>
+    /// <param name="bytes">The bytes to process. / 要處理的位元組。</param>
+    /// <returns>The final CRC-32 checksum. / 最終 CRC-32 校驗碼。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint Compute(ReadOnlySpan<byte> bytes)
     {
@@ -70,12 +70,12 @@ public static class OdfCrc32
     }
 
     /// <summary>
-    /// Executes the Compute operation.
-    /// 以現有的 CRC 種子（Seed）累積計算指定位元組 Span 的 CRC-32 值。
+    /// Accumulates CRC-32 state with the specified bytes.
+    /// 使用指定位元組累積 CRC-32 狀態。
     /// </summary>
-    /// <param name="currentCrc">之前的 CRC 狀態值（累計中間狀態，或 0xFFFFFFFF）</param>
-    /// <param name="bytes">要計算的唯讀位元組 Span</param>
-    /// <returns>新的 CRC 中間狀態值</returns>
+    /// <param name="currentCrc">The previous CRC state, usually <c>0xFFFFFFFF</c>. / 先前的 CRC 狀態，通常為 <c>0xFFFFFFFF</c>。</param>
+    /// <param name="bytes">The bytes to process. / 要處理的位元組。</param>
+    /// <returns>The updated intermediate CRC state. / 更新後的 CRC 中間狀態。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint Compute(uint currentCrc, ReadOnlySpan<byte> bytes)
     {

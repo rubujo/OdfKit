@@ -3,8 +3,8 @@ using OdfKit.DOM;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfDocument API.
-/// 提供 OdfDocument API。
+/// Adds protected helpers for ODF settings and metadata nodes.
+/// 提供 ODF 設定與中繼資料節點的受保護輔助方法。
 /// </summary>
 
 
@@ -80,8 +80,8 @@ public abstract partial class OdfDocument
         => OdfDocumentSettingsEngine.FindOrCreateConfigItemNode(entryNode, name, type);
 
     /// <summary>
-    /// Provides the member member.
-    /// 取得或設定外部連結更新模式。
+    /// Gets or sets the external link update mode stored in document settings.
+    /// 取得或設定文件設定中儲存的外部連結更新模式。
     /// </summary>
     public int LinkUpdateMode
     {
@@ -99,8 +99,8 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Provides the member member.
-    /// 取得或設定是否自動計算公式（試算表專屬，但可全域讀寫）。
+    /// Gets or sets a value indicating whether spreadsheet formulas are recalculated automatically.
+    /// 取得或設定是否自動重新計算試算表公式。
     /// </summary>
     public bool AutoCalculate
     {

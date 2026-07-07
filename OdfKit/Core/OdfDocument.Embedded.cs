@@ -7,8 +7,8 @@ using System.Text;
 using OdfKit.Compliance;
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfDocument API.
-/// 提供 OdfDocument API。
+/// Adds embedded ODF document creation and lookup APIs.
+/// 提供嵌入式 ODF 文件的建立與查找 API。
 /// </summary>
 
 public abstract partial class OdfDocument
@@ -19,12 +19,12 @@ public abstract partial class OdfDocument
     #region Embedded Documents
 
     /// <summary>
-    /// Executes the GetEmbeddedDocument operation.
-    /// 取得指定子路徑的嵌入式 ODF 文件。
+    /// Gets an embedded ODF document wrapper for the specified package subpath.
+    /// 取得指定封裝子路徑的嵌入式 ODF 文件包裝器。
     /// </summary>
-    /// <typeparam name="T">嵌入式文件 wrapper 類型</typeparam>
-    /// <param name="subPath">封裝中的子路徑</param>
-    /// <returns>嵌入式文件 wrapper</returns>
+    /// <typeparam name="T">The embedded document wrapper type. / 嵌入式文件包裝器型別。</typeparam>
+    /// <param name="subPath">The package subpath that contains the embedded document. / 包含嵌入式文件的封裝子路徑。</param>
+    /// <returns>The embedded document wrapper. / 嵌入式文件包裝器。</returns>
     public T GetEmbeddedDocument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(string subPath) where T : OdfDocument
     {
         if (string.IsNullOrEmpty(subPath))
@@ -44,12 +44,12 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the CreateEmbeddedDocument operation.
-    /// 建立指定子路徑的嵌入式 ODF 文件。
+    /// Creates a new embedded ODF document at the specified package subpath.
+    /// 在指定封裝子路徑建立新的嵌入式 ODF 文件。
     /// </summary>
-    /// <typeparam name="T">嵌入式文件 wrapper 類型</typeparam>
-    /// <param name="subPath">封裝中的子路徑</param>
-    /// <returns>建立完成的嵌入式文件 wrapper</returns>
+    /// <typeparam name="T">The embedded document wrapper type. / 嵌入式文件包裝器型別。</typeparam>
+    /// <param name="subPath">The package subpath where the embedded document is created. / 建立嵌入式文件的封裝子路徑。</param>
+    /// <returns>The created embedded document wrapper. / 建立完成的嵌入式文件包裝器。</returns>
     /// <remarks>
     /// 此方法會在建立時立即呼叫一次傳回文件的 <c>Save()</c> 以寫入最小骨架內容；
     /// 後續透過傳回 wrapper 所做的修改會由父文件 <see cref="Save(OdfSaveOptions?)"/>、

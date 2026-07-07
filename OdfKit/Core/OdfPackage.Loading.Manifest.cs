@@ -3,8 +3,8 @@
 using OdfKit.Compliance;
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfPackage API.
-/// 提供 OdfPackage API。
+/// Adds manifest parsing helpers used while loading ODF packages.
+/// 提供載入 ODF 封裝時使用的 manifest 解析輔助方法。
 /// </summary>
 
 public sealed partial class OdfPackage

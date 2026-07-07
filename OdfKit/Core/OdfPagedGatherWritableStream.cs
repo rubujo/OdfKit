@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Provides the OdfPagedGatherWritableStream API.
-/// 將寫入資料分割為固定大小頁面，並在檔案目標上以向量化寫入一次提交多個頁面。
+/// Buffers writes into fixed-size pages and flushes them as gathered write batches when possible.
+/// 將寫入資料緩衝為固定大小頁面，並在可行時以聚合寫入批次刷寫。
 /// </summary>
 public sealed class OdfPagedGatherWritableStream : Stream
 {
@@ -41,15 +41,15 @@ public sealed class OdfPagedGatherWritableStream : Stream
     internal static int ReturnedPageCountForTests;
 
     /// <summary>
-    /// Executes the OdfPagedGatherWritableStream operation.
+    /// Initializes a new instance of the <see cref="OdfPagedGatherWritableStream"/> class.
     /// 初始化 <see cref="OdfPagedGatherWritableStream"/> 類別的新執行個體。
     /// </summary>
-    /// <param name="underlyingStream">接收寫入結果的底層串流</param>
-    /// <param name="pageSize">每個分頁的位元組大小，預設為 4096</param>
-    /// <param name="pagesPerFlush">每次聚合刷寫的最大分頁數</param>
-    /// <param name="leaveOpen">是否在處置後保持底層串流開啟</param>
-    /// <exception cref="ArgumentNullException">當 <paramref name="underlyingStream"/> 為 <see langword="null"/> 時擲出</exception>
-    /// <exception cref="ArgumentOutOfRangeException">當 <paramref name="pageSize"/> 或 <paramref name="pagesPerFlush"/> 小於 1 時擲出</exception>
+    /// <param name="underlyingStream">The stream that receives flushed bytes. / 接收刷寫位元組的底層資料流。</param>
+    /// <param name="pageSize">The byte size of each page. / 每個頁面的位元組大小。</param>
+    /// <param name="pagesPerFlush">The maximum number of pages gathered into one flush. / 每次聚合刷寫的最大頁面數。</param>
+    /// <param name="leaveOpen">A value indicating whether the underlying stream remains open after disposal. / 指出處置後是否保持底層資料流開啟。</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="underlyingStream"/> is <see langword="null"/>. / 當 <paramref name="underlyingStream"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="pageSize"/> or <paramref name="pagesPerFlush"/> is less than 1. / 當 <paramref name="pageSize"/> 或 <paramref name="pagesPerFlush"/> 小於 1 時擲出。</exception>
     public OdfPagedGatherWritableStream(
         Stream underlyingStream,
         int pageSize = DefaultPageSize,
@@ -111,8 +111,8 @@ public sealed class OdfPagedGatherWritableStream : Stream
     public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     /// <summary>
-    /// Provides the member member.
-    /// 提供 member 成員。
+    /// Gets or sets the stream position.
+    /// 取得或設定資料流位置。
     /// </summary>
     /// <inheritdoc />
     public override long Position

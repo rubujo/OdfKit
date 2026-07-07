@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Provides the OdfSigner API.
-/// 提供 ODF 封裝的數位簽署與驗證功能。
+/// Provides digital signing and signature validation for ODF packages.
+/// 提供 ODF 封裝的數位簽署與簽章驗證功能。
 /// </summary>
 public static partial class OdfSigner
 {
@@ -36,13 +36,13 @@ public static partial class OdfSigner
     }
 
     /// <summary>
-    /// Executes the SignAsync operation.
-    /// 對 ODF 封裝中的關鍵檔案進行數位簽署（非同步）。
+    /// Asynchronously signs the ODF package with the default XMLDSig options.
+    /// 以預設 XMLDSig 選項非同步簽署 ODF 封裝。
     /// </summary>
-    /// <param name="package">要簽署的 ODF 封裝</param>
-    /// <param name="certificate">用於簽署的 X.509 憑證</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步簽署作業的工作</returns>
+    /// <param name="package">The ODF package to sign. / 要簽署的 ODF 封裝。</param>
+    /// <param name="certificate">The X.509 certificate used to sign the package. / 用於簽署封裝的 X.509 憑證。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous signing operation. / 代表非同步簽署作業的工作。</returns>
     public static Task SignAsync(
         OdfPackage package,
         X509Certificate2 certificate,
@@ -52,14 +52,14 @@ public static partial class OdfSigner
     }
 
     /// <summary>
-    /// Executes the SignAsync operation.
-    /// 對 ODF 封裝中的關鍵檔案進行數位簽署（非同步）。
+    /// Asynchronously signs the ODF package with the specified signing options.
+    /// 使用指定簽署選項非同步簽署 ODF 封裝。
     /// </summary>
-    /// <param name="package">要簽署的 ODF 封裝</param>
-    /// <param name="certificate">用於簽署的 X.509 憑證</param>
-    /// <param name="options">簽署選項</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步簽署作業的工作</returns>
+    /// <param name="package">The ODF package to sign. / 要簽署的 ODF 封裝。</param>
+    /// <param name="certificate">The X.509 certificate used to sign the package. / 用於簽署封裝的 X.509 憑證。</param>
+    /// <param name="options">The signing options. / 簽署選項。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous signing operation. / 代表非同步簽署作業的工作。</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 ZIP 寫入與 HTTP（TSA／CRL）期間協作檢查取消語彙。

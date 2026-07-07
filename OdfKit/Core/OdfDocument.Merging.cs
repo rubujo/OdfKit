@@ -4,8 +4,8 @@ using OdfKit.DOM;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfDocument API.
-/// 提供 OdfDocument API。
+/// Adds APIs for adopting nodes and appending content from another ODF document.
+/// 提供採用節點與附加其他 ODF 文件內容的 API。
 /// </summary>
 
 public abstract partial class OdfDocument

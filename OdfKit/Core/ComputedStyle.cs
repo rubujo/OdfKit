@@ -5,20 +5,20 @@ using OdfKit.Styles;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Provides the ComputedStyle API.
-/// 表示元素經過層疊繼承解析後的實質最終樣式。
+/// Represents the effective style values resolved for an ODF element.
+/// 表示為 ODF 元素解析後的有效樣式值。
 /// </summary>
 public sealed class ComputedStyle
 {
     /// <summary>
-    /// Gets the FontName value.
-    /// 取得字型名稱。
+    /// Gets the resolved font family name.
+    /// 取得解析後的字型家族名稱。
     /// </summary>
     public string? FontName { get; init; }
 
     /// <summary>
-    /// Gets the FontSize value.
-    /// 取得字型大小（例如 "12pt"）。
+    /// Gets the resolved font size token.
+    /// 取得解析後的字型大小語彙。
     /// </summary>
     public string? FontSize { get; init; }
 
@@ -41,30 +41,30 @@ public sealed class ComputedStyle
     public bool Underline { get; init; }
 
     /// <summary>
-    /// Gets the Color value.
-    /// 取得文字顏色（RGB 十六進位字串，例如 "#ff0000"）。
+    /// Gets the resolved text color.
+    /// 取得解析後的文字顏色。
     /// </summary>
     public string? Color { get; init; }
 
     /// <summary>
-    /// Gets the BackgroundColor value.
-    /// 取得背景顏色。
+    /// Gets the resolved background color.
+    /// 取得解析後的背景顏色。
     /// </summary>
     public string? BackgroundColor { get; init; }
 
     /// <summary>
-    /// Gets the TextAlignment value.
-    /// 取得文字對齊方式。
+    /// Gets the resolved text alignment value.
+    /// 取得解析後的文字對齊值。
     /// </summary>
     public string? TextAlignment { get; init; }
 
     /// <summary>
-    /// Executes the Resolve operation.
-    /// 從指定的 OdfElement 解析實質最終樣式。
+    /// Resolves the effective style values for the specified ODF element.
+    /// 解析指定 ODF 元素的有效樣式值。
     /// </summary>
-    /// <param name="element">要解析的 ODF 元素</param>
-    /// <returns>解析出來的實質最終樣式</returns>
-    /// <exception cref="ArgumentNullException">當 <paramref name="element"/> 為 null 時拋出</exception>
+    /// <param name="element">The ODF element to inspect. / 要檢查的 ODF 元素。</param>
+    /// <returns>The resolved effective style values. / 解析後的有效樣式值。</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="element"/> is <see langword="null"/>. / 當 <paramref name="element"/> 為 <see langword="null"/> 時擲出。</exception>
     public static ComputedStyle Resolve(OdfElement element)
     {
         if (element is null)

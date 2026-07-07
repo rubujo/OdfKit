@@ -7,8 +7,8 @@ using OdfKit.Spreadsheet;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfPackage API.
-/// 提供 OdfPackage API。
+/// Wires collaborators used by package save operations.
+/// 串接封裝儲存作業使用的協作者。
 /// </summary>
 
 public sealed partial class OdfPackage

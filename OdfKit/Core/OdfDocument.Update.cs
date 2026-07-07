@@ -2,8 +2,8 @@
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfDocument API.
-/// 提供 OdfDocument API。
+/// Adds batched update scopes for document mutation workflows.
+/// 提供文件變更流程使用的批次更新範圍 API。
 /// </summary>
 
 public abstract partial class OdfDocument

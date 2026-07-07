@@ -5,8 +5,8 @@ using OdfKit.Styles;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfDocument API.
-/// 提供 OdfDocument API。
+/// Wires shared collaborators used by core document persistence operations.
+/// 串接核心文件持久化作業使用的共用協作者。
 /// </summary>
 
 public abstract partial class OdfDocument

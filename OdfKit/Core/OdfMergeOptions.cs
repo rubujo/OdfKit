@@ -5,49 +5,51 @@ using System;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Defines values for ConflictResolution.
-/// 指定在附加或合併文件時，如何解決樣式名稱的衝突。
+/// Defines style conflict behavior for document append and merge operations.
+/// 定義附加或合併文件時的樣式衝突處理方式。
 /// </summary>
 public enum ConflictResolution
 {
     /// <summary>
-    /// 衝突的來源文件樣式會被重新命名（例如 MyStyle_s1 ），並複製以保持來源文件格式的獨立性。
+    /// Renames conflicting source styles so copied content keeps its original formatting.
+    /// 重新命名發生衝突的來源樣式，讓複製內容保留原始格式。
     /// </summary>
     KeepSourceFormatting,
 
     /// <summary>
-    /// 捨棄衝突的樣式。複製的來源節點將直接參考目的地的樣式，以符合目的地的佈景主題。
+    /// Reuses destination styles when names conflict.
+    /// 樣式名稱衝突時重用目的地樣式。
     /// </summary>
     UseDestinationStyles
 }
 
 /// <summary>
-/// Provides the OdfMergeOptions API.
-/// 合併或附加文件時的組態選項。
+/// Controls style and media handling for document append and merge operations.
+/// 控制附加或合併文件時的樣式與媒體處理方式。
 /// </summary>
 public class OdfMergeOptions
 {
     /// <summary>
-    /// Gets the StyleConflictResolution value.
-    /// 取得或設定樣式衝突的解決策略。
+    /// Gets or sets the strategy used when source and destination style names conflict.
+    /// 取得或設定來源與目的地樣式名稱衝突時使用的策略。
     /// </summary>
     public ConflictResolution StyleConflictResolution { get; set; } = ConflictResolution.KeepSourceFormatting;
 
     /// <summary>
-    /// Gets a value indicating the CopyMedia state.
-    /// 取得或設定一個值，指出是否應複製並遷移參考的媒體或圖片。
+    /// Gets or sets a value indicating whether referenced media entries are copied into the destination.
+    /// 取得或設定是否將參照的媒體專案複製到目的地文件。
     /// </summary>
     public bool CopyMedia { get; set; } = true;
 
     /// <summary>
-    /// Gets a value indicating the ImportStyles state.
-    /// 取得或設定一個值，指出是否應匯入自訂樣式。
+    /// Gets or sets a value indicating whether source custom styles are imported.
+    /// 取得或設定是否匯入來源文件的自訂樣式。
     /// </summary>
     public bool ImportStyles { get; set; } = true;
 
     /// <summary>
-    /// Executes the Default operation.
-    /// 取得預設的合併選項組態。
+    /// Gets a new instance with default merge settings.
+    /// 取得使用預設合併設定的新執行個體。
     /// </summary>
     public static OdfMergeOptions Default => new();
 }

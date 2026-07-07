@@ -7,8 +7,8 @@ using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfPackage API.
-/// 提供 OdfPackage API。
+/// Adds transaction helpers for reversible ODF package mutations.
+/// 提供可復原 ODF 封裝變更的交易輔助方法。
 /// </summary>
 
 public sealed partial class OdfPackage

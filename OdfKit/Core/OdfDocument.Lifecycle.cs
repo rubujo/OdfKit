@@ -9,8 +9,8 @@ using OdfKit.DOM;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfDocument API.
-/// 提供 OdfDocument API。
+/// Adds package persistence, byte serialization, and Flat XML conversion APIs.
+/// 提供封裝持久化、位元組序列化與 Flat XML 轉換 API。
 /// </summary>
 
 public abstract partial class OdfDocument
@@ -18,11 +18,14 @@ public abstract partial class OdfDocument
     #region Package Lifecycle & Persistence
 
     /// <summary>
-    /// Executes the Save operation.
-    /// 儲存文件至 ODF 封裝容器中。
+    /// Saves the document back to its package container.
+    /// 將文件儲存回其 ODF 封裝容器。
     /// </summary>
-    /// <param name="options">儲存設定選項</param>
-    /// <remarks>在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="SaveAsync(OdfSaveOptions?, CancellationToken)"/> 以避免阻塞執行緒</remarks>
+    /// <param name="options">The save options to apply. / 要套用的儲存選項。</param>
+    /// <remarks>
+    /// Prefer <see cref="SaveAsync(OdfSaveOptions?, CancellationToken)"/> in server environments to avoid blocking request threads.
+    /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="SaveAsync(OdfSaveOptions?, CancellationToken)"/> 以避免阻塞要求執行緒。
+    /// </remarks>
     public virtual void Save(OdfSaveOptions? options = null)
     {
         options ??= OdfSaveOptions.Default;
@@ -31,11 +34,11 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
-    /// Executes the Save operation.
-    /// 將文件保存到指定檔案路徑。
+    /// Saves the document to the specified file path.
+    /// 將文件儲存至指定檔案路徑。
     /// </summary>
-    /// <param name="path">要寫入的檔案路徑</param>
-    /// <param name="options">儲存設定選項</param>
+    /// <param name="path">The destination file path. / 目的地檔案路徑。</param>
+    /// <param name="options">The save options to apply. / 要套用的儲存選項。</param>
     public void Save(string path, OdfSaveOptions? options = null)
     {
         if (path is null)

@@ -48,6 +48,7 @@
 |------|------|
 | `Benchmark-Performance.ps1` | 執行 OdfKit 效能相關單元測試與簡易計時。 |
 | `Benchmark-Regression.ps1` | 執行 BenchmarkDotNet 微基準並與 `eng/baselines/performance-baselines.json` 基準線比對。 |
+| `Benchmark-Stable.ps1` | 以較長且時間導向的 BenchmarkDotNet profile 執行本機穩定效能量測。 |
 
 ### 封裝與發行
 

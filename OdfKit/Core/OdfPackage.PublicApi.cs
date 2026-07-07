@@ -7,8 +7,8 @@ using OdfKit.Compliance;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfPackage API.
-/// 提供 OdfPackage API。
+/// Adds public entry management APIs for ODF packages.
+/// 提供 ODF 封裝的公開專案管理 API。
 /// </summary>
 
 public sealed partial class OdfPackage

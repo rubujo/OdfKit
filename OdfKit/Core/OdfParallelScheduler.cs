@@ -5,8 +5,8 @@ using System.Threading;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Provides the OdfParallelScheduler API.
-/// 提供 OdfKit 內部平行工作負載的核心預留調度設定。
+/// Provides global scheduling hints for OdfKit internal parallel workloads.
+/// 提供 OdfKit 內部平行工作負載的全域調度提示。
 /// </summary>
 public static class OdfParallelScheduler
 {
@@ -15,8 +15,8 @@ public static class OdfParallelScheduler
     private static ThreadPriority? _workerThreadPriority;
 
     /// <summary>
-    /// Provides the member member.
-    /// 取得或設定自動平行化時預留給宿主系統的 CPU 核心比例。
+    /// Gets or sets the CPU core ratio reserved for the host when OdfKit chooses parallelism automatically.
+    /// 取得或設定 OdfKit 自動選擇平行度時預留給宿主系統的 CPU 核心比例。
     /// </summary>
     /// <remarks>
     /// 值必須大於或等於 0 且小於 1。當呼叫端明確指定平行度時，不會套用此全域預留比例。
@@ -45,8 +45,8 @@ public static class OdfParallelScheduler
     }
 
     /// <summary>
-    /// Provides the member member.
-    /// 取得或設定內部平行工作負載執行期間要暫時套用的執行緒優先權。
+    /// Gets or sets the temporary thread priority applied while an internal parallel worker is running.
+    /// 取得或設定內部平行工作執行期間暫時套用的執行緒優先權。
     /// </summary>
     /// <remarks>
     /// 設為 <see langword="null"/> 時使用執行階段預設優先權。OdfKit 只會在單一工作委派執行期間暫時套用此值，

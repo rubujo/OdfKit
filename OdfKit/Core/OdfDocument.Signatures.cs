@@ -9,8 +9,8 @@ using OdfKit.Styles;
 
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfDocument API.
-/// 提供 OdfDocument API。
+/// Adds high-level digital signature APIs for ODF documents.
+/// 提供 ODF 文件的高階數位簽章 API。
 /// </summary>
 
 public abstract partial class OdfDocument
@@ -19,22 +19,22 @@ public abstract partial class OdfDocument
 
 
     /// <summary>
-    /// Executes the Sign operation.
-    /// 使用指定的 X.509 憑證對文件進行數位簽章。
+    /// Signs the document with the specified X.509 certificate.
+    /// 使用指定的 X.509 憑證簽署文件。
     /// </summary>
-    /// <param name="certificate">用於簽章的憑證</param>
+    /// <param name="certificate">The certificate used to sign the document. / 用於簽署文件的憑證。</param>
     public void Sign(X509Certificate2 certificate)
     {
         SignAsync(certificate).GetAwaiter().GetResult();
     }
 
     /// <summary>
-    /// Executes the SignAsync operation.
-    /// 非同步使用指定的 X.509 憑證對文件進行數位簽章。
+    /// Asynchronously signs the document with the specified X.509 certificate.
+    /// 非同步使用指定的 X.509 憑證簽署文件。
     /// </summary>
-    /// <param name="certificate">用於簽章的憑證</param>
-    /// <param name="cancellationToken">取消語彙基元</param>
-    /// <returns>代表非同步簽章作業的工作</returns>
+    /// <param name="certificate">The certificate used to sign the document. / 用於簽署文件的憑證。</param>
+    /// <param name="cancellationToken">The cancellation token. / 取消語彙基元。</param>
+    /// <returns>A task representing the asynchronous signing operation. / 代表非同步簽署作業的工作。</returns>
     /// <remarks>
     /// 若 <paramref name="cancellationToken"/> 已請求取消，作業會立即以 <see cref="OperationCanceledException"/> 結束；
     /// 否則會在 DOM 寫入、ZIP 寫入與 HTTP（TSA／CRL）期間協作檢查取消語彙。

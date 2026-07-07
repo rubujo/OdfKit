@@ -8,94 +8,99 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
-/// Defines values for OdfEncryptionAlgorithm.
-/// 加密文件時使用的對稱加密演算法。
+/// Defines encryption algorithms available when saving encrypted ODF packages.
+/// 定義儲存加密 ODF 封裝時可使用的加密演算法。
 /// </summary>
 public enum OdfEncryptionAlgorithm
 {
     /// <summary>
-    /// AES-256 加密演算法
+    /// Uses the ODF AES-256 encryption profile.
+    /// 使用 ODF AES-256 加密設定檔。
     /// </summary>
     Aes256,
 
     /// <summary>
-    /// Blowfish 加密演算法
+    /// Uses the legacy Blowfish encryption profile.
+    /// 使用舊版 Blowfish 加密設定檔。
     /// </summary>
     Blowfish,
 
     /// <summary>
-    /// OpenPGP 加密，須搭配自訂密碼學提供者
+    /// Uses OpenPGP encryption through a custom cryptography provider.
+    /// 透過自訂密碼學提供者使用 OpenPGP 加密。
     /// </summary>
     OpenPgp,
 
     /// <summary>
-    /// AES-256-GCM 認證加密模式，與 LibreOffice 25.8+ 相容
+    /// Uses AES-256-GCM authenticated encryption compatible with LibreOffice 25.8 and later.
+    /// 使用與 LibreOffice 25.8 以上版本相容的 AES-256-GCM 認證加密。
     /// </summary>
     Aes256Gcm
 }
 
 /// <summary>
-/// Provides the OdfSaveOptions API.
-/// 提供儲存 ODF 文件時的組態選項。
+/// Controls package layout, compatibility, and encryption behavior used when saving ODF documents.
+/// 控制儲存 ODF 文件時使用的封裝配置、相容性與加密行為。
 /// </summary>
 public class OdfSaveOptions
 {
     /// <summary>
-    /// Gets the CompressionLevel value.
-    /// 取得或設定 ZIP 檔案壓縮等級。
+    /// Gets or sets the ZIP compression level used for package entries.
+    /// 取得或設定封裝專案使用的 ZIP 壓縮等級。
     /// </summary>
     public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.Optimal;
 
     /// <summary>
-    /// Gets the EncryptionAlgorithm value.
-    /// 取得或設定加密文件時使用的對稱加密演算法。預設為 ODF 1.3 標準的 AES-256。
+    /// Gets or sets the algorithm used when password or OpenPGP encryption is enabled.
+    /// 取得或設定啟用密碼或 OpenPGP 加密時使用的演算法。
     /// </summary>
     public OdfEncryptionAlgorithm EncryptionAlgorithm { get; set; } = OdfEncryptionAlgorithm.Aes256;
 
     /// <summary>
-    /// Gets the DocumentCulture value.
-    /// 取得或設定文件文化語系設定。
+    /// Gets or sets the culture used for user-facing document formatting decisions.
+    /// 取得或設定用於面向使用者之文件格式化決策的文化語系。
     /// </summary>
     /// <remarks>
-    /// 用於在轉譯貨幣、日期時間等格式化字串時進行本地化識別（如貨幣符號、日期排列順序）。
-    /// 預設為目前執行緒的 Culture 。而底層 XML 的 float/double 與日期序列化一律維持 Culture-Invariant 。
+    /// The invariant culture is still used for raw XML numeric and date serialization.
+    /// 此設定用於轉譯貨幣、日期時間等格式化字串；底層 XML 的浮點數與日期序列化仍一律使用不變文化。
     /// </remarks>
     public CultureInfo DocumentCulture { get; set; } = CultureInfo.CurrentCulture;
 
     /// <summary>
-    /// Gets a value indicating the IndentXml state.
-    /// 取得或設定是否排版 XML （Indent XML）以利於偵錯。預設為 <see langword="false"/> （緊湊格式輸出，效能最佳）。
+    /// Gets or sets a value indicating whether XML entries should be indented for diagnostics.
+    /// 取得或設定是否為了診斷目的縮排 XML 專案。
     /// </summary>
     public bool IndentXml { get; set; } = false;
 
     /// <summary>
-    /// Gets a value indicating the Deterministic state.
-    /// 取得或設定是否裝載確定性輸出（Deterministic Save）。
+    /// Gets or sets a value indicating whether repeat saves should produce deterministic ZIP metadata.
+    /// 取得或設定重複儲存是否產生確定性的 ZIP 中繼資料。
     /// </summary>
     /// <remarks>
-    /// 啟用時，將所有 ZIP 封裝專案的 LastWriteTime 設為固定值（2026-01-01T00:00:00Z），
-    /// 確保內容不變時，產出的二進位 ZIP 雜湊值（MD5/SHA256）完全相同。
+    /// When enabled, ZIP entry timestamps are pinned so unchanged content produces repeatable binary hashes.
+    /// 啟用時，所有 ZIP 封裝專案的 LastWriteTime 會固定，讓內容不變時產生可重複的二進位雜湊值。
     /// </remarks>
     public bool Deterministic { get; set; } = false;
 
     /// <summary>
-    /// Gets the ForceVersion value.
-    /// 取得或設定儲存時要強制寫入的 ODF 版本。若為 <see langword="null"/>，則保留文件目前宣告的版本。
+    /// Gets or sets the ODF version to force into saved package metadata.
+    /// 取得或設定儲存時要強制寫入封裝中繼資料的 ODF 版本。
     /// </summary>
     public OdfVersion? ForceVersion { get; set; }
 
     /// <summary>
-    /// Gets the TemporaryDirectory value.
-    /// 取得或設定自訂原子化儲存的磁碟暫存路徑。
+    /// Gets or sets the temporary directory used by atomic save operations.
+    /// 取得或設定原子化儲存作業使用的暫存目錄。
     /// </summary>
     /// <remarks>
-    /// 若為 <see langword="null"/> ，則預設使用系統暫存目錄（對小於 50MB 檔案，系統會優先於記憶體中重構以防權限不足）。
+    /// When <see langword="null"/>, the system temporary directory is used.
+    /// 若為 <see langword="null"/>，則使用系統暫存目錄。
     /// </remarks>
     public string? TemporaryDirectory { get; set; }
 
     /// <summary>
-    /// Gets a value indicating the PruneUnusedMedia state.
-    /// 取得或設定儲存時是否自動清理未被目前 DOM 參照的 <c>Pictures/</c> 媒體檔案。
+    /// Gets or sets a value indicating whether unreferenced <c>Pictures/</c> media entries are removed on save.
+    /// 取得或設定儲存時是否自動移除未被目前 DOM 參照的 <c>Pictures/</c> 媒體專案。
     /// </summary>
     /// <remarks>
     /// 此選項只影響高階 <see cref="OdfDocument"/> 儲存管線；直接使用 <see cref="OdfPackage"/> 儲存時，
@@ -104,37 +109,37 @@ public class OdfSaveOptions
     public bool PruneUnusedMedia { get; set; } = true;
 
     /// <summary>
-    /// Gets a value indicating the EmbedUsedFonts state.
-    /// 取得或設定一個值，指出是否在儲存時於文件中內嵌所使用的字型。預設為 <see langword="false"/> 。
+    /// Gets or sets a value indicating whether fonts referenced by the document are embedded on save.
+    /// 取得或設定儲存時是否內嵌文件參照的字型。
     /// </summary>
     public bool EmbedUsedFonts { get; set; } = false;
 
     /// <summary>
-    /// Gets a value indicating the EvaluateFormulasOnSave state.
-    /// 取得或設定一個值，指出是否在儲存時計算文件中的公式。預設為 <see langword="false"/> 。
+    /// Gets or sets a value indicating whether spreadsheet formulas are evaluated before saving.
+    /// 取得或設定儲存前是否計算試算表公式。
     /// </summary>
     public bool EvaluateFormulasOnSave { get; set; } = false;
 
     /// <summary>
-    /// Gets a value indicating the EnableDirectIo state.
-    /// 取得或設定一個值，指出是否啟用 Direct I/O 無快取寫入模式以提升存檔效能。預設為 <see langword="false"/> 。
+    /// Gets or sets a value indicating whether Direct I/O is used for uncached package writes.
+    /// 取得或設定是否啟用 Direct I/O 進行非快取封裝寫入。
     /// </summary>
     public bool EnableDirectIo { get; set; } = false;
 
     /// <summary>
-    /// Gets the Password value.
-    /// 取得或設定用於加密 ODF 文件的密碼。
+    /// Gets or sets the password used to encrypt the saved ODF document.
+    /// 取得或設定用於加密已儲存 ODF 文件的密碼。
     /// </summary>
     public string? Password { get; set; }
 
     /// <summary>
-    /// Gets the CryptographyProvider value.
-    /// 取得或設定自訂的密碼學提供者，用於加密文件專案。
+    /// Gets or sets the cryptography provider used to encrypt package entries.
+    /// 取得或設定用於加密封裝專案的密碼學提供者。
     /// </summary>
     public IOdfCryptographyProvider? CryptographyProvider { get; set; }
 
     /// <summary>
-    /// Provides the member member.
+    /// Gets or sets the OpenPGP key provider used for ODF 1.3 package encryption.
     /// 取得或設定用於加密 ODF 1.3 OpenPGP 文件的金鑰提供者。
     /// </summary>
     public IOdfOpenPgpKeyProvider? OpenPgpKeyProvider
@@ -153,14 +158,14 @@ public class OdfSaveOptions
     private IOdfOpenPgpKeyProvider? _openPgpKeyProvider;
 
     /// <summary>
-    /// Gets the OpenPgpRecipients value.
-    /// 取得 OpenPGP 加密收件者描述，供自訂密碼學提供者使用。
+    /// Gets the OpenPGP recipients supplied to the encryption provider.
+    /// 取得提供給加密提供者的 OpenPGP 收件者描述。
     /// </summary>
     public IList<OdfOpenPgpRecipient> OpenPgpRecipients { get; } = [];
 
     /// <summary>
-    /// Executes the Default operation.
-    /// 取得預設的儲存選項執行個體。
+    /// Gets a new instance with the default save settings.
+    /// 取得使用預設儲存設定的新執行個體。
     /// </summary>
     public static OdfSaveOptions Default => new();
 }

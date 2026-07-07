@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using OdfKit.Compliance;
 namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfPackage API.
-/// 提供 OdfPackage API。
+/// Adds save and stream serialization APIs for ODF packages.
+/// 提供 ODF 封裝的儲存與資料流序列化 API。
 /// </summary>
 
 public sealed partial class OdfPackage

@@ -185,8 +185,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     public bool IsFlatXml => Package.IsFlatXml;
 
     /// <summary>
-    /// Gets the TargetVersion value.
-    /// 取得或設定文件儲存時的目標 ODF 版本。
+    /// Gets or sets the ODF version to declare when the document is saved.
+    /// 取得或設定文件儲存時要宣告的目標 ODF 版本。
     /// </summary>
     public OdfVersion? TargetVersion { get; set; }
 

@@ -1,7 +1,7 @@
 ﻿namespace OdfKit.Core;
 /// <summary>
-/// Provides the OdfPackage API.
-/// 提供 OdfPackage API。
+/// Adds RDF metadata synchronization helpers for ODF packages.
+/// 提供 ODF 封裝的 RDF 中繼資料同步輔助方法。
 /// </summary>
 
 public sealed partial class OdfPackage
