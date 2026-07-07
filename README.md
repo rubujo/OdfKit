@@ -81,7 +81,7 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate report.odt
 ```
 
 完整入門流程、CLI 範例與後續文件請見
-[docs/getting-started.md](docs/getting-started.md) 與
+[docs/getting-started.md](docs/getting-started.md)、[docs/core-quickstart.md](docs/core-quickstart.md) 與
 [samples/README.md](samples/README.md)。
 
 ## 文件中心
@@ -93,10 +93,12 @@ OdfKit 的文件已依常用技術文件結構重整為「評估 → 導入 → 
 | 評估 | [文件中心](docs/index.md) | 文件入口、閱讀路徑與角色導覽 |
 | 選型 | [套件目錄與選型指南](docs/package-catalog.md) | 核心套件、擴充套件、工具與情境對照 |
 | 導入 | [快速開始](docs/getting-started.md) | 安裝模式、第一個文件、CLI、下一步 |
+| SDK 路徑 | [Core SDK Quickstart](docs/core-quickstart.md)、[API Surface Layers](docs/api-surface-layers.md) | 核心純 managed 路徑、API 分層與新增 API 放置準則 |
 | 相容性 | [NuGet 相容矩陣](docs/nuget-compatibility-matrix.md) | 套件清單、目標框架、安裝策略 |
 | 功能邊界 | [ODF 格式支援矩陣](docs/odf-format-support.md) | 支援狀態、測試證據、已知缺口 |
 | 規則與語系 | [ODF Profile 來源](docs/odf-profile-sources.md)、[i18n 與在地化](docs/i18n-localization.md) | 內建 Profile、語系字典與訊息回退 |
 | 版本與交付 | [版本與交付資訊](docs/version-delivery.md) | 交付管道、版本原則與安裝參考 |
+| 效能 | [Performance Baselines](docs/performance-baselines.md) | Benchmark regression gate、stable profile 與報告產生方式 |
 
 更細部的規格、互通、測試與 corpus 文件，請由
 [docs/index.md](docs/index.md) 進入。

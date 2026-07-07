@@ -54,6 +54,17 @@ pwsh eng/Benchmark-Stable.ps1 -Filter "*OdsStreamWriter*"
 次量測迭代，並開啟 memory 與 exception 欄位。它比 smoke 指令更慢，但較能避免極短迭代
 造成的量測雜訊。
 
+## Baseline report
+
+需要產生可附在 PR 或 release note 的 Markdown 摘要時，使用：
+
+```powershell
+pwsh eng/Benchmark-BaselineReport.ps1 -Filter "*OdsStreamWriter*"
+```
+
+報告會包含 stable profile 指令、目前 regression gate 基準線，以及 BenchmarkDotNet
+GitHub summary。長期基準政策請見 [docs/performance-baselines.md](../docs/performance-baselines.md)。
+
 ## Result policy
 
 Benchmark 結果受 CPU、記憶體、磁碟、OS、電源設定與 JIT 狀態影響，不提交本機輸出作為固定

@@ -9,7 +9,7 @@
 |-----------|----------|------------|
 | 快速評估 OdfKit 是否符合需求 | [README](../README.md) | [套件目錄與選型指南](package-catalog.md)、[ODF 格式支援矩陣](odf-format-support.md) |
 | 決定要安裝哪些套件 | [套件目錄與選型指南](package-catalog.md) | [NuGet 相容矩陣](nuget-compatibility-matrix.md)、[Rendering 後端部署](rendering-backend-deployment.md) |
-| 建立第一個範例或驗證 PoC | [快速開始](getting-started.md) | [Cookbook](cookbook.md)、[samples/README.md](../samples/README.md) |
+| 建立第一個範例或驗證 PoC | [快速開始](getting-started.md)、[Core SDK Quickstart](core-quickstart.md) | [Cookbook](cookbook.md)、[samples/README.md](../samples/README.md) |
 | 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[ODF 格式支援矩陣](odf-format-support.md) |
 | 規劃部署、升級與版本交付 | [版本與交付資訊](version-delivery.md) | [GitHub Release 發佈指南](github-release-publishing.md)、[CHANGELOG](../CHANGELOG.md) |
 | 確認功能邊界、互通性與驗證證據 | [ODF 格式支援矩陣](odf-format-support.md) | [LibreOffice 互通矩陣](libreoffice-interop-matrix.md)、[OOXML 視覺驗收矩陣](ooxml-visual-golden-matrix.md)、[ODF Toolkit 對標線](odf-toolkit-parity.md)、[ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md) |
@@ -34,7 +34,9 @@
 | 文件 | 用途 |
 |------|------|
 | [快速開始](getting-started.md) | 第一個專案、第一個文件、CLI 驗證 |
+| [Core SDK Quickstart](core-quickstart.md) | 核心 SDK 的純 managed 建立、載入、驗證與低記憶體匯出路徑 |
 | [Cookbook](cookbook.md) | 常見操作片段與實作範例 |
+| [API Surface Layers](api-surface-layers.md) | API 分層、使用路徑與新增 API 放置準則 |
 | [API Surface Consistency](api-surface-consistency.md) | 公開 API 分層、命名契約與非目標邊界 |
 | [API Surface Inventory](api-surface-inventory.md) | 高階 facade 命名分布、breaking rename 批次與文件掃描基線 |
 | [tools/README.md](../tools/README.md) | CLI、schema generator、corpus generator 與 trim smoke 工具總覽 |
@@ -54,6 +56,7 @@
 | [官方 Corpus 來源](odf-official-corpus-sources.md) | 官方 ODF corpus 來源說明 |
 | [Corpus Manifest 規則](corpus-manifest.md) | corpus manifest 契約 |
 | [CI/CD 驗證設計](ci-cd.md) | GitHub Actions 分層、timeout、Smoke 測試與診斷 artifact 規則 |
+| [Performance Baselines](performance-baselines.md) | Benchmark regression gate、stable profile 與 baseline report 產生方式 |
 | [GitHub Release 發佈指南](github-release-publishing.md) | 封裝、驗證與發佈步驟 |
 | [ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md) | 對照 ODF 1.4 四份正式規格文本逐章比對 schema／驗證層／公式引擎缺口 |
 
