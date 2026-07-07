@@ -41,6 +41,27 @@ public class FormulaHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證短名公式 facade 的 Fluent builder 會建立 <see cref="FormulaDocument"/>。
+    /// </summary>
+    [Fact]
+    public void FormulaDocumentBuilderCreatesShortFacadeAndRoundTrips()
+    {
+        using FormulaDocument formula = FormulaDocument.Builder()
+            .WithIdentifierEquation("F", "ma")
+            .Build();
+
+        Assert.IsType<FormulaDocument>(formula);
+        Assert.Equal("F=ma", formula.MathText);
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using FormulaDocument loaded = FormulaDocument.Load(stream, "equation.odf");
+        Assert.Equal("F=ma", loaded.MathText);
+    }
+
+    /// <summary>
     /// 驗證建立公式文件、設定與獲取 MathML。
     /// </summary>
     [Fact]
@@ -205,6 +226,23 @@ public class FormulaHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證短名公式 facade 的 builder delegate 入口會建立 <see cref="FormulaDocument"/>。
+    /// </summary>
+    [Fact]
+    public void FormulaDocument_FromBuilder_ReturnsShortFacade()
+    {
+        using FormulaDocument formula = FormulaDocument.FromBuilder(builder => builder
+            .Matrix(
+                row => row.Number("1").Number("2"),
+                row => row.Number("3").Number("4")));
+
+        Assert.IsType<FormulaDocument>(formula);
+        Assert.Contains("mtable", formula.GetMathML());
+        OdfMathToken matrix = Assert.Single(formula.GetMathTokens());
+        Assert.Equal(OdfMathTokenKind.Matrix, matrix.Kind);
+    }
+
+    /// <summary>
     /// 驗證 <see cref="OdfMathToken.WithAttribute"/> 設定的 MathML 通用屬性可寫入並於儲存／載入後讀回。
     /// </summary>
     [Fact]
@@ -264,6 +302,25 @@ public class FormulaHighLevelApiTests
 
         using OdfFormulaDocument reconverted = OdfFormulaDocument.FromLatex(latex);
         Assert.Equal(formula.GetMathML(), reconverted.GetMathML());
+    }
+
+    /// <summary>
+    /// 驗證短名公式 facade 的 LaTeX 入口會建立 <see cref="FormulaDocument"/> 並保留來源標註。
+    /// </summary>
+    [Fact]
+    public void FormulaDocument_FromLatex_ReturnsShortFacadeAndPreservesSource()
+    {
+        using FormulaDocument formula = FormulaDocument.FromLatex(@"\frac{a}{b}");
+
+        Assert.IsType<FormulaDocument>(formula);
+        Assert.Equal(@"\frac{a}{b}", formula.ToLatex());
+
+        using var stream = new MemoryStream();
+        formula.SaveToStream(stream);
+        stream.Position = 0;
+
+        using FormulaDocument loaded = FormulaDocument.Load(stream, "equation.odf");
+        Assert.Equal(@"\frac{a}{b}", loaded.ToLatex());
     }
 
     /// <summary>

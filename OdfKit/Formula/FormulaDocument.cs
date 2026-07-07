@@ -33,6 +33,26 @@ public class FormulaDocument : OdfFormulaDocument
     }
 
     /// <summary>
+    /// Creates a new high-level formula document.
+    /// 建立新的高階公式文件。
+    /// </summary>
+    /// <returns>A new <see cref="FormulaDocument"/> instance. / 新的 <see cref="FormulaDocument"/> 執行個體。</returns>
+    public new static FormulaDocument Create()
+    {
+        return (FormulaDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Formula);
+    }
+
+    /// <summary>
+    /// Creates a new high-level formula document fluent builder.
+    /// 建立新的高階公式文件 Fluent builder。
+    /// </summary>
+    /// <returns>A new <see cref="FormulaDocumentBuilder"/> instance. / 新的 <see cref="FormulaDocumentBuilder"/> 執行個體。</returns>
+    public new static FormulaDocumentBuilder Builder()
+    {
+        return new FormulaDocumentBuilder(Create());
+    }
+
+    /// <summary>
     /// Creates a new high-level formula document from the specified MathML XML.
     /// 根據指定 MathML XML 建立新的高階公式文件。
     /// </summary>
@@ -46,8 +66,46 @@ public class FormulaDocument : OdfFormulaDocument
             throw new ArgumentNullException(nameof(mathml));
         }
 
-        var doc = (FormulaDocument)OdfDocumentFactory.CreateDocument(OdfDocumentKind.Formula);
+        FormulaDocument doc = Create();
         doc.SetMathML(mathml);
+        return doc;
+    }
+
+    /// <summary>
+    /// Creates and loads a high-level formula document from the specified LaTeX formula string.
+    /// 從指定的 LaTeX 公式字串建立並載入高階公式文件。
+    /// </summary>
+    /// <param name="latex">The LaTeX formula string. / LaTeX 公式字串。</param>
+    /// <returns>The <see cref="FormulaDocument"/> instance loaded with the LaTeX formula. / 已載入 LaTeX 公式的 <see cref="FormulaDocument"/> 執行個體。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="latex"/> is <see langword="null"/>. / 當 <paramref name="latex"/> 為 <see langword="null"/> 時擲出。</exception>
+    /// <exception cref="ArgumentException">When the LaTeX formula syntax is invalid. / 當 LaTeX 公式語法錯誤時擲出。</exception>
+    public new static FormulaDocument FromLatex(string latex)
+    {
+        FormulaDocument doc = Create();
+        doc.LoadFromLatex(latex);
+        return doc;
+    }
+
+    /// <summary>
+    /// Creates and loads a high-level formula document by using an <see cref="OdfMathBuilder"/> composition delegate.
+    /// 使用 <see cref="OdfMathBuilder"/> 組合委派建立並載入高階公式文件。
+    /// </summary>
+    /// <param name="build">The delegate used to compose the MathML token tree. / 用於組合 MathML token 樹狀結構的委派。</param>
+    /// <returns>The <see cref="FormulaDocument"/> instance loaded with the composed result. / 已載入組合結果的 <see cref="FormulaDocument"/> 執行個體。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="build"/> is <see langword="null"/>. / 當 <paramref name="build"/> 為 <see langword="null"/> 時擲出。</exception>
+    public new static FormulaDocument FromBuilder(Action<OdfMathBuilder> build)
+    {
+        if (build is null)
+        {
+            throw new ArgumentNullException(nameof(build));
+        }
+
+        var mathBuilder = new OdfMathBuilder();
+        build(mathBuilder);
+        OdfMathToken root = mathBuilder.Build();
+
+        FormulaDocument doc = Create();
+        doc.SetMathRow(root);
         return doc;
     }
 

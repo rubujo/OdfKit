@@ -403,7 +403,7 @@ Console.WriteLine(loadedChart.FindSeriesDataLabels(0)?.ShowCategoryName);
 ```csharp
 using OdfKit.Formula;
 
-using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+using FormulaDocument formula = FormulaDocument.Builder()
     .WithIdentifierEquation("F", "ma")
     .Build();
 formula.Save("equation.odf");
@@ -414,7 +414,7 @@ formula.Save("equation.odf");
 ```csharp
 using OdfKit.Formula;
 
-using OdfFormulaDocument formula = OdfFormulaDocument.Builder()
+using FormulaDocument formula = FormulaDocument.Builder()
     .WithTokens(
         OdfMathToken.Superscript(
             OdfMathToken.Identifier("x"),
@@ -445,14 +445,14 @@ formula.Save("edited-equation.odf");
 ```csharp
 using OdfKit.Formula;
 
-using OdfFormulaDocument formula = OdfFormulaDocument.Create();
+using FormulaDocument formula = FormulaDocument.Create();
 formula.SetMathRow(
     OdfMathToken.Identifier("x"),
     OdfMathToken.Operator("="),
     OdfMathToken.Number("1"));
 formula.Save("equation.odf");
 
-using OdfFormulaDocument loadedFormula = OdfFormulaDocument.Load("equation.odf");
+using FormulaDocument loadedFormula = FormulaDocument.Load("equation.odf");
 Console.WriteLine(loadedFormula.MathText);
 Console.WriteLine(loadedFormula.MathTokens[0].Text);
 ```

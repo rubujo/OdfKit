@@ -53,15 +53,13 @@ dotnet build
 dotnet test
 ```
 
-**GitHub Release 套件整合**（本機 NuGet feed）：
+**ProjectReference 整合**：
 
 ```powershell
-dotnet nuget add source C:\path\to\release-assets --name odfkit-github-release
-dotnet add package OdfKit --version 0.0.1 --source odfkit-github-release
+dotnet add YourApp.csproj reference path\to\OdfKit\OdfKit\OdfKit.csproj
 ```
 
-發佈與封裝流程請見 [GitHub Release 發佈指南](docs/github-release-publishing.md)
-與 [NuGet 相容矩陣](docs/nuget-compatibility-matrix.md)。
+版本原則與交付方式請見 [版本與交付資訊](docs/version-delivery.md)。
 
 ### 2. 第一個 ODT
 
@@ -74,7 +72,22 @@ document.Body.Paragraphs.Add("這是一份 ODF 文字文件。");
 document.Save("report.odt");
 ```
 
-### 3. 驗證文件
+### 3. 其他常用文件種類
+
+```csharp
+using OdfKit.Formula;
+
+using FormulaDocument formula = FormulaDocument.Builder()
+    .WithIdentifierEquation("F", "ma")
+    .Build();
+formula.Save("equation.odf");
+```
+
+`SpreadsheetDocument`、`PresentationDocument`、`DrawingDocument`、`ChartDocument`、
+`ImageDocument` 與 `DatabaseDocument` 也提供短名 facade。完整範例請見
+[samples/README.md](samples/README.md) 與 [docs/cookbook.md](docs/cookbook.md)。
+
+### 4. 驗證文件
 
 ```powershell
 dotnet run --project tools/OdfKit.Cli --framework net10.0 -- validate report.odt

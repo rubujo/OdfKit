@@ -15,6 +15,11 @@ using System.Globalization;
 using System.Drawing;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Chart;
+using OdfKit.Database;
+using OdfKit.Drawing;
+using OdfKit.Formula;
+using OdfKit.Image;
 using OdfKit.Text;
 using OdfKit.Spreadsheet;
 using OdfKit.Presentation;
@@ -44,6 +49,7 @@ if (!Directory.Exists(outputDir))
 DemoTextDocument(outputDir);
 DemoSpreadsheetDocument(outputDir);
 string presentationPath = DemoPresentationDocument(outputDir);
+DemoSecondaryFormatDocuments(outputDir);
 DemoProfilesAndLocalization(presentationPath);
 DemoOdsStreamWriter(outputDir);
 DemoMetadataAndSecurity(outputDir);
@@ -343,12 +349,86 @@ static string DemoPresentationDocument(string outputDir)
 }
 
 /// <summary>
+/// 示範建立 ODG、ODC、ODF、ODI 與 ODB 次要格式文件，展示短名 facade 入口。
+/// </summary>
+/// <param name="outputDir"> 輸出的目標目錄 </param>
+static void DemoSecondaryFormatDocuments(string outputDir)
+{
+    Console.WriteLine(" 4. 正在建立圖形、圖表、公式、影像與資料庫文件 ⋯⋯");
+
+    using DrawingDocument drawing = DrawingDocument.Builder()
+        .WithMetadata(metadata => metadata.Title("OdfKit 流程圖"))
+        .AddPage("流程", page => page
+            .AddFlowStep("step-collect", "收集資料", 0)
+            .AddFlowStep("step-generate", "產生 ODF", 1)
+            .AddConnector(2.8, 2.1, 4.2, 2.1))
+        .Build();
+    string drawingPath = Path.Combine(outputDir, "output_drawing.odg");
+    drawing.Save(drawingPath);
+    Console.WriteLine($"   已儲存圖形文件至： {drawingPath} ");
+
+    using ChartDocument chart = ChartDocument.Builder()
+        .WithType(OdfChartType.Bar)
+        .WithTitle("季度營收")
+        .WithDataRange("Sales", new OdfCellRange(0, 0, 4, 1), firstRowAsHeader: true, firstColumnAsLabel: true)
+        .WithLegend("end")
+        .Build();
+    chart.UpdateData(new object?[][]
+    {
+        ["季度", "營收"],
+        ["Q1", 120],
+        ["Q2", 180],
+        ["Q3", 210],
+        ["Q4", 260]
+    });
+    string chartPath = Path.Combine(outputDir, "output_chart.odc");
+    chart.Save(chartPath);
+    Console.WriteLine($"   已儲存圖表文件至： {chartPath} ");
+
+    using FormulaDocument formula = FormulaDocument.Builder()
+        .WithTokens(
+            OdfMathToken.Identifier("E"),
+            OdfMathToken.Operator("="),
+            OdfMathToken.Identifier("m"),
+            OdfMathToken.Superscript(
+                OdfMathToken.Identifier("c"),
+                OdfMathToken.Number("2")))
+        .Build();
+    string formulaPath = Path.Combine(outputDir, "output_formula.odf");
+    formula.Save(formulaPath);
+    Console.WriteLine($"   已儲存公式文件至： {formulaPath} ");
+
+    using ImageDocument image = ImageDocument.Create();
+    image.SetImageLayout(
+        OdfLength.FromCentimeters(1),
+        OdfLength.FromCentimeters(1),
+        OdfLength.FromCentimeters(4),
+        OdfLength.FromCentimeters(4),
+        "DemoImage",
+        "示範影像",
+        "由 OdfKit 產生的 ODI 影像文件。");
+    image.SetImage(CreatePngBytes(), "demo.png");
+    string imagePath = Path.Combine(outputDir, "output_image.odi");
+    image.Save(imagePath);
+    Console.WriteLine($"   已儲存影像文件至： {imagePath} ");
+
+    using DatabaseDocument database = DatabaseDocument.Create();
+    database.SetConnection("sdbc:embedded:hsqldb");
+    database.AddDataSourceSetting("AppendTableAliasName", OdfDatabaseDataSourceSettingType.Boolean, "true");
+    database.AddTable("Customers", "SELECT * FROM Customers");
+    database.AddQuery("ActiveCustomers", "SELECT * FROM Customers WHERE IsActive = TRUE");
+    string databasePath = Path.Combine(outputDir, "output_database.odb");
+    database.Save(databasePath);
+    Console.WriteLine($"   已儲存資料庫文件至： {databasePath} ");
+}
+
+/// <summary>
 /// 示範使用內建 ODF Profile 進行驗證，並展示在地化訊息查找與語系切換。
 /// </summary>
 /// <param name="presentationPath"> 要驗證的簡報檔案路徑 </param>
 static void DemoProfilesAndLocalization(string presentationPath)
 {
-    Console.WriteLine(" 4. 正在示範 ODF Profile 驗證與 i18n 在地化 ⋯⋯");
+    Console.WriteLine(" 5. 正在示範 ODF Profile 驗證與 i18n 在地化 ⋯⋯");
 
     // 使用臺灣 CNS 15251 Profile 驗證剛產生的 ODP。
     try
@@ -389,7 +469,7 @@ static void DemoProfilesAndLocalization(string presentationPath)
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoOdsStreamWriter(string outputDir)
 {
-    Console.WriteLine(" 5. 正在執行低記憶體高流速寫入 (OdsStreamWriter) ⋯⋯");
+    Console.WriteLine(" 6. 正在執行低記憶體高流速寫入 (OdsStreamWriter) ⋯⋯");
 
     string outputPath = Path.Combine(outputDir, "output_stream.ods");
     FileStream fileStream;
@@ -490,7 +570,7 @@ static void DemoOdsStreamWriter(string outputDir)
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoMetadataAndSecurity(string outputDir)
 {
-    Console.WriteLine(" 6. 正在示範中介資料 (Metadata) 讀寫設定 ⋯⋯");
+    Console.WriteLine(" 7. 正在示範中介資料 (Metadata) 讀寫設定 ⋯⋯");
 
     string testOdtPath = Path.Combine(outputDir, "output_text.odt");
     if (!File.Exists(testOdtPath))
@@ -518,7 +598,7 @@ static void DemoMetadataAndSecurity(string outputDir)
 
 static void DemoExtensions(string outputDir)
 {
-    Console.WriteLine(" 7. 正在執行 PDF、HTML、CSV、OOXML、協同編輯、RDF 與影像渲染等轉換匯出展示 ⋯⋯");
+    Console.WriteLine(" 8. 正在執行 PDF、HTML、CSV、OOXML、協同編輯、RDF 與影像渲染等轉換匯出展示 ⋯⋯");
 
     // 建立臨時文字文件做為轉換來源
     using var tempDoc = TextDocument.Create();
@@ -630,7 +710,7 @@ static byte[] CreatePngBytes()
 /// <param name="outputDir"> 輸出的目標目錄 </param>
 static void DemoOdtStreamWriter(string outputDir)
 {
-    Console.WriteLine(" 8. 正在執行低記憶體高流速寫入 (OdtStreamWriter) ⋯⋯");
+    Console.WriteLine(" 9. 正在執行低記憶體高流速寫入 (OdtStreamWriter) ⋯⋯");
 
     string outputPath = Path.Combine(outputDir, "output_stream.odt");
     FileStream fileStream;

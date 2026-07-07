@@ -15,7 +15,7 @@ CLI 驗證與下一步閱讀建議。
 若要使用 `OdfKit.Extensions.Rendering`，還需要本機 LibreOffice 或相容的
 後端程序；詳見 [rendering-backend-deployment.md](rendering-backend-deployment.md)。
 
-## 2. 選擇安裝模式
+## 2. 選擇導入模式
 
 ### 原始碼整合
 
@@ -28,21 +28,17 @@ dotnet build
 dotnet test
 ```
 
-### GitHub Release 套件整合
+### ProjectReference 整合
 
-適合要建立固定版本 feed、以 `.nupkg` 方式管理相依的情境。
+適合產品程式碼與 OdfKit 同倉或同工作區開發的情境。
 
 ```powershell
-dotnet nuget add source C:\path\to\release-assets --name odfkit-github-release
-dotnet add package OdfKit --version 0.0.1 --source odfkit-github-release
+dotnet add YourApp.csproj reference path\to\OdfKit\OdfKit\OdfKit.csproj
 ```
 
-完整套件清單與目標框架請見
-[NuGet 相容矩陣](nuget-compatibility-matrix.md)。
+## 3. 選擇元件
 
-## 3. 選擇套件
-
-| 需求 | 建議套件 |
+| 需求 | 建議元件 |
 |------|----------|
 | ODF 建立、載入、保存、驗證 | `OdfKit` |
 | 匯出 HTML / Markdown / RTF | `OdfKit.Extensions.Html` |
@@ -66,6 +62,28 @@ using TextDocument document = TextDocument.Create();
 document.Body.Headings.Add("報告", 1);
 document.Body.Paragraphs.Add("這是一份 ODF 文字文件。");
 document.Save("report.odt");
+```
+
+### 常用文件種類速覽
+
+| 格式 | 入口 | 常見用途 |
+|------|------|----------|
+| ODT | `TextDocument` | 報告、合約、郵件合併、文字範本 |
+| ODS | `SpreadsheetDocument` | 試算表、CSV 匯入匯出、公式、圖表、大量資料輸出 |
+| ODP | `PresentationDocument` | 投影片、講者備註、轉場、簡報樣板 |
+| ODG | `DrawingDocument` | 流程圖、架構圖、形狀、連接線 |
+| ODC | `ChartDocument` | 獨立或嵌入式 ODF 圖表 |
+| ODF | `FormulaDocument` | MathML 公式與 LaTeX / token helper |
+| ODI | `ImageDocument` | ODF 影像封裝、框架、裁切、濾鏡 |
+| ODB | `DatabaseDocument` | 資料來源、查詢、表單、報表參照與 schema 描述 |
+
+```csharp
+using OdfKit.Formula;
+
+using FormulaDocument formula = FormulaDocument.Builder()
+    .WithIdentifierEquation("F", "ma")
+    .Build();
+formula.Save("equation.odf");
 ```
 
 ### 驗證 ODT
@@ -93,5 +111,4 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- info report.odt
 | 確認格式支援深度 | [ODF 格式支援矩陣](odf-format-support.md) |
 | 確認可用 Profile 與規則來源 | [ODF Profile 來源](odf-profile-sources.md) |
 | 確認語系訊息與在地化機制 | [i18n 與在地化](i18n-localization.md) |
-| 規劃套件發佈流程 | [GitHub Release 發佈指南](github-release-publishing.md) |
 | 確認版本原則與交付方式 | [版本與交付資訊](version-delivery.md) |
