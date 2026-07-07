@@ -542,7 +542,7 @@ public class DocsAndCorpusContractTests
         Assert.Contains("W3C XML Schema Part 2 Datatypes", sourceIndex, StringComparison.Ordinal);
         Assert.Contains("TDF ODF Toolkit 公開文件", sourceIndex, StringComparison.Ordinal);
         Assert.Contains("reference JSON", sourceIndex, StringComparison.Ordinal);
-        Assert.Contains("Managed conversion fidelity 來源", sourceIndex, StringComparison.Ordinal);
+        Assert.Contains("受控轉換保真度來源", sourceIndex, StringComparison.Ordinal);
         Assert.Contains("OdfSvgExporter.cs", sourceIndex, StringComparison.Ordinal);
         Assert.Contains("OdfRtfImporter.cs", sourceIndex, StringComparison.Ordinal);
         Assert.Contains("OdpToPptxConverter.cs", sourceIndex, StringComparison.Ordinal);
@@ -565,7 +565,7 @@ public class DocsAndCorpusContractTests
         Assert.Contains("golden / regression", sourceIndex, StringComparison.Ordinal);
         Assert.Contains("clean-room-source-index.md", provenance, StringComparison.Ordinal);
         Assert.Contains("clean-room-source-index.md", docsIndex, StringComparison.Ordinal);
-        Assert.Contains("managed conversion fidelity", docsIndex, StringComparison.Ordinal);
+        Assert.Contains("受控轉換保真度", docsIndex, StringComparison.Ordinal);
         Assert.Contains("SpreadsheetFormulaRoundTripPreservesUnsupportedFormula", formulaTests, StringComparison.Ordinal);
         Assert.Contains("LibreOfficeEasterSundayEvaluatesToDateSerial", formulaTests, StringComparison.Ordinal);
         Assert.Contains("LibreOfficeIsOmittedEvaluatesByArgumentCount", formulaTests, StringComparison.Ordinal);
