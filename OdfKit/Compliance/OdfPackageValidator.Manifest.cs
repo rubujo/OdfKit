@@ -195,7 +195,8 @@ public static partial class OdfPackageValidator
         {
             if (manifestPath != "/" &&
                 !manifestPath.EndsWith("/", StringComparison.Ordinal) &&
-                string.IsNullOrEmpty(package.Manifest[manifestPath]))
+                string.IsNullOrEmpty(package.Manifest[manifestPath]) &&
+                !package.HasEntry(manifestPath))
             {
                 issues.Add(new OdfValidationIssue(
                     OdfIssueSeverity.Error,

@@ -38,12 +38,22 @@ Console.WriteLine("==================================================");
 Console.WriteLine(" OdfKit .NET 10.0 全功能單檔 Script 示範");
 Console.WriteLine("==================================================");
 
-// 建立輸出目錄
-string outputDir = Path.Combine(Directory.GetCurrentDirectory(), "samples", "output");
+// 建立輸出目錄；測試可透過環境變數改到暫存目錄，避免污染工作樹。
+string outputDir = Environment.GetEnvironmentVariable("ODFKIT_SAMPLE_OUTPUT_DIR");
+if (string.IsNullOrWhiteSpace(outputDir))
+{
+    outputDir = Path.Combine(Directory.GetCurrentDirectory(), "samples", "output");
+}
+
 if (!Directory.Exists(outputDir))
 {
     Directory.CreateDirectory(outputDir);
 }
+
+bool smokeOnly = string.Equals(
+    Environment.GetEnvironmentVariable("ODFKIT_SAMPLE_SMOKE_ONLY"),
+    "true",
+    StringComparison.OrdinalIgnoreCase);
 
 // 執行各項功能示範
 DemoTextDocument(outputDir);
@@ -53,7 +63,11 @@ DemoSecondaryFormatDocuments(outputDir);
 DemoProfilesAndLocalization(presentationPath);
 DemoOdsStreamWriter(outputDir);
 DemoMetadataAndSecurity(outputDir);
-DemoExtensions(outputDir);
+if (!smokeOnly)
+{
+    DemoExtensions(outputDir);
+}
+
 DemoOdtStreamWriter(outputDir);
 
 Console.WriteLine("==================================================");

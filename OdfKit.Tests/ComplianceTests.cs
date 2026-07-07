@@ -1375,6 +1375,30 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void ValidatorAllowsEmptyMediaTypeForExistingMimetypeEntry()
+        {
+            using MemoryStream ms = CreateZipWithCustomManifestEntries(
+                "application/vnd.oasis.opendocument.spreadsheet",
+                CreateDocumentContent("1.4", "spreadsheet"),
+                new[]
+                {
+                    new KeyValuePair<string, string>("Object 1/", "application/vnd.oasis.opendocument.chart"),
+                    new KeyValuePair<string, string>("Object 1/mimetype", string.Empty)
+                },
+                extraPackageEntries: new[]
+                {
+                    new KeyValuePair<string, string>("Object 1/mimetype", "application/vnd.oasis.opendocument.chart")
+                });
+            using OdfPackage package = OdfPackage.Open(ms);
+
+            OdfValidationReport report = OdfPackageValidator.Validate(package, OdfComplianceProfiles.OasisOdf14Strict);
+
+            Assert.DoesNotContain(report.Issues, issue =>
+                issue.RuleId == "ODF0106" &&
+                issue.PackagePath == "Object 1/mimetype");
+        }
+
+        [Fact]
         public void ValidatorReportsCoreXmlManifestMediaTypeMismatch()
         {
             using MemoryStream ms = CreateZipWithCustomManifestEntries(
@@ -2224,7 +2248,8 @@ namespace OdfKit.Tests
             string mimeType,
             string contentXml,
             IEnumerable<KeyValuePair<string, string>> manifestEntries,
-            string contentMediaType = "text/xml")
+            string contentMediaType = "text/xml",
+            IEnumerable<KeyValuePair<string, string>>? extraPackageEntries = null)
         {
             var ms = new MemoryStream();
             using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
@@ -2258,6 +2283,14 @@ namespace OdfKit.Tests
                     }
 
                     writer.Write("</manifest:manifest>");
+                }
+
+                if (extraPackageEntries is not null)
+                {
+                    foreach (KeyValuePair<string, string> entry in extraPackageEntries)
+                    {
+                        WriteZipTextEntry(zip, entry.Key, entry.Value, CompressionLevel.Fastest);
+                    }
                 }
             }
 

@@ -50,6 +50,18 @@
    ```
 4. 執行完成後，範例將在 `samples/output/` 目錄下產生示範檔案與轉換結果。
 
+### Smoke 模式
+
+若只想確認範例能編譯執行並產生核心 ODF 文件，可使用環境變數切換到 smoke
+模式。此模式會略過 PDF、OOXML 與影像渲染等較重的轉檔展示，但仍會建立
+ODT、ODS、ODP、ODG、ODC、ODF、ODI、ODB 與串流輸出文件：
+
+```powershell
+$env:ODFKIT_SAMPLE_SMOKE_ONLY = "true"
+$env:ODFKIT_SAMPLE_OUTPUT_DIR = "$PWD\samples\output-smoke"
+dotnet run samples/Sample.cs
+```
+
 ---
 
 ## 示範涵蓋功能說明
@@ -71,23 +83,29 @@
    - 採用 `OdfKit` 專屬的 Fluent Builder 模式建立簡報。
    - 自訂投影片標題、文字框與幾何圖形 (Shape)。
    - 新增講者備忘錄 (Speaker Notes) 與投影片切換轉場 (Transition) 特效。
-4. **Profile 驗證與 i18n 在地化**：
+4. **次要格式文件建立**：
+   - 使用 `DrawingDocument` 建立 ODG 流程圖。
+   - 使用 `ChartDocument` 建立 ODC 圖表。
+   - 使用 `FormulaDocument` 建立 ODF 公式。
+   - 使用 `ImageDocument` 建立 ODI 影像文件。
+   - 使用 `DatabaseDocument` 建立 ODB 資料來源描述。
+5. **Profile 驗證與 i18n 在地化**：
    - 使用 `OdfComplianceProfiles.RocTaiwanOdfCns15251` 對產出的 ODP 執行 Profile 驗證。
    - 使用 `OdfLocalizer.DefaultCulture` 與 `OdfLocalizer.GetMessage(...)` 展示 `zh-TW` 在地化訊息查找。
    - 驗證結果與在地化訊息會輸出到主控台，不額外產生獨立輸出檔案。
-5. **低記憶體高效能串流寫入 (OdsStreamWriter)**：
+6. **低記憶體高效能串流寫入 (OdsStreamWriter)**：
    - 示範在大數據情境下，以順序工作表寫入模式將記憶體佔用控制在小於 1 MB，流式寫入多達 100 列以上的表格明細，有效杜絕記憶體不足 (OOM) 錯誤。
    - `SwitchToSheet` 支援交錯多工作表寫入，但會使用暫存緩衝，適合便利性優先而非嚴格低記憶體的情境。
-6. **中繼資料 (Metadata) 讀取與更新**：
+7. **中繼資料 (Metadata) 讀取與更新**：
    - 展示如何載入既有檔案、讀取文件 metadata 標題與建立者資訊，並進行修改更新與二次存檔。
-7. **進階轉檔與擴充套件整合**：
+8. **進階轉檔與擴充套件整合**：
    - 使用 `OdfPdfExporter` 將 ODT 轉換並渲染匯出為 PDF 檔案。
    - 使用 `OdfHtmlExporter` 將 ODT 轉換並匯出為 HTML 網頁。
    - 使用 `OdfToDocxConverter` / `OdfToXlsxConverter` 轉出 OOXML。
    - 使用 `OdtOperationsExporter` / `OdtOperationsImporter` 展示協作操作匯出與回讀。
    - 使用 `RdfMetadata` 展示 RDF 三元組寫入與 SPARQL 查詢。
    - 使用 `OdfImageExporter` 將工作表渲染為 PNG。
-8. **低記憶體串流寫入**：
+9. **低記憶體串流寫入**：
    - 示範 `OdsStreamWriter` 與 `OdtStreamWriter` 的串流輸出。
 
 ---
@@ -102,6 +120,11 @@
 | **`output_text_updated.odt`** | ODF 文字文件 | 更新中繼資料（標題與建立者）後的版本。 |
 | **`output_spreadsheet.ods`** | ODF 試算表 | 包含銷售統計資料與總計 SUM 公式的表格。 |
 | **`output_presentation.odp`** | ODF 簡報 | 包含兩張投影片、轉場效果與形狀的簡報。 |
+| **`output_drawing.odg`** | ODF 圖形文件 | 使用短名 facade 建立的流程圖。 |
+| **`output_chart.odc`** | ODF 圖表文件 | 使用短名 facade 建立的季度營收圖表。 |
+| **`output_formula.odf`** | ODF 公式文件 | 使用 `FormulaDocument` 建立的 MathML 公式。 |
+| **`output_image.odi`** | ODF 影像文件 | 使用 `ImageDocument` 建立的影像封裝文件。 |
+| **`output_database.odb`** | ODF 資料庫文件 | 使用 `DatabaseDocument` 建立的資料來源描述。 |
 | **`output_stream.ods`** | ODF 試算表 | 透過 `OdsStreamWriter` 大量串流寫入的明細表。 |
 | **`output_stream.odt`** | ODF 文字文件 | 透過 `OdtStreamWriter` 串流寫入的文字文件。 |
 | **`output_pdf.pdf`** | PDF 檔案 | 將 ODT 內容完美轉譯後的 PDF 格式文件。 |
