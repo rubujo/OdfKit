@@ -593,14 +593,14 @@ await bulkCopy.WriteToServerAsync(reader);
 | 場景 | 建議路徑 | 記憶體特性 |
 | --- | --- | --- |
 | 只需要把 ODS 內容匯出成 CSV、灌入資料庫、或做逐列彙總，不需要修改原始檔案 | `OdsStreamReader`（實作 `DbDataReader`，SAX 風格逐列讀取） | 恆定，不隨檔案大小成長；不建立 DOM |
-| 需要開啟既有 ODS、修改儲存格/樣式/公式後存回 | `SpreadsheetDocument.Open(...)` / `OdfDocument.Load(...)` DOM 路徑 | 見下方說明 |
+| 需要載入既有 ODS、修改儲存格/樣式/公式後存回 | `SpreadsheetDocument.Load(...)` / `OdfDocument.Load(...)` DOM 路徑 | 見下方說明 |
 
 `OdsStreamReader` 的用法見前面〈匯出任意物件序列或 EF Core 查詢結果〉一節的
 `SqlBulkCopy` 範例；它完全不建立 DOM，一次只解析目前列，適合單向匯出。
 
 ### DOM 編輯路徑的兩層記憶體最佳化
 
-透過 `SpreadsheetDocument.Open`／`OdfDocument.Load` 開啟既有文件時，DOM 樹**並非**
+透過 `SpreadsheetDocument.Load`／`OdfDocument.Load` 載入既有文件時，DOM 樹**並非**
 一次性完整攤平載入，而是有兩層彼此獨立的最佳化：
 
 1. **文件層級延遲載入（lazy loading）**：`content.xml` 中超過 8192 bytes 的
@@ -628,7 +628,7 @@ await bulkCopy.WriteToServerAsync(reader);
 ```csharp
 using OdfKit.Spreadsheet;
 
-using var doc = SpreadsheetDocument.Open("huge-report.ods");
+using var doc = SpreadsheetDocument.Load("huge-report.ods");
 var sheet = doc.Worksheets[0];
 
 // 若存取範圍分散在整張工作表（如逐欄彙總），調高熱頁上限可減少反覆壓縮/解壓縮，
