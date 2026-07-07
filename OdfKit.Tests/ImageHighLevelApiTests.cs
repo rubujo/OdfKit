@@ -13,12 +13,12 @@ namespace OdfKit.Tests;
 public class ImageHighLevelApiTests
 {
     /// <summary>
-    /// 驗證 <see cref="OdfImageDocument.GetImageFrames"/> 可讀回主要影像框架。
+    /// 驗證 <see cref="ImageDocument.GetImageFrames"/> 可讀回主要影像框架。
     /// </summary>
     [Fact]
     public void GetImageFrames_RoundTripsAfterSetImage()
     {
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
         byte[] bytes = CreatePngBytes();
         image.SetImageLayout(
             OdfLength.FromCentimeters(1),
@@ -46,12 +46,12 @@ public class ImageHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfImageDocument.AddImageFrame"/> 與 <see cref="OdfImageDocument.GetImageFrames"/> 可列舉多個框架。
+    /// 驗證 <see cref="ImageDocument.AddImageFrame"/> 與 <see cref="ImageDocument.GetImageFrames"/> 可列舉多個框架。
     /// </summary>
     [Fact]
     public void GetImageFrames_ReturnsMultipleFrames()
     {
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
         byte[] primary = CreatePngBytes();
         byte[] secondary = CreateAlternatePngBytes();
 
@@ -77,18 +77,18 @@ public class ImageHighLevelApiTests
         image.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfImageDocument.Load(stream, "gallery.odi");
+        using var loaded = ImageDocument.Load(stream, "gallery.odi");
         Assert.Equal(2, loaded.GetImageFrames().Count);
         Assert.Equal("SecondaryFrame", loaded.GetImageFrames()[1].Name);
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfImageDocument.UpdateImageFrame"/> 與 <see cref="OdfImageDocument.RemoveImageFrame"/> 可編輯多框架文件。
+    /// 驗證 <see cref="ImageDocument.UpdateImageFrame"/> 與 <see cref="ImageDocument.RemoveImageFrame"/> 可編輯多框架文件。
     /// </summary>
     [Fact]
     public void UpdateAndRemoveImageFrame_EditsMultiFrameDocument()
     {
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
         image.SetImage(CreatePngBytes(), "Primary.png");
         image.AddImageFrame(
             CreateAlternatePngBytes(),
@@ -133,7 +133,7 @@ public class ImageHighLevelApiTests
     [Fact]
     public void UpdateAndRemoveImageFrame_PersistAfterSaveAndLoad()
     {
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
         image.SetImage(CreatePngBytes(), "Primary.png");
         image.AddImageFrame(
             CreateAlternatePngBytes(),
@@ -149,7 +149,7 @@ public class ImageHighLevelApiTests
         image.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfImageDocument.Load(stream, "gallery.odi");
+        using var loaded = ImageDocument.Load(stream, "gallery.odi");
         Assert.True(loaded.UpdateImageFrame(
             "SecondaryFrame",
             OdfLength.FromCentimeters(8),
@@ -162,7 +162,7 @@ public class ImageHighLevelApiTests
         loaded.SaveToStream(updatedStream);
         updatedStream.Position = 0;
 
-        using var reloaded = OdfImageDocument.Load(updatedStream, "gallery.odi");
+        using var reloaded = ImageDocument.Load(updatedStream, "gallery.odi");
         OdfImageFrameInfo? frame = reloaded.TryGetImageFrame("SecondaryFrame");
         Assert.NotNull(frame);
         Assert.Equal("更新附圖", frame!.Title);
@@ -174,12 +174,12 @@ public class ImageHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfImageDocument.SetImageFilter"/> 與 <see cref="OdfImageDocument.FindImageFilter"/> 的往返一致性。
+    /// 驗證 <see cref="ImageDocument.SetImageFilter"/> 與 <see cref="ImageDocument.FindImageFilter"/> 的往返一致性。
     /// </summary>
     [Fact]
     public void ImageFilter_RoundTripsAfterSetAndSave()
     {
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
         image.SetImage(CreatePngBytes(), "Primary.png");
         image.FrameName = "PrimaryFrame";
 
@@ -193,7 +193,7 @@ public class ImageHighLevelApiTests
         image.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfImageDocument.Load(stream, "gallery.odi");
+        using var loaded = ImageDocument.Load(stream, "gallery.odi");
         OdfImageFilterInfo? readFilter = loaded.FindImageFilter("PrimaryFrame");
         Assert.NotNull(readFilter);
         Assert.Equal("grayscale", readFilter!.FilterName);
@@ -204,12 +204,12 @@ public class ImageHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfImageDocument.SetImageRotation"/> 與 <see cref="OdfImageDocument.SetImageCrop"/> 的往返一致性。
+    /// 驗證 <see cref="ImageDocument.SetImageRotation"/> 與 <see cref="ImageDocument.SetImageCrop"/> 的往返一致性。
     /// </summary>
     [Fact]
     public void ImageRotationAndCrop_RoundTripAfterSaveAndLoad()
     {
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
         image.SetImage(CreatePngBytes(), "Primary.png");
         image.FrameName = "PrimaryFrame";
 
@@ -221,7 +221,7 @@ public class ImageHighLevelApiTests
         image.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfImageDocument.Load(stream, "gallery.odi");
+        using var loaded = ImageDocument.Load(stream, "gallery.odi");
         OdfImageFrameInfo frame = Assert.Single(loaded.GetImageFrames());
         Assert.NotNull(frame.RotationDegrees);
         Assert.Equal(90, frame.RotationDegrees!.Value, 3);
@@ -240,13 +240,13 @@ public class ImageHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfImageDocument.AddImageFrames"/> 可一次新增多個影像框架，
-    /// 且結果與依序個別呼叫 <see cref="OdfImageDocument.AddImageFrame"/> 等價。
+    /// 驗證 <see cref="ImageDocument.AddImageFrames"/> 可一次新增多個影像框架，
+    /// 且結果與依序個別呼叫 <see cref="ImageDocument.AddImageFrame"/> 等價。
     /// </summary>
     [Fact]
     public void AddImageFrames_AddsMultipleFramesInOneCall()
     {
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
         byte[] primary = CreatePngBytes();
         byte[] secondary = CreateAlternatePngBytes();
 
@@ -282,13 +282,13 @@ public class ImageHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfImageDocument.RemoveImageFrames"/> 可一次移除多個影像框架，
+    /// 驗證 <see cref="ImageDocument.RemoveImageFrames"/> 可一次移除多個影像框架，
     /// 並正確回報實際移除數量（忽略找不到的名稱，不擲出例外）。
     /// </summary>
     [Fact]
     public void RemoveImageFrames_RemovesMultipleFramesAndIgnoresMissingNames()
     {
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
         image.SetImage(CreatePngBytes(), "Primary.png");
         image.AddImageFrames(
         [
@@ -311,14 +311,14 @@ public class ImageHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfImageDocument.AddImageFrames"/> 與
-    /// <see cref="OdfImageDocument.RemoveImageFrames"/> 的邊界案例：
+    /// 驗證 <see cref="ImageDocument.AddImageFrames"/> 與
+    /// <see cref="ImageDocument.RemoveImageFrames"/> 的邊界案例：
     /// 傳入 <see langword="null"/> 集合時擲出 <see cref="System.ArgumentNullException"/>。
     /// </summary>
     [Fact]
     public void BatchFrameOperations_NullCollection_ThrowsArgumentNullException()
     {
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
 
         Assert.Throws<System.ArgumentNullException>(() => image.AddImageFrames(null!));
         Assert.Throws<System.ArgumentNullException>(() => image.RemoveImageFrames(null!));

@@ -13,14 +13,14 @@ namespace OdfKit.Tests;
 public class ImageVariantRoundTripTests
 {
     /// <summary>
-    /// 驗證 <see cref="ImageTemplateDocument.CreateFromDocument(OdfImageDocument)"/> 與
-    /// <see cref="OdfImageDocument.CreateFromTemplate(ImageTemplateDocument)"/> 形成的雙向轉換，
+    /// 驗證 <see cref="ImageTemplateDocument.CreateFromDocument(ImageDocument)"/> 與
+    /// <see cref="ImageDocument.CreateFromTemplate(ImageTemplateDocument)"/> 形成的雙向轉換，
     /// 影像框架內容完整保留。
     /// </summary>
     [Fact]
-    public void OdfImageDocument_CreateTemplateFromDocument_RoundTripsBackToDocument()
+    public void ImageDocument_CreateTemplateFromDocument_RoundTripsBackToDocument()
     {
-        using var original = OdfImageDocument.Create();
+        using var original = ImageDocument.Create();
         original.SetImageLayout(
             OdfLength.FromCentimeters(1),
             OdfLength.FromCentimeters(1),
@@ -37,7 +37,7 @@ public class ImageVariantRoundTripTests
         OdfImageFrameInfo templateFrame = Assert.Single(template.GetImageFrames());
         Assert.Equal("範本往返測試標題", templateFrame.Title);
 
-        using var restored = OdfImageDocument.CreateFromTemplate(template);
+        using var restored = ImageDocument.CreateFromTemplate(template);
         Assert.Equal("application/vnd.oasis.opendocument.image", restored.Package.MimeType);
         Assert.Equal(OdfDocumentKind.Image, restored.DocumentKind);
         OdfImageFrameInfo restoredFrame = Assert.Single(restored.GetImageFrames());
@@ -46,14 +46,14 @@ public class ImageVariantRoundTripTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="FlatImageDocument.CreateFromDocument(OdfImageDocument)"/> 與
-    /// <see cref="OdfImageDocument.CreateFromFlatDocument(FlatImageDocument)"/> 形成的雙向轉換，
+    /// 驗證 <see cref="FlatImageDocument.CreateFromDocument(ImageDocument)"/> 與
+    /// <see cref="ImageDocument.CreateFromFlatDocument(FlatImageDocument)"/> 形成的雙向轉換，
     /// 影像框架內容完整保留。
     /// </summary>
     [Fact]
-    public void OdfImageDocument_CreateFlatDocument_RoundTripsBackToZip()
+    public void ImageDocument_CreateFlatDocument_RoundTripsBackToZip()
     {
-        using var original = OdfImageDocument.Create();
+        using var original = ImageDocument.Create();
         original.SetImageLayout(
             OdfLength.FromCentimeters(1),
             OdfLength.FromCentimeters(1),
@@ -70,7 +70,7 @@ public class ImageVariantRoundTripTests
         OdfImageFrameInfo flatFrame = Assert.Single(flat.GetImageFrames());
         Assert.Equal("Flat 往返測試標題", flatFrame.Title);
 
-        using var restored = OdfImageDocument.CreateFromFlatDocument(flat);
+        using var restored = ImageDocument.CreateFromFlatDocument(flat);
         Assert.False(restored.IsFlatXml);
         Assert.Equal(OdfDocumentKind.Image, restored.DocumentKind);
         OdfImageFrameInfo restoredFrame = Assert.Single(restored.GetImageFrames());
@@ -85,9 +85,9 @@ public class ImageVariantRoundTripTests
     public void ImageVariantConversions_NullSource_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => ImageTemplateDocument.CreateFromDocument(null!));
-        Assert.Throws<ArgumentNullException>(() => OdfImageDocument.CreateFromTemplate(null!));
+        Assert.Throws<ArgumentNullException>(() => ImageDocument.CreateFromTemplate(null!));
         Assert.Throws<ArgumentNullException>(() => FlatImageDocument.CreateFromDocument(null!));
-        Assert.Throws<ArgumentNullException>(() => OdfImageDocument.CreateFromFlatDocument(null!));
+        Assert.Throws<ArgumentNullException>(() => ImageDocument.CreateFromFlatDocument(null!));
     }
 
     private static byte[] CreatePngBytes() =>

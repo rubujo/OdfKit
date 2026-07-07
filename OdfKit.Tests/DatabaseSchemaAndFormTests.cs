@@ -26,7 +26,7 @@ public class DatabaseSchemaAndFormTests
     [Fact]
     public void Schema_AddTableAndKeys_RoundTripsSuccessfully()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         var schema = database.Schema;
 
         // 1. 建立 Customers 表格
@@ -58,7 +58,7 @@ public class DatabaseSchemaAndFormTests
         stream.Position = 0;
 
         // 4. 重新載入並驗證
-        using var loadedDb = OdfDatabaseDocument.Load(stream, "test_db.odb");
+        using var loadedDb = DatabaseDocument.Load(stream, "test_db.odb");
         var loadedSchema = loadedDb.Schema;
 
         Assert.Equal(2, loadedSchema.Tables.Count);
@@ -184,7 +184,7 @@ public class DatabaseSchemaAndFormTests
 
     /// <summary>
     /// 驗證報表內容應建立為獨立 <see cref="TextDocument"/>（使用真實 ODF 欄位元素），
-    /// 再透過 <see cref="OdfDatabaseDocument.AddReport"/> 的 <c>xlink:href</c> 參照機制連結至 .odb 套件，
+    /// 再透過 <see cref="DatabaseDocument.AddReport"/> 的 <c>xlink:href</c> 參照機制連結至 .odb 套件，
     /// 取代先前基於虛構 <c>report:1.0</c> 命名空間的 <c>DefineReportStructure</c>。
     /// </summary>
     [Fact]
@@ -194,7 +194,7 @@ public class DatabaseSchemaAndFormTests
         var p = reportDoc.AddParagraph("銷售人員：");
         p.AddDatabaseDisplayField("Sales", "SalesPersonName", tableType: "table");
 
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         database.AddReport("SalesReport", href: "Reports/SalesReport/", title: "銷售報表");
 
         OdfDatabaseReportInfo? report = database.FindReport("SalesReport");

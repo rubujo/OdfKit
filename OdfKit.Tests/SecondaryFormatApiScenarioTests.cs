@@ -74,7 +74,7 @@ public class SecondaryFormatApiScenarioTests
     [Fact]
     public void DatabaseScenario_ConnectionTablesQueriesFormsSurviveRoundTrip()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:hsqldb");
         database.AddTable("Customers", "SELECT * FROM customers");
         database.AddQuery(
@@ -91,7 +91,7 @@ public class SecondaryFormatApiScenarioTests
         database.SaveToStream(stream);
         stream.Position = 0;
 
-        using OdfDatabaseDocument loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        using DatabaseDocument loaded = DatabaseDocument.Load(stream, "database.odb");
         Assert.Equal("sdbc:embedded:hsqldb", loaded.ConnectionHref);
 
         OdfDatabaseTableInfo table = Assert.Single(loaded.GetTables());
@@ -155,7 +155,7 @@ public class SecondaryFormatApiScenarioTests
         byte[] primary = CreatePngBytes();
         byte[] secondary = CreateAlternatePngBytes();
 
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
         image.SetImageLayout(
             OdfLength.FromCentimeters(1),
             OdfLength.FromCentimeters(2),
@@ -179,7 +179,7 @@ public class SecondaryFormatApiScenarioTests
         image.SaveToStream(stream);
         stream.Position = 0;
 
-        using OdfImageDocument loaded = OdfImageDocument.Load(stream, "gallery.odi");
+        using ImageDocument loaded = ImageDocument.Load(stream, "gallery.odi");
         Assert.Equal(2, loaded.GetImageFrames().Count);
 
         OdfImageFrameInfo primaryFrame = loaded.GetImageFrames()[0];

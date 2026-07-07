@@ -14,12 +14,12 @@ namespace OdfKit.Tests;
 public class DatabaseHighLevelApiTests
 {
     /// <summary>
-    /// 驗證 <see cref="OdfDatabaseDocument.GetForms"/> 可讀回已新增的表單元件。
+    /// 驗證 <see cref="DatabaseDocument.GetForms"/> 可讀回已新增的表單元件。
     /// </summary>
     [Fact]
     public void GetForms_RoundTripsAfterAdd()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         database.AddForm(
             "CustomerForm",
             "forms/CustomerForm",
@@ -42,12 +42,12 @@ public class DatabaseHighLevelApiTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfDatabaseDocument.GetReports"/> 可讀回已新增的報表元件。
+    /// 驗證 <see cref="DatabaseDocument.GetReports"/> 可讀回已新增的報表元件。
     /// </summary>
     [Fact]
     public void GetReports_RoundTripsAfterAdd()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         database.AddReport(
             "SalesReport",
             "reports/SalesReport",
@@ -74,7 +74,7 @@ public class DatabaseHighLevelApiTests
     [Fact]
     public void ReportsPersistAfterSaveAndLoad()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:hsqldb");
         database.AddReport("SalesReport", "reports/SalesReport", "銷售報表", "每月銷售摘要。");
 
@@ -82,7 +82,7 @@ public class DatabaseHighLevelApiTests
         database.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        using var loaded = DatabaseDocument.Load(stream, "database.odb");
         OdfDatabaseReportInfo report = Assert.Single(loaded.GetReports());
         Assert.Equal("SalesReport", report.Name);
         Assert.Equal("reports/SalesReport", report.Href);
@@ -96,7 +96,7 @@ public class DatabaseHighLevelApiTests
     [Fact]
     public void FormsPersistAfterSaveAndLoad()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:hsqldb");
         database.AddForm("MainForm", "forms/MainForm", "主表單");
 
@@ -104,7 +104,7 @@ public class DatabaseHighLevelApiTests
         database.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        using var loaded = DatabaseDocument.Load(stream, "database.odb");
         OdfDatabaseFormInfo form = Assert.Single(loaded.GetForms());
         Assert.Equal("MainForm", form.Name);
         Assert.Equal("forms/MainForm", form.Href);
@@ -117,7 +117,7 @@ public class DatabaseHighLevelApiTests
     [Fact]
     public void SchemaColumnConstraints_RoundTripAfterSaveAndLoad()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         var schema = new OdfDatabaseSchema(database);
 
         var table = new OdfSchemaTable("Customers");
@@ -134,7 +134,7 @@ public class DatabaseHighLevelApiTests
         database.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        using var loaded = DatabaseDocument.Load(stream, "database.odb");
         var loadedSchema = new OdfDatabaseSchema(loaded);
         OdfSchemaTable loadedTable = Assert.Single(loadedSchema.Tables);
         OdfSchemaColumn emailColumn = loadedTable.Columns.Single(c => c.Name == "Email");
@@ -150,7 +150,7 @@ public class DatabaseHighLevelApiTests
     [Fact]
     public void SchemaIndexes_RoundTripAfterSaveAndLoad()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         var schema = new OdfDatabaseSchema(database);
 
         var table = new OdfSchemaTable("Customers");
@@ -163,7 +163,7 @@ public class DatabaseHighLevelApiTests
         database.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        using var loaded = DatabaseDocument.Load(stream, "database.odb");
         var loadedSchema = new OdfDatabaseSchema(loaded);
         OdfSchemaTable loadedTable = Assert.Single(loadedSchema.Tables);
         OdfSchemaIndex index = Assert.Single(loadedTable.Indexes);
@@ -179,7 +179,7 @@ public class DatabaseHighLevelApiTests
     [Fact]
     public void AdvancedFormControls_RoundTripAfterSaveAndLoad()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         var designer = new OdfDatabaseFormDesigner(database);
 
         designer.AddRadioButton("Gender", "男", isSelected: true);
@@ -192,7 +192,7 @@ public class DatabaseHighLevelApiTests
         database.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        using var loaded = DatabaseDocument.Load(stream, "database.odb");
         using var contentStream = loaded.Package.GetEntryStream("content.xml");
         using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();
@@ -212,7 +212,7 @@ public class DatabaseHighLevelApiTests
     [Fact]
     public void LoginAndDriverSettings_RoundTripAfterSaveAndLoad()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:hsqldb");
         database.SetLogin(userName: "admin", useSystemUser: false, isPasswordRequired: true, loginTimeout: 30);
         database.SetDriverSettings(showDeleted: false, isFirstRowHeaderLine: true, parameterNameSubstitution: true);
@@ -221,7 +221,7 @@ public class DatabaseHighLevelApiTests
         database.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        using var loaded = DatabaseDocument.Load(stream, "database.odb");
         OdfDatabaseLoginInfo? login = loaded.GetLogin();
         Assert.NotNull(login);
         Assert.Equal("admin", login!.UserName);
@@ -242,7 +242,7 @@ public class DatabaseHighLevelApiTests
     [Fact]
     public void QueryStatementsColumnsAndUpdateTable_RoundTripAfterSaveAndLoad()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         database.AddQuery("CustomerQuery", "SELECT * FROM Customers");
         database.SetQueryOrderStatement("CustomerQuery", "Name ASC", applyCommand: true);
         database.SetQueryFilterStatement("CustomerQuery", "Age > 18", applyCommand: true);
@@ -253,7 +253,7 @@ public class DatabaseHighLevelApiTests
         database.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        using var loaded = DatabaseDocument.Load(stream, "database.odb");
         OdfDatabaseQueryStatementInfo? order = loaded.FindQueryOrderStatement("CustomerQuery");
         Assert.NotNull(order);
         Assert.Equal("Name ASC", order!.Command);
@@ -273,7 +273,7 @@ public class DatabaseHighLevelApiTests
     [Fact]
     public void ControlEventAndValidationAttributes_RoundTripAfterSaveAndLoad()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         var designer = new OdfDatabaseFormDesigner(database);
         var textBox = designer.AddTextBox("CustomerName", "客戶名稱");
         designer.SetControlEvent(textBox, "form:approveaction", "Standard.Module1.OnApprove");
@@ -284,7 +284,7 @@ public class DatabaseHighLevelApiTests
         database.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        using var loaded = DatabaseDocument.Load(stream, "database.odb");
         using var contentStream = loaded.Package.GetEntryStream("content.xml");
         using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();
@@ -302,7 +302,7 @@ public class DatabaseHighLevelApiTests
     [Fact]
     public void GroupBox_RoundTripsAfterSaveAndLoad()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         var designer = new OdfDatabaseFormDesigner(database);
         designer.AddGroupBox("ContactGroup", "聯絡資訊");
 
@@ -310,7 +310,7 @@ public class DatabaseHighLevelApiTests
         database.SaveToStream(stream);
         stream.Position = 0;
 
-        using var loaded = OdfDatabaseDocument.Load(stream, "database.odb");
+        using var loaded = DatabaseDocument.Load(stream, "database.odb");
         using var contentStream = loaded.Package.GetEntryStream("content.xml");
         using var reader = new StreamReader(contentStream);
         string xml = reader.ReadToEnd();

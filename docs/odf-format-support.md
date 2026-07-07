@@ -215,7 +215,7 @@ CNS 11643 官方語意相容或認證。
   - **互通驗收的誠實負向結果**：實測確認 LibreOffice 26.2.1 不支援將獨立（非嵌入
     ODS/ODT/ODP）的 ODC／OTC 開啟為主文件（回報 `source file could not be loaded`），
     FODC 則被誤判為「Writer document」僅原樣回顯來源 XML，並非真正剖析。
-    這與既有 `OdfImageDocument_PackageStructureMatchesOdf14Schema` 註解中
+    這與既有 `ImageDocument_PackageStructureMatchesOdf14Schema` 註解中
     「LibreOffice 已在 draw.xcd 註冊 ODC」的舊有假設不符——已在
     `LibreOfficeInteropTests.OdfChartDocument_PackageStructureMatchesOdf14Schema` 的文件
     註解中修正此假設。改以封裝結構驗證取代真機驗證，並以既有
@@ -270,16 +270,17 @@ CNS 11643 官方語意相容或認證。
   （`GetImageFrames`／`AddImageFrame`／`UpdateImageFrame`／`RemoveImageFrame`／
   `SetImageRotation`／`SetImageCrop`／`SetImageFilter`）；圖層與群組支援經查證為 ODF 規格層級
   不支援（`office:image` 不同於 `office:drawing`，規格未定義 layer／group 容器），維持先前
-  「已查證不可行」的結論不變。本次補上確認缺失的部分：
-  - 新增批次操作 API `OdfImageDocument.AddImageFrames(IEnumerable<OdfImageFrameRequest>)`／
+  「已查證不可行」的結論不變。主文件建議使用短名 facade `ImageDocument`；
+  既有 `OdfImageDocument` 入口仍保留相容性。本次補上確認缺失的部分：
+  - 新增批次操作 API `ImageDocument.AddImageFrames(IEnumerable<OdfImageFrameRequest>)`／
     `RemoveImageFrames(IEnumerable<string>)`，對應「Frame／picture／layout
     的批次操作」要求。
-  - 新增雙向轉換工作流 `ImageTemplateDocument.CreateFromDocument(OdfImageDocument)` ↔
-    `OdfImageDocument.CreateFromTemplate(ImageTemplateDocument)`；
-    `FlatImageDocument.CreateFromDocument(OdfImageDocument)` ↔
-    `OdfImageDocument.CreateFromFlatDocument(FlatImageDocument)`。新增
+  - 新增雙向轉換工作流 `ImageTemplateDocument.CreateFromDocument(...)` ↔
+    `ImageDocument.CreateFromTemplate(...)`；
+    `FlatImageDocument.CreateFromDocument(...)` ↔
+    `ImageDocument.CreateFromFlatDocument(...)`。新增
     `ImageVariantRoundTripTests`（雙向往返、邊界測試）。
-  - **修正一個既有文件註解的不準確描述**：`OdfImageDocument_PackageStructureMatchesOdf14Schema`
+  - **修正一個既有文件註解的不準確描述**：`ImageDocument_PackageStructureMatchesOdf14Schema`
     原先聲稱 LibreOffice 對 ODI／OTI／FODI 一律回報「source file could not be loaded」；
     實測確認此描述對 ODI／OTI 成立，但 **FODI 實際上被誤判為「Writer document」**，以
     `writer_png_Export` 篩選器產生與影像內容完全無關的輸出，與 `.fodc`（誤判為 Writer
@@ -294,11 +295,12 @@ CNS 11643 官方語意相容或認證。
   並無比照 Chart（Legend 物件模型與資料標籤 preset）那樣明確追蹤的延伸項目；
   Formula 的最小語意編輯 helper 已另有程式與測試證據，
   經評估後依使用者先前確認的「ODB complete 標準採真實可用工作流為準」決策，**升級為
-  `complete`**：
-  - **資料來源**：連線 href、登入（`OdfDatabaseDocument.GetLogin`／`SetLogin`）、驅動程式設定
+  `complete`**。主文件建議使用短名 facade `DatabaseDocument`；既有
+  `OdfDatabaseDocument` 入口仍保留相容性：
+  - **資料來源**：連線 href、登入（`DatabaseDocument.GetLogin`／`SetLogin`）、驅動程式設定
     （`GetDriverSettings`／`SetDriverSettings`）。
   - **查詢**：SQL 命令、`ORDER BY`／`WHERE` 陳述式、可見欄位、更新目標表、escape processing
-    （`OdfDatabaseDocument.Queries.cs`）。
+    （`DatabaseDocument` 繼承的查詢 API，實作位於 `OdfDatabaseDocument.Queries.cs`）。
   - **表單**：完整表單設計器 `OdfDatabaseFormDesigner`，涵蓋文字框、核取方塊、選項按鈕、下拉
     選單、列表框、按鈕、標籤、群組框、數值／日期／時間欄位，並支援事件繫結與必填／長度驗證。
   - **報表**：因官方 OASIS ODF schema 並未定義報表內容結構（先前以虛構命名空間

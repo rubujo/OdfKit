@@ -95,7 +95,7 @@ ODF Formula 是唯一一個獨立 ZIP 主格式（`.odf`）確實有真機支援
 | `.fodi` | ❌ 未回報錯誤，但被誤判為「Writer document」，以 `writer_png_Export` 篩選器產生與影像內容完全無關的輸出 |
 
 `.fodi` 的誤判模式與 `.fodc`（誤判為 Writer document）、`.fdf`（誤判為 Calc document）一致——
-這修正了既有 `OdfImageDocument_PackageStructureMatchesOdf14Schema` 註解中原先聲稱「ODI／OTI／
+這修正了既有 `ImageDocument_PackageStructureMatchesOdf14Schema` 註解中原先聲稱「ODI／OTI／
 FODI 一律回報 source file could not be loaded」的不準確描述（該描述對 ODI／OTI 成立，但對
 FODI 並不成立）。改以封裝結構與 schema 層級的精確驗證取代真機驗證（該測試已擴充涵蓋
 ODI／OTI／FODI 三者）。

@@ -1362,7 +1362,7 @@ public partial class LibreOfficeInteropTests
     /// 結構與 schema 層級的精確驗證取代真機驗證。
     /// </summary>
     [Fact]
-    public void OdfImageDocument_PackageStructureMatchesOdf14Schema()
+    public void ImageDocument_PackageStructureMatchesOdf14Schema()
     {
         string tempRoot = Path.Combine(Path.GetTempPath(), "OdfKitImagePackageStructure_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempRoot);
@@ -1391,7 +1391,7 @@ public partial class LibreOfficeInteropTests
             Assert.Contains("xlink:href=\"Pictures/interop.png\"", contentXml);
             Assert.Contains("OdfKit-LibreOffice-Image-Interop-Marker", contentXml);
 
-            using OdfImageDocument loaded = OdfImageDocument.Load(odiPath);
+            using ImageDocument loaded = ImageDocument.Load(odiPath);
             OdfImageFrameInfo frame = Assert.Single(loaded.GetImageFrames());
             Assert.Equal("PrimaryFrame", frame.Name);
             Assert.Equal("OdfKit-LibreOffice-Image-Interop-Marker", frame.Title);
@@ -1401,7 +1401,7 @@ public partial class LibreOfficeInteropTests
             string otiPath = Path.Combine(tempRoot, "interop-image.oti");
             string fodiPath = Path.Combine(tempRoot, "interop-image.fodi");
 
-            using (OdfImageDocument odiForTemplate = OdfImageDocument.Load(odiPath))
+            using (ImageDocument odiForTemplate = ImageDocument.Load(odiPath))
             using (ImageTemplateDocument oti = ImageTemplateDocument.CreateFromDocument(odiForTemplate))
             {
                 oti.Save(otiPath);
@@ -1410,7 +1410,7 @@ public partial class LibreOfficeInteropTests
             using OdfPackage otiPackage = OdfPackage.Open(otiPath);
             Assert.Equal("application/vnd.oasis.opendocument.image-template", otiPackage.MimeType);
 
-            using (OdfImageDocument odiForFlat = OdfImageDocument.Load(odiPath))
+            using (ImageDocument odiForFlat = ImageDocument.Load(odiPath))
             using (FlatImageDocument fodi = FlatImageDocument.CreateFromDocument(odiForFlat))
             {
                 fodi.Save(fodiPath);
@@ -1442,7 +1442,7 @@ public partial class LibreOfficeInteropTests
     /// OdfKit 產生的獨立 .odc／.otc 一律回報「source file could not be loaded」，即使內容完全
     /// 符合 ODF 規格亦然；獨立 .fodc（Flat XML）則更隱晦地被誤判為「Writer document」並原樣
     /// 回顯來源 XML（並非真正剖析為圖表），同樣不構成有效互通。這與既有
-    /// <c>OdfImageDocument_PackageStructureMatchesOdf14Schema</c> 註解中「LibreOffice 已在
+    /// <c>ImageDocument_PackageStructureMatchesOdf14Schema</c> 註解中「LibreOffice 已在
     /// draw.xcd 註冊 ODC」的舊有假設不符——ODF Chart 在 ODF 生態中設計上即為僅可嵌入
     /// ODS/ODT/ODP 內的子文件類型，並非獨立可開啟的主文件格式，這是上游應用程式的已知限制，
     /// 並非 OdfKit 的缺陷。因此 ODC／OTC／FODC 改以封裝結構與 schema 層級的精確驗證，以及
@@ -1519,7 +1519,7 @@ public partial class LibreOfficeInteropTests
 
     private static void CreateImageDocument(string path)
     {
-        using var document = OdfImageDocument.Create();
+        using var document = ImageDocument.Create();
         document.SetImageLayout(
             OdfLength.Parse("1cm"),
             OdfLength.Parse("1cm"),
@@ -2594,7 +2594,7 @@ public partial class LibreOfficeInteropTests
     }
 
     /// <summary>
-    /// 驗證 <see cref="OdfDatabaseSchema"/>／<see cref="OdfDatabaseDocument"/> 建立的 ODB 資料庫文件，
+    /// 驗證 <see cref="OdfDatabaseSchema"/>／<see cref="DatabaseDocument"/> 建立的 ODB 資料庫文件，
     /// 其封裝結構（mimetype／manifest media-type）符合真實 LibreOffice 對 ODF 資料庫文件的偵測慣例。
     /// </summary>
     /// <remarks>
@@ -2626,7 +2626,7 @@ public partial class LibreOfficeInteropTests
         {
             string odbPath = Path.Combine(tempRoot, "interop-database.odb");
 
-            using (var database = OdfKit.Database.OdfDatabaseDocument.Create())
+            using (var database = OdfKit.Database.DatabaseDocument.Create())
             {
                 database.SetConnection("sdbc:embedded:hsqldb");
 
@@ -2652,7 +2652,7 @@ public partial class LibreOfficeInteropTests
                 "application/vnd.oasis.opendocument.base",
                 savedPackage.Manifest["/"]);
 
-            using OdfKit.Database.OdfDatabaseDocument reloaded = OdfKit.Database.OdfDatabaseDocument.Load(odbPath);
+            using OdfKit.Database.DatabaseDocument reloaded = OdfKit.Database.DatabaseDocument.Load(odbPath);
             Assert.Single(reloaded.Schema.Tables);
             Assert.Equal("Customers", reloaded.Schema.Tables[0].Name);
             Assert.NotNull(reloaded.Schema.Tables[0].PrimaryKey);

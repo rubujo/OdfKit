@@ -199,11 +199,11 @@ public class OdfValidatorApiTests
         OdfValidationReport formulaReport = formula.Validate();
         Assert.True(formulaReport.IsValid, string.Join(Environment.NewLine, formulaReport.Issues));
 
-        using OdfImageDocument image = OdfImageDocument.Create();
+        using ImageDocument image = ImageDocument.Create();
         OdfValidationReport imageReport = image.Validate();
         Assert.True(imageReport.IsValid, string.Join(Environment.NewLine, imageReport.Issues));
 
-        using OdfDatabaseDocument database = OdfDatabaseDocument.Create();
+        using DatabaseDocument database = DatabaseDocument.Create();
         OdfValidationReport databaseReport = database.Validate();
         Assert.True(databaseReport.IsValid, string.Join(Environment.NewLine, databaseReport.Issues));
     }
