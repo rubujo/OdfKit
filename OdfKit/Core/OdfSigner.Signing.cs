@@ -3,6 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfSigner API.
+/// 提供 OdfSigner API。
+/// </summary>
 
 public static partial class OdfSigner
 {

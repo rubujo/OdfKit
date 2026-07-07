@@ -7,6 +7,10 @@ using OdfKit.DOM;
 using OdfKit.Formula;
 
 namespace OdfKit.Text;
+/// <summary>
+/// Provides the OdfMailMergeEngine API.
+/// 提供 OdfMailMergeEngine API。
+/// </summary>
 
 public partial class OdfMailMergeEngine
 {

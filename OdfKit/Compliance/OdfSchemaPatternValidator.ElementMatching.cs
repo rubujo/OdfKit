@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace OdfKit.Compliance;
+/// <summary>
+/// Provides the OdfSchemaPatternValidator API.
+/// 提供 OdfSchemaPatternValidator API。
+/// </summary>
 
 public static partial class OdfSchemaPatternValidator
 {

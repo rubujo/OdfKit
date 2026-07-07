@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfStyleDirection.
 /// 表示 ODF schema 中 <c>style:direction</c> 的方向 token。
 /// </summary>
 public enum OdfStyleDirection
@@ -17,6 +18,7 @@ public enum OdfStyleDirection
 }
 
 /// <summary>
+/// Defines values for OdfFormOrientation.
 /// 表示 ODF schema 中 <c>form:orientation</c> 的表單方向 token。
 /// </summary>
 public enum OdfFormOrientation
@@ -33,6 +35,7 @@ public enum OdfFormOrientation
 }
 
 /// <summary>
+/// Defines values for OdfTableDirection.
 /// 表示 ODF schema 中 <c>table:direction</c> 的表格方向 token。
 /// </summary>
 public enum OdfTableDirection
@@ -54,6 +57,7 @@ public enum OdfTableDirection
 }
 
 /// <summary>
+/// Defines values for OdfTableOrientation.
 /// 表示 ODF schema 中 <c>table:orientation</c> 的表格方向 token。
 /// </summary>
 public enum OdfTableOrientation

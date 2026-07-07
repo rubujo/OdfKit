@@ -29,12 +29,24 @@ public readonly struct OdfFrozenPanes(int rows, int columns) : IEquatable<OdfFro
     /// </summary>
     public bool IsFrozen => Rows > 0 || Columns > 0;
 
+    /// <summary>
+    /// Executes the Equals operation.
+    /// 執行 Equals 作業。
+    /// </summary>
     /// <inheritdoc />
     public bool Equals(OdfFrozenPanes other) => Rows == other.Rows && Columns == other.Columns;
 
+    /// <summary>
+    /// Executes the Equals operation.
+    /// 執行 Equals 作業。
+    /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfFrozenPanes other && Equals(other);
 
+    /// <summary>
+    /// Executes the GetHashCode operation.
+    /// 執行 GetHashCode 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int GetHashCode()
     {

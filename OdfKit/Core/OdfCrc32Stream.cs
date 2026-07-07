@@ -5,6 +5,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfCrc32Stream API.
 /// 裝飾者串流，在讀取或寫入資料時以 <see cref="OdfCrc32"/> 實時計算累積的 CRC-32 校驗碼。
 /// </summary>
 public sealed class OdfCrc32Stream : Stream
@@ -20,6 +21,7 @@ public sealed class OdfCrc32Stream : Stream
 #endif
 
     /// <summary>
+    /// Executes the OdfCrc32Stream operation.
     /// 初始化 <see cref="OdfCrc32Stream"/> 類別的新執行個體。
     /// </summary>
     /// <param name="underlyingStream">底層被包裝的實體資料流</param>
@@ -30,27 +32,52 @@ public sealed class OdfCrc32Stream : Stream
         _expectedCrc = expectedCrc;
     }
 
-    /// <summary>
-    /// 取得目前為止計算出的最終 CRC-32 值。
-    /// </summary>
 #if NET10_0_OR_GREATER
+    /// <summary>
+    /// Gets the current CRC-32 value computed so far.
+    /// 取得目前為止計算出的 CRC-32 值。
+    /// </summary>
     public uint Crc32 => _crcInstance.GetCurrentHashAsUInt32();
 #else
+    /// <summary>
+    /// Gets the current CRC-32 value computed so far.
+    /// 取得目前為止計算出的 CRC-32 值。
+    /// </summary>
     public uint Crc32 => _currentCrc ^ 0xFFFFFFFF;
 #endif
 
+    /// <summary>
+    /// Provides the CanRead member.
+    /// 提供 CanRead 成員。
+    /// </summary>
     /// <inheritdoc />
     public override bool CanRead => _underlyingStream.CanRead;
 
+    /// <summary>
+    /// Provides the CanSeek member.
+    /// 提供 CanSeek 成員。
+    /// </summary>
     /// <inheritdoc />
     public override bool CanSeek => _underlyingStream.CanSeek;
 
+    /// <summary>
+    /// Provides the CanWrite member.
+    /// 提供 CanWrite 成員。
+    /// </summary>
     /// <inheritdoc />
     public override bool CanWrite => _underlyingStream.CanWrite;
 
+    /// <summary>
+    /// Provides the Length member.
+    /// 提供 Length 成員。
+    /// </summary>
     /// <inheritdoc />
     public override long Length => _underlyingStream.Length;
 
+    /// <summary>
+    /// Provides the member member.
+    /// 提供 member 成員。
+    /// </summary>
     /// <inheritdoc />
     public override long Position
     {
@@ -58,15 +85,31 @@ public sealed class OdfCrc32Stream : Stream
         set => _underlyingStream.Position = value;
     }
 
+    /// <summary>
+    /// Executes the Flush operation.
+    /// 執行 Flush 作業。
+    /// </summary>
     /// <inheritdoc />
     public override void Flush() => _underlyingStream.Flush();
 
+    /// <summary>
+    /// Executes the Seek operation.
+    /// 執行 Seek 作業。
+    /// </summary>
     /// <inheritdoc />
     public override long Seek(long offset, SeekOrigin origin) => _underlyingStream.Seek(offset, origin);
 
+    /// <summary>
+    /// Executes the SetLength operation.
+    /// 執行 SetLength 作業。
+    /// </summary>
     /// <inheritdoc />
     public override void SetLength(long value) => _underlyingStream.SetLength(value);
 
+    /// <summary>
+    /// Executes the Read operation.
+    /// 執行 Read 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int Read(byte[] buffer, int offset, int count)
     {
@@ -86,6 +129,10 @@ public sealed class OdfCrc32Stream : Stream
         return bytesRead;
     }
 
+    /// <summary>
+    /// Executes the Write operation.
+    /// 執行 Write 作業。
+    /// </summary>
     /// <inheritdoc />
     public override void Write(byte[] buffer, int offset, int count)
     {
@@ -110,6 +157,10 @@ public sealed class OdfCrc32Stream : Stream
         }
     }
 
+    /// <summary>
+    /// Executes the Dispose operation.
+    /// 執行 Dispose 作業。
+    /// </summary>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {

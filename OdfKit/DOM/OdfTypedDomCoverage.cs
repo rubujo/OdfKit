@@ -11,19 +11,29 @@ using OdfKit.Styles;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfTypedDomCoverage API.
 /// 產生 typed DOM 與 ODF schema 之間的覆蓋報告。
 /// </summary>
 public static class OdfTypedDomCoverage
 {
+#if !NETSTANDARD2_0
     /// <summary>
+    /// Builds the machine-readable typed DOM coverage report for the specified schema.
     /// 依指定 schema 建立 machine-readable typed DOM 覆蓋報告。
     /// </summary>
     /// <param name="schema">要檢查的 schema；若為 <see langword="null"/>，則使用最新 schema</param>
     /// <returns>typed DOM 覆蓋報告</returns>
-#if !NETSTANDARD2_0
     [RequiresUnreferencedCode("以反射掃描 typed DOM 包裝類型屬性；Native AOT 需改為原始碼產生器。")]
-#endif
     public static OdfTypedDomCoverageReport Build(OdfSchemaSet? schema = null)
+#else
+    /// <summary>
+    /// Builds the machine-readable typed DOM coverage report for the specified schema.
+    /// 依指定 schema 建立 machine-readable typed DOM 覆蓋報告。
+    /// </summary>
+    /// <param name="schema">要檢查的 schema；若為 <see langword="null"/>，則使用最新 schema</param>
+    /// <returns>typed DOM 覆蓋報告</returns>
+    public static OdfTypedDomCoverageReport Build(OdfSchemaSet? schema = null)
+#endif
     {
         OdfSchemaSet resolvedSchema = schema ?? OdfSchemaRegistry.Latest;
         List<OdfTypedDomElementCoverage> elements = [];

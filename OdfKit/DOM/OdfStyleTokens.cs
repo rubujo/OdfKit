@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfStyleLineBreak.
 /// 表示 ODF schema 中 <c>style:line-break</c> 的斷行 token。
 /// </summary>
 public enum OdfStyleLineBreak
@@ -17,6 +18,7 @@ public enum OdfStyleLineBreak
 }
 
 /// <summary>
+/// Defines values for OdfStyleRepeat.
 /// 表示 ODF schema 中 <c>style:repeat</c> 的背景重複 token。
 /// </summary>
 public enum OdfStyleRepeat

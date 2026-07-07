@@ -21,7 +21,8 @@ internal readonly ref struct OdfUtf8SpanWriter
         Span<byte> buffer = stackalloc byte[32];
         if (!Utf8Formatter.TryFormat(value, buffer, out int written))
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(
+                OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfUtf8SpanWriter_FormatFailed"));
         }
 
         WriteRaw(buffer.Slice(0, written));
@@ -32,7 +33,8 @@ internal readonly ref struct OdfUtf8SpanWriter
         Span<byte> buffer = stackalloc byte[64];
         if (!Utf8Formatter.TryFormat(value, buffer, out int written, new StandardFormat('G')))
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(
+                OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfUtf8SpanWriter_FormatFailed"));
         }
 
         WriteRaw(buffer.Slice(0, written));
@@ -46,7 +48,8 @@ internal readonly ref struct OdfUtf8SpanWriter
         Span<byte> buffer = stackalloc byte[64];
         if (!Utf8Formatter.TryFormat(value, buffer, out int written, new StandardFormat('O')))
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(
+                OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfUtf8SpanWriter_FormatFailed"));
         }
 
         WriteRaw(buffer.Slice(0, written));

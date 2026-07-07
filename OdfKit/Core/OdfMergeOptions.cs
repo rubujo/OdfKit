@@ -5,6 +5,7 @@ using System;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Defines values for ConflictResolution.
 /// 指定在附加或合併文件時，如何解決樣式名稱的衝突。
 /// </summary>
 public enum ConflictResolution
@@ -21,26 +22,31 @@ public enum ConflictResolution
 }
 
 /// <summary>
+/// Provides the OdfMergeOptions API.
 /// 合併或附加文件時的組態選項。
 /// </summary>
 public class OdfMergeOptions
 {
     /// <summary>
+    /// Gets the StyleConflictResolution value.
     /// 取得或設定樣式衝突的解決策略。
     /// </summary>
     public ConflictResolution StyleConflictResolution { get; set; } = ConflictResolution.KeepSourceFormatting;
 
     /// <summary>
+    /// Gets a value indicating the CopyMedia state.
     /// 取得或設定一個值，指出是否應複製並遷移參考的媒體或圖片。
     /// </summary>
     public bool CopyMedia { get; set; } = true;
 
     /// <summary>
+    /// Gets a value indicating the ImportStyles state.
     /// 取得或設定一個值，指出是否應匯入自訂樣式。
     /// </summary>
     public bool ImportStyles { get; set; } = true;
 
     /// <summary>
+    /// Executes the Default operation.
     /// 取得預設的合併選項組態。
     /// </summary>
     public static OdfMergeOptions Default => new();

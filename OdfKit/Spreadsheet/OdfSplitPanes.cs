@@ -28,12 +28,24 @@ public readonly struct OdfSplitPanes(int rows, int columns) : IEquatable<OdfSpli
     /// </summary>
     public bool IsSplit => Rows > 0 || Columns > 0;
 
+    /// <summary>
+    /// Executes the Equals operation.
+    /// 執行 Equals 作業。
+    /// </summary>
     /// <inheritdoc />
     public bool Equals(OdfSplitPanes other) => Rows == other.Rows && Columns == other.Columns;
 
+    /// <summary>
+    /// Executes the Equals operation.
+    /// 執行 Equals 作業。
+    /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfSplitPanes other && Equals(other);
 
+    /// <summary>
+    /// Executes the GetHashCode operation.
+    /// 執行 GetHashCode 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int GetHashCode()
     {

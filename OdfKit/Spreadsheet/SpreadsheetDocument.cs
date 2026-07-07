@@ -72,6 +72,10 @@ public partial class SpreadsheetDocument : OdfDocument
     public static SpreadsheetDocument CreateFromFlatDocument(FlatSpreadsheetDocument document) =>
         (SpreadsheetDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.Spreadsheet, targetIsFlatXml: false);
 
+    /// <summary>
+    /// Executes the ClearTemplateUserContent operation.
+    /// 執行 ClearTemplateUserContent 作業。
+    /// </summary>
     /// <inheritdoc/>
     protected override void ClearTemplateUserContent()
     {

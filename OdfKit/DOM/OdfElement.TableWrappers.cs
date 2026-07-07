@@ -8,12 +8,14 @@ namespace OdfKit.DOM;
 
 
 /// <summary>
+/// Provides the TableTableElement API.
 /// 表示 ODF 中的 table:table 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class TableTableElement(string? prefix = null) : OdfElement("table", OdfNamespaces.Table, prefix)
 {
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此表格的名稱。
     /// </summary>
     public string? Name
@@ -29,6 +31,7 @@ public partial class TableTableElement(string? prefix = null) : OdfElement("tabl
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此表格的樣式名稱。
     /// </summary>
     public string? StyleName
@@ -45,12 +48,14 @@ public partial class TableTableElement(string? prefix = null) : OdfElement("tabl
 }
 
 /// <summary>
+/// Provides the TableTableRowElement API.
 /// 表示 ODF 中的 table:table-row 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class TableTableRowElement(string? prefix = null) : OdfElement("table-row", OdfNamespaces.Table, prefix)
 {
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此表格列的重複次數。
     /// </summary>
     public int NumberRowsRepeated
@@ -61,12 +66,14 @@ public partial class TableTableRowElement(string? prefix = null) : OdfElement("t
 }
 
 /// <summary>
+/// Provides the TableTableCellElement API.
 /// 表示 ODF 中的 table:table-cell 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class TableTableCellElement(string? prefix = null) : OdfElement("table-cell", OdfNamespaces.Table, prefix)
 {
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此表格儲存格的重複次數。
     /// </summary>
     public int NumberColumnsRepeated
@@ -76,6 +83,7 @@ public partial class TableTableCellElement(string? prefix = null) : OdfElement("
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此表格儲存格的值類型。
     /// </summary>
     public string? ValueType
@@ -91,6 +99,7 @@ public partial class TableTableCellElement(string? prefix = null) : OdfElement("
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此表格儲存格的樣式名稱。
     /// </summary>
     public string? StyleName
@@ -107,18 +116,21 @@ public partial class TableTableCellElement(string? prefix = null) : OdfElement("
 }
 
 /// <summary>
+/// Provides the TableCoveredTableCellElement API.
 /// 表示 ODF 中的 table:covered-table-cell 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class TableCoveredTableCellElement(string? prefix = null) : OdfElement("covered-table-cell", OdfNamespaces.Table, prefix);
 
 /// <summary>
+/// Provides the TableNamedRangeElement API.
 /// 表示 ODF 中的 table:named-range 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class TableNamedRangeElement(string? prefix = null) : OdfElement("named-range", OdfNamespaces.Table, prefix)
 {
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此具名範圍的名稱。
     /// </summary>
     public string? Name
@@ -135,12 +147,14 @@ public partial class TableNamedRangeElement(string? prefix = null) : OdfElement(
 }
 
 /// <summary>
+/// Provides the TableDatabaseRangeElement API.
 /// 表示 ODF 中的 table:database-range 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class TableDatabaseRangeElement(string? prefix = null) : OdfElement("database-range", OdfNamespaces.Table, prefix)
 {
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此資料庫範圍的名稱。
     /// </summary>
     public string? Name

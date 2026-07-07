@@ -11,6 +11,7 @@ using System.Runtime.Intrinsics;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfUtf8XmlReader API.
 /// 針對 ODF 熱路徑設計的自訂、超輕量零分配 UTF-8 XML 拉取解析器。
 /// </summary>
 public ref struct OdfUtf8XmlReader
@@ -26,6 +27,7 @@ public ref struct OdfUtf8XmlReader
     public readonly int Position => _position;
 
     /// <summary>
+    /// Executes the OdfUtf8XmlReader operation.
     /// 初始化 <see cref="OdfUtf8XmlReader"/> 結構的新執行個體。
     /// </summary>
     /// <param name="xml">XML 的 UTF-8 位元組 Span</param>
@@ -38,6 +40,7 @@ public ref struct OdfUtf8XmlReader
     }
 
     /// <summary>
+    /// Executes the Read operation.
     /// 拉取並讀取下一個 XML 標記。
     /// </summary>
     /// <param name="token">輸出的標記資訊</param>
@@ -172,6 +175,7 @@ public ref struct OdfUtf8XmlReader
     }
 
     /// <summary>
+    /// Executes the ReadValueChunk operation.
     /// 將目前文字值以 UTF-8 位元組分塊讀入指定緩衝區。
     /// </summary>
     /// <param name="buffer">接收目前文字值片段的緩衝區</param>
@@ -190,6 +194,7 @@ public ref struct OdfUtf8XmlReader
     }
 
     /// <summary>
+    /// Executes the CopyValueTo operation.
     /// 將目前文字值從目前分塊游標位置直接複製到指定的位元組寫入器。
     /// </summary>
     /// <param name="writer">接收 UTF-8 文字值的位元組寫入器</param>
@@ -281,6 +286,7 @@ public ref struct OdfUtf8XmlReader
     }
 
     /// <summary>
+    /// Executes the GetCommonPrefixLength operation.
     /// 快速比對常見命名空間字首。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -508,6 +514,7 @@ public ref struct OdfUtf8XmlReader
     internal static int LastEntityFastDecodeCountForTests;
 
     /// <summary>
+    /// Executes the GetStringMaybeDecoded operation.
     /// 解碼給定 Span 位元組為 UTF-8 字串，並在必要時進行 XML 實體（Entity）解碼。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -779,6 +786,7 @@ internal enum OdfUtf8KnownQualifiedName
 }
 
 /// <summary>
+/// Defines values for OdfUtf8XmlTokenKind.
 /// XML 標記種類。
 /// </summary>
 public enum OdfUtf8XmlTokenKind
@@ -815,31 +823,37 @@ public enum OdfUtf8XmlTokenKind
 public readonly ref struct OdfUtf8XmlToken
 {
     /// <summary>
+    /// Gets the Kind value.
     /// 取得標記的種類。
     /// </summary>
     public OdfUtf8XmlTokenKind Kind { get; }
 
     /// <summary>
+    /// Gets the Name value.
     /// 取得標記名稱的 UTF-8 位元組 Span。
     /// </summary>
     public ReadOnlySpan<byte> Name { get; }
 
     /// <summary>
+    /// Gets the Attributes value.
     /// 取得標記屬性的 UTF-8 位元組 Span。
     /// </summary>
     public ReadOnlySpan<byte> Attributes { get; }
 
     /// <summary>
+    /// Gets the Offset value.
     /// 取得標記在原始 XML 緩衝區中的起始偏移量。
     /// </summary>
     public int Offset { get; }
 
     /// <summary>
+    /// Gets the Length value.
     /// 取得標記在原始 XML 緩衝區中的位元組長度。
     /// </summary>
     public int Length { get; }
 
     /// <summary>
+    /// Provides the Value member.
     /// 取得標記值的 UTF-8 位元組 Span。
     /// </summary>
     public ReadOnlySpan<byte> Value => Name;
@@ -854,12 +868,14 @@ public readonly ref struct OdfUtf8XmlToken
     }
 
     /// <summary>
+    /// Executes the GetNameString operation.
     /// 取得標記名稱的字串形式。
     /// </summary>
     /// <returns>標記名稱字串</returns>
     public string GetNameString() => Encoding.UTF8.GetString(Name.ToArray());
 
     /// <summary>
+    /// Executes the GetValueString operation.
     /// 取得標記值的字串形式。
     /// </summary>
     /// <returns>標記值字串</returns>

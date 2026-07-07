@@ -5,6 +5,10 @@ using OdfKit.Core;
 using System.Threading;
 
 namespace OdfKit.Spreadsheet;
+/// <summary>
+/// Provides the SpreadsheetDocument API.
+/// 提供 SpreadsheetDocument API。
+/// </summary>
 
 public partial class SpreadsheetDocument
 {
@@ -47,6 +51,10 @@ public partial class SpreadsheetDocument
         _formulaEvaluationChannel?.TryEnqueue();
     }
 
+    /// <summary>
+    /// Executes the Dispose operation.
+    /// 執行 Dispose 作業。
+    /// </summary>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {

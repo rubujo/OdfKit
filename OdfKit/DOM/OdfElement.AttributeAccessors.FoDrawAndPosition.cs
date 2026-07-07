@@ -4,12 +4,17 @@ using OdfKit.DOM;
 using OdfKit.Styles;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Attribute Accessors - FO, Draw & Position
 
     /// <summary>
+    /// Executes the GetFoTextTransformAttributeValue operation.
     /// 取得具有 schema awareness 的 FO 文字轉換屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -23,6 +28,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFoTextTransformAttributeValue operation.
     /// 設定具有 schema awareness 的 FO 文字轉換屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -36,6 +42,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFoTextAlignAttributeValue operation.
     /// 取得具有 schema awareness 的 FO 文字對齊屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -49,6 +56,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFoTextAlignAttributeValue operation.
     /// 設定具有 schema awareness 的 FO 文字對齊屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -62,6 +70,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleTextRotationScaleAttributeValue operation.
     /// 取得具有 schema awareness 的樣式文字旋轉縮放屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -75,6 +84,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleTextRotationScaleAttributeValue operation.
     /// 設定具有 schema awareness 的樣式文字旋轉縮放屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -88,6 +98,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleTextCombineAttributeValue operation.
     /// 取得具有 schema awareness 的樣式文字組合屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -101,6 +112,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleTextCombineAttributeValue operation.
     /// 設定具有 schema awareness 的樣式文字組合屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -114,6 +126,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetDrawFillAttributeValue operation.
     /// 取得具有 schema awareness 的繪圖填滿屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -127,6 +140,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetDrawFillAttributeValue operation.
     /// 設定具有 schema awareness 的繪圖填滿屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -140,6 +154,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetSmilFillAttributeValue operation.
     /// 取得具有 schema awareness 的 SMIL 動畫填滿屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -153,6 +168,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetSmilFillAttributeValue operation.
     /// 設定具有 schema awareness 的 SMIL 動畫填滿屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -166,6 +182,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetDrawFillImageRefPointAttributeValue operation.
     /// 取得具有 schema awareness 的繪圖填滿圖片參照點屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -179,6 +196,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetDrawFillImageRefPointAttributeValue operation.
     /// 設定具有 schema awareness 的繪圖填滿圖片參照點屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -192,6 +210,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetDrawColorModeAttributeValue operation.
     /// 取得具有 schema awareness 的繪圖色彩模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -205,6 +224,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetDrawColorModeAttributeValue operation.
     /// 設定具有 schema awareness 的繪圖色彩模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -218,6 +238,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleVerticalAlignAttributeValue operation.
     /// 取得具有 schema awareness 的樣式垂直對齊屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -231,6 +252,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleVerticalAlignAttributeValue operation.
     /// 設定具有 schema awareness 的樣式垂直對齊屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -244,6 +266,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleVerticalPosAttributeValue operation.
     /// 取得具有 schema awareness 的樣式垂直位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -257,6 +280,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleVerticalPosAttributeValue operation.
     /// 設定具有 schema awareness 的樣式垂直位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -270,6 +294,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleVerticalRelAttributeValue operation.
     /// 取得具有 schema awareness 的樣式垂直相對基準屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -283,6 +308,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleVerticalRelAttributeValue operation.
     /// 設定具有 schema awareness 的樣式垂直相對基準屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -296,6 +322,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleHorizontalPosAttributeValue operation.
     /// 取得具有 schema awareness 的樣式水平位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -309,6 +336,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleHorizontalPosAttributeValue operation.
     /// 設定具有 schema awareness 的樣式水平位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

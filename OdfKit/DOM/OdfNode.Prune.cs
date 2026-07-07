@@ -3,10 +3,15 @@
 using OdfKit.Styles;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfNode API.
+/// 提供 OdfNode API。
+/// </summary>
 
 public partial class OdfNode
 {
     /// <summary>
+    /// Executes the ReleaseUnusedNodes operation.
     /// 釋放此節點已載入子樹中的可重建查詢快取，而不移除 DOM 節點或具現化延遲 XML。
     /// </summary>
     /// <returns>已掃描並釋放快取的已載入節點數，包含此節點本身。</returns>
@@ -20,6 +25,7 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Executes the PruneAndCollect operation.
     /// 將此節點子樹自目前 DOM 樹斷開，並釋放其子節點、屬性與延遲載入 XML 參照。
     /// </summary>
     /// <param name="collectGarbage">是否在剪裁後要求執行一次最佳化 GC 收集</param>

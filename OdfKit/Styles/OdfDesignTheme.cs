@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Styles;
 
 /// <summary>
+/// Provides the OdfDesignTheme API.
 /// 表示高階 builder 可共用的文件設計主題。
 /// </summary>
 public sealed class OdfDesignTheme
@@ -8,6 +9,7 @@ public sealed class OdfDesignTheme
     private readonly string[] _accentFillColors;
 
     /// <summary>
+    /// Executes the OdfDesignTheme operation.
     /// 初始化 <see cref="OdfDesignTheme"/> 類別的新執行個體。
     /// </summary>
     public OdfDesignTheme()
@@ -28,6 +30,7 @@ public sealed class OdfDesignTheme
     }
 
     /// <summary>
+    /// Executes the Flowchart operation.
     /// 取得適合流程圖與架構圖的內建主題。
     /// </summary>
     public static OdfDesignTheme Flowchart => new(
@@ -37,21 +40,25 @@ public sealed class OdfDesignTheme
         ["#CFE2F3", "#FFF2CC", "#D9EAD3", "#EADCF8"]);
 
     /// <summary>
+    /// Gets the Name value.
     /// 取得或設定主題名稱。
     /// </summary>
     public string Name { get; set; } = "Default";
 
     /// <summary>
+    /// Gets the StrokeColor value.
     /// 取得或設定一般圖形的預設邊框色彩。
     /// </summary>
     public string StrokeColor { get; set; } = "#333333";
 
     /// <summary>
+    /// Gets the ConnectorColor value.
     /// 取得或設定連接線與線段的預設色彩。
     /// </summary>
     public string ConnectorColor { get; set; } = "#333333";
 
     /// <summary>
+    /// Executes the GetAccentFillColor operation.
     /// 依序號取得圖形填滿色彩。
     /// </summary>
     /// <param name="index">圖形序號</param>
@@ -63,6 +70,7 @@ public sealed class OdfDesignTheme
     }
 
     /// <summary>
+    /// Executes the WithAccentFillColors operation.
     /// 取代主題使用的強調填滿色彩序列。
     /// </summary>
     /// <param name="colors">色彩序列</param>

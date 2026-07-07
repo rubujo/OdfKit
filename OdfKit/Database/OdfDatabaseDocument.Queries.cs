@@ -5,6 +5,10 @@ using OdfKit.DOM;
 
 using OdfKit.Compliance;
 namespace OdfKit.Database;
+/// <summary>
+/// Provides the OdfDatabaseDocument API.
+/// 提供 OdfDatabaseDocument API。
+/// </summary>
 
 public partial class OdfDatabaseDocument
 {

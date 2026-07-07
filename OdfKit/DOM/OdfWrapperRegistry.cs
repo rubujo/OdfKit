@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfWrapperRegistry API.
 /// 提供自訂 XML 擴充元素對應 typed DOM wrapper 的註冊表。
 /// </summary>
 public static class OdfWrapperRegistry
@@ -12,6 +13,7 @@ public static class OdfWrapperRegistry
     private static readonly Dictionary<OdfWrapperKey, Func<string?, OdfElement>> Factories = new();
 
     /// <summary>
+    /// Executes the Register operation.
     /// 註冊指定元素名稱對應的 typed DOM wrapper factory。
     /// </summary>
     /// <param name="localName">元素局部名稱</param>
@@ -33,6 +35,7 @@ public static class OdfWrapperRegistry
     }
 
     /// <summary>
+    /// Executes the Unregister operation.
     /// 移除指定元素名稱的自訂 typed DOM wrapper 註冊。
     /// </summary>
     /// <param name="localName">元素局部名稱</param>

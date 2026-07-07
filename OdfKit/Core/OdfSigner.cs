@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfSigner API.
 /// 提供 ODF 封裝的數位簽署與驗證功能。
 /// </summary>
 public static partial class OdfSigner
 {
     /// <summary>
+    /// Executes the Sign operation.
     /// 對 ODF 封裝中的關鍵檔案進行數位簽署，支援同僚聯署。
     /// </summary>
     /// <param name="package">要簽署的 ODF 封裝</param>
@@ -21,6 +23,7 @@ public static partial class OdfSigner
     }
 
     /// <summary>
+    /// Executes the Sign operation.
     /// 對 ODF 封裝中的關鍵檔案進行數位簽署，支援自訂選項。
     /// </summary>
     /// <param name="package">要簽署的 ODF 封裝</param>
@@ -33,6 +36,7 @@ public static partial class OdfSigner
     }
 
     /// <summary>
+    /// Executes the SignAsync operation.
     /// 對 ODF 封裝中的關鍵檔案進行數位簽署（非同步）。
     /// </summary>
     /// <param name="package">要簽署的 ODF 封裝</param>
@@ -48,6 +52,7 @@ public static partial class OdfSigner
     }
 
     /// <summary>
+    /// Executes the SignAsync operation.
     /// 對 ODF 封裝中的關鍵檔案進行數位簽署（非同步）。
     /// </summary>
     /// <param name="package">要簽署的 ODF 封裝</param>
@@ -69,6 +74,7 @@ public static partial class OdfSigner
     }
 
     /// <summary>
+    /// Executes the VerifySignatures operation.
     /// 驗證 ODF 封裝中的所有數位簽章。
     /// </summary>
     /// <param name="package">要驗證的 ODF 封裝</param>
@@ -87,6 +93,7 @@ public static partial class OdfSigner
     }
 
     /// <summary>
+    /// Executes the VerifySignatures operation.
     /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果。
     /// </summary>
     /// <param name="package">要驗證的 ODF 封裝</param>
@@ -98,6 +105,7 @@ public static partial class OdfSigner
     }
 
     /// <summary>
+    /// Executes the VerifySignaturesAsync operation.
     /// 驗證 ODF 封裝中的所有數位簽章，並傳回詳細的驗證結果（非同步）。
     /// </summary>
     /// <param name="package">要驗證的 ODF 封裝</param>

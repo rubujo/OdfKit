@@ -185,12 +185,8 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     public bool IsFlatXml => Package.IsFlatXml;
 
     /// <summary>
-    /// Gets or sets the target ODF version to use when the document is saved.
-    /// If <see langword="null"/> (the default), the existing version declaration in the DOM is retained.
-    /// When set, saving overwrites the <c>office:version</c> and the version string in the manifest.
+    /// Gets the TargetVersion value.
     /// 取得或設定文件儲存時的目標 ODF 版本。
-    /// 若為 <see langword="null"/>（預設），則沿用現有 DOM 中的版本宣告。
-    /// 設定後，存檔時會覆寫 <c>office:version</c> 及 manifest 中的版本字串。
     /// </summary>
     public OdfVersion? TargetVersion { get; set; }
 

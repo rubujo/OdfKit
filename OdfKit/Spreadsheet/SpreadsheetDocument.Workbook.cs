@@ -7,6 +7,10 @@ using OdfKit.DOM;
 
 using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
+/// <summary>
+/// Provides the SpreadsheetDocument API.
+/// 提供 SpreadsheetDocument API。
+/// </summary>
 
 public partial class SpreadsheetDocument
 {

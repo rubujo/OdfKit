@@ -13,9 +13,17 @@ namespace OdfKit.Formula.AST;
 /// <param name="child">The child AST node. / 子 AST 節點。</param>
 public class UnaryNode(char op, AstNode child) : AstNode
 {
+    /// <summary>
+    /// Executes the GetRanges operation.
+    /// 執行 GetRanges 作業。
+    /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context) => child.GetRanges(context);
 
+    /// <summary>
+    /// Executes the Evaluate operation.
+    /// 執行 Evaluate 作業。
+    /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
@@ -44,6 +52,10 @@ public class UnaryNode(char op, AstNode child) : AstNode
         return OdfFormulaError.Value;
     }
 
+    /// <summary>
+    /// Executes the Serialize operation.
+    /// 執行 Serialize 作業。
+    /// </summary>
     /// <inheritdoc />
     public override string Serialize()
     {
@@ -62,6 +74,10 @@ public class UnaryNode(char op, AstNode child) : AstNode
 /// <param name="right">The right AST node. / 右側 AST 節點。</param>
 public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
 {
+    /// <summary>
+    /// Executes the GetRanges operation.
+    /// 執行 GetRanges 作業。
+    /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
@@ -71,6 +87,10 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
         return list;
     }
 
+    /// <summary>
+    /// Executes the Evaluate operation.
+    /// 執行 Evaluate 作業。
+    /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
@@ -166,6 +186,10 @@ public class BinaryNode(string op, AstNode left, AstNode right) : AstNode
         };
     }
 
+    /// <summary>
+    /// Executes the Serialize operation.
+    /// 執行 Serialize 作業。
+    /// </summary>
     /// <inheritdoc />
     public override string Serialize() => $"{left.Serialize()}{op}{right.Serialize()}";
 }

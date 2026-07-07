@@ -9,6 +9,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfLanguageCode : IEquatable<OdfLanguageCode>
 {
     /// <summary>
+    /// Executes the OdfLanguageCode operation.
     /// 以語言代碼 lexical form 建立 <see cref="OdfLanguageCode"/>。
     /// </summary>
     /// <param name="value">語言代碼，例如 <c>en</c> 或 <c>zh</c></param>
@@ -24,11 +25,13 @@ public readonly struct OdfLanguageCode : IEquatable<OdfLanguageCode>
     }
 
     /// <summary>
+    /// Gets the Value value.
     /// 取得原始語言代碼字串。
     /// </summary>
     public string Value { get; }
 
     /// <summary>
+    /// Executes the TryParse operation.
     /// 嘗試解析語言代碼。
     /// </summary>
     /// <param name="value">語言代碼字串</param>
@@ -47,25 +50,36 @@ public readonly struct OdfLanguageCode : IEquatable<OdfLanguageCode>
     }
 
     /// <summary>
+    /// Executes the ToString operation.
     /// 傳回原始語言代碼字串。
     /// </summary>
     /// <returns>語言代碼字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷目前值是否等於另一個語言代碼。
     /// </summary>
     /// <param name="other">要比較的語言代碼</param>
     /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfLanguageCode other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
+    /// <summary>
+    /// Executes the Equals operation.
+    /// 執行 Equals 作業。
+    /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfLanguageCode other && Equals(other);
 
+    /// <summary>
+    /// Executes the GetHashCode operation.
+    /// 執行 GetHashCode 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個語言代碼是否相等。
     /// </summary>
     /// <param name="left">左側語言代碼</param>
@@ -74,6 +88,7 @@ public readonly struct OdfLanguageCode : IEquatable<OdfLanguageCode>
     public static bool operator ==(OdfLanguageCode left, OdfLanguageCode right) => left.Equals(right);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個語言代碼是否不相等。
     /// </summary>
     /// <param name="left">左側語言代碼</param>

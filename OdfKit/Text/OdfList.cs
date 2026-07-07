@@ -69,10 +69,8 @@ public class OdfList
     }
 
     /// <summary>
-    /// Adds a list item at the specified level (1-based). Level 1 is added directly to this list;
-    /// level 2 and above automatically creates or reuses a nested list structure.
+    /// Executes the AddItem operation.
     /// 在指定層級新增清單專案（1-based）。層級 1 直接加入此清單；
-    /// 層級 2 以上則自動建立/沿用巢狀清單結構。
     /// </summary>
     /// <param name="text">The item text content. / 專案文字內容。</param>
     /// <param name="level">The target level, starting from 1, with a maximum of 10. / 目標層級，從 1 開始，最大值為 10。</param>

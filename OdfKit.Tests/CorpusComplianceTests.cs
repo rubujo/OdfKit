@@ -278,6 +278,22 @@ namespace OdfKit.Tests
         }
 
         [Fact]
+        public void PackageEntryLookup_NormalizesRelativeReferenceUris()
+        {
+            using var stream = new MemoryStream();
+            using var package = OdfPackage.Create(stream);
+            package.SetMimeType("application/vnd.oasis.opendocument.text");
+            package.WriteEntry("content.xml", Encoding.UTF8.GetBytes("<content/>"), "text/xml");
+
+            Assert.True(package.HasEntry("./content.xml"));
+            Assert.Equal("content.xml", OdfPackageEntryNameSanitizer.NormalizeReferenceUri("folder/../content.xml"));
+            Assert.Equal("content.xml", OdfPackageEntryNameSanitizer.NormalizeReferenceUri("%63ontent.xml"));
+            Assert.True(package.HasEntry(OdfPackageEntryNameSanitizer.NormalizeReferenceUri("./content.xml")));
+            Assert.True(package.HasEntry(OdfPackageEntryNameSanitizer.NormalizeReferenceUri("%63ontent.xml")));
+            Assert.Throws<SecurityException>(() => OdfPackageEntryNameSanitizer.NormalizeReferenceUri("../content.xml"));
+        }
+
+        [Fact]
         public void RocTaiwanOdfCns15251_Negative_MacroEntry()
         {
             byte[] dummyData = Encoding.UTF8.GetBytes("Sub Main\nEnd Sub");

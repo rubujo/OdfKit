@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfCellDataKind.
 /// 表示輕量儲存格檢視的資料種類。
 /// </summary>
 public enum OdfCellDataKind
@@ -55,41 +56,49 @@ public readonly struct OdfCellData
     }
 
     /// <summary>
+    /// Provides the Kind member.
     /// 取得儲存格資料種類。
     /// </summary>
     public OdfCellDataKind Kind => _kind;
 
     /// <summary>
+    /// Provides the Number member.
     /// 取得數值資料；僅當 <see cref="Kind"/> 為 <see cref="OdfCellDataKind.Number"/> 時有效。
     /// </summary>
     public double Number => _primitive.Number;
 
     /// <summary>
+    /// Provides the Boolean member.
     /// 取得布林資料；僅當 <see cref="Kind"/> 為 <see cref="OdfCellDataKind.Boolean"/> 時有效。
     /// </summary>
     public bool Boolean => _primitive.Boolean != 0;
 
     /// <summary>
+    /// Executes the DateTime operation.
     /// 取得日期時間資料；僅當 <see cref="Kind"/> 為 <see cref="OdfCellDataKind.DateTime"/> 時有效。
     /// </summary>
     public DateTime DateTime => new(_primitive.Ticks);
 
     /// <summary>
+    /// Provides the Text member.
     /// 取得文字資料。
     /// </summary>
     public string? Text => _text;
 
     /// <summary>
+    /// Provides the StyleName member.
     /// 取得樣式名稱。
     /// </summary>
     public string? StyleName => _styleName;
 
     /// <summary>
+    /// Provides the Formula member.
     /// 取得 OpenFormula 公式字串。
     /// </summary>
     public string? Formula => _formula;
 
     /// <summary>
+    /// Executes the Empty operation.
     /// 建立空白儲存格資料。
     /// </summary>
     /// <param name="styleName">樣式名稱</param>
@@ -99,6 +108,7 @@ public readonly struct OdfCellData
         => new(OdfCellDataKind.Empty, default, null, styleName, formula);
 
     /// <summary>
+    /// Executes the FromNumber operation.
     /// 建立數值儲存格資料。
     /// </summary>
     /// <param name="value">數值</param>
@@ -109,6 +119,7 @@ public readonly struct OdfCellData
         => new(OdfCellDataKind.Number, OdfCellPrimitiveData.FromNumber(value), null, styleName, formula);
 
     /// <summary>
+    /// Executes the FromBoolean operation.
     /// 建立布林儲存格資料。
     /// </summary>
     /// <param name="value">布林值</param>
@@ -119,6 +130,7 @@ public readonly struct OdfCellData
         => new(OdfCellDataKind.Boolean, OdfCellPrimitiveData.FromBoolean(value), null, styleName, formula);
 
     /// <summary>
+    /// Executes the FromDateTime operation.
     /// 建立日期時間儲存格資料。
     /// </summary>
     /// <param name="value">日期時間</param>
@@ -129,6 +141,7 @@ public readonly struct OdfCellData
         => new(OdfCellDataKind.DateTime, OdfCellPrimitiveData.FromTicks(value.Ticks), null, styleName, formula);
 
     /// <summary>
+    /// Executes the FromText operation.
     /// 建立文字儲存格資料。
     /// </summary>
     /// <param name="value">文字值</param>
@@ -192,16 +205,19 @@ public readonly struct OdfCellView
     }
 
     /// <summary>
+    /// Gets the RowIndex value.
     /// 取得以零為基準的列索引。
     /// </summary>
     public int RowIndex { get; }
 
     /// <summary>
+    /// Gets the ColumnIndex value.
     /// 取得以零為基準的欄索引。
     /// </summary>
     public int ColumnIndex { get; }
 
     /// <summary>
+    /// Gets the Data value.
     /// 取得儲存格資料。
     /// </summary>
     public OdfCellData Data { get; }

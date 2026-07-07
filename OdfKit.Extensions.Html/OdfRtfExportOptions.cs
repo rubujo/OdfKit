@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Export;
 
 /// <summary>
+/// Provides the OdfRtfExportOptions API.
 /// RTF 匯出的選項設定。
 /// </summary>
 public sealed class OdfRtfExportOptions

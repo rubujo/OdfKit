@@ -4,12 +4,17 @@ using OdfKit.DOM;
 using OdfKit.Styles;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Attribute Values - Script, Table & Animation
 
     /// <summary>
+    /// Executes the GetStyleScriptTypeAttributeValue operation.
     /// 取得具有 schema awareness 的樣式文字系統類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -23,6 +28,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleScriptTypeAttributeValue operation.
     /// 設定具有 schema awareness 的樣式文字系統類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -36,6 +42,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleTextEmphasizeAttributeValue operation.
     /// 取得具有 schema awareness 的樣式文字強調標記屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -49,6 +56,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleTextEmphasizeAttributeValue operation.
     /// 設定具有 schema awareness 的樣式文字強調標記屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -62,6 +70,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetNumberCalendarAttributeValue operation.
     /// 取得具有 schema awareness 的數字曆法屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -75,6 +84,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetNumberCalendarAttributeValue operation.
     /// 設定具有 schema awareness 的數字曆法屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -88,6 +98,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableMemberTypeAttributeValue operation.
     /// 取得具有 schema awareness 的表格成員類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -101,6 +112,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableMemberTypeAttributeValue operation.
     /// 設定具有 schema awareness 的表格成員類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -114,6 +126,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableGroupedByAttributeValue operation.
     /// 取得具有 schema awareness 的表格分組單位屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -127,6 +140,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableGroupedByAttributeValue operation.
     /// 設定具有 schema awareness 的表格分組單位屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -140,6 +154,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableSortModeAttributeValue operation.
     /// 取得具有 schema awareness 的表格排序模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -153,6 +168,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableSortModeAttributeValue operation.
     /// 設定具有 schema awareness 的表格排序模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -166,6 +182,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableConditionSourceAttributeValue operation.
     /// 取得具有 schema awareness 的表格條件來源屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -179,6 +196,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableConditionSourceAttributeValue operation.
     /// 設定具有 schema awareness 的表格條件來源屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -192,6 +210,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetAnimationColorInterpolationAttributeValue operation.
     /// 取得具有 schema awareness 的動畫色彩插值屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -205,6 +224,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetAnimationColorInterpolationAttributeValue operation.
     /// 設定具有 schema awareness 的動畫色彩插值屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -218,6 +238,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetAnimationColorInterpolationDirectionAttributeValue operation.
     /// 取得具有 schema awareness 的動畫色彩插值方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -231,6 +252,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetAnimationColorInterpolationDirectionAttributeValue operation.
     /// 設定具有 schema awareness 的動畫色彩插值方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -244,6 +266,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetDatabaseIsNullableAttributeValue operation.
     /// 取得具有 schema awareness 的資料庫可空性屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -257,6 +280,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetDatabaseIsNullableAttributeValue operation.
     /// 設定具有 schema awareness 的資料庫可空性屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -270,6 +294,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetDatabaseDataSourceSettingTypeAttributeValue operation.
     /// 取得具有 schema awareness 的資料庫資料來源設定型別屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -283,6 +308,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetDatabaseDataSourceSettingTypeAttributeValue operation.
     /// 設定具有 schema awareness 的資料庫資料來源設定型別屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

@@ -7,6 +7,7 @@ using System.Text;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfValidationReport API.
 /// 代表 ODF 套件或文件的驗證結果。
 /// </summary>
 /// <param name="detectedVersion">偵測到的 ODF 版本</param>
@@ -17,51 +18,61 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
     private readonly IReadOnlyList<OdfValidationIssue> _issues = new List<OdfValidationIssue>(issues ?? []).AsReadOnly();
 
     /// <summary>
+    /// Provides the IsValid member.
     /// 取得一個值，表示驗證的文件是否符合選取的檢查專案。
     /// </summary>
     public bool IsValid => BlockingIssueCount == 0;
 
     /// <summary>
+    /// Gets the DetectedVersion value.
     /// 取得偵測到的 ODF 版本。
     /// </summary>
     public OdfVersion DetectedVersion { get; } = detectedVersion;
 
     /// <summary>
+    /// Gets the DocumentKind value.
     /// 取得偵測到的 ODF 文件種類。
     /// </summary>
     public OdfDocumentKind DocumentKind { get; } = documentKind;
 
     /// <summary>
+    /// Provides the Issues member.
     /// 取得所有驗證問題。
     /// </summary>
     public IReadOnlyList<OdfValidationIssue> Issues => _issues;
 
     /// <summary>
+    /// Executes the InfoCount operation.
     /// 取得資訊性問題數量。
     /// </summary>
     public int InfoCount => CountSeverity(OdfIssueSeverity.Info);
 
     /// <summary>
+    /// Executes the WarningCount operation.
     /// 取得警告問題數量。
     /// </summary>
     public int WarningCount => CountSeverity(OdfIssueSeverity.Warning);
 
     /// <summary>
+    /// Executes the ErrorCount operation.
     /// 取得錯誤問題數量。
     /// </summary>
     public int ErrorCount => CountSeverity(OdfIssueSeverity.Error);
 
     /// <summary>
+    /// Executes the FatalCount operation.
     /// 取得致命問題數量。
     /// </summary>
     public int FatalCount => CountSeverity(OdfIssueSeverity.Fatal);
 
     /// <summary>
+    /// Provides the BlockingIssueCount member.
     /// 取得會讓驗證失敗的問題數量。
     /// </summary>
     public int BlockingIssueCount => ErrorCount + FatalCount;
 
     /// <summary>
+    /// Provides the IssuesBySeverity member.
     /// 取得依嚴重性彙整的問題數量。
     /// </summary>
     public IReadOnlyDictionary<OdfIssueSeverity, int> IssuesBySeverity => new Dictionary<OdfIssueSeverity, int>
@@ -73,6 +84,7 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
     };
 
     /// <summary>
+    /// Executes the ToJsonModel operation.
     /// 建立可序列化的 JSON 匯出模型。
     /// </summary>
     /// <returns>包含驗證報告摘要與問題清單的 JSON 匯出模型</returns>
@@ -91,6 +103,7 @@ public sealed class OdfValidationReport(OdfVersion detectedVersion, OdfDocumentK
     }
 
     /// <summary>
+    /// Executes the ToJson operation.
     /// 將驗證報告匯出為穩定 JSON 字串。
     /// </summary>
     /// <returns>JSON 格式的驗證報告</returns>

@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using OdfKit.Core;
 
 namespace OdfKit.Compliance;
+/// <summary>
+/// Provides the OdfPackageValidator API.
+/// 提供 OdfPackageValidator API。
+/// </summary>
 
 public static partial class OdfPackageValidator
 {

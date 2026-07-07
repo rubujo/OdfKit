@@ -96,7 +96,7 @@ internal static partial class OdfSignatureVerifier
                     string? uri = reference.Uri;
                     if (!string.IsNullOrEmpty(uri) && !uri!.StartsWith("#"))
                     {
-                        string entryName = uri.Replace('\\', '/').TrimStart('/');
+                        string entryName = OdfPackageEntryNameSanitizer.NormalizeReferenceUri(uri);
                         if (package.HasEntry(entryName))
                         {
                             var stream = package.GetEntryStream(entryName);
@@ -286,7 +286,7 @@ internal static partial class OdfSignatureVerifier
             string? uri = reference.Uri;
             if (uri != null && !uri.StartsWith("#"))
             {
-                string entryName = uri.Replace('\\', '/').TrimStart('/');
+                string entryName = OdfPackageEntryNameSanitizer.NormalizeReferenceUri(uri);
                 singleResult.CheckedReferences.Add(entryName);
             }
         }

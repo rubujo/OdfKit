@@ -4,10 +4,15 @@ using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Styles;
+/// <summary>
+/// Provides the OdfStyleEngine API.
+/// 提供 OdfStyleEngine API。
+/// </summary>
 
 public partial class OdfStyleEngine
 {
     /// <summary>
+    /// Executes the CollectGarbage operation.
     /// 移除未被文件 DOM 或樣式繼承鏈引用的 <c>style:style</c> 樣式定義。
     /// </summary>
     /// <returns>移除的樣式數量</returns>
@@ -51,6 +56,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
+    /// Executes the GC operation.
     /// 移除未被文件 DOM 或樣式繼承鏈引用的 <c>style:style</c> 樣式定義。
     /// </summary>
     /// <returns>移除的樣式數量</returns>

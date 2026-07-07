@@ -6,12 +6,17 @@ using System.Threading.Tasks;
 
 using OdfKit.Compliance;
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfPackage API.
+/// 提供 OdfPackage API。
+/// </summary>
 
 public sealed partial class OdfPackage
 {
     #region Saving and Atomic Save
 
     /// <summary>
+    /// Executes the Save operation.
     /// 將所有變更儲存回原來的檔案或資料流中。
     /// </summary>
     /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
@@ -34,6 +39,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the SaveAsync operation.
     /// 將所有變更儲存回原來的檔案或資料流中（非同步）。
     /// </summary>
     /// <param name="cancellationToken">取消語彙</param>
@@ -42,6 +48,7 @@ public sealed partial class OdfPackage
         => SaveAsync(null, cancellationToken);
 
     /// <summary>
+    /// Executes the SaveAsync operation.
     /// 使用指定儲存選項，將所有變更儲存回原來的檔案或資料流中（非同步）。
     /// </summary>
     /// <param name="options">單次儲存設定選項；若為 <see langword="null"/>，則使用封裝預設選項</param>
@@ -71,6 +78,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the SaveToStream operation.
     /// 將封裝序列化儲存至指定的目的地資料流。
     /// </summary>
     /// <param name="destinationStream">目標目的地資料流</param>
@@ -91,6 +99,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the Save operation.
     /// 將封裝序列化儲存至指定的位元組緩衝區寫入器。
     /// </summary>
     /// <param name="destination">目標位元組緩衝區寫入器</param>
@@ -109,6 +118,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the SaveToStreamAsync operation.
     /// 將封裝序列化儲存至指定的目的地資料流（非同步）。
     /// </summary>
     /// <param name="destinationStream">目標目的地資料流</param>
@@ -118,6 +128,7 @@ public sealed partial class OdfPackage
         => SaveToStreamAsync(destinationStream, null, cancellationToken);
 
     /// <summary>
+    /// Executes the SaveToStreamAsync operation.
     /// 使用指定儲存選項，將封裝序列化儲存至指定的目的地資料流（非同步）。
     /// </summary>
     /// <param name="destinationStream">目標目的地資料流</param>

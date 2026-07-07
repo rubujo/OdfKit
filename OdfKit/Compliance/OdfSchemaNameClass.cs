@@ -3,6 +3,7 @@
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfSchemaNameClass API.
 /// 描述保留用於結構描述驅動驗證的 RELAX NG 名稱類別條件約束。
 /// </summary>
 /// <param name="kind">名稱類別種類</param>
@@ -16,26 +17,31 @@ public sealed class OdfSchemaNameClass(
     bool isExcept)
 {
     /// <summary>
+    /// Gets the Kind value.
     /// 取得 RELAX NG 名稱類別種類。
     /// </summary>
     public OdfSchemaNameClassKind Kind { get; } = kind;
 
     /// <summary>
+    /// Gets the NamespaceUri value.
     /// 取得名稱類別限制的命名空間 URI（若有限制）。
     /// </summary>
     public string NamespaceUri { get; } = namespaceUri ?? string.Empty;
 
     /// <summary>
+    /// Gets the LocalName value.
     /// 取得名稱類別限制的區域名稱（若有限制）。
     /// </summary>
     public string LocalName { get; } = localName ?? string.Empty;
 
     /// <summary>
+    /// Gets a value indicating the IsExcept state.
     /// 取得此名稱類別是否出現在 <c>rng:except</c> 節點下。
     /// </summary>
     public bool IsExcept { get; } = isExcept;
 
     /// <summary>
+    /// Executes the Matches operation.
     /// 傳回指定的命名空間限定名稱是否與此名稱類別相符。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>

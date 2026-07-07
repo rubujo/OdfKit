@@ -10,6 +10,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfDuration : IEquatable<OdfDuration>
 {
     /// <summary>
+    /// Executes the OdfDuration operation.
     /// 以 XML Schema <c>duration</c> 字串建立 <see cref="OdfDuration"/>。
     /// </summary>
     /// <param name="value">duration 字串，例如 <c>PT1H30M</c></param>
@@ -25,11 +26,13 @@ public readonly struct OdfDuration : IEquatable<OdfDuration>
     }
 
     /// <summary>
+    /// Gets the Value value.
     /// 取得原始 duration 字串。
     /// </summary>
     public string Value { get; }
 
     /// <summary>
+    /// Executes the TryParse operation.
     /// 嘗試解析 XML Schema <c>duration</c> 字串。
     /// </summary>
     /// <param name="value">要解析的字串</param>
@@ -48,6 +51,7 @@ public readonly struct OdfDuration : IEquatable<OdfDuration>
     }
 
     /// <summary>
+    /// Executes the TryGetTimeSpan operation.
     /// 嘗試轉換為 <see cref="TimeSpan"/>。
     /// </summary>
     /// <param name="timeSpan">成功時傳回對應的 <see cref="TimeSpan"/></param>
@@ -72,25 +76,36 @@ public readonly struct OdfDuration : IEquatable<OdfDuration>
     }
 
     /// <summary>
+    /// Executes the ToString operation.
     /// 傳回原始 duration 字串。
     /// </summary>
     /// <returns>duration 字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷目前值是否等於另一個 duration。
     /// </summary>
     /// <param name="other">要比較的 duration</param>
     /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfDuration other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
+    /// <summary>
+    /// Executes the Equals operation.
+    /// 執行 Equals 作業。
+    /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfDuration other && Equals(other);
 
+    /// <summary>
+    /// Executes the GetHashCode operation.
+    /// 執行 GetHashCode 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個 duration 是否相等。
     /// </summary>
     /// <param name="left">左側 duration</param>
@@ -99,6 +114,7 @@ public readonly struct OdfDuration : IEquatable<OdfDuration>
     public static bool operator ==(OdfDuration left, OdfDuration right) => left.Equals(right);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個 duration 是否不相等。
     /// </summary>
     /// <param name="left">左側 duration</param>

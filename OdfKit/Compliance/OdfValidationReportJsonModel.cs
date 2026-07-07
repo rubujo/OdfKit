@@ -4,11 +4,13 @@ using System.Collections.Generic;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfValidationReportJsonModel API.
 /// 表示驗證報告的 JSON 匯出模型。
 /// </summary>
 public sealed class OdfValidationReportJsonModel
 {
     /// <summary>
+    /// Executes the OdfValidationReportJsonModel operation.
     /// 初始化 <see cref="OdfValidationReportJsonModel"/> 類別的新執行個體。
     /// </summary>
     /// <param name="isValid">文件是否通過驗證</param>
@@ -43,46 +45,55 @@ public sealed class OdfValidationReportJsonModel
     }
 
     /// <summary>
+    /// Gets a value indicating the IsValid state.
     /// 取得文件是否通過驗證。
     /// </summary>
     public bool IsValid { get; }
 
     /// <summary>
+    /// Gets the DetectedVersion value.
     /// 取得偵測到的 ODF 版本。
     /// </summary>
     public string DetectedVersion { get; }
 
     /// <summary>
+    /// Gets the DocumentKind value.
     /// 取得偵測到的文件種類。
     /// </summary>
     public string DocumentKind { get; }
 
     /// <summary>
+    /// Gets the InfoCount value.
     /// 取得資訊性問題數量。
     /// </summary>
     public int InfoCount { get; }
 
     /// <summary>
+    /// Gets the WarningCount value.
     /// 取得警告問題數量。
     /// </summary>
     public int WarningCount { get; }
 
     /// <summary>
+    /// Gets the ErrorCount value.
     /// 取得錯誤問題數量。
     /// </summary>
     public int ErrorCount { get; }
 
     /// <summary>
+    /// Gets the FatalCount value.
     /// 取得致命問題數量。
     /// </summary>
     public int FatalCount { get; }
 
     /// <summary>
+    /// Gets the BlockingIssueCount value.
     /// 取得會讓驗證失敗的問題數量。
     /// </summary>
     public int BlockingIssueCount { get; }
 
     /// <summary>
+    /// Gets the Issues value.
     /// 取得驗證問題匯出模型集合。
     /// </summary>
     public IReadOnlyList<OdfValidationIssueJsonModel> Issues { get; }

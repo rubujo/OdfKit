@@ -3,11 +3,13 @@
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfTypedDomElementCoverage API.
 /// 表示單一 schema 元素與 typed DOM wrapper 的對照結果。
 /// </summary>
 public sealed class OdfTypedDomElementCoverage
 {
     /// <summary>
+    /// Executes the OdfTypedDomElementCoverage operation.
     /// 初始化單一元素覆蓋專案。
     /// </summary>
     /// <param name="namespaceUri">元素命名空間 URI</param>
@@ -36,36 +38,43 @@ public sealed class OdfTypedDomElementCoverage
     }
 
     /// <summary>
+    /// Gets the NamespaceUri value.
     /// 取得元素命名空間 URI。
     /// </summary>
     public string NamespaceUri { get; }
 
     /// <summary>
+    /// Gets the LocalName value.
     /// 取得元素區域名稱。
     /// </summary>
     public string LocalName { get; }
 
     /// <summary>
+    /// Gets the Role value.
     /// 取得 schema 角色。
     /// </summary>
     public string Role { get; }
 
     /// <summary>
+    /// Gets the DocumentKind value.
     /// 取得文件種類。
     /// </summary>
     public string DocumentKind { get; }
 
     /// <summary>
+    /// Gets the WrapperType value.
     /// 取得 wrapper 型別名稱。
     /// </summary>
     public string WrapperType { get; }
 
     /// <summary>
+    /// Gets a value indicating the HasTypedWrapper state.
     /// 取得是否具備專門 wrapper。
     /// </summary>
     public bool HasTypedWrapper { get; }
 
     /// <summary>
+    /// Gets the WrapperPropertyCount value.
     /// 取得 wrapper 宣告的公開屬性數。
     /// </summary>
     public int WrapperPropertyCount { get; }

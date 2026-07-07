@@ -6,11 +6,13 @@ using OdfKit.Core;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfXmlWriter API.
 /// 提供將 ODF DOM 節點樹序列化為 XML 格式並寫入串流之功能的類別。
 /// </summary>
 public static class OdfXmlWriter
 {
     /// <summary>
+    /// Executes the Write operation.
     /// 將記憶體 DOM 節點樹序列化寫入 XML 檔案流。
     /// </summary>
     /// <param name="rootNode">要寫入的根節點</param>

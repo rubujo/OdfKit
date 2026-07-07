@@ -5,6 +5,7 @@ using OdfKit.Core;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfStyleMixinBuilder API.
 /// 提供 typed DOM 元素的 Fluent 樣式混合設定器。
 /// </summary>
 public sealed class OdfStyleMixinBuilder
@@ -24,6 +25,7 @@ public sealed class OdfStyleMixinBuilder
     }
 
     /// <summary>
+    /// Executes the Bold operation.
     /// 設定文字為粗體。
     /// </summary>
     /// <param name="enabled">是否啟用粗體</param>
@@ -32,6 +34,7 @@ public sealed class OdfStyleMixinBuilder
         => SetTextProperty("font-weight", OdfNamespaces.Fo, enabled ? "bold" : "normal", "fo");
 
     /// <summary>
+    /// Executes the Italic operation.
     /// 設定文字為斜體。
     /// </summary>
     /// <param name="enabled">是否啟用斜體</param>
@@ -40,6 +43,7 @@ public sealed class OdfStyleMixinBuilder
         => SetTextProperty("font-style", OdfNamespaces.Fo, enabled ? "italic" : "normal", "fo");
 
     /// <summary>
+    /// Executes the Underline operation.
     /// 設定文字底線。
     /// </summary>
     /// <param name="enabled">是否啟用底線</param>
@@ -48,6 +52,7 @@ public sealed class OdfStyleMixinBuilder
         => SetTextProperty("text-underline-style", OdfNamespaces.Style, enabled ? "solid" : "none", "style");
 
     /// <summary>
+    /// Executes the Color operation.
     /// 設定文字色彩。
     /// </summary>
     /// <param name="color">ODF 色彩字串，例如 <c>#336699</c></param>
@@ -56,6 +61,7 @@ public sealed class OdfStyleMixinBuilder
         => SetTextProperty("color", OdfNamespaces.Fo, color, "fo");
 
     /// <summary>
+    /// Executes the FontSize operation.
     /// 設定字級。
     /// </summary>
     /// <param name="fontSize">ODF 長度字串，例如 <c>14pt</c></param>
@@ -64,6 +70,7 @@ public sealed class OdfStyleMixinBuilder
         => SetTextProperty("font-size", OdfNamespaces.Fo, fontSize, "fo");
 
     /// <summary>
+    /// Executes the TextAlign operation.
     /// 設定文字對齊。
     /// </summary>
     /// <param name="alignment">ODF 對齊字串，例如 <c>start</c>、<c>center</c> 或 <c>end</c></param>
@@ -72,6 +79,7 @@ public sealed class OdfStyleMixinBuilder
         => SetFamilyProperty("paragraph-properties", "text-align", OdfNamespaces.Fo, alignment, "fo");
 
     /// <summary>
+    /// Executes the BackgroundColor operation.
     /// 設定背景色彩。
     /// </summary>
     /// <param name="color">ODF 色彩字串，例如 <c>#FFFFCC</c></param>
@@ -80,6 +88,7 @@ public sealed class OdfStyleMixinBuilder
         => SetFamilyProperty(GetBackgroundPropertyElement(), "background-color", OdfNamespaces.Fo, color, "fo");
 
     /// <summary>
+    /// Executes the InheritFrom operation.
     /// 設定目前自動樣式要繼承的父樣式名稱。
     /// </summary>
     /// <param name="parentStyleName">父樣式名稱；傳入 <see langword="null"/> 或空白字串時移除繼承關聯</param>
@@ -88,6 +97,7 @@ public sealed class OdfStyleMixinBuilder
         => SetStyleAttribute("parent-style-name", parentStyleName);
 
     /// <summary>
+    /// Executes the StyleClass operation.
     /// 設定目前自動樣式的 ODF 樣式 class。
     /// </summary>
     /// <param name="styleClass">樣式 class；傳入 <see langword="null"/> 或空白字串時移除 class</param>
@@ -159,11 +169,13 @@ public sealed class OdfStyleMixinBuilder
 }
 
 /// <summary>
+/// Provides the OdfStyleMixinExtensions API.
 /// 提供 typed DOM 元素的 Fluent 樣式混合擴充方法。
 /// </summary>
 public static class OdfStyleMixinExtensions
 {
     /// <summary>
+    /// Executes the ApplyStyle operation.
     /// 對指定 typed DOM 元素套用 Fluent 樣式混合設定。
     /// </summary>
     /// <typeparam name="TElement">要套用樣式的 typed DOM 元素型別</typeparam>
@@ -196,6 +208,7 @@ public static class OdfStyleMixinExtensions
     }
 
     /// <summary>
+    /// Executes the ConfigureStyle operation.
     /// 對指定 typed DOM 元素設定自動樣式。
     /// </summary>
     /// <typeparam name="TElement">要設定樣式的 typed DOM 元素型別</typeparam>
@@ -218,6 +231,7 @@ public static class OdfStyleMixinExtensions
     }
 
     /// <summary>
+    /// Executes the CopyFormatFrom operation.
     /// 從來源元素複製樣式參照到指定 typed DOM 元素。
     /// </summary>
     /// <typeparam name="TElement">要套用樣式的 typed DOM 元素型別</typeparam>

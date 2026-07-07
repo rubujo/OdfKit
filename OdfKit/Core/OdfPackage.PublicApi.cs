@@ -6,12 +6,17 @@ using System.Linq;
 using OdfKit.Compliance;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfPackage API.
+/// 提供 OdfPackage API。
+/// </summary>
 
 public sealed partial class OdfPackage
 {
     #region Public API
 
     /// <summary>
+    /// Executes the HasEntry operation.
     /// 檢查封裝中是否包含指定名稱的專案。
     /// </summary>
     /// <param name="name">專案的相對路徑名稱</param>
@@ -20,16 +25,19 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.HasEntry(EntryCollaborators, name);
 
     /// <summary>
+    /// Provides the OdfPackageEntryInfo API.
     /// 提供 ODF 封裝中實體專案的基本資訊。
     /// </summary>
     public class OdfPackageEntryInfo
     {
         /// <summary>
+        /// Gets the Path value.
         /// 取得專案的相對路徑。
         /// </summary>
         public string Path { get; }
 
         /// <summary>
+        /// Executes the OdfPackageEntryInfo operation.
         /// 初始化 <see cref="OdfPackageEntryInfo"/> 類別的新執行個體。
         /// </summary>
         /// <param name="path">專案的相對路徑</param>
@@ -37,6 +45,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the GetEntries operation.
     /// 取得封裝中所有實體專案的資訊集合。
     /// </summary>
     /// <returns>所有專案的資訊集合</returns>
@@ -44,6 +53,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.GetEntries(EntryCollaborators);
 
     /// <summary>
+    /// Executes the ReadEntry operation.
     /// 讀取指定路徑專案的完整內容位元組。
     /// </summary>
     /// <param name="path">專案的相對路徑名稱</param>
@@ -52,6 +62,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.ReadEntry(EntryCollaborators, path);
 
     /// <summary>
+    /// Executes the Save operation.
     /// 將目前 ODF 封裝儲存到指定的目標資料流中。
     /// </summary>
     /// <param name="stream">要寫入的目標資料流</param>
@@ -62,6 +73,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the GetEntryStream operation.
     /// 取得指定專案的唯讀資料流。
     /// </summary>
     /// <param name="name">專案的相對路徑名稱</param>
@@ -76,6 +88,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the WriteEntry operation.
     /// 將指定的位元組內容寫入或覆寫封裝中的專案。
     /// </summary>
     /// <param name="name">專案的相對路徑名稱</param>
@@ -85,6 +98,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, content, mediaType);
 
     /// <summary>
+    /// Executes the WriteEntry operation.
     /// 將指定的資料流內容寫入或覆寫封裝中的專案。
     /// </summary>
     /// <param name="name">專案的相對路徑名稱</param>
@@ -94,6 +108,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.WriteEntry(EntryCollaborators, name, contentStream, mediaType);
 
     /// <summary>
+    /// Executes the AddEntry operation.
     /// 將指定的位元組內容新增至封裝；若同名專案已存在，則覆寫該專案。
     /// </summary>
     /// <param name="name">專案的相對路徑名稱</param>
@@ -103,6 +118,7 @@ public sealed partial class OdfPackage
         => WriteEntry(name, content, mediaType);
 
     /// <summary>
+    /// Executes the AddEntry operation.
     /// 將指定的資料流內容新增至封裝；若同名專案已存在，則覆寫該專案。
     /// </summary>
     /// <param name="name">專案的相對路徑名稱</param>
@@ -121,6 +137,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.RemoveEntry(EntryCollaborators, name);
 
     /// <summary>
+    /// Executes the PruneUnusedMedia operation.
     /// 清理封裝中未被參照的圖片等媒體檔案。
     /// </summary>
     /// <param name="referencedMediaPaths">所有目前正被參照的媒體檔案路徑集合</param>
@@ -135,6 +152,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.PruneUnusedMedia(EntryCollaborators, referencedMediaPaths);
 
     /// <summary>
+    /// Executes the SetMimeType operation.
     /// 設定 ODF 封裝的主要 MIME 媒體類型。
     /// </summary>
     /// <param name="mimetype">媒體類型字串</param>
@@ -146,6 +164,7 @@ public sealed partial class OdfPackage
     #region Embedded Objects Extraction
 
     /// <summary>
+    /// Executes the GetEmbeddedObjects operation.
     /// 取得此封裝中所內嵌的 ODF 物件資料夾路徑清單。
     /// </summary>
     /// <returns>內嵌物件路徑的集合</returns>
@@ -153,6 +172,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.GetEmbeddedObjects(EntryCollaborators);
 
     /// <summary>
+    /// Executes the ExtractObjectStream operation.
     /// 擷取內嵌物件的主要內容 XML 資料流。
     /// </summary>
     /// <param name="objectName">內嵌物件的路徑名稱</param>
@@ -161,6 +181,7 @@ public sealed partial class OdfPackage
         => OdfPackageEntryAccessEngine.ExtractObjectStream(EntryCollaborators, objectName);
 
     /// <summary>
+    /// Executes the RawEntryPatch operation.
     /// 支援免 DOM 解析的原始二進位直改。
     /// </summary>
     /// <param name="entryName">專案的相對路徑名稱</param>
@@ -265,6 +286,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the DumpVfsLayout operation.
     /// 傳回代表封裝內部虛擬檔案系統（VFS）結構的視覺化佈局字串。
     /// </summary>
     /// <returns>VFS 結構的視覺化字串</returns>
@@ -424,6 +446,7 @@ internal sealed class OdfPackageDebugEntry
 }
 
 /// <summary>
+/// Executes the OdfRawEntryPatcher operation.
 /// 表示免 DOM 解析的原始二進位直改委派。
 /// </summary>
 /// <param name="input">原始 Entry 唯讀位元組區段</param>

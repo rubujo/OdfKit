@@ -5,6 +5,7 @@ using OdfKit.Text;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the InlineTextBuilder API.
 /// 提供鏈式（Fluent）建構行內富文本樣式（產生 <c>text:span</c>）與文字節點的建構器。
 /// </summary>
 public sealed class InlineTextBuilder
@@ -25,6 +26,7 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
+    /// Executes the Bold operation.
     /// 設定後續文字是否為粗體。
     /// </summary>
     /// <param name="bold">是否為粗體，預設為 <see langword="true"/></param>
@@ -36,6 +38,7 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
+    /// Executes the Italic operation.
     /// 設定後續文字是否為斜體。
     /// </summary>
     /// <param name="italic">是否為斜體，預設為 <see langword="true"/></param>
@@ -47,6 +50,7 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
+    /// Executes the Underline operation.
     /// 設定後續文字是否具備下劃線。
     /// </summary>
     /// <param name="underline">是否具備下劃線，預設為 <see langword="true"/></param>
@@ -58,6 +62,7 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
+    /// Executes the Color operation.
     /// 設定後續文字的顏色（如十六進位色彩碼 "#FF0000"）。
     /// </summary>
     /// <param name="colorHex">顏色的十六進位碼字串</param>
@@ -69,6 +74,7 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
+    /// Executes the FontSize operation.
     /// 設定後續文字的字型大小（例如 "12pt" 或 "120%"）。
     /// </summary>
     /// <param name="size">字型大小描述字串</param>
@@ -80,6 +86,7 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
+    /// Executes the Clear operation.
     /// 清除目前累積的所有行內樣式狀態，重設為預設文字。
     /// </summary>
     /// <returns>當前建構器執行個體，支援鏈式呼叫</returns>
@@ -94,6 +101,7 @@ public sealed class InlineTextBuilder
     }
 
     /// <summary>
+    /// Executes the Text operation.
     /// 在段落中追加一段指定樣式的文字。
     /// </summary>
     /// <param name="value">要寫入的文字內容</param>

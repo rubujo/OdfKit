@@ -5,12 +5,17 @@ using OdfKit.DOM;
 using OdfKit.Styles;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Attribute Accessors - XLink, Presentation & Table
 
     /// <summary>
+    /// Executes the GetIriReferenceAttributeValue operation.
     /// 取得具有 schema awareness 的 IRI 參照屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -24,6 +29,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetIriReferenceAttributeValue operation.
     /// 設定具有 schema awareness 的 IRI 參照屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -37,6 +43,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetXLinkTypeAttributeValue operation.
     /// 取得具有 schema awareness 的 XLink 類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -50,6 +57,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetXLinkTypeAttributeValue operation.
     /// 設定具有 schema awareness 的 XLink 類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -63,6 +71,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetXLinkShowAttributeValue operation.
     /// 取得具有 schema awareness 的 XLink 顯示行為屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -76,6 +85,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetXLinkShowAttributeValue operation.
     /// 設定具有 schema awareness 的 XLink 顯示行為屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -89,6 +99,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetXLinkActuateAttributeValue operation.
     /// 取得具有 schema awareness 的 XLink 觸發行為屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -102,6 +113,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetXLinkActuateAttributeValue operation.
     /// 設定具有 schema awareness 的 XLink 觸發行為屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -115,6 +127,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetNumberStyleAttributeValue operation.
     /// 取得具有 schema awareness 的數字樣式長短屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -128,6 +141,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetNumberStyleAttributeValue operation.
     /// 設定具有 schema awareness 的數字樣式長短屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -141,6 +155,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableOrderAttributeValue operation.
     /// 取得具有 schema awareness 的表格排序方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -154,6 +169,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableOrderAttributeValue operation.
     /// 設定具有 schema awareness 的表格排序方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -167,6 +183,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableTypeAttributeValue operation.
     /// 取得具有 schema awareness 的表格類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -180,6 +197,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableTypeAttributeValue operation.
     /// 設定具有 schema awareness 的表格類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -193,6 +211,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetPresentationEffectAttributeValue operation.
     /// 取得具有 schema awareness 的簡報效果屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -206,6 +225,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetPresentationEffectAttributeValue operation.
     /// 設定具有 schema awareness 的簡報效果屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -219,6 +239,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetPresentationSpeedAttributeValue operation.
     /// 取得具有 schema awareness 的簡報速度屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -232,6 +253,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetPresentationSpeedAttributeValue operation.
     /// 設定具有 schema awareness 的簡報速度屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -245,6 +267,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetPresentationActionAttributeValue operation.
     /// 取得具有 schema awareness 的簡報動作屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -258,6 +281,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetPresentationActionAttributeValue operation.
     /// 設定具有 schema awareness 的簡報動作屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -271,6 +295,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetPresentationTransitionTypeAttributeValue operation.
     /// 取得具有 schema awareness 的簡報轉場類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -284,6 +309,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetPresentationTransitionTypeAttributeValue operation.
     /// 設定具有 schema awareness 的簡報轉場類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -297,6 +323,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetPresentationTransitionStyleAttributeValue operation.
     /// 取得具有 schema awareness 的簡報轉場樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -310,6 +337,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetPresentationTransitionStyleAttributeValue operation.
     /// 設定具有 schema awareness 的簡報轉場樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

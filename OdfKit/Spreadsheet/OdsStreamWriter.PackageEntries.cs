@@ -6,6 +6,10 @@ using System.Xml;
 using OdfKit.Core;
 
 namespace OdfKit.Spreadsheet;
+/// <summary>
+/// Provides the OdsStreamWriter API.
+/// 提供 OdsStreamWriter API。
+/// </summary>
 
 public partial class OdsStreamWriter
 {

@@ -70,6 +70,10 @@ public partial class TextDocument : OdfDocument
         return (TextDocument)CreateFromTemplateInternal(template, OdfDocumentKind.Text, "application/vnd.oasis.opendocument.text", clearUserContent);
     }
 
+    /// <summary>
+    /// Executes the ClearTemplateUserContent operation.
+    /// 執行 ClearTemplateUserContent 作業。
+    /// </summary>
     /// <inheritdoc/>
     protected override void ClearTemplateUserContent()
     {

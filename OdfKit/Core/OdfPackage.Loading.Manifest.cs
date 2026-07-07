@@ -2,6 +2,10 @@
 
 using OdfKit.Compliance;
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfPackage API.
+/// 提供 OdfPackage API。
+/// </summary>
 
 public sealed partial class OdfPackage
 {

@@ -5,6 +5,7 @@ using System;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Defines the IOdfCryptographyProvider contract.
 /// 定義 ODF 文件加密與解密操作的密碼學提供者介面。
 /// </summary>
 public interface IOdfCryptographyProvider

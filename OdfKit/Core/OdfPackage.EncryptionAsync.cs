@@ -4,10 +4,15 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfPackage API.
+/// 提供 OdfPackage API。
+/// </summary>
 
 public sealed partial class OdfPackage
 {
     /// <summary>
+    /// Executes the SaveEncryptedAsync operation.
     /// 非同步以密碼加密並儲存封裝至原始目的地。
     /// </summary>
     /// <param name="password">加密密碼</param>
@@ -24,6 +29,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the SaveEncryptedAsync operation.
     /// 非同步以密碼加密並儲存封裝至指定資料流。
     /// </summary>
     /// <param name="destinationStream">目標資料流</param>
@@ -45,6 +51,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the LoadEncryptedAsync operation.
     /// 非同步以密碼解密並載入指定路徑的 ODF 封裝。
     /// </summary>
     /// <param name="path">ODF 封裝路徑</param>
@@ -63,6 +70,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the LoadEncryptedAsync operation.
     /// 非同步以密碼解密並載入指定資料流的 ODF 封裝。
     /// </summary>
     /// <param name="stream">ODF 封裝資料流</param>

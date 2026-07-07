@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfPresentationSpeed.
 /// 表示 ODF schema 中簡報速度相關屬性的 token。
 /// </summary>
 public enum OdfPresentationSpeed

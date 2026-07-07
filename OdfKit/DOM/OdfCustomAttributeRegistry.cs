@@ -5,6 +5,7 @@ using System.Text;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfCustomAttributeRegistry API.
 /// 提供自訂 XML 屬性的 UTF-8 快速查表註冊表。
 /// </summary>
 public static class OdfCustomAttributeRegistry
@@ -13,6 +14,7 @@ public static class OdfCustomAttributeRegistry
     private static List<OdfCustomAttributeEntry> _entries = [];
 
     /// <summary>
+    /// Executes the Register operation.
     /// 註冊需要在 UTF-8 解析階段快速識別的自訂 XML 屬性。
     /// </summary>
     /// <param name="localName">屬性的局部名稱</param>
@@ -23,12 +25,16 @@ public static class OdfCustomAttributeRegistry
     {
         if (string.IsNullOrWhiteSpace(localName))
         {
-            throw new ArgumentException(null, nameof(localName));
+            throw new ArgumentException(
+                OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfCustomAttributeRegistry_LocalNameCannotBeEmpty"),
+                nameof(localName));
         }
 
         if (string.IsNullOrWhiteSpace(namespaceUri))
         {
-            throw new ArgumentException(null, nameof(namespaceUri));
+            throw new ArgumentException(
+                OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfCustomAttributeRegistry_NamespaceUriCannotBeEmpty"),
+                nameof(namespaceUri));
         }
 
         OdfCustomAttributeEntry entry = new(localName, namespaceUri);

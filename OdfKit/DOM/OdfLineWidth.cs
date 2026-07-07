@@ -11,6 +11,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
 {
     /// <summary>
+    /// Executes the OdfLineWidth operation.
     /// 以線條寬度 lexical form 建立 <see cref="OdfLineWidth"/>。
     /// </summary>
     /// <param name="value">線條寬度，例如 <c>auto</c>、<c>bold</c>、<c>150%</c>、<c>2pt</c> 或 <c>3</c></param>
@@ -30,31 +31,37 @@ public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
     }
 
     /// <summary>
+    /// Gets the Value value.
     /// 取得原始線條寬度字串。
     /// </summary>
     public string Value { get; }
 
     /// <summary>
+    /// Gets the Kind value.
     /// 取得線條寬度值的分類。
     /// </summary>
     public OdfLineWidthKind Kind { get; }
 
     /// <summary>
+    /// Gets the PositiveInteger value.
     /// 當 <see cref="Kind"/> 為 <see cref="OdfLineWidthKind.PositiveInteger"/> 時，取得正整數值。
     /// </summary>
     public int? PositiveInteger { get; }
 
     /// <summary>
+    /// Gets the Percent value.
     /// 當 <see cref="Kind"/> 為 <see cref="OdfLineWidthKind.Percent"/> 時，取得百分比數值。
     /// </summary>
     public decimal? Percent { get; }
 
     /// <summary>
+    /// Gets the Length value.
     /// 當 <see cref="Kind"/> 為 <see cref="OdfLineWidthKind.Length"/> 時，取得正長度值。
     /// </summary>
     public OdfLength? Length { get; }
 
     /// <summary>
+    /// Executes the TryParse operation.
     /// 嘗試解析線條寬度字串。
     /// </summary>
     /// <param name="value">線條寬度字串</param>
@@ -73,25 +80,36 @@ public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
     }
 
     /// <summary>
+    /// Executes the ToString operation.
     /// 傳回原始線條寬度字串。
     /// </summary>
     /// <returns>線條寬度字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷目前值是否等於另一個線條寬度。
     /// </summary>
     /// <param name="other">要比較的線條寬度</param>
     /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfLineWidth other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
+    /// <summary>
+    /// Executes the Equals operation.
+    /// 執行 Equals 作業。
+    /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfLineWidth other && Equals(other);
 
+    /// <summary>
+    /// Executes the GetHashCode operation.
+    /// 執行 GetHashCode 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個線條寬度是否相等。
     /// </summary>
     /// <param name="left">左側線條寬度</param>
@@ -100,6 +118,7 @@ public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
     public static bool operator ==(OdfLineWidth left, OdfLineWidth right) => left.Equals(right);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個線條寬度是否不相等。
     /// </summary>
     /// <param name="left">左側線條寬度</param>
@@ -217,6 +236,7 @@ public readonly struct OdfLineWidth : IEquatable<OdfLineWidth>
 }
 
 /// <summary>
+/// Defines values for OdfLineWidthKind.
 /// 表示 <see cref="OdfLineWidth"/> 的 schema choice 分類。
 /// </summary>
 public enum OdfLineWidthKind

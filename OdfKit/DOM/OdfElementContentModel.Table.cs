@@ -19,11 +19,13 @@ using OdfKit.Spreadsheet;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the TableTableElement API.
 /// 為 <see cref="TableTableElement"/> 提供 <c>table:table</c> 結構 content model facade。
 /// </summary>
 public partial class TableTableElement
 {
     /// <summary>
+    /// Provides the member member.
     /// 以零為基準的列與欄索引存取儲存格，若目標位置不存在則自動補齊列與儲存格。
     /// </summary>
     /// <param name="row">以零為基準的列索引</param>
@@ -35,6 +37,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 以 Excel 位址（例如 <c>A1</c>）存取儲存格，若目標位置不存在則自動補齊列與儲存格。
     /// </summary>
     /// <param name="address">Excel 樣式儲存格位址</param>
@@ -49,6 +52,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the EnumerateCellViews operation.
     /// 以輕量檢視列舉表格儲存格，避免為稀疏儲存格建立 <see cref="TableTableCellElement"/> facade。
     /// </summary>
     /// <returns>儲存格檢視列舉器</returns>
@@ -56,6 +60,7 @@ public partial class TableTableElement
         => new(this);
 
     /// <summary>
+    /// Executes the InsertRows operation.
     /// 在指定位置插入空白列，並同步位移尚未具現化的稀疏儲存格資料。
     /// </summary>
     /// <param name="position">以零為基準的插入位置</param>
@@ -83,6 +88,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the DeleteRows operation.
     /// 刪除指定位置起算的列，並同步位移尚未具現化的稀疏儲存格資料。
     /// </summary>
     /// <param name="position">以零為基準的刪除位置</param>
@@ -110,6 +116,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the CopyRows operation.
     /// 將指定範圍的列複製到目標位置，並同步複製尚未具現化的稀疏儲存格資料。
     /// </summary>
     /// <param name="sourcePosition">以零為基準的來源起始列索引</param>
@@ -145,6 +152,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the MoveRows operation.
     /// 將指定範圍的列移動到目標位置，並同步移動尚未具現化的稀疏儲存格資料。
     /// </summary>
     /// <param name="sourcePosition">以零為基準的來源起始列索引</param>
@@ -181,6 +189,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 依文件順序列舉 <c>table:table</c> 欄位結構 choice group 中的直接子元素。
     /// </summary>
     public IEnumerable<OdfElement> ColumnStructureChildElements
@@ -198,6 +207,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 依文件順序列舉 <c>table:table</c> 列結構 choice group 中的直接子元素。
     /// </summary>
     public IEnumerable<OdfElement> RowStructureChildElements
@@ -215,6 +225,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the EnsureTableColumns operation.
     /// 取得或建立 <c>table:table-columns</c> 容器，供後續新增欄定義使用。
     /// </summary>
     /// <returns>表格欄位容器元素</returns>
@@ -230,6 +241,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the AppendColumn operation.
     /// 在欄位結構區段末尾新增單一欄定義。
     /// </summary>
     /// <returns>新增的 <c>table:table-column</c> 元素</returns>
@@ -240,6 +252,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the AppendRow operation.
     /// 在列結構區段末尾新增表格列。
     /// </summary>
     /// <returns>新增的 <c>table:table-row</c> 元素</returns>
@@ -249,9 +262,8 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the AppendHeaderRows operation.
     /// 新增表頭列容器；表頭列固定置於所有一般資料列（<c>table:table-row</c>／
-    /// <c>table:table-rows</c>／<c>table:table-row-group</c>）之前，即使呼叫時已存在資料列，
-    /// 仍會插入在第一個資料列之前，而非單純附加於列結構區段末尾。
     /// </summary>
     /// <returns>新增的 <c>table:table-header-rows</c> 元素</returns>
     public TableTableHeaderRowsElement AppendHeaderRows()
@@ -270,6 +282,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the InsertColumnStructure operation.
     /// 在欄位結構 choice group 的語意位置插入子元素。
     /// </summary>
     /// <typeparam name="TElement">欄位結構元素型別</typeparam>
@@ -289,6 +302,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the ImportData operation.
     /// 將 <see cref="DbDataReader"/> 的資料逐列匯入至目前表格。
     /// </summary>
     /// <param name="reader">資料讀取器</param>
@@ -315,6 +329,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the ImportData operation.
     /// 將 <see cref="DataTable"/> 的資料逐列匯入至目前表格。
     /// </summary>
     /// <param name="table">資料表</param>
@@ -339,6 +354,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the ImportData operation.
     /// 將實體集合逐列匯入至目前表格。
     /// </summary>
     /// <typeparam name="T">資料列型別</typeparam>
@@ -848,6 +864,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the Dispose operation.
     /// 釋放非託管頁面記憶體。
     /// </summary>
     public void Dispose()
@@ -1279,6 +1296,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the MaterializeSparseCells operation.
     /// 將尚未具現化的稀疏儲存格全部加載至 DOM。在文件序列化存檔前呼叫。
     /// </summary>
     public void MaterializeSparseCells()
@@ -1328,6 +1346,10 @@ public partial class TableTableElement
         FreeNativePages();
     }
 
+    /// <summary>
+    /// Executes the TryWriteOverride operation.
+    /// 執行 TryWriteOverride 作業。
+    /// </summary>
     /// <inheritdoc />
     public override bool TryWriteOverride(System.Xml.XmlWriter writer, Dictionary<string, string> nsDict)
     {
@@ -1558,6 +1580,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Executes the CompressColdPages operation.
     /// 將所有已分配的熱頁 (Hot-Page) 進行壓縮並轉為冷頁 (Cold-Page) 以節省記憶體。
     /// </summary>
     public void CompressColdPages()
@@ -1738,6 +1761,7 @@ public partial class TableTableElement
         }
 
         /// <summary>
+        /// Executes the GetEnumerator operation.
         /// 取得儲存格檢視列舉器。
         /// </summary>
         /// <returns>儲存格檢視列舉器</returns>
@@ -1746,6 +1770,7 @@ public partial class TableTableElement
     }
 
     /// <summary>
+    /// Provides the OdfCellViewEnumerator API.
     /// 表示 <see cref="TableTableElement.EnumerateCellViews"/> 使用的 stack-only 儲存格檢視列舉器。
     /// </summary>
     public ref struct OdfCellViewEnumerator
@@ -1786,11 +1811,13 @@ public partial class TableTableElement
         }
 
         /// <summary>
+        /// Gets the Current value.
         /// 取得目前的儲存格檢視。
         /// </summary>
         public OdfCellView Current { get; private set; }
 
         /// <summary>
+        /// Executes the MoveNext operation.
         /// 移至下一個儲存格檢視。
         /// </summary>
         /// <returns>若成功移至下一筆資料則為 <see langword="true"/>；否則為 <see langword="false"/></returns>

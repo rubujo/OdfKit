@@ -4,9 +4,8 @@ using System.Runtime.CompilerServices;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfCrc32 API.
 /// 提供高效且零分配的 CRC-32 (ISO-HDLC) 校驗碼計算。
-/// 支援在 net10.0 與 ARM64 架構下使用 CPU 硬體指令加速；
-/// 於其餘平台與 netstandard2.0 下自動 Fallback 至 Slice-by-8 查表法。
 /// </summary>
 public static class OdfCrc32
 {
@@ -55,6 +54,7 @@ public static class OdfCrc32
     }
 
     /// <summary>
+    /// Executes the Compute operation.
     /// 計算指定位元組 Span 的 CRC-32 值。
     /// </summary>
     /// <param name="bytes">要計算的唯讀位元組 Span</param>
@@ -70,6 +70,7 @@ public static class OdfCrc32
     }
 
     /// <summary>
+    /// Executes the Compute operation.
     /// 以現有的 CRC 種子（Seed）累積計算指定位元組 Span 的 CRC-32 值。
     /// </summary>
     /// <param name="currentCrc">之前的 CRC 狀態值（累計中間狀態，或 0xFFFFFFFF）</param>

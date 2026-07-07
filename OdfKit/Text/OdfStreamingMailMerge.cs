@@ -20,10 +20,8 @@ using OdfKit.Core;
 namespace OdfKit.Text;
 
 /// <summary>
-/// Streams mail merge and template-fill output with under 1 MB of managed working memory.
-/// Uses byte-level template compilation and zero-reflection expression trees for maximum performance.
+/// Provides the OdfStreamingMailMerge API.
 /// 提供超低記憶體佔用（小於 1MB）的 SAX 流式郵件合併與範本套印引擎。
-/// 使用 Byte-level 範本編譯與 Expression Trees 零反射技術，性能極致。
 /// </summary>
 public static class OdfStreamingMailMerge
 {
@@ -87,10 +85,8 @@ public static class OdfStreamingMailMerge
     }
 
     /// <summary>
-    /// Asynchronously applies batch template data merging and writes the result to the target stream.
-    /// Each merged record is separated by a page break in the output document.
+    /// Executes the ApplyBatchTemplateAsync operation.
     /// 非同步套用批次範本資料合併，並將結果輸出至目標串流。
-    /// 每筆資料合併後，在輸出文件中會以分頁符分隔。
     /// </summary>
     /// <param name="templateStream">The source template ODF (ODT/ODS) file stream. / 來源範本 ODF (ODT/ODS) 檔案串流。</param>
     /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
@@ -117,10 +113,8 @@ public static class OdfStreamingMailMerge
     }
 
     /// <summary>
-    /// Asynchronously applies batch template data merging from an asynchronous data sequence and writes the result to the target stream.
-    /// Each merged record is separated by a page break in the output document.
+    /// Executes the ApplyBatchTemplateAsync operation.
     /// 非同步套用批次範本資料合併，資料序列以非同步方式列舉，並將結果輸出至目標串流。
-    /// 每筆資料合併後，在輸出文件中會以分頁符分隔。
     /// </summary>
     /// <param name="templateStream">The source template ODF (ODT/ODS) file stream. / 來源範本 ODF (ODT/ODS) 檔案串流。</param>
     /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
@@ -288,10 +282,8 @@ public static class OdfStreamingMailMerge
     }
 
     /// <summary>
-    /// Asynchronously applies batch template data merging with DbDataReader support and writes the result to the target stream.
-    /// Each merged record is separated by a page break in the output document.
+    /// Executes the ApplyBatchTemplateAsync operation.
     /// 非同步套用批次範本資料合併，支援 DbDataReader，並將結果輸出至目標串流。
-    /// 每筆資料合併後，在輸出文件中會以分頁符分隔。
     /// </summary>
     /// <param name="templateStream">The source template ODF (ODT/ODS) file stream. / 來源範本 ODF (ODT/ODS) 檔案串流。</param>
     /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>

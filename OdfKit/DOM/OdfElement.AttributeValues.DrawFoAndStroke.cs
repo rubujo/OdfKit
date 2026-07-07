@@ -3,12 +3,17 @@ using OdfKit.Compliance;
 using OdfKit.DOM;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Attribute Values - Draw, FO & Stroke
 
     /// <summary>
+    /// Executes the GetDrawNoHrefAttributeValue operation.
     /// 取得具有 schema awareness 的繪圖無連結屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -22,6 +27,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetDrawNoHrefAttributeValue operation.
     /// 設定具有 schema awareness 的繪圖無連結屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -35,6 +41,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableFunctionAttributeValue operation.
     /// 取得具有 schema awareness 的表格彙總函式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -48,6 +55,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableFunctionAttributeValue operation.
     /// 設定具有 schema awareness 的表格彙總函式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -61,6 +69,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetDrawStrokeLineJoinAttributeValue operation.
     /// 取得具有 schema awareness 的繪圖線條接合屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -74,6 +83,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetDrawStrokeLineJoinAttributeValue operation.
     /// 設定具有 schema awareness 的繪圖線條接合屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -87,6 +97,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetSvgStrokeLineCapAttributeValue operation.
     /// 取得具有 schema awareness 的 SVG 線端樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -100,6 +111,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetSvgStrokeLineCapAttributeValue operation.
     /// 設定具有 schema awareness 的 SVG 線端樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -113,6 +125,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFoKeepTogetherAttributeValue operation.
     /// 取得具有 schema awareness 的 FO 分頁保持屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -126,6 +139,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFoKeepTogetherAttributeValue operation.
     /// 設定具有 schema awareness 的 FO 分頁保持屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -139,6 +153,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFoWrapOptionAttributeValue operation.
     /// 取得具有 schema awareness 的 FO 換行選項屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -152,6 +167,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFoWrapOptionAttributeValue operation.
     /// 設定具有 schema awareness 的 FO 換行選項屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -165,6 +181,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetDr3dProjectionAttributeValue operation.
     /// 取得具有 schema awareness 的 3D 投影屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -178,6 +195,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetDr3dProjectionAttributeValue operation.
     /// 設定具有 schema awareness 的 3D 投影屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -191,6 +209,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetDr3dShadeModeAttributeValue operation.
     /// 取得具有 schema awareness 的 3D 著色模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -204,6 +223,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetDr3dShadeModeAttributeValue operation.
     /// 設定具有 schema awareness 的 3D 著色模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -217,6 +237,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetSvgFillRuleAttributeValue operation.
     /// 取得具有 schema awareness 的 SVG 填滿規則屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -230,6 +251,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetSvgFillRuleAttributeValue operation.
     /// 設定具有 schema awareness 的 SVG 填滿規則屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -243,6 +265,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableBorderModelAttributeValue operation.
     /// 取得具有 schema awareness 的表格邊框模型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -256,6 +279,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableBorderModelAttributeValue operation.
     /// 設定具有 schema awareness 的表格邊框模型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

@@ -4,6 +4,10 @@ using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Chart;
+/// <summary>
+/// Provides the OdfChartDocument API.
+/// 提供 OdfChartDocument API。
+/// </summary>
 
 public partial class OdfChartDocument
 {

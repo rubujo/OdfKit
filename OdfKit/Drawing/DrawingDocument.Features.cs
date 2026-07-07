@@ -2,6 +2,10 @@
 using System.Linq;
 
 namespace OdfKit.Drawing;
+/// <summary>
+/// Provides the DrawingDocument API.
+/// 提供 DrawingDocument API。
+/// </summary>
 
 public partial class DrawingDocument
 {

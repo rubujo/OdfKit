@@ -4,6 +4,7 @@ using System.Security.Cryptography.X509Certificates;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Defines values for XadesLevel.
 /// XAdES 標準層級。
 /// </summary>
 public enum XadesLevel
@@ -35,6 +36,7 @@ public enum XadesLevel
 }
 
 /// <summary>
+/// Defines values for OdfSignatureLevel.
 /// ODF 文件支援的簽章層級。
 /// </summary>
 public enum OdfSignatureLevel
@@ -66,16 +68,19 @@ public enum OdfSignatureLevel
 }
 
 /// <summary>
+/// Provides the OdfSigningOptions API.
 /// 用於以數位簽章/ XAdES 簽署與驗證 ODF 封裝的組態選項。
 /// </summary>
 public class OdfSigningOptions
 {
     /// <summary>
+    /// Gets the SignatureLevel value.
     /// 取得或設定簽章層級。
     /// </summary>
     public OdfSignatureLevel SignatureLevel { get; set; } = OdfSignatureLevel.None;
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定 XAdES 標準層級（ None/XMLDSig, BES, T, LT, A ）。
     /// </summary>
     public XadesLevel Level
@@ -107,31 +112,37 @@ public class OdfSigningOptions
     }
 
     /// <summary>
+    /// Gets the TsaUrl value.
     /// 取得或設定 RFC 3161 時間戳記授權機構（TSA）的 URL 。
     /// </summary>
     public string? TsaUrl { get; set; }
 
     /// <summary>
+    /// Gets a value indicating the CheckRevocation state.
     /// 取得或設定是否檢查憑證撤銷狀態（透過 CRL ）。
     /// </summary>
     public bool CheckRevocation { get; set; } = false;
 
     /// <summary>
+    /// Gets the HttpClient value.
     /// 取得或設定自訂的 HttpClient ，用於擷取 CRL 與查詢 TSA ；可用於離線模擬測試。
     /// </summary>
     public HttpClient? HttpClient { get; set; }
 
     /// <summary>
+    /// Gets a value indicating the AllowUntrustedRoot state.
     /// 取得或設定在驗證簽章時，是否允許不受信任的根憑證。
     /// </summary>
     public bool AllowUntrustedRoot { get; set; } = false;
 
     /// <summary>
+    /// Gets a value indicating the AllowUntrustedTimestamp state.
     /// 取得或設定在驗證簽章時，是否允許不受信任的時間戳記憑證。
     /// </summary>
     public bool AllowUntrustedTimestamp { get; set; } = false;
 
     /// <summary>
+    /// Gets the ExtraCertificates value.
     /// 取得額外的憑證，用於建立簽署或驗證憑證鏈。
     /// </summary>
     public X509Certificate2Collection ExtraCertificates { get; } = new();

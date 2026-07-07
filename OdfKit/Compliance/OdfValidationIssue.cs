@@ -5,6 +5,7 @@ using System.Collections.Generic;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfValidationIssue API.
 /// 代表單一驗證問題。
 /// </summary>
 /// <param name="severity">問題嚴重性</param>
@@ -28,56 +29,67 @@ public sealed class OdfValidationIssue(
     CultureInfo? culture = null)
 {
     /// <summary>
+    /// Gets the Severity value.
     /// 取得問題嚴重性。
     /// </summary>
     public OdfIssueSeverity Severity { get; } = severity;
 
     /// <summary>
+    /// Gets the RuleId value.
     /// 取得規則識別碼。
     /// </summary>
     public string RuleId { get; } = ruleId ?? string.Empty;
 
     /// <summary>
+    /// Gets the Message value.
     /// 取得人類可讀的問題說明訊息。
     /// </summary>
     public string Message { get; } = message ?? string.Empty;
 
     /// <summary>
+    /// Gets the PackagePath value.
     /// 取得與此問題相關的套件進入路徑。
     /// </summary>
     public string? PackagePath { get; } = packagePath;
 
     /// <summary>
+    /// Gets the XPath value.
     /// 取得與此問題相關的 XML 路徑（可用時）。
     /// </summary>
     public string? XPath { get; } = xPath;
 
     /// <summary>
+    /// Gets the RequiredVersion value.
     /// 取得問題與版本相關時所需的 ODF 版本。
     /// </summary>
     public OdfVersion? RequiredVersion { get; } = requiredVersion;
 
     /// <summary>
+    /// Gets the ProfileId value.
     /// 取得發出此問題的相容性設定檔識別碼。
     /// </summary>
     public string? ProfileId { get; } = profileId;
 
     /// <summary>
+    /// Gets the Culture value.
     /// 取得與此問題相關的文化特性，用於本地化翻譯。
     /// </summary>
     public CultureInfo? Culture { get; set; } = culture;
 
     /// <summary>
+    /// Gets the Details value.
     /// 取得可供工具處理的結構化診斷細節。
     /// </summary>
     public IReadOnlyDictionary<string, string?> Details { get; } = OdfValidationReport.CopyDetails(details);
 
     /// <summary>
+    /// Executes the SuggestedFix operation.
     /// 取得使用者可採取的建議修復文字。
     /// </summary>
     public string SuggestedFix => BuildSuggestedFix();
 
     /// <summary>
+    /// Executes the ToJsonModel operation.
     /// 建立可序列化的 JSON 匯出模型。
     /// </summary>
     /// <returns>包含驗證問題欄位的 JSON 匯出模型</returns>

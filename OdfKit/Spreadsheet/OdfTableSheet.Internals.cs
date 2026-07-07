@@ -2,6 +2,10 @@
 using OdfKit.DOM;
 
 namespace OdfKit.Spreadsheet;
+/// <summary>
+/// Provides the OdfTableSheet API.
+/// 提供 OdfTableSheet API。
+/// </summary>
 
 public partial class OdfTableSheet
 {

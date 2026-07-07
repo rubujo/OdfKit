@@ -3,12 +3,17 @@ using OdfKit.Compliance;
 using OdfKit.DOM;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Attribute Values - Text List & Reference
 
     /// <summary>
+    /// Executes the GetTextLabelFollowedByAttributeValue operation.
     /// 取得具有 schema awareness 的文字清單標籤後接屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -22,6 +27,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextLabelFollowedByAttributeValue operation.
     /// 設定具有 schema awareness 的文字清單標籤後接屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -35,6 +41,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextListLevelPositionModeAttributeValue operation.
     /// 取得具有 schema awareness 的文字清單層級定位模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -48,6 +55,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextListLevelPositionModeAttributeValue operation.
     /// 設定具有 schema awareness 的文字清單層級定位模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -61,6 +69,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextIndexScopeAttributeValue operation.
     /// 取得具有 schema awareness 的文字索引範圍屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -74,6 +83,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextIndexScopeAttributeValue operation.
     /// 設定具有 schema awareness 的文字索引範圍屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -87,6 +97,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextTableTypeAttributeValue operation.
     /// 取得具有 schema awareness 的文字資料表來源類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -100,6 +111,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextTableTypeAttributeValue operation.
     /// 設定具有 schema awareness 的文字資料表來源類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -113,6 +125,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextAnchorTypeAttributeValue operation.
     /// 取得具有 schema awareness 的文字錨定類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -126,6 +139,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextAnchorTypeAttributeValue operation.
     /// 設定具有 schema awareness 的文字錨定類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -139,6 +153,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextNoteClassAttributeValue operation.
     /// 取得具有 schema awareness 的文字註解類別屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -152,6 +167,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextNoteClassAttributeValue operation.
     /// 設定具有 schema awareness 的文字註解類別屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -165,6 +181,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextSelectPageAttributeValue operation.
     /// 取得具有 schema awareness 的文字頁面選取屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -178,6 +195,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextSelectPageAttributeValue operation.
     /// 設定具有 schema awareness 的文字頁面選取屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -191,6 +209,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextReferenceFormatAttributeValue operation.
     /// 取得具有 schema awareness 的文字參照格式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -204,6 +223,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextReferenceFormatAttributeValue operation.
     /// 設定具有 schema awareness 的文字參照格式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -217,6 +237,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextStartNumberingAtAttributeValue operation.
     /// 取得具有 schema awareness 的文字起始編號範圍屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -230,6 +251,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextStartNumberingAtAttributeValue operation.
     /// 設定具有 schema awareness 的文字起始編號範圍屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -243,6 +265,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextFootnotesPositionAttributeValue operation.
     /// 取得具有 schema awareness 的文字註腳位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -256,6 +279,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextFootnotesPositionAttributeValue operation.
     /// 設定具有 schema awareness 的文字註腳位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

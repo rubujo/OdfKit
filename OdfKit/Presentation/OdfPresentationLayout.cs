@@ -56,6 +56,10 @@ public sealed class OdfMasterPageDefinition
     /// </summary>
     public string? BackgroundColor { get; init; }
 }
+/// <summary>
+/// Provides the PresentationDocument API.
+/// 提供 PresentationDocument API。
+/// </summary>
 
 
 

@@ -1,4 +1,8 @@
 ﻿namespace OdfKit.Text;
+/// <summary>
+/// Provides the OdfPageSetup API.
+/// 提供 OdfPageSetup API。
+/// </summary>
 
 public partial class OdfPageSetup
 {

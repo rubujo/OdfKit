@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfPkgRdfPredicates API.
 /// 提供 ODF 1.2 封裝 RDF ontology（<c>pkg:</c>）的標準述詞 IRI。
 /// </summary>
 public static class OdfPkgRdfPredicates

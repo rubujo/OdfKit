@@ -9,6 +9,10 @@ using Org.BouncyCastle.Crypto.Generators;
 
 using OdfKit.Compliance;
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfEncryption API.
+/// 提供 OdfEncryption API。
+/// </summary>
 
 public static partial class OdfEncryption
 {
@@ -19,6 +23,7 @@ public static partial class OdfEncryption
     internal static int LastParallelEncryptionMaxDegreeForTests { get; private set; }
 
     /// <summary>
+    /// Executes the Decrypt operation.
     /// 解密指定 ODF 封裝中的所有加密專案。
     /// </summary>
     /// <param name="package">要解密的 ODF 封裝執行個體</param>
@@ -186,6 +191,7 @@ public static partial class OdfEncryption
     }
 
     /// <summary>
+    /// Executes the Encrypt operation.
     /// 加密指定 ODF 封裝中的所有適用專案。
     /// </summary>
     /// <param name="package">要加密的 ODF 封裝執行個體</param>
@@ -343,8 +349,10 @@ public static partial class OdfEncryption
 
         public void Apply()
         {
-            entry.SetContent(_ciphertext ?? throw new InvalidOperationException());
-            entry.EncryptionInfo = _info ?? throw new InvalidOperationException();
+            entry.SetContent(_ciphertext ?? throw new InvalidOperationException(
+                OdfLocalizer.GetMessage("Err_OdfEncryptionPackage_MissingCiphertext")));
+            entry.EncryptionInfo = _info ?? throw new InvalidOperationException(
+                OdfLocalizer.GetMessage("Err_OdfEncryptionPackage_MissingEncryptionInfo"));
         }
     }
 

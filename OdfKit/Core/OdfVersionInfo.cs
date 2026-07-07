@@ -6,11 +6,13 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfVersionInfo API.
 /// 提供 OdfKit 所使用的 ODF 版本資訊與預設版本配置。
 /// </summary>
 public static class OdfVersionInfo
 {
     /// <summary>
+    /// Provides the DefaultVersion member.
     /// 取得 OdfKit 預設使用的 ODF 版本，目前為 ODF 1.4。
     /// </summary>
     public static OdfVersion DefaultVersion => OdfVersion.Odf14;
@@ -21,6 +23,7 @@ public static class OdfVersionInfo
     public const string DefaultVersionString = "1.4";
 
     /// <summary>
+    /// Executes the ToVersionString operation.
     /// 將 OdfVersion 轉換為對應的規格版本字串。
     /// </summary>
     /// <param name="version">ODF 版本</param>
@@ -39,6 +42,7 @@ public static class OdfVersionInfo
     }
 
     /// <summary>
+    /// Executes the TryParseVersionString operation.
     /// 嘗試將規格版本字串轉換為 <see cref="OdfVersion"/>。
     /// </summary>
     /// <param name="value">版本字串，例如 <c>1.4</c></param>

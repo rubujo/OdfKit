@@ -1,9 +1,8 @@
 ﻿namespace OdfKit.Core;
 
 /// <summary>
+/// Defines the IOdfOpenPgpKeyProvider contract.
 /// 定義 ODF 1.3 OpenPGP 加密模式所需的 Session Key 加解密提供者。
-/// 實作此介面後，搭配 <see cref="OdfOpenPgpCryptographyProvider"/> 即可完整支援
-/// OpenPGP 加密，而無需自行實作 AES-256-CBC 內容層加密邏輯。
 /// </summary>
 public interface IOdfOpenPgpKeyProvider
 {

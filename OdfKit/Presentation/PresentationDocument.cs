@@ -93,6 +93,10 @@ public partial class PresentationDocument : OdfDocument
     public static PresentationDocument CreateFromFlatDocument(FlatPresentationDocument document) =>
         (PresentationDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.Presentation, targetIsFlatXml: false);
 
+    /// <summary>
+    /// Executes the ClearTemplateUserContent operation.
+    /// 執行 ClearTemplateUserContent 作業。
+    /// </summary>
     /// <inheritdoc/>
     protected override void ClearTemplateUserContent()
     {

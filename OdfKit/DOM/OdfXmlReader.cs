@@ -12,6 +12,7 @@ using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfXmlReader API.
 /// 用於將 XML 串流解析為 ODF DOM 節點樹的讀取器類別。
 /// </summary>
 public static class OdfXmlReader
@@ -22,6 +23,7 @@ public static class OdfXmlReader
     public const int MaxElementDepth = 256;
 
     /// <summary>
+    /// Executes the Parse operation.
     /// 將 ODF XML 唯讀位元組區段解析為記憶體 DOM 節點樹。
     /// </summary>
     /// <param name="xmlData">包含 XML 資料的唯讀位元組區段</param>
@@ -33,6 +35,7 @@ public static class OdfXmlReader
     }
 
     /// <summary>
+    /// Executes the Parse operation.
     /// 將 ODF XML 唯讀位元組區段與基底指標解析為記憶體 DOM 節點樹。
     /// </summary>
     public static OdfNode Parse(ReadOnlyMemory<byte> xmlData, IntPtr basePtr, OdfLoadOptions? options = null)
@@ -428,6 +431,7 @@ public static class OdfXmlReader
     }
 
     /// <summary>
+    /// Executes the Parse operation.
     /// 將 ODF XML 檔案串流解析為記憶體 DOM 節點樹。
     /// </summary>
     /// <param name="stream">要解析的 XML 輸入串流</param>

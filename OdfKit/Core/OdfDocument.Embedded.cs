@@ -6,6 +6,10 @@ using System.Text;
 
 using OdfKit.Compliance;
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfDocument API.
+/// 提供 OdfDocument API。
+/// </summary>
 
 public abstract partial class OdfDocument
 {
@@ -15,6 +19,7 @@ public abstract partial class OdfDocument
     #region Embedded Documents
 
     /// <summary>
+    /// Executes the GetEmbeddedDocument operation.
     /// 取得指定子路徑的嵌入式 ODF 文件。
     /// </summary>
     /// <typeparam name="T">嵌入式文件 wrapper 類型</typeparam>
@@ -39,6 +44,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the CreateEmbeddedDocument operation.
     /// 建立指定子路徑的嵌入式 ODF 文件。
     /// </summary>
     /// <typeparam name="T">嵌入式文件 wrapper 類型</typeparam>

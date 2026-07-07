@@ -5,6 +5,7 @@ using OdfKit.Core;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfSchemaRegistry API.
 /// 提供驗證器與具類型 DOM 層所使用的版本化 ODF 結構描述中繼資料。
 /// </summary>
 public static class OdfSchemaRegistry
@@ -29,11 +30,13 @@ public static class OdfSchemaRegistry
     private static readonly Dictionary<OdfVersion, OdfSchemaSet> RegisteredSchemas = [];
 
     /// <summary>
+    /// Executes the Latest operation.
     /// 取得此程式庫中可用的最新 ODF 結構描述中繼資料。
     /// </summary>
     public static OdfSchemaSet Latest => GetSchema(OdfVersion.Odf14);
 
     /// <summary>
+    /// Executes the Odf14 operation.
     /// 取得 ODF 1.4 結構描述中繼資料種子。
     /// </summary>
     public static OdfSchemaSet Odf14 => GetSchema(OdfVersion.Odf14);
@@ -54,6 +57,7 @@ public static class OdfSchemaRegistry
     }
 
     /// <summary>
+    /// Executes the GetSchema operation.
     /// 取得指定版本的結構描述中繼資料。
     /// </summary>
     /// <param name="version">ODF 版本</param>
@@ -67,6 +71,7 @@ public static class OdfSchemaRegistry
     }
 
     /// <summary>
+    /// Executes the RegisterSchema operation.
     /// 註冊指定版本的產出結構描述中繼資料，直到傳回的範圍被釋放為止。
     /// </summary>
     /// <param name="schema">要註冊的結構描述集</param>

@@ -6,6 +6,10 @@ using OdfKit.Compliance;
 using OdfKit.Core;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfNode API.
+/// 提供 OdfNode API。
+/// </summary>
 
 public partial class OdfNode
 {
@@ -15,10 +19,15 @@ public partial class OdfNode
     // 複製遞迴深度計數器（執行緒個別）：防止透過公開 DOM API 疊出的極深巢狀樹
     // 在 CloneNode/ImportNode 遞迴時引發 StackOverflowException，與 OdfXmlReader.MaxElementDepth
     // 對剖析路徑的深度防護保持一致。OdfElement.CloneNode 覆寫亦共用此計數器。
+    /// <summary>
+    /// Provides the member member.
+    /// 提供 member 成員。
+    /// </summary>
     [ThreadStatic]
     private protected static int CloneRecursionDepth;
 
     /// <summary>
+    /// Executes the CloneNode operation.
     /// 複製當前節點。
     /// </summary>
     /// <param name="deep">是否進行深層複製（遞迴複製子節點）</param>
@@ -86,6 +95,7 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Executes the ImportNode operation.
     /// 將一個節點從來源 <see cref="OdfPackage"/> 匯入至目的 <see cref="OdfPackage"/>，自動複製並移轉其所屬的媒體檔案與樣式關聯。
     /// </summary>
     /// <param name="sourceNode">要匯入的來源節點</param>

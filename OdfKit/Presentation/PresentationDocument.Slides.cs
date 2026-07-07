@@ -6,6 +6,10 @@ using OdfKit.Styles;
 
 using OdfKit.Compliance;
 namespace OdfKit.Presentation;
+/// <summary>
+/// Provides the PresentationDocument API.
+/// 提供 PresentationDocument API。
+/// </summary>
 
 public partial class PresentationDocument
 {

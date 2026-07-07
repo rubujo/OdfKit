@@ -7,6 +7,7 @@ using OdfKit.DOM;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfTypedDomCoverageReport API.
 /// 表示 typed DOM 覆蓋報告的摘要與元素對照清單。
 /// </summary>
 public sealed class OdfTypedDomCoverageReport
@@ -18,6 +19,7 @@ public sealed class OdfTypedDomCoverageReport
     private readonly IReadOnlyDictionary<string, int> wrapperPropertyTypeCounts;
 
     /// <summary>
+    /// Executes the OdfTypedDomCoverageReport operation.
     /// 初始化 typed DOM 覆蓋報告。
     /// </summary>
     /// <param name="schemaVersion">schema 版本</param>
@@ -52,51 +54,61 @@ public sealed class OdfTypedDomCoverageReport
     }
 
     /// <summary>
+    /// Gets the SchemaVersion value.
     /// 取得 schema 版本。
     /// </summary>
     public string SchemaVersion { get; }
 
     /// <summary>
+    /// Gets the SchemaSourceUrl value.
     /// 取得 schema 來源 URL。
     /// </summary>
     public string SchemaSourceUrl { get; }
 
     /// <summary>
+    /// Gets the SchemaSourceDate value.
     /// 取得 schema 來源日期。
     /// </summary>
     public string SchemaSourceDate { get; }
 
     /// <summary>
+    /// Provides the SchemaElementCount member.
     /// 取得 schema 元素總數。
     /// </summary>
     public int SchemaElementCount => elements.Count;
 
     /// <summary>
+    /// Provides the SchemaChildElementRelationCount member.
     /// 取得 schema 中具名直接子元素關係總數。
     /// </summary>
     public int SchemaChildElementRelationCount => childElementRelations.Count;
 
     /// <summary>
+    /// Executes the TypedElementCount operation.
     /// 取得具備專門 wrapper 的 schema 元素數。
     /// </summary>
     public int TypedElementCount => elements.Count(element => element.HasTypedWrapper);
 
     /// <summary>
+    /// Executes the FallbackElementCount operation.
     /// 取得仍回退到通用 <see cref="OdfElement"/> 的 schema 元素數。
     /// </summary>
     public int FallbackElementCount => elements.Count(element => !element.HasTypedWrapper);
 
     /// <summary>
+    /// Gets the SchemaAttributeCount value.
     /// 取得 schema 屬性總數。
     /// </summary>
     public int SchemaAttributeCount { get; }
 
     /// <summary>
+    /// Executes the WrapperPropertyCount operation.
     /// 取得 wrapper 上公開屬性總數。
     /// </summary>
     public int WrapperPropertyCount => elements.Sum(element => element.WrapperPropertyCount);
 
     /// <summary>
+    /// Provides the TypedElementRatio member.
     /// 取得專門 wrapper 覆蓋比例。
     /// </summary>
     public double TypedElementRatio => SchemaElementCount == 0
@@ -104,31 +116,37 @@ public sealed class OdfTypedDomCoverageReport
         : (double)TypedElementCount / SchemaElementCount;
 
     /// <summary>
+    /// Provides the Elements member.
     /// 取得元素覆蓋清單。
     /// </summary>
     public IReadOnlyList<OdfTypedDomElementCoverage> Elements => elements;
 
     /// <summary>
+    /// Provides the ChildElementRelations member.
     /// 取得 schema 直接子元素關係清單。
     /// </summary>
     public IReadOnlyList<OdfTypedDomChildElementRelationCoverage> ChildElementRelations => childElementRelations;
 
     /// <summary>
+    /// Provides the AttributeDatatypeCoverage member.
     /// 取得 schema 屬性值類型與 typed helper 對照清單。
     /// </summary>
     public IReadOnlyList<OdfTypedDomAttributeDatatypeCoverage> AttributeDatatypeCoverage => attributeDatatypeCoverage;
 
     /// <summary>
+    /// Provides the AttributeValueTypeCounts member.
     /// 取得 schema 屬性值類型分布。
     /// </summary>
     public IReadOnlyDictionary<string, int> AttributeValueTypeCounts => attributeValueTypeCounts;
 
     /// <summary>
+    /// Provides the WrapperPropertyTypeCounts member.
     /// 取得 wrapper 屬性 CLR 類型分布。
     /// </summary>
     public IReadOnlyDictionary<string, int> WrapperPropertyTypeCounts => wrapperPropertyTypeCounts;
 
     /// <summary>
+    /// Executes the ToJsonModel operation.
     /// 建立適合 JSON 序列化的匿名模型。
     /// </summary>
     /// <returns>可被 JSON 序列化的報告模型</returns>

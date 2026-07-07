@@ -1,4 +1,8 @@
 ﻿namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfNode API.
+/// 提供 OdfNode API。
+/// </summary>
 
 public partial class OdfNode
 {
@@ -6,6 +10,7 @@ public partial class OdfNode
     private OdfNode? _lastChild;
 
     /// <summary>
+    /// Provides the member member.
     /// 取得第一個子節點（雙向鏈結串列頭指標）。
     /// </summary>
     public OdfNode? FirstChild
@@ -19,6 +24,7 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得最後一個子節點（雙向鏈結串列尾指標）。
     /// </summary>
     public OdfNode? LastChild
@@ -32,11 +38,13 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Gets the NextSibling value.
     /// 取得下一個兄弟節點。
     /// </summary>
     public OdfNode? NextSibling { get; internal set; }
 
     /// <summary>
+    /// Gets the PreviousSibling value.
     /// 取得上一個兄弟節點。
     /// </summary>
     public OdfNode? PreviousSibling { get; internal set; }

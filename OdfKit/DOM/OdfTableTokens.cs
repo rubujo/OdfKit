@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfTableOrder.
 /// 表示 ODF schema 中 <c>table:order</c> 的排序方向 token。
 /// </summary>
 public enum OdfTableOrder
@@ -17,6 +18,7 @@ public enum OdfTableOrder
 }
 
 /// <summary>
+/// Defines values for OdfTableType.
 /// 表示 ODF schema 中封閉 <c>table:type</c> 屬性的表格類型 token。
 /// </summary>
 public enum OdfTableType

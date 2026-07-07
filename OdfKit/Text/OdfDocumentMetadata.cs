@@ -63,10 +63,8 @@ public sealed class OdfDocumentMetadata
     }
 
     /// <summary>
-    /// Gets or sets the document language (a BCP-47 language tag, e.g. "zh-TW", "en-US").
-    /// Maps to the ODF <c>dc:language</c> element.
+    /// Provides the member member.
     /// 取得或設定文件語言（BCP-47 語言標籤，例如 "zh-TW"、"en-US"）。
-    /// 對應 ODF 的 <c>dc:language</c> 元素。
     /// </summary>
     public string? Language
     {

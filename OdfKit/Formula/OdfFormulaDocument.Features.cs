@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 
 namespace OdfKit.Formula;
+/// <summary>
+/// Provides the OdfFormulaDocument API.
+/// 提供 OdfFormulaDocument API。
+/// </summary>
 
 public partial class OdfFormulaDocument
 {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfSchemaPatternValidationResult API.
 /// 代表結構描述模式驗證的結果。
 /// </summary>
 public sealed class OdfSchemaPatternValidationResult
@@ -15,11 +16,13 @@ public sealed class OdfSchemaPatternValidationResult
     }
 
     /// <summary>
+    /// Gets a value indicating the IsMatch state.
     /// 取得一個值，表示 XML 元素是否符合結構描述模式。
     /// </summary>
     public bool IsMatch { get; }
 
     /// <summary>
+    /// Gets the Issues value.
     /// 取得模式驗證的問題。
     /// </summary>
     public IReadOnlyList<OdfValidationIssue> Issues { get; }

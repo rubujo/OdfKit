@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Styles;
 
 /// <summary>
+/// Provides the OdfStyleSet API.
 /// 表示高階文件 builder 可共用的樣式集合。
 /// </summary>
 public sealed class OdfStyleSet
@@ -8,6 +9,7 @@ public sealed class OdfStyleSet
     private readonly string[] _chartPaletteColors = ["#4472C4", "#ED7D31", "#A5A5A5", "#70AD47"];
 
     /// <summary>
+    /// Executes the BusinessReport operation.
     /// 取得適合商業報告的內建樣式集合。
     /// </summary>
     public static OdfStyleSet BusinessReport => new OdfStyleSet()
@@ -19,6 +21,7 @@ public sealed class OdfStyleSet
         .WithTableHeaderColor("#111111");
 
     /// <summary>
+    /// Executes the FromTheme operation.
     /// 從設計主題建立適合 ODT / ODS 內容 builder 使用的樣式集合。
     /// </summary>
     /// <param name="theme">設計主題</param>
@@ -40,41 +43,49 @@ public sealed class OdfStyleSet
     }
 
     /// <summary>
+    /// Gets the HeadingColor value.
     /// 取得或設定標題文字色彩。
     /// </summary>
     public string? HeadingColor { get; set; }
 
     /// <summary>
+    /// Gets the HeadingFontSizePoints value.
     /// 取得或設定標題文字大小（點）。
     /// </summary>
     public double? HeadingFontSizePoints { get; set; }
 
     /// <summary>
+    /// Gets the BodyColor value.
     /// 取得或設定內文文字色彩。
     /// </summary>
     public string? BodyColor { get; set; }
 
     /// <summary>
+    /// Gets the BodyFontSizePoints value.
     /// 取得或設定內文文字大小（點）。
     /// </summary>
     public double? BodyFontSizePoints { get; set; }
 
     /// <summary>
+    /// Gets the TableHeaderBackgroundColor value.
     /// 取得或設定表格首列背景色彩。
     /// </summary>
     public string? TableHeaderBackgroundColor { get; set; }
 
     /// <summary>
+    /// Gets the TableHeaderColor value.
     /// 取得或設定表格首列文字色彩。
     /// </summary>
     public string? TableHeaderColor { get; set; }
 
     /// <summary>
+    /// Gets a value indicating the TableHeaderBold state.
     /// 取得或設定表格首列文字是否使用粗體。
     /// </summary>
     public bool TableHeaderBold { get; set; } = true;
 
     /// <summary>
+    /// Executes the WithHeadingColor operation.
     /// 設定標題文字色彩。
     /// </summary>
     /// <param name="color">色彩值</param>
@@ -86,6 +97,7 @@ public sealed class OdfStyleSet
     }
 
     /// <summary>
+    /// Executes the WithHeadingFontSize operation.
     /// 設定標題文字大小。
     /// </summary>
     /// <param name="points">字級點數</param>
@@ -97,6 +109,7 @@ public sealed class OdfStyleSet
     }
 
     /// <summary>
+    /// Executes the WithBodyColor operation.
     /// 設定內文文字色彩。
     /// </summary>
     /// <param name="color">色彩值</param>
@@ -108,6 +121,7 @@ public sealed class OdfStyleSet
     }
 
     /// <summary>
+    /// Executes the WithBodyFontSize operation.
     /// 設定內文文字大小。
     /// </summary>
     /// <param name="points">字級點數</param>
@@ -119,6 +133,7 @@ public sealed class OdfStyleSet
     }
 
     /// <summary>
+    /// Executes the WithTableHeaderBackgroundColor operation.
     /// 設定表格首列背景色彩。
     /// </summary>
     /// <param name="color">色彩值</param>
@@ -130,6 +145,7 @@ public sealed class OdfStyleSet
     }
 
     /// <summary>
+    /// Executes the WithTableHeaderColor operation.
     /// 設定表格首列文字色彩。
     /// </summary>
     /// <param name="color">色彩值</param>
@@ -141,6 +157,7 @@ public sealed class OdfStyleSet
     }
 
     /// <summary>
+    /// Executes the WithTableHeaderBold operation.
     /// 設定表格首列文字是否使用粗體。
     /// </summary>
     /// <param name="enabled">若要使用粗體則為 <see langword="true"/></param>
@@ -152,6 +169,7 @@ public sealed class OdfStyleSet
     }
 
     /// <summary>
+    /// Executes the GetChartPaletteColor operation.
     /// 依序列索引取得圖表色盤色彩。
     /// </summary>
     /// <param name="index">序列索引</param>
@@ -163,6 +181,7 @@ public sealed class OdfStyleSet
     }
 
     /// <summary>
+    /// Executes the WithChartPaletteColors operation.
     /// 取代圖表序列使用的色彩序列。
     /// </summary>
     /// <param name="colors">色彩序列</param>

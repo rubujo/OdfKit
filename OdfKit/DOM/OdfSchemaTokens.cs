@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfNumberCalendar.
 /// 表示 ODF schema 中 <c>number:calendar</c> 的曆法 token。
 /// </summary>
 public enum OdfNumberCalendar
@@ -47,6 +48,7 @@ public enum OdfNumberCalendar
 }
 
 /// <summary>
+/// Defines values for OdfTableMemberType.
 /// 表示 ODF schema 中 <c>table:member-type</c> 的成員類型 token。
 /// </summary>
 public enum OdfTableMemberType
@@ -68,6 +70,7 @@ public enum OdfTableMemberType
 }
 
 /// <summary>
+/// Defines values for OdfTableGroupedBy.
 /// 表示 ODF schema 中 <c>table:grouped-by</c> 的分組單位 token。
 /// </summary>
 public enum OdfTableGroupedBy
@@ -109,6 +112,7 @@ public enum OdfTableGroupedBy
 }
 
 /// <summary>
+/// Defines values for OdfTableSortMode.
 /// 表示 ODF schema 中 <c>table:sort-mode</c> 的排序模式 token。
 /// </summary>
 public enum OdfTableSortMode
@@ -135,6 +139,7 @@ public enum OdfTableSortMode
 }
 
 /// <summary>
+/// Defines values for OdfTableConditionSource.
 /// 表示 ODF schema 中 <c>table:condition-source</c> 的條件來源 token。
 /// </summary>
 public enum OdfTableConditionSource
@@ -151,6 +156,7 @@ public enum OdfTableConditionSource
 }
 
 /// <summary>
+/// Defines values for OdfAnimationColorInterpolation.
 /// 表示 ODF schema 中 <c>anim:color-interpolation</c> 的色彩插值 token。
 /// </summary>
 public enum OdfAnimationColorInterpolation
@@ -167,6 +173,7 @@ public enum OdfAnimationColorInterpolation
 }
 
 /// <summary>
+/// Defines values for OdfAnimationColorInterpolationDirection.
 /// 表示 ODF schema 中 <c>anim:color-interpolation-direction</c> 的色彩插值方向 token。
 /// </summary>
 public enum OdfAnimationColorInterpolationDirection
@@ -183,6 +190,7 @@ public enum OdfAnimationColorInterpolationDirection
 }
 
 /// <summary>
+/// Defines values for OdfDatabaseIsNullable.
 /// 表示 ODF schema 中 <c>db:is-nullable</c> 的可空性 token。
 /// </summary>
 public enum OdfDatabaseIsNullable
@@ -199,6 +207,7 @@ public enum OdfDatabaseIsNullable
 }
 
 /// <summary>
+/// Defines values for OdfDatabaseDataSourceSettingType.
 /// 表示 ODF schema 中 <c>db:data-source-setting-type</c> 的資料來源設定型別 token。
 /// </summary>
 public enum OdfDatabaseDataSourceSettingType
@@ -235,6 +244,7 @@ public enum OdfDatabaseDataSourceSettingType
 }
 
 /// <summary>
+/// Defines values for OdfDrawNoHref.
 /// 表示 ODF schema 中 <c>draw:nohref</c> 的無連結 token。
 /// </summary>
 public enum OdfDrawNoHref
@@ -246,6 +256,7 @@ public enum OdfDrawNoHref
 }
 
 /// <summary>
+/// Defines values for OdfTableFunction.
 /// 表示 ODF schema 中 <c>table:function</c> 的彙總函式 token。
 /// </summary>
 public enum OdfTableFunction

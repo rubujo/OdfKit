@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfNumberStyle.
 /// 表示 ODF schema 中 <c>number:style</c> 的數字樣式長短 token。
 /// </summary>
 public enum OdfNumberStyle

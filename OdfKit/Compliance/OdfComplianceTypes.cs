@@ -7,6 +7,7 @@ using System.Collections.Generic;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Defines values for OdfVersion.
 /// 識別 OdfKit 支援的開放文件格式 (OpenDocument Format, ODF) 版本。
 /// </summary>
 public enum OdfVersion
@@ -43,6 +44,7 @@ public enum OdfVersion
 }
 
 /// <summary>
+/// Defines values for OdfDocumentKind.
 /// 識別封裝容器或單一 XML 文件所代表的 ODF 文件種類。
 /// </summary>
 public enum OdfDocumentKind
@@ -174,6 +176,7 @@ public enum OdfDocumentKind
 }
 
 /// <summary>
+/// Defines values for OdfIssueSeverity.
 /// 指示合規性驗證問題的嚴重性等級。
 /// </summary>
 public enum OdfIssueSeverity
@@ -200,6 +203,7 @@ public enum OdfIssueSeverity
 }
 
 /// <summary>
+/// Defines values for OdfPolicyAuthorityLevel.
 /// 描述合規性規範的權威等級。
 /// </summary>
 public enum OdfPolicyAuthorityLevel
@@ -226,6 +230,7 @@ public enum OdfPolicyAuthorityLevel
 }
 
 /// <summary>
+/// Defines values for OdfProfileVerificationStatus.
 /// 追蹤合規性規範來源的驗證狀態。
 /// </summary>
 public enum OdfProfileVerificationStatus
@@ -252,6 +257,7 @@ public enum OdfProfileVerificationStatus
 }
 
 /// <summary>
+/// Provides the OdfVersionRange API.
 /// 表示受支援的 ODF 版本範圍（包含邊界值）。
 /// </summary>
 /// <param name="minimum">範圍的最小 ODF 版本</param>
@@ -259,21 +265,25 @@ public enum OdfProfileVerificationStatus
 public sealed class OdfVersionRange(OdfVersion minimum, OdfVersion maximum)
 {
     /// <summary>
+    /// Gets the Minimum value.
     /// 取得受支援的最小 ODF 版本。
     /// </summary>
     public OdfVersion Minimum { get; } = minimum;
 
     /// <summary>
+    /// Gets the Maximum value.
     /// 取得受支援的最大 ODF 版本。
     /// </summary>
     public OdfVersion Maximum { get; } = maximum;
 
     /// <summary>
+    /// Gets the AllKnown value.
     /// 取得此程式庫所知的所有 ODF 版本範圍。
     /// </summary>
     public static OdfVersionRange AllKnown { get; } = new(OdfVersion.Odf10, OdfVersion.Odf14);
 
     /// <summary>
+    /// Executes the Exact operation.
     /// 建立僅包含單一特定 ODF 版本的範圍。
     /// </summary>
     /// <param name="version">目標 ODF 版本</param>
@@ -281,6 +291,7 @@ public sealed class OdfVersionRange(OdfVersion minimum, OdfVersion maximum)
     public static OdfVersionRange Exact(OdfVersion version) => new(version, version);
 
     /// <summary>
+    /// Executes the Contains operation.
     /// 判斷指定的 ODF 版本是否在此範圍內。
     /// </summary>
     /// <param name="version">要判斷的 ODF 版本</param>
@@ -297,6 +308,7 @@ public sealed class OdfVersionRange(OdfVersion minimum, OdfVersion maximum)
 }
 
 /// <summary>
+/// Provides the OdfPolicyRule API.
 /// 描述合規性規範所宣告的原則或驗證規則。
 /// </summary>
 /// <param name="id">規則的唯一識別碼</param>
@@ -305,22 +317,26 @@ public sealed class OdfVersionRange(OdfVersion minimum, OdfVersion maximum)
 public sealed class OdfPolicyRule(string id, string description, OdfIssueSeverity defaultSeverity = OdfIssueSeverity.Warning)
 {
     /// <summary>
+    /// Gets the Id value.
     /// 取得穩定的規則唯一識別碼。
     /// </summary>
     public string Id { get; } = !string.IsNullOrWhiteSpace(id) ? id : throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfComplianceTypes_RuleCannotBeEmpty"), nameof(id));
 
     /// <summary>
+    /// Gets the Description value.
     /// 取得規則的詳細說明。
     /// </summary>
     public string Description { get; } = description ?? string.Empty;
 
     /// <summary>
+    /// Gets the DefaultSeverity value.
     /// 取得規則發生問題時的預設嚴重性等級。
     /// </summary>
     public OdfIssueSeverity DefaultSeverity { get; } = defaultSeverity;
 }
 
 /// <summary>
+/// Provides the OdfComplianceProfile API.
 /// 描述 ODF 合規性規範及其政策中繼資料。
 /// </summary>
 /// <param name="id">規範的唯一識別碼</param>
@@ -350,61 +366,73 @@ public sealed class OdfComplianceProfile(
     CultureInfo? targetCulture = null)
 {
     /// <summary>
+    /// Gets the Id value.
     /// 取得穩定的規範唯一識別碼。
     /// </summary>
     public string Id { get; } = !string.IsNullOrWhiteSpace(id) ? id : throw new ArgumentException(OdfLocalizer.GetMessage("Err_OdfComplianceTypes_CanonicalCannotBeEmpty"), nameof(id));
 
     /// <summary>
+    /// Gets the Jurisdiction value.
     /// 取得此規範適用的管轄區域。
     /// </summary>
     public string Jurisdiction { get; } = jurisdiction ?? string.Empty;
 
     /// <summary>
+    /// Gets the Authority value.
     /// 取得此規範的權威機構名稱。
     /// </summary>
     public string Authority { get; } = authority ?? string.Empty;
 
     /// <summary>
+    /// Gets the SourceUrl value.
     /// 取得此規範的官方來源網址。
     /// </summary>
     public Uri? SourceUrl { get; } = sourceUrl;
 
     /// <summary>
+    /// Gets the SourceDate value.
     /// 取得來源發布日期。
     /// </summary>
     public string? SourceDate { get; } = sourceDate;
 
     /// <summary>
+    /// Gets the AuthorityLevel value.
     /// 取得規範的權威等級。
     /// </summary>
     public OdfPolicyAuthorityLevel AuthorityLevel { get; } = authorityLevel;
 
     /// <summary>
+    /// Gets the VerificationStatus value.
     /// 取得來源驗證狀態。
     /// </summary>
     public OdfProfileVerificationStatus VerificationStatus { get; } = verificationStatus;
 
     /// <summary>
+    /// Gets the SupportedVersions value.
     /// 取得此規範支援的 ODF 版本範圍。
     /// </summary>
     public OdfVersionRange SupportedVersions { get; } = supportedVersions ?? throw new ArgumentNullException(nameof(supportedVersions));
 
     /// <summary>
+    /// Gets the AllowedExtensions value.
     /// 取得允許使用的副檔名唯讀清單。
     /// </summary>
     public IReadOnlyList<string> AllowedExtensions { get; } = new List<string>(allowedExtensions ?? Array.Empty<string>()).AsReadOnly();
 
     /// <summary>
+    /// Gets the AllowedMimeTypes value.
     /// 取得允許使用的 MIME 類型唯讀清單。
     /// </summary>
     public IReadOnlyList<string> AllowedMimeTypes { get; } = new List<string>(allowedMimeTypes ?? Array.Empty<string>()).AsReadOnly();
 
     /// <summary>
+    /// Gets the Rules value.
     /// 取得此規範所包含的合規性規則唯讀清單。
     /// </summary>
     public IReadOnlyList<OdfPolicyRule> Rules { get; } = new List<OdfPolicyRule>(rules ?? Array.Empty<OdfPolicyRule>()).AsReadOnly();
 
     /// <summary>
+    /// Gets the TargetCulture value.
     /// 取得此規範的目標文化特性，用於自動語系偵測。
     /// </summary>
     public CultureInfo? TargetCulture { get; } = targetCulture;

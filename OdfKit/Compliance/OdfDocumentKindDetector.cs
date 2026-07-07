@@ -8,6 +8,7 @@ using System.Linq;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfFormatInfo API.
 /// 描述單一 ODF 檔案格式的副檔名、MIME 類型與文件種類。
 /// </summary>
 /// <param name="extension">包含前導句點的檔案副檔名</param>
@@ -23,42 +24,50 @@ public sealed class OdfFormatInfo(
     bool isFlatXml)
 {
     /// <summary>
+    /// Gets the Extension value.
     /// 取得包含前導句點的檔案副檔名。
     /// </summary>
     public string Extension { get; } = extension ?? throw new ArgumentNullException(nameof(extension));
 
     /// <summary>
+    /// Gets the MimeType value.
     /// 取得 ODF 封裝或扁平 XML 宣告的 MIME 類型。
     /// </summary>
     public string MimeType { get; } = mimeType ?? throw new ArgumentNullException(nameof(mimeType));
 
     /// <summary>
+    /// Gets the Kind value.
     /// 取得對應的 ODF 文件種類。
     /// </summary>
     public OdfDocumentKind Kind { get; } = kind;
 
     /// <summary>
+    /// Gets the BodyKind value.
     /// 取得對應於 <c>office:body</c> 子元素的內容種類。
     /// </summary>
     public OdfDocumentKind BodyKind { get; } = bodyKind;
 
     /// <summary>
+    /// Gets a value indicating the IsFlatXml state.
     /// 取得是否為單一 XML (Flat XML) 格式。
     /// </summary>
     public bool IsFlatXml { get; } = isFlatXml;
 
     /// <summary>
+    /// Executes the IsTemplate operation.
     /// 取得是否為 ODF 範本格式。
     /// </summary>
     public bool IsTemplate => OdfDocumentKindDetector.IsTemplateKind(Kind);
 
     /// <summary>
+    /// Executes the IsMasterDocument operation.
     /// 取得是否為 ODF 主控文件格式。
     /// </summary>
     public bool IsMasterDocument => OdfDocumentKindDetector.IsMasterKind(Kind);
 }
 
 /// <summary>
+/// Provides the OdfDocumentKindDetector API.
 /// 從 MIME 類型與副檔名偵測 ODF 文件種類。
 /// </summary>
 public static class OdfDocumentKindDetector
@@ -109,11 +118,13 @@ public static class OdfDocumentKindDetector
         .ToDictionary(format => format.Extension, format => format, StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
+    /// Provides the SupportedFormats member.
     /// 取得目前支援偵測的 ODF 格式描述清單。
     /// </summary>
     public static IReadOnlyList<OdfFormatInfo> SupportedFormats => SupportedFormatsValue;
 
     /// <summary>
+    /// Executes the FromMimeType operation.
     /// 從 ODF MIME 類型偵測封裝的 ODF 文件種類。
     /// </summary>
     /// <param name="mimeType">MIME 類型</param>
@@ -126,6 +137,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the FromFileName operation.
     /// 從檔案名稱或副檔名偵測 ODF 文件種類。
     /// </summary>
     /// <param name="fileName">檔案名稱或副檔名</param>
@@ -143,6 +155,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the TryGetFormatByMimeType operation.
     /// 從 ODF MIME 類型取得格式描述。
     /// </summary>
     /// <param name="mimeType">MIME 類型</param>
@@ -155,6 +168,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the TryGetFormatByFileName operation.
     /// 從檔案名稱或副檔名取得格式描述。
     /// </summary>
     /// <param name="fileName">檔案名稱或副檔名</param>
@@ -173,6 +187,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the TryGetFormatByKind operation.
     /// 從 ODF 文件種類取得格式描述。
     /// </summary>
     /// <param name="kind">ODF 文件種類</param>
@@ -194,6 +209,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the ToFlatKind operation.
     /// 將封裝的 ODF 種類轉換為其對應的單一 XML (Flat XML) 種類。
     /// </summary>
     /// <param name="kind">ODF 文件種類</param>
@@ -214,6 +230,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the ToContentKind operation.
     /// 將範本、主控文件及單一 XML 變體轉換為在 <c>office:body</c> 下表示的內容種類。
     /// </summary>
     /// <param name="kind">ODF 文件種類</param>
@@ -234,6 +251,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the FromOfficeBodyElement operation.
     /// 從 <c>office:body</c> 下的第一個 ODF 子元素偵測內容種類。
     /// </summary>
     /// <param name="localName">元素區域名稱</param>
@@ -258,6 +276,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the IsCompatibleWithBodyKind operation.
     /// 傳回宣告的文件種類是否與偵測到的 <c>office:body</c> 種類相容。
     /// </summary>
     /// <param name="declaredKind">宣告的文件種類</param>
@@ -274,6 +293,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the IsFlatKind operation.
     /// 傳回指定的種類是否代表單一 XML (Flat XML) ODF 文件。
     /// </summary>
     /// <param name="kind">ODF 文件種類</param>
@@ -290,6 +310,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the IsTemplateKind operation.
     /// 傳回指定的種類是否代表 ODF 範本文件。
     /// </summary>
     /// <param name="kind">ODF 文件種類</param>
@@ -307,6 +328,7 @@ public static class OdfDocumentKindDetector
     }
 
     /// <summary>
+    /// Executes the IsMasterKind operation.
     /// 傳回指定的種類是否代表 ODF 主控文件。
     /// </summary>
     /// <param name="kind">ODF 文件種類</param>

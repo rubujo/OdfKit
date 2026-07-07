@@ -8,6 +8,7 @@ using OdfKit.Text;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfBookmarkManager API.
 /// 提供安全讀寫與操作 ODF 文件中書籤的高階管理器。
 /// </summary>
 public sealed class OdfBookmarkManager
@@ -15,6 +16,7 @@ public sealed class OdfBookmarkManager
     private readonly OdfDocument _doc;
 
     /// <summary>
+    /// Executes the OdfBookmarkManager operation.
     /// 初始化 <see cref="OdfBookmarkManager"/> 類別的新執行個體。
     /// </summary>
     /// <param name="doc">所屬的 ODF 文件</param>
@@ -25,6 +27,7 @@ public sealed class OdfBookmarkManager
     }
 
     /// <summary>
+    /// Executes the new operation.
     /// 取得指定名稱的書籤操作介面。
     /// </summary>
     /// <param name="name">書籤名稱</param>
@@ -32,6 +35,7 @@ public sealed class OdfBookmarkManager
     public OdfBookmark this[string name] => new(_doc, name);
 
     /// <summary>
+    /// Provides the member member.
     /// 取得目前文件中所有書籤的名稱集合。
     /// </summary>
     public IEnumerable<string> Names
@@ -64,6 +68,7 @@ public sealed class OdfBookmarkManager
 }
 
 /// <summary>
+/// Provides the OdfBookmark API.
 /// 代表一個 ODF 文件中的書籤，支援讀取與替換其文字值。
 /// </summary>
 public sealed class OdfBookmark
@@ -71,6 +76,7 @@ public sealed class OdfBookmark
     private readonly OdfDocument _doc;
 
     /// <summary>
+    /// Gets the Name value.
     /// 取得書籤名稱。
     /// </summary>
     public string Name { get; }
@@ -82,6 +88,7 @@ public sealed class OdfBookmark
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定書籤的文字內容。
     /// </summary>
     /// <exception cref="KeyNotFoundException">當在文件中找不到指定名稱的書籤節點時擲出</exception>

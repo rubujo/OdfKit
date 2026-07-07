@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfXLinkType.
 /// 表示 ODF schema 中 <c>xlink:type</c> 的 XLink 類型 token。
 /// </summary>
 public enum OdfXLinkType
@@ -12,6 +13,7 @@ public enum OdfXLinkType
 }
 
 /// <summary>
+/// Defines values for OdfXLinkShow.
 /// 表示 ODF schema 中 <c>xlink:show</c> 的 XLink 顯示行為 token。
 /// </summary>
 public enum OdfXLinkShow
@@ -38,6 +40,7 @@ public enum OdfXLinkShow
 }
 
 /// <summary>
+/// Defines values for OdfXLinkActuate.
 /// 表示 ODF schema 中 <c>xlink:actuate</c> 的 XLink 觸發行為 token。
 /// </summary>
 public enum OdfXLinkActuate

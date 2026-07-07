@@ -9,6 +9,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfTextEncoding : IEquatable<OdfTextEncoding>
 {
     /// <summary>
+    /// Executes the OdfTextEncoding operation.
     /// 以文字編碼名稱 lexical form 建立 <see cref="OdfTextEncoding"/>。
     /// </summary>
     /// <param name="value">文字編碼名稱，例如 <c>UTF-8</c> 或 <c>windows-1252</c></param>
@@ -24,11 +25,13 @@ public readonly struct OdfTextEncoding : IEquatable<OdfTextEncoding>
     }
 
     /// <summary>
+    /// Gets the Value value.
     /// 取得原始文字編碼名稱。
     /// </summary>
     public string Value { get; }
 
     /// <summary>
+    /// Executes the TryParse operation.
     /// 嘗試解析文字編碼名稱。
     /// </summary>
     /// <param name="value">文字編碼名稱字串</param>
@@ -47,25 +50,36 @@ public readonly struct OdfTextEncoding : IEquatable<OdfTextEncoding>
     }
 
     /// <summary>
+    /// Executes the ToString operation.
     /// 傳回原始文字編碼名稱。
     /// </summary>
     /// <returns>文字編碼名稱</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷目前值是否等於另一個文字編碼名稱。
     /// </summary>
     /// <param name="other">要比較的文字編碼名稱</param>
     /// <returns>若 lexical form 相同則為 <see langword="true"/></returns>
     public bool Equals(OdfTextEncoding other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
+    /// <summary>
+    /// Executes the Equals operation.
+    /// 執行 Equals 作業。
+    /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfTextEncoding other && Equals(other);
 
+    /// <summary>
+    /// Executes the GetHashCode operation.
+    /// 執行 GetHashCode 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個文字編碼名稱是否相等。
     /// </summary>
     /// <param name="left">左側文字編碼名稱</param>
@@ -74,6 +88,7 @@ public readonly struct OdfTextEncoding : IEquatable<OdfTextEncoding>
     public static bool operator ==(OdfTextEncoding left, OdfTextEncoding right) => left.Equals(right);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個文字編碼名稱是否不相等。
     /// </summary>
     /// <param name="left">左側文字編碼名稱</param>

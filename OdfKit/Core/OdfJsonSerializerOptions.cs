@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfJsonSerializerOptions API.
 /// 提供專案共用的 <see cref="JsonSerializerOptions"/> 預設組態。
 /// </summary>
 /// <remarks>
@@ -21,16 +22,19 @@ namespace OdfKit.Core;
 public static class OdfJsonSerializerOptions
 {
     /// <summary>
+    /// Gets the HumanReadable value.
     /// 供 CLI 與人工閱讀使用的縮排 JSON 組態。
     /// </summary>
     public static JsonSerializerOptions HumanReadable { get; } = CreateBase(writeIndented: true);
 
     /// <summary>
+    /// Gets the Manifest value.
     /// 供 corpus manifest 等檔案持久化使用的組態（camelCase 屬性名稱 + 縮排）。
     /// </summary>
     public static JsonSerializerOptions Manifest { get; } = CreateManifest();
 
     /// <summary>
+    /// Gets the Compact value.
     /// 供測試或機器消費使用的單行 JSON 組態。
     /// </summary>
     public static JsonSerializerOptions Compact { get; } = CreateBase(writeIndented: false);

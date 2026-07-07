@@ -1,17 +1,23 @@
 ﻿using OdfKit.Compliance;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfDocument API.
+/// 提供 OdfDocument API。
+/// </summary>
 
 public abstract partial class OdfDocument
 {
     private int _updateDepth;
 
     /// <summary>
+    /// Provides the IsUpdateActive member.
     /// 取得目前文件是否位於批次更新範圍內。
     /// </summary>
     public bool IsUpdateActive => _updateDepth > 0;
 
     /// <summary>
+    /// Executes the BeginUpdate operation.
     /// 開始批次更新範圍，暫緩樣式重對照與自動樣式去重，直到最外層範圍結束。
     /// </summary>
     /// <returns>可釋放的批次更新範圍；建議搭配 <c>using</c> 使用</returns>
@@ -26,6 +32,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the EndUpdate operation.
     /// 結束目前批次更新範圍，並在離開最外層範圍時重新整理延後的樣式變更。
     /// </summary>
     /// <exception cref="InvalidOperationException">當未先呼叫 <see cref="BeginUpdate"/> 時擲出</exception>

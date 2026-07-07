@@ -8,6 +8,7 @@ using OdfKit.Spreadsheet;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfChartBuilder API.
 /// 提供 ODF 圖表的資料繫結與建置輔助功能。
 /// </summary>
 public sealed class OdfChartBuilder
@@ -15,6 +16,7 @@ public sealed class OdfChartBuilder
     private readonly ChartDocument _chartDocument;
 
     /// <summary>
+    /// Executes the OdfChartBuilder operation.
     /// 初始化 <see cref="OdfChartBuilder"/> 類別的新執行個體。
     /// </summary>
     /// <param name="chartDocument">要進行建置的圖表文件</param>
@@ -25,6 +27,7 @@ public sealed class OdfChartBuilder
     }
 
     /// <summary>
+    /// Executes the BindData operation.
     /// 將圖表資料來源繫結至指定的試算表表格與儲存格範圍，並自動同步圖表內嵌之本地 ODS 數據。
     /// </summary>
     /// <param name="table">來源試算表表格元素</param>

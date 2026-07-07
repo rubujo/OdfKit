@@ -94,6 +94,10 @@ public partial class DrawingDocument : OdfDocument
     public static DrawingDocument CreateFromFlatDocument(FlatGraphicsDocument document) =>
         (DrawingDocument)ConvertFlatVariantInternal(document, OdfDocumentKind.Graphics, targetIsFlatXml: false);
 
+    /// <summary>
+    /// Executes the ClearTemplateUserContent operation.
+    /// 執行 ClearTemplateUserContent 作業。
+    /// </summary>
     /// <inheritdoc/>
     protected override void ClearTemplateUserContent()
     {

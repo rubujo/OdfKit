@@ -6,6 +6,7 @@ using System.Text;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfMemoryTracker API.
 /// 未受控記憶體安全生命週期追蹤器 (Unmanaged Memory Leak Tracker)。
 /// </summary>
 public static class OdfMemoryTracker
@@ -14,36 +15,43 @@ public static class OdfMemoryTracker
     private static long _trackedBytes;
 
     /// <summary>
+    /// Gets a value indicating the DiagnosticsEnabled state.
     /// 取得或設定是否啟用記憶體與反模式診斷警示。
     /// </summary>
     public static bool DiagnosticsEnabled { get; set; } = true;
 
     /// <summary>
+    /// Gets the LargeAllocationWarningThresholdBytes value.
     /// 取得或設定單次分配大小警示門檻；預設對齊 .NET LOH 常見門檻。
     /// </summary>
     public static long LargeAllocationWarningThresholdBytes { get; set; } = 85_000;
 
     /// <summary>
+    /// Gets the TotalTrackedMemoryWarningThresholdBytes value.
     /// 取得或設定累計追蹤記憶體警示門檻。
     /// </summary>
     public static long TotalTrackedMemoryWarningThresholdBytes { get; set; } = 128L * 1024 * 1024;
 
     /// <summary>
+    /// Gets the TrackedAllocationCountWarningThreshold value.
     /// 取得或設定追蹤分配數量警示門檻。
     /// </summary>
     public static int TrackedAllocationCountWarningThreshold { get; set; } = 100_000;
 
     /// <summary>
+    /// Gets the NodeLoadWarningThreshold value.
     /// 取得或設定單次載入節點數警示門檻。
     /// </summary>
     public static long NodeLoadWarningThreshold { get; set; } = 250_000;
 
     /// <summary>
+    /// Gets the BoxingWarningThreshold value.
     /// 取得或設定高頻 boxing 估計次數警示門檻。
     /// </summary>
     public static long BoxingWarningThreshold { get; set; } = 10_000;
 
     /// <summary>
+    /// Executes the Track operation.
     /// 追蹤非受控記憶體或 POH 鎖定分配。
     /// </summary>
     /// <param name="ptr">記憶體區塊指標</param>
@@ -66,6 +74,7 @@ public static class OdfMemoryTracker
     }
 
     /// <summary>
+    /// Executes the Untrack operation.
     /// 取消追蹤並釋放非受控記憶體。
     /// </summary>
     /// <param name="ptr">記憶體區塊指標</param>
@@ -82,6 +91,7 @@ public static class OdfMemoryTracker
     }
 
     /// <summary>
+    /// Executes the ReportLoadProfile operation.
     /// 回報單次載入或批次操作的記憶體與反模式特徵，超過門檻時輸出診斷警示。
     /// </summary>
     /// <param name="nodeCount">本次載入或操作涉及的 DOM 節點數</param>
@@ -119,6 +129,7 @@ public static class OdfMemoryTracker
     }
 
     /// <summary>
+    /// Executes the CheckLeaks operation.
     /// 檢查是否有尚未釋放的非受控記憶體。
     /// </summary>
     /// <param name="reportLeaks">是否列印洩漏報告</param>

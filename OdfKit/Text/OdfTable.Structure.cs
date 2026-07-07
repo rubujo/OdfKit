@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using OdfKit.DOM;
 
 namespace OdfKit.Text;
+/// <summary>
+/// Provides the OdfTable API.
+/// 提供 OdfTable API。
+/// </summary>
 
 public partial class OdfTable
 {

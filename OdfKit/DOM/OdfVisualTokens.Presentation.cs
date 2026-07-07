@@ -3,6 +3,7 @@
 #region Visual Tokens - Presentation & Stroke
 
 /// <summary>
+/// Defines values for OdfStyleHorizontalRel.
 /// 表示 ODF schema 中 <c>style:horizontal-rel</c> 的水平相對基準 token。
 /// </summary>
 public enum OdfStyleHorizontalRel
@@ -74,6 +75,7 @@ public enum OdfStyleHorizontalRel
 }
 
 /// <summary>
+/// Defines values for OdfStyleWritingMode.
 /// 表示 ODF schema 中 <c>style:writing-mode</c> 的書寫方向 token。
 /// </summary>
 public enum OdfStyleWritingMode
@@ -130,6 +132,7 @@ public enum OdfStyleWritingMode
 }
 
 /// <summary>
+/// Defines values for OdfStyleWrap.
 /// 表示 ODF schema 中 <c>style:wrap</c> 的文繞圖 token。
 /// </summary>
 public enum OdfStyleWrap
@@ -171,6 +174,7 @@ public enum OdfStyleWrap
 }
 
 /// <summary>
+/// Defines values for OdfStyleRunThrough.
 /// 表示 ODF schema 中 <c>style:run-through</c> 的穿越排列 token。
 /// </summary>
 public enum OdfStyleRunThrough
@@ -187,6 +191,7 @@ public enum OdfStyleRunThrough
 }
 
 /// <summary>
+/// Defines values for OdfStyleWrapContourMode.
 /// 表示 ODF schema 中 <c>style:wrap-contour-mode</c> 的輪廓繞排模式 token。
 /// </summary>
 public enum OdfStyleWrapContourMode
@@ -203,6 +208,7 @@ public enum OdfStyleWrapContourMode
 }
 
 /// <summary>
+/// Defines values for OdfTableDisplayMemberMode.
 /// 表示 ODF schema 中 <c>table:display-member-mode</c> 的成員顯示方向 token。
 /// </summary>
 public enum OdfTableDisplayMemberMode
@@ -219,6 +225,7 @@ public enum OdfTableDisplayMemberMode
 }
 
 /// <summary>
+/// Defines values for OdfTableLayoutMode.
 /// 表示 ODF schema 中 <c>table:layout-mode</c> 的版面配置模式 token。
 /// </summary>
 public enum OdfTableLayoutMode
@@ -240,6 +247,7 @@ public enum OdfTableLayoutMode
 }
 
 /// <summary>
+/// Defines values for OdfDatabaseRule.
 /// 表示 ODF schema 中資料庫參照動作規則的 token。
 /// </summary>
 public enum OdfDatabaseRule
@@ -271,6 +279,7 @@ public enum OdfDatabaseRule
 }
 
 /// <summary>
+/// Defines values for OdfPresentationPresetClass.
 /// 表示 ODF schema 中 <c>presentation:preset-class</c> 的預設動畫類別 token。
 /// </summary>
 public enum OdfPresentationPresetClass
@@ -312,6 +321,7 @@ public enum OdfPresentationPresetClass
 }
 
 /// <summary>
+/// Defines values for OdfNumberTransliterationStyle.
 /// 表示 ODF schema 中 <c>number:transliteration-style</c> 的音譯樣式 token。
 /// </summary>
 public enum OdfNumberTransliterationStyle
@@ -333,6 +343,7 @@ public enum OdfNumberTransliterationStyle
 }
 
 /// <summary>
+/// Defines values for OdfStyleScriptType.
 /// 表示 ODF schema 中 <c>style:script-type</c> 的文字系統類型 token。
 /// </summary>
 public enum OdfStyleScriptType
@@ -359,6 +370,7 @@ public enum OdfStyleScriptType
 }
 
 /// <summary>
+/// Defines values for OdfStyleTextEmphasize.
 /// 表示 ODF schema 中 <c>style:text-emphasize</c> 的文字強調標記 token。
 /// </summary>
 public enum OdfStyleTextEmphasize
@@ -400,6 +412,7 @@ public enum OdfStyleTextEmphasize
 }
 
 /// <summary>
+/// Defines values for OdfDrawStrokeLineJoin.
 /// 表示 ODF schema 中 <c>draw:stroke-linejoin</c> 的線條接合 token。
 /// </summary>
 public enum OdfDrawStrokeLineJoin
@@ -431,6 +444,7 @@ public enum OdfDrawStrokeLineJoin
 }
 
 /// <summary>
+/// Defines values for OdfSvgStrokeLineCap.
 /// 表示 ODF schema 中 <c>svg:stroke-linecap</c> 的線端樣式 token。
 /// </summary>
 public enum OdfSvgStrokeLineCap

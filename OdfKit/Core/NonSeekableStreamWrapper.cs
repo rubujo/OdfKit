@@ -10,20 +10,20 @@ internal class NonSeekableStreamWrapper(Stream baseStream) : Stream
     public override bool CanRead => _baseStream.CanRead;
     public override bool CanSeek => false;
     public override bool CanWrite => _baseStream.CanWrite;
-    public override long Length => throw new NotSupportedException();
+    public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     public override long Position
     {
-        get => throw new NotSupportedException();
-        set => throw new NotSupportedException();
+        get => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
+        set => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     }
 
     public override void Flush() => _baseStream.Flush();
 
     public override int Read(byte[] buffer, int offset, int count) => _baseStream.Read(buffer, offset, count);
 
-    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
-    public override void SetLength(long value) => throw new NotSupportedException();
+    public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
     public override void Write(byte[] buffer, int offset, int count) => _baseStream.Write(buffer, offset, count);
 
@@ -42,3 +42,4 @@ internal class NonSeekableStreamWrapper(Stream baseStream) : Stream
         return _baseStream.FlushAsync(cancellationToken);
     }
 }
+

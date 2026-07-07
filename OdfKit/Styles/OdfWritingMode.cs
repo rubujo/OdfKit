@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Styles;
 
 /// <summary>
+/// Defines values for OdfWritingMode.
 /// 表示 ODF 書寫方向。
 /// </summary>
 public enum OdfWritingMode

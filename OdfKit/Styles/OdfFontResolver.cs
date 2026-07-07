@@ -10,6 +10,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Styles;
 
 /// <summary>
+/// Provides the OdfFontResolver API.
 /// 提供 ODF 文件的字型解析與內嵌功能。
 /// </summary>
 public static class OdfFontResolver
@@ -43,8 +44,8 @@ public static class OdfFontResolver
     private static IFontSubsetter? _fontSubsetter;
 
     /// <summary>
+    /// Executes the WarnIfUnresolvable operation.
     /// 檢查指定字型名稱是否能成功解析出實際字型檔案；若找不到則發出一次性警告（同一名稱不重複記錄），
-    /// 避免使用者在缺少全字庫／花園明朝／字雲等超大字型時，毫無線索地得到顯示為空白方塊的文字。
     /// </summary>
     /// <param name="fontName">字型名稱</param>
     /// <param name="context">用於警告訊息的情境描述（例如觸發此字型查詢的功能名稱）</param>
@@ -76,8 +77,8 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the IsTrueTypeCollection operation.
     /// 檢查指定字型檔案是否為 TrueType Collection（.ttc）格式。PDFsharp 等部分渲染後端不支援直接讀取
-    /// TTC 容器，須在使用前偵測並改用替代字型，否則可能拋出例外或無法正確顯示文字。
     /// </summary>
     /// <param name="filePath">字型檔案路徑</param>
     /// <returns>若檔案以 TTC 簽章（'ttcf'）開頭則為 <see langword="true"/></returns>
@@ -107,6 +108,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the RegisterFallback operation.
     /// 註冊字型替代對照規則（例如在無微軟字型之 Linux/Docker 上將 "MS YaHei" 對照至 "Noto Sans CJK TC"）。
     /// </summary>
     /// <param name="targetFont">要替代的目標字型名稱</param>
@@ -126,6 +128,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the MapFont operation.
     /// 取得指定字型的實質替代字型名稱。若無替代規則則傳回原名稱。
     /// </summary>
     /// <param name="fontName">字型名稱</param>
@@ -142,6 +145,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the GetFontFallbackCandidates operation.
     /// 取得指定字型的解析候選序列，依序包含原始名稱、使用者註冊替代字型與內建跨平台替代字型。
     /// </summary>
     /// <param name="fontName">字型名稱</param>
@@ -185,6 +189,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the ResolveFontFallback operation.
     /// 依指定可用性探針解析第一個可使用的字型候選名稱。
     /// </summary>
     /// <param name="fontName">字型名稱</param>
@@ -210,6 +215,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the RegisterFont operation.
     /// 顯式註冊字型對應。
     /// </summary>
     /// <param name="fontName">字型名稱</param>
@@ -232,6 +238,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the RegisterFontDirectory operation.
     /// 註冊用於搜尋字型檔案的目錄。
     /// </summary>
     /// <param name="directoryPath">字型目錄的路徑</param>
@@ -252,6 +259,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the RegisterFontSubsetter operation.
     /// 註冊字型子集化擴充實作。
     /// </summary>
     /// <param name="subsetter">字型子集化實作</param>
@@ -273,6 +281,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the ResolveFontPath operation.
     /// 依字型家族名稱解析字型的絕對路徑。
     /// </summary>
     /// <param name="fontName">字型名稱</param>
@@ -299,6 +308,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the EmbedFonts operation.
     /// 掃描並將文件中定義的所有字型內嵌至套件中。
     /// </summary>
     /// <param name="package">ODF 套件</param>
@@ -374,6 +384,7 @@ public static class OdfFontResolver
     }
 
     /// <summary>
+    /// Executes the EmbedFontSubsets operation.
     /// 若已註冊字型子集化實作，掃描文件中的 PUA 自造字並將對應子集字型嵌入封裝。
     /// </summary>
     /// <param name="package">ODF 套件</param>

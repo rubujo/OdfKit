@@ -5,10 +5,15 @@ using OdfKit.Styles;
 
 using OdfKit.Compliance;
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfDocument API.
+/// 提供 OdfDocument API。
+/// </summary>
 
 public abstract partial class OdfDocument
 {
     /// <summary>
+    /// Executes the GetMasterPages operation.
     /// 取得文件中所有的主控頁面（Master Page）。
     /// </summary>
     /// <returns>主控頁面集合</returns>
@@ -25,6 +30,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the AddMasterPage operation.
     /// 新增一個指定名稱的主控頁面（Master Page）。
     /// </summary>
     /// <param name="name">主控頁面的名稱</param>

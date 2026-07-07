@@ -8,6 +8,10 @@ using OdfKit.DOM;
 using OdfKit.Styles;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfDocument API.
+/// 提供 OdfDocument API。
+/// </summary>
 
 public abstract partial class OdfDocument
 {
@@ -15,6 +19,7 @@ public abstract partial class OdfDocument
 
 
     /// <summary>
+    /// Executes the Sign operation.
     /// 使用指定的 X.509 憑證對文件進行數位簽章。
     /// </summary>
     /// <param name="certificate">用於簽章的憑證</param>
@@ -24,6 +29,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the SignAsync operation.
     /// 非同步使用指定的 X.509 憑證對文件進行數位簽章。
     /// </summary>
     /// <param name="certificate">用於簽章的憑證</param>
@@ -39,6 +45,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the SignDocumentAsync operation.
     /// 非同步使用指定的 X.509 憑證對文件進行一鍵式數位簽章。
     /// </summary>
     /// <param name="certificate">用於簽章的憑證</param>
@@ -54,6 +61,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the SignDocumentAsync operation.
     /// 非同步使用指定的 X.509 憑證與簽章選項對文件進行一鍵式數位簽章。
     /// </summary>
     /// <param name="certificate">用於簽章的憑證</param>
@@ -80,6 +88,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the GetSignatureSummary operation.
     /// 取得文件封裝內數位簽章專案的摘要狀態。
     /// </summary>
     /// <returns>描述簽章專案存在狀態、可讀性與簽章數量的摘要</returns>
@@ -104,6 +113,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the VerifySignatures operation.
     /// 驗證文件中的所有數位簽章。
     /// </summary>
     /// <param name="certificates">輸出參數，傳回驗證通過的憑證集合</param>
@@ -114,6 +124,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the VerifySignatures operation.
     /// 驗證文件中的所有數位簽章，並傳回詳細驗證結果。
     /// </summary>
     /// <param name="options">簽章驗證選項；若為 <see langword="null"/>，則使用預設選項</param>
@@ -124,6 +135,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the VerifySignaturesAsync operation.
     /// 非同步驗證文件中的所有數位簽章，並傳回詳細驗證結果。
     /// </summary>
     /// <param name="options">簽章驗證選項；若為 <see langword="null"/>，則使用預設選項</param>

@@ -5,6 +5,7 @@ using OdfKit.Compliance;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfNodeChildList API.
 /// 以雙向鏈結串列實作的子節點集合；插入與移除為 O(1)，並以延遲索引快取支援隨機存取。
 /// </summary>
 public sealed class OdfNodeChildList : IList<OdfNode>
@@ -19,6 +20,10 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         _owner = owner;
     }
 
+    /// <summary>
+    /// Provides the member member.
+    /// 提供 member 成員。
+    /// </summary>
     /// <inheritdoc />
     public int Count
     {
@@ -29,11 +34,19 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         }
     }
 
+    /// <summary>
+    /// Provides the IsReadOnly member.
+    /// 提供 IsReadOnly 成員。
+    /// </summary>
     /// <inheritdoc />
     public bool IsReadOnly => false;
 
     internal int LoadedCount => _count;
 
+    /// <summary>
+    /// Provides the member member.
+    /// 提供 member 成員。
+    /// </summary>
     /// <inheritdoc />
     public OdfNode this[int index]
     {
@@ -52,6 +65,7 @@ public sealed class OdfNodeChildList : IList<OdfNode>
     }
 
     /// <summary>
+    /// Executes the Find operation.
     /// 搜尋符合條件的第一個子節點（與 <see cref="List{T}.Find"/> 語意相同）。
     /// </summary>
     public OdfNode? Find(Predicate<OdfNode> match)
@@ -72,9 +86,17 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         return null;
     }
 
+    /// <summary>
+    /// Executes the Add operation.
+    /// 執行 Add 作業。
+    /// </summary>
     /// <inheritdoc />
     public void Add(OdfNode item) => Append(item);
 
+    /// <summary>
+    /// Executes the Clear operation.
+    /// 執行 Clear 作業。
+    /// </summary>
     /// <inheritdoc />
     public void Clear()
     {
@@ -87,6 +109,10 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         }
     }
 
+    /// <summary>
+    /// Executes the Contains operation.
+    /// 執行 Contains 作業。
+    /// </summary>
     /// <inheritdoc />
     public bool Contains(OdfNode item)
     {
@@ -94,6 +120,10 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         return item.Parent == _owner;
     }
 
+    /// <summary>
+    /// Executes the CopyTo operation.
+    /// 執行 CopyTo 作業。
+    /// </summary>
     /// <inheritdoc />
     public void CopyTo(OdfNode[] array, int arrayIndex)
     {
@@ -119,6 +149,10 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         }
     }
 
+    /// <summary>
+    /// Executes the GetEnumerator operation.
+    /// 執行 GetEnumerator 作業。
+    /// </summary>
     /// <inheritdoc />
     public IEnumerator<OdfNode> GetEnumerator()
     {
@@ -129,6 +163,10 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         }
     }
 
+    /// <summary>
+    /// Executes the IndexOf operation.
+    /// 執行 IndexOf 作業。
+    /// </summary>
     /// <inheritdoc />
     public int IndexOf(OdfNode item)
     {
@@ -157,6 +195,10 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         return -1;
     }
 
+    /// <summary>
+    /// Executes the Insert operation.
+    /// 執行 Insert 作業。
+    /// </summary>
     /// <inheritdoc />
     public void Insert(int index, OdfNode item)
     {
@@ -176,6 +218,10 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         InsertBefore(item, refChild);
     }
 
+    /// <summary>
+    /// Executes the Remove operation.
+    /// 執行 Remove 作業。
+    /// </summary>
     /// <inheritdoc />
     public bool Remove(OdfNode item)
     {
@@ -188,6 +234,10 @@ public sealed class OdfNodeChildList : IList<OdfNode>
         return true;
     }
 
+    /// <summary>
+    /// Executes the RemoveAt operation.
+    /// 執行 RemoveAt 作業。
+    /// </summary>
     /// <inheritdoc />
     public void RemoveAt(int index)
     {

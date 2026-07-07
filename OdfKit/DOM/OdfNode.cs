@@ -376,11 +376,11 @@ public partial class OdfNode
         public override bool CanRead => true;
         public override bool CanSeek => false;
         public override bool CanWrite => false;
-        public override long Length => throw new NotSupportedException();
+        public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         public override long Position
         {
             get => _position;
-            set => throw new NotSupportedException();
+            set => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         }
 
         public override void Flush() { }
@@ -414,9 +414,9 @@ public partial class OdfNode
             return totalRead;
         }
 
-        public override long Seek(long offset, System.IO.SeekOrigin origin) => throw new NotSupportedException();
-        public override void SetLength(long value) => throw new NotSupportedException();
-        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        public override long Seek(long offset, System.IO.SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
+        public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     }
 
     /// <summary>
@@ -484,20 +484,36 @@ internal sealed unsafe class UnmanagedMemoryManager : System.Buffers.MemoryManag
 {
     private readonly byte* _pointer;
     private readonly int _length;
+    /// <summary>
+    /// Executes the UnmanagedMemoryManager operation.
+    /// 執行 UnmanagedMemoryManager 作業。
+    /// </summary>
 
     public UnmanagedMemoryManager(byte* pointer, int length)
     {
         _pointer = pointer;
         _length = length;
     }
+    /// <summary>
+    /// Executes the UnmanagedMemoryManager operation.
+    /// 執行 UnmanagedMemoryManager 作業。
+    /// </summary>
 
     public UnmanagedMemoryManager(IntPtr pointer, int length)
     {
         _pointer = (byte*)pointer;
         _length = length;
     }
+    /// <summary>
+    /// Executes the GetSpan operation.
+    /// 執行 GetSpan 作業。
+    /// </summary>
 
     public override Span<byte> GetSpan() => new Span<byte>(_pointer, _length);
+    /// <summary>
+    /// Executes the Pin operation.
+    /// 執行 Pin 作業。
+    /// </summary>
 
     public override System.Buffers.MemoryHandle Pin(int elementIndex = 0)
     {
@@ -505,8 +521,17 @@ internal sealed unsafe class UnmanagedMemoryManager : System.Buffers.MemoryManag
             throw new ArgumentOutOfRangeException(nameof(elementIndex));
         return new System.Buffers.MemoryHandle(_pointer + elementIndex);
     }
+    /// <summary>
+    /// Executes the Unpin operation.
+    /// 執行 Unpin 作業。
+    /// </summary>
 
     public override void Unpin() { }
+    /// <summary>
+    /// Executes the Dispose operation.
+    /// 執行 Dispose 作業。
+    /// </summary>
 
     protected override void Dispose(bool disposing) { }
 }
+

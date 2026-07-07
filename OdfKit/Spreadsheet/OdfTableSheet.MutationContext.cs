@@ -32,6 +32,10 @@ internal readonly struct OdfTableSheetMutationContext
 
     internal OdfCell GetCell(int row, int col) => _sheet.GetCell(row, col);
 }
+/// <summary>
+/// Provides the OdfTableSheet API.
+/// 提供 OdfTableSheet API。
+/// </summary>
 
 public partial class OdfTableSheet
 {

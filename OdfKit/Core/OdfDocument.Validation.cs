@@ -6,10 +6,15 @@ using OdfKit.Compliance;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfDocument API.
+/// 提供 OdfDocument API。
+/// </summary>
 
 public abstract partial class OdfDocument
 {
     /// <summary>
+    /// Executes the Validate operation.
     /// 驗證目前文件（反映記憶體中尚未儲存的編輯內容）是否符合 ODF 規格。
     /// </summary>
     /// <param name="profile">相容性設定檔；若為 <see langword="null"/> 則使用預設設定檔</param>
@@ -27,6 +32,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the ValidateAsync operation.
     /// 非同步驗證目前文件（反映記憶體中尚未儲存的編輯內容）是否符合 ODF 規格。
     /// </summary>
     /// <param name="profile">相容性設定檔；若為 <see langword="null"/> 則使用預設設定檔</param>

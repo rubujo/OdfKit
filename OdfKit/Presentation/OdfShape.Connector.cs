@@ -7,6 +7,10 @@ using OdfKit.Styles;
 
 using OdfKit.Compliance;
 namespace OdfKit.Presentation;
+/// <summary>
+/// Provides the OdfShape API.
+/// 提供 OdfShape API。
+/// </summary>
 
 public partial class OdfShape
 {

@@ -21,7 +21,7 @@ internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
 
         if (string.Equals(absoluteUri.Scheme, "odf", StringComparison.OrdinalIgnoreCase))
         {
-            string path = absoluteUri.AbsolutePath.TrimStart('/');
+            string path = OdfPackageEntryNameSanitizer.NormalizeReferenceUri(absoluteUri.ToString());
             if (_package.HasEntry(path))
             {
                 return _package.GetEntryStream(path);
@@ -65,7 +65,13 @@ internal sealed class OdfPackageXmlResolver(OdfPackage package) : XmlResolver
     {
         if (baseUri == null)
         {
-            return new Uri($"odf://package/{relativeUri?.TrimStart('/')}");
+            if (relativeUri?.StartsWith("#", StringComparison.Ordinal) == true)
+            {
+                return new Uri($"odf://package/{relativeUri}");
+            }
+
+            string path = OdfPackageEntryNameSanitizer.NormalizeReferenceUri(relativeUri ?? string.Empty);
+            return new Uri($"odf://package/{path}");
         }
         return new Uri(baseUri, relativeUri);
     }

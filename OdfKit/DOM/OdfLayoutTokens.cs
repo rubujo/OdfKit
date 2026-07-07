@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfFoKeepTogether.
 /// 表示 ODF schema 中 <c>fo:keep-together</c> 的段落分頁保持 token。
 /// </summary>
 public enum OdfFoKeepTogether
@@ -17,6 +18,7 @@ public enum OdfFoKeepTogether
 }
 
 /// <summary>
+/// Defines values for OdfFoWrapOption.
 /// 表示 ODF schema 中 <c>fo:wrap-option</c> 的文字換行選項 token。
 /// </summary>
 public enum OdfFoWrapOption

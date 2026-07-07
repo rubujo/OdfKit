@@ -4,12 +4,17 @@ using OdfKit.DOM;
 using OdfKit.Styles;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Attribute Values - Style & Presentation
 
     /// <summary>
+    /// Executes the GetStyleHorizontalRelAttributeValue operation.
     /// 取得具有 schema awareness 的樣式水平相對基準屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -23,6 +28,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleHorizontalRelAttributeValue operation.
     /// 設定具有 schema awareness 的樣式水平相對基準屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -36,6 +42,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleWritingModeAttributeValue operation.
     /// 取得具有 schema awareness 的樣式書寫方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -49,6 +56,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleWritingModeAttributeValue operation.
     /// 設定具有 schema awareness 的樣式書寫方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -62,6 +70,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleWrapAttributeValue operation.
     /// 取得具有 schema awareness 的樣式文繞圖屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -75,6 +84,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleWrapAttributeValue operation.
     /// 設定具有 schema awareness 的樣式文繞圖屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -88,6 +98,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleRunThroughAttributeValue operation.
     /// 取得具有 schema awareness 的樣式穿越排列屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -101,6 +112,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleRunThroughAttributeValue operation.
     /// 設定具有 schema awareness 的樣式穿越排列屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -114,6 +126,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleWrapContourModeAttributeValue operation.
     /// 取得具有 schema awareness 的樣式輪廓繞排模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -127,6 +140,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleWrapContourModeAttributeValue operation.
     /// 設定具有 schema awareness 的樣式輪廓繞排模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -140,6 +154,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableDisplayMemberModeAttributeValue operation.
     /// 取得具有 schema awareness 的表格成員顯示方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -153,6 +168,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableDisplayMemberModeAttributeValue operation.
     /// 設定具有 schema awareness 的表格成員顯示方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -166,6 +182,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableLayoutModeAttributeValue operation.
     /// 取得具有 schema awareness 的表格版面配置模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -179,6 +196,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableLayoutModeAttributeValue operation.
     /// 設定具有 schema awareness 的表格版面配置模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -192,6 +210,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetDatabaseRuleAttributeValue operation.
     /// 取得具有 schema awareness 的資料庫參照動作規則屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -205,6 +224,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetDatabaseRuleAttributeValue operation.
     /// 設定具有 schema awareness 的資料庫參照動作規則屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -218,6 +238,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetPresentationPresetClassAttributeValue operation.
     /// 取得具有 schema awareness 的簡報預設動畫類別屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -231,6 +252,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetPresentationPresetClassAttributeValue operation.
     /// 設定具有 schema awareness 的簡報預設動畫類別屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -244,6 +266,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetNumberTransliterationStyleAttributeValue operation.
     /// 取得具有 schema awareness 的數字音譯樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -257,6 +280,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetNumberTransliterationStyleAttributeValue operation.
     /// 設定具有 schema awareness 的數字音譯樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

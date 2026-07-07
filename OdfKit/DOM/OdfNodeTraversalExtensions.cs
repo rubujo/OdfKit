@@ -4,11 +4,13 @@ using System.Collections.Generic;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfNodeTraversalExtensions API.
 /// 提供 LINQ 友善的 ODF DOM 尋覽與鏈式建立擴充方法。
 /// </summary>
 public static class OdfNodeTraversalExtensions
 {
     /// <summary>
+    /// Executes the Children operation.
     /// 列舉指定節點的直接子節點，並只傳回指定型別。
     /// </summary>
     /// <typeparam name="TNode">要篩選的子節點型別</typeparam>
@@ -33,6 +35,7 @@ public static class OdfNodeTraversalExtensions
     }
 
     /// <summary>
+    /// Executes the Descendants operation.
     /// 列舉指定節點的所有後代節點，並只傳回指定型別。
     /// </summary>
     /// <typeparam name="TNode">要篩選的後代節點型別</typeparam>
@@ -57,6 +60,7 @@ public static class OdfNodeTraversalExtensions
     }
 
     /// <summary>
+    /// Executes the Append operation.
     /// 將多個子節點依序加入來源節點，並傳回同一個來源節點以便鏈式建立 DOM。
     /// </summary>
     /// <typeparam name="TNode">來源節點型別</typeparam>

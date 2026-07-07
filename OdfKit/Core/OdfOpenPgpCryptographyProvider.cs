@@ -6,14 +6,15 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfOpenPgpCryptographyProvider API.
 /// 以 <see cref="IOdfOpenPgpKeyProvider"/> 為基礎，實作 ODF 1.3 OpenPGP 加密模式的
-/// 密碼學提供者。內建 AES-256-CBC 內容層加解密；Session Key 加解密委派給提供者。
 /// </summary>
 public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
 {
     private readonly IOdfOpenPgpKeyProvider _keyProvider;
 
     /// <summary>
+    /// Executes the OdfOpenPgpCryptographyProvider operation.
     /// 初始化 <see cref="OdfOpenPgpCryptographyProvider"/> 類別的新執行個體。
     /// </summary>
     /// <param name="keyProvider">負責 Session Key 加解密的 OpenPGP 金鑰提供者</param>
@@ -23,6 +24,10 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
         _keyProvider = keyProvider ?? throw new ArgumentNullException(nameof(keyProvider));
     }
 
+    /// <summary>
+    /// Executes the CanHandle operation.
+    /// 執行 CanHandle 作業。
+    /// </summary>
     /// <inheritdoc />
     public bool CanHandle(OdfEncryptionInfo info)
     {
@@ -30,6 +35,10 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
             || info.OpenPgpEncryptedKeys.Count > 0;
     }
 
+    /// <summary>
+    /// Executes the Decrypt operation.
+    /// 執行 Decrypt 作業。
+    /// </summary>
     /// <inheritdoc />
     public byte[] Decrypt(byte[] ciphertext, OdfEncryptionInfo info, OdfLoadOptions loadOptions)
     {
@@ -66,6 +75,10 @@ public sealed class OdfOpenPgpCryptographyProvider : IOdfCryptographyProvider
         throw new CryptographicException(OdfLocalizer.GetMessage("Err_OdfOpenPgpCryptographyProvider_OpenpgpDecryptionFailedUnable"));
     }
 
+    /// <summary>
+    /// Executes the Encrypt operation.
+    /// 執行 Encrypt 作業。
+    /// </summary>
     /// <inheritdoc />
     public byte[] Encrypt(byte[] plaintext, string entryPath, OdfSaveOptions saveOptions, out OdfEncryptionInfo info)
     {

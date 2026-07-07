@@ -75,14 +75,16 @@ rg -n "public .* Find[A-Z]|public .* Find\(" OdfKit\<domain> -g "*.cs"
 
 ## 文件掃描基線
 
-`eng/Test-BilingualXmlDocs.ps1` 目前為 report mode。最近一次靜態掃描結果：
+`eng/Test-BilingualXmlDocs.ps1` 預設為 report mode；若要阻止新增文件債，使用
+`-FailOnNewIssues` 與目前基線比對。最近一次靜態掃描結果：
 
 ```text
-TOTAL=1971; FILES=342
+TOTAL=1984; FILES=347
 ```
 
-這是後續文件批次的基線，不作為目前 CI fail gate。掃描器已排除 generated DOM wrapper、
-`bin/`、`obj/`，並避免把 private / internal helper 型別中的 public 成員誤判為公開 API。
+這是後續文件批次的基線；`-FailOnIssues` 仍可用於要求零債務的專門文件批次。掃描器已排除
+generated DOM wrapper、`bin/`、`obj/`，並避免把 private / internal helper 型別中的 public
+成員誤判為公開 API。
 
 ## 下一批建議
 

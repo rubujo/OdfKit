@@ -5,6 +5,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Styles;
 
 /// <summary>
+/// Defines values for OdfUnit.
 /// 表示 ODF 長度單位的列舉。
 /// </summary>
 public enum OdfUnit
@@ -56,6 +57,7 @@ public enum OdfUnit
 }
 
 /// <summary>
+/// Provides the OdfLength API.
 /// 表示 ODF 長度的結構。
 /// </summary>
 /// <remarks>
@@ -66,11 +68,13 @@ public enum OdfUnit
 public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
 {
     /// <summary>
+    /// Gets the Value value.
     /// 取得長度的數值。
     /// </summary>
     public double Value { get; } = value;
 
     /// <summary>
+    /// Gets the Unit value.
     /// 取得長度的單位。
     /// </summary>
     public OdfUnit Unit { get; } = unit;
@@ -78,6 +82,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     #region 工廠方法
 
     /// <summary>
+    /// Executes the FromCentimeters operation.
     /// 從指定的公分值建立 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="val">長度數值</param>
@@ -85,6 +90,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     public static OdfLength FromCentimeters(double val) => new(val, OdfUnit.Centimeters);
 
     /// <summary>
+    /// Executes the FromMillimeters operation.
     /// 從指定的公釐值建立 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="val">長度數值</param>
@@ -92,6 +98,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     public static OdfLength FromMillimeters(double val) => new(val, OdfUnit.Millimeters);
 
     /// <summary>
+    /// Executes the FromInches operation.
     /// 從指定的英吋值建立 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="val">長度數值</param>
@@ -99,6 +106,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     public static OdfLength FromInches(double val) => new(val, OdfUnit.Inches);
 
     /// <summary>
+    /// Executes the FromPoints operation.
     /// 從指定的點數值建立 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="val">長度數值</param>
@@ -106,6 +114,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     public static OdfLength FromPoints(double val) => new(val, OdfUnit.Points);
 
     /// <summary>
+    /// Executes the FromPicas operation.
     /// 從指定的派卡值建立 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="val">長度數值</param>
@@ -113,6 +122,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     public static OdfLength FromPicas(double val) => new(val, OdfUnit.Picas);
 
     /// <summary>
+    /// Executes the FromPixels operation.
     /// 從指定的像素值建立 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="val">長度數值</param>
@@ -120,6 +130,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     public static OdfLength FromPixels(double val) => new(val, OdfUnit.Pixels);
 
     /// <summary>
+    /// Executes the FromPercentage operation.
     /// 從指定的百分比值建立 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="val">長度數值</param>
@@ -127,6 +138,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     public static OdfLength FromPercentage(double val) => new(val, OdfUnit.Percentage);
 
     /// <summary>
+    /// Executes the FromEm operation.
     /// 從指定的 Em 值建立 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="val">長度數值</param>
@@ -139,6 +151,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     internal const double EmusPerInch = 914_400d;
 
     /// <summary>
+    /// Executes the FromEmu operation.
     /// 從指定的 EMU（OOXML 度量單位）值建立 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="emu">EMU 數值</param>
@@ -150,6 +163,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     #region 轉換與解析
 
     /// <summary>
+    /// Executes the Parse operation.
     /// 解析長度字串並傳回 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="text">要解析的長度字串</param>
@@ -197,6 +211,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     }
 
     /// <summary>
+    /// Executes the TryParse operation.
     /// 嘗試解析長度字串。
     /// </summary>
     /// <param name="text">要解析的長度字串</param>
@@ -222,36 +237,42 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     }
 
     /// <summary>
+    /// Executes the ToCentimeters operation.
     /// 將長度轉換為公分。
     /// </summary>
     /// <returns>轉換為公分的數值</returns>
     public double ToCentimeters() => ConvertTo(OdfUnit.Centimeters);
 
     /// <summary>
+    /// Executes the ToPoints operation.
     /// 將長度轉換為點。
     /// </summary>
     /// <returns>轉換為點的數值</returns>
     public double ToPoints() => ConvertTo(OdfUnit.Points);
 
     /// <summary>
+    /// Executes the ToInches operation.
     /// 將長度轉換為英吋。
     /// </summary>
     /// <returns>轉換為英吋的數值</returns>
     public double ToInches() => ConvertTo(OdfUnit.Inches);
 
     /// <summary>
+    /// Executes the ToMillimeters operation.
     /// 將長度轉換為公釐。
     /// </summary>
     /// <returns>轉換為公釐的數值</returns>
     public double ToMillimeters() => ConvertTo(OdfUnit.Millimeters);
 
     /// <summary>
+    /// Executes the ToEmu operation.
     /// 將長度轉換為 EMU（OOXML 度量單位）。
     /// </summary>
     /// <returns>轉換為 EMU 的數值（四捨五入至最接近的整數，遠離零捨入）</returns>
     public long ToEmu() => (long)Math.Round(ToInches() * EmusPerInch, MidpointRounding.AwayFromZero);
 
     /// <summary>
+    /// Executes the ConvertTo operation.
     /// 將長度轉換為指定的目標單位。
     /// </summary>
     /// <param name="targetUnit">目標長度單位</param>
@@ -298,6 +319,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     }
 
     /// <summary>
+    /// Executes the FallbackTo operation.
     /// 如果是 Unspecified 則套用 context 預設的單位進行轉譯。
     /// </summary>
     /// <param name="defaultUnit">當單位為未指定時所套用的預設長度單位</param>
@@ -312,6 +334,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     }
 
     /// <summary>
+    /// Executes the ToString operation.
     /// 將長度結構轉換為其字串表示法。
     /// </summary>
     /// <returns>代表目前長度結構的字串</returns>
@@ -337,18 +360,21 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     #region 隱式/顯式運算子
 
     /// <summary>
+    /// Executes the OdfLength operation.
     /// 隱式將字串轉換為 <see cref="OdfLength"/> 結構。
     /// </summary>
     /// <param name="text">要解析的長度字串</param>
     public static implicit operator OdfLength(string text) => Parse(text);
 
     /// <summary>
+    /// Executes the string operation.
     /// 隱式將 <see cref="OdfLength"/> 結構轉換為字串。
     /// </summary>
     /// <param name="len">長度結構</param>
     public static implicit operator string(OdfLength len) => len.ToString();
 
     /// <summary>
+    /// Executes the double operation.
     /// 顯式將 <see cref="OdfLength"/> 結構轉換為 double。
     /// </summary>
     /// <param name="len">長度結構</param>
@@ -359,6 +385,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     #region 相等性比較
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷目前的長度結構是否與另一個長度結構相等。
     /// </summary>
     /// <param name="other">要比較的另一個長度結構</param>
@@ -381,6 +408,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     }
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷指定的物件是否與目前的長度結構相等。
     /// </summary>
     /// <param name="obj">要比較的物件</param>
@@ -388,6 +416,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     public override bool Equals(object? obj) => obj is OdfLength other && Equals(other);
 
     /// <summary>
+    /// Executes the GetHashCode operation.
     /// 傳回此長度結構的雜湊碼。
     /// </summary>
     /// <returns>一個 32 位元有正負號的整數雜湊碼</returns>
@@ -407,6 +436,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     }
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個 <see cref="OdfLength"/> 結構是否相等。
     /// </summary>
     /// <param name="left">要比較的左側結構</param>
@@ -415,6 +445,7 @@ public struct OdfLength(double value, OdfUnit unit) : IEquatable<OdfLength>
     public static bool operator ==(OdfLength left, OdfLength right) => left.Equals(right);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個 <see cref="OdfLength"/> 結構是否不相等。
     /// </summary>
     /// <param name="left">要比較的左側結構</param>

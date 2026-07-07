@@ -10,12 +10,14 @@ namespace OdfKit.DOM;
 
 
 /// <summary>
+/// Provides the DrawFrameElement API.
 /// 表示 ODF 中的 draw:frame 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class DrawFrameElement(string? prefix = null) : OdfElement("frame", OdfNamespaces.Draw, prefix)
 {
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此框架的名稱。
     /// </summary>
     public string? Name
@@ -31,6 +33,7 @@ public partial class DrawFrameElement(string? prefix = null) : OdfElement("frame
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此繪圖框架的仿射變換矩陣。
     /// </summary>
     public System.Numerics.Matrix3x2 Transform
@@ -47,12 +50,14 @@ public partial class DrawFrameElement(string? prefix = null) : OdfElement("frame
 }
 
 /// <summary>
+/// Provides the DrawImageElement API.
 /// 表示 ODF 中的 draw:image 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class DrawImageElement(string? prefix = null) : OdfElement("image", OdfNamespaces.Draw, prefix)
 {
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定影像的超連結 URL。
     /// </summary>
     public string? Href
@@ -68,6 +73,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此影像的裁切矩形 lexical form。
     /// </summary>
     public string? CropClip
@@ -83,6 +89,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     }
 
     /// <summary>
+    /// Executes the Crop operation.
     /// 設定此影像的裁切矩形。
     /// </summary>
     /// <remarks>
@@ -102,6 +109,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     }
 
     /// <summary>
+    /// Executes the ClearCrop operation.
     /// 清除此影像的裁切設定。
     /// </summary>
     /// <returns>目前的影像元素，供鏈式呼叫使用</returns>
@@ -112,6 +120,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     }
 
     /// <summary>
+    /// Executes the SetEffects operation.
     /// 設定此影像的繪圖效果。
     /// </summary>
     /// <param name="configure">用來設定影像效果的委派</param>
@@ -128,6 +137,7 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
     }
 
     /// <summary>
+    /// Executes the SetImageSource operation.
     /// 將圖片二進位資料寫入文件封裝並繫結至此 <c>draw:image</c>。
     /// </summary>
     /// <param name="bytes">圖片二進位資料</param>
@@ -161,12 +171,14 @@ public partial class DrawImageElement(string? prefix = null) : OdfElement("image
 }
 
 /// <summary>
+/// Provides the OdfImageEffectsBuilder API.
 /// 提供 <see cref="DrawImageElement"/> 影像效果的鏈式設定 API。
 /// </summary>
 /// <param name="image">要設定效果的影像元素</param>
 public sealed class OdfImageEffectsBuilder(DrawImageElement image)
 {
     /// <summary>
+    /// Executes the Filter operation.
     /// 設定影像濾鏡名稱。
     /// </summary>
     /// <param name="filterName">濾鏡名稱；傳入 null 時移除設定</param>
@@ -178,6 +190,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
+    /// Executes the SoftEdge operation.
     /// 設定影像柔邊半徑。
     /// </summary>
     /// <param name="radius">柔邊半徑</param>
@@ -185,6 +198,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     public OdfImageEffectsBuilder SoftEdge(OdfLength radius) => Filter($"soft-edge({radius})");
 
     /// <summary>
+    /// Executes the Opacity operation.
     /// 設定影像不透明度。
     /// </summary>
     /// <param name="opacity">不透明度百分比</param>
@@ -196,6 +210,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
+    /// Executes the Luminance operation.
     /// 設定影像亮度調整。
     /// </summary>
     /// <param name="luminance">亮度百分比</param>
@@ -207,6 +222,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
+    /// Executes the Contrast operation.
     /// 設定影像對比調整。
     /// </summary>
     /// <param name="contrast">對比 lexical form；傳入 null 時移除設定</param>
@@ -218,6 +234,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
+    /// Executes the Gamma operation.
     /// 設定影像 gamma 調整。
     /// </summary>
     /// <param name="gamma">Gamma lexical form；傳入 null 時移除設定</param>
@@ -229,6 +246,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
+    /// Executes the CornerRadius operation.
     /// 設定影像圓角半徑。
     /// </summary>
     /// <param name="radius">圓角半徑</param>
@@ -240,6 +258,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
+    /// Executes the Shadow operation.
     /// 設定影像陰影效果。
     /// </summary>
     /// <param name="color">陰影色彩</param>
@@ -258,6 +277,7 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
     }
 
     /// <summary>
+    /// Executes the ClearShadow operation.
     /// 清除影像陰影效果。
     /// </summary>
     /// <returns>目前的建構器</returns>
@@ -281,12 +301,14 @@ public sealed class OdfImageEffectsBuilder(DrawImageElement image)
 }
 
 /// <summary>
+/// Provides the DrawObjectElement API.
 /// 表示 ODF 中的 draw:object 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class DrawObjectElement(string? prefix = null) : OdfElement("object", OdfNamespaces.Draw, prefix)
 {
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定內嵌物件的超連結 URL。
     /// </summary>
     public string? Href
@@ -303,6 +325,7 @@ public partial class DrawObjectElement(string? prefix = null) : OdfElement("obje
 }
 
 /// <summary>
+/// Provides the DrawShapeElement API.
 /// 表示 ODF 中的繪圖形狀元素。
 /// </summary>
 /// <param name="shapeKind">形狀種類</param>
@@ -310,6 +333,7 @@ public partial class DrawObjectElement(string? prefix = null) : OdfElement("obje
 public partial class DrawShapeElement(string shapeKind, string? prefix = null) : OdfElement(shapeKind, OdfNamespaces.Draw, prefix)
 {
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此形狀的名稱。
     /// </summary>
     public string? Name
@@ -325,6 +349,7 @@ public partial class DrawShapeElement(string shapeKind, string? prefix = null) :
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此繪圖形狀的仿射變換矩陣。
     /// </summary>
     public System.Numerics.Matrix3x2 Transform
@@ -341,12 +366,14 @@ public partial class DrawShapeElement(string shapeKind, string? prefix = null) :
 }
 
 /// <summary>
+/// Provides the DrawGroupElement API.
 /// 表示 ODF 中的 draw:g 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class DrawGroupElement(string? prefix = null) : OdfElement("g", OdfNamespaces.Draw, prefix);
 
 /// <summary>
+/// Provides the DrawConnectorElement API.
 /// 表示 ODF 中的 draw:connector 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>

@@ -9,6 +9,10 @@ using Org.BouncyCastle.Crypto.Parameters;
 
 using OdfKit.Compliance;
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfBouncyCastleOpenPgpProvider API.
+/// 提供 OdfBouncyCastleOpenPgpProvider API。
+/// </summary>
 
 public sealed partial class OdfBouncyCastleOpenPgpProvider
 {

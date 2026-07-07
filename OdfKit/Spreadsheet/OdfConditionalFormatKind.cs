@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Defines values for OdfConditionalFormatKind.
 /// LibreOffice calcext 條件格式的種類。
 /// </summary>
 public enum OdfConditionalFormatKind

@@ -8,18 +8,21 @@ namespace OdfKit.DOM;
 
 
 /// <summary>
+/// Provides the ManifestManifestElement API.
 /// 表示 ODF 資訊清單中的 manifest:manifest 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class ManifestManifestElement(string? prefix = null) : OdfElement("manifest", OdfNamespaces.Manifest, prefix);
 
 /// <summary>
+/// Provides the ManifestFileEntryElement API.
 /// 表示 ODF 資訊清單中的 manifest:file-entry 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>
 public partial class ManifestFileEntryElement(string? prefix = null) : OdfElement("file-entry", OdfNamespaces.Manifest, prefix)
 {
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定檔案專案在套件中的完整路徑。
     /// </summary>
     public string? FullPath
@@ -35,6 +38,7 @@ public partial class ManifestFileEntryElement(string? prefix = null) : OdfElemen
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定檔案專案的媒體類型。
     /// </summary>
     public string? MediaType
@@ -51,6 +55,7 @@ public partial class ManifestFileEntryElement(string? prefix = null) : OdfElemen
 }
 
 /// <summary>
+/// Provides the ManifestEncryptionDataElement API.
 /// 表示 ODF 資訊清單中的 manifest:encryption-data 元素。
 /// </summary>
 /// <param name="prefix">選用的命名空間前綴</param>

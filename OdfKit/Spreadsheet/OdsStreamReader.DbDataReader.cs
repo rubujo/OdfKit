@@ -5,6 +5,10 @@ using System.Globalization;
 using OdfKit.Compliance;
 
 namespace OdfKit.Spreadsheet;
+/// <summary>
+/// Provides the OdsStreamReader API.
+/// 提供 OdsStreamReader API。
+/// </summary>
 
 public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
 {

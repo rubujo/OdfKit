@@ -468,6 +468,10 @@ public sealed class ObjectDataReader<
             throw new ObjectDisposedException(nameof(ObjectDataReader<T>), OdfLocalizer.GetMessage("Err_ObjectDataReader_Disposed"));
     }
 
+    /// <summary>
+    /// Executes the Dispose operation.
+    /// 執行 Dispose 作業。
+    /// </summary>
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {

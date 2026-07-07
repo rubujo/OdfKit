@@ -4,11 +4,13 @@ using OdfKit.Core;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OfficeImageElement API.
 /// 為 <see cref="OfficeImageElement"/> 提供 <c>office:image</c> content model facade。
 /// </summary>
 public partial class OfficeImageElement
 {
     /// <summary>
+    /// Provides the member member.
     /// 依文件順序列舉 <c>office:image</c> 影像框架 content group 中的直接子元素。
     /// </summary>
     public IEnumerable<OdfElement> ImageFrameChildElements
@@ -26,6 +28,7 @@ public partial class OfficeImageElement
     }
 
     /// <summary>
+    /// Executes the AppendImageFrame operation.
     /// 在 <c>office:image</c> 末尾新增影像框架。
     /// </summary>
     /// <param name="name">選用的框架名稱</param>

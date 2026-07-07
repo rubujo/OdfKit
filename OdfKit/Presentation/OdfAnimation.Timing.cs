@@ -2,6 +2,10 @@
 using OdfKit.DOM;
 
 namespace OdfKit.Presentation;
+/// <summary>
+/// Provides the OdfAnimation API.
+/// 提供 OdfAnimation API。
+/// </summary>
 
 public partial class OdfAnimation
 {

@@ -7,11 +7,13 @@ using OdfKit.Core;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfDocumentValidator API.
 /// 提供 ODF DOM 樹結構拓撲相容性檢查的驗證器。
 /// </summary>
 public static class OdfDocumentValidator
 {
     /// <summary>
+    /// Executes the Validate operation.
     /// 驗證指定的 OdfDocument 拓撲結構，並傳回診斷報告。
     /// </summary>
     /// <param name="document">要驗證的 ODF 文件</param>

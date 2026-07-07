@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfLineMode.
 /// 表示 ODF schema 中名為 <c>lineMode</c> 的線條模式 token。
 /// </summary>
 public enum OdfLineMode

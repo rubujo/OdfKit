@@ -10,6 +10,7 @@ using OdfKit.Core;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfPackageValidator API.
 /// 在完整結構描述驗證可用之前，執行套件層級的 ODF 驗證。
 /// </summary>
 public static partial class OdfPackageValidator
@@ -31,6 +32,7 @@ public static partial class OdfPackageValidator
         [OdfSignerConstants.SignaturePath] = "text/xml"
     };
     /// <summary>
+    /// Executes the Validate operation.
     /// 驗證 ODF 套件是否符合套件層級規則與選用的設定檔。
     /// </summary>
     /// <param name="package">ODF 套件</param>

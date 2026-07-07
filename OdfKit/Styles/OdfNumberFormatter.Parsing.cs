@@ -7,6 +7,10 @@ using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Styles;
+/// <summary>
+/// Provides the OdfNumberFormatter API.
+/// 提供 OdfNumberFormatter API。
+/// </summary>
 
 public partial class OdfNumberFormatter
 {
@@ -18,6 +22,7 @@ public partial class OdfNumberFormatter
     private static readonly ConcurrentDictionary<string, FormatInfo> FormatInfoPool = new(StringComparer.Ordinal);
 
     /// <summary>
+    /// Executes the ResolveStandardFormat operation.
     /// 解析標準格式。
     /// </summary>
     /// <param name="format">格式字串</param>
@@ -80,6 +85,7 @@ public partial class OdfNumberFormatter
     }
 
     /// <summary>
+    /// Executes the ParsePattern operation.
     /// 解析格式模式。
     /// </summary>
     /// <param name="pattern">格式模式字串</param>

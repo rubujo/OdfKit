@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfPresentationAction.
 /// 表示 ODF schema 中 <c>presentation:action</c> 的簡報動作 token。
 /// </summary>
 public enum OdfPresentationAction

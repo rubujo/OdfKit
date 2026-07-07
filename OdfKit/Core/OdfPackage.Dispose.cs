@@ -3,6 +3,10 @@ using System.IO;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfPackage API.
+/// 提供 OdfPackage API。
+/// </summary>
 
 public sealed partial class OdfPackage
 {
@@ -56,6 +60,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the Dispose operation.
     /// 釋放 <see cref="OdfPackage"/> 類別所使用的資源。
     /// </summary>
     public void Dispose()
@@ -65,6 +70,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the DisposeAsync operation.
     /// 非同步釋放 <see cref="OdfPackage"/> 類別所使用的資源。
     /// </summary>
     /// <returns>代表非同步處置作業的 ValueTask</returns>

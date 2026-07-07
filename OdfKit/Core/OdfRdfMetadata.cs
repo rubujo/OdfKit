@@ -6,6 +6,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfRdfMetadata API.
 /// 表示 ODF 封裝中 <c>META-INF/manifest.rdf</c> 的 RDF metadata 集合。
 /// </summary>
 public sealed class OdfRdfMetadata
@@ -13,6 +14,7 @@ public sealed class OdfRdfMetadata
     private readonly List<OdfRdfTriple> _triples = [];
 
     /// <summary>
+    /// Provides the Triples member.
     /// 取得目前記錄的 RDF triples。
     /// </summary>
     public IReadOnlyList<OdfRdfTriple> Triples => _triples;
@@ -20,6 +22,7 @@ public sealed class OdfRdfMetadata
     internal bool IsDirty { get; private set; }
 
     /// <summary>
+    /// Executes the AddTriple operation.
     /// 新增一筆 RDF triple。
     /// </summary>
     /// <param name="subject">主詞 IRI</param>
@@ -33,6 +36,7 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// Executes the AddTriple operation.
     /// 新增一筆 RDF triple。
     /// </summary>
     /// <param name="triple">要新增的 RDF triple</param>
@@ -69,6 +73,7 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// Executes the TryGetLiteral operation.
     /// 嘗試取得指定主詞與述詞的 literal 受詞。
     /// </summary>
     /// <param name="subject">主詞 IRI</param>
@@ -92,6 +97,7 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// Executes the LinkDocumentPart operation.
     /// 建立文件主詞與封裝組件之間的 <c>pkg:hasPart</c> 關聯。
     /// </summary>
     /// <param name="documentSubject">文件主詞 IRI（通常為空字串或 <c>./</c>）</param>
@@ -102,6 +108,7 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// Executes the SetPartMimeType operation.
     /// 設定封裝組件的 <c>pkg:mimeType</c> literal。
     /// </summary>
     /// <param name="partSubject">組件主詞 IRI</param>
@@ -112,6 +119,7 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// Executes the SyncWithPackageEntries operation.
     /// 依目前封裝專案同步 <c>pkg:hasPart</c> 與 <c>pkg:mimeType</c> triples。
     /// </summary>
     /// <param name="entryPaths">封裝專案路徑集合</param>
@@ -170,6 +178,7 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// Executes the GetLinkedPartPaths operation.
     /// 取得指定文件主詞已連結的封裝組件路徑。
     /// </summary>
     /// <param name="documentSubject">文件主詞 IRI</param>
@@ -184,6 +193,7 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// Executes the RemoveTriples operation.
     /// 移除符合主詞與述詞的 RDF triples。
     /// </summary>
     /// <param name="subject">主詞 IRI</param>
@@ -203,6 +213,7 @@ public sealed class OdfRdfMetadata
     }
 
     /// <summary>
+    /// Executes the Clear operation.
     /// 清除全部 RDF triples。
     /// </summary>
     public void Clear()
@@ -301,11 +312,13 @@ public sealed class OdfRdfMetadata
 }
 
 /// <summary>
+/// Provides the OdfRdfTriple API.
 /// 表示一筆 RDF triple。
 /// </summary>
 public sealed class OdfRdfTriple
 {
     /// <summary>
+    /// Executes the OdfRdfTriple operation.
     /// 以指定主詞、述詞與受詞建立新的 RDF triple。
     /// </summary>
     /// <param name="subject">主詞 IRI</param>
@@ -329,21 +342,25 @@ public sealed class OdfRdfTriple
     }
 
     /// <summary>
+    /// Gets the Subject value.
     /// 取得主詞 IRI。
     /// </summary>
     public string Subject { get; }
 
     /// <summary>
+    /// Gets the Predicate value.
     /// 取得述詞 IRI。
     /// </summary>
     public string Predicate { get; }
 
     /// <summary>
+    /// Gets the ObjectValue value.
     /// 取得受詞值。
     /// </summary>
     public string ObjectValue { get; }
 
     /// <summary>
+    /// Gets a value indicating the IsLiteral state.
     /// 取得受詞是否為 literal。
     /// </summary>
     public bool IsLiteral { get; }

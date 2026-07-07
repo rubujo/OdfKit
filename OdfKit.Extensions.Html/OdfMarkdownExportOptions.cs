@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Export;
 
 /// <summary>
+/// Defines values for OdfMarkdownFlavor.
 /// Markdown 方言。
 /// </summary>
 public enum OdfMarkdownFlavor
@@ -27,21 +28,25 @@ public enum OdfMarkdownFlavor
 }
 
 /// <summary>
+/// Provides the OdfMarkdownExportOptions API.
 /// Markdown 匯出的選項設定。
 /// </summary>
 public sealed class OdfMarkdownExportOptions
 {
     /// <summary>
+    /// Gets the GitHub value.
     /// GitHub Flavored Markdown 匯出 preset。
     /// </summary>
     public static OdfMarkdownExportOptions GitHub { get; } = new() { Flavor = OdfMarkdownFlavor.GitHubFlavored };
 
     /// <summary>
+    /// Gets the GitLab value.
     /// GitLab Flavored Markdown 匯出 preset。
     /// </summary>
     public static OdfMarkdownExportOptions GitLab { get; } = new() { Flavor = OdfMarkdownFlavor.GitLabFlavored };
 
     /// <summary>
+    /// Gets the CommonMark value.
     /// CommonMark 相容匯出 preset。
     /// </summary>
     public static OdfMarkdownExportOptions CommonMark { get; } = new() { Flavor = OdfMarkdownFlavor.CommonMark };

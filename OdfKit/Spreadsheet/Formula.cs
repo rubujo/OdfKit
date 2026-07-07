@@ -258,9 +258,17 @@ public readonly struct OdfSpreadsheetFormula : IEquatable<OdfSpreadsheetFormula>
     /// <returns><see langword="true"/> if the formula bodies are the same. / 若公式主體相同則為 <see langword="true"/>。</returns>
     public bool Equals(OdfSpreadsheetFormula other) => string.Equals(Body, other.Body, StringComparison.Ordinal);
 
+    /// <summary>
+    /// Executes the Equals operation.
+    /// 執行 Equals 作業。
+    /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfSpreadsheetFormula other && Equals(other);
 
+    /// <summary>
+    /// Executes the GetHashCode operation.
+    /// 執行 GetHashCode 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Body ?? string.Empty);
 

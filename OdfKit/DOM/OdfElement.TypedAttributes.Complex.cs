@@ -3,12 +3,17 @@ using OdfKit.Compliance;
 using OdfKit.Styles;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Typed Attribute Accessors - Complex
 
     /// <summary>
+    /// Executes the GetDateTimeAttributeValue operation.
     /// 取得具有 schema awareness 的日期時間屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -19,6 +24,7 @@ public partial class OdfElement
         => OdfElementComplexAttributeAccess.GetDateTime(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetDateTimeAttributeValue operation.
     /// 設定具有 schema awareness 的日期時間屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -30,6 +36,7 @@ public partial class OdfElement
         => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatDateTime(value), prefix, version);
 
     /// <summary>
+    /// Executes the GetTimeAttributeValue operation.
     /// 取得具有 schema awareness 的時間屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -40,6 +47,7 @@ public partial class OdfElement
         => OdfElementComplexAttributeAccess.GetTime(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetTimeAttributeValue operation.
     /// 設定具有 schema awareness 的時間屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -51,6 +59,7 @@ public partial class OdfElement
         => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatTime(value), prefix, version);
 
     /// <summary>
+    /// Executes the GetLengthAttributeValue operation.
     /// 取得具有 schema awareness 的長度屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -61,6 +70,7 @@ public partial class OdfElement
         => OdfElementComplexAttributeAccess.GetLength(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetLengthAttributeValue operation.
     /// 設定具有 schema awareness 的長度屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -72,6 +82,7 @@ public partial class OdfElement
         => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatLength(value), prefix, version);
 
     /// <summary>
+    /// Executes the GetBorderWidthsAttributeValue operation.
     /// 取得具有 schema awareness 的三段邊框線寬屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -82,6 +93,7 @@ public partial class OdfElement
         => OdfElementComplexAttributeAccess.GetBorderWidths(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetBorderWidthsAttributeValue operation.
     /// 設定具有 schema awareness 的三段邊框線寬屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -93,6 +105,7 @@ public partial class OdfElement
         => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatBorderWidths(value), prefix, version);
 
     /// <summary>
+    /// Executes the GetDurationAttributeValue operation.
     /// 取得具有 schema awareness 的 duration 屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -103,6 +116,7 @@ public partial class OdfElement
         => OdfElementComplexAttributeAccess.GetDuration(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetDurationAttributeValue operation.
     /// 設定具有 schema awareness 的 duration 屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -114,6 +128,7 @@ public partial class OdfElement
         => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatDuration(value), prefix, version);
 
     /// <summary>
+    /// Executes the GetAngleAttributeValue operation.
     /// 取得具有 schema awareness 的角度屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -124,6 +139,7 @@ public partial class OdfElement
         => OdfElementComplexAttributeAccess.GetAngle(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetAngleAttributeValue operation.
     /// 設定具有 schema awareness 的角度屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -135,6 +151,7 @@ public partial class OdfElement
         => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatAngle(value), prefix, version);
 
     /// <summary>
+    /// Executes the GetStyleNameAttributeValue operation.
     /// 取得具有 schema awareness 的樣式名稱屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -145,6 +162,7 @@ public partial class OdfElement
         => OdfElementComplexAttributeAccess.GetStyleName(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetStyleNameAttributeValue operation.
     /// 設定具有 schema awareness 的樣式名稱屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -156,6 +174,7 @@ public partial class OdfElement
         => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatStyleName(value), prefix, version);
 
     /// <summary>
+    /// Executes the GetStyleNameListAttributeValue operation.
     /// 取得具有 schema awareness 的樣式名稱參照清單屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -166,6 +185,7 @@ public partial class OdfElement
         => OdfElementComplexAttributeAccess.GetStyleNameList(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetStyleNameListAttributeValue operation.
     /// 設定具有 schema awareness 的樣式名稱參照清單屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -177,6 +197,7 @@ public partial class OdfElement
         => SetAttributeValue(localName, namespaceUri, OdfElementComplexAttributeAccess.FormatStyleNameList(value), prefix, version);
 
     /// <summary>
+    /// Executes the GetColorAttributeValue operation.
     /// 取得具有 schema awareness 的色彩屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -187,6 +208,7 @@ public partial class OdfElement
         => OdfElementComplexAttributeAccess.GetColor(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetColorAttributeValue operation.
     /// 設定具有 schema awareness 的色彩屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

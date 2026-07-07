@@ -5,6 +5,7 @@ using OdfKit.Core;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfNodeType.
 /// 表示 ODF 節點類型的列舉。
 /// </summary>
 public enum OdfNodeType
@@ -31,6 +32,7 @@ public enum OdfNodeType
 }
 
 /// <summary>
+/// Provides the OdfAttributeName API.
 /// 表示 ODF 屬性名稱的結構。
 /// </summary>
 /// <param name="localName">屬性的局部名稱</param>
@@ -38,16 +40,19 @@ public enum OdfNodeType
 public struct OdfAttributeName(string localName, string namespaceUri) : IEquatable<OdfAttributeName>
 {
     /// <summary>
+    /// Gets the LocalName value.
     /// 取得屬性的局部名稱。
     /// </summary>
     public string LocalName { get; } = OdfAttributeStringPool.InternName(localName);
 
     /// <summary>
+    /// Gets the NamespaceUri value.
     /// 取得屬性的命名空間 URI。
     /// </summary>
     public string NamespaceUri { get; } = OdfAttributeStringPool.InternName(namespaceUri);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 指示目前物件是否等於另一個相同類型的物件。
     /// </summary>
     /// <param name="other">要與目前物件進行比較的物件</param>
@@ -57,6 +62,7 @@ public struct OdfAttributeName(string localName, string namespaceUri) : IEquatab
         string.Equals(NamespaceUri, other.NamespaceUri, StringComparison.Ordinal);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 指示此執行個體與指定的物件是否相等。
     /// </summary>
     /// <param name="obj">要比較的物件</param>
@@ -64,6 +70,7 @@ public struct OdfAttributeName(string localName, string namespaceUri) : IEquatab
     public override bool Equals(object? obj) => obj is OdfAttributeName name && Equals(name);
 
     /// <summary>
+    /// Executes the GetHashCode operation.
     /// 傳回此執行個體的雜湊碼。
     /// </summary>
     /// <returns>32 位元有號整數雜湊碼</returns>

@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfFontFamilyGeneric.
 /// 表示 ODF schema 中名為 <c>fontFamilyGeneric</c> 的通用字型家族 token。
 /// </summary>
 public enum OdfFontFamilyGeneric
@@ -37,6 +38,7 @@ public enum OdfFontFamilyGeneric
 }
 
 /// <summary>
+/// Defines values for OdfFontPitch.
 /// 表示 ODF schema 中名為 <c>fontPitch</c> 的字型間距 token。
 /// </summary>
 public enum OdfFontPitch
@@ -53,6 +55,7 @@ public enum OdfFontPitch
 }
 
 /// <summary>
+/// Defines values for OdfFontRelief.
 /// 表示 ODF schema 中 <c>style:font-relief</c> 的字型浮雕 token。
 /// </summary>
 public enum OdfFontRelief
@@ -74,6 +77,7 @@ public enum OdfFontRelief
 }
 
 /// <summary>
+/// Defines values for OdfFontStretch.
 /// 表示 ODF schema 中 <c>svg:font-stretch</c> 的字型伸縮 token。
 /// </summary>
 public enum OdfFontStretch
@@ -125,6 +129,7 @@ public enum OdfFontStretch
 }
 
 /// <summary>
+/// Defines values for OdfFontStyle.
 /// 表示 ODF schema 中名為 <c>fontStyle</c> 的字型樣式 token。
 /// </summary>
 public enum OdfFontStyle
@@ -146,6 +151,7 @@ public enum OdfFontStyle
 }
 
 /// <summary>
+/// Defines values for OdfFontVariant.
 /// 表示 ODF schema 中名為 <c>fontVariant</c> 的字型變體 token。
 /// </summary>
 public enum OdfFontVariant
@@ -162,6 +168,7 @@ public enum OdfFontVariant
 }
 
 /// <summary>
+/// Defines values for OdfFontWeight.
 /// 表示 ODF schema 中名為 <c>fontWeight</c> 的字型粗細 token。
 /// </summary>
 public enum OdfFontWeight

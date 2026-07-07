@@ -33,6 +33,11 @@ fluent builder API、Formula 的完整符號級編輯模型）。這些屬於更
 Formula 已具備 `FindFirst`／`GetAll`／`WithChild`／`ReplaceFirst` 等最小「尋找→取得→更新」
 語意編輯 helper。
 
+凡標示為「真機」的互通證據，均指已有 `LibreOfficeInteropTests` 與
+`eng/Test-LibreOfficeInterop.ps1` 驗收路徑；一般 `dotnet test` 不會自動啟動真實
+LibreOffice，且專用腳本在找不到 LibreOffice 時預設略過。若要作為發佈門檻，請使用
+`pwsh eng/Test-LibreOfficeInterop.ps1 -RequireLibreOffice`。
+
 ### CNS 11643／全字庫字型支援邊界
 
 OdfKit 的文字內容仍以 Unicode 儲存；一般 ODT 文字層不寫入 CNS 11643 交換碼。針對臺灣全字庫

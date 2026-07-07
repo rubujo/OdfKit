@@ -8,12 +8,17 @@ using OdfKit.Compliance;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfDocument API.
+/// 提供 OdfDocument API。
+/// </summary>
 
 public abstract partial class OdfDocument
 {
     #region Package Lifecycle & Persistence
 
     /// <summary>
+    /// Executes the Save operation.
     /// 儲存文件至 ODF 封裝容器中。
     /// </summary>
     /// <param name="options">儲存設定選項</param>
@@ -26,6 +31,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the Save operation.
     /// 將文件保存到指定檔案路徑。
     /// </summary>
     /// <param name="path">要寫入的檔案路徑</param>
@@ -49,6 +55,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the SaveAsync operation.
     /// 非同步儲存文件至 ODF 封裝容器中。
     /// </summary>
     /// <param name="options">儲存設定選項</param>
@@ -66,6 +73,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the SaveAsync operation.
     /// 非同步將文件保存到指定檔案路徑。
     /// </summary>
     /// <param name="path">要寫入的檔案路徑</param>
@@ -99,6 +107,7 @@ public abstract partial class OdfDocument
     #region Web Streaming APIs
 
     /// <summary>
+    /// Executes the SaveToBytes operation.
     /// 將文件儲存為 ODF 封裝位元組陣列。
     /// </summary>
     /// <returns>包含文件封裝內容的位元組陣列</returns>
@@ -110,6 +119,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the SaveToStream operation.
     /// 將文件儲存至指定的資料流。
     /// </summary>
     /// <param name="destinationStream">要寫入文件封裝內容的目標資料流</param>
@@ -130,6 +140,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the SaveAsync operation.
     /// 非同步將文件儲存至指定的資料流。
     /// </summary>
     /// <param name="destinationStream">要寫入文件封裝內容的目標資料流</param>
@@ -140,6 +151,7 @@ public abstract partial class OdfDocument
         SaveToStreamAsync(destinationStream, options, cancellationToken);
 
     /// <summary>
+    /// Executes the SaveToStreamAsync operation.
     /// 非同步將文件儲存至指定的資料流。
     /// </summary>
     /// <param name="destinationStream">要寫入文件封裝內容的目標資料流</param>
@@ -255,6 +267,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the ClearTemplateUserContent operation.
     /// 清除範本實例化後的使用者內容，但保留格式與版面配置。
     /// </summary>
     /// <remarks>
@@ -266,8 +279,8 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the ClearParagraphTextContentRecursive operation.
     /// 遞迴清除指定節點底下所有 <c>text:p</c>／<c>text:span</c> 段落的文字內容，但保留節點結構
-    /// （例如形狀、框架），用於簡報與繪圖範本清除使用者文字內容但保留版面配置。
     /// </summary>
     /// <param name="node">要清除文字內容的根節點</param>
     protected static void ClearParagraphTextContentRecursive(OdfNode node)
@@ -295,6 +308,7 @@ public abstract partial class OdfDocument
     #region Flat XML Conversion APIs
 
     /// <summary>
+    /// Executes the SaveAsFlatXml operation.
     /// 將文件儲存為單一 Flat XML 格式的檔案。
     /// </summary>
     /// <param name="path">要儲存的檔案路徑</param>
@@ -318,6 +332,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the SaveAsFlatXml operation.
     /// 將文件儲存為單一 Flat XML 格式並寫入指定的資料流。
     /// </summary>
     /// <param name="stream">目標資料流</param>
@@ -341,6 +356,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the LoadFromFlatXml operation.
     /// 從指定的 Flat XML 檔案載入 ODF 文件。
     /// </summary>
     /// <param name="path">Flat XML 檔案路徑</param>
@@ -357,6 +373,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the LoadFromFlatXml operation.
     /// 從指定的 Flat XML 資料流載入 ODF 文件。
     /// </summary>
     /// <param name="stream">Flat XML 資料流</param>
@@ -398,6 +415,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the ConvertZipToFlatXml operation.
     /// 將一般 ZIP 封裝的 ODF 文件就地轉換為 Flat XML 格式。
     /// </summary>
     /// <param name="sourcePath">來源 ZIP 封裝文件路徑</param>
@@ -420,6 +438,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the ConvertFlatXmlToZip operation.
     /// 將 Flat XML 格式的 ODF 文件就地轉換為一般 ZIP 封裝格式。
     /// </summary>
     /// <param name="sourcePath">來源 Flat XML 文件路徑</param>

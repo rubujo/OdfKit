@@ -3,10 +3,15 @@ using System.Text;
 using OdfKit.Core;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfNode API.
+/// 提供 OdfNode API。
+/// </summary>
 
 public partial class OdfNode
 {
     /// <summary>
+    /// Executes the TryWriteTextContent operation.
     /// 將節點的文字內容寫入指定的緩衝區寫入器，避免配置完整 <see cref="string"/>。
     /// </summary>
     /// <param name="buffer">接收文字內容的緩衝區寫入器</param>

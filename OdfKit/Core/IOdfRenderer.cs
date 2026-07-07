@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Defines the IOdfRenderer contract.
 /// 定義 ODF 文件渲染與 PDF 匯出的抽象介面。
 /// </summary>
 public interface IOdfRenderer
@@ -20,6 +21,7 @@ public interface IOdfRenderer
 }
 
 /// <summary>
+/// Provides the OdfRendererRegistry API.
 /// 提供 IOdfRenderer 實作之全域註冊與取得機制。
 /// </summary>
 public static class OdfRendererRegistry
@@ -28,6 +30,7 @@ public static class OdfRendererRegistry
     private static bool _attemptedAutoRegister;
 
     /// <summary>
+    /// Executes the Register operation.
     /// 註冊預設的 ODF 渲染器。
     /// </summary>
     /// <param name="renderer">要註冊的渲染器實例</param>
@@ -37,6 +40,7 @@ public static class OdfRendererRegistry
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得目前已註冊的渲染器實例，若未註冊則嘗試動態自動載入已引用的 PDF 擴充套件。
     /// </summary>
     public static IOdfRenderer? Instance

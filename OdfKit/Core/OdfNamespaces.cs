@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfNamespaces API.
 /// 提供常用 ODF XML 命名空間 URI 的常數與公用程式方法。
 /// </summary>
 public static class OdfNamespaces
@@ -166,6 +167,7 @@ public static class OdfNamespaces
     public const string Report = "urn:oasis:names:tc:opendocument:xmlns:report:1.0";
 
     /// <summary>
+    /// Executes the GetPrefix operation.
     /// 取得指定命名空間 URI 的標準前綴。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>
@@ -210,6 +212,7 @@ public static class OdfNamespaces
     }
 
     /// <summary>
+    /// Executes the LookupNamespaceUri operation.
     /// 根據命名空間前綴查找標準命名空間 URI。
     /// </summary>
     /// <param name="prefix">命名空間前綴</param>

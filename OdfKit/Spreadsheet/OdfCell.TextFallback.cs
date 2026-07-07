@@ -2,6 +2,10 @@
 using OdfKit.Styles;
 
 namespace OdfKit.Spreadsheet;
+/// <summary>
+/// Provides the OdfCell API.
+/// 提供 OdfCell API。
+/// </summary>
 
 public partial class OdfCell
 {

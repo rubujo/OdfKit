@@ -5,12 +5,17 @@ using OdfKit.DOM;
 using OdfKit.Styles;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Attribute Values - Style, Form, Table & Media
 
     /// <summary>
+    /// Executes the GetStyleLineBreakAttributeValue operation.
     /// 取得具有 schema awareness 的斷行規則屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -24,6 +29,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleLineBreakAttributeValue operation.
     /// 設定具有 schema awareness 的斷行規則屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -37,6 +43,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleRepeatAttributeValue operation.
     /// 取得具有 schema awareness 的背景重複屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -50,6 +57,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleRepeatAttributeValue operation.
     /// 設定具有 schema awareness 的背景重複屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -63,6 +71,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleDirectionAttributeValue operation.
     /// 取得具有 schema awareness 的樣式方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -76,6 +85,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleDirectionAttributeValue operation.
     /// 設定具有 schema awareness 的樣式方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -89,6 +99,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFormOrientationAttributeValue operation.
     /// 取得具有 schema awareness 的表單方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -102,6 +113,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFormOrientationAttributeValue operation.
     /// 設定具有 schema awareness 的表單方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -115,6 +127,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableDirectionAttributeValue operation.
     /// 取得具有 schema awareness 的表格方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -128,6 +141,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableDirectionAttributeValue operation.
     /// 設定具有 schema awareness 的表格方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -141,6 +155,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTableOrientationAttributeValue operation.
     /// 取得具有 schema awareness 的表格方位屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -154,6 +169,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTableOrientationAttributeValue operation.
     /// 設定具有 schema awareness 的表格方位屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -167,6 +183,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetStyleFamilyAttributeValue operation.
     /// 取得具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -180,6 +197,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetStyleFamilyAttributeValue operation.
     /// 設定具有 schema awareness 的樣式家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -193,6 +211,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetOdfVersionAttributeValue operation.
     /// 取得具有 schema awareness 的 ODF 版本屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -206,6 +225,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetOdfVersionAttributeValue operation.
     /// 設定具有 schema awareness 的 ODF 版本屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -219,6 +239,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetMediaTypeAttributeValue operation.
     /// 取得具有 schema awareness 的 MIME 類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -232,6 +253,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetMediaTypeAttributeValue operation.
     /// 設定具有 schema awareness 的 MIME 類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

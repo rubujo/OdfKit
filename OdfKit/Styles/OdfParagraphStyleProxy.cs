@@ -6,6 +6,7 @@ using OdfKit.Text;
 namespace OdfKit.Styles;
 
 /// <summary>
+/// Provides the OdfParagraphStyleProxy API.
 /// 實作文字段落的樣式代理 Facade，提供對齊、行距與縮排等高階樣式屬性讀寫。
 /// </summary>
 public sealed class OdfParagraphStyleProxy
@@ -13,6 +14,7 @@ public sealed class OdfParagraphStyleProxy
     private readonly OdfParagraph _paragraph;
 
     /// <summary>
+    /// Executes the OdfParagraphStyleProxy operation.
     /// 初始化 <see cref="OdfParagraphStyleProxy"/> 類別的新執行個體。
     /// </summary>
     /// <param name="paragraph">目標段落</param>
@@ -22,6 +24,7 @@ public sealed class OdfParagraphStyleProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定段落的水平對齊方式。
     /// </summary>
     public string? Alignment
@@ -31,6 +34,7 @@ public sealed class OdfParagraphStyleProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定段落的行高/行距（對應 <c>fo:line-height</c> 屬性）。
     /// </summary>
     public string? LineSpacing
@@ -40,6 +44,7 @@ public sealed class OdfParagraphStyleProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定段落的左邊界縮排距離（對應 <c>fo:margin-left</c> 屬性）。
     /// </summary>
     public string? MarginLeft
@@ -49,6 +54,7 @@ public sealed class OdfParagraphStyleProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定段落的右邊界縮排距離（對應 <c>fo:margin-right</c> 屬性）。
     /// </summary>
     public string? MarginRight
@@ -58,6 +64,7 @@ public sealed class OdfParagraphStyleProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定段落上方間距（對應 <c>fo:margin-top</c> 屬性）。
     /// </summary>
     public string? MarginTop
@@ -67,6 +74,7 @@ public sealed class OdfParagraphStyleProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定段落下方間距（對應 <c>fo:margin-bottom</c> 屬性）。
     /// </summary>
     public string? MarginBottom
@@ -76,6 +84,7 @@ public sealed class OdfParagraphStyleProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定段落首行縮排（對應 <c>fo:text-indent</c> 屬性）。
     /// </summary>
     public string? TextIndent

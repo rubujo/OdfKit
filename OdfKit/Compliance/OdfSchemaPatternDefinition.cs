@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfSchemaPatternDefinition API.
 /// 描述從結構描述中繼資料中保留的一個命名 RELAX NG 模式。
 /// </summary>
 public sealed class OdfSchemaPatternDefinition
@@ -11,6 +12,7 @@ public sealed class OdfSchemaPatternDefinition
     private readonly IReadOnlyList<OdfSchemaPatternNode> _roots;
 
     /// <summary>
+    /// Executes the OdfSchemaPatternDefinition operation.
     /// 初始化命名模式定義的新執行個體。
     /// </summary>
     /// <param name="name">定義名稱</param>
@@ -24,11 +26,13 @@ public sealed class OdfSchemaPatternDefinition
     }
 
     /// <summary>
+    /// Gets the Name value.
     /// 取得 RELAX NG 定義名稱。
     /// </summary>
     public string Name { get; }
 
     /// <summary>
+    /// Provides the Roots member.
     /// 取得此命名模式的根節點。
     /// </summary>
     public IReadOnlyList<OdfSchemaPatternNode> Roots => _roots;

@@ -4,11 +4,13 @@ using OdfKit.Core;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfNodeFactory API.
 /// 根據限定名稱來具現化特定 <see cref="OdfElement"/> 子類別的工廠類別。
 /// </summary>
 public static partial class OdfNodeFactory
 {
     /// <summary>
+    /// Executes the CreateElement operation.
     /// 建立特定類型的 ODF 元素；如果無對應的特定類型，則建立 <see cref="OdfUnknownElement"/>。
     /// </summary>
     /// <param name="localName">元素局部名稱</param>

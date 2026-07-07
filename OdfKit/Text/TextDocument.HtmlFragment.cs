@@ -1,4 +1,8 @@
 ﻿namespace OdfKit.Text;
+/// <summary>
+/// Provides the TextDocument API.
+/// 提供 TextDocument API。
+/// </summary>
 
 public partial class TextDocument
 {

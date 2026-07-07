@@ -14,11 +14,13 @@ using OdfKit.Compliance;
 namespace OdfKit.Csv;
 
 /// <summary>
+/// Provides the OdfCsvExporter API.
 /// 將 SpreadsheetDocument 的工作表匯出為 CSV 的靜態工具類別。
 /// </summary>
 public static class OdfCsvExporter
 {
     /// <summary>
+    /// Executes the ExportToStream operation.
     /// 將指定工作表的資料匯出為 CSV 並寫入資料流。
     /// </summary>
     /// <param name="workbook">來源 SpreadsheetDocument 執行個體</param>
@@ -63,6 +65,7 @@ public static class OdfCsvExporter
     }
 
     /// <summary>
+    /// Executes the ExportToFile operation.
     /// 將指定工作表的資料匯出為 CSV 檔案。
     /// </summary>
     /// <param name="workbook">來源 SpreadsheetDocument 執行個體</param>
@@ -269,9 +272,9 @@ internal sealed class OdfTableSheetDataReader : DbDataReader
 
     public override bool GetBoolean(int ordinal) => Convert.ToBoolean(GetValue(ordinal));
     public override byte GetByte(int ordinal) => Convert.ToByte(GetValue(ordinal));
-    public override long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length) => throw new NotSupportedException();
+    public override long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_DbDataReader_GetBytesNotSupported"));
     public override char GetChar(int ordinal) => Convert.ToChar(GetValue(ordinal));
-    public override long GetChars(int ordinal, long dataOffset, char[]? buffer, int bufferOffset, int length) => throw new NotSupportedException();
+    public override long GetChars(int ordinal, long dataOffset, char[]? buffer, int bufferOffset, int length) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_DbDataReader_GetCharsNotSupported"));
     public override string GetDataTypeName(int ordinal) => typeof(object).Name;
     public override DateTime GetDateTime(int ordinal) => Convert.ToDateTime(GetValue(ordinal));
     public override decimal GetDecimal(int ordinal) => Convert.ToDecimal(GetValue(ordinal));
@@ -294,5 +297,6 @@ internal sealed class OdfTableSheetDataReader : DbDataReader
         return count;
     }
     public override bool NextResult() => false;
-    public override IEnumerator GetEnumerator() => throw new NotSupportedException();
+    public override IEnumerator GetEnumerator() => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_EnumerableOperation_NotSupported"));
 }
+

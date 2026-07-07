@@ -4,10 +4,15 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfDocument API.
+/// 提供 OdfDocument API。
+/// </summary>
 
 public abstract partial class OdfDocument
 {
     /// <summary>
+    /// Executes the SaveEncryptedAsync operation.
     /// 非同步以密碼加密並儲存文件至原始封裝目的地。
     /// </summary>
     /// <param name="password">加密密碼</param>
@@ -24,6 +29,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the SaveEncryptedAsync operation.
     /// 非同步以密碼加密並儲存文件至指定路徑。
     /// </summary>
     /// <param name="path">目標檔案路徑</param>
@@ -45,6 +51,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the SaveEncryptedAsync operation.
     /// 非同步以密碼加密並儲存文件至指定資料流。
     /// </summary>
     /// <param name="destinationStream">目標資料流</param>
@@ -66,6 +73,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the LoadEncryptedAsync operation.
     /// 非同步以密碼解密並載入指定路徑的 ODF 文件。
     /// </summary>
     /// <param name="path">ODF 文件路徑</param>
@@ -84,6 +92,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the LoadEncryptedAsync operation.
     /// 非同步以密碼解密並載入指定資料流的 ODF 文件。
     /// </summary>
     /// <param name="stream">ODF 文件資料流</param>

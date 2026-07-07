@@ -4,6 +4,10 @@ using OdfKit.Compliance;
 using OdfKit.Core;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfNode API.
+/// 提供 OdfNode API。
+/// </summary>
 
 public partial class OdfNode
 {
@@ -11,6 +15,7 @@ public partial class OdfNode
 
 
     /// <summary>
+    /// Executes the GetAttribute operation.
     /// 取得指定屬性名稱與命名空間的屬性值。
     /// </summary>
     /// <param name="localName">屬性的局部名稱</param>
@@ -23,6 +28,7 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Executes the GetAttribute operation.
     /// 取得指定屬性名稱與命名空間的屬性值。
     /// </summary>
     /// <param name="localName">屬性的局部名稱</param>
@@ -31,6 +37,7 @@ public partial class OdfNode
     public string? GetAttribute(string localName, XNamespace namespaceUri) => GetAttribute(localName, namespaceUri.NamespaceName);
 
     /// <summary>
+    /// Executes the SetAttribute operation.
     /// 設定指定屬性名稱與命名空間的屬性值。
     /// </summary>
     /// <param name="localName">屬性的局部名稱</param>
@@ -78,6 +85,7 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Executes the SetAttribute operation.
     /// 設定指定屬性名稱與命名空間的屬性值。
     /// </summary>
     /// <param name="localName">屬性的局部名稱</param>
@@ -108,6 +116,7 @@ public partial class OdfNode
     }
 
     /// <summary>
+    /// Executes the GetAttributePrefix operation.
     /// 取得指定屬性的原始命名空間前綴。
     /// </summary>
     /// <param name="attributeName">屬性名稱</param>

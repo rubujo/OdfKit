@@ -6,6 +6,10 @@ using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Styles;
+/// <summary>
+/// Provides the OdfNumberFormatter API.
+/// 提供 OdfNumberFormatter API。
+/// </summary>
 
 public partial class OdfNumberFormatter
 {

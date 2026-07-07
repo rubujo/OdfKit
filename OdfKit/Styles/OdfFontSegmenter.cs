@@ -5,11 +5,13 @@ using System.Text;
 namespace OdfKit.Styles;
 
 /// <summary>
+/// Provides the OdfFontSegmenter API.
 /// 提供針對 CNS 11643 中文標準交換碼字型之文字分段與對應工具。
 /// </summary>
 public static class OdfFontSegmenter
 {
     /// <summary>
+    /// Executes the SegmentText operation.
     /// 將文字依照 Unicode 字面拆分為多個文字片段，並指派適當的字型名稱。
     /// </summary>
     /// <param name="text">要分段的來源文字</param>
@@ -81,6 +83,7 @@ public static class OdfFontSegmenter
     }
 
     /// <summary>
+    /// Executes the GetSupplementaryPlaneFontName operation.
     /// 依據基礎字型名稱與 Unicode 平面，取得對應的字型名稱（支援全字庫、花園明朝與字雲等增補平面與罕見字字型）。
     /// </summary>
     /// <param name="baseFontFamily">基礎字型名稱</param>

@@ -6,6 +6,7 @@ using OdfKit.Spreadsheet;
 namespace OdfKit.Styles;
 
 /// <summary>
+/// Provides the OdfCellStyleProxy API.
 /// 實作試算表儲存格的樣式代理 Facade，自動處理 Local Style 與屬性對照。
 /// </summary>
 public sealed class OdfCellStyleProxy
@@ -15,6 +16,7 @@ public sealed class OdfCellStyleProxy
     private OdfCellFillProxy? _fill;
 
     /// <summary>
+    /// Executes the OdfCellStyleProxy operation.
     /// 初始化 <see cref="OdfCellStyleProxy"/> 類別的新執行個體。
     /// </summary>
     /// <param name="cell">目標儲存格</param>
@@ -24,16 +26,19 @@ public sealed class OdfCellStyleProxy
     }
 
     /// <summary>
+    /// Executes the Font operation.
     /// 取得此儲存格的字型樣式代理。
     /// </summary>
     public OdfCellFontProxy Font => _font ??= new OdfCellFontProxy(_cell);
 
     /// <summary>
+    /// Executes the Fill operation.
     /// 取得此儲存格的填充背景樣式代理。
     /// </summary>
     public OdfCellFillProxy Fill => _fill ??= new OdfCellFillProxy(_cell);
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定此儲存格套用的資料數值格式（例如 <c>data-style-name</c>）。
     /// </summary>
     public string? NumberFormat
@@ -50,6 +55,7 @@ public sealed class OdfCellStyleProxy
 }
 
 /// <summary>
+/// Provides the OdfCellFontProxy API.
 /// 實作試算表儲存格的字型樣式代理。
 /// </summary>
 public sealed class OdfCellFontProxy
@@ -62,6 +68,7 @@ public sealed class OdfCellFontProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定字型是否為粗體。
     /// </summary>
     public bool IsBold
@@ -71,6 +78,7 @@ public sealed class OdfCellFontProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定字型是否為斜體。
     /// </summary>
     public bool IsItalic
@@ -80,6 +88,7 @@ public sealed class OdfCellFontProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定字型大小（例如 <c>12pt</c>）。
     /// </summary>
     public string? Size
@@ -89,6 +98,7 @@ public sealed class OdfCellFontProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定字型顏色（例如十六進位色碼 <c>#FF0000</c>）。
     /// </summary>
     public string? Color
@@ -99,6 +109,7 @@ public sealed class OdfCellFontProxy
 }
 
 /// <summary>
+/// Provides the OdfCellFillProxy API.
 /// 實作試算表儲存格的填充背景樣式代理。
 /// </summary>
 public sealed class OdfCellFillProxy
@@ -111,6 +122,7 @@ public sealed class OdfCellFillProxy
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定儲存格的背景填充顏色（例如 <c>#FFFF00</c>）。
     /// </summary>
     public string? Color

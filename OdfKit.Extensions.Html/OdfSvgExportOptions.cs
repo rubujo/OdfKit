@@ -3,6 +3,7 @@
 namespace OdfKit.Export;
 
 /// <summary>
+/// Provides the OdfSvgExportOptions API.
 /// SVG 匯出的選項設定。
 /// </summary>
 public sealed class OdfSvgExportOptions

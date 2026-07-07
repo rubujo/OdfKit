@@ -16,6 +16,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfEncryption API.
 /// 提供 ODF 封裝檔案加密與解密操作的實作。
 /// </summary>
 public static partial class OdfEncryption
@@ -53,6 +54,7 @@ public static partial class OdfEncryption
     private static readonly SemaphoreSlim Argon2ConcurrencyGate = new(Argon2MaxConcurrentOperations, Argon2MaxConcurrentOperations);
 
     /// <summary>
+    /// Executes the Pbkdf2 operation.
     /// 自訂實作以金鑰為基礎的金鑰衍生函式 PBKDF2，支援 SHA-1 與 SHA-256，確保跨平台行為一致。
     /// </summary>
     /// <param name="password">密碼位元組陣列</param>

@@ -8,6 +8,10 @@ using OdfKit.Styles;
 
 using OdfKit.Compliance;
 namespace OdfKit.Presentation;
+/// <summary>
+/// Provides the OdfSlide API.
+/// 提供 OdfSlide API。
+/// </summary>
 
 public partial class OdfSlide
 {

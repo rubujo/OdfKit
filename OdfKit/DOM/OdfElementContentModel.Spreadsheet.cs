@@ -3,11 +3,13 @@
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OfficeSpreadsheetElement API.
 /// 為 <see cref="OfficeSpreadsheetElement"/> 提供 <c>office:spreadsheet</c> content model facade。
 /// </summary>
 public partial class OfficeSpreadsheetElement
 {
     /// <summary>
+    /// Provides the member member.
     /// 依文件順序列舉 <c>office:spreadsheet</c> 試算表 content group 中的直接子元素。
     /// </summary>
     public IEnumerable<OdfElement> SpreadsheetTableChildElements
@@ -25,6 +27,7 @@ public partial class OfficeSpreadsheetElement
     }
 
     /// <summary>
+    /// Executes the AppendTable operation.
     /// 在 <c>office:spreadsheet</c> 末尾新增工作表表格。
     /// </summary>
     /// <param name="name">選用的表格名稱</param>

@@ -1,21 +1,25 @@
 ﻿namespace OdfKit.Export;
 
 /// <summary>
+/// Provides the OdfMarkdownImportOptions API.
 /// Markdown 匯入的選項設定。
 /// </summary>
 public sealed class OdfMarkdownImportOptions
 {
     /// <summary>
+    /// Gets the GitHub value.
     /// GitHub Flavored Markdown 匯入 preset。
     /// </summary>
     public static OdfMarkdownImportOptions GitHub { get; } = new() { Flavor = OdfMarkdownFlavor.GitHubFlavored };
 
     /// <summary>
+    /// Gets the GitLab value.
     /// GitLab Flavored Markdown 匯入 preset。
     /// </summary>
     public static OdfMarkdownImportOptions GitLab { get; } = new() { Flavor = OdfMarkdownFlavor.GitLabFlavored };
 
     /// <summary>
+    /// Gets the CommonMark value.
     /// CommonMark 相容匯入 preset。
     /// </summary>
     public static OdfMarkdownImportOptions CommonMark { get; } = new() { Flavor = OdfMarkdownFlavor.CommonMark };

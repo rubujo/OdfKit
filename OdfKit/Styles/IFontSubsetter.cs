@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace OdfKit.Styles;
 
 /// <summary>
+/// Defines the IFontSubsetter contract.
 /// 定義 ODF 字型子集化擴充點。
 /// </summary>
 public interface IFontSubsetter
@@ -17,11 +18,13 @@ public interface IFontSubsetter
 }
 
 /// <summary>
+/// Provides the OdfFontSubsetRequest API.
 /// 表示單一字型子集化請求。
 /// </summary>
 public sealed class OdfFontSubsetRequest
 {
     /// <summary>
+    /// Executes the OdfFontSubsetRequest operation.
     /// 初始化 <see cref="OdfFontSubsetRequest"/> 類別的新執行個體。
     /// </summary>
     /// <param name="fontName">ODF 字型宣告名稱</param>
@@ -35,27 +38,32 @@ public sealed class OdfFontSubsetRequest
     }
 
     /// <summary>
+    /// Gets the FontName value.
     /// 取得 ODF 字型宣告名稱。
     /// </summary>
     public string FontName { get; }
 
     /// <summary>
+    /// Gets the FontPath value.
     /// 取得解析出的原始字型檔案路徑；若無法解析則為 <see langword="null"/>。
     /// </summary>
     public string? FontPath { get; }
 
     /// <summary>
+    /// Gets the CodePoints value.
     /// 取得文件中偵測到的 PUA 自造字碼位集合。
     /// </summary>
     public IReadOnlyCollection<int> CodePoints { get; }
 }
 
 /// <summary>
+/// Provides the OdfFontSubset API.
 /// 表示字型子集化完成後要嵌入 ODF 封裝的結果。
 /// </summary>
 public sealed class OdfFontSubset
 {
     /// <summary>
+    /// Executes the OdfFontSubset operation.
     /// 初始化 <see cref="OdfFontSubset"/> 類別的新執行個體。
     /// </summary>
     /// <param name="bytes">字型子集二進位資料</param>
@@ -71,16 +79,19 @@ public sealed class OdfFontSubset
     }
 
     /// <summary>
+    /// Gets the Bytes value.
     /// 取得字型子集二進位資料。
     /// </summary>
     public byte[] Bytes { get; }
 
     /// <summary>
+    /// Gets the Extension value.
     /// 取得字型副檔名。
     /// </summary>
     public string Extension { get; }
 
     /// <summary>
+    /// Gets the MediaType value.
     /// 取得字型 MIME 類型。
     /// </summary>
     public string MediaType { get; }

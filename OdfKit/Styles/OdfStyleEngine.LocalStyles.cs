@@ -5,6 +5,10 @@ using OdfKit.Core;
 using OdfKit.DOM;
 
 namespace OdfKit.Styles;
+/// <summary>
+/// Provides the OdfStyleEngine API.
+/// 提供 OdfStyleEngine API。
+/// </summary>
 
 public partial class OdfStyleEngine
 {
@@ -47,6 +51,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
+    /// Executes the GetOrCreateLocalStyle operation.
     /// 取得或建立特定 DOM 節點在記憶體中的局部編輯樣式節點。
     /// </summary>
     /// <param name="elementNode">DOM 專案節點</param>
@@ -95,6 +100,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
+    /// Executes the SetLocalStyleProperty operation.
     /// 設定局部樣式屬性。
     /// </summary>
     /// <param name="elementNode">DOM 專案節點</param>
@@ -240,6 +246,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
+    /// Executes the DeduplicateAndSaveStyles operation.
     /// 執行自動樣式去重，將記憶體中的臨時局部樣式合併寫入 XML 並更新 DOM 節點參照。
     /// </summary>
     public void DeduplicateAndSaveStyles()

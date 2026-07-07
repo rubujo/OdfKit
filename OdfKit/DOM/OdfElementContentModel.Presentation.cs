@@ -5,11 +5,13 @@ using OdfKit.Core;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OfficePresentationElement API.
 /// 為 <see cref="OfficePresentationElement"/> 提供 <c>office:presentation</c> content model facade。
 /// </summary>
 public partial class OfficePresentationElement
 {
     /// <summary>
+    /// Provides the member member.
     /// 依文件順序列舉 <c>office:presentation</c> 主要 content group 中的直接子元素。
     /// </summary>
     public IEnumerable<OdfElement> PresentationPageChildElements
@@ -27,6 +29,7 @@ public partial class OfficePresentationElement
     }
 
     /// <summary>
+    /// Executes the AppendPage operation.
     /// 在 <c>office:presentation</c> 主要 content 區段新增投影片頁面。
     /// </summary>
     /// <param name="name">選用的頁面名稱</param>

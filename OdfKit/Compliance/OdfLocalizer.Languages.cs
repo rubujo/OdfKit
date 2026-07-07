@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 
 namespace OdfKit.Compliance;
+/// <summary>
+/// Provides the OdfLocalizer API.
+/// 提供 OdfLocalizer API。
+/// </summary>
 
 public static partial class OdfLocalizer
 {

@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfTextLabelFollowedBy.
 /// 表示 ODF schema 中 <c>text:label-followed-by</c> 的清單標籤後接 token。
 /// </summary>
 public enum OdfTextLabelFollowedBy
@@ -22,6 +23,7 @@ public enum OdfTextLabelFollowedBy
 }
 
 /// <summary>
+/// Defines values for OdfTextListLevelPositionMode.
 /// 表示 ODF schema 中 <c>text:list-level-position-and-space-mode</c> 的清單層級定位模式 token。
 /// </summary>
 public enum OdfTextListLevelPositionMode
@@ -38,6 +40,7 @@ public enum OdfTextListLevelPositionMode
 }
 
 /// <summary>
+/// Defines values for OdfTextIndexScope.
 /// 表示 ODF schema 中 <c>text:index-scope</c> 的索引範圍 token。
 /// </summary>
 public enum OdfTextIndexScope
@@ -54,6 +57,7 @@ public enum OdfTextIndexScope
 }
 
 /// <summary>
+/// Defines values for OdfTextTableType.
 /// 表示 ODF schema 中 <c>text:table-type</c> 的資料表來源類型 token。
 /// </summary>
 public enum OdfTextTableType
@@ -75,6 +79,7 @@ public enum OdfTextTableType
 }
 
 /// <summary>
+/// Defines values for OdfTextAnchorType.
 /// 表示 ODF schema 中 <c>text:anchor-type</c> 的錨定類型 token。
 /// </summary>
 public enum OdfTextAnchorType
@@ -106,6 +111,7 @@ public enum OdfTextAnchorType
 }
 
 /// <summary>
+/// Defines values for OdfTextNoteClass.
 /// 表示 ODF schema 中 <c>text:note-class</c> 的註解類別 token。
 /// </summary>
 public enum OdfTextNoteClass
@@ -122,6 +128,7 @@ public enum OdfTextNoteClass
 }
 
 /// <summary>
+/// Defines values for OdfTextSelectPage.
 /// 表示 ODF schema 中 <c>text:select-page</c> 的頁面選取 token。
 /// </summary>
 public enum OdfTextSelectPage
@@ -143,6 +150,7 @@ public enum OdfTextSelectPage
 }
 
 /// <summary>
+/// Defines values for OdfTextReferenceFormat.
 /// 表示 ODF schema 中 <c>text:reference-format</c> 的參照顯示格式 token。
 /// </summary>
 public enum OdfTextReferenceFormat
@@ -199,6 +207,7 @@ public enum OdfTextReferenceFormat
 }
 
 /// <summary>
+/// Defines values for OdfTextStartNumberingAt.
 /// 表示 ODF schema 中 <c>text:start-numbering-at</c> 的起始編號範圍 token。
 /// </summary>
 public enum OdfTextStartNumberingAt
@@ -220,6 +229,7 @@ public enum OdfTextStartNumberingAt
 }
 
 /// <summary>
+/// Defines values for OdfTextFootnotesPosition.
 /// 表示 ODF schema 中 <c>text:footnotes-position</c> 的註腳位置 token。
 /// </summary>
 public enum OdfTextFootnotesPosition
@@ -246,6 +256,7 @@ public enum OdfTextFootnotesPosition
 }
 
 /// <summary>
+/// Defines values for OdfTextCaptionSequenceFormat.
 /// 表示 ODF schema 中 <c>text:caption-sequence-format</c> 的標號序列格式 token。
 /// </summary>
 public enum OdfTextCaptionSequenceFormat
@@ -267,6 +278,7 @@ public enum OdfTextCaptionSequenceFormat
 }
 
 /// <summary>
+/// Defines values for OdfTextNumberPosition.
 /// 表示 ODF schema 中 <c>text:number-position</c> 的編號位置 token。
 /// </summary>
 public enum OdfTextNumberPosition
@@ -293,6 +305,7 @@ public enum OdfTextNumberPosition
 }
 
 /// <summary>
+/// Defines values for OdfTextPlaceholderType.
 /// 表示 ODF schema 中 <c>text:placeholder-type</c> 的預留位置類型 token。
 /// </summary>
 public enum OdfTextPlaceholderType
@@ -324,6 +337,7 @@ public enum OdfTextPlaceholderType
 }
 
 /// <summary>
+/// Defines values for OdfTextAnimation.
 /// 表示 ODF schema 中 <c>text:animation</c> 的文字動畫 token。
 /// </summary>
 public enum OdfTextAnimation
@@ -350,6 +364,7 @@ public enum OdfTextAnimation
 }
 
 /// <summary>
+/// Defines values for OdfTextAnimationDirection.
 /// 表示 ODF schema 中 <c>text:animation-direction</c> 的文字動畫方向 token。
 /// </summary>
 public enum OdfTextAnimationDirection
@@ -376,6 +391,7 @@ public enum OdfTextAnimationDirection
 }
 
 /// <summary>
+/// Defines values for OdfTextKind.
 /// 表示 ODF schema 中 <c>text:kind</c> 的索引專案種類 token。
 /// </summary>
 public enum OdfTextKind

@@ -17,6 +17,7 @@ namespace OdfKit.Styles;
 public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, Color color) : IEquatable<OdfBorder>
 {
     /// <summary>
+    /// Defines values for BorderStyle.
     /// 表示框線樣式的列舉。
     /// </summary>
     public enum BorderStyle
@@ -48,26 +49,31 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
     }
 
     /// <summary>
+    /// Gets the Style value.
     /// 取得框線的樣式。
     /// </summary>
     public BorderStyle Style { get; } = style;
 
     /// <summary>
+    /// Gets the Width value.
     /// 取得框線的寬度。
     /// </summary>
     public OdfLength Width { get; } = width;
 
     /// <summary>
+    /// Gets the Color value.
     /// 取得框線的色彩。
     /// </summary>
     public Color Color { get; } = color;
 
     /// <summary>
+    /// Executes the None operation.
     /// 取得一個表示無框線的 <see cref="OdfBorder"/> 結構。
     /// </summary>
     public static OdfBorder None => new(BorderStyle.None, new(0, OdfUnit.Unspecified), Color.Empty);
 
     /// <summary>
+    /// Executes the Parse operation.
     /// 解析框線字串並傳回 <see cref="OdfBorder"/> 結構。
     /// </summary>
     /// <param name="borderString">要解析的框線字串</param>
@@ -111,6 +117,7 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
     }
 
     /// <summary>
+    /// Executes the ToString operation.
     /// 將目前的框線結構轉換為其字串表示法。
     /// </summary>
     /// <returns>代表目前結構的字串</returns>
@@ -123,6 +130,7 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
     }
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷目前的框線結構是否與另一個框線結構相等。
     /// </summary>
     /// <param name="other">要比較的另一個框線結構</param>
@@ -130,6 +138,7 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
     public bool Equals(OdfBorder other) => Style == other.Style && Width.Equals(other.Width) && Color.ToArgb() == other.Color.ToArgb();
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷指定的物件是否與目前的框線結構相等。
     /// </summary>
     /// <param name="obj">要比較的物件</param>
@@ -137,6 +146,7 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
     public override bool Equals(object? obj) => obj is OdfBorder other && Equals(other);
 
     /// <summary>
+    /// Executes the GetHashCode operation.
     /// 傳回此框線結構的雜湊碼。
     /// </summary>
     /// <returns>一個 32 位元有正負號的整數雜湊碼</returns>
@@ -150,6 +160,7 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
     }
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個 <see cref="OdfBorder"/> 結構是否相等。
     /// </summary>
     /// <param name="left">要比較的左側結構</param>
@@ -158,6 +169,7 @@ public readonly struct OdfBorder(OdfBorder.BorderStyle style, OdfLength width, C
     public static bool operator ==(OdfBorder left, OdfBorder right) => left.Equals(right);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個 <see cref="OdfBorder"/> 結構是否不相等。
     /// </summary>
     /// <param name="left">要比較的左側結構</param>

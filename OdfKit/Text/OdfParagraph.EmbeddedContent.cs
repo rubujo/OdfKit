@@ -5,6 +5,10 @@ using OdfKit.DOM;
 using OdfKit.Styles;
 
 namespace OdfKit.Text;
+/// <summary>
+/// Provides the OdfParagraph API.
+/// 提供 OdfParagraph API。
+/// </summary>
 
 public partial class OdfParagraph
 {

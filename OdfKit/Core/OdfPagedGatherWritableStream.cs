@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfPagedGatherWritableStream API.
 /// 將寫入資料分割為固定大小頁面，並在檔案目標上以向量化寫入一次提交多個頁面。
 /// </summary>
 public sealed class OdfPagedGatherWritableStream : Stream
@@ -40,6 +41,7 @@ public sealed class OdfPagedGatherWritableStream : Stream
     internal static int ReturnedPageCountForTests;
 
     /// <summary>
+    /// Executes the OdfPagedGatherWritableStream operation.
     /// 初始化 <see cref="OdfPagedGatherWritableStream"/> 類別的新執行個體。
     /// </summary>
     /// <param name="underlyingStream">接收寫入結果的底層串流</param>
@@ -80,25 +82,49 @@ public sealed class OdfPagedGatherWritableStream : Stream
 #endif
     }
 
+    /// <summary>
+    /// Provides the CanRead member.
+    /// 提供 CanRead 成員。
+    /// </summary>
     /// <inheritdoc />
     public override bool CanRead => false;
 
+    /// <summary>
+    /// Provides the CanSeek member.
+    /// 提供 CanSeek 成員。
+    /// </summary>
     /// <inheritdoc />
     public override bool CanSeek => false;
 
+    /// <summary>
+    /// Provides the CanWrite member.
+    /// 提供 CanWrite 成員。
+    /// </summary>
     /// <inheritdoc />
     public override bool CanWrite => !_isDisposed && _underlyingStream.CanWrite;
 
+    /// <summary>
+    /// Executes the Length operation.
+    /// 執行 Length 作業。
+    /// </summary>
     /// <inheritdoc />
-    public override long Length => throw new NotSupportedException();
+    public override long Length => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
+    /// <summary>
+    /// Provides the member member.
+    /// 提供 member 成員。
+    /// </summary>
     /// <inheritdoc />
     public override long Position
     {
-        get => throw new NotSupportedException();
-        set => throw new NotSupportedException();
+        get => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
+        set => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
     }
 
+    /// <summary>
+    /// Executes the Flush operation.
+    /// 執行 Flush 作業。
+    /// </summary>
     /// <inheritdoc />
     public override void Flush()
     {
@@ -107,6 +133,10 @@ public sealed class OdfPagedGatherWritableStream : Stream
         _underlyingStream.Flush();
     }
 
+    /// <summary>
+    /// Executes the FlushAsync operation.
+    /// 執行 FlushAsync 作業。
+    /// </summary>
     /// <inheritdoc />
     public override async Task FlushAsync(CancellationToken cancellationToken)
     {
@@ -115,15 +145,31 @@ public sealed class OdfPagedGatherWritableStream : Stream
         await _underlyingStream.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the Seek operation.
+    /// 執行 Seek 作業。
+    /// </summary>
     /// <inheritdoc />
-    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
+    /// <summary>
+    /// Executes the SetLength operation.
+    /// 執行 SetLength 作業。
+    /// </summary>
     /// <inheritdoc />
-    public override void SetLength(long value) => throw new NotSupportedException();
+    public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
+    /// <summary>
+    /// Executes the Read operation.
+    /// 執行 Read 作業。
+    /// </summary>
     /// <inheritdoc />
-    public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+    public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
+    /// <summary>
+    /// Executes the Write operation.
+    /// 執行 Write 作業。
+    /// </summary>
     /// <inheritdoc />
     public override void Write(byte[] buffer, int offset, int count)
     {
@@ -147,6 +193,10 @@ public sealed class OdfPagedGatherWritableStream : Stream
         }
     }
 
+    /// <summary>
+    /// Executes the WriteAsync operation.
+    /// 執行 WriteAsync 作業。
+    /// </summary>
     /// <inheritdoc />
     public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
@@ -170,6 +220,10 @@ public sealed class OdfPagedGatherWritableStream : Stream
         }
     }
 
+    /// <summary>
+    /// Executes the Dispose operation.
+    /// 執行 Dispose 作業。
+    /// </summary>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {
@@ -220,7 +274,9 @@ public sealed class OdfPagedGatherWritableStream : Stream
 
         if (buffer.Length - offset < count)
         {
-            throw new ArgumentException(null, nameof(count));
+            throw new ArgumentException(
+                OdfKit.Compliance.OdfLocalizer.GetMessage("Err_ArgumentOutOfRange_Count"),
+                nameof(count));
         }
     }
 
@@ -366,3 +422,4 @@ public sealed class OdfPagedGatherWritableStream : Stream
         public int Count { get; } = count;
     }
 }
+

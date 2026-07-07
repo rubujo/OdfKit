@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfDocument API.
+/// 提供 OdfDocument API。
+/// </summary>
 
 public abstract partial class OdfDocument
 {
     #region Metadata API (meta.xml)
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定文件標題。
     /// </summary>
     public string? Title
@@ -18,6 +23,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定文件建立者。
     /// </summary>
     public string? Creator
@@ -27,6 +33,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定文件描述。
     /// </summary>
     public string? Description
@@ -36,6 +43,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定文件主旨。
     /// </summary>
     public string? Subject
@@ -45,6 +53,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定文件語言。
     /// </summary>
     public string? Language
@@ -54,6 +63,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定文件建立日期。
     /// </summary>
     public DateTime? CreationDate
@@ -63,6 +73,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定文件修改日期。
     /// </summary>
     public DateTime? ModificationDate
@@ -72,6 +83,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定文件來源範本中繼資料。
     /// </summary>
     public OdfTemplateMetadata? TemplateMetadata
@@ -90,26 +102,31 @@ public abstract partial class OdfDocument
         => OdfDocumentMetadataEngine.SetCustomProperty(MetaDom, name, value, type);
 
     /// <summary>
+    /// Executes the SetCustomProperty operation.
     /// 設定字串類型的自訂屬性
     /// </summary>
     public void SetCustomProperty(string name, string value) => SetCustomProperty(name, (object)value, "string");
 
     /// <summary>
+    /// Executes the SetCustomProperty operation.
     /// 設定整數類型的自訂屬性
     /// </summary>
     public void SetCustomProperty(string name, int value) => SetCustomProperty(name, (object)value, "float");
 
     /// <summary>
+    /// Executes the SetCustomProperty operation.
     /// 設定浮點數類型的自訂屬性
     /// </summary>
     public void SetCustomProperty(string name, double value) => SetCustomProperty(name, (object)value, "float");
 
     /// <summary>
+    /// Executes the SetCustomProperty operation.
     /// 設定布林類型的自訂屬性
     /// </summary>
     public void SetCustomProperty(string name, bool value) => SetCustomProperty(name, (object)value, "boolean");
 
     /// <summary>
+    /// Executes the SetCustomProperty operation.
     /// 設定日期類型的自訂屬性
     /// </summary>
     public void SetCustomProperty(string name, DateTime value) => SetCustomProperty(name, (object)value, "date");
@@ -141,6 +158,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the GetAllCustomProperties operation.
     /// 取得所有自訂中繼資料屬性的字典。
     /// </summary>
     /// <returns>以屬性名稱為 Key 的唯讀字典</returns>
@@ -152,6 +170,7 @@ public abstract partial class OdfDocument
     #region Statistics & Document Structure Diagnostics
 
     /// <summary>
+    /// Executes the UpdateDocumentStatistics operation.
     /// 更新文件統計中繼資料。
     /// </summary>
     protected virtual void UpdateDocumentStatistics()

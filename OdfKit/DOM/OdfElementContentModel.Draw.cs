@@ -4,11 +4,13 @@ using OdfKit.Core;
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the DrawPageElement API.
 /// 為 <see cref="DrawPageElement"/> 提供 <c>draw:page</c> 頁面 content model facade。
 /// </summary>
 public partial class DrawPageElement
 {
     /// <summary>
+    /// Provides the member member.
     /// 依文件順序列舉 <c>draw:page</c> 形狀 content choice group 中的直接子元素。
     /// </summary>
     public IEnumerable<OdfElement> ShapeContentChildElements
@@ -26,6 +28,7 @@ public partial class DrawPageElement
     }
 
     /// <summary>
+    /// Provides the member member.
     /// 依文件順序列舉 <c>draw:page</c> 中非形狀附註類直接子元素（例如 <c>presentation:notes</c>）。
     /// </summary>
     public IEnumerable<OdfElement> PageAnnotationChildElements
@@ -43,6 +46,7 @@ public partial class DrawPageElement
     }
 
     /// <summary>
+    /// Executes the AppendFrame operation.
     /// 在 <c>draw:page</c> 末尾新增框架。
     /// </summary>
     /// <param name="name">選用的框架名稱</param>
@@ -59,6 +63,7 @@ public partial class DrawPageElement
     }
 
     /// <summary>
+    /// Executes the AppendRectangle operation.
     /// 在 <c>draw:page</c> 末尾新增矩形。
     /// </summary>
     /// <param name="name">選用的形狀名稱</param>
@@ -75,6 +80,7 @@ public partial class DrawPageElement
     }
 
     /// <summary>
+    /// Executes the AppendNotes operation.
     /// 在 <c>draw:page</c> 末尾新增簡報備忘稿。
     /// </summary>
     /// <returns>新增的 <c>presentation:notes</c> 元素</returns>

@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using OdfKit.DOM;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfDocument API.
+/// 提供 OdfDocument API。
+/// </summary>
 
 public abstract partial class OdfDocument
 {
@@ -10,6 +14,7 @@ public abstract partial class OdfDocument
 
 
     /// <summary>
+    /// Executes the AdoptNode operation.
     /// 採納來源節點至目前文件，將其與原父節點脫鉤，並轉移其所有權至目前文件。
     /// </summary>
     /// <param name="node">要採納的來源節點</param>
@@ -51,6 +56,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the AdoptNode operation.
     /// 採納來源文件中的節點至目前文件，將其與原父節點脫鉤，並轉移其所有權至目前文件。
     /// </summary>
     /// <param name="sourceDocument">來源文件</param>
@@ -397,6 +403,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the AppendDocument operation.
     /// 將另一份 ODF 文件附加到目前文件。
     /// </summary>
     /// <param name="otherDoc">要附加的來源文件</param>
@@ -411,6 +418,7 @@ public abstract partial class OdfDocument
 
 
     /// <summary>
+    /// Executes the FindOrCreateChild operation.
     /// 尋找或建立指定子元素。
     /// </summary>
     /// <param name="parent">父節點</param>
@@ -432,6 +440,7 @@ public abstract partial class OdfDocument
     }
 
     /// <summary>
+    /// Executes the MergeContentNodes operation.
     /// 將來源文件的內容節點合併到目前文件。
     /// </summary>
     /// <param name="sourceDoc">來源文件</param>
@@ -440,6 +449,7 @@ public abstract partial class OdfDocument
     protected abstract void MergeContentNodes(OdfDocument sourceDoc, OdfMergeOptions options, Dictionary<string, string> renameMap);
 
     /// <summary>
+    /// Executes the RemapStylesInNodes operation.
     /// 依樣式重新命名對照表重寫節點樹中的樣式參照。
     /// </summary>
     /// <param name="node">要處理的根節點</param>

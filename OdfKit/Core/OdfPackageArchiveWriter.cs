@@ -679,16 +679,16 @@ internal static class OdfPackageArchiveWriter
         public override long Position
         {
             get => BytesWritten;
-            set => throw new NotSupportedException();
+            set => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         }
 
         public override void Flush() => inner.Flush();
 
-        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
-        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
-        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
         public override void Write(byte[] buffer, int offset, int count)
         {
@@ -739,7 +739,7 @@ internal static class OdfPackageArchiveWriter
         public override long Position
         {
             get => _length;
-            set => throw new NotSupportedException();
+            set => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
         }
 
         public byte[] ToArray()
@@ -758,11 +758,11 @@ internal static class OdfPackageArchiveWriter
         {
         }
 
-        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
-        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
-        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
         public override void Write(byte[] buffer, int offset, int count)
         {
@@ -1159,3 +1159,4 @@ internal static class OdfPackageArchiveWriter
         }
     }
 }
+

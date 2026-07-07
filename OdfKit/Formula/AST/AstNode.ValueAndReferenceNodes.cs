@@ -13,9 +13,17 @@ namespace OdfKit.Formula.AST;
 /// <param name="value">The literal value. / 常值內容。</param>
 public class LiteralNode(object value) : AstNode
 {
+    /// <summary>
+    /// Executes the Evaluate operation.
+    /// 執行 Evaluate 作業。
+    /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context) => value;
 
+    /// <summary>
+    /// Executes the Serialize operation.
+    /// 執行 Serialize 作業。
+    /// </summary>
     /// <inheritdoc />
     public override string Serialize()
     {
@@ -42,12 +50,24 @@ public class CellAddressNode(OdfCellAddress address) : AstNode
     /// </summary>
     public OdfCellAddress Address { get; } = address;
 
+    /// <summary>
+    /// Executes the Evaluate operation.
+    /// 執行 Evaluate 作業。
+    /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context) => context.GetCellValue(Address);
 
+    /// <summary>
+    /// Executes the GetRanges operation.
+    /// 執行 GetRanges 作業。
+    /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context) => [new OdfCellRange(Address, Address)];
 
+    /// <summary>
+    /// Executes the Serialize operation.
+    /// 執行 Serialize 作業。
+    /// </summary>
     /// <inheritdoc />
     public override string Serialize() => Address.ToString();
 }
@@ -65,12 +85,24 @@ public class RangeReferenceNode(OdfCellRange range) : AstNode
     /// </summary>
     public OdfCellRange Range { get; } = range;
 
+    /// <summary>
+    /// Executes the Evaluate operation.
+    /// 執行 Evaluate 作業。
+    /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context) => context.GetRangeValues(Range);
 
+    /// <summary>
+    /// Executes the GetRanges operation.
+    /// 執行 GetRanges 作業。
+    /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context) => [Range];
 
+    /// <summary>
+    /// Executes the Serialize operation.
+    /// 執行 Serialize 作業。
+    /// </summary>
     /// <inheritdoc />
     public override string Serialize() => Range.ToString();
 }
@@ -83,6 +115,10 @@ public class RangeReferenceNode(OdfCellRange range) : AstNode
 /// <param name="right">The right AST node. / 右側 AST 節點。</param>
 public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
 {
+    /// <summary>
+    /// Executes the GetRanges operation.
+    /// 執行 GetRanges 作業。
+    /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
@@ -92,6 +128,10 @@ public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
         return list;
     }
 
+    /// <summary>
+    /// Executes the Evaluate operation.
+    /// 執行 Evaluate 作業。
+    /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
@@ -104,6 +144,10 @@ public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
         return list;
     }
 
+    /// <summary>
+    /// Executes the Serialize operation.
+    /// 執行 Serialize 作業。
+    /// </summary>
     /// <inheritdoc />
     public override string Serialize() => $"{left.Serialize()}~{right.Serialize()}";
 }
@@ -116,6 +160,10 @@ public class ReferenceUnionNode(AstNode left, AstNode right) : AstNode
 /// <param name="right">The right AST node. / 右側 AST 節點。</param>
 public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
 {
+    /// <summary>
+    /// Executes the GetRanges operation.
+    /// 執行 GetRanges 作業。
+    /// </summary>
     /// <inheritdoc />
     public override List<OdfCellRange> GetRanges(IEvaluationContext context)
     {
@@ -136,6 +184,10 @@ public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
         return list;
     }
 
+    /// <summary>
+    /// Executes the Evaluate operation.
+    /// 執行 Evaluate 作業。
+    /// </summary>
     /// <inheritdoc />
     public override object Evaluate(IEvaluationContext context)
     {
@@ -156,6 +208,10 @@ public class ReferenceIntersectionNode(AstNode left, AstNode right) : AstNode
         return list;
     }
 
+    /// <summary>
+    /// Executes the Serialize operation.
+    /// 執行 Serialize 作業。
+    /// </summary>
     /// <inheritdoc />
     public override string Serialize() => $"{left.Serialize()}!{right.Serialize()}";
 }

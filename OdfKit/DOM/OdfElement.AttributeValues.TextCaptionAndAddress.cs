@@ -5,12 +5,17 @@ using OdfKit.DOM;
 using OdfKit.Styles;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Attribute Values - Text Caption & Address
 
     /// <summary>
+    /// Executes the GetTextCaptionSequenceFormatAttributeValue operation.
     /// 取得具有 schema awareness 的文字標號序列格式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -24,6 +29,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextCaptionSequenceFormatAttributeValue operation.
     /// 設定具有 schema awareness 的文字標號序列格式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -37,6 +43,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextNumberPositionAttributeValue operation.
     /// 取得具有 schema awareness 的文字編號位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -50,6 +57,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextNumberPositionAttributeValue operation.
     /// 設定具有 schema awareness 的文字編號位置屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -63,6 +71,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextPlaceholderTypeAttributeValue operation.
     /// 取得具有 schema awareness 的文字預留位置類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -76,6 +85,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextPlaceholderTypeAttributeValue operation.
     /// 設定具有 schema awareness 的文字預留位置類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -89,6 +99,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextAnimationAttributeValue operation.
     /// 取得具有 schema awareness 的文字動畫屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -102,6 +113,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextAnimationAttributeValue operation.
     /// 設定具有 schema awareness 的文字動畫屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -115,6 +127,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextAnimationDirectionAttributeValue operation.
     /// 取得具有 schema awareness 的文字動畫方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -128,6 +141,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextAnimationDirectionAttributeValue operation.
     /// 設定具有 schema awareness 的文字動畫方向屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -141,6 +155,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextKindAttributeValue operation.
     /// 取得具有 schema awareness 的文字索引專案種類屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -154,6 +169,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextKindAttributeValue operation.
     /// 設定具有 schema awareness 的文字索引專案種類屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -167,6 +183,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetPercentAttributeValue operation.
     /// 取得具有 schema awareness 的 0 到 100 百分比屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -180,6 +197,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetSignedPercentAttributeValue operation.
     /// 取得具有 schema awareness 的 -100 到 100 百分比屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -193,6 +211,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetPercentAttributeValue operation.
     /// 設定具有 schema awareness 的 0 到 100 百分比屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -212,6 +231,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetSignedPercentAttributeValue operation.
     /// 設定具有 schema awareness 的 -100 到 100 百分比屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -225,6 +245,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetCellAddressAttributeValue operation.
     /// 取得具有 schema awareness 的儲存格位址屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -238,6 +259,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetCellAddressAttributeValue operation.
     /// 設定具有 schema awareness 的儲存格位址屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -251,6 +273,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetCellRangeAddressAttributeValue operation.
     /// 取得具有 schema awareness 的儲存格範圍位址屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -264,6 +287,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetCellRangeAddressAttributeValue operation.
     /// 設定具有 schema awareness 的儲存格範圍位址屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -277,6 +301,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetCellRangeAddressListAttributeValue operation.
     /// 取得具有 schema awareness 的儲存格範圍位址清單屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -290,6 +315,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetCellRangeAddressListAttributeValue operation.
     /// 設定具有 schema awareness 的儲存格範圍位址清單屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

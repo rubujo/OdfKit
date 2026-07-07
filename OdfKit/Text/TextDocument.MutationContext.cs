@@ -27,6 +27,10 @@ internal readonly struct TextDocumentMutationContext
     internal void SetUpdateFieldsWhenOpening(bool update) =>
         TextDocumentSettingsEngine.SetUpdateFieldsWhenOpening(_document.CoreCollaborators, update);
 }
+/// <summary>
+/// Provides the TextDocument API.
+/// 提供 TextDocument API。
+/// </summary>
 
 public partial class TextDocument
 {

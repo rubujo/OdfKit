@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Spreadsheet;
 
 /// <summary>
+/// Defines values for OdfSpreadsheetChangeKind.
 /// ODS 試算表追蹤修訂的變更種類。
 /// </summary>
 public enum OdfSpreadsheetChangeKind

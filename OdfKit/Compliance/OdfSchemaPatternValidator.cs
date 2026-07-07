@@ -10,11 +10,13 @@ using System.Xml.Linq;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfSchemaPatternValidator API.
 /// 針對 XML 元素評估保留的 RELAX NG 模式樹中繼資料。
 /// </summary>
 public static partial class OdfSchemaPatternValidator
 {
     /// <summary>
+    /// Executes the ValidateElement operation.
     /// 根據具名的結構描述模式驗證 XML 元素。
     /// </summary>
     /// <param name="element">XML 元素</param>

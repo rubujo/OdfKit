@@ -5,6 +5,7 @@ using OdfKit.Core;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfExternalValidator API.
 /// 提供呼叫外部 ODF 驗證器的輔助方法。
 /// </summary>
 public static class OdfExternalValidator
@@ -15,6 +16,7 @@ public static class OdfExternalValidator
     public const string OdfValidatorJarEnvironmentVariable = "ODFKIT_ODFVALIDATOR_JAR";
 
     /// <summary>
+    /// Executes the ValidateWithOdfValidator operation.
     /// 使用 ODF Toolkit 的 ODF Validator JAR 驗證指定文件。
     /// </summary>
     /// <param name="filePath">要驗證的 ODF 文件路徑</param>
@@ -35,6 +37,7 @@ public static class OdfExternalValidator
     }
 
     /// <summary>
+    /// Executes the ValidateWithOdfValidatorAsync operation.
     /// 非同步使用 ODF Toolkit 的 ODF Validator JAR 驗證指定文件。
     /// </summary>
     /// <remarks>
@@ -81,6 +84,7 @@ public static class OdfExternalValidator
     }
 
     /// <summary>
+    /// Executes the ValidateWithCommand operation.
     /// 執行可選外部驗證命令並以結束碼判定 valid / invalid。
     /// </summary>
     /// <param name="commandPath">外部命令路徑</param>
@@ -96,6 +100,7 @@ public static class OdfExternalValidator
     }
 
     /// <summary>
+    /// Executes the ValidateWithCommandAsync operation.
     /// 非同步執行可選外部驗證命令並以結束碼判定 valid / invalid。
     /// </summary>
     /// <remarks>
@@ -290,6 +295,7 @@ internal static class OdfNativeProcessErrorMode
 }
 
 /// <summary>
+/// Provides the OdfExternalValidatorResult API.
 /// 表示外部 ODF 驗證器執行結果。
 /// </summary>
 /// <param name="exitCode">程序結束碼</param>
@@ -301,21 +307,25 @@ public sealed class OdfExternalValidatorResult(
     string standardError)
 {
     /// <summary>
+    /// Gets the ExitCode value.
     /// 取得程序結束碼。
     /// </summary>
     public int ExitCode { get; } = exitCode;
 
     /// <summary>
+    /// Gets the StandardOutput value.
     /// 取得標準輸出內容。
     /// </summary>
     public string StandardOutput { get; } = standardOutput;
 
     /// <summary>
+    /// Gets the StandardError value.
     /// 取得標準錯誤內容。
     /// </summary>
     public string StandardError { get; } = standardError;
 
     /// <summary>
+    /// Provides the IsValid member.
     /// 取得外部驗證器是否將文件分類為有效。
     /// </summary>
     public bool IsValid => ExitCode == 0;

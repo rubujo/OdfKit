@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
 
 namespace OdfKit.Drawing;
+/// <summary>
+/// Provides the OdfDrawPage API.
+/// 提供 OdfDrawPage API。
+/// </summary>
 
 public partial class OdfDrawPage
 {

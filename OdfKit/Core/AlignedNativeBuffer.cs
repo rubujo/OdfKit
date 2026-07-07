@@ -15,6 +15,7 @@ internal sealed unsafe class AlignedNativeBuffer : MemoryManager<byte>
     private bool _disposed;
 
     /// <summary>
+    /// Executes the AlignedNativeBuffer operation.
     /// 初始化 <see cref="AlignedNativeBuffer"/> 類別的新執行個體。
     /// </summary>
     /// <param name="length">緩衝區長度，單位為位元組。</param>
@@ -28,6 +29,10 @@ internal sealed unsafe class AlignedNativeBuffer : MemoryManager<byte>
         _pointer = NativeMemory.AlignedAlloc((nuint)length, (nuint)alignment);
     }
 
+    /// <summary>
+    /// Executes the GetSpan operation.
+    /// 執行 GetSpan 作業。
+    /// </summary>
     /// <inheritdoc />
     public override Span<byte> GetSpan()
     {
@@ -35,6 +40,10 @@ internal sealed unsafe class AlignedNativeBuffer : MemoryManager<byte>
         return new Span<byte>(_pointer, _length);
     }
 
+    /// <summary>
+    /// Executes the Pin operation.
+    /// 執行 Pin 作業。
+    /// </summary>
     /// <inheritdoc />
     public override MemoryHandle Pin(int elementIndex = 0)
     {
@@ -45,11 +54,19 @@ internal sealed unsafe class AlignedNativeBuffer : MemoryManager<byte>
         return new MemoryHandle((byte*)_pointer + elementIndex);
     }
 
+    /// <summary>
+    /// Executes the Unpin operation.
+    /// 執行 Unpin 作業。
+    /// </summary>
     /// <inheritdoc />
     public override void Unpin()
     {
     }
 
+    /// <summary>
+    /// Executes the Dispose operation.
+    /// 執行 Dispose 作業。
+    /// </summary>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {

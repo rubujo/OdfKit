@@ -6,6 +6,7 @@
 public readonly struct OdfLayoutBounds
 {
     /// <summary>
+    /// Executes the OdfLayoutBounds operation.
     /// 初始化 <see cref="OdfLayoutBounds"/> 結構的新執行個體。
     /// </summary>
     /// <param name="xCm">左側位置（公分）</param>
@@ -21,21 +22,25 @@ public readonly struct OdfLayoutBounds
     }
 
     /// <summary>
+    /// Gets the XCm value.
     /// 取得左側位置（公分）。
     /// </summary>
     public double XCm { get; }
 
     /// <summary>
+    /// Gets the YCm value.
     /// 取得上方位置（公分）。
     /// </summary>
     public double YCm { get; }
 
     /// <summary>
+    /// Gets the WidthCm value.
     /// 取得寬度（公分）。
     /// </summary>
     public double WidthCm { get; }
 
     /// <summary>
+    /// Gets the HeightCm value.
     /// 取得高度（公分）。
     /// </summary>
     public double HeightCm { get; }

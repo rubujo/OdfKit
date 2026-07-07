@@ -1,6 +1,10 @@
 ﻿using OdfKit.DOM;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfPackage API.
+/// 提供 OdfPackage API。
+/// </summary>
 
 public sealed partial class OdfPackage
 {
@@ -8,6 +12,7 @@ public sealed partial class OdfPackage
 
 
     /// <summary>
+    /// Executes the SanitizeMacros operation.
     /// 淨化封裝以移除所有 VBA、StarBasic 巨集指令碼、簽章以及指令碼參考。
     /// </summary>
     public void SanitizeMacros()
@@ -24,6 +29,7 @@ public sealed partial class OdfPackage
     }
 
     /// <summary>
+    /// Executes the SanitizeXmlNode operation.
     /// 遞迴淨化指定的 XML 節點，移除事件監聽器與巨集或指令碼屬性。
     /// </summary>
     /// <param name="node">要淨化的 ODF 節點</param>
@@ -38,6 +44,7 @@ public sealed partial class OdfPackage
 
 
     /// <summary>
+    /// Executes the SanitizeEntryName operation.
     /// 淨化與驗證 ZIP 專案名稱，防止目錄穿越攻擊（Zip Slip 漏洞防禦）。
     /// </summary>
     /// <param name="name">原始專案名稱</param>

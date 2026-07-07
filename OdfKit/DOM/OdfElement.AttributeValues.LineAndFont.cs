@@ -4,12 +4,17 @@ using OdfKit.DOM;
 using OdfKit.Styles;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Attribute Values - Line & Font
 
     /// <summary>
+    /// Executes the GetLineWidthAttributeValue operation.
     /// 取得具有 schema awareness 的線條寬度屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -23,6 +28,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetLineWidthAttributeValue operation.
     /// 設定具有 schema awareness 的線條寬度屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -36,6 +42,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetLineModeAttributeValue operation.
     /// 取得具有 schema awareness 的線條模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -49,6 +56,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetLineModeAttributeValue operation.
     /// 設定具有 schema awareness 的線條模式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -62,6 +70,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFontStyleAttributeValue operation.
     /// 取得具有 schema awareness 的字型樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -75,6 +84,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFontStyleAttributeValue operation.
     /// 設定具有 schema awareness 的字型樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -88,6 +98,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFontVariantAttributeValue operation.
     /// 取得具有 schema awareness 的字型變體屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -101,6 +112,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFontVariantAttributeValue operation.
     /// 設定具有 schema awareness 的字型變體屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -114,6 +126,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFontWeightAttributeValue operation.
     /// 取得具有 schema awareness 的字型粗細屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -127,6 +140,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFontWeightAttributeValue operation.
     /// 設定具有 schema awareness 的字型粗細屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -140,6 +154,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFontFamilyGenericAttributeValue operation.
     /// 取得具有 schema awareness 的通用字型家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -153,6 +168,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFontFamilyGenericAttributeValue operation.
     /// 設定具有 schema awareness 的通用字型家族屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -166,6 +182,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFontPitchAttributeValue operation.
     /// 取得具有 schema awareness 的字型間距屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -179,6 +196,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFontPitchAttributeValue operation.
     /// 設定具有 schema awareness 的字型間距屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -192,6 +210,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFontReliefAttributeValue operation.
     /// 取得具有 schema awareness 的字型浮雕屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -205,6 +224,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFontReliefAttributeValue operation.
     /// 設定具有 schema awareness 的字型浮雕屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -218,6 +238,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetFontStretchAttributeValue operation.
     /// 取得具有 schema awareness 的字型伸縮屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -231,6 +252,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetFontStretchAttributeValue operation.
     /// 設定具有 schema awareness 的字型伸縮屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

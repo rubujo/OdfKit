@@ -1,8 +1,13 @@
 ﻿namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfNode API.
+/// 提供 OdfNode API。
+/// </summary>
 
 public partial class OdfNode
 {
     /// <summary>
+    /// Executes the As operation.
     /// 嘗試將此節點轉型為指定的 typed DOM 元素型別，成功時回傳同一個節點實例。
     /// </summary>
     /// <typeparam name="TElement">目標 typed DOM 元素型別</typeparam>

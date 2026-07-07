@@ -10,6 +10,7 @@ using Microsoft.Win32.SafeHandles;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfDirectIoReadableStream API.
 /// 實作作業系統 Direct I/O 的高效唯讀資料流。
 /// </summary>
 public sealed class OdfDirectIoReadableStream : Stream
@@ -47,6 +48,7 @@ public sealed class OdfDirectIoReadableStream : Stream
     private readonly object _lock = new();
 
     /// <summary>
+    /// Executes the OdfDirectIoReadableStream operation.
     /// 初始化 <see cref="OdfDirectIoReadableStream"/> 類別的新執行個體。
     /// </summary>
     /// <param name="filePath">檔案路徑。</param>
@@ -101,18 +103,38 @@ public sealed class OdfDirectIoReadableStream : Stream
         }
     }
 
+    /// <summary>
+    /// Provides the CanRead member.
+    /// 提供 CanRead 成員。
+    /// </summary>
     /// <inheritdoc />
     public override bool CanRead => !_isDisposed;
 
+    /// <summary>
+    /// Provides the CanSeek member.
+    /// 提供 CanSeek 成員。
+    /// </summary>
     /// <inheritdoc />
     public override bool CanSeek => true;
 
+    /// <summary>
+    /// Provides the CanWrite member.
+    /// 提供 CanWrite 成員。
+    /// </summary>
     /// <inheritdoc />
     public override bool CanWrite => false;
 
+    /// <summary>
+    /// Provides the Length member.
+    /// 提供 Length 成員。
+    /// </summary>
     /// <inheritdoc />
     public override long Length => _totalLength;
 
+    /// <summary>
+    /// Provides the member member.
+    /// 提供 member 成員。
+    /// </summary>
     /// <inheritdoc />
     public override long Position
     {
@@ -120,11 +142,19 @@ public sealed class OdfDirectIoReadableStream : Stream
         set => Seek(value, SeekOrigin.Begin);
     }
 
+    /// <summary>
+    /// Executes the Flush operation.
+    /// 執行 Flush 作業。
+    /// </summary>
     /// <inheritdoc />
     public override void Flush()
     {
     }
 
+    /// <summary>
+    /// Executes the Seek operation.
+    /// 執行 Seek 作業。
+    /// </summary>
     /// <inheritdoc />
     public override long Seek(long offset, SeekOrigin origin)
     {
@@ -136,7 +166,9 @@ public sealed class OdfDirectIoReadableStream : Stream
             SeekOrigin.Begin => offset,
             SeekOrigin.Current => _currentPosition + offset,
             SeekOrigin.End => _totalLength + offset,
-            _ => throw new ArgumentException(null, nameof(origin))
+            _ => throw new ArgumentException(
+                OdfKit.Compliance.OdfLocalizer.GetMessage("Err_ArgumentOutOfRange_Origin"),
+                nameof(origin))
         };
 
         if (target < 0 || target > _totalLength)
@@ -157,9 +189,17 @@ public sealed class OdfDirectIoReadableStream : Stream
         return _currentPosition;
     }
 
+    /// <summary>
+    /// Executes the SetLength operation.
+    /// 執行 SetLength 作業。
+    /// </summary>
     /// <inheritdoc />
-    public override void SetLength(long value) => throw new NotSupportedException();
+    public override void SetLength(long value) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
+    /// <summary>
+    /// Executes the Read operation.
+    /// 執行 Read 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int Read(byte[] buffer, int offset, int count)
     {
@@ -426,9 +466,17 @@ public sealed class OdfDirectIoReadableStream : Stream
         }
     }
 
+    /// <summary>
+    /// Executes the Write operation.
+    /// 執行 Write 作業。
+    /// </summary>
     /// <inheritdoc />
-    public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+    public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException(OdfKit.Compliance.OdfLocalizer.GetMessage("Err_StreamOperation_NotSupported"));
 
+    /// <summary>
+    /// Executes the ReadAsync operation.
+    /// 執行 ReadAsync 作業。
+    /// </summary>
     /// <inheritdoc />
     /// <remarks>
     /// Completes synchronously when the requested data is already prefetched; otherwise the blocking read is dispatched to the thread pool so the caller thread is never blocked.
@@ -462,6 +510,10 @@ public sealed class OdfDirectIoReadableStream : Stream
     }
 
 #if NET10_0_OR_GREATER
+    /// <summary>
+    /// Executes the Read operation.
+    /// 執行 Read 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int Read(Span<byte> buffer)
     {
@@ -485,6 +537,10 @@ public sealed class OdfDirectIoReadableStream : Stream
         return ReadFromPrefetchLoop(buffer);
     }
 
+    /// <summary>
+    /// Executes the ReadAsync operation.
+    /// 執行 ReadAsync 作業。
+    /// </summary>
     /// <inheritdoc />
     /// <remarks>
     /// Completes synchronously when the requested data is already prefetched; otherwise the blocking read is dispatched to the thread pool so the caller thread is never blocked.
@@ -513,6 +569,10 @@ public sealed class OdfDirectIoReadableStream : Stream
     }
 #endif
 
+    /// <summary>
+    /// Executes the Dispose operation.
+    /// 執行 Dispose 作業。
+    /// </summary>
     /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {
@@ -558,3 +618,4 @@ public sealed class OdfDirectIoReadableStream : Stream
         base.Dispose(disposing);
     }
 }
+

@@ -3,6 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace OdfKit.Spreadsheet;
+/// <summary>
+/// Provides the OdsStreamWriter API.
+/// 提供 OdsStreamWriter API。
+/// </summary>
 
 public partial class OdsStreamWriter
 {

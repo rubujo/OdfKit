@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfPresentationTransitionStyle.
 /// 表示 ODF schema 中 <c>presentation:transition-style</c> 的轉場樣式 token。
 /// </summary>
 public enum OdfPresentationTransitionStyle

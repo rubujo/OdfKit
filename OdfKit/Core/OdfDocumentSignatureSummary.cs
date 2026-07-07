@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfDocumentSignatureSummary API.
 /// 表示文件層數位簽章專案的摘要狀態。
 /// </summary>
 public sealed class OdfDocumentSignatureSummary
@@ -20,31 +21,37 @@ public sealed class OdfDocumentSignatureSummary
     }
 
     /// <summary>
+    /// Gets the SignatureEntryPath value.
     /// 取得文件簽章專案在 ODF 封裝中的路徑。
     /// </summary>
     public string SignatureEntryPath { get; }
 
     /// <summary>
+    /// Gets a value indicating the HasSignatureEntry state.
     /// 取得一個值，指出封裝是否包含文件簽章專案。
     /// </summary>
     public bool HasSignatureEntry { get; }
 
     /// <summary>
+    /// Gets a value indicating the IsSignatureEntryReadable state.
     /// 取得一個值，指出文件簽章專案是否可用安全 XML 讀取器解析。
     /// </summary>
     public bool IsSignatureEntryReadable { get; }
 
     /// <summary>
+    /// Gets the SignatureCount value.
     /// 取得文件簽章專案內的 XML 數位簽章數量。
     /// </summary>
     public int SignatureCount { get; }
 
     /// <summary>
+    /// Provides the IsSigned member.
     /// 取得一個值，指出文件是否至少包含一個可辨識的 XML 數位簽章。
     /// </summary>
     public bool IsSigned => SignatureCount > 0;
 
     /// <summary>
+    /// Gets the ErrorMessage value.
     /// 取得讀取文件簽章專案時的錯誤訊息；若可正常讀取則為 <see langword="null"/>。
     /// </summary>
     public string? ErrorMessage { get; }

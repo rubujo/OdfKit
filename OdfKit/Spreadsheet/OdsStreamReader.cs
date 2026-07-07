@@ -10,10 +10,8 @@ using OdfKit.Compliance;
 namespace OdfKit.Spreadsheet;
 
 /// <summary>
-/// Reads an ODS spreadsheet row by row with low-memory streaming for large data sets.
-/// The read process uses a SAX-style <see cref="XmlReader"/>, keeping memory usage far below the DOM path.
+/// Provides the OdsStreamReader API.
 /// 以低記憶體流式方式逐列讀取 ODS 試算表，適用於大型資料集。
-/// 整個讀取過程使用 SAX 風格 XmlReader，記憶體佔用遠低於 DOM 讀取路徑。
 /// </summary>
 public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
 {
@@ -369,6 +367,10 @@ public sealed partial class OdsStreamReader : System.Data.Common.DbDataReader
         MaxCharactersInDocument = OdfLoadOptions.Default.MaxXmlCharactersInDocument,
     };
 
+    /// <summary>
+    /// Executes the Dispose operation.
+    /// 執行 Dispose 作業。
+    /// </summary>
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {

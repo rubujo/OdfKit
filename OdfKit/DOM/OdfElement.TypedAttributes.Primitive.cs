@@ -1,12 +1,17 @@
 ﻿using OdfKit.Compliance;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Typed Attribute Accessors - Primitive
 
     /// <summary>
+    /// Executes the GetInt32AttributeValue operation.
     /// 取得具有 schema awareness 的 32 位元整數屬性值。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -18,6 +23,7 @@ public partial class OdfElement
         => OdfElementPrimitiveAttributeAccess.GetInt32(GetAttributeValue(localName, namespaceUri, version), defaultValue);
 
     /// <summary>
+    /// Executes the GetNullableInt32AttributeValue operation.
     /// 取得具有 schema awareness 的可空 32 位元整數屬性值。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -28,6 +34,7 @@ public partial class OdfElement
         => OdfElementPrimitiveAttributeAccess.GetNullableInt32(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetInt32AttributeValue operation.
     /// 設定具有 schema awareness 的 32 位元整數屬性值。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -39,6 +46,7 @@ public partial class OdfElement
         => SetAttributeValue(localName, namespaceUri, OdfElementPrimitiveAttributeAccess.FormatInt32(value), prefix, version);
 
     /// <summary>
+    /// Executes the GetBooleanAttributeValue operation.
     /// 取得具有 schema awareness 的布林屬性值。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -49,6 +57,7 @@ public partial class OdfElement
         => OdfElementPrimitiveAttributeAccess.GetBoolean(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetBooleanAttributeValue operation.
     /// 設定具有 schema awareness 的布林屬性值。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -60,6 +69,7 @@ public partial class OdfElement
         => SetAttributeValue(localName, namespaceUri, OdfElementPrimitiveAttributeAccess.FormatBoolean(value), prefix, version);
 
     /// <summary>
+    /// Executes the GetDecimalAttributeValue operation.
     /// 取得具有 schema awareness 的十進位數值屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -70,6 +80,7 @@ public partial class OdfElement
         => OdfElementPrimitiveAttributeAccess.GetDecimal(GetAttributeValue(localName, namespaceUri, version));
 
     /// <summary>
+    /// Executes the SetDecimalAttributeValue operation.
     /// 設定具有 schema awareness 的十進位數值屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

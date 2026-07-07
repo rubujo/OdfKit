@@ -4,6 +4,10 @@ using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace OdfKit.Compliance;
+/// <summary>
+/// Provides the OdfSchemaPatternValidator API.
+/// 提供 OdfSchemaPatternValidator API。
+/// </summary>
 
 public static partial class OdfSchemaPatternValidator
 {

@@ -3,11 +3,13 @@
 namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OfficeTextElement API.
 /// 為 <see cref="OfficeTextElement"/> 提供 <c>office:text</c> 區塊層級 content model facade。
 /// </summary>
 public partial class OfficeTextElement
 {
     /// <summary>
+    /// Provides the member member.
     /// 依文件順序列舉 <c>office:text</c> 區塊層級 content choice group 中的直接子元素。
     /// </summary>
     public IEnumerable<OdfElement> BlockContentChildElements
@@ -25,6 +27,7 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
+    /// Executes the AppendParagraph operation.
     /// 在 <c>office:text</c> 末尾新增段落。
     /// </summary>
     /// <param name="text">段落文字內容</param>
@@ -41,6 +44,7 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
+    /// Executes the AppendHeading operation.
     /// 在 <c>office:text</c> 末尾新增標題。
     /// </summary>
     /// <param name="text">標題文字內容</param>
@@ -55,6 +59,7 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
+    /// Executes the AppendList operation.
     /// 在 <c>office:text</c> 末尾新增專案清單。
     /// </summary>
     /// <param name="styleName">選用的清單樣式名稱</param>
@@ -71,6 +76,7 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
+    /// Executes the AppendTable operation.
     /// 在 <c>office:text</c> 末尾新增表格。
     /// </summary>
     /// <param name="name">選用的表格名稱</param>
@@ -87,6 +93,7 @@ public partial class OfficeTextElement
     }
 
     /// <summary>
+    /// Executes the AppendSection operation.
     /// 在 <c>office:text</c> 末尾新增章節。
     /// </summary>
     /// <param name="name">章節名稱</param>

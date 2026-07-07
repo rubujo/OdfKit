@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfSchemaSet API.
 /// 代表單一 ODF 版本的確定性結構描述中繼資料。
 /// </summary>
 public sealed class OdfSchemaSet
@@ -15,6 +16,7 @@ public sealed class OdfSchemaSet
     private readonly IReadOnlyDictionary<string, OdfSchemaPatternDefinition> _patterns;
 
     /// <summary>
+    /// Executes the OdfSchemaSet operation.
     /// 初始化結構描述中繼資料集的新執行個體。
     /// </summary>
     /// <param name="version">ODF 版本</param>
@@ -64,41 +66,49 @@ public sealed class OdfSchemaSet
     }
 
     /// <summary>
+    /// Gets the Version value.
     /// 取得此中繼資料集代表的 ODF 版本。
     /// </summary>
     public OdfVersion Version { get; }
 
     /// <summary>
+    /// Gets the SourceUrl value.
     /// 取得此結構描述中繼資料集所使用的官方來源 URL。
     /// </summary>
     public Uri SourceUrl { get; }
 
     /// <summary>
+    /// Gets the SourceDate value.
     /// 取得作為 ISO 日期字串的來源日期。
     /// </summary>
     public string SourceDate { get; }
 
     /// <summary>
+    /// Provides the Elements member.
     /// 取得所有元素定義，以命名空間 URI 與區域名稱作為索引鍵。
     /// </summary>
     public IReadOnlyDictionary<OdfQualifiedName, OdfElementDefinition> Elements => _elements;
 
     /// <summary>
+    /// Provides the Attributes member.
     /// 取得所有屬性定義，以命名空間 URI 與區域名稱作為索引鍵。
     /// </summary>
     public IReadOnlyDictionary<OdfQualifiedName, OdfAttributeDefinition> Attributes => _attributes;
 
     /// <summary>
+    /// Provides the NameClasses member.
     /// 取得從來源結構描述保留的 RELAX NG 名稱類別。
     /// </summary>
     public IReadOnlyList<OdfSchemaNameClass> NameClasses => _nameClasses;
 
     /// <summary>
+    /// Provides the Patterns member.
     /// 取得具名 RELAX NG 模式樹，以定義名稱作為索引鍵。
     /// </summary>
     public IReadOnlyDictionary<string, OdfSchemaPatternDefinition> Patterns => _patterns;
 
     /// <summary>
+    /// Executes the MergeWith operation.
     /// 藉由合併此中繼資料與另一個結構描述集，建立新的結構描述集。
     /// </summary>
     /// <param name="additional">要合併的額外結構描述集</param>
@@ -165,6 +175,7 @@ public sealed class OdfSchemaSet
     }
 
     /// <summary>
+    /// Executes the FindElement operation.
     /// 根據命名空間 URI 與區域名稱尋找元素定義。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>
@@ -178,6 +189,7 @@ public sealed class OdfSchemaSet
     }
 
     /// <summary>
+    /// Executes the ContainsElement operation.
     /// 傳回此中繼資料集中是否存在該元素。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>
@@ -186,6 +198,7 @@ public sealed class OdfSchemaSet
     public bool ContainsElement(string namespaceUri, string localName) => FindElement(namespaceUri, localName) is not null;
 
     /// <summary>
+    /// Executes the FindAttribute operation.
     /// 根據命名空間 URI 與區域名稱尋找屬性定義。
     /// </summary>
     /// <param name="namespaceUri">命名空間 URI</param>
@@ -199,6 +212,7 @@ public sealed class OdfSchemaSet
     }
 
     /// <summary>
+    /// Executes the FindPattern operation.
     /// 根據定義名稱尋找具名的 RELAX NG 模式樹。
     /// </summary>
     /// <param name="name">定義名稱</param>
@@ -237,6 +251,7 @@ public sealed class OdfSchemaSet
     }
 
     /// <summary>
+    /// Executes the IsNameAllowedByNameClasses operation.
     /// 傳回保留的扁平名稱類別集是否允許該限定名稱。
     /// </summary>
     /// <remarks>

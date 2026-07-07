@@ -3,6 +3,7 @@
 #region Visual Tokens - Layout
 
 /// <summary>
+/// Defines values for OdfFoTextTransform.
 /// 表示 ODF schema 中 <c>fo:text-transform</c> 的大小寫轉換 token。
 /// </summary>
 public enum OdfFoTextTransform
@@ -29,6 +30,7 @@ public enum OdfFoTextTransform
 }
 
 /// <summary>
+/// Defines values for OdfFoTextAlign.
 /// 表示 ODF schema 中 <c>fo:text-align</c> 的文字對齊 token。
 /// </summary>
 public enum OdfFoTextAlign
@@ -65,6 +67,7 @@ public enum OdfFoTextAlign
 }
 
 /// <summary>
+/// Defines values for OdfStyleTextRotationScale.
 /// 表示 ODF schema 中 <c>style:text-rotation-scale</c> 的文字旋轉縮放 token。
 /// </summary>
 public enum OdfStyleTextRotationScale
@@ -81,6 +84,7 @@ public enum OdfStyleTextRotationScale
 }
 
 /// <summary>
+/// Defines values for OdfStyleTextCombine.
 /// 表示 ODF schema 中 <c>style:text-combine</c> 的文字組合 token。
 /// </summary>
 public enum OdfStyleTextCombine
@@ -102,6 +106,7 @@ public enum OdfStyleTextCombine
 }
 
 /// <summary>
+/// Defines values for OdfDrawFill.
 /// 表示 ODF schema 中 <c>draw:fill</c> 的繪圖填滿 token。
 /// </summary>
 public enum OdfDrawFill
@@ -133,6 +138,7 @@ public enum OdfDrawFill
 }
 
 /// <summary>
+/// Defines values for OdfSmilFill.
 /// 表示 ODF schema 中 <c>smil:fill</c> 的動畫填滿行為 token。
 /// </summary>
 public enum OdfSmilFill
@@ -169,6 +175,7 @@ public enum OdfSmilFill
 }
 
 /// <summary>
+/// Defines values for OdfDrawFillImageRefPoint.
 /// 表示 ODF schema 中 <c>draw:fill-image-ref-point</c> 的填滿圖片參照點 token。
 /// </summary>
 public enum OdfDrawFillImageRefPoint
@@ -220,6 +227,7 @@ public enum OdfDrawFillImageRefPoint
 }
 
 /// <summary>
+/// Defines values for OdfDrawColorMode.
 /// 表示 ODF schema 中 <c>draw:color-mode</c> 的色彩模式 token。
 /// </summary>
 public enum OdfDrawColorMode
@@ -246,6 +254,7 @@ public enum OdfDrawColorMode
 }
 
 /// <summary>
+/// Defines values for OdfStyleVerticalAlign.
 /// 表示 ODF schema 中 <c>style:vertical-align</c> 的垂直對齊 token。
 /// </summary>
 public enum OdfStyleVerticalAlign
@@ -282,6 +291,7 @@ public enum OdfStyleVerticalAlign
 }
 
 /// <summary>
+/// Defines values for OdfStyleVerticalPos.
 /// 表示 ODF schema 中 <c>style:vertical-pos</c> 的垂直位置 token。
 /// </summary>
 public enum OdfStyleVerticalPos
@@ -313,6 +323,7 @@ public enum OdfStyleVerticalPos
 }
 
 /// <summary>
+/// Defines values for OdfStyleVerticalRel.
 /// 表示 ODF schema 中 <c>style:vertical-rel</c> 的垂直相對基準 token。
 /// </summary>
 public enum OdfStyleVerticalRel
@@ -379,6 +390,7 @@ public enum OdfStyleVerticalRel
 }
 
 /// <summary>
+/// Defines values for OdfStyleHorizontalPos.
 /// 表示 ODF schema 中 <c>style:horizontal-pos</c> 的水平位置 token。
 /// </summary>
 public enum OdfStyleHorizontalPos

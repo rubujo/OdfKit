@@ -5,51 +5,61 @@ using OdfKit.Styles;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the ComputedStyle API.
 /// 表示元素經過層疊繼承解析後的實質最終樣式。
 /// </summary>
 public sealed class ComputedStyle
 {
     /// <summary>
+    /// Gets the FontName value.
     /// 取得字型名稱。
     /// </summary>
     public string? FontName { get; init; }
 
     /// <summary>
+    /// Gets the FontSize value.
     /// 取得字型大小（例如 "12pt"）。
     /// </summary>
     public string? FontSize { get; init; }
 
     /// <summary>
+    /// Gets a value indicating the Bold state.
     /// 取得一個值，指出字型是否為粗體。
     /// </summary>
     public bool Bold { get; init; }
 
     /// <summary>
+    /// Gets a value indicating the Italic state.
     /// 取得一個值，指出字型是否為斜體。
     /// </summary>
     public bool Italic { get; init; }
 
     /// <summary>
+    /// Gets a value indicating the Underline state.
     /// 取得一個值，指出字型是否具有底線。
     /// </summary>
     public bool Underline { get; init; }
 
     /// <summary>
+    /// Gets the Color value.
     /// 取得文字顏色（RGB 十六進位字串，例如 "#ff0000"）。
     /// </summary>
     public string? Color { get; init; }
 
     /// <summary>
+    /// Gets the BackgroundColor value.
     /// 取得背景顏色。
     /// </summary>
     public string? BackgroundColor { get; init; }
 
     /// <summary>
+    /// Gets the TextAlignment value.
     /// 取得文字對齊方式。
     /// </summary>
     public string? TextAlignment { get; init; }
 
     /// <summary>
+    /// Executes the Resolve operation.
     /// 從指定的 OdfElement 解析實質最終樣式。
     /// </summary>
     /// <param name="element">要解析的 ODF 元素</param>

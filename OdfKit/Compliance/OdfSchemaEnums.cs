@@ -3,6 +3,7 @@
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Defines values for OdfSchemaElementRole.
 /// 識別 ODF 元素在低階驗證期間所扮演的結構描述角色。
 /// </summary>
 public enum OdfSchemaElementRole
@@ -24,6 +25,7 @@ public enum OdfSchemaElementRole
 }
 
 /// <summary>
+/// Defines values for OdfSchemaNameClassKind.
 /// 識別在結構描述中保留的 RELAX NG 名稱類別種類。
 /// </summary>
 public enum OdfSchemaNameClassKind
@@ -45,6 +47,7 @@ public enum OdfSchemaNameClassKind
 }
 
 /// <summary>
+/// Defines values for OdfSchemaPatternNodeKind.
 /// 識別在結構描述中保留的 RELAX NG 模式節點種類。
 /// </summary>
 public enum OdfSchemaPatternNodeKind

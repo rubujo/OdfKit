@@ -12,11 +12,13 @@ namespace OdfKit.Styles;
 public readonly struct DateTimeToken(string token, bool isLiteral)
 {
     /// <summary>
+    /// Gets the Token value.
     /// 取得格式化語彙基元字串。
     /// </summary>
     public string Token { get; } = token;
 
     /// <summary>
+    /// Gets a value indicating the IsLiteral state.
     /// 取得一個值，指出該語彙基元是否為字面值。
     /// </summary>
     public bool IsLiteral { get; } = isLiteral;

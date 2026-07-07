@@ -7,6 +7,7 @@ using OdfKit.DOM;
 namespace OdfKit.Styles;
 
 /// <summary>
+/// Provides the OdfStyleEngine API.
 /// ODF 樣式引擎，負責樣式繼承、解析與去重管理。
 /// </summary>
 /// <remarks>
@@ -22,6 +23,7 @@ public partial class OdfStyleEngine
     private readonly OdfNode _stylesRoot;
 
     /// <summary>
+    /// Provides the member member.
     /// 樣式變更時發生的事件。
     /// </summary>
     public Action<OdfNode, string>? OnStyleChanging;
@@ -38,6 +40,7 @@ public partial class OdfStyleEngine
     private readonly Dictionary<OdfNode, Dictionary<OdfAttributeName, string?>> _directStyleProperties = new();
 
     /// <summary>
+    /// Executes the OdfStyleEngine operation.
     /// 初始化 <see cref="OdfStyleEngine"/> 類別的新執行個體。
     /// </summary>
     /// <param name="contentRoot">內容 XML 的根節點</param>
@@ -51,6 +54,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
+    /// Executes the RebuildStyleIndex operation.
     /// 重新建構樣式索引。
     /// </summary>
     public void RebuildStyleIndex()
@@ -137,6 +141,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
+    /// Executes the StyleExists operation.
     /// 判斷指定的樣式是否存在。
     /// </summary>
     /// <param name="styleName">樣式名稱</param>
@@ -147,6 +152,7 @@ public partial class OdfStyleEngine
     }
 
     /// <summary>
+    /// Executes the GetStyleProperty operation.
     /// 取得指定的樣式屬性，自動支援層級回溯與循環繼承保護。
     /// </summary>
     /// <param name="styleName">樣式名稱</param>

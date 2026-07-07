@@ -3,12 +3,17 @@ using OdfKit.Compliance;
 using OdfKit.DOM;
 
 namespace OdfKit.DOM;
+/// <summary>
+/// Provides the OdfElement API.
+/// 提供 OdfElement API。
+/// </summary>
 
 public partial class OdfElement
 {
     #region Attribute Values - Geometry, Locale & Line
 
     /// <summary>
+    /// Executes the GetVector3DAttributeValue operation.
     /// 取得具有 schema awareness 的三維向量屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -22,6 +27,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetVector3DAttributeValue operation.
     /// 設定具有 schema awareness 的三維向量屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -35,6 +41,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetPoint3DAttributeValue operation.
     /// 取得具有 schema awareness 的三維點屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -48,6 +55,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetPoint3DAttributeValue operation.
     /// 設定具有 schema awareness 的三維點屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -61,6 +69,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetPointListAttributeValue operation.
     /// 取得具有 schema awareness 的二維座標清單屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -74,6 +83,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetPointListAttributeValue operation.
     /// 設定具有 schema awareness 的二維座標清單屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -87,6 +97,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetXmlNameAttributeValue operation.
     /// 取得具有 schema awareness 的 XML 名稱屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -100,6 +111,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetXmlNameAttributeValue operation.
     /// 設定具有 schema awareness 的 XML 名稱屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -113,6 +125,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetLanguageCodeAttributeValue operation.
     /// 取得具有 schema awareness 的語言代碼屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -126,6 +139,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetLanguageCodeAttributeValue operation.
     /// 設定具有 schema awareness 的語言代碼屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -139,6 +153,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetCountryCodeAttributeValue operation.
     /// 取得具有 schema awareness 的國別代碼屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -152,6 +167,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetCountryCodeAttributeValue operation.
     /// 設定具有 schema awareness 的國別代碼屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -165,6 +181,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetScriptCodeAttributeValue operation.
     /// 取得具有 schema awareness 的文字系統代碼屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -178,6 +195,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetScriptCodeAttributeValue operation.
     /// 設定具有 schema awareness 的文字系統代碼屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -191,6 +209,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetLanguageTagAttributeValue operation.
     /// 取得具有 schema awareness 的語言標記屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -204,6 +223,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetLanguageTagAttributeValue operation.
     /// 設定具有 schema awareness 的語言標記屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -217,6 +237,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetNamespacedTokenAttributeValue operation.
     /// 取得具有 schema awareness 的命名空間 token 屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -230,6 +251,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetNamespacedTokenAttributeValue operation.
     /// 設定具有 schema awareness 的命名空間 token 屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -243,6 +265,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetCharacterAttributeValue operation.
     /// 取得具有 schema awareness 的單一字元屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -256,6 +279,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetCharacterAttributeValue operation.
     /// 設定具有 schema awareness 的單一字元屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -269,6 +293,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTextEncodingAttributeValue operation.
     /// 取得具有 schema awareness 的文字編碼名稱屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -282,6 +307,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTextEncodingAttributeValue operation.
     /// 設定具有 schema awareness 的文字編碼名稱屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -295,6 +321,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetTargetFrameNameAttributeValue operation.
     /// 取得具有 schema awareness 的目標框架名稱屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -308,6 +335,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetTargetFrameNameAttributeValue operation.
     /// 設定具有 schema awareness 的目標框架名稱屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -321,6 +349,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetLineStyleAttributeValue operation.
     /// 取得具有 schema awareness 的線條樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -334,6 +363,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetLineStyleAttributeValue operation.
     /// 設定具有 schema awareness 的線條樣式屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -347,6 +377,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the GetLineTypeAttributeValue operation.
     /// 取得具有 schema awareness 的線條類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>
@@ -360,6 +391,7 @@ public partial class OdfElement
     }
 
     /// <summary>
+    /// Executes the SetLineTypeAttributeValue operation.
     /// 設定具有 schema awareness 的線條類型屬性。
     /// </summary>
     /// <param name="localName">屬性局部名稱</param>

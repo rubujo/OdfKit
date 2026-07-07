@@ -10,11 +10,13 @@ using OdfKit.Core;
 namespace OdfKit.Compliance;
 
 /// <summary>
+/// Provides the OdfFlatDocumentValidator API.
 /// 執行單一 XML ODF 文件的低階驗證。
 /// </summary>
 public static class OdfFlatDocumentValidator
 {
     /// <summary>
+    /// Executes the Validate operation.
     /// 驗證單一 XML ODF 文件串流是否符合根層級規則與選用的設定檔。
     /// </summary>
     /// <param name="stream">文件串流</param>

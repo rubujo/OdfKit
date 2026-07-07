@@ -5,6 +5,7 @@ using OdfKit.DOM;
 namespace OdfKit.Styles;
 
 /// <summary>
+/// Defines values for FormatType.
 /// 表示格式類型的列舉。
 /// </summary>
 public enum FormatType

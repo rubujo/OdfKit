@@ -53,6 +53,10 @@ public sealed class UnoserverRestBackend : ILibreOfficeConversionBackend
         return new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(60) };
     }
 
+    /// <summary>
+    /// Executes the ConvertAsync operation.
+    /// 執行 ConvertAsync 作業。
+    /// </summary>
     /// <inheritdoc />
     public async Task<Stream> ConvertAsync(Stream input, string inputExtension, string convertTo, CancellationToken ct)
     {

@@ -15,18 +15,27 @@ using Org.BouncyCastle.Security;
 using OdfKit.Compliance;
 namespace OdfKit.Core;
 
+#if !NETSTANDARD2_0
 /// <summary>
+/// Provides the BouncyCastle-backed OpenPGP session key provider.
 /// 以 BouncyCastle.Cryptography 為底層，實作 ODF 1.3 OpenPGP Session Key 加解密。
-/// 支援 RSA（PKCS#1 v1.5 盲簽）、ElGamal 及 ECDH（X25519 / Curve25519 及傳統 EC 曲線）公開金鑰演算法。
 /// </summary>
 /// <remarks>
 /// Native AOT：BouncyCastle 演算法實作依賴執行期組裝探索，裁剪時須保留完整 <c>Org.BouncyCastle</c> 組件或改用靜態註冊表。
 /// </remarks>
-#if !NETSTANDARD2_0
 [RequiresUnreferencedCode("BouncyCastle OpenPGP 路徑尚未完成 trimming 相容；Native AOT 需保留 Org.BouncyCastle 組件。")]
 [RequiresDynamicCode("BouncyCastle 密碼學實作依賴動態程式碼產生。")]
-#endif
 public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
+#else
+/// <summary>
+/// Provides the BouncyCastle-backed OpenPGP session key provider.
+/// 以 BouncyCastle.Cryptography 為底層，實作 ODF 1.3 OpenPGP Session Key 加解密。
+/// </summary>
+/// <remarks>
+/// Native AOT：BouncyCastle 演算法實作依賴執行期組裝探索，裁剪時須保留完整 <c>Org.BouncyCastle</c> 組件或改用靜態註冊表。
+/// </remarks>
+public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvider
+#endif
 {
     private readonly byte[]? _secretKeyRingData;
     private readonly Func<long, char[]>? _passphraseProvider;
@@ -47,11 +56,13 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         };
 
     /// <summary>
+    /// Executes the OdfBouncyCastleOpenPgpProvider operation.
     /// 建立僅支援加密（無法解密）的提供者實例。
     /// </summary>
     public OdfBouncyCastleOpenPgpProvider() { }
 
     /// <summary>
+    /// Executes the OdfBouncyCastleOpenPgpProvider operation.
     /// 建立同時支援加密與解密的提供者實例。
     /// </summary>
     /// <param name="secretKeyRingData">
@@ -67,6 +78,10 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         _passphraseProvider = passphraseProvider ?? throw new ArgumentNullException(nameof(passphraseProvider));
     }
 
+    /// <summary>
+    /// Executes the EncryptSessionKey operation.
+    /// 執行 EncryptSessionKey 作業。
+    /// </summary>
     /// <inheritdoc />
     /// <exception cref="ArgumentNullException"><paramref name="sessionKey"/> 或 <paramref name="recipient"/> 為 null</exception>
     /// <exception cref="ArgumentException">收件人未提供公鑰資料</exception>
@@ -89,6 +104,10 @@ public sealed partial class OdfBouncyCastleOpenPgpProvider : IOdfOpenPgpKeyProvi
         return pkt.GetEncoded();
     }
 
+    /// <summary>
+    /// Executes the DecryptSessionKey operation.
+    /// 執行 DecryptSessionKey 作業。
+    /// </summary>
     /// <inheritdoc />
     /// <exception cref="InvalidOperationException">此實例以純加密模式建立，無法執行解密</exception>
     /// <exception cref="ArgumentNullException"><paramref name="encryptedKeyPacket"/> 為 null</exception>

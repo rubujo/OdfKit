@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfDr3dProjection.
 /// 表示 ODF schema 中 <c>dr3d:projection</c> 的 3D 投影 token。
 /// </summary>
 public enum OdfDr3dProjection
@@ -17,6 +18,7 @@ public enum OdfDr3dProjection
 }
 
 /// <summary>
+/// Defines values for OdfDr3dShadeMode.
 /// 表示 ODF schema 中 <c>dr3d:shade-mode</c> 的 3D 著色模式 token。
 /// </summary>
 public enum OdfDr3dShadeMode
@@ -43,6 +45,7 @@ public enum OdfDr3dShadeMode
 }
 
 /// <summary>
+/// Defines values for OdfSvgFillRule.
 /// 表示 ODF schema 中 <c>svg:fill-rule</c> 的填滿規則 token。
 /// </summary>
 public enum OdfSvgFillRule
@@ -59,6 +62,7 @@ public enum OdfSvgFillRule
 }
 
 /// <summary>
+/// Defines values for OdfTableBorderModel.
 /// 表示 ODF schema 中 <c>table:border-model</c> 的表格邊框模型 token。
 /// </summary>
 public enum OdfTableBorderModel

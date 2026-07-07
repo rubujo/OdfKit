@@ -535,14 +535,8 @@ public sealed class TextWebDocument : TextDocument
         Ensure(await OdfDocumentFactory.LoadDocumentAsync(stream, fileName, cancellationToken).ConfigureAwait(false));
 
     /// <summary>
-    /// Creates a new OTH web template document from an existing ODT text document, fully preserving its content, styles, and master pages.
-    /// Because the OTH content model is identical to ODT (differing only in MIME type and purpose marker, commonly used for downstream HTML export
-    /// workflows such as <c>OdfHtmlExporter</c> in <c>OdfKit.Extensions.Html</c>), this reuses the
-    /// shared kind/MIME substitution base implementation behind <c>CreateTemplateFromDocumentInternal</c>.
+    /// Executes the CreateFromDocument operation.
     /// 從現有的 ODT 文字文件建立新的 OTH 網頁範本文件，完整保留其內容、樣式與母片頁面。
-    /// 因 OTH 內容模型與 ODT 完全相同（僅 MIME 類型與用途標記不同，常用於後續 HTML 匯出
-    /// 工作流，例如 <c>OdfKit.Extensions.Html</c> 的 <c>OdfHtmlExporter</c>），故重用
-    /// 與 <c>CreateFromTemplateInternal</c> 共用的種類／MIME 置換基礎實作。
     /// </summary>
     /// <param name="document">The text document used as the web template content source. / 作為網頁範本內容來源的文字文件。</param>
     /// <returns>The created <see cref="TextWebDocument"/> instance. / 建立完成的 <see cref="TextWebDocument"/> 執行個體。</returns>

@@ -9,6 +9,7 @@ namespace OdfKit.DOM;
 public readonly struct OdfMediaType : IEquatable<OdfMediaType>
 {
     /// <summary>
+    /// Executes the OdfMediaType operation.
     /// 以指定 MIME 類型字串建立 <see cref="OdfMediaType"/>。
     /// </summary>
     /// <param name="value">MIME 類型字串，例如 <c>application/vnd.oasis.opendocument.text</c></param>
@@ -24,11 +25,13 @@ public readonly struct OdfMediaType : IEquatable<OdfMediaType>
     }
 
     /// <summary>
+    /// Gets the Value value.
     /// 取得原始 MIME 類型字串。
     /// </summary>
     public string Value { get; }
 
     /// <summary>
+    /// Executes the TryParse operation.
     /// 嘗試解析 MIME 類型字串。
     /// </summary>
     /// <param name="value">MIME 類型字串</param>
@@ -47,25 +50,36 @@ public readonly struct OdfMediaType : IEquatable<OdfMediaType>
     }
 
     /// <summary>
+    /// Executes the ToString operation.
     /// 傳回 MIME 類型字串。
     /// </summary>
     /// <returns>MIME 類型字串</returns>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷目前值是否等於另一個 MIME 類型。
     /// </summary>
     /// <param name="other">要比較的 MIME 類型</param>
     /// <returns>若值相等則為 <see langword="true"/></returns>
     public bool Equals(OdfMediaType other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
 
+    /// <summary>
+    /// Executes the Equals operation.
+    /// 執行 Equals 作業。
+    /// </summary>
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is OdfMediaType other && Equals(other);
 
+    /// <summary>
+    /// Executes the GetHashCode operation.
+    /// 執行 GetHashCode 作業。
+    /// </summary>
     /// <inheritdoc />
     public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個 MIME 類型是否相等。
     /// </summary>
     /// <param name="left">左側 MIME 類型</param>
@@ -74,6 +88,7 @@ public readonly struct OdfMediaType : IEquatable<OdfMediaType>
     public static bool operator ==(OdfMediaType left, OdfMediaType right) => left.Equals(right);
 
     /// <summary>
+    /// Executes the Equals operation.
     /// 判斷兩個 MIME 類型是否不相等。
     /// </summary>
     /// <param name="left">左側 MIME 類型</param>

@@ -4,6 +4,10 @@ using OdfKit.Spreadsheet;
 using OdfKit.Styles;
 
 namespace OdfKit.Core;
+/// <summary>
+/// Provides the OdfDocument API.
+/// 提供 OdfDocument API。
+/// </summary>
 
 public abstract partial class OdfDocument
 {

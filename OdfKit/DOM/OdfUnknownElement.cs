@@ -1,11 +1,13 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Provides the OdfUnknownElement API.
 /// 表示 OdfKit 尚未提供 typed wrapper 的未知或第三方擴充元素。
 /// </summary>
 public sealed class OdfUnknownElement : OdfElement
 {
     /// <summary>
+    /// Executes the OdfUnknownElement operation.
     /// 初始化 <see cref="OdfUnknownElement"/> 類別的新執行個體。
     /// </summary>
     /// <param name="localName">元素局部名稱</param>

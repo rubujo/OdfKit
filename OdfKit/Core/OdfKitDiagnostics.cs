@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Defines values for OdfDiagnosticsLevel.
 /// 表示 OdfKit 診斷日誌的嚴重性等級。
 /// </summary>
 public enum OdfDiagnosticsLevel
@@ -33,6 +34,7 @@ public enum OdfDiagnosticsLevel
 }
 
 /// <summary>
+/// Provides the OdfDiagnosticsEventArgs API.
 /// 提供 OdfKit 診斷日誌事件的資料。
 /// </summary>
 /// <param name="level">診斷日誌等級</param>
@@ -41,32 +43,38 @@ public enum OdfDiagnosticsLevel
 public class OdfDiagnosticsEventArgs(OdfDiagnosticsLevel level, string message, Exception? exception = null) : EventArgs
 {
     /// <summary>
+    /// Gets the Level value.
     /// 取得診斷日誌等級。
     /// </summary>
     public OdfDiagnosticsLevel Level { get; } = level;
 
     /// <summary>
+    /// Gets the Message value.
     /// 取得診斷訊息內容。
     /// </summary>
     public string Message { get; } = message;
 
     /// <summary>
+    /// Gets the Exception value.
     /// 取得診斷相關聯的例外狀況。
     /// </summary>
     public Exception? Exception { get; } = exception;
 
     /// <summary>
+    /// Gets the Timestamp value.
     /// 取得診斷日誌記錄的 UTC 時間戳記。
     /// </summary>
     public DateTime Timestamp { get; } = DateTime.UtcNow;
 }
 
 /// <summary>
+/// Provides the OdfKitDiagnostics API.
 /// 提供 OdfKit 的全域診斷與日誌功能。
 /// </summary>
 public static class OdfKitDiagnostics
 {
     /// <summary>
+    /// Provides the member member.
     /// 全域靜態診斷日誌事件。開發者可訂閱此事件以將診斷資訊導向自訂的日誌系統。
     /// </summary>
     public static event EventHandler<OdfDiagnosticsEventArgs>? Log;

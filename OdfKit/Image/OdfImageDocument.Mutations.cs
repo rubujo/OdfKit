@@ -7,6 +7,10 @@ using OdfKit.Styles;
 
 using OdfKit.Compliance;
 namespace OdfKit.Image;
+/// <summary>
+/// Provides the OdfImageDocument API.
+/// 提供 OdfImageDocument API。
+/// </summary>
 
 public partial class OdfImageDocument
 {

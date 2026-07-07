@@ -6,11 +6,13 @@ using Sylvan.Data.Csv;
 namespace OdfKit.Csv;
 
 /// <summary>
+/// Provides the OdfCsvImporter API.
 /// 將 CSV 資料匯入為 SpreadsheetDocument 的靜態工具類別。
 /// </summary>
 public static class OdfCsvImporter
 {
     /// <summary>
+    /// Executes the ImportFromStream operation.
     /// 從資料流讀取 CSV 並建立新的 SpreadsheetDocument
     /// </summary>
     /// <param name="csvStream">CSV 來源資料流（不得為 null）</param>
@@ -58,6 +60,7 @@ public static class OdfCsvImporter
     }
 
     /// <summary>
+    /// Executes the ImportFromFile operation.
     /// 從檔案路徑讀取 CSV 並建立新的 SpreadsheetDocument。
     /// </summary>
     /// <param name="csvPath">CSV 檔案路徑</param>

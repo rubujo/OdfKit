@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfStyleFamily.
 /// 表示 ODF <c>style:family</c> 屬性的官方樣式家族 token。
 /// </summary>
 public enum OdfStyleFamily

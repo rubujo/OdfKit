@@ -1,6 +1,7 @@
 ﻿namespace OdfKit.DOM;
 
 /// <summary>
+/// Defines values for OdfPresentationEffect.
 /// 表示 ODF schema 中 <c>presentation:effect</c> 的簡報效果 token。
 /// </summary>
 public enum OdfPresentationEffect

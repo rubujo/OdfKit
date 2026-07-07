@@ -1,5 +1,8 @@
 param(
-    [switch]$FailOnIssues
+    [switch]$FailOnIssues,
+    [switch]$FailOnNewIssues,
+    [int]$BaselineIssueCount = 1984,
+    [int]$BaselineFileCount = 347
 )
 
 $ErrorActionPreference = 'Stop'
@@ -37,11 +40,40 @@ function Get-XmlDocBlock {
     )
 
     $index = $DeclarationIndex - 1
-    while ($index -ge 0 -and
-        ($Lines[$index] -match '^\s*$' -or
-         $Lines[$index] -match '^\s*\[[^\]]+\]\s*$'))
+    while ($index -ge 0)
     {
-        $index--
+        if ($Lines[$index] -match '^\s*$' -or
+            $Lines[$index] -match '^\s*\[[^\]]+\]\s*$')
+        {
+            $index--
+            continue
+        }
+
+        if ($Lines[$index] -notmatch '^\s*///')
+        {
+            $attributeStart = -1
+            for ($candidate = $index; $candidate -ge 0 -and $candidate -ge $index - 20; $candidate--)
+            {
+                if ($Lines[$candidate] -match '^\s*\[')
+                {
+                    $attributeStart = $candidate
+                    break
+                }
+
+                if ($Lines[$candidate] -match '^\s*///' -or $Lines[$candidate] -match '^\s*$')
+                {
+                    break
+                }
+            }
+
+            if ($attributeStart -ge 0)
+            {
+                $index = $attributeStart - 1
+                continue
+            }
+        }
+
+        break
     }
 
     $block = New-Object System.Collections.Generic.List[string]
@@ -292,6 +324,16 @@ $issues |
     }
 
 Write-Host ("TOTAL={0}; FILES={1}" -f $issues.Count, (($issues | Select-Object -ExpandProperty File -Unique).Count))
+
+if ($FailOnNewIssues)
+{
+    $fileCount = ($issues | Select-Object -ExpandProperty File -Unique).Count
+    if ($issues.Count -gt $BaselineIssueCount -or $fileCount -gt $BaselineFileCount)
+    {
+        Write-Error ("Bilingual XML documentation issues exceed baseline: TOTAL={0}/{1}; FILES={2}/{3}" -f $issues.Count, $BaselineIssueCount, $fileCount, $BaselineFileCount)
+        exit 1
+    }
+}
 
 if ($FailOnIssues)
 {

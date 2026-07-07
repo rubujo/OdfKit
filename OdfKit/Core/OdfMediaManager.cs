@@ -8,6 +8,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Provides the OdfMediaManager API.
 /// 管理 ODF 封裝中的媒體專案（如圖片），提供重複資料刪除與格式偵測功能。
 /// </summary>
 public class OdfMediaManager
@@ -24,6 +25,7 @@ public class OdfMediaManager
     private int _fallbackImageCounter;
 
     /// <summary>
+    /// Executes the OdfMediaManager operation.
     /// 初始化 <see cref="OdfMediaManager"/> 類別的新執行個體。
     /// </summary>
     /// <param name="package">ODF 封裝執行個體</param>
@@ -58,6 +60,7 @@ public class OdfMediaManager
     }
 
     /// <summary>
+    /// Executes the AddImage operation.
     /// 插入圖片二進位資料。若圖片內容已存在，則會自動重用現有路徑，實現自動重複資料刪除。
     /// </summary>
     /// <param name="imageBytes">圖片的二進位內容</param>
@@ -162,6 +165,7 @@ public class OdfMediaManager
     ];
 
     /// <summary>
+    /// Executes the DetectImageFormat operation.
     /// 根據檔案的幻數（Magic Bytes）偵測圖片格式。
     /// </summary>
     /// <param name="bytes">圖片的二進位內容</param>

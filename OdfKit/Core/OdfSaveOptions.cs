@@ -8,6 +8,7 @@ using OdfKit.Compliance;
 namespace OdfKit.Core;
 
 /// <summary>
+/// Defines values for OdfEncryptionAlgorithm.
 /// 加密文件時使用的對稱加密演算法。
 /// </summary>
 public enum OdfEncryptionAlgorithm
@@ -34,21 +35,25 @@ public enum OdfEncryptionAlgorithm
 }
 
 /// <summary>
+/// Provides the OdfSaveOptions API.
 /// 提供儲存 ODF 文件時的組態選項。
 /// </summary>
 public class OdfSaveOptions
 {
     /// <summary>
+    /// Gets the CompressionLevel value.
     /// 取得或設定 ZIP 檔案壓縮等級。
     /// </summary>
     public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.Optimal;
 
     /// <summary>
+    /// Gets the EncryptionAlgorithm value.
     /// 取得或設定加密文件時使用的對稱加密演算法。預設為 ODF 1.3 標準的 AES-256。
     /// </summary>
     public OdfEncryptionAlgorithm EncryptionAlgorithm { get; set; } = OdfEncryptionAlgorithm.Aes256;
 
     /// <summary>
+    /// Gets the DocumentCulture value.
     /// 取得或設定文件文化語系設定。
     /// </summary>
     /// <remarks>
@@ -58,11 +63,13 @@ public class OdfSaveOptions
     public CultureInfo DocumentCulture { get; set; } = CultureInfo.CurrentCulture;
 
     /// <summary>
+    /// Gets a value indicating the IndentXml state.
     /// 取得或設定是否排版 XML （Indent XML）以利於偵錯。預設為 <see langword="false"/> （緊湊格式輸出，效能最佳）。
     /// </summary>
     public bool IndentXml { get; set; } = false;
 
     /// <summary>
+    /// Gets a value indicating the Deterministic state.
     /// 取得或設定是否裝載確定性輸出（Deterministic Save）。
     /// </summary>
     /// <remarks>
@@ -72,11 +79,13 @@ public class OdfSaveOptions
     public bool Deterministic { get; set; } = false;
 
     /// <summary>
+    /// Gets the ForceVersion value.
     /// 取得或設定儲存時要強制寫入的 ODF 版本。若為 <see langword="null"/>，則保留文件目前宣告的版本。
     /// </summary>
     public OdfVersion? ForceVersion { get; set; }
 
     /// <summary>
+    /// Gets the TemporaryDirectory value.
     /// 取得或設定自訂原子化儲存的磁碟暫存路徑。
     /// </summary>
     /// <remarks>
@@ -85,6 +94,7 @@ public class OdfSaveOptions
     public string? TemporaryDirectory { get; set; }
 
     /// <summary>
+    /// Gets a value indicating the PruneUnusedMedia state.
     /// 取得或設定儲存時是否自動清理未被目前 DOM 參照的 <c>Pictures/</c> 媒體檔案。
     /// </summary>
     /// <remarks>
@@ -94,34 +104,38 @@ public class OdfSaveOptions
     public bool PruneUnusedMedia { get; set; } = true;
 
     /// <summary>
+    /// Gets a value indicating the EmbedUsedFonts state.
     /// 取得或設定一個值，指出是否在儲存時於文件中內嵌所使用的字型。預設為 <see langword="false"/> 。
     /// </summary>
     public bool EmbedUsedFonts { get; set; } = false;
 
     /// <summary>
+    /// Gets a value indicating the EvaluateFormulasOnSave state.
     /// 取得或設定一個值，指出是否在儲存時計算文件中的公式。預設為 <see langword="false"/> 。
     /// </summary>
     public bool EvaluateFormulasOnSave { get; set; } = false;
 
     /// <summary>
+    /// Gets a value indicating the EnableDirectIo state.
     /// 取得或設定一個值，指出是否啟用 Direct I/O 無快取寫入模式以提升存檔效能。預設為 <see langword="false"/> 。
     /// </summary>
     public bool EnableDirectIo { get; set; } = false;
 
     /// <summary>
+    /// Gets the Password value.
     /// 取得或設定用於加密 ODF 文件的密碼。
     /// </summary>
     public string? Password { get; set; }
 
     /// <summary>
+    /// Gets the CryptographyProvider value.
     /// 取得或設定自訂的密碼學提供者，用於加密文件專案。
     /// </summary>
     public IOdfCryptographyProvider? CryptographyProvider { get; set; }
 
     /// <summary>
+    /// Provides the member member.
     /// 取得或設定用於加密 ODF 1.3 OpenPGP 文件的金鑰提供者。
-    /// 設定此屬性後，<see cref="CryptographyProvider"/> 會自動更新為對應的
-    /// <see cref="OdfOpenPgpCryptographyProvider"/> 執行個體。
     /// </summary>
     public IOdfOpenPgpKeyProvider? OpenPgpKeyProvider
     {
@@ -139,11 +153,13 @@ public class OdfSaveOptions
     private IOdfOpenPgpKeyProvider? _openPgpKeyProvider;
 
     /// <summary>
+    /// Gets the OpenPgpRecipients value.
     /// 取得 OpenPGP 加密收件者描述，供自訂密碼學提供者使用。
     /// </summary>
     public IList<OdfOpenPgpRecipient> OpenPgpRecipients { get; } = [];
 
     /// <summary>
+    /// Executes the Default operation.
     /// 取得預設的儲存選項執行個體。
     /// </summary>
     public static OdfSaveOptions Default => new();

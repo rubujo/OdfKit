@@ -114,13 +114,18 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
             cancellationToken.ThrowIfCancellationRequested();
             if (DateTimeOffset.UtcNow >= deadline)
             {
-                throw new TimeoutException();
+                throw new TimeoutException(
+                    OdfKit.Compliance.OdfLocalizer.GetMessage("Err_OdfFormulaEvaluationChannel_WaitForIdleTimedOut"));
             }
 
             await Task.Delay(10, cancellationToken).ConfigureAwait(false);
         }
     }
 
+    /// <summary>
+    /// Executes the Dispose operation.
+    /// 執行 Dispose 作業。
+    /// </summary>
     /// <inheritdoc />
     public void Dispose()
     {
@@ -147,6 +152,10 @@ public sealed class OdfFormulaEvaluationChannel : IDisposable, IAsyncDisposable
 #endif
     }
 
+    /// <summary>
+    /// Executes the DisposeAsync operation.
+    /// 執行 DisposeAsync 作業。
+    /// </summary>
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
