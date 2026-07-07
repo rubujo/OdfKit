@@ -349,12 +349,14 @@ Console.WriteLine(loadedDrawing.Pages[0].TextBoxes[0].Text);
 
 ## 建立 ODI 影像文件
 
+建議使用短名 facade `ImageDocument`；既有 `OdfImageDocument` 入口仍保留相容性。
+
 ```csharp
 using OdfKit.Image;
 using OdfKit.Styles;
 
 byte[] bytes = File.ReadAllBytes("photo.png");
-using OdfImageDocument image = OdfImageDocument.Create();
+using ImageDocument image = ImageDocument.Create();
 image.SetImageLayout(
     OdfLength.FromCentimeters(1),
     OdfLength.FromCentimeters(2),
@@ -366,7 +368,7 @@ image.SetImageLayout(
 image.SetImage(bytes, "photo.png");
 image.Save("photo.odi");
 
-using OdfImageDocument loadedImage = OdfImageDocument.Load("photo.odi");
+using ImageDocument loadedImage = ImageDocument.Load("photo.odi");
 Console.WriteLine(loadedImage.FrameTitle);
 Console.WriteLine(loadedImage.FrameWidth);
 ```
@@ -457,10 +459,12 @@ Console.WriteLine(loadedFormula.MathTokens[0].Text);
 
 ## 建立 ODB 資料來源描述
 
+建議使用短名 facade `DatabaseDocument`；既有 `OdfDatabaseDocument` 入口仍保留相容性。
+
 ```csharp
 using OdfKit.Database;
 
-using OdfDatabaseDocument database = OdfDatabaseDocument.Create();
+using DatabaseDocument database = DatabaseDocument.Create();
 database.SetConnection("sdbc:embedded:hsqldb");
 database.AddDataSourceSetting("AppendTableAliasName", OdfDatabaseDataSourceSettingType.Boolean, "true");
 database.AddTable("Customers", "SELECT * FROM Customers");
@@ -472,7 +476,7 @@ database.AddQuery(
     escapeProcessing: true);
 database.Save("data.odb");
 
-using OdfDatabaseDocument loaded = OdfDatabaseDocument.Load("data.odb");
+using DatabaseDocument loaded = DatabaseDocument.Load("data.odb");
 Console.WriteLine(loaded.ConnectionHref);
 Console.WriteLine(loaded.FindDataSourceSetting("AppendTableAliasName")?.Values[0]);
 Console.WriteLine(loaded.Tables[0].Name);

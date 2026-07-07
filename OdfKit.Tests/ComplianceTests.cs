@@ -1946,8 +1946,8 @@ namespace OdfKit.Tests
         [Theory]
         [InlineData(OdfDocumentKind.Chart, "ChartDocument")]
         [InlineData(OdfDocumentKind.Formula, "FormulaDocument")]
-        [InlineData(OdfDocumentKind.Image, nameof(OdfImageDocument))]
-        [InlineData(OdfDocumentKind.Database, nameof(OdfDatabaseDocument))]
+        [InlineData(OdfDocumentKind.Image, nameof(ImageDocument))]
+        [InlineData(OdfDocumentKind.Database, nameof(DatabaseDocument))]
         public void HighLevelFactoryCreatesPackageLevelDocuments(OdfDocumentKind kind, string expectedTypeName)
         {
             using OdfDocument document = OdfDocument.Create(kind);
@@ -1962,6 +1962,18 @@ namespace OdfKit.Tests
 
             Assert.True(report.IsValid, string.Join(", ", report.Issues.Select(issue => issue.RuleId + ": " + issue.Message)));
             Assert.Equal(kind, report.DocumentKind);
+        }
+
+        [Fact]
+        public void OdfPrefixedImageAndDatabaseEntrypointsRemainCompatible()
+        {
+            using OdfImageDocument image = OdfImageDocument.Create();
+            using OdfDatabaseDocument database = OdfDatabaseDocument.Create();
+
+            Assert.IsType<ImageDocument>(image);
+            Assert.IsType<DatabaseDocument>(database);
+            Assert.IsAssignableFrom<OdfImageDocument>(image);
+            Assert.IsAssignableFrom<OdfDatabaseDocument>(database);
         }
 
         [Fact]

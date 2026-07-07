@@ -219,7 +219,7 @@ public class DocumentKindApiUsabilityTests
     [Fact]
     public void CreateLoadImageWithEmbeddedPicture()
     {
-        using var image = OdfImageDocument.Create();
+        using var image = ImageDocument.Create();
         byte[] bytes = CreatePngBytes();
         image.SetImageLayout(
             OdfLength.FromCentimeters(1),
@@ -231,7 +231,7 @@ public class DocumentKindApiUsabilityTests
             "一張用於型錄的產品照片。");
         string href = image.SetImage(bytes, "TinyPng.png");
 
-        using OdfImageDocument loaded = RoundTrip(image, "image.odi", OdfImageDocument.Load);
+        using ImageDocument loaded = RoundTrip(image, "image.odi", ImageDocument.Load);
         OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "image.odi");
 
         Assert.Equal("application/vnd.oasis.opendocument.image", loaded.Package.MimeType);
@@ -263,7 +263,7 @@ public class DocumentKindApiUsabilityTests
     [Fact]
     public void CreateLoadDatabaseWithConnectionAndTable()
     {
-        using var database = OdfDatabaseDocument.Create();
+        using var database = DatabaseDocument.Create();
         database.SetConnection("sdbc:embedded:hsqldb");
         database.AddDataSourceSetting("AppendTableAliasName", OdfDatabaseDataSourceSettingType.Boolean, "true");
         database.AddDataSourceSetting(
@@ -286,7 +286,7 @@ public class DocumentKindApiUsabilityTests
         Assert.True(database.RemoveQuery("ScratchQuery"));
         Assert.True(database.RemoveDataSourceSetting("ScratchSetting"));
 
-        using OdfDatabaseDocument loaded = RoundTrip(database, "database.odb", OdfDatabaseDocument.Load);
+        using DatabaseDocument loaded = RoundTrip(database, "database.odb", DatabaseDocument.Load);
         OdfValidationReport report = OdfPackageValidator.Validate(loaded.Package, OdfComplianceProfiles.OasisOdf14Extended, "database.odb");
 
         Assert.Equal("application/vnd.oasis.opendocument.base", loaded.Package.MimeType);

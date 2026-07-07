@@ -493,10 +493,10 @@ public static class OdfDocumentFactory
             OdfDocumentKind.Formula => new FormulaDocument(package),
             OdfDocumentKind.FormulaTemplate => new FormulaTemplateDocument(package),
             OdfDocumentKind.FlatFormula => new FlatFormulaDocument(package),
-            OdfDocumentKind.Image => new OdfImageDocument(package),
+            OdfDocumentKind.Image => new ImageDocument(package),
             OdfDocumentKind.ImageTemplate => new ImageTemplateDocument(package),
             OdfDocumentKind.FlatImage => new FlatImageDocument(package),
-            OdfDocumentKind.Database => new OdfDatabaseDocument(package),
+            OdfDocumentKind.Database => new DatabaseDocument(package),
             OdfDocumentKind.TextWeb => new TextWebDocument(package),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, OdfLocalizer.GetMessage("Err_OdfDocumentFactory_UnsupportedOdfFileType_3"))
         };
