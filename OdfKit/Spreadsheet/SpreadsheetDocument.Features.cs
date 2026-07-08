@@ -154,6 +154,143 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Creates a practical spreadsheet table backed by an ODF database range.
+    /// 建立由 ODF 資料庫範圍支援的實務試算表表格。
+    /// </summary>
+    /// <param name="name">The table name. / 表格名稱。</param>
+    /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
+    /// <param name="options">The table options. / 表格選項。</param>
+    /// <returns>The editable table facade. / 可編輯的表格 facade。</returns>
+    public OdfSpreadsheetTable CreateTable(
+        string name,
+        OdfCellRange range,
+        OdfSpreadsheetTableOptions? options = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_WorksheetCannotBeEmpty_2"), nameof(name));
+        }
+
+        if (FindDatabaseRangeNode(name) is not null)
+        {
+            throw new InvalidOperationException(OdfLocalizer.GetMessage("Err_OdfDatabaseDocument_DuplicateName", name));
+        }
+
+        options ??= new OdfSpreadsheetTableOptions();
+        OdfDatabaseRange databaseRange = AddDatabaseRange(name, range);
+        databaseRange.DisplayFilterButtons = options.DisplayFilterButtons;
+        databaseRange.ContainsHeader = options.FirstRowAsHeader;
+        if (options.CreateNamedRange)
+        {
+            AddNamedRange(name, range);
+        }
+
+        return new OdfSpreadsheetTable(databaseRange, this, options.FirstRowAsHeader);
+    }
+
+    /// <summary>
+    /// Gets practical spreadsheet table summaries.
+    /// 取得實務試算表表格摘要。
+    /// </summary>
+    /// <returns>The table summaries. / 表格摘要。</returns>
+    public IReadOnlyList<OdfSpreadsheetTableInfo> GetTables() =>
+        GetDatabaseRanges()
+            .Select(range => new OdfSpreadsheetTableInfo(
+                range.Name,
+                range.TargetRangeAddress,
+                range.ContainsHeader,
+                range.DisplayFilterButtons))
+            .ToList()
+            .AsReadOnly();
+
+    /// <summary>
+    /// Finds an editable practical spreadsheet table by name.
+    /// 依名稱尋找可編輯的實務試算表表格。
+    /// </summary>
+    /// <param name="name">The table name. / 表格名稱。</param>
+    /// <returns>The table facade, or <see langword="null"/> when not found. / 表格 facade；找不到時為 <see langword="null"/>。</returns>
+    public OdfSpreadsheetTable? FindTable(string name)
+    {
+        OdfNode? node = FindDatabaseRangeNode(name);
+        return node is null
+            ? null
+            : new OdfSpreadsheetTable(new OdfDatabaseRange(node, this), this, node.GetAttribute("contains-header", OdfNamespaces.Table) != "false");
+    }
+
+    /// <summary>
+    /// Resizes a practical spreadsheet table by name.
+    /// 依名稱調整實務試算表表格範圍。
+    /// </summary>
+    /// <param name="name">The table name. / 表格名稱。</param>
+    /// <param name="range">The new cell range. / 新儲存格範圍。</param>
+    /// <returns><see langword="true"/> if updated; otherwise <see langword="false"/>. / 若已更新則為 <see langword="true"/>；否則為 <see langword="false"/>。</returns>
+    public bool ResizeTable(string name, OdfCellRange range)
+    {
+        OdfSpreadsheetTable? table = FindTable(name);
+        if (table is null)
+        {
+            return false;
+        }
+
+        table.Resize(range);
+        UpdateNamedRangeAddress(name, range);
+        return true;
+    }
+
+    private void UpdateNamedRangeAddress(string name, OdfCellRange range)
+    {
+        OdfNode? namedExpressions = OdfTableSheetDomHelper.FindChildElement(
+            SheetsRoot,
+            "named-expressions",
+            OdfNamespaces.Table);
+        if (namedExpressions is null)
+        {
+            return;
+        }
+
+        foreach (OdfNode child in namedExpressions.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "named-range" &&
+                child.NamespaceUri == OdfNamespaces.Table &&
+                string.Equals(child.GetAttribute("name", OdfNamespaces.Table), name, StringComparison.Ordinal))
+            {
+                child.SetAttribute("cell-range-address", OdfNamespaces.Table, range.ToOdfString(false), "table");
+            }
+        }
+    }
+
+    private OdfNode? FindDatabaseRangeNode(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return null;
+        }
+
+        OdfNode? databaseRanges = OdfTableSheetDomHelper.FindChildElement(
+            SheetsRoot,
+            "database-ranges",
+            OdfNamespaces.Table);
+        if (databaseRanges is null)
+        {
+            return null;
+        }
+
+        foreach (OdfNode child in databaseRanges.Children)
+        {
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "database-range" &&
+                child.NamespaceUri == OdfNamespaces.Table &&
+                string.Equals(child.GetAttribute("name", OdfNamespaces.Table), name, StringComparison.Ordinal))
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Inserts a chart at the specified cell position in a worksheet.
     /// 在指定工作表的儲存格位置插入圖表。
     /// </summary>
@@ -287,6 +424,199 @@ public partial class SpreadsheetDocument
 
         AddChart(sheetName, anchor, definition);
         return GetEmbeddedChartFrame(sheetName);
+    }
+
+    /// <summary>
+    /// Inserts an editable embedded chart bound to a worksheet range.
+    /// 插入繫結至工作表範圍且可繼續編輯的嵌入圖表。
+    /// </summary>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="anchor">The top-left anchor cell. / 左上角錨定儲存格。</param>
+    /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
+    /// <param name="options">The embedded chart options. / 嵌入圖表選項。</param>
+    /// <returns>The embedded chart document. / 嵌入的圖表文件。</returns>
+    public OdfChartDocument InsertChartFromRange(
+        string sheetName,
+        OdfCellAddress anchor,
+        OdfCellRange range,
+        OdfEmbeddedChartOptions? options = null)
+    {
+        if (string.IsNullOrEmpty(sheetName))
+        {
+            throw new ArgumentException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_WorksheetCannotBeEmpty_2"), nameof(sheetName));
+        }
+
+        OdfTableSheet? sheet = FindSheet(sheetName);
+        if (sheet is null)
+        {
+            throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SheetNamedCannotFound_2", sheetName));
+        }
+
+        options ??= new OdfEmbeddedChartOptions();
+        (double anchorXCm, double anchorYCm) = ComputeAnchorOffset(sheet, anchor);
+        OdfChartDocument chart = sheet.InsertChart(
+            range,
+            options.Preset.ToChartType(),
+            OdfLength.FromCentimeters(anchorXCm),
+            OdfLength.FromCentimeters(anchorYCm),
+            options.Width,
+            options.Height,
+            options.FirstRowAsHeader,
+            options.FirstColumnAsLabel);
+
+        if (!string.IsNullOrEmpty(options.Title))
+        {
+            chart.ChartTitle = options.Title;
+        }
+
+        chart.LegendPosition = options.LegendPosition;
+        chart.XAxisTitle = options.XAxisTitle;
+        chart.YAxisTitle = options.YAxisTitle;
+        if (!string.IsNullOrWhiteSpace(options.XAxisNumberFormat))
+        {
+            chart.SetAxisNumberFormat("x", options.XAxisNumberFormat);
+        }
+
+        if (!string.IsNullOrWhiteSpace(options.YAxisNumberFormat))
+        {
+            chart.SetAxisNumberFormat("y", options.YAxisNumberFormat);
+        }
+
+        if (options.ShowMajorGridLines.HasValue)
+        {
+            chart.SetAxisGrid("y", OdfChartGridKind.Major, options.ShowMajorGridLines.Value);
+        }
+
+        if (options.ShowMinorGridLines.HasValue)
+        {
+            chart.SetAxisGrid("y", OdfChartGridKind.Minor, options.ShowMinorGridLines.Value);
+        }
+
+        for (int i = 0; i < chart.SeriesCount; i++)
+        {
+            if (options.DataLabelPreset.HasValue)
+            {
+                chart.SetSeriesDataLabelPreset(i, options.DataLabelPreset.Value);
+            }
+
+            if (i < options.SeriesStyleNames.Count)
+            {
+                chart.GetSeriesEditor(i).StyleName = options.SeriesStyleNames[i];
+            }
+
+            if (i < options.Palette.Count)
+            {
+                chart.GetSeriesEditor(i).Style.FillColor = options.Palette[i];
+            }
+
+            if (i < options.MarkerStyles.Count)
+            {
+                chart.GetSeriesEditor(i).ApplyMarkerStyle(options.MarkerStyles[i]);
+            }
+        }
+
+        if (options.ThreeDOptions is not null)
+        {
+            chart.Apply3DOptions(options.ThreeDOptions);
+        }
+        else if (options.Preset.IsThreeDimensional())
+        {
+            chart.Apply3DOptions(new OdfChart3DOptions
+            {
+                Enabled = true,
+                AngleOffset = 45,
+                Projection = OdfDr3dProjection.Perspective,
+                LightingMode = true
+            });
+        }
+
+        chart.Save();
+        return chart;
+    }
+
+    /// <summary>
+    /// Refreshes an embedded chart data range.
+    /// 重新設定嵌入圖表的資料範圍。
+    /// </summary>
+    /// <param name="chart">The embedded chart document. / 嵌入圖表文件。</param>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
+    /// <param name="firstRowAsHeader">Whether the first row is treated as series labels. / 首列是否視為序列標籤。</param>
+    /// <param name="firstColumnAsLabel">Whether the first column is treated as category labels. / 首欄是否視為分類標籤。</param>
+    /// <returns>The updated embedded chart document. / 已更新的嵌入圖表文件。</returns>
+    public OdfChartDocument RefreshChartDataRange(
+        OdfChartDocument chart,
+        string sheetName,
+        OdfCellRange range,
+        bool firstRowAsHeader = true,
+        bool firstColumnAsLabel = true)
+    {
+        if (chart is null)
+        {
+            throw new ArgumentNullException(nameof(chart));
+        }
+
+        chart.SetDataRange(sheetName, range, firstRowAsHeader, firstColumnAsLabel);
+        chart.Save();
+        return chart;
+    }
+
+    /// <summary>
+    /// Applies practical updates to embedded chart series.
+    /// 將實務更新套用至嵌入圖表序列。
+    /// </summary>
+    /// <param name="chart">The embedded chart document. / 嵌入圖表文件。</param>
+    /// <param name="updates">The series updates. / 序列更新。</param>
+    /// <returns>The batch update result. / 批次更新結果。</returns>
+    public OdfBatchUpdateResult UpdateEmbeddedChartSeries(
+        OdfChartDocument chart,
+        IEnumerable<OdfEmbeddedChartSeriesUpdate> updates)
+    {
+        if (chart is null)
+        {
+            throw new ArgumentNullException(nameof(chart));
+        }
+
+        if (updates is null)
+        {
+            throw new ArgumentNullException(nameof(updates));
+        }
+
+        var result = new OdfBatchUpdateResult();
+        foreach (OdfEmbeddedChartSeriesUpdate update in updates)
+        {
+            if (update.Index < 0 || update.Index >= chart.SeriesCount)
+            {
+                result.MissingNames.Add(update.Index.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                continue;
+            }
+
+            OdfChartSeries series = chart.GetSeriesEditor(update.Index);
+            if (update.StyleName is not null)
+            {
+                series.StyleName = update.StyleName;
+            }
+
+            if (update.AttachedAxis is not null)
+            {
+                series.AttachedAxis = update.AttachedAxis;
+            }
+
+            if (update.DataLabelPreset.HasValue)
+            {
+                series.SetDataLabelPreset(update.DataLabelPreset.Value);
+            }
+
+            if (update.MarkerStyle is not null)
+            {
+                series.ApplyMarkerStyle(update.MarkerStyle);
+            }
+
+            result.UpdatedCount++;
+        }
+
+        chart.Save();
+        return result;
     }
 
     /// <summary>

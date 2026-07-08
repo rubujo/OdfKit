@@ -2,7 +2,12 @@
 using System.Text;
 using OdfKit.Chart;
 using OdfKit.Compliance;
+using OdfKit.Core;
+using OdfKit.Drawing;
 using OdfKit.Image;
+using OdfKit.Presentation;
+using OdfKit.Spreadsheet;
+using OdfKit.Styles;
 using OdfKit.Text;
 using Xunit;
 
@@ -47,6 +52,24 @@ public class PracticalCompatibilityValidatorTests
     }
 
     /// <summary>
+    /// 驗證 ImageDocument inspection issue 會整合到實務相容性報告。
+    /// </summary>
+    [Fact]
+    public void Validate_IncludesImageInspectionIssuesForImageDocuments()
+    {
+        using OdfImageDocument document = OdfImageDocument.Create();
+        document.AddImageFrame([1, 2, 3, 4], 1.Cm(), 1.Cm(), 2.Cm(), 2.Cm(), "risk.bmp", "RiskFrame");
+        document.SetImageRotation("RiskFrame", 30);
+
+        OdfPracticalCompatibilityReport report = OdfPracticalCompatibilityValidator.Validate(
+            document,
+            OdfPracticalCompatibilityProfile.PortableEditing);
+
+        Assert.Contains(report.Issues, issue => issue.RuleId == "IMG0001" && issue.MessageKey == "Msg_ImageInspection_NonPortableMediaType");
+        Assert.Contains(report.Issues, issue => issue.RuleId == "IMG0004");
+    }
+
+    /// <summary>
     /// 驗證進階圖表對 Microsoft Office ODF profile 會回報呈現差異風險。
     /// </summary>
     [Fact]
@@ -67,6 +90,98 @@ public class PracticalCompatibilityValidatorTests
     }
 
     /// <summary>
+    /// 驗證複雜 ODT 結構會對 Microsoft Office profile 回報 Word 復原提示風險。
+    /// </summary>
+    [Fact]
+    public void Validate_ReportsWordOdtRepairRiskForComplexTextStructures()
+    {
+        using TextDocument document = TextDocument.Create();
+        document.AddTableOfContents("目錄", 1);
+        _ = document.AddSection("ExecutiveSection", 2, 0.5.Cm());
+
+        OdfPracticalCompatibilityReport report = OdfPracticalCompatibilityValidator.Validate(
+            document,
+            OdfPracticalCompatibilityProfile.MicrosoftOfficeOdf);
+
+        OdfPracticalCompatibilityIssue issue = Assert.Single(report.Issues.Where(i => i.RuleId == "PRAC0301"));
+        Assert.Equal("content.xml", issue.PackagePath);
+        Assert.Equal("True", issue.Details?["hasTextIndex"]);
+        Assert.Equal("True", issue.Details?["hasTextSection"]);
+        Assert.DoesNotContain(
+            OdfPracticalCompatibilityValidator.Validate(document, OdfPracticalCompatibilityProfile.LibreOfficeCurrent).Issues,
+            i => i.RuleId == "PRAC0301");
+    }
+
+    /// <summary>
+    /// 驗證 ODS 嵌入進階圖表也會依 profile 回報呈現差異風險。
+    /// </summary>
+    [Fact]
+    public void Validate_ReportsEmbeddedAdvancedChartForMicrosoftOfficeProfile()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.SetValues(
+            new OdfCellAddress(0, 0, "Data"),
+            new object?[,]
+            {
+                { "Name", "Value" },
+                { "A", 10d },
+                { "B", 20d },
+            });
+
+        _ = document.InsertChartFromRange(
+            "Data",
+            new OdfCellAddress(0, 3, "Data"),
+            new OdfCellRange(0, 0, 2, 1, "Data"),
+            new OdfEmbeddedChartOptions { Preset = OdfChartPreset.Column3D });
+
+        OdfPracticalCompatibilityReport report = OdfPracticalCompatibilityValidator.Validate(
+            document,
+            OdfPracticalCompatibilityProfile.MicrosoftOfficeOdf);
+
+        Assert.Contains(report.Issues, issue => issue.RuleId == "PRAC0200" && issue.PackagePath == "Object 1/content.xml");
+    }
+
+    /// <summary>
+    /// 驗證 ODS 明確列高欄寬會依 profile 回報跨套件風險。
+    /// </summary>
+    [Fact]
+    public void Validate_ReportsSpreadsheetSizingForPortableProfiles()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.SetColumnWidth(0, 2.Cm());
+        sheet.SetRowHeight(0, 1.Cm());
+
+        OdfPracticalCompatibilityReport report = OdfPracticalCompatibilityValidator.Validate(
+            document,
+            OdfPracticalCompatibilityProfile.PortableEditing);
+
+        Assert.Contains(report.Issues, issue => issue.RuleId == "PRAC0400");
+        Assert.DoesNotContain(
+            OdfPracticalCompatibilityValidator.Validate(document, OdfPracticalCompatibilityProfile.LibreOfficeCurrent).Issues,
+            issue => issue.RuleId == "PRAC0400");
+    }
+
+    /// <summary>
+    /// 驗證 ODG 裁切或旋轉圖片會對 portable editing 回報風險。
+    /// </summary>
+    [Fact]
+    public void Validate_ReportsImageTransformForDrawingDocuments()
+    {
+        using DrawingDocument document = DrawingDocument.Create();
+        OdfPicture picture = document.Pages.Add("Canvas")
+            .AddPicture([1, 2, 3, 4], 1.Cm(), 1.Cm(), 2.Cm(), 2.Cm());
+        picture.Node.SetAttribute("transform", OdfNamespaces.Draw, "rotate(0.5)", "draw");
+
+        OdfPracticalCompatibilityReport report = OdfPracticalCompatibilityValidator.Validate(
+            document,
+            OdfPracticalCompatibilityProfile.MicrosoftOfficeOdf);
+
+        Assert.Contains(report.Issues, issue => issue.RuleId == "PRAC0500");
+    }
+
+    /// <summary>
     /// 驗證實務互通報告保留文件類型與本地化訊息。
     /// </summary>
     [Fact]
@@ -84,5 +199,49 @@ public class PracticalCompatibilityValidatorTests
         Assert.Equal(chart.DocumentKind, issue.DocumentKind);
         Assert.False(string.IsNullOrWhiteSpace(issue.Message));
         Assert.False(string.IsNullOrWhiteSpace(issue.Suggestion));
+    }
+
+    /// <summary>
+    /// 驗證 validator options 可停用規則、覆寫嚴重性與限制回傳數量。
+    /// </summary>
+    [Fact]
+    public void Validate_OptionsFilterOverrideAndLimitIssues()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.SetColumnWidth(0, 2.Cm());
+        sheet.SetPrintArea(new OdfCellRange(0, 0, 5, 2, "Data"));
+
+        var options = new OdfPracticalCompatibilityOptions { MaximumIssueCount = 1 };
+        options.DisabledRuleIds.Add("PRAC0400");
+        options.SeverityOverrides["PRAC0401"] = OdfIssueSeverity.Info;
+
+        OdfPracticalCompatibilityReport report = OdfPracticalCompatibilityValidator.Validate(
+            document,
+            OdfPracticalCompatibilityProfile.PortableEditing,
+            options);
+
+        OdfPracticalCompatibilityIssue issue = Assert.Single(report.Issues);
+        Assert.Equal("PRAC0401", issue.RuleId);
+        Assert.Equal(OdfIssueSeverity.Info, issue.Severity);
+    }
+
+    /// <summary>
+    /// 驗證 maximum issue count 為 0 時會回傳空清單。
+    /// </summary>
+    [Fact]
+    public void Validate_OptionsCanSuppressAllIssuesWithZeroLimit()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.SetColumnWidth(0, 2.Cm());
+        sheet.SetPrintArea(new OdfCellRange(0, 0, 5, 2, "Data"));
+
+        OdfPracticalCompatibilityReport report = OdfPracticalCompatibilityValidator.Validate(
+            document,
+            OdfPracticalCompatibilityProfile.PortableEditing,
+            new OdfPracticalCompatibilityOptions { MaximumIssueCount = 0 });
+
+        Assert.Empty(report.Issues);
     }
 }

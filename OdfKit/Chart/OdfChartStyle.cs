@@ -80,6 +80,56 @@ public sealed class OdfChartStyle
     }
 
     /// <summary>
+    /// Gets or sets the chart marker symbol type.
+    /// 取得或設定圖表標記符號類型。
+    /// </summary>
+    public string? SymbolType
+    {
+        get => _document.StyleEngine.GetStyleProperty(Name, "symbol-type", OdfNamespaces.Chart, "chart");
+        set => SetChartProperty("symbol-type", OdfNamespaces.Chart, value, "chart");
+    }
+
+    /// <summary>
+    /// Gets or sets the chart marker symbol name.
+    /// 取得或設定圖表標記符號名稱。
+    /// </summary>
+    public string? SymbolName
+    {
+        get => _document.StyleEngine.GetStyleProperty(Name, "symbol-name", OdfNamespaces.Chart, "chart");
+        set => SetChartProperty("symbol-name", OdfNamespaces.Chart, value, "chart");
+    }
+
+    /// <summary>
+    /// Gets or sets the chart marker symbol width.
+    /// 取得或設定圖表標記符號寬度。
+    /// </summary>
+    public string? SymbolWidth
+    {
+        get => _document.StyleEngine.GetStyleProperty(Name, "symbol-width", OdfNamespaces.Chart, "chart");
+        set => SetChartProperty("symbol-width", OdfNamespaces.Chart, value, "chart");
+    }
+
+    /// <summary>
+    /// Gets or sets the chart marker symbol height.
+    /// 取得或設定圖表標記符號高度。
+    /// </summary>
+    public string? SymbolHeight
+    {
+        get => _document.StyleEngine.GetStyleProperty(Name, "symbol-height", OdfNamespaces.Chart, "chart");
+        set => SetChartProperty("symbol-height", OdfNamespaces.Chart, value, "chart");
+    }
+
+    /// <summary>
+    /// Gets or sets the data style name used for number formatting.
+    /// 取得或設定用於數字格式的資料樣式名稱。
+    /// </summary>
+    public string? DataStyleName
+    {
+        get => _document.StyleEngine.GetStyleProperty(Name, "data-style-name", OdfNamespaces.Style, "chart");
+        set => SetChartProperty("data-style-name", OdfNamespaces.Style, value, "style");
+    }
+
+    /// <summary>
     /// Gets or sets whether the chart is displayed in 3D (maps to <c>chart:three-dimensional</c>).
     /// 取得或設定圖表是否為 3D 顯示（對應 <c>chart:three-dimensional</c>）。
     /// </summary>
@@ -191,7 +241,19 @@ public sealed class OdfChartStyle
     /// </summary>
     /// <returns>The chart style summary. / 圖表樣式摘要。</returns>
     public OdfChartStyleInfo ToInfo() =>
-        new(Name, FillColor, StrokeColor, StrokeWidth, Fill, Stroke, ThreeDimensional, AngleOffset);
+        new(
+            Name,
+            FillColor,
+            StrokeColor,
+            StrokeWidth,
+            Fill,
+            Stroke,
+            ThreeDimensional,
+            AngleOffset,
+            SymbolType,
+            SymbolName,
+            SymbolWidth,
+            DataStyleName);
 
     private void SetGraphicProperty(string attributeName, string namespaceUri, string? value, string prefix)
     {

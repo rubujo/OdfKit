@@ -33,6 +33,7 @@ internal static class SpreadsheetDocumentDatabaseRangeReadEngine
                 name!,
                 targetRange,
                 child.GetAttribute("display-filter-buttons", OdfNamespaces.Table) == "true",
+                child.GetAttribute("contains-header", OdfNamespaces.Table) != "false",
                 ParseFilterConditions(child),
                 ParseSortRules(child)));
         }

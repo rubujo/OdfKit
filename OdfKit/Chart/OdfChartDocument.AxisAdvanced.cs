@@ -99,6 +99,47 @@ public partial class OdfChartDocument
     }
 
     /// <summary>
+    /// Sets the number format data style name for the specified axis.
+    /// 設定指定座標軸的數字格式資料樣式名稱。
+    /// </summary>
+    /// <param name="dimension">The axis dimension. / 座標軸維度。</param>
+    /// <param name="dataStyleName">The data style name; blank removes the setting. / 資料樣式名稱；空白值會移除設定。</param>
+    public void SetAxisNumberFormat(string dimension, string? dataStyleName)
+    {
+        ValidateAxisDimension(dimension);
+        OdfNode axis = FindOrCreateAxis(dimension);
+        string? existingStyleName = axis.GetAttribute("style-name", OdfNamespaces.Chart);
+        string resolvedStyleName;
+        if (string.IsNullOrWhiteSpace(existingStyleName))
+        {
+            resolvedStyleName = "axis-" + dimension + "-style";
+            axis.SetAttribute("style-name", OdfNamespaces.Chart, resolvedStyleName, "chart");
+        }
+        else
+        {
+            resolvedStyleName = existingStyleName!;
+        }
+
+        CreateChartStyle(resolvedStyleName).DataStyleName = dataStyleName;
+    }
+
+    /// <summary>
+    /// Gets the number format data style name for the specified axis.
+    /// 取得指定座標軸的數字格式資料樣式名稱。
+    /// </summary>
+    /// <param name="dimension">The axis dimension. / 座標軸維度。</param>
+    /// <returns>The data style name, or <see langword="null"/> when not set. / 資料樣式名稱；未設定時為 <see langword="null"/>。</returns>
+    public string? GetAxisNumberFormat(string dimension)
+    {
+        ValidateAxisDimension(dimension);
+        OdfNode? axis = FindAxis(dimension);
+        string? styleName = axis?.GetAttribute("style-name", OdfNamespaces.Chart);
+        return string.IsNullOrWhiteSpace(styleName)
+            ? null
+            : CreateChartStyle(styleName!).DataStyleName;
+    }
+
+    /// <summary>
     /// Sets the grid line visibility of the axis for the specified dimension.
     /// 設定指定維度座標軸的網格線可見性。
     /// </summary>

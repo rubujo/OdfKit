@@ -136,11 +136,114 @@ public class ChartAdvancedDepthTests
         Assert.Equal("FloorStyle", loaded.GetFloorStyleName());
     }
 
+    /// <summary>
+    /// 驗證折線圖標記樣式與座標軸數字格式可 round-trip。
+    /// </summary>
+    [Fact]
+    public void MarkerStyleAndAxisNumberFormat_RoundTrip()
+    {
+        using ChartDocument chart = ChartDocument.FromTable(
+            "Data",
+            new OdfCellRange(0, 0, 3, 1, "Data"),
+            OdfChartPreset.Line,
+            "Marker");
+        chart.GetSeriesEditor(0).ApplyMarkerStyle(new OdfChartMarkerStyle("circle", "0.25cm", "#FF0000", "#333333"));
+        chart.SetAxisNumberFormat("y", "N2");
+
+        using ChartDocument loaded = RoundTrip(chart);
+        OdfChartMarkerStyle marker = loaded.GetSeriesEditor(0).GetMarkerStyle()!;
+
+        Assert.Equal("circle", marker.Symbol);
+        Assert.Equal("0.25cm", marker.Size);
+        Assert.Equal("#FF0000", marker.FillColor);
+        Assert.Equal("N2", loaded.GetAxisNumberFormat("y"));
+    }
+
+    /// <summary>
+    /// 驗證圖表樣式摘要可讀回 marker 與 data style。
+    /// </summary>
+    [Fact]
+    public void ChartStyleInfo_ReadsMarkerAndDataStyle()
+    {
+        using ChartDocument chart = ChartDocument.FromTable(
+            "Data",
+            new OdfCellRange(0, 0, 3, 1, "Data"),
+            OdfChartPreset.Scatter,
+            "Styles");
+        chart.GetSeriesEditor(0).ApplyMarkerStyle(new OdfChartMarkerStyle("square", "0.3cm", "#00AA66", "#333333"));
+        chart.SetAxisNumberFormat("y", "Percent2");
+
+        OdfChartStyleInfo seriesStyle = Assert.Single(chart.GetChartStyles(), style => style.SymbolName == "square");
+
+        Assert.Equal("named-symbol", seriesStyle.SymbolType);
+        Assert.Equal("0.3cm", seriesStyle.SymbolSize);
+        Assert.Contains(chart.GetChartStyles(), style => style.DataStyleName == "Percent2");
+    }
+
+    /// <summary>
+    /// 驗證進階圖表設定在 ODS 嵌入圖表中可 round-trip。
+    /// </summary>
+    [Fact]
+    public void EmbeddedChart_AdvancedOptionsRoundTripWithStandaloneParity()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.SetValues(
+            new OdfCellAddress(0, 0, "Data"),
+            new object?[,]
+            {
+                { "Name", "Value" },
+                { "A", 10d },
+                { "B", 20d },
+            });
+
+        var options = new OdfEmbeddedChartOptions
+        {
+            Preset = OdfChartPreset.Column3D,
+            Title = "Embedded 3D",
+            YAxisNumberFormat = "N2",
+            ThreeDOptions = new OdfChart3DOptions
+            {
+                Projection = OdfDr3dProjection.Parallel,
+                AngleOffset = 30,
+                WallStyle = new OdfChartSurfaceStyle("WallStyle", FillColor: "#EEEEEE"),
+                FloorStyle = new OdfChartSurfaceStyle("FloorStyle", FillColor: "#DDDDDD"),
+            }
+        };
+        options.MarkerStyles.Add(new OdfChartMarkerStyle("circle", "0.25cm", "#FF0000", "#333333"));
+
+        _ = document.InsertChartFromRange(
+            "Data",
+            new OdfCellAddress(0, 3, "Data"),
+            new OdfCellRange(0, 0, 2, 1, "Data"),
+            options);
+
+        using SpreadsheetDocument loaded = RoundTripSpreadsheet(document);
+        OdfChartDocument chart = loaded.GetEmbeddedChartDocument(Assert.Single(loaded.GetEmbeddedCharts()));
+
+        Assert.Equal("Embedded 3D", chart.ChartTitle);
+        Assert.True(chart.PlotAreaStyle.ThreeDimensional);
+        Assert.Equal(OdfDr3dProjection.Parallel, chart.PlotAreaStyle.Projection);
+        Assert.Equal(30, chart.PlotAreaStyle.AngleOffset);
+        Assert.Equal("WallStyle", chart.GetWallStyleName());
+        Assert.Equal("FloorStyle", chart.GetFloorStyleName());
+        Assert.Equal("N2", chart.GetAxisNumberFormat("y"));
+        Assert.Equal("circle", chart.GetSeriesEditor(0).GetMarkerStyle()?.Symbol);
+    }
+
     private static ChartDocument RoundTrip(ChartDocument chart)
     {
         var stream = new MemoryStream();
         chart.SaveToStream(stream);
         stream.Position = 0;
         return ChartDocument.Load(stream, "chart.odc");
+    }
+
+    private static SpreadsheetDocument RoundTripSpreadsheet(SpreadsheetDocument document)
+    {
+        var stream = new MemoryStream();
+        document.SaveToStream(stream);
+        stream.Position = 0;
+        return SpreadsheetDocument.Load(stream, "chart.ods");
     }
 }

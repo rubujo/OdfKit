@@ -123,11 +123,13 @@ public sealed class DrawingDocumentBuilder
     /// <param name="pageName">The page name. / 頁面名稱。</param>
     /// <param name="steps">The flow steps. / 流程步驟。</param>
     /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
+    /// <param name="layoutOptions">The optional explicit flow layout options. / 選用的明確流程版面選項。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder AddFlow(
         string pageName,
         IEnumerable<OdfFlowStepRequest> steps,
-        OdfConnectorType connectorType = OdfConnectorType.Straight)
+        OdfConnectorType connectorType = OdfConnectorType.Straight,
+        OdfFlowLayoutOptions? layoutOptions = null)
     {
         if (steps is null)
         {
@@ -140,10 +142,56 @@ public sealed class DrawingDocumentBuilder
             for (int i = 0; i < snapshot.Length; i++)
             {
                 OdfFlowStepRequest step = snapshot[i];
-                page.AddFlowStep(step.Id, step.Text, i, step.ShapeType);
+                if (layoutOptions is null)
+                {
+                    page.AddFlowStep(step.Id, step.Text, i, step.ShapeType);
+                }
+                else
+                {
+                    double x = layoutOptions.StartXCm + (layoutOptions.Horizontal ? i * (layoutOptions.NodeWidthCm + layoutOptions.GapCm) : 0);
+                    double y = layoutOptions.StartYCm + (layoutOptions.Horizontal ? 0 : i * (layoutOptions.NodeHeightCm + layoutOptions.GapCm));
+                    if (step.ShapeType == OdfShapeType.Ellipse)
+                    {
+                        page.AddEllipse(x, y, layoutOptions.NodeWidthCm, layoutOptions.NodeHeightCm, shape => shape.WithId(step.Id));
+                    }
+                    else
+                    {
+                        page.AddRectangle(x, y, layoutOptions.NodeWidthCm, layoutOptions.NodeHeightCm, shape => shape.WithId(step.Id));
+                    }
+
+                    page.AddTextBox(
+                        step.Text,
+                        x + 0.3,
+                        y + 0.25,
+                        Math.Max(0.1, layoutOptions.NodeWidthCm - 0.6),
+                        Math.Max(0.1, layoutOptions.NodeHeightCm - 0.5));
+                }
+
                 if (i > 0)
                 {
                     page.AddConnector(snapshot[i - 1].Id, step.Id, connectorType);
+                    string? connectorLabelFormat = layoutOptions?.ConnectorLabelFormat;
+                    if (layoutOptions is not null && !string.IsNullOrWhiteSpace(connectorLabelFormat))
+                    {
+                        double labelX = layoutOptions.StartXCm +
+                            (layoutOptions.Horizontal
+                                ? (i - 0.5) * (layoutOptions.NodeWidthCm + layoutOptions.GapCm)
+                                : layoutOptions.NodeWidthCm + 0.4);
+                        double labelY = layoutOptions.StartYCm +
+                            (layoutOptions.Horizontal
+                                ? layoutOptions.NodeHeightCm + 0.2
+                                : (i - 0.5) * (layoutOptions.NodeHeightCm + layoutOptions.GapCm));
+                        page.AddTextBox(
+                            string.Format(
+                                System.Globalization.CultureInfo.InvariantCulture,
+                                connectorLabelFormat!,
+                                snapshot[i - 1].Id,
+                                step.Id),
+                            labelX,
+                            labelY,
+                            Math.Max(1, layoutOptions.NodeWidthCm),
+                            0.5);
+                    }
                 }
             }
         });
@@ -155,12 +203,14 @@ public sealed class DrawingDocumentBuilder
     /// </summary>
     /// <param name="steps">The flow steps. / 流程步驟。</param>
     /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
+    /// <param name="layoutOptions">The optional explicit flow layout options. / 選用的明確流程版面選項。</param>
     /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
     public DrawingDocumentBuilder AddFlow(
         IEnumerable<OdfFlowStepRequest> steps,
-        OdfConnectorType connectorType = OdfConnectorType.Straight)
+        OdfConnectorType connectorType = OdfConnectorType.Straight,
+        OdfFlowLayoutOptions? layoutOptions = null)
     {
-        return AddFlow($"Page {_pageCount + 1}", steps, connectorType);
+        return AddFlow($"Page {_pageCount + 1}", steps, connectorType, layoutOptions);
     }
 
     /// <summary>

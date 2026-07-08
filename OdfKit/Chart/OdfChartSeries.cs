@@ -434,4 +434,57 @@ public sealed class OdfChartSeries
             }
         }
     }
+
+    /// <summary>
+    /// Applies practical marker styling to this series.
+    /// 將實務標記樣式套用至此序列。
+    /// </summary>
+    /// <param name="style">The marker style. / 標記樣式。</param>
+    public void ApplyMarkerStyle(OdfChartMarkerStyle style)
+    {
+        if (style is null)
+        {
+            throw new ArgumentNullException(nameof(style));
+        }
+
+        OdfChartStyle chartStyle = Style;
+        chartStyle.SymbolType = string.IsNullOrWhiteSpace(style.Symbol) ? null : "named-symbol";
+        chartStyle.SymbolName = style.Symbol;
+        chartStyle.SymbolWidth = style.Size;
+        chartStyle.SymbolHeight = style.Size;
+        if (!string.IsNullOrWhiteSpace(style.FillColor))
+        {
+            chartStyle.Fill = "solid";
+            chartStyle.FillColor = style.FillColor;
+        }
+
+        if (!string.IsNullOrWhiteSpace(style.StrokeColor))
+        {
+            chartStyle.Stroke = "solid";
+            chartStyle.StrokeColor = style.StrokeColor;
+        }
+    }
+
+    /// <summary>
+    /// Gets practical marker styling from this series style.
+    /// 取得此序列樣式中的實務標記樣式。
+    /// </summary>
+    /// <returns>The marker style, or <see langword="null"/> when no marker style is set. / 標記樣式；未設定時為 <see langword="null"/>。</returns>
+    public OdfChartMarkerStyle? GetMarkerStyle()
+    {
+        OdfChartStyle chartStyle = Style;
+        if (string.IsNullOrWhiteSpace(chartStyle.SymbolName) &&
+            string.IsNullOrWhiteSpace(chartStyle.SymbolWidth) &&
+            string.IsNullOrWhiteSpace(chartStyle.FillColor) &&
+            string.IsNullOrWhiteSpace(chartStyle.StrokeColor))
+        {
+            return null;
+        }
+
+        return new OdfChartMarkerStyle(
+            chartStyle.SymbolName,
+            chartStyle.SymbolWidth,
+            chartStyle.FillColor,
+            chartStyle.StrokeColor);
+    }
 }

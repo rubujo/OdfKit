@@ -79,6 +79,51 @@ public class SpreadsheetHighLevelApiTests
     }
 
     /// <summary>
+    /// 驗證 InsertChartFromRange 會回傳可繼續編輯的嵌入圖表文件。
+    /// </summary>
+    [Fact]
+    public void InsertChartFromRange_ReturnsEditableEmbeddedChartDocument()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.Cells["A1"].CellValue = "Name";
+        sheet.Cells["B1"].CellValue = "Value";
+        sheet.Cells["A2"].CellValue = "Alpha";
+        sheet.Cells["B2"].CellValue = 10d;
+
+        var options = new OdfEmbeddedChartOptions
+        {
+            Preset = OdfChartPreset.Column3D,
+            Title = "實務圖表",
+            Width = 10.Cm(),
+            Height = 6.Cm(),
+            XAxisTitle = "分類",
+            YAxisTitle = "數值",
+            DataLabelPreset = OdfChartDataLabelPreset.Value,
+            ShowMajorGridLines = true
+        };
+        options.SeriesStyleNames.Add("SeriesA");
+        options.Palette.Add("#3366CC");
+
+        OdfChartDocument chart = document.InsertChartFromRange(
+            "Data",
+            new OdfCellAddress(0, 3, "Data"),
+            new OdfCellRange(0, 0, 1, 1),
+            options);
+
+        Assert.Equal("實務圖表", chart.ChartTitle);
+        Assert.Equal("end", chart.LegendPosition);
+        Assert.Equal("分類", chart.XAxisTitle);
+        Assert.Equal("數值", chart.YAxisTitle);
+        Assert.Equal("SeriesA", chart.GetSeriesEditor(0).StyleName);
+        Assert.Equal("#3366CC", chart.GetSeriesEditor(0).Style.FillColor);
+        Assert.True(chart.FindAxisInfo("y")?.HasMajorGrid);
+        Assert.NotNull(chart.FindSeriesDataLabels(0));
+        Assert.Single(document.GetEmbeddedCharts());
+        Assert.Contains("chart:three-dimensional=\"true\"", Encoding.UTF8.GetString(document.Package.ReadEntry("Object 1/content.xml")));
+    }
+
+    /// <summary>
     /// 驗證資料驗證 (AddDataValidation) API 的全域宣告與儲存格關聯。
     /// </summary>
     [Fact]
@@ -1390,6 +1435,248 @@ public class SpreadsheetHighLevelApiTests
         Assert.Contains("fo:border-top=\"1pt solid #000000\"", xml);
         Assert.Contains("fo:border-bottom=\"0.5pt dotted #0000FF\"", xml);
         Assert.Contains("fo:text-align=\"center\"", xml);
+    }
+
+    /// <summary>
+    /// 驗證 SetValues、AppendRows 與 GetUsedRange 提供實務批次資料入口。
+    /// </summary>
+    [Fact]
+    public void RangeDepthHelpers_SetValuesAppendRowsAndUsedRange()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+
+        OdfCellRange initial = sheet.SetValues(
+            new OdfCellAddress(0, 0, "Data"),
+            new object?[,]
+            {
+                { "Name", "Amount" },
+                { "A", 10d },
+            });
+        OdfCellRange appended = document.AppendRows(
+            "Data",
+            [
+                ["B", 20d],
+                ["C", 30d],
+            ]);
+        sheet.ApplyStyle(initial, "HeadingStyle");
+
+        Assert.Equal("A", sheet.Cells["A2"].DisplayText);
+        Assert.Equal("B", sheet.Cells["A3"].DisplayText);
+        Assert.Equal("HeadingStyle", sheet.Cells["A1"].StyleName);
+        Assert.Equal(3, appended.EndAddress.Row);
+        OdfCellRange? usedRange = document.GetUsedRange("Data");
+        Assert.NotNull(usedRange);
+        Assert.Equal(0, usedRange!.Value.StartAddress.Row);
+        Assert.Equal(3, usedRange.Value.EndAddress.Row);
+        Assert.Equal(1, usedRange.Value.EndAddress.Column);
+    }
+
+    /// <summary>
+    /// 驗證範圍寫入 report 可回報清除、略過與依 key 欄附加。
+    /// </summary>
+    [Fact]
+    public void RangeDepthHelpers_ReportClearTrailingAndAppendByKeyColumn()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.SetValues(
+            new OdfCellAddress(0, 0, "Data"),
+            new object?[,]
+            {
+                { "Name", "Amount", "Note" },
+                { "A", 10d, "keep" },
+            });
+        sheet.Cells["E10"].CellValue = "side note";
+
+        OdfRangeWriteReport update = sheet.UpdateRows(
+            new OdfCellRange(1, 0, 1, 2, "Data"),
+            [["B"]],
+            new OdfRangeWriteOptions { ClearTrailingCells = true });
+        OdfRangeWriteReport append = document.AppendRows(
+            "Data",
+            [["C", 30d]],
+            0,
+            new OdfRangeWriteOptions { AppendKeyColumn = 0 });
+
+        Assert.Equal(1, update.WrittenCellCount);
+        Assert.Equal(0, update.SkippedCellCount);
+        Assert.Equal(0, update.ClearedCellCount);
+        Assert.Equal("B", sheet.Cells["A2"].DisplayText);
+        Assert.Equal("C", sheet.Cells["A3"].DisplayText);
+        Assert.Equal(2, append.Range.StartAddress.Row);
+    }
+
+    /// <summary>
+    /// 驗證嵌入圖表可刷新資料範圍並批次更新序列。
+    /// </summary>
+    [Fact]
+    public void EmbeddedChart_CanRefreshRangeAndUpdateSeries()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.SetValues(
+            new OdfCellAddress(0, 0, "Data"),
+            new object?[,]
+            {
+                { "Name", "Value" },
+                { "A", 10d },
+                { "B", 20d },
+            });
+        OdfChartDocument chart = document.InsertChartFromRange(
+            "Data",
+            new OdfCellAddress(0, 3, "Data"),
+            new OdfCellRange(0, 0, 1, 1, "Data"));
+
+        document.RefreshChartDataRange(chart, "Data", new OdfCellRange(0, 0, 2, 1, "Data"));
+        OdfBatchUpdateResult result = document.UpdateEmbeddedChartSeries(
+            chart,
+            [
+                new OdfEmbeddedChartSeriesUpdate
+                {
+                    Index = 0,
+                    StyleName = "SeriesBlue",
+                    AttachedAxis = "primary-y",
+                    DataLabelPreset = OdfChartDataLabelPreset.Value
+                }
+            ]);
+
+        var (_, range) = chart.GetDataRange();
+        Assert.Equal(1, result.UpdatedCount);
+        Assert.Equal(2, range!.Value.EndAddress.Row);
+        Assert.Equal("SeriesBlue", chart.GetSeriesEditor(0).StyleName);
+        Assert.Equal("primary-y", chart.GetSeriesEditor(0).AttachedAxis);
+        Assert.NotNull(chart.GetSeriesEditor(0).FindDataLabels());
+    }
+
+    /// <summary>
+    /// 驗證嵌入圖表可套用 marker 與座標軸格式。
+    /// </summary>
+    [Fact]
+    public void EmbeddedChart_AppliesMarkerAndAxisFormat()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.SetValues(
+            new OdfCellAddress(0, 0, "Data"),
+            new object?[,]
+            {
+                { "Name", "Value" },
+                { "A", 10d },
+                { "B", 20d },
+            });
+
+        var options = new OdfEmbeddedChartOptions
+        {
+            Preset = OdfChartPreset.Line,
+            YAxisNumberFormat = "N2"
+        };
+        options.MarkerStyles.Add(new OdfChartMarkerStyle("circle", "0.25cm", "#FF0000", "#333333"));
+
+        OdfChartDocument chart = document.InsertChartFromRange(
+            "Data",
+            new OdfCellAddress(0, 3, "Data"),
+            new OdfCellRange(0, 0, 2, 1, "Data"),
+            options);
+
+        OdfChartMarkerStyle marker = chart.GetSeriesEditor(0).GetMarkerStyle()!;
+        Assert.Equal("circle", marker.Symbol);
+        Assert.Equal("N2", chart.GetAxisNumberFormat("y"));
+    }
+
+    /// <summary>
+    /// 驗證 spreadsheet table facade 會寫入 database range、named range、filter、sort 並可調整範圍。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetTableFacade_WritesDatabaseRangeMetadata()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.SetValues(
+            new OdfCellAddress(0, 0, "Data"),
+            new object?[,]
+            {
+                { "Name", "Amount" },
+                { "A", 10d },
+                { "B", 20d },
+            });
+
+        OdfSpreadsheetTable table = document.CreateTable(
+            "Sales",
+            new OdfCellRange(0, 0, 2, 1, "Data"));
+        table.ApplyFilter(new OdfDatabaseFilterConditionInfo(1, ">", "10"));
+        table.ApplySort(new OdfDatabaseSortRuleInfo(0, ascending: true));
+        Assert.True(document.ResizeTable("Sales", new OdfCellRange(0, 0, 3, 1, "Data")));
+
+        OdfSpreadsheetTableInfo info = Assert.Single(document.GetTables(), item => item.Name == "Sales");
+        OdfDatabaseRangeInfo databaseRange = Assert.Single(document.GetDatabaseRanges(), item => item.Name == "Sales");
+
+        Assert.Equal("Data.A1:.B4", info.TargetRangeAddress);
+        Assert.True(info.DisplayFilterButtons);
+        Assert.Contains(document.GetNamedRanges(), item => item.Name == "Sales");
+        Assert.Contains(databaseRange.FilterConditions, condition => condition.FieldNumber == 1 && condition.Value == "10");
+        Assert.Contains(databaseRange.SortRules, rule => rule.FieldNumber == 0 && rule.Ascending);
+    }
+
+    /// <summary>
+    /// 驗證 table facade 會拒絕重複名稱並同步更新同名 named range。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetTableFacade_RejectsDuplicateAndSyncsNamedRange()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        OdfTableSheet sheet = document.Worksheets.Add("Data");
+        sheet.SetValues(
+            new OdfCellAddress(0, 0, "Data"),
+            new object?[,]
+            {
+                { "Name", "Amount" },
+                { "A", 10d },
+                { "B", 20d },
+            });
+
+        document.CreateTable(
+            "Sales",
+            new OdfCellRange(0, 0, 2, 1, "Data"),
+            new OdfSpreadsheetTableOptions { FirstRowAsHeader = false });
+
+        Assert.Throws<InvalidOperationException>(() =>
+            document.CreateTable("Sales", new OdfCellRange(0, 0, 1, 1, "Data")));
+        Assert.True(document.ResizeTable("Sales", new OdfCellRange(0, 0, 3, 1, "Data")));
+
+        OdfSpreadsheetTableInfo table = Assert.Single(document.GetTables(), item => item.Name == "Sales");
+        OdfNamedRangeInfo namedRange = Assert.Single(document.GetNamedRanges(), item => item.Name == "Sales");
+
+        Assert.False(table.FirstRowAsHeader);
+        Assert.Equal("Data.A1:.B4", namedRange.CellRangeAddress);
+    }
+
+    /// <summary>
+    /// 驗證 FindTable 取得的 facade 可編輯 filter、sort 並清除 metadata。
+    /// </summary>
+    [Fact]
+    public void SpreadsheetTableFacade_FindTableEditsAndClearsMetadata()
+    {
+        using SpreadsheetDocument document = SpreadsheetDocument.Create();
+        document.Worksheets.Add("Data").SetValues(
+            new OdfCellAddress(0, 0, "Data"),
+            new object?[,]
+            {
+                { "Name", "Amount" },
+                { "A", 10d },
+                { "B", 20d },
+            });
+        document.CreateTable("Sales", new OdfCellRange(0, 0, 2, 1, "Data"));
+
+        OdfSpreadsheetTable table = document.FindTable("Sales")!;
+        table.ApplyFilter(new OdfDatabaseFilterConditionInfo(1, ">", "10"));
+        table.ApplySort(new OdfDatabaseSortRuleInfo(1, ascending: false));
+        table.ClearFilter();
+        table.ClearSort();
+
+        OdfDatabaseRangeInfo info = Assert.Single(document.GetDatabaseRanges(), item => item.Name == "Sales");
+        Assert.Empty(info.FilterConditions);
+        Assert.Empty(info.SortRules);
     }
 
     private static string? GetCellStyle(OdfCell cell, string propertyName) =>

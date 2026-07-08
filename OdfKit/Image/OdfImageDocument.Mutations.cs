@@ -67,6 +67,68 @@ public partial class OdfImageDocument
     }
 
     /// <summary>
+    /// Batch-sets the rotation angle for image frames.
+    /// 批次設定影像框架的旋轉角度。
+    /// </summary>
+    /// <param name="names">The frame names. / 框架名稱清單。</param>
+    /// <param name="degrees">The rotation angle in degrees; <see langword="null"/> removes rotation. / 旋轉角度（度）；<see langword="null"/> 表示移除旋轉設定。</param>
+    /// <returns>The batch update result. / 批次更新結果。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="names"/> is <see langword="null"/>. / 當 <paramref name="names"/> 為 <see langword="null"/> 時擲出。</exception>
+    public OdfImageBatchUpdateResult SetImageRotations(IEnumerable<string> names, double? degrees)
+    {
+        if (names is null)
+        {
+            throw new ArgumentNullException(nameof(names));
+        }
+
+        var result = new OdfImageBatchUpdateResult();
+        foreach (string name in names)
+        {
+            if (SetImageRotation(name, degrees))
+            {
+                result.UpdatedCount++;
+            }
+            else
+            {
+                result.MissingNames.Add(name);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Batch-sets crop bounds for image frames.
+    /// 批次設定影像框架的裁切邊界。
+    /// </summary>
+    /// <param name="names">The frame names. / 框架名稱清單。</param>
+    /// <param name="crop">The crop bounds; <see langword="null"/> removes crop settings. / 裁切邊界；<see langword="null"/> 表示移除裁切設定。</param>
+    /// <returns>The batch update result. / 批次更新結果。</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="names"/> is <see langword="null"/>. / 當 <paramref name="names"/> 為 <see langword="null"/> 時擲出。</exception>
+    public OdfImageBatchUpdateResult SetImageCrops(IEnumerable<string> names, OdfImageCropInfo? crop)
+    {
+        if (names is null)
+        {
+            throw new ArgumentNullException(nameof(names));
+        }
+
+        var result = new OdfImageBatchUpdateResult();
+        foreach (string name in names)
+        {
+            if (SetImageCrop(name, crop))
+            {
+                result.UpdatedCount++;
+            }
+            else
+            {
+                result.MissingNames.Add(name);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Finds an image frame summary by name.
     /// 依名稱尋找影像框架摘要。
     /// </summary>

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using OdfKit.Core;
 using OdfKit.Database;
+using OdfKit.DOM;
 using Xunit;
 
 namespace OdfKit.Tests;
@@ -66,6 +67,54 @@ public class DatabaseHighLevelApiTests
 
         Assert.True(database.RemoveReport("DraftReport"));
         Assert.Single(database.Reports);
+    }
+
+    /// <summary>
+    /// 驗證資料庫摘要可彙總常見檢查資訊。
+    /// </summary>
+    [Fact]
+    public void GetSummary_ReturnsPracticalDatabaseCounts()
+    {
+        using var database = DatabaseDocument.Create();
+        database.SetConnection("sdbc:embedded:hsqldb");
+        database.AddTable("Customers");
+        database.AddQuery("Adults", "SELECT * FROM Customers WHERE Age > 18");
+        database.AddForm("CustomerForm", "forms/CustomerForm");
+        database.AddReport("CustomerReport", "reports/CustomerReport");
+        database.AddDataSourceSetting("UseCatalog", OdfDatabaseDataSourceSettingType.Boolean, "true");
+
+        OdfDatabaseSummaryInfo summary = database.GetSummary();
+
+        Assert.Equal("sdbc:embedded:hsqldb", summary.ConnectionHref);
+        Assert.Equal(1, summary.TableCount);
+        Assert.Equal(1, summary.QueryCount);
+        Assert.Equal(1, summary.FormCount);
+        Assert.Equal(1, summary.ReportCount);
+        Assert.Equal(1, summary.DataSourceSettingCount);
+    }
+
+    /// <summary>
+    /// 驗證資料庫實務 helper 可描述連線、schema 與參數化查詢。
+    /// </summary>
+    [Fact]
+    public void PracticalDepthHelpers_DescribeConnectionSchemaAndParameterizedQuery()
+    {
+        using var database = DatabaseDocument.Create();
+        database
+            .ConfigureConnection("sdbc:embedded:hsqldb")
+            .AddTableSchema("Customers", ["Id INT", "Name VARCHAR"]);
+        database.AddParameterizedQuery(
+            "ByName",
+            "SELECT * FROM Customers WHERE Name = :name",
+            [new OdfDatabaseQueryParameter("name", "string", "Customer name")],
+            "依名稱查詢");
+
+        Assert.Equal("sdbc:embedded:hsqldb", database.ConnectionHref);
+        Assert.Equal("Id INT, Name VARCHAR", database.FindTable("Customers")?.Command);
+        OdfDatabaseQueryInfo? query = database.FindQuery("ByName");
+        Assert.NotNull(query);
+        Assert.Equal("依名稱查詢", query!.Title);
+        Assert.Contains("name:string", query.Description);
     }
 
     /// <summary>

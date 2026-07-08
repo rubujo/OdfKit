@@ -9,12 +9,14 @@ namespace OdfKit.Spreadsheet;
 /// <param name="name">The database range name. / 資料庫範圍名稱。</param>
 /// <param name="targetRangeAddress">The target range address string from <c>table:target-range-address</c>. / 目標範圍位址字串（<c>table:target-range-address</c>）。</param>
 /// <param name="displayFilterButtons">Whether to display auto-filter buttons. / 是否顯示自動篩選按鈕。</param>
+/// <param name="containsHeader">Whether the first row is treated as labels. / 第一列是否視為標籤。</param>
 /// <param name="filterConditions">The filter condition list. / 篩選條件清單。</param>
 /// <param name="sortRules">The sort rule list. / 排序規則清單。</param>
 public sealed class OdfDatabaseRangeInfo(
     string name,
     string targetRangeAddress,
     bool displayFilterButtons,
+    bool containsHeader,
     IReadOnlyList<OdfDatabaseFilterConditionInfo> filterConditions,
     IReadOnlyList<OdfDatabaseSortRuleInfo> sortRules)
 {
@@ -35,6 +37,12 @@ public sealed class OdfDatabaseRangeInfo(
     /// 取得是否顯示自動篩選按鈕。
     /// </summary>
     public bool DisplayFilterButtons { get; } = displayFilterButtons;
+
+    /// <summary>
+    /// Gets whether the first row is treated as labels.
+    /// 取得第一列是否視為標籤。
+    /// </summary>
+    public bool ContainsHeader { get; } = containsHeader;
 
     /// <summary>
     /// Gets the filter condition list.

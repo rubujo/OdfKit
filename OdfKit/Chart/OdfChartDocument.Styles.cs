@@ -169,7 +169,11 @@ public partial class OdfChartDocument
             fillVal,
             strokeVal,
             threeD,
-            angleOffset);
+            angleOffset,
+            StyleEngine.GetStyleProperty(name, "symbol-type", OdfNamespaces.Chart, "chart"),
+            StyleEngine.GetStyleProperty(name, "symbol-name", OdfNamespaces.Chart, "chart"),
+            StyleEngine.GetStyleProperty(name, "symbol-width", OdfNamespaces.Chart, "chart"),
+            StyleEngine.GetStyleProperty(name, "data-style-name", OdfNamespaces.Style, "chart"));
     }
 
     /// <summary>
@@ -243,7 +247,11 @@ public partial class OdfChartDocument
                 fillVal,
                 strokeVal,
                 threeD,
-                angleOffset));
+                angleOffset,
+                StyleEngine.GetStyleProperty(name!, "symbol-type", OdfNamespaces.Chart, "chart"),
+                StyleEngine.GetStyleProperty(name!, "symbol-name", OdfNamespaces.Chart, "chart"),
+                StyleEngine.GetStyleProperty(name!, "symbol-width", OdfNamespaces.Chart, "chart"),
+                StyleEngine.GetStyleProperty(name!, "data-style-name", OdfNamespaces.Style, "chart")));
         }
 
         return styles;

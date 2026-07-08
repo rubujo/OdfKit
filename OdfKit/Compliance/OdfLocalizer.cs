@@ -277,6 +277,15 @@ public static partial class OdfLocalizer
             "PRAC0102" => "Reuse styles or simplify generated styling to reduce automatic style fragmentation.",
             "PRAC0200" => "Use LibreOffice for final chart verification or provide a simpler chart fallback.",
             "PRAC0300" => "Verify headers and footers in Microsoft Office or simplify page layout settings.",
+            "PRAC0301" => "Open the representative ODT in Microsoft Word, or simplify text indexes, sections, and embedded objects for Office-targeted exchange.",
+            "PRAC0400" => "Verify spreadsheet sizing in the target editor or keep dimensions simple.",
+            "PRAC0401" => "Verify print ranges and page settings after cross-suite editing.",
+            "PRAC0500" => "Prefer baked image variants or verify crop and rotation in the target editor.",
+            "IMG0001" => "Prefer PNG, JPEG or SVG images for portable ODF editing.",
+            "IMG0002" => "Add a title or description for accessibility.",
+            "IMG0003" => "Consider optimizing the image outside the core OdfKit package.",
+            "IMG0004" => "Verify the rendered result in the target editor.",
+            "IMG0005" => "Reuse the existing package resource when practical.",
             _ => "Correct the document content based on validation messages."
         };
     }

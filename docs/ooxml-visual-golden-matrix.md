@@ -14,6 +14,9 @@ pwsh eng/Test-OoxmlVisualGolden.ps1
 
 # 強制要求完整環境（缺任一項則 exit 1）
 pwsh eng/Test-OoxmlVisualGolden.ps1 -RequireEnvironment
+
+# Office GUI / COM ODF 開啟煙霧驗收
+pwsh eng/Test-OfficeGuiSmoke.ps1 -RequireEnvironment
 ```
 
 ## 環境需求
@@ -35,6 +38,19 @@ PDF 像素比對腳本：[`eng/scripts/PdfVisualDiff.py`](../eng/scripts/PdfVisu
 | `odt-docx-word-pdf` | ODT | DOCX | LibreOffice | Word | `WordAndLibreOffice_RenderConvertedDocxToPdf` | ✅ 自動化（可選環境） |
 | `ods-xlsx-excel-pdf` | ODS | XLSX | LibreOffice | Excel | `ExcelAndLibreOffice_RenderConvertedXlsxToPdf` | ✅ 自動化（可選環境） |
 
+## Office GUI / COM 煙霧驗收
+
+`eng/Test-OfficeGuiSmoke.ps1` 使用本機 Microsoft Office COM 開啟 repo 內代表性 ODF fixture：
+
+| 場景 | 檔案 | 目標應用程式 | 驗收 |
+|------|------|--------------|------|
+| ODT 文字文件 | `complex-annual-report.odt` | Word | 可復原並讀取「年度報告」與「營運摘要」 |
+| ODS 試算表 | `complex-financial-model.ods` | Excel | 可讀取 A1「月份」 |
+| ODP 簡報 | `complex-business-deck.odp` | PowerPoint | 可讀取至少 2 張投影片 |
+
+此 smoke test 驗證 Office 實機可載入代表性 ODF，但不取代 PDF pixel diff，
+也不宣稱 Microsoft Office 與 LibreOffice 呈現像素級一致。
+
 ## 驗收邏輯
 
 1. OdfKit 建立含代表性內容的 ODF 樣本。
@@ -46,7 +62,7 @@ PDF 像素比對腳本：[`eng/scripts/PdfVisualDiff.py`](../eng/scripts/PdfVisu
 
 - 儲存庫內預先提交基準 PDF 二進位（目前採即時雙路徑渲染比對）
 - macOS / Linux Office COM 驗收
-- PPTX / 繪圖格式 OOXML 視覺驗收
+- Codex Computer Use 或瀏覽器 PDF 截圖作為自動化門檻
 - 圖表樣式、樞紐表等進階視覺保真
 
 ## 相關測試
@@ -54,4 +70,5 @@ PDF 像素比對腳本：[`eng/scripts/PdfVisualDiff.py`](../eng/scripts/PdfVisu
 | 類別 | 說明 |
 |------|------|
 | `OfficeInteropConversionTests` | 本矩陣的實機 PDF 視覺比對 |
+| `OfficeGuiSmokeTests` | Office COM 開啟代表性 ODT / ODS / ODP 的煙霧驗收 |
 | `OoxmlConversionTests` | OOXML 結構與語意來回讀寫（非視覺）；含 ODT↔DOCX 圖片／追蹤修訂與 ODS↔XLSX 樞紐表往返；`Manifest_DefinesExpectedScenarios` 驗證本矩陣 manifest 結構與場景清單完整性 |

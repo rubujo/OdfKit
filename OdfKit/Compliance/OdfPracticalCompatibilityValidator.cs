@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OdfKit.Core;
 using OdfKit.DOM;
+using OdfKit.Image;
 
 namespace OdfKit.Compliance;
 
@@ -23,6 +25,23 @@ public static class OdfPracticalCompatibilityValidator
         OdfDocument document,
         OdfPracticalCompatibilityProfile profile)
     {
+        return Validate(document, profile, null);
+    }
+
+    /// <summary>
+    /// Validates practical interoperability risks for an ODF document with post-processing options.
+    /// 使用後處理選項驗證 ODF 文件的實務互通性風險。
+    /// </summary>
+    /// <param name="document">The document to validate. / 要驗證的文件。</param>
+    /// <param name="profile">The practical compatibility profile. / 實務相容性設定檔。</param>
+    /// <param name="options">The post-processing options. / 後處理選項。</param>
+    /// <returns>The practical compatibility report. / 實務相容性報告。</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="document"/> is <see langword="null"/>. / 當 <paramref name="document"/> 為 <see langword="null"/> 時擲出。</exception>
+    public static OdfPracticalCompatibilityReport Validate(
+        OdfDocument document,
+        OdfPracticalCompatibilityProfile profile,
+        OdfPracticalCompatibilityOptions? options)
+    {
         if (document is null)
         {
             throw new ArgumentNullException(nameof(document));
@@ -31,7 +50,62 @@ public static class OdfPracticalCompatibilityValidator
         List<OdfPracticalCompatibilityIssue> issues = [];
         ScanPackage(document, profile, issues);
         ScanContent(document, profile, issues);
+        ScanEmbeddedChartContent(document, profile, issues);
+        ScanImageInspection(document, profile, issues);
+        issues = ApplyOptions(issues, options);
         return new OdfPracticalCompatibilityReport(profile, document.DocumentKind, issues);
+    }
+
+    private static List<OdfPracticalCompatibilityIssue> ApplyOptions(
+        List<OdfPracticalCompatibilityIssue> issues,
+        OdfPracticalCompatibilityOptions? options)
+    {
+        if (options is null)
+        {
+            return issues;
+        }
+
+        IEnumerable<OdfPracticalCompatibilityIssue> filtered = issues
+            .Where(issue => !options.DisabledRuleIds.Contains(issue.RuleId))
+            .Select(issue => options.SeverityOverrides.TryGetValue(issue.RuleId, out OdfIssueSeverity severity)
+                ? issue with { Severity = severity }
+                : issue);
+
+        if (options.MaximumIssueCount.HasValue)
+        {
+            filtered = filtered.Take(Math.Max(0, options.MaximumIssueCount.Value));
+        }
+
+        return filtered.ToList();
+    }
+
+    private static void ScanImageInspection(
+        OdfDocument document,
+        OdfPracticalCompatibilityProfile profile,
+        List<OdfPracticalCompatibilityIssue> issues)
+    {
+        if (document is not OdfImageDocument imageDocument)
+        {
+            return;
+        }
+
+        OdfImageInspectionReport report = imageDocument.InspectImages(null, profile);
+        foreach (OdfImageInspectionIssue issue in report.Issues)
+        {
+            issues.Add(new OdfPracticalCompatibilityIssue(
+                issue.Severity,
+                issue.RuleId,
+                issue.MessageKey ?? issue.RuleId,
+                issue.Message,
+                issue.Suggestion,
+                document.DocumentKind,
+                issue.ImageHref,
+                new Dictionary<string, string?>
+                {
+                    ["frameName"] = issue.FrameName,
+                    ["profile"] = profile.ToString()
+                }));
+        }
     }
 
     private static void ScanPackage(
@@ -66,6 +140,12 @@ public static class OdfPracticalCompatibilityValidator
         int groupDepth = 0;
         bool hasAdvancedChart = false;
         bool hasHeaderFooter = false;
+        bool hasSpreadsheetSizing = false;
+        bool hasSpreadsheetPrintSettings = false;
+        bool hasImageTransform = false;
+        bool hasTextIndex = false;
+        bool hasTextSection = false;
+        bool hasEmbeddedObject = false;
 
         var stack = new Stack<(OdfNode Node, int TextBoxDepth, int GroupDepth)>();
         stack.Push((document.ContentRoot, 0, 0));
@@ -97,6 +177,36 @@ public static class OdfPracticalCompatibilityValidator
                 if (IsAdvancedChartNode(node))
                 {
                     hasAdvancedChart = true;
+                }
+
+                if (IsSpreadsheetSizingNode(node))
+                {
+                    hasSpreadsheetSizing = true;
+                }
+
+                if (IsSpreadsheetPrintSettingsNode(node))
+                {
+                    hasSpreadsheetPrintSettings = true;
+                }
+
+                if (IsImageTransformNode(node))
+                {
+                    hasImageTransform = true;
+                }
+
+                if (IsTextIndexNode(node))
+                {
+                    hasTextIndex = true;
+                }
+
+                if (node.LocalName == "section" && node.NamespaceUri == OdfNamespaces.Text)
+                {
+                    hasTextSection = true;
+                }
+
+                if (node.LocalName == "object" && node.NamespaceUri == OdfNamespaces.Draw)
+                {
+                    hasEmbeddedObject = true;
                 }
 
                 if (node.NamespaceUri == OdfNamespaces.Style &&
@@ -138,6 +248,101 @@ public static class OdfPracticalCompatibilityValidator
         {
             AddIssue(document, issues, "PRAC0300", "Msg_Practical_HeaderFooterLayout", "content.xml");
         }
+
+        if (IsTextKind(document.DocumentKind) &&
+            profile is OdfPracticalCompatibilityProfile.MicrosoftOfficeOdf &&
+            (hasEmbeddedObject || (hasTextIndex && hasTextSection)))
+        {
+            AddIssue(
+                document,
+                issues,
+                "PRAC0301",
+                "Msg_Practical_WordOdtRepairRisk",
+                "content.xml",
+                new Dictionary<string, string?>
+                {
+                    ["hasTextIndex"] = hasTextIndex.ToString(),
+                    ["hasTextSection"] = hasTextSection.ToString(),
+                    ["hasEmbeddedObject"] = hasEmbeddedObject.ToString()
+                });
+        }
+
+        if (hasSpreadsheetSizing &&
+            IsSpreadsheetKind(document.DocumentKind) &&
+            profile is not OdfPracticalCompatibilityProfile.LibreOfficeCurrent)
+        {
+            AddIssue(document, issues, "PRAC0400", "Msg_Practical_SpreadsheetSizing", "content.xml");
+        }
+
+        if (hasSpreadsheetPrintSettings &&
+            IsSpreadsheetKind(document.DocumentKind) &&
+            profile is not OdfPracticalCompatibilityProfile.LibreOfficeCurrent)
+        {
+            AddIssue(document, issues, "PRAC0401", "Msg_Practical_SpreadsheetPrintSettings", "content.xml");
+        }
+
+        if (hasImageTransform &&
+            (IsPresentationOrGraphicsKind(document.DocumentKind) || IsImageKind(document.DocumentKind)) &&
+            profile is not OdfPracticalCompatibilityProfile.LibreOfficeCurrent)
+        {
+            AddIssue(document, issues, "PRAC0500", "Msg_Practical_ImageTransform", "content.xml");
+        }
+    }
+
+    private static void ScanEmbeddedChartContent(
+        OdfDocument document,
+        OdfPracticalCompatibilityProfile profile,
+        List<OdfPracticalCompatibilityIssue> issues)
+    {
+        if (profile is OdfPracticalCompatibilityProfile.LibreOfficeCurrent)
+        {
+            return;
+        }
+
+        foreach (KeyValuePair<string, string> entry in document.Package.Manifest)
+        {
+            string path = entry.Key;
+            if (!path.StartsWith("Object ", StringComparison.Ordinal) ||
+                !path.EndsWith("/content.xml", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            try
+            {
+                using var stream = document.Package.GetEntryStream(path);
+                OdfNode root = OdfXmlReader.Parse(stream, document.Package.LoadOptions);
+                if (ContainsAdvancedChartNode(root))
+                {
+                    AddIssue(document, issues, "PRAC0200", "Msg_Practical_AdvancedChart", path);
+                }
+            }
+            catch
+            {
+                // 實務相容性檢查不取代封裝驗證；無法解析的嵌入物件交由 schema/package validator 回報。
+            }
+        }
+    }
+
+    private static bool ContainsAdvancedChartNode(OdfNode root)
+    {
+        var stack = new Stack<OdfNode>();
+        stack.Push(root);
+        while (stack.Count > 0)
+        {
+            OdfNode node = stack.Pop();
+            if (IsAdvancedChartNode(node))
+            {
+                return true;
+            }
+
+            foreach (OdfNode child in node.Children)
+            {
+                stack.Push(child);
+            }
+        }
+
+        return false;
     }
 
     private static bool IsAdvancedChartNode(OdfNode node)
@@ -170,6 +375,47 @@ public static class OdfPracticalCompatibilityValidator
 
         return false;
     }
+
+    private static bool IsSpreadsheetSizingNode(OdfNode node) =>
+        node.NamespaceUri == OdfNamespaces.Style &&
+        (node.GetAttribute("column-width", OdfNamespaces.Style) is not null ||
+         node.GetAttribute("row-height", OdfNamespaces.Style) is not null);
+
+    private static bool IsSpreadsheetPrintSettingsNode(OdfNode node) =>
+        (node.NamespaceUri == OdfNamespaces.Table && node.GetAttribute("print-ranges", OdfNamespaces.Table) is not null) ||
+        (node.NamespaceUri == OdfNamespaces.Style && node.LocalName.IndexOf("print", StringComparison.OrdinalIgnoreCase) >= 0);
+
+    private static bool IsImageTransformNode(OdfNode node) =>
+        (node.NamespaceUri == OdfNamespaces.Draw &&
+         node.LocalName == "frame" &&
+         node.GetAttribute("transform", OdfNamespaces.Draw) is not null) ||
+        (node.NamespaceUri == OdfNamespaces.Draw &&
+         node.LocalName == "image" &&
+         node.GetAttribute("clip", OdfNamespaces.Fo) is not null);
+
+    private static bool IsTextIndexNode(OdfNode node) =>
+        node.NamespaceUri == OdfNamespaces.Text &&
+        (node.LocalName == "table-of-content" ||
+         node.LocalName == "illustration-index" ||
+         node.LocalName == "table-index" ||
+         node.LocalName == "object-index" ||
+         node.LocalName == "user-index" ||
+         node.LocalName == "alphabetical-index" ||
+         node.LocalName == "bibliography");
+
+    private static bool IsTextKind(OdfDocumentKind kind) =>
+        kind is OdfDocumentKind.Text or OdfDocumentKind.TextTemplate or OdfDocumentKind.TextMaster or
+            OdfDocumentKind.TextWeb or OdfDocumentKind.FlatText;
+
+    private static bool IsSpreadsheetKind(OdfDocumentKind kind) =>
+        kind is OdfDocumentKind.Spreadsheet or OdfDocumentKind.SpreadsheetTemplate or OdfDocumentKind.FlatSpreadsheet;
+
+    private static bool IsPresentationOrGraphicsKind(OdfDocumentKind kind) =>
+        kind is OdfDocumentKind.Presentation or OdfDocumentKind.PresentationTemplate or OdfDocumentKind.FlatPresentation or
+            OdfDocumentKind.Graphics or OdfDocumentKind.GraphicsTemplate or OdfDocumentKind.FlatGraphics;
+
+    private static bool IsImageKind(OdfDocumentKind kind) =>
+        kind is OdfDocumentKind.Image or OdfDocumentKind.ImageTemplate or OdfDocumentKind.FlatImage;
 
     private static void AddIssue(
         OdfDocument document,

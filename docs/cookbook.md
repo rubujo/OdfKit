@@ -485,6 +485,77 @@ TemplateBinder.Bind(template, new Dictionary<string, object?>
 template.Save("contract.odt");
 ```
 
+集合資料可用 `{{Items[].Field}}` 展開。`OdfTemplateBindReport` 會回報展開集合、
+命中占位符、未解析 token 與非致命警告；若同一個模板節點混用多個集合，會記錄
+警告而不做含糊展開。
+
+```csharp
+OdfTemplateBindReport bindReport = TemplateBinder.Bind(
+    template,
+    new Dictionary<string, object?>
+    {
+        ["Items"] = new[]
+        {
+            new { Name = "設計", Amount = 1000 },
+            new { Name = "驗證", Amount = 800 },
+        },
+    },
+    new OdfTemplateBindOptions());
+```
+
+## 試算表範圍批次操作
+
+```csharp
+using OdfKit.Spreadsheet;
+
+using SpreadsheetDocument workbook = SpreadsheetDocument.Create();
+OdfTableSheet sheet = workbook.Worksheets.Add("Data");
+
+sheet.SetValues(
+    new OdfCellAddress(0, 0, "Data"),
+    new object?[,]
+    {
+        { "Name", "Amount" },
+        { "A", 10d },
+    });
+
+workbook.AppendRows(
+    "Data",
+    [
+        ["B", 20d],
+        ["C", 30d],
+    ]);
+
+OdfCellRange? used = workbook.GetUsedRange("Data");
+```
+
+若只是產生大型 ODS，仍應優先使用 `OdsStreamWriter`；上述 range helper 適合已載入
+DOM 後的修改、樣式與公式工作流。
+
+## 簡報、繪圖與圖片批次更新
+
+```csharp
+using OdfKit.Presentation;
+
+using PresentationDocument deck = PresentationDocument.Create();
+OdfSlide slide = deck.AddSlide("Intro");
+OdfPicture picture = slide.AddPicture(imageBytes, 1.Cm(), 3.Cm(), 4.Cm(), 3.Cm());
+picture.Id = "hero";
+
+deck.ReplaceText("{{Name}}", "OdfKit");
+deck.UpdatePictures([
+    new OdfPictureUpdateRequest
+    {
+        Name = "hero",
+        AltText = "Hero image",
+        Width = 5.Cm(),
+    },
+]);
+```
+
+`ImageDocument.InspectImages()` 只做檢查與建議，會回報非可攜格式、缺少替代文字、
+過大圖片、裁切／旋轉與重複圖片 bytes；核心不做影像轉檔。
+
 ## 建立 ODF 公式（Fluent Builder）
 
 ```csharp
@@ -773,6 +844,263 @@ dotnet run --project tools/OdfKit.Cli --framework net10.0 -- pack file.fodt file
 | `.ods` | ODF 試算表 | `application/vnd.oasis.opendocument.spreadsheet` |
 | `.odp` | ODF 簡報 | `application/vnd.oasis.opendocument.presentation` |
 | `.odg` | ODF 繪圖 | `application/vnd.oasis.opendocument.graphics` |
+
+## 實務深度 helper
+
+### ODS 表格化資料、篩選與排序
+
+`OdfSpreadsheetTable` 是建立在 ODF `table:database-range` 與 named range 上的實務 facade，適合一般 C# 應用程式做可篩選、可排序、可調整範圍的資料區塊。它不執行樞紐分析或公式重算。
+
+```csharp
+using OdfKit.Spreadsheet;
+
+using SpreadsheetDocument workbook = SpreadsheetDocument.Create();
+OdfTableSheet sheet = workbook.Worksheets.Add("Data");
+sheet.SetValues(
+    new OdfCellAddress(0, 0, "Data"),
+    new object?[,]
+    {
+        { "Name", "Amount" },
+        { "A", 10d },
+        { "B", 20d },
+    });
+
+OdfSpreadsheetTable table = workbook.CreateTable(
+    "Sales",
+    new OdfCellRange(0, 0, 2, 1, "Data"));
+table.ApplyFilter(new OdfDatabaseFilterConditionInfo(1, ">", "10"));
+table.ApplySort(new OdfDatabaseSortRuleInfo(0, ascending: true));
+table.Resize(new OdfCellRange(0, 0, 3, 1, "Data"));
+```
+
+若資料來源已經是 C# 物件，可以直接寫入 POCO 並建立可篩選表格；標題列會優先使用
+`DisplayNameAttribute` 或 `DisplayAttribute.Name`，否則使用屬性名稱。
+
+```csharp
+using System.ComponentModel;
+using OdfKit.Spreadsheet;
+using OdfKit.Styles;
+
+using SpreadsheetDocument workbook = SpreadsheetDocument.Create();
+OdfTableSheet sheet = workbook.Worksheets.Add("Data");
+var map = new OdfObjectColumnMap();
+map.Map(nameof(SalesRow.Amount), "Total", order: 0).Format = new OdfObjectColumnFormat
+{
+    NumberFormat = "N2",
+    Width = 3.Cm(),
+    HeaderStyleName = "HeaderCell",
+    StyleName = "MoneyCell",
+};
+map.Map(nameof(SalesRow.Customer), "Client", order: 1).Aliases.Add("Customer Name");
+map.Map(nameof(SalesRow.Closed), ignore: true);
+
+sheet.WriteObjects(
+    new OdfCellAddress(0, 0, "Data"),
+    new[]
+    {
+        new SalesRow { Customer = "A", Amount = 10m, Closed = true },
+        new SalesRow { Customer = "B", Amount = 20m, Closed = false },
+    },
+    new OdfObjectBindingOptions { CreateTableName = "Sales", ColumnMap = map });
+
+OdfSpreadsheetTable table = workbook.FindTable("Sales")!;
+table.ApplyFilter("Client", "=", "A");
+table.ApplySort("Total", ascending: false);
+
+OdfObjectBindingReport readReport = new();
+IReadOnlyList<SalesRow> rows = sheet.ReadObjects<SalesRow>(
+    new OdfCellRange(0, 0, 2, 1, "Data"),
+    new OdfObjectReadOptions
+    {
+        ColumnMap = map,
+        ConversionErrorPolicy = OdfObjectConversionErrorPolicy.WarnAndUseDefault,
+        Report = readReport,
+    });
+
+public sealed class SalesRow
+{
+    [DisplayName("Customer")]
+    public string? Customer { get; set; }
+
+    public decimal Amount { get; set; }
+
+    public bool Closed { get; set; }
+}
+```
+
+這個 API 針對一般業務資料匯入／匯出設計，支援字串、布林、數值、enum、`Guid`、
+`DateTime`、`DateTimeOffset` 與 nullable 型別；`OdfObjectColumnMap` 可控制欄名、
+順序、忽略欄位、讀取別名、必要欄位、空白值預設值與常見欄位格式。讀取轉換錯誤
+預設會擲出，也可用 `ConversionErrorPolicy` 改成記錄診斷並保留預設值或略過整列。
+大型資料串流仍建議使用 `OdsStreamWriter`，巢狀集合或 ORM 追蹤則留給呼叫端處理。
+
+匯入使用者維護的 ODS 時，可以先驗證欄位與資料品質，再依 key 更新或 upsert
+既有資料列。`UpsertObjects` 會保留已存在的未對應儲存格，新增列時也可從範本列複製
+樣式與公式；公式預設會位移相對列參照，例如將 `of:=[.B3]*2` 複製到下一列時變成
+`of:=[.B4]*2`。這適合「表格資料由程式更新、旁邊公式與格式由使用者維護」的工作流。
+
+```csharp
+var importMap = new OdfObjectColumnMap();
+importMap.Map(nameof(SalesRow.Customer)).RequiredColumn = true;
+importMap.Map(nameof(SalesRow.Amount)).RequiredValue = true;
+importMap.Map(nameof(SalesRow.Closed)).DefaultValue = false;
+
+OdfObjectBindingValidationReport validation = sheet.ValidateObjectBinding<SalesRow>(
+    new OdfCellRange(0, 0, 20, 3, "Data"),
+    new OdfObjectReadOptions
+    {
+        ColumnMap = importMap,
+        UnknownColumnPolicy = OdfObjectUnknownColumnPolicy.Warn,
+        DuplicateHeaderPolicy = OdfObjectDuplicateHeaderPolicy.WarnAndUseFirst,
+    });
+
+if (!validation.HasErrors)
+{
+    OdfObjectBindingReport update = sheet.UpsertObjects(
+        new OdfCellRange(0, 0, 20, 3, "Data"),
+        incomingRows,
+        new OdfObjectUpdateOptions
+        {
+            ColumnMap = importMap,
+            KeyColumn = nameof(SalesRow.Customer),
+            CopyStylesFromTemplateRow = true,
+            FillFormulasFromTemplateRow = true,
+            FormulaCopyMode = OdfFormulaCopyMode.ShiftRelativeReferences,
+            ResizeTable = true,
+        });
+}
+```
+
+若要完全保留模板公式文字，可將 `FormulaCopyMode` 設為 `CopyAsIs`；若新列不應帶入公式，
+可設為 `Clear`。
+
+### 模板圖片占位符
+
+`TemplateBinder` 支援 `{{Image:Logo}}`。為了避免版面不可預期，圖片占位符必須獨占整個 ODT 段落，或獨占 ODP／ODG 文字方塊內容。
+
+```csharp
+using OdfKit;
+using OdfKit.Text;
+
+using TextDocument document = TextDocument.Create();
+document.AddParagraph("{{Image:Logo}}");
+
+OdfTemplateBindReport report = TemplateBinder.Bind(
+    document,
+    new Dictionary<string, object?>
+    {
+        ["Logo"] = new OdfTemplateImageValue(
+            File.ReadAllBytes("logo.png"),
+            "logo.png",
+            AltText: "Company logo")
+    },
+    new OdfTemplateBindOptions());
+```
+
+### 圖表標記與軸格式
+
+Line／scatter 常見標記樣式與座標軸數字格式可透過 chart style round-trip。這是資料呈現 helper，不保證 Microsoft Office 與 LibreOffice 像素級一致。
+
+```csharp
+using OdfKit.Chart;
+using OdfKit.Spreadsheet;
+
+using ChartDocument chart = ChartDocument.FromTable(
+    "Data",
+    new OdfCellRange(0, 0, 3, 1, "Data"),
+    OdfChartPreset.Line,
+    "Trend");
+
+chart.GetSeriesEditor(0).ApplyMarkerStyle(
+    new OdfChartMarkerStyle("circle", "0.25cm", "#FF0000", "#333333"));
+chart.SetAxisNumberFormat("y", "N2");
+```
+
+常用 `data-style-name` 可以對應到呼叫端已建立或希望保留的資料樣式名稱，例如 `N2` 表示兩位小數、`Percent2` 表示百分比兩位小數、`CurrencyTwd` 表示新臺幣格式。OdfKit 會把名稱寫入 chart style，實際顯示格式由文件中的 number style 與開啟端決定。
+
+若圖表嵌入 ODS，可用同一組實務 options 套用 3D、marker、axis 與資料標籤設定；重新載入後可透過 `GetEmbeddedChartDocument` 繼續編輯。
+
+```csharp
+var options = new OdfEmbeddedChartOptions
+{
+    Preset = OdfChartPreset.Column3D,
+    Title = "Embedded 3D",
+    YAxisNumberFormat = "N2",
+    ThreeDOptions = new OdfChart3DOptions
+    {
+        Projection = OdfDr3dProjection.Parallel,
+        AngleOffset = 30,
+    },
+};
+options.MarkerStyles.Add(new OdfChartMarkerStyle("circle", "0.25cm", "#FF0000", "#333333"));
+
+OdfChartDocument embedded = workbook.InsertChartFromRange(
+    "Data",
+    new OdfCellAddress(0, 3, "Data"),
+    new OdfCellRange(0, 0, 10, 2, "Data"),
+    options);
+```
+
+### 簡報與繪圖批次圖形更新
+
+`UpdateShapes` 可依 id 或 name 批次更新位置、大小、圖層、填滿、筆觸與 z-index。繪圖順序可用 `BringToFront`／`SendToBack`／`MoveBefore`／`MoveAfter` 調整。
+
+```csharp
+using OdfKit.Presentation;
+using OdfKit.Styles;
+
+using PresentationDocument deck = PresentationDocument.Create();
+OdfSlide slide = deck.AddSlide("Intro");
+OdfShape shape = slide.AddShape(OdfShapeType.Rectangle, 1.Cm(), 1.Cm(), 2.Cm(), 1.Cm());
+shape.Id = "status";
+
+deck.UpdateShapes(
+[
+    new OdfShapeUpdateRequest
+    {
+        Name = "status",
+        FillColor = "#00AA66",
+        StrokeColor = "#333333",
+        ZIndex = 5
+    }
+]);
+deck.BringToFront("status");
+deck.MoveAfter("status", "title");
+```
+
+### 實務相容性規則選項
+
+`OdfPracticalCompatibilityOptions` 可停用特定 rule id、覆寫嚴重性，或限制回傳數量。validator 仍只回報風險，不宣稱跨套件版面完全一致。
+
+```csharp
+using OdfKit.Compliance;
+
+var options = new OdfPracticalCompatibilityOptions { MaximumIssueCount = 20 };
+options.DisabledRuleIds.Add("PRAC0400");
+options.SeverityOverrides["PRAC0401"] = OdfIssueSeverity.Info;
+
+OdfPracticalCompatibilityReport report =
+    OdfPracticalCompatibilityValidator.Validate(
+        workbook,
+        OdfPracticalCompatibilityProfile.PortableEditing,
+        options);
+```
+
+常見 rule id：
+
+| Rule id | Profile | 觸發情境 | 建議 |
+| --- | --- | --- | --- |
+| `PRAC0001` | 全部 | 封裝含巨集或腳本 | 移除巨集或改以外部流程執行 |
+| `PRAC0002` | 全部 | 圖片不是 PNG、JPEG 或 SVG | 改用可攜圖片格式 |
+| `PRAC0100` | 全部 | 複雜巢狀文字方塊 | 簡化版面或攤平成單層文字方塊 |
+| `PRAC0101` | 全部 | 複雜群組圖形 | 減少群組深度 |
+| `PRAC0102` | 全部 | 自動樣式過度分裂 | 合併重複樣式 |
+| `PRAC0200` | Microsoft Office / Portable editing | bubble、stock、3D、wall/floor 等進階圖表 | 以 LibreOffice 為主要互通目標，或提供替代圖表 |
+| `PRAC0300` | Microsoft Office | 頁首／頁尾版面可能不同 | 簡化頁面樣式並以目標套件檢視 |
+| `PRAC0301` | Microsoft Office | ODT 同時含目錄／索引、多欄區段或內嵌物件，可能觸發 Word 復原提示 | 以 Word 實機開啟代表檔，或簡化 Office 交換版 |
+| `PRAC0400` | Microsoft Office / Portable editing | ODS 明確欄寬／列高 | 以目標套件檢查版面 |
+| `PRAC0401` | Microsoft Office / Portable editing | ODS 列印設定 | 以目標套件檢查列印預覽 |
+| `PRAC0500` | Microsoft Office / Portable editing | ODP／ODG／ODI 圖片裁切或旋轉 | 優先烘焙成可攜圖片或提供替代版面 |
 
 ### ASP.NET Core Razor Pages (非同步)
 

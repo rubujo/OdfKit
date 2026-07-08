@@ -46,6 +46,16 @@ public class OdfDatabaseRange(OdfNode node, SpreadsheetDocument doc)
     }
 
     /// <summary>
+    /// Gets or sets whether this database range treats the first row as labels.
+    /// 取得或設定此資料庫範圍是否將第一列視為標籤。
+    /// </summary>
+    public bool ContainsHeader
+    {
+        get => Node.GetAttribute("contains-header", OdfNamespaces.Table) == "true";
+        set => Node.SetAttribute("contains-header", OdfNamespaces.Table, value ? "true" : "false", "table");
+    }
+
+    /// <summary>
     /// Gets or sets whether auto-filter buttons are displayed.
     /// 取得或設定是否顯示自動篩選按鈕。
     /// </summary>

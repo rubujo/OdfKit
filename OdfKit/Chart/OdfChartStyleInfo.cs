@@ -12,6 +12,10 @@
 /// <param name="stroke">The stroke style (e.g. <c>solid</c> or <c>none</c>). / 筆觸樣式（例如 <c>solid</c> 或 <c>none</c>）。</param>
 /// <param name="threeDimensional">Indicates whether this is a 3D chart. / 指出是否為 3D 圖表。</param>
 /// <param name="angleOffset">The 3D projection angle offset. / 3D 投影角度偏置。</param>
+/// <param name="symbolType">The marker symbol type. / 標記符號類型。</param>
+/// <param name="symbolName">The marker symbol name. / 標記符號名稱。</param>
+/// <param name="symbolSize">The marker symbol size. / 標記符號大小。</param>
+/// <param name="dataStyleName">The data style name. / 資料樣式名稱。</param>
 public sealed class OdfChartStyleInfo(
     string name,
     string? fillColor,
@@ -20,7 +24,11 @@ public sealed class OdfChartStyleInfo(
     string? fill = null,
     string? stroke = null,
     bool? threeDimensional = null,
-    int? angleOffset = null)
+    int? angleOffset = null,
+    string? symbolType = null,
+    string? symbolName = null,
+    string? symbolSize = null,
+    string? dataStyleName = null)
 {
     /// <summary>
     /// Gets the style name.
@@ -69,4 +77,28 @@ public sealed class OdfChartStyleInfo(
     /// 取得 3D 投影角度偏置。
     /// </summary>
     public int? AngleOffset { get; } = angleOffset;
+
+    /// <summary>
+    /// Gets the marker symbol type.
+    /// 取得標記符號類型。
+    /// </summary>
+    public string? SymbolType { get; } = symbolType;
+
+    /// <summary>
+    /// Gets the marker symbol name.
+    /// 取得標記符號名稱。
+    /// </summary>
+    public string? SymbolName { get; } = symbolName;
+
+    /// <summary>
+    /// Gets the marker symbol size.
+    /// 取得標記符號大小。
+    /// </summary>
+    public string? SymbolSize { get; } = symbolSize;
+
+    /// <summary>
+    /// Gets the data style name used for number formatting.
+    /// 取得用於數字格式的資料樣式名稱。
+    /// </summary>
+    public string? DataStyleName { get; } = dataStyleName;
 }
