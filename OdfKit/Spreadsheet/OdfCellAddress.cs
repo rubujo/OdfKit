@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using OdfKit.Core;
 
@@ -285,7 +286,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         }
 
         int colStart = i;
-        while (i < cellSpan.Length && char.IsLetter(cellSpan[i]))
+        while (i < cellSpan.Length && IsAsciiLetter(cellSpan[i]))
         {
             i++;
         }
@@ -301,7 +302,7 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
         }
 
         int rowStart = i;
-        while (i < cellSpan.Length && char.IsDigit(cellSpan[i]))
+        while (i < cellSpan.Length && IsAsciiDigit(cellSpan[i]))
         {
             i++;
         }
@@ -322,13 +323,29 @@ public readonly struct OdfCellAddress : IEquatable<OdfCellAddress>
 
         // 將資料列數字轉換為以 0 為起始的索引（文字中是以 1 為起始）
 #if NET10_0_OR_GREATER
-        int row = int.Parse(rowDigits) - 1;
+        int row = int.Parse(rowDigits, NumberStyles.None, CultureInfo.InvariantCulture) - 1;
 #else
-        int row = int.Parse(rowDigits.ToString()) - 1;
+        int row = int.Parse(rowDigits.ToString(), NumberStyles.None, CultureInfo.InvariantCulture) - 1;
 #endif
 
         return new OdfCellAddress(row, column, sheetName, isRowAbsolute, isColAbsolute, isSheetAbsolute);
     }
+
+    /// <summary>
+    /// Determines whether the specified character is an ASCII decimal digit ('0'-'9').
+    /// 判斷指定字元是否為 ASCII 十進位數字（'0' 至 '9'）。
+    /// </summary>
+    /// <param name="c">The character to test. / 要測試的字元。</param>
+    /// <returns><see langword="true"/> if the character is an ASCII digit; otherwise, <see langword="false"/>. / 如果該字元為 ASCII 數字則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    private static bool IsAsciiDigit(char c) => c is >= '0' and <= '9';
+
+    /// <summary>
+    /// Determines whether the specified character is an ASCII letter ('A'-'Z' or 'a'-'z').
+    /// 判斷指定字元是否為 ASCII 字母（'A' 至 'Z' 或 'a' 至 'z'）。
+    /// </summary>
+    /// <param name="c">The character to test. / 要測試的字元。</param>
+    /// <returns><see langword="true"/> if the character is an ASCII letter; otherwise, <see langword="false"/>. / 如果該字元為 ASCII 字母則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    private static bool IsAsciiLetter(char c) => c is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z');
 
     #endregion
 
