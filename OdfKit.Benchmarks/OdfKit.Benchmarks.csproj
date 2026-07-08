@@ -13,6 +13,10 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+    <!-- 下列兩者僅用於 CompetitiveStreamWriteBenchmarks 的跨套件效能對照，兩者皆為 MIT / Apache-2.0 寬鬆授權，
+         不會為建置此 repo 之使用者帶來授權負擔；詳見 docs/performance-comparison.md 的授權裁定說明。 -->
+    <PackageReference Include="MiniExcel" Version="1.45.0" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
   </ItemGroup>
 
   <ItemGroup>

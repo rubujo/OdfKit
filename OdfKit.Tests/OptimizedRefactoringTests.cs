@@ -31,7 +31,10 @@ namespace OdfKit.Tests;
 public partial class OptimizedRefactoringTests
 {
     /// <summary>
-    /// 驗證文件非同步載入會解析 content、styles、meta 與 settings 四個核心 XML entry。
+    /// 驗證文件非同步載入會解析 content、styles、meta 與 settings 四個核心 XML entry；
+    /// 文件內容刻意灌入大量文字，讓四份核心 XML 總量超過 <see cref="OdfDocument.SequentialCoreXmlLoadThresholdBytes"/>，
+    /// 以維持對 Channel 平行載入路徑的覆蓋（門檻以下的小型文件改走循序路徑，見
+    /// <see cref="Test_OdfDocument_LoadAsync_SmallCoreXml_UsesSequentialPath"/>）。
     /// </summary>
     [Fact]
     public async Task Test_OdfDocument_LoadAsync_ParsesCoreXmlEntries()
@@ -44,6 +47,7 @@ public partial class OptimizedRefactoringTests
             using (TextDocument document = TextDocument.Create())
             {
                 document.AddParagraph("非同步載入內容");
+                document.AddParagraph(new string('大', 80_000));
                 document.StylesDom.AppendChild(new OdfUnknownElement("styles-marker", markerNamespace, "async"));
                 document.MetaDom.AppendChild(new OdfUnknownElement("meta-marker", markerNamespace, "async"));
                 document.SettingsDom.AppendChild(new OdfUnknownElement("settings-marker", markerNamespace, "async"));
@@ -68,6 +72,40 @@ public partial class OptimizedRefactoringTests
             Assert.Equal(
                 expectedWorkerCount,
                 OdfDocument.LastCoreXmlChannelWorkerCountForTests);
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 驗證四份核心 XML 總量低於 <see cref="OdfDocument.SequentialCoreXmlLoadThresholdBytes"/> 的小型文件，
+    /// 載入時會略過 Channel 平行載入路徑，直接在呼叫執行緒上循序剖析（見 <c>OdfDocument.LoadXmlTrees</c>）。
+    /// </summary>
+    [Fact]
+    public async Task Test_OdfDocument_LoadAsync_SmallCoreXml_UsesSequentialPath()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"odfkit_async_load_small_{Guid.NewGuid():N}.odt");
+
+        try
+        {
+            using (TextDocument document = TextDocument.Create())
+            {
+                document.AddParagraph("小型文件內容");
+                document.Save(tempFile);
+            }
+
+            await using TextDocument loaded = await TextDocument.LoadAsync(
+                tempFile,
+                TestContext.Current.CancellationToken);
+
+            Assert.Contains("小型文件內容", loaded.ContentDom.TextContent, StringComparison.Ordinal);
+            Assert.Equal(4, OdfDocument.LastCoreXmlChannelJobCountForTests);
+            Assert.Equal(1, OdfDocument.LastCoreXmlChannelWorkerCountForTests);
         }
         finally
         {

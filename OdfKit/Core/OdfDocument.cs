@@ -30,6 +30,18 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
     internal static int LastCoreXmlChannelWorkerCountForTests { get; private set; }
 
     /// <summary>
+    /// 四份核心 XML 專案（content/styles/meta/settings）估計總大小（位元組）門檻；低於此門檻時 <see cref="LoadXmlTrees"/>
+    /// 會在呼叫執行緒上循序剖析，不建立 Channel（<c>System.Threading.Channels.Channel&lt;T&gt;</c>）與平行工作。
+    /// </summary>
+    /// <remarks>
+    /// 建立 Channel、啟動最多 4 個 <see cref="Task.Run(Action)"/> 背景工作並同步阻塞等待完成，其執行緒排程與同步成本，
+    /// 對總容量僅數 KB 至數十 KB 等級的小型核心 XML（常見於剛建立或內容精簡的文件）而言，容易超過循序剖析 4 份小型
+    /// XML 本身的成本；只有在總量達到門檻以上，平行剖析帶來的 CPU 平行度效益才足以攤銷排程成本。此門檻僅影響
+    /// <c>NET10_0_OR_GREATER</c> 路徑，netstandard2.0 路徑本來就是循序處理，不受影響。
+    /// </remarks>
+    internal const long SequentialCoreXmlLoadThresholdBytes = 64 * 1024;
+
+    /// <summary>
     /// Creates an ODF document of the specified kind.
     /// 建立指定種類的 ODF 文件。
     /// </summary>
@@ -317,39 +329,61 @@ public abstract partial class OdfDocument : IDisposable, IAsyncDisposable
         ];
         OdfNode[] results = new OdfNode[jobs.Length];
 #if NET10_0_OR_GREATER
-        var channel = Channel.CreateUnbounded<CoreXmlLoadJob>(new UnboundedChannelOptions
-        {
-            SingleReader = false,
-            SingleWriter = true
-        });
-
+        long estimatedTotalSize = 0;
         foreach (CoreXmlLoadJob job in jobs)
         {
-            channel.Writer.TryWrite(job);
+            string entryPath = string.IsNullOrEmpty(SubPath) ? job.EntryName : SubPath + job.EntryName;
+            OdfPackageEntry? entry = Package.GetEntry(entryPath);
+            estimatedTotalSize += entry?.GetEstimatedSize() ?? job.DefaultXml.Length;
         }
-        channel.Writer.Complete();
 
-        int workerCount = Math.Min(jobs.Length, OdfParallelScheduler.GetEffectiveConcurrency());
-        LastCoreXmlChannelJobCountForTests = jobs.Length;
-        LastCoreXmlChannelWorkerCountForTests = workerCount;
-
-        Task[] workers = new Task[workerCount];
-        for (int i = 0; i < workers.Length; i++)
+        if (estimatedTotalSize < SequentialCoreXmlLoadThresholdBytes)
         {
-            workers[i] = Task.Run(async () =>
+            // 小型文件：四份核心 XML 總量低於門檻，循序剖析的成本低於建立 Channel 與排程平行工作的成本，
+            // 直接在呼叫執行緒上循序處理，略過 Channel／Task.Run 平行路徑。
+            LastCoreXmlChannelJobCountForTests = jobs.Length;
+            LastCoreXmlChannelWorkerCountForTests = 1;
+            foreach (CoreXmlLoadJob job in jobs)
             {
-                ChannelReader<CoreXmlLoadJob> reader = channel.Reader;
-                while (await reader.WaitToReadAsync().ConfigureAwait(false))
-                {
-                    while (reader.TryRead(out CoreXmlLoadJob job))
-                    {
-                        results[job.Index] = LoadOrInitDom(job.EntryName, job.DefaultXml);
-                    }
-                }
-            });
+                results[job.Index] = LoadOrInitDom(job.EntryName, job.DefaultXml);
+            }
         }
+        else
+        {
+            var channel = Channel.CreateUnbounded<CoreXmlLoadJob>(new UnboundedChannelOptions
+            {
+                SingleReader = false,
+                SingleWriter = true
+            });
 
-        Task.WhenAll(workers).GetAwaiter().GetResult();
+            foreach (CoreXmlLoadJob job in jobs)
+            {
+                channel.Writer.TryWrite(job);
+            }
+            channel.Writer.Complete();
+
+            int workerCount = Math.Min(jobs.Length, OdfParallelScheduler.GetEffectiveConcurrency());
+            LastCoreXmlChannelJobCountForTests = jobs.Length;
+            LastCoreXmlChannelWorkerCountForTests = workerCount;
+
+            Task[] workers = new Task[workerCount];
+            for (int i = 0; i < workers.Length; i++)
+            {
+                workers[i] = Task.Run(async () =>
+                {
+                    ChannelReader<CoreXmlLoadJob> reader = channel.Reader;
+                    while (await reader.WaitToReadAsync().ConfigureAwait(false))
+                    {
+                        while (reader.TryRead(out CoreXmlLoadJob job))
+                        {
+                            results[job.Index] = LoadOrInitDom(job.EntryName, job.DefaultXml);
+                        }
+                    }
+                });
+            }
+
+            Task.WhenAll(workers).GetAwaiter().GetResult();
+        }
 #else
         LastCoreXmlChannelJobCountForTests = jobs.Length;
         LastCoreXmlChannelWorkerCountForTests = 1;
