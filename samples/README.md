@@ -53,7 +53,8 @@
 ### Smoke 模式
 
 若只想確認範例能編譯執行並產生核心 ODF 文件，可使用環境變數切換到 smoke
-模式。此模式會略過 PDF、OOXML 與影像渲染等較重的轉檔展示，但仍會建立
+模式。此模式會完整略過 `DemoExtensions`（PDF、HTML、CSV、OOXML 轉檔、
+Collaboration JSON 往返與 RDF-SPARQL、影像渲染等展示），但仍會建立
 ODT、ODS、ODP、ODG、ODC、ODF、ODI、ODB 與串流輸出文件：
 
 ```powershell
@@ -70,8 +71,10 @@ dotnet run samples/Sample.cs
 
 1. **文字文件 (ODT) 建立與編排**：
    - 建立標題與段落，並套用粗體、斜體等字型樣式。
-   - 建立多層級清單。
+   - 建立有序清單。
    - 建立 3x2 的自訂表格，並寫入表頭與資料格。
+   - 使用 `OdfMailMergeEngine`（`document.MailMerge(...)`）示範郵件合併，以
+     `{{TableStart:Users}}...{{TableEnd:Users}}` 語法展開巢狀清單資料。
    - 插入二進位 PNG 影像。
 2. **試算表 (ODS) 建立與公式**：
    - 建立試算表並新增多個工作表。
@@ -79,10 +82,13 @@ dotnet run samples/Sample.cs
    - 實作 ODF 公式計算（如計算總和的 `SUM` 公式）。
    - 搜尋公式儲存格並輸出公式位址。
    - 套用儲存格樣式。
+   - 使用 `workbook.AddChart(...)` 新增內嵌長條圖，並以
+     `sheet.Ranges["A1:B5"].AddFilter(...)` 新增自動篩選 (AutoFilter)。
 3. **簡報 (ODP) 建立與轉場特效**：
    - 採用 `OdfKit` 專屬的 Fluent Builder 模式建立簡報。
    - 自訂投影片標題、文字框與幾何圖形 (Shape)。
    - 新增講者備忘錄 (Speaker Notes) 與投影片切換轉場 (Transition) 特效。
+   - 使用 `shape.Animate(OdfAnimationType.FadeIn, ...)` 為圖形設定進場動畫。
 4. **次要格式文件建立**：
    - 使用 `DrawingDocument` 建立 ODG 流程圖。
    - 使用 `ChartDocument` 建立 ODC 圖表。
@@ -95,7 +101,7 @@ dotnet run samples/Sample.cs
    - 驗證結果與在地化訊息會輸出到主控台，不額外產生獨立輸出檔案。
 6. **低記憶體高效能串流寫入 (OdsStreamWriter)**：
    - 示範在大數據情境下，以順序工作表寫入模式將記憶體佔用控制在小於 1 MB，流式寫入多達 100 列以上的表格明細，有效杜絕記憶體不足 (OOM) 錯誤。
-   - `SwitchToSheet` 支援交錯多工作表寫入，但會使用暫存緩衝，適合便利性優先而非嚴格低記憶體的情境。
+   - `SwitchToSheet` 支援交錯多工作表寫入，但會使用暫存緩衝，適合便利性優先而非嚴格低記憶體的情境（未在範例中實際執行，行為詳見 API 文件）。
 7. **中繼資料 (Metadata) 讀取與更新**：
    - 展示如何載入既有檔案、讀取文件 metadata 標題與建立者資訊，並進行修改更新與二次存檔。
 8. **進階轉檔與擴充套件整合**：

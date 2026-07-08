@@ -22,7 +22,7 @@ Office 或 Java 的情況下，建立、載入、保存、驗證並保留 ODF �
 | 相容性 | Package 與 DOM 來回讀寫會保留未知封裝專案、foreign XML、processing instructions、comments 與 prefix |
 | 驗證 | 內建 package / flat XML 檢查、ODF 1.4 schema metadata、profile rules、positive / negative corpus 測試 |
 | 在地化 | 透過 `OdfLocalizer` 提供多語系訊息與文化回退機制 |
-| 工具鏈 | CLI 提供 `validate`、`validate-corpus`、`info`、`metadata`、`sanitize`、`convert-flat`、`convert-csv` 與 `pack` |
+| 工具鏈 | CLI 提供 `validate`、`validate-corpus`、`info`、`metadata`、`sanitize`、`typed-dom-coverage`、`convert-flat`、`convert-csv` 與 `pack` |
 
 完整支援範圍請見 [ODF 格式支援矩陣](docs/odf-format-support.md)、
 [ODF Profile 來源](docs/odf-profile-sources.md)、

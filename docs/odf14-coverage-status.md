@@ -14,7 +14,7 @@
 ## Tracking Commands
 
 ```powershell
-dotnet run --project tools/OdfKit.Cli -- typed-dom-coverage
+dotnet run --project tools/OdfKit.Cli --framework net10.0 -- typed-dom-coverage
 dotnet test OdfKit.Tests/OdfKit.Tests.csproj -c Release --framework net10.0 --filter "FullyQualifiedName~OdfCoverageRoadmapTests"
 ```
 

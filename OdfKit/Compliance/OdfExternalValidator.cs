@@ -27,6 +27,10 @@ public static class OdfExternalValidator
     /// <exception cref="ArgumentException">當文件路徑或 JAR 路徑未提供時擲出</exception>
     /// <exception cref="FileNotFoundException">當文件或 JAR 不存在時擲出</exception>
     /// <exception cref="TimeoutException">當外部程序逾時時擲出</exception>
+    /// <remarks>
+    /// Prefer <see cref="ValidateWithOdfValidatorAsync(string, string?, string?, int, CancellationToken)"/> in server environments to avoid blocking request threads.
+    /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="ValidateWithOdfValidatorAsync(string, string?, string?, int, CancellationToken)"/> 以避免阻塞要求執行緒。
+    /// </remarks>
     public static OdfExternalValidatorResult ValidateWithOdfValidator(
         string filePath,
         string? jarPath = null,
@@ -91,6 +95,10 @@ public static class OdfExternalValidator
     /// <param name="filePath">要驗證的 ODF 文件路徑</param>
     /// <param name="timeoutMilliseconds">外部程序逾時毫秒數</param>
     /// <returns>外部驗證器執行結果</returns>
+    /// <remarks>
+    /// Prefer <see cref="ValidateWithCommandAsync(string, string, int, CancellationToken)"/> in server environments to avoid blocking request threads.
+    /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="ValidateWithCommandAsync(string, string, int, CancellationToken)"/> 以避免阻塞要求執行緒。
+    /// </remarks>
     public static OdfExternalValidatorResult ValidateWithCommand(
         string commandPath,
         string filePath,

@@ -7,7 +7,7 @@
 
 | 如果您要… | 建議先讀 | 再延伸閱讀 |
 |-----------|----------|------------|
-| 快速評估 OdfKit 是否符合需求 | [README](../README.md) | [套件目錄與選型指南](package-catalog.md)、[ODF 格式支援矩陣](odf-format-support.md) |
+| 快速評估 OdfKit 是否符合需求 | [README](../README.md) | [套件目錄與選型指南](package-catalog.md)、[ODF 格式支援矩陣](odf-format-support.md)、[效能對比報告](performance-comparison.md) |
 | 決定要安裝哪些套件 | [套件目錄與選型指南](package-catalog.md) | [NuGet 相容矩陣](nuget-compatibility-matrix.md)、[渲染後端部署](rendering-backend-deployment.md) |
 | 建立第一個範例或驗證 PoC | [快速開始](getting-started.md)、[核心 SDK 快速開始](core-quickstart.md) | [實作食譜](cookbook.md)、[samples/README.md](../samples/README.md) |
 | 了解內建 Profile 與多語系機制 | [ODF Profile 來源](odf-profile-sources.md) | [i18n 與在地化](i18n-localization.md)、[ODF 格式支援矩陣](odf-format-support.md) |
@@ -57,6 +57,7 @@
 | [Corpus Manifest 規則](corpus-manifest.md) | corpus manifest 契約 |
 | [CI/CD 驗證設計](ci-cd.md) | GitHub Actions 分層、逾時、煙霧測試與診斷產物規則 |
 | [效能基準線](performance-baselines.md) | 基準測試回歸關卡、穩定量測設定檔與基準線報告產生方式 |
+| [效能對比報告](performance-comparison.md) | `OdsStreamWriter` 與 MiniExcel、ClosedXML 之跨套件串流寫入實測對比、方法論限制與授權裁定 |
 | [GitHub Release 發佈指南](github-release-publishing.md) | 封裝、驗證與發佈步驟 |
 | [ODF 1.4 逐章稽核紀錄](odf14-gap-audit.md) | 對照 ODF 1.4 四份正式規格文本逐章比對 schema／驗證層／公式引擎缺口 |
 

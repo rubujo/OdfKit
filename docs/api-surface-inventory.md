@@ -21,14 +21,14 @@ rg -n "public .* Find[A-Z]|public .* Find\(" OdfKit\<domain> -g "*.cs"
 
 | 領域 | Builder 命中 | Add 命中 | Get 命中 | Set 命中 | Remove 命中 | Find 命中 | 判讀 |
 |--------|--------------|----------|----------|----------|-------------|-----------|------|
-| Chart | 10 | 3 | 15 | 24 | 1 | 7 | 已將依序列或軸向查找的 nullable API 改為 `Find*`。 |
-| Database | 0 | 18 | 14 | 10 | 6 | 8 | `Find*` 皆為單一 nullable lookup，符合契約；缺 builder 屬可接受，ODB 工作流程偏 CRUD。 |
-| Drawing | 22 | 34 | 20 | 0 | 0 | 4 | `Find*` 命中多為內部 helper 或屬性 initializer 呼叫；無集合型公開 `Find*` 違規。 |
-| Formula | 14 | 1 | 22 | 5 | 1 | 4 | 已將 token 集合查詢改為 `GetAll`，並將 annotation lookup 改為 `FindAnnotation`；`FindFirst` 保留為單一 lookup。 |
-| Image | 0 | 2 | 3 | 5 | 2 | 2 | 已將依框架名稱查找的 nullable image filter API 改為 `Find*`。 |
-| Presentation | 11 | 42 | 16 | 26 | 1 | 6 | 已將依名稱查找的 nullable page layout API 改為 `Find*`。 |
-| Spreadsheet | 20 | 51 | 65 | 34 | 4 | 4 | 已將公式儲存格集合查詢改為 `GetFormulaCells` overload，並將 sheet / cell annotation lookup 改為 `Find*`。 |
-| Text | 42 | 97 | 29 | 11 | 2 | 4 | `Find*` 命中為單一節點 helper；追蹤修訂 affected nodes 已改為 `GetAffectedNodesForFormatChange`。 |
+| Chart | 13 | 3 | 19 | 27 | 1 | 7 | 已將依序列或軸向查找的 nullable API 改為 `Find*`。 |
+| Database | 0 | 20 | 15 | 10 | 6 | 8 | `Find*` 皆為單一 nullable lookup，符合契約；缺 builder 屬可接受，ODB 工作流程偏 CRUD。 |
+| Drawing | 22 | 37 | 20 | 0 | 0 | 4 | `Find*` 命中多為內部 helper 或屬性 initializer 呼叫；無集合型公開 `Find*` 違規。 |
+| Formula | 20 | 1 | 22 | 5 | 1 | 4 | 已將 token 集合查詢改為 `GetAll`，並將 annotation lookup 改為 `FindAnnotation`；`FindFirst` 保留為單一 lookup。 |
+| Image | 0 | 3 | 3 | 7 | 2 | 2 | 已將依框架名稱查找的 nullable image filter API 改為 `Find*`。 |
+| Presentation | 11 | 43 | 19 | 26 | 1 | 6 | 已將依名稱查找的 nullable page layout API 改為 `Find*`。 |
+| Spreadsheet | 21 | 53 | 93 | 47 | 4 | 5 | 已將公式儲存格集合查詢改為 `GetFormulaCells` overload，並將 sheet / cell annotation lookup 改為 `Find*`；`Get` 命中大量成長主要來自 `ObjectDataReader<T>` 實作 `DbDataReader` 所需的欄位存取 API。 |
+| Text | 42 | 98 | 29 | 11 | 2 | 4 | `Find*` 命中為單一節點 helper；追蹤修訂 affected nodes 已改為 `GetAffectedNodesForFormatChange`。 |
 
 ## 已完成的破壞性重新命名
 

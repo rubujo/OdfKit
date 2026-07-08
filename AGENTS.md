@@ -15,6 +15,7 @@
   - `System.Security.Cryptography.Xml` (採用 MIT 授權)
   - `System.Security.Cryptography.Pkcs` (採用 MIT 授權)
   - `Sylvan.Data.Csv` (採用 MIT 授權)
+  - 另有依 TFM 條件引入之 BCL 套件（如 `net10.0` 限定的 `System.Numerics.Tensors`、`System.IO.Hashing`，與 `netstandard2.0` 之 polyfill 套件），詳見 `OdfKit.csproj`。
 - **授權協議**：**CC0-1.0 Universal** (專案原創程式碼屬公有領域；第三方套件維持其原 MIT 授權)。
 
 ---

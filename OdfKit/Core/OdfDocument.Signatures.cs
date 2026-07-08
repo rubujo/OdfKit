@@ -23,6 +23,10 @@ public abstract partial class OdfDocument
     /// 使用指定的 X.509 憑證簽署文件。
     /// </summary>
     /// <param name="certificate">The certificate used to sign the document. / 用於簽署文件的憑證。</param>
+    /// <remarks>
+    /// Prefer <see cref="SignAsync(X509Certificate2, CancellationToken)"/> in server environments to avoid blocking request threads.
+    /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="SignAsync(X509Certificate2, CancellationToken)"/> 以避免阻塞要求執行緒。
+    /// </remarks>
     public void Sign(X509Certificate2 certificate)
     {
         SignAsync(certificate).GetAwaiter().GetResult();

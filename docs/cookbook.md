@@ -158,6 +158,8 @@ drawing.Save("flow.odg");
 drawing.SaveAsSvg("flow.svg");
 ```
 
+`SaveAsSvg` 定義於 `OdfKit.Extensions.Html`（`OdfManagedTextExportExtensions`），此範例需另參考該套件。
+
 ## TDF JSON Collaboration 相容子集合
 
 ```csharp

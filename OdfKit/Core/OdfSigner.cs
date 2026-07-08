@@ -99,6 +99,10 @@ public static partial class OdfSigner
     /// <param name="package">要驗證的 ODF 封裝</param>
     /// <param name="options">簽署選項</param>
     /// <returns>詳細的數位簽章驗證結果</returns>
+    /// <remarks>
+    /// Prefer <see cref="VerifySignaturesAsync(OdfPackage, OdfSigningOptions?, CancellationToken)"/> in server environments to avoid blocking request threads.
+    /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="VerifySignaturesAsync(OdfPackage, OdfSigningOptions?, CancellationToken)"/> 以避免阻塞要求執行緒。
+    /// </remarks>
     public static OdfSignatureValidationResult VerifySignatures(OdfPackage package, OdfSigningOptions? options = null)
     {
         return VerifySignaturesAsync(package, options).GetAwaiter().GetResult();

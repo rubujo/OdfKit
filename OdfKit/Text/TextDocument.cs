@@ -681,6 +681,10 @@ public partial class TextDocument : OdfDocument
     /// </summary>
     /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
     /// <param name="dataSource">The merge data dictionary, whose keys correspond to merge field names in the template. / 套印資料字典，Key 對應範本中的合併欄位名稱。</param>
+    /// <remarks>
+    /// Prefer <see cref="StreamingMailMergeAsync(Stream, IDictionary{string, object}, CancellationToken)"/> in server environments to avoid blocking request threads.
+    /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="StreamingMailMergeAsync(Stream, IDictionary{string, object}, CancellationToken)"/> 以避免阻塞要求執行緒。
+    /// </remarks>
     public void StreamingMailMerge(Stream outputStream, IDictionary<string, object?> dataSource)
     {
         StreamingMailMergeAsync(outputStream, dataSource).GetAwaiter().GetResult();
@@ -693,6 +697,10 @@ public partial class TextDocument : OdfDocument
     /// <param name="templatePath">The template text document path. / 範本文字文件路徑。</param>
     /// <param name="outputStream">The target output file stream. / 輸出目標檔案串流。</param>
     /// <param name="dataSource">The merge data dictionary, whose keys correspond to merge field names in the template. / 套印資料字典，Key 對應範本中的合併欄位名稱。</param>
+    /// <remarks>
+    /// Prefer <see cref="OdfStreamingMailMerge.ApplyTemplateAsync(Stream, Stream, IDictionary{string, object}, CancellationToken)"/> in server environments to avoid blocking request threads.
+    /// 在 ASP.NET Core 等伺服器環境中，請優先使用 <see cref="OdfStreamingMailMerge.ApplyTemplateAsync(Stream, Stream, IDictionary{string, object}, CancellationToken)"/> 以避免阻塞要求執行緒。
+    /// </remarks>
     public static void StreamingMailMerge(string templatePath, Stream outputStream, IDictionary<string, object?> dataSource)
     {
         if (string.IsNullOrEmpty(templatePath))
