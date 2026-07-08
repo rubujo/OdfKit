@@ -122,4 +122,13 @@ public partial class OdfImageDocument
 
         return hrefs;
     }
+
+    /// <summary>
+    /// Adds multiple image frames and returns their package hrefs.
+    /// 新增多個影像框架並回傳其封裝 href。
+    /// </summary>
+    /// <param name="requests">The image frame requests. / 影像框架要求。</param>
+    /// <returns>The package hrefs written for the added images. / 新增影像寫入的封裝 href。</returns>
+    public IReadOnlyList<string> AddImages(IEnumerable<OdfImageFrameRequest> requests) =>
+        AddImageFrames(requests);
 }

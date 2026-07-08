@@ -398,6 +398,93 @@ Console.WriteLine(loadedChart.ChartTitle);
 Console.WriteLine(loadedChart.FindSeriesDataLabels(0)?.ShowCategoryName);
 ```
 
+## 建立進階實務圖表
+
+```csharp
+using OdfKit.Chart;
+using OdfKit.DOM;
+using OdfKit.Spreadsheet;
+
+using ChartDocument bubble = ChartDocument.CreateBubble(
+    "銷售機會泡泡圖",
+    new OdfBubbleChartSeriesRequest(
+        "Sales.$A$2:.$A$20",
+        "Sales.$B$2:.$B$20",
+        "Sales.$C$2:.$C$20",
+        "Sales.$B$1"));
+
+using ChartDocument stock = ChartDocument.CreateStock(
+    "OHLC 股票圖",
+    new OdfStockChartSeriesRequest(
+        "Stock.$B$2:.$B$31",
+        "Stock.$C$2:.$C$31",
+        "Stock.$D$2:.$D$31",
+        "Stock.$E$2:.$E$31",
+        "Stock.$F$2:.$F$31"));
+
+stock.ApplyStockMarkerStyle(new OdfStockMarkerStyle(
+    new OdfChartSurfaceStyle("GainStyle", FillColor: "#2E7D32"),
+    new OdfChartSurfaceStyle("LossStyle", FillColor: "#C62828"),
+    new OdfChartSurfaceStyle("RangeStyle", StrokeColor: "#555555")));
+
+using ChartDocument column3d = ChartDocument.FromTable(
+    "Sales",
+    new OdfCellRange(0, 0, 12, 3, "Sales"),
+    OdfChartPreset.Column3D,
+    "年度營收 3D 圖");
+
+column3d.Apply3DOptions(new OdfChart3DOptions
+{
+    Projection = OdfDr3dProjection.Perspective,
+    AngleOffset = 45,
+    LightingMode = true,
+    WallStyle = new OdfChartSurfaceStyle("WallStyle", FillColor: "#EEEEEE"),
+    FloorStyle = new OdfChartSurfaceStyle("FloorStyle", FillColor: "#DDDDDD"),
+    Lights =
+    {
+        new OdfChartLightRequest("(0 0 1)", "#FFFFFF", Enabled: true),
+    },
+});
+```
+
+## 檢查實務互通風險
+
+```csharp
+using OdfKit.Compliance;
+
+OdfPracticalCompatibilityReport report =
+    OdfPracticalCompatibilityValidator.Validate(
+        column3d,
+        OdfPracticalCompatibilityProfile.MicrosoftOfficeOdf);
+
+foreach (OdfPracticalCompatibilityIssue issue in report.Issues)
+{
+    Console.WriteLine($"{issue.RuleId}: {issue.Message}");
+    Console.WriteLine(issue.Suggestion);
+}
+```
+
+`OdfPracticalCompatibilityValidator` 偏向實務提示，不取代 OASIS schema 驗證。它會針對巨集／腳本、非可攜影像格式、巢狀文字方塊、複雜群組、樣式過度分裂、進階圖表與頁首頁尾版面等跨工具編輯風險給出建議。
+
+## 低魔法模板填值
+
+```csharp
+using OdfKit;
+using OdfKit.Text;
+
+using TextDocument template = TextDocument.Create();
+template.AddParagraph("客戶：{{Name}}");
+template.AddParagraph("金額：{{Amount}}");
+
+TemplateBinder.Bind(template, new Dictionary<string, object?>
+{
+    ["Name"] = "星河股份有限公司",
+    ["Amount"] = 1200,
+});
+
+template.Save("contract.odt");
+```
+
 ## 建立 ODF 公式（Fluent Builder）
 
 ```csharp

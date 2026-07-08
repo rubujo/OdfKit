@@ -270,6 +270,13 @@ public static partial class OdfLocalizer
             "RequireForeignExtensionIsolation" => "Place extensions in non-ODF namespaces and ensure they are removable.",
             "DisallowMacroByDefault" => "Remove macros, scripts, and event listeners, or use a policy allowing macros.",
             "RequireSafeExternalResourcePolicy" => "Use embedded resources or ensure external references comply with deployment policy.",
+            "PRAC0001" => "Remove macros or scripts when the file is expected to be edited across office suites.",
+            "PRAC0002" => "Prefer PNG, JPEG or SVG images for portable ODF editing.",
+            "PRAC0100" => "Flatten nested text boxes or verify the layout in the target office suite.",
+            "PRAC0101" => "Simplify nested graphic groups before exchanging the file across office suites.",
+            "PRAC0102" => "Reuse styles or simplify generated styling to reduce automatic style fragmentation.",
+            "PRAC0200" => "Use LibreOffice for final chart verification or provide a simpler chart fallback.",
+            "PRAC0300" => "Verify headers and footers in Microsoft Office or simplify page layout settings.",
             _ => "Correct the document content based on validation messages."
         };
     }

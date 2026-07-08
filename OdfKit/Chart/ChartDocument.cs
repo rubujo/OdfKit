@@ -83,6 +83,66 @@ public class ChartDocument : OdfChartDocument
     }
 
     /// <summary>
+    /// Creates a chart document from a spreadsheet-style table range and a practical preset.
+    /// 以試算表表格範圍與實務預設建立圖表文件。
+    /// </summary>
+    /// <param name="sheetName">The sheet name. / 工作表名稱。</param>
+    /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
+    /// <param name="preset">The chart preset. / 圖表預設。</param>
+    /// <param name="title">The optional chart title. / 選用的圖表標題。</param>
+    /// <param name="firstRowAsHeader">Whether the first row is treated as series labels. / 首列是否視為序列標籤。</param>
+    /// <param name="firstColumnAsLabel">Whether the first column is treated as category labels. / 首欄是否視為分類標籤。</param>
+    /// <returns>The created <see cref="ChartDocument"/>. / 建立完成的 <see cref="ChartDocument"/>。</returns>
+    public static ChartDocument FromTable(
+        string sheetName,
+        OdfCellRange range,
+        OdfChartPreset preset = OdfChartPreset.Bar,
+        string? title = null,
+        bool firstRowAsHeader = true,
+        bool firstColumnAsLabel = true)
+    {
+        ChartDocument document = Builder()
+            .WithPreset(preset)
+            .WithTitle(title)
+            .WithDataRange(sheetName, range, firstRowAsHeader, firstColumnAsLabel)
+            .Build();
+
+        return document;
+    }
+
+    /// <summary>
+    /// Creates a bubble chart document from explicit series requests.
+    /// 以明確序列要求建立泡泡圖文件。
+    /// </summary>
+    /// <param name="title">The optional chart title. / 選用的圖表標題。</param>
+    /// <param name="series">The bubble chart series requests. / 泡泡圖序列要求。</param>
+    /// <returns>The created <see cref="ChartDocument"/>. / 建立完成的 <see cref="ChartDocument"/>。</returns>
+    public static ChartDocument CreateBubble(string? title, params OdfBubbleChartSeriesRequest[] series)
+    {
+        ChartDocument document = Builder()
+            .WithTitle(title)
+            .WithBubbleSeries(series)
+            .Build();
+        return document;
+    }
+
+    /// <summary>
+    /// Creates a stock chart document from explicit OHLC series requests.
+    /// 以明確 OHLC 序列要求建立股票圖文件。
+    /// </summary>
+    /// <param name="title">The optional chart title. / 選用的圖表標題。</param>
+    /// <param name="series">The stock chart series requests. / 股票圖序列要求。</param>
+    /// <returns>The created <see cref="ChartDocument"/>. / 建立完成的 <see cref="ChartDocument"/>。</returns>
+    public static ChartDocument CreateStock(string? title, params OdfStockChartSeriesRequest[] series)
+    {
+        ChartDocument document = Builder()
+            .WithTitle(title)
+            .WithStockSeries(series)
+            .Build();
+        return document;
+    }
+
+    /// <summary>
     /// Creates a fluent builder for a high-level chart document.
     /// 建立高階圖表文件 Fluent builder。
     /// </summary>

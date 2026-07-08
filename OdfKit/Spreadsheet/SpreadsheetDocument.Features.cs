@@ -261,6 +261,35 @@ public partial class SpreadsheetDocument
     }
 
     /// <summary>
+    /// Inserts a practical preset chart bound to a worksheet range.
+    /// 插入繫結至工作表範圍的實務預設圖表。
+    /// </summary>
+    /// <param name="sheetName">The worksheet name. / 工作表名稱。</param>
+    /// <param name="anchor">The top-left anchor cell. / 左上角錨定儲存格。</param>
+    /// <param name="range">The source cell range. / 來源儲存格範圍。</param>
+    /// <param name="preset">The chart preset. / 圖表預設。</param>
+    /// <param name="title">The optional chart title. / 選用的圖表標題。</param>
+    /// <returns>The created frame node. / 建立完成的框架節點。</returns>
+    public OdfNode AddChartFromRange(
+        string sheetName,
+        OdfCellAddress anchor,
+        OdfCellRange range,
+        OdfChartPreset preset = OdfChartPreset.Bar,
+        string? title = null)
+    {
+        var definition = new OdfChartDefinition
+        {
+            ChartType = preset.ToChartType(),
+            DataRange = range,
+            Title = title ?? string.Empty,
+            HasLegend = true
+        };
+
+        AddChart(sheetName, anchor, definition);
+        return GetEmbeddedChartFrame(sheetName);
+    }
+
+    /// <summary>
     /// 累加錨點儲存格前所有列高／欄寬，計算 draw:frame 的絕對 svg:x／svg:y 偏移（單位：公分）。
     /// 未明確設定列高／欄寬的儲存格採用 LibreOffice Calc 預設值（列高 0.45cm、欄寬 2.267cm）估算。
     /// </summary>
@@ -282,6 +311,29 @@ public partial class SpreadsheetDocument
         }
 
         return (xCm, yCm);
+    }
+
+    private OdfNode GetEmbeddedChartFrame(string sheetName)
+    {
+        OdfTableSheet? sheet = FindSheet(sheetName);
+        if (sheet is null)
+        {
+            throw new KeyNotFoundException(OdfLocalizer.GetMessage("Err_SpreadsheetDocument_SheetNamedCannotFound_2", sheetName));
+        }
+
+        OdfNode shapesNode = OdfTableSheetDomHelper.FindOrCreateTableShapes(sheet.TableNode);
+        for (int i = shapesNode.Children.Count - 1; i >= 0; i--)
+        {
+            OdfNode child = shapesNode.Children[i];
+            if (child.NodeType is OdfNodeType.Element &&
+                child.LocalName == "frame" &&
+                child.NamespaceUri == OdfNamespaces.Draw)
+            {
+                return child;
+            }
+        }
+
+        return shapesNode;
     }
 
     private static void AppendChartSeriesXml(StringBuilder sb, OdfChartDefinition chart, string chartClass)

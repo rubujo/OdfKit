@@ -117,6 +117,53 @@ public sealed class DrawingDocumentBuilder
     }
 
     /// <summary>
+    /// Adds a page containing a connected flow diagram.
+    /// 新增包含已連接流程圖的頁面。
+    /// </summary>
+    /// <param name="pageName">The page name. / 頁面名稱。</param>
+    /// <param name="steps">The flow steps. / 流程步驟。</param>
+    /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
+    public DrawingDocumentBuilder AddFlow(
+        string pageName,
+        IEnumerable<OdfFlowStepRequest> steps,
+        OdfConnectorType connectorType = OdfConnectorType.Straight)
+    {
+        if (steps is null)
+        {
+            throw new ArgumentNullException(nameof(steps));
+        }
+
+        OdfFlowStepRequest[] snapshot = steps.ToArray();
+        return AddPage(pageName, page =>
+        {
+            for (int i = 0; i < snapshot.Length; i++)
+            {
+                OdfFlowStepRequest step = snapshot[i];
+                page.AddFlowStep(step.Id, step.Text, i, step.ShapeType);
+                if (i > 0)
+                {
+                    page.AddConnector(snapshot[i - 1].Id, step.Id, connectorType);
+                }
+            }
+        });
+    }
+
+    /// <summary>
+    /// Adds a default-named page containing a connected flow diagram.
+    /// 新增包含已連接流程圖的預設命名頁面。
+    /// </summary>
+    /// <param name="steps">The flow steps. / 流程步驟。</param>
+    /// <param name="connectorType">The connector geometry type. / 連接線幾何類型。</param>
+    /// <returns>The current builder instance. / 目前 builder 執行個體。</returns>
+    public DrawingDocumentBuilder AddFlow(
+        IEnumerable<OdfFlowStepRequest> steps,
+        OdfConnectorType connectorType = OdfConnectorType.Straight)
+    {
+        return AddFlow($"Page {_pageCount + 1}", steps, connectorType);
+    }
+
+    /// <summary>
     /// Builds and returns the drawing document.
     /// 建立並傳回繪圖文件。
     /// </summary>

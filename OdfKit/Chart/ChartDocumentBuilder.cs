@@ -1,4 +1,5 @@
 ﻿using System;
+using OdfKit.DOM;
 using OdfKit.Spreadsheet;
 using OdfKit.Styles;
 
@@ -38,6 +39,29 @@ public sealed class ChartDocumentBuilder
             OdfChartType.Stock => "chart:stock",
             _ => "chart:bar"
         };
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the chart type and practical defaults from a preset.
+    /// 依圖表預設設定圖表類型與實務預設值。
+    /// </summary>
+    /// <param name="preset">The chart preset. / 圖表預設。</param>
+    /// <returns>The current builder. / 目前 builder。</returns>
+    public ChartDocumentBuilder WithPreset(OdfChartPreset preset)
+    {
+        WithType(preset.ToChartType());
+        if (preset.IsThreeDimensional())
+        {
+            _document.Apply3DOptions(new OdfChart3DOptions
+            {
+                Enabled = true,
+                AngleOffset = 45,
+                Projection = OdfDr3dProjection.Perspective,
+                LightingMode = true
+            });
+        }
 
         return this;
     }
@@ -154,6 +178,63 @@ public sealed class ChartDocumentBuilder
         OdfChartSeries series = _document.GetSeriesEditor(index);
         ApplyStyleSetToSeries(series, index);
         configure(new ChartSeriesBuilder(series));
+        return this;
+    }
+
+    /// <summary>
+    /// Replaces the chart data with bubble chart series.
+    /// 以泡泡圖序列取代圖表資料。
+    /// </summary>
+    /// <param name="series">The bubble chart series requests. / 泡泡圖序列要求。</param>
+    /// <returns>The current builder. / 目前 builder。</returns>
+    public ChartDocumentBuilder WithBubbleSeries(params OdfBubbleChartSeriesRequest[] series)
+    {
+        _document.SetBubbleSeries(series);
+        ApplyStyleSetToAllSeries();
+        return this;
+    }
+
+    /// <summary>
+    /// Replaces the chart data with stock chart series.
+    /// 以股票圖序列取代圖表資料。
+    /// </summary>
+    /// <param name="series">The stock chart series requests. / 股票圖序列要求。</param>
+    /// <returns>The current builder. / 目前 builder。</returns>
+    public ChartDocumentBuilder WithStockSeries(params OdfStockChartSeriesRequest[] series)
+    {
+        _document.SetStockSeries(series);
+        ApplyStyleSetToAllSeries();
+        return this;
+    }
+
+    /// <summary>
+    /// Applies practical 3D chart options.
+    /// 套用實務 3D 圖表選項。
+    /// </summary>
+    /// <param name="configure">The 3D options configuration delegate. / 3D 選項設定委派。</param>
+    /// <returns>The current builder. / 目前 builder。</returns>
+    public ChartDocumentBuilder With3D(Action<OdfChart3DOptions> configure)
+    {
+        if (configure is null)
+        {
+            throw new ArgumentNullException(nameof(configure));
+        }
+
+        var options = new OdfChart3DOptions();
+        configure(options);
+        _document.Apply3DOptions(options);
+        return this;
+    }
+
+    /// <summary>
+    /// Applies practical stock marker styles.
+    /// 套用實務股票圖標記樣式。
+    /// </summary>
+    /// <param name="style">The stock marker style. / 股票圖標記樣式。</param>
+    /// <returns>The current builder. / 目前 builder。</returns>
+    public ChartDocumentBuilder WithStockMarkers(OdfStockMarkerStyle style)
+    {
+        _document.ApplyStockMarkerStyle(style);
         return this;
     }
 
